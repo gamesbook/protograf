@@ -19,13 +19,32 @@ Simple
 =========== ==================================================================
 Title       *Simple BoardGameGeek Example*
 ----------- ------------------------------------------------------------------
-Source Code `example01.py <https://github.com/gamesbook/protograf/blob/master/examples/bgg/example01.py>`_
+Source Code `example01.py <https://github.com/gamesbook/protograf/blob/master/examples/bgg/cards_bgg_basic.py>`_
 ----------- ------------------------------------------------------------------
 Discussion  This example shows how to construct a set of cards - one per game -
             using the BoardGameGeek API, accessed via the
             https://github.com/SukiCZ/boardgamegeek Python library.
 
 ----------- ------------------------------------------------------------------
-Screenshot  .. image:: images/bgg/example01.png
+Screenshot  .. image:: images/bgg/bgg_cards_basic.png
+               :width: 90%
+=========== ==================================================================
+
+
+Images
+======
+`↑ <table-of-contents_>`_
+
+=========== ==================================================================
+Title       *BoardGameGeek Example with Images and Custom Values*
+----------- ------------------------------------------------------------------
+Source Code `example01.py <https://github.com/gamesbook/protograf/blob/master/examples/bgg/cards_bgg_thumb.py>`_
+----------- ------------------------------------------------------------------
+Discussion  This example shows how to construct a set of cards - one per game -
+            using the BoardGameGeek API, accessed via the
+            https://github.com/SukiCZ/boardgamegeek Python library.
+
+----------- ------------------------------------------------------------------
+Screenshot  .. image:: images/bgg/bgg_cards_thumb.png
                :width: 90%
 =========== ==================================================================

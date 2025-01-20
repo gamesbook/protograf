@@ -10,3 +10,8 @@ div.highlight-python {
     border-top: 1px solid #ac9;
     border-bottom: 1px solid #ac9;
 }
+div.highlight {
+    background-color: #f4debf;
+    border-top: 1px solid #ac9;
+    border-bottom: 1px solid #ac9;
+}

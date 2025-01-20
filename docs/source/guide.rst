@@ -25,14 +25,14 @@ other.
     available and how to construct and customise them
 8.  :doc:`Card Decks <card_decks>` - how to create a deck, or set, of
     cards/tiles; more detail also in the :doc:`Deck command <deck_command>`
-9.  :doc:`Additional Commands < additional_commands>` - special commands not part
+9.  :doc:`Additional Commands <additional_commands>` - special commands not part
     of the core shapes
-10.  :doc:`Advanced Commands <advanced_commands>` - how to work with
+10. :doc:`Advanced Commands <advanced_commands>` - how to work with
     common/reused items and repetitive elements
 11. :doc:`Customised Shapes <customised_shapes>` - how to refine the
     appearance of certain shapes; circles, hexagons and rectangles
-12. :doc:`Layouts <layouts>` - how to work with different kinds of
-    layouts; repeats, sequences, tracks and rectangular grids
+12. :doc:`Repetitive Elements <layouts>` - how to work with repeats, sequences,
+    tracks and grid layouts
 13. :doc:`Hexagonal Grids <hexagonal_grids>` - how to create different types
     of hexagonal grids and customise or add to them
 14. :doc:`Terminology <terminology>` - summary of common jargon and descriptions

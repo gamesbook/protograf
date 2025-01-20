@@ -45,7 +45,6 @@ These are:
 - **EXPANSION** -
 - **EXPANSIONS** -
 - **FAMILIES** -
-- **GET_DESCRIPTION_SHORT** -
 - **ID** -
 - **IMAGE** -
 - **IMPLEMENTATIONS** -

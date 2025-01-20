@@ -1,6 +1,6 @@
-=======
-Layouts
-=======
+===================
+Repetitive Elements
+===================
 
 This section assumes you are very familiar with the concepts, terms and ideas
 for :doc:`protograf <index>`  as presented in the
@@ -14,8 +14,8 @@ Table of Contents
 =================
 
 -  `Overview`_
--  `Command Summary`_
--  `Command Details`_
+-  `Commands Summary`_
+-  `Commands Details`_
 
 Overview
 ========
@@ -23,37 +23,48 @@ Overview
 
 **protograf** allows you to directly define where elements, that make up
 your design, should be placed within a page, or over a series of pages
-within a ``Deck``, but it also includes commands that let you place, or
-"layout", elements in a more repetitive or regular way within a page.
+within a :doc:`Deck <card_decks>`, but it also includes commands that let
+you place, or "layout", elements in a more repetitive or regular way
+within a page.
 
-To support this, **protograf** includes a number of different kinds of
-**layouts**.
+Sequences
+---------
 
-Sequences and Tracks
---------------------
-
-The most basic layout is that of a simple **sequence**, with elements
+The most basic repetition is that of a simple **sequence**, with elements
 placed at regular x- and y-positions in a linear direction.
 
-In a similar way elements can be placed along a **track**. The track can
-be defined as the border of a rectangle or polygon shape; or at specific
-angles along the circumference of a circle. The properties needed to
-construct this kind of layout differ slightly from that of a simple
-linear layout but the principle is the same. The track can be visible,
-or not.
+Repeats
+-------
 
-Grid-based Locations
---------------------
+The other fairly basic repetition is that of a **repeat**, with elements
+placed at grid locations within a page.
 
-The other way that elements can be laid out on a page is through a
-grid **locations**. In **protograf**, such a grid can be derived from
-various of the built-in shapes - for example, ``Hexagons`` - or it can
-be constructed using a supplied set of properties. Because these grids
-do not themselves appear on the page, they are termed "virtual grids".
+Tracks
+------
+
+Elements can also be placed repetitively along a **track**.
+
+A track can be defined as the border of a rectangle or polygon shape;
+or at specific angles along the circumference of a circle.
+
+The properties needed to construct this kind of repetition differ
+slightly from that of a simple linear one but the principle is the
+same. The track can be visible, or not.
+
+Locations and Layouts
+---------------------
+
+The other way that elements can be laid out repetitively on a page
+is through grid **locations**.
+
+In **protograf**, such a grid can be derived from various built-in shapes -
+for example, ``Hexagons`` - or it can be constructed using a supplied set
+of properties. Because these grids do not themselves appear on the page,
+they are termed *"virtual grids"*.
 
 A virtual grid is **not** specifically drawn on the page; rather it creates
-a set of point locations at which elements can be drawn. This set of points
-can be used for creating a layout by:
+a set of point locations at which other elements can be drawn. This set of
+points can be used for creating a **layout** by:
 
 1. providing a sequence or list of elements, which are then drawn in the
    order specified by the "virtual grid" points, starting from a known point
@@ -61,7 +72,7 @@ can be used for creating a layout by:
 2. refering to each point directly, by using the identity of its locations,
    and then drawing the element using that point’s position.
 
-.. NOTE::
+.. HINT::
 
     The *first approach* is useful when the entire grid will be filled with a
     single element (or a repeating set of elements), and the *second approach*
@@ -70,8 +81,8 @@ can be used for creating a layout by:
     very specific - and possibly irregular - places that the script specifies.
 
 
-Command Summary
-===============
+Commands Summary
+================
 `↑ <table-of-contents_>`_
 
 Very briefly, the different kinds of layout commands are as follows.
@@ -96,12 +107,12 @@ Grid-based layouts, where elements appear in two-dimensional space:
    in a triangular pattern; these x- and y-values will set the
    centre of any element being placed on the grid
 
-These Location-types are paired with the **Layout()** command, which
-links them with the shapes that are to be drawn at their locations.
+These location-types are paired with a **Layout()** command, which
+links them with the shapes that need to be drawn at their locations.
 
 
-Command Details
-===============
+Commands Details
+================
 `↑ <table-of-contents_>`_
 
 The commands are described in detail, with examples, in these sections:
@@ -111,3 +122,8 @@ The commands are described in detail, with examples, in these sections:
 - :doc:`Track <layouts_track>`
 - :doc:`RectangularLocations <layouts_rectangular>`
 - :doc:`TriangularLocations <layouts_triangular>`
+
+.. HINT::
+
+    :doc:`Hexagonal Grids <hexagonal_grids>` are a special kind of repetition
+    that can be more specifically customised.

@@ -9,9 +9,9 @@ Notes:
 """
 from protograf import *
 
-Create(filename="cards_bgg.pdf", margin_bottom=1.75)
+Create(filename="cards_bgg_basic.pdf", margin_bottom=1.75)
 
-# number of games to retrieve
+# ID numbers of games to retrieve
 choice = range(1, 10)
 
 # BGG game data -> progress is True so we can see the rate of retrieval

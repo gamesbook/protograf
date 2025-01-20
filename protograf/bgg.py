@@ -177,7 +177,7 @@ class BGGGame():
             with open(str(filename), 'rb') as filehandler:
                 the_game = pickle.load(filehandler)
                 return the_game, True
-                print(f' !!! loaded {game_file} for GameID#{game_id}')
+                # print(f' !!! loaded {game_file} for GameID#{game_id}')
         except:
             try:
                 the_game = self.bgg.game(game_id=game_id)
@@ -208,7 +208,7 @@ class BGGGame():
         filename = Path(self.cache_directory / game_file)
         with open(str(filename), 'wb') as file_pickle:
             pickle.dump(self._game, file_pickle)
-        print(f' !!! saved {game_file} for GameID#{game_id}')
+        # print(f' !!! saved {game_file} for GameID#{game_id}')
 
     def get_description_short(self):
         """Create an abbreviated description for a game."""

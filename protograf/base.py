@@ -1376,13 +1376,13 @@ class BaseShape:
                 return True
         return False
 
-    def load_image(self, source=None, scaling=None, cache_directory=None) -> tuple:
+    def load_image(self, image_location=None, scaling=None, cache_directory=None) -> tuple:
         """Load an image from file or website.
 
-        Attempt to use local cache directory to source an image
+        Attempt to use local cache directory to retrieve an image
         for web-based assets, if possible.
 
-        If source not found; try path in which script located.
+        If image_location not found; try path in which script located.
 
         Returns:
             tuple:
@@ -1409,59 +1409,59 @@ class BaseShape:
             drawing.scale(scaling_x, scaling_y)
             return drawing
 
-        def image_reader(source) -> object:
-            """Attempt to load first from local, then source."""
+        def image_reader(image_location) -> object:
+            """Attempt to load first from local, then image_location."""
             img = None
-            breakpoint()
             if cache_directory:
-                if tools.is_url_valid(source):
-                    loc = urlparse(source)
+                if tools.is_url_valid(image_location):
+                    loc = urlparse(image_location)
                     filename = loc.path.split("/")[-1]
-                    _source = os.path.join(cache_directory, filename)
-                    if os.path.exists(_source):
-                        img = ImageReader(_source)
+                    _image_location = os.path.join(cache_directory, filename)
+                    if os.path.exists(_image_location):
+                        img = ImageReader(_image_location)
             if not img:
-                img = ImageReader(source)
+                img = ImageReader(image_location)
+            return img
 
         img = None
         svg = False
         is_directory = False
         try:
-            source_ext = source.strip()[-3:]
-            # tools.feedback(f'Loading type: {source_ext}')
-            if source_ext.lower() == 'svg':
+            image_location_ext = image_location.strip()[-3:]
+            # tools.feedback(f'Loading type: {image_location_ext}')
+            if image_location_ext.lower() == 'svg':
                 svg = True
         except Exception:
             pass
-        if source:
+        if image_location:
             try:
                 if svg:
-                    if not os.path.exists(source):
+                    if not os.path.exists(image_location):
                         raise IOError
-                    img = svg2rlg(source)
+                    img = svg2rlg(image_location)
                     if scaling:
                         img = scale_image(img, scaling)
                 else:
-                    img = image_reader(source)
+                    img = image_reader(image_location)
                 return img, svg, is_directory
             except IOError:
                 filepath = tools.script_path()
-                _source = os.path.join(filepath, source)
+                _image_location = os.path.join(filepath, image_location)
                 try:
                     if svg:
-                        if not os.path.exists(_source):
+                        if not os.path.exists(_image_location):
                             raise IOError
-                        img = svg2rlg(_source)
+                        img = svg2rlg(_image_location)
                         if scaling:
                             img = scale_image(img, scaling_factor=scaling)
                     else:
-                        img = ImageReader(_source)
+                        img = ImageReader(_image_location)
                     return img, svg, is_directory
                 except IOError:
                     ftype = 'SVG ' if svg else ''
-                    if not os.path.isdir(_source):
+                    if not os.path.isdir(_image_location):
                         tools.feedback(
-                            f'Unable to find or open {ftype}image "{_source}";'
+                            f'Unable to find or open {ftype}image "{_image_location}";'
                             f' including {filepath}.')
                     else:
                         is_directory = True

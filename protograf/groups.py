@@ -225,7 +225,7 @@ class CardShape(BaseShape):
                         custom_new_ele = self.handle_custom_values(flat_new_ele, iid)
                         if isinstance(custom_new_ele, SequenceShape):
                             custom_new_ele.deck_data = self.deck_data
-                        tools.feedback(f'$$$ draw_card $$$ {custom_new_ele=}')
+                        # tools.feedback(f'$$$ draw_card $$$ {custom_new_ele=}')
                         custom_new_ele.draw(cnv=cnv, off_x=_dx, off_y=_dy, ID=iid, **kwargs)
 
             except Exception as err:
