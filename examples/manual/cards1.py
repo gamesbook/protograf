@@ -7,5 +7,5 @@ Created on: 29 February 2016
 from protograf import *
 
 Create()
-Deck())
+Deck()
 Save()

@@ -29,7 +29,7 @@ for squares in range(len(text) + 1):
             y = y + 1
             z = 0.5
             continue
-        Rectangle(side=0.5, x=z, y=y, label=text[t])
+        Rectangle(side=0.5, rounding=0.1, x=z, y=y, label=text[t])
     PageBreak()
 
 # ---- line 2
@@ -45,12 +45,12 @@ for squares in range(len(text) + 1):
             y = y - 1
             z = 0.5
             continue
-        Rectangle(side=0.5, x=z, y=y, label=text[t])
+        Rectangle(side=0.5, rounding=0.1, x=z, y=y, label=text[t])
     PageBreak()
 
 Save(
-     output='gif',
-     directory="docs/examples/images/various",
-     dpi=300,
-     framerate=0.1, # seconds-delay-per-frame
+    output='gif',
+    directory="docs/source/examples/images/various",
+    dpi=300,
+    framerate=0.1, # seconds-delay-per-frame
 )

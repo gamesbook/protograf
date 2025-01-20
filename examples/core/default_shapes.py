@@ -213,7 +213,7 @@ PageBreak()
 
 Save(output='png',
      dpi=300,
-     directory="docs/images/defaults",
+     directory="docs/source/images/defaults",
      names=[
         'blueprint', 'blueprint-sub', 'text', 'line', 'rectangle',
         'circle', 'hexagon-flat', 'hexagon-pointy', 'rhombus',

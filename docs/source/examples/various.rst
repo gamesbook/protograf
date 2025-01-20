@@ -128,7 +128,7 @@ Discussion  This example shows how to construct a simple effect by combining
             details.
 ----------- ------------------------------------------------------------------
 Screenshot  .. image:: images/various/chords.png
-               :width: 50%
+               :width: 30%
 =========== ==================================================================
 
 
