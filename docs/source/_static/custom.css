@@ -15,6 +15,6 @@ div.highlight {
     border-top: 1px solid #ac9;
     border-bottom: 1px solid #ac9;
 }
-table td p {
+table tbody tr td p {
     margin-bottom: 30px; /* between paragraphs */
 }

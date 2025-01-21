@@ -196,7 +196,9 @@ Example 3. Full bleed
 
 ===== ======
 |d03| This example shows the definition of a deck for a set of small
-      cards. The card size means that there will be 4 rectangular cards
+      cards.
+
+      The card size means that there will be 4 rectangular cards
       on each A8 page:
 
       .. code:: python
@@ -209,10 +211,13 @@ Example 3. Full bleed
             bleed_fill=grey)
 
       The bleed area for the card can also be extended to the whole page
-      (up to the margins) by using the *bleed_fill* color. In this example
-      it's shown as a different color from the Cards' bleed, so that it's
-      clear what its coverage is, but usually these colors would match - see
-      also `Example 5. Grid Marks`_ below.
+      (up to the margins) by using the *bleed_fill* color.
+
+      In this example, the *bleed_fill* is shown as a different color from
+      the Card's bleed, so it's clear what its coverage is, but usually
+      these colors would match.
+
+      See also `Example 5. Grid Marks`_ below.
 
 ===== ======
 
@@ -226,7 +231,9 @@ Example 4. Offset
 
 ===== ======
 |d04| This example shows the definition of a deck for a set of small
-      cards. The card size means that there will be 4 rectangular cards
+      cards.
+
+      The card size means that there will be 4 rectangular cards
       on each A8 page:
 
       .. code:: python
@@ -263,7 +270,9 @@ Example 5. Grid Marks
 
 ===== ======
 |d05| This example shows the definition of a deck for a set of small
-      cards. The card size means that there will be 4 rectangular cards
+      cards.
+
+      The card size means that there will be 4 rectangular cards
       on each A8 page:
 
       .. code:: python
@@ -302,7 +311,9 @@ Example 6. Card Spacing
 
 ===== ======
 |d06| This example shows the definition of a deck for a set of small
-      cards. The card size means that there will be 4 rectangular cards
+      cards.
+
+      The card size means that there will be 4 rectangular cards
       on each A8 page:
 
       .. code:: python
@@ -320,10 +331,11 @@ Example 6. Card Spacing
             spacing_y=0.15)
 
       Depending on the priniting and cutting requirements, it can be useful
-      to add spacing (unused area) between the cards.  The *spacing* property
-      sets spacing distance in both x- and y-directions; but it can also be
-      set for each individually (using **spacing_x** for horizontal spacing
-      and **spacing_y** for vertical spacing).
+      to add spacing (unused area) between the cards.
+
+      The *spacing* property sets spacing distance in both x- and y-directions;
+      but it can also be set for each individually |dash| using **spacing_x**
+      for horizontal spacing and **spacing_y** for vertical spacing.
 
       Using spacing also adds extra grid marks.
 
@@ -360,11 +372,14 @@ Example 7. Clean Layout
             grid_length=0.18,
             spacing=0.15)
 
-      By keeping all the other adjustments to the Deck layout - *bleed_fill*,
-      *offset*, *grid_marks* and (possibly) *spacing* - but disabling the
-      drawing of the Card frames by setting ``stroke=None``, the result is a
-      "clean" layout where small mistakes in cutting will mean cards are
-      still retain a fair visual appearance.
+      Here, all the other adjustments to the Deck layout |dash| *bleed_fill*,
+      *offset*, *grid_marks* and (possibly) *spacing* are as above.
+
+      In this example, drawing of the Card frames is disabled by setting
+      ``stroke=None``.
+
+      The result is a "clean" layout where small mistakes in cutting will mean
+      cards can still retain a fair visual appearance.
 
 ===== ======
 
@@ -378,7 +393,9 @@ Example 8. Column Limit
 
 ===== ======
 |d08| This example shows the definition of a deck for a set of small
-      cards. The card size means that there will be 4 rectangular cards
+      cards.
+
+      The card size means that there will be 4 rectangular cards
       on each A8 page:
 
       .. code:: python
@@ -395,8 +412,10 @@ Example 8. Column Limit
             cols=1)
 
       By default, **protograf** will fit as many cards as possible into the
-      available page area.  If for any reason, there need to be less cards on
-      a page, then setting the *cols* property will limit the creation of the
+      available page area.
+
+      If for any reason, there needs to be fewer cards on a page, then setting
+      the *cols* property will limit the creation of the
       number of columns on each one.
 
 ===== ======
@@ -411,7 +430,9 @@ Example 9. Row Limit
 
 ===== ======
 |d09| This example shows the definition of a deck for a set of small
-      cards. The card size means that there will be 4 rectangular cards
+      cards.
+
+      The card size means that there will be 4 rectangular cards
       on each A8 page:
 
       .. code:: python
@@ -428,8 +449,10 @@ Example 9. Row Limit
             rows=1)
 
       By default, **protograf** will fit as many cards as possible into the
-      available page area.  If for any reason, there need to be less cards on
-      a page, then setting the *rows* property will limit the creation of the
+      available page area.
+
+      If for any reason, there needs to be fewer cards on a page, then
+      setting the *rows* property will limit the creation of the
       number of rows on each one.
 
 ===== ======
