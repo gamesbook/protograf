@@ -534,7 +534,9 @@ e.g. ``n s`` to draw both lines on both north **and** south sides.
         )
 
       The top rectangle has a *fill* but no *stroke* i.e. no lines are drawn
-      around it. There are two *borders* that are set in the list (shown in
+      around it.
+
+      There are two *borders* that are set in the list (shown in
       the square brackets going from ``[`` to ``]``):
 
       - first border sets a thick grey dotted line for the top (north) edge
@@ -1427,8 +1429,8 @@ Subdivisions
       - *stroke_width* - set to ``0.5``; this slightly thicker primary line makes
         the grid more visible
 
-     Note that *subdivisions* do not have any numbering and are automatically
-     drawn with a *dotted* style.
+      Note that *subdivisions* do not have any numbering and are automatically
+      drawn with a thinner line in a *dotted* style.
 
 ===== ======
 
