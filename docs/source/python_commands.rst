@@ -64,6 +64,7 @@ Any statement or functionality that is part of the Python programming language
 can be used in a script if you want to. The ones below are just to give
 you some idea of "the basics".
 
+.. _python-loop:
 
 Loops
 =====
@@ -207,6 +208,7 @@ For example:
      for x, y, fill in zip(x_pos, y_pos, fills):
          Circle(cx=x, cy=y, fill=fill)
 
+.. _python-if:
 
 If Statements
 =============
@@ -322,13 +324,15 @@ are handled with an ``elif`` prefix |dash| short for "else if":
 In this example, the driver might be unsure what to do if the light has
 malfunctioned - best to be safe!
 
+.. _python-function:
 
 Functions
 =========
 `↑ <table-of-contents_>`_
 
 A function is the workhorse of a language.  It allows you to define your
-"recipe" and then use that recipe multiple times with differing properties.
+"recipe" and then use that recipe multiple times with differing values
+for its properties.
 
 Effectively, it allows you to create a mini  **protograf** script inside your
 main script. As with `loops`_, functions embed a set of steps to be carried when
@@ -337,13 +341,13 @@ control of the behaviour of **any** of the properties or commands that are part
 of them.
 
 A function is simply created by using a ``def`` command, followed by the name you
-want to give the function  |dash| using a word with **no** spaces in it  |dash|
+want to give the function |dash| using a word with **no** spaces in it |dash|
 followed by the set of property names and their default values.  These properties
 are only available as part of the function, and represent aspects of that function
 that you need to be able to change every time the function is used.
 
-The ``def`` line is followed by one or more lines that are all indented below
-each other; these represent the actions that are to be carried out in that
+The ``def`` line is followed by one or more lines that are all indented and
+all aligned; these represent the actions that are to be carried out in that
 functions; this can include drawing of shapes, but could also involve use of
 `loops`_ and `if statements`_.
 

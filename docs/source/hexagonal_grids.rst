@@ -6,6 +6,7 @@ Hexagonal Grids
    :trim:
 .. |deg|  unicode:: U+00B0 .. DEGREE SIGN
    :ltrim:
+.. |dash| unicode:: U+2014 .. EM DASH SIGN
 
 This section assumes you are very familiar with the concepts, terms and
 ideas for :doc:`protograf <index>` as presented in the
@@ -357,18 +358,23 @@ when a grid is designed for a scenario where not all hexagons are needed.
 
       In the green pointy grid:
 
-      - *hidden* - this is a list, shown by the square brackets
-        (``[`` to ``]``), of one or more sets of row and column numbers,
-        each pair enclosed by the round brackets;
-        the second and third columns are hidden in both the first and the
-        third row
+      - *hidden* - a list (``[`` to ``]``) of row and column numbers
+
+      The row and column numbers are in the form of one or more sets; with
+      each pair enclosed by round brackets.
+
+      In this example, the second and third columns are hidden in both the
+      first and the third row.
 
       In the white flat grid:
 
-      - *hidden* - this is a string, which should contain one or more
-        pairs of row and column numbers, each pair separated by a space;
-        here the second row hexagon is hidden in both first and second
-        columns
+      - *hidden* - a string of row and column numbers
+
+      The pairs of comma-delimited row and column numbers are each separated
+      by a space.
+
+      In this example, the second row hexagon is hidden in both first and
+      second columns.
 
 ===== ======
 
@@ -538,15 +544,17 @@ Nested Shapes
 
       It has the following properties that differ from the defaults:
 
-      - *x* and *y* are used to set the lower-left corner of the grid
-      - *height* sets the side-to-side height of a hexagon in the grid
-      - *sides* sets the number of hexagons running along each "edge" of the
-        grid - there are six sides in all
-      - *hex_layout* is set to ``circle`` to create the circular pattern
-      - *centre_shape* - defines a shape that will appear is all hexagons
-        in the grid, and whose centre location will matchthat of the hexagon
-        within which it is "nested"; in this case its size is smaller (``0.6``
-        is less than ``0.75``) so there is a "gap" around each of the shapes.
+      - *x* and *y* - the lower-left corner of the grid
+      - *height* - the side-to-side height of a hexagon in the grid
+      - *sides* - the number of hexagons running along each "edge" of the
+        grid; there are six sides in all
+      - *hex_layout* is set to ``circle`` to create a circular grid
+      - *centre_shape* - a shape that will appear in all hexagons
+
+      The location of the *centre_shape*  will match that of the hexagon
+      within which it is "nested"; in this case its size is smaller
+      |dash| ``0.6`` is less than ``0.75`` |dash| so there is a "gap" around
+      each of the shapes.
 
 ===== ======
 
@@ -652,15 +660,19 @@ Example 1.  Single Shape
         )
 
       The ``Hexagons`` grid is constructed as per the examples described in
-      the `Rectangular Hexagonal Grid`_ section.  The grid is assigned the
-      name *hexgrid* so it's result can be reused.
+      the `Rectangular Hexagonal Grid`_ section.
+
+      The grid is assigned the name *hexgrid* so it's result can be reused.
 
       The ``Location`` command has the following properties:
 
       - *hexgrid* refers to the assigned name for the ``Hexagons`` grid
       - "0101" contains the co-ordinate of the top-left hexagon in the grid
-      - the list contains one shape - a ``Circle`` that will be drawn at the
-        centre of the hexagon matching the co-ordinate that has been set
+      - a list, with a shape
+
+      The Location's list contains just one shape |dash| a ``Circle`` which
+      will be drawn at the centre of the hexagon matching the co-ordinate
+      that has been set.
 
 ===== ======
 
@@ -688,16 +700,19 @@ Example 2. Multiple Shapes
         )
 
       The ``Hexagons`` grid is constructed as per the examples described in
-      the `Rectangular Hexagonal Grid`_ section.  The grid is assigned the
-      name *hexgrid* so it's result can be reused.
+      the `Rectangular Hexagonal Grid`_ section.
+
+      The grid is assigned the name *hexgrid* so it's result can be reused.
 
       The ``Location`` command has the following properties:
 
       - *hexgrid* refers to the assigned name for the ``Hexagons`` grid
       - ``"0101"`` is the co-ordinate of the top-left hexagon in the grid
-      - the list contains two shapes - a ``Circle`` and a ``Dot``;  these
-        will be drawn in that order, each at the centre of the hexagon
-        matching the co-ordinate that has been set
+      - a list of shapes
+
+      The list contains two shapes |dash| a ``Circle`` and a ``Dot``; these
+      will be drawn in that order, each at the centre of the hexagon
+      matching the co-ordinate that has been set.
 
 ===== ======
 
@@ -729,20 +744,23 @@ Example 1.  Locations and Shapes
         Locations(
             hexgrid,
             "0204, 0101",
-            [circle(common=a_circle)]
+            [circle(common=a_circle), dot()]
         )
 
       The ``Hexagons`` grid is constructed as per the examples described in
-      the `Rectangular Hexagonal Grid`_ section.  The grid is assigned the
-      name *hexgrid* so it's result can be reused.
+      the `Rectangular Hexagonal Grid`_ section.
+
+      The grid is assigned the name *hexgrid* so it's result can be reused.
 
       The ``Locations`` command has the following properties:
 
       - *hexgrid* refers to the assigned name for the ``Hexagons`` grid
       - ``"0204, 0101"`` are the co-ordinates of the two hexagons in the grid
-      - the list contains two shapes - a ``Circle`` and a ``Dot``;  these
-        will be drawn in that order, each at the centre of the hexagon
-        matching the co-ordinates that have been set
+      - a list of shapes
+
+      The list contains two shapes |dash| a ``Circle`` and a ``Dot``; these
+      will be drawn in that order, each at the centre of the hexagon
+      matching the co-ordinates that have been set.
 
 ===== ======
 
@@ -771,18 +789,21 @@ Example 2.  Locations & Sequence
         )
 
       The ``Hexagons`` grid is constructed as per the examples described in
-      the `Rectangular Hexagonal Grid`_ section.  The grid is assigned the
-      name *hexgrid* so it's result can be reused.
+      the `Rectangular Hexagonal Grid`_ section.
+
+      The grid is assigned the name *hexgrid* so it's result can be reused.
 
       The ``Locations`` command has the following properties:
 
       - *hexgrid* refers to the assigned name for the ``Hexagons`` grid
       - ``"all"`` is a short-cut which refers to **all** the co-ordinates of
         the hexagons in the grid
-      - the list contains a single shape - a ``Circle`` whose label has been
-        set to the reference keyword ``{{sequence}}``; because of the enclosing
-        brackets ``{{...}}`` the keyword will be replaced by the actual value
-        of the sequence number in which the hexagon has been drawn.
+      - a list, with a shape
+
+      The list contains a single shape |dash| a ``Circle`` whose label has been
+      set to the reference keyword ``{{sequence}}``; because of the enclosing
+      brackets ``{{...}}`` the keyword will be replaced by the actual value
+      of the sequence number in which the hexagon has been drawn.
 
 ===== ======
 
@@ -811,18 +832,21 @@ Example 3.  Locations & Labels
         )
 
       The ``Hexagons`` grid is constructed as per the examples described in
-      the `Rectangular Hexagonal Grid`_ section.  The grid is assigned the
-      name *hexgrid* so it's result can be reused.
+      the `Rectangular Hexagonal Grid`_ section.
+
+      The grid is assigned the name *hexgrid* so it's result can be reused.
 
       The ``Locations`` command has the following properties:
 
       - *hexgrid* refers to the assigned name for the ``Hexagons`` grid
       - ``"all"`` is a short-cut which refers to **all** the co-ordinates of
         the hexagons in the grid
-      - the list contains a single shape - a ``Circle`` whose label has been
-        set to the reference keyword ``{{label}}``; because of the enclosing
-        brackets ``{{...}}`` the keyword will be replaced by the actual value
-        of the label of the hexagon being drawn.
+      - a list, with a shape
+
+      The list contains a single shape |dash| a ``Circle`` whose label has
+      been set to the reference keyword ``{{label}}``; because of the enclosing
+      brackets ``{{...}}`` the keyword will be replaced by the actual value
+       of the label of the hexagon being drawn.
 
 ===== ======
 
@@ -859,11 +883,13 @@ Example 4.  Locations & Col/Row
       - *hexgrid* refers to the assigned name for the ``Hexagons`` grid
       - ``"all"`` is a short-cut which refers to **all** the co-ordinates of
         the hexagons in the grid
-      - the list contains a single shape - a ``Circle`` whose label has been
-        set to use the reference keywords ``{{col}}`` and ``{{row}}``; because
-        of the enclosing brackets ``{{...}}`` these keywords will be replaced
-        by the actual values of the grid's *column* and *row* for the hexagon
-        being drawn.
+      - a list, with a shape
+
+      The list contains a single shape |dash| a ``Circle`` whose label has been
+      set to use the reference keywords ``{{col}}`` and ``{{row}}``. Because
+      of the enclosing brackets ``{{...}}`` these keywords will be replaced
+      by the actual values of the grid's *column* and *row* for the hexagon
+      being drawn.
 
 ===== ======
 
@@ -889,7 +915,7 @@ All of the examples below make use of the same underlying hexagonal grid:
             coord_elevation='top'
         )
 
-The grid is assigned the name *hexgrid* so it's result can be reused.
+The grid is assigned the name *hexgrid* so its result can be reused.
 
 
 Example 1. A Single LinkLine
@@ -911,11 +937,15 @@ Example 1. A Single LinkLine
 
       The ``LinkLine`` command  has the following properties:
 
-      - the *grid* used is *hexgrid* (as defined for all these examples)
-      - the *locations* ``"0101,0403"`` represent the coordinates of the start
-        and end locations in the grid, between which the line is drawn. By
-        default, the line uses the *x* and *y* values of the centre of the
-        hexagon in which it starts or ends, and uses the default styling.
+      - *grid* used is *hexgrid* (as defined for all these examples)
+      - *locations* - set to ``"0101,0403"``
+
+      The *locations* represent the coordinates of the start and end
+      locations in the grid, between which the line is drawn.
+
+      By default, the ``Linkline`` uses the *x* and *y* values of the
+      centre of the hexagon in which it starts or ends, and uses the
+      default styling.
 
 ===== ======
 
@@ -940,16 +970,21 @@ Example 2. A Double LinkLine
       The ``LinkLine`` command  has the following properties:
 
       - the grid used is *hexgrid* (as defined for all these examples)
-      - ``"0101,0403,0104"`` represent the coordinates of multiple start and
-        end locations in the grid, between which the line is drawn. The first
-        is drawn between the first and second hexagon; the second between the
-        second and third hexagon specified. By default, the lines use
-        the *x* and *y* values of the centre of the hex in which they start
-        or end, and use the default styling.
+      - *locations* are set to ``"0101,0403,0104"``
 
-      **Note** that in this example, the *grid=* and *locations=* are ommitted;
+      The string contains the coordinates of multiple start and
+      end locations in the grid, between which the line is drawn.
+
+      The first lines is drawn between the first and second hexagon;
+      the second between the second and third hexagon specified.
+
+      By default, the ``Linkline`` uses the *x* and *y* values of the
+      centre of the hexagon in which it starts or ends, and uses the
+      default styling.
+
+      **Note** that in this example, the *grid=* and *locations=* are omitted;
       the program can just use the values presented, provided they are in the
-      correct order.
+      correct order shown above.
 
 ===== ======
 
@@ -980,12 +1015,18 @@ Example 3. A Styled LinkLine
       The ``LinkLine`` commands have the following properties:
 
       - the grid used is *hexgrid* (as defined for all these examples)
-      - ``["0101","0403","0104","0406"]`` and ```["0104","0406"]`` represent
-        the coordinates of multiple start and end locations in the grid,
-        between which the lines are drawn. In this example, the locations are
-        define as individual strings in a list. By default, the lines use the
-        *x* and *y* values of the centre of the hex in which they start or end.
-      - *common* - this third property defines the styling for the line
+      - ``["0101","0403","0104","0406"]`` - location coordinates
+      - ``["0104","0406"]`` - location coordinates
+      - *common* - defines the styling for the line
+
+      The location coordinates contain multiple start and end locations in
+      the grid, between which the lines are drawn.
+
+      In this example, the locations are defined as individual strings
+      in a list.
+
+      By default, the lines use the *x* and *y* values of the centre of the
+      hex in which they start or end.
 
 ===== ======
 
@@ -1015,16 +1056,19 @@ Example 4. An Offset LinkLine
       The ``LinkLine`` command  has the following properties:
 
       - the grid used is *hexgrid* (as defined for all these examples)
-      - the series of set values - such as ``("0101", 0.25, 0.25)`` - represent
-        both the coordinates of the location in the grid, as well as the
-        **offset** values -  *x* and *y*  - relative to  the centre of the hex
-        in which the line starts (or ends). Positive values for the offset move
-        the *x* and *y*  up and to the right of the centre; negatives move
-        the *x* and *y* down and to the left of the centre
+      - ``("0101", 0.25, 0.25)`` - coordinates of a grid location and the
+        **offset** values
       - *common* - this third property defines the styling for the line
 
+      The **offset** values |dash|  *x* and *y*  |dash| are *relative* to
+      the centre of the hex in which the line starts or ends.
+
+      Positive values for the offset move  the *x* and *y* up and to the
+      right of the centre; negatives move the *x* and *y* down and to the
+      left of the centre.
+
       Note that its possible to define the start and end as different offsets
-      within the **same** hexagon.
+      within the **same** hexagon; as shown here.
 
 ===== ======
 

@@ -2,6 +2,8 @@
 Examples: Various
 =================
 
+.. |dash| unicode:: U+2014 .. EM DASH SIGN
+
 These examples are meant to demonstrate the type of output you can expect
 to create with **protograf**.  They are *not* meant to be exhaustive or
 comprehensive!
@@ -31,12 +33,11 @@ Title       *A Wall Clock*
 Source Code `clock.py <https://github.com/gamesbook/protograf/blob/master/examples/various/clock.py>`_
 ----------- ------------------------------------------------------------------
 Discussion  This example shows how to create a complex element - a clock - by
-            combining multiple
-            :doc:`customised Circles <../customised_shapes#circle>`, each with
-            different properties.
+            combining multiple ref:`customised Circles <circleIndex>`, each
+            with different properties.
 
-            Only the first circle - the clock's outline border and its title -
-            has a ``fill`` color set but the rest do not:
+            Only the first circle |dash the clock's outline border and its
+            title |dash| has a ``fill`` color set but the rest do not:
 
               .. code:: python
 
@@ -121,10 +122,10 @@ Discussion  This example shows how to construct a simple effect by combining
 
             Here the ``for`` loop runs for 200 times. Each time it does so,
             the ``Random()`` command generates a random value between 1 and 360
-            (i.e. corresponding to degrees around a circle) to assign to the
+            i.e. corresponding to degrees around a circle, to assign to the
             Chord's start and end points; then each Chord is drawn as usual.
 
-            See :doc:`Python loops <../python_commands#loops>` for more
+            See :ref:`Python loops <python-loop>` for more
             details.
 ----------- ------------------------------------------------------------------
 Screenshot  .. image:: images/various/chords.png
@@ -142,34 +143,34 @@ Title       *World Clocks*
 Source Code `world_clocks.py <https://github.com/gamesbook/protograf/blob/master/examples/various/world_clocks.py>`_
 ----------- ------------------------------------------------------------------
 Discussion  This example shows how to reuse a complex element - a clock - by
-            means of a set of Python functions (see
-            :doc:`Python functions <../python_commands#functions>` for more
-            details).
+            means of a set of Python functions; see
+            :ref:`Python functions <python-function>` for more
+            details.
 
-            This is a fairly complex script - a mini program really - which
-            is likely only to be legible to a Python programmer! Its probably
-            beyond the scope of this library's intended use.
+            This is a fairly complex script |dash| a mini program really |dash|
+            which is likely only to be legible to a Python programmer! It's
+            probably beyond the scope of this library's intended use.
 
             The script essentially "wraps" the clock creation approach
-            described above into a function which is accessed for each city
-            (or place) whose clock should be displayed.
+            described above into a function which is accessed for each city,
+            or place, whose clock should be displayed.
 
             The script also uses other functions to calculate the position
             of the clock hands based on the current time of the day; this is
             a bit fiddly because the hour hand angle changes in relation to
-            the number of minutes.  The clock face and the hand colors are
+            the number of minutes. The clock face and the hand colors are
             changed depending on the day/night and light/dark cycles.
 
             Further ideas:
 
             -  Wrap a call to this script via a command that gets runs each
                minute e.g. via ``cron`` on Linux; this will produce an updated
-               set of times which could be displayed automatically on screen
-               by a suitable viewer
+               image of times which could be displayed automatically on screen
+               by a suitable viewer.
             -  Add a link to an API that generates quotes; use this quote for
                the header text so that a new quote appears each time the script
-               is run
+               is run.
 ----------- ------------------------------------------------------------------
 Screenshot  .. image:: images/various/world_clocks.png
-               :width: 80%
+               :width: 70%
 =========== ==================================================================
