@@ -2,6 +2,8 @@
 Decks of Cards
 ==============
 
+.. |dash| unicode:: U+2014 .. EM DASH SIGN
+
 This section assumes you are very familiar with the concepts, terms and
 ideas for :doc:`protograf <index>` as presented in the
 :doc:`Basic Concepts <basic_concepts>` , that you understand all of the

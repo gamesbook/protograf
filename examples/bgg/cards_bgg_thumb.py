@@ -5,7 +5,8 @@ Written by: Derek Hohls
 Created on: 20 January 2025
 
 Notes:
-    BGG() uses the `bgg-api` Python library (https://github.com/SukiCZ/boardgamegeek)
+    * BGG() uses the `bgg-api` Python library (https://github.com/SukiCZ/boardgamegeek)
+    * Inspired by https://www.myboardgamecollection.com/
 """
 from protograf import *
 

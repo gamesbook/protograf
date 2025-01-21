@@ -2,6 +2,8 @@
 Additional Commands
 ===================
 
+.. |dash| unicode:: U+2014 .. EM DASH SIGN
+
 This section deals with some of the additional commands available in
 :doc:`protograf <index>` that are not covered elsewhere. You should
 already be familiar with all of the :doc:`Basic Concepts <basic_concepts>`,

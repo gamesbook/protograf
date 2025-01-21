@@ -51,6 +51,7 @@ class ImageShape(BaseShape):
     def __init__(self, _object=None, canvas=None, **kwargs):
         super(ImageShape, self).__init__(_object=_object, canvas=canvas, **kwargs)
         # overrides / extra args
+        self.sliced = kwargs.get('sliced', None)
         default_cache = Path(Path.home() / CACHE_DIRECTORY / 'images')
         default_cache.mkdir(parents=True, exist_ok=True)
         self.cache_directory = kwargs.get('cache_directory', str(default_cache))
@@ -59,7 +60,7 @@ class ImageShape(BaseShape):
                 'Unable to create or find the cache directory:'
                 f' {str(self.cache_directory)}', True)
 
-    def set_cached_dir(source):
+    def set_cached_dir(self, source):
         """Set special cached directory, depending on source being a URL."""
         if not tools.is_url_valid(url=source):
             return None
@@ -80,14 +81,16 @@ class ImageShape(BaseShape):
         img = None
         # ---- check for Card usage
         cache_directory = str(self.cache_directory)
+        _source = self.source
         # tools.feedback(f'*** {ID=} {self.source=}')
         if ID is not None and isinstance(self.source, list):
             _source = self.source[ID]
             cache_directory = self.set_cached_dir(_source) or cache_directory
-        else:
+        elif ID is not None and isinstance(self.source, str):
             _source = self.source
-        if not _source:
-            return
+            cache_directory = self.set_cached_dir(self.source) or cache_directory
+        else:
+            pass
         # ---- convert to using units
         height = self._u.height
         width = self._u.width
@@ -105,9 +108,10 @@ class ImageShape(BaseShape):
             y = self._u.y + self._o.delta_y
         # ---- load image
         # tools.feedback(f'*** IMGE {ID=} {_source=} {x=} {y=} {self.scaling=}')
-        img, is_svg, is_dir = self.load_image(
+        img, is_svg, is_dir = self.load_image(  # via BaseShape (in base.py)
             _source,
             scaling=self.scaling,
+            sliced=self.sliced,
             cache_directory=cache_directory)
         if not img and not is_dir:
             tools.feedback(

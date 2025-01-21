@@ -17,4 +17,5 @@ div.highlight {
 }
 table tbody tr td p {
     margin-bottom: 1em; /* between paragraphs */
+    color: #ff0000;
 }

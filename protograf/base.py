@@ -1376,13 +1376,28 @@ class BaseShape:
                 return True
         return False
 
-    def load_image(self, image_location=None, scaling=None, cache_directory=None) -> tuple:
+    def load_image(
+            self,
+            image_location=None,
+            scaling: float = None,
+            sliced: str = None,
+            cache_directory: str = None) -> tuple:
         """Load an image from file or website.
 
         Attempt to use local cache directory to retrieve an image
         for web-based assets, if possible.
 
         If image_location not found; try path in which script located.
+
+        Args:
+            image_location:
+                full path or URL for image
+            scaling:
+                resize factor for image
+            sliced:
+                what portion of the image to return
+            cache_directory:
+                where to store a local for copy for URL-sourced images
 
         Returns:
             tuple:
@@ -1393,6 +1408,35 @@ class BaseShape:
         Notes:
             * https://www.blog.pythonlibrary.org/2018/04/12/adding-svg-files-in-reportlab/
         """
+
+        def slice_image(drawing, slice_portion: str = None):
+            """Slice off a portion of an image while maintaining its aspect ratio
+            """
+            if not slice_portion:
+                return drawing
+            try:
+                _slice = slice_portion.lower()
+                if _slice[0] not in ['t', 'm', 'b', 'l', 'c', 'r']:
+                    tools.feedback(
+                        f'The sliced value "{slice_portion}" is not valid!', True)
+                match _slice[0]:
+                    case 't':
+                        pass
+                    case 'm':
+                        pass
+                    case  'b':
+                        pass
+                    case  'l':
+                        pass
+                    case  'c':
+                        pass
+                    case 'r':
+                        pass
+                    case _:
+                        raise NotImplementedError(f'Cannot process {slice_portion}')
+            except Exception as err:
+                tools.feedback(
+                    f'The sliced value "{slice_portion}" is not valid! ({err})', True)
 
         def scale_image(drawing, scaling_factor):
             """Scale a shapes.Drawing() while maintaining aspect ratio
@@ -1412,6 +1456,7 @@ class BaseShape:
         def image_reader(image_location) -> object:
             """Attempt to load first from local, then image_location."""
             img = None
+            _image_location = None
             if cache_directory:
                 if tools.is_url_valid(image_location):
                     loc = urlparse(image_location)
@@ -1421,6 +1466,9 @@ class BaseShape:
                         img = ImageReader(_image_location)
             if not img:
                 img = ImageReader(image_location)
+                # cache local copy that was sourced from network
+                if _image_location:
+                    img._image.save(_image_location)  # PIL image
             return img
 
         img = None
@@ -1443,6 +1491,8 @@ class BaseShape:
                         img = scale_image(img, scaling)
                 else:
                     img = image_reader(image_location)
+                    if sliced:
+                        img = slice_image(img, sliced)
                 return img, svg, is_directory
             except IOError:
                 filepath = tools.script_path()

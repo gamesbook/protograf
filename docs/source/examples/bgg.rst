@@ -2,6 +2,8 @@
 Examples: Board Game Geek
 =========================
 
+.. |dash| unicode:: U+2014 .. EM DASH SIGN
+
 These examples are meant to demonstrate the type of output you can expect
 to create with **protograf**.  They are *not* meant to be exhaustive or
 comprehensive!
@@ -12,17 +14,24 @@ will demonstrate full scalability.
 
 .. _table-of-contents:
 
-Simple
-======
+Table of Contents
+=================
+
+- `Basic`_
+- `Image-based`_
+
+
+Basic
+=====
 `↑ <table-of-contents_>`_
 
 =========== ==================================================================
-Title       *Simple BoardGameGeek Example*
+Title       *Basic BoardGameGeek Example*
 ----------- ------------------------------------------------------------------
-Source Code `example01.py <https://github.com/gamesbook/protograf/blob/master/examples/bgg/cards_bgg_basic.py>`_
+Source Code `cards_bgg_basic.py <https://github.com/gamesbook/protograf/blob/master/examples/bgg/cards_bgg_basic.py>`_
 ----------- ------------------------------------------------------------------
-Discussion  This example shows how to construct a set of cards - one per game -
-            using the BoardGameGeek API, accessed via the
+Discussion  This example shows how to construct a set of cards |dash| one per game
+            |dash| using the BoardGameGeek API (BGG API), accessed via the
             https://github.com/SukiCZ/boardgamegeek Python library.
 
 ----------- ------------------------------------------------------------------
@@ -31,18 +40,26 @@ Screenshot  .. image:: images/bgg/bgg_cards_basic.png
 =========== ==================================================================
 
 
-Images
-======
+Image-based
+===========
 `↑ <table-of-contents_>`_
 
 =========== ==================================================================
 Title       *BoardGameGeek Example with Images and Custom Values*
 ----------- ------------------------------------------------------------------
-Source Code `example01.py <https://github.com/gamesbook/protograf/blob/master/examples/bgg/cards_bgg_thumb.py>`_
+Source Code `cards_bgg_thumb.py <https://github.com/gamesbook/protograf/blob/master/examples/bgg/cards_bgg_thumb.py>`_
 ----------- ------------------------------------------------------------------
-Discussion  This example shows how to construct a set of cards - one per game -
-            using the BoardGameGeek API, accessed via the
+Discussion  This example shows how to construct a set of cards |dash| one per game
+            |dash| using the BoardGameGeek API (BGG API), accessed via the
             https://github.com/SukiCZ/boardgamegeek Python library.
+
+            This example was inspired by https://www.myboardgamecollection.com/ -
+            a simple way to create a PDF file with all your collection data!
+
+            This example uses games' "thumbnails" sourced from the BGG API,
+            and also makes use of the :ref:`Selection <the-selection-command>`
+            command to change the color of the third panel, based on how well
+            the game is rated.
 
 ----------- ------------------------------------------------------------------
 Screenshot  .. image:: images/bgg/bgg_cards_thumb.png
