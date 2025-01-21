@@ -772,12 +772,15 @@ Example 2.
       This Compass shape has the following properties:
 
       - centred at x-position ``2`` cm and at y-position ``3`` cm
-      - *perimeter* defines the shape of the ``rectangle`` that is used to define
-        where the radial lines of the compass extend; in this case it is a
-        rectangle with a height of ``2`` cm and width of ``3`` cm.
-      - radial lines extend, by default, in all 8 directions - to the centre of
-        the ``rectangle``'s bounding lines and to its corners
+      - *perimeter* sets a ``rectangle`` used to define
+        where the radial lines of the compass extend
       - *radii_stroke* defines the line colors used
+
+      For this compass the perimter rectangle with a height of ``2`` cm and
+      a width of ``3`` cm.
+
+      The radial lines extend, by default, in all 8 directions |dash| to the
+      centre of the ``rectangle``'s bounding lines and to its corners.
 
       The lower right:
 
@@ -788,11 +791,16 @@ Example 2.
       This Compass shape has the following properties:
 
       - centred at x-position ``3`` cm and at y-position ``1`` cm
-      - *perimeter* - defines the shape of ``hexagon`` that is used to defined
-        where the radial lines of the compass extend; in this case its in a
-        hexagon with a default diameter of ``1`` cm, so lines extend in all
-        ``6`` directions i.e. there is no North or South
+      - *perimeter* sets a ``hexagon`` used to define
+        where the radial lines of the compass extend;
       - *radii_stroke_width* - set to ``2`` points; a much thicker line
+
+      For this compass, the perimeter hexagon has a default diameter of
+      ``1`` cm.
+
+      The radial lines extend, by default, in all ``6`` directions |dash|
+      i.e. there is no North or South.
+
 ===== ======
 
 
