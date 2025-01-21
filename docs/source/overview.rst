@@ -2,14 +2,16 @@
 Overview
 ========
 
+.. |dash| unicode:: U+2014 .. EM DASH SIGN
+
 Introduction
 ============
 
 The aim of :doc:`protograf <index>` is to provide a general purpose
-program that allows you to design simple and reproducible text and graphics
-that can be used for prototyping the elements or components of a project,
-such as the creation of a board game, including the board, the tiles, the
-cards and so on.
+program that allows you to design simple, scalable and reproducible text
+and graphics that can be used for prototyping the elements or components
+of a project, such as the creation of a board game, including the board,
+the tiles, the cards and so on.
 
 .. IMPORTANT::
 
@@ -44,12 +46,13 @@ numbers - that appears in the design.
 How do I use it?
 ================
 
-In general, what you do is type a set of instructions - which **protograf**
-terms a *script* -  into a file, save that file on your computer, and then
-use Python to create your output - a PDF or PNG file - containing the results
-of those instructions; hopefully the design that you intended to make!
+In general, what you do is type a set of instructions which **protograf**
+terms a *script*  into a file, save that file on your computer, and then
+use Python to create your output |dash| a PDF or PNG file |dash|  containing
+the results of those instructions; hopefully the design that you intended
+to make!
 
-As your design changes and evolves, you add or change instructions and
+As your design changes and evolves, you can add or change instructions and
 recreate the output.
 
 
@@ -66,6 +69,10 @@ to write code from scratch.
 
    Python is *not* a speedy language, but its still fast enough to
    use for **protograf**
+
+**protograf** uses various supporting Python packages; the most important
+of these is *ReportLab* which supports the creation of vector graphics in
+a PDF document.
 
 **protograf** is designed such that you *don’t* need to know how to
 program in Python in order to use it; but if you *are* a Python

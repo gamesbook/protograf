@@ -2,6 +2,8 @@
 Terminology
 ===========
 
+.. |dash| unicode:: U+2014 .. EM DASH SIGN
+
 :doc:`protograf <index>` uses many terms; most of which should -
 hopefully - be fairly obvious by their name, or by the context in
 which they are used.
@@ -9,9 +11,9 @@ which they are used.
 However, in order to help with clarity, below is a reasonably comprehensive
 list of terms used in different places, grouped by what they affect.
 
-Note that some shapes, such as the ``Hexagon``, have extensive
-customisation properties available; rather refer to their specific
-descriptions to understand exactly how these can used.
+Note that some shapes, such as the :ref:`Hexagon <hexIndex>`, have
+extensive customisation properties available; rather refer to their
+specific descriptions to understand exactly how these can used.
 
 .. _table-of-contents:
 
@@ -94,7 +96,7 @@ In general, color can be set for the lines (**stroke**) and areas
    be the *same* color
 
 
-.. NOTE::
+.. IMPORTANT::
 
    **Note** that it is possible to use the term *None* in place of a
    specific color; this effectively means that nothing will be drawn
@@ -170,13 +172,13 @@ to set.
 -  **margin** - used in ``Create`` command to set all margins for a
    page; the default for any margin is 1.25cm / 12.5mm (1/2 of an inch)
 -  **margin_top** - used in ``Create`` command to set top margin for a
-   page (this overrides the **margin** property, if any)
+   page |dash| this overrides the **margin** property, if any
 -  **margin_bottom** - used in ``Create`` command to set bottom margin
-   for a page  (this override the **margin** property, if any)
+   for a page  |dash| this overrides the **margin** property, if any
 -  **margin_left** - used in ``Create`` command to set left margin for a
-   page (this overrides the **margin** property, if any)
+   page |dash| this overrides the **margin** property, if any
 -  **margin_right** - used in ``Create`` command to set right margin for
-   a page (this overrides the **margin** property, if any)
+   a page |dash| this overrides the **margin** property, if any
 -  **paper** - used in ``Create`` command to set the paper format in the
    document; either ISO series (A0 down to A8; or B6 down to B0) or a
    USA type; the default is A4. (**NOTE:** the value for paper is **not**
@@ -253,6 +255,8 @@ Properties that use direction include:
    e.g. ``RectangularLayout``
 -  **edges** - can be any primary compass direction; used to indicate
    the sides of a ``Square`` or ``Rectangle``
+-  **flat** - the *orientation* of a ``Hexagon``, meaning the top of it will
+   be parallel to the bottom edge of the paper
 -  **facing** - can be any primary compass direction; used to show
    orientation of some types of layouts e.g. ``DiamondLayout``
 -  **flip** - the relative vertical direction in which a triangle or rhombus
@@ -261,6 +265,9 @@ Properties that use direction include:
    be drawn; can be either: *east* or *west*
 -  **orientation** - used for drawing hexagons; can be either: *flat* or
    *pointy*
+-  **pointy** - the *orientation* of a ``Hexagon``, meaning the top of it will
+   make a "peak" relative to the bottom edge of the paper, and the flat edge
+   will be parallel to the left side of the paper.
 -  **start** - can be any secondary compass direction; for example, it is
    used to show in which corner of a ``RectangularLayout`` that shapes
    should first placed when creating a track
@@ -310,6 +317,7 @@ Miscellaneous Terms
 -  **debug** - a value can be set for this that will cause underlying
    values or locations or positions to be displayed e.g. using ``debug="n"``
    for a layout will show small dots where each point in that layout exists
+-  **frame** - used to demarcate the boundary of a ``Card``;
 -  **perimeter** - used to demarcate the boundary of a ``StarField``;
    one of *circle*, *rectangle* or *polygon*
 -  **peaks** - a series of sets, each containing a primary compass

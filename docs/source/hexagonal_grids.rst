@@ -801,9 +801,11 @@ Example 2.  Locations & Sequence
       - a list, with a shape
 
       The list contains a single shape |dash| a ``Circle`` whose label has been
-      set to the reference keyword ``{{sequence}}``; because of the enclosing
-      brackets ``{{...}}`` the keyword will be replaced by the actual value
-      of the sequence number in which the hexagon has been drawn.
+      set to the reference keyword ``{{sequence}}``.
+
+      Because of the enclosing brackets ``{{...}}`` the keyword will be
+      replaced by the actual value of the sequence number in which the hexagon
+      has been drawn.
 
 ===== ======
 
@@ -844,9 +846,11 @@ Example 3.  Locations & Labels
       - a list, with a shape
 
       The list contains a single shape |dash| a ``Circle`` whose label has
-      been set to the reference keyword ``{{label}}``; because of the enclosing
-      brackets ``{{...}}`` the keyword will be replaced by the actual value
-       of the label of the hexagon being drawn.
+      been set to the reference keyword ``{{label}}``
+
+      Because of the enclosing brackets ``{{...}}`` the keyword will be
+      replaced by the actual value of the sequence number in which the hexagon
+      has been drawn.
 
 ===== ======
 
@@ -875,8 +879,9 @@ Example 4.  Locations & Col/Row
         )
 
       The ``Hexagons`` grid is constructed as per the examples described in
-      the `Rectangular Hexagonal Grid`_ section.  The grid is assigned the
-      name *hexgrid* so it's result can be reused.
+      the `Rectangular Hexagonal Grid`_ section.
+
+      The grid is assigned the name *hexgrid* so it's result can be reused.
 
       The ``Locations`` command has the following properties:
 
@@ -886,10 +891,11 @@ Example 4.  Locations & Col/Row
       - a list, with a shape
 
       The list contains a single shape |dash| a ``Circle`` whose label has been
-      set to use the reference keywords ``{{col}}`` and ``{{row}}``. Because
-      of the enclosing brackets ``{{...}}`` these keywords will be replaced
-      by the actual values of the grid's *column* and *row* for the hexagon
-      being drawn.
+      set to use the reference keywords ``{{col}}`` and ``{{row}}``.
+
+      Because of the enclosing brackets ``{{...}}`` the keyword will be
+      replaced by the actual value of the sequence number in which the hexagon
+      has been drawn.
 
 ===== ======
 
@@ -1079,9 +1085,11 @@ Other Resources
 `↑ <table-of-contents_>`_
 
 There are already a number of software tools available for creating
-hexagonal grids of various kinds and for different purposes. A few of
-them, some of which are game-specific - for example, the so-called
-`18XX <https://en.wikipedia.org/wiki/18XX>`_ series, are listed below:
+hexagonal grids of various kinds and for different purposes.
+
+A few of these tools, some of which are game-specific, for example, the
+so-called `18XX <https://en.wikipedia.org/wiki/18XX>`_ series,
+are listed below:
 
 -  *HEXGRID* (https://hamhambone.github.io/hexgrid/) - an online hex
    grid generator which interactively creates a display, downloadable as
@@ -1110,9 +1118,11 @@ inspiration for how hexagonal grids work in **protograf**. So if the
 functionality available here does not work for you, then possibly one of
 these other tools would be of better use.
 
+.. HINT::
+
    For everything - and I mean **everything** - related to how hexagonal
-   grids are designed and calculated the single most useful reference is
-   https://www.redblobgames.com/grids/hexagons/
+   grids are designed and calculated the single most useful reference
+   for a designer is https://www.redblobgames.com/grids/hexagons/
 
 An 18XX Footnote
 ----------------

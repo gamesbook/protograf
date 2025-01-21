@@ -1422,11 +1422,13 @@ Subdivisions
 
       It has the following properties set:
 
-      - *subdivisions* - set to ``5``; these are the number of thinner lines that
-        are drawn between each pair of primary lines - they do not have any
-        numbering and are automatically drawn with a *dotted* style
+      - *subdivisions* - set to ``5``; number of thinner lines drawn between
+        each pair of primary lines
       - *stroke_width* - set to ``0.5``; this slightly thicker primary line makes
         the grid more visible
+
+     Note that *subdivisions* do not have any numbering and are automatically
+     drawn with a *dotted* style.
 
 ===== ======
 
