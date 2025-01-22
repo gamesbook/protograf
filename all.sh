@@ -87,5 +87,6 @@ python examples/various/world_clocks.py -d /tmp/demo
 echo "Creating BGG game cards..."
 python examples/bgg/cards_bgg_default.py -d /tmp/demo
 python examples/bgg/cards_bgg_thumb.py -d /tmp/demo
+python examples/bgg/cards_bgg_images.py -d /tmp/demo
 
 echo "Done!"

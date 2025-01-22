@@ -15,6 +15,7 @@ import json
 import logging
 import math
 import os
+import pathlib
 from urllib.parse import urlparse
 # third party
 import jinja2
@@ -1425,46 +1426,53 @@ class BaseShape:
                     the (width, height) of the output frame for the image
             """
             if not slice_portion:
-                return drawing
+                return None
             try:
                 _slice = slice_portion.lower()
                 if _slice[0] not in ['t', 'm', 'b', 'l', 'c', 'r']:
                     tools.feedback(
                         f'The sliced value "{slice_portion}" is not valid!', True)
                 img = drawing._image
+                img_file = pathlib.Path(img.fileName)
                 iwidth = img.size[0]
                 iheight = img.size[1]
                 icentre = (int(iwidth / 2), int(iheight / 2))
                 # calculate height of horizontal slice
                 if _slice[0] in ['t', 'm', 'b']:
-                    slice_height = int(max(
+                    slice_height = int(min(
                         iwidth * (width_height[1] / width_height[0]), iheight))
                 # calculate width of vertical slice
                 if _slice[0] in ['l', 'c', 'r']:
-                    slice_width = int(max(
+                    slice_width = int(min(
                         iheight * (width_height[0] / width_height[1]), iwidth))
                 # crop - needs a "box" which accepts a tuple with four values for
                 #        the rectangle: left, upper, right, and lower
                 match _slice[0]:
                     case 't':  # top (horizontal slice)
-                        img2 = img.crop(0, 0, iwidth, slice_height)
+                        img2 = img.crop((0, 0, iwidth, slice_height))
                     case 'm':  # middle (horizontal slice)
                         upper = icentre[1] - int(slice_height / 2)
-                        img2 = img.crop(0, upper, iwidth, upper + slice_height)
-                    case  'b':  # bottom (horizontal slice)
-                        img2 = img.crop(0, iheight - slice_height, iwidth, iheight)
-                    case  'l':  # left (vertical slice)
-                        pass
-                    case  'c':  # centre (vertical slice)
-                        pass
+                        img2 = img.crop((0, upper, iwidth, upper + slice_height))
+                    case 'b':  # bottom (horizontal slice)
+                        img2 = img.crop((0, iheight - slice_height, iwidth, iheight))
+                    case 'l':  # left (vertical slice)
+                        img2 = img.crop((0, 0, slice_width, iheight))
+                    case 'c':  # centre (vertical slice)
+                        middle = icentre[0] - int(slice_width / 2)
+                        img2 = img.crop((middle, 0, middle + slice_width, iheight))
                     case 'r':  # right (vertical slice)
-                        pass
+                        img2 = img.crop((iwidth - slice_width, 0, iwidth, iheight))
                     case _:
                         raise NotImplementedError(f'Cannot process {slice_portion}')
+                # create new file with sliced image
+                img2_filename = img_file.stem + '_' + _slice[0] + img_file.suffix
+                sliced_filename = os.path.join(str(img_file.parent), img2_filename)
+                img2.save(sliced_filename)
+                return sliced_filename
             except Exception as err:
                 tools.feedback(
                     f'The sliced value "{slice_portion}" is not valid! ({err})', True)
-            return drawing
+            return None
 
         def scale_image(drawing, scaling_factor):
             """Scale a shapes.Drawing() while maintaining aspect ratio
@@ -1519,8 +1527,11 @@ class BaseShape:
                         img = scale_image(img, scaling)
                 else:
                     img = image_reader(image_location)
-                    # if sliced:
-                    #     img = slice_image(img, sliced)
+                    if sliced:
+                        sliced_filename = slice_image(
+                            img, sliced, width_height=width_height)
+                        if sliced_filename:
+                            img = image_reader(sliced_filename)
                 return img, svg, is_directory
             except IOError:
                 filepath = tools.script_path()
