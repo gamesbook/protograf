@@ -45,7 +45,7 @@ Image-based
 `↑ <table-of-contents_>`_
 
 =========== ==================================================================
-Title       *BoardGameGeek Example with Images and Custom Values*
+Title       *BoardGameGeek Example with Thumbnails and Custom Values*
 ----------- ------------------------------------------------------------------
 Source Code `cards_bgg_thumb.py <https://github.com/gamesbook/protograf/blob/master/examples/bgg/cards_bgg_thumb.py>`_
 ----------- ------------------------------------------------------------------
@@ -63,5 +63,32 @@ Discussion  This example shows how to construct a set of cards |dash| one per ga
 
 ----------- ------------------------------------------------------------------
 Screenshot  .. image:: images/bgg/bgg_cards_thumb.png
+               :width: 90%
+=========== ==================================================================
+
+
+Images and QR
+=============
+`↑ <table-of-contents_>`_
+
+=========== ==================================================================
+Title       *BoardGameGeek Example with Images and QRCodes*
+----------- ------------------------------------------------------------------
+Source Code `cards_bgg_image.py <https://github.com/gamesbook/protograf/blob/master/examples/bgg/cards_bgg_image.py>`_
+----------- ------------------------------------------------------------------
+Discussion  This example shows how to construct a set of cards |dash| one per game
+            |dash| using the BoardGameGeek API (BGG API), accessed via the
+            https://github.com/SukiCZ/boardgamegeek Python library.
+
+            This example was inspired by https://www.myboardgamecollection.com/ -
+            a simple way to create a PDF file with all your collection data!
+
+            This example uses games' full-sized images sourced from the BGG API,
+            and also makes use of the :ref:`QRCode command <qrcode-command>`
+            to generate a QRCode based on a hyperlink for the games' URLs on
+            the BGG website.
+
+----------- ------------------------------------------------------------------
+Screenshot  .. image:: images/bgg/bgg_cards_images.png
                :width: 90%
 =========== ==================================================================

@@ -58,7 +58,7 @@ from .shapes import (
     ArcShape, ArrowShape, BezierShape, ChordShape, CircleShape, CommonShape,
     CompassShape, DotShape, EllipseShape,
     EquilateralTriangleShape, FooterShape, HexShape, ImageShape, LineShape,
-    PolygonShape, PolylineShape, RectangleShape, RhombusShape,
+    QRCodeShape, PolygonShape, PolylineShape, RectangleShape, RhombusShape,
     RightAngledTriangleShape, SectorShape, ShapeShape, SquareShape,
     StadiumShape, StarShape, StarFieldShape, TextShape, TrapezoidShape,
     GRID_SHAPES_WITH_CENTRE, GRID_SHAPES_NO_CENTRE, SHAPES_FOR_TRACK)
@@ -279,7 +279,7 @@ def Font(face=None, **kwargs):
     globals.cnv.font_size = kwargs.get('size', 12)
     globals.cnv.stroke = COLORS.get(kwargs.get('color', 'black'))
 
-# ---- Various ====
+# ---- various ====
 
 
 def Version():
@@ -823,6 +823,20 @@ def polyshape(row=None, col=None, **kwargs):
     kwargs['row'] = row
     kwargs['col'] = col
     return ShapeShape(canvas=globals.cnv, **kwargs)
+
+
+def QRCode(source=None, **kwargs):
+    kwargs = margins(**kwargs)
+    kwargs['source'] = source
+    image = QRCodeShape(canvas=globals.cnv, **kwargs)
+    image.draw()
+    return image
+
+
+def qrcode(source=None, **kwargs):
+    kwargs = margins(**kwargs)
+    kwargs['source'] = source
+    return QRCodeShape(canvas=globals.cnv, **kwargs)
 
 
 def Sector(row=None, col=None, **kwargs):

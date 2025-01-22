@@ -13,11 +13,13 @@ import random
 from urllib.parse import urlparse
 # third party
 from reportlab.platypus import Paragraph
+from reportlab.lib.colors import red, green, black
 from reportlab.lib.styles import ParagraphStyle
 from reportlab.lib.pagesizes import (
     A8, A7, A6, A5, A4, A3, A2, A1, A0, LETTER, LEGAL, ELEVENSEVENTEEN,
     letter, legal, elevenSeventeen, B6, B5, B4, B3, B2, B0, landscape)
-from reportlab.lib.colors import red, green, black
+from reportlab.lib.utils import ImageReader
+import segno  # QRCode
 # local
 from protograf.utils.geoms import Point, Link, Locale  # named tuples
 from protograf.utils import geoms, tools, support
@@ -43,6 +45,18 @@ SHAPES_FOR_TRACK = [
     'RhombusShape', 'SquareShape', ]
 
 
+def get_cache(**kwargs):
+    """Get and/or set a cache directory for to save file images."""
+    default_cache = Path(Path.home() / CACHE_DIRECTORY / 'images')
+    default_cache.mkdir(parents=True, exist_ok=True)
+    cache_directory = kwargs.get('cache_directory', str(default_cache))
+    if not os.path.exists(cache_directory):
+        tools.feedback(
+            'Unable to create or find the cache directory:'
+            f' {str(cache_directory)}', True)
+    return cache_directory
+
+
 class ImageShape(BaseShape):
     """
     Image (bitmap or SVG) on a given canvas.
@@ -52,13 +66,7 @@ class ImageShape(BaseShape):
         super(ImageShape, self).__init__(_object=_object, canvas=canvas, **kwargs)
         # overrides / extra args
         self.sliced = kwargs.get('sliced', None)
-        default_cache = Path(Path.home() / CACHE_DIRECTORY / 'images')
-        default_cache.mkdir(parents=True, exist_ok=True)
-        self.cache_directory = kwargs.get('cache_directory', str(default_cache))
-        if not os.path.exists(self.cache_directory):
-            tools.feedback(
-                'Unable to create or find the cache directory:'
-                f' {str(self.cache_directory)}', True)
+        self.cache_directory = get_cache(**kwargs)
 
     def set_cached_dir(self, source):
         """Set special cached directory, depending on source being a URL."""
@@ -67,8 +75,12 @@ class ImageShape(BaseShape):
         loc = urlparse(source)
         # print('@http@',  loc)
         # handle special case of BGG images
+        # ... BGG gives thumb and original images the EXACT SAME filename :(
         if loc.netloc == BGG_IMAGES:
-            the_cache = Path(Path.home() / CACHE_DIRECTORY / 'bgg' / 'images')
+            subfolder = 'images'
+            if 'thumb' in loc.path:
+                subfolder = 'thumbs'
+            the_cache = Path(Path.home() / CACHE_DIRECTORY / 'bgg' / subfolder)
             the_cache.mkdir(parents=True, exist_ok=True)
             return str(the_cache)
         return None
@@ -2380,6 +2392,85 @@ class PolylineShape(BaseShape):
                     pth.moveTo(x, y)
                 pth.lineTo(x, y)
             cnv.drawPath(pth, stroke=1 if self.stroke else 0, fill=0)
+
+
+class QRCodeShape(BaseShape):
+    """
+    QRCode drawn on a given canvas.
+    """
+
+    def __init__(self, _object=None, canvas=None, **kwargs):
+        super(QRCodeShape, self).__init__(_object=_object, canvas=canvas, **kwargs)
+        # overrides / extra args
+        self.cache_directory = get_cache(**kwargs)
+
+    def draw(self, cnv=None, off_x=0, off_y=0, ID=None, **kwargs):
+        """Draw a QRCode on a given canvas."""
+        kwargs = self.kwargs | kwargs
+        cnv = cnv.canvas if cnv else self.canvas.canvas
+        super().draw(cnv, off_x, off_y, ID, **kwargs)  # unit-based props
+        img = None
+        # ---- check for Card usage
+        cache_directory = str(self.cache_directory)
+        _source = self.source
+        # tools.feedback(f'*** {ID=} {self.source=}')
+        if ID is not None and isinstance(self.source, list):
+            _source = self.source[ID]
+            cache_directory = self.set_cached_dir(_source) or cache_directory
+        elif ID is not None and isinstance(self.source, str):
+            _source = self.source
+            cache_directory = self.set_cached_dir(self.source) or cache_directory
+        else:
+            pass
+        # tools.feedback(f"Dot {self._o.delta_x=} {self._o.delta_y=}")
+        if self.use_abs_c:
+            x = self._abs_cx
+            y = self._abs_cy
+        else:
+            x = self._u.x + self._o.delta_x
+            y = self._u.y + self._o.delta_y
+        self.set_canvas_props(index=ID)
+        # ---- convert to using units
+        height = self._u.height
+        width = self._u.width
+        if self.cx is not None and self.cy is not None:
+            if width and height:
+                x = self._u.cx - width / 2.0 + self._o.delta_x
+                y = self._u.cy - height / 2.0 + self._o.delta_y
+            else:
+                tools.feedback(
+                    "Must supply width and height for use with cx and cy.",
+                    stop=True
+                )
+        else:
+            x = self._u.x + self._o.delta_x
+            y = self._u.y + self._o.delta_y
+        # ---- create code
+        qrcode = segno.make_qr(self.text)
+        qrcode.save(
+            _source,
+            scale=self.scaling,
+            light=self.fill,
+            dark=self.stroke
+        )
+        img = ImageReader(_source)
+        # ---- draw code
+        cnv.drawImage(img, x=x, y=y, width=width, height=height, mask="auto")
+        # ---- text
+        xc = x + width / 2.0
+        yc = y + height / 2.0
+        if self.heading:
+            cnv.setFont(self.font_face, self.heading_size)
+            cnv.setFillColor(self.heading_stroke)
+            self.draw_multi_string(cnv, xc, y + height + cnv._leading, self.heading)
+        if self.label:
+            cnv.setFont(self.font_face, self.label_size)
+            cnv.setFillColor(self.label_stroke)
+            self.draw_multi_string(cnv, xc, yc, self.label)
+        if self.title:
+            cnv.setFont(self.font_face, self.title_size)
+            cnv.setFillColor(self.title_stroke)
+            self.draw_multi_string(cnv, xc, y - cnv._leading, self.title)
 
 
 class RectangleShape(BaseShape):

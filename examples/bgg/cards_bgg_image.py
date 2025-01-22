@@ -14,7 +14,7 @@ Create(filename="cards_bgg_image.pdf", margin_bottom=1.75)
 
 # ID numbers of games to retrieve
 choices = [1, 2, 3, 4, 5, 6, 7, 391163, 121921]
-choices = [1, 2, 3]
+choices = [1, 2, 3, 4]
 
 # BGG game data -> progress is True to check the rate of retrieval
 bgames = BGG(ids=choices, progress=True, short=750)  # short: characters in DESCRIPTION_SHORT
@@ -27,8 +27,10 @@ Deck(
      grid_marks=True, stroke=None)  # number of cards reset by Data()
 
 # create image for the card
-img = image(T('{{ IMAGE }}'), x=0, y=0, width=15, height=3, sliced='top')
-
+img = image(T('{{ IMAGE }}'), x=0, y=0, width=15, height=5, sliced='m')
+# qr = qrcode(T('bgg-{{ ID }}-qr.png'),
+#             text="https://boardgamegeek.com/boardgame/{{ ID }}",
+#             x=11, y=0.5, width=2, height=2)
 # final layout
 Card("*", img)
 

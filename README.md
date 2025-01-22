@@ -166,6 +166,7 @@ Additional libraries in use include:
 * `imageio` https://pypi.org/project/imageio/- support for compiling PNGs into a GIF
 * `jinja` https://jinja.palletsprojects.com - template logic with variables
 * `pillow` https://github.com/python-pillow/Pillow - support for image processing
+* `segno` https://github.com/heuer/segno/ - support for QRCode creation
 
 ## License
 
