@@ -112,6 +112,7 @@ class ImageShape(BaseShape):
             _source,
             scaling=self.scaling,
             sliced=self.sliced,
+            width_height=(width, height),
             cache_directory=cache_directory)
         if not img and not is_dir:
             tools.feedback(

@@ -448,10 +448,13 @@ Example 1.
       - second point is at x-position ``1`` cm and at y-position ``1`` cm
       - third point is at x-position ``2`` cm and at y-position ``0`` cm
 
-      The *points* for a Polyline are in a list, as shown by the square brackets
-      from `[` to `]`, and then each *x* and *y* are provided as a pair of
-      values in round brackets.  The *x* and *y* are separated by a comma.
-      Each pair of values in the list is also separated by a comma.
+      The *points* for a Polyline:
+
+      - are in a list, as shown by the square brackets from `[` to `]`,
+      - each *x* and *y* are provided as a pair of values in round brackets
+      - each *x* and *y* are separated by a comma
+      - each pair of values in the list is separated by a comma
+
 ===== ======
 
 
@@ -1242,11 +1245,13 @@ Example 1.
       - third point is at x-position ``1`` cm and at y-position ``2`` cm
       - etc.
 
-      The *points* for a Polyshape, which represent its vertices are given in a
-      list, as shown by the square brackets from `[` to `]`, and then each *x*
-      and *y* are provided as a pair of values in round brackets.  The *x* and
-      *y* are separated by a comma. Each pair of values in the list is also
-      separated by a comma.
+      The *points* for a Polyshape which represent its vertices are given in a
+      list:
+
+      - all points are listed inside the square brackets from ``[`` to ``]``
+      - each *x* and *y* are provided as a pair of values in round brackets
+      - each *x* and *y* are separated by a comma
+      - each pair of values in the list is separated by a comma
 
       Lines are drawn between each successive point in the list; **including a
       line from the last to the first**.
@@ -1258,10 +1263,13 @@ Example 2.
 ++++++++++
 
 While the Polyshape does not have the ability to be constructed using a
-*cx* and *cy* pair like other symmetric shapes, it is possible to provide
-these values to the shape command, and they can then be used for label, plus
-the `dot and cross`_, similar to other shapes.  **Note** that the program has
-no way of knowing or "checking" the values that you supply to it!
+*cx* and *cy* pair to set its centre location |dash| like the symmetric
+shapes |dash| it is possible to provide these values to the shape command,
+and they can then be used for a label, plus the `dot and cross`_, similar
+to those other shapes.
+
+**NOTE** - the program has no way of knowing or "checking" that the values
+for the *cx* and *cy* pair that you supply to it are correct!
 
 .. |sh2| image:: images/customised/polyshape_custom.png
    :width: 330
@@ -1334,8 +1342,8 @@ pairs of values; so instead of ``[(0,0), (1,1)]`` just use ``"0,0 1,1"``.
       Other properties:
 
       - the centre is defined to be at x-position ``1`` cm and y-position
-        ``0.5`` cm; this will affect the drawing of the label
-        but does **not** affect the drawing of the shape itself
+        ``0.5`` cm; this affects drawing of the label
+        but does **not** affect drawing the shape itself
       - *label* - sets the text appearing at the defined centre position
       - *fill* color defines the color of the interior of the shape
 
@@ -1999,15 +2007,16 @@ Example 3.
       - *height* of ``3`` cm
       - *top* of ``1.5`` cm
       - *borders* - a list of sets of custom settings for each side; each set
-        can contain""
+        can contain:
 
         - `direction` - one of n(orth), s(outh), e(ast) or w(est)
         - `width` - the line thickness
         - `color` - either a named color or a hexadecimal value
         - `style` - ``True`` makes it dotted; or a list of values creates dashes
 
-        Direction and width are required, but color and style are optional. One
-        or more border values can be used together with spaces between them
+        Direction and width are required, but color and style are optional.
+
+        Multiple border values can be used, with spaces between them,
         e.g. ``n s`` to draw lines on both north **and** south sides.
 
 ===== ======

@@ -13,7 +13,7 @@ from protograf import *
 Create(filename="cards_bgg_thumb.pdf", margin_bottom=1.75)
 
 # ID numbers of games to retrieve
-choices = [1,2,3,4,5,6,7,391163,121921]
+choices = [1, 2, 3, 4, 5, 6, 7, 391163, 121921]
 
 # BGG game data -> progress is True so we can see the rate of retrieval
 bgames = BGG(ids=choices, progress=True, short=750)  # short: characters in DESCRIPTION_SHORT
