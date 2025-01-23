@@ -57,6 +57,7 @@ from reportlab.lib.colors import (
     steelblue, tan, teal, thistle, tomato, turquoise, violet, wheat, white,
     whitesmoke, yellow, yellowgreen, fidblue, fidred, fidlightblue,
     cornflower, firebrick)
+import requests
 # local
 from protograf.utils import geoms, tools
 from protograf.utils.support import LookupType
@@ -1489,22 +1490,25 @@ class BaseShape:
             drawing.scale(scaling_x, scaling_y)
             return drawing
 
+        def save_image_from_url(url: str):
+            """Download image from network and save locally if not present."""
+            loc = urlparse(url)
+            filename = loc.path.split("/")[-1]
+            image_local = os.path.join(cache_directory, filename)
+            if not os.path.exists(image_local):
+                image = requests.get(url)
+                with open(image_local, "wb") as f:
+                    f.write(image.content)
+            return image_local
+
         def image_reader(image_location) -> object:
-            """Attempt to load first from local, then image_location."""
+            """Attempt to load first from local cache, then network."""
             img = None
-            _image_location = None
+            image_local = image_location
             if cache_directory:
                 if tools.is_url_valid(image_location):
-                    loc = urlparse(image_location)
-                    filename = loc.path.split("/")[-1]
-                    _image_location = os.path.join(cache_directory, filename)
-                    if os.path.exists(_image_location):
-                        img = ImageReader(_image_location)
-            if not img:
-                img = ImageReader(image_location)
-                # cache local copy that was sourced from network
-                if _image_location:
-                    img._image.save(_image_location)  # PIL image
+                    image_local = save_image_from_url(image_location)
+            img = ImageReader(image_local)
             return img
 
         img = None

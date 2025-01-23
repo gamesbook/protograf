@@ -28,7 +28,7 @@ numbers = Common(
 title = Common(font_face="Times New Roman", font_size=12, stroke=red)
 
 # create an image for the card
-img = image(T('{{ THUMBNAIL }}'), x=2.8, y=5.45, width=3.25, height=3.25)
+img = image(T('{{ IMAGE }}'), x=2.8, y=5.45, width=3.25, height=3.25)
 
 # create a list of text elements for the cards
 players = rectangle(

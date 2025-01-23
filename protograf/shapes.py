@@ -57,6 +57,24 @@ def get_cache(**kwargs):
     return cache_directory
 
 
+def set_cached_dir(source):
+    """Set special cached directory, depending on source being a URL."""
+    if not tools.is_url_valid(url=source):
+        return None
+    loc = urlparse(source)
+    # print('@http@',  loc)
+    # handle special case of BGG images
+    # ... BGG gives thumb and original images the EXACT SAME filename :(
+    if loc.netloc == BGG_IMAGES:
+        subfolder = 'images'
+        if 'thumb' in loc.path:
+            subfolder = 'thumbs'
+        the_cache = Path(Path.home() / CACHE_DIRECTORY / 'bgg' / subfolder)
+        the_cache.mkdir(parents=True, exist_ok=True)
+        return str(the_cache)
+    return None
+
+
 class ImageShape(BaseShape):
     """
     Image (bitmap or SVG) on a given canvas.
@@ -68,22 +86,7 @@ class ImageShape(BaseShape):
         self.sliced = kwargs.get('sliced', None)
         self.cache_directory = get_cache(**kwargs)
 
-    def set_cached_dir(self, source):
-        """Set special cached directory, depending on source being a URL."""
-        if not tools.is_url_valid(url=source):
-            return None
-        loc = urlparse(source)
-        # print('@http@',  loc)
-        # handle special case of BGG images
-        # ... BGG gives thumb and original images the EXACT SAME filename :(
-        if loc.netloc == BGG_IMAGES:
-            subfolder = 'images'
-            if 'thumb' in loc.path:
-                subfolder = 'thumbs'
-            the_cache = Path(Path.home() / CACHE_DIRECTORY / 'bgg' / subfolder)
-            the_cache.mkdir(parents=True, exist_ok=True)
-            return str(the_cache)
-        return None
+
 
     def draw(self, cnv=None, off_x=0, off_y=0, ID=None, **kwargs):
         """Show an image on a given canvas."""
@@ -97,10 +100,10 @@ class ImageShape(BaseShape):
         # tools.feedback(f'*** {ID=} {self.source=}')
         if ID is not None and isinstance(self.source, list):
             _source = self.source[ID]
-            cache_directory = self.set_cached_dir(_source) or cache_directory
+            cache_directory = set_cached_dir(_source) or cache_directory
         elif ID is not None and isinstance(self.source, str):
             _source = self.source
-            cache_directory = self.set_cached_dir(self.source) or cache_directory
+            cache_directory = set_cached_dir(self.source) or cache_directory
         else:
             pass
         # ---- convert to using units
@@ -2416,10 +2419,10 @@ class QRCodeShape(BaseShape):
         # tools.feedback(f'*** {ID=} {self.source=}')
         if ID is not None and isinstance(self.source, list):
             _source = self.source[ID]
-            cache_directory = self.set_cached_dir(_source) or cache_directory
+            cache_directory = set_cached_dir(_source) or cache_directory
         elif ID is not None and isinstance(self.source, str):
             _source = self.source
-            cache_directory = self.set_cached_dir(self.source) or cache_directory
+            cache_directory = set_cached_dir(self.source) or cache_directory
         else:
             pass
         # tools.feedback(f"Dot {self._o.delta_x=} {self._o.delta_y=}")
@@ -2445,18 +2448,32 @@ class QRCodeShape(BaseShape):
         else:
             x = self._u.x + self._o.delta_x
             y = self._u.y + self._o.delta_y
-        # ---- create code
-        qrcode = segno.make_qr(self.text)
+        # ---- set canvas
+        self.set_canvas_props(index=ID)
+        # ---- overrides for self.text / text value
+        _locale = kwargs.get('locale', None)
+        if _locale:
+            self.text = tools.eval_template(self.text, _locale)
+        _text = self.textify(ID)
+        # tools.feedback(f'*** {_locale=} {self.text=} {_text=}', False)
+        if _text is None or _text == '':
+            tools.feedback('No text supplied for the Text shape!', False, True)
+            return
+        _text = str(_text)  # card data could be numeric
+        if '\\u' in _text:
+            _text = codecs.decode(_text, 'unicode_escape')
+        # ---- create QR code
+        qrcode = segno.make_qr(_text)
         qrcode.save(
             _source,
-            scale=self.scaling,
-            light=self.fill,
-            dark=self.stroke
+            scale=self.scaling or 1,
+            light=tools.color_to_hex(self.fill),
+            dark=tools.color_to_hex(self.stroke)
         )
         img = ImageReader(_source)
-        # ---- draw code
+        # ---- draw code as image
         cnv.drawImage(img, x=x, y=y, width=width, height=height, mask="auto")
-        # ---- text
+        # ---- shape's text
         xc = x + width / 2.0
         yc = y + height / 2.0
         if self.heading:

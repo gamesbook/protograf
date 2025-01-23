@@ -55,6 +55,7 @@ Shape Index
 -  `Polygon`_
 -  `Polyline`_
 -  `Polyshape`_
+-  `QRCode`_
 -  `Rectangle`_
 -  `Rectangles`_
 -  `Rhombus`_
@@ -1350,6 +1351,15 @@ pairs of values; so instead of ``[(0,0), (1,1)]`` just use ``"0,0 1,1"``.
       In the ``gold``-filled Polyshape, the *x* and *y* values have been set,
       causing the whole shape to move up and to the right.
 ===== ======
+
+
+.. _qrcode-command:
+
+QRCode
+~~~~~~
+`↑ <shape-index_>`_
+
+A QRCode is ...
 
 
 .. _rectangle-command:

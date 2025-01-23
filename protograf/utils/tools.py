@@ -733,6 +733,8 @@ def comparer(val, operator, target):
 
 def color_to_hex(name):
     """Convert a named ReportLab color (Color class) to a hexadecimal string"""
+    if isinstance(name, str):
+        return name
     _tuple = (int(name.red * 255), int(name.green * 255), int(name.blue * 255))
     _string = "#%02x%02x%02x" % _tuple
     return _string.upper()

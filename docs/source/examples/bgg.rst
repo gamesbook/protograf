@@ -19,6 +19,7 @@ Table of Contents
 
 - `Basic`_
 - `Image-based`_
+- `Images and QR`_
 
 
 Basic
@@ -89,6 +90,6 @@ Discussion  This example shows how to construct a set of cards |dash| one per ga
             the BGG website.
 
 ----------- ------------------------------------------------------------------
-Screenshot  .. image:: images/bgg/bgg_cards_images.png
+Screenshot  .. image:: images/bgg/bgg_cards_image.png
                :width: 90%
 =========== ==================================================================
