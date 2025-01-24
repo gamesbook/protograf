@@ -33,14 +33,14 @@ age_img = image('age.png', x=4.2, y=6.8, width=1.8, height=1.8)
 time = text(common=numbers, x=1.1, y=6.9, text=T('{{ PLAYINGTIME }}'))
 players = text(common=numbers, x=3.1, y=6.9, text=T('{{ PLAYERS }}'))
 minage = text(common=numbers, x=5.1, y=6.9, text=T('{{ AGE }}'))
-name = text(common=title, x=3.15, y=6.4, text=T('{{ NAME }}'))
+name = text(common=title, x=3.15, y=6.4, text=T('{{ NAME[:32] }}'))
 desc = text(
     font_face="Times New Roman", font_size=9, stroke="#808080",
     leading=11, x=0.075, y=6.35, width=6.125, height=4.8,
     wrap=True, align="centre", text=T('{{ DESCRIPTION_SHORT }}'))
 foot = text(
     font_face="Arial", font_size=7, stroke=black, leading=8,
-    x=0.1, y=0.85, width=6.1, height=0.4,
+    x=0.1, y=1.67, width=6.1, height=1.6,
     wrap=True, align="centre", text=T('{{ MECHANICS }}'))
 
 # final layout

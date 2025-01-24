@@ -32,7 +32,10 @@ img = image(T('{{ IMAGE }}'), x=0., y=0., width=15, height=5, sliced='m')
 qr = qrcode(
     T('bgg-{{ ID }}-qr.png'),
     text=T("https://boardgamegeek.com/boardgame/{{ ID }}"),
-    x=12.5, y=0.5, width=2, height=2, fill="#FF5100", stroke="#3F3A60")
+    x=12.5, y=0.5,
+    width=2, height=2,
+    fill="#FF5100",
+    stroke="#3F3A60")
 rct = rectangle(border=None)
 
 # final layout

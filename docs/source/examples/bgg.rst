@@ -2,6 +2,8 @@
 Examples: Board Game Geek
 =========================
 
+.. _BGG-Examples:
+
 .. |dash| unicode:: U+2014 .. EM DASH SIGN
 
 These examples are meant to demonstrate the type of output you can expect

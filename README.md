@@ -95,10 +95,10 @@ guide.
 
 Please see the [list of contributors](CONTRIBUTORS.txt).
 
-## Work-in-Progress
+## Potential Features
 
 These features are **not** guaranteed to be implemented; they just represent
-current / potential areas of work or development.
+current / potential areas of work or idea development.
 
 * [ ] New shapes:
     * [ ] Diamond shape
@@ -125,17 +125,19 @@ current / potential areas of work or development.
     * [ ] Trapezoid
     * [ ] Triangle
 * [ ] Cards:
-    * [ ] multiple decks in one script
     * [ ] support card back designs
     * [ ] grid lines for hexagonal cards
     * [ ] multiple bleed areas
+    * [ ] access to Google Sheets
 * [ ] Color:
     * [ ] add support for CMYK
     * [ ] investigate gradients
 
-## Planned/Potential Board Examples
+## Potential Examples
 
-* [ ] Abstract boards: Ludo, 9 Mens Morris, Wari
+These are possible examples to show board creation based on existing games:
+
+* [ ] Abstract boards: Ludo, 9 Mens Morris, Wari, Mu Torere
 * [ ] Wargame board: Squad Leader with terrain features (vector and bitmap)
 * [ ] Traveller board: show a fully-styled Star system (demo a custom Shape?)
 * [x] WarpWar board: show a fully-styled example

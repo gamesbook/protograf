@@ -71,7 +71,7 @@ from ._version import __version__
 #     steps, excels, excel_column,  numbers, letters)
 from protograf.utils.tools import base_fonts, DatasetType
 from protograf.utils import geoms, tools, support
-from protograf.utils.geoms import Locale, Point, Place, Ray
+from protograf.utils.geoms import Locale, Point, Place, Ray, equilateral_height
 from protograf.utils.support import LookupType
 
 from protograf import globals

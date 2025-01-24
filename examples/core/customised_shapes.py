@@ -492,6 +492,40 @@ Hexagon(x=1, y=3, height=2,
         centre_shape=small_circle, centre_shape_mx=0.3, centre_shape_my=0.6)
 PageBreak()
 
+# ---- QR Code
+Blueprint()
+Text(common=txt, text="QR Code")
+QRCode('qrcode1.png', text="Help")
+QRCode(
+    'qrcode2.png',
+    text="Help me ObiWan",
+    x=1, y=3,
+    height=2, width=2,
+    fill=grey,
+    stroke=red,
+    scaling=5
+)
+PageBreak()
+
+# ---- image - sliced
+Blueprint()
+Text(common=txt, text="Image: sliced")
+Image("sholes_typewriter.png", sliced='t',
+      width=3, height=1, x=0.5, y=5)
+Image("sholes_typewriter.png", sliced='m',
+      width=3, height=1, x=0.5, y=4)
+Image("sholes_typewriter.png", sliced='b',
+      width=3, height=1, x=0.5, y=3)
+
+Image("sholes_typewriter.png", sliced='l',
+      width=1, height=3, x=0, y=0)
+Image("sholes_typewriter.png", sliced='c',
+      width=1, height=3, x=1.5, y=0)
+Image("sholes_typewriter.png", sliced='r',
+      width=1, height=3, x=3, y=0)
+PageBreak()
+
+
 # ---- END
 Text(common=txt, text="Shapes END...")
 #PageBreak(footer=True)
@@ -519,5 +553,5 @@ Save(
         "polyshape_default", "polyshape_custom", "polyshape_offset",
         "rectangles_rowcol", "rectangles_custom", "rhombus_custom",
         "rhombus_borders", "trapezoid_borders", "arrow_sizes", "arrow_rotate",
-        "shape_centred", "shape_centred_move",
+        "shape_centred", "shape_centred_move", "qr_code", "image_sliced",
         None])

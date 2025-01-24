@@ -376,7 +376,7 @@ Example 2.
           The medium blue line has a style set so that it is not a normal solid
           line:
 
-          - *dashed* - a list, shown by the square brackets from `[` to `]`,
+          - *dashed* - a list, shown by the square brackets from ``[`` to ``]``,
 
           The list provides a number of "on"/"off" pairs: the line is drawn for a
           distance matching an "on" value followed by a gap matching an "off"
@@ -451,7 +451,7 @@ Example 1.
 
       The *points* for a Polyline:
 
-      - are in a list, as shown by the square brackets from `[` to `]`,
+      - are in a list, as shown by the square brackets from ``[`` to ``]``,
       - each *x* and *y* are provided as a pair of values in round brackets
       - each *x* and *y* are separated by a comma
       - each pair of values in the list is separated by a comma
@@ -1359,8 +1359,61 @@ QRCode
 ~~~~~~
 `↑ <shape-index_>`_
 
-A QRCode is ...
+A QR Code is a square image containing a pattern of black squares and dots.
+It represents encoded information that a device with a QR scanner, for example,
+a  cell phone, can decode.
 
+The properties that can be provided to a ``QRCode`` command, apart from the
+usual *x* and *y*, to set the lower-left corner, and *height* and *width* to
+set the size, are:
+
+- *image* - this should be the first property and is the name of the file
+  that will be created by the command
+- *text* - this contains the information that is to be encoded (and decoded)
+- *scaling* - the size of the indivdual QR Code squares, in pixels
+- *stroke* - the color of the pattern containing the black squares and dots
+- *fill* - the color that will appear as the background
+
+Example 1.
+++++++++++
+
+.. |qrc| image:: images/customised/qr_code.png
+   :width: 330
+
+===== ======
+|qrc| This example shows the shape constructed using the commands with these
+      properties:
+
+      .. code:: python
+
+        QRCode("qrcode1.png", text="Help")
+
+      The first command uses the defaults which means it has the following
+      properties automtically set for it:
+
+      - lower-left corner at x-position ``1`` cm and at y-position ``1`` cm
+      - *width* and *height* - default to ``1`` cm
+      - *scaling* - default is ``1``, so 1 pixel per square
+      - *stroke* - is ``black`` for the squares color
+      - *fill* - is ``white`` for the background color
+
+      The second command overides various of these defaults:
+
+      .. code:: python
+
+        QRCode(
+            'qrcode2.png',
+            text="Help me ObiWan",
+            x=2, y=2,
+            height=2, width=2,
+            fill=grey,
+            stroke=red,
+            scaling=5
+        )
+
+      In this example, the QR Code is now larger with colors.
+
+===== ======
 
 .. _rectangle-command:
 
@@ -2377,6 +2430,43 @@ Example 2.
       show through.
 ===== ======
 
+Example 3.
+++++++++++
+
+.. |im3| image:: images/customised/image_sliced.png
+   :width: 330
+
+===== ======
+|im3| This example shows the shape constructed using the command with the
+      following properties:
+
+      .. code:: python
+
+        Image("sholes_typewriter.png", sliced='t',
+              width=3, height=1, x=0.5, y=5)
+        Image("sholes_typewriter.png", sliced='m',
+              width=3, height=1, x=0.5, y=4)
+        Image("sholes_typewriter.png", sliced='b',
+              width=3, height=1, x=0.5, y=3)
+
+        Image("sholes_typewriter.png", sliced='l',
+              width=1, height=3, x=0, y=0)
+        Image("sholes_typewriter.png", sliced='c',
+              width=1, height=3, x=1.5, y=0)
+        Image("sholes_typewriter.png", sliced='r',
+              width=1, height=3, x=3, y=0)
+
+      Here the *sliced* property is used to "slice" off portions of the
+      image:
+
+      - *t* - the top fraction, matching the image's height:width ratio
+      - *m* - the middle fraction, matching the image's height:width ratio
+      - *b* - the botttom fraction, matching the image's height:width ratio
+      - *l* - the left fraction, matching the image's width:height ratio
+      - *c* - the centre fraction, matching the image's width:height ratio
+      - *r* - the right fraction, matching the image's width:height ratio
+
+===== ======
 
 .. _hexagons-command:
 

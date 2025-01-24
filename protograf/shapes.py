@@ -86,8 +86,6 @@ class ImageShape(BaseShape):
         self.sliced = kwargs.get('sliced', None)
         self.cache_directory = get_cache(**kwargs)
 
-
-
     def draw(self, cnv=None, off_x=0, off_y=0, ID=None, **kwargs):
         """Show an image on a given canvas."""
         kwargs = self.kwargs | kwargs
