@@ -496,6 +496,7 @@ class BaseCanvas:
         # ---- image / file
         self.source = self.defaults.get('source', None)  # file or http://
         self.cache_directory = None  # should be a pathlib.Path object
+        self.sliced = ''
         # ---- line / ellipse / bezier / sector
         self.length = self.defaults.get('length', self.default_length)
         self.angle = self.defaults.get('angle', 0)
@@ -836,6 +837,7 @@ class BaseShape:
         # tools.feedback(f"+++ BShp:{self} init {kwargs.get('fill')=} {self.fill=} {kwargs.get('fill_color')=}")
         # ---- image / file
         self.source = kwargs.get('source', cnv.source)  # file or http://
+        self.sliced = ''
         # ---- line / ellipse / bezier / arc / polygon
         self.length = self.kw_float(kwargs.get('length', cnv.length))
         self.angle = self.kw_float(kwargs.get('angle', cnv.angle))  # anti-clock from flat

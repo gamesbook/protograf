@@ -1,6 +1,9 @@
 # -*- coding: utf-8 -*-
 """
 Primary interface for protograf (imported at top-level)
+
+Note:
+    Some imports here are for sake of reuse by the top-level import
 """
 # lib
 import argparse
@@ -63,7 +66,7 @@ from .shapes import (
     StadiumShape, StarShape, StarFieldShape, TextShape, TrapezoidShape,
     GRID_SHAPES_WITH_CENTRE, GRID_SHAPES_NO_CENTRE, SHAPES_FOR_TRACK)
 from .layouts import (
-    GridShape, DotGridShape,
+    GridShape, DotGridShape, RectangularLocations, TriangularLocations,
     VirtualLocations, ConnectShape, RepeatShape, SequenceShape)
 from .groups import DeckShape, Switch
 from ._version import __version__
@@ -72,7 +75,7 @@ from ._version import __version__
 from protograf.utils.tools import base_fonts, DatasetType
 from protograf.utils import geoms, tools, support
 from protograf.utils.geoms import Locale, Point, Place, Ray, equilateral_height
-from protograf.utils.support import LookupType
+from protograf.utils.support import LookupType, steps
 
 from protograf import globals
 
