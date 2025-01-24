@@ -495,6 +495,7 @@ class BaseCanvas:
         self.leading = self.defaults.get('leading', self.font_size)
         # ---- image / file
         self.source = self.defaults.get('source', None)  # file or http://
+        self.cache_directory = None  # should be a pathlib.Path object
         # ---- line / ellipse / bezier / sector
         self.length = self.defaults.get('length', self.default_length)
         self.angle = self.defaults.get('angle', 0)
@@ -840,6 +841,8 @@ class BaseShape:
         self.angle = self.kw_float(kwargs.get('angle', cnv.angle))  # anti-clock from flat
         self.angle_width = self.kw_float(kwargs.get('angle_width', cnv.angle_width))  # delta degrees
         self._angle_theta = math.radians(self.angle)
+        # ---- image
+        self.cache_directory = None  # should be a pathlib.Path object
         # ---- chord
         self.angle_1 = self.kw_float(kwargs.get('angle1', cnv.angle_1))  # anti-clock from flat
         self._angle_1_theta = math.radians(self.angle_1)
@@ -1513,7 +1516,10 @@ class BaseShape:
 
         img = None
         svg = False
-        is_directory = False
+        if not image_location:  # nothing to see here... move along
+            return img, svg, False
+        is_directory = os.path.isdir(image_location)
+        base_image_location = image_location
         try:
             image_location_ext = image_location.strip()[-3:]
             # tools.feedback(f'Loading type: {image_location_ext}')
@@ -1521,7 +1527,15 @@ class BaseShape:
                 svg = True
         except Exception:
             pass
-        if image_location:
+        # check where image is
+        if not os.path.exists(image_location):
+            filepath = tools.script_path()
+            image_location = os.path.join(filepath, image_location)
+        if not os.path.exists(image_location):
+            tools.feedback(
+                f'Unable to find or open image "{image_location}";'
+                f' and its not in "{filepath}"', False, True)
+        else:
             try:
                 if svg:
                     if not os.path.exists(image_location):
@@ -1537,27 +1551,10 @@ class BaseShape:
                         if sliced_filename:
                             img = image_reader(sliced_filename)
                 return img, svg, is_directory
-            except IOError:
-                filepath = tools.script_path()
-                _image_location = os.path.join(filepath, image_location)
-                try:
-                    if svg:
-                        if not os.path.exists(_image_location):
-                            raise IOError
-                        img = svg2rlg(_image_location)
-                        if scaling:
-                            img = scale_image(img, scaling_factor=scaling)
-                    else:
-                        img = ImageReader(_image_location)
-                    return img, svg, is_directory
-                except IOError:
-                    ftype = 'SVG ' if svg else ''
-                    if not os.path.isdir(_image_location):
-                        tools.feedback(
-                            f'Unable to find or open {ftype}image "{_image_location}";'
-                            f' including {filepath}.')
-                    else:
-                        is_directory = True
+            except IOError as err:
+                tools.feedback(
+                    f'Unable to find or open image "{base_image_location}"'
+                    f' ({err}).', False, True)
 
         return img, svg, is_directory
 

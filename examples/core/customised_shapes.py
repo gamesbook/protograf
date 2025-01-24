@@ -65,9 +65,9 @@ PageBreak()
 # ---- compass
 Blueprint()
 Text(common=txt, text="Compass")
-Compass(cx=3, cy=1, perimeter='hexagon', radii_stroke_width=2)
-Compass(cx=1, cy=5, perimeter='circle', directions="ne nw s")
-Compass(cx=2, cy=3, perimeter='rectangle', height=2, width=3, radii_stroke=red)
+Compass(cx=3, cy=1, perimeter='hexagon', radius=0.5, directions="*", radii_stroke_width=2)
+Compass(cx=1, cy=5, perimeter='circle', radius=0.5, directions="ne nw s")
+Compass(cx=2, cy=3, perimeter='rectangle', directions="*", height=2, width=3, radii_stroke=red)
 PageBreak()
 
 # ---- lines (multiple) labels
@@ -511,11 +511,11 @@ PageBreak()
 Blueprint()
 Text(common=txt, text="Image: sliced")
 Image("sholes_typewriter.png", sliced='t',
-      width=3, height=1, x=0.5, y=5)
+      width=3, height=1, x=0, y=5)
 Image("sholes_typewriter.png", sliced='m',
       width=3, height=1, x=0.5, y=4)
 Image("sholes_typewriter.png", sliced='b',
-      width=3, height=1, x=0.5, y=3)
+      width=3, height=1, x=1.25, y=3)
 
 Image("sholes_typewriter.png", sliced='l',
       width=1, height=3, x=0, y=0)

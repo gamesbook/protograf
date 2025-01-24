@@ -753,57 +753,69 @@ Example 2.
 
 ===== ======
 |cm2| This example shows the shape constructed using the command with different
-      properties.  The top left:
+      properties.
 
-      .. code:: python
-
-          Compass(cx=1, cy=5, perimeter='circle', directions="ne nw s")
-
-      This Compass shape has the following properties:
-
-      - centred at x-position ``1`` cm and at y-position ``5`` cm
-      - *directions* define where the radial lines extend; in this case to the
-        North-East, North-West and South
-
-      The centre:
+      The top-left Compass shape:
 
       .. code:: python
 
           Compass(
-              cx=2, cy=3, perimeter='rectangle', height=2, width=3,
+              cx=1, cy=5, radius=0.5,
+              perimeter='circle',
+              directions="ne nw s"
+          )
+
+      This Compass shape has the following properties:
+
+      - centred at x-position ``1`` cm and at y-position ``5`` cm
+      - radius of ``0.5`` cm
+      - *directions* define where the radial lines extend; in this case to the
+        North-East, North-West and South
+
+      The centre Compass shape:
+
+      .. code:: python
+
+          Compass(
+              cx=2, cy=3,
+              height=2, width=3,
+              perimeter='rectangle',
+              directions="*",
               radii_stroke=red)
 
       This Compass shape has the following properties:
 
       - centred at x-position ``2`` cm and at y-position ``3`` cm
       - *perimeter* sets a ``rectangle`` used to define
-        where the radial lines of the compass extend
+        to where the radial lines of the compass extend
+      - *directions* define where the radial lines extend; in this case
+        the ``*`` means to "all" eight compass points
       - *radii_stroke* defines the line colors used
 
-      For this compass the perimter rectangle with a height of ``2`` cm and
-      a width of ``3`` cm.
+      For this Compass, the perimeter is a rectangle with a height of ``2`` cm
+      and a width of ``3`` cm.
 
-      The radial lines extend, by default, in all 8 directions |dash| to the
-      centre of the ``rectangle``'s bounding lines and to its corners.
-
-      The lower right:
+      The lower-right Compass shape:
 
       .. code:: python
 
-          Compass(cx=3, cy=1, perimeter='hexagon', radii_stroke_width=2)
+          Compass(
+              cx=3, cy=1,
+              radius=0.5,
+              perimeter='hexagon',
+              directions="*",
+              radii_stroke_width=2)
 
       This Compass shape has the following properties:
 
       - centred at x-position ``3`` cm and at y-position ``1`` cm
       - *perimeter* sets a ``hexagon`` used to define
-        where the radial lines of the compass extend;
+        where the radial lines of the compass extend
+      - *directions* define where the radial lines extend; in this case
+        the ``*`` means to "all" six hexagon points
       - *radii_stroke_width* - set to ``2`` points; a much thicker line
 
-      For this compass, the perimeter hexagon has a default diameter of
-      ``1`` cm.
-
-      The radial lines extend, by default, in all ``6`` directions |dash|
-      i.e. there is no North or South.
+      For this Compass, the perimeter is a hexagon with a radius of ``0.5`` cm.
 
 ===== ======
 
@@ -1373,6 +1385,13 @@ set the size, are:
 - *scaling* - the size of the indivdual QR Code squares, in pixels
 - *stroke* - the color of the pattern containing the black squares and dots
 - *fill* - the color that will appear as the background
+
+.. NOTE::
+
+    The QR Code images generated will be stored in the cache directory
+    ``.protograf/images/qrcodes`` (or ``.protograf\images\qrcodes``);
+    see :ref:`caching <protograf_caching>`.
+
 
 Example 1.
 ++++++++++

@@ -97,6 +97,7 @@ To retrieve games for an (imaginary) user with the username ``BenKenobi1976``:
 A collection can be very large; you may want to filter it to create a
 `Subset of Games`_.
 
+.. _protograf_caching:
 
 Caching
 -------
