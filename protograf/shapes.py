@@ -85,6 +85,7 @@ class ImageShape(BaseShape):
         # overrides / extra args
         self.sliced = kwargs.get('sliced', None)
         self.cache_directory = get_cache(**kwargs)
+        self.image_location = None
 
     def draw(self, cnv=None, off_x=0, off_y=0, ID=None, **kwargs):
         """Show an image on a given canvas."""
@@ -131,6 +132,11 @@ class ImageShape(BaseShape):
             tools.feedback(
                 f'Unable to load image "{_source}!" - please check name and location',
                 True)
+        else:
+            try:
+                self.image_location = img.fileName
+            except AttributeError:
+                self.image_location = _source
         rotation = kwargs.get('rotation', self.rotation)
         # assumes 1 pt == 1 pixel ?
         if rotation:
@@ -875,6 +881,7 @@ class CompassShape(BaseShape):
             self.height = 2.0 * self.radius
         self.x_c = None
         self.y_c = None
+        self.directions = self.directions or '*'  # compass should always have!
 
     def draw_radius(self, cnv, ID, x, y, absolute=False):
         self.set_canvas_props(
@@ -1291,7 +1298,7 @@ class EquilateralTriangleShape(BaseShape):
             y_off = height - centroid_to_vertex
             x = self._u.cx - side / 2.0
             y = self._u.cy - (height - centroid_to_vertex)
-            print(f'** {side=} {height=} {centroid_to_vertex=} {y_off=}')
+            # print(f'** {side=} {height=} {centroid_to_vertex=} {y_off=}')
         # tools.feedback(f'*** EQT {side=} {height=} {self.fill=} {self.stroke=}')
         self.vertices = self.get_vertices(x, y, side, self.hand, self.flip)
         self.centroid = self.get_centroid(self.vertices)
@@ -1312,8 +1319,8 @@ class EquilateralTriangleShape(BaseShape):
             y_off = height - centroid_to_vertex
             x = 0. - side / 2.0
             y = 0. - y_off
-            print(f'*R {side=} {height=} {centroid_to_vertex=} {y_off=}')
-            print(f'*R {x=}, {y=}')
+            # print(f'*** EQT {side=} {height=} {centroid_to_vertex=} {y_off=}')
+            # print(f'*** EQT {x=}, {y=}')
             self.vertices = self.get_vertices(x, y, side, self.hand, self.flip)
         # tools.feedback(f'*** EQT {self.centroid=}')
         # ---- set canvas
@@ -3067,29 +3074,30 @@ class RectangleShape(BaseShape):
             # done
             cnv.drawPath(pth, stroke=1, fill=1)
         # ---- fill pattern?
-        img, is_svg, is_dir = self.load_image(self.pattern)
-        if img:
-            log.debug("IMG %s s%s %s", type(img._image), img._image.size)
-            iwidth = img._image.size[0]
-            iheight = img._image.size[1]
-            # repeat?
-            if self.repeat:
-                cnv.drawImage(img, x=x, y=y, width=iwidth, height=iheight, mask="auto")
-            else:
-                # stretch
-                # TODO - work out how to (a) fill and (b) cut off -- mask?
-                # assume DPI = 300?  72pt = 1" = 300px -see
-                # http://two.pairlist.net/pipermail/reportlab-users/2006-January/004670.html
-                # w, h = yourImage.size
-                # yourImage.crop((0, 30, w, h-30)).save(...)
-                cnv.drawImage(
-                        img,
-                        x=x,
-                        y=y,
-                        width=self._u.width,
-                        height=self._u.height,
-                        mask="auto",
-                    )
+        if self.pattern:
+            img, is_svg, is_dir = self.load_image(self.pattern)
+            if img:
+                log.debug("IMG %s s%s %s", type(img._image), img._image.size)
+                iwidth = img._image.size[0]
+                iheight = img._image.size[1]
+                # repeat?
+                if self.repeat:
+                    cnv.drawImage(img, x=x, y=y, width=iwidth, height=iheight, mask="auto")
+                else:
+                    # stretch
+                    # TODO - work out how to (a) fill and (b) cut off -- mask?
+                    # assume DPI = 300?  72pt = 1" = 300px -see
+                    # http://two.pairlist.net/pipermail/reportlab-users/2006-January/004670.html
+                    # w, h = yourImage.size
+                    # yourImage.crop((0, 30, w, h-30)).save(...)
+                    cnv.drawImage(
+                            img,
+                            x=x,
+                            y=y,
+                            width=self._u.width,
+                            height=self._u.height,
+                            mask="auto",
+                        )
         # ---- centred shape (with offset)
         if self.centre_shape:
             cshape_name = self.centre_shape.__class__.__name__

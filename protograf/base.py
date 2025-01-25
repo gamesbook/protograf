@@ -497,6 +497,7 @@ class BaseCanvas:
         self.source = self.defaults.get('source', None)  # file or http://
         self.cache_directory = None  # should be a pathlib.Path object
         self.sliced = ''
+        self.image_location = None
         # ---- line / ellipse / bezier / sector
         self.length = self.defaults.get('length', self.default_length)
         self.angle = self.defaults.get('angle', 0)
@@ -838,6 +839,7 @@ class BaseShape:
         # ---- image / file
         self.source = kwargs.get('source', cnv.source)  # file or http://
         self.sliced = ''
+        self.image_location = None
         # ---- line / ellipse / bezier / arc / polygon
         self.length = self.kw_float(kwargs.get('length', cnv.length))
         self.angle = self.kw_float(kwargs.get('angle', cnv.angle))  # anti-clock from flat
@@ -1403,7 +1405,8 @@ class BaseShape:
             scaling:
                 resize factor for image
             sliced:
-                what portion of the image to return
+                what fraction of the image to return; one of
+                't', 'm', 'b', 'l', 'c', or 'r'
             width_height:
                 the (width, height) of the output frame for the image
             cache_directory:
@@ -1518,10 +1521,28 @@ class BaseShape:
 
         img = None
         svg = False
+        is_directory = False
+
         if not image_location:  # nothing to see here... move along
-            return img, svg, False
-        is_directory = os.path.isdir(image_location)
+            return img, svg, None
         base_image_location = image_location
+
+        # local files
+        if not tools.is_url_valid(image_location):
+            # relative paths
+            if not os.path.isabs(image_location):
+                filepath = tools.script_path()
+                image_location = os.path.join(filepath, image_location)
+            # no filename
+            is_directory = os.path.isdir(image_location)
+            if is_directory:
+                return img, svg, True
+            # check image exists
+            if not os.path.exists(image_location):
+                tools.feedback(
+                    f'Unable to find or open image "{image_location}"', False, True)
+                return img, svg, True
+
         try:
             image_location_ext = image_location.strip()[-3:]
             # tools.feedback(f'Loading type: {image_location_ext}')
@@ -1529,34 +1550,26 @@ class BaseShape:
                 svg = True
         except Exception:
             pass
-        # check where image is
-        if not os.path.exists(image_location):
-            filepath = tools.script_path()
-            image_location = os.path.join(filepath, image_location)
-        if not os.path.exists(image_location):
+
+        try:
+            if svg:
+                if not os.path.exists(image_location):
+                    raise IOError
+                img = svg2rlg(image_location)
+                if scaling:
+                    img = scale_image(img, scaling)
+            else:
+                img = image_reader(image_location)
+                if sliced:
+                    sliced_filename = slice_image(
+                        img, sliced, width_height=width_height)
+                    if sliced_filename:
+                        img = image_reader(sliced_filename)
+            return img, svg, is_directory
+        except IOError as err:
             tools.feedback(
-                f'Unable to find or open image "{image_location}";'
-                f' and its not in "{filepath}"', False, True)
-        else:
-            try:
-                if svg:
-                    if not os.path.exists(image_location):
-                        raise IOError
-                    img = svg2rlg(image_location)
-                    if scaling:
-                        img = scale_image(img, scaling)
-                else:
-                    img = image_reader(image_location)
-                    if sliced:
-                        sliced_filename = slice_image(
-                            img, sliced, width_height=width_height)
-                        if sliced_filename:
-                            img = image_reader(sliced_filename)
-                return img, svg, is_directory
-            except IOError as err:
-                tools.feedback(
-                    f'Unable to find or open image "{base_image_location}"'
-                    f' ({err}).', False, True)
+                f'Unable to find or open image "{base_image_location}"'
+                f' ({err}).', False, True)
 
         return img, svg, is_directory
 

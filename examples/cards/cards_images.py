@@ -16,6 +16,13 @@ Data(images="pictures", images_filter=".png,.jpg")
 Deck(grid_marks=True)
 
 # add an image to each card
-Card("*", image("*", x=0, y=0, width=6.3, height=8.8))
+img = image("*", x=0, y=0, width=6.3, height=8.8)
+rct = rectangle(fill_stroke=None)
+layout = group(rct, img)
+Card('*', layout)
+
+# FIXME - should be:
+# img = image("*", x=0, y=0, width=6.3, height=8.8)
+# Card('*', img)
 
 Save()

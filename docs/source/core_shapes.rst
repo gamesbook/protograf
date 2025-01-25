@@ -803,19 +803,19 @@ Example 2.
               cx=3, cy=1,
               radius=0.5,
               perimeter='hexagon',
-              directions="*",
               radii_stroke_width=2)
 
       This Compass shape has the following properties:
 
       - centred at x-position ``3`` cm and at y-position ``1`` cm
       - *perimeter* sets a ``hexagon`` used to define
-        where the radial lines of the compass extend
-      - *directions* define where the radial lines extend; in this case
-        the ``*`` means to "all" six hexagon points
+        where the six radial lines of the compass extend
       - *radii_stroke_width* - set to ``2`` points; a much thicker line
 
       For this Compass, the perimeter is a hexagon with a radius of ``0.5`` cm.
+
+      Note that where *directions*, which define where the radial lines extend,
+      are not given, the default is ``*``, which means "all" radial lines.
 
 ===== ======
 

@@ -177,6 +177,8 @@ class CardShape(BaseShape):
         shape_kwargs = copy.copy(kwargs)
         shape_kwargs['is_cards'] = True
         shape_kwargs['fill'] = kwargs.get('fill', kwargs.get('bleed_fill', None))
+        shape_kwargs.pop('image_list', None)  # do NOT draw linked image
+        shape_kwargs.pop('image', None)  # do NOT draw linked image
         # tools.feedback(f'$$$ draw_card SKW=> {shape_kwargs}')
         outline = self.get_outline(
             cnv=cnv, row=row, col=col, cid=cid, label=label, **shape_kwargs)
@@ -346,8 +348,8 @@ class DeckShape(BaseShape):
             # print(f'*** {page_across=}, {page_down=}')
             rect.draw()
         # ---- bleed areas (custom)
-        for area in self.bleed_areas:
-            print(area)
+        # for area in self.bleed_areas:
+        #     #print('*** BLEED AREA ***', area)
 
     def draw(self, cnv=None, off_x=0, off_y=0, ID=None, **kwargs):
         """Method called by Save() in proto.

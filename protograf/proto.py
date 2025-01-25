@@ -383,8 +383,7 @@ def Card(sequence, *elements, **kwargs):
                 card.members = _cards
                 card.elements.append(element)  # may be Group or Shape or Query
         else:
-            tools.feedback(f'Cannot find card#{_card}.'
-                           ' (Check "cards" setting in Deck)')
+            tools.feedback(f'Cannot find card#{_card}. (Check "cards" setting in Deck)')
 
 
 def Counter(sequence, *elements, **kwargs):
@@ -481,7 +480,7 @@ def Data(**kwargs):
                     f'Cannot locate or access directory: {images} or {full_path}', True)
         for child in src.iterdir():
             if not filters or child.suffix in filters:
-                globals.image_list.append(child)
+                globals.image_list.append(str(child))
         if len(globals.image_list) == 0:
             tools.feedback(
                 f'Directory "{src}" has no relevant files or cannot be loaded!', True)
