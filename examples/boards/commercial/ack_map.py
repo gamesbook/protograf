@@ -19,7 +19,7 @@ Text(
     width=15,
     height=1,
     align="left",
-    font_face="Times New Roman",
+    font_face="Times-Roman",
     font_size=23,
     text="ADVENTURER CONQUEROR KING",
 )

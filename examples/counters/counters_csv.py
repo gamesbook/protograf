@@ -22,9 +22,9 @@ CounterSheet(width=2.6, height=2.6, fill=white, grid_marks=True, copy='COPIES')
 # colors and text labels
 grey = "#B8BAB1"
 brown = "#B6A378"
-value = text(font_face="Arial", font_size=18, x=1.3, y=0.5, text=T('{{ VALUE }}'))
-size = text(font_face="Arial", font_size=12, x=1.3, y=1.9, text=T('{{ SIZE }}'))
-ident = text(font_face="Arial", font_size=12, x=0.55, y=1.18, align='left', rotation=90,
+value = text(font_face="Helvetica", font_size=18, x=1.3, y=0.5, text=T('{{ VALUE }}'))
+size = text(font_face="Helvetica", font_size=12, x=1.3, y=1.9, text=T('{{ SIZE }}'))
+ident = text(font_face="Helvetica", font_size=12, x=0.55, y=1.18, align='left', rotation=90,
              text=T('{{ ID }}'))
 
 # national colors

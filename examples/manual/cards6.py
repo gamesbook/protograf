@@ -15,7 +15,7 @@ Deck(cards=9,
      grid_marks=True,
      shape='circle')
 
-times = Common(font_face="Times New Roman", font_size=48, stroke=white, x=3, y=2.5)
+times = Common(font_face="Times-Roman", font_size=48, stroke=white, x=3, y=2.5)
 
 # create a list of text elements for the cards, containing single letters
 mytext1 = text(text=letters("D", "L"), common=times)

@@ -1,6 +1,6 @@
-================
-Useful Resources
-================
+=============================
+Appendix II: Useful Resources
+=============================
 
 These are resources that can supplement, or aid, with game design when
 working with :doc:`protograf <index>`.

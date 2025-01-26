@@ -37,9 +37,9 @@ HQ = group(out, rect1)
 art = group(out, circ1)
 
 # unit text
-inf_A = text(font_face="Arial", font_size=18, x=1.3, y=0.5, text="2-3-4")
-division = text(font_face="Arial", font_size=12, x=1.3, y=1.9, text="XX")
-battalion = text(font_face="Arial", font_size=12, x=1.3, y=1.9, text="X")
+inf_A = text(font_face="Helvetica", font_size=18, x=1.3, y=0.5, text="2-3-4")
+division = text(font_face="Helvetica", font_size=12, x=1.3, y=1.9, text="XX")
+battalion = text(font_face="Helvetica", font_size=12, x=1.3, y=1.9, text="X")
 
 # final counter designs
 marker_german = group(

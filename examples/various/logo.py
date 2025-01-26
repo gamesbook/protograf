@@ -4,6 +4,10 @@ Logo for protograf
 
 Written by: Derek Hohls
 Created on: 5 January 2025
+
+Notes:
+    Not sure what font to use for your logo ... watch
+    https://www.youtube.com/watch?v=j7SByXWWVzU
 """
 from protograf import *
 
@@ -22,7 +26,7 @@ header = Common(x=0, y=6, font_size=8, align="left")
 sanserif = Font("Courier", size=24, stroke="#3085AC")
 Text(x=0, y=2, text='proto', width=3, height=2,
      wrap=True, align="left", stroke="#3085AC")
-sans = Font("Arial", size=20, stroke="#3085AC")
+sans = Font("Helvetica", size=20, stroke="#3085AC")
 Text(x=2.58, y=1.85, text='<b>graf</b>', width=2, height=2,
      wrap=True, align="left", stroke="#3085AC")
 

@@ -207,8 +207,8 @@ items that are "own"ed in the collection of the (imaginary) user
     A user's entire collection is retrieved at once - so there is no
     "progress" option available!
 
-
-The full list of property filters that can be used are:
+The full list of property filters that can be used, when accessing a
+user's collection, are:
 
 - *own* -  include (if ``True``) or exclude (if ``False``) owned items
 - *rated* -  include (if ``True``) or exclude (if ``False``) rated items
@@ -238,8 +238,51 @@ Font Command
 ============
 `↑ <table-of-contents_>`_
 
-**To Be Done**
+.. NOTE::
 
+  There is a section with more in-depth discussion on the
+  :doc:`use of fonts <using_fonts>` which could be helpful,
+  especially if you have problems...
+
+The ``Font()`` command will change the default font in use from that point
+forward in the script.
+
+Usually, the font's properties will be set at the time that a ``Text()``
+command is issued, and multiple ``Text()`` commands can obviously use the
+``Common()`` command to avoid duplication, but it can sometimes be useful
+to set the font properties more widely.
+
+The following properties are available for the command:
+
+- *face* - the name of the font
+- *size* - the font "height" in points
+- *stroke* - the font color; either a built-in color or a hexadecimal value
+
+
+.. |fc1| image:: images/custom/commands/fonts.png
+   :width: 330
+
+===== ======
+|fc1| This example shows the use of the command with different properties:
+
+      .. code:: python
+
+        Font("Helvetica")
+        Text(text="Helvetica 12pt black", x=0, y=5, align="left")
+
+        Font("Times-Roman", size=11, stroke=tomato)
+        Text(text="Times-Roman 11pt red", x=0, y=4, align="left")
+
+        Font("Courier", size=10, stroke=aqua)
+        Text(text="Courier 9pt aqua", x=0, y=3, align="left")
+
+        Font("Verdana", size=9, stroke=gold)
+        Text(text="Verdana 9pt gold", x=0, y=2, align="left")
+
+      In each example, the name of the font appears first, followed by any
+      further details as to its properties.
+
+===== ======
 
 .. _the-today-command:
 
@@ -247,4 +290,48 @@ Today Command
 ============
 `↑ <table-of-contents_>`_
 
-**To Be Done**
+The ``Today()`` command will insert text with the current date and/or time.
+
+Varying date formats can be used. Two properties are available:
+
+- *details* - this can be either ``date`` or ``datetime``
+- *style* - this can be ``usa`` or ``eur``; if not provided then ``ISO`` date
+  style is used |dash| see the "1." example below.
+
+
+Example 1.
+----------
+`^ <the-today-command_>`_
+
+.. |df1| image:: images/customised/dates_formats.png
+   :width: 330
+
+===== ======
+|df1| This example shows the use of the command with different *details*
+      and *style* - the first example just uses defaults.
+
+      .. code:: python
+
+        dtext = Common(x=0.25, align="left", font_size=8)
+        Text(
+            common=dtext, y=5,
+            text="1.  "+Today())
+        Text(
+            common=dtext, y=4,
+            text="2.  "+Today(details="date", style="usa"))
+        Text(
+            common=dtext, y=3,
+            text="3.  "+Today(details="date", style="eur"))
+        Text(
+            common=dtext, y=2,
+            text="4.  "+Today(details="datetime", style="usa"))
+        Text(
+            common=dtext, y=1,
+            stroke=red,
+            text="5.  "+Today(details="datetime", style="eur"))
+
+      Because the output of the ``Today()`` command is provided as text,
+      it can be used for the *text* property of the ``Text()`` command
+      and located and styled as part of that command.
+
+===== ======

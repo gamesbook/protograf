@@ -23,7 +23,7 @@ from jinja2.environment import Template
 from svglib.svglib import svg2rlg
 from reportlab.pdfgen import canvas as reportlab_canvas
 from reportlab.pdfbase import pdfmetrics
-from reportlab.pdfbase.ttfonts import TTFont
+from reportlab.pdfbase.ttfonts import TTFont, TTFError
 from reportlab.lib.units import cm, inch, mm
 from reportlab.lib.pagesizes import (
     A8, A7, A6, A5, A4, A3, A2, A1, A0, LETTER, LEGAL, ELEVENSEVENTEEN,
@@ -68,6 +68,7 @@ DEBUG = False
 DEBUG_COLOR = lightsteelblue
 CACHE_DIRECTORY = '.protograf'   # append to the user's home directory
 BGG_IMAGES = 'cf.geekdo-images.com'
+BUILTIN_FONTS =  ['Times-Roman', 'Courier', 'Helvetica']
 
 # ---- named tuples
 UnitProperties = namedtuple(
@@ -1142,7 +1143,7 @@ class BaseShape:
             ff = ext(self.font_face)
             try:
                 self.register_font(ff)
-            except (KeyError, ValueError):
+            except (KeyError, ValueError, TTFError):
                 tools.feedback(
                     f'Unable to find or register font: "{ff}".'
                     ' Please check that it is installed on your system.',
@@ -1244,11 +1245,28 @@ class BaseShape:
         self.use_abs_c = True if self._abs_cx is not None and self._abs_cy is not None else False
         # tools.feedback(f'*** draw baseshape: {self._abs_x=} {self._abs_y=} {self._abs_cx=} {self._abs_cy=}')
 
-    def register_font(self, font_name: str = ''):
+    def register_font(self, font_name: str = '', font_type='ttf'):
+        """Replace spaces and try different font extensions."""
         if not font_name:
-            raise ValueError('No font name supplied for registration!')
-        font_file = font_name + '.ttf'
-        pdfmetrics.registerFont(TTFont(font_name, font_file))
+            tools.feedback('No font name supplied for registration!', True)
+        if font_name in BUILTIN_FONTS :
+            return  # these are built-in to ReportLab
+        _font_name = str(font_name).replace(' ', '_')
+        try:
+            font_file = _font_name + '.' + font_type
+            pdfmetrics.registerFont(TTFont(font_name, font_file))
+            return
+        except TTFError:
+            pass
+        ps_fonts = ['.pfb', '.pfm', '.afm', '.pfa', '.ofm', '.otf']
+        for ps_ext in ps_fonts:
+            try:
+                font_file = _font_name + ps_ext
+                pdfmetrics.registerFont(TTFont(font_name, font_file))
+                return
+            except TTFError:
+                pass
+        tools.feedback(f'Unable to register font {font_name}!', True)
 
     def check_settings(self) -> tuple:
         """Check that the user-supplied parameters for choices are correct"""

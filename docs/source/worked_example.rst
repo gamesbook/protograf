@@ -234,7 +234,7 @@ last card number separated by a dash ("-").
 
 In the line starting ``Card("25"``, you can see that Card#25 will
 contains the text ``25!`` in a large font size, using the default
-font face of *Arial*.
+font face of ``Helvetica``.
 
 This script also shows the use of a **reference** - a reference is just
 a name, followed by an "=" sign, and then an instruction of some kind.

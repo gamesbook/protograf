@@ -293,5 +293,5 @@ Some examples of defaults are:
    value of ``#000000``
 -  the default area *fill* color is ``white`` - which has a hexadecimal
    value of ``#FFFFFF``
--  the default *font* is Arial, with a size (height) of ``12`` points and a
-   stroke color of ``black``
+-  the default *font* is ``Helvetica``, with a size (height) of ``12`` points
+   and a stroke color of ``black``

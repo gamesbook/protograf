@@ -1,6 +1,6 @@
-=====================
-Using Python Commands
-=====================
+=================================
+Appendix I: Using Python Commands
+=================================
 
 .. |dash| unicode:: U+2014 .. EM DASH SIGN
 

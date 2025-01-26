@@ -23,9 +23,9 @@ Deck(cards=1, grid_marks=True, stroke=None)  # number of cards reset by Data()
 
 # format the text and numeric boxes used
 numbers = Common(
-    font_face="Arial", font_size=9, height=0.8, width=2.6, x=0.2,
+    font_face="Helvetica", font_size=9, height=0.8, width=2.6, x=0.2,
     notch=0.15, notch_corners="NW SW")
-title = Common(font_face="Times New Roman", font_size=12, stroke=red)
+title = Common(font_face="Times-Roman", font_size=12, stroke=red)
 
 # create an image for the card
 img = image(T('{{ IMAGE }}'), x=2.8, y=5.45, width=3.25, height=3.25)
@@ -41,7 +41,7 @@ name = text(
     common=title, align="left", x=0.2, y=5.8, width=6, wrap=True,
     text=T('<i>{{ NAME }}</i>'))
 desc = text(
-    font_face="Arial", font_size=7, stroke=dimgray,
+    font_face="Helvetica", font_size=7, stroke=dimgray,
     leading=8, x=0.2, y=4.8, width=5.8, height=4.8,
     wrap=True, align="justify", text=T('{{ DESCRIPTION_SHORT }}'))
 game_id = circle(

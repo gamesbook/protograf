@@ -46,6 +46,7 @@ useful information but do build on each other.
    examples/various
    python_commands
    useful_resources
+   using_fonts
 
 
 Indices and tables

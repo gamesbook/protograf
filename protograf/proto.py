@@ -280,7 +280,7 @@ def Font(face=None, **kwargs):
 
     globals.cnv.font_face = face or 'Helvetica'
     globals.cnv.font_size = kwargs.get('size', 12)
-    globals.cnv.stroke = COLORS.get(kwargs.get('color', 'black'))
+    globals.cnv.stroke = kwargs.get('stroke', black)
 
 # ---- various ====
 

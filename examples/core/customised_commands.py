@@ -43,6 +43,19 @@ capitol(a=1, b=2, c=gold)
 capitol(a=2, b=4, c=lime)
 PageBreak()
 
+Blueprint()
+Text(common=txt, text="Font Command")
+Font("Helvetica")
+Text(text="Helvetica 12pt black", x=0, y=5, align="left")
+Font("Times-Roman", size=11, stroke=tomato)
+Text(text="Times-Roman 11pt red", x=0, y=4, align="left")
+Font("Courier", size=10, stroke=aqua)
+Text(text="Courier 10pt aqua", x=0, y=3, align="left")
+Font("Verdana", size=9, stroke=gold)
+Text(text="Verdana 9pt gold", x=0, y=2, align="left")
+PageBreak()
+
+
 # ---- END
 Text(common=txt, text="Command END...")
 PageBreak(footer=True)
@@ -53,5 +66,5 @@ Save(
      directory="docs/source/images/custom/commands",
      names=[
         None,
-        "loop", "function",
+        "loop", "function", "fonts",
         None])

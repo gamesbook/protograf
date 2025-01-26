@@ -467,8 +467,18 @@ Text
 
 It may seem strange to view text as a "shape" but, from a drawing point of
 view, it's really just a series of complex lines drawn in a particular pattern!
-Thus text has size, color and position in common with many other shapes, as
-well as its own special properties.
+Thus text has a position in common with many other shapes, as well as its own
+special properties.
+
+The properties that can be set are:
+
+- *text* - the text string; if this appears as the first property, you can
+  omit the ``text=``` prefix
+- *font_size* - default is ``12`` points
+- *font_face* - the default is ``Helvetica``
+- *stroke* - the default text color is ``black``
+- *align* - the default aligment is ``center``; it can be changed to be
+  ``left``, ``right`` or ``justified``.
 
 Example 1.
 ++++++++++
@@ -478,8 +488,8 @@ Example 1.
 
 ===== ======
 |txt| This example shows the shape constructed using the command with only
-      defaults except for the **text** property - this is changed otherwise
-      there would not be any text to see!:
+      defaults except for the **text** property; this is changed from a blank
+      string otherwise there would not be anything to see!:
 
       .. code:: python
 
@@ -487,9 +497,11 @@ Example 1.
 
       It otherwise has the following properties based on the defaults:
 
-      - centred at x-position ``1`` cm and at y-position ``1`` cm
-      - default font size is ``12`` points
-      - default font face is ``Arial``
+      - located is at x-position ``1`` cm and at y-position ``1`` cm
+      - text is at the ``center`` of the position
+      - default *font_size* is ``12`` points
+      - default *font_face* is ``Helvetica``
+
 ===== ======
 
 
