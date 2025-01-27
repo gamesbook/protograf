@@ -791,7 +791,6 @@ def sheet_column(num: int, lower: bool = False) -> string:
 def base_fonts():
     """On Ubuntu: sudo apt-get install ttf-mscorefonts-installer"""
     fonts = [
-        {'name': 'Ubuntu', 'file': 'Ubuntu-R.ttf'},
         {'name': 'Arial', 'file': 'Arial.ttf'},
         {'name': 'Verdana', 'file': 'Verdana.ttf'},
         {'name': 'Courier New', 'file': 'Courier_New.ttf'},

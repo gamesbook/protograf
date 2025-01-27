@@ -3803,7 +3803,15 @@ class TextShape(BaseShape):
             splitLongWords=1,
             """
             # tools.feedback(f'*** Text LONG-{ID} => _text:{_text}')
-            para = Paragraph(_text, style=_style)
+            try:
+                para = Paragraph(_text, style=_style)
+            except ValueError as err:
+                if 'name=sc' in str(err):
+                    parts = str(err).split('name=sc')
+                    _err = parts[1]
+                else:
+                    _err = err
+                tools.feedback(f'Cannot create Text - {_err}', True)
             w, h = para.wrap(width, height)
             para.drawOn(cnv, x_t, y_t - h)  # start text from top of 'box'
         else:

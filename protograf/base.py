@@ -23,6 +23,7 @@ from jinja2.environment import Template
 from svglib.svglib import svg2rlg
 from reportlab.pdfgen import canvas as reportlab_canvas
 from reportlab.pdfbase import pdfmetrics
+from reportlab.pdfbase.pdfmetrics import registerFontFamily
 from reportlab.pdfbase.ttfonts import TTFont, TTFError
 from reportlab.lib.units import cm, inch, mm
 from reportlab.lib.pagesizes import (
@@ -1247,26 +1248,69 @@ class BaseShape:
 
     def register_font(self, font_name: str = '', font_type='ttf'):
         """Replace spaces and try different font extensions."""
+
+        def register_base_font(font_name: str):
+            basename = None
+            font_names = [font_name, str(font_name).replace(' ', '_')]
+            font_seps = ['', '-']
+            styles = ['', 'Regular', 'R', 'Rg']
+            for fontname in font_names:
+                for style in styles:
+                    for font_sep in font_seps:
+                        basename = f'{fontname}{font_sep}{style}.ttf'
+                        try:
+                            pdfmetrics.registerFont(TTFont(font_name, basename + '.ttf'))
+                            font_base = filename
+                            return font_base
+                        except TTFError:
+                            pass
+            return basename
+
         if not font_name:
             tools.feedback('No font name supplied for registration!', True)
-        if font_name in BUILTIN_FONTS :
+        if font_name in BUILTIN_FONTS:
             return  # these are built-in to ReportLab
-        _font_name = str(font_name).replace(' ', '_')
-        try:
-            font_file = _font_name + '.' + font_type
-            pdfmetrics.registerFont(TTFont(font_name, font_file))
-            return
-        except TTFError:
-            pass
-        ps_fonts = ['.pfb', '.pfm', '.afm', '.pfa', '.ofm', '.otf']
-        for ps_ext in ps_fonts:
-            try:
-                font_file = _font_name + ps_ext
-                pdfmetrics.registerFont(TTFont(font_name, font_file))
-                return
-            except TTFError:
-                pass
-        tools.feedback(f'Unable to register font {font_name}!', True)
+
+        # breakpoint()
+        # pdfmetrics.registerFont(TTFont('DejaVuSans', 'DejaVuSans.ttf'))
+        # pdfmetrics.registerFont(TTFont('DejaVuSans-Bold', 'DejaVuSans-Bold.ttf'))
+        # registerFontFamily('DejaVuSans', normal='DejaVuSans', bold='DejaVuSans-Bold')
+        # return
+
+        # get base font
+        font_base = register_base_font(font_name)
+        if not font_base:
+            tools.feedback(f'Unable to register font {font_name}!', True)
+
+        # look for additional styles
+        kwargs = {}
+        styles = [
+            'Light', 'Thin', 'Medium', 'Black', 'Bold', 'Oblique', 'Italic',
+            'L', 'T', 'M', 'A', 'B', 'O', 'I',
+            'Lt', 'Th', 'Md', 'Bl', 'Bo', 'Ob', 'It',
+            'BI', 'BO', 'BoOb', 'BoIt', 'BoldOblique', 'BoldItalic', ]
+        font_names = [font_name, str(font_name).replace(' ', '_')]
+        font_seps = ['-', '']
+        for fontname in font_names:
+            for style in styles:
+                for font_sep in font_seps:
+                    basename = f'{fontname}{font_sep}{style}'
+                    filename = basename + '.ttf'
+                    try:
+                        pdfmetrics.registerFont(TTFont(basename, filename))
+                        print(f'Registered: {basename=} {filename=}')
+                        if style in ['Bold', 'Bo', 'B', ]:
+                            kwargs['bold'] = basename
+                        if style in ['Italic', 'Oblique', 'O', 'I', 'Ob', 'It', ]:
+                            kwargs['italic'] = basename
+                        if style in [
+                                'BI', 'BO', 'BoOb', 'BoIt', 'BoldOblique', 'BoldItalic']:
+                            kwargs['boldItalic'] = basename
+                    except TTFError:
+                        pass
+        if font_base and kwargs:
+            print(f'{font_name=} {font_base=} {kwargs=}')
+            registerFontFamily(font_name, normal=font_base, **kwargs)
 
     def check_settings(self) -> tuple:
         """Check that the user-supplied parameters for choices are correct"""

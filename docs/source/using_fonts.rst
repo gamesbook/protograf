@@ -2,6 +2,8 @@
 Appendix I: Using Fonts
 =======================
 
+.. |dash| unicode:: U+2014 .. EM DASH SIGN
+
 .. IMPORTANT::
 
    This section represents the **very** limited understanding of the program's

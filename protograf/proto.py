@@ -112,7 +112,6 @@ def Create(**kwargs):
 
     # ---- cards and page
     _cards = kwargs.get('cards', 0)
-    fonts = kwargs.get('fonts', [])
     landscape = kwargs.get('landscape', False)
     kwargs = margins(**kwargs)
     globals.paper = kwargs.get('paper', globals.paper)
@@ -121,8 +120,6 @@ def Create(**kwargs):
 
     # ---- fonts
     base_fonts()
-    for _font in fonts:
-        pdfmetrics.registerFont(TTFont(_font[0], _font[1]))
     globals.font_size = kwargs.get('font_size', 12)
 
     # ---- command-line arguments
