@@ -1,12 +1,13 @@
-=========================
-Appendix III: Using Fonts
-=========================
+=======================
+Appendix I: Using Fonts
+=======================
 
 .. IMPORTANT::
 
    This section represents the **very** limited understanding of the program's
    author - certainly any feedback to help correct and make it clearer will be
    more than welcome!
+
 
 The Basics
 ==========
@@ -19,7 +20,6 @@ If you are using the ``Text`` command, the font can be setup as follows:
 .. code:: python
 
     Text("Hello World!", font_face="Arial", font_size=48, stroke=red)
-
 
 If you want to set the font for a whole section of script, then using the
 ``Font`` command, you can setup as follows:
@@ -64,7 +64,7 @@ operating system, you can consider using a command such as:
 In this case, when the ``Create`` command runs, it will automatically try to
 register the following fonts:
 
-- *Ubuntu*
+- *Ubuntu*  (technically, *Ubuntu Regular*)
 - *Arial*
 - *Verdana*
 - *Courier New*
@@ -81,25 +81,82 @@ Using Additional Fonts
 ======================
 
 It is possible to install additional fonts into an operating system. Once
-installed, these could be used in a :doc:`protograf <index>` script.
+installed, these could then be used in a :doc:`protograf <index>` script.
 
 However, there are some limitations:
 
-- The font **MUST** be a TrueType font, which will have a filename with a
+- The font **MUST** be a *TrueType* font, which will have a filename with a
   ``.ttf`` extension
 - The font must be installed into the standard location for that operating
-  system, so that it can be "discovered"
+  system, so that it can be "auto-discovered"
 - The font must be referred to correctly; for example, the ``Ubuntu`` font is
   not actually available as ``Ubuntu`` but rather as ``Ubuntu-L``, ``Ubuntu-R``
-  and ``Ubuntu-M`` for the light, regular and medium varieties.
+  and ``Ubuntu-M`` for the light, regular and medium styles. By default,
+  :doc:`protograf <index>` will attempt to find and use the *regular* style
+  if no plain version is available.
 
-It should also be noted that the ability of a font to display bold and italic
-(or, for serif fonts, oblique) styles require additional font files to be
-installed.  These files usually have an appended suffix like *Bold* or *B*.
+Font Styles
+-----------
+
+Fonts can be created with a number of styles, including:
+
+- light
+- thin
+- regular (the "default")
+- medium
+- black
+- bold
+- italic
+- oblique (italic equivalent for sanserif fonts)
+
+All of these styles require additional font files to be installed.
+
+The style files usually have an appended suffix like *-Bold* or *B*.
 :doc:`protograf <index>` will attempt to discover and install those extra
-files, to create what is termed a "font family" but there is no guarantee it
+files, to create what is termed a "font family", but there is no guarantee it
 will be able to do so!
+
+Font Style Combinations
+-----------------------
+
+It is common for two of the styles - bold and italic - to be used together
+with the default, or plain, version of the font.  There can also be a combined
+version of these styles |dash| *BoldItalic* or *BoldOblique* |dash| that is
+useful when both styles are applied.
+
+When all these styles are available, they will be registered as being part of
+the same family; internally the program's command to do so is:
+
+    registerFontFamily(
+        'Merriweather',
+        normal='Merriweather-Regular',
+        bold='Merriweather-Bold',
+        italic='Merriweather-Italic',
+        boldItalic='Merriweather-BoldItalic')
+
+(This example assumes you would have downloaded and installed the font files
+for the *Merriweather* font from https://fonts.google.com/specimen/Merriweather )
+
+Font Filename
+-------------
+
+If :doc:`protograf <index>` is unable to "auto-discover" the font, but
+you know the name, including the full path, of the font file, then you can
+supply this directly to the ``Font`` command:
+
+.. code:: python
+
+    Font(face="BenKenobi", size=48, stroke=red, filename="/tmp/BKenobi.ttf")
+
+Be aware that doing this makes your script less portable between machines,
+as that same file may not be present on a different machine.
 
 
 Font Resources
 ==============
+
+Additional fonts are available from:
+
+- https://www.dafont.com/
+- https://fonts.google.com/ - also very useful explanations about fonts, and
+  how to choose them
