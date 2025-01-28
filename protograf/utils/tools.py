@@ -791,22 +791,44 @@ def sheet_column(num: int, lower: bool = False) -> string:
 def base_fonts():
     """On Ubuntu: sudo apt-get install ttf-mscorefonts-installer"""
     fonts = [
-        {'name': 'Arial', 'file': 'Arial.ttf'},
-        {'name': 'Verdana', 'file': 'Verdana.ttf'},
-        {'name': 'Courier New', 'file': 'Courier_New.ttf'},
-        {'name': 'Times New Roman', 'file': 'Times_New_Roman.ttf'},
-        {'name': 'Trebuchet_MS', 'file': 'Trebuchet_MS.ttf'},
-        {'name': 'Georgia', 'file': 'Georgia.ttf'},
-        {'name': 'Webdings', 'file': 'Webdings.ttf'},
-        #{'name': '', 'file': '.ttf'},
+        {'name': 'Arial', 'base': 'Arial', 'bold': '_Bold', 'it': '_Italic', 'bi': '_Bold_Italic'},
+        {'name': 'Verdana', 'base': 'Verdana', 'bold': '_Bold', 'it': '_Italic', 'bi': '_Bold_Italic'},
+        {'name': 'Courier New', 'base': 'Courier_New', 'bold': '_Bold', 'it': '_Italic', 'bi': '_Bold_Italic'},
+        {'name': 'Times New Roman', 'base': 'Times_New_Roman', 'bold': '_Bold', 'it': '_Italic', 'bi': '_Bold_Italic'},
+        {'name': 'Trebuchet MS', 'base': 'Trebuchet_MS', 'bold': '_Bold', 'it': '_Italic', 'bi': '_Bold_Italic'},
+        {'name': 'Georgia', 'base': 'Georgia', 'bold': '_Bold', 'it': '_Italic', 'bi': '_Bold_Italic'},
+        {'name': 'Webdings', 'base': 'Webdings', 'bold': None, 'it': None, 'bi': None},
+        # {'name': '', 'base': '', , 'bold': None, 'it': None, 'bi': None},
     ]
-    for _font in fonts:
+    for ffont in fonts:
+        kwargs = {}
         try:
-            pdfmetrics.registerFont(TTFont(_font['name'], _font['file']))
+            name = ffont['name']
+            base = ffont['base']
+            filename = base+'.ttf'
+            pdfmetrics.registerFont(TTFont(name, filename))
+            _name = name.replace(' ', '_')
+            # styles
+            if ffont['bold']:
+                kwargs['bold'] = f"{_name}{ffont['bold']}"
+                fname = f"{base}{ffont['bold']}"+'.ttf'
+                print(' ****', kwargs['bold'], fname)
+                pdfmetrics.registerFont(TTFont(kwargs['bold'], fname))
+            if ffont['it']:
+                kwargs['italic'] = f"{_name}{ffont['it']}"
+                fname = f"{base}{ffont['it']}"+'.ttf'
+                print(' ****', kwargs['italic'], fname)
+                pdfmetrics.registerFont(TTFont(kwargs['italic'], fname))
+            if ffont['bi']:
+                kwargs['boldItalic'] = f"{_name}{ffont['bi']}"
+                fname = f"{base}{ffont['bi']}"+'.ttf'
+                print(' ****', kwargs['boldItalic'], fname)
+                pdfmetrics.registerFont(TTFont(kwargs['boldItalic'], fname))
+            if kwargs:
+                pdfmetrics.registerFontFamily(_name, normal=base, **kwargs)
+                print(f'Register Family:  {_name=} {filename=} {kwargs=}')
         except Exception as err:
-            pass
-            #log.error('Unable to register %s from %s (%s)',
-            #    _font['name'], _font['file'], err)
+            log.error('Unable to register %s from %s (%s)', name, base+'.ttf', err)
 
 
 def eval_template(string: str, data: dict = None, label: str = ''):

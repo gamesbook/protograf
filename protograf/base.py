@@ -1250,21 +1250,22 @@ class BaseShape:
         """Replace spaces and try different font extensions."""
 
         def register_base_font(font_name: str):
-            basename = None
-            font_names = [font_name, str(font_name).replace(' ', '_')]
+            font_names = list(set([font_name, str(font_name).replace(' ', '_')]))
             font_seps = ['', '-']
             styles = ['', 'Regular', 'R', 'Rg']
             for fontname in font_names:
                 for style in styles:
                     for font_sep in font_seps:
-                        basename = f'{fontname}{font_sep}{style}.ttf'
+                        basename = f'{fontname}{font_sep}{style}'
+                        filename = basename + '.ttf'
+                        print(f'{filename}')
                         try:
-                            pdfmetrics.registerFont(TTFont(font_name, basename + '.ttf'))
-                            font_base = filename
-                            return font_base
+                            pdfmetrics.registerFont(TTFont(font_name, filename))
+                            print(f'Registered Base:  {basename=} {filename=}')
+                            return basename
                         except TTFError:
                             pass
-            return basename
+            return None
 
         if not font_name:
             tools.feedback('No font name supplied for registration!', True)
@@ -1289,8 +1290,8 @@ class BaseShape:
             'L', 'T', 'M', 'A', 'B', 'O', 'I',
             'Lt', 'Th', 'Md', 'Bl', 'Bo', 'Ob', 'It',
             'BI', 'BO', 'BoOb', 'BoIt', 'BoldOblique', 'BoldItalic', ]
-        font_names = [font_name, str(font_name).replace(' ', '_')]
-        font_seps = ['-', '']
+        font_names = list(set([font_name, str(font_name).replace(' ', '_')]))
+        font_seps = ['-', '_',  '']
         for fontname in font_names:
             for style in styles:
                 for font_sep in font_seps:
@@ -1298,7 +1299,7 @@ class BaseShape:
                     filename = basename + '.ttf'
                     try:
                         pdfmetrics.registerFont(TTFont(basename, filename))
-                        print(f'Registered: {basename=} {filename=}')
+                        print(f'Registered style: {basename=} {filename=}')
                         if style in ['Bold', 'Bo', 'B', ]:
                             kwargs['bold'] = basename
                         if style in ['Italic', 'Oblique', 'O', 'I', 'Ob', 'It', ]:
@@ -1309,7 +1310,7 @@ class BaseShape:
                     except TTFError:
                         pass
         if font_base and kwargs:
-            print(f'{font_name=} {font_base=} {kwargs=}')
+            print(f'Register Family:  {font_name=} {font_base=} {kwargs=}')
             registerFontFamily(font_name, normal=font_base, **kwargs)
 
     def check_settings(self) -> tuple:
