@@ -1256,13 +1256,15 @@ class BaseShape:
             for fontname in font_names:
                 for style in styles:
                     for font_sep in font_seps:
+                        fontname = f'{fontname} {style}'
                         basename = f'{fontname}{font_sep}{style}'
                         filename = basename + '.ttf'
                         print(f'{filename}')
                         try:
-                            pdfmetrics.registerFont(TTFont(font_name, filename))
-                            print(f'Registered Base:  {basename=} {filename=}')
-                            return basename
+                            _font_name = font_name.strip(' ')
+                            pdfmetrics.registerFont(TTFont(_font_name, filename))
+                            print(f'Registered Base:  {_font_name=} {filename=}')
+                            return _font_name
                         except TTFError:
                             pass
             return None
@@ -1295,23 +1297,24 @@ class BaseShape:
         for fontname in font_names:
             for style in styles:
                 for font_sep in font_seps:
+                    fontname = f'{fontname} {style}'
                     basename = f'{fontname}{font_sep}{style}'
                     filename = basename + '.ttf'
                     try:
                         pdfmetrics.registerFont(TTFont(basename, filename))
                         print(f'Registered style: {basename=} {filename=}')
                         if style in ['Bold', 'Bo', 'B', ]:
-                            kwargs['bold'] = basename
+                            kwargs['bold'] = fontname
                         if style in ['Italic', 'Oblique', 'O', 'I', 'Ob', 'It', ]:
-                            kwargs['italic'] = basename
+                            kwargs['italic'] = fontname
                         if style in [
                                 'BI', 'BO', 'BoOb', 'BoIt', 'BoldOblique', 'BoldItalic']:
-                            kwargs['boldItalic'] = basename
+                            kwargs['boldItalic'] = fontname
                     except TTFError:
                         pass
         if font_base and kwargs:
             print(f'Register Family:  {font_name=} {font_base=} {kwargs=}')
-            registerFontFamily(font_name, normal=font_base, **kwargs)
+            registerFontFamily(font_name.strip(' '), normal=font_base, **kwargs)
 
     def check_settings(self) -> tuple:
         """Check that the user-supplied parameters for choices are correct"""

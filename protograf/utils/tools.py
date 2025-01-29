@@ -810,23 +810,21 @@ def base_fonts():
             _name = name.replace(' ', '_')
             # styles
             if ffont['bold']:
-                kwargs['bold'] = f"{_name}{ffont['bold']}"
+                kwargs['bold'] = f"{name}{ffont['bold']}".replace('_', ' ')
                 fname = f"{base}{ffont['bold']}"+'.ttf'
-                print(' ****', kwargs['bold'], fname)
                 pdfmetrics.registerFont(TTFont(kwargs['bold'], fname))
             if ffont['it']:
-                kwargs['italic'] = f"{_name}{ffont['it']}"
+                kwargs['italic'] = f"{_name}{ffont['it']}".replace('_', ' ')
                 fname = f"{base}{ffont['it']}"+'.ttf'
-                print(' ****', kwargs['italic'], fname)
                 pdfmetrics.registerFont(TTFont(kwargs['italic'], fname))
             if ffont['bi']:
-                kwargs['boldItalic'] = f"{_name}{ffont['bi']}"
+                kwargs['boldItalic'] = f"{_name}{ffont['bi']}".replace('_', ' ')
                 fname = f"{base}{ffont['bi']}"+'.ttf'
-                print(' ****', kwargs['boldItalic'], fname)
                 pdfmetrics.registerFont(TTFont(kwargs['boldItalic'], fname))
             if kwargs:
-                pdfmetrics.registerFontFamily(_name, normal=base, **kwargs)
-                print(f'Register Family:  {_name=} {filename=} {kwargs=}')
+                normal = base.replace('_', ' ')
+                pdfmetrics.registerFontFamily(name, normal=normal, **kwargs)
+                # print(f'Register Family:  {name=} {normal=} {kwargs=}')
         except Exception as err:
             log.error('Unable to register %s from %s (%s)', name, base+'.ttf', err)
 
