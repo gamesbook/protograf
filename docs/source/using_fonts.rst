@@ -78,6 +78,8 @@ register the following fonts:
 If you are running on a Windows operating system, these fonts should already
 be installed and usable.
 
+On Ubuntu Linux these font files are typically installed into ``/usr/share/fonts``.
+
 
 Using Additional Fonts
 ======================
@@ -96,6 +98,9 @@ However, there are some limitations:
   and ``Ubuntu-M`` for the light, regular and medium styles. By default,
   :doc:`protograf <index>` will attempt to find and use the *regular* style
   if no plain version is available.
+
+On an Ubuntu Linux machine, your new font file could be installed into
+``./home/USERNAME/.local/share/fonts``.
 
 Font Styles
 -----------

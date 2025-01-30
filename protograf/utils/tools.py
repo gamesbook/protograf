@@ -29,6 +29,13 @@ DEBUG = False
 MIN_ATTRIBUTES = ('scheme', 'netloc')
 
 
+class FontStyleType(Enum):
+    REGULAR = 1
+    BOLD = 2
+    ITALIC = 3
+    BOLDITALIC = 4
+
+
 class DatasetType(Enum):
     FILE = 1
     DICT = 2
