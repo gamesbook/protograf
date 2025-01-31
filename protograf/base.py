@@ -436,6 +436,8 @@ class BaseCanvas:
         # ---- font
         self.font_face = self.defaults.get('font_face', 'Helvetica')
         self.font_size = self.defaults.get('font_size', 12)
+        self.font_style = self.defaults.get('font_style', None)
+        self.font_directory = self.defaults.get('font_directory', None)
         self.style = self.defaults.get('style', None)  # Normal? from reportlab
         self.wrap = self.defaults.get('wrap', False)
         self.align = self.defaults.get('align', 'centre')  # centre,left,right,justify
@@ -797,6 +799,8 @@ class BaseShape:
         # ---- font
         self.font_face = kwargs.get('font_face', cnv.font_face)
         self.font_size = self.kw_float(kwargs.get('font_size', cnv.font_size))
+        self.font_style = kwargs.get('font_style', cnv.font_style)
+        self.font_directory = kwargs.get('font_directory', cnv.font_directory)
         self.style = kwargs.get('style', cnv.style)  # Normal? from reportlab
         self.wrap = kwargs.get('wrap', cnv.wrap)
         self.align = kwargs.get('align', cnv.align)  # centre,left,right,justify
@@ -1143,11 +1147,16 @@ class BaseShape:
         except KeyError:
             ff = ext(self.font_face)
             try:
-                self.register_font(ff)
+                self.register_font(
+                    font_name=self.font_face,
+                    style=self.font_style,
+                    directory=self.font_directory)
             except (KeyError, ValueError, TTFError):
+                _style = f' with style "{self.font_style}"' if self.font_style else ''
+                _dir = f' in "{self.font_directory}"' if self.font_directory else ''
                 tools.feedback(
-                    f'Unable to find or register font: "{ff}".'
-                    ' Please check that it is installed on your system.',
+                    f'Unable to find or register font "{ff}"{_style}{_dir}.'
+                    ' Please check that it is available on your system.',
                     stop=True)
         try:
             if fill in [None, []] and self.fill in [None, []]:
@@ -1246,13 +1255,18 @@ class BaseShape:
         self.use_abs_c = True if self._abs_cx is not None and self._abs_cy is not None else False
         # tools.feedback(f'*** draw baseshape: {self._abs_x=} {self._abs_y=} {self._abs_cx=} {self._abs_cy=}')
 
-    def register_font(self, font_name: str = '', style: str = ''):
+    def register_font(
+            self,
+            font_name: str = None,
+            style: str = None,
+            directory: str = None):
         """Replace spaces and try different font extensions."""
 
         def register_font_style(
                 font_name: str,
                 font_type: tools.FontStyleType,
-                style: str = None):
+                style: str = None,
+                directory: str = None):
             """Use pdfmetrics to registerFont, linked to a font file, for a style type.
 
             Args:
@@ -1277,14 +1291,18 @@ class BaseShape:
                     style_name = f'{font_name} Bold Italic'
 
             base_names = list(set([font_name, str(font_name).replace(' ', '_')]))
-            file_seps = ['', '-', '_']
+            file_seps = ['', '-', '_', ' ']
+            directory = '' if directory is None else directory
+            path = directory if os.path.exists(directory) else ''
             for base_name in base_names:
                 for style in fstyles:
                     for sep in file_seps:
-                        file_name = f'{base_name}{sep}{style}.ttf'
-                        file_name_lower = file_name.lower()
+                        _file_name = f'{base_name}{sep}{style}.ttf'
+                        file_name = os.path.join(path, _file_name)
+                        file_name_lower = os.path.join(path, _file_name.lower())
                         filenames = [file_name, file_name_lower]
                         for fname in filenames:
+                            # print(f'{style_name=} {fname=}')
                             try:
                                 pdfmetrics.registerFont(TTFont(style_name, fname))
                                 # print(f'Registered:  {style_name} file:{fname}')
@@ -1296,18 +1314,21 @@ class BaseShape:
         if not font_name:
             tools.feedback('No font name supplied for registration!', True)
         if font_name in BUILTIN_FONTS:
-            return  # these are built-in to ReportLab
+            return  # font families available in ReportLab without registration
 
         # get base font
-        font_regular = register_font_style(font_name, tools.FontStyleType.REGULAR, style)
+        font_regular = register_font_style(
+            font_name, tools.FontStyleType.REGULAR, style, directory)
+        if not font_regular:
+            raise TTFError
         # try additional styles
         kwargs = {}
         kwargs['bold'] = register_font_style(
-            font_name, tools.FontStyleType.BOLD, style)
+            font_name, tools.FontStyleType.BOLD, style, directory)
         kwargs['italic'] = register_font_style(
-            font_name, tools.FontStyleType.ITALIC, style)
+            font_name, tools.FontStyleType.ITALIC, style, directory)
         kwargs['boldItalic'] = register_font_style(
-            font_name, tools.FontStyleType.BOLDITALIC, style)
+            font_name, tools.FontStyleType.BOLDITALIC, style, directory)
 
         if font_regular and kwargs:
             # print(f'Register Family: {font_regular=} {kwargs=}')

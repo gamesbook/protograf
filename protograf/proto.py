@@ -277,6 +277,8 @@ def Font(face=None, **kwargs):
 
     globals.cnv.font_face = face or 'Helvetica'
     globals.cnv.font_size = kwargs.get('size', 12)
+    globals.cnv.font_style = kwargs.get('style', None)
+    globals.cnv.font_directory = kwargs.get('directory', None)
     globals.cnv.stroke = kwargs.get('stroke', black)
 
 # ---- various ====
