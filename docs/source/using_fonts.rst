@@ -10,9 +10,22 @@ Appendix I: Using Fonts
    author - certainly any feedback to help correct and make it clearer will be
    more than welcome!
 
+.. _table-of-contents:
+
+Table of Contents
+=================
+
+- `The Basics`_
+- `Built-In Fonts`_
+- `Supplementary Fonts`_
+- `Using Additional Fonts`_
+- `Word Processor fonts vs protograf`_
+- `External Font Resources`_
+
 
 The Basics
 ==========
+`↑ <table-of-contents_>`_
 
 Apart from the `Built-In Fonts`_, each time you want to use a different font
 in your script, you first need to declare it.
@@ -31,7 +44,8 @@ If you want to set the font for a whole section of script, then using the
     Font(face="Arial", size=48, stroke=red)
 
 In this case, the properties are similar but the "*font_*" prefix is not
-needed.
+needed. The ``Font()`` command also has some useful extra properties,
+which are described below.
 
 .. NOTE::
 
@@ -41,6 +55,7 @@ needed.
 
 Built-In Fonts
 ==============
+`↑ <table-of-contents_>`_
 
 Because :doc:`protograf <index>` uses *ReportLab* to generate the PDF output,
 it has access to the three "built-in" fonts supplied by it.
@@ -57,6 +72,7 @@ use of these fonts, so that they can run anywhere.
 
 Supplementary Fonts
 ===================
+`↑ <table-of-contents_>`_
 
 As suggested in :doc:`Setting Up <setting_up>` , if you're running on a Linux
 operating system, you can consider using a command such as:
@@ -71,18 +87,20 @@ register the following fonts:
 - *Verdana*
 - *Courier New*
 - *Times New Roman*
-- *Trebuchet_MS*
+- *Trebuchet MS*
 - *Georgia*
 - *Webdings*
 
 If you are running on a Windows operating system, these fonts should already
 be installed and usable.
 
-On Ubuntu Linux these font files are typically installed into ``/usr/share/fonts``.
+On Ubuntu Linux these font files are typically installed into the ``/usr/share/fonts``
+directory.
 
 
 Using Additional Fonts
 ======================
+`↑ <table-of-contents_>`_
 
 It is possible to install additional fonts into an operating system. Once
 installed, these could then be used in a :doc:`protograf <index>` script.
@@ -99,40 +117,30 @@ However, there are some limitations:
   :doc:`protograf <index>` will attempt to find and use the *regular* style
   if no plain version is available.
 
-On an Ubuntu Linux machine, your new font file could be installed into
-``./home/USERNAME/.local/share/fonts``.
+On an Ubuntu Linux machine, your new font file could be installed into the
+``/home/USERNAME/.local/share/fonts`` directory.
 
-Font Styles
------------
+Common Font Styles
+------------------
 
-Fonts can be created with a number of styles, including:
+In addition to a font default appearance - sometimes termed *Regular* - a
+font often has bold or italic styling that can be used together
+with this default.
 
-- light
-- thin
-- regular (the "default")
-- medium
-- black
-- bold
-- italic
-- oblique (italic equivalent for sanserif fonts)
+There can also be a combined version of these styles |dash| *BoldItalic* or
+*BoldOblique* |dash| that is useful when both styles are applied.
 
-All of these styles require additional font files to be installed.
+These files for these styles usually have an appended suffix like *-Bold* or
+*B*. :doc:`protograf <index>` will attempt to discover and install both bold
+and italic files, to create what is termed a "font family", by trying out
+different combinations of names and abbreviations, as well as different name
+separators, but there is no sure guarantee that it will be able to do so!
 
-The style files usually have an appended suffix like *-Bold* or *B*.
-:doc:`protograf <index>` will attempt to discover and install those extra
-files, to create what is termed a "font family", but there is no guarantee it
-will be able to do so!
+When any or all of these styles can be accessed, they will be registered as
+being part of the same "font family"; internally the program's command to do
+this is:
 
-Font Style Combinations
------------------------
-
-It is common for two of the styles - bold and italic - to be used together
-with the default, or plain, version of the font.  There can also be a combined
-version of these styles |dash| *BoldItalic* or *BoldOblique* |dash| that is
-useful when both styles are applied.
-
-When all these styles are available, they will be registered as being part of
-the same family; internally the program's command to do so is:
+.. code:: python
 
     registerFontFamily(
         'Merriweather',
@@ -148,22 +156,73 @@ Font Filename
 -------------
 
 If :doc:`protograf <index>` is unable to "auto-discover" the font, but
-you know the name, including the full path, of the font file, then you can
-supply this directly to the ``Font`` command:
+you know the path where the font file exists, then you can supply the
+*directory* property to the ``Font`` command:
 
 .. code:: python
 
-    Font(face="BenKenobi", size=48, stroke=red, filename="/tmp/BKenobi.ttf")
+    Font(face="BenKenobi", size=48, stroke=red, directory="/tmp/")
 
 Be aware that doing this makes your script less portable between machines,
-as that same file may not be present on a different machine.
+as that same file may not be present in the same directory on a different
+machine.
+
+Additional Font Styles
+----------------------
+
+Fonts can also be created with a number of additional styles, including:
+
+- light
+- thin
+- medium
+- black
+
+All of these styles require additional font files to be installed.
+
+To use such a style |dash| and its associated file |dash| you need supply
+the *style* property to the ``Font`` command:
+
+.. code:: python
+
+    Font(face="Skywalker", size=48, stroke=red, style="Dark")
 
 
-Font Resources
-==============
+Word Processor fonts vs protograf
+=================================
+`↑ <table-of-contents_>`_
+
+In some cases, you'll notice that a font can be displayed with bold or
+italic styling in a word processor, even though it cannot be displayed the
+same way in :doc:`protograf <index>`.  The short answer is that *ReportLab*
+does not create an "artificial" style.
+
+The long answer is supplied in a Reddit post
+(https://www.reddit.com/r/fonts/comments/1dzlhl0/) paraphrased below:
+
+
+*Question:* Why do some fonts have a separate "bold" or "italics" version, when
+you can just  format the main font for the same effect. When I download a new
+font, there's often a few variants included in the ZIP file, most commonly an
+Italic version & Bold version. But whenever I install just the base font and
+test if I can italicize/bolden it, it works just fine - and looks the same as
+the standalone italic/bold versions.
+
+*Answer:* Depending on the app you’re using, selecting bold or italic will
+automatically switch to the bold or italic version of the font. If the app
+doesn’t automatically switch it might **artificially** bold the font or slant
+it to be italic.  There's also a big difference between a word processor app
+putting a generic slant (for italics) or thickness (for bold) on the letters,
+and the actual font designers having considered and crafted what the font
+should look like in various forms. So, they don't look at all the same.
+Set them really large, and you'll see the difference.
+
+
+External Font Resources
+=======================
+`↑ <table-of-contents_>`_
 
 Additional fonts are available from:
 
 - https://www.dafont.com/
-- https://fonts.google.com/ - also very useful explanations about fonts, and
+- https://fonts.google.com/ - also has very useful explanations about fonts and
   how to choose them

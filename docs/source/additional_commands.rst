@@ -240,7 +240,7 @@ Font Command
 
 .. NOTE::
 
-  There is a section with more in-depth discussion on the
+  There is a section with much more in-depth discussion on the
   :doc:`use of fonts <using_fonts>` which could be helpful,
   especially if you have problems...
 
@@ -257,6 +257,9 @@ The following properties are available for the command:
 - *face* - the name of the font
 - *size* - the font "height" in points
 - *stroke* - the font color; either a built-in color or a hexadecimal value
+- *style* - a specific style name that differs from the default style,
+  which is often termed "regular"
+- *directory* - a location where the font file(s) can be found
 
 
 .. |fc1| image:: images/custom/commands/fonts.png
@@ -268,16 +271,25 @@ The following properties are available for the command:
       .. code:: python
 
         Font("Helvetica")
-        Text(text="Helvetica 12pt black", x=0, y=5, align="left")
+        Text(text="Helvetica 12pt black",
+             x=0, y=5, align="left")
 
         Font("Times-Roman", size=11, stroke=tomato)
-        Text(text="Times-Roman 11pt red", x=0, y=4, align="left")
+        Text(text="Times-Roman 11pt red",
+             x=0, y=4, align="left")
 
         Font("Courier", size=10, stroke=aqua)
-        Text(text="Courier 9pt aqua", x=0, y=3, align="left")
+        Text(text="Courier 9pt aqua",
+             x=0, y=3, align="left")
 
         Font("Verdana", size=9, stroke=gold)
-        Text(text="Verdana 9pt gold", x=0, y=2, align="left")
+        Text(text="Verdana 9pt gold",
+             x=0, y=2, align="left")
+
+      The first three are examples of the fonts "built in" to ReportLab,
+      and can be safely used anywhere that :doc:`protograf <index>` can
+      be run, while the fourth is one that would have to be installed onto
+      the host machine.
 
       In each example, the name of the font appears first, followed by any
       further details as to its properties.
