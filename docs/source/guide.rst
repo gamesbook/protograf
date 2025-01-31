@@ -44,9 +44,11 @@ doing more advanced scripts or needing further resources:
 
 16. :doc:`Descriptions of Supplied Examples <examples/index>` - brief
     walkthoughs of many of the examples provided with **protograf**
-17. :doc:`Using Python Commands <python_commands>` - how to work with
+17. :doc:`Working with Fonts <using_fonts>` - how to install and
+    use *fonts*, both built-in and additional ones
+18. :doc:`Using Python Commands <python_commands>` - how to work with
     *loops*, *if/then* statements and *functions* for more flexibility
-18. :doc:`Development Notes <development>` - notes for programmers wanting
-    to develop further in or with  **protograf**
 19. :doc:`Useful Resources <useful_resources>` - links to
     tools and websites related to boardgame prototyping
+20. :doc:`Development Notes <development>` - notes for programmers wanting
+    to develop further in or with  **protograf**

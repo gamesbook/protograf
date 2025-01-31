@@ -2,6 +2,8 @@
 Setting Up
 ==========
 
+.. |dash| unicode:: U+2014 .. EM DASH SIGN
+
 .. _table-of-contents:
 
 Table of Contents
@@ -47,10 +49,11 @@ Python is composed of many built-in libaries, or *packages*, each of which
 handles some aspect of a program. Python is designed to be extended by adding
 on additional packages written by other programmers; ``ReportLab``, for example,
 is one of those, as is **protograf**.  Python does not come with those packages
-built-in - you need to install them after Python itself has been installed.
+built-in |dash| you need to install them after Python itself has been installed.
 
-Installing Python packages is handled by a tool called ``pip``, which is typically
-installed at the same time as Python itself.
+Installing Python packages is handled by a tool called ``pip`` |dash| the
+Python Installation Package |dash| which is typically installed at the same
+time as Python itself.
 
 
 Installing Python
@@ -64,20 +67,22 @@ not a smart phone) that already has the correct version of Python
 Linux users
 -----------
 
-You likely already have a version of Python installed.  To setup a new virtual
-environment, you can use a modern tool such as `uv`; see
+You likely already have a version of Python installed.
+
+To setup a new virtual environment to work with **protograf**, you can use
+a modern tool such as ``uv``; see
 https://ubuntushell.com/install-uv-python-package-manager/
 
-You can then use `uv` to install an updated version of Python as well as this
+You can then use ``uv`` to install an updated version of Python as well as this
 virtual environment; for example::
 
     uv venv --python 3.13
 
-New packages can be installed using `uv` and `pip`::
+New packages can be installed using ``uv`` with ``pip``::
 
     uv pip install reportlab
 
-`uv` has extensive documentation at https://docs.astral.sh/uv/
+``uv`` has extensive documentation at https://docs.astral.sh/uv/
 
 Windows and mac Users
 ---------------------
@@ -89,6 +94,19 @@ downloading and running the installer. Make sure you choose a version that will
 install Python 3.13 or higher (3.13, 3.14, etc.).  Again, follow the
 documentation there to ensure that Python is working after the installation
 is complete.
+
+Alternatively, install ``uv`` |dash| see for example
+https://docs.astral.sh/uv/getting-started/installation/#standalone-installer
+
+and then use ``uv`` to install the right version of Python in a
+virtual environment; for example::
+
+    uv venv --python 3.13
+
+New packages can be installed using ``uv`` with ``pip``::
+
+    uv pip install reportlab
+
 
 Once Python is installed and working, you can install new packages for it using
 ``pip``.
@@ -149,8 +167,8 @@ Core Fonts (optional)
 ---------------------
 
 For Linux users, it is recommended that you install Microsoft’s Core
-Fonts - see http://mscorefonts2.sourceforge.net/ - Ubuntu users can
-install these via::
+Fonts - see http://mscorefonts2.sourceforge.net/ |dash| Ubuntu users
+can install these via::
 
    sudo apt-get install ttf-mscorefonts-installer
 
@@ -166,6 +184,10 @@ and::
 
    pip install protograf
 
+If you are using ``uv``::
+
+   uv pip install protograf
+
 
 Checking if **protograf** works
 =================================
@@ -174,38 +196,39 @@ Checking if **protograf** works
 To now check that ``protograf`` works, you should create a small test
 file.
 
-Open your text editor and type - or copy and paste - the following (
-but do not start any line with spaces!)::
+Open your text editor and type |dash| or copy and paste |dash| the following,
+making sure you do not start any line with spaces!::
 
    from protograf import *
    Create()
    Text(text="Hello World")
    Save()
 
-Save the file; call it something like *test.py*. (The ".py" indicates
-its a Python file - this is useful but not essential).
+Save the file; call it *test.py*. The ".py" indicates that this a Python
+file |dash| this is useful but not essential!
 
 Now use Python to "run" this file.
 
-By "run", its meant that you open a command-line window (see the section
-`Test that Python is installed`_), change to the directory in which the
-test file was created, for example on Windows::
+By "run", its meant that you open a command-line window and change to the
+directory in which the test file was created, for example on Windows::
 
    cd C:/
 
-and then type::
+If you're not sure about the "command-line" part, then see the section
+`Test that Python is installed`_.
+
+Now type::
 
    python test.py
 
-and press the *Enter* key. Note that you should replace ``test.py`` with
-the actual name of the file you created.
+and press the *Enter* key.
 
 There should now be a new file called ``test.pdf`` in the same
 directory.
 
 You should be able to open and view this PDF file via your PDF viewer.
-It should be a mostly blank page with the phrase *Hello World* near the
-bottom-left.
+It should be a mostly blank, A4-sized page with the phrase *Hello World*
+in a Helvetica font near the bottom-left.
 
 
 Python in the cloud
@@ -217,9 +240,12 @@ If you do not want to install Python, you can try a cloud-based version.
 You will need to register on this site: https://www.pythonanywhere.com/ and
 use the tools and infrastructure they provide.
 
-    **NOTE** The environment used for `pythonanywhere` is a Linux-based one
-    and likely unfamiliar if you're a Windows user - especially if you're not
-    used to working via a "shell" in a terminal, or command-line, interface.
+.. HINT::
+
+    The environment used for `pythonanywhere` is a Linux-based one
+    and likely to be unfamiliar if you're a Windows user |dash| especially
+    if you're not used to working via a "shell" in a terminal, or
+    command-line, interface.
 
 *pythonanywhere* provides a terminal (`bash`) that you can use to install Python
 packages via `pip` and the option to upload files - such as **protograf**

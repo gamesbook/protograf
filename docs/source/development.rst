@@ -2,6 +2,8 @@
 Development
 ===========
 
+.. |dash| unicode:: U+2014 .. EM DASH SIGN
+
 These notes are aimed at those who might be developing the code further,
 or who want to use :doc:`protograf <index>` as part of other Python
 projects.
@@ -10,8 +12,9 @@ projects.
 Coding
 ======
 
-In general, follow the `Zen of Python <https://peps.python.org/pep-0020/>`_ ...
-but also try to follow the style of the code in the rest of the project.
+In general, follow the `Zen of Python <https://peps.python.org/pep-0020/>`_
+|dash| which is much easier to say than do |dash| but also try to follow
+the style of the code in the rest of the project.
 
 Note, however, that this project "breaks" a few normal conventions:
 
@@ -23,9 +26,9 @@ Note, however, that this project "breaks" a few normal conventions:
   juggle...
 - Use of ``from protograf import *`` for running scripts; you could force a
   user to import only what they need but that makes it really tedious for them,
-  and much harder to do if you're not a programmer;  if you are using it as
-  part of another project, then of course you should follow the normal approach
-  of only importing exactly what you need!
+  and much harder to do if you're not a programmer!  If you are using this as
+  part of another Python project, then of course you should follow the normal
+  approach of only importing exactly what you need!
 
 
 Documentation
@@ -44,3 +47,5 @@ Some useful tools:
 - https://github.com/retext-project/retext - a reStructuredText editor
 - https://github.com/mgedmin/restview - a reStructuredText viewer in your browser
   (but currently does not support Sphinx directives)
+- https://pypi.org/project/sphinx-view/ - a reStructuredText viewer in your browser
+  that *does* support Sphinx directives (but is quite dated)

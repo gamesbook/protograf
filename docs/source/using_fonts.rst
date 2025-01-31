@@ -1,6 +1,6 @@
-=======================
-Appendix I: Using Fonts
-=======================
+==============================
+Appendix I: Working with Fonts
+==============================
 
 .. |dash| unicode:: U+2014 .. EM DASH SIGN
 
