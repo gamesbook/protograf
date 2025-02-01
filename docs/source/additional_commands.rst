@@ -250,17 +250,19 @@ forward in the script.
 Usually, the font's properties will be set at the time that a ``Text()``
 command is issued, and multiple ``Text()`` commands can obviously use the
 ``Common()`` command to avoid duplication, but it can sometimes be useful
-to set the font properties more widely.
+to set the font properties more widely, especially where locating or
+setting up the font
 
 The following properties are available for the command:
 
-- *face* - the name of the font
+- *name* - the name of the font face
 - *size* - the font "height" in points
 - *stroke* - the font color; either a built-in color or a hexadecimal value
 - *style* - a specific style name that differs from the default style,
   which is often termed "regular"
 - *directory* - a location where the font file(s) can be found
 
+Because the *name* is compulsory, its often omitted from the command.
 
 .. |fc1| image:: images/custom/commands/fonts.png
    :width: 330

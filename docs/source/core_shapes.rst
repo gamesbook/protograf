@@ -483,11 +483,11 @@ The properties that can be set are:
 Example 1.
 ++++++++++
 
-.. |txt| image:: images/defaults/text.png
+.. |t01| image:: images/defaults/text.png
    :width: 330
 
 ===== ======
-|txt| This example shows the shape constructed using the command with only
+|t01| This example shows the shape constructed using the command with only
       defaults except for the **text** property; this is changed from a blank
       string otherwise there would not be anything to see!:
 
@@ -500,10 +500,80 @@ Example 1.
       - located is at x-position ``1`` cm and at y-position ``1`` cm
       - text is at the ``center`` of the position
       - default *font_size* is ``12`` points
-      - default *font_face* is ``Helvetica``
+      - default *font_name* is ``Helvetica``
 
 ===== ======
 
+Example 2.
+++++++++++
+
+.. |t02| image:: images/customised/text_custom.png
+   :width: 330
+
+===== ======
+|t02| This example shows the shape constructed using various properties:
+
+      .. code:: python
+
+        Font("Times-Roman", size=11, stroke=tomato)
+        Text(x=0, y=5, align="left",
+             text="Times-Roman 12pt red")
+        Text(x=0, y=4, align="right", stroke=blue,
+             wrap=True, width=4, fill=None,
+             leading=14,
+             outline_stroke=red, outline_width=2,
+             text='<font name="Helvetica" size="14">'
+                  '<u>Helvetica</u><br/>'
+                  '<b>bold</b> <i>ital</i><br/>'
+                  '<b><i>bold ital</i></b></font>')
+        Text(x=0, y=2, align="left", stroke=orange,
+             wrap=True, width=4, fill=None,
+             transform='c',
+             text="I am capitalized")
+        Text(x=0, y=1.5, align="left", stroke=orange,
+             wrap=True, width=4, fill=None,
+             transform='l',
+             text="I am in lowercase")
+        Text(x=0, y=1, align="left", stroke=orange,
+             wrap=True, width=4, fill=None,
+             transform='u',
+             text="I am in uppercase")
+
+      This example shows how the text's font can be set in two ways:
+
+      - via the ``Font`` command (see :ref:`Font commands <the-font-command>`)
+      - via the ``<font name="...">`` embedded in the *text*
+
+      Basic text is a single line, without any embedded styling.
+
+      Complex text can be many lines, with styling, by using ``wrap=True``.
+
+      Complex text can have the following additional properties:
+
+      - *width* - maximum line length before wrapping
+      - *leading* - the spacing between the lines (in points)
+      - *fill* - the color of the "box" in which the text is located
+      - *outline_stroke* - the color of the line of the "box"
+        in which the text is located
+      - *outline_stroke* - the thickness of the line of the "box"
+        in which the text is located
+      - *transform* - uppercase (u), lowercase (l) or capitalise (c)
+
+      The text itself can contain basic HTML tags:
+
+      - *<b>...</b>* - draw the text in bold
+      - *<i>...</i>* - draw the text in italic
+      - *<u>...</u>* - draw a line under the text
+      - *<strike>...</strike>* - draw a line through the text
+      - *<br/>* - break current line and start a new one
+
+      The red text in the example shows a one-line basic ``Text``.
+
+      The blue text in the example shows complex ``Text`` with use of HTML tags.
+
+      The orange text in the example shows complex ``Text`` with transforms.
+
+===== ======
 
 Enclosed Shapes
 ---------------

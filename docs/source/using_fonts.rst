@@ -94,8 +94,8 @@ register the following fonts:
 If you are running on a Windows operating system, these fonts should already
 be installed and usable.
 
-On Ubuntu Linux these font files are typically installed into the ``/usr/share/fonts``
-directory.
+On Ubuntu Linux these font files are typically installed into the
+``/usr/share/fonts`` directory.
 
 
 Using Additional Fonts
@@ -108,17 +108,23 @@ installed, these could then be used in a :doc:`protograf <index>` script.
 However, there are some limitations:
 
 - The font **MUST** be a *TrueType* font, which will have a filename with a
-  ``.ttf`` extension
-- The font must be installed into the standard location for that operating
-  system, so that it can be "auto-discovered"
+  ``.ttf`` extension.
+- The font should be installed into the standard location for that operating
+  system, so that it can be "auto-discovered".
 - The font must be referred to correctly; for example, the ``Ubuntu`` font is
   not actually available as ``Ubuntu`` but rather as ``Ubuntu-L``, ``Ubuntu-R``
-  and ``Ubuntu-M`` for the light, regular and medium styles. By default,
+  and ``Ubuntu-M`` for the light, regular and medium styles.  By default,
   :doc:`protograf <index>` will attempt to find and use the *regular* style
   if no plain version is available.
 
 On an Ubuntu Linux machine, your new font file could be installed into the
 ``/home/USERNAME/.local/share/fonts`` directory.
+
+.. HINT::
+
+    There are online tools that will convert different font types |dash| for
+    example, from OpenType to TrueType font. Please ensure that you adhere to
+    the restrictions imposed by the font's license.
 
 Common Font Styles
 ------------------
@@ -175,6 +181,7 @@ Fonts can also be created with a number of additional styles, including:
 - light
 - thin
 - medium
+- dark
 - black
 
 All of these styles require additional font files to be installed.

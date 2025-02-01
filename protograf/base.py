@@ -497,6 +497,7 @@ class BaseCanvas:
         self.outline_stroke = self.defaults.get('outline_stroke', self.fill)
         self.outline_width = self.defaults.get('outline_width', 0)
         self.leading = self.defaults.get('leading', self.font_size)
+        self.transform = self.defaults.get('transform', None)
         # ---- image / file
         self.source = self.defaults.get('source', None)  # file or http://
         self.cache_directory = None  # should be a pathlib.Path object
@@ -841,6 +842,7 @@ class BaseShape:
         self.outline_stroke = kwargs.get('outline_stroke', cnv.outline_stroke)
         self.outline_width = self.kw_float(kwargs.get('outline_width', cnv.outline_width))
         self.leading = self.kw_float(kwargs.get('leading', self.font_size))
+        self.transform = kwargs.get('transform', cnv.transform)
         # tools.feedback(f"+++ BShp:{self} init {kwargs.get('fill')=} {self.fill=} {kwargs.get('fill_color')=}")
         # ---- image / file
         self.source = kwargs.get('source', cnv.source)  # file or http://
@@ -1290,7 +1292,10 @@ class BaseShape:
                     fstyles = ['BoldItalic', 'BoIt', 'BI', 'BoldOblique', 'BoOb', 'BO']
                     style_name = f'{font_name} Bold Italic'
 
-            base_names = list(set([font_name, str(font_name).replace(' ', '_')]))
+            base_names = list(set([
+                font_name,
+                str(font_name).replace(' ', '_'),
+                str(font_name).replace(' ', '-')]))
             file_seps = ['', '-', '_', ' ']
             directory = '' if directory is None else directory
             path = directory if os.path.exists(directory) else ''

@@ -3773,6 +3773,17 @@ class TextShape(BaseShape):
         _text = str(_text)  # card data could be numeric
         if '\\u' in _text:
             _text = codecs.decode(_text, 'unicode_escape')
+        # ---- validations
+        if self.transform is not None:
+            _trans = str(self.transform).lower()
+            if _trans in ['u', 'upper', 'uppercase']:
+                self.transform = 'uppercase'
+            elif _trans in ['l', 'lower', 'lowercase']:
+                self.transform = 'lowercase'
+            elif _trans in ['c', 'caps', 'capitals', 'capitalise', 'capitalize']:
+                self.transform = 'capitalize'
+            else:
+                self.transform = None
         # ---- text style
         if self.wrap:
             _style = ParagraphStyle(name="sc")
@@ -3784,6 +3795,7 @@ class TextShape(BaseShape):
             _style.fontSize = self.font_size
             _style.fontName = self.font_face
             _style.leading = self.leading
+            _style.textTransform = self.transform
             """
             # potential other properties
             leftIndent=0,
@@ -3798,7 +3810,6 @@ class TextShape(BaseShape):
             borderRadius= None,
             allowWidows= 1,
             allowOrphans= 0,
-            textTransform=None,  # 'uppercase' | 'lowercase' | None
             endDots=None,
             splitLongWords=1,
             """

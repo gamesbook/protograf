@@ -525,6 +525,32 @@ Image("sholes_typewriter.png", sliced='r',
       width=1, height=3, x=3, y=0)
 PageBreak()
 
+# ---- text custom
+Blueprint()
+Text(common=txt, text="Text - custom")
+Font("Times-Roman", size=11, stroke=tomato)
+Text(x=0, y=5, align="left", text="Times-Roman 12pt red")
+Text(x=0, y=4, align="right", stroke=blue,
+     wrap=True, width=4, fill=None,
+     leading=14,
+     outline_stroke=red, outline_width=2,
+     text='<font name="Helvetica" size="14">'
+          '<u>Helvetica</u><br/>'
+          '<b>bold</b> <i>ital</i><br/>'
+          '<b><i>bold ital</i></b></font>')
+Text(x=0, y=2, align="left", stroke=orange,
+     wrap=True, width=4, fill=None,
+     transform='c',
+     text="I am capitalized")
+Text(x=0, y=1.5, align="left", stroke=orange,
+     wrap=True, width=4, fill=None,
+     transform='l',
+     text="I am in lowercase")
+Text(x=0, y=1, align="left", stroke=orange,
+     wrap=True, width=4, fill=None,
+     transform='u',
+     text="I am in uppercase")
+PageBreak()
 
 # ---- END
 Text(common=txt, text="Shapes END...")
@@ -554,4 +580,5 @@ Save(
         "rectangles_rowcol", "rectangles_custom", "rhombus_custom",
         "rhombus_borders", "trapezoid_borders", "arrow_sizes", "arrow_rotate",
         "shape_centred", "shape_centred_move", "qr_code", "image_sliced",
+        "text_custom",
         None])

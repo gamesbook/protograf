@@ -26,7 +26,7 @@ other.
 8.  :doc:`Card Decks <card_decks>` - how to create a deck, or set, of
     cards/tiles; more detail also in the :doc:`Deck command <deck_command>`
 9.  :doc:`Additional Commands <additional_commands>` - special commands not part
-    of the core shapes
+    of the core shapes; fonts, dates and access to BoardGameGeek data
 10. :doc:`Advanced Commands <advanced_commands>` - how to work with
     common/reused items and repetitive elements
 11. :doc:`Customised Shapes <customised_shapes>` - how to refine the
