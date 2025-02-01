@@ -69,9 +69,9 @@ Discussion  This example shows how to construct a set of counters.
 
                 brown = "#B6A378"
                 inf_A = text(
-                  font_face="Helvetica", font_size=18, x=1.3, y=0.5, text="2-3-4")
+                  font_name="Helvetica", font_size=18, x=1.3, y=0.5, text="2-3-4")
                 division = text(
-                  font_face="Helvetica", font_size=12, x=1.3, y=1.9, text="XX")
+                  font_name="Helvetica", font_size=12, x=1.3, y=1.9, text="XX")
 
             Now the counter outline is defined:
 
@@ -155,7 +155,7 @@ Discussion  This example shows how to construct a set of counters using data
               .. code:: python
 
                 value = text(
-                  font_face="Helvetica", font_size=18, x=1.3, y=0.5,
+                  font_name="Helvetica", font_size=18, x=1.3, y=0.5,
                   text=T('{{VALUE}}'))
 
             Here the text that will be used depends on the **VALUE** which

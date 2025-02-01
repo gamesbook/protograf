@@ -36,13 +36,13 @@ base = rectangle(x=0.2, y=0.2, width=2.5, height=2.5, stroke=brown, fill=lbrown)
 
 # per-tile values and elements
 title = text(
-    font_face="Times-Roman", font_size=8, x=1.4, y=2, align="centre",
+    font_name="Times-Roman", font_size=8, x=1.4, y=2, align="centre",
     text=T('{{TITLE}}'))
 move = text(
-    font_face="Times-Roman", font_size=12, x=0.6, y=0.5,
+    font_name="Times-Roman", font_size=12, x=0.6, y=0.5,
     text=T('{{MOVE}}'))
 strength = text(
-    font_face="Times-Roman", font_size=12, x=2.1, y=0.5,
+    font_name="Times-Roman", font_size=12, x=2.1, y=0.5,
     text=T('{{STRENGTH}}'))
 outline = rectangle(
     x=0.45, y=0.45, width=2.0, height=2.0,

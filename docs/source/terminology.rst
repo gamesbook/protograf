@@ -149,11 +149,12 @@ will be numeric values, corresponding to the **unit** in use (unless
 otherwise noted). The default is usually 1 e.g. 1cm.  The default *unit** is
 *centimetres* ("cm").
 
-Some sizes are set in **points** - there are 72 points in an inch - so as to
-align with existing conventions, or simply because these items are
+Some sizes are set in **points** - there are 72 points in an inch - so as
+to align with existing conventions, or simply because these items are
 typically very tiny. As far as possible, the term **size** is reserved
-for these settings; for example, **font_size** and **dot**. An exception
-is **stroke_width** which is also in points, again because of convention.
+for these settings; for example, **font_size**, **leading** and **dot**.
+An exception is **stroke_width** which is also in points, again because
+of convention.
 
 A few sizes are given descriptive names; this makes them a little easier
 to set.
@@ -167,6 +168,7 @@ to set.
    the centre of a shape
 -  **height** - the vertical dimension of a shape e.g. a ``Rectangle``
    or a bitmap ``Image``
+-  **leading** - the spacing, in points, between lines of wrapped ``Text``
 -  **interval** - the distance between the centres of a series of shapes;
    typically in a repeated pattern of some type
 -  **margin** - used in ``Create`` command to set all margins for a
@@ -284,6 +286,8 @@ Styling-orientated Terms
 -  **dashed** - allows a line to be broken into a series of short lines
    of specific lengths, separated by spaces of specified lengths; there
    can any number of these length/space pairs
+-  **transform** - will change text in a ``Text`` command to uppercase,
+   lowercase, or capitalise
 
 
 Display-orientated Terms

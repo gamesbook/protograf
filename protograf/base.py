@@ -434,7 +434,7 @@ class BaseCanvas:
         #     self.stroke = self.outline
         #     self.fill = None
         # ---- font
-        self.font_face = self.defaults.get('font_face', 'Helvetica')
+        self.font_name = self.defaults.get('font_name', 'Helvetica')
         self.font_size = self.defaults.get('font_size', 12)
         self.font_style = self.defaults.get('font_style', None)
         self.font_directory = self.defaults.get('font_directory', None)
@@ -464,7 +464,7 @@ class BaseCanvas:
         # ---- text: label
         self.label = self.defaults.get('label', '')
         self.label_size = self.defaults.get('label_size', self.font_size)
-        self.label_face = self.defaults.get('label_face', self.font_face)
+        self.label_face = self.defaults.get('label_face', self.font_name)
         self.label_stroke = self.get_color(
             self.defaults.get('label_stroke'), self.stroke)
         self.label_stroke_width = self.defaults.get('label_stroke_width', self.stroke_width)
@@ -474,7 +474,7 @@ class BaseCanvas:
         # ---- text: title
         self.title = self.defaults.get('title', '')
         self.title_size = self.defaults.get('title_size', self.font_size)
-        self.title_face = self.defaults.get('title_face', self.font_face)
+        self.title_face = self.defaults.get('title_face', self.font_name)
         self.title_stroke = self.get_color(
             self.defaults.get('title_stroke', self.stroke))
         self.title_stroke_width = self.defaults.get(
@@ -485,7 +485,7 @@ class BaseCanvas:
         # ---- text: heading
         self.heading = self.defaults.get('heading', '')
         self.heading_size = self.defaults.get('heading_size', self.font_size)
-        self.heading_face = self.defaults.get('heading_face', self.font_face)
+        self.heading_face = self.defaults.get('heading_face', self.font_name)
         self.heading_stroke = self.get_color(
             self.defaults.get('heading_stroke'), self.stroke)
         self.heading_stroke_width = self.defaults.get(
@@ -641,7 +641,7 @@ class BaseCanvas:
         self.coord_start_y = self.defaults.get('coord_start_y', 0)
         self.coord_elevation = self.defaults.get('coord_elevation', None)  # top|middle|bottom
         self.coord_offset = self.defaults.get('coord_offset', 0)
-        self.coord_font_face = self.defaults.get('coord_font_face', 'Helvetica')
+        self.coord_font_name = self.defaults.get('coord_font_name', 'Helvetica')
         self.coord_font_size = self.defaults.get('coord_font_size',
                                                  int(self.font_size * 0.5))
         self.coord_stroke = self.get_color(self.defaults.get('coord_stroke'), black)
@@ -798,7 +798,7 @@ class BaseShape:
         self.debug_color = kwargs.get('debug_color', cnv.debug_color)
         self.transparency = self.kw_float(kwargs.get('transparency', cnv.transparency))
         # ---- font
-        self.font_face = kwargs.get('font_face', cnv.font_face)
+        self.font_name = kwargs.get('font_name', cnv.font_name)
         self.font_size = self.kw_float(kwargs.get('font_size', cnv.font_size))
         self.font_style = kwargs.get('font_style', cnv.font_style)
         self.font_directory = kwargs.get('font_directory', cnv.font_directory)
@@ -814,7 +814,7 @@ class BaseShape:
         # ---- text: label
         self.label = kwargs.get('label', cnv.label)
         self.label_size = self.kw_float(kwargs.get('label_size', self.font_size))
-        self.label_face = kwargs.get('label_face', self.font_face)
+        self.label_face = kwargs.get('label_face', self.font_name)
         self.label_stroke = kwargs.get('label_stroke', self.stroke)
         self.label_stroke_width = self.kw_float(kwargs.get('label_stroke_width', self.stroke_width))
         self.label_mx = self.kw_float(kwargs.get('label_mx', 0))
@@ -823,7 +823,7 @@ class BaseShape:
         # ---- text: title
         self.title = kwargs.get('title', cnv.title)
         self.title_size = self.kw_float(kwargs.get('title_size', self.font_size))
-        self.title_face = kwargs.get('title_face', self.font_face)
+        self.title_face = kwargs.get('title_face', self.font_name)
         self.title_stroke = kwargs.get('title_stroke', self.stroke)
         self.title_stroke_width = self.kw_float(kwargs.get('title_stroke_width', self.stroke_width))
         self.title_mx = self.kw_float(kwargs.get('title_mx', 0))
@@ -832,7 +832,7 @@ class BaseShape:
         # ---- text: heading
         self.heading = kwargs.get('heading', cnv.heading)
         self.heading_size = self.kw_float(kwargs.get('heading_size', self.font_size))
-        self.heading_face = kwargs.get('heading_face', self.font_face)
+        self.heading_face = kwargs.get('heading_face', self.font_name)
         self.heading_stroke = kwargs.get('heading_stroke', self.stroke)
         self.heading_stroke_width = self.kw_float(kwargs.get('heading_stroke_width', self.stroke_width))
         self.heading_mx = self.kw_float(kwargs.get('heading_mx', 0))
@@ -979,7 +979,7 @@ class BaseShape:
         self.coord_start_y = self.kw_int(kwargs.get('coord_start_y', cnv.coord_start_y))
         self.coord_elevation = kwargs.get('coord_elevation', cnv.coord_elevation)  # top|middle|bottom
         self.coord_offset = self.kw_float(kwargs.get('coord_offset', cnv.coord_offset))
-        self.coord_font_face = kwargs.get('coord_font_face', cnv.coord_font_face)
+        self.coord_font_name = kwargs.get('coord_font_name', cnv.coord_font_name)
         self.coord_font_size = self.kw_float(kwargs.get('coord_font_size', cnv.coord_font_size))
         self.coord_stroke = kwargs.get('coord_stroke', cnv.coord_stroke)
         self.coord_padding = self.kw_int(kwargs.get('coord_padding', cnv.coord_padding))
@@ -1143,14 +1143,14 @@ class BaseShape:
 
         canvas = cnv if cnv else self.canvas.canvas
         try:
-            canvas.setFont(ext(self.font_face), ext(self.font_size))
+            canvas.setFont(ext(self.font_name), ext(self.font_size))
         except AttributeError:
             pass
         except KeyError:
-            ff = ext(self.font_face)
+            ff = ext(self.font_name)
             try:
                 self.register_font(
-                    font_name=self.font_face,
+                    font_name=self.font_name,
                     style=self.font_style,
                     directory=self.font_directory)
             except (KeyError, ValueError, TTFError):
@@ -1710,7 +1710,7 @@ class BaseShape:
             return the_shape
 
     def get_font_height(self) -> float:
-        face = pdfmetrics.getFont(self.font_face).face
+        face = pdfmetrics.getFont(self.font_name).face
         height = (face.ascent - face.descent) / 1000 * self.font_size
         return height
 
@@ -1786,7 +1786,7 @@ class BaseShape:
         # tools.feedback(f"*** {string=} {rotation=}")
         if kwargs.get('font_size'):
             fsize = float(kwargs.get('font_size'))
-            canvas.setFont(self.font_face, fsize)
+            canvas.setFont(self.font_name, fsize)
         # ---- drawString
         for ln in string.split('\n'):
             if rotation:
@@ -1827,7 +1827,7 @@ class BaseShape:
             y_off = y_offset or self.title_size / 2.0
             y = yh + self.unit(self.heading_my)
             x = xh + self.unit(self.heading_mx)
-            canvas.setFont(self.font_face, self.heading_size)
+            canvas.setFont(self.font_name, self.heading_size)
             canvas.setFillColor(self.heading_stroke)
             self.draw_multi_string(
                 canvas, x, y + y_off, _ttext, align=align, rotation=_rotation, **kwargs)
@@ -1844,7 +1844,7 @@ class BaseShape:
             yl = yl - (self.label_size / 3.0) if centred else yl
             y = yl + self.unit(self.label_my)
             x = xl + self.unit(self.label_mx)
-            canvas.setFont(self.font_face, self.label_size)
+            canvas.setFont(self.font_name, self.label_size)
             canvas.setFillColor(self.label_stroke)
             self.draw_multi_string(
                 canvas, x, y, _ttext, align=align, rotation=_rotation, **kwargs)
@@ -1861,7 +1861,7 @@ class BaseShape:
             y_off = y_offset or self.title_size
             y = yt + self.unit(self.title_my)
             x = xt + self.unit(self.title_mx)
-            canvas.setFont(self.font_face, self.title_size)
+            canvas.setFont(self.font_name, self.title_size)
             canvas.setFillColor(self.title_stroke)
             self.draw_multi_string(
                 canvas, x, y - y_off, _ttext, align=align, rotation=_rotation, **kwargs)
@@ -1940,7 +1940,7 @@ class BaseShape:
             # display vertex index number next to vertex
             if kwargs.get('vertices', []):
                 canvas.setFillColor(self.debug_color)
-                canvas.setFont(self.font_face, 4)
+                canvas.setFont(self.font_name, 4)
                 for key, vert in enumerate(kwargs.get('vertices')):
                     x = self.points_to_value(vert.x)
                     y = self.points_to_value(vert.y)
@@ -1954,7 +1954,7 @@ class BaseShape:
                 canvas.setFillColor(kwargs.get('color', self.debug_color))
                 canvas.setStrokeColor(kwargs.get('color', self.debug_color))
                 canvas.setLineWidth(0.1)
-                canvas.setFont(self.font_face, 4)
+                canvas.setFont(self.font_name, 4)
                 x = self.points_to_value(point.x)
                 y = self.points_to_value(point.y)
                 self.draw_multi_string(

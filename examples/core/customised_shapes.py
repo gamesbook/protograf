@@ -539,14 +539,17 @@ Text(x=0, y=4, align="right", stroke=blue,
           '<b>bold</b> <i>ital</i><br/>'
           '<b><i>bold ital</i></b></font>')
 Text(x=0, y=2, align="left", stroke=orange,
+     font_name="Courier", font_size=10,
      wrap=True, width=4, fill=None,
      transform='c',
      text="I am capitalized")
 Text(x=0, y=1.5, align="left", stroke=orange,
+     font_name="Courier", font_size=10,
      wrap=True, width=4, fill=None,
      transform='l',
      text="I am in lowercase")
 Text(x=0, y=1, align="left", stroke=orange,
+     font_name="Courier", font_size=10,
      wrap=True, width=4, fill=None,
      transform='u',
      text="I am in uppercase")

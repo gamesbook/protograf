@@ -34,14 +34,14 @@ If you are using the ``Text`` command, the font can be setup as follows:
 
 .. code:: python
 
-    Text("Hello World!", font_face="Arial", font_size=48, stroke=red)
+    Text("Hello World!", font_name="Arial", font_size=48, stroke=red)
 
 If you want to set the font for a whole section of script, then using the
 ``Font`` command, you can setup as follows:
 
 .. code:: python
 
-    Font(face="Arial", size=48, stroke=red)
+    Font(name="Arial", size=48, stroke=red)
 
 In this case, the properties are similar but the "*font_*" prefix is not
 needed. The ``Font()`` command also has some useful extra properties,

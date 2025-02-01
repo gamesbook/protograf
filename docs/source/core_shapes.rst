@@ -470,15 +470,18 @@ view, it's really just a series of complex lines drawn in a particular pattern!
 Thus text has a position in common with many other shapes, as well as its own
 special properties.
 
-The properties that can be set are:
+The basic properties that can be set are:
 
 - *text* - the text string; if this appears as the first property, you can
   omit the ``text=``` prefix
 - *font_size* - default is ``12`` points
-- *font_face* - the default is ``Helvetica``
+- *font_name* - the default is ``Helvetica``
 - *stroke* - the default text color is ``black``
 - *align* - the default aligment is ``center``; it can be changed to be
   ``left``, ``right`` or ``justified``.
+
+See Example 2 below for additional properties.
+
 
 Example 1.
 ++++++++++
@@ -527,22 +530,32 @@ Example 2.
                   '<b>bold</b> <i>ital</i><br/>'
                   '<b><i>bold ital</i></b></font>')
         Text(x=0, y=2, align="left", stroke=orange,
+             font_name="Courier", font_size=10,
              wrap=True, width=4, fill=None,
              transform='c',
              text="I am capitalized")
         Text(x=0, y=1.5, align="left", stroke=orange,
+             font_name="Courier", font_size=10,
              wrap=True, width=4, fill=None,
              transform='l',
              text="I am in lowercase")
         Text(x=0, y=1, align="left", stroke=orange,
+             font_name="Courier", font_size=10,
              wrap=True, width=4, fill=None,
              transform='u',
              text="I am in uppercase")
 
-      This example shows how the text's font can be set in two ways:
+      This example shows how the text's font can be set in three ways:
 
-      - via the ``Font`` command (see :ref:`Font commands <the-font-command>`)
+      - via the ``Font`` command
+      - via *font_name* property
       - via the ``<font name="...">`` embedded in the *text*
+
+      .. NOTE::
+
+        If you are not working with one of the built-in fonts, you will
+        first have to install it with the ``Font`` command, as described
+        in (see :ref:`the Font command <the-font-command>`).
 
       Basic text is a single line, without any embedded styling.
 

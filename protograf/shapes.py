@@ -175,15 +175,15 @@ class ImageShape(BaseShape):
         xc = x + width / 2.0
         yc = y + height / 2.0
         if self.heading:
-            cnv.setFont(self.font_face, self.heading_size)
+            cnv.setFont(self.font_name, self.heading_size)
             cnv.setFillColor(self.heading_stroke)
             self.draw_multi_string(cnv, xc, y + height + cnv._leading, self.heading)
         if self.label:
-            cnv.setFont(self.font_face, self.label_size)
+            cnv.setFont(self.font_name, self.label_size)
             cnv.setFillColor(self.label_stroke)
             self.draw_multi_string(cnv, xc, yc, self.label)
         if self.title:
-            cnv.setFont(self.font_face, self.title_size)
+            cnv.setFont(self.font_name, self.title_size)
             cnv.setFillColor(self.title_stroke)
             self.draw_multi_string(cnv, xc, y - cnv._leading, self.title)
 
@@ -1497,7 +1497,7 @@ class HexShape(BaseShape):
         # ---- draw coord (optional)
         if self.coord_elevation:
             # ---- * set coord props
-            cnv.setFont(self.coord_font_face, self.coord_font_size)
+            cnv.setFont(self.coord_font_name, self.coord_font_size)
             cnv.setFillColor(self.coord_stroke)
             coord_offset = self.unit(self.coord_offset)
             if self.coord_elevation in ['t', 'top']:
@@ -2485,15 +2485,15 @@ class QRCodeShape(BaseShape):
         xc = x + width / 2.0
         yc = y + height / 2.0
         if self.heading:
-            cnv.setFont(self.font_face, self.heading_size)
+            cnv.setFont(self.font_name, self.heading_size)
             cnv.setFillColor(self.heading_stroke)
             self.draw_multi_string(cnv, xc, y + height + cnv._leading, self.heading)
         if self.label:
-            cnv.setFont(self.font_face, self.label_size)
+            cnv.setFont(self.font_name, self.label_size)
             cnv.setFillColor(self.label_stroke)
             self.draw_multi_string(cnv, xc, yc, self.label)
         if self.title:
-            cnv.setFont(self.font_face, self.title_size)
+            cnv.setFont(self.font_name, self.title_size)
             cnv.setFillColor(self.title_stroke)
             self.draw_multi_string(cnv, xc, y - cnv._leading, self.title)
 
@@ -2589,7 +2589,7 @@ class RectangleShape(BaseShape):
         # ---- draw coord (optional)
         if self.coord_elevation:
             # ---- * set coord props
-            cnv.setFont(self.coord_font_face, self.coord_font_size)
+            cnv.setFont(self.coord_font_name, self.coord_font_size)
             cnv.setFillColor(self.coord_stroke)
             coord_offset = self.unit(self.coord_offset)
             if self.coord_elevation in ['t', 'top']:
@@ -3793,7 +3793,7 @@ class TextShape(BaseShape):
             _style.borderWidth = self.outline_width
             _style.alignment = self.to_alignment()
             _style.fontSize = self.font_size
-            _style.fontName = self.font_face
+            _style.fontName = self.font_name
             _style.leading = self.leading
             _style.textTransform = self.transform
             """
