@@ -28,7 +28,7 @@ The Basics
 `↑ <table-of-contents_>`_
 
 Apart from the `Built-In Fonts`_, each time you want to use a different font
-in your script, you first need to declare it.
+in your script, you'll first need to declare it.
 
 If you are using the ``Text`` command, the font can be setup as follows:
 
@@ -37,7 +37,7 @@ If you are using the ``Text`` command, the font can be setup as follows:
     Text("Hello World!", font_name="Arial", font_size=48, stroke=red)
 
 If you want to set the font for a whole section of script, then using the
-``Font`` command, you can setup as follows:
+``Font`` command you can set this up as follows:
 
 .. code:: python
 
@@ -49,7 +49,7 @@ which are described below.
 
 .. NOTE::
 
-    Font face names, and their associated file names, should be considered
+    Font names, and their associated file names, should be considered
     as **case-sensitive**!
 
 
@@ -82,7 +82,6 @@ operating system, you can consider using a command such as:
 In this case, when the ``Create`` command runs, it will automatically try to
 register the following fonts:
 
-- *Ubuntu*  (technically, *Ubuntu Regular*)
 - *Arial*
 - *Verdana*
 - *Courier New*
