@@ -31,10 +31,55 @@ Note, however, that this project "breaks" a few normal conventions:
   approach of only importing exactly what you need!
 
 
+Package Management
+==================
+
+Project packaging is handling via *poetry* (https://python-poetry.org/).  You
+must have installed this before starting development.
+
+New dependencies should be added via::
+
+    poetry add MyNewPackage
+
+Or perhaps with finer control over versions::
+
+    poetry add MyNewPackage^3.1.4
+
+Check existing dependencies via::
+
+    poetry show
+
+Update a patch version via::
+
+    poetry version patch
+
+Update a minor version via::
+
+    poetry version minor
+
+
+Releases on pypi
+----------------
+
+The software includes a GitHub workflow |dash| see the ``.github/workflows``
+directory on GitHub |dash| which handles pushing new releases  onto pypi.
+
+To trigger such an update, add a new version as above, and then tag and push::
+
+    git tag 0.1.1
+    git push origin --tags
+
+If you check the *Actions* tab on the GitHub project page, you should now see
+the workflow in action.
+
+When complete, there should now be an updated version showing if you refresh
+the home page of the project on pypi.
+
+
 Documentation
 =============
 
-Documents are written in reStructuredText. Some helpful web resources:
+Documentation is written in reStructuredText. Some helpful web resources:
 
 - https://github.com/DevDungeon/reStructuredText-Documentation-Reference - guide
 - https://docutils.sourceforge.io/docs/user/rst/quickstart.html - quick start
