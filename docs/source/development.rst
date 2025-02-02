@@ -35,9 +35,14 @@ Package Management
 ==================
 
 Project packaging is handling via *poetry* (https://python-poetry.org/).  You
-must have installed this before starting development.
+must have installed this before starting development. Follow the guides to
+setup a virtual environment in which to work.
 
-New dependencies should be added via::
+As you work, you can update the changes locally by running::
+
+    poetry install
+
+New package dependencies should be added via::
 
     poetry add MyNewPackage
 

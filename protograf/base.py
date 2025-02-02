@@ -1336,7 +1336,7 @@ class BaseShape:
             font_name, tools.FontStyleType.BOLDITALIC, style, directory)
 
         if font_regular and kwargs:
-            # print(f'Register Family: {font_regular=} {kwargs=}')
+            # print(f'Register Family! {font_regular=} {kwargs=}')
             registerFontFamily(font_name.strip(' '), normal=font_regular, **kwargs)
 
     def check_settings(self) -> tuple:
