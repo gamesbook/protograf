@@ -29,6 +29,8 @@ release = '0.1.0'
 
 # Add any Sphinx extension module names here, as strings. They can be
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom ones.
+
+# NB - ensure these packages are added to docs/requirements.txt
 extensions = [
     'sphinx_rtd_theme',
     'sphinx.ext.autosectionlabel',
