@@ -666,19 +666,21 @@ Example 2.
       The shapes all set the following properties:
 
       - centre-bottom point at *x* and *y*
-      - *title* appears below the shape
-      - *dot* - small, filled circle. This also marks the **centre** of the
+      - *title* - appears below the shape
+      - *dot* - small, filled circle |dash| marks the **centre** of the
         Arrow
 
       The lower-left Arrow also sets the following properties:
 
-      - *heading* appears above the shape
-      - *cross* small pair of lines superimposed on the dot (also at the
-        Arrow's centre)
+      - *heading* - appears above the shape
+      - *cross* - small pair of lines at the Arrow's centre
 
-      The two arrows in the top-right are superimposed; the red outline Arrow
-      shares the same centre as the black dotted Arrow below it.  The red
-      arrow is rotated 45 |deg| to the left about the centre.
+      The two arrows in the top-right are superimposed.
+
+      The red outline Arrow shares the same centre as the black dotted
+      Arrow before/below it.
+
+      The red arrow is rotated 45 |deg| to the left about the centre.
 
       .. NOTE::
 
@@ -730,38 +732,42 @@ Example 3.
       - centre-bottom point at *x* and *y*
       - *height* of the tail portion (``1`` cm for all)
       - *width* of the tail portion
-      - *head_height* sets height of the head portion
-      - *head_width* sets width of the head portion.
+      - *head_height* sets height of the head (triangular) portion
+      - *head_width* sets width of the head (triangular) portion
 
       The *head_width* represents the maximum distance between the outer
       arrowhead "wingtips".
 
       The **silver** arrow has these properties:
 
-      - *tail_width* of ``0.75`` cm; this means the base of the arrow is wider
-        than the body i.e. the width at the top of the tail section
+      - *tail_width* of ``0.75`` cm
       - *transparency* - set to ``50`` %; the grid is partly visible through it
+
+      The smaller *tail_width* means the base of the arrow is wider
+      than the body i.e. the width at the top of the tail section.
 
       The **gold** arrow has these properties:
 
-      - *tail_width* of ``0.01`` cm; this means the base of the arrow is much
-        narrow than the body (the width at the top of the tail section)
+      - *tail_width* of ``0.01`` cm
+
+      The near-zero *tail_width*  means the base of the arrow is nearly
+      shown as a point.
 
       The **green** (``lime`` fill) arrow has these properties:
 
       - *points_offset* of ``-0.25`` cm
 
       The *points_offset* here means that the two "wingtips" of the arrowhead
-      are not in line with the top of the tail portion but are moved backwards
-      towards the tail.
+      are moved back towards the tail.
 
       The **red** (``tomato`` fill)  arrow has these properties:
 
       - *points_offset* of ``0.25`` cm;
 
       The *points_offset* here means that the two "wingtips" of the arrowhead
-      are not in line with the top of the tail portion but are moved forwards,
-      away from the tail, and the head has been been made narrower and longer.
+      are moved forwards away from the tail.
+
+      In this case, the head has been been made narrower and longer.
 
       The **blue** (``aqua`` fill) arrow has these properties:
 
@@ -2855,6 +2861,8 @@ will have no fill color, and effectively become transparent.
 If the stroke is set to the keyword ``None`` (note the uppercase "N"), the line
 will have no color, and effectively become transparent.
 
+Example 1.
+++++++++++
 
 .. |fsb| image:: images/defaults/fill-stroke.png
    :width: 330
@@ -2868,9 +2876,9 @@ will have no color, and effectively become transparent.
 
       The shape has the following properties that differ from the defaults:
 
-      - *fill* color of ``yellow``for the interior of the shape
-      - *stroke* color of ``red`` for the color of the border of the shape
-      - *stroke_width* - set to ``6`` points (corresponds to about 2mm or 0.2cm)
+      - *fill* color of ``yellow`` for the interior of the shape
+      - *stroke* color of ``red`` for the border of the shape
+      - *stroke_width* - set to ``6`` points (about 2mm or 0.2cm)
 
       It can be seen that very thick lines "straddle" a centre line running
       through the defined location.
@@ -2878,6 +2886,9 @@ will have no color, and effectively become transparent.
       In this case the Rectangle is both larger in outer dimensions than the
       expected 1x1 cm and smaller in inner dimensions than the expected 1x1 cm.
 ===== ======
+
+Example 2.
+++++++++++
 
 .. |fst| image:: images/defaults/fill-and-stroke.png
    :width: 330
@@ -2889,12 +2900,15 @@ will have no color, and effectively become transparent.
 
           Circle(fill_stroke=aqua)
 
-      The shape has the following properties that differ from the defaults:
+      The shape has the following property that differ from the defaults:
 
-      - *fill_stroke* color of ``aqua`` (this corresponds to hexadecimal value
-        of ``#00FFFF``), and is a ""shortcut"" which sets **both** the *fill*
-        and *stroke* at same time,  so that the line used to draw the
-        circumference is the same as the fill of the interior.
+      - *fill_stroke* color of ``aqua``
+
+      The *fill_stroke* property is a ""shortcut"" which sets **both** the
+      *fill* and *stroke* at same time.
+
+      In this case, the color of the line used to draw  circumference is the same
+      as the fill color of the interior.
 ===== ======
 
 
@@ -2971,10 +2985,6 @@ Example 2. Polygon
       - *rotation* - varies from 0 |deg| to 60 |deg| (anti-clockwise from the
         horizontal)
 
-      Note that the fact that the angle of the sides of the polygon is 30 |deg|
-      creates a type of regularity, so that the last polygon with the rotation
-      of 60 |deg| appears to match the first polygon - but the slope of the
-      label inside that last polygon clearly shows that rotation has happened.
 ===== ======
 
 

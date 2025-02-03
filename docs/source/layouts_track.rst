@@ -141,11 +141,15 @@ Example 2. Track with a Shape
           shapes=[circle(radius=0.25, fill=None)]))
 
       This is similar to the first example; the main difference is the
-      specification of *shapes* - this causes the *shp* (a ``Circle``)
-      to be drawn at each of the vertices of the ``Rectangle`` that forms
-      the track.  This is of default size (similar to the first example)
-      of ``1`` cm high by ``1`` cm wide, with the lower-left corner at
-      x = ``1`` cm and y = ``1`` cm.
+      specification of *shapes*.
+
+      The *shapes* property causes a ``Circle`` to be drawn at each vertex of
+      the ``Rectangle``.
+
+      The ``Circle`` is of default size (similar to the first example):
+
+      - ``1`` cm high by ``1`` cm wide
+      - lower-left corner at x ``1`` cm and y ``1`` cm.
 
 ===== ======
 
@@ -169,14 +173,19 @@ Example 3. Track with sequence
           rectangle(),
           shapes=[shp])
 
-      This is similar to the second example; the main difference is the
-      specification of *label* with a value of *{{sequence}}* for the
-      shape being drawn.  In this case, the value is replaced by the
-      actual number.  The ``Rectangle`` vertices are numbered in an
+      This is similar to the second example.
+
+      The difference is using a *label* with a value of *{{sequence}}* for the
+      shape being drawn.
+
+      In this case, the *label* value is replaced by the
+      actual number.
+
+      The ``Rectangle`` vertices are numbered in an
       anti-clockwise direction starting with the lower-left corner.
 
-      Note that for this, and further examples, the shape to be drawn
-      is defined before the track; this makes the script a bit less
+      For this, and further examples, the shape to be drawn
+      is defined before the track; this makes the script less
       cluttered and easier to read; but it does not **have** to be
       written this way.
 
@@ -647,9 +656,10 @@ Example 18. Circular Track - clock
           clockwise=True)
 
       This example is to show how a track could be used to construct a
-      familiar shape - an analog clock face. By setting the angles in the
-      desired order, the clock numbering starts at the correct place to
-      show the 'hour' numbers.
+      familiar shape - an analog clock face.
+
+      By setting the angles in the desired order, the clock numbering starts
+      at the correct place to show the 'hours'.
 
       The outer ``Circle`` with its *dot* is really just for decoration!
 
@@ -682,7 +692,7 @@ Example 19. Polygon Track - scoring
             clockwise=True,
             start=24
         )
-        # colored circles
+        # blue circles
         shp5 = circle(common=score, fill=aqua)
         Track(
             trk,
@@ -693,13 +703,18 @@ Example 19. Polygon Track - scoring
             sequences=[5,10,15,20,25,30,35]
         )
 
-      This example is to show how a track could be used to construct a
-      familiar shape - a scoring track for a game.  In this case, a
-      30-sided polygon is used as the basis for the track.
+      This example shows how a track could be used to construct a
+      familiar shape - a scoring track for a game.
 
-      Two tracks are constructed; first the one with the white circles
-      and then the second one is constructed "above" it with blue circles;
-      these circles are only drawn at every fifth location in the sequence.
+      In this case, a 30-sided polygon is used as the basis for the track.
+
+      Two tracks are constructed:
+
+      - first one has the white circles;
+      - second one is constructed "above" it with blue circles.
+
+      The blue circles are only drawn at every *fifth* location in the sequence.
+
       The track's circles share the same *common* property, as the only
       difference between them is their *fill* color.
 

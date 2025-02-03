@@ -16,7 +16,7 @@ div.highlight {
     border-bottom: 1px solid #ac9;
 }
 td p {
-    margin: 30px 0; /* between paragraphs */
+    margin: 20px 2px; /* between paragraphs in table */
     color: #2f4f4f;
 }
 div.body p, div.body dd, div.body li {
