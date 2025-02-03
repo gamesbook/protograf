@@ -5,6 +5,9 @@
 .wy-table-responsive table td, .wy-table-responsive table th {
     white-space: normal;
 }
+.wy-table-responsive p {
+    font-size: 16px;
+}
 div.highlight-python {
     background-color: #f4debf;
     border-top: 1px solid #ac9;
@@ -19,6 +22,6 @@ td p {
     margin: 20px 2px; /* between paragraphs in table */
     color: #2f4f4f;
 }
-div.body p, div.body dd, div.body li {
-    font-size: 150%;
+p {
+    font-size: 18px;
 }

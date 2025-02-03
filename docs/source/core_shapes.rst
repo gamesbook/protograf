@@ -1414,17 +1414,16 @@ for the *cx* and *cy* pair that you supply to it are correct!
       shape. Other properties:
 
       - the centre is *defined* to be at x-position ``1`` cm and y-position
-        ``1`` cm; this will affect the drawing of the cross and the label but
-        does **not** affect the drawing of the shape itself
+        ``1`` cm
       - *cross* - sets the length of each of the two lines that cross at the
         centre to be ``0.5`` cm
       - *label* - sets the text appearing at the defined centre position
-      - *fill* - color of ``sandybrown`` (corresponds to the hexadecimal
-        value ``#F4A460``)
-        that defines the color of the interior of the shape
-      - *stroke* - color of ``peru`` (corresponds to the hexadecimal
-        value ``#CD853F``)
+      - *fill* - color of ``sandybrown`` (hexadecimal value ``#F4A460``)
+        for the shape's' interior
+      - *stroke* - color of ``peru`` (hexadecimal value ``#CD853F``)
 
+      Reminder: ``cx`` and ``cy`` affect the drawing of the cross label but
+      do **not** affect the drawing of the shape itself.
 ===== ======
 
 Example 3.
@@ -1683,10 +1682,10 @@ Example 3.
       - *width* of ``2`` cm
       - *height* of ``3`` cm
       - *borders* - a list of sets of custom settings for each side; each set
-        can contain""
+        can contain:
 
-        - `direction` - one of ne(northeast), se(southeast), nw(northwest),
-          or sw(southwest)
+        - `direction` - one of ne (northeast), se (southeast), nw (northwest),
+          or sw (southwest)
         - `width` - the line thickness
         - `color` - either a named color or a hexadecimal value
         - `style` - ``True`` makes it dotted; or a list of values creates dashes
@@ -1889,8 +1888,8 @@ Example 2.
 
       - ``n`` is ``north`` ("up"),
       - ``s`` is ``south`` ("down"),
-      - ``e`` is ``east`` ("right") and
-      - ``w`` is ``west`` ("left"").
+      - ``e`` is ``east`` ("right"), and
+      - ``w`` is ``west`` ("left").
 
       One or more edge values can be used together with spaces between them
       e.g. ``n e`` to draw both north **and** east.
@@ -2842,11 +2841,11 @@ of the shape which they are part of; see the `Stadium` example below.
 
       - *cx* and *cy* set the centre point of the shape
       - *dot* - sets the size of dot at the centre
-      - *dot_stroke*  - sets the color of the dot (note that the dot is "filled
-        in" with that same color); defaults to match the *stroke* of the shape
+      - *dot_stroke*  - sets the color (and fill) of the dot; defaults to match the
+        *stroke* of the shape
         that it is part of
       - *cross* - sets the length of each of the two lines that cross at the
-         centre
+        centre
       - *cross_stroke*  - sets the color of the cross lines; defaults to the
         stroke of the shape that it is part of
       - *cross_stroke_width* - sets the thickness of the cross lines
@@ -2916,11 +2915,12 @@ Example 2.
 
       - *fill_stroke* color of ``aqua``
 
-      The *fill_stroke* property is a ""shortcut"" which sets **both** the
+      The *fill_stroke* property is a "shortcut" which sets **both** the
       *fill* and *stroke* at same time.
 
-      In this case, the color of the line used to draw  circumference is the same
-      as the fill color of the interior.
+      In this case, the color of the line used to draw the circumference is
+      the same as the fill color of the interior.
+
 ===== ======
 
 
@@ -3188,14 +3188,14 @@ Example 1. Default Centre
             x=2.5, y=0.5, height=1, centre_shape=small_star)
 
       At the start, a Star shape is defined by the lowercase ``star()``
-      command which means the shape is not drawn at this time but rather
-      assigned to a named value - ``small_star`` so that it can be
-      referred to further on.
+
+      A lowercase command means the shape is not drawn at this time but is
+      assigned to a named value and can be referred to further on.
 
       Each of the other shapes in the script can now use this named shape
       as their ``centre_shape``.
 
-      Note that regardless of whether the primary shape's position is
+      Regardless of whether the primary shape's position is
       defined using ``x`` and ``y``, or  ``cx`` and ``cy``, the Star
       is still drawn in the centre of that shape.
 
@@ -3231,15 +3231,19 @@ The centre-shape can be shifted from the centre by setting values for
             centre_shape=small_circle)
 
       As in the first example, the ``small_star`` is defined but not drawn.
-      Then the ``small_star`` is assigned as the ``centre_shape``  to
-      ``small_circle``; a shape that is also not drawn.  This circle is used
-      as the ``centre_shape``  for both of the Hexagons.
+
+      The ``small_star`` is assigned as the ``centre_shape``  to
+      ``small_circle``; a shape that is also not drawn.
+
+      This circle is used as the ``centre_shape``  for both of the Hexagons.
 
       The top Hexagon shows how the centre-shape can be moved with the ``*_mx``
-      and ``*_my`` values.  Positive values move it up and to the right while
+      and ``*_my`` values.
+
+      Positive values move the shape up and to the right while
       negative values move it down and to the left.
 
-      The lower Hexagon shows how the centre-shape is drawn super-imposed
+      The lower Hexagon shows how the centre-shape is drawn
       over other features in the Hexagon, except for the ``dot``.
 
 ===== ======
