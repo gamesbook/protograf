@@ -838,11 +838,14 @@ Example 1.
 
       It has the following properties based on the defaults:
 
-      - lower-left "corner" at x-position ``1`` cm and at y-position ``1`` cm
+      - lower-left at x-position ``1`` cm and at y-position ``1`` cm
       - diameter of ``1`` cm
-      - lines in all 8 directions, extending from the centre outwards; these
-        represent the primary - North, South, East and West - and secondary -
-        North-East, South-East, North-West and South-West directions.
+      - lines in all 8 directions, extending from the centre outwards
+
+      The lines  represent the primary |dash| North, South, East and West |dash| and
+      secondary |dash| North-East, South-East, North-West and South-West |dash|
+      directions.
+
 ===== ======
 
 Example 2.
@@ -1219,12 +1222,15 @@ Example 3.
       - *radii* - set to ``True`` to force lines to be drawn from the centre of
         the polygon to each of its vertices; the radii properties are then set:
 
-        - *radii_offset* - set to ``0.5`` cm; the distance away from the centre
-          that the radii will start to be drawn
-        - *radii_length*  - set to ``0.75`` cm; the length is shorter than that of
-          the complete distance from vertex to centre, so the line goes in the
-          same direction but never touches the vertex or the centre
+        - *radii_offset* - set to ``0.5`` cm; distance away from the centre
+          that the radii will start
+        - *radii_length*  - set to ``0.75`` cm
         - *radii_stroke_width* - set to ``1`` point; a slightly thicker line
+
+      Note that when the radii length is shorter than that the distance from
+      vertex to centre, the line will still go in the same direction but never
+      touch the vertex or the centre.
+
 ===== ======
 
 
@@ -1269,18 +1275,24 @@ Example 4.
       - *sides* - ``8`` (an octagon)
       - *perbis* - lines drawn to sides 2, 4 and 7
 
-      The *perbis* |dash| short for "perperdicular bisector" |dash| defines
+      The *perbis* |dash| short for "perpendicular bisector" |dash| defines
       lines  that are to be drawn from the centres of the sides
-      of the polygon to its centre. Its properties can be set as follows:
+      of the polygon to its centre.
 
-      - *perbis* - the edges of the polygon are numbered from the
-        east-most facing edge as 1, and then in an anti-clockwise direction.
+      The edges of the polygon are numbered; the east-most facing edge is 1,
+      and then numbers increase in an anti-clockwise direction.
+
+      Its properties can be set as follows:
+
+      - *perbis* - a list of edges to use
       - *perbis_offset* - set to ``0.25`` cm; the distance away from the centre
         that the lines will start to be drawn
-      - *perbis_length*  - set to ``0.5`` cm; the length is shorter than that of
-        the complete distance from centre point to edge, so the line goes in
-        the same direction but never touches the vertex or the edge
+      - *perbis_length*  - set to ``0.5`` cm
       - *perbis_stroke_width* - set to ``1`` point; a slightly thicker line
+
+      Note that when the perbis length is shorter than that the distance from
+      centre point to edge, the line will still go in the same direction but never
+      touch the vertex or the edge.
 
 ===== ======
 
