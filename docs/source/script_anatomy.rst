@@ -210,7 +210,6 @@ See:
 
 - :doc:`Core Shapes <core_shapes>`
 - :doc:`Card and Deck commands <card_decks>`
-- :doc:`Repetitive and reuse commands <advanced_commands>`
 - :doc:`Further commands <additional_commands>`
 - :doc:`Layout <layouts>` commands
 - :doc:`Hexagonal Grid <hexagonal_grids>` commands

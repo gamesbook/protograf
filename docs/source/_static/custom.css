@@ -15,7 +15,10 @@ div.highlight {
     border-top: 1px solid #ac9;
     border-bottom: 1px solid #ac9;
 }
-table tbody tr td p {
-    margin-bottom: 1em; /* between paragraphs */
+td p {
+    margin: 30px 0; /* between paragraphs */
     color: #2f4f4f;
+}
+div.body p, div.body dd, div.body li {
+    font-size: 150%;
 }

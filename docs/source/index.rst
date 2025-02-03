@@ -31,7 +31,6 @@ useful information but do build on each other.
    card_decks
    deck_command
    additional_commands
-   advanced_commands
    customised_shapes
    layouts
    hexagonal_grids

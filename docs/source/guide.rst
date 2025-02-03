@@ -27,28 +27,26 @@ other.
     cards/tiles; more detail also in the :doc:`Deck command <deck_command>`
 9.  :doc:`Additional Commands <additional_commands>` - special commands not part
     of the core shapes; fonts, dates and access to BoardGameGeek data
-10. :doc:`Advanced Commands <advanced_commands>` - how to work with
-    common/reused items and repetitive elements
-11. :doc:`Customised Shapes <customised_shapes>` - how to refine the
+10. :doc:`Customised Shapes <customised_shapes>` - how to refine the
     appearance of certain shapes; circles, hexagons and rectangles
-12. :doc:`Repetitive Elements <layouts>` - how to work with repeats, sequences,
+11. :doc:`Repetitive Elements <layouts>` - how to work with repeats, sequences,
     tracks and grid layouts
-13. :doc:`Hexagonal Grids <hexagonal_grids>` - how to create different types
+12. :doc:`Hexagonal Grids <hexagonal_grids>` - how to create different types
     of hexagonal grids and customise or add to them
-14. :doc:`Terminology <terminology>` - summary of common jargon and descriptions
+13. :doc:`Terminology <terminology>` - summary of common jargon and descriptions
     of many of the elements' properties
-15. :doc:`Commands <commands>` - summary of all the commands available
+14. :doc:`Commands <commands>` - summary of all the commands available
 
 The following are supplementary sections that you're likely to need when
 doing more advanced scripts or needing further resources:
 
-16. :doc:`Descriptions of Supplied Examples <examples/index>` - brief
+15. :doc:`Descriptions of Supplied Examples <examples/index>` - brief
     walkthoughs of many of the examples provided with **protograf**
-17. :doc:`Working with Fonts <using_fonts>` - how to install and
+16. :doc:`Working with Fonts <using_fonts>` - how to install and
     use *fonts*, both built-in and additional ones
-18. :doc:`Using Python Commands <python_commands>` - how to work with
+17. :doc:`Using Python Commands <python_commands>` - how to work with
     *loops*, *if/then* statements and *functions* for more flexibility
-19. :doc:`Useful Resources <useful_resources>` - links to
+18. :doc:`Useful Resources <useful_resources>` - links to
     tools and websites related to boardgame prototyping
-20. :doc:`Development Notes <development>` - notes for programmers wanting
+19. :doc:`Development Notes <development>` - notes for programmers wanting
     to develop further in or with  **protograf**

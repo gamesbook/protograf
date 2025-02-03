@@ -1,4 +1,3 @@
-===========
 Core Shapes
 ===========
 
@@ -1305,11 +1304,7 @@ Example 5.
       - *rotation* - varies from 0 |deg| to 60 |deg|
 
       The rotation defined here is anti-clockwise from the horizontal.
-      The fact that the angle of the sides of the polygon is
-      30 |deg| creates a type of regularity, so that the polygon with the
-      rotation of 60 |deg| appears to match the first polygon |dash| but the
-      slope of the label inside that polygon clearly shows that rotation has
-      happened.
+
 ===== ======
 
 
@@ -2873,16 +2868,15 @@ will have no color, and effectively become transparent.
 
       The shape has the following properties that differ from the defaults:
 
-      - *fill* color of ``yellow`` (corresponds to hexadecimal value ``#FFFF00``)
-        that defines the color of the interior of the shape
-      - *stroke* color of ``red`` (corresponds to hexadecimal value ``#FF0000``)
-        that defines the color of the border of the shape
+      - *fill* color of ``yellow``for the interior of the shape
+      - *stroke* color of ``red`` for the color of the border of the shape
       - *stroke_width* - set to ``6`` points (corresponds to about 2mm or 0.2cm)
 
       It can be seen that very thick lines "straddle" a centre line running
-      through the defined location; so in this case the Rectangle is both
-      larger in outer dimensions than the expected 1x1 cm and smaller in the
-      inner dimensions than the expected 1x1 cm.
+      through the defined location.
+
+      In this case the Rectangle is both larger in outer dimensions than the
+      expected 1x1 cm and smaller in inner dimensions than the expected 1x1 cm.
 ===== ======
 
 .. |fst| image:: images/defaults/fill-and-stroke.png
@@ -3127,9 +3121,10 @@ visible - then set the *fill* value to ``None``.
       - *transparency* - the lower the value, the more "see through" the color
 
       The last Rectangle, which also has a *transparency* value, is drawn
-      partially over the Rectangle on the lower-left.  This means there is an
-      apparent color change in the overlapping section, because some of the
-      underlying color is partially visible ("bleed through").
+      partially over the Rectangle on the lower-left.
+
+      When overdrawn, there is a color change in the overlapping section
+      ("bleed through").
 ===== ======
 
 Centre Shape

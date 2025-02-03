@@ -32,6 +32,7 @@ release = '0.1.0'
 extensions = [
     'sphinx_rtd_theme',
     'sphinx.ext.autosectionlabel',
+    'sphinx_copybutton',
 ]
 
 # https://docs.readthedocs.io/en/stable/guides/cross-referencing-with-sphinx.html#automatically-label-sections
