@@ -1,0 +1,48 @@
+[project]
+name = "protograf"
+version = "0.1.0"
+description = "Python utility for designing and creating simple, regular, graphic outputs as PDF/PNG files"
+authors = [
+    {name = "Derek Hohls", email = "gamesbook@gmail.com"}
+]
+maintainers = [
+    { name = "Rory Meyer", email = "rory@oceanmaps.xyz"},
+]
+license = {text = "GPL 3.0 License"}
+readme = "README.md"
+requires-python = ">=3.9,<4"
+dependencies = [
+    "reportlab (>=4.2.0)",
+    "xlrd (>=0.9.4)",
+    "bgg-api (>=1.1.6)",
+    "imageio (>=2.36.1)",
+    "svglib (>=1.5.1)",
+    "pymupdf (>=1.24.9)",
+    "jinja2 (>=3.1.4)",
+    "segno (>=1.6.1)",
+    "sphinx-copybutton (>=0.5.2,<0.6.0)",
+    "black (>=25.1.0,<26.0.0)"
+]
+keywords = [ "python", "graphics", "boardgames", "cards", "counters" ]
+classifiers = [
+    "Programming Language :: Python :: 3.11",
+    "Development Status :: 3 - Alpha",
+    "Natural Language :: English",
+    "Environment :: Console",
+    "Intended Audience :: End Users/Desktop",
+    "License :: OSI Approved :: GPL License",
+    "Operating System :: OS Independent",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Topic :: Games/Entertainment :: Board Games",
+    "Topic :: Multimedia :: Graphics :: Presentation"
+]
+
+[project.urls]
+repository = "https://github.com/gamesbook/protograf"
+documentation = "https://protograf.readthedocs.io/en/latest/"
+"Bug Tracker" = "https://github.com/gamesbook/protograf/issues"
+
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"

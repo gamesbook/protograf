@@ -1,0 +1,11 @@
+SIDE,TITLE,MOVE,STRENGTH,DOTS,SHIELD,BORDER,IMAGE
+English,DURHAM,2,B2,4,red,#57762C,
+English,LANCASTER,2,B3,4,red,#937301,
+English,NORSE,,A2,3,'',#416E83,viking.png
+English,WESTMOR,2,B2,4,red,#57762C,
+English,YORK,2,B3,4,blue,#937301,
+Scots,BRUCE,2,B2,4,blue,#57762C,
+Scots,DOUGLAS,2,C3,3,blue,#416E83,
+Scots,GRANT,2,B1,4,blue,#57762C,
+Scots,KING,3,A3,4,'',#416E83,king.png
+Scots,CAMPBELL,2,C3,3,blue,#416E83,

@@ -1,0 +1,9 @@
+Source:
+https://picjumbo.com/mysterious-fantasy-forest-with-old-bridges/
+Splitter:
+https://splitter.imageonline.co/
+Conversion to PNG:
+https://imagemagick.org/script/index.php
+Process:
+convert '*.*' img_%02d.png
+

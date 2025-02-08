@@ -1,0 +1,25 @@
+===========
+protograf
+===========
+
+Changes
+=======
+
+2016-02-05 (0.1.0a1)
+--------------------
+* First draft!
+
+2024-02-04 (0.1.0a2)
+--------------------
+* Upgrade to Python 3.13
+* Patch code for changes related to Python and library upgrades
+* Switch to using bgg-api library
+
+2025-01-11 (0.1.0a3)
+--------------------
+* Initial feature set complete
+* Documentation linked to Read The Docs
+
+TDB (0.1.0)
+--------------------
+* Release on pypi
