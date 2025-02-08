@@ -23,14 +23,14 @@ dependencies = [
     "sphinx-copybutton (>=0.5.2,<0.6.0)",
     "black (>=25.1.0,<26.0.0)"
 ]
-keywords = [ "python", "graphics", "boardgames", "cards", "counters" ]
+keywords = [ "python", "graphics", "boardgames", "cards", "counters", "tiles" ]
 classifiers = [
     "Programming Language :: Python :: 3.11",
     "Development Status :: 3 - Alpha",
     "Natural Language :: English",
     "Environment :: Console",
     "Intended Audience :: End Users/Desktop",
-    "License :: OSI Approved :: GPL License",
+    "License-Expression :: BSD-3-Clause",
     "Operating System :: OS Independent",
     "Topic :: Software Development :: Libraries :: Python Modules",
     "Topic :: Games/Entertainment :: Board Games",
