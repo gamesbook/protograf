@@ -8,9 +8,19 @@ These notes are aimed at those who might be developing the code further,
 or who want to use :doc:`protograf <index>` as part of other Python
 projects.
 
+.. _table-of-contents:
+
+Table of Contents
+=================
+
+- `Coding`_
+- `Package Management`_
+- `Documentation`_
+
 
 Coding
 ======
+`↑ <table-of-contents_>`_
 
 In general, follow the `Zen of Python <https://peps.python.org/pep-0020/>`_
 |dash| which is much easier to say than do |dash| but also try to follow
@@ -28,18 +38,22 @@ Note, however, that this project "breaks" a few normal conventions:
   user to import only what they need but that makes it really tedious for them,
   and much harder to do if you're not a programmer!  If you are using this as
   part of another Python project, then of course you should follow the normal
-  approach of only importing exactly what you need!
+  approach of only importing **exactly** what you need!
 
 Code is formatted using ``black`` (https://black.readthedocs.io/) which is
-triggered as a GitHub action  |dash| see the ``.github/workflows/`` directory.
+triggered as a GitHub action |dash| see the ``.github/workflows/`` directory.
 
 
 Package Management
 ==================
+`↑ <table-of-contents_>`_
 
 Project packaging is handling via *poetry* (https://python-poetry.org/).  You
 must have installed this before starting development. Follow the guides to
 setup a virtual environment in which to work.
+
+Workflow
+--------
 
 As you work, you can update the changes locally by running::
 
@@ -65,12 +79,11 @@ Update a minor version via::
 
     poetry version minor
 
-
 Releases on pypi
 ----------------
 
-The software includes a GitHub workflow |dash| see the
-``.github/workflows/`` directory |dash| which handles pushing new releases  onto pypi.
+The software includes a GitHub workflow |dash| see the ``.github/workflows/``
+directory |dash| which handles pushing new releases  onto pypi.
 
 To trigger such an update, add a new version as above, and then tag and push::
 
@@ -83,11 +96,29 @@ the workflow in action.
 When complete, there should now be an updated version showing if you refresh
 the home page of the project on https://pypi.org/.
 
+Working with latest
+-------------------
+
+If you're just interested in installing the latest version via ``pip``,
+then use::
+
+    pip install git+https://github.com/gamesbook/protograf
+
 
 Documentation
 =============
+`↑ <table-of-contents_>`_
 
-Documentation is written in reStructuredText. Some helpful web resources:
+Documentation is written in reStructuredText and hosted on *ReadTheDocs*
+at https://app.readthedocs.org/projects/protograf/
+
+Every time you push a commit to GitHub, the documentation workflow |dash|
+see the ``.github/workflows/`` directory |dash| will trigger a build,
+which can be accessed here:
+https://app.readthedocs.org/projects/protograf/builds/
+
+
+Some helpful reStructuredText web resources:
 
 - https://github.com/DevDungeon/reStructuredText-Documentation-Reference - guide
 - https://docutils.sourceforge.io/docs/user/rst/quickstart.html - quick start
@@ -98,7 +129,7 @@ Documentation is written in reStructuredText. Some helpful web resources:
 Some useful tools:
 
 - https://github.com/retext-project/retext - a reStructuredText editor
-- https://github.com/mgedmin/restview - a reStructuredText viewer in your browser
-  (but currently does not support Sphinx directives)
+- https://github.com/mgedmin/restview - a reStructuredText viewer in your browser;
+  it currently does **not** support Sphinx directives
 - https://pypi.org/project/sphinx-view/ - a reStructuredText viewer in your browser
   that *does* support Sphinx directives (but is quite dated)

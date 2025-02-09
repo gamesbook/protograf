@@ -213,12 +213,21 @@ Source Code `counters_excel.py <https://github.com/gamesbook/protograf/blob/mast
 Discussion  This example shows how to construct a set of counters using data
             from an Excel file.
 
-            This example is effectively exactly the same as the one above,
+            This example is effectively exactly the same as the ones above,
             with the only difference being the data source file:
 
               .. code:: python
 
                 Data(filename="counters.xls")
+
+            .. HINT::
+
+                It is possible - maybe even preferable! - to use a font for
+                common/standard military unit icons; see, for example,
+                the *JZNATO v11* font available from:
+                https://github.com/jzedwards/jzfonts
+                (but bear in mind you will need to convert this to a TrueType
+                font before installation).
 
 ----------- ------------------------------------------------------------------
 Screenshot  .. image:: images/counters/counters_excel.png

@@ -1394,7 +1394,7 @@ class BaseShape:
         except KeyError:
             ff = ext(self.font_name)
             try:
-                self.register_font(
+                tools.register_font(
                     font_name=self.font_name,
                     style=self.font_style,
                     directory=self.font_directory,
@@ -1516,96 +1516,6 @@ class BaseShape:
             True if self._abs_cx is not None and self._abs_cy is not None else False
         )
         # tools.feedback(f'*** draw baseshape: {self._abs_x=} {self._abs_y=} {self._abs_cx=} {self._abs_cy=}')
-
-    def register_font(
-        self, font_name: str = None, style: str = None, directory: str = None
-    ):
-        """Replace spaces and try different font extensions."""
-
-        def register_font_style(
-            font_name: str,
-            font_type: tools.FontStyleType,
-            style: str = None,
-            directory: str = None,
-        ):
-            """Use pdfmetrics to registerFont, linked to a font file, for a style type.
-
-            Args:
-                style
-                    use the name of a specific style e.g. Light or Thin or Medium
-                    to register a single specific style; useful when a font does
-                    not actually have a Regular
-            """
-            font_name = font_name.strip(" ")
-            match font_type:
-                case tools.FontStyleType.REGULAR:
-                    fstyles = [style] if style else ["", "Regular", "R", "Rg"]
-                    style_name = f"{font_name}"
-                case tools.FontStyleType.BOLD:
-                    fstyles = ["Bold", "Bo", "B"]
-                    style_name = f"{font_name} Bold"
-                case tools.FontStyleType.ITALIC:
-                    fstyles = ["Italic", "It", "I", "Oblique", "Ob", "O"]
-                    style_name = f"{font_name} Italic"
-                case tools.FontStyleType.BOLDITALIC:
-                    fstyles = ["BoldItalic", "BoIt", "BI", "BoldOblique", "BoOb", "BO"]
-                    style_name = f"{font_name} Bold Italic"
-
-            base_names = list(
-                set(
-                    [
-                        font_name,
-                        str(font_name).replace(" ", "_"),
-                        str(font_name).replace(" ", "-"),
-                    ]
-                )
-            )
-            file_seps = ["", "-", "_", " "]
-            directory = "" if directory is None else directory
-            path = directory if os.path.exists(directory) else ""
-            for base_name in base_names:
-                for style in fstyles:
-                    for sep in file_seps:
-                        _file_name = f"{base_name}{sep}{style}.ttf"
-                        file_name = os.path.join(path, _file_name)
-                        file_name_lower = os.path.join(path, _file_name.lower())
-                        filenames = [file_name, file_name_lower]
-                        for fname in filenames:
-                            # print(f'{style_name=} {fname=}')
-                            try:
-                                pdfmetrics.registerFont(TTFont(style_name, fname))
-                                # print(f'Registered:  {style_name} file:{fname}')
-                                return style_name
-                            except TTFError:
-                                pass
-            return None
-
-        if not font_name:
-            tools.feedback("No font name supplied for registration!", True)
-        if font_name in BUILTIN_FONTS:
-            return  # font families available in ReportLab without registration
-
-        # get base font
-        font_regular = register_font_style(
-            font_name, tools.FontStyleType.REGULAR, style, directory
-        )
-        if not font_regular:
-            raise TTFError
-        # try additional styles
-        kwargs = {}
-        kwargs["bold"] = register_font_style(
-            font_name, tools.FontStyleType.BOLD, style, directory
-        )
-        kwargs["italic"] = register_font_style(
-            font_name, tools.FontStyleType.ITALIC, style, directory
-        )
-        kwargs["boldItalic"] = register_font_style(
-            font_name, tools.FontStyleType.BOLDITALIC, style, directory
-        )
-
-        if font_regular and kwargs:
-            # print(f'Register Family! {font_regular=} {kwargs=}')
-            registerFontFamily(font_name.strip(" "), normal=font_regular, **kwargs)
 
     def check_settings(self) -> tuple:
         """Check that the user-supplied parameters for choices are correct"""

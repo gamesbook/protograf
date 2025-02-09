@@ -21,7 +21,8 @@ import xlrd
 
 # third party
 from reportlab.pdfbase import pdfmetrics
-from reportlab.pdfbase.ttfonts import TTFont
+from reportlab.pdfbase.ttfonts import TTFont, TTFError
+from reportlab.pdfbase.pdfmetrics import registerFontFamily
 
 # local
 from protograf.utils.support import numbers, feedback
@@ -29,6 +30,7 @@ from protograf.utils.support import numbers, feedback
 log = logging.getLogger(__name__)
 DEBUG = False
 MIN_ATTRIBUTES = ("scheme", "netloc")
+BUILTIN_FONTS = ["Times-Roman", "Courier", "Helvetica"]
 
 
 class FontStyleType(Enum):
@@ -777,6 +779,104 @@ def alpha_column(num: int, lower: bool = False) -> string:
         )
 
 
+def register_font(
+    font_name: str = None, style: str = None, directory: str = None, filename: str = None
+):
+    """Use likely combos of name and styles to register font and family styles."""
+
+    def register_font_style(
+        font_name: str,
+        font_type: FontStyleType,
+        style: str = None,
+        directory: str = None,
+        filename: str = None,
+    ):
+        """Use pdfmetrics to registerFont, linked to a font file, for a style type.
+
+        Args:
+            style
+                use the name of a specific style e.g. Light or Thin or Medium
+                to register a single specific style; useful when a font does
+                not actually have a Regular
+            filename
+                the actual filename might not be based on the font name;
+                supply this instead
+        """
+        font_name = font_name.strip(" ")
+        match font_type:
+            case FontStyleType.REGULAR:
+                fstyles = [style] if style else ["", "Regular", "R", "Rg"]
+                style_name = f"{font_name}"
+            case FontStyleType.BOLD:
+                fstyles = ["Bold", "Bo", "Bd", "B"]
+                style_name = f"{font_name} Bold"
+            case FontStyleType.ITALIC:
+                fstyles = ["Italic", "It", "I", "Oblique", "Ob", "O"]
+                style_name = f"{font_name} Italic"
+            case FontStyleType.BOLDITALIC:
+                fstyles = ["BoldItalic", "BoIt", "BI", "BoldOblique", "BoOb", "BO", "Z"]
+                style_name = f"{font_name} Bold Italic"
+
+        base_names = list(
+            set(
+                [
+                    font_name,
+                    str(font_name).replace(" ", "_"),
+                    str(font_name).replace(" ", "-"),
+                ]
+            )
+        )
+        file_seps = ["", "-", "_", " "]
+        directory = "" if directory is None else directory
+        path = directory if os.path.exists(directory) else ""
+        for base_name in base_names:
+            for style in fstyles:
+                for sep in file_seps:
+                    if filename:
+                        _file_name = f"{filename}{sep}{style}.ttf"
+                    else:
+                        _file_name = f"{base_name}{sep}{style}.ttf"
+                    full_file_name = os.path.join(path, _file_name)
+                    full_file_name_lower = os.path.join(path, full_file_name.lower())
+                    filenames = [full_file_name, full_file_name_lower]
+                    for fname in filenames:
+                        # print(f'{style_name=} {fname=}')
+                        try:
+                            pdfmetrics.registerFont(TTFont(style_name, fname))
+                            # print(f'Registered:  {style_name} file:{fname}')
+                            return style_name
+                        except TTFError:
+                            pass
+        return None
+
+    if not font_name:
+        feedback("No font name supplied for registration!", True)
+    if font_name in BUILTIN_FONTS:
+        return  # font families available in ReportLab without registration
+
+    # get base font
+    font_regular = register_font_style(
+        font_name, FontStyleType.REGULAR, style, directory, filename
+    )
+    if not font_regular:
+        raise TTFError
+    # possble additional styles
+    kwargs = {}
+    kwargs["bold"] = register_font_style(
+        font_name, FontStyleType.BOLD, style, directory, filename
+    )
+    kwargs["italic"] = register_font_style(
+        font_name, FontStyleType.ITALIC, style, directory, filename
+    )
+    kwargs["boldItalic"] = register_font_style(
+        font_name, FontStyleType.BOLDITALIC, style, directory, filename
+    )
+    # full family
+    if font_regular and kwargs:
+        # print(f'Register Family! {font_regular=} {kwargs=}')
+        registerFontFamily(font_name.strip(" "), normal=font_regular, **kwargs)
+
+
 def sheet_column(num: int, lower: bool = False) -> string:
     """Convert a spreadsheet number to a column letter
 
@@ -811,80 +911,55 @@ def sheet_column(num: int, lower: bool = False) -> string:
 
 
 def base_fonts():
-    """On Ubuntu: sudo apt-get install ttf-mscorefonts-installer"""
+    """Register MS Core Fonts
+
+    NOTES:
+        * On Ubuntu: sudo apt-get install ttf-mscorefonts-installer
+        * The Windows filenames are 'truncated' versions, hence the use
+          of an alternate
+    """
     fonts = [
         {
             "name": "Arial",
-            "base": "Arial",
-            "bold": "_Bold",
-            "it": "_Italic",
-            "bi": "_Bold_Italic",
+            "alternate": "Arial",
         },
         {
             "name": "Verdana",
-            "base": "Verdana",
-            "bold": "_Bold",
-            "it": "_Italic",
-            "bi": "_Bold_Italic",
+            "alternate": "Verda",
         },
         {
             "name": "Courier New",
-            "base": "Courier_New",
-            "bold": "_Bold",
-            "it": "_Italic",
-            "bi": "_Bold_Italic",
+            "alternate": "Cour",
         },
         {
             "name": "Times New Roman",
-            "base": "Times_New_Roman",
-            "bold": "_Bold",
-            "it": "_Italic",
-            "bi": "_Bold_Italic",
+            "alternate": "Times",
         },
         {
             "name": "Trebuchet MS",
-            "base": "Trebuchet_MS",
-            "bold": "_Bold",
-            "it": "_Italic",
-            "bi": "_Bold_Italic",
+            "alternate": "Trebuc",
         },
         {
             "name": "Georgia",
-            "base": "Georgia",
-            "bold": "_Bold",
-            "it": "_Italic",
-            "bi": "_Bold_Italic",
+            "alternate": "Georg",
         },
-        {"name": "Webdings", "base": "Webdings", "bold": None, "it": None, "bi": None},
-        # {'name': '', 'base': '', , 'bold': None, 'it': None, 'bi': None},
+        {"name": "Webdings", "alternate": "Webd", },
+        # {'name': 'ObiWan', 'alternate': 'benK'},  # dummy to check failure
     ]
+    missing = []
     for ffont in fonts:
-        kwargs = {}
         try:
             name = ffont["name"]
-            base = ffont["base"]
-            filename = base + ".ttf"
-            pdfmetrics.registerFont(TTFont(name, filename))
-            _name = name.replace(" ", "_")
-            # styles
-            if ffont["bold"]:
-                kwargs["bold"] = f"{name}{ffont['bold']}".replace("_", " ")
-                fname = f"{base}{ffont['bold']}" + ".ttf"
-                pdfmetrics.registerFont(TTFont(kwargs["bold"], fname))
-            if ffont["it"]:
-                kwargs["italic"] = f"{_name}{ffont['it']}".replace("_", " ")
-                fname = f"{base}{ffont['it']}" + ".ttf"
-                pdfmetrics.registerFont(TTFont(kwargs["italic"], fname))
-            if ffont["bi"]:
-                kwargs["boldItalic"] = f"{_name}{ffont['bi']}".replace("_", " ")
-                fname = f"{base}{ffont['bi']}" + ".ttf"
-                pdfmetrics.registerFont(TTFont(kwargs["boldItalic"], fname))
-            if kwargs:
-                normal = base.replace("_", " ")
-                pdfmetrics.registerFontFamily(name, normal=normal, **kwargs)
-                # print(f'Register Family:  {name=} {normal=} {kwargs=}')
-        except Exception as err:
-            log.error("Unable to register %s from %s (%s)", name, base + ".ttf", err)
+            register_font(name)
+        except TTFError:
+            try:
+                alt = ffont.get("alternate")
+                register_font(name, filename=alt)
+            except TTFError:
+                missing.append(name)
+    if missing:
+        names = ', '.join(missing)
+        feedback(f"Unable to register the MS font(s): {names}", False, True)
 
 
 def eval_template(string: str, data: dict = None, label: str = ""):

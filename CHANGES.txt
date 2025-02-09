@@ -1,13 +1,34 @@
-===========
+=========
 protograf
-===========
+=========
 
 Changes
 =======
 
-2016-02-05 (0.1.0a1)
+2025-02-00 (0.1.4)
+------------------
+* Update installation docs (Windows notes)
+* Patch default font installation for Windows filenames
+* Reverse CHANGE order
+
+2025-02-08 (0.1.3)
+------------------
+* Patch license (properly, this time!)
+
+2025-02-08 (0.1.2)
+------------------
+* Patch license
+
+2025-02-08 (0.1.1)
+------------------
+* Added GitHub workflows
+* Reset git history for a "clean" start
+* Release on pypi
+
+2025-01-11 (0.1.0a3)
 --------------------
-* First draft!
+* Initial feature set complete
+* Documentation linked to Read The Docs
 
 2024-02-04 (0.1.0a2)
 --------------------
@@ -15,11 +36,6 @@ Changes
 * Patch code for changes related to Python and library upgrades
 * Switch to using bgg-api library
 
-2025-01-11 (0.1.0a3)
+2016-02-05 (0.1.0a1)
 --------------------
-* Initial feature set complete
-* Documentation linked to Read The Docs
-
-TDB (0.1.0)
---------------------
-* Release on pypi
+* First draft!
