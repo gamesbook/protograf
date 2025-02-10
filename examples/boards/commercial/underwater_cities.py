@@ -40,52 +40,52 @@ drect = Common(fill=None, stroke=grey, dashed=[0,0.05,0.05], rounding=0.5, strok
 
 # Action Cards Slots: Red
 rrect = rectangle(common=drect, x=-0.5, y=4.25, height=6., width=6.75)
-Repeat(rrect, rows=5, cols=1, interval=7)
+Repeat(rrect, rows=5, cols=1, interval=6)
 
 action_red = "#D4322D"
 action_red_rect = rectangle(x=-0.5, y=4.5, width=6.5, height=5.5, fill_stroke=action_red, rounding=0.5)
-Repeat(action_red_rect, rows=5, cols=1, interval=7)
+Repeat(action_red_rect, rows=5, cols=1, interval=6)
 
 action_red_dark = "#9D2622"
 red_dark = Rectangle(y=4.5, x=0, width=2.5, height=5.5, fill_stroke=action_red_dark)
-Repeat(red_dark, rows=5, cols=1, interval=7)
+Repeat(red_dark, rows=5, cols=1, interval=6)
 
 lock_red = image('images/padlock-open-red.png', x=1.5, y=7.25, width=1.5, height=1.5, rotation=270)
-Repeat(lock_red, rows=5, cols=1, interval=3.5)
+Repeat(lock_red, rows=5, cols=1, interval=2.5)
 
 Rectangle(common=card_icon_med, x=4, y=34.5, label="A", rotation=270)
 
 # Action Cards Slots: Orange
 orect = rectangle(common=drect, y=36.75, x=6.75, width=6., height=6.75)
-Repeat(orect, cols=5, rows=1, interval=7)
+Repeat(orect, cols=5, rows=1, interval=6)
 
 action_ong = "#FFAD01"
 action_ong_rect = rectangle(x=7, y=37, width=5.5, height=6.5, fill_stroke=action_ong, rounding=0.5)
-Repeat(action_ong_rect, cols=5, rows=1, interval=7)
+Repeat(action_ong_rect, cols=5, rows=1, interval=6)
 
 action_ong_dark = "#FE9402"
 ong_dark = Rectangle(y=40, x=7, width=5.5, height=2.5, fill_stroke=action_ong_dark)
-Repeat(ong_dark, cols=5, rows=1, interval=7)
+Repeat(ong_dark, cols=5, rows=1, interval=6)
 
 lock_ong = image('images/padlock-open-orange.png', x=10, y=41, width=1.5, height=1.5, rotation=180)
-Repeat(lock_ong, rows=1, cols=5, interval=3.5)
+Repeat(lock_ong, rows=1, cols=5, interval=2.5)
 
 Rectangle(common=card_icon_large, x=24, y=37.5, label="A", rotation=180)
 
 # Action Cards Slots: Green
 grect = rectangle(common=drect, y=-0.5, x=6.75, width=6., height=6.75)
-Repeat(grect, cols=5, rows=1, interval=7)
+Repeat(grect, cols=5, rows=1, interval=6)
 
 action_grn = "#017A51"
 action_grn_rect = rectangle(y=-0.5, x=7, width=5.5, height=6.5, fill_stroke=action_grn, rounding=0.5)
-Repeat(action_grn_rect, cols=5, rows=1, interval_x=7)
+Repeat(action_grn_rect, cols=5, rows=1, interval_x=6)
 
 action_grn_dark = "#005D33"
 grn_dark = Rectangle(y=0, x=7, width=5.5, height=2.5, fill_stroke=action_grn_dark)
-Repeat(grn_dark, cols=5, rows=1, interval_x=7)
+Repeat(grn_dark, cols=5, rows=1, interval_x=6)
 
 lock_grn = image('images/padlock-open-green.png', x=9, y=0.5, width=1.5, height=1.5)
-Repeat(lock_grn, rows=1, cols=5, interval_x=7)
+Repeat(lock_grn, rows=1, cols=5, interval_x=6)
 
 Rectangle(common=card_icon_large, x=36, y=3, label="A")
 Image(common=pipe, x=28.5, y=4)
@@ -97,13 +97,13 @@ special_grn_design = Common(
     transparency=80, label="S", label_size=164, label_stroke="#69A8B9")
 Repeat(
    rectangle(common=special_grn_design, y=9.5, x=34.5, ),
-   cols=3, rows=2, interval_x=7, interval_y=9)
+   cols=3, rows=2, interval_x=6, interval_y=9)
 Rectangle(common=special_grn_design, y=13.5, x=27.5)
 
 # Government Cards
 gov_blue = "#666D8A"
 gov_blue_rect = rectangle(y=24, x=11, width=5.5, height=8.5, fill_stroke=gov_blue, rounding=0.5, transparency=90)
-Repeat(gov_blue_rect, cols=3, rows=1, interval=7)
+Repeat(gov_blue_rect, cols=3, rows=1, interval=6)
 
 # Free Action Space
 free_action_top = "#016EB3"
@@ -174,7 +174,7 @@ Circle(cx=14, cy=9.9, radius=0.5, fill_stroke=darkorchid)
 
 # Player VP
 wreath = image('images/laurel-wreath.png', x=11.9, y=11.7, width=1.5, height=1.5)
-Repeat(wreath, rows=4, cols=1, interval_y=2.1)
+Repeat(wreath, rows=4, cols=1, interval_y=1)
 Sequence(
     text(x=10.4, y=18.4, font_size=32, stroke=orange, text="{{sequence}}."),
     setting=(1,4,1,'number'),

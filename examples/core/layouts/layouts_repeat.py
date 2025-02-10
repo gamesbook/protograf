@@ -28,17 +28,17 @@ Repeat(marble, cols=4, rows=5, interval=1)
 PageBreak()
 
 Blueprint(stroke_width=0.5, subdivisions=4)
-Text(common=header, text="Repeat: interval: across&down")
+Text(common=header, text="Repeat: interval: across < down")
 Repeat(marble, cols=4, rows=4, interval_x=0.75, interval_y=1.25)
 PageBreak()
 
 Blueprint(stroke_width=0.5)
-Text(common=header, text="Repeat: across (cols 2 & 4)")
+Text(common=header, text="Repeat: across (cols 2 & 4 only)")
 Repeat(marble, cols=4, rows=5, interval=1, across=(2, 4))
 PageBreak()
 
 Blueprint(stroke_width=0.5)
-Text(common=header, text="Repeat: down (rows 1,3,5)")
+Text(common=header, text="Repeat: down (rows 1, 3 & 5 only)")
 Repeat(marble, cols=4, rows=5, interval=1, down=(1, 3, 5))
 PageBreak()
 
