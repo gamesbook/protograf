@@ -184,7 +184,7 @@ PageBreak()
 Save(
     output='png',
     dpi=300,
-    directory="docs/source/images/custom/hexagonal_grid",
+    directory="../docs/source/images/custom/hexagonal_grid",
     names=[
         "hexgrid_location_single", "hexgrid_location_multiple",
         "hexgrid_locations_multi",

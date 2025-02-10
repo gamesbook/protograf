@@ -51,7 +51,7 @@ PageBreak()
 Save(
      output='png',
      dpi=300,
-     directory="docs/source/images/layouts",
+     directory="../docs/source/images/layouts",
      names=[
         "repeat_basic",
         "repeat_interval", "repeat_interval_acrossdown",

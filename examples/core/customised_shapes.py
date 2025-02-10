@@ -577,7 +577,7 @@ Text(common=txt, text="Shapes END...")
 Save(
      output='png',
      dpi=300,
-     directory="docs/source/images/customised",
+     directory="../docs/source/images/customised",
      names=[
         None,
         "blueprint_subdiv", "dots_crosses", "centred", "right_angled_triangle",

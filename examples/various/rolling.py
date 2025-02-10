@@ -50,7 +50,7 @@ for squares in range(len(text) + 1):
 
 Save(
     output='gif',
-    directory="docs/source/examples/images/various",
+    directory="../docs/source/examples/images/various",
     dpi=300,
     framerate=0.1, # seconds-delay-per-frame
 )

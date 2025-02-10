@@ -30,6 +30,6 @@ for number, turn in enumerate(turns):
 # output
 Save(
     output='gif',
-    directory="docs/source/examples/images/boards/abstract/",
+    directory="../docs/source/examples/images/boards/abstract/",
     dpi='300',
     framerate=0.5)

@@ -171,7 +171,7 @@ PageBreak()
 Save(
     output='png',
     dpi=300,
-    directory="docs/source/images/layouts",
+    directory="../docs/source/images/layouts",
     names=[
         "rect_locs_reg_nw_S", "rect_locs_reg_nw_E",
         "rect_locs_reg_ne_W", "rect_locs_reg_ne_S",

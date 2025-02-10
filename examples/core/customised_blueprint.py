@@ -56,7 +56,7 @@ PageBreak()
 Save(
      output='png',
      dpi=300,
-     directory="docs/source/images/custom/blueprint",
+     directory="../docs/source/images/custom/blueprint",
      names=[
         "defaults", "stroke_width_red",
         "style_blue", "style_green", "style_grey",

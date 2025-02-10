@@ -75,7 +75,7 @@ PageBreak()
 Save(
      output='png',
      dpi=300,
-     directory="docs/source/images/layouts",
+     directory="../docs/source/images/layouts",
      names=[
         "layout_rect_outer_multi",
         "layout_rect_outer_multi_stop",

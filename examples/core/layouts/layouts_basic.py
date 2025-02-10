@@ -117,7 +117,7 @@ Layout(
 Save(
      output='png',
      dpi=300,
-     directory="docs/source/images/layouts",
+     directory="../docs/source/images/layouts",
      names=[
         "rect_basic_debug", "rect_basic_debug_sequence", "rect_basic_debug_xy",
         "rect_basic_debug_colrow",

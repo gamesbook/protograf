@@ -138,7 +138,7 @@ PageBreak(footer=True)
 Save(
      output='png',
      dpi=300,
-     directory="docs/source/images/custom/circle",
+     directory="../docs/source/images/custom/circle",
      names=[
         None,
         "hatch", "dot_cross", "radii",

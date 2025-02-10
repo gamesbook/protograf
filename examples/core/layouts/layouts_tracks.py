@@ -252,7 +252,7 @@ PageBreak(footer=True)
 Save(
      output='png',
      dpi=300,
-     directory="docs/source/images/tracks",
+     directory="../docs/source/images/tracks",
      names=[
         None,
         "track_default", "track_default_circle", "track_default_count",

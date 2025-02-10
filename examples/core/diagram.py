@@ -75,7 +75,7 @@ PageBreak()
 Save(
     output='png',
     dpi=300,
-    directory="docs/source/images/customised",
+    directory="../docs/source/images/customised",
     names=[
         "diagram_basic", "diagram_a", "diagram_b", "diagram_c", "diagram_d",
     ]

@@ -63,7 +63,7 @@ PageBreak(footer=True)
 Save(
      output='png',
      dpi=300,
-     directory="docs/source/images/custom/commands",
+     directory="../docs/source/images/custom/commands",
      names=[
         None,
         "loop", "function", "fonts",

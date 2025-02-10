@@ -31,7 +31,18 @@ output has been created.
    which can be downloaded and extracted.
 
    If, in a Terminal, you navigate to the ``examples`` directory, you will
-   find two script files:
+   find two batch files:
 
-   - In Windows, you can run the ``all.bat`` file
-   - In Linux, you can run the ``all.sh`` file
+   - For Windows, you can run the ``all.bat`` file
+   - For Linux, you can run the ``all.sh`` file
+
+   These batch files process each example script in turn and save the
+   output from each as a PDF file:
+
+   - In Windows, to a subdirectory ``Temp\protograf`` under your home directory
+   - In Linux, to the ``tmp/demo`` subdirectory
+
+   You may notice that each file is called with the ``--no-png`` option.
+   This is prevent PNG images being created; the reason for this is because
+   the directory names in some of the example files will likely not exist
+   on your machine.

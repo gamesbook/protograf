@@ -49,5 +49,5 @@ Polygon(
 
 Save(
     output='png',
-    directory="docs/source/examples/images/various"
+    directory="../docs/source/examples/images/various"
 )

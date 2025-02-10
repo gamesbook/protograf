@@ -249,7 +249,7 @@ def validate_globals():
     """Check that Create has been called to set initialise globals"""
     global globals_set
     if not globals_set:
-        tools.feedback("Please ensure Create() command has been called first!", True)
+        tools.feedback("Please ensure Create() command is called first!", True)
 
 
 # ---- page-related ====
@@ -258,8 +258,9 @@ def validate_globals():
 def Create(**kwargs):
     """Initialisation of page, units and canvas.
 
-    NOTE:
-        * Allows shortcut creation of cards.
+    NOTES:
+        * Will use argparse to process command-line keyword args
+        * Allows shortcut creation of cards
     """
     global globals_set
 
@@ -290,6 +291,13 @@ def Create(**kwargs):
     parser = argparse.ArgumentParser()
     parser.add_argument(
         "-d", "--directory", help="Specify output directory", default=""
+    )
+    # use: --no-png to skip PNG output during Save()
+    parser.add_argument(
+        "--png",
+        help="Whether to create PNG during Save (default is True)",
+        default=True,
+        action=argparse.BooleanOptionalAction,
     )
     parser.add_argument(
         "-p", "--pages", help="Specify which pages to process", default=""
@@ -410,13 +418,13 @@ def Save(**kwargs):
     except FileNotFoundError as err:
         tools.feedback(f'Unable to save "{globals.filename}" - {err}', True)
 
-    # ---- save to GIF
+    # ---- save to image(s)
     output = kwargs.get("output", None)
     dpi = support.to_int(kwargs.get("dpi", 300), "dpi")
     framerate = support.to_float(kwargs.get("framerate", 1), "framerate")
     names = kwargs.get("names", None)
     directory = kwargs.get("directory", None)
-    if output:
+    if output and globals.pargs.png:  # pargs.png should default to True
         support.pdf_to_png(
             globals.filename, output, dpi, names, directory, framerate=framerate
         )

@@ -76,7 +76,7 @@ PageBreak()
 Save(
      output='png',
      dpi=300,
-     directory="docs/source/images/layouts",
+     directory="../docs/source/images/layouts",
      names=[
         "layout_tri_default",
         "layout_tri_east_row2", "layout_tri_east_row6",
