@@ -23,3 +23,15 @@ output has been created.
    accessed from the BoardGameGeek API
 6. :doc:`Various <various>` - examples of miscellaneous "real world" objects;
    usually constructed using multiple different elements of **protograf**
+
+.. HINT::
+
+   All the examples are stored into a single
+   `ZIP file <https://github.com/gamesbook/protograf/blob/master/examples.zip>`_
+   which can be downloaded and extracted.
+
+   If, in a Terminal, you navigate to the ``examples`` directory, you will
+   find two script files:
+
+   - In Windows, you can run the ``all.bat`` file
+   - In Linux, you can run the ``all.sh`` file

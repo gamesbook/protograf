@@ -4224,6 +4224,17 @@ class TextShape(BaseShape):
                 else:
                     _err = err
                 tools.feedback(f"Cannot create Text - {_err}", True)
+            except IOError as err:
+                _err = str(err)
+                cause, thefile = '', ''
+                if 'caused exception' in _err:
+                    cause = _err.split('caused exception')[0].strip('\n').strip(' ')
+                    cause = f' in {cause}'
+                if 'Cannot open resource' in _err:
+                    thefile = _err.split('Cannot open resource')[1].strip('\n')
+                    thefile = f' - unable to open or find {thefile}'
+                msg = f'Cannot create Text{thefile}{cause}'
+                tools.feedback(msg, True, True)
             w, h = para.wrap(width, height)
             para.drawOn(cnv, x_t, y_t - h)  # start text from top of 'box'
         else:

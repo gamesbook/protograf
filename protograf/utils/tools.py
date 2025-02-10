@@ -780,7 +780,10 @@ def alpha_column(num: int, lower: bool = False) -> string:
 
 
 def register_font(
-    font_name: str = None, style: str = None, directory: str = None, filename: str = None
+    font_name: str = None,
+    style: str = None,
+    directory: str = None,
+    filename: str = None,
 ):
     """Use likely combos of name and styles to register font and family styles."""
 
@@ -943,7 +946,10 @@ def base_fonts():
             "name": "Georgia",
             "alternate": "Georg",
         },
-        {"name": "Webdings", "alternate": "Webd", },
+        {
+            "name": "Webdings",
+            "alternate": "Webd",
+        },
         # {'name': 'ObiWan', 'alternate': 'benK'},  # dummy to check failure
     ]
     missing = []
@@ -958,7 +964,7 @@ def base_fonts():
             except TTFError:
                 missing.append(name)
     if missing:
-        names = ', '.join(missing)
+        names = ", ".join(missing)
         feedback(f"Unable to register the MS font(s): {names}", False, True)
 
 

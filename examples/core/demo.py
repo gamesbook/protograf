@@ -359,8 +359,9 @@ nonumy deterruisset ne sed, cum cu quet reque <b>signiferumque</b>.<br/>
 <font face="times" color="red" size="15">Qui at primis regione consetetur.</font>
 Id vis viris antiopam gloriatur, muscipit ex has, an ius mazim.
 """
-# path for img assumes this file is called from the project root ...
-IMAGE = LATIN + '<img src="examples/core/13.png" height="10" valign="bottom"/>' +\
+# path for img assumes this script is called from the examples dir
+image = os.path.join('core', '13.png')  # make filename cross-platform
+IMAGE = LATIN + f'<img src="{image}" height="10" valign="bottom"/>' + \
     ' per at ullum iracundia intellegam.'
 
 header = Common(x=1, font_size=18, align="left", width=2.5, height=2, wrap=True)
