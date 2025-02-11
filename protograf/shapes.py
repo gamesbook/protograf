@@ -600,9 +600,15 @@ class CircleShape(BaseShape):
                     " from 0 to 360",
                     True,
                 )
-            _radius = self.radii_length or self.radius
-            rad_offset = self.unit(self.radii_offset) or 0
-            rad_length = self.unit(_radius, label="radius length")
+            if self.radii_length and self.radii_offset:
+                outer_radius = self.radii_length + self.radii_offset
+            elif self.radii_length:
+                outer_radius = self.radii_length
+            else:
+                outer_radius = self.radius
+            radius_offset = self.unit(self.radii_offset) or None
+            radius_length = self.unit(outer_radius, label="radius length")
+            # print(f'{radius_length=} :: {radius_offset=} :: {outer_radius=}')
             self.set_canvas_props(
                 index=ID,
                 stroke=self.radii_stroke,
@@ -612,14 +618,18 @@ class CircleShape(BaseShape):
             )
             for rad_angle in _radii:
                 # points based on length of line, offset and the angle in degrees
-                diam_pt = geoms.point_on_circle(Point(x_c, y_c), rad_length, rad_angle)
+                diam_pt = geoms.point_on_circle(
+                    Point(x_c, y_c), radius_length, rad_angle
+                )
                 pth = cnv.beginPath()
-                if rad_offset is not None and rad_offset != 0:
+                if radius_offset is not None and radius_offset != 0:
+                    # print(f'{rad_angle=} {radius_offset=} {diam_pt}, {x_c=}, {y_c=}')
                     offset_pt = geoms.point_on_circle(
-                        Point(x_c, y_c), rad_offset, rad_angle
+                        Point(x_c, y_c), radius_offset, rad_angle
                     )
-                    end_pt = geoms.point_on_line(offset_pt, diam_pt, rad_length)
-                    # print(rad_angle, offset_pt, f'{x_c=}, {y_c=}')
+                    end_pt = geoms.point_on_circle(
+                        Point(x_c, y_c), radius_length, rad_angle
+                    )
                     pth.moveTo(offset_pt.x, offset_pt.y)
                     pth.lineTo(end_pt.x, end_pt.y)
                 else:

@@ -44,19 +44,23 @@ PageBreak()
 # ---- circle radii
 Blueprint()
 Text(common=txt, text="Circle: radii (single & overlapped)")
-Circle(x=0, y=0, radius=2,
+Circle(x=0, y=0,
+       radius=2,
        fill=None,
        radii=[45,135,225,315],
        radii_stroke_width=1,
        radii_dotted=True,
        radii_offset=1,
-       radii_length=1.25)
-Circle(x=0, y=0, radius=2,
+       radii_length=1.25
+       )
+Circle(x=0, y=0,
+       radius=2,
        fill=None,
        radii=[0,90,180,270],
        radii_stroke_width=3,
        radii_stroke=red)
-Circle(cx=3, cy=5, radius=1,
+Circle(cx=3, cy=5,
+       radius=1,
        fill=green,
        stroke=orange,
        stroke_width=1,

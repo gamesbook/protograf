@@ -59,10 +59,10 @@ def the_clock(
            label_size=7, label_my=1, label=label.upper())
     # minutes
     Circle(cx=x, cy=y, radius=2.3, radii=steps(0,360,6), stroke=face, fill=None,
-           radii_length=0.15, radii_offset=2.2, radii_stroke_width=0.5)
+           radii_length=0.15, radii_offset=2.2, radii_stroke_width=0.5, radii_stroke=black)
     # hours
     Circle(cx=x, cy=y, radius=2.3, radii=steps(0,360,30), stroke=face, fill=None,
-           radii_length=0.3, radii_offset=2.2, radii_stroke_width=1.5)
+           radii_length=0.3, radii_offset=2.2, radii_stroke_width=1.5, radii_stroke=black)
     # centre
     Circle(cx=x, cy=y, radius=.13, stroke=hand, fill=hand)
     # hour hand
