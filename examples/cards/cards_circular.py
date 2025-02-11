@@ -12,7 +12,7 @@ Create(filename='cards_circular.pdf', paper=landscape(A4))
 Data(filename="lotr.csv")
 
 # design deck
-Deck(cards=1, shape='circle', radius=3.15, copy='Copies')
+Deck(cards=1, frame='circle', radius=3.15, copy='Copies')
 
 # background color per Race
 back_race = Common(x=0.35, y=0.35,radius=2.8)

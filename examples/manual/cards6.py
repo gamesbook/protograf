@@ -13,7 +13,7 @@ Deck(cards=9,
      fill=teal,
      radius=3,
      grid_marks=True,
-     shape='circle')
+     frame='circle')
 
 times = Common(font_name="Times-Roman", font_size=48, stroke=white, x=3, y=2.5)
 
