@@ -148,6 +148,9 @@ class DotGridShape(BaseShape):
 class SequenceShape(BaseShape):
     """
     Set of shapes drawn at points
+
+    Notes:
+        * `deck_data` is used, if provided by CardShape, to draw Shapes in the sequence.
     """
 
     def __init__(self, _object=None, canvas=None, **kwargs):
@@ -159,7 +162,6 @@ class SequenceShape(BaseShape):
             self.setting_list = self.setting
         else:
             self.calculate_setting_list()
-
         self.interval_x = self.interval_x or self.interval
         self.interval_y = self.interval_y or self.interval
 
@@ -289,6 +291,9 @@ class SequenceShape(BaseShape):
 class RepeatShape(BaseShape):
     """
     Shape is drawn multiple times.
+
+    Notes:
+        *  * `deck_data` is used, if provided by CardShape, to draw Shape repeatedly.
     """
 
     def __init__(self, _object=None, canvas=None, **kwargs):
@@ -335,21 +340,27 @@ class RepeatShape(BaseShape):
                 pass
 
     def draw(self, cnv=None, off_x=0, off_y=0, ID=None, **kwargs):
+        _ID = ID if ID is not None else self.shape_id
         kwargs = self.kwargs | kwargs
         cnv = cnv.canvas if cnv else self.canvas.canvas
         super().draw(cnv, off_x, off_y, ID, **kwargs)  # unit-based props
+        _off_x, _off_y = off_x, off_y
 
         for col in range(self.cols):
             for row in range(self.rows):
                 if ((col + 1) in self.across) and ((row + 1) in self.down):
-                    off_x = self.offset_x + col * self.interval_x
-                    off_y = self.offset_y + row * self.interval_y
+                    off_x = _off_x + col * self.interval_x  # WAS self.offset_x
+                    off_y = _off_y + row * self.interval_y  # WAS self.offset_y
                     flat_elements = tools.flatten(self._object)
                     log.debug("flat_eles:%s", flat_elements)
                     for flat_ele in flat_elements:
                         log.debug("flat_ele:%s", flat_ele)
                         try:  # normal element
-                            flat_ele.draw(off_x=off_x, off_y=off_y, ID=self.shape_id)
+                            if self.deck_data:
+                                new_ele = self.handle_custom_values(flat_ele, _ID)
+                            else:
+                                new_ele = flat_ele
+                            new_ele.draw(off_x=off_x, off_y=off_y, ID=_ID, **kwargs)
                         except AttributeError:
                             new_ele = flat_ele(cid=self.shape_id)
                             log.debug("%s %s", new_ele, type(new_ele))
@@ -358,7 +369,13 @@ class RepeatShape(BaseShape):
                                 log.debug("%s", flat_new_eles)
                                 for flat_new_ele in flat_new_eles:
                                     log.debug("%s", flat_new_ele)
-                                    flat_new_ele.draw(
+                                    if self.deck_data:
+                                        new_flat_new_ele = self.handle_custom_values(
+                                            flat_new_ele, _ID
+                                        )
+                                    else:
+                                        new_flat_new_ele = flat_new_ele
+                                    new_flat_new_ele.draw(
                                         off_x=off_x, off_y=off_y, ID=self.shape_id
                                     )
 

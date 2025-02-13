@@ -64,6 +64,9 @@ python cards/cards_images.py --no-png -d /tmp/demo
 python cards/cards_matrix_one.py --no-png -d /tmp/demo
 python cards/cards_matrix_two.py --no-png -d /tmp/demo
 python cards/cards_standard.py --no-png -d /tmp/demo
+# ---- play_money
+echo -e "\nCreating play money..."
+python play_money/supreme.py --no-png -d /tmp/demo
 # ---- decks
 echo -e "\nCreating decks..."
 python cards/cards_deck_01.py --no-png -d /tmp/demo

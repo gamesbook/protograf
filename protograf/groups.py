@@ -13,7 +13,7 @@ import jinja2
 from protograf.utils import tools
 from protograf.utils.tools import DatasetType, CardFrame  # enums
 from protograf.base import BaseShape
-from protograf.layouts import SequenceShape
+from protograf.layouts import SequenceShape, RepeatShape
 from protograf.shapes import CircleShape, HexShape, ImageShape, RectangleShape
 from protograf.utils.geoms import Locale
 
@@ -164,7 +164,10 @@ class CardShape(BaseShape):
         return outline
 
     def draw_card(self, cnv, row, col, cid, **kwargs):
-        """Draw a card on a given canvas."""
+        """Draw a card on a given canvas.
+
+        Pass on `deck_data` to other commands, as needed, for them to draw Shapes
+        """
         image = kwargs.get("image", None)
         # tools.feedback(f'$$$ draw_card  KW=> {kwargs}')
         # ---- draw outline
@@ -210,6 +213,8 @@ class CardShape(BaseShape):
                 # ---- * normal element
                 iid = members.index(cid + 1)
                 new_ele = self.handle_custom_values(flat_ele, cid)  # calculated values
+                if isinstance(new_ele, (SequenceShape, RepeatShape)):
+                    new_ele.deck_data = self.deck_data
                 # tools.feedback(f'$$$ draw_card $$$ {new_ele=}')
                 new_ele.draw(cnv=cnv, off_x=_dx, off_y=_dy, ID=iid, **kwargs)
             except AttributeError:
@@ -223,7 +228,7 @@ class CardShape(BaseShape):
                         members = flat_new_ele.members or self.members
                         iid = members.index(cid + 1)
                         custom_new_ele = self.handle_custom_values(flat_new_ele, iid)
-                        if isinstance(custom_new_ele, SequenceShape):
+                        if isinstance(custom_new_ele, (SequenceShape, RepeatShape)):
                             custom_new_ele.deck_data = self.deck_data
                         # tools.feedback(f'$$$ draw_card $$$ {custom_new_ele=}')
                         custom_new_ele.draw(

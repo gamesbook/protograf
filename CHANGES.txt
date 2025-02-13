@@ -12,6 +12,7 @@ Changes
 - Reverse CHANGES entries order
 - Catch error if missing file embedded in Text's text
 - Enable suppression of PNG output
+- Enable Repeat command for use on Cards
 
 2025-02-08 (0.1.3)
 ------------------
