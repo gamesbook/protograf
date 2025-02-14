@@ -21,6 +21,7 @@ Table of Contents
 - `Image-only Cards`_
 - `Hexagonal Cards`_
 - `Circular Cards`_
+- `Play Money`_
 
 .. _simple-cards
 
@@ -301,4 +302,33 @@ Discussion  This example shows how to construct a deck of cards using these
 ----------- ------------------------------------------------------------------
 Screenshot  .. image:: images/cards/cards_circular.png
                :width: 90%
+=========== ==================================================================
+
+
+.. _play-money
+
+Play Money
+==========
+`↑ <table-of-contents_>`_
+
+=========== ==================================================================
+Title       *Play Money Cards*
+----------- ------------------------------------------------------------------
+Source Code `supreme.py <https://github.com/gamesbook/protograf/blob/master/examples/play_money/supreme.py>`_
+----------- ------------------------------------------------------------------
+Discussion  This example shows how to construct a set of play money using
+            ``Deck()`` and ``Card()`` commands.  This example was inspired by
+            the money found in the game "Supremacy" (Supremacy Games, 1984).
+
+            Of interest is the use of ``PolyLine()`` command to create the logo
+            at the centre, with the ``Repeat()`` command used to create the set
+            of lines that forms the background to the logo.
+
+            The data used to set the various denomination values and their
+            colors is "baked into" the script using the list-of-lists
+            approach.
+
+----------- ------------------------------------------------------------------
+Screenshot  .. image:: images/play_money/supreme.png
+               :width: 95%
 =========== ==================================================================

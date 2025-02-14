@@ -21,7 +21,7 @@ Trapezoid(x=-0.25, y=18, height=3, width=18, top=14, fill_stroke=grey, flip='s')
 Polyshape(points=[(-0.25,21), (2,18), (2,5), (-0.25,2)], fill=black)
 Polyshape(points=[(17.75,21), (15.75,18), (15.75,5), (17.75,2)], fill=black)
 
-Rectangle(x=1, y=4, height=15, width=16, fill=white)
+Rectangle(x=1.25, y=4, height=15, width=15.25, fill=white)
 
 Repeat(oct_flat, cols=8, rows=8, interval=2.2,
        across=(1, 3, 5, 7), down=(1, 3, 5, 7), offset_x=2.2)

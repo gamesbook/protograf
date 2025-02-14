@@ -344,7 +344,8 @@ class RepeatShape(BaseShape):
         kwargs = self.kwargs | kwargs
         cnv = cnv.canvas if cnv else self.canvas.canvas
         super().draw(cnv, off_x, off_y, ID, **kwargs)  # unit-based props
-        _off_x, _off_y = off_x, off_y
+        _off_x, _off_y = off_x or self.offset_x or 0, off_y or self.offset_y or 0
+        # print(f'*** {_off_x=}, {_off_y=}')
 
         for col in range(self.cols):
             for row in range(self.rows):

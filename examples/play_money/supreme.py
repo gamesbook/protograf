@@ -12,7 +12,7 @@ Create(filename='supreme.pdf', margin_bottom=2.5)
 cash = [
     ['VALUE', 'UNITS', 'COLOR', 'LINE', 'COPIES'],
     [1, "Million",  "#ADFF2F","#FFFFFF", 10],
-    [2, "Million", "#C0C0C0", "#FFFFFF", 10],
+    [2, "Million", "#C0C0C0", "#000000", 10],
     [5, "Million", "#00FF00", "#FFFFFF", 10],
     [25, "Million", "#00FFFF", "#FFFFFF", 10],
     [50, "Million", "#800080", "#FFFFFF", 10],
@@ -30,7 +30,7 @@ Deck(cards=20,
      copy='COPIES')
 
 # card elements
-base = rectangle(x=0, y=0, width=9.5, height=5, line=None, fill=T('{{COLOR}}'))
+base = rectangle(x=0, y=0, width=9.5, height=5, fill_stroke=T('{{COLOR}}'))
 
 edge = Common(x=0.35, length=8.8, stroke=T('{{LINE}}'), stroke_width=1)
 btop = line(common=edge, y=0.3)
