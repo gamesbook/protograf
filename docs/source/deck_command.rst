@@ -2,6 +2,8 @@
 The Deck Command
 ================
 
+.. |dash| unicode:: U+2014 .. EM DASH SIGN
+
 This section assumes you are very familiar with the concepts, terms and
 ideas for :doc:`protograf <index>` as presented in the
 :doc:`Basic Concepts <basic_concepts>` , that you understand all of the
@@ -67,7 +69,12 @@ The following are other properties that can also be set for a ``Deck``:
   the card frames
 - **grid_length** - if set to ``True``, will cause small marks to be drawn at
   the border of the page that align with the edges of the cards
-- **mask** - an expression which should evaluate to ``True` or ``False``;
+- **grouping** - set the number of cards to be drawn adjacent to each other
+  before a blank space is added by the **spacing** property |dash| use
+  **grouping_col** and/or **grouping_row** to set spacing specifically for the
+  horizontal (columns) or vertical (rows) direction respectively. **grouping**
+  does not apply to  *hexagon* **frame** cards.
+- **mask** - an expression which should evaluate to ``True`` or ``False``;
   this expression uses the same kind of syntax as the
   :ref:`T(emplate) command <the-template-command>`
   and it uses data available from the Deck's
@@ -78,6 +85,9 @@ The following are other properties that can also be set for a ``Deck``:
 - **rounding** - sets the size of rounding on each corner of a rectangular
   frame card
 - **rows** - the maximum number of card rows that should appear on a page
+- **spacing** - create blank space between each card or group |dash| use
+  **spacing_x** and/or **spacing_y** to set spacing specifically for the
+  horizontal or vertical direction respectively.
 - **stroke** - sets the color of the card's border; defaults to black
 
 .. _property-examples:
@@ -96,20 +106,22 @@ Property Examples
 - `Example 8. Column Limit`_
 - `Example 9. Row Limit`_
 - `Example 10. Circular Frame`_
+- `Example 11. Card Grouping`_
 
 These examples are shown on a small A8-sized page, as the purpose is to
 illustrate how the Deck properties are used; normally cards would be
 set out on an A4- or Letter-sized page, but the principle will be the
 same.
 
-In all cases, for rectangular cards, a basic ``Rectangle``, with a thick
-border, is used as the shape that is drawn on each card.  This purely for
-illustration purposes - your cards would have their own set of shapes
-that would you want to display.
+In most cases |dash| except where otherwise show |dash|, a basic
+``Rectangle``, with a thick border, is used as the shape that is drawn
+on each card.  This purely for illustration purposes - your cards would
+have their own set of shapes that you would want to display.
 
 The ``Rectangle`` also has its *label* set to show the Card's *sequence*
 number i.e. the order in  which it is drawn (usually bottom-to-top and
 left-to-right), followed by its *column* and *row* number.
+
 The script for all this is:
 
   .. code:: python
@@ -491,5 +503,53 @@ Example 10. Circular Frame
       The **frame** property also can be seen "in action" in various
       examples; see a :ref:`hexagonal example <hexagonal-cards>`
       and another :ref:`circular example <circular-cards>`.
+
+===== ======
+
+
+Example 11. Card Grouping
+-------------------------
+`^ <property-examples_>`_
+
+.. |d11| image:: images/decks/cards_deck_11.png
+   :width: 330
+
+===== ======
+|d11| This example shows the definition of a deck for a set of very small
+      cards |dash| these are more likely to be game counters.
+
+      The card size means that there will be 60 square cards
+      on each A8 page:
+
+      .. code:: python
+
+        Deck(
+            cards=60,
+            width=0.65,
+            height=0.65,
+            bleed_fill=silver,
+            offset=0.15,
+            grid_marks=True,
+            grid_length=0.18,
+            spacing_x=0.3,
+            spacing_y=0.15,
+            grouping_cols=2,
+            grouping_rows=5,
+            )
+        Card(
+            '*',
+            rectangle(
+                x=0, y=0,
+                width=0.65, height=0.65,
+                stroke_width=1, rounding=0.1,
+                label='{{sequence}}'),
+        )
+
+      By default, **protograf** will fit as many cards as possible into the
+      available page area.
+
+      This example shows how cards in the same grouping |dash| whether in a row
+      or column |dash| are kept together, and how the spacing is inserted
+      between each *group* rather than between each *individual card*.
 
 ===== ======

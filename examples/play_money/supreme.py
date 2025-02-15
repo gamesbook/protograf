@@ -8,14 +8,15 @@ from protograf import *
 
 Create(filename='supreme.pdf', margin_bottom=2.5)
 
-# deck data
+# card data
 cash = [
     ['VALUE', 'UNITS', 'COLOR', 'LINE', 'COPIES'],
-    [1, "Million",  "#ADFF2F","#FFFFFF", 10],
-    [2, "Million", "#C0C0C0", "#000000", 10],
-    [5, "Million", "#00FF00", "#FFFFFF", 10],
-    [25, "Million", "#00FFFF", "#FFFFFF", 10],
-    [50, "Million", "#800080", "#FFFFFF", 10],
+    [1,   "Million",  "#ADFF2F","#FFFFFF", 10],
+    [2,   "Million", "#C0C0C0", "#000000", 10],
+    [5,   "Million", "#00FF00", "#FFFFFF", 10],
+    [10,  "Million", "#0055E3", "#FFFFFF", 10],
+    [25,  "Million", "#00FFFF", "#FFFFFF", 10],
+    [50 , "Million", "#800080", "#FFFFFF", 10],
     [100, "Million", "#DC143C", "#FFFFFF", 10],
     [1, "Billion", "#FFA500", "#FFFFFF", 10],
 ]
@@ -56,20 +57,21 @@ pl7 = polyline(points=[(4.6, 2.8), (4.95, 3.5), (5.25, 3.5)],
                common=sym_style)
 symbol = (pl1, pl2, pl3, pl4, pl5, pl6, pl7)
 
-numbers = Common(text=T('{{VALUE}}'), font_name='Arial Bold', font_size=18, stroke=T('{{LINE}}'))
+numbers = Common(
+    text=T('{{VALUE}}'), font_name='Arial Bold', font_size=18, stroke=T('{{LINE}}'))
 num1 = text(common=numbers, align="left", x=0.3, y=0.4)
 num2 = text(common=numbers, align="left", x=0.3, y=4.1)
 num3 = text(common=numbers, align="right", x=9.2, y=0.4)
 num4 = text(common=numbers, align="right", x=9.2, y=4.1)
 values = group(num1, num2, num3, num4)
 
-units = Common(text=T('{{UNITS}}'), font_name='Arial Bold', font_size=18, x=4.75, stroke=T('{{LINE}}'))
+units = Common(
+    text=T('{{UNITS}}'), font_name='Arial Bold', font_size=18, x=4.75, stroke=T('{{LINE}}'))
 header = text(common=units, y=4.1)
 footer = text(common=units, y=0.4)
 
-parts = group(base, btop, blow, header, footer, stripes, values, symbol)
-
 # card setup
+parts = group(base, btop, blow, header, footer, stripes, values, symbol)
 Card("*",  parts)
 
 Save()

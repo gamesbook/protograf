@@ -34,11 +34,14 @@ Discussion  This example shows how to construct a set of counters.
 
             The "placeholder" for the counters is the ``CounterSheet``; here
             it defines how many are needed and what their basic size and
-            default color is:
+            default color is, as well the grouping and spacing between them:
 
               .. code:: python
 
-                CounterSheet(counters=18, width=2.6, height=2.6, fill=yellow)
+                CounterSheet(
+                    counters=18, width=2.6, height=2.6, fill=yellow,
+                    spacing_x=2.6, spacing_y=1.3,
+                    grouping_cols=3, grouping_rows=2)
 
             The layouts for the counters are constructed from a series of a
             basic shapes. Intermediate steps are stored via assigned names;
@@ -58,9 +61,9 @@ Discussion  This example shows how to construct a set of counters.
                   x=0.8, y=1.2, width=1.0, height=0.6,
                   stroke_width=0.5, fill=None)
                 lu = line(
-                  x=0.8, y=1.2, x1=1.8, y1=1.8, stroke=black, stroke_width=0.5)
+                  x=0.8, y=1.2, x1=1.8, y1=1.8, stroke=black, stroke_width=1.5)
                 ld = line(
-                  x=0.8, y=1.8, x1=1.8, y1=1.2, stroke=black, stroke_width=0.5)
+                  x=0.8, y=1.8, x1=1.8, y1=1.2, stroke=black, stroke_width=1.5)
                 inf = group(out, lu, ld)
 
             Then text and color (for one of the country's armies) are defined:
@@ -89,21 +92,22 @@ Discussion  This example shows how to construct a set of counters.
                 inf_russian = group(russian, inf)
                 inf_russian_A = group(inf_russian, inf_A, division)
 
-            Finally, the counter can be drawn in one or more positions on the
-            countersheet:
+            Finally, the counter, or counters, can be drawn in one or more
+            positions on the countersheet:
 
                .. code:: python
 
-                Counter("10-12", inf_russian_A)
+                Counter("13-15", inf_russian_A)
 
             These counters are shown outlined in blue in the screenshot. Note
-            that the blue line was *not* created as part of the script.
+            that the blue line was *not* created as part of the script but
+            just added in with a graphics editor.
 
             Bear in mind that counters are drawn in order, starting from the
             bottom-left, then moving across to the right to complete a row,
             then moving up to the next row - so in this example, counters 1
-            to 7 are drawn along the bottow row; 8 to 14 on the next row up,
-            and so on.
+            to 6 are drawn along the bottow row |dash| in two groups of 3
+            each |dash|; 7 to 12 on the next row up, and so on.
 
 ----------- ------------------------------------------------------------------
 Screenshot  .. image:: images/counters/counters_basic.png

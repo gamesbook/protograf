@@ -616,7 +616,9 @@ class CircleShape(BaseShape):
                 dashed=self.radii_dashed,
                 dotted=self.radii_dotted,
             )
-            for rad_angle in _radii:
+            _radii_labels = tools.split(self.radii_labels)
+            label_key = 0
+            for key, rad_angle in enumerate(_radii):
                 # points based on length of line, offset and the angle in degrees
                 diam_pt = geoms.point_on_circle(
                     Point(x_c, y_c), radius_length, rad_angle
@@ -630,14 +632,32 @@ class CircleShape(BaseShape):
                     end_pt = geoms.point_on_circle(
                         Point(x_c, y_c), radius_length, rad_angle
                     )
-                    pth.moveTo(offset_pt.x, offset_pt.y)
-                    pth.lineTo(end_pt.x, end_pt.y)
+                    x_start, y_start = offset_pt.x, offset_pt.y
+                    x_end, y_end = end_pt.x, end_pt.y
                 else:
-                    pth.moveTo(x_c, y_c)
-                    pth.lineTo(diam_pt.x, diam_pt.y)
+                    x_start, y_start = x_c, y_c
+                    x_end, y_end = diam_pt.x, diam_pt.y
+                # ---- radii line
+                pth.moveTo(x_start, y_start)
+                pth.lineTo(x_end, y_end)
                 cnv.drawPath(
                     pth, stroke=1 if self.stroke else 0, fill=1 if self.fill else 0
                 )
+                # ---- radii text label
+                if _radii_labels:
+                    self.radii_label = _radii_labels[label_key]
+                    self.draw_radii_label(
+                        cnv,
+                        ID,
+                        (x_start + x_end) / 2.0,
+                        (y_start + y_end) / 2.0 + self.radii_labels_font_size / 4.0,
+                        # rotation=self.radii_labels_rotation,
+                        centred=False
+                    )
+                    label_key += 1
+                    if label_key > len(_radii_labels) - 1:
+                        label_key = 0
+
 
     def draw_petals(self, cnv, ID, x_c: float, y_c: float):
         """Draw "petals" going outwards from the circumference.
@@ -792,18 +812,38 @@ class CircleShape(BaseShape):
         self.area = self.calculate_area()
         # ---- draw by row/col
         if self.row is not None and self.col is not None and is_cards:
-            x = (
-                self.col * (self._u.radius * 2.0 + self._u.spacing_x)
-                + self._o.delta_x
-                + self._u.radius
-                + self._u.offset_x
-            )
-            y = (
-                self.row * (self._u.radius * 2.0 + self._u.spacing_y)
-                + self._o.delta_y
-                + self._u.radius
-                + self._u.offset_y
-            )
+            if self.kwargs.get("grouping_cols", 1) == 1:
+                x = (
+                    self.col * (self._u.radius * 2.0 + self._u.spacing_x)
+                    + self._o.delta_x
+                    + self._u.radius
+                    + self._u.offset_x
+                )
+            else:
+                group_no = self.col // self.kwargs["grouping_cols"]
+                x = (
+                    self.col * self._u.radius * 2.0
+                    + self._u.spacing_x * group_no
+                    + self._o.delta_x
+                    + self._u.radius
+                    + self._u.offset_x
+                )
+            if self.kwargs.get("grouping_rows", 1) == 1:
+                y = (
+                    self.row * (self._u.radius * 2.0 + self._u.spacing_y)
+                    + self._o.delta_y
+                    + self._u.radius
+                    + self._u.offset_y
+                )
+            else:
+                group_no = self.row // self.kwargs["grouping_rows"]
+                y = (
+                    self.row * self._u.radius * 2.0
+                    + self._u.spacing_y * group_no
+                    + self._o.delta_y
+                    + self._u.radius
+                    + self._u.offset_y
+                )
             self.x_c, self.y_c = x, y
         # ---- handle rotation: START
         is_rotated = False
@@ -2905,16 +2945,34 @@ class RectangleShape(BaseShape):
     def calculate_xy(self, **kwargs):
         # ---- adjust start
         if self.row is not None and self.col is not None:
-            x = (
-                self.col * (self._u.width + self._u.spacing_x)
-                + self._o.delta_x
-                + self._u.offset_x
-            )
-            y = (
-                self.row * (self._u.height + self._u.spacing_y)
-                + self._o.delta_y
-                + self._u.offset_y
-            )
+            if self.kwargs.get("grouping_cols", 1) == 1:
+                x = (
+                    self.col * (self._u.width + self._u.spacing_x)
+                    + self._o.delta_x
+                    + self._u.offset_x
+                )
+            else:
+                group_no = self.col // self.kwargs["grouping_cols"]
+                x = (
+                    self.col * self._u.width
+                    + self._u.spacing_x * group_no
+                    + self._o.delta_x
+                    + self._u.offset_x
+                )
+            if self.kwargs.get("grouping_rows", 1) == 1:
+                y = (
+                    self.row * (self._u.height + self._u.spacing_y)
+                    + self._o.delta_y
+                    + self._u.offset_y
+                )
+            else:
+                group_no = self.row // self.kwargs["grouping_rows"]
+                y = (
+                    self.row * self._u.height
+                    + self._u.spacing_y * group_no
+                    + self._o.delta_y
+                    + self._u.offset_y
+                )
         elif self.cx is not None and self.cy is not None:
             x = self._u.cx - self._u.width / 2.0 + self._o.delta_x
             y = self._u.cy - self._u.height / 2.0 + self._o.delta_y
@@ -3409,7 +3467,6 @@ class RectangleShape(BaseShape):
             )
             # ---- * borders (override)
             if self.borders:
-                # breakpoint()
                 if isinstance(self.borders, tuple):
                     self.borders = [
                         self.borders,

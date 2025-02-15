@@ -80,7 +80,8 @@ and is designed to produce a single, blank, A4-sized page in a PDF file.
 
 It should create an output file called `example1.pdf`, which will appear in the
 same directory as the script. You should be able to open and view this file using
-any PDF-capable program or application.
+any PDF-capable program or application. (If you run the script in a Python shell,
+the output file will be called `test.pdf`.)
 
 If this works, then download and try out other scripts from any of the `examples`
 sub-directories (**note** some examples may require additional files such as

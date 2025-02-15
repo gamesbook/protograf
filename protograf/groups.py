@@ -159,7 +159,7 @@ class CardShape(BaseShape):
             outline.hex_height_width()
         else:
             raise NotImplementedError(
-                f"Cannot handle card frame type: {self.frame_type}"
+                f'Cannot handle card frame type: {kwargs["frame_type"]}'
             )
         return outline
 
@@ -199,13 +199,26 @@ class CardShape(BaseShape):
             # ---- * card frame
             match kwargs["frame_type"]:
                 case CardFrame.RECTANGLE | CardFrame.CIRCLE:
-                    _dx = col * (outline.width + outline.spacing_x) + outline.offset_x
-                    _dy = row * (outline.height + outline.spacing_y) + outline.offset_y
+                    if kwargs["grouping_cols"] == 1:
+                        _dx = col * (outline.width + outline.spacing_x) + outline.offset_x
+                    else:
+                        group_no = col // kwargs["grouping_cols"]
+                        _dx = col * outline.width + outline.offset_x + outline.spacing_x * group_no
+                    if kwargs["grouping_rows"] == 1:
+                        _dy = row * (outline.height + outline.spacing_y) + outline.offset_y
+                        # print(f"{col=} {outline.width=} {group_no=} {_dx=}")
+                    else:
+                        group_no = row // kwargs["grouping_rows"]
+                        _dy = row * outline.height + outline.offset_y + outline.spacing_y * group_no
+                        # print(f"{row=} {outline.height=} {group_no=} {_dy=}")
                 case CardFrame.HEXAGON:
                     _dx = col * 2.0 * (side + outline.spacing_x) + outline.offset_x
                     _dy = row * 2.0 * (half_flat + outline.spacing_y) + outline.offset_y
                     if row & 1:
                         _dx = _dx + side + outline.spacing_x
+                case _:
+                    raise NotImplementedError(
+                        f'Cannot handle card frame type: {kwargs["frame_type"]}')
             # print(f' #*# {kwargs["frame_type"]=} {col=} {row=} {_dx=} {_dy=} ')
 
             members = self.members or flat_ele.members
@@ -398,6 +411,8 @@ class DeckShape(BaseShape):
             self.points_to_value(globals.page_height) - margin_top - margin_bottom
         )
         _height, _width, _radius = self.width, self.width, self.radius
+        _spacing_x = self.unit(self.spacing_x)
+        _spacing_y = self.unit(self.spacing_y)
         self.draw_bleed(cnv, page_across, page_down)
         # ---- deck settings
         col_space, row_space = 0.0, 0.0
@@ -415,14 +430,24 @@ class DeckShape(BaseShape):
             row_space = (
                 float(globals.page_height / globals.units) - margin_bottom - margin_top
             )
-            max_rows = int(row_space / float(_height))
+            if self.grouping_rows == 1:
+                max_rows = int((row_space + self.spacing_y) / (float(_height) + self.spacing_y))
+            else:
+                max_groups = int((row_space + self.spacing_y) / (float(_height) * self.grouping_rows + self.spacing_y))
+                max_rows = max_groups * self.grouping_rows
         if not max_cols:
             col_space = (
                 float(globals.page_width / globals.units) - margin_left - margin_right
             )
-            max_cols = int(col_space / float(_width))
-        log.debug("W:%s c-space:%s cols:%s", globals.page_width, col_space, max_cols)
-        log.debug("H:%s r-space:%s mr:%s", globals.page_height, row_space, max_rows)
+            if self.grouping_cols == 1:
+                max_cols = int( (col_space + self.spacing_x) / (float(_width) + self.spacing_x))
+            else:
+                max_groups = int( (col_space + self.spacing_x) / (float(_width) * self.grouping_cols + self.spacing_x))
+                max_cols = max_groups * self.grouping_cols
+        # log.warning("PW:%s width:%s c-space:%s max-cols:%s",
+        #             globals.page_width, _width, col_space, max_cols)
+        # log.warning("PH:%s heiht:%s r-space:%s max-rows:%s",
+        #             globals.page_height, _height, row_space, max_rows)
         row, col = 0, 0
         # ---- draw cards
         for key, card in enumerate(self.deck):
@@ -431,6 +456,8 @@ class DeckShape(BaseShape):
                 col=col + 1, row=row + 1, id=f"{col + 1}:{row + 1}", sequence=key + 1
             )
             kwargs["locale"] = _locale._asdict()
+            kwargs["grouping_cols"] = self.grouping_cols
+            kwargs["grouping_rows"] = self.grouping_rows
             image = images[key] if images and key <= len(images) else None
             card.deck_data = self.dataset
 

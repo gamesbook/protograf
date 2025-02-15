@@ -5,7 +5,11 @@ protograf
 Changes
 =======
 
-2025-02-14 (0.1.4)
+2025-02-?? (0.1.6)
+------------------
+- Enable card grouping
+
+2025-02-14 (0.1.5)
 ------------------
 - Update installation docs (Windows notes)
 - Patch default font installation for Windows filenames

@@ -96,6 +96,11 @@ be installed and usable.
 On Ubuntu Linux these font files are typically installed into the
 ``/usr/share/fonts`` directory.
 
+If you do not install these fonts, or have them already installed, you may
+see a warning message every time you run a script:
+
+    WARNING:: Unable to register the MS font(s): Arial, Verdana, Courier New, Times New Roman, Trebuchet MS, Georgia, Webdings
+
 
 Using Additional Fonts
 ======================
@@ -199,15 +204,17 @@ Word Processor fonts vs protograf
 
 In some cases, you'll notice that a font can be displayed with bold or
 italic styling in a word processor, even though it cannot be displayed the
-same way in :doc:`protograf <index>`.  The short answer is that *ReportLab*
-does not create an "artificial" style.
+same way in :doc:`protograf <index>`.  The reason is that *ReportLab*
+does not create an "artificial" font style if it cannot find a matching
+file for italic or bold version of the font.
 
-The long answer is supplied in a Reddit post
-(https://www.reddit.com/r/fonts/comments/1dzlhl0/) paraphrased below:
+The long answer was supplied in a Reddit post
+(https://www.reddit.com/r/fonts/comments/1dzlhl0/) which is
+paraphrased below:
 
 
 *Question:* Why do some fonts have a separate "bold" or "italics" version, when
-you can just  format the main font for the same effect. When I download a new
+you can just  format the main font for the same effect? When I download a new
 font, there's often a few variants included in the ZIP file, most commonly an
 Italic version & Bold version. But whenever I install just the base font and
 test if I can italicize/bolden it, it works just fine - and looks the same as
@@ -218,9 +225,9 @@ automatically switch to the bold or italic version of the font. If the app
 doesn’t automatically switch it might **artificially** bold the font or slant
 it to be italic.  There's also a big difference between a word processor app
 putting a generic slant (for italics) or thickness (for bold) on the letters,
-and the actual font designers having considered and crafted what the font
-should look like in various forms. So, they don't look at all the same.
-Set them really large, and you'll see the difference.
+and the actual font created by designers having considered and crafted what
+the font should look like in various forms. So, they don't look at all the
+same. Set them really large, and you'll see the difference.
 
 
 External Font Resources

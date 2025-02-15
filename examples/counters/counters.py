@@ -10,7 +10,9 @@ from protograf import *
 Create(filename='tannenberg.pdf')
 
 # create counters
-CounterSheet(counters=18, width=2.6, height=2.6, grid_marks=True, fill=yellow)
+CounterSheet(
+    counters=24, width=2.6, height=2.6, grid_marks=True, fill=yellow,
+    spacing_x=2.6, spacing_y=1.3, grouping_cols=3, grouping_rows=2,)
 
 # basic values
 # http://cliparts.co/clipart/3214807
@@ -24,10 +26,10 @@ brown = "#B6A378"
 german = rectangle(x=0, y=0, width=2.6, height=2.6, stroke_width=1, fill=grey)
 russian = rectangle(x=0, y=0, width=2.6, height=2.6, stroke_width=1, fill=brown)
 
-out = rectangle(x=0.8, y=1.2, width=1.0, height=0.6, stroke_width=0.5, fill=None)
-lu = line(x=0.8, y=1.2, x1=1.8, y1=1.8, stroke=black, stroke_width=0.5)
-ld = line(x=0.8, y=1.8, x1=1.8, y1=1.2, stroke=black, stroke_width=0.5)
-rect1 = rectangle(x=0.8, y=1.2, width=1.0, height=0.3, stroke_width=0.5, fill=black)
+out = rectangle(x=0.8, y=1.2, width=1.0, height=0.6, stroke_width=1.5, fill=None)
+lu = line(x=0.8, y=1.2, x1=1.8, y1=1.8, stroke=black, stroke_width=1.5)
+ld = line(x=0.8, y=1.8, x1=1.8, y1=1.2, stroke=black, stroke_width=1.5)
+rect1 = rectangle(x=0.8, y=1.2, width=1.0, height=0.3, stroke_width=1.5, fill=black)
 circ1 = circle(cx=1.3, cy=1.5, radius=0.1, stroke_width=0.1, fill=black)
 
 # unit types
@@ -56,12 +58,12 @@ HQ_russian = group(russian, HQ)
 art_russian = group(russian, art, battalion)
 
 # generate counter images
-Counter("1-3", inf_german)
-Counter("4-6", cav_german)
-Counter("7-9", HQ_russian)
-Counter("10-12", inf_russian_A)
-Counter("13-14", art_russian)
-Counter("15-16", marker_german)
-Counter("17-18", marker_russian)
+Counter("1-5", inf_german)
+Counter("6-9", cav_german)
+Counter("10-12", HQ_russian)
+Counter("13-15", inf_russian_A)
+Counter("16-18", art_russian)
+Counter("19-21", marker_german)
+Counter("22-24", marker_russian)
 
 Save()

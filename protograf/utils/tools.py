@@ -396,6 +396,8 @@ def split(string: str):
     >>> split('A 1 B')
     ['A', '1', 'B']
     """
+    if isinstance(string, (list, tuple)):
+        return string
     sep = " " if string and "," not in string else ","
     return sequence_split(string, False, False, sep)
 

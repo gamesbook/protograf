@@ -2,6 +2,8 @@
 Examples: Decks of Cards
 ========================
 
+.. |dash| unicode:: U+2014 .. EM DASH SIGN
+
 These examples are meant to demonstrate the type of output you can expect
 to create with **protograf**.  They are *not* meant to be exhaustive or
 comprehensive!

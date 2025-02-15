@@ -727,6 +727,9 @@ class BaseCanvas:
         self.spacing = self.defaults.get("spacing", 0)  # between cards
         self.spacing_x = self.defaults.get("spacing_x", self.spacing)
         self.spacing_y = self.defaults.get("spacing_y", self.spacing)
+        self.grouping = self.defaults.get("grouping", 1)  # no. of cards in a set
+        self.grouping_rows = self.defaults.get("grouping_rows", self.grouping)
+        self.grouping_cols = self.defaults.get("grouping_cols", self.grouping)
         # ---- circle / star / polygon
         self.diameter = self.defaults.get("diameter", 1)
         self.radius = self.defaults.get("radius", self.diameter / 2.0)
@@ -735,7 +738,7 @@ class BaseCanvas:
         self.points = self.defaults.get("points", [])
         self.x_c = self.defaults.get("xc", 0)
         self.y_c = self.defaults.get("yc", 0)
-        # ---- circle, hex & polygon only
+        # ---- radii (circle, hex & polygon)
         self.radii = self.defaults.get("radii", [])
         self.radii_stroke = self.defaults.get("radii_stroke", self.stroke)
         self.radii_stroke_width = self.defaults.get(
@@ -748,6 +751,15 @@ class BaseCanvas:
         self.radii_cap = self.defaults.get("radii_cap", None)
         self.radii_dotted = self.defaults.get("radii_dotted", self.dotted)
         self.radii_dashed = self.defaults.get("radii_dashed", self.dashed)
+        self.radii_labels = self.defaults.get("radii_labels", "")
+        self.radii_labels_size = self.defaults.get("radii_labels_size", self.font_size)
+        self.radii_labels_face = self.defaults.get("radii_labels_face", self.font_name)
+        self.radii_labels_stroke = self.get_color(
+            self.defaults.get("radii_labels_stroke"), self.stroke
+        )
+        self.labels_stroke_width = self.defaults.get(
+            "labels_stroke_width", self.stroke_width
+        )
         # ---- circle
         self.petals = self.defaults.get("petals", 0)
         self.petals_style = self.defaults.get("petals_style", "triangle")
@@ -1102,13 +1114,16 @@ class BaseShape:
         self.spacing = self.kw_float(kwargs.get("spacing", cnv.spacing))
         self.spacing_x = self.kw_float(kwargs.get("spacing_x", self.spacing))
         self.spacing_y = self.kw_float(kwargs.get("spacing_y", self.spacing))
+        self.grouping = self.kw_int(kwargs.get("grouping", 1))  # no. of cards in a set
+        self.grouping_rows = self.kw_int(kwargs.get("grouping_rows", self.grouping))
+        self.grouping_cols = self.kw_int(kwargs.get("grouping_cols", self.grouping))
         # ---- circle / star / polygon
         self.diameter = self.kw_float(kwargs.get("diameter", cnv.diameter))
         self.radius = self.kw_float(kwargs.get("radius", cnv.radius))
         self.vertices = self.kw_int(kwargs.get("vertices", cnv.vertices))
         self.sides = kwargs.get("sides", cnv.sides)
         self.points = kwargs.get("points", cnv.points)
-        # ---- circle / hexagon / polygon / compass
+        # ---- radii (circle / hexagon / polygon / compass)
         self.radii = kwargs.get("radii", cnv.radii)
         self.radii_stroke = kwargs.get("radii_stroke", self.stroke)
         self.radii_stroke_width = self.kw_float(
@@ -1119,6 +1134,13 @@ class BaseShape:
         self.radii_cap = kwargs.get("radii_cap", cnv.radii_cap)
         self.radii_dotted = kwargs.get("radii_dotted", cnv.dotted)
         self.radii_dashed = kwargs.get("radii_dashed", cnv.dashed)
+        self.radii_labels = kwargs.get("radii_labels", cnv.radii_labels)
+        self.radii_labels_size = self.kw_float(kwargs.get("radii_labels_size", self.font_size))
+        self.radii_labels_face = kwargs.get("radii_labels_face", self.font_name)
+        self.radii_labels_stroke = kwargs.get("radii_labels_stroke", self.stroke)
+        self.radii_labels_stroke_width = self.kw_float(
+            kwargs.get("radii_labels_stroke_width", self.stroke_width)
+        )
         # ---- circle
         self.petals = self.kw_int(kwargs.get("petals", cnv.petals))
         self.petals_style = kwargs.get("petals_style", cnv.petals_style)
@@ -2147,6 +2169,28 @@ class BaseShape:
             canvas.setFillColor(self.title_stroke)
             self.draw_multi_string(
                 canvas, x, y - y_off, _ttext, align=align, rotation=_rotation, **kwargs
+            )
+
+    def draw_radii_label(
+        self, canvas, ID, xl, yl, align=None, rotation=0, centred=True, **kwargs
+    ):
+        """Draw the label for a radius (usually at the centre).
+
+        Requires native units (i.e. points)!
+        """
+        if not self.radii_label:
+            return
+        ttext = self.textify(index=ID, text=self.radii_label)
+        _rotation = rotation or self.radii_labels_rotation
+        if ttext:
+            _ttext = str(ttext)
+            yl = yl - (self.radii_labels_size / 3.0) if centred else yl
+            y = yl  # + self.unit(self.label_my)
+            x = xl  # + self.unit(self.label_mx)
+            canvas.setFont(self.radii_labels_font_name, self.radii_labels_size)
+            canvas.setFillColor(self.radii_labels_stroke)
+            self.draw_multi_string(
+                canvas, x, y, _ttext, align=align, rotation=_rotation, **kwargs
             )
 
     def draw_dot(self, canvas, x, y):

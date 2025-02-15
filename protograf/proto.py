@@ -399,7 +399,7 @@ def Save(**kwargs):
     validate_globals()
 
     # ---- draw Deck
-    if globals.deck and len(globals.deck.deck) > 1:
+    if globals.deck and len(globals.deck.deck) >= 1:
         globals.deck.draw(
             globals.cnv,
             cards=globals.deck_settings.get("cards", 9),
