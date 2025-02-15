@@ -1135,7 +1135,9 @@ class BaseShape:
         self.radii_dotted = kwargs.get("radii_dotted", cnv.dotted)
         self.radii_dashed = kwargs.get("radii_dashed", cnv.dashed)
         self.radii_labels = kwargs.get("radii_labels", cnv.radii_labels)
-        self.radii_labels_size = self.kw_float(kwargs.get("radii_labels_size", self.font_size))
+        self.radii_labels_size = self.kw_float(
+            kwargs.get("radii_labels_size", self.font_size)
+        )
         self.radii_labels_face = kwargs.get("radii_labels_face", self.font_name)
         self.radii_labels_stroke = kwargs.get("radii_labels_stroke", self.stroke)
         self.radii_labels_stroke_width = self.kw_float(

@@ -652,12 +652,11 @@ class CircleShape(BaseShape):
                         (x_start + x_end) / 2.0,
                         (y_start + y_end) / 2.0 + self.radii_labels_font_size / 4.0,
                         # rotation=self.radii_labels_rotation,
-                        centred=False
+                        centred=False,
                     )
                     label_key += 1
                     if label_key > len(_radii_labels) - 1:
                         label_key = 0
-
 
     def draw_petals(self, cnv, ID, x_c: float, y_c: float):
         """Draw "petals" going outwards from the circumference.

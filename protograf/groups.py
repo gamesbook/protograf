@@ -200,16 +200,29 @@ class CardShape(BaseShape):
             match kwargs["frame_type"]:
                 case CardFrame.RECTANGLE | CardFrame.CIRCLE:
                     if kwargs["grouping_cols"] == 1:
-                        _dx = col * (outline.width + outline.spacing_x) + outline.offset_x
+                        _dx = (
+                            col * (outline.width + outline.spacing_x) + outline.offset_x
+                        )
                     else:
                         group_no = col // kwargs["grouping_cols"]
-                        _dx = col * outline.width + outline.offset_x + outline.spacing_x * group_no
+                        _dx = (
+                            col * outline.width
+                            + outline.offset_x
+                            + outline.spacing_x * group_no
+                        )
                     if kwargs["grouping_rows"] == 1:
-                        _dy = row * (outline.height + outline.spacing_y) + outline.offset_y
+                        _dy = (
+                            row * (outline.height + outline.spacing_y)
+                            + outline.offset_y
+                        )
                         # print(f"{col=} {outline.width=} {group_no=} {_dx=}")
                     else:
                         group_no = row // kwargs["grouping_rows"]
-                        _dy = row * outline.height + outline.offset_y + outline.spacing_y * group_no
+                        _dy = (
+                            row * outline.height
+                            + outline.offset_y
+                            + outline.spacing_y * group_no
+                        )
                         # print(f"{row=} {outline.height=} {group_no=} {_dy=}")
                 case CardFrame.HEXAGON:
                     _dx = col * 2.0 * (side + outline.spacing_x) + outline.offset_x
@@ -218,7 +231,8 @@ class CardShape(BaseShape):
                         _dx = _dx + side + outline.spacing_x
                 case _:
                     raise NotImplementedError(
-                        f'Cannot handle card frame type: {kwargs["frame_type"]}')
+                        f'Cannot handle card frame type: {kwargs["frame_type"]}'
+                    )
             # print(f' #*# {kwargs["frame_type"]=} {col=} {row=} {_dx=} {_dy=} ')
 
             members = self.members or flat_ele.members
@@ -431,18 +445,28 @@ class DeckShape(BaseShape):
                 float(globals.page_height / globals.units) - margin_bottom - margin_top
             )
             if self.grouping_rows == 1:
-                max_rows = int((row_space + self.spacing_y) / (float(_height) + self.spacing_y))
+                max_rows = int(
+                    (row_space + self.spacing_y) / (float(_height) + self.spacing_y)
+                )
             else:
-                max_groups = int((row_space + self.spacing_y) / (float(_height) * self.grouping_rows + self.spacing_y))
+                max_groups = int(
+                    (row_space + self.spacing_y)
+                    / (float(_height) * self.grouping_rows + self.spacing_y)
+                )
                 max_rows = max_groups * self.grouping_rows
         if not max_cols:
             col_space = (
                 float(globals.page_width / globals.units) - margin_left - margin_right
             )
             if self.grouping_cols == 1:
-                max_cols = int( (col_space + self.spacing_x) / (float(_width) + self.spacing_x))
+                max_cols = int(
+                    (col_space + self.spacing_x) / (float(_width) + self.spacing_x)
+                )
             else:
-                max_groups = int( (col_space + self.spacing_x) / (float(_width) * self.grouping_cols + self.spacing_x))
+                max_groups = int(
+                    (col_space + self.spacing_x)
+                    / (float(_width) * self.grouping_cols + self.spacing_x)
+                )
                 max_cols = max_groups * self.grouping_cols
         # log.warning("PW:%s width:%s c-space:%s max-cols:%s",
         #             globals.page_width, _width, col_space, max_cols)
