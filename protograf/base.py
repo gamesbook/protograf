@@ -757,9 +757,10 @@ class BaseCanvas:
         self.radii_labels_stroke = self.get_color(
             self.defaults.get("radii_labels_stroke"), self.stroke
         )
-        self.labels_stroke_width = self.defaults.get(
-            "labels_stroke_width", self.stroke_width
+        self.radii_labels_stroke_width = self.defaults.get(
+            "radii_labels_stroke_width", self.stroke_width
         )
+        self.radii_labels_rotation = self.defaults.get("radii_labels_rotation", 0)
         # ---- circle
         self.petals = self.defaults.get("petals", 0)
         self.petals_style = self.defaults.get("petals_style", "triangle")
@@ -1142,6 +1143,9 @@ class BaseShape:
         self.radii_labels_stroke = kwargs.get("radii_labels_stroke", self.stroke)
         self.radii_labels_stroke_width = self.kw_float(
             kwargs.get("radii_labels_stroke_width", self.stroke_width)
+        )
+        self.radii_labels_rotation = self.kw_float(
+            kwargs.get("radii_labels_rotation", 0)
         )
         # ---- circle
         self.petals = self.kw_int(kwargs.get("petals", cnv.petals))
@@ -2189,7 +2193,7 @@ class BaseShape:
             yl = yl - (self.radii_labels_size / 3.0) if centred else yl
             y = yl  # + self.unit(self.label_my)
             x = xl  # + self.unit(self.label_mx)
-            canvas.setFont(self.radii_labels_font_name, self.radii_labels_size)
+            canvas.setFont(self.radii_labels_face, self.radii_labels_size)
             canvas.setFillColor(self.radii_labels_stroke)
             self.draw_multi_string(
                 canvas, x, y, _ttext, align=align, rotation=_rotation, **kwargs

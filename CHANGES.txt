@@ -8,6 +8,7 @@ Changes
 2025-02-?? (0.1.6)
 ------------------
 - Enable card grouping
+- Add radii labels
 
 2025-02-14 (0.1.5)
 ------------------

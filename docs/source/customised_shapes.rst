@@ -1079,6 +1079,7 @@ ways that it can be customised.
 - `Dot and Cross <circleCross_>`_
 - `Hatch <circleHatch_>`_
 - `Radii <circleRadii_>`_
+- `Radii Labels <circleRadiiLabels_>`_
 - `Petals: petal <circlePetalsPetal_>`_
 - `Petals: curve <circlePetalsCurve_>`_
 - `Petals: triangle <circlePetalsTriangle_>`_
@@ -1215,13 +1216,71 @@ of a Circle towards its centre.
         radii lines are drawn
       - *radii_stroke_width* - if set, will determine the thickness of the radii
       - *radii_dotted* - if set to True, will make the radii lines dotted
-      - *radii_stroke* - if set, will determine the color of the radii
-      - *radii_length* - if set, will change the length of the radii lines
-        from the default (centre to circumference)
-      - *radii_offset* - if set, will move the endpoint of the radii line
+      - *radii_stroke* - determines the color of the radii
+      - *radii_length* - changes the length of the radii lines
+        (centre to circumference)
+      - *radii_offset* - moves the endpoint of the radii line
         **away** from the centre
 
 ===== ======
+
+.. _circleRadiiLabels:
+
+Radii - Labels
+--------------
+`^ <circle_>`_
+
+Radii labels are text lines linked to one or more radii. Text can be repeated
+or unique. It can also be rotated |dash| relative to the radius line it is
+on |dash| and styled with stroke color, size, and face.
+
+.. |crl| image:: images/custom/circle/radii_labels.png
+   :width: 330
+
+===== ======
+|crl| This example shows Circles constructed using these commands:
+
+      .. code:: python
+
+        Circle(cx=1, cy=5, radius=1,
+               radii=[30, 150, 270],
+               radii_labels="ABC",
+               dot=0.05)
+        Circle(cx=3, cy=3, radius=1,
+               radii=[30, 150, 270],
+               radii_labels="A,B,C",
+               radii_labels_rotation=90,
+               dot=0.05)
+        Circle(cx=1, cy=1, radius=1,
+               radii=[30, 150, 270],
+               radii_stroke=white,
+               radii_labels=["A","B", "C"],
+               radii_labels_rotation=270,
+               radii_labels_stroke=red,
+               radii_labels_face="Courier",
+               dot=0.05)
+
+      Apart from the `radii lines <circleRadii_>`_ themselves, the labels
+      properties can be set:
+
+      - *radii_labels* - a string or list of strings used for text
+      - *radii_labels_face* - the font used for the labels
+      - *radii_labels_rotation* - rotation in degrees relative to radius angle
+      - *radii_labels_size* - point size of labels
+      - *radii_labels_stroke* - the color of the labels
+      - *radii_labels_stroke_width* - thickness of the labels
+
+      The top example shows how the same text is repeated for all radii.
+
+      The middle example shows how the text string is split using commas.
+
+      The lower example shows how text strings are created with a list.
+
+      The lower example shows how text is rotated and styled. The radii lines
+      color is set to match the circle, making it "invisible".
+
+===== ======
+
 
 .. _circlePetalsPetal:
 

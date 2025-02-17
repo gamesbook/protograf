@@ -134,6 +134,28 @@ Circle(cx=2, cy=4.5, radius=1,
        petals_fill=yellow)
 PageBreak()
 
+# ---- circle radii labels
+Blueprint()
+Text(common=txt, text="Radii: Labels")
+Circle(cx=1, cy=5, radius=1,
+       radii=[30, 150, 270],
+       radii_labels="ABC",
+       dot=0.05)
+Circle(cx=3, cy=3, radius=1,
+       radii=[30, 150, 270],
+       radii_labels="A,B,C",
+       radii_labels_rotation=90,
+       dot=0.05)
+Circle(cx=1, cy=1, radius=1,
+       radii=[30, 150, 270],
+       radii_stroke=white,
+       radii_labels=["A","B", "C"],
+       radii_labels_rotation=270,
+       radii_labels_stroke=red,
+       radii_labels_face="Courier",
+       dot=0.05)
+PageBreak()
+
 # ---- END
 Text(common=txt, text="Circle END...")
 PageBreak(footer=True)
@@ -147,4 +169,5 @@ Save(
         None,
         "hatch", "dot_cross", "radii",
         "petals_triangle", "petals_curve", "petals_petal",
+        "radii_labels",
         None])

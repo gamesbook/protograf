@@ -650,8 +650,8 @@ class CircleShape(BaseShape):
                         cnv,
                         ID,
                         (x_start + x_end) / 2.0,
-                        (y_start + y_end) / 2.0 + self.radii_labels_font_size / 4.0,
-                        # rotation=self.radii_labels_rotation,
+                        (y_start + y_end) / 2.0,
+                        rotation=rad_angle + self.radii_labels_rotation,
                         centred=False,
                     )
                     label_key += 1
