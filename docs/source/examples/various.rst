@@ -19,6 +19,7 @@ Table of Contents
 
 - `A Clock`_
 - `Chords`_
+- `Rondel`_
 - `Miscellaneous Objects 1`_
 - `Miscellaneous Objects 2`_
 - `World Clocks`_
@@ -129,7 +130,7 @@ Discussion  This example shows how to construct a simple effect by combining
             details.
 ----------- ------------------------------------------------------------------
 Screenshot  .. image:: images/various/chords.png
-               :width: 30%
+               :width: 40%
 =========== ==================================================================
 
 
@@ -182,8 +183,8 @@ Discussion  This example shows how to construct a simple effect by using
             details.
 ----------- ------------------------------------------------------------------
 Screenshot  .. image:: images/various/rondel.png
-               :width: 30%
-
+               :width: 50%
+=========== ==================================================================
 
 
 World Clocks

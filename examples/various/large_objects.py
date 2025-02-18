@@ -22,6 +22,7 @@ Text(common=header, text="Random Chords")
 
 for i in range(0, 200):
     Chord(shape=Circle(cx=2, cy=3, radius=2, fill=None),
+          stroke_width=0.5,
           angle=Random(360), angle1=Random(360))
 PageBreak()
 
@@ -57,7 +58,7 @@ PageBreak()
 Save(
     output='png',
     dpi=300,
-    directory="../docs/source/images/various",
+    directory="../docs/source/examples/images/various",
     names=[
         'chords', 'rondel'
     ]
