@@ -641,7 +641,9 @@ class CircleShape(BaseShape):
                 pth.moveTo(x_start, y_start)
                 pth.lineTo(x_end, y_end)
                 cnv.drawPath(
-                    pth, stroke=1 if self.stroke else 0, fill=1 if self.fill else 0
+                    pth,
+                    stroke=1 if self.radii_stroke else 0,
+                    fill=1 if self.fill else 0,
                 )
                 # ---- radii text label
                 if _radii_labels:
@@ -1068,7 +1070,9 @@ class CompassShape(BaseShape):
             pth.lineTo(x, y)
         else:
             pth.lineTo(x + self.x_c, y + self.y_c)
-        cnv.drawPath(pth, stroke=1 if self.stroke else 0, fill=1 if self.fill else 0)
+        cnv.drawPath(
+            pth, stroke=1 if self.radii_stroke else 0, fill=1 if self.fill else 0
+        )
 
     def circle_radius(self, cnv, ID, angle):
         """Calc x,y on circle and draw line from centre to it."""
@@ -2568,7 +2572,7 @@ class PolygonShape(BaseShape):
                 pth.moveTo(centre.x, centre.y)
                 pth.lineTo(diam_pt.x, diam_pt.y)
             cnv.drawPath(
-                pth, stroke=1 if self.stroke else 0, fill=1 if self.fill else 0
+                pth, stroke=1 if self.radii_stroke else 0, fill=1 if self.fill else 0
             )
 
     def get_vertices(self, rotation: float = None, is_rotated: bool = False):

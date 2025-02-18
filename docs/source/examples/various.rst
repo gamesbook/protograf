@@ -108,7 +108,7 @@ Chords
 =========== ==================================================================
 Title       *Chords (in a circle)*
 ----------- ------------------------------------------------------------------
-Source Code `chords.py <https://github.com/gamesbook/protograf/blob/master/examples/various/chords.py>`_
+Source Code `large_objects.py <https://github.com/gamesbook/protograf/blob/master/examples/various/large_objects.py>`_
 ----------- ------------------------------------------------------------------
 Discussion  This example shows how to construct a simple effect by combining
             a basic shape - a :doc:`chord <../core_shapes#chord>` - with a
@@ -131,6 +131,59 @@ Discussion  This example shows how to construct a simple effect by combining
 Screenshot  .. image:: images/various/chords.png
                :width: 30%
 =========== ==================================================================
+
+
+Rondel
+======
+`↑ <table-of-contents_>`_
+
+=========== ==================================================================
+Title       *Rondel (circle radii and sectors)*
+----------- ------------------------------------------------------------------
+Source Code `large_objects.py <https://github.com/gamesbook/protograf/blob/master/examples/various/large_objects.py>`_
+----------- ------------------------------------------------------------------
+Discussion  This example shows how to construct a simple effect by using
+            data from a Python loop combined with radii labels:
+
+              .. code:: python
+
+                circ = Common(cx=2, cy=3, radius=2)
+
+                # information needed
+                radii = list(range(0, 360, 60))
+                colrs = [tomato, aqua, gold, lime, silver, white]
+                labels = ['Build', 'Trade', 'Income',
+                          'Plant', 'Expand', 'Harvest']
+
+                # rondel colors
+                for colr, angle in zip(colrs, radii):
+                    Sector(
+                        common=circ,
+                        fill=colr, stroke=sienna, stroke_width=2,
+                        angle=420 - angle, angle_width=60)
+                # rondel text
+                Circle(
+                    common=circ,
+                    stroke=sienna, stroke_width=3,
+                    fill=None,
+                    radii=radii,
+                    radii_offset=0.75,
+                    radii_length=1,
+                    radii_stroke=None,
+                    radii_labels=labels,
+                    radii_labels_face="Times-Roman",
+                    dot=0.2)
+
+            In this example, using the "offset" for the radii allows the
+            label |dash| which is centred on the radius line  |dash| to
+            be moved further outward.
+
+            See :ref:`Python loops <python-loop>` for more
+            details.
+----------- ------------------------------------------------------------------
+Screenshot  .. image:: images/various/rondel.png
+               :width: 30%
+
 
 
 World Clocks
