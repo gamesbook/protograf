@@ -429,6 +429,13 @@ def Save(**kwargs):
             globals.filename, output, dpi, names, directory, framerate=framerate
         )
 
+    # ---- save cards to image(s)
+    cards = kwargs.get("cards", None)
+    if cards and globals.pargs.png:  # pargs.png should default to True
+        support.pdf_cards_to_png(
+            globals.filename, output, dpi, directory, globals.card_frames
+        )
+
 
 def save(**kwargs):
     Save(**kwargs)
@@ -655,6 +662,7 @@ def Data(**kwargs):
             dict_list = [dict(zip(keys, values)) for values in data_list[1:]]
             globals.dataset = dict_list
             globals.dataset_type = DatasetType.DICT
+            breakpoint()
         except Exception:
             tools.feedback("The data_list is not valid - please check", True)
     elif source:  # handle pre-built dict

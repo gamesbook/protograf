@@ -182,6 +182,15 @@ class CardShape(BaseShape):
             cnv=cnv, row=row, col=col, cid=cid, label=label, **shape_kwargs
         )
         outline.draw(**shape_kwargs)
+        outline_vertices = outline.get_vertices()  # clockwise from bottom-left
+        # track frame outlines for possible image extraction
+        page = kwargs.get("page_number", 0)
+        if page not in globals.deck_frames:
+            globals.deck_frames[page] = [outline_vertices]
+        else:
+            globals.deck_frames[page].append(outline_vertices)
+
+        # ---- grid marks
         kwargs["grid_marks"] = None  # reset so not used by elements on card
         if kwargs["frame_type"] == CardFrame.HEXAGON:
             radius, diameter, side, half_flat = outline.hex_height_width()
@@ -474,6 +483,7 @@ class DeckShape(BaseShape):
         #             globals.page_height, _height, row_space, max_rows)
         row, col = 0, 0
         # ---- draw cards
+        page_number = 0
         for key, card in enumerate(self.deck):
             # set meta data
             _locale = Locale(
@@ -482,6 +492,7 @@ class DeckShape(BaseShape):
             kwargs["locale"] = _locale._asdict()
             kwargs["grouping_cols"] = self.grouping_cols
             kwargs["grouping_rows"] = self.grouping_rows
+            kwargs["page_number"] = page_number
             image = images[key] if images and key <= len(images) else None
             card.deck_data = self.dataset
 
@@ -515,6 +526,7 @@ class DeckShape(BaseShape):
                         if key != len(self.deck) - 1 or (i < (copies - 1)):
                             cnv.canvas.showPage()
                             self.draw_bleed(cnv, page_across, page_down)
+                            page_number += 1
 
     def get(self, cid):
         """Return a card based on the internal ID"""

@@ -430,6 +430,44 @@ def pdf_to_png(
         feedback(f"Unable to extract images for {filename} - {err}!")
 
 
+def pdf_cards_to_png(
+    filename: str,
+    fformat: str = "png",
+    dpi: int = 300,
+    directory: str = None,
+    card_frames: dict = None,
+):
+    """Extract individual cards from PDF as PNG image(s).
+
+    Uses:
+        * https://pymupdf.io/
+        * https://pypi.org/project/imageio/
+    """
+    feedback(f'Saving card(s) from "{filename}" as image file(s)...', False)
+    _filename = os.path.basename(filename)
+    basename = os.path.splitext(_filename)[0]
+    dirname = directory or os.path.dirname(filename)
+    # validate directory
+    if not os.path.exists(dirname):
+        feedback(
+            f'Cannot find the directory "{dirname}" - please create this first.', True
+        )
+    try:
+        doc = pymupdf.open(filename)
+        pages = doc.page_count
+        all_pngs = []  # track full and final name of each saved .png
+        # save cards from each page as .png files
+        for page in range(0, pages):
+            outlines = card_frames.get(page, [])
+            for key, outline in enumerate(outlines):
+                iname = os.path.join(dirname, f"{basename}-{page.number + 1}-{key + 1}.png")
+                print(f'processing {outline} as {iname}')
+                # TODO - extract image
+
+    except Exception as err:
+        feedback(f"Unable to extract card images for {filename} - {err}!")
+
+
 if __name__ == "__main__":
     import doctest
 
