@@ -2316,7 +2316,11 @@ class BaseShape:
                 if isinstance(value, Template):
                     if not self.deck_data:
                         tools.feedback(
-                            f"Cannot use T() or S() command without Data already defined!",
+                            "Cannot use T() or S() command without Data already defined!",
+                            False,
+                        )
+                        tools.feedback(
+                            "Check that Data command is used before Deck command.",
                             True,
                         )
                     record = self.deck_data[ID]

@@ -185,10 +185,10 @@ class CardShape(BaseShape):
         outline_vertices = outline.get_vertices()  # clockwise from bottom-left
         # track frame outlines for possible image extraction
         page = kwargs.get("page_number", 0)
-        if page not in globals.deck_frames:
-            globals.deck_frames[page] = [outline_vertices]
+        if page not in globals.card_frames:
+            globals.card_frames[page] = [outline_vertices]
         else:
-            globals.deck_frames[page].append(outline_vertices)
+            globals.card_frames[page].append(outline_vertices)
 
         # ---- grid marks
         kwargs["grid_marks"] = None  # reset so not used by elements on card

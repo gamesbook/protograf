@@ -439,6 +439,12 @@ def pdf_cards_to_png(
 ):
     """Extract individual cards from PDF as PNG image(s).
 
+    Args:
+        * card_frames - key is page number; value is a list of lists;
+          each item in nested list is a bounding box (bottom-left and
+          top-right coordinates)
+
+
     Uses:
         * https://pymupdf.io/
         * https://pypi.org/project/imageio/
@@ -454,16 +460,22 @@ def pdf_cards_to_png(
         )
     try:
         doc = pymupdf.open(filename)
-        pages = doc.page_count
-        all_pngs = []  # track full and final name of each saved .png
-        # save cards from each page as .png files
-        for page in range(0, pages):
-            outlines = card_frames.get(page, [])
+        page_num = 0
+        for page in doc:
+            outlines = card_frames.get(page_num, [])
             for key, outline in enumerate(outlines):
-                iname = os.path.join(dirname, f"{basename}-{page.number + 1}-{key + 1}.png")
-                print(f'processing {outline} as {iname}')
-                # TODO - extract image
-
+                iname = os.path.join(
+                    dirname, f"{basename}-{page_num + 1}-{key + 1}.png"
+                )
+                rect = pymupdf.Rect(
+                    outline[0].x,
+                    outline[0].y,  # bottom-left
+                    outline[2].x,
+                    outline[2].y,
+                )  # top-right
+                pix = page.get_pixmap(clip=rect, dpi=dpi)  # page fragment as an image
+                pix.save(iname)  # store image as a PNG
+            page_num += 1
     except Exception as err:
         feedback(f"Unable to extract card images for {filename} - {err}!")
 

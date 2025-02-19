@@ -10,7 +10,7 @@ def initialize():
     global cnv
     global deck
     global deck_settings
-    global deck_frames  # card boundaries - use for image extraction
+    global card_frames  # card boundaries - use for image extraction
     global dataset
     global dataset_type
     global image_list
@@ -33,7 +33,7 @@ def initialize():
     cnv = None  # will become a reportlab.canvas object
     deck = None  # will become a shapes.DeckShape object
     deck_settings = {}  # holds kwargs passed to Deck ; cards, copy, extra, grid_marks
-    deck_frames = {}  # store vertices of card outlines; keyed on page number
+    card_frames = {}  # store vertices of card outlines; keyed on page number
     filename = None
     dataset = None  # will become a dictionary of data loaded from a file
     dataset_type = None  # set when Data is loaded; enum DatasetType

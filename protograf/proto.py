@@ -662,7 +662,6 @@ def Data(**kwargs):
             dict_list = [dict(zip(keys, values)) for values in data_list[1:]]
             globals.dataset = dict_list
             globals.dataset_type = DatasetType.DICT
-            breakpoint()
         except Exception:
             tools.feedback("The data_list is not valid - please check", True)
     elif source:  # handle pre-built dict
