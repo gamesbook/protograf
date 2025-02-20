@@ -468,11 +468,11 @@ def pdf_cards_to_png(
                     dirname, f"{basename}-{page_num + 1}-{key + 1}.png"
                 )
                 rect = pymupdf.Rect(
-                    outline[0].x,
-                    outline[0].y,  # bottom-left
-                    outline[2].x,
-                    outline[2].y,
-                )  # top-right
+                    outline[0].x,  # bottom-left x
+                    outline[0].y,  # bottom-left y
+                    outline[1].x,  # top-right x
+                    outline[1].y,  # top-right y
+                )
                 pix = page.get_pixmap(clip=rect, dpi=dpi)  # page fragment as an image
                 pix.save(iname)  # store image as a PNG
             page_num += 1

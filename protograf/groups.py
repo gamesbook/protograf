@@ -14,9 +14,9 @@ from protograf.utils import tools
 from protograf.utils.tools import DatasetType, CardFrame  # enums
 from protograf.base import BaseShape
 from protograf.layouts import SequenceShape, RepeatShape
-from protograf.shapes import CircleShape, HexShape, ImageShape, RectangleShape
-from protograf.utils.geoms import Locale
-
+from protograf.shapes import (
+    CircleShape, HexShape, ImageShape, PolygonShape, RectangleShape)
+from protograf.utils.geoms import Locale, Point
 from protograf import globals
 
 log = logging.getLogger(__name__)
@@ -144,23 +144,25 @@ class CardShape(BaseShape):
         kwargs["radius"] = self.radius
         kwargs["spacing_x"] = self.spacing_x
         kwargs["spacing_y"] = self.spacing_y
-        if kwargs["frame_type"] == CardFrame.RECTANGLE:
-            outline = RectangleShape(
-                label=label,
-                canvas=cnv,
-                col=col,
-                row=row,
-                **kwargs,
-            )
-        elif kwargs["frame_type"] == CardFrame.CIRCLE:
-            outline = CircleShape(label=label, canvas=cnv, col=col, row=row, **kwargs)
-        elif kwargs["frame_type"] == CardFrame.HEXAGON:
-            outline = HexShape(label=label, canvas=cnv, col=col, row=row, **kwargs)
-            outline.hex_height_width()
-        else:
-            raise NotImplementedError(
-                f'Cannot handle card frame type: {kwargs["frame_type"]}'
-            )
+        match kwargs["frame_type"]:
+            case CardFrame.RECTANGLE:
+                outline = RectangleShape(
+                    label=label,
+                    canvas=cnv,
+                    col=col,
+                    row=row,
+                    **kwargs,
+                )
+            case CardFrame.CIRCLE:
+                outline = CircleShape(label=label, canvas=cnv, col=col, row=row, **kwargs)
+            case CardFrame.HEXAGON:
+                kwargs['sides'] = 6
+                outline = PolygonShape(label=label, canvas=cnv, col=col, row=row, **kwargs)
+                # outline.hex_height_width()
+            case _:
+                raise NotImplementedError(
+                    f'Cannot handle card frame type: {kwargs["frame_type"]}'
+                )
         return outline
 
     def draw_card(self, cnv, row, col, cid, **kwargs):
@@ -182,18 +184,35 @@ class CardShape(BaseShape):
             cnv=cnv, row=row, col=col, cid=cid, label=label, **shape_kwargs
         )
         outline.draw(**shape_kwargs)
-        outline_vertices = outline.get_vertices()  # clockwise from bottom-left
-        # track frame outlines for possible image extraction
+
+        # ---- track frame outlines for possible image extraction
+        match kwargs["frame_type"]:
+            case CardFrame.RECTANGLE:
+                _vertices = outline.get_vertices()  # clockwise from bottom-left
+                frame_vertices = [_vertices[0], _vertices[2]]
+            case CardFrame.CIRCLE:
+                pass
+            case CardFrame.HEXAGON:
+                _vertices = outline.get_vertices()  # anti-clockwise from mid-right
+                frame_vertices = [
+                    Point(_vertices[3].x, _vertices[4].y),
+                    Point(_vertices[0].x, _vertices[1].y),
+                ]
+            case _:
+                raise NotImplementedError(
+                    f'Cannot handle card frame type: {kwargs["frame_type"]}'
+                )
         page = kwargs.get("page_number", 0)
         if page not in globals.card_frames:
-            globals.card_frames[page] = [outline_vertices]
+            globals.card_frames[page] = [frame_vertices]
         else:
-            globals.card_frames[page].append(outline_vertices)
+            globals.card_frames[page].append(frame_vertices)
 
         # ---- grid marks
         kwargs["grid_marks"] = None  # reset so not used by elements on card
         if kwargs["frame_type"] == CardFrame.HEXAGON:
-            radius, diameter, side, half_flat = outline.hex_height_width()
+            _geom = outline.get_geometry()
+            radius, diameter, side, half_flat = _geom.radius, 2. * _geom.radius, _geom.side, _geom.half_flat
             side = self.points_to_value(side)
             half_flat = self.points_to_value(half_flat)
 

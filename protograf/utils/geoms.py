@@ -22,6 +22,8 @@ Place = namedtuple("Place", ["shape", "rotation"])
 Point = namedtuple("Point", ["x", "y"])
 # ray is a mathematical term that specifies a position and direction
 Ray = namedtuple("Ray", ["x", "y", "angle"])
+PolyGeometry = namedtuple(
+    "PolyGeometry", ["x", "y", "radius", "side", "half_flat", "vertices"])
 
 
 def polygon_vertices(
