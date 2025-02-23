@@ -33,7 +33,7 @@ def initialize():
     cnv = None  # will become a reportlab.canvas object
     deck = None  # will become a shapes.DeckShape object
     deck_settings = {}  # holds kwargs passed to Deck ; cards, copy, extra, grid_marks
-    card_frames = {}  # store vertices of card outlines; keyed on page number
+    card_frames = {}  # list of BBox card outlines; keyed on page number
     filename = None
     dataset = None  # will become a dictionary of data loaded from a file
     dataset_type = None  # set when Data is loaded; enum DatasetType

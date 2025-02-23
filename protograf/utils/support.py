@@ -440,10 +440,9 @@ def pdf_cards_to_png(
     """Extract individual cards from PDF as PNG image(s).
 
     Args:
-        * card_frames - key is page number; value is a list of lists;
-          each item in nested list is a bounding box (bottom-left and
-          top-right coordinates)
-
+        * card_frames - dict key is page number; value is a list of lists;
+          each item in the nested list is a Bounding Box (bottom-left and
+          top-right x,y coordinates)
 
     Uses:
         * https://pymupdf.io/
@@ -467,12 +466,14 @@ def pdf_cards_to_png(
                 iname = os.path.join(
                     dirname, f"{basename}-{page_num + 1}-{key + 1}.png"
                 )
+                # https://pymupdf.readthedocs.io/en/latest/rect.html
                 rect = pymupdf.Rect(
-                    outline[0].x,  # bottom-left x
-                    outline[0].y,  # bottom-left y
-                    outline[1].x,  # top-right x
-                    outline[1].y,  # top-right y
+                    outline.bl.x,  # top-left x
+                    outline.tr.y,  # top-left y
+                    outline.tr.x,  # bottom-right x
+                    outline.bl.y,  # bottom-right y
                 )
+                print('*==*', page_num, key, rect)
                 pix = page.get_pixmap(clip=rect, dpi=dpi)  # page fragment as an image
                 pix.save(iname)  # store image as a PNG
             page_num += 1

@@ -16,7 +16,7 @@ from protograf.base import BaseShape
 from protograf.layouts import SequenceShape, RepeatShape
 from protograf.shapes import (
     CircleShape, HexShape, ImageShape, PolygonShape, RectangleShape)
-from protograf.utils.geoms import Locale, Point
+from protograf.utils.geoms import Locale, Point, BBox
 from protograf import globals
 
 log = logging.getLogger(__name__)
@@ -189,24 +189,22 @@ class CardShape(BaseShape):
         match kwargs["frame_type"]:
             case CardFrame.RECTANGLE:
                 _vertices = outline.get_vertices()  # clockwise from bottom-left
-                frame_vertices = [_vertices[0], _vertices[2]]
+                base_frame_bbox = BBox(bl=_vertices[0], tr=_vertices[2])
             case CardFrame.CIRCLE:
-                pass
+                base_frame_bbox = None
             case CardFrame.HEXAGON:
                 _vertices = outline.get_vertices()  # anti-clockwise from mid-right
-                frame_vertices = [
-                    Point(_vertices[3].x, _vertices[4].y),
-                    Point(_vertices[0].x, _vertices[1].y),
-                ]
+                base_frame_bbox = BBox(
+                    bl=Point(_vertices[3].x, _vertices[4].y),
+                    tr=Point(_vertices[0].x, _vertices[1].y),
+                )
             case _:
                 raise NotImplementedError(
                     f'Cannot handle card frame type: {kwargs["frame_type"]}'
                 )
-        page = kwargs.get("page_number", 0)
-        if page not in globals.card_frames:
-            globals.card_frames[page] = [frame_vertices]
-        else:
-            globals.card_frames[page].append(frame_vertices)
+        frame_height = base_frame_bbox.tr.x - base_frame_bbox.bl.x
+        frame_width = base_frame_bbox.tr.y - base_frame_bbox.bl.y
+        print(f'\n #*# {frame_width=} {frame_height=}')
 
         # ---- grid marks
         kwargs["grid_marks"] = None  # reset so not used by elements on card
@@ -224,7 +222,7 @@ class CardShape(BaseShape):
                 if flat_ele.kwargs.get("source", "").lower() in ["*", "all"]:
                     flat_ele.source = image
 
-            # ---- * card frame
+            # ---- * calculate card frame shift
             match kwargs["frame_type"]:
                 case CardFrame.RECTANGLE | CardFrame.CIRCLE:
                     if kwargs["grouping_cols"] == 1:
@@ -261,7 +259,25 @@ class CardShape(BaseShape):
                     raise NotImplementedError(
                         f'Cannot handle card frame type: {kwargs["frame_type"]}'
                     )
-            # print(f' #*# {kwargs["frame_type"]=} {col=} {row=} {_dx=} {_dy=} ')
+
+            # ---- * track/update frame and store
+            from protograf.shapes import DotShape
+            dds = DotShape(canvas=globals.cnv, x=_dx, y=_dy)  # should be lower-left
+            dds.draw()
+            mx, my = self.unit(_dx or 0), self.unit(_dy or 0)
+            frame_bbox = BBox(
+                bl=Point(mx, my),
+                tr=Point(mx + frame_width, my + frame_height)
+            )
+            page = kwargs.get("page_number", 0)
+            if page not in globals.card_frames:
+                globals.card_frames[page] = [frame_bbox]
+            else:
+                globals.card_frames[page].append(frame_bbox)
+
+            print(f'\n #*# {kwargs["frame_type"]=} {col=} {row=} {_dx=} {_dy=}')
+            print(f' #*#      {frame_bbox=}')
+            print(f' #*# {base_frame_bbox=}')
 
             members = self.members or flat_ele.members
             try:
