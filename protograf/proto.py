@@ -433,7 +433,7 @@ def Save(**kwargs):
     cards = kwargs.get("cards", None)
     if cards and globals.pargs.png:  # pargs.png should default to True
         support.pdf_cards_to_png(
-            globals.filename, output, dpi, directory, globals.card_frames
+            globals.filename, output, dpi, directory, globals.card_frames, globals.paper[1]
         )
 
 

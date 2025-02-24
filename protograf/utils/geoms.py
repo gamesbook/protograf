@@ -29,6 +29,8 @@ PolyGeometry = namedtuple(
 
 @dataclass
 class BBox():
+    """A spatial bounding box - BL is SouthWest x,y point and TR is NorthEast x,y point
+    """
     bl: Tuple[Point, Point]
     tr: Tuple[Point, Point]
 

@@ -204,7 +204,6 @@ class CardShape(BaseShape):
                 )
         frame_height = base_frame_bbox.tr.x - base_frame_bbox.bl.x
         frame_width = base_frame_bbox.tr.y - base_frame_bbox.bl.y
-        print(f'\n #*# {frame_width=} {frame_height=}')
 
         # ---- grid marks
         kwargs["grid_marks"] = None  # reset so not used by elements on card
@@ -261,10 +260,8 @@ class CardShape(BaseShape):
                     )
 
             # ---- * track/update frame and store
-            from protograf.shapes import DotShape
-            dds = DotShape(canvas=globals.cnv, x=_dx, y=_dy)  # should be lower-left
-            dds.draw()
-            mx, my = self.unit(_dx or 0), self.unit(_dy or 0)
+            mx = self.unit(_dx or 0) + self._o.delta_x
+            my = self.unit(_dy or 0) + self._o.delta_y
             frame_bbox = BBox(
                 bl=Point(mx, my),
                 tr=Point(mx + frame_width, my + frame_height)
@@ -274,10 +271,6 @@ class CardShape(BaseShape):
                 globals.card_frames[page] = [frame_bbox]
             else:
                 globals.card_frames[page].append(frame_bbox)
-
-            print(f'\n #*# {kwargs["frame_type"]=} {col=} {row=} {_dx=} {_dy=}')
-            print(f' #*#      {frame_bbox=}')
-            print(f' #*# {base_frame_bbox=}')
 
             members = self.members or flat_ele.members
             try:

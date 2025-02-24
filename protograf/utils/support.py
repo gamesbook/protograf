@@ -436,6 +436,7 @@ def pdf_cards_to_png(
     dpi: int = 300,
     directory: str = None,
     card_frames: dict = None,
+    page_height: float = 0
 ):
     """Extract individual cards from PDF as PNG image(s).
 
@@ -443,6 +444,8 @@ def pdf_cards_to_png(
         * card_frames - dict key is page number; value is a list of lists;
           each item in the nested list is a Bounding Box (bottom-left and
           top-right x,y coordinates)
+        * page_height - in MuPDF's coordinate system, the y-axis is oriented
+          from top to bottom, so ReportLab y-coordinates must be "inverted"
 
     Uses:
         * https://pymupdf.io/
@@ -467,13 +470,16 @@ def pdf_cards_to_png(
                     dirname, f"{basename}-{page_num + 1}-{key + 1}.png"
                 )
                 # https://pymupdf.readthedocs.io/en/latest/rect.html
+                # Rect represents a rectangle defined by four floating point numbers
+                # x0, y0, x1, y1. They are coordinates of diagonally opposite points.
+                # The first two numbers are regarded as the “top left” corner P(x0,y0)
+                # and second two are regarded P(x1,y1) as the “bottom right” one.
                 rect = pymupdf.Rect(
-                    outline.bl.x,  # top-left x
-                    outline.tr.y,  # top-left y
-                    outline.tr.x,  # bottom-right x
-                    outline.bl.y,  # bottom-right y
+                    outline.bl.x,  # top-left x0
+                    page_height - outline.tr.y,  # top-left y0
+                    outline.tr.x,  # bottom-right x1
+                    page_height - outline.bl.y,  # bottom-right y1
                 )
-                print('*==*', page_num, key, rect)
                 pix = page.get_pixmap(clip=rect, dpi=dpi)  # page fragment as an image
                 pix.save(iname)  # store image as a PNG
             page_num += 1
