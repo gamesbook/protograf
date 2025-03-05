@@ -44,7 +44,7 @@ from reportlab.lib.utils import ImageReader
 import segno  # QRCode
 
 # local
-from protograf.utils.geoms import Point, Link, Locale  # named tuples
+from protograf.utils.geoms import Point, Link, Locale, PolyGeometry  # named tuples
 from protograf.utils import geoms, tools, support
 from protograf.base import (
     BaseShape,
@@ -2591,27 +2591,14 @@ class PolygonShape(BaseShape):
         return vertices
 
     def get_geometry(self, rotation: float = None, is_rotated: bool = False):
-        """Calculate centre, radius and vertices of polygon."""
+        """Calculate centre, radius, side and vertices of Polygon."""
         # convert to using units
         if is_rotated:
             x, y = 0.0, 0.0  # centre for now-rotated canvas
         else:
             x = self._u.x + self._o.delta_x
             y = self._u.y + self._o.delta_y
-        radius = self.get_radius()
-        # calculate vertices - assumes x,y marks the centre point
-        _rotation = rotation or self.flatten_angle
-        vertices = geoms.polygon_vertices(self.sides, radius, Point(x, y), _rotation)
-        # for p in vertices: print(f'*G* {p.x / 28.3465}, {p.y / 28.3465}')
-        return x, y, radius, vertices
-
-    def draw(self, cnv=None, off_x=0, off_y=0, ID=None, **kwargs):
-        """Draw a regular polygon on a given canvas."""
-        kwargs = self.kwargs | kwargs
-        cnv = cnv.canvas if cnv else self.canvas.canvas
-        super().draw(cnv, off_x, off_y, ID, **kwargs)  # unit-based props
-        # ---- set canvas
-        self.set_canvas_props(index=ID)
+        # calculate side
         if self.height:
             side = self._u.height / math.sqrt(3)
             half_flat = self._u.height / 2.0
@@ -2621,6 +2608,21 @@ class PolygonShape(BaseShape):
             half_flat = self._u.side * math.sqrt(3) / 2.0
         elif self.radius:
             side = self.u_radius
+        # radius
+        radius = self.get_radius()
+        # calculate vertices - assumes x,y marks the centre point
+        _rotation = rotation or self.flatten_angle
+        vertices = geoms.polygon_vertices(self.sides, radius, Point(x, y), _rotation)
+        # for p in vertices: print(f'*G* {p.x / 28.3465}, {p.y / 28.3465}')
+        return PolyGeometry(x, y, radius, side, half_flat, vertices)
+
+    def draw(self, cnv=None, off_x=0, off_y=0, ID=None, **kwargs):
+        """Draw a regular polygon on a given canvas."""
+        kwargs = self.kwargs | kwargs
+        cnv = cnv.canvas if cnv else self.canvas.canvas
+        super().draw(cnv, off_x, off_y, ID, **kwargs)  # unit-based props
+        # ---- set canvas
+        self.set_canvas_props(index=ID)
         # ---- calc centre (in units)
         centre = self.get_centre()
         x, y = centre.x, centre.y
@@ -2638,9 +2640,10 @@ class PolygonShape(BaseShape):
                 cnv.translate(x, y)
             cnv.rotate(rotation)
         # --- handle 'orientation' (flat vs pointy)
-        x, y, radius, vertices = self.get_geometry(
+        _geom = self.get_geometry(
             rotation=rotation, is_rotated=is_rotated
         )
+        x, y, radius, vertices = _geom.x, _geom.y, _geom.radius, _geom.vertices
         # ---- invalid polygon?
         if not vertices or len(vertices) == 0:
             if rotation:
@@ -4148,7 +4151,8 @@ class StarFieldShape(BaseShape):
         if isinstance(self.enclosure, CircleShape):
             x_c, y_c = self.enclosure.calculate_centre()
         if isinstance(self.enclosure, PolygonShape):
-            x_c, y_c, radius, vertices = self.enclosure.get_geometry()
+            _geom = self.enclosure.get_geometry()
+            x_c, y_c, radius, vertices = _geom.x, _geom.y, _geom.radius, _geom.vertices
         stars = 0
         if self.seed:
             random.seed(self.seed)

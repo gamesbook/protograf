@@ -430,6 +430,63 @@ def pdf_to_png(
         feedback(f"Unable to extract images for {filename} - {err}!")
 
 
+def pdf_cards_to_png(
+    filename: str,
+    fformat: str = "png",
+    dpi: int = 300,
+    directory: str = None,
+    card_frames: dict = None,
+    page_height: float = 0
+):
+    """Extract individual cards from PDF as PNG image(s).
+
+    Args:
+        * card_frames - dict key is page number; value is a list of lists;
+          each item in the nested list is a Bounding Box (bottom-left and
+          top-right x,y coordinates)
+        * page_height - in MuPDF's coordinate system, the y-axis is oriented
+          from top to bottom, so ReportLab y-coordinates must be "inverted"
+
+    Uses:
+        * https://pymupdf.io/
+        * https://pypi.org/project/imageio/
+    """
+    feedback(f'Saving card(s) from "{filename}" as image file(s)...', False)
+    _filename = os.path.basename(filename)
+    basename = os.path.splitext(_filename)[0]
+    dirname = directory or os.path.dirname(filename)
+    # validate directory
+    if not os.path.exists(dirname):
+        feedback(
+            f'Cannot find the directory "{dirname}" - please create this first.', True
+        )
+    try:
+        doc = pymupdf.open(filename)
+        page_num = 0
+        for page in doc:
+            outlines = card_frames.get(page_num, [])
+            for key, outline in enumerate(outlines):
+                iname = os.path.join(
+                    dirname, f"{basename}-{page_num + 1}-{key + 1}.png"
+                )
+                # https://pymupdf.readthedocs.io/en/latest/rect.html
+                # Rect represents a rectangle defined by four floating point numbers
+                # x0, y0, x1, y1. They are coordinates of diagonally opposite points.
+                # The first two numbers are regarded as the “top left” corner P(x0,y0)
+                # and second two are regarded P(x1,y1) as the “bottom right” one.
+                rect = pymupdf.Rect(
+                    outline.bl.x,  # top-left x0
+                    page_height - outline.tr.y,  # top-left y0
+                    outline.tr.x,  # bottom-right x1
+                    page_height - outline.bl.y,  # bottom-right y1
+                )
+                pix = page.get_pixmap(clip=rect, dpi=dpi)  # page fragment as an image
+                pix.save(iname)  # store image as a PNG
+            page_num += 1
+    except Exception as err:
+        feedback(f"Unable to extract card images for {filename} - {err}!")
+
+
 if __name__ == "__main__":
     import doctest
 

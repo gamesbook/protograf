@@ -14,9 +14,9 @@ from protograf.utils import tools
 from protograf.utils.tools import DatasetType, CardFrame  # enums
 from protograf.base import BaseShape
 from protograf.layouts import SequenceShape, RepeatShape
-from protograf.shapes import CircleShape, HexShape, ImageShape, RectangleShape
-from protograf.utils.geoms import Locale
-
+from protograf.shapes import (
+    CircleShape, HexShape, ImageShape, PolygonShape, RectangleShape)
+from protograf.utils.geoms import Locale, Point, BBox
 from protograf import globals
 
 log = logging.getLogger(__name__)
@@ -144,23 +144,25 @@ class CardShape(BaseShape):
         kwargs["radius"] = self.radius
         kwargs["spacing_x"] = self.spacing_x
         kwargs["spacing_y"] = self.spacing_y
-        if kwargs["frame_type"] == CardFrame.RECTANGLE:
-            outline = RectangleShape(
-                label=label,
-                canvas=cnv,
-                col=col,
-                row=row,
-                **kwargs,
-            )
-        elif kwargs["frame_type"] == CardFrame.CIRCLE:
-            outline = CircleShape(label=label, canvas=cnv, col=col, row=row, **kwargs)
-        elif kwargs["frame_type"] == CardFrame.HEXAGON:
-            outline = HexShape(label=label, canvas=cnv, col=col, row=row, **kwargs)
-            outline.hex_height_width()
-        else:
-            raise NotImplementedError(
-                f'Cannot handle card frame type: {kwargs["frame_type"]}'
-            )
+        match kwargs["frame_type"]:
+            case CardFrame.RECTANGLE:
+                outline = RectangleShape(
+                    label=label,
+                    canvas=cnv,
+                    col=col,
+                    row=row,
+                    **kwargs,
+                )
+            case CardFrame.CIRCLE:
+                outline = CircleShape(label=label, canvas=cnv, col=col, row=row, **kwargs)
+            case CardFrame.HEXAGON:
+                kwargs['sides'] = 6
+                outline = PolygonShape(label=label, canvas=cnv, col=col, row=row, **kwargs)
+                # outline.hex_height_width()
+            case _:
+                raise NotImplementedError(
+                    f'Cannot handle card frame type: {kwargs["frame_type"]}'
+                )
         return outline
 
     def draw_card(self, cnv, row, col, cid, **kwargs):
@@ -182,9 +184,32 @@ class CardShape(BaseShape):
             cnv=cnv, row=row, col=col, cid=cid, label=label, **shape_kwargs
         )
         outline.draw(**shape_kwargs)
+
+        # ---- track frame outlines for possible image extraction
+        match kwargs["frame_type"]:
+            case CardFrame.RECTANGLE:
+                _vertices = outline.get_vertices()  # clockwise from bottom-left
+                base_frame_bbox = BBox(bl=_vertices[0], tr=_vertices[2])
+            case CardFrame.CIRCLE:
+                base_frame_bbox = None
+            case CardFrame.HEXAGON:
+                _vertices = outline.get_vertices()  # anti-clockwise from mid-right
+                base_frame_bbox = BBox(
+                    bl=Point(_vertices[3].x, _vertices[4].y),
+                    tr=Point(_vertices[0].x, _vertices[1].y),
+                )
+            case _:
+                raise NotImplementedError(
+                    f'Cannot handle card frame type: {kwargs["frame_type"]}'
+                )
+        frame_height = base_frame_bbox.tr.x - base_frame_bbox.bl.x
+        frame_width = base_frame_bbox.tr.y - base_frame_bbox.bl.y
+
+        # ---- grid marks
         kwargs["grid_marks"] = None  # reset so not used by elements on card
         if kwargs["frame_type"] == CardFrame.HEXAGON:
-            radius, diameter, side, half_flat = outline.hex_height_width()
+            _geom = outline.get_geometry()
+            radius, diameter, side, half_flat = _geom.radius, 2. * _geom.radius, _geom.side, _geom.half_flat
             side = self.points_to_value(side)
             half_flat = self.points_to_value(half_flat)
 
@@ -196,7 +221,7 @@ class CardShape(BaseShape):
                 if flat_ele.kwargs.get("source", "").lower() in ["*", "all"]:
                     flat_ele.source = image
 
-            # ---- * card frame
+            # ---- * calculate card frame shift
             match kwargs["frame_type"]:
                 case CardFrame.RECTANGLE | CardFrame.CIRCLE:
                     if kwargs["grouping_cols"] == 1:
@@ -233,7 +258,19 @@ class CardShape(BaseShape):
                     raise NotImplementedError(
                         f'Cannot handle card frame type: {kwargs["frame_type"]}'
                     )
-            # print(f' #*# {kwargs["frame_type"]=} {col=} {row=} {_dx=} {_dy=} ')
+
+            # ---- * track/update frame and store
+            mx = self.unit(_dx or 0) + self._o.delta_x
+            my = self.unit(_dy or 0) + self._o.delta_y
+            frame_bbox = BBox(
+                bl=Point(mx, my),
+                tr=Point(mx + frame_width, my + frame_height)
+            )
+            page = kwargs.get("page_number", 0)
+            if page not in globals.card_frames:
+                globals.card_frames[page] = [frame_bbox]
+            else:
+                globals.card_frames[page].append(frame_bbox)
 
             members = self.members or flat_ele.members
             try:
@@ -474,6 +511,7 @@ class DeckShape(BaseShape):
         #             globals.page_height, _height, row_space, max_rows)
         row, col = 0, 0
         # ---- draw cards
+        page_number = 0
         for key, card in enumerate(self.deck):
             # set meta data
             _locale = Locale(
@@ -482,6 +520,7 @@ class DeckShape(BaseShape):
             kwargs["locale"] = _locale._asdict()
             kwargs["grouping_cols"] = self.grouping_cols
             kwargs["grouping_rows"] = self.grouping_rows
+            kwargs["page_number"] = page_number
             image = images[key] if images and key <= len(images) else None
             card.deck_data = self.dataset
 
@@ -515,6 +554,7 @@ class DeckShape(BaseShape):
                         if key != len(self.deck) - 1 or (i < (copies - 1)):
                             cnv.canvas.showPage()
                             self.draw_bleed(cnv, page_across, page_down)
+                            page_number += 1
 
     def get(self, cid):
         """Return a card based on the internal ID"""

@@ -5,9 +5,10 @@ Mathematical utility functions for protograf
 # lib
 from collections import namedtuple
 import cmath
+from dataclasses import dataclass
 import logging
 import math
-from typing import Any, List
+from typing import Any, List, Tuple
 
 # local
 from protograf.utils.support import numbers, feedback
@@ -20,8 +21,18 @@ fields = ("col", "row", "x", "y", "id", "sequence", "corner", "label")
 Locale = namedtuple("Locale", fields, defaults=(None,) * len(fields))
 Place = namedtuple("Place", ["shape", "rotation"])
 Point = namedtuple("Point", ["x", "y"])
-# ray is a mathematical term that specifies a position and direction
+# a ray is a mathematical term that specifies a position and direction
 Ray = namedtuple("Ray", ["x", "y", "angle"])
+PolyGeometry = namedtuple(
+    "PolyGeometry", ["x", "y", "radius", "side", "half_flat", "vertices"])
+
+
+@dataclass
+class BBox():
+    """A spatial bounding box - BL is SouthWest x,y point and TR is NorthEast x,y point
+    """
+    bl: Tuple[Point, Point]
+    tr: Tuple[Point, Point]
 
 
 def polygon_vertices(
