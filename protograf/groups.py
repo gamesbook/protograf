@@ -15,7 +15,12 @@ from protograf.utils.tools import DatasetType, CardFrame  # enums
 from protograf.base import BaseShape
 from protograf.layouts import SequenceShape, RepeatShape
 from protograf.shapes import (
-    CircleShape, HexShape, ImageShape, PolygonShape, RectangleShape)
+    CircleShape,
+    HexShape,
+    ImageShape,
+    PolygonShape,
+    RectangleShape,
+)
 from protograf.utils.geoms import Locale, Point, BBox
 from protograf import globals
 
@@ -154,10 +159,14 @@ class CardShape(BaseShape):
                     **kwargs,
                 )
             case CardFrame.CIRCLE:
-                outline = CircleShape(label=label, canvas=cnv, col=col, row=row, **kwargs)
+                outline = CircleShape(
+                    label=label, canvas=cnv, col=col, row=row, **kwargs
+                )
             case CardFrame.HEXAGON:
-                kwargs['sides'] = 6
-                outline = PolygonShape(label=label, canvas=cnv, col=col, row=row, **kwargs)
+                kwargs["sides"] = 6
+                outline = PolygonShape(
+                    label=label, canvas=cnv, col=col, row=row, **kwargs
+                )
                 # outline.hex_height_width()
             case _:
                 raise NotImplementedError(
@@ -209,7 +218,12 @@ class CardShape(BaseShape):
         kwargs["grid_marks"] = None  # reset so not used by elements on card
         if kwargs["frame_type"] == CardFrame.HEXAGON:
             _geom = outline.get_geometry()
-            radius, diameter, side, half_flat = _geom.radius, 2. * _geom.radius, _geom.side, _geom.half_flat
+            radius, diameter, side, half_flat = (
+                _geom.radius,
+                2.0 * _geom.radius,
+                _geom.side,
+                _geom.half_flat,
+            )
             side = self.points_to_value(side)
             half_flat = self.points_to_value(half_flat)
 
@@ -263,8 +277,7 @@ class CardShape(BaseShape):
             mx = self.unit(_dx or 0) + self._o.delta_x
             my = self.unit(_dy or 0) + self._o.delta_y
             frame_bbox = BBox(
-                bl=Point(mx, my),
-                tr=Point(mx + frame_width, my + frame_height)
+                bl=Point(mx, my), tr=Point(mx + frame_width, my + frame_height)
             )
             page = kwargs.get("page_number", 0)
             if page not in globals.card_frames:

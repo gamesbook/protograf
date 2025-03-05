@@ -2640,9 +2640,7 @@ class PolygonShape(BaseShape):
                 cnv.translate(x, y)
             cnv.rotate(rotation)
         # --- handle 'orientation' (flat vs pointy)
-        _geom = self.get_geometry(
-            rotation=rotation, is_rotated=is_rotated
-        )
+        _geom = self.get_geometry(rotation=rotation, is_rotated=is_rotated)
         x, y, radius, vertices = _geom.x, _geom.y, _geom.radius, _geom.vertices
         # ---- invalid polygon?
         if not vertices or len(vertices) == 0:

@@ -24,13 +24,14 @@ Point = namedtuple("Point", ["x", "y"])
 # a ray is a mathematical term that specifies a position and direction
 Ray = namedtuple("Ray", ["x", "y", "angle"])
 PolyGeometry = namedtuple(
-    "PolyGeometry", ["x", "y", "radius", "side", "half_flat", "vertices"])
+    "PolyGeometry", ["x", "y", "radius", "side", "half_flat", "vertices"]
+)
 
 
 @dataclass
-class BBox():
-    """A spatial bounding box - BL is SouthWest x,y point and TR is NorthEast x,y point
-    """
+class BBox:
+    """A spatial bounding box - BL is SouthWest x,y point and TR is NorthEast x,y point"""
+
     bl: Tuple[Point, Point]
     tr: Tuple[Point, Point]
 

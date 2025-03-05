@@ -436,7 +436,7 @@ def pdf_cards_to_png(
     dpi: int = 300,
     directory: str = None,
     card_frames: dict = None,
-    page_height: float = 0
+    page_height: float = 0,
 ):
     """Extract individual cards from PDF as PNG image(s).
 

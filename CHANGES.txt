@@ -5,10 +5,11 @@ protograf
 Changes
 =======
 
-2025-02-?? (0.1.6)
+2025-04-05 (0.1.6)
 ------------------
 - Enable card grouping
 - Add radii labels
+- Extract cards as images
 
 2025-02-14 (0.1.5)
 ------------------
