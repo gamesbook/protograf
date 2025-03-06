@@ -16,6 +16,23 @@ import imageio
 import pymupdf
 
 LookupType = namedtuple("LookupType", ["column", "lookups"])
+UnitPoints = namedtuple(
+    "UnitPoints",
+    [
+        "cm",
+        "mm",
+        "inch",
+        "pt",
+    ],
+)
+
+# ---- units
+unit = UnitPoints(
+    cm=28.3465,
+    mm=2.83465,
+    inch=72.0,
+    pt=1.0,
+)
 
 
 def feedback(item, stop=False, warn=False):

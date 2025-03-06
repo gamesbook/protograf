@@ -22,201 +22,17 @@ from urllib.parse import urlparse
 import jinja2
 from jinja2.environment import Template
 from svglib.svglib import svg2rlg
-from reportlab.pdfgen import canvas as reportlab_canvas
-from reportlab.pdfbase import pdfmetrics
-from reportlab.pdfbase.pdfmetrics import registerFontFamily
-from reportlab.pdfbase.ttfonts import TTFont, TTFError
-from reportlab.lib.units import cm, inch, mm
-from reportlab.lib.pagesizes import (
-    A8,
-    A7,
-    A6,
-    A5,
-    A4,
-    A3,
-    A2,
-    A1,
-    A0,
-    LETTER,
-    LEGAL,
-    ELEVENSEVENTEEN,
-    letter,
-    legal,
-    elevenSeventeen,
-    B6,
-    B5,
-    B4,
-    B3,
-    B2,
-    B0,
-    landscape,
-)
-from reportlab.lib.utils import ImageReader
-from reportlab.lib.styles import getSampleStyleSheet
-from reportlab.lib.enums import TA_LEFT, TA_RIGHT, TA_CENTER, TA_JUSTIFY
-from reportlab.lib.colors import (
-    Color,
-    aliceblue,
-    antiquewhite,
-    aqua,
-    aquamarine,
-    azure,
-    beige,
-    bisque,
-    black,
-    blanchedalmond,
-    blue,
-    blueviolet,
-    brown,
-    burlywood,
-    cadetblue,
-    chartreuse,
-    chocolate,
-    coral,
-    cornflowerblue,
-    cornsilk,
-    crimson,
-    cyan,
-    darkblue,
-    darkcyan,
-    darkgoldenrod,
-    darkgray,
-    darkgrey,
-    darkgreen,
-    darkkhaki,
-    darkmagenta,
-    darkolivegreen,
-    darkorange,
-    darkorchid,
-    darkred,
-    darksalmon,
-    darkseagreen,
-    darkslateblue,
-    darkslategray,
-    darkslategrey,
-    darkturquoise,
-    darkviolet,
-    deeppink,
-    deepskyblue,
-    dimgray,
-    dimgrey,
-    dodgerblue,
-    floralwhite,
-    forestgreen,
-    fuchsia,
-    gainsboro,
-    ghostwhite,
-    gold,
-    goldenrod,
-    gray,
-    grey,
-    green,
-    greenyellow,
-    honeydew,
-    hotpink,
-    indianred,
-    indigo,
-    ivory,
-    khaki,
-    lavender,
-    lavenderblush,
-    lawngreen,
-    lemonchiffon,
-    lightblue,
-    lightcoral,
-    lightcyan,
-    lightgoldenrodyellow,
-    lightgreen,
-    lightgrey,
-    lightpink,
-    lightsalmon,
-    lightseagreen,
-    lightskyblue,
-    lightslategray,
-    lightslategrey,
-    lightsteelblue,
-    lightyellow,
-    lime,
-    limegreen,
-    linen,
-    magenta,
-    maroon,
-    mediumaquamarine,
-    mediumblue,
-    mediumorchid,
-    mediumpurple,
-    mediumseagreen,
-    mediumslateblue,
-    mediumspringgreen,
-    mediumturquoise,
-    mediumvioletred,
-    midnightblue,
-    mintcream,
-    mistyrose,
-    moccasin,
-    navajowhite,
-    navy,
-    oldlace,
-    olive,
-    olivedrab,
-    orange,
-    orangered,
-    orchid,
-    palegoldenrod,
-    palegreen,
-    paleturquoise,
-    palevioletred,
-    papayawhip,
-    peachpuff,
-    peru,
-    pink,
-    plum,
-    powderblue,
-    purple,
-    red,
-    rosybrown,
-    royalblue,
-    saddlebrown,
-    salmon,
-    sandybrown,
-    seagreen,
-    seashell,
-    sienna,
-    silver,
-    skyblue,
-    slateblue,
-    slategray,
-    slategrey,
-    snow,
-    springgreen,
-    steelblue,
-    tan,
-    teal,
-    thistle,
-    tomato,
-    turquoise,
-    violet,
-    wheat,
-    white,
-    whitesmoke,
-    yellow,
-    yellowgreen,
-    fidblue,
-    fidred,
-    fidlightblue,
-    cornflower,
-    firebrick,
-)
 import requests
+import pymupdf
 
 # local
 from protograf.utils import geoms, tools
-from protograf.utils.support import LookupType
+from protograf.utils.support import LookupType, unit
 
 log = logging.getLogger(__name__)
 
 DEBUG = False
-DEBUG_COLOR = lightsteelblue
+DEBUG_COLOR = "#B0C4DE"
 CACHE_DIRECTORY = ".protograf"  # append to the user's home directory
 BGG_IMAGES = "cf.geekdo-images.com"
 BUILTIN_FONTS = ["Times-Roman", "Courier", "Helvetica"]
@@ -276,173 +92,170 @@ Bounds = namedtuple(
     ],
 )
 
-# ---- units
-UNITS = {"cm": cm, "inch": inch, "mm": mm, "points": "points"}
-# ---- colors (ReportLab; 18xx Games)
+
+# ---- colors (SVG named; 18xx Games)
 COLORS = {
-    "aliceblue": aliceblue,
-    "antiquewhite": antiquewhite,
-    "aqua": aqua,
-    "aquamarine": aquamarine,
-    "azure": azure,
-    "beige": beige,
-    "bisque": bisque,
-    "black": black,
-    "blanchedalmond": blanchedalmond,
-    "blue": blue,
-    "blueviolet": blueviolet,
-    "brown": brown,
-    "burlywood": burlywood,
-    "cadetblue": cadetblue,
-    "chartreuse": chartreuse,
-    "chocolate": chocolate,
-    "coral": coral,
-    "cornflower": cornflower,
-    "cornflowerblue": cornflowerblue,
-    "cornsilk": cornsilk,
-    "crimson": crimson,
-    "cyan": cyan,
-    "darkblue": darkblue,
-    "darkcyan": darkcyan,
-    "darkgoldenrod": darkgoldenrod,
-    "darkgray": darkgray,
-    "darkgreen": darkgreen,
-    "darkgrey": darkgrey,
-    "darkkhaki": darkkhaki,
-    "darkmagenta": darkmagenta,
-    "darkolivegreen": darkolivegreen,
-    "darkorange": darkorange,
-    "darkorchid": darkorchid,
-    "darkred": darkred,
-    "darksalmon": darksalmon,
-    "darkseagreen": darkseagreen,
-    "darkslateblue": darkslateblue,
-    "darkslategray": darkslategray,
-    "darkslategrey": darkslategrey,
-    "darkturquoise": darkturquoise,
-    "darkviolet": darkviolet,
-    "deeppink": deeppink,
-    "deepskyblue": deepskyblue,
-    "dimgray": dimgray,
-    "dimgrey": dimgrey,
-    "dodgerblue": dodgerblue,
-    "fidblue": fidblue,
-    "fidlightblue": fidlightblue,
-    "fidred": fidred,
-    "firebrick": firebrick,
-    "floralwhite": floralwhite,
-    "forestgreen": forestgreen,
-    "fuchsia": fuchsia,
-    "gainsboro": gainsboro,
-    "ghostwhite": ghostwhite,
-    "goldenrod": goldenrod,
-    "gold": gold,
-    "gray": gray,
-    "green": green,
-    "greenyellow": greenyellow,
-    "grey": grey,
-    "honeydew": honeydew,
-    "hotpink": hotpink,
-    "indianred": indianred,
-    "indigo": indigo,
-    "ivory": ivory,
-    "khaki": khaki,
-    "lavenderblush": lavenderblush,
-    "lavender": lavender,
-    "lawngreen": lawngreen,
-    "lemonchiffon": lemonchiffon,
-    "lightblue": lightblue,
-    "lightcoral": lightcoral,
-    "lightcyan": lightcyan,
-    "lightgoldenrodyellow": lightgoldenrodyellow,
-    "lightgreen": lightgreen,
-    "lightgrey": lightgrey,
-    "lightpink": lightpink,
-    "lightsalmon": lightsalmon,
-    "lightseagreen": lightseagreen,
-    "lightskyblue": lightskyblue,
-    "lightslategray": lightslategray,
-    "lightslategrey": lightslategrey,
-    "lightsteelblue": lightsteelblue,
-    "lightyellow": lightyellow,
-    "limegreen": limegreen,
-    "lime": lime,
-    "linen": linen,
-    "magenta": magenta,
-    "maroon": maroon,
-    "mediumaquamarine": mediumaquamarine,
-    "mediumblue": mediumblue,
-    "mediumorchid": mediumorchid,
-    "mediumpurple": mediumpurple,
-    "mediumseagreen": mediumseagreen,
-    "mediumslateblue": mediumslateblue,
-    "mediumspringgreen": mediumspringgreen,
-    "mediumturquoise": mediumturquoise,
-    "mediumvioletred": mediumvioletred,
-    "midnightblue": midnightblue,
-    "mintcream": mintcream,
-    "mistyrose": mistyrose,
-    "moccasin": moccasin,
-    "navajowhite": navajowhite,
-    "navy": navy,
-    "oldlace": oldlace,
-    "olivedrab": olivedrab,
-    "olive": olive,
-    "orange": orange,
-    "orangered": orangered,
-    "orchid": orchid,
-    "palegoldenrod": palegoldenrod,
-    "palegreen": palegreen,
-    "paleturquoise": paleturquoise,
-    "palevioletred": palevioletred,
-    "papayawhip": papayawhip,
-    "peachpuff": peachpuff,
-    "peru": peru,
-    "pink": pink,
-    "plum": plum,
-    "powderblue": powderblue,
-    "purple": purple,
-    "red": red,
-    "rosybrown": rosybrown,
-    "royalblue": royalblue,
-    "saddlebrown": saddlebrown,
-    "salmon": salmon,
-    "sandybrown": sandybrown,
-    "seagreen": seagreen,
-    "seashell": seashell,
-    "sienna": sienna,
-    "silver": silver,
-    "skyblue": skyblue,
-    "slateblue": slateblue,
-    "slategray": slategray,
-    "slategrey": slategrey,
-    "snow": snow,
-    "springgreen": springgreen,
-    "steelblue": steelblue,
-    "tan": tan,
-    "teal": teal,
-    "thistle": thistle,
-    "tomato": tomato,
-    "turquoise": turquoise,
-    "violet": violet,
-    "wheat": wheat,
-    "whitesmoke": whitesmoke,
-    "white": white,
-    "yellowgreen": yellowgreen,
-    "yellow": yellow,
+    'aliceblue': '#f0f8ff',
+    'antiquewhite': '#faebd7',
+    'aqua': '#00ffff',
+    'aquamarine': '#7fffd4',
+    'azure': '#f0ffff',
+    'beige': '#f5f5dc',
+    'bisque': '#ffe4c4',
+    'black': '#000000',
+    'blanchedalmond': '#ffebcd',
+    'blue': '#0000ff',
+    'blueviolet': '#8a2be2',
+    'brown': '#a52a2a',
+    'burlywood': '#deb887',
+    'cadetblue': '#5f9ea0',
+    'chartreuse': '#7fff00',
+    'chocolate': '#d2691e',
+    'coral': '#ff7f50',
+    'cornflowerblue': '#6495ed',
+    'cornsilk': '#fff8dc',
+    'crimson': '#dc143c',
+    'cyan': '#00ffff',
+    'darkblue': '#00008b',
+    'darkcyan': '#008b8b',
+    'darkgoldenrod': '#b8860b',
+    'darkgray': '#a9a9a9',
+    'darkgreen': '#006400',
+    'darkgrey': '#a9a9a9',
+    'darkkhaki': '#bdb76b',
+    'darkmagenta': '#8b008b',
+    'darkolivegreen': '#556b2f',
+    'darkorange': '#ff8c00',
+    'darkorchid': '#9932cc',
+    'darkred': '#8b0000',
+    'darksalmon': '#e9967a',
+    'darkseagreen': '#8fbc8f',
+    'darkslateblue': '#483d8b',
+    'darkslategray': '#2f4f4f',
+    'darkslategrey': '#2f4f4f',
+    'darkturquoise': '#00ced1',
+    'darkviolet': '#9400d3',
+    'deeppink': '#ff1493',
+    'deepskyblue': '#00bfff',
+    'dimgray': '#696969',
+    'dimgrey': '#696969',
+    'dodgerblue': '#1e90ff',
+    'firebrick': '#b22222',
+    'floralwhite': '#fffaf0',
+    'forestgreen': '#228b22',
+    'fuchsia': '#ff00ff',
+    'gainsboro': '#dcdcdc',
+    'ghostwhite': '#f8f8ff',
+    'gold': '#ffd700',
+    'goldenrod': '#daa520',
+    'gray': '#808080',
+    'green': '#008000',
+    'greenyellow': '#adff2f',
+    'grey': '#808080',
+    'honeydew': '#f0fff0',
+    'hotpink': '#ff69b4',
+    'indianred': '#cd5c5c',
+    'indigo': '#4b0082',
+    'ivory': '#fffff0',
+    'khaki': '#f0e68c',
+    'lavender': '#e6e6fa',
+    'lavenderblush': '#fff0f5',
+    'lawngreen': '#7cfc00',
+    'lemonchiffon': '#fffacd',
+    'lightblue': '#add8e6',
+    'lightcoral': '#f08080',
+    'lightcyan': '#e0ffff',
+    'lightgoldenrodyellow': '#fafad2',
+    'lightgray': '#d3d3d3',
+    'lightgreen': '#90ee90',
+    'lightgrey': '#d3d3d3',
+    'lightpink': '#ffb6c1',
+    'lightsalmon': '#ffa07a',
+    'lightseagreen': '#20b2aa',
+    'lightskyblue': '#87cefa',
+    'lightslategray': '#778899',
+    'lightslategrey': '#778899',
+    'lightsteelblue': '#b0c4de',
+    'lightyellow': '#ffffe0',
+    'lime': '#00ff00',
+    'limegreen': '#32cd32',
+    'linen': '#faf0e6',
+    'magenta': '#ff00ff',
+    'maroon': '#800000',
+    'mediumaquamarine': '#66cdaa',
+    'mediumblue': '#0000cd',
+    'mediumorchid': '#ba55d3',
+    'mediumpurple': '#9370db',
+    'mediumseagreen': '#3cb371',
+    'mediumslateblue': '#7b68ee',
+    'mediumspringgreen': '#00fa9a',
+    'mediumturquoise': '#48d1cc',
+    'mediumvioletred': '#c71585',
+    'midnightblue': '#191970',
+    'mintcream': '#f5fffa',
+    'mistyrose': '#ffe4e1',
+    'moccasin': '#ffe4b5',
+    'navajowhite': '#ffdead',
+    'navy': '#000080',
+    'oldlace': '#fdf5e6',
+    'olive': '#808000',
+    'olivedrab': '#6b8e23',
+    'orange': '#ffa500',
+    'orangered': '#ff4500',
+    'orchid': '#da70d6',
+    'palegoldenrod': '#eee8aa',
+    'palegreen': '#98fb98',
+    'paleturquoise': '#afeeee',
+    'palevioletred': '#db7093',
+    'papayawhip': '#ffefd5',
+    'peachpuff': '#ffdab9',
+    'peru': '#cd853f',
+    'pink': '#ffc0cb',
+    'plum': '#dda0dd',
+    'powderblue': '#b0e0e6',
+    'purple': '#800080',
+    'red': '#ff0000',
+    'rosybrown': '#bc8f8f',
+    'royalblue': '#4169e1',
+    'saddlebrown': '#8b4513',
+    'salmon': '#fa8072',
+    'sandybrown': '#f4a460',
+    'seagreen': '#2e8b57',
+    'seashell': '#fff5ee',
+    'sienna': '#a0522d',
+    'silver': '#c0c0c0',
+    'skyblue': '#87ceeb',
+    'slateblue': '#6a5acd',
+    'slategray': '#708090',
+    'slategrey': '#708090',
+    'snow': '#fffafa',
+    'springgreen': '#00ff7f',
+    'steelblue': '#4682b4',
+    'tan': '#d2b48c',
+    'teal': '#008080',
+    'thistle': '#d8bfd8',
+    'tomato': '#ff6347',
+    'turquoise': '#40e0d0',
+    'violet': '#ee82ee',
+    'wheat': '#f5deb3',
+    'white': '#ffffff',
+    'whitesmoke': '#f5f5f5',
+    'yellow': '#ffff00',
+    'yellowgreen': '#9acd32',
     # 18xx colors from https://github.com/XeryusTC/map18xx/blob/master/src/tile.rs
-    "GROUND_18XX": "#FDD9B5",  # Sandy Tan
-    "YELLOW_18XX": "#FDEE00",  # Aureolin
-    "GREEN_18XX": "#00A550",  # Pigment Green
-    "RUSSET_18XX": "#CD7F32",  # Bronze
-    "GREY_18XX": "#ACACAC",  # Silver Chalice
-    "BROWN_18XX": "#7B3F00",  # Chocolate
-    "RED_18XX": "#DC143C",  # Crimson
-    "BLUE_18XX": "#007FFF",  # Azure
-    "BARRIER_18XX": "#660000",  # Blood Red
-    "WHITE_18XX": "#FFFFFF",  # White
+    "18xx_ground": "#fdd9b5",  # sandy tan
+    "18xx_yellow": "#fdee00",  # aureolin
+    "18xx_green": "#00a550",  # pigment green
+    "18xx_russet": "#cd7f32",  # bronze
+    "18xx_grey": "#acacac",  # silver chalice
+    "18xx_brown": "#7b3f00",  # chocolate
+    "18xx_red": "#dc143c",  # crimson
+    "18xx_blue": "#007fff",  # azure
+    "18xx_barrier": "#660000",  # blood red
+    "18xx_white": "#ffffff",  # white
 }
 # ---- paper formats
+'''
 PAGES = {
     "LETTER": LETTER,
     "landscape": landscape,
@@ -466,17 +279,19 @@ PAGES = {
     "ELEVENSEVENTEEN": ELEVENSEVENTEEN,
     "tabloid": elevenSeventeen,
 }
+'''
 WIDTH = 0.1
 
 CLOCK_ANGLES = [60, 90, 120, 150, 180, 210, 240, 270, 300, 330, 0, 30]
 
 
 class BaseCanvas:
-    """Wrapper/extended class for a ReportLab canvas."""
+    """Wrapper/extended class for a PyMuPDF page."""
 
     def __init__(self, filename=None, paper=None, defaults=None, **kwargs):
         self.jsonfile = kwargs.get("defaults", None)
         self.defaults = {}
+        self.doc = None
         # ---- setup defaults
         if self.jsonfile:
             try:
@@ -500,13 +315,11 @@ class BaseCanvas:
             for kwarg in _kwargs:
                 self.defaults[kwarg] = _kwargs[kwarg]
             # print(f" *** {self.defaults=}")
-        # ---- paper, pagesize & canvas
-        _paper = paper or self.defaults.get("paper", A4)
-        # **NOTE** ReportLab uses 'pagesize' to track the page dimensions;
-        #          the named paper formats, e.g. A4, are just tuples storing
-        #          (width, height) values using points units, so A4 is :
-        #          (595.2755905511812, 841.8897637795277)
-        self.canvas = reportlab_canvas.Canvas(filename=filename, pagesize=_paper)
+        # ---- paper & canvas
+        _paper = paper or self.defaults.get("paper", "A4")
+        self.doc = pymupdf.open()
+        pw, ph = pymupdf.paper_size(_paper)  # tuple: (width, height) in points units
+        self.canvas = self.doc.new_page(width=pw, height=ph)  # filename used in save()
         # ---- constants
         self.default_length = 1
         self.show_id = False
@@ -519,7 +332,7 @@ class BaseCanvas:
         self._object = None
         self.kwargs = kwargs
         self.run_debug = False
-        self.units = self.get_units(self.defaults.get("units"), cm)
+        self.units = self.defaults.get("units", unit.cm)  # defaults must store point-equivalent
         # print(f" *** {self.units=} \n {self.defaults=}")
         # ---- paper & margins
         self.paper = _paper
@@ -563,14 +376,14 @@ class BaseCanvas:
         self.facing = self.defaults.get("facing", "out")  # out/in
         # ---- color and transparency
         fill = self.defaults.get("fill", self.defaults.get("fill_color"))
-        self.fill = self.get_color(fill, white)
+        self.fill = self.get_color(fill, "white")
         self.transparency = self.defaults.get("transparency", None)
         self.debug_color = self.get_color(self.defaults.get("debug_color"), DEBUG_COLOR)
         self.fill_stroke = self.defaults.get("fill_stroke", None)
         self.stroke_fill = self.defaults.get("stroke_fill", None)  # alias
         # ---- stroke
         stroke = self.defaults.get("stroke", self.defaults.get("stroke_color"))
-        self.stroke = self.get_color(stroke, black)
+        self.stroke = self.get_color(stroke, "black")
         self.stroke_width = self.defaults.get("stroke_width", WIDTH)
         self.outline = self.defaults.get("outline", None)
         # ---- overwrite fill & stroke
@@ -588,13 +401,13 @@ class BaseCanvas:
         self.font_size = self.defaults.get("font_size", 12)
         self.font_style = self.defaults.get("font_style", None)
         self.font_directory = self.defaults.get("font_directory", None)
-        self.style = self.defaults.get("style", None)  # Normal? from reportlab
+        self.style = self.defaults.get("style", None)
         self.wrap = self.defaults.get("wrap", False)
         self.align = self.defaults.get("align", "centre")  # centre,left,right,justify
-        self._alignment = TA_LEFT  # see to_alignment()
+        self._alignment = pymupdf.TEXT_ALIGN_LEFT  # see to_alignment()
         # ---- grid cut marks
         self.grid_marks = self.defaults.get("grid_marks", 0)
-        self.grid_stroke = self.get_color(self.defaults.get("grid_stroke"), grey)
+        self.grid_stroke = self.get_color(self.defaults.get("grid_stroke"), "grey")
         self.grid_stroke_width = self.defaults.get(
             "grid_stroke_width", self.stroke_width
         )
@@ -789,14 +602,14 @@ class BaseCanvas:
         self.dot_stroke_width = self.defaults.get("dot_stroke_width", self.stroke_width)
         self.dot_fill = self.defaults.get("dot_fill", self.dot_stroke)  # colors match
         self.cross = self.defaults.get("cross", 0)
-        self.cross_stroke = self.get_color(self.defaults.get("cross_stroke"), black)
+        self.cross_stroke = self.get_color(self.defaults.get("cross_stroke"), "black")
         self.cross_stroke_width = self.defaults.get(
             "cross_stroke_width", self.stroke_width
         )
         # ---- hexagon / polygon
         self.orientation = self.defaults.get("orientation", "flat")  # flat|pointy
         self.perbis = self.defaults.get("perbis", None)  # directions
-        self.perbis_stroke = self.defaults.get("perbis_stroke", black)
+        self.perbis_stroke = self.defaults.get("perbis_stroke", "black")
         self.perbis_stroke_width = self.defaults.get(
             "perbis_stroke_width", self.stroke_width
         )
@@ -833,7 +646,7 @@ class BaseCanvas:
         self.coord_font_size = self.defaults.get(
             "coord_font_size", int(self.font_size * 0.5)
         )
-        self.coord_stroke = self.get_color(self.defaults.get("coord_stroke"), black)
+        self.coord_stroke = self.get_color(self.defaults.get("coord_stroke"), "black")
         self.coord_padding = self.defaults.get("coord_padding", 2)
         self.coord_separator = self.defaults.get("coord_separator", "")
         self.coord_prefix = self.defaults.get("coord_prefix", "")
@@ -842,7 +655,7 @@ class BaseCanvas:
         self.hidden = self.defaults.get("hidden", [])
         # ---- starfield
         self.enclosure = None
-        self.colors = [white]
+        self.colors = ["white"]
         self.sizes = [self.defaults.get("stroke_width", WIDTH)]
         self.density = self.defaults.get("density", 10)
         self.star_pattern = "random"
@@ -868,10 +681,10 @@ class BaseCanvas:
         self.deck_data = []
 
     def get_canvas(self):
-        """Return reportlab canvas object"""
+        """Return canvas (page) object"""
         return self.canvas
 
-    def get_color(self, name=None, default=black):
+    def get_color(self, name=None, default="black"):
         """Get a color by name from a pre-defined dictionary."""
         if name:
             if isinstance(name, Color):
@@ -879,19 +692,9 @@ class BaseCanvas:
             return COLORS.get(name, default)
         return default
 
-    def get_units(self, name=None, default=cm):
-        """Get units by name from a pre-defined dictionary."""
-        if name and isinstance(name, str):
-            return UNITS.get(name, default)
-        if name and isinstance(name, float):
-            return name
-        return default
-
-    def get_page(self, name=None, default=A4):
+    def get_page(self, name="A4"):
         """Get a paper format by name from a pre-defined dictionary."""
-        if name:
-            return PAGES.get(name, default)
-        return default
+        return pymupdf.paper_size(name)
 
 
 class BaseShape:
@@ -910,7 +713,6 @@ class BaseShape:
         # log.debug("Base types %s %s %s",type(self.canvas), type(canvas), type(cnv))
         self._object = _object  # placeholder for an incoming Shape object
         self.shape_id = None
-        self.stylesheet = getSampleStyleSheet()
         self.sequence = kwargs.get("sequence", [])  # e.g. card numbers
         self.dataset = []  # list of dict data (loaded from file)
         self.members = []  # card IDs, of which current card is a member
@@ -997,10 +799,10 @@ class BaseShape:
         self.font_size = self.kw_float(kwargs.get("font_size", cnv.font_size))
         self.font_style = kwargs.get("font_style", cnv.font_style)
         self.font_directory = kwargs.get("font_directory", cnv.font_directory)
-        self.style = kwargs.get("style", cnv.style)  # Normal? from reportlab
+        self.style = kwargs.get("style", cnv.style)
         self.wrap = kwargs.get("wrap", cnv.wrap)
         self.align = kwargs.get("align", cnv.align)  # centre,left,right,justify
-        self._alignment = TA_LEFT  # see to_alignment()
+        self._alignment = pymupdf.TEXT_ALIGN_LEFT  # see to_alignment()
         # ---- text: base
         self.text = kwargs.get("text", cnv.text)
         self.text_size = self.kw_float(kwargs.get("text_size", cnv.text_size))
@@ -1404,7 +1206,7 @@ class BaseShape:
         dashed=None,
         debug=False,
     ):
-        """Set Reportlab canvas properties for fill, font, line and colors"""
+        """Set canvas (page) properties for fill, font, line and colors"""
 
         def ext(prop):
             if isinstance(prop, str):
@@ -1427,7 +1229,7 @@ class BaseShape:
                     style=self.font_style,
                     directory=self.font_directory,
                 )
-            except (KeyError, ValueError, TTFError):
+            except (KeyError, ValueError):
                 _style = f' with style "{self.font_style}"' if self.font_style else ""
                 _dir = f' in "{self.font_directory}"' if self.font_directory else ""
                 tools.feedback(
@@ -1437,7 +1239,7 @@ class BaseShape:
                 )
         try:
             if fill in [None, []] and self.fill in [None, []]:
-                canvas.setFillColor(white, 0)  # full transparency
+                canvas.setFillColor("white", 0)  # full transparency
                 if debug:
                     tools.feedback("~~~ NO fill color set!")
             else:
@@ -1475,7 +1277,7 @@ class BaseShape:
 
         try:
             if stroke in [None, []] and self.stroke in [None, []]:
-                canvas.setStrokeColor(black, 0)  # full transparency
+                canvas.setStrokeColor("black", 0)  # full transparency
                 if debug:
                     tools.feedback("~~~ NO stroke color set!")
             else:
@@ -1745,15 +1547,18 @@ class BaseShape:
         return correct, issue
 
     def to_alignment(self) -> Enum:
-        """Convert local, English-friendly alignments to a Reportlab Enum."""
-        if self.align == "centre" or self.align == "center":
-            self._alignment = TA_CENTER
-        elif self.align == "right":
-            self._alignment = TA_RIGHT
-        elif self.align == "justify":
-            self._alignment = TA_JUSTIFY
-        else:
-            self._alignment = TA_LEFT
+        """Convert local, English-friendly alignments to a PyMuPDF Enum."""
+        match self.align:
+            case "centre" | "center":
+                self._alignment = pymupdf.TEXT_ALIGN_CENTER
+            case "right":
+                self._alignment = pymupdf.TEXT_ALIGN_RIGHT
+            case "justify":
+                # TEXT_ALIGN_JUSTIFY only achievable with “simple” (singlebyte) fonts
+                # this includes the PDF Base 14 Fonts.
+                self._alignment = pymupdf.TEXT_ALIGN_JUSTIFY
+            case _:
+                self._alignment = pymupdf.TEXT_ALIGN_LEFT
         return self._alignment
 
     def is_kwarg(self, value) -> bool:
@@ -1800,7 +1605,7 @@ class BaseShape:
                 * boolean (True if flie is a directory)
 
         Notes:
-            * https://www.blog.pythonlibrary.org/2018/04/12/adding-svg-files-in-reportlab/
+
         """
 
         def slice_image(
@@ -2024,14 +1829,17 @@ class BaseShape:
     def points_to_value(self, value: float) -> float:
         """Convert a point value to a units-based value."""
         try:
-            if self.units == cm:
-                return float(value) / cm
-            if self.units == mm:
-                return float(value) / mm
-            elif self.units == inch:
-                return float(value) / inch
-            else:
-                return float(value)
+            match self.units:
+                case "cm" | "centimetres":
+                    return float(value) * unit.cm
+                case "mm" | "millimetres":
+                    return float(value) * unit.mm
+                case "inch" | "in" | "inches":
+                    return float(value) * unit.inch
+                case "points" | "pts":
+                    return float(value) * unit.pt
+                case _:
+                    return float(value)
         except Exception as err:
             log.exception(err)
             tools.feedback(f'Unable to convert "{value}" to {self.units}!', True)
@@ -2039,14 +1847,17 @@ class BaseShape:
     def values_to_points(self, items: list) -> list:
         """Convert a list of values to point units."""
         try:
-            if self.units == cm:
-                return [float(item) * cm for item in items]
-            elif self.units == mm:
-                return [float(item) * mm for item in items]
-            elif self.units == inch:
-                return [float(item) * inch for item in items]
-            else:
-                tools.feedback(f'Unable to convert "{self.units}" to points!', True)
+            match self.units:
+                case "cm" | "centimetres":
+                    return [float(item) * unit.cm for item in items]
+                case "mm" | "millimetres":
+                    return [float(item) * unit.mm for item in items]
+                case "inch" | "in" | "inches":
+                    return [float(item) * unit.inch for item in items]
+                case "points" | "pts":
+                    return [float(item) * unit.pt for item in items]
+                case _:
+                    tools.feedback(f'Unable to convert "{self.units}" to points!', True)
         except Exception as err:
             log.exception(err)
             tools.feedback(f'Unable to convert "{items}" to points!', True)
@@ -2057,7 +1868,7 @@ class BaseShape:
         """Low-level text drawing, split string (\n) if needed, with align and rotation.
 
         Args:
-            * canvas (reportlab.pdfgen.canvas.Canvas): usually the calling
+            * canvas (pymupdf page): usually the calling
               function should access cnv.canvas i.e. an attribute of BaseCanvas
             * x (float) and y (float): must be in native units (i.e. points)!
             * string (str): the text to draw/write
@@ -2358,7 +2169,7 @@ class BaseShape:
         bdirections, bwidth, bcolor, bstyle, dotted, dashed = (
             None,
             None,
-            black,
+            "black",
             None,
             False,
             None,
