@@ -850,7 +850,8 @@ class BaseShape:
         )
         self.leading = self.kw_float(kwargs.get("leading", self.font_size))
         self.transform = kwargs.get("transform", cnv.transform)
-        # tools.feedback(f"+++ BShp:{self} init {kwargs.get('fill')=} {self.fill=} {kwargs.get('fill_color')=}")
+        # tools.feedback(
+        # f"BShp:{self} {kwargs.get('fill')=} {self.fill=} {kwargs.get('fill_color')=}")
         # ---- image / file
         self.source = kwargs.get("source", cnv.source)  # file or http://
         self.sliced = ""
@@ -1809,9 +1810,11 @@ class BaseShape:
             return the_shape
 
     def get_font_height(self) -> float:
-        face = pdfmetrics.getFont(self.font_name).face
-        height = (face.ascent - face.descent) / 1000 * self.font_size
-        return height
+        # see Span Dictionary for ascender and descender of the font (float).
+        # face = pdfmetrics.getFont(self.font_name).face
+        # height = (face.ascent - face.descent) / 1000 * self.font_size
+        # return height
+        return float(self.font_size)
 
     def textify(self, index: int = None, text: str = "") -> str:
         """Extract text from a list, or create string, based on index & type."""
@@ -1868,9 +1871,9 @@ class BaseShape:
         """Low-level text drawing, split string (\n) if needed, with align and rotation.
 
         Args:
-            * canvas (pymupdf page): usually the calling
+            * canvas (pymupdf.Page): usually the calling
               function should access cnv.canvas i.e. an attribute of BaseCanvas
-            * x (float) and y (float): must be in native units (i.e. points)!
+            * xm (float) and ym (float): must be in native units (i.e. points)!
             * string (str): the text to draw/write
             * align (str): one of [centre|right|left|None] alignment of text
             * rotation (float): an angle in degrees; anti-clockwise from East
@@ -1891,10 +1894,36 @@ class BaseShape:
         align = align or self.align
         mvy = copy.copy(ym)
         # tools.feedback(f"*** {string=} {rotation=}")
+        # ---- text properties
+        keys = {}
+        keys['fontsize'] = kwargs.get('font_size', self.font_size)
+        keys['fontname'] = kwargs.get('font_name', self.font_name)
+        # keys['fontfile'] = self.font_file
+        keys['color'] = kwargs.get('stroke', self.stroke)
+        keys['fill'] = kwargs.get('fill', self.fill)
+        keys['align'] = align or self.align
+        keys['rotate'] = rotation or 0
+        # keys['stroke_opacity'] = self.show_stroke or 1
+        # keys['fill_opacity'] = self.show_fill or 1
+
+        # potential other properties
+        # keys['idx'] = 0
+        # keys['render_mode'] = 0
+        # keys['miter_limit'] = 1
+        # keys['border_width'] = 1
+        # keys['encoding'] = pymupdf.TEXT_ENCODING_LATIN
+        # keys['morph'] = None
+        # keys['oc'] = 0
+        # keys['overlay'] = True
+
+        # ---- drawString
+        point = pymupdf.Point(xm, ym)
+        canvas.insert_text(point, string, **keys)
+
+        """
         if kwargs.get("font_size"):
             fsize = float(kwargs.get("font_size"))
             canvas.setFont(self.font_name, fsize)
-        # ---- drawString
         for ln in string.split("\n"):
             if rotation:
                 canvas.saveState()
@@ -1915,6 +1944,7 @@ class BaseShape:
                 else:
                     canvas.drawString(xm, mvy, ln)
             mvy -= canvas._leading
+        """
 
     def draw_string(self, canvas, xs, ys, string, align=None, rotation=0, **kwargs):
         """Draw a multi-string on the canvas."""
@@ -1942,8 +1972,9 @@ class BaseShape:
             y_off = y_offset or self.title_size / 2.0
             y = yh + self.unit(self.heading_my)
             x = xh + self.unit(self.heading_mx)
-            canvas.setFont(self.font_name, self.heading_size)
-            canvas.setFillColor(self.heading_stroke)
+            kwargs['font_name'] = self.font_name
+            kwargs['stroke'] = self.heading_stroke
+            kwargs['font_size'] = self.heading_size
             self.draw_multi_string(
                 canvas, x, y + y_off, _ttext, align=align, rotation=_rotation, **kwargs
             )
@@ -1962,8 +1993,9 @@ class BaseShape:
             yl = yl - (self.label_size / 3.0) if centred else yl
             y = yl + self.unit(self.label_my)
             x = xl + self.unit(self.label_mx)
-            canvas.setFont(self.font_name, self.label_size)
-            canvas.setFillColor(self.label_stroke)
+            kwargs['font_name'] = self.font_name
+            kwargs['stroke'] = self.label_stroke
+            kwargs['font_size'] = self.label_size
             self.draw_multi_string(
                 canvas, x, y, _ttext, align=align, rotation=_rotation, **kwargs
             )
@@ -1982,8 +2014,9 @@ class BaseShape:
             y_off = y_offset or self.title_size
             y = yt + self.unit(self.title_my)
             x = xt + self.unit(self.title_mx)
-            canvas.setFont(self.font_name, self.title_size)
-            canvas.setFillColor(self.title_stroke)
+            kwargs['font_name'] = self.font_name
+            kwargs['stroke'] = self.title_stroke
+            kwargs['font_size'] = self.title_size
             self.draw_multi_string(
                 canvas, x, y - y_off, _ttext, align=align, rotation=_rotation, **kwargs
             )
@@ -2004,8 +2037,9 @@ class BaseShape:
             yl = yl - (self.radii_labels_size / 3.0) if centred else yl
             y = yl  # + self.unit(self.label_my)
             x = xl  # + self.unit(self.label_mx)
-            canvas.setFont(self.radii_labels_face, self.radii_labels_size)
-            canvas.setFillColor(self.radii_labels_stroke)
+            kwargs['font_name'] = self.radii_labels_face
+            kwargs['stroke'] = self.radii_labels_stroke
+            kwargs['font_size'] = self.radii_labels_size
             self.draw_multi_string(
                 canvas, x, y, _ttext, align=align, rotation=_rotation, **kwargs
             )

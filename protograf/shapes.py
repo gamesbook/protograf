@@ -13,6 +13,8 @@ import random
 from urllib.parse import urlparse
 
 # third party
+import pymupdf
+'''
 from reportlab.platypus import Paragraph
 from reportlab.lib.colors import red, green, black
 from reportlab.lib.styles import ParagraphStyle
@@ -41,6 +43,7 @@ from reportlab.lib.pagesizes import (
     landscape,
 )
 from reportlab.lib.utils import ImageReader
+'''
 import segno  # QRCode
 
 # local
@@ -735,7 +738,7 @@ class CircleShape(BaseShape):
                                 center, self._u.radius + offset, angle
                             )
                             petals_vertices.append(last_pt)
-                            self._debug(cnv, point=last_pt, label="start", color=red)
+                            self._debug(cnv, point=last_pt, label="start", color="red")
                         else:
                             # 3 points for create arc/bezier 'bounding box':
                             # the curveTo method starts painting a Bezier curve
@@ -746,7 +749,7 @@ class CircleShape(BaseShape):
                                 center, self._u.radius + offset, angle
                             )
                             self._debug(
-                                cnv, point=next_pt, label=f"next:{index}", color=green
+                                cnv, point=next_pt, label=f"next:{index}", color="green"
                             )
                             chord = abs(geoms.length_of_line(last_pt, next_pt))
                             box_height = chord / 2.0 * 4.0 / 3.0
@@ -761,7 +764,7 @@ class CircleShape(BaseShape):
                             petals_vertices.append((pt0, pt1, next_pt))
                             last_pt = next_pt
                             self._debug(
-                                cnv, point=next_pt, label=f"last:{index}", color=red
+                                cnv, point=next_pt, label=f"last:{index}", color="red"
                             )
                             # print(f'  {pt0=} {pt1=} {next_pt=} ')
             # ---- draw and fill
@@ -4259,43 +4262,37 @@ class TextShape(BaseShape):
                 self.transform = None
         # ---- text style
         if self.wrap:
-            _style = ParagraphStyle(name="sc")
-            _style.textColor = self.stroke
-            _style.backColor = self.fill
-            _style.borderColor = self.outline_stroke
-            _style.borderWidth = self.outline_width
-            _style.alignment = self.to_alignment()
-            _style.fontSize = self.font_size
-            _style.fontName = self.font_name
-            _style.leading = self.leading
-            _style.textTransform = self.transform
-            """
+            keys = {}
+            keys['fontsize'] =  self.font_size
+            keys['fontname'] = self.font_name
+            # keys['fontfile'] = self.font_file
+            keys['color'] = self.stroke
+            keys['fill'] = self.fill
+            keys['align'] = self.to_alignment()
+            keys['rotate'] = self.rotate
+            # keys['stroke_opacity'] = self.show_stroke
+            # keys['fill_opacity'] = self.show_fill
+
             # potential other properties
-            leftIndent=0,
-            rightIndent=0,
-            firstLineIndent=0,
-            spaceBefore=0,
-            spaceAfter=0,
-            bulletFontName='Times-Roman',
-            bulletFontSize=10,
-            bulletIndent=0,
-            borderPadding= 0,
-            borderRadius= None,
-            allowWidows= 1,
-            allowOrphans= 0,
-            endDots=None,
-            splitLongWords=1,
-            """
-            # tools.feedback(f'*** Text LONG-{ID} => _text:{_text}')
+            # keys['idx'] = 0
+            # keys['render_mode'] = 0
+            # keys['miter_limit'] = 1
+            # keys['border_width'] = 1
+            # keys['encoding'] = pymupdf.TEXT_ENCODING_LATIN
+            # keys['morph'] = None
+            # keys['oc'] = 0
+            # keys['overlay'] = True
+            # keys['expandtabs'] = 8
+            # keys['charwidths'] = None
+
+            # rect text only
+            # expandtabs=8, align=TEXT_ALIGN_LEFT, charwidths=None,
             try:
-                para = Paragraph(_text, style=_style)
+                rect = pymupdf.Rect(x_t, y_t, x_t + width, y_t + height)
+                # tools.feedback(f'*** Text LONG-{ID} => {rec} _text:{_text}')
+                cnv.insert_textbox(rect, _text, **keys)
             except ValueError as err:
-                if "name=sc" in str(err):
-                    parts = str(err).split("name=sc")
-                    _err = parts[1]
-                else:
-                    _err = err
-                tools.feedback(f"Cannot create Text - {_err}", True)
+                tools.feedback(f"Cannot create Text - {err}", True)
             except IOError as err:
                 _err = str(err)
                 cause, thefile = "", ""
@@ -4307,8 +4304,6 @@ class TextShape(BaseShape):
                     thefile = f" - unable to open or find {thefile}"
                 msg = f"Cannot create Text{thefile}{cause}"
                 tools.feedback(msg, True, True)
-            w, h = para.wrap(width, height)
-            para.drawOn(cnv, x_t, y_t - h)  # start text from top of 'box'
         else:
             # tools.feedback(f"*** {x_t=} {y_t=} {_text=} {sequence=} {rotation=}")
             cnv.setFillColor(self.stroke)
