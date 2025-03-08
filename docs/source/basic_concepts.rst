@@ -173,9 +173,9 @@ For example, settings can include:
 
 - the *height* |dash| size in the vertical direction and *width* |dash| the
   size in the horizontal direction, of a rectangle;
-- the *stroke width* and *stroke color* of the line used to draw a rectangle;
+- the *width* and *stroke*, i.e. color, of the line used to draw a rectangle;
 - the *radius* or *diameter* of a circle;
-- the  *color*, *paper* size, and so on for a document.
+- the  *color*, *paper* size, and so on for the document.
 
 All of these kinds of settings are termed **properties**.
 

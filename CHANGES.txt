@@ -7,7 +7,7 @@ Changes
 
 2025-03-?? (0.1.7)
 ------------------
-- Drop use of ReportLab and switch to pymupdf
+- Drop use of ReportLab and switch to PyMuPDF
 
 2025-03-05 (0.1.6)
 ------------------

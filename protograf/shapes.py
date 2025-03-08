@@ -2316,12 +2316,12 @@ class LineShape(BaseShape):
             x_1 = x_1 + self.col * self._u.width  # - self._u.margin_left
         # tools.feedback(f"{x=} {x_1=} {y=} {y_1=}")
         # ---- set canvas
-        self.set_canvas_props(index=ID)
         # ---- draw line
-        pth = cnv.beginPath()
-        pth.moveTo(x, y)
-        pth.lineTo(x_1, y_1)
-        cnv.drawPath(pth, stroke=1 if self.stroke else 0, fill=1 if self.fill else 0)
+        shape = cnv.new_shape()
+        shape.draw_line(Point(x, y), Point(x_1, y_1))
+        self.set_canvas_props(shape, index=ID)  # shape.finish()
+        shape.commit()
+        # cnv.drawPath(pth, stroke=1 if self.stroke else 0, fill=1 if self.fill else 0)
         # ---- calculate line rotation
         compass, rotation = geoms.angles_from_points(x, y, x_1, y_1)
         # ---- dot

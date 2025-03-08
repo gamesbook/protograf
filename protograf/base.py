@@ -1222,9 +1222,11 @@ class BaseShape:
 
     def set_canvas_props(
         self,
+        shape,
         cnv=None,
         index=None,  # extract from list of potential values (usually Card options)
         fill=None,  # reserve None for 'no fill at all'
+        transparency=None,
         stroke=None,
         stroke_width=None,
         stroke_cap=None,
@@ -1232,8 +1234,38 @@ class BaseShape:
         dashed=None,
         debug=False,
     ):
-        """Set canvas (page) properties for fill, font, line and colors"""
+        """Set Shape properties for fill, font, line and colors"""
+        tools.feedback('set_canvas_props() is deprecated', False)
 
+        # finish(
+        # width=1, color=(0,), fill=None, lineCap=0, lineJoin=0, dashes=None,
+        # closePath=True, even_odd=False, morph=(fixpoint, matrix),
+        # stroke_opacity=1, fill_opacity=1, oc=0
+
+        # ---- set line dots / dashed
+        _dotted = ext(dotted) or ext(self.dotted)
+        _dashed = ext(dashed) or ext(self.dashed)
+        if _dotted:
+            the_stwd = ext(stroke_width) or ext(self.stroke_width)
+            # _dots = self.values_to_points([0.03, 0.03])
+            dashes = [the_stwd, the_stwd]
+        elif _dashed:
+            dashes = self.values_to_points(_dashed)
+        else:
+            dashes = None
+
+        shape.finish(
+            width=stroke_width or self.stroke_width,
+            color=stroke or self.stroke,
+            fill=fill or self.fill,
+            lineCap=stroke_cap or self.stroke_cap,
+            lineJoin=0,
+            dashes=dashes,
+            fill_opacity=transparency or self.transparency,
+        )
+
+        return None
+        '''
         def ext(prop):
             if isinstance(prop, str):
                 return prop
@@ -1346,6 +1378,7 @@ class BaseShape:
             canvas.setDash(array=dash_points)
         else:
             canvas.setDash(array=[])
+        '''
 
     def draw(self, cnv=None, off_x=0, off_y=0, ID=None, **kwargs):
         """Draw an element on a given canvas."""

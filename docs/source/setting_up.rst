@@ -48,13 +48,14 @@ Python in 1 minute
 Why do you need Python before starting?
 
 When you work with Python, you do not create executable files, such as the
-typical `.exe` ones you find on Windows (or ``.app`` on macOS). Instead, Python
-itself is loaded and then it "runs" your Python file/script on your behalf.
-So, running any Python scripts requires that you first install Python itself.
+typical ``.exe`` ones you find on Windows (or ``.app`` on macOS). Instead,
+Python itself is loaded and then it "runs" your Python file/script on your
+behalf. So, running any Python scripts requires that you first install
+Python itself.
 
 Python is composed of many built-in libaries, or *packages*, each of which
 handles some aspect of a program. Python also is designed to be extended by
-adding-on additional packages written by other programmers; *ReportLab*, for
+adding-on additional packages written by other programmers; *PyMuPDF*, for
 example, is one of those, as is **protograf**.  Python does not come with those
 packages built-in |dash| you need to install them after Python itself has been
 installed.

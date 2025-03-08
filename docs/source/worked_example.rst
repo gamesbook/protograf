@@ -42,13 +42,13 @@ As can be seen there are four lines in the file:
 -  *Line 2* - ``Create()`` tells **protograf** to setup an output PDF
    file in which this design of will be saved. Because no further
    information is given, the default values for sizes and colours will
-   used, as well as the default page dimensions - an A4 page. Every
-   script you write **must** have this line before any further
+   used, as well as the default page dimensions |dash| an A4 page.
+   Every script you write **must** have this line before *any* further
    **protograf** instructions/commands are supplied.
 -  *Line 3* - ``Deck()`` means that **protograf** is defining a deck.
    Because there is no other information given, it will create the default
-   number of cards - *9* - with each card having the same default size
-   (i.e. a "Poker" card size of 8.8 cm high and a width of 6.3 cm).
+   number of cards |dash| *9* |dash| with each card having the same default size
+   i.e. a "Poker" card size of 8.8 cm high and a width of 6.3 cm.
 -  *Line 4* - ``Save()`` gives the go-ahead to create the output file on
    disc. Usually, every script you write will have this as the last
    line.  If you don't have it, no file will be created.  The output file

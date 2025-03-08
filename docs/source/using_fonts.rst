@@ -57,7 +57,7 @@ Built-In Fonts
 ==============
 `↑ <table-of-contents_>`_
 
-Because :doc:`protograf <index>` uses *ReportLab* to generate the PDF output,
+Because :doc:`protograf <index>` uses *PyMuPDF* to generate the PDF output,
 it has access to the three "built-in" fonts supplied by it.
 
 These are:
@@ -204,7 +204,7 @@ Word Processor fonts vs protograf
 
 In some cases, you'll notice that a font can be displayed with bold or
 italic styling in a word processor, even though it cannot be displayed the
-same way in :doc:`protograf <index>`.  The reason is that *ReportLab*
+same way in :doc:`protograf <index>`.  The reason is that *PyMuPDF*
 does not create an "artificial" font style if it cannot find a matching
 file for italic or bold version of the font.
 

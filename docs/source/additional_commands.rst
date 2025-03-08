@@ -288,7 +288,7 @@ Because the *name* is compulsory, its often omitted from the command.
         Text(text="Verdana 9pt gold",
              x=0, y=2, align="left")
 
-      The first three are examples of the fonts "built in" to ReportLab,
+      The first three are examples of the standard fonts available to a PDF,
       and can be safely used anywhere that :doc:`protograf <index>` can
       be run, while the fourth is one that would have to be installed onto
       the host machine.
