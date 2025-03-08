@@ -387,7 +387,7 @@ class BaseCanvas:
         # ---- color and transparency
         fill = self.defaults.get("fill", self.defaults.get("fill_color"))
         self.fill = self.get_color(fill, "white")
-        self.transparency = self.defaults.get("transparency", None)
+        self.transparency = self.defaults.get("transparency", 1)  # NOT transparent
         self.debug_color = self.get_color(self.defaults.get("debug_color"), DEBUG_COLOR)
         self.fill_stroke = self.defaults.get("fill_stroke", None)
         self.stroke_fill = self.defaults.get("stroke_fill", None)  # alias
@@ -1237,6 +1237,14 @@ class BaseShape:
         """Set Shape properties for fill, font, line and colors"""
         tools.feedback('set_canvas_props() is deprecated', False)
 
+        def ext(prop):
+            if isinstance(prop, str):
+                return prop
+            try:
+                return prop[index]
+            except TypeError:
+                return prop
+
         # finish(
         # width=1, color=(0,), fill=None, lineCap=0, lineJoin=0, dashes=None,
         # closePath=True, even_odd=False, morph=(fixpoint, matrix),
@@ -1258,7 +1266,7 @@ class BaseShape:
             width=stroke_width or self.stroke_width,
             color=stroke or self.stroke,
             fill=fill or self.fill,
-            lineCap=stroke_cap or self.stroke_cap,
+            lineCap=stroke_cap or 0, # or self.stroke_cap,  # FIXME
             lineJoin=0,
             dashes=dashes,
             fill_opacity=transparency or self.transparency,
