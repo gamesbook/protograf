@@ -8,5 +8,4 @@ from protograf import *
 
 Create()
 Text(text="Hello World", x="a")  # wrong - cannot use letter for numeric!
-PageBreak()
 Save()

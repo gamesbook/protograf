@@ -15,33 +15,6 @@ from urllib.parse import urlparse
 # third party
 import pymupdf
 '''
-from reportlab.platypus import Paragraph
-from reportlab.lib.colors import red, green, black
-from reportlab.lib.styles import ParagraphStyle
-from reportlab.lib.pagesizes import (
-    A8,
-    A7,
-    A6,
-    A5,
-    A4,
-    A3,
-    A2,
-    A1,
-    A0,
-    LETTER,
-    LEGAL,
-    ELEVENSEVENTEEN,
-    letter,
-    legal,
-    elevenSeventeen,
-    B6,
-    B5,
-    B4,
-    B3,
-    B2,
-    B0,
-    landscape,
-)
 from reportlab.lib.utils import ImageReader
 '''
 import segno  # QRCode
@@ -53,9 +26,7 @@ from protograf.base import (
     BaseShape,
     BaseCanvas,
     GridShape,
-    UNITS,
-    COLORS,
-    PAGES,
+    COLOR_NAMES,
     DEBUG_COLOR,
     CACHE_DIRECTORY,
     BGG_IMAGES,

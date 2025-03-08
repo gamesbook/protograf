@@ -7,6 +7,7 @@ from protograf.utils.support import unit
 
 
 def initialize():
+    global document
     global cnv
     global deck
     global deck_settings
@@ -30,6 +31,7 @@ def initialize():
     global font_size
     global units
 
+    document = None  # will become a pymupdf.document object
     cnv = None  # will become a pymupdf.page object
     deck = None  # will become a shapes.DeckShape object
     deck_settings = {}  # holds kwargs passed to Deck ; cards, copy, extra, grid_marks

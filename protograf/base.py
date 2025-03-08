@@ -24,6 +24,8 @@ from jinja2.environment import Template
 from svglib.svglib import svg2rlg
 import requests
 import pymupdf
+from pymupdf.utils import getColor
+from pymupdf.utils import getColorList
 
 # local
 from protograf.utils import geoms, tools
@@ -36,6 +38,7 @@ DEBUG_COLOR = "#B0C4DE"
 CACHE_DIRECTORY = ".protograf"  # append to the user's home directory
 BGG_IMAGES = "cf.geekdo-images.com"
 BUILTIN_FONTS = ["Times-Roman", "Courier", "Helvetica"]
+COLOR_NAMES = getColorList()
 
 # ---- named tuples
 UnitProperties = namedtuple(
@@ -286,12 +289,13 @@ CLOCK_ANGLES = [60, 90, 120, 150, 180, 210, 240, 270, 300, 330, 0, 30]
 
 
 class BaseCanvas:
-    """Wrapper/extended class for a PyMuPDF page."""
+    """Wrapper/extension for a PyMuPDF Page."""
 
-    def __init__(self, filename=None, paper=None, defaults=None, **kwargs):
+    def __init__(self, document, paper=None, defaults=None, **kwargs):
+        """Create self.canvas as page-equivalent."""
+
         self.jsonfile = kwargs.get("defaults", None)
         self.defaults = {}
-        self.doc = None
         # ---- setup defaults
         if self.jsonfile:
             try:
@@ -317,9 +321,16 @@ class BaseCanvas:
             # print(f" *** {self.defaults=}")
         # ---- paper & canvas
         _paper = paper or self.defaults.get("paper", "A4")
-        self.doc = pymupdf.open()
-        pw, ph = pymupdf.paper_size(_paper)  # tuple: (width, height) in points units
-        self.canvas = self.doc.new_page(width=pw, height=ph)  # filename used in save()
+        if isinstance(_paper, tuple) and len(_paper) == 2:
+            self.paper = _paper
+        else:
+            try:
+                self.paper = pymupdf.paper_size(_paper)  # (width, height) in points
+                if self.paper == (-1, -1):  # pymupdf fallback ...
+                    raise ValueError
+            except Exception:
+                tools.feedback(f'Unable to use {_paper} as paper size!', True)
+        self.canvas = document.new_page(width=self.paper[0], height=self.paper[1])
         # ---- constants
         self.default_length = 1
         self.show_id = False
@@ -332,10 +343,9 @@ class BaseCanvas:
         self._object = None
         self.kwargs = kwargs
         self.run_debug = False
-        self.units = self.defaults.get("units", unit.cm)  # defaults must store point-equivalent
+        self.units = self.defaults.get("units", unit.cm)  # defaults MUST store point-equivalent
         # print(f" *** {self.units=} \n {self.defaults=}")
-        # ---- paper & margins
-        self.paper = _paper
+        # ---- paper size in units & margins
         self.page_width = self.paper[0] / self.units  # user-units e.g. cm
         self.page_height = self.paper[1] / self.units  # user-units e.g. cm
         # print(f" *** {self.page_height=} {self.page_width=}")
@@ -407,7 +417,7 @@ class BaseCanvas:
         self._alignment = pymupdf.TEXT_ALIGN_LEFT  # see to_alignment()
         # ---- grid cut marks
         self.grid_marks = self.defaults.get("grid_marks", 0)
-        self.grid_stroke = self.get_color(self.defaults.get("grid_stroke"), "grey")
+        self.grid_stroke = self.get_color(self.defaults.get("grid_stroke"), "gray")
         self.grid_stroke_width = self.defaults.get(
             "grid_stroke_width", self.stroke_width
         )
@@ -684,13 +694,28 @@ class BaseCanvas:
         """Return canvas (page) object"""
         return self.canvas
 
-    def get_color(self, name=None, default="black"):
-        """Get a color by name from a pre-defined dictionary."""
-        if name:
-            if isinstance(name, Color):
+    def get_color(self, color=None, default="black"):
+        """Get a color tuple; by name from a pre-defined dictionary or as RGB tuple."""
+        name = color or default
+        if isinstance(name, tuple) and len(name) == 3:  # RGB color tuple
+            if ((name[0] >= 0 and name[0] <= 255) and
+                (name[1] >= 0 and name[0] <= 255) and
+                (name[2] >= 0 and name[0] <= 255)):
                 return name
-            return COLORS.get(name, default)
-        return default
+            else:
+                tools.feedback(f'The color tuple "{name}" is invalid!')
+        elif isinstance(name, str) and len(name) == 7 and name[0] == '#':  # hexadecimal
+            rgb = tuple(int(name[i:i+2], 16) for i in (1, 3, 5))
+            return rgb
+        else:
+            pass  # unknown format
+        if name.upper() not in COLOR_NAMES:
+            tools.feedback(f'The color name "{name}" is not pre-defined!', True)
+        try:
+            color = getColor(name)
+            return color
+        except (AttributeError, ValueError):
+            tools.feedback(f'The color name "{name}" cannot be converted to RGB!', True)
 
     def get_page(self, name="A4"):
         """Get a paper format by name from a pre-defined dictionary."""
@@ -1880,6 +1905,10 @@ class BaseShape:
 
         Kwargs:
             * locale - dict created from Locale namedtuple
+            * font_size -
+            * font_name -
+            * stroke -
+            * fill -
         """
         if not string:
             return
@@ -1916,7 +1945,7 @@ class BaseShape:
         # keys['oc'] = 0
         # keys['overlay'] = True
 
-        # ---- drawString
+        # ---- draw
         point = pymupdf.Point(xm, ym)
         canvas.insert_text(point, string, **keys)
 

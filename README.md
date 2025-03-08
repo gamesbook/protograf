@@ -73,7 +73,6 @@ This script is very simple - it just contains these lines:
 # Created on: 29 February 2016
 from protograf import *
 Create()
-PageBreak()
 Save()
 ```
 and is designed to produce a single, blank, A4-sized page in a PDF file.
@@ -126,22 +125,21 @@ current / potential areas of work or idea development.
     * [ ] Trapezoid
     * [ ] Triangle
 * [ ] Cards:
-    * [ ] support card back designs
+    * [ ] support card-back designs
     * [ ] grid lines for hexagonal cards
     * [ ] multiple bleed areas
     * [ ] access to Google Sheets
-    * [ ] extract rectangular cards as PNG files
+    * [x] extract rectangular cards as PNG files
 * [ ] Color:
     * [ ] add support for CMYK
-    * [ ] investigate gradients
 
 ## Potential Examples
 
 These are possible examples to show board creation based on existing games:
 
-* [ ] Abstract boards: Ludo, 9 Mens Morris, Wari, Mu Torere
+* [ ] Extra abstract game boards: Ludo, 9 Mens Morris, Wari, Mu Torere
 * [ ] Wargame board: Squad Leader with terrain features (vector and bitmap)
-* [ ] Traveller board: show a fully-styled Star system (demo a custom Shape?)
+* [ ] Traveller board: show a fully-styled Star System (demo a custom Shape?)
 * [x] WarpWar board: show a fully-styled example
 * [ ] 18xx board: show a basic map with tracks, towns, cities and off-map areas
 
@@ -152,12 +150,13 @@ These are possible examples to show board creation based on existing games:
 > "[Snow Crash](https://en.wikipedia.org/wiki/Snow_Crash)", Neal Stephenson, 1992.
 
 As always, with Python, you are building "on the shoulders of giants".
-In this case, the
-[ReportLab PDF Toolkit](https://docs.reportlab.com/reportlab/userguide/ch1_intro/)
-provides all of the core infrastructure used to do the underlying graphics
-processing and PDF file creation; __protograf__ is effectively a highly
-customised wrapper to simplify common uses around its existing and extensive
-capabilities.
+In this case, the [pyMuPDF](https://pymupdf.io/) library provides all of the
+core infrastructure used to do the underlying graphics processing, PDF file
+creation and images exports; __protograf__ is effectively a highly customised
+wrapper to simplify common uses around its existing and extensive capabilities.
+
+An earlier version of  __protograf__  used the *ReportLab PDF Toolkit*, which is
+also a very powerful library for supporting this type of application.
 
 Additional libraries in use include:
 
@@ -166,7 +165,6 @@ Additional libraries in use include:
   [BoardGameGeek](https://boardgamegeek.com) API
 * `xlrd` https://pypi.org/project/xlrd/ - support for access to Excel `.xls` files
 * `openpyxl` https://pypi.org/project/openpyxl/ - support for access to Excel files
-* `pymupdf` https://pymupdf.io/ - support for exporting PDF to PNG images
 * `imageio` https://pypi.org/project/imageio/- support for compiling PNGs into a GIF
 * `jinja` https://jinja.palletsprojects.com - template logic with variables
 * `pillow` https://github.com/python-pillow/Pillow - support for image processing

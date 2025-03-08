@@ -20,6 +20,8 @@ from typing import Union, Any
 
 # third party
 import jinja2
+import pymupdf
+'''
 from reportlab.lib.pagesizes import *
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
@@ -27,160 +29,7 @@ from reportlab.lib.pagesizes import A4
 
 # from reportlab.lib.colors import black, white
 from reportlab.lib.units import cm, inch
-from reportlab.lib.colors import (
-    Color,
-    aliceblue,
-    antiquewhite,
-    aqua,
-    aquamarine,
-    azure,
-    beige,
-    bisque,
-    black,
-    blanchedalmond,
-    blue,
-    blueviolet,
-    brown,
-    burlywood,
-    cadetblue,
-    chartreuse,
-    chocolate,
-    coral,
-    cornflowerblue,
-    cornsilk,
-    crimson,
-    cyan,
-    darkblue,
-    darkcyan,
-    darkgoldenrod,
-    darkgray,
-    darkgrey,
-    darkgreen,
-    darkkhaki,
-    darkmagenta,
-    darkolivegreen,
-    darkorange,
-    darkorchid,
-    darkred,
-    darksalmon,
-    darkseagreen,
-    darkslateblue,
-    darkslategray,
-    darkslategrey,
-    darkturquoise,
-    darkviolet,
-    deeppink,
-    deepskyblue,
-    dimgray,
-    dimgrey,
-    dodgerblue,
-    floralwhite,
-    forestgreen,
-    fuchsia,
-    gainsboro,
-    ghostwhite,
-    gold,
-    goldenrod,
-    gray,
-    grey,
-    green,
-    greenyellow,
-    honeydew,
-    hotpink,
-    indianred,
-    indigo,
-    ivory,
-    khaki,
-    lavender,
-    lavenderblush,
-    lawngreen,
-    lemonchiffon,
-    lightblue,
-    lightcoral,
-    lightcyan,
-    lightgoldenrodyellow,
-    lightgreen,
-    lightgrey,
-    lightpink,
-    lightsalmon,
-    lightseagreen,
-    lightskyblue,
-    lightslategray,
-    lightslategrey,
-    lightsteelblue,
-    lightyellow,
-    lime,
-    limegreen,
-    linen,
-    magenta,
-    maroon,
-    mediumaquamarine,
-    mediumblue,
-    mediumorchid,
-    mediumpurple,
-    mediumseagreen,
-    mediumslateblue,
-    mediumspringgreen,
-    mediumturquoise,
-    mediumvioletred,
-    midnightblue,
-    mintcream,
-    mistyrose,
-    moccasin,
-    navajowhite,
-    navy,
-    oldlace,
-    olive,
-    olivedrab,
-    orange,
-    orangered,
-    orchid,
-    palegoldenrod,
-    palegreen,
-    paleturquoise,
-    palevioletred,
-    papayawhip,
-    peachpuff,
-    peru,
-    pink,
-    plum,
-    powderblue,
-    purple,
-    red,
-    rosybrown,
-    royalblue,
-    saddlebrown,
-    salmon,
-    sandybrown,
-    seagreen,
-    seashell,
-    sienna,
-    silver,
-    skyblue,
-    slateblue,
-    slategray,
-    slategrey,
-    snow,
-    springgreen,
-    steelblue,
-    tan,
-    teal,
-    thistle,
-    tomato,
-    turquoise,
-    violet,
-    wheat,
-    white,
-    whitesmoke,
-    yellow,
-    yellowgreen,
-    fidblue,
-    fidred,
-    fidlightblue,
-    cornflower,
-    firebrick,
-)
-
+'''
 # local
 from .bgg import BGGGame, BGGGameList
 from .base import BaseCanvas, GroupBase, COLORS, DEBUG_COLOR
@@ -237,8 +86,7 @@ from ._version import __version__
 from protograf.utils.tools import base_fonts, DatasetType
 from protograf.utils import geoms, tools, support
 from protograf.utils.geoms import Locale, Point, Place, Ray, equilateral_height
-from protograf.utils.support import LookupType, steps
-
+from protograf.utils.support import LookupType, steps, unit
 from protograf import globals
 
 log = logging.getLogger(__name__)
@@ -321,10 +169,13 @@ def Create(**kwargs):
     globals.filename = os.path.join(globals.pargs.directory, _filename)
     # tools.feedback(f"output: {filename}", False)
 
+    # ---- document
+    globals.document = pymupdf.open()
+
     # ---- canvas, paper, page size, and deck
     globals.cnv = BaseCanvas(
-        globals.filename, paper=globals.paper, defaults=defaults, kwargs=kwargs
-    )
+        globals.document, paper=globals.paper, defaults=defaults, kwargs=kwargs
+    )  # a pymupdf Page
     if landscape:
         globals.cnv.canvas.setPageSize(landscape(globals.cnv.paper))
         globals.page_width = globals.cnv.paper[1]  # point units (1/72 of an inch)
@@ -367,6 +218,8 @@ def PageBreak(**kwargs):
     validate_globals()
 
     globals.page_count += 1
+    globals.cnv = globals.document.new_page()  # pymupdf Page
+
     kwargs = margins(**kwargs)
     if kwargs.get("footer", globals.footer_draw):
         if globals.footer is None:
@@ -374,21 +227,6 @@ def PageBreak(**kwargs):
             kwargs["font_size"] = globals.font_size
             globals.footer = FooterShape(_object=None, canvas=globals.cnv, **kwargs)
         globals.footer.draw(cnv=globals.cnv, ID=globals.page_count, text=None, **kwargs)
-
-    # If count not in the required pargs.pages then do NOT display!
-    # Note: this code does not work; seems there is no way to clear or hide the canvas
-    #       in ReportLab that would support this operation
-    # try:
-    #     pages = tools.sequence_split(pargs.pages) if pargs.pages else None
-    # except:
-    #     tools.feedback(
-    #         f'Cannot process "pages" value {pargs.pages} - please check and try again!',
-    #         True)
-    # if pages and page_count not in pages:
-    #     pass
-    # else:
-    #     cnv.canvas.showPage()
-    globals.cnv.canvas.showPage()
 
 
 def page_break():
@@ -412,7 +250,7 @@ def Save(**kwargs):
 
     # ---- save canvas to file
     try:
-        globals.cnv.canvas.save()
+        globals.document.save(globals.filename)
     except RuntimeError as err:
         tools.feedback(f'Unable to save "{globals.filename}" - {err}', True)
     except FileNotFoundError as err:
@@ -473,7 +311,7 @@ def Font(name=None, **kwargs):
     globals.cnv.font_size = kwargs.get("size", 12)
     globals.cnv.font_style = kwargs.get("style", None)
     globals.cnv.font_directory = kwargs.get("directory", None)
-    globals.cnv.stroke = kwargs.get("stroke", black)
+    globals.cnv.stroke = kwargs.get("stroke", "black")
 
 
 # ---- various ====
@@ -1185,9 +1023,9 @@ def Blueprint(**kwargs):
             case "green":
                 color, fill = "#CECE2C", "#35705E"
             case "grey" | "gray":
-                color, fill = white, "#A1969C"
+                color, fill = "white", "#A1969C"
             case "blue" | "invert" | "inverted":
-                color, fill = honeydew, "#3085AC"
+                color, fill = "honeydew", "#3085AC"
             case _:
                 color, fill = "#3085AC", None
                 if style_name is not None:
@@ -1201,7 +1039,7 @@ def Blueprint(**kwargs):
         tools.feedback('The "common" property cannot be used with a Blueprint.', True)
     kwargs["units"] = kwargs.get("units", globals.units)
     side = 1.0
-    if kwargs["units"] == inch:
+    if kwargs["units"] == unit.inch:
         side = 0.5
     decimals = tools.as_int(kwargs.get("decimals", 0), "Blueprint decimals")
     # override defaults ... otherwise grid not "next" to margins
@@ -1218,7 +1056,7 @@ def Blueprint(**kwargs):
     kwargs["rows"] = kwargs.get("rows", rows)
     kwargs["cols"] = kwargs.get("cols", cols)
     kwargs["stroke_width"] = kwargs.get("stroke_width", 0.2)  # fine line
-    default_font_size = 10 * math.sqrt(globals.paper[0]) / math.sqrt(A4[0])
+    default_font_size = 10 * math.sqrt(globals.paper[0]) / math.sqrt(globals.paper[1])
     dotted = kwargs.get("dotted", False)
     kwargs["font_size"] = kwargs.get("font_size", default_font_size)
     line_stroke, page_fill = set_style(kwargs.get("style", None))

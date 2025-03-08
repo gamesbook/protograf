@@ -8,5 +8,4 @@ from protograf import *
 
 Create()
 Text(text="Hello World")
-PageBreak()
 Save()
