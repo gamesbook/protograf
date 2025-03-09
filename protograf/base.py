@@ -24,8 +24,8 @@ from jinja2.environment import Template
 from svglib.svglib import svg2rlg
 import requests
 import pymupdf
-from pymupdf.utils import getColor
-from pymupdf.utils import getColorList
+from pymupdf import Shape as muShape, Point as muPoint, Matrix
+from pymupdf.utils import getColor, getColorList
 
 # local
 from protograf.utils import geoms, tools
@@ -98,153 +98,153 @@ Bounds = namedtuple(
 
 # ---- colors (SVG named; 18xx Games)
 COLORS = {
-    'aliceblue': '#f0f8ff',
-    'antiquewhite': '#faebd7',
-    'aqua': '#00ffff',
-    'aquamarine': '#7fffd4',
-    'azure': '#f0ffff',
-    'beige': '#f5f5dc',
-    'bisque': '#ffe4c4',
-    'black': '#000000',
-    'blanchedalmond': '#ffebcd',
-    'blue': '#0000ff',
-    'blueviolet': '#8a2be2',
-    'brown': '#a52a2a',
-    'burlywood': '#deb887',
-    'cadetblue': '#5f9ea0',
-    'chartreuse': '#7fff00',
-    'chocolate': '#d2691e',
-    'coral': '#ff7f50',
-    'cornflowerblue': '#6495ed',
-    'cornsilk': '#fff8dc',
-    'crimson': '#dc143c',
-    'cyan': '#00ffff',
-    'darkblue': '#00008b',
-    'darkcyan': '#008b8b',
-    'darkgoldenrod': '#b8860b',
-    'darkgray': '#a9a9a9',
-    'darkgreen': '#006400',
-    'darkgrey': '#a9a9a9',
-    'darkkhaki': '#bdb76b',
-    'darkmagenta': '#8b008b',
-    'darkolivegreen': '#556b2f',
-    'darkorange': '#ff8c00',
-    'darkorchid': '#9932cc',
-    'darkred': '#8b0000',
-    'darksalmon': '#e9967a',
-    'darkseagreen': '#8fbc8f',
-    'darkslateblue': '#483d8b',
-    'darkslategray': '#2f4f4f',
-    'darkslategrey': '#2f4f4f',
-    'darkturquoise': '#00ced1',
-    'darkviolet': '#9400d3',
-    'deeppink': '#ff1493',
-    'deepskyblue': '#00bfff',
-    'dimgray': '#696969',
-    'dimgrey': '#696969',
-    'dodgerblue': '#1e90ff',
-    'firebrick': '#b22222',
-    'floralwhite': '#fffaf0',
-    'forestgreen': '#228b22',
-    'fuchsia': '#ff00ff',
-    'gainsboro': '#dcdcdc',
-    'ghostwhite': '#f8f8ff',
-    'gold': '#ffd700',
-    'goldenrod': '#daa520',
-    'gray': '#808080',
-    'green': '#008000',
-    'greenyellow': '#adff2f',
-    'grey': '#808080',
-    'honeydew': '#f0fff0',
-    'hotpink': '#ff69b4',
-    'indianred': '#cd5c5c',
-    'indigo': '#4b0082',
-    'ivory': '#fffff0',
-    'khaki': '#f0e68c',
-    'lavender': '#e6e6fa',
-    'lavenderblush': '#fff0f5',
-    'lawngreen': '#7cfc00',
-    'lemonchiffon': '#fffacd',
-    'lightblue': '#add8e6',
-    'lightcoral': '#f08080',
-    'lightcyan': '#e0ffff',
-    'lightgoldenrodyellow': '#fafad2',
-    'lightgray': '#d3d3d3',
-    'lightgreen': '#90ee90',
-    'lightgrey': '#d3d3d3',
-    'lightpink': '#ffb6c1',
-    'lightsalmon': '#ffa07a',
-    'lightseagreen': '#20b2aa',
-    'lightskyblue': '#87cefa',
-    'lightslategray': '#778899',
-    'lightslategrey': '#778899',
-    'lightsteelblue': '#b0c4de',
-    'lightyellow': '#ffffe0',
-    'lime': '#00ff00',
-    'limegreen': '#32cd32',
-    'linen': '#faf0e6',
-    'magenta': '#ff00ff',
-    'maroon': '#800000',
-    'mediumaquamarine': '#66cdaa',
-    'mediumblue': '#0000cd',
-    'mediumorchid': '#ba55d3',
-    'mediumpurple': '#9370db',
-    'mediumseagreen': '#3cb371',
-    'mediumslateblue': '#7b68ee',
-    'mediumspringgreen': '#00fa9a',
-    'mediumturquoise': '#48d1cc',
-    'mediumvioletred': '#c71585',
-    'midnightblue': '#191970',
-    'mintcream': '#f5fffa',
-    'mistyrose': '#ffe4e1',
-    'moccasin': '#ffe4b5',
-    'navajowhite': '#ffdead',
-    'navy': '#000080',
-    'oldlace': '#fdf5e6',
-    'olive': '#808000',
-    'olivedrab': '#6b8e23',
-    'orange': '#ffa500',
-    'orangered': '#ff4500',
-    'orchid': '#da70d6',
-    'palegoldenrod': '#eee8aa',
-    'palegreen': '#98fb98',
-    'paleturquoise': '#afeeee',
-    'palevioletred': '#db7093',
-    'papayawhip': '#ffefd5',
-    'peachpuff': '#ffdab9',
-    'peru': '#cd853f',
-    'pink': '#ffc0cb',
-    'plum': '#dda0dd',
-    'powderblue': '#b0e0e6',
-    'purple': '#800080',
-    'red': '#ff0000',
-    'rosybrown': '#bc8f8f',
-    'royalblue': '#4169e1',
-    'saddlebrown': '#8b4513',
-    'salmon': '#fa8072',
-    'sandybrown': '#f4a460',
-    'seagreen': '#2e8b57',
-    'seashell': '#fff5ee',
-    'sienna': '#a0522d',
-    'silver': '#c0c0c0',
-    'skyblue': '#87ceeb',
-    'slateblue': '#6a5acd',
-    'slategray': '#708090',
-    'slategrey': '#708090',
-    'snow': '#fffafa',
-    'springgreen': '#00ff7f',
-    'steelblue': '#4682b4',
-    'tan': '#d2b48c',
-    'teal': '#008080',
-    'thistle': '#d8bfd8',
-    'tomato': '#ff6347',
-    'turquoise': '#40e0d0',
-    'violet': '#ee82ee',
-    'wheat': '#f5deb3',
-    'white': '#ffffff',
-    'whitesmoke': '#f5f5f5',
-    'yellow': '#ffff00',
-    'yellowgreen': '#9acd32',
+    "aliceblue": "#f0f8ff",
+    "antiquewhite": "#faebd7",
+    "aqua": "#00ffff",
+    "aquamarine": "#7fffd4",
+    "azure": "#f0ffff",
+    "beige": "#f5f5dc",
+    "bisque": "#ffe4c4",
+    "black": "#000000",
+    "blanchedalmond": "#ffebcd",
+    "blue": "#0000ff",
+    "blueviolet": "#8a2be2",
+    "brown": "#a52a2a",
+    "burlywood": "#deb887",
+    "cadetblue": "#5f9ea0",
+    "chartreuse": "#7fff00",
+    "chocolate": "#d2691e",
+    "coral": "#ff7f50",
+    "cornflowerblue": "#6495ed",
+    "cornsilk": "#fff8dc",
+    "crimson": "#dc143c",
+    "cyan": "#00ffff",
+    "darkblue": "#00008b",
+    "darkcyan": "#008b8b",
+    "darkgoldenrod": "#b8860b",
+    "darkgray": "#a9a9a9",
+    "darkgreen": "#006400",
+    "darkgrey": "#a9a9a9",
+    "darkkhaki": "#bdb76b",
+    "darkmagenta": "#8b008b",
+    "darkolivegreen": "#556b2f",
+    "darkorange": "#ff8c00",
+    "darkorchid": "#9932cc",
+    "darkred": "#8b0000",
+    "darksalmon": "#e9967a",
+    "darkseagreen": "#8fbc8f",
+    "darkslateblue": "#483d8b",
+    "darkslategray": "#2f4f4f",
+    "darkslategrey": "#2f4f4f",
+    "darkturquoise": "#00ced1",
+    "darkviolet": "#9400d3",
+    "deeppink": "#ff1493",
+    "deepskyblue": "#00bfff",
+    "dimgray": "#696969",
+    "dimgrey": "#696969",
+    "dodgerblue": "#1e90ff",
+    "firebrick": "#b22222",
+    "floralwhite": "#fffaf0",
+    "forestgreen": "#228b22",
+    "fuchsia": "#ff00ff",
+    "gainsboro": "#dcdcdc",
+    "ghostwhite": "#f8f8ff",
+    "gold": "#ffd700",
+    "goldenrod": "#daa520",
+    "gray": "#808080",
+    "green": "#008000",
+    "greenyellow": "#adff2f",
+    "grey": "#808080",
+    "honeydew": "#f0fff0",
+    "hotpink": "#ff69b4",
+    "indianred": "#cd5c5c",
+    "indigo": "#4b0082",
+    "ivory": "#fffff0",
+    "khaki": "#f0e68c",
+    "lavender": "#e6e6fa",
+    "lavenderblush": "#fff0f5",
+    "lawngreen": "#7cfc00",
+    "lemonchiffon": "#fffacd",
+    "lightblue": "#add8e6",
+    "lightcoral": "#f08080",
+    "lightcyan": "#e0ffff",
+    "lightgoldenrodyellow": "#fafad2",
+    "lightgray": "#d3d3d3",
+    "lightgreen": "#90ee90",
+    "lightgrey": "#d3d3d3",
+    "lightpink": "#ffb6c1",
+    "lightsalmon": "#ffa07a",
+    "lightseagreen": "#20b2aa",
+    "lightskyblue": "#87cefa",
+    "lightslategray": "#778899",
+    "lightslategrey": "#778899",
+    "lightsteelblue": "#b0c4de",
+    "lightyellow": "#ffffe0",
+    "lime": "#00ff00",
+    "limegreen": "#32cd32",
+    "linen": "#faf0e6",
+    "magenta": "#ff00ff",
+    "maroon": "#800000",
+    "mediumaquamarine": "#66cdaa",
+    "mediumblue": "#0000cd",
+    "mediumorchid": "#ba55d3",
+    "mediumpurple": "#9370db",
+    "mediumseagreen": "#3cb371",
+    "mediumslateblue": "#7b68ee",
+    "mediumspringgreen": "#00fa9a",
+    "mediumturquoise": "#48d1cc",
+    "mediumvioletred": "#c71585",
+    "midnightblue": "#191970",
+    "mintcream": "#f5fffa",
+    "mistyrose": "#ffe4e1",
+    "moccasin": "#ffe4b5",
+    "navajowhite": "#ffdead",
+    "navy": "#000080",
+    "oldlace": "#fdf5e6",
+    "olive": "#808000",
+    "olivedrab": "#6b8e23",
+    "orange": "#ffa500",
+    "orangered": "#ff4500",
+    "orchid": "#da70d6",
+    "palegoldenrod": "#eee8aa",
+    "palegreen": "#98fb98",
+    "paleturquoise": "#afeeee",
+    "palevioletred": "#db7093",
+    "papayawhip": "#ffefd5",
+    "peachpuff": "#ffdab9",
+    "peru": "#cd853f",
+    "pink": "#ffc0cb",
+    "plum": "#dda0dd",
+    "powderblue": "#b0e0e6",
+    "purple": "#800080",
+    "red": "#ff0000",
+    "rosybrown": "#bc8f8f",
+    "royalblue": "#4169e1",
+    "saddlebrown": "#8b4513",
+    "salmon": "#fa8072",
+    "sandybrown": "#f4a460",
+    "seagreen": "#2e8b57",
+    "seashell": "#fff5ee",
+    "sienna": "#a0522d",
+    "silver": "#c0c0c0",
+    "skyblue": "#87ceeb",
+    "slateblue": "#6a5acd",
+    "slategray": "#708090",
+    "slategrey": "#708090",
+    "snow": "#fffafa",
+    "springgreen": "#00ff7f",
+    "steelblue": "#4682b4",
+    "tan": "#d2b48c",
+    "teal": "#008080",
+    "thistle": "#d8bfd8",
+    "tomato": "#ff6347",
+    "turquoise": "#40e0d0",
+    "violet": "#ee82ee",
+    "wheat": "#f5deb3",
+    "white": "#ffffff",
+    "whitesmoke": "#f5f5f5",
+    "yellow": "#ffff00",
+    "yellowgreen": "#9acd32",
     # 18xx colors from https://github.com/XeryusTC/map18xx/blob/master/src/tile.rs
     "18xx_ground": "#fdd9b5",  # sandy tan
     "18xx_yellow": "#fdee00",  # aureolin
@@ -258,7 +258,7 @@ COLORS = {
     "18xx_white": "#ffffff",  # white
 }
 # ---- paper formats
-'''
+"""
 PAGES = {
     "LETTER": LETTER,
     "landscape": landscape,
@@ -282,10 +282,39 @@ PAGES = {
     "ELEVENSEVENTEEN": ELEVENSEVENTEEN,
     "tabloid": elevenSeventeen,
 }
-'''
+"""
 WIDTH = 0.1
 
 CLOCK_ANGLES = [60, 90, 120, 150, 180, 210, 240, 270, 300, 330, 0, 30]
+
+
+def get_color(color=None, default=None):
+    """Get a color tuple; by name from a pre-defined dictionary or as RGB tuple."""
+    name = color or default
+    if name is None:
+        return None  # valid to say that no color is set
+    if isinstance(name, tuple) and len(name) == 3:  # RGB color tuple
+        if (
+            (name[0] >= 0 and name[0] <= 255)
+            and (name[1] >= 0 and name[0] <= 255)
+            and (name[2] >= 0 and name[0] <= 255)
+        ):
+            return name
+        else:
+            tools.feedback(f'The color tuple "{name}" is invalid!')
+    elif isinstance(name, str) and len(name) == 7 and name[0] == "#":  # hexadecimal
+        _rgb = tuple(int(name[i : i + 2], 16) for i in (1, 3, 5))
+        rgb = tuple(i / 255 for i in _rgb)
+        return rgb
+    else:
+        pass  # unknown format
+    if name.upper() not in COLOR_NAMES:
+        tools.feedback(f'The color name "{name}" is not pre-defined!', True)
+    try:
+        color = getColor(name)
+        return color
+    except (AttributeError, ValueError):
+        tools.feedback(f'The color name "{name}" cannot be converted to RGB!', True)
 
 
 class BaseCanvas:
@@ -329,7 +358,7 @@ class BaseCanvas:
                 if self.paper == (-1, -1):  # pymupdf fallback ...
                     raise ValueError
             except Exception:
-                tools.feedback(f'Unable to use {_paper} as paper size!', True)
+                tools.feedback(f"Unable to use {_paper} as paper size!", True)
         self.canvas = document.new_page(width=self.paper[0], height=self.paper[1])
         # ---- constants
         self.default_length = 1
@@ -343,7 +372,9 @@ class BaseCanvas:
         self._object = None
         self.kwargs = kwargs
         self.run_debug = False
-        self.units = self.defaults.get("units", unit.cm)  # defaults MUST store point-equivalent
+        self.units = self.defaults.get(
+            "units", unit.cm
+        )  # defaults MUST store point-equivalent
         # print(f" *** {self.units=} \n {self.defaults=}")
         # ---- paper size in units & margins
         self.page_width = self.paper[0] / self.units  # user-units e.g. cm
@@ -379,6 +410,7 @@ class BaseCanvas:
         self.interval_y = self.defaults.get("interval_y", self.interval)
         # ---- rotation / position /elevation
         self.rotation = self.defaults.get("rotation", 0)  # degrees
+        self.rotation_point = self.defaults.get("rotation_point", "centre")
         self.direction = self.defaults.get("direction", "north")
         self.position = self.defaults.get("position", None)
         self.flip = self.defaults.get("flip", "north")  # north/south
@@ -386,14 +418,14 @@ class BaseCanvas:
         self.facing = self.defaults.get("facing", "out")  # out/in
         # ---- color and transparency
         fill = self.defaults.get("fill", self.defaults.get("fill_color"))
-        self.fill = self.get_color(fill, "white")
+        self.fill = get_color(fill, "white")
         self.transparency = self.defaults.get("transparency", 1)  # NOT transparent
-        self.debug_color = self.get_color(self.defaults.get("debug_color"), DEBUG_COLOR)
+        self.debug_color = get_color(self.defaults.get("debug_color"), DEBUG_COLOR)
         self.fill_stroke = self.defaults.get("fill_stroke", None)
         self.stroke_fill = self.defaults.get("stroke_fill", None)  # alias
         # ---- stroke
         stroke = self.defaults.get("stroke", self.defaults.get("stroke_color"))
-        self.stroke = self.get_color(stroke, "black")
+        self.stroke = get_color(stroke, "black")
         self.stroke_width = self.defaults.get("stroke_width", WIDTH)
         self.outline = self.defaults.get("outline", None)
         # ---- overwrite fill & stroke
@@ -417,7 +449,7 @@ class BaseCanvas:
         self._alignment = pymupdf.TEXT_ALIGN_LEFT  # see to_alignment()
         # ---- grid cut marks
         self.grid_marks = self.defaults.get("grid_marks", 0)
-        self.grid_stroke = self.get_color(self.defaults.get("grid_stroke"), "gray")
+        self.grid_stroke = get_color(self.defaults.get("grid_stroke"), "gray")
         self.grid_stroke_width = self.defaults.get(
             "grid_stroke_width", self.stroke_width
         )
@@ -432,7 +464,7 @@ class BaseCanvas:
         # ---- text: base
         self.text = self.defaults.get("text", "")
         self.text_size = self.defaults.get("text_size", self.font_size)
-        self.text_stroke = self.get_color(self.defaults.get("text_stroke"), self.stroke)
+        self.text_stroke = get_color(self.defaults.get("text_stroke"), self.stroke)
         self.text_stroke_width = self.defaults.get(
             "text_stroke_width", self.stroke_width
         )
@@ -440,9 +472,7 @@ class BaseCanvas:
         self.label = self.defaults.get("label", "")
         self.label_size = self.defaults.get("label_size", self.font_size)
         self.label_face = self.defaults.get("label_face", self.font_name)
-        self.label_stroke = self.get_color(
-            self.defaults.get("label_stroke"), self.stroke
-        )
+        self.label_stroke = get_color(self.defaults.get("label_stroke"), self.stroke)
         self.label_stroke_width = self.defaults.get(
             "label_stroke_width", self.stroke_width
         )
@@ -453,9 +483,7 @@ class BaseCanvas:
         self.title = self.defaults.get("title", "")
         self.title_size = self.defaults.get("title_size", self.font_size)
         self.title_face = self.defaults.get("title_face", self.font_name)
-        self.title_stroke = self.get_color(
-            self.defaults.get("title_stroke", self.stroke)
-        )
+        self.title_stroke = get_color(self.defaults.get("title_stroke", self.stroke))
         self.title_stroke_width = self.defaults.get(
             "title_stroke_width", self.stroke_width
         )
@@ -466,7 +494,7 @@ class BaseCanvas:
         self.heading = self.defaults.get("heading", "")
         self.heading_size = self.defaults.get("heading_size", self.font_size)
         self.heading_face = self.defaults.get("heading_face", self.font_name)
-        self.heading_stroke = self.get_color(
+        self.heading_stroke = get_color(
             self.defaults.get("heading_stroke"), self.stroke
         )
         self.heading_stroke_width = self.defaults.get(
@@ -553,6 +581,7 @@ class BaseCanvas:
         self.grouping = self.defaults.get("grouping", 1)  # no. of cards in a set
         self.grouping_rows = self.defaults.get("grouping_rows", self.grouping)
         self.grouping_cols = self.defaults.get("grouping_cols", self.grouping)
+        self.lines = self.defaults.get("lines", "all")  # which direction to draw
         # ---- circle / star / polygon
         self.diameter = self.defaults.get("diameter", 1)
         self.radius = self.defaults.get("radius", self.diameter / 2.0)
@@ -577,7 +606,7 @@ class BaseCanvas:
         self.radii_labels = self.defaults.get("radii_labels", "")
         self.radii_labels_size = self.defaults.get("radii_labels_size", self.font_size)
         self.radii_labels_face = self.defaults.get("radii_labels_face", self.font_name)
-        self.radii_labels_stroke = self.get_color(
+        self.radii_labels_stroke = get_color(
             self.defaults.get("radii_labels_stroke"), self.stroke
         )
         self.radii_labels_stroke_width = self.defaults.get(
@@ -608,11 +637,11 @@ class BaseCanvas:
         self.centre_shape_mx = self.defaults.get("centre_shape_mx", 0)
         self.centre_shape_my = self.defaults.get("centre_shape_my", 0)
         self.dot = self.defaults.get("dot", 0)
-        self.dot_stroke = self.get_color(self.defaults.get("dot_stroke"), self.stroke)
+        self.dot_stroke = get_color(self.defaults.get("dot_stroke"), self.stroke)
         self.dot_stroke_width = self.defaults.get("dot_stroke_width", self.stroke_width)
         self.dot_fill = self.defaults.get("dot_fill", self.dot_stroke)  # colors match
         self.cross = self.defaults.get("cross", 0)
-        self.cross_stroke = self.get_color(self.defaults.get("cross_stroke"), "black")
+        self.cross_stroke = get_color(self.defaults.get("cross_stroke"), "black")
         self.cross_stroke_width = self.defaults.get(
             "cross_stroke_width", self.stroke_width
         )
@@ -656,7 +685,7 @@ class BaseCanvas:
         self.coord_font_size = self.defaults.get(
             "coord_font_size", int(self.font_size * 0.5)
         )
-        self.coord_stroke = self.get_color(self.defaults.get("coord_stroke"), "black")
+        self.coord_stroke = get_color(self.defaults.get("coord_stroke"), "black")
         self.coord_padding = self.defaults.get("coord_padding", 2)
         self.coord_separator = self.defaults.get("coord_separator", "")
         self.coord_prefix = self.defaults.get("coord_prefix", "")
@@ -693,29 +722,6 @@ class BaseCanvas:
     def get_canvas(self):
         """Return canvas (page) object"""
         return self.canvas
-
-    def get_color(self, color=None, default="black"):
-        """Get a color tuple; by name from a pre-defined dictionary or as RGB tuple."""
-        name = color or default
-        if isinstance(name, tuple) and len(name) == 3:  # RGB color tuple
-            if ((name[0] >= 0 and name[0] <= 255) and
-                (name[1] >= 0 and name[0] <= 255) and
-                (name[2] >= 0 and name[0] <= 255)):
-                return name
-            else:
-                tools.feedback(f'The color tuple "{name}" is invalid!')
-        elif isinstance(name, str) and len(name) == 7 and name[0] == '#':  # hexadecimal
-            rgb = tuple(int(name[i:i+2], 16) for i in (1, 3, 5))
-            return rgb
-        else:
-            pass  # unknown format
-        if name.upper() not in COLOR_NAMES:
-            tools.feedback(f'The color name "{name}" is not pre-defined!', True)
-        try:
-            color = getColor(name)
-            return color
-        except (AttributeError, ValueError):
-            tools.feedback(f'The color name "{name}" cannot be converted to RGB!', True)
 
     def get_page(self, name="A4"):
         """Get a paper format by name from a pre-defined dictionary."""
@@ -789,7 +795,8 @@ class BaseShape:
         # ---- rotation / position /elevation
         self.rotation = self.kw_float(
             kwargs.get("rotation", kwargs.get("rotation", cnv.rotation))
-        )  # degree
+        )  # degrees ant-clockwise
+        self.rotation_point = kwargs.get("rotation_point", cnv.rotation_point)
         self._rotation_theta = math.radians(self.rotation or 0)  # radians
         self.direction = kwargs.get("direction", cnv.direction)
         self.position = kwargs.get("position", cnv.position)
@@ -946,6 +953,7 @@ class BaseShape:
         self.grouping = self.kw_int(kwargs.get("grouping", 1))  # no. of cards in a set
         self.grouping_rows = self.kw_int(kwargs.get("grouping_rows", self.grouping))
         self.grouping_cols = self.kw_int(kwargs.get("grouping_cols", self.grouping))
+        self.lines = kwargs.get("lines", cnv.lines)
         # ---- circle / star / polygon
         self.diameter = self.kw_float(kwargs.get("diameter", cnv.diameter))
         self.radius = self.kw_float(kwargs.get("radius", cnv.radius))
@@ -1145,6 +1153,9 @@ class BaseShape:
     def kw_int(self, value, label: str = ""):
         return tools.as_int(value, label) if value is not None else value
 
+    def kw_bool(self, value, label: str = ""):
+        return tools.as_bool(value, label) if value is not None else value
+
     def unit(self, item, units=None, skip_none=False, label=""):
         """Convert an item into the appropriate unit system."""
         log.debug("units %s %s :: label: %s", units, self.units, label)
@@ -1222,7 +1233,7 @@ class BaseShape:
 
     def set_canvas_props(
         self,
-        shape,
+        shape: muShape,
         cnv=None,
         index=None,  # extract from list of potential values (usually Card options)
         fill=None,  # reserve None for 'no fill at all'
@@ -1232,10 +1243,11 @@ class BaseShape:
         stroke_cap=None,
         dotted=None,
         dashed=None,
+        rotation=None,
         debug=False,
     ):
         """Set Shape properties for fill, font, line and colors"""
-        tools.feedback('set_canvas_props() is deprecated', False)
+        tools.feedback("set_canvas_props() is deprecated", False)
 
         def ext(prop):
             if isinstance(prop, str):
@@ -1245,10 +1257,10 @@ class BaseShape:
             except TypeError:
                 return prop
 
-        # finish(
-        # width=1, color=(0,), fill=None, lineCap=0, lineJoin=0, dashes=None,
-        # closePath=True, even_odd=False, morph=(fixpoint, matrix),
-        # stroke_opacity=1, fill_opacity=1, oc=0
+        # Shape.finish(
+        #   width=1, color=(0,), fill=None, lineCap=0, lineJoin=0, dashes=None,
+        #   closePath=True, even_odd=False, morph=(fixpoint, matrix),
+        #   stroke_opacity=1, fill_opacity=1, oc=0
 
         # ---- set line dots / dashed
         _dotted = ext(dotted) or ext(self.dotted)
@@ -1261,19 +1273,38 @@ class BaseShape:
             dashes = self.values_to_points(_dashed)
         else:
             dashes = None
-
+        # ---- check rotation
+        morph = None
+        _rotation = rotation or self.rotation or None
+        if _rotation:
+            if not isinstance(_rotation, tuple):
+                tools.feedback(f'Unable to handle rotation: "{_rotation}"', True)
+            if not isinstance(_rotation[0], (float, int)):
+                tools.feedback(f'Rotation angle "{_rotation[0]}" is invalid', True)
+            if not isinstance(_rotation[1], muPoint):
+                tools.feedback(f'Rotation point "{_rotation[1]}" is invalid', True)
+            # ---- * set rotation matrix
+            mtrx = Matrix(1, 1)
+            mtrx.prerotate(_rotation[0])
+            morph = (_rotation[1], mtrx)
+        # ---- get color tuples
+        _color = get_color(color=stroke, default=self.stroke)
+        _fill = get_color(color=fill, default=self.fill)
+        # print(f'{_color:} {_fill:}')  # either: None, or fractional RGB
+        # ---- set/apply properties
         shape.finish(
             width=stroke_width or self.stroke_width,
-            color=stroke or self.stroke,
-            fill=fill or self.fill,
-            lineCap=stroke_cap or 0, # or self.stroke_cap,  # FIXME
+            color=_color,
+            fill=_fill,
+            lineCap=stroke_cap or 0,  # or self.stroke_cap,  # FIXME
             lineJoin=0,
             dashes=dashes,
             fill_opacity=transparency or self.transparency,
+            morph=morph,
         )
 
         return None
-        '''
+        """
         def ext(prop):
             if isinstance(prop, str):
                 return prop
@@ -1365,7 +1396,6 @@ class BaseShape:
             )
         except AttributeError:
             pass
-        # ---- line cap
         _stroke_cap = ext(stroke_cap)
         if _stroke_cap:
             if _stroke_cap in ["r", "rounded"]:
@@ -1374,7 +1404,6 @@ class BaseShape:
                 canvas.setLineCap(2)
             else:
                 tools.feedback(f'Line cap type "{_stroke_cap}" cannot be used.', False)
-        # ---- set line dots / dashed
         _dotted = ext(dotted) or ext(self.dotted)
         _dashed = ext(dashed) or ext(self.dashed)
         if _dotted:
@@ -1386,7 +1415,7 @@ class BaseShape:
             canvas.setDash(array=dash_points)
         else:
             canvas.setDash(array=[])
-        '''
+        """
 
     def draw(self, cnv=None, off_x=0, off_y=0, ID=None, **kwargs):
         """Draw an element on a given canvas."""
@@ -1415,7 +1444,7 @@ class BaseShape:
         # tools.feedback(f'*** draw baseshape: {self._abs_x=} {self._abs_y=} {self._abs_cx=} {self._abs_cy=}')
 
     def check_settings(self) -> tuple:
-        """Check that the user-supplied parameters for choices are correct"""
+        """Validate that the user-supplied parameters for choices are correct"""
         correct = True
         issue = []
         if self.align:
@@ -1473,6 +1502,19 @@ class BaseShape:
             ]:
                 issue.append(f'"{self.hand}" is an invalid hand!')
                 correct = False
+        if self.lines:
+            if str(self.lines).lower() not in [
+                "all",
+                "vertical",
+                "horizontal",
+                "vert",
+                "horiz",
+                "a",
+                "v",
+                "h",
+            ]:
+                issue.append(f'"{self.lines}" is an invalid lines setting!')
+                correct = False
         if self.elevation:
             if str(self.elevation).lower() not in [
                 "vertical",
@@ -1522,6 +1564,17 @@ class BaseShape:
                 "p",
             ]:
                 issue.append(f'"{self.petals_style}" is an invalid petals style!')
+                correct = False
+        # ---- line / arrow
+        if self.rotation_point:
+            if str(self.rotation_point).lower() not in [
+                "start",
+                "centre",
+                "end" "s",
+                "c",
+                "e",
+            ]:
+                issue.append(f'"{self.rotation_point}" is an invalid rotation_point!')
                 correct = False
         # ---- hexagons
         if self.coord_style:
@@ -1966,13 +2019,13 @@ class BaseShape:
         # tools.feedback(f"*** {string=} {rotation=}")
         # ---- text properties
         keys = {}
-        keys['fontsize'] = kwargs.get('font_size', self.font_size)
-        keys['fontname'] = kwargs.get('font_name', self.font_name)
+        keys["fontsize"] = kwargs.get("font_size", self.font_size)
+        keys["fontname"] = kwargs.get("font_name", self.font_name)
         # keys['fontfile'] = self.font_file
-        keys['color'] = kwargs.get('stroke', self.stroke)
-        keys['fill'] = kwargs.get('fill', self.fill)
-        keys['align'] = align or self.align
-        keys['rotate'] = rotation or 0
+        keys["color"] = kwargs.get("stroke", self.stroke)
+        keys["fill"] = kwargs.get("fill", self.fill)
+        keys["align"] = align or self.align
+        keys["rotate"] = rotation or 0
         # keys['stroke_opacity'] = self.show_stroke or 1
         # keys['fill_opacity'] = self.show_fill or 1
 
@@ -2042,9 +2095,9 @@ class BaseShape:
             y_off = y_offset or self.title_size / 2.0
             y = yh + self.unit(self.heading_my)
             x = xh + self.unit(self.heading_mx)
-            kwargs['font_name'] = self.font_name
-            kwargs['stroke'] = self.heading_stroke
-            kwargs['font_size'] = self.heading_size
+            kwargs["font_name"] = self.font_name
+            kwargs["stroke"] = self.heading_stroke
+            kwargs["font_size"] = self.heading_size
             self.draw_multi_string(
                 canvas, x, y + y_off, _ttext, align=align, rotation=_rotation, **kwargs
             )
@@ -2063,9 +2116,9 @@ class BaseShape:
             yl = yl - (self.label_size / 3.0) if centred else yl
             y = yl + self.unit(self.label_my)
             x = xl + self.unit(self.label_mx)
-            kwargs['font_name'] = self.font_name
-            kwargs['stroke'] = self.label_stroke
-            kwargs['font_size'] = self.label_size
+            kwargs["font_name"] = self.font_name
+            kwargs["stroke"] = self.label_stroke
+            kwargs["font_size"] = self.label_size
             self.draw_multi_string(
                 canvas, x, y, _ttext, align=align, rotation=_rotation, **kwargs
             )
@@ -2084,9 +2137,9 @@ class BaseShape:
             y_off = y_offset or self.title_size
             y = yt + self.unit(self.title_my)
             x = xt + self.unit(self.title_mx)
-            kwargs['font_name'] = self.font_name
-            kwargs['stroke'] = self.title_stroke
-            kwargs['font_size'] = self.title_size
+            kwargs["font_name"] = self.font_name
+            kwargs["stroke"] = self.title_stroke
+            kwargs["font_size"] = self.title_size
             self.draw_multi_string(
                 canvas, x, y - y_off, _ttext, align=align, rotation=_rotation, **kwargs
             )
@@ -2107,9 +2160,9 @@ class BaseShape:
             yl = yl - (self.radii_labels_size / 3.0) if centred else yl
             y = yl  # + self.unit(self.label_my)
             x = xl  # + self.unit(self.label_mx)
-            kwargs['font_name'] = self.radii_labels_face
-            kwargs['stroke'] = self.radii_labels_stroke
-            kwargs['font_size'] = self.radii_labels_size
+            kwargs["font_name"] = self.radii_labels_face
+            kwargs["stroke"] = self.radii_labels_stroke
+            kwargs["font_size"] = self.radii_labels_size
             self.draw_multi_string(
                 canvas, x, y, _ttext, align=align, rotation=_rotation, **kwargs
             )
@@ -2153,7 +2206,7 @@ class BaseShape:
         self,
         cnv,
         side: float,
-        lines: int,
+        line_count: int,
         vertices: list,
         left_nodes: tuple,
         right_nodes: tuple,
@@ -2162,7 +2215,7 @@ class BaseShape:
 
         Args:
             side: length of a side
-            lines: number of lines extending from the side
+            line_count: number of lines extending from the side
             vertices: list of the Points making up the shape
             left_nodes: ID's of vertices on either end of the left side
             right_nodes: ID's of vertices on either end of the right side
@@ -2171,9 +2224,9 @@ class BaseShape:
             * Vertices normally go clockwise from bottom/lower left
             * Directions of vertex indices in left- and right-nodes must be the same
         """
-        delta = side / lines
-        # tools.feedback(f'{side=} {lines=} {delta=}')
-        for number in range(0, lines + 1):
+        delta = side / line_count
+        # tools.feedback(f'{side=} {line_count=} {delta=}')
+        for number in range(0, line_count + 1):
             left_pt = geoms.point_on_line(
                 vertices[left_nodes[0]], vertices[left_nodes[1]], delta * number
             )
@@ -2291,7 +2344,7 @@ class BaseShape:
                 f' and an optional style - not "{border}"',
                 True,
             )
-        # ---- validate
+        # ---- line styles
         bwidth = tools.as_float(bwidth, "")
         if bstyle is True:
             dotted = True

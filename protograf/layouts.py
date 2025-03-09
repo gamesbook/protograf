@@ -73,10 +73,28 @@ class GridShape(BaseShape):
             y_cols.append(y + y_col * height)
         for x_col in range(0, self.cols + 1):
             x_cols.append(x + x_col * width)
-        # ---- set canvas
-        self.set_canvas_props(index=ID)  # this causes Image to disappear ???
         # ---- draw grid
-        cnv.grid(x_cols, y_cols)  # , stroke=1, fill=1)
+        match kwargs["lines"]:
+            case "horizontal" | "horiz" | "h":
+                horizontal, vertical = True, False
+            case "vertical" | "vert" | "v":
+                horizontal, vertical = False, True
+            case _:
+                horizontal, vertical = True, True
+        mu_shape = cnv.new_shape()
+        if vertical:
+            for x in x_cols:
+                mu_shape.draw_line(Point(x, y_cols[0]), Point(x, y_cols[-1]))
+        if horizontal:
+            for y in y_cols:
+                mu_shape.draw_line(Point(x_cols[0], y), Point(x_cols[-1], y))
+        self.set_canvas_props(  # shape.finish()
+            mu_shape,
+            # rotation=(self.rotation, the_point),
+            index=ID,
+        )
+        mu_shape.commit()
+        # cnv.grid(x_cols, y_cols)  # , stroke=1, fill=1)
 
 
 class DotGridShape(BaseShape):

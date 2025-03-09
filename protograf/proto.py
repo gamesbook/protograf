@@ -21,7 +21,8 @@ from typing import Union, Any
 # third party
 import jinja2
 import pymupdf
-'''
+
+"""
 from reportlab.lib.pagesizes import *
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
@@ -29,10 +30,10 @@ from reportlab.lib.pagesizes import A4
 
 # from reportlab.lib.colors import black, white
 from reportlab.lib.units import cm, inch
-'''
+"""
 # local
 from .bgg import BGGGame, BGGGameList
-from .base import BaseCanvas, GroupBase, COLORS, DEBUG_COLOR
+from .base import BaseCanvas, GroupBase, COLORS, DEBUG_COLOR, get_color
 from .dice import Dice, DiceD4, DiceD6, DiceD8, DiceD10, DiceD12, DiceD20, DiceD100
 from .shapes import (
     BaseShape,
@@ -276,7 +277,7 @@ def Save(**kwargs):
             dpi,
             directory,
             globals.card_frames,
-            globals.paper[1],
+            globals.page[1],
         )
 
 
@@ -966,6 +967,8 @@ def starfield(**kwargs):
 
 
 def Text(**kwargs):
+    tools.feedback("Text is under construction", False)
+    return
     kwargs = margins(**kwargs)
     text = TextShape(canvas=globals.cnv, **kwargs)
     text.draw()
@@ -1049,14 +1052,14 @@ def Blueprint(**kwargs):
     kwargs["y"] = kwargs.get("y", 0)
     m_x = kwargs["units"] * (globals.margin_left + globals.margin_right)
     m_y = kwargs["units"] * (globals.margin_top + globals.margin_bottom)
-    _cols = (globals.paper[0] - m_x) / (kwargs["units"] * float(kwargs["side"]))
-    _rows = (globals.paper[1] - m_y) / (kwargs["units"] * float(kwargs["side"]))
+    _cols = (globals.page[0] - m_x) / (kwargs["units"] * float(kwargs["side"]))
+    _rows = (globals.page[1] - m_y) / (kwargs["units"] * float(kwargs["side"]))
     rows = int(_rows)
     cols = int(_cols)
     kwargs["rows"] = kwargs.get("rows", rows)
     kwargs["cols"] = kwargs.get("cols", cols)
     kwargs["stroke_width"] = kwargs.get("stroke_width", 0.2)  # fine line
-    default_font_size = 10 * math.sqrt(globals.paper[0]) / math.sqrt(globals.paper[1])
+    default_font_size = 10 * math.sqrt(globals.page[0]) / math.sqrt(globals.page[1])
     dotted = kwargs.get("dotted", False)
     kwargs["font_size"] = kwargs.get("font_size", default_font_size)
     line_stroke, page_fill = set_style(kwargs.get("style", None))
@@ -1064,12 +1067,12 @@ def Blueprint(**kwargs):
     kwargs["fill"] = kwargs.get("fill", page_fill)
     # ---- page color (optional)
     if kwargs["fill"] is not None:
-        globals.cnv.canvas.setFillColor(kwargs["fill"])
-        globals.cnv.canvas.rect(
-            0, 0, globals.paper[0], globals.paper[1], stroke=0, fill=1
-        )
+        fill = get_color(kwargs["fill"], "white")
+        mu_shape = globals.cnv.new_shape()
+        mu_shape.draw_rect(0, 0, globals.page[0], globals.page[1], fill=fill)
     # ---- numbering
     if numbering:
+        # TODO => add position - Top Left Bottom Right
         _common = Common(
             font_size=kwargs["font_size"],
             stroke=kwargs["stroke"],
@@ -1102,6 +1105,7 @@ def Blueprint(**kwargs):
             text="0",
             common=_common,
         )
+
     # ---- draw subgrid
     if kwargs.get("subdivisions"):
         local_kwargs = copy(kwargs)

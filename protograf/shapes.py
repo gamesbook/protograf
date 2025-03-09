@@ -14,9 +14,11 @@ from urllib.parse import urlparse
 
 # third party
 import pymupdf
-'''
+from pymupdf import Shape as muShape, Point as muPoint
+
+"""
 from reportlab.lib.utils import ImageReader
-'''
+"""
 import segno  # QRCode
 
 # local
@@ -2315,24 +2317,32 @@ class LineShape(BaseShape):
             x = x + self.col * self._u.width
             x_1 = x_1 + self.col * self._u.width  # - self._u.margin_left
         # tools.feedback(f"{x=} {x_1=} {y=} {y_1=}")
-        # ---- set canvas
-        # ---- draw line
-        shape = cnv.new_shape()
-        shape.draw_line(Point(x, y), Point(x_1, y_1))
-        self.set_canvas_props(shape, index=ID)  # shape.finish()
-        shape.commit()
-        # cnv.drawPath(pth, stroke=1 if self.stroke else 0, fill=1 if self.fill else 0)
         # ---- calculate line rotation
-        compass, rotation = geoms.angles_from_points(x, y, x_1, y_1)
+        match self.rotation_point:
+            case "centre" | "center" | "c":
+                mid_point = geoms.fraction_along_line(Point(x, y), Point(x_1, y_1), 0.5)
+                the_point = muPoint(mid_point[0], mid_point[1])
+            case "start" | "s":
+                the_point = muPoint(x, y)
+            case "end" | "e":
+                the_point = muPoint(x_1, y_1)
+        # ---- draw line
+        mu_shape = cnv.new_shape()
+        mu_shape.draw_line(Point(x, y), Point(x_1, y_1))
+        self.set_canvas_props(  # shape.finish()
+            mu_shape, rotation=(self.rotation, the_point), index=ID
+        )
+        mu_shape.commit()
         # ---- dot
         self.draw_dot(cnv, (x_1 + x) / 2.0, (y_1 + y) / 2.0)
         # ---- text
+        kwargs.pop("rotation", None)
         self.draw_label(
             cnv,
             ID,
             (x_1 + x) / 2.0,
             (y_1 + y) / 2.0 + self.font_size / 4.0,
-            rotation=rotation,
+            rotation=(self.rotation, the_point),
             centred=False,
             **kwargs,
         )
@@ -4234,13 +4244,13 @@ class TextShape(BaseShape):
         # ---- text style
         if self.wrap:
             keys = {}
-            keys['fontsize'] =  self.font_size
-            keys['fontname'] = self.font_name
+            keys["fontsize"] = self.font_size
+            keys["fontname"] = self.font_name
             # keys['fontfile'] = self.font_file
-            keys['color'] = self.stroke
-            keys['fill'] = self.fill
-            keys['align'] = self.to_alignment()
-            keys['rotate'] = self.rotate
+            keys["color"] = self.stroke
+            keys["fill"] = self.fill
+            keys["align"] = self.to_alignment()
+            keys["rotate"] = self.rotate
             # keys['stroke_opacity'] = self.show_stroke
             # keys['fill_opacity'] = self.show_fill
 

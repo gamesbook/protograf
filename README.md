@@ -103,7 +103,6 @@ current / potential areas of work or idea development.
 * [ ] New shapes:
     * [ ] Diamond shape
     * [ ] Parallelogram shape
-    * [ ] Wave shape
     * [ ] Cross shape
     * [ ] Pod shape
 * [ ] Common objects:
@@ -150,13 +149,14 @@ These are possible examples to show board creation based on existing games:
 > "[Snow Crash](https://en.wikipedia.org/wiki/Snow_Crash)", Neal Stephenson, 1992.
 
 As always, with Python, you are building "on the shoulders of giants".
-In this case, the [pyMuPDF](https://pymupdf.io/) library provides all of the
+In this case, the [](https://pymupdf.io/) library provides all of the
 core infrastructure used to do the underlying graphics processing, PDF file
 creation and images exports; __protograf__ is effectively a highly customised
 wrapper to simplify common uses around its existing and extensive capabilities.
 
-An earlier version of  __protograf__  used the *ReportLab PDF Toolkit*, which is
-also a very powerful library for supporting this type of application.
+Earlier versions of  __protograf__  used the *ReportLab PDF Toolkit*, which is
+also a very powerful library for supporting this type of application. Internal
+terminology, such as `shapes`, was developed before the adoption of *pyMuPDF*.
 
 Additional libraries in use include:
 
