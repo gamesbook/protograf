@@ -132,6 +132,10 @@ def Create(**kwargs):
     defaults = kwargs.get("defaults", None)
     globals.units = kwargs.get("units", globals.units)
 
+    globals.page = pymupdf.paper_size(globals.paper)  # (width, height) in points
+    globals.page_width = globals.page[0] / globals.units
+    globals.page_height = globals.page[1] / globals.units
+
     # ---- fonts
     base_fonts()
     globals.font_size = kwargs.get("font_size", 12)
@@ -176,7 +180,7 @@ def Create(**kwargs):
     # ---- canvas, paper, page size, and deck
     globals.cnv = BaseCanvas(
         globals.document, paper=globals.paper, defaults=defaults, kwargs=kwargs
-    )  # a pymupdf Page
+    )
     if landscape:
         globals.cnv.canvas.setPageSize(landscape(globals.cnv.paper))
         globals.page_width = globals.cnv.paper[1]  # point units (1/72 of an inch)
@@ -219,7 +223,9 @@ def PageBreak(**kwargs):
     validate_globals()
 
     globals.page_count += 1
-    globals.cnv = globals.document.new_page()  # pymupdf Page
+    globals.cnv.canvas = globals.cnv.document.new_page(
+        width=globals.page[0], height=globals.page[1]
+    )  # pymupdf Page
 
     kwargs = margins(**kwargs)
     if kwargs.get("footer", globals.footer_draw):
@@ -250,12 +256,15 @@ def Save(**kwargs):
         globals.cnv.canvas.showPage()
 
     # ---- save canvas to file
+    msg = "Please check folder exists and that you have access rights."
     try:
         globals.document.save(globals.filename)
     except RuntimeError as err:
-        tools.feedback(f'Unable to save "{globals.filename}" - {err}', True)
+        tools.feedback(f'Unable to save "{globals.filename}" - {err} - {msg}', True)
     except FileNotFoundError as err:
-        tools.feedback(f'Unable to save "{globals.filename}" - {err}', True)
+        tools.feedback(f'Unable to save "{globals.filename}" - {err} - {msg}', True)
+    except pymupdf.mupdf.FzErrorSystem as err:
+        tools.feedback(f'Unable to save "{globals.filename}" - {err} - {msg}', True)
 
     # ---- save to image(s)
     output = kwargs.get("output", None)
@@ -1068,8 +1077,10 @@ def Blueprint(**kwargs):
     # ---- page color (optional)
     if kwargs["fill"] is not None:
         fill = get_color(kwargs["fill"], "white")
-        mu_shape = globals.cnv.new_shape()
-        mu_shape.draw_rect(0, 0, globals.page[0], globals.page[1], fill=fill)
+        # mu_shape = globals.cnv.canvas.new_shape()
+        globals.cnv.canvas.draw_rect(
+            (0, 0, globals.page[0], globals.page[1]), fill=fill
+        )
     # ---- numbering
     if numbering:
         # TODO => add position - Top Left Bottom Right

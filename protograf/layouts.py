@@ -74,7 +74,7 @@ class GridShape(BaseShape):
         for x_col in range(0, self.cols + 1):
             x_cols.append(x + x_col * width)
         # ---- draw grid
-        match kwargs["lines"]:
+        match kwargs.get("lines"):
             case "horizontal" | "horiz" | "h":
                 horizontal, vertical = True, False
             case "vertical" | "vert" | "v":

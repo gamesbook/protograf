@@ -30,6 +30,7 @@ from pymupdf.utils import getColor, getColorList
 # local
 from protograf.utils import geoms, tools
 from protograf.utils.support import LookupType, unit
+from protograf import globals
 
 log = logging.getLogger(__name__)
 
@@ -324,6 +325,7 @@ class BaseCanvas:
         """Create self.canvas as page-equivalent."""
 
         self.jsonfile = kwargs.get("defaults", None)
+        self.document = document
         self.defaults = {}
         # ---- setup defaults
         if self.jsonfile:
@@ -359,7 +361,7 @@ class BaseCanvas:
                     raise ValueError
             except Exception:
                 tools.feedback(f"Unable to use {_paper} as paper size!", True)
-        self.canvas = document.new_page(width=self.paper[0], height=self.paper[1])
+        self.canvas = self.document.new_page(width=self.paper[0], height=self.paper[1])
         # ---- constants
         self.default_length = 1
         self.show_id = False
@@ -738,9 +740,9 @@ class BaseShape:
         self.default_length = 1
         self.show_id = False  # True
         # ---- KEY
-        # print(f" *** {canvas=}")
-        self.canvas = canvas or BaseCanvas()  # BaseCanvas object
-        cnv = self.canvas  # shortcut for use in getting defaults
+        self.canvas = globals.cnv.canvas  # pymupdf Page object
+        cnv = globals.cnv
+        # print(f" *** {canvas=} {self.canvas=} {cnv=}")
         # log.debug("Base types %s %s %s",type(self.canvas), type(canvas), type(cnv))
         self._object = _object  # placeholder for an incoming Shape object
         self.shape_id = None
@@ -1966,10 +1968,10 @@ class BaseShape:
             log.exception(err)
             tools.feedback(f'Unable to convert "{value}" to {self.units}!', True)
 
-    def values_to_points(self, items: list) -> list:
+    def values_to_points(self, items: list, units_name=None) -> list:
         """Convert a list of values to point units."""
         try:
-            match self.units:
+            match units_name:
                 case "cm" | "centimetres":
                     return [float(item) * unit.cm for item in items]
                 case "mm" | "millimetres":
@@ -1978,11 +1980,15 @@ class BaseShape:
                     return [float(item) * unit.inch for item in items]
                 case "points" | "pts":
                     return [float(item) * unit.pt for item in items]
+                case None:
+                    return [float(item) * self.units for item in items]
                 case _:
-                    tools.feedback(f'Unable to convert "{self.units}" to points!', True)
+                    tools.feedback(
+                        f'Unable to convert units "{units_name}" to points!', True
+                    )
         except Exception as err:
             log.exception(err)
-            tools.feedback(f'Unable to convert "{items}" to points!', True)
+            tools.feedback(f'Unable to convert value(s) "{items}" to points!', True)
 
     def draw_multi_string(
         self, canvas, xm, ym, string, align=None, rotation=0, **kwargs

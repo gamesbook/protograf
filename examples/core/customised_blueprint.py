@@ -8,7 +8,7 @@ Created on: 18 August 2024
 from protograf import *
 
 Create(filename="customised_blueprint.pdf",
-       paper=A8,
+       paper="A8",
        margin_top=0.2,
        margin_left=0.75,
        margin_bottom=0.75,
@@ -21,7 +21,7 @@ Blueprint()
 Text(common=txt, text="Blueprint:defaults")
 PageBreak()
 
-Blueprint(stroke_width=1, stroke=red)
+Blueprint(stroke_width=1, stroke='red')
 Text(common=txt, text="Blueprint: stroke-red; width=1")
 PageBreak()
 
@@ -37,7 +37,7 @@ Blueprint(style='grey')
 Text(common=txt, text="Blueprint: style=grey")
 PageBreak()
 
-Blueprint(style='grey', stroke=purple)
+Blueprint(style='grey', stroke='purple')
 Text(common=txt, text="Blueprint: grey; stroke=purple")
 PageBreak()
 
@@ -51,7 +51,6 @@ PageBreak()
 
 Blueprint(decimals=1)
 Text(common=txt, text="Blueprint: decimals")
-PageBreak()
 
 Save(
      output='png',

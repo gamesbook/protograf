@@ -33,7 +33,7 @@ def initialize():
     global units
 
     document = None  # will become a pymupdf.document object
-    cnv = None  # will become a pymupdf.page object
+    cnv = None  # will become a BaseCanvas object
     deck = None  # will become a shapes.DeckShape object
     deck_settings = {}  # holds kwargs passed to Deck ; cards, copy, extra, grid_marks
     card_frames = {}  # list of BBox card outlines; keyed on page number
