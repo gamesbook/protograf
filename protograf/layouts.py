@@ -91,6 +91,7 @@ class GridShape(BaseShape):
         self.set_canvas_props(  # shape.finish()
             mu_shape,
             # rotation=(self.rotation, the_point),
+            kwargs,
             index=ID,
         )
         mu_shape.commit()

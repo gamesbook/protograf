@@ -1469,6 +1469,7 @@ been served.
 It can be styled as described below.
 
 - `Subdivisions <blueSub_>`_
+- `Subdivisions - dashed <blueSubDash_>`_
 - `Style: Blue <blueStyleBlue_>`_
 - `Style: Green <blueStyleGreen_>`_
 - `Style: Grey <blueStyleGrey_>`_
@@ -1482,11 +1483,11 @@ Subdivisions
 ------------
 `↑ <blueprint_>`_
 
-.. |bl1| image:: images/custom/blueprint/subdivisions.png
+.. |bl0| image:: images/custom/blueprint/subdivisions.png
    :width: 330
 
 ===== ======
-|bl1| This example shows the Blueprint constructed using the command with these
+|bl0| This example shows the Blueprint constructed using the command with these
       properties:
 
         .. code:: python
@@ -1500,6 +1501,36 @@ Subdivisions
 
       Note: *subdivisions* are not numbered and are automatically
       drawn with a thinner line in a *dotted* style.
+
+===== ======
+
+
+.. _blueSubDash:
+
+Subdivisions - Dashed
+---------------------
+`↑ <blueprint_>`_
+
+.. |bl1| image:: images/custom/blueprint/subdivisions_dashed.png
+   :width: 330
+
+===== ======
+|bl1| This example shows the Blueprint constructed using the command with these
+      properties:
+
+        .. code:: python
+
+          Blueprint(subdivisions=5, stroke_width=0.5, subdivisions_dashed=1)
+
+      It has the following properties set:
+
+      - *subdivisions* - ``5`` thinner lines between each pair of primary lines
+      - *stroke_width* - set to ``0.5`` |dash| thicker and more visible
+      - *subdivisions_dashed* - set to size of `1` (any whole number up to
+        size 8 can be used)
+
+      Note: *subdivisions* are not numbered and are automatically
+      drawn with a thinner line.
 
 ===== ======
 

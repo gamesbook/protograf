@@ -348,8 +348,7 @@ Example 2. Customised
           .. code:: python
 
               Line(x=0, y=4, x1=4, y1=5, stroke=blue, stroke_width=1,
-                 dashed=[0.2, 0.2, 0.2, 0.2, 1.0, 0.0],
-                 label="dashed", font_size=6)
+                 dashed=1, label="dashed", font_size=6)
 
               Line(
                 x=0, y=3, length=4.1, angle=15, stroke=red,
@@ -375,7 +374,8 @@ Example 2. Customised
           The medium blue line has a style set so that it is not a normal solid
           line:
 
-          - *dashed* - a list, shown by the square brackets from ``[`` to ``]``,
+          - *dashed* - set to size of ``1``; any whole number up to size ``8``
+            can be used
 
           The list provides a number of "on"/"off" pairs: the line is drawn for a
           distance matching an "on" value followed by a gap matching an "off"

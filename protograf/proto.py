@@ -1126,12 +1126,13 @@ def Blueprint(**kwargs):
         local_kwargs["cols"] = sub_count * kwargs["cols"]
         local_kwargs["stroke_width"] = kwargs.get("stroke_width") / 2.0
         local_kwargs["stroke"] = kwargs.get("subdivisions_stroke", kwargs["stroke"])
-        local_kwargs["dashed"] = kwargs.get("subdivisions_dashed", [])
+        local_kwargs["dashed"] = kwargs.get("subdivisions_dashed", None)
         local_kwargs["dotted"] = kwargs.get("subdivisions_dotted", True)
         if local_kwargs["dashed"]:
             local_kwargs["dotted"] = False
         subgrid = GridShape(canvas=globals.cnv, **local_kwargs)
         subgrid.draw(cnv=globals.cnv)
+
     # ---- draw Blueprint grid
     grid = GridShape(
         canvas=globals.cnv, dotted=dotted, **kwargs

@@ -36,7 +36,7 @@ Grid(x=0.25, y=0.4, side=1.25, stroke="#587CBC")
 Rectangle(x=0, y=0, width=59.4, height=42, fill=white, transparency=20)
 
 # Outline
-drect = Common(fill=None, stroke=grey, dashed=[0,0.05,0.05], rounding=0.5, stroke_width=2)
+drect = Common(fill=None, stroke=grey, dashed=1, rounding=0.5, stroke_width=2)
 
 # Action Cards Slots: Red
 rrect = rectangle(common=drect, x=-0.5, y=4.25, height=6., width=6.75)

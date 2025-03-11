@@ -172,28 +172,28 @@ def as_int(value, label, maximum=None, minimum=None, allow_none=False) -> int:
     # >>> as_int(value='3', label='N', maximum=2)
     # FEEDBACK:: z is
     # >>> as_int(value='z', label='N')
-    # FEEDBACK:: z is not a valid N integer!
+    # FEEDBACK:: The N value "z" is not a valid integer!
     # >>> as_int(value='3.1', label='N')
-    # FEEDBACK:: 3.1 is not a valid N integer!
+    # FEEDBACK:: The N value "3.1" is not a valid integer!
     """
     if value is None or value == "" and allow_none:
         return value
-    _label = f" for {label}" if label else " of"
+    _label = f"{label} value " if label else "value "
     try:
         the_value = int(value)
         if minimum and the_value < minimum:
             feedback(
-                f"The value{_label} integer is less than the minimum of {minimum}!",
+                f'The {_label}"{value}" integer is less than the minimum of {minimum}!',
                 True,
             )
         if maximum and the_value > maximum:
             feedback(
-                f"The value{_label} integer is more than the maximum of {maximum}!",
+                f'The {_label}"{value}" integer is more than the maximum of {maximum}!',
                 True,
             )
         return the_value
     except (ValueError, Exception):
-        feedback(f"The {value}{label} is not a valid integer!", True)
+        feedback(f'The {_label}"{value}" is not a valid integer!', True)
 
 
 def as_bool(value, label=None, allow_none=True) -> bool:

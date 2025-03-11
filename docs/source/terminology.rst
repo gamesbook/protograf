@@ -292,11 +292,10 @@ Styling-orientated Terms
 
 -  **dotted** - allows a line to be broken into a series of "dots" |dash| very
    short lines |dash| of length equal to the width of the line being drawn,
-   with spacing in-between each dot of that same length; to make a line dashed,
-   simply use ``dashed=True``
--  **dashed** - allows a line to be broken into a series of short lines
-   of specific lengths, separated by spaces of specified lengths; there
-   can any number of these length/space pairs
+   with spacing in-between each dot of that same length; to make a line dotted,
+   simply use ``dotted=True``
+-  **dashed** - allows a line to be broken into a series of short lines,
+   separated by spaces; any whole number in the range 1 to 8 can be used
 -  **transform** - will change text in a ``Text`` command to *uppercase*,
    *lowercase*, or *capitalise* it
 
