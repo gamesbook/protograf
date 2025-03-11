@@ -1520,14 +1520,14 @@ Subdivisions - Dashed
 
         .. code:: python
 
-          Blueprint(subdivisions=5, stroke_width=0.5, subdivisions_dashed=1)
+          Blueprint(subdivisions=5, stroke_width=0.5, subdivisions_dashed=[0.2, 0.1])
 
       It has the following properties set:
 
       - *subdivisions* - ``5`` thinner lines between each pair of primary lines
       - *stroke_width* - set to ``0.5`` |dash| thicker and more visible
-      - *subdivisions_dashed* - set to size of `1` (any whole number up to
-        size 8 can be used)
+      - *subdivisions_dashed* - a list with the length of the dash followed by
+        the length of the space between two dashes - ``2`` and ``1`` mm.
 
       Note: *subdivisions* are not numbered and are automatically
       drawn with a thinner line.

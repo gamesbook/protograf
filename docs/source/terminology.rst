@@ -295,7 +295,10 @@ Styling-orientated Terms
    with spacing in-between each dot of that same length; to make a line dotted,
    simply use ``dotted=True``
 -  **dashed** - allows a line to be broken into a series of short lines,
-   separated by spaces; any whole number in the range 1 to 8 can be used
+   separated by spaces defined in a list; the first number is the length of
+   the dash; the second is the length of the space between two dashes |dash|
+   note that sizes will be rounded to the nearest whole point value; so ``2cm``
+   which is equivalent to ``56.693`` points will be changed to ``57`` points
 -  **transform** - will change text in a ``Text`` command to *uppercase*,
    *lowercase*, or *capitalise* it
 

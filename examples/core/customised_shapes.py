@@ -296,7 +296,7 @@ Line(x=3, y=0.5, stroke_width=1.6, dotted=True, label="1.6", font_size=6)
 Line(x=0, y=2, length=4, stroke=lime, stroke_width=2)
 Line(x=0, y=3, length=4.1, angle=15, stroke=red, label="15", font_size=6)
 Line(x=0, y=4, x1=4, y1=5, stroke=blue, stroke_width=1,
-     dashed=2, label="dashed:2", font_size=6)
+     dashed=[0.2, 0.1], label="dashed:[0.2,0.1]", font_size=6)
 PageBreak()
 
 # ---- bezier - custom

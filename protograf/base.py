@@ -808,7 +808,7 @@ class BaseShape:
         self.line_width = self.kw_float(kwargs.get("line_width", cnv.line_width))
         self.line_cap = kwargs.get("line_cap", cnv.line_cap)
         self.dotted = kwargs.get("dotted", kwargs.get("dots", cnv.dotted))
-        self.dashed = self.kw_int(kwargs.get("dashed", cnv.dashed))
+        self.dashed = kwargs.get("dashed", cnv.dashed)
         # ---- fill color
         self.fill = kwargs.get("fill", kwargs.get("fill_color", cnv.fill))
         # ---- stroke
@@ -972,7 +972,7 @@ class BaseShape:
         self.radii_offset = self.kw_float(kwargs.get("radii_offset", cnv.radii_offset))
         self.radii_cap = kwargs.get("radii_cap", cnv.radii_cap)
         self.radii_dotted = kwargs.get("radii_dotted", cnv.dotted)
-        self.radii_dashed = self.kw_int(kwargs.get("radii_dashed", cnv.dashed))
+        self.radii_dashed = kwargs.get("radii_dashed", self.dashed)
         self.radii_labels = kwargs.get("radii_labels", cnv.radii_labels)
         self.radii_labels_size = self.kw_float(
             kwargs.get("radii_labels_size", self.font_size)
@@ -1000,7 +1000,7 @@ class BaseShape:
         )
         self.petals_fill = kwargs.get("petals_fill", cnv.petals_fill)
         self.petals_dotted = kwargs.get("petals_dotted", cnv.petals_dotted)
-        self.petals_dashed = self.kw_int(kwargs.get("petals_dashed", cnv.petals_dashed))
+        self.petals_dashed = kwargs.get("petals_dashed", self.dashed)
         # ---- compass
         self.perimeter = kwargs.get("perimeter", "circle")  # circle|rectangle|hexagon
         self.directions = kwargs.get("directions", None)
@@ -1042,7 +1042,7 @@ class BaseShape:
         )
         self.perbis_cap = kwargs.get("perbis_cap", cnv.perbis_cap)
         self.perbis_dotted = kwargs.get("perbis_dotted", cnv.dotted)
-        self.perbis_dashed = self.kw_int(kwargs.get("perbis_dashed", cnv.dashed))
+        self.perbis_dashed = kwargs.get("perbis_dashed", self.dashed)
         # ---- hexagon
         self.caltrops = kwargs.get("caltrops", cnv.caltrops)
         self.caltrops_fraction = self.kw_float(
@@ -1104,7 +1104,7 @@ class BaseShape:
         self.hatch_stroke = kwargs.get("hatch_stroke", cnv.stroke)
         self.hatch_cap = kwargs.get("hatch_cap", cnv.hatch_cap)
         self.hatch_dots = kwargs.get("hatch_dots", cnv.dotted)
-        self.hatch_dashed = self.kw_int(kwargs.get("hatch_dashed", cnv.dashed))
+        self.hatch_dashed = kwargs.get("hatch_dashed", self.dashed)
         # ---- deck
         self.deck_data = kwargs.get("deck_data", [])  # list of dicts
 
@@ -1246,6 +1246,7 @@ class BaseShape:
         dotted=None,
         dashed=None,
         rotation=None,
+        closed=False,  # whether to connect last and first points
         debug=False,
     ):
         """Set Shape properties for fill, font, line and colors"""
@@ -1267,18 +1268,20 @@ class BaseShape:
         # ---- set line dots / dashed
         _dotted = ext(dotted) or ext(self.dotted)
         _dashed = ext(dashed) or ext(self.dashed)
-        _dash_sizes = [2, 6, 12, 26, 32, 38, 42, 52]
         if _dotted:
-            the_stwd = ext(stroke_width) or ext(self.stroke_width)
-            # _dots = self.values_to_points([12, 12])
-            dashes = f"[{the_stwd}] 0"
+            the_stwd = round(ext(stroke_width)) if stroke_width else round(ext(self.stroke_width))
+            the_stwd = max(the_stwd, 1)
+            dashes = f"[{the_stwd} {the_stwd}] 0"
         elif _dashed:
-            _dash = 8 if _dashed > 8 else _dashed
-            _dash = 1 if _dashed < 1 else _dashed
-            _dash_size = _dash_sizes[_dash - 1]
-            dashes = f"[{_dash_size}] 0"
+            _dlist = _dashed if isinstance(_dashed, (list, tuple)) else \
+                   tools.sequence_split(_dashed, as_int=False)
+            doffset = round(self.unit(_dlist[2])) if len(_dlist) >= 3 else 0
+            dspaced = round(self.unit(_dlist[1])) if len(_dlist) >= 2 else ''
+            dlength = round(self.unit(_dlist[0])) if len(_dlist) >= 1 else ''
+            dashes = f"[{dlength} {dspaced}] {doffset}"
         else:
             dashes = None
+        # print(f"{_dotted =} {_dashed=} {dashes=}")
         # ---- check rotation
         morph = None
         _rotation = rotation or self.rotation or None
@@ -1293,12 +1296,10 @@ class BaseShape:
             mtrx = Matrix(1, 1)
             mtrx.prerotate(_rotation[0])
             morph = (_rotation[1], mtrx)
-
         # ---- get color tuples
         _color = get_color(color=stroke, default=self.stroke)
         _fill = get_color(color=fill, default=self.fill)
         # print(f'{_color:} {_fill:}')  # either: None, or fractional RGB
-
         # ---- set/apply properties
         shape.finish(
             width=stroke_width or self.stroke_width,
@@ -1309,6 +1310,7 @@ class BaseShape:
             dashes=dashes,
             fill_opacity=transparency or self.transparency,
             morph=morph,
+            closePath=closed,
         )
 
         return None

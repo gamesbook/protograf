@@ -200,10 +200,10 @@ Line(
     y=9,
     x1=19,
     y1=9,
-    dashed=1,
+    dashed=[0.2, 0.1],
     stroke=lime,
     stroke_width=2,
-    label="dashed=1",
+    label="dashed=[0.2,0.1]",
 )
 Line(x=0, y=5, x1=19, y1=5, dotted=True, stroke=blue, stroke_width=2, label="dotted")
 # house

@@ -41,11 +41,11 @@ Blueprint(style='grey', stroke='purple')
 Text(common=txt, text="Blueprint: grey; stroke=purple")
 PageBreak()
 
-Blueprint(subdivisions=4, stroke_width=.5)
+Blueprint(subdivisions=4, stroke_width=1)
 Text(common=txt, text="Blueprint: 4 subdivisions (dotted)")
 PageBreak()
 
-Blueprint(subdivisions=5, subdivisions_dashed=1, stroke_width=.5)
+Blueprint(subdivisions=5, subdivisions_dashed=[0.08, 0.08], stroke_width=.5)
 Text(common=txt, text="Blueprint: 5 dashed subdivisions")
 PageBreak()
 
