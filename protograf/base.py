@@ -1269,15 +1269,22 @@ class BaseShape:
         _dotted = ext(dotted) or ext(self.dotted)
         _dashed = ext(dashed) or ext(self.dashed)
         if _dotted:
-            the_stwd = round(ext(stroke_width)) if stroke_width else round(ext(self.stroke_width))
+            the_stwd = (
+                round(ext(stroke_width))
+                if stroke_width
+                else round(ext(self.stroke_width))
+            )
             the_stwd = max(the_stwd, 1)
             dashes = f"[{the_stwd} {the_stwd}] 0"
         elif _dashed:
-            _dlist = _dashed if isinstance(_dashed, (list, tuple)) else \
-                   tools.sequence_split(_dashed, as_int=False)
+            _dlist = (
+                _dashed
+                if isinstance(_dashed, (list, tuple))
+                else tools.sequence_split(_dashed, as_int=False)
+            )
             doffset = round(self.unit(_dlist[2])) if len(_dlist) >= 3 else 0
-            dspaced = round(self.unit(_dlist[1])) if len(_dlist) >= 2 else ''
-            dlength = round(self.unit(_dlist[0])) if len(_dlist) >= 1 else ''
+            dspaced = round(self.unit(_dlist[1])) if len(_dlist) >= 2 else ""
+            dlength = round(self.unit(_dlist[0])) if len(_dlist) >= 1 else ""
             dashes = f"[{dlength} {dspaced}] {doffset}"
         else:
             dashes = None
