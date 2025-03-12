@@ -441,7 +441,7 @@ class BaseCanvas:
         #     self.stroke = self.outline
         #     self.fill = None
         # ---- font
-        self.font_name = self.defaults.get("font_name", "Helvetica")
+        self.font_name = self.defaults.get("font_name", "helv")
         self.font_size = self.defaults.get("font_size", 12)
         self.font_style = self.defaults.get("font_style", None)
         self.font_directory = self.defaults.get("font_directory", None)
@@ -2011,7 +2011,7 @@ class BaseShape:
         """Low-level text drawing, split string (\n) if needed, with align and rotation.
 
         Args:
-            * canvas (pymupdf.Page): usually the calling
+            * canvas (pymupdf.Page oR pymupdf.Shape): set by calling function
               function should access cnv.canvas i.e. an attribute of BaseCanvas
             * xm (float) and ym (float): must be in native units (i.e. points)!
             * string (str): the text to draw/write
@@ -2024,6 +2024,19 @@ class BaseShape:
             * font_name -
             * stroke -
             * fill -
+
+        Notes:
+            Each Page draw method is just a convenience wrapper for:
+            (1) one Shape draw method,
+            (2) the Shape.finish() method, and
+            (3) the Shape.commit() method.
+            For Page text insertion, only the Shape.commit() method is invoked.
+            If many draw and text operations are executed for a page,
+            always consider using a Shape object.
+
+            If `canvas` is a Shape, then the calling function must execute the
+            Shape.finish() method and the Shape.commit() method; useful when
+            creating a series of text objects!
         """
         if not string:
             return
@@ -2045,8 +2058,7 @@ class BaseShape:
         # keys['fontfile'] = self.font_file
         keys["color"] = kwargs.get("stroke", self.stroke)
         keys["fill"] = kwargs.get("fill", self.fill)
-        keys["align"] = align or self.align
-        keys["rotate"] = rotation or 0
+        keys["rotate"] = rotation or 0  # must be multiple of 90
         # keys['stroke_opacity'] = self.show_stroke or 1
         # keys['fill_opacity'] = self.show_fill or 1
 
@@ -2061,6 +2073,23 @@ class BaseShape:
         # keys['overlay'] = True
 
         # ---- draw
+
+        # TODO - recalculate xm, ym based on align and text width
+        # keys["align"] = align or self.align
+
+        """
+        breakpoint()
+        # See: Document.get_char_widths(xref=0, limit=256)
+        doc = globals.document
+        widthlist = doc.get_char_widths(xref=0)
+        # *** pymupdf.mupdf.FzErrorFormat: code=7: object out of range (0 0 R); xref size 6
+        def pixlen(text, widthlist, fontsize):
+            try:
+                return sum([widthlist[ord(c)] for c in text]) * fontsize
+            except IndexError:
+                raise ValueError("max. code point found: %i, increase limit" % ord(max(text)))
+        """
+
         point = pymupdf.Point(xm, ym)
         canvas.insert_text(point, string, **keys)
 
@@ -2122,6 +2151,8 @@ class BaseShape:
             self.draw_multi_string(
                 canvas, x, y + y_off, _ttext, align=align, rotation=_rotation, **kwargs
             )
+            if isinstance(canvas, muShape):
+                canvas.commit()
 
     def draw_label(
         self, canvas, ID, xl, yl, align=None, rotation=0, centred=True, **kwargs
@@ -2143,6 +2174,8 @@ class BaseShape:
             self.draw_multi_string(
                 canvas, x, y, _ttext, align=align, rotation=_rotation, **kwargs
             )
+            if isinstance(canvas, muShape):
+                canvas.commit()
 
     def draw_title(
         self, canvas, ID, xt, yt, y_offset=0, align=None, rotation=0, **kwargs
@@ -2164,6 +2197,8 @@ class BaseShape:
             self.draw_multi_string(
                 canvas, x, y - y_off, _ttext, align=align, rotation=_rotation, **kwargs
             )
+            if isinstance(canvas, muShape):
+                canvas.commit()
 
     def draw_radii_label(
         self, canvas, ID, xl, yl, align=None, rotation=0, centred=True, **kwargs
@@ -2187,6 +2222,8 @@ class BaseShape:
             self.draw_multi_string(
                 canvas, x, y, _ttext, align=align, rotation=_rotation, **kwargs
             )
+            if isinstance(canvas, muShape):
+                canvas.commit()
 
     def draw_dot(self, canvas, x, y):
         """Draw a small dot on a shape (normally the centre)."""

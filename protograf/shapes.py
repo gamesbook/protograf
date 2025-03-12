@@ -983,35 +983,6 @@ class ChordShape(BaseShape):
         )
 
 
-class DotShape(BaseShape):
-    """
-    Dot of fixed radius on a given canvas.
-    """
-
-    def draw(self, cnv=None, off_x=0, off_y=0, ID=None, **kwargs):
-        """Draw a dot on a given canvas."""
-        kwargs = self.kwargs | kwargs
-        cnv = cnv.canvas if cnv else self.canvas
-        super().draw(cnv, off_x, off_y, ID, **kwargs)  # unit-based props
-        # tools.feedback(f"Dot {self._o.delta_x=} {self._o.delta_y=}")
-        if self.use_abs_c:
-            x = self._abs_cx
-            y = self._abs_cy
-        else:
-            x = self._u.x + self._o.delta_x
-            y = self._u.y + self._o.delta_y
-        size = self.dot_point / 2.0  # diameter is 3 points ~ 1mm or 1/32"
-        self.fill = self.stroke
-        self.set_canvas_props(index=ID)
-        # ---- draw dot
-        # tools.feedback(f'*** Dot {size=} {x=} {y=}')
-        cnv.circle(x, y, size, stroke=0, fill=1 if self.fill else 0)
-        # ---- text
-        self.draw_heading(cnv, ID, x, y, **kwargs)
-        self.draw_label(cnv, ID, x, y, **kwargs)
-        self.draw_title(cnv, ID, x, y, **kwargs)
-
-
 class CompassShape(BaseShape):
     """
     Compass on a given canvas.
@@ -1216,52 +1187,6 @@ class CompassShape(BaseShape):
         self.draw_title(cnv, ID, self.x_c, self.y_c - radius, **kwargs)
 
 
-class ChordShape(BaseShape):
-    """
-    Chord line on a Circle on a given canvas.
-    """
-
-    def draw(self, cnv=None, off_x=0, off_y=0, ID=None, **kwargs):
-        """Draw a chord on a given canvas."""
-        super().draw(cnv, off_x, off_y, ID, **kwargs)  # unit-based props
-        cnv = cnv.canvas if cnv else self.canvas
-        if not isinstance(self.shape, CircleShape):
-            tools.feedback("Shape must be a circle!", True)
-        circle = self.shape
-        x_c, y_c = circle.calculate_centre()
-        centre = Point(circle.cx, circle.cy)
-        pt0 = geoms.point_on_circle(centre, circle.radius, self.angle)
-        pt1 = geoms.point_on_circle(centre, circle.radius, self.angle_1)
-        # tools.feedback(f"*** {circle.radius=} {pt0=} {pt1=}")
-        x = self.unit(pt0.x) + self._o.delta_x
-        y = self.unit(pt0.y) + self._o.delta_y
-        x_1 = self.unit(pt1.x) + self._o.delta_x
-        y_1 = self.unit(pt1.y) + self._o.delta_y
-        # tools.feedback(f"*** {x=} {x_1=} {y=} {y_1=}")
-        # ---- set canvas
-        self.set_canvas_props(index=ID)
-        # ---- draw line
-        pth = cnv.beginPath()
-        pth.moveTo(x, y)
-        pth.lineTo(x_1, y_1)
-        cnv.drawPath(pth, stroke=1 if self.stroke else 0, fill=1 if self.fill else 0)
-        # ---- calculate line rotation
-        compass, rotation = geoms.angles_from_points(x, y, x_1, y_1)
-        # tools.feedback(f"*** {compass=} {rotation=}")
-        # ---- dot
-        self.draw_dot(cnv, (x_1 + x) / 2.0, (y_1 + y) / 2.0)
-        # ---- text
-        self.draw_label(
-            cnv,
-            ID,
-            (x_1 + x) / 2.0,
-            (y_1 + y) / 2.0,
-            rotation=rotation,
-            centred=False,
-            **kwargs,
-        )
-
-
 class DotShape(BaseShape):
     """
     Dot of fixed radius on a given canvas.
@@ -1269,9 +1194,10 @@ class DotShape(BaseShape):
 
     def draw(self, cnv=None, off_x=0, off_y=0, ID=None, **kwargs):
         """Draw a dot on a given canvas."""
+        kwargs = self.kwargs | kwargs
+        cnv = cnv.canvas if cnv else self.canvas
         super().draw(cnv, off_x, off_y, ID, **kwargs)  # unit-based props
         # tools.feedback(f"Dot {self._o.delta_x=} {self._o.delta_y=}")
-        cnv = cnv.canvas if cnv else self.canvas
         if self.use_abs_c:
             x = self._abs_cx
             y = self._abs_cy
@@ -1280,14 +1206,19 @@ class DotShape(BaseShape):
             y = self._u.y + self._o.delta_y
         size = self.dot_point / 2.0  # diameter is 3 points ~ 1mm or 1/32"
         self.fill = self.stroke
-        self.set_canvas_props(index=ID)
+        center = muPoint(x, y)
         # ---- draw dot
         # tools.feedback(f'*** Dot {size=} {x=} {y=}')
-        cnv.circle(x, y, size, stroke=0, fill=1 if self.fill else 0)
+        mu_shape = cnv.new_shape()
+        mu_shape.draw_circle(center=center, radius=size)
+        self.set_canvas_props(  # shape.finish()
+            mu_shape, cnv=cnv, rotation=(self.rotation, center), index=ID
+        )
         # ---- text
-        self.draw_heading(cnv, ID, x, y, **kwargs)
-        self.draw_label(cnv, ID, x, y, **kwargs)
-        self.draw_title(cnv, ID, x, y, **kwargs)
+        self.draw_heading(mu_shape, ID, x, y, **kwargs)
+        self.draw_label(mu_shape, ID, x, y, **kwargs)
+        self.draw_title(mu_shape, ID, x, y, **kwargs)
+        mu_shape.commit()
 
 
 class EllipseShape(BaseShape):
@@ -4287,7 +4218,7 @@ class TextShape(BaseShape):
                 tools.feedback(msg, True, True)
         else:
             # tools.feedback(f"*** {x_t=} {y_t=} {_text=} {sequence=} {rotation=}")
-            cnv.setFillColor(self.stroke)
+            # cnv.setFillColor(self.stroke)
             self.draw_multi_string(cnv, x_t, y_t, _text, rotation=rotation)
 
 
