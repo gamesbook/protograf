@@ -158,7 +158,7 @@ def Create(**kwargs):
     globals.pargs = parser.parse_args()
     # NB - pages does not work - see notes in PageBreak()
     if globals.pargs.pages:
-        tools.feedback("Pages is not an implemented feature - sorry!")
+        tools.feedback("--pages is not yet an implemented feature - sorry!")
 
     # ---- filename and fallback
     _filename = kwargs.get("filename", "")
@@ -174,29 +174,30 @@ def Create(**kwargs):
     globals.filename = os.path.join(globals.pargs.directory, _filename)
     # tools.feedback(f"output: {filename}", False)
 
-    # ---- document
-    globals.document = pymupdf.open()
+    # ---- document, page and shape/canvas
+    globals.document = pymupdf.open()  # pymupdf Document
+    globals.doc_page = globals.document.new_page(
+        width=globals.paper[0], height=globals.paper[1]
+    )  # pymupdf Page
+    globals.canvas = globals.doc_page.new_shape()  # pymupdf Shape
 
-    # ---- canvas, paper, page size, and deck
-    globals.cnv = BaseCanvas(
+    # ---- BaseCanvas
+    globals.base = BaseCanvas(
         globals.document, paper=globals.paper, defaults=defaults, kwargs=kwargs
     )
-    if landscape:
-        globals.cnv.canvas.setPageSize(landscape(globals.cnv.paper))
-        globals.page_width = globals.cnv.paper[1]  # point units (1/72 of an inch)
-        globals.page_height = globals.cnv.paper[0]  # point units (1/72 of an inch)
-    else:
-        globals.page_width = globals.cnv.paper[0]  # point units (1/72 of an inch)
-        globals.page_height = globals.cnv.paper[1]  # point units (1/72 of an inch)
+
+    # ---- paper, page size+color, deck
+    globals.page_width = globals.base.paper[0]  # point units (1/72 of an inch)
+    globals.page_height = globals.base.paper[1]  # point units (1/72 of an inch)
     if kwargs.get("page_fill"):
-        globals.cnv.canvas.setFillColor(kwargs.get("page_fill"))
-        globals.cnv.canvas.rect(
-            0, 0, globals.page_width, globals.page_height, stroke=0, fill=1
+        fill = get_color(kwargs["page_fill"], "white")
+        globals.canvas.draw_rect(
+            (0, 0, globals.page_width, globals.page_height), fill=fill
         )
 
     # ---- cards
     if _cards:
-        Deck(canvas=globals.cnv, sequence=range(1, _cards + 1), **kwargs)  # deck var
+        Deck(canvas=globals.canvas, sequence=range(1, _cards + 1), **kwargs)  # deck var
 
 
 def create(**kwargs):
@@ -210,7 +211,7 @@ def Footer(**kwargs):
     if not kwargs.get("font_size"):
         kwargs["font_size"] = globals.font_size
     globals.footer_draw = kwargs.get("draw", False)
-    globals.footer = FooterShape(_object=None, canvas=globals.cnv, **kwargs)
+    globals.footer = FooterShape(_object=None, canvas=globals.canvas, **kwargs)
     # footer.draw() - this is called via PageBreak()
 
 
@@ -222,18 +223,22 @@ def Header(**kwargs):
 def PageBreak(**kwargs):
     validate_globals()
 
+    globals.canvas.commit()  # add all drawings (to current pymupdf Shape)
     globals.page_count += 1
-    globals.cnv.canvas = globals.cnv.document.new_page(
+    globals.doc_page = globals.document.new_page(
         width=globals.page[0], height=globals.page[1]
     )  # pymupdf Page
+    globals.canvas = globals.doc_page.new_shape()  # pymupdf Shape for new Page
 
     kwargs = margins(**kwargs)
     if kwargs.get("footer", globals.footer_draw):
         if globals.footer is None:
             kwargs["paper"] = globals.paper
             kwargs["font_size"] = globals.font_size
-            globals.footer = FooterShape(_object=None, canvas=globals.cnv, **kwargs)
-        globals.footer.draw(cnv=globals.cnv, ID=globals.page_count, text=None, **kwargs)
+            globals.footer = FooterShape(_object=None, canvas=globals.canvas, **kwargs)
+        globals.footer.draw(
+            cnv=globals.base, ID=globals.page_count, text=None, **kwargs
+        )
 
 
 def page_break():
@@ -246,16 +251,18 @@ def Save(**kwargs):
     # ---- draw Deck
     if globals.deck and len(globals.deck.deck) >= 1:
         globals.deck.draw(
-            globals.cnv,
+            globals.base,
             cards=globals.deck_settings.get("cards", 9),
             copy=globals.deck_settings.get("copy", None),
             extra=globals.deck_settings.get("extra", 0),
             grid_marks=globals.deck_settings.get("grid_marks", None),
             image_list=globals.image_list,
         )
-        globals.cnv.canvas.showPage()
 
-    # ---- save canvas to file
+    # ---- update current pymupdf Shape
+    globals.canvas.commit()  # add all drawings (to current pymupdf Shape)
+
+    # ---- save all Pages to file
     msg = "Please check folder exists and that you have access rights."
     try:
         globals.document.save(globals.filename)
@@ -317,11 +324,11 @@ def margins(**kwargs):
 def Font(name=None, **kwargs):
     validate_globals()
 
-    globals.cnv.font_name = name or "Helvetica"
-    globals.cnv.font_size = kwargs.get("size", 12)
-    globals.cnv.font_style = kwargs.get("style", None)
-    globals.cnv.font_directory = kwargs.get("directory", None)
-    globals.cnv.stroke = kwargs.get("stroke", "black")
+    globals.base.font_name = name or "Helvetica"
+    globals.base.font_size = kwargs.get("size", 12)
+    globals.base.font_style = kwargs.get("style", None)
+    globals.base.font_directory = kwargs.get("directory", None)
+    globals.base.stroke = kwargs.get("stroke", "black")
 
 
 # ---- various ====
@@ -630,28 +637,28 @@ def Set(_object, **kwargs):
 def base_shape(source=None, **kwargs):
     kwargs = margins(**kwargs)
     kwargs["source"] = source
-    bshape = BaseShape(canvas=globals.cnv, **kwargs)
+    bshape = BaseShape(canvas=globals.canvas, **kwargs)
     return bshape
 
 
 def Common(source=None, **kwargs):
     kwargs = margins(**kwargs)
     kwargs["source"] = source
-    cshape = CommonShape(canvas=globals.cnv, **kwargs)
+    cshape = CommonShape(canvas=globals.canvas, **kwargs)
     return cshape
 
 
 def common(source=None, **kwargs):
     kwargs = margins(**kwargs)
     kwargs["source"] = source
-    cshape = CommonShape(canvas=globals.cnv, **kwargs)
+    cshape = CommonShape(canvas=globals.canvas, **kwargs)
     return cshape
 
 
 def Image(source=None, **kwargs):
     kwargs = margins(**kwargs)
     kwargs["source"] = source
-    image = ImageShape(canvas=globals.cnv, **kwargs)
+    image = ImageShape(canvas=globals.canvas, **kwargs)
     image.draw()
     return image
 
@@ -659,19 +666,19 @@ def Image(source=None, **kwargs):
 def image(source=None, **kwargs):
     kwargs = margins(**kwargs)
     kwargs["source"] = source
-    return ImageShape(canvas=globals.cnv, **kwargs)
+    return ImageShape(canvas=globals.canvas, **kwargs)
 
 
 def Arc(**kwargs):
     kwargs = margins(**kwargs)
-    arc = ArcShape(canvas=globals.cnv, **kwargs)
+    arc = ArcShape(canvas=globals.canvas, **kwargs)
     arc.draw()
     return arc
 
 
 def arc(**kwargs):
     kwargs = margins(**kwargs)
-    return ArcShape(canvas=globals.cnv, **kwargs)
+    return ArcShape(canvas=globals.canvas, **kwargs)
 
 
 def Arrow(row=None, col=None, **kwargs):
@@ -685,19 +692,19 @@ def arrow(row=None, col=None, **kwargs):
     kwargs = margins(**kwargs)
     kwargs["row"] = row
     kwargs["col"] = col
-    return ArrowShape(canvas=globals.cnv, **kwargs)
+    return ArrowShape(canvas=globals.canvas, **kwargs)
 
 
 def Bezier(**kwargs):
     kwargs = margins(**kwargs)
-    bezier = BezierShape(canvas=globals.cnv, **kwargs)
+    bezier = BezierShape(canvas=globals.canvas, **kwargs)
     bezier.draw()
     return bezier
 
 
 def bezier(**kwargs):
     kwargs = margins(**kwargs)
-    return BezierShape(canvas=globals.cnv, **kwargs)
+    return BezierShape(canvas=globals.canvas, **kwargs)
 
 
 def Chord(row=None, col=None, **kwargs):
@@ -711,19 +718,19 @@ def chord(row=None, col=None, **kwargs):
     kwargs = margins(**kwargs)
     kwargs["row"] = row
     kwargs["col"] = col
-    return ChordShape(canvas=globals.cnv, **kwargs)
+    return ChordShape(canvas=globals.canvas, **kwargs)
 
 
 def Circle(**kwargs):
     kwargs = margins(**kwargs)
-    circle = CircleShape(canvas=globals.cnv, **kwargs)
+    circle = CircleShape(canvas=globals.canvas, **kwargs)
     circle.draw()
     return circle
 
 
 def circle(**kwargs):
     kwargs = margins(**kwargs)
-    return CircleShape(canvas=globals.cnv, **kwargs)
+    return CircleShape(canvas=globals.canvas, **kwargs)
 
 
 def Compass(row=None, col=None, **kwargs):
@@ -735,7 +742,7 @@ def Compass(row=None, col=None, **kwargs):
 
 def compass(row=None, col=None, **kwargs):
     kwargs = margins(**kwargs)
-    return CompassShape(canvas=globals.cnv, **kwargs)
+    return CompassShape(canvas=globals.canvas, **kwargs)
 
 
 def Dot(row=None, col=None, **kwargs):
@@ -747,33 +754,33 @@ def Dot(row=None, col=None, **kwargs):
 
 def dot(row=None, col=None, **kwargs):
     kwargs = margins(**kwargs)
-    return DotShape(canvas=globals.cnv, **kwargs)
+    return DotShape(canvas=globals.canvas, **kwargs)
 
 
 def Ellipse(**kwargs):
     kwargs = margins(**kwargs)
-    ellipse = EllipseShape(canvas=globals.cnv, **kwargs)
+    ellipse = EllipseShape(canvas=globals.canvas, **kwargs)
     ellipse.draw()
     return ellipse
 
 
 def ellipse(**kwargs):
     kwargs = margins(**kwargs)
-    return EllipseShape(canvas=globals.cnv, **kwargs)
+    return EllipseShape(canvas=globals.canvas, **kwargs)
 
 
 def EquilateralTriangle(row=None, col=None, **kwargs):
     kwargs = margins(**kwargs)
     kwargs["row"] = row
     kwargs["col"] = col
-    eqt = EquilateralTriangleShape(canvas=globals.cnv, **kwargs)
+    eqt = EquilateralTriangleShape(canvas=globals.canvas, **kwargs)
     eqt.draw()
     return eqt
 
 
 def equilateraltriangle(row=None, col=None, **kwargs):
     kwargs = margins(**kwargs)
-    return EquilateralTriangleShape(canvas=globals.cnv, **kwargs)
+    return EquilateralTriangleShape(canvas=globals.canvas, **kwargs)
 
 
 def Hexagon(row=None, col=None, **kwargs):
@@ -781,7 +788,7 @@ def Hexagon(row=None, col=None, **kwargs):
     # print(f'Will draw HexShape: {kwargs}')
     kwargs["row"] = row
     kwargs["col"] = col
-    hexagon = HexShape(canvas=globals.cnv, **kwargs)
+    hexagon = HexShape(canvas=globals.canvas, **kwargs)
     hexagon.draw()
     return hexagon
 
@@ -790,7 +797,7 @@ def hexagon(row=None, col=None, **kwargs):
     kwargs = margins(**kwargs)
     kwargs["row"] = row
     kwargs["col"] = col
-    return HexShape(canvas=globals.cnv, **kwargs)
+    return HexShape(canvas=globals.canvas, **kwargs)
 
 
 def Line(row=None, col=None, **kwargs):
@@ -804,7 +811,7 @@ def line(row=None, col=None, **kwargs):
     kwargs = margins(**kwargs)
     kwargs["row"] = row
     kwargs["col"] = col
-    return LineShape(canvas=globals.cnv, **kwargs)
+    return LineShape(canvas=globals.canvas, **kwargs)
 
 
 def Polygon(row=None, col=None, **kwargs):
@@ -818,7 +825,7 @@ def polygon(row=None, col=None, **kwargs):
     kwargs = margins(**kwargs)
     kwargs["row"] = row
     kwargs["col"] = col
-    return PolygonShape(canvas=globals.cnv, **kwargs)
+    return PolygonShape(canvas=globals.canvas, **kwargs)
 
 
 def Polyline(row=None, col=None, **kwargs):
@@ -832,21 +839,21 @@ def polyline(row=None, col=None, **kwargs):
     kwargs = margins(**kwargs)
     kwargs["row"] = row
     kwargs["col"] = col
-    return PolylineShape(canvas=globals.cnv, **kwargs)
+    return PolylineShape(canvas=globals.canvas, **kwargs)
 
 
 def RightAngledTriangle(row=None, col=None, **kwargs):
     kwargs = margins(**kwargs)
     kwargs["row"] = row
     kwargs["col"] = col
-    rat = RightAngledTriangleShape(canvas=globals.cnv, **kwargs)
+    rat = RightAngledTriangleShape(canvas=globals.canvas, **kwargs)
     rat.draw()
     return rat
 
 
 def rightangledtriangle(row=None, col=None, **kwargs):
     kwargs = margins(**kwargs)
-    return RightAngledTriangleShape(canvas=globals.cnv, **kwargs)
+    return RightAngledTriangleShape(canvas=globals.canvas, **kwargs)
 
 
 def Rhombus(row=None, col=None, **kwargs):
@@ -858,7 +865,7 @@ def Rhombus(row=None, col=None, **kwargs):
 
 def rhombus(row=None, col=None, **kwargs):
     kwargs = margins(**kwargs)
-    return RhombusShape(canvas=globals.cnv, **kwargs)
+    return RhombusShape(canvas=globals.canvas, **kwargs)
 
 
 def Rectangle(row=None, col=None, **kwargs):
@@ -872,7 +879,7 @@ def rectangle(row=None, col=None, **kwargs):
     kwargs = margins(**kwargs)
     kwargs["row"] = row
     kwargs["col"] = col
-    return RectangleShape(canvas=globals.cnv, **kwargs)
+    return RectangleShape(canvas=globals.canvas, **kwargs)
 
 
 def Polyshape(row=None, col=None, **kwargs):
@@ -886,13 +893,13 @@ def polyshape(row=None, col=None, **kwargs):
     kwargs = margins(**kwargs)
     kwargs["row"] = row
     kwargs["col"] = col
-    return ShapeShape(canvas=globals.cnv, **kwargs)
+    return ShapeShape(canvas=globals.canvas, **kwargs)
 
 
 def QRCode(source=None, **kwargs):
     kwargs = margins(**kwargs)
     kwargs["source"] = source
-    image = QRCodeShape(canvas=globals.cnv, **kwargs)
+    image = QRCodeShape(canvas=globals.canvas, **kwargs)
     image.draw()
     return image
 
@@ -900,7 +907,7 @@ def QRCode(source=None, **kwargs):
 def qrcode(source=None, **kwargs):
     kwargs = margins(**kwargs)
     kwargs["source"] = source
-    return QRCodeShape(canvas=globals.cnv, **kwargs)
+    return QRCodeShape(canvas=globals.canvas, **kwargs)
 
 
 def Sector(row=None, col=None, **kwargs):
@@ -914,7 +921,7 @@ def sector(row=None, col=None, **kwargs):
     kwargs = margins(**kwargs)
     kwargs["row"] = row
     kwargs["col"] = col
-    return SectorShape(canvas=globals.cnv, **kwargs)
+    return SectorShape(canvas=globals.canvas, **kwargs)
 
 
 def Square(row=None, col=None, **kwargs):
@@ -928,14 +935,14 @@ def square(row=None, col=None, **kwargs):
     kwargs = margins(**kwargs)
     kwargs["row"] = row
     kwargs["col"] = col
-    return SquareShape(canvas=globals.cnv, **kwargs)
+    return SquareShape(canvas=globals.canvas, **kwargs)
 
 
 def Stadium(row=None, col=None, **kwargs):
     kwargs = margins(**kwargs)
     kwargs["row"] = row
     kwargs["col"] = col
-    std = StadiumShape(canvas=globals.cnv, **kwargs)
+    std = StadiumShape(canvas=globals.canvas, **kwargs)
     std.draw()
     return std
 
@@ -944,14 +951,14 @@ def stadium(row=None, col=None, **kwargs):
     kwargs = margins(**kwargs)
     kwargs["row"] = row
     kwargs["col"] = col
-    return StadiumShape(canvas=globals.cnv, **kwargs)
+    return StadiumShape(canvas=globals.canvas, **kwargs)
 
 
 def Star(row=None, col=None, **kwargs):
     kwargs = margins(**kwargs)
     kwargs["row"] = row
     kwargs["col"] = col
-    star = StarShape(canvas=globals.cnv, **kwargs)
+    star = StarShape(canvas=globals.canvas, **kwargs)
     star.draw()
     return star
 
@@ -960,26 +967,26 @@ def star(row=None, col=None, **kwargs):
     kwargs = margins(**kwargs)
     kwargs["row"] = row
     kwargs["col"] = col
-    return StarShape(canvas=globals.cnv, **kwargs)
+    return StarShape(canvas=globals.canvas, **kwargs)
 
 
 def StarField(**kwargs):
     kwargs = margins(**kwargs)
-    starfield = StarFieldShape(canvas=globals.cnv, **kwargs)
+    starfield = StarFieldShape(canvas=globals.canvas, **kwargs)
     starfield.draw()
     return starfield
 
 
 def starfield(**kwargs):
     kwargs = margins(**kwargs)
-    return StarFieldShape(canvas=globals.cnv, **kwargs)
+    return StarFieldShape(canvas=globals.canvas, **kwargs)
 
 
 def Text(**kwargs):
     tools.feedback("Text is under construction", False)
     return
     kwargs = margins(**kwargs)
-    text = TextShape(canvas=globals.cnv, **kwargs)
+    text = TextShape(canvas=globals.canvas, **kwargs)
     text.draw()
     return text
 
@@ -987,7 +994,7 @@ def Text(**kwargs):
 def text(*args, **kwargs):
     kwargs = margins(**kwargs)
     _obj = args[0] if args else None
-    return TextShape(_object=_obj, canvas=globals.cnv, **kwargs)
+    return TextShape(_object=_obj, canvas=globals.canvas, **kwargs)
 
 
 def Trapezoid(row=None, col=None, **kwargs):
@@ -1001,7 +1008,7 @@ def trapezoid(row=None, col=None, **kwargs):
     kwargs = margins(**kwargs)
     kwargs["row"] = row
     kwargs["col"] = col
-    return TrapezoidShape(canvas=globals.cnv, **kwargs)
+    return TrapezoidShape(canvas=globals.canvas, **kwargs)
 
 
 # ---- grids ====
@@ -1012,7 +1019,7 @@ def DotGrid(**kwargs):
     # override defaults ... otherwise grid not "next" to margins
     kwargs["x"] = kwargs.get("x", 0)
     kwargs["y"] = kwargs.get("y", 0)
-    dgrd = DotGridShape(canvas=globals.cnv, **kwargs)
+    dgrd = DotGridShape(canvas=globals.canvas, **kwargs)
     dgrd.draw()
     return dgrd
 
@@ -1022,7 +1029,7 @@ def Grid(**kwargs):
     # override defaults ... otherwise grid not "next" to margins
     kwargs["x"] = kwargs.get("x", 0)
     kwargs["y"] = kwargs.get("y", 0)
-    grid = GridShape(canvas=globals.cnv, **kwargs)
+    grid = GridShape(canvas=globals.canvas, **kwargs)
     grid.draw()
     return grid
 
@@ -1077,10 +1084,7 @@ def Blueprint(**kwargs):
     # ---- page color (optional)
     if kwargs["fill"] is not None:
         fill = get_color(kwargs["fill"], "white")
-        # mu_shape = globals.cnv.canvas.new_shape()
-        globals.cnv.canvas.draw_rect(
-            (0, 0, globals.page[0], globals.page[1]), fill=fill
-        )
+        globals.canvas.draw_rect((0, 0, globals.page[0], globals.page[1]), fill=fill)
     # ---- numbering
     if numbering:
         # TODO => add position - Top Left Bottom Right
@@ -1130,14 +1134,14 @@ def Blueprint(**kwargs):
         local_kwargs["dotted"] = kwargs.get("subdivisions_dotted", True)
         if local_kwargs["dashed"]:
             local_kwargs["dotted"] = False
-        subgrid = GridShape(canvas=globals.cnv, **local_kwargs)
-        subgrid.draw(cnv=globals.cnv)
+        subgrid = GridShape(canvas=globals.canvas, **local_kwargs)
+        subgrid.draw(cnv=globals.canvas)
 
     # ---- draw Blueprint grid
     grid = GridShape(
-        canvas=globals.cnv, dotted=dotted, **kwargs
+        canvas=globals.canvas, dotted=dotted, **kwargs
     )  # don't add canvas as arg here!
-    grid.draw(cnv=globals.cnv)
+    grid.draw(cnv=globals.canvas)
     return grid
 
 
@@ -1148,8 +1152,8 @@ def Connect(shape_from, shape_to, **kwargs):
     kwargs = margins(**kwargs)
     kwargs["shape_from"] = shape_from
     kwargs["shape_to"] = shape_to
-    connect = ConnectShape(canvas=globals.cnv, **kwargs)
-    connect.draw(cnv=globals.cnv)
+    connect = ConnectShape(canvas=globals.canvas, **kwargs)
+    connect.draw(cnv=globals.canvas)
     return connect
 
 
@@ -1157,7 +1161,7 @@ def connect(shape_from, shape_to, **kwargs):
     kwargs = margins(**kwargs)
     kwargs["shape_from"] = shape_from
     kwargs["shape_to"] = shape_to
-    return ConnectShape(canvas=globals.cnv, **kwargs)
+    return ConnectShape(canvas=globals.canvas, **kwargs)
 
 
 # ---- repeats ====
@@ -1931,7 +1935,7 @@ def Track(track=None, **kwargs):
             sequence=index + 1,
         )
         _locale = locale._asdict()
-        shape.draw(cnv=globals.cnv, rotation=shape_rotation, locale=_locale)
+        shape.draw(cnv=globals.base, rotation=shape_rotation, locale=_locale)
         shape_id += 1
         if shape_id > len(shapes) - 1:
             shape_id = 0  # reset and start again

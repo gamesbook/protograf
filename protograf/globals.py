@@ -8,7 +8,7 @@ from protograf.utils.support import unit
 
 def initialize():
     global document
-    global cnv
+    global base
     global deck
     global deck_settings
     global card_frames  # card boundaries - use for image extraction
@@ -32,8 +32,10 @@ def initialize():
     global font_size
     global units
 
-    document = None  # will become a pymupdf.document object
-    cnv = None  # will become a BaseCanvas object
+    document = None  # will become a pymupdf.Document object
+    doc_page = None  # will become a pymupdf.Page object
+    canvas = None  # will become a pymupdf.Shape object; one created per Page
+    base = None  # will become a base.BaseCanvas object
     deck = None  # will become a shapes.DeckShape object
     deck_settings = {}  # holds kwargs passed to Deck ; cards, copy, extra, grid_marks
     card_frames = {}  # list of BBox card outlines; keyed on page number

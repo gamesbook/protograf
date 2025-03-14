@@ -46,7 +46,7 @@ class GridShape(BaseShape):
     def draw(self, cnv=None, off_x=0, off_y=0, ID=None, **kwargs):
         """Draw a grid on a given canvas."""
         kwargs = self.kwargs | kwargs
-        cnv = cnv.canvas if cnv else self.canvas.canvas
+        cnv = cnv if cnv else self.canvas
         super().draw(cnv, off_x, off_y, ID, **kwargs)  # unit-based props
         # ---- convert to using units
         x = self._u.x + self._o.delta_x
@@ -81,20 +81,18 @@ class GridShape(BaseShape):
                 horizontal, vertical = False, True
             case _:
                 horizontal, vertical = True, True
-        mu_shape = cnv.new_shape()
         if vertical:
             for x in x_cols:
-                mu_shape.draw_line(Point(x, y_cols[0]), Point(x, y_cols[-1]))
+                cnv.draw_line(Point(x, y_cols[0]), Point(x, y_cols[-1]))
         if horizontal:
             for y in y_cols:
-                mu_shape.draw_line(Point(x_cols[0], y), Point(x_cols[-1], y))
+                cnv.draw_line(Point(x_cols[0], y), Point(x_cols[-1], y))
         self.set_canvas_props(  # shape.finish()
-            mu_shape,
+            cnv,
             # rotation=(self.rotation, the_point),
             kwargs,
             index=ID,
         )
-        mu_shape.commit()
         # cnv.grid(x_cols, y_cols)  # , stroke=1, fill=1)
 
 
@@ -110,7 +108,7 @@ class DotGridShape(BaseShape):
     def draw(self, cnv=None, off_x=0, off_y=0, ID=None, **kwargs):
         """Draw a dot grid on a given canvas."""
         kwargs = self.kwargs | kwargs
-        cnv = cnv.canvas if cnv else self.canvas.canvas
+        cnv = cnv if cnv else self.canvas
         super().draw(cnv, off_x, off_y, ID, **kwargs)  # unit-based props
         # ---- switch to use of units
         x = 0 + self._u.offset_x
@@ -264,7 +262,7 @@ class SequenceShape(BaseShape):
 
     def draw(self, cnv=None, off_x=0, off_y=0, ID=None, **kwargs):
         kwargs = self.kwargs | kwargs
-        cnv = cnv.canvas if cnv else self.canvas.canvas
+        cnv = cnv if cnv else self.canvas
         super().draw(cnv, off_x, off_y, ID, **kwargs)  # unit-based props
         _off_x, _off_y = off_x, off_y
 
@@ -361,7 +359,7 @@ class RepeatShape(BaseShape):
     def draw(self, cnv=None, off_x=0, off_y=0, ID=None, **kwargs):
         _ID = ID if ID is not None else self.shape_id
         kwargs = self.kwargs | kwargs
-        cnv = cnv.canvas if cnv else self.canvas.canvas
+        cnv = cnv if cnv else self.canvas
         super().draw(cnv, off_x, off_y, ID, **kwargs)  # unit-based props
         _off_x, _off_y = off_x or self.offset_x or 0, off_y or self.offset_y or 0
         # print(f'*** {_off_x=}, {_off_y=}')
@@ -1045,7 +1043,7 @@ class ConnectShape(BaseShape):
         """Draw a connection (line) between two shapes on given canvas."""
         kwargs = self.kwargs | kwargs
         base_canvas = cnv
-        cnv = cnv.canvas if cnv else self.canvas.canvas
+        cnv = cnv if cnv else self.canvas
         super().draw(cnv, off_x, off_y, ID, **kwargs)  # unit-based props
         # ---- style
         style = self.style or "direct"

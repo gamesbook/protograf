@@ -112,7 +112,7 @@ class ImageShape(BaseShape):
     def draw(self, cnv=None, off_x=0, off_y=0, ID=None, **kwargs):
         """Show an image on a given canvas."""
         kwargs = self.kwargs | kwargs
-        cnv = cnv.canvas if cnv else self.canvas
+        cnv = cnv if cnv else self.canvas
         super().draw(cnv, off_x, off_y, ID, **kwargs)  # unit-based props
         img = None
         # ---- check for Card usage
@@ -222,7 +222,7 @@ class ArcShape(BaseShape):
     def draw(self, cnv=None, off_x=0, off_y=0, ID=None, **kwargs):
         """Draw arc on a given canvas."""
         kwargs = self.kwargs | kwargs
-        cnv = cnv.canvas if cnv else self.canvas
+        cnv = cnv if cnv else self.canvas
         super().draw(cnv, off_x, off_y, ID, **kwargs)  # unit-based props
         # tools.feedback(f'*** ARC {self.x=} {self.y=} {self.x_1=} {self.y_1=} {self.angle_width=} ')
         # ---- convert to using units
@@ -302,7 +302,7 @@ class ArrowShape(BaseShape):
     def draw(self, cnv=None, off_x=0, off_y=0, ID=None, **kwargs):
         """Draw an arrow shape on a given canvas."""
         kwargs = self.kwargs | kwargs
-        cnv = cnv.canvas if cnv else self.canvas
+        cnv = cnv if cnv else self.canvas
         super().draw(cnv, off_x, off_y, ID, **kwargs)  # unit-based props
         if self.use_abs:
             x = self._abs_x
@@ -365,7 +365,7 @@ class BezierShape(BaseShape):
     def draw(self, cnv=None, off_x=0, off_y=0, ID=None, **kwargs):
         """Draw Bezier curve on a given canvas."""
         kwargs = self.kwargs | kwargs
-        cnv = cnv.canvas if cnv else self.canvas
+        cnv = cnv if cnv else self.canvas
         super().draw(cnv, off_x, off_y, ID, **kwargs)  # unit-based props
         # ---- convert to using units
         x_1 = self._u.x + self._o.delta_x
@@ -781,7 +781,7 @@ class CircleShape(BaseShape):
         kwargs = self.kwargs | kwargs
         _ = kwargs.pop("ID", None)
         # tools.feedback(f' @@@ Circ.draw {kwargs=}')
-        cnv = cnv.canvas if cnv else self.canvas
+        cnv = cnv if cnv else self.canvas
         super().draw(cnv, off_x, off_y, ID, **kwargs)  # unit-based props
         is_cards = kwargs.get("is_cards", False)
         # ---- set centre & area
@@ -944,7 +944,7 @@ class ChordShape(BaseShape):
     def draw(self, cnv=None, off_x=0, off_y=0, ID=None, **kwargs):
         """Draw a chord on a given canvas."""
         kwargs = self.kwargs | kwargs
-        cnv = cnv.canvas if cnv else self.canvas
+        cnv = cnv if cnv else self.canvas
         super().draw(cnv, off_x, off_y, ID, **kwargs)  # unit-based props
         if not isinstance(self.shape, CircleShape):
             tools.feedback("Shape must be a circle!", True)
@@ -1070,7 +1070,7 @@ class CompassShape(BaseShape):
     def draw(self, cnv=None, off_x=0, off_y=0, ID=None, **kwargs):
         """Draw compass on a given canvas."""
         super().draw(cnv, off_x, off_y, ID, **kwargs)  # unit-based props
-        cnv = cnv.canvas if cnv else self.canvas
+        cnv = cnv if cnv else self.canvas
         # convert to using units
         height = self._u.height
         width = self._u.width
@@ -1195,7 +1195,7 @@ class DotShape(BaseShape):
     def draw(self, cnv=None, off_x=0, off_y=0, ID=None, **kwargs):
         """Draw a dot on a given canvas."""
         kwargs = self.kwargs | kwargs
-        cnv = cnv.canvas if cnv else self.canvas
+        cnv = cnv if cnv else self.canvas
         super().draw(cnv, off_x, off_y, ID, **kwargs)  # unit-based props
         # tools.feedback(f"Dot {self._o.delta_x=} {self._o.delta_y=}")
         if self.use_abs_c:
@@ -1209,16 +1209,14 @@ class DotShape(BaseShape):
         center = muPoint(x, y)
         # ---- draw dot
         # tools.feedback(f'*** Dot {size=} {x=} {y=}')
-        mu_shape = cnv.new_shape()
-        mu_shape.draw_circle(center=center, radius=size)
+        cnv.draw_circle(center=center, radius=size)
         self.set_canvas_props(  # shape.finish()
-            mu_shape, cnv=cnv, rotation=(self.rotation, center), index=ID
+            cnv, cnv=cnv, rotation=(self.rotation, center), index=ID
         )
         # ---- text
-        self.draw_heading(mu_shape, ID, x, y, **kwargs)
-        self.draw_label(mu_shape, ID, x, y, **kwargs)
-        self.draw_title(mu_shape, ID, x, y, **kwargs)
-        mu_shape.commit()
+        self.draw_heading(cnv, ID, x, y, **kwargs)
+        self.draw_label(cnv, ID, x, y, **kwargs)
+        self.draw_title(cnv, ID, x, y, **kwargs)
 
 
 class EllipseShape(BaseShape):
@@ -1254,7 +1252,7 @@ class EllipseShape(BaseShape):
     def draw(self, cnv=None, off_x=0, off_y=0, ID=None, **kwargs):
         """Draw ellipse on a given canvas."""
         kwargs = self.kwargs | kwargs
-        cnv = cnv.canvas if cnv else self.canvas
+        cnv = cnv if cnv else self.canvas
         super().draw(cnv, off_x, off_y, ID, **kwargs)  # unit-based props
         # ---- calculate properties
         x, y = self.calculate_xy()
@@ -1382,7 +1380,7 @@ class EquilateralTriangleShape(BaseShape):
     def draw(self, cnv=None, off_x=0, off_y=0, ID=None, **kwargs):
         """Draw an equilateraltriangle on a given canvas."""
         kwargs = self.kwargs | kwargs
-        cnv = cnv.canvas if cnv else self.canvas
+        cnv = cnv if cnv else self.canvas
         super().draw(cnv, off_x, off_y, ID, **kwargs)  # unit-based props
         # ---- calculate points
         x, y = self._u.x, self._u.y
@@ -1939,7 +1937,7 @@ class HexShape(BaseShape):
         # tools.feedback(f'*** draw hex: {self.x=} {self.y=} {self.cx=} {self.cy=}')
         # tools.feedback(f'*** draw hex: {self.row=} {self.col=}')
         # tools.feedback(f' @@@ Hexg.draw {kwargs=}')
-        cnv = cnv.canvas if cnv else self.canvas
+        cnv = cnv if cnv else self.canvas
         super().draw(cnv, off_x, off_y, ID, **kwargs)  # unit-based props
         is_cards = kwargs.get("is_cards", False)
         # ---- calculate half_flat & half_side
@@ -2219,7 +2217,7 @@ class LineShape(BaseShape):
     def draw(self, cnv=None, off_x=0, off_y=0, ID=None, **kwargs):
         """Draw a line on a given canvas."""
         kwargs = self.kwargs | kwargs
-        cnv = cnv.canvas if cnv else self.canvas
+        cnv = cnv if cnv else self.canvas
         super().draw(cnv, off_x, off_y, ID, **kwargs)  # unit-based props
         if self.use_abs:
             x = self._abs_x
@@ -2258,12 +2256,10 @@ class LineShape(BaseShape):
             case "end" | "e":
                 the_point = muPoint(x_1, y_1)
         # ---- draw line
-        mu_shape = cnv.new_shape()
-        mu_shape.draw_line(Point(x, y), Point(x_1, y_1))
+        cnv.draw_line(Point(x, y), Point(x_1, y_1))
         self.set_canvas_props(  # shape.finish()
-            mu_shape, rotation=(self.rotation, the_point), index=ID
+            cnv, rotation=(self.rotation, the_point), index=ID
         )
-        mu_shape.commit()
         # ---- dot
         self.draw_dot(cnv, (x_1 + x) / 2.0, (y_1 + y) / 2.0)
         # ---- text
@@ -2534,7 +2530,7 @@ class PolygonShape(BaseShape):
     def draw(self, cnv=None, off_x=0, off_y=0, ID=None, **kwargs):
         """Draw a regular polygon on a given canvas."""
         kwargs = self.kwargs | kwargs
-        cnv = cnv.canvas if cnv else self.canvas
+        cnv = cnv if cnv else self.canvas
         super().draw(cnv, off_x, off_y, ID, **kwargs)  # unit-based props
         # ---- set canvas
         self.set_canvas_props(index=ID)
@@ -2632,7 +2628,7 @@ class PolylineShape(BaseShape):
     def draw(self, cnv=None, off_x=0, off_y=0, ID=None, **kwargs):
         """Draw a polyline on a given canvas."""
         kwargs = self.kwargs | kwargs
-        cnv = cnv.canvas if cnv else self.canvas
+        cnv = cnv if cnv else self.canvas
         super().draw(cnv, off_x, off_y, ID, **kwargs)  # unit-based props
         points = self.get_points()
         # ---- set canvas
@@ -2666,7 +2662,7 @@ class QRCodeShape(BaseShape):
     def draw(self, cnv=None, off_x=0, off_y=0, ID=None, **kwargs):
         """Draw a QRCode on a given canvas."""
         kwargs = self.kwargs | kwargs
-        cnv = cnv.canvas if cnv else self.canvas
+        cnv = cnv if cnv else self.canvas
         super().draw(cnv, off_x, off_y, ID, **kwargs)  # unit-based props
         img = None
         # ---- check for Card usage
@@ -3049,7 +3045,7 @@ class RectangleShape(BaseShape):
         """Draw a rectangle on a given canvas."""
         kwargs = self.kwargs | kwargs
         # tools.feedback(f' @@@ Rect.draw {kwargs=}')
-        cnv = cnv.canvas if cnv else self.canvas
+        cnv = cnv if cnv else self.canvas
         super().draw(cnv, off_x, off_y, ID, **kwargs)  # unit-based props
         # ---- updated based on kwargs
         self.rounding = kwargs.get("rounding", self.rounding)
@@ -3508,7 +3504,7 @@ class RhombusShape(BaseShape):
     def draw(self, cnv=None, off_x=0, off_y=0, ID=None, **kwargs):
         """Draw a rhombus (diamond) on a given canvas."""
         kwargs = self.kwargs | kwargs
-        cnv = cnv.canvas if cnv else self.canvas
+        cnv = cnv if cnv else self.canvas
         super().draw(cnv, off_x, off_y, ID, **kwargs)  # unit-based props
         if self.use_abs_c:
             x = self._abs_cx
@@ -3588,7 +3584,7 @@ class RightAngledTriangleShape(BaseShape):
 
     def draw(self, cnv=None, off_x=0, off_y=0, ID=None, **kwargs):
         kwargs = self.kwargs | kwargs
-        cnv = cnv.canvas if cnv else self.canvas
+        cnv = cnv if cnv else self.canvas
         super().draw(cnv, off_x, off_y, ID, **kwargs)  # unit-based props
         # set sizes
         if self.height and not self.width:
@@ -3683,7 +3679,7 @@ class SectorShape(BaseShape):
     def draw(self, cnv=None, off_x=0, off_y=0, ID=None, **kwargs):
         """Draw sector on a given canvas."""
         kwargs = self.kwargs | kwargs
-        cnv = cnv.canvas if cnv else self.canvas
+        cnv = cnv if cnv else self.canvas
         super().draw(cnv, off_x, off_y, ID, **kwargs)  # unit-based props
         if self.use_abs_c:
             self.x_c = self._abs_cx
@@ -3718,7 +3714,7 @@ class ShapeShape(BaseShape):
     def draw(self, cnv=None, off_x=0, off_y=0, ID=None, **kwargs):
         """Draw an irregular polygon on a given canvas."""
         super().draw(cnv, off_x, off_y, ID, **kwargs)  # unit-based props
-        cnv = cnv.canvas if cnv else self.canvas
+        cnv = cnv if cnv else self.canvas
         # ---- set canvas
         self.set_canvas_props(index=ID)
         # ---- draw Shape
@@ -3808,7 +3804,7 @@ class StadiumShape(BaseShape):
     def draw(self, cnv=None, off_x=0, off_y=0, ID=None, **kwargs):
         """Draw a stadium on a given canvas."""
         kwargs = self.kwargs | kwargs
-        cnv = cnv.canvas if cnv else self.canvas
+        cnv = cnv if cnv else self.canvas
         super().draw(cnv, off_x, off_y, ID, **kwargs)  # unit-based props
         # ---- adjust start
         if self.row is not None and self.col is not None:
@@ -3959,7 +3955,7 @@ class StarShape(BaseShape):
     def draw(self, cnv=None, off_x=0, off_y=0, ID=None, **kwargs):
         """Draw a star on a given canvas."""
         super().draw(cnv, off_x, off_y, ID, **kwargs)  # unit-based props
-        cnv = cnv.canvas if cnv else self.canvas
+        cnv = cnv if cnv else self.canvas
         # convert to using units
         x = self._u.x + self._o.delta_x
         y = self._u.y + self._o.delta_y
@@ -4097,7 +4093,7 @@ class StarFieldShape(BaseShape):
     def draw(self, cnv=None, off_x=0, off_y=0, ID=None, **kwargs):
         """Draw StarField pattern on a given canvas."""
         kwargs = self.kwargs | kwargs
-        cnv = cnv.canvas if cnv else self.canvas
+        cnv = cnv if cnv else self.canvas
         super().draw(cnv, off_x, off_y, ID, **kwargs)  # unit-based props
         # ---- settings
         if self.enclosure is None:
@@ -4133,7 +4129,7 @@ class TextShape(BaseShape):
     def draw(self, cnv=None, off_x=0, off_y=0, ID=None, **kwargs):
         """Draw text on a given canvas."""
         kwargs = self.kwargs | kwargs
-        cnv = cnv.canvas if cnv else self.canvas
+        cnv = cnv if cnv else self.canvas
         super().draw(cnv, off_x, off_y, ID, **kwargs)  # unit-based props
         # ---- convert to using units
         x_t = self._u.x + self._o.delta_x
@@ -4303,7 +4299,7 @@ class TrapezoidShape(BaseShape):
     def draw(self, cnv=None, off_x=0, off_y=0, ID=None, **kwargs):
         """Draw a trapezoid on a given canvas."""
         kwargs = self.kwargs | kwargs
-        cnv = cnv.canvas if cnv else self.canvas
+        cnv = cnv if cnv else self.canvas
         super().draw(cnv, off_x, off_y, ID, **kwargs)  # unit-based props
         # ---- set canvas
         self.set_canvas_props(index=ID)

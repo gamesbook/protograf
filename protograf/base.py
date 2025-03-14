@@ -322,7 +322,7 @@ class BaseCanvas:
     """Wrapper/extension for a PyMuPDF Page."""
 
     def __init__(self, document, paper=None, defaults=None, **kwargs):
-        """Create self.canvas as page-equivalent."""
+        """Create self.doc_page as Page-equivalent."""
 
         self.jsonfile = kwargs.get("defaults", None)
         self.document = document
@@ -361,7 +361,7 @@ class BaseCanvas:
                     raise ValueError
             except Exception:
                 tools.feedback(f"Unable to use {_paper} as paper size!", True)
-        self.canvas = self.document.new_page(width=self.paper[0], height=self.paper[1])
+
         # ---- constants
         self.default_length = 1
         self.show_id = False
@@ -740,82 +740,85 @@ class BaseShape:
         self.default_length = 1
         self.show_id = False  # True
         # ---- KEY
-        self.canvas = globals.cnv.canvas  # pymupdf Page object
-        cnv = globals.cnv
-        # print(f" *** {canvas=} {self.canvas=} {cnv=}")
-        # log.debug("Base types %s %s %s",type(self.canvas), type(canvas), type(cnv))
-        self._object = _object  # placeholder for an incoming Shape object
+        self.doc_page = globals.doc_page
+        self.canvas = globals.canvas  # pymupdf Shape object
+        base = _object or globals.base
+        # print(f" *** {self.canvas=} {cnv=} {base=}")
+        # print(f" *** {type(self.canvas)=} {type(cnv)=} {type(base=)}")
+        self._object = base
         self.shape_id = None
         self.sequence = kwargs.get("sequence", [])  # e.g. card numbers
         self.dataset = []  # list of dict data (loaded from file)
         self.members = []  # card IDs, of which current card is a member
         # ---- general
         self.common = kwargs.get("common", None)
-        self.shape = kwargs.get("shape", cnv.shape)
-        self.run_debug = kwargs.get("debug", cnv.run_debug)
-        self.units = kwargs.get("units", cnv.units)
+        self.shape = kwargs.get("shape", base.shape)
+        self.run_debug = kwargs.get("debug", base.run_debug)
+        self.units = kwargs.get("units", base.units)
         # print(f" *** {self.units=}")
         # ---- paper & margins
-        self.paper = kwargs.get("paper") or cnv.paper
-        self.margin = self.kw_float(kwargs.get("margin", cnv.margin))
+        self.paper = kwargs.get("paper") or base.paper
+        self.margin = self.kw_float(kwargs.get("margin", base.margin))
         self.margin_top = self.kw_float(kwargs.get("margin_top", self.margin))
         self.margin_bottom = self.kw_float(kwargs.get("margin_bottom", self.margin))
         self.margin_left = self.kw_float(kwargs.get("margin_left", self.margin))
         self.margin_right = self.kw_float(kwargs.get("margin_right", self.margin))
         # ---- grid marks
-        self.grid_marks = self.kw_float(kwargs.get("grid_marks", cnv.grid_marks))
-        self.grid_stroke = kwargs.get("grid_stroke", cnv.grid_stroke)
+        self.grid_marks = self.kw_float(kwargs.get("grid_marks", base.grid_marks))
+        self.grid_stroke = kwargs.get("grid_stroke", base.grid_stroke)
         self.grid_stroke_width = self.kw_float(
-            kwargs.get("grid_stroke_width", cnv.grid_stroke_width)
+            kwargs.get("grid_stroke_width", base.grid_stroke_width)
         )
-        self.grid_length = self.kw_float(kwargs.get("grid_length", cnv.grid_length))
+        self.grid_length = self.kw_float(kwargs.get("grid_length", base.grid_length))
         self.page_width = self.paper[0] / self.units
         self.page_height = self.paper[1] / self.units
         # ---- sizes and positions
-        self.row = kwargs.get("row", cnv.row)
-        self.col = self.kw_int(kwargs.get("col", kwargs.get("column", cnv.col)))
-        self.side = self.kw_float(kwargs.get("side", cnv.side))  # equal length sides
+        self.row = kwargs.get("row", base.row)
+        self.col = self.kw_int(kwargs.get("col", kwargs.get("column", base.col)))
+        self.side = self.kw_float(kwargs.get("side", base.side))  # equal length sides
         self.height = self.kw_float(kwargs.get("height", self.side))
         self.width = self.kw_float(kwargs.get("width", self.side))
-        self.top = self.kw_float(kwargs.get("top", cnv.top))
+        self.top = self.kw_float(kwargs.get("top", base.top))
         self.depth = self.kw_float(kwargs.get("depth", self.side))  # diamond
-        self.x = self.kw_float(kwargs.get("x", kwargs.get("left", cnv.x)))
-        self.y = self.kw_float(kwargs.get("y", kwargs.get("bottom", cnv.y)))
-        self.cx = self.kw_float(kwargs.get("cx", cnv.cx))  # centre (for some shapes)
-        self.cy = self.kw_float(kwargs.get("cy", cnv.cy))  # centre (for some shapes)
+        self.x = self.kw_float(kwargs.get("x", kwargs.get("left", base.x)))
+        self.y = self.kw_float(kwargs.get("y", kwargs.get("bottom", base.y)))
+        self.cx = self.kw_float(kwargs.get("cx", base.cx))  # centre (for some shapes)
+        self.cy = self.kw_float(kwargs.get("cy", base.cy))  # centre (for some shapes)
         self.scaling = self.kw_float(kwargs.get("scaling", None))  # SVG images
-        self.dot_point = self.kw_float(kwargs.get("dot_point", cnv.dot_point))  # points
+        self.dot_point = self.kw_float(
+            kwargs.get("dot_point", base.dot_point)
+        )  # points
         # ---- to be calculated ...
-        self.area = cnv.area
-        self.vertices = cnv.vertices
+        self.area = base.area
+        self.vertices = base.vertices
         # ---- repeats
-        self.pattern = kwargs.get("pattern", cnv.pattern)
-        self.repeat = kwargs.get("repeat", cnv.repeat)
-        self.interval = self.kw_float(kwargs.get("interval", cnv.interval))
-        self.interval_x = self.kw_float(kwargs.get("interval_x", cnv.interval_x))
-        self.interval_y = self.kw_float(kwargs.get("interval_y", cnv.interval_y))
+        self.pattern = kwargs.get("pattern", base.pattern)
+        self.repeat = kwargs.get("repeat", base.repeat)
+        self.interval = self.kw_float(kwargs.get("interval", base.interval))
+        self.interval_x = self.kw_float(kwargs.get("interval_x", base.interval_x))
+        self.interval_y = self.kw_float(kwargs.get("interval_y", base.interval_y))
         # ---- rotation / position /elevation
         self.rotation = self.kw_float(
-            kwargs.get("rotation", kwargs.get("rotation", cnv.rotation))
+            kwargs.get("rotation", kwargs.get("rotation", base.rotation))
         )  # degrees ant-clockwise
-        self.rotation_point = kwargs.get("rotation_point", cnv.rotation_point)
+        self.rotation_point = kwargs.get("rotation_point", base.rotation_point)
         self._rotation_theta = math.radians(self.rotation or 0)  # radians
-        self.direction = kwargs.get("direction", cnv.direction)
-        self.position = kwargs.get("position", cnv.position)
-        self.elevation = kwargs.get("elevation", cnv.elevation)
-        self.facing = kwargs.get("facing", cnv.facing)
+        self.direction = kwargs.get("direction", base.direction)
+        self.position = kwargs.get("position", base.position)
+        self.elevation = kwargs.get("elevation", base.elevation)
+        self.facing = kwargs.get("facing", base.facing)
         # ---- line style
-        self.line_width = self.kw_float(kwargs.get("line_width", cnv.line_width))
-        self.line_cap = kwargs.get("line_cap", cnv.line_cap)
-        self.dotted = kwargs.get("dotted", kwargs.get("dots", cnv.dotted))
-        self.dashed = kwargs.get("dashed", cnv.dashed)
+        self.line_width = self.kw_float(kwargs.get("line_width", base.line_width))
+        self.line_cap = kwargs.get("line_cap", base.line_cap)
+        self.dotted = kwargs.get("dotted", kwargs.get("dots", base.dotted))
+        self.dashed = kwargs.get("dashed", base.dashed)
         # ---- fill color
-        self.fill = kwargs.get("fill", kwargs.get("fill_color", cnv.fill))
+        self.fill = kwargs.get("fill", kwargs.get("fill_color", base.fill))
         # ---- stroke
-        self.stroke = kwargs.get("stroke", kwargs.get("stroke_color", cnv.stroke))
-        self.fill_stroke = kwargs.get("fill_stroke", cnv.fill_stroke)
-        self.outline = kwargs.get("outline", cnv.outline)
-        self.stroke_width = self.kw_float(kwargs.get("stroke_width", cnv.stroke_width))
+        self.stroke = kwargs.get("stroke", kwargs.get("stroke_color", base.stroke))
+        self.fill_stroke = kwargs.get("fill_stroke", base.fill_stroke)
+        self.outline = kwargs.get("outline", base.outline)
+        self.stroke_width = self.kw_float(kwargs.get("stroke_width", base.stroke_width))
         # ---- overwrite fill&stroke colors
         if self.fill_stroke and self.outline:
             tools.feedback("Cannot set 'fill_stroke' and 'outline' together!", True)
@@ -826,26 +829,26 @@ class BaseShape:
             self.stroke = self.outline
             self.fill = None
         # ---- debug color & transparency
-        self.debug_color = kwargs.get("debug_color", cnv.debug_color)
-        self.transparency = self.kw_float(kwargs.get("transparency", cnv.transparency))
+        self.debug_color = kwargs.get("debug_color", base.debug_color)
+        self.transparency = self.kw_float(kwargs.get("transparency", base.transparency))
         # ---- font
-        self.font_name = kwargs.get("font_name", cnv.font_name)
-        self.font_size = self.kw_float(kwargs.get("font_size", cnv.font_size))
-        self.font_style = kwargs.get("font_style", cnv.font_style)
-        self.font_directory = kwargs.get("font_directory", cnv.font_directory)
-        self.style = kwargs.get("style", cnv.style)
-        self.wrap = kwargs.get("wrap", cnv.wrap)
-        self.align = kwargs.get("align", cnv.align)  # centre,left,right,justify
+        self.font_name = kwargs.get("font_name", base.font_name)
+        self.font_size = self.kw_float(kwargs.get("font_size", base.font_size))
+        self.font_style = kwargs.get("font_style", base.font_style)
+        self.font_directory = kwargs.get("font_directory", base.font_directory)
+        self.style = kwargs.get("style", base.style)
+        self.wrap = kwargs.get("wrap", base.wrap)
+        self.align = kwargs.get("align", base.align)  # centre,left,right,justify
         self._alignment = pymupdf.TEXT_ALIGN_LEFT  # see to_alignment()
         # ---- text: base
-        self.text = kwargs.get("text", cnv.text)
-        self.text_size = self.kw_float(kwargs.get("text_size", cnv.text_size))
-        self.text_stroke = kwargs.get("text_stroke", cnv.text_stroke)
+        self.text = kwargs.get("text", base.text)
+        self.text_size = self.kw_float(kwargs.get("text_size", base.text_size))
+        self.text_stroke = kwargs.get("text_stroke", base.text_stroke)
         self.text_stroke_width = self.kw_float(
-            kwargs.get("text_stroke_width", cnv.text_stroke_width)
+            kwargs.get("text_stroke_width", base.text_stroke_width)
         )
         # ---- text: label
-        self.label = kwargs.get("label", cnv.label)
+        self.label = kwargs.get("label", base.label)
         self.label_size = self.kw_float(kwargs.get("label_size", self.font_size))
         self.label_face = kwargs.get("label_face", self.font_name)
         self.label_stroke = kwargs.get("label_stroke", self.stroke)
@@ -856,7 +859,7 @@ class BaseShape:
         self.label_my = self.kw_float(kwargs.get("label_my", 0))
         self.label_rotation = self.kw_float(kwargs.get("label_rotation", 0))
         # ---- text: title
-        self.title = kwargs.get("title", cnv.title)
+        self.title = kwargs.get("title", base.title)
         self.title_size = self.kw_float(kwargs.get("title_size", self.font_size))
         self.title_face = kwargs.get("title_face", self.font_name)
         self.title_stroke = kwargs.get("title_stroke", self.stroke)
@@ -867,7 +870,7 @@ class BaseShape:
         self.title_my = self.kw_float(kwargs.get("title_my", 0))
         self.title_rotation = self.kw_float(kwargs.get("title_rotation", 0))
         # ---- text: heading
-        self.heading = kwargs.get("heading", cnv.heading)
+        self.heading = kwargs.get("heading", base.heading)
         self.heading_size = self.kw_float(kwargs.get("heading_size", self.font_size))
         self.heading_face = kwargs.get("heading_face", self.font_name)
         self.heading_stroke = kwargs.get("heading_stroke", self.stroke)
@@ -878,102 +881,102 @@ class BaseShape:
         self.heading_my = self.kw_float(kwargs.get("heading_my", 0))
         self.heading_rotation = self.kw_float(kwargs.get("heading_rotation", 0))
         # ---- text block
-        self.outline_stroke = kwargs.get("outline_stroke", cnv.outline_stroke)
+        self.outline_stroke = kwargs.get("outline_stroke", base.outline_stroke)
         self.outline_width = self.kw_float(
-            kwargs.get("outline_width", cnv.outline_width)
+            kwargs.get("outline_width", base.outline_width)
         )
         self.leading = self.kw_float(kwargs.get("leading", self.font_size))
-        self.transform = kwargs.get("transform", cnv.transform)
+        self.transform = kwargs.get("transform", base.transform)
         # tools.feedback(
         # f"BShp:{self} {kwargs.get('fill')=} {self.fill=} {kwargs.get('fill_color')=}")
         # ---- image / file
-        self.source = kwargs.get("source", cnv.source)  # file or http://
+        self.source = kwargs.get("source", base.source)  # file or http://
         self.sliced = ""
         self.image_location = None
         # ---- line / ellipse / bezier / arc / polygon
-        self.length = self.kw_float(kwargs.get("length", cnv.length))
+        self.length = self.kw_float(kwargs.get("length", base.length))
         self.angle = self.kw_float(
-            kwargs.get("angle", cnv.angle)
+            kwargs.get("angle", base.angle)
         )  # anti-clock from flat
         self.angle_width = self.kw_float(
-            kwargs.get("angle_width", cnv.angle_width)
+            kwargs.get("angle_width", base.angle_width)
         )  # delta degrees
         self._angle_theta = math.radians(self.angle)
         # ---- image
         self.cache_directory = None  # should be a pathlib.Path object
         # ---- chord
         self.angle_1 = self.kw_float(
-            kwargs.get("angle1", cnv.angle_1)
+            kwargs.get("angle1", base.angle_1)
         )  # anti-clock from flat
         self._angle_1_theta = math.radians(self.angle_1)
         # ---- arrow shape: head, points and tail
         self.points_offset = self.kw_float(
-            kwargs.get("points_offset", cnv.points_offset)
+            kwargs.get("points_offset", base.points_offset)
         )
-        self.head_height = self.kw_float(kwargs.get("head_height", cnv.head_height))
-        self.head_width = self.kw_float(kwargs.get("head_width", cnv.head_width))
-        self.tail_width = self.kw_float(kwargs.get("tail_width", cnv.tail_width))
-        self.tail_notch = self.kw_float(kwargs.get("tail_notch", cnv.tail_notch))
+        self.head_height = self.kw_float(kwargs.get("head_height", base.head_height))
+        self.head_width = self.kw_float(kwargs.get("head_width", base.head_width))
+        self.tail_width = self.kw_float(kwargs.get("tail_width", base.tail_width))
+        self.tail_notch = self.kw_float(kwargs.get("tail_notch", base.tail_notch))
         # TODO arrow-on-a-line
-        self.arrow_style = kwargs.get("arrow_style", cnv.arrow_style)
-        self.arrow_tail_style = kwargs.get("arrow_tail_style", cnv.arrow_tail_style)
+        self.arrow_style = kwargs.get("arrow_style", base.arrow_style)
+        self.arrow_tail_style = kwargs.get("arrow_tail_style", base.arrow_tail_style)
         # ---- line / bezier / sector
-        self.x_1 = self.kw_float(kwargs.get("x1", cnv.x_1))
-        self.y_1 = self.kw_float(kwargs.get("y1", cnv.y_1))
+        self.x_1 = self.kw_float(kwargs.get("x1", base.x_1))
+        self.y_1 = self.kw_float(kwargs.get("y1", base.y_1))
         # ---- bezier / sector
-        self.x_2 = self.kw_float(kwargs.get("x2", cnv.x_2))
-        self.y_2 = self.kw_float(kwargs.get("y2", cnv.y_2))
-        self.x_3 = self.kw_float(kwargs.get("x3", cnv.x_3))
-        self.y_3 = self.kw_float(kwargs.get("y3", cnv.y_3))
+        self.x_2 = self.kw_float(kwargs.get("x2", base.x_2))
+        self.y_2 = self.kw_float(kwargs.get("y2", base.y_2))
+        self.x_3 = self.kw_float(kwargs.get("x3", base.x_3))
+        self.y_3 = self.kw_float(kwargs.get("y3", base.y_3))
         # ---- rectangle / card
-        self.rounding = self.kw_float(kwargs.get("rounding", cnv.rounding))
-        self.rounded = kwargs.get("rounded", cnv.rounded)
-        self.notch = self.kw_float(kwargs.get("notch", cnv.notch))
-        self.notch_corners = kwargs.get("notch_corners", cnv.notch_corners)
-        self.notch_x = self.kw_float(kwargs.get("notch_x", cnv.notch_x))
-        self.notch_y = self.kw_float(kwargs.get("notch_y", cnv.notch_y))
-        self.notch_style = kwargs.get("notch_style", cnv.notch_style)
-        self.chevron = kwargs.get("chevron", cnv.chevron)
+        self.rounding = self.kw_float(kwargs.get("rounding", base.rounding))
+        self.rounded = kwargs.get("rounded", base.rounded)
+        self.notch = self.kw_float(kwargs.get("notch", base.notch))
+        self.notch_corners = kwargs.get("notch_corners", base.notch_corners)
+        self.notch_x = self.kw_float(kwargs.get("notch_x", base.notch_x))
+        self.notch_y = self.kw_float(kwargs.get("notch_y", base.notch_y))
+        self.notch_style = kwargs.get("notch_style", base.notch_style)
+        self.chevron = kwargs.get("chevron", base.chevron)
         self.chevron_height = self.kw_float(
-            kwargs.get("chevron_height", cnv.chevron_height)
+            kwargs.get("chevron_height", base.chevron_height)
         )
-        self.peaks = kwargs.get("peaks", cnv.peaks)
+        self.peaks = kwargs.get("peaks", base.peaks)
         self.peaks_dict = {}
-        self.borders = kwargs.get("borders", cnv.borders)
+        self.borders = kwargs.get("borders", base.borders)
         # ---- stadium
-        self.edges = kwargs.get("edges", cnv.edges)
+        self.edges = kwargs.get("edges", base.edges)
         # ---- grid / card layout
-        self.rows = self.kw_int(kwargs.get("rows", cnv.rows))
-        self.cols = self.kw_int(kwargs.get("cols", kwargs.get("columns", cnv.cols)))
-        self.frame = kwargs.get("frame", cnv.frame)
-        self.offset = self.kw_float(kwargs.get("offset", cnv.offset))
+        self.rows = self.kw_int(kwargs.get("rows", base.rows))
+        self.cols = self.kw_int(kwargs.get("cols", kwargs.get("columns", base.cols)))
+        self.frame = kwargs.get("frame", base.frame)
+        self.offset = self.kw_float(kwargs.get("offset", base.offset))
         self.offset_x = self.kw_float(kwargs.get("offset_x", self.offset))
         self.offset_y = self.kw_float(kwargs.get("offset_y", self.offset))
-        self.spacing = self.kw_float(kwargs.get("spacing", cnv.spacing))
+        self.spacing = self.kw_float(kwargs.get("spacing", base.spacing))
         self.spacing_x = self.kw_float(kwargs.get("spacing_x", self.spacing))
         self.spacing_y = self.kw_float(kwargs.get("spacing_y", self.spacing))
         self.grouping = self.kw_int(kwargs.get("grouping", 1))  # no. of cards in a set
         self.grouping_rows = self.kw_int(kwargs.get("grouping_rows", self.grouping))
         self.grouping_cols = self.kw_int(kwargs.get("grouping_cols", self.grouping))
-        self.lines = kwargs.get("lines", cnv.lines)
+        self.lines = kwargs.get("lines", base.lines)
         # ---- circle / star / polygon
-        self.diameter = self.kw_float(kwargs.get("diameter", cnv.diameter))
-        self.radius = self.kw_float(kwargs.get("radius", cnv.radius))
-        self.vertices = self.kw_int(kwargs.get("vertices", cnv.vertices))
-        self.sides = kwargs.get("sides", cnv.sides)
-        self.points = kwargs.get("points", cnv.points)
+        self.diameter = self.kw_float(kwargs.get("diameter", base.diameter))
+        self.radius = self.kw_float(kwargs.get("radius", base.radius))
+        self.vertices = self.kw_int(kwargs.get("vertices", base.vertices))
+        self.sides = kwargs.get("sides", base.sides)
+        self.points = kwargs.get("points", base.points)
         # ---- radii (circle / hexagon / polygon / compass)
-        self.radii = kwargs.get("radii", cnv.radii)
+        self.radii = kwargs.get("radii", base.radii)
         self.radii_stroke = kwargs.get("radii_stroke", self.stroke)
         self.radii_stroke_width = self.kw_float(
-            kwargs.get("radii_stroke_width", cnv.radii_stroke_width)
+            kwargs.get("radii_stroke_width", base.radii_stroke_width)
         )
-        self.radii_length = self.kw_float(kwargs.get("radii_length", cnv.radii_length))
-        self.radii_offset = self.kw_float(kwargs.get("radii_offset", cnv.radii_offset))
-        self.radii_cap = kwargs.get("radii_cap", cnv.radii_cap)
-        self.radii_dotted = kwargs.get("radii_dotted", cnv.dotted)
+        self.radii_length = self.kw_float(kwargs.get("radii_length", base.radii_length))
+        self.radii_offset = self.kw_float(kwargs.get("radii_offset", base.radii_offset))
+        self.radii_cap = kwargs.get("radii_cap", base.radii_cap)
+        self.radii_dotted = kwargs.get("radii_dotted", base.dotted)
         self.radii_dashed = kwargs.get("radii_dashed", self.dashed)
-        self.radii_labels = kwargs.get("radii_labels", cnv.radii_labels)
+        self.radii_labels = kwargs.get("radii_labels", base.radii_labels)
         self.radii_labels_size = self.kw_float(
             kwargs.get("radii_labels_size", self.font_size)
         )
@@ -986,20 +989,20 @@ class BaseShape:
             kwargs.get("radii_labels_rotation", 0)
         )
         # ---- circle
-        self.petals = self.kw_int(kwargs.get("petals", cnv.petals))
-        self.petals_style = kwargs.get("petals_style", cnv.petals_style)
+        self.petals = self.kw_int(kwargs.get("petals", base.petals))
+        self.petals_style = kwargs.get("petals_style", base.petals_style)
         self.petals_height = self.kw_float(
-            kwargs.get("petals_height", cnv.petals_height)
+            kwargs.get("petals_height", base.petals_height)
         )
         self.petals_offset = self.kw_float(
-            kwargs.get("petals_offset", cnv.petals_offset)
+            kwargs.get("petals_offset", base.petals_offset)
         )
-        self.petals_stroke = kwargs.get("petals_stroke", cnv.petals_stroke)
+        self.petals_stroke = kwargs.get("petals_stroke", base.petals_stroke)
         self.petals_stroke_width = self.kw_float(
-            kwargs.get("petals_stroke_width", cnv.petals_stroke_width)
+            kwargs.get("petals_stroke_width", base.petals_stroke_width)
         )
-        self.petals_fill = kwargs.get("petals_fill", cnv.petals_fill)
-        self.petals_dotted = kwargs.get("petals_dotted", cnv.petals_dotted)
+        self.petals_fill = kwargs.get("petals_fill", base.petals_fill)
+        self.petals_dotted = kwargs.get("petals_dotted", base.petals_dotted)
         self.petals_dashed = kwargs.get("petals_dashed", self.dashed)
         # ---- compass
         self.perimeter = kwargs.get("perimeter", "circle")  # circle|rectangle|hexagon
@@ -1011,99 +1014,105 @@ class BaseShape:
         # ---- hexagon / circle / polygon
         self.centre_shape = kwargs.get("centre_shape", "")
         self.centre_shape_mx = self.kw_float(
-            kwargs.get("centre_shape_mx", cnv.centre_shape_mx)
+            kwargs.get("centre_shape_mx", base.centre_shape_mx)
         )
         self.centre_shape_my = self.kw_float(
-            kwargs.get("centre_shape_my", cnv.centre_shape_my)
+            kwargs.get("centre_shape_my", base.centre_shape_my)
         )
         self.dot_stroke = kwargs.get("dot_stroke", self.stroke)
         self.dot_stroke_width = self.kw_float(
-            kwargs.get("dot_stroke_width", cnv.dot_stroke_width)
+            kwargs.get("dot_stroke_width", base.dot_stroke_width)
         )
         self.dot_fill = kwargs.get("dot_fill", self.stroke)
-        self.dot = self.kw_float(kwargs.get("dot", cnv.dot))
+        self.dot = self.kw_float(kwargs.get("dot", base.dot))
         self.cross_stroke = kwargs.get("cross_stroke", self.stroke)
         self.cross_stroke_width = self.kw_float(
-            kwargs.get("cross_stroke_width", cnv.cross_stroke_width)
+            kwargs.get("cross_stroke_width", base.cross_stroke_width)
         )
-        self.cross = self.kw_float(kwargs.get("cross", cnv.cross))
+        self.cross = self.kw_float(kwargs.get("cross", base.cross))
         # ---- hexagon / polygon
-        self.orientation = kwargs.get("orientation", cnv.orientation)
-        self.perbis = kwargs.get("perbis", cnv.perbis)  # directions
-        self.perbis_stroke = kwargs.get("perbis_stroke", cnv.perbis_stroke)
+        self.orientation = kwargs.get("orientation", base.orientation)
+        self.perbis = kwargs.get("perbis", base.perbis)  # directions
+        self.perbis_stroke = kwargs.get("perbis_stroke", base.perbis_stroke)
         self.perbis_stroke_width = self.kw_float(
-            kwargs.get("perbis_stroke_width", cnv.perbis_stroke_width)
+            kwargs.get("perbis_stroke_width", base.perbis_stroke_width)
         )
         self.perbis_length = self.kw_float(
-            kwargs.get("perbis_length", cnv.perbis_length)
+            kwargs.get("perbis_length", base.perbis_length)
         )
         self.perbis_offset = self.kw_float(
-            kwargs.get("perbis_offset", cnv.perbis_offset)
+            kwargs.get("perbis_offset", base.perbis_offset)
         )
-        self.perbis_cap = kwargs.get("perbis_cap", cnv.perbis_cap)
-        self.perbis_dotted = kwargs.get("perbis_dotted", cnv.dotted)
+        self.perbis_cap = kwargs.get("perbis_cap", base.perbis_cap)
+        self.perbis_dotted = kwargs.get("perbis_dotted", base.dotted)
         self.perbis_dashed = kwargs.get("perbis_dashed", self.dashed)
         # ---- hexagon
-        self.caltrops = kwargs.get("caltrops", cnv.caltrops)
+        self.caltrops = kwargs.get("caltrops", base.caltrops)
         self.caltrops_fraction = self.kw_float(
-            kwargs.get("caltrops_fraction", cnv.caltrops_fraction)
+            kwargs.get("caltrops_fraction", base.caltrops_fraction)
         )
-        self.caltrops_invert = kwargs.get("caltrops_invert", cnv.caltrops_invert)
-        self.links = kwargs.get("links", cnv.links)
+        self.caltrops_invert = kwargs.get("caltrops_invert", base.caltrops_invert)
+        self.links = kwargs.get("links", base.links)
         self.link_stroke_width = self.kw_float(
-            kwargs.get("link_stroke_width", cnv.link_stroke_width)
+            kwargs.get("link_stroke_width", base.link_stroke_width)
         )
-        self.link_stroke = kwargs.get("link_stroke", cnv.stroke)
-        self.link_cap = kwargs.get("link_cap", cnv.link_cap)
+        self.link_stroke = kwargs.get("link_stroke", base.stroke)
+        self.link_cap = kwargs.get("link_cap", base.link_cap)
         # ---- hexagons
-        self.hid = kwargs.get("id", cnv.hid)  # HEX ID
-        self.hex_rows = self.kw_int(kwargs.get("hex_rows", cnv.hex_rows))
-        self.hex_cols = self.kw_int(kwargs.get("hex_cols", cnv.hex_cols))
+        self.hid = kwargs.get("id", base.hid)  # HEX ID
+        self.hex_rows = self.kw_int(kwargs.get("hex_rows", base.hex_rows))
+        self.hex_cols = self.kw_int(kwargs.get("hex_cols", base.hex_cols))
         self.hex_layout = kwargs.get(
-            "hex_layout", cnv.hex_layout
+            "hex_layout", base.hex_layout
         )  # rectangle|circle|diamond|triangle
-        self.hex_offset = kwargs.get("hex_offset", cnv.hex_offset)  # even|odd
+        self.hex_offset = kwargs.get("hex_offset", base.hex_offset)  # even|odd
         self.coord_type_x = kwargs.get(
-            "coord_type_x", cnv.coord_type_x
+            "coord_type_x", base.coord_type_x
         )  # number|letter
         self.coord_type_y = kwargs.get(
-            "coord_type_y", cnv.coord_type_y
+            "coord_type_y", base.coord_type_y
         )  # number|letter
-        self.coord_start_x = self.kw_int(kwargs.get("coord_start_x", cnv.coord_start_x))
-        self.coord_start_y = self.kw_int(kwargs.get("coord_start_y", cnv.coord_start_y))
+        self.coord_start_x = self.kw_int(
+            kwargs.get("coord_start_x", base.coord_start_x)
+        )
+        self.coord_start_y = self.kw_int(
+            kwargs.get("coord_start_y", base.coord_start_y)
+        )
         self.coord_elevation = kwargs.get(
-            "coord_elevation", cnv.coord_elevation
+            "coord_elevation", base.coord_elevation
         )  # top|middle|bottom
-        self.coord_offset = self.kw_float(kwargs.get("coord_offset", cnv.coord_offset))
-        self.coord_font_name = kwargs.get("coord_font_name", cnv.coord_font_name)
+        self.coord_offset = self.kw_float(kwargs.get("coord_offset", base.coord_offset))
+        self.coord_font_name = kwargs.get("coord_font_name", base.coord_font_name)
         self.coord_font_size = self.kw_float(
-            kwargs.get("coord_font_size", cnv.coord_font_size)
+            kwargs.get("coord_font_size", base.coord_font_size)
         )
-        self.coord_stroke = kwargs.get("coord_stroke", cnv.coord_stroke)
-        self.coord_padding = self.kw_int(kwargs.get("coord_padding", cnv.coord_padding))
-        self.coord_separator = kwargs.get("coord_separator", cnv.coord_separator)
-        self.coord_prefix = kwargs.get("coord_prefix", cnv.coord_prefix)
-        self.coord_suffix = kwargs.get("coord_suffix", cnv.coord_suffix)
+        self.coord_stroke = kwargs.get("coord_stroke", base.coord_stroke)
+        self.coord_padding = self.kw_int(
+            kwargs.get("coord_padding", base.coord_padding)
+        )
+        self.coord_separator = kwargs.get("coord_separator", base.coord_separator)
+        self.coord_prefix = kwargs.get("coord_prefix", base.coord_prefix)
+        self.coord_suffix = kwargs.get("coord_suffix", base.coord_suffix)
         self.coord_style = kwargs.get("coord_style", "")  # linear|diagonal
-        self.hidden = kwargs.get("hidden", cnv.hidden)
+        self.hidden = kwargs.get("hidden", base.hidden)
         # ---- starfield
-        self.enclosure = kwargs.get("enclosure", cnv.enclosure)
-        self.colors = kwargs.get("colors", cnv.colors)
-        self.sizes = kwargs.get("sizes", cnv.sizes)
-        self.density = self.kw_int(kwargs.get("density", cnv.density))
-        self.star_pattern = kwargs.get("star_pattern", cnv.star_pattern)
-        self.seeding = kwargs.get("seeding", cnv.seeding)
+        self.enclosure = kwargs.get("enclosure", base.enclosure)
+        self.colors = kwargs.get("colors", base.colors)
+        self.sizes = kwargs.get("sizes", base.sizes)
+        self.density = self.kw_int(kwargs.get("density", base.density))
+        self.star_pattern = kwargs.get("star_pattern", base.star_pattern)
+        self.seeding = kwargs.get("seeding", base.seeding)
         # ---- mesh
-        self.mesh = kwargs.get("mesh", cnv.mesh)
+        self.mesh = kwargs.get("mesh", base.mesh)
         # ---- hatches
-        self.hatch_count = kwargs.get("hatch_count", cnv.hatch_count)
-        self.hatch = kwargs.get("hatch", cnv.hatch)
+        self.hatch_count = kwargs.get("hatch_count", base.hatch_count)
+        self.hatch = kwargs.get("hatch", base.hatch)
         self.hatch_stroke_width = self.kw_float(
-            kwargs.get("hatch_width", cnv.hatch_stroke_width)
+            kwargs.get("hatch_width", base.hatch_stroke_width)
         )
-        self.hatch_stroke = kwargs.get("hatch_stroke", cnv.stroke)
-        self.hatch_cap = kwargs.get("hatch_cap", cnv.hatch_cap)
-        self.hatch_dots = kwargs.get("hatch_dots", cnv.dotted)
+        self.hatch_stroke = kwargs.get("hatch_stroke", base.stroke)
+        self.hatch_cap = kwargs.get("hatch_cap", base.hatch_cap)
+        self.hatch_dots = kwargs.get("hatch_dots", base.dotted)
         self.hatch_dashed = kwargs.get("hatch_dashed", self.dashed)
         # ---- deck
         self.deck_data = kwargs.get("deck_data", [])  # list of dicts
@@ -1330,7 +1339,7 @@ class BaseShape:
             except TypeError:
                 return prop
 
-        canvas = cnv if cnv else self.canvas.canvas
+        canvas = cnv if cnv else self.canvas
         try:
             canvas.setFont(ext(self.font_name), ext(self.font_size))
         except AttributeError:
@@ -2012,7 +2021,7 @@ class BaseShape:
 
         Args:
             * canvas (pymupdf.Page oR pymupdf.Shape): set by calling function
-              function should access cnv.canvas i.e. an attribute of BaseCanvas
+              function should access globals.canvas or BaseShape.canvas
             * xm (float) and ym (float): must be in native units (i.e. points)!
             * string (str): the text to draw/write
             * align (str): one of [centre|right|left|None] alignment of text
