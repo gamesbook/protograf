@@ -56,5 +56,5 @@ def initialize():
     font_size = 12
     units = unit.cm
     page = paper_size(paper)  # (width, height) in points
-    page_width = page[0] / unit.cm
-    page_height = page[1] / unit.cm
+    page_width = page[0] / unit.cm  # width in user units
+    page_height = page[1] / unit.cm  # height in user units

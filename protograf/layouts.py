@@ -88,12 +88,10 @@ class GridShape(BaseShape):
             for y in y_cols:
                 cnv.draw_line(Point(x_cols[0], y), Point(x_cols[-1], y))
         self.set_canvas_props(  # shape.finish()
-            cnv,
-            # rotation=(self.rotation, the_point),
-            kwargs,
+            cnv=cnv,
             index=ID,
+            **kwargs,
         )
-        # cnv.grid(x_cols, y_cols)  # , stroke=1, fill=1)
 
 
 class DotGridShape(BaseShape):
@@ -146,17 +144,14 @@ class DotGridShape(BaseShape):
         # ---- set canvas
         size = self.dot_point / 2.0  # diameter is 3 points ~ 1mm or 1/32"
         self.fill = self.stroke
-        self.set_canvas_props(index=ID)
         # ---- draw dot grid
         for y_col in range(0, self.rows):
             for x_col in range(0, self.cols):
-                cnv.circle(
-                    x + x_col * width,
-                    y + y_col * height,
-                    size,
-                    stroke=0,
-                    fill=1 if self.fill else 0,
+                cnv.draw_circle(
+                    (x + x_col * width, y + y_col * height),
+                    size
                 )
+        self.set_canvas_props(cnv=cnv, index=ID, **kwargs)
 
 
 # ---- sequence

@@ -28,6 +28,7 @@ from protograf.base import (
     BaseShape,
     BaseCanvas,
     GridShape,
+    get_color,
     COLOR_NAMES,
     DEBUG_COLOR,
     CACHE_DIRECTORY,
@@ -660,7 +661,6 @@ class CircleShape(BaseShape):
             # print(f' ^ {self.petals=} {angles=}')
             for index, angle in enumerate(angles):
                 angle = angle - 360.0 if angle > 360.0 else angle
-                # print(f'  ^^^ {index=} {angle=} ')
                 petals_style = self.petals_style.lower()
                 if petals_style not in ["triangle", "t"]:
                     if len(angles) < self.petals + 1:
@@ -849,20 +849,16 @@ class CircleShape(BaseShape):
             else:
                 self.draw_petals(cnv, ID, self.x_c, self.y_c)
         # tools.feedback(f'*** Circle: {x=} {y=}')
-        # ---- set canvas
-        self.set_canvas_props(index=ID)
         # ---- draw circle
         cnv.circle(
-            x,
-            y,
+            (x, y),
             self._u.radius,
             stroke=1 if self.stroke else 0,
             fill=1 if self.fill else 0,
         )
+
+        self.set_canvas_props(index=ID)
         # ---- grid marks
-        self.set_canvas_props(
-            index=ID, stroke=self.grid_stroke, stroke_width=self.grid_stroke_width
-        )
         if self.grid_marks:
             # print(f'{self._u.radius=} {self._u.diameter=}')
             deltag = self.unit(self.grid_length)
@@ -889,6 +885,11 @@ class CircleShape(BaseShape):
             pth.lineTo(gx + self._u.radius * 2.0, gy + deltag)
             # done
             cnv.drawPath(pth, stroke=1, fill=1)
+            keys = kwargs
+            keys['stroke'] = self.grid_stroke
+            keys['stroke_width'] = self.grid_stroke_width
+            self.set_canvas_props(
+                cnv=cnv, index=ID, **keys)
         # ---- draw hatch
         if self.hatch_count:
             if self.rotation:
@@ -1210,9 +1211,8 @@ class DotShape(BaseShape):
         # ---- draw dot
         # tools.feedback(f'*** Dot {size=} {x=} {y=}')
         cnv.draw_circle(center=center, radius=size)
-        self.set_canvas_props(  # shape.finish()
-            cnv, cnv=cnv, rotation=(self.rotation, center), index=ID
-        )
+        kwargs['rotation'] = (self.rotation, center)
+        self.set_canvas_props(cnv=cnv, index=ID, **kwargs)  # shape.finish()
         # ---- text
         self.draw_heading(cnv, ID, x, y, **kwargs)
         self.draw_label(cnv, ID, x, y, **kwargs)
@@ -3338,7 +3338,7 @@ class RectangleShape(BaseShape):
             self.vertices = self.get_vertices(**kwargs)
         # tools.feedback(f'*** Rect {len(self.vertices)=}')
         # ---- set canvas
-        self.set_canvas_props(index=ID)
+
         # ---- draw rectangle
         if is_notched or is_chevron or is_peaks:
             pth = cnv.beginPath()
@@ -3351,34 +3351,28 @@ class RectangleShape(BaseShape):
             )
         elif self.rounding:
             rounding = self.unit(self.rounding)
-            cnv.roundRect(
-                x,
+            kwargs['rounding'] = rounding
+            cnv.draw_rect(
+                (x,
                 y,
                 self._u.width,
-                self._u.height,
-                rounding,
-                stroke=1 if self.stroke else 0,
-                fill=1 if self.fill else 0,
+                self._u.height)
             )
         elif self.rounded:
             _rounding = self._u.width * 0.08
-            cnv.roundRect(
-                x,
+            kwargs['rounding'] = _rounding
+            cnv.draw_rect(
+                (x,
                 y,
                 self._u.width,
-                self._u.height,
-                _rounding,
-                stroke=1 if self.stroke else 0,
-                fill=1 if self.fill else 0,
+                self._u.height)
             )
         else:
-            cnv.rect(
-                x,
+            cnv.draw_rect(
+                (x,
                 y,
                 self._u.width,
-                self._u.height,
-                stroke=1 if self.stroke else 0,
-                fill=1 if self.fill else 0,
+                self._u.height)
             )
             # ---- * borders (override)
             if self.borders:
@@ -3392,6 +3386,7 @@ class RectangleShape(BaseShape):
                     )
                 for border in self.borders:
                     self.draw_border(cnv, border, ID)
+        self.set_canvas_props(cnv=cnv, index=ID, **kwargs)
 
         # ---- draw hatch
         if self.hatch_count:
@@ -4169,30 +4164,30 @@ class TextShape(BaseShape):
             else:
                 self.transform = None
         # ---- text style
+        keys = {}
+        keys["fontsize"] = self.font_size
+        keys["fontname"] = self.font_name
+        # keys['fontfile'] = self.font_file
+        keys["color"] = self.stroke
+        keys["fill"] = self.fill
+        keys["align"] = self.to_alignment()
+        keys["rotate"] = self.rotation
+        # keys['stroke_opacity'] = self.show_stroke
+        # keys['fill_opacity'] = self.show_fill
+
+        # potential other properties
+        # keys['idx'] = 0
+        # keys['render_mode'] = 0
+        # keys['miter_limit'] = 1
+        # keys['border_width'] = 1
+        # keys['encoding'] = pymupdf.TEXT_ENCODING_LATIN
+        # keys['morph'] = None
+        # keys['oc'] = 0
+        # keys['overlay'] = True
+        # keys['expandtabs'] = 8
+        # keys['charwidths'] = None
+
         if self.wrap:
-            keys = {}
-            keys["fontsize"] = self.font_size
-            keys["fontname"] = self.font_name
-            # keys['fontfile'] = self.font_file
-            keys["color"] = self.stroke
-            keys["fill"] = self.fill
-            keys["align"] = self.to_alignment()
-            keys["rotate"] = self.rotate
-            # keys['stroke_opacity'] = self.show_stroke
-            # keys['fill_opacity'] = self.show_fill
-
-            # potential other properties
-            # keys['idx'] = 0
-            # keys['render_mode'] = 0
-            # keys['miter_limit'] = 1
-            # keys['border_width'] = 1
-            # keys['encoding'] = pymupdf.TEXT_ENCODING_LATIN
-            # keys['morph'] = None
-            # keys['oc'] = 0
-            # keys['overlay'] = True
-            # keys['expandtabs'] = 8
-            # keys['charwidths'] = None
-
             # rect text only
             # expandtabs=8, align=TEXT_ALIGN_LEFT, charwidths=None,
             try:
@@ -4213,9 +4208,8 @@ class TextShape(BaseShape):
                 msg = f"Cannot create Text{thefile}{cause}"
                 tools.feedback(msg, True, True)
         else:
-            # tools.feedback(f"*** {x_t=} {y_t=} {_text=} {sequence=} {rotation=}")
-            # cnv.setFillColor(self.stroke)
-            self.draw_multi_string(cnv, x_t, y_t, _text, rotation=rotation)
+            # tools.feedback(f"*** {x_t=} {y_t=} {_text=} {keys=}")
+            self.draw_multi_string(cnv, x_t, y_t, _text, **keys)
 
 
 class TrapezoidShape(BaseShape):

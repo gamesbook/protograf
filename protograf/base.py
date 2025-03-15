@@ -326,6 +326,7 @@ class BaseCanvas:
 
         self.jsonfile = kwargs.get("defaults", None)
         self.document = document
+        self.doc_page = None
         self.defaults = {}
         # ---- setup defaults
         if self.jsonfile:
@@ -741,7 +742,7 @@ class BaseShape:
         self.show_id = False  # True
         # ---- KEY
         self.doc_page = globals.doc_page
-        self.canvas = globals.canvas  # pymupdf Shape object
+        self.canvas = canvas or globals.canvas  # pymupdf Shape object
         base = _object or globals.base
         # print(f" *** {self.canvas=} {cnv=} {base=}")
         # print(f" *** {type(self.canvas)=} {type(cnv)=} {type(base=)}")
@@ -781,7 +782,7 @@ class BaseShape:
         self.top = self.kw_float(kwargs.get("top", base.top))
         self.depth = self.kw_float(kwargs.get("depth", self.side))  # diamond
         self.x = self.kw_float(kwargs.get("x", kwargs.get("left", base.x)))
-        self.y = self.kw_float(kwargs.get("y", kwargs.get("bottom", base.y)))
+        self.y = self.kw_float(kwargs.get("y", kwargs.get("top", base.y)))
         self.cx = self.kw_float(kwargs.get("cx", base.cx))  # centre (for some shapes)
         self.cy = self.kw_float(kwargs.get("cy", base.cy))  # centre (for some shapes)
         self.scaling = self.kw_float(kwargs.get("scaling", None))  # SVG images
@@ -1143,7 +1144,7 @@ class BaseShape:
                 ):
                     # tools.feedback(f'{attr=}')
                     common_attr = getattr(self.common, attr)
-                    base_attr = getattr(BaseCanvas(), attr)
+                    base_attr = getattr(base, attr)
                     if common_attr != base_attr:
                         setattr(self, attr, common_attr)
 
@@ -1244,22 +1245,11 @@ class BaseShape:
 
     def set_canvas_props(
         self,
-        shape: muShape,
         cnv=None,
         index=None,  # extract from list of potential values (usually Card options)
-        fill=None,  # reserve None for 'no fill at all'
-        transparency=None,
-        stroke=None,
-        stroke_width=None,
-        stroke_cap=None,
-        dotted=None,
-        dashed=None,
-        rotation=None,
-        closed=False,  # whether to connect last and first points
-        debug=False,
+        **kwargs
     ):
-        """Set Shape properties for fill, font, line and colors"""
-        tools.feedback("set_canvas_props() is deprecated", False)
+        """Set pymupdf Shape properties for fill, font, line and colors"""
 
         def ext(prop):
             if isinstance(prop, str):
@@ -1273,7 +1263,18 @@ class BaseShape:
         #   width=1, color=(0,), fill=None, lineCap=0, lineJoin=0, dashes=None,
         #   closePath=True, even_odd=False, morph=(fixpoint, matrix),
         #   stroke_opacity=1, fill_opacity=1, oc=0
-
+        # ---- set props
+        cnv = cnv if cnv else self.canvas
+        fill = kwargs.get('fill', None)  # reserve None for 'no fill at all'
+        transparency = kwargs.get('transparency', None)
+        stroke = kwargs.get('stroke', None)
+        stroke_width = kwargs.get('stroke_width', None)
+        stroke_cap = kwargs.get('stroke_cap', None)
+        dotted = kwargs.get('dotted', None)
+        dashed = kwargs.get('dashed', None)
+        rotation = kwargs.get('rotation', None)
+        closed = kwargs.get('closed', False)  # whether to connect last and first points
+        debug = kwargs.get('debug', False)
         # ---- set line dots / dashed
         _dotted = ext(dotted) or ext(self.dotted)
         _dashed = ext(dashed) or ext(self.dashed)
@@ -1317,7 +1318,7 @@ class BaseShape:
         _fill = get_color(color=fill, default=self.fill)
         # print(f'{_color:} {_fill:}')  # either: None, or fractional RGB
         # ---- set/apply properties
-        shape.finish(
+        cnv.finish(
             width=stroke_width or self.stroke_width,
             color=_color,
             fill=_fill,
@@ -1328,8 +1329,8 @@ class BaseShape:
             morph=morph,
             closePath=closed,
         )
-
         return None
+
         """
         def ext(prop):
             if isinstance(prop, str):
@@ -1974,23 +1975,23 @@ class BaseShape:
         except TypeError:
             return _text
 
-    def points_to_value(self, value: float) -> float:
+    def points_to_value(self, value: float, units_name=None) -> float:
         """Convert a point value to a units-based value."""
         try:
-            match self.units:
+            match units_name:
                 case "cm" | "centimetres":
-                    return float(value) * unit.cm
+                    return float(value) / unit.cm
                 case "mm" | "millimetres":
-                    return float(value) * unit.mm
+                    return float(value) / unit.mm
                 case "inch" | "in" | "inches":
-                    return float(value) * unit.inch
+                    return float(value) / unit.inch
                 case "points" | "pts":
-                    return float(value) * unit.pt
+                    return float(value) / unit.pt
                 case _:
-                    return float(value)
+                    return float(value) / self.units
         except Exception as err:
             log.exception(err)
-            tools.feedback(f'Unable to convert "{value}" to {self.units}!', True)
+            tools.feedback(f'Unable to do unit conversion from "{value}" using {self.units}!', True)
 
     def values_to_points(self, items: list, units_name=None) -> list:
         """Convert a list of values to point units."""
@@ -2005,7 +2006,7 @@ class BaseShape:
                 case "points" | "pts":
                     return [float(item) * unit.pt for item in items]
                 case None:
-                    return [float(item) * self.units for item in items]
+                    return [float(item) / self.units for item in items]
                 case _:
                     tools.feedback(
                         f'Unable to convert units "{units_name}" to points!', True
@@ -2020,8 +2021,8 @@ class BaseShape:
         """Low-level text drawing, split string (\n) if needed, with align and rotation.
 
         Args:
-            * canvas (pymupdf.Page oR pymupdf.Shape): set by calling function
-              function should access globals.canvas or BaseShape.canvas
+            * canvas (pymupdf.Shape): set by calling function; which
+              should access globals.canvas or BaseShape.canvas
             * xm (float) and ym (float): must be in native units (i.e. points)!
             * string (str): the text to draw/write
             * align (str): one of [centre|right|left|None] alignment of text
@@ -2033,20 +2034,20 @@ class BaseShape:
             * font_name -
             * stroke -
             * fill -
-
-        Notes:
-            Each Page draw method is just a convenience wrapper for:
-            (1) one Shape draw method,
-            (2) the Shape.finish() method, and
-            (3) the Shape.commit() method.
-            For Page text insertion, only the Shape.commit() method is invoked.
-            If many draw and text operations are executed for a page,
-            always consider using a Shape object.
-
-            If `canvas` is a Shape, then the calling function must execute the
-            Shape.finish() method and the Shape.commit() method; useful when
-            creating a series of text objects!
         """
+
+        def move_string_start(text, point, font, fontsize, align):
+            # compute length of written text under font and fontsize:
+            tl = font.text_length(text, fontsize=fontsize)
+            # insertion point ("origin"):
+            if align == 'centre':
+                origin = muPoint(point.x - tl / 2.0, point.y)
+            elif align == 'right':
+                origin = muPoint(point.x - tl, point.y)
+            else:
+                origin = point
+            return origin
+
         if not string:
             return
         # ---- deprecated
@@ -2065,9 +2066,13 @@ class BaseShape:
         keys["fontsize"] = kwargs.get("font_size", self.font_size)
         keys["fontname"] = kwargs.get("font_name", self.font_name)
         # keys['fontfile'] = self.font_file
-        keys["color"] = kwargs.get("stroke", self.stroke)
-        keys["fill"] = kwargs.get("fill", self.fill)
-        keys["rotate"] = rotation or 0  # must be multiple of 90
+        keys["color"] = get_color(kwargs.get("stroke", self.stroke))
+        if kwargs.get("stroke_inner"):
+            keys["fill"] = get_color(kwargs.get("stroke_inner", self.stroke))
+        else:
+            keys["fill"] = keys["color"]
+        if rotation:  # must be multiple of 90 for text
+            keys['rotate'] = int(keys.get('rotate', (0,0))[0])
         # keys['stroke_opacity'] = self.show_stroke or 1
         # keys['fill_opacity'] = self.show_fill or 1
 
@@ -2081,25 +2086,18 @@ class BaseShape:
         # keys['oc'] = 0
         # keys['overlay'] = True
 
-        # ---- draw
-
         # TODO - recalculate xm, ym based on align and text width
         # keys["align"] = align or self.align
 
-        """
-        breakpoint()
-        # See: Document.get_char_widths(xref=0, limit=256)
-        doc = globals.document
-        widthlist = doc.get_char_widths(xref=0)
-        # *** pymupdf.mupdf.FzErrorFormat: code=7: object out of range (0 0 R); xref size 6
-        def pixlen(text, widthlist, fontsize):
-            try:
-                return sum([widthlist[ord(c)] for c in text]) * fontsize
-            except IndexError:
-                raise ValueError("max. code point found: %i, increase limit" % ord(max(text)))
-        """
+            # insert font on the page (not needed for built-in fonts)
+            # page.insert_font(fontname="myfont", fontbuffer=font.buffer)
 
+        # ---- draw
+        # print(f'$$$ multi_string {xm=} {ym=} {string=} {self.align=}')
         point = pymupdf.Point(xm, ym)
+        if self.align:
+            font = pymupdf.Font(keys["fontname"])  # built-in
+            point = move_string_start(string, point, font, keys["fontsize"], self.align)
         canvas.insert_text(point, string, **keys)
 
         """

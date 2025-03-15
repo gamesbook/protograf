@@ -15,9 +15,9 @@ Create(filename="customised_blueprint.pdf",
        margin_right=0.2,
        font_size=8)
 
-txt = Common(x=0, y=6, font_size=8, align="left")
+txt = Common(x=0, y=0, font_size=8, align="left")
 
-Blueprint()
+#Blueprint()
 Text(common=txt, text="Blueprint:defaults")
 PageBreak()
 
@@ -51,6 +51,10 @@ PageBreak()
 
 Blueprint(decimals=1)
 Text(common=txt, text="Blueprint: decimals")
+PageBreak()
+
+Blueprint(edges='n,s,e,w')
+Text(common=txt, text="Blueprint: label edges")
 
 Save(
      output='png',
@@ -60,5 +64,5 @@ Save(
         "defaults", "stroke_width_red",
         "style_blue", "style_green", "style_grey",
         "style_stroke", "subdivisions", "subdivisions_dashed",
-        "decimals"
+        "decimals", "edges",
      ])

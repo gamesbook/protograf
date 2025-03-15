@@ -112,34 +112,29 @@ def Create(**kwargs):
         * Allows shortcut creation of cards
     """
     global globals_set
-
     # ---- set and confirm globals
     globals.initialize()
     globals_set = True
-
     # ---- margins
     globals.margin = kwargs.get("margin", globals.margin)
     globals.margin_left = kwargs.get("margin_left", globals.margin)
     globals.margin_top = kwargs.get("margin_top", globals.margin)
     globals.margin_bottom = kwargs.get("margin_bottom", globals.margin)
     globals.margin_right = kwargs.get("margin_right", globals.margin)
-
-    # ---- cards and page
+    # ---- cards and units
     _cards = kwargs.get("cards", 0)
     landscape = kwargs.get("landscape", False)
     kwargs = margins(**kwargs)
-    globals.paper = kwargs.get("paper", globals.paper)
     defaults = kwargs.get("defaults", None)
     globals.units = kwargs.get("units", globals.units)
-
+    # ---- paper, page, page sizes
+    globals.paper = kwargs.get("paper", globals.paper)
     globals.page = pymupdf.paper_size(globals.paper)  # (width, height) in points
-    globals.page_width = globals.page[0] / globals.units
-    globals.page_height = globals.page[1] / globals.units
-
+    globals.page_width = globals.page[0] / globals.units  # width in user units
+    globals.page_height = globals.page[1] / globals.units  # height in user units
     # ---- fonts
     base_fonts()
     globals.font_size = kwargs.get("font_size", 12)
-
     # ---- command-line arguments
     parser = argparse.ArgumentParser()
     parser.add_argument(
@@ -159,7 +154,6 @@ def Create(**kwargs):
     # NB - pages does not work - see notes in PageBreak()
     if globals.pargs.pages:
         tools.feedback("--pages is not yet an implemented feature - sorry!")
-
     # ---- filename and fallback
     _filename = kwargs.get("filename", "")
     if not _filename:
@@ -172,29 +166,22 @@ def Create(**kwargs):
                 basename = "cards"
         _filename = f"{basename}.pdf"
     globals.filename = os.path.join(globals.pargs.directory, _filename)
-    # tools.feedback(f"output: {filename}", False)
-
-    # ---- document, page and shape/canvas
+    # ---- pymupdf doc, page, shape/canvas
     globals.document = pymupdf.open()  # pymupdf Document
     globals.doc_page = globals.document.new_page(
-        width=globals.paper[0], height=globals.paper[1]
+        width=globals.page[0], height=globals.page[1]
     )  # pymupdf Page
     globals.canvas = globals.doc_page.new_shape()  # pymupdf Shape
-
     # ---- BaseCanvas
     globals.base = BaseCanvas(
         globals.document, paper=globals.paper, defaults=defaults, kwargs=kwargs
     )
-
-    # ---- paper, page size+color, deck
-    globals.page_width = globals.base.paper[0]  # point units (1/72 of an inch)
-    globals.page_height = globals.base.paper[1]  # point units (1/72 of an inch)
+    # ---- paper color
     if kwargs.get("page_fill"):
         fill = get_color(kwargs["page_fill"], "white")
         globals.canvas.draw_rect(
-            (0, 0, globals.page_width, globals.page_height), fill=fill
+            (0, 0, globals.page[0], globals.page[1]), fill=fill
         )
-
     # ---- cards
     if _cards:
         Deck(canvas=globals.canvas, sequence=range(1, _cards + 1), **kwargs)  # deck var
@@ -983,8 +970,6 @@ def starfield(**kwargs):
 
 
 def Text(**kwargs):
-    tools.feedback("Text is under construction", False)
-    return
     kwargs = margins(**kwargs)
     text = TextShape(canvas=globals.canvas, **kwargs)
     text.draw()
@@ -1053,6 +1038,9 @@ def Blueprint(**kwargs):
                     )
         return color, fill
 
+    def set_format(num, side):
+        return f"{num*side:{1}.{decimals}f}"
+
     kwargs = margins(**kwargs)
     if kwargs.get("common"):
         tools.feedback('The "common" property cannot be used with a Blueprint.', True)
@@ -1064,6 +1052,7 @@ def Blueprint(**kwargs):
     # override defaults ... otherwise grid not "next" to margins
     numbering = kwargs.get("numbering", True)
     kwargs["side"] = kwargs.get("side", side)
+    number_edges = kwargs.get("edges", "S,W")
     kwargs["x"] = kwargs.get("x", 0)
     kwargs["y"] = kwargs.get("y", 0)
     m_x = kwargs["units"] * (globals.margin_left + globals.margin_right)
@@ -1084,42 +1073,67 @@ def Blueprint(**kwargs):
     # ---- page color (optional)
     if kwargs["fill"] is not None:
         fill = get_color(kwargs["fill"], "white")
-        globals.canvas.draw_rect((0, 0, globals.page[0], globals.page[1]), fill=fill)
+        globals.canvas.draw_rect((0, 0, globals.page[0], globals.page[1]))
+        globals.canvas.finish(fill=fill)
+    kwargs["fill"] = kwargs.get("fill", line_stroke)  # revert back for font
+    # ---- number edges
+    if number_edges:
+        edges = tools.validated_directions(number_edges, tools.DirectionGroup.CARDINAL)
     # ---- numbering
     if numbering:
-        # TODO => add position - Top Left Bottom Right
         _common = Common(
             font_size=kwargs["font_size"],
             stroke=kwargs["stroke"],
+            fill=kwargs["stroke"],
             units=kwargs["units"],
         )
-        for x in range(1, kwargs["cols"] + 1):
-            Text(
-                x=x * side,
-                y=kwargs["y"] - kwargs["side"] / 2.0,
-                text=f"{x*side:{1}.{decimals}f}",
-                common=_common,
-            )
-        for y in range(1, kwargs["rows"] + 1):
-            Text(
-                x=kwargs["x"] - kwargs["side"] / 2.0,
-                y=y * side - _common.points_to_value(kwargs["font_size"]) / 2.0,
-                text=f"{y*side:{1}.{decimals}f}",
-                common=_common,
-            )
-        # draw "zero" number
-        z_x = kwargs["units"] * globals.margin_left
-        z_y = kwargs["units"] * globals.margin_bottom
-        corner_dist = geoms.length_of_line(Point(0, 0), Point(z_x, z_y))
-        corner_frac = corner_dist * 0.66 / kwargs["units"]
-        # tools.feedback(f'*** {z_x=} {z_y=} {corner_dist=}')
-        zero_pt = geoms.point_on_line(Point(0, 0), Point(z_x, z_y), corner_frac)
-        Text(
-            x=zero_pt.x / kwargs["units"] - kwargs["side"] / 4.0,
-            y=zero_pt.y / kwargs["units"] - kwargs["side"] / 4.0,
-            text="0",
-            common=_common,
-        )
+        offset = _common.points_to_value(kwargs["font_size"]) / 2.0
+        fixed_y, fixed_x = None, None
+        if 'n' in edges:
+            for x in range(1, kwargs["cols"] + 1):
+                Text(
+                    x=x * side,
+                    y=kwargs["y"] - offset,
+                    text=set_format(x, side),
+                    common=_common,
+                )
+        if 's' in edges:
+            for x in range(1, kwargs["cols"] + 1):
+                Text(
+                    x=x * side,
+                    y=kwargs["y"] + kwargs["rows"] * side + globals.margin_bottom / 2.0,
+                    text=set_format(x, side),
+                    common=_common,
+                )
+        if 'e' in edges:
+            for y in range(1, kwargs["rows"] + 1):
+                Text(
+                    x=kwargs["x"] + kwargs["cols"] * side + globals.margin_left / 2.0,
+                    y=y * side + offset,
+                    text=set_format(y, side),
+                    common=_common,
+                )
+        if 'w' in edges:
+            for y in range(1, kwargs["rows"] + 1):
+                Text(
+                    x=kwargs["x"] - globals.margin_left / 2.0,
+                    y=y * side + offset,
+                    text=set_format(y, side),
+                    common=_common,
+                )
+        # ---- draw "zero" number
+        # z_x = kwargs["units"] * globals.margin_left
+        # z_y = kwargs["units"] * globals.margin_bottom
+        # corner_dist = geoms.length_of_line(Point(0, 0), Point(z_x, z_y))
+        # corner_frac = corner_dist * 0.66 / kwargs["units"]
+        # # tools.feedback(f'*** {z_x=} {z_y=} {corner_dist=}')
+        # zero_pt = geoms.point_on_line(Point(0, 0), Point(z_x, z_y), corner_frac)
+        # Text(
+        #     x=zero_pt.x / kwargs["units"] - kwargs["side"] / 4.0,
+        #     y=zero_pt.y / kwargs["units"] - kwargs["side"] / 4.0,
+        #     text="0",
+        #     common=_common,
+        # )
 
     # ---- draw subgrid
     if kwargs.get("subdivisions"):

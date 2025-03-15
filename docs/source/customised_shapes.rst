@@ -1679,3 +1679,27 @@ Decimals
       - *decimals* - set to ``1``; number of decimal points in the grid numbers
 
 ===== ======
+
+.. _blueEdge:
+
+Edges
+-----
+`↑ <blueprint_>`_
+
+.. |bl8| image:: images/custom/blueprint/edges.png
+   :width: 330
+
+===== ======
+|bl8| This example shows the Blueprint constructed using the command with these
+      properties:
+
+        .. code:: python
+
+          Blueprint(edges='n,s,e,w')
+
+      It has the following properties set:
+
+      - *edges* - set to ``'n,s,e,w'``; grid numbers will be drawn on
+        all four edges
+
+===== ======
