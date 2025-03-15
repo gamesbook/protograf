@@ -235,13 +235,12 @@ class ArcShape(BaseShape):
             self.y_1 = self.y + self.default_length
         x_2 = self.unit(self.x_1) + self._o.delta_x
         y_2 = self.unit(self.y_1) + self._o.delta_y
-        # ---- set canvas
-        self.set_canvas_props(index=ID)
         # ---- draw arc
         # tools.feedback(f'*** Arc: {x_1=}, {y_1=}, {x_2=}, {y_2=}')
-        cnv.arc(
-            x_1, y_1, x_2, y_2, startAng=self.angle, extent=self.angle_width
-        )  # anti-clock from flat; 90°
+        cnv.draw_sector(
+            (x_1, y_1), (x_2, y_2), self.angle_width, fullSector=self.filled)
+        # anti-clock from flat; 90°
+        self.set_canvas_props(cnv=cnv, index=ID, **kwargs)
 
 
 class ArrowShape(BaseShape):
@@ -333,12 +332,10 @@ class ArrowShape(BaseShape):
             y = -self._u.height
         # ---- draw arrow
         self.vertices = self.get_vertices(cx=cx, cy=cy, x=x, y=y)
-        pth = cnv.beginPath()
-        pth.moveTo(*self.vertices[0])
-        for vertex in self.vertices:
-            pth.lineTo(*vertex)
-        pth.close()
-        cnv.drawPath(pth, stroke=1 if self.stroke else 0, fill=1 if self.fill else 0)
+        # tools.feedback(f'***Arrow {x=} {y=} {self.vertices=}')
+        cnv.draw_polyline(self.vertices)
+        kwargs['closed'] = True
+        self.set_canvas_props(cnv=cnv, index=ID, **kwargs)
         # ---- dot
         self.draw_dot(cnv, cx, cy)
         # ---- cross
@@ -381,10 +378,9 @@ class BezierShape(BaseShape):
         y_3 = self.unit(self.y_2) + self._o.delta_y
         x_4 = self.unit(self.x_3) + self._o.delta_x
         y_4 = self.unit(self.y_3) + self._o.delta_y
-        # ---- set canvas
-        self.set_canvas_props(index=ID)
         # ---- draw bezier
-        cnv.bezier(x_1, y_1, x_2, y_2, x_3, y_3, x_4, y_4)
+        cnv.draw_bezier((x_1, y_1), (x_2, y_2), (x_3, y_3), (x_4, y_4))
+        self.set_canvas_props(cnv=cnv, index=ID, **kwargs)
 
 
 class CircleShape(BaseShape):
@@ -749,17 +745,15 @@ class CircleShape(BaseShape):
                 dashed=self.petals_dashed,
                 dotted=self.petals_dotted,
             )
-            pth = cnv.beginPath()
-            pth.moveTo(*petals_vertices[0])
             match self.petals_style:
                 case "triangle" | "t":
                     for vertex in petals_vertices:
-                        pth.lineTo(*vertex)
+                        cnv.lineTo(*vertex)
                 case "curve" | "c" | "petal" | "p":
                     for index, vertex in enumerate(petals_vertices):
                         if index == 0:
                             continue  # already have a "start" location on path
-                        pth.curveTo(
+                        cnv.curveTo(
                             vertex[0].x,
                             vertex[0].y,
                             vertex[1].x,
@@ -769,12 +763,7 @@ class CircleShape(BaseShape):
                         )
                         if index in [1, 1]:
                             self._debug(cnv, vertices=[vertex[0], vertex[1], vertex[2]])
-            pth.close()
-            cnv.drawPath(
-                pth,
-                stroke=1 if self.petals_stroke else 0,
-                fill=1 if self.petals_fill else 0,
-            )
+            self.set_canvas_props(cnv=cnv, index=ID, **self.kwargs)  # shape.finish()
 
     def draw(self, cnv=None, off_x=0, off_y=0, ID=None, **kwargs):
         """Draw circle on a given canvas."""
@@ -850,41 +839,29 @@ class CircleShape(BaseShape):
                 self.draw_petals(cnv, ID, self.x_c, self.y_c)
         # tools.feedback(f'*** Circle: {x=} {y=}')
         # ---- draw circle
-        cnv.circle(
+        cnv.draw_circle(
             (x, y),
-            self._u.radius,
-            stroke=1 if self.stroke else 0,
-            fill=1 if self.fill else 0,
+            self._u.radius
         )
-
-        self.set_canvas_props(index=ID)
+        self.set_canvas_props(cnv=cnv, index=ID, **kwargs)
         # ---- grid marks
         if self.grid_marks:
             # print(f'{self._u.radius=} {self._u.diameter=}')
             deltag = self.unit(self.grid_length)
             pth = cnv.beginPath()
             gx, gy = 0, y - self._u.radius  # left-side
-            pth.moveTo(gx, gy)
-            pth.lineTo(deltag, gy)
-            pth.moveTo(0, gy + self._u.radius * 2.0)
-            pth.lineTo(deltag, gy + self._u.radius * 2.0)
+            cnv.draw_line((gx, gy), (deltag, gy))
+            cnv.draw_line((0, gy + self._u.radius * 2.0), (deltag, gy + self._u.radius * 2.0))
             gx, gy = x - self._u.radius, self.paper[1]  # top-side
-            pth.moveTo(gx, gy)
-            pth.lineTo(gx, gy - deltag)
-            pth.moveTo(gx + self._u.radius * 2.0, gy)
-            pth.lineTo(gx + self._u.radius * 2.0, gy - deltag)
+            cnv.draw_line((gx, gy), (gx, gy - deltag))
+            cnv.draw_line((gx + self._u.radius * 2.0, gy), (gx + self._u.radius * 2.0, gy - deltag))
             gx, gy = self.paper[0], y - self._u.radius  # right-side
-            pth.moveTo(gx, gy)
-            pth.lineTo(gx - deltag, gy)
-            pth.moveTo(gx, gy + self._u.radius * 2.0)
-            pth.lineTo(gx - deltag, gy + self._u.radius * 2)
+            cnv.draw_line((gx, gy), (gx - deltag, gy))
+            cnv.draw_line((gx, gy + self._u.radius * 2.0), (gx - deltag, gy + self._u.radius * 2))
             gx, gy = x - self._u.radius, 0  # bottom-side
-            pth.moveTo(gx, gy)
-            pth.lineTo(gx, gy + deltag)
-            pth.moveTo(gx + self._u.radius * 2.0, gy)
-            pth.lineTo(gx + self._u.radius * 2.0, gy + deltag)
+            cnv.draw_line((gx, gy), (gx, gy + deltag))
+            cnv.draw_line((gx + self._u.radius * 2.0, gy), (gx + self._u.radius * 2.0, gy + deltag))
             # done
-            cnv.drawPath(pth, stroke=1, fill=1)
             keys = kwargs
             keys['stroke'] = self.grid_stroke
             keys['stroke_width'] = self.grid_stroke_width
@@ -1003,24 +980,18 @@ class CompassShape(BaseShape):
         self.directions = self.directions or "*"  # compass should always have!
 
     def draw_radius(self, cnv, ID, x, y, absolute=False):
-        self.set_canvas_props(
-            index=ID,
-            stroke=self.radii_stroke,
-            stroke_width=self.radii_stroke_width,
-            dashed=self.radii_dashed,
-            dotted=self.radii_dotted,
-        )
-        pth = cnv.beginPath()
         # tools.feedback(
-        #    f'*** Compass {self.x_c=:.2f} {self.y_c=:.2f}; {x=:.2f} {y=:.2f}')
-        pth.moveTo(self.x_c, self.y_c)
+        #    f'*** Compass Radius {self.x_c=:.2f} {self.y_c=:.2f}; {x=:.2f} {y=:.2f}')
         if absolute:
-            pth.lineTo(x, y)
+            cnv.draw_line((self.x_c, self.y_c), (x, y))
         else:
-            pth.lineTo(x + self.x_c, y + self.y_c)
-        cnv.drawPath(
-            pth, stroke=1 if self.radii_stroke else 0, fill=1 if self.fill else 0
-        )
+            cnv.draw_line((self.x_c, self.y_c), (x + self.x_c, y + self.y_c))
+        keys = {}
+        keys['stroke'] = self.radii_stroke
+        keys['stroke_width'] = self.radii_stroke_width
+        keys['dashed'] = self.radii_dashed
+        keys['dotted'] = self.radii_dotted
+        self.set_canvas_props(cnv=cnv, index=ID, **keys)
 
     def circle_radius(self, cnv, ID, angle):
         """Calc x,y on circle and draw line from centre to it."""
@@ -1094,10 +1065,10 @@ class CompassShape(BaseShape):
             else:
                 self.x_c = self._u.x + self._o.delta_x + radius
                 self.y_c = self._u.y + self._o.delta_y + radius
-        # ---- set canvas
-        self.set_canvas_props(index=ID)
+        # ---- draw perimeter
         if self.perimeter == "circle":
-            cnv.circle(self.x_c, self.y_c, radius, stroke=1, fill=1 if self.fill else 0)
+            cnv.draw_circle((self.x_c, self.y_c), radius)
+            self.set_canvas_props(cnv=cnv, index=ID, **kwargs)
         # ---- draw compass in circle
         _directions = tools.validated_directions(
             self.directions, tools.DirectionGroup.COMPASS, "directions"
@@ -1282,9 +1253,8 @@ class EllipseShape(BaseShape):
         # ---- set canvas
         self.set_canvas_props(index=ID)
         # ---- draw ellipse
-        pth = cnv.beginPath()
-        pth.ellipse(x, y, self._u.width, self._u.height)
-        cnv.drawPath(pth, stroke=1 if self.stroke else 0, fill=1 if self.fill else 0)
+        cnv.draw_oval((x, y, x + self._u.width, y + self._u.height))
+        self.set_canvas_props(cnv=cnv, index=ID, **kwargs)  # shape.finish()
         # ---- cross
         self.draw_cross(cnv, x_d, y_d)
         # ---- dot
@@ -1421,12 +1391,10 @@ class EquilateralTriangleShape(BaseShape):
         # ---- set canvas
         self.set_canvas_props(index=ID)
         # ---- draw equilateral triangle
-        pth = cnv.beginPath()
-        pth.moveTo(self.vertices[0].x, self.vertices[0].y)
-        for key, vertex in enumerate(self.vertices):
-            pth.lineTo(vertex.x, vertex.y)
-        pth.close()
-        cnv.drawPath(pth, stroke=1 if self.stroke else 0, fill=1 if self.fill else 0)
+        # tools.feedback(f'***EqiTru {x=} {y=} {self.vertices=}')
+        cnv.draw_polyline(self.vertices)
+        kwargs['closed'] = True
+        self.set_canvas_props(cnv=cnv, index=ID, **kwargs)
         # ---- debug
         self._debug(cnv, vertices=self.vertices)
         # ---- draw hatch
@@ -2122,33 +2090,29 @@ class HexShape(BaseShape):
         # ---- calculate vertical hexagon (clockwise)
         if self.orientation.lower() in ["p", "pointy"]:
             self.vertices = [  # clockwise from bottom-left; relative to centre
-                Point(x, y + z_fraction),
-                Point(x, y + z_fraction + side),
-                Point(x + half_flat, y + diameter),
-                Point(x + height_flat, y + z_fraction + side),
-                Point(x + height_flat, y + z_fraction),
-                Point(x + half_flat, y),
+                muPoint(x, y + z_fraction),
+                muPoint(x, y + z_fraction + side),
+                muPoint(x + half_flat, y + diameter),
+                muPoint(x + height_flat, y + z_fraction + side),
+                muPoint(x + height_flat, y + z_fraction),
+                muPoint(x + half_flat, y),
             ]
         # ---- calculate horizontal hexagon (clockwise)
         else:  # self.orientation.lower() in ['f',  'flat']:
             self.vertices = [  # clockwise from left; relative to centre
-                Point(x, y + half_flat),
-                Point(x + z_fraction, y + height_flat),
-                Point(x + z_fraction + side, y + height_flat),
-                Point(x + diameter, y + half_flat),
-                Point(x + z_fraction + side, y),
-                Point(x + z_fraction, y),
+                muPoint(x, y + half_flat),
+                muPoint(x + z_fraction, y + height_flat),
+                muPoint(x + z_fraction + side, y + height_flat),
+                muPoint(x + diameter, y + half_flat),
+                muPoint(x + z_fraction + side, y),
+                muPoint(x + z_fraction, y),
             ]
 
         # ---- draw hexagon
         # tools.feedback(f'***Hex {x=} {y=} {self.vertices=}')
-        pth = cnv.beginPath()
-        pth.moveTo(*self.vertices[0])
-        for vertex in self.vertices:
-            # TODO - set side-specific line color/style here
-            pth.lineTo(*vertex)
-        pth.close()
-        cnv.drawPath(pth, stroke=1 if self.stroke else 0, fill=1 if self.fill else 0)
+        cnv.draw_polyline(self.vertices)
+        kwargs['closed'] = True
+        self.set_canvas_props(cnv=cnv, index=ID, **kwargs)
 
         # ---- * borders (override)
         if self.borders:
@@ -2559,12 +2523,10 @@ class PolygonShape(BaseShape):
                 cnv.restoreState()
             return
         # ---- draw polygon
-        pth = cnv.beginPath()
-        pth.moveTo(*vertices[0])
-        for vertex in vertices:
-            pth.lineTo(vertex.x, vertex.y)
-        pth.close()
-        cnv.drawPath(pth, stroke=1 if self.stroke else 0, fill=1 if self.fill else 0)
+        tools.feedback(f'***PolyGon {x=} {y=} {vertices=}')
+        cnv.draw_polyline(vertices)
+        kwargs['closed'] = True
+        self.set_canvas_props(cnv=cnv, index=ID, **kwargs)
         # ---- draw radii
         if self.radii:
             self.draw_radii(cnv, ID, Point(x, y), vertices)
@@ -2631,20 +2593,20 @@ class PolylineShape(BaseShape):
         cnv = cnv if cnv else self.canvas
         super().draw(cnv, off_x, off_y, ID, **kwargs)  # unit-based props
         points = self.get_points()
-        # ---- set canvas
-        self.set_canvas_props(index=ID)
+        # ---- set vertices
+        x_sum, y_sum = 0, 0
+        self.vertexes = []
+        for key, vertex in enumerate(points):
+            x, y = vertex
+            # convert to using units
+            x = self.unit(x) + self._o.delta_x
+            y = self.unit(y) + self._o.delta_y
+            self.vertexes.append((x, y))
         # ---- draw polyline
-        if points:
-            pth = cnv.beginPath()
-            for key, vertex in enumerate(points):
-                x, y = vertex
-                # convert to using units
-                x = self.unit(x) + self._o.delta_x
-                y = self.unit(y) + self._o.delta_y
-                if key == 0:
-                    pth.moveTo(x, y)
-                pth.lineTo(x, y)
-            cnv.drawPath(pth, stroke=1 if self.stroke else 0, fill=0)
+        # tools.feedback(f'***Hex {x=} {y=} {self.vertices=}')
+        cnv.draw_polyline(self.vertexes)
+        kwargs['closed'] = False
+        self.set_canvas_props(cnv=cnv, index=ID, **kwargs)
 
 
 class QRCodeShape(BaseShape):
@@ -3537,12 +3499,10 @@ class RhombusShape(BaseShape):
             y = -self._u.height / 2.0
         # ---- draw rhombus
         self.vertices = self.get_vertices(cx=cx, cy=cy, x=x, y=y)
-        pth = cnv.beginPath()
-        pth.moveTo(*self.vertices[0])
-        for vertex in self.vertices:
-            pth.lineTo(*vertex)
-        pth.close()
-        cnv.drawPath(pth, stroke=1 if self.stroke else 0, fill=1 if self.fill else 0)
+        # tools.feedback(f'***Rhombus {x=} {y=} {self.vertices=}')
+        cnv.draw_polyline(self.vertices)
+        kwargs['closed'] = True
+        self.set_canvas_props(cnv=cnv, index=ID, **kwargs)
         # ---- borders (override)
         if self.borders:
             if isinstance(self.borders, tuple):
@@ -3607,22 +3567,22 @@ class RightAngledTriangleShape(BaseShape):
             y2 = y - self._u.height
         self.vertices.append(Point(x2, y2))
         self.vertices.append(Point(x2, y))
-        # ---- set canvas
-        self.set_canvas_props(index=ID)
-        # ---- draw RA triangle
+        # ---- set vertices
         x_sum, y_sum = 0, 0
-        pth = cnv.beginPath()
+        self.vertexes = []
         for key, vertex in enumerate(self.vertices):
             # shift to relative position
             x = vertex.x + self._o.delta_x
             y = vertex.y + self._o.delta_y
             x_sum += x
             y_sum += y
-            if key == 0:
-                pth.moveTo(x, y)
-            pth.lineTo(x, y)
-        pth.close()
-        cnv.drawPath(pth, stroke=1 if self.stroke else 0, fill=1 if self.fill else 0)
+            self.vertexes.append((x, y))
+        # ---- draw RightAngledTriangle
+        # tools.feedback(f'***RAT {x=} {y=} {self.vertices=}')
+        cnv.draw_polyline(self.vertexes)
+        kwargs['closed'] = True
+        self.set_canvas_props(cnv=cnv, index=ID, **kwargs)
+        # ---- centre
         x_c, y_c = x_sum / 3.0, y_sum / 3.0  # centroid
         # ---- dot
         self.draw_dot(cnv, x_c, y_c)
@@ -3721,19 +3681,19 @@ class ShapeShape(BaseShape):
             points = self.points
         if points and len(points) > 0:
             x_offset, y_offset = self.unit(self.x or 0), self.unit(self.y or 0)
-            pth = cnv.beginPath()
+            # ---- set vertices
+            x_sum, y_sum = 0, 0
+            self.vertexes = []
             for key, vertex in enumerate(points):
                 _x0, _y0 = float(vertex[0]), float(vertex[1])
                 # convert to using units
                 x = self.unit(_x0) + self._o.delta_x + x_offset
                 y = self.unit(_y0) + self._o.delta_y + y_offset
-                if key == 0:
-                    pth.moveTo(x, y)
-                pth.lineTo(x, y)
-            pth.close()
-            cnv.drawPath(
-                pth, stroke=1 if self.stroke else 0, fill=1 if self.fill else 0
-            )
+                self.vertexes.append((x, y))
+            # tools.feedback(f'***RAT {x=} {y=} {self.vertices=}')
+            cnv.draw_polyline(self.vertexes)
+            kwargs['closed'] = True
+            self.set_canvas_props(cnv=cnv, index=ID, **kwargs)
             # ---- centre?
             if self.cx and self.cy:
                 x = self._u.cx + self._o.delta_x + x_offset
@@ -3979,9 +3939,9 @@ class StarShape(BaseShape):
                 cnv.translate(x, y)
             cnv.rotate(rotation)
             x, y = 0, 0
-        # ---- draw star
-        pth = cnv.beginPath()
-        pth.moveTo(x, y + radius)
+        # ---- calculate vertices
+        self.vertices_list = []
+        self.vertices_list.append(muPoint(x, y + radius))
         angle = (2 * math.pi) * 2.0 / 5.0
         start_angle = math.pi / 2.0
         log.debug("Start self.vertices:%s", self.vertices)
@@ -3989,9 +3949,12 @@ class StarShape(BaseShape):
             next_angle = angle * (vertex + 1) + start_angle
             x_1 = x + radius * math.cos(next_angle)
             y_1 = y + radius * math.sin(next_angle)
-            pth.lineTo(x_1, y_1)
-        pth.close()
-        cnv.drawPath(pth, stroke=1 if self.stroke else 0, fill=1 if self.fill else 0)
+            self.vertices_list.append(muPoint(x_1, y_1))
+        # ---- draw star
+        tools.feedback(f'***Star {x=} {y=} {self.vertices_list=}')
+        cnv.draw_polyline(self.vertices_list)
+        kwargs['closed'] = True
+        self.set_canvas_props(cnv=cnv, index=ID, **kwargs)
         # ---- dot
         self.draw_dot(cnv, x, y)
         # ---- cross
@@ -4316,12 +4279,9 @@ class TrapezoidShape(BaseShape):
             cnv.rotate(rotation)
         # ---- draw trapezoid
         self.vertices = self.get_vertices(cx=cx, cy=cy, x=x, y=y)
-        pth = cnv.beginPath()
-        pth.moveTo(*self.vertices[0])
-        for vertex in self.vertices:
-            pth.lineTo(*vertex)
-        pth.close()
-        cnv.drawPath(pth, stroke=1 if self.stroke else 0, fill=1 if self.fill else 0)
+        # tools.feedback(f'***Trap {x=} {y=} {self.vertices=}')
+        cnv.draw_polyline(self.vertices)
+        self.set_canvas_props(cnv=cnv, index=ID, **kwargs)
         sign = -1 if self.flip.lower() in ["s", "south"] else 1
         # ---- borders (override)
         if self.borders:

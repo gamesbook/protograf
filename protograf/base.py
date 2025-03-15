@@ -522,6 +522,8 @@ class BaseCanvas:
         self.angle_width = self.defaults.get("angle_width", 90)
         # ---- chord
         self.angle_1 = self.defaults.get("angle1", 0)
+        # ---- arc / sector
+        self.filled = self.defaults.get("filled", False)
         # ---- arrow shape: head and tail
         self.points_offset = self.defaults.get("points_offset", 0)
         self.head_height = self.defaults.get("head_height", self.height)
@@ -910,6 +912,8 @@ class BaseShape:
             kwargs.get("angle1", base.angle_1)
         )  # anti-clock from flat
         self._angle_1_theta = math.radians(self.angle_1)
+        # ---- arc / sector
+        self.filled =  self.kw_bool(kwargs.get("filled", base.filled))
         # ---- arrow shape: head, points and tail
         self.points_offset = self.kw_float(
             kwargs.get("points_offset", base.points_offset)
