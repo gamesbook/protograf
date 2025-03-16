@@ -15,7 +15,7 @@ Create(filename="default_shapes.pdf",
        font_size=8,
        stroke_width=0.5)
 
-header = Common(x=0, y=6, font_size=8, align="left")
+header = Common(x=0, y=0, font_size=8, align="left")
 
 Blueprint(stroke_width=0.5)
 Text(common=header, text="Blueprint")
@@ -153,7 +153,7 @@ PageBreak()
 
 Blueprint(stroke_width=0.5)
 Text(common=header, text="StarField")
-Rectangle(x=0, y=0, fill=black)
+Rectangle(x=0, y=0, fill="black")
 StarField(seed=42.3)
 PageBreak()
 
@@ -169,16 +169,16 @@ PageBreak()
 
 Blueprint(stroke_width=0.5)
 Text(common=header, text="Fill & Stroke")
-Rectangle(fill=yellow, stroke=red, stroke_width=6)
+Rectangle(fill="yellow", stroke="red", stroke_width=6)
 PageBreak()
 
 Blueprint(stroke_width=0.5)
 Text(common=header, text="Transparency")
-Rectangle(x=1, y=3, height=1, width=2, fill="#008000", stroke=silver, transparency=25, label="25%")
-Rectangle(x=1, y=4, height=1, width=2, fill="#008000", stroke=silver, transparency=50, label="50%")
-Rectangle(x=1, y=5, height=1, width=2, fill="#008000", stroke=silver, transparency=75, label="75%")
-Rectangle(x=0, y=0, height=2, width=2, fill=yellow, stroke=yellow)
-Rectangle(x=1, y=1, height=2, width=2, fill=red, stroke=red, transparency=50)
+Rectangle(x=1, y=3, height=1, width=2, fill="#008000", stroke="#C0C0C0", transparency=25, label="25%")
+Rectangle(x=1, y=4, height=1, width=2, fill="#008000", stroke="#C0C0C0", transparency=50, label="50%")
+Rectangle(x=1, y=5, height=1, width=2, fill="#008000", stroke="#C0C0C0", transparency=75, label="75%")
+Rectangle(x=0, y=0, height=2, width=2, fill="yellow", stroke="yellow")
+Rectangle(x=1, y=1, height=2, width=2, fill="red", stroke="red", transparency=50)
 PageBreak()
 
 Blueprint(stroke_width=0.5)
@@ -208,7 +208,7 @@ PageBreak()
 
 Blueprint(stroke_width=0.5)
 Text(common=header, text="Match Fill and Stroke")
-Circle(fill_stroke=aqua)
+Circle(fill_stroke="cyan")
 PageBreak()
 
 Save(output='png',

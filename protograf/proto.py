@@ -179,9 +179,7 @@ def Create(**kwargs):
     # ---- paper color
     if kwargs.get("page_fill"):
         fill = get_color(kwargs["page_fill"], "white")
-        globals.canvas.draw_rect(
-            (0, 0, globals.page[0], globals.page[1]), fill=fill
-        )
+        globals.canvas.draw_rect((0, 0, globals.page[0], globals.page[1]), fill=fill)
     # ---- cards
     if _cards:
         Deck(canvas=globals.canvas, sequence=range(1, _cards + 1), **kwargs)  # deck var
@@ -1089,7 +1087,7 @@ def Blueprint(**kwargs):
         )
         offset = _common.points_to_value(kwargs["font_size"]) / 2.0
         fixed_y, fixed_x = None, None
-        if 'n' in edges:
+        if "n" in edges:
             for x in range(1, kwargs["cols"] + 1):
                 Text(
                     x=x * side,
@@ -1097,7 +1095,7 @@ def Blueprint(**kwargs):
                     text=set_format(x, side),
                     common=_common,
                 )
-        if 's' in edges:
+        if "s" in edges:
             for x in range(1, kwargs["cols"] + 1):
                 Text(
                     x=x * side,
@@ -1105,7 +1103,7 @@ def Blueprint(**kwargs):
                     text=set_format(x, side),
                     common=_common,
                 )
-        if 'e' in edges:
+        if "e" in edges:
             for y in range(1, kwargs["rows"] + 1):
                 Text(
                     x=kwargs["x"] + kwargs["cols"] * side + globals.margin_left / 2.0,
@@ -1113,7 +1111,7 @@ def Blueprint(**kwargs):
                     text=set_format(y, side),
                     common=_common,
                 )
-        if 'w' in edges:
+        if "w" in edges:
             for y in range(1, kwargs["rows"] + 1):
                 Text(
                     x=kwargs["x"] - globals.margin_left / 2.0,

@@ -913,7 +913,7 @@ class BaseShape:
         )  # anti-clock from flat
         self._angle_1_theta = math.radians(self.angle_1)
         # ---- arc / sector
-        self.filled =  self.kw_bool(kwargs.get("filled", base.filled))
+        self.filled = self.kw_bool(kwargs.get("filled", base.filled))
         # ---- arrow shape: head, points and tail
         self.points_offset = self.kw_float(
             kwargs.get("points_offset", base.points_offset)
@@ -1251,7 +1251,7 @@ class BaseShape:
         self,
         cnv=None,
         index=None,  # extract from list of potential values (usually Card options)
-        **kwargs
+        **kwargs,
     ):
         """Set pymupdf Shape properties for fill, font, line and colors"""
 
@@ -1269,16 +1269,16 @@ class BaseShape:
         #   stroke_opacity=1, fill_opacity=1, oc=0
         # ---- set props
         cnv = cnv if cnv else self.canvas
-        fill = kwargs.get('fill', None)  # reserve None for 'no fill at all'
-        transparency = kwargs.get('transparency', None)
-        stroke = kwargs.get('stroke', None)
-        stroke_width = kwargs.get('stroke_width', None)
-        stroke_cap = kwargs.get('stroke_cap', None)
-        dotted = kwargs.get('dotted', None)
-        dashed = kwargs.get('dashed', None)
-        rotation = kwargs.get('rotation', None)
-        closed = kwargs.get('closed', False)  # whether to connect last and first points
-        debug = kwargs.get('debug', False)
+        fill = kwargs.get("fill", None)  # reserve None for 'no fill at all'
+        transparency = kwargs.get("transparency", None)
+        stroke = kwargs.get("stroke", None)
+        stroke_width = kwargs.get("stroke_width", None)
+        stroke_cap = kwargs.get("stroke_cap", None)
+        dotted = kwargs.get("dotted", None)
+        dashed = kwargs.get("dashed", None)
+        rotation = kwargs.get("rotation", None)
+        closed = kwargs.get("closed", False)  # whether to connect last and first points
+        debug = kwargs.get("debug", False)
         # ---- set line dots / dashed
         _dotted = ext(dotted) or ext(self.dotted)
         _dashed = ext(dashed) or ext(self.dashed)
@@ -1311,7 +1311,7 @@ class BaseShape:
                 tools.feedback(f'Unable to handle rotation: "{_rotation}"', True)
             if not isinstance(_rotation[0], (float, int)):
                 tools.feedback(f'Rotation angle "{_rotation[0]}" is invalid', True)
-            if not isinstance(_rotation[1], muPoint):
+            if not isinstance(_rotation[1], (geoms.Point, muPoint)):
                 tools.feedback(f'Rotation point "{_rotation[1]}" is invalid', True)
             # ---- * set rotation matrix
             mtrx = Matrix(1, 1)
@@ -1995,7 +1995,9 @@ class BaseShape:
                     return float(value) / self.units
         except Exception as err:
             log.exception(err)
-            tools.feedback(f'Unable to do unit conversion from "{value}" using {self.units}!', True)
+            tools.feedback(
+                f'Unable to do unit conversion from "{value}" using {self.units}!', True
+            )
 
     def values_to_points(self, items: list, units_name=None) -> list:
         """Convert a list of values to point units."""
@@ -2044,9 +2046,9 @@ class BaseShape:
             # compute length of written text under font and fontsize:
             tl = font.text_length(text, fontsize=fontsize)
             # insertion point ("origin"):
-            if align == 'centre':
+            if align == "centre":
                 origin = muPoint(point.x - tl / 2.0, point.y)
-            elif align == 'right':
+            elif align == "right":
                 origin = muPoint(point.x - tl, point.y)
             else:
                 origin = point
@@ -2076,7 +2078,7 @@ class BaseShape:
         else:
             keys["fill"] = keys["color"]
         if rotation:  # must be multiple of 90 for text
-            keys['rotate'] = int(keys.get('rotate', (0,0))[0])
+            keys["rotate"] = int(keys.get("rotate", (0, 0))[0])
         # keys['stroke_opacity'] = self.show_stroke or 1
         # keys['fill_opacity'] = self.show_fill or 1
 
@@ -2093,8 +2095,8 @@ class BaseShape:
         # TODO - recalculate xm, ym based on align and text width
         # keys["align"] = align or self.align
 
-            # insert font on the page (not needed for built-in fonts)
-            # page.insert_font(fontname="myfont", fontbuffer=font.buffer)
+        # insert font on the page (not needed for built-in fonts)
+        # page.insert_font(fontname="myfont", fontbuffer=font.buffer)
 
         # ---- draw
         # print(f'$$$ multi_string {xm=} {ym=} {string=} {self.align=}')

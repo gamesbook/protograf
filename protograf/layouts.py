@@ -147,10 +147,7 @@ class DotGridShape(BaseShape):
         # ---- draw dot grid
         for y_col in range(0, self.rows):
             for x_col in range(0, self.cols):
-                cnv.draw_circle(
-                    (x + x_col * width, y + y_col * height),
-                    size
-                )
+                cnv.draw_circle((x + x_col * width, y + y_col * height), size)
         self.set_canvas_props(cnv=cnv, index=ID, **kwargs)
 
 
