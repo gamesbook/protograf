@@ -3585,9 +3585,12 @@ class SectorShape(BaseShape):
     Sector on a given canvas. Aka "wedge". Aka "slice" or "pie slice".
 
     Note:
-        * User supplies a "compass" angle i.e. degrees clockwise from North -
-          but this must be converted to a "ReportLab" angle i.e. degrees
-          anti-clockwise from East
+        * User supplies a "compass" angle i.e. degrees anti-clockwise from East;
+          which determines the "width" of the sector at the circumference;
+          default is 90°
+        * User also supplies a start angle; where 0 corresponds to East,
+          which determines the second point on the circumference;
+          default is 0°
     """
 
     def __init__(self, _object=None, canvas=None, **kwargs):
@@ -3602,12 +3605,7 @@ class SectorShape(BaseShape):
         if self.cx is not None and self.cy is not None:
             self.x = self.cx - self.radius
             self.y = self.cy - self.radius
-            self.x_1 = self.cx + self.radius
-            self.y_1 = self.cy + self.radius
-            # tools.feedback(f'*** Sect {self.x=} {self.y=} {self.x1=} {self.y1=}')
-        else:
-            self.x_1 = self.x + 2.0 * self.radius
-            self.y_1 = self.y + 2.0 * self.radius
+        # tools.feedback(f'***Sector {self.cx=} {self.cy=} {self.x=} {self.y=}')
         # ---- calculate centre
         radius = self._u.radius
         if self.row is not None and self.col is not None:
@@ -3620,6 +3618,7 @@ class SectorShape(BaseShape):
         else:
             self.x_c = self._u.x + radius
             self.y_c = self._u.y + radius
+        # tools.feedback(f'***Sector {self.x_c=} {self.y_c=} {self.radius=}')
 
     def draw(self, cnv=None, off_x=0, off_y=0, ID=None, **kwargs):
         """Draw sector on a given canvas."""
@@ -3629,19 +3628,17 @@ class SectorShape(BaseShape):
         if self.use_abs_c:
             self.x_c = self._abs_cx
             self.y_c = self._abs_cy
-        # convert to using units
-        x_1 = self.unit(self.x) + self._o.delta_x
-        y_1 = self.unit(self.y) + self._o.delta_y
-        x_2 = self.unit(self.x_1) + self._o.delta_x
-        y_2 = self.unit(self.y_1) + self._o.delta_y
-        # ---- sector angles
-        start = (450 - self.angle) % 360.0 - self.angle_width
-        width = self.angle_width
+        # ---- centre point in units
+        p_C = Point(self.x_c + self._o.delta_x, self.y_c + self._o.delta_y)
+        # ---- circumference point in units
+        p_P = geoms.point_on_circle(p_C, self._u.radius, self.angle_start)
         # ---- draw sector
-        # tools.feedback(f'*** Sector: {x_1=} {y_1=} {x_2=} {y_2=} {self.angle_width=}')
-        cnv.draw_sector(  # anti-clock from flat; 90°
-            (x_1, y_1), (x_2, y_2), width, fullSector=self.filled
+        # tools.feedback(
+        #     f'***Sector: {p_P=} {p_C=} {self.angle_start=} {self.angle_width=}')
+        cnv.draw_sector(  # anti-clockwise from p_P; 90° default
+            (p_C.x, p_C.y), (p_P.x, p_P.y), self.angle_width, fullSector=True
         )
+        kwargs["closed"] = False
         self.set_canvas_props(cnv=cnv, index=ID, **kwargs)
 
 
@@ -3751,6 +3748,9 @@ class StadiumShape(BaseShape):
         kwargs = self.kwargs | kwargs
         cnv = cnv if cnv else self.canvas
         super().draw(cnv, off_x, off_y, ID, **kwargs)  # unit-based props
+        if "fill" in kwargs.keys():
+            if kwargs.get("fill") is None:
+                tools.feedback("Cannot have no fill for a Stadium!", True)
         # ---- adjust start
         if self.row is not None and self.col is not None:
             x = self.col * self._u.width + self._o.delta_x
@@ -3781,7 +3781,7 @@ class StadiumShape(BaseShape):
             x = -self._u.width / 2.0
             y = -self._u.height / 2.0
         # ---- vertices
-        self.vertices = [  # clockwise from bottom-left; relative to centre
+        self.vertices = [  # clockwise from top-left; relative to centre
             Point(x, y),
             Point(x, y + self._u.height),
             Point(x + self._u.width, y + self._u.height),
@@ -3789,89 +3789,63 @@ class StadiumShape(BaseShape):
         ]
         # tools.feedback(f'*** Stad{len(self.vertices)=}')
         # ---- edges
-        _edges = []
-        if self.edges:
-            if not isinstance(self.edges, list):
-                __edges = self.edges.split()
-            else:
-                __edges = self.edges
-            _edges = [edge.lower() for edge in __edges]
-            # reverse order of vertices because curves are drawn anti-clockwise
-            self.vertices = list(reversed(self.vertices))
-            self.vertices.append(self.vertices[0])
-        # ---- set canvas
-        self.set_canvas_props(index=ID)
+        _edges = tools.validated_directions(
+            self.edges, tools.DirectionGroup.CARDINAL, "edges"
+        )  # need curves on these edges
+        self.vertices.append(self.vertices[0])
+
         # ---- draw rect fill only
-        # tools.feedback(f'***Stadim:Rect {x=} {y=} {self.vertices=}')
+        # tools.feedback(f'***Stadium:Rect {x=} {y=} {self.vertices=}')
+        keys = copy.deepcopy(kwargs)
+        keys["stroke"] = None
         cnv.draw_polyline(self.vertices)
-        kwargs["closed"] = True
-        # ---- draw stadium
+        self.set_canvas_props(cnv=cnv, index=ID, **keys)
+
+        # ---- draw stadium - lines or curves
         radius_lr = self._u.height / 2.0
         radius_tb = self._u.width / 2.0
 
-        # TODO => use draw_sector() to create semi-circle
-        """
-        pth = cnv.beginPath()
-        pth.moveTo(*self.vertices[0])
-        for count, vertex in enumerate(self.vertices):
-            # draw half-circle at chosen stadium self.edges;
-            # using Bezier, cannot get half-circle - need to use two quarter circles
-            # vx, vy = self.points_to_value(vertex.x) - 1, self.points_to_value(vertex.y) - 1
-            # tools.feedback(f'*** Stad {count=} vx={vx:.2f} vy={vy:.2f}')
-            if count == 2 and ("w" in _edges or "west" in _edges):
-                cx, cy = vertex.x, vertex.y - 0.5 * self._u.height
-                # _cx, _cy = self.points_to_value(cx) - 1, self.points_to_value(cy) - 1
-                # tools.feedback(f'*** Stad cx={_cx:.2f} cy={_cy:.2f}')
-                top_curve = geoms.bezier_arc_segment(
-                    cx, cy, radius_lr, radius_lr, 90, 180
+        for key, vertex in enumerate(self.vertices):
+            if key + 1 == len(self.vertices):
+                continue
+            if key == 0 and "w" in _edges:
+                midpt = geoms.fraction_along_line(vertex, self.vertices[1], 0.5)
+                cnv.draw_sector(
+                    (midpt.x, midpt.y),
+                    (self.vertices[1].x, self.vertices[1].y),
+                    -180.0,
+                    fullSector=False,
                 )
-                bottom_curve = geoms.bezier_arc_segment(
-                    cx, cy, radius_lr, radius_lr, 180, 270
+            elif key == 2 and "e" in _edges:
+                midpt = geoms.fraction_along_line(vertex, self.vertices[3], 0.5)
+                cnv.draw_sector(
+                    (midpt.x, midpt.y),
+                    (self.vertices[3].x, self.vertices[3].y),
+                    -180.0,
+                    fullSector=False,
                 )
-                pth.moveTo(*vertex)
-                pth.curveTo(*top_curve[1])
-                pth.curveTo(*bottom_curve[1])
-            elif count == 1 and ("n" in _edges or "north" in _edges):
-                cx, cy = vertex.x - 0.5 * self._u.width, vertex.y
-                right_curve = geoms.bezier_arc_segment(
-                    cx, cy, radius_tb, radius_tb, 0, 90
+            elif key == 1 and "s" in _edges:
+                midpt = geoms.fraction_along_line(vertex, self.vertices[2], 0.5)
+                cnv.draw_sector(
+                    (midpt.x, midpt.y),
+                    (self.vertices[2].x, self.vertices[2].y),
+                    -180.0,
+                    fullSector=False,
                 )
-                left_curve = geoms.bezier_arc_segment(
-                    cx, cy, radius_tb, radius_tb, 90, 180
+            elif key == 3 and "n" in _edges:
+                midpt = geoms.fraction_along_line(vertex, self.vertices[0], 0.5)
+                # TEST ONLY cnv.draw_circle((midpt.x, midpt.y), 1)
+                cnv.draw_sector(
+                    (midpt.x, midpt.y),
+                    (self.vertices[3].x, self.vertices[3].y),
+                    180.0,
+                    fullSector=False,
                 )
-                pth.moveTo(*vertex)
-                pth.curveTo(*right_curve[1])
-                pth.curveTo(*left_curve[1])
-            elif count == 3 and ("s" in _edges or "south" in _edges):
-                cx, cy = vertex.x + 0.5 * self._u.width, vertex.y
-                left_curve = geoms.bezier_arc_segment(
-                    cx, cy, radius_tb, radius_tb, 180, 270
-                )
-                right_curve = geoms.bezier_arc_segment(
-                    cx, cy, radius_tb, radius_tb, 270, 360
-                )
-                pth.moveTo(*vertex)
-                pth.curveTo(*left_curve[1])
-                pth.curveTo(*right_curve[1])
-                pth.moveTo(*self.vertices[3])
-            elif count == 0 and ("e" in _edges or "east" in _edges):
-                cx, cy = vertex.x, vertex.y + 0.5 * self._u.height
-                bottom_curve = geoms.bezier_arc_segment(
-                    cx, cy, radius_lr, radius_lr, 270, 360
-                )
-                top_curve = geoms.bezier_arc_segment(
-                    cx, cy, radius_lr, radius_lr, 0, 90
-                )
-                pth.moveTo(*vertex)
-                pth.curveTo(*bottom_curve[1])
-                pth.curveTo(*top_curve[1])
-            # no curve; use a regular line
             else:
-                if count + 1 < len(self.vertices):
-                    pth.lineTo(*self.vertices[count + 1])
-        # pth.close()
-        cnv.drawPath(pth, stroke=1 if self.stroke else 0, fill=1 if self.fill else 0)
-        """
+                vertex1 = self.vertices[key + 1]
+                cnv.draw_line((vertex.x, vertex.y), (vertex1.x, vertex1.y))
+
+        kwargs["closed"] = False
         self.set_canvas_props(cnv=cnv, index=ID, **kwargs)
 
         # ---- cross

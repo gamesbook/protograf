@@ -178,7 +178,7 @@ def Create(**kwargs):
     )
     # ---- paper color
     if kwargs.get("page_fill"):
-        fill = get_color(kwargs["page_fill"], "white")
+        fill = get_color(kwargs.get("page_fill", "white"))
         globals.canvas.draw_rect((0, 0, globals.page[0], globals.page[1]), fill=fill)
     # ---- cards
     if _cards:
@@ -1070,7 +1070,7 @@ def Blueprint(**kwargs):
     kwargs["fill"] = kwargs.get("fill", page_fill)
     # ---- page color (optional)
     if kwargs["fill"] is not None:
-        fill = get_color(kwargs["fill"], "white")
+        fill = get_color(kwargs.get("fill", "white"))
         globals.canvas.draw_rect((0, 0, globals.page[0], globals.page[1]))
         globals.canvas.finish(fill=fill)
     kwargs["fill"] = kwargs.get("fill", line_stroke)  # revert back for font

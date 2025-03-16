@@ -289,11 +289,10 @@ WIDTH = 0.1
 CLOCK_ANGLES = [60, 90, 120, 150, 180, 210, 240, 270, 300, 330, 0, 30]
 
 
-def get_color(color=None, default=None):
-    """Get a color tuple; by name from a pre-defined dictionary or as RGB tuple."""
-    name = color or default
+def get_color(name=None, is_rgb=True):
+    """Get a color tuple; by name from a pre-defined dictionary or as a RGB tuple."""
     if name is None:
-        return None  # valid to say that no color is set
+        return None  # valid to say that NO color has been set
     if isinstance(name, tuple) and len(name) == 3:  # RGB color tuple
         if (
             (name[0] >= 0 and name[0] <= 255)
@@ -420,15 +419,16 @@ class BaseCanvas:
         self.elevation = self.defaults.get("elevation", "horizontal")
         self.facing = self.defaults.get("facing", "out")  # out/in
         # ---- color and transparency
-        fill = self.defaults.get("fill", self.defaults.get("fill_color"))
-        self.fill = get_color(fill, "white")
+        fill = self.defaults.get("fill", self.defaults.get("fill_color")) or "white"
+        self.fill = get_color(fill)
         self.transparency = self.defaults.get("transparency", 1)  # NOT transparent
-        self.debug_color = get_color(self.defaults.get("debug_color"), DEBUG_COLOR)
+        debug_color = self.defaults.get("debug_color", DEBUG_COLOR)
+        self.debug_color = get_color(debug_color)
         self.fill_stroke = self.defaults.get("fill_stroke", None)
         self.stroke_fill = self.defaults.get("stroke_fill", None)  # alias
         # ---- stroke
         stroke = self.defaults.get("stroke", self.defaults.get("stroke_color"))
-        self.stroke = get_color(stroke, "black")
+        self.stroke = get_color(stroke)
         self.stroke_width = self.defaults.get("stroke_width", WIDTH)
         self.outline = self.defaults.get("outline", None)
         # ---- overwrite fill & stroke
@@ -452,7 +452,8 @@ class BaseCanvas:
         self._alignment = pymupdf.TEXT_ALIGN_LEFT  # see to_alignment()
         # ---- grid cut marks
         self.grid_marks = self.defaults.get("grid_marks", 0)
-        self.grid_stroke = get_color(self.defaults.get("grid_stroke"), "gray")
+        grid_stroke = self.defaults.get("grid_stroke", "gray")
+        self.grid_stroke = get_color(grid_stroke)
         self.grid_stroke_width = self.defaults.get(
             "grid_stroke_width", self.stroke_width
         )
@@ -467,7 +468,8 @@ class BaseCanvas:
         # ---- text: base
         self.text = self.defaults.get("text", "")
         self.text_size = self.defaults.get("text_size", self.font_size)
-        self.text_stroke = get_color(self.defaults.get("text_stroke"), self.stroke)
+        text_stroke = self.defaults.get("text_stroke", self.stroke)
+        self.text_stroke = get_color(text_stroke)
         self.text_stroke_width = self.defaults.get(
             "text_stroke_width", self.stroke_width
         )
@@ -475,7 +477,8 @@ class BaseCanvas:
         self.label = self.defaults.get("label", "")
         self.label_size = self.defaults.get("label_size", self.font_size)
         self.label_face = self.defaults.get("label_face", self.font_name)
-        self.label_stroke = get_color(self.defaults.get("label_stroke"), self.stroke)
+        label_stroke = self.defaults.get("label_stroke", self.stroke)
+        self.label_stroke = get_color(label_stroke)
         self.label_stroke_width = self.defaults.get(
             "label_stroke_width", self.stroke_width
         )
@@ -486,7 +489,8 @@ class BaseCanvas:
         self.title = self.defaults.get("title", "")
         self.title_size = self.defaults.get("title_size", self.font_size)
         self.title_face = self.defaults.get("title_face", self.font_name)
-        self.title_stroke = get_color(self.defaults.get("title_stroke", self.stroke))
+        title_stroke = self.defaults.get("title_stroke", self.stroke)
+        self.title_stroke = get_color(title_stroke)
         self.title_stroke_width = self.defaults.get(
             "title_stroke_width", self.stroke_width
         )
@@ -497,9 +501,8 @@ class BaseCanvas:
         self.heading = self.defaults.get("heading", "")
         self.heading_size = self.defaults.get("heading_size", self.font_size)
         self.heading_face = self.defaults.get("heading_face", self.font_name)
-        self.heading_stroke = get_color(
-            self.defaults.get("heading_stroke"), self.stroke
-        )
+        heading_stroke = self.defaults.get("heading_stroke", self.stroke)
+        self.heading_stroke = get_color(heading_stroke)
         self.heading_stroke_width = self.defaults.get(
             "heading_stroke_width", self.stroke_width
         )
@@ -520,6 +523,7 @@ class BaseCanvas:
         self.length = self.defaults.get("length", self.default_length)
         self.angle = self.defaults.get("angle", 0)
         self.angle_width = self.defaults.get("angle_width", 90)
+        self.angle_start = self.defaults.get("angle_start", 0)
         # ---- chord
         self.angle_1 = self.defaults.get("angle1", 0)
         # ---- arc / sector
@@ -571,7 +575,7 @@ class BaseCanvas:
         self.peaks_dict = {}
         self.borders = kwargs.get("borders", [])
         # ---- stadium
-        self.edges = self.defaults.get("edges", "east west")
+        self.edges = self.defaults.get("edges", "E W")
         # ---- grid / card layout
         self.grid = None  # some Shapes can auto-generate a GridShape
         self.rows = self.defaults.get("rows", 0)
@@ -611,9 +615,8 @@ class BaseCanvas:
         self.radii_labels = self.defaults.get("radii_labels", "")
         self.radii_labels_size = self.defaults.get("radii_labels_size", self.font_size)
         self.radii_labels_face = self.defaults.get("radii_labels_face", self.font_name)
-        self.radii_labels_stroke = get_color(
-            self.defaults.get("radii_labels_stroke"), self.stroke
-        )
+        radii_labels_stroke = self.defaults.get("radii_labels_stroke", self.stroke)
+        self.radii_labels_stroke = get_color(radii_labels_stroke)
         self.radii_labels_stroke_width = self.defaults.get(
             "radii_labels_stroke_width", self.stroke_width
         )
@@ -642,11 +645,13 @@ class BaseCanvas:
         self.centre_shape_mx = self.defaults.get("centre_shape_mx", 0)
         self.centre_shape_my = self.defaults.get("centre_shape_my", 0)
         self.dot = self.defaults.get("dot", 0)
-        self.dot_stroke = get_color(self.defaults.get("dot_stroke"), self.stroke)
+        dot_stroke = self.defaults.get("dot_stroke", self.stroke)
+        self.dot_stroke = get_color(dot_stroke)
         self.dot_stroke_width = self.defaults.get("dot_stroke_width", self.stroke_width)
         self.dot_fill = self.defaults.get("dot_fill", self.dot_stroke)  # colors match
         self.cross = self.defaults.get("cross", 0)
-        self.cross_stroke = get_color(self.defaults.get("cross_stroke"), "black")
+        cross_stroke = self.defaults.get("cross_stroke", self.stroke)
+        self.cross_stroke = get_color(cross_stroke)
         self.cross_stroke_width = self.defaults.get(
             "cross_stroke_width", self.stroke_width
         )
@@ -690,7 +695,8 @@ class BaseCanvas:
         self.coord_font_size = self.defaults.get(
             "coord_font_size", int(self.font_size * 0.5)
         )
-        self.coord_stroke = get_color(self.defaults.get("coord_stroke"), "black")
+        coord_stroke = self.defaults.get("coord_stroke", "black")
+        self.coord_stroke = get_color(coord_stroke)
         self.coord_padding = self.defaults.get("coord_padding", 2)
         self.coord_separator = self.defaults.get("coord_separator", "")
         self.coord_prefix = self.defaults.get("coord_prefix", "")
@@ -904,6 +910,9 @@ class BaseShape:
         self.angle_width = self.kw_float(
             kwargs.get("angle_width", base.angle_width)
         )  # delta degrees
+        self.angle_start = self.kw_float(
+            kwargs.get("angle_start", base.angle_start)
+        )  # degrees anti-clock from flat
         self._angle_theta = math.radians(self.angle)
         # ---- image
         self.cache_directory = None  # should be a pathlib.Path object
@@ -1269,9 +1278,15 @@ class BaseShape:
         #   stroke_opacity=1, fill_opacity=1, oc=0
         # ---- set props
         cnv = cnv if cnv else self.canvas
-        fill = kwargs.get("fill", None)  # reserve None for 'no fill at all'
+        if "fill" in kwargs.keys():
+            fill = kwargs.get("fill", None)  # reserve None for 'no fill at all'
+        else:
+            fill = self.fill
+        if "stroke" in kwargs.keys():
+            stroke = kwargs.get("stroke", None)
+        else:
+            stroke = self.stroke
         transparency = kwargs.get("transparency", None)
-        stroke = kwargs.get("stroke", None)
         stroke_width = kwargs.get("stroke_width", None)
         stroke_cap = kwargs.get("stroke_cap", None)
         dotted = kwargs.get("dotted", None)
@@ -1318,9 +1333,9 @@ class BaseShape:
             mtrx.prerotate(_rotation[0])
             morph = (_rotation[1], mtrx)
         # ---- get color tuples
-        _color = get_color(color=stroke, default=self.stroke)
-        _fill = get_color(color=fill, default=self.fill)
-        # print(f'{_color:} {_fill:}')  # either: None, or fractional RGB
+        _color = get_color(stroke)
+        _fill = get_color(fill)
+        # print(f'{stroke=} {fill=} {_color=} {_fill=}')  # either: None, or fractn RGB
         # ---- set/apply properties
         cnv.finish(
             width=stroke_width or self.stroke_width,
@@ -1504,7 +1519,9 @@ class BaseShape:
                 correct = False
         if self.edges:
             if not isinstance(self.edges, list):
-                _edges = self.edges.split()
+                _edges = (
+                    self.edges.split(",") if "," in self.edges else self.edges.split()
+                )
             else:
                 _edges = self.edges
             for edge in _edges:
@@ -1518,7 +1535,9 @@ class BaseShape:
                     "w",
                     "s",
                 ]:
-                    issue.append(f'"{edge}" is an invalid choice in {self.edges}!')
+                    issue.append(
+                        f'"{edge}" is an invalid choice in edges {self.edges}!'
+                    )
                     correct = False
         if self.flip:
             if str(self.flip).lower() not in ["north", "south", "n", "s"]:
@@ -2072,9 +2091,11 @@ class BaseShape:
         keys["fontsize"] = kwargs.get("font_size", self.font_size)
         keys["fontname"] = kwargs.get("font_name", self.font_name)
         # keys['fontfile'] = self.font_file
-        keys["color"] = get_color(kwargs.get("stroke", self.stroke))
+        _color = kwargs.get("stroke", self.stroke)
+        keys["color"] = get_color(_color)
         if kwargs.get("stroke_inner"):
-            keys["fill"] = get_color(kwargs.get("stroke_inner", self.stroke))
+            _fill = kwargs.get("stroke_inner", self.stroke)
+            keys["fill"] = get_color(_fill)
         else:
             keys["fill"] = keys["color"]
         if rotation:  # must be multiple of 90 for text
