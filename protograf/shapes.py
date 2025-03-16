@@ -2610,6 +2610,7 @@ class PolylineShape(BaseShape):
         # tools.feedback(f'***Hex {x=} {y=} {self.vertices=}')
         cnv.draw_polyline(self.vertexes)
         kwargs["closed"] = False
+        kwargs["fill"] = None
         self.set_canvas_props(cnv=cnv, index=ID, **kwargs)
 
 
@@ -3324,7 +3325,7 @@ class RectangleShape(BaseShape):
             kwargs["rounding"] = _rounding
             cnv.draw_rect((x, y, self._u.width, self._u.height))
         else:
-            cnv.draw_rect((x, y, self._u.width, self._u.height))
+            cnv.draw_rect((x, y, x + self._u.width, y + self._u.height))
             # ---- * borders (override)
             if self.borders:
                 if isinstance(self.borders, tuple):
@@ -3344,9 +3345,6 @@ class RectangleShape(BaseShape):
             vertices = self.get_vertices(rotation=rotation, **kwargs)
             self.draw_hatch(cnv, ID, vertices, self.hatch_count)
         # ---- grid marks
-        self.set_canvas_props(
-            index=ID, stroke=self.grid_stroke, stroke_width=self.grid_stroke_width
-        )
         if self.grid_marks:
             deltag = self.unit(self.grid_length)
             pth = cnv.beginPath()
@@ -3372,6 +3370,9 @@ class RectangleShape(BaseShape):
             pth.lineTo(gx + self._u.width, gy + deltag)
             # done
             cnv.drawPath(pth, stroke=1, fill=1)
+            self.set_canvas_props(
+                index=ID, stroke=self.grid_stroke, stroke_width=self.grid_stroke_width
+            )
         # ---- fill pattern?
         if self.pattern:
             img, is_svg, is_dir = self.load_image(self.pattern)
@@ -3429,7 +3430,7 @@ class RectangleShape(BaseShape):
         if rotation:
             cnv.restoreState()
         # ---- set grid property
-        self.grid = GridShape(label=self.coord_text, x=x_d, y=y_d, shape=self)
+        # self.grid = GridShape(label=self.coord_text, x=x_d, y=y_d, shape=self)
 
 
 class RhombusShape(BaseShape):
