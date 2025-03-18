@@ -21,8 +21,8 @@ Data(data_list=bgames.data_list)
 Deck(cards=1, grid_marks=True, stroke=None)  # number of cards reset by Data()
 
 # format of text used
-numbers = Common(font_name="Helvetica", font_size=9, stroke=black)
-title = Common(font_name="Times-Roman", font_size=12, stroke=black)
+numbers = Common(font_name="Helvetica", font_size=9, stroke="black")
+title = Common(font_name="Times-Roman", font_size=12, stroke="black")
 
 # source and location of images
 time_img = image('time.png', x=0.2, y=6.8, width=1.8, height=1.8)
@@ -39,7 +39,7 @@ desc = text(
     leading=11, x=0.075, y=6.35, width=6.125, height=4.8,
     wrap=True, align="centre", text=T('{{ DESCRIPTION_SHORT }}'))
 foot = text(
-    font_name="Helvetica", font_size=7, stroke=black, leading=8,
+    font_name="Helvetica", font_size=7, stroke="black", leading=8,
     x=0.1, y=1.67, width=6.1, height=1.6,
     wrap=True, align="centre", text=T('{{ MECHANICS }}'))
 

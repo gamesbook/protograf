@@ -103,12 +103,12 @@ hexN = Common(
     side=1.5,
     fill=None,
     font_size=28,
-    stroke=black,
+    stroke="black",
     stroke_width=2)
 hex_in = hexagon(
     side=1.0,
     fill=None,
-    stroke=black,
+    stroke="black",
     stroke_width=.5)
 Card("49-51",
      hexagon(common=hexN, cx=2.0, cy=7.0, centre_shape=hex_in, label="1"),
@@ -116,7 +116,7 @@ Card("49-51",
      hexagon(common=hexN, cx=4.6, cy=1.8, centre_shape=hex_in, label="5"),
 )
 
-circle_icon = Common(fill=black, stroke=white, radius=1.25, font_size=48)
+circle_icon = Common(fill="black", stroke=white, radius=1.25, font_size=48)
 Card("52-54",
      circle(common=circle_icon, cx=1.8, cy=7.0, label='\u2707'),
      circle(common=circle_icon, cx=3.1, cy=4.4, label='\u2766'),

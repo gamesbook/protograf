@@ -18,8 +18,8 @@ oct_vert = polygon(
 
 Trapezoid(x=-0.25, y=2, height=3, width=18, top=14, fill_stroke=grey)
 Trapezoid(x=-0.25, y=18, height=3, width=18, top=14, fill_stroke=grey, flip='s')
-Polyshape(points=[(-0.25,21), (2,18), (2,5), (-0.25,2)], fill=black)
-Polyshape(points=[(17.75,21), (15.75,18), (15.75,5), (17.75,2)], fill=black)
+Polyshape(points=[(-0.25,21), (2,18), (2,5), (-0.25,2)], fill="black")
+Polyshape(points=[(17.75,21), (15.75,18), (15.75,5), (17.75,2)], fill="black")
 
 Rectangle(x=1.25, y=4, height=15, width=15.25, fill=white)
 

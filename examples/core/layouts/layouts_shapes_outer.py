@@ -8,7 +8,7 @@ Created on: 15 September 2024
 from protograf import *
 
 Create(filename="layouts_shapes_outer.pdf",
-       paper=A8,
+       paper="A8",
        margin=0.75,
        margin_right=0.2, margin_top=0.2,
        font_size=8,
@@ -50,7 +50,7 @@ PageBreak()
 
 circ = circle(label="{{sequence - 1}}", label_size=5, radius=0.26, fill=rosybrown)
 rct2 = rectangle(
-    common=rct_common, label="{{sequence - 1}}", fill=tan)
+    common=rct_common, label="{{sequence - 1}}", fill="tan")
 rct3 = rectangle(
     common=rct_common, label="{{sequence - 1}}", fill=maroon, stroke=rosybrown)
 

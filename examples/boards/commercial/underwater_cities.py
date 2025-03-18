@@ -13,11 +13,11 @@ Create(filename="underwater_cities.pdf", margin=0.0, paper=landscape(A2))
 
 # Icons
 money = rectangle(
-    fill_stroke=gold, height=1.2, width=0.8, rounding=0.1,
-    hatch_count=5, hatch='w', hatch_stroke=black,
-    label_stroke=black, label_size=18)
+    fill_stroke="gold", height=1.2, width=0.8, rounding=0.1,
+    hatch_count=5, hatch='w', hatch_stroke="black",
+    label_stroke="black", label_size=18)
 pipe = image("images/pipe.png", width=2, height=0.75)
-card_icon = rectangle(fill=white, label_stroke=black, label_size=32)
+card_icon = rectangle(fill=white, label_stroke="black", label_size=32)
 card_icon_small = rectangle(common=card_icon, height=1.2, width=0.8, rounding=0.1)
 card_icon_med = rectangle(common=card_icon, height=1.7, width=1.2, rounding=0.15)
 card_icon_large = rectangle(common=card_icon, height=2.2, width=1.6, rounding=0.2)
@@ -168,7 +168,7 @@ Rectangle(
     stroke=play_order, rounding=0.4)
 
 Circle(cx=10.2, cy=10.8, radius=0.5, fill_stroke=steelblue)
-Circle(cx=12.8, cy=10.8, radius=0.5, fill_stroke=orange)
+Circle(cx=12.8, cy=10.8, radius=0.5, fill_stroke="orange")
 Circle(cx=11.5, cy=9.9, radius=0.5, fill_stroke=dimgray)
 Circle(cx=14, cy=9.9, radius=0.5, fill_stroke=darkorchid)
 
@@ -176,7 +176,7 @@ Circle(cx=14, cy=9.9, radius=0.5, fill_stroke=darkorchid)
 wreath = image('images/laurel-wreath.png', x=11.9, y=11.7, width=1.5, height=1.5)
 Repeat(wreath, rows=4, cols=1, interval_y=2)
 Sequence(
-    text(x=10.4, y=18.4, font_size=32, stroke=orange, text="{{sequence}}."),
+    text(x=10.4, y=18.4, font_size=32, stroke="orange", text="{{sequence}}."),
     setting=(1,4,1,'number'),
     interval_y=-2.1)
 Sequence(

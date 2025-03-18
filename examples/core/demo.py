@@ -26,11 +26,11 @@ Hexagon(
 # the track of the signs...
 sign = circle(cx=0, cy=0, radius=2.7, label='{{sequence}}', fill=None, stroke_width=18,
               radii=[0,90,180,270], radii_stroke_width=18,)
-iron = circle(common=sign, stroke=black)
+iron = circle(common=sign, stroke="black")
 wood = circle(common=sign, stroke=sienna)
-bronze = circle(common=sign, stroke=goldenrod)
+bronze = circle(common=sign, stroke="gold"enrod)
 stone = circle(common=sign, stroke=grey)
-fire = circle(common=sign, stroke=gold)
+fire = circle(common=sign, stroke="gold")
 water = circle(common=sign, stroke=snow)
 Track(
     polygon(cx=9.5, cy=14, sides=6, radius=6),
@@ -91,7 +91,7 @@ PageBreak()
 # ---- centre shapes and blueprint + heading
 Blueprint()
 Text(common=header, text="Centred shapes with centre point and x-y heading")
-dot = Common(dot=0.2, dot_stroke=blue)
+dot = Common(dot=0.2, dot_stroke="blue")
 
 Rectangle(cx=3, cy=23, width=5, height=3, heading="rectangle:3-23", common=dot)
 EquilateralTriangle(x=7, y=21, side=4, heading="triangle:9-22", common=dot)
@@ -160,30 +160,30 @@ PageBreak()
 Blueprint()
 Text(common=header, text="Filled shapes")
 Rectangle(cx=3, cy=23, width=5, height=3,
-          title="rectangle:3-23", title_stroke=black, fill_stroke=tomato)
+          title="rectangle:3-23", title_stroke="black", fill_stroke="tomato")
 EquilateralTriangle(
     x=7, y=21, side=4,
-    title="triangle:9-22", title_stroke=black, fill_stroke=tomato)
+    title="triangle:9-22", title_stroke="black", fill_stroke="tomato")
 Stadium(x=13.5, y=22, width=3, height=2,
-        title="stadium:15-23", title_stroke=black, fill_stroke=tomato)
+        title="stadium:15-23", title_stroke="black", fill_stroke="tomato")
 Hexagon(cx=3, cy=17, side=2, orientation="flat",
-        title="hexagon:3-17", title_stroke=black, fill_stroke=gold)
+        title="hexagon:3-17", title_stroke="black", fill_stroke="gold")
 Ellipse(cx=9, cy=17, width=5, height=3,
-        title="ellipse:9-17", title_stroke=black, fill_stroke=gold)
+        title="ellipse:9-17", title_stroke="black", fill_stroke="gold")
 Trapezoid(cx=16, cy=17, width=4, top=2, height=3,
-          title="trapezoid:16-17", title_stroke=black, fill_stroke=gold)
+          title="trapezoid:16-17", title_stroke="black", fill_stroke="gold")
 Hexagon(cx=3, cy=11, side=2, orientation="pointy",
-        title="hexagon:3-11", title_stroke=black, fill_stroke=lime)
+        title="hexagon:3-11", title_stroke="black", fill_stroke="chartreuse")
 Compass(cx=9, cy=11, radius=2,
-        title="compass:9-11", title_stroke=black, fill_stroke=lime)
+        title="compass:9-11", title_stroke="black", fill_stroke="chartreuse")
 Circle(cx=16, cy=11, radius=2,
-       title="circle:16-11", title_stroke=black, fill_stroke=lime)
+       title="circle:16-11", title_stroke="black", fill_stroke="chartreuse")
 Star(cx=3, cy=5, vertices=5, radius=2,
-     title="star:3-5", title_stroke=black, fill_stroke=aqua)
+     title="star:3-5", title_stroke="black", fill_stroke="cyan")
 Rhombus(cx=16, cy=5, width=3, height=5,
-        title="rhombus:16-5", title_stroke=black, fill_stroke=aqua)
+        title="rhombus:16-5", title_stroke="black", fill_stroke="cyan")
 Square(cx=9, cy=5, side=3,
-       title="square:9-5", title_stroke=black, fill_stroke=aqua)
+       title="square:9-5", title_stroke="black", fill_stroke="cyan")
 Dot(x=9.5, y=1, dot_point=6, title="dot:1-9.5")
 PageBreak()
 
@@ -193,19 +193,19 @@ Polyline(
     points=[(0, 13), (2, 15), (4, 13), (6, 15), (8, 13), (10, 15), (12, 13)],
     stroke=grey)
 Polyline(points="0,11 2,13 4,11 6,13 8,11 10,13 12,11", stroke=grey)
-Line(x=1, y=1, length=30, angle=55.3, stroke=tomato, stroke_width=3)  # thick diagonal
-Line(x=0, y=3, x1=19, y1=3, stroke=black, stroke_width=2)
+Line(x=1, y=1, length=30, angle=55.3, stroke="tomato", stroke_width=3)  # thick diagonal
+Line(x=0, y=3, x1=19, y1=3, stroke="black", stroke_width=2)
 Line(
     x=0,
     y=9,
     x1=19,
     y1=9,
     dashed=[0.2, 0.1],
-    stroke=lime,
+    stroke="chartreuse",
     stroke_width=2,
     label="dashed=[0.2,0.1]",
 )
-Line(x=0, y=5, x1=19, y1=5, dotted=True, stroke=blue, stroke_width=2, label="dotted")
+Line(x=0, y=5, x1=19, y1=5, dotted=True, stroke="blue", stroke_width=2, label="dotted")
 # house
 points = [
     (2, 17),
@@ -219,16 +219,16 @@ points = [
     (4, 17),
     (1, 17),
 ]
-Polyshape(cx=5, cy=19.5, points=points, stroke=bisque, fill=tomato,
+Polyshape(cx=5, cy=19.5, points=points, stroke=bisque, fill="tomato",
           label="Store", label_size=24)
-Polyshape(x=25, y=4, points="0,0 0,1 2,0 2,1 0,0", fill_stroke=gold)
+Polyshape(x=25, y=4, points="0,0 0,1 2,0 2,1 0,0", fill_stroke="gold")
 PageBreak()
 
 # ---- bezier / arc
 Blueprint()
 Text(common=header, text="Bezier line and arc")
-Bezier(x=2, y=7, x1=12, y1=9, x2=12, y2=16, x3=17, y3=20, stroke=blue, stroke_width=2)
-Arc(x=1, y=7, x1=4, y1=4, stroke=tomato, stroke_width=4)
+Bezier(x=2, y=7, x1=12, y1=9, x2=12, y2=16, x3=17, y3=20, stroke="blue", stroke_width=2)
+Arc(x=1, y=7, x1=4, y1=4, stroke="tomato", stroke_width=4)
 PageBreak()
 
 # ---- common, with angled lines
@@ -254,13 +254,13 @@ PageBreak()
 # ---- school book page with margin
 Text(common=header, text="Lines -> school book page")
 Lines(x=0, x1=19, y=0, y1=0, rows=28, height=1.0, stroke=lightsteelblue)
-Line(x=2, x1=2, y=0, y1=27, stroke=orangered)
+Line(x=2, x1=2, y=0, y1=27, stroke="orange"red)
 PageBreak()
 
 # ---- school book page - landscape
 Text(common=header, text="Lines -> school book page; landscape")
 Lines(x=0, x1=0, y=0, y1=28.5, cols=20, width=1.0, stroke=lightsteelblue)
-Line(x=0, x1=19, y=2, y1=2, stroke=orangered)
+Line(x=0, x1=19, y=2, y1=2, stroke="orange"red)
 PageBreak()
 
 # ---- set of stickers
@@ -272,8 +272,8 @@ Rectangles(
     height=2,
     rounding=0.4,
     margin=1,
-    fill=gold,
-    stroke=lime,
+    fill="gold",
+    stroke="chartreuse",
 )
 PageBreak()
 
@@ -291,7 +291,7 @@ Hexagons(
     margin_left=-1.69,
     margin_bottom=-2.529,
     dot=0.05,
-    dot_stroke=black,
+    dot_stroke="black",
     coord_elevation="top",
     coord_font_size=9,
     coord_stroke=darkslategrey,
@@ -304,7 +304,7 @@ PageBreak()
 
 # ---- images and various text descriptors
 Text(common=header, text="Rectangles and images (with transparency)")
-Rectangle(x=5.9, y=15.9, width=7.2, height=6.2, stroke=silver, fill=gold)
+Rectangle(x=5.9, y=15.9, width=7.2, height=6.2, stroke=silver, fill="gold")
 Image(
     "sholes_typewriter.png",  # has transparent background
     x=6,
@@ -313,14 +313,14 @@ Image(
     height=6,
     font_size=18,
     label="sholes typewriter",
-    label_stroke=tomato,
+    label_stroke="tomato",
     heading="Sholes Typewriter (PNG)",
     heading_stroke=turquoise,
     title="Fig 2. The Sholes Typewriter",
-    title_stroke=lime,
+    title_stroke="chartreuse",
 )
 
-Rectangle(x=6, y=6, width=7, height=6.25, stroke=silver, fill=gold)
+Rectangle(x=6, y=6, width=7, height=6.25, stroke=silver, fill="gold")
 Image(
     # "Typewriter_Vector.svg",
     "noun-typewriter-3933515.svg",
@@ -330,11 +330,11 @@ Image(
     height=6,
     font_size=18,
     label="noun typewriter",
-    label_stroke=tomato,
+    label_stroke="tomato",
     heading="Noun Project Typewriter (SVG)",
     heading_stroke=turquoise,
     title="Fig 3. A nounproject.com Typewriter (AlekZakaUddin, CC BY 3.0)",
-    title_stroke=lime,
+    title_stroke="chartreuse",
     scaling=0.6,
 )
 PageBreak()
@@ -368,7 +368,7 @@ header = Common(x=1, font_size=18, align="left", width=2.5, height=2, wrap=True)
 
 Rectangle(x=4.5, y=1, width=10, height=5.5, stroke_width=1, stroke=grey)
 Text(
-    x=4.5, y=6.5, width=10, height=5, wrap=True, align="left", text=IMAGE, stroke=aqua
+    x=4.5, y=6.5, width=10, height=5, wrap=True, align="left", text=IMAGE, stroke="cyan"
 )
 Text(common=header, y=4, text="Align: Left")
 

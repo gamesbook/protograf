@@ -24,7 +24,7 @@ Circle(cx=3, cy=23, radius=1.5, fill=skyblue, label="5", font_size=48)
 
 Text(align="left", x=9, y=20, wrap=True, width=10, height=4, font_size=16,
      text='<b>Warning Sign:</b> rounded rectangles plus a sequence of "E" (east) chevrons')
-Rectangle(x=1, y=17, width=7.5, height=3, rounded=0.5, stroke=black, fill=black)
+Rectangle(x=1, y=17, width=7.5, height=3, rounded=0.5, stroke="black", fill="black")
 Rectangle(x=1.1, y=17.1, width=7.3, height=2.8, rounded=0.5, stroke_width=2, stroke=yellow, fill=None)
 Sequence(
     rectangle(x=1.5, y=17.1, width=1, height=2.8,
@@ -37,7 +37,7 @@ Text(common=header_font, x=5, y=15, text="Leaded Window: rectangle with diagonal
 Rectangle(
     x=2, y=13.5,
     height=3, width=2,
-    hatch_count=7, hatch_width=0.1, hatch='d', hatch_stroke=black,
+    hatch_count=7, hatch_width=0.1, hatch='d', hatch_stroke="black",
     stroke=saddlebrown, stroke_width=2, fill=lightcyan)
 
 Text(common=header_font, x=5, y=11, text="Paned Window: rectangle with single orthogonal hatch")
@@ -48,10 +48,10 @@ Rectangle(
     stroke=sienna, stroke_width=3, fill=lightcyan)
 
 Text(common=header_font, x=5, y=7, text="Start Player Token: circles + radii using steps() function")
-Polygon(cx=3, cy=7.5, height=3, sides=8, fill=black)
-Circle(x=1.75, y=6.25, fill=black, radius=1.25,
-       radii=[0,45,90,135,180,225,270,315], radii_stroke=gold, radii_stroke_width=2)
-Circle(x=2.5, y=7, stroke=black, fill=gold, radius=0.5, stroke_width=5)
+Polygon(cx=3, cy=7.5, height=3, sides=8, fill="black")
+Circle(x=1.75, y=6.25, fill="black", radius=1.25,
+       radii=[0,45,90,135,180,225,270,315], radii_stroke="gold", radii_stroke_width=2)
+Circle(x=2.5, y=7, stroke="black", fill="gold", radius=0.5, stroke_width=5)
 
 Text(common=header_font, x=5, y=3, text="Doorway: stadiums, dashline + radii")
 Stadium(x=1.5, y=1, height=3, width=3, fill=skyblue, stroke=darkgrey, stroke_width=8, edges="n")
@@ -79,7 +79,7 @@ Polygon(common=poly6, radius=1.05, rotation=60)
 Polygon(common=poly6, radius=0.90, rotation=15)
 Polygon(common=poly6, radius=0.75, rotation=30)
 Polygon(common=poly6, radius=0.60, rotation=45)
-Polygon(x=2, y=25, fill=black, radius=0.60, rotation=60)
+Polygon(x=2, y=25, fill="black", radius=0.60, rotation=60)
 
 Text(common=header_font, x=5, y=22,
      text="XOK Fish: nested circles with 2 thick offset radii")
@@ -101,13 +101,13 @@ Text(common=header_font, x=5, y=16, text="Atom: ellipses with rotation; circle")
 atom = Common(cx=2, cy=16, width=3, height=1, stroke_width=1, outline=red)
 for degrees in [30,150,270]:
     Ellipse(common=atom, rotation=degrees)
-Circle(cx=2, cy=16, radius=0.2, fill_stroke=red)
+Circle(cx=2, cy=16, radius=0.2, fill_stroke="red")
 
 Text(common=header_font, x=5, y=12.5,
      text="German Cross: rectangle with 'o' hatch and 'step' notch")
 Rectangle(
-    height=2.8, width=2.8, x=0.5, y=11, fill=white, stroke=black, stroke_width=2,
-    hatch_width=22, hatch_stroke=black, hatch='o', hatch_count=1,
+    height=2.8, width=2.8, x=0.5, y=11, fill=white, stroke="black", stroke_width=2,
+    hatch_width=22, hatch_stroke="black", hatch='o', hatch_count=1,
     notch=0.7, notch_style='step')
 Rectangle(
     height=2.8, width=2.8, x=0.5, y=11, fill=None, stroke=white, stroke_width=3)
@@ -129,8 +129,8 @@ Circle(cx=3.5, cy=9, radius=0.35, fill=None, stroke=firebrick, stroke_width=1,
 Text(common=header_font, x=7, y=7, text="Sets of check boxes (loop + sequence)")
 for s in steps(0, 6, 2.2):
     Sequence(
-        [rectangle(fill_stroke=black, x=s+0.05, y=6.95, height=0.5, width=0.5),
-         rectangle(stroke=black, x=s+0, y=7, height=0.5, width=0.5)],
+        [rectangle(fill_stroke="black", x=s+0.05, y=6.95, height=0.5, width=0.5),
+         rectangle(stroke="black", x=s+0, y=7, height=0.5, width=0.5)],
         setting=(1, 3),
         interval_x=0.6)
 

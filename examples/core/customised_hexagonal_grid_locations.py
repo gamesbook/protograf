@@ -9,7 +9,7 @@ from protograf import *
 
 Create(
     filename="customised_hexagonal_grid_locations.pdf",
-    paper=A8,
+    paper="A8",
     margin=0.75,
     margin_right=0.2, margin_top=0.2,
     font_size=8,
@@ -154,12 +154,12 @@ hexgrid = Hexagons(
 LinkLine(
     hexgrid,
     ["0101","0403","0104","0406"],
-    common=Common(stroke=tomato, stroke_width=2)
+    common=Common(stroke="tomato", stroke_width=2)
 )
 LinkLine(
     hexgrid,
     ["0104","0406"],
-    common=Common(stroke=aqua, stroke_width=2)
+    common=Common(stroke="cyan", stroke_width=2)
 )
 PageBreak()
 
@@ -176,7 +176,7 @@ LinkLine(
     hexgrid,
     [("0101", 0.25, 0.25), ("0403", -0.25, -0.25),
      ("0104", 0.0, 0.25), ("0104", 0.25, -0.25)],
-    common=Common(stroke=tomato, stroke_width=1, dotted=True)
+    common=Common(stroke="tomato", stroke_width=1, dotted=True)
 )
 PageBreak()
 

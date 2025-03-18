@@ -8,7 +8,7 @@ Created on: 22 November 2024
 from protograf import *
 
 Create(filename="customised_hexagonal_grid.pdf",
-       paper=A8,
+       paper="A8",
        margin=0.75,
        margin_right=0.2, margin_top=0.2,
        font_size=8,
@@ -160,8 +160,8 @@ Hexagons(
     side=0.5,
     x=1.25, y=3,
     rows=3, cols=3,
-    stroke=red,
-    radii_stroke=red,
+    stroke="red",
+    radii_stroke="red",
     hex_offset="even",
     radii="e nw sw",
 )
@@ -187,7 +187,7 @@ Hexagons(
     stroke=None, fill=None,
     height=.75,
     hex_layout="circle",
-    centre_shape=hexagon(stroke=black, fill=silver, height=0.6, stroke_width=2),
+    centre_shape=hexagon(stroke="black", fill=silver, height=0.6, stroke_width=2),
 )
 PageBreak()
 

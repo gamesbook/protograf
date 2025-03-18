@@ -8,7 +8,7 @@ Created on: 9 August 2024
 from protograf import *
 
 Create(filename="large_objects.pdf",
-        paper=A8,
+        paper="A8",
         margin_top=0.25,
         margin_left=0.75,
         margin_bottom=0.75,

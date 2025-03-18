@@ -381,18 +381,18 @@ Another example:
 
 .. code:: python
 
-   paper=A8 cards=9
+   paper="A8" cards=9
             ^^
    SyntaxError: invalid syntax. Perhaps you forgot a comma?
 
 Another ``SyntaxError`` where Python tries to assess what the cause
 might be. Here, you’d need to add a ``,`` (comma) at the end of setting the
-``paper=A8`` property as each property in the list **must** be comma-separated
+``paper="A8"`` property as each property in the list **must** be comma-separated
 (a space is not sufficient) as follows:
 
 .. code:: python
 
-   paper=A8, cards=9
+   paper="A8", cards=9
 
 .. NOTE::
 

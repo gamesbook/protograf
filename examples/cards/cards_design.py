@@ -17,7 +17,7 @@ Deck(
     fill=ivory)
 
 # basic shapes
-l1 = line(x=0.8, x1=5.6, y=7.1, y1=8.4, stroke=gold, stroke_width=2)
+l1 = line(x=0.8, x1=5.6, y=7.1, y1=8.4, stroke="gold", stroke_width=2)
 r1 = rectangle(x=0.7, y=7.0, width=5, height=1.5, stroke_width=1, rounding=0.2)
 low = group(r1, l1)
 

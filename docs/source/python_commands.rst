@@ -372,7 +372,7 @@ as part of it.
             EquilateralTriangle(
                 cx=a+1, cy=b+1.5, side=0.25, fill_stroke=c)
 
-        Create(paper=A8, margin=0.25)
+        Create(paper="A8", margin=0.25)
         Blueprint()
         capitol()  # uses default values
         capitol(a=1, b=2, c=gold)

@@ -48,5 +48,5 @@ for a_color in sorted(COLORS.keys()):
         col = 0
         row += 1
 
-Text(x=13.5, y=27, text="Report Lab: Named Color Set", stroke=red)
+Text(x=13.5, y=27, text="Report Lab: Named Color Set", stroke="red")
 Save()

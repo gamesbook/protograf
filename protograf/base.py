@@ -350,18 +350,6 @@ class BaseCanvas:
             for kwarg in _kwargs:
                 self.defaults[kwarg] = _kwargs[kwarg]
             # print(f" *** {self.defaults=}")
-        # ---- paper & canvas
-        _paper = paper or self.defaults.get("paper", "A4")
-        if isinstance(_paper, tuple) and len(_paper) == 2:
-            self.paper = _paper
-        else:
-            try:
-                self.paper = pymupdf.paper_size(_paper)  # (width, height) in points
-                if self.paper == (-1, -1):  # pymupdf fallback ...
-                    raise ValueError
-            except Exception:
-                tools.feedback(f"Unable to use {_paper} as paper size!", True)
-
         # ---- constants
         self.default_length = 1
         self.show_id = False
@@ -378,6 +366,17 @@ class BaseCanvas:
             "units", unit.cm
         )  # defaults MUST store point-equivalent
         # print(f" *** {self.units=} \n {self.defaults=}")
+        # ---- paper
+        _paper = paper or self.defaults.get("paper", "A4")
+        if isinstance(_paper, tuple) and len(_paper) == 2:
+            self.paper = _paper
+        else:
+            try:
+                self.paper = pymupdf.paper_size(_paper)  # (width, height) in points
+                if self.paper == (-1, -1):  # pymupdf fallback ...
+                    raise ValueError
+            except Exception:
+                tools.feedback(f"Unable to use {_paper} as paper size!", True)
         # ---- paper size in units & margins
         self.page_width = self.paper[0] / self.units  # user-units e.g. cm
         self.page_height = self.paper[1] / self.units  # user-units e.g. cm
@@ -765,8 +764,22 @@ class BaseShape:
         self.run_debug = kwargs.get("debug", base.run_debug)
         self.units = kwargs.get("units", base.units)
         # print(f" *** {self.units=}")
-        # ---- paper & margins
-        self.paper = kwargs.get("paper") or base.paper
+        # ---- paper
+        _paper = kwargs.get("paper", base.paper)
+        if isinstance(_paper, tuple) and len(_paper) == 2:
+            self.paper = _paper
+        else:
+            try:
+                self.paper = pymupdf.paper_size(_paper)  # (width, height) in points
+                if self.paper == (-1, -1):  # pymupdf fallback ...
+                    raise ValueError
+            except Exception:
+                tools.feedback(f"Unable to use {_paper} as paper size!", True)
+        # ---- paper size in units
+        self.page_width = self.paper[0] / self.units  # user-units e.g. cm
+        self.page_height = self.paper[1] / self.units  # user-units e.g. cm
+        # print(f" *** {self.page_height=} {self.page_width=}")
+        # ---- margins
         self.margin = self.kw_float(kwargs.get("margin", base.margin))
         self.margin_top = self.kw_float(kwargs.get("margin_top", self.margin))
         self.margin_bottom = self.kw_float(kwargs.get("margin_bottom", self.margin))
@@ -779,8 +792,6 @@ class BaseShape:
             kwargs.get("grid_stroke_width", base.grid_stroke_width)
         )
         self.grid_length = self.kw_float(kwargs.get("grid_length", base.grid_length))
-        self.page_width = self.paper[0] / self.units
-        self.page_height = self.paper[1] / self.units
         # ---- sizes and positions
         self.row = kwargs.get("row", base.row)
         self.col = self.kw_int(kwargs.get("col", kwargs.get("column", base.col)))
@@ -1291,7 +1302,7 @@ class BaseShape:
         stroke_cap = kwargs.get("stroke_cap", None)
         dotted = kwargs.get("dotted", None)
         dashed = kwargs.get("dashed", None)
-        rotation = kwargs.get("rotation", None)
+        _rotation = kwargs.get("rotation", None)  # calling Shape must set a tuple!
         closed = kwargs.get("closed", False)  # whether to connect last and first points
         debug = kwargs.get("debug", False)
         # ---- set line dots / dashed
@@ -1320,9 +1331,9 @@ class BaseShape:
         # print(f"{_dotted =} {_dashed=} {dashes=}")
         # ---- check rotation
         morph = None
-        _rotation = rotation or self.rotation or None
         if _rotation:
             if not isinstance(_rotation, tuple):
+                breakpoint()
                 tools.feedback(f'Unable to handle rotation: "{_rotation}"', True)
             if not isinstance(_rotation[0], (float, int)):
                 tools.feedback(f'Rotation angle "{_rotation[0]}" is invalid', True)
@@ -2263,36 +2274,33 @@ class BaseShape:
         """Draw a small dot on a shape (normally the centre)."""
         if self.dot:
             dot_size = self.unit(self.dot)
-            canvas.setFillColor(self.dot_stroke)
-            canvas.setStrokeColor(self.dot_stroke)
-            canvas.circle(x, y, dot_size, stroke=1, fill=1)
+            kwargs = {}
+            kwargs['fill'] = self.dot_stroke
+            kwargs['stroke'] = self.dot_stroke
+            canvas.draw_circle((x, y), dot_size)
+            self.set_canvas_props(cnv=canvas, index=None, **kwargs)
 
     def draw_cross(self, canvas, xd, yd):
         """Draw a cross on a shape (normally the centre)."""
         if self.cross:
             cross_size = self.unit(self.cross)
-            canvas.setFillColor(self.cross_stroke)
-            canvas.setStrokeColor(self.cross_stroke)
-            canvas.setLineWidth(self.cross_stroke_width)
+            kwargs = {}
+            kwargs['fill'] = self.cross_stroke
+            kwargs['stroke'] = self.cross_stroke
+            kwargs['stroke_width'] = self.cross_stroke_width
             # horizontal
             pt1 = geoms.Point(xd - cross_size / 2.0, yd)
             pt2 = geoms.Point(xd + cross_size / 2.0, yd)
-            self.draw_line_between_points(canvas, pt1, pt2)
+            canvas.draw_line(pt1, pt2)
             # vertical
             pt1 = geoms.Point(xd, yd - cross_size / 2.0)
             pt2 = geoms.Point(xd, yd + cross_size / 2.0)
-            self.draw_line_between_points(canvas, pt1, pt2)
-
-    def draw_line_between_points(self, cnv, p1: geoms.Point, p2: geoms.Point):
-        """Draw line between two Points"""
-        pth = cnv.beginPath()
-        pth.moveTo(p1.x, p1.y)
-        pth.lineTo(p2.x, p2.y)
-        cnv.drawPath(pth, stroke=1 if self.stroke else 0, fill=1 if self.fill else 0)
+            canvas.draw_line(pt1, pt2)
+            self.set_canvas_props(cnv=canvas, index=None, **kwargs)
 
     def make_path_vertices(self, cnv, vertices: list, v1: int, v2: int):
         """Draw line between two vertices"""
-        self.draw_line_between_points(cnv, vertices[v1], vertices[v2])
+        cnv.draw_line(vertices[v1], vertices[v2])
 
     def draw_lines_between_sides(
         self,
@@ -2325,14 +2333,14 @@ class BaseShape:
             right_pt = geoms.point_on_line(
                 vertices[right_nodes[0]], vertices[right_nodes[1]], delta * number
             )
-            self.draw_line_between_points(cnv, left_pt, right_pt)
+            cnv.draw_line(left_pt, right_pt)
 
     def _debug(self, canvas, **kwargs):
         """Execute any debug statements."""
         if self.run_debug:
             # display vertex index number next to vertex
             if kwargs.get("vertices", []):
-                canvas.setFillColor(self.debug_color)
+                kwargs['fill'] = self.debug_color
                 canvas.setFont(self.font_name, 4)
                 for key, vert in enumerate(kwargs.get("vertices")):
                     x = self.points_to_value(vert.x)
@@ -2340,21 +2348,22 @@ class BaseShape:
                     self.draw_multi_string(
                         canvas, vert.x, vert.y, f"{key}:{x:.2f},{y:.2f}"
                     )
-                    canvas.circle(vert.x, vert.y, 1, stroke=1, fill=1)
+                    canvas.draw_circle((vert.x, vert.y))
             # display labelled point (geoms.Point)
             if kwargs.get("point", []):
                 point = kwargs.get("point")
                 label = kwargs.get("label", "")
-                canvas.setFillColor(kwargs.get("color", self.debug_color))
-                canvas.setStrokeColor(kwargs.get("color", self.debug_color))
-                canvas.setLineWidth(0.1)
-                canvas.setFont(self.font_name, 4)
+                kwargs['fill'] = kwargs.get("color", self.debug_color)
+                kwargs['stroke'] = kwargs.get("color", self.debug_color)
+                kwargs['stroke_width'] = 0.1
+                kwargs['font_size'] = 4
                 x = self.points_to_value(point.x)
                 y = self.points_to_value(point.y)
                 self.draw_multi_string(
                     canvas, point.x, point.y, f"{label} {point.x:.2f},{point.y:.2f}"
                 )
-                canvas.circle(point.x, point.y, 2, stroke=1, fill=1)
+                canvas.draw_circle((point.x, point.y), 2)
+            self.set_canvas_props(cnv=canvas, index=None, **kwargs)
 
     def handle_custom_values(self, the_element, ID):
         """Process custom values for a Shape's properties.
@@ -2550,7 +2559,8 @@ class BaseShape:
                         case _:
                             tools.feedback(f"Cannot draw borders for a {shape_name}")
 
-            # ---- set canvas
+            # ---- draw line
+            cnv.draw((x, y), (x_1, y_1))
             self.set_canvas_props(
                 index=ID,
                 stroke=bcolor,
@@ -2558,11 +2568,6 @@ class BaseShape:
                 dotted=dotted,
                 dashed=dashed,
             )
-            # ---- draw line
-            pth = cnv.beginPath()
-            pth.moveTo(x, y)
-            pth.lineTo(x_1, y_1)
-            cnv.drawPath(pth, stroke=1 if bcolor else 0, fill=1)
 
 
 class GroupBase(list):

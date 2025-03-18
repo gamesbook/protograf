@@ -8,7 +8,7 @@ Created on: 29 September 2024
 from protograf import *
 
 Create(filename="customised_circles.pdf",
-       paper=A8,
+       paper="A8",
        margin=0.75,
        margin_right=0.2, margin_top=0.2,
        font_size=8,
@@ -24,7 +24,7 @@ PageBreak(footer=True)
 # ---- circle hatches
 Blueprint()
 Text(common=txt, text="Circle: hatches")
-htc = Common(radius=0.7, hatch_count=5, hatch_stroke=red,)
+htc = Common(radius=0.7, hatch_count=5, hatch_stroke="red",)
 Circle(common=htc, cx=2, cy=5.2, label='5')  # all directions
 Circle(common=htc, cx=1, cy=3.7, hatch='o', label='o')
 Circle(common=htc, cx=3, cy=3.7, hatch='d', label='d')
@@ -58,15 +58,15 @@ Circle(x=0, y=0,
        fill=None,
        radii=[0,90,180,270],
        radii_stroke_width=3,
-       radii_stroke=red)
+       radii_stroke="red")
 Circle(cx=3, cy=5,
        radius=1,
        fill=green,
-       stroke=orange,
+       stroke="orange",
        stroke_width=1,
        radii=[0,90,180,270,45,135,225,315],
        radii_stroke_width=8,
-       radii_stroke=orange,
+       radii_stroke="orange",
        radii_length=0.8)
 PageBreak()
 
@@ -86,7 +86,7 @@ Circle(cx=2, cy=4.5, radius=1,
        petals=8,
        petals_stroke_width=3,
        petals_height=0.25,
-       petals_stroke=red,
+       petals_stroke="red",
        petals_fill=yellow)
 PageBreak()
 
@@ -108,7 +108,7 @@ Circle(cx=2, cy=4.5, radius=1,
        petals_style="c",
        petals_stroke_width=3,
        petals_height=0.5,
-       petals_stroke=red,
+       petals_stroke="red",
        petals_fill=yellow)
 PageBreak()
 
@@ -130,7 +130,7 @@ Circle(cx=2, cy=4.5, radius=1,
        petals_style="p",
        petals_stroke_width=3,
        petals_height=0.25,
-       petals_stroke=red,
+       petals_stroke="red",
        petals_fill=yellow)
 PageBreak()
 
@@ -151,7 +151,7 @@ Circle(cx=1, cy=1, radius=1,
        radii_stroke=white,
        radii_labels=["A","B", "C"],
        radii_labels_rotation=270,
-       radii_labels_stroke=red,
+       radii_labels_stroke="red",
        radii_labels_face="Courier",
        dot=0.05)
 PageBreak()

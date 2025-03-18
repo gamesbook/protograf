@@ -67,7 +67,7 @@ Sequence(
     interval_x=1.92)
 
 # star properties
-dstar = Common(fill=d_brown, stroke=d_brown, radius=0.18, dot=0.04, dot_stroke=black)
+dstar = Common(fill=d_brown, stroke=d_brown, radius=0.18, dot=0.04, dot_stroke="black")
 kstar = Common(fill=k_orange, stroke=k_orange, radius=0.15)
 mstar = Common(fill=m_red, stroke=m_red, radius=0.1)
 sname = Common(font_size=12, align="centre", stroke=system_label)

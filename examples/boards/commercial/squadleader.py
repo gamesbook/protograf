@@ -19,7 +19,7 @@ Hexagons(
     cols=17,
     rows=10,
     side=1.15,
-    stroke=black,
+    stroke="black",
     fill=empty_hex,
     hex_offset="odd",
     y=-0.8,

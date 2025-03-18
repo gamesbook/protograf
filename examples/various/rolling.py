@@ -7,7 +7,7 @@ Created on: 1 December 2024
 from protograf import *
 
 Create(filename="rolling.pdf",
-       paper=A8,  #A8
+       paper="A8",  #A8
        margin=0.75, margin_right=0.25, margin_top=0.25,
        font_size=8,
        stroke_width=0.5,

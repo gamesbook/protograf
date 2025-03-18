@@ -34,10 +34,10 @@ russian = rectangle(common=troop, fill=brown)
 
 # unit symbol - basic elements
 out = rectangle(x=0.8, y=1.2, width=1.0, height=0.6, stroke_width=0.5, fill=None)
-lu = line(x=0.8, y=1.2, x1=1.8, y1=1.8, stroke=black, stroke_width=0.5)
-ld = line(x=0.8, y=1.8, x1=1.8, y1=1.2, stroke=black, stroke_width=0.5)
-rect1 = rectangle(x=0.8, y=1.2, width=1.0, height=0.3, stroke_width=0.5, fill=black)
-circ1 = circle(cx=1.3, cy=1.5, radius=0.1, stroke_width=0.1, fill=black)
+lu = line(x=0.8, y=1.2, x1=1.8, y1=1.8, stroke="black", stroke_width=0.5)
+ld = line(x=0.8, y=1.8, x1=1.8, y1=1.2, stroke="black", stroke_width=0.5)
+rect1 = rectangle(x=0.8, y=1.2, width=1.0, height=0.3, stroke_width=0.5, fill="black")
+circ1 = circle(cx=1.3, cy=1.5, radius=0.1, stroke_width=0.1, fill="black")
 
 # unit symbols - types
 inf = group(out, lu, ld)

@@ -15,7 +15,7 @@ Hexagons(
     sides=4,
     hex_layout="circle",
     fill=white,
-    stroke=black,
+    stroke="black",
     height=2.2,
     margin_bottom=0.5,
     margin_left=0.5,

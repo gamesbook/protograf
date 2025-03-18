@@ -30,8 +30,8 @@ red = "#A71C20"
 lbrown = "#F1D7B5"
 
 # basic elements
-tile_red = rectangle(x=0.0, y=0.0, width=2.9, height=2.9, stroke=red, fill=red)
-tile_blue = rectangle(x=0.0, y=0.0, width=2.9, height=2.9, stroke=blue, fill=blue)
+tile_red = rectangle(x=0.0, y=0.0, width=2.9, height=2.9, stroke="red", fill="red")
+tile_blue = rectangle(x=0.0, y=0.0, width=2.9, height=2.9, stroke="blue", fill="blue")
 base = rectangle(x=0.2, y=0.2, width=2.5, height=2.5, stroke=brown, fill=lbrown)
 
 # per-tile values and elements
@@ -86,9 +86,9 @@ dots3 = group(top3, right2, low1)
 # shields
 shield = Common(x=1.1, y=.8, height=0.9, width=0.7, hatch_count=1, hatch_width=3)
 shield_blue = rectangle(
-    common=shield, fill=blue, hatch_stroke=white, hatch='ne nw')
+    common=shield, fill="blue", hatch_stroke=white, hatch='ne nw')
 shield_red = rectangle(
-    common=shield, fill=white, hatch_stroke=red, hatch='n e')
+    common=shield, fill=white, hatch_stroke="red", hatch='n e')
 
 # counter assembly
 Counter("all", S("{{ SIDE == 'English' }}", tile_red))

@@ -222,7 +222,7 @@ def PageBreak(**kwargs):
             kwargs["font_size"] = globals.font_size
             globals.footer = FooterShape(_object=None, canvas=globals.canvas, **kwargs)
         globals.footer.draw(
-            cnv=globals.base, ID=globals.page_count, text=None, **kwargs
+            cnv=globals.canvas, ID=globals.page_count, text=None, **kwargs
         )
 
 

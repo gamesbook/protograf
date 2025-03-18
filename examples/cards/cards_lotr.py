@@ -37,10 +37,10 @@ Deck(
 
 # background color per Race
 back_race = Common(x=0.5, y=0.5, width=5.3, height=7.9, rounded=0.2)
-back_hum = rectangle(common=back_race, fill_stroke=tomato)
-back_elf = rectangle(common=back_race, fill_stroke=gold)
-back_dwa = rectangle(common=back_race, fill_stroke=aqua)
-back_hob = rectangle(common=back_race, fill_stroke=lime)
+back_hum = rectangle(common=back_race, fill_stroke="tomato")
+back_elf = rectangle(common=back_race, fill_stroke="gold")
+back_dwa = rectangle(common=back_race, fill_stroke="cyan")
+back_hob = rectangle(common=back_race, fill_stroke="chartreuse")
 back_naz = rectangle(common=back_race, fill_stroke=grey)
 Card("all", S("{{ Race == 'Human' }}", back_hum))
 Card("all", S("{{ Race == 'Elf' }}", back_elf))

@@ -121,7 +121,7 @@ Text(common=header, text="Bezier")
 Bezier()
 PageBreak()
 
-Blueprint(stroke_width=blue_width, style="grey")
+Blueprint(stroke_width=blue_width, style="gray")
 Text(common=header, text="Polyline")
 # Polyline() # will get FEEDBACK
 Polyline(points=[(0, 0), (1, 1), (2, 0)])

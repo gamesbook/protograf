@@ -1372,34 +1372,16 @@ class EquilateralTriangleShape(BaseShape):
         # tools.feedback(f'*** EQT {side=} {height=} {self.fill=} {self.stroke=}')
         self.vertices = self.get_vertices(x, y, side, self.hand, self.flip)
         self.centroid = self.get_centroid(self.vertices)
-        # ---- handle rotation: START
+        # ---- handle rotation
         rotation = kwargs.get("rotation", self.rotation)
         if rotation:
-            # tools.feedback(f'*** EQT {ID=} {rotation=} {x=}, {y=}')
-            cnv.saveState()
-            # move the canvas origin
-            if ID is not None:
-                cnv.translate(self.centroid.x, self.centroid.y)
-            else:
-                cnv.translate(self.centroid.x, self.centroid.y)
-            cnv.rotate(rotation)
-            # reset centre and "bottom left"
-            self.centroid = Point(0, 0)
-            centroid_to_vertex = side / math.sqrt(3)
-            y_off = height - centroid_to_vertex
-            x = 0.0 - side / 2.0
-            y = 0.0 - y_off
-            # print(f'*** EQT {side=} {height=} {centroid_to_vertex=} {y_off=}')
-            # print(f'*** EQT {x=}, {y=}')
-            self.vertices = self.get_vertices(x, y, side, self.hand, self.flip)
-        # tools.feedback(f'*** EQT {self.centroid=}')
-        # ---- set canvas
-        self.set_canvas_props(index=ID)
+            kwargs["rotation"] = (rotation, self.centroid)
         # ---- draw equilateral triangle
         # tools.feedback(f'***EqiTru {x=} {y=} {self.vertices=}')
         cnv.draw_polyline(self.vertices)
         kwargs["closed"] = True
         self.set_canvas_props(cnv=cnv, index=ID, **kwargs)
+
         # ---- debug
         self._debug(cnv, vertices=self.vertices)
         # ---- draw hatch
@@ -1425,9 +1407,6 @@ class EquilateralTriangleShape(BaseShape):
         self.draw_title(
             cnv, ID, self.centroid.x, self.centroid.y - height / 3.0, **kwargs
         )
-        # ---- handle rotation: END
-        if rotation:
-            cnv.restoreState()
 
 
 class HexShape(BaseShape):
@@ -2380,6 +2359,18 @@ class PolygonShape(BaseShape):
             if self.perbis_length
             else self.get_radius()
         )
+        for key, pb_angle in enumerate(_perbis):
+            if self.perbis and key + 1 not in self.perbis:
+                continue
+            # points based on length of line, offset and the angle in degrees
+            edge_pt = _perbis_pts[key]
+            if pb_offset is not None and pb_offset != 0:
+                offset_pt = geoms.point_on_circle(centre, pb_offset, pb_angle)
+                end_pt = geoms.point_on_line(offset_pt, edge_pt, pb_length)
+                # print(pb_angle, offset_pt, f'{x_c=}, {y_c=}')
+                cnv.draw_line((offset_pt.x, offset_pt.y), (end_pt.x, end_pt.y))
+            else:
+                cnv.draw_line((centre.x, centre.y), (edge_pt.x, edge_pt.y))
         self.set_canvas_props(
             index=ID,
             stroke=self.perbis_stroke,
@@ -2387,25 +2378,6 @@ class PolygonShape(BaseShape):
             dashed=self.perbis_dashed,
             dotted=self.perbis_dotted,
         )
-        for key, pb_angle in enumerate(_perbis):
-            if self.perbis and key + 1 not in self.perbis:
-                continue
-            # points based on length of line, offset and the angle in degrees
-            edge_pt = _perbis_pts[key]
-            pth = cnv.beginPath()
-            if pb_offset is not None and pb_offset != 0:
-                offset_pt = geoms.point_on_circle(centre, pb_offset, pb_angle)
-                end_pt = geoms.point_on_line(offset_pt, edge_pt, pb_length)
-                # print(pb_angle, offset_pt, f'{x_c=}, {y_c=}')
-                pth.moveTo(offset_pt.x, offset_pt.y)
-                pth.lineTo(end_pt.x, end_pt.y)
-            else:
-                pth.moveTo(centre.x, centre.y)
-                pth.lineTo(edge_pt.x, edge_pt.y)
-            cnv.drawPath(
-                pth, stroke=1 if self.stroke else 0, fill=1 if self.fill else 0
-            )
-            # cnv.drawCentredString(edge_pt.x, edge_pt.y, f"{key}")  # test
 
     def draw_radii(
         self,
@@ -2430,29 +2402,24 @@ class PolygonShape(BaseShape):
             if self.radii_length
             else self.get_radius()
         )
+        for rad_angle in _radii:
+            # points based on length of line, offset and the angle in degrees
+            diam_pt = geoms.point_on_circle(centre, rad_length, rad_angle)
+            if rad_offset is not None and rad_offset != 0:
+                offset_pt = geoms.point_on_circle(centre, rad_offset, rad_angle)
+                end_pt = geoms.point_on_line(offset_pt, diam_pt, rad_length)
+                # print(rad_angle, offset_pt, f'{x_c=}, {y_c=}')
+                cnv.draw_line((offset_pt.x, offset_pt.y), (end_pt.x, end_pt.y))
+            else:
+                cnv.draw_line((centre.x, centre.y), (diam_pt.x, diam_pt.y))
         self.set_canvas_props(
+            cnv=cnv,
             index=ID,
             stroke=self.radii_stroke,
             stroke_width=self.radii_stroke_width,
             dashed=self.radii_dashed,
             dotted=self.radii_dotted,
         )
-        for rad_angle in _radii:
-            # points based on length of line, offset and the angle in degrees
-            diam_pt = geoms.point_on_circle(centre, rad_length, rad_angle)
-            pth = cnv.beginPath()
-            if rad_offset is not None and rad_offset != 0:
-                offset_pt = geoms.point_on_circle(centre, rad_offset, rad_angle)
-                end_pt = geoms.point_on_line(offset_pt, diam_pt, rad_length)
-                # print(rad_angle, offset_pt, f'{x_c=}, {y_c=}')
-                pth.moveTo(offset_pt.x, offset_pt.y)
-                pth.lineTo(end_pt.x, end_pt.y)
-            else:
-                pth.moveTo(centre.x, centre.y)
-                pth.lineTo(diam_pt.x, diam_pt.y)
-            cnv.drawPath(
-                pth, stroke=1 if self.radii_stroke else 0, fill=1 if self.fill else 0
-            )
 
     def get_vertices(self, rotation: float = None, is_rotated: bool = False):
         """Calculate vertices of polygon."""
@@ -4314,5 +4281,5 @@ class FooterShape(BaseShape):
         # tools.feedback(f'*** FooterShape {ID=} {text=} {x=} {y=} {font_size=}')
         # ---- draw footer
         self.draw_multi_string(
-            cnv.canvas, x, y, text, align="centre", font_size=font_size
+            cnv, x, y, text, align="centre", font_size=font_size
         )

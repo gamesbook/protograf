@@ -27,7 +27,7 @@ Locations(
     "a6,c6,e6,g6,b5,d5,f5,h5,"
     "a4,c4,e4,g4,b3,d3,f3,h3,"
     "a2,c2,e2,g2,b1,d1,f1,h1",
-    [square(side=2.25, fill=tan, stroke=tan)],
+    [square(side=2.25, fill="tan", stroke=tan)],
 )
 
 # border for the board

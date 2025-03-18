@@ -8,7 +8,7 @@ Created on: 17 November 2024
 from protograf import *
 
 Create(filename="customised_commands.pdf",
-       paper=A8,
+       paper="A8",
        margin=0.75,
        margin_right=0.2, margin_top=0.2,
        font_size=8,
@@ -47,11 +47,11 @@ Blueprint()
 Text(common=txt, text="Font Command")
 Font("Helvetica")
 Text(text="Helvetica 12pt black", x=0, y=5, align="left")
-Font("Times-Roman", size=11, stroke=tomato)
+Font("Times-Roman", size=11, stroke="tomato")
 Text(text="Times-Roman 11pt red", x=0, y=4, align="left")
-Font("Courier", size=10, stroke=aqua)
+Font("Courier", size=10, stroke="cyan")
 Text(text="Courier 10pt aqua", x=0, y=3, align="left")
-Font("Verdana", size=9, stroke=gold)
+Font("Verdana", size=9, stroke="gold")
 Text(text="Verdana 9pt gold", x=0, y=2, align="left")
 PageBreak()
 

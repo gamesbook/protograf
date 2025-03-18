@@ -8,7 +8,7 @@ Created on: 19 September 2024
 from protograf import *
 
 Create(filename="customised_hexagon.pdf",
-       paper=A8,
+       paper="A8",
        margin=0.75,
        margin_right=0.2, margin_top=0.2,
        font_size=8,
@@ -32,21 +32,21 @@ PageBreak()
 Blueprint()
 Text(common=txt, text="Hexagon: dot & cross")
 Hexagon(x=-0.25, y=4, height=2,
-        dot=0.1, dot_stroke=red)
+        dot=0.1, dot_stroke="red")
 Hexagon(x=1.75, y=3.5, height=2,
-        cross=0.25, cross_stroke=red, cross_stroke_width=1)
+        cross=0.25, cross_stroke="red", cross_stroke_width=1)
 Hexagon(x=0, y=1, height=2,
-        dot=0.1, dot_stroke=red,
+        dot=0.1, dot_stroke="red",
         orientation='pointy')
 Hexagon(x=2, y=1, height=2,
-        cross=0.25, cross_stroke=red, cross_stroke_width=1,
+        cross=0.25, cross_stroke="red", cross_stroke_width=1,
         orientation='pointy')
 PageBreak()
 
 # ---- hatches - flat
 Blueprint()
 Text(common=txt, text="Hexagon: flat; hatches")
-hxgn = Common(x=1, height=1.5, hatch_count=5, hatch_stroke=red, orientation='flat')
+hxgn = Common(x=1, height=1.5, hatch_count=5, hatch_stroke="red", orientation='flat')
 Hexagon(common=hxgn, y=0, hatch='e', label="e/w")
 Hexagon(common=hxgn, y=2, hatch='ne', label="ne/sw")
 Hexagon(common=hxgn, y=4, hatch='nw', label="nw/se")
@@ -55,7 +55,7 @@ PageBreak()
 # ---- hatches - pointy
 Blueprint()
 Text(common=txt, text="Hexagon: pointy; hatches")
-hxgn = Common(x=1, height=1.5, hatch_count=5, hatch_stroke=red, orientation='pointy')
+hxgn = Common(x=1, height=1.5, hatch_count=5, hatch_stroke="red", orientation='pointy')
 Hexagon(common=hxgn, y=0, hatch='n', label="n/s")
 Hexagon(common=hxgn, y=2, hatch='ne', label="ne/sw")
 Hexagon(common=hxgn, y=4, hatch='nw', label="nw/se")
@@ -87,7 +87,7 @@ PageBreak()
 # ---- radii - flat
 Blueprint(stroke_width=0.5)
 Text(common=txt, text="Hexagon: flat; radii")
-hxg = Common(height=1.5, dot=0.05, dot_stroke=red, orientation="flat", font_size=8)
+hxg = Common(height=1.5, dot=0.05, dot_stroke="red", orientation="flat", font_size=8)
 Hexagon(common=hxg, x=0.25, y=0.25, radii='sw', label="SW")
 Hexagon(common=hxg, x=0.25, y=2.15, radii='w', label="W")
 Hexagon(common=hxg, x=0.25, y=4, radii='nw', label="NW")
@@ -99,7 +99,7 @@ PageBreak()
 # ---- radii - pointy
 Blueprint(stroke_width=0.5)
 Text(common=txt, text="Hexagon: pointy; radii")
-hxg = Common(height=1.5, dot=0.05, dot_stroke=red, orientation="pointy", font_size=8)
+hxg = Common(height=1.5, dot=0.05, dot_stroke="red", orientation="pointy", font_size=8)
 Hexagon(common=hxg, x=0.25, y=0.25, radii='sw', label="SW")
 Hexagon(common=hxg, x=0.25, y=2.15, radii='nw', label="NW")
 Hexagon(common=hxg, x=0.25, y=4, radii='n', label="N")
@@ -135,7 +135,7 @@ PageBreak()
 # ---- perbis - flat
 Blueprint(stroke_width=0.5)
 Text(common=txt, text="Hex Flat: perbis")
-hxg = Common(height=1.5, dot=0.05, dot_stroke=red, orientation="flat", font_size=8)
+hxg = Common(height=1.5, dot=0.05, dot_stroke="red", orientation="flat", font_size=8)
 Hexagon(common=hxg, x=0.25, y=0.25, perbis='sw', label="SW")
 Hexagon(common=hxg, x=0.25, y=2.15, perbis='nw', label="NW")
 Hexagon(common=hxg, x=0.25, y=4, perbis='n', label="N")
@@ -147,7 +147,7 @@ PageBreak()
 # ---- perbis - pointy
 Blueprint(stroke_width=0.5)
 Text(common=txt, text="Hex Pointy: perbis")
-hxg = Common(height=1.5, dot=0.05, dot_stroke=red, orientation="pointy", font_size=8)
+hxg = Common(height=1.5, dot=0.05, dot_stroke="red", orientation="pointy", font_size=8)
 Hexagon(common=hxg, x=0.25, y=0.25, perbis='sw', label="SW")
 Hexagon(common=hxg, x=0.25, y=2.15, perbis='w', label="W")
 Hexagon(common=hxg, x=0.25, y=4, perbis='nw', label="NW")
@@ -159,7 +159,7 @@ PageBreak()
 # ---- perbis - all
 Blueprint(stroke_width=0.5)
 Text(common=txt, text="Hex: perbis")
-hxg = Common(height=1.5, dot=0.05, dot_stroke=red, font_size=8)
+hxg = Common(height=1.5, dot=0.05, dot_stroke="red", font_size=8)
 Hexagon(common=hxg, cx=2, cy=4, perbis='*', orientation="pointy")
 # Hexagon(common=hxg, cx=2, cy=1, perbis='*')
 PageBreak()

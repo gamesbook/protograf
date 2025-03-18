@@ -6,7 +6,7 @@ Created on: 20 February 2025
 """
 from protograf import *
 
-Create(filename='cards_deck_12.pdf', margin=0.25, paper=A8)
+Create(filename='cards_deck_12.pdf', margin=0.25, paper="A8")
 
 # design deck
 Deck(

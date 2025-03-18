@@ -8,14 +8,14 @@ Created on: 19 December 2024
 from protograf import *
 
 Create(filename="layouts_repeat.pdf",
-       paper=A8,
+       paper="A8",
        margin=0.75,
        margin_right=0.2, margin_top=0.2,
        font_size=10,
        stroke_width=0.5)
 
 header = Common(x=0, y=6, font_size=7, align="left")
-marble = circle(cx=1, cy=1, radius=0.25, fill=lime)
+marble = circle(cx=1, cy=1, radius=0.25, fill="chartreuse")
 
 Blueprint(stroke_width=0.5)
 Text(common=header, text="Repeat: cols&rows: interval=0")

@@ -8,7 +8,7 @@ Created on: 19 September 2024
 from protograf import *
 
 Create(filename="customised_rectangle.pdf",
-       paper=A8,
+       paper="A8",
        margin=0.75,
        margin_right=0.2, margin_top=0.2,
        font_size=8,
@@ -57,7 +57,7 @@ PageBreak()
 # ---- hatches
 Blueprint()
 Text(common=txt, text="Rectangle: hatches + directions")
-htch = Common(height=1.5, width=1, hatch_count=5, hatch_width=0.1, hatch_stroke=red)
+htch = Common(height=1.5, width=1, hatch_count=5, hatch_width=0.1, hatch_stroke="red")
 Rectangle(common=htch, x=0, y=0,  hatch='w', label="W")
 Rectangle(common=htch, x=1.5, y=0, hatch='e', label="E")
 Rectangle(common=htch, x=3, y=0, hatch='ne', label="NE\nSW")
@@ -76,7 +76,7 @@ PageBreak()
 Blueprint()
 Text(common=txt, text="Rectangle: rounding; hatches")
 rct = Common(x=0.5, height=1.5, width=3.0, stroke_width=.5,
-             hatch_stroke=red, hatch='o')
+             hatch_stroke="red", hatch='o')
 Rectangle(common=rct, y=0.0, rounding=0.1, hatch_count=10)
 Rectangle(common=rct, y=2.0, rounding=0.5, hatch_count=3)
 # Rectangle(common=rct, y=4.0, rounding=0.75, hatch_count=15)  # FAILS!
@@ -139,7 +139,7 @@ Blueprint()
 Text(common=txt, text="Rectangle: red => rotation 45\u00B0")
 Rectangle(cx=2, cy=3, width=1.5, height=3, dot=0.06)
 Rectangle(cx=2, cy=3, width=1.5, height=3, fill=None,
-          stroke=red, stroke_width=.3, rotation=45, dot=0.04)
+          stroke="red", stroke_width=.3, rotation=45, dot=0.04)
 PageBreak()
 
 # ---- notches
@@ -157,7 +157,7 @@ PageBreak()
 Blueprint(stroke_width=0.5)
 Text(common=txt, text="Rectangle: borders")
 Rectangle(
-    y=3, height=2, width=2, stroke=None, fill=gold,
+    y=3, height=2, width=2, stroke=None, fill="gold",
     borders=[
         ("n", 3, silver, True),
         ("s", 2),
