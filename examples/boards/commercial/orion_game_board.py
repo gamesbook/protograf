@@ -8,7 +8,7 @@ Notes:
 
 from protograf import *
 
-Create(filename="orion_game_board.pdf", margin=0.5, paper=A4)
+Create(filename="orion_game_board.pdf", margin=0.5, paper="A4")
 
 # Background Areas
 Circle(cx=10, cy=15, radius=10.3, fill="#ADCBF4", stroke=white)

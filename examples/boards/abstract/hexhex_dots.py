@@ -8,7 +8,7 @@ Notes:
 
 from protograf import *
 
-Create(filename="hexhex_board_dots.pdf", margin=0.5, paper=A4)
+Create(filename="hexhex_board_dots.pdf", margin=0.5, paper="A4")
 
 # Game Board
 Hexagons(

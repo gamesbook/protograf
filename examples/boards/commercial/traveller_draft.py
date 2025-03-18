@@ -9,7 +9,7 @@ Notes:
 
 from protograf import *
 
-Create(filename="traveller_draft.pdf", margin=0.5, paper=A4)
+Create(filename="traveller_draft.pdf", margin=0.5, paper="A4")
 
 # set colors
 map_fill = "#FAEBD7"
