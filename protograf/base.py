@@ -2275,8 +2275,8 @@ class BaseShape:
         if self.dot:
             dot_size = self.unit(self.dot)
             kwargs = {}
-            kwargs['fill'] = self.dot_stroke
-            kwargs['stroke'] = self.dot_stroke
+            kwargs["fill"] = self.dot_stroke
+            kwargs["stroke"] = self.dot_stroke
             canvas.draw_circle((x, y), dot_size)
             self.set_canvas_props(cnv=canvas, index=None, **kwargs)
 
@@ -2285,9 +2285,9 @@ class BaseShape:
         if self.cross:
             cross_size = self.unit(self.cross)
             kwargs = {}
-            kwargs['fill'] = self.cross_stroke
-            kwargs['stroke'] = self.cross_stroke
-            kwargs['stroke_width'] = self.cross_stroke_width
+            kwargs["fill"] = self.cross_stroke
+            kwargs["stroke"] = self.cross_stroke
+            kwargs["stroke_width"] = self.cross_stroke_width
             # horizontal
             pt1 = geoms.Point(xd - cross_size / 2.0, yd)
             pt2 = geoms.Point(xd + cross_size / 2.0, yd)
@@ -2340,7 +2340,7 @@ class BaseShape:
         if self.run_debug:
             # display vertex index number next to vertex
             if kwargs.get("vertices", []):
-                kwargs['fill'] = self.debug_color
+                kwargs["fill"] = self.debug_color
                 canvas.setFont(self.font_name, 4)
                 for key, vert in enumerate(kwargs.get("vertices")):
                     x = self.points_to_value(vert.x)
@@ -2353,10 +2353,10 @@ class BaseShape:
             if kwargs.get("point", []):
                 point = kwargs.get("point")
                 label = kwargs.get("label", "")
-                kwargs['fill'] = kwargs.get("color", self.debug_color)
-                kwargs['stroke'] = kwargs.get("color", self.debug_color)
-                kwargs['stroke_width'] = 0.1
-                kwargs['font_size'] = 4
+                kwargs["fill"] = kwargs.get("color", self.debug_color)
+                kwargs["stroke"] = kwargs.get("color", self.debug_color)
+                kwargs["stroke_width"] = 0.1
+                kwargs["font_size"] = 4
                 x = self.points_to_value(point.x)
                 y = self.points_to_value(point.y)
                 self.draw_multi_string(

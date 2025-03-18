@@ -4280,6 +4280,4 @@ class FooterShape(BaseShape):
         text = kwargs.get("text") or "Page %s" % ID
         # tools.feedback(f'*** FooterShape {ID=} {text=} {x=} {y=} {font_size=}')
         # ---- draw footer
-        self.draw_multi_string(
-            cnv, x, y, text, align="centre", font_size=font_size
-        )
+        self.draw_multi_string(cnv, x, y, text, align="centre", font_size=font_size)
