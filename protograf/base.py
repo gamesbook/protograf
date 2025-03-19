@@ -24,7 +24,7 @@ from jinja2.environment import Template
 from svglib.svglib import svg2rlg
 import requests
 import pymupdf
-from pymupdf import Shape as muShape, Point as muPoint, Matrix
+from pymupdf import Shape as muShape, Point as muPoint, Page as muPage, Matrix
 from pymupdf.utils import getColor, getColorList
 
 # local
@@ -1753,11 +1753,14 @@ class BaseShape:
 
     def load_image(
         self,
-        image_location=None,
-        scaling: float = None,
+        pdf_page: muPage,
+        image_location: str = None,
+        page_number: int = 0,
+        origin: tuple = None,
         sliced: str = None,
         width_height: tuple = None,
         cache_directory: str = None,
+        rotation: float = 0,
     ) -> tuple:
         """Load an image from file or website.
 
@@ -1769,21 +1772,25 @@ class BaseShape:
         Args:
             image_location:
                 full path or URL for image
-            scaling:
-                resize factor for image
+            page_number:
+                page number of PDF where image is to be added
+            origin:
+                x, y location of image on Page
             sliced:
                 what fraction of the image to return; one of
                 't', 'm', 'b', 'l', 'c', or 'r'
             width_height:
-                the (width, height) of the output frame for the image
+                the (width, height) of the output frame for the image;
+                will be used along with x,y to set size and position
             cache_directory:
                 where to store a local for copy for URL-sourced images
+            rotation:
+                angle of image rotation (in degrees)
 
         Returns:
             tuple:
-                * Image or SVG;
-                * boolean (True if file type is SVG);
-                * boolean (True if flie is a directory)
+                * Image
+                * boolean (True if file is a directory)
 
         Notes:
 
@@ -1853,21 +1860,6 @@ class BaseShape:
                 )
             return None
 
-        def scale_image(drawing, scaling_factor):
-            """Scale a shapes.Drawing() while maintaining aspect ratio"""
-            try:
-                _scaling_factor = float(scaling_factor)
-            except Exception:
-                tools.feedback(
-                    f"Cannot scale an image with a value of {scaling_factor}", True
-                )
-            scaling_x = _scaling_factor
-            scaling_y = _scaling_factor
-            drawing.width = drawing.minWidth() * scaling_x
-            drawing.height = drawing.height * scaling_y
-            drawing.scale(scaling_x, scaling_y)
-            return drawing
-
         def save_image_from_url(url: str):
             """Download image from network and save locally if not present."""
             loc = urlparse(url)
@@ -1879,25 +1871,38 @@ class BaseShape:
                     f.write(image.content)
             return image_local
 
-        def image_reader(image_location) -> object:
-            """Attempt to load first from local cache, then network."""
-            img = None
+        def image_render(image_location) -> object:
+            """Load, first from local cache then network, and draw."""
             image_local = image_location
             if cache_directory:
                 if tools.is_url_valid(image_location):
                     image_local = save_image_from_url(image_location)
-            img = ImageReader(image_local)
-            return img
+            # ---- draw image
+            imgdoc = pymupdf.open(image_local)  # open image file as a␣document
+            pdfbytes = imgdoc.convert_to_pdf()  # make a 1-page PDF of it
+            imgpdf = pymupdf.open("pdf", pdfbytes)
+            rct = pymupdf.Rect(scaffold)
+            pdf_page.show_pdf_page(
+                rct,  # where to place the image (rect-like)
+                imgpdf,  # source PDF
+                pno=0,  # page number in *source* PDF (not current PDF)
+                clip=None,  # only display this area (rect-like)
+                rotate=self.rotation,  # rotate (float, any value)
+                oc=0,  # control visibility via OCG / OCMD
+                keep_proportion=True,  # keep aspect ratio
+                overlay=True,  # put in foreground
+            )
+            #  cnv.draw_rect(rct) #  optional??
+            return True
 
-        img = None
-        svg = False
+        img = False
         is_directory = False
 
         if not image_location:  # nothing to see here... move along
-            return img, svg, None
+            return img, None
         base_image_location = image_location
 
-        # local files
+        # ---- check local files
         if not tools.is_url_valid(image_location):
             # relative paths
             if not os.path.isabs(image_location):
@@ -1906,38 +1911,32 @@ class BaseShape:
             # no filename
             is_directory = os.path.isdir(image_location)
             if is_directory:
-                return img, svg, True
+                return img, True
             # check image exists
             if not os.path.exists(image_location):
                 tools.feedback(
                     f'Unable to find or open image "{image_location}"', False, True
                 )
-                return img, svg, True
+                return img, True
 
-        try:
-            image_location_ext = image_location.strip()[-3:]
-            # tools.feedback(f'Loading type: {image_location_ext}')
-            if image_location_ext.lower() == "svg":
-                svg = True
-        except Exception:
+        # ---- calculate outline for image
+        scaffold = (
+            origin[0], origin[1],
+            origin[0] + width_height[0], origin[1] + width_height[1])
+        if rotation is not None:
+            # need larger rect!
             pass
 
+        # ---- render image
         try:
-            if svg:
-                if not os.path.exists(image_location):
-                    raise IOError
-                img = svg2rlg(image_location)
-                if scaling:
-                    img = scale_image(img, scaling)
-            else:
-                img = image_reader(image_location)
-                if sliced:
-                    sliced_filename = slice_image(
-                        img, sliced, width_height=width_height
-                    )
-                    if sliced_filename:
-                        img = image_reader(sliced_filename)
-            return img, svg, is_directory
+            img = image_render(image_location)
+            if sliced:
+                sliced_filename = slice_image(
+                    img, sliced, width_height=width_height
+                )
+                if sliced_filename:
+                    img = image_render(sliced_filename)
+            return img, is_directory
         except IOError as err:
             tools.feedback(
                 f'Unable to find or open image "{base_image_location}"' f" ({err}).",
@@ -1945,7 +1944,7 @@ class BaseShape:
                 True,
             )
 
-        return img, svg, is_directory
+        return img, is_directory
 
     def process_template(self, _dict):
         """Set values for properties based on those defined in a dictionary."""

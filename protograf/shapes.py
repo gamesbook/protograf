@@ -15,10 +15,6 @@ from urllib.parse import urlparse
 # third party
 import pymupdf
 from pymupdf import Shape as muShape, Point as muPoint
-
-"""
-from reportlab.lib.utils import ImageReader
-"""
 import segno  # QRCode
 
 # local
@@ -34,6 +30,7 @@ from protograf.base import (
     CACHE_DIRECTORY,
     BGG_IMAGES,
 )
+from protograf import globals
 
 log = logging.getLogger(__name__)
 
@@ -142,77 +139,43 @@ class ImageShape(BaseShape):
         else:
             x = self._u.x + self._o.delta_x
             y = self._u.y + self._o.delta_y
+        rotation = kwargs.get("rotation", self.rotation)
         # ---- load image
-        # tools.feedback(f'*** IMAGE {ID=} {_source=} {x=} {y=} {self.scaling=}')
-        img, is_svg, is_dir = self.load_image(  # via BaseShape (in base.py)
+        # tools.feedback(f'*** IMAGE {ID=} {_source=} {x=} {y=} {self.rotation=}')
+        img, is_dir = self.load_image(  # via base.BaseShape
+            globals.doc_page,
             _source,
-            scaling=self.scaling,
+            page_number=globals.page_count,
+            origin=(x, y),
             sliced=self.sliced,
             width_height=(width, height),
             cache_directory=cache_directory,
+            rotation=rotation,
         )
         if not img and not is_dir:
             tools.feedback(
                 f'Unable to load image "{_source}!" - please check name and location',
                 True,
             )
-        else:
-            try:
-                self.image_location = img.fileName
-            except AttributeError:
-                self.image_location = _source
-        rotation = kwargs.get("rotation", self.rotation)
-        # assumes 1 pt == 1 pixel ?
-        if rotation:
-            # ---- rotated image
-            # tools.feedback(f'*** IMAGE {ID=} {rotation=} {self._u.x=} {self._u.y=}')
-            cnv.saveState()
-            # move the canvas origin
-            if ID is not None:
-                dx, dy = self._u.margin_left, self._u.margin_bottom
-                cnv.translate(x + dx, y + dy)
-            else:
-                cnv.translate(x + self._o.delta_x, y + self._o.delta_y)
-            cnv.rotate(rotation)
-            # draw the image relative to the origin
-            if is_svg:
-                from reportlab.graphics import renderPDF
-
-                renderPDF.draw(img, cnv, x=-width / 2.0, y=-height / 2.0)
-            else:
-                cnv.drawImage(
-                    img,
-                    x=-width / 2.0,
-                    y=-height / 2.0,
-                    width=width,
-                    height=height,
-                    mask="auto",
-                )
-            cnv.restoreState()
-        else:
-            # ---- normal image
-            if is_svg:
-                from reportlab.graphics import renderPDF
-
-                renderPDF.draw(img, cnv, x=x, y=y)
-            else:
-                # TODO -> use height=10 OR width=12 AND preserveAspectRatio=True
-                cnv.drawImage(img, x=x, y=y, width=width, height=height, mask="auto")
         # ---- text
         xc = x + width / 2.0
         yc = y + height / 2.0
+        keys = {}
         if self.heading:
-            cnv.setFont(self.font_name, self.heading_size)
-            cnv.setFillColor(self.heading_stroke)
-            self.draw_multi_string(cnv, xc, y + height + cnv._leading, self.heading)
+            keys['font_name'] = self.font_name
+            keys['font_size'] = self.heading_size
+            keys['stroke'] = self.heading_stroke
+            self.draw_multi_string(cnv, xc, yc, self.heading, **keys)
         if self.label:
-            cnv.setFont(self.font_name, self.label_size)
-            cnv.setFillColor(self.label_stroke)
-            self.draw_multi_string(cnv, xc, yc, self.label)
+            keys['font_name'] = self.font_name
+            keys['font_size'] = self.label_size
+            keys['stroke'] = self.label_stroke
+            self.draw_multi_string(cnv, xc, yc, self.label, **keys)
         if self.title:
-            cnv.setFont(self.font_name, self.title_size)
-            cnv.setFillColor(self.title_stroke)
-            self.draw_multi_string(cnv, xc, y - cnv._leading, self.title)
+            keys['font_name'] = self.font_name
+            keys['font_size'] = self.title_size
+            keys['stroke'] = self.title_stroke
+            self.draw_multi_string(cnv, xc, yc, self.title, **keys)
 
 
 class ArcShape(BaseShape):
