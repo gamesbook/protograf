@@ -23,6 +23,7 @@ import jinja2
 from jinja2.environment import Template
 from svglib.svglib import svg2rlg
 import requests
+from PIL import Image
 import pymupdf
 from pymupdf import Shape as muShape, Point as muPoint, Page as muPage, Matrix
 from pymupdf.utils import getColor, getColorList
@@ -1795,11 +1796,13 @@ class BaseShape:
         """
 
         def slice_image(
-            drawing, slice_portion: str = None, width_height: tuple = (1, 1)
+            img_path, slice_portion: str = None, width_height: tuple = (1, 1)
         ):
             """Slice off a portion of an image while maintaining its aspect ratio
 
             Args:
+                img_path:
+                    Pathlib file
                 sliced:
                     what portion of the image to return
                 width_height:
@@ -1813,8 +1816,7 @@ class BaseShape:
                     tools.feedback(
                         f'The sliced value "{slice_portion}" is not valid!', True
                     )
-                img = drawing._image
-                img_file = pathlib.Path(img.fileName)
+                img = Image.open(img_path)
                 iwidth = img.size[0]
                 iheight = img.size[1]
                 icentre = (int(iwidth / 2), int(iheight / 2))
@@ -1848,8 +1850,8 @@ class BaseShape:
                     case _:
                         raise NotImplementedError(f"Cannot process {slice_portion}")
                 # create new file with sliced image
-                img2_filename = img_file.stem + "_" + _slice[0] + img_file.suffix
-                sliced_filename = os.path.join(str(img_file.parent), img2_filename)
+                img2_filename = img_path.stem + "_" + _slice[0] + img_path.suffix
+                sliced_filename = os.path.join(str(img_path.parent), img2_filename)
                 img2.save(sliced_filename)
                 return sliced_filename
             except Exception as err:
@@ -1938,11 +1940,13 @@ class BaseShape:
 
         # ---- render image
         try:
-            img = image_render(image_location)
             if sliced:
-                sliced_filename = slice_image(img, sliced, width_height=width_height)
+                sliced_filename = slice_image(
+                    pathlib.Path(image_location), sliced, width_height)
                 if sliced_filename:
                     img = image_render(sliced_filename)
+            else:
+                img = image_render(image_location)
             return img, is_directory
         except IOError as err:
             tools.feedback(

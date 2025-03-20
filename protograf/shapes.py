@@ -1179,18 +1179,8 @@ class EllipseShape(BaseShape):
         # ---- handle rotation: START
         rotation = kwargs.get("rotation", self.rotation)
         if rotation:
-            # tools.feedback(f'***Ellp {ID=} {rotation=} {self._u.x=}, {self._u.y=}')
-            cnv.saveState()
-            # move the canvas origin
-            if ID is not None:
-                cnv.translate(x + self._u.margin_left, y + self._u.margin_bottom)
-            else:
-                cnv.translate(x + self._u.width / 2.0, y + self._u.height / 2.0)
-            cnv.rotate(rotation)
-            # reset centre and "bottom left"
-            x_d, y_d = 0, 0
-            x = -self._u.width / 2.0
-            y = -self._u.height / 2.0
+            self.centroid = muPoint(x_d, y_d)
+            kwargs["rotation"] = (rotation, self.centroid)
         # ---- set canvas
         self.set_canvas_props(index=ID)
         # ---- draw ellipse
@@ -1210,9 +1200,6 @@ class EllipseShape(BaseShape):
         self.draw_title(
             cnv, ID, x_d, y_d - 0.5 * self._u.height - delta_m_down, **kwargs
         )
-        # ---- handle rotation: END
-        if rotation:
-            cnv.restoreState()
 
 
 class EquilateralTriangleShape(BaseShape):
@@ -2419,8 +2406,6 @@ class PolygonShape(BaseShape):
         x, y, radius, vertices = _geom.x, _geom.y, _geom.radius, _geom.vertices
         # ---- invalid polygon?
         if not vertices or len(vertices) == 0:
-            if rotation:
-                cnv.restoreState()
             return
         # ---- draw polygon
         # tools.feedback(f'***PolyGon {x=} {y=} {vertices=}')
@@ -2959,18 +2944,8 @@ class RectangleShape(BaseShape):
         rotation = kwargs.get("rotation", self.rotation)
         # print(self.label, rotation)
         if rotation:
-            # tools.feedback(f'*** Rect {ID=} {rotation=} {self._u.x=}, {self._u.y=}')
-            cnv.saveState()
-            # move the canvas origin
-            if ID is not None:
-                cnv.translate(x + self._u.margin_left, y + self._u.margin_bottom)
-            else:
-                cnv.translate(x + self._u.width / 2.0, y + self._u.height / 2.0)
-            cnv.rotate(rotation)
-            # reset centre and "bottom left"
-            x_d, y_d = 0, 0
-            x = -self._u.width / 2.0
-            y = -self._u.height / 2.0
+            self.centroid = muPoint(x_d, y_d)
+            kwargs["rotation"] = (rotation, self.centroid)
         # ---- * notch vertices
         if is_notched:
             _notch_style = self.notch_style.lower()
@@ -3203,7 +3178,6 @@ class RectangleShape(BaseShape):
         else:
             self.vertices = self.get_vertices(**kwargs)
         # tools.feedback(f'*** Rect {len(self.vertices)=}')
-        # ---- set canvas
 
         # ---- draw rectangle
         if is_notched or is_chevron or is_peaks:
@@ -3325,9 +3299,6 @@ class RectangleShape(BaseShape):
         )
         # ----  numbering
         self.set_coord(cnv, x_d, y_d)
-        # ---- handle rotation: END
-        if rotation:
-            cnv.restoreState()
         # ---- set grid property
         # self.grid = GridShape(label=self.coord_text, x=x_d, y=y_d, shape=self)
 
@@ -3668,7 +3639,7 @@ class StadiumShape(BaseShape):
 
         # ---- draw rect fill only
         # tools.feedback(f'***Stadium:Rect {x=} {y=} {self.vertices=}')
-        keys = copy.deepcopy(kwargs)
+        keys = copy.copy(kwargs)
         keys["stroke"] = None
         cnv.draw_polyline(self.vertices)
         self.set_canvas_props(cnv=cnv, index=ID, **keys)

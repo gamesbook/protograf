@@ -21,7 +21,7 @@ Create(filename="customised_shapes.pdf",
 Footer(draw=False)
 
 txt = Common(x=0, y=6, font_size=8, align="left")
-
+'''
 Text(common=txt, text="Shapes START...")
 Text(x=0, y=5, font_size=8, align="left", text=Today())
 PageBreak(footer=True)
@@ -538,7 +538,7 @@ Stadium(cx=3, cy=3, side=1, common=props, label="stadium")
 Star(x=1, y=1, vertices=5, radius=0.75, common=props, label="star")
 Ellipse(cx=3, cy=1, height=1, width=1.5, common=props, label="ellipse")
 PageBreak()
-
+'''
 # ---- text custom
 Blueprint()
 Text(common=txt, text="Text - custom")
@@ -552,21 +552,21 @@ Text(x=0, y=4, align="right", stroke="blue",
           '<u>Helvetica</u><br/>'
           '<b>bold</b> <i>ital</i><br/>'
           '<b><i>bold ital</i></b></font>')
-Text(x=0, y=2, align="left", stroke="orange",
-     font_name="Courier", font_size=10,
-     wrap=True, width=4, fill=None,
-     transform='c',
-     text="I am capitalized")
-Text(x=0, y=1.5, align="left", stroke="orange",
-     font_name="Courier", font_size=10,
-     wrap=True, width=4, fill=None,
-     transform='l',
-     text="I am in lowercase")
-Text(x=0, y=1, align="left", stroke="orange",
-     font_name="Courier", font_size=10,
-     wrap=True, width=4, fill=None,
-     transform='u',
-     text="I am in uppercase")
+# Text(x=0, y=2, align="left", stroke="orange",
+#      font_name="Courier", font_size=10,
+#      wrap=True, width=4, fill=None,
+#      transform='c',
+#      text="I am capitalized")
+# Text(x=0, y=1.5, align="left", stroke="orange",
+#      font_name="Courier", font_size=10,
+#      wrap=True, width=4, fill=None,
+#      transform='l',
+#      text="I am in lowercase")
+# Text(x=0, y=1, align="left", stroke="orange",
+#      font_name="Courier", font_size=10,
+#      wrap=True, width=4, fill=None,
+#      transform='u',
+#      text="I am in uppercase")
 PageBreak()
 
 # ---- END
