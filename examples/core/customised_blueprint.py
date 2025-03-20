@@ -33,12 +33,12 @@ Blueprint(style='green')
 Text(common=txt, text="Blueprint: style=green")
 PageBreak()
 
-Blueprint(style='grey')
-Text(common=txt, text="Blueprint: style=grey")
+Blueprint(style='gray')
+Text(common=txt, text="Blueprint: style=gray")
 PageBreak()
 
-Blueprint(style='grey', stroke='purple')
-Text(common=txt, text="Blueprint: grey; stroke=purple")
+Blueprint(style='gray', stroke='purple')
+Text(common=txt, text="Blueprint: gray; stroke=purple")
 PageBreak()
 
 Blueprint(subdivisions=4, stroke_width=1)
@@ -62,7 +62,7 @@ Save(
      directory="../docs/source/images/custom/blueprint",
      names=[
         "defaults", "stroke_width_red",
-        "style_blue", "style_green", "style_grey",
+        "style_blue", "style_green", "style_gray",
         "style_stroke", "subdivisions", "subdivisions_dashed",
         "decimals", "edges",
      ])

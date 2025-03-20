@@ -29,7 +29,7 @@ sign = circle(cx=0, cy=0, radius=2.7, label='{{sequence}}', fill=None, stroke_wi
 iron = circle(common=sign, stroke="black")
 wood = circle(common=sign, stroke=sienna)
 bronze = circle(common=sign, stroke="gold"enrod)
-stone = circle(common=sign, stroke=grey)
+stone = circle(common=sign, stroke=gray)
 fire = circle(common=sign, stroke="gold")
 water = circle(common=sign, stroke=snow)
 Track(
@@ -66,7 +66,7 @@ PageBreak()
 # ---- centre shapes and blueprint + label
 Blueprint()
 Text(common=header, text="Centred shapes with centre point and x-y label")
-dot = Common(dot=0.2, dot_stroke=yellow)
+dot = Common(dot=0.2, dot_stroke="yellow")
 
 Rectangle(cx=3, cy=23, width=5, height=3, label="rectangle:3-23", common=dot)
 EquilateralTriangle(x=7, y=21, side=4, label="triangle:9-22", common=dot)
@@ -191,8 +191,8 @@ PageBreak()
 Text(common=header, text="Polyshapes, Polylines and lines")
 Polyline(
     points=[(0, 13), (2, 15), (4, 13), (6, 15), (8, 13), (10, 15), (12, 13)],
-    stroke=grey)
-Polyline(points="0,11 2,13 4,11 6,13 8,11 10,13 12,11", stroke=grey)
+    stroke=gray)
+Polyline(points="0,11 2,13 4,11 6,13 8,11 10,13 12,11", stroke=gray)
 Line(x=1, y=1, length=30, angle=55.3, stroke="tomato", stroke_width=3)  # thick diagonal
 Line(x=0, y=3, x1=19, y1=3, stroke="black", stroke_width=2)
 Line(
@@ -294,9 +294,9 @@ Hexagons(
     dot_stroke="black",
     coord_elevation="top",
     coord_font_size=9,
-    coord_stroke=darkslategrey,
+    coord_stroke=darkslategray,
     fill=white,
-    stroke=darkslategrey,
+    stroke=darkslategray,
     caltrops="medium",
 )
 Text(common=header, text="Hexagons (dot; coords; caltrops)")
@@ -304,7 +304,7 @@ PageBreak()
 
 # ---- images and various text descriptors
 Text(common=header, text="Rectangles and images (with transparency)")
-Rectangle(x=5.9, y=15.9, width=7.2, height=6.2, stroke=silver, fill="gold")
+Rectangle(x=5.9, y=15.9, width=7.2, height=6.2, stroke="lightsteelblue", fill="gold")
 Image(
     "sholes_typewriter.png",  # has transparent background
     x=6,
@@ -320,7 +320,7 @@ Image(
     title_stroke="chartreuse",
 )
 
-Rectangle(x=6, y=6, width=7, height=6.25, stroke=silver, fill="gold")
+Rectangle(x=6, y=6, width=7, height=6.25, stroke="lightsteelblue", fill="gold")
 Image(
     # "Typewriter_Vector.svg",
     "noun-typewriter-3933515.svg",
@@ -342,7 +342,7 @@ PageBreak()
 # ---- text alignment (default is centre);
 Text(common=header, text="Text: face, styling, wrap and align")
 
-Rectangle(x=0.75, y=23.5, width=7.5, height=3, stroke_width=1, stroke=grey) #, heading="Aligments")
+Rectangle(x=0.75, y=23.5, width=7.5, height=3, stroke_width=1, stroke=gray) #, heading="Aligments")
 Text(text="sholes\ntypewriter!", x=4.5, y=26)  #  add line break via \n
 Text(text="sholes * typewriter!", x=4.5, y=25, align="centre")
 Text(text="sholes typewriter! *", x=4.5, y=24.5, align="right")
@@ -366,21 +366,21 @@ IMAGE = LATIN + f'<img src="{image}" height="10" valign="bottom"/>' + \
 
 header = Common(x=1, font_size=18, align="left", width=2.5, height=2, wrap=True)
 
-Rectangle(x=4.5, y=1, width=10, height=5.5, stroke_width=1, stroke=grey)
+Rectangle(x=4.5, y=1, width=10, height=5.5, stroke_width=1, stroke=gray)
 Text(
     x=4.5, y=6.5, width=10, height=5, wrap=True, align="left", text=IMAGE, stroke="cyan"
 )
 Text(common=header, y=4, text="Align: Left")
 
-Rectangle(x=4.5, y=7, width=10, height=5, stroke_width=1, stroke=grey)
+Rectangle(x=4.5, y=7, width=10, height=5, stroke_width=1, stroke=gray)
 Text(x=4.5, y=12, width=10, height=5, wrap=True, align="right", text=LATIN)
 Text(common=header, y=10, text="Align: Right")
 
-Rectangle(x=4.5, y=12.5, width=10, height=5, stroke_width=1, stroke=grey)
+Rectangle(x=4.5, y=12.5, width=10, height=5, stroke_width=1, stroke=gray)
 Text(x=4.5, y=17.5, width=10, height=5, wrap=True, align="centre", text=LATIN)
 Text(common=header, y=16, text="Align: Centre")
 
-Rectangle(x=4.5, y=18, width=10, height=5, stroke_width=1, stroke=grey)
+Rectangle(x=4.5, y=18, width=10, height=5, stroke_width=1, stroke=gray)
 Text(x=4.5, y=23, width=10, height=5, wrap=True, align="justify", text=LATIN)
 Text(common=header, y=21, text="Align: Justify")
 

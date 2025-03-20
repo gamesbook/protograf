@@ -79,7 +79,7 @@ Circle(cx=2, cy=1.5, radius=1,
         petals_stroke_width=1,
         petals_dotted=1,
         petals_height=0.25,
-        petals_fill=grey)
+        petals_fill="gray")
 Circle(cx=2, cy=4.5, radius=1,
        stroke=None,
        fill=None,
@@ -87,7 +87,7 @@ Circle(cx=2, cy=4.5, radius=1,
        petals_stroke_width=3,
        petals_height=0.25,
        petals_stroke="red",
-       petals_fill=yellow)
+       petals_fill="yellow")
 PageBreak()
 
 # ---- circle petals: curve
@@ -100,7 +100,7 @@ Circle(cx=2, cy=1.5, radius=1,
         petals_stroke_width=1,
         petals_dotted=1,
         petals_height=0.5,
-        petals_fill=grey)
+        petals_fill="gray")
 Circle(cx=2, cy=4.5, radius=1,
        stroke=None,
        fill=None,
@@ -109,7 +109,7 @@ Circle(cx=2, cy=4.5, radius=1,
        petals_stroke_width=3,
        petals_height=0.5,
        petals_stroke="red",
-       petals_fill=yellow)
+       petals_fill="yellow")
 PageBreak()
 
 # ---- circle petals: petal
@@ -122,7 +122,7 @@ Circle(cx=2, cy=1.5, radius=1,
         petals_stroke_width=1,
         petals_dotted=1,
         petals_height=0.25,
-        petals_fill=grey)
+        petals_fill="gray")
 Circle(cx=2, cy=4.5, radius=1,
        stroke=None,
        fill=None,
@@ -131,7 +131,7 @@ Circle(cx=2, cy=4.5, radius=1,
        petals_stroke_width=3,
        petals_height=0.25,
        petals_stroke="red",
-       petals_fill=yellow)
+       petals_fill="yellow")
 PageBreak()
 
 # ---- circle radii labels

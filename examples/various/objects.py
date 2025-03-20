@@ -25,10 +25,10 @@ Circle(cx=3, cy=23, radius=1.5, fill=skyblue, label="5", font_size=48)
 Text(align="left", x=9, y=20, wrap=True, width=10, height=4, font_size=16,
      text='<b>Warning Sign:</b> rounded rectangles plus a sequence of "E" (east) chevrons')
 Rectangle(x=1, y=17, width=7.5, height=3, rounded=0.5, stroke="black", fill="black")
-Rectangle(x=1.1, y=17.1, width=7.3, height=2.8, rounded=0.5, stroke_width=2, stroke=yellow, fill=None)
+Rectangle(x=1.1, y=17.1, width=7.3, height=2.8, rounded=0.5, stroke_width=2, stroke="yellow", fill=None)
 Sequence(
     rectangle(x=1.5, y=17.1, width=1, height=2.8,
-              chevron='E', chevron_height=1, stroke=yellow, fill=yellow),
+              chevron='E', chevron_height=1, stroke="yellow", fill="yellow"),
     setting=(1, 3),
     interval_x=2,
 )
@@ -54,7 +54,7 @@ Circle(x=1.75, y=6.25, fill="black", radius=1.25,
 Circle(x=2.5, y=7, stroke="black", fill="gold", radius=0.5, stroke_width=5)
 
 Text(common=header_font, x=5, y=3, text="Doorway: stadiums, dashline + radii")
-Stadium(x=1.5, y=1, height=3, width=3, fill=skyblue, stroke=darkgrey, stroke_width=8, edges="n")
+Stadium(x=1.5, y=1, height=3, width=3, fill=skyblue, stroke=darkgray, stroke_width=8, edges="n")
 Stadium(x=1.503, y=1.003, height=3.003, width=3.003, fill=None, edges="n",
         stroke=fidred, stroke_width=5, dotted=True,)
 Circle(cx=3, cy=4, stroke=sienna, stroke_width=5, fill=skyblue, radius=1.3,
@@ -92,10 +92,10 @@ Dot(x=2.5, y=22.5, stroke=white, dot_point=3)
 
 Text(common=header_font, x=5, y=19, text="Gear: nested circles; one with 8 offset radii")
 Circle(cx=2, cy=19, radius=0.5,
-       fill=None, stroke=grey, stroke_width=8,
+       fill=None, stroke=gray, stroke_width=8,
        radii=[0,45,90,135,180,225,270,315],
-       radii_offset=0.8, radii_length=0.2, radii_stroke=grey, radii_stroke_width=8)
-Circle(cx=2, cy=19, radius=0.15, fill_stroke=grey)
+       radii_offset=0.8, radii_length=0.2, radii_stroke=gray, radii_stroke_width=8)
+Circle(cx=2, cy=19, radius=0.15, fill_stroke=gray)
 
 Text(common=header_font, x=5, y=16, text="Atom: ellipses with rotation; circle")
 atom = Common(cx=2, cy=16, width=3, height=1, stroke_width=1, outline=red)

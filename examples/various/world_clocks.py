@@ -49,7 +49,7 @@ def the_clock(
     if detail[0]:
         face = white
     else:
-        face = darkgrey
+        face = darkgray
     hand = red if detail[1] == 'AM' else black
     # adjust hours for GMT
     hours = hours + gmt

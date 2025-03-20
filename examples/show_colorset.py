@@ -24,7 +24,7 @@ for a_color in sorted(COLORS.keys()):
         "mediumblue",
         "black",
         "darkslategray",
-        "darkslategrey",
+        "darkslategray",
         "indigo",
         "teal",
         "blue",

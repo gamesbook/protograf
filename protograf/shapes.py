@@ -145,7 +145,6 @@ class ImageShape(BaseShape):
         img, is_dir = self.load_image(  # via base.BaseShape
             globals.doc_page,
             _source,
-            page_number=globals.page_count,
             origin=(x, y),
             sliced=self.sliced,
             width_height=(width, height),
@@ -160,22 +159,10 @@ class ImageShape(BaseShape):
         # ---- text
         xc = x + width / 2.0
         yc = y + height / 2.0
-        keys = {}
-        if self.heading:
-            keys['font_name'] = self.font_name
-            keys['font_size'] = self.heading_size
-            keys['stroke'] = self.heading_stroke
-            self.draw_multi_string(cnv, xc, yc, self.heading, **keys)
-        if self.label:
-            keys['font_name'] = self.font_name
-            keys['font_size'] = self.label_size
-            keys['stroke'] = self.label_stroke
-            self.draw_multi_string(cnv, xc, yc, self.label, **keys)
-        if self.title:
-            keys['font_name'] = self.font_name
-            keys['font_size'] = self.title_size
-            keys['stroke'] = self.title_stroke
-            self.draw_multi_string(cnv, xc, yc, self.title, **keys)
+        _off = self.heading_size / 2.0
+        self.draw_heading(cnv, ID, xc, yc - height / 2.0 - _off, **kwargs)
+        self.draw_label(cnv, ID, xc, yc + _off, **kwargs)
+        self.draw_title(cnv, ID, xc, yc + height / 2.0 + _off * 3.5, **kwargs)
 
 
 class ArcShape(BaseShape):
@@ -281,19 +268,8 @@ class ArrowShape(BaseShape):
         # ---- handle rotation: START
         rotation = kwargs.get("rotation", self.rotation)
         if rotation:
-            # tools.feedback(f'*** Arrow {ID=} {rotation=} {self._u.x=}, {self._u.y=}')
-            cnv.saveState()
-            # move the canvas origin
-            if ID is not None:
-                # cnv.translate(cx + self._u.margin_left, cy + self._u.margin_bottom)
-                cnv.translate(cx, cy)
-            else:
-                cnv.translate(cx, cy)
-            cnv.rotate(rotation)
-            # reset centre and "bottom centre"
-            cx, cy = 0, 0
-            x = 0
-            y = -self._u.height
+            self.centroid = muPoint(cx, cy)
+            kwargs["rotation"] = (rotation, self.centroid)
         # ---- draw arrow
         self.vertices = self.get_vertices(cx=cx, cy=cy, x=x, y=y)
         # tools.feedback(f'***Arrow {x=} {y=} {self.vertices=}')
@@ -309,9 +285,6 @@ class ArrowShape(BaseShape):
             kwargs.pop("rotation")  # otherwise labels rotate again!
         self.draw_heading(cnv, ID, x, y + self._u.height + self.head_height_u, **kwargs)
         self.draw_title(cnv, ID, x, y, **kwargs)
-        # ---- handle rotation: END
-        if rotation:
-            cnv.restoreState()
 
 
 class BezierShape(BaseShape):
@@ -2439,15 +2412,8 @@ class PolygonShape(BaseShape):
         is_rotated = False
         rotation = kwargs.get("rotation", self.rotation)
         if rotation:
-            is_rotated = True
-            # tools.feedback(f'*** POLY {ID=} {rotation=} {self._u.x=}, {self._u.y=}')
-            cnv.saveState()
-            # move the canvas origin
-            if ID is not None:
-                cnv.translate(x + self._u.margin_left, y + self._u.margin_bottom)
-            else:
-                cnv.translate(x, y)
-            cnv.rotate(rotation)
+            self.centroid = muPoint(x, y)
+            kwargs["rotation"] = (rotation, self.centroid)
         # --- handle 'orientation' (flat vs pointy)
         _geom = self.get_geometry(rotation=rotation, is_rotated=is_rotated)
         x, y, radius, vertices = _geom.x, _geom.y, _geom.radius, _geom.vertices
@@ -2492,9 +2458,6 @@ class PolygonShape(BaseShape):
         self.draw_heading(cnv, ID, x, y, 1.3 * radius, **kwargs)
         self.draw_label(cnv, ID, x, y, **kwargs)
         self.draw_title(cnv, ID, x, y, 1.4 * radius, **kwargs)
-        # ---- handle rotation: END
-        if rotation:
-            cnv.restoreState()
 
 
 class PolylineShape(BaseShape):
@@ -2616,27 +2579,33 @@ class QRCodeShape(BaseShape):
         qrcode.save(
             _source,
             scale=self.scaling or 1,
-            light=tools.color_to_hex(self.fill),
-            dark=tools.color_to_hex(self.stroke),
+            light=tools.rgb_to_hex(get_color(self.fill)),
+            dark=tools.rgb_to_hex(get_color(self.stroke)),
         )
-        img = ImageReader(_source)
-        # ---- draw code as image
-        cnv.drawImage(img, x=x, y=y, width=width, height=height, mask="auto")
-        # ---- shape's text
+        rotation = kwargs.get("rotation", self.rotation)
+        # ---- load QR image
+        # tools.feedback(f'*** IMAGE {ID=} {_source=} {x=} {y=} {self.rotation=}')
+        img, is_dir = self.load_image(  # via base.BaseShape
+            globals.doc_page,
+            _source,
+            origin=(x, y),
+            sliced=self.sliced,
+            width_height=(width, height),
+            cache_directory=cache_directory,
+            rotation=rotation,
+        )
+        if not img and not is_dir:
+            tools.feedback(
+                f'Unable to load image "{_source}!" - please check name and location',
+                True,
+            )
+        # ---- QR shape's text
         xc = x + width / 2.0
         yc = y + height / 2.0
-        if self.heading:
-            cnv.setFont(self.font_name, self.heading_size)
-            cnv.setFillColor(self.heading_stroke)
-            self.draw_multi_string(cnv, xc, y + height + cnv._leading, self.heading)
-        if self.label:
-            cnv.setFont(self.font_name, self.label_size)
-            cnv.setFillColor(self.label_stroke)
-            self.draw_multi_string(cnv, xc, yc, self.label)
-        if self.title:
-            cnv.setFont(self.font_name, self.title_size)
-            cnv.setFillColor(self.title_stroke)
-            self.draw_multi_string(cnv, xc, y - cnv._leading, self.title)
+        _off = self.heading_size / 2.0
+        self.draw_heading(cnv, ID, xc, yc - height / 2.0 - _off, **kwargs)
+        self.draw_label(cnv, ID, xc, yc + _off, **kwargs)
+        self.draw_title(cnv, ID, xc, yc + height / 2.0 + _off * 3.5, **kwargs)
 
 
 class RectangleShape(BaseShape):
@@ -3397,26 +3366,13 @@ class RhombusShape(BaseShape):
             y = self._u.y + self._o.delta_y
         cx = x + self._u.width / 2.0
         cy = y + self._u.height / 2.0
-        # ---- set canvas
-        self.set_canvas_props(index=ID)
         # ---- calculated properties
         self.area = (self._u.width * self._u.height) / 2.0
         # ---- handle rotation: START
         rotation = kwargs.get("rotation", self.rotation)
         if rotation:
-            # tools.feedback(f'*** RHOMB {ID=} {rotation=} {self._u.x=}, {self._u.y=}')
-            cnv.saveState()
-            # move the canvas origin
-            if ID is not None:
-                # cnv.translate(cx + self._u.margin_left, cy + self._u.margin_bottom)
-                cnv.translate(cx, cy)
-            else:
-                cnv.translate(cx, cy)
-            cnv.rotate(rotation)
-            # reset centre and "bottom left"
-            cx, cy = 0, 0
-            x = -self._u.width / 2.0
-            y = -self._u.height / 2.0
+            self.centroid = muPoint(cx, cy)
+            kwargs["rotation"] = (rotation, self.centroid)
         # ---- draw rhombus
         self.vertices = self.get_vertices(cx=cx, cy=cy, x=x, y=y)
         # tools.feedback(f'***Rhombus {x=} {y=} {self.vertices=}')
@@ -3447,9 +3403,6 @@ class RhombusShape(BaseShape):
             cnv, ID, x + self._u.width / 2.0, y + self._u.height / 2.0, **kwargs
         )
         self.draw_title(cnv, ID, x + self._u.width / 2.0, y, **kwargs)
-        # ---- handle rotation: END
-        if rotation:
-            cnv.restoreState()
 
 
 class RightAngledTriangleShape(BaseShape):
@@ -3697,19 +3650,8 @@ class StadiumShape(BaseShape):
         # ---- handle rotation: START
         rotation = kwargs.get("rotation", self.rotation)
         if rotation:
-            # tools.feedback(f'*** Stad {ID=} {rotation=} {self._u.x=}, {self._u.y=}')
-            cnv.saveState()
-            # move the canvas origin
-            if ID is not None:
-                # cnv.translate(cx + self._u.margin_left, cy + self._u.margin_bottom)
-                cnv.translate(cx, cy)
-            else:
-                cnv.translate(cx, cy)
-            cnv.rotate(rotation)
-            # reset centre and "bottom left"
-            cx, cy = 0, 0
-            x = -self._u.width / 2.0
-            y = -self._u.height / 2.0
+            self.centroid = muPoint(cx, cy)
+            kwargs["rotation"] = (rotation, self.centroid)
         # ---- vertices
         self.vertices = [  # clockwise from top-left; relative to centre
             Point(x, y),
@@ -3822,16 +3764,8 @@ class StarShape(BaseShape):
         is_rotated = False
         rotation = kwargs.get("rotation", self.rotation)
         if rotation:
-            is_rotated = True
-            # tools.feedback(f'*** Star {ID=} {rotation=} {x=}, {y=}')
-            cnv.saveState()
-            # move the canvas origin
-            if ID is not None:
-                cnv.translate(x + self._u.margin_left, y + self._u.margin_bottom)
-            else:
-                cnv.translate(x, y)
-            cnv.rotate(rotation)
-            x, y = 0, 0
+            self.centroid = muPoint(x, y)
+            kwargs["rotation"] = (rotation, self.centroid)
         # ---- calculate vertices
         self.vertices_list = []
         self.vertices_list.append(muPoint(x, y + radius))
@@ -3858,9 +3792,6 @@ class StarShape(BaseShape):
         self.draw_heading(cnv, ID, x, y + radius, **kwargs)
         self.draw_label(cnv, ID, x, y, **kwargs)
         self.draw_title(cnv, ID, x, y - radius, **kwargs)
-        # ---- handle rotation: END
-        if rotation:
-            cnv.restoreState()
 
 
 class StarFieldShape(BaseShape):

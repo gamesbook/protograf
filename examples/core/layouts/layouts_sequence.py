@@ -63,7 +63,7 @@ Sequence(
     )
 Sequence(
     [hexagon(x=0.5, y=1.5, radius=0.5, title_size=8, title="Fig. {{sequence}}"),
-     circle(cx=1, cy=2, radius=0.2, fill=grey)],
+     circle(cx=1, cy=2, radius=0.2, fill="gray")],
     setting=('C', 'A', -1),
     interval_y=1.5,
     interval_x=0.5,

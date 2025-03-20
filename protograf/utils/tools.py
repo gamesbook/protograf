@@ -762,6 +762,15 @@ def color_to_hex(name):
     return _string.upper()
 
 
+def rgb_to_hex(color):
+    """Convert a RGB tuple color to a hexadecimal string"""
+    if color is None:
+        return color
+    _tuple = (int(color[0] * 255), int(color[1] * 255), int(color[2] * 255))
+    _string = "#%02x%02x%02x" % _tuple
+    return _string.upper()
+
+
 def alpha_column(num: int, lower: bool = False) -> string:
     """Convert a number to a letter-based notation
 

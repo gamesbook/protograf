@@ -1755,7 +1755,6 @@ class BaseShape:
         self,
         pdf_page: muPage,
         image_location: str = None,
-        page_number: int = 0,
         origin: tuple = None,
         sliced: str = None,
         width_height: tuple = None,
@@ -1772,8 +1771,6 @@ class BaseShape:
         Args:
             image_location:
                 full path or URL for image
-            page_number:
-                page number of PDF where image is to be added
             origin:
                 x, y location of image on Page
             sliced:
@@ -1781,7 +1778,8 @@ class BaseShape:
                 't', 'm', 'b', 'l', 'c', or 'r'
             width_height:
                 the (width, height) of the output frame for the image;
-                will be used along with x,y to set size and position
+                will be used along with x,y to set size and position;
+                will be recalcuated if image is rotated
             cache_directory:
                 where to store a local for copy for URL-sourced images
             rotation:
@@ -1885,14 +1883,15 @@ class BaseShape:
             pdf_page.show_pdf_page(
                 rct,  # where to place the image (rect-like)
                 imgpdf,  # source PDF
-                pno=0,  # page number in *source* PDF (not current PDF)
+                pno=0,  # page number in *source* PDF (NOT current PDF)
                 clip=None,  # only display this area (rect-like)
                 rotate=self.rotation,  # rotate (float, any value)
                 oc=0,  # control visibility via OCG / OCMD
                 keep_proportion=True,  # keep aspect ratio
                 overlay=True,  # put in foreground
             )
-            #  cnv.draw_rect(rct) #  optional??
+            if self.run_debug:
+                pdf_page.draw_rect(rct, color=get_color(DEBUG_COLOR))
             return True
 
         img = False
@@ -1920,20 +1919,28 @@ class BaseShape:
                 return img, True
 
         # ---- calculate outline for image
-        scaffold = (
-            origin[0], origin[1],
-            origin[0] + width_height[0], origin[1] + width_height[1])
+        width, height = width_height[0], width_height[1]
+        scaffold = (origin[0], origin[1], origin[0] + width, origin[1] + height)
         if rotation is not None:
-            # need larger rect!
-            pass
+            # need a larger rect!
+            theta = math.radians(self.rotation)
+            new_width = width * math.cos(theta) + height * math.sin(theta)
+            new_height = width * math.sin(theta) + height * math.cos(theta)
+            dx = new_width - width
+            dy = new_height - height
+            new_origin = (origin[0] - dx * 0.5, origin[1] - dy * 0.5)
+            scaffold = (
+                new_origin[0],
+                new_origin[1],
+                new_origin[0] + new_width,
+                new_origin[1] + new_height,
+            )
 
         # ---- render image
         try:
             img = image_render(image_location)
             if sliced:
-                sliced_filename = slice_image(
-                    img, sliced, width_height=width_height
-                )
+                sliced_filename = slice_image(img, sliced, width_height=width_height)
                 if sliced_filename:
                     img = image_render(sliced_filename)
             return img, is_directory
@@ -2559,7 +2566,7 @@ class BaseShape:
                             tools.feedback(f"Cannot draw borders for a {shape_name}")
 
             # ---- draw line
-            cnv.draw((x, y), (x_1, y_1))
+            cnv.draw_line((x, y), (x_1, y_1))
             self.set_canvas_props(
                 index=ID,
                 stroke=bcolor,

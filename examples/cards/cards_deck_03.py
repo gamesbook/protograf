@@ -13,8 +13,8 @@ Deck(
     cards=4,
     height=3.2,
     width=2.1,
-    fill=silver,
-    bleed_fill=grey)
+    fill="lightsteelblue",
+    bleed_fill="gray")
 # design card
 Card(
     '*',

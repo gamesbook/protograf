@@ -145,7 +145,7 @@ PageBreak()
 # ---- notches
 Blueprint()
 Text(common=txt, text="Rectangle : Notch Styles")
-styles = Common(height=1, width=3.5, x=0.25, notch=0.25, label_size=7, fill=silver)
+styles = Common(height=1, width=3.5, x=0.25, notch=0.25, label_size=7, fill="lightsteelblue")
 Rectangle(common=styles, y=0, notch_style='snip', label='Notch: snip (s)')
 Rectangle(common=styles, y=1.5, notch_style='step', label='Notch: step (t)')
 Rectangle(common=styles, y=3, notch_style='fold', label='Notch: fold (o)')

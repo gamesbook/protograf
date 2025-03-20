@@ -233,7 +233,7 @@ Track(
     clockwise=True,
     start=24
 )
-shp5 = circle(common=score, fill=aqua)
+shp5 = circle(common=score, fill="cyan")
 Track(
     trk,
     shapes=[shp5],

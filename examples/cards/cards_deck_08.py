@@ -14,7 +14,7 @@ Deck(
     height=3.2,
     width=2.1,
     stroke=None,
-    bleed_fill=silver,
+    bleed_fill="lightsteelblue",
     offset=0.15,
     grid_marks=True,
     grid_length=0.18,

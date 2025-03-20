@@ -13,8 +13,8 @@ Create(filename="traveller_black.pdf", margin=0.25, paper="A4")
 
 # set colors
 map_fill = black
-hex_lines = lightgrey
-map_border = lightgrey
+hex_lines = lightgray
+map_border = lightgray
 
 Rectangle(x=0.0, y=-0.05, width=20, height=29.2, stroke=map_fill, fill=map_fill)
 

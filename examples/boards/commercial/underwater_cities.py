@@ -36,7 +36,7 @@ Grid(x=0.25, y=0.4, side=1.25, stroke="#587CBC")
 Rectangle(x=0, y=0, width=59.4, height=42, fill=white, transparency=20)
 
 # Outline
-drect = Common(fill=None, stroke=grey, dashed=[0.2, 0.1], rounding=0.5, stroke_width=2)
+drect = Common(fill=None, stroke=gray, dashed=[0.2, 0.1], rounding=0.5, stroke_width=2)
 
 # Action Cards Slots: Red
 rrect = rectangle(common=drect, x=-0.5, y=4.25, height=6., width=6.75)
@@ -148,7 +148,7 @@ Rectangle(
     x=57.4, y=6, width=2.4, height=30, fill_stroke="#554F52", rounding=0.4,
     hatch_count=12, hatch='w', hatch_stroke="#4E6B9A")
 Sequence(
-    text(x=58.5, y=6.8, font_size=24, stroke=grey, text="{{sequence}}"),
+    text(x=58.5, y=6.8, font_size=24, stroke=gray, text="{{sequence}}"),
     setting=[1,2,3,4,' ',5,6,7,' ',8,9,10],
     interval_y=2.3)
 

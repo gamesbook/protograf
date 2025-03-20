@@ -247,7 +247,7 @@ PageBreak()
 Blueprint()
 Text(common=txt, text="Stadium: red => rotation 60\u00B0")
 Stadium(cx=2, cy=3, width=1.25, height=2, dot=0.06)
-Stadium(cx=2, cy=3, width=1.25, height=2, fill=None,
+Stadium(cx=2, cy=3, width=1.25, height=2,
         stroke="red", stroke_width=.3, rotation=60, dot=0.04)
 PageBreak()
 
@@ -363,7 +363,7 @@ PageBreak()
 # ---- star shape
 Blueprint(stroke_width=0.5)
 Text(common=txt, text="Shape label: offsets")
-Star(cx=2, cy=3, radius=2, fill=yellow, stroke="red", rotation=45)
+Star(cx=2, cy=3, radius=2, fill="yellow", stroke="red", rotation=45)
 PageBreak()
 
 # ---- shapeshape
@@ -379,10 +379,10 @@ Polyshape(
       points=[(0, 0), (0, 1), (1,  2), (2, 1), (2, 0)],
       cx=1, cy=1,
       label='A House',
-      label_stroke=olive,
+      label_stroke="seagreen",
       cross=0.5,
-      fill=sandybrown,
-      stroke=peru,
+      fill="sandybrown",
+      stroke="peru",
 )
 PageBreak()
 
@@ -450,7 +450,7 @@ Blueprint()
 Text(common=txt, text="Arrow: sizes")
 Arrow(x=1, y=1, height=1, width=0.5, head_height=0.5, head_width=0.75)
 Arrow(x=2, y=1, height=1, width=0.5, head_height=0.5, head_width=0.75, tail_width=0.75,
-      stroke="tomato", fill=silver, stroke_width=2, transparency=50)
+      stroke="tomato", fill="lightsteelblue", stroke_width=2, transparency=50)
 Arrow(x=3, y=1, height=1, width=0.5, head_height=0.5, head_width=0.75, tail_width=0.01,
       fill_stroke="gold")
 Arrow(x=1, y=3, height=1, width=0.25, head_height=0.5, head_width=1, points_offset=-0.25,
@@ -458,7 +458,7 @@ Arrow(x=1, y=3, height=1, width=0.25, head_height=0.5, head_width=1, points_offs
 Arrow(x=2, y=3, height=1, width=0.25, head_height=1, head_width=0.75, points_offset=0.25,
       fill="tomato")
 Arrow(x=3, y=3, height=1, width=0.5, head_height=0.5, head_width=0.5, tail_notch=0.25,
-      stroke="black", fill=aqua, stroke_width=1)
+      stroke="black", fill="cyan", stroke_width=1)
 PageBreak()
 
 # ---- arrow - rotate, text
@@ -485,7 +485,7 @@ PageBreak()
 Blueprint()
 Text(common=txt, text="Centred Shape: move + double")
 small_star = star(radius=0.25)
-small_circle = circle(radius=0.33, fill=grey, centre_shape=small_star)
+small_circle = circle(radius=0.33, fill="gray", centre_shape=small_star)
 Hexagon(x=1, y=0.5, height=2, hatch_count=5, hatch_stroke="red", dot=0.1,
         centre_shape=small_circle)
 Hexagon(x=1, y=3, height=2,
@@ -501,7 +501,7 @@ QRCode(
     text="Help me ObiWan",
     x=1, y=3,
     height=2, width=2,
-    fill=grey,
+    fill="gray",
     stroke="red",
     scaling=5
 )

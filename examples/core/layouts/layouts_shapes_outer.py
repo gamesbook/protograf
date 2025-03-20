@@ -21,7 +21,7 @@ rct_common = Common(label_size=5, points=[('s', 0.1)], height=0.5, width=0.5)
 # ---- multi-shapes
 
 sqr = square(common=is_common, side=0.9, label_size=6)
-sqr5 = square(common=is_common, side=1.0, label_size=8, fill=yellow)
+sqr5 = square(common=is_common, side=1.0, label_size=8, fill="yellow")
 
 Blueprint(stroke_width=0.5)
 Text(common=header, text="Rect.Locations: SW->north/outer + sequence")

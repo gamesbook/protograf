@@ -31,7 +31,7 @@ Deck(
     grid_marks=True,
     rounding=0.3,
     fill=None,
-    stroke=grey,
+    stroke=gray,
     mask="{{ Race == 'Hobbit' }}",
     copy='Copies')
 
@@ -41,7 +41,7 @@ back_hum = rectangle(common=back_race, fill_stroke="tomato")
 back_elf = rectangle(common=back_race, fill_stroke="gold")
 back_dwa = rectangle(common=back_race, fill_stroke="cyan")
 back_hob = rectangle(common=back_race, fill_stroke="chartreuse")
-back_naz = rectangle(common=back_race, fill_stroke=grey)
+back_naz = rectangle(common=back_race, fill_stroke=gray)
 Card("all", S("{{ Race == 'Human' }}", back_hum))
 Card("all", S("{{ Race == 'Elf' }}", back_elf))
 Card("all", S("{{ Race == 'Dwarf' }}", back_dwa))

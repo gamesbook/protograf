@@ -10,7 +10,7 @@ from protograf import *
 
 Create(filename="ack_map.pdf", margin=0.5, paper=landscape(A3))
 
-deepgrey = "#666666"
+deepgray = "#666666"
 
 # Header Section
 Text(
@@ -23,7 +23,7 @@ Text(
     font_size=23,
     text="ADVENTURER CONQUEROR KING",
 )
-Rectangle(x=15, y=27.5, width=22.5, height=1.5, stroke=darkgrey, stroke_width=1.5)
+Rectangle(x=15, y=27.5, width=22.5, height=1.5, stroke=darkgray, stroke_width=1.5)
 
 # Base Map (small numbered hexes)
 Hexagons(
@@ -37,10 +37,10 @@ Hexagons(
     coord_elevation="top",
     coord_offset=-0.1,
     coord_font_size=8,
-    coord_stroke=deepgrey,
+    coord_stroke=deepgray,
     coord_padding=2,
     fill=white,
-    stroke=deepgrey,
+    stroke=deepgray,
     stroke_width=1.2,
 )
 
@@ -55,7 +55,7 @@ Hexagons(
     margin_left=2,
     hex_offset="odd",
     fill=None,
-    stroke=darkgrey,
+    stroke=darkgray,
     stroke_width=3,
 )
 

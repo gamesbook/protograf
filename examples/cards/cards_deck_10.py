@@ -12,7 +12,7 @@ Create(filename='cards_deck_10.pdf', margin=0.25, paper="A8")
 Deck(
     cards=6,
     radius=1,
-    bleed_fill=silver,
+    bleed_fill="lightsteelblue",
     offset=0.15,
     grid_marks=True,
     grid_length=0.18,

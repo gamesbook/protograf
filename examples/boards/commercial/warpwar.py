@@ -15,7 +15,7 @@ Create(filename="warpwar.pdf", margin=0.5, paper="A2")
 
 # set map colors
 map_fill = black
-map_border = lightgrey
+map_border = lightgray
 grid_line = "#AA9A38"
 system_label = "#1CAEE5"
 warp = "#2ACD21"

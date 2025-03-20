@@ -20,7 +20,7 @@ Data(filename="counters.csv")
 CounterSheet(width=2.6, height=2.6, fill=white, grid_marks=True, copy='COPIES')
 
 # colors and text labels
-grey = "#B8BAB1"
+gray = "#B8BAB1"
 brown = "#B6A378"
 value = text(font_name="Helvetica", font_size=18, x=1.3, y=0.5, text=T('{{ VALUE }}'))
 size = text(font_name="Helvetica", font_size=12, x=1.3, y=1.9, text=T('{{ SIZE }}'))
@@ -29,7 +29,7 @@ ident = text(font_name="Helvetica", font_size=12, x=0.55, y=1.18, align='left', 
 
 # national colors
 troop = Common(x=0, y=0, width=2.6, height=2.6, stroke_width=1)
-german = rectangle(common=troop, fill=grey)
+german = rectangle(common=troop, fill="gray")
 russian = rectangle(common=troop, fill=brown)
 
 # unit symbol - basic elements

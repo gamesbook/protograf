@@ -46,7 +46,7 @@ value_top = text(
     font_size=28,
     text=T('{{VALUE}}'),
     align="centre",
-    stroke=darkslategrey)
+    stroke=darkslategray)
 icon_btm = hexagon(
     x=3.8, y=0.9,
     side=0.8,
@@ -56,7 +56,7 @@ value_btm = text(
     font_size=28,
     align="centre",
     text=T('{{VALUE}}'),
-    stroke=darkslategrey,
+    stroke=darkslategray,
     rotation=180)
 picture = text(
     x=3.0, y=3.3,

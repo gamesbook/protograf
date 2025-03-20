@@ -187,7 +187,7 @@ Hexagons(
     stroke=None, fill=None,
     height=.75,
     hex_layout="circle",
-    centre_shape=hexagon(stroke="black", fill=silver, height=0.6, stroke_width=2),
+    centre_shape=hexagon(stroke="black", fill="lightsteelblue", height=0.6, stroke_width=2),
 )
 PageBreak()
 

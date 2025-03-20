@@ -14,8 +14,8 @@ Deck(
     height=3.2,
     width=2.1,
     stroke="red",
-    fill=silver,
-    bleed_fill=grey,
+    fill="lightsteelblue",
+    bleed_fill="gray",
     offset=0.25,
     )
 # design card
