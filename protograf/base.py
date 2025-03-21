@@ -290,7 +290,7 @@ WIDTH = 0.1
 CLOCK_ANGLES = [60, 90, 120, 150, 180, 210, 240, 270, 300, 330, 0, 30]
 
 
-def get_color(name:str = None, is_rgb:bool = True) -> tuple:
+def get_color(name: str = None, is_rgb: bool = True) -> tuple:
     """Get a color tuple; by name from a pre-defined dictionary or as a RGB tuple."""
     if name is None:
         return None  # it IS valid to say that NO color has been set
@@ -304,7 +304,7 @@ def get_color(name:str = None, is_rgb:bool = True) -> tuple:
         else:
             tools.feedback(f'The color tuple "{name}" is invalid!')
     elif isinstance(name, str) and len(name) == 7 and name[0] == "#":  # hexadecimal
-        _rgb = tuple(int(name[i: i + 2], 16) for i in (1, 3, 5))
+        _rgb = tuple(int(name[i : i + 2], 16) for i in (1, 3, 5))
         rgb = tuple(i / 255 for i in _rgb)
         return rgb
     else:
@@ -323,10 +323,11 @@ def get_opacity(transparency: float = 0) -> float:
     if transparency is None:
         return 1.0
     try:
-        return float(1.0 - transparency / 100.)
+        return float(1.0 - transparency / 100.0)
     except (ValueError, TypeError):
         tools.feedback(
-            f'The transparency of "{transparency}" is not valid (use 0 to 100)', True)
+            f'The transparency of "{transparency}" is not valid (use 0 to 100)', True
+        )
 
 
 class BaseCanvas:
@@ -435,7 +436,9 @@ class BaseCanvas:
         self.fill_stroke = self.defaults.get("fill_stroke", None)
         self.stroke_fill = self.defaults.get("stroke_fill", None)  # alias
         # ---- stroke
-        stroke = self.defaults.get("stroke", self.defaults.get("stroke_color")) or "black"
+        stroke = (
+            self.defaults.get("stroke", self.defaults.get("stroke_color")) or "black"
+        )
         self.stroke = get_color(stroke)
         self.stroke_width = self.defaults.get("stroke_width", WIDTH)
         self.outline = self.defaults.get("outline", None)
@@ -1278,10 +1281,8 @@ class BaseShape:
             if self.margin_bottom is not None
             else self.margin
         )
-        margin_top= (
-            self.unit(self.margin_top)
-            if self.margin_top is not None
-            else self.margin
+        margin_top = (
+            self.unit(self.margin_top) if self.margin_top is not None else self.margin
         )
         off_x = self.unit(off_x) if off_x is not None else None
         off_y = self.unit(off_y) if off_y is not None else None
@@ -1965,7 +1966,8 @@ class BaseShape:
         try:
             if sliced:
                 sliced_filename = slice_image(
-                    pathlib.Path(image_location), sliced, width_height)
+                    pathlib.Path(image_location), sliced, width_height
+                )
                 if sliced_filename:
                     img = image_render(sliced_filename)
             else:
@@ -2313,11 +2315,15 @@ class BaseShape:
             canvas.draw_circle((x, y), dot_size)
             self.set_canvas_props(cnv=canvas, index=None, **kwargs)
 
-    def draw_cross(self, canvas, xd, yd):
+    def draw_cross(self, canvas, xd, yd, **kwargs):
         """Draw a cross on a shape (normally the centre)."""
         if self.cross:
             cross_size = self.unit(self.cross)
-            kwargs = {}
+            rotation = kwargs.get("rotation")
+            if rotation:
+                kwargs = {"rotation": rotation}
+            else:
+                kwargs = {}
             kwargs["fill"] = self.cross_stroke
             kwargs["stroke"] = self.cross_stroke
             kwargs["stroke_width"] = self.cross_stroke_width
@@ -2374,14 +2380,15 @@ class BaseShape:
             # display vertex index number next to vertex
             if kwargs.get("vertices", []):
                 kwargs["fill"] = self.debug_color
-                canvas.setFont(self.font_name, 4)
+                kwargs["font_name"] = self.font_name
+                kwargs["font_size"] = 4
                 for key, vert in enumerate(kwargs.get("vertices")):
                     x = self.points_to_value(vert.x)
                     y = self.points_to_value(vert.y)
                     self.draw_multi_string(
-                        canvas, vert.x, vert.y, f"{key}:{x:.2f},{y:.2f}"
+                        canvas, vert.x, vert.y, f"{key}:{x:.2f},{y:.2f}", **kwargs
                     )
-                    canvas.draw_circle((vert.x, vert.y))
+                    canvas.draw_circle((vert.x, vert.y), 2)
             # display labelled point (geoms.Point)
             if kwargs.get("point", []):
                 point = kwargs.get("point")

@@ -1086,6 +1086,7 @@ def Blueprint(**kwargs):
             units=kwargs["units"],
         )
         offset = _common.points_to_value(kwargs["font_size"]) / 2.0
+        offset_edge = _common.points_to_value(kwargs["font_size"]) * 1.25
         fixed_y, fixed_x = None, None
         if "n" in edges:
             for x in range(1, kwargs["cols"] + 1):
@@ -1099,7 +1100,7 @@ def Blueprint(**kwargs):
             for x in range(1, kwargs["cols"] + 1):
                 Text(
                     x=x * side,
-                    y=kwargs["y"] + kwargs["rows"] * side + globals.margin_bottom / 2.0,
+                    y=kwargs["y"] + kwargs["rows"] * side + offset_edge,
                     text=set_format(x, side),
                     common=_common,
                 )

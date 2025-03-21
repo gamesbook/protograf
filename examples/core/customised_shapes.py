@@ -25,12 +25,12 @@ Footer(draw=False)
 txt = Common(x=0, y=0, font_size=8, align="left")
 
 Text(common=txt, text="Shapes START...")
-Text(x=0, y=5, font_size=8, align="left", text=Today())
-PageBreak(footer=True)
+Text(x=0, y=6, font_size=8, align="left", text=Today())
+PageBreak()
 
 # ---- blueprint custom
-Blueprint(subdivisions=5, stroke_width=0.5, style='invert')
-Text(common=txt, text="Blueprint: subdiv;invert;stroke")
+Blueprint(subdivisions=5, stroke_width=0.5, style='invert', edges="n s e w")
+Text(common=txt, text="Blueprint: style;edges;subdivisions", stroke="gray")
 PageBreak()
 
 # ---- dot & cross
@@ -52,7 +52,7 @@ Trapezoid(common=shp_font, cx=1, cy=5, heading="Trapezoid cx=1;cy=5")
 Rhombus(common=shp_font, cx=3, cy=5, heading="Rhombus cx=3;cy=5")
 Star(common=shp_font, cx=1, cy=3, heading="Star cx=1;cy=3")
 Ellipse(common=shp_font, cx=3, cy=3, width=2, height=1, heading="Ellipse cx=3;cy=3")
-Polygon(common=shp_font, cx=2, cy=1, sides=7, label="Polygon-7 cx2=;cy=1")
+Polygon(common=shp_font, cx=2, cy=1, radius=0.8, sides=7, heading="Polygon-7 cx2=;cy=1")
 PageBreak()
 
 # ---- RA triangles
@@ -127,9 +127,7 @@ EquilateralTriangle(
 EquilateralTriangle(
     x=2, y=1, flip="south", hand="west", label="SW", fill="blue")
 EquilateralTriangle(
-    x=1, y=4, stroke_width=1, rotation=45, dot=.05)
-# EquilateralTriangle(cx=2, cy=2, side=1, stroke_width=1, dot=.02, label="|+|", rotation=45, debug=True)
-# EquilateralTriangle(cx=3, cy=4, side=1, stroke_width=1, dot=.02, label="|+|")
+    x=0.5, y=3.5, side=1.5, stroke_width=1, rotation=45, dot=.05)
 PageBreak()
 
 # ---- RA Triangle
@@ -182,10 +180,10 @@ PageBreak()
 # ---- stadium
 Blueprint()
 Text(common=txt, text="Stadium: edges")
-Stadium(x=0, y=0, height=1, width=1, edges='n', fill="tan", label="north")
+Stadium(x=0, y=1, height=1, width=1, edges='n', fill="tan", label="north")
 Stadium(x=3, y=1, height=1, width=1, edges='s', fill="tan", label="south")
-Stadium(x=0, y=4, height=1, width=1, edges='e', fill="tan", label="east")
-Stadium(x=3, y=5, height=1, width=1, edges='w', fill="tan", label="west")
+Stadium(x=0, y=3, height=1, width=1, edges='e', fill="tan", label="east")
+Stadium(x=3, y=4, height=1, width=1, edges='w', fill="tan", label="west")
 PageBreak()
 
 # ---- trapezoid
@@ -202,7 +200,7 @@ PageBreak()
 # ---- chord
 Blueprint()
 Text(common=txt, text="Chord: 135 to 45 degrees")
-Chord(shape=Circle(cx=2, cy=2, radius=2, fill=None), angle=135, angle1=45, label="chord")
+Chord(shape=Circle(cx=2, cy=2, radius=1.5, fill=None), angle=135, angle1=45, label="chord")
 PageBreak()
 
 # ---- polygon radii
@@ -238,12 +236,16 @@ Text(common=dtext, y=1, text="5.  "+Today(details="datetime", style="eur"))
 PageBreak()
 
 # ---- rotation: image
-Blueprint(style="gray")
+Blueprint()
 Text(common=txt, text="Images: normal & rotation")
 Image("sholes_typewriter.png", x=0, y=1, width=1.5, height=1.5, title="PNG")
 Image("sholes_typewriter.png", x=2, y=1, width=1.5, height=1.5, title="60\u00B0", rotation=60)
-Image("noun-typewriter-3933515.svg", x=0, y=4, scaling=0.15, title="SVG")
-Image("noun-typewriter-3933515.svg", x=2, y=4, scaling=0.15, title="45\u00B0", rotation=45)
+Image("noun-typewriter-3933515.svg",
+      width=1.5, height=1.5,
+      x=0, y=4, title="SVG")
+Image("noun-typewriter-3933515.svg",
+      width=1.5, height=1.5,
+      x=2, y=4, title="45\u00B0", rotation=45)
 PageBreak()
 
 # ---- rotation: rhombus
@@ -380,15 +382,15 @@ PageBreak()
 # ---- shapeshape
 Blueprint(stroke_width=0.5)
 Text(common=txt, text="Polyshape: default")
-Polyshape(points=[(0, 0), (0, 1), (1,  2), (2, 1), (2, 0)])
+Polyshape(points=[(1, 1), (1, 2), (2, 3), (3, 2), (3, 1)])
 PageBreak()
 
 # ---- shapeshape - custom
 Blueprint(stroke_width=0.5)
 Text(common=txt, text="Polyshape: custom")
 Polyshape(
-      points=[(0, 0), (0, 1), (1,  2), (2, 1), (2, 0)],
-      cx=1, cy=1,
+      points=[(1, 1), (1, 2), (2, 3), (3, 2), (3, 1)],
+      cx=2, cy=2,
       label='A House',
       label_stroke="seagreen",
       cross=0.5,
@@ -497,10 +499,12 @@ Blueprint()
 Text(common=txt, text="Centred Shape: move + double")
 small_star = star(radius=0.25)
 small_circle = circle(radius=0.33, fill="gray", centre_shape=small_star)
-Hexagon(x=1, y=0.5, height=2, hatch_count=5, hatch_stroke="red", dot=0.1,
+Hexagon(x=1, y=0.5, height=2,
+        dot=0.1,
         centre_shape=small_circle)
 Hexagon(x=1, y=3, height=2,
-        centre_shape=small_circle, centre_shape_mx=0.3, centre_shape_my=0.6)
+        centre_shape=small_circle,
+        centre_shape_mx=0.3, centre_shape_my=0.6)
 PageBreak()
 
 # ---- QR Code

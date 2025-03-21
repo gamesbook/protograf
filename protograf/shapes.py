@@ -280,7 +280,7 @@ class ArrowShape(BaseShape):
         # ---- dot
         self.draw_dot(cnv, cx, cy)
         # ---- cross
-        self.draw_cross(cnv, cx, cy)
+        self.draw_cross(cnv, cx, cy, rotation=kwargs.get("rotation"))
         # ---- text
         if kwargs and kwargs.get("rotation"):
             kwargs.pop("rotation")  # otherwise labels rotate again!
@@ -844,7 +844,7 @@ class CircleShape(BaseShape):
             elif cshape_name not in GRID_SHAPES_WITH_CENTRE:
                 tools.feedback(f"Cannot draw a centered {cshape_name}!")
         # ---- cross
-        self.draw_cross(cnv, self.x_c, self.y_c)
+        self.draw_cross(cnv, self.x_c, self.y_c, rotation=kwargs.get("rotation"))
         # ---- dot
         self.draw_dot(cnv, self.x_c, self.y_c)
         # ---- text
@@ -1092,7 +1092,7 @@ class CompassShape(BaseShape):
                         pass
 
         # ---- cross
-        self.draw_cross(cnv, self.x_c, self.y_c)
+        self.draw_cross(cnv, self.x_c, self.y_c, rotation=kwargs.get("rotation"))
         # ---- dot
         self.draw_dot(cnv, self.x_c, self.y_c)
         # ---- text
@@ -1188,7 +1188,7 @@ class EllipseShape(BaseShape):
         cnv.draw_oval((x, y, x + self._u.width, y + self._u.height))
         self.set_canvas_props(cnv=cnv, index=ID, **kwargs)  # shape.finish()
         # ---- cross
-        self.draw_cross(cnv, x_d, y_d)
+        self.draw_cross(cnv, x_d, y_d, rotation=kwargs.get("rotation"))
         # ---- dot
         self.draw_dot(cnv, x_d, y_d)
         # ---- text
@@ -2064,7 +2064,7 @@ class HexShape(BaseShape):
             elif cshape_name not in GRID_SHAPES_WITH_CENTRE:
                 tools.feedback(f"Cannot draw a centered {cshape_name}!")
         # ---- cross
-        self.draw_cross(cnv, self.x_d, self.y_d)
+        self.draw_cross(cnv, self.x_d, self.y_d, rotation=kwargs.get("rotation"))
         # ---- dot
         self.draw_dot(cnv, self.x_d, self.y_d)
         # ---- text
@@ -2437,7 +2437,7 @@ class PolygonShape(BaseShape):
         # ---- dot
         self.draw_dot(cnv, x, y)
         # ---- cross
-        self.draw_cross(cnv, x, y)
+        self.draw_cross(cnv, x, y, rotation=kwargs.get("rotation"))
         # ---- text
         if kwargs and kwargs.get("rotation"):
             kwargs.pop("rotation")  # otherwise labels rotate again!
@@ -3285,7 +3285,7 @@ class RectangleShape(BaseShape):
             elif cshape_name not in GRID_SHAPES_WITH_CENTRE:
                 tools.feedback(f"Cannot draw a centered {cshape_name}!")
         # ---- cross
-        self.draw_cross(cnv, x_d, y_d)
+        self.draw_cross(cnv, x_d, y_d, rotation=kwargs.get("rotation"))
         # ---- dot
         self.draw_dot(cnv, x_d, y_d)
         # ---- text
@@ -3364,7 +3364,12 @@ class RhombusShape(BaseShape):
         # ---- dot
         self.draw_dot(cnv, x + self._u.width / 2.0, y + self._u.height / 2.0)
         # ---- cross
-        self.draw_cross(cnv, x + self._u.width / 2.0, y + self._u.height / 2.0)
+        self.draw_cross(
+            cnv,
+            x + self._u.width / 2.0,
+            y + self._u.height / 2.0,
+            rotation=kwargs.get("rotation"),
+        )
         # ---- text
         if kwargs and kwargs.get("rotation"):
             kwargs.pop("rotation")  # otherwise labels rotate again!
@@ -3543,7 +3548,7 @@ class ShapeShape(BaseShape):
                 # ---- * dot
                 self.draw_dot(cnv, x, y)
                 # ---- * cross
-                self.draw_cross(cnv, x, y)
+                self.draw_cross(cnv, x, y, rotation=kwargs.get("rotation"))
                 # ---- * text
                 self.draw_label(cnv, ID, x, y, **kwargs)
         else:
@@ -3693,7 +3698,12 @@ class StadiumShape(BaseShape):
         self.set_canvas_props(cnv=cnv, index=ID, **kwargs)
 
         # ---- cross
-        self.draw_cross(cnv, x + self._u.width / 2.0, y + self._u.height / 2.0)
+        self.draw_cross(
+            cnv,
+            x + self._u.width / 2.0,
+            y + self._u.height / 2.0,
+            rotation=kwargs.get("rotation"),
+        )
         # ---- dot
         self.draw_dot(cnv, x + self._u.width / 2.0, y + self._u.height / 2.0)
         # ---- text
@@ -3757,7 +3767,7 @@ class StarShape(BaseShape):
         # ---- dot
         self.draw_dot(cnv, x, y)
         # ---- cross
-        self.draw_cross(cnv, x, y)
+        self.draw_cross(cnv, x, y, rotation=kwargs.get("rotation"))
         # ---- text
         if kwargs and kwargs.get("rotation"):
             kwargs.pop("rotation")  # otherwise labels rotate again!
@@ -3918,11 +3928,20 @@ class TextShape(BaseShape):
             elif _trans in ["l", "low", "lower", "lowercase"]:
                 _text = _text.lower()
             elif _trans in [
-                    "c", "capitalise", "capitalize",
-                    "t", "title", "titlecase", "titlelise", "titlelize",  ]:
+                "c",
+                "capitalise",
+                "capitalize",
+                "t",
+                "title",
+                "titlecase",
+                "titlelise",
+                "titlelize",
+            ]:
                 _text = _text.title()
             else:
-                tools.feedback(f"The transform {self.transform} is unknown.", False, True)
+                tools.feedback(
+                    f"The transform {self.transform} is unknown.", False, True
+                )
         # ---- text rotation
         if self.rotation is None or self.rotation == 0:
             text_rotation = 0
@@ -3981,7 +4000,7 @@ class TextShape(BaseShape):
             try:
                 keys["opacity"] = get_opacity(self.transparency)
                 if self.css:
-                    keys["css"] = '* {%s}' % self.css
+                    keys["css"] = "* {%s}" % self.css
                 # tools.feedback(f'*** Text HTML {keys=} \n=> {rect=} _text:{_text}')
                 current_page.insert_htmlbox(rect, _text, **keys)
             except ValueError as err:
@@ -4113,7 +4132,12 @@ class TrapezoidShape(BaseShape):
         # ---- dot
         self.draw_dot(cnv, x + self._u.width / 2.0, y + sign * self._u.height / 2.0)
         # ---- cross
-        self.draw_cross(cnv, x + self._u.width / 2.0, y + sign * self._u.height / 2.0)
+        self.draw_cross(
+            cnv,
+            x + self._u.width / 2.0,
+            y + sign * self._u.height / 2.0,
+            rotation=kwargs.get("rotation"),
+        )
         # ---- text
         if kwargs and kwargs.get("rotation"):
             kwargs.pop("rotation")  # otherwise labels rotate again!
