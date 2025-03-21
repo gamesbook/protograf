@@ -3959,7 +3959,7 @@ class TextShape(BaseShape):
                 # keys['expandtabs'] = 8
                 # keys['charwidths'] = None
                 # draw
-                # tools.feedback(f'*** Text WRAP {keys=} => {rect=} _text:{_text}')
+                # tools.feedback(f'*** Text WRAP {keys=} \n=> {rect=} _text:{_text}')
                 current_page.insert_textbox(rect, _text, **keys)
             except ValueError as err:
                 tools.feedback(f"Cannot create Text - {err}", True)
@@ -3979,8 +3979,10 @@ class TextShape(BaseShape):
             # insert_htmlbox(rect, text, *, css=None, scale_low=0,
             #   archive=None, rotate=0, oc=0, opacity=1, overlay=True)
             try:
-                # keys["opacity"] = get_opacity(self.transparency)
-                tools.feedback(f'*** Text HTTML {ID=} => {rect=} _text:{_text}')
+                keys["opacity"] = get_opacity(self.transparency)
+                if self.css:
+                    keys["css"] = '* {%s}' % self.css
+                # tools.feedback(f'*** Text HTML {keys=} \n=> {rect=} _text:{_text}')
                 current_page.insert_htmlbox(rect, _text, **keys)
             except ValueError as err:
                 tools.feedback(f"Cannot create Text - {err}", True)

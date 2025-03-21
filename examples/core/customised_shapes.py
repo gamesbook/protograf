@@ -12,8 +12,10 @@ from protograf import *
 
 Create(filename="customised_shapes.pdf",
        paper="A8",
-       margin=0.75,
-       margin_right=0.2, margin_top=0.2,
+       margin_left=0.5,
+       margin_right=0.3,
+       margin_bottom=0.2,
+       margin_top=0.5,
        font_size=8,
        stroke_width=0.5,
        )
@@ -21,7 +23,7 @@ Create(filename="customised_shapes.pdf",
 Footer(draw=False)
 
 txt = Common(x=0, y=0, font_size=8, align="left")
-'''
+
 Text(common=txt, text="Shapes START...")
 Text(x=0, y=5, font_size=8, align="left", text=Today())
 PageBreak(footer=True)
@@ -144,9 +146,9 @@ PageBreak()
 Blueprint()
 Text(common=txt, text="Sectors: 3 with same centre")
 sctm = Common(cx=2, cy=3, radius=2, fill="black", angle_width=43,)
-Sector(common=sctm, angle=40)
-Sector(common=sctm, angle=160)
-Sector(common=sctm, angle=280)
+Sector(common=sctm, angle_start=40)
+Sector(common=sctm, angle_start=160)
+Sector(common=sctm, angle_start=280)
 PageBreak()
 
 # ---- grid
@@ -156,7 +158,16 @@ PageBreak()
 
 # ---- dotgrid - Moleskin
 Text(common=txt, text='DotGrid: "Moleskine" setting')
-DotGrid(stroke="darkgray", width=0.5, height=0.5, dot_point=1, offset_y=-0.25)
+DotGrid(stroke="darkgray", width=0.5, height=0.5, dot_point=1, offset_y=0.25)
+PageBreak()
+
+# ---- dotgrid - rows & cols
+Blueprint()
+Text(common=txt, text="DotGrid: rows&cols")
+DotGrid(stroke="darkgray",
+        width=0.5, height=0.5,
+        rows=14, cols=10,
+        dot_point=1)
 PageBreak()
 
 # ---- arc
@@ -538,30 +549,32 @@ Stadium(cx=3, cy=3, side=1, common=props, label="stadium")
 Star(x=1, y=1, vertices=5, radius=0.75, common=props, label="star")
 Ellipse(cx=3, cy=1, height=1, width=1.5, common=props, label="ellipse")
 PageBreak()
-'''
+
 # ---- text styling
 Blueprint()
 Text(common=txt, text="Text - styling")
 
 Font("Times-Roman", size=11, stroke="tomato")
-Text(x=0, y=1, align="left", text="Times-Roman 12pt red")
+Text(x=0, y=0.5, align="left", text="Times-Roman 12pt red")
 
 Text(html=True,
-     x=0, y=2, width=4, height=1,
-     text='<span style="font-family: Helvetica; font-size: 8pt;>'
-          '<u>HTML Helvetica</u><br/>'
-          '<b>bold</b> <i>ital</i><br/>'
-          '<b><i>bold ital</i></b></span>')
-# Text(x=0, y=3, align="left", stroke="orange",
-#      font_name="Courier", font_size=10,
-#      wrap=True, width=4, fill=None,
-#      transform='l',
-#      text="I am in lowercase")
-# Text(x=0, y=4, align="left", stroke="orange",
-#      font_name="Courier", font_size=10,
-#      wrap=True, width=4, fill=None,
-#      transform='u',
-#      text="I am in uppercase")
+     x=0, y=1, width=4, height=2,
+     text='<span style="font-family: Helvetica; font-size: 10pt; color: red">'
+          'HTML Helvetica 10pt<br/>'
+          '<b>bold</b> <i>ital</i> <b><i>bold ital</i></b></span>'
+)
+Text(html=True,
+     x=0, y=2, width=4, height=2,
+     text='<span style="font-family: Times-Roman; font-size: 9pt; color: blue">'
+          'HTML Times-Roman 9pt<br/>'
+          '<b>bold</b> <i>ital</i> <b><i>bold ital</i></b></span>'
+)
+Text(html=True,
+     x=0, y=3, width=4, height=2,
+     css="font-family: Courier; font-size: 8pt; color: blue;",
+     text='HTML/CSS Courier 8pt<br/>'
+          '<b>bold</b> <i>ital</i> <b><i>bold ital</i></b>'
+)
 PageBreak()
 
 
@@ -578,13 +591,13 @@ Text(wrap=True,
      x=0, y=2.5, width=4, height=1,
      font_size=8,  fill="black", stroke="black",
      font_name="Helvetica", align="left",
-     transform='u',
+     transform='upper',
      text="I am Helvetica in upper case to the left")
 Text(wrap=True,
      x=0, y=4, width=4, height=1,
-     font_size=8,  fill="black", stroke="black",
+     font_size=9,  fill="black", stroke="black",
      font_name="Times-Roman", align="centre",
-     transform='l',
+     transform='lowercase',
      text="I'm lower case Times-Roman in the centre")
 PageBreak()
 
@@ -600,7 +613,7 @@ Save(
         "blueprint_subdiv", "dots_crosses", "centred", "right_angled_triangle",
         "compass", "lines", "starfield_rectangle", "starfield_circle",
         "starfield_poly", "equilateral_triangle", "right_angled_triangle_flip",
-        "sectors", "grid_gray", "dotgrid_moleskine", "arc",
+        "sectors", "grid_gray", "dotgrid_moleskine", "dotgrid_rowscols", "arc",
         "stadium_edges", "trapezoid_flip", "chord",
         "polygon_radii", "polygon_perbis",
         "dates_formats",

@@ -128,19 +128,12 @@ class DotGridShape(BaseShape):
         # ---- number of blocks in grid:
         if self.rows == 0:
             self.rows = int(
-                (
-                    self.page_height
-                    - self.margin_bottom
-                    - self.margin_top
-                    - self.offset_y
-                )
-                / self.points_to_value(height)
-            )
+                (self.page_height) / self.points_to_value(height)
+            ) + 1
         if self.cols == 0:
             self.cols = int(
-                (self.page_width - self.margin_left - self.margin_right - self.offset_x)
-                / self.points_to_value(width)
-            )
+                (self.page_width) / self.points_to_value(width)
+            ) + 1
         # ---- set canvas
         size = self.dot_point / 2.0  # diameter is 3 points ~ 1mm or 1/32"
         self.fill = self.stroke

@@ -429,16 +429,13 @@ class BaseCanvas:
         self.flip = self.defaults.get("flip", "north")  # north/south
         self.elevation = self.defaults.get("elevation", "horizontal")
         self.facing = self.defaults.get("facing", "out")  # out/in
-        # ---- color and transparency
+        # ---- fill color
         fill = self.defaults.get("fill", self.defaults.get("fill_color")) or "white"
         self.fill = get_color(fill)
-        self.transparency = self.defaults.get("transparency", 1)  # NOT transparent
-        debug_color = self.defaults.get("debug_color", DEBUG_COLOR)
-        self.debug_color = get_color(debug_color)
         self.fill_stroke = self.defaults.get("fill_stroke", None)
         self.stroke_fill = self.defaults.get("stroke_fill", None)  # alias
         # ---- stroke
-        stroke = self.defaults.get("stroke", self.defaults.get("stroke_color"))
+        stroke = self.defaults.get("stroke", self.defaults.get("stroke_color")) or "black"
         self.stroke = get_color(stroke)
         self.stroke_width = self.defaults.get("stroke_width", WIDTH)
         self.outline = self.defaults.get("outline", None)
@@ -449,6 +446,10 @@ class BaseCanvas:
         if self.fill_stroke:
             self.stroke = self.fill_stroke
             self.fill = self.fill_stroke
+        # ---- debug color & transparency
+        debug_color = self.defaults.get("debug_color", DEBUG_COLOR)
+        self.debug_color = get_color(debug_color)
+        self.transparency = self.defaults.get("transparency", 1)  # NOT transparent
         # if self.outline:
         #     self.stroke = self.outline
         #     self.fill = None
@@ -526,6 +527,7 @@ class BaseCanvas:
         self.leading = self.defaults.get("leading", self.font_size)
         self.transform = self.defaults.get("transform", None)
         self.html = self.defaults.get("html", False)
+        self.css = self.defaults.get("css", None)
         # ---- image / file
         self.source = self.defaults.get("source", None)  # file or http://
         self.cache_directory = None  # should be a pathlib.Path object
@@ -921,6 +923,7 @@ class BaseShape:
         self.leading = self.kw_float(kwargs.get("leading", self.font_size))
         self.transform = kwargs.get("transform", base.transform)
         self.html = self.kw_bool(kwargs.get("html", base.html))
+        self.css = kwargs.get("css", base.css)
         # tools.feedback(
         # f"BShp:{self} {kwargs.get('fill')=} {self.fill=} {kwargs.get('fill_color')=}")
         # ---- image / file
@@ -1275,10 +1278,15 @@ class BaseShape:
             if self.margin_bottom is not None
             else self.margin
         )
+        margin_top= (
+            self.unit(self.margin_top)
+            if self.margin_top is not None
+            else self.margin
+        )
         off_x = self.unit(off_x) if off_x is not None else None
         off_y = self.unit(off_y) if off_y is not None else None
         return OffsetProperties(
-            off_x, off_y, off_x + margin_left, off_y + margin_bottom
+            off_x, off_y, off_x + margin_left, off_y + margin_top  # margin_bottom
         )
 
     def set_canvas_props(
@@ -1302,6 +1310,7 @@ class BaseShape:
         #   closePath=True, even_odd=False, morph=(fixpoint, matrix),
         #   stroke_opacity=1, fill_opacity=1, oc=0
         # ---- set props
+        # print(f'$$$ Props: {kwargs.keys()}')
         cnv = cnv if cnv else self.canvas
         if "fill" in kwargs.keys():
             fill = kwargs.get("fill", None)  # reserve None for 'no fill at all'
@@ -1311,6 +1320,7 @@ class BaseShape:
             stroke = kwargs.get("stroke", None)
         else:
             stroke = self.stroke
+        # print(f'$$$ {kwargs.get("fill")=} {fill=} {kwargs.get("stroke")=} {stroke=}')
         transparency = kwargs.get("transparency", None)
         stroke_width = kwargs.get("stroke_width", None)
         stroke_cap = kwargs.get("stroke_cap", None)
