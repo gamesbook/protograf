@@ -290,10 +290,10 @@ WIDTH = 0.1
 CLOCK_ANGLES = [60, 90, 120, 150, 180, 210, 240, 270, 300, 330, 0, 30]
 
 
-def get_color(name=None, is_rgb=True):
+def get_color(name:str = None, is_rgb:bool = True) -> tuple:
     """Get a color tuple; by name from a pre-defined dictionary or as a RGB tuple."""
     if name is None:
-        return None  # valid to say that NO color has been set
+        return None  # it IS valid to say that NO color has been set
     if isinstance(name, tuple) and len(name) == 3:  # RGB color tuple
         if (
             (name[0] >= 0 and name[0] <= 255)
@@ -304,7 +304,7 @@ def get_color(name=None, is_rgb=True):
         else:
             tools.feedback(f'The color tuple "{name}" is invalid!')
     elif isinstance(name, str) and len(name) == 7 and name[0] == "#":  # hexadecimal
-        _rgb = tuple(int(name[i : i + 2], 16) for i in (1, 3, 5))
+        _rgb = tuple(int(name[i: i + 2], 16) for i in (1, 3, 5))
         rgb = tuple(i / 255 for i in _rgb)
         return rgb
     else:
@@ -316,6 +316,17 @@ def get_color(name=None, is_rgb=True):
         return color
     except (AttributeError, ValueError):
         tools.feedback(f'The color name "{name}" cannot be converted to RGB!', True)
+
+
+def get_opacity(transparency: float = 0) -> float:
+    """Convert from '100% is fully transparent' to '0 is not opaque'."""
+    if transparency is None:
+        return 1.0
+    try:
+        return float(1.0 - transparency / 100.)
+    except (ValueError, TypeError):
+        tools.feedback(
+            f'The transparency of "{transparency}" is not valid (use 0 to 100)', True)
 
 
 class BaseCanvas:
@@ -514,6 +525,7 @@ class BaseCanvas:
         self.outline_width = self.defaults.get("outline_width", 0)
         self.leading = self.defaults.get("leading", self.font_size)
         self.transform = self.defaults.get("transform", None)
+        self.html = self.defaults.get("html", False)
         # ---- image / file
         self.source = self.defaults.get("source", None)  # file or http://
         self.cache_directory = None  # should be a pathlib.Path object
@@ -908,6 +920,7 @@ class BaseShape:
         )
         self.leading = self.kw_float(kwargs.get("leading", self.font_size))
         self.transform = kwargs.get("transform", base.transform)
+        self.html = self.kw_bool(kwargs.get("html", base.html))
         # tools.feedback(
         # f"BShp:{self} {kwargs.get('fill')=} {self.fill=} {kwargs.get('fill_color')=}")
         # ---- image / file

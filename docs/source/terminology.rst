@@ -301,6 +301,11 @@ Styling-orientated Terms
    which is equivalent to ``56.693`` points will be changed to ``57`` points
 -  **transform** - will change text in a ``Text`` command to *uppercase*,
    *lowercase*, or *capitalise* it
+-  **transparency** - a percentage value from 0 to 100 that determines how
+   "see through" a shape, or line, or area is; where 0 means it is not at all
+   transparent and 100 means it is completely transparent |dash| this also
+   corresponds to what some program's term as *opacity*; but that is usually
+   a fractional number from 1 down to 0 i.e. the inverse of transparency
 
 
 Display-orientated Terms

@@ -25,6 +25,7 @@ from protograf.base import (
     BaseCanvas,
     GridShape,
     get_color,
+    get_opacity,
     COLOR_NAMES,
     DEBUG_COLOR,
     CACHE_DIRECTORY,
@@ -3912,45 +3913,54 @@ class TextShape(BaseShape):
         # ---- validations
         if self.transform is not None:
             _trans = str(self.transform).lower()
-            if _trans in ["u", "upper", "uppercase"]:
-                self.transform = "uppercase"
-            elif _trans in ["l", "lower", "lowercase"]:
-                self.transform = "lowercase"
-            elif _trans in ["c", "caps", "capitals", "capitalise", "capitalize"]:
-                self.transform = "capitalize"
+            if _trans in ["u", "up", "upper", "uppercase"]:
+                _text = _text.upper()
+            elif _trans in ["l", "low", "lower", "lowercase"]:
+                _text = _text.lower()
+            elif _trans in [
+                    "c", "capitalise", "capitalize",
+                    "t", "title", "titlecase", "titlelise", "titlelize",  ]:
+                _text = _text.title()
             else:
-                self.transform = None
+                tools.feedback(f"The transform {self.transform} is unknown.", False, True)
+        # ---- text rotation
+        if self.rotation is None or self.rotation == 0:
+            text_rotation = 0
+        else:
+            text_rotation = self.rotation // 90 * 90
         # ---- text style
         keys = {}
-        keys["fontsize"] = self.font_size
-        keys["fontname"] = self.font_name
-        # keys['fontfile'] = self.font_file
-        keys["color"] = self.stroke
-        keys["fill"] = self.fill
-        keys["align"] = self.to_alignment()
-        keys["rotate"] = self.rotation
-        # keys['stroke_opacity'] = self.show_stroke
-        # keys['fill_opacity'] = self.show_fill
-
-        # potential other properties
-        # keys['idx'] = 0
-        # keys['render_mode'] = 0
-        # keys['miter_limit'] = 1
-        # keys['border_width'] = 1
-        # keys['encoding'] = pymupdf.TEXT_ENCODING_LATIN
-        # keys['morph'] = None
-        # keys['oc'] = 0
-        # keys['overlay'] = True
-        # keys['expandtabs'] = 8
-        # keys['charwidths'] = None
-
+        keys["rotate"] = text_rotation
+        # ---- boxed text
+        current_page = globals.doc_page
+        rect = pymupdf.Rect(x_t, y_t, x_t + width, y_t + height)
         if self.wrap:
-            # rect text only
-            # expandtabs=8, align=TEXT_ALIGN_LEFT, charwidths=None,
             try:
-                rect = pymupdf.Rect(x_t, y_t, x_t + width, y_t + height)
-                # tools.feedback(f'*** Text LONG-{ID} => {rec} _text:{_text}')
-                cnv.insert_textbox(rect, _text, **keys)
+                # style
+                keys["fontsize"] = self.font_size
+                keys["fontname"] = self.font_name
+                # keys['fontfile'] = self.font_file
+                keys["color"] = get_color(self.stroke)
+                # keys["fill"] = get_color(self.fill)
+                keys["align"] = self.to_alignment()
+                # keys['stroke_opacity'] = self.show_stroke
+                # keys['fill_opacity'] = self.show_fill
+
+                # potential other properties
+                # expandtabs=8, charwidths=None,
+                # keys['idx'] = 0
+                # keys['render_mode'] = 0
+                # keys['miter_limit'] = 1
+                # keys['border_width'] = 1
+                # keys['encoding'] = pymupdf.TEXT_ENCODING_LATIN
+                # keys['morph'] = None
+                # keys['oc'] = 0
+                # keys['overlay'] = True
+                # keys['expandtabs'] = 8
+                # keys['charwidths'] = None
+                # draw
+                # tools.feedback(f'*** Text WRAP {keys=} => {rect=} _text:{_text}')
+                current_page.insert_textbox(rect, _text, **keys)
             except ValueError as err:
                 tools.feedback(f"Cannot create Text - {err}", True)
             except IOError as err:
@@ -3964,6 +3974,17 @@ class TextShape(BaseShape):
                     thefile = f" - unable to open or find {thefile}"
                 msg = f"Cannot create Text{thefile}{cause}"
                 tools.feedback(msg, True, True)
+        # ---- HTML text
+        elif self.html:
+            # insert_htmlbox(rect, text, *, css=None, scale_low=0,
+            #   archive=None, rotate=0, oc=0, opacity=1, overlay=True)
+            try:
+                # keys["opacity"] = get_opacity(self.transparency)
+                tools.feedback(f'*** Text HTTML {ID=} => {rect=} _text:{_text}')
+                current_page.insert_htmlbox(rect, _text, **keys)
+            except ValueError as err:
+                tools.feedback(f"Cannot create Text - {err}", True)
+        # ---- text string
         else:
             # tools.feedback(f"*** {x_t=} {y_t=} {_text=} {keys=}")
             self.draw_multi_string(cnv, x_t, y_t, _text, **keys)

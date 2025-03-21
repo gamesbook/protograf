@@ -20,7 +20,7 @@ Create(filename="customised_shapes.pdf",
 
 Footer(draw=False)
 
-txt = Common(x=0, y=6, font_size=8, align="left")
+txt = Common(x=0, y=0, font_size=8, align="left")
 '''
 Text(common=txt, text="Shapes START...")
 Text(x=0, y=5, font_size=8, align="left", text=Today())
@@ -539,41 +539,58 @@ Star(x=1, y=1, vertices=5, radius=0.75, common=props, label="star")
 Ellipse(cx=3, cy=1, height=1, width=1.5, common=props, label="ellipse")
 PageBreak()
 '''
-# ---- text custom
+# ---- text styling
 Blueprint()
-Text(common=txt, text="Text - custom")
+Text(common=txt, text="Text - styling")
+
 Font("Times-Roman", size=11, stroke="tomato")
-Text(x=0, y=5, align="left", text="Times-Roman 12pt red")
-Text(x=0, y=4, align="right", stroke="blue",
-     wrap=True, width=4, fill=None,
-     leading=14,
-     outline_stroke="red", outline_width=2,
-     text='<font name="Helvetica" size="14">'
-          '<u>Helvetica</u><br/>'
+Text(x=0, y=1, align="left", text="Times-Roman 12pt red")
+
+Text(html=True,
+     x=0, y=2, width=4, height=1,
+     text='<span style="font-family: Helvetica; font-size: 8pt;>'
+          '<u>HTML Helvetica</u><br/>'
           '<b>bold</b> <i>ital</i><br/>'
-          '<b><i>bold ital</i></b></font>')
-# Text(x=0, y=2, align="left", stroke="orange",
-#      font_name="Courier", font_size=10,
-#      wrap=True, width=4, fill=None,
-#      transform='c',
-#      text="I am capitalized")
-# Text(x=0, y=1.5, align="left", stroke="orange",
+          '<b><i>bold ital</i></b></span>')
+# Text(x=0, y=3, align="left", stroke="orange",
 #      font_name="Courier", font_size=10,
 #      wrap=True, width=4, fill=None,
 #      transform='l',
 #      text="I am in lowercase")
-# Text(x=0, y=1, align="left", stroke="orange",
+# Text(x=0, y=4, align="left", stroke="orange",
 #      font_name="Courier", font_size=10,
 #      wrap=True, width=4, fill=None,
 #      transform='u',
 #      text="I am in uppercase")
 PageBreak()
 
+
+# ---- text custom
+Blueprint()
+Text(common=txt, text="Text - font, case & align")
+Text(wrap=True,
+     x=0, y=1, width=4, height=1,
+     font_size=7,  fill="black", stroke="black",
+     font_name="Courier", align="right",
+     transform='t',
+     text="I am Courier in title case to the right")
+Text(wrap=True,
+     x=0, y=2.5, width=4, height=1,
+     font_size=8,  fill="black", stroke="black",
+     font_name="Helvetica", align="left",
+     transform='u',
+     text="I am Helvetica in upper case to the left")
+Text(wrap=True,
+     x=0, y=4, width=4, height=1,
+     font_size=8,  fill="black", stroke="black",
+     font_name="Times-Roman", align="centre",
+     transform='l',
+     text="I'm lower case Times-Roman in the centre")
+PageBreak()
+
 # ---- END
 Text(common=txt, text="Shapes END...")
-#PageBreak(footer=True)
 
-#Save()
 Save(
      output='png',
      dpi=300,
@@ -597,5 +614,5 @@ Save(
         "rectangles_rowcol", "rectangles_custom", "rhombus_custom",
         "rhombus_borders", "trapezoid_borders", "arrow_sizes", "arrow_rotate",
         "shape_centred", "shape_centred_move", "qr_code", "image_sliced",
-        "shape_rotation", "text_custom",
+        "shape_rotation", "text_style", "text_custom",
         None])
