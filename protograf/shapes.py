@@ -171,27 +171,53 @@ class ArcShape(BaseShape):
     Arc on a given canvas.
     """
 
+    def __init__(self, _object=None, canvas=None, **kwargs):
+        super(ArcShape, self).__init__(_object=_object, canvas=canvas, **kwargs)
+        self.kwargs = kwargs
+        # ---- perform overrides
+        self.radius = self.radius or self.diameter / 2.0
+        if self.cx is None and self.x is None:
+            tools.feedback("Either provide x or cx for Arc", True)
+        if self.cy is None and self.y is None:
+            tools.feedback("Either provide y or cy for Arc", True)
+        if self.cx is not None and self.cy is not None:
+            self.x = self.cx - self.radius
+            self.y = self.cy - self.radius
+        # tools.feedback(f'***Arc {self.cx=} {self.cy=} {self.x=} {self.y=}')
+        # ---- calculate centre
+        radius = self._u.radius
+        if self.row is not None and self.col is not None:
+            self.x_c = self.col * 2.0 * radius + radius
+            self.y_c = self.row * 2.0 * radius + radius
+            # log.debug(f"{self.col=}, {self.row=}, {self.x_c=}, {self.y_c=}")
+        elif self.cx is not None and self.cy is not None:
+            self.x_c = self._u.cx
+            self.y_c = self._u.cy
+        else:
+            self.x_c = self._u.x + radius
+            self.y_c = self._u.y + radius
+        # tools.feedback(f'***Arc {self.x_c=} {self.y_c=} {self.radius=}')
+
     def draw(self, cnv=None, off_x=0, off_y=0, ID=None, **kwargs):
         """Draw arc on a given canvas."""
         kwargs = self.kwargs | kwargs
         cnv = cnv if cnv else self.canvas
         super().draw(cnv, off_x, off_y, ID, **kwargs)  # unit-based props
-        # tools.feedback(f'*** ARC {self.x=} {self.y=} {self.x_1=} {self.y_1=} {self.angle_width=} ')
-        # ---- convert to using units
-        x_1 = self._u.x + self._o.delta_x
-        y_1 = self._u.y + self._o.delta_y
-        if not self.x_1:
-            self.x_1 = self.x + self.default_length
-        if not self.y_1:
-            self.y_1 = self.y + self.default_length
-        x_2 = self.unit(self.x_1) + self._o.delta_x
-        y_2 = self.unit(self.y_1) + self._o.delta_y
-        # ---- draw arc
-        # tools.feedback(f'*** Arc: {x_1=} {y_1=}, {x_2=} {y_2=}')
-        cnv.draw_sector(
-            (x_1, y_1), (x_2, y_2), self.angle_width, fullSector=self.filled
+        if self.use_abs_c:
+            self.x_c = self._abs_cx
+            self.y_c = self._abs_cy
+        # ---- centre point in units
+        p_C = Point(self.x_c + self._o.delta_x, self.y_c + self._o.delta_y)
+        # ---- circumference point in units
+        p_P = geoms.point_on_circle(p_C, self._u.radius, self.angle_start)
+        # ---- draw sector
+        # tools.feedback(
+        #     f'***Arc: {p_P=} {p_C=} {self.angle_start=} {self.angle_width=}')
+        cnv.draw_sector(  # anti-clockwise from p_P; 90° default
+            (p_C.x, p_C.y), (p_P.x, p_P.y), self.angle_width, fullSector=False
         )
-        # anti-clock from flat; 90°
+        kwargs["closed"] = False
+        kwargs["fill"] = None
         self.set_canvas_props(cnv=cnv, index=ID, **kwargs)
 
 
@@ -233,22 +259,22 @@ class ArrowShape(BaseShape):
         # print(f"{=} ")
         vertices = []
         vertices.append(Point(x_s, y_s))  # lower-left corner
-        vertices.append(Point(x_c - self._u.width / 2.0, y_s + tail_height))
+        vertices.append(Point(x_c - self._u.width / 2.0, y_s - tail_height))
         vertices.append(
             Point(
-                x_c - self.head_width_u / 2.0, y_s + tail_height + self.points_offset_u
+                x_c - self.head_width_u / 2.0, y_s - tail_height - self.points_offset_u
             )
         )
-        vertices.append(Point(x_c, y_s + total_height))  # tip
+        vertices.append(Point(x_c, y_s - total_height))  # tip
         vertices.append(
             Point(
-                x_c + self.head_width_u / 2.0, y_s + tail_height + self.points_offset_u
+                x_c + self.head_width_u / 2.0, y_s - tail_height - self.points_offset_u
             )
         )
-        vertices.append(Point(x_c + self._u.width / 2.0, y_s + tail_height))
+        vertices.append(Point(x_c + self._u.width / 2.0, y_s - tail_height))
         vertices.append(Point(x_c + self.tail_width_u / 2.0, y_s))  # bottom corner
         if self.tail_notch_u > 0:
-            vertices.append(Point(x_c, y_s + self.tail_notch_u))  # centre notch
+            vertices.append(Point(x_c, y_s - self.tail_notch_u))  # centre notch
         return vertices
 
     def draw(self, cnv=None, off_x=0, off_y=0, ID=None, **kwargs):
@@ -263,7 +289,7 @@ class ArrowShape(BaseShape):
             x = self._u.x + self._o.delta_x
             y = self._u.y + self._o.delta_y
         cx = x
-        cy = y + self._u.height
+        cy = y - self._u.height
         # ---- set canvas
         self.set_canvas_props(index=ID)
         # ---- handle rotation: START
@@ -284,7 +310,8 @@ class ArrowShape(BaseShape):
         # ---- text
         if kwargs and kwargs.get("rotation"):
             kwargs.pop("rotation")  # otherwise labels rotate again!
-        self.draw_heading(cnv, ID, x, y + self._u.height + self.head_height_u, **kwargs)
+        self.draw_label(cnv, ID, cx, cy, **kwargs)
+        self.draw_heading(cnv, ID, x, y - self._u.height - self.head_height_u, **kwargs)
         self.draw_title(cnv, ID, x, y, **kwargs)
 
 
@@ -318,6 +345,8 @@ class BezierShape(BaseShape):
         y_4 = self.unit(self.y_3) + self._o.delta_y
         # ---- draw bezier
         cnv.draw_bezier((x_1, y_1), (x_2, y_2), (x_3, y_3), (x_4, y_4))
+        kwargs["closed"] = False
+        kwargs["fill"] = None
         self.set_canvas_props(cnv=cnv, index=ID, **kwargs)
 
 
@@ -399,51 +428,45 @@ class CircleShape(BaseShape):
 
         if num >= 1 and lines & 1:  # is odd - draw centre lines
             if "e" in _dirs or "w" in _dirs or "o" in _dirs:  # horizontal
-                self.draw_line_between_points(
-                    cnv,
+                cnv.draw_line(
                     Point(x_c + self._u.radius, y_c),
                     Point(x_c - self._u.radius, y_c),
                 )
             if "n" in _dirs or "s" in _dirs or "o" in _dirs:  # vertical
-                self.draw_line_between_points(
-                    cnv,
+                cnv.draw_line(
                     Point(x_c, y_c + self._u.radius),
                     Point(x_c, y_c - self._u.radius),
                 )
             if "se" in _dirs or "nw" in _dirs or "d" in _dirs:  # diagonal  "down"
                 poc_top_d = geoms.point_on_circle(Point(x_c, y_c), self._u.radius, 135)
                 poc_btm_d = geoms.point_on_circle(Point(x_c, y_c), self._u.radius, 315)
-                self.draw_line_between_points(cnv, poc_top_d, poc_btm_d)
+                cnv.draw_line(poc_top_d, poc_btm_d)
             if "ne" in _dirs or "sw" in _dirs or "d" in _dirs:  # diagonal  "up"
                 poc_top_u = geoms.point_on_circle(Point(x_c, y_c), self._u.radius, 45)
                 poc_btm_u = geoms.point_on_circle(Point(x_c, y_c), self._u.radius, 225)
-                self.draw_line_between_points(cnv, poc_top_u, poc_btm_u)
+                cnv.draw_line(poc_top_u, poc_btm_u)
 
         if num <= 1:
             return
 
         if "e" in _dirs or "w" in _dirs or "o" in _dirs:  # horizontal
             for dist in horizontal_distances:
-                self.draw_line_between_points(  # "above" diameter
-                    cnv,
+                cnv.draw_line(  # "above" diameter
                     Point(x_c - dist[0], y_c + dist[1]),
                     Point(x_c + dist[0], y_c + dist[1]),
                 )
-                self.draw_line_between_points(  # "below" diameter
-                    cnv,
+                cnv.draw_line(  # "below" diameter
                     Point(x_c - dist[0], y_c - dist[1]),
                     Point(x_c + dist[0], y_c - dist[1]),
                 )
 
         if "n" in _dirs or "s" in _dirs or "o" in _dirs:  # vertical
             for dist in vertical_distances:
-                self.draw_line_between_points(  # "right" of diameter
-                    cnv,
+                cnv.draw_line(  # "right" of diameter
                     Point(x_c + dist[0], y_c + dist[1]),
                     Point(x_c + dist[0], y_c - dist[1]),
                 )
-                self.draw_line_between_points(  # "left" of diameter
-                    cnv,
+                cnv.draw_line(  # "left" of diameter
                     Point(x_c - dist[0], y_c + dist[1]),
                     Point(x_c - dist[0], y_c - dist[1]),
                 )
@@ -458,7 +481,7 @@ class CircleShape(BaseShape):
                 dar = geoms.point_on_circle(
                     Point(x_c, y_c), self._u.radius, 45.0 - _angle
                 )  # + 45.)
-                self.draw_line_between_points(cnv, dar, dal)
+                cnv.draw_line(dar, dal)
                 # "below left" of diameter
                 dbl = geoms.point_on_circle(
                     Point(x_c, y_c), self._u.radius, 225.0 - _angle
@@ -466,7 +489,7 @@ class CircleShape(BaseShape):
                 dbr = geoms.point_on_circle(
                     Point(x_c, y_c), self._u.radius, 225.0 + _angle
                 )
-                self.draw_line_between_points(cnv, dbr, dbl)
+                cnv.draw_line(dbr, dbl)
                 # TEST cnv.circle(dal.x, dal.y, 2, stroke=1, fill=1 if self.fill else 0)
 
         if "ne" in _dirs or "sw" in _dirs or "d" in _dirs:  # diagonal  "up"
@@ -479,7 +502,7 @@ class CircleShape(BaseShape):
                 poc_btm = geoms.point_on_circle(
                     Point(x_c, y_c), self._u.radius, 180.0 - _angle + 45.0
                 )
-                self.draw_line_between_points(cnv, poc_top, poc_btm)
+                cnv.draw_line(poc_top, poc_btm)
                 # "below right" of diameter
                 poc_top = geoms.point_on_circle(
                     Point(x_c, y_c), self._u.radius, 45 - _angle
@@ -487,7 +510,7 @@ class CircleShape(BaseShape):
                 poc_btm = geoms.point_on_circle(
                     Point(x_c, y_c), self._u.radius, 180.0 + _angle + 45.0
                 )
-                self.draw_line_between_points(cnv, poc_top, poc_btm)
+                cnv.draw_line(poc_top, poc_btm)
 
     def draw_radii(self, cnv, ID, x_c: float, y_c: float):
         """Draw radius lines from the centre outwards to the circumference.
@@ -520,21 +543,14 @@ class CircleShape(BaseShape):
             radius_offset = self.unit(self.radii_offset) or None
             radius_length = self.unit(outer_radius, label="radius length")
             # print(f'{radius_length=} :: {radius_offset=} :: {outer_radius=}')
-            self.set_canvas_props(
-                index=ID,
-                stroke=self.radii_stroke,
-                stroke_width=self.radii_stroke_width,
-                dashed=self.radii_dashed,
-                dotted=self.radii_dotted,
-            )
             _radii_labels = tools.split(self.radii_labels)
             label_key = 0
+            label_points = []
             for key, rad_angle in enumerate(_radii):
                 # points based on length of line, offset and the angle in degrees
                 diam_pt = geoms.point_on_circle(
                     Point(x_c, y_c), radius_length, rad_angle
                 )
-                pth = cnv.beginPath()
                 if radius_offset is not None and radius_offset != 0:
                     # print(f'{rad_angle=} {radius_offset=} {diam_pt}, {x_c=}, {y_c=}')
                     offset_pt = geoms.point_on_circle(
@@ -548,23 +564,30 @@ class CircleShape(BaseShape):
                 else:
                     x_start, y_start = x_c, y_c
                     x_end, y_end = diam_pt.x, diam_pt.y
-                # ---- radii line
-                pth.moveTo(x_start, y_start)
-                pth.lineTo(x_end, y_end)
-                cnv.drawPath(
-                    pth,
-                    stroke=1 if self.radii_stroke else 0,
-                    fill=1 if self.fill else 0,
+                # ---- track label points
+                label_points.append(
+                    (Point((x_start + x_end) / 2.0, (y_start + y_end) / 2.0), rad_angle)
                 )
-                # ---- radii text label
-                if _radii_labels:
+                # ---- draw radii line
+                cnv.draw_line((x_start, y_start), (x_end, y_end))
+            # ---- style radii lines
+            self.set_canvas_props(
+                index=ID,
+                stroke=self.radii_stroke,
+                stroke_width=self.radii_stroke_width,
+                dashed=self.radii_dashed,
+                dotted=self.radii_dotted,
+            )
+            # ---- draw radii text labels
+            if _radii_labels:
+                for label_point in label_points:
                     self.radii_label = _radii_labels[label_key]
                     self.draw_radii_label(
                         cnv,
                         ID,
-                        (x_start + x_end) / 2.0,
-                        (y_start + y_end) / 2.0,
-                        rotation=rad_angle + self.radii_labels_rotation,
+                        label_point[0].x,
+                        label_point[0].y,
+                        rotation=label_point[1] + self.radii_labels_rotation,
                         centred=False,
                     )
                     label_key += 1
@@ -753,28 +776,11 @@ class CircleShape(BaseShape):
         is_rotated = False
         rotation = kwargs.get("rotation", self.rotation)
         if rotation:
-            is_rotated = True
-            # tools.feedback(f'*** Rect {ID=} {rotation=} {self._u.x=}, {self._u.y=}')
-            cnv.saveState()
-            # move the canvas origin
-            if ID is not None:
-                cnv.translate(x + self._u.margin_left, y + self._u.margin_bottom)
-            else:
-                cnv.translate(x, y)
-            cnv.rotate(rotation)
-            x, y = 0, 0
-            self.x_c, self.y_c = 0, 0
+            self.centroid = muPoint(x, y)
+            kwargs["rotation"] = (rotation, self.centroid)
         # ---- draw petals
         if self.petals:
-            if self.rotation:
-                # tools.feedback(f'*** Rect {self.petals=}, {self.rotation=}, {type(cnv)}')
-                cnv.saveState()
-                cnv.translate(self.x_c, self.y_c)
-                self.draw_petals(cnv, ID, 0, 0)
-                cnv.rotate(self.rotation)
-                cnv.restoreState()
-            else:
-                self.draw_petals(cnv, ID, self.x_c, self.y_c)
+            self.draw_petals(cnv, ID, self.x_c, self.y_c)
         # tools.feedback(f'*** Circle: {x=} {y=}')
         # ---- draw circle
         cnv.draw_circle((x, y), self._u.radius)
@@ -813,26 +819,10 @@ class CircleShape(BaseShape):
             self.set_canvas_props(cnv=cnv, index=ID, **keys)
         # ---- draw hatch
         if self.hatch_count:
-            if self.rotation:
-                # tools.feedback(f'*** Circle {self.hatch_count=}, {self.rotation=}, {type(cnv)}')
-                cnv.saveState()
-                cnv.translate(self.x_c, self.y_c)
-                self.draw_hatch(cnv, ID, self.hatch_count, 0, 0)
-                cnv.rotate(self.rotation)
-                cnv.restoreState()
-            else:
-                self.draw_hatch(cnv, ID, self.hatch_count, self.x_c, self.y_c)
+            self.draw_hatch(cnv, ID, self.hatch_count, self.x_c, self.y_c)
         # ---- draw radii
         if self.radii:
-            if self.rotation:
-                # tools.feedback(f'*** Circle {self.hatch_count=}, {self.rotation=}, {type(cnv)}')
-                cnv.saveState()
-                cnv.translate(self.x_c, self.y_c)
-                self.draw_radii(cnv, ID, 0, 0)
-                cnv.rotate(self.rotation)
-                cnv.restoreState()
-            else:
-                self.draw_radii(cnv, ID, self.x_c, self.y_c)
+            self.draw_radii(cnv, ID, self.x_c, self.y_c)
         # ---- centred shape (with offset)
         if self.centre_shape:
             cshape_name = self.centre_shape.__class__.__name__
@@ -850,12 +840,9 @@ class CircleShape(BaseShape):
         # ---- text
         if kwargs and kwargs.get("rotation"):
             kwargs.pop("rotation")  # otherwise labels rotate again!
-        self.draw_heading(cnv, ID, self.x_c, self.y_c + self._u.radius, **kwargs)
+        self.draw_heading(cnv, ID, self.x_c, self.y_c - self._u.radius, **kwargs)
         self.draw_label(cnv, ID, self.x_c, self.y_c, **kwargs)
-        self.draw_title(cnv, ID, self.x_c, self.y_c - self._u.radius, **kwargs)
-        # ---- handle rotation: END
-        if rotation:
-            cnv.restoreState()
+        self.draw_title(cnv, ID, self.x_c, self.y_c + self._u.radius, **kwargs)
 
 
 class ChordShape(BaseShape):
@@ -1096,9 +1083,9 @@ class CompassShape(BaseShape):
         # ---- dot
         self.draw_dot(cnv, self.x_c, self.y_c)
         # ---- text
-        self.draw_heading(cnv, ID, self.x_c, self.y_c + radius, **kwargs)
+        self.draw_heading(cnv, ID, self.x_c, self.y_c - radius, **kwargs)
         self.draw_label(cnv, ID, self.x_c, self.y_c, **kwargs)
-        self.draw_title(cnv, ID, self.x_c, self.y_c - radius, **kwargs)
+        self.draw_title(cnv, ID, self.x_c, self.y_c + radius, **kwargs)
 
 
 class DotShape(BaseShape):
@@ -1195,11 +1182,11 @@ class EllipseShape(BaseShape):
         if kwargs and kwargs.get("rotation"):
             kwargs.pop("rotation")  # otherwise labels rotate again!
         self.draw_heading(
-            cnv, ID, x_d, y_d + 0.5 * self._u.height + delta_m_up, **kwargs
+            cnv, ID, x_d, y_d - 0.5 * self._u.height - delta_m_up, **kwargs
         )
         self.draw_label(cnv, ID, x_d, y_d, **kwargs)
         self.draw_title(
-            cnv, ID, x_d, y_d - 0.5 * self._u.height - delta_m_down, **kwargs
+            cnv, ID, x_d, y_d + 0.5 * self._u.height + delta_m_down, **kwargs
         )
 
 
@@ -1264,9 +1251,9 @@ class EquilateralTriangleShape(BaseShape):
             y2 = pt0.y
             x3 = x2 - 0.5 * side
         if flip == "north" or flip == "n":
-            y3 = pt0.y + height
-        elif flip == "south" or flip == "s":
             y3 = pt0.y - height
+        elif flip == "south" or flip == "s":
+            y3 = pt0.y + height
         vertices.append(Point(x2, y2))
         vertices.append(Point(x3, y3))
         return vertices
@@ -1289,9 +1276,9 @@ class EquilateralTriangleShape(BaseShape):
         if self.cx and self.cy:
             self.centroid = Point(self._u.cx, self._u.cy)
             centroid_to_vertex = side / math.sqrt(3)
-            y_off = height - centroid_to_vertex
+            y_off = height + centroid_to_vertex
             x = self._u.cx - side / 2.0
-            y = self._u.cy - (height - centroid_to_vertex)
+            y = self._u.cy + (height - centroid_to_vertex)
             # print(f'** {side=} {height=} {centroid_to_vertex=} {y_off=}')
         # tools.feedback(f'*** EQT {side=} {height=} {self.fill=} {self.stroke=}')
         self.vertices = self.get_vertices(x, y, side, self.hand, self.flip)
@@ -1325,11 +1312,11 @@ class EquilateralTriangleShape(BaseShape):
         self.draw_dot(cnv, self.centroid.x, self.centroid.y)
         # ---- text
         self.draw_heading(
-            cnv, ID, self.centroid.x, self.centroid.y + height * 2.0 / 3.0, **kwargs
+            cnv, ID, self.centroid.x, self.centroid.y - height * 2.0 / 3.0, **kwargs
         )
         self.draw_label(cnv, ID, self.centroid.x, self.centroid.y, **kwargs)
         self.draw_title(
-            cnv, ID, self.centroid.x, self.centroid.y - height / 3.0, **kwargs
+            cnv, ID, self.centroid.x, self.centroid.y + height / 3.0, **kwargs
         )
 
 
@@ -1477,12 +1464,18 @@ class HexShape(BaseShape):
         # ---- draw coord (optional)
         if self.coord_elevation:
             # ---- * set coord props
-            cnv.setFont(self.coord_font_name, self.coord_font_size)
-            cnv.setFillColor(self.coord_stroke)
+            keys = {}
+            keys["font_name"] = self.coord_font_name
+            keys["font_size"] = self.coord_font_size
+            keys["stroke"] = self.coord_stroke
             coord_offset = self.unit(self.coord_offset)
             if self.coord_elevation in ["t", "top"]:
                 self.draw_multi_string(
-                    cnv, x_d, y_d + half_flat * 0.7 + coord_offset, self.coord_text
+                    cnv,
+                    x_d,
+                    y_d + half_flat * 0.7 + coord_offset,
+                    self.coord_text,
+                    **keys,
                 )
             elif self.coord_elevation in ["m", "middle", "mid"]:
                 self.draw_multi_string(
@@ -1490,10 +1483,15 @@ class HexShape(BaseShape):
                     x_d,
                     y_d + coord_offset - self.coord_font_size / 2.0,
                     self.coord_text,
+                    **keys,
                 )
             elif self.coord_elevation in ["b", "bottom", "bot"]:
                 self.draw_multi_string(
-                    cnv, x_d, y_d - half_flat * 0.9 + coord_offset, self.coord_text
+                    cnv,
+                    x_d,
+                    y_d - half_flat * 0.9 + coord_offset,
+                    self.coord_text,
+                    **keys,
                 )
             else:
                 tools.feedback(
@@ -1614,24 +1612,24 @@ class HexShape(BaseShape):
         )
         _dirs = tools.validated_directions(self.radii, dir_group, "radii")
         if "ne" in _dirs:  # slope UP to the right
-            self.draw_line_between_points(cnv, centre, vertices[2])
+            cnv.draw_line(centre, vertices[2])
         if "sw" in _dirs:  # slope DOWN to the left
             if self.orientation in ["p", "pointy"]:
-                self.draw_line_between_points(cnv, centre, vertices[0])
+                cnv.draw_line(centre, vertices[0])
             else:
-                self.draw_line_between_points(cnv, centre, vertices[5])
+                cnv.draw_line(centre, vertices[5])
         if "se" in _dirs:  # slope DOWN to the right
-            self.draw_line_between_points(cnv, centre, vertices[4])
+            cnv.draw_line(centre, vertices[4])
         if "nw" in _dirs:  # slope UP to the left
-            self.draw_line_between_points(cnv, centre, vertices[1])
+            cnv.draw_line(centre, vertices[1])
         if "n" in _dirs and self.orientation in ["p", "pointy"]:  # vertical UP
-            self.draw_line_between_points(cnv, centre, vertices[2])
+            cnv.draw_line(centre, vertices[2])
         if "s" in _dirs and self.orientation in ["p", "pointy"]:  # vertical DOWN
-            self.draw_line_between_points(cnv, centre, vertices[5])
+            cnv.draw_line(centre, vertices[5])
         if "e" in _dirs and self.orientation in ["f", "flat"]:  # horizontal RIGHT
-            self.draw_line_between_points(cnv, centre, vertices[3])
+            cnv.draw_line(centre, vertices[3])
         if "w" in _dirs and self.orientation in ["f", "flat"]:  # horizontal LEFT
-            self.draw_line_between_points(cnv, centre, vertices[0])
+            cnv.draw_line(centre, vertices[0])
 
     def draw_perbis(
         self, cnv, ID, centre: Point, vertices: list, rotation: float = None
@@ -1664,14 +1662,6 @@ class HexShape(BaseShape):
             if self.perbis_length
             else self.radius
         )
-        self.set_canvas_props(
-            index=ID,
-            stroke=self.perbis_stroke,
-            stroke_width=self.perbis_stroke_width,
-            dashed=self.perbis_dashed,
-            dotted=self.perbis_dotted,
-        )
-
         if self.perbis:
             dir_group = (
                 tools.DirectionGroup.HEX_POINTY_EDGE
@@ -1718,24 +1708,20 @@ class HexShape(BaseShape):
                 offset_pt = geoms.point_on_circle(centre, pb_offset, pb_angle)
                 end_pt = geoms.point_on_line(offset_pt, edge_pt, pb_length)
                 # print(f'{pb_angle=} {offset_pt=} {x_c=}, {y_c=}')
-                pth.moveTo(offset_pt.x, offset_pt.y)
-                pth.lineTo(end_pt.x, end_pt.y)
+                cnv.draw_line((offset_pt.x, offset_pt.y), (end_pt.x, end_pt.y))
             else:
-                pth.moveTo(centre.x, centre.y)
-                pth.lineTo(edge_pt.x, edge_pt.y)
-            cnv.drawPath(
-                pth, stroke=1 if self.stroke else 0, fill=1 if self.fill else 0
-            )
-            # cnv.drawCentredString(edge_pt.x, edge_pt.y, f"{key}")  # test
+                cnv.draw_line((centre.x, centre.y), (edge_pt.x, edge_pt.y))
+
+        self.set_canvas_props(
+            index=ID,
+            stroke=self.perbis_stroke,
+            stroke_width=self.perbis_stroke_width,
+            dashed=self.perbis_dashed,
+            dotted=self.perbis_dotted,
+        )
 
     def draw_hatch(self, cnv, ID, side: float, vertices: list, num: int):
         """Draw lines connecting two opposite sides and parallel to adjacent side."""
-        self.set_canvas_props(
-            index=ID,
-            stroke=self.hatch_stroke,
-            stroke_width=self.hatch_stroke_width,
-            stroke_cap=self.hatch_cap,
-        )
         dir_group = (
             tools.DirectionGroup.HEX_POINTY
             if self.orientation == "pointy"
@@ -1805,6 +1791,12 @@ class HexShape(BaseShape):
                     self.draw_lines_between_sides(
                         cnv, side, lines, vertices, (0, 5), (3, 4)
                     )
+        self.set_canvas_props(
+            index=ID,
+            stroke=self.hatch_stroke,
+            stroke_width=self.hatch_stroke_width,
+            stroke_cap=self.hatch_cap,
+        )
 
     def draw(self, cnv=None, off_x=0, off_y=0, ID=None, **kwargs):
         """Draw a hexagon on a given canvas."""
@@ -1989,12 +1981,11 @@ class HexShape(BaseShape):
         # ---- calculate area
         self.area = self.calculate_area()
         # ---- canvas
-        self.set_canvas_props(index=ID)
         if self.caltrops or self.caltrops_fraction:
             line_dashed = self.calculate_caltrops(
                 self.side, self.caltrops, self.caltrops_fraction, self.caltrops_invert
             )
-            cnv.setDash(array=line_dashed)
+            kwargs["dashed"] = line_dashed
         # ---- calculate vertical hexagon (clockwise)
         if self.orientation.lower() in ["p", "pointy"]:
             self.vertices = [  # clockwise from bottom-left; relative to centre
@@ -2017,7 +2008,9 @@ class HexShape(BaseShape):
             ]
 
         # ---- draw hexagon
-        # tools.feedback(f'***Hex {x=} {y=} {self.vertices=}')
+        if kwargs and kwargs.get("rotation"):
+            kwargs.pop("rotation")
+        # tools.feedback(f'***Hex {x=} {y=} {self.vertices=} {self.kwargs=')
         cnv.draw_polyline(self.vertices)
         kwargs["closed"] = True
         self.set_canvas_props(cnv=cnv, index=ID, **kwargs)
@@ -2072,9 +2065,9 @@ class HexShape(BaseShape):
             offset = side  # == radius
         else:
             offset = half_flat
-        self.draw_heading(cnv, ID, self.x_d, self.y_d + offset, **kwargs)
+        self.draw_heading(cnv, ID, self.x_d, self.y_d - offset, **kwargs)
         self.draw_label(cnv, ID, self.x_d, self.y_d, **kwargs)
-        self.draw_title(cnv, ID, self.x_d, self.y_d - offset, **kwargs)
+        self.draw_title(cnv, ID, self.x_d, self.y_d + offset, **kwargs)
         # ----  numbering
         self.set_coord(cnv, self.x_d, self.y_d, half_flat)
         # ---- set grid property
@@ -2441,9 +2434,9 @@ class PolygonShape(BaseShape):
         # ---- text
         if kwargs and kwargs.get("rotation"):
             kwargs.pop("rotation")  # otherwise labels rotate again!
-        self.draw_heading(cnv, ID, x, y, 1.3 * radius, **kwargs)
+        self.draw_heading(cnv, ID, x, y, radius, **kwargs)
         self.draw_label(cnv, ID, x, y, **kwargs)
-        self.draw_title(cnv, ID, x, y, 1.4 * radius, **kwargs)
+        self.draw_title(cnv, ID, x, y, radius + 0.5 * self.title_size, **kwargs)
 
 
 class PolylineShape(BaseShape):
@@ -2585,7 +2578,9 @@ class QRCodeShape(BaseShape):
                 f'Unable to load image "{_source}!" - please check name and location',
                 True,
             )
-        # ---- QR shape's text
+        # ---- QR shape other text
+        if kwargs and kwargs.get("text"):
+            kwargs.pop("text")  # otherwise labels use text!
         xc = x + width / 2.0
         yc = y + height / 2.0
         _off = self.heading_size / 2.0
@@ -3292,11 +3287,11 @@ class RectangleShape(BaseShape):
         if kwargs and kwargs.get("rotation"):
             kwargs.pop("rotation")  # otherwise labels rotate again!
         self.draw_heading(
-            cnv, ID, x_d, y_d + 0.5 * self._u.height + delta_m_up, **kwargs
+            cnv, ID, x_d, y_d - 0.5 * self._u.height - delta_m_up, **kwargs
         )
         self.draw_label(cnv, ID, x_d, y_d, **kwargs)
         self.draw_title(
-            cnv, ID, x_d, y_d - 0.5 * self._u.height - delta_m_down, **kwargs
+            cnv, ID, x_d, y_d + 0.5 * self._u.height + delta_m_down, **kwargs
         )
         # ----  numbering
         self.set_coord(cnv, x_d, y_d)
@@ -3371,15 +3366,12 @@ class RhombusShape(BaseShape):
             rotation=kwargs.get("rotation"),
         )
         # ---- text
+        y_off = self._u.height / 2.0
         if kwargs and kwargs.get("rotation"):
             kwargs.pop("rotation")  # otherwise labels rotate again!
-        self.draw_heading(
-            cnv, ID, x + self._u.width / 2.0, y + self._u.height, **kwargs
-        )
-        self.draw_label(
-            cnv, ID, x + self._u.width / 2.0, y + self._u.height / 2.0, **kwargs
-        )
-        self.draw_title(cnv, ID, x + self._u.width / 2.0, y, **kwargs)
+        self.draw_heading(cnv, ID, x + self._u.width / 2.0, cy - y_off, **kwargs)
+        self.draw_label(cnv, ID, x + self._u.width / 2.0, cy, **kwargs)
+        self.draw_title(cnv, ID, x + self._u.width / 2.0, cy + y_off, **kwargs)
 
 
 class RightAngledTriangleShape(BaseShape):
@@ -3711,12 +3703,22 @@ class StadiumShape(BaseShape):
             kwargs.pop("rotation")  # otherwise labels rotate again!
         delta = radius_tb if "n" in _edges or "north" in _edges else 0.0
         self.draw_heading(
-            cnv, ID, x + self._u.width / 2.0, y + self._u.height + delta, **kwargs
+            cnv,
+            ID,
+            x + self._u.width / 2.0,
+            cy - self._u.height / 2.0 - delta,
+            **kwargs,
         )
         self.draw_label(
             cnv, ID, x + self._u.width / 2.0, y + self._u.height / 2.0, **kwargs
         )
-        self.draw_title(cnv, ID, x + self._u.width / 2.0, y - delta, **kwargs)
+        self.draw_title(
+            cnv,
+            ID,
+            x + self._u.width / 2.0,
+            cy + self._u.height / 2.0 + delta,
+            **kwargs,
+        )
 
 
 class StarShape(BaseShape):
@@ -3771,9 +3773,9 @@ class StarShape(BaseShape):
         # ---- text
         if kwargs and kwargs.get("rotation"):
             kwargs.pop("rotation")  # otherwise labels rotate again!
-        self.draw_heading(cnv, ID, x, y + radius, **kwargs)
+        self.draw_heading(cnv, ID, x, y - radius, **kwargs)
         self.draw_label(cnv, ID, x, y, **kwargs)
-        self.draw_title(cnv, ID, x, y - radius, **kwargs)
+        self.draw_title(cnv, ID, x, y + radius, **kwargs)
 
 
 class StarFieldShape(BaseShape):
@@ -3906,6 +3908,7 @@ class TextShape(BaseShape):
         if self.width:
             width = self._u.width
         rotation = kwargs.get("rotation", self.rotation)
+        # TODO => text rotation
         # ---- set canvas
         self.set_canvas_props(index=ID)
         # ---- overrides for self.text / text value
@@ -4100,23 +4103,13 @@ class TrapezoidShape(BaseShape):
         # ---- handle rotation: START
         rotation = kwargs.get("rotation", self.rotation)
         if rotation:
-            # tools.feedback(f'*** TRAP {ID=} {rotation=} {self._u.x=}, {self._u.y=}')
-            cnv.saveState()
-            # reset centre and "bottom left"
-            cx, cy = 0, 0
-            x = -self._u.width / 2.0
-            y = -self._u.height / 2.0
-            # move the canvas origin
-            if ID is not None:
-                # cnv.translate(cx + self._u.margin_left, cy + self._u.margin_bottom)
-                cnv.translate(cx, cy)
-            else:
-                cnv.translate(cx, cy)
-            cnv.rotate(rotation)
+            self.centroid = muPoint(cx, cy)
+            kwargs["rotation"] = (rotation, self.centroid)
         # ---- draw trapezoid
         self.vertices = self.get_vertices(cx=cx, cy=cy, x=x, y=y)
         # tools.feedback(f'***Trap {x=} {y=} {self.vertices=}')
         cnv.draw_polyline(self.vertices)
+        kwargs["closed"] = True
         self.set_canvas_props(cnv=cnv, index=ID, **kwargs)
         sign = -1 if self.flip.lower() in ["s", "south"] else 1
         # ---- borders (override)
@@ -4141,16 +4134,13 @@ class TrapezoidShape(BaseShape):
         # ---- text
         if kwargs and kwargs.get("rotation"):
             kwargs.pop("rotation")  # otherwise labels rotate again!
-        self.draw_heading(
-            cnv, ID, x + self._u.width / 2.0, y + sign * self._u.height, **kwargs
-        )
+        self.draw_heading(cnv, ID, x + self._u.width / 2.0, y, **kwargs)
         self.draw_label(
             cnv, ID, x + self._u.width / 2.0, y + sign * self._u.height / 2.0, **kwargs
         )
-        self.draw_title(cnv, ID, x + self._u.width / 2.0, y, **kwargs)
-        # ---- handle rotation: END
-        if rotation:
-            cnv.restoreState()
+        self.draw_title(
+            cnv, ID, x + self._u.width / 2.0, y + sign * self._u.height, **kwargs
+        )
 
 
 # ---- Other

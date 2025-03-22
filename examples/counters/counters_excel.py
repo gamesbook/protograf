@@ -17,7 +17,7 @@ Create(filename='tannenberg_excel.pdf')
 Data(filename="counters.xls", headers=['NATION','TYPE','SIZE','VALUE','ID','COPIES'])
 
 # no. of counters is based on rows in Excel file (and COPIES column)
-CounterSheet(width=2.6, height=2.6, fill=white, grid_marks=True, copy='COPIES')
+CounterSheet(width=2.6, height=2.6, fill="white", grid_marks=True, copy='COPIES')
 
 # colors and text labels
 gray = "#B8BAB1"

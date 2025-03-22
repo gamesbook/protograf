@@ -12,7 +12,7 @@ Create(filename="tictactoe.pdf", paper="A8", margin=0.2, stroke_width=0.5)
 
 # board & pieces
 rect = RectangularLocations(cols=3, rows=3, interval=1.25, y=2)
-me = circle(radius=0.5, fill_stroke=white)
+me = circle(radius=0.5, fill_stroke="white")
 you = circle(radius=0.5, fill_stroke="black")
 # turns
 turns = [(me,1,1), (you,2,2), (me,1,3), (you,1,2), (me,2,1), (you,2,3), (me,3,1)]

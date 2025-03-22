@@ -25,7 +25,7 @@ Card(
     rectangle(
         x=0.3, y=0.3, width=1.4, height=1.4,
         stroke_width=1, rounding=0.2,
-        fill=white,
+        fill="white",
         label='{{sequence}}\n{{id}}'),
 )
 # create output

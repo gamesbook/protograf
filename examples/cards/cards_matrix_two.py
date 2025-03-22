@@ -41,27 +41,27 @@ outline = rectangle(
 icon_top = hexagon(
     x=1, y=6.4,
     side=0.8,
-    stroke=white)
+    stroke="white")
 value_top = text(
     x=1.8, y=6.8,
     font_size=28,
     text=T('{{VALUE}}'),
     align="centre",
-    stroke=darkslategray)
+    stroke="darkslategray")
 icon_btm = hexagon(
     x=3.8, y=0.9,
     side=0.8,
-    stroke=white)
+    stroke="white")
 value_btm = text(
     x=4.6, y=1.9,
     font_size=28,
     align="centre",
     text=T('{{VALUE}}'),
-    stroke=darkslategray,
+    stroke="darkslategray",
     rotation=180)
 picture = text(
     x=3.0, y=3.3,
-    stroke=white,
+    stroke="white",
     font_size=76,
     text=T('{{IMAGE}}'))
 deco_top = hexagon(
@@ -90,7 +90,7 @@ rectC = rectangle(
     height=7.8,
     width=1.02,
     rounded=1,
-    stroke=white)
+    stroke="white")
 Card("46-48",
      rectangle(common=rectC, x=0.6, fill='#FF0000'),
      rectangle(common=rectC, x=1.62, fill='#FFD700'),
@@ -116,7 +116,7 @@ Card("49-51",
      hexagon(common=hexN, cx=4.6, cy=1.8, centre_shape=hex_in, label="5"),
 )
 
-circle_icon = Common(fill="black", stroke=white, radius=1.25, font_size=48)
+circle_icon = Common(fill="black", stroke="white", radius=1.25, font_size=48)
 Card("52-54",
      circle(common=circle_icon, cx=1.8, cy=7.0, label='\u2707'),
      circle(common=circle_icon, cx=3.1, cy=4.4, label='\u2766'),

@@ -17,7 +17,7 @@ Hexagons(
     stroke=None,
     fill=None,
     height=2.2,
-    centre_shape=rectangle(stroke="black", fill=white, width=1.9, height=2.2, stroke_width=2),
+    centre_shape=rectangle(stroke="black", fill="white", width=1.9, height=2.2, stroke_width=2),
     margin_bottom=4,
 )
 

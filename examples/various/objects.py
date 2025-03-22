@@ -44,8 +44,8 @@ Text(common=header_font, x=5, y=11, text="Paned Window: rectangle with single or
 Rectangle(
     x=2, y=9.5,
     height=3, width=2,
-    hatch_count=1, hatch_width=1, hatch='o', hatch_stroke=sienna,
-    stroke=sienna, stroke_width=3, fill=lightcyan)
+    hatch_count=1, hatch_width=1, hatch='o', hatch_stroke="sienna",
+    stroke="sienna", stroke_width=3, fill=lightcyan)
 
 Text(common=header_font, x=5, y=7, text="Start Player Token: circles + radii using steps() function")
 Polygon(cx=3, cy=7.5, height=3, sides=8, fill="black")
@@ -57,11 +57,11 @@ Text(common=header_font, x=5, y=3, text="Doorway: stadiums, dashline + radii")
 Stadium(x=1.5, y=1, height=3, width=3, fill=skyblue, stroke=darkgray, stroke_width=8, edges="n")
 Stadium(x=1.503, y=1.003, height=3.003, width=3.003, fill=None, edges="n",
         stroke=fidred, stroke_width=5, dotted=True,)
-Circle(cx=3, cy=4, stroke=sienna, stroke_width=5, fill=skyblue, radius=1.3,
-       radii=[30,90,150], radii_stroke=sienna, radii_stroke_width=3)
-Circle(cx=3, cy=4, stroke=sienna, stroke_width=5, fill=sienna, radius=0.3)
+Circle(cx=3, cy=4, stroke="sienna", stroke_width=5, fill=skyblue, radius=1.3,
+       radii=[30,90,150], radii_stroke="sienna", radii_stroke_width=3)
+Circle(cx=3, cy=4, stroke="sienna", stroke_width=5, fill="sienna", radius=0.3)
 Rectangle(x=1.7, y=0.9, height=3, width=2.6,
-          stroke=sienna, stroke_width=5, fill=skyblue)
+          stroke="sienna", stroke_width=5, fill=skyblue)
 PageBreak()
 
 # ---- PAGE 2 ===>
@@ -86,16 +86,16 @@ Text(common=header_font, x=5, y=22,
 Circle(cx=2, cy=22, radius=1,
        fill="#63B1BB", stroke="#63B1BB",
        radii=[135,225],
-       radii_offset=1.05, radii_length=0.4, radii_stroke=white, radii_stroke_width=15)
+       radii_offset=1.05, radii_length=0.4, radii_stroke="white", radii_stroke_width=15)
 Circle(cx=2, cy=22, radius=0.75, fill="#63B1BB", stroke="#63B1BB")
-Dot(x=2.5, y=22.5, stroke=white, dot_point=3)
+Dot(x=2.5, y=22.5, stroke="white", dot_point=3)
 
 Text(common=header_font, x=5, y=19, text="Gear: nested circles; one with 8 offset radii")
 Circle(cx=2, cy=19, radius=0.5,
-       fill=None, stroke=gray, stroke_width=8,
+       fill=None, stroke="gray", stroke_width=8,
        radii=[0,45,90,135,180,225,270,315],
-       radii_offset=0.8, radii_length=0.2, radii_stroke=gray, radii_stroke_width=8)
-Circle(cx=2, cy=19, radius=0.15, fill_stroke=gray)
+       radii_offset=0.8, radii_length=0.2, radii_stroke="gray", radii_stroke_width=8)
+Circle(cx=2, cy=19, radius=0.15, fill_stroke="gray")
 
 Text(common=header_font, x=5, y=16, text="Atom: ellipses with rotation; circle")
 atom = Common(cx=2, cy=16, width=3, height=1, stroke_width=1, outline=red)
@@ -106,11 +106,11 @@ Circle(cx=2, cy=16, radius=0.2, fill_stroke="red")
 Text(common=header_font, x=5, y=12.5,
      text="German Cross: rectangle with 'o' hatch and 'step' notch")
 Rectangle(
-    height=2.8, width=2.8, x=0.5, y=11, fill=white, stroke="black", stroke_width=2,
+    height=2.8, width=2.8, x=0.5, y=11, fill="white", stroke="black", stroke_width=2,
     hatch_width=22, hatch_stroke="black", hatch='o', hatch_count=1,
     notch=0.7, notch_style='step')
 Rectangle(
-    height=2.8, width=2.8, x=0.5, y=11, fill=None, stroke=white, stroke_width=3)
+    height=2.8, width=2.8, x=0.5, y=11, fill=None, stroke="white", stroke_width=3)
 
 Text(common=header_font, x=5, y=9,
      text="Mars Base: rectangle borders; circles with offset radii")

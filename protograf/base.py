@@ -1772,8 +1772,15 @@ class BaseShape:
         if value in self.kwargs:
             return True
         if "common" in self.kwargs:
-            if value in self.kwargs["common"]._kwargs:
-                return True
+            try:
+                if value in self.kwargs.get("common")._kwargs:
+                    return True
+            except AttributeError:
+                tools.feedback(
+                    "Unable to process Common properties"
+                    " - has the Common command been set?",
+                    True,
+                )
         return False
 
     def load_image(
@@ -2031,9 +2038,11 @@ class BaseShape:
         # return height
         return float(self.font_size)
 
-    def textify(self, index: int = None, text: str = "") -> str:
+    def textify(self, index: int = None, text: str = "", default: bool = True) -> str:
         """Extract text from a list, or create string, based on index & type."""
-        _text = text or self.text
+        _text = text
+        if not _text and default:
+            _text = self.text
         log.debug("text %s %s %s %s", index, text, _text, type(_text))
         if _text is None:
             return
@@ -2218,7 +2227,7 @@ class BaseShape:
 
         Requires native units (i.e. points)!
         """
-        ttext = self.textify(index=ID, text=self.heading)
+        ttext = self.textify(index=ID, text=self.heading, default=False)
         _rotation = rotation or self.heading_rotation
         if ttext:
             _ttext = str(ttext)
@@ -2229,7 +2238,7 @@ class BaseShape:
             kwargs["stroke"] = self.heading_stroke
             kwargs["font_size"] = self.heading_size
             self.draw_multi_string(
-                canvas, x, y + y_off, _ttext, align=align, rotation=_rotation, **kwargs
+                canvas, x, y - y_off, _ttext, align=align, rotation=_rotation, **kwargs
             )
             if isinstance(canvas, muShape):
                 canvas.commit()
@@ -2241,11 +2250,11 @@ class BaseShape:
 
         Requires native units (i.e. points)!
         """
-        ttext = self.textify(index=ID, text=self.label)
+        ttext = self.textify(index=ID, text=self.label, default=False)
         _rotation = rotation or self.label_rotation
         if ttext:
             _ttext = str(ttext)
-            yl = yl - (self.label_size / 3.0) if centred else yl
+            yl = yl + (self.label_size / 3.0) if centred else yl
             y = yl + self.unit(self.label_my)
             x = xl + self.unit(self.label_mx)
             kwargs["font_name"] = self.font_name
@@ -2264,7 +2273,7 @@ class BaseShape:
 
         Requires native units (i.e. points)!
         """
-        ttext = self.textify(index=ID, text=self.title)
+        ttext = self.textify(index=ID, text=self.title, default=False)
         _rotation = rotation or self.title_rotation
         if ttext:
             _ttext = str(ttext)
@@ -2275,7 +2284,7 @@ class BaseShape:
             kwargs["stroke"] = self.title_stroke
             kwargs["font_size"] = self.title_size
             self.draw_multi_string(
-                canvas, x, y - y_off, _ttext, align=align, rotation=_rotation, **kwargs
+                canvas, x, y + y_off, _ttext, align=align, rotation=_rotation, **kwargs
             )
             if isinstance(canvas, muShape):
                 canvas.commit()
@@ -2289,7 +2298,7 @@ class BaseShape:
         """
         if not self.radii_label:
             return
-        ttext = self.textify(index=ID, text=self.radii_label)
+        ttext = self.textify(index=ID, text=self.radii_label, default=False)
         _rotation = rotation or self.radii_labels_rotation
         if ttext:
             _ttext = str(ttext)

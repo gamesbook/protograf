@@ -41,6 +41,6 @@ Line(x=0.4, y=1.4, x1=19.6, y1=1.4, stroke=map_border, stroke_width=3)
 Line(x=0.4, y=29.05, x1=19.6, y1=29.05, stroke=map_border, stroke_width=3)
 
 # Tidy bottom edge
-Rectangle(x=-0.2, y=-1.05, width=20.5, height=1.2, stroke=white, fill=white)
+Rectangle(x=-0.2, y=-1.05, width=20.5, height=1.2, stroke="white", fill="white")
 
 Save()

@@ -170,11 +170,11 @@ PageBreak()
 
 # ---- arc
 Blueprint()
-Text(common=txt, text="Arc; 'inside' rect")
-Rectangle(x=1, y=1, height=1, width=2, dot=0.02,
+Text(common=txt, text="Arc; 'inside' square")
+Rectangle(x=1, y=1, height=2, width=2, dot=0.02,
           stroke="red", fill=None,
-          title="Arc(x=1, y=1, x1=3, y1=2)")
-Arc(x=1, y=1, x1=3, y1=2)
+          title="Arc(cx=1, cy=3, radius=2)")
+Arc(cx=1, cy=3, radius=2)  #, angle_start=0, angle_width=90)
 PageBreak()
 
 # ---- stadium
@@ -461,10 +461,10 @@ PageBreak()
 # ---- arrow - sizes
 Blueprint()
 Text(common=txt, text="Arrow: sizes")
-Arrow(x=1, y=1, height=1, width=0.5, head_height=0.5, head_width=0.75)
-Arrow(x=2, y=1, height=1, width=0.5, head_height=0.5, head_width=0.75, tail_width=0.75,
+Arrow(x=1, y=5, height=1, width=0.5, head_height=0.5, head_width=0.75)
+Arrow(x=2, y=5, height=1, width=0.5, head_height=0.5, head_width=0.75, tail_width=0.75,
       stroke="tomato", fill="lightsteelblue", stroke_width=2, transparency=50)
-Arrow(x=3, y=1, height=1, width=0.5, head_height=0.5, head_width=0.75, tail_width=0.01,
+Arrow(x=3, y=5, height=1, width=0.5, head_height=0.5, head_width=0.75, tail_width=0.01,
       fill_stroke="gold")
 Arrow(x=1, y=3, height=1, width=0.25, head_height=0.5, head_width=1, points_offset=-0.25,
       fill="chartreuse")
@@ -477,10 +477,11 @@ PageBreak()
 # ---- arrow - rotate, text
 Blueprint()
 Text(common=txt, text="Arrow: dot, cross, text & rotation")
-Arrow(x=1, y=0.5, title="The Arrow", heading="An arrow", dot=0.1, cross=0.5)
+Arrow(x=1, y=5.5, title="The Arrow", heading="An arrow", dot=0.1, cross=0.5)
 Arrow(x=2.5, y=3, title="0\u00B0", dot=0.15, dotted=True)
 Arrow(x=2.5, y=3, title="45\u00B0", dot=0.1,
       fill=None, stroke="red", dot_stroke="red", rotation=45)
+Arrow(x=3, y=5.5, label="arrow")
 PageBreak()
 
 # ---- Centred Shapes
@@ -518,7 +519,7 @@ QRCode(
     height=2, width=2,
     fill="gray",
     stroke="red",
-    scaling=5
+    scaling=5,
 )
 PageBreak()
 

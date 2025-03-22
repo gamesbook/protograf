@@ -17,7 +17,7 @@ money = rectangle(
     hatch_count=5, hatch='w', hatch_stroke="black",
     label_stroke="black", label_size=18)
 pipe = image("images/pipe.png", width=2, height=0.75)
-card_icon = rectangle(fill=white, label_stroke="black", label_size=32)
+card_icon = rectangle(fill="white", label_stroke="black", label_size=32)
 card_icon_small = rectangle(common=card_icon, height=1.2, width=0.8, rounding=0.1)
 card_icon_med = rectangle(common=card_icon, height=1.7, width=1.2, rounding=0.15)
 card_icon_large = rectangle(common=card_icon, height=2.2, width=1.6, rounding=0.2)
@@ -33,10 +33,10 @@ Image("images/world_map.png", x=7, y=6, width=52.4, height=32)
 Grid(x=0.25, y=0.4, side=1.25, stroke="#587CBC")
 
 # Partial blur
-Rectangle(x=0, y=0, width=59.4, height=42, fill=white, transparency=20)
+Rectangle(x=0, y=0, width=59.4, height=42, fill="white", transparency=20)
 
 # Outline
-drect = Common(fill=None, stroke=gray, dashed=[0.2, 0.1], rounding=0.5, stroke_width=2)
+drect = Common(fill=None, stroke="gray", dashed=[0.2, 0.1], rounding=0.5, stroke_width=2)
 
 # Action Cards Slots: Red
 rrect = rectangle(common=drect, x=-0.5, y=4.25, height=6., width=6.75)
@@ -130,7 +130,7 @@ Rectangle(
 # Scoring Track
 score_common = Common(
     cx=0, cy=0, radius=0.75, stroke_width=3, transparency=50,
-    label_size=21, label_stroke=white)
+    label_size=21, label_stroke="white")
 score_base = circle(common=score_common, stroke="#11B6E4", fill="#008FCE")
 score_5 = circle(
     common=score_common, stroke="#7BC9E6", fill="#3FA1BB", label="{{sequence}}")
@@ -148,7 +148,7 @@ Rectangle(
     x=57.4, y=6, width=2.4, height=30, fill_stroke="#554F52", rounding=0.4,
     hatch_count=12, hatch='w', hatch_stroke="#4E6B9A")
 Sequence(
-    text(x=58.5, y=6.8, font_size=24, stroke=gray, text="{{sequence}}"),
+    text(x=58.5, y=6.8, font_size=24, stroke="gray", text="{{sequence}}"),
     setting=[1,2,3,4,' ',5,6,7,' ',8,9,10],
     interval_y=2.3)
 
@@ -180,7 +180,7 @@ Sequence(
     setting=(1,4,1,'number'),
     interval_y=-2.1)
 Sequence(
-    text(x=12.8, y=18.4, font_size=32, stroke=white, text="{{sequence}}."),
+    text(x=12.8, y=18.4, font_size=32, stroke="white", text="{{sequence}}."),
     setting=(1,4,1,'number'),
     interval_y=-2.1)
 

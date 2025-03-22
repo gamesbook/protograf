@@ -23,18 +23,18 @@ Text(common=header, text="Basic Clock")
 Circle(cx=3, cy=4.5, radius=2.5, stroke_width=6,
        label_size=6, label_my=1, label="PROTO")
 # minutes
-Circle(cx=3, cy=4.5, radius=2.3, radii=steps(0,360,6), stroke=white, fill=None, stroke_width=0.01,
+Circle(cx=3, cy=4.5, radius=2.3, radii=steps(0,360,6), stroke="white", fill=None, stroke_width=0.01,
        radii_length=0.15, radii_offset=2.2, radii_stroke_width=0.5, radii_stroke="black")
 # hours
-Circle(cx=3, cy=4.5, radius=2.3, radii=steps(0,360,30), stroke=white, fill=None, stroke_width=0.01,
+Circle(cx=3, cy=4.5, radius=2.3, radii=steps(0,360,30), stroke="white", fill=None, stroke_width=0.01,
        radii_length=0.3, radii_offset=2.2, radii_stroke_width=1.5, radii_stroke="black")
 # centre
 Circle(cx=3, cy=4.5, radius=.13, fill="black")
 # hour hand
-Circle(cx=3, cy=4.5, radius=1.8, radii=[35], stroke=white, fill=None,
+Circle(cx=3, cy=4.5, radius=1.8, radii=[35], stroke="white", fill=None,
        radii_length=2, radii_offset=-.5,  radii_stroke_width=4, radii_stroke="black")
 # minute hand
-Circle(cx=3, cy=4.5, radius=1.8, radii=[150], stroke=white, fill=None,
+Circle(cx=3, cy=4.5, radius=1.8, radii=[150], stroke="white", fill=None,
        radii_length=2.3, radii_offset=-.5, radii_stroke_width=3, radii_stroke="black")
 
 Save()

@@ -39,12 +39,12 @@ labels = ['Build', 'Trade', 'Income', 'Plant', 'Expand', 'Harvest']
 for colr, angle in zip(colrs, radii):
     Sector(
         common=circ,
-        fill=colr, stroke=sienna, stroke_width=2,
+        fill=colr, stroke="sienna", stroke_width=2,
         angle=420 - angle, angle_width=60)
 # rondel text
 Circle(
     common=circ,
-    stroke=sienna, stroke_width=3,
+    stroke="sienna", stroke_width=3,
     fill=None,
     radii=radii,
     radii_offset=0.75, radii_length=1,

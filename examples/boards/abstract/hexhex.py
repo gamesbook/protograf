@@ -14,7 +14,7 @@ Create(filename="hexhex_board.pdf", margin=0.5, paper="A4")
 Hexagons(
     sides=4,
     hex_layout="circle",
-    fill=white,
+    fill="white",
     stroke="black",
     height=2.2,
     margin_bottom=0.5,

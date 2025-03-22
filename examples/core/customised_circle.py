@@ -37,8 +37,8 @@ PageBreak()
 # ---- circle dot & cross
 Blueprint()
 Text(common=txt, text="Circle: Dots & Crosses")
-Circle(cx=1, cy=1, radius=1, dot=0.1, dot_stroke=green)
-Circle(cx=3, cy=1, radius=1, cross=0.25, cross_stroke=green, cross_stroke_width=1)
+Circle(cx=1, cy=1, radius=1, dot=0.1, dot_stroke="green")
+Circle(cx=3, cy=1, radius=1, cross=0.25, cross_stroke="green", cross_stroke_width=1)
 PageBreak()
 
 # ---- circle radii
@@ -148,7 +148,7 @@ Circle(cx=3, cy=3, radius=1,
        dot=0.05)
 Circle(cx=1, cy=1, radius=1,
        radii=[30, 150, 270],
-       radii_stroke=white,
+       radii_stroke="white",
        radii_labels=["A","B", "C"],
        radii_labels_rotation=270,
        radii_labels_stroke="red",

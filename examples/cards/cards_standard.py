@@ -78,7 +78,7 @@ Card("42", image("images/jack_d.png", common=royals))
 # ace
 Card("13",
      text(x=3.15, y=2.6, font_size=180, stroke="black", text='\u2660'),
-     text(x=3.15, y=3.8, font_size=60, stroke=white, text='\u2660'))
+     text(x=3.15, y=3.8, font_size=60, stroke="white", text='\u2660'))
 
 # jokers (2 extra cards)
 jok_pic = Common(x=0.8, y=1.9, width=5, height=5)

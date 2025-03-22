@@ -14,10 +14,10 @@ Create(filename="hexhex_board_hexagons.pdf", margin=0.5, paper="A4")
 Hexagons(
     sides=5,
     hex_layout="circle",
-    stroke=white,
+    stroke="white",
     fill=None,
     height=2.2,
-    centre_shape=hexagon(stroke="black", fill=white, height=2, stroke_width=2),
+    centre_shape=hexagon(stroke="black", fill="white", height=2, stroke_width=2),
     margin_bottom=4,
     hidden=[(5, 5)],
 )

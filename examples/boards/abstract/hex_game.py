@@ -12,7 +12,7 @@ Create(filename="hex_game_board.pdf", margin=0.5, paper=landscape(A4))
 
 # Background Player Areas
 RightAngledTriangle(
-    x=-1.1, y=10.0, height=9, width=15.35, fill=white, flip="north", hand="east"
+    x=-1.1, y=10.0, height=9, width=15.35, fill="white", flip="north", hand="east"
 )
 RightAngledTriangle(
     x=-1.1, y=10.0, height=9, width=15.35, fill="black", flip="south", hand="east"
@@ -21,7 +21,7 @@ RightAngledTriangle(
     x=29.55, y=10.0, height=9, width=15.35, fill="black", flip="north", hand="west"
 )
 RightAngledTriangle(
-    x=29.55, y=10.0, height=9, width=15.35, fill=white, flip="south", hand="west"
+    x=29.55, y=10.0, height=9, width=15.35, fill="white", flip="south", hand="west"
 )
 
 # Hex Game Board

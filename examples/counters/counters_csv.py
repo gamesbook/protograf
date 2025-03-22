@@ -17,7 +17,7 @@ Create(filename='tannenberg_csv.pdf')
 Data(filename="counters.csv")
 
 # no. of counters is based on rows in CSV file (and COPIES column)
-CounterSheet(width=2.6, height=2.6, fill=white, grid_marks=True, copy='COPIES')
+CounterSheet(width=2.6, height=2.6, fill="white", grid_marks=True, copy='COPIES')
 
 # colors and text labels
 gray = "#B8BAB1"

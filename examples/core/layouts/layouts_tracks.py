@@ -206,7 +206,7 @@ Blueprint()
 Text(common=txt, text="Track: circles; 'clock'")
 Circle(cx=2, cy=3, radius=1.8, stroke_width=2, dot=0.1)
 times = circle(
-    cx=1, cy=1, radius=0.25, stroke=white,
+    cx=1, cy=1, radius=0.25, stroke="white",
     label='{{sequence}}', label_stroke="black")
 Track(
     circle(cx=2, cy=3, radius=1.5),
@@ -225,7 +225,7 @@ score = Common(
     cx=1, cy=1, radius=0.18, stroke=navy,
     label='{{sequence}}', label_size=6)
 
-shp = circle(common=score, fill=white)
+shp = circle(common=score, fill="white")
 Track(
     trk,
     shapes=[shp],

@@ -23,7 +23,7 @@ sqr_locations = RectangularLocations(
     start="NW", direction="east", pattern="snake")
 Layout(
    sqr_locations,
-   shapes=[square(common=sqr, fill=white), square(common=sqr, fill="gray")])
+   shapes=[square(common=sqr, fill="white"), square(common=sqr, fill="gray")])
 Rectangle(x=0.18, y=3.85, width=18, height=18, stroke_width=3, fill=None)
 
 Save()

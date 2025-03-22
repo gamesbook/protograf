@@ -46,7 +46,7 @@ desc = text(
     wrap=True, align="justify", text=T('{{ DESCRIPTION_SHORT }}'))
 game_id = circle(
     cx=5.6, cy=0.3, font_size=7, radius=0.2,
-    stroke=None, fill=None, label_stroke=gray, label=T('{{ ID }}'))
+    stroke=None, fill=None, label_stroke="gray", label=T('{{ ID }}'))
 
 # create colored ratings based on score
 rating_high = rectangle(

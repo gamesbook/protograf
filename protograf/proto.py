@@ -1948,7 +1948,7 @@ def Track(track=None, **kwargs):
             sequence=index + 1,
         )
         _locale = locale._asdict()
-        shape.draw(cnv=globals.base, rotation=shape_rotation, locale=_locale)
+        shape.draw(cnv=globals.canvas, rotation=shape_rotation, locale=_locale)
         shape_id += 1
         if shape_id > len(shapes) - 1:
             shape_id = 0  # reset and start again

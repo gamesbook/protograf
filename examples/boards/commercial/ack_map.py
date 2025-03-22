@@ -39,7 +39,7 @@ Hexagons(
     coord_font_size=8,
     coord_stroke=deepgray,
     coord_padding=2,
-    fill=white,
+    fill="white",
     stroke=deepgray,
     stroke_width=1.2,
 )
@@ -60,6 +60,6 @@ Hexagons(
 )
 
 # Tidy bottom edge
-Rectangle(x=-0.2, y=-1.05, width=38.5, height=1.55, stroke=white, fill=white)
+Rectangle(x=-0.2, y=-1.05, width=38.5, height=1.55, stroke="white", fill="white")
 
 Save()

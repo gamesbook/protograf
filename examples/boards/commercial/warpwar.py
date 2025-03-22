@@ -32,7 +32,7 @@ cloud_dark = "#4D173E"
 Rectangle(x=0.0, y=0.0, width=41, height=58.3, stroke=map_border, fill=map_fill)
 
 # title line
-txt = Common(y=57.5, font_size=21, align="left", stroke=white)
+txt = Common(y=57.5, font_size=21, align="left", stroke="white")
 gridnum = Common(font_size=21, align="left", stroke=grid_line)
 Text(common=txt, x=3,  text="2 Player Warp War Map:      Vedem Sector")
 Text(common=txt, x=22, text="(c) 2024 by Richard W. Smith")

@@ -25,14 +25,14 @@ Hexagons(
     y=-0.8,
     x=-0.0,
     dot=0.04,
-    dot_stroke=white,
+    dot_stroke="white",
     coord_elevation="t",
     coord_type_x="upper",
     coord_font_size=7,
     coord_padding=0,
 )
 # cover "extra" hexagons
-Rectangle(x=-0.05, y=-0.83, width=29, height=1, stroke=white, fill=white)
-Rectangle(x=28.75, y=-0.83, width=0.5, height=24.93, stroke=white, fill=white)
+Rectangle(x=-0.05, y=-0.83, width=29, height=1, stroke="white", fill="white")
+Rectangle(x=28.75, y=-0.83, width=0.5, height=24.93, stroke="white", fill="white")
 
 Save()

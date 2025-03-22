@@ -40,27 +40,27 @@ outline = rectangle(
 icon_top = hexagon(
     x=1, y=6.4,
     side=0.8,
-    stroke=white)
+    stroke="white")
 value_top = text(
     x=1.8, y=6.8,
     font_size=28,
     text=T('{{VALUE}}'),
     align="centre",
-    stroke=darkslategray)
+    stroke="darkslategray")
 icon_btm = hexagon(
     x=3.8, y=0.9,
     side=0.8,
-    stroke=white)
+    stroke="white")
 value_btm = text(
     x=4.6, y=1.9,
     font_size=28,
     align="centre",
     text=T('{{VALUE}}'),
-    stroke=darkslategray,
+    stroke="darkslategray",
     rotation=180)
 picture = text(
     x=3.0, y=3.3,
-    stroke=white,
+    stroke="white",
     font_size=76,
     text=T('{{IMAGE}}'))
 deco_top = hexagon(
