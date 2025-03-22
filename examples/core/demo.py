@@ -19,10 +19,11 @@ Hexagon(
     cx=9.5, cy=14,
     side=10,
     fill_stroke="forestgreen",
-    label="WELCOME!\nto a \nprotograf\ndemo",
+    label="Welcome to\na protograf\ndemo",
     label_size=30,
     label_stroke="white",
-    label_my=1.7)
+    label_my=-1.5,
+    label_mx=4.1)
 # the track of the signs...
 sign = circle(cx=0, cy=0, radius=2.7, label='{{sequence}}', fill=None, stroke_width=18,
               radii=[0,90,180,270], radii_stroke_width=18,)
@@ -138,24 +139,6 @@ Dot(x=9.5, y=1, dot_point=6, title="dot:1-9.5")
 
 PageBreak()
 
-# ---- rotation all shapes + label
-Blueprint()
-Text(common=header, text="Rotated shapes with labels")
-Polygon(x=4, y=24.5, radius=2, rotation=45, stroke_width=2, label="polygon6")
-Polygon(x=10, y=24.5, radius=2, sides=8, angle=22.5, rotation=45, stroke_width=2, label="polygon8")
-Polygon(x=16, y=24.5, radius=2.5, sides=3, rotation=45, stroke_width=2, label="polygon3")
-Rectangle(x=2, y=18.5, width=4, height=3, rotation=45, stroke_width=2, label="rectangle")
-Trapezoid(x=14, y=13, width=4, top=2, height=3, rotation=45, stroke_width=2, label="Trapezoid")
-Stadium(x=14.5, y=19, width=3, height=2, rotation=45, stroke_width=2, label="stadium")
-Hexagon(x=2, y=13, side=2, rotation=45, stroke_width=2, label="hexagon")
-Hexagon(x=8, y=13, side=2, orientation="pointy", rotation=45, stroke_width=2, label="hexagon")
-Star(x=10, y=9, vertices=5, radius=2, rotation=45, stroke_width=2, label="star")
-Circle(cx=16, cy=9, radius=2, rotation=45, stroke_width=2, label="circle")
-Ellipse(cx=4, cy=9, width=5, height=3, rotation=45, stroke_width=2, label="ellipse")
-Rhombus(x=8.5, y=1, width=3, height=5, rotation=45, stroke_width=2, label="rhombus")
-Square(x=14, y=2, side=3, rotation=45, stroke_width=2, label="square")
-PageBreak()
-
 # ---- filled shapes
 Blueprint()
 Text(common=header, text="Filled shapes")
@@ -187,6 +170,26 @@ Square(cx=9, cy=5, side=3,
 Dot(x=9.5, y=1, dot_point=6, title="dot:1-9.5")
 PageBreak()
 
+# ---- rotation all shapes + label
+Blueprint()
+Text(common=header, text="Rotated shapes with labels")
+Arrow(x=3, y=6, height=3, width=1.25, head_height=1, head_width=2, rotation=45, stroke_width=2, label="arrow")
+Polygon(x=4, y=24.5, radius=2, rotation=45, stroke_width=2, label="polygon6")
+Polygon(x=10, y=24.5, radius=2, sides=8, angle=22.5, rotation=45, stroke_width=2, label="polygon8")
+Polygon(x=15, y=24.5, radius=2.5, sides=3, rotation=45, stroke_width=2, label="polygon3")
+Rectangle(x=2, y=18.5, width=4, height=3, rotation=45, stroke_width=2, label="rectangle")
+Trapezoid(x=14, y=13, width=4, top=2, height=3, rotation=45, stroke_width=2, label="trapezoid")
+Stadium(x=14.5, y=19, width=3, height=2, rotation=45, stroke_width=2, label="stadium")
+EquilateralTriangle(cx=10, cy=20, side=4, rotation=45, stroke_width=2, label="equ.tri.")
+Hexagon(x=2, y=13, side=2, rotation=45, stroke_width=2, label="hexagon")
+Hexagon(x=8, y=13, side=2, orientation="pointy", rotation=45, stroke_width=2, label="hexagon")
+Star(x=10, y=9, vertices=5, radius=2, rotation=45, stroke_width=2, label="star")
+Circle(cx=16, cy=9, radius=2, rotation=45, stroke_width=2, label="circle")
+Ellipse(cx=4, cy=9, width=5, height=3, rotation=45, stroke_width=2, label="ellipse")
+Rhombus(x=8.5, y=1, width=3, height=5, rotation=45, stroke_width=2, label="rhombus")
+Square(x=14, y=2, side=3, rotation=45, stroke_width=2, label="square")
+PageBreak()
+
 # ---- lines and polyshapes & polylines
 Text(common=header, text="Polyshapes, Polylines and lines")
 Polyline(
@@ -208,18 +211,18 @@ Line(
 Line(x=0, y=5, x1=19, y1=5, dotted=True, stroke="blue", stroke_width=2, label="dotted")
 # house
 points = [
-    (2, 17),
+    (2, 23),
     (2, 20),
-    (5, 21),
+    (5, 19),
     (8, 20),
-    (8, 17),
-    (6, 17),
-    (6, 18.5),
-    (4, 18.5),
-    (4, 17),
-    (1, 17),
+    (8, 23),
+    (6, 23),
+    (6, 21.5),
+    (4, 21.5),
+    (4, 23),
+    (1, 23),
 ]
-Polyshape(cx=5, cy=19.5, points=points, stroke="bisque", fill="tomato",
+Polyshape(cx=5, cy=20.5, points=points, stroke="bisque", fill="tomato",
           label="Store", label_size=24)
 Polyshape(x=25, y=4, points="0,0 0,1 2,0 2,1 0,0", fill_stroke="gold")
 PageBreak()
@@ -339,68 +342,64 @@ Image(
 )
 PageBreak()
 
-Text(html=True,
-     x=1, y=1, width=10, height=2,
-     text='<span style="font-family: Helvetica; font-size: 14pt; color: red">'
-          'HTML Helvetica 10pt<br/>'
-          '<b>bold</b> <i>ital</i> <b><i>bold ital</i></b></span>'
-)
-PageBreak()
+# TEST = '''<span style="font-family: Helvetica; font-size: 14pt; color: blue">
+#      HTML Helvetica 10pt<br/>
+#      <b>bold</b> <i>ital</i> <b><i>bold ital</i></b></span>'''
 
 # ---- text alignment (default is centre);
-# Text(common=header, text="Text: face, styling, wrap and align")
-
-# Rectangle(x=0.75, y=23.5, width=7.5, height=3, stroke_width=1, stroke="gray") #, heading="Aligments")
-# Text(text="sholes\ntypewriter!", x=4.5, y=26)  #  add line break via \n
-# Text(text="sholes * typewriter!", x=4.5, y=25, align="centre")
-# Text(text="sholes typewriter! *", x=4.5, y=24.5, align="right")
-# Text(text="* sholes typewriter!", x=4.5, y=24, align="left")
+Text(common=header, text="Text: face, styling, wrap and align")
+Rectangle(x=0.75, y=23.5, width=7.5, height=3, stroke_width=1, stroke="gray") #, heading="Aligments")
+Text(text="sholes\ntypewriter!", x=4.5, y=26)  #  add line break via \n
+Text(text="sholes * typewriter!", x=4.5, y=25, align="centre")
+Text(text="sholes typewriter! *", x=4.5, y=24.5, align="right")
+Text(text="* sholes typewriter!", x=4.5, y=24, align="left")
 
 # # ---- auto-text wrapping & justification
-# LATIN = """At cum perfecto praesent, ne causae voluptua <i>reprimique</i> usu,
-# his id odio tamquam <strike>senserit</strike>.<br/>
-# <br/>
-# Eu facete audire assentor usu. Legendos reformidans et vel. Ignota <u>seprehendunt</u>
-# nam an, vix ad veri maiorum vivendo. Per at ullum iracundia intellegam, alii
-# nonumy deterruisset ne sed, cum cu quet reque <b>signiferumque</b>.<br/>
-# <br/>
-# <font face="times" color="red" size="15">Qui at primis regione consetetur.</font>
-# Id vis viris antiopam gloriatur, muscipit ex has, an ius mazim.
-# """
+LATIN = """At cum perfecto praesent, ne causae voluptua <i>reprimique</i> usu,
+his id odio tamquam senserit.<br/>
+<br/>
+Eu facete audire assentor usu. Legendos reformidans et vel. Ignota <u>seprehendunt
+nam an, vix ad veri maiorum vivendo. Per at ullum iracundia intellegam, alii
+nonumy deterruisset ne sed, cum cu quet reque <b>signiferumque</b>.<br/>
+<br/>
+<span style="font-family:Times-Roman; color:red; font-size:15pt">
+  Qui at primis regione consetetur.</span>
+Id vis viris antiopam gloriatur, muscipit ex has, an ius mazim.
+"""
 # image = os.path.join('core', '13.png')  # make name cross-platform; call from examples dir
 # IMAGE = LATIN + f'<img src="{image}" height="10" valign="bottom"/>' + \
 #     ' per at ullum iracundia intellegam.'
 
-# header = Common(x=1, font_size=18, align="left", width=2.5, height=2, html=True)
+header = Common(x=1, font_size=24, align="left", width=2.5, height=2)
+Text(common=header, y=3, text="HTML\nStyled")
+Rectangle(x=4.5, y=1, width=10, height=6, stroke_width=1, stroke="gray", fill=None)
+Text(
+    x=4.5, y=1, width=10, height=6, html=True, text=LATIN
+)
 
-# Rectangle(x=4.5, y=1, width=10, height=5.5, stroke_width=1, stroke="gray")
-# Text(
-#     x=4.5, y=1, width=10, height=5, html=True, text=LATIN, stroke="cyan"
-# )
-# Text(common=header, y=4, text="Align: Left")
+LATIN_PLAIN = """At cum perfecto praesent, ne causae voluptua reprimique usu, his id odio tamquam senserit.
 
-# Rectangle(x=4.5, y=7, width=10, height=5, stroke_width=1, stroke="gray")
-# Text(x=4.5, y=12, width=10, height=5, wrap=True, align="right", text=LATIN)
-# Text(common=header, y=10, text="Align: Right")
+Eu facete audire assentor usu. Legendos reformidans et vel. Ignota seprehendunt nam an, vix ad veri maiorum vivendo. Per at ullum iracundia intellegam, alii nonumy deterruisset ne sed, cum cu quet reque signiferumque.
 
-# Rectangle(x=4.5, y=12.5, width=10, height=5, stroke_width=1, stroke="gray")
-# Text(x=4.5, y=17.5, width=10, height=5, wrap=True, align="centre", text=LATIN)
-# Text(common=header, y=16, text="Align: Centre")
+Qui at primis regione consetetur. Id vis viris antiopam gloriatur, muscipit ex has, an ius mazim."""
 
-# Rectangle(x=4.5, y=18, width=10, height=5, stroke_width=1, stroke="gray")
-# Text(x=4.5, y=23, width=10, height=5, wrap=True, align="justify", text=LATIN)
-# Text(common=header, y=21, text="Align: Justify")
+Rectangle(x=4.5, y=8, width=10, height=7, stroke_width=1, stroke="gray", fill=None)
+Text(common=header, y=10, text="Wrap:\nright")
+Text(x=4.5, y=8, width=10, height=10, wrap=True, align="right", text=LATIN_PLAIN)
 
-# PageBreak()
+Rectangle(x=4.5, y=16, width=10, height=7, stroke_width=1, stroke="gray", fill=None)
+Text(common=header, y=19, text="Wrap:\ncentre")
+Text(x=4.5, y=16, width=10, height=10, wrap=True, align="centre", text=LATIN_PLAIN)
+PageBreak()
 
-# # one BIG hex
-# Hexagon(
-#     cx=9.5, cy=14,
-#     side=10,
-#     label="THIS IS THE END...\nof a basic\nprotograf demo!",
-#     label_size=30,
-#     label_my=-1,
-#     label_mx=7,)
+# one BIG hex
+Hexagon(
+    cx=9.5, cy=14,
+    side=10,
+    label="THIS IS THE END...\nof a basic\nprotograf demo!",
+    label_size=30,
+    label_my=-1,
+    label_mx=7,)
 
 # Save(output='png', dpi=300)
 Save()
