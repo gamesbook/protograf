@@ -591,6 +591,9 @@ class BaseCanvas:
         self.peaks = kwargs.get("peaks", [])
         self.peaks_dict = {}
         self.borders = kwargs.get("borders", [])
+        self.rounded_radius = self.defaults.get(
+            "rounded_radius", 0.05
+        )  # fraction of smallest side
         # ---- stadium
         self.edges = self.defaults.get("edges", "E W")
         # ---- grid / card layout
@@ -988,6 +991,7 @@ class BaseShape:
         self.peaks = kwargs.get("peaks", base.peaks)
         self.peaks_dict = {}
         self.borders = kwargs.get("borders", base.borders)
+        self.rounded_radius = base.rounded_radius
         # ---- stadium
         self.edges = kwargs.get("edges", base.edges)
         # ---- grid / card layout

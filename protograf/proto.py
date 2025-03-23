@@ -855,7 +855,6 @@ def rhombus(row=None, col=None, **kwargs):
 
 def Rectangle(row=None, col=None, **kwargs):
     kwargs = margins(**kwargs)
-    breakpoint()
     rect = rectangle(row=row, col=col, **kwargs)
     rect.draw()
     return rect
@@ -1365,6 +1364,7 @@ def Rectangles(rows=1, cols=1, **kwargs):
                     label=rect.label,
                 )
                 kwargs["locale"] = _locale._asdict()
+                # Note: Rectangle.calculate_xy() uses the row&col to get y&x
                 Rectangle(row=row, col=col, **kwargs)
                 locales.append(_locale)
                 sequence += 1

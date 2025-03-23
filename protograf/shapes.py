@@ -2024,7 +2024,7 @@ class HexShape(BaseShape):
             if not isinstance(self.borders, list):
                 tools.feedback('The "borders" property must be a list of sets or a set')
             for border in self.borders:
-                self.draw_border(cnv, border, ID)
+                self.draw_border(cnv, border, ID)  # BaseShape
 
         # ---- debug
         # self._debug(cnv, Point(x, y), 'start')
@@ -2706,6 +2706,7 @@ class RectangleShape(BaseShape):
 
     def calculate_xy(self, **kwargs):
         # ---- adjust start
+        # tools.feedback(f'*** Rect.calc {self.col=} {self.row=}')
         if self.row is not None and self.col is not None:
             if self.kwargs.get("grouping_cols", 1) == 1:
                 x = (
@@ -2891,7 +2892,7 @@ class RectangleShape(BaseShape):
     def draw(self, cnv=None, off_x=0, off_y=0, ID=None, **kwargs):
         """Draw a rectangle on a given canvas."""
         kwargs = self.kwargs | kwargs
-        # tools.feedback(f' @@@ Rect.draw {kwargs=}')
+        # tools.feedback(f'\n@@@ Rect.draw {kwargs=}')
         cnv = cnv if cnv else self.canvas
         super().draw(cnv, off_x, off_y, ID, **kwargs)  # unit-based props
         # ---- updated based on kwargs
@@ -2928,6 +2929,7 @@ class RectangleShape(BaseShape):
             )
         # ---- calculate properties
         x, y = self.calculate_xy()
+        # tools.feedback(f'*** RECT      {self.col=} {self.row=} {x=} {y=}')
         # ---- overrides for grid layout
         if self.use_abs_c:
             x = self._abs_cx - self._u.width / 2.0
@@ -3175,26 +3177,28 @@ class RectangleShape(BaseShape):
             self.vertices = self.get_vertices(**kwargs)
         # tools.feedback(f'*** Rect {len(self.vertices)=}')
 
-        # ---- draw rectangle
-        if is_notched or is_chevron or is_peaks:
-            pth = cnv.beginPath()
-            pth.moveTo(*self.vertices[0])
-            for vertex in self.vertices:
-                pth.lineTo(*vertex)
-            pth.close()
-            cnv.drawPath(
-                pth, stroke=1 if self.stroke else 0, fill=1 if self.fill else 0
-            )
-        elif self.rounding:
+        # ---- calculate rounding
+        # radius (multiple) – draw rounded rectangle corners. S
+        # Specifies the radius of the curvature as percentage of rectangle side length
+        # where 0.5 corresponds to 50% of the respective side.
+        radius = None
+        if self.rounding:
             rounding = self.unit(self.rounding)
-            kwargs["rounding"] = rounding
-            cnv.draw_rect((x, y, self._u.width, self._u.height))
-        elif self.rounded:
-            _rounding = self._u.width * 0.08
-            kwargs["rounding"] = _rounding
-            cnv.draw_rect((x, y, self._u.width, self._u.height))
+            radius = rounding / min(self._u.width, self._u.height)
+        if self.rounded:
+            radius = self.rounded_radius  # hard-coded OR from defaults
+
+        # ---- draw rectangle
+        # tools.feedback(f'*** RECT {self.col=} {self.row=} {x=} {y=} {radius=}')
+        if is_notched or is_chevron or is_peaks:
+            # tools.feedback(f'*** RECT  vertices')
+            cnv.draw_polyline(self.vertexes)
+            kwargs["closed"] = True
+            self.set_canvas_props(cnv=cnv, index=ID, **kwargs)
         else:
-            cnv.draw_rect((x, y, x + self._u.width, y + self._u.height))
+            # tools.feedback(f'*** RECT  normal')
+            cnv.draw_rect((x, y, x + self._u.width, y + self._u.height), radius=radius)
+            self.set_canvas_props(cnv=cnv, index=ID, **kwargs)
             # ---- * borders (override)
             if self.borders:
                 if isinstance(self.borders, tuple):
@@ -3206,8 +3210,7 @@ class RectangleShape(BaseShape):
                         'The "borders" property must be a list of sets or a set'
                     )
                 for border in self.borders:
-                    self.draw_border(cnv, border, ID)
-        self.set_canvas_props(cnv=cnv, index=ID, **kwargs)
+                    self.draw_border(cnv, border, ID)  # BaseShape
 
         # ---- draw hatch
         if self.hatch_count:
@@ -3355,7 +3358,7 @@ class RhombusShape(BaseShape):
             if not isinstance(self.borders, list):
                 tools.feedback('The "borders" property must be a list of sets or a set')
             for border in self.borders:
-                self.draw_border(cnv, border, ID)
+                self.draw_border(cnv, border, ID)  # BaseShape
         # ---- dot
         self.draw_dot(cnv, x + self._u.width / 2.0, y + self._u.height / 2.0)
         # ---- cross
@@ -4121,7 +4124,7 @@ class TrapezoidShape(BaseShape):
             if not isinstance(self.borders, list):
                 tools.feedback('The "borders" property must be a list of sets or a set')
             for border in self.borders:
-                self.draw_border(cnv, border, ID)
+                self.draw_border(cnv, border, ID)  # BaseShape
         # ---- dot
         self.draw_dot(cnv, x + self._u.width / 2.0, y + sign * self._u.height / 2.0)
         # ---- cross
