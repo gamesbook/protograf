@@ -855,6 +855,7 @@ def rhombus(row=None, col=None, **kwargs):
 
 def Rectangle(row=None, col=None, **kwargs):
     kwargs = margins(**kwargs)
+    breakpoint()
     rect = rectangle(row=row, col=col, **kwargs)
     rect.draw()
     return rect
