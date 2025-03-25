@@ -9,20 +9,20 @@ from protograf import *
 
 Create(filename="customised_blueprint.pdf",
        paper="A8",
-       margin_top=0.2,
-       margin_left=0.75,
-       margin_bottom=0.75,
-       margin_right=0.2,
+       margin_left=0.5,
+       margin_right=0.3,
+       margin_bottom=0.2,
+       margin_top=0.5,
        font_size=8)
 
 txt = Common(x=0, y=0, font_size=8, align="left")
 
-#Blueprint()
+Blueprint()
 Text(common=txt, text="Blueprint:defaults")
 PageBreak()
 
 Blueprint(stroke_width=1, stroke='red')
-Text(common=txt, text="Blueprint: stroke-red; width=1")
+Text(common=txt, text="Blueprint: stroke - red&width=1")
 PageBreak()
 
 Blueprint(style='invert')

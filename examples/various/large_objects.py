@@ -32,7 +32,7 @@ Text(common=header, text="Rondel")
 
 circ = Common(cx=2, cy=3, radius=2)
 radii = list(range(0, 360, 60))
-colrs = [tomato, aqua, gold, lime, silver, white]
+colrs = ["tomato", aqua, gold, "chartreuse", "lightsteelblue", white]
 labels = ['Build', 'Trade', 'Income', 'Plant', 'Expand', 'Harvest']
 
 # rondel colors

@@ -9,14 +9,14 @@ from protograf import *
 
 Create(filename="customised_hexagonal_grid.pdf",
        paper="A8",
-       margin=0.75,
-       margin_right=0.2, margin_top=0.2,
+       margin_left=0.5,
+       margin_right=0.3,
+       margin_bottom=0.2,
+       margin_top=0.5,
        font_size=8,
        stroke_width=0.5)
 
-Footer(draw=False)
-
-header = Common(x=0, y=6, font_size=8, align="left")
+header = Common(x=0, y=0, font_size=8, align="left")
 
 # ---- rectangular - flat
 Blueprint(stroke_width=0.5)
@@ -200,8 +200,6 @@ Hexagons(
     height=0.75,
     hex_layout="diamond",
 )
-PageBreak()
-
 
 Save(
     output='png',

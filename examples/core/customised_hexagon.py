@@ -9,17 +9,17 @@ from protograf import *
 
 Create(filename="customised_hexagon.pdf",
        paper="A8",
-       margin=0.75,
-       margin_right=0.2, margin_top=0.2,
+       margin_left=0.5,
+       margin_right=0.3,
+       margin_bottom=0.2,
+       margin_top=0.5,
        font_size=8,
        stroke_width=0.5)
 
-Footer(draw=False)
-
-txt = Common(x=0, y=6, font_size=8, align="left")
+txt = Common(x=0, y=0, font_size=8, align="left")
 
 Text(common=txt, text="Hexagon START...")
-PageBreak(footer=True)
+PageBreak()
 
 # ---- centre placement
 Blueprint()
@@ -112,24 +112,24 @@ PageBreak()
 Blueprint(stroke_width=0.5)
 Text(common=txt, text="Hexagon: flat; borders")
 hxg = Common(height=1.5, orientation="flat", font_size=8)
-Hexagon(common=hxg, x=0.25, y=0.25, borders=('sw', 2, gold), label="SW")
-Hexagon(common=hxg, x=0.25, y=2.15, borders=('nw', 2, gold), label="NW")
-Hexagon(common=hxg, x=0.25, y=4.00, borders=('n', 2, gold), label="N")
-Hexagon(common=hxg, x=2.25, y=4.00, borders=('s', 2, gold), label="S")
-Hexagon(common=hxg, x=2.25, y=0.25, borders=('ne', 2, gold), label="NE")
-Hexagon(common=hxg, x=2.25, y=2.15, borders=('se', 2, gold), label="SE")
+Hexagon(common=hxg, x=0.25, y=0.25, borders=('sw', 2, "gold"), label="SW")
+Hexagon(common=hxg, x=0.25, y=2.15, borders=('nw', 2, "gold"), label="NW")
+Hexagon(common=hxg, x=0.25, y=4.00, borders=('n', 2, "gold"), label="N")
+Hexagon(common=hxg, x=2.25, y=4.00, borders=('s', 2, "gold"), label="S")
+Hexagon(common=hxg, x=2.25, y=0.25, borders=('ne', 2, "gold"), label="NE")
+Hexagon(common=hxg, x=2.25, y=2.15, borders=('se', 2, "gold"), label="SE")
 PageBreak()
 
 # ---- borders - pointy
 Blueprint(stroke_width=0.5)
 Text(common=txt, text="Hexagon: pointy; borders")
 hxg = Common(height=1.5, orientation="pointy", font_size=8)
-Hexagon(common=hxg, x=0.25, y=0.25, borders=('sw', 2, gold), label="SW")
-Hexagon(common=hxg, x=0.25, y=2.15, borders=('nw', 2, gold), label="NW")
-Hexagon(common=hxg, x=0.25, y=4.00, borders=('w', 2, gold), label="W")
-Hexagon(common=hxg, x=2.25, y=4.00, borders=('e', 2, gold), label="E")
-Hexagon(common=hxg, x=2.25, y=0.25, borders=('ne', 2, gold), label="NE")
-Hexagon(common=hxg, x=2.25, y=2.15, borders=('se', 2, gold), label="SE")
+Hexagon(common=hxg, x=0.25, y=0.25, borders=('sw', 2, "gold"), label="SW")
+Hexagon(common=hxg, x=0.25, y=2.15, borders=('nw', 2, "gold"), label="NW")
+Hexagon(common=hxg, x=0.25, y=4.00, borders=('w', 2, "gold"), label="W")
+Hexagon(common=hxg, x=2.25, y=4.00, borders=('e', 2, "gold"), label="E")
+Hexagon(common=hxg, x=2.25, y=0.25, borders=('ne', 2, "gold"), label="NE")
+Hexagon(common=hxg, x=2.25, y=2.15, borders=('se', 2, "gold"), label="SE")
 PageBreak()
 
 # ---- perbis - flat
@@ -158,15 +158,14 @@ PageBreak()
 
 # ---- perbis - all
 Blueprint(stroke_width=0.5)
-Text(common=txt, text="Hex: perbis")
+Text(common=txt, text="Hex Flat&Pointy: perbis: *")
 hxg = Common(height=1.5, dot=0.05, dot_stroke="red", font_size=8)
+Hexagon(common=hxg, cx=2, cy=2, perbis='*', orientation="flat")
 Hexagon(common=hxg, cx=2, cy=4, perbis='*', orientation="pointy")
-# Hexagon(common=hxg, cx=2, cy=1, perbis='*')
 PageBreak()
 
 # ---- END
 Text(common=txt, text="Hexagon END...")
-PageBreak(footer=True)
 
 Save(
      output='png',

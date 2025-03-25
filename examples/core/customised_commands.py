@@ -9,15 +9,17 @@ from protograf import *
 
 Create(filename="customised_commands.pdf",
        paper="A8",
-       margin=0.75,
-       margin_right=0.2, margin_top=0.2,
+       margin_left=0.5,
+       margin_right=0.3,
+       margin_bottom=0.2,
+       margin_top=0.5,
        font_size=8,
        stroke_width=0.5)
 
-txt = Common(x=0, y=6, font_size=8, align="left")
+txt = Common(x=0, y=0, font_size=8, align="left")
 
 Text(common=txt, text="Commands START...")
-PageBreak(footer=True)
+PageBreak()
 
 # ---- loop and if
 Blueprint()
@@ -30,35 +32,33 @@ for count in range(1, 5):
 PageBreak()
 
 # ---- functions
-def capitol(a=0, b=0, c=red):
-    Circle(cx=a+1, cy=b+1, radius=0.5, fill_stroke=c)
+def capitol(a=0, b=1, c="red"):
+    Circle(cx=a+1, cy=b, radius=0.5, fill_stroke=c)
     Rectangle(x=a, y=b, height=1, width=2, fill_stroke=c,
               notch_y=0.1, notch_x=0.5, notch_corners="nw ne",)
-    EquilateralTriangle(cx=a+1, cy=b+1.5, side=0.25, fill_stroke=c)
+    EquilateralTriangle(cx=a+1, cy=b-0.5, side=0.25, fill_stroke=c)
 
 Blueprint()
 Text(common=txt, text="Function")
 capitol()
-capitol(a=1, b=2, c=gold)
-capitol(a=2, b=4, c=lime)
+capitol(a=1, b=3, c="gold")
+capitol(a=2, b=5, c="chartreuse")
 PageBreak()
 
 Blueprint()
 Text(common=txt, text="Font Command")
 Font("Helvetica")
-Text(text="Helvetica 12pt black", x=0, y=5, align="left")
+Text(text="Helvetica 12pt black", x=0, y=4, align="left")
 Font("Times-Roman", size=11, stroke="tomato")
-Text(text="Times-Roman 11pt red", x=0, y=4, align="left")
+Text(text="Times-Roman 11pt red", x=0, y=3, align="left")
 Font("Courier", size=10, stroke="cyan")
-Text(text="Courier 10pt aqua", x=0, y=3, align="left")
-Font("Verdana", size=9, stroke="gold")
-Text(text="Verdana 9pt gold", x=0, y=2, align="left")
+Text(text="Courier 10pt aqua", x=0, y=2, align="left")
+Font("Helvetica", size=9, stroke="gold")
+Text(text="Helvetica 9pt gold", x=0, y=1, align="left")
 PageBreak()
-
 
 # ---- END
 Text(common=txt, text="Command END...")
-PageBreak(footer=True)
 
 Save(
      output='png',

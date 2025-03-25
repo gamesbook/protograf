@@ -698,6 +698,27 @@ class CircleShape(BaseShape):
                             )
                             # print(f'  {pt0=} {pt1=} {next_pt=} ')
             # ---- draw and fill
+            match self.petals_style:
+                case "triangle" | "t":
+                    petals_vertices.append(petals_vertices[0])
+                    for key, vertex in enumerate(petals_vertices):
+                        if key == len(petals_vertices) - 1:
+                            continue
+                        cnv.draw_line(
+                            (vertex.x, vertex.y),
+                            (petals_vertices[key + 1].x, petals_vertices[key + 1].y),
+                        )
+                case "curve" | "c" | "petal" | "p":
+                    for key, vertex in enumerate(petals_vertices):
+                        if key == 0:
+                            continue  # already have a "start" location on path
+                        cnv.draw_curve(  # was curveTo
+                            (vertex[0].x, vertex[0].y),
+                            (vertex[1].x, vertex[1].y),
+                            (vertex[2].x, vertex[2].y),
+                        )
+                        if key in [1, 1]:
+                            self._debug(cnv, vertices=[vertex[0], vertex[1], vertex[2]])
             self.set_canvas_props(
                 index=ID,
                 fill=self.petals_fill,
@@ -706,25 +727,6 @@ class CircleShape(BaseShape):
                 dashed=self.petals_dashed,
                 dotted=self.petals_dotted,
             )
-            match self.petals_style:
-                case "triangle" | "t":
-                    for vertex in petals_vertices:
-                        cnv.lineTo(*vertex)
-                case "curve" | "c" | "petal" | "p":
-                    for index, vertex in enumerate(petals_vertices):
-                        if index == 0:
-                            continue  # already have a "start" location on path
-                        cnv.curveTo(
-                            vertex[0].x,
-                            vertex[0].y,
-                            vertex[1].x,
-                            vertex[1].y,
-                            vertex[2].x,
-                            vertex[2].y,
-                        )
-                        if index in [1, 1]:
-                            self._debug(cnv, vertices=[vertex[0], vertex[1], vertex[2]])
-            self.set_canvas_props(cnv=cnv, index=ID, **self.kwargs)  # shape.finish()
 
     def draw(self, cnv=None, off_x=0, off_y=0, ID=None, **kwargs):
         """Draw circle on a given canvas."""
@@ -1612,20 +1614,23 @@ class HexShape(BaseShape):
         )
         _dirs = tools.validated_directions(self.radii, dir_group, "radii")
         if "ne" in _dirs:  # slope UP to the right
-            cnv.draw_line(centre, vertices[2])
+            cnv.draw_line(centre, vertices[4])
         if "sw" in _dirs:  # slope DOWN to the left
+            cnv.draw_line(centre, vertices[1])
+        if "se" in _dirs:  # slope DOWN to the right
+            if self.orientation in ["p", "pointy"]:
+                cnv.draw_line(centre, vertices[3])
+            else:
+                cnv.draw_line(centre, vertices[2])
+        if "nw" in _dirs:  # slope UP to the left
             if self.orientation in ["p", "pointy"]:
                 cnv.draw_line(centre, vertices[0])
             else:
-                cnv.draw_line(centre, vertices[5])
-        if "se" in _dirs:  # slope DOWN to the right
-            cnv.draw_line(centre, vertices[4])
-        if "nw" in _dirs:  # slope UP to the left
-            cnv.draw_line(centre, vertices[1])
+                cnv.draw_line(centre, vertices[1])
         if "n" in _dirs and self.orientation in ["p", "pointy"]:  # vertical UP
-            cnv.draw_line(centre, vertices[2])
-        if "s" in _dirs and self.orientation in ["p", "pointy"]:  # vertical DOWN
             cnv.draw_line(centre, vertices[5])
+        if "s" in _dirs and self.orientation in ["p", "pointy"]:  # vertical DOWN
+            cnv.draw_line(centre, vertices[2])
         if "e" in _dirs and self.orientation in ["f", "flat"]:  # horizontal RIGHT
             cnv.draw_line(centre, vertices[3])
         if "w" in _dirs and self.orientation in ["f", "flat"]:  # horizontal LEFT
@@ -1675,35 +1680,34 @@ class HexShape(BaseShape):
                 if "e" in perbis_dirs:
                     _dirs.append(4)
                 if "ne" in perbis_dirs:
-                    _dirs.append(3)
+                    _dirs.append(5)
                 if "nw" in perbis_dirs:
-                    _dirs.append(2)
+                    _dirs.append(0)
                 if "w" in perbis_dirs:
                     _dirs.append(1)
                 if "sw" in perbis_dirs:
-                    _dirs.append(0)
+                    _dirs.append(2)
                 if "se" in perbis_dirs:
-                    _dirs.append(5)
+                    _dirs.append(3)
             if self.orientation in ["f", "flat"]:
                 if "ne" in perbis_dirs:
-                    _dirs.append(3)
-                if "n" in perbis_dirs:
-                    _dirs.append(2)
-                if "nw" in perbis_dirs:
-                    _dirs.append(1)
-                if "sw" in perbis_dirs:
-                    _dirs.append(0)
-                if "s" in perbis_dirs:
-                    _dirs.append(5)
-                if "se" in perbis_dirs:
                     _dirs.append(4)
+                if "n" in perbis_dirs:
+                    _dirs.append(5)
+                if "nw" in perbis_dirs:
+                    _dirs.append(0)
+                if "sw" in perbis_dirs:
+                    _dirs.append(1)
+                if "s" in perbis_dirs:
+                    _dirs.append(2)
+                if "se" in perbis_dirs:
+                    _dirs.append(3)
 
         for key, pb_angle in enumerate(_perbis):
             if self.perbis and key not in _dirs:
                 continue
             # points based on length of line, offset and the angle in degrees
             edge_pt = _perbis_pts[key]
-            pth = cnv.beginPath()
             if pb_offset is not None and pb_offset != 0:
                 offset_pt = geoms.point_on_circle(centre, pb_offset, pb_angle)
                 end_pt = geoms.point_on_line(offset_pt, edge_pt, pb_length)
@@ -1734,33 +1738,33 @@ class HexShape(BaseShape):
             # tools.feedback(f'*** HEX {vertices=} {num=} {_dirs=}')
             if self.orientation in ["p", "pointy"]:
                 if "ne" in _dirs or "sw" in _dirs:  # slope UP to the right
-                    self.make_path_vertices(cnv, vertices, 0, 3)
-                if "se" in _dirs or "nw" in _dirs:  # slope down to the right
                     self.make_path_vertices(cnv, vertices, 1, 4)
+                if "se" in _dirs or "nw" in _dirs:  # slope down to the right
+                    self.make_path_vertices(cnv, vertices, 0, 3)
                 if "n" in _dirs or "s" in _dirs:  # vertical
                     self.make_path_vertices(cnv, vertices, 2, 5)
             if self.orientation in ["f", "flat"]:
                 if "ne" in _dirs or "sw" in _dirs:  # slope UP to the right
-                    self.make_path_vertices(cnv, vertices, 2, 5)
-                if "se" in _dirs or "nw" in _dirs:  # slope down to the right
                     self.make_path_vertices(cnv, vertices, 1, 4)
+                if "se" in _dirs or "nw" in _dirs:  # slope down to the right
+                    self.make_path_vertices(cnv, vertices, 2, 5)
                 if "e" in _dirs or "w" in _dirs:  # horizontal
                     self.make_path_vertices(cnv, vertices, 0, 3)
         if num >= 3:
             if self.orientation in ["p", "pointy"]:
                 if "ne" in _dirs or "sw" in _dirs:  # slope UP to the right
                     self.draw_lines_between_sides(
-                        cnv, side, lines, vertices, (2, 3), (1, 0)
+                        cnv, side, lines, vertices, (4, 5), (1, 0)
                     )
                     self.draw_lines_between_sides(
-                        cnv, side, lines, vertices, (3, 4), (0, 5)
+                        cnv, side, lines, vertices, (4, 3), (1, 2)
                     )
                 if "se" in _dirs or "nw" in _dirs:  # slope down to the right
                     self.draw_lines_between_sides(
-                        cnv, side, lines, vertices, (0, 1), (5, 4)
+                        cnv, side, lines, vertices, (0, 5), (3, 4)
                     )
                     self.draw_lines_between_sides(
-                        cnv, side, lines, vertices, (1, 2), (4, 3)
+                        cnv, side, lines, vertices, (3, 2), (0, 1)
                     )
                 if "n" in _dirs or "s" in _dirs:  # vertical
                     self.draw_lines_between_sides(
@@ -1772,17 +1776,17 @@ class HexShape(BaseShape):
             if self.orientation in ["f", "flat"]:
                 if "ne" in _dirs or "sw" in _dirs:  # slope UP to the right
                     self.draw_lines_between_sides(
-                        cnv, side, lines, vertices, (2, 1), (5, 0)
+                        cnv, side, lines, vertices, (0, 1), (5, 4)
                     )
                     self.draw_lines_between_sides(
-                        cnv, side, lines, vertices, (2, 3), (5, 4)
+                        cnv, side, lines, vertices, (3, 4), (2, 1)
                     )
                 if "se" in _dirs or "nw" in _dirs:  # slope down to the right
                     self.draw_lines_between_sides(
-                        cnv, side, lines, vertices, (4, 5), (1, 0)
+                        cnv, side, lines, vertices, (4, 5), (3, 2)
                     )
                     self.draw_lines_between_sides(
-                        cnv, side, lines, vertices, (1, 2), (4, 3)
+                        cnv, side, lines, vertices, (2, 1), (5, 0)
                     )
                 if "e" in _dirs or "w" in _dirs:  # horizontal
                     self.draw_lines_between_sides(
@@ -2804,39 +2808,28 @@ class RectangleShape(BaseShape):
         # ---- draw items
         if num >= 1:
             if "ne" in _dirs or "sw" in _dirs or "d" in _dirs:  # UP to the right
-                pth = cnv.beginPath()
-                pth.moveTo(vertices[0].x, vertices[0].y)
-                pth.lineTo(vertices[2].x, vertices[2].y)
-                cnv.drawPath(
-                    pth, stroke=1 if self.stroke else 0, fill=1 if self.fill else 0
+                cnv.draw_line(
+                    (vertices[0].x, vertices[0].y), (vertices[2].x, vertices[2].y)
                 )
             if "se" in _dirs or "nw" in _dirs or "d" in _dirs:  # DOWN to the right
-                pth = cnv.beginPath()
-                pth.moveTo(vertices[1].x, vertices[1].y)
-                pth.lineTo(vertices[3].x, vertices[3].y)
-                cnv.drawPath(
-                    pth, stroke=1 if self.stroke else 0, fill=1 if self.fill else 0
+                cnv.draw_line(
+                    (vertices[1].x, vertices[1].y), (vertices[3].x, vertices[3].y)
                 )
             if "n" in _dirs or "s" in _dirs or "o" in _dirs:  # vertical
                 x_dist = self._u.width / (num + 1)
                 for i in range(1, num + 1):
-                    pth = cnv.beginPath()
-                    pth.moveTo(vertices[0].x + i * x_dist, vertices[1].y)
-                    pth.lineTo(vertices[0].x + i * x_dist, vertices[0].y)
-                    cnv.drawPath(
-                        pth, stroke=1 if self.stroke else 0, fill=1 if self.fill else 0
+                    cnv.draw_line(
+                        (vertices[0].x + i * x_dist, vertices[1].y),
+                        (vertices[0].x + i * x_dist, vertices[0].y),
                     )
             if "e" in _dirs or "w" in _dirs or "o" in _dirs:  # horizontal
                 y_dist = self._u.height / (num + 1)
                 for i in range(1, num + 1):
-                    pth = cnv.beginPath()
-                    pth.moveTo(vertices[0].x, vertices[0].y + i * y_dist)
-                    pth.lineTo(
-                        vertices[0].x + self._u.width, vertices[0].y + i * y_dist
+                    cnv.draw_line(
+                        (vertices[0].x, vertices[0].y + i * y_dist),
+                        (vertices[0].x + self._u.width, vertices[0].y + i * y_dist),
                     )
-                    cnv.drawPath(
-                        pth, stroke=1 if self.stroke else 0, fill=1 if self.fill else 0
-                    )
+
         if num >= 1:
             diag_num = int((num - 1) / 2 + 1)
             x_dist = self._u.width / diag_num
@@ -2859,35 +2852,15 @@ class RectangleShape(BaseShape):
         if "ne" in _dirs or "sw" in _dirs or "d" in _dirs:  # slope UP to the right
             for i in range(1, diag_num):  # top-left side
                 j = diag_num - i
-                pth = cnv.beginPath()
-                pth.moveTo(left_pt[i].x, left_pt[i].y)
-                pth.lineTo(top_pt[j].x, top_pt[j].y)
-                cnv.drawPath(
-                    pth, stroke=1 if self.stroke else 0, fill=1 if self.fill else 0
-                )
+                cnv.draw_line((left_pt[i].x, left_pt[i].y), (top_pt[j].x, top_pt[j].y))
             for i in range(1, diag_num):  # bottom-right side
                 j = diag_num - i
-                pth = cnv.beginPath()
-                pth.moveTo(btm_pt[i].x, btm_pt[i].y)
-                pth.lineTo(rite_pt[j].x, rite_pt[j].y)
-                cnv.drawPath(
-                    pth, stroke=1 if self.stroke else 0, fill=1 if self.fill else 0
-                )
+                cnv.draw_line((btm_pt[i].x, btm_pt[i].y), (rite_pt[j].x, rite_pt[j].y))
         if "se" in _dirs or "nw" in _dirs or "d" in _dirs:  # slope down to the right
             for i in range(1, diag_num):  # bottom-left side
-                pth = cnv.beginPath()
-                pth.moveTo(left_pt[i].x, left_pt[i].y)
-                pth.lineTo(btm_pt[i].x, btm_pt[i].y)
-                cnv.drawPath(
-                    pth, stroke=1 if self.stroke else 0, fill=1 if self.fill else 0
-                )
+                cnv.draw_line((left_pt[i].x, left_pt[i].y), (btm_pt[i].x, btm_pt[i].y))
             for i in range(1, diag_num):  # top-right side
-                pth = cnv.beginPath()
-                pth.moveTo(top_pt[i].x, top_pt[i].y)
-                pth.lineTo(rite_pt[i].x, rite_pt[i].y)
-                cnv.drawPath(
-                    pth, stroke=1 if self.stroke else 0, fill=1 if self.fill else 0
-                )
+                cnv.draw_line((top_pt[i].x, top_pt[i].y), (rite_pt[i].x, rite_pt[i].y))
 
     def draw(self, cnv=None, off_x=0, off_y=0, ID=None, **kwargs):
         """Draw a rectangle on a given canvas."""
@@ -3192,7 +3165,7 @@ class RectangleShape(BaseShape):
         # tools.feedback(f'*** RECT {self.col=} {self.row=} {x=} {y=} {radius=}')
         if is_notched or is_chevron or is_peaks:
             # tools.feedback(f'*** RECT  vertices')
-            cnv.draw_polyline(self.vertexes)
+            cnv.draw_polyline(self.vertices)
             kwargs["closed"] = True
             self.set_canvas_props(cnv=cnv, index=ID, **kwargs)
         else:

@@ -267,14 +267,15 @@ Line(x=0, x1=19, y=2, y1=2, stroke="orange")
 PageBreak()
 
 # ---- set of stickers
-Text(common=header, text="Rectangles (6x13)")
+Text(common=header, text="Rectangles (6x12)")
 Rectangles(
-    rows=13,
+    rows=12,
     cols=6,
     width=3,
     height=2,
     rounding=0.4,
-    margin=1,
+    offset_y=2,
+    offset_x=0.5,
     fill="gold",
     stroke="chartreuse",
 )

@@ -14,7 +14,7 @@ Create(filename='cards_matrix_one.pdf', margin_bottom=1.9)
 combos = Matrix(
     labels=['SUIT', 'VALUE', 'IMAGE'],
     data=[
-        # tomato, lime, aqua, gold, hotpink
+        # "tomato", "chartreuse", aqua, gold, hotpink
         ['#FF6347', '#00FF00','#00FFFF', '#FFD700', '#FF69B4'],
         ['5', '3', '1'],
         # tapedrive, heart, snowflake

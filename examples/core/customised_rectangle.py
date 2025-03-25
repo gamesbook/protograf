@@ -9,17 +9,17 @@ from protograf import *
 
 Create(filename="customised_rectangle.pdf",
        paper="A8",
-       margin=0.75,
-       margin_right=0.2, margin_top=0.2,
+       margin_left=0.5,
+       margin_right=0.3,
+       margin_bottom=0.2,
+       margin_top=0.5,
        font_size=8,
        stroke_width=0.5)
 
-Footer(draw=False)
-
-txt = Common(x=0, y=6, font_size=8, align="left")
+txt = Common(x=0, y=0, font_size=8, align="left")
 
 Text(common=txt, text="Rectangle START...")
-PageBreak(footer=True)
+PageBreak()
 
 # ---- centre placement
 Blueprint()
@@ -77,8 +77,8 @@ Blueprint()
 Text(common=txt, text="Rectangle: rounding; hatches")
 rct = Common(x=0.5, height=1.5, width=3.0, stroke_width=.5,
              hatch_stroke="red", hatch='o')
-Rectangle(common=rct, y=0.0, rounding=0.1, hatch_count=10)
-Rectangle(common=rct, y=2.0, rounding=0.5, hatch_count=3)
+Rectangle(common=rct, y=1.0, rounding=0.1, hatch_count=10)
+Rectangle(common=rct, y=4.0, rounding=0.5, hatch_count=3)
 # Rectangle(common=rct, y=4.0, rounding=0.75, hatch_count=15)  # FAILS!
 PageBreak()
 
@@ -157,25 +157,24 @@ PageBreak()
 Blueprint(stroke_width=0.5)
 Text(common=txt, text="Rectangle: borders")
 Rectangle(
-    y=3, height=2, width=2, stroke=None, fill="gold",
+    x=0.5, y=3.5, height=2, width=3, stroke=None, fill="gold",
     borders=[
-        ("n", 3, silver, True),
+        ("n", 3, "lightsteelblue", True),
         ("s", 2),
     ]
 )
 Rectangle(
-    y=0, height=2, width=2, stroke_width=1.9,
+    x=0.5,y=0.5, height=2, width=3, stroke_width=1.9,
     borders=[
-        ("w", 2, gold),
-        ("n", 2, lime, True),
-        ("e", 2, tomato, [0.1,0.2,0.1,0]),
+        ("w", 2, "gold"),
+        ("n", 2, "chartreuse", True),
+        ("e", 2, "tomato", [0.1,0.2,0.1,0]),
     ]
 )
 PageBreak()
 
 # ---- END
 Text(common=txt, text="Rectangle END...")
-PageBreak(footer=True)
 
 Save(
      output='png',

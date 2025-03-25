@@ -1300,7 +1300,24 @@ class BaseShape:
         index=None,  # extract from list of potential values (usually Card options)
         **kwargs,
     ):
-        """Set pymupdf Shape properties for fill, font, line and colors"""
+        """Set pymupdf Shape properties for fill, font, line and colors
+
+        Notes:
+            If letting default a color parameter to None, then no resp. color selection
+            command will be generated. If fill and color are both None, then the drawing
+            will contain no color specification. But it will still be “stroked”,
+            which causes PDF’s default color “black” be used by PDF viewers.
+
+            The default value of width is 1.
+
+            The values width, color and fill have the following relationship:
+            • If fill=None, then shape elements will *always* be drawn with a border -
+              even if color=None (in which case black is taken) or width=0
+              (in which case 1 is taken).
+            • Shapes without border can only be achieved if a fill color is specified
+              (which may be be white). To achieve this, specify width=0.
+              In this case, the color parameter is ignored.
+        """
 
         def ext(prop):
             if isinstance(prop, str):
@@ -1314,6 +1331,7 @@ class BaseShape:
         #   width=1, color=(0,), fill=None, lineCap=0, lineJoin=0, dashes=None,
         #   closePath=True, even_odd=False, morph=(fixpoint, matrix),
         #   stroke_opacity=1, fill_opacity=1, oc=0
+
         # ---- set props
         # print(f'$$$ Props: {kwargs.keys()}')
         cnv = cnv if cnv else self.canvas
@@ -1322,10 +1340,10 @@ class BaseShape:
         else:
             fill = self.fill
         if "stroke" in kwargs.keys():
-            stroke = kwargs.get("stroke", None)
+            stroke = kwargs.get("stroke", None)  # reserve None for 'no stroke at all'
         else:
             stroke = self.stroke
-        # print(f'$$$ {kwargs.get("fill")=} {fill=} {kwargs.get("stroke")=} {stroke=}')
+        # print(f'BS $$$ {kwargs.get("fill")=} {fill=} {kwargs.get("stroke")=} {stroke=}')
         transparency = kwargs.get("transparency", None)
         stroke_width = kwargs.get("stroke_width", None)
         stroke_cap = kwargs.get("stroke_cap", None)
@@ -1357,7 +1375,7 @@ class BaseShape:
             dashes = f"[{dlength} {dspaced}] {doffset}"
         else:
             dashes = None
-        # print(f"{_dotted =} {_dashed=} {dashes=}")
+        # print(f"BS $$$ {_dotted =} {_dashed=} {dashes=}")
         # ---- check rotation
         morph = None
         if _rotation:
@@ -1375,10 +1393,14 @@ class BaseShape:
         # ---- get color tuples
         _color = get_color(stroke)
         _fill = get_color(fill)
-        # print(f'{stroke=} {fill=} {_color=} {_fill=}')  # either: None, or fractn RGB
+        # ---- set width
+        _width = stroke_width or self.stroke_width
+        if _color is None and _fill is None:
+            tools.feedback("Cannot have both fill and stroke set to None!", True)
+        # print(f'BS $$$ {stroke=} {fill=} {_color=} {_fill=}')  # None OR fraction RGB
         # ---- set/apply properties
         cnv.finish(
-            width=stroke_width or self.stroke_width,
+            width=_width,
             color=_color,
             fill=_fill,
             lineCap=stroke_cap or 0,  # or self.stroke_cap,  # FIXME
@@ -2392,6 +2414,7 @@ class BaseShape:
         if self.run_debug:
             # display vertex index number next to vertex
             if kwargs.get("vertices", []):
+                kwargs["stroke"] = self.debug_color
                 kwargs["fill"] = self.debug_color
                 kwargs["font_name"] = self.font_name
                 kwargs["font_size"] = 4
@@ -2556,22 +2579,22 @@ class BaseShape:
                 case "HexShape":
                     if self.orientation == "pointy":
                         match bdirection:
-                            case "ne":
+                            case "se":
                                 x, y = self.vertices[2][0], self.vertices[2][1]
                                 x_1, y_1 = self.vertices[3][0], self.vertices[3][1]
                             case "e":
                                 x, y = self.vertices[3][0], self.vertices[3][1]
                                 x_1, y_1 = self.vertices[4][0], self.vertices[4][1]
-                            case "se":
+                            case "ne":
                                 x, y = self.vertices[4][0], self.vertices[4][1]
                                 x_1, y_1 = self.vertices[5][0], self.vertices[5][1]
-                            case "sw":
+                            case "nw":
                                 x, y = self.vertices[5][0], self.vertices[5][1]
                                 x_1, y_1 = self.vertices[0][0], self.vertices[0][1]
                             case "w":
                                 x, y = self.vertices[0][0], self.vertices[0][1]
                                 x_1, y_1 = self.vertices[1][0], self.vertices[1][1]
-                            case "nw":
+                            case "sw":
                                 x, y = self.vertices[1][0], self.vertices[1][1]
                                 x_1, y_1 = self.vertices[2][0], self.vertices[2][1]
                             case _:
@@ -2580,22 +2603,22 @@ class BaseShape:
                                 )
                     elif self.orientation == "flat":
                         match bdirection:
-                            case "n":
+                            case "s":
                                 x, y = self.vertices[1][0], self.vertices[1][1]
                                 x_1, y_1 = self.vertices[2][0], self.vertices[2][1]
-                            case "ne":
+                            case "se":
                                 x, y = self.vertices[2][0], self.vertices[2][1]
                                 x_1, y_1 = self.vertices[3][0], self.vertices[3][1]
-                            case "se":
+                            case "ne":
                                 x, y = self.vertices[3][0], self.vertices[3][1]
                                 x_1, y_1 = self.vertices[4][0], self.vertices[4][1]
-                            case "s":
+                            case "n":
                                 x, y = self.vertices[4][0], self.vertices[4][1]
                                 x_1, y_1 = self.vertices[5][0], self.vertices[5][1]
-                            case "sw":
+                            case "nw":
                                 x, y = self.vertices[5][0], self.vertices[5][1]
                                 x_1, y_1 = self.vertices[0][0], self.vertices[0][1]
-                            case "nw":
+                            case "sw":
                                 x, y = self.vertices[0][0], self.vertices[0][1]
                                 x_1, y_1 = self.vertices[1][0], self.vertices[1][1]
                             case _:
