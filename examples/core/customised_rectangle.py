@@ -37,14 +37,25 @@ Rectangle(
     label="notch:0.5",
     label_size=5,
     )
+# Rectangle(
+#     x=1, y=4,
+#     height=1, width=2,
+#     notch_y=0.25,
+#     notch_x=0.5,
+#     notch_corners="NW SE",
+#     label="notch:.25/.5 loc: NW, SE",
+#     label_size=5,
+#     )
 Rectangle(
-    x=1, y=4,
-    height=1, width=2,
+    x=1, y=3,
+    height=3, width=2,
     notch_y=0.25,
     notch_x=0.5,
-    notch_corners="NW SE",
-    label="notch:.25/.5 loc: NW, SE",
+    notch_corners="NW",
+    label="*",
     label_size=5,
+    debug=True,
+    fill=None,
     )
 PageBreak()
 
