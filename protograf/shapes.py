@@ -2930,26 +2930,6 @@ class RectangleShape(BaseShape):
             n_y = self.unit(self.notch_y) if self.notch_y else self.unit(self.notch)
             self.vertices = []
 
-            if "SW" in _notches:
-                match _notch_style:
-                    case "snip" | "s":
-                        self.vertices.append(Point(x + n_x, y))
-                    case "fold" | "o":
-                        self.vertices.append(Point(x + n_x, y))
-                    case "flap" | "l":
-                        self.vertices.append(Point(x + n_x, y))
-                    case "step" | "t":
-                        self.vertices.append(Point(x + n_x, y))
-                        self.vertices.append(Point(x + n_x, y + n_y))
-                        self.vertices.append(Point(x, y + n_y))
-                    case "bite" | "b":
-                        # TODO - write code ...
-                        tools.feedback(
-                            'The "bite" setting is not implemented yet', False
-                        )
-            else:
-                self.vertices.append(Point(x, y))
-
             if "NW" in _notches:
                 match _notch_style:
                     case "snip" | "s":
@@ -2970,6 +2950,7 @@ class RectangleShape(BaseShape):
                         pass
             else:
                 self.vertices.append(Point(x, y))
+
             if "SW" in _notches: ###
                 self.vertices.append(Point(x, y + self._u.height - n_y))
                 match _notch_style:
@@ -2993,6 +2974,7 @@ class RectangleShape(BaseShape):
                         pass
             else:
                 self.vertices.append(Point(x, y + self._u.height))
+
             if "SE" in _notches:  ##
                 self.vertices.append(Point(x + self._u.width - n_x, y + self._u.height))
                 match _notch_style:
@@ -3038,6 +3020,7 @@ class RectangleShape(BaseShape):
                         pass
             else:
                 self.vertices.append(Point(x + self._u.width, y + self._u.height))
+
             if "NE" in _notches:  ###
                 self.vertices.append(Point(x + self._u.width, y + n_y))
                 match _notch_style:

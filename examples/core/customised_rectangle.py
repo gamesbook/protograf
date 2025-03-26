@@ -51,7 +51,7 @@ Rectangle(
     height=3, width=2,
     notch_y=0.25,
     notch_x=0.5,
-    notch_corners="NW",
+    notch_corners="NE",
     label="*",
     label_size=5,
     debug=True,
