@@ -29,7 +29,7 @@ PageBreak()
 
 # ---- notches
 Blueprint()
-Text(common=txt, text="Rectangle & Notches")
+Text(common=txt, text="Rectangle: notches")
 Rectangle(
     x=2, y=1,
     height=2, width=1,
@@ -37,25 +37,14 @@ Rectangle(
     label="notch:0.5",
     label_size=5,
     )
-# Rectangle(
-#     x=1, y=4,
-#     height=1, width=2,
-#     notch_y=0.25,
-#     notch_x=0.5,
-#     notch_corners="NW SE",
-#     label="notch:.25/.5 loc: NW, SE",
-#     label_size=5,
-#     )
 Rectangle(
-    x=1, y=3,
-    height=3, width=2,
+    x=1, y=4,
+    height=1, width=2,
     notch_y=0.25,
     notch_x=0.5,
-    notch_corners="NE",
-    label="*",
+    notch_corners="NW SE",
+    label="notch:.25/.5 loc: NW, SE",
     label_size=5,
-    debug=True,
-    fill=None,
     )
 PageBreak()
 
@@ -141,8 +130,10 @@ PageBreak()
 # ---- peaks
 Blueprint()
 Text(common=txt, text="Rectangle: peaks")
-Rectangle(x=1, y=1, width=2, height=1, peaks=[("*",0.2)], font_size=6, label="peaks = *")
-Rectangle(x=1, y=4, width=2, height=1.5, peaks=[("s",1), ("e",0.25)], font_size=6, label="points = s")
+Rectangle(x=1, y=1, width=2, height=1, peaks=[("*",0.2)], font_size=6,
+          label="peaks = *")
+Rectangle(x=1, y=3, width=2, height=1.5, peaks=[("s",1), ("e",0.25)], font_size=6,
+          label="peaks = s,e")
 PageBreak()
 
 # ---- rotation
@@ -159,8 +150,8 @@ Text(common=txt, text="Rectangle : Notch Styles")
 styles = Common(height=1, width=3.5, x=0.25, notch=0.25, label_size=7, fill="lightsteelblue")
 Rectangle(common=styles, y=0, notch_style='snip', label='Notch: snip (s)')
 Rectangle(common=styles, y=1.5, notch_style='step', label='Notch: step (t)')
-Rectangle(common=styles, y=3, notch_style='fold', label='Notch: fold (o)')
-Rectangle(common=styles, y=4.5, notch_style='flap', label='Notch: flap (l)')
+Rectangle(common=styles, y=3, notch_style='fold', label='Notch: fold (d)')
+Rectangle(common=styles, y=4.5, notch_style='flap', label='Notch: flap (p)')
 # Rectangle(common=styles, y=5, label='Notch: bite (NOT WORKING)')
 PageBreak()
 

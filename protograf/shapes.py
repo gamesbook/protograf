@@ -2807,11 +2807,11 @@ class RectangleShape(BaseShape):
         )
         # ---- draw items
         if num >= 1:
-            if "ne" in _dirs or "sw" in _dirs or "d" in _dirs:  # UP to the right
+            if "se" in _dirs or "nw" in _dirs or "d" in _dirs:  # UP to the right
                 cnv.draw_line(
                     (vertices[0].x, vertices[0].y), (vertices[2].x, vertices[2].y)
                 )
-            if "se" in _dirs or "nw" in _dirs or "d" in _dirs:  # DOWN to the right
+            if "sw" in _dirs or "ne" in _dirs or "d" in _dirs:  # DOWN to the right
                 cnv.draw_line(
                     (vertices[1].x, vertices[1].y), (vertices[3].x, vertices[3].y)
                 )
@@ -2849,14 +2849,14 @@ class RectangleShape(BaseShape):
                     geoms.point_on_line(vertices[0], vertices[3], x_dist * number)
                 )
 
-        if "ne" in _dirs or "sw" in _dirs or "d" in _dirs:  # slope UP to the right
+        if "se" in _dirs or "nw" in _dirs or "d" in _dirs:  # slope UP to the right
             for i in range(1, diag_num):  # top-left side
                 j = diag_num - i
                 cnv.draw_line((left_pt[i].x, left_pt[i].y), (top_pt[j].x, top_pt[j].y))
             for i in range(1, diag_num):  # bottom-right side
                 j = diag_num - i
                 cnv.draw_line((btm_pt[i].x, btm_pt[i].y), (rite_pt[j].x, rite_pt[j].y))
-        if "se" in _dirs or "nw" in _dirs or "d" in _dirs:  # slope down to the right
+        if "ne" in _dirs or "sw" in _dirs or "d" in _dirs:  # slope down to the right
             for i in range(1, diag_num):  # bottom-left side
                 cnv.draw_line((left_pt[i].x, left_pt[i].y), (btm_pt[i].x, btm_pt[i].y))
             for i in range(1, diag_num):  # top-right side
@@ -2940,6 +2940,8 @@ class RectangleShape(BaseShape):
                         self.vertices.append(Point(x + n_x, y))
                         self.vertices.append(Point(x, y + n_y))
                     case "flap" | "p":
+                        self.vertices.append(Point(x + n_x, y))
+                        self.vertices.append(Point(x, y + n_y))
                         self.vertices.append(Point(x + n_x, y + n_y))
                         self.vertices.append(Point(x + n_x, y))
                         self.vertices.append(Point(x, y + n_y))
@@ -3045,6 +3047,29 @@ class RectangleShape(BaseShape):
             else:
                 self.vertices.append(Point(x + self._u.width, y))
 
+            if "NW" in _notches:
+                match _notch_style:
+                    case "snip" | "s":
+                        pass
+                    case "fold" | "d":
+                        self.vertices.append(Point(x, y))
+                        self.vertices.append(Point(x + n_x, y))
+                        self.vertices.append(Point(x, y + n_y))
+                    case "flap" | "p":
+                        pass
+                        # self.vertices.append(Point(x + n_x, y + n_y))
+                        # self.vertices.append(Point(x + n_x, y))
+                        # self.vertices.append(Point(x, y + n_y))
+                    case "step" | "t":
+                        self.vertices.append(Point(x + n_x, y))
+                        self.vertices.append(Point(x + n_x, y + n_y))
+                        self.vertices.append(Point(x, y + n_y))
+                    case "bite" | "b":
+                        # TODO - write code ...
+                        pass
+            else:
+                self.vertices.append(Point(x, y))
+
             # ---- debug
             self._debug(cnv, vertices=self.vertices)
         # ---- * peaks vertices
@@ -3059,8 +3084,8 @@ class RectangleShape(BaseShape):
                 self.vertices.append(Point(x, y + self._u.height))
             else:
                 self.vertices.append(Point(x, y + self._u.height))
-            if "n" in self.peaks_dict.keys():
-                _pt = self.unit(self.peaks_dict["n"])
+            if "s" in self.peaks_dict.keys():
+                _pt = self.unit(self.peaks_dict["s"])
                 self.vertices.append(Point(x + half_width, y + self._u.height + _pt))
                 self.vertices.append(Point(x + self._u.width, y + self._u.height))
             else:
@@ -3071,8 +3096,8 @@ class RectangleShape(BaseShape):
                 self.vertices.append(Point(x + self._u.width, y))
             else:
                 self.vertices.append(Point(x + self._u.width, y))
-            if "s" in self.peaks_dict.keys():
-                _pt = self.unit(self.peaks_dict["s"])
+            if "n" in self.peaks_dict.keys():
+                _pt = self.unit(self.peaks_dict["n"])
                 self.vertices.append(Point(x + half_width, y - _pt))
             else:
                 self.vertices.append(Point(x, y))  # close() draws line back to start
@@ -3094,8 +3119,8 @@ class RectangleShape(BaseShape):
             if not self.chevron:
                 self.chevron = "N"
             self.vertices = []
-            if self.chevron.upper() == "N":
-                delta_m_up = delta_m
+            if self.chevron.upper() == "S":
+                delta_m_down = delta_m
                 self.vertices.append(Point(x, y))
                 self.vertices.append(Point(x, y + self._u.height))
                 self.vertices.append(
@@ -3104,8 +3129,8 @@ class RectangleShape(BaseShape):
                 self.vertices.append(Point(x + self._u.width, y + self._u.height))
                 self.vertices.append(Point(x + self._u.width, y))
                 self.vertices.append(Point(x + self._u.width / 2.0, y + delta_m))
-            elif self.chevron.upper() == "S":
-                delta_m_down = delta_m
+            elif self.chevron.upper() == "N":
+                delta_m_up = delta_m
                 self.vertices.append(Point(x, y))
                 self.vertices.append(Point(x, y + self._u.height))
                 self.vertices.append(

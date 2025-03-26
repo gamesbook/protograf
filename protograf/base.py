@@ -2422,7 +2422,8 @@ class BaseShape:
                     x = self.points_to_value(vert.x)
                     y = self.points_to_value(vert.y)
                     self.draw_multi_string(
-                        canvas, vert.x, vert.y, f"{key}:{x:.2f},{y:.2f}", **kwargs
+                        #canvas, vert.x, vert.y, f"{key}:{x:.2f},{y:.2f}", **kwargs
+                        canvas, vert.x, vert.y, f"{key}", **kwargs
                     )
                     canvas.draw_circle((vert.x, vert.y), 2)
             # display labelled point (geoms.Point)
