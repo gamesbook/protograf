@@ -9,14 +9,16 @@ from protograf import *
 
 Create(filename="layouts_basic_rectangular.pdf",
        paper="A8",
-       margin=0.75,
-       margin_right=0.2, margin_top=0.2,
+       margin_left=0.5,
+       margin_right=0.3,
+       margin_bottom=0.2,
+       margin_top=0.5,
        font_size=8,
        stroke_width=0.5)
 
-header = Common(x=0, y=6, font_size=6, align="left")
+header = Common(x=0, y=0, font_size=6, align="left")
 a_circle = circle(
-    x=0, y=0, diameter=1.0, label="{{sequence}}//{{col}}-{{row}}", label_size=6)
+    x=0, y=0, radius=0.5, label="{{sequence}}//{{col}}-{{row}}", label_size=6)
 
 # ---- regular
 
@@ -166,7 +168,6 @@ Blueprint(stroke_width=0.5)
 Text(common=header, text="Rect.Locations: SW->north: Outer")
 rect = RectangularLocations(cols=3, rows=4, start="SW", direction="north", pattern="outer")
 Layout(rect, shapes=[a_circle,])
-PageBreak()
 
 Save(
     output='png',

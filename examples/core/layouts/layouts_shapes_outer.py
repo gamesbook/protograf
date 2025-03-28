@@ -9,12 +9,14 @@ from protograf import *
 
 Create(filename="layouts_shapes_outer.pdf",
        paper="A8",
-       margin=0.75,
-       margin_right=0.2, margin_top=0.2,
+       margin_left=0.5,
+       margin_right=0.3,
+       margin_bottom=0.2,
+       margin_top=0.5,
        font_size=8,
        stroke_width=0.5)
 
-header = Common(x=0, y=6, font_size=6, align="left")
+header = Common(x=0, y=0, font_size=6, align="left")
 is_common = Common(label="{{sequence}}")
 rct_common = Common(label_size=5, points=[('s', 0.1)], height=0.5, width=0.5)
 
@@ -26,7 +28,7 @@ sqr5 = square(common=is_common, side=1.0, label_size=8, fill="yellow")
 Blueprint(stroke_width=0.5)
 Text(common=header, text="Rect.Locations: SW->north/outer + sequence")
 rect = RectangularLocations(
-    x=0.5, y=0.5, cols=4, rows=5, interval=1,
+    x=0.5, y=0.5, cols=4, rows=6, interval=1,
     start="SW", direction="north", pattern="outer")
 Layout(rect, shapes=[sqr]*4 + [sqr5] )
 PageBreak()
@@ -34,9 +36,9 @@ PageBreak()
 # ---- single shape + multi-color + stop
 
 rct_small = Common(label_size=5, side=0.48)
-rct1 = square(common=rct_small, fill_stroke=palegreen)
-rct5 = square(common=rct_small, fill_stroke=lightgreen)
-rct10 = square(common=rct_small, fill_stroke=mediumseagreen)
+rct1 = square(common=rct_small, fill_stroke="palegreen")
+rct5 = square(common=rct_small, fill_stroke="lightgreen")
+rct10 = square(common=rct_small, fill_stroke="mediumseagreen")
 
 Blueprint(stroke_width=0.5)
 Text(common=header, text="Rect.Locations: NW->east/outer + stop")
@@ -48,11 +50,12 @@ PageBreak()
 
 # ---- rotations + corners
 
-circ = circle(label="{{sequence - 1}}", label_size=5, radius=0.26, fill=rosybrown)
+circ = circle(label="{{sequence - 1}}", label_size=5, radius=0.26, fill="rosybrown")
 rct2 = rectangle(
     common=rct_common, label="{{sequence - 1}}", fill="tan")
 rct3 = rectangle(
-    common=rct_common, label="{{sequence - 1}}", fill=maroon, stroke=rosybrown)
+    common=rct_common, label="{{sequence - 1}}",
+    fill="maroon", stroke="rosybrown")
 
 Blueprint(stroke_width=0.5)
 Text(common=header, text="Rect.Locations: SW/outer + rotate + corner")
@@ -68,8 +71,6 @@ Layout(
         ("16", -45), ("17-24", 270),
         ("25", 225), ("26-30", 180),],
     corners=[('*',circ)])
-
-PageBreak()
 
 #Save()
 Save(

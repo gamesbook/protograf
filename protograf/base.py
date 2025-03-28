@@ -259,34 +259,8 @@ COLORS = {
     "18xx_barrier": "#660000",  # blood red
     "18xx_white": "#ffffff",  # white
 }
-# ---- paper formats
-"""
-PAGES = {
-    "LETTER": LETTER,
-    "landscape": landscape,
-    "legal": legal,
-    "A1": A1,
-    "A0": A0,
-    "A3": A3,
-    "A2": A2,
-    "A5": A5,
-    "A4": A4,
-    "A6": A6,
-    "elevenSeventeen": elevenSeventeen,
-    "LEGAL": LEGAL,
-    "letter": letter,
-    "B4": B4,
-    "B5": B5,
-    "B6": B6,
-    "B0": B0,
-    "B2": B2,
-    "B3": B3,
-    "ELEVENSEVENTEEN": ELEVENSEVENTEEN,
-    "tabloid": elevenSeventeen,
-}
-"""
-WIDTH = 0.1
 
+WIDTH = 0.1
 CLOCK_ANGLES = [60, 90, 120, 150, 180, 210, 240, 270, 300, 330, 0, 30]
 
 

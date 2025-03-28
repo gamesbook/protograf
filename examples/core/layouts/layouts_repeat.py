@@ -9,12 +9,14 @@ from protograf import *
 
 Create(filename="layouts_repeat.pdf",
        paper="A8",
-       margin=0.75,
-       margin_right=0.2, margin_top=0.2,
+       margin_left=0.5,
+       margin_right=0.3,
+       margin_bottom=0.2,
+       margin_top=0.5,
        font_size=10,
        stroke_width=0.5)
 
-header = Common(x=0, y=6, font_size=7, align="left")
+header = Common(x=0, y=0, font_size=7, align="left")
 marble = circle(cx=1, cy=1, radius=0.25, fill="chartreuse")
 
 Blueprint(stroke_width=0.5)

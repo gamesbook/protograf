@@ -596,19 +596,19 @@ class RectangularLocations(VirtualLocations):
         current_dir = _dir
         match _start:
             case "sw":
-                row_start = 1
+                row_start = self.rows
                 col_start = 1
                 clockwise = True if _dir in ["north", "n"] else False
             case "se":
-                row_start = 1
+                row_start = self.rows
                 col_start = self.cols
                 clockwise = True if _dir in ["west", "w"] else False
             case "nw":
-                row_start = self.rows
+                row_start = 1
                 col_start = 1
                 clockwise = True if _dir in ["east", "e"] else False
             case "ne":
-                row_start = self.rows
+                row_start = 1
                 col_start = self.cols
                 clockwise = True if _dir in ["south", "s"] else False
             case _:
@@ -920,7 +920,7 @@ class TriangularLocations(VirtualLocations):
         hlf_side = self.side / 2.0
         for key, entry in enumerate(array):
             match _facing:
-                case "north":  # layout is row-oriented
+                case "south":  # layout is row-oriented
                     y = (
                         self.y
                         + (self.rows - 1) * self.interval_y
@@ -936,7 +936,7 @@ class TriangularLocations(VirtualLocations):
                         yield Locale(
                             loc, key + 1, x, y, self.set_id(loc, key + 1), count, corner
                         )
-                case "south":  # layout is row-oriented
+                case "north":  # layout is row-oriented
                     y = self.y + key * self.interval_y
                     dx = (
                         0.5 * (self.cols - len(entry)) * self.interval_x
@@ -1155,8 +1155,8 @@ class ConnectShape(BaseShape):
 
         N,S,E,W = North, South, East, West
         """
-        top = _shape.y + _shape.height
-        btm = _shape.y
+        top = _shape.y
+        btm = _shape.y + _shape.height
         mid_horizontal = _shape.x + _shape.width / 2.0
         mid_vertical = _shape.y + _shape.height / 2.0
         left = _shape.x
