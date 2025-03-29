@@ -681,7 +681,7 @@ class RectangularLocations(VirtualLocations):
                                     row = row + 1
                                 self.direction = "e"
 
-                        case "n" | "north":
+                        case "s" | "south":
                             row = row + 1
                             if row > self.rows:
                                 row = self.rows
@@ -689,9 +689,9 @@ class RectangularLocations(VirtualLocations):
                                     col = col - 1
                                 else:
                                     col = col + 1
-                                self.direction = "s"
+                                self.direction = "n"
 
-                        case "s" | "south":
+                        case "n" | "north":
                             row = row - 1
                             if row < 1:
                                 row = 1
@@ -699,7 +699,7 @@ class RectangularLocations(VirtualLocations):
                                     col = col - 1
                                 else:
                                     col = col + 1
-                                self.direction = "n"
+                                self.direction = "s"
 
                     x = self.x + (col - 1) * self.interval_x
                     y = self.y + (row - 1) * self.interval_y
@@ -710,52 +710,52 @@ class RectangularLocations(VirtualLocations):
                         return
                     corner = None
                     if row == 1 and col == 1:
-                        corner = "sw"
-                    if row == self.rows and col == 1:
                         corner = "nw"
+                    if row == self.rows and col == 1:
+                        corner = "sw"
                     if row == self.rows and col == self.cols:
-                        corner = "ne"
-                    if row == 1 and col == self.cols:
                         corner = "se"
+                    if row == 1 and col == self.cols:
+                        corner = "ne"
                     yield Locale(col, row, x, y, self.set_id(col, row), count, corner)
                     # next grid location
                     # print(f'*** {count=} {current_dir=} {row=},{col=} // {row_start=},{col_start=}')
 
                     if row == 1 and col == 1:
-                        corner = "sw"
-                        if clockwise:
-                            current_dir = "n"
-                            row = row + 1
-                        else:
-                            current_dir = "e"
-                            col = col + 1
-
-                    if row == self.rows and col == 1:
                         corner = "nw"
                         if clockwise:
                             current_dir = "e"
                             col = col + 1
                         else:
                             current_dir = "s"
-                            row = row - 1
+                            row = row + 1
 
-                    if row == self.rows and col == self.cols:
-                        corner = "ne"
+                    if row == self.rows and col == 1:
+                        corner = "sw"
                         if clockwise:
-                            current_dir = "s"
+                            current_dir = "n"
                             row = row - 1
                         else:
-                            current_dir = "w"
-                            col = col - 1
+                            current_dir = "e"
+                            col = col + 1
 
-                    if row == 1 and col == self.cols:
+                    if row == self.rows and col == self.cols:
                         corner = "se"
                         if clockwise:
                             current_dir = "w"
                             col = col - 1
                         else:
                             current_dir = "n"
+                            row = row - 1
+
+                    if row == 1 and col == self.cols:
+                        corner = "ne"
+                        if clockwise:
+                            current_dir = "s"
                             row = row + 1
+                        else:
+                            current_dir = "w"
+                            col = col - 1
 
                     if not corner:
                         match current_dir:
@@ -764,9 +764,9 @@ class RectangularLocations(VirtualLocations):
                             case "w" | "west":
                                 col = col - 1
                             case "n" | "north":
-                                row = row + 1
-                            case "s" | "south":
                                 row = row - 1
+                            case "s" | "south":
+                                row = row + 1
 
                     x = self.x + (col - 1) * self.interval_x
                     y = self.y + (row - 1) * self.interval_y
@@ -800,7 +800,7 @@ class RectangularLocations(VirtualLocations):
                                     row = row + 1
                                     if row > self.rows:
                                         return  # end
-                        case "n" | "north":
+                        case "s" | "south":
                             row = row + 1
                             if row > self.rows:
                                 row = row_start
@@ -812,7 +812,7 @@ class RectangularLocations(VirtualLocations):
                                     col = col + 1
                                     if col > self.cols:
                                         return  # end
-                        case "s" | "south":
+                        case "n" | "north":
                             row = row - 1
                             if row < 1:
                                 row = row_start

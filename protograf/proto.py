@@ -22,15 +22,6 @@ from typing import Union, Any
 import jinja2
 import pymupdf
 
-"""
-from reportlab.lib.pagesizes import *
-from reportlab.pdfbase import pdfmetrics
-from reportlab.pdfbase.ttfonts import TTFont
-from reportlab.lib.pagesizes import A4
-
-# from reportlab.lib.colors import black, white
-from reportlab.lib.units import cm, inch
-"""
 # local
 from .bgg import BGGGame, BGGGameList
 from .base import BaseCanvas, GroupBase, COLORS, DEBUG_COLOR, get_color
@@ -82,8 +73,6 @@ from .layouts import (
 from .groups import DeckShape, Switch
 from ._version import __version__
 
-# from protograf.utils.support import (
-#     steps, excels, excel_column,  numbers, letters)
 from protograf.utils.tools import base_fonts, DatasetType
 from protograf.utils import geoms, tools, support
 from protograf.utils.geoms import Locale, Point, Place, Ray, equilateral_height
@@ -1709,21 +1698,6 @@ def Layout(grid, **kwargs):
             # ---- * set shape to enable overwrite/change of properties
             shape = copy(_shape)
 
-            # DEPRECATED - now use jinja2 templates
-            # ---- * update shape's text fields
-            # data = {
-            #     'col': loc.col, 'row': loc.row, 'x': loc.x, 'y': loc.y,
-            #     'count': count + 1, 'count_zero': count}
-            # try:
-            #     shape.label = shapes[shape_id].label.format(**data)  # replace {xyz} entries
-            #     shape.title = shapes[shape_id].title.format(**data)
-            #     shape.heading = shapes[shape_id].heading.format(**data)
-            # except KeyError as err:
-            #     text = str(err).split()
-            #     tools.feedback(
-            #         f'You cannot use {text[0]} as a special field; remove the {{ }} brackets',
-            #         True)
-
             # ---- * execute shape.draw()
             cx = loc.x * shape.units + shape._o.delta_x
             cy = loc.y * shape.units + shape._o.delta_y
@@ -1843,9 +1817,9 @@ def Track(track=None, **kwargs):
         angles = track.get_angles()
         # change behaviour to match Circle and Polygon
         if clockwise is not None:
-            clockwise = not clockwise
-        else:
             clockwise = True
+        else:
+            clockwise = not clockwise
     elif track_name == "PolygonShape":
         angles = track.get_angles()
     elif track_name not in SHAPES_FOR_TRACK:
@@ -1883,7 +1857,7 @@ def Track(track=None, **kwargs):
             track_points.append(Ray(vertex.x, vertex.y, angles[key]))
 
     # ---- change drawing order
-    if clockwise is not None and clockwise:
+    if clockwise is not None and clockwise is False:
         track_points = list(reversed(track_points))
         _swop = len(track_points) - 1
         track_points = track_points[_swop:] + track_points[:_swop]
@@ -1931,9 +1905,9 @@ def Track(track=None, **kwargs):
         if _rotation_style:
             match _rotation_style:
                 case "i" | "inwards":
-                    shape_rotation = 90 + track_point.angle
+                    shape_rotation = 90 - track_point.angle
                 case "o" | "outwards":
-                    shape_rotation = track_point.angle - 90
+                    shape_rotation = 270 - track_point.angle
                 case _:
                     raise NotImplementedError(
                         f"The rotation_style '{_rotation_style}' is not valid"

@@ -292,8 +292,8 @@ Hexagons(
     rows=11,
     cols=9,
     side=1.69,
-    margin_left=-1.69,
-    margin_bottom=-2.529,
+    margin_left=-1.8,
+    margin_top=-1.529,
     dot=0.05,
     dot_stroke="black",
     coord_elevation="top",
@@ -301,7 +301,7 @@ Hexagons(
     coord_stroke="darkslategray",
     fill="white",
     stroke="darkslategray",
-    caltrops="medium",
+    caltrops=0.5,
 )
 Text(common=header, text="Hexagons (dot; coords; caltrops)")
 PageBreak()

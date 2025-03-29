@@ -663,8 +663,7 @@ class BaseCanvas:
         self.perbis_dashed = self.defaults.get("perbis_dashed", self.dashed)
         # ---- hexagon
         self.caltrops = self.defaults.get("caltrops", None)
-        self.caltrops_fraction = self.defaults.get("caltrops_fraction", None)
-        self.caltrops_invert = kwargs.get("caltrops_invert", False)
+        self.caltrops_invert = self.defaults.get("caltrops_invert", False)
         self.links = self.defaults.get("links", None)
         self.link_stroke_width = self.defaults.get(
             "link_stroke_width", self.stroke_width
@@ -1070,11 +1069,10 @@ class BaseShape:
         self.perbis_dotted = kwargs.get("perbis_dotted", base.dotted)
         self.perbis_dashed = kwargs.get("perbis_dashed", self.dashed)
         # ---- hexagon
-        self.caltrops = kwargs.get("caltrops", base.caltrops)
-        self.caltrops_fraction = self.kw_float(
-            kwargs.get("caltrops_fraction", base.caltrops_fraction)
+        self.caltrops = self.kw_float(kwargs.get("caltrops", base.caltrops))
+        self.caltrops_invert = self.kw_bool(
+            kwargs.get("caltrops_invert", base.caltrops_invert)
         )
-        self.caltrops_invert = kwargs.get("caltrops_invert", base.caltrops_invert)
         self.links = kwargs.get("links", base.links)
         self.link_stroke_width = self.kw_float(
             kwargs.get("link_stroke_width", base.link_stroke_width)
@@ -1354,7 +1352,6 @@ class BaseShape:
         morph = None
         if _rotation:
             if not isinstance(_rotation, tuple):
-                breakpoint()
                 tools.feedback(f'Unable to handle rotation: "{_rotation}"', True)
             if not isinstance(_rotation[0], (float, int)):
                 tools.feedback(f'Rotation angle "{_rotation[0]}" is invalid', True)
@@ -1541,17 +1538,6 @@ class BaseShape:
                 "c",
             ]:
                 issue.append(f'"{self.align}" is an invalid align!')
-                correct = False
-        if self.caltrops:
-            if str(self.caltrops).lower() not in [
-                "large",
-                "medium",
-                "small",
-                "s",
-                "m",
-                "l",
-            ]:
-                issue.append(f'"{self.caltrops}" is an invalid caltrops size!')
                 correct = False
         if self.edges:
             if not isinstance(self.edges, list):
@@ -2086,7 +2072,7 @@ class BaseShape:
                 case "points" | "pts":
                     return [float(item) * unit.pt for item in items]
                 case None:
-                    return [float(item) / self.units for item in items]
+                    return [float(item) * self.units for item in items]
                 case _:
                     tools.feedback(
                         f'Unable to convert units "{units_name}" to points!', True
@@ -2396,8 +2382,12 @@ class BaseShape:
                     x = self.points_to_value(vert.x)
                     y = self.points_to_value(vert.y)
                     self.draw_multi_string(
-                        #canvas, vert.x, vert.y, f"{key}:{x:.2f},{y:.2f}", **kwargs
-                        canvas, vert.x, vert.y, f"{key}", **kwargs
+                        # canvas, vert.x, vert.y, f"{key}:{x:.2f},{y:.2f}", **kwargs
+                        canvas,
+                        vert.x,
+                        vert.y,
+                        f"{key}",
+                        **kwargs,
                     )
                     canvas.draw_circle((vert.x, vert.y), 2)
             # display labelled point (geoms.Point)

@@ -52,7 +52,7 @@ Hexagons(
     side=0.6,
     x=2, y=3,
     rows=2, cols=2,
-    fill=darkseagreen,
+    fill="darkseagreen",
     hex_offset="odd",
     coord_elevation="top", coord_type_x="upper", coord_separator='::',
 )
@@ -73,7 +73,7 @@ Hexagons(
     x=1, y=3,
     rows=2, cols=2,
     orientation='pointy',
-    fill=darkseagreen,
+    fill="darkseagreen",
     hex_offset="odd",
     coord_elevation="top", coord_type_x="upper", coord_separator='::',
 )
@@ -84,23 +84,24 @@ Blueprint(stroke_width=0.5)
 Text(common=header, text="Hexagons: flat; caltrops&dots")
 Hexagons(
     side=0.6,
-    x=0, y=0,
-    rows=3, cols=3,
+    x=0, y=1,
+    rows=4, cols=4,
     dot=0.04,
-    caltrops="medium",
+    caltrops=0.15,
 )
 PageBreak()
 
 # ---- rectangular - pointy - caltrops
 Blueprint(stroke_width=0.5)
-Text(common=header, text="Hexagons: pointy; caltrops&dots")
+Text(common=header, text="Hexagons: pointy; caltrops/invert")
 Hexagons(
     side=0.6,
-    x=0, y=0,
-    rows=3, cols=3,
+    x=0, y=1,
+    rows=4, cols=3,
     orientation='pointy',
     dot=0.04,
-    caltrops="large",
+    caltrops=0.2,
+    caltrops_invert=True,
 )
 PageBreak()
 
@@ -121,7 +122,7 @@ Hexagons(
     rows=3, cols=3,
     hex_offset="odd",
     orientation='pointy',
-    fill=darkseagreen,
+    fill="darkseagreen",
     coord_elevation="middle", coord_font_size=5,
     coord_separator=' r', coord_prefix='c',
 )
@@ -135,7 +136,7 @@ Hexagons(
     x=1, y=3,
     rows=3, cols=3,
     orientation='pointy',
-    fill=darkseagreen,
+    fill="darkseagreen",
     hidden=[(1, 2), (1, 3), (3, 2), (3, 3)]
 )
 Hexagons(
@@ -171,7 +172,7 @@ PageBreak()
 Blueprint(stroke_width=0.5)
 Text(common=header, text="Hexagons: circular")
 Hexagons(
-    x=0, y=0,
+    x=0, y=1,
     sides=3,
     height=.75,
     hex_layout="circle",
@@ -182,9 +183,9 @@ PageBreak()
 Blueprint(stroke_width=0.5)
 Text(common=header, text="Hexagons: circular; nested")
 Hexagons(
-    x=0, y=0,
+    x=0, y=1,
     sides=3,
-    stroke=None, fill=None,
+    stroke=None, fill="white",
     height=.75,
     hex_layout="circle",
     centre_shape=hexagon(stroke="black", fill="lightsteelblue", height=0.6, stroke_width=2),
@@ -195,7 +196,7 @@ PageBreak()
 Blueprint(stroke_width=0.5)
 Text(common=header, text="Hexagons: diamond")
 Hexagons(
-    x=0, y=0,
+    x=0, y=1,
     rows=3,
     height=0.75,
     hex_layout="diamond",

@@ -47,9 +47,7 @@ PageBreak()
 Blueprint(stroke_width=0.5)
 Text(common=header, text="Repeat: across&down")
 Repeat(marble, cols=4, rows=5, interval=1, across=(2, 4), down=(1, 3, 5))
-PageBreak()
 
-# Save()
 Save(
      output='png',
      dpi=300,

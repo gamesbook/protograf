@@ -20,7 +20,7 @@ Footer(draw=False)
 txt = Common(x=0, y=0, font_size=8, align="left")
 
 Text(common=txt, text="Tracks START...")
-PageBreak(footer=True)
+PageBreak()
 
 # ---- default track
 Blueprint()
@@ -66,7 +66,7 @@ PageBreak()
 Blueprint()
 Text(common=txt, text="Track: polyline")
 shp = circle(cx=1, cy=1, radius=0.25, label='{{sequence}}')
-Track(Polyline(points=[(0, 0), (1, 2), (2, 1), (3, 3), (1, 5)]), shapes=[shp])
+Track(Polyline(points=[(1, 1), (2, 2), (3, 1), (4, 4), (1, 5)]), shapes=[shp])
 PageBreak()
 
 # # ---- circle track + shape
@@ -212,7 +212,7 @@ times = circle(
     label='{{sequence}}', label_stroke="black")
 Track(
     circle(cx=2, cy=3, radius=1.5),
-    angles=[60,90,120,150,180,210,240,270,300,330,0,30],
+    angles=[300,330,0,30,60,90,120,150,180,210,240,270,],
     shapes=[times],
     rotation_style='o',
     clockwise=True,
@@ -224,7 +224,7 @@ Blueprint()
 Text(common=txt, text="Track: polygon; 'scoring'")
 trk = polygon(cx=2, cy=3, sides=30, radius=1.75)
 score = Common(
-    cx=1, cy=1, radius=0.18, stroke=navy,
+    cx=1, cy=1, radius=0.18, stroke="navy",
     label='{{sequence}}', label_size=6)
 
 shp = circle(common=score, fill="white")
@@ -248,7 +248,6 @@ PageBreak()
 
 # ---- END
 Text(common=txt, text="Tracks END...")
-PageBreak(footer=True)
 
 # Save()
 Save(

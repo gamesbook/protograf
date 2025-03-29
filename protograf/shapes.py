@@ -1389,39 +1389,38 @@ class HexShape(BaseShape):
             )
         return radius, diameter, side, half_flat
 
-    def calculate_caltrops(self, side, size=None, fraction=None, invert=False):
-        """Calculate settings for caltrops (the hex "corner").
+    def calculate_caltrop_lines(
+        self,
+        p0: Point,
+        p1: Point,
+        side: float,
+        size: float = None,
+        invert: bool = False,
+    ) -> Point:
+        """Calculate points for caltrops lines (extend from the hex "corner").
 
         Note: `side` must be in unconverted (user) form e.g. cm or inches
+
+        Returns:
+            tuple:
+                if not invert; two sets of Point tuples (start/end for the two caltrops)
+                if invert; one set of Point tuples (start/end for the mid-caltrops)
         """
-        # tools.feedback(f'*** HEX {side=} {size=} {fraction=}')
-        array = []
-        match size:
-            case "large" | "l":
-                part = side / 3.0
-                array = [part, part, part]
-            case "medium" | "m":
-                part = side / 5.0
-                array = [part, part * 3.0, part]
-            case "small" | "s":
-                part = side / 7.0
-                array = [part, part * 5.0, part]
-            case _:
-                pass
-        if fraction:
-            try:
-                float(fraction)
-            except Exception:
-                tools.feedback(f'Cannot use "{fraction}" for a caltrops fraction', True)
-            fraction = min(fraction, 0.5)  # caltrops might meet in the middle
-            if fraction < 1.0:
-                part = fraction * side
-                middle = (1.0 - 2.0 * fraction) * side
-                array = [part, middle, part]
-        array.insert(0, 0) if invert else array.append(0)
-        # convert to points!
-        points = self.values_to_points(array)
-        return points
+        # tools.feedback(f'*** HEX-CC {p0=} {p1=} {size=} {invert=}')
+        if invert:
+            size = (side - size) / 2
+        fraction = size / side
+        if fraction > 0.5:
+            tools.feedback(f'Cannot use "{fraction}" for a caltrops fraction', True)
+        else:
+            # first caltrop end pt
+            p0a = geoms.fraction_along_line(p0, p1, fraction)
+            # second caltrop end pt
+            p1a = geoms.fraction_along_line(p1, p0, fraction)
+            if not invert:
+                return ((p0, p0a), (p1, p1a))
+            else:
+                return (p0a, p1a)
 
     def set_coord(self, cnv, x_d, y_d, half_flat):
         """Set and draw the coords of the hexagon."""
@@ -1475,7 +1474,7 @@ class HexShape(BaseShape):
                 self.draw_multi_string(
                     cnv,
                     x_d,
-                    y_d + half_flat * 0.7 + coord_offset,
+                    y_d - half_flat * 0.7 + coord_offset,
                     self.coord_text,
                     **keys,
                 )
@@ -1483,7 +1482,7 @@ class HexShape(BaseShape):
                 self.draw_multi_string(
                     cnv,
                     x_d,
-                    y_d + coord_offset - self.coord_font_size / 2.0,
+                    y_d + coord_offset + self.coord_font_size / 2.0,
                     self.coord_text,
                     **keys,
                 )
@@ -1491,7 +1490,7 @@ class HexShape(BaseShape):
                 self.draw_multi_string(
                     cnv,
                     x_d,
-                    y_d - half_flat * 0.9 + coord_offset,
+                    y_d + half_flat * 0.9 + coord_offset,
                     self.coord_text,
                     **keys,
                 )
@@ -1984,12 +1983,7 @@ class HexShape(BaseShape):
 
         # ---- calculate area
         self.area = self.calculate_area()
-        # ---- canvas
-        if self.caltrops or self.caltrops_fraction:
-            line_dashed = self.calculate_caltrops(
-                self.side, self.caltrops, self.caltrops_fraction, self.caltrops_invert
-            )
-            kwargs["dashed"] = line_dashed
+
         # ---- calculate vertical hexagon (clockwise)
         if self.orientation.lower() in ["p", "pointy"]:
             self.vertices = [  # clockwise from bottom-left; relative to centre
@@ -2011,13 +2005,40 @@ class HexShape(BaseShape):
                 muPoint(x + z_fraction, y),
             ]
 
-        # ---- draw hexagon
+        # ---- remove rotation
         if kwargs and kwargs.get("rotation"):
             kwargs.pop("rotation")
         # tools.feedback(f'***Hex {x=} {y=} {self.vertices=} {self.kwargs=')
-        cnv.draw_polyline(self.vertices)
-        kwargs["closed"] = True
-        self.set_canvas_props(cnv=cnv, index=ID, **kwargs)
+
+        # ---- draw hexagon with caltrops
+        if self.caltrops:
+            # draw fill
+            _stroke = kwargs.get("stroke", self.stroke)
+            if self.fill:
+                cnv.draw_polyline(self.vertices)
+                kwargs["stroke"] = None
+                kwargs["closed"] = True
+                self.set_canvas_props(cnv=cnv, index=ID, **kwargs)
+            # draw lines
+            kwargs["stroke"] = _stroke
+            self.vertices.append(self.vertices[0])
+            for key, vertex0 in enumerate(self.vertices):
+                if key + 1 != len(self.vertices):
+                    vertex1 = self.vertices[key + 1]
+                    caltrop_points = self.calculate_caltrop_lines(
+                        vertex0, vertex1, self.side, self.caltrops, self.caltrops_invert
+                    )
+                    if self.caltrops_invert:
+                        cnv.draw_line(caltrop_points[0], caltrop_points[1])
+                    else:
+                        for caltrop_point in caltrop_points:
+                            cnv.draw_line(caltrop_point[0], caltrop_point[1])
+            self.set_canvas_props(cnv=cnv, index=ID, **kwargs)
+        # ---- draw normal hexagon
+        else:
+            cnv.draw_polyline(self.vertices)
+            kwargs["closed"] = True
+            self.set_canvas_props(cnv=cnv, index=ID, **kwargs)
 
         # ---- * borders (override)
         if self.borders:
@@ -2953,7 +2974,7 @@ class RectangleShape(BaseShape):
             else:
                 self.vertices.append(Point(x, y))
 
-            if "SW" in _notches: ###
+            if "SW" in _notches:  ###
                 self.vertices.append(Point(x, y + self._u.height - n_y))
                 match _notch_style:
                     case "snip" | "s":
