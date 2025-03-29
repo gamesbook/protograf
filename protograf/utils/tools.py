@@ -193,7 +193,8 @@ def as_int(value, label, maximum=None, minimum=None, allow_none=False) -> int:
             )
         return the_value
     except (ValueError, Exception):
-        feedback(f'The {_label}"{value}" is not a valid integer!', True)
+        breakpoint()
+        feedback(f'The {_label}"{value}" is not a valid integer!!', True)
 
 
 def as_bool(value, label=None, allow_none=True) -> bool:

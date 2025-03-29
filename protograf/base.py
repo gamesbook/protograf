@@ -788,7 +788,7 @@ class BaseShape:
         self.grid_length = self.kw_float(kwargs.get("grid_length", base.grid_length))
         # ---- sizes and positions
         self.row = kwargs.get("row", base.row)
-        self.col = self.kw_int(kwargs.get("col", kwargs.get("column", base.col)))
+        self.col = self.kw_int(kwargs.get("col", kwargs.get("column", base.col)), "col")
         self.side = self.kw_float(kwargs.get("side", base.side))  # equal length sides
         self.height = self.kw_float(kwargs.get("height", self.side))
         self.width = self.kw_float(kwargs.get("width", self.side))
@@ -968,8 +968,8 @@ class BaseShape:
         # ---- stadium
         self.edges = kwargs.get("edges", base.edges)
         # ---- grid / card layout
-        self.rows = self.kw_int(kwargs.get("rows", base.rows))
-        self.cols = self.kw_int(kwargs.get("cols", kwargs.get("columns", base.cols)))
+        self.rows = self.kw_int(kwargs.get("rows", base.rows), "rows")
+        self.cols = self.kw_int(kwargs.get("cols", kwargs.get("columns", base.cols)), "cols")
         self.frame = kwargs.get("frame", base.frame)
         self.offset = self.kw_float(kwargs.get("offset", base.offset))
         self.offset_x = self.kw_float(kwargs.get("offset_x", self.offset))
@@ -977,14 +977,14 @@ class BaseShape:
         self.spacing = self.kw_float(kwargs.get("spacing", base.spacing))
         self.spacing_x = self.kw_float(kwargs.get("spacing_x", self.spacing))
         self.spacing_y = self.kw_float(kwargs.get("spacing_y", self.spacing))
-        self.grouping = self.kw_int(kwargs.get("grouping", 1))  # no. of cards in a set
-        self.grouping_rows = self.kw_int(kwargs.get("grouping_rows", self.grouping))
-        self.grouping_cols = self.kw_int(kwargs.get("grouping_cols", self.grouping))
+        self.grouping = self.kw_int(kwargs.get("grouping", 1), "grouping")  # no. of cards in a set
+        self.grouping_rows = self.kw_int(kwargs.get("grouping_rows", self.grouping), "grouping_rows")
+        self.grouping_cols = self.kw_int(kwargs.get("grouping_cols", self.grouping), "grouping_cols")
         self.lines = kwargs.get("lines", base.lines)
         # ---- circle / star / polygon
         self.diameter = self.kw_float(kwargs.get("diameter", base.diameter))
         self.radius = self.kw_float(kwargs.get("radius", base.radius))
-        self.vertices = self.kw_int(kwargs.get("vertices", base.vertices))
+        self.vertices = self.kw_int(kwargs.get("vertices", base.vertices), "vertices")
         self.sides = kwargs.get("sides", base.sides)
         self.points = kwargs.get("points", base.points)
         # ---- radii (circle / hexagon / polygon / compass)
@@ -1011,7 +1011,7 @@ class BaseShape:
             kwargs.get("radii_labels_rotation", 0)
         )
         # ---- circle
-        self.petals = self.kw_int(kwargs.get("petals", base.petals))
+        self.petals = self.kw_int(kwargs.get("petals", base.petals), "petals")
         self.petals_style = kwargs.get("petals_style", base.petals_style)
         self.petals_height = self.kw_float(
             kwargs.get("petals_height", base.petals_height)
@@ -1081,8 +1081,8 @@ class BaseShape:
         self.link_cap = kwargs.get("link_cap", base.link_cap)
         # ---- hexagons
         self.hid = kwargs.get("id", base.hid)  # HEX ID
-        self.hex_rows = self.kw_int(kwargs.get("hex_rows", base.hex_rows))
-        self.hex_cols = self.kw_int(kwargs.get("hex_cols", base.hex_cols))
+        self.hex_rows = self.kw_int(kwargs.get("hex_rows", base.hex_rows), "hex_rows")
+        self.hex_cols = self.kw_int(kwargs.get("hex_cols", base.hex_cols), "hex_cols")
         self.hex_layout = kwargs.get(
             "hex_layout", base.hex_layout
         )  # rectangle|circle|diamond|triangle
@@ -1094,10 +1094,10 @@ class BaseShape:
             "coord_type_y", base.coord_type_y
         )  # number|letter
         self.coord_start_x = self.kw_int(
-            kwargs.get("coord_start_x", base.coord_start_x)
+            kwargs.get("coord_start_x", base.coord_start_x), "coord_start_x"
         )
         self.coord_start_y = self.kw_int(
-            kwargs.get("coord_start_y", base.coord_start_y)
+            kwargs.get("coord_start_y", base.coord_start_y), "coord_start_y"
         )
         self.coord_elevation = kwargs.get(
             "coord_elevation", base.coord_elevation
@@ -1109,7 +1109,7 @@ class BaseShape:
         )
         self.coord_stroke = kwargs.get("coord_stroke", base.coord_stroke)
         self.coord_padding = self.kw_int(
-            kwargs.get("coord_padding", base.coord_padding)
+            kwargs.get("coord_padding", base.coord_padding), "coord_padding"
         )
         self.coord_separator = kwargs.get("coord_separator", base.coord_separator)
         self.coord_prefix = kwargs.get("coord_prefix", base.coord_prefix)
@@ -1120,7 +1120,7 @@ class BaseShape:
         self.enclosure = kwargs.get("enclosure", base.enclosure)
         self.colors = kwargs.get("colors", base.colors)
         self.sizes = kwargs.get("sizes", base.sizes)
-        self.density = self.kw_int(kwargs.get("density", base.density))
+        self.density = self.kw_int(kwargs.get("density", base.density), "density")
         self.star_pattern = kwargs.get("star_pattern", base.star_pattern)
         self.seeding = kwargs.get("seeding", base.seeding)
         # ---- mesh
