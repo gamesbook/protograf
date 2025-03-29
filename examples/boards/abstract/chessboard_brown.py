@@ -14,8 +14,8 @@ square_grid = Squares(
     rows=8,
     cols=8,
     side=2.25,
-    fill=saddlebrown,
-    stroke=saddlebrown,
+    fill="saddlebrown",
+    stroke="saddlebrown",
     coord_type_x="lower",
     coord_padding=0,
 )
@@ -32,11 +32,11 @@ Locations(
 
 # border for the board
 Rectangle(
-    x=-0.02, y=-0.02, height=18, width=18, stroke=saddlebrown, stroke_width=2, fill=None
+    x=-0.02, y=-0.02, height=18, width=18, stroke="saddlebrown", stroke_width=2, fill=None
 )
 
 # labels for board
-grid_label = Common(font_size=18, align="left", stroke=saddlebrown)
+grid_label = Common(font_size=18, align="left", stroke="saddlebrown")
 Sequence(
     text(common=grid_label, text="{{sequence}}", x=0.75, y=-0.75),
     setting=('a', 'h'),

@@ -1851,7 +1851,7 @@ def Track(track=None, **kwargs):
             )
     else:
         # ---- get normal vertices and angles
-        vertices = track.get_vertices()
+        vertices = track.get_vertexes()
         angles = [0] * len(vertices) if not angles else angles  # Polyline-> has none!
         for key, vertex in enumerate(vertices):
             track_points.append(Ray(vertex.x, vertex.y, angles[key]))

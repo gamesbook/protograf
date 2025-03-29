@@ -197,12 +197,12 @@ class CardShape(BaseShape):
         # ---- track frame outlines for possible image extraction
         match kwargs["frame_type"]:
             case CardFrame.RECTANGLE:
-                _vertices = outline.get_vertices()  # clockwise from bottom-left
+                _vertices = outline.get_vertexes()  # clockwise from bottom-left
                 base_frame_bbox = BBox(bl=_vertices[0], tr=_vertices[2])
             case CardFrame.CIRCLE:
                 base_frame_bbox = None
             case CardFrame.HEXAGON:
-                _vertices = outline.get_vertices()  # anti-clockwise from mid-right
+                _vertices = outline.get_vertexes()  # anti-clockwise from mid-right
                 base_frame_bbox = BBox(
                     bl=Point(_vertices[3].x, _vertices[4].y),
                     tr=Point(_vertices[0].x, _vertices[1].y),

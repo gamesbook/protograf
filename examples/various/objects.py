@@ -38,7 +38,7 @@ Rectangle(
     x=2, y=13.5,
     height=3, width=2,
     hatch_count=7, hatch_width=0.1, hatch='d', hatch_stroke="black",
-    stroke=saddlebrown, stroke_width=2, fill=lightcyan)
+    stroke="saddlebrown", stroke_width=2, fill=lightcyan)
 
 Text(common=header_font, x=5, y=11, text="Paned Window: rectangle with single orthogonal hatch")
 Rectangle(

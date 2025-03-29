@@ -245,7 +245,7 @@ class ArrowShape(BaseShape):
         )
         self.tail_notch_u = self.unit(self.tail_notch) if self.tail_notch else 0
 
-    def get_vertices(self, **kwargs):
+    def get_vertexes(self, **kwargs):
         """Calculate vertices of arrow."""
         x_c = kwargs.get("x")
         x_s, y_s = x_c - self.tail_width_u / 2.0, kwargs.get("y")
@@ -298,9 +298,9 @@ class ArrowShape(BaseShape):
             self.centroid = muPoint(cx, cy)
             kwargs["rotation"] = (rotation, self.centroid)
         # ---- draw arrow
-        self.vertices = self.get_vertices(cx=cx, cy=cy, x=x, y=y)
-        # tools.feedback(f'***Arrow {x=} {y=} {self.vertices=}')
-        cnv.draw_polyline(self.vertices)
+        self.vertexes = self.get_vertexes(cx=cx, cy=cy, x=x, y=y)
+        # tools.feedback(f'***Arrow {x=} {y=} {self.vertexes=}')
+        cnv.draw_polyline(self.vertexes)
         kwargs["closed"] = True
         self.set_canvas_props(cnv=cnv, index=ID, **kwargs)
         # ---- dot
@@ -1035,7 +1035,7 @@ class CompassShape(BaseShape):
                 )
             rect = RectangleShape(**self.kwargs)
             rotation = 0
-            vertices = rect.get_vertices(rotation, **kwargs)
+            vertices = rect.get_vertexes(rotation, **kwargs)
 
             for direction in _directions:
                 match direction:
@@ -1237,7 +1237,7 @@ class EquilateralTriangleShape(BaseShape):
         else:
             return length
 
-    def get_vertices(
+    def get_vertexes(
         self, x: float, y: float, side: float, hand: str, flip: str
     ) -> list:
         height = 0.5 * math.sqrt(3) * side  # ½√3(a)
@@ -1283,23 +1283,23 @@ class EquilateralTriangleShape(BaseShape):
             y = self._u.cy + (height - centroid_to_vertex)
             # print(f'** {side=} {height=} {centroid_to_vertex=} {y_off=}')
         # tools.feedback(f'*** EQT {side=} {height=} {self.fill=} {self.stroke=}')
-        self.vertices = self.get_vertices(x, y, side, self.hand, self.flip)
-        self.centroid = self.get_centroid(self.vertices)
+        self.vertexes = self.get_vertexes(x, y, side, self.hand, self.flip)
+        self.centroid = self.get_centroid(self.vertexes)
         # ---- handle rotation
         rotation = kwargs.get("rotation", self.rotation)
         if rotation:
             kwargs["rotation"] = (rotation, self.centroid)
         # ---- draw equilateral triangle
-        # tools.feedback(f'***EqiTru {x=} {y=} {self.vertices=}')
-        cnv.draw_polyline(self.vertices)
+        # tools.feedback(f'***EqiTru {x=} {y=} {self.vertexes=}')
+        cnv.draw_polyline(self.vertexes)
         kwargs["closed"] = True
         self.set_canvas_props(cnv=cnv, index=ID, **kwargs)
 
         # ---- debug
-        self._debug(cnv, vertices=self.vertices)
+        self._debug(cnv, vertices=self.vertexes)
         # ---- draw hatch
         if self.hatch_count:
-            self.draw_hatch(cnv, ID, side, self.vertices, self.hatch_count)
+            self.draw_hatch(cnv, ID, side, self.vertexes, self.hatch_count)
         # ---- centred shape (with offset)
         if self.centre_shape:
             cshape_name = self.centre_shape.__class__.__name__
@@ -1986,7 +1986,7 @@ class HexShape(BaseShape):
 
         # ---- calculate vertical hexagon (clockwise)
         if self.orientation.lower() in ["p", "pointy"]:
-            self.vertices = [  # clockwise from bottom-left; relative to centre
+            self.vertexes = [  # clockwise from bottom-left; relative to centre
                 muPoint(x, y + z_fraction),
                 muPoint(x, y + z_fraction + side),
                 muPoint(x + half_flat, y + diameter),
@@ -1996,7 +1996,7 @@ class HexShape(BaseShape):
             ]
         # ---- calculate horizontal hexagon (clockwise)
         else:  # self.orientation.lower() in ['f',  'flat']:
-            self.vertices = [  # clockwise from left; relative to centre
+            self.vertexes = [  # clockwise from left; relative to centre
                 muPoint(x, y + half_flat),
                 muPoint(x + z_fraction, y + height_flat),
                 muPoint(x + z_fraction + side, y + height_flat),
@@ -2008,23 +2008,23 @@ class HexShape(BaseShape):
         # ---- remove rotation
         if kwargs and kwargs.get("rotation"):
             kwargs.pop("rotation")
-        # tools.feedback(f'***Hex {x=} {y=} {self.vertices=} {self.kwargs=')
+        # tools.feedback(f'***Hex {x=} {y=} {self.vertexes=} {self.kwargs=')
 
         # ---- draw hexagon with caltrops
         if self.caltrops:
             # draw fill
             _stroke = kwargs.get("stroke", self.stroke)
             if self.fill:
-                cnv.draw_polyline(self.vertices)
+                cnv.draw_polyline(self.vertexes)
                 kwargs["stroke"] = None
                 kwargs["closed"] = True
                 self.set_canvas_props(cnv=cnv, index=ID, **kwargs)
             # draw lines
             kwargs["stroke"] = _stroke
-            self.vertices.append(self.vertices[0])
-            for key, vertex0 in enumerate(self.vertices):
-                if key + 1 != len(self.vertices):
-                    vertex1 = self.vertices[key + 1]
+            self.vertexes.append(self.vertexes[0])
+            for key, vertex0 in enumerate(self.vertexes):
+                if key + 1 != len(self.vertexes):
+                    vertex1 = self.vertexes[key + 1]
                     caltrop_points = self.calculate_caltrop_lines(
                         vertex0, vertex1, self.side, self.caltrops, self.caltrops_invert
                     )
@@ -2036,7 +2036,7 @@ class HexShape(BaseShape):
             self.set_canvas_props(cnv=cnv, index=ID, **kwargs)
         # ---- draw normal hexagon
         else:
-            cnv.draw_polyline(self.vertices)
+            cnv.draw_polyline(self.vertexes)
             kwargs["closed"] = True
             self.set_canvas_props(cnv=cnv, index=ID, **kwargs)
 
@@ -2054,21 +2054,21 @@ class HexShape(BaseShape):
         # ---- debug
         # self._debug(cnv, Point(x, y), 'start')
         # self._debug(cnv, Point(self.x_d, self.y_d), 'centre')
-        self._debug(cnv, vertices=self.vertices)
+        self._debug(cnv, vertices=self.vertexes)
         # ---- draw hatch
         if self.hatch_count:
             if not self.hatch_count & 1:
                 tools.feedback("Hatch must be an odd number for a Hexagon", True)
-            self.draw_hatch(cnv, ID, side, self.vertices, self.hatch_count)
+            self.draw_hatch(cnv, ID, side, self.vertexes, self.hatch_count)
         # ---- draw links
         if self.links:
-            self.draw_links(cnv, ID, side, self.vertices, self.links)
+            self.draw_links(cnv, ID, side, self.vertexes, self.links)
         # ---- draw radii
         if self.radii:
-            self.draw_radii(cnv, ID, Point(self.x_d, self.y_d), self.vertices)
+            self.draw_radii(cnv, ID, Point(self.x_d, self.y_d), self.vertexes)
         # ---- draw perbis
         if self.perbis:
-            self.draw_perbis(cnv, ID, Point(self.x_d, self.y_d), self.vertices)
+            self.draw_perbis(cnv, ID, Point(self.x_d, self.y_d), self.vertexes)
         # ---- centred shape (with offset)
         if self.centre_shape:
             cshape_name = self.centre_shape.__class__.__name__
@@ -2254,7 +2254,7 @@ class PolygonShape(BaseShape):
     def get_angles(self, rotation: float = 0, is_rotated: bool = False) -> list:
         """Angles of lines connecting the Polygon centre to each of the vertices."""
         centre = self.get_centre()
-        vertices = self.get_vertices(rotation, is_rotated)
+        vertices = self.get_vertexes(rotation, is_rotated)
         angles = []
         for vertex in vertices:
             _, angle = geoms.angles_from_points(centre.x, centre.y, vertex.x, vertex.y)
@@ -2280,7 +2280,7 @@ class PolygonShape(BaseShape):
         if not centre:
             centre = self.get_center()
         if not vertices:
-            vertices = self.get_vertices(rotation=rotation)
+            vertices = self.get_vertexes(rotation=rotation)
         _perbis = []  # store angles to centre of edges (the "chords")
         _perbis_pts = []  # store centre Point of edges
         vcount = len(vertices) - 1
@@ -2333,7 +2333,7 @@ class PolygonShape(BaseShape):
         if not centre:
             centre = self.get_center()
         if not vertices:
-            vertices = self.get_vertices(rotation=rotation)
+            vertices = self.get_vertexes(rotation=rotation)
         _radii = []
         for vertex in vertices:
             _, angle = geoms.angles_from_points(centre.x, centre.y, vertex.x, vertex.y)
@@ -2363,7 +2363,7 @@ class PolygonShape(BaseShape):
             dotted=self.radii_dotted,
         )
 
-    def get_vertices(self, rotation: float = None, is_rotated: bool = False):
+    def get_vertexes(self, rotation: float = None, is_rotated: bool = False):
         """Calculate vertices of polygon."""
         # convert to using units
         if is_rotated:
@@ -2477,7 +2477,7 @@ class PolylineShape(BaseShape):
             tools.feedback("There are no points to draw the Polyline", False, True)
         return points
 
-    def get_vertices(self):
+    def get_vertexes(self):
         """Return polyline vertices in canvas units"""
         points = self.get_points()
         vertices = [
@@ -2504,7 +2504,7 @@ class PolylineShape(BaseShape):
             y = self.unit(y) + self._o.delta_y
             self.vertexes.append((x, y))
         # ---- draw polyline
-        # tools.feedback(f'***Hex {x=} {y=} {self.vertices=}')
+        # tools.feedback(f'***Hex {x=} {y=} {self.vertexes=}')
         cnv.draw_polyline(self.vertexes)
         kwargs["closed"] = False
         kwargs["fill"] = None
@@ -2642,7 +2642,7 @@ class RectangleShape(BaseShape):
     def get_angles(self, rotation=0, **kwargs):
         """Get angles from centre to vertices for rectangle without notches."""
         x, y = self.calculate_xy(**kwargs)
-        vertices = self.get_vertices(rotation=rotation, **kwargs)
+        vertices = self.get_vertexes(rotation=rotation, **kwargs)
         centre = Point(x + self._u.height / 2.0, y + self._u.height / 2.0)
         angles = []
         for vtx in vertices:
@@ -2650,7 +2650,7 @@ class RectangleShape(BaseShape):
             angles.append(angle)
         return angles
 
-    def get_vertices(self, rotation=0, **kwargs):
+    def get_vertexes(self, rotation=0, **kwargs):
         """Get vertices for rectangle without notches."""
         if rotation:
             kwargs["rotation"] = rotation
@@ -2949,179 +2949,179 @@ class RectangleShape(BaseShape):
             # tools.feedback(f'*** Rect {self.notch_x=} {self.notch_y=} {_notches=} ')
             n_x = self.unit(self.notch_x) if self.notch_x else self.unit(self.notch)
             n_y = self.unit(self.notch_y) if self.notch_y else self.unit(self.notch)
-            self.vertices = []
+            self.vertexes = []
 
             if "NW" in _notches:
                 match _notch_style:
                     case "snip" | "s":
-                        self.vertices.append(Point(x + n_x, y))
-                        self.vertices.append(Point(x, y + n_y))
+                        self.vertexes.append(Point(x + n_x, y))
+                        self.vertexes.append(Point(x, y + n_y))
                     case "fold" | "d":
-                        self.vertices.append(Point(x, y))
-                        self.vertices.append(Point(x + n_x, y))
-                        self.vertices.append(Point(x, y + n_y))
+                        self.vertexes.append(Point(x, y))
+                        self.vertexes.append(Point(x + n_x, y))
+                        self.vertexes.append(Point(x, y + n_y))
                     case "flap" | "p":
-                        self.vertices.append(Point(x + n_x, y))
-                        self.vertices.append(Point(x, y + n_y))
-                        self.vertices.append(Point(x + n_x, y + n_y))
-                        self.vertices.append(Point(x + n_x, y))
-                        self.vertices.append(Point(x, y + n_y))
+                        self.vertexes.append(Point(x + n_x, y))
+                        self.vertexes.append(Point(x, y + n_y))
+                        self.vertexes.append(Point(x + n_x, y + n_y))
+                        self.vertexes.append(Point(x + n_x, y))
+                        self.vertexes.append(Point(x, y + n_y))
                     case "step" | "t":
                         pass
                     case "bite" | "b":
                         # TODO - write code ...
                         pass
             else:
-                self.vertices.append(Point(x, y))
+                self.vertexes.append(Point(x, y))
 
             if "SW" in _notches:  ###
-                self.vertices.append(Point(x, y + self._u.height - n_y))
+                self.vertexes.append(Point(x, y + self._u.height - n_y))
                 match _notch_style:
                     case "snip" | "s":
-                        self.vertices.append(Point(x + n_x, y + self._u.height))
+                        self.vertexes.append(Point(x + n_x, y + self._u.height))
                     case "fold" | "d":
-                        self.vertices.append(Point(x + n_x, y + self._u.height))
-                        self.vertices.append(Point(x, y + self._u.height))
-                        self.vertices.append(Point(x, y + self._u.height - n_y))
-                        self.vertices.append(Point(x + n_x, y + self._u.height))
+                        self.vertexes.append(Point(x + n_x, y + self._u.height))
+                        self.vertexes.append(Point(x, y + self._u.height))
+                        self.vertexes.append(Point(x, y + self._u.height - n_y))
+                        self.vertexes.append(Point(x + n_x, y + self._u.height))
                     case "flap" | "p":
-                        self.vertices.append(Point(x + n_x, y + self._u.height))
-                        self.vertices.append(Point(x + n_x, y + self._u.height - n_y))
-                        self.vertices.append(Point(x, y + self._u.height - n_y))
-                        self.vertices.append(Point(x + n_x, y + self._u.height))
+                        self.vertexes.append(Point(x + n_x, y + self._u.height))
+                        self.vertexes.append(Point(x + n_x, y + self._u.height - n_y))
+                        self.vertexes.append(Point(x, y + self._u.height - n_y))
+                        self.vertexes.append(Point(x + n_x, y + self._u.height))
                     case "step" | "t":
-                        self.vertices.append(Point(x + n_x, y + self._u.height - n_y))
-                        self.vertices.append(Point(x + n_x, y + self._u.height))
+                        self.vertexes.append(Point(x + n_x, y + self._u.height - n_y))
+                        self.vertexes.append(Point(x + n_x, y + self._u.height))
                     case "bite" | "b":
                         # TODO - write code ...
                         pass
             else:
-                self.vertices.append(Point(x, y + self._u.height))
+                self.vertexes.append(Point(x, y + self._u.height))
 
             if "SE" in _notches:  ##
-                self.vertices.append(Point(x + self._u.width - n_x, y + self._u.height))
+                self.vertexes.append(Point(x + self._u.width - n_x, y + self._u.height))
                 match _notch_style:
                     case "snip" | "s":
-                        self.vertices.append(
+                        self.vertexes.append(
                             Point(x + self._u.width, y + self._u.height - n_y)
                         )
                     case "fold" | "d":
-                        self.vertices.append(
+                        self.vertexes.append(
                             Point(x + self._u.width, y + self._u.height - n_y)
                         )
-                        self.vertices.append(
+                        self.vertexes.append(
                             Point(x + self._u.width, y + self._u.height)
                         )
-                        self.vertices.append(
+                        self.vertexes.append(
                             Point(x + self._u.width - n_x, y + self._u.height)
                         )
-                        self.vertices.append(
+                        self.vertexes.append(
                             Point(x + self._u.width, y + self._u.height - n_y)
                         )
                     case "flap" | "p":
-                        self.vertices.append(
+                        self.vertexes.append(
                             Point(x + self._u.width, y + self._u.height - n_y)
                         )
-                        self.vertices.append(
+                        self.vertexes.append(
                             Point(x + self._u.width - n_x, y + self._u.height - n_y)
                         )
-                        self.vertices.append(
+                        self.vertexes.append(
                             Point(x + self._u.width - n_x, y + self._u.height)
                         )
-                        self.vertices.append(
+                        self.vertexes.append(
                             Point(x + self._u.width, y + self._u.height - n_y)
                         )
                     case "step" | "t":
-                        self.vertices.append(
+                        self.vertexes.append(
                             Point(x + self._u.width - n_x, y + self._u.height - n_y)
                         )
-                        self.vertices.append(
+                        self.vertexes.append(
                             Point(x + self._u.width, y + self._u.height - n_y)
                         )
                     case "bite" | "b":
                         # TODO - write code ...
                         pass
             else:
-                self.vertices.append(Point(x + self._u.width, y + self._u.height))
+                self.vertexes.append(Point(x + self._u.width, y + self._u.height))
 
             if "NE" in _notches:  ###
-                self.vertices.append(Point(x + self._u.width, y + n_y))
+                self.vertexes.append(Point(x + self._u.width, y + n_y))
                 match _notch_style:
                     case "snip" | "s":
-                        self.vertices.append(Point(x + self._u.width - n_x, y))
+                        self.vertexes.append(Point(x + self._u.width - n_x, y))
                     case "fold" | "d":
-                        self.vertices.append(Point(x + self._u.width - n_x, y))
-                        self.vertices.append(Point(x + self._u.width, y))
-                        self.vertices.append(Point(x + self._u.width, y + n_y))
-                        self.vertices.append(Point(x + self._u.width - n_x, y))
+                        self.vertexes.append(Point(x + self._u.width - n_x, y))
+                        self.vertexes.append(Point(x + self._u.width, y))
+                        self.vertexes.append(Point(x + self._u.width, y + n_y))
+                        self.vertexes.append(Point(x + self._u.width - n_x, y))
                     case "flap" | "p":
-                        self.vertices.append(Point(x + self._u.width - n_x, y))
-                        self.vertices.append(Point(x + self._u.width - n_x, y + n_y))
-                        self.vertices.append(Point(x + self._u.width, y + n_y))
-                        self.vertices.append(Point(x + self._u.width - n_x, y))
+                        self.vertexes.append(Point(x + self._u.width - n_x, y))
+                        self.vertexes.append(Point(x + self._u.width - n_x, y + n_y))
+                        self.vertexes.append(Point(x + self._u.width, y + n_y))
+                        self.vertexes.append(Point(x + self._u.width - n_x, y))
                     case "step" | "t":
-                        self.vertices.append(Point(x + self._u.width - n_x, y + n_y))
-                        self.vertices.append(Point(x + self._u.width - n_x, y))
+                        self.vertexes.append(Point(x + self._u.width - n_x, y + n_y))
+                        self.vertexes.append(Point(x + self._u.width - n_x, y))
                     case "bite" | "b":
                         # TODO - write code ...
                         pass
             else:
-                self.vertices.append(Point(x + self._u.width, y))
+                self.vertexes.append(Point(x + self._u.width, y))
 
             if "NW" in _notches:
                 match _notch_style:
                     case "snip" | "s":
                         pass
                     case "fold" | "d":
-                        self.vertices.append(Point(x, y))
-                        self.vertices.append(Point(x + n_x, y))
-                        self.vertices.append(Point(x, y + n_y))
+                        self.vertexes.append(Point(x, y))
+                        self.vertexes.append(Point(x + n_x, y))
+                        self.vertexes.append(Point(x, y + n_y))
                     case "flap" | "p":
                         pass
-                        # self.vertices.append(Point(x + n_x, y + n_y))
-                        # self.vertices.append(Point(x + n_x, y))
-                        # self.vertices.append(Point(x, y + n_y))
+                        # self.vertexes.append(Point(x + n_x, y + n_y))
+                        # self.vertexes.append(Point(x + n_x, y))
+                        # self.vertexes.append(Point(x, y + n_y))
                     case "step" | "t":
-                        self.vertices.append(Point(x + n_x, y))
-                        self.vertices.append(Point(x + n_x, y + n_y))
-                        self.vertices.append(Point(x, y + n_y))
+                        self.vertexes.append(Point(x + n_x, y))
+                        self.vertexes.append(Point(x + n_x, y + n_y))
+                        self.vertexes.append(Point(x, y + n_y))
                     case "bite" | "b":
                         # TODO - write code ...
                         pass
             else:
-                self.vertices.append(Point(x, y))
+                self.vertexes.append(Point(x, y))
 
             # ---- debug
-            self._debug(cnv, vertices=self.vertices)
+            self._debug(cnv, vertices=self.vertexes)
         # ---- * peaks vertices
         elif is_peaks:
             half_height = self._u.height / 2.0
             half_width = self._u.width / 2.0
-            self.vertices = []
-            self.vertices.append(Point(x, y))  # start here!
+            self.vertexes = []
+            self.vertexes.append(Point(x, y))  # start here!
             if "w" in self.peaks_dict.keys():
                 _pt = self.unit(self.peaks_dict["w"])
-                self.vertices.append(Point(x - _pt, y + half_height))
-                self.vertices.append(Point(x, y + self._u.height))
+                self.vertexes.append(Point(x - _pt, y + half_height))
+                self.vertexes.append(Point(x, y + self._u.height))
             else:
-                self.vertices.append(Point(x, y + self._u.height))
+                self.vertexes.append(Point(x, y + self._u.height))
             if "s" in self.peaks_dict.keys():
                 _pt = self.unit(self.peaks_dict["s"])
-                self.vertices.append(Point(x + half_width, y + self._u.height + _pt))
-                self.vertices.append(Point(x + self._u.width, y + self._u.height))
+                self.vertexes.append(Point(x + half_width, y + self._u.height + _pt))
+                self.vertexes.append(Point(x + self._u.width, y + self._u.height))
             else:
-                self.vertices.append(Point(x + self._u.width, y + self._u.height))
+                self.vertexes.append(Point(x + self._u.width, y + self._u.height))
             if "e" in self.peaks_dict.keys():
                 _pt = self.unit(self.peaks_dict["e"])
-                self.vertices.append(Point(x + +self._u.width + _pt, y + half_height))
-                self.vertices.append(Point(x + self._u.width, y))
+                self.vertexes.append(Point(x + +self._u.width + _pt, y + half_height))
+                self.vertexes.append(Point(x + self._u.width, y))
             else:
-                self.vertices.append(Point(x + self._u.width, y))
+                self.vertexes.append(Point(x + self._u.width, y))
             if "n" in self.peaks_dict.keys():
                 _pt = self.unit(self.peaks_dict["n"])
-                self.vertices.append(Point(x + half_width, y - _pt))
+                self.vertexes.append(Point(x + half_width, y - _pt))
             else:
-                self.vertices.append(Point(x, y))  # close() draws line back to start
+                self.vertexes.append(Point(x, y))  # close() draws line back to start
         # ---- * chevron vertices
         elif is_chevron:
             try:
@@ -3139,50 +3139,50 @@ class RectangleShape(BaseShape):
             delta_m = self.unit(_chevron_height)
             if not self.chevron:
                 self.chevron = "N"
-            self.vertices = []
+            self.vertexes = []
             if self.chevron.upper() == "S":
                 delta_m_down = delta_m
-                self.vertices.append(Point(x, y))
-                self.vertices.append(Point(x, y + self._u.height))
-                self.vertices.append(
+                self.vertexes.append(Point(x, y))
+                self.vertexes.append(Point(x, y + self._u.height))
+                self.vertexes.append(
                     Point(x + self._u.width / 2.0, y + self._u.height + delta_m)
                 )
-                self.vertices.append(Point(x + self._u.width, y + self._u.height))
-                self.vertices.append(Point(x + self._u.width, y))
-                self.vertices.append(Point(x + self._u.width / 2.0, y + delta_m))
+                self.vertexes.append(Point(x + self._u.width, y + self._u.height))
+                self.vertexes.append(Point(x + self._u.width, y))
+                self.vertexes.append(Point(x + self._u.width / 2.0, y + delta_m))
             elif self.chevron.upper() == "N":
                 delta_m_up = delta_m
-                self.vertices.append(Point(x, y))
-                self.vertices.append(Point(x, y + self._u.height))
-                self.vertices.append(
+                self.vertexes.append(Point(x, y))
+                self.vertexes.append(Point(x, y + self._u.height))
+                self.vertexes.append(
                     Point(x + self._u.width / 2.0, y + self._u.height - delta_m)
                 )
-                self.vertices.append(Point(x + self._u.width, y + self._u.height))
-                self.vertices.append(Point(x + self._u.width, y))
-                self.vertices.append(Point(x + self._u.width / 2.0, y - delta_m))
+                self.vertexes.append(Point(x + self._u.width, y + self._u.height))
+                self.vertexes.append(Point(x + self._u.width, y))
+                self.vertexes.append(Point(x + self._u.width / 2.0, y - delta_m))
             elif self.chevron.upper() == "W":
-                self.vertices.append(Point(x, y))
-                self.vertices.append(Point(x - delta_m, y + self._u.height / 2.0))
-                self.vertices.append(Point(x, y + self._u.height))
-                self.vertices.append(Point(x + self._u.width, y + self._u.height))
-                self.vertices.append(
+                self.vertexes.append(Point(x, y))
+                self.vertexes.append(Point(x - delta_m, y + self._u.height / 2.0))
+                self.vertexes.append(Point(x, y + self._u.height))
+                self.vertexes.append(Point(x + self._u.width, y + self._u.height))
+                self.vertexes.append(
                     Point(x + self._u.width - delta_m, y + self._u.height / 2.0)
                 )
-                self.vertices.append(Point(x + self._u.width, y))
+                self.vertexes.append(Point(x + self._u.width, y))
             elif self.chevron.upper() == "E":
-                self.vertices.append(Point(x, y))
-                self.vertices.append(Point(x + delta_m, y + self._u.height / 2.0))
-                self.vertices.append(Point(x, y + self._u.height))
-                self.vertices.append(Point(x + self._u.width, y + self._u.height))
-                self.vertices.append(
+                self.vertexes.append(Point(x, y))
+                self.vertexes.append(Point(x + delta_m, y + self._u.height / 2.0))
+                self.vertexes.append(Point(x, y + self._u.height))
+                self.vertexes.append(Point(x + self._u.width, y + self._u.height))
+                self.vertexes.append(
                     Point(x + self._u.width + delta_m, y + self._u.height / 2.0)
                 )
-                self.vertices.append(Point(x + self._u.width, y))
+                self.vertexes.append(Point(x + self._u.width, y))
             else:
-                self.vertices = self.get_vertices(**kwargs)
+                self.vertexes = self.get_vertexes(**kwargs)
         else:
-            self.vertices = self.get_vertices(**kwargs)
-        # tools.feedback(f'*** Rect {len(self.vertices)=}')
+            self.vertexes = self.get_vertexes(**kwargs)
+        # tools.feedback(f'*** Rect {len(self.vertexes)=}')
 
         # ---- calculate rounding
         # radius (multiple) – draw rounded rectangle corners. S
@@ -3199,7 +3199,7 @@ class RectangleShape(BaseShape):
         # tools.feedback(f'*** RECT {self.col=} {self.row=} {x=} {y=} {radius=}')
         if is_notched or is_chevron or is_peaks:
             # tools.feedback(f'*** RECT  vertices')
-            cnv.draw_polyline(self.vertices)
+            cnv.draw_polyline(self.vertexes)
             kwargs["closed"] = True
             self.set_canvas_props(cnv=cnv, index=ID, **kwargs)
         else:
@@ -3221,7 +3221,7 @@ class RectangleShape(BaseShape):
 
         # ---- draw hatch
         if self.hatch_count:
-            vertices = self.get_vertices(rotation=rotation, **kwargs)
+            vertices = self.get_vertexes(rotation=rotation, **kwargs)
             self.draw_hatch(cnv, ID, vertices, self.hatch_count)
         # ---- grid marks
         if self.grid_marks:
@@ -3314,7 +3314,7 @@ class RhombusShape(BaseShape):
     Rhombus on a given canvas.
     """
 
-    def get_vertices(self, **kwargs):
+    def get_vertexes(self, **kwargs):
         """Calculate vertices of rhombus."""
         x_s, y_s = kwargs.get("x"), kwargs.get("y") + self._u.height / 2.0
         vertices = []
@@ -3351,9 +3351,9 @@ class RhombusShape(BaseShape):
             self.centroid = muPoint(cx, cy)
             kwargs["rotation"] = (rotation, self.centroid)
         # ---- draw rhombus
-        self.vertices = self.get_vertices(cx=cx, cy=cy, x=x, y=y)
-        # tools.feedback(f'***Rhombus {x=} {y=} {self.vertices=}')
-        cnv.draw_polyline(self.vertices)
+        self.vertexes = self.get_vertexes(cx=cx, cy=cy, x=x, y=y)
+        # tools.feedback(f'***Rhombus {x=} {y=} {self.vertexes=}')
+        cnv.draw_polyline(self.vertexes)
         kwargs["closed"] = True
         self.set_canvas_props(cnv=cnv, index=ID, **kwargs)
         # ---- borders (override)
@@ -3400,8 +3400,8 @@ class RightAngledTriangleShape(BaseShape):
             self._u.height = self._u.width
         # calculate points
         x, y = self._u.x, self._u.y
-        self.vertices = []
-        self.vertices.append(Point(x, y))
+        self.vertexes = []
+        self.vertexes.append(Point(x, y))
         if not self.hand or not self.flip:
             tools.feedback(
                 'Need to supply both "flip" and "hand" options! for triangle.',
@@ -3417,12 +3417,12 @@ class RightAngledTriangleShape(BaseShape):
             y2 = y + self._u.height
         elif flip == "south":
             y2 = y - self._u.height
-        self.vertices.append(Point(x2, y2))
-        self.vertices.append(Point(x2, y))
+        self.vertexes.append(Point(x2, y2))
+        self.vertexes.append(Point(x2, y))
         # ---- set vertices
         x_sum, y_sum = 0, 0
         self.vertexes = []
-        for key, vertex in enumerate(self.vertices):
+        for key, vertex in enumerate(self.vertexes):
             # shift to relative position
             x = vertex.x + self._o.delta_x
             y = vertex.y + self._o.delta_y
@@ -3430,7 +3430,7 @@ class RightAngledTriangleShape(BaseShape):
             y_sum += y
             self.vertexes.append((x, y))
         # ---- draw RightAngledTriangle
-        # tools.feedback(f'***RAT {x=} {y=} {self.vertices=}')
+        # tools.feedback(f'***RAT {x=} {y=} {self.vertexes=}')
         cnv.draw_polyline(self.vertexes)
         kwargs["closed"] = True
         self.set_canvas_props(cnv=cnv, index=ID, **kwargs)
@@ -3539,7 +3539,7 @@ class ShapeShape(BaseShape):
                 x = self.unit(_x0) + self._o.delta_x + x_offset
                 y = self.unit(_y0) + self._o.delta_y + y_offset
                 self.vertexes.append((x, y))
-            # tools.feedback(f'***RAT {x=} {y=} {self.vertices=}')
+            # tools.feedback(f'***RAT {x=} {y=} {self.vertexes=}')
             cnv.draw_polyline(self.vertexes)
             kwargs["closed"] = True
             self.set_canvas_props(cnv=cnv, index=ID, **kwargs)
@@ -3632,68 +3632,68 @@ class StadiumShape(BaseShape):
             self.centroid = muPoint(cx, cy)
             kwargs["rotation"] = (rotation, self.centroid)
         # ---- vertices
-        self.vertices = [  # clockwise from top-left; relative to centre
+        self.vertexes = [  # clockwise from top-left; relative to centre
             Point(x, y),
             Point(x, y + self._u.height),
             Point(x + self._u.width, y + self._u.height),
             Point(x + self._u.width, y),
         ]
-        # tools.feedback(f'*** Stad{len(self.vertices)=}')
+        # tools.feedback(f'*** Stad{len(self.vertexes)=}')
         # ---- edges
         _edges = tools.validated_directions(
             self.edges, tools.DirectionGroup.CARDINAL, "edges"
         )  # need curves on these edges
-        self.vertices.append(self.vertices[0])
+        self.vertexes.append(self.vertexes[0])
 
         # ---- draw rect fill only
-        # tools.feedback(f'***Stadium:Rect {x=} {y=} {self.vertices=}')
+        # tools.feedback(f'***Stadium:Rect {x=} {y=} {self.vertexes=}')
         keys = copy.copy(kwargs)
         keys["stroke"] = None
-        cnv.draw_polyline(self.vertices)
+        cnv.draw_polyline(self.vertexes)
         self.set_canvas_props(cnv=cnv, index=ID, **keys)
 
         # ---- draw stadium - lines or curves
         radius_lr = self._u.height / 2.0
         radius_tb = self._u.width / 2.0
 
-        for key, vertex in enumerate(self.vertices):
-            if key + 1 == len(self.vertices):
+        for key, vertex in enumerate(self.vertexes):
+            if key + 1 == len(self.vertexes):
                 continue
             if key == 0 and "w" in _edges:
-                midpt = geoms.fraction_along_line(vertex, self.vertices[1], 0.5)
+                midpt = geoms.fraction_along_line(vertex, self.vertexes[1], 0.5)
                 cnv.draw_sector(
                     (midpt.x, midpt.y),
-                    (self.vertices[1].x, self.vertices[1].y),
+                    (self.vertexes[1].x, self.vertexes[1].y),
                     -180.0,
                     fullSector=False,
                 )
             elif key == 2 and "e" in _edges:
-                midpt = geoms.fraction_along_line(vertex, self.vertices[3], 0.5)
+                midpt = geoms.fraction_along_line(vertex, self.vertexes[3], 0.5)
                 cnv.draw_sector(
                     (midpt.x, midpt.y),
-                    (self.vertices[3].x, self.vertices[3].y),
+                    (self.vertexes[3].x, self.vertexes[3].y),
                     -180.0,
                     fullSector=False,
                 )
             elif key == 1 and "s" in _edges:
-                midpt = geoms.fraction_along_line(vertex, self.vertices[2], 0.5)
+                midpt = geoms.fraction_along_line(vertex, self.vertexes[2], 0.5)
                 cnv.draw_sector(
                     (midpt.x, midpt.y),
-                    (self.vertices[2].x, self.vertices[2].y),
+                    (self.vertexes[2].x, self.vertexes[2].y),
                     -180.0,
                     fullSector=False,
                 )
             elif key == 3 and "n" in _edges:
-                midpt = geoms.fraction_along_line(vertex, self.vertices[0], 0.5)
+                midpt = geoms.fraction_along_line(vertex, self.vertexes[0], 0.5)
                 # TEST ONLY cnv.draw_circle((midpt.x, midpt.y), 1)
                 cnv.draw_sector(
                     (midpt.x, midpt.y),
-                    (self.vertices[3].x, self.vertices[3].y),
+                    (self.vertexes[3].x, self.vertexes[3].y),
                     180.0,
                     fullSector=False,
                 )
             else:
-                vertex1 = self.vertices[key + 1]
+                vertex1 = self.vertexes[key + 1]
                 cnv.draw_line((vertex.x, vertex.y), (vertex1.x, vertex1.y))
 
         kwargs["closed"] = False
@@ -3761,19 +3761,19 @@ class StarShape(BaseShape):
             self.centroid = muPoint(x, y)
             kwargs["rotation"] = (rotation, self.centroid)
         # ---- calculate vertices
-        self.vertices_list = []
-        self.vertices_list.append(muPoint(x, y + radius))
+        self.vertexes_list = []
+        self.vertexes_list.append(muPoint(x, y + radius))
         angle = (2 * math.pi) * 2.0 / 5.0
         start_angle = math.pi / 2.0
-        log.debug("Start self.vertices:%s", self.vertices)
+        log.debug("Start # self.vertices:%s", self.vertices)
         for vertex in range(self.vertices - 1):
             next_angle = angle * (vertex + 1) + start_angle
             x_1 = x + radius * math.cos(next_angle)
             y_1 = y + radius * math.sin(next_angle)
-            self.vertices_list.append(muPoint(x_1, y_1))
+            self.vertexes_list.append(muPoint(x_1, y_1))
         # ---- draw star
-        # tools.feedback(f'***Star {x=} {y=} {self.vertices_list=}')
-        cnv.draw_polyline(self.vertices_list)
+        # tools.feedback(f'***Star {x=} {y=} {self.vertexes_list=}')
+        cnv.draw_polyline(self.vertexes_list)
         kwargs["closed"] = True
         self.set_canvas_props(cnv=cnv, index=ID, **kwargs)
         # ---- dot
@@ -4082,7 +4082,7 @@ class TrapezoidShape(BaseShape):
         else:
             return cx, cy, x, y
 
-    def get_vertices(self, **kwargs):
+    def get_vertexes(self, **kwargs):
         """Calculate vertices of trapezoid."""
         # set start
         _cx, _cy, _x, _y = self.calculate_xy()  # for direct call without draw()
@@ -4116,9 +4116,9 @@ class TrapezoidShape(BaseShape):
             self.centroid = muPoint(cx, cy)
             kwargs["rotation"] = (rotation, self.centroid)
         # ---- draw trapezoid
-        self.vertices = self.get_vertices(cx=cx, cy=cy, x=x, y=y)
-        # tools.feedback(f'***Trap {x=} {y=} {self.vertices=}')
-        cnv.draw_polyline(self.vertices)
+        self.vertexes = self.get_vertexes(cx=cx, cy=cy, x=x, y=y)
+        # tools.feedback(f'***Trap {x=} {y=} {self.vertexes=}')
+        cnv.draw_polyline(self.vertexes)
         kwargs["closed"] = True
         self.set_canvas_props(cnv=cnv, index=ID, **kwargs)
         sign = -1 if self.flip.lower() in ["s", "south"] else 1
