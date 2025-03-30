@@ -9,7 +9,7 @@ Notes:
 """
 from protograf import *
 
-Create(filename="underwater_cities.pdf", margin=0.0, paper=landscape(A2))
+Create(filename="underwater_cities.pdf", margin=0.0, paper="A2-l")
 
 # Icons
 money = rectangle(
