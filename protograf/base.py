@@ -969,7 +969,9 @@ class BaseShape:
         self.edges = kwargs.get("edges", base.edges)
         # ---- grid / card layout
         self.rows = self.kw_int(kwargs.get("rows", base.rows), "rows")
-        self.cols = self.kw_int(kwargs.get("cols", kwargs.get("columns", base.cols)), "cols")
+        self.cols = self.kw_int(
+            kwargs.get("cols", kwargs.get("columns", base.cols)), "cols"
+        )
         self.frame = kwargs.get("frame", base.frame)
         self.offset = self.kw_float(kwargs.get("offset", base.offset))
         self.offset_x = self.kw_float(kwargs.get("offset_x", self.offset))
@@ -977,9 +979,15 @@ class BaseShape:
         self.spacing = self.kw_float(kwargs.get("spacing", base.spacing))
         self.spacing_x = self.kw_float(kwargs.get("spacing_x", self.spacing))
         self.spacing_y = self.kw_float(kwargs.get("spacing_y", self.spacing))
-        self.grouping = self.kw_int(kwargs.get("grouping", 1), "grouping")  # no. of cards in a set
-        self.grouping_rows = self.kw_int(kwargs.get("grouping_rows", self.grouping), "grouping_rows")
-        self.grouping_cols = self.kw_int(kwargs.get("grouping_cols", self.grouping), "grouping_cols")
+        self.grouping = self.kw_int(
+            kwargs.get("grouping", 1), "grouping"
+        )  # no. of cards in a set
+        self.grouping_rows = self.kw_int(
+            kwargs.get("grouping_rows", self.grouping), "grouping_rows"
+        )
+        self.grouping_cols = self.kw_int(
+            kwargs.get("grouping_cols", self.grouping), "grouping_cols"
+        )
         self.lines = kwargs.get("lines", base.lines)
         # ---- circle / star / polygon
         self.diameter = self.kw_float(kwargs.get("diameter", base.diameter))
@@ -1265,6 +1273,17 @@ class BaseShape:
         return OffsetProperties(
             off_x, off_y, off_x + margin_left, off_y + margin_top  # margin_bottom
         )
+
+    def draw_polyline_props(self, cnv: muShape, vertexes: list, **kwargs) -> bool:
+        """Draw polyline IF either fill or stroke is set.
+
+        Args:
+            vertexes (list): Point tuples
+        """
+        if kwargs.get("stroke") or kwargs.get("fill"):
+            cnv.draw_polyline(vertexes)
+            return True
+        return False
 
     def set_canvas_props(
         self,

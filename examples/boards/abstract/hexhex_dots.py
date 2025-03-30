@@ -18,8 +18,7 @@ Hexagons(
     fill=None,
     height=2.2,
     dot=0.1,
-    dot_stroke="gray",
-    margin_bottom=4,
+    dot_stroke="gray"
 )
 
 Save(output='png')

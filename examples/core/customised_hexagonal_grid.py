@@ -25,6 +25,7 @@ Hexagons(
     side=0.5,
     x=0, y=0,
     rows=3, cols=3,
+    fill="white",
 )
 PageBreak()
 
@@ -35,6 +36,7 @@ Hexagons(
     side=0.5,
     x=0, y=0,
     rows=3, cols=3,
+    fill="white",
     orientation='pointy',
 )
 PageBreak()
@@ -46,6 +48,7 @@ Hexagons(
     side=0.6,
     x=0, y=0,
     rows=2, cols=2,
+    fill="white",
     coord_elevation="middle", coord_prefix='z', coord_suffix='!',
 )
 Hexagons(
@@ -65,6 +68,7 @@ Hexagons(
     side=0.6,
     x=0, y=0,
     rows=2, cols=2,
+    fill="white",
     orientation='pointy',
     coord_elevation="middle", coord_prefix='z', coord_suffix='!',
 )
@@ -113,6 +117,7 @@ Hexagons(
     x=0, y=0,
     rows=3, cols=3,
     hex_offset="odd",
+    fill="white",
     coord_elevation="middle", coord_font_size=5,
     coord_separator=' r', coord_prefix='c',
 )
@@ -143,6 +148,7 @@ Hexagons(
     side=0.5,
     x=0, y=0,
     rows=3, cols=3,
+    fill="white",
     hidden="2,1 2,3"
 )
 PageBreak()
@@ -154,6 +160,7 @@ Hexagons(
     side=0.5,
     x=0.5, y=0,
     rows=3, cols=3,
+    fill="white",
     hex_offset="odd",
     radii="w ne se",
 )
@@ -175,6 +182,7 @@ Hexagons(
     x=0, y=1,
     sides=3,
     height=.75,
+    fill="white",
     hex_layout="circle",
 )
 PageBreak()
@@ -185,7 +193,8 @@ Text(common=header, text="Hexagons: circular; nested")
 Hexagons(
     x=0, y=1,
     sides=3,
-    stroke=None, fill="white",
+    stroke=None,
+    fill="white",
     height=.75,
     hex_layout="circle",
     centre_shape=hexagon(stroke="black", fill="lightsteelblue", height=0.6, stroke_width=2),
@@ -198,6 +207,7 @@ Text(common=header, text="Hexagons: diamond")
 Hexagons(
     x=0, y=1,
     rows=3,
+    fill="white",
     height=0.75,
     hex_layout="diamond",
 )

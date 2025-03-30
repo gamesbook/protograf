@@ -1235,9 +1235,10 @@ def Hexagons(rows=1, cols=1, sides=None, **kwargs):
                 if hidden and (_row, ccol) in hidden:
                     pass
                 else:
-                    hxgn = Hexagon(
+                    hxgn = hexagon(
                         row=row, col=ccol - 1, hex_rows=rows, hex_cols=cols, **kwargs
                     )
+                    hxgn.draw()
                     _locale = Locale(
                         col=ccol - 1,
                         row=row,

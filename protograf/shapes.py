@@ -1426,7 +1426,7 @@ class HexShape(BaseShape):
         """Set and draw the coords of the hexagon."""
         the_row = self.row or 0
         the_col = self.col or 0
-        _row = self.hex_rows - the_row + self.coord_start_y
+        _row = the_row + 1 if not self.coord_start_y else the_row + self.coord_start_y
         _col = the_col + 1 if not self.coord_start_x else the_col + self.coord_start_x
         # ---- set coord label value
         if self.coord_style:
@@ -2036,9 +2036,9 @@ class HexShape(BaseShape):
             self.set_canvas_props(cnv=cnv, index=ID, **kwargs)
         # ---- draw normal hexagon
         else:
-            cnv.draw_polyline(self.vertexes)
-            kwargs["closed"] = True
-            self.set_canvas_props(cnv=cnv, index=ID, **kwargs)
+            if self.draw_polyline_props(cnv, self.vertexes, **kwargs):
+                kwargs["closed"] = True
+                self.set_canvas_props(cnv=cnv, index=ID, **kwargs)
 
         # ---- * borders (override)
         if self.borders:
@@ -3306,7 +3306,7 @@ class RectangleShape(BaseShape):
         # ----  numbering
         self.set_coord(cnv, x_d, y_d)
         # ---- set grid property
-        # self.grid = GridShape(label=self.coord_text, x=x_d, y=y_d, shape=self)
+        self.grid = GridShape(label=self.coord_text, x=x_d, y=y_d, shape=self)
 
 
 class RhombusShape(BaseShape):
@@ -3400,8 +3400,8 @@ class RightAngledTriangleShape(BaseShape):
             self._u.height = self._u.width
         # calculate points
         x, y = self._u.x, self._u.y
-        self.vertexes = []
-        self.vertexes.append(Point(x, y))
+        self._vertexes = []
+        self._vertexes.append(Point(x, y))
         if not self.hand or not self.flip:
             tools.feedback(
                 'Need to supply both "flip" and "hand" options! for triangle.',
@@ -3417,12 +3417,12 @@ class RightAngledTriangleShape(BaseShape):
             y2 = y + self._u.height
         elif flip == "south":
             y2 = y - self._u.height
-        self.vertexes.append(Point(x2, y2))
-        self.vertexes.append(Point(x2, y))
+        self._vertexes.append(Point(x2, y2))
+        self._vertexes.append(Point(x2, y))
         # ---- set vertices
-        x_sum, y_sum = 0, 0
         self.vertexes = []
-        for key, vertex in enumerate(self.vertexes):
+        x_sum, y_sum = 0, 0
+        for key, vertex in enumerate(self._vertexes):
             # shift to relative position
             x = vertex.x + self._o.delta_x
             y = vertex.y + self._o.delta_y

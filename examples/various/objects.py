@@ -54,7 +54,7 @@ Circle(x=1.75, y=6.25, fill="black", radius=1.25,
 Circle(x=2.5, y=7, stroke="black", fill="gold", radius=0.5, stroke_width=5)
 
 Text(common=header_font, x=5, y=3, text="Doorway: stadiums, dashline + radii")
-Stadium(x=1.5, y=1, height=3, width=3, fill=skyblue, stroke=darkgray, stroke_width=8, edges="n")
+Stadium(x=1.5, y=1, height=3, width=3, fill=skyblue, stroke="darkgray", stroke_width=8, edges="n")
 Stadium(x=1.503, y=1.003, height=3.003, width=3.003, fill=None, edges="n",
         stroke=fidred, stroke_width=5, dotted=True,)
 Circle(cx=3, cy=4, stroke="sienna", stroke_width=5, fill=skyblue, radius=1.3,
