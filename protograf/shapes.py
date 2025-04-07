@@ -2819,13 +2819,6 @@ class RectangleShape(BaseShape):
                     "Multi- diagonal hatching not permissible in a notched Rectangle",
                     True,
                 )
-        # ---- set canvas
-        self.set_canvas_props(
-            index=ID,
-            stroke=self.hatch_stroke,
-            stroke_width=self.hatch_stroke_width,
-            stroke_cap=self.hatch_cap,
-        )
         # ---- draw items
         if num >= 1:
             if "se" in _dirs or "nw" in _dirs or "d" in _dirs:  # UP to the right
@@ -2882,6 +2875,15 @@ class RectangleShape(BaseShape):
                 cnv.draw_line((left_pt[i].x, left_pt[i].y), (btm_pt[i].x, btm_pt[i].y))
             for i in range(1, diag_num):  # top-right side
                 cnv.draw_line((top_pt[i].x, top_pt[i].y), (rite_pt[i].x, rite_pt[i].y))
+        # ---- set canvas
+        self.set_canvas_props(
+            index=ID,
+            stroke=self.hatch_stroke,
+            stroke_width=self.hatch_stroke_width,
+            stroke_cap=self.hatch_cap,
+            dashed=self.hatch_dashed,
+            dotted=self.hatch_dots,
+        )
 
     def draw(self, cnv=None, off_x=0, off_y=0, ID=None, **kwargs):
         """Draw a rectangle on a given canvas."""
@@ -3219,10 +3221,39 @@ class RectangleShape(BaseShape):
                 for border in self.borders:
                     self.draw_border(cnv, border, ID)  # BaseShape
 
+        # ---- fill pattern?
+        if self.pattern:
+            img, is_svg, is_dir = self.load_image(self.pattern)
+            if img:
+                log.debug("IMG %s s%s %s", type(img._image), img._image.size)
+                iwidth = img._image.size[0]
+                iheight = img._image.size[1]
+                # repeat?
+                if self.repeat:
+                    cnv.drawImage(
+                        img, x=x, y=y, width=iwidth, height=iheight, mask="auto"
+                    )
+                else:
+                    # stretch
+                    # TODO - work out how to (a) fill and (b) cut off -- mask?
+                    # assume DPI = 300?  72pt = 1" = 300px -see
+                    # http://two.pairlist.net/pipermail/reportlab-users/2006-January/004670.html
+                    # w, h = yourImage.size
+                    # yourImage.crop((0, 30, w, h-30)).save(...)
+                    cnv.drawImage(
+                        img,
+                        x=x,
+                        y=y,
+                        width=self._u.width,
+                        height=self._u.height,
+                        mask="auto",
+                    )
+
         # ---- draw hatch
         if self.hatch_count:
             vertices = self.get_vertexes(rotation=rotation, **kwargs)
             self.draw_hatch(cnv, ID, vertices, self.hatch_count)
+
         # ---- grid marks
         if self.grid_marks:
             deltag = self.unit(self.grid_length)
@@ -3252,33 +3283,6 @@ class RectangleShape(BaseShape):
             self.set_canvas_props(
                 index=ID, stroke=self.grid_stroke, stroke_width=self.grid_stroke_width
             )
-        # ---- fill pattern?
-        if self.pattern:
-            img, is_svg, is_dir = self.load_image(self.pattern)
-            if img:
-                log.debug("IMG %s s%s %s", type(img._image), img._image.size)
-                iwidth = img._image.size[0]
-                iheight = img._image.size[1]
-                # repeat?
-                if self.repeat:
-                    cnv.drawImage(
-                        img, x=x, y=y, width=iwidth, height=iheight, mask="auto"
-                    )
-                else:
-                    # stretch
-                    # TODO - work out how to (a) fill and (b) cut off -- mask?
-                    # assume DPI = 300?  72pt = 1" = 300px -see
-                    # http://two.pairlist.net/pipermail/reportlab-users/2006-January/004670.html
-                    # w, h = yourImage.size
-                    # yourImage.crop((0, 30, w, h-30)).save(...)
-                    cnv.drawImage(
-                        img,
-                        x=x,
-                        y=y,
-                        width=self._u.width,
-                        height=self._u.height,
-                        mask="auto",
-                    )
         # ---- centred shape (with offset)
         if self.centre_shape:
             cshape_name = self.centre_shape.__class__.__name__

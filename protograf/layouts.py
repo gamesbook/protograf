@@ -92,6 +92,7 @@ class GridShape(BaseShape):
             index=ID,
             **kwargs,
         )
+        cnv.commit()  # if not, then Page objects e.g. Image not layered
 
 
 class DotGridShape(BaseShape):
@@ -138,6 +139,7 @@ class DotGridShape(BaseShape):
             for x_col in range(0, self.cols):
                 cnv.draw_circle((x + x_col * width, y + y_col * height), size)
         self.set_canvas_props(cnv=cnv, index=ID, **kwargs)
+        cnv.commit()  # if not, then Page objects e.g. Image not layered
 
 
 # ---- sequence
@@ -145,16 +147,19 @@ class DotGridShape(BaseShape):
 
 class SequenceShape(BaseShape):
     """
-    Set of shapes drawn at points
+    Set of Shapes drawn at points
 
     Notes:
         * `deck_data` is used, if provided by CardShape, to draw Shapes in the sequence.
     """
 
     def __init__(self, _object=None, canvas=None, **kwargs):
+        # tools.feedback(f'*** SequenceShape {_object=} {canvas=} {kwargs=}')
         super(SequenceShape, self).__init__(_object=_object, canvas=canvas, **kwargs)
         self.kwargs = kwargs
-        self._object = _object or TextShape(_object=None, canvas=canvas, **kwargs)
+        self._objects = kwargs.get(
+            "shapes", TextShape(_object=None, canvas=canvas, **kwargs)
+        )
         self.setting = kwargs.get("setting", (1, 1, 1, "number"))
         if isinstance(self.setting, list):
             self.setting_list = self.setting
@@ -255,7 +260,7 @@ class SequenceShape(BaseShape):
             # tools.feedback(f'*   @Seqnc@ {kwargs["locale"]}')
             off_x = _off_x + key * self.interval_x
             off_y = _off_y + key * self.interval_y
-            flat_elements = tools.flatten(self._object)
+            flat_elements = tools.flatten(self._objects)
             log.debug("flat_eles:%s", flat_elements)
             for each_flat_ele in flat_elements:
                 flat_ele = copy.copy(each_flat_ele)  # allow props to be reset
@@ -291,12 +296,13 @@ class RepeatShape(BaseShape):
     Shape is drawn multiple times.
 
     Notes:
-        *  * `deck_data` is used, if provided by CardShape, to draw Shape repeatedly.
+        *  `deck_data` is used, if provided by CardShape, to draw Shape(s) repeatedly.
     """
 
     def __init__(self, _object=None, canvas=None, **kwargs):
         super(RepeatShape, self).__init__(_object=_object, canvas=canvas, **kwargs)
         self.kwargs = kwargs
+        self._objects = kwargs.get("shapes", [])  # incoming Shape object(s)
         # UPDATE SELF WITH COMMON
         if self.common:
             attrs = vars(self.common)
@@ -307,7 +313,6 @@ class RepeatShape(BaseShape):
                     if common_attr != base_attr:
                         setattr(self, attr, common_attr)
 
-        self._object = _object  # incoming Shape object
         # repeat
         self.rows = kwargs.get("rows", 1)
         self.cols = kwargs.get("cols", kwargs.get("columns", 1))
@@ -350,7 +355,7 @@ class RepeatShape(BaseShape):
                 if ((col + 1) in self.across) and ((row + 1) in self.down):
                     off_x = _off_x + col * self.interval_x  # WAS self.offset_x
                     off_y = _off_y + row * self.interval_y  # WAS self.offset_y
-                    flat_elements = tools.flatten(self._object)
+                    flat_elements = tools.flatten(self._objects)
                     log.debug("flat_eles:%s", flat_elements)
                     for flat_ele in flat_elements:
                         log.debug("flat_ele:%s", flat_ele)

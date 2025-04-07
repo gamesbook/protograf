@@ -11,7 +11,7 @@ Create(filename='example4.pdf', margin_bottom=2.5)
 
 # create a deck design
 Deck(cards=25,
-     fill=skyblue,
+     fill="skyblue",
      stroke="white",
      height=5,
      width=3.8)

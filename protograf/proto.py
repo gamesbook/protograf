@@ -1169,16 +1169,17 @@ def connect(shape_from, shape_to, **kwargs):
 # ---- repeats ====
 
 
-def Repeat(_object, **kwargs):
-    """Draw multiple copies of a shape across rows and columns."""
+def Repeat(shapes=None, **kwargs):
+    """Draw multiple copies of a Shape across rows and columns."""
     kwargs = margins(**kwargs)
-    repeat = RepeatShape(_object=_object, **kwargs)
+    kwargs["shapes"] = shapes
+    repeat = RepeatShape(**kwargs)
     repeat.draw()
 
 
-def repeat(_object, **kwargs):
+def repeat(shapes=None, **kwargs):
     kwargs = margins(**kwargs)
-    return RepeatShape(_object=_object, **kwargs)
+    return RepeatShape(shapes=shapes, **kwargs)
 
 
 def Lines(rows=1, cols=1, **kwargs):
@@ -1191,16 +1192,17 @@ def Lines(rows=1, cols=1, **kwargs):
 # ---- sequence ====
 
 
-def Sequence(_object=None, **kwargs):
-    """Draw a set of objects in a line."""
+def Sequence(shapes=None, **kwargs):
+    """Draw a list of Shapes in a line."""
     kwargs = margins(**kwargs)
-    sequence = SequenceShape(_object=_object, **kwargs)
+    kwargs["shapes"] = shapes
+    sequence = SequenceShape(**kwargs)
     sequence.draw()
 
 
-def sequence(_object=None, **kwargs):
-    """Draw a set of objects in a line."""
-    return SequenceShape(_object=_object, **kwargs)
+def sequence(shapes=None, **kwargs):
+    """Draw a list of Shapes in a line."""
+    return SequenceShape(shapes=shapes, **kwargs)
 
 
 # ---- patterns (grid) ====

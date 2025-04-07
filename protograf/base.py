@@ -307,9 +307,14 @@ def get_opacity(transparency: float = 0) -> float:
 class BaseCanvas:
     """Wrapper/extension for a PyMuPDF Page."""
 
-    def __init__(self, document, paper=None, defaults=None, **kwargs):
+    def __init__(
+        self,
+        document: pymupdf.Document,
+        paper: str = None,  # e.g. "A4", "Letter"
+        defaults: dict = None,
+        **kwargs,
+    ):
         """Create self.doc_page as Page-equivalent."""
-
         self.jsonfile = kwargs.get("defaults", None)
         self.document = document
         self.doc_page = None
@@ -346,7 +351,7 @@ class BaseCanvas:
         self.sequence = self.defaults.get("sequence", [])
         self.dataset = []
         self.members = []  # card IDs, of which current card is a member
-        self._object = None
+        self._objects = None
         self.kwargs = kwargs
         self.run_debug = False
         self.units = self.defaults.get(
@@ -733,25 +738,27 @@ class BaseCanvas:
 
 
 class BaseShape:
-    """Base class for objects that are drawn on a given canvas."""
+    """Base class for objects that are drawn on a given canvas aka pymupdf.Shape."""
 
-    def __init__(self, _object=None, canvas=None, **kwargs):
+    def __init__(
+        self, _object: pymupdf.Shape = None, canvas: BaseCanvas = None, **kwargs
+    ):
         self.kwargs = kwargs
-        # tools.feedback(f'*** BaseShape {kwargs=}')
+        # tools.feedback(f'*** BaseShape {_object=} {canvas=} {kwargs=}')
         # ---- constants
         self.default_length = 1
         self.show_id = False  # True
         # ---- KEY
         self.doc_page = globals.doc_page
-        self.canvas = canvas or globals.canvas  # pymupdf Shape object
-        base = _object or globals.base
+        self.canvas = canvas or globals.canvas  # pymupdf Shape
+        base = _object or globals.base  # protograf BaseCanvas
         # print(f" *** {self.canvas=} {cnv=} {base=}")
         # print(f" *** {type(self.canvas)=} {type(cnv)=} {type(base=)}")
-        self._object = base
         self.shape_id = None
         self.sequence = kwargs.get("sequence", [])  # e.g. card numbers
         self.dataset = []  # list of dict data (loaded from file)
         self.members = []  # card IDs, of which current card is a member
+        self._objects = None  # used by e.g. SequenceShape
         # ---- general
         self.common = kwargs.get("common", None)
         self.shape = kwargs.get("shape", base.shape)
@@ -1907,6 +1914,33 @@ class BaseShape:
                     f.write(image.content)
             return image_local
 
+        def image_resize(bbox: pymupdf.Rect, rotation: float) -> pymupdf.Rect:
+            """Recompute bounding Rect for a rotated image to maintain image size.
+
+            Args
+                bbox: the original bounding box for the image
+                rotation: angle, in degrees, of image rotation
+            Returns
+                adjusted Rect (new bounding box)
+            """
+            # Compute Rect center point
+            center = (bbox.tl + bbox.br) / 2
+            # Define the desired rotation matrix
+            matrx = pymupdf.Matrix(rotation)
+            # Compute the tetragon (Quad) for the Rect rotated around its center `
+            quad = bbox.morph(center, matrx)
+            # Compute the rectangle hull of the quad for new boundary box
+            new_bbox = quad.rect
+            # Resize if non-square Rect
+            factor = max(new_bbox.width / bbox.width, new_bbox.height / bbox.height)
+            if factor != 1:
+                scale = pymupdf.Matrix(1 / factor, 1 / factor)
+                squad = new_bbox.morph(center, scale)
+                scaled_bbox = squad.rect
+                return scaled_bbox
+            else:
+                return new_bbox
+
         def image_render(image_location) -> object:
             """Load, first from local cache then network, and draw."""
             image_local = image_location
@@ -1961,17 +1995,12 @@ class BaseShape:
         scaffold = (origin[0], origin[1], origin[0] + width, origin[1] + height)
         if rotation is not None:
             # need a larger rect!
-            theta = math.radians(self.rotation)
-            new_width = width * math.cos(theta) + height * math.sin(theta)
-            new_height = width * math.sin(theta) + height * math.cos(theta)
-            dx = new_width - width
-            dy = new_height - height
-            new_origin = (origin[0] - dx * 0.5, origin[1] - dy * 0.5)
+            new_origin = image_resize(pymupdf.Rect(scaffold), rotation)
             scaffold = (
                 new_origin[0],
                 new_origin[1],
-                new_origin[0] + new_width,
-                new_origin[1] + new_height,
+                new_origin[2],
+                new_origin[3],
             )
 
         # ---- render image
