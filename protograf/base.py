@@ -2463,6 +2463,39 @@ class BaseShape:
 
         Values can be accessed via a Jinja template using e.g. T("{{ SUIT }}")
         """
+        def processed_value(value):
+
+            if isinstance(value, Template):
+                if not self.deck_data:
+                    tools.feedback(
+                        "Cannot use T() or S() command without Data already defined!",
+                        False,
+                    )
+                    tools.feedback(
+                        "Check that Data command is used before Deck command.",
+                        True,
+                    )
+                record = self.deck_data[ID]
+                try:
+                    custom_value = value.render(record)
+                    return custom_value
+                    # print('  +++', f'{ID=} {key=} {custom_value=}', '=>', getattr(new_element, key))
+                except jinja2.exceptions.UndefinedError as err:
+                    tools.feedback(
+                        f"Unable to process data with this template ({err})", True
+                    )
+                except Exception as err:
+                    tools.feedback(
+                        f"Unable to process data with this template ({err})", True
+                    )
+            elif isinstance(value, LookupType):
+                record = self.deck_data[ID]
+                lookup_value = record[value.column]
+                custom_value = value.lookups.get(lookup_value, None)
+                return custom_value
+                # print('+++', f'{ID=} {key=} {custom_value=}', '=>', getattr(new_element, key))
+            return None
+
         # if not self.deck_data:
         #     return the_element
         new_element = None
@@ -2471,35 +2504,20 @@ class BaseShape:
             keys = vars(the_element).keys()
             for key in keys:
                 value = getattr(the_element, key)
-                if isinstance(value, Template):
-                    if not self.deck_data:
-                        tools.feedback(
-                            "Cannot use T() or S() command without Data already defined!",
-                            False,
-                        )
-                        tools.feedback(
-                            "Check that Data command is used before Deck command.",
-                            True,
-                        )
-                    record = self.deck_data[ID]
-                    try:
-                        custom_value = value.render(record)
+                if isinstance(value, dict):
+                    updated = False
+                    for key, val in value.items():
+                        custom_value = processed_value(val)
+                        if custom_value:
+                            value[key] = custom_value
+                            updated = True
+                    if updated:
+                        setattr(new_element, key, value)
+                else:
+                    custom_value = processed_value(value)
+                    if custom_value:
                         setattr(new_element, key, custom_value)
-                        # print('  +++', f'{ID=} {key=} {custom_value=}', '=>', getattr(new_element, key))
-                    except jinja2.exceptions.UndefinedError as err:
-                        tools.feedback(
-                            f"Unable to process data with this template ({err})", True
-                        )
-                    except Exception as err:
-                        tools.feedback(
-                            f"Unable to process data with this template ({err})", True
-                        )
-                elif isinstance(value, LookupType):
-                    record = self.deck_data[ID]
-                    lookup_value = record[value.column]
-                    custom_value = value.lookups.get(lookup_value, None)
-                    setattr(new_element, key, custom_value)
-                    # print('+++', f'{ID=} {key=} {custom_value=}', '=>', getattr(new_element, key))
+
         if new_element:
             return new_element
         return the_element  # no changes needed or made

@@ -32,7 +32,7 @@ lbrown = "#F1D7B5"
 # basic elements
 tile_red = rectangle(x=0.0, y=0.0, width=2.9, height=2.9, stroke="red", fill="red")
 tile_blue = rectangle(x=0.0, y=0.0, width=2.9, height=2.9, stroke="blue", fill="blue")
-base = rectangle(x=0.2, y=0.2, width=2.5, height=2.5, stroke=brown, fill=lbrown)
+base = rectangle(x=0.2, y=0.2, width=2.5, height=2.5, stroke="brown", fill=lbrown)
 
 # per-tile values and elements
 title = text(

@@ -69,7 +69,7 @@ Counter("10-12", HQ_russian)
 Counter("13-15", inf_russian)
 Counter("16-18", art_russian)
 Counter("19-20", HQ_german)
-Counter("21-22", german, german_marker)  # FIXME!
-Counter("23-24", russian_marker)
+Counter("21-22", german, german_marker)
+Counter("23-24", russian, russian_marker)
 
 Save()

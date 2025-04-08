@@ -19,39 +19,48 @@ Data(filename="counters.csv")
 # no. of counters is based on rows in CSV file (and COPIES column)
 CounterSheet(width=2.6, height=2.6, fill="white", grid_marks=True, copy='COPIES')
 
-# colors and text labels
+# markers
+# Source: http://cliparts.co/clipart/3214807
+marker_german = image('images/ironcross_small.png', x=0.4, y=0.4, width=1.8, height=1.8)
+# Source: http://www.free-vectors.com/vector-russian-eagle/
+marker_russian = image('images/russianeagle_small.png', x=0.4, y=0.4, width=1.8, height=1.8)
+
+# colors
 gray = "#B8BAB1"
 brown = "#B6A378"
-value = text(font_name="Helvetica", font_size=18, x=1.3, y=0.5, text=T('{{ VALUE }}'))
-size = text(font_name="Helvetica", font_size=12, x=1.3, y=1.9, text=T('{{ SIZE }}'))
-ident = text(font_name="Helvetica", font_size=12, x=0.55, y=1.18, align='left', rotation=90,
-             text=T('{{ ID }}'))
 
 # national colors
-troop = Common(x=0, y=0, width=2.6, height=2.6, stroke_width=1)
-german = rectangle(common=troop, fill="gray")
-russian = rectangle(common=troop, fill=brown)
+german = rectangle(x=0, y=0, width=2.6, height=2.6, stroke_width=0.5, fill=gray)
+russian = rectangle(x=0, y=0, width=2.6, height=2.6, stroke_width=0.5, fill=brown)
 
-# unit symbol - basic elements
-out = rectangle(x=0.8, y=1.2, width=1.0, height=0.6, stroke_width=0.5, fill=None)
-lu = line(x=0.8, y=1.2, x1=1.8, y1=1.8, stroke="black", stroke_width=0.5)
-ld = line(x=0.8, y=1.8, x1=1.8, y1=1.2, stroke="black", stroke_width=0.5)
-rect1 = rectangle(x=0.8, y=1.2, width=1.0, height=0.3, stroke_width=0.5, fill="black")
-circ1 = circle(cx=1.3, cy=1.5, radius=0.1, stroke_width=0.1, fill="black")
+# basic shapes
+out = rectangle(x=0.8, y=1, width=1.2, height=0.8, stroke="black", stroke_width=1.5, fill=None)
+lu = line(x=0.8, y=1, x1=2, y1=1.8, stroke="black", stroke_width=1.5)
+ld = line(x=0.8, y=1.8, x1=2, y1=1, stroke="black", stroke_width=1.5)
+rect1 = rectangle(x=0.8, y=1.4, width=1.2, height=0.4, stroke="black", stroke_width=1.5, fill="black")
+circ1 = circle(cx=1.4, cy=1.4, radius=0.15, stroke="black", stroke_width=1, fill="black")
+
+# text labels
+ratings = Common(font_name="Helvetica", font_size=18, x=1.4, y=2.4)
+value = text(ratings, text=T('{{VALUE}}'))
+
+classify = Common(font_name="Helvetica", font_size=12, x=1.4, y=0.8)
+size = text(common=classify, text=T('{{SIZE}}'))
+
+ident = text(font_name="Helvetica", font_size=12, x=0.35, y=1.18, align='left',
+             rotation=90,   text=T('{{ID}}'))
+# basic shapes
+out = rectangle(x=0.8, y=1, width=1.2, height=0.8, stroke="black", stroke_width=1.5, fill=None)
+lu = line(x=0.8, y=1, x1=2, y1=1.8, stroke="black", stroke_width=1.5)
+ld = line(x=0.8, y=1.8, x1=2, y1=1, stroke="black", stroke_width=1.5)
+rect1 = rectangle(x=0.8, y=1.4, width=1.2, height=0.4, stroke="black", stroke_width=1.5, fill="black")
+circ1 = circle(cx=1.4, cy=1.4, radius=0.15, stroke="black", stroke_width=1, fill="black")
 
 # unit symbols - types
 inf = group(out, lu, ld)
 cav = group(out, lu)
 HQ = group(out, rect1)
 art = group(out, circ1)
-
-# markers
-marker_german = group(
-    german,
-    image('images/ironcross_small.png', x=0.4, y=0.4, width=1.8, height=1.8))
-marker_russian = group(
-    russian,
-    image('images/russianeagle_small.png', x=0.4, y=0.4, width=1.8, height=1.8))
 
 # construct counters
 Counter("all", S("{{ NATION == 'ger' }}", german))
