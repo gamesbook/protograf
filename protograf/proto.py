@@ -78,6 +78,7 @@ from protograf.utils.tools import base_fonts, DatasetType, CardFrame  # enums
 from protograf.utils.geoms import BBox, Locale, Point, Place, Ray, equilateral_height
 from protograf.utils.support import LookupType, steps, unit
 from protograf import globals
+
 log = logging.getLogger(__name__)
 globals_set = False
 
@@ -1930,6 +1931,7 @@ def Track(track=None, **kwargs):
         if shape_id > len(shapes) - 1:
             shape_id = 0  # reset and start again
 
+
 # ---- Deck / Card related ====
 
 
@@ -2404,7 +2406,6 @@ class DeckShape(BaseShape):
     def count(self):
         """Return number of cards in the deck"""
         return len(self.deck)
-
 
 
 # ---- bgg API ====

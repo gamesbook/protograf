@@ -1331,7 +1331,7 @@ class BaseShape:
         #   stroke_opacity=1, fill_opacity=1, oc=0
 
         # ---- set props
-        #print(f'$$$ Props: {kwargs.keys()} \n {kwargs.get("fill", "?")=}')
+        # print(f'$$$ Props: {kwargs.keys()} \n {kwargs.get("fill", "?")=}')
         cnv = cnv if cnv else globals.canvas
         if "fill" in kwargs.keys():
             fill = kwargs.get("fill", None)  # reserve None for 'no fill at all'

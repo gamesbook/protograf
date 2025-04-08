@@ -3271,8 +3271,8 @@ class RectangleShape(BaseShape):
             cnv.draw_line((gx + self._u.width, gy), (gx + self._u.width, gy + deltag))
             # done
             gargs = {}
-            gargs['stroke'] = self.grid_stroke
-            gargs['stroke_width'] = self.grid_stroke_width
+            gargs["stroke"] = self.grid_stroke
+            gargs["stroke_width"] = self.grid_stroke_width
             self.set_canvas_props(cnv=None, index=ID, **gargs)
 
         # ---- centred shape (with offset)
