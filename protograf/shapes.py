@@ -3257,32 +3257,24 @@ class RectangleShape(BaseShape):
         # ---- grid marks
         if self.grid_marks:
             deltag = self.unit(self.grid_length)
-            pth = cnv.beginPath()
             gx, gy = 0, y  # left-side
-            pth.moveTo(gx, gy)
-            pth.lineTo(deltag, gy)
-            pth.moveTo(0, gy + self._u.height)
-            pth.lineTo(deltag, gy + self._u.height)
+            cnv.draw_line((gx, gy), (deltag, gy))
+            cnv.draw_line((0, gy + self._u.height), (deltag, gy + self._u.height))
             gx, gy = x, self.paper[1]  # top-side
-            pth.moveTo(gx, gy)
-            pth.lineTo(gx, gy - deltag)
-            pth.moveTo(gx + self._u.width, gy)
-            pth.lineTo(gx + self._u.width, gy - deltag)
+            cnv.draw_line((gx, gy), (gx, gy - deltag))
+            cnv.draw_line((gx + self._u.width, gy), (gx + self._u.width, gy - deltag))
             gx, gy = self.paper[0], y  # right-side
-            pth.moveTo(gx, gy)
-            pth.lineTo(gx - deltag, gy)
-            pth.moveTo(gx, gy + self._u.height)
-            pth.lineTo(gx - deltag, gy + self._u.height)
+            cnv.draw_line((gx, gy), (gx - deltag, gy))
+            cnv.draw_line((gx, gy + self._u.height), (gx - deltag, gy + self._u.height))
             gx, gy = x, 0  # bottom-side
-            pth.moveTo(gx, gy)
-            pth.lineTo(gx, gy + deltag)
-            pth.moveTo(gx + self._u.width, gy)
-            pth.lineTo(gx + self._u.width, gy + deltag)
+            cnv.draw_line((gx, gy), (gx, gy + deltag))
+            cnv.draw_line((gx + self._u.width, gy), (gx + self._u.width, gy + deltag))
             # done
-            cnv.drawPath(pth, stroke=1, fill=1)
-            self.set_canvas_props(
-                index=ID, stroke=self.grid_stroke, stroke_width=self.grid_stroke_width
-            )
+            gargs = {}
+            gargs['stroke'] = self.grid_stroke
+            gargs['stroke_width'] = self.grid_stroke_width
+            self.set_canvas_props(cnv=None, index=ID, **gargs)
+
         # ---- centred shape (with offset)
         if self.centre_shape:
             cshape_name = self.centre_shape.__class__.__name__

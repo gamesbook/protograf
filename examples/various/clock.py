@@ -8,13 +8,13 @@ Created on: 19 August 2024
 from protograf import *
 
 Create(filename="clock.pdf",
-        paper="A7",
-        margin_top=0.5,
-        margin_left=0.15,
-        margin_bottom=0.15,
-        margin_right=0.5)
+       paper="A7",
+       margin_left=0.5,
+       margin_right=0.3,
+       margin_bottom=0.2,
+       margin_top=0.5)
 
-header = Common(x=0, y=9, font_size=14, align="left")
+header = Common(x=0, y=0, font_size=14, align="left")
 
 Blueprint(stroke_width=0.5)
 Text(common=header, text="Basic Clock")
@@ -31,10 +31,10 @@ Circle(cx=3, cy=4.5, radius=2.3, radii=steps(0,360,30), stroke="white", fill=Non
 # centre
 Circle(cx=3, cy=4.5, radius=.13, fill="black")
 # hour hand
-Circle(cx=3, cy=4.5, radius=1.8, radii=[35], stroke="white", fill=None,
+Circle(cx=3, cy=4.5, radius=1.8, radii=[330], stroke="white", fill=None,
        radii_length=2, radii_offset=-.5,  radii_stroke_width=4, radii_stroke="black")
 # minute hand
-Circle(cx=3, cy=4.5, radius=1.8, radii=[150], stroke="white", fill=None,
+Circle(cx=3, cy=4.5, radius=1.8, radii=[210], stroke="white", fill=None,
        radii_length=2.3, radii_offset=-.5, radii_stroke_width=3, radii_stroke="black")
 
 Save()

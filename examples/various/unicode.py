@@ -9,7 +9,7 @@ from protograf import *
 
 Create(filename="unicode.pdf", margin=1, margin_top=0.25)
 
-header = Common(x=0, y=27, font_size=24, align="left")
+header = Common(x=0, y=5, font_size=24, align="left")
 header_font = Common(font_size=18, align="left")
 
 Text(common=header, text=r"Unicode Text: Prefix the number with \\u")
