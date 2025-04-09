@@ -6,36 +6,40 @@ Created on: 22 December 2024
 """
 from protograf import *
 
-Create(filename='cards_circular.pdf', paper=landscape(A4))
+Create(filename='cards_circular.pdf', paper="A4-l")
 
 # deck data
 Data(filename="lotr.csv")
 
 # design deck
-Deck(cards=1, frame='circle', radius=3.15, copy='Copies')
+Deck(
+     cards=1,
+     frame='circle',
+     radius=3.15,
+     copy='Copies',
+     grid_marks=True)
 
 # background color per Race
-back_race = Common(x=0.35, y=0.35,radius=2.8)
-back_hum = circle(common=back_race, fill_stroke="tomato")
-back_elf = circle(common=back_race, fill_stroke="gold")
-back_dwa = circle(common=back_race, fill_stroke="cyan")
-back_hob = circle(common=back_race, fill_stroke="chartreuse")
-back_naz = circle(common=back_race, fill_stroke="gray")
-Card("all", S("{{ Race == 'Human' }}", back_hum))
-Card("all", S("{{ Race == 'Elf' }}", back_elf))
-Card("all", S("{{ Race == 'Dwarf' }}", back_dwa))
-Card("all", S("{{ Race == 'Hobbit' }}", back_hob))
-Card("all", S("{{ Race == 'Nazgul' }}", back_naz))
+race = Common(x=0.35, y=0.35,radius=2.8)
+Card("all", S("{{ Race == 'Human' }}", circle(common=race, fill_stroke="tomato")))
+Card("all", S("{{ Race == 'Elf' }}", circle(common=race, fill_stroke="gold")))
+Card("all", S("{{ Race == 'Dwarf' }}", circle(common=race, fill_stroke="cyan")))
+Card("all", S("{{ Race == 'Hobbit' }}", circle(common=race, fill_stroke="chartreuse")))
+Card("all", S("{{ Race == 'Nazgul' }}", circle(common=race, fill_stroke="gray")))
 
 # # character Name
-name_box = rectangle(x=1.5, y=4.2, width=3.4, height=1, rounded=0.2)
-Card("*", name_box)
-Card("all", text(text=T("{{ Name }}"), x=3.2, y=4.5, font_size=18))
+Card("*", rectangle(x=1.5, y=4.2, width=3.4, height=1, rounding=0.4))
+Card("all", text(text=T("{{ Name }}"), x=3.2, y=4.9, font_size=18))
 
 # # character Age
-power = text(text=T("<i>Long-lived</i> <b>({{ Age or '\u221E' }})</b>"),  # infinity
-             x=1.4, y=1.4, width=3.5, font_size=12,
-             align="centre", wrap=True, fill=None)
+power = text(
+    text=T("""
+       <p style="text-align:center; font-family:Helvetica; color:red; font-size:30px">
+       <i>Long-lived</i> <b>({{ Age or '\u221E' }})</b>
+       </p>"""),
+    x=1.4, y=0.7, width=3.5, font_size=12,
+    html=True, fill=None)
+Card("all", S("{{ Race == 'Dwarf' }}", power))
 Card("all", S("{{ Race == 'Elf' }}", power))
 Card("all", S("{{ Race == 'Maia' }}", power))
 Card("all", S("{{ Race == 'Nazgul' }}", power))

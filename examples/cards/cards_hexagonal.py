@@ -6,7 +6,7 @@ Created on: 21 December 2024
 """
 from protograf import *
 
-Create(filename='cards_hexagonal.pdf', paper=landscape(A4))
+Create(filename='cards_hexagonal.pdf', paper="A4-l")
 
 # deck data
 Data(filename="lotr.csv")
@@ -30,7 +30,7 @@ Card("all", S("{{ Race == 'Nazgul' }}", back_naz))
 # # character Name
 name_box = rectangle(x=2, y=4.5, width=3.2, height=1.25, rounded=0.2)
 Card("*", name_box)
-Card("all", text(text=T("{{ Name }}"), x=3.6, y=4.8, font_size=18))
+Card("all", text(text=T("{{ Name }}"), x=3.6, y=5.2, font_size=18))
 
 # # character Age
 power = text(text=T("<i>Long-lived</i> <b>({{ Age or '\u221E' }})</b>"),  # infinity

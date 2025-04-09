@@ -17,8 +17,8 @@ combos = Matrix(
         # "tomato", "chartreuse", aqua, gold, hotpink
         ['#FF6347', '#00FF00','#00FFFF', '#FFD700', '#FF69B4'],
         ['5', '3', '1'],
-        # tapedrive, heart, snowflake
-        ['\u2707', '\u2766', '\u2745']
+        # plane, star, snowflake
+        ['\x28', 'H', '\x64']
     ])
 Data(matrix=combos)  # (re)set no. of cards based on length
 
@@ -38,41 +38,47 @@ outline = rectangle(
     )
 
 icon_top = hexagon(
-    x=1, y=6.4,
+    x=1, y=0.9,
     side=0.8,
     stroke="white")
 value_top = text(
-    x=1.8, y=6.8,
+    x=1.8, y=1.9,
     font_size=28,
     text=T('{{VALUE}}'),
     align="centre",
     stroke="darkslategray")
+deco_top = hexagon(
+    x=1.1, y=1,
+    side=0.7,
+    fill=None,
+    stroke=T('{{SUIT}}'))
+
 icon_btm = hexagon(
-    x=3.8, y=0.9,
+    x=3.8, y=6.6,
     side=0.8,
     stroke="white")
 value_btm = text(
-    x=4.6, y=1.9,
+    x=4.6, y=7.6,
     font_size=28,
     align="centre",
     text=T('{{VALUE}}'),
     stroke="darkslategray",
     rotation=180)
+deco_btm = hexagon(
+    x=3.9, y=6.7,
+    side=0.7,
+    fill=None,
+    stroke=T('{{SUIT}}'))
+
 picture = text(
-    x=3.0, y=3.3,
+    x=3.1, y=5.5,
     stroke="white",
     font_size=76,
-    text=T('{{IMAGE}}'))
-deco_top = hexagon(
-    x=1.1, y=6.5,
-    side=0.7,
-    fill=None,
-    stroke=T('{{SUIT}}'))
-deco_btm = hexagon(
-    x=3.9, y=1.0,
-    side=0.7,
-    fill=None,
-    stroke=T('{{SUIT}}'))
+    align="centre",
+    font_name='zapfdingbats',
+    text=T('{{IMAGE}}'),
+    )
+
 
 # card setup
 Card(

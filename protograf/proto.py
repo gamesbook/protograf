@@ -184,7 +184,7 @@ class CardShape(BaseShape):
                 _vertices = outline.get_vertexes()  # clockwise from bottom-left
                 base_frame_bbox = BBox(bl=_vertices[0], tr=_vertices[2])
             case CardFrame.CIRCLE:
-                base_frame_bbox = None
+                base_frame_bbox = outline.bbox
             case CardFrame.HEXAGON:
                 _vertices = outline.get_vertexes()  # anti-clockwise from mid-right
                 base_frame_bbox = BBox(
@@ -272,9 +272,19 @@ class CardShape(BaseShape):
             members = self.members or flat_ele.members
             # ---- clear kwargs for drawing
             # (otherwise BaseShape self attributes already set are overwritten)
-            dargs = {key:kwargs.get(key) for key in [
-                'dataset', 'frame_type', 'locale', '_is_countersheet',
-                'page_number', 'grouping_cols', 'grouping_rows', 'deck_data']}
+            dargs = {
+                key: kwargs.get(key)
+                for key in [
+                    "dataset",
+                    "frame_type",
+                    "locale",
+                    "_is_countersheet",
+                    "page_number",
+                    "grouping_cols",
+                    "grouping_rows",
+                    "deck_data",
+                ]
+            }
             kwargs = dargs
             try:
                 # ---- * normal element
@@ -2414,7 +2424,6 @@ def Track(track=None, **kwargs):
         shape_id += 1
         if shape_id > len(shapes) - 1:
             shape_id = 0  # reset and start again
-
 
 
 # ---- bgg API ====

@@ -14,7 +14,7 @@ Deck(
     height=8.8,
     width=6.3,
     rounding=0.3,
-    fill=ivory)
+    fill="ivory")
 
 # basic shapes
 l1 = line(x=0.8, x1=5.6, y=7.1, y1=8.4, stroke="gold", stroke_width=2)

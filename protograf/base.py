@@ -2268,7 +2268,7 @@ class BaseShape:
             y_off = y_offset or self.title_size / 2.0
             y = yh + self.unit(self.heading_my)
             x = xh + self.unit(self.heading_mx)
-            kwargs["font_name"] = self.font_name
+            kwargs["font_name"] = self.heading_face or self.font_name
             kwargs["stroke"] = self.heading_stroke
             kwargs["font_size"] = self.heading_size
             self.draw_multi_string(
@@ -2291,7 +2291,7 @@ class BaseShape:
             yl = yl + (self.label_size / 3.0) if centred else yl
             y = yl + self.unit(self.label_my)
             x = xl + self.unit(self.label_mx)
-            kwargs["font_name"] = self.font_name
+            kwargs["font_name"] = self.label_face or self.font_name
             kwargs["stroke"] = self.label_stroke
             kwargs["font_size"] = self.label_size
             self.draw_multi_string(
@@ -2314,7 +2314,7 @@ class BaseShape:
             y_off = y_offset or self.title_size
             y = yt + self.unit(self.title_my)
             x = xt + self.unit(self.title_mx)
-            kwargs["font_name"] = self.font_name
+            kwargs["font_name"] = self.title_face or self.font_name
             kwargs["stroke"] = self.title_stroke
             kwargs["font_size"] = self.title_size
             self.draw_multi_string(
@@ -2463,6 +2463,7 @@ class BaseShape:
 
         Values can be accessed via a Jinja template using e.g. T("{{ SUIT }}")
         """
+
         def processed_value(value):
 
             if isinstance(value, (BaseShape, pymupdf.utils.Shape, pymupdf.Page)):
@@ -2498,7 +2499,7 @@ class BaseShape:
                 return custom_value
                 # print('+++ LookupType', f'{ID=} {key=} {custom_value=}', '=>', getattr(new_element, key))
             else:
-                raise NotImplementedError(f'Cannot handle value of type: {type(value)}')
+                raise NotImplementedError(f"Cannot handle value of type: {type(value)}")
 
             return None
 
@@ -2509,12 +2510,16 @@ class BaseShape:
             keys = vars(the_element).keys()
             for key in keys:
                 value = getattr(the_element, key)
-                if value is None or isinstance(value, (str, int, float, list, tuple, range)):
+                if value is None or isinstance(
+                    value, (str, int, float, list, tuple, range)
+                ):
                     continue
                 elif isinstance(value, dict):
                     updated = False
                     for dkey, val in value.items():
-                        if val is None or isinstance(val, (str, int, float, list, tuple, range)):
+                        if val is None or isinstance(
+                            val, (str, int, float, list, tuple, range)
+                        ):
                             continue
                         custom_value = processed_value(val)
                         if custom_value:

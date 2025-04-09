@@ -18,7 +18,13 @@ from pymupdf import Shape as muShape, Point as muPoint
 import segno  # QRCode
 
 # local
-from protograf.utils.geoms import Point, Link, Locale, PolyGeometry  # named tuples
+from protograf.utils.geoms import (
+    BBox,
+    Point,
+    Link,
+    Locale,
+    PolyGeometry,
+)  # named tuples
 from protograf.utils import geoms, tools, support
 from protograf.base import (
     BaseShape,
@@ -368,6 +374,7 @@ class CircleShape(BaseShape):
             self.cy = self.y + self.radius
         self.width = 2.0 * self.radius
         self.height = 2.0 * self.radius
+        self.bbox = None
         # ---- RESET UNIT PROPS (last!)
         self.set_unit_properties()
 
@@ -774,6 +781,10 @@ class CircleShape(BaseShape):
                     + self._u.offset_y
                 )
             self.x_c, self.y_c = x, y
+            self.bbox = BBox(
+                bl=Point(self.x_c - self._u.radius, self.y_c + self._u.radius),
+                tr=Point(self.x_c + self._u.radius, self.y_c - self._u.radius),
+            )
         # ---- handle rotation: START
         is_rotated = False
         rotation = kwargs.get("rotation", self.rotation)
@@ -791,7 +802,6 @@ class CircleShape(BaseShape):
         if self.grid_marks:
             # print(f'{self._u.radius=} {self._u.diameter=}')
             deltag = self.unit(self.grid_length)
-            pth = cnv.beginPath()
             gx, gy = 0, y - self._u.radius  # left-side
             cnv.draw_line((gx, gy), (deltag, gy))
             cnv.draw_line(
