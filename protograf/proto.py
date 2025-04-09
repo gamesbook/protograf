@@ -271,15 +271,13 @@ class CardShape(BaseShape):
 
             members = self.members or flat_ele.members
             # ---- clear kwargs for drawing
-            # (otherwise attributes already set are overwritten)
+            # (otherwise BaseShape self attributes already set are overwritten)
             dargs = {key:kwargs.get(key) for key in [
                 'dataset', 'frame_type', 'locale', '_is_countersheet',
                 'page_number', 'grouping_cols', 'grouping_rows', 'deck_data']}
             kwargs = dargs
             try:
                 # ---- * normal element
-                print(flat_ele)
-                breakpoint()
                 iid = members.index(cid + 1)
                 new_ele = self.handle_custom_values(flat_ele, cid)  # calculated values
                 if isinstance(new_ele, (SequenceShape, RepeatShape)):

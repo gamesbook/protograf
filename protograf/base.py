@@ -2465,7 +2465,10 @@ class BaseShape:
         """
         def processed_value(value):
 
-            if isinstance(value, Template):
+            if isinstance(value, (BaseShape, pymupdf.utils.Shape, pymupdf.Page)):
+                return None
+
+            elif isinstance(value, Template):
                 if not self.deck_data:
                     tools.feedback(
                         "Cannot use T() or S() command without Data already defined!",
@@ -2493,25 +2496,29 @@ class BaseShape:
                 lookup_value = record[value.column]
                 custom_value = value.lookups.get(lookup_value, None)
                 return custom_value
-                # print('+++', f'{ID=} {key=} {custom_value=}', '=>', getattr(new_element, key))
+                # print('+++ LookupType', f'{ID=} {key=} {custom_value=}', '=>', getattr(new_element, key))
+            else:
+                raise NotImplementedError(f'Cannot handle value of type: {type(value)}')
+
             return None
 
-        # if not self.deck_data:
-        #     return the_element
         new_element = None
+        # print('+++ ShapeType ::', type(the_element))
         if isinstance(the_element, BaseShape):
             new_element = copy.copy(the_element)
             keys = vars(the_element).keys()
             for key in keys:
                 value = getattr(the_element, key)
-                if isinstance(value, (str, int, float)):
+                if value is None or isinstance(value, (str, int, float, list, tuple, range)):
                     continue
                 elif isinstance(value, dict):
                     updated = False
-                    for key, val in value.items():
+                    for dkey, val in value.items():
+                        if val is None or isinstance(val, (str, int, float, list, tuple, range)):
+                            continue
                         custom_value = processed_value(val)
                         if custom_value:
-                            value[key] = custom_value
+                            value[dkey] = custom_value
                             updated = True
                     if updated:
                         setattr(new_element, key, value)
