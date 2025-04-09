@@ -2504,7 +2504,9 @@ class BaseShape:
             keys = vars(the_element).keys()
             for key in keys:
                 value = getattr(the_element, key)
-                if isinstance(value, dict):
+                if isinstance(value, (str, int, float)):
+                    continue
+                elif isinstance(value, dict):
                     updated = False
                     for key, val in value.items():
                         custom_value = processed_value(val)
@@ -2517,8 +2519,6 @@ class BaseShape:
                     custom_value = processed_value(value)
                     if custom_value:
                         setattr(new_element, key, custom_value)
-
-        if new_element:
             return new_element
         return the_element  # no changes needed or made
 
