@@ -58,7 +58,7 @@ icon_btm = hexagon(
     side=0.8,
     stroke="white")
 value_btm = text(
-    x=4.6, y=7.6,
+    x=4.7, y=7,
     font_size=28,
     align="centre",
     text=T('{{VALUE}}'),

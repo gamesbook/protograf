@@ -302,7 +302,8 @@ class ArrowShape(BaseShape):
         rotation = kwargs.get("rotation", self.rotation)
         if rotation:
             self.centroid = muPoint(cx, cy)
-            kwargs["rotation"] = (rotation, self.centroid)
+            kwargs["rotation"] = rotation
+            kwargs["rotation_point"] = self.centroid
         # ---- draw arrow
         self.vertexes = self.get_vertexes(cx=cx, cy=cy, x=x, y=y)
         # tools.feedback(f'***Arrow {x=} {y=} {self.vertexes=}')
@@ -314,8 +315,6 @@ class ArrowShape(BaseShape):
         # ---- cross
         self.draw_cross(cnv, cx, cy, rotation=kwargs.get("rotation"))
         # ---- text
-        if kwargs and kwargs.get("rotation"):
-            kwargs.pop("rotation")  # otherwise labels rotate again!
         self.draw_label(cnv, ID, cx, cy, **kwargs)
         self.draw_heading(cnv, ID, x, y - self._u.height - self.head_height_u, **kwargs)
         self.draw_title(cnv, ID, x, y, **kwargs)
@@ -790,7 +789,8 @@ class CircleShape(BaseShape):
         rotation = kwargs.get("rotation", self.rotation)
         if rotation:
             self.centroid = muPoint(x, y)
-            kwargs["rotation"] = (rotation, self.centroid)
+            kwargs["rotation"] = rotation
+            kwargs["rotation_point"] = self.centroid
         # ---- draw petals
         if self.petals:
             self.draw_petals(cnv, ID, self.x_c, self.y_c)
@@ -850,8 +850,6 @@ class CircleShape(BaseShape):
         # ---- dot
         self.draw_dot(cnv, self.x_c, self.y_c)
         # ---- text
-        if kwargs and kwargs.get("rotation"):
-            kwargs.pop("rotation")  # otherwise labels rotate again!
         self.draw_heading(cnv, ID, self.x_c, self.y_c - self._u.radius, **kwargs)
         self.draw_label(cnv, ID, self.x_c, self.y_c, **kwargs)
         self.draw_title(cnv, ID, self.x_c, self.y_c + self._u.radius, **kwargs)
@@ -883,7 +881,8 @@ class ChordShape(BaseShape):
         # tools.feedback(f"*** Chord {x=} {y=}, {x_1=} {y_1=}")
         mid_point = geoms.fraction_along_line(Point(x, y), Point(x_1, y_1), 0.5)
         cnv.draw_line(Point(x, y), Point(x_1, y_1))
-        kwargs["rotation"] = (self.rotation, mid_point)
+        kwargs["rotation"] = self.rotation
+        kwargs["rotation_point"] = mid_point
         self.set_canvas_props(cnv=cnv, index=ID, **kwargs)  # shape.finish()
         # ---- calculate line rotation
         compass, rotation = geoms.angles_from_points(x, y, x_1, y_1)
@@ -891,7 +890,8 @@ class ChordShape(BaseShape):
         # ---- dot
         self.draw_dot(cnv, (x_1 + x) / 2.0, (y_1 + y) / 2.0)
         # ---- text
-        kwargs["rotation"] = (rotation, mid_point)
+        kwargs["rotation"] = rotation
+        kwargs["rotation_point"] = mid_point
         self.draw_label(
             cnv,
             ID,
@@ -1123,7 +1123,8 @@ class DotShape(BaseShape):
         # ---- draw dot
         # tools.feedback(f'*** Dot {size=} {x=} {y=}')
         cnv.draw_circle(center=center, radius=size)
-        kwargs["rotation"] = (self.rotation, center)
+        kwargs["rotation"] = self.rotation
+        kwargs["rotation_point"] = center
         self.set_canvas_props(cnv=cnv, index=ID, **kwargs)  # shape.finish()
         # ---- text
         self.draw_heading(cnv, ID, x, y, **kwargs)
@@ -1180,7 +1181,8 @@ class EllipseShape(BaseShape):
         rotation = kwargs.get("rotation", self.rotation)
         if rotation:
             self.centroid = muPoint(x_d, y_d)
-            kwargs["rotation"] = (rotation, self.centroid)
+            kwargs["rotation"] = rotation
+            kwargs["rotation_point"] = self.centroid
         # ---- set canvas
         self.set_canvas_props(index=ID)
         # ---- draw ellipse
@@ -1191,8 +1193,6 @@ class EllipseShape(BaseShape):
         # ---- dot
         self.draw_dot(cnv, x_d, y_d)
         # ---- text
-        if kwargs and kwargs.get("rotation"):
-            kwargs.pop("rotation")  # otherwise labels rotate again!
         self.draw_heading(
             cnv, ID, x_d, y_d - 0.5 * self._u.height - delta_m_up, **kwargs
         )
@@ -1298,7 +1298,8 @@ class EquilateralTriangleShape(BaseShape):
         # ---- handle rotation
         rotation = kwargs.get("rotation", self.rotation)
         if rotation:
-            kwargs["rotation"] = (rotation, self.centroid)
+            kwargs["rotation"] = rotation
+            kwargs["rotation_point"] = self.centroid
         # ---- draw equilateral triangle
         # tools.feedback(f'***EqiTru {x=} {y=} {self.vertexes=}')
         cnv.draw_polyline(self.vertexes)
@@ -2157,18 +2158,17 @@ class LineShape(BaseShape):
                 the_point = muPoint(x_1, y_1)
         # ---- draw line
         cnv.draw_line(Point(x, y), Point(x_1, y_1))
-        kwargs["rotation"] = (self.rotation, the_point)
         self.set_canvas_props(cnv=cnv, index=ID, **kwargs)  # shape.finish()
         # ---- dot
         self.draw_dot(cnv, (x_1 + x) / 2.0, (y_1 + y) / 2.0)
         # ---- text
-        kwargs.pop("rotation", None)
+        kwargs["rotation"] = self.rotation
+        kwargs["rotation_point"] = the_point
         self.draw_label(
             cnv,
             ID,
             (x_1 + x) / 2.0,
             (y_1 + y) / 2.0 + self.font_size / 4.0,
-            rotation=(self.rotation, the_point),
             centred=False,
             **kwargs,
         )
@@ -2429,7 +2429,8 @@ class PolygonShape(BaseShape):
         rotation = kwargs.get("rotation", self.rotation)
         if rotation:
             self.centroid = muPoint(x, y)
-            kwargs["rotation"] = (rotation, self.centroid)
+            kwargs["rotation"] = rotation
+            kwargs["rotation_point"] = self.centroid
         # --- handle 'orientation' (flat vs pointy)
         _geom = self.get_geometry(rotation=rotation, is_rotated=is_rotated)
         x, y, radius, vertices = _geom.x, _geom.y, _geom.radius, _geom.vertices
@@ -2467,8 +2468,6 @@ class PolygonShape(BaseShape):
         # ---- cross
         self.draw_cross(cnv, x, y, rotation=kwargs.get("rotation"))
         # ---- text
-        if kwargs and kwargs.get("rotation"):
-            kwargs.pop("rotation")  # otherwise labels rotate again!
         self.draw_heading(cnv, ID, x, y, radius, **kwargs)
         self.draw_label(cnv, ID, x, y, **kwargs)
         self.draw_title(cnv, ID, x, y, radius + 0.5 * self.title_size, **kwargs)
@@ -2949,7 +2948,8 @@ class RectangleShape(BaseShape):
         # print(self.label, rotation)
         if rotation:
             self.centroid = muPoint(x_d, y_d)
-            kwargs["rotation"] = (rotation, self.centroid)
+            kwargs["rotation"] = rotation
+            kwargs["rotation_point"] = self.centroid
         # ---- * notch vertices
         if is_notched:
             _notch_style = self.notch_style.lower()
@@ -3300,8 +3300,6 @@ class RectangleShape(BaseShape):
         # ---- dot
         self.draw_dot(cnv, x_d, y_d)
         # ---- text
-        if kwargs and kwargs.get("rotation"):
-            kwargs.pop("rotation")  # otherwise labels rotate again!
         self.draw_heading(
             cnv, ID, x_d, y_d - 0.5 * self._u.height - delta_m_up, **kwargs
         )
@@ -3355,7 +3353,8 @@ class RhombusShape(BaseShape):
         rotation = kwargs.get("rotation", self.rotation)
         if rotation:
             self.centroid = muPoint(cx, cy)
-            kwargs["rotation"] = (rotation, self.centroid)
+            kwargs["rotation"] = rotation
+            kwargs["rotation_point"] = self.centroid
         # ---- draw rhombus
         self.vertexes = self.get_vertexes(cx=cx, cy=cy, x=x, y=y)
         # tools.feedback(f'***Rhombus {x=} {y=} {self.vertexes=}')
@@ -3383,8 +3382,6 @@ class RhombusShape(BaseShape):
         )
         # ---- text
         y_off = self._u.height / 2.0
-        if kwargs and kwargs.get("rotation"):
-            kwargs.pop("rotation")  # otherwise labels rotate again!
         self.draw_heading(cnv, ID, x + self._u.width / 2.0, cy - y_off, **kwargs)
         self.draw_label(cnv, ID, x + self._u.width / 2.0, cy, **kwargs)
         self.draw_title(cnv, ID, x + self._u.width / 2.0, cy + y_off, **kwargs)
@@ -3636,7 +3633,8 @@ class StadiumShape(BaseShape):
         rotation = kwargs.get("rotation", self.rotation)
         if rotation:
             self.centroid = muPoint(cx, cy)
-            kwargs["rotation"] = (rotation, self.centroid)
+            kwargs["rotation"] = rotation
+            kwargs["rotation_point"] = self.centroid
         # ---- vertices
         self.vertexes = [  # clockwise from top-left; relative to centre
             Point(x, y),
@@ -3715,8 +3713,6 @@ class StadiumShape(BaseShape):
         # ---- dot
         self.draw_dot(cnv, x + self._u.width / 2.0, y + self._u.height / 2.0)
         # ---- text
-        if kwargs and kwargs.get("rotation"):
-            kwargs.pop("rotation")  # otherwise labels rotate again!
         delta = radius_tb if "n" in _edges or "north" in _edges else 0.0
         self.draw_heading(
             cnv,
@@ -3765,7 +3761,8 @@ class StarShape(BaseShape):
         rotation = kwargs.get("rotation", self.rotation)
         if rotation:
             self.centroid = muPoint(x, y)
-            kwargs["rotation"] = (rotation, self.centroid)
+            kwargs["rotation"] = rotation
+            kwargs["rotation_point"] = self.centroid
         # ---- calculate vertices
         self.vertexes_list = []
         self.vertexes_list.append(muPoint(x, y + radius))
@@ -3787,8 +3784,6 @@ class StarShape(BaseShape):
         # ---- cross
         self.draw_cross(cnv, x, y, rotation=kwargs.get("rotation"))
         # ---- text
-        if kwargs and kwargs.get("rotation"):
-            kwargs.pop("rotation")  # otherwise labels rotate again!
         self.draw_heading(cnv, ID, x, y - radius, **kwargs)
         self.draw_label(cnv, ID, x, y, **kwargs)
         self.draw_title(cnv, ID, x, y + radius, **kwargs)
@@ -4020,14 +4015,15 @@ class TextShape(BaseShape):
                 keys["opacity"] = get_opacity(self.transparency)
                 if self.css:
                     keys["css"] = "* {%s}" % self.css
-                # tools.feedback(f'*** Text HTML {keys=} \n=> {rect=} _text:{_text}')
+                # tools.feedback(f'*** Text HTML {keys=} {rect=} _text:{_text}')
                 current_page.insert_htmlbox(rect, _text, **keys)
             except ValueError as err:
                 tools.feedback(f"Cannot create Text - {err}", True)
         # ---- text string
         else:
-            # tools.feedback(f"*** {x_t=} {y_t=} {_text=} {keys=}")
-            self.draw_multi_string(cnv, x_t, y_t, _text, **keys)
+            keys["rotation"] = self.rotation
+            # tools.feedback(f" Text PLAIN *** {x_t=} {y_t=} {_text=} {keys=}")
+            self.draw_multi_string(cnv, x_t, y_t, _text, **keys)  # use morph to rotate
 
 
 class TrapezoidShape(BaseShape):
@@ -4120,7 +4116,8 @@ class TrapezoidShape(BaseShape):
         rotation = kwargs.get("rotation", self.rotation)
         if rotation:
             self.centroid = muPoint(cx, cy)
-            kwargs["rotation"] = (rotation, self.centroid)
+            kwargs["rotation"] = rotation
+            kwargs["rotation_point"] = self.centroid
         # ---- draw trapezoid
         self.vertexes = self.get_vertexes(cx=cx, cy=cy, x=x, y=y)
         # tools.feedback(f'***Trap {x=} {y=} {self.vertexes=}')
@@ -4148,8 +4145,6 @@ class TrapezoidShape(BaseShape):
             rotation=kwargs.get("rotation"),
         )
         # ---- text
-        if kwargs and kwargs.get("rotation"):
-            kwargs.pop("rotation")  # otherwise labels rotate again!
         self.draw_heading(cnv, ID, x + self._u.width / 2.0, y, **kwargs)
         self.draw_label(
             cnv, ID, x + self._u.width / 2.0, y + sign * self._u.height / 2.0, **kwargs

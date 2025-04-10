@@ -41,7 +41,7 @@ value_top = Common(x=1.0, y=1.4, font_size=40)
 value_black = text(common=value_top, stroke="black", text=T('{{VALUE}}'))
 value_red = text(common=value_top, stroke=gred, text=T('{{VALUE}}'))
 
-value_low = Common(x=5.5, y=7.2, font_size=40, rotation=180)
+value_low = Common(x=5.85, y=7.4, font_size=40, rotation=180)
 value_low_black = text(common=value_low, stroke="black", text=T('{{VALUE}}'))
 value_low_red = text(common=value_low, stroke=gred, text=T('{{VALUE}}'))
 
@@ -58,7 +58,7 @@ Card("1-26", value_black, value_low_black, marker_black, marker_low_black)
 Card("27-52", value_red, value_low_red, marker_red, marker_low_red)
 
 # royalty
-royals = Common(x=1.5, y=2, width=3.5, height=5)
+royals = Common(x=1.55, y=1.9, width=3.3, height=5)
 # royalty - SPADES
 Card( "1", image("images/king_s.png", common=royals))
 Card( "2", image("images/queen_s.png", common=royals))

@@ -60,7 +60,7 @@ icon_btm = hexagon(
     side=0.8,
     stroke="white")
 value_btm = text(
-    x=4.6, y=7.6,
+    x=4.7, y=7,
     font_size=28,
     align="centre",
     text=T('{{VALUE}}'),
@@ -128,8 +128,8 @@ Card("49-51",
 circle_icon = Common(fill="black", stroke="white", radius=1.25, font_size=48)
 Card("52-54",
      circle(common=circle_icon, cx=1.8, cy=1.8, label='\x28', label_face='zapfdingbats'),
-     circle(common=circle_icon, cx=3.1, cy=4.4, label='\x64', label_face='zapfdingbats'),
-     circle(common=circle_icon, cx=4.4, cy=7.0, label='H', label_face='zapfdingbats'),
+     circle(common=circle_icon, cx=3.1, cy=4.4, label='H', label_face='zapfdingbats'),
+     circle(common=circle_icon, cx=4.4, cy=7.0, label='\x64', label_face='zapfdingbats'),
 )
 
 Save()

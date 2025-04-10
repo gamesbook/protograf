@@ -27,6 +27,7 @@ from PIL import Image
 import pymupdf
 from pymupdf import Shape as muShape, Point as muPoint, Page as muPage, Matrix
 from pymupdf.utils import getColor, getColorList
+from pymupdf import Base14_fontnames as BUILTIN_FONTS
 
 # local
 from protograf.utils import geoms, tools
@@ -39,7 +40,6 @@ DEBUG = False
 DEBUG_COLOR = "#B0C4DE"
 CACHE_DIRECTORY = ".protograf"  # append to the user's home directory
 BGG_IMAGES = "cf.geekdo-images.com"
-BUILTIN_FONTS = ["Times-Roman", "Courier", "Helvetica"]
 COLOR_NAMES = getColorList()
 
 # ---- named tuples
@@ -436,7 +436,7 @@ class BaseCanvas:
         #     self.stroke = self.outline
         #     self.fill = None
         # ---- font
-        self.font_name = self.defaults.get("font_name", "helv")
+        self.font_name = self.defaults.get("font_name", "Helvetica")
         self.font_size = self.defaults.get("font_size", 12)
         self.font_style = self.defaults.get("font_style", None)
         self.font_directory = self.defaults.get("font_directory", None)
@@ -821,7 +821,7 @@ class BaseShape:
         # ---- rotation / position /elevation
         self.rotation = self.kw_float(
             kwargs.get("rotation", kwargs.get("rotation", base.rotation))
-        )  # degrees ant-clockwise
+        )  # degrees anti-clockwise for text
         self.rotation_point = kwargs.get("rotation_point", base.rotation_point)
         self._rotation_theta = math.radians(self.rotation or 0)  # radians
         self.direction = kwargs.get("direction", base.direction)
@@ -1348,6 +1348,9 @@ class BaseShape:
         dotted = kwargs.get("dotted", None)
         dashed = kwargs.get("dashed", None)
         _rotation = kwargs.get("rotation", None)  # calling Shape must set a tuple!
+        _rotation_point = kwargs.get(
+            "rotation_point", None
+        )  # calling Shape must set a tuple!
         closed = kwargs.get("closed", False)  # whether to connect last and first points
         debug = kwargs.get("debug", False)
         # ---- set line dots / dashed
@@ -1376,17 +1379,14 @@ class BaseShape:
         # print(f"BS $$$ {_dotted =} {_dashed=} {dashes=}")
         # ---- check rotation
         morph = None
-        if _rotation:
-            if not isinstance(_rotation, tuple):
-                tools.feedback(f'Unable to handle rotation: "{_rotation}"', True)
-            if not isinstance(_rotation[0], (float, int)):
-                tools.feedback(f'Rotation angle "{_rotation[0]}" is invalid', True)
-            if not isinstance(_rotation[1], (geoms.Point, muPoint)):
-                tools.feedback(f'Rotation point "{_rotation[1]}" is invalid', True)
+        if _rotation_point and not isinstance(_rotation_point, (geoms.Point, muPoint)):
+            tools.feedback(f'Rotation point "{_rotation_point}" is invalid', True)
+        if _rotation is not None and not isinstance(_rotation, (float, int)):
+            tools.feedback(f'Rotation angle "{_rotation}" is invalid', True)
             # ---- * set rotation matrix
             mtrx = Matrix(1, 1)
-            mtrx.prerotate(_rotation[0])
-            morph = (_rotation[1], mtrx)
+            mtrx.prerotate(_rotation)
+            morph = (_rotation, mtrx)
         # ---- get color tuples
         _color = get_color(stroke)
         _fill = get_color(fill)
@@ -2140,7 +2140,7 @@ class BaseShape:
             * xm (float) and ym (float): must be in native units (i.e. points)!
             * string (str): the text to draw/write
             * align (str): one of [centre|right|left|None] alignment of text
-            * rotation (float): an angle in degrees; anti-clockwise from East
+            * rotation (float): an angle in degrees; clockwise from East
 
         Kwargs:
             * locale - dict created from Locale namedtuple
@@ -2187,8 +2187,7 @@ class BaseShape:
             keys["fill"] = get_color(_fill)
         else:
             keys["fill"] = keys["color"]
-        if rotation:  # must be multiple of 90 for text
-            keys["rotate"] = int(keys.get("rotate", (0, 0))[0])
+
         # keys['stroke_opacity'] = self.show_stroke or 1
         # keys['fill_opacity'] = self.show_fill or 1
 
@@ -2198,7 +2197,6 @@ class BaseShape:
         # keys['miter_limit'] = 1
         # keys['border_width'] = 1
         # keys['encoding'] = pymupdf.TEXT_ENCODING_LATIN
-        # keys['morph'] = None
         # keys['oc'] = 0
         # keys['overlay'] = True
 
@@ -2214,33 +2212,20 @@ class BaseShape:
         if self.align:
             font = pymupdf.Font(keys["fontname"])  # built-in
             point = move_string_start(string, point, font, keys["fontsize"], self.align)
-        canvas.insert_text(point, string, **keys)
-
-        """
-        if kwargs.get("font_size"):
-            fsize = float(kwargs.get("font_size"))
-            canvas.setFont(self.font_name, fsize)
-        for ln in string.split("\n"):
-            if rotation:
-                canvas.saveState()
-                canvas.translate(xm, mvy)
-                canvas.rotate(rotation)
-                if align == "centre":
-                    canvas.drawCentredString(0, 0, ln)
-                elif align == "right":
-                    canvas.drawRightString(0, 0, ln)
-                else:
-                    canvas.drawString(0, 0, ln)
-                canvas.restoreState()
+        if rotation:
+            # page.insert_text(point, text, morph=(point, fitz.Matrix(45))
+            # all_fonts = globals.doc_page.get_fonts()
+            if self.font_name in BUILTIN_FONTS:
+                dx = pymupdf.get_text_length(string) / 2
             else:
-                if align == "centre":
-                    canvas.drawCentredString(xm, mvy, ln)
-                elif align == "right":
-                    canvas.drawRightString(xm, mvy, ln)
-                else:
-                    canvas.drawString(xm, mvy, ln)
-            mvy -= canvas._leading
-        """
+                font = pymupdf.Font(keys["fontname"])
+                dx = font.text_length(string)  # FIXME - need pymupdf.Font
+            midpt = pymupdf.Point(point.x + 2 * dx, point.y)
+            canvas.insert_text(
+                point, string, morph=(midpt, pymupdf.Matrix(rotation)), **keys
+            )
+        else:
+            canvas.insert_text(point, string, **keys)
 
     def draw_string(self, canvas, xs, ys, string, align=None, rotation=0, **kwargs):
         """Draw a multi-string on the canvas."""
