@@ -1331,7 +1331,7 @@ class BaseShape:
         #   stroke_opacity=1, fill_opacity=1, oc=0
 
         # ---- set props
-        # print(f'$$$ Props: {kwargs.keys()} \n {kwargs.get("fill", "?")=}')
+        # print(f'$$$ SetCnvProps: {kwargs.keys()} \n {kwargs.get("fill", "?")=}')
         cnv = cnv if cnv else globals.canvas
         if "fill" in kwargs.keys():
             fill = kwargs.get("fill", None)  # reserve None for 'no fill at all'
@@ -1341,7 +1341,7 @@ class BaseShape:
             stroke = kwargs.get("stroke", None)  # reserve None for 'no stroke at all'
         else:
             stroke = self.stroke
-        # print(f'BS $$$ {kwargs.get("fill")=} {fill=} {kwargs.get("stroke")=} {stroke=}')
+        # print(f'SCP $$$ {kwargs.get("fill")=} {fill=} {kwargs.get("stroke")=} {stroke=}')
         transparency = kwargs.get("transparency", None)
         stroke_width = kwargs.get("stroke_width", None)
         stroke_cap = kwargs.get("stroke_cap", None)
@@ -1376,7 +1376,7 @@ class BaseShape:
             dashes = f"[{dlength} {dspaced}] {doffset}"
         else:
             dashes = None
-        # print(f"BS $$$ {_dotted =} {_dashed=} {dashes=}")
+        # print(f"SCP $$$ {_dotted =} {_dashed=} {dashes=}")
         # ---- check rotation
         morph = None
         if _rotation_point and not isinstance(_rotation_point, (geoms.Point, muPoint)):
@@ -1387,6 +1387,7 @@ class BaseShape:
             mtrx = Matrix(1, 1)
             mtrx.prerotate(_rotation)
             morph = (_rotation, mtrx)
+            # print(f'SCP $$$ {morph=}')
         # ---- get color tuples
         _color = get_color(stroke)
         _fill = get_color(fill)
@@ -1394,7 +1395,7 @@ class BaseShape:
         _width = stroke_width or self.stroke_width
         if _color is None and _fill is None:
             tools.feedback("Cannot have both fill and stroke set to None!", True)
-        # print(f'BS $$$ {stroke=} {fill=} {_color=} {_fill=}')  # None OR fraction RGB
+        # print(f'SCP $$$ {stroke=} {fill=} {_color=} {_fill=}')  # None OR fraction RGB
         # ---- set/apply properties
         cnv.finish(
             width=_width,
@@ -2140,7 +2141,7 @@ class BaseShape:
             * xm (float) and ym (float): must be in native units (i.e. points)!
             * string (str): the text to draw/write
             * align (str): one of [centre|right|left|None] alignment of text
-            * rotation (float): an angle in degrees; clockwise from East
+            * rotation (float): an angle in degrees; counter-clockwise from East
 
         Kwargs:
             * locale - dict created from Locale namedtuple
@@ -2216,13 +2217,18 @@ class BaseShape:
             # page.insert_text(point, text, morph=(point, fitz.Matrix(45))
             # all_fonts = globals.doc_page.get_fonts()
             if self.font_name in BUILTIN_FONTS:
-                dx = pymupdf.get_text_length(string) / 2
+                dx = pymupdf.get_text_length(string, fontsize=keys["fontsize"]) / 2
             else:
                 font = pymupdf.Font(keys["fontname"])
-                dx = font.text_length(string)  # FIXME - need pymupdf.Font
-            midpt = pymupdf.Point(point.x + 2 * dx, point.y)
+                dx = font.text_length(string, fontsize=keys["fontsize"])
+            midpt = pymupdf.Point(point.x + dx, point.y)
+            # self.dot = 0.05; self.draw_dot(canvas, midpt.x, midpt.y)
             canvas.insert_text(
-                point, string, morph=(midpt, pymupdf.Matrix(rotation)), **keys
+                point,
+                string,
+                morph=(midpt, pymupdf.Matrix(rotation)),
+                **keys,
+                # point, string, morph=(point, pymupdf.Matrix(rotation)), **keys
             )
         else:
             canvas.insert_text(point, string, **keys)
@@ -2256,9 +2262,35 @@ class BaseShape:
             kwargs["font_name"] = self.heading_face or self.font_name
             kwargs["stroke"] = self.heading_stroke
             kwargs["font_size"] = self.heading_size
-            self.draw_multi_string(
-                canvas, x, y - y_off, _ttext, align=align, rotation=_rotation, **kwargs
-            )
+            center_point = kwargs.get("rotation_point", None)
+            # print(f"{center_point=} {x=} {y - y_off}")
+            if center_point and _rotation:
+                point_to_rotate = muPoint(x, y - y_off)
+                rpt = geoms.rotate_point_around_point(
+                    point_to_rotate, center_point, _rotation
+                )
+                # print("rotated_point:", rpt)
+                # self.dot = 0.05; self.draw_dot(canvas, rpt.x, rpt.y)
+                self.draw_multi_string(
+                    canvas,
+                    rpt.x,
+                    rpt.y,
+                    _ttext,
+                    align=align,
+                    rotation=_rotation,
+                    **kwargs,
+                )
+            else:
+                # self.dot = 0.05; self.draw_dot(canvas, x, y - y_off)
+                self.draw_multi_string(
+                    canvas,
+                    x,
+                    y - y_off,
+                    _ttext,
+                    align=align,
+                    rotation=_rotation,
+                    **kwargs,
+                )
             if isinstance(canvas, muShape):
                 canvas.commit()
 
@@ -2279,9 +2311,28 @@ class BaseShape:
             kwargs["font_name"] = self.label_face or self.font_name
             kwargs["stroke"] = self.label_stroke
             kwargs["font_size"] = self.label_size
-            self.draw_multi_string(
-                canvas, x, y, _ttext, align=align, rotation=_rotation, **kwargs
-            )
+            center_point = kwargs.get("rotation_point", None)
+            if center_point and _rotation:
+                point_to_rotate = muPoint(x, y)
+                rpt = geoms.rotate_point_around_point(
+                    point_to_rotate, center_point, _rotation
+                )
+                # print("rotated_point:", rpt)
+                # self.dot = 0.05; self.draw_dot(canvas, rpt.x, rpt.y)
+                self.draw_multi_string(
+                    canvas,
+                    rpt.x,
+                    rpt.y,
+                    _ttext,
+                    align=align,
+                    rotation=_rotation,
+                    **kwargs,
+                )
+            else:
+                # self.dot = 0.05; self.draw_dot(canvas, x, y)
+                self.draw_multi_string(
+                    canvas, x, y, _ttext, align=align, rotation=_rotation, **kwargs
+                )
             if isinstance(canvas, muShape):
                 canvas.commit()
 
@@ -2302,9 +2353,34 @@ class BaseShape:
             kwargs["font_name"] = self.title_face or self.font_name
             kwargs["stroke"] = self.title_stroke
             kwargs["font_size"] = self.title_size
-            self.draw_multi_string(
-                canvas, x, y + y_off, _ttext, align=align, rotation=_rotation, **kwargs
-            )
+            center_point = kwargs.get("rotation_point", None)
+            if center_point and _rotation:
+                point_to_rotate = muPoint(x, y + y_off)
+                rpt = geoms.rotate_point_around_point(
+                    point_to_rotate, center_point, _rotation
+                )
+                # print("rotated_point:", rpt)
+                # self.dot = 0.05; self.draw_dot(canvas, rpt.x, rpt.y)
+                self.draw_multi_string(
+                    canvas,
+                    rpt.x,
+                    rpt.y,
+                    _ttext,
+                    align=align,
+                    rotation=_rotation,
+                    **kwargs,
+                )
+            else:
+                # self.dot = 0.05; self.draw_dot(canvas, x, y + y_off)
+                self.draw_multi_string(
+                    canvas,
+                    x,
+                    y + y_off,
+                    _ttext,
+                    align=align,
+                    rotation=_rotation,
+                    **kwargs,
+                )
             if isinstance(canvas, muShape):
                 canvas.commit()
 

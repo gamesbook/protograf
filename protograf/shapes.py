@@ -14,7 +14,7 @@ from urllib.parse import urlparse
 
 # third party
 import pymupdf
-from pymupdf import Shape as muShape, Point as muPoint
+from pymupdf import Shape as muShape, Point as muPoint, Matrix
 import segno  # QRCode
 
 # local
@@ -298,7 +298,7 @@ class ArrowShape(BaseShape):
         cy = y - self._u.height
         # ---- set canvas
         self.set_canvas_props(index=ID)
-        # ---- handle rotation: START
+        # ---- handle rotation
         rotation = kwargs.get("rotation", self.rotation)
         if rotation:
             self.centroid = muPoint(cx, cy)
@@ -784,7 +784,7 @@ class CircleShape(BaseShape):
                 bl=Point(self.x_c - self._u.radius, self.y_c + self._u.radius),
                 tr=Point(self.x_c + self._u.radius, self.y_c - self._u.radius),
             )
-        # ---- handle rotation: START
+        # ---- handle rotation
         is_rotated = False
         rotation = kwargs.get("rotation", self.rotation)
         if rotation:
@@ -1177,7 +1177,7 @@ class EllipseShape(BaseShape):
         y_d = y + self._u.height / 2.0  # centre
         self.area = self.calculate_area()
         delta_m_up, delta_m_down = 0.0, 0.0  # potential text offset from chevron
-        # ---- handle rotation: START
+        # ---- handle rotation
         rotation = kwargs.get("rotation", self.rotation)
         if rotation:
             self.centroid = muPoint(x_d, y_d)
@@ -2424,7 +2424,7 @@ class PolygonShape(BaseShape):
         # ---- calc centre (in units)
         centre = self.get_centre()
         x, y = centre.x, centre.y
-        # ---- handle rotation: START
+        # ---- handle rotation
         is_rotated = False
         rotation = kwargs.get("rotation", self.rotation)
         if rotation:
@@ -2943,9 +2943,8 @@ class RectangleShape(BaseShape):
         y_d = y + self._u.height / 2.0  # centre
         self.area = self.calculate_area()
         delta_m_up, delta_m_down = 0.0, 0.0  # potential text offset from chevron
-        # ---- handle rotation: START
+        # ---- handle rotation
         rotation = kwargs.get("rotation", self.rotation)
-        # print(self.label, rotation)
         if rotation:
             self.centroid = muPoint(x_d, y_d)
             kwargs["rotation"] = rotation
@@ -3216,7 +3215,19 @@ class RectangleShape(BaseShape):
             self.set_canvas_props(cnv=cnv, index=ID, **kwargs)
         else:
             # tools.feedback(f'*** RECT  normal')
-            cnv.draw_rect((x, y, x + self._u.width, y + self._u.height), radius=radius)
+            if rotation:
+                mtrx = Matrix(1, 1)
+                mtrx.prerotate(rotation)
+                morph = (self.centroid, mtrx)
+                globals.doc_page.draw_rect(
+                    (x, y, x + self._u.width, y + self._u.height),
+                    radius=radius,
+                    morph=morph,
+                )
+            else:
+                cnv.draw_rect(
+                    (x, y, x + self._u.width, y + self._u.height), radius=radius
+                )
             self.set_canvas_props(cnv=cnv, index=ID, **kwargs)
             # ---- * borders (override)
             if self.borders:
@@ -3349,7 +3360,7 @@ class RhombusShape(BaseShape):
         cy = y + self._u.height / 2.0
         # ---- calculated properties
         self.area = (self._u.width * self._u.height) / 2.0
-        # ---- handle rotation: START
+        # ---- handle rotation
         rotation = kwargs.get("rotation", self.rotation)
         if rotation:
             self.centroid = muPoint(cx, cy)
@@ -3629,7 +3640,7 @@ class StadiumShape(BaseShape):
         # ---- overrides to centre the shape
         cx = x + self._u.width / 2.0
         cy = y + self._u.height / 2.0
-        # ---- handle rotation: START
+        # ---- handle rotation
         rotation = kwargs.get("rotation", self.rotation)
         if rotation:
             self.centroid = muPoint(cx, cy)
@@ -3756,7 +3767,7 @@ class StarShape(BaseShape):
         radius = self._u.radius
         # ---- set canvas
         self.set_canvas_props(index=ID)
-        # ---- handle rotation: START
+        # ---- handle rotation
         is_rotated = False
         rotation = kwargs.get("rotation", self.rotation)
         if rotation:
@@ -4112,7 +4123,7 @@ class TrapezoidShape(BaseShape):
         # ---- set canvas
         self.set_canvas_props(index=ID)
         cx, cy, x, y = self.calculate_xy()
-        # ---- handle rotation: START
+        # ---- handle rotation
         rotation = kwargs.get("rotation", self.rotation)
         if rotation:
             self.centroid = muPoint(cx, cy)
