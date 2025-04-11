@@ -2162,7 +2162,8 @@ class LineShape(BaseShape):
         # ---- dot
         self.draw_dot(cnv, (x_1 + x) / 2.0, (y_1 + y) / 2.0)
         # ---- text
-        kwargs["rotation"] = self.rotation
+        _, _rotation = geoms.angles_from_points(x, y, x_1, y_1)
+        kwargs["rotation"] = -1 * _rotation
         kwargs["rotation_point"] = the_point
         self.draw_label(
             cnv,
