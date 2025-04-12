@@ -1843,18 +1843,9 @@ class HexShape(BaseShape):
         return HexGeometry(
             radius, diameter, side, half_side, half_flat, height_flat, z_fraction)
 
-    def draw(self, cnv=None, off_x=0, off_y=0, ID=None, **kwargs):
-        """Draw a hexagon on a given canvas."""
-        kwargs = self.kwargs | kwargs
-        # tools.feedback(f'*** draw hex: {off_x=} {off_y=} {ID=}')
-        # tools.feedback(f'*** draw hex: {self.x=} {self.y=} {self.cx=} {self.cy=}')
-        # tools.feedback(f'*** draw hex: {self.row=} {self.col=}')
-        # tools.feedback(f' @@@ Hexg.draw {kwargs=}')
-        cnv = cnv if cnv else globals.canvas  # a new Page/Shape may now exist
-        super().draw(cnv, off_x, off_y, ID, **kwargs)  # unit-based props
-        is_cards = kwargs.get("is_cards", False)
+    def get_vertexes(self, is_cards=False):
+        """Calculate vertices of hexagon."""
         geo = self.get_geometry()
-
         # ---- POINTY^
         if self.orientation.lower() in ["p", "pointy"]:
             #          .
@@ -1998,10 +1989,7 @@ class HexShape(BaseShape):
                 y = self.y_d - geo.half_flat
             # tools.feedback(f"*** F~: {x=} {y=} {self.x_d=} {self.y_d=} {geo=}")
 
-        # ---- calculate area
-        self.area = self.calculate_area()
-
-        # ---- calculate vertical hexagon (clockwise)
+        # ---- ^ pointy hexagon vertices (clockwise)
         if self.orientation.lower() in ["p", "pointy"]:
             self.vertexes = [  # clockwise from bottom-left; relative to centre
                 muPoint(x, y + geo.z_fraction),
@@ -2011,7 +1999,7 @@ class HexShape(BaseShape):
                 muPoint(x + geo.height_flat, y + geo.z_fraction),
                 muPoint(x + geo.half_flat, y),
             ]
-        # ---- calculate horizontal hexagon (clockwise)
+        # ---- ~ flat hexagon vertices (clockwise)
         else:  # self.orientation.lower() in ['f',  'flat']:
             self.vertexes = [  # clockwise from left; relative to centre
                 muPoint(x, y + geo.half_flat),
@@ -2021,7 +2009,23 @@ class HexShape(BaseShape):
                 muPoint(x + geo.z_fraction + geo.side, y),
                 muPoint(x + geo.z_fraction, y),
             ]
+        return self.vertexes
 
+    def draw(self, cnv=None, off_x=0, off_y=0, ID=None, **kwargs):
+        """Draw a hexagon on a given canvas."""
+        kwargs = self.kwargs | kwargs
+        # tools.feedback(f'*** draw hex: {off_x=} {off_y=} {ID=}')
+        # tools.feedback(f'*** draw hex: {self.x=} {self.y=} {self.cx=} {self.cy=}')
+        # tools.feedback(f'*** draw hex: {self.row=} {self.col=}')
+        # tools.feedback(f' @@@ Hexg.draw {kwargs=}')
+        cnv = cnv if cnv else globals.canvas  # a new Page/Shape may now exist
+        super().draw(cnv, off_x, off_y, ID, **kwargs)  # unit-based props
+        # ---- calculate vertexes
+        geo = self.get_geometry()
+        is_cards = kwargs.get("is_cards", False)
+        self.get_vertexes(is_cards)
+        # ---- calculate area
+        self.area = self.calculate_area()
         # ---- remove rotation
         if kwargs and kwargs.get("rotation"):
             kwargs.pop("rotation")
