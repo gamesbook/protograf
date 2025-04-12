@@ -2382,21 +2382,6 @@ class PolygonShape(BaseShape):
             dotted=self.radii_dotted,
         )
 
-    def get_vertexes(self, rotation: float = None, is_rotated: bool = False):
-        """Calculate vertices of polygon."""
-        # convert to using units
-        if is_rotated:
-            x, y = 0.0, 0.0  # centre for now-rotated canvas
-        else:
-            x = self._u.x + self._o.delta_x
-            y = self._u.y + self._o.delta_y
-        radius = self.get_radius()
-        # calculate vertices - assumes x,y marks the centre point
-        _rotation = rotation or self.flatten_angle
-        vertices = geoms.polygon_vertices(self.sides, radius, Point(x, y), _rotation)
-        # for p in vertices: print(f'*V* {p.x / 28.3465}, {p.y / 28.3465}')
-        return vertices
-
     def get_geometry(self, rotation: float = None, is_rotated: bool = False):
         """Calculate centre, radius, side and vertices of Polygon."""
         # convert to using units
@@ -2422,6 +2407,21 @@ class PolygonShape(BaseShape):
         vertices = geoms.polygon_vertices(self.sides, radius, Point(x, y), _rotation)
         # for p in vertices: print(f'*G* {p.x / 28.3465}, {p.y / 28.3465}')
         return PolyGeometry(x, y, radius, side, half_flat, vertices)
+
+    def get_vertexes(self, rotation: float = None, is_rotated: bool = False):
+        """Calculate vertices of polygon."""
+        # convert to using units
+        if is_rotated:
+            x, y = 0.0, 0.0  # centre for now-rotated canvas
+        else:
+            x = self._u.x + self._o.delta_x
+            y = self._u.y + self._o.delta_y
+        radius = self.get_radius()
+        # calculate vertices - assumes x,y marks the centre point
+        _rotation = rotation or self.flatten_angle
+        vertices = geoms.polygon_vertices(self.sides, radius, Point(x, y), _rotation)
+        # for p in vertices: print(f'*V* {p.x / 28.3465}, {p.y / 28.3465}')
+        return vertices
 
     def draw(self, cnv=None, off_x=0, off_y=0, ID=None, **kwargs):
         """Draw a regular polygon on a given canvas."""
