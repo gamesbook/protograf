@@ -553,6 +553,7 @@ class DeckShape(BaseShape):
                     )
 
                 for i in range(0, copies):
+                    # breakpoint()
                     card.draw_card(
                         cnv, row=row, col=col, cid=card.shape_id, image=image, **kwargs
                     )
@@ -560,6 +561,15 @@ class DeckShape(BaseShape):
                     if col >= max_cols:
                         col = 0
                         row += 1
+                    elif (
+                        col == max_cols - 1
+                        and row % 2
+                        and card.kwargs.get("frame_type") == CardFrame.HEXAGON
+                    ):
+                        col = 0
+                        row += 1
+                    else:
+                        pass
                     # print(f"{card=} => {col=} {row=} // {max_cols=} {max_rows=}")
                     if row >= max_rows:
                         row, col = 0, 0

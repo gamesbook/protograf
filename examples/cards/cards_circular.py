@@ -15,6 +15,7 @@ Data(filename="lotr.csv")
 Deck(
      cards=1,
      frame='circle',
+     stroke="darkgray",
      radius=3.15,
      copy='Copies',
      grid_marks=True)
@@ -23,7 +24,7 @@ Deck(
 race = Common(x=0.35, y=0.35,radius=2.8)
 Card("all", S("{{ Race == 'Human' }}", circle(common=race, fill_stroke="tomato")))
 Card("all", S("{{ Race == 'Elf' }}", circle(common=race, fill_stroke="gold")))
-Card("all", S("{{ Race == 'Dwarf' }}", circle(common=race, fill_stroke="cyan")))
+Card("all", S("{{ Race == 'Dwarf' }}", circle(common=race, fill_stroke="turquoise")))
 Card("all", S("{{ Race == 'Hobbit' }}", circle(common=race, fill_stroke="chartreuse")))
 Card("all", S("{{ Race == 'Nazgul' }}", circle(common=race, fill_stroke="gray")))
 

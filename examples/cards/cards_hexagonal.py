@@ -12,7 +12,7 @@ Create(filename='cards_hexagonal.pdf', paper="A4-l")
 Data(filename="lotr.csv")
 
 # design deck
-Deck(frame='hexagon', copy='Copies', height=6)
+Deck(frame='hexagon', copy='Copies', height=6, stroke="darkgray")
 
 # background color per Race
 back_race = Common(x=0.5, y=0.4, radius=3, label_size=18)
