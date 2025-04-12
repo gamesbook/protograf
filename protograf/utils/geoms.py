@@ -28,8 +28,17 @@ PolyGeometry = namedtuple(
 )
 HexGeometry = namedtuple(
     "HexGeometry",
-    ["radius", "diameter", "side", "half_side", "half_flat", "height_flat", "z_fraction"]
+    [
+        "radius",
+        "diameter",
+        "side",
+        "half_side",
+        "half_flat",
+        "height_flat",
+        "z_fraction",
+    ],
 )
+
 
 @dataclass
 class BBox:

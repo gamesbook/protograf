@@ -1841,7 +1841,8 @@ class HexShape(BaseShape):
         radius = side
         z_fraction = (diameter - side) / 2.0
         return HexGeometry(
-            radius, diameter, side, half_side, half_flat, height_flat, z_fraction)
+            radius, diameter, side, half_side, half_flat, height_flat, z_fraction
+        )
 
     def get_vertexes(self, is_cards=False):
         """Calculate vertices of hexagon."""
@@ -1958,12 +1959,20 @@ class HexShape(BaseShape):
                 )  # do NOT add half_flat
             elif self.row is not None and self.col is not None:
                 if self.hex_offset in ["o", "O", "odd"]:
-                    x = self.col * (geo.half_side + geo.side) + self._u.x + self._o.delta_x
+                    x = (
+                        self.col * (geo.half_side + geo.side)
+                        + self._u.x
+                        + self._o.delta_x
+                    )
                     y = self.row * geo.half_flat * 2.0 + self._u.y + self._o.delta_y
                     if (self.col + 1) & 1:  # is odd
                         y = y + geo.half_flat
                 else:  # self.hex_offset in ['e', 'E', 'even']
-                    x = self.col * (geo.half_side + geo.side) + self._u.x + self._o.delta_x
+                    x = (
+                        self.col * (geo.half_side + geo.side)
+                        + self._u.x
+                        + self._o.delta_x
+                    )
                     y = self.row * geo.half_flat * 2.0 + self._u.y + self._o.delta_y
                     if (self.col + 1) & 1:  # is odd
                         pass
@@ -2444,7 +2453,12 @@ class PolygonShape(BaseShape):
             kwargs["rotation_point"] = self.centroid
             is_rotated = True
         pre_geom = self.get_geometry(rotation=rotation, is_rotated=is_rotated)
-        x, y, radius, vertices = pre_geom.x, pre_geom.y, pre_geom.radius, pre_geom.vertices
+        x, y, radius, vertices = (
+            pre_geom.x,
+            pre_geom.y,
+            pre_geom.radius,
+            pre_geom.vertices,
+        )
         # ---- new x/y per col/row
         is_cards = kwargs.get("is_cards", False)
         if self.row is not None and self.col is not None and is_cards:
@@ -2492,7 +2506,7 @@ class PolygonShape(BaseShape):
         if not vertices or len(vertices) == 0:
             return
         # ---- draw polygon
-        tools.feedback(f'***Polygon {self.col=} {self.row=} {x=} {y=} {vertices=}')
+        tools.feedback(f"***Polygon {self.col=} {self.row=} {x=} {y=} {vertices=}")
         cnv.draw_polyline(vertices)
         kwargs["closed"] = True
         self.set_canvas_props(cnv=cnv, index=ID, **kwargs)

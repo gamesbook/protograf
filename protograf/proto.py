@@ -148,13 +148,7 @@ class CardShape(BaseShape):
                     label=label, canvas=cnv, col=col, row=row, **kwargs
                 )
             case CardFrame.HEXAGON:
-                kwargs["sides"] = 6
-                outline = PolygonShape(
-                    label=label, canvas=cnv, col=col, row=row, **kwargs
-                )
-                # outline = HexShape(
-                #     label=label, canvas=cnv, col=col, row=row, **kwargs
-                # )
+                outline = HexShape(label=label, canvas=cnv, col=col, row=row, **kwargs)
             case _:
                 raise NotImplementedError(
                     f'Cannot handle card frame type: {kwargs["frame_type"]}'
