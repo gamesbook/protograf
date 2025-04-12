@@ -24,6 +24,7 @@ from protograf.utils.geoms import (
     Link,
     Locale,
     PolyGeometry,
+    HexGeometry,
 )  # named tuples
 from protograf.utils import geoms, tools, support
 from protograf.base import (
@@ -886,7 +887,7 @@ class ChordShape(BaseShape):
         self.set_canvas_props(cnv=cnv, index=ID, **kwargs)  # shape.finish()
         # ---- calculate line rotation
         compass, rotation = geoms.angles_from_points(x, y, x_1, y_1)
-        # tools.feedback(f"***Chord {compass=} {rotation=}")
+        # tools.feedback(f"*** Chord {compass=} {rotation=}")
         # ---- dot
         self.draw_dot(cnv, (x_1 + x) / 2.0, (y_1 + y) / 2.0)
         # ---- text
@@ -1110,7 +1111,7 @@ class DotShape(BaseShape):
         kwargs = self.kwargs | kwargs
         cnv = cnv if cnv else globals.canvas  # a new Page/Shape may now exist
         super().draw(cnv, off_x, off_y, ID, **kwargs)  # unit-based props
-        # tools.feedback(f"Dot {self._o.delta_x=} {self._o.delta_y=}")
+        # tools.feedback(f"*** Dot {self._o.delta_x=} {self._o.delta_y=}")
         if self.use_abs_c:
             x = self._abs_cx
             y = self._abs_cy
@@ -1812,16 +1813,8 @@ class HexShape(BaseShape):
             stroke_cap=self.hatch_cap,
         )
 
-    def draw(self, cnv=None, off_x=0, off_y=0, ID=None, **kwargs):
-        """Draw a hexagon on a given canvas."""
-        kwargs = self.kwargs | kwargs
-        # tools.feedback(f'*** draw hex: {off_x=} {off_y=} {ID=}')
-        # tools.feedback(f'*** draw hex: {self.x=} {self.y=} {self.cx=} {self.cy=}')
-        # tools.feedback(f'*** draw hex: {self.row=} {self.col=}')
-        # tools.feedback(f' @@@ Hexg.draw {kwargs=}')
-        cnv = cnv if cnv else globals.canvas  # a new Page/Shape may now exist
-        super().draw(cnv, off_x, off_y, ID, **kwargs)  # unit-based props
-        is_cards = kwargs.get("is_cards", False)
+    def get_geometry(self):
+        """Calculate geometric settings of a Hexagon."""
         # ---- calculate half_flat & half_side
         if self.height and self.use_height:
             side = self._u.height / math.sqrt(3)
@@ -1842,12 +1835,25 @@ class HexShape(BaseShape):
                 "No value for side or height or diameter or radius supplied for hexagon.",
                 True,
             )
-
         half_side = side / 2.0
         height_flat = 2 * half_flat
         diameter = 2.0 * side
         radius = side
         z_fraction = (diameter - side) / 2.0
+        return HexGeometry(
+            radius, diameter, side, half_side, half_flat, height_flat, z_fraction)
+
+    def draw(self, cnv=None, off_x=0, off_y=0, ID=None, **kwargs):
+        """Draw a hexagon on a given canvas."""
+        kwargs = self.kwargs | kwargs
+        # tools.feedback(f'*** draw hex: {off_x=} {off_y=} {ID=}')
+        # tools.feedback(f'*** draw hex: {self.x=} {self.y=} {self.cx=} {self.cy=}')
+        # tools.feedback(f'*** draw hex: {self.row=} {self.col=}')
+        # tools.feedback(f' @@@ Hexg.draw {kwargs=}')
+        cnv = cnv if cnv else globals.canvas  # a new Page/Shape may now exist
+        super().draw(cnv, off_x, off_y, ID, **kwargs)  # unit-based props
+        is_cards = kwargs.get("is_cards", False)
+        geo = self.get_geometry()
 
         # ---- POINTY^
         if self.orientation.lower() in ["p", "pointy"]:
@@ -1862,12 +1868,12 @@ class HexShape(BaseShape):
             # ---- ^ draw pointy by row/col
             if self.row is not None and self.col is not None and is_cards:
                 x = (
-                    self.col * (height_flat + self._u.spacing_x)
+                    self.col * (geo.height_flat + self._u.spacing_x)
                     + self._o.delta_x
                     + self._u.offset_x
                 )
                 y = (
-                    self.row * (diameter + self._u.spacing_y)
+                    self.row * (geo.diameter + self._u.spacing_y)
                     + self._o.delta_y
                     + self._u.offset_y
                 )  # do NOT add half_flat
@@ -1875,61 +1881,61 @@ class HexShape(BaseShape):
                 if self.hex_offset in ["o", "O", "odd"]:
                     # TODO => calculate!
                     # downshift applies from first even row - NOT the very first one!
-                    downshift = diameter - z_fraction if self.row >= 1 else 0
+                    downshift = geo.diameter - geo.z_fraction if self.row >= 1 else 0
                     downshift = downshift * self.row if self.row >= 2 else downshift
                     y = (
-                        self.row * (diameter + side)
+                        self.row * (geo.diameter + geo.side)
                         - downshift
                         + self._u.y
                         + self._o.delta_y
                     )
                     if (self.row + 1) & 1:  # is odd row; row are 0-base numbered!
                         x = (
-                            self.col * height_flat
-                            + half_flat
+                            self.col * geo.height_flat
+                            + geo.half_flat
                             + self._u.x
                             + self._o.delta_x
                         )
                     else:  # even row
-                        x = self.col * height_flat + self._u.x + self._o.delta_x
+                        x = self.col * geo.height_flat + self._u.x + self._o.delta_x
                 else:  # self.hex_offset in ['e', 'E', 'even']
                     # downshift applies from first even row - NOT the very first one!
-                    downshift = diameter - z_fraction if self.row >= 1 else 0
+                    downshift = geo.diameter - geo.z_fraction if self.row >= 1 else 0
                     downshift = downshift * self.row if self.row >= 2 else downshift
                     y = (
-                        self.row * (diameter + side)
+                        self.row * (geo.diameter + geo.side)
                         - downshift
                         + self._u.y
                         + self._o.delta_y
                     )
                     if (self.row + 1) & 1:  # is odd row; row are 0-base numbered!
-                        x = self.col * height_flat + self._u.x + self._o.delta_x
+                        x = self.col * geo.height_flat + self._u.x + self._o.delta_x
                     else:  # even row
                         x = (
-                            self.col * height_flat
-                            + half_flat
+                            self.col * geo.height_flat
+                            + geo.half_flat
                             + self._u.x
                             + self._o.delta_x
                         )
             # ----  ^ set hex centre relative to x,y
-            self.x_d = x + half_flat
-            self.y_d = y + side
+            self.x_d = x + geo.half_flat
+            self.y_d = y + geo.side
             # ---- ^ recalculate hex centre
             if self.use_abs_c:
                 # create x_d, y_d as the unit-formatted hex centre
                 self.x_d = self._abs_cx
                 self.y_d = self._abs_cy
                 # recalculate start x,y
-                x = self.x_d - half_flat
-                y = self.y_d - half_side - side / 2.0
+                x = self.x_d - geo.half_flat
+                y = self.y_d - geo.half_side - geo.side / 2.0
             elif self.cx is not None and self.cy is not None:
                 # cx,cy are centre; create x_d, y_d as the unit-formatted hex centre
                 self.x_d = self._u.cx + self._o.delta_y
                 self.y_d = self._u.cy + self._o.delta_x
                 # recalculate start x,y
-                x = self.x_d - half_flat
-                y = self.y_d - half_side - side / 2.0
-            # tools.feedback(f"*** P^: {x=} {y=} {self.x_d=} {self.y_d=} {half_flat=} {side=}")
+                x = self.x_d - geo.half_flat
+                y = self.y_d - geo.half_side - geo.side / 2.0
+            # tools.feedback(f"*** P^: {x=} {y=}{self.x_d=} {self.y_d=} {geo=} ")
 
         # ---- FLAT~
         else:
@@ -1940,57 +1946,57 @@ class HexShape(BaseShape):
             # x and y are at the bottom-left corner of the box around the hex
             x = self._u.x + self._o.delta_x
             y = self._u.y + self._o.delta_y
-            # tools.feedback(f"{x=} {y=} {half_flat=} {side=} {self.row=} {self.col=}")
+            # tools.feedback(f""*** P~: {x=} {y=} {self.row=} {self.col=} {geo=} ")
             # ---- ~ draw flat by row/col
             if self.row is not None and self.col is not None and is_cards:
-                # x = self.col * 2.0 * side + self._o.delta_x
+                # x = self.col * 2.0 * geo.side + self._o.delta_x
                 # if self.row & 1:
-                #     x = x + side
-                # y = self.row * 2.0 * half_flat + self._o.delta_y  # do NOT add half_flat
+                #     x = x + geo.side
+                # y = self.row * 2.0 * geo.half_flat + self._o.delta_y  # do NOT add half_flat
                 x = (
-                    self.col * 2.0 * (side + self._u.spacing_x)
+                    self.col * 2.0 * (geo.side + self._u.spacing_x)
                     + self._o.delta_x
                     + self._u.offset_x
                 )
                 if self.row & 1:
-                    x = x + side + self._u.spacing_x
+                    x = x + geo.side + self._u.spacing_x
                 y = (
-                    self.row * 2.0 * (half_flat + self._u.spacing_y)
+                    self.row * 2.0 * (geo.half_flat + self._u.spacing_y)
                     + self._o.delta_y
                     + self._u.offset_y
                 )  # do NOT add half_flat
             elif self.row is not None and self.col is not None:
                 if self.hex_offset in ["o", "O", "odd"]:
-                    x = self.col * (half_side + side) + self._u.x + self._o.delta_x
-                    y = self.row * half_flat * 2.0 + self._u.y + self._o.delta_y
+                    x = self.col * (geo.half_side + geo.side) + self._u.x + self._o.delta_x
+                    y = self.row * geo.half_flat * 2.0 + self._u.y + self._o.delta_y
                     if (self.col + 1) & 1:  # is odd
-                        y = y + half_flat
+                        y = y + geo.half_flat
                 else:  # self.hex_offset in ['e', 'E', 'even']
-                    x = self.col * (half_side + side) + self._u.x + self._o.delta_x
-                    y = self.row * half_flat * 2.0 + self._u.y + self._o.delta_y
+                    x = self.col * (geo.half_side + geo.side) + self._u.x + self._o.delta_x
+                    y = self.row * geo.half_flat * 2.0 + self._u.y + self._o.delta_y
                     if (self.col + 1) & 1:  # is odd
                         pass
                     else:
-                        y = y + half_flat
+                        y = y + geo.half_flat
             # ----  ~ set hex centre relative to x,y
-            self.x_d = x + side
-            self.y_d = y + half_flat
+            self.x_d = x + geo.side
+            self.y_d = y + geo.half_flat
             # ----  ~ recalculate centre if preset
             if self.use_abs_c:
                 # create x_d, y_d as the unit-formatted hex centre
                 self.x_d = self._abs_cx
                 self.y_d = self._abs_cy
                 # recalculate start x,y
-                x = self.x_d - half_side - side / 2.0
-                y = self.y_d - half_flat
+                x = self.x_d - geo.half_side - geo.side / 2.0
+                y = self.y_d - geo.half_flat
             elif self.cx is not None and self.cy is not None:
                 # cx,cy are centre; create x_d, y_d as the unit-formatted hex centre
                 self.x_d = self._u.cx + self._o.delta_x
                 self.y_d = self._u.cy + self._o.delta_y
                 # recalculate start x,y
-                x = self.x_d - half_side - side / 2.0
-                y = self.y_d - half_flat
-            # tools.feedback(f"*** F~: {x=} {y=} {self.x_d=} {self.y_d=} {half_flat=} {side=}")
+                x = self.x_d - geo.half_side - geo.side / 2.0
+                y = self.y_d - geo.half_flat
+            # tools.feedback(f"*** F~: {x=} {y=} {self.x_d=} {self.y_d=} {geo=}")
 
         # ---- calculate area
         self.area = self.calculate_area()
@@ -1998,22 +2004,22 @@ class HexShape(BaseShape):
         # ---- calculate vertical hexagon (clockwise)
         if self.orientation.lower() in ["p", "pointy"]:
             self.vertexes = [  # clockwise from bottom-left; relative to centre
-                muPoint(x, y + z_fraction),
-                muPoint(x, y + z_fraction + side),
-                muPoint(x + half_flat, y + diameter),
-                muPoint(x + height_flat, y + z_fraction + side),
-                muPoint(x + height_flat, y + z_fraction),
-                muPoint(x + half_flat, y),
+                muPoint(x, y + geo.z_fraction),
+                muPoint(x, y + geo.z_fraction + geo.side),
+                muPoint(x + geo.half_flat, y + geo.diameter),
+                muPoint(x + geo.height_flat, y + geo.z_fraction + geo.side),
+                muPoint(x + geo.height_flat, y + geo.z_fraction),
+                muPoint(x + geo.half_flat, y),
             ]
         # ---- calculate horizontal hexagon (clockwise)
         else:  # self.orientation.lower() in ['f',  'flat']:
             self.vertexes = [  # clockwise from left; relative to centre
-                muPoint(x, y + half_flat),
-                muPoint(x + z_fraction, y + height_flat),
-                muPoint(x + z_fraction + side, y + height_flat),
-                muPoint(x + diameter, y + half_flat),
-                muPoint(x + z_fraction + side, y),
-                muPoint(x + z_fraction, y),
+                muPoint(x, y + geo.half_flat),
+                muPoint(x + geo.z_fraction, y + geo.height_flat),
+                muPoint(x + geo.z_fraction + geo.side, y + geo.height_flat),
+                muPoint(x + geo.diameter, y + geo.half_flat),
+                muPoint(x + geo.z_fraction + geo.side, y),
+                muPoint(x + geo.z_fraction, y),
             ]
 
         # ---- remove rotation
@@ -2047,6 +2053,8 @@ class HexShape(BaseShape):
             self.set_canvas_props(cnv=cnv, index=ID, **kwargs)
         # ---- draw normal hexagon
         else:
+            kwargs["fill"] = kwargs.get("fill", self.fill)
+            kwargs["stroke"] = kwargs.get("stroke", self.stroke)
             if self.draw_polyline_props(cnv, self.vertexes, **kwargs):
                 kwargs["closed"] = True
                 self.set_canvas_props(cnv=cnv, index=ID, **kwargs)
@@ -2070,10 +2078,10 @@ class HexShape(BaseShape):
         if self.hatch_count:
             if not self.hatch_count & 1:
                 tools.feedback("Hatch must be an odd number for a Hexagon", True)
-            self.draw_hatch(cnv, ID, side, self.vertexes, self.hatch_count)
+            self.draw_hatch(cnv, ID, geo.side, self.vertexes, self.hatch_count)
         # ---- draw links
         if self.links:
-            self.draw_links(cnv, ID, side, self.vertexes, self.links)
+            self.draw_links(cnv, ID, geo.side, self.vertexes, self.links)
         # ---- draw radii
         if self.radii:
             self.draw_radii(cnv, ID, Point(self.x_d, self.y_d), self.vertexes)
@@ -2098,14 +2106,14 @@ class HexShape(BaseShape):
         self.draw_dot(cnv, self.x_d, self.y_d)
         # ---- text
         if self.orientation.lower() in ["p", "pointy"]:
-            offset = side  # == radius
+            offset = geo.side  # == radius
         else:
-            offset = half_flat
+            offset = geo.half_flat
         self.draw_heading(cnv, ID, self.x_d, self.y_d - offset, **kwargs)
         self.draw_label(cnv, ID, self.x_d, self.y_d, **kwargs)
         self.draw_title(cnv, ID, self.x_d, self.y_d + offset, **kwargs)
         # ----  numbering
-        self.set_coord(cnv, self.x_d, self.y_d, half_flat)
+        self.set_coord(cnv, self.x_d, self.y_d, geo.half_flat)
         # ---- set grid property
         self.grid = GridShape(label=self.coord_text, x=self.x_d, y=self.y_d, shape=self)
 
@@ -2146,7 +2154,7 @@ class LineShape(BaseShape):
         if self.col is not None and self.col >= 0:
             x = x + self.col * self._u.width
             x_1 = x_1 + self.col * self._u.width  # - self._u.margin_left
-        # tools.feedback(f"{x=} {x_1=} {y=} {y_1=}")
+        # tools.feedback(f"*** Line {x=} {x_1=} {y=} {y_1=}")
         # ---- calculate line rotation
         match self.rotation_point:
             case "centre" | "center" | "c":
@@ -2420,8 +2428,6 @@ class PolygonShape(BaseShape):
         kwargs = self.kwargs | kwargs
         cnv = cnv if cnv else globals.canvas  # a new Page/Shape may now exist
         super().draw(cnv, off_x, off_y, ID, **kwargs)  # unit-based props
-        # ---- set canvas
-        self.set_canvas_props(index=ID)
         # ---- calc centre (in units)
         centre = self.get_centre()
         x, y = centre.x, centre.y
@@ -2432,14 +2438,57 @@ class PolygonShape(BaseShape):
             self.centroid = muPoint(x, y)
             kwargs["rotation"] = rotation
             kwargs["rotation_point"] = self.centroid
-        # --- handle 'orientation' (flat vs pointy)
-        _geom = self.get_geometry(rotation=rotation, is_rotated=is_rotated)
-        x, y, radius, vertices = _geom.x, _geom.y, _geom.radius, _geom.vertices
+            is_rotated = True
+        pre_geom = self.get_geometry(rotation=rotation, is_rotated=is_rotated)
+        x, y, radius, vertices = pre_geom.x, pre_geom.y, pre_geom.radius, pre_geom.vertices
+        # ---- new x/y per col/row
+        is_cards = kwargs.get("is_cards", False)
+        if self.row is not None and self.col is not None and is_cards:
+            if self.kwargs.get("grouping_cols", 1) == 1:
+                x = (
+                    self.col * (self._u.radius * 2.0 + self._u.spacing_x)
+                    + self._o.delta_x
+                    + self._u.radius
+                    + self._u.offset_x
+                )
+            else:
+                group_no = self.col // self.kwargs["grouping_cols"]
+                x = (
+                    self.col * self._u.radius * 2.0
+                    + self._u.spacing_x * group_no
+                    + self._o.delta_x
+                    + self._u.radius
+                    + self._u.offset_x
+                )
+            if self.kwargs.get("grouping_rows", 1) == 1:
+                y = (
+                    self.row * (self._u.radius * 2.0 + self._u.spacing_y)
+                    + self._o.delta_y
+                    + self._u.radius
+                    + self._u.offset_y
+                )
+            else:
+                group_no = self.row // self.kwargs["grouping_rows"]
+                y = (
+                    self.row * self._u.radius * 2.0
+                    + self._u.spacing_y * group_no
+                    + self._o.delta_y
+                    + self._u.radius
+                    + self._u.offset_y
+                )
+            self.x_c, self.y_c = x, y
+            self.bbox = BBox(
+                bl=Point(self.x_c - self._u.radius, self.y_c + self._u.radius),
+                tr=Point(self.x_c + self._u.radius, self.y_c - self._u.radius),
+            )
+        # ---- updated geom
+        _rotation = rotation or self.flatten_angle
+        vertices = geoms.polygon_vertices(self.sides, radius, Point(x, y), _rotation)
         # ---- invalid polygon?
         if not vertices or len(vertices) == 0:
             return
         # ---- draw polygon
-        # tools.feedback(f'***PolyGon {x=} {y=} {vertices=}')
+        tools.feedback(f'***Polygon {self.col=} {self.row=} {x=} {y=} {vertices=}')
         cnv.draw_polyline(vertices)
         kwargs["closed"] = True
         self.set_canvas_props(cnv=cnv, index=ID, **kwargs)
@@ -2552,7 +2601,7 @@ class QRCodeShape(BaseShape):
         # if no directory in _source, use qrcodes cache directory!
         if Path(_source).name:
             _source = os.path.join(cache_directory, _source)
-        # tools.feedback(f"QRC {self._o.delta_x=} {self._o.delta_y=}")
+        # tools.feedback(f"*** QRC {self._o.delta_x=} {self._o.delta_y=}")
         if self.use_abs_c:
             x = self._abs_cx
             y = self._abs_cy
@@ -2635,7 +2684,7 @@ class RectangleShape(BaseShape):
         if self.cx is not None and self.cy is not None:
             self.x = self.cx - self.width / 2.0
             self.y = self.cy - self.height / 2.0
-            # tools.feedback(f"INIT {self.cx=} {self.cy=} {self.x=} {self.y=}")
+            # tools.feedback(f"*** INIT {self.cx=} {self.cy=} {self.x=} {self.y=}")
         self.kwargs = kwargs
 
     def calculate_area(self) -> float:
@@ -3617,7 +3666,7 @@ class StadiumShape(BaseShape):
         if self.cx is not None and self.cy is not None:
             self.x = self.cx - self.width / 2.0
             self.y = self.cy - self.height / 2.0
-            # tools.feedback(f"INIT Old x:{x} Old y:{y} New X:{self.x} New Y:{self.y}")
+            # tools.feedback(f"*** INIT OldX:{x} OldY:{y} NewX:{self.x} NewY:{self.y}")
         self.kwargs = kwargs
 
     def draw(self, cnv=None, off_x=0, off_y=0, ID=None, **kwargs):
@@ -4034,7 +4083,7 @@ class TextShape(BaseShape):
         # ---- text string
         else:
             keys["rotation"] = self.rotation
-            # tools.feedback(f" Text PLAIN *** {x_t=} {y_t=} {_text=} {keys=}")
+            # tools.feedback(f"*** Text PLAIN {x_t=} {y_t=} {_text=} {keys=}")
             self.draw_multi_string(cnv, x_t, y_t, _text, **keys)  # use morph to rotate
 
 

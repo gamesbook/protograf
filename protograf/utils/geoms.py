@@ -26,7 +26,10 @@ Ray = namedtuple("Ray", ["x", "y", "angle"])
 PolyGeometry = namedtuple(
     "PolyGeometry", ["x", "y", "radius", "side", "half_flat", "vertices"]
 )
-
+HexGeometry = namedtuple(
+    "HexGeometry",
+    ["radius", "diameter", "side", "half_side", "half_flat", "height_flat", "z_fraction"]
+)
 
 @dataclass
 class BBox:

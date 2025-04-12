@@ -67,7 +67,7 @@ class GridShape(BaseShape):
                 (self.page_width - self.margin_left - self.margin_right)
                 / self.points_to_value(width)
             )
-        # tools.feedback(f'*** {self.rows=} {self.cols=}')
+        # tools.feedback(f'+++ {self.rows=} {self.cols=}')
         y_cols, x_cols = [], []
         for y_col in range(0, self.rows + 1):
             y_cols.append(y + y_col * height)
@@ -154,7 +154,7 @@ class SequenceShape(BaseShape):
     """
 
     def __init__(self, _object=None, canvas=None, **kwargs):
-        # tools.feedback(f'*** SequenceShape {_object=} {canvas=} {kwargs=}')
+        # tools.feedback(f'+++ SequenceShape {_object=} {canvas=} {kwargs=}')
         super(SequenceShape, self).__init__(_object=_object, canvas=canvas, **kwargs)
         self.kwargs = kwargs
         self._objects = kwargs.get(
@@ -237,7 +237,6 @@ class SequenceShape(BaseShape):
                     " number, roman, excel or letter!",
                     True,
                 )
-            # tools.feedback(f'{self.setting_list=}')
         except Exception as err:
             log.warning(err)
             tools.feedback(
@@ -256,8 +255,8 @@ class SequenceShape(BaseShape):
             _ID = ID if ID is not None else self.shape_id
             _locale = Locale(sequence=item)
             kwargs["locale"] = _locale._asdict()
-            # tools.feedback(f'*   @Seqnc@ {self.interval_x=}, {self.interval_y=}')
-            # tools.feedback(f'*   @Seqnc@ {kwargs["locale"]}')
+            # tools.feedback(f'+++ @Seqnc@ {self.interval_x=}, {self.interval_y=}')
+            # tools.feedback(f'+++ @Seqnc@ {kwargs["locale"]}')
             off_x = _off_x + key * self.interval_x
             off_y = _off_y + key * self.interval_y
             flat_elements = tools.flatten(self._objects)
@@ -348,7 +347,7 @@ class RepeatShape(BaseShape):
         cnv = cnv if cnv else self.canvas
         super().draw(cnv, off_x, off_y, ID, **kwargs)  # unit-based props
         _off_x, _off_y = off_x or self.offset_x or 0, off_y or self.offset_y or 0
-        # print(f'*** {_off_x=}, {_off_y=}')
+        # print(f'+++ {_off_x=}, {_off_y=}')
 
         for col in range(self.cols):
             for row in range(self.rows):
@@ -623,7 +622,7 @@ class RectangularLocations(VirtualLocations):
         col, row, count = col_start, row_start, 0
         max_outer = 2 * self.rows + (self.cols - 2) * 2
         corner = None
-        # print(f'\n*** {self.start=} {self.layout_size=} {max_outer=} {self.stop=} {clockwise=}')
+        # print(f'\n+++ {self.start=} {self.layout_size=} {max_outer=} {self.stop=} {clockwise=}')
         # ---- triangular layout
         if self.side:
             self.interval_x = self.side
@@ -655,12 +654,12 @@ class RectangularLocations(VirtualLocations):
                     x = x + self.row_odd
                 if self.row_even and not row & 1:
                     x = x + self.row_even
-            # print(f'*** {count=} {row=},{col=} // {x=},{y=}')
+            # print(f'+++ {count=} {row=},{col=} // {x=},{y=}')
             # ---- set next grid location
             match self.pattern.lower():
                 # ---- * snake
                 case "snake" | "snaking" | "s":
-                    # tools.feedback(f'*** {count=} {self.layout_size=} {self.stop=}')
+                    # tools.feedback(f'+++ {count=} {self.layout_size=} {self.stop=}')
                     if count > self.layout_size or (self.stop and count > self.stop):
                         return
                     yield Locale(col, row, x, y, self.set_id(col, row), count, corner)
@@ -724,7 +723,7 @@ class RectangularLocations(VirtualLocations):
                         corner = "ne"
                     yield Locale(col, row, x, y, self.set_id(col, row), count, corner)
                     # next grid location
-                    # print(f'*** {count=} {current_dir=} {row=},{col=} // {row_start=},{col_start=}')
+                    # print(f'+++ {count=} {current_dir=} {row=},{col=} // {row_start=},{col_start=}')
 
                     if row == 1 and col == 1:
                         corner = "nw"
@@ -832,7 +831,7 @@ class RectangularLocations(VirtualLocations):
 
                     x = self.x + (col - 1) * self.interval_x
                     y = self.y + (row - 1) * self.interval_y
-                    # tools.feedback(f"{x=}, {y=}, {col=}, {row=}, ")
+                    # tools.feedback(f"+++ {x=}, {y=}, {col=}, {row=}")
 
 
 class TriangularLocations(VirtualLocations):
@@ -891,7 +890,7 @@ class TriangularLocations(VirtualLocations):
                         array.append(_rows)
             case _:
                 tools.feedback(f"The facing value {self.facing} is not valid!", True)
-        # print(f'{_facing}', f'{self.cols=}',  f'{self.rows=}',array)
+        # print(f'+++ {_facing}', f'{self.cols=}',  f'{self.rows=}',array)
 
         # ---- calculate initial conditions
         col_start, row_start = 1, 1
@@ -912,7 +911,7 @@ class TriangularLocations(VirtualLocations):
         col, row, count = col_start, row_start, 0
         max_outer = 2 * self.rows + (self.cols - 2) * 2
         corner = None
-        # print(f'\n*** {self.start=} {self.layout_size=} {max_outer=} {self.stop=} {clockwise=}')
+        # print(f'\n+++ {self.start=} {self.layout_size=} {max_outer=} {self.stop=} {clockwise=}')
         # ---- set row and col interval
         match _facing:
             case "north" | "south":  # layout is row-oriented

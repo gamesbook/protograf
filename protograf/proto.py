@@ -128,6 +128,7 @@ class CardShape(BaseShape):
 
     def get_outline(self, cnv, row, col, cid, label, **kwargs):
         outline = None
+        tools.feedback(f"$$$ getoutline {row=}, {col=}, {cid=}, {label=}")
         kwargs["height"] = self.height
         kwargs["width"] = self.width
         kwargs["radius"] = self.radius
@@ -151,7 +152,9 @@ class CardShape(BaseShape):
                 outline = PolygonShape(
                     label=label, canvas=cnv, col=col, row=row, **kwargs
                 )
-                # outline.hex_height_width()
+                # outline = HexShape(
+                #     label=label, canvas=cnv, col=col, row=row, **kwargs
+                # )
             case _:
                 raise NotImplementedError(
                     f'Cannot handle card frame type: {kwargs["frame_type"]}'
@@ -172,7 +175,7 @@ class CardShape(BaseShape):
         shape_kwargs["fill"] = kwargs.get("fill", kwargs.get("bleed_fill", None))
         shape_kwargs.pop("image_list", None)  # do NOT draw linked image
         shape_kwargs.pop("image", None)  # do NOT draw linked image
-        # tools.feedback(f'$$$ draw_card SKW=> {shape_kwargs}')
+        # tools.feedback(f'$$$ draw_card {cid=} {row=} {col=} \nSKW=> {shape_kwargs}')
         outline = self.get_outline(
             cnv=cnv, row=row, col=col, cid=cid, label=label, **shape_kwargs
         )
@@ -1895,9 +1898,9 @@ def Location(grid: list, label: str, shapes: list, **kwargs):
             x = point.x + pts[0]
             y = point.y + pts[1]
             kwargs["locale"] = locale
-            # tools.feedback(f"{shape=} :: {loc.x=}, {loc.y=} // {dx=}, {dy=}")
-            # tools.feedback(f"{kwargs=}")
-            # tools.feedback(f"{label} :: {shape_name=}")
+            # tools.feedback(f"$$$ {shape=} :: {loc.x=}, {loc.y=} // {dx=}, {dy=}")
+            # tools.feedback(f"$$$ {kwargs=}")
+            # tools.feedback(f"$$$ {label} :: {shape_name=}")
             if shape_name in GRID_SHAPES_WITH_CENTRE:
                 shape.draw(_abs_cx=x, _abs_cy=y, **kwargs)
             elif shape_name in GRID_SHAPES_NO_CENTRE:
@@ -2030,10 +2033,10 @@ def LinkLine(grid: list, locations: Union[list, str], **kwargs):
             y1 = dummy.points_to_value(loc_2.y) + location_2[2]
 
             _line = line(x=x, y=y, x1=x1, y1=y1, **kwargs)
-            # tools.feedback(f"{x=}, {y=}, {x1=}, {y1=}")
+            # tools.feedback(f"$$$ {x=}, {y=}, {x1=}, {y1=}")
             delta_x = globals.margin_left
             delta_y = globals.margin_bottom
-            # tools.feedback(f"{delta_x=}, {delta_y=}")
+            # tools.feedback(f"$$$ {delta_x=}, {delta_y=}")
             _line.draw(
                 off_x=-delta_x,
                 off_y=-delta_y,

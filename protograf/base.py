@@ -341,7 +341,7 @@ class BaseCanvas:
             _kwargs = kwargs["kwargs"]
             for kwarg in _kwargs:
                 self.defaults[kwarg] = _kwargs[kwarg]
-            # print(f" *** {self.defaults=}")
+            # print(f"### {self.defaults=}")
         # ---- constants
         self.default_length = 1
         self.show_id = False
@@ -357,7 +357,7 @@ class BaseCanvas:
         self.units = self.defaults.get(
             "units", unit.cm
         )  # defaults MUST store point-equivalent
-        # print(f" *** {self.units=} \n {self.defaults=}")
+        # print(f"### {self.units=} \n {self.defaults=}")
         # ---- paper
         _paper = paper or self.defaults.get("paper", "A4")
         if isinstance(_paper, tuple) and len(_paper) == 2:
@@ -372,7 +372,7 @@ class BaseCanvas:
         # ---- paper size in units & margins
         self.page_width = self.paper[0] / self.units  # user-units e.g. cm
         self.page_height = self.paper[1] / self.units  # user-units e.g. cm
-        # print(f" *** {self.page_height=} {self.page_width=}")
+        # print(f"### {self.page_height=} {self.page_width=}")
         self.margin = self.defaults.get("margin", 1)
         self.margin_top = self.defaults.get("margin_top", self.margin)
         self.margin_bottom = self.defaults.get("margin_bottom", self.margin)
@@ -744,7 +744,7 @@ class BaseShape:
         self, _object: pymupdf.Shape = None, canvas: BaseCanvas = None, **kwargs
     ):
         self.kwargs = kwargs
-        # tools.feedback(f'*** BaseShape {_object=} {canvas=} {kwargs=}')
+        # tools.feedback(f'### BaseShape {_object=} {canvas=} {kwargs=}')
         # ---- constants
         self.default_length = 1
         self.show_id = False  # True
@@ -752,8 +752,8 @@ class BaseShape:
         self.doc_page = globals.doc_page
         self.canvas = canvas or globals.canvas  # pymupdf Shape
         base = _object or globals.base  # protograf BaseCanvas
-        # print(f" *** {self.canvas=} {cnv=} {base=}")
-        # print(f" *** {type(self.canvas)=} {type(cnv)=} {type(base=)}")
+        # print(f"### {type(self.canvas)=} {type(cnv)=} {type(base=)}")
+        # print(f"### {self.canvas=} {cnv=} {base=}")
         self.shape_id = None
         self.sequence = kwargs.get("sequence", [])  # e.g. card numbers
         self.dataset = []  # list of dict data (loaded from file)
@@ -764,7 +764,7 @@ class BaseShape:
         self.shape = kwargs.get("shape", base.shape)
         self.run_debug = kwargs.get("debug", base.run_debug)
         self.units = kwargs.get("units", base.units)
-        # print(f" *** {self.units=}")
+        # print(f"### {self.units=}")
         # ---- paper
         _paper = kwargs.get("paper", base.paper)
         if isinstance(_paper, tuple) and len(_paper) == 2:
@@ -779,7 +779,7 @@ class BaseShape:
         # ---- paper size in units
         self.page_width = self.paper[0] / self.units  # user-units e.g. cm
         self.page_height = self.paper[1] / self.units  # user-units e.g. cm
-        # print(f" *** {self.page_height=} {self.page_width=}")
+        # print(f"### {self.page_height=} {self.page_width=}")
         # ---- margins
         self.margin = self.kw_float(kwargs.get("margin", base.margin))
         self.margin_top = self.kw_float(kwargs.get("margin_top", self.margin))
@@ -910,8 +910,8 @@ class BaseShape:
         self.transform = kwargs.get("transform", base.transform)
         self.html = self.kw_bool(kwargs.get("html", base.html))
         self.css = kwargs.get("css", base.css)
-        # tools.feedback(
-        # f"BShp:{self} {kwargs.get('fill')=} {self.fill=} {kwargs.get('fill_color')=}")
+        # tools.feedback(f"### BShp:"
+        # f"{self} {kwargs.get('fill')=} {self.fill=} {kwargs.get('fill_color')=}")
         # ---- image / file
         self.source = kwargs.get("source", base.source)  # file or http://
         self.sliced = ""
@@ -1177,7 +1177,6 @@ class BaseShape:
                     attr not in ["canvas", "common", "stylesheet", "kwargs"]
                     and attr[0] != "_"
                 ):
-                    # tools.feedback(f'{attr=}')
                     common_attr = getattr(self.common, attr)
                     base_attr = getattr(base, attr)
                     if common_attr != base_attr:
@@ -1286,7 +1285,11 @@ class BaseShape:
 
         Args:
             vertexes (list): Point tuples
+
+        Notes:
+            Ensure that **kwargs default to `self` values!
         """
+        # print(f'### dpp {kwargs.get("fill")=} {kwargs.get("stroke")=} {vertexes=}')
         if kwargs.get("stroke") or kwargs.get("fill"):
             cnv.draw_polyline(vertexes)
             return True
@@ -1331,7 +1334,7 @@ class BaseShape:
         #   stroke_opacity=1, fill_opacity=1, oc=0
 
         # ---- set props
-        # print(f'$$$ SetCnvProps: {kwargs.keys()} \n {kwargs.get("fill", "?")=}')
+        # print(f'### SetCnvProps: {kwargs.keys()} \n {kwargs.get("fill", "?")=}')
         cnv = cnv if cnv else globals.canvas
         if "fill" in kwargs.keys():
             fill = kwargs.get("fill", None)  # reserve None for 'no fill at all'
@@ -1341,7 +1344,7 @@ class BaseShape:
             stroke = kwargs.get("stroke", None)  # reserve None for 'no stroke at all'
         else:
             stroke = self.stroke
-        # print(f'SCP $$$ {kwargs.get("fill")=} {fill=} {kwargs.get("stroke")=} {stroke=}')
+        # print(f'### SCP {kwargs.get("fill")=} {fill=} {kwargs.get("stroke")=} {stroke=}')
         transparency = kwargs.get("transparency", None)
         stroke_width = kwargs.get("stroke_width", None)
         stroke_cap = kwargs.get("stroke_cap", None)
@@ -1376,7 +1379,7 @@ class BaseShape:
             dashes = f"[{dlength} {dspaced}] {doffset}"
         else:
             dashes = None
-        # print(f"SCP $$$ {_dotted =} {_dashed=} {dashes=}")
+        # print(f"### SCP{_dotted =} {_dashed=} {dashes=}")
         # ---- check rotation
         morph = None
         if _rotation_point and not isinstance(_rotation_point, (geoms.Point, muPoint)):
@@ -1387,7 +1390,7 @@ class BaseShape:
             mtrx = Matrix(1, 1)
             mtrx.prerotate(_rotation)
             morph = (_rotation, mtrx)
-            # print(f'SCP $$$ {morph=}')
+            # print(f'### SCP {morph=}')
         # ---- get color tuples
         _color = get_color(stroke)
         _fill = get_color(fill)
@@ -1395,7 +1398,7 @@ class BaseShape:
         _width = stroke_width or self.stroke_width
         if _color is None and _fill is None:
             tools.feedback("Cannot have both fill and stroke set to None!", True)
-        # print(f'SCP $$$ {stroke=} {fill=} {_color=} {_fill=}')  # None OR fraction RGB
+        # print(f'### SCP {stroke=} {fill=} {_color=} {_fill=}')  # None OR fraction RGB
         # ---- set/apply properties
         cnv.finish(
             width=_width,
@@ -1547,7 +1550,7 @@ class BaseShape:
         self.use_abs_c = (
             True if self._abs_cx is not None and self._abs_cy is not None else False
         )
-        # tools.feedback(f'*** draw baseshape: {self._abs_x=} {self._abs_y=} {self._abs_cx=} {self._abs_cy=}')
+        # tools.feedback(f'### draw baseshape: {self._abs_x=} {self._abs_y=} {self._abs_cx=} {self._abs_cy=}')
 
     def check_settings(self) -> tuple:
         """Validate that the user-supplied parameters for choices are correct"""
@@ -2175,7 +2178,7 @@ class BaseShape:
         # ---- align and font
         align = align or self.align
         mvy = copy.copy(ym)
-        # tools.feedback(f"*** {string=} {rotation=}")
+        # tools.feedback(f"### {string=} {rotation=}")
         # ---- text properties
         keys = {}
         keys["fontsize"] = kwargs.get("font_size", self.font_size)
@@ -2208,7 +2211,7 @@ class BaseShape:
         # page.insert_font(fontname="myfont", fontbuffer=font.buffer)
 
         # ---- draw
-        # print(f'$$$ multi_string {xm=} {ym=} {string=} {self.align=}')
+        # print(f'### multi_string {xm=} {ym=} {string=} {self.align=}')
         point = pymupdf.Point(xm, ym)
         if self.align:
             font = pymupdf.Font(keys["fontname"])  # built-in
@@ -2263,13 +2266,11 @@ class BaseShape:
             kwargs["stroke"] = self.heading_stroke
             kwargs["font_size"] = self.heading_size
             center_point = kwargs.get("rotation_point", None)
-            # print(f"{center_point=} {x=} {y - y_off}")
             if center_point and _rotation:
                 point_to_rotate = muPoint(x, y - y_off)
                 rpt = geoms.rotate_point_around_point(
                     point_to_rotate, center_point, _rotation
                 )
-                # print("rotated_point:", rpt)
                 # self.dot = 0.05; self.draw_dot(canvas, rpt.x, rpt.y)
                 self.draw_multi_string(
                     canvas,
@@ -2317,7 +2318,6 @@ class BaseShape:
                 rpt = geoms.rotate_point_around_point(
                     point_to_rotate, center_point, _rotation
                 )
-                # print("rotated_point:", rpt)
                 # self.dot = 0.05; self.draw_dot(canvas, rpt.x, rpt.y)
                 self.draw_multi_string(
                     canvas,
@@ -2359,7 +2359,6 @@ class BaseShape:
                 rpt = geoms.rotate_point_around_point(
                     point_to_rotate, center_point, _rotation
                 )
-                # print("rotated_point:", rpt)
                 # self.dot = 0.05; self.draw_dot(canvas, rpt.x, rpt.y)
                 self.draw_multi_string(
                     canvas,
@@ -2468,7 +2467,7 @@ class BaseShape:
             * Directions of vertex indices in left- and right-nodes must be the same
         """
         delta = side / line_count
-        # tools.feedback(f'{side=} {line_count=} {delta=}')
+        # tools.feedback(f'### {side=} {line_count=} {delta=}')
         for number in range(0, line_count + 1):
             left_pt = geoms.point_on_line(
                 vertices[left_nodes[0]], vertices[left_nodes[1]], delta * number
@@ -2544,7 +2543,7 @@ class BaseShape:
                 try:
                     custom_value = value.render(record)
                     return custom_value
-                    # print('  +++', f'{ID=} {key=} {custom_value=}', '=>', getattr(new_element, key))
+                    # print('###', f'{ID=} {key=} {custom_value=}', '=>', getattr(new_element, key))
                 except jinja2.exceptions.UndefinedError as err:
                     tools.feedback(
                         f"Unable to process data with this template ({err})", True
@@ -2558,14 +2557,14 @@ class BaseShape:
                 lookup_value = record[value.column]
                 custom_value = value.lookups.get(lookup_value, None)
                 return custom_value
-                # print('+++ LookupType', f'{ID=} {key=} {custom_value=}', '=>', getattr(new_element, key))
+                # print('### LookupType', f'{ID=} {key=} {custom_value=}', '=>', getattr(new_element, key))
             else:
                 raise NotImplementedError(f"Cannot handle value of type: {type(value)}")
 
             return None
 
         new_element = None
-        # print('+++ ShapeType ::', type(the_element))
+        # print('### ShapeType ::', type(the_element))
         if isinstance(the_element, BaseShape):
             new_element = copy.copy(the_element)
             keys = vars(the_element).keys()
