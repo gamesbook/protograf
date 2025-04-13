@@ -1351,7 +1351,7 @@ class BaseShape:
         if _transparency:
             _transparency = self.kw_float(_transparency, "transparency")
             if _transparency >= 1:
-                _transparency = _transparency / 100.
+                _transparency = _transparency / 100.0
             opacity = 1 - _transparency
         stroke_width = kwargs.get("stroke_width", None)
         stroke_cap = kwargs.get("stroke_cap", None)

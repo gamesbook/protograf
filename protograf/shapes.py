@@ -3284,9 +3284,7 @@ class RectangleShape(BaseShape):
             self.set_canvas_props(cnv=cnv, index=ID, **kwargs)
         else:
             # tools.feedback(f'*** RECT  normal')   )
-            cnv.draw_rect(
-                (x, y, x + self._u.width, y + self._u.height), radius=radius
-            )
+            cnv.draw_rect((x, y, x + self._u.width, y + self._u.height), radius=radius)
             self.set_canvas_props(cnv=cnv, index=ID, **kwargs)
             # ---- * borders (override)
             if self.borders:
@@ -3303,7 +3301,7 @@ class RectangleShape(BaseShape):
 
         # ---- fill pattern?
         if self.pattern:
-            raise NotImplementedError('Pattern is not yet supported!')
+            raise NotImplementedError("Pattern is not yet supported!")
             # TODO - convert to PyMuPDF
             img, is_svg, is_dir = self.load_image(self.pattern)
             if img:
