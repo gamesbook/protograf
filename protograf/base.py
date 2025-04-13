@@ -351,6 +351,7 @@ class BaseCanvas:
         self.sequence = self.defaults.get("sequence", [])
         self.dataset = []
         self.members = []  # card IDs, of which current card is a member
+        self.bbox = None
         self._objects = None
         self.kwargs = kwargs
         self.run_debug = False
@@ -759,6 +760,7 @@ class BaseShape:
         self.dataset = []  # list of dict data (loaded from file)
         self.members = []  # card IDs, of which current card is a member
         self._objects = None  # used by e.g. SequenceShape
+        self.bbox = None
         # ---- general
         self.common = kwargs.get("common", None)
         self.shape = kwargs.get("shape", base.shape)
@@ -1177,6 +1179,7 @@ class BaseShape:
                     attr not in ["canvas", "common", "stylesheet", "kwargs"]
                     and attr[0] != "_"
                 ):
+                    # print(f'### Common {attr=} {base=} {type(base)=}')
                     common_attr = getattr(self.common, attr)
                     base_attr = getattr(base, attr)
                     if common_attr != base_attr:
@@ -1865,6 +1868,7 @@ class BaseShape:
                 width_height:
                     the (width, height) of the output frame for the image
             """
+            # tools.feedback(f"### {img_path=} {slice_portion=}")
             if not slice_portion:
                 return None
             try:
@@ -1919,6 +1923,7 @@ class BaseShape:
 
         def save_image_from_url(url: str):
             """Download image from network and save locally if not present."""
+            # tools.feedback(f"### image save: {url=} ")
             loc = urlparse(url)
             filename = loc.path.split("/")[-1]
             image_local = os.path.join(cache_directory, filename)
@@ -1978,27 +1983,32 @@ class BaseShape:
             )
             if self.run_debug:
                 pdf_page.draw_rect(rct, color=get_color(DEBUG_COLOR))
-            return True
+            return image_local
 
         img = False
         is_directory = False
 
-        if not image_location:  # nothing to see here... move along
+        if not image_location:  # not the droids you're looking for... move along
             return img, None
         base_image_location = image_location
 
+        if cache_directory:
+            if tools.is_url_valid(image_location):
+                image_local = save_image_from_url(image_location)
         # ---- check local files
         if not tools.is_url_valid(image_location):
             # relative paths
             if not os.path.isabs(image_location):
                 filepath = tools.script_path()
-                image_location = os.path.join(filepath, image_location)
+                image_local = os.path.join(filepath, image_location)
+            else:
+                image_local = image_location
             # no filename
-            is_directory = os.path.isdir(image_location)
+            is_directory = os.path.isdir(image_local)
             if is_directory:
                 return img, True
             # check image exists
-            if not os.path.exists(image_location):
+            if not os.path.exists(image_local):
                 tools.feedback(
                     f'Unable to find or open image "{image_location}"', False, True
                 )
@@ -2021,12 +2031,12 @@ class BaseShape:
         try:
             if sliced:
                 sliced_filename = slice_image(
-                    pathlib.Path(image_location), sliced, width_height
+                    pathlib.Path(image_local), sliced, width_height
                 )
                 if sliced_filename:
                     img = image_render(sliced_filename)
             else:
-                img = image_render(image_location)
+                img = image_render(image_local)
             return img, is_directory
         except IOError as err:
             tools.feedback(
@@ -2202,6 +2212,9 @@ class BaseShape:
         else:
             keys["fill"] = keys["color"]
 
+        _lineheight = kwargs.get("line_height", None)
+        keys["lineheight"] = self.kw_float(_lineheight, "line_height")
+
         # keys['stroke_opacity'] = self.show_stroke or 1
         # keys['fill_opacity'] = self.show_fill or 1
 
@@ -2221,7 +2234,7 @@ class BaseShape:
         # page.insert_font(fontname="myfont", fontbuffer=font.buffer)
 
         # ---- draw
-        # print(f'### multi_string {xm=} {ym=} {string=} {self.align=}')
+        # print(f'### multi_string {xm=} {ym=} {string=} {keys}')
         point = pymupdf.Point(xm, ym)
         if self.align:
             font = pymupdf.Font(keys["fontname"])  # built-in
@@ -2568,6 +2581,9 @@ class BaseShape:
                 custom_value = value.lookups.get(lookup_value, None)
                 return custom_value
                 # print('### LookupType', f'{ID=} {key=} {custom_value=}', '=>', getattr(new_element, key))
+            elif isinstance(value, pathlib.PosixPath):
+                # print(f'### HCV {ID=} {key=} {value=}')
+                return None
             else:
                 raise NotImplementedError(f"Cannot handle value of type: {type(value)}")
 

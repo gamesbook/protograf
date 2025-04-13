@@ -4041,6 +4041,8 @@ class TextShape(BaseShape):
                 keys["color"] = get_color(self.stroke)
                 # keys["fill"] = get_color(self.fill)
                 keys["align"] = self.to_alignment()
+                _lineheight = kwargs.get("line_height", None)
+                keys["lineheight"] = self.kw_float(_lineheight, "line_height")
                 # keys['stroke_opacity'] = self.show_stroke
                 # keys['fill_opacity'] = self.show_fill
 
@@ -4056,7 +4058,6 @@ class TextShape(BaseShape):
                 # keys['overlay'] = True
                 # keys['expandtabs'] = 8
                 # keys['charwidths'] = None
-                # draw
                 # tools.feedback(f'*** Text WRAP {keys=} \n=> {rect=} _text:{_text}')
                 current_page.insert_textbox(rect, _text, **keys)
             except ValueError as err:
