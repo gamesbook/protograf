@@ -15,8 +15,8 @@ Create(filename="underwater_cities.pdf", margin=0.0, paper="A2-l")
 # Icons
 money = rectangle(
     fill_stroke="gold", height=1.2, width=0.8, rounding=0.1,
-    hatch_count=5, hatch='w', hatch_stroke="black",
-    label_stroke="black", label_size=18)
+    hatch_count=5, hatch='w', hatch_stroke="dimgray",
+    label_stroke="black", label_size=16)
 pipe = image("images/pipe.png", width=2, height=0.75)
 card_icon = rectangle(fill="white", label_stroke="black", label_size=32)
 card_icon_small = rectangle(common=card_icon, height=1.2, width=0.8, rounding=0.1)
@@ -28,13 +28,13 @@ deepsea = "#17366F"
 Rectangle(x=0, y=0, width=59.4, height=42, fill=deepsea)
 
 # World Map (#B6DCF4)
-Image("images/world_map.png", x=7, y=6, width=52.4, height=32)
+Image("images/world_map.png", x=7, y=4, width=52.4, height=32)
 
 # Grid
 Grid(x=0.25, y=0.4, side=1.25, stroke="#587CBC", fill=None)
 
 # Partial blur
-# Rectangle(x=0, y=0, width=59.4, height=42, fill="white", transparency=20)
+Rectangle(x=0, y=0, width=59.4, height=42, fill="white", transparency=80)
 
 # Outline
 drect = Common(fill=None, stroke="gray", dashed=[0.2, 0.1], rounding=0.5, stroke_width=2)
@@ -51,7 +51,7 @@ action_red_dark = "#9D2622"
 red_dark = Rectangle(y=4.5, x=0, width=2.5, height=5.5, fill_stroke=action_red_dark)
 Repeat(red_dark, rows=5, cols=1, interval=7)
 
-lock_red = image('images/padlock-open-red.png', x=1.5, y=7, width=1.5, height=1.5, rotation=270)
+lock_red = image('images/padlock-open-red.png', x=0.75, y=7, width=1.5, height=1.5, rotation=270)
 Repeat(lock_red, rows=5, cols=1, interval=7)
 
 Rectangle(common=card_icon_med, x=4, y=6.5, label="A", rotation=270)
@@ -71,7 +71,7 @@ Repeat(ong_dark, cols=5, rows=1, interval=7)
 lock_ong = image('images/padlock-open-orange.png', x=9, y=0.5, width=1.5, height=1.5, rotation=180)
 Repeat(lock_ong, rows=1, cols=5, interval=7)
 
-# Rectangle(common=card_icon_large, x=24, y=37.5, label="A", rotation=180)
+Rectangle(common=card_icon_med, x=24, y=2.7, label="A", rotation=180)
 
 # Action Cards Slots: Green
 grect = rectangle(common=drect, y=35.75, x=6.75, width=6., height=6.75)
@@ -82,20 +82,20 @@ action_grn_rect = rectangle(y=36, x=7, width=5.5, height=6.5, fill_stroke=action
 Repeat(action_grn_rect, cols=5, rows=1, interval_x=7)
 
 action_grn_dark = "#005D33"
-grn_dark = Rectangle(y=40, x=7, width=5.5, height=2.5, fill_stroke=action_grn_dark)
+grn_dark = Rectangle(y=39.5, x=7, width=5.5, height=2.5, fill_stroke=action_grn_dark)
 Repeat(grn_dark, cols=5, rows=1, interval_x=7)
 
-lock_grn = image('images/padlock-open-green.png', x=9, y=39.5, width=1.5, height=1.5)
+lock_grn = image('images/padlock-open-green.png', x=9, y=40, width=1.5, height=1.5)
 Repeat(lock_grn, rows=1, cols=5, interval_x=7)
 
-Rectangle(common=card_icon_large, x=36, y=37, label="A")
-Image(common=pipe, x=28.5, y=38)
+Rectangle(common=card_icon_large, x=36, y=36.5, label="A")
+Image(common=pipe, x=28.5, y=37)
 
 # Special Cards
 special_grn = "#4A8D86"
 special_grn_design = Common(
     width=5.5, height=8.5, fill_stroke=special_grn, rounding=0.5,
-    transparency=80, label="S", label_size=164, label_stroke="#69A8B9")
+    transparency=20, label="S", label_size=164, label_stroke="#69A8B9")
 Repeat(
    rectangle(common=special_grn_design, y=14, x=34.5),
    cols=3, rows=2, interval_x=7, interval_y=10)
@@ -103,7 +103,7 @@ Rectangle(common=special_grn_design, y=19.5, x=27.5)
 
 # Government Cards
 gov_blue = "#666D8A"
-gov_blue_rect = rectangle(x=11, y=9.5, width=5.5, height=8.5, fill_stroke=gov_blue, rounding=0.5, transparency=90)
+gov_blue_rect = rectangle(x=11, y=9.5, width=5.5, height=8.5, fill_stroke=gov_blue, rounding=0.5, transparency=10)
 Repeat(gov_blue_rect, cols=3, rows=1, interval=7)
 
 # Free Action Space
@@ -117,7 +117,7 @@ Rectangle(common=money, label="2", x=23.5, y=27.5)
 Rectangle(common=card_icon_small, x=20, y=27.5)
 Rectangle(common=card_icon_small, x=22.25, y=27.25)
 Rectangle(common=card_icon_small, x=22.5, y=27.5)
-EquilateralTriangle(x=21, y=28.5, side=0.7, rotation=45)
+EquilateralTriangle(x=21, y=28.3, side=0.7, rotation=30)
 
 # Scoring Track
 score_common = Common(
@@ -173,16 +173,16 @@ Sequence(
     text(x=12.8, y=29.8, font_size=32, stroke="white", text="{{sequence}}."),
     setting=(4,1,-1,'number'),
     interval_y=-2.1)
-wreath = image('images/laurel-wreath.png', x=11.9, y=22.7, width=1.5, height=1.5)
+wreath = image('images/laurel-wreath.png', x=11.9, y=22.6, width=1.5, height=1.5)
 Repeat(wreath, rows=4, cols=1, interval_y=2.1)
 Rectangle(common=money, label="1", x=13.75, y=26.75)
 
 # Draw/Discards
 disc_rect = Common(
-    width=9.5, height=5.4,  rounding=0.5, transparency=80)
+    width=9.5, height=5.4,  rounding=0.5, transparency=20)
 Rectangle(common=disc_rect, fill_stroke="#483D8B", x=44, y=0)
 Rectangle(common=disc_rect, fill_stroke="#0275CC", x=44, y=8)
-Image('images/trash-can-blue.png', x=49, y=2.5, width=2.5, height=2.5)
+Image('images/trash-can-blue.png', x=47.5, y=1.5, width=2.5, height=2.5, rotation=270)
 
 # Game Name
 name_fill = "#4C588C"
@@ -192,9 +192,5 @@ Rectangle(common=name_rect, x=44, y=37, width=10.5, height=4)
 Rectangle(
     common=name_rect, x=44, y=36.75, width=10.5, height=1.25,
     label="PROJECT: UNDERWATER CITIES", label_size=18)
-
-# TEST
-# Rectangle(common=card_icon, x=2, y=2, height=1.7, width=1.2, rounding=0.15,
-#           fill="white", stroke="red", rotation=0, label="Z")
 
 Save()

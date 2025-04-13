@@ -1345,7 +1345,14 @@ class BaseShape:
         else:
             stroke = self.stroke
         # print(f'### SCP {kwargs.get("fill")=} {fill=} {kwargs.get("stroke")=} {stroke=}')
-        transparency = kwargs.get("transparency", None)
+        # ---- transparency / opacity
+        opacity = 1
+        _transparency = kwargs.get("transparency", self.transparency)
+        if _transparency:
+            _transparency = self.kw_float(_transparency, "transparency")
+            if _transparency >= 1:
+                _transparency = _transparency / 100.
+            opacity = 1 - _transparency
         stroke_width = kwargs.get("stroke_width", None)
         stroke_cap = kwargs.get("stroke_cap", None)
         dotted = kwargs.get("dotted", None)
@@ -1382,14 +1389,16 @@ class BaseShape:
         # print(f"### SCP{_dotted =} {_dashed=} {dashes=}")
         # ---- check rotation
         morph = None
+        # print(f'### SCP {_rotation_point=} {_rotation}')
         if _rotation_point and not isinstance(_rotation_point, (geoms.Point, muPoint)):
             tools.feedback(f'Rotation point "{_rotation_point}" is invalid', True)
         if _rotation is not None and not isinstance(_rotation, (float, int)):
             tools.feedback(f'Rotation angle "{_rotation}" is invalid', True)
+        if _rotation and _rotation_point:
             # ---- * set rotation matrix
             mtrx = Matrix(1, 1)
             mtrx.prerotate(_rotation)
-            morph = (_rotation, mtrx)
+            morph = (_rotation_point, mtrx)
             # print(f'### SCP {morph=}')
         # ---- get color tuples
         _color = get_color(stroke)
@@ -1407,10 +1416,11 @@ class BaseShape:
             lineCap=stroke_cap or 0,  # or self.stroke_cap,  # FIXME
             lineJoin=0,
             dashes=dashes,
-            fill_opacity=transparency or self.transparency,
+            fill_opacity=opacity,
             morph=morph,
             closePath=closed,
         )
+        cnv.commit()
         return None
 
         """

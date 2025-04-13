@@ -1302,7 +1302,7 @@ class EquilateralTriangleShape(BaseShape):
             kwargs["rotation"] = rotation
             kwargs["rotation_point"] = self.centroid
         # ---- draw equilateral triangle
-        # tools.feedback(f'***EqiTru {x=} {y=} {self.vertexes=}')
+        # tools.feedback(f'*** EqiTri {x=} {y=} {self.vertexes=} {kwargs=}')
         cnv.draw_polyline(self.vertexes)
         kwargs["closed"] = True
         self.set_canvas_props(cnv=cnv, index=ID, **kwargs)
@@ -2416,7 +2416,7 @@ class PolygonShape(BaseShape):
         # radius
         radius = self.get_radius()
         # calculate vertices - assumes x,y marks the centre point
-        _rotation = rotation or self.flatten_angle
+        _rotation = self.flatten_angle
         vertices = geoms.polygon_vertices(self.sides, radius, Point(x, y), _rotation)
         # for p in vertices: print(f'*G* {p.x / 28.3465}, {p.y / 28.3465}')
         return PolyGeometry(x, y, radius, side, half_flat, vertices)
@@ -2431,7 +2431,7 @@ class PolygonShape(BaseShape):
             y = self._u.y + self._o.delta_y
         radius = self.get_radius()
         # calculate vertices - assumes x,y marks the centre point
-        _rotation = rotation or self.flatten_angle
+        _rotation = self.flatten_angle
         vertices = geoms.polygon_vertices(self.sides, radius, Point(x, y), _rotation)
         # for p in vertices: print(f'*V* {p.x / 28.3465}, {p.y / 28.3465}')
         return vertices
@@ -2444,15 +2444,8 @@ class PolygonShape(BaseShape):
         # ---- calc centre (in units)
         centre = self.get_centre()
         x, y = centre.x, centre.y
-        # ---- handle rotation
-        is_rotated = False
-        rotation = kwargs.get("rotation", self.rotation)
-        if rotation:
-            self.centroid = muPoint(x, y)
-            kwargs["rotation"] = rotation
-            kwargs["rotation_point"] = self.centroid
-            is_rotated = True
-        pre_geom = self.get_geometry(rotation=rotation, is_rotated=is_rotated)
+        # ---- calculate vertices
+        pre_geom = self.get_geometry()
         x, y, radius, vertices = (
             pre_geom.x,
             pre_geom.y,
@@ -2499,14 +2492,22 @@ class PolygonShape(BaseShape):
                 bl=Point(self.x_c - self._u.radius, self.y_c + self._u.radius),
                 tr=Point(self.x_c + self._u.radius, self.y_c - self._u.radius),
             )
+        # ---- handle rotation
+        is_rotated = False
+        rotation = kwargs.get("rotation", self.rotation)
+        if rotation:
+            self.centroid = muPoint(x, y)
+            kwargs["rotation"] = rotation
+            kwargs["rotation_point"] = self.centroid
+            is_rotated = True
         # ---- updated geom
-        _rotation = rotation or self.flatten_angle
-        vertices = geoms.polygon_vertices(self.sides, radius, Point(x, y), _rotation)
+        # _rotation = rotation or self.flatten_angle
+        # vertices = geoms.polygon_vertices(self.sides, radius, Point(x, y), _rotation)
         # ---- invalid polygon?
         if not vertices or len(vertices) == 0:
             return
         # ---- draw polygon
-        tools.feedback(f"***Polygon {self.col=} {self.row=} {x=} {y=} {vertices=}")
+        # tools.feedback(f"***Polygon {self.col=} {self.row=} {x=} {y=} {vertices=}")
         cnv.draw_polyline(vertices)
         kwargs["closed"] = True
         self.set_canvas_props(cnv=cnv, index=ID, **kwargs)
@@ -2581,7 +2582,7 @@ class PolylineShape(BaseShape):
             y = self.unit(y) + self._o.delta_y
             self.vertexes.append((x, y))
         # ---- draw polyline
-        # tools.feedback(f'***Hex {x=} {y=} {self.vertexes=}')
+        # tools.feedback(f'***PolyLineShp{x=} {y=} {self.vertexes=}')
         cnv.draw_polyline(self.vertexes)
         kwargs["closed"] = False
         kwargs["fill"] = None
@@ -2702,7 +2703,7 @@ class RectangleShape(BaseShape):
         if self.cx is not None and self.cy is not None:
             self.x = self.cx - self.width / 2.0
             self.y = self.cy - self.height / 2.0
-            # tools.feedback(f"*** INIT {self.cx=} {self.cy=} {self.x=} {self.y=}")
+            # tools.feedback(f"*** RectShp {self.cx=} {self.cy=} {self.x=} {self.y=}")
         self.kwargs = kwargs
 
     def calculate_area(self) -> float:
@@ -3282,20 +3283,10 @@ class RectangleShape(BaseShape):
             kwargs["closed"] = True
             self.set_canvas_props(cnv=cnv, index=ID, **kwargs)
         else:
-            # tools.feedback(f'*** RECT  normal')
-            if rotation:
-                mtrx = Matrix(1, 1)
-                mtrx.prerotate(rotation)
-                morph = (self.centroid, mtrx)
-                globals.doc_page.draw_rect(
-                    (x, y, x + self._u.width, y + self._u.height),
-                    radius=radius,
-                    morph=morph,
-                )
-            else:
-                cnv.draw_rect(
-                    (x, y, x + self._u.width, y + self._u.height), radius=radius
-                )
+            # tools.feedback(f'*** RECT  normal')   )
+            cnv.draw_rect(
+                (x, y, x + self._u.width, y + self._u.height), radius=radius
+            )
             self.set_canvas_props(cnv=cnv, index=ID, **kwargs)
             # ---- * borders (override)
             if self.borders:
@@ -3312,6 +3303,8 @@ class RectangleShape(BaseShape):
 
         # ---- fill pattern?
         if self.pattern:
+            raise NotImplementedError('Pattern is not yet supported!')
+            # TODO - convert to PyMuPDF
             img, is_svg, is_dir = self.load_image(self.pattern)
             if img:
                 log.debug("IMG %s s%s %s", type(img._image), img._image.size)
@@ -3324,11 +3317,6 @@ class RectangleShape(BaseShape):
                     )
                 else:
                     # stretch
-                    # TODO - work out how to (a) fill and (b) cut off -- mask?
-                    # assume DPI = 300?  72pt = 1" = 300px -see
-                    # http://two.pairlist.net/pipermail/reportlab-users/2006-January/004670.html
-                    # w, h = yourImage.size
-                    # yourImage.crop((0, 30, w, h-30)).save(...)
                     cnv.drawImage(
                         img,
                         x=x,
