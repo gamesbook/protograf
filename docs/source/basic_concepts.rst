@@ -99,7 +99,7 @@ on the page.
 If you look at an upright A4 page - which is 21cm wide and just less
 than 30cm high - then a point in the middle of the page will have an **x
 position** of 10.5cm - its distance from the left edge of the page; and
-a **y position** of 14.8cm - its distance from the bottom edge of the
+a **y position** of 14.8cm - its distance from the top edge of the
 page. Similarly, for a US letter-sized page of 8.5" by 11", a point in
 the middle of the page would have an **x position** of 4.25" and a **y
 position** of 5.5".

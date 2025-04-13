@@ -2241,10 +2241,8 @@ one would just comment out this command when its purpose has been served.
 
 On the grid, the values of **x** appear across the lower edge (increasing
 from left to right); those for **y** along the left side (increasing from
-bottom to top). The grid respects the margins that have been set - so the
-lower-left grid corner shown as "0" is actually offset from the physical
-page corner... but you will observe that the Blueprint numbering itself is
-located inside the margin area!
+top to bottom). The grid respects the margins that have been set but you will
+observe that the Blueprint numbering itself is located inside the margin area!
 
 Different styling options are provided that can make the Blueprint more
 useful in different contexts.
@@ -2792,7 +2790,7 @@ Almost every shape will need to have its position set.
 
 The common way to do this is by setting a value for **x** |dash| the distance
 from the left margin of the page (or card) to the left edge of the shape;
-and/or **y** |dash| the distance from the bottom margin of the page (or card)
+and/or **y** |dash| the distance from the top margin of the page (or card)
 to the bottom edge of the shape.
 
 cx and cy

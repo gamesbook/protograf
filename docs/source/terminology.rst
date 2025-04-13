@@ -59,7 +59,7 @@ places in the documentation:
   lines used to construct a shape; for example, a triangle has 3 vertices and
   a square has 4 vertices.
 - **_x** and **_y** - some terms can be modified to be specific for
-  *x* (left to right) or *y* (bottom to top) distances by appending one of
+  *x* (left to right) or *y* (top to bottom) distances by appending one of
   these to it
 
 
@@ -117,7 +117,7 @@ Everything in **protograf** that needs to be displayed or drawn or
 positioned must be placed at a **position** on the page; i.e. each thing
 must have both a horizontal position - its **x** value - and a vertical
 position - its **y** value. These respectively represent the distances
-from the left- and bottom-edge of a page or a card.
+from the left- and top-edge of a page or a card.
 
 **Location** is a more general term; it can be a combination of the **x**
 and **y** positions; it could be a row and/or column identifier; it
@@ -143,7 +143,7 @@ at the *top* of a Hexagon.
    ``Card``; or the away from the centre of a Hexagon in a grid
 -  **y** - the position of a point in the vertical direction; its usually
    the case that the distance is not absolute, but relative to some
-   other value e.g. distance from a margin; or the edge of a ``Card``
+   other value e.g. distance from a margin; or the top edge of a ``Card``
 
 
 Size- and length-orientated Terms
@@ -301,11 +301,11 @@ Styling-orientated Terms
    which is equivalent to ``56.693`` points will be changed to ``57`` points
 -  **transform** - will change text in a ``Text`` command to *uppercase*,
    *lowercase*, or *capitalise* it
--  **transparency** - a percentage value from 0 to 100 that determines how
-   "see through" a shape, or line, or area is; where 0 means it is not at all
-   transparent and 100 means it is completely transparent |dash| this also
-   corresponds to what some program's term as *opacity*; but that is usually
-   a fractional number from 1 down to 0 i.e. the inverse of transparency
+-  **transparency** - a percentage value from 1 to 100 that determines how
+   "see through" a shape, or line, or area is; where `1` means it is nearly
+   not transparent and `100` means it is completely transparent. It is also
+   possible to use a fractional number e.g. `0.5` equares to 50%. Some
+   programs use the term *opacity*; but that is the inverse of transparency.
 
 
 Display-orientated Terms

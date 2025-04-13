@@ -237,10 +237,10 @@ tedious  to type, for example, ``southeast`` or ``northwest`` and so
 
 The other exceptions are the location names.
 
-- Instead of "across" and "up", **protograf** uses ``x`` and ``y`` because
+- Instead of "across" and "down", **protograf** uses ``x`` and ``y`` because
   of their common usage in geometry.
-- Similarly, ``cx`` and ``cy`` are used instead of "centre from left"
-  or "centre from bottom".
+- Similarly, ``cx`` and ``cy`` are used instead of "centre-relative-to-left"
+  or "centre-relative-to-top".
 - Also, ``mx`` and ``my`` are used instead of "move horizontally" or
   "move vertically".
 

@@ -119,7 +119,7 @@ on each card.  This purely for illustration purposes - your cards would
 have their own set of shapes that you would want to display.
 
 The ``Rectangle`` also has its *label* set to show the Card's *sequence*
-number i.e. the order in  which it is drawn (usually bottom-to-top and
+number i.e. the order in  which it is drawn (usually top-to-bottom and
 left-to-right), followed by its *column* and *row* number.
 
 The script for all this is:
