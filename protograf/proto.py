@@ -128,7 +128,7 @@ class CardShape(BaseShape):
 
     def get_outline(self, cnv, row, col, cid, label, **kwargs):
         outline = None
-        tools.feedback(f"$$$ getoutline {row=}, {col=}, {cid=}, {label=}")
+        # tools.feedback(f"$$$ getoutline {row=}, {col=}, {cid=}, {label=}")
         kwargs["height"] = self.height
         kwargs["width"] = self.width
         kwargs["radius"] = self.radius
