@@ -48,7 +48,7 @@ Introduction
 ============
 `↑ <table-of-contents_>`_
 
-Cards are a common and widely used method of storing and transmitting
+Cards are a common and widely used method of storing and displaying
 small sets of related data.
 
 Scientists have used index cards since the 17th century and, of course,
@@ -61,9 +61,9 @@ Europe, coming into more widespread use somewhere in the 9th and 14th
 centuries respectively.
 
 The massive rise in popularity of a game like *Magic the Gathering*, from
-the 1990s onwards, has inspired the greater use of cards in all aspects of
+the 1990s onwards, has inspired the much greater use of cards in all aspects of
 the modern board gaming experience, with cards or tiles taking the predominant
-role  in many of them.
+role in many of them.
 
 
 Basic Concepts
@@ -80,9 +80,9 @@ There are two core commands needed; the ``Card()`` and the ``Deck()``:
 -  A ``Card()`` command is used to specify the design for a card, or range
    of cards, typically using elements that have already been defined.
    The patterns or designs can be set to appear on single or multiple cards.
--  A ``Deck()`` command is used to specify type, size and number of cards
-   that will be used to create "frames" for all of the cards in the deck and
-   then lay them out on one or more pages.
+-  A ``Deck()`` command is used to specify type, size and number of cards,
+   as well as any spacing between them, that will be used to create "frames"
+   for all of the cards in the deck and then lay them out on one or more pages.
 
 .. NOTE::
 
@@ -91,14 +91,16 @@ There are two core commands needed; the ``Card()`` and the ``Deck()``:
     on `Countersheet and Counter Commands`_
 
 In many cases, the ``Data()`` command will be needed in order to provide
-settings, for the properties of the elements appearing on a card, from another
-source; for example, an Excel file.
+settings for the properties of the elements appearing on a card, from another
+source; for example, an Excel or CSV file.  This will typically be text that
+needs to appear, but could also include colors and links to images.
 
 In some cases, the ``Matrix()`` command will be needed. This is an alternate
 method of providing the settings for the properties of the elements appearing
 on a card.
 
 These commands, and the ones supporting them, are described in detail below.
+
 For additional examples that illustrate some of these, see the
 :doc:`card and deck examples <examples/cards>` section.
 
@@ -117,10 +119,10 @@ The following are key properties that will usually need to be set for a
 ``Deck``:
 
 - **cards** - this is the number of cards appearing in the deck. It defaults
-  to 9. Note that other commands such as ``Data()`` and ``Matrix()`` can alter
-  this value
-- **height** - this is the card height. It defaults to 8.8 cm
-- **width** - this is the card width. It defaults to 6.3 cm
+  to ``9``. Note that other commands such as ``Data()`` and ``Matrix()`` will
+  alter this value
+- **height** - this is the card height; it defaults to ``8.8`` cm
+- **width** - this is the card width. It defaults to ``6.3`` cm
 
 .. IMPORTANT::
 
@@ -717,7 +719,7 @@ a Card whose **NAME** column contains a matching value - in this case, the
 first card; and then returns the value from that card's **IMAGE** column - in
 this case, the value **wire.png**.
 
-.. _other-card-resources
+.. _other-card-resources:
 
 Other Resources
 ===============

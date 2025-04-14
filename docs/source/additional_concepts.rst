@@ -2,6 +2,8 @@
 Additional Concepts
 ===================
 
+.. |dash| unicode:: U+2014 .. EM DASH SIGN
+
 This section assumes you are familiar with the concepts, terms and ideas
 for :doc:`protograf <index>` as presented in
 :doc:`Basic Concepts <basic_concepts>`, have looked through the
@@ -40,7 +42,7 @@ so-called "reserved" names that are available as part of Python.
 
 .. WARNING::
 
-   If your assigned name is the same as a reserved name, then you’ll
+   If your assigned name is the same as a reserved name, then you'll
    overwite it and your scripts may fail in *very* strange ways!!
 
 Reserved Names
@@ -63,7 +65,7 @@ memoryview, min, next, object, oct, open, ord, pow, print, property,
 range, repr, reversed, round, set, setattr, slice, sorted, staticmethod,
 str, sum, super, tuple, type, vars, zip
 
-If you’re interested in what all these functions do, there is a very
+If you're interested in what all these functions do, there is a very
 readable guide available at:
 https://www.mattlayman.com/blog/2024/layman-guide-python-built-in-functions/
 
@@ -84,14 +86,14 @@ The string can contain numbers as well - ``"ABC 123"``. Strings are usually
 **not** used for calculations, although some can be converted into numbers.
 Also see below on `using quotes in text <Quotes in Text>`_.
 
-Numbers are either *integers* - "whole" or "counting" numbers, such as ``21``
-or ``100``, or *floats* which are numbers with fractions - ``3.141``.  In most
-cases,  **protograf** will handle these differences for you.
+Numbers are either *integers* |dash| "whole" or "counting" numbers, such as
+``21`` or ``100``|dash| or *floats* which are numbers with fractions, such as
+``3.141``. In most cases,  **protograf** will handle these differences for you.
 
-Booleans are commonly referred to a "true or false" values. In Python, the
+Booleans are commonly referred to a "true" or "false" values. In Python, the
 reserved names ``True`` and ``False`` can be used whenever such values are
 required.  Some of the properties for some commands require a ``True`` value
-to be activated.
+to be set before they are activated.
 
 
 Assigned Names
@@ -155,9 +157,12 @@ a number to a given power is included (``2**3``).
 
 Even though its not essential to use them, adding calculations can make a
 script easier to read. For example, if working with *inches* as units, then a
-fractional value can be set like this: ``x=5/16`` - while this is numerically
-the same as ``x=0.3125`` its probably easier to understand the intent of the
-calculation.
+fractional value can be set like this: ``x=5/16`` |dash| while this is
+numerically the same as ``x=0.3125`` its probably easier to understand the
+intent of the calculation.
+
+You can also combine two text strings with each other, so ``"ab" + "cd"``, but
+you cannot combine a number and a text string, so **not** ``1 + "ab"``!
 
 
 Changeable Values
@@ -175,7 +180,7 @@ For example, if a shape has this property ``label="{{row}}"`` when it is
 drawn as part of a grid, the value of ``{{row}}`` will be replaced by the row
 number in which it appears - say ``2``.  Because the values are numeric, it
 is also possible to perform `calculations`_ with them; so an entry such as
-``{{2 * row}}`` will produce values that are double that of the  row number.
+``{{2 * row}}`` will produce values that are double that of the row number.
 
 When working with ``Deck()`` commands, the data source will contain named
 columns with multiple values; again the use of a ``{{name}}`` - where *name*
@@ -202,7 +207,7 @@ You can easily add single quotes as part of the text e.g. for ``isn't``::
 
    Text(x=1, y=1, text="Something isn't interesting")
 
-However, if you want to use double quotes inside the text, then you’ll
+However, if you want to use double quotes inside the text, then you'll
 need to change the outer ones to singles:
 
 .. code:: python
@@ -210,16 +215,16 @@ need to change the outer ones to singles:
    Text(x=1, y=1, text='Something "interesting"!')
 
 What if you want to use single and double quotes in the text? In this
-case, you’ll need to add a special marker character - a backslash - before
-the quote that is matched by the outer one:
+case, you'll need to add a special marker character |dash| a backslash |dash|
+before the quote that is used by the outer one:
 
 .. code:: python
 
    Text(x=1, y=1, text='Something isn\'t "interesting"!')
 
 Here the ``\'`` in front of the ``t`` in ``isn't`` shows that the single
-quote is **not** the end of the string, but simply a symbol that must be
-displayed "as is".
+quote does **not** represent the end of the string, but simply a symbol that
+must be displayed "as is".
 
 
 Properties and Short-cuts
@@ -276,15 +281,15 @@ Lists in **protograf** are written in a similar way but they need to
 be identified by wrapping them at their start and end by the use of
 *brackets*.
 
-The brackets that are used are so-called **square brackets** - ``[`` and
-``]``. Items in the list are separated by commas.
+The brackets that are used are so-called **square brackets** |dash| ``[``
+and ``]``. Items in the list must be separated by commas.
 
--  If they are numbers, then that’s all you need: for example, *[1, 3, 5,
-   7]* - this list is a series of odd numbers.
+-  If they are numbers, then that's all you need: for example,
+  ``[1, 3, 5, 7]`` - this list is a series of odd numbers.
 -  If they are words, or strings of text then each item must be wrapped
-   in quotes: for example, *['apples', 'oranges', 'bananas', 'plums']*
-   or *["apples", "oranges", "bananas", "plums"]* |dash| remember that quotes
-   can be single or double but not a mix of both!
+   in quotes: for example, ``['apples', 'oranges', 'bananas', 'plums']``
+   or ``["apples", "oranges", "bananas", "plums"]`` |dash| remember that
+   quotes can be single or double but not a mix of both!
 
 .. NOTE::
 
@@ -302,7 +307,7 @@ shorthand reference name |dash| in this case ``groceries``. There are various
 examples of the use of lists of elsewhere in these documents and also in
 the script examples.
 
-.. _script-errors
+.. _script-errors:
 
 Errors
 ======
@@ -326,7 +331,7 @@ will cause this error when the script is run::
     FEEDBACK:: The "a" is not a valid float number!
     FEEDBACK:: Could not continue with program.
 
-because the ``height`` is meant to be a number, not a string.
+because the ``height`` is meant to be a number, not text.
 
 In some cases, instructions will **not** cause an error, but they will simply
 be ignored, for example:
@@ -363,19 +368,19 @@ Another example:
 
 .. code:: python
 
-   Rectangle(height=1.5, stroke=green, fill=bred)
-                                            ^^^^
+   Rectangle(height=1.5, stroke="green", fill=bred)
+                                              ^^^^
    NameError: name 'bred' is not defined
 
 In this case, the script uses the name of something - ``bred`` - which
 is unknown. It could be a simple spelling mistake e.g. here it should be
-``red`` *or* possibly you'd meant to assign the word ``bred`` to a particular
-color before using it for the ``Rectangle``:
+``"red"`` *or* possibly you'd meant to assign the word ``bred`` to a
+particular customised color before using it for the ``Rectangle``:
 
 .. code:: python
 
    bred = "#A0522D"
-   Rectangle(height=1.5, stroke=green, fill=bred)
+   Rectangle(height=1.5, stroke="green", fill=bred)
 
 Another example:
 
@@ -386,7 +391,7 @@ Another example:
    SyntaxError: invalid syntax. Perhaps you forgot a comma?
 
 Another ``SyntaxError`` where Python tries to assess what the cause
-might be. Here, you’d need to add a ``,`` (comma) at the end of setting the
+might be. Here, you'd need to add a ``,`` (comma) at the end of setting the
 ``paper="A8"`` property as each property in the list **must** be comma-separated
 (a space is not sufficient) as follows:
 

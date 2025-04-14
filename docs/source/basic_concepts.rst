@@ -109,7 +109,7 @@ distances in **protograf** are considered to be relative to the margin
 settings i.e. if the default page margin, for the A4 page mentioned above,
 was 2.5cm (1") then to locate a point at those same distances would mean
 using an **x position** of 8cm and a **y position** of 12.3cm, as the margin
-size will be automtically added onto the supplied values for the position.
+size will be automatically added onto the supplied values for the position.
 
 .. _command-concept:
 
@@ -119,14 +119,25 @@ The "command" concept
 
 Instructions in **protograf** are termed *commands*.
 
-Command are usually written with an initial capital letter. They are effectively
-"imperative" in nature, causing something to happen; for example:
+Commands are usually written with an initial capital letter. They are
+effectively "imperative" in nature, causing something to happen;
+for example:
 
 - ``Save()`` - instructs the program to save the output to file
 - ``Circle()`` - instructs the program to draw a circle
 
 The :doc:`summary list of all commands <commands>` is a useful reference
 for checking what is available.
+
+.. HINT::
+
+   In some cases you will use the same command but with a lowercase initial
+   |dash| often when defining :doc:`shapes <core_shapes>` for cards when
+   constructing decks (see :doc:`Card Decks <card_decks>`).
+
+   When used in this way, the command is not carried out straightaway, but
+   deferred to later in the script.
+
 
 .. _element-concept:
 
@@ -234,6 +245,8 @@ In almost all of the rest of the world, the Metric System is in use. In
 centimetres; referred to in **protograf** as *cm*. Alternatively, you
 can choose to use millimetres, abbreviated in **protograf** as *mm*.
 
+The default **units** in **protograf**  are *cm*.
+
 .. HINT::
 
    For conversion purposes, 1 inch equals 2.54 centimetres or 25.4
@@ -284,8 +297,8 @@ Some examples of defaults are:
 -  the default *paper* size for pages in the output PDF is ``A4`` |dash| similar
    to the US Letter size
 -  the default *units* are centimetres (*cm*)
--  the default *x* and *y* positions are each ``1`` (one) - with default
-   units that equals 1cm
+-  the default *x* and *y* positions are each ``1`` (one) |dash| with default
+   units that equates to *1cm*
 -  the default line *length* is ``1`` (one) - with default units that is 1cm
 -  the default line *stroke width* is ``1`` point - that corresponds to
    1/72 inches (or 0.353 mm)

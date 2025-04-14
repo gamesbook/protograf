@@ -60,7 +60,7 @@ can be found at https://boardgamegeek.com/boardgame/1406
 Example 1.
 ~~~~~~~~~~
 
-To retrieve games with ID's 1, 2 and 3:
+To retrieve games which have the ID's 1, 2 and 3:
 
 .. code:: python
 
@@ -102,11 +102,13 @@ A collection can be very large; you may want to filter it to create a
 Caching
 -------
 
-Caching is the process of storing a copy of something - usually a file or
-data, so that it does not have to be retrieved again.
+*Caching* is the process of storing a copy of something |dash| usually a file,
+an image or some other kind of data |dash| so that it does not have to be
+retrieved again.  This is useful when accessing resources from the internet,
+as it saves time and bandwidth.
 
 In the case of BoardGameGeek data, copies of the game data and images are
-stored under your user directory on your local machine (or whereever you are
+stored under your user directory on your local machine (or where ever you are
 running :doc:`protograf <index>`).
 
 The directory is called ``.protograf`` and will have a ``bgg`` subdirectory
@@ -276,15 +278,15 @@ Because the *name* is compulsory, its often omitted from the command.
         Text(text="Helvetica 12pt black",
              x=0, y=5, align="left")
 
-        Font("Times-Roman", size=11, stroke=tomato)
+        Font("Times-Roman", size=11, stroke="tomato")
         Text(text="Times-Roman 11pt red",
              x=0, y=4, align="left")
 
-        Font("Courier", size=10, stroke=aqua)
+        Font("Courier", size=10, stroke="cyan")
         Text(text="Courier 9pt aqua",
              x=0, y=3, align="left")
 
-        Font("Verdana", size=9, stroke=gold)
+        Font("Verdana", size=9, stroke="gold")
         Text(text="Verdana 9pt gold",
              x=0, y=2, align="left")
 

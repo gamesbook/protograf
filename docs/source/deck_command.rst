@@ -62,7 +62,7 @@ The following are other properties that can also be set for a ``Deck``:
   :ref:`the Data Command <the-data-command>`) that specifies
   how many copies of a card are needed
 - **fill** - sets the color of the card's area; defaults to white
-- **frame** - the default card frame is a rectangle (or square, if the
+- **frame** - the default card frame is a *rectangle* (or square, if the
   height and width match); but can be set to *hexagon* or *circle*
 - **grid_marks** - if set to ``True``, will cause small marks (``1`` cm in
   length) to be drawn at the border of the page that align with the edges of
