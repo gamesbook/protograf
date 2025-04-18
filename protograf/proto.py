@@ -1567,6 +1567,8 @@ def Blueprint(**kwargs):
     # ---- number edges
     if number_edges:
         edges = tools.validated_directions(number_edges, tools.DirectionGroup.CARDINAL)
+    else:
+        edges = []
     # ---- numbering
     if numbering:
         _common = Common(
@@ -1577,7 +1579,32 @@ def Blueprint(**kwargs):
         )
         offset = _common.points_to_value(kwargs["font_size"]) / 2.0
         offset_edge = _common.points_to_value(kwargs["font_size"]) * 1.25
+        # ---- * absolute?
         fixed_y, fixed_x = None, None
+        edges_x = kwargs.get("edges_x", None)
+        if edges_x:
+            fixed_x = tools.as_float(edges_x, "edges_x")
+        edges_y = kwargs.get("edges_y", None)
+        if edges_y:
+            fixed_y = tools.as_float(edges_y, "edges_y")
+        if fixed_x:
+            for y in range(1, kwargs["rows"] + 1):
+                Text(
+                    x=fixed_x,
+                    y=y * side + offset,
+                    text=set_format(y, side),
+                    common=_common,
+                )
+        if fixed_y:
+            for x in range(1, kwargs["cols"] + 1):
+                Text(
+                    x=x * side,
+                    y=fixed_y + offset,
+                    text=set_format(x, side),
+                    common=_common,
+                )
+
+        # ---- * relative
         if "n" in edges:
             for x in range(1, kwargs["cols"] + 1):
                 Text(
