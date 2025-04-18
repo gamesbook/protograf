@@ -286,10 +286,11 @@ class CardShape(BaseShape):
             try:
                 # ---- * normal element
                 iid = members.index(cid + 1)
+                # convert Template into a string via render
                 new_ele = self.handle_custom_values(flat_ele, cid)  # calculated values
                 if isinstance(new_ele, (SequenceShape, RepeatShape)):
                     new_ele.deck_data = self.deck_data
-                # tools.feedback(f'$$$ draw_card $$$ {new_ele=}')
+                # tools.feedback(f'$$$ CS draw_card $$$ {new_ele=} {kwargs=}')
                 new_ele.draw(cnv=cnv, off_x=_dx, off_y=_dy, ID=iid, **kwargs)
                 cnv.commit()
             except AttributeError:
@@ -1028,6 +1029,15 @@ def Data(**kwargs):
     else:
         tools.feedback("You must provide data for the Data command!", True)
 
+    # ---- check keys - cannot use spaces!
+    if len(globals.dataset) > 0:
+        first = globals.dataset[0].keys()
+        for key in first:
+            if " " in key:
+                tools.feedback(
+                    f'You cannot have spaces in the Data headers e.g. "{key}"', True
+                )
+
     return globals.dataset
 
 
@@ -1093,8 +1103,12 @@ def L(lookup: str, target: str, result: str, default: Any = "") -> LookupType:
 
 def T(string: str, data: dict = None):
     """Use string to create a Jinja2 Template."""
+    # print(f'*** TEMPLATE {string=} {data=}')
     environment = jinja2.Environment()
-    template = environment.from_string(str(string))
+    try:
+        template = environment.from_string(str(string))
+    except jinja2.exceptions.TemplateSyntaxError as err:
+        tools.feedback(f'Invalid template "{string}" - {err}', True)
     return template
 
 

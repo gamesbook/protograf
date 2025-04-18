@@ -39,8 +39,8 @@ Deck(
 back_race = Common(x=0.5, y=0.5, width=5.3, height=7.9, rounded=0.2)
 back_hum = rectangle(common=back_race, fill_stroke="tomato")
 back_elf = rectangle(common=back_race, fill_stroke="gold")
-back_dwa = hexagon(common=back_race, fill_stroke="turquoise")
-back_hob = hexagon(common=back_race, fill_stroke="chartreuse")
+back_dwa = rectangle(common=back_race, fill_stroke="turquoise")
+back_hob = rectangle(common=back_race, fill_stroke="chartreuse")
 back_naz = rectangle(common=back_race, fill_stroke="gray")
 Card("all", S("{{ Race == 'Human' }}", back_hum))
 Card("all", S("{{ Race == 'Elf' }}", back_elf))
@@ -51,7 +51,7 @@ Card("all", S("{{ Race == 'Nazgul' }}", back_naz))
 # character Name
 name_box = rectangle(x=0.75, y=6.6, width=4.8, height=1.5, rounding=0.3)
 Card("*", name_box)
-Card("all", text(text=T("{{ Name }}"), x=3.3, y=7.3, font_size=18))
+Card("all", text(text=T("{{ CName }}"), x=3.3, y=7.3, font_size=18))
 
 # character Age
 Card("all",

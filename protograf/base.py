@@ -1,4 +1,4 @@
-    # -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """
 Base shape class for protograf
 
@@ -2565,8 +2565,8 @@ class BaseShape:
                 record = self.deck_data[ID]
                 try:
                     custom_value = value.render(record)
+                    # print('###', f'{ID=} {key=} {custom_value=}')
                     return custom_value
-                    # print('###', f'{ID=} {key=} {custom_value=}', '=>', getattr(new_element, key))
                 except jinja2.exceptions.UndefinedError as err:
                     tools.feedback(
                         f"Unable to process data with this template ({err})", True
@@ -2608,14 +2608,14 @@ class BaseShape:
                         ):
                             continue
                         custom_value = processed_value(val)
-                        if custom_value:
+                        if custom_value is not None:
                             value[dkey] = custom_value
                             updated = True
                     if updated:
                         setattr(new_element, key, value)
                 else:
                     custom_value = processed_value(value)
-                    if custom_value:
+                    if custom_value is not None:
                         setattr(new_element, key, custom_value)
             return new_element
         return the_element  # no changes needed or made

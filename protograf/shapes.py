@@ -3968,7 +3968,12 @@ class TextShape(BaseShape):
         log.debug("calling TextShape...")
 
     def draw(self, cnv=None, off_x=0, off_y=0, ID=None, **kwargs):
-        """Draw text on a given canvas."""
+        """Draw text on a given canvas.
+
+        Note:
+            Any text in a Template should already have been rendered by
+            base.handle_custom_values()
+        """
         kwargs = self.kwargs | kwargs
         cnv = cnv if cnv else globals.canvas  # a new Page/Shape may now exist
         super().draw(cnv, off_x, off_y, ID, **kwargs)  # unit-based props
@@ -3992,7 +3997,7 @@ class TextShape(BaseShape):
         if _locale:
             self.text = tools.eval_template(self.text, _locale)
         _text = self.textify(ID)
-        # tools.feedback(f'*** Text {_locale=} {self.text=} {_text=}', False)
+        # tools.feedback(f'*** Text {ID=} {_locale=} {self.text=} {_text=}', False)
         if _text is None or _text == "":
             tools.feedback("No text supplied for the Text shape!", False, True)
             return
@@ -4088,7 +4093,7 @@ class TextShape(BaseShape):
         # ---- text string
         else:
             keys["rotation"] = self.rotation
-            # tools.feedback(f"*** Text PLAIN {x_t=} {y_t=} {_text=} {keys=}")
+            tools.feedback(f"*** Text PLAIN {x_t=} {y_t=} {_text=} {keys=}")
             self.draw_multi_string(cnv, x_t, y_t, _text, **keys)  # use morph to rotate
 
 
