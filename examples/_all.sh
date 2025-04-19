@@ -1,7 +1,7 @@
 echo -e "\nCreating PDFs and PNGs for all examples (except those in manual)"
 echo ""
 mkdir -p /tmp/demo
-echo -e "\nAll examples output is saved to \tmp\demo"
+echo -e "\nAll examples outputs are saved to /tmp/demo"
 # ---- examples: simple
 echo -e "\nCreating basic examples..."
 python core/demo.py -d /tmp/demo
@@ -48,6 +48,8 @@ python boards/commercial/traveller_draft.py -d /tmp/demo
 python boards/commercial/traveller_black.py -d /tmp/demo
 python boards/commercial/underwater_cities.py -d /tmp/demo
 python boards/commercial/warpwar.py -d /tmp/demo
+# ---- boards: maps
+python boards/map/honorverse.py -d /tmp/demo
 # ---- counters
 echo -e "\nCreating counters..."
 python counters/counters.py -d /tmp/demo

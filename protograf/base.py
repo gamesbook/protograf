@@ -30,7 +30,7 @@ from pymupdf.utils import getColor, getColorList
 from pymupdf import Base14_fontnames as BUILTIN_FONTS
 
 # local
-from protograf.utils import geoms, tools
+from protograf.utils import geoms, tools, support
 from protograf.utils.support import LookupType, unit
 from protograf import globals
 
@@ -355,9 +355,8 @@ class BaseCanvas:
         self._objects = None
         self.kwargs = kwargs
         self.run_debug = False
-        self.units = self.defaults.get(
-            "units", unit.cm
-        )  # defaults MUST store point-equivalent
+        _units = self.defaults.get("units", unit.cm)
+        self.units = support.to_units(_units)
         # print(f"### {self.units=} \n {self.defaults=}")
         # ---- paper
         _paper = paper or self.defaults.get("paper", "A4")
@@ -765,7 +764,8 @@ class BaseShape:
         self.common = kwargs.get("common", None)
         self.shape = kwargs.get("shape", base.shape)
         self.run_debug = kwargs.get("debug", base.run_debug)
-        self.units = kwargs.get("units", base.units)
+        _units = kwargs.get("units", base.units)
+        self.units = support.to_units(_units)
         # print(f"### {self.units=}")
         # ---- paper
         _paper = kwargs.get("paper", base.paper)
@@ -1205,13 +1205,12 @@ class BaseShape:
     def kw_bool(self, value, label: str = ""):
         return tools.as_bool(value, label) if value is not None else value
 
-    def unit(self, item, units=None, skip_none=False, label=""):
+    def unit(self, item, units: str = None, skip_none: bool = False, label: str = ""):
         """Convert an item into the appropriate unit system."""
         log.debug("units %s %s :: label: %s", units, self.units, label)
         if item is None and skip_none:
             return None
-        if not units:
-            units = self.units
+        units = support.to_units(units) if units is not None else self.units
         try:
             _item = tools.as_float(item, label)
             return _item * units

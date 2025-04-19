@@ -157,7 +157,7 @@ Example 2. Customised
 
       .. code:: python
 
-          Arc(x=1, y=1, x1=3, y1=2)
+          Arc(cx=1, cy=1, radius=2)
 
       To help with visualisation, the Arc is surrounded by a red Rectangle:
 
@@ -166,13 +166,13 @@ Example 2. Customised
             Rectangle(
                 x=1, y=1, height=1, width=2, dot=0.02,
                 stroke=red, fill=None,
-                title="Arc(x=1, y=1, x1=3, y1=2)")
+                title="Arc(cx=1, cy=1, radius=2)")
             )
 
       The Arc has the following properties:
 
-      - origin is at x-position ``1`` cm and at y-position ``1`` cm
-      - the secondary x-position and y-position are at ``3`` cm and ``2`` cm
+      - origin is at x-position ``1`` cm and at y-position ``3`` cm
+      - the arc radius is ``2`` cm
 ===== ======
 
 
@@ -216,12 +216,19 @@ Example 2. Customised
       .. code:: python
 
           Bezier(
-            x=0, y=1, x1=4, y1=3, x2=3, y2=4, x3=4, y3=6, stroke_width=1)
+            x=0, y=1,
+            x1=4, y1=3,
+            x2=3, y2=4,
+            x3=4, y3=6,
+            stroke_width=1)
 
       It has the following properties based on changes to the defaults:
 
       - starts at x-position ``0`` cm and at y-position ``1`` cm
-      - has the inflection points set by *x1* and *y1* and then *x2* and *y2*
+      - has the inflection points set by:
+
+        -  *x1* and *y1* and
+        - *x2* and *y2*
       - ends at position *x3* of ``4`` cm and at *y3* of ``6`` cm
       - has a thicker *stroke_width*
 ===== ======
@@ -253,12 +260,17 @@ Example 1.
 
       .. code:: python
 
-          Chord(shape=Circle(), angle=135, angle1=45)
+          Chord(
+              shape=Circle(radius=1, fill=None),
+              angle=135,
+              angle1=45)
 
       It has the following properties based on these values:
 
-      - the circle that helps defines the start and end of the chord line is
-        located with its "corner" at x-position ``1`` cm and at y-position ``1`` cm
+      - a default circle that defines boundaries of the chord line:
+
+        - centre x-position is ``2`` cm
+        - centre y-position  is ``2`` cm
       - the start of chord is at the intersection of the radius of the circle
         at 135 |deg| with the circle's circumference
       - the end of chord is at the intersection of the radius of the circle
@@ -293,7 +305,7 @@ Example 1.
       - centre at x-position ``1`` cm and at y-position ``1`` cm
       - diameter of ``3`` points; there are 72 points in an inch, so this is 1/24th
         of an inch, or approximately 1mm (``0.1`` cm), in size
-      - fill color for a Dot is the same as the stroke - default is black
+      - fill color for a Dot is the same as the stroke |dash| default is black
 ===== ======
 
 
@@ -325,7 +337,7 @@ Example 1. Defaults
 
           - starts at x-position ``1`` cm and at y-position ``1`` cm
           - length of ``1`` cm
-          - heading/default direction is 0 |deg|
+          - heading/default direction is 0 |deg| |dash| i.e. "eastwards"
 
           *Note* that direction means "anti-clockwise from 0 |deg|", where
           the zero lines runs in the "east" direction from the left.
@@ -347,41 +359,47 @@ Example 2. Customised
 
           .. code:: python
 
-              Line(x=0, y=4, x1=4, y1=5, stroke=blue, stroke_width=1,
-                 dashed=[0.2, 0.1], label="dashed", font_size=6)
-
-              Line(
-                x=0, y=3, length=4.1, angle=15, stroke=red,
-                label="15", font_size=6)
-
-              Line(
-                x=0, y=2, length=4, stroke=lime, stroke_width=2)
-
-              # black lines
-              Line(
-                x=0, y=0.5, stroke_width=0.2, dotted=True,
+            Line(
+                x=0, y=0.5,
+                stroke_width=0.2,
+                dotted=True,
                 label="0.2", font_size=6)
-              Line(
-                x=1, y=0.5, stroke_width=0.4, dotted=True,
+            Line(
+                x=1, y=0.5,
+                stroke_width=0.4, dotted=True,
                 label="0.4", font_size=6)
-              Line(
-                x=2, y=0.5, stroke_width=0.8, dotted=True,
+            Line(
+                x=2, y=0.5,
+                stroke_width=0.8, dotted=True,
                 label="0.8", font_size=6)
-              Line(
-                x=3, y=0.5, stroke_width=1.6, dotted=True,
+            Line(
+                x=3, y=0.5,
+                stroke_width=1.6, dotted=True,
                 label="1.6", font_size=6)
 
-          The medium blue line has a style set so that it is not a normal solid
-          line:
+            # colored lines
+            Line(
+                x=0, y=4, x1=4, y1=5,
+                stroke="blue", stroke_width=1,
+                dashed=[0.2, 0.1],
+                label="dashed:[0.2,0.1]", font_size=6)
+            Line(
+                x=0, y=3, length=4.1, angle=15,
+                stroke="red",
+                label="15", font_size=6)
+            Line(
+                x=0, y=2, length=4,
+                stroke="chartreuse", stroke_width=2)
+
+          The medium blue line has:
 
           - *dashed* - a list with the length of the dash followed by
             the length of the space between two dashes - ``2`` and ``1`` mm
+          - *x1* and *y1* set as the ending point
 
           The thin red line has:
 
-          - *x* and *y* set as a starting point
-          - *x1* and *y1* set as an ending point
-          - *angle* - of 15 |deg| from the baseline, anti-clockwise
+          - *angle* - of 15 |deg| from the baseline, clockwise
 
           The angle guides the direction in which the line is drawn; if not
           given |dash| as in the case of the thick green line |dash| this
@@ -466,15 +484,14 @@ special properties.
 
 The basic properties that can be set are:
 
-- *text* - the text string; if this appears as the first property, you can
-  omit the ``text=``` prefix
+- *text* - the text string
 - *font_size* - default is ``12`` points
 - *font_name* - the default is ``Helvetica``
 - *stroke* - the default text color is ``black``
-- *align* - the default aligment is ``center``; it can be changed to be
-  ``left``, ``right`` or ``justified``.
+- *align* - the default alignment is ``centre``; it can be changed to be
+  ``left`` or ``right``
 
-See Example 2 below for additional properties.
+See Examples 2 and 3 below for additional properties.
 
 
 Example 1. Defaults
@@ -514,38 +531,38 @@ Example 2. Customised
 
       .. code:: python
 
-        Font("Times-Roman", size=11, stroke=tomato)
-        Text(x=0, y=5, align="left",
-             text="Times-Roman 12pt red")
-        Text(x=0, y=4, align="right", stroke=blue,
-             wrap=True, width=4, fill=None,
-             leading=14,
-             outline_stroke=red, outline_width=2,
-             text='<font name="Helvetica" size="14">'
-                  '<u>Helvetica</u><br/>'
-                  '<b>bold</b> <i>ital</i><br/>'
-                  '<b><i>bold ital</i></b></font>')
-        Text(x=0, y=2, align="left", stroke=orange,
-             font_name="Courier", font_size=10,
-             wrap=True, width=4, fill=None,
-             transform='c',
-             text="I am capitalized")
-        Text(x=0, y=1.5, align="left", stroke=orange,
-             font_name="Courier", font_size=10,
-             wrap=True, width=4, fill=None,
-             transform='l',
-             text="I am in lowercase")
-        Text(x=0, y=1, align="left", stroke=orange,
-             font_name="Courier", font_size=10,
-             wrap=True, width=4, fill=None,
-             transform='u',
-             text="I am in uppercase")
+        Text(wrap=True,
+             x=0, y=1, width=4, height=1,
+             font_size=7,  fill="black", stroke="black",
+             font_name="Courier", align="right",
+             transform='t',
+             text="I am Courier in title case to the right")
+        Text(wrap=True,
+             x=0, y=2.5, width=4, height=1,
+             font_size=8,  fill="black", stroke="black",
+             font_name="Helvetica", align="left",
+             transform='upper',
+             text="I am Helvetica in upper case to the left")
+        Text(wrap=True,
+             x=0, y=4, width=4, height=1,
+             font_size=9,  fill="black", stroke="black",
+             font_name="Times-Roman", align="centre",
+             transform='lowercase',
+             text="I'm lower case Times-Roman in the centre")
 
-      This example shows how the text's font can be set in three ways:
+      In this example, the use of ``wrap=True`` signifies the  use of "complex"
+      multi-line text, to which various styling properties can be applied.
 
-      - via the ``Font`` command
-      - via *font_name* property
-      - via the ``<font name="...">`` embedded in the *text*
+      Complex text can have the following properties:
+
+      - *width* - width of the box in which the text appears
+      - *height* - height of the box in which the text appears
+      - *align* - can be ``left``, ``centre`` or ``right``
+      - *transform* - uppercase (u), lowercase (l) or capitalise (c)
+      - various font properties
+
+      This example shows how the text's font can be set using the ``font_name``
+      property.
 
       .. NOTE::
 
@@ -554,33 +571,53 @@ Example 2. Customised
 
         For more details see :ref:`the Font command <the-font-command>`.
 
-      In the example:
+===== ======
 
-      - red text  (Times-Roman) shows a basic one-line ``Text``.
-      - blue text (Helvetica) shows complex ``Text`` with use of HTML tags.
-      - orange text (Courier) shows complex ``Text`` with transforms.
+Example 3. Styled
++++++++++++++++++
 
-      Complex text can be many lines long, with styling, by setting
-      ``wrap=True`` property.
+.. |t03| image:: images/customised/text_style.png
+   :width: 330
 
-      Complex text can have the following additional properties:
+===== ======
+|t03| This example shows the shape constructed using various properties:
 
-      - *width* - maximum line length before wrapping
-      - *leading* - the spacing between the lines (in points)
-      - *fill* - the color of the "box" in which the text is located
-      - *outline_stroke* - the color of the line of the "box"
-        in which the text is located
-      - *outline_stroke* - the thickness of the line of the "box"
-        in which the text is located
-      - *transform* - uppercase (u), lowercase (l) or capitalise (c)
+      .. code:: python
 
-      The complex text can contain the following HTML tags:
+        Font("Times-Roman", size=11, stroke="tomato")
+        Text(x=0, y=0.5, align="left",
+             text="Times-Roman 12pt red")
 
-      - *<b>...</b>* - draw the text in bold
-      - *<i>...</i>* - draw the text in italic
-      - *<u>...</u>* - draw a line under the text
-      - *<strike>...</strike>* - draw a line through the text
-      - *<br/>* - break current line and start a new one
+        Text(html=True,
+             x=0, y=1, width=4, height=2,
+             text='<span style="font-family: Helvetica; '
+                  'font-size: 10pt; color: red">'
+                  'HTML Helvetica 10pt<br/>'
+                  '<b>bold</b> <i>ital</i> <b><i>bold ital</i></b></span>'
+        )
+        Text(html=True,
+             x=0, y=2, width=4, height=2,
+             text='<span style="font-family: Times-Roman; '
+                  '  font-size: 9pt; color: blue">'
+                  'HTML Times-Roman 9pt<br/>'
+                  '<b>bold</b> <i>ital</i> <b><i>bold ital</i></b></span>'
+        )
+        Text(html=True,
+             x=0, y=3, width=4, height=2,
+             css="font-family: Courier; font-size: 8pt; color: blue;",
+             text='HTML/CSS Courier 8pt<br/>'
+                  '<b>bold</b> <i>ital</i> <b><i>bold ital</i></b>'
+        )
+
+      In this example, the use of ``html=True`` signifies the  use of "styled"
+      multi-line HTML-fomatted text, to which various CSS styling properties
+      can be applied.
+
+      This example shows how the text's font can be set either:
+
+      - via the ``Font`` command
+      - via *css* property
+      - via the ``font-family: ...">`` embedded in the *text*
 
 ===== ======
 

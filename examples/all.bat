@@ -58,6 +58,9 @@ python boards\commercial\traveller_black.py --no-png -d %location%
 python boards\commercial\underwater_cities.py --no-png -d %location%
 python boards\commercial\warpwar.py --no-png -d %location%
 
+REM ---- boards: maps
+python boards\map\honorverse.py  --no-png -d %location%
+
 REM ---- counters
 ECHO "Creating counters..."
 python counters\counters.py --no-png -d %location%

@@ -324,6 +324,27 @@ def to_float(value: Any, name: str = "", fail: bool = True) -> float:
             feedback(f'Unable to convert "{value}" into a floating point number!', fail)
 
 
+def to_units(value):
+    """Convert a named unit to a numeric points equivalent
+    """
+    if not isinstance(value, (int, float)):
+        match value:
+            case "in" | "inch" | "inches":
+                numeric_units = unit.inch
+            case "point" | "points" | "pt" | "pts":
+                numeric_units = unit.pt
+            case "cm" | "centimetre" | "cms" | "centimetres":
+                numeric_units = unit.cm
+            case "mm" | "millimetre" | "mms" | "millimetres":
+                numeric_units = unit.mm
+            case _:
+                feedback(f'Cannot recognise "{value}" as valid units -'
+                         ' use mm, cm, inch or pt', True)
+    else:
+        numeric_units = value
+    return numeric_units
+
+
 def excel_column(value: int = 1):
     """Convert a number into an Excel column letter.
 

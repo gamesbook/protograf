@@ -612,12 +612,14 @@ def Create(**kwargs):
     globals.margin_top = kwargs.get("margin_top", globals.margin)
     globals.margin_bottom = kwargs.get("margin_bottom", globals.margin)
     globals.margin_right = kwargs.get("margin_right", globals.margin)
-    # ---- cards and units
+    # ---- cards
     _cards = kwargs.get("cards", 0)
     landscape = kwargs.get("landscape", False)
     kwargs = margins(**kwargs)
     defaults = kwargs.get("defaults", None)
-    globals.units = kwargs.get("units", globals.units)
+    # ---- units
+    _units = kwargs.get("units", globals.units)
+    globals.units = support.to_units(_units)
     # ---- paper, page, page sizes
     globals.paper = kwargs.get("paper", globals.paper)
     globals.page = pymupdf.paper_size(globals.paper)  # (width, height) in points
@@ -1020,7 +1022,7 @@ def Data(**kwargs):
         for child in src.iterdir():
             if not filters or child.suffix in filters:
                 globals.image_list.append(str(child))
-        if len(globals.image_list) == 0:
+        if globals.image_list is None or len(globals.image_list) == 0:
             tools.feedback(
                 f'Directory "{src}" has no relevant files or cannot be loaded!', True
             )
@@ -1030,7 +1032,7 @@ def Data(**kwargs):
         tools.feedback("You must provide data for the Data command!", True)
 
     # ---- check keys - cannot use spaces!
-    if len(globals.dataset) > 0:
+    if globals.dataset and len(globals.dataset) > 0:
         first = globals.dataset[0].keys()
         for key in first:
             if " " in key:

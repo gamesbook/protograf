@@ -200,7 +200,7 @@ PageBreak()
 # ---- chord
 Blueprint()
 Text(common=txt, text="Chord: 135 to 45 degrees")
-Chord(shape=Circle(cx=2, cy=2, radius=1.5, fill=None), angle=135, angle1=45, label="chord")
+Chord(shape=Circle(radius=1, fill=None), angle=135, angle1=45, label="chord")
 PageBreak()
 
 # ---- polygon radii

@@ -4093,7 +4093,7 @@ class TextShape(BaseShape):
         # ---- text string
         else:
             keys["rotation"] = self.rotation
-            tools.feedback(f"*** Text PLAIN {x_t=} {y_t=} {_text=} {keys=}")
+            # tools.feedback(f"*** Text PLAIN {x_t=} {y_t=} {_text=} {keys=}")
             self.draw_multi_string(cnv, x_t, y_t, _text, **keys)  # use morph to rotate
 
 
