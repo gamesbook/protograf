@@ -31,16 +31,17 @@ Blueprint(stroke_width=0.5)
 Text(common=header, text="Rondel")
 
 circ = Common(cx=2, cy=3, radius=2)
-radii = list(range(0, 360, 60))
-colrs = ["tomato", "cyan", "gold", "chartreuse", "lightsteelblue", "white"]
-labels = ['Build', 'Trade', 'Income', 'Plant', 'Expand', 'Harvest']
+radii_angles = steps(0, 360, 60)
+colrs = ["lightsteelblue", "cyan", "gold", "chartreuse", "tomato", "white", ]
+labels = ['Build', 'Trade', 'Income', 'Plant', 'Explore', 'Harvest']
 
 # rondel colors
-for colr, angle in zip(colrs, radii):
+for colr, angle in zip(colrs, radii_angles):
     Sector(
         common=circ,
-        fill=colr, stroke="sienna", stroke_width=2,
-        angle_start=420 - angle,
+        fill=colr,
+        stroke="sienna", stroke_width=2,
+        angle_start=angle - 30,
         angle_width=60)
 # rondel text
 Circle(
@@ -48,10 +49,10 @@ Circle(
     stroke="#A0522D",
     stroke_width=3,
     fill=None,
-    radii=radii,
+    radii=radii_angles,
     radii_offset=0.75,
     radii_length=1,
-    radii_stroke="white",
+    radii_stroke=colrs,
     radii_stroke_width=0.01,
     radii_labels=labels,
     radii_labels_face="Times-Roman",

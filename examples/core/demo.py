@@ -14,7 +14,7 @@ from protograf import *
 Create(filename="demo.pdf", margin=1, margin_top=0.25)
 Footer()
 
-# one BIG hex
+# ---- the BIG hex
 Hexagon(
     cx=9.5, cy=14,
     side=10,
@@ -25,8 +25,11 @@ Hexagon(
     label_my=-1.5,
     label_mx=4.1)
 # the track of the signs...
-sign = circle(cx=0, cy=0, radius=2.7, label='{{sequence}}', fill=None, stroke_width=18,
-              radii=[0,90,180,270], radii_stroke_width=18,)
+sign = circle(
+    cx=0, cy=0, radius=2.7,
+    label='{{sequence}}',
+    fill=None, stroke_width=18,
+    radii=[0,90,180,270], radii_stroke_width=18,)
 iron = circle(common=sign, stroke="black")
 wood = circle(common=sign, stroke="sienna")
 bronze = circle(common=sign, stroke="goldenrod")
@@ -85,7 +88,7 @@ Star(cx=3, cy=5, vertices=5, radius=2, label="star:3-5", common=dot)
 Rhombus(cx=16, cy=5, width=3, height=5, label="rhombus:16-5", common=dot)
 Square(cx=9, cy=5, side=3, label="square:9-5", common=dot)
 
-Dot(x=9.5, y=1, dot_point=6, label="dot:1-9.5")
+Dot(x=9, y=1, dot_point=6, label="dot:1-9")
 
 PageBreak()
 
@@ -110,7 +113,7 @@ Star(cx=3, cy=5, vertices=5, radius=2, heading="star:3-5", common=dot)
 Rhombus(cx=16, cy=5, width=3, height=5, heading="rhombus:16-5", common=dot)
 Square(cx=9, cy=5, side=3, heading="square:9-5", common=dot)
 
-Dot(x=9.5, y=1, dot_point=6, heading="dot:1-9.5")
+Dot(x=9, y=1, dot_point=6, heading="dot:1-9")
 
 PageBreak()
 
@@ -135,7 +138,7 @@ Star(cx=3, cy=5, vertices=5, radius=2, title="star:3-5", common=dot)
 Rhombus(cx=16, cy=5, width=3, height=5, title="rhombus:16-5", common=dot)
 Square(cx=9, cy=5, side=3, title="square:9-5", common=dot)
 
-Dot(x=9.5, y=1, dot_point=6, title="dot:1-9.5")
+Dot(x=9, y=1, dot_point=6, title="dot:1-9")
 
 PageBreak()
 
@@ -167,7 +170,7 @@ Rhombus(cx=16, cy=5, width=3, height=5,
         title="rhombus:16-5", title_stroke="black", fill_stroke="cyan")
 Square(cx=9, cy=5, side=3,
        title="square:9-5", title_stroke="black", fill_stroke="cyan")
-Dot(x=9.5, y=1, dot_point=6, title="dot:1-9.5")
+Dot(x=9, y=1, dot_point=6, title="dot:1-9")
 PageBreak()
 
 # ---- rotation all shapes + label
@@ -176,7 +179,7 @@ Text(common=header, text="Rotated shapes with labels")
 Arrow(x=3, y=6, height=3, width=1.25, head_height=1, head_width=2, rotation=45, stroke_width=2, label="arrow")
 Polygon(x=4, y=24.5, radius=2, rotation=45, stroke_width=2, label="polygon6")
 Polygon(x=10, y=24.5, radius=2, sides=8, angle=22.5, rotation=45, stroke_width=2, label="polygon8")
-Polygon(x=15, y=24.5, radius=2.5, sides=3, rotation=45, stroke_width=2, label="polygon3")
+Polygon(x=15, y=24.5, radius=2, sides=5, rotation=45, stroke_width=2, label="polygon5")
 Rectangle(x=2, y=18.5, width=4, height=3, rotation=45, stroke_width=2, label="rectangle")
 Trapezoid(x=14, y=13, width=4, top=2, height=3, rotation=45, stroke_width=2, label="trapezoid")
 Stadium(x=14.5, y=19, width=3, height=2, rotation=45, stroke_width=2, label="stadium")
@@ -196,13 +199,13 @@ Polyline(
     points=[(0, 13), (2, 15), (4, 13), (6, 15), (8, 13), (10, 15), (12, 13)],
     stroke="gray")
 Polyline(points="0,11 2,13 4,11 6,13 8,11 10,13 12,11", stroke="gray")
-Line(x=1, y=1, length=30, angle=55.3, stroke="tomato", stroke_width=3)  # thick diagonal
-Line(x=0, y=3, x1=19, y1=3, stroke="black", stroke_width=2)
+Line(x=1, y=20, length=25.5, angle=45, stroke="tomato", stroke_width=3)  # thick diagonal
+Line(x=0, y=2, x1=19, y1=2, stroke="black", stroke_width=2)
 Line(
     x=0,
-    y=9,
+    y=8,
     x1=19,
-    y1=9,
+    y1=8,
     dashed=[0.2, 0.1],
     stroke="chartreuse",
     stroke_width=2,
@@ -237,7 +240,7 @@ PageBreak()
 # ---- common, with angled lines
 Blueprint()
 Text(common=header, text="Lines drawn manually using angles (default origin)")
-cmm = Common(x=0, y=0, length=19, dots=True, stroke="darkmagenta", stroke_width=2)
+cmm = Common(x=0, y=18, length=18, dots=True, stroke="darkmagenta", stroke_width=2)
 Line(common=cmm, label="No angle (flat)")
 Line(common=cmm, angle=15, label="15 degrees")
 Line(common=cmm, angle=30, label="30 degrees")
@@ -249,8 +252,8 @@ PageBreak()
 
 # ---- common, with angled lines via loop
 Blueprint()
-Text(common=header, text="Lines drawn via angles (via loop; 5 degrees steps)")
-for angle in range(0, 91, 5):
+Text(common=header, text="Lines drawn via angles; loop in 5 degree steps")
+for angle in steps(0, 91, 5):
     Line(common=cmm, angle=angle)
 PageBreak()
 

@@ -119,6 +119,7 @@ hexgrid = Hexagons(
     side=0.5,
     x=0, y=0,
     rows=6, cols=4,
+    dot=0.02,
     coord_elevation='top'
 )
 LinkLine(
@@ -134,6 +135,7 @@ hexgrid = Hexagons(
     side=0.5,
     x=0, y=0,
     rows=6, cols=4,
+    dot=0.02,
     coord_elevation='top'
 )
 LinkLine(
@@ -149,6 +151,7 @@ hexgrid = Hexagons(
     side=0.5,
     x=0, y=0,
     rows=6, cols=4,
+    dot=0.02,
     coord_elevation='top'
 )
 LinkLine(
@@ -170,6 +173,7 @@ hexgrid = Hexagons(
     side=0.5,
     x=0, y=0,
     rows=6, cols=4,
+    dot=0.02,
     coord_elevation='top'
 )
 LinkLine(

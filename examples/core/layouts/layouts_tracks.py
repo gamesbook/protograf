@@ -128,12 +128,13 @@ PageBreak()
 # ---- circle track + rotation shape
 Blueprint()
 Text(common=txt, text="Track: circle; rotate 'o'")
-shp = rectangle(cx=1, cy=1, width=0.5, height=0.5, label='{{sequence}}', peaks=[("n", 0.25)])
+shp = rectangle(cx=1, cy=1, width=0.5, height=0.5,
+                label='{{sequence}}', peaks=[("n", 0.25)])
 Track(
     Circle(cx=2, cy=3, radius=1.5),
     angles=[30,120,210,300],
     shapes=[shp],
-    rotation_style='o',
+    rotation_style='i',
 )
 PageBreak()
 
@@ -212,9 +213,8 @@ times = circle(
     label='{{sequence}}', label_stroke="black")
 Track(
     circle(cx=2, cy=3, radius=1.5),
-    angles=[300,330,0,30,60,90,120,150,180,210,240,270,],
+    angles=[60,30,0,330,300,270,240,210,180,150,120,90],
     shapes=[times],
-    rotation_style='o',
     clockwise=True,
 )
 PageBreak()

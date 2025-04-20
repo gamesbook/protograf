@@ -1419,13 +1419,13 @@ Example 1. Defaults
 
       .. code:: python
 
-        Polyshape(points=[(0, 0), (0, 1), (1,  2), (2, 1), (2, 0)])
+        Polyshape(points=[(1, 2), (1, 1), (2, 0), (3, 1), (3, 2)])
 
       It has the following properties:
 
-      - starts at x-position ``0`` cm and at y-position ``0`` cm
-      - second point is at x-position ``0`` cm and at y-position ``1`` cm
-      - third point is at x-position ``1`` cm and at y-position ``2`` cm
+      - starts at x-position ``1`` cm and at y-position ``2`` cm
+      - second point is at x-position ``1`` cm and at y-position ``1`` cm
+      - third point is at x-position ``2`` cm and at y-position ``0`` cm
       - etc.
 
       The *points* for a Polyshape which represent its vertices are given in a
@@ -1463,8 +1463,8 @@ for the *cx* and *cy* pair that you supply to it are correct!
       .. code:: python
 
         Polyshape(
-              points=[(0, 0), (0, 1), (1,  2), (2, 1), (2, 0)],
-              cx=1, cy=1,
+              points=[(1, 2), (1, 1), (2, 0), (3, 1), (3, 2)],
+              cx=2, cy=1,
               label='A House',
               label_stroke="seagreen",
               cross=0.5,
@@ -1475,7 +1475,7 @@ for the *cx* and *cy* pair that you supply to it are correct!
       As in Example 1, the *points* are used to construct the outline of the
       shape. Other properties:
 
-      - the centre is *defined* to be at x-position ``1`` cm and y-position
+      - the centre is *defined* to be at x-position ``2`` cm and y-position
         ``1`` cm
       - *cross* - sets the length of each of the two lines that cross at the
         centre to be ``0.5`` cm
@@ -1484,8 +1484,8 @@ for the *cx* and *cy* pair that you supply to it are correct!
         for the shape's' interior
       - *stroke* - color of ``peru`` (hexadecimal value ``#CD853F``)
 
-      Reminder: ``cx`` and ``cy`` affect the drawing of the cross label but
-      do **not** affect the drawing of the shape itself.
+      Reminder: ``cx`` and ``cy`` affect the drawing of the cross and label
+      but do **not** affect the drawing of the shape itself.
 ===== ======
 
 Example 3. Offset

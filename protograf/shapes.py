@@ -263,7 +263,6 @@ class ArrowShape(BaseShape):
                 "The Arrow head height must be less than overall height", True
             )
         # print(f"***2 {self._u.width=} {self.tail_width_u=}  {self.head_width_u=} {self.fill=} ")
-        # print(f"{=} ")
         vertices = []
         vertices.append(Point(x_s, y_s))  # lower-left corner
         vertices.append(Point(x_c - self._u.width / 2.0, y_s - tail_height))
@@ -553,9 +552,17 @@ class CircleShape(BaseShape):
                 outer_radius = self.radius
             radius_offset = self.unit(self.radii_offset) or None
             radius_length = self.unit(outer_radius, label="radius length")
-            # print(f'{radius_length=} :: {radius_offset=} :: {outer_radius=}')
-            _radii_labels = tools.split(self.radii_labels)
-            label_key = 0
+            # print(f'*** {radius_length=} :: {radius_offset=} :: {outer_radius=}')
+            _radii_labels = [self.radii_labels]
+            if self.radii_labels:
+                if isinstance(self.radii_labels, (list, tuple)):
+                    _radii_labels = tools.split(self.radii_labels)
+            _radii_strokes = [self.radii_stroke]
+            if self.radii_stroke:
+                if isinstance(self.radii_stroke, (list, tuple)):
+                    _radii_strokes = tools.split(self.radii_stroke)
+            # print(f'*** {_radii_labels=} {_radii_strokes=}')
+            label_key, stroke_key = 0, 0
             label_points = []
             for key, rad_angle in enumerate(_radii):
                 # points based on length of line, offset and the angle in degrees
@@ -563,7 +570,7 @@ class CircleShape(BaseShape):
                     Point(x_c, y_c), radius_length, rad_angle
                 )
                 if radius_offset is not None and radius_offset != 0:
-                    # print(f'{rad_angle=} {radius_offset=} {diam_pt}, {x_c=}, {y_c=}')
+                    # print(f'***{rad_angle=} {radius_offset=} {diam_pt} {x_c=} {y_c=}')
                     offset_pt = geoms.point_on_circle(
                         Point(x_c, y_c), radius_offset, rad_angle
                     )
@@ -581,18 +588,23 @@ class CircleShape(BaseShape):
                 )
                 # ---- draw radii line
                 cnv.draw_line((x_start, y_start), (x_end, y_end))
-            # ---- style radii lines
-            self.set_canvas_props(
-                index=ID,
-                stroke=self.radii_stroke,
-                stroke_width=self.radii_stroke_width,
-                dashed=self.radii_dashed,
-                dotted=self.radii_dotted,
-            )
+                # ---- style radii lines
+                _radii_stroke = _radii_strokes[stroke_key]
+                self.set_canvas_props(
+                    index=ID,
+                    stroke=_radii_stroke,
+                    stroke_width=self.radii_stroke_width,
+                    dashed=self.radii_dashed,
+                    dotted=self.radii_dotted,
+                )
+                stroke_key += 1
+                if stroke_key > len(_radii_strokes) - 1:
+                    stroke_key = 0
             # ---- draw radii text labels
-            if _radii_labels:
+            if self.radii_labels:
                 for label_point in label_points:
                     self.radii_label = _radii_labels[label_key]
+                    # print(f'*** {label_point[1]=}  {self.radii_labels_rotation=}')
                     self.draw_radii_label(
                         cnv,
                         ID,
@@ -2167,7 +2179,7 @@ class LineShape(BaseShape):
             if self.angle > 0:
                 angle = math.radians(self.angle)
                 x_1 = x + (self._u.length * math.cos(angle))
-                y_1 = y + (self._u.length * math.sin(angle))
+                y_1 = y - (self._u.length * math.sin(angle))
             else:
                 x_1 = x + self._u.length
                 y_1 = y

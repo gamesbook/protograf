@@ -1765,6 +1765,7 @@ def Hexagons(rows=1, cols=1, sides=None, **kwargs):
         rows: int, cols: int, stop: int, the_cols: list, odd_mid: bool = True
     ):
         """Draw rows of hexagons for each column in `the_cols`"""
+        breakpoint()
         sequence = 0
         top_row = 0
         end_row = rows - 1
@@ -1794,6 +1795,7 @@ def Hexagons(rows=1, cols=1, sides=None, **kwargs):
                         sequence=sequence,
                         label=hxgn.grid.label,
                     )
+                    # print(f'### locale {ccol=} {_row=} / {hxgn.grid.x=} {hxgn.grid.y=}')
                     locales.append(_locale)
                     sequence += 1
 
@@ -1866,6 +1868,7 @@ def Hexagons(rows=1, cols=1, sides=None, **kwargs):
                         sequence=sequence,
                         label=hxgn.grid.label,
                     )
+                    # print(f'### locale {col=} {row=} / {hxgn.grid.x=} {hxgn.grid.y=}')
                     locales.append(_locale)
                     sequence += 1
 
@@ -2082,7 +2085,7 @@ def LinkLine(grid: list, locations: Union[list, str], **kwargs):
             _line = line(x=x, y=y, x1=x1, y1=y1, **kwargs)
             # tools.feedback(f"$$$ {x=}, {y=}, {x1=}, {y1=}")
             delta_x = globals.margin_left
-            delta_y = globals.margin_bottom
+            delta_y = globals.margin_top
             # tools.feedback(f"$$$ {delta_x=}, {delta_y=}")
             _line.draw(
                 off_x=-delta_x,
@@ -2452,9 +2455,15 @@ def Track(track=None, **kwargs):
         if _rotation_style:
             match _rotation_style:
                 case "i" | "inwards":
-                    shape_rotation = 90 - track_point.angle
+                    if track_name == "CircleShape":
+                        shape_rotation = 90 + track_point.angle
+                    else:
+                        shape_rotation = 90 - track_point.angle
                 case "o" | "outwards":
-                    shape_rotation = 270 - track_point.angle
+                    if track_name == "CircleShape":
+                        shape_rotation = 270 + track_point.angle
+                    else:
+                        shape_rotation = 270 - track_point.angle
                 case _:
                     raise NotImplementedError(
                         f"The rotation_style '{_rotation_style}' is not valid"

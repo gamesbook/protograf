@@ -620,6 +620,8 @@ class BaseCanvas:
             "radii_labels_stroke_width", self.stroke_width
         )
         self.radii_labels_rotation = self.defaults.get("radii_labels_rotation", 0)
+        self.radii_labels_my = self.defaults.get("radii_labels_my", 0)
+        self.radii_labels_mx = self.defaults.get("radii_labels_mx", 0)
         # ---- circle
         self.petals = self.defaults.get("petals", 0)
         self.petals_style = self.defaults.get("petals_style", "triangle")
@@ -1027,6 +1029,8 @@ class BaseShape:
         self.radii_labels_rotation = self.kw_float(
             kwargs.get("radii_labels_rotation", 0)
         )
+        self.radii_labels_my = self.kw_float(kwargs.get("radii_labels_my", 0))
+        self.radii_labels_mx = self.kw_float(kwargs.get("radii_labels_mx", 0))
         # ---- circle
         self.petals = self.kw_int(kwargs.get("petals", base.petals), "petals")
         self.petals_style = kwargs.get("petals_style", base.petals_style)
@@ -2419,11 +2423,12 @@ class BaseShape:
         if ttext:
             _ttext = str(ttext)
             yl = yl - (self.radii_labels_size / 3.0) if centred else yl
-            y = yl  # + self.unit(self.label_my)
-            x = xl  # + self.unit(self.label_mx)
+            y = yl + self.unit(self.radii_labels_my)
+            x = xl + self.unit(self.radii_labels_mx)
             kwargs["font_name"] = self.radii_labels_face
             kwargs["stroke"] = self.radii_labels_stroke
             kwargs["font_size"] = self.radii_labels_size
+            # print(f'*** draw_radii_label {rotation=}')
             self.draw_multi_string(
                 canvas, x, y, _ttext, align=align, rotation=_rotation, **kwargs
             )
@@ -2433,6 +2438,7 @@ class BaseShape:
     def draw_dot(self, canvas, x, y):
         """Draw a small dot on a shape (normally the centre)."""
         if self.dot:
+            # print(f'*** draw_dot {x=} {y=}' )
             dot_size = self.unit(self.dot)
             kwargs = {}
             kwargs["fill"] = self.dot_stroke

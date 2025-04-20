@@ -383,18 +383,18 @@ Text(common=txt, text="Shape label: offsets")
 Star(cx=2, cy=3, radius=2, fill="yellow", stroke="red", rotation=45)
 PageBreak()
 
-# ---- shapeshape
+# ---- polyshape
 Blueprint(stroke_width=0.5)
 Text(common=txt, text="Polyshape: default")
-Polyshape(points=[(1, 1), (1, 2), (2, 3), (3, 2), (3, 1)])
+Polyshape(points=[(1, 2), (1, 1), (2, 0), (3, 1), (3, 2)])
 PageBreak()
 
-# ---- shapeshape - custom
+# ---- polyshape - custom
 Blueprint(stroke_width=0.5)
 Text(common=txt, text="Polyshape: custom")
 Polyshape(
-      points=[(1, 1), (1, 2), (2, 3), (3, 2), (3, 1)],
-      cx=2, cy=2,
+      points=[(1, 2), (1, 1), (2, 0), (3, 1), (3, 2)],
+      cx=2, cy=1,
       label='A House',
       label_stroke="seagreen",
       cross=0.5,

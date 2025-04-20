@@ -280,7 +280,7 @@ def point_on_circle(point_centre: Point, radius: float, angle: float) -> Point:
     try:
         theta = float(angle) * math.pi / 180.0
         x = math.cos(theta) * radius + point_centre.x
-        y = math.sin(theta) * radius + point_centre.y
+        y = point_centre.y - math.sin(theta) * radius  # + point_centre.y
     except:
         raise ValueError(
             f"Cannot calculate point on circle for: {point_centre}, {radius} and {angle}"
