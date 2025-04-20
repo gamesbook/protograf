@@ -2443,20 +2443,21 @@ class BaseShape:
     def draw_cross(self, canvas, xd, yd, **kwargs):
         """Draw a cross on a shape (normally the centre)."""
         if self.cross:
+            # ---- properties
+            kwargs = {}
             cross_size = self.unit(self.cross)
-            rotation = kwargs.get("rotation")
+            rotation = kwargs.get("rotation", self.rotation)
             if rotation:
-                kwargs = {"rotation": rotation}
-            else:
-                kwargs = {}
+                kwargs["rotation"] = rotation
+                kwargs["rotation_point"] = muPoint(xd, yd)
             kwargs["fill"] = self.cross_stroke
             kwargs["stroke"] = self.cross_stroke
             kwargs["stroke_width"] = self.cross_stroke_width
-            # horizontal
+            # ---- horizontal line
             pt1 = geoms.Point(xd - cross_size / 2.0, yd)
             pt2 = geoms.Point(xd + cross_size / 2.0, yd)
             canvas.draw_line(pt1, pt2)
-            # vertical
+            # ---- vertical line
             pt1 = geoms.Point(xd, yd - cross_size / 2.0)
             pt2 = geoms.Point(xd, yd + cross_size / 2.0)
             canvas.draw_line(pt1, pt2)

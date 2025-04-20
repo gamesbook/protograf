@@ -165,7 +165,7 @@ Example 2. Customised
 
             Rectangle(
                 x=1, y=1, height=1, width=2, dot=0.02,
-                stroke=red, fill=None,
+                stroke="red", fill=None,
                 title="Arc(cx=1, cy=1, radius=2)")
             )
 
@@ -267,7 +267,7 @@ Example 1.
 
       It has the following properties based on these values:
 
-      - a default circle that defines boundaries of the chord line:
+      - a small circle that defines boundaries for the chord line:
 
         - centre x-position is ``2`` cm
         - centre y-position  is ``2`` cm
@@ -533,19 +533,19 @@ Example 2. Customised
 
         Text(wrap=True,
              x=0, y=1, width=4, height=1,
-             font_size=7,  fill="black", stroke="black",
+             font_size=7, fill="black", stroke="black",
              font_name="Courier", align="right",
              transform='t',
              text="I am Courier in title case to the right")
         Text(wrap=True,
              x=0, y=2.5, width=4, height=1,
-             font_size=8,  fill="black", stroke="black",
+             font_size=8, fill="black", stroke="black",
              font_name="Helvetica", align="left",
              transform='upper',
              text="I am Helvetica in upper case to the left")
         Text(wrap=True,
              x=0, y=4, width=4, height=1,
-             font_size=9,  fill="black", stroke="black",
+             font_size=9, fill="black", stroke="black",
              font_name="Times-Roman", align="centre",
              transform='lowercase',
              text="I'm lower case Times-Roman in the centre")
@@ -687,27 +687,38 @@ Example 2. Rotation
       .. code:: python
 
         Arrow(
-            x=1, y=0.5,
+            x=1, y=5.5,
             title="The Arrow", heading="An arrow",
             dot=0.1, cross=0.5)
 
         Arrow(
-            x=2.5, y=3, title="0\u00B0", dot=0.15, dotted=True)
+            x=2.5, y=3, title="0\u00B0",
+            dot=0.15, dotted=True)
+
         Arrow(
-            x=2.5, y=3, title="45\u00B0", dot=0.1,
-            fill=None, stroke=red, dot_stroke=red, rotation=45)
+            x=2.5, y=3, title="45\u00B0",
+            dot=0.1, dot_stroke="red",
+            fill=None, stroke="red", rotation=45)
+
+        Arrow(
+            x=3, y=5.5,
+            label="arrow")
 
       The shapes all set the following properties:
 
       - centre-bottom point at *x* and *y*
       - *title* - appears below the shape
-      - *dot* - small, filled circle |dash| marks the **centre** of the
+      - *dot* - small, filled circle |dash| **centre** of the
         Arrow
 
       The lower-left Arrow also sets the following properties:
 
       - *heading* - appears above the shape
       - *cross* - small pair of lines at the Arrow's centre
+
+      The lower-right Arrow also sets the following properties:
+
+      - *label* - appears in the middle of the shape
 
       The two arrows in the top-right are superimposed.
 
@@ -739,27 +750,34 @@ Example 3. Styled
       .. code:: python
 
         Arrow(
-            x=1, y=3, height=1, width=0.25, head_height=0.5, head_width=1,
-            points_offset=-0.25,
-            fill=lime)
+            x=1, y=5, height=1, width=0.5,
+            head_height=0.5, head_width=0.75)
         Arrow(
-            x=2, y=3, height=1, width=0.25, head_height=1, head_width=0.75,
-            points_offset=0.25,
-            fill=tomato)
+            x=2, y=5, height=1, width=0.5,
+            head_height=0.5, head_width=0.75,
+            tail_width=0.75,
+            stroke="tomato", fill="lightsteelblue",
+            stroke_width=2, transparency=50)
         Arrow(
-            x=3, y=3, height=1, width=0.5, head_height=0.5, head_width=0.5,
-            tail_notch=0.25,
-            fill=aqua, stroke=black, stroke_width=1)
-        Arrow(
-            x=1, y=1, height=1, width=0.5, head_height=0.5, head_width=0.75)
-        Arrow(
-            x=2, y=1, height=1, width=0.5, head_height=0.5, head_width=0.75,
-            tail_width=0.75, transparency=50,
-            fill=silver, stroke=tomato, stroke_width=2)
-        Arrow(
-            x=3, y=1, height=1, width=0.5, head_height=0.5, head_width=0.75,
+            x=3, y=5, height=1, width=0.5,
+            head_height=0.5, head_width=0.75,
             tail_width=0.01,
-            fill_stroke=gold)
+            fill_stroke="gold")
+        Arrow(
+            x=1, y=3, height=1, width=0.25,
+            head_height=0.5, head_width=1,
+            points_offset=-0.25,
+            fill="chartreuse")
+        Arrow(
+            x=2, y=3, height=1, width=0.25,
+            head_height=1, head_width=0.75,
+            points_offset=0.25,
+            fill="tomato")
+        Arrow(
+            x=3, y=3, height=1, width=0.5,
+            head_height=0.5, head_width=0.5,
+            tail_notch=0.25,
+            stroke="black", fill="cyan", stroke_width=1)
 
       The shapes all set the following properties:
 
@@ -787,7 +805,7 @@ Example 3. Styled
       The near-zero *tail_width*  means the base of the arrow is nearly
       shown as a point.
 
-      The **green** (``lime`` fill) arrow has these properties:
+      The **green** (``chartreuse`` fill) arrow has these properties:
 
       - *points_offset* of ``-0.25`` cm
 
@@ -803,7 +821,7 @@ Example 3. Styled
 
       In this case, the head has been been made narrower and longer.
 
-      The **blue** (``aqua`` fill) arrow has these properties:
+      The **blue** (``cyan`` fill) arrow has these properties:
 
       - *tail_notch* of ``0.25`` cm; the base has a small inwards-facing
         triangle "cut out"
@@ -841,7 +859,7 @@ Example 1.
 
       It has the following properties based on the defaults:
 
-      - lower-left "corner" at x-position ``1`` cm and at y-position ``1`` cm
+      - upper-left "corner" at x-position ``1`` cm and at y-position ``1`` cm
       - diameter of ``1`` cm
 ===== ======
 
@@ -872,7 +890,7 @@ Example 1. Defaults
 
       It has the following properties based on the defaults:
 
-      - lower-left at x-position ``1`` cm and at y-position ``1`` cm
+      - upper-left at x-position ``1`` cm and at y-position ``1`` cm
       - diameter of ``1`` cm
       - lines in all 8 directions, extending from the centre outwards
 
@@ -918,7 +936,7 @@ Example 2. Customised
               height=2, width=3,
               perimeter='rectangle',
               directions="*",
-              radii_stroke=red)
+              radii_stroke="red")
 
       This Compass shape has the following properties:
 
@@ -979,7 +997,7 @@ Example 1. Defaults
 
       It has the following properties based on the defaults:
 
-      - lower-left "corner" at x-position ``1`` cm and at y-position ``1`` cm
+      - upper-left "corner" at x-position ``1`` cm and at y-position ``1`` cm
       - height of ``1`` cm
       - width of ``1`` cm
 
@@ -1034,7 +1052,7 @@ Example 1. Defaults
 
       It has the following properties based on the defaults:
 
-      - lower-left "corner" at x-position ``1`` cm and at y-position ``1`` cm
+      - upper-left "corner" at x-position ``1`` cm and at y-position ``1`` cm
       - side of ``1`` cm; all sides are equal
 ===== ======
 
@@ -1048,22 +1066,30 @@ Example 2. Customised
 |eq2| This example shows the shape constructed using the command with the
       various properties.
 
-      In the lower section:
+      In the top section:
 
       .. code:: python
 
         EquilateralTriangle(
-          x=2, y=1, flip="north", hand="east", label="NE", fill=gold)
+            x=2, y=1, flip="north",
+            hand="east", label="NE",
+            fill="gold")
         EquilateralTriangle(
-          x=2, y=1, flip="south", hand="east", label="SE", fill=lime)
+            x=2, y=1,
+            flip="south", hand="east",
+            label="SE", fill="chartreuse")
         EquilateralTriangle(
-          x=2, y=1, flip="north", hand="west", label="NW", fill=red)
+            x=2, y=1, flip="north",
+            hand="west", label="NW",
+            fill="red")
         EquilateralTriangle(
-          x=2, y=1, flip="south", hand="west", label="SW", fill=blue)
+            x=2, y=1, flip="south",
+            hand="west", label="SW",
+            fill="blue")
 
       These shapes have the following properties:
 
-      - starting position at x-position ``2`` cm and at y-position ``1`` cm
+      - starting position - x-position ``2`` cm
       - default side of ``1`` cm; all sides are equal
       - *flip* - this can be ``north`` or ``south`` and will cause the triangle
         to either point up or down relative to the starting position
@@ -1075,14 +1101,14 @@ Example 2. Customised
       .. code:: python
 
         EquilateralTriangle(
-            x=2, y=3, side=1.5,
-            hatch_count=5, hatch_stroke=red,
+            x=1, y=4, side=1.5,
+            hatch_count=5, hatch_stroke="red",
             title='Title', heading='Head')
 
-      - starting position at *x*-position ``2`` cm and at *y*-position ``3`` cm
+      - starting position - *x*-position ``1`` cm and *y*-position ``4`` cm
       - *side* of ``1.5`` cm; all sides are equal
       - *hatch_count* of ``5`` - this means there will be 5 equally spaced lines drawn
-        between opposing sides which run parallel to the third side
+        between opposing sides and running parallel to the third side
       - *hatch_stroke* - customise the hatches to show them as ``red``
 
       The top section shows:
@@ -1090,11 +1116,14 @@ Example 2. Customised
       .. code:: python
 
         EquilateralTriangle(
-            x=1, y=4, stroke_width=1, rotation=45, dot=.05)
+            x=1, y=5.5, side=1.5,
+            stroke_width=1,
+            rotation=45,
+            dot=.05)
 
-      - starting position at x-position ``1`` cm and at y-position ``4`` cm
+      - starting position - x-position ``1`` cm y-position ``5.5`` cm
       - *dot* - in the centre
-      - *rotation* - of 45 |deg| (from the baseline, anti-clockwise) about
+      - *rotation* - of 45 |deg| (from the baseline, clockwise) about
         the centre
 
 ===== ======
@@ -1127,7 +1156,7 @@ Example 1. Defaults
 
       It has the following properties based on the defaults:
 
-      - lower-left "corner" at x-position ``1`` cm and at y-position ``1`` cm
+      - upper-left "corner" at x-position ``1`` cm and at y-position ``1`` cm
       - flat-to-flat height of ``1`` cm
       - "flat" top
 ===== ======
@@ -1148,7 +1177,7 @@ Example 2. Pointy
 
       It has the following properties based on the defaults:
 
-      - lower-left "corner" at x-position ``1`` cm and at y-position ``1`` cm
+      - upper-left "corner" at x-position ``1`` cm and at y-position ``1`` cm
       - flat-to-flat height of ``1`` cm
       - a ``pointy`` top set via the *orientation*
 ===== ======
@@ -1245,7 +1274,7 @@ Example 3. Radii
               cx=2, cy=1, sides=10, radius=1,
               radii=True,
               radii_offset=0.75, radii_length=0.25, radii_stroke_width=1,
-              dot=0.1, dot_stroke=red
+              dot=0.1, dot_stroke="red"
           )
 
       It has the following properties:
@@ -1299,7 +1328,7 @@ Example 4. Perbis
             cx=2, cy=1, sides=8, radius=1,
             perbis="2,4,7",
             perbis_offset=0.25, perbis_length=0.5, perbis_stroke_width=1,
-            dot=0.1, dot_stroke=red)
+            dot=0.1, dot_stroke="red")
 
       It has the following properties:
 
@@ -1349,7 +1378,7 @@ Example 5. Rotation
 
       The examples have the following properties:
 
-      - *x* and *y* - set the lower-left location
+      - *x* and *y* - set the upper-left location
       - *radius* - ``1`` cm in each case
       - *sides* - the default of ``6`` in each case (a `hexagon`_ shape)
       - *rotation* - varies from 0 |deg| to 60 |deg|
@@ -1437,10 +1466,10 @@ for the *cx* and *cy* pair that you supply to it are correct!
               points=[(0, 0), (0, 1), (1,  2), (2, 1), (2, 0)],
               cx=1, cy=1,
               label='A House',
-              label_stroke=olive,
+              label_stroke="seagreen",
               cross=0.5,
-              fill=sandybrown,
-              stroke=peru,
+              fill="sandybrown",
+              stroke="peru",
         )
 
       As in Example 1, the *points* are used to construct the outline of the
@@ -1479,15 +1508,17 @@ pairs of values; so instead of ``[(0,0), (1,1)]`` just use ``"0,0 1,1"``.
 
         .. code:: python
 
-        Polyshape(
-            points="0,0 0,1 2,0 2,1 0,0",
-            cx=1, cy=0.5,
-            fill=lime, label="Left ....... Right")
-        Polyshape(
-            points="0,0 0,1 2,0 2,1 0,0",
-            cx=1, cy=0.5,
-            fill=gold, label="Left ....... Right",
-            x=1, y=2)
+            Polyshape(
+                points="0,0 0,1 2,0 2,1 0,0",
+                cx=1, cy=0.5,
+                fill="chartreuse",
+                label="Left ....... Right")
+            Polyshape(
+                points="0,0 0,1 2,0 2,1 0,0",
+                cx=1, cy=0.5,
+                fill="gold",
+                label="Left ....... Right",
+                x=1, y=2)
 
       As in Example 2, the *points* are used to construct the outline of the
       shape. In this case, they are a string of space-separated pairs of values.
@@ -1495,13 +1526,13 @@ pairs of values; so instead of ``[(0,0), (1,1)]`` just use ``"0,0 1,1"``.
       Other properties:
 
       - the centre is defined to be at x-position ``1`` cm and y-position
-        ``0.5`` cm; this affects drawing of the label
+        ``0.5`` cm; this **only** affects drawing of the label
         but does **not** affect drawing the shape itself
       - *label* - sets the text appearing at the defined centre position
       - *fill* color defines the color of the interior of the shape
 
       In the ``gold``-filled Polyshape, the *x* and *y* values have been set,
-      causing the whole shape to move up and to the right.
+      causing the whole shape to move down and to the right.
 ===== ======
 
 
@@ -1516,7 +1547,7 @@ It represents encoded information that a device with a QR scanner, for example,
 a  cell phone, can decode.
 
 The properties that can be provided to a ``QRCode`` command, apart from the
-usual *x* and *y*, to set the lower-left corner, and *height* and *width* to
+usual *x* and *y*, to set the upper-left corner, and *height* and *width* to
 set the size, are:
 
 - *image* - this should be the first property and is the name of the file
@@ -1550,7 +1581,7 @@ Example 1.
       The first command uses the defaults which means it has the following
       properties automtically set for it:
 
-      - lower-left corner at x-position ``1`` cm and at y-position ``1`` cm
+      - upper-left corner at x-position ``1`` cm and at y-position ``1`` cm
       - *width* and *height* - default to ``1`` cm
       - *scaling* - default is ``1``, so 1 pixel per square
       - *stroke* - is ``black`` for the squares color
@@ -1563,14 +1594,14 @@ Example 1.
         QRCode(
             'qrcode2.png',
             text="Help me ObiWan",
-            x=2, y=2,
+            x=1, y=3,
             height=2, width=2,
-            fill=grey,
-            stroke=red,
+            fill="gray",
+            stroke="red",
             scaling=5
         )
 
-      In this example, the QR Code is now larger with colors.
+      In this example, the QR Code is now larger with different colors.
 
 ===== ======
 
@@ -1601,7 +1632,7 @@ Example 1. Defaults
 
       It has the following properties set for it:
 
-      - lower-left corner at x-position ``1`` cm and at y-position ``1`` cm
+      - upper-left corner at x-position ``1`` cm and at y-position ``1`` cm
       - *width* and *height* - default to ``1`` cm
 
       Because all sides of the Rectangle are equal, it appears as though it
@@ -1657,7 +1688,7 @@ Example 1. Defaults
 
       It has the following properties based on the defaults:
 
-      - starts at x-position ``1`` cm and at y-position ``1`` cm
+      - upper-left at x-position ``1`` cm and at y-position ``1`` cm
       - *width* of ``1`` cm
       - *height* of ``1`` cm
 
@@ -1761,8 +1792,8 @@ Example 1. Defaults
 
           It has the following properties based on the defaults:
 
-          - lower-left "corner"at x-position ``1`` cm and at y-position ``1`` cm
-          - sector is then drawn inside a circle of diameter ``1`` cm, with a
+          - upper-left "corner"at x-position ``1`` cm and at y-position ``1`` cm
+          - sector is then drawn inside a circle of radius ``1`` cm, with a
             default *angle_width* of 90 |deg|
     ===== ======
 
@@ -1783,7 +1814,7 @@ Example 2. Customised
           .. code:: python
 
             sctm = Common(
-                cx=2, cy=3, radius=2, fill=black, angle_width=43)
+                cx=2, cy=3, radius=2, fill="black", angle_width=43)
 
             Sector(common=sctm, angle=40)
             Sector(common=sctm, angle=160)
@@ -1825,7 +1856,7 @@ Example 1. Defaults
 
       It has the following properties based on the defaults:
 
-      - lower-left corner at:
+      - upper-left corner at:
 
         - x-position ``1`` cm and
         - y-position ``1`` cm
@@ -1886,7 +1917,7 @@ Example 1. Defaults
         - x-position ``1`` cm and
         - y-position ``1`` cm
       - height and width of ``1`` cm each
-      - curved ends at the east/right and west/left sides
+      - curved ends extend from the east/right and west/left sides
 
 ===== ======
 
@@ -1903,13 +1934,17 @@ Example 2. Customised
       .. code:: python
 
         Stadium(
-          x=0, y=0, height=1, width=1, edges='n', fill=tan, label="north")
+          x=0, y=0, height=1, width=1, edges='n',
+          fill="tan", label="north")
         Stadium(
-          x=3, y=1, height=1, width=1, edges='s', fill=tan, label="south")
+          x=3, y=1, height=1, width=1, edges='s',
+          fill="tan", label="south")
         Stadium(
-          x=0, y=4, height=1, width=1, edges='e', fill=tan, label="east")
+          x=0, y=4, height=1, width=1, edges='e',
+          fill="tan", label="east")
         Stadium(
-          x=3, y=5, height=1, width=1, edges='w', fill=tan, label="west")
+          x=3, y=5, height=1, width=1, edges='w',
+          fill="tan", label="west")
 
       These have the following properties set:
 
@@ -1976,7 +2011,8 @@ Example 2. Customised
 
           Star(
             cx=2, cy=3, radius=2,
-            fill=yellow, stroke=red, rotation=45)
+            fill="yellow", stroke="red",
+            rotation=45)
 
       It has the following properties that differ from the defaults:
 
@@ -1986,7 +2022,7 @@ Example 2. Customised
         that defines the color of the interior of the Star
       - *stroke* color of ``red`` (corresponds to hexadecimal value ``#FF0000``)
         that defines the color of the border of the Star
-      - *rotation* -  of 45 |deg| (from the baseline, anti-clockwise) about
+      - *rotation* -  of 45 |deg| (from the baseline, clockwise) about
         the centre
 ===== ======
 
@@ -2306,7 +2342,7 @@ Example 1. Defaults
 
       It has the following properties based on the defaults:
 
-      - starts at the lower-left corner, as defined by the page margins
+      - starts at the upper-left corner, as defined by the page margins
       - has vertical and horizontal lines filling the page from the lower left
         corner up to the right-most and top-most margins
       - has interval between the lines of ``1`` cm
@@ -2361,7 +2397,7 @@ Example 1. Defaults
 
       It has the following properties based on the defaults:
 
-      - the lower-left of the grid is drawn at the absolute page x-position
+      - the upper-left of the grid is drawn at the absolute page x-position
         of ``0`` cm and y-position ``0`` cm i.e. the margins are ignored
       - a set of dots, spaced ``1`` cm apart, are created extending to the
         right- and top- margins
@@ -2380,7 +2416,8 @@ Example 2. Moleskine Grid
       .. code:: python
 
         DotGrid(
-            stroke=darkgray, width=0.5, height=0.5,
+            stroke="darkgray",
+            width=0.5, height=0.5,
             dot_point=1, offset_y=-0.25)
 
       To simulate the dot grid found in Moleskine notebooks, it
@@ -2397,8 +2434,8 @@ Example 2. Moleskine Grid
          For a notebook page for *actual*  use, you could consider setting
          the page color.
 
-         A color like ``cornsilk`` might provide a suitable backdrop for
-         the light grey of the grid.
+         A color like ``"cornsilk"`` might provide a suitable backdrop
+         for the light grey of the grid.
 
          To change the page color, set the *fill* property of the ``Create()``
          command.
@@ -2431,7 +2468,7 @@ Example 1. Defaults
 
       It has the following properties based on the defaults:
 
-      - starts at lower-left corner of page defined by the margin
+      - starts at upper-left corner of page defined by the margin
       - has a default grid interval of ``1`` cm in both the x- and y-direction
 ===== ======
 
@@ -2447,7 +2484,7 @@ Example 2. Side & Stroke
 
       .. code:: python
 
-          Grid(side=0.85, stroke=gray, stroke_width=1)
+          Grid(side=0.85, stroke="gray", stroke_width=1)
 
       It has the following properties based on the defaults:
 
@@ -2475,12 +2512,12 @@ Example 3. Fixed Size
               x=0.5, y=0.5,
               height=1.25, width=1,
               cols=3, rows=4,
-              stroke=gray, stroke_width=1
+              stroke="gray", stroke_width=1
           )
 
       It has the following properties set for it:
 
-      - *x* and *y* - each set to ``0.5`` cm; offsets the grid's lower-left
+      - *x* and *y* - each set to ``0.5`` cm; offsets the grid's upper-left
         corner from the page margin
       - *height* - value of ``1.25`` cm set for the row height
       - *width* - value of ``1`` cm set for the column width
@@ -2509,7 +2546,11 @@ An "image" refers to an external file which is simply inserted into the drawing.
 The Image shape shares a number of common aspects with other shapes - such as
 an x & y position, a width and height and the ability to be rotated.
 
-An image can also be "drawn over" by other shapes appearing further on in a script.
+An image can also be "drawn over" by other shapes appearing further on in a
+script.
+
+If an image has a transparent area, this will be respected and shapes
+appearing earlier on in a script may then be visible "below" it.
 
 
 Example 1. Defaults
@@ -2538,9 +2579,9 @@ Example 1. Defaults
 
       The image has the following other properties based on the defaults:
 
-      - lower-left corner at x-position ``1`` cm and at y-position ``1`` cm
-      - *width* and *height* - default to ``1`` cm; this may distort the image if it
-        is not square in shape
+      - upper-left corner - x-position ``1`` cm and y-position ``1`` cm
+      - *width* and *height* - default to ``1`` cm; this may distort the image
+        if it is not square in shape
 ===== ======
 
 Example 2. Rotation & Scaling
@@ -2573,7 +2614,7 @@ Example 2. Rotation & Scaling
       Each image has the following properties set for it:
 
       - name of the image file; this must be the first property set
-      - *x* and *y* - these values set the lower-left corner
+      - *x* and *y* - these values set the upper-left corner
 
       The PNG images also have the following properties set for them:
 
@@ -2662,7 +2703,7 @@ Example 1. Defaults
 
       It has the following properties based on the defaults:
 
-      - lower-left "corner" at x-position ``1`` cm and at y-position ``1`` cm
+      - upper-left "corner" at x-position ``1`` cm and at y-position ``1`` cm
       - flat-to-flat hexagon *height* of ``1`` cm
       - "flat" top hexagons
       - size of ``2`` *rows* by ``2`` *cols* ("columns")
@@ -2787,12 +2828,12 @@ Example 2. Customised
 
           Rectangles(
              rows=4, cols=2, width=1.5, height=1.25,
-             dotted=True, fill=lime)
+             dotted=True, fill="chartreuse")
 
       It has the following properties based on the defaults:
 
       - starts at x-position ``1`` cm and at y-position ``1`` cm
-      - *fill* color of ``lime``
+      - *fill* color of ``chartreuse``
       - *dotted* lines
       - *height* of ``1.25`` cm set for each Rectangle's height
       - *width* of ``1.5`` cm set for each Rectangle's width
@@ -2842,69 +2883,16 @@ position of the shape and/or **cy** |dash| the distance from the bottom margin
 of the page (or card) to the centre position of the shape.
 
 
-Dot and Cross
-~~~~~~~~~~~~~
-`^ <shapes-common-properties_>`_
-
-For shapes that have a definable centre e.g. a `Circle`_, a `Square`_
-or a `Hexagon`_, it is possible to place a dot, a cross, or both at this
-location.
-
-The color for the dot and cross will, if not provided, take on the color
-of the shape of which they are part |dash| see the `Stadium` example below.
-
-.. |dnc| image:: images/customised/dots_crosses.png
-   :width: 330
-
-===== ======
-|dnc| This example shows various shapes constructed using the following
-      commands:
-
-      .. code:: python
-
-        Rhombus(
-          cx=1, cy=5, side=2, dot=0.1, dot_stroke=red)
-        Rhombus(
-           cx=3, cy=5, side=2,
-           cross=0.25, cross_stroke=red, cross_stroke_width=1)
-
-        Polygon(
-          cx=1, cy=3, sides=8, radius=1,
-          dot=0.1, dot_stroke=orange)
-        Polygon(
-           cx=3, cy=3, sides=8, diameter=2,
-           cross=0.25, cross_stroke=orange, cross_stroke_width=1)
-
-        Stadium(cx=1, cy=1, side=1, stroke=blue, dot=0.1)
-        Stadium(
-            cx=3, cy=1, side=1, stroke=blue,
-            cross=0.25, cross_stroke=blue, cross_stroke_width=1)
-
-      The shapes have their properties set as follows:
-
-      - *cx* and *cy* set the centre point of the shape
-      - *dot* - sets the size of dot at the centre
-      - *dot_stroke*  - sets the color (and fill) of the dot; defaults to match the
-        *stroke* of the shape
-        that it is part of
-      - *cross* - sets the length of each of the two lines that cross at the
-        centre
-      - *cross_stroke*  - sets the color of the cross lines; defaults to the
-        stroke of the shape that it is part of
-      - *cross_stroke_width* - sets the thickness of the cross lines
-===== ======
-
-
 Fill and Stroke
 ~~~~~~~~~~~~~~~
 `^ <shapes-common-properties_>`_
 
 Almost every single shape will have a *stroke*, corresponding to the color of
 the line used to draw it, and a *stroke_width* which is the thickness in
-points (72 points per inch); the default line color is black.
+points (72 points per inch); the default line color is *black*.
 
 All `Enclosed Shapes`_ will have a *fill* corresponding to the color used for
-the area inside it; the default fill color is white.
+the area inside it; the default fill color is *white*.
 
 A "shortcut" to setting both fill and stroke to be the same for a shape,
 is to use the property *fill_stroke* (see Example 2 below).
@@ -2926,7 +2914,9 @@ Example 1. Fill & Stroke
 
       .. code:: python
 
-          Rectangle(fill=yellow, stroke=red, stroke_width=6)
+          Rectangle(
+              fill="yellow", stroke="red",
+              stroke_width=6)
 
       The shape has the following properties that differ from the defaults:
 
@@ -2938,7 +2928,8 @@ Example 1. Fill & Stroke
       through the defined location.
 
       In this case the Rectangle is both larger in outer dimensions than the
-      expected 1x1 cm and smaller in inner dimensions than the expected 1x1 cm.
+      expected 1x1 cm and smaller in inner dimensions than the expected 1x1 cm
+      due to the thickness of the lines used to construct it.
 
 ===== ======
 
@@ -2953,11 +2944,11 @@ Example 2. Fill_Stroke
 
       .. code:: python
 
-          Circle(fill_stroke=aqua)
+          Circle(fill_stroke="cyan")
 
       The shape has the following property that differ from the defaults:
 
-      - *fill_stroke* color of ``aqua``
+      - *fill_stroke* color of ``cyan``
 
       The *fill_stroke* property is a "shortcut" which sets **both** the
       *fill* and *stroke* at same time.
@@ -2965,6 +2956,70 @@ Example 2. Fill_Stroke
       Here, the line color used to draw the circumference is the same as
       the fill color of the interior.
 
+===== ======
+
+
+Dot and Cross
+~~~~~~~~~~~~~
+`^ <shapes-common-properties_>`_
+
+For shapes that have a definable centre e.g. a `Circle`_, a `Square`_
+or a `Hexagon`_, it is possible to place a dot, a cross, or both at this
+location.
+
+The color for the dot and cross will, if not provided, take on the color
+of the shape of which they are part |dash| see the `Stadium` example below.
+
+.. |dnc| image:: images/customised/dots_crosses.png
+   :width: 330
+
+===== ======
+|dnc| This example shows various shapes constructed using the following
+      commands:
+
+      .. code:: python
+
+        Stadium(
+            cx=1, cy=1, side=1,
+            stroke="blue",
+            dot=0.1)
+        Stadium(
+            cx=3, cy=1, side=1,
+            stroke="blue",
+            cross=0.25,
+            cross_stroke_width=1)
+
+        Polygon(
+            cx=1, cy=3, sides=8,
+            radius=1,
+            dot=0.1, dot_stroke="orange")
+        Polygon(
+            cx=3, cy=3, sides=8, diameter=2,
+            cross=0.25,
+            cross_stroke="orange",
+            cross_stroke_width=1)
+
+        Rhombus(
+            cx=1, cy=5, side=2,
+            dot=0.1, d
+            ot_stroke="red")
+        Rhombus(
+            cx=3, cy=5, side=2,
+            cross=0.25,
+            cross_stroke="red",
+            cross_stroke_width=1)
+
+      The shapes have their properties set as follows:
+
+      - *cx* and *cy* set the centre point of the shape
+      - *dot* - sets the size of dot at the centre
+      - *dot_stroke*  - sets the color (and fill) of the dot; defaults to match the
+        *stroke* of the shape that it is part of
+      - *cross* - sets the length of each of the two lines that cross at the
+        centre
+      - *cross_stroke*  - sets the color of the cross lines; defaults to the
+        stroke of the shape that it is part of
+      - *cross_stroke_width* - sets the thickness of the cross lines
 ===== ======
 
 
@@ -2989,11 +3044,17 @@ Example 1. Rhombus
 
         Rhombus(
             cx=2, cy=3,
-            width=1.5, height=2*equilateral_height(1.5), dot=0.06)
+            width=1.5,
+            height=2*equilateral_height(1.5),
+            fill=None, stroke="black",
+            dot=0.06)
         Rhombus(
             cx=2, cy=3,
-            width=1.5, height=2*equilateral_height(1.5), dot=0.04,
-            fill=None, stroke=red, rotation=60)
+            width=1.5,
+            height=2*equilateral_height(1.5),
+            fill=None, stroke="red",
+            dot=0.03,
+            rotation=60)
 
       The shape with the black outline and large dot in the centre is the
       "normal" Rhombus.
@@ -3006,8 +3067,8 @@ Example 1. Rhombus
       - *rotation* of ``60`` is the number of degrees, anti-clockwise, that
         it has been rotated
 
-      The second shape is completely transparent, so its possible to see
-      how it is drawn relative to the first.
+      The shapes are completely transparent, so its possible to see
+      how the second is drawn relative to the first.
 ===== ======
 
 Example 2. Polygon
@@ -3026,11 +3087,20 @@ Example 2. Polygon
           fill=None, sides=6, diameter=1,
           stroke_width=1, orientation='flat')
 
-        Polygon(common=poly6, y=1, x=1.0, label="0")
-        Polygon(common=poly6, y=2, x=1.5, rotation=15, label="15")
-        Polygon(common=poly6, y=3, x=2.0, rotation=30, label="30")
-        Polygon(common=poly6, y=4, x=2.5, rotation=45, label="45")
-        Polygon(common=poly6, y=5, x=3.0, rotation=60, label="60")
+        Polygon(common=poly6,
+                y=1, x=1.0, label="0")
+        Polygon(common=poly6,
+                y=2, x=1.5, rotation=15,
+                label="15")
+        Polygon(common=poly6,
+                y=3, x=2.0, rotation=30,
+                label="30")
+        Polygon(common=poly6,
+                y=4, x=2.5, rotation=45,
+                label="45")
+        Polygon(common=poly6,
+                y=5, x=3.0, rotation=60,
+                label="60")
 
       The examples have the following properties:
 
@@ -3055,8 +3125,9 @@ Example 3. Shapes
       .. code:: python
 
         props = Common(
-            stroke=black,
-            cross=0.5, cross_stroke=red, cross_stroke_width=1,
+            stroke="black",
+            cross=0.5, cross_stroke="red",
+            cross_stroke_width=1,
             rotation=45, label_size=6)
         Rectangle(
             cx=1, cy=5, height=1, width=1.5,
@@ -3110,7 +3181,7 @@ in terms of its color, size and face by appending *_stroke*, *_size* and
 
 The *label* text can, in addition, be **moved** relative to the shape's centre
 by using *mx* and *my* properties; positive values will move the text to
-the right and up; and negative values will move the text to the left and down.
+the right and down; and negative values will move the text to the left and up.
 
 Example 1. Descriptions
 +++++++++++++++++++++++
@@ -3124,17 +3195,22 @@ Example 1. Descriptions
 
       .. code:: python
 
-        Rectangle(
-            x=0.5, y=3, width=3, height=2,
-            label="red; size=14", label_stroke=red, label_size=14)
         Hexagon(
             cx=2, cy=1.5, height=1.5,
-            title="Title", label="Label", heading="Heading")
+            title="Title",
+            label="Label",
+            heading="Heading")
+
+        Rectangle(
+            x=0.5, y=3, width=3, height=2,
+            label="red; size=14",
+            label_stroke="red", label_size=14)
+
+      The Hexagon shows where the *heading*, *label* and *title* appear
+      relative to the shape's boundaries, with default font size of 12 points.
 
       The Rectangle shows how the *label* can be customised in terms of its
       *stroke* (``red``) and font *size* (``14`` points).
-
-      The Hexagon shows where the *heading*, *label* and *title* appear.
 ===== ======
 
 Example 2. Text Offsets
@@ -3150,7 +3226,8 @@ Example 2. Text Offsets
       .. code:: python
 
         rct = Common(
-          height=1.0, width=1.75, stroke_width=.5, label_size=7)
+          height=1.0, width=1.75,
+          stroke_width=0.5, label_size=7)
 
         Rectangle(
           common=rct, x=0, y=0.0, label="offset -x, -y",
@@ -3180,6 +3257,9 @@ Example 2. Text Offsets
       Setting values for *label_my* and *label_mx* cause the label to
       shift away from centre.
 
+      Positive values move the label down and to the right while
+      negative values move it up and to the left.
+
 ===== ======
 
 
@@ -3202,32 +3282,32 @@ visible - then set the *fill* value to ``None``.
       .. code:: python
 
         Rectangle(
-            x=1, y=3, height=1, width=2, fill="#008000", stroke=silver,
-            transparency=25, label="25%"
-        )
+            x=1, y=3, height=1, width=2,
+            fill="#008000", stroke="#C0C0C0",
+            transparency=25, label="25%")
         Rectangle(
-            x=1, y=4, height=1, width=2, fill="#008000", stroke=silver,
-            transparency=50, label="50%"
-        )
+            x=1, y=4, height=1, width=2,
+            fill="#008000", stroke="#C0C0C0",
+            transparency=50, label="50%")
         Rectangle(
-            x=1, y=5, height=1, width=2, fill="#008000", stroke=silver,
-            transparency=75, label="75%"
-        )
+            x=1, y=5, height=1, width=2,
+            fill="#008000", stroke="#C0C0C0",
+            transparency=75, label="75%")
 
         Rectangle(
-            x=0, y=0, height=2, width=2, fill=yellow, stroke=yellow
-        )
+            x=0, y=0, height=2, width=2,
+            fill="yellow", stroke="yellow")
         Rectangle(
-            x=1, y=1, height=2, width=2, fill=red, stroke=red,
-            transparency=50
-        )
+            x=1, y=1, height=2, width=2,
+            fill="red", stroke="red",
+            transparency=50)
 
       The first three Rectangles shapes have the following property set:
 
-      - *transparency* - the lower the value, the more "see through" the color
+      - *transparency* - the higher the value, the more "see through" the color
 
       The last Rectangle, which also has a *transparency* value, is drawn
-      partially over the Rectangle on the lower-left.
+      partially over the yellow Rectangle on the upper-left.
 
       When overdrawn, there is a color change in the overlapping section
       ("bleed through").
@@ -3292,7 +3372,6 @@ Example 2. Off-Centre
 .. |cs1| image:: images/customised/shape_centred_move.png
    :width: 330
 
-
 The centre-shape can be shifted from the centre by setting values for
 *centre_shape_mx* and *centre_shape_my*.
 
@@ -3303,17 +3382,17 @@ The centre-shape can be shifted from the centre by setting values for
 
         small_star = star(radius=0.25)
         small_circle = circle(
-            radius=0.33, fill=grey, centre_shape=small_star)
+            radius=0.33, fill="gray", centre_shape=small_star)
+
+        Hexagon(
+            x=1, y=0.5, height=2,
+            dot=0.1,
+            centre_shape=small_circle)
 
         Hexagon(
             x=1, y=3, height=2,
             centre_shape=small_circle,
             centre_shape_mx=0.3, centre_shape_my=0.6)
-
-        Hexagon(
-            x=1, y=0.5, height=2,
-            hatch_count=5, hatch_stroke=red, dot=0.1,
-            centre_shape=small_circle)
 
       As in the first example, the ``small_star`` is defined but not drawn.
 
@@ -3322,13 +3401,13 @@ The centre-shape can be shifted from the centre by setting values for
 
       This circle is used as the ``centre_shape``  for both of the Hexagons.
 
-      The top Hexagon shows how the centre-shape can be moved with the ``*_mx``
-      and ``*_my`` values.
+      The upper Hexagon shows how the centre-shape is drawn
+      over other features in the Hexagon, **except** for the ``dot``.
 
-      Positive values move the shape up and to the right while
-      negative values move it down and to the left.
+      The lower Hexagon shows how the centre-shape can be moved with the
+      ``*_mx`` and ``*_my`` values.
 
-      The lower Hexagon shows how the centre-shape is drawn
-      over other features in the Hexagon, except for the ``dot``.
+      Positive values move the shape down and to the right while
+      negative values move it up and to the left.
 
 ===== ======

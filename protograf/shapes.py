@@ -407,12 +407,6 @@ class CircleShape(BaseShape):
             x_c: x-centre of circle
             y_c: y-centre of circle
         """
-        self.set_canvas_props(
-            index=ID,
-            stroke=self.hatch_stroke,
-            stroke_width=self.hatch_stroke_width,
-            stroke_cap=self.hatch_cap,
-        )
         _dirs = tools.validated_directions(
             self.hatch, tools.DirectionGroup.CIRCULAR, "hatch"
         )
@@ -518,6 +512,16 @@ class CircleShape(BaseShape):
                     Point(x_c, y_c), self._u.radius, 180.0 + _angle + 45.0
                 )
                 cnv.draw_line(poc_top, poc_btm)
+
+        # ---- set canvas
+        self.set_canvas_props(
+            index=ID,
+            stroke=self.hatch_stroke,
+            stroke_width=self.hatch_stroke_width,
+            stroke_cap=self.hatch_cap,
+            dashed=self.hatch_dashed,
+            dotted=self.hatch_dots,
+        )
 
     def draw_radii(self, cnv, ID, x_c: float, y_c: float):
         """Draw radius lines from the centre outwards to the circumference.
@@ -1209,14 +1213,8 @@ class EquilateralTriangleShape(BaseShape):
     """
 
     def draw_hatch(self, cnv, ID, side: float, vertices: list, num: int):
-        self.set_canvas_props(
-            index=ID,
-            stroke=self.hatch_stroke,
-            stroke_width=self.hatch_stroke_width,
-            stroke_cap=self.hatch_cap,
-        )
         _dirs = tools.validated_directions(
-            self.hatch, tools.DirectionGroup.HEX_POINTY, "hatch"
+            self.hatch, tools.DirectionGroup.HEX_POINTY_EDGE, "hatch"
         )
         lines = int(num) + 1
 
@@ -1226,7 +1224,7 @@ class EquilateralTriangleShape(BaseShape):
                 self.draw_lines_between_sides(
                     cnv, side, lines, vertices, (0, 1), (2, 1)
                 )
-            if "se" in _dirs or "nw" in _dirs:  # slope down to the right
+            if "se" in _dirs or "nw" in _dirs:  # slope DOWN to the right
                 self.draw_lines_between_sides(
                     cnv, side, lines, vertices, (0, 2), (0, 1)
                 )
@@ -1234,6 +1232,15 @@ class EquilateralTriangleShape(BaseShape):
                 self.draw_lines_between_sides(
                     cnv, side, lines, vertices, (0, 2), (1, 2)
                 )
+        # ---- set canvas
+        self.set_canvas_props(
+            index=ID,
+            stroke=self.hatch_stroke,
+            stroke_width=self.hatch_stroke_width,
+            stroke_cap=self.hatch_cap,
+            dashed=self.hatch_dashed,
+            dotted=self.hatch_dots,
+        )
 
     def calculate_area(self) -> float:
         _side = self._u.side if self._u.side else self._u.width
@@ -1806,11 +1813,14 @@ class HexShape(BaseShape):
                     self.draw_lines_between_sides(
                         cnv, side, lines, vertices, (0, 5), (3, 4)
                     )
+        # ---- set canvas
         self.set_canvas_props(
             index=ID,
             stroke=self.hatch_stroke,
             stroke_width=self.hatch_stroke_width,
             stroke_cap=self.hatch_cap,
+            dashed=self.hatch_dashed,
+            dotted=self.hatch_dots,
         )
 
     def get_geometry(self):

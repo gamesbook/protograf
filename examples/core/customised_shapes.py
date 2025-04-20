@@ -115,9 +115,7 @@ PageBreak()
 
 # ---- equilateral triangle: hatch
 Blueprint()
-Text(common=txt, text="Equilateral Triangle; text; hatch")
-EquilateralTriangle(
-    x=2, y=3, side=1.5, hatch_count=5, hatch_stroke="red", title='Title', heading='Head')
+Text(common=txt, text="Equilateral Triangle; flip; hatch")
 EquilateralTriangle(
     x=2, y=1, flip="north", hand="east", label="NE", fill="gold")
 EquilateralTriangle(
@@ -127,7 +125,12 @@ EquilateralTriangle(
 EquilateralTriangle(
     x=2, y=1, flip="south", hand="west", label="SW", fill="blue")
 EquilateralTriangle(
-    x=0.5, y=3.5, side=1.5, stroke_width=1, rotation=45, dot=.05)
+    x=1, y=4, side=1.5,
+    hatch_count=5, hatch_stroke="red",
+    title='Title', heading='Head')
+EquilateralTriangle(
+    x=1, y=5.5, side=1.5, stroke_width=1,
+    rotation=45, dot=.05)
 PageBreak()
 
 # ---- RA Triangle
@@ -177,7 +180,7 @@ Rectangle(x=1, y=1, height=2, width=2, dot=0.02,
 Arc(cx=1, cy=3, radius=2)  #, angle_start=0, angle_width=90)
 PageBreak()
 
-# ---- stadium
+# ---- stadium edges
 Blueprint()
 Text(common=txt, text="Stadium: edges")
 Stadium(x=0, y=1, height=1, width=1, edges='n', fill="tan", label="north")
@@ -186,7 +189,7 @@ Stadium(x=0, y=3, height=1, width=1, edges='e', fill="tan", label="east")
 Stadium(x=3, y=4, height=1, width=1, edges='w', fill="tan", label="west")
 PageBreak()
 
-# ---- trapezoid
+# ---- trapezoid flip
 Blueprint()
 Text(common=txt, text="Trapezoid: flip")
 Trapezoid(
@@ -251,8 +254,9 @@ PageBreak()
 # ---- rotation: rhombus
 Blueprint()
 Text(common=txt, text="Rhombus: red => rotation 60\u00B0")
-Rhombus(cx=2, cy=3, width=1.5, height=2*equilateral_height(1.5), dot=0.06)
-Rhombus(cx=2, cy=3, width=1.5, height=2*equilateral_height(1.5), dot=0.04,
+Rhombus(cx=2, cy=3, width=1.5, height=2*equilateral_height(1.5), dot=0.06,
+        fill=None, stroke="black")
+Rhombus(cx=2, cy=3, width=1.5, height=2*equilateral_height(1.5), dot=0.03,
         fill=None, stroke="red", rotation=60)
 PageBreak()
 
@@ -496,12 +500,14 @@ Polygon(cx=1, cy=5, radius=0.5, sides=8, centre_shape=small_star)
 EquilateralTriangle(x=2.35, y=4.5, side=1.25, centre_shape=small_star)
 PageBreak()
 
+# ---- Centred Shapes - move
 Blueprint()
 Text(common=txt, text="Centred Shape: move + double")
 small_star = star(radius=0.25)
 small_circle = circle(radius=0.33, fill="gray", centre_shape=small_star)
 Hexagon(x=1, y=0.5, height=2,
         dot=0.1,
+        hatch_count=5,
         centre_shape=small_circle)
 Hexagon(x=1, y=3, height=2,
         centre_shape=small_circle,
