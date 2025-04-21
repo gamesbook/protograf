@@ -37,7 +37,7 @@ Hexagons(
     x=1, y=1,
     rows=3, cols=3,
     fill="white",
-    orientation='pointy',
+    orientation="pointy",
 )
 PageBreak()
 
@@ -69,14 +69,14 @@ Hexagons(
     x=0, y=1,
     rows=2, cols=2,
     fill="white",
-    orientation='pointy',
+    orientation="pointy",
     coord_elevation="middle", coord_prefix='z', coord_suffix='!',
 )
 Hexagons(
     side=0.6,
     x=1, y=4,
     rows=2, cols=2,
-    orientation='pointy',
+    orientation="pointy",
     fill="darkseagreen",
     hex_offset="odd",
     coord_elevation="top", coord_type_x="upper", coord_separator='::',
@@ -102,7 +102,7 @@ Hexagons(
     side=0.6,
     x=0, y=1,
     rows=4, cols=3,
-    orientation='pointy',
+    orientation="pointy",
     dot=0.04,
     caltrops=0.2,
     caltrops_invert=True,
@@ -126,7 +126,7 @@ Hexagons(
     x=1, y=3.5,
     rows=3, cols=3,
     hex_offset="odd",
-    orientation='pointy',
+    orientation="pointy",
     fill="darkseagreen",
     coord_elevation="middle", coord_font_size=5,
     coord_separator=' r', coord_prefix='c',
@@ -140,7 +140,7 @@ Hexagons(
     side=0.5,
     x=1, y=3.5,
     rows=3, cols=3,
-    orientation='pointy',
+    orientation="pointy",
     fill="darkseagreen",
     hidden=[(1, 2), (1, 3), (3, 2), (3, 3)]
 )

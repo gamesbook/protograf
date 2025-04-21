@@ -80,16 +80,19 @@ Rows and Columns
 
         Hexagons(
             side=0.5,
-            x=0, y=0,
+            x=1, y=1,
             rows=3, cols=3,
+            fill="white",
         )
 
       It has the following properties that differ from the defaults:
 
       - *side* sets the length of each side of a hexagon in the grid
-      - *x* and *y* are used to set the lower-left corner of the grid
+      - *x* and *y* are used to set the upper-left corner of the grid
       - *rows* sets the number of rows  in the grid
       - *cols* sets the number of columns in the grid
+      - *fill* - sets the color used for area of each hexagon in the grid
+
 ===== ======
 
 
@@ -103,17 +106,22 @@ Rows and Columns
 
         Hexagons(
             side=0.5,
-            x=0, y=0,
+            x=1, y=1,
             rows=3, cols=3,
-            orientation='pointy',
+            orientation="pointy",
+            fill="white",
         )
 
       It has the following properties that differ from the defaults:
 
       - *side* sets the length of each side of a hexagon in the grid
-      - *x* and *y* are used to set the lower-left corner of the grid
+      - *x* and *y* are used to set the upper-left corner of the grid
       - *rows* sets the number of rows  in the grid
       - *cols* sets the number of columns in the grid
+      - *orientation* set to``pointy``, ensuring there is a "peak" for
+        each hexagon
+      - *fill* - sets the color used for area of each hexagon in the grid
+
 ===== ======
 
 .. _rectCoords:
@@ -151,7 +159,7 @@ Most coordinate property names are prefixed with ``coord_``.
             side=0.6,
             x=2, y=3,
             rows=2, cols=2,
-            fill=darkseagreen,
+            fill="darkseagreen",
             hex_offset="odd",
             coord_elevation="top",
             coord_type_x="upper",
@@ -169,7 +177,7 @@ Most coordinate property names are prefixed with ``coord_``.
       Each has the following properties that differ from the defaults:
 
       - *side* sets the length of each side of a hexagon in the grid
-      - *x* and *y* are used to set the lower-left corner of the grid
+      - *x* and *y* are used to set the upper-left corner of the grid
       - *rows* sets the number of rows  in the grid
       - *cols* sets the number of columns in the grid
       - *coord_elevation* can be ``top``, ``middle`` or ``bottom`` to set
@@ -191,6 +199,7 @@ Most coordinate property names are prefixed with ``coord_``.
         values are shown (to their left)
       - *coord_suffix* - this is text that appears after the row and column
         values are shown (to their right)
+
 ===== ======
 
 .. |rc2| image:: images/custom/hexagonal_grid/rect_coords_pointy.png
@@ -203,10 +212,10 @@ Most coordinate property names are prefixed with ``coord_``.
 
         Hexagons(
             side=0.6,
-            x=1, y=3,
+            x=1, y=4,
             rows=2, cols=2,
-            orientation='pointy',
-            fill=darkseagreen,
+            orientation="pointy",
+            fill="darkseagreen",
             hex_offset="odd",
             coord_elevation="top",
             coord_type_x="upper",
@@ -214,9 +223,10 @@ Most coordinate property names are prefixed with ``coord_``.
         )
         Hexagons(
             side=0.6,
-            x=0, y=0,
+            x=0, y=1,
             rows=2, cols=2,
-            orientation='pointy',
+            orientation="pointy",
+            fill="white",
             coord_elevation="middle",
             coord_prefix='z',
             coord_suffix='!',
@@ -225,7 +235,7 @@ Most coordinate property names are prefixed with ``coord_``.
       Each has the following properties that differ from the defaults:
 
       - *side* sets the length of each side of a hexagon in the grid
-      - *x* and *y* are used to set the lower-left corner of the grid
+      - *x* and *y* are used to set the upper-left corner of the grid
       - *rows* sets the number of rows  in the grid
       - *cols* sets the number of columns in the grid
       - *orientation* set to ``pointy`` to have hexagons with pointed tops
@@ -247,6 +257,7 @@ Most coordinate property names are prefixed with ``coord_``.
         values are shown (to their left)
       - *coord_suffix* - this is text that appears after the row and column
         values are shown (to their right)
+
 ===== ======
 
 .. _rectCaltrops:
@@ -268,22 +279,22 @@ a set of three small lines; these replace the normal edge of the hexagon.
 
         Hexagons(
             side=0.6,
-            x=0, y=0,
+            x=0, y=1,
             rows=3, cols=3,
             dot=0.04,
-            caltrops="medium",
+            caltrops=0.15,
         )
 
       It has the following properties that differ from the defaults:
 
       - *side* sets the length of each side of a hexagon in the grid
-      - *x* and *y* are used to set the lower-left corner of the grid
+      - *x* and *y* are used to set the upper-left corner of the grid
       - *rows* sets the number of rows  in the grid
       - *cols* sets the number of columns in the grid
-      - *dot* draws a small dot (of size ``0.04``) in the centre of the
+      - *dot* draws a small dot (of size ``0.04``) in the centre of a
         hexagon
-      - *caltrops* sets the size of the caltrop lines; this can be ``small``,
-        ``medium`` or ``large``
+      - *caltrops* sets the length of the caltrop lines
+
 ===== ======
 
 
@@ -297,24 +308,28 @@ a set of three small lines; these replace the normal edge of the hexagon.
 
         Hexagons(
             side=0.6,
-            x=0, y=0,
+            x=0, y=1,
             rows=3, cols=3,
-            orientation='pointy',
+            orientation="pointy",
             dot=0.04,
-            caltrops="large",
+            caltrops=0.2,
+            caltrops_invert=True,
         )
 
       It has the following properties that differ from the defaults:
 
       - *side* sets the length of each side of a hexagon in the grid
-      - *x* and *y* are used to set the lower-left corner of the grid
+      - *x* and *y* are used to set the upper-left corner of the grid
       - *rows* sets the number of rows  in the grid
       - *cols* sets the number of columns in the grid
       - *orientation* set to ``pointy`` to have hexagons with pointed tops
       - *dot* draws a small dot (of size ``0.04``) in the centre of the
         hexagon
-      - *caltrops* sets the size of the caltrop lines; this can be ``small``,
-        ``medium`` or ``large``
+      - *caltrops* sets the size of the caltrop lines
+      - *caltrops_invert* - if set to ``True``, this will cause the caltrops
+        line to be drawn in the middle between the hexagon vertices; with
+        no lines drawn touching those vertices
+
 ===== ======
 
 .. _rectHidden:
@@ -339,8 +354,8 @@ when a grid is designed for a scenario where not all hexagons are needed.
             side=0.5,
             x=1, y=3,
             rows=3, cols=3,
-            orientation='pointy',
-            fill=darkseagreen,
+            orientation="pointy",
+            fill="darkseagreen",
             hidden=[(1, 2), (1, 3), (3, 2), (3, 3)]
         )
         Hexagons(
@@ -352,7 +367,7 @@ when a grid is designed for a scenario where not all hexagons are needed.
 
       Each has the following properties that differ from the defaults:
 
-      - *x* and *y* are used to set the lower-left corner of the grid
+      - *x* and *y* are used to set the upper-left corner of the grid
       - *rows* sets the number of rows  in the grid
       - *cols* sets the number of columns in the grid
 
@@ -394,11 +409,11 @@ Offset
 
         Hexagons(
             side=0.5,
-            x=1, y=3,
+            x=1, y=3.5,
             rows=3, cols=3,
             hex_offset="odd",
-            orientation='pointy',
-            fill=darkseagreen,
+            orientation="pointy",
+            fill="darkseagreen",
             coord_elevation="middle",
             coord_font_size=5,
             coord_separator=' r',
@@ -406,7 +421,7 @@ Offset
         )
         Hexagons(
             side=0.5,
-            x=0, y=0,
+            x=0, y=0.5,
             rows=3, cols=3,
             hex_offset="odd",
             coord_elevation="middle",
@@ -418,7 +433,7 @@ Offset
       Each has the following properties that differ from the defaults:
 
       - *side* sets the length of each side of a hexagon in the grid
-      - *x* and *y* are used to set the lower-left corner of the grid
+      - *x* and *y* are used to set the upper-left corner of the grid
       - *rows* sets the number of rows  in the grid
       - *cols* sets the number of columns in the grid
       - *hex_offset* - if ``odd``, then every odd column - for a flat grid - or
@@ -426,6 +441,7 @@ Offset
         those on either side
       - *coord_...* - various settings to control the appearance of the
         `hex coordinates <rectCoords_>`_
+
 ===== ======
 
 .. _rectRadii:
@@ -453,8 +469,8 @@ Radii
             side=0.5,
             x=1.25, y=3,
             rows=3, cols=3,
-            stroke=red,
-            radii_stroke=red,
+            stroke="red",
+            radii_stroke="red",
             hex_offset="even",
             radii="e nw sw",
         )
@@ -462,7 +478,7 @@ Radii
       Each has the following properties that differ from the defaults:
 
       - *side* sets the length of each side of a hexagon in the grid
-      - *x* and *y* are used to set the lower-left corner of the grid
+      - *x* and *y* are used to set the upper-left corner of the grid
       - *rows* sets the number of rows  in the grid
       - *cols* sets the number of columns in the grid
       - *hex_offset* determines which columns are shifted
@@ -470,6 +486,7 @@ Radii
         :doc:`customised hexagon <customised_shapes#hexagon>`,this will
         create lines running from each hexagon centre to the vertices, as
         define by the directions specified
+
 ===== ======
 
 
@@ -502,18 +519,20 @@ Basic
       .. code:: python
 
         Hexagons(
-            x=0, y=0,
+            x=0.25, y=1,
             height=0.75,
             sides=3,
+            fill="white",
             hex_layout="circle",
         )
 
       It has the following properties that differ from the defaults:
 
-      - *x* and *y* are used to set the lower-left corner of the grid
+      - *x* and *y* are used to set the upper-left corner of the grid
       - *height* sets the side-to-side height of a hexagon in the grid
       - *sides* sets the number of hexagons running along each "edge" of the
         grid - there are six sides in all
+      - *fill* - sets the color used for area of each hexagon in the grid
       - *hex_layout* is set to ``circle`` to create the circular effect
 
 ===== ======
@@ -533,25 +552,30 @@ Nested Shapes
       .. code:: python
 
         Hexagons(
-            x=0, y=0,
+            x=0.25, y=1,
             height=0.75,
             sides=3,
-            stroke=None, fill=None,
+            stroke=None, fill="white",
             hex_layout="circle",
             centre_shape=hexagon(
-                stroke=black, fill=silver, height=0.6, stroke_width=2),
+                stroke="black", fill="lightsteelblue",
+                height=0.6, stroke_width=2),
         )
 
       It has the following properties that differ from the defaults:
 
-      - *x* and *y* - the lower-left corner of the grid
+      - *x* and *y* - the upper-left corner of the grid
       - *height* - the side-to-side height of a hexagon in the grid
       - *sides* - the number of hexagons running along each "edge" of the
         grid; there are six sides in all
+      - *fill* - sets the color used for area of each hexagon in the grid
       - *hex_layout* is set to ``circle`` to create a circular grid
-      - *centre_shape* - a shape that will appear in all hexagons
+      - *centre_shape* - a shape that will appear inside all hexagons
 
-      The location of the *centre_shape*  will match that of the hexagon
+      The centre point of the *centre_shape* aligns with the centre of the
+      hexagon.
+
+      The location of the *centre_shape* will match that of the hexagon
       within which it is "nested"; in this case its size is smaller
       |dash| ``0.6`` is less than ``0.75`` |dash| so there is a "gap" around
       each of the shapes.
@@ -585,17 +609,19 @@ Basic
       .. code:: python
 
         Hexagons(
-            x=0, y=0,
+            x=0.25, y=1,
             height=0.75,
             rows=3,
+            fill="white",
             hex_layout="diamond",
         )
 
       It has the following properties that differ from the defaults:
 
-      - *x* and *y* are used to set the lower-left corner of the grid
+      - *x* and *y* are used to set the upper-left corner of the grid
       - *height* sets the side-to-side height of a hexagon in the grid
       - *row* sets the number of hexagons in each row of the grid
+      - *fill* - sets the color used for area of each hexagon in the grid
       - *hex_layout* is set to ``diamond`` to create the layout pattern
 ===== ======
 
@@ -1010,13 +1036,15 @@ Example 3. A Styled LinkLine
 
         LinkLine(
             hexgrid,
-            ["0101","0403","0104","0406"],
-            common=Common(stroke=tomato, stroke_width=2)
+            ["0101", "0403", "0104", "0406"],
+            common=Common(
+                stroke="tomato", stroke_width=2)
         )
         LinkLine(
             hexgrid,
-            ["0104","0406"],
-            common=Common(stroke=aqua, stroke_width=2)
+            ["0104", "0406"],
+            common=Common(
+                stroke="cyan", stroke_width=2)
         )
 
       The ``LinkLine`` commands have the following properties:
@@ -1057,7 +1085,8 @@ Example 4. An Offset LinkLine
              ("0104", 0.0, 0.25),
              ("0104", 0.25, -0.25)],
             common=Common(
-                stroke=tomato, stroke_width=1, dotted=True)
+                stroke="tomato", stroke_width=1,
+                dotted=True)
         )
 
       The ``LinkLine`` command  has the following properties:
@@ -1070,12 +1099,12 @@ Example 4. An Offset LinkLine
       The **offset** values |dash|  *x* and *y*  |dash| are *relative* to
       the centre of the hex in which the line starts or ends.
 
-      Positive values for the offset move  the *x* and *y* up and to the
-      right of the centre; negatives move the *x* and *y* down and to the
+      Positive values for the offset move the *x* and *y* down and to the
+      right of the centre; negatives move the *x* and *y* up and to the
       left of the centre.
 
       Note that its possible to define the start and end as different offsets
-      within the **same** hexagon; as shown here.
+      within the **same** hexagon; as shown here in location ``0104``.
 
 ===== ======
 
@@ -1117,7 +1146,7 @@ are listed below:
 The options and facilities provided by these tools have been the primary
 inspiration for how hexagonal grids work in **protograf**. So if the
 functionality available here does not work for you, then possibly one of
-these other tools would be of better use.
+these other tools would be of better fit.
 
 .. HINT::
 

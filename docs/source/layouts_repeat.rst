@@ -47,11 +47,12 @@ The ``Repeat()`` command accepts the following properties:
 - **down** - a set (list of whole numbers surrounded by curved brackets)
   containing only those *row* numbers which should be active
 
-All the examples below make use of a commonly-defined shape:
+All the examples below make use of a commonly-defined shape (a circle with
+a light green fill color).
 
 .. code:: python
 
-    marble = circle(cx=1, cy=1, radius=0.25, fill=lime)
+    marble = circle(cx=1, cy=1, radius=0.25, fill="chartreuse")
 
 Example 1.
 ----------
@@ -67,8 +68,9 @@ Example 1.
 
         Repeat(marble, cols=4, rows=5)
 
-      In this case, because there is *no* interval between the columns or the
-      rows, the shape is not drawn anywhere else except at the start location.
+      In this case, because there is *no* interval between either the columns
+      or the rows, the shape is *not* drawn anywhere else except at the start
+      location.
 
 ===== ======
 
@@ -86,9 +88,9 @@ Example 2.
 
         Repeat(marble, cols=4, rows=5, interval=1)
 
-      In this case, there is an *interval* of ``1`` cm - which applies to
-      both the columns and the rows - and so the shape drawn at **20**
-      different locations.
+      In this case, there is an *interval* of ``1`` cm |dash| which is
+      applied to both the columns and the rows |dash| and so the shape is
+      drawn at **20** different locations.
 
 ===== ======
 
@@ -110,7 +112,7 @@ Example 3.
       In this case, there are different intervals between the columns
       versus the rows; so the shapes are closer together between the columns
       (*interval_x* of ``0.75`` cm) and further apart for the rows
-      (*interval_y* of ``1.25`` cm);  the shape is here drawn at **16**
+      (*interval_y* of ``1.25`` cm); the shape is here drawn at **16**
       different locations.
 
 ===== ======

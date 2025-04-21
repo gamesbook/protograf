@@ -20,7 +20,7 @@ header = Common(x=0, y=0, font_size=6, align="left")
 is_common = Common(label="{{sequence}}")
 rct_common = Common(label_size=5, points=[('s', 0.1)], height=0.5, width=0.5)
 
-# ---- multi-shapes
+# ---- multi-shapes - layout_rect_outer_multi
 
 sqr = square(common=is_common, side=0.9, label_size=6)
 sqr5 = square(common=is_common, side=1.0, label_size=8, fill="yellow")
@@ -33,7 +33,7 @@ rect = RectangularLocations(
 Layout(rect, shapes=[sqr]*4 + [sqr5] )
 PageBreak()
 
-# ---- single shape + multi-color + stop
+# ---- single shape + multi-color + stop - layout_rect_outer_multi_stop
 
 rct_small = Common(label_size=5, side=0.48)
 rct1 = square(common=rct_small, fill_stroke="palegreen")
@@ -48,9 +48,10 @@ rect = RectangularLocations(
 Layout(rect, shapes=[rct1]*4 + [rct5] + [rct1]*4 + [rct10])
 PageBreak()
 
-# ---- rotations + corners
+# ---- rotations + corners - layout_rect_outer_rotation
 
-circ = circle(label="{{sequence - 1}}", label_size=5, radius=0.26, fill="rosybrown")
+circ = circle(
+    label="{{sequence - 1}}", label_size=5, radius=0.26, fill="rosybrown")
 rct2 = rectangle(
     common=rct_common, label="{{sequence - 1}}", fill="tan")
 rct3 = rectangle(

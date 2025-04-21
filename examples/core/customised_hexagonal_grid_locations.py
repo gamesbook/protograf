@@ -18,11 +18,10 @@ Create(
     stroke_width=0.5
 )
 
-
 header = Common(x=0, y=0, font_size=8, align="left")
 a_circle = Common(radius=0.4)
 
-# ---- location - single shape
+# ---- location - single shape -  hexgrid_location_single
 Blueprint(stroke_width=0.5)
 Text(common=header, text="Location: single shape")
 hexgrid = Hexagons(
@@ -37,7 +36,7 @@ Location(
 )
 PageBreak()
 
-# ---- location - multiple shapes
+# ---- location - multiple shapes -  hexgrid_location_multiple
 Blueprint(stroke_width=0.5)
 Text(common=header, text="Location: multiple shapes")
 hexgrid = Hexagons(
@@ -52,7 +51,7 @@ Location(
 )
 PageBreak()
 
-# ---- locations - multiple shapes
+# ---- locations - multiple shapes -  hexgrid_locations_multi
 Blueprint(stroke_width=0.5)
 Text(common=header, text="Locations: multiple shapes")
 hexgrid = Hexagons(
@@ -67,7 +66,7 @@ Locations(
 )
 PageBreak()
 
-# ---- locations - sequence numbers
+# ---- locations - sequence numbers -  hexgrid_locations_seq
 Blueprint(stroke_width=0.5)
 Text(common=header, text="Locations: sequence numbers")
 hexgrid = Hexagons(
@@ -82,7 +81,7 @@ Locations(
 )
 PageBreak()
 
-# ---- locations - col & row numbers
+# ---- locations - col & row numbers -  hexgrid_locations_colrow
 Blueprint(stroke_width=0.5)
 Text(common=header, text="Locations: col&row")
 hexgrid = Hexagons(
@@ -97,7 +96,7 @@ Locations(
 )
 PageBreak()
 
-# ---- locations - labels
+# ---- locations - labels -  hexgrid_locations_labels
 Blueprint(stroke_width=0.5)
 Text(common=header, text="Locations: labels")
 hexgrid = Hexagons(
@@ -112,7 +111,7 @@ Locations(
 )
 PageBreak()
 
-# ---- linklines - single line
+# ---- linklines - single line -  hexgrid_linkline_single
 Blueprint(stroke_width=0.5)
 Text(common=header, text="LinkLine: single")
 hexgrid = Hexagons(
@@ -128,7 +127,7 @@ LinkLine(
 )
 PageBreak()
 
-# ---- linklines - double-line
+# ---- linklines - double-line -  hexgrid_linkline_double
 Blueprint(stroke_width=0.5)
 Text(common=header, text="LinkLine: double")
 hexgrid = Hexagons(
@@ -144,7 +143,7 @@ LinkLine(
 )
 PageBreak()
 
-# ---- linklines - double-line style
+# ---- linklines - double-line style -  hexgrid_linkline_multi_style
 Blueprint(stroke_width=0.5)
 Text(common=header, text="LinkLine: multi style")
 hexgrid = Hexagons(
@@ -166,7 +165,7 @@ LinkLine(
 )
 PageBreak()
 
-# ---- linklines - double-line style
+# ---- linklines - double-line & offset -  hexgrid_linkline_offset
 Blueprint(stroke_width=0.5)
 Text(common=header, text="LinkLine: style & offset")
 hexgrid = Hexagons(
@@ -188,10 +187,15 @@ Save(
     dpi=300,
     directory="../docs/source/images/custom/hexagonal_grid",
     names=[
-        "hexgrid_location_single", "hexgrid_location_multiple",
+        "hexgrid_location_single",
+        "hexgrid_location_multiple",
         "hexgrid_locations_multi",
-        "hexgrid_locations_seq", "hexgrid_locations_colrow", "hexgrid_locations_labels",
-        "hexgrid_linkline_single", "hexgrid_linkline_double",
-        "hexgrid_linkline_multi_style", "hexgrid_linkline_offset",
+        "hexgrid_locations_seq",
+        "hexgrid_locations_colrow",
+        "hexgrid_locations_labels",
+        "hexgrid_linkline_single",
+        "hexgrid_linkline_double",
+        "hexgrid_linkline_multi_style",
+        "hexgrid_linkline_offset",
     ]
 )

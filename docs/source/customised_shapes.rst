@@ -171,7 +171,7 @@ point in a specified direction.  This creates an arrow-like effect.
          - *chevron* - the primary compass direction in which the chevron is
            pointing; N(orth), S(outh), E(ast) or W(est)
          - *chevron_height* - the distance of the chevron peak from the side of
-           the rectangle
+           the rectangle it is adjacent to
 
    ===== ======
 
@@ -197,7 +197,8 @@ the length or width of the Rectangle in a vertical, horizontal or diagonal direc
          .. code:: python
 
            htch = Common(
-             height=1.5, width=1, hatch_count=5, hatch_width=0.1, hatch_stroke=red)
+             height=1.5, width=1, hatch_count=5,
+             hatch_width=0.1, hatch_stroke="red")
 
            Rectangle(
              common=htch, x=0, y=0,  hatch='w', label="W")
@@ -280,7 +281,8 @@ Example 1. Size & Location
         Rectangle(
             x=1, y=4, height=1, width=2,
             label="notch:.25/.5 loc: NW, SE", label_size=5,
-            notch_y=0.25,  notch_x=0.5, notch_corners="NW SE",
+            notch_y=0.25,
+            notch_x=0.5, notch_corners="NW SE",
         )
 
       These share the following properties:
@@ -313,19 +315,20 @@ Example 2. Styles
       .. code:: python
 
         styles = Common(
-          height=1, width=3.5, x=0.25, notch=0.25, label_size=7, fill=silver)
+          height=1, width=3.5, x=0.25,
+          notch=0.25, label_size=7, fill="lightsteelblue")
 
         Rectangle(
           common=styles, y=0,  notch_style='snip',
           label='Notch: snip (s)')
         Rectangle(
-          common=styles, y=1.25, notch_style='step',
+          common=styles, y=1.5, notch_style='step',
           label='Notch: step (t)')
         Rectangle(
-          common=styles, y=2.5, notch_style='fold',
+          common=styles, y=3, notch_style='fold',
           label='Notch: fold (o)')
         Rectangle(
-          common=styles, y=3.75, notch_style='flap',
+          common=styles, y=4.5, notch_style='flap',
           label='Notch: flap (l)')
 
       These Rectangles all share the following Common properties that differ from the
@@ -333,8 +336,8 @@ Example 2. Styles
 
       - *height* and *width* - set the basic configuration
       - *x* - sets the position of the left edge
-      - *fill* - set to the color ``silver`` so the interior color differs from
-        the default white elsewhere
+      - *fill* - set to the color ``lightsteelblue`` so the interior color
+        differs from the default white that would be used elsewhere
       - *notch* - sets the size of notch, in terms of distance from the corner
 
       Each *notch_style* results in a slightly different effect:
@@ -364,7 +367,7 @@ a specified direction
       .. code:: python
 
         Rectangle(
-            x=1, y=4, width=2, height=1.5,
+            x=1, y=3, width=2, height=1,
             font_size=6, label="points = s",
             peaks=[("s", 1), ("e", 0.25)]
         )
@@ -416,7 +419,7 @@ the centre of the Rectangle.
         Rectangle(cx=2, cy=3, width=1.5, height=3, dot=0.06)
         Rectangle(
             cx=2, cy=3, width=1.5, height=3, fill=None,
-            stroke=red, stroke_width=.3, rotation=45, dot=0.04)
+            stroke="red", stroke_width=.3, rotation=45, dot=0.04)
 
       The first, upright, Rectangle is a normal one, with a black outline, and
       centred at x-location ``2`` cm and y-location ``3`` cm.  It has a small
@@ -429,7 +432,7 @@ the centre of the Rectangle.
       - *stroke* - set to ``red`` to highlight it
       - *dot* - has the same color as the *stroke* (by default) and is smaller
         than the *dot* of the  first Rectangle
-      - *rotation* - of 45 |deg|; counter-clockwise from the horizontal
+      - *rotation* - of 45 |deg|; anti-clockwise from the horizontal
 
 ===== ======
 
@@ -452,11 +455,11 @@ into the arc of a quarter-circle.
 
         rct = Common(
             x=0.5, height=1.5, width=3.0, stroke_width=.5,
-            hatch_stroke=red, hatch='o')
+            hatch_stroke="red", hatch='o')
         Rectangle(
-            common=rct, y=2.0, rounding=0.5,  hatch_count=3)
+            common=rct, y=1, rounding=0.1, hatch_count=10)
         Rectangle(
-            common=rct, y=0.0, rounding=0.1, hatch_count=10)
+            common=rct, y=4, rounding=0.5,  hatch_count=3)
 
 
       Both Rectangles share the Common properties of:
@@ -469,16 +472,16 @@ into the arc of a quarter-circle.
       These properties set the color and directions of the lines crossing
       the Rectangles.
 
-      The first Rectangle has these specific properties:
-
-      - *rounding* - set to ``0.5``; the radius of the circle used for the corner
-      - *hatch_count* - set to ``3``; the number of lines crossing the Rectangle
-        in both vertical and horizontal directions.
-
-      The second Rectangle has these specific properties:
+      The upper Rectangle has these specific properties:
 
       - *rounding* - set to ``0.1``; the radius of the circle used for the corner
       - *hatch_count* - set to  ``10``; the number of lines crossing the Rectangle
+        in both vertical and horizontal directions.
+
+      The lower Rectangle has these specific properties:
+
+      - *rounding* - set to ``0.5``; the radius of the circle used for the corner
+      - *hatch_count* - set to ``3``; the number of lines crossing the Rectangle
         in both vertical and horizontal directions.
 
       It should be noted that if the rounding is too large in comparison with
@@ -486,7 +489,7 @@ into the arc of a quarter-circle.
 
         .. code:: python
 
-          Rectangle(common=rct, y=2.0, rounding=0.5, hatch_count=10)
+          Rectangle(common=rct, y=2, rounding=0.5, hatch_count=10)
 
       then the program will issue an error::
 
@@ -524,23 +527,23 @@ e.g. ``n s`` to draw both lines on both north **and** south sides.
       .. code:: python
 
         Rectangle(
-            y=3, height=2, width=2, stroke=None, fill=gold,
+            x=0.5, y=3.5, height=2, width=3, stroke=None, fill="gold",
             borders=[
-                ("n", 2, silver, True),
+                ("n", 2, "lightsteelblue", True),
                 ("s", 2),
             ]
         )
         Rectangle(
-            y=0, height=2, width=2, stroke_width=1.9,
+         x=0.5, y=0.5, height=2, width=3, stroke_width=1.9,
             borders=[
-                ("w", 2, gold),
-                ("n", 2, lime, True),
-                ("e", 2, tomato, [0.1,0.2,0.1,0]),
+                ("w", 2, "gold"),
+                ("n", 2, "chartreuse", True),
+                ("e", 2, "tomato", [0.1,0.2,0.1,0]),
             ]
         )
 
-      The top rectangle has a *fill* but no *stroke* i.e. no lines are drawn
-      around it.
+      The lower rectangle has a yellow *fill* but no *stroke* i.e. no lines are
+      drawn around it.
 
       There are two *borders* that are set in the list (shown in
       the square brackets going from ``[`` to ``]``):
@@ -549,7 +552,7 @@ e.g. ``n s`` to draw both lines on both north **and** south sides.
       - second border sets a thick line for the bottom (south) edge; no color
         is given so it defaults to black
 
-      The lower rectangle has a thick *stroke_width* as its outline, with a
+      The top rectangle has a thick *stroke_width* as its outline, with a
       default *fill* of white and default *stroke* of black.
 
       There are three *borders* that are set in the list (the square brackets
@@ -629,15 +632,15 @@ Dot & Cross
       .. code:: python
 
         Hexagon(x=-0.25, y=4, height=2,
-                dot=0.1, dot_stroke=red)
+                dot=0.1, dot_stroke="red")
         Hexagon(x=1.75, y=3.5, height=2,
-                cross=0.25, cross_stroke=red, cross_stroke_width=1)
+                cross=0.25, cross_stroke="red", cross_stroke_width=1)
 
         Hexagon(x=0, y=1, height=2,
-                dot=0.1, dot_stroke=red,
+                dot=0.1, dot_stroke="red",
                 orientation='pointy')
         Hexagon(x=2, y=1, height=2,
-                cross=0.25, cross_stroke=red, cross_stroke_width=1,
+                cross=0.25, cross_stroke="red", cross_stroke_width=1,
                 orientation='pointy')
 
       These Hexagons have properties set as follows:
@@ -673,7 +676,7 @@ diagonal direction.
       .. code:: python
 
         hxgn = Common(
-            x=1, height=1.5, orientation='flat', hatch_count=5, hatch_stroke=red)
+            x=1, height=1.5, orientation='flat', hatch_count=5, hatch_stroke="red")
         Hexagon(common=hxgn, y=0, hatch='e', label="e/w")
         Hexagon(common=hxgn, y=2, hatch='ne', label="ne/sw")
         Hexagon(common=hxgn, y=4, hatch='nw', label="nw/se")
@@ -723,7 +726,7 @@ or diagonal direction.
 
         hxgn = Common(
             x=1, height=1.5, orientation='pointy',
-            hatch_count=5, hatch_stroke=red)
+            hatch_count=5, hatch_stroke="red")
         Hexagon(common=hxgn, y=0, hatch='n', label="n/s")
         Hexagon(common=hxgn, y=2, hatch='ne', label="ne/sw")
         Hexagon(common=hxgn, y=4, hatch='nw', label="nw/se")
@@ -772,7 +775,7 @@ of a Hexagon towards its centre.
 
         hxg = Common(
             height=1.5, font_size=8,
-            dot=0.05, dot_stroke=red,
+            dot=0.05, dot_stroke="red",
             orientation="flat")
 
         Hexagon(common=hxg, x=0.25, y=0.25, radii='sw', label="SW")
@@ -812,7 +815,7 @@ of a Hexagon towards its centre.
 
         hxg = Common(
             height=1.5, font_size=8,
-            dot=0.05, dot_stroke=red,
+            dot=0.05, dot_stroke="red",
             orientation="pointy")
         Hexagon(common=hxg, x=0.25, y=0.25, radii='sw', label="SW")
         Hexagon(common=hxg, x=0.25, y=2.15, radii='nw', label="NW")
@@ -853,7 +856,7 @@ a Hexagon towards its centre.
 
         hxg = Common(
             height=1.5, font_size=8,
-            dot=0.05, dot_stroke=red,
+            dot=0.05, dot_stroke="red",
             orientation="flat")
 
         Hexagon(common=hxg, x=0.25, y=0.25, perbis='sw', label="SW")
@@ -893,7 +896,7 @@ of a Hexagon towards its centre.
 
         hxg = Common(
             height=1.5, font_size=8,
-            dot=0.05, dot_stroke=red,
+            dot=0.05, dot_stroke="red",
             orientation="pointy")
         Hexagon(common=hxg, x=0.25, y=0.25, perbis='sw', label="SW")
         Hexagon(common=hxg, x=0.25, y=2.15, perbis='nw', label="NW")
@@ -1135,7 +1138,7 @@ or diagonal direction.
 
       .. code:: python
 
-        htc = Common(radius=0.7, hatch_count=5, hatch_stroke=red)
+        htc = Common(radius=0.7, hatch_count=5, hatch_stroke="red")
         Circle(common=htc, cx=2, cy=5.2, label='5')
         Circle(common=htc, cx=1, cy=3.7, hatch='o', label='o')
         Circle(common=htc, cx=3, cy=3.7, hatch='d', label='d')
@@ -1199,7 +1202,7 @@ of a Circle towards its centre.
                fill=None,
                radii=[0,90,180,270],
                radii_stroke_width=3,
-               radii_stroke=red)
+               radii_stroke="red")
         Circle(cx=3, cy=5, radius=1,
                fill=green, stroke=orange, stroke_width=1,
                radii=[0,90,180,270,45,135,225,315],
@@ -1256,7 +1259,7 @@ on |dash| and styled with stroke color, size, and face.
                radii_stroke=white,
                radii_labels=["A","B", "C"],
                radii_labels_rotation=270,
-               radii_labels_stroke=red,
+               radii_labels_stroke="red",
                radii_labels_face="Courier",
                dot=0.05)
 
@@ -1307,7 +1310,7 @@ effect.
                petals_style="p",
                petals_stroke_width=3,
                petals_height=0.25,
-               petals_stroke=red,
+               petals_stroke="red",
                petals_fill=yellow)
         Circle(cx=2, cy=1.5, radius=1,
                petals=11,
@@ -1363,7 +1366,7 @@ effect.
                petals_style="c",
                petals_stroke_width=3,
                petals_height=0.5,
-               petals_stroke=red,
+               petals_stroke="red",
                petals_fill=yellow)
         Circle(cx=2, cy=1.5, radius=1,
                petals=11,
@@ -1418,7 +1421,7 @@ effect.
                petals=8,
                petals_stroke_width=3,
                petals_height=0.25,
-               petals_stroke=red,
+               petals_stroke="red",
                petals_fill=yellow)
         Circle(cx=2, cy=1.5, radius=1,
                petals=11,
@@ -1621,7 +1624,7 @@ Stroke
 
         .. code:: python
 
-          Blueprint(stroke_width=1, stroke=red)
+          Blueprint(stroke_width=1, stroke="red")
 
       It has the following properties set:
 

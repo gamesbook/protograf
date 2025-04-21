@@ -21,7 +21,7 @@ txt = Common(x=0, y=0, font_size=8, align="left")
 Text(common=txt, text="Rectangle START...")
 PageBreak()
 
-# ---- centre placement
+# ---- centre
 Blueprint()
 Text(common=txt, text="Rectangle: cx=2, cy=3")
 Rectangle(cx=2, cy=3)
@@ -48,7 +48,7 @@ Rectangle(
     )
 PageBreak()
 
-# ---- dot & cross
+# ---- dot_cross
 Blueprint()
 Text(common=txt, text="Rectangle: dot & cross")
 Rectangle(height=3, width=2, cross=0.75, dot=0.15)
@@ -72,14 +72,14 @@ Rectangle(common=htch, x=3, y=4, hatch='d', label="D")
 
 PageBreak()
 
-# ---- rounding + hatches
+# ---- rounding
 Blueprint()
 Text(common=txt, text="Rectangle: rounding; hatches")
 rct = Common(x=0.5, height=1.5, width=3.0, stroke_width=.5,
              hatch_stroke="red", hatch='o')
-Rectangle(common=rct, y=1.0, rounding=0.1, hatch_count=10)
-Rectangle(common=rct, y=4.0, rounding=0.5, hatch_count=3)
-# Rectangle(common=rct, y=4.0, rounding=0.75, hatch_count=15)  # FAILS!
+Rectangle(common=rct, y=1, rounding=0.1, hatch_count=10)
+Rectangle(common=rct, y=4, rounding=0.5, hatch_count=3)
+# Rectangle(common=rct, y=4, rounding=0.5, hatch_count=15)  # THIS FAILS!
 PageBreak()
 
 # ---- chevron
@@ -127,12 +127,14 @@ Rectangle(
     )
 PageBreak()
 
-# ---- peaks
+# ---- peak
 Blueprint()
 Text(common=txt, text="Rectangle: peaks")
-Rectangle(x=1, y=1, width=2, height=1, peaks=[("*",0.2)], font_size=6,
+Rectangle(x=1, y=1, width=2, height=1,
+          peaks=[("*", 0.2)], font_size=6,
           label="peaks = *")
-Rectangle(x=1, y=3, width=2, height=1.5, peaks=[("s",1), ("e",0.25)], font_size=6,
+Rectangle(x=1, y=3, width=2, height=1.5,
+          peaks=[("s", 1), ("e", 0.25)], font_size=6,
           label="peaks = s,e")
 PageBreak()
 
@@ -144,18 +146,19 @@ Rectangle(cx=2, cy=3, width=1.5, height=3, fill=None,
           stroke="red", stroke_width=.3, rotation=45, dot=0.04)
 PageBreak()
 
-# ---- notches
+# ---- notch_style
 Blueprint()
 Text(common=txt, text="Rectangle : Notch Styles")
-styles = Common(height=1, width=3.5, x=0.25, notch=0.25, label_size=7, fill="lightsteelblue")
+styles = Common(height=1, width=3.5, x=0.25,
+                notch=0.25, label_size=7, fill="lightsteelblue")
 Rectangle(common=styles, y=0, notch_style='snip', label='Notch: snip (s)')
 Rectangle(common=styles, y=1.5, notch_style='step', label='Notch: step (t)')
 Rectangle(common=styles, y=3, notch_style='fold', label='Notch: fold (d)')
 Rectangle(common=styles, y=4.5, notch_style='flap', label='Notch: flap (p)')
-# Rectangle(common=styles, y=5, label='Notch: bite (NOT WORKING)')
+# Rectangle(common=styles, y=6, label='Notch: bite (NOT WORKING)')
 PageBreak()
 
-# ---- rectangle - borders
+# ---- borders
 Blueprint(stroke_width=0.5)
 Text(common=txt, text="Rectangle: borders")
 Rectangle(
@@ -166,7 +169,7 @@ Rectangle(
     ]
 )
 Rectangle(
-    x=0.5,y=0.5, height=2, width=3, stroke_width=1.9,
+    x=0.5, y=0.5, height=2, width=3, stroke_width=1.9,
     borders=[
         ("w", 2, "gold"),
         ("n", 2, "chartreuse", True),
