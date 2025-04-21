@@ -173,7 +173,7 @@ Rectangle(
     borders=[
         ("w", 2, "gold"),
         ("n", 2, "chartreuse", True),
-        ("e", 2, "tomato", [0.1,0.2,0.1,0]),
+        ("e", 2, "tomato", [0.1, 0.2]),
     ]
 )
 PageBreak()

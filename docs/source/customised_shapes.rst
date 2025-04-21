@@ -538,7 +538,7 @@ e.g. ``n s`` to draw both lines on both north **and** south sides.
             borders=[
                 ("w", 2, "gold"),
                 ("n", 2, "chartreuse", True),
-                ("e", 2, "tomato", [0.1,0.2,0.1,0]),
+                ("e", 2, "tomato", [0.1, 0.2]),
             ]
         )
 
@@ -559,11 +559,12 @@ e.g. ``n s`` to draw both lines on both north **and** south sides.
       going from ``[`` to ``]``):
 
       - first border sets a thick yellow line for the left (west) edge
-      - second border sets a thick green dotted line for the top (north) edge
-      - third border sets a thick red dashed line for the left (west) edge
+      - second border sets a thick green *dotted* line for the top (north) edge
+      - third border sets a thick red dashed line for the right (east) edge
 
-      *Note* that for both dotted and dashed lines, any underlying color or
-      image will "show though" the gaps in the line.
+      **Note** that for both dotted and dashed lines, any underlying color or
+      image will "show though" the gaps in the line; in this case, it is the
+      original thick black line used to draw the rectangle.
 
 ===== ======
 
@@ -604,16 +605,15 @@ Centre
 
       .. code:: python
 
-          Hexagon(cx=2, cy=3, orientation='pointy')
 		  Hexagon(cx=2, cy=1)
-
+          Hexagon(cx=2, cy=3, orientation='pointy')
 
       Both Hexagons are located via their centres - *cx* and *cy*.
 
-      The upper Hexagon also has the *orientation* property set to
-      ``pointy``, ensuring there is a "peak" at the top of it.
+      The upper Hexagon has the default *orientation* value of ``flat``.
 
-      The lower Hexagon has the default *orientation* value of ``flat``.
+      The lower Hexagon also has the *orientation* property set to
+      ``pointy``, ensuring there is a "peak" at the top of it.
 
 ===== ======
 
@@ -631,17 +631,19 @@ Dot & Cross
 
       .. code:: python
 
-        Hexagon(x=-0.25, y=4, height=2,
-                dot=0.1, dot_stroke="red")
-        Hexagon(x=1.75, y=3.5, height=2,
-                cross=0.25, cross_stroke="red", cross_stroke_width=1)
-
         Hexagon(x=0, y=1, height=2,
                 dot=0.1, dot_stroke="red",
                 orientation='pointy')
         Hexagon(x=2, y=1, height=2,
-                cross=0.25, cross_stroke="red", cross_stroke_width=1,
+                cross=0.25, cross_stroke="red",
+                cross_stroke_width=1,
                 orientation='pointy')
+
+        Hexagon(x=-0.25, y=4, height=2,
+                dot=0.1, dot_stroke="red")
+        Hexagon(x=1.75, y=3.5, height=2,
+                cross=0.25, cross_stroke="red",
+                cross_stroke_width=1)
 
       These Hexagons have properties set as follows:
 
@@ -664,7 +666,7 @@ Hatch: Flat
 `^ <hexagon_>`_
 
 Hatches are a set of parallel lines that are drawn across
-the Hexagon from one opposing side to another in a vertical, horizontal or
+a Hexagon from one opposing side to another in a vertical, horizontal or
 diagonal direction.
 
 .. |hhf| image:: images/custom/hexagon/hatch_flat.png
@@ -676,7 +678,8 @@ diagonal direction.
       .. code:: python
 
         hxgn = Common(
-            x=1, height=1.5, orientation='flat', hatch_count=5, hatch_stroke="red")
+            x=1, height=1.5, orientation='flat',
+            hatch_count=5, hatch_stroke="red")
         Hexagon(common=hxgn, y=0, hatch='e', label="e/w")
         Hexagon(common=hxgn, y=2, hatch='ne', label="ne/sw")
         Hexagon(common=hxgn, y=4, hatch='nw', label="nw/se")
@@ -1026,12 +1029,12 @@ Example 1. Flat
 
         hxg = Common(
           height=1.5, orientation="flat", font_size=8)
-        Hexagon(common=hxg, x=0.25, y=0.25, borders=('sw', 2, gold), label="SW")
-        Hexagon(common=hxg, x=0.25, y=2.15, borders=('nw', 2, gold), label="NW")
-        Hexagon(common=hxg, x=0.25, y=4.00, borders=('n', 2, gold), label="N")
-        Hexagon(common=hxg, x=2.25, y=4.00, borders=('s', 2, gold), label="S")
-        Hexagon(common=hxg, x=2.25, y=0.25, borders=('ne', 2, gold), label="NE")
-        Hexagon(common=hxg, x=2.25, y=2.15, borders=('se', 2, gold), label="SE")
+        Hexagon(common=hxg, x=0.25, y=0.25, borders=('sw', 2, "gold"), label="SW")
+        Hexagon(common=hxg, x=0.25, y=2.15, borders=('nw', 2, "gold"), label="NW")
+        Hexagon(common=hxg, x=0.25, y=4.00, borders=('n', 2, "gold"), label="N")
+        Hexagon(common=hxg, x=2.25, y=4.00, borders=('s', 2, "gold"), label="S")
+        Hexagon(common=hxg, x=2.25, y=0.25, borders=('ne', 2, "gold"), label="NE")
+        Hexagon(common=hxg, x=2.25, y=2.15, borders=('se', 2, "gold"), label="SE")
 
       Each Hexagon has a normal *stroke_width* as its outline, with a
       default *fill* and *stroke* color of black.
@@ -1054,12 +1057,12 @@ Example 2. Pointy
 
         hxg = Common(
           height=1.5, orientation="pointy", font_size=8)
-        Hexagon(common=hxg, x=0.25, y=0.25, borders=('sw', 2, gold), label="SW")
-        Hexagon(common=hxg, x=0.25, y=2.15, borders=('nw', 2, gold), label="NW")
-        Hexagon(common=hxg, x=0.25, y=4.00, borders=('w', 2, gold), label="W")
-        Hexagon(common=hxg, x=2.25, y=4.00, borders=('e', 2, gold), label="E")
-        Hexagon(common=hxg, x=2.25, y=0.25, borders=('ne', 2, gold), label="NE")
-        Hexagon(common=hxg, x=2.25, y=2.15, borders=('se', 2, gold), label="SE")
+        Hexagon(common=hxg, x=0.25, y=0.25, borders=('sw', 2, "gold"), label="SW")
+        Hexagon(common=hxg, x=0.25, y=2.15, borders=('nw', 2, "gold"), label="NW")
+        Hexagon(common=hxg, x=0.25, y=4.00, borders=('w', 2, "gold"), label="W")
+        Hexagon(common=hxg, x=2.25, y=4.00, borders=('e', 2, "gold"), label="E")
+        Hexagon(common=hxg, x=2.25, y=0.25, borders=('ne', 2, "gold"), label="NE")
+        Hexagon(common=hxg, x=2.25, y=2.15, borders=('se', 2, "gold"), label="SE")
 
       Each Hexagon has a normal *stroke_width* as its outline, with a
       default *fill* and *stroke* color of black.
@@ -1068,7 +1071,6 @@ Example 2. Pointy
       the direction in *borders*.
 
 ===== ======
-
 
 .. _circleIndex:
 
@@ -1084,7 +1086,6 @@ ways that it can be customised.
 - `Radii <circleRadii_>`_
 - `Radii Labels <circleRadiiLabels_>`_
 - `Petals: petal <circlePetalsPetal_>`_
-- `Petals: curve <circlePetalsCurve_>`_
 - `Petals: triangle <circlePetalsTriangle_>`_
 
 .. _circleCross:
@@ -1101,10 +1102,13 @@ Dot & Cross
 
       .. code:: python
 
-        Circle(cx=1, cy=1, radius=1, dot=0.1, dot_stroke=green)
         Circle(
-            cx=3, cy=1, radius=1,
-            cross=0.25, cross_stroke=green, cross_stroke_width=1)
+            cx=1, cy=3, radius=1,
+            dot=0.1, dot_stroke="green")
+        Circle(
+            cx=3, cy=3, radius=1,
+            cross=0.25, cross_stroke="green",
+            cross_stroke_width=1)
 
       These Circles have properties set as follows:
 
@@ -1138,7 +1142,8 @@ or diagonal direction.
 
       .. code:: python
 
-        htc = Common(radius=0.7, hatch_count=5, hatch_stroke="red")
+        htc = Common(
+          radius=0.7, hatch_count=5, hatch_stroke="red")
         Circle(common=htc, cx=2, cy=5.2, label='5')
         Circle(common=htc, cx=1, cy=3.7, hatch='o', label='o')
         Circle(common=htc, cx=3, cy=3.7, hatch='d', label='d')
@@ -1153,19 +1158,19 @@ or diagonal direction.
       - *radius* - sets the basic size
       - *hatch_count* - sets the **number** of lines to be drawn; the interval
         between them is equal and depends on the direction
-      - *hatch_stroke* - set to the color `red` to make it stand out from the
-        hexagon sides
+      - *hatch_stroke* - set to the color `red` to set the line off from the
+        circumference
 
       Each Circle has its own setting for:
 
       - *cx* and *cy* - different positions on the page for the centres
       - *label* - text to help identify it
       - *hatch* - if not specified, hatches will be drawn in all
-        directions - as seen in top-most circle - otherwise:
+        directions |dash| as seen in lower-most circle |dash| otherwise:
 
         - ``o`` (orthogonal) draws vertical **and** horizontal lines
-        - ``d`` (diagonal) draws diagonal lines between all corners
-        - ``e`` (East) or ``w`` (West) or draws horizontal lines
+        - ``d`` (diagonal) draws diagonal lines (``ne`` and ``nw``)
+        - ``e`` (East) or ``w`` (West) draws horizontal lines
         - ``n`` (West) or ``s`` (East) draws vertical lines
         - ``ne`` (North-East) or ``sw`` (South-West) draws diagonal lines from
           bottom-left to top-right
@@ -1203,11 +1208,12 @@ of a Circle towards its centre.
                radii=[0,90,180,270],
                radii_stroke_width=3,
                radii_stroke="red")
+
         Circle(cx=3, cy=5, radius=1,
-               fill=green, stroke=orange, stroke_width=1,
+               fill="green", stroke="orange", stroke_width=1,
                radii=[0,90,180,270,45,135,225,315],
                radii_stroke_width=8,
-               radii_stroke=orange,
+               radii_stroke="orange",
                radii_length=0.8)
 
       These Circles have some of the following properties:
@@ -1245,22 +1251,24 @@ on |dash| and styled with stroke color, size, and face.
 
       .. code:: python
 
-        Circle(cx=1, cy=5, radius=1,
+        Circle(cx=1, cy=1, radius=1,
                radii=[30, 150, 270],
-               radii_labels="ABC",
+               radii_stroke=white,
+               radii_labels=["A", "B", "C"],
+               radii_labels_rotation=270,
+               radii_labels_stroke="red",
+               radii_labels_face="Courier",
                dot=0.05)
+
         Circle(cx=3, cy=3, radius=1,
                radii=[30, 150, 270],
                radii_labels="A,B,C",
                radii_labels_rotation=90,
                dot=0.05)
-        Circle(cx=1, cy=1, radius=1,
+
+        Circle(cx=1, cy=5, radius=1,
                radii=[30, 150, 270],
-               radii_stroke=white,
-               radii_labels=["A","B", "C"],
-               radii_labels_rotation=270,
-               radii_labels_stroke="red",
-               radii_labels_face="Courier",
+               radii_labels="ABC",
                dot=0.05)
 
       Apart from the `radii lines <circleRadii_>`_ themselves, the labels
@@ -1273,17 +1281,18 @@ on |dash| and styled with stroke color, size, and face.
       - *radii_labels_stroke* - the color of the labels
       - *radii_labels_stroke_width* - thickness of the labels
 
-      The top example shows how the same text is repeated for all radii.
+      The top example shows how text strings are created with a list.
 
-      The middle example shows how the text string is split using commas.
+      The middle example shows how the text string is split using commas;
+      this results in a list whose members are used to create the labels.
 
-      The lower example shows how text strings are created with a list.
+      The lower example shows how the same text is repeated for all radii.
 
-      The lower example shows how text is rotated and styled. The radii lines
-      color is set to match the circle, making it "invisible".
+      The top example also shows how text is rotated and styled. The radii
+      lines stroke color is set to match the circle fill, thereby making it
+      "invisible".
 
 ===== ======
-
 
 .. _circlePetalsPetal:
 
@@ -1303,23 +1312,24 @@ effect.
 
       .. code:: python
 
-        Circle(cx=2, cy=4.5, radius=1,
-               stroke=None,
-               fill=None,
-               petals=8,
-               petals_style="p",
-               petals_stroke_width=3,
-               petals_height=0.25,
-               petals_stroke="red",
-               petals_fill=yellow)
         Circle(cx=2, cy=1.5, radius=1,
                petals=11,
                petals_style="petal",
-               petals_offset=0.25,
+               petals_offset=0.2,
                petals_stroke_width=1,
                petals_dotted=1,
-               petals_height=0.25,
-               petals_fill=grey)
+               petals_height=0.5,
+               petals_fill="gray")
+
+        Circle(cx=2, cy=4.5, radius=1,
+               fill_stroke="yellow",
+               petals=8,
+               petals_style="p",
+               petals_offset=0.1,
+               petals_stroke_width=2,
+               petals_height=0.8,
+               petals_stroke="red",
+               petals_fill="yellow")
 
       These Circles have the following properties:
 
@@ -1336,67 +1346,12 @@ effect.
       - *petals_fill* - sets the color of the area inside the line used to
         draw the petals. Any *fill* or *stroke* settings for the circle itself
         may appear superimposed on this area.
-      - *petals_dotted* - if True, sets the line style to ``dotted``
+      - *petals_dotted* -if ``True``, sets the line style to *dotted*
       - *petals_height* - sets the distance between the highest and the lowest
         points of the petal line
 
 ===== ======
 
-.. _circlePetalsCurve:
-
-Petals - curve
---------------
-`^ <circle_>`_
-
-Petals are projecting shapes drawn from the circumference of a Circle outwards
-at regular intervals.  They are typically used to create a "flower" or "sun"
-effect.
-
-.. |cpc| image:: images/custom/circle/petals_curve.png
-   :width: 330
-
-===== ======
-|cpc| This example shows Circles constructed using the commands:
-
-      .. code:: python
-
-        Circle(cx=2, cy=4.5, radius=1,
-               stroke=None,  fill=None,
-               petals=8,
-               petals_style="c",
-               petals_stroke_width=3,
-               petals_height=0.5,
-               petals_stroke="red",
-               petals_fill=yellow)
-        Circle(cx=2, cy=1.5, radius=1,
-               petals=11,
-               petals_style="curve",
-               petals_offset=0.25,
-               petals_stroke_width=1,
-               petals_dotted=1,
-               petals_height=0.5,
-               petals_fill=grey)
-
-      These Circles have the following properties:
-
-      - *cx*, *cy*, *radius*, *stroke* and *fill* - set the properties of the
-        `Circle`_; if these are set to ``None`` then the *petal_fill*
-        setting will be used for the whole area
-      - *petals* - sets the number of petals to drawn
-      - *petals_style* - a style of ``c`` or ``curve`` affects the way petals
-        are drawn
-      - *petals_offset* - sets the distance of the lowest point of the petal
-        line away from the circle's circumference
-      - *petals_stroke_width* - sets the thickness of the line used to draw
-        the petals
-      - *petals_fill* - sets the color of the area inside the line used to
-        draw the petals. Any *fill* or *stroke* settings for the circle itself
-        may appear superimposed on this area.
-      - *petals_dotted* - if True, sets the line style to ``dotted``
-      - *petals_height* - sets the distance between the highest and the lowest
-        points of the petal line
-
-===== ======
 
 .. _circlePetalsTriangle:
 
@@ -1416,20 +1371,20 @@ effect.
 
       .. code:: python
 
-        Circle(cx=2, cy=4.5, radius=1,
-               stroke=None, fill=None,
-               petals=8,
-               petals_stroke_width=3,
-               petals_height=0.25,
-               petals_stroke="red",
-               petals_fill=yellow)
         Circle(cx=2, cy=1.5, radius=1,
                petals=11,
                petals_offset=0.25,
                petals_stroke_width=1,
                petals_dotted=True,
                petals_height=0.25,
-               petals_fill=grey)
+               petals_fill="grey")
+        Circle(cx=2, cy=4.5, radius=1,
+               stroke=None, fill=None,
+               petals=8,
+               petals_stroke_width=3,
+               petals_height=0.25,
+               petals_stroke="red",
+               petals_fill="yellow")
 
       These Circles have the following properties:
 
@@ -1444,7 +1399,7 @@ effect.
       - *petals_fill* - sets the color of the area inside the line used to
         draw the petals. Any *fill* or *stroke* settings for the circle itself
         may appear superimposed on this area.
-      - *petals_dotted* - if True, sets the line style to `dotted`
+      - *petals_dotted* - if ``True``, sets the line style to *dotted*
       - *petals_height* - sets the distance between the highest and the lowest
         points of the petal line
 
@@ -1523,12 +1478,15 @@ Subdivisions - Dashed
 
         .. code:: python
 
-          Blueprint(subdivisions=5, stroke_width=0.5, subdivisions_dashed=[0.2, 0.1])
+          Blueprint(
+              stroke_width=0.5,
+              subdivisions=5,
+              subdivisions_dashed=[0.2, 0.1])
 
       It has the following properties set:
 
-      - *subdivisions* - ``5`` thinner lines between each pair of primary lines
       - *stroke_width* - set to ``0.5`` |dash| thicker and more visible
+      - *subdivisions* - ``5`` thinner lines between each pair of primary lines
       - *subdivisions_dashed* - a list with the length of the dash followed by
         the length of the space between two dashes - ``2`` and ``1`` mm.
 
@@ -1704,5 +1662,34 @@ Edges
 
       - *edges* - set to ``'n,s,e,w'``; grid numbers will be drawn on
         all four edges
+
+===== ======
+
+
+Edges at x and y
+----------------
+`↑ <blueprint_>`_
+
+.. |bl9| image:: images/custom/blueprint/edges_x_y.png
+   :width: 330
+
+===== ======
+|bl9| This example shows the Blueprint constructed using the command with these
+      properties:
+
+        .. code:: python
+
+          Blueprint(
+              edges_y=3, edges_x=2)
+
+      It has the following properties set:
+
+      - *edges_y* - set to ``3``; a horizontal line of grid numbers will be
+        drawn where ``y`` is equal to 3.
+      - *edges_x* - set to ``2``; a vertical line of grid numbers will be
+        drawn where ``x`` is equal to 2.
+
+      This is not very useful for a tiny grid, but for a very large page size
+      it can be helpful to use such grid numbering while working on a design.
 
 ===== ======

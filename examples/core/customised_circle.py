@@ -20,11 +20,12 @@ Create(filename="customised_circles.pdf",
 txt = Common(x=0, y=0, font_size=8, align="left")
 
 Text(common=txt, text="Circle START...")
+PageBreak()
 
-# ---- circle hatches
+# ---- circle hatch
 Blueprint()
 Text(common=txt, text="Circle: hatches")
-htc = Common(radius=0.7, hatch_count=5, hatch_stroke="red",)
+htc = Common(radius=0.7, hatch_count=5, hatch_stroke="red")
 Circle(common=htc, cx=2, cy=5.2, label='5')  # all directions
 Circle(common=htc, cx=1, cy=3.7, hatch='o', label='o')
 Circle(common=htc, cx=3, cy=3.7, hatch='d', label='d')
@@ -34,11 +35,11 @@ Circle(common=htc, cx=1, cy=0.7, hatch='ne', label='ne')
 Circle(common=htc, cx=3, cy=0.7, hatch='nw', label='nw')
 PageBreak()
 
-# ---- circle dot & cross
+# ---- circle dot_cross
 Blueprint()
 Text(common=txt, text="Circle: Dots & Crosses")
-Circle(cx=1, cy=1, radius=1, dot=0.1, dot_stroke="green")
-Circle(cx=3, cy=1, radius=1, cross=0.25, cross_stroke="green", cross_stroke_width=1)
+Circle(cx=1, cy=3, radius=1, dot=0.1, dot_stroke="green")
+Circle(cx=3, cy=3, radius=1, cross=0.25, cross_stroke="green", cross_stroke_width=1)
 PageBreak()
 
 # ---- circle radii
@@ -70,7 +71,7 @@ Circle(cx=3, cy=5,
        radii_length=0.8)
 PageBreak()
 
-# ---- circle petals: triangle
+# ---- circle petals_triangle
 Blueprint()
 Text(common=txt, text="Circle: petals; triangle style")
 Circle(cx=2, cy=1.5, radius=1,
@@ -92,53 +93,30 @@ Circle(cx=2, cy=4.5, radius=1,
 )
 PageBreak()
 
-# ---- circle petals: curve
-Blueprint()
-Text(common=txt, text="Circle: petals; curve style")
-Circle(cx=2, cy=1.5, radius=1,
-        petals=11,
-        petals_style="curve",
-        petals_offset=0.25,
-        petals_stroke_width=1,
-        petals_dotted=1,
-        petals_height=0.5,
-        petals_fill="gray")
-Circle(cx=2, cy=4.5, radius=1,
-       stroke="yellow",
-       fill=None,
-       stroke_width=0.001,
-       petals=8,
-       petals_style="c",
-       petals_stroke_width=3,
-       petals_height=0.5,
-       petals_stroke="red",
-       petals_fill="yellow")
-PageBreak()
-
-# ---- circle petals: petal
+# ---- circle petals_petal
 Blueprint()
 Text(common=txt, text="Circle: petals; petal style")
 Circle(cx=2, cy=1.5, radius=1,
-        petals=11,
-        petals_style="petal",
-        petals_offset=0.25,
-        petals_stroke_width=1,
-        petals_dotted=1,
-        petals_height=0.25,
-        petals_fill="gray")
+       petals=11,
+       petals_style="petal",
+       petals_offset=0.2,
+       petals_stroke_width=1,
+       petals_dotted=1,
+       petals_height=0.5,
+       petals_fill="gray")
+
 Circle(cx=2, cy=4.5, radius=1,
-       stroke="yellow",
-       fill=None,
-       stroke_width=0.001,
+       fill_stroke="yellow",
        petals=8,
        petals_style="p",
-       petals_stroke_width=3,
-       petals_height=0.25,
+       petals_offset=0.1,
+       petals_stroke_width=2,
+       petals_height=0.8,
        petals_stroke="red",
        petals_fill="yellow")
 PageBreak()
 
-# ---- circle radii labels
+# ---- circle radi_labels
 Blueprint()
 Text(common=txt, text="Radii: Labels")
 Circle(cx=1, cy=5, radius=1,
@@ -153,7 +131,7 @@ Circle(cx=3, cy=3, radius=1,
 Circle(cx=1, cy=1, radius=1,
        radii=[30, 150, 270],
        radii_stroke="white",
-       radii_labels=["A","B", "C"],
+       radii_labels=["A", "B", "C"],
        radii_labels_rotation=270,
        radii_labels_stroke="red",
        radii_labels_face="Courier",
@@ -169,7 +147,10 @@ Save(
      directory="../docs/source/images/custom/circle",
      names=[
         None,
-        "hatch", "dot_cross", "radii",
-        "petals_triangle", "petals_curve", "petals_petal",
+        "hatch",
+        "dot_cross",
+        "radii",
+        "petals_triangle",
+        "petals_petal",
         "radii_labels",
         None])

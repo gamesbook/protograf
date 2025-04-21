@@ -387,7 +387,7 @@ def sequence_split(
     return values
 
 
-def split(string: str):
+def split(string: str, tuple_to_list: bool = False):
     """
     Split a string into a list of individual characters
 
@@ -396,8 +396,14 @@ def split(string: str):
     ['A', '1', 'B']
     >>> split('A 1 B')
     ['A', '1', 'B']
+    >>> split((1, 2, 3), True)
+    [(1, 2, 3)]
     """
-    if isinstance(string, (list, tuple)):
+    if isinstance(string, list):
+        return string
+    if isinstance(string, tuple):
+        if tuple_to_list:
+            return [string]
         return string
     sep = " " if string and "," not in string else ","
     return sequence_split(string, False, False, sep)

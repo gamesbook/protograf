@@ -398,7 +398,9 @@ class CircleShape(BaseShape):
         else:
             return length
 
-    def draw_hatch(self, cnv, ID, num: int, x_c: float, y_c: float):
+    def draw_hatch(
+        self, cnv, ID, num: int, x_c: float, y_c: float, rotation: float = 0.0
+    ):
         """Draw line(s) from one edge to the other.
 
         Args:
@@ -520,6 +522,8 @@ class CircleShape(BaseShape):
             stroke_cap=self.hatch_cap,
             dashed=self.hatch_dashed,
             dotted=self.hatch_dots,
+            rotation=rotation,
+            rotation_point=muPoint(x_c, y_c),
         )
 
     def draw_radii(self, cnv, ID, x_c: float, y_c: float):
@@ -555,12 +559,16 @@ class CircleShape(BaseShape):
             # print(f'*** {radius_length=} :: {radius_offset=} :: {outer_radius=}')
             _radii_labels = [self.radii_labels]
             if self.radii_labels:
-                if isinstance(self.radii_labels, (list, tuple)):
+                if isinstance(self.radii_labels, list):
+                    _radii_labels = self.radii_labels
+                else:
                     _radii_labels = tools.split(self.radii_labels)
-            _radii_strokes = [self.radii_stroke]
+            _radii_strokes = [self.radii_stroke]  # could be color tuple (or str?)
             if self.radii_stroke:
-                if isinstance(self.radii_stroke, (list, tuple)):
-                    _radii_strokes = tools.split(self.radii_stroke)
+                if isinstance(self.radii_stroke, list):
+                    _radii_strokes = self.radii_stroke
+                else:
+                    _radii_strokes = tools.split(self.radii_stroke, tuple_to_list=True)
             # print(f'*** {_radii_labels=} {_radii_strokes=}')
             label_key, stroke_key = 0, 0
             label_points = []
@@ -659,67 +667,28 @@ class CircleShape(BaseShape):
                                 center, self._u.radius + offset, angle
                             )
                         )
-                    case "curve" | "c":
-                        if index == 0:
-                            # start point (for first "current" petal location)
-                            petals_vertices.append(
-                                geoms.point_on_circle(
-                                    center, self._u.radius + offset, angle + gap
-                                )
-                            )
-                        else:
-                            # 3 points for create arc/bezier 'bounding box':
-                            # the curveTo method starts painting a Bezier curve
-                            # beginning at the current location, using
-                            # (x1,y1), (x2,y2), and (x3,y3) as the other
-                            # three control points, leaving brush on (x3,y3)
-                            pt1 = geoms.point_on_circle(
-                                center, self._u.radius + offset + height, angle
-                            )
-                            pt2 = geoms.point_on_circle(
-                                center, self._u.radius + offset + height, angle + gap
-                            )
-                            pt3 = geoms.point_on_circle(
-                                center, self._u.radius + offset, angle + gap
-                            )
-                            petals_vertices.append((pt1, pt2, pt3))
-                            # print(f'  {pt1=} {pt2=} {pt3=}')
+
                     case "petal" | "p":
-                        if index == 0:
-                            # start point (for first "current" curve location)
-                            last_pt = geoms.point_on_circle(
-                                center, self._u.radius + offset, angle
-                            )
-                            petals_vertices.append(last_pt)
-                            self._debug(cnv, point=last_pt, label="start", color="red")
-                        else:
-                            # 3 points for create arc/bezier 'bounding box':
-                            # the curveTo method starts painting a Bezier curve
-                            # beginning at the current location, using
-                            # (x1,y1), (x2,y2), and (x3,y3) as the other
-                            # three control points, leaving brush on (x3,y3)
-                            next_pt = geoms.point_on_circle(
-                                center, self._u.radius + offset, angle
-                            )
-                            self._debug(
-                                cnv, point=next_pt, label=f"next:{index}", color="green"
-                            )
-                            chord = abs(geoms.length_of_line(last_pt, next_pt))
-                            box_height = chord / 2.0 * 4.0 / 3.0
-                            _, _, chord_angle = geoms.circle_angles(
-                                self._u.radius, chord
-                            )
-                            pt0_angle = angles[index - 1] + (90 - chord_angle)
-                            pt1_angle = angle - (90 - chord_angle)
-                            # print(f' * {chord_angle=} {pt0_angle=} {pt1_angle=}')
-                            pt0 = geoms.degrees_to_xy(pt0_angle, box_height, last_pt)
-                            pt1 = geoms.degrees_to_xy(pt1_angle, box_height, next_pt)
-                            petals_vertices.append((pt0, pt1, next_pt))
-                            last_pt = next_pt
-                            self._debug(
-                                cnv, point=next_pt, label=f"last:{index}", color="red"
-                            )
-                            # print(f'  {pt0=} {pt1=} {next_pt=} ')
+                        pt1 = geoms.point_on_circle(
+                            center,
+                            self._u.radius + offset,
+                            angle - gap / 2.0,
+                        )
+                        pt2 = geoms.point_on_circle(
+                            center, self._u.radius + offset + height, angle
+                        )
+                        pt3 = geoms.point_on_circle(
+                            center,
+                            self._u.radius + offset,
+                            angle + gap / 2.0,
+                        )
+                        petals_vertices.append((pt1, pt2, pt3))
+
+                    case _:
+                        tools.feedback(
+                            f'Unknown petals_style "{self.petals_style}"', True
+                        )
+
             # ---- draw and fill
             match self.petals_style:
                 case "triangle" | "t":
@@ -731,17 +700,18 @@ class CircleShape(BaseShape):
                             (vertex.x, vertex.y),
                             (petals_vertices[key + 1].x, petals_vertices[key + 1].y),
                         )
-                case "curve" | "c" | "petal" | "p":
+                case "petal" | "p":
                     for key, vertex in enumerate(petals_vertices):
-                        if key == 0:
-                            continue  # already have a "start" location on path
+                        # if key == 0:
+                        #     continue  # already have a "start" location on path
                         cnv.draw_curve(  # was curveTo
                             (vertex[0].x, vertex[0].y),
                             (vertex[1].x, vertex[1].y),
                             (vertex[2].x, vertex[2].y),
                         )
-                        if key in [1, 1]:
-                            self._debug(cnv, vertices=[vertex[0], vertex[1], vertex[2]])
+                case _:
+                    tools.feedback(f'Unknown petals_style "{self.petals_style}"', True)
+
             self.set_canvas_props(
                 index=ID,
                 fill=self.petals_fill,
@@ -749,6 +719,18 @@ class CircleShape(BaseShape):
                 stroke_width=self.petals_stroke_width,
                 dashed=self.petals_dashed,
                 dotted=self.petals_dotted,
+            )
+
+            # ---- draw 'fill' circles
+            cnv.draw_circle(center, self._u.radius + offset)
+            _color = self.petals_fill or self.fill
+            self.set_canvas_props(
+                index=ID,
+                fill=_color,
+                stroke=_color,
+                stroke_width=0.001,
+                dashed=None,
+                dotted=None,
             )
 
     def draw(self, cnv=None, off_x=0, off_y=0, ID=None, **kwargs):
@@ -848,7 +830,9 @@ class CircleShape(BaseShape):
             self.set_canvas_props(cnv=cnv, index=ID, **keys)
         # ---- draw hatch
         if self.hatch_count:
-            self.draw_hatch(cnv, ID, self.hatch_count, self.x_c, self.y_c)
+            self.draw_hatch(
+                cnv, ID, self.hatch_count, self.x_c, self.y_c, rotation=rotation
+            )
         # ---- draw radii
         if self.radii:
             self.draw_radii(cnv, ID, self.x_c, self.y_c)
@@ -1224,7 +1208,9 @@ class EquilateralTriangleShape(BaseShape):
     Equilateral Triangle on a given canvas.
     """
 
-    def draw_hatch(self, cnv, ID, side: float, vertices: list, num: int):
+    def draw_hatch(
+        self, cnv, ID, side: float, vertices: list, num: int, rotation: float = 0.0
+    ):
         _dirs = tools.validated_directions(
             self.hatch, tools.DirectionGroup.HEX_POINTY_EDGE, "hatch"
         )
@@ -1245,6 +1231,7 @@ class EquilateralTriangleShape(BaseShape):
                     cnv, side, lines, vertices, (0, 2), (1, 2)
                 )
         # ---- set canvas
+        centre = self.get_centroid(vertices)
         self.set_canvas_props(
             index=ID,
             stroke=self.hatch_stroke,
@@ -1252,6 +1239,8 @@ class EquilateralTriangleShape(BaseShape):
             stroke_cap=self.hatch_cap,
             dashed=self.hatch_dashed,
             dotted=self.hatch_dots,
+            rotation=rotation,
+            rotation_point=centre,
         )
 
     def calculate_area(self) -> float:
@@ -1330,7 +1319,9 @@ class EquilateralTriangleShape(BaseShape):
         self._debug(cnv, vertices=self.vertexes)
         # ---- draw hatch
         if self.hatch_count:
-            self.draw_hatch(cnv, ID, side, self.vertexes, self.hatch_count)
+            self.draw_hatch(
+                cnv, ID, side, self.vertexes, self.hatch_count, rotation=rotation
+            )
         # ---- centred shape (with offset)
         if self.centre_shape:
             cshape_name = self.centre_shape.__class__.__name__
@@ -2750,16 +2741,14 @@ class RectangleShape(BaseShape):
             angles.append(angle)
         return angles
 
-    def get_vertexes(self, rotation=0, **kwargs):
+    def get_vertexes(self, **kwargs):
         """Get vertices for rectangle without notches."""
-        if rotation:
-            kwargs["rotation"] = rotation
         x, y = self.calculate_xy(**kwargs)
-        vertices = [  # clockwise from bottom-left; relative to centre
-            Point(x, y),
-            Point(x, y + self._u.height),
-            Point(x + self._u.width, y + self._u.height),
-            Point(x + self._u.width, y),
+        vertices = [  # anti-clockwise from top-left; relative to centre
+            Point(x, y),  # e
+            Point(x, y + self._u.height),  # s
+            Point(x + self._u.width, y + self._u.height),  # w
+            Point(x + self._u.width, y),  # n
         ]
         # tools.feedback(
         #     '*** RECT VERTS '
@@ -2871,14 +2860,9 @@ class RectangleShape(BaseShape):
         if kwargs.get("cx") and kwargs.get("cy"):
             x = kwargs.get("cx") - self._u.width / 2.0
             y = kwargs.get("cy") - self._u.height / 2.0
-        # ---- overrides for centering
-        rotation = kwargs.get("rotation", None)
-        if rotation:
-            x = -self._u.width / 2.0
-            y = -self._u.height / 2.0
         return x, y
 
-    def draw_hatch(self, cnv, ID, vertices: list, num: int):
+    def draw_hatch(self, cnv, ID, vertices: list, num: int, rotation: float = 0.0):
         _dirs = tools.validated_directions(
             self.hatch, tools.DirectionGroup.CIRCULAR, "hatch"
         )
@@ -2976,6 +2960,8 @@ class RectangleShape(BaseShape):
             for i in range(1, diag_num):  # top-right side
                 cnv.draw_line((top_pt[i].x, top_pt[i].y), (rite_pt[i].x, rite_pt[i].y))
         # ---- set canvas
+        cx = vertices[0].x + 0.5 * self._u.width
+        cy = vertices[0].y + 0.5 * self._u.height
         self.set_canvas_props(
             index=ID,
             stroke=self.hatch_stroke,
@@ -2983,6 +2969,8 @@ class RectangleShape(BaseShape):
             stroke_cap=self.hatch_cap,
             dashed=self.hatch_dashed,
             dotted=self.hatch_dots,
+            rotation=rotation,
+            rotation_point=muPoint(cx, cy),
         )
 
     def draw(self, cnv=None, off_x=0, off_y=0, ID=None, **kwargs):
@@ -3304,10 +3292,12 @@ class RectangleShape(BaseShape):
             cnv.draw_polyline(self.vertexes)
             kwargs["closed"] = True
             self.set_canvas_props(cnv=cnv, index=ID, **kwargs)
+            self._debug(cnv, vertices=self.vertexes)
         else:
             # tools.feedback(f'*** RECT  normal')   )
             cnv.draw_rect((x, y, x + self._u.width, y + self._u.height), radius=radius)
             self.set_canvas_props(cnv=cnv, index=ID, **kwargs)
+            self._debug(cnv, vertices=self.vertexes)
             # ---- * borders (override)
             if self.borders:
                 if isinstance(self.borders, tuple):
@@ -3348,8 +3338,10 @@ class RectangleShape(BaseShape):
 
         # ---- draw hatch
         if self.hatch_count:
-            vertices = self.get_vertexes(rotation=rotation, **kwargs)
-            self.draw_hatch(cnv, ID, vertices, self.hatch_count)
+            # if 'rotation' in kwargs.keys():
+            #     kwargs.pop('rotation')
+            vertices = self.get_vertexes(**kwargs)
+            self.draw_hatch(cnv, ID, vertices, self.hatch_count, rotation=rotation)
 
         # ---- grid marks
         if self.grid_marks:

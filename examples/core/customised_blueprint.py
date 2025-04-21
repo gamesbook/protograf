@@ -59,7 +59,7 @@ Blueprint(edges="n,s,e,w")
 Text(common=txt, text="Blueprint: label all edges")
 PageBreak()
 
-Blueprint(edges="", edges_y=2, edges_x=2)
+Blueprint(edges="", edges_y=3, edges_x=2)
 Text(common=txt, text="Blueprint: label x & y")
 
 Save(
