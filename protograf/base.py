@@ -2483,23 +2483,28 @@ class BaseShape:
         vertices: list,
         left_nodes: tuple,
         right_nodes: tuple,
+        skip_ends: bool = True,
     ):
-        """Draw lines between opposing (left and right) sides of a shape
+        """Draw lines between opposing sides of a shape
 
         Args:
             side: length of a side
-            line_count: number of lines extending from the side
+            line_count: number of connections
             vertices: list of the Points making up the shape
-            left_nodes: ID's of vertices on either end of the left side
-            right_nodes: ID's of vertices on either end of the right side
+            left_nodes: IDs of the two vertices on either end of one of the sides
+            right_nodes: IDs of the two vertices on either end of the opposite side
+            skip_ends: if True, do not draw the first or last connection
 
         Note:
             * Vertices normally go clockwise from bottom/lower left
-            * Directions of vertex indices in left- and right-nodes must be the same
+            * Directions of vertex indices in left- and right-sides must be the same
         """
         delta = side / line_count
-        # tools.feedback(f'### {side=} {line_count=} {delta=}')
+        # tools.feedback(f'### {side=} {line_count=} {delta=} {skip_ends=}')
         for number in range(0, line_count + 1):
+            if skip_ends:
+                if number == line_count or number == 0:
+                    continue
             left_pt = geoms.point_on_line(
                 vertices[left_nodes[0]], vertices[left_nodes[1]], delta * number
             )

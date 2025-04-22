@@ -401,17 +401,18 @@ class CircleShape(BaseShape):
     def draw_hatch(
         self, cnv, ID, num: int, x_c: float, y_c: float, rotation: float = 0.0
     ):
-        """Draw line(s) from one edge to the other.
+        """Draw parallel line(s) across the Circle
 
         Args:
             num: number of lines
             x_c: x-centre of circle
             y_c: y-centre of circle
+            rotation: degrees anti-clockwise from horizontal "east"
         """
         _dirs = tools.validated_directions(
             self.hatch, tools.DirectionGroup.CIRCULAR, "hatch"
         )
-        lines = int(num)
+        lines = tools.as_int(num, "hatch_count")
         if lines < 0:
             tools.feedback("Cannot draw negative number of lines!", True)
         dist = (self._u.radius * 2.0) / (lines + 1)
@@ -1214,21 +1215,20 @@ class EquilateralTriangleShape(BaseShape):
         _dirs = tools.validated_directions(
             self.hatch, tools.DirectionGroup.HEX_POINTY_EDGE, "hatch"
         )
-        lines = int(num) + 1
-
-        if num >= 1:
+        lines = tools.as_int(num, "hatch_count")
+        if lines >= 1:
             # v_tl, v_tr, v_bl, v_br
             if "ne" in _dirs or "sw" in _dirs:  # slope UP to the right
                 self.draw_lines_between_sides(
-                    cnv, side, lines, vertices, (0, 1), (2, 1)
+                    cnv, side, lines, vertices, (0, 1), (2, 1), True
                 )
             if "se" in _dirs or "nw" in _dirs:  # slope DOWN to the right
                 self.draw_lines_between_sides(
-                    cnv, side, lines, vertices, (0, 2), (0, 1)
+                    cnv, side, lines, vertices, (0, 2), (0, 1), True
                 )
             if "e" in _dirs or "w" in _dirs:  # horizontal
                 self.draw_lines_between_sides(
-                    cnv, side, lines, vertices, (0, 2), (1, 2)
+                    cnv, side, lines, vertices, (0, 2), (1, 2), True
                 )
         # ---- set canvas
         centre = self.get_centroid(vertices)
@@ -1319,9 +1319,7 @@ class EquilateralTriangleShape(BaseShape):
         self._debug(cnv, vertices=self.vertexes)
         # ---- draw hatch
         if self.hatch_count:
-            self.draw_hatch(
-                cnv, ID, side, self.vertexes, self.hatch_count, rotation=rotation
-            )
+            self.draw_hatch(cnv, ID, side, self.vertexes, self.hatch_count, rotation)
         # ---- centred shape (with offset)
         if self.centre_shape:
             cshape_name = self.centre_shape.__class__.__name__
@@ -1745,18 +1743,29 @@ class HexShape(BaseShape):
             dotted=self.perbis_dotted,
         )
 
-    def draw_hatch(self, cnv, ID, side: float, vertices: list, num: int):
-        """Draw lines connecting two opposite sides and parallel to adjacent side."""
+    def draw_hatch(
+        self, cnv, ID, side: float, vertices: list, num: int, rotation: float = 0.0
+    ):
+        """Draw lines connecting two opposite sides and parallel to adjacent side.
+
+        Args:
+            ID: unique ID
+            side: length of a hexagon side
+            vertices: the hexagons's nodes
+            num: number of lines
+            rotation: degrees anti-clockwise from horizontal "east"
+        """
         dir_group = (
             tools.DirectionGroup.HEX_POINTY
             if self.orientation == "pointy"
             else tools.DirectionGroup.HEX_FLAT
         )
         _dirs = tools.validated_directions(self.hatch, dir_group, "hatch")
-        lines = int((num - 1) / 2 + 1)
-
+        _num = tools.as_int(num, "hatch_count")
+        lines = int((_num - 1) / 2 + 1)
+        # tools.feedback(f'*** HEX {num=} {lines=} {vertices=} {_dirs=}')
         if num >= 1:
-            # tools.feedback(f'*** HEX {vertices=} {num=} {_dirs=}')
+
             if self.orientation in ["p", "pointy"]:
                 if "ne" in _dirs or "sw" in _dirs:  # slope UP to the right
                     self.make_path_vertices(cnv, vertices, 1, 4)
@@ -2103,7 +2112,7 @@ class HexShape(BaseShape):
         # ---- draw hatch
         if self.hatch_count:
             if not self.hatch_count & 1:
-                tools.feedback("Hatch must be an odd number for a Hexagon", True)
+                tools.feedback("Hatch count must be an odd number for a Hexagon", True)
             self.draw_hatch(cnv, ID, geo.side, self.vertexes, self.hatch_count)
         # ---- draw links
         if self.links:
@@ -2266,24 +2275,13 @@ class PolygonShape(BaseShape):
 
     def draw_mesh(self, cnv, ID, vertices: list):
         """Lines connecting each vertex to mid-points of opposing sides."""
-        tools.feedback("Sorry, the mesh for Polygon is not yet implemented.", True)
+        tools.feedback("Mesh for Polygon is not yet implemented.", True)
         """ TODO - autodraw (without dirs)
         self.set_canvas_props(
             index=ID,
             stroke=self.mesh_stroke or self.stroke,
             stroke_width=self.mesh_stroke_width or self.stroke_width,
             stroke_cap=self.mesh_cap or self.line_cap)
-        _dirs = self.hatch.lower().split()
-        lines = int(num)
-        if num >= 1:
-            if 'ne' in _dirs or 'sw' in _dirs:  # slope UP to the right
-                self.draw_lines_between_sides(cnv, side, lines, vertices, (0, 1), (5, 4))
-            if 'se' in _dirs or 'nw' in _dirs:  # slope down to the right
-                self.draw_lines_between_sides(cnv, side, lines, vertices, (2, 3), (7, 6))
-            if 'n' in _dirs or 's' in _dirs:  # vertical
-                self.draw_lines_between_sides(cnv, side, lines, vertices, (3, 4), (0, 7))
-            if 'e' in _dirs or 'w' in _dirs:  # horizontal
-                self.draw_lines_between_sides(cnv, side, lines, vertices, (1, 2), (6, 5))
         """
 
     def get_centre(self) -> Point:
@@ -2863,9 +2861,18 @@ class RectangleShape(BaseShape):
         return x, y
 
     def draw_hatch(self, cnv, ID, vertices: list, num: int, rotation: float = 0.0):
+        """Draw line(s) from one side of Rectangle to the parallel opposite.
+
+        Args:
+            ID: unique ID
+            vertices: the rectangle's nodes
+            num: number of lines
+            rotation: degrees anti-clockwise from horizontal "east"
+        """
         _dirs = tools.validated_directions(
             self.hatch, tools.DirectionGroup.CIRCULAR, "hatch"
         )
+        lines = tools.as_int(num, "hatch_count")
         # ---- check dirs
         if self.rounding or self.rounded:
             if (
@@ -2881,7 +2888,7 @@ class RectangleShape(BaseShape):
                 )
         # ---- check spaces
         if self.rounding or self.rounded:
-            spaces = max(self._u.width / (num + 1), self._u.height / (num + 1))
+            spaces = max(self._u.width / (lines + 1), self._u.height / (lines + 1))
             if self.rounding:
                 _rounding = self.unit(self.rounding)
             elif self.rounded:
@@ -2904,7 +2911,7 @@ class RectangleShape(BaseShape):
                     True,
                 )
         # ---- draw items
-        if num >= 1:
+        if lines >= 1:
             if "se" in _dirs or "nw" in _dirs or "d" in _dirs:  # UP to the right
                 cnv.draw_line(
                     (vertices[0].x, vertices[0].y), (vertices[2].x, vertices[2].y)
@@ -2914,22 +2921,22 @@ class RectangleShape(BaseShape):
                     (vertices[1].x, vertices[1].y), (vertices[3].x, vertices[3].y)
                 )
             if "n" in _dirs or "s" in _dirs or "o" in _dirs:  # vertical
-                x_dist = self._u.width / (num + 1)
-                for i in range(1, num + 1):
+                x_dist = self._u.width / (lines + 1)
+                for i in range(1, lines + 1):
                     cnv.draw_line(
                         (vertices[0].x + i * x_dist, vertices[1].y),
                         (vertices[0].x + i * x_dist, vertices[0].y),
                     )
             if "e" in _dirs or "w" in _dirs or "o" in _dirs:  # horizontal
-                y_dist = self._u.height / (num + 1)
-                for i in range(1, num + 1):
+                y_dist = self._u.height / (lines + 1)
+                for i in range(1, lines + 1):
                     cnv.draw_line(
                         (vertices[0].x, vertices[0].y + i * y_dist),
                         (vertices[0].x + self._u.width, vertices[0].y + i * y_dist),
                     )
 
-        if num >= 1:
-            diag_num = int((num - 1) / 2 + 1)
+        if lines >= 1:
+            diag_num = int((lines - 1) / 2 + 1)
             x_dist = self._u.width / diag_num
             y_dist = self._u.height / diag_num
             top_pt, btm_pt, left_pt, rite_pt = [], [], [], []
