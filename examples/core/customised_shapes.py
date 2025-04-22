@@ -546,7 +546,7 @@ Image("sholes_typewriter.png", sliced='r',
       width=1, height=3, x=3, y=0)
 PageBreak()
 
-# ---- shapes rotation
+# ---- shape rotation
 Blueprint()
 Text(common=txt, text="Rotation (cross & label)")
 props = Common(
@@ -559,6 +559,41 @@ Polygon(cx=1, cy=3, sides=6, side=0.75, common=props, label="polygon")
 Stadium(cx=3, cy=3, side=1, common=props, label="stadium")
 Star(x=1, y=1, vertices=5, radius=0.75, common=props, label="star")
 Ellipse(cx=3, cy=1, height=1, width=1.5, common=props, label="ellipse")
+PageBreak()
+
+# ---- shape hatch-and-rotation
+Blueprint()
+Text(common=txt, text="Hatch and Rotate")
+htch = Common(
+    fill='lightgray', stroke=None,
+    hatch_count=5, hatch_width=0.75,
+    hatch='w', hatch_stroke="red")
+
+Hexagon(
+    common=htch,
+    cx=2, cy=1, height=1.5,
+    rotation=30,
+    )
+EquilateralTriangle(
+    common=htch,
+    cx=1, cy=3, side=1.5,
+    rotation=30,
+    )
+Rectangle(
+    common=htch,
+    x=0.5, y=4, height=1.5, width=1,
+    rotation=30,
+)
+Circle(
+   common=htch,
+   cx=3, cy=3, radius=0.75,
+   rotation=30,
+)
+Rhombus(
+   common=htch,
+   cx=3, cy=5, height=2, width=1.5,
+   rotation=30,
+)
 PageBreak()
 
 # ---- text styling
@@ -638,5 +673,6 @@ Save(
         "rectangles_rowcol", "rectangles_custom", "rhombus_custom",
         "rhombus_borders", "trapezoid_borders", "arrow_sizes", "arrow_rotate",
         "shape_centred", "shape_centred_move", "qr_code", "image_sliced",
-        "shape_rotation", "text_style", "text_custom",
+        "shape_rotation", "shape_hatch_and_rotation",
+        "text_style", "text_custom",
         None])

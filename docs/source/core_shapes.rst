@@ -3153,6 +3153,54 @@ Example 3. Shapes
 
 ===== ======
 
+Example 4. Hatches
+++++++++++++++++++
+
+.. |rt4| image:: images/customised/shape_hatch_and_rotation.png
+   :width: 330
+
+===== ======
+|rt4| This example shows different shapes constructed using commands with
+      some ``Common`` properties:
+
+      .. code:: python
+
+        htch = Common(
+            fill='lightgray', stroke=None,
+            hatch_count=5, hatch_width=0.75,
+            hatch='w', hatch_stroke="red")
+
+        Hexagon(
+            common=htch,
+            cx=2, cy=1, height=1.5,
+            rotation=30,
+            )
+        EquilateralTriangle(
+            common=htch,
+            cx=1, cy=3, side=1.5,
+            rotation=30,
+            )
+        Rectangle(
+            common=htch,
+            x=0.5, y=4, height=1.5, width=1,
+            rotation=30,
+        )
+        Circle(
+           common=htch,
+           cx=3, cy=3, radius=0.75,
+           hatch='w',
+           rotation=30,
+        )
+        Rhombus(
+           common=htch,
+           cx=3, cy=5, height=2, width=1.5,
+           rotation=30,
+        )
+
+      The shapes share common properties for the number and style of hatches,
+      with a rotation of 30 |deg| each.
+
+===== ======
 
 Text Descriptions
 ~~~~~~~~~~~~~~~~~

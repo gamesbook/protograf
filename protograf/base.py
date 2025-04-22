@@ -2499,11 +2499,11 @@ class BaseShape:
             * Vertices normally go clockwise from bottom/lower left
             * Directions of vertex indices in left- and right-sides must be the same
         """
-        delta = side / line_count
+        delta = side / (line_count + 1)
         # tools.feedback(f'### {side=} {line_count=} {delta=} {skip_ends=}')
-        for number in range(0, line_count + 1):
+        for number in range(0, line_count + 2):
             if skip_ends:
-                if number == line_count or number == 0:
+                if number == line_count + 1 or number == 0:
                     continue
             left_pt = geoms.point_on_line(
                 vertices[left_nodes[0]], vertices[left_nodes[1]], delta * number

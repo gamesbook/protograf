@@ -1047,7 +1047,7 @@ class CompassShape(BaseShape):
                 )
             rect = RectangleShape(**self.kwargs)
             rotation = 0
-            vertices = rect.get_vertexes(rotation, **kwargs)
+            vertices = rect.get_vertexes(**kwargs)
 
             for direction in _directions:
                 match direction:
@@ -1765,7 +1765,6 @@ class HexShape(BaseShape):
         lines = int((_num - 1) / 2 + 1)
         # tools.feedback(f'*** HEX {num=} {lines=} {vertices=} {_dirs=}')
         if num >= 1:
-
             if self.orientation in ["p", "pointy"]:
                 if "ne" in _dirs or "sw" in _dirs:  # slope UP to the right
                     self.make_path_vertices(cnv, vertices, 1, 4)
@@ -1781,49 +1780,50 @@ class HexShape(BaseShape):
                 if "e" in _dirs or "w" in _dirs:  # horizontal
                     self.make_path_vertices(cnv, vertices, 0, 3)
         if num >= 3:
+            _lines = lines - 1
             if self.orientation in ["p", "pointy"]:
                 if "ne" in _dirs or "sw" in _dirs:  # slope UP to the right
                     self.draw_lines_between_sides(
-                        cnv, side, lines, vertices, (4, 5), (1, 0)
+                        cnv, side, _lines, vertices, (4, 5), (1, 0)
                     )
                     self.draw_lines_between_sides(
-                        cnv, side, lines, vertices, (4, 3), (1, 2)
+                        cnv, side, _lines, vertices, (4, 3), (1, 2)
                     )
                 if "se" in _dirs or "nw" in _dirs:  # slope down to the right
                     self.draw_lines_between_sides(
-                        cnv, side, lines, vertices, (0, 5), (3, 4)
+                        cnv, side, _lines, vertices, (0, 5), (3, 4)
                     )
                     self.draw_lines_between_sides(
-                        cnv, side, lines, vertices, (3, 2), (0, 1)
+                        cnv, side, _lines, vertices, (3, 2), (0, 1)
                     )
                 if "n" in _dirs or "s" in _dirs:  # vertical
                     self.draw_lines_between_sides(
-                        cnv, side, lines, vertices, (1, 2), (0, 5)
+                        cnv, side, _lines, vertices, (1, 2), (0, 5)
                     )
                     self.draw_lines_between_sides(
-                        cnv, side, lines, vertices, (2, 3), (5, 4)
+                        cnv, side, _lines, vertices, (2, 3), (5, 4)
                     )
             if self.orientation in ["f", "flat"]:
                 if "ne" in _dirs or "sw" in _dirs:  # slope UP to the right
                     self.draw_lines_between_sides(
-                        cnv, side, lines, vertices, (0, 1), (5, 4)
+                        cnv, side, _lines, vertices, (0, 1), (5, 4)
                     )
                     self.draw_lines_between_sides(
-                        cnv, side, lines, vertices, (3, 4), (2, 1)
+                        cnv, side, _lines, vertices, (3, 4), (2, 1)
                     )
                 if "se" in _dirs or "nw" in _dirs:  # slope down to the right
                     self.draw_lines_between_sides(
-                        cnv, side, lines, vertices, (4, 5), (3, 2)
+                        cnv, side, _lines, vertices, (4, 5), (3, 2)
                     )
                     self.draw_lines_between_sides(
-                        cnv, side, lines, vertices, (2, 1), (5, 0)
+                        cnv, side, _lines, vertices, (2, 1), (5, 0)
                     )
                 if "e" in _dirs or "w" in _dirs:  # horizontal
                     self.draw_lines_between_sides(
-                        cnv, side, lines, vertices, (0, 1), (3, 2)
+                        cnv, side, _lines, vertices, (0, 1), (3, 2)
                     )
                     self.draw_lines_between_sides(
-                        cnv, side, lines, vertices, (0, 5), (3, 4)
+                        cnv, side, _lines, vertices, (0, 5), (3, 4)
                     )
         # ---- set canvas
         self.set_canvas_props(
@@ -3414,6 +3414,67 @@ class RhombusShape(BaseShape):
         vertices.append(Point(x_s + self._u.width / 2.0, y_s - self._u.height / 2.0))
         return vertices
 
+    def draw_hatch(
+        self, cnv, ID, x_c: float, y_c: float, side: float, vertices: list, num: int, rotation: float = 0.0
+    ):
+        """Draw lines connecting two opposite sides and parallel to adjacent sides.
+
+        Args:
+            ID: unique ID
+            x_c, yc: centre of rhombus
+            side: length of rhombus edge
+            vertices: the rhombus's nodes
+            num: number of lines
+            rotation: degrees anti-clockwise from horizontal "east"
+        """
+        _dirs = tools.validated_directions(
+            self.hatch, tools.DirectionGroup.CIRCULAR, "hatch"
+        )
+        _num = tools.as_int(num, "hatch_count")
+        lines = int((_num - 1) / 2 + 1)
+        # tools.feedback(f'*** RHOMB {num=} {lines=} {vertices=} {_dirs=} {side=}')
+        if num >= 1:
+            if any(item in _dirs for item in ["e", "w", "o"]):
+                cnv.draw_line(vertices[0], vertices[2])
+            if any(item in _dirs for item in ["n", "s", "o"]):  # vertical
+                cnv.draw_line(vertices[1], vertices[3])
+        if num >= 3:
+            _lines = lines - 1
+            if any(item in _dirs for item in ["ne", "sw", "d"]):
+                self.draw_lines_between_sides(
+                    cnv, side, _num, vertices, (1, 0), (2, 3)
+                )
+            if any(item in _dirs for item in ["se", "nw", "d"]):
+                self.draw_lines_between_sides(
+                    cnv, side, _num, vertices, (0, 3), (1, 2)
+                )
+            if any(item in _dirs for item in ["s", "n", "o"]):
+                self.draw_lines_between_sides(
+                    cnv, side, _lines, vertices, (0, 3), (0, 1)
+                )
+                self.draw_lines_between_sides(
+                    cnv, side, _lines, vertices, (3, 2), (1, 2)
+                )
+            if any(item in _dirs for item in ["e", "w", "o"]):
+                self.draw_lines_between_sides(
+                    cnv, side, _lines, vertices, (0, 3), (2, 3)
+                )
+                self.draw_lines_between_sides(
+                    cnv, side, _lines, vertices, (1, 0), (1, 2)
+                )
+
+        # ---- set canvas
+        self.set_canvas_props(
+            index=ID,
+            stroke=self.hatch_stroke,
+            stroke_width=self.hatch_stroke_width,
+            stroke_cap=self.hatch_cap,
+            dashed=self.hatch_dashed,
+            dotted=self.hatch_dots,
+            rotation=rotation,
+            rotation_point=muPoint(x_c, y_c),
+        )
+
     def draw(self, cnv=None, off_x=0, off_y=0, ID=None, **kwargs):
         """Draw a rhombus (diamond) on a given canvas."""
         kwargs = self.kwargs | kwargs
@@ -3447,6 +3508,12 @@ class RhombusShape(BaseShape):
         cnv.draw_polyline(self.vertexes)
         kwargs["closed"] = True
         self.set_canvas_props(cnv=cnv, index=ID, **kwargs)
+        # ---- draw hatch
+        if self.hatch_count:
+            self.side = math.sqrt((self._u.width / 2.0)**2 + (self._u.height / 2.0)**2)
+            self.draw_hatch(
+                cnv, ID, cx, cy, self.side, self.vertexes ,self.hatch_count, rotation
+            )
         # ---- borders (override)
         if self.borders:
             if isinstance(self.borders, tuple):
