@@ -17,8 +17,8 @@ Table of Contents
 
 - `The Basics`_
 - `Built-In Fonts`_
-- `Supplementary Fonts`_
 - `Using Additional Fonts`_
+- `Supplementary Fonts`_
 - `Word Processor fonts vs protograf`_
 - `External Font Resources`_
 
@@ -58,48 +58,23 @@ Built-In Fonts
 `↑ <table-of-contents_>`_
 
 Because :doc:`protograf <index>` uses *PyMuPDF* to generate the PDF output,
-it has access to the three "built-in" fonts supplied by it.
+it has access to these "built-in" fonts.
 
 These are:
 
 - *Times-Roman* - a basic serif font
 - *Helvetica* - a basic sanserif font
 - *Courier* - a basic fixed-width font
+- *Symbol* - a variety of custom lettering
+- "ZapDingbats" - a variety of "dingbats" (mini-images)
 
 As far as possible, all examples supplied with :doc:`protograf <index>` make
 use of these fonts, so that they can run anywhere.
 
+CJK Fonts
+---------
 
-Supplementary Fonts
-===================
-`↑ <table-of-contents_>`_
 
-As suggested in :doc:`Setting Up <setting_up>` , if you're running on a Linux
-operating system, you can consider using a command such as:
-
-    sudo apt-get install ttf-mscorefonts-installer
-
-In this case, when the ``Create`` command runs, it will automatically try to
-register the following fonts:
-
-- *Arial*
-- *Verdana*
-- *Courier New*
-- *Times New Roman*
-- *Trebuchet MS*
-- *Georgia*
-- *Webdings*
-
-If you are running on a Windows operating system, these fonts should already
-be installed and usable.
-
-On Ubuntu Linux these font files are typically installed into the
-``/usr/share/fonts`` directory.
-
-If you do not install these fonts, or have them already installed, you may
-see a warning message every time you run a script:
-
-    WARNING:: Unable to register the MS font(s): Arial, Verdana, Courier New, Times New Roman, Trebuchet MS, Georgia, Webdings
 
 
 Using Additional Fonts
@@ -111,8 +86,6 @@ installed, these could then be used in a :doc:`protograf <index>` script.
 
 However, there are some limitations:
 
-- The font **MUST** be a *TrueType* font, which will have a filename with a
-  ``.ttf`` extension.
 - The font should be installed into the standard location for that operating
   system, so that it can be "auto-discovered".
 - The font must be referred to correctly; for example, the ``Ubuntu`` font is
@@ -124,21 +97,30 @@ However, there are some limitations:
 On an Ubuntu Linux machine, your new font file could be installed into the
 ``/home/USERNAME/.local/share/fonts`` directory.
 
-.. HINT::
 
-    There are online tools that will convert different font types |dash| for
-    example, from OpenType to TrueType font. Please ensure that you adhere to
-    the restrictions imposed by the font's license.
+Auto Registration
+-----------------
+
+
+Manual Registration
+-------------------
+
+You must supply:
+
+* directory
+* prefix
+
 
 Common Font Styles
 ------------------
 
-In addition to a font default appearance - sometimes termed *Regular* - a
-font often has bold or italic styling that can be used together
-with this default.
+In addition to a font default appearance |dash| sometimes termed
+*Regular* |dash| a font often has bold or italic  |dash| sometimes termed
+*Oblique* |dash| styling that can be used together with this default.
 
-There can also be a combined version of these styles |dash| *BoldItalic* or
-*BoldOblique* |dash| that is useful when both styles are applied.
+There can also be a combined version of these styles |dash| for example,
+*BoldItalic* or *BoldOblique* |dash| that is useful when both styles must be
+applied.
 
 These files for these styles usually have an appended suffix like *-Bold* or
 *B*. :doc:`protograf <index>` will attempt to discover and install both bold
@@ -173,9 +155,11 @@ you know the path where the font file exists, then you can supply the
 
     Font(face="BenKenobi", size=48, stroke=red, directory="/tmp/")
 
-Be aware that doing this makes your script less portable between machines,
-as that same file may not be present in the same directory on a different
-machine.
+.. HINT::
+
+    Be aware that doing this makes your script less portable between machines,
+    as that same file may not be present in the same directory on a different
+    machine.
 
 Additional Font Styles
 ----------------------
@@ -198,6 +182,38 @@ the *style* property to the ``Font`` command:
     Font(face="Skywalker", size=48, stroke=red, style="Dark")
 
 
+Supplementary Fonts
+===================
+`↑ <table-of-contents_>`_
+
+As suggested in :doc:`Setting Up <setting_up>` , if you're running on a Linux
+operating system, you can consider using a command such as:
+
+    sudo apt-get install ttf-mscorefonts-installer
+
+In this case, when the ``Create`` command runs, it will automatically try to
+register the following fonts:
+
+- *Arial*
+- *Verdana*
+- *Courier New*
+- *Times New Roman*
+- *Trebuchet MS*
+- *Georgia*
+- *Webdings*
+
+If you are running on a Windows operating system, these fonts should already
+be installed and usable.
+
+On Ubuntu Linux these font files are typically installed into the
+``/usr/share/fonts`` directory.
+
+If you do not install these fonts, or have them already installed, you may
+see a warning message every time you run a script:
+
+    WARNING:: Unable to register the MS font(s): Arial, Verdana, Courier New, Times New Roman, Trebuchet MS, Georgia, Webdings
+
+
 Word Processor fonts vs protograf
 =================================
 `↑ <table-of-contents_>`_
@@ -211,7 +227,6 @@ file for italic or bold version of the font.
 The long answer was supplied in a Reddit post
 (https://www.reddit.com/r/fonts/comments/1dzlhl0/) which is
 paraphrased below:
-
 
 *Question:* Why do some fonts have a separate "bold" or "italics" version, when
 you can just  format the main font for the same effect? When I download a new

@@ -2054,6 +2054,8 @@ class BaseShape:
 
     def process_template(self, _dict):
         """Set values for properties based on those defined in a dictionary."""
+        if not _dict:
+            return
         if _dict.get("x"):
             self.x = _dict.get("x", 1)
         if _dict.get("y"):
@@ -2254,15 +2256,21 @@ class BaseShape:
                 dx = font.text_length(string, fontsize=keys["fontsize"])
             midpt = pymupdf.Point(point.x + dx, point.y)
             # self.dot = 0.05; self.draw_dot(canvas, midpt.x, midpt.y)
-            canvas.insert_text(
-                point,
-                string,
-                morph=(midpt, pymupdf.Matrix(rotation)),
-                **keys,
-                # point, string, morph=(point, pymupdf.Matrix(rotation)), **keys
-            )
+            morph = (midpt, pymupdf.Matrix(rotation))
         else:
-            canvas.insert_text(point, string, **keys)
+            morph = None
+
+        try:
+            canvas.insert_text(point, string, morph=morph, **keys)
+        except Exception as err:
+            if "need font file" in str(err):
+                tools.feedback(
+                    f'The font "{self.font_name}" cannot be found -'
+                    " please check spelling and/or location",
+                    True,
+                )
+            else:
+                tools.feedback(f'Cannot write "{string}" - {err}', True)
 
     def draw_string(self, canvas, xs, ys, string, align=None, rotation=0, **kwargs):
         """Draw a multi-string on the canvas."""

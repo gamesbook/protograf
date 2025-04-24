@@ -3415,7 +3415,15 @@ class RhombusShape(BaseShape):
         return vertices
 
     def draw_hatch(
-        self, cnv, ID, x_c: float, y_c: float, side: float, vertices: list, num: int, rotation: float = 0.0
+        self,
+        cnv,
+        ID,
+        x_c: float,
+        y_c: float,
+        side: float,
+        vertices: list,
+        num: int,
+        rotation: float = 0.0,
     ):
         """Draw lines connecting two opposite sides and parallel to adjacent sides.
 
@@ -3441,13 +3449,9 @@ class RhombusShape(BaseShape):
         if num >= 3:
             _lines = lines - 1
             if any(item in _dirs for item in ["ne", "sw", "d"]):
-                self.draw_lines_between_sides(
-                    cnv, side, _num, vertices, (1, 0), (2, 3)
-                )
+                self.draw_lines_between_sides(cnv, side, _num, vertices, (1, 0), (2, 3))
             if any(item in _dirs for item in ["se", "nw", "d"]):
-                self.draw_lines_between_sides(
-                    cnv, side, _num, vertices, (0, 3), (1, 2)
-                )
+                self.draw_lines_between_sides(cnv, side, _num, vertices, (0, 3), (1, 2))
             if any(item in _dirs for item in ["s", "n", "o"]):
                 self.draw_lines_between_sides(
                     cnv, side, _lines, vertices, (0, 3), (0, 1)
@@ -3510,9 +3514,11 @@ class RhombusShape(BaseShape):
         self.set_canvas_props(cnv=cnv, index=ID, **kwargs)
         # ---- draw hatch
         if self.hatch_count:
-            self.side = math.sqrt((self._u.width / 2.0)**2 + (self._u.height / 2.0)**2)
+            self.side = math.sqrt(
+                (self._u.width / 2.0) ** 2 + (self._u.height / 2.0) ** 2
+            )
             self.draw_hatch(
-                cnv, ID, cx, cy, self.side, self.vertexes ,self.hatch_count, rotation
+                cnv, ID, cx, cy, self.side, self.vertexes, self.hatch_count, rotation
             )
         # ---- borders (override)
         if self.borders:
