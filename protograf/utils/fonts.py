@@ -28,7 +28,9 @@ from typing import List, Union
 import unicodedata
 
 from find_system_fonts_filename import (
-    get_system_fonts_filename, FindSystemFontsFilenameException)
+    get_system_fonts_filename,
+    FindSystemFontsFilenameException,
+)
 from fontTools.ttLib import TTFont, TTLibFileIsCollectionError
 
 # raise log level for fontTools
@@ -63,9 +65,9 @@ class FontInterface:
         if cached:
             if not cache_path:
                 cache_path = tempfile.gettempdir()
-            cache_file = os.path.join(cache_path, 'protograf_font_families.pickle')
+            cache_file = os.path.join(cache_path, "protograf_font_families.pickle")
             if os.path.exists(cache_file):
-                with open(cache_file, 'rb') as file:
+                with open(cache_file, "rb") as file:
                     self.font_families = pickle.load(file)
                 if self.font_families:
                     return
@@ -73,29 +75,33 @@ class FontInterface:
         for ffile in self.font_files:
             fdt = self.extract_font_summary(ffile)
             if fdt:
-                family = fdt['fontFamily']
+                family = fdt["fontFamily"]
                 if family not in list(self.font_families.keys()):
                     self.font_families[family] = []
                 self.font_families[family].append(
-                    {'file': fdt['fileName'],
-                     'name': fdt['fullName'],
-                     'italic': fdt['isItalic'],
-                     'class': fdt['fontSubfamily']
-                })
+                    {
+                        "file": fdt["fileName"],
+                        "name": fdt["fullName"],
+                        "italic": fdt["isItalic"],
+                        "class": fdt["fontSubfamily"],
+                    }
+                )
                 # register font under alternate (display?) name
-                if fdt['altName'] and fdt['altName'] != fdt['fontFamily']:
-                    family = fdt['altName']
+                if fdt["altName"] and fdt["altName"] != fdt["fontFamily"]:
+                    family = fdt["altName"]
                     if family not in list(self.font_families.keys()):
                         self.font_families[family] = []
                     self.font_families[family].append(
-                        {'file': fdt['fileName'],
-                         'name': fdt['fullName'],
-                         'italic': fdt['isItalic'],
-                         'class': fdt['fontSubfamily']
-                    })
+                        {
+                            "file": fdt["fileName"],
+                            "name": fdt["fullName"],
+                            "italic": fdt["isItalic"],
+                            "class": fdt["fontSubfamily"],
+                        }
+                    )
 
         if cached:
-            with open(cache_file, 'wb') as file:
+            with open(cache_file, "wb") as file:
                 pickle.dump(self.font_families, file)
 
     @lru_cache(maxsize=256)  # limits cache
@@ -128,7 +134,7 @@ class FontInterface:
                          src: url(Bookerly-Regular.ttf); }
             @font-face { font-family: Bookerly;
                          src: url(Bookerly-RegularItalic.ttf); font-style: italic; }'
-         """
+        """
         if not self.font_families:
             self.load_font_families()
         if font_family not in list(self.font_families.keys()):
@@ -136,20 +142,21 @@ class FontInterface:
         styles = self.font_families[font_family]
         css_styles = []
         for style in styles:
-            weight = ';'
-            if ('Bold' in style['class'] or 'Gras' in style['class']) and \
-                    ('Italic' in style['class'] or 'Italique' in style['class']):
-                weight = ';font-weight: bold; font-style: italic;'
-            elif ('Bold' in style['class'] or 'Gras' in style['class']):
-                weight = ';font-weight: bold;'
-            elif ('Italic' in style['class'] or 'Italique' in style['class']):
-                weight = '; font-style: italic;'
+            weight = ";"
+            if ("Bold" in style["class"] or "Gras" in style["class"]) and (
+                "Italic" in style["class"] or "Italique" in style["class"]
+            ):
+                weight = ";font-weight: bold; font-style: italic;"
+            elif "Bold" in style["class"] or "Gras" in style["class"]:
+                weight = ";font-weight: bold;"
+            elif "Italic" in style["class"] or "Italique" in style["class"]:
+                weight = "; font-style: italic;"
 
-            path, url = os.path.split(style['file'])
+            path, url = os.path.split(style["file"])
             css_styles.append(
-                f'@font-face {{ font-family: {font_family}; src: url({url}){weight} }}'
-                )
-        css = ' '.join(css_styles)
+                f"@font-face {{ font-family: {font_family}; src: url({url}){weight} }}"
+            )
+        css = " ".join(css_styles)
         return path, css
 
     def get_ttfont(self, file_path: str):
@@ -159,13 +166,11 @@ class FontInterface:
             return font
         except TTLibFileIsCollectionError as err:
             if not os.path.exists(file_path):
-                print(f'Cannot load font from: {file_path} - {err}')
+                print(f"Cannot load font from: {file_path} - {err}")
         return None
 
     def extract_font_summary(
-        self,
-        font_path: Union[str, Path],
-        normalize: bool = True
+        self, font_path: Union[str, Path], normalize: bool = True
     ) -> dict:
         """Extract basic metadata from a font file.
 
@@ -196,16 +201,16 @@ class FontInterface:
         self.extract_font_details(font_path, normalize)
 
         font_info = {
-            'fontFamily': self.name_table_readable.get('fontFamily'),
-            'fontSubfamily': self.name_table_readable.get('fontSubfamily'),
-            'fileName': font_path,
-            'uniqueID': self.name_table.get(3, ''),
-            'fullName': self.name_table.get(4, ''),
-            'altName': self.name_table.get(16, ''),
-            'version': self.name_table_readable.get('version'),
-            'postScriptName': self.name_table.get(6, ''),
-            'weightClass': self.os2_table.get('usWeightClass'),
-            'isItalic': self.post_table.get('italicAngle') != 0
+            "fontFamily": self.name_table_readable.get("fontFamily"),
+            "fontSubfamily": self.name_table_readable.get("fontSubfamily"),
+            "fileName": font_path,
+            "uniqueID": self.name_table.get(3, ""),
+            "fullName": self.name_table.get(4, ""),
+            "altName": self.name_table.get(16, ""),
+            "version": self.name_table_readable.get("version"),
+            "postScriptName": self.name_table.get(6, ""),
+            "weightClass": self.os2_table.get("usWeightClass"),
+            "isItalic": self.post_table.get("italicAngle") != 0,
         }
         return font_info
 
@@ -227,21 +232,18 @@ class FontInterface:
             str: The sanitized string with control and invisible characters removed.
         """
         # Remove basic control characters (C0 and C1 control codes)
-        sanitized = re.sub(r'[\x00-\x1F\x7F-\x9F]', '', text)
+        sanitized = re.sub(r"[\x00-\x1F\x7F-\x9F]", "", text)
         # Remove specific Unicode control and invisible formatting characters
-        sanitized = re.sub(
-            r'[\u200B-\u200F\u2028-\u202F\u2060-\u206F]', '', sanitized)
+        sanitized = re.sub(r"[\u200B-\u200F\u2028-\u202F\u2060-\u206F]", "", sanitized)
         # Remove directional formatting characters (optional, adjust if needed)
-        sanitized = re.sub(r'[\u202A-\u202E]', '', sanitized)
+        sanitized = re.sub(r"[\u202A-\u202E]", "", sanitized)
         # Optionally, normalize the text to remove any leftover inconsistencies
         if normalize:
-            sanitized = unicodedata.normalize('NFKC', sanitized)
+            sanitized = unicodedata.normalize("NFKC", sanitized)
         return sanitized
 
     def extract_font_details(
-        self,
-        font_path: Union[str, Path],
-        normalize: bool = True
+        self, font_path: Union[str, Path], normalize: bool = True
     ) -> dict:
         """Extract detailed metadata and structural information from a font file.
 
@@ -308,33 +310,34 @@ class FontInterface:
             return font_info
 
         # File name and available tables
-        font_info['fileName'] = font_path
-        font_info['tables'] = list(font.keys())
+        font_info["fileName"] = font_path
+        font_info["tables"] = list(font.keys())
 
         # Parse name table
         self.name_table = {}
-        for record in font['name'].names:
+        for record in font["name"].names:
             try:
-                raw_string = record.string.decode('utf-16-be').strip()
+                raw_string = record.string.decode("utf-16-be").strip()
                 clean_string = self.remove_control_characters(raw_string, normalize)
                 self.name_table[record.nameID] = clean_string
             except UnicodeDecodeError:
                 self.name_table[record.nameID] = self.remove_control_characters(
-                    record.string.decode(errors='ignore'), normalize)
-        font_info['nameTable'] = self.name_table
+                    record.string.decode(errors="ignore"), normalize
+                )
+        font_info["nameTable"] = self.name_table
 
         # Readable name table for common nameIDs
         self.name_table_readable = {
-            'copyright': self.name_table.get(0, ''),
-            'fontFamily': self.name_table.get(1, ''),
-            'fontSubfamily': self.name_table.get(2, ''),
-            'uniqueID': self.name_table.get(3, ''),
-            'fullName': self.name_table.get(4, ''),
-            'version': self.name_table.get(5, ''),
-            'postScriptName': self.name_table.get(6, ''),
-            'altName': self.name_table.get(16, ''),
+            "copyright": self.name_table.get(0, ""),
+            "fontFamily": self.name_table.get(1, ""),
+            "fontSubfamily": self.name_table.get(2, ""),
+            "uniqueID": self.name_table.get(3, ""),
+            "fullName": self.name_table.get(4, ""),
+            "version": self.name_table.get(5, ""),
+            "postScriptName": self.name_table.get(6, ""),
+            "altName": self.name_table.get(16, ""),
         }
-        font_info['nameTableReadable'] = {
+        font_info["nameTableReadable"] = {
             k: self.remove_control_characters(v, normalize)
             for k, v in self.name_table_readable.items()
         }
@@ -343,96 +346,95 @@ class FontInterface:
         cmap_table = {}
         cmap_table_index = []
 
-        for cmap in font['cmap'].tables:
-            platform_name = {
-                0: 'Unicode',
-                1: 'Macintosh',
-                3: 'Windows'
-            }.get(cmap.platformID, f"Platform {cmap.platformID}")
+        for cmap in font["cmap"].tables:
+            platform_name = {0: "Unicode", 1: "Macintosh", 3: "Windows"}.get(
+                cmap.platformID, f"Platform {cmap.platformID}"
+            )
 
             encoding_name = {
-                (0, 0): 'Unicode 1.0',
-                (0, 3): 'Unicode 2.0+',
-                (0, 4): 'Unicode 2.0+ with BMP',
-                (1, 0): 'Mac Roman',
-                (3, 1): 'Windows Unicode BMP',
-                (3, 10): 'Windows Unicode Full'
+                (0, 0): "Unicode 1.0",
+                (0, 3): "Unicode 2.0+",
+                (0, 4): "Unicode 2.0+ with BMP",
+                (1, 0): "Mac Roman",
+                (3, 1): "Windows Unicode BMP",
+                (3, 10): "Windows Unicode Full",
             }.get((cmap.platformID, cmap.platEncID), f"Encoding {cmap.platEncID}")
 
             cmap_entries = {}
             for codepoint, glyph_name in cmap.cmap.items():
                 char = chr(codepoint)
-                cmap_entries[self.remove_control_characters(char, normalize)] = \
+                cmap_entries[self.remove_control_characters(char, normalize)] = (
                     self.remove_control_characters(glyph_name, normalize)
+                )
 
             key = f"{platform_name}, {encoding_name}"
             cmap_table[key] = cmap_entries
             cmap_table_index.append(key)
 
-        font_info['cmapTable'] = cmap_table
-        font_info['cmapTableIndex'] = cmap_table_index
+        font_info["cmapTable"] = cmap_table
+        font_info["cmapTableIndex"] = cmap_table_index
 
         # Parse head table
-        head = font['head']
+        head = font["head"]
         head_table = {
-            'unitsPerEm': head.unitsPerEm,
-            'xMin': head.xMin,
-            'yMin': head.yMin,
-            'xMax': head.xMax,
-            'yMax': head.yMax,
+            "unitsPerEm": head.unitsPerEm,
+            "xMin": head.xMin,
+            "yMin": head.yMin,
+            "xMax": head.xMax,
+            "yMax": head.yMax,
         }
-        font_info['headTable'] = head_table
+        font_info["headTable"] = head_table
 
         # Parse hhea table
-        hhea = font['hhea']
+        hhea = font["hhea"]
         hhea_table = {
-            'ascent': hhea.ascent,
-            'descent': hhea.descent,
-            'lineGap': hhea.lineGap,
+            "ascent": hhea.ascent,
+            "descent": hhea.descent,
+            "lineGap": hhea.lineGap,
         }
-        font_info['hheaTable'] = hhea_table
+        font_info["hheaTable"] = hhea_table
 
         # Parse OS/2 table
-        os2 = font['OS/2']
+        os2 = font["OS/2"]
         self.os2_table = {
-            'usWeightClass': os2.usWeightClass,
-            'usWidthClass': os2.usWidthClass,
-            'fsType': os2.fsType,
+            "usWeightClass": os2.usWeightClass,
+            "usWidthClass": os2.usWidthClass,
+            "fsType": os2.fsType,
         }
-        font_info['OS2Table'] = self.os2_table
+        font_info["OS2Table"] = self.os2_table
 
         # Parse post table
-        post = font['post']
+        post = font["post"]
         self.post_table = {
-            'isFixedPitch': post.isFixedPitch,
-            'italicAngle': post.italicAngle,
+            "isFixedPitch": post.isFixedPitch,
+            "italicAngle": post.italicAngle,
         }
-        font_info['postTable'] = self.post_table
+        font_info["postTable"] = self.post_table
 
         # Combine layout-related metrics
-        font_info['layoutMetrics'] = {
-            'unitsPerEm': head_table['unitsPerEm'],
-            'boundingBox': {
-                'xMin': head_table['xMin'],
-                'yMin': head_table['yMin'],
-                'xMax': head_table['xMax'],
-                'yMax': head_table['yMax']
+        font_info["layoutMetrics"] = {
+            "unitsPerEm": head_table["unitsPerEm"],
+            "boundingBox": {
+                "xMin": head_table["xMin"],
+                "yMin": head_table["yMin"],
+                "xMax": head_table["xMax"],
+                "yMax": head_table["yMax"],
             },
-            'ascent': hhea_table['ascent'],
-            'descent': hhea_table['descent'],
-            'lineGap': hhea_table['lineGap']
+            "ascent": hhea_table["ascent"],
+            "descent": hhea_table["descent"],
+            "lineGap": hhea_table["lineGap"],
         }
 
         # Font summary
-        font_info['summary'] = {
-            'fontFamily': self.name_table_readable['fontFamily'],
-            'fontSubfamily': self.name_table_readable['fontSubfamily'],
-            'uniqueID': self.name_table.get(3, ''),
-            'fullName': self.name_table.get(4, ''),
-            'version': self.name_table_readable['version'],
-            'postScriptName': self.name_table.get(6, ''),
-            'weightClass': os2.usWeightClass,
-            'isItalic': self.post_table['italicAngle'] != 0
+        font_info["summary"] = {
+            "fontFamily": self.name_table_readable["fontFamily"],
+            "fontSubfamily": self.name_table_readable["fontSubfamily"],
+            "uniqueID": self.name_table.get(3, ""),
+            "fullName": self.name_table.get(4, ""),
+            "version": self.name_table_readable["version"],
+            "postScriptName": self.name_table.get(6, ""),
+            "weightClass": os2.usWeightClass,
+            "isItalic": self.post_table["italicAngle"] != 0,
         }
 
         return font_info
