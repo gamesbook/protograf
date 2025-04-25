@@ -1,16 +1,39 @@
 # -*- coding: utf-8 -*-
 """
 Font utility functions for protograf
+
+Notes:
+    There is a noticable "startup"" cost to gather details of all fonts on a
+    machine; a cached file is then created and stored in a temp direcory which
+    makes this faster in subsequent iterations. Restarting the machine or
+    clearing the temp/cache directory will cause this delay again.
+
+Example usage:
+
+from fonts import FontInterface
+fi = FontInterface()
+fi.load_font_families(cached=False)  # reset cache
+print(fi.font_file_css('Bookerly'))
+print(fi.font_families.keys()
+
 """
 from functools import lru_cache
+import logging
+import os
 from pathlib import Path
+import pickle
 import re
+import tempfile
 from typing import List, Union
 import unicodedata
 
 from find_system_fonts_filename import (
     get_system_fonts_filename, FindSystemFontsFilenameException)
 from fontTools.ttLib import TTFont, TTLibFileIsCollectionError
+
+# raise log level for fontTools
+package_logger = logging.getLogger("fontTools")
+package_logger.setLevel(logging.ERROR)
 
 
 class FontInterface:
@@ -30,8 +53,22 @@ class FontInterface:
         self.font_files = sorted(list(font_filenames))
 
     @lru_cache(maxsize=256)  # limits cache
-    def load_font_families(self):
-        """Track family data across all files from default locations used by an OS."""
+    def load_font_families(self, cached: bool = True, cache_path: str = None):
+        """Track family data across all files from default locations used by an OS.
+
+        Args:
+            cached (bool): if True, will pickle the font_families directory
+            cache_path (str): location of pickle file; defaults to OS's temp directory
+        """
+        if cached:
+            if not cache_path:
+                cache_path = tempfile.gettempdir()
+            cache_file = os.path.join(cache_path, 'protograf_font_families.pickle')
+            if os.path.exists(cache_file):
+                with open(cache_file, 'rb') as file:
+                    self.font_families = pickle.load(file)
+                if self.font_families:
+                    return
         self.load_font_files()
         for ffile in self.font_files:
             fdt = self.extract_font_summary(ffile)
@@ -45,10 +82,75 @@ class FontInterface:
                      'italic': fdt['isItalic'],
                      'class': fdt['fontSubfamily']
                 })
+                # register font under alternate (display?) name
+                if fdt['altName'] and fdt['altName'] != fdt['fontFamily']:
+                    family = fdt['altName']
+                    if family not in list(self.font_families.keys()):
+                        self.font_families[family] = []
+                    self.font_families[family].append(
+                        {'file': fdt['fileName'],
+                         'name': fdt['fullName'],
+                         'italic': fdt['isItalic'],
+                         'class': fdt['fontSubfamily']
+                    })
+
+        if cached:
+            with open(cache_file, 'wb') as file:
+                pickle.dump(self.font_families, file)
 
     @lru_cache(maxsize=256)  # limits cache
-    def font_file_css(self, font_family: str):
-        """Create a CSS string to be used by PyMuPDF."""
+    def font_file_css(self, font_family: str) -> Union[str, None]:
+        """Create a CSS string to be used by PyMuPDF.
+
+        Args:
+            font_family: proper name of a font family
+
+        Returns:
+            tuple (str|None, str|None): base file path, CSS styling specification
+
+        Example family entry:
+            font_families['Bookerly']:
+            [{'file': '/home/user/.local/share/fonts/Bookerly-Bold.ttf',
+              'name': 'Bookerly Bold', 'italic': False, 'class': 'Bold'},
+             {'file': '/home/user/.local/share/fonts/Bookerly-BoldItalic.ttf',
+              'name': 'Bookerly Bold Italic', 'italic': True, 'class': 'Bold Italic'},
+             {'file': '/home/user/.local/share/fonts/Bookerly-Regular.ttf',
+              'name': 'Bookerly', 'italic': False, 'class': 'Regular'},
+             {'file': '/home/user/.local/share/fonts/Bookerly-RegularItalic.ttf',
+              'name': 'Bookerly Italic', 'italic': True, 'class': 'Italic'}]
+
+        Example CSS:
+            @font-face { font-family: Bookerly;
+                         src: url(Bookerly-Bold.ttf);font-weight: bold; }
+            @font-face { font-family: Bookerly;
+                         src: url(Bookerly-BoldItalic.ttf);font-weight: bold; font-style: italic; }
+            @font-face { font-family: Bookerly;
+                         src: url(Bookerly-Regular.ttf); }
+            @font-face { font-family: Bookerly;
+                         src: url(Bookerly-RegularItalic.ttf); font-style: italic; }'
+         """
+        if not self.font_families:
+            self.load_font_families()
+        if font_family not in list(self.font_families.keys()):
+            return None, None
+        styles = self.font_families[font_family]
+        css_styles = []
+        for style in styles:
+            weight = ';'
+            if ('Bold' in style['class'] or 'Gras' in style['class']) and \
+                    ('Italic' in style['class'] or 'Italique' in style['class']):
+                weight = ';font-weight: bold; font-style: italic;'
+            elif ('Bold' in style['class'] or 'Gras' in style['class']):
+                weight = ';font-weight: bold;'
+            elif ('Italic' in style['class'] or 'Italique' in style['class']):
+                weight = '; font-style: italic;'
+
+            path, url = os.path.split(style['file'])
+            css_styles.append(
+                f'@font-face {{ font-family: {font_family}; src: url({url}){weight} }}'
+                )
+        css = ' '.join(css_styles)
+        return path, css
 
     def get_ttfont(self, file_path: str):
         """."""
@@ -56,7 +158,8 @@ class FontInterface:
             font = TTFont(file_path)
             return font
         except TTLibFileIsCollectionError as err:
-            print(f'Cannot load font from: {file_path} - {err}')
+            if not os.path.exists(file_path):
+                print(f'Cannot load font from: {file_path} - {err}')
         return None
 
     def extract_font_summary(
@@ -64,7 +167,7 @@ class FontInterface:
         font_path: Union[str, Path],
         normalize: bool = True
     ) -> dict:
-        """Extract basic metadata and structural information from a font file.
+        """Extract basic metadata from a font file.
 
         Args:
             font_path (Union[str, Path]): Path to the font file.
@@ -73,9 +176,10 @@ class FontInterface:
             dict: A dictionary containing high-level font summary with keys:
                 * fontFamily (str): Font family name.
                 * fontSubfamily (str): Font subfamily name.
-                * fileName (str): Font file path
+                * fileName (str): Font file path.
                 * uniqueID (str): Unique identifier for the font.
                 * fullName (str): Full font name.
+                * altName (str): Alternate font name.
                 * version (str): Font version.
                 * postScriptName (str): PostScript name.
                 * weightClass (int): Weight class.
@@ -97,6 +201,7 @@ class FontInterface:
             'fileName': font_path,
             'uniqueID': self.name_table.get(3, ''),
             'fullName': self.name_table.get(4, ''),
+            'altName': self.name_table.get(16, ''),
             'version': self.name_table_readable.get('version'),
             'postScriptName': self.name_table.get(6, ''),
             'weightClass': self.os2_table.get('usWeightClass'),
@@ -227,6 +332,7 @@ class FontInterface:
             'fullName': self.name_table.get(4, ''),
             'version': self.name_table.get(5, ''),
             'postScriptName': self.name_table.get(6, ''),
+            'altName': self.name_table.get(16, ''),
         }
         font_info['nameTableReadable'] = {
             k: self.remove_control_characters(v, normalize)
@@ -330,19 +436,3 @@ class FontInterface:
         }
 
         return font_info
-
-
-# fi = FontInterface()
-# summ = fi.extract_font_summary(
-#     '/home/derek/.local/share/fonts/Adobe/TrueType/Univers LT Std/Univers_LT_Std_65_Bold.ttf')
-# pprint.pprint(summ)
-
-"""
-import pprint
-from fonts import FontInterface
-fi = FontInterface()
-fi.load_font_files()
-len(fi.font_files)
-fi.load_font_families()
-print(fi.font_families.keys()
-"""
