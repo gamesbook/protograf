@@ -1,6 +1,6 @@
-================================
-Examples: Commercial Board Games
-================================
+=========================================
+Examples: Commercial Board Games and Maps
+=========================================
 
 These examples are meant to demonstrate the type of output you can expect
 to create with **protograf**.  They are *not* meant to be exhaustive or
@@ -28,6 +28,7 @@ Table of Contents
 - `Traveller: Black`_
 - `Warp War`_
 - `Underwater Cities`_
+- `The Honorverse`_
 
 
 Squad Leader
@@ -224,5 +225,55 @@ Discussion  This example shows how to construct the board for the commercial
               vertical track on the right)
 ----------- ------------------------------------------------------------------
 Screenshot  .. image:: images/boards/commercial/underwater_cities.png
+               :width: 90%
+=========== ==================================================================
+
+
+The Honorverse
+==============
+`↑ <table-of-contents_>`_
+
+=========== ==================================================================
+Title       *The Honorverse Star Map*
+----------- ------------------------------------------------------------------
+Source Code `honorverse.py <https://github.com/gamesbook/protograf/blob/master/examples/boards/maps/honorverse.py>`_
+----------- ------------------------------------------------------------------
+Discussion  This example shows a map with the locations of stars described in the
+            "Honor Harrington" science fiction series, written by David Weber, and
+            sometimes termed `the Honorverse <https://en.wikipedia.org/wiki/Honorverse>`_
+
+            The backdrop to the series is that FTL travel is possible; both with
+            spaceships travelling through hyperspace as well as through wormholes.
+            However wormholes are very limited in number, and so the stars that have
+            both habitable planets, as well as multiple wormhole junctions, become
+            obvious focal points for development and expansion. The main character
+            in the series is from such a star system called "Manticore"; the
+            centre of a "kingdom" of planets loosely modelled after the British
+            Empire in the nineteenth century.
+
+            The data is sourced from:
+
+            * https://www.gotshifted.com/honorverseglossary/MAPS.html
+            * https://www.gotshifted.com/honorverseglossary/Book%20Originals.html
+
+            Any errors in transcription are mine - *NOT* the original sources!
+
+            Some items of interest:
+
+            * The "stars" are just point locations on the grid; a Python loop
+              processes them and styles each according to its information; using
+              the ZapfDingbats font to provide icons for the stars.
+            * The names of stars allow their point locations to be accessed and
+              form the start and end points of lines showing the wormholes.
+            * The script has a boolean "toggle" (called ``IS_DARK``) which can
+              be set to change the background color of the map to black and
+              the stars to white.
+
+----------- ------------------------------------------------------------------
+Screenshot  .. image:: images/boards/maps/honoverse.png
+               :width: 90%
+
+----------- ------------------------------------------------------------------
+Screenshot  .. image:: images/boards/maps/manticore.png
                :width: 90%
 =========== ==================================================================
