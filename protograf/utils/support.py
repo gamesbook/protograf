@@ -15,6 +15,38 @@ from typing import Any
 import imageio
 import pymupdf
 
+CACHE_DIRECTORY = ".protograf"  # append to the user's home directory
+BUILT_IN_FONTS = [
+    "helv",
+    "Helvetica",
+    "heit",
+    "Helvetica-Oblique",
+    "hebo",
+    "Helvetica-Bold",
+    "hebi",
+    "Helvetica-BoldOblique",
+    "cour",
+    "Courier",
+    "coit",
+    "Courier-Oblique",
+    "cobo",
+    "Courier-Bold",
+    "cobi",
+    "Courier-BoldOblique",
+    "tiro",
+    "Times-Roman",
+    "tiit",
+    "Times-Italic",
+    "tibo",
+    "Times-Bold",
+    "tibi",
+    "Times-BoldItalic",
+    "symb",
+    "Symbol",
+    "zadb",
+    "ZapfDingbats",
+]
+
 LookupType = namedtuple("LookupType", ["column", "lookups"])
 UnitPoints = namedtuple(
     "UnitPoints",

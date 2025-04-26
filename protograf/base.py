@@ -15,7 +15,7 @@ import json
 import logging
 import math
 import os
-import pathlib
+from pathlib import Path, PosixPath
 from urllib.parse import urlparse
 
 # third party
@@ -27,18 +27,21 @@ from PIL import Image
 import pymupdf
 from pymupdf import Shape as muShape, Point as muPoint, Page as muPage, Matrix
 from pymupdf.utils import getColor, getColorList
-from pymupdf import Base14_fontnames as BUILTIN_FONTS
+
+# from pymupdf import Base14_fontnames as BUILTIN_FONTS as BUILT_IN_FONTS
 
 # local
 from protograf.utils import geoms, tools, support
+from protograf.utils.fonts import builtin_font, FontInterface
 from protograf.utils.support import LookupType, unit
+from protograf.utils.support import BUILT_IN_FONTS, CACHE_DIRECTORY
 from protograf import globals
 
 log = logging.getLogger(__name__)
 
 DEBUG = False
 DEBUG_COLOR = "#B0C4DE"
-CACHE_DIRECTORY = ".protograf"  # append to the user's home directory
+DEFAULT_FONT = "Helvetica"
 BGG_IMAGES = "cf.geekdo-images.com"
 COLOR_NAMES = getColorList()
 
@@ -436,7 +439,7 @@ class BaseCanvas:
         #     self.stroke = self.outline
         #     self.fill = None
         # ---- font
-        self.font_name = self.defaults.get("font_name", "Helvetica")
+        self.font_name = self.defaults.get("font_name", DEFAULT_FONT)
         self.font_size = self.defaults.get("font_size", 12)
         self.font_style = self.defaults.get("font_style", None)
         self.font_directory = self.defaults.get("font_directory", None)
@@ -691,7 +694,7 @@ class BaseCanvas:
             "coord_elevation", None
         )  # top|middle|bottom
         self.coord_offset = self.defaults.get("coord_offset", 0)
-        self.coord_font_name = self.defaults.get("coord_font_name", "Helvetica")
+        self.coord_font_name = self.defaults.get("coord_font_name", DEFAULT_FONT)
         self.coord_font_size = self.defaults.get(
             "coord_font_size", int(self.font_size * 0.5)
         )
@@ -2035,9 +2038,7 @@ class BaseShape:
         # ---- render image
         try:
             if sliced:
-                sliced_filename = slice_image(
-                    pathlib.Path(image_local), sliced, width_height
-                )
+                sliced_filename = slice_image(Path(image_local), sliced, width_height)
                 if sliced_filename:
                     img = image_render(sliced_filename)
             else:
@@ -2179,6 +2180,9 @@ class BaseShape:
             * font_name -
             * stroke -
             * fill -
+
+        Notes:
+            Drawing using HTML CSS-styling is handled in the Text shape
         """
 
         def move_string_start(text, point, font, fontsize, align):
@@ -2237,23 +2241,33 @@ class BaseShape:
         # TODO - recalculate xm, ym based on align and text width
         # keys["align"] = align or self.align
 
-        # insert font on the page (not needed for built-in fonts)
-        # page.insert_font(fontname="myfont", fontbuffer=font.buffer)
+        # ---- set font (custom/built-in)
+        if not builtin_font(keys["fontname"]):
+            cache_directory = Path(Path.home() / CACHE_DIRECTORY)
+            fi = FontInterface(cache_directory=cache_directory)
+            keys["fontfile"] = fi.get_font_file(name=keys["fontname"])
+            if not keys["fontfile"]:
+                tools.feedback(
+                    f'Cannot find or load a font named `{keys["fontname"]}`.'
+                    f' Defaulting to "{DEFAULT_FONT}".',
+                    False,
+                    True,
+                )
+                keys["fontname"] = DEFAULT_FONT
+                font = pymupdf.Font(DEFAULT_FONT)  # built-in
+            else:
+                keys["fontname"] = keys["fontname"].replace(" ", "-")
+                font = pymupdf.Font(keys["fontname"], fontfile=keys["fontfile"])
+        else:
+            font = pymupdf.Font(keys["fontname"])  # built-in
 
         # ---- draw
         # print(f'### multi_string {xm=} {ym=} {string=} {keys}')
         point = pymupdf.Point(xm, ym)
         if self.align:
-            font = pymupdf.Font(keys["fontname"])  # built-in
             point = move_string_start(string, point, font, keys["fontsize"], self.align)
         if rotation:
-            # page.insert_text(point, text, morph=(point, fitz.Matrix(45))
-            # all_fonts = globals.doc_page.get_fonts()
-            if self.font_name in BUILTIN_FONTS:
-                dx = pymupdf.get_text_length(string, fontsize=keys["fontsize"]) / 2
-            else:
-                font = pymupdf.Font(keys["fontname"])
-                dx = font.text_length(string, fontsize=keys["fontsize"])
+            dx = pymupdf.get_text_length(string, fontsize=keys["fontsize"]) / 2
             midpt = pymupdf.Point(point.x + dx, point.y)
             # self.dot = 0.05; self.draw_dot(canvas, midpt.x, midpt.y)
             morph = (midpt, pymupdf.Matrix(rotation))
@@ -2261,6 +2275,13 @@ class BaseShape:
             morph = None
 
         try:
+            # insert_text(
+            #     point, text, *, fontsize=11, fontname='helv', fontfile=None,
+            #     set_simple=False, encoding=TEXT_ENCODING_LATIN, color=None,
+            #     lineheight=None, fill=None, render_mode=0, miter_limit=1,
+            #     border_width=1, rotate=0, morph=None, stroke_opacity=1,
+            #     fill_opacity=1, oc=0)
+            # print(f'### insert_text {point=} {string=} {morph=} {keys}')
             canvas.insert_text(point, string, morph=morph, **keys)
         except Exception as err:
             if "need font file" in str(err):
@@ -2602,7 +2623,7 @@ class BaseShape:
                 custom_value = value.lookups.get(lookup_value, None)
                 return custom_value
                 # print('### LookupType', f'{ID=} {key=} {custom_value=}', '=>', getattr(new_element, key))
-            elif isinstance(value, pathlib.PosixPath):
+            elif isinstance(value, PosixPath):
                 # print(f'### HCV {ID=} {key=} {value=}')
                 return None
             else:

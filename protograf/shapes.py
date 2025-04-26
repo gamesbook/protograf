@@ -35,9 +35,9 @@ from protograf.base import (
     get_opacity,
     COLOR_NAMES,
     DEBUG_COLOR,
-    CACHE_DIRECTORY,
     BGG_IMAGES,
 )
+from protograf.utils.support import CACHE_DIRECTORY
 from protograf import globals
 
 log = logging.getLogger(__name__)
@@ -4120,18 +4120,26 @@ class TextShape(BaseShape):
                 tools.feedback(
                     f"The transform {self.transform} is unknown.", False, True
                 )
-        # ---- text rotation
+        # ---- rotation
         if self.rotation is None or self.rotation == 0:
             text_rotation = 0
         else:
-            text_rotation = self.rotation // 90 * 90
-        # ---- text style
+            text_rotation = self.rotation // 90 * 90  # multiple of 90 for HTML/Box
+        # ---- text styles - htmlbox & textbox
+        # https://pymupdf.readthedocs.io/en/latest/page.html#Page.insert_htmlbox
+        # https://pymupdf.readthedocs.io/en/latest/shape.html#Shape.insert_textbox
         keys = {}
         keys["rotate"] = text_rotation
-        # ---- boxed text
+        # ---- BOX text
         current_page = globals.doc_page
         rect = pymupdf.Rect(x_t, y_t, x_t + width, y_t + height)
         if self.wrap:
+            # insert_textbox(
+            #     rect, buffer, *, fontsize=11, fontname='helv', fontfile=None,
+            #     set_simple=False, encoding=TEXT_ENCODING_LATIN, color=None, fill=None,
+            #     render_mode=0, miter_limit=1, border_width=1, expandtabs=8,
+            #     align=TEXT_ALIGN_LEFT, rotate=0, lineheight=None, morph=None,
+            #     stroke_opacity=1, fill_opacity=1, oc=0)
             try:
                 # style
                 keys["fontsize"] = self.font_size
@@ -4179,8 +4187,12 @@ class TextShape(BaseShape):
             try:
                 keys["opacity"] = get_opacity(self.transparency)
                 if self.css:
-                    keys["css"] = "* {%s}" % self.css
-                # tools.feedback(f'*** Text HTML {keys=} {rect=} _text:{_text}')
+                    keys["css"] = globals.css + " * {%s}" % self.css
+                else:
+                    if globals.css:
+                        keys["css"] = globals.css
+                keys["archive"] = globals.archive
+                # tools.feedback(f'*** Text HTML {keys=} {rect=} {_text=} {keys=}')
                 current_page.insert_htmlbox(rect, _text, **keys)
             except ValueError as err:
                 tools.feedback(f"Cannot create Text - {err}", True)

@@ -127,7 +127,7 @@ from boardgamegeek.objects.games import CollectionBoardGame
 from boardgamegeek.objects.games import BoardGame
 
 # local
-from protograf.base import CACHE_DIRECTORY
+from protograf.utils.support import CACHE_DIRECTORY
 from protograf.utils import tools
 
 

@@ -36,6 +36,12 @@ If you are using the ``Text`` command, the font can be setup as follows:
 
     Text("Hello World!", font_name="Arial", font_size=48, stroke=red)
 
+If you do not supply the font properties, they will default to:
+
+- *font_name* - Helvetica
+- *font_size* - 12 (points)
+- *stroke* - black
+
 If you want to set the font for a whole section of script, then using the
 ``Font`` command you can set this up as follows:
 
@@ -44,8 +50,7 @@ If you want to set the font for a whole section of script, then using the
     Font(name="Arial", size=48, stroke=red)
 
 In this case, the properties are similar but the "*font_*" prefix is not
-needed. The ``Font()`` command also has some useful extra properties,
-which are described below.
+needed.
 
 .. NOTE::
 
@@ -66,15 +71,32 @@ These are:
 - *Helvetica* - a basic sanserif font
 - *Courier* - a basic fixed-width font
 - *Symbol* - a variety of custom lettering
-- "ZapDingbats" - a variety of "dingbats" (mini-images)
+- *ZapfDingbats* - a variety of "dingbats" (mini-images)
 
 As far as possible, all examples supplied with :doc:`protograf <index>` make
-use of these fonts, so that they can run anywhere.
+use of these fonts, so that they can be run and used anywhere.
+
+.. NOTE::
+
+    Be aware that some PDF viewers may not render some, or all, of the
+    characters when using *Symbol* or *ZapfDingbats*. Also, the glyph
+    (visual) images will be specific to every viewer.
 
 CJK Fonts
 ---------
 
+CJK fonts (China, Japan, Korea) **may** be available and installed on some
+machines, depending on the OS and the PDF viwer in use.  If they are, they
+can be referred to as follows:
 
+- *Heiti* - simplified Chinese
+- *Song* - simplified Chinese (serif)
+- *Fangti* - traditional Chinese
+- *Ming* - traditional Chinese (serif)
+- *Gothic* - Japanese
+- *Mincho* - Japanese (serif)
+- *Dotum* - Korean
+- *Batang* - Korean (serif)
 
 
 Using Additional Fonts
@@ -86,13 +108,11 @@ installed, these could then be used in a :doc:`protograf <index>` script.
 
 However, there are some limitations:
 
-- The font should be installed into the standard location for that operating
+- The font should be installed into the standard location(s) for that operating
   system, so that it can be "auto-discovered".
 - The font must be referred to correctly; for example, the ``Ubuntu`` font is
   not actually available as ``Ubuntu`` but rather as ``Ubuntu-L``, ``Ubuntu-R``
-  and ``Ubuntu-M`` for the light, regular and medium styles.  By default,
-  :doc:`protograf <index>` will attempt to find and use the *regular* style
-  if no plain version is available.
+  and ``Ubuntu-M`` for the light, regular and medium styles.
 
 On an Ubuntu Linux machine, your new font file could be installed into the
 ``/home/USERNAME/.local/share/fonts`` directory.
@@ -101,85 +121,58 @@ On an Ubuntu Linux machine, your new font file could be installed into the
 Auto Registration
 -----------------
 
+The first time that a non-default font |dash| one that is installed specifically
+on your machine |dash| is referred to, :doc:`protograf <index>` will need to
+check all available font files to find it - this can take some time.
+Thereafter, a copy of all the fonts' information is stored in a single file in
+the settings location used by  :doc:`protograf <index>` (usually in a
+sub-directory called ``.protograph`` located in your home directory). This
+will speed up the font checking process significantly for future.
 
-Manual Registration
--------------------
+However, if you install new fonts onto your machine, you need to force the file
+to be recreated so it has access to these.  Use the property
+``cached_fonts=False`` in the script's ``Create`` command e.g.
 
-You must supply:
+.. code:: python
 
-* directory
-* prefix
+    Create(
+        cached_fonts=False
+    )
 
 
 Common Font Styles
 ------------------
 
-In addition to a font default appearance |dash| sometimes termed
-*Regular* |dash| a font often has bold or italic  |dash| sometimes termed
-*Oblique* |dash| styling that can be used together with this default.
+In addition to a font's default appearance |dash| sometimes termed
+*regular* |dash| a font often has bold or italic |dash| sometimes termed
+*oblique* |dash| styling that can be used together with this default.
 
 There can also be a combined version of these styles |dash| for example,
 *BoldItalic* or *BoldOblique* |dash| that is useful when both styles must be
-applied.
+applied together.
 
 These files for these styles usually have an appended suffix like *-Bold* or
-*B*. :doc:`protograf <index>` will attempt to discover and install both bold
-and italic files, to create what is termed a "font family", by trying out
-different combinations of names and abbreviations, as well as different name
-separators, but there is no sure guarantee that it will be able to do so!
+*B*. :doc:`protograf <index>` will attempt to discover and register both bold
+and italic files, to create what is termed a "font family", but there is no
+guarantee that all these files exist for every family!
 
-When any or all of these styles can be accessed, they will be registered as
-being part of the same "font family"; internally the program's command to do
-this is:
+When any or all of these styles are accessed, they will be registered as
+being part of the same "font family"; and the command to make the family
+available is:
 
 .. code:: python
 
-    registerFontFamily(
-        'Merriweather',
-        normal='Merriweather-Regular',
-        bold='Merriweather-Bold',
-        italic='Merriweather-Italic',
-        boldItalic='Merriweather-BoldItalic')
+    Font(name='Merriweather')
 
 (This example assumes you would have downloaded and installed the font files
 for the *Merriweather* font from https://fonts.google.com/specimen/Merriweather )
 
-Font Filename
--------------
-
-If :doc:`protograf <index>` is unable to "auto-discover" the font, but
-you know the path where the font file exists, then you can supply the
-*directory* property to the ``Font`` command:
+If you need to use a specific style for a text box, append the style to the
+font's family name; for example:
 
 .. code:: python
 
-    Font(face="BenKenobi", size=48, stroke=red, directory="/tmp/")
-
-.. HINT::
-
-    Be aware that doing this makes your script less portable between machines,
-    as that same file may not be present in the same directory on a different
-    machine.
-
-Additional Font Styles
-----------------------
-
-Fonts can also be created with a number of additional styles, including:
-
-- light
-- thin
-- medium
-- dark
-- black
-
-All of these styles require additional font files to be installed.
-
-To use such a style |dash| and its associated file |dash| you need supply
-the *style* property to the ``Font`` command:
-
-.. code:: python
-
-    Font(face="Skywalker", size=48, stroke=red, style="Dark")
+    Text(text='Hello World', font_name="Merriweather Bold")
 
 
 Supplementary Fonts
@@ -254,3 +247,5 @@ Additional fonts are available from:
 - https://www.dafont.com/
 - https://fonts.google.com/ - also has very useful explanations about fonts and
   how to choose them
+
+As always, please check licenses and restrictions associated with these fonts.

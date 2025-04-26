@@ -13,7 +13,7 @@ import itertools
 import logging
 import math
 import os
-import pathlib
+from pathlib import Path
 import random
 import sys
 from typing import Union, Any
@@ -24,7 +24,7 @@ import pymupdf
 
 # local
 from .bgg import BGGGame, BGGGameList
-from .base import BaseCanvas, GroupBase, COLORS, DEBUG_COLOR, get_color
+from .base import BaseCanvas, GroupBase, COLORS, DEBUG_COLOR, DEFAULT_FONT, get_color
 from .dice import Dice, DiceD4, DiceD6, DiceD8, DiceD10, DiceD12, DiceD20, DiceD100
 from .shapes import (
     BaseShape,
@@ -74,9 +74,10 @@ from .groups import Switch, Lookup
 from ._version import __version__
 
 from protograf.utils import geoms, tools, support
+from protograf.utils.fonts import builtin_font, FontInterface
 from protograf.utils.tools import base_fonts, DatasetType, CardFrame  # enums
 from protograf.utils.geoms import BBox, Locale, Point, Place, Ray, equilateral_height
-from protograf.utils.support import LookupType, steps, unit
+from protograf.utils.support import LookupType, steps, unit, CACHE_DIRECTORY
 from protograf import globals
 
 log = logging.getLogger(__name__)
@@ -596,7 +597,7 @@ class DeckShape(BaseShape):
 
 
 def Create(**kwargs):
-    """Initialisation of page, units and canvas.
+    """Initialisation of globals, page, units and canvas.
 
     NOTES:
         * Will use argparse to process command-line keyword args
@@ -676,6 +677,14 @@ def Create(**kwargs):
     # ---- cards
     if _cards:
         Deck(canvas=globals.canvas, sequence=range(1, _cards + 1), **kwargs)  # deck var
+    # ---- pymupdf fonts
+    globals.archive = pymupdf.Archive()
+    globals.css = ""
+    cached_fonts = tools.as_bool(kwargs.get("cached_fonts", True))
+    if not cached_fonts:
+        cache_directory = Path(Path.home() / CACHE_DIRECTORY)
+        fi = FontInterface(cache_directory=cache_directory)
+        fi.load_font_families(cached=cached_fonts)
 
 
 def create(**kwargs):
@@ -743,6 +752,7 @@ def Save(**kwargs):
     # ---- save all Pages to file
     msg = "Please check folder exists and that you have access rights."
     try:
+        globals.document.subset_fonts(verbose=True)  # subset fonts to reduce file size
         globals.document.save(globals.filename)
     except RuntimeError as err:
         tools.feedback(f'Unable to save "{globals.filename}" - {err} - {msg}', True)
@@ -802,10 +812,29 @@ def margins(**kwargs):
 def Font(name=None, **kwargs):
     validate_globals()
 
-    globals.base.font_name = name or "Helvetica"
+    if name:
+        _name = builtin_font(name)
+        if not _name:  # check for custom font
+            cache_directory = Path(Path.home() / CACHE_DIRECTORY)
+            fi = FontInterface(cache_directory=cache_directory)
+            _name = fi.get_font_family(name)
+            if not _name:
+                tools.feedback(
+                    f'Cannot find or load a font named "{name}".'
+                    f' Defaulting to "{DEFAULT_FONT}".',
+                    False,
+                    True,
+                )
+            else:
+                font_path, css = fi.font_file_css(_name)
+                globals.css += css
+                globals.archive.add(font_path)
+    else:
+        _name = None
+
+    globals.base.font_name = _name or DEFAULT_FONT
     globals.base.font_size = kwargs.get("size", 12)
     globals.base.font_style = kwargs.get("style", None)
-    globals.base.font_directory = kwargs.get("directory", None)
     globals.base.stroke = kwargs.get("stroke", "black")
 
 
@@ -1009,12 +1038,12 @@ def Data(**kwargs):
         globals.dataset = source
         globals.dataset_type = DatasetType.DICT
     elif images:  # create list of images
-        src = pathlib.Path(images)
+        src = Path(images)
         if not src.is_dir():
             # look relative to script's location
             script_dir = os.path.dirname(os.path.realpath(sys.argv[0]))
             full_path = os.path.join(script_dir, images)
-            src = pathlib.Path(full_path)
+            src = Path(full_path)
             if not src.is_dir():
                 tools.feedback(
                     f"Cannot locate or access directory: {images} or {full_path}", True

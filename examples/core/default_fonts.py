@@ -6,8 +6,8 @@ Written by: Derek Hohls
 Created on: 24 April 2025
 
 Notes:
-    * CJK fonts not automatically built-in to some operating systems.
-    * For Ubuntu/Debian, see:
+    * CJK fonts are NOT automatically built-in to some operating systems.
+    * For Ubuntu/Debian alternatives, see:
         https://help.accusoft.com/PrizmDoc/v12.2/HTML/Installing_Asian_Fonts_on_Ubuntu_and_Debian.html
     * For Windows, see:
         https://helpx.adobe.com/acrobat/kb/font-pack-spelling-dictionary-64-bit-windows.html

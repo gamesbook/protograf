@@ -7,6 +7,8 @@ from protograf.utils.support import unit
 
 
 def initialize():
+    global archive
+    global css
     global document
     global base
     global deck
@@ -32,6 +34,8 @@ def initialize():
     global font_size
     global units
 
+    archive = None  # will become a pymupdf.Archive()
+    css = None  # will become a string containing CSS font details
     document = None  # will become a pymupdf.Document object
     doc_page = None  # will become a pymupdf.Page object
     canvas = None  # will become a pymupdf.Shape object; one created per Page

@@ -198,7 +198,7 @@ def as_int(value, label, maximum=None, minimum=None, allow_none=False) -> int:
 
 
 def as_bool(value, label=None, allow_none=True) -> bool:
-    """Convert a value to a boolean
+    """Convert a value to a Boolean
 
     Doc Test:
 
@@ -207,10 +207,11 @@ def as_bool(value, label=None, allow_none=True) -> bool:
     >>> as_bool(value='Y', label='Y')
     True
     """
+    TRUES = ["yes", "ja", "oui", "si", "y", "ya", "yep", "yeah", "true", "t", "1"]
     if value is None and allow_none:
         return value
     _label = f" for {label}" if label else " of"
-    result = str(value).lower() in ("yes", "ja", "oui", "y", "true", "t", "1")
+    result = str(value).lower() in TRUES
     return result
 
 

@@ -37,20 +37,34 @@ from fontTools.ttLib import TTFont, TTLibFileIsCollectionError
 package_logger = logging.getLogger("fontTools")
 package_logger.setLevel(logging.ERROR)
 
+from .support import BUILT_IN_FONTS
+
+
+def builtin_font(name: str) -> Union[str, None]:
+    """Return a built-in name if it exists."""
+    if not name:
+        return None
+    for available in BUILT_IN_FONTS:
+        if str(name).strip().lower() == available.lower():
+            return available
+    return None
+
 
 class FontInterface:
 
-    def __init__(self):
+    def __init__(self, cache_directory):
         self.name_table = {}
         self.name_table_readable = {}
+        self.name_table_summary = {}
         self.post_table = {}
         self.os2_table = {}
         self.font_files = []
         self.font_families = {}
+        self.cache_directory = cache_directory or tempfile.gettempdir()
 
     @lru_cache(maxsize=256)  # limits cache
     def load_font_files(self):
-        """Track all files from default locations used by an OS."""
+        """Track all font files from the default locations used by the OS."""
         font_filenames = get_system_fonts_filename()
         self.font_files = sorted(list(font_filenames))
 
@@ -59,13 +73,13 @@ class FontInterface:
         """Track family data across all files from default locations used by an OS.
 
         Args:
-            cached (bool): if True, will pickle the font_families directory
+            cached (bool): if False, will reload available font_families from the OS
             cache_path (str): location of pickle file; defaults to OS's temp directory
         """
+        if not cache_path:
+            cache_path = self.cache_directory
+        cache_file = os.path.join(cache_path, "font_families.pickle")
         if cached:
-            if not cache_path:
-                cache_path = tempfile.gettempdir()
-            cache_file = os.path.join(cache_path, "protograf_font_families.pickle")
             if os.path.exists(cache_file):
                 with open(cache_file, "rb") as file:
                     self.font_families = pickle.load(file)
@@ -75,20 +89,8 @@ class FontInterface:
         for ffile in self.font_files:
             fdt = self.extract_font_summary(ffile)
             if fdt:
-                family = fdt["fontFamily"]
-                if family not in list(self.font_families.keys()):
-                    self.font_families[family] = []
-                self.font_families[family].append(
-                    {
-                        "file": fdt["fileName"],
-                        "name": fdt["fullName"],
-                        "italic": fdt["isItalic"],
-                        "class": fdt["fontSubfamily"],
-                    }
-                )
-                # register font under alternate (display?) name
-                if fdt["altName"] and fdt["altName"] != fdt["fontFamily"]:
-                    family = fdt["altName"]
+                family = fdt.get("fontFamily")
+                if family:
                     if family not in list(self.font_families.keys()):
                         self.font_families[family] = []
                     self.font_families[family].append(
@@ -99,10 +101,70 @@ class FontInterface:
                             "class": fdt["fontSubfamily"],
                         }
                     )
-
-        if cached:
+                    # register font under alternate (display?) name
+                    if fdt["altName"] and fdt["altName"] != fdt["fontFamily"]:
+                        family = fdt["altName"]
+                        if family not in list(self.font_families.keys()):
+                            self.font_families[family] = []
+                        self.font_families[family].append(
+                            {
+                                "file": fdt["fileName"],
+                                "name": fdt["fullName"],
+                                "italic": fdt["isItalic"],
+                                "class": fdt["fontSubfamily"],
+                            }
+                        )
+        breakpoint()
+        if self.font_families:
             with open(cache_file, "wb") as file:
                 pickle.dump(self.font_families, file)
+
+    @lru_cache(maxsize=256)  # limits cache
+    def get_font_family(self, name: str) -> Union[str, None]:
+        """Get proper name for a font family if it exists
+
+        Args:
+            name: case-insensitive name of a font family e.g. "bookerly"
+        """
+        if not name:
+            return None
+        if not self.font_families:
+            self.load_font_families()
+        for font_family in list(self.font_families.keys()):
+            if str(name).lower() == font_family.lower():
+                return font_family
+        return None
+
+    @lru_cache(maxsize=256)  # limits cache
+    def get_font_file(self, name: str) -> str:
+        """Get file name for a specific font style if it exists
+
+        Args:
+            name: case-insensitive name of a font style e.g. "bookerly Bold"
+        """
+        if not name:
+            return None
+        if not self.font_families:
+            self.load_font_families()
+        for font_family in list(self.font_families.keys()):
+            font_details = self.font_families[font_family]
+            for font in font_details:
+                if str(name).lower() == font["name"].lower():
+                    return font["file"]
+                if "Gras" in font["name"]:
+                    if (
+                        str(name).lower()
+                        == font["name"].replace("Gras", "Bold").lower()
+                    ):
+                        return font["file"]
+                if "Italique" in font["name"]:
+                    if (
+                        str(name).lower()
+                        == font["name"].replace("Italique", "Italic").lower()
+                    ):
+                        return font["file"]
+
+        return None
 
     @lru_cache(maxsize=256)  # limits cache
     def font_file_css(self, font_family: str) -> Union[str, None]:
@@ -190,29 +252,9 @@ class FontInterface:
                 * weightClass (int): Weight class.
                 * isItalic (bool): Whether the font is italic.
         """
-        if isinstance(font_path, Path):
-            font_path = str(font_path)
-
-        font_info = {}
-        font = self.get_ttfont(font_path)
-        if not font:
-            return font_info
-
-        self.extract_font_details(font_path, normalize)
-
-        font_info = {
-            "fontFamily": self.name_table_readable.get("fontFamily"),
-            "fontSubfamily": self.name_table_readable.get("fontSubfamily"),
-            "fileName": font_path,
-            "uniqueID": self.name_table.get(3, ""),
-            "fullName": self.name_table.get(4, ""),
-            "altName": self.name_table.get(16, ""),
-            "version": self.name_table_readable.get("version"),
-            "postScriptName": self.name_table.get(6, ""),
-            "weightClass": self.os2_table.get("usWeightClass"),
-            "isItalic": self.post_table.get("italicAngle") != 0,
-        }
-        return font_info
+        font_info = self.extract_font_details(font_path, normalize)
+        result = font_info.get("summary", None) if font_info else None
+        return result
 
     def load_ttfont(self, font_path: Union[str, Path], **kwargs) -> TTFont:
         """Load a TrueType font file."""
@@ -313,7 +355,7 @@ class FontInterface:
         font_info["fileName"] = font_path
         font_info["tables"] = list(font.keys())
 
-        # Parse name table
+        # ---- name table
         self.name_table = {}
         for record in font["name"].names:
             try:
@@ -326,7 +368,7 @@ class FontInterface:
                 )
         font_info["nameTable"] = self.name_table
 
-        # Readable name table for common nameIDs
+        # ---- Readable name table
         self.name_table_readable = {
             "copyright": self.name_table.get(0, ""),
             "fontFamily": self.name_table.get(1, ""),
@@ -341,6 +383,7 @@ class FontInterface:
             k: self.remove_control_characters(v, normalize)
             for k, v in self.name_table_readable.items()
         }
+        self.name_table_summary = font_info["nameTableReadable"]
 
         # Parse cmap table
         cmap_table = {}
@@ -385,7 +428,7 @@ class FontInterface:
         }
         font_info["headTable"] = head_table
 
-        # Parse hhea table
+        # ---- hhea table
         hhea = font["hhea"]
         hhea_table = {
             "ascent": hhea.ascent,
@@ -394,7 +437,7 @@ class FontInterface:
         }
         font_info["hheaTable"] = hhea_table
 
-        # Parse OS/2 table
+        # ---- OS/2 table
         os2 = font["OS/2"]
         self.os2_table = {
             "usWeightClass": os2.usWeightClass,
@@ -403,7 +446,7 @@ class FontInterface:
         }
         font_info["OS2Table"] = self.os2_table
 
-        # Parse post table
+        # ----  post table
         post = font["post"]
         self.post_table = {
             "isFixedPitch": post.isFixedPitch,
@@ -425,16 +468,18 @@ class FontInterface:
             "lineGap": hhea_table["lineGap"],
         }
 
-        # Font summary
+        # ----  Font summary
         font_info["summary"] = {
-            "fontFamily": self.name_table_readable["fontFamily"],
-            "fontSubfamily": self.name_table_readable["fontSubfamily"],
-            "uniqueID": self.name_table.get(3, ""),
-            "fullName": self.name_table.get(4, ""),
-            "version": self.name_table_readable["version"],
-            "postScriptName": self.name_table.get(6, ""),
-            "weightClass": os2.usWeightClass,
-            "isItalic": self.post_table["italicAngle"] != 0,
+            "fontFamily": self.name_table_summary["fontFamily"],
+            "fontSubfamily": self.name_table_summary["fontSubfamily"],
+            "fileName": font_path,
+            "uniqueID": self.name_table_summary["uniqueID"],
+            "fullName": self.name_table_summary["fullName"],
+            "altName": self.name_table_summary["altName"],
+            "version": self.name_table_summary["version"],
+            "postScriptName": self.name_table_summary["postScriptName"],
+            "weightClass": os2.usWeightClass if os2 else None,
+            "isItalic": self.post_table.get("italicAngle") != 0,
         }
 
         return font_info
