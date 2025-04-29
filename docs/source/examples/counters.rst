@@ -2,6 +2,8 @@
 Examples: Counters
 ==================
 
+.. |dash| unicode:: U+2014 .. EM DASH SIGN
+
 These examples are meant to demonstrate the type of output you can expect
 to create with **protograf**.  They are *not* meant to be exhaustive or
 comprehensive!
@@ -39,7 +41,7 @@ Discussion  This example shows how to construct a set of counters.
               .. code:: python
 
                 CounterSheet(
-                    counters=18, width=2.6, height=2.6, fill=yellow,
+                    counters=18, width=2.6, height=2.6, fill="yellow",
                     spacing_x=2.6, spacing_y=1.3,
                     grouping_cols=3, grouping_rows=2)
 
@@ -61,9 +63,9 @@ Discussion  This example shows how to construct a set of counters.
                   x=0.8, y=1.2, width=1.0, height=0.6,
                   stroke_width=0.5, fill=None)
                 lu = line(
-                  x=0.8, y=1.2, x1=1.8, y1=1.8, stroke=black, stroke_width=1.5)
+                  x=0.8, y=1.2, x1=1.8, y1=1.8, stroke="black", stroke_width=1.5)
                 ld = line(
-                  x=0.8, y=1.8, x1=1.8, y1=1.2, stroke=black, stroke_width=1.5)
+                  x=0.8, y=1.8, x1=1.8, y1=1.2, stroke="black", stroke_width=1.5)
                 inf = group(out, lu, ld)
 
             Then text and color (for one of the country's armies) are defined:
@@ -259,8 +261,7 @@ Discussion  This example shows how to construct a set of labels, designed to
                 English,DURHAM,2,B2,4,red,#57762C,
 
             Of interest, is that second-last column in each row defines a
-            hexadecimal color (see:
-            :doc:`colors <../basic_concepts#working-with-color>`) which can
+            hexadecimal color (see :ref:`colors <basic-color>`) which can
             used, for example, via:
 
               .. code:: python
@@ -279,6 +280,7 @@ Discussion  This example shows how to construct a set of labels, designed to
 
               .. code:: python
 
+                lbrown = "#F1D7B5"
                 top4 = sequence(
                      square(
                        x=0.9, y=2.35, side=0.25,

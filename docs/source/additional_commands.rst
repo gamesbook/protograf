@@ -5,18 +5,176 @@ Additional Commands
 .. |dash| unicode:: U+2014 .. EM DASH SIGN
 
 This section deals with some of the additional commands available in
-:doc:`protograf <index>` that are not covered elsewhere. You should
-already be familiar with all of the :doc:`Basic Concepts <basic_concepts>`,
-and have looked through the section on :doc:`Core Shapes <core_shapes>`.
+:doc:`protograf <index>` that are not covered in detail elsewhere.
+
+You should already be familiar with all of the
+:doc:`Basic Concepts <basic_concepts>`,  and that you've created some
+basic scripts of your own using the :doc:`Core Shapes <core_shapes>`.
 
 .. _table-of-contents:
 
 Table of Contents
 =================
 
--  `BGG Command`_
+-  `Common Command`_
 -  `Font Command`_
 -  `Today Command`_
+-  `BGG Command`_
+
+
+.. _the-common-command:
+
+Common Command
+==============
+`↑ <table-of-contents_>`_
+
+The ``Common()`` command allows different shapes to share the same properties.
+
+For example:
+
+.. code:: python
+
+  colors = Common(stroke="tomato", fill="gold")
+  Circle(common=colors, cx=1, cy=2)
+  Square(common=colors, cx=2, cy=2)
+
+Here the circle and the square will use the Common properties assigned to the
+``colors`` name.
+
+.. NOTE::
+
+  The common properties **cannot** be overwritten by a shape; if set, they
+  will be used and cannot be changed on a case-by-case basis!
+
+
+.. _the-font-command:
+
+Font Command
+============
+`↑ <table-of-contents_>`_
+
+.. NOTE::
+
+  There is a section with much more in-depth discussion on the
+  :doc:`use of fonts <using_fonts>` which could be helpful,
+  especially if you have problems...
+
+The ``Font()`` command will change the default font in use from that point
+forward in the script.
+
+Usually, the font's properties will be set at the time that a ``Text()``
+command is issued, and multiple ``Text()`` commands can obviously use the
+`Common Command`_ to avoid duplication, but it can sometimes be useful
+to set the font properties more widely, especially where locating or
+setting up the font
+
+The following properties are available for the command:
+
+- *name* - the name of the font face
+- *size* - the font "height" in points
+- *stroke* - the font color; either a built-in color or a hexadecimal value
+
+If you need to use a specific style name that differs from the default style,
+for example *italic* or *bold*, you will need to refer to that font by its
+name, for example ``Arial-Bold``.
+
+Because the *name* is compulsory, its often omitted from the command.
+
+.. |fc1| image:: images/custom/commands/fonts.png
+   :width: 330
+
+===== ======
+|fc1| This example shows the use of the command with different properties:
+
+      .. code:: python
+
+        Font("Helvetica")
+        Text(text="Helvetica 12pt black",
+             x=0, y=5, align="left")
+
+        Font("Times-Roman", size=11, stroke="tomato")
+        Text(text="Times-Roman 11pt red",
+             x=0, y=4, align="left")
+
+        Font("Courier", size=10, stroke="cyan")
+        Text(text="Courier 9pt aqua",
+             x=0, y=3, align="left")
+
+        Font("Verdana", size=9, stroke="gold")
+        Text(text="Verdana 9pt gold",
+             x=0, y=2, align="left")
+
+      The first three are examples of the :ref:`standard fonts <builtin-fonts>`
+      available to a PDF, and can be safely used anywhere that
+      :doc:`protograf <index>` can be run, while the fourth is a custom one
+      that would need to first be installed onto the machine where the script
+      is running.
+
+      .. HINT::
+
+        The first time that any custom font is used, in any of your scripts,
+        will trigger a "discovery" process whereby all fonts are catalogued.
+        This will cause a long delay |dash| however, after that the catalogue
+        can be used directly and scripts will avoid that delay.
+
+      In each example, the name of the font appears first, followed by any
+      further details as to its properties.
+
+===== ======
+
+
+.. _the-today-command:
+
+Today Command
+=============
+`↑ <table-of-contents_>`_
+
+The ``Today()`` command will insert text with the current date and/or time.
+
+Varying date formats can be used. Two properties are available:
+
+- *details* - this can be either ``date`` or ``datetime``
+- *style* - this can be ``usa`` or ``eur``; if not provided then ``ISO`` date
+  style is used |dash| see the "1." example below.
+
+
+Example 1.
+----------
+`^ <the-today-command_>`_
+
+.. |df1| image:: images/customised/dates_formats.png
+   :width: 330
+
+===== ======
+|df1| This example shows the use of the command with different *details*
+      and *style* - the first example just uses defaults.
+
+      .. code:: python
+
+        dtext = Common(x=0.25, align="left", font_size=8)
+        Text(
+            common=dtext, y=5,
+            text="1.  "+Today())
+        Text(
+            common=dtext, y=4,
+            text="2.  "+Today(details="date", style="usa"))
+        Text(
+            common=dtext, y=3,
+            text="3.  "+Today(details="date", style="eur"))
+        Text(
+            common=dtext, y=2,
+            text="4.  "+Today(details="datetime", style="usa"))
+        Text(
+            common=dtext, y=1,
+            stroke=red,
+            text="5.  "+Today(details="datetime", style="eur"))
+
+      Because the output of the ``Today()`` command is provided as text,
+      it can be used for the *text* property of the ``Text()`` command
+      and located and styled as part of that command.
+
+===== ======
+
 
 .. _the-bgg-command:
 
@@ -123,43 +281,44 @@ Output Fields
 The results of a successful command, that returns one or more games,
 includes data for the following fields:
 
-- **AVERAGEWEIGHT** -
-- **BAYESAVERAGE** -
-- **BGG** -
-- **CATEGORIES** -
-- **DESCRIPTION** -
-- **DESCRIPTION_SHORT** -
-- **DESIGNERS** -
-- **DISPLAY** -
-- **EXPANDS** -
-- **EXPANSION** -
-- **EXPANSIONS** -
-- **FAMILIES** -
-- **ID** -
-- **IMAGE** -
-- **IMPLEMENTATIONS** -
-- **MAXPLAYERS** -
-- **MECHANICS** -
-- **MEDIAN** -
-- **MINAGE** -
-- **MINPLAYERS** -
-- **NAME** -
-- **NUMCOMMENTS** -
-- **NUMWEIGHTS** -
-- **OWNED** -
-- **PLAYERS** -
-- **PLAYINGTIME** -
-- **PROPERTIES** -
-- **PUBLISHERS** -
-- **RANKS** -
-- **SHORT** -
-- **STDDEV** -
-- **THUMBNAIL** -
-- **TRADING** -
-- **USERSRATED** -
-- **WANTING** -
-- **WISHING** -
-- **YEARPUBLISHED** -
+- **AVERAGEWEIGHT** ~
+- **BAYESAVERAGE** ~
+- **BGG** ~
+- **CATEGORIES** ~
+- **DESCRIPTION** ~
+- **DESCRIPTION_SHORT** ~
+- **DESIGNERS** ~
+- **DISPLAY** ~
+- **EXPANDS** ~
+- **EXPANSION** ~
+- **EXPANSIONS** ~
+- **FAMILIES** ~
+- **ID** ~
+- **IMAGE** ~
+- **IMPLEMENTATIONS** ~
+- **MAXPLAYERS** ~
+- **MECHANICS** ~
+- **MEDIAN** ~
+- **MINAGE** ~
+- **MINPLAYERS** ~
+- **NAME** ~
+- **NUMCOMMENTS** ~
+- **NUMWEIGHTS** ~
+- **OWNED** ~
+- **PLAYERS** ~
+- **PLAYINGTIME** ~
+- **PROPERTIES** ~
+- **PUBLISHERS** ~
+- **RANKS** ~
+- **SHORT** ~
+- **STDDEV** ~
+- **THUMBNAIL** ~
+- **TRADING** ~
+- **USERSRATED** ~
+- **WANTING** ~
+- **WISHING** ~
+- **YEARPUBLISHED** ~
+
 
 .. HINT::
 
@@ -172,16 +331,16 @@ includes data for the following fields:
 If you retrieve data for a user's collection, there will also be an
 additional set of fields, with data specific to that user:
 
-- **USER_GAME** -
-- **USER_OWN** -
-- **USER_PREORDERED** -
-- **USER_PREVOWNED** -
-- **USER_RATING** -
-- **USER_WANT** -
-- **USER_WANTTOBUY** -
-- **USER_WANTTOPLAY** -
-- **USER_WISHLIST** -
-- **USER_WISHLISTPRIORITY** -
+- **USER_GAME** ~
+- **USER_OWN** ~
+- **USER_PREORDERED** ~
+- **USER_PREVOWNED** ~
+- **USER_RATING** ~
+- **USER_WANT** ~
+- **USER_WANTTOBUY** ~
+- **USER_WANTTOPLAY** ~
+- **USER_WISHLIST** ~
+- **USER_WISHLISTPRIORITY** ~
 
 
 Subset of Games
@@ -232,122 +391,3 @@ user's collection, are:
   which there is a comment in the "Has parts" field
 - *want_parts* -  include (if ``True``) or exclude (if ``False``) items for
   which there is a comment in the "Want parts" field
-
-
-.. _the-font-command:
-
-Font Command
-============
-`↑ <table-of-contents_>`_
-
-.. NOTE::
-
-  There is a section with much more in-depth discussion on the
-  :doc:`use of fonts <using_fonts>` which could be helpful,
-  especially if you have problems...
-
-The ``Font()`` command will change the default font in use from that point
-forward in the script.
-
-Usually, the font's properties will be set at the time that a ``Text()``
-command is issued, and multiple ``Text()`` commands can obviously use the
-``Common()`` command to avoid duplication, but it can sometimes be useful
-to set the font properties more widely, especially where locating or
-setting up the font
-
-The following properties are available for the command:
-
-- *name* - the name of the font face
-- *size* - the font "height" in points
-- *stroke* - the font color; either a built-in color or a hexadecimal value
-- *style* - a specific style name that differs from the default style,
-  which is often termed "regular"
-- *directory* - a location where the font file(s) can be found
-
-Because the *name* is compulsory, its often omitted from the command.
-
-.. |fc1| image:: images/custom/commands/fonts.png
-   :width: 330
-
-===== ======
-|fc1| This example shows the use of the command with different properties:
-
-      .. code:: python
-
-        Font("Helvetica")
-        Text(text="Helvetica 12pt black",
-             x=0, y=5, align="left")
-
-        Font("Times-Roman", size=11, stroke="tomato")
-        Text(text="Times-Roman 11pt red",
-             x=0, y=4, align="left")
-
-        Font("Courier", size=10, stroke="cyan")
-        Text(text="Courier 9pt aqua",
-             x=0, y=3, align="left")
-
-        Font("Verdana", size=9, stroke="gold")
-        Text(text="Verdana 9pt gold",
-             x=0, y=2, align="left")
-
-      The first three are examples of the standard fonts available to a PDF,
-      and can be safely used anywhere that :doc:`protograf <index>` can
-      be run, while the fourth is one that would have to be installed onto
-      the host machine.
-
-      In each example, the name of the font appears first, followed by any
-      further details as to its properties.
-
-===== ======
-
-.. _the-today-command:
-
-Today Command
-============
-`↑ <table-of-contents_>`_
-
-The ``Today()`` command will insert text with the current date and/or time.
-
-Varying date formats can be used. Two properties are available:
-
-- *details* - this can be either ``date`` or ``datetime``
-- *style* - this can be ``usa`` or ``eur``; if not provided then ``ISO`` date
-  style is used |dash| see the "1." example below.
-
-
-Example 1.
-----------
-`^ <the-today-command_>`_
-
-.. |df1| image:: images/customised/dates_formats.png
-   :width: 330
-
-===== ======
-|df1| This example shows the use of the command with different *details*
-      and *style* - the first example just uses defaults.
-
-      .. code:: python
-
-        dtext = Common(x=0.25, align="left", font_size=8)
-        Text(
-            common=dtext, y=5,
-            text="1.  "+Today())
-        Text(
-            common=dtext, y=4,
-            text="2.  "+Today(details="date", style="usa"))
-        Text(
-            common=dtext, y=3,
-            text="3.  "+Today(details="date", style="eur"))
-        Text(
-            common=dtext, y=2,
-            text="4.  "+Today(details="datetime", style="usa"))
-        Text(
-            common=dtext, y=1,
-            stroke=red,
-            text="5.  "+Today(details="datetime", style="eur"))
-
-      Because the output of the ``Today()`` command is provided as text,
-      it can be used for the *text* property of the ``Text()`` command
-      and located and styled as part of that command.
-
-===== ======

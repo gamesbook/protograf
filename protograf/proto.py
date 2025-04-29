@@ -1064,9 +1064,10 @@ def Data(**kwargs):
     if globals.dataset and len(globals.dataset) > 0:
         first = globals.dataset[0].keys()
         for key in first:
-            if " " in key:
+            if not key.isalpha():
                 tools.feedback(
-                    f'You cannot have spaces in the Data headers e.g. "{key}"', True
+                    'The Data headers must only be characters (without spaces)'
+                    f' e.g. not "{key}"', True
                 )
 
     return globals.dataset

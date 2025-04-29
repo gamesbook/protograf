@@ -44,9 +44,9 @@ examples of both :doc:`commercial <examples/commercial>` and
 :doc:`abstract <examples/abstract>` boards.
 
 You should have already seen how a single Hexagon and a basic grid of Hexagons
-are created using defaults, via a :doc:`Hexagon Shape <core_shapes#hexagon>`.
-You should also have seen how a single Hexagon can be further enhanced in
-:doc:`Customised Shapes <customised_shapes#hexagon>`.
+are created using defaults.
+You should also have seen how a single hexagon can be further enhanced in
+as a :ref:`Customised Hexagon Shape <hexIndex>`.
 
 .. _rectIndex:
 
@@ -483,7 +483,7 @@ Radii
       - *cols* sets the number of columns in the grid
       - *hex_offset* determines which columns are shifted
       - *radii* - as described for a
-        :doc:`customised hexagon <customised_shapes#hexagon>`,this will
+        :ref:`customised hexagon <hexIndex>`, this will
         create lines running from each hexagon centre to the vertices, as
         define by the directions specified
 

@@ -647,6 +647,24 @@ Text(wrap=True,
      text="I'm lower case Times-Roman in the centre")
 PageBreak()
 
+# ---- text rotate
+Blueprint()
+Text(common=txt, text="Text - rotate")
+props = Common(font_size=7,  fill="black", stroke="black", font_name="Helvetica")
+# line
+Text(common=props, x=1, y=1, text="Line text 1,1 - rotate 30", rotation=30)
+Text(common=props, x=3, y=1, text="Line text 3,1 - rotate 30\nline break", rotation=30)
+
+Text(common=props, x=0, y=3, width=1, height=3, wrap=True,
+     text="Wrap text - 1-by-3 - rotate 90", rotation=90)
+Text(common=props, x=1, y=3, width=3, height=1, wrap=True,
+     text="Wrap text - 3-by-1 - rotate 90", rotation=90)
+
+Text(common=props, x=3, y=3, width=1, height=3, html=True,
+     css="font-family: Helvetica; font-size: 7pt; color: black;",
+     text="<i>HTML text</i> - 1-by-3 - rotate 90", rotation=90)
+PageBreak()
+
 # ---- END
 Text(common=txt, text="Shapes END...")
 
@@ -674,5 +692,5 @@ Save(
         "rhombus_borders", "trapezoid_borders", "arrow_sizes", "arrow_rotate",
         "shape_centred", "shape_centred_move", "qr_code", "image_sliced",
         "shape_rotation", "shape_hatch_and_rotation",
-        "text_style", "text_custom",
+        "text_style", "text_custom", "text_rotate",
         None])

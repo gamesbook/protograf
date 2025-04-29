@@ -5,9 +5,9 @@ Commands List
 .. |dash| unicode:: U+2014 .. EM DASH SIGN
 
 This list provides an alphabetic summary of all the
-:ref:`commands <command-concept>` specific to
-:ref:`protograf <index>`.  It is not intended to be used for learning
-but is a handy cross-reference to the detailed information for that command.
+:ref:`commands <command-concept>` specific to **protograf**.
+It is not intended to be used for learning, but is just a handy
+cross-reference to the detailed information for that command.
 
 .. HINT::
 
@@ -30,6 +30,7 @@ but is a handy cross-reference to the detailed information for that command.
    (see also further :ref:`customisation options <circleIndex>`)
 -  :ref:`Compass <compass-command>` * - a geometric shape that can be drawn on a page
 -  :ref:`Chord <chord-command>` * - a geometric shape that can be drawn on a page
+-  :ref:`Common <the-common-command>` - set the properties for any shape that can be drawn on a page
 -  :ref:`Counter <the-countersheet-command>`  - details for a counter that is part
    of a :ref:`countersheet <the-countersheet-command>`
 -  :ref:`countersheet <the-countersheet-command>`  - details for a

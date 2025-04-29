@@ -255,7 +255,7 @@ This example shows how different shapes can be assigned to cards:
 
         Deck(cards=9)
 
-        line1 = line(x=0.8, x1=5.6, y=7.1, y1=8.4, stroke=red)
+        line1 = line(x=0.8, x1=5.6, y=7.1, y1=8.4, stroke="red")
         rect1 = rectangle(x=0.7, y=7.0, width=5, height=1.5)
         text1 = text(text='proto', x=3.1, y=4.4, font_size=18)
         line_in_rect = group(rect1, line1)
@@ -317,6 +317,12 @@ Each **column** must be named so that the data can be referenced and used:
 - the names for `the Matrix Command`_ command must appear as a list assigned
   to the *labels* property of the command
 - the names for a "list of lists" must appear in the first list in the lists
+
+.. IMPORTANT::
+
+    The names used must **only** consist of normal alphabetical characters
+    |dash| upper- or lower-case |dash|  and **not** other symbols, punctuation
+    marks, spaces etc.
 
 The ``Data`` command uses different properties to access these different
 types of sources:
@@ -475,7 +481,7 @@ Data Example #6 BoardGameGeek API
 This example shows how data is loaded for boardgame details obtained from the
 :ref:`BoardGameGeek API <the-bgg-command>`.
 
-    .. code:: python
+.. code:: python
 
     boardgames = BGG(ids=[1, 2, 3], progress=True)
     Data(data_list=boardgames.data_list)
@@ -493,7 +499,7 @@ The game information can then be used as it would for other data sources.
 A collection of games, linked to a BoardGameGeek user, can also be retrieved
 by supplying their username, for example:
 
-    .. code:: python
+.. code:: python
 
     boardgames = BGG(user='BenKenobi1976', progress=True)
     Data(data_list=boardgames.data_list)
@@ -516,18 +522,18 @@ The ``Matrix`` command uses these properties to create data:
 This command will generate a dataset for the cards, based on all combinations
 of values in a "list of lists"; so for this set of *data*:
 
-    .. code:: python
+.. code:: python
 
-        data=[
-            ['A', 'B', ],
-            ['1', '2', ],
-            ['x', 'y', ],
-         ])
+    data=[
+        ['A', 'B', ],
+        ['1', '2', ],
+        ['x', 'y', ],
+     ])
 
 There are 8 combinations:  A-1-x, A-1-y, A-2-x, A-2-y, B-1-x, B-1-y, B-2-x,
 and B-2-y and therefore eight cards in the deck.
 
-See the `Data Example #3`_ above for a full Matrix.
+See the `Data Example #3 Matrix`_ above for a full Matrix.
 
 .. _the-countersheet-command:
 
@@ -585,7 +591,8 @@ When this group named *stack* is assigned to a card and then drawn,
 the Rectangle will be drawn first, followed by the Line, following the
 order in which the appear in the group's listing.
 
-This command is somewhat similar to ``Common()``, which provides a way to
+This command is somewhat similar to the
+:ref:`Common command <the-common-command>`, which also provides a way to
 group commonly used properties.
 
 .. _the-template-command:
@@ -601,7 +608,7 @@ To use this command, simply enclose the name of the data column in curly
 brackets - ``"{{...}}"`` - remember that this **is** case-sensitive.
 
 This example shows how to use the command, with reference to the ``Data``
-from `Data Example #5`_.  The text appearing at the top of all cards
+from `Data Example #5 Lists`_.  The text appearing at the top of all cards
 is derived from the **Name** column:
 
     .. code:: python
@@ -660,7 +667,7 @@ from `Data Example #5`_:
         back_race = Common(
             x=0.5, y=0.5, width=5.3, height=7.9, rounded=0.2)
         back_hum = rectangle(
-            common=back_race, fill_stroke=tomato)
+            common=back_race, fill_stroke="tomato")
         Card("all", S("{{ Race == 'Human' }}", back_hum))
 
 In this example, any/all cards for which the **Race** column is equal

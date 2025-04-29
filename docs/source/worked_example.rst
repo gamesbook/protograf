@@ -269,7 +269,7 @@ Continuing on …
 If you are interested in carrying on with design of card decks, then the
 section on :doc:`Card Decks <card_decks>` will be helpful for you.
 Please bear in mind that that section assumes you are familiar with **all**
-the :doc:`core concepts <core_concepts>` and program usage described in
+the :doc:`basic concepts <basic_concepts>` and program usage described in
 earlier sections.
 
 There are also card-related examples in the

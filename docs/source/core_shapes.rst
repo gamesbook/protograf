@@ -391,6 +391,7 @@ Example 2. Customised
                 x=0, y=2, length=4,
                 stroke="chartreuse", stroke_width=2)
 
+
           The medium blue line has:
 
           - *dashed* - a list with the length of the dash followed by
@@ -618,6 +619,73 @@ Example 3. Styled
       - via the ``Font`` command
       - via *css* property
       - via the ``font-family: ...">`` embedded in the *text*
+
+===== ======
+
+Example 4. Rotated
+++++++++++++++++++
+
+.. |t04| image:: images/customised/text_rotate.png
+   :width: 330
+
+===== ======
+|t04| This example shows the shape constructed using various properties:
+
+      .. code:: python
+
+        props = Common(
+            font_size=7,  fill="black", stroke="black",
+            font_name="Helvetica")
+
+        Text(
+            common=props, x=1, y=1,
+            text="Line text 1,1 - rotate 30",
+            rotation=30)
+        Text(
+            common=props, x=3, y=1,
+            text="Line text 3,1 - rotate 30\nline break",
+            rotation=30)
+
+        Text(
+            common=props, x=0, y=3,
+            width=1, height=3, wrap=True,
+            text="Wrap text - 1-by-3 - rotate 90",
+            rotation=90)
+        Text(
+            common=props, x=1, y=3,
+            width=3, height=1, wrap=True,
+            text="Wrap text - 3-by-1 - rotate 90",
+            rotation=90)
+
+        Text(
+            common=props, x=3, y=3,
+            width=1, height=3, html=True,
+            css="font-family: Helvetica; font-size: 7pt;",
+            text="<i>HTML text</i> - 1-by-3 - rotate 90",
+            rotation=90)
+
+
+      This example shows how the text can be rotated using the *rotation*
+      property.
+
+      The top two examples show normal (aka "line") text rotated around
+      the mind-point of the text at the ``x`` and ``y``location.  Be aware
+      that even though the ``\n`` forces a line-break, the total length of
+      the line is still calculated using all the characters.
+
+      The lower two examples on the left show "text in a box" using the
+      ``wrap=True`` property.  It should be noted that the width of the
+      box is effectively also rotated, so that the width now becomes the
+      "height" (and vice-versa of course).
+
+      The lower example on the right shows "text in a box" using the
+      ``html=True`` property. For this example, styling is via the *css*
+      property and not via the :ref:`Common command <the-common-command>`
+
+      .. NOTE::
+
+        Both *wrap* and *html* text can only be rotated in increments of
+        90 (ninety) degrees!!
 
 ===== ======
 

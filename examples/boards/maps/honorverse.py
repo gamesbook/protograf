@@ -36,7 +36,7 @@ HAVEN = "#FF80FF"
 MANTICORE = "#C0C0C0"
 MONICA =  "#BDB76B" # "#A0522D"
 
-DARK_MODE = False  # True
+DARK_MODE = False  # True to use Black background
 if DARK_MODE:
     WORMHOLE = "red"
     STAR = "white"
@@ -49,6 +49,8 @@ else:
     CAPITAL = "red"
     GRID = None
     SCALE = "black"
+
+THE_FONT = "Helvetica"
 
 # grid / overlay
 #Blueprint(numbering_x=15, edges="n w e s",
@@ -377,100 +379,98 @@ for system in systems:
             stroke=STAR,
             font_size=4,
             align=align,
-            font_name='Helvetica',
+            font_name=THE_FONT,
             text=system[1],
         )
 # LEGEND
 Rectangle(x=0, y=37, height=5, width=57,
           fill="white", stroke="white")
 Line(x=0, y=37, x1=56, y1=37, stroke="#587CBC")
-Text(x=30, y=39, font_name='Helvetica', font_size=40,
+Text(x=30, y=39, font_name=THE_FONT, font_size=40,
      text="Honor Harrington Universe")
 
 # empires
 Circle(cx=1, cy=37.4, radius=0.3,
        stroke=MIDGARD, stroke_width=4)
-Text(x=1.5, y=37.6, font_name='Helvetica', font_size=18,
+Text(x=1.5, y=37.6, font_name=THE_FONT, font_size=18,
      text="Midgard Federation", align="left")
 Circle(cx=1, cy=38.2, radius=0.3,
        stroke=ANDERMAN, stroke_width=4)
-Text(x=1.5, y=38.4, font_name='Helvetica', font_size=18,
+Text(x=1.5, y=38.4, font_name=THE_FONT, font_size=18,
      text="Anderman Empire", align="left")
 Circle(cx=1, cy=38.9, radius=0.3,
        stroke=SILESIA, stroke_width=4)
-Text(x=1.5, y=39.2, font_name='Helvetica', font_size=18,
+Text(x=1.5, y=39.2, font_name=THE_FONT, font_size=18,
      text="Silesia", align="left")
 Circle(cx=1, cy=39.65, radius=0.3,
        stroke=MANTICORE, stroke_width=4)
-Text(x=1.5, y=39.85, font_name='Helvetica', font_size=18,
+Text(x=1.5, y=39.85, font_name=THE_FONT, font_size=18,
      text="Star Kingdom of Manticore", align="left")
 Circle(cx=1, cy=40.4, radius=0.3,
        stroke=HAVEN, stroke_width=4)
-Text(x=1.5, y=40.6, font_name='Helvetica', font_size=18,
+Text(x=1.5, y=40.6, font_name=THE_FONT, font_size=18,
      text="People's Republic of Haven", align="left")
-
-
 Circle(cx=11, cy=37.4, radius=0.3,
        stroke=MATAPAN, stroke_width=4)
-Text(x=11.5, y=37.6, font_name='Helvetica', font_size=18,
+Text(x=11.5, y=37.6, font_name=THE_FONT, font_size=18,
      text="Matapan", align="left")
 Circle(cx=11, cy=38.2, radius=0.3,
        stroke=ASGARD, stroke_width=4)
-Text(x=11.5, y=38.4, font_name='Helvetica', font_size=18,
+Text(x=11.5, y=38.4, font_name=THE_FONT, font_size=18,
      text="Asgard", align="left")
 Circle(cx=11, cy=38.9, radius=0.3,
        stroke=TALBOTT, stroke_width=4)
-Text(x=11.5, y=39.2, font_name='Helvetica', font_size=18,
+Text(x=11.5, y=39.2, font_name=THE_FONT, font_size=18,
      text="Talbot Cluster", align="left")
 Circle(cx=11, cy=39.65, radius=0.3,
        stroke=MONICA, stroke_width=4)
-Text(x=11.5, y=39.85, font_name='Helvetica', font_size=18,
+Text(x=11.5, y=39.85, font_name=THE_FONT, font_size=18,
      text="Republic of Monica", align="left")
 Circle(cx=11, cy=40.4, radius=0.3,
        stroke=PHOENIX, stroke_width=4)
-Text(x=11.5, y=40.6, font_name='Helvetica', font_size=18,
+Text(x=11.5, y=40.6, font_name=THE_FONT, font_size=18,
      text="Phoenix Foundation", align="left")
-
 
 Circle(cx=41, cy=37.4, radius=0.3,
        stroke=SOLARIAN_CORE, stroke_width=4)
-Text(x=41.5, y=37.6, font_name='Helvetica', font_size=18,
+Text(x=41.5, y=37.6, font_name=THE_FONT, font_size=18,
      text="Solarian League", align="left")
 Circle(cx=41, cy=38.2, radius=0.3,
        stroke=SOLARIAN_SHELL, stroke_width=4)
-Text(x=41.5, y=38.4, font_name='Helvetica', font_size=18,
+Text(x=41.5, y=38.4, font_name=THE_FONT, font_size=18,
      text="The Shell", align="left")
 Circle(cx=41, cy=38.9, radius=0.3,
        stroke=SOLARIAN_INNER, stroke_width=4)
-Text(x=41.5, y=39.2, font_name='Helvetica', font_size=18,
+Text(x=41.5, y=39.2, font_name=THE_FONT, font_size=18,
      text="Inner Protectorate", align="left")
 Circle(cx=41, cy=39.65, radius=0.3,
        stroke=SOLARIAN_OUTER, stroke_width=4)
-Text(x=41.5, y=39.85, font_name='Helvetica', font_size=18,
+Text(x=41.5, y=39.85, font_name=THE_FONT, font_size=18,
      text="Outer Protectorate", align="left")
 Circle(cx=41, cy=40.4, radius=0.3,
        stroke=SOLARIAN_VERGE, stroke_width=4, dotted=True)
-Text(x=41.5, y=40.6, font_name='Helvetica', font_size=18,
+Text(x=41.5, y=40.6, font_name=THE_FONT, font_size=18,
      text="The Verge", align="left")
 
 
 Text(x=50, y=37.6, font_name='zapfdingbats', font_size=18, text=" H")
-Text(x=50.5, y=37.6, font_name='Helvetica', font_size=18,
+Text(x=50.5, y=37.6, font_name=THE_FONT, font_size=18,
      text="Empire's System", align="left")
 
 Text(x=50, y=38.4, font_name='zapfdingbats', font_size=18, text="I")
-Text(x=50.5, y=38.4,font_name='Helvetica', font_size=18,
+Text(x=50.5, y=38.4,font_name=THE_FONT, font_size=18,
      text="Neutral System", align="left")
 
 Text(x=50, y=39.2, font_name='zapfdingbats', font_size=18, text="J")
-Text(x=50.5, y=39.2, font_name='Helvetica', font_size=18,
+Text(x=50.5, y=39.2, font_name=THE_FONT, font_size=18,
      text="Manticore System", align="left")
 
 Line(x=49.5, y=39.65, stroke_width=4, stroke=WORMHOLE)
-Text(x=50.5, y=39.85, font_name='Helvetica', font_size=18,
+Text(x=50.5, y=39.85, font_name=THE_FONT, font_size=18,
      text="Wormhole Link", align="left")
 
-Line(x=48, y=34, x1=52, y1=34, stroke_width=4, stroke=SCALE,
+Line(x=48, y=34, x1=52, y1=34,
+     stroke_width=4, stroke=SCALE,
      label="100 light years", label_my=-0.4)
 
 Save()

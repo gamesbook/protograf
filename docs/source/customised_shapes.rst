@@ -39,8 +39,9 @@ refers to as a `Blueprint`_ shape) added to the page - a small A8
 (aka *stroke_width*) has been made thicker for easier viewing of the small
 PNG images that were generated from the original PDF output.
 
-A number of examples also used the ``Common`` command - this allows shared
-properties to be defined once and then used by any number of shapes.
+A number of examples also use the :ref:`Common command <the-common-command>`
+|dash| this allows shared properties to be defined once and then used by any
+number of shapes.
 
 .. _rectangleIndex:
 
@@ -1253,7 +1254,7 @@ on |dash| and styled with stroke color, size, and face.
 
         Circle(cx=1, cy=1, radius=1,
                radii=[30, 150, 270],
-               radii_stroke=white,
+               radii_stroke="white",
                radii_labels=["A", "B", "C"],
                radii_labels_rotation=270,
                radii_labels_stroke="red",
@@ -1606,7 +1607,7 @@ Fill
 
         .. code:: python
 
-          Blueprint(style='grey', stroke=purple)
+          Blueprint(style="grey", stroke="purple")
 
       It has the following properties set:
 

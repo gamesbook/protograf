@@ -11,7 +11,7 @@ an extension of ``.py``
 .. HINT::
 
     This document assumes that :doc:`protograf <index>` is working on your
-    computer after successfully :doc:`Setting Up <setting_up.>`, and that you
+    computer after successfully :doc:`Setting Up <setting_up>`, and that you
     have read and understood the :doc:`Basic Concepts <basic_concepts>`
 
 .. _table-of-contents:
@@ -405,8 +405,8 @@ Supplying the script with a **duplicate property**, for example:
 
 .. code:: python
 
-   display = hexagon(stroke=black, fill=white, height=2, stroke=2)
-                                                         ^^^^^^^^
+   display = hexagon(stroke="black", fill="white", height=2, stroke=2)
+                                                             ^^^^^^^^
    SyntaxError: keyword argument repeated: stroke
 
 This kind of mistake is usually easier to see as both keywords, in this

@@ -25,7 +25,7 @@ Table of Contents
 - `Circular Cards`_
 - `Play Money`_
 
-.. _simple-cards
+.. _simple-cards:
 
 Simple
 ======
@@ -43,7 +43,7 @@ Discussion  This example shows how to construct a deck of cards using these
 
                 l1 = line(
                     x=0.8, x1=5.6, y=7.1, y1=8.4,
-                    stroke=gold, stroke_width=2)
+                    stroke="gold", stroke_width=2)
                 r1 = rectangle(
                     x=0.7, y=7.0, width=5, height=1.5,
                     stroke_width=1, rounding=0.2)
@@ -75,7 +75,7 @@ Screenshot  .. image:: images/cards/cards_simple.png
                :width: 90%
 =========== ==================================================================
 
-.. _matrix-generated-cards
+.. _matrix-generated-cards:
 
 Matrix Generated
 ================
@@ -181,9 +181,9 @@ Discussion  This example shows how to construct a deck of cards using these
               .. code:: python
 
                 Card("13",
-                     text(x=3.15, y=2.6, font_size=180, stroke=black,
+                     text(x=3.15, y=2.6, font_size=180, stroke="black",
                           text='\u2660'),
-                     text(x=3.15, y=3.8, font_size=60, stroke=white,
+                     text(x=3.15, y=3.8, font_size=60, stroke="white",
                           text='\u2660'))
 
             The Jokers (not shown in the screenshot) are the **extra** 2
@@ -195,8 +195,8 @@ Discussion  This example shows how to construct a deck of cards using these
 
                 jok_pic = Common(x=0.8, y=1.9, width=5, height=5)
                 Card("53",
-                     text(common=value_top, stroke=black, text='J'),
-                     text(common=value_low, stroke=black, text='J'),
+                     text(common=value_top, stroke="black", text='J'),
+                     text(common=value_low, stroke="black", text='J'),
                      image("images/joker_black.png", common=jok_pic))
 
 ----------- ------------------------------------------------------------------
@@ -204,7 +204,7 @@ Screenshot  .. image:: images/cards/cards_standard.png
                :width: 90%
 =========== ==================================================================
 
-.. _image-only-cards
+.. _image-only-cards:
 
 Image-Only Cards
 ================
@@ -246,7 +246,7 @@ Screenshot  .. image:: images/cards/cards_images.png
                :width: 90%
 =========== ==================================================================
 
-.. _hexagonal-cards
+.. _hexagonal-cards:
 
 Hexagonal Cards
 ================
@@ -278,7 +278,7 @@ Screenshot  .. image:: images/cards/cards_hexagonal.png
                :width: 90%
 =========== ==================================================================
 
-.. _circular-cards
+.. _circular-cards:
 
 Circular Cards
 ==============
@@ -307,7 +307,7 @@ Screenshot  .. image:: images/cards/cards_circular.png
 =========== ==================================================================
 
 
-.. _play-money
+.. _play-money:
 
 Play Money
 ==========

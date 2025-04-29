@@ -34,7 +34,7 @@ If you are using the ``Text`` command, the font can be setup as follows:
 
 .. code:: python
 
-    Text("Hello World!", font_name="Arial", font_size=48, stroke=red)
+    Text("Hello World!", font_name="Arial", font_size=48, stroke="red")
 
 If you do not supply the font properties, they will default to:
 
@@ -47,7 +47,7 @@ If you want to set the font for a whole section of script, then using the
 
 .. code:: python
 
-    Font(name="Arial", size=48, stroke=red)
+    Font(name="Arial", size=48, stroke="red")
 
 In this case, the properties are similar but the "*font_*" prefix is not
 needed.
@@ -57,6 +57,8 @@ needed.
     Font names, and their associated file names, should be considered
     as **case-sensitive**!
 
+
+.. _builtin-fonts:
 
 Built-In Fonts
 ==============
@@ -98,6 +100,8 @@ can be referred to as follows:
 - *Dotum* - Korean
 - *Batang* - Korean (serif)
 
+
+.. _additionalFonts:
 
 Using Additional Fonts
 ======================
@@ -172,8 +176,10 @@ font's family name; for example:
 
 .. code:: python
 
-    Text(text='Hello World', font_name="Merriweather Bold")
+    Text(text='Hello World', font_name="Merriweather-Bold")
 
+
+.. _supplementaryFonts:
 
 Supplementary Fonts
 ===================

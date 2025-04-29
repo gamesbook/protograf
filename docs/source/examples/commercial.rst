@@ -2,6 +2,8 @@
 Examples: Commercial Board Games and Maps
 =========================================
 
+.. |dash| unicode:: U+2014 .. EM DASH SIGN
+
 These examples are meant to demonstrate the type of output you can expect
 to create with **protograf**.  They are *not* meant to be exhaustive or
 comprehensive!
@@ -240,7 +242,7 @@ Source Code `honorverse.py <https://github.com/gamesbook/protograf/blob/master/e
 ----------- ------------------------------------------------------------------
 Discussion  This example shows a map with the locations of stars described in the
             "Honor Harrington" science fiction series, written by David Weber, and
-            sometimes termed `the Honorverse <https://en.wikipedia.org/wiki/Honorverse>`_
+            sometimes termed the `Honorverse <https://en.wikipedia.org/wiki/Honorverse>`_
 
             The backdrop to the series is that FTL travel is possible; both with
             spaceships travelling through hyperspace as well as through wormholes.
@@ -262,18 +264,21 @@ Discussion  This example shows a map with the locations of stars described in th
 
             * The "stars" are just point locations on the grid; a Python loop
               processes them and styles each according to its information; using
-              the ZapfDingbats font to provide icons for the stars.
-            * The names of stars allow their point locations to be accessed and
-              form the start and end points of lines showing the wormholes.
-            * The script has a boolean "toggle" (called ``IS_DARK``) which can
+              ``if`` and ``else``, while the ZapfDingbats font provides icons
+              used to show the star.
+            * The names of stars allow their point locations to be "looked" up
+              in the list, and the stars locations form the start and end points
+              of lines showing the connecting wormholes.
+            * The script has a boolean "toggle" (called ``DARK_MODE``) which can
               be set to change the background color of the map to black and
               the stars to white.
 
 ----------- ------------------------------------------------------------------
-Screenshot  .. image:: images/boards/maps/honoverse.png
+Screenshot  .. image:: images/boards/maps/honorverse.png
                :width: 90%
 
 ----------- ------------------------------------------------------------------
-Screenshot  .. image:: images/boards/maps/manticore.png
+"Zoomed"    .. image:: images/boards/maps/manticore.png
                :width: 90%
+
 =========== ==================================================================

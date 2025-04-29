@@ -588,28 +588,28 @@ Example 17. Multiple Tracks - starts
 
         # polygon
         Track(
-          Polygon(cx=1, cy=5, radius=0.5, sides=4, stroke=red),
+          Polygon(cx=1, cy=5, radius=0.5, sides=4, stroke="red"),
           shapes=[shp])
         Track(
-          Polygon(cx=3, cy=5, radius=0.5, sides=4, stroke=red),
+          Polygon(cx=3, cy=5, radius=0.5, sides=4, stroke="red"),
           shapes=[shp],
           clockwise=True)
         # circle
         Track(
-          Circle(cx=1, cy=3, radius=0.5, stroke=red),
+          Circle(cx=1, cy=3, radius=0.5, stroke="red"),
           shapes=[shp],
           angles=[45,135,225,315])
         Track(
-          Circle(cx=3, cy=3, radius=0.5, stroke=red),
+          Circle(cx=3, cy=3, radius=0.5, stroke="red"),
           shapes=[shp],
           angles=[45,135,225,315],
           clockwise=True)
         # square
         Track(
-          Square(x=0.75, y=0.75, side=0.75, stroke=red),
+          Square(x=0.75, y=0.75, side=0.75, stroke="red"),
           shapes=[shp])
         Track(
-          Square(x=2.75, y=0.75, side=0.75, stroke=red),
+          Square(x=2.75, y=0.75, side=0.75, stroke="red"),
           shapes=[shp],
           clockwise=True)
 
@@ -645,8 +645,8 @@ Example 18. Circular Track - clock
           cx=2, cy=3, radius=1.8, stroke_width=2, dot=0.1)
 
         times = circle(
-          cx=1, cy=1, radius=0.25, stroke=white,
-          label='{{sequence}}', label_stroke=black)
+          cx=1, cy=1, radius=0.25, stroke="white",
+          label='{{sequence}}', label_stroke="black")
 
         Track(
           circle(cx=2, cy=3, radius=1.5),
@@ -681,10 +681,10 @@ Example 19. Polygon Track - scoring
 
         trk = polygon(cx=2, cy=3, sides=30, radius=1.75)
         score = Common(
-            cx=1, cy=1, radius=0.18, stroke=navy,
+            cx=1, cy=1, radius=0.18, stroke="navy",
             label='{{sequence}}', label_size=6)
         # white circles
-        shp = circle(common=score, fill=white)
+        shp = circle(common=score, fill="white")
         Track(
             trk,
             shapes=[shp],
@@ -693,7 +693,7 @@ Example 19. Polygon Track - scoring
             start=24
         )
         # blue circles
-        shp5 = circle(common=score, fill=aqua)
+        shp5 = circle(common=score, fill="aqua")
         Track(
             trk,
             shapes=[shp5],
