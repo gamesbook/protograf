@@ -1,4 +1,4 @@
-echo -e "\nCreating PDFs and PNGs for all examples (except those in manual)"
+echo -e "\nCreating PDFs for all examples (except those in manual)"
 echo ""
 mkdir -p /tmp/demo
 echo -e "\nAll examples output is saved to /tmp/demo"
@@ -51,7 +51,7 @@ python boards/commercial/underwater_cities.py --no-png -d /tmp/demo
 python boards/commercial/warpwar.py --no-png -d /tmp/demo
 # ---- boards: maps
 echo -e "\nCreating maps..."
-python boards/map/honorverse.py --no-png -d /tmp/demo
+python boards/maps/honorverse.py --no-png -d /tmp/demo
 # ---- counters
 echo -e "\nCreating counters..."
 python counters/counters.py --no-png -d /tmp/demo

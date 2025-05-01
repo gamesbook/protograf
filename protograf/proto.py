@@ -1064,7 +1064,7 @@ def Data(**kwargs):
     if globals.dataset and len(globals.dataset) > 0:
         first = globals.dataset[0].keys()
         for key in first:
-            if not key.isalpha():
+            if not (key.isalpha() or "_" in key):
                 tools.feedback(
                     "The Data headers must only be characters (without spaces)"
                     f' e.g. not "{key}"',
@@ -1796,7 +1796,6 @@ def Hexagons(rows=1, cols=1, sides=None, **kwargs):
         rows: int, cols: int, stop: int, the_cols: list, odd_mid: bool = True
     ):
         """Draw rows of hexagons for each column in `the_cols`"""
-        breakpoint()
         sequence = 0
         top_row = 0
         end_row = rows - 1

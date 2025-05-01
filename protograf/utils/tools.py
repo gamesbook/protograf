@@ -19,11 +19,6 @@ import sys
 from urllib.parse import urlparse
 import xlrd
 
-# third party
-from reportlab.pdfbase import pdfmetrics
-from reportlab.pdfbase.ttfonts import TTFont, TTFError
-from reportlab.pdfbase.pdfmetrics import registerFontFamily
-
 # local
 from protograf.utils.support import numbers, feedback
 
@@ -798,107 +793,6 @@ def alpha_column(num: int, lower: bool = False) -> string:
         )
 
 
-def register_font(
-    font_name: str = None,
-    style: str = None,
-    directory: str = None,
-    filename: str = None,
-):
-    """Use likely combos of name and styles to register font and family styles."""
-
-    def register_font_style(
-        font_name: str,
-        font_type: FontStyleType,
-        style: str = None,
-        directory: str = None,
-        filename: str = None,
-    ):
-        """Use pdfmetrics to registerFont, linked to a font file, for a style type.
-
-        Args:
-            style
-                use the name of a specific style e.g. Light or Thin or Medium
-                to register a single specific style; useful when a font does
-                not actually have a Regular
-            filename
-                the actual filename might not be based on the font name;
-                supply this instead
-        """
-        font_name = font_name.strip(" ")
-        match font_type:
-            case FontStyleType.REGULAR:
-                fstyles = [style] if style else ["", "Regular", "R", "Rg"]
-                style_name = f"{font_name}"
-            case FontStyleType.BOLD:
-                fstyles = ["Bold", "Bo", "Bd", "B"]
-                style_name = f"{font_name} Bold"
-            case FontStyleType.ITALIC:
-                fstyles = ["Italic", "It", "I", "Oblique", "Ob", "O"]
-                style_name = f"{font_name} Italic"
-            case FontStyleType.BOLDITALIC:
-                fstyles = ["BoldItalic", "BoIt", "BI", "BoldOblique", "BoOb", "BO", "Z"]
-                style_name = f"{font_name} Bold Italic"
-
-        base_names = list(
-            set(
-                [
-                    font_name,
-                    str(font_name).replace(" ", "_"),
-                    str(font_name).replace(" ", "-"),
-                ]
-            )
-        )
-        file_seps = ["", "-", "_", " "]
-        directory = "" if directory is None else directory
-        path = directory if os.path.exists(directory) else ""
-        for base_name in base_names:
-            for style in fstyles:
-                for sep in file_seps:
-                    if filename:
-                        _file_name = f"{filename}{sep}{style}.ttf"
-                    else:
-                        _file_name = f"{base_name}{sep}{style}.ttf"
-                    full_file_name = os.path.join(path, _file_name)
-                    full_file_name_lower = os.path.join(path, full_file_name.lower())
-                    filenames = [full_file_name, full_file_name_lower]
-                    for fname in filenames:
-                        # print(f'{style_name=} {fname=}')
-                        try:
-                            pdfmetrics.registerFont(TTFont(style_name, fname))
-                            # print(f'Registered:  {style_name} file:{fname}')
-                            return style_name
-                        except TTFError:
-                            pass
-        return None
-
-    if not font_name:
-        feedback("No font name supplied for registration!", True)
-    if font_name in BUILTIN_FONTS:
-        return  # font families available in ReportLab without registration
-
-    # get base font
-    font_regular = register_font_style(
-        font_name, FontStyleType.REGULAR, style, directory, filename
-    )
-    if not font_regular:
-        raise TTFError
-    # possble additional styles
-    kwargs = {}
-    kwargs["bold"] = register_font_style(
-        font_name, FontStyleType.BOLD, style, directory, filename
-    )
-    kwargs["italic"] = register_font_style(
-        font_name, FontStyleType.ITALIC, style, directory, filename
-    )
-    kwargs["boldItalic"] = register_font_style(
-        font_name, FontStyleType.BOLDITALIC, style, directory, filename
-    )
-    # full family
-    if font_regular and kwargs:
-        # print(f'Register Family! {font_regular=} {kwargs=}')
-        registerFontFamily(font_name.strip(" "), normal=font_regular, **kwargs)
-
-
 def sheet_column(num: int, lower: bool = False) -> string:
     """Convert a spreadsheet number to a column letter
 
@@ -930,6 +824,11 @@ def sheet_column(num: int, lower: bool = False) -> string:
             )
 
     return converter(num, lower)
+
+
+def register_font(name: str, filename: str = None):
+    """Register a font."""
+    pass
 
 
 def base_fonts():
@@ -976,11 +875,11 @@ def base_fonts():
         try:
             name = ffont["name"]
             register_font(name)
-        except TTFError:
+        except Exception:
             try:
                 alt = ffont.get("alternate")
                 register_font(name, filename=alt)
-            except TTFError:
+            except Exception:
                 missing.append(name)
     if missing:
         names = ", ".join(missing)

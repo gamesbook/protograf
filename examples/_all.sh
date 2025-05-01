@@ -51,7 +51,7 @@ python boards/commercial/underwater_cities.py -d /tmp/demo
 python boards/commercial/warpwar.py -d /tmp/demo
 # ---- boards: maps
 echo -e "\nCreating maps..."
-python boards/map/honorverse.py -d /tmp/demo
+python boards/maps/honorverse.py -d /tmp/demo
 # ---- counters
 echo -e "\nCreating counters..."
 python counters/counters.py -d /tmp/demo

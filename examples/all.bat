@@ -61,7 +61,7 @@ python boards\commercial\warpwar.py --no-png -d %location%
 
 REM ---- boards: maps
 ECHO "Creating maps..."
-python boards\map\honorverse.py  --no-png -d %location%
+python boards\maps\honorverse.py  --no-png -d %location%
 
 REM ---- counters
 ECHO "Creating counters..."

@@ -5,9 +5,10 @@ protograf
 Changes
 =======
 
-2025-03-?? (0.1.7)
+2025-05-01 (0.1.7)
 ------------------
 - Drop use of ReportLab and switch to PyMuPDF
+- Adjust shapes and commands according underlying capabilities
 
 2025-03-05 (0.1.6)
 ------------------

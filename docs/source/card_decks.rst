@@ -321,9 +321,8 @@ Each **column** must be named so that the data can be referenced and used:
 .. IMPORTANT::
 
     The names used must **only** consist of normal alphabetical characters
-    |dash| upper- or lower-case |dash| and **not** other symbols, punctuation
-    marks, spaces etc.
-
+    |dash| upper- or lower-case |dash| and **not** other numbers, symbols,
+    punctuation marks, spaces etc. except for an underscore (``_``).
 
 The ``Data`` command uses different properties to access these different
 types of sources:
