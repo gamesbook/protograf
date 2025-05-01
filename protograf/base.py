@@ -12,6 +12,7 @@ import copy
 from enum import Enum
 import inspect
 import json
+import io
 import logging
 import math
 import os
@@ -19,11 +20,11 @@ from pathlib import Path, PosixPath
 from urllib.parse import urlparse
 
 # third party
+import cairosvg
 import jinja2
 from jinja2.environment import Template
-from svglib.svglib import svg2rlg
 import requests
-from PIL import Image
+from PIL import Image, UnidentifiedImageError
 import pymupdf
 from pymupdf import Shape as muShape, Point as muPoint, Page as muPage, Matrix
 from pymupdf.utils import getColor, getColorList
@@ -1929,6 +1930,17 @@ class BaseShape:
                 )
             return None
 
+        def get_image_from_svg(image_location: str = None):
+
+            with open(image_location) as f:
+                svg_code = f.read()
+            png_bytes = cairosvg.svg2png(
+                bytestring=svg_code.encode('utf-8'),
+                dpi=300
+            )
+            image = Image.open(io.BytesIO(png_bytes))
+            return image
+
         def save_image_from_url(url: str):
             """Download image from network and save locally if not present."""
             # tools.feedback(f"### image save: {url=} ")
@@ -1941,15 +1953,20 @@ class BaseShape:
                     f.write(image.content)
             return image_local
 
-        def image_resize(bbox: pymupdf.Rect, rotation: float) -> pymupdf.Rect:
+        def image_box_resize(
+            bbox: pymupdf.Rect, img_path: str, rotation: float
+        ) -> pymupdf.Rect:
             """Recompute bounding Rect for a rotated image to maintain image size.
 
             Args
-                bbox: the original bounding box for the image
-                rotation: angle, in degrees, of image rotation
+                bbox: Rect; original bounding box for the image
+                image_path: str; full path to image file
+                rotation: angle; degrees of image rotation
             Returns
                 adjusted Rect (new bounding box)
             """
+            if not rotation or rotation == 0:
+                return bbox
             # Compute Rect center point
             center = (bbox.tl + bbox.br) / 2
             # Define the desired rotation matrix
@@ -1958,15 +1975,43 @@ class BaseShape:
             quad = bbox.morph(center, matrx)
             # Compute the rectangle hull of the quad for new boundary box
             new_bbox = quad.rect
-            # Resize if non-square Rect
-            factor = max(new_bbox.width / bbox.width, new_bbox.height / bbox.height)
-            if factor != 1:
-                scale = pymupdf.Matrix(1 / factor, 1 / factor)
-                squad = new_bbox.morph(center, scale)
-                scaled_bbox = squad.rect
-                return scaled_bbox
-            else:
-                return new_bbox
+            # Check image dimensions and ratios
+            try:
+                img = Image.open(img_path)
+            except UnidentifiedImageError:
+                try:
+                    img = get_image_from_svg(img_path)
+                except Exception:
+                    tools.feedback(
+                        f'Unable to open and process the image "{img_path}"', True
+                    )
+            iwidth = img.size[0]
+            iheight = img.size[1]
+            iratio = iwidth / iheight
+            bratio = new_bbox.width / new_bbox.height
+            # Calculate new BBOX size based on image
+            if iratio != bratio:
+                if rotation > 270.0:
+                    _rotation = rotation - 270.0
+                elif rotation > 180.0:
+                    _rotation = rotation - 180.0
+                elif rotation > 90.0:
+                    _rotation = rotation - 90.0
+                else:
+                    _rotation = rotation
+                rotation_rad = math.radians(_rotation)
+                img_height = bbox.width * iheight / iwidth
+                new_box_height = bbox.width * math.sin(
+                    rotation_rad
+                ) + img_height * math.cos(rotation_rad)
+                new_box_width = bbox.width * math.cos(
+                    rotation_rad
+                ) + img_height * math.sin(rotation_rad)
+                new_bbox = pymupdf.Rect(
+                    (center.x - new_box_width / 2.0, center.y - new_box_height / 2.0),
+                    (center.x + new_box_width / 2.0, center.y + new_box_height / 2.0),
+                )
+            return new_bbox
 
         def image_render(image_location) -> object:
             """Load, first from local cache then network, and draw."""
@@ -2022,12 +2067,12 @@ class BaseShape:
                 )
                 return img, True
 
-        # ---- calculate outline for image
+        # ---- calculate BBOX for image
         width, height = width_height[0], width_height[1]
         scaffold = (origin[0], origin[1], origin[0] + width, origin[1] + height)
         if rotation is not None:
             # need a larger rect!
-            new_origin = image_resize(pymupdf.Rect(scaffold), rotation)
+            new_origin = image_box_resize(pymupdf.Rect(scaffold), image_local, rotation)
             scaffold = (
                 new_origin[0],
                 new_origin[1],

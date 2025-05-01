@@ -231,24 +231,28 @@ PageBreak()
 Blueprint()
 Text(common=txt, text="Dates: format and styles")
 dtext = Common(x=0.25, align="left", font_size=8)
-Text(common=dtext, y=5, text="1.  "+Today())
-Text(common=dtext, y=4, text="2.  "+Today(details="date", style="usa"))
+Text(common=dtext, y=1, text="1.  "+Today())
+Text(common=dtext, y=2, text="2.  "+Today(details="date", style="usa"))
 Text(common=dtext, y=3, text="3.  "+Today(details="date", style="eur"))
-Text(common=dtext, y=2, text="4.  "+Today(details="datetime", style="usa"))
-Text(common=dtext, y=1, text="5.  "+Today(details="datetime", style="eur"))
+Text(common=dtext, y=4, text="4.  "+Today(details="datetime", style="usa"))
+Text(common=dtext, y=5, text="5.  "+Today(details="datetime", style="eur"))
 PageBreak()
 
 # ---- rotation: image
 Blueprint()
 Text(common=txt, text="Images: normal & rotation")
-Image("sholes_typewriter.png", x=0, y=1, width=1.5, height=1.5, title="PNG")
-Image("sholes_typewriter.png", x=2, y=1, width=1.5, height=1.5, title="60\u00B0", rotation=60)
+Image("sholes_typewriter.png",
+      width=1.5, height=1.5,
+      x=0, y=0, title="PNG")
+Image("sholes_typewriter.png",
+      width=1.5, height=1.5,
+      x=2, y=0, title="60\u00B0", rotation=60)
 Image("noun-typewriter-3933515.svg",
       width=1.5, height=1.5,
-      x=0, y=4, title="SVG")
+      x=0, y=3, title="SVG")
 Image("noun-typewriter-3933515.svg",
       width=1.5, height=1.5,
-      x=2, y=4, title="45\u00B0", rotation=45)
+      x=2, y=3, title="45\u00B0", rotation=45)
 PageBreak()
 
 # ---- rotation: rhombus

@@ -1066,8 +1066,9 @@ def Data(**kwargs):
         for key in first:
             if not key.isalpha():
                 tools.feedback(
-                    'The Data headers must only be characters (without spaces)'
-                    f' e.g. not "{key}"', True
+                    "The Data headers must only be characters (without spaces)"
+                    f' e.g. not "{key}"',
+                    True,
                 )
 
     return globals.dataset
@@ -2632,3 +2633,19 @@ def d100(rolls=None):
 
 def named(variable):
     return f"{variable=}".split("=")[0]
+
+
+# ---- shortcuts ====
+
+
+def A8BA():
+    """Shortcut to setup A8 page with Blueprint; use for examples."""
+    Create(
+        paper="A8",
+        margin_left=0.5,
+        margin_right=0.5,
+        margin_bottom=0.5,
+        margin_top=0.5,
+        font_size=8,
+    )
+    Blueprint(stroke_width=0.5)

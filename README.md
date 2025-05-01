@@ -118,27 +118,22 @@ current / potential areas of work or idea development.
 * [ ] Arcs (pathways) inside a hexagon (**in progress**)
 * [ ] Shortcut notation for styling of a shape
 * [ ] Stripes: interior "areas" for a Rectangle
-* [x] Rotation:
-    * [x] text along a line
-    * [x] Polygon
-    * [ ] Trapezoid
-    * [ ] Triangle
 * [ ] Cards:
     * [ ] support card-back designs
     * [ ] grid lines for hexagonal cards
-    * [ ] multiple bleed areas
+    * [ ] multiple custom bleed areas
     * [ ] access to Google Sheets
     * [x] extract rectangular cards as PNG files
 * [ ] Color:
-    * [ ] add support for CMYK
+    * [ ] add support for CYMK
 
 ## Potential Examples
 
 These are possible examples to show board creation based on existing games:
 
-* [ ] Extra abstract game boards: Ludo, 9 Mens Morris, Wari, Mu Torere
-* [ ] Wargame board: Squad Leader with terrain features (vector and bitmap)
-* [ ] Traveller board: show a fully-styled Star System (demo a custom Shape?)
+* [ ] Extra abstract game boards: 9 Mens Morris, Ludo, Wari, Mu Torere
+* [ ] Wargame board: Squad Leader with full terrain features (vector and bitmap)
+* [ ] Traveller board: show a fully-styled Star System
 * [x] WarpWar board: show a fully-styled example
 * [ ] 18xx board: show a basic map with tracks, towns, cities and off-map areas
 
@@ -149,18 +144,19 @@ These are possible examples to show board creation based on existing games:
 > "[Snow Crash](https://en.wikipedia.org/wiki/Snow_Crash)", Neal Stephenson, 1992.
 
 As always, with Python, you are building "on the shoulders of giants".
-In this case, the [](https://pymupdf.io/) library provides all of the
+In this case, the [pyMuPDF](https://pymupdf.io/) library provides all of the
 core infrastructure used to do the underlying graphics processing, PDF file
 creation and images exports; __protograf__ is effectively a highly customised
 wrapper to simplify common uses around its existing and extensive capabilities.
 
 Earlier versions of  __protograf__  used the *ReportLab PDF Toolkit*, which is
 also a very powerful library for supporting this type of application. Internal
-terminology, such as `shapes`, was developed before the adoption of *pyMuPDF*.
+terminology, such as `shapes`, was developed before the adoption of *pyMuPDF*
+and it is coincidental that these are similar!
 
 Additional libraries in use include:
 
-* `svglib` https://pypi.org/project/svglib/ - support for drawing SVG images
+* `cairoSVG` https://pypi.org/project/cairosvg/ - support for drawing SVG images
 * `bgg-api` https://pypi.org/project/bgg-api/ - support for access to the
   [BoardGameGeek](https://boardgamegeek.com) API
 * `xlrd` https://pypi.org/project/xlrd/ - support for access to Excel `.xls` files

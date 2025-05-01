@@ -22,6 +22,7 @@ Table of Contents
 - `Go`_
 - `Hex`_
 - `HexHex Games`_
+- `Morabaraba`_
 - `Octagons`_
 - `TicTacToe`_
 
@@ -182,6 +183,26 @@ Discussion  This example shows how to construct a HexHex board, but with
 
 ----------- ------------------------------------------------------------------
 Screenshot  .. image:: images/boards/abstract/hexhex_hexagons.png
+               :width: 66%
+=========== ==================================================================
+
+
+Morabaraba
+==========
+`↑ <table-of-contents_>`_
+
+=========== ==================================================================
+Title       *Morabaraba Board*
+----------- ------------------------------------------------------------------
+Source Code `morabaraba.py <https://github.com/gamesbook/protograf/blob/master/examples/boards/abstract/morabaraba.py>`_
+----------- ------------------------------------------------------------------
+Discussion  This example shows how to construct a Morabaraba board.
+
+            There is just a simple set of Rectangles, with corners connected by
+            Lines.
+
+----------- ------------------------------------------------------------------
+Screenshot  .. image:: images/boards/abstract/morabaraba.png
                :width: 66%
 =========== ==================================================================
 

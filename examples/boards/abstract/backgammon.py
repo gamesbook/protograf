@@ -7,14 +7,14 @@ Created on: 29 December 2024
 
 from protograf import *
 
-Create(filename="backgammon.pdf", margin=1, paper=landscape(A4))
+Create(filename="backgammon.pdf", margin=1, paper="A4-l")
 
 # board outline
-Rectangle(x=3, y=0, width=21, height=18, stroke_width=2, fill=burlywood)
+Rectangle(x=3, y=0, width=21, height=18, stroke_width=2, fill="burlywood")
 # zones background
 zone = Common(width=9, height=16, stroke_width=2)
-Rectangle(common=zone, x=4, y=1, fill=bisque)
-Rectangle(common=zone, x=14, y=1, fill=bisque)
+Rectangle(common=zone, x=4, y=1, fill="bisque")
+Rectangle(common=zone, x=14, y=1, fill="bisque")
 # shared sizes
 points = Common(width=1.5, height=7.5, top=0.01)
 # left zone
@@ -39,5 +39,4 @@ Sequence(
 Rectangle(common=zone, x=4, y=1, fill=None)
 Rectangle(common=zone, x=14, y=1, fill=None)
 
-PageBreak()
 Save()

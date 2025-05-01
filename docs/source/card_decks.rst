@@ -321,8 +321,9 @@ Each **column** must be named so that the data can be referenced and used:
 .. IMPORTANT::
 
     The names used must **only** consist of normal alphabetical characters
-    |dash| upper- or lower-case |dash|  and **not** other symbols, punctuation
+    |dash| upper- or lower-case |dash| and **not** other symbols, punctuation
     marks, spaces etc.
+
 
 The ``Data`` command uses different properties to access these different
 types of sources:
@@ -343,8 +344,9 @@ types of sources:
 .. HINT::
 
    If you are a Python programmer, there is a final way to provide data.
-   Internally, all of these data sources are converted to a *dictionary*,
-   so if you have one available, through any means, this can be supplied
+   Internally, all of these data sources are converted to a list of
+   *dictionarie*, whose keys all match and correspond to the column names,
+   so if you have this available, through any means, this it can be supplied
    directly to ``Data`` via a **source** property.  The onus is on you
    to ensure that the dictionary is correctly formatted.
 
@@ -611,18 +613,18 @@ This example shows how to use the command, with reference to the ``Data``
 from `Data Example #5 Lists`_.  The text appearing at the top of all cards
 is derived from the **Name** column:
 
-    .. code:: python
+.. code:: python
 
-        Card("all", text(text=T("{{ Name }}"), x=3.3, y=7.5, font_size=18))
+    Card("all", text(text=T("{{ Name }}"), x=3.3, y=7.5, font_size=18))
 
 Data from the column can also be mixed in with other text or values:
 
-    .. code:: python
+.. code:: python
 
-        power = text(
-            text=T("<i>Long-lived</i> <b>({{ Age or '\u221E' }})</b>"),
-            x=0.5, y=1.2, width=5, font_size=18,
-            align="centre", wrap=True, fill=None)
+    power = text(
+        text=T("<i>Long-lived</i> <b>({{ Age or '\u221E' }})</b>"),
+        x=0.5, y=1.2, width=5, font_size=18,
+        align="centre", wrap=True, fill=None)
 
 Here the Text assigned to the name *power* uses the full text capability to
 style the text - italic and bold - and also uses the **or** option in the
@@ -631,6 +633,16 @@ sign - to use when there no *Age* value (for example, for the "Gandalf" row).
 
 The full code for this example is available as
 `cards_lotr.py <https://github.com/gamesbook/protograf/blob/master/examples/cards/cards_lotr.py>`_
+
+.. HINT::
+
+    If the column name you use in the ``T()`` command does **not** appear in
+    any the actual column names, you will get an error such as:
+
+    .. code::
+
+        FEEDBACK:: Unable to process data with this template ('Ag' is undefined)
+
 
 .. _the-selection-command:
 
