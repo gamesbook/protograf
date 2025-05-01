@@ -48,7 +48,7 @@ Introduction
 ============
 `↑ <table-of-contents_>`_
 
-Cards are a common and widely used method of storing and transmitting
+Cards are a common and widely used method of storing and displaying
 small sets of related data.
 
 Scientists have used index cards since the 17th century and, of course,
@@ -61,9 +61,9 @@ Europe, coming into more widespread use somewhere in the 9th and 14th
 centuries respectively.
 
 The massive rise in popularity of a game like *Magic the Gathering*, from
-the 1990s onwards, has inspired the greater use of cards in all aspects of
+the 1990s onwards, has inspired the much greater use of cards in all aspects of
 the modern board gaming experience, with cards or tiles taking the predominant
-role  in many of them.
+role in many of them.
 
 
 Basic Concepts
@@ -80,9 +80,9 @@ There are two core commands needed; the ``Card()`` and the ``Deck()``:
 -  A ``Card()`` command is used to specify the design for a card, or range
    of cards, typically using elements that have already been defined.
    The patterns or designs can be set to appear on single or multiple cards.
--  A ``Deck()`` command is used to specify type, size and number of cards
-   that will be used to create "frames" for all of the cards in the deck and
-   then lay them out on one or more pages.
+-  A ``Deck()`` command is used to specify type, size and number of cards,
+   as well as any spacing between them, that will be used to create "frames"
+   for all of the cards in the deck and then lay them out on one or more pages.
 
 .. NOTE::
 
@@ -91,14 +91,16 @@ There are two core commands needed; the ``Card()`` and the ``Deck()``:
     on `Countersheet and Counter Commands`_
 
 In many cases, the ``Data()`` command will be needed in order to provide
-settings, for the properties of the elements appearing on a card, from another
-source; for example, an Excel file.
+settings for the properties of the elements appearing on a card, from another
+source; for example, an Excel or CSV file.  This will typically be text that
+needs to appear, but could also include colors and links to images.
 
 In some cases, the ``Matrix()`` command will be needed. This is an alternate
 method of providing the settings for the properties of the elements appearing
 on a card.
 
 These commands, and the ones supporting them, are described in detail below.
+
 For additional examples that illustrate some of these, see the
 :doc:`card and deck examples <examples/cards>` section.
 
@@ -117,10 +119,10 @@ The following are key properties that will usually need to be set for a
 ``Deck``:
 
 - **cards** - this is the number of cards appearing in the deck. It defaults
-  to 9. Note that other commands such as ``Data()`` and ``Matrix()`` can alter
-  this value
-- **height** - this is the card height. It defaults to 8.8 cm
-- **width** - this is the card width. It defaults to 6.3 cm
+  to ``9``. Note that other commands such as ``Data()`` and ``Matrix()`` will
+  alter this value
+- **height** - this is the card height; it defaults to ``8.8`` cm
+- **width** - this is the card width. It defaults to ``6.3`` cm
 
 .. IMPORTANT::
 
@@ -253,7 +255,7 @@ This example shows how different shapes can be assigned to cards:
 
         Deck(cards=9)
 
-        line1 = line(x=0.8, x1=5.6, y=7.1, y1=8.4, stroke=red)
+        line1 = line(x=0.8, x1=5.6, y=7.1, y1=8.4, stroke="red")
         rect1 = rectangle(x=0.7, y=7.0, width=5, height=1.5)
         text1 = text(text='proto', x=3.1, y=4.4, font_size=18)
         line_in_rect = group(rect1, line1)
@@ -316,6 +318,13 @@ Each **column** must be named so that the data can be referenced and used:
   to the *labels* property of the command
 - the names for a "list of lists" must appear in the first list in the lists
 
+.. IMPORTANT::
+
+    The names used must **only** consist of normal alphabetical characters
+    |dash| upper- or lower-case |dash| and **not** other symbols, punctuation
+    marks, spaces etc.
+
+
 The ``Data`` command uses different properties to access these different
 types of sources:
 
@@ -335,8 +344,9 @@ types of sources:
 .. HINT::
 
    If you are a Python programmer, there is a final way to provide data.
-   Internally, all of these data sources are converted to a *dictionary*,
-   so if you have one available, through any means, this can be supplied
+   Internally, all of these data sources are converted to a list of
+   *dictionarie*, whose keys all match and correspond to the column names,
+   so if you have this available, through any means, this it can be supplied
    directly to ``Data`` via a **source** property.  The onus is on you
    to ensure that the dictionary is correctly formatted.
 
@@ -473,7 +483,7 @@ Data Example #6 BoardGameGeek API
 This example shows how data is loaded for boardgame details obtained from the
 :ref:`BoardGameGeek API <the-bgg-command>`.
 
-    .. code:: python
+.. code:: python
 
     boardgames = BGG(ids=[1, 2, 3], progress=True)
     Data(data_list=boardgames.data_list)
@@ -491,7 +501,7 @@ The game information can then be used as it would for other data sources.
 A collection of games, linked to a BoardGameGeek user, can also be retrieved
 by supplying their username, for example:
 
-    .. code:: python
+.. code:: python
 
     boardgames = BGG(user='BenKenobi1976', progress=True)
     Data(data_list=boardgames.data_list)
@@ -514,18 +524,18 @@ The ``Matrix`` command uses these properties to create data:
 This command will generate a dataset for the cards, based on all combinations
 of values in a "list of lists"; so for this set of *data*:
 
-    .. code:: python
+.. code:: python
 
-        data=[
-            ['A', 'B', ],
-            ['1', '2', ],
-            ['x', 'y', ],
-         ])
+    data=[
+        ['A', 'B', ],
+        ['1', '2', ],
+        ['x', 'y', ],
+     ])
 
 There are 8 combinations:  A-1-x, A-1-y, A-2-x, A-2-y, B-1-x, B-1-y, B-2-x,
 and B-2-y and therefore eight cards in the deck.
 
-See the `Data Example #3`_ above for a full Matrix.
+See the `Data Example #3 Matrix`_ above for a full Matrix.
 
 .. _the-countersheet-command:
 
@@ -583,7 +593,8 @@ When this group named *stack* is assigned to a card and then drawn,
 the Rectangle will be drawn first, followed by the Line, following the
 order in which the appear in the group's listing.
 
-This command is somewhat similar to ``Common()``, which provides a way to
+This command is somewhat similar to the
+:ref:`Common command <the-common-command>`, which also provides a way to
 group commonly used properties.
 
 .. _the-template-command:
@@ -599,21 +610,21 @@ To use this command, simply enclose the name of the data column in curly
 brackets - ``"{{...}}"`` - remember that this **is** case-sensitive.
 
 This example shows how to use the command, with reference to the ``Data``
-from `Data Example #5`_.  The text appearing at the top of all cards
+from `Data Example #5 Lists`_.  The text appearing at the top of all cards
 is derived from the **Name** column:
 
-    .. code:: python
+.. code:: python
 
-        Card("all", text(text=T("{{ Name }}"), x=3.3, y=7.5, font_size=18))
+    Card("all", text(text=T("{{ Name }}"), x=3.3, y=7.5, font_size=18))
 
 Data from the column can also be mixed in with other text or values:
 
-    .. code:: python
+.. code:: python
 
-        power = text(
-            text=T("<i>Long-lived</i> <b>({{ Age or '\u221E' }})</b>"),
-            x=0.5, y=1.2, width=5, font_size=18,
-            align="centre", wrap=True, fill=None)
+    power = text(
+        text=T("<i>Long-lived</i> <b>({{ Age or '\u221E' }})</b>"),
+        x=0.5, y=1.2, width=5, font_size=18,
+        align="centre", wrap=True, fill=None)
 
 Here the Text assigned to the name *power* uses the full text capability to
 style the text - italic and bold - and also uses the **or** option in the
@@ -622,6 +633,16 @@ sign - to use when there no *Age* value (for example, for the "Gandalf" row).
 
 The full code for this example is available as
 `cards_lotr.py <https://github.com/gamesbook/protograf/blob/master/examples/cards/cards_lotr.py>`_
+
+.. HINT::
+
+    If the column name you use in the ``T()`` command does **not** appear in
+    any the actual column names, you will get an error such as:
+
+    .. code::
+
+        FEEDBACK:: Unable to process data with this template ('Ag' is undefined)
+
 
 .. _the-selection-command:
 
@@ -658,7 +679,7 @@ from `Data Example #5`_:
         back_race = Common(
             x=0.5, y=0.5, width=5.3, height=7.9, rounded=0.2)
         back_hum = rectangle(
-            common=back_race, fill_stroke=tomato)
+            common=back_race, fill_stroke="tomato")
         Card("all", S("{{ Race == 'Human' }}", back_hum))
 
 In this example, any/all cards for which the **Race** column is equal
@@ -717,7 +738,7 @@ a Card whose **NAME** column contains a matching value - in this case, the
 first card; and then returns the value from that card's **IMAGE** column - in
 this case, the value **wire.png**.
 
-.. _other-card-resources
+.. _other-card-resources:
 
 Other Resources
 ===============

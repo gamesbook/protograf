@@ -11,8 +11,8 @@ Create(filename='example4.pdf', margin_bottom=2.5)
 
 # create a deck design
 Deck(cards=25,
-     fill=skyblue,
-     stroke=white,
+     fill="skyblue",
+     stroke="white",
      height=5,
      width=3.8)
 
@@ -23,7 +23,7 @@ mytext = text(text="25!", point=(1.9, 2.5))
 Card("25", mytext)
 
 # specify and store a specifx font; using face, size and color
-times = Common(font_name="Times-Roman", font_size=8, stroke=red)
+times = Common(font_name="Times-Roman", font_size=8, stroke="red")
 
 # create more text, and display it using font stored in 'times'
 mytext2 = text(x=1.9, y=1, text="I'm on cards 1-10", common=times)

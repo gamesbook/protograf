@@ -14,11 +14,11 @@ Create(filename='cards_matrix_one.pdf', margin_bottom=1.9)
 combos = Matrix(
     labels=['SUIT', 'VALUE', 'IMAGE'],
     data=[
-        # tomato, lime, aqua, gold, hotpink
+        # "tomato", "chartreuse", aqua, gold, hotpink
         ['#FF6347', '#00FF00','#00FFFF', '#FFD700', '#FF69B4'],
         ['5', '3', '1'],
-        # tapedrive, heart, snowflake
-        ['\u2707', '\u2766', '\u2745']
+        # plane, star, snowflake
+        ['\x28', 'H', '\x64']
     ])
 Data(matrix=combos)  # (re)set no. of cards based on length
 
@@ -38,41 +38,47 @@ outline = rectangle(
     )
 
 icon_top = hexagon(
-    x=1, y=6.4,
+    x=1, y=0.9,
     side=0.8,
-    stroke=white)
+    stroke="white")
 value_top = text(
-    x=1.8, y=6.8,
+    x=1.8, y=1.9,
     font_size=28,
     text=T('{{VALUE}}'),
     align="centre",
-    stroke=darkslategrey)
-icon_btm = hexagon(
-    x=3.8, y=0.9,
-    side=0.8,
-    stroke=white)
-value_btm = text(
-    x=4.6, y=1.9,
-    font_size=28,
-    align="centre",
-    text=T('{{VALUE}}'),
-    stroke=darkslategrey,
-    rotation=180)
-picture = text(
-    x=3.0, y=3.3,
-    stroke=white,
-    font_size=76,
-    text=T('{{IMAGE}}'))
+    stroke="darkslategray")
 deco_top = hexagon(
-    x=1.1, y=6.5,
+    x=1.1, y=1,
     side=0.7,
     fill=None,
     stroke=T('{{SUIT}}'))
+
+icon_btm = hexagon(
+    x=3.8, y=6.6,
+    side=0.8,
+    stroke="white")
+value_btm = text(
+    x=4.7, y=7,
+    font_size=28,
+    align="centre",
+    text=T('{{VALUE}}'),
+    stroke="darkslategray",
+    rotation=180)
 deco_btm = hexagon(
-    x=3.9, y=1.0,
+    x=3.9, y=6.7,
     side=0.7,
     fill=None,
     stroke=T('{{SUIT}}'))
+
+picture = text(
+    x=3.1, y=5.5,
+    stroke="white",
+    font_size=76,
+    align="centre",
+    font_name='zapfdingbats',
+    text=T('{{IMAGE}}'),
+    )
+
 
 # card setup
 Card(

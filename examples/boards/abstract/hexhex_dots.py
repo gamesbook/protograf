@@ -8,18 +8,17 @@ Notes:
 
 from protograf import *
 
-Create(filename="hexhex_board_dots.pdf", margin=0.5, paper=A4)
+Create(filename="hexhex_board_dots.pdf", margin=0.5, paper="A4")
 
 # Game Board
 Hexagons(
     sides=5,
     hex_layout="circle",
-    stroke=white,
+    stroke="white",
     fill=None,
     height=2.2,
     dot=0.1,
-    dot_stroke=gray,
-    margin_bottom=4,
+    dot_stroke="gray"
 )
 
 Save(output='png')

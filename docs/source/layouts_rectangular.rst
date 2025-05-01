@@ -95,17 +95,24 @@ It accepts the following properties:
 
 - **grid** - this *must* be the first property used for the command; it will
   refer to, in this case, a row & column grid created by ``RectangularLocations()``
+- **locations** - a list of sets of ``(col, row)`` pairs; these are locations
+  that will be used for drawing, in the order that they appear
 - **shapes** - this is a list of one or more of the core shapes available,
   for example, a circle or rectangle; if no shapes are provided, the program
-  will issue a ``WARNING``
+  will issue a ``WARNING`` message
 - **masked** - a list of sequence numbers for the locations in which shapes
   should **not** be displayed
 - **visible** - a list of sequence numbers for the **only** locations in
-  which shapes that should displayed
-- **locations** - a list of sets of ``(col, row)`` pairs; these are locations
-  that will be used for drawing, in the order that they appear
-- **debug** - this will display the centre points of the grid, along with any
-  extra information specified.  Allowed settings for debug include:
+  which shapes should be displayed
+
+Debug
+~~~~~
+
+A property that is not usually used for a final layout, but can be helpful
+during the design stage is  **debug**.
+
+**debug** will display the centre points of the grid, along with any
+extra information specified.  Allowed values for debug include:
 
   - *none* - only the locations are shown as small dots; matching the color
     of the :ref:`Blueprint <blueprintIndex>`
@@ -129,6 +136,7 @@ Key Properties
 - `Example 5. Snaking`_
 - `Example 6. Outer Edge`_
 
+  - `Example 6a. Outer Edge - Shapes`_
   - `Example 6b. Outer Edge - Stop and Start`_
   - `Example 6c. Outer Edge - Rotation`_
 
@@ -218,8 +226,6 @@ Example 3. Row and Column Interval
 
       Here the sequence starts in the top-left / northwest ("NW") corner,
       and then flows to the right ("east") and down.
-
-
 
 ===== ======
 
@@ -317,6 +323,46 @@ Example 6. Outer Edge
 
 ===== ======
 
+The examples below all make use of some Common elements:
+
+.. code:: python
+
+    is_common = Common(label="{{sequence}}")
+    rct_common = Common(label_size=5, points=[('s', 0.1)], height=0.5, width=0.5)
+
+
+Example 6a. Outer Edge - Shapes
+-------------------------------
+`^ <key-properties_>`_
+
+.. |r4a| image:: images/layouts/layout_rect_outer_multi.png
+   :width: 330
+
+===== ======
+|r4a| This example shows the design constructed using the following values
+      for the shapes' properties.
+
+      .. code:: python
+        sqr = square(common=is_common, side=0.9,
+                     label_size=6)
+        sqr5 = square(common=is_common, side=1.0,
+                      label_size=8, fill="yellow")
+
+        rect = RectangularLocations(
+            x=0.5, y=0.5, cols=4, rows=6, interval=1,
+            start="SW", direction="north", pattern="outer")
+        Layout(rect, shapes=[sqr]*4 + [sqr5] )
+
+      This example shows how to provide copies of differenet shapes that
+      must be drawn.
+
+      Using the ``[sqr`]*4`` ensures that four copies of the Square are drawn.
+      Similarly, using ``+`` adds another, different shape to the final list
+      of *shapes* that will be used for the Layout; thereby creating
+      the pattern shown.
+
+===== ======
+
 Example 6b. Outer Edge - Stop and Start
 ---------------------------------------
 `^ <key-properties_>`_
@@ -331,12 +377,16 @@ Example 6b. Outer Edge - Stop and Start
       .. code:: python
 
         rct_small = Common(label_size=5, side=0.48)
-        rct1 = square(common=rct_small, fill_stroke=palegreen)
-        rct5 = square(common=rct_small, fill_stroke=lightgreen)
-        rct10 = square(common=rct_small, fill_stroke=mediumseagreen)
+        rct1 = square(common=rct_small,
+                      fill_stroke="palegreen")
+        rct5 = square(common=rct_small,
+                      fill_stroke="lightgreen")
+        rct10 = square(common=rct_small,
+                       fill_stroke="mediumseagreen")
 
         rect = RectangularLocations(
-            x=0.25, y=0.25, cols=8, rows=11, interval=0.5
+            x=0.25, y=0.25,
+            cols=8, rows=11, interval=0.5
             start="NW", direction="east", pattern="outer",
             stop=26)
         Layout(rect, shapes=[rct1]*4 + [rct5] + [rct1]*4 + [rct10])
@@ -344,13 +394,9 @@ Example 6b. Outer Edge - Stop and Start
       This example shows how by providing a value for *stop* - the locations
       stop at sequence number ``26``.
 
-      This example shows how to easily provide multiple copies of multiple
-      shapes that will be drawn.  Using the ``[rct1`]*4`` ensures that four
-      copies of the Rectangle are drawn.  Similarly, using ``+`` adds others
-      to the list of *shapes*; thereby creating the pattern shown of different
-      numbers of colors od green.  Note that it does not matter how many
-      locations will be used; when all shapes in the list have been processed
-      the cycle will start again with the first.
+      Note that it does not matter how many locations will be used; when all
+      shapes in the list have been processed the cycle will start again with
+      the first.
 
 ===== ======
 
@@ -372,13 +418,13 @@ Example 6c. Outer Edge - Rotation
             label_size=5, points=[('s', 0.1)], height=0.5, width=0.5)
         circ = circle(
             label="{{sequence - 1}}",
-            label_size=5, radius=0.26, fill=rosybrown)
+            label_size=5, radius=0.26, fill="rosybrown")
         rct2 = rectangle(
             common=rct_common, label="{{sequence - 1}}",
-            fill=tan)
+            fill="tan")
         rct3 = rectangle(
             common=rct_common, label="{{sequence - 1}}",
-            fill=maroon, stroke=white)
+            fill="maroon", stroke="rosybrown")
 
         locs = RectangularLocations(
             x=0.5, y=0.75, cols=7, rows=10, interval=0.5,
@@ -387,10 +433,14 @@ Example 6c. Outer Edge - Rotation
             locs,
             shapes=[rct3] + [rct2]*4,
             rotations=[
-                ("1", 135), ("2-9", 90),
+                ("1", 135),
+                ("2-9", 90),
                 ("10", 45),
-                ("16", -45), ("17-24", 270),
-                ("25", 225), ("26-30", 180),],
+                ("16", -45),
+                ("17-24", 270),
+                ("25", 225),
+                ("26-30", 180)
+            ],
             corners=[('*',circ)])
 
       This example also shows how to provide multiple copies of multiple
@@ -402,7 +452,7 @@ Example 6c. Outer Edge - Rotation
       the numbering will start from zero not one.
 
       It adds *rotations* settings for specific sequence values in a list of
-      sets of value; for example, ``("17-24", 270)`` rotates the shapes at all
+      sets of values; for example, ``("17-24", 270)`` rotates the shapes at all
       the sequence values from 17 to 24 (inclusive) by 270 |deg|.
 
       The *corners* settings allows the corner elements to be replaced by those

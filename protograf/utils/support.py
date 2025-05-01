@@ -15,7 +15,56 @@ from typing import Any
 import imageio
 import pymupdf
 
+CACHE_DIRECTORY = ".protograf"  # append to the user's home directory
+BUILT_IN_FONTS = [
+    "helv",
+    "Helvetica",
+    "heit",
+    "Helvetica-Oblique",
+    "hebo",
+    "Helvetica-Bold",
+    "hebi",
+    "Helvetica-BoldOblique",
+    "cour",
+    "Courier",
+    "coit",
+    "Courier-Oblique",
+    "cobo",
+    "Courier-Bold",
+    "cobi",
+    "Courier-BoldOblique",
+    "tiro",
+    "Times-Roman",
+    "tiit",
+    "Times-Italic",
+    "tibo",
+    "Times-Bold",
+    "tibi",
+    "Times-BoldItalic",
+    "symb",
+    "Symbol",
+    "zadb",
+    "ZapfDingbats",
+]
+
 LookupType = namedtuple("LookupType", ["column", "lookups"])
+UnitPoints = namedtuple(
+    "UnitPoints",
+    [
+        "cm",
+        "mm",
+        "inch",
+        "pt",
+    ],
+)
+
+# ---- units
+unit = UnitPoints(
+    cm=28.3465,
+    mm=2.83465,
+    inch=72.0,
+    pt=1.0,
+)
 
 
 def feedback(item, stop=False, warn=False):
@@ -305,6 +354,29 @@ def to_float(value: Any, name: str = "", fail: bool = True) -> float:
             )
         else:
             feedback(f'Unable to convert "{value}" into a floating point number!', fail)
+
+
+def to_units(value):
+    """Convert a named unit to a numeric points equivalent"""
+    if not isinstance(value, (int, float)):
+        match value:
+            case "in" | "inch" | "inches":
+                numeric_units = unit.inch
+            case "point" | "points" | "pt" | "pts":
+                numeric_units = unit.pt
+            case "cm" | "centimetre" | "cms" | "centimetres":
+                numeric_units = unit.cm
+            case "mm" | "millimetre" | "mms" | "millimetres":
+                numeric_units = unit.mm
+            case _:
+                feedback(
+                    f'Cannot recognise "{value}" as valid units -'
+                    " use mm, cm, inch or pt",
+                    True,
+                )
+    else:
+        numeric_units = value
+    return numeric_units
 
 
 def excel_column(value: int = 1):

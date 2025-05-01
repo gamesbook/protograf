@@ -37,13 +37,15 @@ Discussion  This example shows how to create a complex element - a clock - by
             combining multiple ref:`customised Circles <circleIndex>`, each
             with different properties.
 
-            Only the first circle |dash the clock's outline border and its
+            Only the first circle |dash| the clock's outline border and its
             title |dash| has a ``fill`` color set but the rest do not:
 
               .. code:: python
 
-                Circle(cx=3, cy=4.5, radius=2.5, stroke_width=6,
-                       label_size=6, label_my=1, label="PROTO")
+                Circle(
+                    cx=3, cy=4.5, radius=2.5,
+                    stroke_width=6,
+                    label="PROTO", label_size=6, label_my=1)
 
             The other circles - which each have a `fill`` color of *None* so
             as to be transparent - make use of the ``radiii`` property to draw
@@ -52,12 +54,17 @@ Discussion  This example shows how to create a complex element - a clock - by
               .. code:: python
 
                 Circle(
-                   cx=3, cy=4.5, stroke=white, fill=None, radius=2.3,
-                   radii=steps(0,360,30), radii_stroke_width=1.5,
-                   radii_length=0.3, radii_offset=2.2)
+                   cx=3, cy=4.5, radius=2.3,
+                   stroke="white", fill=None,
+                   radii=steps(0, 360, 30),
+                   radii_stroke_width=1.5,
+                   radii_length=0.3,
+                   radii_offset=2.2)
 
             Here the setting of various ``radii_`` properties allows the marks
-            to be generated.  Of interest is the use of the ``steps()`` command
+            to be generated.
+
+            Of interest is the use of the ``steps()`` command
             to create the list of angles needed to specify where the radii are
             to be drawn.
 
@@ -160,12 +167,12 @@ Discussion  This example shows how to construct a simple effect by using
                 for colr, angle in zip(colrs, radii):
                     Sector(
                         common=circ,
-                        fill=colr, stroke=sienna, stroke_width=2,
+                        fill=colr, stroke="sienna", stroke_width=2,
                         angle=420 - angle, angle_width=60)
                 # rondel text
                 Circle(
                     common=circ,
-                    stroke=sienna, stroke_width=3,
+                    stroke="sienna", stroke_width=3,
                     fill=None,
                     radii=radii,
                     radii_offset=0.75,
@@ -176,7 +183,7 @@ Discussion  This example shows how to construct a simple effect by using
                     dot=0.2)
 
             In this example, using the "offset" for the radii allows the
-            label |dash| which is centred on the radius line  |dash| to
+            label |dash| which is centred on the radius line |dash| to
             be moved further outward.
 
             See :ref:`Python loops <python-loop>` for more

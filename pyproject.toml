@@ -12,12 +12,11 @@ license = "GPL-3.0-or-later"
 readme = "README.md"
 requires-python = ">=3.9,<4"
 dependencies = [
-    "reportlab (>=4.2.0)",
     "xlrd (>=0.9.4)",
     "bgg-api (>=1.1.6)",
+    "cairosvg (>=2.7.1)",
     "imageio (>=2.36.1)",
-    "svglib (>=1.5.1)",
-    "pymupdf (>=1.24.9)",
+    "pymupdf (>=1.25.4)",
     "jinja2 (>=3.1.4)",
     "segno (>=1.6.1)",
     "sphinx-copybutton (>=0.5.2,<0.6.0)",
@@ -25,7 +24,7 @@ dependencies = [
 ]
 keywords = [ "python", "graphics", "boardgames", "cards", "counters", "tiles" ]
 classifiers = [
-    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.13",
     "Development Status :: 3 - Alpha",
     "Natural Language :: English",
     "Environment :: Console",

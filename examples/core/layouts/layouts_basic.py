@@ -8,13 +8,15 @@ Created on: 19 May 2024
 from protograf import *
 
 Create(filename="layouts_basic.pdf",
-       paper=A8,
-       margin=0.75,
-       margin_right=0.2, margin_top=0.2,
+       paper="A8",
+       margin_left=0.5,
+       margin_right=0.3,
+       margin_bottom=0.2,
+       margin_top=0.5,
        font_size=10,
        stroke_width=0.5)
 
-header = Common(x=0, y=6, font_size=7, align="left")
+header = Common(x=0, y=0, font_size=7, align="left")
 a_circle = circle(
     x=0, y=0, diameter=1.0, label="{{sequence}}//{{col}}-{{row}}", label_size=6)
 

@@ -26,6 +26,18 @@ Ray = namedtuple("Ray", ["x", "y", "angle"])
 PolyGeometry = namedtuple(
     "PolyGeometry", ["x", "y", "radius", "side", "half_flat", "vertices"]
 )
+HexGeometry = namedtuple(
+    "HexGeometry",
+    [
+        "radius",
+        "diameter",
+        "side",
+        "half_side",
+        "half_flat",
+        "height_flat",
+        "z_fraction",
+    ],
+)
 
 
 @dataclass
@@ -42,12 +54,13 @@ def polygon_vertices(
     """Calculate array of Points for a polygon's vertices.
 
     Args:
-        * sides:  number of sides
-        * radius: distance from centre
-        * centre: Point
-        * starting_angle:  effectively the "rotation"
+        sides:  number of sides of polygon
+        radius: distance from centre
+        centre: the Point of origin
+        starting_angle: effectively the "rotation"
 
-    Doc test:
+    Doc Test:
+
     >>> P = polygon_vertices(6, 1.0, Point(2,2))
     >>> assert P == [Point(x=3.0, y=2.0), Point(x=2.5, y=2.8660254037844384), \
                      Point(x=1.5000000000000002, y=2.866025403784439), \
@@ -81,13 +94,15 @@ def polygon_vertices(
 
 
 def degrees_to_xy(degrees: float, radius: float, origin: Point) -> Point:
-    """Calculates a Point that is at an angle from the origin;
-    0 is to the right.
+    """Calculates a Point that is at an angle from the origin; 0 is to the right.
 
     Args:
-        * degrees: normal angle (NOT radians)
+        degrees: normal angle (NOT radians) in counter-clockwise direction
+        radius: length of line originating at origin
+        origin: the (x, y) coordinates of the point of origin
 
-    Doc test
+    Doc Test:
+
     >>> R = degrees_to_xy(300, 5, Point(0,0))
     >>> assert round(R.x, 2) == 2.5
     >>> assert round(R.y, 2) == -4.33
@@ -116,11 +131,15 @@ def degrees_to_xy(degrees: float, radius: float, origin: Point) -> Point:
 def point_in_polygon(point: Point, vertices: List[Point], valid_border=False) -> bool:
     """Wrapper for is_inside_polygon() function.
 
+    Args:
+        point: the (x, y) coordinates of the Point to check
+        vertices: a list of (x, y) Point coordinates of the enclosing shape
+
     Doc Test:
 
-    >>> point_in_polygon(Point(1,1), [ Point(1, 1), Point(2, 2), Point(3, 3)])
+    >>> point_in_polygon(Point(1,1), [Point(1, 1), Point(2, 2), Point(3, 3)])
     False
-    >>> point_in_polygon(Point(1,1), [ Point(0, 0), Point(1, 2), Point(2, 0)])
+    >>> point_in_polygon(Point(1,1), [Point(0, 0), Point(1, 2), Point(2, 0)])
     True
     """
     _point = (point.x, point.y)
@@ -182,6 +201,11 @@ def length_of_line(start: Point, end: Point) -> float:
 def point_on_line(point_start: Point, point_end: Point, distance: float) -> Point:
     """Calculate new Point at a distance along a line defined by its end Points
 
+    Args:
+        point_start: the (x, y) coordinates of the start point
+        point_end: the (x, y) coordinates of the end point
+        distance: the distance of the line to use (from the point_start)
+
     Doc Test:
 
     >>> P = Point(0,2)
@@ -237,6 +261,13 @@ def point_on_line(point_start: Point, point_end: Point, distance: float) -> Poin
 def point_on_circle(point_centre: Point, radius: float, angle: float) -> Point:
     """Calculate Point on circumference of a circle at a specific angle in degrees
 
+    Args:
+        point_center: the (x, y) coordinates of the circle centre
+        angle: the rotation angle in degrees (counter-clockwise)
+        radius: length of circle radius
+
+    Doc Test:
+
     >>> P = Point(0,0)
     >>> R = 3.0
     >>> T = 45.0
@@ -249,7 +280,7 @@ def point_on_circle(point_centre: Point, radius: float, angle: float) -> Point:
     try:
         theta = float(angle) * math.pi / 180.0
         x = math.cos(theta) * radius + point_centre.x
-        y = math.sin(theta) * radius + point_centre.y
+        y = point_centre.y - math.sin(theta) * radius  # + point_centre.y
     except:
         raise ValueError(
             f"Cannot calculate point on circle for: {point_centre}, {radius} and {angle}"
@@ -258,7 +289,14 @@ def point_on_circle(point_centre: Point, radius: float, angle: float) -> Point:
 
 
 def fraction_along_line(point_start: Point, point_end: Point, fraction: float) -> Point:
-    """Calculate new Point at a fractional distance along line defined by end Points"""
+    """Calculate new Point at a fractional distance along line defined by end Points
+
+    Args:
+        point_start: the (x, y) coordinates of the start point
+        point_end: the (x, y) coordinates of the end point
+        fraction: the fraction of the line to use (from the point_start)
+
+    """
     if fraction > 1.0 or fraction < 0.0:
         raise ValueError("The fraction cannot be greater than 1 or less than 0.")
     line_length = length_of_line(start=point_start, end=point_end)
@@ -269,12 +307,18 @@ def fraction_along_line(point_start: Point, point_end: Point, fraction: float) -
     return fraction_point
 
 
-def angles_from_points(x1, y1, x2, y2, radians=False):
+def angles_from_points(x1: float, y1: float, x2: float, y2: float) -> tuple:
     """Given two points, calculate the compass and rotation angles between them
+
+    Args:
+        x1: x-coodinate of first point
+        y1: y-coodinate of first point
+        x2: x-coodinate of second point
+        y2: y-coodinate of second point
 
     Returns:
         compass (float): degrees clockwise from North
-        rotation (float): degrees anti-clockwise from East
+        rotation (float): degrees counter-clockwise from East
 
     Doc Test:
 
@@ -301,7 +345,7 @@ def angles_from_points(x1, y1, x2, y2, radians=False):
         gradient = (y2 - y1) / (x2 - x1)
         theta = math.atan(gradient)
         angle = theta * 180.0 / math.pi
-        # feedback(f'{x1-x1=} {y1-y1=} {a=} {b=} {angle=}')
+        # print(f'{x1-x1=} {y1-y1=} {a=} {b=} {angle=}')
         if a > 0 and b >= 0:
             compass = 90.0 - angle
         if a > 0 and b < 0:
@@ -315,12 +359,16 @@ def angles_from_points(x1, y1, x2, y2, radians=False):
         if y2 - y1 < 0:
             compass = 180.0
     rotation = (450 - compass) % 360.0
-    # feedback(f'angle fn: {compass=}, {rotation=}')
+    # print(f'angle fn: {compass=}, {rotation=}')
     return compass, rotation
 
 
-def separation_between_hexsides(side_a, side_b):
+def separation_between_hexsides(side_a: int, side_b: int) -> int:
     """Levels of separation between two sides of a hexagon.
+
+    Args:
+        side_a: the ID number of the first side
+        side_b: the ID number of the second side
 
     Notes:
         Sides are numbered from 1 to 6 (by convention starting at furthest left).
@@ -347,7 +395,7 @@ def separation_between_hexsides(side_a, side_b):
         _side_a = 6 if (side_a % 6 == 0) else side_a % 6
         _side_b = 6 if (side_b % 6 == 0) else side_b % 6
     except TypeError:
-        # tools.feedback(f'Cannot use {side_a} and/or {side_b} as side numbers.', True)
+        # print(f'Cannot use {side_a} and/or {side_b} as side numbers.', True)
         return None
     if _side_a - _side_b > 3:
         result = (_side_b, _side_a)
@@ -364,7 +412,13 @@ def separation_between_hexsides(side_a, side_b):
 
 
 def lines_intersect(A: Point, B: Point, C: Point, D: Point) -> bool:
-    """ "Return True if line segments AB and CD intersect
+    """Return True if line segments AB and CD intersect
+
+    Args:
+        A: (x, y) coodinate of start point of line AB
+        B: (x, y) coodinate of end point of line AB
+        C: (x, y) coodinate of start point of line CD
+        D: (x, y) coodinate of end point of line CD
 
     Ref:
         https://stackoverflow.com/questions/3838329
@@ -389,7 +443,7 @@ def bezier_arc_segment(
     """Compute the control points for a Bezier arc with angles theta1-theta0 <= 90.
 
     Points are computed for an arc with angle theta increasing in the
-    counter-clockwise (CCW) direction. Zero degrees is at the "East" position.
+    counter-clockwise direction. Zero degrees is at the "East" position.
 
     Returns:
         tuple: starting point and 3 control points of a cubic Bezier curve
@@ -463,6 +517,50 @@ def equilateral_height(side: Any):
     """
     _side = float(side)
     return math.sqrt(_side**2 - (0.5 * _side) ** 2)
+
+
+def rotate_point_around_point(
+    point_to_rotate: tuple, center_point: tuple, angle: float
+) -> Point:
+    """
+    Rotates a point around another point by a specified angle.
+
+    Args:
+        point_to_rotate: the (x, y) coordinates of the point to rotate
+        center_point: the (x, y) coordinates of the point to rotate around
+        angle (float): the rotation angle in degrees (counter-clockwise)
+
+    Returns:
+        Point: The (x, y) coordinates of the rotated point (rounded to 8 decimals)
+
+    Doc Test:
+
+    >>> rotate_point_around_point((2,2), (1,1), 90)
+    Point(x=0.0, y=2.0)
+    >>> rotate_point_around_point((2,2), (1,3), 45)
+    Point(x=2.41421356, y=3.0)
+    >>> rotate_point_around_point((10,0), (0,0), 90)
+    Point(x=0.0, y=10.0)
+    """
+    import math
+
+    x, y = point_to_rotate
+    cx, cy = center_point
+    angle_radians = math.radians(-angle)
+    # Translate the point so that the center of rotation is the origin
+    translated_x = x - cx
+    translated_y = y - cy
+    # Perform the rotation
+    rotated_x = translated_x * math.cos(angle_radians) - translated_y * math.sin(
+        angle_radians
+    )
+    rotated_y = translated_x * math.sin(angle_radians) + translated_y * math.cos(
+        angle_radians
+    )
+    # Translate the rotated point back to the original center
+    final_x = rotated_x + cx
+    final_y = rotated_y + cy
+    return Point(round(final_x, 8), round(final_y, 8))
 
 
 if __name__ == "__main__":

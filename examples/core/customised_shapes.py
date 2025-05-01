@@ -11,46 +11,48 @@ Sources and Credit:
 from protograf import *
 
 Create(filename="customised_shapes.pdf",
-       paper=A8,
-       margin=0.75,
-       margin_right=0.2, margin_top=0.2,
+       paper="A8",
+       margin_left=0.5,
+       margin_right=0.3,
+       margin_bottom=0.2,
+       margin_top=0.5,
        font_size=8,
        stroke_width=0.5,
        )
 
 Footer(draw=False)
 
-txt = Common(x=0, y=6, font_size=8, align="left")
+txt = Common(x=0, y=0, font_size=8, align="left")
 
 Text(common=txt, text="Shapes START...")
-Text(x=0, y=5, font_size=8, align="left", text=Today())
-PageBreak(footer=True)
+Text(x=0, y=6, font_size=8, align="left", text=Today())
+PageBreak()
 
 # ---- blueprint custom
-Blueprint(subdivisions=5, stroke_width=0.5, style='invert')
-Text(common=txt, text="Blueprint: subdiv;invert;stroke")
+Blueprint(subdivisions=5, stroke_width=0.5, style='invert', edges="n s e w")
+Text(common=txt, text="Blueprint: style;edges;subdivisions", stroke="gray")
 PageBreak()
 
 # ---- dot & cross
 Blueprint()
 Text(common=txt, text="Dots & Crosses")
-Rhombus(cx=1, cy=5, side=2, dot=0.1, dot_stroke=red)
-Rhombus(cx=3, cy=5, side=2, cross=0.25, cross_stroke=red, cross_stroke_width=1)
-Polygon(cx=1, cy=3, sides=8, radius=1, dot=0.1, dot_stroke=orange)
-Polygon(cx=3, cy=3, sides=8, diameter=2, cross=0.25, cross_stroke=orange, cross_stroke_width=1)
-Stadium(cx=1, cy=1, side=1, stroke=blue, dot=0.1)
-Stadium(cx=3, cy=1, side=1, stroke=blue, cross=0.25, cross_stroke_width=1)
+Rhombus(cx=1, cy=5, side=2, dot=0.1, dot_stroke="red")
+Rhombus(cx=3, cy=5, side=2, cross=0.25, cross_stroke="red", cross_stroke_width=1)
+Polygon(cx=1, cy=3, sides=8, radius=1, dot=0.1, dot_stroke="orange")
+Polygon(cx=3, cy=3, sides=8, diameter=2, cross=0.25, cross_stroke="orange", cross_stroke_width=1)
+Stadium(cx=1, cy=1, side=1, stroke="blue", dot=0.1)
+Stadium(cx=3, cy=1, side=1, stroke="blue", cross=0.25, cross_stroke_width=1)
 PageBreak()
 
 # ---- centre placement
 Blueprint()
 Text(common=txt, text="Centred")
-shp_font = Common(font_size=6, stroke=red)
+shp_font = Common(font_size=6, stroke="red")
 Trapezoid(common=shp_font, cx=1, cy=5, heading="Trapezoid cx=1;cy=5")
 Rhombus(common=shp_font, cx=3, cy=5, heading="Rhombus cx=3;cy=5")
 Star(common=shp_font, cx=1, cy=3, heading="Star cx=1;cy=3")
 Ellipse(common=shp_font, cx=3, cy=3, width=2, height=1, heading="Ellipse cx=3;cy=3")
-Polygon(common=shp_font, cx=2, cy=1, sides=7, label="Polygon-7 cx2=;cy=1")
+Polygon(common=shp_font, cx=2, cy=1, radius=0.8, sides=7, heading="Polygon-7 cx2=;cy=1")
 PageBreak()
 
 # ---- RA triangles
@@ -67,7 +69,7 @@ Blueprint()
 Text(common=txt, text="Compass")
 Compass(cx=3, cy=1, perimeter='hexagon', radius=0.5, radii_stroke_width=2)
 Compass(cx=1, cy=5, perimeter='circle', radius=0.5, directions="ne nw s")
-Compass(cx=2, cy=3, perimeter='rectangle', directions="*", height=2, width=3, radii_stroke=red)
+Compass(cx=2, cy=3, perimeter='rectangle', directions="*", height=2, width=3, radii_stroke="red")
 PageBreak()
 
 # ---- lines (multiple) labels
@@ -80,18 +82,18 @@ PageBreak()
 # ---- starfield
 Blueprint()
 Text(common=txt, text="StarField: Rectangle; multi-color")
-Rectangle(x=0, y=0, height=3, width=3, fill=black)
+Rectangle(x=0, y=0, height=3, width=3, fill="black")
 StarField(
     enclosure=rectangle(x=0, y=0, height=3, width=3),
     density=80,
-    colors=[white, white, red, green, blue],
+    colors=["white", "white", "red", "green", "blue", ],
     sizes=[0.4],
     seeding=42.3)
 PageBreak()
 
 Blueprint()
 Text(common=txt, text="StarField: Circle; multi-size")
-Circle(x=0, y=0, radius=1.5, fill=black)
+Circle(x=0, y=0, radius=1.5, fill="black")
 StarField(
     enclosure=circle(x=0, y=0, radius=1.5),
     density=30,
@@ -102,32 +104,33 @@ PageBreak()
 Blueprint()
 Text(common=txt, text="StarField: Poly; multi-color&size")
 plys = Common(x=1.5, y=1.4, sides=10, radius=1.5)
-Polygon(common=plys, fill=black)
+Polygon(common=plys, fill="black")
 StarField(
     enclosure=polygon(x=1.5, y=1.4, sides=10, radius=1.5),
     density=50,
-    colors=[white, white, white, red, green, blue],
+    colors=["white", "white", "white", "red", "green", "blue", ],
     sizes=[0.15, 0.15, 0.15, 0.15, 0.3, 0.3, 0.45],
     seeding=42.3)
 PageBreak()
 
 # ---- equilateral triangle: hatch
 Blueprint()
-Text(common=txt, text="Equilateral Triangle; text; hatch")
+Text(common=txt, text="Equilateral Triangle; flip; hatch")
 EquilateralTriangle(
-    x=2, y=3, side=1.5, hatch_count=5, hatch_stroke=red, title='Title', heading='Head')
+    x=2, y=1, flip="north", hand="east", label="NE", fill="gold")
 EquilateralTriangle(
-    x=2, y=1, flip="north", hand="east", label="NE", fill=gold)
+    x=2, y=1, flip="south", hand="east", label="SE", fill="chartreuse")
 EquilateralTriangle(
-    x=2, y=1, flip="south", hand="east", label="SE", fill=lime)
+    x=2, y=1, flip="north", hand="west", label="NW", fill="red")
 EquilateralTriangle(
-    x=2, y=1, flip="north", hand="west", label="NW", fill=red)
+    x=2, y=1, flip="south", hand="west", label="SW", fill="blue")
 EquilateralTriangle(
-    x=2, y=1, flip="south", hand="west", label="SW", fill=blue)
+    x=1, y=4, side=1.5,
+    hatch_count=5, hatch_stroke="red",
+    title='Title', heading='Head')
 EquilateralTriangle(
-    x=1, y=4, stroke_width=1, rotation=45, dot=.05)
-# EquilateralTriangle(cx=2, cy=2, side=1, stroke_width=1, dot=.02, label="|+|", rotation=45, debug=True)
-# EquilateralTriangle(cx=3, cy=4, side=1, stroke_width=1, dot=.02, label="|+|")
+    x=1, y=5.5, side=1.5, stroke_width=1,
+    rotation=45, dot=.05)
 PageBreak()
 
 # ---- RA Triangle
@@ -143,41 +146,50 @@ PageBreak()
 # ---- sectors
 Blueprint()
 Text(common=txt, text="Sectors: 3 with same centre")
-sctm = Common(cx=2, cy=3, radius=2, fill=black, angle_width=43,)
-Sector(common=sctm, angle=40)
-Sector(common=sctm, angle=160)
-Sector(common=sctm, angle=280)
+sctm = Common(cx=2, cy=3, radius=2, fill="black", angle_width=43,)
+Sector(common=sctm, angle_start=40)
+Sector(common=sctm, angle_start=160)
+Sector(common=sctm, angle_start=280)
 PageBreak()
 
 # ---- grid
 Text(common=txt, text='Grid: gray; 1/3"; thick')
-Grid(side=0.85, stroke=gray, stroke_width=1)
+Grid(side=0.85, stroke="gray", stroke_width=1)
 PageBreak()
 
 # ---- dotgrid - Moleskin
 Text(common=txt, text='DotGrid: "Moleskine" setting')
-DotGrid(stroke=darkgray, width=0.5, height=0.5, dot_point=1, offset_y=-0.25)
+DotGrid(stroke="darkgray", width=0.5, height=0.5, dot_point=1, offset_y=0.25)
+PageBreak()
+
+# ---- dotgrid - rows & cols
+Blueprint()
+Text(common=txt, text="DotGrid: rows&cols")
+DotGrid(stroke="darkgray",
+        width=0.5, height=0.5,
+        rows=14, cols=10,
+        dot_point=1)
 PageBreak()
 
 # ---- arc
 Blueprint()
-Text(common=txt, text="Arc; 'inside' rect")
-Rectangle(x=1, y=1, height=1, width=2, dot=0.02,
-          stroke=red, fill=None,
-          title="Arc(x=1, y=1, x1=3, y1=2)")
-Arc(x=1, y=1, x1=3, y1=2)
+Text(common=txt, text="Arc; 'inside' square")
+Rectangle(x=1, y=1, height=2, width=2, dot=0.02,
+          stroke="red", fill=None,
+          title="Arc(cx=1, cy=3, radius=2)")
+Arc(cx=1, cy=3, radius=2)  #, angle_start=0, angle_width=90)
 PageBreak()
 
-# ---- stadium
+# ---- stadium edges
 Blueprint()
 Text(common=txt, text="Stadium: edges")
-Stadium(x=0, y=0, height=1, width=1, edges='n', fill=tan, label="north")
-Stadium(x=3, y=1, height=1, width=1, edges='s', fill=tan, label="south")
-Stadium(x=0, y=4, height=1, width=1, edges='e', fill=tan, label="east")
-Stadium(x=3, y=5, height=1, width=1, edges='w', fill=tan, label="west")
+Stadium(x=0, y=1, height=1, width=1, edges='n', fill="tan", label="north")
+Stadium(x=3, y=1, height=1, width=1, edges='s', fill="tan", label="south")
+Stadium(x=0, y=3, height=1, width=1, edges='e', fill="tan", label="east")
+Stadium(x=3, y=4, height=1, width=1, edges='w', fill="tan", label="west")
 PageBreak()
 
-# ---- trapezoid
+# ---- trapezoid flip
 Blueprint()
 Text(common=txt, text="Trapezoid: flip")
 Trapezoid(
@@ -191,7 +203,7 @@ PageBreak()
 # ---- chord
 Blueprint()
 Text(common=txt, text="Chord: 135 to 45 degrees")
-Chord(shape=Circle(cx=2, cy=2, radius=2, fill=None), angle=135, angle1=45, label="chord")
+Chord(shape=Circle(radius=1, fill=None), angle=135, angle1=45, label="chord")
 PageBreak()
 
 # ---- polygon radii
@@ -201,7 +213,7 @@ Polygon(cx=2, cy=4, sides=8, radius=1, radii=True)
 Polygon(
     cx=2, cy=1, sides=10, radius=1, radii=True,
     radii_offset=0.75, radii_length=0.25, radii_stroke_width=1,
-    dot=0.1, dot_stroke=red)
+    dot=0.1, dot_stroke="red")
 PageBreak()
 
 # ---- polygon perbis
@@ -212,43 +224,52 @@ Polygon(
     cx=2, cy=1, sides=8, radius=1,
     perbis="2,4,7",
     perbis_offset=0.25, perbis_length=0.5, perbis_stroke_width=1,
-    dot=0.1, dot_stroke=red)
+    dot=0.1, dot_stroke="red")
 PageBreak()
 
 # ---- dates
 Blueprint()
 Text(common=txt, text="Dates: format and styles")
 dtext = Common(x=0.25, align="left", font_size=8)
-Text(common=dtext, y=5, text="1.  "+Today())
-Text(common=dtext, y=4, text="2.  "+Today(details="date", style="usa"))
+Text(common=dtext, y=1, text="1.  "+Today())
+Text(common=dtext, y=2, text="2.  "+Today(details="date", style="usa"))
 Text(common=dtext, y=3, text="3.  "+Today(details="date", style="eur"))
-Text(common=dtext, y=2, text="4.  "+Today(details="datetime", style="usa"))
-Text(common=dtext, y=1, text="5.  "+Today(details="datetime", style="eur"))
+Text(common=dtext, y=4, text="4.  "+Today(details="datetime", style="usa"))
+Text(common=dtext, y=5, text="5.  "+Today(details="datetime", style="eur"))
 PageBreak()
 
 # ---- rotation: image
-Blueprint(style="grey")
+Blueprint()
 Text(common=txt, text="Images: normal & rotation")
-Image("sholes_typewriter.png", x=0, y=1, width=1.5, height=1.5, title="PNG")
-Image("sholes_typewriter.png", x=2, y=1, width=1.5, height=1.5, title="60\u00B0", rotation=60)
-Image("noun-typewriter-3933515.svg", x=0, y=4, scaling=0.15, title="SVG")
-Image("noun-typewriter-3933515.svg", x=2, y=4, scaling=0.15, title="45\u00B0", rotation=45)
+Image("sholes_typewriter.png",
+      width=1.5, height=1.5,
+      x=0, y=0, title="PNG")
+Image("sholes_typewriter.png",
+      width=1.5, height=1.5,
+      x=2, y=0, title="60\u00B0", rotation=60)
+Image("noun-typewriter-3933515.svg",
+      width=1.5, height=1.5,
+      x=0, y=3, title="SVG")
+Image("noun-typewriter-3933515.svg",
+      width=1.5, height=1.5,
+      x=2, y=3, title="45\u00B0", rotation=45)
 PageBreak()
 
 # ---- rotation: rhombus
 Blueprint()
 Text(common=txt, text="Rhombus: red => rotation 60\u00B0")
-Rhombus(cx=2, cy=3, width=1.5, height=2*equilateral_height(1.5), dot=0.06)
-Rhombus(cx=2, cy=3, width=1.5, height=2*equilateral_height(1.5), dot=0.04,
-        fill=None, stroke=red, rotation=60)
+Rhombus(cx=2, cy=3, width=1.5, height=2*equilateral_height(1.5), dot=0.06,
+        fill=None, stroke="black")
+Rhombus(cx=2, cy=3, width=1.5, height=2*equilateral_height(1.5), dot=0.03,
+        fill=None, stroke="red", rotation=60)
 PageBreak()
 
 # ---- rotation: stadium
 Blueprint()
 Text(common=txt, text="Stadium: red => rotation 60\u00B0")
 Stadium(cx=2, cy=3, width=1.25, height=2, dot=0.06)
-Stadium(cx=2, cy=3, width=1.25, height=2, fill=None,
-        stroke=red, stroke_width=.3, rotation=60, dot=0.04)
+Stadium(cx=2, cy=3, width=1.25, height=2,
+        stroke="red", stroke_width=.3, rotation=60, dot=0.04)
 PageBreak()
 
 # ---- rotation: polygon
@@ -283,7 +304,7 @@ PageBreak()
 # ---- grid cols and rows
 Blueprint()
 Text(common=txt, text='Grid: gray; 3x4; thick')
-Grid(x=0.5, y=0.5, cols=3, rows=4, height=1.25, width=1, stroke=gray, stroke_width=1)
+Grid(x=0.5, y=0.5, cols=3, rows=4, height=1.25, width=1, stroke="gray", stroke_width=1)
 PageBreak()
 
 # ---- line - custom
@@ -293,10 +314,10 @@ Line(x=0, y=0.5, stroke_width=0.2, dotted=True, label="0.2", font_size=6)
 Line(x=1, y=0.5, stroke_width=0.4, dotted=True, label="0.4", font_size=6)
 Line(x=2, y=0.5, stroke_width=0.8, dotted=True, label="0.8", font_size=6)
 Line(x=3, y=0.5, stroke_width=1.6, dotted=True, label="1.6", font_size=6)
-Line(x=0, y=2, length=4, stroke=lime, stroke_width=2)
-Line(x=0, y=3, length=4.1, angle=15, stroke=red, label="15", font_size=6)
-Line(x=0, y=4, x1=4, y1=5, stroke=blue, stroke_width=1,
-     dashed=[0.2, 0.2, 0.2, 0.2, 1.0, 0.0], label="dashed", font_size=6)
+Line(x=0, y=2, length=4, stroke="chartreuse", stroke_width=2)
+Line(x=0, y=3, length=4.1, angle=15, stroke="red", label="15", font_size=6)
+Line(x=0, y=4, x1=4, y1=5, stroke="blue", stroke_width=1,
+     dashed=[0.2, 0.1], label="dashed:[0.2,0.1]", font_size=6)
 PageBreak()
 
 # ---- bezier - custom
@@ -343,7 +364,7 @@ Hexagon(
     title="Title", label="Label", heading="Heading")
 Rectangle(
     x=0.5, y=3, width=3, height=2,
-    label="red; size=14", label_stroke=red, label_size=14)
+    label="red; size=14", label_stroke="red", label_size=14)
 PageBreak()
 
 # ---- label offsets
@@ -363,26 +384,26 @@ PageBreak()
 # ---- star shape
 Blueprint(stroke_width=0.5)
 Text(common=txt, text="Shape label: offsets")
-Star(cx=2, cy=3, radius=2, fill=yellow, stroke=red, rotation=45)
+Star(cx=2, cy=3, radius=2, fill="yellow", stroke="red", rotation=45)
 PageBreak()
 
-# ---- shapeshape
+# ---- polyshape
 Blueprint(stroke_width=0.5)
 Text(common=txt, text="Polyshape: default")
-Polyshape(points=[(0, 0), (0, 1), (1,  2), (2, 1), (2, 0)])
+Polyshape(points=[(1, 2), (1, 1), (2, 0), (3, 1), (3, 2)])
 PageBreak()
 
-# ---- shapeshape - custom
+# ---- polyshape - custom
 Blueprint(stroke_width=0.5)
 Text(common=txt, text="Polyshape: custom")
 Polyshape(
-      points=[(0, 0), (0, 1), (1,  2), (2, 1), (2, 0)],
-      cx=1, cy=1,
+      points=[(1, 2), (1, 1), (2, 0), (3, 1), (3, 2)],
+      cx=2, cy=1,
       label='A House',
-      label_stroke=olive,
+      label_stroke="seagreen",
       cross=0.5,
-      fill=sandybrown,
-      stroke=peru,
+      fill="sandybrown",
+      stroke="peru",
 )
 PageBreak()
 
@@ -392,11 +413,11 @@ Text(common=txt, text="Polyshape: offset")
 Polyshape(
     points="0,0 0,1 2,0 2,1 0,0",
     cx=1, cy=0.5,
-    fill=lime, label="Left ....... Right")
+    fill="chartreuse", label="Left ....... Right")
 Polyshape(
     points="0,0 0,1 2,0 2,1 0,0",
     cx=1, cy=0.5,
-    fill=gold, label="Left ....... Right",
+    fill="gold", label="Left ....... Right",
     x=1, y=2)
 PageBreak()
 
@@ -409,7 +430,7 @@ PageBreak()
 # ---- rectangles - custom
 Blueprint(stroke_width=0.5)
 Text(common=txt, text="Rectangles: custom")
-Rectangles(rows=4, cols=2, width=1.5, height=1.25, dotted=True, fill=lime)
+Rectangles(rows=4, cols=2, width=1.5, height=1.25, dotted=True, fill="chartreuse")
 PageBreak()
 
 # ---- rhombus - custom
@@ -423,9 +444,9 @@ Blueprint()
 Text(common=txt, text="Rhombus - borders")
 Rhombus(cx=2, cy=3, width=2, height=3, stroke_width=1.9,
     borders=[
-        ("nw", 2, gold),
-        ("ne", 2, lime, True),
-        ("se", 2, tomato, [0.1,0.2,0.1,0]),
+        ("nw", 2, "gold"),
+        ("ne", 2, "chartreuse", True),
+        ("se", 2, "tomato", [0.1,0.2,0.1,0]),
         ("sw", 2)
     ]
 )
@@ -437,9 +458,9 @@ Text(common=txt, text="Trapezoid - borders")
 Trapezoid(
     cx=2, cy=3, width=2, height=2, top=1.5, stroke_width=2,
     borders=[
-        ("w", 2, gold),
-        ("e", 2, lime, True),
-        ("n", 2, tomato, [0.1,0.2,0.1,0]),
+        ("w", 2, "gold"),
+        ("e", 2, "chartreuse", True),
+        ("n", 2, "tomato", [0.1,0.2,0.1,0]),
         ("s", 2)
     ]
 )
@@ -448,26 +469,27 @@ PageBreak()
 # ---- arrow - sizes
 Blueprint()
 Text(common=txt, text="Arrow: sizes")
-Arrow(x=1, y=1, height=1, width=0.5, head_height=0.5, head_width=0.75)
-Arrow(x=2, y=1, height=1, width=0.5, head_height=0.5, head_width=0.75, tail_width=0.75,
-      stroke=tomato, fill=silver, stroke_width=2, transparency=50)
-Arrow(x=3, y=1, height=1, width=0.5, head_height=0.5, head_width=0.75, tail_width=0.01,
-      fill_stroke=gold)
+Arrow(x=1, y=5, height=1, width=0.5, head_height=0.5, head_width=0.75)
+Arrow(x=2, y=5, height=1, width=0.5, head_height=0.5, head_width=0.75, tail_width=0.75,
+      stroke="tomato", fill="lightsteelblue", stroke_width=2, transparency=50)
+Arrow(x=3, y=5, height=1, width=0.5, head_height=0.5, head_width=0.75, tail_width=0.01,
+      fill_stroke="gold")
 Arrow(x=1, y=3, height=1, width=0.25, head_height=0.5, head_width=1, points_offset=-0.25,
-      fill=lime)
+      fill="chartreuse")
 Arrow(x=2, y=3, height=1, width=0.25, head_height=1, head_width=0.75, points_offset=0.25,
-      fill=tomato)
+      fill="tomato")
 Arrow(x=3, y=3, height=1, width=0.5, head_height=0.5, head_width=0.5, tail_notch=0.25,
-      stroke=black, fill=aqua, stroke_width=1)
+      stroke="black", fill="cyan", stroke_width=1)
 PageBreak()
 
 # ---- arrow - rotate, text
 Blueprint()
 Text(common=txt, text="Arrow: dot, cross, text & rotation")
-Arrow(x=1, y=0.5, title="The Arrow", heading="An arrow", dot=0.1, cross=0.5)
+Arrow(x=1, y=5.5, title="The Arrow", heading="An arrow", dot=0.1, cross=0.5)
 Arrow(x=2.5, y=3, title="0\u00B0", dot=0.15, dotted=True)
 Arrow(x=2.5, y=3, title="45\u00B0", dot=0.1,
-      fill=None, stroke=red, dot_stroke=red, rotation=45)
+      fill=None, stroke="red", dot_stroke="red", rotation=45)
+Arrow(x=3, y=5.5, label="arrow")
 PageBreak()
 
 # ---- Centred Shapes
@@ -482,14 +504,18 @@ Polygon(cx=1, cy=5, radius=0.5, sides=8, centre_shape=small_star)
 EquilateralTriangle(x=2.35, y=4.5, side=1.25, centre_shape=small_star)
 PageBreak()
 
+# ---- Centred Shapes - move
 Blueprint()
 Text(common=txt, text="Centred Shape: move + double")
 small_star = star(radius=0.25)
-small_circle = circle(radius=0.33, fill=grey, centre_shape=small_star)
-Hexagon(x=1, y=0.5, height=2, hatch_count=5, hatch_stroke=red, dot=0.1,
+small_circle = circle(radius=0.33, fill="gray", centre_shape=small_star)
+Hexagon(x=1, y=0.5, height=2,
+        dot=0.1,
+        hatch_count=5,
         centre_shape=small_circle)
 Hexagon(x=1, y=3, height=2,
-        centre_shape=small_circle, centre_shape_mx=0.3, centre_shape_my=0.6)
+        centre_shape=small_circle,
+        centre_shape_mx=0.3, centre_shape_my=0.6)
 PageBreak()
 
 # ---- QR Code
@@ -501,9 +527,9 @@ QRCode(
     text="Help me ObiWan",
     x=1, y=3,
     height=2, width=2,
-    fill=grey,
-    stroke=red,
-    scaling=5
+    fill="gray",
+    stroke="red",
+    scaling=5,
 )
 PageBreak()
 
@@ -524,12 +550,12 @@ Image("sholes_typewriter.png", sliced='r',
       width=1, height=3, x=3, y=0)
 PageBreak()
 
-# ---- shapes rotation
+# ---- shape rotation
 Blueprint()
 Text(common=txt, text="Rotation (cross & label)")
 props = Common(
-    stroke=black,
-    cross=0.5, cross_stroke=red, cross_stroke_width=1,
+    stroke="black",
+    cross=0.5, cross_stroke="red", cross_stroke_width=1,
     rotation=45, label_size=6)
 Rectangle(cx=1, cy=5, height=1, width=1.5, common=props, label="rectangle")
 Rhombus(cx=3, cy=5, side=2, common=props, label="rhombus")
@@ -539,41 +565,113 @@ Star(x=1, y=1, vertices=5, radius=0.75, common=props, label="star")
 Ellipse(cx=3, cy=1, height=1, width=1.5, common=props, label="ellipse")
 PageBreak()
 
+# ---- shape hatch-and-rotation
+Blueprint()
+Text(common=txt, text="Hatch and Rotate")
+htch = Common(
+    fill='lightgray', stroke=None,
+    hatch_count=5, hatch_width=0.75,
+    hatch='w', hatch_stroke="red")
+
+Hexagon(
+    common=htch,
+    cx=2, cy=1, height=1.5,
+    rotation=30,
+    )
+EquilateralTriangle(
+    common=htch,
+    cx=1, cy=3, side=1.5,
+    rotation=30,
+    )
+Rectangle(
+    common=htch,
+    x=0.5, y=4, height=1.5, width=1,
+    rotation=30,
+)
+Circle(
+   common=htch,
+   cx=3, cy=3, radius=0.75,
+   rotation=30,
+)
+Rhombus(
+   common=htch,
+   cx=3, cy=5, height=2, width=1.5,
+   rotation=30,
+)
+PageBreak()
+
+# ---- text styling
+Blueprint()
+Text(common=txt, text="Text - styling")
+
+Font("Times-Roman", size=11, stroke="tomato")
+Text(x=0, y=0.5, align="left", text="Times-Roman 12pt red")
+
+Text(html=True,
+     x=0, y=1, width=4, height=2,
+     text='<span style="font-family: Helvetica; font-size: 10pt; color: red">'
+          'HTML Helvetica 10pt<br/>'
+          '<b>bold</b> <i>ital</i> <b><i>bold ital</i></b></span>'
+)
+Text(html=True,
+     x=0, y=2, width=4, height=2,
+     text='<span style="font-family: Times-Roman; font-size: 9pt; color: blue">'
+          'HTML Times-Roman 9pt<br/>'
+          '<b>bold</b> <i>ital</i> <b><i>bold ital</i></b></span>'
+)
+Text(html=True,
+     x=0, y=3, width=4, height=2,
+     css="font-family: Courier; font-size: 8pt; color: blue;",
+     text='HTML/CSS Courier 8pt<br/>'
+          '<b>bold</b> <i>ital</i> <b><i>bold ital</i></b>'
+)
+PageBreak()
+
+
 # ---- text custom
 Blueprint()
-Text(common=txt, text="Text - custom")
-Font("Times-Roman", size=11, stroke=tomato)
-Text(x=0, y=5, align="left", text="Times-Roman 12pt red")
-Text(x=0, y=4, align="right", stroke=blue,
-     wrap=True, width=4, fill=None,
-     leading=14,
-     outline_stroke=red, outline_width=2,
-     text='<font name="Helvetica" size="14">'
-          '<u>Helvetica</u><br/>'
-          '<b>bold</b> <i>ital</i><br/>'
-          '<b><i>bold ital</i></b></font>')
-Text(x=0, y=2, align="left", stroke=orange,
-     font_name="Courier", font_size=10,
-     wrap=True, width=4, fill=None,
-     transform='c',
-     text="I am capitalized")
-Text(x=0, y=1.5, align="left", stroke=orange,
-     font_name="Courier", font_size=10,
-     wrap=True, width=4, fill=None,
-     transform='l',
-     text="I am in lowercase")
-Text(x=0, y=1, align="left", stroke=orange,
-     font_name="Courier", font_size=10,
-     wrap=True, width=4, fill=None,
-     transform='u',
-     text="I am in uppercase")
+Text(common=txt, text="Text - font, case & align")
+Text(wrap=True,
+     x=0, y=1, width=4, height=1,
+     font_size=7,  fill="black", stroke="black",
+     font_name="Courier", align="right",
+     transform='t',
+     text="I am Courier in title case to the right")
+Text(wrap=True,
+     x=0, y=2.5, width=4, height=1,
+     font_size=8,  fill="black", stroke="black",
+     font_name="Helvetica", align="left",
+     transform='upper',
+     text="I am Helvetica in upper case to the left")
+Text(wrap=True,
+     x=0, y=4, width=4, height=1,
+     font_size=9,  fill="black", stroke="black",
+     font_name="Times-Roman", align="centre",
+     transform='lowercase',
+     text="I'm lower case Times-Roman in the centre")
+PageBreak()
+
+# ---- text rotate
+Blueprint()
+Text(common=txt, text="Text - rotate")
+props = Common(font_size=7,  fill="black", stroke="black", font_name="Helvetica")
+# line
+Text(common=props, x=1, y=1, text="Line text 1,1 - rotate 30", rotation=30)
+Text(common=props, x=3, y=1, text="Line text 3,1 - rotate 30\nline break", rotation=30)
+
+Text(common=props, x=0, y=3, width=1, height=3, wrap=True,
+     text="Wrap text - 1-by-3 - rotate 90", rotation=90)
+Text(common=props, x=1, y=3, width=3, height=1, wrap=True,
+     text="Wrap text - 3-by-1 - rotate 90", rotation=90)
+
+Text(common=props, x=3, y=3, width=1, height=3, html=True,
+     css="font-family: Helvetica; font-size: 7pt; color: black;",
+     text="<i>HTML text</i> - 1-by-3 - rotate 90", rotation=90)
 PageBreak()
 
 # ---- END
 Text(common=txt, text="Shapes END...")
-#PageBreak(footer=True)
 
-#Save()
 Save(
      output='png',
      dpi=300,
@@ -583,7 +681,7 @@ Save(
         "blueprint_subdiv", "dots_crosses", "centred", "right_angled_triangle",
         "compass", "lines", "starfield_rectangle", "starfield_circle",
         "starfield_poly", "equilateral_triangle", "right_angled_triangle_flip",
-        "sectors", "grid_gray", "dotgrid_moleskine", "arc",
+        "sectors", "grid_gray", "dotgrid_moleskine", "dotgrid_rowscols", "arc",
         "stadium_edges", "trapezoid_flip", "chord",
         "polygon_radii", "polygon_perbis",
         "dates_formats",
@@ -597,5 +695,6 @@ Save(
         "rectangles_rowcol", "rectangles_custom", "rhombus_custom",
         "rhombus_borders", "trapezoid_borders", "arrow_sizes", "arrow_rotate",
         "shape_centred", "shape_centred_move", "qr_code", "image_sliced",
-        "shape_rotation", "text_custom",
+        "shape_rotation", "shape_hatch_and_rotation",
+        "text_style", "text_custom", "text_rotate",
         None])

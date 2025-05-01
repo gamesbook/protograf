@@ -64,12 +64,12 @@ Example 1.
       values in the sequence; the values are automatically assigned to its
       **text** property.
 
-      The example with **normal integer numbers** (top of example) is created by:
+      The example with **normal integer numbers** (bottom of example) is created by:
 
       .. code:: python
 
           Sequence(
-              text(x=1, y=5.),
+              text(x=1, y=5.5),
               setting=(10, 0, -2, 'number'),
               interval_x=0.5,
           )
@@ -81,7 +81,7 @@ Example 1.
       of the previous one; they will be in a level line, because the default
       ``interval_y`` value is zero.
 
-      The example with **lowercase letters** (middle top) is created by:
+      The example with **lowercase letters** (lower middle) is created by:
 
       .. code:: python
 
@@ -99,7 +99,7 @@ Example 1.
       be ``0.5`` cm to the right (``interval_x``) and ``0.5`` cm (``interval_y``)
       above the previous one.
 
-      The example with **uppercase letters** (middle bottom) is created by:
+      The example with **uppercase letters** (upper middle) is created by:
 
       .. code:: python
 
@@ -115,12 +115,12 @@ Example 1.
       ``0.5`` cm to the right and below - because ``interval_y`` is negative - the
       previous one.
 
-      The example with **Roman numerals** (lower down) is created by:
+      The example with **Roman numerals** (upper top) is created by:
 
       .. code:: python
 
           Sequence(
-              text(x=0.5, y=1),
+              text(x=0.5, y=3),
               setting=(5, 11, 1, 'roman'),
               interval_x=0.5,
           )
@@ -128,7 +128,7 @@ Example 1.
       Here the progression is one of Roman numbers. The range starts at ``5``,
       which is a ``V`` in Roman, and ends at ``11`` which is a ``XI`` in Roman.
 
-      The example with **Excel columns** (lower edge of example) is created by:
+      The example with **Excel columns** (top edge of example) is created by:
 
       .. code:: python
 
@@ -158,7 +158,23 @@ Example 2.
       is encountered, it is replaced by the **actual** value of the sequence number
       for the item.
 
-      The example with **hexagons** and nested circles (upper left) is created by:
+      The example with **rectangles** (top edge) is created by:
+
+      .. code:: python
+
+          Sequence(
+              rectangle(
+                  x=0.25, y=0.25, height=0.75, width=1,
+                  label_size=8, label="${{sequence}}"),
+              setting=(1, 3, 1, 'number'),
+              interval_x=1.2,
+          )
+
+      Here the progression is one of numbers; with each number in the sequence
+      is assigned to the ``{{sequence}}`` keyword and substituted into the text as
+      part of the ``Rectangle`` 's label; the `$` is just a normal character.
+
+      The example with **hexagons** and nested circles (middle left) is created by:
 
       .. code:: python
 
@@ -166,7 +182,7 @@ Example 2.
               [hexagon(
                  x=0.5, y=1.5, radius=0.5,
                   title_size=8, title="Fig. {{sequence}}"),
-               circle(cx=1, cy=2, radius=0.2, fill=grey)],
+               circle(cx=1, cy=2, radius=0.2, fill="gray")],
               setting=('C', 'A', -1),
               interval_y=1.5,
               interval_x=0.5,
@@ -184,23 +200,7 @@ Example 2.
       as always the shapes are drawn in order - in this case, the hexagon first
       and then the grey circle.
 
-      The example with **rectangles** (lower edge) is created by:
-
-      .. code:: python
-
-          Sequence(
-              rectangle(
-                  x=0.25, y=0.25, height=0.75, width=1,
-                  label_size=8, label="${{sequence}}"),
-              setting=(1, 3, 1, 'number'),
-              interval_x=1.2,
-          )
-
-      Here the progression is one of numbers; with each number in the sequence
-      is assigned to the ``{{sequence}}`` keyword and substituted into the text as
-      part of the ``Rectangle`` 's label; the `$` is just a normal character.
-
-      The example with **circles** (upper right) is created by:
+      The example with **circles** (middle right) is created by:
 
       .. code:: python
 

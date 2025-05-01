@@ -8,20 +8,21 @@ Notes:
 
 from protograf import *
 
-Create(filename="hex_game_board.pdf", margin=0.5, paper=landscape(A4))
+Create(filename="hex_game_board.pdf", margin=0.5, paper="A4-l")
 
 # Background Player Areas
+locale = Common(y=9.25, height=9, width=15.35)
 RightAngledTriangle(
-    x=-1.1, y=10.0, height=9, width=15.35, fill=white, flip="north", hand="east"
+    common=locale, x=-1.1,  fill="white", flip="north", hand="east"
 )
 RightAngledTriangle(
-    x=-1.1, y=10.0, height=9, width=15.35, fill=black, flip="south", hand="east"
+    common=locale, x=-1.1, fill="black", flip="south", hand="east"
 )
 RightAngledTriangle(
-    x=29.55, y=10.0, height=9, width=15.35, fill=black, flip="north", hand="west"
+    common=locale, x=29.55, fill="black", flip="north", hand="west"
 )
 RightAngledTriangle(
-    x=29.55, y=10.0, height=9, width=15.35, fill=white, flip="south", hand="west"
+    common=locale, x=29.55, fill="white", flip="south", hand="west"
 )
 
 # Hex Game Board

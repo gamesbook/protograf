@@ -2,12 +2,15 @@
 """
 Global variables for proto (import at top-level)
 """
-from reportlab.lib.pagesizes import A4
-from reportlab.lib.units import cm
+from pymupdf import paper_size
+from protograf.utils.support import unit
 
 
 def initialize():
-    global cnv
+    global archive
+    global css
+    global document
+    global base
     global deck
     global deck_settings
     global card_frames  # card boundaries - use for image extraction
@@ -25,12 +28,18 @@ def initialize():
     global page_count
     global pargs
     global paper
+    global page  #  (width, height) in points
     global page_width
     global page_height
     global font_size
     global units
 
-    cnv = None  # will become a reportlab.canvas object
+    archive = None  # will become a pymupdf.Archive()
+    css = None  # will become a string containing CSS font details
+    document = None  # will become a pymupdf.Document object
+    doc_page = None  # will become a pymupdf.Page object
+    canvas = None  # will become a pymupdf.Shape object; one created per Page
+    base = None  # will become a base.BaseCanvas object
     deck = None  # will become a shapes.DeckShape object
     deck_settings = {}  # holds kwargs passed to Deck ; cards, copy, extra, grid_marks
     card_frames = {}  # list of BBox card outlines; keyed on page number
@@ -47,8 +56,9 @@ def initialize():
     footer_draw = False
     page_count = 0
     pargs = None
-    paper = A4
+    paper = "A4"
     font_size = 12
-    units = cm
-    page_width = paper[0] / cm
-    page_height = paper[1] / cm
+    units = unit.cm
+    page = paper_size(paper)  # (width, height) in points
+    page_width = page[0] / unit.cm  # width in user units
+    page_height = page[1] / unit.cm  # height in user units

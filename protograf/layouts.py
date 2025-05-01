@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Create grids, repeats, sequences, layouts and connections - for protograf
+Create grids, repeats, sequences, layouts, and connections for protograf
 """
 # lib
 import copy
@@ -46,7 +46,7 @@ class GridShape(BaseShape):
     def draw(self, cnv=None, off_x=0, off_y=0, ID=None, **kwargs):
         """Draw a grid on a given canvas."""
         kwargs = self.kwargs | kwargs
-        cnv = cnv.canvas if cnv else self.canvas.canvas
+        cnv = cnv if cnv else self.canvas
         super().draw(cnv, off_x, off_y, ID, **kwargs)  # unit-based props
         # ---- convert to using units
         x = self._u.x + self._o.delta_x
@@ -67,16 +67,32 @@ class GridShape(BaseShape):
                 (self.page_width - self.margin_left - self.margin_right)
                 / self.points_to_value(width)
             )
-        # tools.feedback(f'*** {self.rows=} {self.cols=}')
+        # tools.feedback(f'+++ {self.rows=} {self.cols=}')
         y_cols, x_cols = [], []
         for y_col in range(0, self.rows + 1):
             y_cols.append(y + y_col * height)
         for x_col in range(0, self.cols + 1):
             x_cols.append(x + x_col * width)
-        # ---- set canvas
-        self.set_canvas_props(index=ID)  # this causes Image to disappear ???
         # ---- draw grid
-        cnv.grid(x_cols, y_cols)  # , stroke=1, fill=1)
+        match kwargs.get("lines"):
+            case "horizontal" | "horiz" | "h":
+                horizontal, vertical = True, False
+            case "vertical" | "vert" | "v":
+                horizontal, vertical = False, True
+            case _:
+                horizontal, vertical = True, True
+        if vertical:
+            for x in x_cols:
+                cnv.draw_line(Point(x, y_cols[0]), Point(x, y_cols[-1]))
+        if horizontal:
+            for y in y_cols:
+                cnv.draw_line(Point(x_cols[0], y), Point(x_cols[-1], y))
+        self.set_canvas_props(  # shape.finish()
+            cnv=cnv,
+            index=ID,
+            **kwargs,
+        )
+        cnv.commit()  # if not, then Page objects e.g. Image not layered
 
 
 class DotGridShape(BaseShape):
@@ -91,7 +107,7 @@ class DotGridShape(BaseShape):
     def draw(self, cnv=None, off_x=0, off_y=0, ID=None, **kwargs):
         """Draw a dot grid on a given canvas."""
         kwargs = self.kwargs | kwargs
-        cnv = cnv.canvas if cnv else self.canvas.canvas
+        cnv = cnv if cnv else self.canvas
         super().draw(cnv, off_x, off_y, ID, **kwargs)  # unit-based props
         # ---- switch to use of units
         x = 0 + self._u.offset_x
@@ -112,34 +128,18 @@ class DotGridShape(BaseShape):
             )
         # ---- number of blocks in grid:
         if self.rows == 0:
-            self.rows = int(
-                (
-                    self.page_height
-                    - self.margin_bottom
-                    - self.margin_top
-                    - self.offset_y
-                )
-                / self.points_to_value(height)
-            )
+            self.rows = int((self.page_height) / self.points_to_value(height)) + 1
         if self.cols == 0:
-            self.cols = int(
-                (self.page_width - self.margin_left - self.margin_right - self.offset_x)
-                / self.points_to_value(width)
-            )
+            self.cols = int((self.page_width) / self.points_to_value(width)) + 1
         # ---- set canvas
         size = self.dot_point / 2.0  # diameter is 3 points ~ 1mm or 1/32"
         self.fill = self.stroke
-        self.set_canvas_props(index=ID)
         # ---- draw dot grid
         for y_col in range(0, self.rows):
             for x_col in range(0, self.cols):
-                cnv.circle(
-                    x + x_col * width,
-                    y + y_col * height,
-                    size,
-                    stroke=0,
-                    fill=1 if self.fill else 0,
-                )
+                cnv.draw_circle((x + x_col * width, y + y_col * height), size)
+        self.set_canvas_props(cnv=cnv, index=ID, **kwargs)
+        cnv.commit()  # if not, then Page objects e.g. Image not layered
 
 
 # ---- sequence
@@ -147,16 +147,19 @@ class DotGridShape(BaseShape):
 
 class SequenceShape(BaseShape):
     """
-    Set of shapes drawn at points
+    Set of Shapes drawn at points
 
     Notes:
         * `deck_data` is used, if provided by CardShape, to draw Shapes in the sequence.
     """
 
     def __init__(self, _object=None, canvas=None, **kwargs):
+        # tools.feedback(f'+++ SequenceShape {_object=} {canvas=} {kwargs=}')
         super(SequenceShape, self).__init__(_object=_object, canvas=canvas, **kwargs)
         self.kwargs = kwargs
-        self._object = _object or TextShape(_object=None, canvas=canvas, **kwargs)
+        self._objects = kwargs.get(
+            "shapes", TextShape(_object=None, canvas=canvas, **kwargs)
+        )
         self.setting = kwargs.get("setting", (1, 1, 1, "number"))
         if isinstance(self.setting, list):
             self.setting_list = self.setting
@@ -234,7 +237,6 @@ class SequenceShape(BaseShape):
                     " number, roman, excel or letter!",
                     True,
                 )
-            # tools.feedback(f'{self.setting_list=}')
         except Exception as err:
             log.warning(err)
             tools.feedback(
@@ -245,7 +247,7 @@ class SequenceShape(BaseShape):
 
     def draw(self, cnv=None, off_x=0, off_y=0, ID=None, **kwargs):
         kwargs = self.kwargs | kwargs
-        cnv = cnv.canvas if cnv else self.canvas.canvas
+        cnv = cnv if cnv else self.canvas
         super().draw(cnv, off_x, off_y, ID, **kwargs)  # unit-based props
         _off_x, _off_y = off_x, off_y
 
@@ -253,11 +255,11 @@ class SequenceShape(BaseShape):
             _ID = ID if ID is not None else self.shape_id
             _locale = Locale(sequence=item)
             kwargs["locale"] = _locale._asdict()
-            # tools.feedback(f'*   @Seqnc@ {self.interval_x=}, {self.interval_y=}')
-            # tools.feedback(f'*   @Seqnc@ {kwargs["locale"]}')
+            # tools.feedback(f'+++ @Seqnc@ {self.interval_x=}, {self.interval_y=}')
+            # tools.feedback(f'+++ @Seqnc@ {kwargs["locale"]}')
             off_x = _off_x + key * self.interval_x
             off_y = _off_y + key * self.interval_y
-            flat_elements = tools.flatten(self._object)
+            flat_elements = tools.flatten(self._objects)
             log.debug("flat_eles:%s", flat_elements)
             for each_flat_ele in flat_elements:
                 flat_ele = copy.copy(each_flat_ele)  # allow props to be reset
@@ -293,12 +295,13 @@ class RepeatShape(BaseShape):
     Shape is drawn multiple times.
 
     Notes:
-        *  * `deck_data` is used, if provided by CardShape, to draw Shape repeatedly.
+        *  `deck_data` is used, if provided by CardShape, to draw Shape(s) repeatedly.
     """
 
     def __init__(self, _object=None, canvas=None, **kwargs):
         super(RepeatShape, self).__init__(_object=_object, canvas=canvas, **kwargs)
         self.kwargs = kwargs
+        self._objects = kwargs.get("shapes", [])  # incoming Shape object(s)
         # UPDATE SELF WITH COMMON
         if self.common:
             attrs = vars(self.common)
@@ -309,7 +312,6 @@ class RepeatShape(BaseShape):
                     if common_attr != base_attr:
                         setattr(self, attr, common_attr)
 
-        self._object = _object  # incoming Shape object
         # repeat
         self.rows = kwargs.get("rows", 1)
         self.cols = kwargs.get("cols", kwargs.get("columns", 1))
@@ -342,17 +344,17 @@ class RepeatShape(BaseShape):
     def draw(self, cnv=None, off_x=0, off_y=0, ID=None, **kwargs):
         _ID = ID if ID is not None else self.shape_id
         kwargs = self.kwargs | kwargs
-        cnv = cnv.canvas if cnv else self.canvas.canvas
+        cnv = cnv if cnv else self.canvas
         super().draw(cnv, off_x, off_y, ID, **kwargs)  # unit-based props
         _off_x, _off_y = off_x or self.offset_x or 0, off_y or self.offset_y or 0
-        # print(f'*** {_off_x=}, {_off_y=}')
+        # print(f'+++ {_off_x=}, {_off_y=}')
 
         for col in range(self.cols):
             for row in range(self.rows):
                 if ((col + 1) in self.across) and ((row + 1) in self.down):
                     off_x = _off_x + col * self.interval_x  # WAS self.offset_x
                     off_y = _off_y + row * self.interval_y  # WAS self.offset_y
-                    flat_elements = tools.flatten(self._object)
+                    flat_elements = tools.flatten(self._objects)
                     log.debug("flat_eles:%s", flat_elements)
                     for flat_ele in flat_elements:
                         log.debug("flat_ele:%s", flat_ele)
@@ -598,19 +600,19 @@ class RectangularLocations(VirtualLocations):
         current_dir = _dir
         match _start:
             case "sw":
-                row_start = 1
+                row_start = self.rows
                 col_start = 1
                 clockwise = True if _dir in ["north", "n"] else False
             case "se":
-                row_start = 1
+                row_start = self.rows
                 col_start = self.cols
                 clockwise = True if _dir in ["west", "w"] else False
             case "nw":
-                row_start = self.rows
+                row_start = 1
                 col_start = 1
                 clockwise = True if _dir in ["east", "e"] else False
             case "ne":
-                row_start = self.rows
+                row_start = 1
                 col_start = self.cols
                 clockwise = True if _dir in ["south", "s"] else False
             case _:
@@ -620,7 +622,7 @@ class RectangularLocations(VirtualLocations):
         col, row, count = col_start, row_start, 0
         max_outer = 2 * self.rows + (self.cols - 2) * 2
         corner = None
-        # print(f'\n*** {self.start=} {self.layout_size=} {max_outer=} {self.stop=} {clockwise=}')
+        # print(f'\n+++ {self.start=} {self.layout_size=} {max_outer=} {self.stop=} {clockwise=}')
         # ---- triangular layout
         if self.side:
             self.interval_x = self.side
@@ -652,12 +654,12 @@ class RectangularLocations(VirtualLocations):
                     x = x + self.row_odd
                 if self.row_even and not row & 1:
                     x = x + self.row_even
-            # print(f'*** {count=} {row=},{col=} // {x=},{y=}')
+            # print(f'+++ {count=} {row=},{col=} // {x=},{y=}')
             # ---- set next grid location
             match self.pattern.lower():
                 # ---- * snake
                 case "snake" | "snaking" | "s":
-                    # tools.feedback(f'*** {count=} {self.layout_size=} {self.stop=}')
+                    # tools.feedback(f'+++ {count=} {self.layout_size=} {self.stop=}')
                     if count > self.layout_size or (self.stop and count > self.stop):
                         return
                     yield Locale(col, row, x, y, self.set_id(col, row), count, corner)
@@ -683,7 +685,7 @@ class RectangularLocations(VirtualLocations):
                                     row = row + 1
                                 self.direction = "e"
 
-                        case "n" | "north":
+                        case "s" | "south":
                             row = row + 1
                             if row > self.rows:
                                 row = self.rows
@@ -691,9 +693,9 @@ class RectangularLocations(VirtualLocations):
                                     col = col - 1
                                 else:
                                     col = col + 1
-                                self.direction = "s"
+                                self.direction = "n"
 
-                        case "s" | "south":
+                        case "n" | "north":
                             row = row - 1
                             if row < 1:
                                 row = 1
@@ -701,7 +703,7 @@ class RectangularLocations(VirtualLocations):
                                     col = col - 1
                                 else:
                                     col = col + 1
-                                self.direction = "n"
+                                self.direction = "s"
 
                     x = self.x + (col - 1) * self.interval_x
                     y = self.y + (row - 1) * self.interval_y
@@ -712,52 +714,52 @@ class RectangularLocations(VirtualLocations):
                         return
                     corner = None
                     if row == 1 and col == 1:
-                        corner = "sw"
-                    if row == self.rows and col == 1:
                         corner = "nw"
+                    if row == self.rows and col == 1:
+                        corner = "sw"
                     if row == self.rows and col == self.cols:
-                        corner = "ne"
-                    if row == 1 and col == self.cols:
                         corner = "se"
+                    if row == 1 and col == self.cols:
+                        corner = "ne"
                     yield Locale(col, row, x, y, self.set_id(col, row), count, corner)
                     # next grid location
-                    # print(f'*** {count=} {current_dir=} {row=},{col=} // {row_start=},{col_start=}')
+                    # print(f'+++ {count=} {current_dir=} {row=},{col=} // {row_start=},{col_start=}')
 
                     if row == 1 and col == 1:
-                        corner = "sw"
-                        if clockwise:
-                            current_dir = "n"
-                            row = row + 1
-                        else:
-                            current_dir = "e"
-                            col = col + 1
-
-                    if row == self.rows and col == 1:
                         corner = "nw"
                         if clockwise:
                             current_dir = "e"
                             col = col + 1
                         else:
                             current_dir = "s"
-                            row = row - 1
+                            row = row + 1
 
-                    if row == self.rows and col == self.cols:
-                        corner = "ne"
+                    if row == self.rows and col == 1:
+                        corner = "sw"
                         if clockwise:
-                            current_dir = "s"
+                            current_dir = "n"
                             row = row - 1
                         else:
-                            current_dir = "w"
-                            col = col - 1
+                            current_dir = "e"
+                            col = col + 1
 
-                    if row == 1 and col == self.cols:
+                    if row == self.rows and col == self.cols:
                         corner = "se"
                         if clockwise:
                             current_dir = "w"
                             col = col - 1
                         else:
                             current_dir = "n"
+                            row = row - 1
+
+                    if row == 1 and col == self.cols:
+                        corner = "ne"
+                        if clockwise:
+                            current_dir = "s"
                             row = row + 1
+                        else:
+                            current_dir = "w"
+                            col = col - 1
 
                     if not corner:
                         match current_dir:
@@ -766,9 +768,9 @@ class RectangularLocations(VirtualLocations):
                             case "w" | "west":
                                 col = col - 1
                             case "n" | "north":
-                                row = row + 1
-                            case "s" | "south":
                                 row = row - 1
+                            case "s" | "south":
+                                row = row + 1
 
                     x = self.x + (col - 1) * self.interval_x
                     y = self.y + (row - 1) * self.interval_y
@@ -802,7 +804,7 @@ class RectangularLocations(VirtualLocations):
                                     row = row + 1
                                     if row > self.rows:
                                         return  # end
-                        case "n" | "north":
+                        case "s" | "south":
                             row = row + 1
                             if row > self.rows:
                                 row = row_start
@@ -814,7 +816,7 @@ class RectangularLocations(VirtualLocations):
                                     col = col + 1
                                     if col > self.cols:
                                         return  # end
-                        case "s" | "south":
+                        case "n" | "north":
                             row = row - 1
                             if row < 1:
                                 row = row_start
@@ -829,7 +831,7 @@ class RectangularLocations(VirtualLocations):
 
                     x = self.x + (col - 1) * self.interval_x
                     y = self.y + (row - 1) * self.interval_y
-                    # tools.feedback(f"{x=}, {y=}, {col=}, {row=}, ")
+                    # tools.feedback(f"+++ {x=}, {y=}, {col=}, {row=}")
 
 
 class TriangularLocations(VirtualLocations):
@@ -888,7 +890,7 @@ class TriangularLocations(VirtualLocations):
                         array.append(_rows)
             case _:
                 tools.feedback(f"The facing value {self.facing} is not valid!", True)
-        # print(f'{_facing}', f'{self.cols=}',  f'{self.rows=}',array)
+        # print(f'+++ {_facing}', f'{self.cols=}',  f'{self.rows=}',array)
 
         # ---- calculate initial conditions
         col_start, row_start = 1, 1
@@ -909,7 +911,7 @@ class TriangularLocations(VirtualLocations):
         col, row, count = col_start, row_start, 0
         max_outer = 2 * self.rows + (self.cols - 2) * 2
         corner = None
-        # print(f'\n*** {self.start=} {self.layout_size=} {max_outer=} {self.stop=} {clockwise=}')
+        # print(f'\n+++ {self.start=} {self.layout_size=} {max_outer=} {self.stop=} {clockwise=}')
         # ---- set row and col interval
         match _facing:
             case "north" | "south":  # layout is row-oriented
@@ -922,7 +924,7 @@ class TriangularLocations(VirtualLocations):
         hlf_side = self.side / 2.0
         for key, entry in enumerate(array):
             match _facing:
-                case "north":  # layout is row-oriented
+                case "south":  # layout is row-oriented
                     y = (
                         self.y
                         + (self.rows - 1) * self.interval_y
@@ -938,7 +940,7 @@ class TriangularLocations(VirtualLocations):
                         yield Locale(
                             loc, key + 1, x, y, self.set_id(loc, key + 1), count, corner
                         )
-                case "south":  # layout is row-oriented
+                case "north":  # layout is row-oriented
                     y = self.y + key * self.interval_y
                     dx = (
                         0.5 * (self.cols - len(entry)) * self.interval_x
@@ -1026,7 +1028,7 @@ class ConnectShape(BaseShape):
         """Draw a connection (line) between two shapes on given canvas."""
         kwargs = self.kwargs | kwargs
         base_canvas = cnv
-        cnv = cnv.canvas if cnv else self.canvas.canvas
+        cnv = cnv if cnv else self.canvas
         super().draw(cnv, off_x, off_y, ID, **kwargs)  # unit-based props
         # ---- style
         style = self.style or "direct"
@@ -1157,8 +1159,8 @@ class ConnectShape(BaseShape):
 
         N,S,E,W = North, South, East, West
         """
-        top = _shape.y + _shape.height
-        btm = _shape.y
+        top = _shape.y
+        btm = _shape.y + _shape.height
         mid_horizontal = _shape.x + _shape.width / 2.0
         mid_vertical = _shape.y + _shape.height / 2.0
         left = _shape.x

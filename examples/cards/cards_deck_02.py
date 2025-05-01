@@ -6,14 +6,14 @@ Created on: 8 January 2025
 """
 from protograf import *
 
-Create(filename='cards_deck_02.pdf', margin=0.25, paper=A8)
+Create(filename='cards_deck_02.pdf', margin=0.25, paper="A8")
 
 # design deck
 Deck(
     cards=4,
     height=3.2,
     width=2.1,
-    fill=silver)
+    fill="lightsteelblue")
 # design card
 Card(
     '*',

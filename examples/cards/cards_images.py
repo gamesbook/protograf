@@ -13,10 +13,10 @@ Data(images="pictures", images_filter=".png,.jpg")
 
 # create the deck with default size cards
 # * card count will be based on number of images loaded via Data()
-Deck(grid_marks=True)
+Deck(grid_marks=True, width=6.2, height=8.3)
 
 # add an image to each card
-img = image("*", x=0, y=0, width=6.3, height=8.8)
+img = image("*", x=0, y=0, width=6.2, height=8.3)
 rct = rectangle(fill_stroke=None)
 layout = group(rct, img)
 Card('*', layout)

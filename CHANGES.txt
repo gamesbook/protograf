@@ -5,7 +5,11 @@ protograf
 Changes
 =======
 
-2025-04-05 (0.1.6)
+2025-03-?? (0.1.7)
+------------------
+- Drop use of ReportLab and switch to PyMuPDF
+
+2025-03-05 (0.1.6)
 ------------------
 - Enable card grouping
 - Add radii labels

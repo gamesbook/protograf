@@ -45,6 +45,7 @@ python boards\abstract\hexhex_circles.py --no-png -d %location%
 python boards\abstract\hexhex_dots.py --no-png -d %location%
 python boards\abstract\hexhex_hexagons.py --no-png -d %location%
 python boards\abstract\hexhex_rectangles.py --no-png -d %location%
+python boards\abstract\morabaraba.py --no-png -d %location%
 python boards\abstract\octagons.py --no-png -d %location%
 python boards\abstract\tictactoe.py --no-png -d %location%
 
@@ -57,6 +58,10 @@ python boards\commercial\traveller_draft.py --no-png -d %location%
 python boards\commercial\traveller_black.py --no-png -d %location%
 python boards\commercial\underwater_cities.py --no-png -d %location%
 python boards\commercial\warpwar.py --no-png -d %location%
+
+REM ---- boards: maps
+ECHO "Creating maps..."
+python boards\map\honorverse.py  --no-png -d %location%
 
 REM ---- counters
 ECHO "Creating counters..."

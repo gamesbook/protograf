@@ -8,13 +8,15 @@ Created on: 19 May 2024
 from protograf import *
 
 Create(filename="layouts_sequence.pdf",
-       paper=A8,
-       margin=0.75,
-       margin_right=0.2, margin_top=0.2,
+       paper="A8",
+       margin_left=0.5,
+       margin_right=0.3,
+       margin_bottom=0.2,
+       margin_top=0.5,
        font_size=8,
        stroke_width=0.5)
 
-txt = Common(x=0, y=6, font_size=8, align="left")
+txt = Common(x=0, y=0, font_size=8, align="left")
 
 # ---- sequence_values
 Blueprint()
@@ -63,12 +65,11 @@ Sequence(
     )
 Sequence(
     [hexagon(x=0.5, y=1.5, radius=0.5, title_size=8, title="Fig. {{sequence}}"),
-     circle(cx=1, cy=2, radius=0.2, fill=grey)],
-    setting=('C', 'A', -1),
+     circle(cx=1, cy=2, radius=0.2, fill="gray")],
+    setting=('A', 'C', 1),
     interval_y=1.5,
     interval_x=0.5,
     )
-PageBreak()
 
 #Save()
 Save(

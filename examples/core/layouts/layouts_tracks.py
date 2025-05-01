@@ -7,18 +7,20 @@ Created on: 24 September 2024
 from protograf import *
 
 Create(filename="customised_tracks.pdf",
-       paper=A8,
-       margin=0.75,
-       margin_right=0.2, margin_top=0.2,
+       paper="A8",
+       margin_left=0.5,
+       margin_right=0.3,
+       margin_bottom=0.2,
+       margin_top=0.5,
        font_size=8,
        stroke_width=0.5)
 
 Footer(draw=False)
 
-txt = Common(x=0, y=6, font_size=8, align="left")
+txt = Common(x=0, y=0, font_size=8, align="left")
 
 Text(common=txt, text="Tracks START...")
-PageBreak(footer=True)
+PageBreak()
 
 # ---- default track
 Blueprint()
@@ -64,7 +66,7 @@ PageBreak()
 Blueprint()
 Text(common=txt, text="Track: polyline")
 shp = circle(cx=1, cy=1, radius=0.25, label='{{sequence}}')
-Track(Polyline(points=[(0, 0), (1, 2), (2, 1), (3, 3), (1, 5)]), shapes=[shp])
+Track(Polyline(points=[(1, 1), (2, 2), (3, 1), (4, 4), (1, 5)]), shapes=[shp])
 PageBreak()
 
 # # ---- circle track + shape
@@ -126,12 +128,13 @@ PageBreak()
 # ---- circle track + rotation shape
 Blueprint()
 Text(common=txt, text="Track: circle; rotate 'o'")
-shp = rectangle(cx=1, cy=1, width=0.5, height=0.5, label='{{sequence}}', peaks=[("n", 0.25)])
+shp = rectangle(cx=1, cy=1, width=0.5, height=0.5,
+                label='{{sequence}}', peaks=[("n", 0.25)])
 Track(
     Circle(cx=2, cy=3, radius=1.5),
     angles=[30,120,210,300],
     shapes=[shp],
-    rotation_style='o',
+    rotation_style='i',
 )
 PageBreak()
 
@@ -175,28 +178,28 @@ Text(common=txt, text="Track: multiple types; starts")
 shp = circle(cx=0, cy=0, radius=0.25, label='{{sequence}}')
 # square
 Track(
-  Square(x=0.75, y=0.75, side=0.75, stroke=red),
+  Square(x=0.75, y=0.75, side=0.75, stroke="red"),
   shapes=[shp])
 Track(
-  Square(x=2.75, y=0.75, side=0.75, stroke=red),
+  Square(x=2.75, y=0.75, side=0.75, stroke="red"),
   shapes=[shp],
   clockwise=True)
 # circle
 Track(
-  Circle(cx=1, cy=3, radius=0.5, stroke=red),
+  Circle(cx=1, cy=3, radius=0.5, stroke="red"),
   shapes=[shp],
   angles=[45,135,225,315])
 Track(
-  Circle(cx=3, cy=3, radius=0.5, stroke=red),
+  Circle(cx=3, cy=3, radius=0.5, stroke="red"),
   shapes=[shp],
   angles=[45,135,225,315],
   clockwise=True)
 # poly
 Track(
-  Polygon(cx=1, cy=5, radius=0.5, sides=4, stroke=red),
+  Polygon(cx=1, cy=5, radius=0.5, sides=4, stroke="red"),
   shapes=[shp])
 Track(
-  Polygon(cx=3, cy=5, radius=0.5, sides=4, stroke=red),
+  Polygon(cx=3, cy=5, radius=0.5, sides=4, stroke="red"),
   shapes=[shp],
   clockwise=True)
 PageBreak()
@@ -206,13 +209,12 @@ Blueprint()
 Text(common=txt, text="Track: circles; 'clock'")
 Circle(cx=2, cy=3, radius=1.8, stroke_width=2, dot=0.1)
 times = circle(
-    cx=1, cy=1, radius=0.25, stroke=white,
-    label='{{sequence}}', label_stroke=black)
+    cx=1, cy=1, radius=0.25, stroke="white",
+    label='{{sequence}}', label_stroke="black")
 Track(
     circle(cx=2, cy=3, radius=1.5),
-    angles=[60,90,120,150,180,210,240,270,300,330,0,30],
+    angles=[60,30,0,330,300,270,240,210,180,150,120,90],
     shapes=[times],
-    rotation_style='o',
     clockwise=True,
 )
 PageBreak()
@@ -222,10 +224,10 @@ Blueprint()
 Text(common=txt, text="Track: polygon; 'scoring'")
 trk = polygon(cx=2, cy=3, sides=30, radius=1.75)
 score = Common(
-    cx=1, cy=1, radius=0.18, stroke=navy,
+    cx=1, cy=1, radius=0.18, stroke="navy",
     label='{{sequence}}', label_size=6)
 
-shp = circle(common=score, fill=white)
+shp = circle(common=score, fill="white")
 Track(
     trk,
     shapes=[shp],
@@ -233,7 +235,7 @@ Track(
     clockwise=True,
     start=24
 )
-shp5 = circle(common=score, fill=aqua)
+shp5 = circle(common=score, fill="cyan")
 Track(
     trk,
     shapes=[shp5],
@@ -246,7 +248,6 @@ PageBreak()
 
 # ---- END
 Text(common=txt, text="Tracks END...")
-PageBreak(footer=True)
 
 # Save()
 Save(

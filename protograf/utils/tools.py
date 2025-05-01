@@ -172,32 +172,33 @@ def as_int(value, label, maximum=None, minimum=None, allow_none=False) -> int:
     # >>> as_int(value='3', label='N', maximum=2)
     # FEEDBACK:: z is
     # >>> as_int(value='z', label='N')
-    # FEEDBACK:: z is not a valid N integer!
+    # FEEDBACK:: The N value "z" is not a valid integer!
     # >>> as_int(value='3.1', label='N')
-    # FEEDBACK:: 3.1 is not a valid N integer!
+    # FEEDBACK:: The N value "3.1" is not a valid integer!
     """
     if value is None or value == "" and allow_none:
         return value
-    _label = f" for {label}" if label else " of"
+    _label = f"{label} value " if label else "value "
     try:
         the_value = int(value)
         if minimum and the_value < minimum:
             feedback(
-                f"The value{_label} integer is less than the minimum of {minimum}!",
+                f'The {_label}"{value}" integer is less than the minimum of {minimum}!',
                 True,
             )
         if maximum and the_value > maximum:
             feedback(
-                f"The value{_label} integer is more than the maximum of {maximum}!",
+                f'The {_label}"{value}" integer is more than the maximum of {maximum}!',
                 True,
             )
         return the_value
     except (ValueError, Exception):
-        feedback(f"The {value}{label} is not a valid integer!", True)
+        breakpoint()
+        feedback(f'The {_label}"{value}" is not a valid integer!!', True)
 
 
 def as_bool(value, label=None, allow_none=True) -> bool:
-    """Convert a value to a boolean
+    """Convert a value to a Boolean
 
     Doc Test:
 
@@ -206,10 +207,11 @@ def as_bool(value, label=None, allow_none=True) -> bool:
     >>> as_bool(value='Y', label='Y')
     True
     """
+    TRUES = ["yes", "ja", "oui", "si", "y", "ya", "yep", "yeah", "true", "t", "1"]
     if value is None and allow_none:
         return value
     _label = f" for {label}" if label else " of"
-    result = str(value).lower() in ("yes", "ja", "oui", "y", "true", "t", "1")
+    result = str(value).lower() in TRUES
     return result
 
 
@@ -386,7 +388,7 @@ def sequence_split(
     return values
 
 
-def split(string: str):
+def split(string: str, tuple_to_list: bool = False):
     """
     Split a string into a list of individual characters
 
@@ -395,8 +397,14 @@ def split(string: str):
     ['A', '1', 'B']
     >>> split('A 1 B')
     ['A', '1', 'B']
+    >>> split((1, 2, 3), True)
+    [(1, 2, 3)]
     """
-    if isinstance(string, (list, tuple)):
+    if isinstance(string, list):
+        return string
+    if isinstance(string, tuple):
+        if tuple_to_list:
+            return [string]
         return string
     sep = " " if string and "," not in string else ","
     return sequence_split(string, False, False, sep)
@@ -758,6 +766,15 @@ def color_to_hex(name):
     if isinstance(name, str):
         return name
     _tuple = (int(name.red * 255), int(name.green * 255), int(name.blue * 255))
+    _string = "#%02x%02x%02x" % _tuple
+    return _string.upper()
+
+
+def rgb_to_hex(color):
+    """Convert a RGB tuple color to a hexadecimal string"""
+    if color is None:
+        return color
+    _tuple = (int(color[0] * 255), int(color[1] * 255), int(color[2] * 255))
     _string = "#%02x%02x%02x" % _tuple
     return _string.upper()
 

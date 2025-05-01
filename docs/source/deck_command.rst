@@ -62,7 +62,7 @@ The following are other properties that can also be set for a ``Deck``:
   :ref:`the Data Command <the-data-command>`) that specifies
   how many copies of a card are needed
 - **fill** - sets the color of the card's area; defaults to white
-- **frame** - the default card frame is a rectangle (or square, if the
+- **frame** - the default card frame is a *rectangle* (or square, if the
   height and width match); but can be set to *hexagon* or *circle*
 - **grid_marks** - if set to ``True``, will cause small marks (``1`` cm in
   length) to be drawn at the border of the page that align with the edges of
@@ -119,7 +119,7 @@ on each card.  This purely for illustration purposes - your cards would
 have their own set of shapes that you would want to display.
 
 The ``Rectangle`` also has its *label* set to show the Card's *sequence*
-number i.e. the order in  which it is drawn (usually bottom-to-top and
+number i.e. the order in  which it is drawn (usually top-to-bottom and
 left-to-right), followed by its *column* and *row* number.
 
 The script for all this is:
@@ -189,7 +189,7 @@ Example 2. Card bleed
             cards=4,
             height=3.2,
             width=2.1,
-            fill=silver)
+            fill="silver")
 
       Every card can be assigned a background color via the *fill* property
       of the Deck. This is also known as a "bleed" area, and is useful in case
@@ -219,8 +219,8 @@ Example 3. Full bleed
             cards=4,
             height=3.2,
             width=2.1,
-            fill=silver,
-            bleed_fill=grey)
+            fill="silver",
+            bleed_fill="gray")
 
       The bleed area for the card can also be extended to the whole page
       (up to the margins) by using the *bleed_fill* color.
@@ -254,9 +254,9 @@ Example 4. Offset
             cards=4,
             height=3.2,
             width=2.1,
-            stroke=red,
-            fill=silver,
-            bleed_fill=grey,
+            stroke="red",
+            fill="silver",
+            bleed_fill="gray",
             offset=0.25)
 
       To allow for the possibility that a page may not printed all the way
@@ -293,8 +293,8 @@ Example 5. Grid Marks
             cards=4,
             height=3.2,
             width=2.1,
-            stroke=red,
-            bleed_fill=silver,
+            stroke="red",
+            bleed_fill="silver",
             offset=0.25,
             grid_marks=True,
             grid_length=0.18)
@@ -334,8 +334,8 @@ Example 6. Card Spacing
             cards=4,
             height=3.2,
             width=2.1,
-            stroke=red,
-            bleed_fill=silver,
+            stroke="red",
+            bleed_fill="silver",
             offset=0.15,
             grid_marks=True,
             grid_length=0.18,
@@ -378,7 +378,7 @@ Example 7. Clean Layout
             height=3.2,
             width=2.1,
             stroke=None,
-            bleed_fill=silver,
+            bleed_fill="silver",
             offset=0.15,
             grid_marks=True,
             grid_length=0.18,
@@ -417,7 +417,7 @@ Example 8. Column Limit
             height=3.2,
             width=2.1,
             stroke=None,
-            bleed_fill=silver,
+            bleed_fill="silver",
             offset=0.15,
             grid_marks=True,
             grid_length=0.18,
@@ -454,7 +454,7 @@ Example 9. Row Limit
             height=3.2,
             width=2.1,
             stroke=None,
-            bleed_fill=silver,
+            bleed_fill="silver",
             offset=0.15,
             grid_marks=True,
             grid_length=0.18,
@@ -487,7 +487,7 @@ Example 10. Circular Frame
         Deck(
             cards=6,
             radius=1,
-            bleed_fill=silver,
+            bleed_fill="silver",
             offset=0.15,
             grid_marks=True,
             grid_length=0.18,
@@ -527,7 +527,7 @@ Example 11. Card Grouping
             cards=60,
             width=0.65,
             height=0.65,
-            bleed_fill=silver,
+            bleed_fill="silver",
             offset=0.15,
             grid_marks=True,
             grid_length=0.18,

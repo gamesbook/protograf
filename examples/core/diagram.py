@@ -69,8 +69,6 @@ Connect(centralD, left_D, style='path')
 Connect(centralD, right_D, style='path')
 Connect(centralD, bottom_D, style='path')
 
-PageBreak()
-
 # Save()
 Save(
     output='png',

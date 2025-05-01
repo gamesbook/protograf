@@ -8,7 +8,7 @@ Notes:
 
 from protograf import *
 
-Create(filename="hexhex_board_rectangles.pdf", margin=0.5, paper=A4)
+Create(filename="hexhex_board_rectangles.pdf", margin=0.5, paper="A4")
 
 # Game Board
 Hexagons(
@@ -17,8 +17,8 @@ Hexagons(
     stroke=None,
     fill=None,
     height=2.2,
-    centre_shape=rectangle(stroke=black, fill=white, width=1.9, height=2.2, stroke_width=2),
-    margin_bottom=4,
+    centre_shape=rectangle(
+        stroke="black", fill="white", width=1.9, height=2.2, stroke_width=2),
 )
 
 Save(output='png')

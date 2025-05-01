@@ -37,6 +37,7 @@ python boards/abstract/hexhex_circles.py --no-png -d /tmp/demo
 python boards/abstract/hexhex_dots.py --no-png -d /tmp/demo
 python boards/abstract/hexhex_hexagons.py --no-png -d /tmp/demo
 python boards/abstract/hexhex_rectangles.py --no-png -d /tmp/demo
+python boards/abstract/morabaraba.py --no-png -d /tmp/demo
 python boards/abstract/octagons.py --no-png -d /tmp/demo
 python boards/abstract/tictactoe.py --no-png -d /tmp/demo
 # ---- boards: commercial
@@ -48,6 +49,9 @@ python boards/commercial/traveller_draft.py --no-png -d /tmp/demo
 python boards/commercial/traveller_black.py --no-png -d /tmp/demo
 python boards/commercial/underwater_cities.py --no-png -d /tmp/demo
 python boards/commercial/warpwar.py --no-png -d /tmp/demo
+# ---- boards: maps
+echo -e "\nCreating maps..."
+python boards/map/honorverse.py --no-png -d /tmp/demo
 # ---- counters
 echo -e "\nCreating counters..."
 python counters/counters.py --no-png -d /tmp/demo

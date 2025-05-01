@@ -31,17 +31,17 @@ Deck(
     grid_marks=True,
     rounding=0.3,
     fill=None,
-    stroke=grey,
+    stroke="gray",
     mask="{{ Race == 'Hobbit' }}",
     copy='Copies')
 
 # background color per Race
 back_race = Common(x=0.5, y=0.5, width=5.3, height=7.9, rounded=0.2)
-back_hum = rectangle(common=back_race, fill_stroke=tomato)
-back_elf = rectangle(common=back_race, fill_stroke=gold)
-back_dwa = rectangle(common=back_race, fill_stroke=aqua)
-back_hob = rectangle(common=back_race, fill_stroke=lime)
-back_naz = rectangle(common=back_race, fill_stroke=grey)
+back_hum = rectangle(common=back_race, fill_stroke="tomato")
+back_elf = rectangle(common=back_race, fill_stroke="gold")
+back_dwa = rectangle(common=back_race, fill_stroke="turquoise")
+back_hob = rectangle(common=back_race, fill_stroke="chartreuse")
+back_naz = rectangle(common=back_race, fill_stroke="gray")
 Card("all", S("{{ Race == 'Human' }}", back_hum))
 Card("all", S("{{ Race == 'Elf' }}", back_elf))
 Card("all", S("{{ Race == 'Dwarf' }}", back_dwa))
@@ -49,19 +49,19 @@ Card("all", S("{{ Race == 'Hobbit' }}", back_hob))
 Card("all", S("{{ Race == 'Nazgul' }}", back_naz))
 
 # character Name
-name_box = rectangle(x=0.5, y=7.0, width=5.3, height=1.5, rounded=0.2)
+name_box = rectangle(x=0.75, y=6.6, width=4.8, height=1.5, rounding=0.3)
 Card("*", name_box)
-Card("all", text(text=T("{{ Name }}"), x=3.3, y=7.5, font_size=18))
+Card("all", text(text=T("{{ Name }}"), x=3.3, y=7.3, font_size=18))
 
 # character Age
-power = text(text=T("<i>Long-lived</i> <b>({{ Age or '\u221E' }})</b>"),  # infinity
-             x=0.5, y=1.2, width=5, font_size=18,
-             align="centre", wrap=True, fill=None)
-Card("all", S("{{ Race == 'Elf' }}", power))
-Card("all", S("{{ Race == 'Maia' }}", power))
-Card("all", S("{{ Race == 'Nazgul' }}", power))
-
-# no effect!
-Card("all", S("{{ foo == 'Orc' }}", power))
+Card("all",
+     text(
+         text=T("""
+            <p style="text-align:center; font-family:Helvetica; color:red; font-size:30px">
+              <i>Long-lived</i> <b>({{ Age or '\u221E' }})</b>
+            </p>"""),
+         x=0.75, y=7.1,
+         height=1, width=4.8,
+         html=True, fill=None))
 
 Save()

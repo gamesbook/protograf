@@ -71,7 +71,7 @@ to write code from scratch.
    use for **protograf**
 
 **protograf** uses various supporting Python packages; the most important
-of these is *ReportLab* which supports the creation of vector graphics in
+of these is *PyMuPDF* which supports the creation of vector graphics in
 a PDF document.
 
 **protograf** is designed in such a way that you *don’t* need to know how

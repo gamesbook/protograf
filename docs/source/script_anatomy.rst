@@ -6,12 +6,12 @@ Script Anatomy
 
 A "script" is the short-cut name for a file containing a list of instructions
 that will be read and processed by Python.  The script filename is usually given
-an extension of ".py".
+an extension of ``.py``
 
 .. HINT::
 
     This document assumes that :doc:`protograf <index>` is working on your
-    computer after successfully :doc:`Setting Up <setting_up.>`, and that you
+    computer after successfully :doc:`Setting Up <setting_up>`, and that you
     have read and understood the :doc:`Basic Concepts <basic_concepts>`
 
 .. _table-of-contents:
@@ -47,14 +47,15 @@ command can run over multiple lines).
 .. HINT::
 
     If your needs are more complex, you have the options of embedding "pure"
-    Python commands or even using tools provided by other Python libraries.
+    Python commands and/or using tools provided by other Python libraries.
 
-If the design you are working on needs multiple pages, then a `PageBreak command`_
-can be inserted, followed again by the specific commands you need.
+If the design you are working on requires multiple pages, then a
+`PageBreak command`_ can be inserted, followed again by the specific commands
+you need.
 
 The final command in the script will be the `Save command`_, which triggers the
-creation of the output; by default a PDF file - with optional PNG or GIF output
-as well.
+creation of the output; by default a PDF file |dash| optional PNG or GIF output
+is available as well.
 
 .. _key-commands:
 
@@ -81,7 +82,8 @@ elements that will appear after it.
 
 .. HINT::
 
-    If you omit the ``Create()`` command, you should get an error message::
+    If you omit the ``Create()`` command, you should get a
+    `FEEDBACK <feedback-message_>`_ message::
 
         FEEDBACK:: Please ensure Create() command has been called first!
 
@@ -93,14 +95,13 @@ but with a '.pdf' extension.
 To customise the command, set its properties as follows:
 
 - **paper** - use a paper size from either of the ISO series - A0 down to A8;
-  or B6 down to B0 - or a USA type - letter, legal or elevenSeventeen; note
-  that the name does **not** have quotes around it!
+  or B6 down to B0 - or a USA type - letter, legal or elevenSeventeen; to change
+  the page orientation to **landscape** simply append ``-l`` to the name |dash|
+  for example, ``"A3-l"`` is a landscape A3 paper size
 - **filename** - name of the output PDF file; by default this is the prefix
   name of the script, with a ``.pdf`` extension
 - **units** - these can be ``cm`` (centimetres), ``in`` (inches), ``mm``
   (millimetres), or ``points``; the default is ``cm``
-- **landscape** - "wrap" the paper size with ``landscape()`` to change the page
-  orientation; so ``landscape(A4)`` produces a "rotated" A4-sized page
 - **margin** - set the value for *all* margins using the defined *units*
 - **margin_top** - set the top margin
 - **margin_bottom** - set the bottom margin
@@ -117,8 +118,8 @@ in landscape mode, with top and left margins being 2 inches each:
 .. code:: python
 
     Create(
-        paper=landscape(A3),
-        units=in,
+        paper="A3-l",
+        units="in",
         filename="testA3.pdf",
         margin_top=2,
         margin_left=2,
@@ -160,8 +161,8 @@ To customise the command, set its properties as follows:
   extension |dash| for the image files that will be created from the PDF; the
   first name corresponds to the first page, the second name to the second and
   so on.  Each will automatically get the ``.png`` extension added to it.
-  If the term ``None`` is used in place of a name, that page will **not** have
-  a PNG file created for it.
+  If the term ``None`` is used in place of a name, then that page will **not**
+  have a PNG file created for it.
 - **framerate** - the delay in seconds between each "page" of a GIF image; by
   default this is ``1`` second
 
@@ -178,8 +179,8 @@ Here is an example of a customised ``Save`` command:
         names=['pageOne', None, 'pageThree']
     )
 
-In this example, no PNG file will be created from the second page, while PNG
-files named ``'pageOne.png`` and ``'pageThree.png`` will be used created from
+In this example, **no** PNG file will be created from the second page, while PNG
+files named ``pageOne.png`` and ``pageThree.png`` will be created from
 the first and third pages of the PDF file.
 
 Example 2
@@ -326,12 +327,14 @@ The other way that elements can be laid out on a page is through a
 **grid layout** which can be derived from a built-in shape such ``Hexagons``
 or constructed using a defined set of properties.
 
-These are all described in the :doc:`Layouts <layout>` section.
+These are all described in the :doc:`Layouts <layouts>` section.
 
 There is also a separate section on :doc:`Hexagonal Grids <hexagonal_grids>`
 which describes the variety of these types of grids, as well as some options
 for adding shapes to them.
 
+
+.. _feedback-message:
 
 The FEEDBACK Message
 ====================
@@ -345,13 +348,14 @@ some occasions when you will see feedback or warning message of some kind.
 2. **Generating Images from Save()** - this will show a message like::
 
         FEEDBACK:: Saving page(s) from "/tmp/test.pdf" as PNG image file(s)...
-3. **Accessing BGG** - you can enable progress when accessing BoardGameGeek to
-   retrieve boardgame data as follows::
+3. **Accessing BGG** - you can enable progress when using the
+   :ref:`BGG() <the-bgg-command>` command, to retrieve boardgame
+   information, as follows::
 
         # progress is True - games retrieval is shown
         BGG(ids=[1,2,4], progress=True)
 
-   In this case you will see a message like::
+   In this case you will see messages like::
 
         FEEDBACK:: Retrieving game '1' from BoardGameGeek...
 4. **An empty Layout** - this is just a warning issued because the
@@ -401,8 +405,8 @@ Supplying the script with a **duplicate property**, for example:
 
 .. code:: python
 
-   display = hexagon(stroke=black, fill=white, height=2, stroke=2)
-                                                         ^^^^^^^^
+   display = hexagon(stroke="black", fill="white", height=2, stroke=2)
+                                                             ^^^^^^^^
    SyntaxError: keyword argument repeated: stroke
 
 This kind of mistake is usually easier to see as both keywords, in this
@@ -411,5 +415,5 @@ highlights the repetition with the ``^^^^^^^^`` characters.
 
 .. HINT::
 
-   Errors are discussed further in the :ref:`Additional Concepts <script-errors>`
+   Errors are discussed further in the :ref:`Script Errors <script-errors>`
    section.

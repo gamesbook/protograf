@@ -15,11 +15,11 @@ Create(filename='cards_matrix_two.pdf',
 combos = Matrix(
     labels=['SUIT', 'VALUE', 'IMAGE'],
     data=[
-        # tomato, lime, aqua, gold, hotpink
+        # "tomato", "chartreuse", aqua, gold, hotpink
         ['#FF6347', '#00FF00','#00FFFF', '#FFD700', '#FF69B4'],
         ['5', '3', '1'],
-        # tapedrive, heart, snowflake
-        ['\u2707', '\u2766', '\u2745']
+        # plane, star, snowflake
+        ['\x28', 'H', '\x64']
     ])
 Data(matrix=combos, extra=9)  # (re)set no. of cards based on length
 
@@ -39,41 +39,49 @@ outline = rectangle(
     )
 
 icon_top = hexagon(
-    x=1, y=6.4,
+    x=1, y=0.9,
     side=0.8,
-    stroke=white)
+    stroke="white")
 value_top = text(
-    x=1.8, y=6.8,
+    x=1.8, y=1.9,
     font_size=28,
     text=T('{{VALUE}}'),
     align="centre",
-    stroke=darkslategrey)
-icon_btm = hexagon(
-    x=3.8, y=0.9,
-    side=0.8,
-    stroke=white)
-value_btm = text(
-    x=4.6, y=1.9,
-    font_size=28,
-    align="centre",
-    text=T('{{VALUE}}'),
-    stroke=darkslategrey,
-    rotation=180)
-picture = text(
-    x=3.0, y=3.3,
-    stroke=white,
-    font_size=76,
-    text=T('{{IMAGE}}'))
+    stroke="darkslategray")
 deco_top = hexagon(
-    x=1.1, y=6.5,
+    x=1.1, y=1,
     side=0.7,
     fill=None,
-    stroke=T('{{SUIT}}'))
+    stroke_width=1,
+    stroke="gray")
+
+icon_btm = hexagon(
+    x=3.8, y=6.6,
+    side=0.8,
+    stroke="white")
+value_btm = text(
+    x=4.7, y=7,
+    font_size=28,
+    align="centre",
+    text=T('{{VALUE}}'),
+    stroke="darkslategray",
+    rotation=180)
 deco_btm = hexagon(
-    x=3.9, y=1.0,
+    x=3.9, y=6.7,
     side=0.7,
     fill=None,
-    stroke=T('{{SUIT}}'))
+    stroke_width=1,
+    stroke="gray")
+
+picture = text(
+    x=3.1, y=5.5,
+    stroke="white",
+    font_size=76,
+    align="centre",
+    font_name='zapfdingbats',
+    text=T('{{IMAGE}}'),
+    )
+
 
 # card setup
 Card("1-45",
@@ -89,8 +97,8 @@ rectC = rectangle(
     y=0.5,
     height=7.8,
     width=1.02,
-    rounded=1,
-    stroke=white)
+    rounding=0.2,
+    stroke="white")
 Card("46-48",
      rectangle(common=rectC, x=0.6, fill='#FF0000'),
      rectangle(common=rectC, x=1.62, fill='#FFD700'),
@@ -103,24 +111,25 @@ hexN = Common(
     side=1.5,
     fill=None,
     font_size=28,
-    stroke=black,
+    stroke="black",
     stroke_width=2)
 hex_in = hexagon(
     side=1.0,
     fill=None,
-    stroke=black,
+    stroke="black",
     stroke_width=.5)
 Card("49-51",
-     hexagon(common=hexN, cx=2.0, cy=7.0, centre_shape=hex_in, label="1"),
+     hexagon(common=hexN, cx=2.0, cy=1.8, centre_shape=hex_in, label="1"),
      hexagon(common=hexN, cx=3.3, cy=4.4, centre_shape=hex_in, label="3"),
-     hexagon(common=hexN, cx=4.6, cy=1.8, centre_shape=hex_in, label="5"),
+     hexagon(common=hexN, cx=4.6, cy=7.0, centre_shape=hex_in, label="5"),
 )
 
-circle_icon = Common(fill=black, stroke=white, radius=1.25, font_size=48)
+# circle + icons ['\x28', 'H', '\x64']
+circle_icon = Common(fill="black", stroke="white", radius=1.25, font_size=48)
 Card("52-54",
-     circle(common=circle_icon, cx=1.8, cy=7.0, label='\u2707'),
-     circle(common=circle_icon, cx=3.1, cy=4.4, label='\u2766'),
-     circle(common=circle_icon, cx=4.4, cy=1.8, label='\u2745'),
+     circle(common=circle_icon, cx=1.8, cy=1.8, label='\x28', label_face='zapfdingbats'),
+     circle(common=circle_icon, cx=3.1, cy=4.4, label='H', label_face='zapfdingbats'),
+     circle(common=circle_icon, cx=4.4, cy=7.0, label='\x64', label_face='zapfdingbats'),
 )
 
 Save()
