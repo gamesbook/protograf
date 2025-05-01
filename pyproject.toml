@@ -24,7 +24,7 @@ dependencies = [
 ]
 keywords = [ "python", "graphics", "boardgames", "cards", "counters", "tiles" ]
 classifiers = [
-    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.13",
     "Development Status :: 3 - Alpha",
     "Natural Language :: English",
     "Environment :: Console",

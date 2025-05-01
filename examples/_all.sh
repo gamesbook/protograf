@@ -37,6 +37,7 @@ python boards/abstract/hexhex_circles.py -d /tmp/demo
 python boards/abstract/hexhex_dots.py -d /tmp/demo
 python boards/abstract/hexhex_hexagons.py -d /tmp/demo
 python boards/abstract/hexhex_rectangles.py -d /tmp/demo
+python boards/abstract/morabaraba.py -d /tmp/demo
 python boards/abstract/octagons.py -d /tmp/demo
 python boards/abstract/tictactoe.py -d /tmp/demo
 # ---- boards: commercial

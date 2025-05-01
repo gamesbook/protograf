@@ -135,7 +135,7 @@ Varying date formats can be used. Two properties are available:
 
 - *details* - this can be either ``date`` or ``datetime``
 - *style* - this can be ``usa`` or ``eur``; if not provided then ``ISO`` date
-  style is used |dash| see the "1." example below.
+  style is used |dash| see the ``"1."`` example below.
 
 
 Example 1.
@@ -153,19 +153,19 @@ Example 1.
 
         dtext = Common(x=0.25, align="left", font_size=8)
         Text(
-            common=dtext, y=5,
+            common=dtext, y=1,
             text="1.  "+Today())
         Text(
-            common=dtext, y=4,
+            common=dtext, y=2,
             text="2.  "+Today(details="date", style="usa"))
         Text(
             common=dtext, y=3,
             text="3.  "+Today(details="date", style="eur"))
         Text(
-            common=dtext, y=2,
+            common=dtext, y=4,
             text="4.  "+Today(details="datetime", style="usa"))
         Text(
-            common=dtext, y=1,
+            common=dtext, y=5,
             stroke=red,
             text="5.  "+Today(details="datetime", style="eur"))
 
