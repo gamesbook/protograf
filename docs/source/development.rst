@@ -16,7 +16,7 @@ Table of Contents
 - `Coding`_
 - `Package Management`_
 - `Documentation`_
-
+- `Notes`_
 
 Coding
 ======
@@ -117,6 +117,9 @@ see the ``.github/workflows/`` directory |dash| will trigger a build,
 which can be accessed here:
 https://app.readthedocs.org/projects/protograf/builds/
 
+
+Notes
+=====
 
 Some helpful reStructuredText web resources:
 

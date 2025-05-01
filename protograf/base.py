@@ -1934,10 +1934,7 @@ class BaseShape:
 
             with open(image_location) as f:
                 svg_code = f.read()
-            png_bytes = cairosvg.svg2png(
-                bytestring=svg_code.encode('utf-8'),
-                dpi=300
-            )
+            png_bytes = cairosvg.svg2png(bytestring=svg_code.encode("utf-8"), dpi=300)
             image = Image.open(io.BytesIO(png_bytes))
             return image
 
