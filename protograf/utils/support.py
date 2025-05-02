@@ -566,6 +566,7 @@ def pdf_cards_to_png(
 def color_set(svg_only: bool = False) -> list:
     """Get a list of PyMuPDF colors with: name, RGB and HEX values in dict"""
     from pymupdf.utils import getColorInfoList
+
     svg_color_names = named_colors.keys()
     color_info = getColorInfoList()  # [('ALICEBLUE', 240, 248, 255), ...]
     colors = []
@@ -577,12 +578,9 @@ def color_set(svg_only: bool = False) -> list:
         is_svg = True if name in svg_color_names else False
         if svg_only and not is_svg:
             continue
-        colors.append({
-            'name': name,
-            'rgb': rgb_tuple,
-            'hex': hex_string,
-            'is_svg': is_svg
-        })
+        colors.append(
+            {"name": name, "rgb": rgb_tuple, "hex": hex_string, "is_svg": is_svg}
+        )
     return colors
 
 

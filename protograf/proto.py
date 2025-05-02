@@ -1035,11 +1035,11 @@ def Data(**kwargs):
         if not isinstance(source, list):
             source_type = type(source)
             tools.feedback(
-                f"The source must be a list-of-dictionaries, not {source_type}", True)
+                f"The source must be a list-of-dictionaries, not {source_type}", True
+            )
         if not isinstance(source[0], dict):
             sub_type = type(source)
-            tools.feedback(
-                f"The list must contain dictionaries, not {sub_type}", True)
+            tools.feedback(f"The list must contain dictionaries, not {sub_type}", True)
         globals.dataset = source
         globals.dataset_type = DatasetType.DICT
     elif images:  # create list of images
