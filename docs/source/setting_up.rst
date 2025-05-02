@@ -88,7 +88,7 @@ Installing Python
 
 **protograf** requires a device e.g. laptop or desktop |dash| but
 probably not a smart phone |dash| that already has the correct version
-of Python (version 3.12 or higher) installed.  This section guides you
+of Python (version 3.13 or higher) installed.  This section guides you
 through such an install.
 
 .. NOTE::
@@ -109,7 +109,7 @@ https://ubuntushell.com/install-uv-python-package-manager/
 You can then use ``uv`` to install an updated version of Python into a
 virtual environment. After `opening a Terminal`_::
 
-    uv venv --python 3.12
+    uv venv --python 3.13
 
 ``uv`` has extensive documentation at https://docs.astral.sh/uv/
 
@@ -137,7 +137,7 @@ text followed by small ``_``::
 
 Now install Python by entering::
 
-    uv venv --python 3.12
+    uv venv --python 3.13
 
 After a successful install, you will be prompted with::
 
@@ -164,8 +164,8 @@ The *miniconda* software is also a fairly simple way of starting to use Python.
 Follow https://docs.anaconda.com/miniconda/miniconda-install/ for instructions
 on downloading and running the installer.
 
-Make sure you choose a version that will install Python 3.12 or higher (3.12,
-3.13, 3.14, etc.).
+Make sure you choose a version that will install Python 3.13 or higher
+(3.13, 3.14, etc.).
 
 Follow their documentation there to ensure that Python is working after the
 installation is complete.
@@ -194,9 +194,9 @@ After `opening a Terminal`_, and activating the virtual environment::
 
 You should see something like::
 
-   Python 3.12.4
+   Python 3.13.1
 
-The exact number after the "12" does not matter.
+The exact number after the "13" does not matter.
 
 You can now close the command-line window.
 
@@ -277,6 +277,12 @@ making sure you do not have any spaces at the start of any line!::
    Text(text="Hello World")
    Save()
 
+.. HINT::
+
+  If you're viewing this documentation on the *readthedocs* website, you
+  can hover over the top-right corner of any colored block of text and
+  click on the icon to automatically copy that block.
+
 Save the file; call it *test.py*. The ``.py`` extension indicates that this
 is a Python file |dash| this is useful but not absolutely essential!
 
@@ -299,7 +305,7 @@ that has been created in the same directory.
 
 You should be able to open and view this PDF file via your `PDF viewer`_.
 It should be a mostly blank, A4-sized page with the phrase *Hello World*
-in a small Helvetica font near the bottom-left.
+in a small, Helvetica font near the top-left.
 
 
 Python in the cloud

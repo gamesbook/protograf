@@ -90,7 +90,7 @@ elements that will appear after it.
 By default, this command will setup an A4 page |dash| in portrait mode |dash|
 with a margin of one-half inch (1.25cm), and units of centimetres;
 the resulting output file will have the same name as the script,
-but with a '.pdf' extension.
+but with a ``.pdf`` extension.
 
 To customise the command, set its properties as follows:
 

@@ -67,11 +67,11 @@ So, for example, a page may contain rectangles representing cards. Each
 card may then have additional rectangles placed on it, representing some
 aspect that is part of your card design. Those rectangles, in turn,
 could have text, images or icons on/inside them. So, each item that is
-created later can "obscure" some part - or even all - of the item it is placed
-on which was defined previously.
+created later can "obscure" some part - or even all - of item, or items,
+defined previously.
 
-Its also possible to define things earlier in a script that are reused
-later on.
+Its also possible to define things earlier in a script that are used, or
+reused, later on.
 
 In summary - the *order* of instructions in a script is important as this
 will affect what you see at the end!
@@ -106,10 +106,10 @@ position** of 5.5".
 
 As the use of margins is common for most documents and drawings, nearly all
 distances in **protograf** are considered to be relative to the margin
-settings i.e. if the default page margin, for the A4 page mentioned above,
+settings i.e. if the page margin, for the A4 page mentioned above,
 was 2.5cm (1") then to locate a point at those same distances would mean
 using an **x position** of 8cm and a **y position** of 12.3cm, as the margin
-size will be automatically added onto the supplied values for the position.
+size will be automatically added onto the values you specify for the position.
 
 .. _command-concept:
 
@@ -136,7 +136,7 @@ for checking what is available.
    constructing decks (see :doc:`Card Decks <card_decks>`).
 
    When used in this way, the command is not carried out straightaway, but
-   deferred to later in the script.
+   deferred for activation for later on in the script.
 
 
 .. _element-concept:
@@ -214,8 +214,12 @@ list - for example ``#A0522D`` is defined as the color *sienna*. The
 file shows all the names and colors that are available, along with their
 *hexadecimal* value.
 
-Color properties in **protograf** are typically used via *"fill"* to
-set the color of an area, and *"stroke"* to set the color of a line.
+Color properties in **protograf** are typically set either with a *"fill"*,
+which defines the color of a whole area, or a *"stroke"* which determines
+the color of a line or of text.
+
+The :ref:`default <default-concept>` **colors** in **protograf**  are
+``white`` for areas and ``black`` for lines.
 
 .. HINT::
 
@@ -236,7 +240,7 @@ kinds of lengths or sizes all need to be measured in a particular set of
 
 In the USA, people tend to use the so-called Imperial System. In
 **protograf** this means that distances might be measured in units of
-inches. Inches are often shown with an *"*, or double-quotes, symbol
+inches. Inches are often shown with an double-quotes symbol (``"``)
 in documents, but in **protograf** inches are referred to using the
 term *inch*.
 
@@ -245,7 +249,7 @@ In almost all of the rest of the world, the Metric System is in use. In
 centimetres; referred to in **protograf** as *cm*. Alternatively, you
 can choose to use millimetres, abbreviated in **protograf** as *mm*.
 
-The default **units** in **protograf**  are *cm*.
+The :ref:`default <default-concept>` **units** in **protograf**  are *cm*.
 
 .. HINT::
 
@@ -255,14 +259,15 @@ The default **units** in **protograf**  are *cm*.
 **protograf** also allows units of *points*, which are the measurement
 units traditionally used in the printing industry. There are 72 points
 in 1 inch. Internal calculations in **protograf** are all done in
-point units i.e. all inputs, regardless of being inches or centimetres
-are converted to points.
+point units i.e. all inputs, regardless of their being inches, centimetres,
+or anything else, are converted to points.
 
 .. NOTE::
 
    In a few cases, **protograf** adopts the word "size" where point units are
    in use e.g. font size, but because the term is such a general one,  it's
    not really used that much.
+
 
 .. _stroke-concept:
 
@@ -276,6 +281,7 @@ points (see `working with units`_ above). These include *font size*, that you’
 likely familiar with from word processing programs, and line thickness - termed
 "stroke width". The reason for doing this is to maintain consistency with other,
 existing tools.
+
 
 .. _default-concept:
 
@@ -308,3 +314,11 @@ Some examples of defaults are:
    value of ``#FFFFFF``
 -  the default *font* is ``Helvetica``, with a size (height) of ``12`` points
    and a stroke color of ``black``
+
+.. HINT::
+
+  A default which may be less obvious is the name of the output file created
+  by :doc:`protograf <index>`.  This matches the name of the script but the
+  extension is changed to ``.pdf`` because this is the default output type
+  that is created. So, if your script is called ``test01.py`` then the
+  default output file that is created will be called ``test01.pdf``.
