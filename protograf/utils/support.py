@@ -15,6 +15,10 @@ from typing import Any
 import imageio
 import pymupdf
 
+# local
+from protograf.utils.colors_svg import named_colors
+
+
 CACHE_DIRECTORY = ".protograf"  # append to the user's home directory
 BUILT_IN_FONTS = [
     "helv",
@@ -557,6 +561,29 @@ def pdf_cards_to_png(
             page_num += 1
     except Exception as err:
         feedback(f"Unable to extract card images for {filename} - {err}!")
+
+
+def color_set(svg_only: bool = False) -> list:
+    """Get a list of PyMuPDF colors with: name, RGB and HEX values in dict"""
+    from pymupdf.utils import getColorInfoList
+    svg_color_names = named_colors.keys()
+    color_info = getColorInfoList()  # [('ALICEBLUE', 240, 248, 255), ...]
+    colors = []
+    for _color in color_info:
+        rgb_tuple = (_color[1], _color[2], _color[3])
+        _string = "#%02x%02x%02x" % rgb_tuple
+        hex_string = _string.upper()
+        name = _color[0].lower()
+        is_svg = True if name in svg_color_names else False
+        if svg_only and not is_svg:
+            continue
+        colors.append({
+            'name': name,
+            'rgb': rgb_tuple,
+            'hex': hex_string,
+            'is_svg': is_svg
+        })
+    return colors
 
 
 if __name__ == "__main__":

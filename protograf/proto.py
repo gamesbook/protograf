@@ -1031,10 +1031,15 @@ def Data(**kwargs):
             globals.dataset_type = DatasetType.DICT
         except Exception:
             tools.feedback("The data_list is not valid - please check", True)
-    elif source:  # handle pre-built dict
-        if not isinstance(source, dict):
+    elif source:  # handle pre-built list-of-dict
+        if not isinstance(source, list):
             source_type = type(source)
-            tools.feedback(f"The source must be a dictionary, not {source_type}", True)
+            tools.feedback(
+                f"The source must be a list-of-dictionaries, not {source_type}", True)
+        if not isinstance(source[0], dict):
+            sub_type = type(source)
+            tools.feedback(
+                f"The list must contain dictionaries, not {sub_type}", True)
         globals.dataset = source
         globals.dataset_type = DatasetType.DICT
     elif images:  # create list of images

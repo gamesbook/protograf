@@ -1,52 +1,36 @@
 # -*- coding: utf-8 -*-
 """
-Purpose: Shows all pre-defined colors for protograf (available from ReportLab)
+Purpose: Shows all pre-defined colors available from PyMuPDF
 Author: Derek Hohls
-Created: 29 February 2016
+Created: 2 May 2025
 """
-# lib
-# local
-from protograf import Create, Text, Save, Rectangle, black, red
-from protograf.utils.tools import color_to_hex
-from protograf.base import COLORS
-
+from protograf import *
+from protograf.utils import support
 
 Create(filename="colorset.pdf")
 
-row, col = 0, 0
-for a_color in sorted(COLORS.keys()):
-    label_color = black
-    # overwrite label color for dark backgrounds
-    if a_color in [
-        "midnightblue",
-        "navy",
-        "darkblue",
-        "mediumblue",
-        "black",
-        "darkslategray",
-        "darkslategray",
-        "indigo",
-        "teal",
-        "blue",
-        "darkgreen",
-        "seagreen",
-        "maroon",
-        "purple",
-        "darkslateblue",
-    ]:
-        label_color = "white"
-    Rectangle(row=row, col=col, width=2.7, height=1.25, fill=COLORS[a_color])
-    Text(
-        x=col * 2.7 + 1.35,
-        y=row * 1.25 + 0.75,
-        font_size=8,
-        stroke=label_color,
-        text="%s\n%s" % (a_color, color_to_hex(COLORS[a_color])),
-    )
-    col += 1
-    if col > 6:
-        col = 0
-        row += 1
+Data(source=support.color_set())
 
-Text(x=13.5, y=27, text="Report Lab: Named Color Set", stroke="red")
+Deck(width=2.7, height=1.25)
+
+block = rectangle(x=0, y=0, width=2.7, height=1.25, fill=T('{{name}}'))
+label = text(
+    x=0.1,
+    y=0.3,
+    font_size=8,
+    stroke="black",
+    align="left",
+    text=T('{{name}}')
+)
+col = text(
+    x=0.1,
+    y=0.6,
+    font_size=8,
+    stroke="black",
+    align="left",
+    text=T('{{hex}}')
+)
+
+Card('*', block, label, col)
+
 Save()

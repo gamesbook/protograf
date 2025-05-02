@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-colors_hex = {
+named_colors = {
     "black": "#000000",
     "navy": "#000080",
     "darkblue": "#00008b",
