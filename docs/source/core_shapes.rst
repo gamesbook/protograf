@@ -1441,8 +1441,8 @@ to the polygon's centre.
 
 ===== ======
 
-Example 5. Rotation
-+++++++++++++++++++
+Example 5. Polygon Rotation
++++++++++++++++++++++++++++
 
 .. |pl4| image:: images/customised/polygon_rotation_flat.png
    :width: 330
@@ -1479,8 +1479,8 @@ Polyshape
 
 A Polyshape is an irregular `polygon`_, constructed using a series of points.
 
-Example 1. Defaults
-+++++++++++++++++++
+Example 1. Default Polyshape
+++++++++++++++++++++++++++++
 
 .. |shp| image:: images/customised/polyshape_default.png
    :width: 330
@@ -1525,8 +1525,8 @@ Example 1. Defaults
       The default *stroke* and *fill* apply to this example of a Polyshape.
 ===== ======
 
-Example 2. Add a Centre
-+++++++++++++++++++++++
+Example 2. Polyshape with Centre
+++++++++++++++++++++++++++++++++
 
 While the Polyshape does not have the ability to be constructed using a
 *cx* and *cy* pair to set its centre location |dash| like the symmetric
@@ -1571,8 +1571,8 @@ for the *cx* and *cy* pair that you supply to it are correct!
       but do **not** affect the drawing of the shape itself.
 ===== ======
 
-Example 3. Offset
-+++++++++++++++++
+Example 3. Polyshape Offset
++++++++++++++++++++++++++++
 
 There are two other options available.
 
@@ -1647,8 +1647,8 @@ set the size, are:
     see :ref:`caching <protograf_caching>`.
 
 
-Example 1.
-++++++++++
+Example 1. Default QRCode
++++++++++++++++++++++++++
 
 .. |qrc| image:: images/customised/qr_code.png
    :width: 330
@@ -1688,6 +1688,7 @@ Example 1.
 
 ===== ======
 
+
 .. _rectangle-command:
 
 Rectangle
@@ -1699,8 +1700,8 @@ Rectangle
    There is more detail about the many properties that can be defined for a
    Rectangle in the :ref:`customised Rectangle <rectangleIndex>` section.
 
-Example 1. Defaults
-+++++++++++++++++++
+Example 1. Default Rectangle
+++++++++++++++++++++++++++++
 
 .. |rct| image:: images/defaults/rectangle.png
    :width: 330
@@ -1722,8 +1723,8 @@ Example 1. Defaults
       is a `Square`_.
 ===== ======
 
-Example 2. Customised
-+++++++++++++++++++++
+Example 2. Customised Rectangle
++++++++++++++++++++++++++++++++
 
 .. |rc1| image:: images/customised/rectangle_custom.png
    :width: 330
@@ -1755,8 +1756,8 @@ Rhombus
 ~~~~~~~
 `↑ <shape-index_>`_
 
-Example 1. Defaults
-+++++++++++++++++++
+Example 1. Default Rhombus
+++++++++++++++++++++++++++
 
 .. |rh0| image:: images/defaults/rhombus.png
    :width: 330
@@ -1779,8 +1780,8 @@ Example 1. Defaults
       rotated Square.
 ===== ======
 
-Example 2. Centre & Dot
-+++++++++++++++++++++++
+Example 2. Rhombus Centre & Dot
++++++++++++++++++++++++++++++++
 
 .. |rh1| image:: images/customised/rhombus_custom.png
    :width: 330
@@ -1801,8 +1802,8 @@ Example 2. Centre & Dot
       - *dot* of size ``0.1``
 ===== ======
 
-Example 3. Border Styles
-++++++++++++++++++++++++
+Example 3. Rhombus Border Styles
+++++++++++++++++++++++++++++++++
 
 .. |rh2| image:: images/customised/rhombus_borders.png
    :width: 330
@@ -1855,8 +1856,8 @@ or cake. It extends from the centre of a "virtual" circle outwards to its
 enclosing diameter.  The two "arms" of the sector will cover a certain number
 of degrees of the circle (from 1 to 360).
 
-Example 1. Defaults
-+++++++++++++++++++
+Example 1. Default Sector
++++++++++++++++++++++++++
 
 .. |sct| image:: images/defaults/sector.png
    :width: 330
@@ -1880,8 +1881,8 @@ Example 1. Defaults
             default *angle_width* of 90 |deg|
     ===== ======
 
-Example 2. Customised
-+++++++++++++++++++++
+Example 2. Customised Sector
+++++++++++++++++++++++++++++
 
 .. |sc1| image:: images/customised/sectors.png
    :width: 330
@@ -1923,8 +1924,8 @@ Square
 ~~~~~~
 `↑ <shape-index_>`_
 
-Example 1. Defaults
-+++++++++++++++++++
+Example 1. Default Square
++++++++++++++++++++++++++
 
 .. |sqr| image:: images/defaults/square.png
    :width: 330
@@ -1947,8 +1948,8 @@ Example 1. Defaults
 
 ===== ======
 
-Example 2. Customised
-+++++++++++++++++++++
+Example 2. Customised Square
+++++++++++++++++++++++++++++
 
 .. |sq1| image:: images/customised/square_custom.png
    :width: 330
@@ -1979,8 +1980,8 @@ Stadium
 A Stadium is a shape constructed with a rectangle as a base, and then curved
 projections extending from one or more of the sides.
 
-Example 1. Defaults
-+++++++++++++++++++
+Example 1. Default Stadium
+++++++++++++++++++++++++++
 
 .. |std| image:: images/defaults/stadium.png
    :width: 330
@@ -2004,8 +2005,8 @@ Example 1. Defaults
 
 ===== ======
 
-Example 2. Customised
-+++++++++++++++++++++
+Example 2. Customised Stadium
++++++++++++++++++++++++++++++
 
 .. |st1| image:: images/customised/stadium_edges.png
    :width: 330
@@ -2060,8 +2061,8 @@ pentagram outwards to meet at a point.
 To create more varied kinds of stars, see the triangle petal shapes that can
 be created via a :ref:`customised Circle <circleIndex>`.
 
-Example 1. Defaults
-+++++++++++++++++++
+Example 1. Default Star
++++++++++++++++++++++++
 
 .. |str| image:: images/defaults/star.png
    :width: 330
@@ -2080,8 +2081,8 @@ Example 1. Defaults
       - "height" of ``1`` cm
 ===== ======
 
-Example 2. Customised
-+++++++++++++++++++++
+Example 2. Customised Star
+++++++++++++++++++++++++++
 
 .. |st2| image:: images/customised/star_custom.png
    :width: 330
@@ -2135,8 +2136,8 @@ actual area of the shape multiplied by the density value.
     The images used for this document are created with such a setting; but only
     to avoid the code repository detecting a "change" each time the script runs.
 
-Example 1. Defaults
-+++++++++++++++++++
+Example 1. Default Starfield
+++++++++++++++++++++++++++++
 
 .. |sf0| image:: images/defaults/starfield.png
    :width: 330
@@ -2160,8 +2161,8 @@ Example 1. Defaults
       hence "behind" the field of dots.
 ===== ======
 
-Example 2. Multiple Colors
-++++++++++++++++++++++++++
+Example 2. Multiple Color Starfield
++++++++++++++++++++++++++++++++++++
 
 .. |sf1| image:: images/customised/starfield_rectangle.png
    :width: 330
@@ -2197,8 +2198,8 @@ Example 2. Multiple Colors
       is hence "behind" the field of dots.
 ===== ======
 
-Example 3. Multiple Sizes
-+++++++++++++++++++++++++
+Example 3. Multiple Size Starfield
+++++++++++++++++++++++++++++++++++
 
 .. |sf2| image:: images/customised/starfield_circle.png
    :width: 330
@@ -2230,8 +2231,8 @@ Example 3. Multiple Sizes
       hence "behind" the field of dots.
 ===== ======
 
-Example 4. Multiple Color & Size
-++++++++++++++++++++++++++++++++
+Example 4. Multiple Color & Size Starfield
+++++++++++++++++++++++++++++++++++++++++++
 
 .. |sf3| image:: images/customised/starfield_poly.png
    :width: 330
@@ -2273,8 +2274,8 @@ Trapezoid
 ~~~~~~~~~
 `↑ <shape-index_>`_
 
-Example 1. Defaults
-+++++++++++++++++++
+Example 1. Default Trapezoid
+++++++++++++++++++++++++++++
 
 .. |trp| image:: images/defaults/trapezoid.png
    :width: 330
@@ -2295,8 +2296,8 @@ Example 1. Defaults
       - *top* - the upper edge of the shape defaults to half the *width*
 ===== ======
 
-Example 2. Size & Flip
-++++++++++++++++++++++
+Example 2. Size & Flip Trapezoid
+++++++++++++++++++++++++++++++++
 
 .. |tr1| image:: images/customised/trapezoid_custom.png
    :width: 330
@@ -2320,8 +2321,8 @@ Example 2. Size & Flip
 
 ===== ======
 
-Example 3. Borders
-++++++++++++++++++
+Example 3. Trapezoid Borders
+++++++++++++++++++++++++++++
 
 .. |tr3| image:: images/customised/trapezoid_borders.png
    :width: 330
