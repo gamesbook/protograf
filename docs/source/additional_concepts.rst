@@ -109,7 +109,7 @@ referred to, and used or reused, later in the script.  For example:
 
 .. code:: python
 
-   green_dots = Common(fill=lime, dot=0.1)
+   green_dots = Common(fill="lime", dot=0.1)
    Circle(common=green_dots)
    Rectangle(common=green_dots)
 
@@ -236,8 +236,8 @@ relies on short, but hopefully memorable, names for things, although there
 are some exceptions,
 
 Many properties are set with *directions* matching those shown on a compass,
-and although you could want write these names out in full, it can be very
-tedious  to type, for example, ``southeast`` or ``northwest`` and so
+and although you might want write these names out in full, it can be very
+tedious to type, for example, ``southeast`` or ``northwest`` and so
 ``se`` and ``nw`` are used instead.
 
 The other exceptions are the location names.

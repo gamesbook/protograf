@@ -126,8 +126,8 @@ Arc
 
 An arc is a curved line.
 
-Example 1. Defaults
-+++++++++++++++++++
+Example 1. Default Arc
+++++++++++++++++++++++
 
 .. |arc| image:: images/defaults/arc.png
    :width: 330
@@ -145,8 +145,8 @@ Example 1. Defaults
       - origin is at x-position ``1`` cm and at y-position ``1`` cm
 ===== ======
 
-Example 2. Customised
-+++++++++++++++++++++
+Example 2. Customised Arc
++++++++++++++++++++++++++
 
 .. |ac2| image:: images/customised/arc.png
    :width: 330
@@ -157,7 +157,7 @@ Example 2. Customised
 
       .. code:: python
 
-          Arc(cx=1, cy=1, radius=2)
+          Arc(cx=1, cy=3, radius=2)
 
       To help with visualisation, the Arc is surrounded by a red Rectangle:
 
@@ -166,7 +166,7 @@ Example 2. Customised
             Rectangle(
                 x=1, y=1, height=1, width=2, dot=0.02,
                 stroke="red", fill=None,
-                title="Arc(cx=1, cy=1, radius=2)")
+                title="Arc(cx=1, cy=3, radius=2)")
             )
 
       The Arc has the following properties:
@@ -184,8 +184,8 @@ Bezier
 
 A Bezier is a curve that has inflection points, allowing it to "bend".
 
-Example 1. Defaults
-+++++++++++++++++++
+Example 1. Default Bezier
++++++++++++++++++++++++++
 
 .. |bez| image:: images/defaults/bezier.png
    :width: 330
@@ -203,8 +203,8 @@ Example 1. Defaults
       - starts at x-position ``1`` cm and at y-position ``1`` cm
 ===== ======
 
-Example 2. Customised
-+++++++++++++++++++++
+Example 2. Customised Bezier
+++++++++++++++++++++++++++++
 
 .. |bz1| image:: images/customised/bezier_custom.png
    :width: 330
@@ -227,7 +227,7 @@ Example 2. Customised
       - starts at x-position ``0`` cm and at y-position ``1`` cm
       - has the inflection points set by:
 
-        -  *x1* and *y1* and
+        - *x1* and *y1*, and
         - *x2* and *y2*
       - ends at position *x3* of ``4`` cm and at *y3* of ``6`` cm
       - has a thicker *stroke_width*
@@ -241,8 +241,8 @@ Chord
 
 A chord is a straight line joining two points on a circle's diameter.
 
-Example 1.
-++++++++++
+Example 1. Customised Chord
++++++++++++++++++++++++++++
 
 .. |chd| image:: images/defaults/chord.png
    :width: 330
@@ -267,10 +267,7 @@ Example 1.
 
       It has the following properties based on these values:
 
-      - a small circle that defines boundaries for the chord line:
-
-        - centre x-position is ``2`` cm
-        - centre y-position  is ``2`` cm
+      - a small circle that defines boundaries for the chord line
       - the start of chord is at the intersection of the radius of the circle
         at 135 |deg| with the circle's circumference
       - the end of chord is at the intersection of the radius of the circle
@@ -286,8 +283,8 @@ Dot
 
 A dot is a small, filled `Circle`_.
 
-Example 1.
-++++++++++
+Example 1. Default Dot
+++++++++++++++++++++++
 
 .. |dot| image:: images/defaults/dot.png
    :width: 330
@@ -315,113 +312,108 @@ Line
 ~~~~
 `↑ <shape-index_>`_
 
-Example 1. Defaults
-+++++++++++++++++++
+Example 1. Default Line
++++++++++++++++++++++++
 
-.. |lne| image:: images/defaults/line.png
-   :width: 310
+.. |ln1| image:: images/defaults/line.png
+   :width: 330
 
-..  table::
-    :width: 100%
-    :widths: 40, 60
+===== ======
+|ln1| This example shows the shape constructed using the command with only
+      defaults:
 
-    ===== ======
-    |lne| This example shows the shape constructed using the command with only
-          defaults:
+      .. code:: python
 
-          .. code:: python
+          Line()
 
-              Line()
+      It has the following properties based on the defaults:
 
-          It has the following properties based on the defaults:
+      - starts at x-position ``1`` cm and at y-position ``1`` cm
+      - length of ``1`` cm
+      - heading/default direction is 0 |deg| |dash| i.e. "eastwards"
 
-          - starts at x-position ``1`` cm and at y-position ``1`` cm
-          - length of ``1`` cm
-          - heading/default direction is 0 |deg| |dash| i.e. "eastwards"
+      *Note* that direction means "anti-clockwise from 0 |deg|", where
+      the zero lines runs in the "east" direction from the left.
+===== ======
 
-          *Note* that direction means "anti-clockwise from 0 |deg|", where
-          the zero lines runs in the "east" direction from the left.
-    ===== ======
+Example 2. Customised Line
+++++++++++++++++++++++++++
 
-Example 2. Customised
-+++++++++++++++++++++
-
-.. |ln1| image:: images/customised/line_custom.png
-   :width: 310
-
-..  table::
-    :width: 100%
-    :widths: 40, 60
-
-    ===== ======
-    |ln1| This example shows Lines constructed using commands with the
-          following properties:
-
-          .. code:: python
-
-            Line(
-                x=0, y=0.5,
-                stroke_width=0.2,
-                dotted=True,
-                label="0.2", font_size=6)
-            Line(
-                x=1, y=0.5,
-                stroke_width=0.4, dotted=True,
-                label="0.4", font_size=6)
-            Line(
-                x=2, y=0.5,
-                stroke_width=0.8, dotted=True,
-                label="0.8", font_size=6)
-            Line(
-                x=3, y=0.5,
-                stroke_width=1.6, dotted=True,
-                label="1.6", font_size=6)
-
-            # colored lines
-            Line(
-                x=0, y=4, x1=4, y1=5,
-                stroke="blue", stroke_width=1,
-                dashed=[0.2, 0.1],
-                label="dashed:[0.2,0.1]", font_size=6)
-            Line(
-                x=0, y=3, length=4.1, angle=15,
-                stroke="red",
-                label="15", font_size=6)
-            Line(
-                x=0, y=2, length=4,
-                stroke="chartreuse", stroke_width=2)
+.. |ln2| image:: images/customised/line_custom.png
+   :width: 330
 
 
-          The medium blue line has:
+===== ======
+|ln2| This example shows Lines constructed using commands with the
+      following properties:
 
-          - *dashed* - a list with the length of the dash followed by
-            the length of the space between two dashes - ``2`` and ``1`` mm
-          - *x1* and *y1* set as the ending point
+      .. code:: python
 
-          The thin red line has:
+        # black lines
+        Line(
+            x=0, y=0.5,
+            stroke_width=0.2,
+            dotted=True,
+            label="0.2", font_size=6)
+        Line(
+            x=1, y=0.5,
+            stroke_width=0.4, dotted=True,
+            label="0.4", font_size=6)
+        Line(
+            x=2, y=0.5,
+            stroke_width=0.8, dotted=True,
+            label="0.8", font_size=6)
+        Line(
+            x=3, y=0.5,
+            stroke_width=1.6, dotted=True,
+            label="1.6", font_size=6)
 
-          - *angle* - of 15 |deg| from the baseline, clockwise
+        # colored lines
+        Line(
+            x=0, y=4, x1=4, y1=5,
+            stroke="blue", stroke_width=1,
+            dashed=[0.2, 0.1],
+            label="dashed:[0.2,0.1]", font_size=6)
+        Line(
+            x=0, y=3, length=4.1, angle=15,
+            stroke="red",
+            label="15", font_size=6)
+        Line(
+            x=0, y=2, length=4,
+            stroke="chartreuse", stroke_width=2)
 
-          The angle guides the direction in which the line is drawn; if not
-          given |dash| as in the case of the thick green line |dash| this
-          will be 0 |deg|. The line length is then calculated based on these
-          points.
+      The various black lines have these properties:
 
-          The thick green line and the thin red line both have:
+      - *x* and *y* set as their starting point
+      - a default length of ``1`` cm
+      - *stroke_width* - set as value in points and labelled accordingly
+      - *dotted* - has a value of ``True``
 
-          - *x* and *y* set as their starting point
-          - *length* to set the specific size of the line
+      The dotted line is just a series of small lines i.e. the "dots",
+      followed by gaps, of sizes equal to the line's *stroke_width*.
 
-          The various black lines have these properties:
+      The thin red line has:
 
-          - *x* and *y* set as their starting point
-          - a default length of ``1`` cm
-          - *stroke_width* - set as value in points and labelled accordingly
-          - *dotted* - has a value of ``True``
+      - *angle* - of 15 |deg| from the baseline, clockwise
 
-          The dotted line is just a series of small lines i.e. the "dots",
-          followed by gaps, of sizes equal to the line's *stroke_width*.
-    ===== ======
+      The angle guides the direction in which the line is drawn; if not
+      given |dash| as in the case of the thick green line |dash| this
+      will be 0 |deg|. The line length is then calculated based on these
+      points.
+
+      The thick green line and the thin red line both have:
+
+      - *x* and *y* set as their starting point
+      - *length* - sets the specific size of the line
+
+      The medium blue line has:
+
+      - *dashed* - length of ``2`` mm and spacing of ``1`` mm
+      - *x1* and *y1* set as the ending point
+
+      Dashes are a list of two numbers. The first is the length of the dash;
+      the second is the length of the space between each dash.
+===== ======
 
 
 .. _polyline-command:
@@ -432,8 +424,8 @@ Polyline
 
 A polyline is a series of lines joining points.
 
-Example 1.
-++++++++++
+Example 1. Customised Polyline
+++++++++++++++++++++++++++++++
 
 .. |ply| image:: images/defaults/polyline.png
    :width: 330
@@ -495,8 +487,8 @@ The basic properties that can be set are:
 See Examples 2 and 3 below for additional properties.
 
 
-Example 1. Defaults
-+++++++++++++++++++
+Example 1. Default Text
++++++++++++++++++++++++
 
 .. |t01| image:: images/defaults/text.png
    :width: 330
@@ -521,8 +513,8 @@ Example 1. Defaults
 
 ===== ======
 
-Example 2. Customised
-+++++++++++++++++++++
+Example 2. Customised Text
+++++++++++++++++++++++++++
 
 .. |t02| image:: images/customised/text_custom.png
    :width: 330
@@ -562,7 +554,10 @@ Example 2. Customised
       - *transform* - uppercase (u), lowercase (l) or capitalise (c)
       - various font properties
 
-      This example shows how the text's font can be set using the ``font_name``
+      The box **must** be big enough to show the text, otherwise none will be
+      displayed!
+
+      This example also shows how the text's font can be set using the ``font_name``
       property.
 
       .. NOTE::
@@ -574,8 +569,8 @@ Example 2. Customised
 
 ===== ======
 
-Example 3. Styled
-+++++++++++++++++
+Example 3. Styled Text
+++++++++++++++++++++++
 
 .. |t03| image:: images/customised/text_style.png
    :width: 330
@@ -610,9 +605,10 @@ Example 3. Styled
                   '<b>bold</b> <i>ital</i> <b><i>bold ital</i></b>'
         )
 
-      In this example, the use of ``html=True`` signifies the  use of "styled"
-      multi-line HTML-fomatted text, to which various CSS styling properties
-      can be applied.
+      In this example, the use of ``html=True`` signifies the use of "styled"
+      multi-line, HTML-formatted, text.
+
+      "Styled" means that various CSS styling properties can be applied to it.
 
       This example shows how the text's font can be set either:
 
@@ -622,8 +618,8 @@ Example 3. Styled
 
 ===== ======
 
-Example 4. Rotated
-++++++++++++++++++
+Example 4. Rotated Text
++++++++++++++++++++++++
 
 .. |t04| image:: images/customised/text_rotate.png
    :width: 330
@@ -669,17 +665,22 @@ Example 4. Rotated
       property.
 
       The top two examples show normal (aka "line") text rotated around
-      the mind-point of the text at the ``x`` and ``y``location.  Be aware
-      that even though the ``\n`` forces a line-break, the total length of
-      the line is still calculated using all the characters.
+      the mind-point of the text at the ``x`` and ``y`` location.
+
+      Be aware that even though the ``\n`` forces a line-break, the total
+      length of the line is still calculated using all the characters.
 
       The lower two examples on the left show "text in a box" using the
-      ``wrap=True`` property.  It should be noted that the width of the
+      ``wrap=True`` property.
+
+      It should be noted that the width of the
       box is effectively also rotated, so that the width now becomes the
       "height" (and vice-versa of course).
 
       The lower example on the right shows "text in a box" using the
-      ``html=True`` property. For this example, styling is via the *css*
+      ``html=True`` property.
+
+      For this example, styling is via the *css*
       property and not via the :ref:`Common command <the-common-command>`
 
       .. NOTE::
@@ -719,8 +720,8 @@ of **protograf** conventions, the tail is the part that takes on the common
 properties of *height* and *width*; while the dimensions for the head, if not
 provided, are calculated from those.
 
-Example 1. Defaults
-+++++++++++++++++++
+Example 1. Default Arrow
+++++++++++++++++++++++++
 
 .. |ar0| image:: images/defaults/arrow.png
    :width: 330
@@ -743,8 +744,8 @@ Example 1. Defaults
         calculated as equal to twice the *width*
 ===== ======
 
-Example 2. Rotation
-+++++++++++++++++++
+Example 2. Rotated Arrow
+++++++++++++++++++++++++
 
 .. |ar1| image:: images/customised/arrow_rotate.png
    :width: 330
@@ -806,8 +807,8 @@ Example 2. Rotation
 
 ===== ======
 
-Example 3. Styled
-+++++++++++++++++
+Example 3. Styled Arrow
++++++++++++++++++++++++
 
 .. |ar2| image:: images/customised/arrow_sizes.png
    :width: 330
@@ -911,8 +912,8 @@ Circle
    There is more detail about the many properties that can be defined for a
    Circle in the :ref:`customised Circles <circleIndex>` section.
 
-Example 1.
-++++++++++
+Example 1. Default Circle
++++++++++++++++++++++++++
 
 .. |ccl| image:: images/defaults/circle.png
    :width: 330
@@ -942,8 +943,8 @@ A Compass is often thought of a specific device used for navigation. Here,
 its abstracted somewhat to indicate directional lines - specified by traditional
 compass directions - drawn within an enclosing shape; by default, circle.
 
-Example 1. Defaults
-+++++++++++++++++++
+Example 1. Default Compass
+++++++++++++++++++++++++++
 
 .. |cmp| image:: images/defaults/compass.png
    :width: 330
@@ -968,8 +969,8 @@ Example 1. Defaults
 
 ===== ======
 
-Example 2. Customised
-+++++++++++++++++++++
+Example 2. Customised Compass
++++++++++++++++++++++++++++++
 
 .. |cm2| image:: images/customised/compass.png
    :width: 330
@@ -978,24 +979,33 @@ Example 2. Customised
 |cm2| This example shows the shape constructed using the command with different
       properties.
 
-      The top-left Compass shape:
+      The **top-right  Compass** shape:
 
       .. code:: python
 
           Compass(
-              cx=1, cy=5, radius=0.5,
-              perimeter='circle',
-              directions="ne nw s"
-          )
+              cx=3, cy=1,
+              radius=0.5,
+              perimeter='hexagon',
+              radii_stroke_width=2)
 
       This Compass shape has the following properties:
 
-      - centred at x-position ``1`` cm and at y-position ``5`` cm
-      - radius of ``0.5`` cm
-      - *directions* define where the radial lines extend; in this case to the
-        North-East, North-West and South
+      - centred at x-position ``3`` cm and at y-position ``1`` cm
+      - *perimeter* - set as ``hexagon`` to define
+        where the six radial lines of the compass extend
+      - *radii_stroke_width* - set to ``2`` points; a much thicker line
 
-      The centre Compass shape:
+      For this Compass, the perimeter is a hexagon with a radius of ``0.5`` cm.
+
+      A hexagon has 6 possible radii, corresponding to its vertices.
+
+      .. NOTE::
+
+        Where *directions*, which define where the radial lines extend,
+        are not given, the default is ``*``, which means "all" radial lines.
+
+      The **centre Compass** shape:
 
       .. code:: python
 
@@ -1009,36 +1019,34 @@ Example 2. Customised
       This Compass shape has the following properties:
 
       - centred at x-position ``2`` cm and at y-position ``3`` cm
-      - *perimeter* sets a ``rectangle`` used to define
-        to where the radial lines of the compass extend
-      - *directions* define where the radial lines extend; in this case
-        the ``*`` means to "all" eight compass points
-      - *radii_stroke* defines the line colors used
+      - *perimeter* - set as ``rectangle`` to define
+        where the radial lines of the compass extend
+      - *directions* - where the radial lines extend; in this case
+        the ``*`` means "all" eight compass points
+      - *radii_stroke* - the line colors used
 
       For this Compass, the perimeter is a rectangle with a height of ``2`` cm
       and a width of ``3`` cm.
 
-      The lower-right Compass shape:
+      A rectangle has 8 possible radii, corresponding to its corners and the
+      centre of its sides.
+
+      The **lower-left Compass** shape:
 
       .. code:: python
 
           Compass(
-              cx=3, cy=1,
-              radius=0.5,
-              perimeter='hexagon',
-              radii_stroke_width=2)
+              cx=1, cy=5, radius=0.5,
+              perimeter='circle',
+              directions="ne nw s"
+          )
 
       This Compass shape has the following properties:
 
-      - centred at x-position ``3`` cm and at y-position ``1`` cm
-      - *perimeter* sets a ``hexagon`` used to define
-        where the six radial lines of the compass extend
-      - *radii_stroke_width* - set to ``2`` points; a much thicker line
-
-      For this Compass, the perimeter is a hexagon with a radius of ``0.5`` cm.
-
-      Note that where *directions*, which define where the radial lines extend,
-      are not given, the default is ``*``, which means "all" radial lines.
+      - centred at x-position ``1`` cm and at y-position ``5`` cm
+      - radius - ``0.5`` cm
+      - *directions* - define where the radial lines extend; in this case to the
+        North-East, North-West and South
 
 ===== ======
 
@@ -1049,8 +1057,8 @@ Ellipse
 ~~~~~~~
 `↑ <shape-index_>`_
 
-Example 1. Defaults
-+++++++++++++++++++
+Example 1. Default Ellipse
+++++++++++++++++++++++++++
 
 .. |ell| image:: images/defaults/ellipse.png
    :width: 330
@@ -1074,8 +1082,8 @@ Example 1. Defaults
 
 ===== ======
 
-Example 2. Customised
-+++++++++++++++++++++
+Example 2. Customised Ellipse
++++++++++++++++++++++++++++++
 
 .. |el1| image:: images/customised/ellipse_custom.png
    :width: 330
@@ -1104,8 +1112,8 @@ EquilateralTriangle
 ~~~~~~~~~~~~~~~~~~~
 `↑ <shape-index_>`_
 
-Example 1. Defaults
-+++++++++++++++++++
+Example 1. Default EquilateralTriangle
+++++++++++++++++++++++++++++++++++++++
 
 .. |eqi| image:: images/defaults/equiangle.png
    :width: 330
@@ -1120,12 +1128,12 @@ Example 1. Defaults
 
       It has the following properties based on the defaults:
 
-      - upper-left "corner" at x-position ``1`` cm and at y-position ``1`` cm
-      - side of ``1`` cm; all sides are equal
+      - lower-left "corner" at x-position ``1`` cm and y-position ``1`` cm
+      - side - ``1`` cm i.e. all sides are equal
 ===== ======
 
-Example 2. Customised
-+++++++++++++++++++++
+Example 2. Customised EquilateralTriangle
++++++++++++++++++++++++++++++++++++++++++
 
 .. |eq2| image:: images/customised/equilateral_triangle.png
    :width: 330
@@ -1139,29 +1147,33 @@ Example 2. Customised
       .. code:: python
 
         EquilateralTriangle(
-            x=2, y=1, flip="north",
-            hand="east", label="NE",
+            x=2, y=1,
+            flip="north", hand="west",
+            label="NW",
+            fill="red")
+        EquilateralTriangle(
+            x=2, y=1,
+            flip="north", hand="east",
+            label="NE",
             fill="gold")
         EquilateralTriangle(
             x=2, y=1,
-            flip="south", hand="east",
-            label="SE", fill="chartreuse")
-        EquilateralTriangle(
-            x=2, y=1, flip="north",
-            hand="west", label="NW",
-            fill="red")
-        EquilateralTriangle(
-            x=2, y=1, flip="south",
-            hand="west", label="SW",
+            flip="south", hand="west",
+            label="SW",
             fill="blue")
+        EquilateralTriangle(
+            x=2, y=1,
+            flip="south", hand="east",
+            label="SE",
+            fill="chartreuse")
 
       These shapes have the following properties:
 
-      - starting position - x-position ``2`` cm
+      - starting position - *x* is``2`` cm and *y* is ``1`` cm
       - default side of ``1`` cm; all sides are equal
-      - *flip* - this can be ``north`` or ``south`` and will cause the triangle
+      - *flip* - can be ``north`` or ``south`` |dash| the triangle
         to either point up or down relative to the starting position
-      - *hand*  - this can be ``west`` or ``east`` and will cause the triangle
+      - *hand*  - can be ``west`` or ``east`` |dash| the triangle
         to be drawn to the left or the right relative to the starting position
 
       The middle section shows:
@@ -1171,9 +1183,9 @@ Example 2. Customised
         EquilateralTriangle(
             x=1, y=4, side=1.5,
             hatch_count=5, hatch_stroke="red",
-            title='Title', heading='Head')
+            title="Title", heading="Head")
 
-      - starting position - *x*-position ``1`` cm and *y*-position ``4`` cm
+      - starting position - *x* is ``1`` cm and *y* is ``4`` cm
       - *side* of ``1.5`` cm; all sides are equal
       - *hatch_count* of ``5`` - this means there will be 5 equally spaced lines drawn
         between opposing sides and running parallel to the third side
@@ -1189,9 +1201,9 @@ Example 2. Customised
             rotation=45,
             dot=.05)
 
-      - starting position - x-position ``1`` cm y-position ``5.5`` cm
+      - starting position -  *x* is ``1`` cm and *y* is ``5.5`` cm
       - *dot* - in the centre
-      - *rotation* - of 45 |deg| (from the baseline, clockwise) about
+      - *rotation* - of 45 |deg| anti-clockwise about
         the centre
 
 ===== ======
@@ -1208,8 +1220,8 @@ Hexagon
    There is more detail about the many properties that can be defined for a
    Hexagon in the :ref:`customised shapes' Hexagon <hexIndex>` section.
 
-Example 1. Defaults
-+++++++++++++++++++
+Example 1. Default Hexagon
+++++++++++++++++++++++++++
 
 .. |hx1| image:: images/defaults/hexagon-flat.png
    :width: 330
@@ -1225,12 +1237,12 @@ Example 1. Defaults
       It has the following properties based on the defaults:
 
       - upper-left "corner" at x-position ``1`` cm and at y-position ``1`` cm
-      - flat-to-flat height of ``1`` cm
-      - "flat" top
+      - flat-to-flat |dash| opposite edges |dash| distance of ``1`` cm
+      - "flat" top - top edge is parallel to top of paper
 ===== ======
 
-Example 2. Pointy
-+++++++++++++++++
+Example 2. Pointy Hexagon
++++++++++++++++++++++++++
 
 .. |hx2| image:: images/defaults/hexagon-pointy.png
    :width: 330
@@ -1247,7 +1259,7 @@ Example 2. Pointy
 
       - upper-left "corner" at x-position ``1`` cm and at y-position ``1`` cm
       - flat-to-flat height of ``1`` cm
-      - a ``pointy`` top set via the *orientation*
+      - *orientation* -``pointy`` i.e. side edge is parallel to side of paper
 ===== ======
 
 
@@ -1258,13 +1270,14 @@ Polygon
 `↑ <shape-index_>`_
 
 A polygon is a shape constructed of any number of sides of equal length.
-For example, a hexagon is a polygon with 6 sides and an octagon is a polygon
-with 8 sides.
+
+For example, a hexagon is simply a polygon with 6 sides and an octagon
+is a polygon with 8 sides.
 
     **HINT** Unlike the `Hexagon`_ shape, a Polygon can be rotated!
 
-Example 1. Defaults
-+++++++++++++++++++
+Example 1. Default Polygon
+++++++++++++++++++++++++++
 
 .. |pol| image:: images/defaults/polygon.png
    :width: 330
@@ -1284,8 +1297,8 @@ Example 1. Defaults
       - a *side* length of  ``1`` cm
 ===== ======
 
-Example 2. Number of Sides
-++++++++++++++++++++++++++
+Example 2. Polygon with Sides
++++++++++++++++++++++++++++++
 
 .. |pl1| image:: images/customised/polygon_sizes.png
    :width: 330
@@ -1310,8 +1323,8 @@ Example 2. Number of Sides
       asymmetrical; this can be adjusted through `rotation`_.
 ===== ======
 
-Example 3. Radii
-++++++++++++++++
+Example 3. Polygon Radii
+++++++++++++++++++++++++
 
 .. |pl2| image:: images/customised/polygon_radii.png
    :width: 330
@@ -1320,7 +1333,7 @@ Example 3. Radii
 |pl2| This example shows the shape constructed using the command with the
       additional properties.
 
-      The top example:
+      The **lower** example:
 
       .. code:: python
 
@@ -1331,10 +1344,10 @@ Example 3. Radii
       - *centre* at x-position ``2`` cm and at y-position ``4`` cm, with a *radius*
         size of ``1`` cm
       - *sides* - ``8`` sides
-      - *radii* - set to ``True`` to force lines to be drawn from each of the
-        vertices of the polygon to its centre
+      - *radii* - set to ``True`` to force lines to be drawn from the centre
+        of the polygon to each of its vertices
 
-      The lower example:
+      The **top** example:
 
       .. code:: python
 
@@ -1353,19 +1366,25 @@ Example 3. Radii
       - *radii* - set to ``True`` to force lines to be drawn from the centre of
         the polygon to each of its vertices; the radii properties are then set:
 
-        - *radii_offset* - set to ``0.5`` cm; distance away from the centre
+        - *radii_offset* - set to ``0.75`` cm; distance away from the centre
           that the radii will start
-        - *radii_length*  - set to ``0.75`` cm
+        - *radii_length*  - set to ``0.25`` cm
         - *radii_stroke_width* - set to ``1`` point; a slightly thicker line
 
-      Note that when the radii length is shorter than that the distance from
-      vertex to centre, the line will still go in the same direction but never
-      touch the vertex or the centre.
+      .. NOTE::
+
+        When the radii length is shorter than the distance from
+        vertex to centre, the line will still go in the same direction
+        but never touch the vertex.
 
 ===== ======
 
-Example 4. Perbis
-+++++++++++++++++
+Example 4. Polygon with Perbis
+++++++++++++++++++++++++++++++
+
+The *perbis* |dash| short for "perpendicular bisector" |dash| defines
+lines that should be drawn from the centres of the sides of the polygon
+to the polygon's centre.
 
 .. |pl3| image:: images/customised/polygon_perbis.png
    :width: 330
@@ -1374,7 +1393,7 @@ Example 4. Perbis
 |pl3| This example shows the shape constructed using the command with the
       additional properties.
 
-      The top example:
+      The **lower** example:
 
       .. code:: python
 
@@ -1388,7 +1407,7 @@ Example 4. Perbis
       - *perbis* - set to ``*``; this means lines are drawn from each of the
         centres of the sides of the polygon to its centre
 
-      The lower example:
+      The **top** example:
 
       .. code:: python
 
@@ -1404,10 +1423,6 @@ Example 4. Perbis
       - *radius* size of ``1`` cm
       - *sides* - ``8`` (an octagon)
       - *perbis* - lines drawn to sides 2, 4 and 7
-
-      The *perbis* |dash| short for "perpendicular bisector" |dash| defines
-      lines  that are to be drawn from the centres of the sides
-      of the polygon to its centre.
 
       The edges of the polygon are numbered; the east-most facing edge is 1,
       and then numbers increase in an anti-clockwise direction.
