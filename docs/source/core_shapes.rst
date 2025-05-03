@@ -1410,7 +1410,7 @@ Example 4. Perbis
       of the polygon to its centre.
 
       The edges of the polygon are numbered; the east-most facing edge is 1,
-      and then numbers increase in an anti-clockwise direction.
+      and then numbers increase in an clockwise direction.
 
       Its properties can be set as follows:
 

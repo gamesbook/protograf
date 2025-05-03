@@ -2315,7 +2315,7 @@ class PolygonShape(BaseShape):
         """Draw lines connecting the Polygon centre to the centre of each edge.
 
         Def:
-        A perpendicular bisector ("perbis") of a chord is:
+            A perpendicular bisector ("perbis") of a chord is:
             A line passing through the center of circle such that it divides the
             chord into two equal parts and meets the chord at a right angle;
             for a polygon, each edge is effectively a chord.
@@ -2327,6 +2327,7 @@ class PolygonShape(BaseShape):
         _perbis = []  # store angles to centre of edges (the "chords")
         _perbis_pts = []  # store centre Point of edges
         vcount = len(vertices) - 1
+        vertices.reverse()
         for key, vertex in enumerate(vertices):
             if key == 0:
                 p1 = Point(vertex.x, vertex.y)
@@ -2337,6 +2338,7 @@ class PolygonShape(BaseShape):
             pc = geoms.fraction_along_line(p1, p2, 0.5)  # centre pt of edge
             _perbis_pts.append(pc)
             _, angle = geoms.angles_from_points(centre.x, centre.y, pc.x, pc.y)
+            angle = 360.0 - angle if angle > 0.0 else angle
             _perbis.append(angle)
         pb_offset = self.unit(self.perbis_offset, label="perbis offset") or 0
         pb_length = (
@@ -2349,10 +2351,11 @@ class PolygonShape(BaseShape):
                 continue
             # points based on length of line, offset and the angle in degrees
             edge_pt = _perbis_pts[key]
+            # print(f'{pb_angle=} {edge_pt=} {centre=}')
             if pb_offset is not None and pb_offset != 0:
                 offset_pt = geoms.point_on_circle(centre, pb_offset, pb_angle)
                 end_pt = geoms.point_on_line(offset_pt, edge_pt, pb_length)
-                # print(pb_angle, offset_pt, f'{x_c=}, {y_c=}')
+                # print(f'{end_pt=} {offset_pt=}')
                 cnv.draw_line((offset_pt.x, offset_pt.y), (end_pt.x, end_pt.y))
             else:
                 cnv.draw_line((centre.x, centre.y), (edge_pt.x, edge_pt.y))
