@@ -446,7 +446,7 @@ Rhombus(cx=2, cy=3, width=2, height=3, stroke_width=1.9,
     borders=[
         ("nw", 2, "gold"),
         ("ne", 2, "chartreuse", True),
-        ("se", 2, "tomato", [0.1,0.2,0.1,0]),
+        ("se", 2, "tomato", [0.1, 0.2]),
         ("sw", 2)
     ]
 )

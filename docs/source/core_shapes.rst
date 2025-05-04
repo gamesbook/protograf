@@ -1656,7 +1656,17 @@ Example 1. Default QRCode
    :width: 330
 
 ===== ======
-|qrc| This example shows the shape constructed using the commands with these
+|qrc| The shape cannot be constructed using only default properties:
+
+      .. code:: python
+
+          QRCode()
+
+      Nothing will be visible; instead you will see a warning::
+
+        WARNING:: No text supplied for the QRCode shape!
+
+      This example shows the shape constructed using the commands with these
       properties:
 
       .. code:: python
@@ -1718,7 +1728,7 @@ Example 1. Default Rectangle
 
       It has the following properties set for it:
 
-      - upper-left corner at x-position ``1`` cm and at y-position ``1`` cm
+      - upper-left corner at x-position ``1`` cm and y-position ``1`` cm
       - *width* and *height* - default to ``1`` cm
 
       Because all sides of the Rectangle are equal, it appears as though it
@@ -1743,12 +1753,12 @@ Example 2. Customised Rectangle
 
       - *cx* and *cy* - set the centre at x-position ``2`` cm and
         y-position ``3`` cm
-      - *height* of ``4`` cm
-      - *width* of ``3`` cm
-      - *dot* - a small, filled circle placed at the centre
+      - *height* - ``4`` cm
+      - *width* - ``3`` cm
+      - *dot* - small, filled circle placed at the centre of size ``0.1``
 
-      Because the *height* is greater than the *width* the Rectangle has a
-      card-like appearance.
+      Because the *height* is greater than the *width* the Rectangle has an
+      appearance like a playing card.
 ===== ======
 
 
@@ -1775,8 +1785,8 @@ Example 1. Default Rhombus
       It has the following properties based on the defaults:
 
       - upper-left at x-position ``1`` cm and at y-position ``1`` cm
-      - *width* of ``1`` cm
-      - *height* of ``1`` cm
+      - *width* - ``1`` cm
+      - *height* - ``1`` cm
 
       Because the sides are of equal length, the Rhombus appears to be a
       rotated Square.
@@ -1799,9 +1809,9 @@ Example 2. Rhombus Centre & Dot
       It has the following properties set for it:
 
       - centre at x-position ``2`` cm and at y-position ``3`` cm
-      - *width* of ``2`` cm
-      - *height* of ``3`` cm
-      - *dot* of size ``0.1``
+      - *width* - ``2`` cm
+      - *height* - ``3`` cm
+      - *dot* - small, filled circle placed at the centre of size ``0.1``
 ===== ======
 
 Example 3. Rhombus Border Styles
@@ -1821,7 +1831,7 @@ Example 3. Rhombus Border Styles
             borders=[
                 ("nw", 2, gold),
                 ("ne", 2, lime, True),
-                ("se", 2, tomato, [0.1,0.2,0.1,0]),
+                ("se", 2, tomato, [0.1, 0.2]),
                 ("sw", 2)
             ]
           )
@@ -1834,16 +1844,15 @@ Example 3. Rhombus Border Styles
       - *borders* - a list of sets of custom settings for each side; each set
         can contain:
 
-        - `direction` - one of ne (northeast), se (southeast), nw (northwest),
+        - `direction` - ne (northeast), se (southeast), nw (northwest),
           or sw (southwest)
         - `width` - the line thickness
         - `color` - either a named color or a hexadecimal value
-        - `style` - ``True`` makes it dotted; or a list of values creates dashes
+        - `style` - ``True`` makes it dotted; a pair of values creates dashes
 
-        Direction and width are required, but color and style are optional. One
-        or more border values can be used together with spaces between them
-        e.g. ``ne se`` to draw lines on both northeast **and** southeast sides.
+        Direction and width are required, but color and style are optional.
 
+        Mutiple, spaced values can be used to draw lines e.g. ``ne se``.
 ===== ======
 
 
@@ -1864,24 +1873,22 @@ Example 1. Default Sector
 .. |sct| image:: images/defaults/sector.png
    :width: 330
 
-..  table::
-    :width: 100%
-    :widths: 40, 60
+===== ======
+|sct| This example shows the shape constructed using the command with only
+      defaults:
 
-    ===== ======
-    |sct| This example shows the shape constructed using the command with only
-          defaults:
+      .. code:: python
 
-          .. code:: python
+          Sector()
 
-              Sector()
+      It has the following properties based on the defaults:
 
-          It has the following properties based on the defaults:
+      - upper-left "corner"at x-position ``1`` cm and at y-position ``1`` cm
 
-          - upper-left "corner"at x-position ``1`` cm and at y-position ``1`` cm
-          - sector is then drawn inside a circle of radius ``1`` cm, with a
-            default *angle_width* of 90 |deg|
-    ===== ======
+      The sector is then drawn inside a circle of radius ``1`` cm, whose
+      centre is at  x-position ``0.5`` cm and at y-position ``0.5`` cm.
+      The default *angle_width* is 90 |deg|.
+===== ======
 
 Example 2. Customised Sector
 ++++++++++++++++++++++++++++
@@ -1889,35 +1896,32 @@ Example 2. Customised Sector
 .. |sc1| image:: images/customised/sectors.png
    :width: 330
 
-..  table::
-    :width: 100%
-    :widths: 40, 60
+===== ======
+|sc1| This example shows examples of the Sector constructed using commands
+      with the following properties:
 
-    ===== ======
-    |sc1| This example shows examples of the Sector constructed using commands
-          with the following properties:
+      .. code:: python
 
-          .. code:: python
+        sctm = Common(
+            cx=2, cy=3, radius=2,
+            fill="black", angle_width=43)
 
-            sctm = Common(
-                cx=2, cy=3, radius=2, fill="black", angle_width=43)
+        Sector(common=sctm, angle=40)
+        Sector(common=sctm, angle=160)
+        Sector(common=sctm, angle=280)
 
-            Sector(common=sctm, angle=40)
-            Sector(common=sctm, angle=160)
-            Sector(common=sctm, angle=280)
+      These all have the following Common properties:
 
-          These all have the following Common properties:
+      - centred at x-position ``2`` cm and at y-position ``3`` cm
+      - *radius* of ``2`` cm for the enclosing "virtual" circle
+      - *fill* color of black
+      - *angle_width* - determines the coverage i.e. the "width" of the
+        Sector; in all these cases it is 43 |deg|
 
-          - centred at x-position ``2`` cm and at y-position ``3`` cm
-          - *radius* of ``2`` cm for the enclosing "virtual" circle
-          - *fill* color of black
-          - *angle_width* - determines the coverage i.e. the "width" of the
-            Sector; in all these cases it is 43 |deg|
-
-          Each sector in this example is drawn at a different *angle*; with the
-          this being the "virtual" centre-line  extending through the sector,
-          outwards from the middle of the  enclosing "virtual" circle.
-    ===== ======
+      Each sector in this example is drawn at a different *angle*.
+      This represents a "virtual" centre-line extending through the sector,
+      outwards from the centre of the enclosing "virtual" circle.
+===== ======
 
 
 .. _square-command:
@@ -1944,7 +1948,7 @@ Example 1. Default Square
 
       - upper-left corner at:
 
-        - x-position ``1`` cm and
+        - x-position ``1`` cm, and
         - y-position ``1`` cm
       - side of ``1`` cm
 
@@ -1968,7 +1972,7 @@ Example 2. Customised Square
 
       - centre at x-position ``2`` cm and at y-position ``3`` cm
       - *side* of ``3`` cm; both *width* and *height* match this
-      - *dot* - a small, filled circle placed at the centre
+      - *dot* - small, filled circle placed at the centre of size ``0.1``
 
 ===== ======
 
@@ -1980,7 +1984,9 @@ Stadium
 `↑ <shape-index_>`_
 
 A Stadium is a shape constructed with a rectangle as a base, and then curved
-projections extending from one or more of the sides.
+projections added that extend from one or more of the sides.
+
+In its default form, it may look like a pill.
 
 Example 1. Default Stadium
 ++++++++++++++++++++++++++
@@ -2003,7 +2009,8 @@ Example 1. Default Stadium
         - x-position ``1`` cm and
         - y-position ``1`` cm
       - height and width of ``1`` cm each
-      - curved ends extend from the east/right and west/left sides
+
+      The default curved ends extend from the east/right and west/left sides.
 
 ===== ======
 
@@ -2020,22 +2027,22 @@ Example 2. Customised Stadium
       .. code:: python
 
         Stadium(
-          x=0, y=0, height=1, width=1, edges='n',
+          x=0, y=1, height=1, width=1, edges='n',
           fill="tan", label="north")
         Stadium(
           x=3, y=1, height=1, width=1, edges='s',
           fill="tan", label="south")
         Stadium(
-          x=0, y=4, height=1, width=1, edges='e',
+          x=0, y=3, height=1, width=1, edges='e',
           fill="tan", label="east")
         Stadium(
-          x=3, y=5, height=1, width=1, edges='w',
+          x=3, y=4, height=1, width=1, edges='w',
           fill="tan", label="west")
 
       These have the following properties set:
 
       - *height* and *width* - of ``1`` cm and ``1`` cm respectively
-      - *edges* - set the display
+      - *edges* - set the projection direction(s)
 
       The edges of the rounded projection(s) can be set using
       a letter to represent direction, where:
@@ -2057,11 +2064,11 @@ Star
 ~~~~
 `↑ <shape-index_>`_
 
-A Star is five-pointed shape; essentially made by extending the sides for a
-pentagram outwards to meet at a point.
+A Star is multi-pointed shape; essentially made by joining points spaced
+equally around the circumference of a circle.
 
 To create more varied kinds of stars, see the triangle petal shapes that can
-be created via a :ref:`customised Circle <circleIndex>`.
+be created using a :ref:`customised Circle <circleIndex>`.
 
 Example 1. Default Star
 +++++++++++++++++++++++
@@ -2081,6 +2088,7 @@ Example 1. Default Star
 
       - centre at x-position ``1`` cm and at y-position ``1`` cm
       - "height" of ``1`` cm
+      - default of 5 points
 ===== ======
 
 Example 2. Customised Star
@@ -2103,13 +2111,10 @@ Example 2. Customised Star
       It has the following properties that differ from the defaults:
 
       - centre at x-position ``2`` cm and at y-position ``3`` cm
-      - *radius* of ``2`` cm
-      - *fill* color of ``yellow`` (corresponds to hexadecimal value ``#FFFF00``)
-        that defines the color of the interior of the Star
-      - *stroke* color of ``red`` (corresponds to hexadecimal value ``#FF0000``)
-        that defines the color of the border of the Star
-      - *rotation* -  of 45 |deg| (from the baseline, clockwise) about
-        the centre
+      - *radius* - ``2`` cm
+      - *fill* color - ``yellow`` for the interior of the Star
+      - *stroke* color - ``red`` for the outline of the Star
+      - *rotation* -  45 |deg| anti-clockwise about the centre
 ===== ======
 
 
