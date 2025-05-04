@@ -2632,6 +2632,9 @@ class QRCodeShape(BaseShape):
             _source = self.source
         else:
             pass
+        breakpoint()
+        if not _source:
+            _source = Path(globals.filename).stem + '.png'
         # if no directory in _source, use qrcodes cache directory!
         if Path(_source).name:
             _source = os.path.join(cache_directory, _source)
