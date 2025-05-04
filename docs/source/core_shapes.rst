@@ -1567,7 +1567,7 @@ for the *cx* and *cy* pair that you supply to it are correct!
         for the shape's' interior
       - *stroke* - color of ``peru`` (hexadecimal value ``#CD853F``)
 
-      Reminder: ``cx`` and ``cy`` affect the drawing of the cross and label
+      *Reminder:* ``cx`` and ``cy`` affect the drawing of the cross and label
       but do **not** affect the drawing of the shape itself.
 ===== ======
 
@@ -1614,8 +1614,10 @@ pairs of values; so instead of ``[(0,0), (1,1)]`` just use ``"0,0 1,1"``.
       - *label* - sets the text appearing at the defined centre position
       - *fill* color defines the color of the interior of the shape
 
-      In the ``gold``-filled Polyshape, the *x* and *y* values have been set,
-      causing the whole shape to move down and to the right.
+      In the ``gold``-filled Polyshape, the *x* and *y* values have been set.
+      So, even though the points used to define the ``gold`` Polyshape are
+      the same as those used for ``green`` one, these values cause the whole
+      shape to be moved down and to the right.
 ===== ======
 
 
@@ -1626,8 +1628,8 @@ QRCode
 `↑ <shape-index_>`_
 
 A QR Code is a square image containing a pattern of black squares and dots.
-It represents encoded information that a device with a QR scanner, for example,
-a  cell phone, can decode.
+It represents encoded information that a device with a QR scanner, for example
+a cell phone, can decode.
 
 The properties that can be provided to a ``QRCode`` command, apart from the
 usual *x* and *y*, to set the upper-left corner, and *height* and *width* to

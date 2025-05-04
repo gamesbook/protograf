@@ -2662,7 +2662,7 @@ class QRCodeShape(BaseShape):
         _text = self.textify(ID)
         # tools.feedback(f'*** QRC {_locale=} {self.text=} {_text=}', False)
         if _text is None or _text == "":
-            tools.feedback("No text supplied for the Text shape!", False, True)
+            tools.feedback("No text supplied for the QRCode shape!", False, True)
             return
         _text = str(_text)  # card data could be numeric
         if "\\u" in _text:
