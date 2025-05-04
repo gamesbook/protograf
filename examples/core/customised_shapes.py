@@ -501,7 +501,7 @@ Square(x=2.5, y=0.5, height=1, centre_shape=small_star)
 Rectangle(x=0.5, y=2.5, height=1, width=1.25, centre_shape=small_star)
 Circle(cx=3, cy=3, radius=0.5, centre_shape=small_star)
 Polygon(cx=1, cy=5, radius=0.5, sides=8, centre_shape=small_star)
-EquilateralTriangle(x=2.35, y=4.5, side=1.25, centre_shape=small_star)
+EquilateralTriangle(x=2.35, y=5.5, side=1.25, centre_shape=small_star)
 PageBreak()
 
 # ---- Centred Shapes - move

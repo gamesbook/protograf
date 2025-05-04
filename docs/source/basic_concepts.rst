@@ -207,7 +207,7 @@ Color in **protograf**, is defined in the same way as it is in pages
 that appear on the web i.e. in RGB |dash| red-green-blue |dash| *hexadecimal*
 format; for example, ``#A0522D`` represents a shade of the color that we
 would likely term "brown", while "basic" colors have their own values;
-"yellow" is ``#FFFF00``, "red" is ``#FF0000``, and "blue" is `#0000FF``.
+"yellow" is ``#FFFF00``, "red" is ``#FF0000``, and "blue" is ``#0000FF``.
 
 Colors in **protograf** can also make use of names from a pre-defined
 list - for example ``#A0522D`` is defined as the color *sienna*. The

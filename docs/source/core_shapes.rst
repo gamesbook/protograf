@@ -2064,7 +2064,7 @@ Star
 ~~~~
 `↑ <shape-index_>`_
 
-A Star is multi-pointed shape; essentially made by joining points spaced
+A Star is a fivepointed shape; essentially made by joining points spaced
 equally around the circumference of a circle.
 
 To create more varied kinds of stars, see the triangle petal shapes that can
@@ -2105,16 +2105,16 @@ Example 2. Customised Star
 
           Star(
             cx=2, cy=3, radius=2,
-            fill="yellow", stroke="red",
-            rotation=45)
+            fill_stroke="yellow",
+            rotation=36)
 
       It has the following properties that differ from the defaults:
 
       - centre at x-position ``2`` cm and at y-position ``3`` cm
       - *radius* - ``2`` cm
       - *fill* color - ``yellow`` for the interior of the Star
-      - *stroke* color - ``red`` for the outline of the Star
-      - *rotation* -  45 |deg| anti-clockwise about the centre
+      - *stroke* color - ``yellow`` for the outline of the Star
+      - *rotation* - 36 |deg| anti-clockwise about the centre
 ===== ======
 
 
@@ -2125,10 +2125,15 @@ Starfield
 `↑ <shape-index_>`_
 
 A Starfield is a shape in which a number of small dots are scattered at random
-to simulate what might be seen looking at a portion of the night sky.
+to simulate what might be seen when looking at a portion of the night sky.
+
+The dots are drawn inside the boundaries of an "enclosure"; this can be a
+rectangle, a circle, or a polygon |dash| but this shape is not, itself, drawn.
 
 The number of dots drawn depends on the "density", which is the product of the
 actual area of the shape multiplied by the density value.
+
+
 
 .. HINT::
 
@@ -2159,13 +2164,13 @@ Example 1. Default Starfield
 
       It has the following properties based on the defaults:
 
-      - lower left-corner at x-position ``0`` cm and at y-position ``0`` cm
-      - an enclosing area with *height* and *width* of ``1`` cm
+      - upper-left corner at x-position ``0`` cm and y-position ``0`` cm
+      - an enclosing rectangle with *height* and *width* of ``1`` cm
       - 10 randomly placed ``white`` *color* 'dots' (the starfield *density*)
 
-      Because the default fill color is white, this example adds an extra
-      `Rectangle()` shape, with a fill of black, which is drawn first and is
-      hence "behind" the field of dots.
+      Because the default fill color is ``white``, this example adds an extra
+      `Rectangle()` shape, with a fill of ``black``, which is drawn first and
+      is hence "behind" the field of dots.
 ===== ======
 
 Example 2. Multiple Color Starfield
@@ -2189,7 +2194,7 @@ Example 2. Multiple Color Starfield
 
       It has the following properties set:
 
-      - lower left-corner at x-position ``0`` cm and at y-position ``0`` cm
+      - upper-left corner at x-position ``0`` cm and y-position ``0`` cm
       - *enclosure* - the rectangle size determines the boundaries of the area
         (*height* and *width* each of ``3`` cm) inside of which the stars (dots) are
         randomly drawn
@@ -2225,7 +2230,7 @@ Example 3. Multiple Size Starfield
 
       It has the following properties set:
 
-      - lower left "corner" at x-position ``0`` cm and at y-position ``0`` cm
+      - upper-left "corner" at x-position ``0`` cm and at y-position ``0`` cm
       - *enclosure* - the `circle` radius (``1.5`` cm) determines the boundaries
         of the area inside of which the stars (dots) are randomly drawn
       - *density* - there will be a total of "30 multiplied by the enclosure
@@ -2253,13 +2258,13 @@ Example 4. Multiple Color & Size Starfield
         StarField(
             enclosure=polygon(x=1.5, y=1.4, sides=10, radius=1.5),
             density=50,
-            colors=[white, white, white, red, green, blue],
+            colors=["white", "white", "white", "red", "green", "blue"],
             sizes=[0.15, 0.15, 0.15, 0.15, 0.3, 0.3, 0.45]
         )
 
       It has the following properties set:
 
-      - lower left "corner" at x-position ``1.5`` cm and y-position ``1.4`` cm
+      - upper-left "corner" at x-position ``1.5`` cm and y-position ``1.4`` cm
       - *enclosure* - the polygon radius (``1.5`` cm) determines the boundaries
         of the area inside of which the stars (dots) are randomly drawn
       - *density* - there will be a total of "50 multiplied by the enclosure
@@ -2300,7 +2305,7 @@ Example 1. Default Trapezoid
       - starts at x-position ``1`` cm and at y-position ``1`` cm
       - *width* of ``1`` cm
       - *height* of ``1`` cm
-      - *top* - the upper edge of the shape defaults to half the *width*
+      - the lower edge of the shape defaults to half the *width*
 ===== ======
 
 Example 2. Size & Flip Trapezoid
@@ -2644,8 +2649,8 @@ If an image has a transparent area, this will be respected and shapes
 appearing earlier on in a script may then be visible "below" it.
 
 
-Example 1. Defaults
-+++++++++++++++++++
+Example 1. Default Image
+++++++++++++++++++++++++
 
 .. |im1| image:: images/customised/image_default.png
    :width: 330
@@ -3122,8 +3127,8 @@ Every shape that has a calculated centre will support a *rotation* property.
 Rotation takes place in anti-clockwise direction, from the horizontal, around
 the centre of the shape, in *degrees*.
 
-Example 1. Rhombus
-++++++++++++++++++
+Example 1. Rhombus Rotation
++++++++++++++++++++++++++++
 
 .. |rt1| image:: images/customised/rhombus_red_rotation.png
    :width: 330
@@ -3162,8 +3167,8 @@ Example 1. Rhombus
       how the second is drawn relative to the first.
 ===== ======
 
-Example 2. Polygon
-++++++++++++++++++
+Example 2. Polygon Rotation
++++++++++++++++++++++++++++
 
 .. |rt2| image:: images/customised/polygon_rotation_pointy.png
    :width: 330
@@ -3203,8 +3208,8 @@ Example 2. Polygon
 
 ===== ======
 
-Example 3. Shapes
-+++++++++++++++++
+Example 3. Shapes Rotation
+++++++++++++++++++++++++++
 
 .. |rt3| image:: images/customised/shape_rotation.png
    :width: 330
@@ -3244,8 +3249,8 @@ Example 3. Shapes
 
 ===== ======
 
-Example 4. Hatches
-++++++++++++++++++
+Example 4. Rotation with Hatches
+++++++++++++++++++++++++++++++++
 
 .. |rt4| image:: images/customised/shape_hatch_and_rotation.png
    :width: 330
@@ -3259,33 +3264,28 @@ Example 4. Hatches
         htch = Common(
             fill='lightgray', stroke=None,
             hatch_count=5, hatch_width=0.75,
-            hatch='w', hatch_stroke="red")
+            hatch='w', hatch_stroke="red",
+            rotation=30)
 
         Hexagon(
             common=htch,
             cx=2, cy=1, height=1.5,
-            rotation=30,
-            )
+        )
         EquilateralTriangle(
             common=htch,
             cx=1, cy=3, side=1.5,
-            rotation=30,
-            )
-        Rectangle(
-            common=htch,
-            x=0.5, y=4, height=1.5, width=1,
-            rotation=30,
         )
         Circle(
            common=htch,
            cx=3, cy=3, radius=0.75,
-           hatch='w',
-           rotation=30,
+        )
+        Rectangle(
+            common=htch,
+            x=0.5, y=4, height=1.5, width=1,
         )
         Rhombus(
            common=htch,
            cx=3, cy=5, height=2, width=1.5,
-           rotation=30,
         )
 
       The shapes share common properties for the number and style of hatches,
@@ -3322,8 +3322,8 @@ The *label* text can, in addition, be **moved** relative to the shape's centre
 by using *mx* and *my* properties; positive values will move the text to
 the right and down; and negative values will move the text to the left and up.
 
-Example 1. Descriptions
-+++++++++++++++++++++++
+Example 1. Heading, Label and Title
++++++++++++++++++++++++++++++++++++
 
 .. |tx1| image:: images/customised/descriptions.png
    :width: 330
@@ -3352,8 +3352,8 @@ Example 1. Descriptions
       *stroke* (``red``) and font *size* (``14`` points).
 ===== ======
 
-Example 2. Text Offsets
-+++++++++++++++++++++++
+Example 2. Label Offsets
+++++++++++++++++++++++++
 
 .. |tx2| image:: images/customised/label_offset.png
    :width: 330
@@ -3449,7 +3449,7 @@ visible - then set the *fill* value to ``None``.
       partially over the yellow Rectangle on the upper-left.
 
       When overdrawn, there is a color change in the overlapping section
-      ("bleed through").
+      i.e. "bleed through" occurs.
 ===== ======
 
 
@@ -3457,16 +3457,17 @@ Centre Shape
 ~~~~~~~~~~~~
 `^ <shapes-common-properties_>`_
 
-Any shape that can be defined using its centre, may have another shape -
-called a "centre shape" - placed inside of it.
+Any shape that can be defined using its centre, may have another shape |dash|
+called a "centre shape" |dash| placed inside of it.
 
 .. NOTE::
-   In terms of drawing order, the  "centre shape" is drawn after most of the
-   shape's other properties: only a dot, cross or label (if any are defined)
-   will be drawn superimposed on the centre-shape.
 
-Example 1. Default Centre
-+++++++++++++++++++++++++
+   In terms of drawing order, the  "centre shape" is drawn after most of the
+   shape's other properties: only a dot, cross or label (if any of these are
+   defined) will be drawn superimposed on the centre-shape.
+
+Example 1. Default Centre Shape
++++++++++++++++++++++++++++++++
 
 .. |cs0| image:: images/customised/shape_centred.png
    :width: 330
@@ -3481,7 +3482,7 @@ Example 1. Default Centre
         Polygon(
             cx=1, cy=5, radius=0.5, sides=8, centre_shape=small_star)
         EquilateralTriangle(
-            x=2.35, y=4.5, side=1.25, centre_shape=small_star)
+            x=2.35, y=5.5, side=1.25, centre_shape=small_star)
         Rectangle(
             x=0.5, y=2.5, height=1, width=1.25, centre_shape=small_star)
         Circle(
@@ -3525,6 +3526,7 @@ The centre-shape can be shifted from the centre by setting values for
 
         Hexagon(
             x=1, y=0.5, height=2,
+            hatch_count=5,
             dot=0.1,
             centre_shape=small_circle)
 
@@ -3538,10 +3540,12 @@ The centre-shape can be shifted from the centre by setting values for
       The ``small_star`` is assigned as the ``centre_shape``  to
       ``small_circle``; a shape that is also not drawn.
 
-      This circle is used as the ``centre_shape``  for both of the Hexagons.
+      This ``small_circle`` is now used as the ``centre_shape``
+      for both of the Hexagons.
 
       The upper Hexagon shows how the centre-shape is drawn
-      over other features in the Hexagon, **except** for the ``dot``.
+      over other features, such as the hatches, in the Hexagon,
+      **except** for the ``dot``.
 
       The lower Hexagon shows how the centre-shape can be moved with the
       ``*_mx`` and ``*_my`` values.
