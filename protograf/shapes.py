@@ -2597,10 +2597,11 @@ class PolylineShape(BaseShape):
             self.vertexes.append((x, y))
         # ---- draw polyline
         # tools.feedback(f'***PolyLineShp{x=} {y=} {self.vertexes=}')
-        cnv.draw_polyline(self.vertexes)
-        kwargs["closed"] = False
-        kwargs["fill"] = None
-        self.set_canvas_props(cnv=cnv, index=ID, **kwargs)
+        if points:
+            cnv.draw_polyline(self.vertexes)
+            kwargs["closed"] = False
+            kwargs["fill"] = None
+            self.set_canvas_props(cnv=cnv, index=ID, **kwargs)
 
 
 class QRCodeShape(BaseShape):
