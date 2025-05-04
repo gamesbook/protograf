@@ -2632,9 +2632,8 @@ class QRCodeShape(BaseShape):
             _source = self.source
         else:
             pass
-        breakpoint()
         if not _source:
-            _source = Path(globals.filename).stem + '.png'
+            _source = Path(globals.filename).stem + ".png"
         # if no directory in _source, use qrcodes cache directory!
         if Path(_source).name:
             _source = os.path.join(cache_directory, _source)
@@ -3904,6 +3903,21 @@ class StarShape(BaseShape):
     Star on a given canvas.
     """
 
+    def get_vertexes(self, x, y, **kwargs):
+        """Calculate vertices of star"""
+        vertices = []
+        radius = self._u.radius
+        vertices.append(muPoint(x, y + radius))
+        angle = (2 * math.pi) * 2.0 / 5.0
+        start_angle = math.pi / 2.0
+        log.debug("Start # self.vertices:%s", self.vertices)
+        for vertex in range(self.vertices - 1):
+            next_angle = angle * (vertex + 1) + start_angle
+            x_1 = x + radius * math.cos(next_angle)
+            y_1 = y + radius * math.sin(next_angle)
+            vertices.append(muPoint(x_1, y_1))
+        return vertices
+
     def draw(self, cnv=None, off_x=0, off_y=0, ID=None, **kwargs):
         """Draw a star on a given canvas."""
         super().draw(cnv, off_x, off_y, ID, **kwargs)  # unit-based props
@@ -3923,24 +3937,13 @@ class StarShape(BaseShape):
         # ---- set canvas
         self.set_canvas_props(index=ID)
         # ---- handle rotation
-        is_rotated = False
         rotation = kwargs.get("rotation", self.rotation)
         if rotation:
             self.centroid = muPoint(x, y)
             kwargs["rotation"] = rotation
             kwargs["rotation_point"] = self.centroid
-        # ---- calculate vertices
-        self.vertexes_list = []
-        self.vertexes_list.append(muPoint(x, y + radius))
-        angle = (2 * math.pi) * 2.0 / 5.0
-        start_angle = math.pi / 2.0
-        log.debug("Start # self.vertices:%s", self.vertices)
-        for vertex in range(self.vertices - 1):
-            next_angle = angle * (vertex + 1) + start_angle
-            x_1 = x + radius * math.cos(next_angle)
-            y_1 = y + radius * math.sin(next_angle)
-            self.vertexes_list.append(muPoint(x_1, y_1))
         # ---- draw star
+        self.vertexes_list = self.get_vertexes(x, y)
         # tools.feedback(f'***Star {x=} {y=} {self.vertexes_list=}')
         cnv.draw_polyline(self.vertexes_list)
         kwargs["closed"] = True

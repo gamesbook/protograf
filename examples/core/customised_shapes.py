@@ -384,7 +384,7 @@ PageBreak()
 # ---- star shape
 Blueprint(stroke_width=0.5)
 Text(common=txt, text="Shape label: offsets")
-Star(cx=2, cy=3, radius=2, fill="yellow", stroke="red", rotation=45)
+Star(cx=2, cy=3, radius=2, fill_stroke="yellow", rotation=36)
 PageBreak()
 
 # ---- polyshape
