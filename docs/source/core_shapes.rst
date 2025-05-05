@@ -2346,11 +2346,13 @@ Example 3. Trapezoid Borders
       .. code:: python
 
         Trapezoid(
-            cx=2, cy=3, width=2, height=2, top=1.5, stroke_width=2,
+            cx=2, cy=3, width=2,
+            height=2, top=1.5,
+            stroke_width=2,
             borders=[
-                ("w", 2, gold),
-                ("e", 2, lime, True),
-                ("n", 2, tomato, [0.1,0.2,0.1,0]),
+                ("w", 2, "gold"),
+                ("e", 2, "chartreuse", True),
+                ("n", 2, "tomato", [0.1, 0.2]),
                 ("s", 2)
             ]
         )
@@ -2361,6 +2363,7 @@ Example 3. Trapezoid Borders
       - *width* of ``2`` cm
       - *height* of ``3`` cm
       - *top* of ``1.5`` cm
+      - *stroke_width* of 2 points
       - *borders* - a list of sets of custom settings for each side; each set
         can contain:
 
@@ -2522,19 +2525,19 @@ Example 2. Moleskine Grid
       - *width* and *height* - intervals between the centre of the dots
         in the x- and y-directions respectively
       - *dot_point* is set to be smaller than the default of ``3``
-      - *stroke* color of ``darkgrey`` is a lighter shade than the default black
-      - *offset_y* moves the start of the grid slightly downwards by 1/4 of a cm
+      - *stroke* color - ``darkgrey`` is a lighter shade than the default black
+      - *offset_y* moves the start of the grid slightly downwards by 1/4 cm
 
       .. HINT::
 
-         For a notebook page for *actual*  use, you could consider setting
+         For a notebook page for *actual* use, you could consider setting
          the page color.
-
-         A color like ``"cornsilk"`` might provide a suitable backdrop
-         for the light grey of the grid.
 
          To change the page color, set the *fill* property of the ``Create()``
          command.
+
+         A color like ``"cornsilk"`` might provide a suitable backdrop
+         for the light grey of the grid.
 ===== ======
 
 
@@ -2783,8 +2786,8 @@ and their movement regulated.
    Very detailed information about using hexagons in grids can be found in the
    section on :doc:`Hexagonal Grids <hexagonal_grids>`.
 
-Example 1. Defaults
-+++++++++++++++++++
+Example 1. Hexagons Defaults
+++++++++++++++++++++++++++++
 
 .. |hex| image:: images/defaults/hexagons-2x2.png
    :width: 330
@@ -2795,16 +2798,15 @@ Example 1. Defaults
 
       .. code:: python
 
-          Hexagons(rows=2, cols=2)
+          Hexagons(rows=3, cols=3)
 
       It has the following properties based on the defaults:
 
       - upper-left "corner" at x-position ``1`` cm and at y-position ``1`` cm
       - flat-to-flat hexagon *height* of ``1`` cm
       - "flat" top hexagons
-      - size of ``2`` *rows* by ``2`` *cols* ("columns")
-      - the "odd" columns - which includes the first one - are offset one-half
-        of a hexagon "downwards"
+      - size of ``3`` *rows* by ``3`` *cols* ("columns")
+      - the "even" columns are offset by one-half hexagon height "downwards"
 ===== ======
 
 
@@ -2817,8 +2819,8 @@ Lines
 Lines are simply a series of parallel lines drawn over repeating rows - for
 horizontal lines - or columns - for vertical lines.
 
-Example 1. Defaults
-+++++++++++++++++++
+Example 1. Lines Defaults
++++++++++++++++++++++++++
 
 .. |ls0| image:: images/defaults/lines.png
    :width: 330
@@ -2839,8 +2841,8 @@ Example 1. Defaults
       - line length of ``1`` cm
 ===== ======
 
-Example 2. Customised
-+++++++++++++++++++++
+Example 2. Customised Lines
++++++++++++++++++++++++++++
 
 .. |ls1| image:: images/customised/lines.png
    :width: 330
@@ -2852,24 +2854,26 @@ Example 2. Customised
       .. code:: python
 
         Lines(
-            x=1, x1=4, y=1, y1=1,
+            x=1, y=1, x1=4, y1=1,
             rows=2, height=1,
             label_size=8, label="rows; ht=1.0")
         Lines(
-            x=1, x1=1, y=3, y1=6,
+            x=1, y=3, x1=1, y1=6,
             cols=2, width=1.5,
             label_size=8, label="col; wd=1.5")
 
       The first command has the following properties:
 
-      - *x* and *y* - both set at ``1`` cm
+      - *x* and *y* - both set at ``1`` cm for the left starting point
+      - *x1* and *y1* - set ``4`` cm and ``1`` cm for the right end point
       - *rows* - set to ``2`` to create two parallel horizontal lines
       - *height* - value of ``1`` cm set for the row height; this is the
         separation between each line
 
       The second command has the following properties:
 
-      - *x* and *y* - both set at ``1`` cm
+      - *x* and *y* - set to ``1`` cm and ``3`` cm  for the left starting point
+      - *x1* and *y1* - set ``1`` cm and ``6`` cm for the right end point
       - *cols* - set to ``2`` to create two parallel vertical lines
       - *width* - value of ``1.5`` cm set for the column width; this sets the
         separation between each line
@@ -2890,8 +2894,8 @@ Rectangles can be drawn in a row-by-column layout to form a grid. For games
 this is often used to delineate a track or other spaces in which playing pieces
 can be placed.
 
-Example 1. Defaults
-+++++++++++++++++++
+Example 1. Rectangles Defaults
+++++++++++++++++++++++++++++++
 
 .. |rc0| image:: images/customised/rectangles_rowcol.png
    :width: 330
@@ -2906,12 +2910,12 @@ Example 1. Defaults
 
       It has the following properties based on the defaults:
 
-      - starts at x-position ``1`` cm and at y-position ``1`` cm
+      - starts at x-position ``0`` cm and y-position ``0`` cm
       - *height* and *width* of ``1`` cm each
 ===== ======
 
-Example 2. Customised
-+++++++++++++++++++++
+Example 2. Customised Rectangles
+++++++++++++++++++++++++++++++++
 
 .. |rn1| image:: images/customised/rectangles_custom.png
    :width: 330
@@ -2923,16 +2927,18 @@ Example 2. Customised
       .. code:: python
 
           Rectangles(
-             rows=4, cols=2, width=1.5, height=1.25,
-             dotted=True, fill="chartreuse")
+             rows=4, cols=2,
+             width=1.5, height=1.25,
+             fill="chartreuse",
+             dotted=True)
 
       It has the following properties based on the defaults:
 
-      - starts at x-position ``1`` cm and at y-position ``1`` cm
+      - starts at x-position ``0`` cm and y-position ``0`` cm
+      - *width* - ``1.5`` cm set for each Rectangle's width
+      - *height* - ``1.25`` cm set for each Rectangle's height
       - *fill* color of ``chartreuse``
-      - *dotted* lines
-      - *height* of ``1.25`` cm set for each Rectangle's height
-      - *width* of ``1.5`` cm set for each Rectangle's width
+      - *dotted* border lines for each Rectangle
 
 ===== ======
 
@@ -2960,20 +2966,31 @@ x and y
 ~~~~~~~
 `^ <shapes-common-properties_>`_
 
-Almost every shape will need to have its position set.
+Almost every shape will need to have its :ref:`position <position-concept>` set.
+"Position" here usually refers to a point corresponding to the top-left of that
+shape.
 
 The common way to do this is by setting a value for **x** |dash| the distance
 from the left margin of the page (or card) to the left edge of the shape;
 and/or **y** |dash| the distance from the top margin of the page (or card)
-to the bottom edge of the shape.
+to the top edge of the shape.
+
+.. NOTE::
+
+    Its more appropriate to think of this position as that of the "bounding
+    box" of the shape i.e. imagine a rectangle drawn such that the shape
+    just fits inside it; the "position" is the point corresponding to the
+    top-left of that imaginary Rectangle.
+
 
 cx and cy
 ~~~~~~~~~
 `^ <shapes-common-properties_>`_
 
-Almost every shape will need to have its position set.
+Almost every shape will need to have its :ref:`position <position-concept>` set.
+"Position" here refers to a point corresponding to the centre of that shape.
 
-For shapes that allow it, a way to do this is by setting a value for **cx**
+For shapes that support it, the way to do this is by setting a value for **cx**
 |dash| the distance from the left margin of the page (or card) to the centre
 position of the shape and/or **cy** |dash| the distance from the bottom margin
 of the page (or card) to the centre position of the shape.
@@ -2993,11 +3010,14 @@ the area inside it; the default fill color is *white*.
 A "shortcut" to setting both fill and stroke to be the same for a shape,
 is to use the property *fill_stroke* (see Example 2 below).
 
-If the fill is set to the keyword ``None`` (note the uppercase "N"), the area
-will have no fill color, and effectively become transparent.
+If the fill is set to the :ref:`keyword <reserved-names-concept>` ``None``
+(note the uppercase "N"), the area will have no fill color, and effectively
+becomes transparent.
 
-If the stroke is set to the keyword ``None`` (note the uppercase "N"), the line
-will have no color, and effectively become transparent.
+If the stroke is set to the :ref:`keyword <reserved-names-concept>` ``None``
+(note the uppercase "N"), the line will have no color, and effectively
+becomes transparent.
+
 
 Example 1. Fill & Stroke
 ++++++++++++++++++++++++
@@ -3032,6 +3052,9 @@ Example 1. Fill & Stroke
 Example 2. Fill_Stroke
 ++++++++++++++++++++++
 
+The *fill_stroke* property is a "shortcut" which sets **both** the
+*fill* and *stroke* color at same time.
+
 .. |fst| image:: images/defaults/fill-and-stroke.png
    :width: 330
 
@@ -3045,9 +3068,6 @@ Example 2. Fill_Stroke
       The shape has the following property that differ from the defaults:
 
       - *fill_stroke* color of ``cyan``
-
-      The *fill_stroke* property is a "shortcut" which sets **both** the
-      *fill* and *stroke* at same time.
 
       Here, the line color used to draw the circumference is the same as
       the fill color of the interior.
@@ -3063,8 +3083,9 @@ For shapes that have a definable centre e.g. a `Circle`_, a `Square`_
 or a `Hexagon`_, it is possible to place a dot, a cross, or both at this
 location.
 
-The color for the dot and cross will, if not provided, take on the color
-of the shape of which they are part |dash| see the `Stadium` example below.
+The color for the dot and cross will, if not provided, take on the stroke
+color of the shape of which they are part |dash| see the `Stadium` example
+below.
 
 .. |dnc| image:: images/customised/dots_crosses.png
    :width: 330
@@ -3088,7 +3109,8 @@ of the shape of which they are part |dash| see the `Stadium` example below.
         Polygon(
             cx=1, cy=3, sides=8,
             radius=1,
-            dot=0.1, dot_stroke="orange")
+            dot=0.1,
+            dot_stroke="orange")
         Polygon(
             cx=3, cy=3, sides=8, diameter=2,
             cross=0.25,
@@ -3097,8 +3119,8 @@ of the shape of which they are part |dash| see the `Stadium` example below.
 
         Rhombus(
             cx=1, cy=5, side=2,
-            dot=0.1, d
-            ot_stroke="red")
+            dot=0.1,
+            dot_stroke="red")
         Rhombus(
             cx=3, cy=5, side=2,
             cross=0.25,
@@ -3123,9 +3145,9 @@ Rotation
 ~~~~~~~~
 `^ <shapes-common-properties_>`_
 
-Every shape that has a calculated centre will support a *rotation* property.
-Rotation takes place in anti-clockwise direction, from the horizontal, around
-the centre of the shape, in *degrees*.
+Every shape, whose *centre* can be calculated, will support a *rotation*
+property. Rotation takes place in anti-clockwise direction, from the horizontal,
+around the centre of the shape, in *degrees*.
 
 Example 1. Rhombus Rotation
 +++++++++++++++++++++++++++
@@ -3152,15 +3174,15 @@ Example 1. Rhombus Rotation
             dot=0.03,
             rotation=60)
 
-      The shape with the black outline and large dot in the centre is the
+      The shape with the *black* outline and large dot in the centre is the
       "normal" Rhombus.
 
-      The shape with the red outline and smaller, red dot in the centre is the
-      rotated Rhombus.
+      The shape with the *red* outline and smaller, red dot in the centre is
+      the rotated Rhombus. It has these properties:
 
-      - *fill* color is `None` so no fill is used; this makes it completely
+      - *fill* color - `None` so no fill is used; this makes it completely
         transparent.
-      - *rotation* of ``60`` is the number of degrees, anti-clockwise, that
+      - *rotation* - ``60`` is the number of degrees, anti-clockwise, that
         it has been rotated
 
       The shapes are completely transparent, so its possible to see
@@ -3225,24 +3247,25 @@ Example 3. Shapes Rotation
             cross=0.5, cross_stroke="red",
             cross_stroke_width=1,
             rotation=45, label_size=6)
-        Rectangle(
-            cx=1, cy=5, height=1, width=1.5,
-            common=props, label="rectangle")
-        Rhombus(
-            cx=3, cy=5, side=2,
-            common=props, label="rhombus")
-        Polygon(
-            cx=1, cy=3, sides=6, side=0.75,
-            common=props, label="polygon")
-        Stadium(
-            cx=3, cy=3, side=1,
-            common=props, label="stadium")
+
         Star(
             x=1, y=1, vertices=5, radius=0.75,
             common=props, label="star")
         Ellipse(
             cx=3, cy=1, height=1, width=1.5,
             common=props, label="ellipse")
+        Polygon(
+            cx=1, cy=3, sides=6, side=0.75,
+            common=props, label="polygon")
+        Stadium(
+            cx=3, cy=3, side=1,
+            common=props, label="stadium")
+        Rectangle(
+            cx=1, cy=5, height=1, width=1.5,
+            common=props, label="rectangle")
+        Rhombus(
+            cx=3, cy=5, side=2,
+            common=props, label="rhombus")
 
       The shapes share common properties for the cross at the centre,
       with a rotation of 45 |deg| each.
@@ -3441,11 +3464,11 @@ visible - then set the *fill* value to ``None``.
             fill="red", stroke="red",
             transparency=50)
 
-      The first three Rectangles shapes have the following property set:
+      The three green Rectangles shapes have the following property set:
 
       - *transparency* - the higher the value, the more "see through" the color
 
-      The last Rectangle, which also has a *transparency* value, is drawn
+      The red Rectangle, which also has a *transparency* value, is drawn
       partially over the yellow Rectangle on the upper-left.
 
       When overdrawn, there is a color change in the overlapping section

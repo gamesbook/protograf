@@ -17,16 +17,17 @@ Table of Contents
 =================
 
 -  `Names and Naming`_
--  `Values: Text, Numbers and Booleans`_
+-  `Value Types: Text, Numbers and Booleans`_
 -  `Assigned Names`_
 -  `Case-sensitivity`_
 -  `Calculations`_
 -  `Changeable Values`_
--  `Quotes in Text`_
+-  `Quote Marks in Text`_
 -  `Properties and Short-cuts`_
 -  `Lists`_
 -  `Errors`_
 
+.. _names-concept:
 
 Names and Naming
 ================
@@ -38,25 +39,29 @@ If you work with the built-in commands and and their properties, the set
 of names to use is already chosen for you. However, if you want to start
 using some additional options, such as giving `assigned names`_ to reuse
 items in multiple places, then you need to be aware of the wider set of
-so-called "reserved" names that are available as part of Python.
+so-called "reserved" names that are built-in to Python.
 
 .. WARNING::
 
-   If your assigned name is the same as a reserved name, then you'll
-   overwite it and your scripts may fail in *very* strange ways!!
+   If your assigned name is the same as a reserved name / keyword then you
+   will overwite it and your script may fail in *very* strange ways!!
+
+.. _reserved-names-concept:
 
 Reserved Names
 --------------
 
-Basic built-in names include: False, None, True, and, as, assert, async,
-await, break, class, continue, def, del, elif, else, except, finally,
-for, from, global, if, import, in, is, lambda, nonlocal,
-not, or, pass, raise, return, try, while, with, yield
+Basic built-in *keywords* include:
 
-Python also has a number of built-in functions, used to carry out common
-operations.
+False, None, True, and, as, assert, async, await, break, class,
+continue, def, del, elif, else, except, finally, for, from, global,
+if, import, in, is, lambda, nonlocal, not, or, pass, raise, return,
+try, while, with, yield
 
-Function names include: abs, aiter, all, anext, any, ascii, bin, bool,
+Python also has a number of built-in *functions*, used to carry out common
+operations. These function names include:
+
+abs, aiter, all, anext, any, ascii, bin, bool,
 breakpoint, bytearray, bytes, callable, chr, classmethod, compile,
 complex, delattr, dict, dir, enumerate, eval, exec, filter, float,
 format, frozenset, getattr, globals, hasattr, hash, help, hex, id,
@@ -70,8 +75,10 @@ readable guide available at:
 https://www.mattlayman.com/blog/2024/layman-guide-python-built-in-functions/
 
 
-Values: Text, Numbers and Booleans
-==================================
+.. _value-types-concept:
+
+Value Types: Text, Numbers and Booleans
+=======================================
 `↑ <table-of-contents_>`_
 
 An important concept in **protograf** is understanding the different types
@@ -96,6 +103,8 @@ required.  Some of the properties for some commands require a ``True`` value
 to be set before they are activated.
 
 
+.. _assigned-names-concept:
+
 Assigned Names
 ==============
 `↑ <table-of-contents_>`_
@@ -118,6 +127,8 @@ and ``dot``|dash| which are assigned to each of their ``common`` property value.
 This value |dash| ``green_dots`` |dash| is in turn created when is assigned
 to the ``Common`` command.
 
+
+.. _case-sensitivity-concept:
 
 Case-sensitivity
 ================
@@ -144,6 +155,8 @@ property named ``area`` |dash| for use later on in the script |dash| but
 will **not** draw the Rectangle on the page.
 
 
+.. _calculation-concept:
+
 Calculations
 ============
 `↑ <table-of-contents_>`_
@@ -164,6 +177,8 @@ intent of the calculation.
 You can also combine two text strings with each other, so ``"ab" + "cd"``, but
 you cannot combine a number and a text string, so **not** ``1 + "ab"``!
 
+
+.. _changeable-values-concept:
 
 Changeable Values
 =================
@@ -191,11 +206,14 @@ is replaced by the column name - is possible.
     Changeable value names **are** case-sensitive!
 
 
-Quotes in Text
-==============
+.. _quote-marks-concept:
+
+Quote Marks in Text
+===================
 `↑ <table-of-contents_>`_
 
-Using quotes - ``'`` or ``"`` - inside a string of letters can be tricky.
+Using quote marks - ``'`` or ``"`` - inside a string of letters can be
+tricky.
 
 If you have a Text shape, for example, like this:
 
@@ -227,13 +245,15 @@ quote does **not** represent the end of the string, but simply a symbol that
 must be displayed "as is".
 
 
+.. _short-cuts-concept:
+
 Properties and Short-cuts
 =========================
 `↑ <table-of-contents_>`_
 
 In general, **protograf** tries to avoid the use of short-cuts and instead
-relies on short, but hopefully memorable, names for things, although there
-are some exceptions,
+relies on short |dash| but hopefully memorable! |dash| names for things,
+although there are some exceptions.
 
 Many properties are set with *directions* matching those shown on a compass,
 and although you might want write these names out in full, it can be very
@@ -256,6 +276,8 @@ Some of the other proprerties can be *optionally* abbreviated to use just their
 first letter; so, for example, using ``d`` for a ``diamond`` layout of a
 ``Hexagons`` grid.
 
+
+.. _lists-concept:
 
 Lists
 =====

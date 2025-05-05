@@ -456,11 +456,12 @@ PageBreak()
 Blueprint()
 Text(common=txt, text="Trapezoid - borders")
 Trapezoid(
-    cx=2, cy=3, width=2, height=2, top=1.5, stroke_width=2,
+    cx=2, cy=3,
+    width=2, height=2, top=1.5, stroke_width=2,
     borders=[
         ("w", 2, "gold"),
         ("e", 2, "chartreuse", True),
-        ("n", 2, "tomato", [0.1,0.2,0.1,0]),
+        ("n", 2, "tomato", [0.1, 0.2]),
         ("s", 2)
     ]
 )
