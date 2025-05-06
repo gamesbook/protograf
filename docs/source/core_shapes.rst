@@ -2105,13 +2105,14 @@ Example 2. Customised Star
 
           Star(
             cx=2, cy=3, radius=2,
-            fill_stroke="yellow",
+            fill="yellow",
+            stroke="yellow",
             rotation=36)
 
       It has the following properties that differ from the defaults:
 
       - centre at x-position ``2`` cm and at y-position ``3`` cm
-      - *radius* - ``2`` cm
+      - *radius* - ``2`` cm; length of the "arms"
       - *fill* color - ``yellow`` for the interior of the Star
       - *stroke* color - ``yellow`` for the outline of the Star
       - *rotation* - 36 |deg| anti-clockwise about the centre
