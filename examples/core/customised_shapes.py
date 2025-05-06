@@ -29,8 +29,8 @@ Text(x=0, y=6, font_size=8, align="left", text=Today())
 PageBreak()
 
 # ---- blueprint custom
-Blueprint(subdivisions=5, stroke_width=0.5, style='invert', edges="n s e w")
-Text(common=txt, text="Blueprint: style;edges;subdivisions", stroke="gray")
+Blueprint(subdivisions=5, stroke_width=0.5, style='invert')
+Text(common=txt, text="Blueprint: style & subdivisions")
 PageBreak()
 
 # ---- dot & cross

@@ -2367,15 +2367,16 @@ Example 3. Trapezoid Borders
       - *borders* - a list of sets of custom settings for each side; each set
         can contain:
 
-        - `direction` - one of n(orth), s(outh), e(ast) or w(est)
-        - `width` - the line thickness
-        - `color` - either a named color or a hexadecimal value
-        - `style` - ``True`` makes it dotted; or a list of values creates dashes
+        - *direction* - one of n(orth), s(outh), e(ast) or w(est)
+        - *width* - the line thickness
+        - *color* - either a named color or a hexadecimal value
+        - *style* - ``True`` makes it dotted; a list of values creates dashes
 
-        Direction and width are required, but color and style are optional.
+      Borders' direction and width are required, but color and style are
+      optional.
 
-        Multiple border values can be used, with spaces between them,
-        e.g. ``n s`` to draw lines on both north **and** south sides.
+      Multiple border directions can be used, with spaces between them,
+      e.g. ``n s`` to draw lines on both north **and** south sides.
 
 ===== ======
 
@@ -2471,7 +2472,7 @@ Example 2. Subdivisions & Style
 
       - *subdivisions* - set to ``5``
       - *stroke_width* - set to ``0.5``; slightly thicker line makes
-        the grid more visible
+        the main grid more visible
       - *style* - set to ``invert`` so that the lines and number colors are white
         and the fill color is now a shade of ``blue`` (``#2F85AC``)
 
