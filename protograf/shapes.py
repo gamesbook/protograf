@@ -160,10 +160,16 @@ class ImageShape(BaseShape):
             rotation=rotation,
         )
         if not img and not is_dir:
-            tools.feedback(
-                f'Unable to load image "{_source}!" - please check name and location',
-                True,
-            )
+            if _source:
+                tools.feedback(
+                    f'Unable to load image "{_source}" - please check name and location',
+                    True,
+                )
+            else:
+                tools.feedback(
+                    f'Unable to load image - no name provided',
+                    True,
+                )
         # ---- text
         xc = x + width / 2.0
         yc = y + height / 2.0

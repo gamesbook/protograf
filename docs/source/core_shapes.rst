@@ -2445,8 +2445,9 @@ Example 1. Defaults
       - has vertical and horizontal lines filling the page from the lower left
         corner up to the right-most and top-most margins
       - has interval between the lines of ``1`` cm
-      - default line color is a shade of ``blue`` (``#2F85AC``)
-      - the x- and y-axis are numbered from the lower left corner
+      - default line color is a shade of ``blue`` (hexadecimal ``#2F85AC``)
+      - the x- and y-axis are numbered from the left and top respectively
+
 ===== ======
 
 Example 2. Subdivisions & Style
@@ -2462,17 +2463,20 @@ Example 2. Subdivisions & Style
       .. code:: python
 
           Blueprint(
-            subdivisions=5, stroke_width=0.5, style='invert')
+            subdivisions=5,
+            stroke_width=0.5,
+            style='invert')
 
       It has the following properties set:
 
-      - *subdivisions* - set to ``5``; these are the number of thinner lines that
-        are drawn between each pair of primary lines - they do not have any
-        numbering and are *dotted*
-      - *stroke_width* - set to ``0.5``; this slightly thicker primary line makes
+      - *subdivisions* - set to ``5``
+      - *stroke_width* - set to ``0.5``; slightly thicker line makes
         the grid more visible
       - *style* - set to ``invert`` so that the lines and number colors are white
         and the fill color is now a shade of ``blue`` (``#2F85AC``)
+
+      The *subdivisions* are the thinner lines that are drawn between each pair
+      of primary lines |dash| they do not have any numbering and are *dotted*.
 ===== ======
 
 
@@ -2481,6 +2485,10 @@ Example 2. Subdivisions & Style
 DotGrid
 ~~~~~~~
 `↑ <shape-index_>`_
+
+A DotGrid is a series of dots |dash| both in the vertical and horizontal
+directions. This will, by default, fill the page, as far as possible,
+between its margins.
 
 Example 1. Defaults
 +++++++++++++++++++
@@ -2499,7 +2507,10 @@ Example 1. Defaults
       - the upper-left of the grid is drawn at the absolute page x-position
         of ``0`` cm and y-position ``0`` cm i.e. the margins are ignored
       - a set of dots, spaced ``1`` cm apart, are created extending to the
-        right- and top- margins
+        right- and top- edges
+      - default dot size of ``3`` points
+      - default color of ``black``
+
 ===== ======
 
 Example 2. Moleskine Grid
@@ -2524,9 +2535,9 @@ Example 2. Moleskine Grid
 
       - *width* and *height* - intervals between the centre of the dots
         in the x- and y-directions respectively
-      - *dot_point* is set to be smaller than the default of ``3``
-      - *stroke* color - ``darkgrey`` is a lighter shade than the default black
-      - *offset_y* moves the start of the grid slightly downwards by 1/4 cm
+      - *dot_point* - set to be smaller than the default of ``3``
+      - *stroke*  - set to ``darkgrey`` i.e. lighter than the default black
+      - *offset_y* - moves the start of the grid slightly downwards by 1/4 cm
 
       .. HINT::
 
@@ -2547,9 +2558,9 @@ Grid
 ~~~~
 `↑ <shape-index_>`_
 
-A Grid is a series of crossed lines - both in the vertical and horizontal
-directions - which will, by default, fill the page, as far as possible,
-between its margins.
+A Grid is a series of crossed lines |dash| both in the vertical and
+horizontal directions. The Grid will, by default, fill the page as far
+as possible between its margins.
 
 Example 1. Defaults
 +++++++++++++++++++
@@ -2587,12 +2598,12 @@ Example 2. Side & Stroke
 
       It has the following properties based on the defaults:
 
-      - *side* - the value of ``0.85`` cm equates to about 1/3 of an inch
-        and sets the size of each square in the grid
-      - *stroke_width* - set to ``1`` point; this thicker line makes the grid
+      - *side* - set to ``0.85`` cm (about 1/3 of an inch)
+        which sets the size of both the x- and y-direction
+      - *stroke_width* - set to ``1`` point; the thicker line makes the grid
         more visible
-      - *stroke* color - set to ``gray`` i.e. a lighter color shade than the
-        default of black
+      - *stroke* - set to ``gray`` i.e. a lighter color than the default black
+
 ===== ======
 
 Example 3. Fixed Size
@@ -2621,12 +2632,12 @@ Example 3. Fixed Size
       - *height* - value of ``1.25`` cm set for the row height
       - *width* - value of ``1`` cm set for the column width
       - *cols* and *rows* - ``3`` columns wide by ``4`` rows high
-      - *stroke_width* - set to ``1`` point; this much thicker line makes
+      - *stroke_width* - set to ``1`` point; the thicker line makes
         the grid clearly visible
-      - *stroke* color of `gray` is a lighter color than default of black
+      - *stroke* -set to ``gray`` i.e. a lighter color than the default black
 
-        The grid now has a fixed row x column size, rather than being
-        automatically calculated to fill up the page.
+      The grid now has a fixed "rows by columns" size, rather than being
+      automatically calculated to fill up the page.
 
 ===== ======
 
@@ -2643,13 +2654,13 @@ it does not consist of lines and areas drawn by **protograf**  itself.
 An "image" refers to an external file which is simply inserted into the drawing.
 
 The Image shape shares a number of common aspects with other shapes - such as
-an x & y position, a width and height and the ability to be rotated.
+an x & y position, a width and height, and the ability to be rotated.
 
-An image can also be "drawn over" by other shapes appearing further on in a
+An image can also be "drawn over" by other shapes appearing later on in the
 script.
 
 If an image has a transparent area, this will be respected and shapes
-appearing earlier on in a script may then be visible "below" it.
+appearing earlier on in the script may then be visible "below" it.
 
 
 Example 1. Default Image
@@ -2660,11 +2671,15 @@ Example 1. Default Image
 
 ===== ======
 |im1| If the shape was constructed using only default properties, there will be
-      nothing to see:
+      nothing to see and an error will be displayed:
 
       .. code:: python
 
           Image()
+
+      Will show this message::
+
+          FEEDBACK:: Unable to load image - no name provided
 
       This example then shows the shape constructed with just a single property:
 
@@ -2672,15 +2687,19 @@ Example 1. Default Image
 
         Image("sholes_typewriter.png")
 
-      This first, unnamed property is the filename of the image; ; if no
-      directory is supplied for the path, then the image is assumed to be
-      in the same one in which the script is located.
+      This first, unnamed property is the filename of the image.
+
+      If no directory is supplied for the image, it is assumed to be
+      in the same as that of the script.
 
       The image has the following other properties based on the defaults:
 
       - upper-left corner - x-position ``1`` cm and y-position ``1`` cm
-      - *width* and *height* - default to ``1`` cm; this may distort the image
-        if it is not square in shape
+      - *width* and *height* - default to ``1`` cm each
+
+      The size set for the image may distort it if the ratios do not match
+      those of the image itself.
+
 ===== ======
 
 Example 2. Rotation & Scaling
@@ -2697,40 +2716,37 @@ Example 2. Rotation & Scaling
 
         Image(
           "sholes_typewriter.png",
-          x=0, y=1, width=1.5, height=1.5, title="PNG")
+          x=0, y=1, width=1.5, height=1.5,
+          title="PNG")
         Image(
           "sholes_typewriter.png",
-          x=2, y=1, width=1.5, height=1.5, title="60\u00B0",
+          x=2, y=1, width=1.5, height=1.5,
+          title="60\u00B0",
           rotation=60)
         Image(
           "noun-typewriter-3933515.svg",
-          x=0, y=4, scaling=0.15, title="SVG")
+          x=0, y=4, width=1.5, height=1.5,
+          title="SVG")
         Image(
           "noun-typewriter-3933515.svg",
-          x=2, y=4, scaling=0.15, title="45\u00B0",
+          x=2, y=4, width=1.5, height=1.5,
+          title="45\u00B0",
           rotation=45)
 
       Each image has the following properties set for it:
 
       - name of the image file; this must be the first property set
       - *x* and *y* - these values set the upper-left corner
-
-      The PNG images also have the following properties set for them:
-
       - *height* - set to ``1.5`` cm; this value may cause some distortion
       - *width* - set to ``1.5`` cm; this value may cause some distortion
 
-      The SVG images also have the following properties set for them:
+      Two of the images |dash| the ones on the right |dash| are rotated about
+      a centre point:
 
-      - *scaling* - set to the fraction ``0.15`` or 15% of its actual size; |br|
-        because SVG is a vector format, there will be no distortion.
+      - *rotation* - degrees, anti-clockwise, about the centre
 
-      Two of the images - ones on the right - are rotated about a centre point
-      (calculated based on the image's height and width)
+      The image centre is calculated based on it's height and width.
 
-      The `Blueprint`_ background is set to ``grey``; just to highlight that both
-      images have transparent sections and how anything "behind" them will
-      show through.
 ===== ======
 
 Example 3. Sliced
@@ -2745,13 +2761,6 @@ Example 3. Sliced
 
       .. code:: python
 
-        Image("sholes_typewriter.png", sliced='t',
-              width=3, height=1, x=0.5, y=5)
-        Image("sholes_typewriter.png", sliced='m',
-              width=3, height=1, x=0.5, y=4)
-        Image("sholes_typewriter.png", sliced='b',
-              width=3, height=1, x=0.5, y=3)
-
         Image("sholes_typewriter.png", sliced='l',
               width=1, height=3, x=0, y=0)
         Image("sholes_typewriter.png", sliced='c',
@@ -2759,15 +2768,25 @@ Example 3. Sliced
         Image("sholes_typewriter.png", sliced='r',
               width=1, height=3, x=3, y=0)
 
+        Image("sholes_typewriter.png", sliced='t',
+              width=3, height=1, x=0.5, y=3)
+        Image("sholes_typewriter.png", sliced='m',
+              width=3, height=1, x=0.5, y=4)
+        Image("sholes_typewriter.png", sliced='b',
+              width=3, height=1, x=0.5, y=5)
+
       Here the *sliced* property is used to "slice" off portions of the
-      image:
+      image. In the upper example:
+
+      - *l* - the left fraction, matching the image's width:height ratio
+      - *c* - the centre fraction, matching the image's width:height ratio
+      - *r* - the right fraction, matching the image's width:height ratio
+
+      In the lower example:
 
       - *t* - the top fraction, matching the image's height:width ratio
       - *m* - the middle fraction, matching the image's height:width ratio
       - *b* - the botttom fraction, matching the image's height:width ratio
-      - *l* - the left fraction, matching the image's width:height ratio
-      - *c* - the centre fraction, matching the image's width:height ratio
-      - *r* - the right fraction, matching the image's width:height ratio
 
 ===== ======
 

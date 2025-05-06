@@ -537,18 +537,18 @@ PageBreak()
 # ---- image - sliced
 Blueprint()
 Text(common=txt, text="Image: sliced")
-Image("sholes_typewriter.png", sliced='t',
-      width=3, height=1, x=0, y=5)
-Image("sholes_typewriter.png", sliced='m',
-      width=3, height=1, x=0.5, y=4)
-Image("sholes_typewriter.png", sliced='b',
-      width=3, height=1, x=1.25, y=3)
 Image("sholes_typewriter.png", sliced='l',
       width=1, height=3, x=0, y=0)
 Image("sholes_typewriter.png", sliced='c',
       width=1, height=3, x=1.5, y=0)
 Image("sholes_typewriter.png", sliced='r',
       width=1, height=3, x=3, y=0)
+Image("sholes_typewriter.png", sliced='t',
+      width=3, height=1, x=0, y=3)
+Image("sholes_typewriter.png", sliced='m',
+      width=3, height=1, x=0.5, y=4)
+Image("sholes_typewriter.png", sliced='b',
+      width=3, height=1, x=1.25, y=5)
 PageBreak()
 
 # ---- shape rotation
