@@ -167,7 +167,7 @@ class ImageShape(BaseShape):
                 )
             else:
                 tools.feedback(
-                    f'Unable to load image - no name provided',
+                    f"Unable to load image - no name provided",
                     True,
                 )
         # ---- text
