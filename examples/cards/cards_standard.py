@@ -4,13 +4,9 @@ Standard playing cards script for protograf
 Written by: Derek Hohls
 Created on: 12 August 2024
 
-Notes:
-
-Suit symbols are shown at: https://www.w3schools.com/charsets/ref_utf_symbols.asp
-    ♠    2660    SPADE SUIT
-    ♣    2663    CLUB SUIT
-    ♥    2665    HEART SUIT
-    ♦    2666    DIAMOND SUIT
+Note:
+    Characters from the ZapfDingbats font are described using their hex code; see:
+    https://help.adobe.com/en_US/framemaker/2015/using/using-framemaker-2015/Appendix/frm_character_sets_cs/frm_character_sets_cs-5.htm
 """
 from protograf import *
 
@@ -21,7 +17,7 @@ Create(filename='cards_standard.pdf', margin_bottom=1.9)
 combos = Matrix(
     labels=['SUIT', 'VALUE'],
     data=[
-        #['\u2660', '\u2663', '\u2665', '\u2666'],  # spade, club, heart, diamond
+        # ['\u2660', '\u2663', '\u2665', '\u2666'],  # spade, club, heart, diamond
         ['\xab', '\xa8', '\xaa', ' \xa9'],  # spade, club, heart, diamond
         ['K', 'Q', 'J', '10', '9', '8', '7', '6', '5', '4', '3', '2', 'A'],
     ])

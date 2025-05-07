@@ -255,9 +255,14 @@ This example shows how different shapes can be assigned to cards:
 
         Deck(cards=9)
 
-        line1 = line(x=0.8, x1=5.6, y=7.1, y1=8.4, stroke="red")
-        rect1 = rectangle(x=0.7, y=7.0, width=5, height=1.5)
-        text1 = text(text='proto', x=3.1, y=4.4, font_size=18)
+        line1 = line(
+            x=0.8, y=7.1, x1=5.6, y1=8.4,
+            stroke="red")
+        rect1 = rectangle(
+            x=0.7, y=7.0, width=5, height=1.5)
+        text1 = text(
+            text='proto',
+            x=3.1, y=4.4, font_size=18)
         line_in_rect = group(rect1, line1)
 
         Card('*', text1)
@@ -343,10 +348,11 @@ types of sources:
 .. HINT::
 
    If you are a Python programmer, there is a final way to provide data.
+
    Internally, all of these data sources are converted to a list of
    *dictionarie*, whose keys all match and correspond to the column names,
-   so if you have this available, through any means, this it can be supplied
-   directly to ``Data`` via a **source** property.  The onus is on you
+   so if you have this available, through any means, it can be supplied
+   directly to ``Data`` via a **source** property.  The onus is on *you*
    to ensure that the dictionary is correctly formatted.
 
 Data Properties
@@ -400,8 +406,7 @@ represents possible combinations for a standard deck of playing cards:
         combos = Matrix(
             labels=['SUIT', 'VALUE'],
             data=[
-                 # Unicode symbols for : spade, club, heart, diamond
-                ['\u2660', '\u2663', '\u2665', '\u2666'],
+                ['\xab', '\xa8', '\xaa', ' \xa9'],  # spade, club, heart, diamond
                 ['K','Q','J','10','9','8','7','6','5','4','3','2','A'],
             ])
         Data(matrix=combos)
@@ -409,7 +414,7 @@ represents possible combinations for a standard deck of playing cards:
 The dataset will contain a combination of every item in the first list of
 *data* - representing the **SUIT** - with every item in the second list of
 *data* - representing the **VALUE**; so 4 suits, multiplied by 13 values,
-which equates to 52 dataset items.
+results in 52 dataset items.
 
 For more detail on these properties see `The Matrix Command`_.
 
