@@ -584,6 +584,19 @@ def color_set(svg_only: bool = False) -> list:
     return colors
 
 
+def uni(code: str):
+    """Convert U+nnnn into Python chr()"""
+    try:
+        return chr(int(code.lstrip("U+").zfill(8), 16))
+    except Exception as err:
+        feedback(f"Unable to process Unicode character {code} - {err}!")
+
+
+def uc(code: str):
+    """Convert U+nnnn into Python chr()"""
+    return uni(code)
+
+
 if __name__ == "__main__":
     import doctest
 

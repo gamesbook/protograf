@@ -77,7 +77,7 @@ from protograf.utils import geoms, tools, support
 from protograf.utils.fonts import builtin_font, FontInterface
 from protograf.utils.tools import base_fonts, DatasetType, CardFrame  # enums
 from protograf.utils.geoms import BBox, Locale, Point, Place, Ray, equilateral_height
-from protograf.utils.support import LookupType, steps, unit, CACHE_DIRECTORY
+from protograf.utils.support import LookupType, steps, unit, uni, uc, CACHE_DIRECTORY
 from protograf import globals
 
 log = logging.getLogger(__name__)
