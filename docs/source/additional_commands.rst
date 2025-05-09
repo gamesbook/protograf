@@ -8,7 +8,7 @@ This section deals with some of the additional commands available in
 :doc:`protograf <index>` that are not covered in detail elsewhere.
 
 You should already be familiar with all of the
-:doc:`Basic Concepts <basic_concepts>`,  and that you've created some
+:doc:`Basic Concepts <basic_concepts>`,  and have created some
 basic scripts of your own using the :doc:`Core Shapes <core_shapes>`.
 
 .. _table-of-contents:
@@ -30,6 +30,9 @@ Common Command
 
 The ``Common()`` command allows different shapes to share the same properties.
 
+These properties are listed in much the same way as they would for an actual
+shape, but the ``Common()`` command does not actually draw anything itself.
+
 For example:
 
 .. code:: python
@@ -38,8 +41,8 @@ For example:
   Circle(common=colors, cx=1, cy=2)
   Square(common=colors, cx=2, cy=2)
 
-Here the circle and the square will use the Common properties assigned to the
-``colors`` name.
+Here the circle and the square will both use the Common properties assigned to
+the ``colors`` name.
 
 .. NOTE::
 
@@ -80,6 +83,9 @@ name, for example ``Arial-Bold``.
 
 Because the *name* is compulsory, its often omitted from the command.
 
+Example 1. Common Fonts
+-----------------------
+
 .. |fc1| image:: images/custom/commands/fonts.png
    :width: 330
 
@@ -88,34 +94,38 @@ Because the *name* is compulsory, its often omitted from the command.
 
       .. code:: python
 
-        Font("Helvetica")
-        Text(text="Helvetica 12pt black",
-             x=0, y=5, align="left")
+        Font("Helvetica", size=9, stroke="gold")
+        Text(text="Helvetica 9pt gold",
+             x=0, y=1, align="left")
+
+        Font("Courier", size=10, stroke="cyan")
+        Text(text="Courier 10pt aqua",
+             x=0, y=2, align="left")
 
         Font("Times-Roman", size=11, stroke="tomato")
         Text(text="Times-Roman 11pt red",
-             x=0, y=4, align="left")
-
-        Font("Courier", size=10, stroke="cyan")
-        Text(text="Courier 9pt aqua",
              x=0, y=3, align="left")
 
-        Font("Verdana", size=9, stroke="gold")
-        Text(text="Verdana 9pt gold",
-             x=0, y=2, align="left")
+        Font("Arial", size=12, stroke="black")
+        Text(text="Arial 12pt black",
+             x=0, y=4, align="left")
 
       The first three are examples of the :ref:`standard fonts <builtin-fonts>`
-      available to a PDF, and can be safely used anywhere that
-      :doc:`protograf <index>` can be run, while the fourth is a custom one
-      that would need to first be installed onto the machine where the script
-      is running.
+      available to a PDF.
 
-      .. HINT::
+      Standard fonts can be safely used anywhere that
+      :doc:`protograf <index>` can be run.
 
-        The first time that any custom font is used, in any of your scripts,
-        will trigger a "discovery" process whereby all fonts are catalogued.
+      The fourth font is a *custom* one that would need to first be installed
+      onto the machine where the script is to be run.
+
+      .. IMPORTANT::
+
+        The first time that *any* custom font is used, in any of your scripts,
+        will trigger a "discovery" process whereby *all* fonts are catalogued.
         This will cause a long delay |dash| however, after that the catalogue
-        can be used directly and scripts will avoid that delay.
+        details are stored in a single file. This can be used directly and
+        quickly, so after that your scripts will not have the delay.
 
       In each example, the name of the font appears first, followed by any
       further details as to its properties.
@@ -138,8 +148,8 @@ Varying date formats can be used. Two properties are available:
   style is used |dash| see the ``"1."`` example below.
 
 
-Example 1.
-----------
+Example 1. Common Usage
+-----------------------
 `^ <the-today-command_>`_
 
 .. |df1| image:: images/customised/dates_formats.png
@@ -172,6 +182,8 @@ Example 1.
       Because the output of the ``Today()`` command is provided as text,
       it can be used for the *text* property of the ``Text()`` command
       and located and styled as part of that command.
+
+      Another option for *details* is to use ``"time"``.
 
 ===== ======
 
@@ -215,8 +227,8 @@ The ID of a game appears in its URL; so, for example, the game "Monopoly"
 can be found at https://boardgamegeek.com/boardgame/1406
 
 
-Example 1.
-~~~~~~~~~~
+Example 1. Games by ID
+~~~~~~~~~~~~~~~~~~~~~~
 
 To retrieve games which have the ID's 1, 2 and 3:
 
@@ -243,8 +255,8 @@ shows::
     FEEDBACK:: Retrieving game '3' from BoardGameGeek...
 
 
-Example 2.
-~~~~~~~~~~
+Example 2. Games for a BGG User
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 To retrieve games for an (imaginary) user with the username ``BenKenobi1976``:
 
@@ -270,9 +282,10 @@ stored under your user directory on your local machine (or where ever you are
 running :doc:`protograf <index>`).
 
 The directory is called ``.protograf`` and will have a ``bgg`` subdirectory
-where game data |dash| as ``.pck`` files |dash| and ``images`` and ``thumbs``
-are stored.  If you delete these folders and files, they will be recreated
-the next time your script runs.
+where game data |dash| such as ``.pck`` files |dash| and ``images`` and
+``thumbs`` are stored.  If you delete these folders and files, they will be
+recreated the next time your script runs i.e. all of their data will need
+to be downloaded again.
 
 
 Output Fields

@@ -1625,12 +1625,6 @@ class HexShape(BaseShape):
 
     def draw_radii(self, cnv, ID, centre: Point, vertices: list):
         """Draw line(s) connecting the Hexagon centre to a vertex."""
-        self.set_canvas_props(
-            index=ID,
-            stroke=self.radii_stroke or self.stroke,
-            stroke_width=self.radii_stroke_width or self.stroke_width,
-            stroke_cap=self.radii_cap or self.line_cap,
-        )
         # _dirs = self.radii.lower().split()
         dir_group = (
             tools.DirectionGroup.HEX_POINTY
@@ -1660,6 +1654,13 @@ class HexShape(BaseShape):
             cnv.draw_line(centre, vertices[3])
         if "w" in _dirs and self.orientation in ["f", "flat"]:  # horizontal LEFT
             cnv.draw_line(centre, vertices[0])
+        # color, thickness etc.
+        self.set_canvas_props(
+            index=ID,
+            stroke=self.radii_stroke or self.stroke,
+            stroke_width=self.radii_stroke_width or self.stroke_width,
+            stroke_cap=self.radii_cap or self.line_cap,
+        )
 
     def draw_perbis(
         self, cnv, ID, centre: Point, vertices: list, rotation: float = None

@@ -37,7 +37,7 @@ PageBreak()
 
 # ---- circle dot_cross
 Blueprint()
-Text(common=txt, text="Circle: Dots & Crosses")
+Text(common=txt, text="Circle: Dot & Cross")
 Circle(cx=1, cy=3, radius=1, dot=0.1, dot_stroke="green")
 Circle(cx=3, cy=3, radius=1, cross=0.25, cross_stroke="green", cross_stroke_width=1)
 PageBreak()

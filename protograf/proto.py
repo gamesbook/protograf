@@ -860,6 +860,10 @@ def Today(details: str = "datetime", style: str = "iso"):
         return current.strftime("%Y-%m-%d %H:%m")  # Europe
     if details == "datetime" and style == "usa":
         return current.strftime("%B %d %Y %I:%m%p")  # USA
+    if details == "time" and style == "eur":
+        return current.strftime("%H:%m")  # Europe
+    if details == "time" and style == "usa":
+        return current.strftime("%I:%m%p")  # USA
     return current.isoformat(timespec="seconds")  # ISO
 
 

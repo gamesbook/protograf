@@ -2,6 +2,8 @@
 Repetitive Elements
 ===================
 
+.. |dash| unicode:: U+2014 .. EM DASH SIGN
+
 This section assumes you are very familiar with the concepts, terms and ideas
 for :doc:`protograf <index>`  as presented in the
 :doc:`Basic Concepts <basic_concepts>` , that you understand all of the
@@ -75,10 +77,12 @@ points can be used for creating a **layout** by:
 .. HINT::
 
     The *first approach* is useful when the entire grid will be filled with a
-    single element (or a repeating set of elements), and the *second approach*
-    is more suitable when only some locations of the grid will be used, or if a
-    much finer degree of control is needed with differing elements going into
-    very specific - and possibly irregular - places that the script specifies.
+    single element (or a repeating set of elements).
+
+    The *second approach* is more suitable when only some locations of the grid
+    will be used, or if a much finer degree of control is needed with differing
+    elements going into very specific |dash| and possibly irregular |dash| places
+    that the script specifies.
 
 
 Commands Summary
