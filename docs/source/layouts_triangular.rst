@@ -9,8 +9,9 @@ ideas for :doc:`protograf <index>` as presented in the
 and that you've created some basic scripts of your own using the
 :doc:`Core Shapes <core_shapes>`.
 
+This is part of the set of commands use for :doc:`Layouts <layouts>`.
 
-.. _table-of-contents:
+.. _table-of-contents-tri:
 
 Table of Contents
 =================
@@ -65,7 +66,7 @@ The ``Layout()`` command accepts the following properties:
 
 Key Properties
 ==============
-`↑ <table-of-contents_>`_
+`↑ <table-of-contents-tri_>`_
 
 - `Example 1. Rows and Columns`_
 

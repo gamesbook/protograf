@@ -18,7 +18,7 @@ will demonstrate full scalability.
     partial examples designed to show possibilities and **not** to encourage
     copying or reproduction of any copyrighted game material.
 
-.. _table-of-contents:
+.. _table-of-contents-excomm:
 
 Table of Contents
 =================
@@ -35,7 +35,7 @@ Table of Contents
 
 Squad Leader
 ============
-`↑ <table-of-contents_>`_
+`↑ <table-of-contents-excomm_>`_
 
 =========== ==================================================================
 Title       *Squad Leader Modular Board Section*
@@ -57,7 +57,7 @@ Screenshot  .. image:: images/boards/commercial/squadleader_blank.png
 
 Orion
 =====
-`↑ <table-of-contents_>`_
+`↑ <table-of-contents-excomm_>`_
 
 =========== ==================================================================
 Title       *Orion Game Board*
@@ -80,7 +80,7 @@ Screenshot  .. image:: images/boards/commercial/orion_game_board.png
 
 Adventurer Conqueror King
 =========================
-`↑ <table-of-contents_>`_
+`↑ <table-of-contents-excomm_>`_
 
 =========== ==================================================================
 Title       *Adventurer Conqueror King RPG Blank Map*
@@ -102,7 +102,7 @@ Screenshot  .. image:: images/boards/commercial/ack_map.png
 
 Traveller: Draft
 ================
-`↑ <table-of-contents_>`_
+`↑ <table-of-contents-excomm_>`_
 
 =========== ==================================================================
 Title       *Traveller RPG Map*
@@ -126,7 +126,7 @@ Screenshot  .. image:: images/boards/commercial/traveller_draft.png
 
 Traveller: Black
 ================
-`↑ <table-of-contents_>`_
+`↑ <table-of-contents-excomm_>`_
 
 =========== ==================================================================
 Title       *Traveller RPG Map*
@@ -153,7 +153,7 @@ Screenshot  .. image:: images/boards/commercial/traveller_black.png
 
 Warp War
 ========
-`↑ <table-of-contents_>`_
+`↑ <table-of-contents-excomm_>`_
 
 =========== ==================================================================
 Title       *Warp War Map*
@@ -196,7 +196,7 @@ Screenshot  .. image:: images/boards/commercial/warpwar.png
 
 Underwater Cities
 =================
-`↑ <table-of-contents_>`_
+`↑ <table-of-contents-excomm_>`_
 
 =========== ==================================================================
 Title       *Underwater Cities Game Board*
@@ -233,7 +233,7 @@ Screenshot  .. image:: images/boards/commercial/underwater_cities.png
 
 The Honorverse
 ==============
-`↑ <table-of-contents_>`_
+`↑ <table-of-contents-excomm_>`_
 
 =========== ==================================================================
 Title       *The Honorverse Star Map*

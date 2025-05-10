@@ -10,18 +10,9 @@ for :doc:`protograf <index>`  as presented in the
 :doc:`Additional Concepts <additional_concepts>` and that you've created some
 basic scripts of your own using the :doc:`Core Shapes <core_shapes>`.
 
-.. _table-of-contents:
-
-Table of Contents
-=================
-
--  `Overview`_
--  `Commands Summary`_
--  `Commands Details`_
 
 Overview
 ========
-`↑ <table-of-contents_>`_
 
 **protograf** allows you to directly define where elements, that make up
 your design, should be placed within a page, or over a series of pages
@@ -87,45 +78,31 @@ points can be used for creating a **layout** by:
 
 Commands Summary
 ================
-`↑ <table-of-contents_>`_
 
 Very briefly, the different kinds of layout commands are as follows.
 
 Linear layouts, where elements appear in one-dimensional space:
 
--  **Sequence()** - allows a set of elements to be placed at regular
-   intervals in a straight line
--  **Track()** - the elements are positioned along the line used to
-   delineate a shape; they can be placed either at the vertices of that
-   line (e.g. at the corners of a square) or in the centre between two
-   sequential vertices.
+-  :doc:`Sequence() <layouts_sequence>` - allows a set of elements to be
+   placed at regular intervals in a straight line
+-  :doc:`Track() <layouts_track>` - the elements are positioned along the
+   line used to delineate a shape; they can be placed either at the vertices
+   of that line (e.g. at the corners of a square) or in the centre between
+   two sequential vertices.
 
 Grid-based layouts, where elements appear in two-dimensional space:
 
--  **Repeat()** - allows an element to be placed multiple times onto
-   a grid
--  **RectangularLocations()** - defines a series of differing x- and y-points
-   in a rectangular pattern; these x- and y-values will set the
-   centre of any element being placed on the grid
--  **TriangularLocations()** - defines a series of differing x- and y-points
-   in a triangular pattern; these x- and y-values will set the
-   centre of any element being placed on the grid
+-  :doc:`Repeat() <layouts_repeat>` - allows an element to be placed multiple
+   times onto a grid
+-  :doc:`RectangularLocations() <layouts_rectangular>` - defines a series of
+   differing x- and y-points in a rectangular pattern; these x- and y-values
+   will set the centre of any element being placed on the grid
+-  :doc:`TriangularLocations() <layouts_triangular>` - defines a series of
+   differing x- and y-points in a triangular pattern; these x- and y-values
+   will set the centre of any element being placed on the grid
 
 These location-types are paired with a **Layout()** command, which
 links them with the shapes that need to be drawn at their locations.
-
-
-Commands Details
-================
-`↑ <table-of-contents_>`_
-
-The commands are described in detail, with examples, in these sections:
-
-- :doc:`Sequence <layouts_sequence>`
-- :doc:`Repeat <layouts_repeat>`
-- :doc:`Track <layouts_track>`
-- :doc:`RectangularLocations <layouts_rectangular>`
-- :doc:`TriangularLocations <layouts_triangular>`
 
 .. HINT::
 

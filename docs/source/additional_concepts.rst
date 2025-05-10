@@ -11,7 +11,7 @@ for :doc:`protograf <index>` as presented in
 or two basic scripts on your own, along the lines described in the
 :doc:`Script Anatomy <script_anatomy>`.
 
-.. _table-of-contents:
+.. _table-of-contents-addcon:
 
 Table of Contents
 =================
@@ -31,7 +31,7 @@ Table of Contents
 
 Names and Naming
 ================
-`↑ <table-of-contents_>`_
+`↑ <table-of-contents-addcon_>`_
 
 Naming of things is supposed to be one of the harder aspects of programming!
 
@@ -79,7 +79,7 @@ https://www.mattlayman.com/blog/2024/layman-guide-python-built-in-functions/
 
 Value Types: Text, Numbers and Booleans
 =======================================
-`↑ <table-of-contents_>`_
+`↑ <table-of-contents-addcon_>`_
 
 An important concept in **protograf** is understanding the different types
 of values and how they are used.
@@ -107,7 +107,7 @@ to be set before they are activated.
 
 Assigned Names
 ==============
-`↑ <table-of-contents_>`_
+`↑ <table-of-contents-addcon_>`_
 
 A very likely usage for assigned names, is when the ``Common`` command is in
 use.  This command stores a number of properties that need to be used across
@@ -132,7 +132,7 @@ to the ``Common`` command.
 
 Case-sensitivity
 ================
-`↑ <table-of-contents_>`_
+`↑ <table-of-contents-addcon_>`_
 
 **protograf**, like Python, is case-sensitive - unlike some computer
 languages or, for example, the file names that are used in Windows; so a
@@ -159,7 +159,7 @@ will **not** draw the Rectangle on the page.
 
 Calculations
 ============
-`↑ <table-of-contents_>`_
+`↑ <table-of-contents-addcon_>`_
 
 Because **protograf** is able to use any of Python's built-in functionality,
 your script can make use of tools such as the ability to perform calculations.
@@ -182,7 +182,7 @@ you cannot combine a number and a text string, so **not** ``1 + "ab"``!
 
 Changeable Values
 =================
-`↑ <table-of-contents_>`_
+`↑ <table-of-contents-addcon_>`_
 
 **protograf** comes with a number of "built-in" names that can be used in
 some circumstances.  There are represented by the name enclosed in a pair of
@@ -210,7 +210,7 @@ is replaced by the column name - is possible.
 
 Quote Marks in Text
 ===================
-`↑ <table-of-contents_>`_
+`↑ <table-of-contents-addcon_>`_
 
 Using quote marks - ``'`` or ``"`` - inside a string of letters can be
 tricky.
@@ -249,7 +249,7 @@ must be displayed "as is".
 
 Properties and Short-cuts
 =========================
-`↑ <table-of-contents_>`_
+`↑ <table-of-contents-addcon_>`_
 
 In general, **protograf** tries to avoid the use of short-cuts and instead
 relies on short |dash| but hopefully memorable! |dash| names for things,
@@ -281,7 +281,7 @@ first letter; so, for example, using ``d`` for a ``diamond`` layout of a
 
 Lists
 =====
-`↑ <table-of-contents_>`_
+`↑ <table-of-contents-addcon_>`_
 
 Lists are a particularly useful way to collate, or group, related items
 so that they can be processed together.
@@ -307,7 +307,7 @@ The brackets that are used are so-called **square brackets** |dash| ``[``
 and ``]``. Items in the list must be separated by commas.
 
 -  If they are numbers, then that's all you need: for example,
-  ``[1, 3, 5, 7]`` - this list is a series of odd numbers.
+   ``[1, 3, 5, 7]`` - this list is a series of odd numbers.
 -  If they are words, or strings of text then each item must be wrapped
    in quotes: for example, ``['apples', 'oranges', 'bananas', 'plums']``
    or ``["apples", "oranges", "bananas", "plums"]`` |dash| remember that
@@ -333,7 +333,7 @@ the script examples.
 
 Errors
 ======
-`↑ <table-of-contents_>`_
+`↑ <table-of-contents-addcon_>`_
 
 A situation that you will often encounter, especially as your script gets
 longer and more complex, is the appearance of errors.

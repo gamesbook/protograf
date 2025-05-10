@@ -12,7 +12,7 @@ Bear in mind that the images shown in these examples are lower-resolution
 screenshots; the original PDFs that can be generated from the source scripts
 will demonstrate full scalability.
 
-.. _table-of-contents:
+.. _table-of-contents-excntr:
 
 Table of Contents
 =================
@@ -25,7 +25,7 @@ Table of Contents
 
 Wargame - Basic Counters
 ========================
-`↑ <table-of-contents_>`_
+`↑ <table-of-contents-excntr_>`_
 
 =========== ==================================================================
 Title       *Basic Wargame Counters*
@@ -119,7 +119,7 @@ Screenshot  .. image:: images/counters/counters_basic.png
 
 Wargame - Counters from CSV
 ===========================
-`↑ <table-of-contents_>`_
+`↑ <table-of-contents-excntr_>`_
 
 =========== ==================================================================
 Title       *Wargame Counters from a CSV file*
@@ -209,7 +209,7 @@ Screenshot  .. image:: images/counters/counters_csv.png
 
 Wargame - Counters from Excel
 =============================
-`↑ <table-of-contents_>`_
+`↑ <table-of-contents-excntr_>`_
 
 =========== ==================================================================
 Title       *Wargame Counters from an Excel file*
@@ -243,7 +243,7 @@ Screenshot  .. image:: images/counters/counters_excel.png
 
 Wargame - Blocks from CSV
 =========================
-`↑ <table-of-contents_>`_
+`↑ <table-of-contents-excntr_>`_
 
 =========== ==================================================================
 Title       *Wargame Block Labels from a CSV file*

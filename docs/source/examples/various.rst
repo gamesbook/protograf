@@ -12,7 +12,7 @@ Bear in mind that the images shown in these examples are lower-resolution
 screenshots; the original PDFs that can be generated from the source scripts
 will demonstrate full scalability.
 
-.. _table-of-contents:
+.. _table-of-contents-exvar:
 
 Table of Contents
 =================
@@ -26,7 +26,7 @@ Table of Contents
 
 A Clock
 =======
-`↑ <table-of-contents_>`_
+`↑ <table-of-contents-exvar_>`_
 
 =========== ==================================================================
 Title       *A Wall Clock*
@@ -75,7 +75,7 @@ Screenshot  .. image:: images/various/clock.png
 
 Miscellaneous Objects 1
 =======================
-`↑ <table-of-contents_>`_
+`↑ <table-of-contents-exvar_>`_
 
 =========== ==================================================================
 Title       *Miscellaneous Objects #1*
@@ -93,7 +93,7 @@ Screenshot  .. image:: images/various/objects_1.png
 
 Miscellaneous Objects 2
 =======================
-`↑ <table-of-contents_>`_
+`↑ <table-of-contents-exvar_>`_
 
 =========== ==================================================================
 Title       *Miscellaneous Objects #2*
@@ -111,7 +111,7 @@ Screenshot  .. image:: images/various/objects_2.png
 
 Chords
 ======
-`↑ <table-of-contents_>`_
+`↑ <table-of-contents-exvar_>`_
 
 =========== ==================================================================
 Title       *Chords (in a circle)*
@@ -119,7 +119,7 @@ Title       *Chords (in a circle)*
 Source Code `large_objects.py <https://github.com/gamesbook/protograf/blob/master/examples/various/large_objects.py>`_
 ----------- ------------------------------------------------------------------
 Discussion  This example shows how to construct a simple effect by combining
-            a basic shape - a :doc:`chord <../core_shapes#chord>` - with a
+            a basic shape |dash| a :ref:`Chord <chord-command>` |dash| with a
             Python loop:
 
               .. code:: python
@@ -143,7 +143,7 @@ Screenshot  .. image:: images/various/chords.png
 
 Rondel
 ======
-`↑ <table-of-contents_>`_
+`↑ <table-of-contents-exvar_>`_
 
 =========== ==================================================================
 Title       *Rondel (circle radii and sectors)*
@@ -196,7 +196,7 @@ Screenshot  .. image:: images/various/rondel.png
 
 World Clocks
 ============
-`↑ <table-of-contents_>`_
+`↑ <table-of-contents-exvar_>`_
 
 =========== ==================================================================
 Title       *World Clocks*

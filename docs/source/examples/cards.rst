@@ -12,7 +12,7 @@ Bear in mind that the images shown in these examples are lower-resolution
 screenshots; the original PDFs that can be generated from the source scripts
 will demonstrate full scalability.
 
-.. _table-of-contents:
+.. _table-of-contents-excards:
 
 Table of Contents
 =================
@@ -29,7 +29,7 @@ Table of Contents
 
 Simple
 ======
-`↑ <table-of-contents_>`_
+`↑ <table-of-contents-excards_>`_
 
 =========== ==================================================================
 Title       *Simple set of Cards*
@@ -68,7 +68,7 @@ Discussion  This example shows how to construct a deck of cards using these
                 # element added to every odd card
                 Card(steps(1,9,2), rectangle())
                 # element added to every even card
-                Card(steps(2,9,2), circle())
+                Card(steps(2,10,2), circle())
 
 ----------- ------------------------------------------------------------------
 Screenshot  .. image:: images/cards/cards_simple.png
@@ -79,7 +79,7 @@ Screenshot  .. image:: images/cards/cards_simple.png
 
 Matrix Generated
 ================
-`↑ <table-of-contents_>`_
+`↑ <table-of-contents-excards_>`_
 
 =========== ==================================================================
 Title       *Cards generated from a Matrix*
@@ -98,7 +98,7 @@ Discussion  This example shows how to construct a deck of cards using these
                         ['#FF6347', '#00FF00','#00FFFF', '#FFD700', '#FF69B4'],
                         ['5', '3', '1'],
                         # tapedrive, heart, snowflake
-                        ['\u2707', '\u2766', '\u2745']
+                        ['\U+2707', '\U+2766', '\U+2745']
                     ])
                 Data(matrix=combos)
 
@@ -107,16 +107,19 @@ Discussion  This example shows how to construct a deck of cards using these
 
             In this example each card will display a unique combination of a
             *SUIT* - these are hexadecimal colors in the first list that
-            appears in ``data`` - plus a *VALUE* - these are the numbers in
-            the second list appearing in ``data`` - and also an *IMAGE* -
-            these are the Unicode symbols shown in the third list of
-            ``data``.
+            appears in ``data`` |dash| plus a *VALUE* |dash| these are the
+            numbers in the second list appearing in ``data`` |dash| and also
+            an *IMAGE* |dash| these are the Unicode symbols shown in the
+            third list of ``data``.
 
             .. HINT::
+
                 As can be seen, a Unicode symbol is shown by 4-characters
-                prefixed by the ``\u`` (For more, see
-                :doc:`Unicode <../useful_resources#unicode-characters>`
-                character resources.)
+                prefixed by the ``\U+`` (For more, see
+                :ref:`Unicode <unicode-characters>` character resources.)
+
+                The Unicode symbols available are specific to the font
+                being used.
 
             Once defined in the ``Matrix``, the results will be generated and
             stored via the ``Data`` command's **matrix** property.
@@ -129,7 +132,7 @@ Screenshot  .. image:: images/cards/cards_matrix.png
 
 Standard Playing Cards
 ======================
-`↑ <table-of-contents_>`_
+`↑ <table-of-contents-excards_>`_
 
 =========== ==================================================================
 Title       *Standard Playing Cards generated from a Matrix & Images*
@@ -208,7 +211,7 @@ Screenshot  .. image:: images/cards/cards_standard.png
 
 Image-Only Cards
 ================
-`↑ <table-of-contents_>`_
+`↑ <table-of-contents-excards_>`_
 
 =========== ==================================================================
 Title       *Cards generated from a directory of images*
@@ -250,7 +253,7 @@ Screenshot  .. image:: images/cards/cards_images.png
 
 Hexagonal Cards
 ================
-`↑ <table-of-contents_>`_
+`↑ <table-of-contents-excards_>`_
 
 =========== ==================================================================
 Title       *Hexagonal-shaped Cards*
@@ -282,7 +285,7 @@ Screenshot  .. image:: images/cards/cards_hexagonal.png
 
 Circular Cards
 ==============
-`↑ <table-of-contents_>`_
+`↑ <table-of-contents-excards_>`_
 
 =========== ==================================================================
 Title       *Circular-shaped Cards*
@@ -311,7 +314,7 @@ Screenshot  .. image:: images/cards/cards_circular.png
 
 Play Money
 ==========
-`↑ <table-of-contents_>`_
+`↑ <table-of-contents-excards_>`_
 
 =========== ==================================================================
 Title       *Play Money Cards*

@@ -14,7 +14,7 @@ an extension of ``.py``
     computer after successfully :doc:`Setting Up <setting_up>`, and that you
     have read and understood the :doc:`Basic Concepts <basic_concepts>`
 
-.. _table-of-contents:
+.. _table-of-contents-anat:
 
 Table of Contents
 =================
@@ -37,7 +37,7 @@ Table of Contents
 
 Start, Middle and End
 =====================
-`↑ <table-of-contents_>`_
+`↑ <table-of-contents-anat_>`_
 
 A script will normally start with a `Create command`_, then contain a series
 of `other commands`_ with the instructions for your particular needs (each
@@ -61,7 +61,7 @@ is available as well.
 
 Key Commands
 ============
-`↑ <table-of-contents_>`_
+`↑ <table-of-contents-anat_>`_
 
 - `Create Command`_
 - `PageBreak Command`_
@@ -218,7 +218,7 @@ See:
 
 Comments
 ========
-`↑ <table-of-contents_>`_
+`↑ <table-of-contents-anat_>`_
 
 It can be useful to "annotate" a script with other details that can remind
 you, as a reader, about any of the "what" or "why" aspects of the script.
@@ -255,7 +255,7 @@ Make sure the quotes appear at the **start** of the lines they are used in.
 
 Drawing vs Assigning
 ====================
-`↑ <table-of-contents_>`_
+`↑ <table-of-contents-anat_>`_
 
 All of the :doc:`shape <core_shapes>` commands can either be called with a
 **capital** letter or a **lowercase** letter.
@@ -281,7 +281,7 @@ it can be used |dash| or drawn |dash| later on in the script:
 
 Basic Shapes
 ============
-`↑ <table-of-contents_>`_
+`↑ <table-of-contents-anat_>`_
 
 **protograf**  allows for the creation of many shapes, with a command for
 each one.
@@ -295,7 +295,7 @@ More extensive customisation of some shapes is also possible; see the
 
 Card Decks
 ==========
-`↑ <table-of-contents_>`_
+`↑ <table-of-contents-anat_>`_
 
 A common element in many games is a deck - or multiple decks - of cards.
 **protograf** also considers items such tiles or counters to be "cards";
@@ -314,7 +314,7 @@ deck of cards.
 
 Layouts, Sequences, Tracks and Grids
 ====================================
-`↑ <table-of-contents_>`_
+`↑ <table-of-contents-anat_>`_
 
 A basic layout is that of a simple **sequence**, with shapes placed
 at regular positions in a linear direction.
@@ -338,7 +338,7 @@ for adding shapes to them.
 
 The FEEDBACK Message
 ====================
-`↑ <table-of-contents_>`_
+`↑ <table-of-contents-anat_>`_
 
 Normally, a script will run without you seeing anything. However, there are
 some occasions when you will see feedback or warning message of some kind.
@@ -374,7 +374,7 @@ some occasions when you will see feedback or warning message of some kind.
 
 Making Mistakes
 ===============
-`↑ <table-of-contents_>`_
+`↑ <table-of-contents-anat_>`_
 
 It is, unfortunately, all too easy to make mistakes while writing scripts.
 Some common kinds of mistakes are listed below - these are in no way

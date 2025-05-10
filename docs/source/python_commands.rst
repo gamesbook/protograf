@@ -16,7 +16,7 @@ and that you've created some basic scripts of your own using the
    Note that if you already know the Python programming language, you can skip
    this section, unless you have any uncertainty about any of these topics!
 
-.. _table-of-contents:
+.. _table-of-contents-pyc:
 
 Table of Contents
 =================
@@ -30,7 +30,7 @@ Table of Contents
 
 Background
 ==========
-`↑ <table-of-contents_>`_
+`↑ <table-of-contents-pyc_>`_
 
 Working with an actual programming language, if you’re not a programmer,
 can be a little intimidating. Hopefully though, by the time you’ve
@@ -47,7 +47,7 @@ too much complexity. These are *not* essential but *may* be very useful.
 
 Introduction
 ============
-`↑ <table-of-contents_>`_
+`↑ <table-of-contents-pyc_>`_
 
 As you may already have worked out; the normal operation of the script
 is to start with the first command and then go on to the next one and
@@ -68,7 +68,7 @@ you some idea of "the basics".
 
 Loops
 =====
-`↑ <table-of-contents_>`_
+`↑ <table-of-contents-pyc_>`_
 
 A loop represents a section of your script that you want to repeat a
 certain number of times.
@@ -212,7 +212,7 @@ For example:
 
 If Statements
 =============
-`↑ <table-of-contents_>`_
+`↑ <table-of-contents-pyc_>`_
 
 An ``if`` statement is a way to allow the computer to make decisions
 based on the information available to it.
@@ -328,7 +328,7 @@ malfunctioned - best to be safe!
 
 Functions
 =========
-`↑ <table-of-contents_>`_
+`↑ <table-of-contents-pyc_>`_
 
 A function is the workhorse of a language.  It allows you to define your
 "recipe" and then use that recipe multiple times with differing values

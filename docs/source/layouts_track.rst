@@ -9,7 +9,9 @@ ideas for :doc:`protograf <index>` as presented in the
 and that you've created some basic scripts of your own using the
 :doc:`Core Shapes <core_shapes>`.
 
-.. _table-of-contents:
+This is part of the set of commands use for :doc:`Layouts <layouts>`.
+
+.. _table-of-contents-laytrk:
 
 Table of Contents
 =================
@@ -21,7 +23,7 @@ Table of Contents
 
 Overview
 ========
-`↑ <table-of-contents_>`_
+`↑ <table-of-contents-laytrk_>`_
 
 The `Track()` command is designed to lay out a number of items - letters or
 numbers, or shapes - at the vertices of another shape. Each vertex is
@@ -44,7 +46,7 @@ elements in a more repetitive or regular way within a page:
 
 Usage
 =====
-`↑ <table-of-contents_>`_
+`↑ <table-of-contents-laytrk_>`_
 
 The ``Track()`` command accepts the following properties:
 
@@ -74,7 +76,7 @@ The ``Track()`` command accepts the following properties:
 
 Key Properties
 ==============
-`↑ <table-of-contents_>`_
+`↑ <table-of-contents-laytrk_>`_
 
 - `Example 1. Default`_
 - `Example 2. Track with a Shape`_

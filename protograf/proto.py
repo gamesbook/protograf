@@ -849,21 +849,52 @@ def Feedback(msg):
     tools.feedback(msg)
 
 
-def Today(details: str = "datetime", style: str = "iso"):
-    """Return string-formatted current date / datetime in a pre-defined style"""
+def Today(details: str = "datetime", style: str = "iso", formatted: str = None) -> str:
+    """Return string-formatted current date / datetime in a pre-defined style
+
+    Args:
+        details (str): what part of the datetime to format
+        style (str): usa, eur (european), or iso - default
+        formatted (str): formatting string following Python conventions;
+            https://docs.python.org/3/library/datetime.html#strftime-and-strptime-behavior
+    """
     current = datetime.now()
-    if details == "date" and style == "usa":
-        return current.strftime("%B %d %Y")  # USA
-    if details == "date" and style == "eur":
+    if formatted:
+        try:
+            return current.strftime(formatted)
+        except Exception:
+            tools.feedback('Unable to use formatted value  "{formatted}".', True)
+    try:
+        sstyle = style.lower()
+    except Exception:
+        tools.feedback('Unable to use style "{style}" - try "eur" or "usa".', True)
+
+    if details == "date" and sstyle == "usa":
+        return current.strftime(f"%B {current.day} %Y")  # USA
+    if details == "date" and sstyle == "eur":
         return current.strftime("%Y-%m-%d")  # Europe
-    if details == "datetime" and style == "eur":
+    if details == "datetime" and sstyle == "eur":
         return current.strftime("%Y-%m-%d %H:%m")  # Europe
-    if details == "datetime" and style == "usa":
+    if details == "datetime" and sstyle == "usa":
         return current.strftime("%B %d %Y %I:%m%p")  # USA
-    if details == "time" and style == "eur":
+    if details == "time" and sstyle == "eur":
         return current.strftime("%H:%m")  # Europe
-    if details == "time" and style == "usa":
+    if details == "time" and sstyle == "usa":
         return current.strftime("%I:%m%p")  # USA
+    if details == "time":
+        return current.strftime("%H:%m:%S")  # iso
+
+    if details == "year":
+        return current.strftime("%Y")  # all
+    if details == "month" and sstyle == "usa":
+        return current.strftime("%B")  # USA
+    if details == "month":
+        return current.strftime("%m")  # eur
+    if details == "day" and sstyle == "usa":
+        return current.strftime(f"{current.day}")  # usa
+    if details == "day":
+        return current.strftime("%d")  # other
+
     return current.isoformat(timespec="seconds")  # ISO
 
 

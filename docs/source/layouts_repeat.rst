@@ -2,12 +2,15 @@
 Repeat Command
 ==============
 
+.. |dash| unicode:: U+2014 .. EM DASH SIGN
+
 **protograf** allows you to directly define where elements, that make up
 your design, should be placed within a page, or over a series of pages
 within a ``Deck``, but it also includes commands that let you place, or
 ":doc:`layout <layouts>`", elements in a more repetitive or regular way
 within a page.
 
+This is part of the set of commands use for :doc:`Layouts <layouts>`.
 
 Overview
 ========

@@ -4,7 +4,7 @@ Setting Up
 
 .. |dash| unicode:: U+2014 .. EM DASH SIGN
 
-.. _table-of-contents:
+.. _table-of-contents-setup:
 
 Table of Contents
 =================
@@ -26,7 +26,7 @@ Table of Contents
 
 Outline
 =======
-`↑ <table-of-contents_>`_
+`↑ <table-of-contents-setup_>`_
 
 There are four parts to being able to use :doc:`protograf <index>`
 on your own machine:
@@ -43,7 +43,7 @@ but please follow the documentation here to ensure they will work with/for
 
 Python in 1 minute
 ==================
-`↑ <table-of-contents_>`_
+`↑ <table-of-contents-setup_>`_
 
 Why do you need Python before starting?
 
@@ -66,7 +66,7 @@ time as Python itself.
 
 Opening a Terminal
 ==================
-`↑ <table-of-contents_>`_
+`↑ <table-of-contents-setup_>`_
 
 In order to install Python and use **protograf**, you will need to use
 a **command-line window** or **Terminal**.
@@ -84,7 +84,7 @@ The way that you open a terminal window depends on your operating system:
 
 Installing Python
 =================
-`↑ <table-of-contents_>`_
+`↑ <table-of-contents-setup_>`_
 
 **protograf** requires a device e.g. laptop or desktop |dash| but
 probably not a smart phone |dash| that already has the correct version
@@ -203,7 +203,7 @@ You can now close the command-line window.
 
 Other Software Installs
 =======================
-`↑ <table-of-contents_>`_
+`↑ <table-of-contents-setup_>`_
 
 PDF Viewer
 ----------
@@ -241,7 +241,7 @@ already have a tool for editing Python scripts.
 
 Installing **protograf**
 ==========================
-`↑ <table-of-contents_>`_
+`↑ <table-of-contents-setup_>`_
 
 .. IMPORTANT::
 
@@ -264,7 +264,7 @@ If you are using ``uv``::
 
 Checking that protograf works
 =============================
-`↑ <table-of-contents_>`_
+`↑ <table-of-contents-setup_>`_
 
 To now check that **protograf** works, you should create a small test
 file.
@@ -310,7 +310,7 @@ in a small, Helvetica font near the top-left.
 
 Python in the cloud
 ===================
-`↑ <table-of-contents_>`_
+`↑ <table-of-contents-setup_>`_
 
 If you do not want to install Python, you can try a cloud-based version.
 
@@ -327,7 +327,7 @@ use the tools and infrastructure they provide.
 *pythonanywhere* provides a terminal (``bash``) that you can use to install
 Python packages via ``pip``.
 
-You also have option to edit, or upload files |dash" such as **protograf**
+You also have option to edit, or upload files |dash| such as **protograf**
 scripts. Once scripts are available there, they can be run in the Terminal.
 
 *pythonanywhere* has its own documentation to help you work further with it.

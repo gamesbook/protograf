@@ -11,7 +11,7 @@ ideas for :doc:`protograf <index>` as presented in the
 and that you've created some basic scripts of your own using the
 :doc:`Core Shapes <core_shapes>`.
 
-.. _table-of-contents:
+.. _table-of-contents-crddk:
 
 Table of Contents
 =================
@@ -46,7 +46,7 @@ Table of Contents
 
 Introduction
 ============
-`↑ <table-of-contents_>`_
+`↑ <table-of-contents-crddk_>`_
 
 Cards are a common and widely used method of storing and displaying
 small sets of related data.
@@ -68,7 +68,7 @@ role in many of them.
 
 Basic Concepts
 ==============
-`↑ <table-of-contents_>`_
+`↑ <table-of-contents-crddk_>`_
 
 Unlike some other designs, where you are specifying exactly where to locate
 elements on a page, **protograf** is designed to handle the flow of placing
@@ -108,7 +108,7 @@ For additional examples that illustrate some of these, see the
 
 The Deck Command
 ================
-`↑ <table-of-contents_>`_
+`↑ <table-of-contents-crddk_>`_
 
 This command provides the overall "framework" for the cards that are defined
 in the script.  It's primary purpose is to set the card size, and then
@@ -190,7 +190,7 @@ If you need multiple *mask* conditions, these can be combined using an
         mask="{{(Race == 'Hobbit' and Age < 39) or (Race == 'Human' and Age < 80)}}")
 
 The dataset that could be used with the above Deck is shown in
-`Data Example #5`_.
+`Data Example #5 Lists`_.
 
 The full code - including the data - for this example is available as
 `cards_lotr.py <https://github.com/gamesbook/protograf/blob/master/examples/cards/cards_lotr.py>`_
@@ -199,7 +199,7 @@ The full code - including the data - for this example is available as
 
 The Card Command
 ================
-`↑ <table-of-contents_>`_
+`↑ <table-of-contents-crddk_>`_
 
 This command is both simple and flexible. It allows for a complex design, with
 many elements, to be added to any - or all - of the cards in a deck.
@@ -282,7 +282,7 @@ Here:
 
 The Data Command
 ================
-`↑ <table-of-contents_>`_
+`↑ <table-of-contents-crddk_>`_
 
 This command allows for a dataset to be used as the source for values or
 properties making up a Card. Because values now have "names" they can be
@@ -301,7 +301,7 @@ reason to supply a data source in this way.
 
 Data Sources
 ------------
-`↑ <table-of-contents_>`_
+`↑ <table-of-contents-crddk_>`_
 
 There are six possible types of data sources to create a dataset:
 
@@ -357,7 +357,7 @@ types of sources:
 
 Data Properties
 ---------------
-`↑ <table-of-contents_>`_
+`↑ <table-of-contents-crddk_>`_
 
 The other property that can be used for the ``Data`` command is:
 
@@ -372,7 +372,7 @@ The other property that can be used for the ``Data`` command is:
 
 Data Example #1 CSV
 -------------------
-`↑ <table-of-contents_>`_
+`↑ <table-of-contents-crddk_>`_
 
 This example shows how data is sourced from a CSV file:
 
@@ -384,7 +384,7 @@ This example shows how data is sourced from a CSV file:
 
 Data Example #2 Excel
 ---------------------
-`↑ <table-of-contents_>`_
+`↑ <table-of-contents-crddk_>`_
 
 This example shows how data is sourced from an Excel file:
 
@@ -396,7 +396,7 @@ This example shows how data is sourced from an Excel file:
 
 Data Example #3 Matrix
 ----------------------
-`↑ <table-of-contents_>`_
+`↑ <table-of-contents-crddk_>`_
 
 This example shows how data is sourced from a Matrix; in this case the data
 represents possible combinations for a standard deck of playing cards:
@@ -422,7 +422,7 @@ For more detail on these properties see `The Matrix Command`_.
 
 Data Example #4 Images
 ----------------------
-`↑ <table-of-contents_>`_
+`↑ <table-of-contents-crddk_>`_
 
 This example shows how data is sourced from an image directory:
 
@@ -435,7 +435,7 @@ This example shows how data is sourced from an image directory:
 
 Data Example #5 Lists
 ---------------------
-`↑ <table-of-contents_>`_
+`↑ <table-of-contents-crddk_>`_
 
 This example shows how data is sourced from a "list of lists":
 
@@ -482,7 +482,7 @@ See below under the `T(emplate) command`_ and also under the
 
 Data Example #6 BoardGameGeek API
 ---------------------------------
-`↑ <table-of-contents_>`_
+`↑ <table-of-contents-crddk_>`_
 
 This example shows how data is loaded for boardgame details obtained from the
 :ref:`BoardGameGeek API <the-bgg-command>`.
@@ -515,7 +515,7 @@ by supplying their username, for example:
 
 The Matrix Command
 ==================
-`↑ <table-of-contents_>`_
+`↑ <table-of-contents-crddk_>`_
 
 The ``Matrix`` command uses these properties to create data:
 
@@ -545,7 +545,7 @@ See the `Data Example #3 Matrix`_ above for a full Matrix.
 
 Countersheet and Counter Commands
 =================================
-`↑ <table-of-contents_>`_
+`↑ <table-of-contents-crddk_>`_
 
 These commands are effectively "wrappers" around the Deck and Card commands
 (respectively) so all of the properties and abilities of those commands can
@@ -564,7 +564,7 @@ can be adapted to **protograf**
 
 Supporting Commands
 ===================
-`↑ <table-of-contents_>`_
+`↑ <table-of-contents-crddk_>`_
 
 The following commands are helpful in terms of increased flexibilty and
 reduced repetition when designing a deck of cards.
@@ -578,7 +578,7 @@ reduced repetition when designing a deck of cards.
 
 group command
 -------------
-`↑ <table-of-contents_>`_
+`↑ <table-of-contents-crddk_>`_
 
 The ``group()`` command provides a "shortcut" way to reference a stack of shapes
 that all need to be drawn together. Add the shapes to a set - comma-separated
@@ -605,7 +605,7 @@ group commonly used properties.
 
 T(emplate) command
 ------------------
-`↑ <table-of-contents_>`_
+`↑ <table-of-contents-crddk_>`_
 
 The ``T()`` command causes the name of a column to be replaced by its equivalent
 value for that card.
@@ -652,7 +652,7 @@ The full code for this example is available as
 
 S(election) command
 -------------------
-`↑ <table-of-contents_>`_
+`↑ <table-of-contents-crddk_>`_
 
 The ``S()``  command causes a shape to be added to a card, or set of cards,
 for a matching condition.
@@ -676,7 +676,7 @@ The match condition contains three parts, all separated by spaces:
 - the *value* being checked - for example, a number or some text
 
 This example shows how to use the command, with reference to the ``Data``
-from `Data Example #5`_:
+from `Data Example #5 Lists`_:
 
     .. code:: python
 
@@ -746,7 +746,7 @@ this case, the value **wire.png**.
 
 Other Resources
 ===============
-`↑ <table-of-contents_>`_
+`↑ <table-of-contents-crddk_>`_
 
 **protograf** is by no means the only tool for creating decks of cards.
 Numerous other options exist, both free and commercial.  Some of the free /

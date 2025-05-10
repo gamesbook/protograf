@@ -12,7 +12,7 @@ will demonstrate full scalability.
 
 .. |dash| unicode:: U+2014 .. EM DASH SIGN
 
-.. _table-of-contents:
+.. _table-of-contents-exabs:
 
 Table of Contents
 =================
@@ -28,7 +28,7 @@ Table of Contents
 
 Chess
 =====
-`↑ <table-of-contents_>`_
+`↑ <table-of-contents-exabs_>`_
 
 =========== ==================================================================
 Title       *Chess Board*
@@ -65,7 +65,7 @@ Screenshot  .. image:: images/boards/abstract/chessboard_brown.png
 
 Backgammon
 ==========
-`↑ <table-of-contents_>`_
+`↑ <table-of-contents-exabs_>`_
 
 =========== ==================================================================
 Title       *Backgammon Board*
@@ -90,7 +90,7 @@ Screenshot  .. image:: images/boards/abstract/backgammon.png
 
 Go
 ==
-`↑ <table-of-contents_>`_
+`↑ <table-of-contents-exabs_>`_
 
 =========== ==================================================================
 Title       *Go Board*
@@ -114,7 +114,7 @@ Screenshot  .. image:: images/boards/abstract/go.png
 
 Hex
 ===
-`↑ <table-of-contents_>`_
+`↑ <table-of-contents-exabs_>`_
 
 "Hex" is the title of a game invented by Piet Hein.
 
@@ -133,7 +133,7 @@ Screenshot  .. image:: images/boards/abstract/hex_game.png
 
 HexHex Games
 ============
-`↑ <table-of-contents_>`_
+`↑ <table-of-contents-exabs_>`_
 
 There are many games that are played on "hexagonal" board i.e. a board that is
 hexagonal in outline and is composed of many hexagons.
@@ -189,7 +189,7 @@ Screenshot  .. image:: images/boards/abstract/hexhex_hexagons.png
 
 Morabaraba
 ==========
-`↑ <table-of-contents_>`_
+`↑ <table-of-contents-exabs_>`_
 
 =========== ==================================================================
 Title       *Morabaraba Board*
@@ -209,7 +209,7 @@ Screenshot  .. image:: images/boards/abstract/morabaraba.png
 
 Octagons
 ========
-`↑ <table-of-contents_>`_
+`↑ <table-of-contents-exabs_>`_
 
 In Octagons, players alternate taking turns. On their turn, a player can
 either fill in one half of an octagon or two squares. The player who first
@@ -237,7 +237,7 @@ Screenshot  .. image:: images/boards/abstract/octagons.png
 
 TicTacToe
 =========
-`↑ <table-of-contents_>`_
+`↑ <table-of-contents-exabs_>`_
 
 =========== ==================================================================
 Title       *TicTacToe Board and Game*

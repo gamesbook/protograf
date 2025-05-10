@@ -13,7 +13,7 @@ This is a general discussion; it may also be useful to look at the more
 detailed definitions of some of the terms in the section covering
 :doc:`terminology <terminology>`.
 
-.. _table-of-contents:
+.. _table-of-contents-basic:
 
 Table of Contents
 =================
@@ -32,7 +32,7 @@ Table of Contents
 
 How you’ll use protograf
 ========================
-`↑ <table-of-contents_>`_
+`↑ <table-of-contents-basic_>`_
 
 You will be using **protograf** to write what is termed a **script**
 i.e. a recipe or list of instructions that are stored in a file.
@@ -54,7 +54,7 @@ again to create the updated version.
 
 The "script" concept
 ====================
-`↑ <table-of-contents_>`_
+`↑ <table-of-contents-basic_>`_
 
 Creating a *script* is similar to the process of building a house; in
 the sense that the instructions which come first create underlying parts
@@ -85,7 +85,7 @@ will affect what you see at the end!
 
 The "position" concept
 ======================
-`↑ <table-of-contents_>`_
+`↑ <table-of-contents-basic_>`_
 
 When using **protograf** what you are doing is defining *where* and
 *how* various things should appear on a *page*. A script can create multiple
@@ -115,7 +115,7 @@ size will be automatically added onto the values you specify for the position.
 
 The "command" concept
 =====================
-`↑ <table-of-contents_>`_
+`↑ <table-of-contents-basic_>`_
 
 Instructions in **protograf** are termed *commands*.
 
@@ -143,7 +143,7 @@ for checking what is available.
 
 The "element" concept
 =====================
-`↑ <table-of-contents_>`_
+`↑ <table-of-contents-basic_>`_
 
 Rather than use the slightly clumsy term "thing", **protograf** uses
 the term *element*.
@@ -175,7 +175,7 @@ regular :doc:`layouts <layouts>` and :doc:`decks of cards <card_decks>`.
 
 Element properties
 ==================
-`↑ <table-of-contents_>`_
+`↑ <table-of-contents-basic_>`_
 
 *Elements*, including *shapes*, can have other settings apart from their
 :ref:`position <position-concept>`.
@@ -199,7 +199,7 @@ more :doc:`extensive properties  <customised_shapes>`.
 
 Working with color
 ==================
-`↑ <table-of-contents_>`_
+`↑ <table-of-contents-basic_>`_
 
 Everything we see has color.
 
@@ -233,7 +233,7 @@ The :ref:`default <default-concept>` **colors** in **protograf**  are
 
 Working with units
 ==================
-`↑ <table-of-contents_>`_
+`↑ <table-of-contents-basic_>`_
 
 All positions, heights, widths, distances, line thicknesses and other
 kinds of lengths or sizes all need to be measured in a particular set of
@@ -274,7 +274,7 @@ or anything else, are converted to points.
 
 The "stroke" concept
 ====================
-`↑ <table-of-contents_>`_
+`↑ <table-of-contents-basic_>`_
 
 While the majority of size-based `element properties`_ in **protograf**
 work with the "normal" units you have chosen - inches or centimetres - some use
@@ -288,7 +288,7 @@ existing tools.
 
 The "default" concept
 =====================
-`↑ <table-of-contents_>`_
+`↑ <table-of-contents-basic_>`_
 
 A "default", in terms of **protograf**, is a value or setting for
 something |dash| usually a `property <element properties_>`_ |dash| which is used

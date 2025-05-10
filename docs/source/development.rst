@@ -8,7 +8,7 @@ These notes are aimed at those who might be developing the code further,
 or who want to use :doc:`protograf <index>` as part of other Python
 projects.
 
-.. _table-of-contents:
+.. _table-of-contents-dev:
 
 Table of Contents
 =================
@@ -20,7 +20,7 @@ Table of Contents
 
 Coding
 ======
-`↑ <table-of-contents_>`_
+`↑ <table-of-contents-dev_>`_
 
 In general, follow the `Zen of Python <https://peps.python.org/pep-0020/>`_
 |dash| which is much easier to say than do |dash| but also try to follow
@@ -46,7 +46,7 @@ triggered as a GitHub action |dash| see the ``.github/workflows/`` directory.
 
 Package Management
 ==================
-`↑ <table-of-contents_>`_
+`↑ <table-of-contents-dev_>`_
 
 Project packaging is handling via *poetry* (https://python-poetry.org/).  You
 must have installed this before starting development. Follow the guides to
@@ -107,7 +107,7 @@ then use::
 
 Documentation
 =============
-`↑ <table-of-contents_>`_
+`↑ <table-of-contents-dev_>`_
 
 Documentation is written in reStructuredText and hosted on *ReadTheDocs*
 at https://app.readthedocs.org/projects/protograf/

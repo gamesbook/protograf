@@ -11,7 +11,7 @@ You should already be familiar with all of the
 :doc:`Basic Concepts <basic_concepts>`,  and have created some
 basic scripts of your own using the :doc:`Core Shapes <core_shapes>`.
 
-.. _table-of-contents:
+.. _table-of-contents-addcmd:
 
 Table of Contents
 =================
@@ -26,7 +26,7 @@ Table of Contents
 
 Common Command
 ==============
-`↑ <table-of-contents_>`_
+`↑ <table-of-contents-addcmd_>`_
 
 The ``Common()`` command allows different shapes to share the same properties.
 
@@ -54,7 +54,7 @@ the ``colors`` name.
 
 Font Command
 ============
-`↑ <table-of-contents_>`_
+`↑ <table-of-contents-addcmd_>`_
 
 .. NOTE::
 
@@ -137,13 +137,14 @@ Example 1. Common Fonts
 
 Today Command
 =============
-`↑ <table-of-contents_>`_
+`↑ <table-of-contents-addcmd_>`_
 
 The ``Today()`` command will insert text with the current date and/or time.
 
 Varying date formats can be used. Two properties are available:
 
-- *details* - this can be either ``date`` or ``datetime``
+- *details* - this can be one of: ``date``, ``datetime``, ``time``, ``year``,
+  ``month`` or ``day```.
 - *style* - this can be ``usa`` or ``eur``; if not provided then ``ISO`` date
   style is used |dash| see the ``"1."`` example below.
 
@@ -183,8 +184,6 @@ Example 1. Common Usage
       it can be used for the *text* property of the ``Text()`` command
       and located and styled as part of that command.
 
-      Another option for *details* is to use ``"time"``.
-
 ===== ======
 
 
@@ -192,7 +191,7 @@ Example 1. Common Usage
 
 BGG Command
 ===========
-`↑ <table-of-contents_>`_
+`↑ <table-of-contents-addcmd_>`_
 
 The `BGG()` command is designed to retrieve board game data from the
 `BoardGameGeek (BGG) <https://boardgamegeek.com/>`_ database, via its API,

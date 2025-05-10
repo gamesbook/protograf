@@ -1,12 +1,6 @@
 Core Shapes
 ===========
 
-These descriptions of the available shapes assume you are familiar with
-the concepts, terms and ideas for :doc:`protograf <index>` as presented
-in the :doc:`Basic Concepts <basic_concepts>` - especially *units*,
-*properties* and *defaults*. It will also help to at least browse through
-the section on :doc:`Additional Concepts <additional_concepts>`.
-
 .. |dash| unicode:: U+2014 .. EM DASH SIGN
 .. |copy| unicode:: U+00A9 .. COPYRIGHT SIGN
    :trim:
@@ -16,7 +10,14 @@ the section on :doc:`Additional Concepts <additional_concepts>`.
 
    <br/>
 
-.. _table-of-contents:
+
+These descriptions of the available shapes assume you are familiar with
+the concepts, terms and ideas for :doc:`protograf <index>` as presented
+in the :doc:`Basic Concepts <basic_concepts>` - especially *units*,
+*properties* and *defaults*. It will also help to at least browse through
+the section on :doc:`Additional Concepts <additional_concepts>`.
+
+.. _table-of-contents-core:
 
 Table of Contents
 -----------------
@@ -68,7 +69,7 @@ Shape Index
 
 Overview
 ---------
-`↑ <table-of-contents_>`_
+`↑ <table-of-contents-core_>`_
 
 Where possible, the basic examples first show how a shape would appear
 on a page when **only** the default properties are used. This means that,
@@ -100,7 +101,7 @@ PNG images that were generated from the original PDF output.
 
 Commonalities
 --------------
-`↑ <table-of-contents_>`_
+`↑ <table-of-contents-core_>`_
 
 There are some properties that can be set for almost all of the shapes;
 examples of these are presented in the section on `Shapes Common Properties`_
@@ -692,7 +693,7 @@ Example 4. Rotated Text
 
 Enclosed Shapes
 ---------------
-`↑ <table-of-contents_>`_
+`↑ <table-of-contents-core_>`_
 
 These shapes are created by enclosing an area, the most basic being a simple rectangle.
 They effectively have two dimensions: *height* and *width*.
@@ -2386,7 +2387,7 @@ Example 3. Trapezoid Borders
 
 Compound Shapes
 ---------------
-`↑ <table-of-contents_>`_
+`↑ <table-of-contents-core_>`_
 
 Compound shapes are ones composed of multiple elements; but the program takes
 care of drawing all of them based on the properties supplied.
@@ -2968,7 +2969,7 @@ Example 2. Customised Rectangles
 
 Shapes Common Properties
 ------------------------
-`↑ <table-of-contents_>`_
+`↑ <table-of-contents-core_>`_
 
 The following are properties common to many shapes that can be set to create
 the desired output:

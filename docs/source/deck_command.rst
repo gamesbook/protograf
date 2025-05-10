@@ -14,7 +14,7 @@ and that you've created some basic scripts of your own using the
 It also assumes you have read through the section on
 :doc:`card decks <card_decks>`.
 
-.. _table-of-contents:
+.. _table-of-contents-deck:
 
 Table of Contents
 =================
@@ -28,7 +28,7 @@ Table of Contents
 
 Overview
 ========
-`↑ <table-of-contents_>`_
+`↑ <table-of-contents-deck_>`_
 
 This command provides the overall "framework" for the cards that are defined
 in the script.  It's primary purpose is to set the card size, and then
@@ -37,7 +37,7 @@ they get drawn.
 
 Primary Properties
 ------------------
-`↑ <table-of-contents_>`_
+`↑ <table-of-contents-deck_>`_
 
 The following are key properties that will usually need to be set for a
 ``Deck``:
@@ -52,7 +52,7 @@ The following are key properties that will usually need to be set for a
 
 Secondary Properties
 --------------------
-`↑ <table-of-contents_>`_
+`↑ <table-of-contents-deck_>`_
 
 The following are other properties that can also be set for a ``Deck``:
 
@@ -94,7 +94,7 @@ The following are other properties that can also be set for a ``Deck``:
 
 Property Examples
 =================
-`↑ <table-of-contents_>`_
+`↑ <table-of-contents-deck_>`_
 
 - `Example 1. Defaults`_
 - `Example 2. Card bleed`_

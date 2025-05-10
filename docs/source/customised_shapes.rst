@@ -16,7 +16,7 @@ and ideas for :doc:`protograf <index>` as presented in the
 You should have already seen how these shapes were created, with defaults,
 in :doc:`Core Shapes <core_shapes>`.
 
-.. _table-of-contents:
+.. _table-of-contents-custom:
 
 Table of Contents
 =================
@@ -30,7 +30,7 @@ Table of Contents
 
 Overview
 ========
-`↑ <table-of-contents_>`_
+`↑ <table-of-contents-custom_>`_
 
 To make it easier to see where and how a shape has been drawn, most of these
 examples have been created with a background grid (which **protograf**
@@ -47,7 +47,7 @@ number of shapes.
 
 Rectangle
 =========
-`↑ <table-of-contents_>`_
+`↑ <table-of-contents-custom_>`_
 
 A Rectangle is a very common shape in many designs; there are a number of ways
 that it can be customised.
@@ -246,8 +246,8 @@ Notch
 -----
 `^ <rectangleIndex_>`_
 
-Notches are small indents - or outdents - that are drawn in the corners of the
-Rectangle.
+Notches are small indents |dash| or outdents |dash| that are drawn in the
+corners of the Rectangle.
 
 .. |rnt| image:: images/custom/rectangle/notch.png
    :width: 330
@@ -564,7 +564,7 @@ e.g. ``n s`` to draw both lines on both north **and** south sides.
 
 Hexagon
 =======
-`↑ <table-of-contents_>`_
+`↑ <table-of-contents-custom_>`_
 
 A key property for a hexagon is its *orientation*; this can either be *flat*,
 which is the default, or *pointy*. The examples below show how each can be
@@ -1075,7 +1075,7 @@ Example 2. Pointy
 
 Circle
 ======
-`↑ <table-of-contents_>`_
+`↑ <table-of-contents-custom_>`_
 
 A Circle is a very common shape in many designs; it provides a number of
 ways that it can be customised.
@@ -1419,7 +1419,7 @@ effect.
 
 Blueprint
 =========
-`↑ <table-of-contents_>`_
+`↑ <table-of-contents-custom_>`_
 
 This shape is primarily intended to support drawing while it is "in progress".
 

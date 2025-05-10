@@ -30,10 +30,11 @@ useful information but do build on each other.
    core_shapes
    card_decks
    deck_command
-   additional_commands
    customised_shapes
    layouts
    hexagonal_grids
+   additional_commands
+   functions
    terminology
    commands
    examples/index
@@ -44,6 +45,7 @@ useful information but do build on each other.
    examples/counters
    examples/various
    using_fonts
+   development
    python_commands
    useful_resources
 

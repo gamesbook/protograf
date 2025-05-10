@@ -2,7 +2,7 @@
 protograf
 ===========
 
-.. _table-of-contents:
+.. _table-of-contents-nts:
 
 Table of Contents
 =================
@@ -14,7 +14,7 @@ Table of Contents
 
 Overview
 ========
-`↑ <table-of-contents_>`_
+`↑ <table-of-contents-nts_>`_
 
 **protograf** is a simple Python utility for fast creation of elements needed for
 prototype board or card games or other creative endevours requiring regular, simple
@@ -28,7 +28,7 @@ fairly complex designs.
 
 Concept
 =======
-`↑ <table-of-contents_>`_
+`↑ <table-of-contents-nts_>`_
 
 The program should be reasonably simple, quick and useful.
 
@@ -53,7 +53,7 @@ if needs be, be catered for by a programmer with knowledge of the langauge.
 
 Elements
 ========
-`↑ <table-of-contents_>`_
+`↑ <table-of-contents-nts_>`_
 
 .. table::
     :width: 100

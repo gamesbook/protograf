@@ -12,7 +12,9 @@ ideas for :doc:`protograf <index>` as presented in the
 and that you've created some basic scripts of your own using the
 :doc:`Core Shapes <core_shapes>`.
 
-.. _table-of-contents:
+This is part of the set of commands use for :doc:`Layouts <layouts>`.
+
+.. _table-of-contents-rect:
 
 Table of Contents
 =================
@@ -27,7 +29,7 @@ Table of Contents
 
 Overview
 ========
-`↑ <table-of-contents_>`_
+`↑ <table-of-contents-rect_>`_
 
 The ``RectangularLocations()`` command defines an ordered series
 of row and column locations that create a rectangular grid.  The x- and
@@ -49,7 +51,7 @@ elements in a more repetitive or regular way within a page:
 
 Usage
 =====
-`↑ <table-of-contents_>`_
+`↑ <table-of-contents-rect_>`_
 
 RectangularLocations
 --------------------
@@ -127,7 +129,7 @@ extra information specified.  Allowed values for debug include:
 
 Key Properties
 ==============
-`↑ <table-of-contents_>`_
+`↑ <table-of-contents-rect_>`_
 
 - `Example 1. Rows and Columns`_
 - `Example 2. Start and Direction`_
@@ -343,6 +345,7 @@ Example 6a. Outer Edge - Shapes
       for the shapes' properties.
 
       .. code:: python
+
         sqr = square(common=is_common, side=0.9,
                      label_size=6)
         sqr5 = square(common=is_common, side=1.0,

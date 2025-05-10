@@ -10,7 +10,7 @@ Appendix I: Working with Fonts
    author - certainly any feedback to help correct and make it clearer will be
    more than welcome!
 
-.. _table-of-contents:
+.. _table-of-contents-fonts:
 
 Table of Contents
 =================
@@ -25,7 +25,7 @@ Table of Contents
 
 The Basics
 ==========
-`↑ <table-of-contents_>`_
+`↑ <table-of-contents-fonts_>`_
 
 Apart from the `Built-In Fonts`_, each time you want to use a different font
 in your script, you'll first need to declare it.
@@ -62,7 +62,7 @@ needed.
 
 Built-In Fonts
 ==============
-`↑ <table-of-contents_>`_
+`↑ <table-of-contents-fonts_>`_
 
 Because :doc:`protograf <index>` uses *PyMuPDF* to generate the PDF output,
 it has access to these "built-in" fonts.
@@ -105,7 +105,7 @@ can be referred to as follows:
 
 Using Additional Fonts
 ======================
-`↑ <table-of-contents_>`_
+`↑ <table-of-contents-fonts_>`_
 
 It is possible to install additional fonts into an operating system. Once
 installed, these could then be used in a :doc:`protograf <index>` script.
@@ -183,7 +183,7 @@ font's family name; for example:
 
 Supplementary Fonts
 ===================
-`↑ <table-of-contents_>`_
+`↑ <table-of-contents-fonts_>`_
 
 As suggested in :doc:`Setting Up <setting_up>` , if you're running on a Linux
 operating system, you can consider using a command such as:
@@ -215,7 +215,7 @@ see a warning message every time you run a script:
 
 Word Processor fonts vs protograf
 =================================
-`↑ <table-of-contents_>`_
+`↑ <table-of-contents-fonts_>`_
 
 In some cases, you'll notice that a font can be displayed with bold or
 italic styling in a word processor, even though it cannot be displayed the
@@ -246,7 +246,7 @@ same. Set them really large, and you'll see the difference.
 
 External Font Resources
 =======================
-`↑ <table-of-contents_>`_
+`↑ <table-of-contents-fonts_>`_
 
 Additional fonts are available from:
 

@@ -14,7 +14,7 @@ Bear in mind that the images shown in these examples are lower-resolution
 screenshots; the original PDFs that can be generated from the source scripts
 will demonstrate full scalability.
 
-.. _table-of-contents:
+.. _table-of-contents-exbgg:
 
 Table of Contents
 =================
@@ -26,7 +26,7 @@ Table of Contents
 
 Basic
 =====
-`↑ <table-of-contents_>`_
+`↑ <table-of-contents-exbgg_>`_
 
 =========== ==================================================================
 Title       *Basic BoardGameGeek Example*
@@ -45,7 +45,7 @@ Screenshot  .. image:: images/bgg/bgg_cards_basic.png
 
 Image-based
 ===========
-`↑ <table-of-contents_>`_
+`↑ <table-of-contents-exbgg_>`_
 
 =========== ==================================================================
 Title       *BoardGameGeek Example with Thumbnails and Custom Values*
@@ -72,7 +72,7 @@ Screenshot  .. image:: images/bgg/bgg_cards_thumb.png
 
 Images and QR
 =============
-`↑ <table-of-contents_>`_
+`↑ <table-of-contents-exbgg_>`_
 
 =========== ==================================================================
 Title       *BoardGameGeek Example with Images and QRCodes*

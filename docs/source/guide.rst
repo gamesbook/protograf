@@ -25,28 +25,30 @@ other.
     available and how to construct and customise them
 8.  :doc:`Card Decks <card_decks>` - how to create a deck, or set, of
     cards/tiles; more detail also in the :doc:`Deck command <deck_command>`
-9.  :doc:`Additional Commands <additional_commands>` - special commands not part
-    of the core shapes; fonts, dates and access to BoardGameGeek data
-10. :doc:`Customised Shapes <customised_shapes>` - how to refine the
+9.  :doc:`Customised Shapes <customised_shapes>` - how to refine the
     appearance of certain shapes; circles, hexagons and rectangles
-11. :doc:`Repetitive Elements <layouts>` - how to work with repeats, sequences,
+10. :doc:`Repetitive Elements <layouts>` - how to work with repeats, sequences,
     tracks and grid layouts
-12. :doc:`Hexagonal Grids <hexagonal_grids>` - how to create different types
+11. :doc:`Hexagonal Grids <hexagonal_grids>` - how to create different types
     of hexagonal grids and customise or add to them
-13. :doc:`Terminology <terminology>` - summary of common jargon and descriptions
+12. :doc:`Additional Commands <additional_commands>` - special commands not part
+    of the core shapes; fonts, dates and access to BoardGameGeek data
+13. :doc:`Custom Functions <functions>` - special functions for specific
+    situations
+14. :doc:`Terminology <terminology>` - summary of common jargon and descriptions
     of many of the elements' properties
-14. :doc:`Commands <commands>` - summary of all the commands available
+15. :doc:`Commands <commands>` - summary of all the commands available
 
 The following are supplementary sections that you're likely to need when
 doing more advanced scripts or needing further resources:
 
-15. :doc:`Descriptions of Supplied Examples <examples/index>` - brief
+16. :doc:`Descriptions of Supplied Examples <examples/index>` - brief
     walkthoughs of many of the examples provided with **protograf**
-16. :doc:`Working with Fonts <using_fonts>` - how to install and
+17. :doc:`Working with Fonts <using_fonts>` - how to install and
     use *fonts*, both built-in and additional ones
-17. :doc:`Using Python Commands <python_commands>` - how to work with
+18. :doc:`Using Python Commands <python_commands>` - how to work with
     *loops*, *if/then* statements and *functions* for more flexibility
-18. :doc:`Useful Resources <useful_resources>` - links to
+19. :doc:`Useful Resources <useful_resources>` - links to
     tools and websites related to boardgame prototyping
-19. :doc:`Development Notes <development>` - notes for programmers wanting
+20. :doc:`Development Notes <development>` - notes for programmers wanting
     to develop further in or with  **protograf**

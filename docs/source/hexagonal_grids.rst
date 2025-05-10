@@ -15,7 +15,7 @@ ideas for :doc:`protograf <index>` as presented in the
 and that you've created some basic scripts of your own using the
 :doc:`Core Shapes <core_shapes>`.
 
-.. _table-of-contents:
+.. _table-of-contents-hexg:
 
 Table of Contents
 =================
@@ -31,7 +31,7 @@ Table of Contents
 
 Overview
 ========
-`↑ <table-of-contents_>`_
+`↑ <table-of-contents-hexg_>`_
 
 Hexagonal grids are now widely used in the table top gaming industry.
 
@@ -52,7 +52,7 @@ as a :ref:`Customised Hexagon Shape <hexIndex>`.
 
 Rectangular Hexagonal Grid
 ==========================
-`↑ <table-of-contents_>`_
+`↑ <table-of-contents-hexg_>`_
 
 The basic hexagonal grid is laid out in a rectangular fashion. It can be
 customised in a number of ways.
@@ -494,7 +494,7 @@ Radii
 
 Circular Hexagonal Grid
 =======================
-`↑ <table-of-contents_>`_
+`↑ <table-of-contents-hexg_>`_
 
 An alternative to the basic hexagonal grid, is a circular, or circle, layout.
 
@@ -587,7 +587,7 @@ Nested Shapes
 
 Diamond Hexagonal Grid
 ======================
-`↑ <table-of-contents_>`_
+`↑ <table-of-contents-hexg_>`_
 
 An alternative to the basic hexagonal grid, is a diamond layout.
 
@@ -628,7 +628,7 @@ Basic
 
 Grid Locations
 ==============
-`↑ <table-of-contents_>`_
+`↑ <table-of-contents-hexg_>`_
 
 In order to layout objects within a hexagonal grid, it is possible to use
 the ``Location()`` or ``Locations()`` command to specify the "what, where
@@ -928,7 +928,7 @@ Example 4.  Locations & Col/Row
 
 Grid LinkLine
 =============
-`↑ <table-of-contents_>`_
+`↑ <table-of-contents-hexg_>`_
 
 The ``LinkLine()`` command allows the creation of a line to join one or more
 hexagons within a hexagonal grid.
@@ -1112,7 +1112,7 @@ Example 4. An Offset LinkLine
 
 Other Resources
 ===============
-`↑ <table-of-contents_>`_
+`↑ <table-of-contents-hexg_>`_
 
 There are already a number of software tools available for creating
 hexagonal grids of various kinds and for different purposes.
