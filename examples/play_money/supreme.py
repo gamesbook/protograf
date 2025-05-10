@@ -21,7 +21,7 @@ cash = [
     [25,  "Million", "#00FFFF", "#FFFFFF", 10],
     [50 , "Million", "#800080", "#FFFFFF", 10],
     [100, "Million", "#DC143C", "#FFFFFF", 10],
-    [1, "Billion", "#FFA500", "#FFFFFF", 10],
+    [1,   "Billion", "#FFA500", "#FFFFFF", 10],
 ]
 Data(data_list=cash)
 
@@ -58,7 +58,7 @@ pl6 = polyline(points=[(4.4, 2), (4.75, 1.3), (4.95, 1.3)],
                common=symbol_style)
 pl7 = polyline(points=[(4.6, 2.2), (4.95, 1.5), (5.25, 1.5)],
                common=symbol_style)
-symbol = (pl1, pl2, pl3, pl4, pl5, pl6, pl7)
+symbol = group(pl1, pl2, pl3, pl4, pl5, pl6, pl7)
 
 numbers = Common(
     text=T('{{VALUE}}'), font_name='Helvetica-Bold', font_size=18, stroke=T('{{LINE}}'))
@@ -68,10 +68,10 @@ num3 = text(common=numbers, align="right", x=9.2, y=0.9)
 num4 = text(common=numbers, align="right", x=9.2, y=4.6)
 values = group(num1, num2, num3, num4)
 
-units = Common(
+denom = Common(
     text=T('{{UNITS}}'), font_name='Helvetica-Bold', font_size=18, x=4.75, stroke=T('{{LINE}}'))
-header = text(common=units, y=0.9)
-footer = text(common=units, y=4.6)
+header = text(common=denom, y=0.9)
+footer = text(common=denom, y=4.6)
 
 # card setup
 parts = group(base, btop, blow, header, footer, stripes, values, symbol)

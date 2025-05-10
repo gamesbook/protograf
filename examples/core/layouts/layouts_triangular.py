@@ -99,7 +99,7 @@ Save(
      names=[
         "layout_tri_default",
         "layout_tri_east_row2", "layout_tri_east_row6",
-        "layout_tri_east_col2", "layout_tri_east_col6",
+        "layout_tri_north_col2", "layout_tri_north_col6",
         "layout_tri_west_row3", "layout_tri_south_col3",
         "layout_tri_all"
      ]
