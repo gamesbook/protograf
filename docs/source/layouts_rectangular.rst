@@ -2,6 +2,7 @@
 RectangularLocations Command
 ============================
 
+.. |dash| unicode:: U+2014 .. EM DASH SIGN
 .. |deg|  unicode:: U+00B0 .. DEGREE SIGN
    :ltrim:
 
@@ -82,8 +83,8 @@ The ``RectangularLocations()`` command accepts the following properties:
     are created
 
 The ``RectangularLocations()`` creates a "virtual" grid that always has the
-first row and first column in the lower-left corner and the last row and last
-column in the upper-right corner.
+first row and first column in the upper-left corner and the last row and last
+column in the lower-right corner.
 
 .. _layoutIndex:
 
@@ -179,9 +180,11 @@ Example 1. Rows and Columns
         Layout(rect, shapes=[a_circle])
 
       As can be seen the sequence starts, by default, in the lower-left;
-      and increases from left to right and then from top to bottom. This
-      pattern is also mirrored in the column and row numbers (which follow
-      next to the *//* in the label).
+      and increases from left to right and then from bottom to top.
+
+      The column and row numbers (which follow next to the *//* in the
+      label) show that the topmost row is ``1`` and leftmost column
+      is ``1``.
 
 ===== ======
 
@@ -229,6 +232,8 @@ Example 3. Row and Column Interval
       Here the sequence starts in the top-left / northwest ("NW") corner,
       and then flows to the right ("east") and down.
 
+      The *interval* property adds spacing in both x- and y-directions.
+
 ===== ======
 
 .. |02b| image:: images/layouts/rect_basic_interval_row_col.png
@@ -245,6 +250,9 @@ Example 3. Row and Column Interval
             x=1.5, y=1.5,
             interval_y=1.25, interval_x=0.75)
         Layout(rect, shapes=[a_circle])
+
+      The *x-interval* property adds spacing in the x-direction, which is less
+      than the *y-interval* property spacing in the y-direction.
 
 ===== ======
 
@@ -263,9 +271,15 @@ Example 4. Row and Column Offset
       .. code:: python
 
         rect = RectangularLocations(
-            cols=3, rows=4, start="NW", direction="east",
+            cols=3, rows=4,
+            start="NW", direction="east",
             col_even=0.5)
         Layout(rect, shapes=[a_circle])
+
+      The *col_even* adds a positive value to every even column, making
+      these shift downwards relative to the odd columns.
+
+      Setting a value for *col_odd* would have the opposite effect.
 
 ===== ======
 
@@ -279,9 +293,15 @@ Example 4. Row and Column Offset
       .. code:: python
 
         rect = RectangularLocations(
-            cols=3, rows=4, start="NW", direction="east",
+            cols=3, rows=4,
+            start="NW", direction="east",
             row_odd=0.5)
         Layout(rect, shapes=[a_circle])
+
+      The *row_odd* adds a positive value to every odd row, making
+      these shift rightwards relative to the even rows.
+
+      Setting a value for *row_even* would have the opposite effect.
 
 ===== ======
 
@@ -299,9 +319,14 @@ Example 5. Snaking
       .. code:: python
 
         rect = RectangularLocations(
-            cols=3, rows=4, start="NW", direction="east",
+            cols=3, rows=4,
+            start="NW", direction="east",
             pattern="snake")
         Layout(rect, shapes=[a_circle])
+
+      The ``snake`` setting for the *pattern* property means that the
+      sequence alternates directions |dash| starting east on the first
+      row and then west on the next and so on.
 
 ===== ======
 
@@ -319,18 +344,32 @@ Example 6. Outer Edge
       .. code:: python
 
         rect = RectangularLocations(
-            cols=3, rows=4, start="NW", direction="east",
+            cols=3, rows=4,
+            start="NW", direction="east",
             pattern="outer")
         Layout(rect, shapes=[a_circle])
 
+      The ``outer`` setting for the *pattern* property means that only
+      the locations on the outermost edge of the rectangle are used.
+
+      The sequence starts off ``east`` and then south, west and north.
+
+      So, the combination of the *start* property and the initial
+      *direction* property determine how an outer sequence proceeds.
+
 ===== ======
 
-The examples below all make use of some Common elements:
 
-.. code:: python
+.. NOTE::
 
-    is_common = Common(label="{{sequence}}")
-    rct_common = Common(label_size=5, points=[('s', 0.1)], height=0.5, width=0.5)
+   The examples below all make use of some Common elements:
+
+    .. code:: python
+
+        is_common = Common(label="{{sequence}}")
+        rct_common = Common(
+            height=0.5, width=0.5,
+            label_size=5, points=[('s', 0.1)])
 
 
 Example 6a. Outer Edge - Shapes
@@ -352,17 +391,32 @@ Example 6a. Outer Edge - Shapes
                       label_size=8, fill="yellow")
 
         rect = RectangularLocations(
-            x=0.5, y=0.5, cols=4, rows=6, interval=1,
-            start="SW", direction="north", pattern="outer")
+            x=0.5, y=0.5,
+            cols=4, rows=6, interval=1,
+            start="SW", direction="north",
+            pattern="outer")
         Layout(rect, shapes=[sqr]*4 + [sqr5] )
 
-      This example shows how to provide copies of differenet shapes that
+      This example shows how to provide copies of different shapes that
       must be drawn.
 
-      Using the ``[sqr`]*4`` ensures that four copies of the Square are drawn.
-      Similarly, using ``+`` adds another, different shape to the final list
+      Using the ``[sqr]*4`` is a shortcut way to ensure that four copies
+      of the Square named ``sqr`` are drawn.
+
+      Similarly, using ``+`` adds another, different shape |dash| in this
+      case the Square named ``sqr5`` |dash| to the final list
       of *shapes* that will be used for the Layout; thereby creating
       the pattern shown.
+
+      In summary, the final list of shapes becomes:
+
+          ``[sqr, sqr, sqr, sqr, sqr5]``
+
+      This notation can also be used if the approach shown in the example
+      is too confusing!
+
+      As before, the ``{{sequence}}`` value is assigned to the Squares'
+      *label* property.
 
 ===== ======
 
@@ -380,22 +434,28 @@ Example 6b. Outer Edge - Stop and Start
       .. code:: python
 
         rct_small = Common(label_size=5, side=0.48)
-        rct1 = square(common=rct_small,
-                      fill_stroke="palegreen")
-        rct5 = square(common=rct_small,
-                      fill_stroke="lightgreen")
-        rct10 = square(common=rct_small,
-                       fill_stroke="mediumseagreen")
+        rct1 = square(
+            common=rct_small,
+            fill_stroke="palegreen")
+        rct5 = square(
+            common=rct_small,
+            fill_stroke="lightgreen")
+        rct10 = square(
+            common=rct_small,
+            fill_stroke="mediumseagreen")
 
         rect = RectangularLocations(
             x=0.25, y=0.25,
             cols=8, rows=11, interval=0.5
-            start="NW", direction="east", pattern="outer",
+            start="NW", direction="east",
+            pattern="outer",
             stop=26)
         Layout(rect, shapes=[rct1]*4 + [rct5] + [rct1]*4 + [rct10])
 
-      This example shows how by providing a value for *stop* - the locations
-      stop at sequence number ``26``.
+      This example shows how by providing a value of ``26`` for the *stop*
+      property that drawing of shapes stops at sequence number ``26``.
+
+      The setting and drawing of *shapes* is as per the previous example.
 
       Note that it does not matter how many locations will be used; when all
       shapes in the list have been processed the cycle will start again with
@@ -418,7 +478,8 @@ Example 6c. Outer Edge - Rotation
       .. code:: python
 
         rct_common = Common(
-            label_size=5, points=[('s', 0.1)], height=0.5, width=0.5)
+            label_size=5, points=[('s', 0.1)],
+            height=0.5, width=0.5)
         circ = circle(
             label="{{sequence - 1}}",
             label_size=5, radius=0.26, fill="rosybrown")
@@ -446,20 +507,21 @@ Example 6c. Outer Edge - Rotation
             ],
             corners=[('*',circ)])
 
-      This example also shows how to provide multiple copies of multiple
-      shapes that will be drawn.
-
       Labels are created by use of the ``{{sequence - 1}}`` placeholder; using
-      `` - 1`` after the usual ``sequence`` means that the value of 1 is
+      ``-1`` after the usual ``sequence`` means that the value of 1 is
       subtracted from every sequence number, and also means that in this case
       the numbering will start from zero not one.
 
-      It adds *rotations* settings for specific sequence values in a list of
+      The *rotations* property references specific sequence values in a list of
       sets of values; for example, ``("17-24", 270)`` rotates the shapes at all
       the sequence values from 17 to 24 (inclusive) by 270 |deg|.
 
+      The *rotations* property sequence value is the original one; **not** the
+      one being displayed!
+
       The *corners* settings allows the corner elements to be replaced by those
-      appearing in this list - in this case the use of ``*`` means all of them.
+      appearing in this list - in this case the use of ``*`` means all of the
+      corners.
 
 ===== ======
 
@@ -478,10 +540,14 @@ Example 7. Masked
       .. code:: python
 
         rect = RectangularLocations(
-            cols=3, rows=4, start="NW", direction="east",
+            cols=3, rows=4, start="NW",
+            direction="east",
             pattern="outer")
-        Layout(rect, shapes=[a_circle], masked=[2,7])
+        Layout(rect, shapes=[a_circle],
+               masked=[2,7])
 
+      The *masked* property means that two of the shapes |dash| corresponding
+      to sequence numbers ``2`` and ``7`` |dash| will not be drawn.
 ===== ======
 
 Example 8. Visible
@@ -498,9 +564,14 @@ Example 8. Visible
       .. code:: python
 
         rect = RectangularLocations(
-            cols=3, rows=4, start="NW", direction="east",
+            cols=3, rows=4, start="NW",
+            direction="east",
             pattern="outer")
-        Layout(rect, shapes=[a_circle], visible=[1,3,6,8])
+        Layout(rect, shapes=[a_circle],
+               visible=[1,3,6,8])
+
+      The *visible* property means that only those shapes |dash| corresponding
+      to sequence numbers ``1``, ``3``, ``6`` and ``8`` |dash| will be drawn.
 
 ===== ======
 
@@ -521,10 +592,18 @@ Example 9. Locations Setting
         Layout(
           rect,
           shapes=[
-              a_circle, rectangle(
+              a_circle,
+              rectangle(
                   label="{{sequence}}//{{col}}-{{row}}",
                   label_size=6)],
           locations=[(1,2), (2,3), (3,1), (1,1), (3,4)])
+
+      The shapes are allocated to the list of *locations* provided.
+
+      Each location is identified by its ``(row, column)`` numbers.
+
+      The shape allocation cycles through the list of *shapes* provided;
+      in this case the Circle and Rectangle.
 
 ===== ======
 
@@ -546,6 +625,12 @@ Example 10. Debug
             cols=3, rows=4, x=0.5, y=0.5)
         Layout(rect, debug='none')
 
+      In this case, setting the *debug* property to ``none`` simply
+      causes a small, blue dot to be shown at all of the locations.
+
+      This is useful to visualise the **centre** positions to see where
+      shapes could be drawn.
+
 ===== ======
 
 .. |10b| image:: images/layouts/rect_basic_debug_sequence.png
@@ -561,6 +646,13 @@ Example 10. Debug
             cols=3, rows=4, x=0.5, y=0.5)
         Layout(rect, debug='sequence')
 
+      In this case, setting the *debug* property to ``sequence``
+      causes a small, blue dot to be shown at all of the locations, as
+      well the matching sequence number.
+
+      This is useful to visualise the **order** in which shapes would be
+      drawn at the locations.
+
 ===== ======
 
 .. |07c| image:: images/layouts/rect_basic_debug_colrow.png
@@ -575,5 +667,13 @@ Example 10. Debug
         rect = RectangularLocations(
             cols=3, rows=4, x=0.5, y=0.5)
         Layout(rect, debug='colrow')
+
+      In this case, setting the *debug* property to ``sequence``
+      causes a small, blue dot to be shown at all of the locations, as
+      well the matching column and row numbers (on either side of the dot).
+
+      This is useful to visualise the **identity** of each location; for
+      example, if you needed to make any of these locations *visible* or
+      *masked*.
 
 ===== ======

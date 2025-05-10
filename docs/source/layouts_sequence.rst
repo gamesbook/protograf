@@ -37,15 +37,15 @@ The ``Sequence()`` command accepts the following properties:
 - **shape** - this is one of the core shapes available, for example, a circle
   or rectangle; the properties of that shape will determine where the first one
   in the sequence is drawn; the shape should always be specified with a
-  lowercase initial so the the ``Sequence()`` can handle the drawing.
+  lowercase initial so that the ``Sequence()`` can handle the drawing.
 - **setting** - [1] this can be a *set* i.e. a number of values enclosed in
   `(...)` round brackets; representing these attributes required to construct
   the sequence:
 
   - *start* - the value the sequence starts with
   - *end* - the value the sequence ends with
-  - *increment* - the difference between one value and next - if negative, the
-    values decrease
+  - *increment* - the difference between one value and next |dash| if negative,
+    the values decrease
   - *type* - the sequence can be `letter`, `number`, `roman`, or `excel`
 - **setting** - [2] alternatively, the setting can be specified by providing a
   list of values (using square ``[...]`` brackets); these are drawn in the order
@@ -56,8 +56,8 @@ The ``Sequence()`` command accepts the following properties:
   the right and up)
 
 
-Example 1.
-----------
+Example 1.Sequence Values
+-------------------------
 
 .. |sqv| image:: images/layouts/sequence_values.png
    :width: 330
@@ -108,14 +108,14 @@ Example 1.
       The letters will be lowercase because the start letter |dash| ``h``
       |dash| is lowercase.
 
-      The sequence ends with a ``b``;
+      The sequence ends with a ``b``.
 
       The sequence will use every second letter because the interval value
       is set to ``-2``.
 
       After the first shape is drawn, each following shape will
       be ``0.5`` cm to the right (``interval_x``) and ``0.5`` cm
-      (``interval_y``) above the previous one.
+      above (``interval_y``) the previous one.
 
       The example with **uppercase letters** (upper middle) is created by:
 
@@ -132,7 +132,7 @@ Example 1.
       is ``B``.
 
       After the first shape is drawn, each following shape will be
-      ``0.5`` cm to the right and below |dash| because ``interval_y`` is
+      ``0.5`` cm to the right and above |dash| because ``interval_y`` is
       negative |dash| the previous one.
 
       The example with **Roman numerals** (upper top) is created by:
@@ -162,16 +162,20 @@ Example 1.
 
       Here the progression is one of Excel column headers.
 
-      The value ranges from ``A`` for the first column to ``Z`` for the 26th
-      column.
+      The value ranges from:
 
-      The values then use letter pairs, as seen here where every ``5`` th
-      column header's letters are used.
+      -  ``AA`` for the first value, which corresponds to column number 27
+
+      to:
+
+      - ``BE`` for the last value, which corresponds to column number 52
+
+      The values make use of letter pairs from every ``5`` th column.
 
 ===== ======
 
-Example 2.
-----------
+Example 2. Sequence Shapes
+--------------------------
 
 .. |sq2| image:: images/layouts/sequence_shapes.png
    :width: 330
@@ -204,26 +208,26 @@ Example 2.
       and substituted into the text as part of the ``Rectangle`` 's label;
       the ``$`` is just a normal character.
 
-      The example with **hexagons** and nested circles (middle left) is created by:
+      The example with **hexagons** and **nested circles** (middle left) is
+      created by:
 
       .. code:: python
 
           Sequence(
-              [hexagon(
-                 x=0.5, y=1.5, radius=0.5,
-                  title_size=8, title="Fig. {{sequence}}"),
+              [hexagon(x=0.5, y=1.5, radius=0.5,
+                       title_size=8, title="Fig. {{sequence}}"),
                circle(cx=1, cy=2, radius=0.2, fill="gray")],
-              setting=('C', 'A', -1),
+              setting=('A', 'C', 1),
               interval_y=1.5,
               interval_x=0.5,
           )
 
-      Here the progression is one of uppercase letters (start letter is ``C``).
+      Here the progression is one of uppercase letters (start letter is ``A``).
 
       Note that the *letter* value is missing from the setting; this is because
       the type of value can be inferred from the start and end values.
 
-      Each lette in the sequence is assigned to the ``{{sequence}}`` keyword and
+      Each letter in the sequence is assigned to the ``{{sequence}}`` keyword and
       so that sequence value becomes part of the ``Hexagon`` 's title text.
 
       This example also shows how multiple shapes can be drawn at the same time
@@ -232,8 +236,8 @@ Example 2.
       Instead of supplying a single shape, provide two or more in a list
       (enclosed with square brackets ``[...]``).
 
-      As always the shapes are drawn in order - in this case, the hexagon first
-      and then the grey circle.
+      As always the shapes are drawn in order |dash| the hexagon first and then
+      the grey circle |dash| downwards and to the right (postive intervals).
 
       The example with **circles** (middle right) is created by:
 
@@ -247,16 +251,16 @@ Example 2.
               interval_y=-0.7,
           )
 
-      Here the progression is a specific list of values.
+      Here the **setting** is a *specific list of values*.
 
-      The items separated by commas between the square brackets from
-      ``[`` to ``]``.
+      The settings items are separated by commas between the square brackets
+      from ``[`` to ``]``.
 
       In this case,
       the list is a mixture of letters and numbers; which are assigned as
       part of the ``Cirle`` 's label via the ``{{sequence}}`` keyword.
 
-      **NOTE** that the ``''`` - empty quotes - for the third item in the
+      **NOTE** that the ``''`` (empty quotes) for the third item in the
       ``setting`` mean that nothing is assigned to the ``{{sequence}}`` but
       that the ``Cirle`` itself is still drawn!
 
