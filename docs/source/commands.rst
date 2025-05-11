@@ -49,7 +49,7 @@ cross-reference to the detailed information for that command.
 -  :ref:`EquilateralTriangle <equilateraltriangle-command>` * - a geometric shape that can be drawn on a page
 -  :ref:`Font <the-font-command>` - set the font properties for any :ref:`Text <text-command>` drawn on a page
 -  :ref:`Grid <grid-command>` - a set, or group, of lines that can be drawn on a page
--  :ref:`group <group-command>` - a way to  reference a stack of shapes that
+-  :ref:`group <group-function>` - a way to  reference a stack of shapes that
    all need to be drawn together on a :ref:`card <the-card-command>`
 -  :ref:`Hexagon <hexagon-command>` * - a geometric shape that can be drawn on a page
    (see also further :ref:`customisation options <hexIndex>`)

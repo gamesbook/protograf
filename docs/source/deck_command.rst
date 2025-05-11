@@ -59,9 +59,9 @@ The following are other properties that can also be set for a ``Deck``:
 - **cols** - the maximum number of card columns that should appear on a
   page
 - **copy** - the name of a column in the dataset defined by
-  :ref:`the Data Command <the-data-command>`) that specifies
+  :ref:`the Data Command <the-data-command>` that specifies
   how many copies of a card are needed
-- **fill** - sets the color of the card's area; defaults to white
+- **fill** - sets the color of the card's area; defaults to ``white``
 - **frame** - the default card frame is a *rectangle* (or square, if the
   height and width match); but can be set to *hexagon* or *circle*
 - **grid_marks** - if set to ``True``, will cause small marks (``1`` cm in
@@ -72,8 +72,8 @@ The following are other properties that can also be set for a ``Deck``:
 - **grouping** - set the number of cards to be drawn adjacent to each other
   before a blank space is added by the **spacing** property |dash| use
   **grouping_col** and/or **grouping_row** to set spacing specifically for the
-  horizontal (columns) or vertical (rows) direction respectively. **grouping**
-  does not apply to  *hexagon* **frame** cards.
+  horizontal (columns) or vertical (rows) direction respectively; note that
+  **grouping** does not apply to  *hexagon* **frame** cards.
 - **mask** - an expression which should evaluate to ``True`` or ``False``;
   this expression uses the same kind of syntax as the
   :ref:`T(emplate) command <the-template-command>`
@@ -88,7 +88,7 @@ The following are other properties that can also be set for a ``Deck``:
 - **spacing** - create blank space between each card or group |dash| use
   **spacing_x** and/or **spacing_y** to set spacing specifically for the
   horizontal or vertical direction respectively.
-- **stroke** - sets the color of the card's border; defaults to black
+- **stroke** - sets the color of the card's border; defaults to ``black``
 
 .. _property-examples:
 
@@ -113,16 +113,16 @@ illustrate how the Deck properties are used; normally cards would be
 set out on an A4- or Letter-sized page, but the principle will be the
 same.
 
-In most cases |dash| except where otherwise show |dash|, a basic
+In most cases |dash| except where otherwise shown |dash| a basic
 ``Rectangle``, with a thick border, is used as the shape that is drawn
-on each card.  This purely for illustration purposes - your cards would
-have their own set of shapes that you would want to display.
+on each card.  This purely for illustration purposes; your cards would
+have their own set of shapes that you would want to draw on them.
 
 The ``Rectangle`` also has its *label* set to show the Card's *sequence*
 number i.e. the order in  which it is drawn (usually top-to-bottom and
 left-to-right), followed by its *column* and *row* number.
 
-The script for all this is:
+The part of the script for doing this is:
 
   .. code:: python
 
@@ -339,15 +339,18 @@ Example 6. Card Spacing
             offset=0.15,
             grid_marks=True,
             grid_length=0.18,
-            spacing=0.1,
+            spacing_x=0.1,
             spacing_y=0.15)
 
       Depending on the priniting and cutting requirements, it can be useful
       to add spacing (unused area) between the cards.
 
-      The *spacing* property sets spacing distance in both x- and y-directions;
-      but it can also be set for each individually |dash| using **spacing_x**
-      for horizontal spacing and **spacing_y** for vertical spacing.
+      The *spacing* property can sets spacing distance in both x- and
+      y-directions.
+
+      This example show spacing set for each direction separately |dash|
+      using **spacing_x** for horizontal spacing and **spacing_y** for
+      vertical spacing.
 
       Using spacing also adds extra grid marks.
 
@@ -407,8 +410,8 @@ Example 8. Column Limit
 |d08| This example shows the definition of a deck for a set of small
       cards.
 
-      The card size means that there will be 4 rectangular cards
-      on each A8 page:
+      The card size means that there would normally be 4 rectangular cards
+      on each A8 page; but use of *cols* changes this.
 
       .. code:: python
 
@@ -427,8 +430,8 @@ Example 8. Column Limit
       available page area.
 
       If for any reason, there needs to be fewer cards on a page, then setting
-      the *cols* property will limit the creation of the
-      number of columns on each one.
+      the *cols* property will limit the creation of the number of columns on
+      each one.
 
 ===== ======
 
@@ -444,8 +447,8 @@ Example 9. Row Limit
 |d09| This example shows the definition of a deck for a set of small
       cards.
 
-      The card size means that there will be 4 rectangular cards
-      on each A8 page:
+      The card size means that there would normally be 4 rectangular cards
+      on each A8 page; but use of *rows* changes this.
 
       .. code:: python
 
@@ -479,7 +482,9 @@ Example 10. Circular Frame
 
 ===== ======
 |d10| This example shows the definition of a deck for a set of small
-      cards. The card size means that there will be 6 circular cards
+      cards.
+
+      The card size means that there will be 6 circular cards
       on each A8 page:
 
       .. code:: python

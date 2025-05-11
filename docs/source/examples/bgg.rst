@@ -87,7 +87,9 @@ Discussion  This example shows how to construct a set of cards |dash| one per ga
             a simple way to create a PDF file with all your collection data!
 
             This example uses games' full-sized images sourced from the BGG API,
-            and also makes use of the :ref:`QRCode command <qrcode-command>`
+            which are "sliced" to show the middle-third of the image.
+
+            It also makes use of the :ref:`QRCode command <qrcode-command>`
             to generate a QRCode based on a hyperlink for the games' URLs on
             the BGG website.
 

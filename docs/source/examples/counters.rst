@@ -63,9 +63,11 @@ Discussion  This example shows how to construct a set of counters.
                   x=0.8, y=1.2, width=1.0, height=0.6,
                   stroke_width=0.5, fill=None)
                 lu = line(
-                  x=0.8, y=1.2, x1=1.8, y1=1.8, stroke="black", stroke_width=1.5)
+                  x=0.8, y=1.2, x1=1.8, y1=1.8,
+                  stroke="black", stroke_width=1.5)
                 ld = line(
-                  x=0.8, y=1.8, x1=1.8, y1=1.2, stroke="black", stroke_width=1.5)
+                  x=0.8, y=1.8, x1=1.8, y1=1.2,
+                  stroke="black", stroke_width=1.5)
                 inf = group(out, lu, ld)
 
             Then text and color (for one of the country's armies) are defined:
@@ -74,9 +76,11 @@ Discussion  This example shows how to construct a set of counters.
 
                 brown = "#B6A378"
                 inf_A = text(
-                  font_name="Helvetica", font_size=18, x=1.3, y=0.5, text="2-3-4")
+                  font_name="Helvetica", font_size=18,
+                  x=1.3, y=0.5, text="2-3-4")
                 division = text(
-                  font_name="Helvetica", font_size=12, x=1.3, y=1.9, text="XX")
+                  font_name="Helvetica", font_size=12,
+                  x=1.3, y=1.9, text="XX")
 
             Now the counter outline is defined:
 
@@ -161,7 +165,8 @@ Discussion  This example shows how to construct a set of counters using data
               .. code:: python
 
                 value = text(
-                  font_name="Helvetica", font_size=18, x=1.3, y=0.5,
+                  font_name="Helvetica",
+                  font_size=18, x=1.3, y=0.5,
                   text=T('{{VALUE}}'))
 
             Here the text that will be used depends on the **VALUE** which
@@ -267,7 +272,9 @@ Discussion  This example shows how to construct a set of labels, designed to
               .. code:: python
 
                 outline = rectangle(
-                  x=0.45, y=0.45, width=2.0, height=2.0, stroke_width=1,
+                  x=0.45, y=0.45,
+                  width=2.0, height=2.0,
+                  stroke_width=1,
                   stroke=T('{{BORDER}}'), fill=None)
 
             As described previously, the ``T()`` command allows the hexadecimal

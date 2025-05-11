@@ -56,7 +56,7 @@ libraries have long-used card catalogues as a way to track information
 about books. Businesses in the 20th century used Rolodexes and business
 cards as means to track and exchange information about individuals. Early
 computers used a form of index cards called "punch" cards to store their
-data. Playing cards, of course, have been popular both in China and
+data. In gaming, playing cards have been popular both in China and
 Europe, coming into more widespread use somewhere in the 9th and 14th
 centuries respectively.
 
@@ -130,13 +130,13 @@ The following are key properties that will usually need to be set for a
   properties, in `The Deck Command <deck_command.html>`_ section.
 
 
-Deck Example #1 Defaults
-------------------------
+Deck Example #1: Defaults
+-------------------------
 
 This example shows the definition of a simple deck for cards that are a
 commonly-used size (with the default units of centimetres in place).
 The card size means that there will be 9 rectangular cards on each
-A4 page (in default portrait mode):
+of two A4 pages (in default portrait mode):
 
     .. code:: python
 
@@ -146,8 +146,8 @@ Note that height (``8.8`` cm) and width (``6.3`` cm) are the default values
 for rectangular cards.
 
 
-Deck Example #2 Copies
-----------------------
+Deck Example #2: Copies
+-----------------------
 
 This example shows the definition of a deck of 27 cards that are a
 default size and type (rectangular). This  means that there will be
@@ -202,11 +202,11 @@ The Card Command
 `↑ <table-of-contents-crddk_>`_
 
 This command is both simple and flexible. It allows for a complex design, with
-many elements, to be added to any - or all - of the cards in a deck.
+many elements, to be added to any |dash| or all |dash| of the cards in a deck.
 
 The **key concept** to note about a card is that its essentially a "small page".
-Any x- and y-locations are defined relative to the lower left of the card
-and **not** that of the page.
+Any x- and y-locations are therefore defined relative to the card
+and **not** to the page.
 
 A Card is defined slightly differently from other shapes in **protograf**
 in that the properties are not named.
@@ -225,20 +225,20 @@ Examples of Card sequence numbers supplied as *strings*:
 
 - ``"10"`` - a single number; card number 10
 - ``"10-20"`` - a range of numbers; in this case the cards numbered 10 through
-   to 20 inclusive
--  ``"5,10-20,23-27"`` - multiple ranges of numbers; in this card number 5,
-   cards numbered 10 through to 20 and cards numbered 23 through to 27
-- ``"*"`` - any and all cards (the term ``"all"`` can also be used)
+  to 20 inclusive
+- ``"5,10-20,23-27"`` - multiple ranges of numbers; in this card number 5,
+  cards numbered 10 through to 20 and cards numbered 23 through to 27
+- ``"*"`` - means any and all cards (the term ``"all"`` can also be used)
 
 Examples of Card sequence numbers supplied as a *list*:
 
 - ``[10]`` -  a single number; card number 10
-- ``[10,11,12,13,14,15]`` - a set of numbers; in this case the cards numbered
-  10 through to 15 inclusive
+- ``[10,11,12,13,15]`` - a set of numbers; in this case the cards numbered
+  10 through to 15, but not number 14
 
 The **second value**, and all further values, supplied to the ``Card()``
 command must be a :doc:`core shape <core_shapes>` or a
-:ref:`group <group-command>`.
+:ref:`group <group-function>`.
 
 There can be any number of ``Card()`` commands; and the same Card could be
 targeted by multiple ``Card()`` commands, each affecting some aspect of its
@@ -276,7 +276,7 @@ Here:
 - cards 7, 8 and 9 are assigned a group (assigned to ``line_in_rect``); this
   group contains a rectangle with a red, diagonal line - the line is
   superimposed on the rectangle because it appears after it in the group list
-  (see below for how the `group <group-command_>`_ command works.)
+  (see below for how the `group <group-function_>`_ function works.)
 
 .. _the-data-command:
 
@@ -310,11 +310,12 @@ There are six possible types of data sources to create a dataset:
 3. A ``Matrix`` command
 4. A directory (containing images)
 5. A "list of lists" (included in the script)
-6. The BoardGameGeek API (available as a list-of-lists)
+6. The :ref:`BoardGameGeek API <the-bgg-command>` (available as a list-of-lists)
 
 Apart from the images directory, each data source is essentially a set of rows
 and columns.  Each **row** represents data that must appear on a card.
-Each **column** must be named so that the data can be referenced and used:
+Each **column** must be named so that the data can be referenced and used,
+in some way, for a card:
 
 - the names for a CSV file must appear in the first line of the file
 - the names for a Excel file must appear in the columns of the first row of
@@ -329,8 +330,8 @@ Each **column** must be named so that the data can be referenced and used:
     |dash| upper- or lower-case |dash| and **not** other numbers, symbols,
     punctuation marks, spaces etc. except for an underscore (``_``).
 
-The ``Data`` command uses different properties to access these different
-types of sources:
+The ``Data`` command uses different property names to refer to these
+different types of data sources:
 
 - **filename** - the full path to the name (including extension) of the
   CSV or Excel file being used; if no directory is supplied in the path,
@@ -343,7 +344,9 @@ types of sources:
   file extensions which filter which type of files will be loaded from the
   directory e.g. ``.png`` or ``.jpg``; this is important to set if the
   directory contains files of a type that are not, or cannot be, used
-- **data_list** refers to the name assigned to the "list of lists" being used
+- **data_list** refers to the name assigned to the "list of lists" being used;
+  this property is also used when linked to data being sources from the
+  :ref:`BoardGameGeek API <the-bgg-command>`
 
 .. HINT::
 
@@ -519,25 +522,27 @@ The Matrix Command
 
 The ``Matrix`` command uses these properties to create data:
 
-- **data** - these are all relevant data that needs to appear on the acards;
+- **data** - these are all relevant data that needs to appear on the cards;
   specified as a "list of lists"; where each nested list contains all data of
   a given type of value
 - **labels** - there should be one label for each nested list i.e. per each
   type of value
 
 This command will generate a dataset for the cards, based on all combinations
-of values in a "list of lists"; so for this set of *data*:
+of values in a "list of lists"; so for this Matrix' set of *data*:
 
 .. code:: python
 
-    data=[
-        ['A', 'B', ],
-        ['1', '2', ],
-        ['x', 'y', ],
-     ])
+    Matrix(
+        labels=['INITIAL', 'NUMBER', 'LETTER'],
+        data=[
+            ['A', 'B', ],
+            ['1', '2', ],
+            ['x', 'y', ],
+         ])
 
-There are 8 combinations:  A-1-x, A-1-y, A-2-x, A-2-y, B-1-x, B-1-y, B-2-x,
-and B-2-y and therefore eight cards in the deck.
+There are 8 possible *data* combinations:  A-1-x, A-1-y, A-2-x, A-2-y,
+B-1-x,  B-1-y, B-2-x, and B-2-y and therefore eight cards in the deck.
 
 See the `Data Example #3 Matrix`_ above for a full Matrix.
 
@@ -555,11 +560,13 @@ of a Counter is 1" square (2.54 cm x 2.54 cm).
 The aim of having these commands is to allow the script to be more informative
 as to its purpose and use.
 
-For an excellent guide on how to create counters for a "traditional"
-hex-and-counter wargame, see *"Creating Wargames Counters with Inkscape"*
-at https://github.com/jzedwards/creating-wargames-counters-with-inkscape ;
-although its "grammar" is specific to Inkscape, the principle and approach
-can be adapted to **protograf**
+.. HINT::
+
+    For an excellent guide on how to create counters for a "traditional"
+    hex-and-counter wargame, see *"Creating Wargames Counters with Inkscape"*
+    at https://github.com/jzedwards/creating-wargames-counters-with-inkscape ;
+    although its "grammar" is specific to Inkscape, the principle and approach
+    can be adapted to **protograf**
 
 
 Supporting Commands
@@ -569,21 +576,24 @@ Supporting Commands
 The following commands are helpful in terms of increased flexibilty and
 reduced repetition when designing a deck of cards.
 
-- `group command`_
+- `group function`_
 - `T(emplate) command`_
 - `S(election) command`_
 - `L(ookup) command`_
 
-.. _group-command:
+.. _group-function:
 
-group command
--------------
+group function
+--------------
 `↑ <table-of-contents-crddk_>`_
 
-The ``group()`` command provides a "shortcut" way to reference a stack of shapes
-that all need to be drawn together. Add the shapes to a set - comma-separated
-names wrapped in curved brackets (``(..., ...)``) - and assign the set to a
-name.  The shapes are drawn in the order listed.
+The ``group()`` function provides a "shortcut" way to reference a set of
+shapes that all need to be drawn together.
+
+Add the shapes to a set |dash| comma-separated names wrapped in curved
+brackets (``(..., ...)``) - and assign the set to a name.
+
+The shapes are drawn in the order listed.
 
 For example:
 
@@ -598,8 +608,8 @@ the Rectangle will be drawn first, followed by the Line, following the
 order in which the appear in the group's listing.
 
 This command is somewhat similar to the
-:ref:`Common command <the-common-command>`, which also provides a way to
-group commonly used properties.
+:ref:`Common command <the-common-command>`, which provides a way to
+group commonly used *properties*.
 
 .. _the-template-command:
 
@@ -611,7 +621,7 @@ The ``T()`` command causes the name of a column to be replaced by its equivalent
 value for that card.
 
 To use this command, simply enclose the name of the data column in curly
-brackets - ``"{{...}}"`` - remember that this **is** case-sensitive.
+brackets - ``"{{...}}"``. Remember that this name **is** case-sensitive.
 
 This example shows how to use the command, with reference to the ``Data``
 from `Data Example #5 Lists`_.  The text appearing at the top of all cards
@@ -626,14 +636,18 @@ Data from the column can also be mixed in with other text or values:
 .. code:: python
 
     power = text(
-        text=T("<i>Long-lived</i> <b>({{ Age or '\u221E' }})</b>"),
-        x=0.5, y=1.2, width=5, font_size=18,
-        align="centre", wrap=True, fill=None)
+        text=T("""
+           <p style="text-align:center; font-family:Helvetica">
+           <i>Long-lived</i> <b>({{ Age or '\u221E' }})</b>
+           </p>"""),
+        x=1.4, y=0.7, width=3.5,
+        html=True, fill=None)
 
-Here the Text assigned to the name *power* uses the full text capability to
-style the text - italic and bold - and also uses the **or** option in the
-``T()`` command to provide an alternate value - in this case the infinity
-sign - to use when there no *Age* value (for example, for the "Gandalf" row).
+Here the Text assigned to the name *power* uses the full text capability
+provided via ``html=True`` to style the text - italic and bold - and also
+uses the **or** option inside the ``T()`` command ``{{ }}`` to provide an
+alternate value |dash| in this case the infinity sign |dash| to use when
+there is no *Age* value (for example, for the "Gandalf" row).
 
 The full code for this example is available as
 `cards_lotr.py <https://github.com/gamesbook/protograf/blob/master/examples/cards/cards_lotr.py>`_
@@ -663,7 +677,7 @@ There are two properties required:
   ``"{{...}}"``
 - the second is the **shape** that will be drawn if the condition is matched
 
-The match condition contains three parts, all separated by spaces:
+The **match condition** contains three parts, all separated by spaces:
 
 - the *column* name being checked - this **is** case-sensitive
 - the test *condition* being used; e.g.:
@@ -687,8 +701,8 @@ from `Data Example #5 Lists`_:
         Card("all", S("{{ Race == 'Human' }}", back_hum))
 
 In this example, any/all cards for which the **Race** column is equal
-to -  the double equals ``==`` check  - the value **Human**, a red
-rectangle will be drawn on the card (the one named ``back_hum``).
+to |dash| the double equals (``==``) check  |dash| the value **Human**,
+a red rectangle, named ``back_hum``, will be drawn on that card(s).
 
 A "nonsense" condition is usually ignored; for example:
 
@@ -711,14 +725,14 @@ The ``L()``  command enables the current Card to retrieve data from a named
 column corresponding to another Card based on the value of a named column
 in the current Card.
 
-It takes three properties; the names of the three columns (remember that
-these names **are** case-sensitive):
+It takes three properties which correspond to the names of the three columns
+(remember that these names **are** case-sensitive):
 
 - the *first* column name is one that must contain a value for the current
   card;
 - the *second* column name is one that is used to find a matching card whose
-  column must contain a value that mtaches that of the one appearing in the
-  the current Card
+  column must contain a value that matches that of the one appearing in the
+  current Card
 - the *third* column is the one that will return the value for the matched
   Card.
 
@@ -738,9 +752,9 @@ when working with the second (*"plug"*) card:
         Card("2", image(source=L('USES', 'NAME', 'IMAGE')))
 
 The program takes the value from the *plug*'s **USES** column; then finds
-a Card whose **NAME** column contains a matching value - in this case, the
-first card; and then returns the value from that card's **IMAGE** column - in
-this case, the value **wire.png**.
+a Card whose **NAME** column contains a matching value |dash| in this case,
+the first card; and then returns the value from that card's **IMAGE** column
+|dash| in this case, the value **wire.png**.
 
 .. _other-card-resources:
 
@@ -767,5 +781,5 @@ Forge of Cards     Online  JavaScript https://forgeofcards.com/#/
 NanDeck            Windows ?          https://www.nandeck.com/
 Paperize           Online  JavaScript https://beta.editor.paperize.io/#/
 Strange Eons       Multi   Java       https://strangeeons.cgjennings.ca/index.html
-Squib              Multi   Ruby       https://squib.rocks/
+Squib              Multi   Ruby       https://github.com/andymeneely/squib
 ================== ======= ========== =========================================================

@@ -110,7 +110,7 @@ Title       *Traveller RPG Map*
 Source Code `traveller_draft.py <https://github.com/gamesbook/protograf/blob/master/examples/boards/commercial/traveller_draft.py>`_
 ----------- ------------------------------------------------------------------
 Discussion  This example shows how to construct a blank sector map for the
-            "Traveller" roleplaying game.
+            "Traveller" science fiction roleplaying game.
 
             Its a simple hexagonal grid, with a numeric coordinate system.
             The "edges" are just drawn with lines.
@@ -134,13 +134,13 @@ Title       *Traveller RPG Map*
 Source Code `<https://github.com/gamesbook/protograf/blob/master/examples/boards/commercial/traveller_black.py>`_
 ----------- ------------------------------------------------------------------
 Discussion  This example shows how to construct a blank sector map for the
-            "Traveller" roleplaying game.
+            "Traveller" scifi roleplaying game.
 
             Its a simple hexagonal grid, with a numeric coordinate system.
             The "edges" are just drawn with lines. The styling is black because
             of the fill used for the hexagons; when testing, however, it could
-            be better to use a lighter color as this much black is not very
-            "print friendly".
+            be better to use a lighter color as this using much black is not
+            very "printer friendly".
 
             It might be possible, in future, to expand this to show how star
             systems could be depicted on it; something along the lines of the
@@ -161,10 +161,11 @@ Title       *Warp War Map*
 Source Code `warpwar.py <https://github.com/gamesbook/protograf/blob/master/examples/boards/commercial/warpwar.py>`_
 ----------- ------------------------------------------------------------------
 Discussion  This example shows how to construct a map for the "Warp War" game.
-            Its based off an image created by Rick Smith and posted to the
-            https://groups.io/g/warpwar/ forum on 3 June 2024.  This is *not*
-            a complete copy of that map - it just serves to illustrate how
-            elements of such a map could be created.
+
+            The example based off an image created by Rick Smith and posted to
+            the https://groups.io/g/warpwar/ forum on 3 June 2024.  This is
+            *not* a complete copy of that map - it just serves to illustrate
+            how elements of such a map could be created.
 
             This is a fairly complex layout as most items need to be placed
             with millimetre accuracy using the ``Location()`` command to detail
@@ -185,8 +186,8 @@ Discussion  This example shows how to construct a map for the "Warp War" game.
 
             The hexagon identifers across the top and side are created with a
             ``Sequence(`` command; they are not "built-in" to the grid.  Not
-            many games seem to use these, or use them in quite different ways,
-            so there is currently no automated way of doing this.
+            many games seem to use these, or use them in a wide variety of
+            ways, so there is currently no automated way of doing this.
 
 ----------- ------------------------------------------------------------------
 Screenshot  .. image:: images/boards/commercial/warpwar.png
@@ -218,8 +219,8 @@ Discussion  This example shows how to construct the board for the commercial
               between similar items
             - Use of an SVG world map to create the background layer
             - Mix of custom images, free icons and **protograf** to create
-              the smaller graphic elements
-            - Use of the ``RectangularLocation()`` command to layout the
+              the smaller graphic elements, such as the locks and wreaths
+            - Use of the ``RectangularLocation()`` command to lay out the
               primary scoring track; the ``Layout()`` command makes use of multiple
               repeating shapes for the color changes at different intervals
             - Use of ``Sequence()`` command to create the player order track,
@@ -258,7 +259,8 @@ Discussion  This example shows a map with the locations of stars described in th
             * https://www.gotshifted.com/honorverseglossary/MAPS.html
             * https://www.gotshifted.com/honorverseglossary/Book%20Originals.html
 
-            Any errors in transcription are mine - *NOT* the original sources!
+            Any errors in transcription are mine |dash| *NOT* the original
+            sources!
 
             Some items of interest:
 

@@ -280,11 +280,11 @@ In the case of BoardGameGeek data, copies of the game data and images are
 stored under your user directory on your local machine (or where ever you are
 running :doc:`protograf <index>`).
 
-The directory is called ``.protograf`` and will have a ``bgg`` subdirectory
-where game data |dash| such as ``.pck`` files |dash| and ``images`` and
-``thumbs`` are stored.  If you delete these folders and files, they will be
-recreated the next time your script runs i.e. all of their data will need
-to be downloaded again.
+The caching directory is called ``.protograf`` and this will have a ``bgg``
+subdirectory where game data |dash| such as ``.pck`` files |dash| and
+``images`` and ``thumbs`` are stored.  If you delete these folders and files,
+they will be recreated the next time your script runs i.e. all of their data
+will need to be downloaded again.
 
 
 Output Fields
@@ -331,14 +331,12 @@ includes data for the following fields:
 - **WISHING** ~
 - **YEARPUBLISHED** ~
 
-
 .. HINT::
 
    This program's developer was not able to find an authoritative set
    of descriptions for these fields; but they do seem mostly self-obvious,
    assuming you have made use of BoardGameGeek's database to manage
    your game collection.
-
 
 If you retrieve data for a user's collection, there will also be an
 additional set of fields, with data specific to that user:
@@ -377,8 +375,8 @@ items that are "own"ed in the collection of the (imaginary) user
 
 .. HINT::
 
-    A user's entire collection is retrieved at once - so there is no
-    "progress" option available!
+    A user's entire collection is retrieved at once |dash| so there
+    is *no* "progress" option available!
 
 The full list of property filters that can be used, when accessing a
 user's collection, are:

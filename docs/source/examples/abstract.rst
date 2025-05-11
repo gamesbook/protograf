@@ -139,7 +139,7 @@ There are many games that are played on "hexagonal" board i.e. a board that is
 hexagonal in outline and is composed of many hexagons.
 
 The number of hexagons on the side of such a board is used to identify the
-board size, for example; *hexhex5* is a board with 5 smaller hexagons along
+board size, for example; *hexhex4* is a board with 4 smaller hexagons along
 each side.
 
 =========== ==================================================================
