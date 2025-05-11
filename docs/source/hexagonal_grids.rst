@@ -164,7 +164,6 @@ Most coordinate property names are prefixed with ``coord_``.
             x=2, y=3,
             rows=2, cols=2,
             fill="darkseagreen",
-            hex_offset="odd",
             coord_elevation="top",
             coord_type_x="upper",
             coord_separator='::',
@@ -189,8 +188,6 @@ Most coordinate property names are prefixed with ``coord_``.
 
       The green grid also has:
 
-      - *hex_offset* - controls the appearance of the
-        `column offset <rectOffset_>`_
       - *coord_type_x* - ``upper`` displays the column (x-value) as an
         uppercase letter
       - *coord_separator* - can be any text used that must be displayed between
@@ -208,17 +205,6 @@ Most coordinate property names are prefixed with ``coord_``.
 
         Hexagons(
             side=0.6,
-            x=1, y=4,
-            rows=2, cols=2,
-            orientation="pointy",
-            fill="darkseagreen",
-            hex_offset="odd",
-            coord_elevation="top",
-            coord_type_x="upper",
-            coord_separator='::',
-        )
-        Hexagons(
-            side=0.6,
             x=0, y=1,
             rows=2, cols=2,
             orientation="pointy",
@@ -226,6 +212,16 @@ Most coordinate property names are prefixed with ``coord_``.
             coord_elevation="middle",
             coord_prefix='z',
             coord_suffix='!',
+        )
+        Hexagons(
+            side=0.6,
+            x=1, y=4,
+            rows=2, cols=2,
+            orientation="pointy",
+            fill="darkseagreen",
+            coord_elevation="top",
+            coord_type_x="upper",
+            coord_separator='::',
         )
 
       Each has the following properties that differ from the defaults:
@@ -238,21 +234,19 @@ Most coordinate property names are prefixed with ``coord_``.
       - *coord_elevation* can be ``top``, ``middle`` or ``bottom`` to set
         the vertical position of the coordinate text
 
-      The green grid also has:
-
-      - *hex_offset* - controls the appearance of the
-        `row offset <rectOffset_>`_
-      - *coord_type_x* - ``upper`` displays the column (x-value) as an
-        uppercase letter
-      - *coord_separator* - can be any text used that must be displayed between
-        the row and column values; in this case it is two colons ``::``
-
       The white grid also has:
 
       - *coord_prefix* - this is text that appears before the row and column
         values are shown (to their left)
       - *coord_suffix* - this is text that appears after the row and column
         values are shown (to their right)
+
+      The green grid also has:
+
+      - *coord_type_x* - ``upper`` displays the column (x-value) as an
+        uppercase letter
+      - *coord_separator* - can be any text used that must be displayed between
+        the row and column values; in this case it is two colons ``::``
 
 ===== ======
 
@@ -348,17 +342,18 @@ when a grid is designed for a scenario where not all hexagons are needed.
 
         Hexagons(
             side=0.5,
-            x=1, y=3,
+            x=0, y=0,
             rows=3, cols=3,
-            orientation="pointy",
-            fill="darkseagreen",
-            hidden=[(1, 2), (1, 3), (3, 2), (3, 3)]
+            fill="white",
+            hidden="2,1 2,3"
         )
         Hexagons(
             side=0.5,
-            x=0, y=0,
+            x=1, y=3,
             rows=3, cols=3,
-            hidden="2,1 2,3"
+            fill="darkseagreen",
+            orientation="pointy",
+            hidden=[(1, 2), (1, 3), (3, 2), (3, 3)]
         )
 
       Each has the following properties that differ from the defaults:
@@ -367,17 +362,7 @@ when a grid is designed for a scenario where not all hexagons are needed.
       - *rows* - number of rows  in the grid
       - *cols* - number of columns in the grid
 
-      In the green pointy grid:
-
-      - *hidden* - a list (``[`` to ``]``) of row and column numbers
-
-      The row and column numbers are in the form of one or more sets; with
-      each pair enclosed by round brackets.
-
-      In this example, the second and third columns are hidden in both the
-      first and the third row.
-
-      In the white flat grid:
+      In the **white** flat grid:
 
       - *hidden* - a string of row and column numbers
 
@@ -386,6 +371,16 @@ when a grid is designed for a scenario where not all hexagons are needed.
 
       In this example, the second row hexagon is hidden in both first and
       second columns.
+
+      In the **green** pointy grid:
+
+      - *hidden* - a list (``[`` to ``]``) of row and column numbers
+
+      The row and column numbers are in the form of one or more sets; with
+      each pair enclosed by round brackets.
+
+      In this example, the second and third columns are hidden in both the
+      first and the third row.
 
 ===== ======
 
@@ -405,11 +400,9 @@ Offset
 
         Hexagons(
             side=0.5,
-            x=1, y=3.5,
+            x=0, y=0.5,
             rows=3, cols=3,
-            hex_offset="odd",
-            orientation="pointy",
-            fill="darkseagreen",
+            hex_offset="even",
             coord_elevation="middle",
             coord_font_size=5,
             coord_separator=' r',
@@ -417,9 +410,11 @@ Offset
         )
         Hexagons(
             side=0.5,
-            x=0, y=0.5,
+            x=1, y=3.5,
             rows=3, cols=3,
-            hex_offset="odd",
+            hex_offset="even",
+            orientation="pointy",
+            fill="darkseagreen",
             coord_elevation="middle",
             coord_font_size=5,
             coord_separator=' r',
@@ -432,9 +427,9 @@ Offset
       - *x* and *y* are used to set the upper-left corner of the grid
       - *rows* - number of rows  in the grid
       - *cols* - number of columns in the grid
-      - *hex_offset* - if ``odd``, then every odd column - for a flat grid - or
-        every odd row - for a pointy grid - is offset one-half hexagon from
-        those on either side
+      - *hex_offset* - if ``even``, then every even column |dash| for a flat
+        grid |dash| or every even row |dash| for a pointy grid |dash| is
+        offset by one-half hexagon from those on either side
       - *coord_...* - various settings to control the appearance of the
         `hex coordinates <rectCoords_>`_
 
@@ -477,7 +472,8 @@ Radii
       - *x* and *y* are used to set the upper-left corner of the grid
       - *rows* - number of rows  in the grid
       - *cols* - number of columns in the grid
-      - *hex_offset* determines which columns are shifted
+      - *hex_offset* determines which columns are shifted (odd for the
+        black grid and even for the red grid)
       - *radii* - as described for a
         :ref:`customised hexagon <hexIndex>`, this will
         create lines running from each hexagon centre to the vertices, as
@@ -493,6 +489,8 @@ Circular Hexagonal Grid
 `↑ <table-of-contents-hexg_>`_
 
 An alternative to the basic hexagonal grid, is a circular, or circle, layout.
+
+Thes are sometimes termed "hexhex" grids.
 
 Most of the properties that associated with the basic grid are can also be
 used for the circular grid: coordinates; caltrops; radii and hidden hexagons.
@@ -554,7 +552,8 @@ Nested Shapes
             stroke=None, fill="white",
             hex_layout="circle",
             centre_shape=hexagon(
-                stroke="black", fill="lightsteelblue",
+                stroke="black",
+                fill="lightsteelblue",
                 height=0.6, stroke_width=2),
         )
 
@@ -563,7 +562,7 @@ Nested Shapes
       - *x* and *y* - the upper-left corner of the grid
       - *height* - the side-to-side height of a hexagon in the grid
       - *sides* - the number of hexagons running along each "edge" of the
-        grid; there are six sides in all
+        grid; there are six edges in all
       - *fill* - color used for area of each hexagon in the grid
       - *hex_layout* is set to ``circle`` to create a circular grid
       - *centre_shape* - a shape that will appear inside all hexagons
@@ -871,8 +870,8 @@ Example 3.  Locations & Labels
       been set to the reference keyword ``{{label}}``
 
       Because of the enclosing brackets ``{{...}}`` the keyword will be
-      replaced by the actual value of the sequence number in which the hexagon
-      has been drawn.
+      replaced by the actual value of hexagon co-ordinates in which the
+      circle has been drawn.
 
 ===== ======
 
@@ -897,7 +896,9 @@ Example 4.  Locations & Col/Row
         Locations(
             hexgrid,
             "all",
-            [circle(common=a_circle, label="c{{col}}r{{row}}")]
+            [circle(
+                common=a_circle,
+                label="c{{col}}r{{row}}")]
         )
 
       The ``Hexagons`` grid is constructed as per the examples described in
@@ -915,12 +916,14 @@ Example 4.  Locations & Col/Row
       The list contains a single shape |dash| a ``Circle`` whose label has been
       set to use the reference keywords ``{{col}}`` and ``{{row}}``.
 
-      Because of the enclosing brackets ``{{...}}`` the keyword will be
-      replaced by the actual value of the sequence number in which the hexagon
-      has been drawn.
+      Because of the enclosing brackets ``{{...}}`` the keywords will be
+      replaced by the actual value of the property of the hexagon in which
+      the circle has been drawn.
 
 ===== ======
 
+
+.. linkline-command::
 
 Grid LinkLine
 =============
@@ -1034,13 +1037,15 @@ Example 3. A Styled LinkLine
             hexgrid,
             ["0101", "0403", "0104", "0406"],
             common=Common(
-                stroke="tomato", stroke_width=2)
+                stroke="tomato",
+                stroke_width=2)
         )
         LinkLine(
             hexgrid,
             ["0104", "0406"],
             common=Common(
-                stroke="cyan", stroke_width=2)
+                stroke="cyan",
+                stroke_width=2)
         )
 
       The ``LinkLine`` commands have the following properties:
@@ -1081,7 +1086,8 @@ Example 4. An Offset LinkLine
              ("0104", 0.0, 0.25),
              ("0104", 0.25, -0.25)],
             common=Common(
-                stroke="tomato", stroke_width=1,
+                stroke="tomato",
+                stroke_width=1,
                 dotted=True)
         )
 
@@ -1146,9 +1152,9 @@ these other tools would be of better fit.
 
 .. HINT::
 
-   For everything - and I mean **everything** - related to how hexagonal
-   grids are designed and calculated the single most useful reference
-   for a designer is https://www.redblobgames.com/grids/hexagons/
+   For everything |dash| and I mean **everything** |dash| related to how
+   hexagonal grids are designed and calculated, the single most useful
+   reference for a designer is https://www.redblobgames.com/grids/hexagons/
 
 An 18XX Footnote
 ----------------

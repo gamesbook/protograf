@@ -56,7 +56,6 @@ Hexagons(
     x=2, y=3,
     rows=2, cols=2,
     fill="darkseagreen",
-    hex_offset="odd",
     coord_elevation="top", coord_type_x="upper", coord_separator='::',
 )
 PageBreak()
@@ -78,7 +77,6 @@ Hexagons(
     rows=2, cols=2,
     orientation="pointy",
     fill="darkseagreen",
-    hex_offset="odd",
     coord_elevation="top", coord_type_x="upper", coord_separator='::',
 )
 PageBreak()
@@ -125,7 +123,7 @@ Hexagons(
     side=0.5,
     x=1, y=3.5,
     rows=3, cols=3,
-    hex_offset="odd",
+    hex_offset="even",
     orientation="pointy",
     fill="darkseagreen",
     coord_elevation="middle", coord_font_size=5,

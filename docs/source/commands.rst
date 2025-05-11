@@ -62,6 +62,7 @@ cross-reference to the detailed information for that command.
    grid and specifies the shapes that are to be drawn at the grid locations
 -  :ref:`Line <line-command>` * - a geometric shape that can be drawn on a page
 -  :ref:`Lines <lines-command>` - a set, or group, of lines that can be drawn on a page
+-  :ref:`LinkLine <linkline-command>` - a line joining one or more hexagons inside a hexagonal grid
 -  :ref:`Matrix <the-matrix-command>` - a way to create a set of data, inside a script,
    for use in a :ref:`deck <the-deck-command>` of cards
 -  :ref:`PageBreak <pagebreak-command>` - set the start of a new page in

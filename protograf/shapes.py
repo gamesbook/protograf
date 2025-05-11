@@ -1645,7 +1645,7 @@ class HexShape(BaseShape):
             if self.orientation in ["p", "pointy"]:
                 cnv.draw_line(centre, vertices[0])
             else:
-                cnv.draw_line(centre, vertices[1])
+                cnv.draw_line(centre, vertices[5])
         if "n" in _dirs and self.orientation in ["p", "pointy"]:  # vertical UP
             cnv.draw_line(centre, vertices[5])
         if "s" in _dirs and self.orientation in ["p", "pointy"]:  # vertical DOWN
@@ -1901,7 +1901,7 @@ class HexShape(BaseShape):
             elif self.row is not None and self.col is not None:
                 if self.hex_offset in ["o", "O", "odd"]:
                     # TODO => calculate!
-                    # downshift applies from first even row - NOT the very first one!
+                    # downshift applies from first odd row - NOT the very first one!
                     downshift = geo.diameter - geo.z_fraction if self.row >= 1 else 0
                     downshift = downshift * self.row if self.row >= 2 else downshift
                     y = (
@@ -1919,7 +1919,7 @@ class HexShape(BaseShape):
                         )
                     else:  # even row
                         x = self.col * geo.height_flat + self._u.x + self._o.delta_x
-                else:  # self.hex_offset in ['e', 'E', 'even']
+                elif self.hex_offset in ['e', 'E', 'even']:  #
                     # downshift applies from first even row - NOT the very first one!
                     downshift = geo.diameter - geo.z_fraction if self.row >= 1 else 0
                     downshift = downshift * self.row if self.row >= 2 else downshift
@@ -1938,6 +1938,8 @@ class HexShape(BaseShape):
                             + self._u.x
                             + self._o.delta_x
                         )
+                else:
+                    tools.feedback(f'Unknown hex_offset value {self.hex_offset}', True)
             # ----  ^ set hex centre relative to x,y
             self.x_d = x + geo.half_flat
             self.y_d = y + geo.side
@@ -1996,7 +1998,7 @@ class HexShape(BaseShape):
                     y = self.row * geo.half_flat * 2.0 + self._u.y + self._o.delta_y
                     if (self.col + 1) & 1:  # is odd
                         y = y + geo.half_flat
-                else:  # self.hex_offset in ['e', 'E', 'even']
+                elif self.hex_offset in ['e', 'E', 'even']:
                     x = (
                         self.col * (geo.half_side + geo.side)
                         + self._u.x
@@ -2007,6 +2009,9 @@ class HexShape(BaseShape):
                         pass
                     else:
                         y = y + geo.half_flat
+                else:
+                    tools.feedback(f'Unknown hex_offset value {self.hex_offset}', True)
+
             # ----  ~ set hex centre relative to x,y
             self.x_d = x + geo.side
             self.y_d = y + geo.half_flat
