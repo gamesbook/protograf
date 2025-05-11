@@ -39,13 +39,13 @@ They are particularly suitable in providing an overlay for maps and have been
 used for decades in war games and role playing games, but can also act as grids
 or tiles in regular board games.
 
-Some practical example of these grids are shown in the section containing
-examples of both :doc:`commercial <examples/commercial>` and
+Some practical examples of these grids are shown in the section with
+both :doc:`commercial <examples/commercial>` and
 :doc:`abstract <examples/abstract>` boards.
 
 You should have already seen how a single Hexagon and a basic grid of Hexagons
 are created using defaults.
-You should also have seen how a single hexagon can be further enhanced in
+You should also have seen how a single hexagon can be further enhanced
 as a :ref:`Customised Hexagon Shape <hexIndex>`.
 
 .. _rectIndex:
@@ -81,17 +81,15 @@ Rows and Columns
         Hexagons(
             side=0.5,
             x=1, y=1,
-            rows=3, cols=3,
-            fill="white",
+            rows=3, cols=3
         )
 
       It has the following properties that differ from the defaults:
 
-      - *side* sets the length of each side of a hexagon in the grid
+      - *side* - length of each side of a hexagon in the grid
       - *x* and *y* are used to set the upper-left corner of the grid
-      - *rows* sets the number of rows  in the grid
-      - *cols* sets the number of columns in the grid
-      - *fill* - sets the color used for area of each hexagon in the grid
+      - *rows* - number of rows  in the grid
+      - *cols* - number of columns in the grid
 
 ===== ======
 
@@ -108,19 +106,17 @@ Rows and Columns
             side=0.5,
             x=1, y=1,
             rows=3, cols=3,
-            orientation="pointy",
-            fill="white",
+            orientation="pointy"
         )
 
       It has the following properties that differ from the defaults:
 
-      - *side* sets the length of each side of a hexagon in the grid
+      - *side* - length of each side of a hexagon in the grid
       - *x* and *y* are used to set the upper-left corner of the grid
-      - *rows* sets the number of rows  in the grid
-      - *cols* sets the number of columns in the grid
+      - *rows* - number of rows  in the grid
+      - *cols* - number of columns in the grid
       - *orientation* set to``pointy``, ensuring there is a "peak" for
         each hexagon
-      - *fill* - sets the color used for area of each hexagon in the grid
 
 ===== ======
 
@@ -130,7 +126,7 @@ Coordinates
 -----------
 `^ <rectIndex_>`_
 
-Every location in a grid has a row and column number - these are not, by
+Every location in a grid has a row and column number |dash| these are not, by
 default, displayed on the grid; but they are needed in some cases; for example,
 to support grid references for a wargame map.
 
@@ -157,6 +153,14 @@ Most coordinate property names are prefixed with ``coord_``.
 
         Hexagons(
             side=0.6,
+            x=0, y=0,
+            rows=2, cols=2,
+            coord_elevation="middle",
+            coord_prefix='z',
+            coord_suffix='!',
+        )
+        Hexagons(
+            side=0.6,
             x=2, y=3,
             rows=2, cols=2,
             fill="darkseagreen",
@@ -165,24 +169,23 @@ Most coordinate property names are prefixed with ``coord_``.
             coord_type_x="upper",
             coord_separator='::',
         )
-        Hexagons(
-            side=0.6,
-            x=0, y=0,
-            rows=2, cols=2,
-            coord_elevation="middle",
-            coord_prefix='z',
-            coord_suffix='!',
-        )
 
       Each has the following properties that differ from the defaults:
 
-      - *side* sets the length of each side of a hexagon in the grid
+      - *side* - length of each side of a hexagon in the grid
       - *x* and *y* are used to set the upper-left corner of the grid
-      - *rows* sets the number of rows  in the grid
-      - *cols* sets the number of columns in the grid
+      - *rows* - number of rows  in the grid
+      - *cols* - number of columns in the grid
       - *coord_elevation* can be ``top``, ``middle`` or ``bottom`` to set
         the vertical position of the coordinates text; the horizontal
         always matches to the hexagon's centre
+
+      The white grid also has:
+
+      - *coord_prefix* - this is text that appears before the row and column
+        values are shown (to their left)
+      - *coord_suffix* - this is text that appears after the row and column
+        values are shown (to their right)
 
       The green grid also has:
 
@@ -192,13 +195,6 @@ Most coordinate property names are prefixed with ``coord_``.
         uppercase letter
       - *coord_separator* - can be any text used that must be displayed between
         the row and column values; in this case it is two colons ``::``
-
-      The white grid also has:
-
-      - *coord_prefix* - this is text that appears before the row and column
-        values are shown (to their left)
-      - *coord_suffix* - this is text that appears after the row and column
-        values are shown (to their right)
 
 ===== ======
 
@@ -234,10 +230,10 @@ Most coordinate property names are prefixed with ``coord_``.
 
       Each has the following properties that differ from the defaults:
 
-      - *side* sets the length of each side of a hexagon in the grid
+      - *side* - length of each side of a hexagon in the grid
       - *x* and *y* are used to set the upper-left corner of the grid
-      - *rows* sets the number of rows  in the grid
-      - *cols* sets the number of columns in the grid
+      - *rows* - number of rows  in the grid
+      - *cols* - number of columns in the grid
       - *orientation* set to ``pointy`` to have hexagons with pointed tops
       - *coord_elevation* can be ``top``, ``middle`` or ``bottom`` to set
         the vertical position of the coordinate text
@@ -287,13 +283,13 @@ a set of three small lines; these replace the normal edge of the hexagon.
 
       It has the following properties that differ from the defaults:
 
-      - *side* sets the length of each side of a hexagon in the grid
+      - *side* - length of each side of a hexagon in the grid
       - *x* and *y* are used to set the upper-left corner of the grid
-      - *rows* sets the number of rows  in the grid
-      - *cols* sets the number of columns in the grid
+      - *rows* - number of rows  in the grid
+      - *cols* - number of columns in the grid
       - *dot* draws a small dot (of size ``0.04``) in the centre of a
         hexagon
-      - *caltrops* sets the length of the caltrop lines
+      - *caltrops* - length of the caltrop lines
 
 ===== ======
 
@@ -318,14 +314,14 @@ a set of three small lines; these replace the normal edge of the hexagon.
 
       It has the following properties that differ from the defaults:
 
-      - *side* sets the length of each side of a hexagon in the grid
+      - *side* - length of each side of a hexagon in the grid
       - *x* and *y* are used to set the upper-left corner of the grid
-      - *rows* sets the number of rows  in the grid
-      - *cols* sets the number of columns in the grid
+      - *rows* - number of rows  in the grid
+      - *cols* - number of columns in the grid
       - *orientation* set to ``pointy`` to have hexagons with pointed tops
       - *dot* draws a small dot (of size ``0.04``) in the centre of the
         hexagon
-      - *caltrops* sets the size of the caltrop lines
+      - *caltrops* - size of the caltrop lines
       - *caltrops_invert* - if set to ``True``, this will cause the caltrops
         line to be drawn in the middle between the hexagon vertices; with
         no lines drawn touching those vertices
@@ -368,8 +364,8 @@ when a grid is designed for a scenario where not all hexagons are needed.
       Each has the following properties that differ from the defaults:
 
       - *x* and *y* are used to set the upper-left corner of the grid
-      - *rows* sets the number of rows  in the grid
-      - *cols* sets the number of columns in the grid
+      - *rows* - number of rows  in the grid
+      - *cols* - number of columns in the grid
 
       In the green pointy grid:
 
@@ -432,10 +428,10 @@ Offset
 
       Each has the following properties that differ from the defaults:
 
-      - *side* sets the length of each side of a hexagon in the grid
+      - *side* - length of each side of a hexagon in the grid
       - *x* and *y* are used to set the upper-left corner of the grid
-      - *rows* sets the number of rows  in the grid
-      - *cols* sets the number of columns in the grid
+      - *rows* - number of rows  in the grid
+      - *cols* - number of columns in the grid
       - *hex_offset* - if ``odd``, then every odd column - for a flat grid - or
         every odd row - for a pointy grid - is offset one-half hexagon from
         those on either side
@@ -477,10 +473,10 @@ Radii
 
       Each has the following properties that differ from the defaults:
 
-      - *side* sets the length of each side of a hexagon in the grid
+      - *side* - length of each side of a hexagon in the grid
       - *x* and *y* are used to set the upper-left corner of the grid
-      - *rows* sets the number of rows  in the grid
-      - *cols* sets the number of columns in the grid
+      - *rows* - number of rows  in the grid
+      - *cols* - number of columns in the grid
       - *hex_offset* determines which columns are shifted
       - *radii* - as described for a
         :ref:`customised hexagon <hexIndex>`, this will
@@ -529,10 +525,10 @@ Basic
       It has the following properties that differ from the defaults:
 
       - *x* and *y* are used to set the upper-left corner of the grid
-      - *height* sets the side-to-side height of a hexagon in the grid
-      - *sides* sets the number of hexagons running along each "edge" of the
+      - *height* - side-to-side height of a hexagon in the grid
+      - *sides* - number of hexagons running along each "edge" of the
         grid - there are six sides in all
-      - *fill* - sets the color used for area of each hexagon in the grid
+      - *fill* - color used for area of each hexagon in the grid
       - *hex_layout* is set to ``circle`` to create the circular effect
 
 ===== ======
@@ -568,7 +564,7 @@ Nested Shapes
       - *height* - the side-to-side height of a hexagon in the grid
       - *sides* - the number of hexagons running along each "edge" of the
         grid; there are six sides in all
-      - *fill* - sets the color used for area of each hexagon in the grid
+      - *fill* - color used for area of each hexagon in the grid
       - *hex_layout* is set to ``circle`` to create a circular grid
       - *centre_shape* - a shape that will appear inside all hexagons
 
@@ -619,9 +615,9 @@ Basic
       It has the following properties that differ from the defaults:
 
       - *x* and *y* are used to set the upper-left corner of the grid
-      - *height* sets the side-to-side height of a hexagon in the grid
-      - *row* sets the number of hexagons in each row of the grid
-      - *fill* - sets the color used for area of each hexagon in the grid
+      - *height* - side-to-side height of a hexagon in the grid
+      - *row* - number of hexagons in each row of the grid
+      - *fill* - color used for area of each hexagon in the grid
       - *hex_layout* is set to ``diamond`` to create the layout pattern
 ===== ======
 
