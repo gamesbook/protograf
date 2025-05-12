@@ -34,11 +34,11 @@ Title       *A Wall Clock*
 Source Code `clock.py <https://github.com/gamesbook/protograf/blob/master/examples/various/clock.py>`_
 ----------- ------------------------------------------------------------------
 Discussion  This example shows how to create a complex element - a clock - by
-            combining multiple ref:`customised Circles <circleIndex>`, each
+            combining :ref:`multiple Circles <circleIndex>`, each
             with different properties.
 
             Only the first circle |dash| the clock's outline border and its
-            title |dash| has a ``fill`` color set but the rest do not:
+            title |dash| has a *fill* color set but the rest do not:
 
               .. code:: python
 
@@ -47,8 +47,8 @@ Discussion  This example shows how to create a complex element - a clock - by
                     stroke_width=6,
                     label="PROTO", label_size=6, label_my=1)
 
-            The other circles - which each have a `fill`` color of *None* so
-            as to be transparent - make use of the ``radiii`` property to draw
+            The other circles - which each have a *fill* color of ``None`` so
+            as to be transparent - make use of the *radii* property to draw
             some aspect of the clock, for example the hour marks:
 
               .. code:: python
@@ -61,12 +61,12 @@ Discussion  This example shows how to create a complex element - a clock - by
                    radii_length=0.3,
                    radii_offset=2.2)
 
-            Here the setting of various ``radii_`` properties allows the marks
+            Here the setting of various *radii_* properties allows the marks
             to be generated.
 
-            Of interest is the use of the ``steps()`` command
-            to create the list of angles needed to specify where the radii are
-            to be drawn.
+            Of interest is the use of the :ref:`steps() <steps-function>`
+            function to create the list of angles needed to specify where
+            the offset radii used for the hours are to be drawn.
 
 ----------- ------------------------------------------------------------------
 Screenshot  .. image:: images/various/clock.png
@@ -125,16 +125,18 @@ Discussion  This example shows how to construct a simple effect by combining
               .. code:: python
 
                for i in range(0, 200):
-                   Chord(shape=Circle(cx=2, cy=2, radius=2, fill=None),
-                         angle=Random(360), angle1=Random(360))
+                   Chord(shape=Circle(
+                           cx=2, cy=2, radius=2, fill=None),
+                         angle=Random(360),
+                         angle1=Random(360))
 
             Here the ``for`` loop runs for 200 times. Each time it does so,
-            the ``Random()`` command generates a random value between 1 and 360
-            i.e. corresponding to degrees around a circle, to assign to the
-            Chord's start and end points; then each Chord is drawn as usual.
+            the :ref:`Random() <random-command>`  command generates a random
+            value between 1 and 360 i.e. corresponding to degrees around a
+            circle, to assign to the Chord's start and end points; then each
+            Chord is drawn as usual.
 
-            See :ref:`Python loops <python-loop>` for more
-            details.
+            Also see :ref:`Python loops <python-loop>` for more details.
 ----------- ------------------------------------------------------------------
 Screenshot  .. image:: images/various/chords.png
                :width: 40%
@@ -159,25 +161,31 @@ Discussion  This example shows how to construct a simple effect by using
 
                 # information needed
                 radii = list(range(0, 360, 60))
-                colrs = [tomato, aqua, gold, lime, silver, white]
-                labels = ['Build', 'Trade', 'Income',
-                          'Plant', 'Expand', 'Harvest']
+                colrs = [
+                    "lightsteelblue", "cyan", "gold",
+                    "chartreuse", "tomato", "white", ]
+                labels = [
+                    'Build', 'Trade', 'Income',
+                    'Plant', 'Explore', 'Harvest']
 
                 # rondel colors
                 for colr, angle in zip(colrs, radii):
                     Sector(
                         common=circ,
-                        fill=colr, stroke="sienna", stroke_width=2,
-                        angle=420 - angle, angle_width=60)
+                        fill=colr,
+                        stroke="sienna", stroke_width=2,
+                        angle_start=angle - 30,
+                        angle_width=60)
                 # rondel text
                 Circle(
                     common=circ,
-                    stroke="sienna", stroke_width=3,
+                    stroke="#A0522D",
+                    stroke_width=3,
                     fill=None,
                     radii=radii,
                     radii_offset=0.75,
                     radii_length=1,
-                    radii_stroke=None,
+                    radii_stroke_width=0.01,
                     radii_labels=labels,
                     radii_labels_face="Times-Roman",
                     dot=0.2)
@@ -186,7 +194,7 @@ Discussion  This example shows how to construct a simple effect by using
             label |dash| which is centred on the radius line |dash| to
             be moved further outward.
 
-            See :ref:`Python loops <python-loop>` for more
+            Also see :ref:`Python loops <python-loop>` for more
             details.
 ----------- ------------------------------------------------------------------
 Screenshot  .. image:: images/various/rondel.png
@@ -203,14 +211,14 @@ Title       *World Clocks*
 ----------- ------------------------------------------------------------------
 Source Code `world_clocks.py <https://github.com/gamesbook/protograf/blob/master/examples/various/world_clocks.py>`_
 ----------- ------------------------------------------------------------------
-Discussion  This example shows how to reuse a complex element - a clock - by
-            means of a set of Python functions; see
+Discussion  This example shows how to reuse a complex element |dash| a clock
+            |dash| by means of a set of Python functions; see
             :ref:`Python functions <python-function>` for more
             details.
 
             This is a fairly complex script |dash| a mini program really |dash|
             which is likely only to be legible to a Python programmer! It's
-            probably beyond the scope of this library's intended use.
+            probably far beyond the scope of this library's intended use...
 
             The script essentially "wraps" the clock creation approach
             described above into a function which is accessed for each city,
@@ -233,5 +241,5 @@ Discussion  This example shows how to reuse a complex element - a clock - by
                is run.
 ----------- ------------------------------------------------------------------
 Screenshot  .. image:: images/various/world_clocks.png
-               :width: 70%
+               :width: 90%
 =========== ==================================================================

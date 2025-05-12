@@ -18,6 +18,7 @@ Table of Contents
 
 -  `Common Command`_
 -  `Font Command`_
+-  `Random Command`_
 -  `Today Command`_
 -  `BGG Command`_
 
@@ -131,6 +132,37 @@ Example 1. Common Fonts
       further details as to its properties.
 
 ===== ======
+
+
+.. _random-command:
+
+Random Command
+==============
+`↑ <table-of-contents-addcmd_>`_
+
+The ``Random()`` command allows the generation of numbers within a range.
+
+.. code:: python
+
+  Random()
+
+will randomly generate a decimal number in the range to 0 to 1,
+rounded to 2 decimal places.
+
+.. code:: python
+
+  Random(10)
+
+will randomly generate a decimal number in the range to 1 to 10,
+rounded to 2 decimal places.
+
+.. code:: python
+
+  Random(10, 20, 3)
+
+will randomly generate a number in the range to 20 to 30,
+rounded to 3 decimal places. The second number is added to the
+range of random numbers generated in the range to 1 to 10
 
 
 .. _the-today-command:

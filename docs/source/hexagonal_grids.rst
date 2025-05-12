@@ -923,7 +923,7 @@ Example 4.  Locations & Col/Row
 ===== ======
 
 
-.. linkline-command::
+.. _linkline-command:
 
 Grid LinkLine
 =============

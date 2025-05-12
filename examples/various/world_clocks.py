@@ -4,6 +4,7 @@ Example code showing use of functions to create customised shapes for protograf
 
 Written by: Derek Hohls
 Created on: 20 August 2024
+Updated on: 12 May 2025
 
 GMT Time :
     gmtime() =>
@@ -14,17 +15,18 @@ GMT Time :
 TODO:
     * replace fixed header with random quote from https://api.quotable.io/quotes/random
 """
-from protograf import *
+from protograf import Create, Circle, Text, Save, steps
 from datetime import datetime, timedelta
 from time import gmtime, mktime
 import argparse
 
+
 Create(filename="world_clocks.pdf",
-        paper="A5-l",
-        margin_top=0.5,
-        margin_left=1,
-        margin_bottom=1,
-        margin_right=0.5)
+       paper="A5-l",
+       margin_top=0.5,
+       margin_left=1,
+       margin_bottom=1,
+       margin_right=0.5)
 
 
 def the_clock(
@@ -38,9 +40,9 @@ def the_clock(
     """Draw and label a clock shape for a specific time and time zone (GMT offset)
     """
     def hour_to_angle(hour: int):
-        rot = (hour - 3) * 30
-        if hour <= 3:
-            return 270 + hour * 30
+        rot = (12 - hour) * 30 + 90
+        if hour < 4:
+            return abs(min(360 - rot, rot))
         return rot
 
     # get face and hand color (if "daytime")
@@ -58,22 +60,25 @@ def the_clock(
            label_size=7, label_my=1, label=label.upper())
     # minutes
     Circle(cx=x, cy=y, radius=2.3, radii=steps(0,360,6), stroke=face, fill=None,
-           radii_length=0.15, radii_offset=2.2, radii_stroke_width=0.5, radii_stroke="black")
+           radii_length=0.15, radii_offset=2.2,
+           radii_stroke_width=0.5, radii_stroke="black")
     # hours
     Circle(cx=x, cy=y, radius=2.3, radii=steps(0,360,30), stroke=face, fill=None,
-           radii_length=0.3, radii_offset=2.2, radii_stroke_width=1.5, radii_stroke="black")
+           radii_length=0.3, radii_offset=2.2,
+           radii_stroke_width=1.5, radii_stroke="black")
     # centre
     Circle(cx=x, cy=y, radius=.13, stroke=hand, fill=hand)
     # hour hand
-    hr_angle = hour_to_angle(hours) + minutes * 0.5
+    delta = minutes / 60. * 30.
+    if hours == 3:
+        hr_angle = 360 - delta
+    else:
+        hr_angle = hour_to_angle(hours) - delta
     Circle(cx=x, cy=y, radius=1.8, radii=[hr_angle], stroke=face, fill=None,
            radii_length=2, radii_offset=-.5, radii_stroke=hand, radii_stroke_width=4)
     # minute hand
-    if minutes >= 15:
-        min_angle = (minutes - 15) * 6
-    else:
-        min_angle = 270 + minutes * 6
-    # print(f"{hours=} {minutes=} // {hr_angle=} {min_angle=}")
+    angle_minutes = 15 - minutes if minutes <= 15 else 75 - minutes
+    min_angle = angle_minutes * 6.
     Circle(cx=x, cy=y, radius=1.8, radii=[min_angle], stroke=face, fill=None,
            radii_length=2.3, radii_offset=-.5, radii_stroke=hand, radii_stroke_width=3)
 
@@ -106,12 +111,12 @@ def main(
 
     """
     now = gmtime()
-    # Set page header
-    Text(x=14, y=0.5, font_size=24, align="centre",
-         text=f"{quote} \n                (GMT {now.tm_hour}:{now.tm_min:>02})")
     # Set time
     _hours = hours or now.tm_hour
     _minutes = minutes or now.tm_min
+    # Set page header
+    Text(x=14, y=0.5, font_size=24, align="centre",
+         text=f"{quote} \n                (GMT {_hours}:{_minutes:>02})")
     # Create a clock for each city
     the_clock(x=4, y=11, hours=_hours, minutes=_minutes, gmt=1, label="London")
     the_clock(x=14, y=11, hours=_hours, minutes=_minutes, gmt=2, label="Munich")
@@ -138,5 +143,11 @@ def main(
     '''
 
 if __name__ == "__main__":
-    #main(offset=0, hours=3, minutes=30)
+    # wcparser = argparse.ArgumentParser()
+    # wcparser.add_argument(
+    #     '-t', '--time', default=0,
+    #     help="Offset of your home location from GMT")
+    # wcargs = wcparser.parse_args()
+    # main(offset=wcargs.time)
+    # main(offset=0, hours=7, minutes=45)
     main()

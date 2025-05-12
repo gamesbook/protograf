@@ -4,7 +4,7 @@ PNG to GIF example for protograf; words credit to Rick Astley
 Written by: Derek Hohls
 Created on: 1 December 2024
 """
-from protograf import *
+from protograf import Blueprint, Create, Common, PageBreak, Rectangle, Text, Save
 
 Create(filename="rolling.pdf",
        paper="A8",

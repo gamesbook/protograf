@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
-Logo for protograf
-
+Logo for protograf (aka "eat your own dogfood")
+s
 Written by: Derek Hohls
 Created on: 5 January 2025
 
@@ -9,7 +9,7 @@ Notes:
     Not sure what font to use for your logo ... watch
     https://www.youtube.com/watch?v=j7SByXWWVzU
 """
-from protograf import *
+from protograf import Create, Font, Hexagon, Polygon, Text, Save
 
 Create(filename="logo.pdf",
        paper="A8-l",

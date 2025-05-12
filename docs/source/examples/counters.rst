@@ -36,26 +36,34 @@ Discussion  This example shows how to construct a set of counters.
 
             The "placeholder" for the counters is the ``CounterSheet``; here
             it defines how many are needed and what their basic size and
-            default color is, as well the grouping and spacing between them:
+            default color is, as well the grouping and spacing between the
+            groups:
 
               .. code:: python
 
                 CounterSheet(
-                    counters=18, width=2.6, height=2.6, fill="yellow",
-                    spacing_x=2.6, spacing_y=1.3,
-                    grouping_cols=3, grouping_rows=2)
+                    counters=18,
+                    width=2.6, height=2.6,
+                    fill="yellow",
+                    grouping_cols=3, grouping_rows=2,
+                    spacing_x=2.6, spacing_y=1.3
+                    )
 
             The layouts for the counters are constructed from a series of a
             basic shapes. Intermediate steps are stored via assigned names;
             this allows them to be reused in different places, for different
             counters that share common elements.
 
+            Remember that using lowercase names for the shape commands means
+            that they will **not** be drawn immediately, but only when the
+            card itself is drawn.
+
             Following is "walkthrough" on how some (*not* all) of the counters
             from this example are created.
 
             First, the shapes forming the conventional symbol for an
             infantry unit ('X' in a box) are assigned names and then combined
-            with a ``group`` command:
+            with a :ref:`group function <group-function>`:
 
               .. code:: python
 
@@ -87,11 +95,12 @@ Discussion  This example shows how to construct a set of counters.
               .. code:: python
 
                 russian = rectangle(
-                   x=0, y=0, width=2.6, height=2.6, stroke_width=1, fill=brown)
+                   x=0, y=0, width=2.6, height=2.6,
+                   stroke_width=1, fill=brown)
 
             And finally the complete counter itself is defined in a two step
-            process, also using the ``group`` command to combine different,
-            previously defined elements:
+            process, also using the :ref:`group function <group-function>`
+            to combine different, previously-defined elements:
 
                .. code:: python
 
@@ -110,10 +119,10 @@ Discussion  This example shows how to construct a set of counters.
             just added in with a graphics editor.
 
             Bear in mind that counters are drawn in order, starting from the
-            bottom-left, then moving across to the right to complete a row,
-            then moving up to the next row - so in this example, counters 1
-            to 6 are drawn along the bottow row |dash| in two groups of 3
-            each |dash|; 7 to 12 on the next row up, and so on.
+            top-left, then moving across to the right to complete a row,
+            then moving down to the next row - so in this example, counters 1
+            to 6 are drawn along the top row |dash| in two groups of 3
+            each |dash| followed by 7 to 12 on the next row down, and so on.
 
 ----------- ------------------------------------------------------------------
 Screenshot  .. image:: images/counters/counters_basic.png
