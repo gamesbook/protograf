@@ -2117,13 +2117,13 @@ def LinkLine(grid: list, locations: Union[list, str], **kwargs):
         try:
             iter(grid)
         except TypeError:
-            tools.feedback(
-                f"The grid '{grid}' is not valid - please check it!", True)
+            tools.feedback(f"The grid '{grid}' is not valid - please check it!", True)
         # breakpoint()
         for position in grid:
             if not isinstance(position, Locale):
                 tools.feedback(
-                    f"The grid '{grid}' is not valid - please check it!", True)
+                    f"The grid '{grid}' is not valid - please check it!", True
+                )
             if location[0] == position.label:
                 loc = Point(position.x, position.y)
                 break
