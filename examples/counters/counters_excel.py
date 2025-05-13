@@ -11,13 +11,20 @@ Notes:
 from protograf import *
 
 # create counters
-Create(filename='tannenberg_excel.pdf')
+Create(filename='tannenberg_excel.pdf', margin_left=1.5)
 
 # load data
-Data(filename="counters.xls", headers=['NATION','TYPE','SIZE','VALUE','ID','COPIES'])
+# 1st row has these headers: NATION, TYPE, SIZE, VALUE, ID, COPIES
+Data(filename="counters.xls")
 
 # no. of counters is based on rows in Excel file (and COPIES column)
-CounterSheet(width=2.6, height=2.6, fill="white", grid_marks=True, copy='COPIES')
+CounterSheet(
+    width=2.6, height=2.6,
+    fill="white",
+    grid_marks=True,
+    spacing_x=2.6, spacing_y=1.3,
+    grouping_cols=3, grouping_rows=2,
+    copy='COPIES')
 
 # markers
 # Source: http://cliparts.co/clipart/3214807
@@ -47,8 +54,12 @@ value = text(ratings, text=T('{{VALUE}}'))
 classify = Common(font_name="Helvetica", font_size=12, x=1.4, y=0.8)
 size = text(common=classify, text=T('{{SIZE}}'))
 
-ident = text(font_name="Helvetica", font_size=12, x=0.35, y=1.18, align='left',
-             rotation=90,   text=T('{{ID}}'))
+ident = text(
+    text=T('{{ID}}'),
+    font_name="Helvetica", font_size=12,
+    x=0.25, y=0.7,
+    width=0.8, height=1.4,
+    wrap=True, align='centre',rotation=90)
 
 # unit symbols - types
 inf = group(out, lu, ld)

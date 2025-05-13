@@ -673,21 +673,22 @@ for a matching condition.
 
 There are two properties required:
 
-- the first is the **condition** that must matched, enclosed in curly brackets
-  ``"{{...}}"``
-- the second is the **shape** that will be drawn if the condition is matched
+1. the first is the **condition** that must matched, enclosed in curly brackets
+   ``"{{...}}"``
+2. the second is the **shape** that will be drawn if the condition is matched
 
-The **match condition** contains three parts, all separated by spaces:
+The match **condition** contains three parts, all separated by spaces:
 
-- the *column* name being checked - this **is** case-sensitive
-- the test *condition* being used; e.g.:
+1. the *column* name being checked |dash| this **is** case-sensitive
+2. the test *comparison* being used; e.g.:
 
-  - ``==`` for equal to;
-  - ``!=`` for not equal to;
-  - ``>`` for greater than;
-  - ``<`` for less than;
-  - ``in`` to check if text is contained in other text
-- the *value* being checked - for example, a number or some text
+   - ``==`` for equal to;
+   - ``!=`` for not equal to;
+   - ``>`` for greater than;
+   - ``<`` for less than;
+   - ``in`` to check if text is contained in other text
+3. the *value* being checked - for example, a number or some text |dash| this
+   **is** also case-sensitive
 
 This example shows how to use the command, with reference to the ``Data``
 from `Data Example #5 Lists`_:
@@ -700,8 +701,8 @@ from `Data Example #5 Lists`_:
             common=back_race, fill_stroke="tomato")
         Card("all", S("{{ Race == 'Human' }}", back_hum))
 
-In this example, any/all cards for which the **Race** column is equal
-to |dash| the double equals (``==``) check  |dash| the value **Human**,
+In this example, for any/all cards for which the **Race** column is equal
+to |dash| the double equals (``==``) comparison |dash| the value **Human**,
 a red rectangle, named ``back_hum``, will be drawn on that card(s).
 
 A "nonsense" condition is usually ignored; for example:

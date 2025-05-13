@@ -11,13 +11,20 @@ Notes:
 from protograf import *
 
 # create counters
-Create(filename='tannenberg_csv.pdf')
+Create(filename='tannenberg_csv.pdf', margin_left=1.5)
 
 # load data
+# 1st row has these headers: NATION, TYPE, SIZE, VALUE, ID, COPIES
 Data(filename="counters.csv")
 
 # no. of counters is based on rows in CSV file (and COPIES column)
-CounterSheet(width=2.6, height=2.6, fill="white", grid_marks=True, copy='COPIES')
+CounterSheet(
+    width=2.6, height=2.6,
+    fill="white",
+    spacing_x=2.6, spacing_y=1.3,
+    grouping_cols=3, grouping_rows=2,
+    grid_marks=True,
+    copy='COPIES')
 
 # markers
 # Source: http://cliparts.co/clipart/3214807
@@ -42,13 +49,17 @@ circ1 = circle(cx=1.4, cy=1.4, radius=0.15, stroke="black", stroke_width=1, fill
 
 # text labels
 ratings = Common(font_name="Helvetica", font_size=18, x=1.4, y=2.4)
-value = text(ratings, text=T('{{VALUE}}'))
+value = text(text=T('{{VALUE}}'), common=ratings)
 
 classify = Common(font_name="Helvetica", font_size=12, x=1.4, y=0.8)
-size = text(common=classify, text=T('{{SIZE}}'))
+size = text(text=T('{{SIZE}}'), common=classify)
 
-ident = text(font_name="Helvetica", font_size=12, x=0.35, y=1.18, align='left',
-             rotation=90,   text=T('{{ID}}'))
+ident = text(text=T('{{ID}}'),
+             font_name="Helvetica", font_size=12,
+             x=0.25, y=0.7,
+             width=0.8, height=1.4,
+             wrap=True, align='centre',rotation=90)
+
 # basic shapes
 out = rectangle(x=0.8, y=1, width=1.2, height=0.8, stroke="black", stroke_width=1.5, fill=None)
 lu = line(x=0.8, y=1, x1=2, y1=1.8, stroke="black", stroke_width=1.5)

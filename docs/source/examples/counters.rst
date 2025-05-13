@@ -126,7 +126,7 @@ Discussion  This example shows how to construct a set of counters.
 
 ----------- ------------------------------------------------------------------
 Screenshot  .. image:: images/counters/counters_basic.png
-               :width: 80%
+               :width: 100%
 =========== ==================================================================
 
 
@@ -173,21 +173,26 @@ Discussion  This example shows how to construct a set of counters using data
 
               .. code:: python
 
-                value = text(
-                  font_name="Helvetica",
-                  font_size=18, x=1.3, y=0.5,
-                  text=T('{{VALUE}}'))
+                ident = text(
+                    text=T('{{ID}}'),
+                    font_name="Helvetica", font_size=12,
+                    x=0.25, y=0.7,
+                    width=0.8, height=1.4,
+                    wrap=True, align='centre',
 
-            Here the text that will be used depends on the **VALUE** which
-            is accessed by the ``T()`` (for template) command which, in
-            the first row of data, shown in the file snippet above, will be
-            ``55R/1``.  So when this is referenced in the script:
+
+            Here the text that will be used depends on data in the **ID**
+            column. This can be accessed by the ``T({{ID}})`` (template
+            command). So, in the first row of data, shown in the file snippet
+            above, contains an **ID** value of ``55R/1``.
+
+            When this is referenced by a Counter in the script:
 
               .. code:: python
 
                 Counter("all", value, size, ident)
 
-            ``value`` will use the text in the  **VALUE** column and assign it
+            ``ident`` will use the text in the  **ID** column and assign it
             to the counter being drawn.  You can see the values from the
             snippet of CSV shown above on the left side of the counters
             outlined in blue in the screenshot.
@@ -203,13 +208,15 @@ Discussion  This example shows how to construct a set of counters using data
                   marker_german))
 
             Here, the ``marker_german`` element (which happens to link to an
-            image) will *only* be drawn if the row in the CSV file meets two
-            conditions:
+            image) will *only* be drawn if the row in the CSV file meets both
+            of **two** conditions, using the
+            :ref:`S() command <the-selection-command>`:
 
-            1. it has a **TYPE** value equal to *MARKER* ``and``
+            1. it has a **TYPE** value equal to *MARKER*, ``and``
             2. it has a  **NATION** value equal to *ger*
 
-            Note that both examples ensure that the *case* is being matched.
+            Note that both examples ensure that the *case* (upper or lower)
+            is being matched correctly.
 
             An example of this is last two rows from the snippet of CSV shown
             above.  The resulting counters are outlined in yellow in the
@@ -217,7 +224,7 @@ Discussion  This example shows how to construct a set of counters using data
 
 ----------- ------------------------------------------------------------------
 Screenshot  .. image:: images/counters/counters_csv.png
-               :width: 80%
+               :width: 100%
 =========== ==================================================================
 
 
@@ -246,8 +253,6 @@ Discussion  This example shows how to construct a set of counters using data
                 common/standard military unit icons; see, for example,
                 the *JZNATO v11* font available from:
                 https://github.com/jzedwards/jzfonts
-                (but bear in mind you will need to convert this to a TrueType
-                font before installation).
 
 ----------- ------------------------------------------------------------------
 Screenshot  .. image:: images/counters/counters_excel.png
@@ -273,6 +278,8 @@ Discussion  This example shows how to construct a set of labels, designed to
 
                 SIDE,TITLE,MOVE,STRENGTH,DOTS,SHIELD,BORDER,IMAGE
                 English,DURHAM,2,B2,4,red,#57762C,
+                ...
+                English,NORSE, ,A2,3,1,#416E83,viking.png
 
             Of interest, is that second-last column in each row defines a
             hexadecimal color (see :ref:`colors <basic-color>`) which can
@@ -290,6 +297,17 @@ Discussion  This example shows how to construct a set of labels, designed to
             color value from the **BORDER** column to be used for the ``stroke``
             property of the Rectangle.
 
+            These counters can also contain images, for example:
+
+              .. code:: python
+
+                pic = image(
+                    T('images/{{IMAGE}}'),
+                    x=0.7, y=0.95, width=1.5, height=1.1)
+
+            This references the last column, called **IMAGE** of the CSV.
+            If the column is empty, then no image is drawn.
+
             Another item of interest is the use of the ``Sequence`` command
             to create the small squares that run along the edge of each
             counter/label:
@@ -306,11 +324,11 @@ Discussion  This example shows how to construct a set of labels, designed to
                      gap_x=0.29)
 
             Because its known that a counter/label always has a set of
-            sequences that proceed, with decreasing length, in clockwise order
-            its possible to use ``group()`` commands to create possible
+            sequences that proceed, with decreasing length, in clockwise order,
+            its possible to use ``group()`` commands to create all possible
             combinations of such sets of sequences.
 
 ----------- ------------------------------------------------------------------
 Screenshot  .. image:: images/counters/blocks_csv.png
-               :width: 80%
+               :width: 100%
 =========== ==================================================================
