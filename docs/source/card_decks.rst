@@ -20,19 +20,19 @@ Table of Contents
 - `Basic Concepts`_
 - `The Deck Command`_
 
-  - `Deck Example #1 Defaults`_
-  - `Deck Example #2 Copies`_
+  - `Deck Example 1. Defaults`_
+  - `Deck Example 2. Copy & Mask`_
 - `The Card Command`_
 - `The Data Command`_
 
   - `Data Sources`_
   - `Data Properties`_
-  - `Data Example #1 CSV`_
-  - `Data Example #2 Excel`_
-  - `Data Example #3 Matrix`_
-  - `Data Example #4 Images`_
-  - `Data Example #5 Lists`_
-  - `Data Example #6 BoardGameGeek API`_
+  - `Data Example 1. CSV`_
+  - `Data Example 2. Excel`_
+  - `Data Example 3. Matrix`_
+  - `Data Example 4. Images`_
+  - `Data Example 5. Lists`_
+  - `Data Example 6. BoardGameGeek API`_
 - `The Matrix Command`_
 - `Countersheet and Counter Commands`_
 - `Supporting Commands`_
@@ -55,15 +55,16 @@ Scientists have used index cards since the 17th century and, of course,
 libraries have long-used card catalogues as a way to track information
 about books. Businesses in the 20th century used Rolodexes and business
 cards as means to track and exchange information about individuals. Early
-computers used a form of index cards called "punch" cards to store their
+computers used perforated cards called "punch" cards to store their
 data. In gaming, playing cards have been popular both in China and
 Europe, coming into more widespread use somewhere in the 9th and 14th
 centuries respectively.
 
-The massive rise in popularity of a game like *Magic the Gathering*, from
-the 1990s onwards, has inspired the much greater use of cards in all aspects of
-the modern board gaming experience, with cards or tiles taking the predominant
-role in many of them.
+The massive rise in popularity of a game like
+`Magic the Gathering <https://en.wikipedia.org/wiki/Magic:_The_Gathering>`_,
+from the early 1990s onwards, has inspired the much greater use of cards in
+all aspects of the modern board gaming experience, with cards or tiles
+taking the predominant role in many of them.
 
 
 Basic Concepts
@@ -91,7 +92,7 @@ There are two core commands needed; the ``Card()`` and the ``Deck()``:
     on `Countersheet and Counter Commands`_
 
 In many cases, the ``Data()`` command will be needed in order to provide
-settings for the properties of the elements appearing on a card, from another
+settings for the properties of the elements appearing on a card from another
 source; for example, an Excel or CSV file.  This will typically be text that
 needs to appear, but could also include colors and links to images.
 
@@ -101,8 +102,8 @@ on a card.
 
 These commands, and the ones supporting them, are described in detail below.
 
-For additional examples that illustrate some of these, see the
-:doc:`card and deck examples <examples/cards>` section.
+For additional examples that illustrate the use of some of these commands,
+see the :doc:`card and deck examples <examples/cards>` section.
 
 .. _the-deck-command:
 
@@ -119,8 +120,8 @@ The following are key properties that will usually need to be set for a
 ``Deck``:
 
 - **cards** - this is the number of cards appearing in the deck. It defaults
-  to ``9``. Note that other commands such as ``Data()`` and ``Matrix()`` will
-  alter this value
+  to ``9``. (Note that other commands such as ``Data()`` and ``Matrix()`` will
+  alter this value.)
 - **height** - this is the card height; it defaults to ``8.8`` cm
 - **width** - this is the card width. It defaults to ``6.3`` cm
 
@@ -130,28 +131,30 @@ The following are key properties that will usually need to be set for a
   properties, in `The Deck Command <deck_command.html>`_ section.
 
 
-Deck Example #1: Defaults
--------------------------
+Deck Example 1. Defaults
+------------------------
+`↑ <table-of-contents-crddk_>`_
 
 This example shows the definition of a simple deck for cards that are a
 commonly-used size (with the default units of centimetres in place).
 The card size means that there will be 9 rectangular cards on each
-of two A4 pages (in default portrait mode):
+of two A4, portait-mode, pages:
 
     .. code:: python
 
       Deck(cards=18)
 
-Note that height (``8.8`` cm) and width (``6.3`` cm) are the default values
-for rectangular cards.
+Note that these rectangular cards have a default height (``8.8`` cm) and
+width (``6.3`` cm).
 
 
-Deck Example #2: Copies
------------------------
+Deck Example 2. Copy & Mask
+---------------------------
+`↑ <table-of-contents-crddk_>`_
 
 This example shows the definition of a deck of 27 cards that are a
 default size and type (rectangular). This  means that there will be
-9 cards on each A4 page (in default portrait mode):
+9 cards on each A4 page:
 
     .. code:: python
 
@@ -190,7 +193,7 @@ If you need multiple *mask* conditions, these can be combined using an
         mask="{{(Race == 'Hobbit' and Age < 39) or (Race == 'Human' and Age < 80)}}")
 
 The dataset that could be used with the above Deck is shown in
-`Data Example #5 Lists`_.
+`Data Example 5. Lists`_.
 
 The full code - including the data - for this example is available as
 `cards_lotr.py <https://github.com/gamesbook/protograf/blob/master/examples/cards/cards_lotr.py>`_
@@ -218,7 +221,7 @@ as a *string*, or a *list* (numbers between square brackets ``[`` and ``]``).
 .. NOTE::
 
    A Card's sequence number depends on how the data for the Deck is sourced;
-   usually it will correspond to the order that it is read from the Excel or
+   usually it will correspond to the order that it is read from an Excel or
    CSV file.
 
 Examples of Card sequence numbers supplied as *strings*:
@@ -236,17 +239,17 @@ Examples of Card sequence numbers supplied as a *list*:
 - ``[10,11,12,13,15]`` - a set of numbers; in this case the cards numbered
   10 through to 15, but not number 14
 
-The **second value**, and all further values, supplied to the ``Card()``
+The **second value**, and **all further values**, supplied to the ``Card()``
 command must be a :doc:`core shape <core_shapes>` or a
 :ref:`group <group-function>`.
 
-There can be any number of ``Card()`` commands; and the same Card could be
-targeted by multiple ``Card()`` commands, each affecting some aspect of its
+There can be any number of ``Card()`` commands; and the same output card could
+be targeted by multiple ``Card()`` commands, each affecting some aspect of its
 appearance; as elsewhere in **protograf** the order of commands matter in
-the sense that later commands will overwrite any elements created by earlier
+the sense that later commands may overwrite any elements created by earlier
 ones.
 
-Card Creation Example #1
+Card Creation Example 1.
 ------------------------
 
 This example shows how different shapes can be assigned to cards:
@@ -255,14 +258,15 @@ This example shows how different shapes can be assigned to cards:
 
         Deck(cards=9)
 
-        line1 = line(
-            x=0.8, y=7.1, x1=5.6, y1=8.4,
-            stroke="red")
-        rect1 = rectangle(
-            x=0.7, y=7.0, width=5, height=1.5)
         text1 = text(
             text='proto',
             x=3.1, y=4.4, font_size=18)
+        rect1 = rectangle(
+            x=0.7, y=7.0, width=5, height=1.5)
+        line1 = line(
+            x=0.8, y=7.1, x1=5.6, y1=8.4,
+            stroke="red")
+
         line_in_rect = group(rect1, line1)
 
         Card('*', text1)
@@ -273,10 +277,11 @@ Here:
 
 - *all* (the ``*``) cards get assigned the same text (in the card centre)
 - cards 1, 2 and 3 are assigned a rectangle
-- cards 7, 8 and 9 are assigned a group (assigned to ``line_in_rect``); this
-  group contains a rectangle with a red, diagonal line - the line is
-  superimposed on the rectangle because it appears after it in the group list
-  (see below for how the `group <group-function_>`_ function works.)
+- cards 7, 8 and 9 are assigned a *group* (named ``line_in_rect``); this
+  group consists of a rectangle (``rect1``) overdrawn by a red, diagonal line
+  (``line1``). The line is superimposed on the rectangle because it appears
+  after it in the group list (see below for how the
+  `group <group-function_>`_ function works.)
 
 .. _the-data-command:
 
@@ -284,9 +289,12 @@ The Data Command
 ================
 `↑ <table-of-contents-crddk_>`_
 
-This command allows for a dataset to be used as the source for values or
-properties making up a Card. Because values now have "names" they can be
-accessed and used in the `Supporting Commands`_ - this is usually the primary
+This command allows for a dataset |dash| for example, a CSV file or an Excel
+spreadsheet |dash| to be used as the source for values or properties of
+commands making the cards.
+
+Because values now have "names" they can be
+referenced and used by the `Supporting Commands`_ - this is usually the primary
 reason to supply a data source in this way.
 
 .. NOTE::
@@ -353,7 +361,7 @@ different types of data sources:
    If you are a Python programmer, there is a final way to provide data.
 
    Internally, all of these data sources are converted to a list of
-   *dictionarie*, whose keys all match and correspond to the column names,
+   *dictionaries*, whose keys all match and correspond to the column names,
    so if you have this available, through any means, it can be supplied
    directly to ``Data`` via a **source** property.  The onus is on *you*
    to ensure that the dictionary is correctly formatted.
@@ -373,7 +381,7 @@ The other property that can be used for the ``Data`` command is:
 
 .. _deck-data-csv:
 
-Data Example #1 CSV
+Data Example 1. CSV
 -------------------
 `↑ <table-of-contents-crddk_>`_
 
@@ -385,7 +393,7 @@ This example shows how data is sourced from a CSV file:
 
 .. _deck-data-excel:
 
-Data Example #2 Excel
+Data Example 2. Excel
 ---------------------
 `↑ <table-of-contents-crddk_>`_
 
@@ -397,7 +405,7 @@ This example shows how data is sourced from an Excel file:
 
 .. _deck-data-matrix:
 
-Data Example #3 Matrix
+Data Example 3. Matrix
 ----------------------
 `↑ <table-of-contents-crddk_>`_
 
@@ -423,7 +431,7 @@ For more detail on these properties see `The Matrix Command`_.
 
 .. _deck-data-images:
 
-Data Example #4 Images
+Data Example 4. Images
 ----------------------
 `↑ <table-of-contents-crddk_>`_
 
@@ -434,9 +442,12 @@ This example shows how data is sourced from an image directory:
        Data(
            images="pictures", images_filter=".png,.jpg")
 
+Here the script will look for all images with a ``png`` or ``jpg`` extension,
+located in the ``pictures`` subdirectory.
+
 .. _deck-data-lists:
 
-Data Example #5 Lists
+Data Example 5. Lists
 ---------------------
 `↑ <table-of-contents-crddk_>`_
 
@@ -475,15 +486,15 @@ This list above is equivalent to a CSV file containing:
         9,Gandalf,,Maia,1
         10,RingWraith,4300,Nazgul,9
 
-It can be seen that using ``None`` is the same as the missing item for
-Gandalf's age.
+It can be seen that using ``None`` in the "list of lists" is equivalent
+to missing item in the CSV file (for Gandalf's age).
 
 See below under the `T(emplate) command`_ and also under the
 `S(election) command`_ for examples how this data could be used.
 
 .. _deck-data-bgg:
 
-Data Example #6 BoardGameGeek API
+Data Example 6. BoardGameGeek API
 ---------------------------------
 `↑ <table-of-contents-crddk_>`_
 
@@ -495,9 +506,9 @@ This example shows how data is loaded for boardgame details obtained from the
     boardgames = BGG(ids=[1, 2, 3], progress=True)
     Data(data_list=boardgames.data_list)
 
-Assuming access to the BoardGameGeek API works and returns the game data
-required |dash| in this case games with ID's ``1``, ``2``, and ``3`` |dash|
-which in turn, in this case, are assigned to the name ``boardgames``.
+If access to the BoardGameGeek API works, then it returns the game data
+|dash| in this case games with ID's ``1``, ``2``, and ``3`` |dash|
+and these data are assigned to the name ``boardgames``.
 
 The ``data_list`` required for Data can be obtained from the stored set of
 games  |dash| in this case ``boardgames`` |dash| by appending the term
@@ -524,9 +535,8 @@ The ``Matrix`` command uses these properties to create data:
 
 - **data** - these are all relevant data that needs to appear on the cards;
   specified as a "list of lists"; where each nested list contains all data of
-  a given type of value
-- **labels** - there should be one label for each nested list i.e. per each
-  type of value
+  a specific type of value
+- **labels** - a list with one label for each of the other nested lists
 
 This command will generate a dataset for the cards, based on all combinations
 of values in a "list of lists"; so for this Matrix' set of *data*:
@@ -544,7 +554,7 @@ of values in a "list of lists"; so for this Matrix' set of *data*:
 There are 8 possible *data* combinations:  A-1-x, A-1-y, A-2-x, A-2-y,
 B-1-x,  B-1-y, B-2-x, and B-2-y and therefore eight cards in the deck.
 
-See the `Data Example #3 Matrix`_ above for a full Matrix.
+See the `Data Example 3. Matrix`_ above for a full Matrix.
 
 .. _the-countersheet-command:
 
@@ -590,10 +600,11 @@ group function
 The ``group()`` function provides a "shortcut" way to reference a set of
 shapes that all need to be drawn together.
 
-Add the shapes to a set |dash| comma-separated names wrapped in curved
-brackets (``(..., ...)``) - and assign the set to a name.
+Add the shapes to a set i.e. comma-separated names wrapped in curved
+brackets |dash| ``(..., ...)`` |dash| and assign the set to a name.
 
-The shapes are drawn in the order listed.
+The shapes are drawn in the order listed in the set (**not** the order
+in which they appear in the script!).
 
 For example:
 
@@ -605,11 +616,12 @@ For example:
 
 When this group named *stack* is assigned to a card and then drawn,
 the Rectangle will be drawn first, followed by the Line, following the
-order in which the appear in the group's listing.
+order in which these appear in the group's set.
 
-This command is somewhat similar to the
+This approach is somewhat similar to the
 :ref:`Common command <the-common-command>`, which provides a way to
-group commonly used *properties*.
+group commonly used *properties*, except that for that command, the
+order of items does not matter.
 
 .. _the-template-command:
 
@@ -617,21 +629,24 @@ T(emplate) command
 ------------------
 `↑ <table-of-contents-crddk_>`_
 
-The ``T()`` command causes the name of a column to be replaced by its equivalent
-value for that card.
+The ``T()`` command causes the name of a :ref:`Data() <the-data-command>`
+column to be replaced by its equivalent value for that card.
 
 To use this command, simply enclose the name of the data column in curly
 brackets - ``"{{...}}"``. Remember that this name **is** case-sensitive.
 
 This example shows how to use the command, with reference to the ``Data``
-from `Data Example #5 Lists`_.  The text appearing at the top of all cards
-is derived from the **Name** column:
+from `Data Example 5. Lists`_.
+
+The text, which will appear at the bottom of all of the cards,
+is derived from the *Name* column:
 
 .. code:: python
 
     Card("all", text(text=T("{{ Name }}"), x=3.3, y=7.5, font_size=18))
 
-Data from the column can also be mixed in with other text or values:
+Data from the column can also be mixed in with other text or values,
+for example:
 
 .. code:: python
 
@@ -640,13 +655,15 @@ Data from the column can also be mixed in with other text or values:
            <p style="text-align:center; font-family:Helvetica">
            <i>Long-lived</i> <b>({{ Age or '\u221E' }})</b>
            </p>"""),
-        x=1.4, y=0.7, width=3.5,
+        x=1.4, y=0.7,
+        height=1, width=3.5,
         html=True, fill=None)
 
-Here the Text assigned to the name *power* uses the full text capability
-provided via ``html=True`` to style the text - italic and bold - and also
-uses the **or** option inside the ``T()`` command ``{{ }}`` to provide an
-alternate value |dash| in this case the infinity sign |dash| to use when
+Here the *text* incoporating the value of the *Age* column uses the
+capabilities supported via ``html=True`` to style the text - italic and bold.
+
+The **or** option is used inside of the ``T()`` command ``{{ }}`` to provide
+an alternate value |dash| in this case the infinity sign |dash| for use when
 there is no *Age* value (for example, for the "Gandalf" row).
 
 The full code for this example is available as
@@ -668,7 +685,7 @@ S(election) command
 -------------------
 `↑ <table-of-contents-crddk_>`_
 
-The ``S()``  command causes a shape to be added to a card, or set of cards,
+The ``S()`` command causes a shape to be added to a card, or set of cards,
 for a matching condition.
 
 There are two properties required:
@@ -680,7 +697,7 @@ There are two properties required:
 The match **condition** contains three parts, all separated by spaces:
 
 1. the *column* name being checked |dash| this **is** case-sensitive
-2. the test *comparison* being used; e.g.:
+2. the test *comparison* being used, e.g.:
 
    - ``==`` for equal to;
    - ``!=`` for not equal to;
@@ -691,7 +708,7 @@ The match **condition** contains three parts, all separated by spaces:
    **is** also case-sensitive
 
 This example shows how to use the command, with reference to the ``Data``
-from `Data Example #5 Lists`_:
+from `Data Example 5. Lists`_:
 
     .. code:: python
 
@@ -754,8 +771,8 @@ when working with the second (*"plug"*) card:
 
 The program takes the value from the *plug*'s **USES** column; then finds
 a Card whose **NAME** column contains a matching value |dash| in this case,
-the first card; and then returns the value from that card's **IMAGE** column
-|dash| in this case, the value **wire.png**.
+the card with **ID** of ``1``; and then returns the value from that card's
+**IMAGE** column |dash| in this case, the value **wire.png**.
 
 .. _other-card-resources:
 
