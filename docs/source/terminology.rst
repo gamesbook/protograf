@@ -73,7 +73,7 @@ web i.e. in RGB (red-green-blue) *hexadecimal* format, for example,
 "brown".
 
 Colors can also be chosen from a pre-defined list of names, for example
-``#A0522D`` is pre-defined in **protograf** in as the color *sienna*.
+``#A0522D`` is pre-defined in **protograf** as the color *sienna*.
 
 A PDF file
 `colorset.pdf <https://github.com/gamesbook/protograf/blob/master/examples/colorset.pdf>`_
@@ -91,7 +91,7 @@ In general, color can be set for the lines (**stroke**) and areas
 
 -  **dot_fill** - the color in which a circle is to be drawn at the
    centre of a shape
--  **fill** - the color in which an area is filled
+-  **fill** - the color with which an area is filled
 -  **outline** - sets the line color, and at the same time sets the fill
    to be ``None``
 -  **stroke** - the color in which a line or text is drawn; there are
@@ -158,8 +158,8 @@ otherwise noted. The default is usually ``1``.  The default **unit** is
 Some sizes are set in **points** |dash| there are 72 points in an inch
 |dash| so as to align with existing conventions, or simply because these
 items are typically very tiny. As far as possible, the term **size** is
-reserved for these settings; for example, **font_size**, **leading** and
-**dot**. An exception is **stroke_width** which is also in points, again
+reserved for these settings; for example, **font_size** and **dot**.
+An exception is **stroke_width** which is also in points, again
 because of convention.
 
 A few sizes are given descriptive names; this makes them a little easier
@@ -167,8 +167,7 @@ to set.
 
 -  **caltrops** - a descriptive term for the relative dimensions of a
    "caltrop" - the small three-pointed shape drawn at the vertex of a
-   hexagon - which can be set one of: *small*, *medium* or *large*
--  **diameter** - the diameter of a ``Circle``
+   hexagon
 -  **dot** - the diameter of a small ``Dot`` in **points**
 -  **cross** - the height and width of the intersecting lines drawn at
    the centre of a shape
@@ -178,19 +177,20 @@ to set.
 -  **interval** - the distance between the centres of a series of shapes;
    typically in a repeated pattern of some type
 -  **margin** - used in ``Create`` command to set all margins for a
-   page; the default for any margin is 1.25cm / 12.5mm (1/2 of an inch)
--  **margin_top** - used in ``Create`` command to set top margin for a
+   page; the default for any margin is 1.25cm or 12.5mm (half an inch)
+-  **margin_top** - used in ``Create`` command to set a top margin for a
    page |dash| this overrides the **margin** property, if any
--  **margin_bottom** - used in ``Create`` command to set bottom margin
+-  **margin_bottom** - used in ``Create`` command to set a bottom margin
    for a page  |dash| this overrides the **margin** property, if any
--  **margin_left** - used in ``Create`` command to set left margin for a
+-  **margin_left** - used in ``Create`` command to set a left margin for a
    page |dash| this overrides the **margin** property, if any
--  **margin_right** - used in ``Create`` command to set right margin for
+-  **margin_right** - used in ``Create`` command to set a right margin for
    a page |dash| this overrides the **margin** property, if any
 -  **paper** - used in ``Create`` command to set the paper format in the
    document; either ISO series |dash| A0 down to A8; or B6 down to B0 |dash|
    or a USA type; the default is A4.
-   **NOTE:** the value for paper is **not** wrapped in any quotes!
+   **NOTE:** to switch to landscape orientation, append an ``l`` to the name;
+   so ``"A5-1"`` set the page to use A5 landscape paper
 -  **radius** - the radius of a ``Circle``
 -  **scaling** - the amount by which an SVG image should be shrunk or
    expanded e.g. 0.5 makes it half-size and 2.0 doubles its size; but
@@ -232,9 +232,9 @@ Other, more descriptive directions are also used.
 The *angle* is the amount of rotation, in degrees, starting from a value
 of zero (0) which is assumed to be the line parallel to the bottom of
 the page as you would normally look at it. Ninety (90) degrees is the
-angle of a line to the side of the page, and so on.
+angle of a line parallel to the side of the page, and so on.
 
-The maximum allowed rotation is 360 degrees i.e. a sweep around a full
+The maximum allowed rotation is 360 degrees i.e. a full sweep around a
 circle.
 
 A *compass direction* is one of the following:
@@ -302,10 +302,11 @@ Styling-orientated Terms
 -  **transform** - will change text in a ``Text`` command to *uppercase*,
    *lowercase*, or *capitalise* it
 -  **transparency** - a percentage value from 1 to 100 that determines how
-   "see through" a shape, or line, or area is; where `1` means it is nearly
+   "see through" a shape, or line, or area is; where ``1`` means it is nearly
    not transparent and `100` means it is completely transparent. It is also
-   possible to use a fractional number e.g. `0.5` equares to 50%. Some
-   programs use the term *opacity*; but that is the inverse of transparency.
+   possible to use a fractional number e.g. ``0.5`` equates to 50%. Some
+   programs use the term *opacity*; but note that that is the inverse of
+   transparency.
 
 
 Display-orientated Terms
@@ -322,8 +323,8 @@ Display-orientated Terms
    ``Polygon`` to be shown
 -  **perbis** - if given one or more numbers will cause the perpendicular
    bisectors |dash| lines from centre to the middle of the edges |dash| of
-   a ``Polygon`` to be shown; edges are numbered from the east-facing one
-   in an anti-clockwise direction
+   a ``Polygon`` or ``Hexagon`` to be shown; edges are numbered from the
+   east-facing one in an anti-clockwise direction
 -  **shown** - a list of locations, indicated by their *row and
    column* identifier which are the only ones that **must** be used for
    display - the rest are ignored
@@ -339,7 +340,8 @@ Miscellaneous Terms
 -  **debug** - a value can be set for this that will cause underlying
    values or locations or positions to be displayed e.g. using ``debug="n"``
    for a layout will show small dots where each point in that layout exists
--  **frame** - used to demarcate the boundary of a ``Card``;
+-  **frame** - used to demarcate the boundary of a ``Card``; one of
+   *rectangle*, *hexagon*, or *circle*
 -  **perimeter** - used to demarcate the boundary of a ``StarField``;
    one of *circle*, *rectangle* or *polygon*
 -  **peaks** - a series of **sets**, each containing a primary compass

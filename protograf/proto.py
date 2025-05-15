@@ -434,7 +434,7 @@ class DeckShape(BaseShape):
                 y=0,
                 fill_stroke=self.bleed_fill,
             )
-            # print(f'*** {page_across=}, {page_down=}')
+            # print(f'*** {self.bleed_fill=} {page_across=}, {page_down=}')
             rect.draw()
         # ---- bleed areas (custom)
         # for area in self.bleed_areas:
@@ -470,12 +470,8 @@ class DeckShape(BaseShape):
             self.margin_right if self.margin_right is not None else self.margin
         )
         margin_top = self.margin_top if self.margin_top is not None else self.margin
-        page_across = (
-            self.points_to_value(globals.page_width) - margin_right - margin_left
-        )
-        page_down = (
-            self.points_to_value(globals.page_height) - margin_top - margin_bottom
-        )
+        page_across = globals.page_width - margin_right - margin_left  # user units
+        page_down = globals.page_height - margin_top - margin_bottom  # user units
         _height, _width, _radius = self.width, self.width, self.radius
         _spacing_x = self.unit(self.spacing_x)
         _spacing_y = self.unit(self.spacing_y)

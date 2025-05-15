@@ -56,6 +56,8 @@ Secondary Properties
 
 The following are other properties that can also be set for a ``Deck``:
 
+- **bleed_fill** - set a background color for the page (up to the margins);
+  if no separate **fill** property is set, then this color will be used instead
 - **cols** - the maximum number of card columns that should appear on a
   page
 - **copy** - the name of a column in the dataset defined by
@@ -64,28 +66,27 @@ The following are other properties that can also be set for a ``Deck``:
 - **fill** - sets the color of the card's area; defaults to ``white``
 - **frame** - the default card frame is a *rectangle* (or square, if the
   height and width match); but can be set to *hexagon* or *circle*
-- **grid_marks** - if set to ``True``, will cause small marks (``1`` cm in
-  length) to be drawn at the border of the page that align with the edges of
-  the card frames
-- **grid_length** - if set to ``True``, will cause small marks to be drawn at
-  the border of the page that align with the edges of the cards
-- **grouping** - set the number of cards to be drawn adjacent to each other
+- **grid_marks** - if set to ``True``, will cause small marks to be drawn at
+  the border of the page that align with the edges of the card frames
+- **grid_length** - the length of the grid mark; defaults to ``0.85`` cm
+  (about one-third of an inch)
+- **grouping** - sets the number of cards to be drawn adjacent to each other
   before a blank space is added by the **spacing** property |dash| use
   **grouping_col** and/or **grouping_row** to set spacing specifically for the
-  horizontal (columns) or vertical (rows) direction respectively; note that
+  horizontal (columns) or vertical (rows) direction respectively. Note that
   **grouping** does not apply to  *hexagon* **frame** cards.
-- **mask** - an expression which should evaluate to ``True`` or ``False``;
-  this expression uses the same kind of syntax as the
+- **mask** - an expression which should evaluate to ``True`` or ``False``.
+  This expression has the same kind of syntax as the
   :ref:`T(emplate) command <the-template-command>`
   and it uses data available from the Deck's
-  :ref:`Data Command <the-data-command>`); if ``True``
+  :ref:`Data Command <the-data-command>`). If the expression result is ``True``
   then any matching cards will be masked i.e. ignored and not drawn
 - **radius** - the radius for a frame of type *hexagon* or *circle*;
-  it defaults to 2.54 cm (1")
+  it defaults to 2.54 cm (one inch)
 - **rounding** - sets the size of rounding on each corner of a rectangular
   frame card
 - **rows** - the maximum number of card rows that should appear on a page
-- **spacing** - create blank space between each card or group |dash| use
+- **spacing** - create blank space between each card or grouping |dash| use
   **spacing_x** and/or **spacing_y** to set spacing specifically for the
   horizontal or vertical direction respectively.
 - **stroke** - sets the color of the card's border; defaults to ``black``
@@ -297,9 +298,11 @@ Example 5. Grid Marks
             bleed_fill="silver",
             offset=0.25,
             grid_marks=True,
-            grid_length=0.18)
+            grid_length=0.18,
+            grid_stroke="black",
+            grid_stroke_width=1)
 
-      In this example, there are two changes from previous ones.
+      In this example, there are two main changes from previous ones.
 
       There is now a consistent bleed color across both page background and
       within in the cards themselves; if no separate *fill* property is used,
@@ -309,7 +312,12 @@ Example 5. Grid Marks
       The edge of the page has small marks that are designed to help with
       card cutting; ``grid_marks=True`` enables these marks, and the optional
       *grid_length* allows the length of these lines to be set; the default
-      length is ``1`` cm.
+      length is ``0.85`` cm.
+
+      In this example, the ``grid_stroke`` has been changed from the default
+      color of ``"gray"`` to ``"black"`` and the ``grid_stroke_width`` has
+      been increased to ``1`` point.  (Normally, the stroke width should be
+      thin to better aid with cutting.)
 
 ===== ======
 
