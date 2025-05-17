@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" />
+    <title>Core Shapes &mdash; protograf 0.1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="pygments.css" />
+      <link rel="stylesheet" type="text/css" href="theme.css" />
+      <link rel="stylesheet" type="text/css" href="custom.css" />
+</head>
+<body>
+
+<h4>Example 2.<a class="headerlink" href="#id8" title="Link to this heading"></a></h4>
+<table class="docutils align-default" style="width: 100%">
+<colgroup>
+<col style="width: 40.0%" />
+<col style="width: 60.0%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="images/customised/line_custom.png"><img alt="ln1" src="images/customised/line_custom.png" style="width: 330px;" /></a></p></td>
+<td><p>This example shows Lines constructed using commands with the
+following properties:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">Line</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">x1</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">y1</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">stroke</span><span class="o">=</span><span class="n">blue</span><span class="p">,</span> <span class="n">stroke_width</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+   <span class="n">dashed</span><span class="o">=</span><span class="p">[</span><span class="mf">0.2</span><span class="p">,</span> <span class="mf">0.2</span><span class="p">,</span> <span class="mf">0.2</span><span class="p">,</span> <span class="mf">0.2</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">],</span>
+   <span class="n">label</span><span class="o">=</span><span class="s2">&quot;dashed&quot;</span><span class="p">,</span> <span class="n">font_size</span><span class="o">=</span><span class="mi">6</span><span class="p">)</span>
+
+<span class="n">Line</span><span class="p">(</span>
+  <span class="n">x</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">length</span><span class="o">=</span><span class="mf">4.1</span><span class="p">,</span> <span class="n">angle</span><span class="o">=</span><span class="mi">15</span><span class="p">,</span> <span class="n">stroke</span><span class="o">=</span><span class="n">red</span><span class="p">,</span>
+  <span class="n">label</span><span class="o">=</span><span class="s2">&quot;15&quot;</span><span class="p">,</span> <span class="n">font_size</span><span class="o">=</span><span class="mi">6</span><span class="p">)</span>
+
+<span class="n">Line</span><span class="p">(</span>
+  <span class="n">x</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">length</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">stroke</span><span class="o">=</span><span class="n">lime</span><span class="p">,</span> <span class="n">stroke_width</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+
+<span class="c1"># black lines</span>
+<span class="n">Line</span><span class="p">(</span>
+  <span class="n">x</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">stroke_width</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span> <span class="n">dotted</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+  <span class="n">label</span><span class="o">=</span><span class="s2">&quot;0.2&quot;</span><span class="p">,</span> <span class="n">font_size</span><span class="o">=</span><span class="mi">6</span><span class="p">)</span>
+<span class="n">Line</span><span class="p">(</span>
+  <span class="n">x</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">stroke_width</span><span class="o">=</span><span class="mf">0.4</span><span class="p">,</span> <span class="n">dotted</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+  <span class="n">label</span><span class="o">=</span><span class="s2">&quot;0.4&quot;</span><span class="p">,</span> <span class="n">font_size</span><span class="o">=</span><span class="mi">6</span><span class="p">)</span>
+<span class="n">Line</span><span class="p">(</span>
+  <span class="n">x</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">stroke_width</span><span class="o">=</span><span class="mf">0.8</span><span class="p">,</span> <span class="n">dotted</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+  <span class="n">label</span><span class="o">=</span><span class="s2">&quot;0.8&quot;</span><span class="p">,</span> <span class="n">font_size</span><span class="o">=</span><span class="mi">6</span><span class="p">)</span>
+<span class="n">Line</span><span class="p">(</span>
+  <span class="n">x</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">stroke_width</span><span class="o">=</span><span class="mf">1.6</span><span class="p">,</span> <span class="n">dotted</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+  <span class="n">label</span><span class="o">=</span><span class="s2">&quot;1.6&quot;</span><span class="p">,</span> <span class="n">font_size</span><span class="o">=</span><span class="mi">6</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The medium blue line has a style set so that it is not a normal solid
+line:</p>
+<ul class="simple">
+<li><p><em>dashed</em> - a list, shown by the square brackets from <cite>[</cite> to <cite>]</cite>,
+which provides a number of “on”/”off” pairs; the line is drawn for a
+distance matching an “on” value followed by a gap matching an “off”
+value; when the end of the list is reached it starts again until the
+full length of the line is drawn</p></li>
+</ul>
+<p>The thin red line has:</p>
+<ul class="simple">
+<li><p><em>x</em> and <em>y</em> set as a starting point</p></li>
+<li><p><em>x1</em> and <em>y1</em> set as an ending point</p></li>
+<li><p><em>angle</em> - of 15° (from the baseline, anti-clockwise) to guide
+the direction in which the line is drawn; if not given (as in the case
+of the thick green line) this will be 0°</p></li>
+</ul>
+<p>and the line length is calculated based on these points.</p>
+<p>The thick green line and the thin red line both have:</p>
+<ul class="simple">
+<li><p><em>x</em> and <em>y</em> set as their starting point</p></li>
+<li><p><em>length</em> to set the specific size of the line</p></li>
+</ul>
+<p>The various black lines have these properties:</p>
+<ul class="simple">
+<li><p><em>x</em> and <em>y</em> set as their starting point</p></li>
+<li><p>a default length of <code class="docutils literal notranslate"><span class="pre">1</span></code> cm</p></li>
+<li><p><em>stroke_width</em> - set as value in points (and labelled accordingly)</p></li>
+<li><p><em>dotted</em> - has a value of <code class="docutils literal notranslate"><span class="pre">True</span></code>, which then generates a series of
+small lines (the “dots”), followed by gaps, of sizes equal to the
+line’s <em>stroke_width</em></p></li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+
+</body>

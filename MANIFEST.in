@@ -1,0 +1,8 @@
+include CHANGES.txt
+include CONTRIBUTORS.txt
+include LICENSE
+include pyproject.yaml
+include logo.png
+include poetry.lock
+include README.md
+include gpl-3.0.md

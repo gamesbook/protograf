@@ -1,0 +1,56 @@
+=========
+protograf
+=========
+
+Changes
+=======
+
+2025-05-17 (0.1.7)
+------------------
+- Drop use of ReportLab and switch to PyMuPDF
+- Adjust shapes and commands according underlying capabilities
+- Update examples and documents
+
+2025-03-05 (0.1.6)
+------------------
+- Enable card grouping
+- Add radii labels
+- Extract cards as images
+
+2025-02-14 (0.1.5)
+------------------
+- Update installation docs (Windows notes)
+- Patch default font installation for Windows filenames
+- Reverse CHANGES entries order
+- Catch error if missing file embedded in Text's text
+- Enable suppression of PNG output
+- Enable Repeat command for use on Cards
+
+2025-02-08 (0.1.3)
+------------------
+- Patch license (properly, this time!)
+
+2025-02-08 (0.1.2)
+------------------
+- Patch license
+
+2025-02-08 (0.1.1)
+------------------
+- Added GitHub workflows
+- Reset git history for a "clean" start
+- Release on pypi
+
+2025-01-11 (0.1.0a3)
+--------------------
+- Initial feature set complete
+- Documentation linked to Read The Docs
+
+2024-02-04 (0.1.0a2)
+--------------------
+- Upgrade to Python 3.13
+- Patch code for changes related to Python and library upgrades
+- Switch to using bgg-api library
+
+2016-02-05 (0.1.0a1)
+--------------------
+- First draft!

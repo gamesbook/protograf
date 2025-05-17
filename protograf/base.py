@@ -1,0 +1,2871 @@
+# -*- coding: utf-8 -*-
+"""
+Base shape class for protograf
+
+Notes:
+    * https://www.a2-size.com/american-paper-sizes/
+    * https://en.wikipedia.org/wiki/Paper_size#Overview_of_ISO_paper_sizes
+"""
+# lib
+from collections import namedtuple
+import copy
+from enum import Enum
+import inspect
+import json
+import io
+import logging
+import math
+import os
+from pathlib import Path, PosixPath
+from urllib.parse import urlparse
+
+# third party
+import cairosvg
+import jinja2
+from jinja2.environment import Template
+import requests
+from PIL import Image, UnidentifiedImageError
+import pymupdf
+from pymupdf import Shape as muShape, Point as muPoint, Page as muPage, Matrix
+from pymupdf.utils import getColor, getColorList
+
+# from pymupdf import Base14_fontnames as BUILTIN_FONTS as BUILT_IN_FONTS
+
+# local
+from protograf.utils import geoms, tools, support
+from protograf.utils.fonts import builtin_font, FontInterface
+from protograf.utils.support import LookupType, unit
+from protograf.utils.support import BUILT_IN_FONTS, CACHE_DIRECTORY
+from protograf import globals
+
+log = logging.getLogger(__name__)
+
+DEBUG = False
+DEBUG_COLOR = "#B0C4DE"
+DEFAULT_FONT = "Helvetica"
+BGG_IMAGES = "cf.geekdo-images.com"
+COLOR_NAMES = getColorList()
+
+# ---- named tuples
+UnitProperties = namedtuple(
+    "UnitProperties",
+    [
+        "page_width",
+        "page_height",
+        "margin_left",
+        "margin_right",
+        "margin_bottom",
+        "margin_top",
+        "x",
+        "y",
+        "cx",
+        "cy",
+        "height",
+        "width",
+        "top",
+        "radius",
+        "diameter",
+        "side",
+        "length",
+        "spacing_x",
+        "spacing_y",
+        "offset_x",
+        "offset_y",
+    ],
+)
+OffsetProperties = namedtuple(
+    "OffsetProperties",
+    [
+        "off_x",
+        "off_y",
+        "delta_x",
+        "delta_y",
+    ],
+)
+GridShape = namedtuple(
+    "GridShape",
+    [
+        "label",
+        "x",
+        "y",
+        "shape",
+    ],
+)
+Bounds = namedtuple(
+    "Bounds",
+    [
+        "left",
+        "right",
+        "bottom",
+        "top",
+    ],
+)
+
+
+# ---- colors (SVG named; 18xx Games)
+COLORS = {
+    "aliceblue": "#f0f8ff",
+    "antiquewhite": "#faebd7",
+    "aqua": "#00ffff",
+    "aquamarine": "#7fffd4",
+    "azure": "#f0ffff",
+    "beige": "#f5f5dc",
+    "bisque": "#ffe4c4",
+    "black": "#000000",
+    "blanchedalmond": "#ffebcd",
+    "blue": "#0000ff",
+    "blueviolet": "#8a2be2",
+    "brown": "#a52a2a",
+    "burlywood": "#deb887",
+    "cadetblue": "#5f9ea0",
+    "chartreuse": "#7fff00",
+    "chocolate": "#d2691e",
+    "coral": "#ff7f50",
+    "cornflowerblue": "#6495ed",
+    "cornsilk": "#fff8dc",
+    "crimson": "#dc143c",
+    "cyan": "#00ffff",
+    "darkblue": "#00008b",
+    "darkcyan": "#008b8b",
+    "darkgoldenrod": "#b8860b",
+    "darkgray": "#a9a9a9",
+    "darkgreen": "#006400",
+    "darkgrey": "#a9a9a9",
+    "darkkhaki": "#bdb76b",
+    "darkmagenta": "#8b008b",
+    "darkolivegreen": "#556b2f",
+    "darkorange": "#ff8c00",
+    "darkorchid": "#9932cc",
+    "darkred": "#8b0000",
+    "darksalmon": "#e9967a",
+    "darkseagreen": "#8fbc8f",
+    "darkslateblue": "#483d8b",
+    "darkslategray": "#2f4f4f",
+    "darkslategrey": "#2f4f4f",
+    "darkturquoise": "#00ced1",
+    "darkviolet": "#9400d3",
+    "deeppink": "#ff1493",
+    "deepskyblue": "#00bfff",
+    "dimgray": "#696969",
+    "dimgrey": "#696969",
+    "dodgerblue": "#1e90ff",
+    "firebrick": "#b22222",
+    "floralwhite": "#fffaf0",
+    "forestgreen": "#228b22",
+    "fuchsia": "#ff00ff",
+    "gainsboro": "#dcdcdc",
+    "ghostwhite": "#f8f8ff",
+    "gold": "#ffd700",
+    "goldenrod": "#daa520",
+    "gray": "#808080",
+    "green": "#008000",
+    "greenyellow": "#adff2f",
+    "grey": "#808080",
+    "honeydew": "#f0fff0",
+    "hotpink": "#ff69b4",
+    "indianred": "#cd5c5c",
+    "indigo": "#4b0082",
+    "ivory": "#fffff0",
+    "khaki": "#f0e68c",
+    "lavender": "#e6e6fa",
+    "lavenderblush": "#fff0f5",
+    "lawngreen": "#7cfc00",
+    "lemonchiffon": "#fffacd",
+    "lightblue": "#add8e6",
+    "lightcoral": "#f08080",
+    "lightcyan": "#e0ffff",
+    "lightgoldenrodyellow": "#fafad2",
+    "lightgray": "#d3d3d3",
+    "lightgreen": "#90ee90",
+    "lightgrey": "#d3d3d3",
+    "lightpink": "#ffb6c1",
+    "lightsalmon": "#ffa07a",
+    "lightseagreen": "#20b2aa",
+    "lightskyblue": "#87cefa",
+    "lightslategray": "#778899",
+    "lightslategrey": "#778899",
+    "lightsteelblue": "#b0c4de",
+    "lightyellow": "#ffffe0",
+    "lime": "#00ff00",
+    "limegreen": "#32cd32",
+    "linen": "#faf0e6",
+    "magenta": "#ff00ff",
+    "maroon": "#800000",
+    "mediumaquamarine": "#66cdaa",
+    "mediumblue": "#0000cd",
+    "mediumorchid": "#ba55d3",
+    "mediumpurple": "#9370db",
+    "mediumseagreen": "#3cb371",
+    "mediumslateblue": "#7b68ee",
+    "mediumspringgreen": "#00fa9a",
+    "mediumturquoise": "#48d1cc",
+    "mediumvioletred": "#c71585",
+    "midnightblue": "#191970",
+    "mintcream": "#f5fffa",
+    "mistyrose": "#ffe4e1",
+    "moccasin": "#ffe4b5",
+    "navajowhite": "#ffdead",
+    "navy": "#000080",
+    "oldlace": "#fdf5e6",
+    "olive": "#808000",
+    "olivedrab": "#6b8e23",
+    "orange": "#ffa500",
+    "orangered": "#ff4500",
+    "orchid": "#da70d6",
+    "palegoldenrod": "#eee8aa",
+    "palegreen": "#98fb98",
+    "paleturquoise": "#afeeee",
+    "palevioletred": "#db7093",
+    "papayawhip": "#ffefd5",
+    "peachpuff": "#ffdab9",
+    "peru": "#cd853f",
+    "pink": "#ffc0cb",
+    "plum": "#dda0dd",
+    "powderblue": "#b0e0e6",
+    "purple": "#800080",
+    "red": "#ff0000",
+    "rosybrown": "#bc8f8f",
+    "royalblue": "#4169e1",
+    "saddlebrown": "#8b4513",
+    "salmon": "#fa8072",
+    "sandybrown": "#f4a460",
+    "seagreen": "#2e8b57",
+    "seashell": "#fff5ee",
+    "sienna": "#a0522d",
+    "silver": "#c0c0c0",
+    "skyblue": "#87ceeb",
+    "slateblue": "#6a5acd",
+    "slategray": "#708090",
+    "slategrey": "#708090",
+    "snow": "#fffafa",
+    "springgreen": "#00ff7f",
+    "steelblue": "#4682b4",
+    "tan": "#d2b48c",
+    "teal": "#008080",
+    "thistle": "#d8bfd8",
+    "tomato": "#ff6347",
+    "turquoise": "#40e0d0",
+    "violet": "#ee82ee",
+    "wheat": "#f5deb3",
+    "white": "#ffffff",
+    "whitesmoke": "#f5f5f5",
+    "yellow": "#ffff00",
+    "yellowgreen": "#9acd32",
+    # 18xx colors from https://github.com/XeryusTC/map18xx/blob/master/src/tile.rs
+    "18xx_ground": "#fdd9b5",  # sandy tan
+    "18xx_yellow": "#fdee00",  # aureolin
+    "18xx_green": "#00a550",  # pigment green
+    "18xx_russet": "#cd7f32",  # bronze
+    "18xx_grey": "#acacac",  # silver chalice
+    "18xx_brown": "#7b3f00",  # chocolate
+    "18xx_red": "#dc143c",  # crimson
+    "18xx_blue": "#007fff",  # azure
+    "18xx_barrier": "#660000",  # blood red
+    "18xx_white": "#ffffff",  # white
+}
+
+WIDTH = 0.1
+CLOCK_ANGLES = [60, 90, 120, 150, 180, 210, 240, 270, 300, 330, 0, 30]
+
+
+def get_color(name: str = None, is_rgb: bool = True) -> tuple:
+    """Get a color tuple; by name from a pre-defined dictionary or as a RGB tuple."""
+    if name is None:
+        return None  # it IS valid to say that NO color has been set
+    if isinstance(name, tuple) and len(name) == 3:  # RGB color tuple
+        if (
+            (name[0] >= 0 and name[0] <= 255)
+            and (name[1] >= 0 and name[0] <= 255)
+            and (name[2] >= 0 and name[0] <= 255)
+        ):
+            return name
+        else:
+            tools.feedback(f'The color tuple "{name}" is invalid!')
+    elif isinstance(name, str) and len(name) == 7 and name[0] == "#":  # hexadecimal
+        _rgb = tuple(int(name[i : i + 2], 16) for i in (1, 3, 5))
+        rgb = tuple(i / 255 for i in _rgb)
+        return rgb
+    else:
+        pass  # unknown format
+    if name.upper() not in COLOR_NAMES:
+        tools.feedback(f'The color name "{name}" is not pre-defined!', True)
+    try:
+        color = getColor(name)
+        return color
+    except (AttributeError, ValueError):
+        tools.feedback(f'The color name "{name}" cannot be converted to RGB!', True)
+
+
+def get_opacity(transparency: float = 0) -> float:
+    """Convert from '100% is fully transparent' to '0 is not opaque'."""
+    if transparency is None:
+        return 1.0
+    try:
+        return float(1.0 - transparency / 100.0)
+    except (ValueError, TypeError):
+        tools.feedback(
+            f'The transparency of "{transparency}" is not valid (use 0 to 100)', True
+        )
+
+
+class BaseCanvas:
+    """Wrapper/extension for a PyMuPDF Page."""
+
+    def __init__(
+        self,
+        document: pymupdf.Document,
+        paper: str = None,  # e.g. "A4", "Letter"
+        defaults: dict = None,
+        **kwargs,
+    ):
+        """Create self.doc_page as Page-equivalent."""
+        self.jsonfile = kwargs.get("defaults", None)
+        self.document = document
+        self.doc_page = None
+        self.defaults = {}
+        # ---- setup defaults
+        if self.jsonfile:
+            try:
+                with open(self.jsonfile) as data_file:
+                    self.defaults = json.load(data_file)
+            except (IOError, ValueError):
+                filepath = tools.script_path()
+                _jsonfile = os.path.join(filepath, self.jsonfile)
+                try:
+                    with open(_jsonfile) as data_file:
+                        self.defaults = json.load(data_file)
+                except (IOError, ValueError):
+                    tools.feedback(
+                        f'Unable to find or load the file "{self.jsonfile}"'
+                        f' - also checked in "{filepath}".',
+                        True,
+                    )
+        # ---- override file defaults with BaseCanvas kwargs
+        if kwargs:
+            _kwargs = kwargs["kwargs"]
+            for kwarg in _kwargs:
+                self.defaults[kwarg] = _kwargs[kwarg]
+            # print(f"### {self.defaults=}")
+        # ---- constants
+        self.default_length = 1
+        self.show_id = False
+        # ---- general
+        self.shape = None
+        self.shape_id = None
+        self.sequence = self.defaults.get("sequence", [])
+        self.dataset = []
+        self.members = []  # card IDs, of which current card is a member
+        self.bbox = None
+        self._objects = None
+        self.kwargs = kwargs
+        self.run_debug = False
+        _units = self.defaults.get("units", unit.cm)
+        self.units = support.to_units(_units)
+        # print(f"### {self.units=} \n {self.defaults=}")
+        # ---- paper
+        _paper = paper or self.defaults.get("paper", "A4")
+        if isinstance(_paper, tuple) and len(_paper) == 2:
+            self.paper = _paper
+        else:
+            try:
+                self.paper = pymupdf.paper_size(_paper)  # (width, height) in points
+                if self.paper == (-1, -1):  # pymupdf fallback ...
+                    raise ValueError
+            except Exception:
+                tools.feedback(f"Unable to use {_paper} as paper size!", True)
+        # ---- paper size in units & margins
+        self.page_width = self.paper[0] / self.units  # user-units e.g. cm
+        self.page_height = self.paper[1] / self.units  # user-units e.g. cm
+        # print(f"### {self.page_height=} {self.page_width=}")
+        self.margin = self.defaults.get("margin", 1)
+        self.margin_top = self.defaults.get("margin_top", self.margin)
+        self.margin_bottom = self.defaults.get("margin_bottom", self.margin)
+        self.margin_left = self.defaults.get("margin_left", self.margin)
+        self.margin_right = self.defaults.get("margin_right", self.margin)
+        # ---- sizes and positions
+        self.row = self.defaults.get("row", None)
+        self.col = self.defaults.get("col", self.defaults.get("column", None))
+        self.side = self.defaults.get("side", 1)  # equal length sides
+        self.height = self.defaults.get("height", self.side)
+        self.width = self.defaults.get("width", self.side)
+        self.top = self.defaults.get("width", self.width * 0.5)
+        self.depth = self.defaults.get("depth", self.side)  # diamond
+        self.x = self.defaults.get("x", self.defaults.get("left", 1))
+        self.y = self.defaults.get("y", self.defaults.get("bottom", 1))
+        self.cx = self.defaults.get("cx", None)  # NB! not 0; needed for internal check
+        self.cy = self.defaults.get("cy", None)  # NB! not 0; needed for internal check
+        self.scaling = self.defaults.get("scaling", None)
+        self.dot_point = self.defaults.get("dot_point", 3.0)  # points
+        # ---- to be calculated ...
+        self.area = None
+        self.vertexes = []
+        # ---- repeats
+        self.pattern = self.defaults.get("pattern", None)
+        self.repeat = self.defaults.get("repeat", True)
+        self.interval = self.defaults.get("interval", 0)
+        self.interval_x = self.defaults.get("interval_x", self.interval)
+        self.interval_y = self.defaults.get("interval_y", self.interval)
+        # ---- rotation / position /elevation
+        self.rotation = self.defaults.get("rotation", 0)  # degrees
+        self.rotation_point = self.defaults.get("rotation_point", "centre")
+        self.direction = self.defaults.get("direction", "north")
+        self.position = self.defaults.get("position", None)
+        self.flip = self.defaults.get("flip", "north")  # north/south
+        self.elevation = self.defaults.get("elevation", "horizontal")
+        self.facing = self.defaults.get("facing", "out")  # out/in
+        # ---- fill color
+        fill = self.defaults.get("fill", self.defaults.get("fill_color")) or "white"
+        self.fill = get_color(fill)
+        self.fill_stroke = self.defaults.get("fill_stroke", None)
+        self.stroke_fill = self.defaults.get("stroke_fill", None)  # alias
+        # ---- stroke
+        stroke = (
+            self.defaults.get("stroke", self.defaults.get("stroke_color")) or "black"
+        )
+        self.stroke = get_color(stroke)
+        self.stroke_width = self.defaults.get("stroke_width", WIDTH)
+        self.outline = self.defaults.get("outline", None)
+        # ---- overwrite fill & stroke
+        if self.stroke_fill:  # alias
+            self.stroke = self.stroke_fill
+            self.fill = self.stroke_fill
+        if self.fill_stroke:
+            self.stroke = self.fill_stroke
+            self.fill = self.fill_stroke
+        # ---- debug color & transparency
+        debug_color = self.defaults.get("debug_color", DEBUG_COLOR)
+        self.debug_color = get_color(debug_color)
+        self.transparency = self.defaults.get("transparency", 1)  # NOT transparent
+        # if self.outline:
+        #     self.stroke = self.outline
+        #     self.fill = None
+        # ---- font
+        self.font_name = self.defaults.get("font_name", DEFAULT_FONT)
+        self.font_size = self.defaults.get("font_size", 12)
+        self.font_style = self.defaults.get("font_style", None)
+        self.font_directory = self.defaults.get("font_directory", None)
+        self.style = self.defaults.get("style", None)
+        self.wrap = self.defaults.get("wrap", False)
+        self.align = self.defaults.get("align", "centre")  # centre,left,right,justify
+        self._alignment = pymupdf.TEXT_ALIGN_LEFT  # see to_alignment()
+        # ---- grid cut marks
+        self.grid_marks = self.defaults.get("grid_marks", 0)
+        grid_stroke = self.defaults.get("grid_stroke", "gray")
+        self.grid_stroke = get_color(grid_stroke)
+        self.grid_stroke_width = self.defaults.get(
+            "grid_stroke_width", self.stroke_width
+        )
+        self.grid_length = self.defaults.get("grid_length", 0.85)  # 1/3 inch
+        self.grid_offset = self.defaults.get("grid_offset", 0)
+        # ---- line style
+        self.line_stroke = self.defaults.get("line_stroke", WIDTH)
+        self.line_width = self.defaults.get("line_width", self.stroke_width)
+        self.line_cap = self.defaults.get("line_cap", None)
+        self.dotted = self.defaults.get("dotted", self.defaults.get("dotted", False))
+        self.dashed = self.defaults.get("dashed", None)
+        # ---- text: base
+        self.text = self.defaults.get("text", "")
+        self.text_size = self.defaults.get("text_size", self.font_size)
+        text_stroke = self.defaults.get("text_stroke", self.stroke)
+        self.text_stroke = get_color(text_stroke)
+        self.text_stroke_width = self.defaults.get(
+            "text_stroke_width", self.stroke_width
+        )
+        # ---- text: label
+        self.label = self.defaults.get("label", "")
+        self.label_size = self.defaults.get("label_size", self.font_size)
+        self.label_face = self.defaults.get("label_face", self.font_name)
+        label_stroke = self.defaults.get("label_stroke", self.stroke)
+        self.label_stroke = get_color(label_stroke)
+        self.label_stroke_width = self.defaults.get(
+            "label_stroke_width", self.stroke_width
+        )
+        self.label_mx = self.defaults.get("label_mx", 0)
+        self.label_my = self.defaults.get("label_my", 0)
+        self.label_rotation = self.defaults.get("label_rotation", 0)
+        # ---- text: title
+        self.title = self.defaults.get("title", "")
+        self.title_size = self.defaults.get("title_size", self.font_size)
+        self.title_face = self.defaults.get("title_face", self.font_name)
+        title_stroke = self.defaults.get("title_stroke", self.stroke)
+        self.title_stroke = get_color(title_stroke)
+        self.title_stroke_width = self.defaults.get(
+            "title_stroke_width", self.stroke_width
+        )
+        self.title_mx = self.defaults.get("title_mx", 0)
+        self.title_my = self.defaults.get("title_my", 0)
+        self.title_rotation = self.defaults.get("title_rotation", 0)
+        # ---- text: heading
+        self.heading = self.defaults.get("heading", "")
+        self.heading_size = self.defaults.get("heading_size", self.font_size)
+        self.heading_face = self.defaults.get("heading_face", self.font_name)
+        heading_stroke = self.defaults.get("heading_stroke", self.stroke)
+        self.heading_stroke = get_color(heading_stroke)
+        self.heading_stroke_width = self.defaults.get(
+            "heading_stroke_width", self.stroke_width
+        )
+        self.heading_mx = self.defaults.get("heading_mx", 0)
+        self.heading_my = self.defaults.get("heading_my", 0)
+        self.heading_rotation = self.defaults.get("heading_rotation", 0)
+        # ---- text block
+        self.outline_stroke = self.defaults.get("outline_stroke", self.fill)
+        self.outline_width = self.defaults.get("outline_width", 0)
+        self.leading = self.defaults.get("leading", self.font_size)
+        self.transform = self.defaults.get("transform", None)
+        self.html = self.defaults.get("html", False)
+        self.css = self.defaults.get("css", None)
+        # ---- image / file
+        self.source = self.defaults.get("source", None)  # file or http://
+        self.cache_directory = None  # should be a pathlib.Path object
+        self.sliced = ""
+        self.image_location = None
+        # ---- line / ellipse / bezier / sector
+        self.length = self.defaults.get("length", self.default_length)
+        self.angle = self.defaults.get("angle", 0)
+        self.angle_width = self.defaults.get("angle_width", 90)
+        self.angle_start = self.defaults.get("angle_start", 0)
+        # ---- chord
+        self.angle_1 = self.defaults.get("angle1", 0)
+        # ---- arc / sector
+        self.filled = self.defaults.get("filled", False)
+        # ---- arrow shape: head and tail
+        self.points_offset = self.defaults.get("points_offset", 0)
+        self.head_height = self.defaults.get("head_height", self.height)
+        self.head_width = self.defaults.get("head_width", 2 * self.width)
+        self.tail_width = self.defaults.get("tail_width", 0)  # adjusted in ArrowShape
+        self.tail_notch = self.defaults.get("tail_notch", 0)
+        # TODO arrow-on-a-line
+        self.arrow_style = self.defaults.get("arrow_style", "triangle")
+        self.arrow_tail_style = self.defaults.get("arrow_tail_style", None)
+        self.arrow_head_fraction = self.defaults.get("arrow_head_fraction", 0.1)
+        self.arrow_tail_fraction = self.defaults.get("arrow_tail_fraction", 0.1)
+        self.arrow_head_height = self.defaults.get("arrow_head_height", None)
+        self.arrow_tail_height = self.defaults.get("tail_height", None)
+        self.arrow_head_width = self.defaults.get("head_width", None)
+        self.arrow_tail_width = self.defaults.get("tail_width", None)
+        self.arrow_tail_fill = self.defaults.get("tail_fill", self.fill)
+        self.arrow_head_fill = self.defaults.get("head_fill", self.fill)
+        self.arrow_head_stroke = self.defaults.get("head_stroke", self.stroke)
+        self.arrow_tail_stroke = self.defaults.get("tail_stroke", self.stroke)
+        self.arrow_head_stroke_width = self.defaults.get(
+            "arrow_head_stroke_width", self.stroke_width
+        )
+        self.arrow_tail_stroke_width = self.defaults.get(
+            "arrow_tail_stroke_width", self.stroke_width
+        )
+        # ---- line / bezier
+        self.x_1 = self.defaults.get("x1", 0)
+        self.y_1 = self.defaults.get("y1", 0)
+        # ---- bezier
+        self.x_2 = self.defaults.get("x2", 1)
+        self.y_2 = self.defaults.get("y2", 1)
+        self.x_3 = self.defaults.get("x3", 1)
+        self.y_3 = self.defaults.get("y3", 1)
+        # ---- rectangle / card
+        self.rounding = self.defaults.get("rounding", 0)
+        self.rounded = self.defaults.get("rounded", False)
+        self.notch = self.defaults.get("notch", 0)
+        self.notch_corners = self.defaults.get("notch_corners", "sw nw ne se")
+        self.notch_x = self.defaults.get("notch_x", 0)
+        self.notch_y = self.defaults.get("notch_y", 0)
+        self.notch_style = self.defaults.get("notch_style", "snip")
+        self.chevron = self.defaults.get("chevron", "")
+        self.chevron_height = kwargs.get("chevron_height", 0)
+        self.peaks = kwargs.get("peaks", [])
+        self.peaks_dict = {}
+        self.borders = kwargs.get("borders", [])
+        self.rounded_radius = self.defaults.get(
+            "rounded_radius", 0.05
+        )  # fraction of smallest side
+        # ---- stadium
+        self.edges = self.defaults.get("edges", "E W")
+        # ---- grid / card layout
+        self.grid = None  # some Shapes can auto-generate a GridShape
+        self.rows = self.defaults.get("rows", 0)
+        self.cols = self.defaults.get("cols", self.defaults.get("columns", 0))
+        self.frame = self.defaults.get("frame", "rectangle")
+        self.offset = self.defaults.get("offset", 0)  # from margin
+        self.offset_x = self.defaults.get("offset_x", self.offset)
+        self.offset_y = self.defaults.get("offset_y", self.offset)
+        self.spacing = self.defaults.get("spacing", 0)  # between cards
+        self.spacing_x = self.defaults.get("spacing_x", self.spacing)
+        self.spacing_y = self.defaults.get("spacing_y", self.spacing)
+        self.grouping = self.defaults.get("grouping", 1)  # no. of cards in a set
+        self.grouping_rows = self.defaults.get("grouping_rows", self.grouping)
+        self.grouping_cols = self.defaults.get("grouping_cols", self.grouping)
+        self.lines = self.defaults.get("lines", "all")  # which direction to draw
+        # ---- circle / star / polygon
+        self.diameter = self.defaults.get("diameter", 1)
+        self.radius = self.defaults.get("radius", self.diameter / 2.0)
+        self.vertices = self.defaults.get("vertices", 5)
+        self.sides = self.defaults.get("sides", 6)
+        self.points = self.defaults.get("points", [])
+        self.x_c = self.defaults.get("xc", 0)
+        self.y_c = self.defaults.get("yc", 0)
+        # ---- radii (circle, hex & polygon)
+        self.radii = self.defaults.get("radii", [])
+        self.radii_stroke = self.defaults.get("radii_stroke", self.stroke)
+        self.radii_stroke_width = self.defaults.get(
+            "radii_stroke_width", self.stroke_width
+        )
+        self.radii_length = self.defaults.get(
+            "radii_length", None
+        )  # default: circle radius
+        self.radii_offset = self.defaults.get("radii_offset", 0)
+        self.radii_cap = self.defaults.get("radii_cap", None)
+        self.radii_dotted = self.defaults.get("radii_dotted", self.dotted)
+        self.radii_dashed = self.defaults.get("radii_dashed", self.dashed)
+        self.radii_labels = self.defaults.get("radii_labels", "")
+        self.radii_labels_size = self.defaults.get("radii_labels_size", self.font_size)
+        self.radii_labels_face = self.defaults.get("radii_labels_face", self.font_name)
+        radii_labels_stroke = self.defaults.get("radii_labels_stroke", self.stroke)
+        self.radii_labels_stroke = get_color(radii_labels_stroke)
+        self.radii_labels_stroke_width = self.defaults.get(
+            "radii_labels_stroke_width", self.stroke_width
+        )
+        self.radii_labels_rotation = self.defaults.get("radii_labels_rotation", 0)
+        self.radii_labels_my = self.defaults.get("radii_labels_my", 0)
+        self.radii_labels_mx = self.defaults.get("radii_labels_mx", 0)
+        # ---- circle
+        self.petals = self.defaults.get("petals", 0)
+        self.petals_style = self.defaults.get("petals_style", "triangle")
+        self.petals_height = self.defaults.get("petals_height", 1)
+        self.petals_offset = self.defaults.get("petals_offset", 0)
+        self.petals_stroke = self.defaults.get("petals_stroke", self.stroke)
+        self.petals_stroke_width = self.defaults.get(
+            "petals_stroke_width", self.stroke_width
+        )
+        self.petals_fill = self.defaults.get("petals_fill", None)
+        self.petals_dotted = self.defaults.get("petals_dotted", self.dotted)
+        self.petals_dashed = self.defaults.get("petals_dashed", self.dashed)
+        # ---- compass
+        self.perimeter = self.defaults.get("perimeter", "circle")
+        self.directions = self.defaults.get("directions", None)
+        # ---- triangle / trapezoid
+        self.flip = self.defaults.get("flip", "north")
+        # ---- triangle
+        self.hand = self.defaults.get("hand", "east")
+        # ---- hexagon / circle
+        self.centre_shape = self.defaults.get("centre_shape", "")
+        self.centre_shape_mx = self.defaults.get("centre_shape_mx", 0)
+        self.centre_shape_my = self.defaults.get("centre_shape_my", 0)
+        self.dot = self.defaults.get("dot", 0)
+        dot_stroke = self.defaults.get("dot_stroke", self.stroke)
+        self.dot_stroke = get_color(dot_stroke)
+        self.dot_stroke_width = self.defaults.get("dot_stroke_width", self.stroke_width)
+        self.dot_fill = self.defaults.get("dot_fill", self.dot_stroke)  # colors match
+        self.cross = self.defaults.get("cross", 0)
+        cross_stroke = self.defaults.get("cross_stroke", self.stroke)
+        self.cross_stroke = get_color(cross_stroke)
+        self.cross_stroke_width = self.defaults.get(
+            "cross_stroke_width", self.stroke_width
+        )
+        # ---- hexagon / polygon
+        self.orientation = self.defaults.get("orientation", "flat")  # flat|pointy
+        self.perbis = self.defaults.get("perbis", None)  # directions
+        self.perbis_stroke = self.defaults.get("perbis_stroke", "black")
+        self.perbis_stroke_width = self.defaults.get(
+            "perbis_stroke_width", self.stroke_width
+        )
+        self.perbis_length = self.defaults.get("perbis_length", None)
+        self.perbis_offset = self.defaults.get("perbis_offset", 0)
+        self.perbis_cap = self.defaults.get("perbis_cap", None)
+        self.perbis_dotted = self.defaults.get("perbis_dotted", self.dotted)
+        self.perbis_dashed = self.defaults.get("perbis_dashed", self.dashed)
+        # ---- hexagon
+        self.caltrops = self.defaults.get("caltrops", None)
+        self.caltrops_invert = self.defaults.get("caltrops_invert", False)
+        self.links = self.defaults.get("links", None)
+        self.link_stroke_width = self.defaults.get(
+            "link_stroke_width", self.stroke_width
+        )
+        self.link_stroke = self.defaults.get("link_stroke", self.stroke)
+        self.link_cap = self.defaults.get("link_cap", self.line_cap)
+        # ---- hexagons
+        self.hid = self.defaults.get("id", "")  # HEX ID
+        self.hex_rows = self.defaults.get("hex_rows", 0)
+        self.hex_cols = self.defaults.get("hex_cols", 0)
+        self.hex_offset = self.defaults.get("hex_offset", "even")  # even|odd
+        self.hex_layout = self.defaults.get("hex_layout", "rectangle")  # rectangle
+        self.coord_type_x = self.defaults.get("coord_type_x", "number")  # number|letter
+        self.coord_type_y = self.defaults.get("coord_type_y", "number")  # number|letter
+        self.coord_start_x = self.defaults.get("coord_start_x", 0)
+        self.coord_start_y = self.defaults.get("coord_start_y", 0)
+        self.coord_elevation = self.defaults.get(
+            "coord_elevation", None
+        )  # top|middle|bottom
+        self.coord_offset = self.defaults.get("coord_offset", 0)
+        self.coord_font_name = self.defaults.get("coord_font_name", DEFAULT_FONT)
+        self.coord_font_size = self.defaults.get(
+            "coord_font_size", int(self.font_size * 0.5)
+        )
+        coord_stroke = self.defaults.get("coord_stroke", "black")
+        self.coord_stroke = get_color(coord_stroke)
+        self.coord_padding = self.defaults.get("coord_padding", 2)
+        self.coord_separator = self.defaults.get("coord_separator", "")
+        self.coord_prefix = self.defaults.get("coord_prefix", "")
+        self.coord_suffix = self.defaults.get("coord_suffix", "")
+        self.coord_style = self.defaults.get("coord_style", "")
+        self.hidden = self.defaults.get("hidden", [])
+        # ---- starfield
+        self.enclosure = None
+        self.colors = ["white"]
+        self.sizes = [self.defaults.get("stroke_width", WIDTH)]
+        self.density = self.defaults.get("density", 10)
+        self.star_pattern = "random"
+        self.seeding = self.defaults.get("seeding", None)
+        # ---- mesh
+        self.mesh = self.defaults.get("mesh", None)
+        # ---- hatches
+        self.hatch_count = self.defaults.get("hatch_count", 0)
+        self.hatch = self.defaults.get("hatch", "*")
+        self.hatch_stroke = self.defaults.get("hatch_stroke", self.stroke)
+        self.hatch_stroke_width = self.defaults.get(
+            "hatch_stroke_width", self.stroke_width
+        )
+        self.hatch_dots = self.defaults.get("hatch_dots", None)
+        self.hatch_cap = self.defaults.get("hatch_cap", self.line_cap)
+        self.hatch_dashed = self.defaults.get("hatch_dashed", None)  # ---- OTHER
+        # defaults for attributes called/set elsewhere e.g. in draw()
+        self.use_abs = False
+        self.use_abs_1 = False
+        self.use_abs_c = False
+        self.clockwise = True
+        # ---- deck
+        self.deck_data = []
+
+    def get_canvas(self):
+        """Return canvas (page) object"""
+        return self.canvas
+
+    def get_page(self, name="A4"):
+        """Get a paper format by name from a pre-defined dictionary."""
+        return pymupdf.paper_size(name)
+
+
+class BaseShape:
+    """Base class for objects that are drawn on a given canvas aka pymupdf.Shape."""
+
+    def __init__(
+        self, _object: pymupdf.Shape = None, canvas: BaseCanvas = None, **kwargs
+    ):
+        self.kwargs = kwargs
+        # tools.feedback(f'### BaseShape {_object=} {canvas=} {kwargs=}')
+        # ---- constants
+        self.default_length = 1
+        self.show_id = False  # True
+        # ---- KEY
+        self.doc_page = globals.doc_page
+        self.canvas = canvas or globals.canvas  # pymupdf Shape
+        base = _object or globals.base  # protograf BaseCanvas
+        # print(f"### {type(self.canvas)=} {type(cnv)=} {type(base=)}")
+        # print(f"### {self.canvas=} {cnv=} {base=}")
+        self.shape_id = None
+        self.sequence = kwargs.get("sequence", [])  # e.g. card numbers
+        self.dataset = []  # list of dict data (loaded from file)
+        self.members = []  # card IDs, of which current card is a member
+        self._objects = None  # used by e.g. SequenceShape
+        self.bbox = None
+        # ---- general
+        self.common = kwargs.get("common", None)
+        self.shape = kwargs.get("shape", base.shape)
+        self.run_debug = kwargs.get("debug", base.run_debug)
+        _units = kwargs.get("units", base.units)
+        self.units = support.to_units(_units)
+        # print(f"### {self.units=}")
+        # ---- paper
+        _paper = kwargs.get("paper", base.paper)
+        if isinstance(_paper, tuple) and len(_paper) == 2:
+            self.paper = _paper
+        else:
+            try:
+                self.paper = pymupdf.paper_size(_paper)  # (width, height) in points
+                if self.paper == (-1, -1):  # pymupdf fallback ...
+                    raise ValueError
+            except Exception:
+                tools.feedback(f"Unable to use {_paper} as paper size!", True)
+        # ---- paper size in units
+        self.page_width = self.paper[0] / self.units  # user-units e.g. cm
+        self.page_height = self.paper[1] / self.units  # user-units e.g. cm
+        # print(f"### {self.page_height=} {self.page_width=}")
+        # ---- margins
+        self.margin = self.kw_float(kwargs.get("margin", base.margin))
+        self.margin_top = self.kw_float(kwargs.get("margin_top", self.margin))
+        self.margin_bottom = self.kw_float(kwargs.get("margin_bottom", self.margin))
+        self.margin_left = self.kw_float(kwargs.get("margin_left", self.margin))
+        self.margin_right = self.kw_float(kwargs.get("margin_right", self.margin))
+        # ---- grid marks
+        self.grid_marks = self.kw_float(kwargs.get("grid_marks", base.grid_marks))
+        self.grid_stroke = kwargs.get("grid_stroke", base.grid_stroke)
+        self.grid_stroke_width = self.kw_float(
+            kwargs.get("grid_stroke_width", base.grid_stroke_width)
+        )
+        self.grid_length = self.kw_float(kwargs.get("grid_length", base.grid_length))
+        # ---- sizes and positions
+        self.row = kwargs.get("row", base.row)
+        self.col = self.kw_int(kwargs.get("col", kwargs.get("column", base.col)), "col")
+        self.side = self.kw_float(kwargs.get("side", base.side))  # equal length sides
+        self.height = self.kw_float(kwargs.get("height", self.side))
+        self.width = self.kw_float(kwargs.get("width", self.side))
+        self.top = self.kw_float(kwargs.get("top", base.top))
+        self.depth = self.kw_float(kwargs.get("depth", self.side))  # diamond
+        self.x = self.kw_float(kwargs.get("x", kwargs.get("left", base.x)))
+        self.y = self.kw_float(kwargs.get("y", kwargs.get("top", base.y)))
+        self.cx = self.kw_float(kwargs.get("cx", base.cx))  # centre (for some shapes)
+        self.cy = self.kw_float(kwargs.get("cy", base.cy))  # centre (for some shapes)
+        self.scaling = self.kw_float(kwargs.get("scaling", None))  # SVG images
+        self.dot_point = self.kw_float(
+            kwargs.get("dot_point", base.dot_point)
+        )  # points
+        # ---- to be calculated ...
+        self.area = base.area
+        self.vertexes = base.vertexes  # list of shape's "points"
+        # ---- repeats
+        self.pattern = kwargs.get("pattern", base.pattern)
+        self.repeat = kwargs.get("repeat", base.repeat)
+        self.interval = self.kw_float(kwargs.get("interval", base.interval))
+        self.interval_x = self.kw_float(kwargs.get("interval_x", base.interval_x))
+        self.interval_y = self.kw_float(kwargs.get("interval_y", base.interval_y))
+        # ---- rotation / position /elevation
+        self.rotation = self.kw_float(
+            kwargs.get("rotation", kwargs.get("rotation", base.rotation))
+        )  # degrees anti-clockwise for text
+        self.rotation_point = kwargs.get("rotation_point", base.rotation_point)
+        self._rotation_theta = math.radians(self.rotation or 0)  # radians
+        self.direction = kwargs.get("direction", base.direction)
+        self.position = kwargs.get("position", base.position)
+        self.elevation = kwargs.get("elevation", base.elevation)
+        self.facing = kwargs.get("facing", base.facing)
+        # ---- line style
+        self.line_width = self.kw_float(kwargs.get("line_width", base.line_width))
+        self.line_cap = kwargs.get("line_cap", base.line_cap)
+        self.dotted = kwargs.get("dotted", kwargs.get("dots", base.dotted))
+        self.dashed = kwargs.get("dashed", base.dashed)
+        # ---- fill color
+        self.fill = kwargs.get("fill", kwargs.get("fill_color", base.fill))
+        # ---- stroke
+        self.stroke = kwargs.get("stroke", kwargs.get("stroke_color", base.stroke))
+        self.fill_stroke = kwargs.get("fill_stroke", base.fill_stroke)
+        self.outline = kwargs.get("outline", base.outline)
+        self.stroke_width = self.kw_float(kwargs.get("stroke_width", base.stroke_width))
+        # ---- overwrite fill&stroke colors
+        if self.fill_stroke and self.outline:
+            tools.feedback("Cannot set 'fill_stroke' and 'outline' together!", True)
+        if self.fill_stroke:
+            self.stroke = self.fill_stroke
+            self.fill = self.fill_stroke
+        if self.outline:
+            self.stroke = self.outline
+            self.fill = None
+        # ---- debug color & transparency
+        self.debug_color = kwargs.get("debug_color", base.debug_color)
+        self.transparency = self.kw_float(kwargs.get("transparency", base.transparency))
+        # ---- font
+        self.font_name = kwargs.get("font_name", base.font_name)
+        self.font_size = self.kw_float(kwargs.get("font_size", base.font_size))
+        self.font_style = kwargs.get("font_style", base.font_style)
+        self.font_directory = kwargs.get("font_directory", base.font_directory)
+        self.style = kwargs.get("style", base.style)
+        self.wrap = kwargs.get("wrap", base.wrap)
+        self.align = kwargs.get("align", base.align)  # centre,left,right,justify
+        self._alignment = pymupdf.TEXT_ALIGN_LEFT  # see to_alignment()
+        # ---- text: base
+        self.text = kwargs.get("text", base.text)
+        self.text_size = self.kw_float(kwargs.get("text_size", base.text_size))
+        self.text_stroke = kwargs.get("text_stroke", base.text_stroke)
+        self.text_stroke_width = self.kw_float(
+            kwargs.get("text_stroke_width", base.text_stroke_width)
+        )
+        # ---- text: label
+        self.label = kwargs.get("label", base.label)
+        self.label_size = self.kw_float(kwargs.get("label_size", self.font_size))
+        self.label_face = kwargs.get("label_face", self.font_name)
+        self.label_stroke = kwargs.get("label_stroke", self.stroke)
+        self.label_stroke_width = self.kw_float(
+            kwargs.get("label_stroke_width", self.stroke_width)
+        )
+        self.label_mx = self.kw_float(kwargs.get("label_mx", 0))
+        self.label_my = self.kw_float(kwargs.get("label_my", 0))
+        self.label_rotation = self.kw_float(kwargs.get("label_rotation", 0))
+        # ---- text: title
+        self.title = kwargs.get("title", base.title)
+        self.title_size = self.kw_float(kwargs.get("title_size", self.font_size))
+        self.title_face = kwargs.get("title_face", self.font_name)
+        self.title_stroke = kwargs.get("title_stroke", self.stroke)
+        self.title_stroke_width = self.kw_float(
+            kwargs.get("title_stroke_width", self.stroke_width)
+        )
+        self.title_mx = self.kw_float(kwargs.get("title_mx", 0))
+        self.title_my = self.kw_float(kwargs.get("title_my", 0))
+        self.title_rotation = self.kw_float(kwargs.get("title_rotation", 0))
+        # ---- text: heading
+        self.heading = kwargs.get("heading", base.heading)
+        self.heading_size = self.kw_float(kwargs.get("heading_size", self.font_size))
+        self.heading_face = kwargs.get("heading_face", self.font_name)
+        self.heading_stroke = kwargs.get("heading_stroke", self.stroke)
+        self.heading_stroke_width = self.kw_float(
+            kwargs.get("heading_stroke_width", self.stroke_width)
+        )
+        self.heading_mx = self.kw_float(kwargs.get("heading_mx", 0))
+        self.heading_my = self.kw_float(kwargs.get("heading_my", 0))
+        self.heading_rotation = self.kw_float(kwargs.get("heading_rotation", 0))
+        # ---- text block
+        self.outline_stroke = kwargs.get("outline_stroke", base.outline_stroke)
+        self.outline_width = self.kw_float(
+            kwargs.get("outline_width", base.outline_width)
+        )
+        self.leading = self.kw_float(kwargs.get("leading", self.font_size))
+        self.transform = kwargs.get("transform", base.transform)
+        self.html = self.kw_bool(kwargs.get("html", base.html))
+        self.css = kwargs.get("css", base.css)
+        # tools.feedback(f"### BShp:"
+        # f"{self} {kwargs.get('fill')=} {self.fill=} {kwargs.get('fill_color')=}")
+        # ---- image / file
+        self.source = kwargs.get("source", base.source)  # file or http://
+        self.sliced = ""
+        self.image_location = None
+        # ---- line / ellipse / bezier / arc / polygon
+        self.length = self.kw_float(kwargs.get("length", base.length))
+        self.angle = self.kw_float(
+            kwargs.get("angle", base.angle)
+        )  # anti-clock from flat
+        self.angle_width = self.kw_float(
+            kwargs.get("angle_width", base.angle_width)
+        )  # delta degrees
+        self.angle_start = self.kw_float(
+            kwargs.get("angle_start", base.angle_start)
+        )  # degrees anti-clock from flat
+        self._angle_theta = math.radians(self.angle)
+        # ---- image
+        self.cache_directory = None  # should be a pathlib.Path object
+        # ---- chord
+        self.angle_1 = self.kw_float(
+            kwargs.get("angle1", base.angle_1)
+        )  # anti-clock from flat
+        self._angle_1_theta = math.radians(self.angle_1)
+        # ---- arc / sector
+        self.filled = self.kw_bool(kwargs.get("filled", base.filled))
+        # ---- arrow shape: head, points and tail
+        self.points_offset = self.kw_float(
+            kwargs.get("points_offset", base.points_offset)
+        )
+        self.head_height = self.kw_float(kwargs.get("head_height", base.head_height))
+        self.head_width = self.kw_float(kwargs.get("head_width", base.head_width))
+        self.tail_width = self.kw_float(kwargs.get("tail_width", base.tail_width))
+        self.tail_notch = self.kw_float(kwargs.get("tail_notch", base.tail_notch))
+        # TODO arrow-on-a-line
+        self.arrow_style = kwargs.get("arrow_style", base.arrow_style)
+        self.arrow_tail_style = kwargs.get("arrow_tail_style", base.arrow_tail_style)
+        # ---- line / bezier / sector
+        self.x_1 = self.kw_float(kwargs.get("x1", base.x_1))
+        self.y_1 = self.kw_float(kwargs.get("y1", base.y_1))
+        # ---- bezier / sector
+        self.x_2 = self.kw_float(kwargs.get("x2", base.x_2))
+        self.y_2 = self.kw_float(kwargs.get("y2", base.y_2))
+        self.x_3 = self.kw_float(kwargs.get("x3", base.x_3))
+        self.y_3 = self.kw_float(kwargs.get("y3", base.y_3))
+        # ---- rectangle / card
+        self.rounding = self.kw_float(kwargs.get("rounding", base.rounding))
+        self.rounded = kwargs.get("rounded", base.rounded)
+        self.notch = self.kw_float(kwargs.get("notch", base.notch))
+        self.notch_corners = kwargs.get("notch_corners", base.notch_corners)
+        self.notch_x = self.kw_float(kwargs.get("notch_x", base.notch_x))
+        self.notch_y = self.kw_float(kwargs.get("notch_y", base.notch_y))
+        self.notch_style = kwargs.get("notch_style", base.notch_style)
+        self.chevron = kwargs.get("chevron", base.chevron)
+        self.chevron_height = self.kw_float(
+            kwargs.get("chevron_height", base.chevron_height)
+        )
+        self.peaks = kwargs.get("peaks", base.peaks)
+        self.peaks_dict = {}
+        self.borders = kwargs.get("borders", base.borders)
+        self.rounded_radius = base.rounded_radius
+        # ---- stadium
+        self.edges = kwargs.get("edges", base.edges)
+        # ---- grid / card layout
+        self.rows = self.kw_int(kwargs.get("rows", base.rows), "rows")
+        self.cols = self.kw_int(
+            kwargs.get("cols", kwargs.get("columns", base.cols)), "cols"
+        )
+        self.frame = kwargs.get("frame", base.frame)
+        self.offset = self.kw_float(kwargs.get("offset", base.offset))
+        self.offset_x = self.kw_float(kwargs.get("offset_x", self.offset))
+        self.offset_y = self.kw_float(kwargs.get("offset_y", self.offset))
+        self.spacing = self.kw_float(kwargs.get("spacing", base.spacing))
+        self.spacing_x = self.kw_float(kwargs.get("spacing_x", self.spacing))
+        self.spacing_y = self.kw_float(kwargs.get("spacing_y", self.spacing))
+        self.grouping = self.kw_int(
+            kwargs.get("grouping", 1), "grouping"
+        )  # no. of cards in a set
+        self.grouping_rows = self.kw_int(
+            kwargs.get("grouping_rows", self.grouping), "grouping_rows"
+        )
+        self.grouping_cols = self.kw_int(
+            kwargs.get("grouping_cols", self.grouping), "grouping_cols"
+        )
+        self.lines = kwargs.get("lines", base.lines)
+        # ---- circle / star / polygon
+        self.diameter = self.kw_float(kwargs.get("diameter", base.diameter))
+        self.radius = self.kw_float(kwargs.get("radius", base.radius))
+        self.vertices = self.kw_int(kwargs.get("vertices", base.vertices), "vertices")
+        self.sides = kwargs.get("sides", base.sides)
+        self.points = kwargs.get("points", base.points)
+        # ---- radii (circle / hexagon / polygon / compass)
+        self.radii = kwargs.get("radii", base.radii)
+        self.radii_stroke = kwargs.get("radii_stroke", self.stroke)
+        self.radii_stroke_width = self.kw_float(
+            kwargs.get("radii_stroke_width", base.radii_stroke_width)
+        )
+        self.radii_length = self.kw_float(kwargs.get("radii_length", base.radii_length))
+        self.radii_offset = self.kw_float(kwargs.get("radii_offset", base.radii_offset))
+        self.radii_cap = kwargs.get("radii_cap", base.radii_cap)
+        self.radii_dotted = kwargs.get("radii_dotted", base.dotted)
+        self.radii_dashed = kwargs.get("radii_dashed", self.dashed)
+        self.radii_labels = kwargs.get("radii_labels", base.radii_labels)
+        self.radii_labels_size = self.kw_float(
+            kwargs.get("radii_labels_size", self.font_size)
+        )
+        self.radii_labels_face = kwargs.get("radii_labels_face", self.font_name)
+        self.radii_labels_stroke = kwargs.get("radii_labels_stroke", self.stroke)
+        self.radii_labels_stroke_width = self.kw_float(
+            kwargs.get("radii_labels_stroke_width", self.stroke_width)
+        )
+        self.radii_labels_rotation = self.kw_float(
+            kwargs.get("radii_labels_rotation", 0)
+        )
+        self.radii_labels_my = self.kw_float(kwargs.get("radii_labels_my", 0))
+        self.radii_labels_mx = self.kw_float(kwargs.get("radii_labels_mx", 0))
+        # ---- circle
+        self.petals = self.kw_int(kwargs.get("petals", base.petals), "petals")
+        self.petals_style = kwargs.get("petals_style", base.petals_style)
+        self.petals_height = self.kw_float(
+            kwargs.get("petals_height", base.petals_height)
+        )
+        self.petals_offset = self.kw_float(
+            kwargs.get("petals_offset", base.petals_offset)
+        )
+        self.petals_stroke = kwargs.get("petals_stroke", base.petals_stroke)
+        self.petals_stroke_width = self.kw_float(
+            kwargs.get("petals_stroke_width", base.petals_stroke_width)
+        )
+        self.petals_fill = kwargs.get("petals_fill", base.petals_fill)
+        self.petals_dotted = kwargs.get("petals_dotted", base.petals_dotted)
+        self.petals_dashed = kwargs.get("petals_dashed", self.dashed)
+        # ---- compass
+        self.perimeter = kwargs.get("perimeter", "circle")  # circle|rectangle|hexagon
+        self.directions = kwargs.get("directions", None)
+        # ---- triangle / trapezoid
+        self.flip = kwargs.get("flip", "north")
+        # ---- triangle
+        self.hand = kwargs.get("hand", "east")
+        # ---- hexagon / circle / polygon
+        self.centre_shape = kwargs.get("centre_shape", "")
+        self.centre_shape_mx = self.kw_float(
+            kwargs.get("centre_shape_mx", base.centre_shape_mx)
+        )
+        self.centre_shape_my = self.kw_float(
+            kwargs.get("centre_shape_my", base.centre_shape_my)
+        )
+        self.dot_stroke = kwargs.get("dot_stroke", self.stroke)
+        self.dot_stroke_width = self.kw_float(
+            kwargs.get("dot_stroke_width", base.dot_stroke_width)
+        )
+        self.dot_fill = kwargs.get("dot_fill", self.stroke)
+        self.dot = self.kw_float(kwargs.get("dot", base.dot))
+        self.cross_stroke = kwargs.get("cross_stroke", self.stroke)
+        self.cross_stroke_width = self.kw_float(
+            kwargs.get("cross_stroke_width", base.cross_stroke_width)
+        )
+        self.cross = self.kw_float(kwargs.get("cross", base.cross))
+        # ---- hexagon / polygon
+        self.orientation = kwargs.get("orientation", base.orientation)
+        self.perbis = kwargs.get("perbis", base.perbis)  # directions
+        self.perbis_stroke = kwargs.get("perbis_stroke", base.perbis_stroke)
+        self.perbis_stroke_width = self.kw_float(
+            kwargs.get("perbis_stroke_width", base.perbis_stroke_width)
+        )
+        self.perbis_length = self.kw_float(
+            kwargs.get("perbis_length", base.perbis_length)
+        )
+        self.perbis_offset = self.kw_float(
+            kwargs.get("perbis_offset", base.perbis_offset)
+        )
+        self.perbis_cap = kwargs.get("perbis_cap", base.perbis_cap)
+        self.perbis_dotted = kwargs.get("perbis_dotted", base.dotted)
+        self.perbis_dashed = kwargs.get("perbis_dashed", self.dashed)
+        # ---- hexagon
+        self.caltrops = self.kw_float(kwargs.get("caltrops", base.caltrops))
+        self.caltrops_invert = self.kw_bool(
+            kwargs.get("caltrops_invert", base.caltrops_invert)
+        )
+        self.links = kwargs.get("links", base.links)
+        self.link_stroke_width = self.kw_float(
+            kwargs.get("link_stroke_width", base.link_stroke_width)
+        )
+        self.link_stroke = kwargs.get("link_stroke", base.stroke)
+        self.link_cap = kwargs.get("link_cap", base.link_cap)
+        # ---- hexagons
+        self.hid = kwargs.get("id", base.hid)  # HEX ID
+        self.hex_rows = self.kw_int(kwargs.get("hex_rows", base.hex_rows), "hex_rows")
+        self.hex_cols = self.kw_int(kwargs.get("hex_cols", base.hex_cols), "hex_cols")
+        self.hex_layout = kwargs.get(
+            "hex_layout", base.hex_layout
+        )  # rectangle|circle|diamond|triangle
+        self.hex_offset = kwargs.get("hex_offset", base.hex_offset)  # even|odd
+        self.coord_type_x = kwargs.get(
+            "coord_type_x", base.coord_type_x
+        )  # number|letter
+        self.coord_type_y = kwargs.get(
+            "coord_type_y", base.coord_type_y
+        )  # number|letter
+        self.coord_start_x = self.kw_int(
+            kwargs.get("coord_start_x", base.coord_start_x), "coord_start_x"
+        )
+        self.coord_start_y = self.kw_int(
+            kwargs.get("coord_start_y", base.coord_start_y), "coord_start_y"
+        )
+        self.coord_elevation = kwargs.get(
+            "coord_elevation", base.coord_elevation
+        )  # top|middle|bottom
+        self.coord_offset = self.kw_float(kwargs.get("coord_offset", base.coord_offset))
+        self.coord_font_name = kwargs.get("coord_font_name", base.coord_font_name)
+        self.coord_font_size = self.kw_float(
+            kwargs.get("coord_font_size", base.coord_font_size)
+        )
+        self.coord_stroke = kwargs.get("coord_stroke", base.coord_stroke)
+        self.coord_padding = self.kw_int(
+            kwargs.get("coord_padding", base.coord_padding), "coord_padding"
+        )
+        self.coord_separator = kwargs.get("coord_separator", base.coord_separator)
+        self.coord_prefix = kwargs.get("coord_prefix", base.coord_prefix)
+        self.coord_suffix = kwargs.get("coord_suffix", base.coord_suffix)
+        self.coord_style = kwargs.get("coord_style", "")  # linear|diagonal
+        self.hidden = kwargs.get("hidden", base.hidden)
+        # ---- starfield
+        self.enclosure = kwargs.get("enclosure", base.enclosure)
+        self.colors = kwargs.get("colors", base.colors)
+        self.sizes = kwargs.get("sizes", base.sizes)
+        self.density = self.kw_int(kwargs.get("density", base.density), "density")
+        self.star_pattern = kwargs.get("star_pattern", base.star_pattern)
+        self.seeding = kwargs.get("seeding", base.seeding)
+        # ---- mesh
+        self.mesh = kwargs.get("mesh", base.mesh)
+        # ---- hatches
+        self.hatch_count = kwargs.get("hatch_count", base.hatch_count)
+        self.hatch = kwargs.get("hatch", base.hatch)
+        self.hatch_stroke_width = self.kw_float(
+            kwargs.get("hatch_width", base.hatch_stroke_width)
+        )
+        self.hatch_stroke = kwargs.get("hatch_stroke", base.stroke)
+        self.hatch_cap = kwargs.get("hatch_cap", base.hatch_cap)
+        self.hatch_dots = kwargs.get("hatch_dots", base.dotted)
+        self.hatch_dashed = kwargs.get("hatch_dashed", self.dashed)
+        # ---- deck
+        self.deck_data = kwargs.get("deck_data", [])  # list of dicts
+
+        # ---- OTHER
+        # defaults for attributes called/set elsewhere e.g. in draw()
+        self.use_abs = False
+        self.use_abs_1 = False
+        self.use_abs_c = False
+        # ---- CHECK ALL
+        correct, issue = self.check_settings()
+        if not correct:
+            tools.feedback("Problem with settings: %s." % "; ".join(issue))
+        # ---- UPDATE SELF WITH COMMON
+        if self.common:
+            try:
+                attrs = vars(self.common)
+            except TypeError:
+                tools.feedback(
+                    f'Cannot process the Common property "{self.common}"'
+                    " - please check!",
+                    True,
+                )
+            for attr in attrs.keys():
+                if (
+                    attr not in ["canvas", "common", "stylesheet", "kwargs"]
+                    and attr[0] != "_"
+                ):
+                    # print(f'### Common {attr=} {base=} {type(base)=}')
+                    common_attr = getattr(self.common, attr)
+                    base_attr = getattr(base, attr)
+                    if common_attr != base_attr:
+                        setattr(self, attr, common_attr)
+
+        # ---- SET offset properties to correct units
+        self._o = self.set_offset_props()
+        # ---- SET UNIT PROPS (last!)
+        self.set_unit_properties()
+
+    def __str__(self):
+        try:
+            return f"{self.__class__.__name__}::{self.kwargs}"
+        except:
+            return f"{self.__class__.__name__}"
+
+    def kw_float(self, value, label: str = ""):
+        return tools.as_float(value, label) if value is not None else value
+
+    def kw_int(self, value, label: str = ""):
+        return tools.as_int(value, label) if value is not None else value
+
+    def kw_bool(self, value, label: str = ""):
+        return tools.as_bool(value, label) if value is not None else value
+
+    def unit(self, item, units: str = None, skip_none: bool = False, label: str = ""):
+        """Convert an item into the appropriate unit system."""
+        log.debug("units %s %s :: label: %s", units, self.units, label)
+        if item is None and skip_none:
+            return None
+        units = support.to_units(units) if units is not None else self.units
+        try:
+            _item = tools.as_float(item, label)
+            return _item * units
+        except (TypeError, ValueError):
+            _label = f" {label}" if label else ""
+            tools.feedback(
+                f"Unable to set unit value for{_label}: {item}."
+                " Please check that this is a valid value.",
+                stop=True,
+            )
+
+    def set_unit_properties(self):
+        """Convert base properties into unit-based values."""
+        # set a "width" value for use in calculations e.g. Track
+        if self.radius and not self.width:
+            self.width = 2.0 * self.radius
+            self.diameter = 2.0 * self.radius
+        if self.diameter and not self.width:
+            self.width = self.diameter
+        if self.side and not self.width:
+            self.width = self.side  # square
+        if self.side and not self.height:
+            self.height = self.side  # square
+        if self.diameter and not self.radius:
+            self.radius = self.diameter / 2.0
+        if self.width and not self.top:
+            self.top = 0.5 * self.width
+
+        self._u = UnitProperties(
+            self.paper[0],  # width, in points
+            self.paper[1],  # height, in points
+            self.unit(self.margin_left) if self.margin_left is not None else None,
+            self.unit(self.margin_right) if self.margin_right is not None else None,
+            self.unit(self.margin_bottom) if self.margin_bottom is not None else None,
+            self.unit(self.margin_top) if self.margin_top else None,
+            self.unit(self.x) if self.x is not None else None,
+            self.unit(self.y) if self.y is not None else None,
+            self.unit(self.cx) if self.cx is not None else None,
+            self.unit(self.cy) if self.cy is not None else None,
+            self.unit(self.height) if self.height is not None else None,
+            self.unit(self.width) if self.width is not None else None,
+            self.unit(self.top) if self.top is not None else None,
+            self.unit(self.radius) if self.radius is not None else None,
+            self.unit(self.diameter) if self.diameter is not None else None,
+            self.unit(self.side) if self.side is not None else None,
+            self.unit(self.length) if self.length is not None else None,
+            self.unit(self.spacing_x) if self.spacing_x is not None else None,
+            self.unit(self.spacing_y) if self.spacing_y is not None else None,
+            self.unit(self.offset_x) if self.offset_x is not None else None,
+            self.unit(self.offset_y) if self.offset_y is not None else None,
+        )
+
+    def set_offset_props(self, off_x=0, off_y=0):
+        """Get OffsetProperties for a Shape."""
+        margin_left = (
+            self.unit(self.margin_left) if self.margin_left is not None else self.margin
+        )
+        margin_bottom = (
+            self.unit(self.margin_bottom)
+            if self.margin_bottom is not None
+            else self.margin
+        )
+        margin_top = (
+            self.unit(self.margin_top) if self.margin_top is not None else self.margin
+        )
+        off_x = self.unit(off_x) if off_x is not None else None
+        off_y = self.unit(off_y) if off_y is not None else None
+        return OffsetProperties(
+            off_x, off_y, off_x + margin_left, off_y + margin_top  # margin_bottom
+        )
+
+    def draw_polyline_props(self, cnv: muShape, vertexes: list, **kwargs) -> bool:
+        """Draw polyline IF either fill or stroke is set.
+
+        Args:
+            vertexes (list): Point tuples
+
+        Notes:
+            Ensure that **kwargs default to `self` values!
+        """
+        # print(f'### dpp {kwargs.get("fill")=} {kwargs.get("stroke")=} {vertexes=}')
+        if kwargs.get("stroke") or kwargs.get("fill"):
+            cnv.draw_polyline(vertexes)
+            return True
+        return False
+
+    def set_canvas_props(
+        self,
+        cnv=None,
+        index=None,  # extract from list of potential values (usually Card options)
+        **kwargs,
+    ):
+        """Set pymupdf Shape properties for fill, font, line and colors
+
+        Notes:
+            If letting default a color parameter to None, then no resp. color selection
+            command will be generated. If fill and color are both None, then the drawing
+            will contain no color specification. But it will still be “stroked”,
+            which causes PDF’s default color “black” be used by PDF viewers.
+
+            The default value of width is 1.
+
+            The values width, color and fill have the following relationship:
+            • If fill=None, then shape elements will *always* be drawn with a border -
+              even if color=None (in which case black is taken) or width=0
+              (in which case 1 is taken).
+            • Shapes without border can only be achieved if a fill color is specified
+              (which may be be white). To achieve this, specify width=0.
+              In this case, the color parameter is ignored.
+        """
+
+        def ext(prop):
+            if isinstance(prop, str):
+                return prop
+            try:
+                return prop[index]
+            except TypeError:
+                return prop
+
+        # Shape.finish(
+        #   width=1, color=(0,), fill=None, lineCap=0, lineJoin=0, dashes=None,
+        #   closePath=True, even_odd=False, morph=(fixpoint, matrix),
+        #   stroke_opacity=1, fill_opacity=1, oc=0
+
+        # ---- set props
+        # print(f'### SetCnvProps: {kwargs.keys()} \n {kwargs.get("fill", "?")=}')
+        cnv = cnv if cnv else globals.canvas
+        if "fill" in kwargs.keys():
+            fill = kwargs.get("fill", None)  # reserve None for 'no fill at all'
+        else:
+            fill = self.fill
+        if "stroke" in kwargs.keys():
+            stroke = kwargs.get("stroke", None)  # reserve None for 'no stroke at all'
+        else:
+            stroke = self.stroke
+        # print(f'### SCP {kwargs.get("fill")=} {fill=} {kwargs.get("stroke")=} {stroke=}')
+        # ---- transparency / opacity
+        opacity = 1
+        _transparency = kwargs.get("transparency", self.transparency)
+        if _transparency:
+            _transparency = self.kw_float(_transparency, "transparency")
+            if _transparency >= 1:
+                _transparency = _transparency / 100.0
+            opacity = 1 - _transparency
+        stroke_width = kwargs.get("stroke_width", None)
+        stroke_cap = kwargs.get("stroke_cap", None)
+        dotted = kwargs.get("dotted", None)
+        dashed = kwargs.get("dashed", None)
+        _rotation = kwargs.get("rotation", None)  # calling Shape must set a tuple!
+        _rotation_point = kwargs.get(
+            "rotation_point", None
+        )  # calling Shape must set a tuple!
+        closed = kwargs.get("closed", False)  # whether to connect last and first points
+        debug = kwargs.get("debug", False)
+        # ---- set line dots / dashed
+        _dotted = ext(dotted) or ext(self.dotted)
+        _dashed = ext(dashed) or ext(self.dashed)
+        if _dotted:
+            the_stwd = (
+                round(ext(stroke_width))
+                if stroke_width
+                else round(ext(self.stroke_width))
+            )
+            the_stwd = max(the_stwd, 1)
+            dashes = f"[{the_stwd} {the_stwd}] 0"
+        elif _dashed:
+            _dlist = (
+                _dashed
+                if isinstance(_dashed, (list, tuple))
+                else tools.sequence_split(_dashed, as_int=False)
+            )
+            doffset = round(self.unit(_dlist[2])) if len(_dlist) >= 3 else 0
+            dspaced = round(self.unit(_dlist[1])) if len(_dlist) >= 2 else ""
+            dlength = round(self.unit(_dlist[0])) if len(_dlist) >= 1 else ""
+            dashes = f"[{dlength} {dspaced}] {doffset}"
+        else:
+            dashes = None
+        # print(f"### SCP{_dotted =} {_dashed=} {dashes=}")
+        # ---- check rotation
+        morph = None
+        # print(f'### SCP {_rotation_point=} {_rotation}')
+        if _rotation_point and not isinstance(_rotation_point, (geoms.Point, muPoint)):
+            tools.feedback(f'Rotation point "{_rotation_point}" is invalid', True)
+        if _rotation is not None and not isinstance(_rotation, (float, int)):
+            tools.feedback(f'Rotation angle "{_rotation}" is invalid', True)
+        if _rotation and _rotation_point:
+            # ---- * set rotation matrix
+            mtrx = Matrix(1, 1)
+            mtrx.prerotate(_rotation)
+            morph = (_rotation_point, mtrx)
+            # print(f'### SCP {morph=}')
+        # ---- get color tuples
+        _color = get_color(stroke)
+        _fill = get_color(fill)
+        # ---- set width
+        _width = stroke_width or self.stroke_width
+        if _color is None and _fill is None:
+            tools.feedback("Cannot have both fill and stroke set to None!", True)
+        # print(f'### SCP {stroke=} {fill=} {_color=} {_fill=}')  # None OR fraction RGB
+        # ---- set/apply properties
+        cnv.finish(
+            width=_width,
+            color=_color,
+            fill=_fill,
+            lineCap=stroke_cap or 0,  # or self.stroke_cap,  # FIXME
+            lineJoin=0,
+            dashes=dashes,
+            fill_opacity=opacity,
+            morph=morph,
+            closePath=closed,
+        )
+        cnv.commit()
+        return None
+
+        """
+        def ext(prop):
+            if isinstance(prop, str):
+                return prop
+            try:
+                return prop[index]
+            except TypeError:
+                return prop
+
+        canvas = cnv if cnv else self.canvas
+        try:
+            canvas.setFont(ext(self.font_name), ext(self.font_size))
+        except AttributeError:
+            pass
+        except KeyError:
+            ff = ext(self.font_name)
+            try:
+                tools.register_font(
+                    font_name=self.font_name,
+                    style=self.font_style,
+                    directory=self.font_directory,
+                )
+            except (KeyError, ValueError):
+                _style = f' with style "{self.font_style}"' if self.font_style else ""
+                _dir = f' in "{self.font_directory}"' if self.font_directory else ""
+                tools.feedback(
+                    f'Unable to find or register font "{ff}"{_style}{_dir}.'
+                    " Please check that it is available on your system.",
+                    stop=True,
+                )
+        try:
+            if fill in [None, []] and self.fill in [None, []]:
+                canvas.setFillColor("white", 0)  # full transparency
+                if debug:
+                    tools.feedback("~~~ NO fill color set!")
+            else:
+                _fill = ext(fill) or ext(self.fill)
+                canvas.setFillColor(_fill)
+                _transparency = ext(self.transparency)
+                if _transparency:
+                    try:
+                        alpha = float(_transparency) / 100.0
+                    except Exception:
+                        tools.feedback(
+                            f'Unable to use "{_transparency}" as transparency'
+                            " value - it must be from 1 to 100",
+                            True,
+                        )
+                    try:
+                        curr_fill = canvas._fillColorObj
+                        alpha_fill = Color(
+                            curr_fill.red, curr_fill.green, curr_fill.blue, alpha
+                        )
+                        if debug:
+                            tools.feedback(
+                                f"~ Transp. color set: {alpha_fill} vs {_fill}"
+                            )
+                        _fill = alpha_fill
+                        canvas.setFillColor(_fill)
+                    except Exception:
+                        tools.feedback("Unable to set transparency for {_fill}")
+                if debug:
+                    tools.feedback(f"~~~ Fill color set: {_fill}")
+
+        except (ValueError, AttributeError):
+            issue = f'"{_fill}" is not a valid value' if _fill else "no value provided!"
+            tools.feedback(f"Unable to set fill color:- {issue}", True)
+
+        try:
+            if stroke in [None, []] and self.stroke in [None, []]:
+                canvas.setStrokeColor("black", 0)  # full transparency
+                if debug:
+                    tools.feedback("~~~ NO stroke color set!")
+            else:
+                _strk = ext(stroke) or ext(self.stroke)
+                canvas.setStrokeColor(_strk)
+        except (TypeError, ValueError):
+            tools.feedback(
+                f'Please check the stroke setting of "{_strk}"; it should be a color value.'
+            )
+        except AttributeError:
+            pass
+        try:
+            the_stwd = ext(stroke_width) or ext(self.stroke_width)
+            canvas.setLineWidth(the_stwd)  # units are points!
+        except TypeError:
+            tools.feedback(
+                f'Please check the stroke_width setting of "{the_stwd}";'
+                " it should be a number."
+            )
+        except AttributeError:
+            pass
+        _stroke_cap = ext(stroke_cap)
+        if _stroke_cap:
+            if _stroke_cap in ["r", "rounded"]:
+                canvas.setLineCap(1)
+            elif _stroke_cap in ["s", "square"]:
+                canvas.setLineCap(2)
+            else:
+                tools.feedback(f'Line cap type "{_stroke_cap}" cannot be used.', False)
+        _dotted = ext(dotted) or ext(self.dotted)
+        _dashed = ext(dashed) or ext(self.dashed)
+        if _dotted:
+            # _dots = self.values_to_points([0.03, 0.03])
+            _dots = [the_stwd, the_stwd]
+            canvas.setDash(array=_dots)
+        elif _dashed:
+            dash_points = self.values_to_points(_dashed)
+            canvas.setDash(array=dash_points)
+        else:
+            canvas.setDash(array=[])
+        """
+
+    def draw(self, cnv=None, off_x=0, off_y=0, ID=None, **kwargs):
+        """Draw an element on a given canvas."""
+        self._o = self.set_offset_props(off_x, off_y)
+        # self._abs... variable are absolute locations in native units;
+        #  They are for internal use only and are not expected
+        #  to be called by the user.
+        #  If set, they should be used to ignore/bypass any other values
+        #  for calculating the starting point or centre point
+        #  for drawing a shape
+        self._abs_x = kwargs.get("_abs_x", None)
+        self._abs_y = kwargs.get("_abs_y", None)
+        self._abs_x1 = kwargs.get("_abs_x1", None)
+        self._abs_y1 = kwargs.get("_abs_y1", None)
+        self._abs_cx = kwargs.get("_abs_cx", None)
+        self._abs_cy = kwargs.get("_abs_cy", None)
+        self.use_abs = (
+            True if self._abs_x is not None and self._abs_y is not None else False
+        )
+        self.use_abs_1 = (
+            True if self._abs_x1 is not None and self._abs_y1 is not None else False
+        )
+        self.use_abs_c = (
+            True if self._abs_cx is not None and self._abs_cy is not None else False
+        )
+        # tools.feedback(f'### draw baseshape: {self._abs_x=} {self._abs_y=} {self._abs_cx=} {self._abs_cy=}')
+
+    def check_settings(self) -> tuple:
+        """Validate that the user-supplied parameters for choices are correct"""
+        correct = True
+        issue = []
+        if self.align:
+            if str(self.align).lower() not in [
+                "left",
+                "right",
+                "justify",
+                "centre",
+                "l",
+                "r",
+                "j",
+                "c",
+            ]:
+                issue.append(f'"{self.align}" is an invalid align!')
+                correct = False
+        if self.edges:
+            if not isinstance(self.edges, list):
+                _edges = (
+                    self.edges.split(",") if "," in self.edges else self.edges.split()
+                )
+            else:
+                _edges = self.edges
+            for edge in _edges:
+                if str(edge).lower() not in [
+                    "north",
+                    "south",
+                    "east",
+                    "west",
+                    "n",
+                    "e",
+                    "w",
+                    "s",
+                ]:
+                    issue.append(
+                        f'"{edge}" is an invalid choice in edges {self.edges}!'
+                    )
+                    correct = False
+        if self.flip:
+            if str(self.flip).lower() not in ["north", "south", "n", "s"]:
+                issue.append(f'"{self.flip}" is an invalid flip!')
+                correct = False
+        if self.hand:
+            if str(self.hand).lower() not in [
+                "west",
+                "east",
+                "w",
+                "e",
+            ]:
+                issue.append(f'"{self.hand}" is an invalid hand!')
+                correct = False
+        if self.lines:
+            if str(self.lines).lower() not in [
+                "all",
+                "vertical",
+                "horizontal",
+                "vert",
+                "horiz",
+                "a",
+                "v",
+                "h",
+            ]:
+                issue.append(f'"{self.lines}" is an invalid lines setting!')
+                correct = False
+        if self.elevation:
+            if str(self.elevation).lower() not in [
+                "vertical",
+                "horizontal",
+                "v",
+                "h",
+            ]:
+                issue.append(f'"{self.elevation}" is an invalid elevation!')
+                correct = False
+        if self.orientation:
+            if str(self.orientation).lower() not in ["flat", "pointy", "f", "p"]:
+                issue.append(f'"{self.orientation}" is an invalid orientation!')
+                correct = False
+        if self.perimeter:
+            if str(self.perimeter).lower() not in [
+                "circle",
+                "rectangle",
+                "hexagon",
+                "c",
+                "r",
+                "h",
+            ]:
+                issue.append(f'"{self.perimeter}" is an invalid perimeter!')
+                correct = False
+        if self.position:
+            if str(self.position).lower() not in [
+                "top",
+                "bottom",
+                "center",
+                "middle",
+                "t",
+                "b",
+                "c",
+                "m",
+            ]:
+                issue.append(f'"{self.position}" is an invalid position!')
+                correct = False
+        if self.petals_style:
+            if str(self.petals_style).lower() not in [
+                "triangle",
+                "curve",
+                "rectangle",
+                "petal",
+                "windmill",
+                "t",
+                "c",
+                "r",
+                "p",
+                "w",
+            ]:
+                issue.append(f'"{self.petals_style}" is an invalid petals style!')
+                correct = False
+        # ---- line / arrow
+        if self.rotation_point:
+            if str(self.rotation_point).lower() not in [
+                "start",
+                "centre",
+                "end" "s",
+                "c",
+                "e",
+            ]:
+                issue.append(f'"{self.rotation_point}" is an invalid rotation_point!')
+                correct = False
+        # ---- hexagons
+        if self.coord_style:
+            if str(self.coord_style).lower() not in ["linear", "diagonal", "l", "d"]:
+                issue.append(f'"{self.coord_style}" is an invalid coord style!')
+                correct = False
+        # ---- line arrows
+        if self.arrow_style:
+            if str(self.arrow_style).lower() not in [
+                "line",
+                "l",
+                "line2",
+                "l2",
+                "line3",
+                "l3",
+                "triangle",
+                "t",
+                "diamond",
+                "d",
+                "notch",
+                "n",
+                "spear",
+                "s",
+                "circle",
+                "c",
+            ]:
+                issue.append(f'"{self.arrow_style}" is an invalid arrow style!')
+                correct = False
+        if self.arrow_tail_style:
+            if str(self.arrow_tail_style).lower() not in [
+                "line",
+                "l",
+                "line2",
+                "l2",
+                "line3",
+                "l3",
+                "feather",
+                "f",
+                "circle",
+                "c",
+            ]:
+                issue.append(
+                    f'"{self.arrow_tail_style}" is an invalid arrow tail style!'
+                )
+                correct = False
+        # ---- starfield
+        if self.star_pattern:
+            if str(self.star_pattern).lower() not in ["random", "cluster", "r", "c"]:
+                issue.append(f'"{self.pattern}" is an invalid starfield pattern!')
+                correct = False
+        # ---- rectangle - notches
+        if self.notch_style:
+            if str(self.notch_style).lower() not in [
+                "snip",
+                "s",
+                "fold",
+                "o",
+                "bite",
+                "b",
+                "flap",
+                "l",
+                "step",
+                "t",
+            ]:
+                issue.append(f'"{self.notch_style}" is an invalid notch_style!')
+                correct = False
+        # ---- rectangle - peaks
+        if self.peaks:
+            if not isinstance(self.peaks, list):
+                tools.feedback(f"The peaks '{self.peaks}' is not a valid list!", True)
+            for point in self.peaks:
+                try:
+                    _dir = point[0]
+                    value = tools.as_float(point[1], " peaks value")
+                    if _dir.lower() not in ["n", "e", "w", "s", "*"]:
+                        tools.feedback(
+                            f'The peaks direction must be one of n, e, s, w (not "{_dir}")!',
+                            True,
+                        )
+                    if _dir == "*":
+                        self.peaks_dict["n"] = value
+                        self.peaks_dict["e"] = value
+                        self.peaks_dict["w"] = value
+                        self.peaks_dict["s"] = value
+                    else:
+                        self.peaks_dict[_dir] = value
+                except Exception:
+                    tools.feedback(f'The peaks setting "{point}" is not valid!', True)
+
+        return correct, issue
+
+    def to_alignment(self) -> Enum:
+        """Convert local, English-friendly alignments to a PyMuPDF Enum."""
+        match self.align:
+            case "centre" | "center":
+                self._alignment = pymupdf.TEXT_ALIGN_CENTER
+            case "right":
+                self._alignment = pymupdf.TEXT_ALIGN_RIGHT
+            case "justify":
+                # TEXT_ALIGN_JUSTIFY only achievable with “simple” (singlebyte) fonts
+                # this includes the PDF Base 14 Fonts.
+                self._alignment = pymupdf.TEXT_ALIGN_JUSTIFY
+            case _:
+                self._alignment = pymupdf.TEXT_ALIGN_LEFT
+        return self._alignment
+
+    def is_kwarg(self, value) -> bool:
+        """Validate if value is in direct kwargs OR in Common _kwargs."""
+        if value in self.kwargs:
+            return True
+        if "common" in self.kwargs:
+            try:
+                if value in self.kwargs.get("common")._kwargs:
+                    return True
+            except AttributeError:
+                tools.feedback(
+                    "Unable to process Common properties"
+                    " - has the Common command been set?",
+                    True,
+                )
+        return False
+
+    def load_image(
+        self,
+        pdf_page: muPage,
+        image_location: str = None,
+        origin: tuple = None,
+        sliced: str = None,
+        width_height: tuple = None,
+        cache_directory: str = None,
+        rotation: float = 0,
+    ) -> tuple:
+        """Load an image from file or website.
+
+        Attempt to use local cache directory to retrieve an image
+        for web-based assets, if possible.
+
+        If image_location not found; try path in which script located.
+
+        Args:
+            image_location:
+                full path or URL for image
+            origin:
+                x, y location of image on Page
+            sliced:
+                what fraction of the image to return; one of
+                't', 'm', 'b', 'l', 'c', or 'r'
+            width_height:
+                the (width, height) of the output frame for the image;
+                will be used along with x,y to set size and position;
+                will be recalcuated if image is rotated
+            cache_directory:
+                where to store a local for copy for URL-sourced images
+            rotation:
+                angle of image rotation (in degrees)
+
+        Returns:
+            tuple:
+                * Image
+                * boolean (True if file is a directory)
+
+        Notes:
+
+        """
+
+        def slice_image(
+            img_path, slice_portion: str = None, width_height: tuple = (1, 1)
+        ):
+            """Slice off a portion of an image while maintaining its aspect ratio
+
+            Args:
+                img_path:
+                    Pathlib file
+                sliced:
+                    what portion of the image to return
+                width_height:
+                    the (width, height) of the output frame for the image
+            """
+            # tools.feedback(f"### {img_path=} {slice_portion=}")
+            if not slice_portion:
+                return None
+            try:
+                _slice = slice_portion.lower()
+                if _slice[0] not in ["t", "m", "b", "l", "c", "r"]:
+                    tools.feedback(
+                        f'The sliced value "{slice_portion}" is not valid!', True
+                    )
+                img = Image.open(img_path)
+                iwidth = img.size[0]
+                iheight = img.size[1]
+                icentre = (int(iwidth / 2), int(iheight / 2))
+                # calculate height of horizontal slice
+                if _slice[0] in ["t", "m", "b"]:
+                    slice_height = int(
+                        min(iwidth * (width_height[1] / width_height[0]), iheight)
+                    )
+                # calculate width of vertical slice
+                if _slice[0] in ["l", "c", "r"]:
+                    slice_width = int(
+                        min(iheight * (width_height[0] / width_height[1]), iwidth)
+                    )
+                # crop - needs a "box" which accepts a tuple with four values for
+                #        the rectangle: left, upper, right, and lower
+                match _slice[0]:
+                    case "t":  # top (horizontal slice)
+                        img2 = img.crop((0, 0, iwidth, slice_height))
+                    case "m":  # middle (horizontal slice)
+                        upper = icentre[1] - int(slice_height / 2)
+                        img2 = img.crop((0, upper, iwidth, upper + slice_height))
+                    case "b":  # bottom (horizontal slice)
+                        img2 = img.crop((0, iheight - slice_height, iwidth, iheight))
+                    case "l":  # left (vertical slice)
+                        img2 = img.crop((0, 0, slice_width, iheight))
+                    case "c":  # centre (vertical slice)
+                        middle = icentre[0] - int(slice_width / 2)
+                        img2 = img.crop((middle, 0, middle + slice_width, iheight))
+                    case "r":  # right (vertical slice)
+                        img2 = img.crop((iwidth - slice_width, 0, iwidth, iheight))
+                    case _:
+                        raise NotImplementedError(f"Cannot process {slice_portion}")
+                # create new file with sliced image
+                img2_filename = img_path.stem + "_" + _slice[0] + img_path.suffix
+                sliced_filename = os.path.join(str(img_path.parent), img2_filename)
+                img2.save(sliced_filename)
+                return sliced_filename
+            except Exception as err:
+                tools.feedback(
+                    f'The sliced value "{slice_portion}" is not valid! ({err})', True
+                )
+            return None
+
+        def get_image_from_svg(image_location: str = None):
+
+            with open(image_location) as f:
+                svg_code = f.read()
+            png_bytes = cairosvg.svg2png(bytestring=svg_code.encode("utf-8"), dpi=300)
+            image = Image.open(io.BytesIO(png_bytes))
+            return image
+
+        def save_image_from_url(url: str):
+            """Download image from network and save locally if not present."""
+            # tools.feedback(f"### image save: {url=} ")
+            loc = urlparse(url)
+            filename = loc.path.split("/")[-1]
+            image_local = os.path.join(cache_directory, filename)
+            if not os.path.exists(image_local):
+                image = requests.get(url)
+                with open(image_local, "wb") as f:
+                    f.write(image.content)
+            return image_local
+
+        def image_box_resize(
+            bbox: pymupdf.Rect, img_path: str, rotation: float
+        ) -> pymupdf.Rect:
+            """Recompute bounding Rect for a rotated image to maintain image size.
+
+            Args
+                bbox: Rect; original bounding box for the image
+                image_path: str; full path to image file
+                rotation: angle; degrees of image rotation
+            Returns
+                adjusted Rect (new bounding box)
+            """
+            if not rotation or rotation == 0:
+                return bbox
+            # Compute Rect center point
+            center = (bbox.tl + bbox.br) / 2
+            # Define the desired rotation matrix
+            matrx = pymupdf.Matrix(rotation)
+            # Compute the tetragon (Quad) for the Rect rotated around its center `
+            quad = bbox.morph(center, matrx)
+            # Compute the rectangle hull of the quad for new boundary box
+            new_bbox = quad.rect
+            # Check image dimensions and ratios
+            try:
+                img = Image.open(img_path)
+            except UnidentifiedImageError:
+                try:
+                    img = get_image_from_svg(img_path)
+                except Exception:
+                    tools.feedback(
+                        f'Unable to open and process the image "{img_path}"', True
+                    )
+            iwidth = img.size[0]
+            iheight = img.size[1]
+            iratio = iwidth / iheight
+            bratio = new_bbox.width / new_bbox.height
+            # Calculate new BBOX size based on image
+            if iratio != bratio:
+                if rotation > 270.0:
+                    _rotation = rotation - 270.0
+                elif rotation > 180.0:
+                    _rotation = rotation - 180.0
+                elif rotation > 90.0:
+                    _rotation = rotation - 90.0
+                else:
+                    _rotation = rotation
+                rotation_rad = math.radians(_rotation)
+                img_height = bbox.width * iheight / iwidth
+                new_box_height = bbox.width * math.sin(
+                    rotation_rad
+                ) + img_height * math.cos(rotation_rad)
+                new_box_width = bbox.width * math.cos(
+                    rotation_rad
+                ) + img_height * math.sin(rotation_rad)
+                new_bbox = pymupdf.Rect(
+                    (center.x - new_box_width / 2.0, center.y - new_box_height / 2.0),
+                    (center.x + new_box_width / 2.0, center.y + new_box_height / 2.0),
+                )
+            return new_bbox
+
+        def image_render(image_location) -> object:
+            """Load, first from local cache then network, and draw."""
+            image_local = image_location
+            if cache_directory:
+                if tools.is_url_valid(image_location):
+                    image_local = save_image_from_url(image_location)
+            # ---- draw image
+            imgdoc = pymupdf.open(image_local)  # open image file as a␣document
+            pdfbytes = imgdoc.convert_to_pdf()  # make a 1-page PDF of it
+            imgpdf = pymupdf.open("pdf", pdfbytes)
+            rct = pymupdf.Rect(scaffold)
+            pdf_page.show_pdf_page(
+                rct,  # where to place the image (rect-like)
+                imgpdf,  # source PDF
+                pno=0,  # page number in *source* PDF (NOT current PDF)
+                clip=None,  # only display this area (rect-like)
+                rotate=self.rotation,  # rotate (float, any value)
+                oc=0,  # control visibility via OCG / OCMD
+                keep_proportion=True,  # keep aspect ratio
+                overlay=True,  # put in foreground
+            )
+            if self.run_debug:
+                pdf_page.draw_rect(rct, color=get_color(DEBUG_COLOR))
+            return image_local
+
+        img = False
+        is_directory = False
+
+        if not image_location:  # not the droids you're looking for... move along
+            return img, None
+        base_image_location = image_location
+
+        if cache_directory:
+            if tools.is_url_valid(image_location):
+                image_local = save_image_from_url(image_location)
+        # ---- check local files
+        if not tools.is_url_valid(image_location):
+            # relative paths
+            if not os.path.isabs(image_location):
+                filepath = tools.script_path()
+                image_local = os.path.join(filepath, image_location)
+            else:
+                image_local = image_location
+            # no filename
+            is_directory = os.path.isdir(image_local)
+            if is_directory:
+                return img, True
+            # check image exists
+            if not os.path.exists(image_local):
+                tools.feedback(
+                    f'Unable to find or open image "{image_location}"', False, True
+                )
+                return img, True
+
+        # ---- calculate BBOX for image
+        width, height = width_height[0], width_height[1]
+        scaffold = (origin[0], origin[1], origin[0] + width, origin[1] + height)
+        if rotation is not None:
+            # need a larger rect!
+            new_origin = image_box_resize(pymupdf.Rect(scaffold), image_local, rotation)
+            scaffold = (
+                new_origin[0],
+                new_origin[1],
+                new_origin[2],
+                new_origin[3],
+            )
+
+        # ---- render image
+        try:
+            if sliced:
+                sliced_filename = slice_image(Path(image_local), sliced, width_height)
+                if sliced_filename:
+                    img = image_render(sliced_filename)
+            else:
+                img = image_render(image_local)
+            return img, is_directory
+        except IOError as err:
+            tools.feedback(
+                f'Unable to find or open image "{base_image_location}"' f" ({err}).",
+                False,
+                True,
+            )
+
+        return img, is_directory
+
+    def process_template(self, _dict):
+        """Set values for properties based on those defined in a dictionary."""
+        if not _dict:
+            return
+        if _dict.get("x"):
+            self.x = _dict.get("x", 1)
+        if _dict.get("y"):
+            self.y = _dict.get("y", 1)
+        if _dict.get("height"):
+            self.height = _dict.get("height", 1)
+        if _dict.get("width"):
+            self.width = _dict.get("width", 1)
+        if _dict.get("diameter"):
+            self.diameter = _dict.get("diameter", 1)
+        if _dict.get("radius"):
+            self.radius = _dict.get("radius", self.diameter / 2.0 or 1)
+        if _dict.get("rounding"):
+            self.rounding = _dict.get("rounding", None)
+        # if _dict.get('x'):
+        #    self.x = _dict.get('x', 1)
+
+    def get_center(self) -> tuple:
+        """Attempt to get centre (x,y) tuple for a shape."""
+        if self.cx and self.cy:
+            return (self.cx, self.cy)
+        if self.x and self.y and self.width and self.height:
+            return (self.x + self.width / 2.0, self.y + self.height / 2.0)
+        return ()
+
+    def get_bounds(self) -> Bounds:
+        """Attempt to get bounds of Rectangle (or any Shape with height and width)."""
+        if self.x and self.y and self.width and self.height:
+            bounds = Bounds(self.x, self.x + self.width, self.y, self.y + self.height)
+            return bounds
+        return None
+
+    def get_shape_in_grid(self, the_shape):
+        """Returns shape contained in GridShape class."""
+        # if inspect.isclass(the_shape) and the_shape.__class__.__name__ == 'GridShape':
+        if isinstance(the_shape, GridShape):
+            return the_shape.shape
+        else:
+            return the_shape
+
+    def get_font_height(self) -> float:
+        # see Span Dictionary for ascender and descender of the font (float).
+        # face = pdfmetrics.getFont(self.font_name).face
+        # height = (face.ascent - face.descent) / 1000 * self.font_size
+        # return height
+        return float(self.font_size)
+
+    def textify(self, index: int = None, text: str = "", default: bool = True) -> str:
+        """Extract text from a list, or create string, based on index & type."""
+        _text = text
+        if not _text and default:
+            _text = self.text
+        log.debug("text %s %s %s %s", index, text, _text, type(_text))
+        if _text is None:
+            return
+        if hasattr(_text, "lower"):
+            return _text
+        try:
+            return _text[index]
+        except TypeError:
+            return _text
+
+    def points_to_value(self, value: float, units_name=None) -> float:
+        """Convert a point value to a units-based value."""
+        try:
+            match units_name:
+                case "cm" | "centimetres":
+                    return float(value) / unit.cm
+                case "mm" | "millimetres":
+                    return float(value) / unit.mm
+                case "inch" | "in" | "inches":
+                    return float(value) / unit.inch
+                case "points" | "pts":
+                    return float(value) / unit.pt
+                case _:
+                    return float(value) / self.units
+        except Exception as err:
+            log.exception(err)
+            tools.feedback(
+                f'Unable to do unit conversion from "{value}" using {self.units}!', True
+            )
+
+    def values_to_points(self, items: list, units_name=None) -> list:
+        """Convert a list of values to point units."""
+        try:
+            match units_name:
+                case "cm" | "centimetres":
+                    return [float(item) * unit.cm for item in items]
+                case "mm" | "millimetres":
+                    return [float(item) * unit.mm for item in items]
+                case "inch" | "in" | "inches":
+                    return [float(item) * unit.inch for item in items]
+                case "points" | "pts":
+                    return [float(item) * unit.pt for item in items]
+                case None:
+                    return [float(item) * self.units for item in items]
+                case _:
+                    tools.feedback(
+                        f'Unable to convert units "{units_name}" to points!', True
+                    )
+        except Exception as err:
+            log.exception(err)
+            tools.feedback(f'Unable to convert value(s) "{items}" to points!', True)
+
+    def draw_multi_string(
+        self, canvas, xm, ym, string, align=None, rotation=0, **kwargs
+    ):
+        """Low-level text drawing, split string (\n) if needed, with align and rotation.
+
+        Args:
+            * canvas (pymupdf.Shape): set by calling function; which
+              should access globals.canvas or BaseShape.canvas
+            * xm (float) and ym (float): must be in native units (i.e. points)!
+            * string (str): the text to draw/write
+            * align (str): one of [centre|right|left|None] alignment of text
+            * rotation (float): an angle in degrees; counter-clockwise from East
+
+        Kwargs:
+            * locale - dict created from Locale namedtuple
+            * font_size -
+            * font_name -
+            * stroke -
+            * fill -
+
+        Notes:
+            Drawing using HTML CSS-styling is handled in the Text shape
+        """
+
+        def move_string_start(text, point, font, fontsize, align):
+            # compute length of written text under font and fontsize:
+            tl = font.text_length(text, fontsize=fontsize)
+            # insertion point ("origin"):
+            if align == "centre":
+                origin = muPoint(point.x - tl / 2.0, point.y)
+            elif align == "right":
+                origin = muPoint(point.x - tl, point.y)
+            else:
+                origin = point
+            return origin
+
+        if not string:
+            return
+        # ---- deprecated
+        if kwargs.get("text_sequence", None):
+            raise NotImplementedError("No text_sequence please!")
+        # ---- process locale data (from Locale namedtuple) via jinja2
+        _locale = kwargs.get("locale", None)
+        if _locale:
+            string = tools.eval_template(string, _locale)
+        # ---- align and font
+        align = align or self.align
+        mvy = copy.copy(ym)
+        # tools.feedback(f"### {string=} {rotation=}")
+        # ---- text properties
+        keys = {}
+        keys["fontsize"] = kwargs.get("font_size", self.font_size)
+        keys["fontname"] = kwargs.get("font_name", self.font_name)
+        # keys['fontfile'] = self.font_file
+        _color = kwargs.get("stroke", self.stroke)
+        keys["color"] = get_color(_color)
+        if kwargs.get("stroke_inner"):
+            _fill = kwargs.get("stroke_inner", self.stroke)
+            keys["fill"] = get_color(_fill)
+        else:
+            keys["fill"] = keys["color"]
+
+        _lineheight = kwargs.get("line_height", None)
+        keys["lineheight"] = self.kw_float(_lineheight, "line_height")
+
+        # keys['stroke_opacity'] = self.show_stroke or 1
+        # keys['fill_opacity'] = self.show_fill or 1
+
+        # potential other properties
+        # keys['idx'] = 0
+        # keys['render_mode'] = 0
+        # keys['miter_limit'] = 1
+        # keys['border_width'] = 1
+        # keys['encoding'] = pymupdf.TEXT_ENCODING_LATIN
+        # keys['oc'] = 0
+        # keys['overlay'] = True
+
+        # TODO - recalculate xm, ym based on align and text width
+        # keys["align"] = align or self.align
+
+        # ---- set font (custom/built-in)
+        if not builtin_font(keys["fontname"]):
+            cache_directory = Path(Path.home() / CACHE_DIRECTORY)
+            fi = FontInterface(cache_directory=cache_directory)
+            keys["fontfile"] = fi.get_font_file(name=keys["fontname"])
+            if not keys["fontfile"]:
+                tools.feedback(
+                    f'Cannot find or load a font named `{keys["fontname"]}`.'
+                    f' Defaulting to "{DEFAULT_FONT}".',
+                    False,
+                    True,
+                )
+                keys["fontname"] = DEFAULT_FONT
+                font = pymupdf.Font(DEFAULT_FONT)  # built-in
+            else:
+                keys["fontname"] = keys["fontname"].replace(" ", "-")
+                font = pymupdf.Font(keys["fontname"], fontfile=keys["fontfile"])
+        else:
+            font = pymupdf.Font(keys["fontname"])  # built-in
+
+        # ---- draw
+        # print(f'### multi_string {xm=} {ym=} {string=} {keys}')
+        point = pymupdf.Point(xm, ym)
+        if self.align:
+            point = move_string_start(string, point, font, keys["fontsize"], self.align)
+        if rotation:
+            dx = pymupdf.get_text_length(string, fontsize=keys["fontsize"]) / 2
+            midpt = pymupdf.Point(point.x + dx, point.y)
+            # self.dot = 0.05; self.draw_dot(canvas, midpt.x, midpt.y)
+            morph = (midpt, pymupdf.Matrix(rotation))
+        else:
+            morph = None
+
+        try:
+            # insert_text(
+            #     point, text, *, fontsize=11, fontname='helv', fontfile=None,
+            #     set_simple=False, encoding=TEXT_ENCODING_LATIN, color=None,
+            #     lineheight=None, fill=None, render_mode=0, miter_limit=1,
+            #     border_width=1, rotate=0, morph=None, stroke_opacity=1,
+            #     fill_opacity=1, oc=0)
+            # print(f'### insert_text {point=} {string=} {morph=} {keys}')
+            canvas.insert_text(point, string, morph=morph, **keys)
+        except Exception as err:
+            if "need font file" in str(err):
+                tools.feedback(
+                    f'The font "{self.font_name}" cannot be found -'
+                    " please check spelling and/or location",
+                    True,
+                )
+            else:
+                tools.feedback(f'Cannot write "{string}" - {err}', True)
+
+    def draw_string(self, canvas, xs, ys, string, align=None, rotation=0, **kwargs):
+        """Draw a multi-string on the canvas."""
+        self.draw_multi_string(
+            canvas=canvas,
+            x=xs,
+            y=ys,
+            string=string,
+            align=align,
+            rotation=rotation,
+            **kwargs,
+        )
+
+    def draw_heading(
+        self, canvas, ID, xh, yh, y_offset=0, align=None, rotation=0, **kwargs
+    ):
+        """Draw the heading for a shape (normally above the shape).
+
+        Requires native units (i.e. points)!
+        """
+        ttext = self.textify(index=ID, text=self.heading, default=False)
+        _rotation = rotation or self.heading_rotation
+        if ttext:
+            _ttext = str(ttext)
+            y_off = y_offset or self.title_size / 2.0
+            y = yh + self.unit(self.heading_my)
+            x = xh + self.unit(self.heading_mx)
+            kwargs["font_name"] = self.heading_face or self.font_name
+            kwargs["stroke"] = self.heading_stroke
+            kwargs["font_size"] = self.heading_size
+            center_point = kwargs.get("rotation_point", None)
+            if center_point and _rotation:
+                point_to_rotate = muPoint(x, y - y_off)
+                rpt = geoms.rotate_point_around_point(
+                    point_to_rotate, center_point, _rotation
+                )
+                # self.dot = 0.05; self.draw_dot(canvas, rpt.x, rpt.y)
+                self.draw_multi_string(
+                    canvas,
+                    rpt.x,
+                    rpt.y,
+                    _ttext,
+                    align=align,
+                    rotation=_rotation,
+                    **kwargs,
+                )
+            else:
+                # self.dot = 0.05; self.draw_dot(canvas, x, y - y_off)
+                self.draw_multi_string(
+                    canvas,
+                    x,
+                    y - y_off,
+                    _ttext,
+                    align=align,
+                    rotation=_rotation,
+                    **kwargs,
+                )
+            if isinstance(canvas, muShape):
+                canvas.commit()
+
+    def draw_label(
+        self, canvas, ID, xl, yl, align=None, rotation=0, centred=True, **kwargs
+    ):
+        """Draw the label for a shape (usually at the centre).
+
+        Requires native units (i.e. points)!
+        """
+        ttext = self.textify(index=ID, text=self.label, default=False)
+        _rotation = rotation or self.label_rotation
+        if ttext:
+            _ttext = str(ttext)
+            yl = yl + (self.label_size / 3.0) if centred else yl
+            y = yl + self.unit(self.label_my)
+            x = xl + self.unit(self.label_mx)
+            kwargs["font_name"] = self.label_face or self.font_name
+            kwargs["stroke"] = self.label_stroke
+            kwargs["font_size"] = self.label_size
+            center_point = kwargs.get("rotation_point", None)
+            if center_point and _rotation:
+                point_to_rotate = muPoint(x, y)
+                rpt = geoms.rotate_point_around_point(
+                    point_to_rotate, center_point, _rotation
+                )
+                # self.dot = 0.05; self.draw_dot(canvas, rpt.x, rpt.y)
+                self.draw_multi_string(
+                    canvas,
+                    rpt.x,
+                    rpt.y,
+                    _ttext,
+                    align=align,
+                    rotation=_rotation,
+                    **kwargs,
+                )
+            else:
+                # self.dot = 0.05; self.draw_dot(canvas, x, y)
+                self.draw_multi_string(
+                    canvas, x, y, _ttext, align=align, rotation=_rotation, **kwargs
+                )
+            if isinstance(canvas, muShape):
+                canvas.commit()
+
+    def draw_title(
+        self, canvas, ID, xt, yt, y_offset=0, align=None, rotation=0, **kwargs
+    ):
+        """Draw the title for a shape (normally below the shape).
+
+        Requires native units (i.e. points)!
+        """
+        ttext = self.textify(index=ID, text=self.title, default=False)
+        _rotation = rotation or self.title_rotation
+        if ttext:
+            _ttext = str(ttext)
+            y_off = y_offset or self.title_size
+            y = yt + self.unit(self.title_my)
+            x = xt + self.unit(self.title_mx)
+            kwargs["font_name"] = self.title_face or self.font_name
+            kwargs["stroke"] = self.title_stroke
+            kwargs["font_size"] = self.title_size
+            center_point = kwargs.get("rotation_point", None)
+            if center_point and _rotation:
+                point_to_rotate = muPoint(x, y + y_off)
+                rpt = geoms.rotate_point_around_point(
+                    point_to_rotate, center_point, _rotation
+                )
+                # self.dot = 0.05; self.draw_dot(canvas, rpt.x, rpt.y)
+                self.draw_multi_string(
+                    canvas,
+                    rpt.x,
+                    rpt.y,
+                    _ttext,
+                    align=align,
+                    rotation=_rotation,
+                    **kwargs,
+                )
+            else:
+                # self.dot = 0.05; self.draw_dot(canvas, x, y + y_off)
+                self.draw_multi_string(
+                    canvas,
+                    x,
+                    y + y_off,
+                    _ttext,
+                    align=align,
+                    rotation=_rotation,
+                    **kwargs,
+                )
+            if isinstance(canvas, muShape):
+                canvas.commit()
+
+    def draw_radii_label(
+        self, canvas, ID, xl, yl, align=None, rotation=0, centred=True, **kwargs
+    ):
+        """Draw the label for a radius (usually at the centre).
+
+        Requires native units (i.e. points)!
+        """
+        if not self.radii_label:
+            return
+        ttext = self.textify(index=ID, text=self.radii_label, default=False)
+        _rotation = rotation or self.radii_labels_rotation
+        if ttext:
+            _ttext = str(ttext)
+            yl = yl - (self.radii_labels_size / 3.0) if centred else yl
+            y = yl + self.unit(self.radii_labels_my)
+            x = xl + self.unit(self.radii_labels_mx)
+            kwargs["font_name"] = self.radii_labels_face
+            kwargs["stroke"] = self.radii_labels_stroke
+            kwargs["font_size"] = self.radii_labels_size
+            # print(f'*** draw_radii_label {rotation=}')
+            self.draw_multi_string(
+                canvas, x, y, _ttext, align=align, rotation=_rotation, **kwargs
+            )
+            if isinstance(canvas, muShape):
+                canvas.commit()
+
+    def draw_dot(self, canvas, x, y):
+        """Draw a small dot on a shape (normally the centre)."""
+        if self.dot:
+            # print(f'*** draw_dot {x=} {y=}' )
+            dot_size = self.unit(self.dot)
+            kwargs = {}
+            kwargs["fill"] = self.dot_stroke
+            kwargs["stroke"] = self.dot_stroke
+            canvas.draw_circle((x, y), dot_size)
+            self.set_canvas_props(cnv=canvas, index=None, **kwargs)
+
+    def draw_cross(self, canvas, xd, yd, **kwargs):
+        """Draw a cross on a shape (normally the centre)."""
+        if self.cross:
+            # ---- properties
+            kwargs = {}
+            cross_size = self.unit(self.cross)
+            rotation = kwargs.get("rotation", self.rotation)
+            if rotation:
+                kwargs["rotation"] = rotation
+                kwargs["rotation_point"] = muPoint(xd, yd)
+            kwargs["fill"] = self.cross_stroke
+            kwargs["stroke"] = self.cross_stroke
+            kwargs["stroke_width"] = self.cross_stroke_width
+            # ---- horizontal line
+            pt1 = geoms.Point(xd - cross_size / 2.0, yd)
+            pt2 = geoms.Point(xd + cross_size / 2.0, yd)
+            canvas.draw_line(pt1, pt2)
+            # ---- vertical line
+            pt1 = geoms.Point(xd, yd - cross_size / 2.0)
+            pt2 = geoms.Point(xd, yd + cross_size / 2.0)
+            canvas.draw_line(pt1, pt2)
+            self.set_canvas_props(cnv=canvas, index=None, **kwargs)
+
+    def make_path_vertices(self, cnv, vertices: list, v1: int, v2: int):
+        """Draw line between two vertices"""
+        cnv.draw_line(vertices[v1], vertices[v2])
+
+    def draw_lines_between_sides(
+        self,
+        cnv,
+        side: float,
+        line_count: int,
+        vertices: list,
+        left_nodes: tuple,
+        right_nodes: tuple,
+        skip_ends: bool = True,
+    ):
+        """Draw lines between opposing sides of a shape
+
+        Args:
+            side: length of a side
+            line_count: number of connections
+            vertices: list of the Points making up the shape
+            left_nodes: IDs of the two vertices on either end of one of the sides
+            right_nodes: IDs of the two vertices on either end of the opposite side
+            skip_ends: if True, do not draw the first or last connection
+
+        Note:
+            * Vertices normally go clockwise from bottom/lower left
+            * Directions of vertex indices in left- and right-sides must be the same
+        """
+        delta = side / (line_count + 1)
+        # tools.feedback(f'### {side=} {line_count=} {delta=} {skip_ends=}')
+        for number in range(0, line_count + 2):
+            if skip_ends:
+                if number == line_count + 1 or number == 0:
+                    continue
+            left_pt = geoms.point_on_line(
+                vertices[left_nodes[0]], vertices[left_nodes[1]], delta * number
+            )
+            right_pt = geoms.point_on_line(
+                vertices[right_nodes[0]], vertices[right_nodes[1]], delta * number
+            )
+            cnv.draw_line(left_pt, right_pt)
+
+    def _debug(self, canvas, **kwargs):
+        """Execute any debug statements."""
+        if self.run_debug:
+            # display vertex index number next to vertex
+            if kwargs.get("vertices", []):
+                kwargs["stroke"] = self.debug_color
+                kwargs["fill"] = self.debug_color
+                kwargs["font_name"] = self.font_name
+                kwargs["font_size"] = 4
+                for key, vert in enumerate(kwargs.get("vertices")):
+                    x = self.points_to_value(vert.x)
+                    y = self.points_to_value(vert.y)
+                    self.draw_multi_string(
+                        # canvas, vert.x, vert.y, f"{key}:{x:.2f},{y:.2f}", **kwargs
+                        canvas,
+                        vert.x,
+                        vert.y,
+                        f"{key}",
+                        **kwargs,
+                    )
+                    canvas.draw_circle((vert.x, vert.y), 2)
+            # display labelled point (geoms.Point)
+            if kwargs.get("point", []):
+                point = kwargs.get("point")
+                label = kwargs.get("label", "")
+                kwargs["fill"] = kwargs.get("color", self.debug_color)
+                kwargs["stroke"] = kwargs.get("color", self.debug_color)
+                kwargs["stroke_width"] = 0.1
+                kwargs["font_size"] = 4
+                x = self.points_to_value(point.x)
+                y = self.points_to_value(point.y)
+                self.draw_multi_string(
+                    canvas, point.x, point.y, f"{label} {point.x:.2f},{point.y:.2f}"
+                )
+                canvas.draw_circle((point.x, point.y), 2)
+            self.set_canvas_props(cnv=canvas, index=None, **kwargs)
+
+    def handle_custom_values(self, the_element, ID):
+        """Process custom values for a Shape's properties.
+
+        Custom values should be stored in self.deck_data as a list of dicts:
+        e.g. [{'SUIT': 'hearts', 'VALUE': 10}, {'SUIT': 'clubs', 'VALUE': 10}]
+        which are used for a set of Cards, or similar placeholder items.
+
+        Values can be accessed via a Jinja template using e.g. T("{{ SUIT }}")
+        """
+
+        def processed_value(value):
+
+            if isinstance(value, (BaseShape, pymupdf.utils.Shape, pymupdf.Page)):
+                return None
+
+            elif isinstance(value, Template):
+                if not self.deck_data:
+                    tools.feedback(
+                        "Cannot use T() or S() command without Data already defined!",
+                        False,
+                    )
+                    tools.feedback(
+                        "Check that Data command is used before Deck command.",
+                        True,
+                    )
+                record = self.deck_data[ID]
+                try:
+                    custom_value = value.render(record)
+                    # print('###', f'{ID=} {key=} {custom_value=}')
+                    return custom_value
+                except jinja2.exceptions.UndefinedError as err:
+                    tools.feedback(
+                        f"Unable to process data with this template ({err})", True
+                    )
+                except Exception as err:
+                    tools.feedback(
+                        f"Unable to process data with this template ({err})", True
+                    )
+            elif isinstance(value, LookupType):
+                record = self.deck_data[ID]
+                lookup_value = record[value.column]
+                custom_value = value.lookups.get(lookup_value, None)
+                return custom_value
+                # print('### LookupType', f'{ID=} {key=} {custom_value=}', '=>', getattr(new_element, key))
+            elif isinstance(value, PosixPath):
+                # print(f'### HCV {ID=} {key=} {value=}')
+                return None
+            else:
+                raise NotImplementedError(f"Cannot handle value of type: {type(value)}")
+
+            return None
+
+        new_element = None
+        # print('### ShapeType ::', type(the_element))
+        if isinstance(the_element, BaseShape):
+            new_element = copy.copy(the_element)
+            keys = vars(the_element).keys()
+            for key in keys:
+                value = getattr(the_element, key)
+                if value is None or isinstance(
+                    value, (str, int, float, list, tuple, range)
+                ):
+                    continue
+                elif isinstance(value, dict):
+                    updated = False
+                    for dkey, val in value.items():
+                        if val is None or isinstance(
+                            val, (str, int, float, list, tuple, range)
+                        ):
+                            continue
+                        custom_value = processed_value(val)
+                        if custom_value is not None:
+                            value[dkey] = custom_value
+                            updated = True
+                    if updated:
+                        setattr(new_element, key, value)
+                else:
+                    custom_value = processed_value(value)
+                    if custom_value is not None:
+                        setattr(new_element, key, custom_value)
+            return new_element
+        return the_element  # no changes needed or made
+
+    def draw_border(self, cnv, border: tuple, ID: int = None):
+        """Draw a border line based its settings."""
+        if not isinstance(border, tuple):
+            tools.feedback(
+                'The "borders" property must contain a list of one or more sets'
+                f' - not "{border}"',
+                True,
+            )
+        # ---- assign tuple values
+        bdirections, bwidth, bcolor, bstyle, dotted, dashed = (
+            None,
+            None,
+            "black",
+            None,
+            False,
+            None,
+        )
+        if len(border) >= 4:
+            bstyle = border[3]
+        if len(border) >= 3:
+            bcolor = border[2]
+        if len(border) >= 2:
+            bdirections = border[0]
+            bwidth = border[1]
+        if len(border) <= 1:
+            tools.feedback(
+                'A "borders" set must contain: direction, width, color'
+                f' and an optional style - not "{border}"',
+                True,
+            )
+        # ---- line styles
+        bwidth = tools.as_float(bwidth, "")
+        if bstyle is True:
+            dotted = True
+        else:
+            dashed = bstyle
+        # ---- multi-directions
+        _bdirections = tools.validated_directions(
+            bdirections, tools.DirectionGroup.COMPASS, "border"
+        )
+        for bdirection in _bdirections:
+            if not bdirection:
+                continue
+            # ---- line start & end
+            shape_name = self.__class__.__name__.replace("Shape", "")
+            match self.__class__.__name__:
+
+                case "RectangleShape" | "SquareShape" | "TrapezoidShape":
+                    match bdirection:  # vertices anti-clockwise from top-left
+                        case "w":
+                            x, y = self.vertexes[0][0], self.vertexes[0][1]
+                            x_1, y_1 = self.vertexes[1][0], self.vertexes[1][1]
+                        case "s":
+                            x, y = self.vertexes[1][0], self.vertexes[1][1]
+                            x_1, y_1 = self.vertexes[2][0], self.vertexes[2][1]
+                        case "e":
+                            x, y = self.vertexes[2][0], self.vertexes[2][1]
+                            x_1, y_1 = self.vertexes[3][0], self.vertexes[3][1]
+                        case "n":
+                            x, y = self.vertexes[3][0], self.vertexes[3][1]
+                            x_1, y_1 = self.vertexes[0][0], self.vertexes[0][1]
+                        case _:
+                            tools.feedback(
+                                f"Invalid direction ({bdirection}) for {shape_name} border",
+                                True,
+                            )
+
+                case "RhombusShape":
+                    match bdirection:
+                        case "se":
+                            x, y = self.vertexes[1][0], self.vertexes[1][1]
+                            x_1, y_1 = self.vertexes[2][0], self.vertexes[2][1]
+                        case "ne":
+                            x, y = self.vertexes[2][0], self.vertexes[2][1]
+                            x_1, y_1 = self.vertexes[3][0], self.vertexes[3][1]
+                        case "nw":
+                            x, y = self.vertexes[3][0], self.vertexes[3][1]
+                            x_1, y_1 = self.vertexes[0][0], self.vertexes[0][1]
+                        case "sw":
+                            x, y = self.vertexes[0][0], self.vertexes[0][1]
+                            x_1, y_1 = self.vertexes[1][0], self.vertexes[1][1]
+                        case _:
+                            tools.feedback(
+                                f"Invalid direction ({bdirection}) for {shape_name} border",
+                                True,
+                            )
+
+                case "HexShape":
+                    if self.orientation == "pointy":
+                        match bdirection:
+                            case "se":
+                                x, y = self.vertexes[2][0], self.vertexes[2][1]
+                                x_1, y_1 = self.vertexes[3][0], self.vertexes[3][1]
+                            case "e":
+                                x, y = self.vertexes[3][0], self.vertexes[3][1]
+                                x_1, y_1 = self.vertexes[4][0], self.vertexes[4][1]
+                            case "ne":
+                                x, y = self.vertexes[4][0], self.vertexes[4][1]
+                                x_1, y_1 = self.vertexes[5][0], self.vertexes[5][1]
+                            case "nw":
+                                x, y = self.vertexes[5][0], self.vertexes[5][1]
+                                x_1, y_1 = self.vertexes[0][0], self.vertexes[0][1]
+                            case "w":
+                                x, y = self.vertexes[0][0], self.vertexes[0][1]
+                                x_1, y_1 = self.vertexes[1][0], self.vertexes[1][1]
+                            case "sw":
+                                x, y = self.vertexes[1][0], self.vertexes[1][1]
+                                x_1, y_1 = self.vertexes[2][0], self.vertexes[2][1]
+                            case _:
+                                tools.feedback(
+                                    f"Invalid direction ({bdirection}) for pointy {shape_name} border",
+                                    True,
+                                )
+                    elif self.orientation == "flat":
+                        match bdirection:
+                            case "s":
+                                x, y = self.vertexes[1][0], self.vertexes[1][1]
+                                x_1, y_1 = self.vertexes[2][0], self.vertexes[2][1]
+                            case "se":
+                                x, y = self.vertexes[2][0], self.vertexes[2][1]
+                                x_1, y_1 = self.vertexes[3][0], self.vertexes[3][1]
+                            case "ne":
+                                x, y = self.vertexes[3][0], self.vertexes[3][1]
+                                x_1, y_1 = self.vertexes[4][0], self.vertexes[4][1]
+                            case "n":
+                                x, y = self.vertexes[4][0], self.vertexes[4][1]
+                                x_1, y_1 = self.vertexes[5][0], self.vertexes[5][1]
+                            case "nw":
+                                x, y = self.vertexes[5][0], self.vertexes[5][1]
+                                x_1, y_1 = self.vertexes[0][0], self.vertexes[0][1]
+                            case "sw":
+                                x, y = self.vertexes[0][0], self.vertexes[0][1]
+                                x_1, y_1 = self.vertexes[1][0], self.vertexes[1][1]
+                            case _:
+                                tools.feedback(
+                                    f"Invalid direction ({bdirection}) for flat {shape_name} border",
+                                    True,
+                                )
+                    else:
+                        raise ValueError(
+                            'Invalid orientation "{self.orientation}" for border'
+                        )
+
+                case _:
+                    match bdirection:
+                        case _:
+                            tools.feedback(f"Cannot draw borders for a {shape_name}")
+
+            # ---- draw line
+            cnv.draw_line((x, y), (x_1, y_1))
+            self.set_canvas_props(
+                index=ID,
+                stroke=bcolor,
+                stroke_width=bwidth,
+                dotted=dotted,
+                dashed=dashed,
+            )
+
+
+class GroupBase(list):
+    """Class for group base."""
+
+    def __init__(self, *args, **kwargs):
+        list.__init__(self, *args)
+        self.kwargs = kwargs

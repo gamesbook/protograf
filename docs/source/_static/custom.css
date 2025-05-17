@@ -1,0 +1,25 @@
+.wy-nav-content {
+    max-width: 95% !important;
+}
+/* override table no-wrap */
+.wy-table-responsive table td, .wy-table-responsive table th {
+    white-space: normal;
+}
+div.highlight-python {
+    background-color: #f4debf;
+    border-top: 1px solid #ac9;
+    border-bottom: 1px solid #ac9;
+}
+div.highlight {
+    background-color: #ffe4b5;
+    border-top: 1px solid #ac9;
+    border-bottom: 1px solid #ac9;
+}
+td p {
+    margin: 20px 2px; /* between paragraphs in table */
+    color: #2f4f4f;
+    font-size: 16px;
+}
+p {
+    font-size: 18px;
+}
