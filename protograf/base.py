@@ -536,7 +536,8 @@ class BaseCanvas:
         self.tail_width = self.defaults.get("tail_width", 0)  # adjusted in ArrowShape
         self.tail_notch = self.defaults.get("tail_notch", 0)
         # ---- arrowhead (on-a-line)
-        self.arrow_style = self.defaults.get("arrow_style", "triangle")
+        self.arrow = self.defaults.get("arrow", False)
+        self.arrow_style = self.defaults.get("arrow_style", None)
         self.arrow_position = self.defaults.get("arrow_position", None)  # 1 => end
         self.arrow_width = self.defaults.get("arrow_width", None)
         self.arrow_height = self.defaults.get("arrow_height", None)
@@ -945,6 +946,7 @@ class BaseShape:
         self.tail_width = self.kw_float(kwargs.get("tail_width", base.tail_width))
         self.tail_notch = self.kw_float(kwargs.get("tail_notch", base.tail_notch))
         # ---- arrowhead (on-a-line)
+        self.arrow = self.kw_bool(kwargs.get("arrow", base.arrow))
         self.arrow_style = kwargs.get("arrow_style", base.arrow_style)
         self.arrow_position = kwargs.get("arrow_position", base.arrow_position)
         self.arrow_width = kwargs.get("arrow_width", base.arrow_width)
@@ -1706,37 +1708,20 @@ class BaseShape:
             if str(self.arrow_style).lower() not in [
                 "angle",
                 "angled",
+                "a",
                 "notch",
                 "notched",
-                "triangle",  # default
-                "a",
                 "n",
+                "spear",
+                "s",
+                "triangle",  # default
                 "t",
+                # "circle",
+                # "c",
             ]:
                 issue.append(f'"{self.arrow_style}" is an invalid arrow_style!')
                 correct = False
         # ---- line arrows
-        # if self.arrow_style:
-        #     if str(self.arrow_style).lower() not in [
-        #         "line",
-        #         "l",
-        #         "line2",
-        #         "l2",
-        #         "line3",
-        #         "l3",
-        #         "triangle",
-        #         "t",
-        #         "diamond",
-        #         "d",
-        #         "notch",
-        #         "n",
-        #         "spear",
-        #         "s",
-        #         "circle",
-        #         "c",
-        #     ]:
-        #         issue.append(f'"{self.arrow_style}" is an invalid arrow style!')
-        #         correct = False
         # if self.arrow_tail_style:
         #     if str(self.arrow_tail_style).lower() not in [
         #         "line",
@@ -2562,52 +2547,65 @@ class BaseShape:
             point_end: end point of line
         """
         if self.arrow_position:
-            pos = tools.as_float(self.arrow_position, "arrow_position")
-            if pos > 1:
-                tools.feedback("The arrow_position value must be less than 1", True)
-            the_tip = geoms.fraction_along_line(
-                point_start, point_end, self.arrow_position
-            )
+            tips = []
+            steps = tools.sequence_split(
+                self.arrow_position, unique=False, as_int=False, as_float=True,
+                msg=' for arrow_position')
+            for step in steps:
+                if step > 1:
+                    tools.feedback("The arrow_position value must be less than 1", True)
+                the_tip = geoms.fraction_along_line(point_start, point_end, step)
+                tips.append(the_tip)
         else:
-            the_tip = point_end
-        head_width = (
-            self.unit(self.arrow_width)
-            if self.arrow_width
-            else (self.stroke_width * 4 + self.stroke_width)
-        )
-        _head_height = math.sqrt(head_width**2 - (0.5 * head_width) ** 2)
-        head_height = (
-            self.unit(self.arrow_height) if self.arrow_height else _head_height
-        )
-        pt1 = geoms.Point(the_tip.x - head_width / 2.0, the_tip.y + head_height)
-        pt2 = the_tip
-        pt3 = geoms.Point(the_tip.x + head_width / 2.0, the_tip.y + head_height)
-        vertexes = [pt1, pt2, pt3]
-        kwargs["vertices"] = vertexes
-        kwargs["stroke_width"] = 0.01
-        # print(f'{self.arrow_stroke=} {self.arrow_fill=} {self.stroke=}')
-        kwargs["fill"] = self.arrow_fill or self.stroke
-        kwargs["stroke"] = self.arrow_stroke or self.stroke
-        kwargs["fill"] = self.arrow_fill or self.stroke
-        kwargs["closed"] = True
-        kwargs["rotation"] = 0
-        kwargs["rotation_point"] = None
-        match str(self.arrow_style).lower():
-            case "triangle" | "t":  # default
-                pass
-            case "angle" | "angled" | "a":
-                kwargs["stroke_width"] = self.stroke_width
-                kwargs["closed"] = False
-                kwargs["fill"] = None
-            case "notch" | "notched" | "n":
-                pt4 = geoms.Point(the_tip.x, the_tip.y + 0.5 * head_height)
-                vertexes.append(pt4)
-        # set props
-        # print(f'{vertexes=}')
-        # print(f'{kwargs=}')
-        self._debug(cnv, vertices=vertexes)  # needs: self.debug=True
-        cnv.draw_polyline(vertexes)
-        self.set_canvas_props(cnv=cnv, index=None, **kwargs)
+            tips = [point_end]
+        for the_tip in tips:
+            head_width = (
+                self.unit(self.arrow_width)
+                if self.arrow_width
+                else (self.stroke_width * 4 + self.stroke_width)
+            )
+            _head_height = math.sqrt(head_width**2 - (0.5 * head_width) ** 2)
+            head_height = (
+                self.unit(self.arrow_height) if self.arrow_height else _head_height
+            )
+            pt1 = geoms.Point(the_tip.x - head_width / 2.0, the_tip.y + head_height)
+            pt2 = the_tip
+            pt3 = geoms.Point(the_tip.x + head_width / 2.0, the_tip.y + head_height)
+            vertexes = [pt1, pt2, pt3]
+            kwargs["vertices"] = vertexes
+            kwargs["stroke_width"] = 0.01
+            # print(f'{self.arrow_stroke=} {self.arrow_fill=} {self.stroke=}')
+            kwargs["fill"] = self.arrow_fill or self.stroke
+            kwargs["stroke"] = self.arrow_stroke or self.stroke
+            kwargs["fill"] = self.arrow_fill or self.stroke
+            kwargs["closed"] = True
+            deg, angle = geoms.angles_from_points(point_start, point_end)
+            # print(f'{deg=} {angle=} ')
+            if point_start.x != point_end.x:
+                kwargs["rotation"] = 180 + deg
+                kwargs["rotation_point"] = the_tip
+            else:
+                kwargs["rotation"] = 0
+                kwargs["rotation_point"] = None
+            self.arrow_style = self.arrow_style or "triangle"  # default
+            match str(self.arrow_style).lower():
+                case "triangle" | "t":
+                    pass
+                case "spear" | "s":
+                    pt4 = geoms.Point(the_tip.x, the_tip.y + 2 * head_height)
+                    vertexes.append(pt4)
+                case "angle" | "angled" | "a":
+                    kwargs["stroke_width"] = self.stroke_width
+                    kwargs["closed"] = False
+                    kwargs["fill"] = None
+                case "notch" | "notched" | "n":
+                    pt4 = geoms.Point(the_tip.x, the_tip.y + 0.5 * head_height)
+                    vertexes.append(pt4)
+            # set props
+            # print(f'{vertexes=}' {kwargs=}')
+            self._debug(cnv, vertices=vertexes)  # needs: self.debug=True
+            cnv.draw_polyline(vertexes)
+            self.set_canvas_props(cnv=cnv, index=None, **kwargs)
 
     def make_path_vertices(self, cnv, vertices: list, v1: int, v2: int):
         """Draw line between two vertices"""

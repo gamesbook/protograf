@@ -312,7 +312,8 @@ def tuple_split(
 
 
 def sequence_split(
-    string: str, as_int: bool = True, unique: bool = True, sep: str = ","
+    string: str, as_int: bool = True, unique: bool = True, sep: str = ",",
+    as_float: bool = False, msg: str = ''
 ):
     """
     Split a string into a list of individual values
@@ -326,20 +327,32 @@ def sequence_split(
     []
     >>> sequence_split('3')
     [3]
-    >>> sequence_split('3', False)
+    >>> sequence_split('3', as_int=False)
     ['3']
     >>> sequence_split('3,4,5')
     [3, 4, 5]
-    >>> sequence_split('3,4,5', False, False)
+    >>> sequence_split('3,4,5', as_int=False, unique=False)
     ['3', '4', '5']
-    >>> x = sequence_split('3,4,5', False)
+    >>> x = sequence_split('3,4,5', as_int=False)
     >>> assert '5' in x
     >>> sequence_split('3-5,6,1-4')
     [1, 2, 3, 4, 5, 6]
-    >>> sequence_split('A,1,B', False, False)
+    >>> sequence_split('A,1,B', as_int=False, unique=False)
     ['A', '1', 'B']
+    >>> sequence_split('3.1,4.2,5.3', unique=False, as_int=False, as_float=True)
+    [3.1, 4.2, 5.3]
+    >>> sequence_split([3.1,4.2,5.3], unique=False, as_int=False, as_float=True)
+    [3.1, 4.2, 5.3]
+    >>> sequence_split(3)
+    [3]
+    >>> sequence_split(3.1)
+    [3.1]
     """
     values = []
+    if isinstance(string, list):
+        return string
+    if isinstance(string, (int, float)):
+        return [string]
     if string:
         try:
             if sep == ",":
@@ -368,13 +381,18 @@ def sequence_split(
     for item in _strings:
         if "-" in item:
             _strs = item.split("-")
-            seq_range = list(range(int(_strs[0]), int(_strs[1]) + 1))
-            if not as_int:
-                seq_range = [str(val) for val in seq_range]
+            seq_range = [str(val) for val in _strs]
+            if as_int:
+                seq_range = list(range(int(_strs[0]), int(_strs[1]) + 1))
             values = values + seq_range
+            if as_float:
+                feedback(
+                    f'Cannot set a range of decimal numbers ("{item}"){msg}', True)
         else:
             if as_int:
                 values.append(int(item))
+            elif as_float:
+                values.append(float(item))
             else:
                 values.append(item)
 

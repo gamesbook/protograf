@@ -893,7 +893,7 @@ class ChordShape(BaseShape):
         kwargs["rotation_point"] = mid_point
         self.set_canvas_props(cnv=cnv, index=ID, **kwargs)  # shape.finish()
         # ---- calculate line rotation
-        compass, rotation = geoms.angles_from_points(x, y, x_1, y_1)
+        compass, rotation = geoms.angles_from_points(Point(x, y), Point(x_1, y_1))
         # tools.feedback(f"*** Chord {compass=} {rotation=}")
         # ---- dot
         self.draw_dot(cnv, (x_1 + x) / 2.0, (y_1 + y) / 2.0)
@@ -1685,7 +1685,7 @@ class HexShape(BaseShape):
                 p2 = Point(vertices[key - 1].x, vertices[key - 1].y)
             pc = geoms.fraction_along_line(p1, p2, 0.5)  # centre pt of edge
             _perbis_pts.append(pc)
-            _, angle = geoms.angles_from_points(centre.x, centre.y, pc.x, pc.y)
+            _, angle = geoms.angles_from_points(centre, pc)
             _perbis.append(angle)
         pb_offset = self.unit(self.perbis_offset, label="perbis offset") or 0
         pb_length = (
@@ -2217,7 +2217,7 @@ class LineShape(BaseShape):
         # ---- dot
         self.draw_dot(cnv, (x_1 + x) / 2.0, (y_1 + y) / 2.0)
         # ---- text
-        _, _rotation = geoms.angles_from_points(x, y, x_1, y_1)
+        _, _rotation = geoms.angles_from_points(Point(x, y), Point(x_1, y_1))
         kwargs["rotation"] = -1 * _rotation
         kwargs["rotation_point"] = the_point
         self.draw_label(
@@ -2229,7 +2229,8 @@ class LineShape(BaseShape):
             **kwargs,
         )
         # ---- arrowhead
-        if self.arrow_style:
+        if (self.arrow or self.arrow_style or self.arrow_position
+                or self.arrow_height or self.arrow_width):
             self.draw_arrowhead(cnv, Point(x, y), Point(x_1, y_1), **kwargs)
 
 
@@ -2315,7 +2316,7 @@ class PolygonShape(BaseShape):
         vertices = self.get_vertexes(rotation, is_rotated)
         angles = []
         for vertex in vertices:
-            _, angle = geoms.angles_from_points(centre.x, centre.y, vertex.x, vertex.y)
+            _, angle = geoms.angles_from_points(centre, vertex)
             angles.append(angle)
         return angles
 
@@ -2352,7 +2353,7 @@ class PolygonShape(BaseShape):
                 p2 = Point(vertices[key - 1].x, vertices[key - 1].y)
             pc = geoms.fraction_along_line(p1, p2, 0.5)  # centre pt of edge
             _perbis_pts.append(pc)
-            _, angle = geoms.angles_from_points(centre.x, centre.y, pc.x, pc.y)
+            _, angle = geoms.angles_from_points(centre, pc)
             angle = 360.0 - angle if angle > 0.0 else angle
             _perbis.append(angle)
         pb_offset = self.unit(self.perbis_offset, label="perbis offset") or 0
@@ -2397,7 +2398,7 @@ class PolygonShape(BaseShape):
             vertices = self.get_vertexes(rotation=rotation)
         _radii = []
         for vertex in vertices:
-            _, angle = geoms.angles_from_points(centre.x, centre.y, vertex.x, vertex.y)
+            _, angle = geoms.angles_from_points(centre, vertex)
             _radii.append(angle)
         rad_offset = self.unit(self.radii_offset, label="radii offset") or 0
         rad_length = (
@@ -2756,7 +2757,7 @@ class RectangleShape(BaseShape):
         centre = Point(x + self._u.height / 2.0, y + self._u.height / 2.0)
         angles = []
         for vtx in vertices:
-            _, angle = geoms.angles_from_points(centre.x, centre.y, vtx.x, vtx.y)
+            _, angle = geoms.angles_from_points(centre, vtx)
             angles.append(angle)
         return angles
 

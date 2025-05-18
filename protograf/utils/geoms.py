@@ -272,8 +272,10 @@ def point_on_circle(point_centre: Point, radius: float, angle: float) -> Point:
     >>> R = 3.0
     >>> T = 45.0
     >>> R = point_on_circle(P, R, T)
-    >>> assert round(R.x, 4) == 2.1213
-    >>> assert round(R.y, 4) == 2.1213
+    >>> round(R.x, 4) == 2.1213
+    True
+    >>> round(R.y, 4) == -2.1213
+    True
     """
     if radius == 0.0:
         return point_centre
@@ -307,14 +309,12 @@ def fraction_along_line(point_start: Point, point_end: Point, fraction: float) -
     return fraction_point
 
 
-def angles_from_points(x1: float, y1: float, x2: float, y2: float) -> tuple:
+def angles_from_points(first: Point, second: Point) -> tuple:
     """Given two points, calculate the compass and rotation angles between them
 
     Args:
-        x1: x-coodinate of first point
-        y1: y-coodinate of first point
-        x2: x-coodinate of second point
-        y2: y-coodinate of second point
+        x: coordinates first point
+        y: coordinate of second point
 
     Returns:
         compass (float): degrees clockwise from North
@@ -323,26 +323,26 @@ def angles_from_points(x1: float, y1: float, x2: float, y2: float) -> tuple:
     Doc Test:
 
     >>> # clockwise around circle from 0 degrees at North
-    >>> angles_from_points(0, 0, 0, 4)
+    >>> angles_from_points(Point(0, 0), Point(0, 4))
     (0.0, 90.0)
-    >>> angles_from_points(0, 0, 4, 4)
+    >>> angles_from_points(Point(0, 0), Point(4, 4))
     (45.0, 45.0)
-    >>> angles_from_points(0, 0, 4, 0)
+    >>> angles_from_points(Point(0, 0), Point(4, 0))
     (90.0, 0.0)
-    >>> angles_from_points(0, 0, 4, -4)
+    >>> angles_from_points(Point(0, 0), Point(4, -4))
     (135.0, 315.0)
-    >>> angles_from_points(0, 0, 0, -4)
+    >>> angles_from_points(Point(0, 0), Point(0, -4))
     (180.0, 270.0)
-    >>> angles_from_points(0, 0, -4, -4)
+    >>> angles_from_points(Point(0, 0), Point(-4, -4))
     (225.0, 225.0)
-    >>> angles_from_points(0, 0, -4, 0)
+    >>> angles_from_points(Point(0, 0), Point(-4, 0))
     (270.0, 180.0)
-    >>> angles_from_points(0, 0, -4, 4)
+    >>> angles_from_points(Point(0, 0), Point(-4, 4))
     (315.0, 135.0)
     """
-    a, b = x2 - x1, y2 - y1
-    if x2 != x1:
-        gradient = (y2 - y1) / (x2 - x1)
+    a, b = second.x - first.x, second.y - first.y
+    if second.x != first.x:
+        gradient = (second.y - first.y) / (second.x - first.x)
         theta = math.atan(gradient)
         angle = theta * 180.0 / math.pi
         # print(f'{x1-x1=} {y1-y1=} {a=} {b=} {angle=}')
@@ -356,7 +356,7 @@ def angles_from_points(x1: float, y1: float, x2: float, y2: float) -> tuple:
             compass = 270.0 - angle
     else:
         compass = 0.0
-        if y2 - y1 < 0:
+        if second.y - first.y < 0:
             compass = 180.0
     rotation = (450 - compass) % 360.0
     # print(f'angle fn: {compass=}, {rotation=}')
@@ -536,11 +536,11 @@ def rotate_point_around_point(
     Doc Test:
 
     >>> rotate_point_around_point((2,2), (1,1), 90)
-    Point(x=0.0, y=2.0)
+    Point(x=2.0, y=0.0)
     >>> rotate_point_around_point((2,2), (1,3), 45)
-    Point(x=2.41421356, y=3.0)
+    Point(x=1.0, y=1.58578644)
     >>> rotate_point_around_point((10,0), (0,0), 90)
-    Point(x=0.0, y=10.0)
+    Point(x=0.0, y=-10.0)
     """
     import math
 

@@ -493,6 +493,50 @@ Arrow(x=2.5, y=3, title="45\u00B0", dot=0.1,
 Arrow(x=3, y=5.5, label="arrow")
 PageBreak()
 
+# ---- arrowhead
+Blueprint(stroke_width=0.5)
+Text(common=txt, text="Line: Arrowheads")
+Line(x=0.5, y=1, x1=0.5, y1=0, arrow=True, stroke="black")
+Line(x=1.5, y=1, x1=1.5, y1=0, arrow_style='notch')
+Line(x=2.5, y=1, x1=2.5, y1=0, arrow_style='angle')
+Line(x=3.5, y=1, x1=3.5, y1=0, arrow_style='spear')
+
+Line(x=0, y=1.75, x1=1, y1=1.25, arrow_style='angle')
+Line(x=2, y=1.5, x1=1, y1=1.5, arrow_style='angle')
+Line(x=2, y=1.25, x1=3, y1=1.75, arrow_style='angle')
+Line(x=3, y=1.5, x1=4, y1=1.5, arrow_style='angle')
+
+Line(x=0, y=3, x1=1, y1=2, arrow=True)
+Line(x=1, y=3, x1=2, y1=2, arrow_style='notch')
+Line(x=2, y=3, x1=3, y1=2, arrow_style='angle')
+Line(x=3, y=3, x1=4, y1=2, arrow_style='spear')
+
+bigger = Common(arrow_width=0.2, arrow_height=0.3)
+Line(common=bigger, x=0, y=4, x1=1, y1=3,)
+Line(common=bigger, x=1, y=4, x1=2, y1=3, arrow_style='notch')
+Line(common=bigger, x=2, y=4, x1=3, y1=3, arrow_style='angle')
+Line(common=bigger, x=3, y=4, x1=4, y1=3, arrow_style='spear')
+
+big_color = Common(
+    arrow_width=0.2, arrow_height=0.3,
+    arrow_fill="yellow", arrow_stroke="red")
+Line(common=big_color, x=0, y=5, x1=1, y1=4,)
+Line(common=big_color, x=1, y=5, x1=2, y1=4, arrow_style='notch')
+Line(common=big_color, x=2, y=5, x1=3, y1=4, arrow_style='angle')
+Line(common=big_color, x=3, y=5, x1=4, y1=4, arrow_style='spear')
+
+Line(x=0.5, y=6, x1=0.5, y1=5, arrow_position=0.6, dotted=True, stroke_width=1.5)
+Line(x=1, y=6, x1=2, y1=5, arrow_position=[0.25, 0.5, 0.75])
+Line(x=2.5, y=6, x1=2.5, y1=5, arrow_position=[1.0, 0.93])
+Line(x=3, y=6, x1=4, y1=5,
+     arrow_style='spear',
+     arrow_height=0.15)
+Line(x=3, y=6, x1=4, y1=5,
+     arrow_style='angle',
+     arrow_width=0.15,
+     arrow_position=[0.1, 0.15, 0.2])
+PageBreak()
+
 # ---- Centred Shapes
 Blueprint()
 Text(common=txt, text="Centred Shapes")
@@ -610,7 +654,7 @@ Text(x=0, y=0.5, align="left", text="Times-Roman 12pt red")
 
 Text(html=True,
      x=0, y=1, width=4, height=2,
-     text='<span style="font-family: Helvetica; font-size: 10pt; color: red">'
+     text='<span style="font-family: Helvetica; font-size: 10pt; color: black">'
           'HTML Helvetica 10pt<br/>'
           '<b>bold</b> <i>ital</i> <b><i>bold ital</i></b></span>'
 )
@@ -694,7 +738,8 @@ Save(
         "descriptions", "label_offset", "star_custom",
         "polyshape_default", "polyshape_custom", "polyshape_offset",
         "rectangles_rowcol", "rectangles_custom", "rhombus_custom",
-        "rhombus_borders", "trapezoid_borders", "arrow_sizes", "arrow_rotate",
+        "rhombus_borders", "trapezoid_borders",
+        "arrow_sizes", "arrow_rotate", "arrowheads",
         "shape_centred", "shape_centred_move", "qr_code", "image_sliced",
         "shape_rotation", "shape_hatch_and_rotation",
         "text_style", "text_custom", "text_rotate",
