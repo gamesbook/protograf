@@ -38,6 +38,7 @@ from protograf.utils.support import LookupType, unit
 from protograf.utils.support import BUILT_IN_FONTS, CACHE_DIRECTORY
 from protograf import globals
 
+
 log = logging.getLogger(__name__)
 
 DEBUG = False
@@ -534,25 +535,15 @@ class BaseCanvas:
         self.head_width = self.defaults.get("head_width", 2 * self.width)
         self.tail_width = self.defaults.get("tail_width", 0)  # adjusted in ArrowShape
         self.tail_notch = self.defaults.get("tail_notch", 0)
-        # TODO arrow-on-a-line
+        # ---- arrowhead (on-a-line)
         self.arrow_style = self.defaults.get("arrow_style", "triangle")
-        self.arrow_tail_style = self.defaults.get("arrow_tail_style", None)
-        self.arrow_head_fraction = self.defaults.get("arrow_head_fraction", 0.1)
-        self.arrow_tail_fraction = self.defaults.get("arrow_tail_fraction", 0.1)
-        self.arrow_head_height = self.defaults.get("arrow_head_height", None)
-        self.arrow_tail_height = self.defaults.get("tail_height", None)
-        self.arrow_head_width = self.defaults.get("head_width", None)
-        self.arrow_tail_width = self.defaults.get("tail_width", None)
-        self.arrow_tail_fill = self.defaults.get("tail_fill", self.fill)
-        self.arrow_head_fill = self.defaults.get("head_fill", self.fill)
-        self.arrow_head_stroke = self.defaults.get("head_stroke", self.stroke)
-        self.arrow_tail_stroke = self.defaults.get("tail_stroke", self.stroke)
-        self.arrow_head_stroke_width = self.defaults.get(
-            "arrow_head_stroke_width", self.stroke_width
-        )
-        self.arrow_tail_stroke_width = self.defaults.get(
-            "arrow_tail_stroke_width", self.stroke_width
-        )
+        self.arrow_position = self.defaults.get("arrow_position", None)  # 1 => end
+        self.arrow_width = self.defaults.get("arrow_width", None)
+        self.arrow_height = self.defaults.get("arrow_height", None)
+        self.arrow_stroke = self.defaults.get(
+            "arrow_stroke", None
+        )  # see draw_arrowhead()
+        self.arrow_fill = self.defaults.get("arrow_fill", None)  # see draw_arrowhead()
         # ---- line / bezier
         self.x_1 = self.defaults.get("x1", 0)
         self.y_1 = self.defaults.get("y1", 0)
@@ -953,9 +944,13 @@ class BaseShape:
         self.head_width = self.kw_float(kwargs.get("head_width", base.head_width))
         self.tail_width = self.kw_float(kwargs.get("tail_width", base.tail_width))
         self.tail_notch = self.kw_float(kwargs.get("tail_notch", base.tail_notch))
-        # TODO arrow-on-a-line
+        # ---- arrowhead (on-a-line)
         self.arrow_style = kwargs.get("arrow_style", base.arrow_style)
-        self.arrow_tail_style = kwargs.get("arrow_tail_style", base.arrow_tail_style)
+        self.arrow_position = kwargs.get("arrow_position", base.arrow_position)
+        self.arrow_width = kwargs.get("arrow_width", base.arrow_width)
+        self.arrow_height = kwargs.get("arrow_height", base.arrow_height)
+        self.arrow_stroke = kwargs.get("arrow_stroke", base.arrow_stroke)
+        self.arrow_fill = kwargs.get("arrow_fill", base.arrow_fill)
         # ---- line / bezier / sector
         self.x_1 = self.kw_float(kwargs.get("x1", base.x_1))
         self.y_1 = self.kw_float(kwargs.get("y1", base.y_1))
@@ -1694,7 +1689,8 @@ class BaseShape:
             if str(self.rotation_point).lower() not in [
                 "start",
                 "centre",
-                "end" "s",
+                "end",
+                "s",
                 "c",
                 "e",
             ]:
@@ -1705,45 +1701,59 @@ class BaseShape:
             if str(self.coord_style).lower() not in ["linear", "diagonal", "l", "d"]:
                 issue.append(f'"{self.coord_style}" is an invalid coord style!')
                 correct = False
-        # ---- line arrows
+        # ---- arrowhead style
         if self.arrow_style:
             if str(self.arrow_style).lower() not in [
-                "line",
-                "l",
-                "line2",
-                "l2",
-                "line3",
-                "l3",
-                "triangle",
-                "t",
-                "diamond",
-                "d",
+                "angle",
+                "angled",
                 "notch",
+                "notched",
+                "triangle",  # default
+                "a",
                 "n",
-                "spear",
-                "s",
-                "circle",
-                "c",
+                "t",
             ]:
-                issue.append(f'"{self.arrow_style}" is an invalid arrow style!')
+                issue.append(f'"{self.arrow_style}" is an invalid arrow_style!')
                 correct = False
-        if self.arrow_tail_style:
-            if str(self.arrow_tail_style).lower() not in [
-                "line",
-                "l",
-                "line2",
-                "l2",
-                "line3",
-                "l3",
-                "feather",
-                "f",
-                "circle",
-                "c",
-            ]:
-                issue.append(
-                    f'"{self.arrow_tail_style}" is an invalid arrow tail style!'
-                )
-                correct = False
+        # ---- line arrows
+        # if self.arrow_style:
+        #     if str(self.arrow_style).lower() not in [
+        #         "line",
+        #         "l",
+        #         "line2",
+        #         "l2",
+        #         "line3",
+        #         "l3",
+        #         "triangle",
+        #         "t",
+        #         "diamond",
+        #         "d",
+        #         "notch",
+        #         "n",
+        #         "spear",
+        #         "s",
+        #         "circle",
+        #         "c",
+        #     ]:
+        #         issue.append(f'"{self.arrow_style}" is an invalid arrow style!')
+        #         correct = False
+        # if self.arrow_tail_style:
+        #     if str(self.arrow_tail_style).lower() not in [
+        #         "line",
+        #         "l",
+        #         "line2",
+        #         "l2",
+        #         "line3",
+        #         "l3",
+        #         "feather",
+        #         "f",
+        #         "circle",
+        #         "c",
+        #     ]:
+        #         issue.append(
+        #             f'"{self.arrow_tail_style}" is an invalid arrow tail style!'
+        #         )
+        #         correct = False
         # ---- starfield
         if self.star_pattern:
             if str(self.star_pattern).lower() not in ["random", "cluster", "r", "c"]:
@@ -2542,6 +2552,63 @@ class BaseShape:
             canvas.draw_line(pt1, pt2)
             self.set_canvas_props(cnv=canvas, index=None, **kwargs)
 
+    def draw_arrowhead(
+        self, cnv, point_start: geoms.Point, point_end: geoms.Point, **kwargs
+    ):
+        """Draw arrowhead at the end of a straight line segment
+
+        Args:
+            point_start: start point of line
+            point_end: end point of line
+        """
+        if self.arrow_position:
+            pos = tools.as_float(self.arrow_position, "arrow_position")
+            if pos > 1:
+                tools.feedback("The arrow_position value must be less than 1", True)
+            the_tip = geoms.fraction_along_line(
+                point_start, point_end, self.arrow_position
+            )
+        else:
+            the_tip = point_end
+        head_width = (
+            self.unit(self.arrow_width)
+            if self.arrow_width
+            else (self.stroke_width * 4 + self.stroke_width)
+        )
+        _head_height = math.sqrt(head_width**2 - (0.5 * head_width) ** 2)
+        head_height = (
+            self.unit(self.arrow_height) if self.arrow_height else _head_height
+        )
+        pt1 = geoms.Point(the_tip.x - head_width / 2.0, the_tip.y + head_height)
+        pt2 = the_tip
+        pt3 = geoms.Point(the_tip.x + head_width / 2.0, the_tip.y + head_height)
+        vertexes = [pt1, pt2, pt3]
+        kwargs["vertices"] = vertexes
+        kwargs["stroke_width"] = 0.01
+        # print(f'{self.arrow_stroke=} {self.arrow_fill=} {self.stroke=}')
+        kwargs["fill"] = self.arrow_fill or self.stroke
+        kwargs["stroke"] = self.arrow_stroke or self.stroke
+        kwargs["fill"] = self.arrow_fill or self.stroke
+        kwargs["closed"] = True
+        kwargs["rotation"] = 0
+        kwargs["rotation_point"] = None
+        match str(self.arrow_style).lower():
+            case "triangle" | "t":  # default
+                pass
+            case "angle" | "angled" | "a":
+                kwargs["stroke_width"] = self.stroke_width
+                kwargs["closed"] = False
+                kwargs["fill"] = None
+            case "notch" | "notched" | "n":
+                pt4 = geoms.Point(the_tip.x, the_tip.y + 0.5 * head_height)
+                vertexes.append(pt4)
+        # set props
+        # print(f'{vertexes=}')
+        # print(f'{kwargs=}')
+        self._debug(cnv, vertices=vertexes)  # needs: self.debug=True
+        cnv.draw_polyline(vertexes)
+        self.set_canvas_props(cnv=cnv, index=None, **kwargs)
+
     def make_path_vertices(self, cnv, vertices: list, v1: int, v2: int):
         """Draw line between two vertices"""
         cnv.draw_line(vertices[v1], vertices[v2])
@@ -2604,7 +2671,7 @@ class BaseShape:
                         f"{key}",
                         **kwargs,
                     )
-                    canvas.draw_circle((vert.x, vert.y), 2)
+                    canvas.draw_circle((vert.x, vert.y), 1)
             # display labelled point (geoms.Point)
             if kwargs.get("point", []):
                 point = kwargs.get("point")
@@ -2618,7 +2685,7 @@ class BaseShape:
                 self.draw_multi_string(
                     canvas, point.x, point.y, f"{label} {point.x:.2f},{point.y:.2f}"
                 )
-                canvas.draw_circle((point.x, point.y), 2)
+                canvas.draw_circle((point.x, point.y), 1)
             self.set_canvas_props(cnv=canvas, index=None, **kwargs)
 
     def handle_custom_values(self, the_element, ID):

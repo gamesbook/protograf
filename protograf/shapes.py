@@ -2228,6 +2228,9 @@ class LineShape(BaseShape):
             centred=False,
             **kwargs,
         )
+        # ---- arrowhead
+        if self.arrow_style:
+            self.draw_arrowhead(cnv, Point(x, y), Point(x_1, y_1), **kwargs)
 
 
 class PolygonShape(BaseShape):
