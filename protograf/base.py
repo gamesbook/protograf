@@ -2546,11 +2546,16 @@ class BaseShape:
             point_start: start point of line
             point_end: end point of line
         """
+        self.arrow_style = self.arrow_style or "triangle"  # default
         if self.arrow_position:
             tips = []
             steps = tools.sequence_split(
-                self.arrow_position, unique=False, as_int=False, as_float=True,
-                msg=' for arrow_position')
+                self.arrow_position,
+                unique=False,
+                as_int=False,
+                as_float=True,
+                msg=" for arrow_position",
+            )
             for step in steps:
                 if step > 1:
                     tools.feedback("The arrow_position value must be less than 1", True)
@@ -2587,7 +2592,7 @@ class BaseShape:
             else:
                 kwargs["rotation"] = 0
                 kwargs["rotation_point"] = None
-            self.arrow_style = self.arrow_style or "triangle"  # default
+
             match str(self.arrow_style).lower():
                 case "triangle" | "t":
                     pass

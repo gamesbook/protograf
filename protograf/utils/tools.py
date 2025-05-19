@@ -312,8 +312,12 @@ def tuple_split(
 
 
 def sequence_split(
-    string: str, as_int: bool = True, unique: bool = True, sep: str = ",",
-    as_float: bool = False, msg: str = ''
+    string: str,
+    as_int: bool = True,
+    unique: bool = True,
+    sep: str = ",",
+    as_float: bool = False,
+    msg: str = "",
 ):
     """
     Split a string into a list of individual values
@@ -386,8 +390,7 @@ def sequence_split(
                 seq_range = list(range(int(_strs[0]), int(_strs[1]) + 1))
             values = values + seq_range
             if as_float:
-                feedback(
-                    f'Cannot set a range of decimal numbers ("{item}"){msg}', True)
+                feedback(f'Cannot set a range of decimal numbers ("{item}"){msg}', True)
         else:
             if as_int:
                 values.append(int(item))

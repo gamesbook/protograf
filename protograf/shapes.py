@@ -2229,8 +2229,13 @@ class LineShape(BaseShape):
             **kwargs,
         )
         # ---- arrowhead
-        if (self.arrow or self.arrow_style or self.arrow_position
-                or self.arrow_height or self.arrow_width):
+        if (
+            self.arrow
+            or self.arrow_style
+            or self.arrow_position
+            or self.arrow_height
+            or self.arrow_width
+        ):
             self.draw_arrowhead(cnv, Point(x, y), Point(x_1, y_1), **kwargs)
 
 

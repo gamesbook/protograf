@@ -507,9 +507,9 @@ Line(x=2, y=1.25, x1=3, y1=1.75, arrow_style='angle')
 Line(x=3, y=1.5, x1=4, y1=1.5, arrow_style='angle')
 
 Line(x=0, y=3, x1=1, y1=2, arrow=True)
-Line(x=1, y=3, x1=2, y1=2, arrow_style='notch')
-Line(x=2, y=3, x1=3, y1=2, arrow_style='angle')
-Line(x=3, y=3, x1=4, y1=2, arrow_style='spear')
+Line(x=1, y=3, x1=2, y1=2, arrow_style='notch', stroke="tomato")
+Line(x=2, y=3, x1=3, y1=2, arrow_style='angle', stroke="chartreuse")
+Line(x=3, y=3, x1=4, y1=2, arrow_style='spear', stroke="aqua")
 
 bigger = Common(arrow_width=0.2, arrow_height=0.3)
 Line(common=bigger, x=0, y=4, x1=1, y1=3,)

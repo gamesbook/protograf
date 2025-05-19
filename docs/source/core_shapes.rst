@@ -345,7 +345,7 @@ Example 2. Customised Line
 
 
 ===== ======
-|ln2| This example shows Lines constructed using commands with the
+|ln2| This example shows a Line constructed using commands with the
       following properties:
 
       .. code:: python
@@ -414,6 +414,141 @@ Example 2. Customised Line
 
       Dashes are a list of two numbers. The first is the length of the dash;
       the second is the length of the space between each dash.
+===== ======
+
+
+Example 3. Line with Arrow
+++++++++++++++++++++++++++
+
+In addition to styling a Line, it is also possible to specify an arrow
+(also called an "arrowhead") for the line.
+
+This is different from the standalone `Arrow`_ which allows a much higher
+degree of customisation.
+
+.. |ln3| image:: images/customised/arrowheads.png
+   :width: 330
+
+===== ======
+|ln3| This example shows a Line constructed using commands with the
+      following properties:
+
+      .. code:: python
+
+        # black styled arrows
+        Line(x=0.5, y=1, x1=0.5, y1=0,
+             arrow=True)
+        Line(x=1.5, y=1, x1=1.5, y1=0,
+             arrow_style='notch')
+        Line(x=2.5, y=1, x1=2.5, y1=0,
+             arrow_style='angle')
+        Line(x=3.5, y=1, x1=3.5, y1=0,
+             arrow_style='spear')
+        # rotated lines
+        Line(x=0, y=1.75, x1=1, y1=1.25,
+             arrow_style='angle')
+        Line(x=2, y=1.5, x1=1, y1=1.5,
+             arrow_style='angle')
+        Line(x=2, y=1.25, x1=3, y1=1.75,
+             arrow_style='angle')
+        Line(x=3, y=1.5, x1=4, y1=1.5,
+             arrow_style='angle')
+        # colored lines and arrows
+        Line(x=0, y=3, x1=1, y1=2,
+             arrow=True)
+        Line(x=1, y=3, x1=2, y1=2,
+             arrow_style='notch', stroke="tomato")
+        Line(x=2, y=3, x1=3, y1=2,
+             arrow_style='angle', stroke="chartreuse")
+        Line(x=3, y=3, x1=4, y1=2,
+             arrow_style='spear',
+             stroke="aqua")
+        # set size of arrow heads
+        bigger = Common(
+            arrow_width=0.2, arrow_height=0.3)
+        Line(common=bigger,
+             x=0, y=4, x1=1, y1=3,)
+        Line(common=bigger,
+             x=1, y=4, x1=2, y1=3,
+             arrow_style='notch')
+        Line(common=bigger,
+             x=2, y=4, x1=3, y1=3,
+             arrow_style='angle')
+        Line(common=bigger,
+             x=3, y=4, x1=4, y1=3,
+             arrow_style='spear')
+        # sized and colored arrow heads
+        big_color = Common(
+            arrow_width=0.2, arrow_height=0.3,
+            arrow_fill="yellow",
+            arrow_stroke="red")
+        Line(common=big_color,
+             x=0, y=5, x1=1, y1=4,)
+        Line(common=big_color,
+             x=1, y=5, x1=2, y1=4,
+             arrow_style='notch')
+        Line(common=big_color,
+             x=2, y=5, x1=3, y1=4,
+             arrow_style='angle')
+        Line(common=big_color,
+             x=3, y=5, x1=4, y1=4,
+             arrow_style='spear')
+        # positioned arrow heads
+        Line(x=0.5, y=6, x1=0.5, y1=5,
+             arrow_position=0.6,
+             dotted=True,
+             stroke_width=1.5)
+        Line(x=1, y=6, x1=2, y1=5,
+             arrow_position=[0.25, 0.5, 0.75])
+        Line(x=2.5, y=6, x1=2.5, y1=5,
+             arrow_position=[1.0, 0.93])
+
+        # two lines superimposed
+        Line(x=3, y=6, x1=4, y1=5,
+             arrow_style='spear',
+             arrow_height=0.15)
+        Line(x=3, y=6, x1=4, y1=5,
+             arrow_style='angle',
+             arrow_width=0.15,
+             arrow_position=[0.1, 0.15, 0.2])
+
+      The first row shows default-sized arrows of differing styles;
+      ``triangle`` (the default), ``notch``,  ``angle``, and ``spear``.
+      As with other types of styles, these can be referred to by their
+      initial letters: *t*, *n*, *a*, or *s*.
+
+      To enable an arrow display, either use ``arrow=True`` or  set one of
+      the properties described in this example.
+
+      The second row shows the default arrow but with the line rotated in
+      different directions.
+
+      The third row shows how arrows take on the stroke color of the line
+      to which they are attached.
+
+      The fourth row shows how the arrow's *height* and *width* (across the
+      "base" of the arrow) can be set to control it's size. **Note** that the
+      ``spear`` arrow is always twice the height of the others!
+
+      The fifth row shows how the arrow can be set to a different color from
+      that of its line.  **Note** that the ``angle`` arrow there is no *fill*
+      color, and that for the other styles, the *stroke* color is set to match
+      the *fill* color.
+
+      The sixth row shows how the *arrow_position* property can be set. The
+      value, or values, represent the fractional distance along the line at
+      which the arrow tip, or tips, is positioned. So, ``0.6`` represents a
+      dustance 60% along the line from the start towards the end. A list
+      (inside the ``[``..``]`` brackets) of values means the arrow is drawn
+      in multiple places.
+
+      The bottom left image shows how the default arrow expands in size
+      proportional to the thickness (*stroke_width*) of the Line.
+
+      The bottom right image is a "cheat" of sorts.  Two lines are drawn in
+      the same location but with different styled arrows in different
+      positions.
+
 ===== ======
 
 

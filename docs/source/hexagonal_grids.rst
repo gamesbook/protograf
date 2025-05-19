@@ -1135,6 +1135,8 @@ are listed below:
    to make brick patterns of staggered rectangles.
 -  *hexboard* (https://www.ctan.org/pkg/hexboard) - a package for LATEX
    that provides functionality for drawing Hex boards and games.
+-  *draw_game_board* (https://github.com/jpneto/draw_game_boards/tree/main) -
+   a Python tool to translate boards from ASCII format into SVG.
 -  *map18xx* (https://github.com/XeryusTC/map18xx) - a 18XX hex map and
    tile generator that outputs to SVG files, scaled to fit A4 paper.
 -  *18xx Maker* (https://www.18xx-maker.com/) - uses 18XX game
@@ -1142,11 +1144,12 @@ are listed below:
    printing.
 -  *ps18xx* (https://github.com/18xx/ps18xx/tree/master) - software for
    running 18XX email games, and creating maps and tile sheets.
--  *LATEX wargame package* (https://wargames_tex.gitlab.io/wargame_www/tools.html) - a
+-  *LATEX wargame package*
+   (https://wargames_tex.gitlab.io/wargame_www/tools.html) - a
    package for LaTeX for authoring hex’n’counter wargames.
 
 The options and facilities provided by these tools have been the primary
-inspiration for how hexagonal grids work in **protograf**. So if the
+inspiration for how hexagonal grids work in **protograf**. If the
 functionality available here does not work for you, then possibly one of
 these other tools would be of better fit.
 
