@@ -4,15 +4,17 @@ Support utilities for draw module
 """
 # lib
 from collections import namedtuple
+from dataclasses import dataclass
 import itertools
 import os
 import math
 import sys
 import string
-from typing import Any
+from typing import Any, List
 
 # third-party
 import imageio
+from jinja2 import Template
 import pymupdf
 
 # local
@@ -61,6 +63,17 @@ UnitPoints = namedtuple(
         "pt",
     ],
 )
+
+
+# wrapper around a jinja Template to support operations on an Template output
+@dataclass
+class TemplatingType:
+    """Support dynamic object creation from a jinga Template"""
+
+    template: Template
+    function: object
+    members: List
+
 
 # ---- units
 unit = UnitPoints(

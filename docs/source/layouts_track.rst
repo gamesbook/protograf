@@ -25,11 +25,12 @@ Overview
 ========
 `↑ <table-of-contents-laytrk_>`_
 
-The `Track()` command is designed to lay out a number of items - letters or
-numbers, or shapes - at the vertices of another shape. Each vertex is
-assigned a **sequence** number; so a ``Rectangle`` has vertices numbered
-from 1 to 4; whereas a 12-sided ``Polygon`` has vertices numbered  from
-1 to 12.
+The `Track()` command is designed to lay out a number of items |dash| letters
+or numbers, or shapes |dash| at the vertices of another shape.
+
+Each vertex is assigned a **sequence** number; so a ``Rectangle`` has vertices
+numbered from 1 to 4; whereas a 12-sided ``Polygon`` has vertices numbered
+from 1 to 12.
 
 The sequence number can be assigned to be used by, or as part of, text using
 the special keyword ``{{sequence}}``.
@@ -309,8 +310,8 @@ Example 7. Polyline Track
             (0, 0), (1, 2), (2, 1), (3, 3), (1, 5)]),
           shapes=[shp])
 
-      A ``Polyline`` is a useful way of drawing a shape at irregular
-      locations on the page.
+      A ``Polyline`` is a useful way of drawing a shape, or list of shapes,
+      at irregular locations on the page.
 
       In this example, because ``Polyline`` is used for the *track*,
       and not ``polyline``, the track itself is drawn.

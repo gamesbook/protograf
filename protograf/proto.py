@@ -77,7 +77,16 @@ from protograf.utils import geoms, tools, support
 from protograf.utils.fonts import builtin_font, FontInterface
 from protograf.utils.tools import base_fonts, DatasetType, CardFrame  # enums
 from protograf.utils.geoms import BBox, Locale, Point, Place, Ray, equilateral_height
-from protograf.utils.support import LookupType, steps, unit, uni, uc, CACHE_DIRECTORY
+from protograf.utils.support import (
+    LookupType,
+    split,
+    steps,
+    TemplatingType,
+    unit,
+    uni,
+    uc,
+    CACHE_DIRECTORY,
+)
 from protograf import globals
 
 log = logging.getLogger(__name__)
@@ -292,8 +301,18 @@ class CardShape(BaseShape):
                 if isinstance(new_ele, (SequenceShape, RepeatShape)):
                     new_ele.deck_data = self.deck_data
                 # tools.feedback(f'$$$ CS draw_card $$$ {new_ele=} {kwargs=}')
-                new_ele.draw(cnv=cnv, off_x=_dx, off_y=_dy, ID=iid, **kwargs)
-                cnv.commit()
+                if isinstance(new_ele, TemplatingType):
+                    card_value = self.deck_data[iid]
+                    custom_value = new_ele.template.render(card_value)
+                    new_eles = new_ele.function(custom_value) or []
+                    for the_new_ele in new_eles:
+                        the_new_ele.draw(
+                            cnv=cnv, off_x=_dx, off_y=_dy, ID=iid, **kwargs
+                        )
+                        cnv.commit()
+                else:
+                    new_ele.draw(cnv=cnv, off_x=_dx, off_y=_dy, ID=iid, **kwargs)
+                    cnv.commit()
             except AttributeError:
                 # ---- * switch ... get a new element ... or not!?
                 new_ele = (
@@ -933,6 +952,12 @@ def Card(sequence, *elements, **kwargs):
 
     NOTE: A Card receives its `draw()` command via Save()!
     """
+
+    def add_members_to_card(element):
+        element.members = _cards  # track all related cards
+        card.members = _cards
+        card.elements.append(element)  # may be Group or Shape or Query
+
     kwargs = margins(**kwargs)
     if not globals.deck:
         tools.feedback("The Deck() has not been defined or is incorrect.", True)
@@ -980,9 +1005,14 @@ def Card(sequence, *elements, **kwargs):
         card = globals.deck.get(_card - 1)  # cards internally number from ZERO
         if card:
             for element in elements:
-                element.members = _cards  # track all related cards
-                card.members = _cards
-                card.elements.append(element)  # may be Group or Shape or Query
+                # print(f'*** Card() {element=} {type(element)=}')
+                if isinstance(element, TemplatingType):
+                    add_members_to_card(element)
+                else:
+                    # element.members = _cards  # track all related cards
+                    # card.members = _cards
+                    # card.elements.append(element)  # may be Group or Shape or Query
+                    add_members_to_card(element)
         else:
             tools.feedback(f'Cannot find card#{_card}. (Check "cards" setting in Deck)')
 
@@ -1170,15 +1200,17 @@ def L(lookup: str, target: str, result: str, default: Any = "") -> LookupType:
     return result
 
 
-def T(string: str, data: dict = None):
+def T(string: str, data: dict = None, function: object = None):
     """Use string to create a Jinja2 Template."""
     # print(f'*** TEMPLATE {string=} {data=}')
     environment = jinja2.Environment()
     try:
         template = environment.from_string(str(string))
     except jinja2.exceptions.TemplateSyntaxError as err:
+        template = None
         tools.feedback(f'Invalid template "{string}" - {err}', True)
-    return template
+    # members can assigned when processing cards
+    return TemplatingType(template=template, function=function, members=None)
 
 
 def Set(_object, **kwargs):

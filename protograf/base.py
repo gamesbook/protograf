@@ -29,15 +29,12 @@ import pymupdf
 from pymupdf import Shape as muShape, Point as muPoint, Page as muPage, Matrix
 from pymupdf.utils import getColor, getColorList
 
-# from pymupdf import Base14_fontnames as BUILTIN_FONTS as BUILT_IN_FONTS
-
 # local
 from protograf.utils import geoms, tools, support
 from protograf.utils.fonts import builtin_font, FontInterface
 from protograf.utils.support import LookupType, unit
-from protograf.utils.support import BUILT_IN_FONTS, CACHE_DIRECTORY
+from protograf.utils.support import CACHE_DIRECTORY, TemplatingType
 from protograf import globals
-
 
 log = logging.getLogger(__name__)
 
@@ -2725,7 +2722,7 @@ class BaseShape:
                 record = self.deck_data[ID]
                 try:
                     custom_value = value.render(record)
-                    # print('###', f'{ID=} {key=} {custom_value=}')
+                    # print('### Template', f'{ID=} {key=} {custom_value=}')
                     return custom_value
                 except jinja2.exceptions.UndefinedError as err:
                     tools.feedback(
@@ -2735,6 +2732,41 @@ class BaseShape:
                     tools.feedback(
                         f"Unable to process data with this template ({err})", True
                     )
+
+            elif isinstance(value, TemplatingType):
+                if not self.deck_data:
+                    tools.feedback(
+                        "Cannot use T() or S() command without Data already defined!",
+                        False,
+                    )
+                    tools.feedback(
+                        "Check that Data command is used before Deck command.",
+                        True,
+                    )
+                record = self.deck_data[ID]
+                try:
+                    custom_value = value.template.render(record)
+                    # print('### TT', f'{ID=} {key=} {custom_value=} {value.function=}')
+                    if value.function:
+                        try:
+                            custom_value = value.function(custom_value)
+                            breakpoint()
+                        except Exception as err:
+                            tools.feedback(
+                                f"Unable to process data with function '{ value.function}' ({err})",
+                                True,
+                            )
+
+                    return custom_value
+                except jinja2.exceptions.UndefinedError as err:
+                    tools.feedback(
+                        f"Unable to process data with this template ({err})", True
+                    )
+                except Exception as err:
+                    tools.feedback(
+                        f"Unable to process data with this template ({err})", True
+                    )
+
             elif isinstance(value, LookupType):
                 record = self.deck_data[ID]
                 lookup_value = record[value.column]

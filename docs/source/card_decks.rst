@@ -703,7 +703,7 @@ The match **condition** contains three parts, all separated by spaces:
    - ``!=`` for not equal to;
    - ``>`` for greater than;
    - ``<`` for less than;
-   - ``in`` to check if text is contained in other text
+   - ``in`` to check if text is contained in other text (see example below)
 3. the *value* being checked - for example, a number or some text |dash| this
    **is** also case-sensitive
 
@@ -721,6 +721,17 @@ from `Data Example 5. Lists`_:
 In this example, for any/all cards for which the **Race** column is equal
 to |dash| the double equals (``==``) comparison |dash| the value **Human**,
 a red rectangle, named ``back_hum``, will be drawn on that card(s).
+
+Note that the ``in`` check can be used in reverse. So:
+
+        back_race = Common(
+            x=0.5, y=0.5, width=5.3, height=7.9, rounded=0.2)
+        back_hum = rectangle(
+            common=back_race, fill_stroke="tomato")
+        Card("all", S("{{ 'H' in Race }}", back_hum))
+
+Here any/all cards for which the **Race** column contains a capital "H"
+will have a red rectangle, named ``back_hum``, drawn on them.
 
 A "nonsense" condition is usually ignored; for example:
 
