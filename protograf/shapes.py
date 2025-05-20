@@ -2235,8 +2235,11 @@ class LineShape(BaseShape):
             or self.arrow_position
             or self.arrow_height
             or self.arrow_width
+            or self.arrow_double
         ):
             self.draw_arrowhead(cnv, Point(x, y), Point(x_1, y_1), **kwargs)
+            if self.arrow_double:
+                self.draw_arrowhead(cnv, Point(x_1, y_1), Point(x, y), **kwargs)
 
 
 class PolygonShape(BaseShape):

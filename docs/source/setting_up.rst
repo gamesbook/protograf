@@ -18,7 +18,7 @@ Table of Contents
   - `Windows Users`_
   - `Mac Users`_
 - `Testing that Python is installed`_
-- `Other Software Installs`_
+- `Other software installs`_
 - `Installing protograf`_
 - `Checking that protograf works`_
 - `Python in the cloud`_
@@ -45,17 +45,18 @@ Python in 1 minute
 ==================
 `↑ <table-of-contents-setup_>`_
 
-Why do you need Python before starting?
+Why do you need Python installed before starting?
 
-When you work with Python, you do not create executable files, such as the
-typical ``.exe`` ones you find on Windows (or ``.app`` on macOS). Instead,
-Python itself is loaded and then it "runs" your Python file/script on your
-behalf. So, running any Python scripts requires that you first install
-Python itself.
+When you work with Python, or software made with Python, you do not have
+executable files, such as the typical ``.exe`` ones you find on Windows
+(or ``.app`` on macOS). Instead, Python itself is first loaded and then
+it "runs" your Python file/script/program on your behalf. So, running any
+Python script, such as the ones created for **protograf** requires that you
+first install Python itself.
 
-Python is composed of many built-in libaries, or *packages*, each of which
-handles some aspect of a program. Python also is designed to be extended by
-adding-on additional packages written by other programmers; *PyMuPDF*, for
+Python itself is composed of many built-in libaries, or *packages*, each of
+which handles some aspect of a program. Python also is designed to be extended
+by adding-on additional packages written by other programmers; *PyMuPDF*, for
 example, is one of those, as is **protograf**.  Python does not come with those
 packages built-in |dash| you need to install them after Python itself has been
 installed.
@@ -63,6 +64,7 @@ installed.
 Installing Python packages is handled by a tool called ``pip`` |dash| the
 Python Installation Package |dash| which is typically installed at the same
 time as Python itself.
+
 
 Opening a Terminal
 ==================
@@ -87,7 +89,7 @@ Installing Python
 `↑ <table-of-contents-setup_>`_
 
 **protograf** requires a device e.g. laptop or desktop |dash| but
-probably not a smart phone |dash| that already has the correct version
+probably not a smart phone |dash| that has the correct version
 of Python (version 3.13 or higher) installed.  This section guides you
 through such an install.
 
@@ -100,10 +102,11 @@ through such an install.
 Linux users
 -----------
 
-You likely already have a version of Python installed.
+You likely already have a version of Python installed, but it is
+ **strongly recommended** that you set up a new version in a "virtual
+ environment" to work with **protograf**
 
-To setup a new virtual environment to work with **protograf**, you can use
-a modern tool such as ``uv``; see
+Todo this, you can use a modern tool such as ``uv``; see
 https://ubuntushell.com/install-uv-python-package-manager/
 
 You can then use ``uv`` to install an updated version of Python into a
@@ -116,11 +119,15 @@ virtual environment. After `opening a Terminal`_::
 Windows Users
 -------------
 
+It is **strongly recommended** that, even if you already have Python installed,
+that you set up a version in a "virtual environment" to work with **protograf**
+This has the advantage of not interfering with, or even accidentally altering,
+what is already working.
+
 Option 1: uv
 ~~~~~~~~~~~~
 
-If you do not already have Python installed, then a quick and easy way to
-get going is to use ``uv``.
+A quick and easy way to get going with a virtual environment is to use ``uv``.
 
 Follow the install guide ``uv`` |dash| see for example
 https://docs.astral.sh/uv/getting-started/installation/#standalone-installer
@@ -155,6 +162,7 @@ which indicates that the virtual environment is now ready for you to
 install software and run Python scripts.
 
 ``uv`` has extensive documentation at https://docs.astral.sh/uv/
+
 
 Option 2: miniconda
 ~~~~~~~~~~~~~~~~~~~
@@ -201,7 +209,7 @@ The exact number after the "13" does not matter.
 You can now close the command-line window.
 
 
-Other Software Installs
+Other software installs
 =======================
 `↑ <table-of-contents-setup_>`_
 
@@ -238,6 +246,7 @@ For Windows users, it is suggested that you install
 `NotePad++ <https://notepad-plus-plus.org/>`_ which is the recommended
 Windows editor for creating **protograf** scripts |dash| if you do not
 already have a tool for editing Python scripts.
+
 
 Installing **protograf**
 ==========================

@@ -501,10 +501,13 @@ Line(x=1.5, y=1, x1=1.5, y1=0, arrow_style='notch')
 Line(x=2.5, y=1, x1=2.5, y1=0, arrow_style='angle')
 Line(x=3.5, y=1, x1=3.5, y1=0, arrow_style='spear')
 
-Line(x=0, y=1.75, x1=1, y1=1.25, arrow_style='angle')
-Line(x=2, y=1.5, x1=1, y1=1.5, arrow_style='angle')
-Line(x=2, y=1.25, x1=3, y1=1.75, arrow_style='angle')
-Line(x=3, y=1.5, x1=4, y1=1.5, arrow_style='angle')
+dbl_ang = Common(
+    arrow_style='angle',
+    arrow_double=True)
+Line(common=dbl_ang, x=0, y=1.75, x1=1, y1=1.25)
+Line(common=dbl_ang, x=2, y=1.5, x1=1, y1=1.5)
+Line(common=dbl_ang, x=2, y=1.25, x1=3, y1=1.75)
+Line(common=dbl_ang, x=3, y=1.5, x1=4, y1=1.5)
 
 Line(x=0, y=3, x1=1, y1=2, arrow=True)
 Line(x=1, y=3, x1=2, y1=2, arrow_style='notch', stroke="tomato")
@@ -525,7 +528,11 @@ Line(common=big_color, x=1, y=5, x1=2, y1=4, arrow_style='notch')
 Line(common=big_color, x=2, y=5, x1=3, y1=4, arrow_style='angle')
 Line(common=big_color, x=3, y=5, x1=4, y1=4, arrow_style='spear')
 
-Line(x=0.5, y=6, x1=0.5, y1=5, arrow_position=0.6, dotted=True, stroke_width=1.5)
+Line(x=0.5, y=6, x1=0.5, y1=5,
+     stroke_width=1,
+     dotted=True,
+     arrow_position=0.66,
+     arrow_double=True)
 Line(x=1, y=6, x1=2, y1=5, arrow_position=[0.25, 0.5, 0.75])
 Line(x=2.5, y=6, x1=2.5, y1=5, arrow_position=[1.0, 0.93])
 Line(x=3, y=6, x1=4, y1=5,

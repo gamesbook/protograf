@@ -537,6 +537,7 @@ class BaseCanvas:
         self.tail_notch = self.defaults.get("tail_notch", 0)
         # ---- arrowhead (on-a-line)
         self.arrow = self.defaults.get("arrow", False)
+        self.arrow_double = self.defaults.get("arrow_double", False)
         self.arrow_style = self.defaults.get("arrow_style", None)
         self.arrow_position = self.defaults.get("arrow_position", None)  # 1 => end
         self.arrow_width = self.defaults.get("arrow_width", None)
@@ -947,6 +948,7 @@ class BaseShape:
         self.tail_notch = self.kw_float(kwargs.get("tail_notch", base.tail_notch))
         # ---- arrowhead (on-a-line)
         self.arrow = self.kw_bool(kwargs.get("arrow", base.arrow))
+        self.arrow_double = self.kw_bool(kwargs.get("arrow_double", base.arrow_double))
         self.arrow_style = kwargs.get("arrow_style", base.arrow_style)
         self.arrow_position = kwargs.get("arrow_position", base.arrow_position)
         self.arrow_width = kwargs.get("arrow_width", base.arrow_width)
@@ -2590,8 +2592,12 @@ class BaseShape:
                 kwargs["rotation"] = 180 + deg
                 kwargs["rotation_point"] = the_tip
             else:
-                kwargs["rotation"] = 0
-                kwargs["rotation_point"] = None
+                if point_end.y > point_start.y:
+                    kwargs["rotation"] = 180
+                    kwargs["rotation_point"] = the_tip
+                else:
+                    kwargs["rotation"] = 0
+                    kwargs["rotation_point"] = None
 
             match str(self.arrow_style).lower():
                 case "triangle" | "t":

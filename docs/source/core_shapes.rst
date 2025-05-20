@@ -421,17 +421,41 @@ Example 3. Line with Arrow
 ++++++++++++++++++++++++++
 
 In addition to styling a Line, it is also possible to specify an arrow
-(also called an "arrowhead") for the line.
+(also called an "arrowhead") for the line; a small "pointing" symbol to
+signify direction.
 
 This is different from the standalone `Arrow`_ which allows a much higher
 degree of customisation.
+
+The following properties can be set:
+
+- *arrow* - if set to ``True`` will cause a default arrow to be drawn
+- *arrow_style* - can be set to ``notch``, ``angle``, or ``spear`` to change
+  the default shape of the arrow
+- *arrow_fill* - set the color of the arrow, which otherwise defaults to the
+  color of the line
+- *arrow_stroke* - set the color of the arrow with style ``angle``, which
+  otherwise defaults to the color of the line
+- *arrow_width* - set the width of the arrow at its base,  which otherwise
+  defaults to a multiple of the line width
+- *arrow_height* - set the height of the arrow, which otherwise
+  defaults to a value proportional to the arrow *width* (specifically, the
+  height of the equilateral triangle used for the default arrow style)
+- *arrow_position* - set a value (single number), or values (list of numbers),
+  the represent the fractional distance along the line at which the arrow tip,
+  or tips, must be positioned relative to the start of the line
+- *arrow_double* - make a copy the same arrow, with the same properties as
+  above, but facing in a opposite direction
 
 .. |ln3| image:: images/customised/arrowheads.png
    :width: 330
 
 ===== ======
 |ln3| This example shows a Line constructed using commands with the
-      following properties:
+      various properties.
+
+      Note the use of the :ref:`Common command <the-common-command>`
+      for when multiple Lines all need to share the same properties.
 
       .. code:: python
 
@@ -444,28 +468,34 @@ degree of customisation.
              arrow_style='angle')
         Line(x=3.5, y=1, x1=3.5, y1=0,
              arrow_style='spear')
-        # rotated lines
-        Line(x=0, y=1.75, x1=1, y1=1.25,
-             arrow_style='angle')
-        Line(x=2, y=1.5, x1=1, y1=1.5,
-             arrow_style='angle')
-        Line(x=2, y=1.25, x1=3, y1=1.75,
-             arrow_style='angle')
-        Line(x=3, y=1.5, x1=4, y1=1.5,
-             arrow_style='angle')
+        # rotated lines; double arrow
+        dbl_ang = Common(
+            arrow_style='angle',
+            arrow_double=True)
+        Line(common=dbl_ang,
+             x=0, y=1.75, x1=1, y1=1.25)
+        Line(common=dbl_ang,
+             x=2, y=1.5, x1=1, y1=1.5)
+        Line(common=dbl_ang,
+             x=2, y=1.25, x1=3, y1=1.75)
+        Line(common=dbl_ang,
+             x=3, y=1.5, x1=4, y1=1.5)
         # colored lines and arrows
         Line(x=0, y=3, x1=1, y1=2,
              arrow=True)
         Line(x=1, y=3, x1=2, y1=2,
-             arrow_style='notch', stroke="tomato")
+             arrow_style='notch',
+             stroke="tomato")
         Line(x=2, y=3, x1=3, y1=2,
-             arrow_style='angle', stroke="chartreuse")
+             arrow_style='angle',
+             stroke="chartreuse")
         Line(x=3, y=3, x1=4, y1=2,
              arrow_style='spear',
              stroke="aqua")
         # set size of arrow heads
         bigger = Common(
-            arrow_width=0.2, arrow_height=0.3)
+            arrow_width=0.2,
+            arrow_height=0.3)
         Line(common=bigger,
              x=0, y=4, x1=1, y1=3,)
         Line(common=bigger,
@@ -479,7 +509,8 @@ degree of customisation.
              arrow_style='spear')
         # sized and colored arrow heads
         big_color = Common(
-            arrow_width=0.2, arrow_height=0.3,
+            arrow_width=0.2,
+            arrow_height=0.3,
             arrow_fill="yellow",
             arrow_stroke="red")
         Line(common=big_color,
@@ -495,9 +526,10 @@ degree of customisation.
              arrow_style='spear')
         # positioned arrow heads
         Line(x=0.5, y=6, x1=0.5, y1=5,
-             arrow_position=0.6,
+             stroke_width=1,
              dotted=True,
-             stroke_width=1.5)
+             arrow_position=0.66,
+             arrow_double=True)
         Line(x=1, y=6, x1=2, y1=5,
              arrow_position=[0.25, 0.5, 0.75])
         Line(x=2.5, y=6, x1=2.5, y1=5,
@@ -517,11 +549,12 @@ degree of customisation.
       As with other types of styles, these can be referred to by their
       initial letters: *t*, *n*, *a*, or *s*.
 
-      To enable an arrow display, either use ``arrow=True`` or  set one of
-      the properties described in this example.
+      To enable an arrow display, either use ``arrow=True`` **or**  set one
+      of the properties described in this example.
 
       The second row shows the default arrow but with the line rotated in
-      different directions.
+      different directions. In this case ``arrow_double=True`` means the
+      same arrow is drawn twice; facing in each direction.
 
       The third row shows how arrows take on the stroke color of the line
       to which they are attached.
@@ -537,13 +570,17 @@ degree of customisation.
 
       The sixth row shows how the *arrow_position* property can be set. The
       value, or values, represent the fractional distance along the line at
-      which the arrow tip, or tips, is positioned. So, ``0.6`` represents a
-      dustance 60% along the line from the start towards the end. A list
-      (inside the ``[``..``]`` brackets) of values means the arrow is drawn
-      in multiple places.
+      which the arrow tip, or tips, is positioned relative to the start of
+      the line. So, ``0.66`` represents a distance 66% along the line from
+      the start towards the end. A list (inside the ``[``..``]`` brackets)
+      of values means the arrow is drawn in multiple places along the line.
 
       The bottom left image shows how the default arrow expands in size
-      proportional to the thickness (*stroke_width*) of the Line.
+      proportional to the thickness (*stroke_width*) of the Line. Again,
+      because ``arrow_double=True`` the same arrow is drawn twice; facing
+      in each direction, but the ``arrow_position=0.66`` property means
+      the arrows are each drawn about two-thirds of the way along the line,
+      relative to their different "starts".
 
       The bottom right image is a "cheat" of sorts.  Two lines are drawn in
       the same location but with different styled arrows in different
@@ -761,7 +798,10 @@ Example 4. Rotated Text
    :width: 330
 
 ===== ======
-|t04| This example shows the shape constructed using various properties:
+|t04| This example shows Text constructed using various properties.
+
+      Note the use of the :ref:`Common command <the-common-command>`
+      for when multiple Texts all need to share the same properties.
 
       .. code:: python
 
@@ -2034,7 +2074,10 @@ Example 2. Customised Sector
 
 ===== ======
 |sc1| This example shows examples of the Sector constructed using commands
-      with the following properties:
+      with the following properties.
+
+      Note the use of the :ref:`Common command <the-common-command>`
+      to allow multiple Sectors to share the same properties.
 
       .. code:: python
 
@@ -3362,7 +3405,10 @@ Example 2. Polygon Rotation
 
 ===== ======
 |rt2| This example shows five Polygons constructed using the command with
-      additional properties:
+      additional properties.
+
+      Note the use of the :ref:`Common command <the-common-command>`
+      to allow multiple Polygons to share the same properties.
 
       .. code:: python
 
@@ -3403,7 +3449,7 @@ Example 3. Shapes Rotation
 
 ===== ======
 |rt3| This example shows different shapes constructed using commands with
-      some ``Common`` properties:
+      some :ref:`Common <the-common-command>` properties:
 
       .. code:: python
 
