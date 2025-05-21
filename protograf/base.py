@@ -918,20 +918,20 @@ class BaseShape:
         self.length = self.kw_float(kwargs.get("length", base.length))
         self.angle = self.kw_float(
             kwargs.get("angle", base.angle)
-        )  # anti-clock from flat
+        )  # anti-clockwise from flat
         self.angle_width = self.kw_float(
             kwargs.get("angle_width", base.angle_width)
         )  # delta degrees
         self.angle_start = self.kw_float(
             kwargs.get("angle_start", base.angle_start)
-        )  # degrees anti-clock from flat
+        )  # degrees anti-clockwise from flat
         self._angle_theta = math.radians(self.angle)
         # ---- image
         self.cache_directory = None  # should be a pathlib.Path object
         # ---- chord
         self.angle_1 = self.kw_float(
             kwargs.get("angle1", base.angle_1)
-        )  # anti-clock from flat
+        )  # anti-clockwise from flat
         self._angle_1_theta = math.radians(self.angle_1)
         # ---- arc / sector
         self.filled = self.kw_bool(kwargs.get("filled", base.filled))
@@ -2208,7 +2208,7 @@ class BaseShape:
             * xm (float) and ym (float): must be in native units (i.e. points)!
             * string (str): the text to draw/write
             * align (str): one of [centre|right|left|None] alignment of text
-            * rotation (float): an angle in degrees; counter-clockwise from East
+            * rotation (float): an angle in degrees; anti-clockwise from East
 
         Kwargs:
             * locale - dict created from Locale namedtuple

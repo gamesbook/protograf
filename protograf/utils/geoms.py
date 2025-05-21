@@ -97,7 +97,7 @@ def degrees_to_xy(degrees: float, radius: float, origin: Point) -> Point:
     """Calculates a Point that is at an angle from the origin; 0 is to the right.
 
     Args:
-        degrees: normal angle (NOT radians) in counter-clockwise direction
+        degrees: normal angle (NOT radians) in anti-clockwise direction
         radius: length of line originating at origin
         origin: the (x, y) coordinates of the point of origin
 
@@ -263,7 +263,7 @@ def point_on_circle(point_centre: Point, radius: float, angle: float) -> Point:
 
     Args:
         point_center: the (x, y) coordinates of the circle centre
-        angle: the rotation angle in degrees (counter-clockwise)
+        angle: the rotation angle in degrees (anti-clockwise)
         radius: length of circle radius
 
     Doc Test:
@@ -309,16 +309,60 @@ def fraction_along_line(point_start: Point, point_end: Point, fraction: float) -
     return fraction_point
 
 
+def point_from_angle(start: Point, length: float, angle: float) -> Point:
+    """Given a point, line length, and an angle, calculate the second point.
+
+    Args:
+        start: coordinates of first point
+        length: length of line
+        angle: angle of line in degrees (anti-clockwise from East)
+
+    Returns:
+        coordinates of second point
+
+    Notes:
+        Operates in the Euclidian plane
+
+    Doc Test:
+    >>> # angle anti-clockwise around circle from 0 degrees at East
+    >>> point_from_angle(Point(0, 0), 1, 0)
+    Point(x=1.0, y=0.0)
+    >>> point_from_angle(Point(0, 0), 1, 90)
+    Point(x=0.0, y=1.0)
+    >>> R = point_from_angle(Point(0, 0), 1, 45)
+    >>> # Point(x=0.7071067811865476, y=0.7071067811865475)
+    >>> round(R.x, 5) == 0.70711
+    True
+    >>> round(R.y, 5) == 0.70711
+    True
+    >>> R = point_from_angle(Point(0, 0), 1, 225)
+    >>> # Point(x=-0.7071067811865476, y=-0.7071067811865475)
+    >>> round(R.x, 5) == -0.70711
+    True
+    >>> round(R.y, 5) == -0.70711
+    True
+    >>> R = point_from_angle(Point(0, 0), 1, -45)
+    >>> # Point(x=0.7071067811865476, y=-0.7071067811865475)
+    >>> round(R.x, 5) == 0.70711
+    True
+    >>> round(R.y, 5) == -0.70711
+    True
+    """
+    theta = math.radians(angle)
+    x1, y1 = start.x + length * math.cos(theta), start.y + length * math.sin(theta)
+    return Point(round_tiny_float(x1), round_tiny_float(y1))
+
+
 def angles_from_points(first: Point, second: Point) -> tuple:
     """Given two points, calculate the compass and rotation angles between them
 
     Args:
-        x: coordinates first point
-        y: coordinate of second point
+        first: coordinates of first point
+        second: coordinates of second point
 
     Returns:
         compass (float): degrees clockwise from North
-        rotation (float): degrees counter-clockwise from East
+        rotation (float): degrees anti-clockwise from East
 
     Doc Test:
 
@@ -443,7 +487,7 @@ def bezier_arc_segment(
     """Compute the control points for a Bezier arc with angles theta1-theta0 <= 90.
 
     Points are computed for an arc with angle theta increasing in the
-    counter-clockwise direction. Zero degrees is at the "East" position.
+    anti-clockwise direction. Zero degrees is at the "East" position.
 
     Returns:
         tuple: starting point and 3 control points of a cubic Bezier curve
@@ -528,7 +572,7 @@ def rotate_point_around_point(
     Args:
         point_to_rotate: the (x, y) coordinates of the point to rotate
         center_point: the (x, y) coordinates of the point to rotate around
-        angle (float): the rotation angle in degrees (counter-clockwise)
+        angle (float): the rotation angle in degrees (anti-clockwise)
 
     Returns:
         Point: The (x, y) coordinates of the rotated point (rounded to 8 decimals)
@@ -561,6 +605,21 @@ def rotate_point_around_point(
     final_x = rotated_x + cx
     final_y = rotated_y + cy
     return Point(round(final_x, 8), round(final_y, 8))
+
+
+def round_tiny_float(number: float, threshold: float = 1e-10):
+    """If the absolute value of float is less than threshold, set to zero.
+
+    Doc Test:
+
+    >>> round_tiny_float(1e-12)
+    0.0
+    >>> round_tiny_float(0.001)
+    0.001
+    """
+    if abs(number) < threshold:
+        return 0.0
+    return number
 
 
 if __name__ == "__main__":

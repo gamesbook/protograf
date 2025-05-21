@@ -2187,14 +2187,26 @@ class LineShape(BaseShape):
         elif self.x_1 or self.y_1:
             x_1 = self.unit(self.x_1) + self._o.delta_x
             y_1 = self.unit(self.y_1) + self._o.delta_y
+        elif self.angle != 0 and self.cx and self.cy and self.length:
+            # calc points for line "sticking out" both sides of a centre points
+            _len = self.unit(self.length) / 2.0
+            _cx = self.unit(self.cx) + self._o.delta_x
+            _cy = self.unit(self.cy) + self._o.delta_y
+            angle1 = max(self.angle + 180., self.angle - 180.)
+            delta_pt_2 = geoms.point_from_angle(Point(0,0), _len, self.angle)
+            delta_pt_1 = geoms.point_from_angle(Point(0,0), _len, angle1)
+            # use delta point as offset because function works in Euclidian space
+            x, y = _cx + delta_pt_1.x, _cy - delta_pt_1.y
+            x_1, y_1 = _cx + delta_pt_2.x, _cy - delta_pt_2.y
         else:
-            if self.angle > 0:
+            if self.angle != 0:
                 angle = math.radians(self.angle)
                 x_1 = x + (self._u.length * math.cos(angle))
                 y_1 = y - (self._u.length * math.sin(angle))
             else:
                 x_1 = x + self._u.length
                 y_1 = y
+
         if self.row is not None and self.row >= 0:
             y = y + self.row * self._u.height
             y_1 = y_1 + self.row * self._u.height  # - self._u.margin_bottom

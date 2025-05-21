@@ -589,6 +589,54 @@ The following properties can be set:
 ===== ======
 
 
+Example 4. Centred Line
++++++++++++++++++++++++
+
+A line can be drawn at a centre point by providing the following properties:
+
+- centre - set using *cx* and *cy* values
+- *length* - the length of the line
+- *angle* - the rotation of the line, anti-clockwise from the baseline
+
+.. |ln4| image:: images/customised/line_centred.png
+   :width: 330
+
+===== ======
+|ln4| This example shows a Line constructed using commands with the
+      following properties:
+
+      .. code:: python
+
+        Line(cx=1, cy=1, angle=45,
+             length=2, stroke="red")
+        Line(cx=3, cy=1, angle=225,
+             length=2, stroke_width=1.5)
+
+        Circle(cx=2, cy=3, radius=1)
+        Line(cx=2, cy=3, angle=45, length=2,
+             stroke="red", arrow_width=0.2)
+        Line(cx=2, cy=3, angle=135, length=2,
+             stroke_width=1.5, arrow_width=0.2)
+
+        Line(cx=1, cy=5, angle=135,
+             length=2, stroke_width=1.5)
+        Line(cx=3, cy=5, angle=315,
+             length=2, stroke="red")
+
+      The top two lines are rotated at 45 |deg| (red) and 255 |deg|
+      (thick black).
+
+      The bottom two lines are rotated at 135 |deg| (thick black) and
+      315 |deg| (red).
+
+      While each pair appears to be "in the same direction", the use of the
+      arrow property will display the actual direction; so the 45 |deg| (red)
+      line in the circle points to 45 |deg|, while the 135 |deg|
+      (thick black) points to 135 |deg|.
+
+===== ======
+
+
 .. _polyline-command:
 
 Polyline

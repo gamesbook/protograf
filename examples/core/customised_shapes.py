@@ -320,6 +320,21 @@ Line(x=0, y=4, x1=4, y1=5, stroke="blue", stroke_width=1,
      dashed=[0.2, 0.1], label="dashed:[0.2,0.1]", font_size=6)
 PageBreak()
 
+# ---- center line from angle
+Blueprint(stroke_width=0.5)
+Text(common=txt, text="Line: Angled")
+
+Line(cx=1, cy=1, angle=45, length=2, stroke="red")
+Line(cx=3, cy=1, angle=225, length=2, stroke_width=1.5)
+
+Circle(cx=2, cy=3, radius=1)
+Line(cx=2, cy=3, angle=45, length=2, stroke="red", arrow_width=0.2)
+Line(cx=2, cy=3, angle=135, length=2, stroke_width=1.5, arrow_width=0.2)
+
+Line(cx=1, cy=5, angle=135, length=2, stroke_width=1.5)
+Line(cx=3, cy=5, angle=315, length=2, stroke="red")
+PageBreak()
+
 # ---- bezier - custom
 Blueprint()
 Text(common=txt, text="Bezier line")
@@ -740,7 +755,8 @@ Save(
         "images_normal_rotation", "rhombus_red_rotation",
         "stadium_red_rotation", "polygon_rotation_flat",
         "polygon_rotation_pointy", "polygon_sizes", "grid_3x4",
-        "line_custom", "bezier_custom", "ellipse_custom", "rectangle_custom",
+        "line_custom", "line_centred",
+        "bezier_custom", "ellipse_custom", "rectangle_custom",
         "square_custom", "trapezoid_custom", "image_default",
         "descriptions", "label_offset", "star_custom",
         "polyshape_default", "polyshape_custom", "polyshape_offset",
