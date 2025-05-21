@@ -74,8 +74,9 @@ from .groups import Switch, Lookup
 from ._version import __version__
 
 from protograf.utils import geoms, tools, support
+from protograf.utils.enums import CardFrame, DatasetType, DirectionGroup, ExportFormat
 from protograf.utils.fonts import builtin_font, FontInterface
-from protograf.utils.tools import base_fonts, DatasetType, CardFrame  # enums
+from protograf.utils.tools import base_fonts
 from protograf.utils.geoms import BBox, Locale, Point, Place, Ray, equilateral_height
 from protograf.utils.support import (
     LookupType,
@@ -776,15 +777,25 @@ def Save(**kwargs):
     except pymupdf.mupdf.FzErrorSystem as err:
         tools.feedback(f'Unable to save "{globals.filename}" - {err} - {msg}', True)
 
-    # ---- save to image(s)
+    # ---- save to PNG image(s) or SVG file(s)
     output = kwargs.get("output", None)
+    if output:
+        match str(output).lower():
+            case "png":
+                fformat = ExportFormat.PNG
+            case "svg":
+                fformat = ExportFormat.SVG
+            case "gif":
+                fformat = ExportFormat.GIF
+            case _:
+                tools.feedback(f'Unknown output format "{output}"', True)
     dpi = support.to_int(kwargs.get("dpi", 300), "dpi")
     framerate = support.to_float(kwargs.get("framerate", 1), "framerate")
     names = kwargs.get("names", None)
     directory = kwargs.get("directory", None)
     if output and globals.pargs.png:  # pargs.png should default to True
-        support.pdf_to_png(
-            globals.filename, output, dpi, names, directory, framerate=framerate
+        support.pdf_export(
+            globals.filename, fformat, dpi, names, directory, framerate=framerate
         )
 
     # ---- save cards to image(s)
@@ -1681,7 +1692,7 @@ def Blueprint(**kwargs):
     kwargs["fill"] = kwargs.get("fill", line_stroke)  # revert back for font
     # ---- number edges
     if number_edges:
-        edges = tools.validated_directions(number_edges, tools.DirectionGroup.CARDINAL)
+        edges = tools.validated_directions(number_edges, DirectionGroup.CARDINAL)
     else:
         edges = []
     # ---- numbering

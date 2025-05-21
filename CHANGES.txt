@@ -11,6 +11,7 @@ Changes
 - Update installation docs (Windows notes)
 - Support function-based processing for Card template data
 - Add option to create Line at a centre point
+- Support export to SVG
 
 2025-05-17 (0.2.0)
 ------------------

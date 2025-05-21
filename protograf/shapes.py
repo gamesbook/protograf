@@ -18,6 +18,7 @@ from pymupdf import Shape as muShape, Point as muPoint, Matrix
 import segno  # QRCode
 
 # local
+from protograf.utils.enums import DirectionGroup
 from protograf.utils.geoms import (
     BBox,
     Point,
@@ -415,9 +416,7 @@ class CircleShape(BaseShape):
             y_c: y-centre of circle
             rotation: degrees anti-clockwise from horizontal "east"
         """
-        _dirs = tools.validated_directions(
-            self.hatch, tools.DirectionGroup.CIRCULAR, "hatch"
-        )
+        _dirs = tools.validated_directions(self.hatch, DirectionGroup.CIRCULAR, "hatch")
         lines = tools.as_int(num, "hatch_count")
         if lines < 0:
             tools.feedback("Cannot draw negative number of lines!", True)
@@ -1020,7 +1019,7 @@ class CompassShape(BaseShape):
             self.set_canvas_props(cnv=cnv, index=ID, **kwargs)
         # ---- draw compass in circle
         _directions = tools.validated_directions(
-            self.directions, tools.DirectionGroup.COMPASS, "directions"
+            self.directions, DirectionGroup.COMPASS, "directions"
         )
         if self.perimeter == "circle":
             for direction in _directions:
@@ -1219,7 +1218,7 @@ class EquilateralTriangleShape(BaseShape):
         self, cnv, ID, side: float, vertices: list, num: int, rotation: float = 0.0
     ):
         _dirs = tools.validated_directions(
-            self.hatch, tools.DirectionGroup.HEX_POINTY_EDGE, "hatch"
+            self.hatch, DirectionGroup.HEX_POINTY_EDGE, "hatch"
         )
         lines = tools.as_int(num, "hatch_count")
         if lines >= 1:
@@ -1627,9 +1626,9 @@ class HexShape(BaseShape):
         """Draw line(s) connecting the Hexagon centre to a vertex."""
         # _dirs = self.radii.lower().split()
         dir_group = (
-            tools.DirectionGroup.HEX_POINTY
+            DirectionGroup.HEX_POINTY
             if self.orientation == "pointy"
-            else tools.DirectionGroup.HEX_FLAT
+            else DirectionGroup.HEX_FLAT
         )
         _dirs = tools.validated_directions(self.radii, dir_group, "radii")
         if "ne" in _dirs:  # slope UP to the right
@@ -1695,9 +1694,9 @@ class HexShape(BaseShape):
         )
         if self.perbis:
             dir_group = (
-                tools.DirectionGroup.HEX_POINTY_EDGE
+                DirectionGroup.HEX_POINTY_EDGE
                 if self.orientation == "pointy"
-                else tools.DirectionGroup.HEX_FLAT_EDGE
+                else DirectionGroup.HEX_FLAT_EDGE
             )
             perbis_dirs = tools.validated_directions(self.perbis, dir_group, "perbis")
             _dirs = []
@@ -1763,9 +1762,9 @@ class HexShape(BaseShape):
             rotation: degrees anti-clockwise from horizontal "east"
         """
         dir_group = (
-            tools.DirectionGroup.HEX_POINTY
+            DirectionGroup.HEX_POINTY
             if self.orientation == "pointy"
-            else tools.DirectionGroup.HEX_FLAT
+            else DirectionGroup.HEX_FLAT
         )
         _dirs = tools.validated_directions(self.hatch, dir_group, "hatch")
         _num = tools.as_int(num, "hatch_count")
@@ -2192,9 +2191,9 @@ class LineShape(BaseShape):
             _len = self.unit(self.length) / 2.0
             _cx = self.unit(self.cx) + self._o.delta_x
             _cy = self.unit(self.cy) + self._o.delta_y
-            angle1 = max(self.angle + 180., self.angle - 180.)
-            delta_pt_2 = geoms.point_from_angle(Point(0,0), _len, self.angle)
-            delta_pt_1 = geoms.point_from_angle(Point(0,0), _len, angle1)
+            angle1 = max(self.angle + 180.0, self.angle - 180.0)
+            delta_pt_2 = geoms.point_from_angle(Point(0, 0), _len, self.angle)
+            delta_pt_1 = geoms.point_from_angle(Point(0, 0), _len, angle1)
             # use delta point as offset because function works in Euclidian space
             x, y = _cx + delta_pt_1.x, _cy - delta_pt_1.y
             x_1, y_1 = _cx + delta_pt_2.x, _cy - delta_pt_2.y
@@ -2911,9 +2910,7 @@ class RectangleShape(BaseShape):
             num: number of lines
             rotation: degrees anti-clockwise from horizontal "east"
         """
-        _dirs = tools.validated_directions(
-            self.hatch, tools.DirectionGroup.CIRCULAR, "hatch"
-        )
+        _dirs = tools.validated_directions(self.hatch, DirectionGroup.CIRCULAR, "hatch")
         lines = tools.as_int(num, "hatch_count")
         # ---- check dirs
         if self.rounding or self.rounded:
@@ -3477,9 +3474,7 @@ class RhombusShape(BaseShape):
             num: number of lines
             rotation: degrees anti-clockwise from horizontal "east"
         """
-        _dirs = tools.validated_directions(
-            self.hatch, tools.DirectionGroup.CIRCULAR, "hatch"
-        )
+        _dirs = tools.validated_directions(self.hatch, DirectionGroup.CIRCULAR, "hatch")
         _num = tools.as_int(num, "hatch_count")
         lines = int((_num - 1) / 2 + 1)
         # tools.feedback(f'*** RHOMB {num=} {lines=} {vertices=} {_dirs=} {side=}')
@@ -3846,7 +3841,7 @@ class StadiumShape(BaseShape):
         # tools.feedback(f'*** Stad{len(self.vertexes)=}')
         # ---- edges
         _edges = tools.validated_directions(
-            self.edges, tools.DirectionGroup.CARDINAL, "edges"
+            self.edges, DirectionGroup.CARDINAL, "edges"
         )  # need curves on these edges
         self.vertexes.append(self.vertexes[0])
 
