@@ -29,13 +29,11 @@ import pymupdf
 from pymupdf import Shape as muShape, Point as muPoint, Page as muPage, Matrix
 from pymupdf.utils import getColor, getColorList
 
-# from pymupdf import Base14_fontnames as BUILTIN_FONTS as BUILT_IN_FONTS
-
 # local
 from protograf.utils import geoms, tools, support
 from protograf.utils.fonts import builtin_font, FontInterface
 from protograf.utils.support import LookupType, unit
-from protograf.utils.support import BUILT_IN_FONTS, CACHE_DIRECTORY
+from protograf.utils.support import CACHE_DIRECTORY, TemplatingType
 from protograf import globals
 
 log = logging.getLogger(__name__)
@@ -534,25 +532,17 @@ class BaseCanvas:
         self.head_width = self.defaults.get("head_width", 2 * self.width)
         self.tail_width = self.defaults.get("tail_width", 0)  # adjusted in ArrowShape
         self.tail_notch = self.defaults.get("tail_notch", 0)
-        # TODO arrow-on-a-line
-        self.arrow_style = self.defaults.get("arrow_style", "triangle")
-        self.arrow_tail_style = self.defaults.get("arrow_tail_style", None)
-        self.arrow_head_fraction = self.defaults.get("arrow_head_fraction", 0.1)
-        self.arrow_tail_fraction = self.defaults.get("arrow_tail_fraction", 0.1)
-        self.arrow_head_height = self.defaults.get("arrow_head_height", None)
-        self.arrow_tail_height = self.defaults.get("tail_height", None)
-        self.arrow_head_width = self.defaults.get("head_width", None)
-        self.arrow_tail_width = self.defaults.get("tail_width", None)
-        self.arrow_tail_fill = self.defaults.get("tail_fill", self.fill)
-        self.arrow_head_fill = self.defaults.get("head_fill", self.fill)
-        self.arrow_head_stroke = self.defaults.get("head_stroke", self.stroke)
-        self.arrow_tail_stroke = self.defaults.get("tail_stroke", self.stroke)
-        self.arrow_head_stroke_width = self.defaults.get(
-            "arrow_head_stroke_width", self.stroke_width
-        )
-        self.arrow_tail_stroke_width = self.defaults.get(
-            "arrow_tail_stroke_width", self.stroke_width
-        )
+        # ---- arrowhead (on-a-line)
+        self.arrow = self.defaults.get("arrow", False)
+        self.arrow_double = self.defaults.get("arrow_double", False)
+        self.arrow_style = self.defaults.get("arrow_style", None)
+        self.arrow_position = self.defaults.get("arrow_position", None)  # 1 => end
+        self.arrow_width = self.defaults.get("arrow_width", None)
+        self.arrow_height = self.defaults.get("arrow_height", None)
+        self.arrow_stroke = self.defaults.get(
+            "arrow_stroke", None
+        )  # see draw_arrowhead()
+        self.arrow_fill = self.defaults.get("arrow_fill", None)  # see draw_arrowhead()
         # ---- line / bezier
         self.x_1 = self.defaults.get("x1", 0)
         self.y_1 = self.defaults.get("y1", 0)
@@ -928,20 +918,20 @@ class BaseShape:
         self.length = self.kw_float(kwargs.get("length", base.length))
         self.angle = self.kw_float(
             kwargs.get("angle", base.angle)
-        )  # anti-clock from flat
+        )  # anti-clockwise from flat
         self.angle_width = self.kw_float(
             kwargs.get("angle_width", base.angle_width)
         )  # delta degrees
         self.angle_start = self.kw_float(
             kwargs.get("angle_start", base.angle_start)
-        )  # degrees anti-clock from flat
+        )  # degrees anti-clockwise from flat
         self._angle_theta = math.radians(self.angle)
         # ---- image
         self.cache_directory = None  # should be a pathlib.Path object
         # ---- chord
         self.angle_1 = self.kw_float(
             kwargs.get("angle1", base.angle_1)
-        )  # anti-clock from flat
+        )  # anti-clockwise from flat
         self._angle_1_theta = math.radians(self.angle_1)
         # ---- arc / sector
         self.filled = self.kw_bool(kwargs.get("filled", base.filled))
@@ -953,9 +943,15 @@ class BaseShape:
         self.head_width = self.kw_float(kwargs.get("head_width", base.head_width))
         self.tail_width = self.kw_float(kwargs.get("tail_width", base.tail_width))
         self.tail_notch = self.kw_float(kwargs.get("tail_notch", base.tail_notch))
-        # TODO arrow-on-a-line
+        # ---- arrowhead (on-a-line)
+        self.arrow = self.kw_bool(kwargs.get("arrow", base.arrow))
+        self.arrow_double = self.kw_bool(kwargs.get("arrow_double", base.arrow_double))
         self.arrow_style = kwargs.get("arrow_style", base.arrow_style)
-        self.arrow_tail_style = kwargs.get("arrow_tail_style", base.arrow_tail_style)
+        self.arrow_position = kwargs.get("arrow_position", base.arrow_position)
+        self.arrow_width = kwargs.get("arrow_width", base.arrow_width)
+        self.arrow_height = kwargs.get("arrow_height", base.arrow_height)
+        self.arrow_stroke = kwargs.get("arrow_stroke", base.arrow_stroke)
+        self.arrow_fill = kwargs.get("arrow_fill", base.arrow_fill)
         # ---- line / bezier / sector
         self.x_1 = self.kw_float(kwargs.get("x1", base.x_1))
         self.y_1 = self.kw_float(kwargs.get("y1", base.y_1))
@@ -1694,7 +1690,8 @@ class BaseShape:
             if str(self.rotation_point).lower() not in [
                 "start",
                 "centre",
-                "end" "s",
+                "end",
+                "s",
                 "c",
                 "e",
             ]:
@@ -1705,45 +1702,42 @@ class BaseShape:
             if str(self.coord_style).lower() not in ["linear", "diagonal", "l", "d"]:
                 issue.append(f'"{self.coord_style}" is an invalid coord style!')
                 correct = False
-        # ---- line arrows
+        # ---- arrowhead style
         if self.arrow_style:
             if str(self.arrow_style).lower() not in [
-                "line",
-                "l",
-                "line2",
-                "l2",
-                "line3",
-                "l3",
-                "triangle",
-                "t",
-                "diamond",
-                "d",
+                "angle",
+                "angled",
+                "a",
                 "notch",
+                "notched",
                 "n",
                 "spear",
                 "s",
-                "circle",
-                "c",
+                "triangle",  # default
+                "t",
+                # "circle",
+                # "c",
             ]:
-                issue.append(f'"{self.arrow_style}" is an invalid arrow style!')
+                issue.append(f'"{self.arrow_style}" is an invalid arrow_style!')
                 correct = False
-        if self.arrow_tail_style:
-            if str(self.arrow_tail_style).lower() not in [
-                "line",
-                "l",
-                "line2",
-                "l2",
-                "line3",
-                "l3",
-                "feather",
-                "f",
-                "circle",
-                "c",
-            ]:
-                issue.append(
-                    f'"{self.arrow_tail_style}" is an invalid arrow tail style!'
-                )
-                correct = False
+        # ---- line arrows
+        # if self.arrow_tail_style:
+        #     if str(self.arrow_tail_style).lower() not in [
+        #         "line",
+        #         "l",
+        #         "line2",
+        #         "l2",
+        #         "line3",
+        #         "l3",
+        #         "feather",
+        #         "f",
+        #         "circle",
+        #         "c",
+        #     ]:
+        #         issue.append(
+        #             f'"{self.arrow_tail_style}" is an invalid arrow tail style!'
+        #         )
+        #         correct = False
         # ---- starfield
         if self.star_pattern:
             if str(self.star_pattern).lower() not in ["random", "cluster", "r", "c"]:
@@ -2214,7 +2208,7 @@ class BaseShape:
             * xm (float) and ym (float): must be in native units (i.e. points)!
             * string (str): the text to draw/write
             * align (str): one of [centre|right|left|None] alignment of text
-            * rotation (float): an angle in degrees; counter-clockwise from East
+            * rotation (float): an angle in degrees; anti-clockwise from East
 
         Kwargs:
             * locale - dict created from Locale namedtuple
@@ -2542,6 +2536,85 @@ class BaseShape:
             canvas.draw_line(pt1, pt2)
             self.set_canvas_props(cnv=canvas, index=None, **kwargs)
 
+    def draw_arrowhead(
+        self, cnv, point_start: geoms.Point, point_end: geoms.Point, **kwargs
+    ):
+        """Draw arrowhead at the end of a straight line segment
+
+        Args:
+            point_start: start point of line
+            point_end: end point of line
+        """
+        self.arrow_style = self.arrow_style or "triangle"  # default
+        if self.arrow_position:
+            tips = []
+            steps = tools.sequence_split(
+                self.arrow_position,
+                unique=False,
+                as_int=False,
+                as_float=True,
+                msg=" for arrow_position",
+            )
+            for step in steps:
+                if step > 1:
+                    tools.feedback("The arrow_position value must be less than 1", True)
+                the_tip = geoms.fraction_along_line(point_start, point_end, step)
+                tips.append(the_tip)
+        else:
+            tips = [point_end]
+        for the_tip in tips:
+            head_width = (
+                self.unit(self.arrow_width)
+                if self.arrow_width
+                else (self.stroke_width * 4 + self.stroke_width)
+            )
+            _head_height = math.sqrt(head_width**2 - (0.5 * head_width) ** 2)
+            head_height = (
+                self.unit(self.arrow_height) if self.arrow_height else _head_height
+            )
+            pt1 = geoms.Point(the_tip.x - head_width / 2.0, the_tip.y + head_height)
+            pt2 = the_tip
+            pt3 = geoms.Point(the_tip.x + head_width / 2.0, the_tip.y + head_height)
+            vertexes = [pt1, pt2, pt3]
+            kwargs["vertices"] = vertexes
+            kwargs["stroke_width"] = 0.01
+            # print(f'{self.arrow_stroke=} {self.arrow_fill=} {self.stroke=}')
+            kwargs["fill"] = self.arrow_fill or self.stroke
+            kwargs["stroke"] = self.arrow_stroke or self.stroke
+            kwargs["fill"] = self.arrow_fill or self.stroke
+            kwargs["closed"] = True
+            deg, angle = geoms.angles_from_points(point_start, point_end)
+            # print(f'{deg=} {angle=} ')
+            if point_start.x != point_end.x:
+                kwargs["rotation"] = 180 + deg
+                kwargs["rotation_point"] = the_tip
+            else:
+                if point_end.y > point_start.y:
+                    kwargs["rotation"] = 180
+                    kwargs["rotation_point"] = the_tip
+                else:
+                    kwargs["rotation"] = 0
+                    kwargs["rotation_point"] = None
+
+            match str(self.arrow_style).lower():
+                case "triangle" | "t":
+                    pass
+                case "spear" | "s":
+                    pt4 = geoms.Point(the_tip.x, the_tip.y + 2 * head_height)
+                    vertexes.append(pt4)
+                case "angle" | "angled" | "a":
+                    kwargs["stroke_width"] = self.stroke_width
+                    kwargs["closed"] = False
+                    kwargs["fill"] = None
+                case "notch" | "notched" | "n":
+                    pt4 = geoms.Point(the_tip.x, the_tip.y + 0.5 * head_height)
+                    vertexes.append(pt4)
+            # set props
+            # print(f'{vertexes=}' {kwargs=}')
+            self._debug(cnv, vertices=vertexes)  # needs: self.debug=True
+            cnv.draw_polyline(vertexes)
+            self.set_canvas_props(cnv=cnv, index=None, **kwargs)
+
     def make_path_vertices(self, cnv, vertices: list, v1: int, v2: int):
         """Draw line between two vertices"""
         cnv.draw_line(vertices[v1], vertices[v2])
@@ -2604,7 +2677,7 @@ class BaseShape:
                         f"{key}",
                         **kwargs,
                     )
-                    canvas.draw_circle((vert.x, vert.y), 2)
+                    canvas.draw_circle((vert.x, vert.y), 1)
             # display labelled point (geoms.Point)
             if kwargs.get("point", []):
                 point = kwargs.get("point")
@@ -2618,7 +2691,7 @@ class BaseShape:
                 self.draw_multi_string(
                     canvas, point.x, point.y, f"{label} {point.x:.2f},{point.y:.2f}"
                 )
-                canvas.draw_circle((point.x, point.y), 2)
+                canvas.draw_circle((point.x, point.y), 1)
             self.set_canvas_props(cnv=canvas, index=None, **kwargs)
 
     def handle_custom_values(self, the_element, ID):
@@ -2649,7 +2722,7 @@ class BaseShape:
                 record = self.deck_data[ID]
                 try:
                     custom_value = value.render(record)
-                    # print('###', f'{ID=} {key=} {custom_value=}')
+                    # print('### Template', f'{ID=} {key=} {custom_value=}')
                     return custom_value
                 except jinja2.exceptions.UndefinedError as err:
                     tools.feedback(
@@ -2659,6 +2732,41 @@ class BaseShape:
                     tools.feedback(
                         f"Unable to process data with this template ({err})", True
                     )
+
+            elif isinstance(value, TemplatingType):
+                if not self.deck_data:
+                    tools.feedback(
+                        "Cannot use T() or S() command without Data already defined!",
+                        False,
+                    )
+                    tools.feedback(
+                        "Check that Data command is used before Deck command.",
+                        True,
+                    )
+                record = self.deck_data[ID]
+                try:
+                    custom_value = value.template.render(record)
+                    # print('### TT', f'{ID=} {key=} {custom_value=} {value.function=}')
+                    if value.function:
+                        try:
+                            custom_value = value.function(custom_value)
+                            breakpoint()
+                        except Exception as err:
+                            tools.feedback(
+                                f"Unable to process data with function '{ value.function}' ({err})",
+                                True,
+                            )
+
+                    return custom_value
+                except jinja2.exceptions.UndefinedError as err:
+                    tools.feedback(
+                        f"Unable to process data with this template ({err})", True
+                    )
+                except Exception as err:
+                    tools.feedback(
+                        f"Unable to process data with this template ({err})", True
+                    )
+
             elif isinstance(value, LookupType):
                 record = self.deck_data[ID]
                 lookup_value = record[value.column]

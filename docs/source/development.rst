@@ -71,7 +71,7 @@ Check existing dependencies via::
 
     poetry show
 
-Update a patch version via::
+Update a patch / feature version (the most common case) via::
 
     poetry version patch
 
@@ -79,22 +79,40 @@ Update a minor version via::
 
     poetry version minor
 
+Update a major version via::
+
+    poetry version major
+
+
+Examples:
+
+======= ======= =======
+type 	before 	after
+======= ======= =======
+patch 	4.1.6 	4.1.7
+minor 	2.1.4 	2.2.0
+major 	1.3.2 	2.0.0
+======= ======= =======
+
 Releases on pypi
 ----------------
 
 The software includes a GitHub workflow |dash| see the ``.github/workflows/``
-directory |dash| which handles pushing new releases  onto pypi.
+directory |dash| which handles pushing new releases onto https://pypi.org
 
-To trigger such an update, add a new version as above, and then tag and push::
+Once all changes have been made and tested a new version can be released.
 
-    git tag 0.1.1
+To trigger such an update, update the version as above using `poetry`, and
+then tag and push::
+
+    git tag 0.1.2
     git push origin --tags
 
 If you check the *Actions* tab on the GitHub project page, you should now see
 the workflow in action.
 
 When complete, there should now be an updated version showing if you refresh
-the home page of the project on https://pypi.org/.
+the home page of the project on https://pypi.org/
 
 Working with latest
 -------------------

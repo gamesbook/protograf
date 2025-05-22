@@ -5,6 +5,14 @@ protograf
 Changes
 =======
 
+2025-00-00 (0.2.1)
+------------------
+- Add arrowhead for Line
+- Update installation docs (Windows notes)
+- Support function-based processing for Card template data
+- Add option to create Line at a centre point
+- Support export to SVG
+
 2025-05-17 (0.2.0)
 ------------------
 - Drop use of ReportLab and switch to PyMuPDF

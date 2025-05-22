@@ -126,7 +126,7 @@ extra information specified.  Allowed values for debug include:
   - *colrow* - shows column and row numbers
   - *id* - shows the internal ID number assigned to the location
 
-.. _key-properties:
+.. _key-properties-rect:
 
 Key Properties
 ==============
@@ -164,7 +164,7 @@ by the sequence value - or order number - in which that Circle gets drawn.
 
 Example 1. Rows and Columns
 ---------------------------
-`^ <key-properties_>`_
+`^ <key-properties-rect_>`_
 
 .. |r00| image:: images/layouts/rect_basic_default.png
    :width: 330
@@ -190,7 +190,7 @@ Example 1. Rows and Columns
 
 Example 2. Start and Direction
 ------------------------------
-`^ <key-properties_>`_
+`^ <key-properties-rect_>`_
 
 .. |r01| image:: images/layouts/rect_basic_east.png
    :width: 330
@@ -213,7 +213,7 @@ Example 2. Start and Direction
 
 Example 3. Row and Column Interval
 ----------------------------------
-`^ <key-properties_>`_
+`^ <key-properties-rect_>`_
 
 .. |02a| image:: images/layouts/rect_basic_interval.png
    :width: 330
@@ -259,7 +259,7 @@ Example 3. Row and Column Interval
 
 Example 4. Row and Column Offset
 --------------------------------
-`^ <key-properties_>`_
+`^ <key-properties-rect_>`_
 
 .. |03a| image:: images/layouts/rect_basic_east_even.png
    :width: 330
@@ -307,7 +307,7 @@ Example 4. Row and Column Offset
 
 Example 5. Snaking
 ------------------
-`^ <key-properties_>`_
+`^ <key-properties-rect_>`_
 
 .. |r03| image:: images/layouts/rect_basic_snake.png
    :width: 330
@@ -332,7 +332,7 @@ Example 5. Snaking
 
 Example 6. Outer Edge
 ---------------------
-`^ <key-properties_>`_
+`^ <key-properties-rect_>`_
 
 .. |r04| image:: images/layouts/rect_basic_outer.png
    :width: 330
@@ -374,7 +374,7 @@ Example 6. Outer Edge
 
 Example 6a. Outer Edge - Shapes
 -------------------------------
-`^ <key-properties_>`_
+`^ <key-properties-rect_>`_
 
 .. |r4a| image:: images/layouts/layout_rect_outer_multi.png
    :width: 330
@@ -422,7 +422,7 @@ Example 6a. Outer Edge - Shapes
 
 Example 6b. Outer Edge - Stop and Start
 ---------------------------------------
-`^ <key-properties_>`_
+`^ <key-properties-rect_>`_
 
 .. |r4b| image:: images/layouts/layout_rect_outer_multi_stop.png
    :width: 330
@@ -466,7 +466,7 @@ Example 6b. Outer Edge - Stop and Start
 
 Example 6c. Outer Edge - Rotation
 ---------------------------------
-`^ <key-properties_>`_
+`^ <key-properties-rect_>`_
 
 .. |r4c| image:: images/layouts/layout_rect_outer_rotation.png
    :width: 330
@@ -528,7 +528,7 @@ Example 6c. Outer Edge - Rotation
 
 Example 7. Masked
 -----------------
-`^ <key-properties_>`_
+`^ <key-properties-rect_>`_
 
 .. |r05| image:: images/layouts/rect_basic_outer_mask.png
    :width: 330
@@ -552,7 +552,7 @@ Example 7. Masked
 
 Example 8. Visible
 ------------------
-`^ <key-properties_>`_
+`^ <key-properties-rect_>`_
 
 .. |r06| image:: images/layouts/rect_basic_outer_visible.png
    :width: 330
@@ -577,7 +577,7 @@ Example 8. Visible
 
 Example 9. Locations Setting
 ----------------------------
-`^ <key-properties_>`_
+`^ <key-properties-rect_>`_
 
 .. |r07| image:: images/layouts/rect_basic_locations.png
    :width: 330
@@ -610,7 +610,7 @@ Example 9. Locations Setting
 
 Example 10. Debug
 -----------------
-`^ <key-properties_>`_
+`^ <key-properties-rect_>`_
 
 .. |10a| image:: images/layouts/rect_basic_debug.png
    :width: 330

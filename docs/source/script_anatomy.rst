@@ -1,4 +1,4 @@
-==============
+:==============
 Script Anatomy
 ==============
 
@@ -109,8 +109,8 @@ To customise the command, set its properties as follows:
 - **margin_right** - set the the right margin
 
 
-Example 1
-~~~~~~~~~
+Example 1. Create Options
+~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Here is an example of a customised ``Create`` command, for an A3-sized page
 in landscape mode, with top and left margins being 2 inches each:
@@ -151,23 +151,29 @@ default filename, or with the one set in the `Create Command`_ .
 
 To customise the command, set its properties as follows:
 
-- **output** - this can be set to ``png`` to create one image file per page of
-  the PDF; by default the name of the PNG files are derived using the PDF filename,
-  with a ``-`` followed by the page number; if set to ``gif`` will create a GIF
-  file composed of all the PNG pages that would have been created
+- **output** - this can be set to:
+
+  - ``png`` - to create one image file per page of the PDF; by default the name
+    of the PNG files are derived using the PDF filename, with a ``-`` followed
+    by the page number;
+  - ``svg`` - to create one file per page of the PDF; by default the name
+    of the SVG files are derived using the PDF filename, with a ``-`` followed
+    by the page number;
+  - ``gif`` - to create a GIF file composed of all the PNG pages (these will be
+    removed after the file been created)
 - **dpi** - can be set to the dots-per-inch resolution required; by default
   this is ``300``
 - **names** - this can be used to provide a list of names |dash| without an
-  extension |dash| for the image files that will be created from the PDF; the
-  first name corresponds to the first page, the second name to the second and
-  so on.  Each will automatically get the ``.png`` extension added to it.
+  extension |dash| for the **output** files that will be created from the PDF;
+  the first name corresponds to the first page, the second name to the second
+  and so on.  Each will automatically get the correct extension added to it.
   If the term ``None`` is used in place of a name, then that page will **not**
-  have a PNG file created for it.
+  have an output file created for it.
 - **framerate** - the delay in seconds between each "page" of a GIF image; by
   default this is ``1`` second
 
-Example 1
-~~~~~~~~~
+Example 1. Save PNG
+~~~~~~~~~~~~~~~~~~~
 
 Here is an example of a customised ``Save`` command:
 
@@ -179,12 +185,12 @@ Here is an example of a customised ``Save`` command:
         names=['pageOne', None, 'pageThree']
     )
 
-In this example, **no** PNG file will be created from the second page, while PNG
-files named ``pageOne.png`` and ``pageThree.png`` will be created from
-the first and third pages of the PDF file.
+In this example, **no** PNG file will be created from the second page, while
+``.png`` files named ``pageOne.png`` and ``pageThree.png`` will be created
+from the first and third pages of the PDF file.
 
-Example 2
-~~~~~~~~~
+Example 2. Save GIF
+~~~~~~~~~~~~~~~~~~~
 
 Here is another example of a customised ``Save`` command:
 

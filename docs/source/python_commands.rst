@@ -335,25 +335,31 @@ A function is the workhorse of a language.  It allows you to define your
 for its properties.
 
 Effectively, it allows you to create a mini  **protograf** script inside your
-main script. As with `loops`_, functions embed a set of steps to be carried when
-they are activated, but functions are more powerful because they can allow
-control of the behaviour of **any** of the properties or commands that are part
-of them.
+main script. As with `loops`_, functions embed a set of steps to be carried
+out when they are activated, but functions are more powerful because they can
+allow control of the behaviour of **any** of the properties or commands that
+are part of them.
 
-A function is simply created by using a ``def`` command, followed by the name you
-want to give the function |dash| using a word with **no** spaces in it |dash|
-followed by the set of property names and their default values.  These properties
-are only available as part of the function, and represent aspects of that function
-that you need to be able to change every time the function is used.
+A function is simply created/defined by using a ``def`` command, followed by
+the name you want to give the function |dash| using a word with **no** spaces
+in it |dash| followed by the set of property names and their default values.
+These properties are only available as part of the function, and represent
+aspects of that function that you need to be able to change every time the
+function is activated.
 
 The ``def`` line is followed by one or more lines that are all indented and
 all aligned; these represent the actions that are to be carried out in that
 functions; this can include drawing of shapes, but could also involve use of
 `loops`_ and `if statements`_.
 
-When a function is defined, it is **not** activated; its only when you issue a
-command for it |dash| ``name()`` |dash| that it will perform the actions defined
-as part of it.
+When a function is defined, it is **not** activated; its only when you issue
+a command for it |dash| ``name()`` |dash| that it will perform the actions
+defined as part of it, and the script will carry on from the point where it
+was activated.
+
+
+Function Example 1. Drawing Shapes
+----------------------------------
 
 .. |fn1| image:: images/custom/commands/function.png
    :width: 330
@@ -364,7 +370,8 @@ as part of it.
       .. code:: python
 
         def capitol(a=0, b=0, c=red):
-            Circle(cx=a+1, cy=b+1, radius=0.5, fill_stroke=c)
+            Circle(
+                cx=a+1, cy=b+1, radius=0.5, fill_stroke=c)
             Rectangle(
                 x=a, y=b, height=1, width=2, fill_stroke=c,
                 notch_y=0.1, notch_x=0.5,
@@ -375,8 +382,8 @@ as part of it.
         Create(paper="A8", margin=0.25)
         Blueprint()
         capitol()  # uses default values
-        capitol(a=1, b=2, c=gold)
-        capitol(a=2, b=4, c=lime)
+        capitol(a=1, b=2, c="gold")
+        capitol(a=2, b=4, c="lime")
         PageBreak()
         Save()
 
@@ -394,5 +401,45 @@ as part of it.
       is provided to *c* it will change the shape's color.
 
       These changes to the function's properties can be seen in
-      the other examples.
+      the other uses made of it above.
+
+      The function is activated by simply including its name as
+      part of the script, along with its brackets, such as in the line:
+
+      .. code:: python
+
+        capitol()
+
+      or, when setting values for the function's properties:
+
+      .. code:: python
+
+        capitol(a=1, b=2, c="gold")
+
 ===== ======
+
+Function Example 2. Modifying Data
+----------------------------------
+
+A *function* can also be used for a "non-drawing" operation.
+
+You can create one that modifies the value of a property used by a shape.
+
+The use of ``return`` is key for most functions; any time that it used,
+the function will stop operations and the script will resume from the point
+where the function has just been activated.
+
+.. code:: python
+
+    def shift(a=0):
+        return a + 1
+
+    Circle(cx=3, cy=3, diameter=shift())
+    Circle(cx=3, cy=3, diameter=shift(1))
+    Circle(cx=3, cy=3, diameter=shift(2))
+
+Here the different circles each are assigned a slighly larger value
+by the function simply adding ``1`` to them.
+
+This is a trivial example, but it serves to show how functions can be
+added and used by your script.

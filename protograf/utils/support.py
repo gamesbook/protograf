@@ -4,19 +4,22 @@ Support utilities for draw module
 """
 # lib
 from collections import namedtuple
+from dataclasses import dataclass
 import itertools
 import os
 import math
 import sys
 import string
-from typing import Any
+from typing import Any, List
 
 # third-party
 import imageio
+from jinja2 import Template
 import pymupdf
 
 # local
 from protograf.utils.colors_svg import named_colors
+from protograf.utils.enums import ExportFormat
 
 
 CACHE_DIRECTORY = ".protograf"  # append to the user's home directory
@@ -61,6 +64,17 @@ UnitPoints = namedtuple(
         "pt",
     ],
 )
+
+
+# wrapper around a jinja Template to support operations on an Template output
+@dataclass
+class TemplatingType:
+    """Support dynamic object creation from a jinga Template"""
+
+    template: Template
+    function: object
+    members: List
+
 
 # ---- units
 unit = UnitPoints(
@@ -211,17 +225,17 @@ def steps(start, end, step=1, REAL=True):
     [1, 2.5, 4.0]
     """
     try:
-        _start = float(start)
+        _ = float(start)
     except Exception:
         feedback(f'A start value of "{start}" is not a valid number', REAL)
         return
     try:
-        _end = float(end)
+        _ = float(end)
     except Exception:
         feedback(f'An end value of "{end}" is not a valid number', REAL)
         return
     try:
-        _step = float(step)
+        _ = float(step)
     except Exception:
         feedback(f'A step value of "{step}" is not a valid number', REAL)
         return
@@ -330,7 +344,7 @@ def to_int(value: Any, name: str = "", fail: bool = True) -> int:
     """
     try:
         return int(value)
-    except Exception as err:
+    except Exception:
         if name:
             feedback(
                 f'Unable to use {name} value of "{value}" - needs to be a whole number!',
@@ -350,7 +364,7 @@ def to_float(value: Any, name: str = "", fail: bool = True) -> float:
     """
     try:
         return float(value)
-    except Exception as err:
+    except Exception:
         if name:
             feedback(
                 f'Unable to use {name} value of "{value}" - needs to be a floating point number!',
@@ -423,21 +437,29 @@ def excels(start, end, step=1, REAL=True):
     return result
 
 
-def pdf_to_png(
+def pdf_export(
     filename: str,
-    fformat: str = "png",
+    fformat: ExportFormat,
     dpi: int = 300,
     names: list = None,
     directory: str = None,
     framerate: float = 1.0,
 ):
-    """Extract pages from PDF as PNG image(s).  Optionally, assemble into a GIF.
+    """Extract pages from PDF as PNG or SVG files.  Optionally, assemble into a GIF.
+
+    Args:
+        fformat: the type of file create (GIF is created from PNGs which get deleted)
+        filename: output file name
+        dpi: resolution of PNG files
+        names: each name corresponds to a page in the document
+        directory: output directory
+        framerate: delay between rendering each image in the GIF file
 
     Uses:
         * https://pymupdf.io/
         * https://pypi.org/project/imageio/
     """
-    feedback(f'Saving page(s) from "{filename}" as image file(s)...', False)
+    feedback(f'Exporting page(s) from "{filename}" ...', False)
     _filename = os.path.basename(filename)
     basename = os.path.splitext(_filename)[0]
     dirname = directory or os.path.dirname(filename)
@@ -470,25 +492,48 @@ def pdf_to_png(
     try:
         doc = pymupdf.open(filename)
         pages = doc.page_count
-        all_pngs = []  # track full and final name of each saved .png
-        # save pages as .png files
-        for pg_number, page in enumerate(doc):
-            pix = page.get_pixmap(dpi=dpi)
-            if names and pg_number < len(names):
-                if names[pg_number] is not None:
-                    iname = os.path.join(dirname, f"{names[pg_number]}.png")
-                    pix.save(iname)
-                    all_pngs.append(iname)  # track for GIF creation
-            else:
-                if pages > 1:
-                    iname = os.path.join(dirname, f"{basename}-{page.number + 1}.png")
-                    all_pngs.append(iname)  # track for GIF creation
+
+        if fformat == ExportFormat.SVG:
+            # save pages as .svg files
+            for pg_number, page in enumerate(doc):
+                svg = page.get_svg_image(matrix=pymupdf.Identity)
+                if names and pg_number < len(names):
+                    if names[pg_number] is not None:
+                        fname = os.path.join(dirname, f"{names[pg_number]}.svg")
+                        with open(fname, "w") as _file:
+                            _file.write(svg)  # store image as a SVG
                 else:
-                    iname = os.path.join(dirname, f"{basename}.png")
-                    all_pngs.append(iname)  # track for GIF creation
-                pix.save(iname)
+                    if pages > 1:
+                        fname = os.path.join(
+                            dirname, f"{basename}-{page.number + 1}.svg"
+                        )
+                    else:
+                        fname = os.path.join(dirname, f"{basename}.svg")
+                    with open(fname, "w") as _file:
+                        _file.write(svg)  # store image as a SVG
+
+        if fformat == ExportFormat.GIF or fformat == ExportFormat.PNG:
+            # save pages as .png files
+            all_pngs = []  # track full and final name of each saved .png
+            for pg_number, page in enumerate(doc):
+                pix = page.get_pixmap(dpi=dpi)
+                if names and pg_number < len(names):
+                    if names[pg_number] is not None:
+                        iname = os.path.join(dirname, f"{names[pg_number]}.png")
+                        pix.save(iname)
+                        all_pngs.append(iname)  # track for GIF creation
+                else:
+                    if pages > 1:
+                        iname = os.path.join(
+                            dirname, f"{basename}-{page.number + 1}.png"
+                        )
+                        all_pngs.append(iname)  # track for GIF creation
+                    else:
+                        iname = os.path.join(dirname, f"{basename}.png")
+                        all_pngs.append(iname)  # track for GIF creation
+                    pix.save(iname)
         # assemble .png files into a .gif
-        if fformat == "gif" and framerate > 0:
+        if fformat == ExportFormat.GIF and framerate > 0:
             feedback(
                 f'Converting PNG image file(s) from "{filename}" into a GIF...', False
             )
