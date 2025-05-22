@@ -3,49 +3,17 @@
 Mathematical utility functions for protograf
 """
 # lib
-from collections import namedtuple
 import cmath
-from dataclasses import dataclass
 import logging
 import math
-from typing import Any, List, Tuple
+from typing import Any, List
 
 # local
+from protograf.utils.structures import Point
 from protograf.utils.support import numbers, feedback
 
 log = logging.getLogger(__name__)
 DEBUG = False
-
-Link = namedtuple("Link", ["a", "b", "style"])
-fields = ("col", "row", "x", "y", "id", "sequence", "corner", "label")
-Locale = namedtuple("Locale", fields, defaults=(None,) * len(fields))
-Place = namedtuple("Place", ["shape", "rotation"])
-Point = namedtuple("Point", ["x", "y"])
-# a ray is a mathematical term that specifies a position and direction
-Ray = namedtuple("Ray", ["x", "y", "angle"])
-PolyGeometry = namedtuple(
-    "PolyGeometry", ["x", "y", "radius", "side", "half_flat", "vertices"]
-)
-HexGeometry = namedtuple(
-    "HexGeometry",
-    [
-        "radius",
-        "diameter",
-        "side",
-        "half_side",
-        "half_flat",
-        "height_flat",
-        "z_fraction",
-    ],
-)
-
-
-@dataclass
-class BBox:
-    """A spatial bounding box - BL is SouthWest x,y point and TR is NorthEast x,y point"""
-
-    bl: Tuple[Point, Point]
-    tr: Tuple[Point, Point]
 
 
 def polygon_vertices(
@@ -283,7 +251,7 @@ def point_on_circle(point_centre: Point, radius: float, angle: float) -> Point:
         theta = float(angle) * math.pi / 180.0
         x = math.cos(theta) * radius + point_centre.x
         y = point_centre.y - math.sin(theta) * radius  # + point_centre.y
-    except:
+    except Exception:
         raise ValueError(
             f"Cannot calculate point on circle for: {point_centre}, {radius} and {angle}"
         )

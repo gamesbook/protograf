@@ -9,7 +9,7 @@ Changes
 ------------------
 - Patch use, options and errors for split() function
 - Expand rationale in the Overview
-- Move all data structures to one file
+- Move all data structure definitions to a single file
 
 2025-05-22 (0.2.1)
 ------------------

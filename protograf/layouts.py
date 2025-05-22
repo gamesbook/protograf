@@ -9,20 +9,19 @@ import math
 
 # third party
 # local
-from protograf.utils.geoms import Point, Locale, Place  # named tuples
-from protograf.utils import geoms, tools, support
+from protograf.utils.structures import Point, Locale  # named tuples
+from protograf.utils import tools, support
 from protograf.base import BaseShape, BaseCanvas
 from protograf.shapes import (
-    CircleShape,
+    # CircleShape,
     LineShape,
-    PolygonShape,
+    # PolygonShape,
     PolylineShape,
-    RectangleShape,
+    # RectangleShape,
     TextShape,
 )
 
 log = logging.getLogger(__name__)
-
 DEBUG = False
 
 

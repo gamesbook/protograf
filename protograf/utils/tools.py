@@ -17,8 +17,7 @@ import xlrd
 
 # local
 from protograf.utils.support import feedback
-from protograf.utils.enums import DirectionGroup, TemplatingType
-from protograf.utils.geoms import Point
+from protograf.utils.structures import DirectionGroup, Point, TemplatingType
 
 log = logging.getLogger(__name__)
 DEBUG = False
@@ -308,7 +307,7 @@ def sequence_split(
     sep: str = ",",
     as_float: bool = False,
     msg: str = "",
-    clean: bool = False
+    clean: bool = False,
 ):
     """
     Split a string into a list of individual values
@@ -374,11 +373,14 @@ def sequence_split(
     try:
         _strings = _string.split(sep)
     except AttributeError as err:
-        feedback(f'Unable to split "{_string}" - please check that its a valid candidate!', False)
+        feedback(
+            f'Unable to split "{_string}" - please check that its a valid candidate!',
+            False,
+        )
         if isinstance(_string, TemplatingType):
-            feedback(f'The script may not be using T() correctly', True)
+            feedback(f"The script may not be using T() correctly", True)
         else:
-            feedback(f'', True)
+            feedback(f"", True)
 
     # log.debug('strings:%s', _strings)
     for item in _strings:
@@ -404,7 +406,9 @@ def sequence_split(
     return values
 
 
-def split(string: str, tuple_to_list: bool = False, separator: str = None, clean: bool = False):
+def split(
+    string: str, tuple_to_list: bool = False, separator: str = None, clean: bool = False
+):
     """
     Split a string into a list of individual characters
 

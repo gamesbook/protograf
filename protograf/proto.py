@@ -70,19 +70,29 @@ from .layouts import (
     RepeatShape,
     SequenceShape,
 )
-from .groups import Switch, Lookup
+from .groups import Switch, Lookup  # used in scripts
 from ._version import __version__
 
 from protograf.utils import geoms, tools, support
-from protograf.utils.enums import (
-    CardFrame, DatasetType, DirectionGroup, ExportFormat, TemplatingType)
-from protograf.utils.fonts import builtin_font, FontInterface
-from protograf.utils.tools import base_fonts, split
-from protograf.utils.geoms import BBox, Locale, Point, Place, Ray, equilateral_height
-from protograf.utils.support import (
+from protograf.utils.structures import (
+    BBox,
+    CardFrame,
+    DatasetType,
+    DirectionGroup,
+    ExportFormat,
     LookupType,
-    steps,
+    Locale,
+    Point,
+    Place,
+    Ray,
+    TemplatingType,
     unit,
+)
+from protograf.utils.fonts import builtin_font, FontInterface
+from protograf.utils.tools import base_fonts, split  # used in scripts
+from protograf.utils.geoms import equilateral_height  # used in scripts
+from protograf.utils.support import (  # used in scripts
+    steps,
     uni,
     uc,
     CACHE_DIRECTORY,

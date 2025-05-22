@@ -1,9 +1,8 @@
 # -*- coding: utf-8 -*-
 """
-Support utilities for draw module
+Support utilities for protograf `draw` module
 """
 # lib
-from collections import namedtuple
 import itertools
 import os
 import string
@@ -15,7 +14,7 @@ import pymupdf
 
 # local
 from protograf.utils.colors_svg import named_colors
-from protograf.utils.enums import ExportFormat
+from protograf.utils.structures import ExportFormat, unit
 
 
 CACHE_DIRECTORY = ".protograf"  # append to the user's home directory
@@ -49,26 +48,6 @@ BUILT_IN_FONTS = [
     "zadb",
     "ZapfDingbats",
 ]
-
-LookupType = namedtuple("LookupType", ["column", "lookups"])
-UnitPoints = namedtuple(
-    "UnitPoints",
-    [
-        "cm",
-        "mm",
-        "inch",
-        "pt",
-    ],
-)
-
-
-# ---- units
-unit = UnitPoints(
-    cm=28.3465,
-    mm=2.83465,
-    inch=72.0,
-    pt=1.0,
-)
 
 
 def feedback(item, stop=False, warn=False):
