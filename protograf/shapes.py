@@ -21,11 +21,11 @@ import segno  # QRCode
 from protograf.utils.enums import DirectionGroup
 from protograf.utils.geoms import (
     BBox,
-    Point,
+    HexGeometry,
     Link,
     Locale,
+    Point,
     PolyGeometry,
-    HexGeometry,
 )  # named tuples
 from protograf.utils import geoms, tools, support
 from protograf.base import (
@@ -34,9 +34,9 @@ from protograf.base import (
     GridShape,
     get_color,
     get_opacity,
+    BGG_IMAGES,
     COLOR_NAMES,
     DEBUG_COLOR,
-    BGG_IMAGES,
 )
 from protograf.utils.support import CACHE_DIRECTORY
 from protograf import globals
@@ -2637,6 +2637,21 @@ class PolylineShape(BaseShape):
             kwargs["closed"] = False
             kwargs["fill"] = None
             self.set_canvas_props(cnv=cnv, index=ID, **kwargs)
+        # ---- arrowhead
+        if (
+            self.arrow
+            or self.arrow_style
+            or self.arrow_position
+            or self.arrow_height
+            or self.arrow_width
+            or self.arrow_double
+        ) and points:
+            _vertexes = tools.as_point(self.vertexes)
+            start, end = _vertexes[-2], _vertexes[-1]
+            self.draw_arrowhead(cnv, start, end, **kwargs)
+            if self.arrow_double:
+                start, end = _vertexes[1], _vertexes[0]
+                self.draw_arrowhead(cnv, start, end, **kwargs)
 
 
 class QRCodeShape(BaseShape):

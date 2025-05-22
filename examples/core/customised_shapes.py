@@ -559,6 +559,23 @@ Line(x=3, y=6, x1=4, y1=5,
      arrow_position=[0.1, 0.15, 0.2])
 PageBreak()
 
+# ---- polyline arrows
+Blueprint(stroke_width=0.5)
+Text(common=txt, text="Polyline: Arrow")
+Polyline(
+    points=[(1, 3), (2, 4), (2.5, 2), (3, 3), (3.5, 1)],
+    stroke_width=1,
+    arrow=True
+)
+Polyline(
+    points=[(1, 5), (3, 5)],
+    stroke_width=1,
+    dotted=True,
+    arrow_style='notch',
+    arrow_double=True
+)
+PageBreak()
+
 # ---- Centred Shapes
 Blueprint()
 Text(common=txt, text="Centred Shapes")
@@ -762,7 +779,7 @@ Save(
         "polyshape_default", "polyshape_custom", "polyshape_offset",
         "rectangles_rowcol", "rectangles_custom", "rhombus_custom",
         "rhombus_borders", "trapezoid_borders",
-        "arrow_sizes", "arrow_rotate", "arrowheads",
+        "arrow_sizes", "arrow_rotate", "arrowheads", "polyline_arrow",
         "shape_centred", "shape_centred_move", "qr_code", "image_sliced",
         "shape_rotation", "shape_hatch_and_rotation",
         "text_style", "text_custom", "text_rotate",

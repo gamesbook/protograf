@@ -18,6 +18,7 @@ import xlrd
 # local
 from protograf.utils.support import feedback
 from protograf.utils.enums import DirectionGroup
+from protograf.utils.geoms import Point
 
 log = logging.getLogger(__name__)
 DEBUG = False
@@ -26,7 +27,13 @@ BUILTIN_FONTS = ["Times-Roman", "Courier", "Helvetica"]
 
 
 def script_path():
-    """Get the path for a script being called from command line."""
+    """Get the path for a script being called from command line.
+
+    Doc Test:
+    >>> R = script_path()
+    >>> 'utils' in R.parts
+    True
+    """
     fname = os.path.abspath(sys.argv[0])
     if fname:
         return pathlib.Path(fname).resolve().parent
@@ -62,7 +69,7 @@ def load_data(datasource=None, **kwargs):
 
 
 def grouper(n, iterable, fillvalue=None):
-    """group and return sets
+    """Group and return sets
 
     See:
         http://stackoverflow.com/questions/2990121/~
@@ -72,7 +79,6 @@ def grouper(n, iterable, fillvalue=None):
         for item1, item2, item3 in grouper(3, 'ABCDEFG', 'x'):
 
     Doc Test:
-
     >>> list(grouper(3, 'ABCDEFG', 'x'))
     [('A', 'B', 'C'), ('D', 'E', 'F'), ('G', 'x', 'x')]
     """
@@ -82,10 +88,9 @@ def grouper(n, iterable, fillvalue=None):
 
 
 def boolean_join(items):
-    """Create a result from boolean concatenation
+    """Create a result from a Boolean concatenation
 
     Doc Test:
-
     >>> items = [True, '+', False]
     >>> boolean_join(items)
     False
@@ -158,7 +163,6 @@ def as_bool(value, label=None, allow_none=True) -> bool:
     """Convert a value to a Boolean
 
     Doc Test:
-
     >>> as_bool(value='3', label='N')
     False
     >>> as_bool(value='Y', label='Y')
@@ -172,11 +176,12 @@ def as_bool(value, label=None, allow_none=True) -> bool:
     return result
 
 
-def as_float(value, label, maximum=None, minimum=None, stop=True, default=None) -> int:
+def as_float(
+    value, label, maximum=None, minimum=None, stop=True, default=None
+) -> float:
     """Set a value to an float; or end program if an invalid value and stop is True
 
     Doc Test:
-
     >>> as_float(value='3', label='N')
     3.0
 
@@ -211,14 +216,37 @@ def as_float(value, label, maximum=None, minimum=None, stop=True, default=None) 
             return None
 
 
+def as_point(value) -> list | Point:
+    """Convert one or more tuples to a Point or list of Points
+
+    Doc Test:
+    >>> as_point((1,2))
+    Point(x=1, y=2)
+    >>> as_point([(1,2), (3,4)])
+    [Point(x=1, y=2), Point(x=3, y=4)]
+    """
+    if value is None:
+        return None
+    elif isinstance(value, tuple):
+        return Point(value[0], value[1])
+    elif isinstance(value, list):
+        items = []
+        for item in value:
+            if isinstance(item, tuple):
+                items.append(Point(item[0], item[1]))
+            else:
+                raise ValueError(f"Cannot convert {item} into a Point!")
+        return items
+    else:
+        raise ValueError(f"Cannot convert {value} into a Point!")
+
+
 def tuple_split(
     string: str, label: str = "list", pairs_list: bool = False, all_ints: bool = False
 ) -> list:
-    """
-    Split a string into a list of tuple numbers
+    """Split a string into a list of tuple numbers
 
     Doc Test:
-
     >>> print(tuple_split(''))
     []
     >>> print(tuple_split('3'))
@@ -288,7 +316,6 @@ def sequence_split(
         * If `unique` is True, order will NOT be maintained!
 
     Doc Test:
-
     >>> sequence_split('')
     []
     >>> sequence_split('3')
@@ -370,7 +397,7 @@ def split(string: str, tuple_to_list: bool = False):
     """
     Split a string into a list of individual characters
 
-    Doc test:
+    Doc Test:
     >>> split('A,1,B')
     ['A', '1', 'B']
     >>> split('A 1 B')
@@ -392,7 +419,6 @@ def integer_pairs(pairs, label: str = "list") -> list:
     """Convert a list or string into a list of tuples; each with a pair of integers.
 
     Doc Test:
-
     >>> integer_pairs(pairs=[(1,2), (3,4)])
     [(1, 2), (3, 4)]
     >>> integer_pairs(pairs="1,2 3,4")
@@ -436,6 +462,9 @@ def splitq(seq, sep=None, pairs=("()", "[]", "{}"), quote="\"'"):
     Source:
         https://www.daniweb.com/programming/software-development/code/426990/\
         split-string-except-inside-brackets-or-quotes
+
+    Doc Test:
+        TODO
     """
     if not seq:
         yield []
@@ -592,10 +621,11 @@ def open_xls(filename, sheet=0, sheetname=None, headers=None, selected=None):
 
 
 def flatten(lst):
-    """Flatten nested lists into a single list of lists.
+    """Flatten nested lists into a single list
 
-    >>> list(flatten([[1, 2], [3,4, [5,6]]]))
-    [1, 2, 3, 4, 5, 6]
+    Doc Test:
+    >>> list(flatten([0, [1, 2], [3,4, [5,6]]]))
+    [0, 1, 2, 3, 4, 5, 6]
     """
     try:
         for ele in lst:
@@ -615,6 +645,7 @@ def flatten_keys(d: dict):
         * values for keys in nested dict will override those in parent(s)!
         * See: https://www.geeksforgeeks.org/python-flatten-nested-keys/
 
+    Doc Test:
     >>> flatten_keys({'height': 8, 'cards': 1, 'image': None, 'kwargs': {'kwargs': {'image': 'FOO', 'kwargs': {'cards': 9}}}})
     {'height': 8, 'cards': 9, 'image': 'FOO'}
     """
@@ -643,6 +674,7 @@ def flatten_keys(d: dict):
 def comparer(val, operator, target):
     """target could be list?? - split a string by , or ~
 
+    Doc Test:
     >>> comparer(None, None, None)
     True
     >>> comparer("1", '*', "1")
@@ -740,7 +772,7 @@ def comparer(val, operator, target):
 
 
 def color_to_hex(name):
-    """Convert a named ReportLab color (Color class) to a hexadecimal string"""
+    """Convert a named color (Color class) to a hexadecimal string"""
     if isinstance(name, str):
         return name
     _tuple = (int(name.red * 255), int(name.green * 255), int(name.blue * 255))
@@ -748,8 +780,13 @@ def color_to_hex(name):
     return _string.upper()
 
 
-def rgb_to_hex(color):
-    """Convert a RGB tuple color to a hexadecimal string"""
+def rgb_to_hex(color: tuple) -> str:
+    """Convert a RGB tuple color to a hexadecimal string
+
+    Doc Test:
+    >>> rgb_to_hex((123,45,6))
+    '#7A852CD35FA'
+    """
     if color is None:
         return color
     _tuple = (int(color[0] * 255), int(color[1] * 255), int(color[2] * 255))
@@ -765,6 +802,14 @@ def alpha_column(num: int, lower: bool = False) -> string:
           a, b, c, etc, numbers above 26 appear sequentially as aa, bb, cc, etc; if
           above 52 then appear sequentially as aaa, bbb, ccc etc. Add more letters for
           each multiple of 26.
+
+    Doc Test:
+    >>> alpha_column(1)
+    'A'
+    >>> alpha_column(26, lower=True)
+    'z'
+    >>> alpha_column(27)
+    'AA'
     """
     if lower:
         return string.ascii_lowercase[divmod(num - 1, 26)[1] % 26] * (
@@ -783,7 +828,6 @@ def sheet_column(num: int, lower: bool = False) -> string:
         https://stackoverflow.com/questions/23861680/
 
     Doc Test:
-
     >>> sheet_column(num=3, lower=True)
     'c'
     >>> sheet_column(num=27, lower=False)

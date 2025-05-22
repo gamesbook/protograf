@@ -416,6 +416,7 @@ Example 2. Customised Line
       the second is the length of the space between each dash.
 ===== ======
 
+.. _line-with-arrow:
 
 Example 3. Line with Arrow
 ++++++++++++++++++++++++++
@@ -643,16 +644,16 @@ Polyline
 ~~~~~~~~
 `↑ <shape-index_>`_
 
-A polyline is a series of lines joining points.
+A polyline is a series of one or more lines joining two or more points.
 
 Example 1. Customised Polyline
 ++++++++++++++++++++++++++++++
 
-.. |ply| image:: images/defaults/polyline.png
+.. |py1| image:: images/defaults/polyline.png
    :width: 330
 
 ===== ======
-|ply| The shape cannot be constructed using only default properties:
+|py1| The shape cannot be constructed using only default properties:
 
       .. code:: python
 
@@ -675,12 +676,44 @@ Example 1. Customised Polyline
       - second point is at x-position ``1`` cm and at y-position ``1`` cm
       - third point is at x-position ``2`` cm and at y-position ``0`` cm
 
-      The *points* for a Polyline:
+      The *points* for a Polyline are in a list, as shown by the square
+      brackets from ``[`` to ``]``, where:
 
-      - are in a list, as shown by the square brackets from ``[`` to ``]``,
       - each *x* and *y* are provided as a pair of values in round brackets
       - each *x* and *y* are separated by a comma
       - each pair of values in the list is separated by a comma
+
+===== ======
+
+
+Example 2. Polyline with Arrow
+++++++++++++++++++++++++++++++
+
+.. |py2| image:: images/customised/polyline_arrow.png
+   :width: 330
+
+===== ======
+|py2| The shape is constructed with these properties:
+
+      .. code:: python
+
+        Polyline(
+            points=[(1,3), (2,4), (2.5,2), (3,3), (3.5,1)],
+            stroke_width=1,
+            arrow=True
+        )
+        Polyline(
+            points=[(1,5), (3,5)],
+            stroke_width=1,
+            dotted=True,
+            arrow_style='notch',
+            arrow_double=True
+        )
+
+      This example makes use of the "arrow" properties available for a line.
+
+      For more details on how arrows are used and set, see the
+      :ref:`Line with Arrow <line-with-arrow>` example.
 
 ===== ======
 

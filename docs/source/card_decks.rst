@@ -37,7 +37,7 @@ Table of Contents
 - `Countersheet and Counter Commands`_
 - `Supporting Commands`_
 
-  - `group command`_
+  - `group function`_
   - `T(emplate) command`_
   - `S(election) command`_
   - `L(ookup) command`_
@@ -643,7 +643,7 @@ is derived from the *Name* column:
 
 .. code:: python
 
-    Card("all", text(text=T("{{ Name }}"), x=3.3, y=7.5, font_size=18))
+    Card("all", text(text=T('{{Name}}', x=3.3, y=7.5, font_size=18))
 
 Data from the column can also be mixed in with other text or values,
 for example:
@@ -678,6 +678,83 @@ The full code for this example is available as
 
         FEEDBACK:: Unable to process data with this template ('Ag' is undefined)
 
+Template functions
+~~~~~~~~~~~~~~~~~~
+
+It could that you need to perform a more complex operation, or validation,
+on the data returned by the template from the :ref:`Data() <the-data-command>`.
+
+In this case, you can write a :ref:`Python function <python-function>` which
+can be used to generate one or more shapes to be drawn on the card.
+
+The function should accept one incoming value; this incoming data for this
+value will be that created by the ``T()`` command.
+
+The function should **return** one or more shapes; anything else will trigger
+this error::
+
+    FEEDBACK:: Check that all elements created by 'icon_list' are shapes.
+
+The name of the function is then passed to the ``T()`` command by that
+command's *function* property.
+
+Template Function Example 1.
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+In this example, the function is called ``greet``, and is assigned and used
+by the ``T()`` command as follows:
+
+.. code:: python
+
+    def greet(data):
+        greeting = 'Hi ' + data
+        return text(greeting, x=1, y=1)
+
+    greetings = T('{{Name}}', function=greet)
+    Card("*", greetings)
+
+Here the value extracted from the ``Name`` column of your data file is
+provided to the function you have called ``greet`` and assigned to it's
+``data`` property.
+
+The function simply creates a new text value called ``greeting`` and uses
+that in a Text() shape which is then returned by the function.
+
+The Text() shape is then assigned, via ``greetings`` to one more cards in
+the usual way.
+
+Template Function Example 2.
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Here is a more complex example involving deeper knowledge of
+:doc:`Python Commands <python_commands>`; please skip it if the terminology
+or grammar makes no sense!
+
+If you had a data value containing a list of image names (say they are
+separated by commas) that need to be drawn in a line on the card, then
+you will need a function that will *split* those
+names and create a list of Image() shapes laid out in a line.
+
+The approach could be:
+
+.. code:: python
+
+    def make_images(data):
+        all_icons = split(data)  # create a list of individual icons
+        icon_list = []  # create a place (a list) to store Images
+        start = 0  # set distance away from start
+        for icon in all_icons:  # step through icon list
+            icon_image = image(icon, x=0.5 + start, y=2)  # create Image
+            icon_list.append(icon_image)  # add image to the list
+            start = start + 0.5  # increase distance for next icon
+        return icon_list
+
+    icons = T('{{Icons}}', function=make_images)
+    Card("*", icons)
+
+The key point here is that the ``make_images`` function generates a list of
+shapes that are provided for use in the script by the **return**.
+
 
 .. _the-selection-command:
 
@@ -710,25 +787,27 @@ The match **condition** contains three parts, all separated by spaces:
 This example shows how to use the command, with reference to the ``Data``
 from `Data Example 5. Lists`_:
 
-    .. code:: python
+.. code:: python
 
-        back_race = Common(
-            x=0.5, y=0.5, width=5.3, height=7.9, rounded=0.2)
-        back_hum = rectangle(
-            common=back_race, fill_stroke="tomato")
-        Card("all", S("{{ Race == 'Human' }}", back_hum))
+    back_race = Common(
+        x=0.5, y=0.5, width=5.3, height=7.9, rounded=0.2)
+    back_hum = rectangle(
+        common=back_race, fill_stroke="tomato")
+    Card("all", S("{{ Race == 'Human' }}", back_hum))
 
 In this example, for any/all cards for which the **Race** column is equal
 to |dash| the double equals (``==``) comparison |dash| the value **Human**,
 a red rectangle, named ``back_hum``, will be drawn on that card(s).
 
-Note that the ``in`` check can be used in reverse. So:
+**Note** that the ``in`` check can be used in reverse. So:
 
-        back_race = Common(
-            x=0.5, y=0.5, width=5.3, height=7.9, rounded=0.2)
-        back_hum = rectangle(
-            common=back_race, fill_stroke="tomato")
-        Card("all", S("{{ 'H' in Race }}", back_hum))
+.. code:: python
+
+    back_race = Common(
+        x=0.5, y=0.5, width=5.3, height=7.9, rounded=0.2)
+    back_hum = rectangle(
+        common=back_race, fill_stroke="tomato")
+    Card("all", S("{{ 'H' in Race }}", back_hum))
 
 Here any/all cards for which the **Race** column contains a capital "H"
 will have a red rectangle, named ``back_hum``, drawn on them.

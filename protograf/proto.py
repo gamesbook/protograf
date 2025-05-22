@@ -307,10 +307,18 @@ class CardShape(BaseShape):
                     custom_value = new_ele.template.render(card_value)
                     new_eles = new_ele.function(custom_value) or []
                     for the_new_ele in new_eles:
-                        the_new_ele.draw(
-                            cnv=cnv, off_x=_dx, off_y=_dy, ID=iid, **kwargs
-                        )
-                        cnv.commit()
+                        try:
+                            the_new_ele.draw(
+                                cnv=cnv, off_x=_dx, off_y=_dy, ID=iid, **kwargs
+                            )
+                            cnv.commit()
+                        except AttributeError as err:
+                            tools.feedback(
+                                f"Unable to draw card #{cid + 1}.  Check that all"
+                                f" elements created by '{new_ele.function.__name__}'"
+                                " are shapes.",
+                                True,
+                            )
                 else:
                     new_ele.draw(cnv=cnv, off_x=_dx, off_y=_dy, ID=iid, **kwargs)
                     cnv.commit()

@@ -2,6 +2,10 @@
 Track Command
 =============
 
+.. |dash| unicode:: U+2014 .. EM DASH SIGN
+.. |deg|  unicode:: U+00B0 .. DEGREE SIGN
+   :ltrim:
+
 This section assumes you are very familiar with the concepts, terms and
 ideas for :doc:`protograf <index>` as presented in the
 :doc:`Basic Concepts <basic_concepts>` , that you understand all of the
@@ -73,7 +77,7 @@ The ``Track()`` command accepts the following properties:
   - **i** - to rotate the shape so that it faces inwards
   - **o** - to rotate the shape so that it faces outwards
 
-.. _key-properties:
+.. _key-properties-track:
 
 Key Properties
 ==============
@@ -102,7 +106,7 @@ Key Properties
 
 Example 1. Default
 ------------------
-`^ <key-properties_>`_
+`^ <key-properties-track_>`_
 
 .. |tk1| image:: images/tracks/track_default.png
    :width: 330
@@ -128,7 +132,7 @@ Example 1. Default
 
 Example 2. Track with a Shape
 -----------------------------
-`^ <key-properties_>`_
+`^ <key-properties-track_>`_
 
 .. |tk2| image:: images/tracks/track_default_circle.png
    :width: 330
@@ -159,7 +163,7 @@ Example 2. Track with a Shape
 
 Example 3. Track with sequence
 ------------------------------
-`^ <key-properties_>`_
+`^ <key-properties-track_>`_
 
 .. |tk3| image:: images/tracks/track_default_count.png
    :width: 330
@@ -197,7 +201,7 @@ Example 3. Track with sequence
 
 Example 4. Square Track with Star
 ---------------------------------
-`^ <key-properties_>`_
+`^ <key-properties-track_>`_
 
 .. |tk4| image:: images/tracks/track_square_star.png
    :width: 330
@@ -226,7 +230,7 @@ Example 4. Square Track with Star
 
 Example 5. Polygon Track
 ------------------------
-`^ <key-properties_>`_
+`^ <key-properties-track_>`_
 
 .. |tk5| image:: images/tracks/track_polygon_hex.png
    :width: 330
@@ -259,7 +263,7 @@ Example 5. Polygon Track
 
 Example 6. Polygon Track with start and stop
 --------------------------------------------
-`^ <key-properties_>`_
+`^ <key-properties-track_>`_
 
 .. |tk6| image:: images/tracks/track_polygon_hex_stop.png
    :width: 330
@@ -292,7 +296,7 @@ Example 6. Polygon Track with start and stop
 
 Example 7. Polyline Track
 -------------------------
-`^ <key-properties_>`_
+`^ <key-properties-track_>`_
 
 .. |tk7| image:: images/tracks/track_polyline.png
    :width: 330
@@ -321,7 +325,7 @@ Example 7. Polyline Track
 
 Example 8. Circle Track - clockwise
 -----------------------------------
-`^ <key-properties_>`_
+`^ <key-properties-track_>`_
 
 .. |tk8| image:: images/tracks/track_circle.png
    :width: 330
@@ -351,7 +355,7 @@ Example 8. Circle Track - clockwise
 
 Example 9. Polygon Track - custom shape
 ---------------------------------------
-`^ <key-properties_>`_
+`^ <key-properties-track_>`_
 
 .. |tk9| image:: images/tracks/track_polygon_six.png
    :width: 330
@@ -378,7 +382,7 @@ Example 9. Polygon Track - custom shape
 
 Example 10. Polygon Track - clockwise
 -------------------------------------
-`^ <key-properties_>`_
+`^ <key-properties-track_>`_
 
 .. |tc0| image:: images/tracks/track_polygon_anti.png
    :width: 330
@@ -405,7 +409,7 @@ Example 10. Polygon Track - clockwise
 
 Example 11. Polygon Track - inwards
 -----------------------------------
-`^ <key-properties_>`_
+`^ <key-properties-track_>`_
 
 .. |tc1| image:: images/tracks/track_polygon_rotate_i.png
    :width: 330
@@ -433,7 +437,7 @@ Example 11. Polygon Track - inwards
 
 Example 12. Polygon Track - outwards
 ------------------------------------
-`^ <key-properties_>`_
+`^ <key-properties-track_>`_
 
 .. |tc2| image:: images/tracks/track_polygon_rotate_o.png
    :width: 330
@@ -461,7 +465,7 @@ Example 12. Polygon Track - outwards
 
 Example 13. Circular Track - outwards
 -------------------------------------
-`^ <key-properties_>`_
+`^ <key-properties-track_>`_
 
 .. |tc3| image:: images/tracks/track_circle_rotate_o.png
    :width: 330
@@ -490,7 +494,7 @@ Example 13. Circular Track - outwards
 
 Example 14. Rectangular Track - inwards
 ---------------------------------------
-`^ <key-properties_>`_
+`^ <key-properties-track_>`_
 
 .. |tc4| image:: images/tracks/track_square_rotate_i.png
    :width: 330
@@ -517,7 +521,7 @@ Example 14. Rectangular Track - inwards
 
 Example 15. Rectangular Track - outwards
 ----------------------------------------
-`^ <key-properties_>`_
+`^ <key-properties-track_>`_
 
 .. |tc5| image:: images/tracks/track_square_rotate_o.png
    :width: 330
@@ -544,7 +548,7 @@ Example 15. Rectangular Track - outwards
 
 Example 16. Polygon Track - sequences
 -------------------------------------
-`^ <key-properties_>`_
+`^ <key-properties-track_>`_
 
 .. |tc6| image:: images/tracks/track_sequences.png
    :width: 330
@@ -576,7 +580,7 @@ Example 16. Polygon Track - sequences
 
 Example 17. Multiple Tracks - starts
 ------------------------------------
-`^ <key-properties_>`_
+`^ <key-properties-track_>`_
 
 .. |tc7| image:: images/tracks/track_starts.png
    :width: 330
@@ -633,7 +637,7 @@ Example 17. Multiple Tracks - starts
 
 Example 18. Circular Track - clock
 ----------------------------------
-`^ <key-properties_>`_
+`^ <key-properties-track_>`_
 
 .. |tc8| image:: images/tracks/track_clock.png
    :width: 330
@@ -671,7 +675,7 @@ Example 18. Circular Track - clock
 
 Example 19. Polygon Track - scoring
 -----------------------------------
-`^ <key-properties_>`_
+`^ <key-properties-track_>`_
 
 .. |tc9| image:: images/tracks/track_score.png
    :width: 330
