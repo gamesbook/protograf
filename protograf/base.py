@@ -33,7 +33,8 @@ from pymupdf.utils import getColor, getColorList
 from protograf.utils import geoms, tools, support
 from protograf.utils.fonts import builtin_font, FontInterface
 from protograf.utils.support import LookupType, unit
-from protograf.utils.support import CACHE_DIRECTORY, TemplatingType
+from protograf.utils.support import CACHE_DIRECTORY
+from protograf.utils.enums import TemplatingType
 from protograf import globals
 
 log = logging.getLogger(__name__)

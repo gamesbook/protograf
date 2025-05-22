@@ -3,8 +3,13 @@
 Project Enum definitions for protograf
 """
 # lib
+from dataclasses import dataclass
 from enum import Enum
 import logging
+from typing import List
+
+# third-party
+from jinja2 import Template
 
 log = logging.getLogger(__name__)
 
@@ -48,3 +53,13 @@ class FontStyleType(Enum):
 class HexOrientation(Enum):
     FLAT = 1
     POINTY = 2
+
+
+# wrapper around a jinja Template to support operations on an Template output
+@dataclass
+class TemplatingType:
+    """Support dynamic object creation from a jinga Template"""
+
+    template: Template
+    function: object
+    members: List

@@ -74,15 +74,14 @@ from .groups import Switch, Lookup
 from ._version import __version__
 
 from protograf.utils import geoms, tools, support
-from protograf.utils.enums import CardFrame, DatasetType, DirectionGroup, ExportFormat
+from protograf.utils.enums import (
+    CardFrame, DatasetType, DirectionGroup, ExportFormat, TemplatingType)
 from protograf.utils.fonts import builtin_font, FontInterface
-from protograf.utils.tools import base_fonts
+from protograf.utils.tools import base_fonts, split
 from protograf.utils.geoms import BBox, Locale, Point, Place, Ray, equilateral_height
 from protograf.utils.support import (
     LookupType,
-    split,
     steps,
-    TemplatingType,
     unit,
     uni,
     uc,

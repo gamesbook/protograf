@@ -17,7 +17,7 @@ import xlrd
 
 # local
 from protograf.utils.support import feedback
-from protograf.utils.enums import DirectionGroup
+from protograf.utils.enums import DirectionGroup, TemplatingType
 from protograf.utils.geoms import Point
 
 log = logging.getLogger(__name__)
@@ -308,6 +308,7 @@ def sequence_split(
     sep: str = ",",
     as_float: bool = False,
     msg: str = "",
+    clean: bool = False
 ):
     """
     Split a string into a list of individual values
@@ -368,8 +369,17 @@ def sequence_split(
             return values
     except Exception:
         pass
+
     # multi-values
-    _strings = _string.split(sep)
+    try:
+        _strings = _string.split(sep)
+    except AttributeError as err:
+        feedback(f'Unable to split "{_string}" - please check that its a valid candidate!', False)
+        if isinstance(_string, TemplatingType):
+            feedback(f'The script may not be using T() correctly', True)
+        else:
+            feedback(f'', True)
+
     # log.debug('strings:%s', _strings)
     for item in _strings:
         if "-" in item:
@@ -386,14 +396,15 @@ def sequence_split(
             elif as_float:
                 values.append(float(item))
             else:
-                values.append(item)
+                _item = str(item).strip() if clean else str(item)
+                values.append(_item)
 
     if unique:
         return list(set(values))  # unique
     return values
 
 
-def split(string: str, tuple_to_list: bool = False):
+def split(string: str, tuple_to_list: bool = False, separator: str = None, clean: bool = False):
     """
     Split a string into a list of individual characters
 
@@ -404,6 +415,10 @@ def split(string: str, tuple_to_list: bool = False):
     ['A', '1', 'B']
     >>> split((1, 2, 3), True)
     [(1, 2, 3)]
+    >>> split("1;2;3", separator=';')
+    ['1', '2', '3']
+    >>> split("1; 2; 3", separator=';', clean=True)
+    ['1', '2', '3']
     """
     if isinstance(string, list):
         return string
@@ -411,8 +426,11 @@ def split(string: str, tuple_to_list: bool = False):
         if tuple_to_list:
             return [string]
         return string
-    sep = " " if string and "," not in string else ","
-    return sequence_split(string, False, False, sep)
+    if separator:
+        sep = separator
+    else:
+        sep = " " if string and "," not in string else ","
+    return sequence_split(string, as_int=False, unique=False, sep=sep, clean=clean)
 
 
 def integer_pairs(pairs, label: str = "list") -> list:
