@@ -1087,7 +1087,7 @@ def group(*args, **kwargs):
 
 
 def Data(**kwargs):
-    """Load data from file, dictionary, list-of-lists, or directory for later access."""
+    """Load data from file, dictionary, list-of-lists, directory or Google Sheet."""
     validate_globals()
 
     filename = kwargs.get("filename", None)  # CSV or Excel
@@ -1097,6 +1097,7 @@ def Data(**kwargs):
     images_filter = kwargs.get("images_filter", "")  # e.g. .png
     filters = tools.sequence_split(images_filter, False, True)
     source = kwargs.get("source", None)  # dict
+    sheet = kwargs.get("sheet", None)  # Google Sheet
     # extra cards added to deck (handle special cases not in the dataset)
     globals.deck_settings["extra"] = tools.as_int(kwargs.get("extra", 0), "extra")
     try:
@@ -1109,6 +1110,14 @@ def Data(**kwargs):
     if filename:  # handle excel and CSV
         globals.dataset = tools.load_data(filename, **kwargs)
         globals.dataset_type = DatasetType.FILE
+    elif sheet:  # handle Google Sheet
+        api_key = kwargs.get("api_key", None)
+        name = kwargs.get("name", None)
+        globals.dataset = tools.load_googlesheet(sheet, api_key=api_key, name=name)
+        globals.dataset_type = DatasetType.GSHEET
+        if not globals.dataset:
+            tools.feedback(
+                "No data accessible from the Google Sheet - please check", True)
     elif matrix:  # handle pre-built dict
         globals.dataset = matrix
         globals.dataset_type = DatasetType.MATRIX

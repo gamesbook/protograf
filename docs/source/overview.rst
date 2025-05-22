@@ -50,7 +50,8 @@ Obviously, if you use a graphics package as an everyday tool, that will
 probably suit your needs perfectly.
 
 However, there might be a reason to use something simpler. Daniel, of
-https://daniel.games/ has this to say about making a prototype:
+https://daniel.games/ has this to say about making a game prototype which
+is ready to show to a wider audience:
 
     The game should be neat. This means it's simple, clear, and not ugly.
 

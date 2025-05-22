@@ -15,6 +15,9 @@ import sys
 from urllib.parse import urlparse
 import xlrd
 
+# third-paty
+import requests
+
 # local
 from protograf.utils.support import feedback
 from protograf.utils.structures import DirectionGroup, Point, TemplatingType
@@ -65,6 +68,42 @@ def load_data(datasource=None, **kwargs):
         else:
             feedback('Unable to process a file %s of type "%s"' % (filename, file_ext))
     return dataset
+
+
+def load_googlesheet(sheet, **kwargs):
+    """
+    Load data from a Google Sheet into a dict
+    """
+    data_list = []
+    spreadsheet_id = sheet
+    api_key = kwargs.get('api_key', None)
+    if not api_key:
+        feedback('Cannot access a Google Sheet without an "api_key"', True)
+    sheet_name = kwargs.get('name', None)
+    if not sheet_name:
+        feedback('Using default tab name of "Sheet1"', False, True)
+        sheet_name = 'Sheet1'
+    log.debug("Load data from a Google Sheet %s", sheet)
+
+    if sheet:
+        url = f'https://sheets.googleapis.com/v4/spreadsheets/{spreadsheet_id}/values/{sheet_name}?alt=json&key={api_key}'
+        try:
+            response = requests.get(url)
+            response.raise_for_status()  # raise exception for HTTP errors
+            raw_data = response.json()
+            data_dict = json_strings_to_numbers(raw_data)
+        except requests.exceptions.RequestException as err:
+            feedback(f"Unable to load Google Sheet: {err}")
+            return []
+
+    if data_dict:
+        _data_list = data_dict.get('values')
+        if _data_list:
+            keys = _data_list[0]  # get keys/names from first sub-list
+            dict_list = [dict(zip(keys, values)) for values in _data_list[1:]]
+            return dict_list
+
+    return data_list
 
 
 def grouper(n, iterable, fillvalue=None):
@@ -238,6 +277,38 @@ def as_point(value) -> list | Point:
         return items
     else:
         raise ValueError(f"Cannot convert {value} into a Point!")
+
+
+def json_strings_to_numbers(json_data):
+    """Iteratively convert JSON string data into numbers, if possible.
+
+    Doc Test:
+    >>> json_strings_to_numbers({})
+    {}
+    >>> json_strings_to_numbers([])
+    []
+    >>> json_strings_to_numbers('[]')
+    '[]'
+    >>> json_strings_to_numbers('["a", "1", "2.3"]')
+    '["a", "1", "2.3"]'
+    >>> json_strings_to_numbers(["a", "1", "2.3", {"a": "0.123"}])
+    ['a', 1, 2.3, {'a': 0.123}]
+    """
+    if isinstance(json_data, dict):
+        for key, value in json_data.items():
+            json_data[key] = json_strings_to_numbers(value)
+    elif isinstance(json_data, list):
+        for i, item in enumerate(json_data):
+            json_data[i] = json_strings_to_numbers(item)
+    elif isinstance(json_data, str):
+        try:
+            return int(json_data)
+        except ValueError:
+            try:
+                return float(json_data)
+            except ValueError:
+                return json_data
+    return json_data
 
 
 def tuple_split(

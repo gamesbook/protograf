@@ -100,7 +100,7 @@ Please see the [list of contributors](CONTRIBUTORS.txt).
 These features are **not** guaranteed to be implemented; they just represent
 current / potential areas of work or idea development.
 
-* [ ] New shapes:
+* [ ] New Shapes:
     * [ ] Diamond shape
     * [ ] Parallelogram shape
     * [ ] Cross shape
@@ -111,15 +111,16 @@ current / potential areas of work or idea development.
     * [ ] Die (Rectangle with DotGrid; 3D?)
     * [ ] Picture Frame (Trapezoid composite)
 * [ ] Hexagons: 18xx tile example (requires `Arcs` below!)
+* [ ] Hexagon Grid: better hexhex creation with notations
 * [ ] Polyline: define arcs along the path
 * [ ] Arcs (pathways) inside a hexagon (**in progress**)
-* [ ] Shortcut notation for styling of a shape
+* [ ] Shortcut notation for styling of a Shape
 * [ ] Stripes: interior "areas" for a Rectangle
 * [ ] Cards:
     * [ ] support card-back designs
     * [ ] grid lines for hexagonal cards
     * [ ] multiple custom bleed areas
-    * [ ] access to Google Sheets
+    * [x] access to Google Sheets
     * [x] extract rectangular cards as PNG files
 * [ ] Color:
     * [ ] add support for CYMK

@@ -28,6 +28,7 @@ class DatasetType(Enum):
     DICT = 2
     MATRIX = 3
     IMAGE = 4
+    GSHEET = 5
 
 
 class DirectionGroup(Enum):
