@@ -3,12 +3,12 @@
 ![protograf](logo.png "protograf logo")
 
 __protograf__ is a utility written in Python for designing and creating
-simple, regular, graphical outputs in PDF (or PNG/GIF) format via a script.
+simple, regular, graphical outputs in PDF (or PNG/GIF/SVG) format via a script.
 
 __protograf__  has been primarily created to handle the prototyping of cards,
-counters, tiles and boards for board games, but can be also used for creating
-any simple design that has regular or repetitive elements; typically a mix of
-graphics and text.
+counters, tiles and boards for board games, including hexagonal grids, but can
+also be used for creating any simple design that has regular or repetitive
+elements; typically a mix of graphics and text.
 
 > You do not need to know the Python language to be able to use __protograf__
 > but you do need Python installed on your machine!
@@ -100,7 +100,7 @@ Please see the [list of contributors](CONTRIBUTORS.txt).
 These features are **not** guaranteed to be implemented; they just represent
 current / potential areas of work or idea development.
 
-* [ ] New shapes:
+* [ ] New Shapes:
     * [ ] Diamond shape
     * [ ] Parallelogram shape
     * [ ] Cross shape
@@ -111,18 +111,16 @@ current / potential areas of work or idea development.
     * [ ] Die (Rectangle with DotGrid; 3D?)
     * [ ] Picture Frame (Trapezoid composite)
 * [ ] Hexagons: 18xx tile example (requires `Arcs` below!)
-* [ ] Line:
-    * [x] end style
-    * [ ] join style
+* [ ] Hexagon Grid: better hexhex creation with notations
 * [ ] Polyline: define arcs along the path
 * [ ] Arcs (pathways) inside a hexagon (**in progress**)
-* [ ] Shortcut notation for styling of a shape
+* [ ] Shortcut notation for styling of a Shape
 * [ ] Stripes: interior "areas" for a Rectangle
 * [ ] Cards:
     * [ ] support card-back designs
     * [ ] grid lines for hexagonal cards
     * [ ] multiple custom bleed areas
-    * [ ] access to Google Sheets
+    * [x] access to Google Sheets
     * [x] extract rectangular cards as PNG files
 * [ ] Color:
     * [ ] add support for CYMK
@@ -131,7 +129,7 @@ current / potential areas of work or idea development.
 
 These are possible examples to show board creation based on existing games:
 
-* [ ] Extra abstract game boards: 9 Mens Morris, Ludo, Wari, Mu Torere
+* [ ] Extra abstract game boards: Ludo, Wari, Mu Torere
 * [ ] Wargame board: Squad Leader with full terrain features (vector and bitmap)
 * [ ] Traveller board: show a fully-styled Star System
 * [x] WarpWar board: show a fully-styled example

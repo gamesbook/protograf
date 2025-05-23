@@ -43,8 +43,39 @@ separate out the design and layout from the content - the text and the
 numbers - that appears in the design.
 
 
-How do I use it?
-================
+Why not use a professional graphics package?
+============================================
+
+Obviously, if you use a graphics package as an everyday tool, that will
+probably suit your needs perfectly.
+
+However, there might be a reason to use something simpler. Daniel, of
+https://daniel.games/ has this to say about making a game prototype which
+is ready to show to a wider audience:
+
+    The game should be neat. This means it's simple, clear, and not ugly.
+
+    Your layout (of cards and other objects) should just be flat areas of
+    muted colour, with text on top of it. It's simple and functional.
+
+    Don't use textures, bevels, gradients, realistic shadows, or other
+    embellishments.
+
+    The best design is design done by a professional. The second-best design
+    is no design at all, which is what you should do.
+
+    In the same way, icons should just be simple, flat-colour shapes.
+    Just go and get free, basic icons from https://thenounproject.com/
+    Make better ones later, if you're good with graphic design.
+
+(See more good advice at https://daniel.games/the-work-of-game-design.htm )
+
+So, **protograf** aims to help you achieve the above |dash| the
+"second-best design"!
+
+
+How do I use **protograf**?
+===========================
 
 In general, what you do is type a set of instructions |dash| which
 **protograf** terms a *script* |dash| into a file. You save that file on
@@ -56,8 +87,8 @@ As your design changes and evolves, you can add or change instructions and
 recreate the output.
 
 
-How does it work?
-=================
+How does **protograf** work?
+============================
 
 **protograf** is written in Python; the reason being that this is a
 relatively easy-to-use programming language that is often used for
@@ -84,7 +115,9 @@ scripts as needed.
 How do I get started?
 =====================
 
-Its suggested that you first get everything :doc:`set-up <setting_up>`
-and tested. Then read through the :doc:`basic concepts <basic_concepts>`
+Its suggested that you **first** get everything :doc:`set-up <setting_up>`
+and tested.
+
+Now read through the :doc:`basic concepts <basic_concepts>`
 before trying out a :doc:`worked example <worked_example>`. After that,
 browse through the sections listed in the :doc:`Guide <guide>`.

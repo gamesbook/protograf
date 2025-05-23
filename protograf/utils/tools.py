@@ -15,10 +15,12 @@ import sys
 from urllib.parse import urlparse
 import xlrd
 
+# third-paty
+import requests
+
 # local
 from protograf.utils.support import feedback
-from protograf.utils.enums import DirectionGroup
-from protograf.utils.geoms import Point
+from protograf.utils.structures import DirectionGroup, Point, TemplatingType
 
 log = logging.getLogger(__name__)
 DEBUG = False
@@ -66,6 +68,42 @@ def load_data(datasource=None, **kwargs):
         else:
             feedback('Unable to process a file %s of type "%s"' % (filename, file_ext))
     return dataset
+
+
+def load_googlesheet(sheet, **kwargs):
+    """
+    Load data from a Google Sheet into a dict
+    """
+    data_list = []
+    spreadsheet_id = sheet
+    api_key = kwargs.get("api_key", None)
+    if not api_key:
+        feedback('Cannot access a Google Sheet without an "api_key"', True)
+    sheet_name = kwargs.get("name", None)
+    if not sheet_name:
+        feedback('Using default tab name of "Sheet1"', False, True)
+        sheet_name = "Sheet1"
+    log.debug("Load data from a Google Sheet %s", sheet)
+
+    if sheet:
+        url = f"https://sheets.googleapis.com/v4/spreadsheets/{spreadsheet_id}/values/{sheet_name}?alt=json&key={api_key}"
+        try:
+            response = requests.get(url)
+            response.raise_for_status()  # raise exception for HTTP errors
+            raw_data = response.json()
+            data_dict = json_strings_to_numbers(raw_data)
+        except requests.exceptions.RequestException as err:
+            feedback(f"Unable to load Google Sheet: {err}")
+            return []
+
+    if data_dict:
+        _data_list = data_dict.get("values")
+        if _data_list:
+            keys = _data_list[0]  # get keys/names from first sub-list
+            dict_list = [dict(zip(keys, values)) for values in _data_list[1:]]
+            return dict_list
+
+    return data_list
 
 
 def grouper(n, iterable, fillvalue=None):
@@ -241,6 +279,38 @@ def as_point(value) -> list | Point:
         raise ValueError(f"Cannot convert {value} into a Point!")
 
 
+def json_strings_to_numbers(json_data):
+    """Iteratively convert JSON string data into numbers, if possible.
+
+    Doc Test:
+    >>> json_strings_to_numbers({})
+    {}
+    >>> json_strings_to_numbers([])
+    []
+    >>> json_strings_to_numbers('[]')
+    '[]'
+    >>> json_strings_to_numbers('["a", "1", "2.3"]')
+    '["a", "1", "2.3"]'
+    >>> json_strings_to_numbers(["a", "1", "2.3", {"a": "0.123"}])
+    ['a', 1, 2.3, {'a': 0.123}]
+    """
+    if isinstance(json_data, dict):
+        for key, value in json_data.items():
+            json_data[key] = json_strings_to_numbers(value)
+    elif isinstance(json_data, list):
+        for i, item in enumerate(json_data):
+            json_data[i] = json_strings_to_numbers(item)
+    elif isinstance(json_data, str):
+        try:
+            return int(json_data)
+        except ValueError:
+            try:
+                return float(json_data)
+            except ValueError:
+                return json_data
+    return json_data
+
+
 def tuple_split(
     string: str, label: str = "list", pairs_list: bool = False, all_ints: bool = False
 ) -> list:
@@ -308,6 +378,7 @@ def sequence_split(
     sep: str = ",",
     as_float: bool = False,
     msg: str = "",
+    clean: bool = False,
 ):
     """
     Split a string into a list of individual values
@@ -342,25 +413,23 @@ def sequence_split(
     [3.1]
     """
     values = []
-    if isinstance(string, list):
+    if isinstance(string, (dict, list)):
         return string
     if isinstance(string, (int, float)):
         return [string]
     if string:
         try:
             if sep == ",":
-                _string = (
-                    string.replace(" ", "")
-                    .replace('"', "")
-                    .replace("'", "")
-                    .replace(";", ",")
-                )
+                _string = string.replace('"', "").replace("'", "").strip()
             else:
                 _string = string
+                if clean:
+                    _string = _string.strip()
         except Exception:
             return values
     else:
         return values
+
     # simple single value
     try:
         if as_int:
@@ -368,8 +437,20 @@ def sequence_split(
             return values
     except Exception:
         pass
+
     # multi-values
-    _strings = _string.split(sep)
+    try:
+        _strings = _string.split(sep)
+    except AttributeError as err:
+        feedback(
+            f'Unable to split "{_string}" - please check that its a valid candidate!',
+            False,
+        )
+        if isinstance(_string, TemplatingType):
+            feedback(f"The script may not be using T() correctly", True)
+        else:
+            feedback(f"", True)
+
     # log.debug('strings:%s', _strings)
     for item in _strings:
         if "-" in item:
@@ -386,14 +467,17 @@ def sequence_split(
             elif as_float:
                 values.append(float(item))
             else:
-                values.append(item)
+                _item = str(item).strip() if clean else str(item)
+                values.append(_item)
 
     if unique:
         return list(set(values))  # unique
     return values
 
 
-def split(string: str, tuple_to_list: bool = False):
+def split(
+    string: str, tuple_to_list: bool = False, separator: str = None, clean: bool = False
+):
     """
     Split a string into a list of individual characters
 
@@ -404,6 +488,14 @@ def split(string: str, tuple_to_list: bool = False):
     ['A', '1', 'B']
     >>> split((1, 2, 3), True)
     [(1, 2, 3)]
+    >>> split("1;2;3", separator=';')
+    ['1', '2', '3']
+    >>> split("1; 2; 3", separator=';', clean=True)
+    ['1', '2', '3']
+    >>> split("A,b B, C")
+    ['A', 'b B', ' C']
+    >>> split("A,b B, C", clean=True)
+    ['A', 'b B', 'C']
     """
     if isinstance(string, list):
         return string
@@ -411,8 +503,11 @@ def split(string: str, tuple_to_list: bool = False):
         if tuple_to_list:
             return [string]
         return string
-    sep = " " if string and "," not in string else ","
-    return sequence_split(string, False, False, sep)
+    if separator:
+        sep = separator
+    else:
+        sep = " " if string and "," not in string else ","
+    return sequence_split(string, as_int=False, unique=False, sep=sep, clean=clean)
 
 
 def integer_pairs(pairs, label: str = "list") -> list:

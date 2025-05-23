@@ -70,20 +70,29 @@ from .layouts import (
     RepeatShape,
     SequenceShape,
 )
-from .groups import Switch, Lookup
+from .groups import Switch, Lookup  # used in scripts
 from ._version import __version__
 
 from protograf.utils import geoms, tools, support
-from protograf.utils.enums import CardFrame, DatasetType, DirectionGroup, ExportFormat
-from protograf.utils.fonts import builtin_font, FontInterface
-from protograf.utils.tools import base_fonts
-from protograf.utils.geoms import BBox, Locale, Point, Place, Ray, equilateral_height
-from protograf.utils.support import (
+from protograf.utils.structures import (
+    BBox,
+    CardFrame,
+    DatasetType,
+    DirectionGroup,
+    ExportFormat,
     LookupType,
-    split,
-    steps,
+    Locale,
+    Point,
+    Place,
+    Ray,
     TemplatingType,
     unit,
+)
+from protograf.utils.fonts import builtin_font, FontInterface
+from protograf.utils.tools import base_fonts, split  # used in scripts
+from protograf.utils.geoms import equilateral_height  # used in scripts
+from protograf.utils.support import (  # used in scripts
+    steps,
     uni,
     uc,
     CACHE_DIRECTORY,
@@ -1078,7 +1087,7 @@ def group(*args, **kwargs):
 
 
 def Data(**kwargs):
-    """Load data from file, dictionary, list-of-lists, or directory for later access."""
+    """Load data from file, dictionary, list-of-lists, directory or Google Sheet."""
     validate_globals()
 
     filename = kwargs.get("filename", None)  # CSV or Excel
@@ -1088,6 +1097,7 @@ def Data(**kwargs):
     images_filter = kwargs.get("images_filter", "")  # e.g. .png
     filters = tools.sequence_split(images_filter, False, True)
     source = kwargs.get("source", None)  # dict
+    sheet = kwargs.get("sheet", None)  # Google Sheet
     # extra cards added to deck (handle special cases not in the dataset)
     globals.deck_settings["extra"] = tools.as_int(kwargs.get("extra", 0), "extra")
     try:
@@ -1100,6 +1110,15 @@ def Data(**kwargs):
     if filename:  # handle excel and CSV
         globals.dataset = tools.load_data(filename, **kwargs)
         globals.dataset_type = DatasetType.FILE
+    elif sheet:  # handle Google Sheet
+        api_key = kwargs.get("api_key", None)
+        name = kwargs.get("name", None)
+        globals.dataset = tools.load_googlesheet(sheet, api_key=api_key, name=name)
+        globals.dataset_type = DatasetType.GSHEET
+        if not globals.dataset:
+            tools.feedback(
+                "No data accessible from the Google Sheet - please check", True
+            )
     elif matrix:  # handle pre-built dict
         globals.dataset = matrix
         globals.dataset_type = DatasetType.MATRIX

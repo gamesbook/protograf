@@ -32,7 +32,8 @@ Table of Contents
   - `Data Example 3. Matrix`_
   - `Data Example 4. Images`_
   - `Data Example 5. Lists`_
-  - `Data Example 6. BoardGameGeek API`_
+  - `Data Example 6. Google Sheets`_
+  - `Data Example 7. BoardGameGeek API`_
 - `The Matrix Command`_
 - `Countersheet and Counter Commands`_
 - `Supporting Commands`_
@@ -167,7 +168,7 @@ For the **copy** property to work, it is expected that there is a column
 with the label **Copies** available in the Deck's dataset (which is created
 by `the Data Command`_); in this case, the number in that column will be
 used to make that many copies of the card (unless it has a **mask**).
-
+id
 For the **mask** property to work, it is expected that there is a column
 with the label **Race** available in the Deck's dataset (which is created
 by `the Data Command`_); in this case, any card with data matching the
@@ -197,6 +198,7 @@ The dataset that could be used with the above Deck is shown in
 
 The full code - including the data - for this example is available as
 `cards_lotr.py <https://github.com/gamesbook/protograf/blob/master/examples/cards/cards_lotr.py>`_
+
 
 .. _the-card-command:
 
@@ -318,7 +320,8 @@ There are six possible types of data sources to create a dataset:
 3. A ``Matrix`` command
 4. A directory (containing images)
 5. A "list of lists" (included in the script)
-6. The :ref:`BoardGameGeek API <the-bgg-command>` (available as a list-of-lists)
+6. A Google Sheet
+7. The :ref:`BoardGameGeek API <the-bgg-command>` (available as a list-of-lists)
 
 Apart from the images directory, each data source is essentially a set of rows
 and columns.  Each **row** represents data that must appear on a card.
@@ -326,8 +329,8 @@ Each **column** must be named so that the data can be referenced and used,
 in some way, for a card:
 
 - the names for a CSV file must appear in the first line of the file
-- the names for a Excel file must appear in the columns of the first row of
-  the spreadsheet
+- the names for a Excel file, or Google Sheet, must appear in the columns of
+  the first row of the spreadsheet
 - the names for `the Matrix Command`_ command must appear as a list assigned
   to the *labels* property of the command
 - the names for a "list of lists" must appear in the first list in the lists
@@ -344,6 +347,8 @@ different types of data sources:
 - **filename** - the full path to the name (including extension) of the
   CSV or Excel file being used; if no directory is supplied in the path,
   then it is assumed to be the same one in which the script is located
+- **sheet** - refers to the ID of the Google Sheet being accessed (see
+  the example below for more details)
 - **matrix** - refers to the name assigned to the ``Matrix`` being used
 - **images** - refers to the directory in which the images are located; if
   a full path is not given, its assumed to be directly under the one in which
@@ -492,9 +497,80 @@ to missing item in the CSV file (for Gandalf's age).
 See below under the `T(emplate) command`_ and also under the
 `S(election) command`_ for examples how this data could be used.
 
+
+Data Example 6. Google Sheets
+-----------------------------
+`↑ <table-of-contents-crddk_>`_
+
+There are three properties needed to gain access to data from a Google Sheet:
+
+- *api_key* - an API key that you can request from Google
+- *sheet* - the unique ID (a mix of numbers and letters) which is randomly
+  assigned to a Google Sheet
+- *name* - the name of the tab in the Google Sheet housing your data
+
+The API Key
++++++++++++
+
+Getting a Google API Key is beyond the scope of this document; one method is
+provided by Google https://support.google.com/googleapi/answer/6158862?hl=en
+but be aware that such documentation may quickly get out of date.
+
+The end result of the process should provide you a key like this:
+``A1_izC00Lbut2001askHAL4aPodd00rsys3rr0r``
+
+You may also need to follow the ``+ Enable APIs and services`` on the Google
+Cloud Dashboard (https://console.cloud.google.com/apis/dashboard) and then
+select/enable the Google Sheets API from the list of services.
+
+The Sheet ID
+++++++++++++
+
+A Google Sheet is only accessible by you when first created. To make it
+allow **protograf** code access to the data, you **must** share the
+Google Sheet publicly.
+
+Navigate to your Google Sheet and click on the ``Share`` button. Then ensure
+that you choose ``Anyone with the link`` and set the access to ``View``.
+
+Click on the ``Copy link`` and save this in a document; the result should look like:
+
+https://docs.google.com/spreadsheets/d/1vRfwxVjafnZVmgjazQKr2UQDyGYYK8GXJhQAPlzJ03o/edit
+
+The string of characters between the ``/d/`` and the ``/edit`` is the **sheet ID**.
+
+The Sheet Name
+++++++++++++++
+
+The name of the sheet you want to access is displayed in the bottom section of
+display on a tab.  The default name of the first sheet is ``Sheet1``.
+
+
+This next example shows how data is sourced from a Google Sheet, once you have
+all the information described above:
+
+    .. code:: python
+
+        Data(
+            sheet="1vRfwxVjafnZVmgjazQKr2UQDyGYYK8GXJhQAPlzJ03o",
+            api_key="A1_izC00Lbut2001askHAL4aPodd00rsys3rr0r",
+            name="Characters")
+
+If the sheet cannot be reached, or access permissions are not correct,
+or the API key is invalid, then you will get an error.
+
+Solving access errors to a Google Sheet is beyond the scope of **protograf**
+and its developers!
+
+.. NOTE::
+
+    There are limits to how many requests you can make to Google; please
+    be aware of what your usage rights and limits are!
+
+
 .. _deck-data-bgg:
 
-Data Example 6. BoardGameGeek API
+Data Example 7. BoardGameGeek API
 ---------------------------------
 `↑ <table-of-contents-crddk_>`_
 

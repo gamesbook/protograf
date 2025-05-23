@@ -18,9 +18,9 @@ from pymupdf import Shape as muShape, Point as muPoint, Matrix
 import segno  # QRCode
 
 # local
-from protograf.utils.enums import DirectionGroup
-from protograf.utils.geoms import (
+from protograf.utils.structures import (
     BBox,
+    DirectionGroup,
     HexGeometry,
     Link,
     Locale,

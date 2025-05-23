@@ -1,25 +1,20 @@
 # -*- coding: utf-8 -*-
 """
-Support utilities for draw module
+Support utilities for protograf `draw` module
 """
 # lib
-from collections import namedtuple
-from dataclasses import dataclass
 import itertools
 import os
-import math
-import sys
 import string
-from typing import Any, List
+from typing import Any
 
 # third-party
 import imageio
-from jinja2 import Template
 import pymupdf
 
 # local
 from protograf.utils.colors_svg import named_colors
-from protograf.utils.enums import ExportFormat
+from protograf.utils.structures import ExportFormat, unit
 
 
 CACHE_DIRECTORY = ".protograf"  # append to the user's home directory
@@ -53,36 +48,6 @@ BUILT_IN_FONTS = [
     "zadb",
     "ZapfDingbats",
 ]
-
-LookupType = namedtuple("LookupType", ["column", "lookups"])
-UnitPoints = namedtuple(
-    "UnitPoints",
-    [
-        "cm",
-        "mm",
-        "inch",
-        "pt",
-    ],
-)
-
-
-# wrapper around a jinja Template to support operations on an Template output
-@dataclass
-class TemplatingType:
-    """Support dynamic object creation from a jinga Template"""
-
-    template: Template
-    function: object
-    members: List
-
-
-# ---- units
-unit = UnitPoints(
-    cm=28.3465,
-    mm=2.83465,
-    inch=72.0,
-    pt=1.0,
-)
 
 
 def feedback(item, stop=False, warn=False):
@@ -264,17 +229,18 @@ def steps(start, end, step=1, REAL=True):
     return result
 
 
-def split(string, delim=" "):
-    """Split a string on the delim.
+# DEPRECATED: replaced by tools.split()
+# def split(string, delim=" "):
+#     """Split a string on the delim.
 
-    Doc Test:
+#     Doc Test:
 
-    >>> split('a b')
-    ['a', 'b']
-    >>> split('a,b', ',')
-    ['a', 'b']
-    """
-    return string.split(delim)
+#     >>> split('a b')
+#     ['a', 'b']
+#     >>> split('a,b', ',')
+#     ['a', 'b']
+#     """
+#     return string.split(delim)
 
 
 def combinations(_object, size=2, repeat=1, delimiter=","):
