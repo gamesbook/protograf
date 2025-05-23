@@ -4,6 +4,12 @@ Common constants used in protograf
 """
 
 CACHE_DIRECTORY = ".protograf"  # append to the user's home directory
+DEFAULT_CARD_WIDTH = 6.35  # cm
+DEFAULT_CARD_HEIGHT = 8.89  # cm
+DEFAULT_CARD_RADIUS = 2.54  # cm
+DEFAULT_CARD_COUNT = 9
+DEFAULT_COUNTER_SIZE = 2.54  # cm
+DEFAULT_DPI = 300
 
 GRID_SHAPES_WITH_CENTRE = [
     "CircleShape",
@@ -228,6 +234,13 @@ BUILT_IN_FONTS = [
     "ZapfDingbats",
 ]
 
+STANDARD_CARD_SIZES = {  # width/height
+    "poker": {"mm": (63.5, 88.9), "in": (2.5, 3.5), "pt": (1, 1)},
+    "bridge": {"mm": (57.2, 88.9), "in": (2.25, 3.5), "pt": (1, 1)},
+    "mini": {"mm": (44.5, 63.5), "in": (1.75, 2.5), "pt": (1, 1)},
+    "tarot": {"mm": (70, 120), "in": (2.75, 4.75), "pt": (1, 1)},
+    "business": {"mm": (88.9, 50.8), "in": (3.5, 2), "pt": (1, 1)},
+}
 
 PAPER_SIZES = {
     "4A0": {"mm": (1682, 2378), "pt": (4768, 6741)},

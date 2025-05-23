@@ -72,6 +72,12 @@ from ._version import __version__
 
 from protograf.utils import geoms, tools, support
 from protograf.utils.constants import (
+    DEFAULT_CARD_WIDTH,
+    DEFAULT_CARD_HEIGHT,
+    DEFAULT_CARD_COUNT,
+    DEFAULT_CARD_RADIUS,
+    DEFAULT_COUNTER_SIZE,
+    DEFAULT_DPI,
     GRID_SHAPES_WITH_CENTRE,
     GRID_SHAPES_NO_CENTRE,
     SHAPES_FOR_TRACK,
@@ -126,13 +132,13 @@ class CardShape(BaseShape):
         # tools.feedback(f'$$$ CardShape KW=> {self.kwargs}')
         self.elements = []  # container for objects which get added to the card
         if kwargs.get("_is_countersheet", False):
-            default_height = 2.54
-            default_width = 2.54
+            default_height = DEFAULT_COUNTER_SIZE
+            default_width = DEFAULT_COUNTER_SIZE
             default_radius = 0.635
         else:
-            default_height = 8.8
-            default_width = 6.3
-            default_radius = 2.54
+            default_height = DEFAULT_CARD_HEIGHT
+            default_width = DEFAULT_CARD_WIDTH
+            default_radius = DEFAULT_CARD_RADIUS
         self.height = kwargs.get("height", default_height)
         self.width = kwargs.get("width", default_width)
         self.radius = kwargs.get("radius", default_radius)
@@ -371,14 +377,14 @@ class DeckShape(BaseShape):
         self.deck = []  # container for CardShape objects
         if kwargs.get("_is_countersheet", False):
             default_items = 70
-            default_height = 2.54
-            default_width = 2.54
+            default_height = DEFAULT_COUNTER_SIZE
+            default_width = DEFAULT_COUNTER_SIZE
             default_radius = 0.635
         else:
-            default_items = 9
-            default_height = 8.8
-            default_width = 6.3
-            default_radius = 2.54
+            default_items = DEFAULT_CARD_COUNT
+            default_height = DEFAULT_CARD_HEIGHT
+            default_width = DEFAULT_CARD_WIDTH
+            default_radius = DEFAULT_CARD_RADIUS
         self.counters = kwargs.get("counters", default_items)
         self.cards = kwargs.get("cards", self.counters)  # default total number of cards
         self.height = kwargs.get("height", default_height)  # OVERWRITE
@@ -808,7 +814,7 @@ def Save(**kwargs):
                 fformat = ExportFormat.GIF
             case _:
                 tools.feedback(f'Unknown output format "{output}"', True)
-    dpi = support.to_int(kwargs.get("dpi", 300), "dpi")
+    dpi = support.to_int(kwargs.get("dpi", DEFAULT_DPI), "dpi")
     framerate = support.to_float(kwargs.get("framerate", 1), "framerate")
     names = kwargs.get("names", None)
     directory = kwargs.get("directory", None)
