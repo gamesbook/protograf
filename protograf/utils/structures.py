@@ -61,6 +61,26 @@ class HexOrientation(Enum):
 
 # ---- NAMEDTUPLE
 
+Bounds = namedtuple(
+    "Bounds",
+    [
+        "left",
+        "right",
+        "bottom",
+        "top",
+    ],
+)
+
+GridShape = namedtuple(
+    "GridShape",
+    [
+        "label",
+        "x",
+        "y",
+        "shape",
+    ],
+)
+
 HexGeometry = namedtuple(
     "HexGeometry",
     [
@@ -73,13 +93,21 @@ HexGeometry = namedtuple(
         "z_fraction",
     ],
 )
-
 LookupType = namedtuple("LookupType", ["column", "lookups"])
-
 Link = namedtuple("Link", ["a", "b", "style"])
 
 fields = ("col", "row", "x", "y", "id", "sequence", "corner", "label")
 Locale = namedtuple("Locale", fields, defaults=(None,) * len(fields))
+
+OffsetProperties = namedtuple(
+    "OffsetProperties",
+    [
+        "off_x",
+        "off_y",
+        "delta_x",
+        "delta_y",
+    ],
+)
 
 Place = namedtuple("Place", ["shape", "rotation"])
 
@@ -98,6 +126,33 @@ UnitPoints = namedtuple(
         "mm",
         "inch",
         "pt",
+    ],
+)
+
+UnitProperties = namedtuple(
+    "UnitProperties",
+    [
+        "page_width",
+        "page_height",
+        "margin_left",
+        "margin_right",
+        "margin_bottom",
+        "margin_top",
+        "x",
+        "y",
+        "cx",
+        "cy",
+        "height",
+        "width",
+        "top",
+        "radius",
+        "diameter",
+        "side",
+        "length",
+        "spacing_x",
+        "spacing_y",
+        "offset_x",
+        "offset_y",
     ],
 )
 

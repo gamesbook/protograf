@@ -9,7 +9,7 @@ import math
 
 # third party
 # local
-from protograf.utils.structures import Point, Locale  # named tuples
+from protograf.utils.structures import Point, Locale
 from protograf.utils import tools, support
 from protograf.base import BaseShape, BaseCanvas
 from protograf.shapes import (

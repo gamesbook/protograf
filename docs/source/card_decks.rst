@@ -959,6 +959,7 @@ Title              O/S     Language   Link
 Batch Card Maker   Multi   Python     https://github.com/p-dimi/Batch-Card-Maker
 Card Creatr Studio Multi   Electron   https://cardcreatr.sffc.xyz/
 Card Editor        Windows Java       https://bitbucket.org/mattsinger/card-editor/src/release/
+CardFoldr          Multi   JavaScript https://foosel.github.io/cardfoldr/
 CardMaker          Multi   C#         https://github.com/nhmkdev/cardmaker
 DeCard64           Windows Delphi     https://github.com/Dimon-II/DeCard64
 Forge of Cards     Online  JavaScript https://forgeofcards.com/#/

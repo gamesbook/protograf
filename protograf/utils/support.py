@@ -13,41 +13,12 @@ import imageio
 import pymupdf
 
 # local
-from protograf.utils.colors_svg import named_colors
+from protograf.utils.constants import (
+    BUILT_IN_FONTS,
+    CACHE_DIRECTORY,
+    COLORS_SVG as named_colors,
+)
 from protograf.utils.structures import ExportFormat, unit
-
-
-CACHE_DIRECTORY = ".protograf"  # append to the user's home directory
-BUILT_IN_FONTS = [
-    "helv",
-    "Helvetica",
-    "heit",
-    "Helvetica-Oblique",
-    "hebo",
-    "Helvetica-Bold",
-    "hebi",
-    "Helvetica-BoldOblique",
-    "cour",
-    "Courier",
-    "coit",
-    "Courier-Oblique",
-    "cobo",
-    "Courier-Bold",
-    "cobi",
-    "Courier-BoldOblique",
-    "tiro",
-    "Times-Roman",
-    "tiit",
-    "Times-Italic",
-    "tibo",
-    "Times-Bold",
-    "tibi",
-    "Times-BoldItalic",
-    "symb",
-    "Symbol",
-    "zadb",
-    "ZapfDingbats",
-]
 
 
 def feedback(item, stop=False, warn=False):

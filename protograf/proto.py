@@ -24,7 +24,7 @@ import pymupdf
 
 # local
 from .bgg import BGGGame, BGGGameList
-from .base import BaseCanvas, GroupBase, COLORS, DEBUG_COLOR, DEFAULT_FONT, get_color
+from .base import BaseCanvas, GroupBase, DEBUG_COLOR, DEFAULT_FONT, get_color
 from .dice import Dice, DiceD4, DiceD6, DiceD8, DiceD10, DiceD12, DiceD20, DiceD100
 from .shapes import (
     BaseShape,
@@ -56,9 +56,6 @@ from .shapes import (
     StarFieldShape,
     TextShape,
     TrapezoidShape,
-    GRID_SHAPES_WITH_CENTRE,
-    GRID_SHAPES_NO_CENTRE,
-    SHAPES_FOR_TRACK,
 )
 from .layouts import (
     GridShape,
@@ -74,6 +71,19 @@ from .groups import Switch, Lookup  # used in scripts
 from ._version import __version__
 
 from protograf.utils import geoms, tools, support
+from protograf.utils.constants import (
+    GRID_SHAPES_WITH_CENTRE,
+    GRID_SHAPES_NO_CENTRE,
+    SHAPES_FOR_TRACK,
+)
+from protograf.utils.fonts import builtin_font, FontInterface
+from protograf.utils.geoms import equilateral_height  # used in scripts
+from protograf.utils.support import (  # used in scripts
+    steps,
+    uni,
+    uc,
+    CACHE_DIRECTORY,
+)
 from protograf.utils.structures import (
     BBox,
     CardFrame,
@@ -88,15 +98,7 @@ from protograf.utils.structures import (
     TemplatingType,
     unit,
 )
-from protograf.utils.fonts import builtin_font, FontInterface
 from protograf.utils.tools import base_fonts, split  # used in scripts
-from protograf.utils.geoms import equilateral_height  # used in scripts
-from protograf.utils.support import (  # used in scripts
-    steps,
-    uni,
-    uc,
-    CACHE_DIRECTORY,
-)
 from protograf import globals
 
 log = logging.getLogger(__name__)

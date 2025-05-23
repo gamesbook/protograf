@@ -2,7 +2,7 @@
 Appendix III: Useful Resources
 ==============================
 
-These are resources that can supplement, or aid, with game design when
+These are resources that might supplement, or aid, with game design when
 working with :doc:`protograf <index>`.
 
 .. NOTE::
@@ -10,8 +10,8 @@ working with :doc:`protograf <index>`.
    Inclusion of these links does **not** constitute a recommendation
    of them or their use!
 
-Icons and Images
-================
+Icons, Art and Images
+=====================
 
 -  https://openclipart.org/
 -  https://www.svgrepo.com/
@@ -20,6 +20,12 @@ Icons and Images
 -  https://bioart.niaid.nih.gov/ - medical, biological, animal and "various"
    in PNG and SVG formats
 -  https://thenounproject.com/ (some free, provided they are attributed)
+
+There is a collated list of sites with free *artwork* at
+https://www.fairway3games.com/where-do-i-get-art-for-free-an-ongoing-list/
+(if this site is down, check the archived copy:
+https://web.archive.org/web/20220330035328/https://www.fairway3games.com/where-do-i-get-art-for-free-an-ongoing-list/)
+
 
 Card Images
 ===========

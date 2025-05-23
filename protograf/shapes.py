@@ -18,6 +18,8 @@ from pymupdf import Shape as muShape, Point as muPoint, Matrix
 import segno  # QRCode
 
 # local
+from protograf import globals
+from protograf.utils import geoms, tools, support
 from protograf.utils.structures import (
     BBox,
     DirectionGroup,
@@ -27,7 +29,7 @@ from protograf.utils.structures import (
     Point,
     PolyGeometry,
 )  # named tuples
-from protograf.utils import geoms, tools, support
+from protograf.utils.support import CACHE_DIRECTORY
 from protograf.base import (
     BaseShape,
     BaseCanvas,
@@ -38,39 +40,10 @@ from protograf.base import (
     COLOR_NAMES,
     DEBUG_COLOR,
 )
-from protograf.utils.support import CACHE_DIRECTORY
-from protograf import globals
+from protograf.utils.constants import GRID_SHAPES_WITH_CENTRE
 
 log = logging.getLogger(__name__)
-
 DEBUG = False
-GRID_SHAPES_WITH_CENTRE = [
-    "CircleShape",
-    "CompassShape",
-    "DotShape",
-    "HexShape",
-    "PolygonShape",
-    "RectangleShape",
-    "RhombusShape",
-    "SquareShape",
-    "StadiumShape",
-    "EllipseShape",
-    "StarShape",
-]
-GRID_SHAPES_NO_CENTRE = [
-    "TextShape",
-]
-# NOT GRID:  ArcShape, BezierShape, PolylineShape, ChordShape
-
-# following shapes must have vertices accessible WITHOUT calling draw()
-SHAPES_FOR_TRACK = [
-    "LineShape",
-    "PolygonShape",
-    "PolylineShape",
-    "RectangleShape",
-    "RhombusShape",
-    "SquareShape",
-]
 
 
 def get_cache(**kwargs):
