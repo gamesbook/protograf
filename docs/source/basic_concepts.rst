@@ -302,7 +302,8 @@ Some examples of defaults are:
 -  the default *margin* for pages in the output PDF is ``1.25`` cm
    or half of 1 inch
 -  the default *paper* size for pages in the output PDF is ``A4`` |dash| similar
-   to the US Letter size
+   to the US Letter size; A4 is 21 x 29.7 cm (8.268 x 11.693 inch) and Letter is
+   8.5 x 11 inch (21.59 x 27.94 cm))
 -  the default *units* are centimetres (*cm*)
 -  the default *x* and *y* positions are each ``1`` (one) |dash| with default
    units that equates to *1cm*
