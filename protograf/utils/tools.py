@@ -76,17 +76,17 @@ def load_googlesheet(sheet, **kwargs):
     """
     data_list = []
     spreadsheet_id = sheet
-    api_key = kwargs.get('api_key', None)
+    api_key = kwargs.get("api_key", None)
     if not api_key:
         feedback('Cannot access a Google Sheet without an "api_key"', True)
-    sheet_name = kwargs.get('name', None)
+    sheet_name = kwargs.get("name", None)
     if not sheet_name:
         feedback('Using default tab name of "Sheet1"', False, True)
-        sheet_name = 'Sheet1'
+        sheet_name = "Sheet1"
     log.debug("Load data from a Google Sheet %s", sheet)
 
     if sheet:
-        url = f'https://sheets.googleapis.com/v4/spreadsheets/{spreadsheet_id}/values/{sheet_name}?alt=json&key={api_key}'
+        url = f"https://sheets.googleapis.com/v4/spreadsheets/{spreadsheet_id}/values/{sheet_name}?alt=json&key={api_key}"
         try:
             response = requests.get(url)
             response.raise_for_status()  # raise exception for HTTP errors
@@ -97,7 +97,7 @@ def load_googlesheet(sheet, **kwargs):
             return []
 
     if data_dict:
-        _data_list = data_dict.get('values')
+        _data_list = data_dict.get("values")
         if _data_list:
             keys = _data_list[0]  # get keys/names from first sub-list
             dict_list = [dict(zip(keys, values)) for values in _data_list[1:]]
@@ -420,11 +420,7 @@ def sequence_split(
     if string:
         try:
             if sep == ",":
-                _string = (
-                    string.replace('"', "")
-                    .replace("'", "")
-                    .strip()
-                )
+                _string = string.replace('"', "").replace("'", "").strip()
             else:
                 _string = string
                 if clean:

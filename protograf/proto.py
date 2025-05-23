@@ -1117,7 +1117,8 @@ def Data(**kwargs):
         globals.dataset_type = DatasetType.GSHEET
         if not globals.dataset:
             tools.feedback(
-                "No data accessible from the Google Sheet - please check", True)
+                "No data accessible from the Google Sheet - please check", True
+            )
     elif matrix:  # handle pre-built dict
         globals.dataset = matrix
         globals.dataset_type = DatasetType.MATRIX
