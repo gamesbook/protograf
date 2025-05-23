@@ -5,9 +5,9 @@ protograf
 Changes
 =======
 
-2025-00-00 (0.2.2)
+2025-05-23 (0.2.2)
 ------------------
-- Patch use, options and errors for split() function
+- Patch use, options and errors for split() function and document
 - Expand rationale in the Overview
 - Move all data structure definitions to a single file
 - Allow Data access to Google Sheets

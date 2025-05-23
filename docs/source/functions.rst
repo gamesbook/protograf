@@ -4,7 +4,7 @@ Functions
 
 .. |dash| unicode:: U+2014 .. EM DASH SIGN
 
-This list provides a guide to all the custom functions specific to
+This list provides a guide to using all the custom functions specific to
 :doc:`protograf <index>`.
 
 .. HINT::
@@ -14,6 +14,9 @@ This list provides a guide to all the custom functions specific to
   :doc:`Python language <python_commands>` |dash| or other
   `Python packages <https://pypi.org>`_  |dash| can be also be used to
   further enhance your own script.
+
+Overview
+========
 
 Functions |dash| in both :doc:`protograf <index>` and Python |dash| represent
 "tools" designed to process or create data to achieve a specific outcome.
@@ -26,15 +29,75 @@ more.
 of enabling creation of cards and other graphic layouts.
 
 In all cases, a function is used or activated through its name followed by
-round brackets |dash| ``the_function_name()``.  In some cases, additional
-properties |dash| much like the ones used in :ref:`Command() <command-concept>`
-|dash| can be set to customise the function's behaviour.
+round brackets; something like this |dash| ``the_function_name()``.  In some
+cases, additional properties |dash| much like the ones used in
+:ref:`Command() <command-concept>` |dash| can be set to customise the
+function's behaviour.
+
+.. _summary-func:
+
+Summary
+=======
+
+- `split()`_ -  turn a string into a list
+- `steps()`_ - generate a list of numbers
+- `uni()`_ - access a symbol, or glyph, from a font's character set
+- `group()`_ - create sets of shapes for a Card
+
+
+.. _split-function:
+
+split()
+=======
+`↑ <summary-func_>`_
+
+The ``split()`` function is used to turn a string into a list; for example:
+
+.. code:: python
+
+    split("A,B,C")
+
+which generates this list: ``["A", "B", "C"]``
+
+or:
+
+.. code:: python
+
+    split("A B C")
+
+which also generates this list: ``["A", "B", "C"]`` - this is because, in the
+absence of a comma, the whitespace is used to separate items.
+
+If you use another symbol as a separator, you can set this with a *separator*
+property; for example:
+
+.. code:: python
+
+    split("A;B;C", separator=";")
+
+which generates this list: ``["A", "B", "C"]``
+
+If you have extra white space in the string, it can be removed with *clean*
+property; for example:
+
+.. code:: python
+
+    split("A; B; C", separator=";")
+
+generates this list: ``["A", " B", " C"]`` with spaces left in, but:
+
+.. code:: python
+
+    split("A; B; C", separator=";", clean=True)
+
+generates this list: ``["A", "B", "C"]``
 
 
 .. _steps-function:
 
-steps
-=====
+steps()
+=======
+`↑ <summary-func_>`_
 
 The ``steps()`` function is used to generate a list of numbers.
 
@@ -65,11 +128,11 @@ The numbers can be decimal values, and the step can be negative, for example:
 which generates this list: ``[10.5, 8.25, 6.0, 3.75, 1.5]``
 
 
-
 .. _uni-function:
 
-uni
-===
+uni()
+=======
+`↑ <summary-func_>`_
 
 The ``uni()`` function is used to access a symbol, or glyph, from a font's
 character set by providing its Unicode text value as ``U+`` value.
@@ -88,8 +151,9 @@ To use this in a script, simply wrap it in the function as:
 
 .. _group-function-link:
 
-group
-=====
+group()
+=======
+`↑ <summary-func_>`_
 
 The ``group()`` function is used when working with
 :doc:`Card Decks <card_decks>`  - see :ref:`group() <group-function>`

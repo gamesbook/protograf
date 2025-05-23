@@ -413,7 +413,7 @@ def sequence_split(
     [3.1]
     """
     values = []
-    if isinstance(string, list):
+    if isinstance(string, (dict, list)):
         return string
     if isinstance(string, (int, float)):
         return [string]
@@ -421,17 +421,19 @@ def sequence_split(
         try:
             if sep == ",":
                 _string = (
-                    string.replace(" ", "")
-                    .replace('"', "")
+                    string.replace('"', "")
                     .replace("'", "")
-                    .replace(";", ",")
+                    .strip()
                 )
             else:
                 _string = string
+                if clean:
+                    _string = _string.strip()
         except Exception:
             return values
     else:
         return values
+
     # simple single value
     try:
         if as_int:
@@ -494,6 +496,10 @@ def split(
     ['1', '2', '3']
     >>> split("1; 2; 3", separator=';', clean=True)
     ['1', '2', '3']
+    >>> split("A,b B, C")
+    ['A', 'b B', ' C']
+    >>> split("A,b B, C", clean=True)
+    ['A', 'b B', 'C']
     """
     if isinstance(string, list):
         return string
