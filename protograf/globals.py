@@ -11,6 +11,7 @@ def initialize():
     global css
     global document
     global base
+    global back
     global deck
     global deck_settings
     global card_frames  # card boundaries - use for image extraction
@@ -41,7 +42,7 @@ def initialize():
     canvas = None  # will become a pymupdf.Shape object; one created per Page
     base = None  # will become a base.BaseCanvas object
     deck = None  # will become a shapes.DeckShape object
-    deck_settings = {}  # holds kwargs passed to Deck ; cards, copy, extra, grid_marks
+    deck_settings = {}  # holds kwargs passed to Deck ; #cards, copy, extra, grid_marks
     card_frames = {}  # list of BBox card outlines; keyed on page number
     filename = None
     dataset = None  # will become a dictionary of data loaded from a file

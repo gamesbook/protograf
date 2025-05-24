@@ -5,6 +5,12 @@ protograf
 Changes
 =======
 
+2025-00-00 (0.2.3)
+------------------
+- Move bulk of constant definitions to a single file
+- Add list() function example
+- Add CardBack shape and support alternate front/back card pages
+
 2025-05-23 (0.2.2)
 ------------------
 - Patch use, options and errors for split() function and document

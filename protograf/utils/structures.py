@@ -71,6 +71,16 @@ Bounds = namedtuple(
     ],
 )
 
+# track progress of a Deck print (front or back)
+DeckPrintState = namedtuple(
+    "DeckPrintState",
+    [
+        "card_count",
+        "card_number",
+        "copies_to_do",
+    ],
+)
+
 GridShape = namedtuple(
     "GridShape",
     [

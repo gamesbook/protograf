@@ -2115,7 +2115,7 @@ class BaseShape:
                     True,
                 )
             else:
-                tools.feedback(f'Cannot write "{string}" - {err}', True)
+                tools.feedback(f'Cannot write "{string}" (Error: {err})', True)
 
     def draw_string(self, canvas, xs, ys, string, align=None, rotation=0, **kwargs):
         """Draw a multi-string on the canvas."""
