@@ -357,7 +357,7 @@ class BaseCanvas:
         )  # fraction of smallest side
         # ---- stadium
         self.edges = self.defaults.get("edges", "E W")
-        # ---- grid / card layout
+        # ---- grid layout
         self.grid = None  # some Shapes can auto-generate a GridShape
         self.rows = self.defaults.get("rows", 0)
         self.cols = self.defaults.get("cols", self.defaults.get("columns", 0))
@@ -766,7 +766,7 @@ class BaseShape:
         self.rounded_radius = base.rounded_radius
         # ---- stadium
         self.edges = kwargs.get("edges", base.edges)
-        # ---- grid / card layout
+        # ---- grid layout
         self.rows = self.kw_int(kwargs.get("rows", base.rows), "rows")
         self.cols = self.kw_int(
             kwargs.get("cols", kwargs.get("columns", base.cols)), "cols"
