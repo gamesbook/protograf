@@ -132,6 +132,7 @@ class CardShape(BaseShape):
         self.kwargs = kwargs
         # tools.feedback(f'$$$ CardShape KW=> {self.kwargs}')
         self.elements = []  # container for objects which get added to the card
+        self.members = None
         if kwargs.get("_is_countersheet", False):
             default_height = DEFAULT_COUNTER_SIZE
             default_width = DEFAULT_COUNTER_SIZE
@@ -363,28 +364,9 @@ class CardShape(BaseShape):
                 tools.feedback(f"Unable to draw card #{cid + 1}. (Error:{err})", True)
 
 
-class CardBackShape(CardShape):
+class DeckOfCards:
     """
-    CardBack shape on a given canvas.
-    """
-
-    def __init__(self, _object=None, canvas=None, **kwargs):
-        super(CardShape, self).__init__(_object=_object, canvas=canvas, **kwargs)
-
-    def draw(self, cnv=None, off_x=0, off_y=0, ID=None, **kwargs):
-        """Draw an element on a given canvas."""
-        raise NotImplementedError
-
-    def get_outline(self, cnv, row, col, cid, label, **kwargs):
-        super(CardShape, self). get_outline(self, cnv, row, col, cid, label, **kwargs)
-
-    def draw_card(self, cnv, row, col, cid, **kwargs):
-        super(CardShape, self).draw_card(self, cnv, row, col, cid, **kwargs)
-
-
-class DeckOfCards():
-    """
-    Placeholder for the deck design; storing lists of CardShapes, and CardBackShapes.
+    Placeholder for the deck design; storing lists of CardShapes.
 
     NOTE: A DeckOfCards object receives its `draw()` command from Save()!
     """
@@ -394,8 +376,8 @@ class DeckOfCards():
         self.kwargs = kwargs
         # tools.feedback(f'$$$ DeckShape KW=> {self.kwargs}')
         # ---- cards
-        self.fronts = []  # container for CardShape objects
-        self.backs = []  # container for CardBackShape objects
+        self.fronts = []  # container for CardShape objects for front of cards
+        self.backs = []  # container for CardShape objects for back of cards
         if kwargs.get("_is_countersheet", False):
             default_items = 70
             default_height = DEFAULT_COUNTER_SIZE
@@ -474,8 +456,12 @@ class DeckOfCards():
         self.offset_x = tools.as_float(kwargs.get("offset_x", self.offset), "offset_x")
         self.offset_y = tools.as_float(kwargs.get("offset_y", self.offset), "offset_y")
         self.spacing = tools.as_float(kwargs.get("spacing", 0), "spacing")
-        self.spacing_x = tools.as_float(kwargs.get("spacing_x", self.spacing), "spacing_x")
-        self.spacing_y = tools.as_float(kwargs.get("spacing_y", self.spacing), "spacing_y")
+        self.spacing_x = tools.as_float(
+            kwargs.get("spacing_x", self.spacing), "spacing_x"
+        )
+        self.spacing_y = tools.as_float(
+            kwargs.get("spacing_y", self.spacing), "spacing_y"
+        )
         # ---- FINALLY...
         extra = globals.deck_settings.get("extra", 0)
         self.cards += extra
@@ -502,7 +488,7 @@ class DeckOfCards():
             pass  # no Data created
 
     def create(self, cards: int = 0):
-        """Create a Deck of CardShapes and CardBackShapes, based on number of `cards`"""
+        """Create a Deck of CardShapes (fronts and backs), based on number of `cards`"""
         log.debug("Cards are: %s", self.sequence)
         # front
         log.debug("Deck Fronts => %s cards with kwargs: %s", cards, self.kwargs)
@@ -513,9 +499,9 @@ class DeckOfCards():
         # backs
         log.debug("Deck Backs  => %s cards with kwargs: %s", cards, self.kwargs)
         for back in range(0, cards):
-            _back = CardBackShape(**self.kwargs)
+            _back = CardShape(**self.kwargs)
             _back.shape_id = back
-            self.backs.append(_card)
+            self.backs.append(_back)
 
     def draw_bleed(self, cnv, page_across: float, page_down: float):
         # ---- bleed area for page (default)
@@ -535,21 +521,27 @@ class DeckOfCards():
         #     #print('*** BLEED AREA ***', area)
 
     def draw(self, cnv=None, off_x=0, off_y=0, ID=None, **kwargs):
-        """Method called by Save() in proto.
+        """Draw all cards for a DDeckOfCards.
 
         Kwargs:
             * copy - name of column to use to set number of copies of a Card
             * image_list - list of image filenames
             * card_rows - maximum number of rows of cards on a page
             * card_cols - maximum number of columns of cards on a page
+
+        Note:
+            DeckOfCards draw() is called by Save() function.
         """
 
-        def draw_the_cards(cnv, state: DeckPrintState, page_number: int = 0, front: bool = True) -> DeckPrintState:
-            """Process a range of Cards for front or back of a deck
+        def draw_the_cards(
+            cnv, state: DeckPrintState, page_number: int = 0, front: bool = True
+        ) -> DeckPrintState:
+            """Process a Page of Cards for front or back of a DeckOfCards
 
             Returns:
                 DeckPrintState at the end of a Page
             """
+            # print(f'*** card_draw {page_number=}')
             start_card = state.card_number
             card_count = state.card_count
             row, col = 0, 0
@@ -557,11 +549,11 @@ class DeckOfCards():
             for card_num in range(start_card, card_count):
 
                 if front:
-                    print(f"FRONT {card_num=} {self.fronts[card_num]=}")
+                    # print(f"FRONT {card_num=} {self.fronts[card_num]=}")
                     card = self.fronts[card_num]
                     deck_length = len(self.fronts)
                 else:
-                    print(f"BACK {card_num=} {self.backs[card_num]=}")
+                    # print(f"BACK {card_num=} {self.backs[card_num]=}")
                     card = self.backs[card_num]
                     deck_length = len(self.backs)
 
@@ -570,7 +562,7 @@ class DeckOfCards():
                     col=col + 1,
                     row=row + 1,
                     id=f"{col + 1}:{row + 1}",
-                    sequence=card_num + 1
+                    sequence=card_num + 1,
                 )
                 kwargs["locale"] = _locale._asdict()
                 kwargs["grouping_cols"] = self.grouping_cols
@@ -581,7 +573,9 @@ class DeckOfCards():
 
                 mask = False
                 if self.mask:
-                    _check = tools.eval_template(self.mask, self.dataset[card_num], label="mask")
+                    _check = tools.eval_template(
+                        self.mask, self.dataset[card_num], label="mask"
+                    )
                     mask = tools.as_bool(_check, label="mask", allow_none=False)
                     if not isinstance(mask, bool):
                         tools.feedback(
@@ -598,7 +592,12 @@ class DeckOfCards():
 
                     for i in range(state.copies_to_do, copies):
                         card.draw_card(
-                            cnv, row=row, col=col, cid=card.shape_id, image=image, **kwargs
+                            cnv,
+                            row=row,
+                            col=col,
+                            cid=card.shape_id,
+                            image=image,
+                            **kwargs,
                         )
                         col += 1
                         if col >= max_cols:
@@ -614,22 +613,24 @@ class DeckOfCards():
                         else:
                             pass
                         if row >= max_rows:
-                            print(f"{front}  {card_num=} => {col=} {row=} // {max_cols=} {max_rows=}")
+                            # print(f"{front}  {card_num=} => {col=} {row=} // {max_cols=} {max_rows=}")
                             row, col = 0, 0
-                            #if card_num != deck_length - 1 or (i < (copies - 1)):
+                            # if card_num != deck_length - 1 or (i < (copies - 1)):
                             PageBreak(**kwargs)
                             cnv = globals.canvas  # new one from page break
                             self.draw_bleed(cnv, page_across, page_down)
                             return cnv, DeckPrintState(
                                 card_count=state.card_count,
                                 card_number=card_num + 1,
-                                copies_to_do=copies - i - 1)
+                                copies_to_do=copies - i - 1,
+                            )
 
                 if card_num + 1 >= deck_length:
                     return cnv, DeckPrintState(
                         card_count=state.card_count,
                         card_number=card_num,
-                        copies_to_do=0)
+                        copies_to_do=0,
+                    )
 
         # ---- primary layout settings
         cnv = cnv if cnv else globals.canvas
@@ -642,14 +643,20 @@ class DeckOfCards():
         max_rows = self.card_rows
         max_cols = self.card_cols
         # ---- calculate rows/cols based on page size and margins AND card size
-        margin_left = globals.margin_left if globals.margin_left is not None else globals.margin
+        margin_left = (
+            globals.margin_left if globals.margin_left is not None else globals.margin
+        )
         margin_bottom = (
-            globals.margin_bottom if globals.margin_bottom is not None else globals.margin
+            globals.margin_bottom
+            if globals.margin_bottom is not None
+            else globals.margin
         )
         margin_right = (
             globals.margin_right if globals.margin_right is not None else globals.margin
         )
-        margin_top = globals.margin_top if globals.margin_top is not None else globals.margin
+        margin_top = (
+            globals.margin_top if globals.margin_top is not None else globals.margin
+        )
         page_across = globals.page_width - margin_right - margin_left  # user units
         page_down = globals.page_height - margin_top - margin_bottom  # user units
         _height, _width, _radius = self.width, self.width, self.radius
@@ -696,22 +703,18 @@ class DeckOfCards():
         # print(f"{globals.page_height=} {_height=} {row_space=} {max_rows=}")
 
         # ---- draw cards
-        page_number = 0
+        page_number = -1
         state_front = DeckPrintState(
-            card_count=len(self.fronts),
-            card_number=0,
-            copies_to_do=0
+            card_count=len(self.fronts), card_number=0, copies_to_do=0
         )
         state_back = DeckPrintState(
-            card_count=len(self.backs),
-            card_number=0,
-            copies_to_do=0
+            card_count=len(self.backs), card_number=0, copies_to_do=0
         )
         while state_front.card_number < len(self.fronts) - 1:
-            cnv, state_front = draw_the_cards(cnv, state_front, page_number, front=True)
             page_number += 1  # for back-to-back OR no backs
-            #cnv, state_back = draw_the_cards(cnv, state_back, page_number, front=False)
-            #page_number += 1  # for back-to-back
+            cnv, state_front = draw_the_cards(cnv, state_front, page_number, front=True)
+            page_number += 1  # for back-to-back
+            cnv, state_back = draw_the_cards(cnv, state_back, page_number, front=False)
 
     def get(self, cid):
         """Return a card based on the internal ID"""
@@ -1102,8 +1105,8 @@ def Card(sequence, *elements, **kwargs):
                 len(globals.dataset)
                 if globals.dataset
                 else (
-                    len(globals.deck.image_list)
-                    if globals.deck.image_list
+                    len(globals.deck.images_front_list)
+                    if globals.deck.images_front_list
                     else (
                         tools.as_int(globals.deck.cards, "cards")
                         if globals.deck.cards
@@ -1122,7 +1125,7 @@ def Card(sequence, *elements, **kwargs):
                 "Handling sequence:%s with dataset:%s & images:%s - %s",
                 sequence,
                 globals.dataset,
-                globals.deck.image_list,
+                globals.deck.images_front_list,
                 err,
             )
             tools.feedback(
@@ -1172,11 +1175,11 @@ def CardBack(sequence, *elements, **kwargs):
                 len(globals.dataset)
                 if globals.dataset
                 else (
-                    len(globals.deck.image_list)
-                    if globals.back.image_list
+                    len(globals.deck.images_back_list)
+                    if globals.deck.images_back_list
                     else (
-                        tools.as_int(globals.back, "card backs")
-                        if globals.back.cardbacks
+                        tools.as_int(globals.deck.cards, "cards")
+                        if globals.deck.cards
                         else 0
                     )
                 )
@@ -1192,11 +1195,11 @@ def CardBack(sequence, *elements, **kwargs):
                 "Handling sequence:%s with dataset:%s & images:%s - %s",
                 sequence,
                 globals.dataset,
-                globals.back.image_list,
+                globals.deck.images_back_list,
                 err,
             )
             tools.feedback(
-                f'Unable to convert "{sequence}" into a cardback or range of cardbacks {globals.back}.'
+                f'Unable to convert "{sequence}" into a cardback or range of cardbacks {globals.deck}.'
             )
     for index, _back in enumerate(_cardbacks):
         cardback = globals.deck.backs[_back - 1]  # cards internally number from ZERO
@@ -1211,7 +1214,9 @@ def CardBack(sequence, *elements, **kwargs):
                     # cardback.elements.append(element)  # may be Group or Shape or Query
                     add_members_to_back(element)
         else:
-            tools.feedback(f'Cannot find cardback#{_back}. (Check "cards" setting in Deck)')
+            tools.feedback(
+                f'Cannot find cardback#{_back}. (Check "cards" setting in Deck)'
+            )
 
 
 def Counter(sequence, *elements, **kwargs):

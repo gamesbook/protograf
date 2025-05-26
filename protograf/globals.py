@@ -41,8 +41,10 @@ def initialize():
     doc_page = None  # will become a pymupdf.Page object
     canvas = None  # will become a pymupdf.Shape object; one created per Page
     base = None  # will become a base.BaseCanvas object
-    deck = None  # will become a shapes.DeckShape object
-    deck_settings = {}  # holds kwargs passed to Deck ; #cards, copy, extra, grid_marks
+    deck = None  # will become a proto.DeckOfCards object
+    deck_settings = (
+        {}
+    )  # holds kwargs passed to DeckOfCards ; #cards, copy, extra, grid_marks
     card_frames = {}  # list of BBox card outlines; keyed on page number
     filename = None
     dataset = None  # will become a dictionary of data loaded from a file
