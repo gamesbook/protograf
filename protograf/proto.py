@@ -521,7 +521,7 @@ class DeckOfCards:
         #     #print('*** BLEED AREA ***', area)
 
     def draw(self, cnv=None, off_x=0, off_y=0, ID=None, **kwargs):
-        """Draw all cards for a DDeckOfCards.
+        """Draw all cards for a DeckOfCards.
 
         Kwargs:
             * copy - name of column to use to set number of copies of a Card
@@ -544,7 +544,10 @@ class DeckOfCards:
             # print(f'*** card_draw {page_number=}')
             start_card = state.card_number
             card_count = state.card_count
-            row, col = 0, 0
+            if front:
+                row, col = 0, 0
+            else:
+                row, col = 0, max_cols - 1  # draw left-to-right for back
 
             for card_num in range(start_card, card_count):
 
@@ -599,23 +602,40 @@ class DeckOfCards:
                             image=image,
                             **kwargs,
                         )
-                        col += 1
-                        if col >= max_cols:
-                            col = 0
-                            row += 1
-                        elif (
-                            col == max_cols - 1
-                            and row % 2
-                            and card.kwargs.get("frame_type") == CardFrame.HEXAGON
-                        ):
-                            col = 0
-                            row += 1
+                        if front:
+                            col += 1
+                            if col >= max_cols:
+                                col = 0
+                                row += 1
+                            elif (
+                                col == max_cols - 1
+                                and row % 2
+                                and card.kwargs.get("frame_type") == CardFrame.HEXAGON
+                            ):
+                                col = 0
+                                row += 1
+                            else:
+                                pass
                         else:
-                            pass
+                            col += -1
+                            if col < 0:
+                                col = max_cols - 1
+                                row += 1
+                            elif (
+                                col == 0
+                                and row % 2
+                                and card.kwargs.get("frame_type") == CardFrame.HEXAGON
+                            ):
+                                col = max_cols
+                                row += 1
+                            else:
+                                pass
                         if row >= max_rows:
                             # print(f"{front}  {card_num=} => {col=} {row=} // {max_cols=} {max_rows=}")
-                            row, col = 0, 0
-                            # if card_num != deck_length - 1 or (i < (copies - 1)):
+                            if front:
+                                row, col = 0, 0
+                            else:
+                                row, col = 0, max_cols - 1
                             PageBreak(**kwargs)
                             cnv = globals.canvas  # new one from page break
                             self.draw_bleed(cnv, page_across, page_down)
@@ -702,7 +722,7 @@ class DeckOfCards:
         # print(f"{globals.page_width=} {_width=} (col_space=} {max_cols=}")
         # print(f"{globals.page_height=} {_height=} {row_space=} {max_rows=}")
 
-        # ---- draw cards
+        # ---- prep for card drawing
         page_number = -1
         state_front = DeckPrintState(
             card_count=len(self.fronts), card_number=0, copies_to_do=0
@@ -710,11 +730,20 @@ class DeckOfCards:
         state_back = DeckPrintState(
             card_count=len(self.backs), card_number=0, copies_to_do=0
         )
+        show_backs = False
+        for back in self.backs:
+            if back.elements:
+                show_backs = True
+                continue
+        # ---- draw cards
         while state_front.card_number < len(self.fronts) - 1:
             page_number += 1  # for back-to-back OR no backs
             cnv, state_front = draw_the_cards(cnv, state_front, page_number, front=True)
-            page_number += 1  # for back-to-back
-            cnv, state_back = draw_the_cards(cnv, state_back, page_number, front=False)
+            if show_backs:
+                page_number += 1  # for back-to-back
+                cnv, state_back = draw_the_cards(cnv, state_back, page_number, front=False)
+        # ---- delete extra blank page at the end
+        globals.document.delete_page(globals.page_count)
 
     def get(self, cid):
         """Return a card based on the internal ID"""
