@@ -10,6 +10,7 @@ Changes
 - Move bulk of constant definitions to a single file
 - Add list() function example
 - Add CardBack shape and support alternate front/back card pages
+- Changed property names used for access to Google Sheets
 
 2025-05-23 (0.2.2)
 ------------------

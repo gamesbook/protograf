@@ -191,6 +191,8 @@ class CardShape(BaseShape):
         Pass on `deck_data` to other commands, as needed, for them to draw Shapes
         """
         image = kwargs.get("image", None)
+        margin_shift_x = kwargs.get("margin_shift_x", 0)  # cards "at the back"
+        margin_shift_y = kwargs.get("margin_shift_y", 0)  # not set/used?
         # tools.feedback(f'$$$ draw_card {cnv=} KW=> {kwargs}')
         # ---- draw outline
         label = "ID:%s" % cid if self.show_id else ""
@@ -198,12 +200,12 @@ class CardShape(BaseShape):
         shape_kwargs["is_cards"] = True
         shape_kwargs["fill"] = kwargs.get("fill", kwargs.get("bleed_fill", None))
         shape_kwargs.pop("image_list", None)  # do NOT draw linked image
-        shape_kwargs.pop("image", None)  # do NOT draw linked image
+        shape_kwargs.pop("image", None)  # do NOT draw get_outline(linked image
         # tools.feedback(f'$$$ draw_card {cid=} {row=} {col=} \nSKW=> {shape_kwargs}')
         outline = self.get_outline(
             cnv=cnv, row=row, col=col, cid=cid, label=label, **shape_kwargs
         )
-        outline.draw(**shape_kwargs)
+        outline.draw(off_x=margin_shift_x, off_y=margin_shift_y, **shape_kwargs)
 
         # ---- track frame outlines for possible image extraction
         match kwargs["frame_type"]:
@@ -251,7 +253,9 @@ class CardShape(BaseShape):
                 case CardFrame.RECTANGLE | CardFrame.CIRCLE:
                     if kwargs["grouping_cols"] == 1:
                         _dx = (
-                            col * (outline.width + outline.spacing_x) + outline.offset_x
+                            col * (outline.width + outline.spacing_x)
+                            + outline.offset_x
+                            + margin_shift_x
                         )
                     else:
                         group_no = col // kwargs["grouping_cols"]
@@ -259,11 +263,13 @@ class CardShape(BaseShape):
                             col * outline.width
                             + outline.offset_x
                             + outline.spacing_x * group_no
+                            + margin_shift_x
                         )
                     if kwargs["grouping_rows"] == 1:
                         _dy = (
                             row * (outline.height + outline.spacing_y)
                             + outline.offset_y
+                            + margin_shift_y
                         )
                         # print(f"{col=} {outline.width=} {group_no=} {_dx=}")
                     else:
@@ -272,29 +278,39 @@ class CardShape(BaseShape):
                             row * outline.height
                             + outline.offset_y
                             + outline.spacing_y * group_no
+                            + margin_shift_y
                         )
                         # print(f"{row=} {outline.height=} {group_no=} {_dy=}")
                 case CardFrame.HEXAGON:
-                    _dx = col * 2.0 * (side + outline.spacing_x) + outline.offset_x
-                    _dy = row * 2.0 * (half_flat + outline.spacing_y) + outline.offset_y
+                    _dx = (
+                        col * 2.0 * (side + outline.spacing_x)
+                        + outline.offset_x
+                        + margin_shift_x
+                    )
+                    _dy = (
+                        row * 2.0 * (half_flat + outline.spacing_y)
+                        + outline.offset_y
+                        + margin_shift_y
+                    )
                     if row & 1:
-                        _dx = _dx + side + outline.spacing_x
+                        _dx = _dx + side + outline.spacing_x + margin_shift_x
                 case _:
                     raise NotImplementedError(
                         f'Cannot handle card frame type: {kwargs["frame_type"]}'
                     )
 
-            # ---- * track/update frame and store
-            mx = self.unit(_dx or 0) + self._o.delta_x
-            my = self.unit(_dy or 0) + self._o.delta_y
-            frame_bbox = BBox(
-                bl=Point(mx, my), tr=Point(mx + frame_width, my + frame_height)
-            )
-            page = kwargs.get("page_number", 0)
-            if page not in globals.card_frames:
-                globals.card_frames[page] = [frame_bbox]
-            else:
-                globals.card_frames[page].append(frame_bbox)
+            # ---- * track/update frame and store card fronts
+            if not kwargs.get("card_back", False):
+                mx = self.unit(_dx or 0) + self._o.delta_x
+                my = self.unit(_dy or 0) + self._o.delta_y
+                frame_bbox = BBox(
+                    bl=Point(mx, my), tr=Point(mx + frame_width, my + frame_height)
+                )
+                page = kwargs.get("page_number", 0)
+                if page not in globals.card_frames:
+                    globals.card_frames[page] = [frame_bbox]
+                else:
+                    globals.card_frames[page].append(frame_bbox)
 
             members = self.members or flat_ele.members
             # ---- clear kwargs for drawing
@@ -534,9 +550,21 @@ class DeckOfCards:
         """
 
         def draw_the_cards(
-            cnv, state: DeckPrintState, page_number: int = 0, front: bool = True
+            cnv,
+            state: DeckPrintState,
+            page_number: int = 0,
+            front: bool = True,
+            shift_x: float = 0.0,
         ) -> DeckPrintState:
             """Process a Page of Cards for front or back of a DeckOfCards
+
+            Args:
+                cnv: pymupdf.Shape object (one per Page)
+                state: track what is being printed on the page
+                page_number: current
+                front: if True, print CardShapes in `deck.fronts`
+                shift_x: amount to move cards "across" when printing `deck.backs`;
+                    used by CardShape.CardShape()
 
             Returns:
                 DeckPrintState at the end of a Page
@@ -571,6 +599,7 @@ class DeckOfCards:
                 kwargs["grouping_cols"] = self.grouping_cols
                 kwargs["grouping_rows"] = self.grouping_rows
                 kwargs["page_number"] = page_number
+                kwargs["margin_shift_x"] = shift_x
                 image = images[card_num] if images and card_num <= len(images) else None
                 card.deck_data = self.dataset
 
@@ -594,6 +623,10 @@ class DeckOfCards:
                         )
 
                     for i in range(state.copies_to_do, copies):
+                        if not front:
+                            kwargs["card_back"] = True  # use to de/activate grid marks
+                        else:
+                            kwargs["card_back"] = False
                         card.draw_card(
                             cnv,
                             row=row,
@@ -719,6 +752,15 @@ class DeckOfCards:
                     / (float(_width) * self.grouping_cols + self.spacing_x)
                 )
                 max_cols = max_groups * self.grouping_cols
+        if self.grouping_cols == 1:
+            effective_right = (
+                globals.page_width - margin_left - max_cols * (_width + self.spacing_x)
+            )
+        else:
+            effective_right = (
+                globals.page_width - margin_left - max_cols * (_width + self.spacing_x)
+            )
+
         # print(f"{globals.page_width=} {_width=} (col_space=} {max_cols=}")
         # print(f"{globals.page_height=} {_height=} {row_space=} {max_rows=}")
 
@@ -741,7 +783,10 @@ class DeckOfCards:
             cnv, state_front = draw_the_cards(cnv, state_front, page_number, front=True)
             if show_backs:
                 page_number += 1  # for back-to-back
-                cnv, state_back = draw_the_cards(cnv, state_back, page_number, front=False)
+                shift_x = effective_right - globals.margin_left
+                cnv, state_back = draw_the_cards(
+                    cnv, state_back, page_number, front=False, shift_x=shift_x
+                )
         # ---- delete extra blank page at the end
         globals.document.delete_page(globals.page_count)
 
@@ -763,9 +808,31 @@ class DeckOfCards:
 def Create(**kwargs):
     """Initialisation of globals, page, units and canvas.
 
-    NOTES:
-        * Will use argparse to process command-line keyword args
-        * Allows shortcut creation of cards
+    Kwargs:
+
+    - **paper** - a paper size from either of the ISO series - A0 down to A8;
+      or B6 down to B0 - or a USA type - letter, legal or elevenSeventeen; to change
+      the page orientation to **landscape** simply append ``-l`` to the name --
+      for example, ``"A3-l"`` is a landscape A3 paper size; default is ``A4``
+    - **filename** - name of the output PDF file; by default this is the prefix
+      name of the script, with a ``.pdf`` extension
+    - **units** - can be ``cm`` (centimetres), ``in`` (inches), ``mm``
+      (millimetres), or ``points``; default is ``cm``
+    - **margin** - set the value for *all* margins using the defined *units*;
+      default is ``1`` centimetre.
+    - **margin_top** - set the top margin using the defined *units*
+    - **margin_bottom** - set the bottom margin using the defined *units*
+    - **margin_left** - set the left margin using the defined *units*
+    - **margin_right** - set the the right margin using the defined *units*
+
+    Kwargs for to override the default values of any of the various properties
+    used for drawing Shapes can be set here as well, for example: ``font_size=18``
+    or ``stroke="red"``.
+
+    Notes:
+
+    - Will use argparse to process command-line keyword args
+    - Allows shortcut creation of cards
     """
     global globals_set
     # ---- set and confirm globals
@@ -897,6 +964,34 @@ def page_break():
 
 
 def Save(**kwargs):
+    """Save the result of all commands to a PDF file.
+
+    Kwargs:
+
+    - **output** - this can be set to:
+
+      - ``png`` - to create one image file per page of the PDF; by default the
+        names of the PNG files are derived using the PDF filename, with a dash (-)
+        followed by the page number;
+      - ``svg`` - to create one file per page of the PDF; by default the names
+        of the SVG files are derived using the PDF filename, with a dash (-)
+        followed by the page number;
+      - ``gif`` - to create a GIF file composed of all the PNG pages (these will be
+        removed after the file been created)
+    - **dpi** - can be set to the dots-per-inch resolution required; by default
+      this is ``300``
+    - **names** - this can be used to provide a list of names -- without an
+      extension -- for the **output** files that will be created from the PDF;
+      the first name corresponds to the first page, the second name to the second
+      and so on.  Each will automatically get the correct extension added to it.
+      If the term ``None`` is used in place of a name, then that page will **not**
+      have an output file created for it.
+    - **framerate** - the delay in seconds between each "page" of a GIF image; by
+      default this is ``1`` second
+    - **cards** - when set to ``True`` will cause all the card fronts to be
+      exported as PNG files;  the names of the files are derived using the PDF
+      filename, with a dash (-) followed by the page number
+    """
     validate_globals()
 
     # ---- draw Deck
@@ -1335,7 +1430,34 @@ def group(*args, **kwargs):
 
 
 def Data(**kwargs):
-    """Load data from file, dictionary, list-of-lists, directory or Google Sheet."""
+    """Load data from file, dictionary, list-of-lists, directory or Google Sheet.
+
+    Kwargs:
+
+    - **filename** - the full path to the name (including extension) of the
+      CSV or Excel file being used; if no directory is supplied in the path,
+      then it is assumed to be the same one in which the script is located
+    - Access to a **Google Sheet** document is via three properties:
+
+      - *google_key* - an API key that you must request from Google
+      - *google_sheet* - the unique ID (a mix of numbers and letters) which is
+        randomly assigned by Google to your Google Sheet
+      - *google_name* - the name of the tab in the Google Sheet housing your data
+    - **matrix** - refers to the name assigned to the ``Matrix`` being used
+    - **images** - refers to the directory in which the cards' images are located;
+      if a full path is not given, its assumed to be directly under the one in which
+      the script is located
+    - **images_list** - is used in conjunction with *images* to provide a list of
+      file extensions that filter which type of files will be loaded from the
+      directory e.g. ``.png`` or ``.jpg``; this is important to set if the
+      directory contains files of a type that are not, or cannot be, used
+    - **data_list** refers to the name assigned to the "list of lists" being used;
+      this property is also used when linked to data being sourced from the
+      BoardGameGeek API
+    - **extra** - if additional cards need to be manually created for a Deck,
+      that are *not* part of the data source, then the number of those cards
+      can be specified here.
+    """
     validate_globals()
 
     filename = kwargs.get("filename", None)  # CSV or Excel
@@ -1345,7 +1467,7 @@ def Data(**kwargs):
     images_filter = kwargs.get("images_filter", "")  # e.g. .png
     filters = tools.sequence_split(images_filter, False, True)
     source = kwargs.get("source", None)  # dict
-    sheet = kwargs.get("sheet", None)  # Google Sheet
+    google_sheet = kwargs.get("google_sheet", None)  # Google Sheet
     # extra cards added to deck (handle special cases not in the dataset)
     globals.deck_settings["extra"] = tools.as_int(kwargs.get("extra", 0), "extra")
     try:
@@ -1358,10 +1480,12 @@ def Data(**kwargs):
     if filename:  # handle excel and CSV
         globals.dataset = tools.load_data(filename, **kwargs)
         globals.dataset_type = DatasetType.FILE
-    elif sheet:  # handle Google Sheet
-        api_key = kwargs.get("api_key", None)
-        name = kwargs.get("name", None)
-        globals.dataset = tools.load_googlesheet(sheet, api_key=api_key, name=name)
+    elif google_sheet:  # handle Google Sheet
+        google_key = kwargs.get("google_key", None)
+        google_name = kwargs.get("google_name", None)
+        globals.dataset = tools.load_googlesheet(
+            google_sheet, api_key=google_key, name=google_name
+        )
         globals.dataset_type = DatasetType.GSHEET
         if not globals.dataset:
             tools.feedback(
@@ -3011,3 +3135,10 @@ def A8BA():
         font_size=8,
     )
     Blueprint(stroke_width=0.5)
+
+
+# ---- inherited docs ====
+
+create.__doc__ = Create.__doc__
+save.__doc__ = Save.__doc__
+deck.__doc__ = Deck.__doc__

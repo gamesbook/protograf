@@ -77,7 +77,7 @@ Create Command
 The ``Create()`` command is the essential command that **must** appear first
 in every script.
 
-``Create()`` sets up the basic document framework to support all of the
+``Create()`` to support all of the
 elements that will appear after it.
 
 .. HINT::
@@ -153,10 +153,10 @@ To customise the command, set its properties as follows:
 
 - **output** - this can be set to:
 
-  - ``png`` - to create one image file per page of the PDF; by default the name
-    of the PNG files are derived using the PDF filename, with a ``-`` followed
-    by the page number;
-  - ``svg`` - to create one file per page of the PDF; by default the name
+  - ``png`` - to create one image file per page of the PDF; by default the
+    names of the PNG files are derived using the PDF filename, with a ``-``
+    followed by the page number;
+  - ``svg`` - to create one file per page of the PDF; by default the names
     of the SVG files are derived using the PDF filename, with a ``-`` followed
     by the page number;
   - ``gif`` - to create a GIF file composed of all the PNG pages (these will be
@@ -171,6 +171,10 @@ To customise the command, set its properties as follows:
   have an output file created for it.
 - **framerate** - the delay in seconds between each "page" of a GIF image; by
   default this is ``1`` second
+- **cards** - when set to ``True`` will cause all the card fronts to be
+  exported as PNG files;  the names of the files are derived using the PDF
+  filename, with a ``-`` followed by the page number
+
 
 Example 1. Save PNG
 ~~~~~~~~~~~~~~~~~~~

@@ -777,7 +777,7 @@ class CircleShape(BaseShape):
         cnv.draw_circle((x, y), self._u.radius)
         self.set_canvas_props(cnv=cnv, index=ID, **kwargs)
         # ---- grid marks
-        if self.grid_marks:
+        if self.grid_marks and not kwargs.get("card_back", False):
             # print(f'{self._u.radius=} {self._u.diameter=}')
             deltag = self.unit(self.grid_length)
             gx, gy = 0, y - self._u.radius  # left-side
@@ -2847,7 +2847,7 @@ class RectangleShape(BaseShape):
 
     def calculate_xy(self, **kwargs):
         # ---- adjust start
-        # tools.feedback(f'*** Rect.calc {self.col=} {self.row=}')
+        # tools.feedback(f'*** Rect.calc {self.col=} {self.row=} {self._u.offset_x=} {self._o.off_x=}')
         if self.row is not None and self.col is not None:
             if self.kwargs.get("grouping_cols", 1) == 1:
                 x = (
@@ -3378,7 +3378,7 @@ class RectangleShape(BaseShape):
             self.draw_hatch(cnv, ID, vertices, self.hatch_count, rotation=rotation)
 
         # ---- grid marks
-        if self.grid_marks:
+        if self.grid_marks and not kwargs.get("card_back", False):
             deltag = self.unit(self.grid_length)
             gx, gy = 0, y  # left-side
             cnv.draw_line((gx, gy), (deltag, gy))

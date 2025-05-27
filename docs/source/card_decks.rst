@@ -504,10 +504,10 @@ Data Example 6. Google Sheets
 
 There are three properties needed to gain access to data from a Google Sheet:
 
-- *api_key* - an API key that you can request from Google
-- *sheet* - the unique ID (a mix of numbers and letters) which is randomly
-  assigned to a Google Sheet
-- *name* - the name of the tab in the Google Sheet housing your data
+- *google_key* - an API Key that you can request from Google
+- *google_sheet* - the unique ID (a mix of numbers and letters) which is randomly
+  assigned by Google to your Google Sheet
+- *google_name* - the name of the tab in the Google Sheet housing your data
 
 The API Key
 +++++++++++
@@ -552,9 +552,9 @@ all the information described above:
     .. code:: python
 
         Data(
-            sheet="1vRfwxVjafnZVmgjazQKr2UQDyGYYK8GXJhQAPlzJ03o",
-            api_key="A1_izC00Lbut2001askHAL4aPodd00rsys3rr0r",
-            name="Characters")
+            google_sheet="1vRfwxVjafnZVmgjazQKr2UQDyGYYK8GXJhQAPlzJ03o",
+            google_key="A1_izC00Lbut2001askHAL4aPodd00rsys3rr0r",
+            google_name="Characters")
 
 If the sheet cannot be reached, or access permissions are not correct,
 or the API key is invalid, then you will get an error.
