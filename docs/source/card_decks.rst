@@ -123,8 +123,8 @@ The following are key properties that will usually need to be set for a
 - **cards** - this is the number of cards appearing in the deck. It defaults
   to ``9``. (Note that other commands such as ``Data()`` and ``Matrix()`` will
   alter this value.)
-- **height** - this is the card height; it defaults to ``8.8`` cm
-- **width** - this is the card width. It defaults to ``6.3`` cm
+- **height** - this is the card height; it defaults to 8.89 cm / 3.5"
+- **width** - this is the card width. It defaults to 6.35 cm / 2.5"
 
 .. IMPORTANT::
 
@@ -145,8 +145,8 @@ of two A4, portait-mode, pages:
 
       Deck(cards=18)
 
-Note that these rectangular cards have a default height (``8.8`` cm) and
-width (``6.3`` cm).
+Note that these rectangular cards have a default height (``8.89`` cm) and
+width (``6.35`` cm).
 
 
 Deck Example 2. Copy & Mask

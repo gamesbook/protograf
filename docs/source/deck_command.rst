@@ -42,13 +42,13 @@ Primary Properties
 The following are key properties that will usually need to be set for a
 ``Deck``:
 
-- **cards** - this is the number of cards appearing in the deck; it defaults
+- **cards** - the number of cards appearing in the deck; it defaults
   to 9; note that other commands such as ``Data()`` and ``Matrix()`` can alter
   this value
-- **height** - this is the card height for a rectangular card;
-  it defaults to 8.8 cm
-- **width** - this is the card width for a rectangular card;
-  it defaults to 6.3 cm
+- **height** - the card height for a rectangular card;
+  it defaults to 8.89 cm, or 3.5", i.e. the height of a Poker playing card
+- **width** - the card width for a rectangular card;
+  it defaults to 6.35 cm, or 2.5", i.e. the width of a Poker playing card
 
 Secondary Properties
 --------------------
@@ -90,6 +90,13 @@ The following are other properties that can also be set for a ``Deck``:
   **spacing_x** and/or **spacing_y** to set spacing specifically for the
   horizontal or vertical direction respectively.
 - **stroke** - sets the color of the card's border; defaults to ``black``
+
+
+.. HINT::
+
+    The one property that does not appear with the ``Deck()`` command is the
+    option to export the cards as individual PNG images.  To this you need
+    to add ``cards=True`` to the :ref:`Save() <save-command>` command.
 
 .. _property-examples:
 

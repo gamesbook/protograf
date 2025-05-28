@@ -211,21 +211,23 @@ class CardShape(BaseShape):
         match kwargs["frame_type"]:
             case CardFrame.RECTANGLE:
                 _vertices = outline.get_vertexes()  # clockwise from bottom-left
-                base_frame_bbox = BBox(bl=_vertices[0], tr=_vertices[2])
+                base_frame_bbox = BBox(tl=_vertices[0], br=_vertices[2])
             case CardFrame.CIRCLE:
                 base_frame_bbox = outline.bbox
             case CardFrame.HEXAGON:
                 _vertices = outline.get_vertexes()  # anti-clockwise from mid-right
                 base_frame_bbox = BBox(
-                    bl=Point(_vertices[3].x, _vertices[4].y),
-                    tr=Point(_vertices[0].x, _vertices[1].y),
+                    tl=Point(_vertices[3].x, _vertices[1].y),
+                    br=Point(_vertices[0].x, _vertices[4].y),
                 )
             case _:
                 raise NotImplementedError(
                     f'Cannot handle card frame type: {kwargs["frame_type"]}'
                 )
-        frame_height = base_frame_bbox.tr.x - base_frame_bbox.bl.x
-        frame_width = base_frame_bbox.tr.y - base_frame_bbox.bl.y
+        frame_width = base_frame_bbox.br.x - base_frame_bbox.tl.x
+        frame_height = base_frame_bbox.br.y - base_frame_bbox.tl.y
+        # print(f"$$$ {base_frame_bbox.tl.x=}  {base_frame_bbox.tl.y=}")
+        # print(f"$$$ {base_frame_bbox.br.x=}  {base_frame_bbox.br.y=}")
 
         # ---- grid marks
         kwargs["grid_marks"] = None  # reset so not used by elements on card
@@ -303,8 +305,9 @@ class CardShape(BaseShape):
             if not kwargs.get("card_back", False):
                 mx = self.unit(_dx or 0) + self._o.delta_x
                 my = self.unit(_dy or 0) + self._o.delta_y
+                # print(f"$$$ {mx=} {my=} {frame_width=} {frame_height=}")
                 frame_bbox = BBox(
-                    bl=Point(mx, my), tr=Point(mx + frame_width, my + frame_height)
+                    tl=Point(mx, my), br=Point(mx + frame_width, my + frame_height)
                 )
                 page = kwargs.get("page_number", 0)
                 if page not in globals.card_frames:
@@ -506,7 +509,7 @@ class DeckOfCards:
     def create(self, cards: int = 0):
         """Create a Deck of CardShapes (fronts and backs), based on number of `cards`"""
         log.debug("Cards are: %s", self.sequence)
-        # front
+        # fronts
         log.debug("Deck Fronts => %s cards with kwargs: %s", cards, self.kwargs)
         for card in range(0, cards):
             _card = CardShape(**self.kwargs)
@@ -3141,4 +3144,3 @@ def A8BA():
 
 create.__doc__ = Create.__doc__
 save.__doc__ = Save.__doc__
-deck.__doc__ = Deck.__doc__

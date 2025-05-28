@@ -759,8 +759,8 @@ class CircleShape(BaseShape):
                 )
             self.x_c, self.y_c = x, y
             self.bbox = BBox(
-                bl=Point(self.x_c - self._u.radius, self.y_c + self._u.radius),
-                tr=Point(self.x_c + self._u.radius, self.y_c - self._u.radius),
+                tl=Point(self.x_c - self._u.radius, self.y_c - self._u.radius),
+                br=Point(self.x_c + self._u.radius, self.y_c + self._u.radius),
             )
         # ---- handle rotation
         is_rotated = False

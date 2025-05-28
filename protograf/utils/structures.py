@@ -179,16 +179,22 @@ unit = UnitPoints(
 
 @dataclass
 class BBox:
-    """A spatial bounding box - BL is SouthWest x,y point and TR is NorthEast x,y point"""
+    """Spatial bounding box.
 
-    bl: Tuple[Point, Point]
-    tr: Tuple[Point, Point]
+    Properties:
+
+    - `tl` is minimum x,y point
+    - `br` is maximum x,y point
+    """
+
+    tl: Point
+    br: Point
 
 
 # wrapper around a jinja Template to support operations on an Template output
 @dataclass
 class TemplatingType:
-    """Support dynamic object creation from a jinga Template"""
+    """Support dynamic object creation from a jinja Template"""
 
     template: Template
     function: object

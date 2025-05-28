@@ -172,8 +172,9 @@ To customise the command, set its properties as follows:
 - **framerate** - the delay in seconds between each "page" of a GIF image; by
   default this is ``1`` second
 - **cards** - when set to ``True`` will cause all the card fronts to be
-  exported as PNG files;  the names of the files are derived using the PDF
-  filename, with a ``-`` followed by the page number
+  exported as PNG files; the names of the files are based on the PDF
+  filename, with a dash (-) followed by the page number, and ``.png`` file
+  extension
 
 
 Example 1. Save PNG

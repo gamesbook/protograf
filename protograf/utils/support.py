@@ -67,17 +67,28 @@ def numbers(*args):
         v += step
 
 
-def letters(start: str = "a", stop: str = "z"):
+def letters(start: str = "a", stop: str = "z", step: int = 1):
     """Return list of characters between two letters.
+
+    Args:
+
+    - start
+        first letter
+    - end
+        last letter
+    - step
+        increment between letters
 
     Doc Test:
 
     >>> letters('b', 'd')
     ['b', 'c', 'd']
+    >>> letters('e', 'l', 2)
+    ['e', 'g', 'i', 'k']
     """
 
     def gen():
-        for c in range(ord(start), ord(stop) + 1):
+        for c in range(ord(start), ord(stop) + 1, step):
             yield chr(c)
 
     return list(gen())
@@ -86,11 +97,16 @@ def letters(start: str = "a", stop: str = "z"):
 def roman(value: int, REAL=True) -> str:
     """Convert an integer to a Roman number
 
-    Source:
-        https://www.geeksforgeeks.org/converting-decimal-number-lying-between-1-to-3999-to-roman-numerals/
+    Args:
 
-    Note:
-        REAL is only used for doctest, to bypass sys.exist() problem
+    - value
+        integer to be converted
+    - REAL
+        only used for doctest, to bypass sys.exist() problem
+
+    Source:
+
+    - https://www.geeksforgeeks.org/converting-decimal-number-lying-between-1-to-3999-to-roman-numerals/
 
     Doc Test:
 
@@ -134,8 +150,16 @@ def roman(value: int, REAL=True) -> str:
 def steps(start, end, step=1, REAL=True):
     """Return a list of numbers from start to end, at step intervals.
 
-    Note:
-        REAL is only used for doctest, to bypass sys.exist() problem
+    Args:
+
+    - start
+        first number
+    - end
+        last number
+    - step
+        increment between numbers
+    - REAL
+        only used for doctest, to bypass sys.exist() problem
 
     Doc Test:
 
@@ -218,11 +242,13 @@ def combinations(_object, size=2, repeat=1, delimiter=","):
     """Create a list of combinations.
 
     Args:
-        _object: list OR delimited string
-        size: int
-            how many items to take from list to create a combo
-        repeat: int
-            how many times to repeat item in original list
+
+    - _object: list OR delimited string
+        source data for combos
+    - size: int
+        how many items to take from list to create a combo
+    - repeat: int
+        how many times to repeat item in original list
 
     Doc Test:
 
@@ -270,6 +296,15 @@ def combinations(_object, size=2, repeat=1, delimiter=","):
 def to_int(value: Any, name: str = "", fail: bool = True) -> int:
     """Convert value to an integer.
 
+    Args:
+
+    - value
+        object to be converted
+    - name
+        name of object
+    - fail
+        if True, then stop program
+
     Doc Test:
 
     >>> to_int('3')
@@ -292,7 +327,20 @@ def to_int(value: Any, name: str = "", fail: bool = True) -> int:
 
 
 def to_float(value: Any, name: str = "", fail: bool = True) -> float:
-    """Convert value to a float.ccto_float('3')
+    """Convert value to a float.
+
+    Args:
+
+    - value
+        object to be converted
+    - name
+        name of object
+    - fail
+        if True, then stop program
+
+    Doc Test:
+
+    >>> to_float('3')
     3.0
     >>> to_float('a', fail=False)
     FEEDBACK:: Unable to convert "a" into a floating point number!
@@ -359,13 +407,26 @@ def excel_column(value: int = 1):
     return converter(num)
 
 
-def excels(start, end, step=1, REAL=True):
+def excels(start: int, end: int, step: int = 1, REAL: bool = True):
     """Return a list of Excel col numbers from start to end, at step intervals.
+
+    Args:
+
+    - start
+        first column number
+    - end
+        last column number
+    - step
+        increment between numbers
+    - REAL
+        only used for doctest, to bypass sys.exist() problem
 
     Doc Test:
 
     >>> excels(1, 2)
     ['A', 'B']
+    >>> excels(1, 6, 2)
+    ['A', 'C', 'E']
     >>> excels(27, 29)
     ['AA', 'AB', 'AC']
     """
@@ -385,27 +446,34 @@ def pdf_export(
     """Extract pages from PDF as PNG or SVG files.  Optionally, assemble into a GIF.
 
     Args:
-        fformat: the type of file create (GIF is created from PNGs which get deleted)
-        filename: output file name
-        dpi: resolution of PNG files
-        names: each name corresponds to a page in the document
-        directory: output directory
-        framerate: delay between rendering each image in the GIF file
+
+    - fformat
+        the type of file create (GIF is created from PNGs which get deleted)
+    - filename
+        the output file name (default prefix is name of script)
+    - dpi
+        resolution of PNG files (default is 300)
+    - names
+        each name corresponds to one page in the document (default is numeric)
+    - directory
+        output directory (default is current)
+    - framerate
+        seconds delay between rendering each image in the GIF file (default is 1)
 
     Uses:
-        * https://pymupdf.io/
-        * https://pypi.org/project/imageio/
+    - https://pymupdf.io/
+    - https://pypi.org/project/imageio/
     """
     feedback(f'Exporting page(s) from "{filename}" ...', False)
     _filename = os.path.basename(filename)
     basename = os.path.splitext(_filename)[0]
     dirname = directory or os.path.dirname(filename)
-    # validate directory
+    # ---- validate directory
     if not os.path.exists(dirname):
         feedback(
             f'Cannot find the directory "{dirname}" - please create this first.', True
         )
-    # validate names list
+    # ---- validate names list
     if names is not None:
         if isinstance(names, list):
             for name in names:
@@ -431,7 +499,7 @@ def pdf_export(
         pages = doc.page_count
 
         if fformat == ExportFormat.SVG:
-            # save pages as .svg files
+            # ---- save pages as .svg files
             for pg_number, page in enumerate(doc):
                 svg = page.get_svg_image(matrix=pymupdf.Identity)
                 if names and pg_number < len(names):
@@ -450,7 +518,7 @@ def pdf_export(
                         _file.write(svg)  # store image as a SVG
 
         if fformat == ExportFormat.GIF or fformat == ExportFormat.PNG:
-            # save pages as .png files
+            # ---- save pages as .png files
             all_pngs = []  # track full and final name of each saved .png
             for pg_number, page in enumerate(doc):
                 pix = page.get_pixmap(dpi=dpi)
@@ -469,7 +537,7 @@ def pdf_export(
                         iname = os.path.join(dirname, f"{basename}.png")
                         all_pngs.append(iname)  # track for GIF creation
                     pix.save(iname)
-        # assemble .png files into a .gif
+        # ---- assemble .png into .gif
         if fformat == ExportFormat.GIF and framerate > 0:
             feedback(
                 f'Converting PNG image file(s) from "{filename}" into a GIF...', False
@@ -499,15 +567,26 @@ def pdf_cards_to_png(
     """Extract individual cards from PDF as PNG image(s).
 
     Args:
-        * card_frames - dict key is page number; value is a list of lists;
-          each item in the nested list is a Bounding Box (bottom-left and
-          top-right x,y coordinates)
-        * page_height - in MuPDF's coordinate system, the y-axis is oriented
-          from top to bottom, so ReportLab y-coordinates must be "inverted"
+
+    - filename
+        the output file name (default prefix is name of script)
+    - fformat
+        the type of file create (GIF is created from PNGs which get deleted)
+    - dpi
+        resolution of PNG files (default is 300)
+    - directory
+        output directory (default is current)
+    - card_frames
+        dict key is page number; value is a list of lists;
+        each item in the nested list is a Bounding Box (top-left and
+        bottom-right x,y coordinates)
+    - page_height:
+        size of page
 
     Uses:
-        * https://pymupdf.io/
-        * https://pypi.org/project/imageio/
+
+    - https://pymupdf.io/
+    - https://pypi.org/project/imageio/
     """
     feedback(f'Saving card(s) from "{filename}" as image file(s)...', False)
     _filename = os.path.basename(filename)
@@ -527,16 +606,13 @@ def pdf_cards_to_png(
                 iname = os.path.join(
                     dirname, f"{basename}-{page_num + 1}-{key + 1}.png"
                 )
+                # print(f"~~~ {page_num=} {outline.tl=} {outline.br=}")
                 # https://pymupdf.readthedocs.io/en/latest/rect.html
-                # Rect represents a rectangle defined by four floating point numbers
-                # x0, y0, x1, y1. They are coordinates of diagonally opposite points.
-                # The first two numbers are regarded as the “top left” corner P(x0,y0)
-                # and second two are regarded P(x1,y1) as the “bottom right” one.
                 rect = pymupdf.Rect(
-                    outline.bl.x,  # top-left x0
-                    page_height - outline.tr.y,  # top-left y0
-                    outline.tr.x,  # bottom-right x1
-                    page_height - outline.bl.y,  # bottom-right y1
+                    outline.tl.x,  # top-left x0
+                    outline.tl.y,  # top-left y0
+                    outline.br.x,  # bottom-right x1
+                    outline.br.y,  # bottom-right y1
                 )
                 pix = page.get_pixmap(clip=rect, dpi=dpi)  # page fragment as an image
                 pix.save(iname)  # store image as a PNG
@@ -546,7 +622,7 @@ def pdf_cards_to_png(
 
 
 def color_set(svg_only: bool = False) -> list:
-    """Get a list of PyMuPDF colors with: name, RGB and HEX values in dict"""
+    """Get a list of PyMuPDF colors as dict: name, RGB and HEX as keys"""
     from pymupdf.utils import getColorInfoList
 
     svg_color_names = named_colors.keys()
