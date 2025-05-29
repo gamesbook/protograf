@@ -24,7 +24,7 @@ import pymupdf
 
 # local
 from .bgg import BGGGame, BGGGameList
-from .base import BaseCanvas, GroupBase, DEBUG_COLOR, DEFAULT_FONT, get_color
+from .base import BaseCanvas, GroupBase, DEBUG_COLOR, DEFAULT_FONT, get_color, WIDTH
 from .dice import Dice, DiceD4, DiceD6, DiceD8, DiceD10, DiceD12, DiceD20, DiceD100
 from .shapes import (
     BaseShape,
@@ -481,6 +481,11 @@ class DeckOfCards:
         self.spacing_y = tools.as_float(
             kwargs.get("spacing_y", self.spacing), "spacing_y"
         )
+        # ---- gutter (put backs of Cards on same page)
+        self.gutter = kwargs.get("gutter", 0)  # if zero, then None!
+        self.gutter_stroke = kwargs.get("gutter_stroke", None)
+        self.gutter_stroke_width = kwargs.get("gutter_stroke_width", WIDTH)
+        self.gutter_dotted = kwargs.get("gutter_dotted", None)
         # ---- FINALLY...
         extra = globals.deck_settings.get("extra", 0)
         self.cards += extra
@@ -688,6 +693,12 @@ class DeckOfCards:
                         copies_to_do=0,
                     )
 
+        def calculate_rows_cols_normal():
+            """Calculate rows and columns for a normal page layout."""
+
+        def calculate_rows_cols_gutter():
+            """Calculate rows and columns for a gutter page layout."""
+
         # ---- primary layout settings
         cnv = cnv if cnv else globals.canvas
         # tools.feedback(f'$$$ DeckShape.draw {cnv=} KW=> {kwargs}')
@@ -698,6 +709,38 @@ class DeckOfCards:
         # ---- user-defined rows and cols
         max_rows = self.card_rows
         max_cols = self.card_cols
+
+        # ---- gutter-based settings (new doc)
+        if self.gutter is not None:
+            prime_cnv = copy(cnv)
+            gutter = tools.as_float(kwargs.get("gutter", 0.0), "gutter")
+            user_page_width, user_page_height = globals.page_width, globals.page_height
+            user_margin_top = globals.margin_top
+            user_doc_page = copy(globals.doc_page)
+            # ---- pymupdf: new file, doc, page, shape/canvas
+            gutter_filename = os.path.join(globals.pargs.directory, "gutter.pdf")
+            gutter_document = pymupdf.open()  # pymupdf Document
+            if globals.page[0] > globals.page[1]:
+                width = globals.page[0] / 2
+                height = globals.page[1] / 2
+                is_landscape = True
+            else:
+                width = globals.page[1] / 2
+                height = globals.page[0] / 2
+                is_landscape = False
+            gutter_doc_page = gutter_document.new_page(
+                width=width, height=height
+            )  # new pymupdf Page
+            # ---- new globals for gutter
+            globals.page_width = width / globals.units
+            globals.page_height = height / globals.units
+            # ---- BaseCanvas
+            # globals.base = BaseCanvas(
+            #     globals.document, paper=globals.paper, defaults=defaults, kwargs=kwargs
+            # )
+            globals.margin_top = globals.margin_top - gutter / 2.0
+            cnv = gutter_doc_page.new_shape()  # pymupdf Shape
+
         # ---- calculate rows/cols based on page size and margins AND card size
         margin_left = (
             globals.margin_left if globals.margin_left is not None else globals.margin
@@ -792,6 +835,43 @@ class DeckOfCards:
                 )
         # ---- delete extra blank page at the end
         globals.document.delete_page(globals.page_count)
+
+        # ---- reset to prime and load-in gutter pages
+        if self.gutter is not None:
+            # save gutter doc
+            gutter_document.save(gutter_filename)
+            # reset globals to current doc
+            globals.page_width, globals.page_height = user_page_width, user_page_height
+            globals.margin_top = user_margin_top
+            globals.doc_page = user_doc_page
+            cnv = prime_cnv
+            # open gutter doc
+            src = pymupdf.open(gutter_filename)
+            if is_landscape:
+                # upper half page (r1: backs)
+                r1 = pymupdf.Rect(0, 0, cnv.width, cnv.height / 2)
+                r1_rotate = 180
+                # lower half page (r2: fronts)
+                r2 = r1 + (0, cnv.height / 2, 0, cnv.height / 2)
+                r2_rotate = 0
+            else:
+                # left half page (r2: fronts)
+                r2 = pymupdf.Rect(0, 0, cnv.width / 2, cnv.height)
+                r2_rotate = -90
+                # right half page (r1: backs)
+                r1 = r1 + (0, cnv.width / 2, 0, cnv.width / 2)
+                r1_rotate = 90
+            # insert pages from gutter.pdf
+            for page_number in range(0, src.page_count, 2):
+                globals.doc_page.show_pdf_page(
+                    r2, src, page_number, rotate=r2_rotate
+                )  # fronts
+                globals.doc_page.show_pdf_page(
+                    r1, src, page_number + 1, rotate=r1_rotate
+                )  # backs
+                globals.page_count += 1
+            # delete gutter
+            os.remove(gutter_filename)
 
     def get(self, cid):
         """Return a card based on the internal ID"""

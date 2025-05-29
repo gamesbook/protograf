@@ -30,8 +30,8 @@ def initialize():
     global pargs
     global paper
     global page  #  (width, height) in points
-    global page_width
-    global page_height
+    global page_width  # user units
+    global page_height  # user units
     global font_size
     global units
 
@@ -63,5 +63,5 @@ def initialize():
     font_size = 12
     units = unit.cm
     page = paper_size(paper)  # (width, height) in points
-    page_width = page[0] / unit.cm  # width in user units
-    page_height = page[1] / unit.cm  # height in user units
+    page_width = page[0] / units  # width in user units
+    page_height = page[1] / units  # height in user units
