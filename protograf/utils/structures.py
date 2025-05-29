@@ -91,6 +91,28 @@ GridShape = namedtuple(
     ],
 )
 
+GlobalDocument = namedtuple(
+    "GlobalDocument",
+    [
+        "base",
+        "deck",
+        "card_frames",
+        "filename",
+        "document",
+        "doc_page",
+        "canvas",
+        "margin",
+        "margin_left",
+        "margin_top",
+        "margin_bottom",
+        "margin_right",
+        "page",
+        "page_width",
+        "page_height",
+        "page_count",
+    ],
+)
+
 HexGeometry = namedtuple(
     "HexGeometry",
     [

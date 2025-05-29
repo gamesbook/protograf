@@ -2538,7 +2538,6 @@ class BaseShape:
                     if value.function:
                         try:
                             custom_value = value.function(custom_value)
-                            breakpoint()
                         except Exception as err:
                             tools.feedback(
                                 f"Unable to process data with function '{ value.function}' ({err})",

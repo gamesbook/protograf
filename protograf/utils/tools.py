@@ -20,7 +20,13 @@ import requests
 
 # local
 from protograf.utils.support import feedback
-from protograf.utils.structures import DirectionGroup, Point, TemplatingType
+from protograf.utils.structures import (
+    DirectionGroup,
+    Point,
+    TemplatingType,
+    GlobalDocument,
+)
+from protograf import globals
 
 log = logging.getLogger(__name__)
 DEBUG = False
@@ -193,7 +199,6 @@ def as_int(value, label, maximum=None, minimum=None, allow_none=False) -> int:
             )
         return the_value
     except (ValueError, Exception):
-        breakpoint()
         feedback(f'The {_label}"{value}" is not a valid integer!!', True)
 
 
@@ -1133,6 +1138,48 @@ def is_url_valid(url: str, qualifying=MIN_ATTRIBUTES):
         if tokens.netloc[0:4] == "http" or tokens.netloc[0:5] == "https":
             return False
     return all(getattr(tokens, qualifying_attr) for qualifying_attr in qualifying)
+
+
+def save_globals() -> GlobalDocument:
+    """Create a copy of key globals settings"""
+    return GlobalDocument(
+        base=globals.base,
+        deck=globals.deck,
+        card_frames=globals.card_frames,
+        filename=globals.filename,
+        document=globals.document,
+        doc_page=globals.doc_page,
+        canvas=globals.canvas,
+        margin=globals.margin,
+        margin_left=globals.margin_left,
+        margin_top=globals.margin_top,
+        margin_bottom=globals.margin_bottom,
+        margin_right=globals.margin_right,
+        page=globals.page,
+        page_width=globals.page_width,
+        page_height=globals.page_height,
+        page_count=globals.page_count,
+    )
+
+
+def restore_globals(doc: GlobalDocument):
+    """Restore key globals settings"""
+    globals.base = doc.base
+    globals.deck = doc.deck
+    globals.card_frames = doc.card_frames
+    globals.filename = doc.filename
+    globals.document = doc.document
+    globals.doc_page = doc.doc_page
+    globals.canvas = doc.canvas
+    globals.margin = doc.margin
+    globals.margin_left = doc.margin_left
+    globals.margin_top = doc.margin_top
+    globals.margin_bottom = doc.margin_bottom
+    globals.margin_right = doc.margin_right
+    globals.page = doc.page
+    globals.page_width = doc.page_width
+    globals.page_height = doc.page_height
+    globals.page_count = doc.page_count
 
 
 if __name__ == "__main__":

@@ -114,7 +114,6 @@ class FontInterface:
                                 "class": fdt["fontSubfamily"],
                             }
                         )
-        breakpoint()
         if self.font_families:
             with open(cache_file, "wb") as file:
                 pickle.dump(self.font_families, file)

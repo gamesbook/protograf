@@ -105,7 +105,12 @@ from protograf.utils.structures import (
     TemplatingType,
     unit,
 )
-from protograf.utils.tools import base_fonts, split  # used in scripts
+from protograf.utils.tools import (
+    base_fonts,
+    split,
+    save_globals,
+    restore_globals,
+)  # used in scripts
 from protograf import globals
 
 log = logging.getLogger(__name__)
@@ -482,7 +487,7 @@ class DeckOfCards:
             kwargs.get("spacing_y", self.spacing), "spacing_y"
         )
         # ---- gutter (put backs of Cards on same page)
-        self.gutter = kwargs.get("gutter", 0)  # if zero, then None!
+        self.gutter = kwargs.get("gutter", None)  # if zero, then None!
         self.gutter_stroke = kwargs.get("gutter_stroke", None)
         self.gutter_stroke_width = kwargs.get("gutter_stroke_width", WIDTH)
         self.gutter_dotted = kwargs.get("gutter_dotted", None)
@@ -693,12 +698,6 @@ class DeckOfCards:
                         copies_to_do=0,
                     )
 
-        def calculate_rows_cols_normal():
-            """Calculate rows and columns for a normal page layout."""
-
-        def calculate_rows_cols_gutter():
-            """Calculate rows and columns for a gutter page layout."""
-
         # ---- primary layout settings
         cnv = cnv if cnv else globals.canvas
         # tools.feedback(f'$$$ DeckShape.draw {cnv=} KW=> {kwargs}')
@@ -712,34 +711,36 @@ class DeckOfCards:
 
         # ---- gutter-based settings (new doc)
         if self.gutter is not None:
-            prime_cnv = copy(cnv)
+            prime_globals = save_globals()
+            globals_page = copy(globals.page)
             gutter = tools.as_float(kwargs.get("gutter", 0.0), "gutter")
-            user_page_width, user_page_height = globals.page_width, globals.page_height
-            user_margin_top = globals.margin_top
-            user_doc_page = copy(globals.doc_page)
             # ---- pymupdf: new file, doc, page, shape/canvas
             gutter_filename = os.path.join(globals.pargs.directory, "gutter.pdf")
-            gutter_document = pymupdf.open()  # pymupdf Document
-            if globals.page[0] > globals.page[1]:
-                width = globals.page[0] / 2
-                height = globals.page[1] / 2
+            globals.filename = gutter_filename
+            globals.document = pymupdf.open()  # pymupdf Document
+            if globals_page[0] > globals_page[1]:
+                width = globals_page[0]
+                height = globals_page[1] / 2
                 is_landscape = True
             else:
-                width = globals.page[1] / 2
-                height = globals.page[0] / 2
+                width = globals_page[1]
+                height = globals_page[0] / 2
                 is_landscape = False
-            gutter_doc_page = gutter_document.new_page(
+            globals.doc_page = globals.document.new_page(
                 width=width, height=height
-            )  # new pymupdf Page
+            )  # pymupdf Page
             # ---- new globals for gutter
             globals.page_width = width / globals.units
             globals.page_height = height / globals.units
+            globals.page = (width, height)
+            print(f"{width=} {height=} {globals.page_width=} {globals.page_height=} ")
             # ---- BaseCanvas
-            # globals.base = BaseCanvas(
-            #     globals.document, paper=globals.paper, defaults=defaults, kwargs=kwargs
-            # )
+            globals.base = BaseCanvas(
+                globals.document, paper=globals.paper, defaults=None, kwargs=kwargs
+            )
             globals.margin_top = globals.margin_top - gutter / 2.0
-            cnv = gutter_doc_page.new_shape()  # pymupdf Shape
+            cnv = globals.doc_page.new_shape()  # pymupdf Shape
+            globals.canvas = cnv
 
         # ---- calculate rows/cols based on page size and margins AND card size
         margin_left = (
@@ -838,14 +839,12 @@ class DeckOfCards:
 
         # ---- reset to prime and load-in gutter pages
         if self.gutter is not None:
-            # save gutter doc
-            gutter_document.save(gutter_filename)
+            # save gutter document
+            globals.document.save(globals.filename)
             # reset globals to current doc
-            globals.page_width, globals.page_height = user_page_width, user_page_height
-            globals.margin_top = user_margin_top
-            globals.doc_page = user_doc_page
-            cnv = prime_cnv
-            # open gutter doc
+            restore_globals(prime_globals)
+            cnv = globals.canvas
+            # open gutter document
             src = pymupdf.open(gutter_filename)
             if is_landscape:
                 # upper half page (r1: backs)
@@ -859,7 +858,7 @@ class DeckOfCards:
                 r2 = pymupdf.Rect(0, 0, cnv.width / 2, cnv.height)
                 r2_rotate = -90
                 # right half page (r1: backs)
-                r1 = r1 + (0, cnv.width / 2, 0, cnv.width / 2)
+                r1 = pymupdf.Rect(cnv.width / 2, 0, cnv.width, cnv.height)
                 r1_rotate = 90
             # insert pages from gutter.pdf
             for page_number in range(0, src.page_count, 2):
@@ -869,8 +868,12 @@ class DeckOfCards:
                 globals.doc_page.show_pdf_page(
                     r1, src, page_number + 1, rotate=r1_rotate
                 )  # backs
-                globals.page_count += 1
-            # delete gutter
+                # draw gutter line
+                if self.gutter is not None:
+                    pass  # TODO  draw_line()
+                if page_number < src.page_count / 2 - 1:
+                    PageBreak()
+            # delete gutter document
             os.remove(gutter_filename)
 
     def get(self, cid):
@@ -1409,6 +1412,8 @@ def CardBack(sequence, *elements, **kwargs):
                 f'Unable to convert "{sequence}" into a cardback or range of cardbacks {globals.deck}.'
             )
     for index, _back in enumerate(_cardbacks):
+        if _back - 1 >= len(globals.deck.backs):
+            tools.feedback("Number of CardBacks cannot exceed Cards!", True)
         cardback = globals.deck.backs[_back - 1]  # cards internally number from ZERO
         if cardback:
             for element in elements:
@@ -2639,7 +2644,6 @@ def LinkLine(grid: list, locations: Union[list, str], **kwargs):
             iter(grid)
         except TypeError:
             tools.feedback(f"The grid '{grid}' is not valid - please check it!", True)
-        # breakpoint()
         for position in grid:
             if not isinstance(position, Locale):
                 tools.feedback(
