@@ -390,7 +390,7 @@ class CardShape(BaseShape):
 
 class DeckOfCards:
     """
-    Placeholder for the deck design; storing lists of CardShapes.
+    Placeholder for the deck design; storing lists of CardShapes; allowing export
 
     NOTE: A DeckOfCards object receives its `draw()` command from Save()!
     """
@@ -491,6 +491,10 @@ class DeckOfCards:
         self.gutter_stroke = kwargs.get("gutter_stroke", None)
         self.gutter_stroke_width = kwargs.get("gutter_stroke_width", WIDTH)
         self.gutter_dotted = kwargs.get("gutter_dotted", None)
+        # ---- export options
+        self.export_cards = kwargs.get("export_cards", False)
+        self.dpi = kwargs.get("dpi", None)
+        self.directory = kwargs.get("directory", None)
         # ---- FINALLY...
         extra = globals.deck_settings.get("extra", 0)
         self.cards += extra
@@ -549,6 +553,21 @@ class DeckOfCards:
         # for area in self.bleed_areas:
         #     #print('*** BLEED AREA ***', area)
 
+    def export_cards_as_images(
+        self,
+        output: str = "png",
+    ):
+        """Save individual cards as PNG images using their frames."""
+        if self.export_cards and globals.pargs.png:  # pargs.png should default to True
+            support.pdf_cards_to_png(
+                globals.filename,
+                output,
+                self.dpi,
+                self.directory,
+                globals.card_frames,
+                globals.page[1],
+            )
+
     def draw(self, cnv=None, off_x=0, off_y=0, ID=None, **kwargs):
         """Draw all cards for a DeckOfCards.
 
@@ -589,8 +608,10 @@ class DeckOfCards:
                 row, col = 0, 0
             else:
                 row, col = 0, max_cols - 1  # draw left-to-right for back
+            card_number = start_card
 
             for card_num in range(start_card, card_count):
+                card_number = card_num
 
                 if front:
                     # print(f"FRONT {card_num=} {self.fronts[card_num]=}")
@@ -685,18 +706,23 @@ class DeckOfCards:
                             PageBreak(**kwargs)
                             cnv = globals.canvas  # new one from page break
                             self.draw_bleed(cnv, page_across, page_down)
+                            # print(f'*** card_draw - RETURN FROM rows / {front=} : {card_number + 1}')
                             return cnv, DeckPrintState(
                                 card_count=state.card_count,
-                                card_number=card_num + 1,
+                                card_number=card_number + 1,
                                 copies_to_do=copies - i - 1,
                             )
 
-                if card_num + 1 >= deck_length:
-                    return cnv, DeckPrintState(
-                        card_count=state.card_count,
-                        card_number=card_num,
-                        copies_to_do=0,
-                    )
+            # if card_num >= deck_length:
+            PageBreak(**kwargs)
+            cnv = globals.canvas  # new one from page break
+            self.draw_bleed(cnv, page_across, page_down)
+            # print(f'*** card_draw - RETURN FROM end  / {front=} : {card_number + 1}')
+            return cnv, DeckPrintState(
+                card_count=state.card_count,
+                card_number=card_number + 1,
+                copies_to_do=0,
+            )
 
         # ---- primary layout settings
         cnv = cnv if cnv else globals.canvas
@@ -733,7 +759,7 @@ class DeckOfCards:
             globals.page_width = width / globals.units
             globals.page_height = height / globals.units
             globals.page = (width, height)
-            print(f"{width=} {height=} {globals.page_width=} {globals.page_height=} ")
+            # print(f"{width=} {height=} {globals.page_width=} {globals.page_height=} ")
             # ---- BaseCanvas
             globals.base = BaseCanvas(
                 globals.document, paper=globals.paper, defaults=None, kwargs=kwargs
@@ -825,7 +851,8 @@ class DeckOfCards:
                 show_backs = True
                 continue
         # ---- draw cards
-        while state_front.card_number < len(self.fronts) - 1:
+        while state_front.card_number < len(self.fronts):
+            # print(f'\n*** *** {state_front.card_number=} *** ***')
             page_number += 1  # for back-to-back OR no backs
             cnv, state_front = draw_the_cards(cnv, state_front, page_number, front=True)
             if show_backs:
@@ -841,6 +868,8 @@ class DeckOfCards:
         if self.gutter is not None:
             # save gutter document
             globals.document.save(globals.filename)
+            # export cards
+            self.export_cards_as_images()  # default to PNG
             # reset globals to current doc
             restore_globals(prime_globals)
             cnv = globals.canvas
@@ -871,10 +900,15 @@ class DeckOfCards:
                 # draw gutter line
                 if self.gutter is not None:
                     pass  # TODO  draw_line()
-                if page_number < src.page_count / 2 - 1:
-                    PageBreak()
+                # if page_number < src.page_count / 2 - 1:
+                PageBreak()
+            # ---- delete extra blank page at the end
+            globals.document.delete_page(globals.page_count)
             # delete gutter document
             os.remove(gutter_filename)
+        else:
+            # export cards
+            self.export_cards_as_images()  # default to PNG
 
     def get(self, cid):
         """Return a card based on the internal ID"""
@@ -1054,7 +1088,7 @@ def Save(**kwargs):
 
     Kwargs:
 
-    - **output** - this can be set to:
+    - **output** - can be set to:
 
       - ``png`` - to create one image file per page of the PDF; by default the
         names of the PNG files are derived using the PDF filename, with a dash (-)
@@ -1066,21 +1100,30 @@ def Save(**kwargs):
         removed after the file been created)
     - **dpi** - can be set to the dots-per-inch resolution required; by default
       this is ``300``
-    - **names** - this can be used to provide a list of names -- without an
-      extension -- for the **output** files that will be created from the PDF;
+    - **directory** -
+    - **names** - provide a list of names -- without an extension -- for the
+      *output* files that will be created from the PDF;
       the first name corresponds to the first page, the second name to the second
       and so on.  Each will automatically get the correct extension added to it.
       If the term ``None`` is used in place of a name, then that page will **not**
       have an output file created for it.
     - **framerate** - the delay in seconds between each "page" of a GIF image; by
       default this is ``1`` second
-    - **cards** - when set to ``True`` will cause all the card fronts to be
+    - **cards** - if set to ``True`` will cause all the card fronts to be
       exported as PNG files;  the names of the files are derived using the PDF
       filename, with a dash (-) followed by the page number
     """
     validate_globals()
 
-    # ---- draw Deck
+    # ---- set local vars from kwargs
+    dpi = support.to_int(kwargs.get("dpi", DEFAULT_DPI), "dpi")
+    framerate = support.to_float(kwargs.get("framerate", 1), "framerate")
+    names = kwargs.get("names", None)
+    directory = kwargs.get("directory", None)
+    cards = kwargs.get("cards", False)  # export individual cards as PNG
+    output = kwargs.get("output", None)  # export document into this format e.g. SVG
+
+    # ---- draw Deck (and export cards)
     if globals.deck and len(globals.deck.fronts) >= 1:
         globals.deck.draw(
             cnv=globals.canvas,
@@ -1089,6 +1132,9 @@ def Save(**kwargs):
             extra=globals.deck_settings.get("extra", 0),
             grid_marks=globals.deck_settings.get("grid_marks", None),
             image_list=globals.image_list,
+            export_cards=cards,
+            dpi=dpi,
+            directory=directory,
         )
 
     # ---- update current pymupdf Shape
@@ -1107,7 +1153,6 @@ def Save(**kwargs):
         tools.feedback(f'Unable to save "{globals.filename}" - {err} - {msg}', True)
 
     # ---- save to PNG image(s) or SVG file(s)
-    output = kwargs.get("output", None)
     if output:
         match str(output).lower():
             case "png":
@@ -1118,26 +1163,14 @@ def Save(**kwargs):
                 fformat = ExportFormat.GIF
             case _:
                 tools.feedback(f'Unknown output format "{output}"', True)
-    dpi = support.to_int(kwargs.get("dpi", DEFAULT_DPI), "dpi")
-    framerate = support.to_float(kwargs.get("framerate", 1), "framerate")
-    names = kwargs.get("names", None)
-    directory = kwargs.get("directory", None)
+
     if output and globals.pargs.png:  # pargs.png should default to True
         support.pdf_export(
             globals.filename, fformat, dpi, names, directory, framerate=framerate
         )
 
     # ---- save cards to image(s)
-    cards = kwargs.get("cards", None)
-    if cards and globals.pargs.png:  # pargs.png should default to True
-        support.pdf_cards_to_png(
-            globals.filename,
-            output,
-            dpi,
-            directory,
-            globals.card_frames,
-            globals.page[1],
-        )
+    # MOVED TO DECK DRAW - because of use of intermediate pages for gutter-based layout
 
 
 def save(**kwargs):
@@ -1413,7 +1446,7 @@ def CardBack(sequence, *elements, **kwargs):
             )
     for index, _back in enumerate(_cardbacks):
         if _back - 1 >= len(globals.deck.backs):
-            tools.feedback("Number of CardBacks cannot exceed Cards!", True)
+            tools.feedback("Number of CardBacks cannot exceed number of Cards!", True)
         cardback = globals.deck.backs[_back - 1]  # cards internally number from ZERO
         if cardback:
             for element in elements:
