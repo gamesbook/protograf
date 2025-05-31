@@ -97,6 +97,9 @@ python cards\cards_deck_07.py --no-png -d %location%
 python cards\cards_deck_08.py --no-png -d %location%
 python cards\cards_deck_09.py --no-png -d %location%
 python cards\cards_deck_10.py --no-png -d %location%
+python cards\cards_deck_11.py --no-png -d %location%
+python cards\cards_deck_12.py --no-png -d %location%
+python cards\cards_deck_13.py --no-png -d %location%
 
 REM ---- various
 ECHO "Creating various..."

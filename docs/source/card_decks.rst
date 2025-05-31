@@ -23,6 +23,7 @@ Table of Contents
   - `Deck Example 1. Defaults`_
   - `Deck Example 2. Copy & Mask`_
 - `The Card Command`_
+- `The CardBack Command`_
 - `The Data Command`_
 
   - `Data Sources`_
@@ -284,6 +285,31 @@ Here:
   (``line1``). The line is superimposed on the rectangle because it appears
   after it in the group list (see below for how the
   `group <group-function_>`_ function works.)
+
+
+.. _the-cardback-command:
+
+The CardBack Command
+====================
+`↑ <table-of-contents-crddk_>`_
+
+This command mirrors its counterpart |dash| :ref:`Card Command <the-card-command>`.
+
+Any element or option that is applicable to that command can be used; for
+example; adding shapes or setting ranges.
+
+There are a few differences.  Any numeric range for a CardBack cannot exceed
+the number of cards |dash| so if there were 9 Cards in the Deck, you cannot
+set a range of ``"1-10"`` for a CardBack.
+
+The default location for CardBacks to be drawn is on alternating pages on the
+assumption that cards will be printed back-to-back and that there are matchiing
+card backs for every front.  The offsets for CardBack positions are changed so
+that the images line-up "behind" the Cards drawn on the front.
+
+Both front and back can be drawn on the same page by using a **gutter**. For
+details on this property, see the `Deck Command <deck_command.html>`_.
+
 
 .. _the-data-command:
 

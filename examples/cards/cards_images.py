@@ -6,7 +6,12 @@ Created on: 29 April 2024
 """
 from protograf import *
 
-Create(filename='cards_images.pdf', margin_bottom=1.5, stroke="white", stroke_width=0.01)
+Create(
+   filename='cards_images.pdf',
+   margin=1,
+   margin_bottom=1.5,
+   stroke="white",
+   stroke_width=0.01)
 
 # load image data
 Data(images="pictures", images_filter=".png,.jpg")

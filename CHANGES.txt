@@ -5,12 +5,14 @@ protograf
 Changes
 =======
 
-2025-00-00 (0.2.3)
+2025-06-00 (0.2.3)
 ------------------
-- Move bulk of constant definitions to a single file
-- Add list() function example
-- Add CardBack shape and support alternate front/back card pages
+- Moved the bulk of constant definitions to a single file
+- Added list() function example
+- Added CardBack shape and support alternate front/back card pages
+- Support card front and back on same page (the "gutter")
 - Changed property names used for access to Google Sheets
+- Changed default card size and page margins
 
 2025-05-23 (0.2.2)
 ------------------

@@ -81,6 +81,7 @@ from protograf.utils.constants import (
     GRID_SHAPES_WITH_CENTRE,
     GRID_SHAPES_NO_CENTRE,
     SHAPES_FOR_TRACK,
+    STANDARD_CARD_SIZES,
 )
 from protograf.utils.fonts import builtin_font, FontInterface
 from protograf.utils.geoms import equilateral_height  # used in scripts
@@ -199,6 +200,7 @@ class CardShape(BaseShape):
         margin_shift_x = kwargs.get("margin_shift_x", 0)  # cards "at the back"
         margin_shift_y = kwargs.get("margin_shift_y", 0)  # not set/used?
         # tools.feedback(f'$$$ draw_card {cnv=} KW=> {kwargs}')
+
         # ---- draw outline
         label = "ID:%s" % cid if self.show_id else ""
         shape_kwargs = copy(kwargs)
@@ -220,10 +222,16 @@ class CardShape(BaseShape):
             case CardFrame.CIRCLE:
                 base_frame_bbox = outline.bbox
             case CardFrame.HEXAGON:
-                _vertices = outline.get_vertexes()  # anti-clockwise from mid-right
+                _vertices = outline.get_vertexes()  # anti-clockwise from mid-left
+                # print(f"$$$ HEXAGON {_vertices=}")
+                #   5__4
+                #   /  \
+                # 0/    \3
+                #  \    /
+                #  1\__/2
                 base_frame_bbox = BBox(
-                    tl=Point(_vertices[3].x, _vertices[1].y),
-                    br=Point(_vertices[0].x, _vertices[4].y),
+                    tl=Point(_vertices[0].x, _vertices[5].y),
+                    br=Point(_vertices[3].x, _vertices[2].y),
                 )
             case _:
                 raise NotImplementedError(
@@ -247,6 +255,71 @@ class CardShape(BaseShape):
             side = self.points_to_value(side)
             half_flat = self.points_to_value(half_flat)
 
+        # ---- card frame shift
+        match kwargs["frame_type"]:
+            case CardFrame.RECTANGLE | CardFrame.CIRCLE:
+                if kwargs["grouping_cols"] == 1:
+                    _dx = (
+                        col * (outline.width + outline.spacing_x)
+                        + outline.offset_x
+                        + margin_shift_x
+                    )
+                else:
+                    group_no = col // kwargs["grouping_cols"]
+                    _dx = (
+                        col * outline.width
+                        + outline.offset_x
+                        + outline.spacing_x * group_no
+                        + margin_shift_x
+                    )
+                if kwargs["grouping_rows"] == 1:
+                    _dy = (
+                        row * (outline.height + outline.spacing_y)
+                        + outline.offset_y
+                        + margin_shift_y
+                    )
+                    # print(f"$$$ {col=} {outline.width=} {group_no=} {_dx=}")
+                else:
+                    group_no = row // kwargs["grouping_rows"]
+                    _dy = (
+                        row * outline.height
+                        + outline.offset_y
+                        + outline.spacing_y * group_no
+                        + margin_shift_y
+                    )
+                    # print(f"$$$ {row=} {outline.height=} {group_no=} {_dy=}")
+            case CardFrame.HEXAGON:
+                _dx = (
+                    col * 2.0 * (side + outline.spacing_x)
+                    + outline.offset_x
+                    + margin_shift_x
+                )
+                _dy = (
+                    row * 2.0 * (half_flat + outline.spacing_y)
+                    + outline.offset_y
+                    + margin_shift_y
+                )
+                if row & 1:
+                    _dx = _dx + side + outline.spacing_x + margin_shift_x
+            case _:
+                raise NotImplementedError(
+                    f'Cannot handle card frame type: {kwargs["frame_type"]}'
+                )
+
+        # ---- track/update frame and store card fronts
+        if not kwargs.get("card_back", False):
+            mx = self.unit(_dx or 0) + self._o.delta_x
+            my = self.unit(_dy or 0) + self._o.delta_y
+            # print(f"$$$ {mx=} {my=} {frame_width=} {frame_height=}")
+            frame_bbox = BBox(
+                tl=Point(mx, my), br=Point(mx + frame_width, my + frame_height)
+            )
+            page = kwargs.get("page_number", 0)
+            if page not in globals.card_frames:
+                globals.card_frames[page] = [frame_bbox]
+            else:
+                globals.card_frames[page].append(frame_bbox)
+
         # ---- draw card elements
         flat_elements = tools.flatten(self.elements)
         for index, flat_ele in enumerate(flat_elements):
@@ -255,73 +328,8 @@ class CardShape(BaseShape):
                 if flat_ele.kwargs.get("source", "").lower() in ["*", "all"]:
                     flat_ele.source = image
 
-            # ---- * calculate card frame shift
-            match kwargs["frame_type"]:
-                case CardFrame.RECTANGLE | CardFrame.CIRCLE:
-                    if kwargs["grouping_cols"] == 1:
-                        _dx = (
-                            col * (outline.width + outline.spacing_x)
-                            + outline.offset_x
-                            + margin_shift_x
-                        )
-                    else:
-                        group_no = col // kwargs["grouping_cols"]
-                        _dx = (
-                            col * outline.width
-                            + outline.offset_x
-                            + outline.spacing_x * group_no
-                            + margin_shift_x
-                        )
-                    if kwargs["grouping_rows"] == 1:
-                        _dy = (
-                            row * (outline.height + outline.spacing_y)
-                            + outline.offset_y
-                            + margin_shift_y
-                        )
-                        # print(f"{col=} {outline.width=} {group_no=} {_dx=}")
-                    else:
-                        group_no = row // kwargs["grouping_rows"]
-                        _dy = (
-                            row * outline.height
-                            + outline.offset_y
-                            + outline.spacing_y * group_no
-                            + margin_shift_y
-                        )
-                        # print(f"{row=} {outline.height=} {group_no=} {_dy=}")
-                case CardFrame.HEXAGON:
-                    _dx = (
-                        col * 2.0 * (side + outline.spacing_x)
-                        + outline.offset_x
-                        + margin_shift_x
-                    )
-                    _dy = (
-                        row * 2.0 * (half_flat + outline.spacing_y)
-                        + outline.offset_y
-                        + margin_shift_y
-                    )
-                    if row & 1:
-                        _dx = _dx + side + outline.spacing_x + margin_shift_x
-                case _:
-                    raise NotImplementedError(
-                        f'Cannot handle card frame type: {kwargs["frame_type"]}'
-                    )
-
-            # ---- * track/update frame and store card fronts
-            if not kwargs.get("card_back", False):
-                mx = self.unit(_dx or 0) + self._o.delta_x
-                my = self.unit(_dy or 0) + self._o.delta_y
-                # print(f"$$$ {mx=} {my=} {frame_width=} {frame_height=}")
-                frame_bbox = BBox(
-                    tl=Point(mx, my), br=Point(mx + frame_width, my + frame_height)
-                )
-                page = kwargs.get("page_number", 0)
-                if page not in globals.card_frames:
-                    globals.card_frames[page] = [frame_bbox]
-                else:
-                    globals.card_frames[page].append(frame_bbox)
-
             members = self.members or flat_ele.members
-            # ---- clear kwargs for drawing
+            # ---- * clear kwargs for drawing
             # (otherwise BaseShape self attributes already set are overwritten)
             dargs = {
                 key: kwargs.get(key)
@@ -413,9 +421,32 @@ class DeckOfCards:
             default_width = DEFAULT_CARD_WIDTH
             default_radius = DEFAULT_CARD_RADIUS
         self.counters = kwargs.get("counters", default_items)
+        # ---- set card size
         self.cards = kwargs.get("cards", self.counters)  # default total number of cards
-        self.height = kwargs.get("height", default_height)  # OVERWRITE
-        self.width = kwargs.get("width", default_width)  # OVERWRITE
+        card_style = kwargs.get("card_style", "")
+        the_height, the_width, size = default_height, default_width, None
+        match str(card_style).lower():
+            case "poker" | "p":
+                size = STANDARD_CARD_SIZES["poker"]["pt"]
+            case "bridge" | "b":
+                size = STANDARD_CARD_SIZES["bridge"]["pt"]
+            case "mini" | "m":
+                size = STANDARD_CARD_SIZES["mini"]["pt"]
+            case "tarot" | "t":
+                size = STANDARD_CARD_SIZES["tarot"]["pt"]
+            case "business" | "u":
+                size = STANDARD_CARD_SIZES["business"]["pt"]
+            case "":
+                pass
+            case _:
+                tools.feedback(f'Card style "{card_style}" is unknown.', True)
+        if size:
+            the_height, the_width = size[1] / globals.units, size[0] / globals.units
+        self.height = kwargs.get("height", the_height)  # OVERWRITE
+        self.width = kwargs.get("width", the_width)  # OVERWRITE
+        # print(f'$$$ {size=}, {self.width=}, {self.height}')
+        self.kwargs["width"] = self.width  # used for create_cardshapes()
+        self.kwargs["height"] = self.height  # used for create_cardshapes()
         self.radius = kwargs.get("radius", default_radius)  # OVERWRITE
         # ----- set card frame type
         self.frame = kwargs.get("frame", "rectangle")
@@ -431,7 +462,7 @@ class DeckOfCards:
                 tools.feedback(
                     f"Unable to draw a {self.frame}-shaped card. {hint}", True
                 )
-        self.kwargs["frame_type"] = self.frame_type
+        self.kwargs["frame_type"] = self.frame_type  # used for create_cardshapes()
         # ---- dataset (list of dicts)
         self.dataset = kwargs.get("dataset", None)
         self.set_dataset()  # globals override : dataset AND cards
@@ -491,6 +522,7 @@ class DeckOfCards:
         self.gutter_stroke = kwargs.get("gutter_stroke", None)
         self.gutter_stroke_width = kwargs.get("gutter_stroke_width", WIDTH)
         self.gutter_dotted = kwargs.get("gutter_dotted", None)
+        self.show_backs = False
         # ---- export options
         self.export_cards = kwargs.get("export_cards", False)
         self.dpi = kwargs.get("dpi", None)
@@ -499,7 +531,7 @@ class DeckOfCards:
         extra = globals.deck_settings.get("extra", 0)
         self.cards += extra
         log.debug("Card Counts: %s Settings: %s", self.cards, globals.deck_settings)
-        self.create(self.cards)
+        self.create_cardshapes(self.cards)
 
     def set_dataset(self):
         """Create deck dataset from globals dataset"""
@@ -520,7 +552,7 @@ class DeckOfCards:
         else:
             pass  # no Data created
 
-    def create(self, cards: int = 0):
+    def create_cardshapes(self, cards: int = 0):
         """Create a Deck of CardShapes (fronts and backs), based on number of `cards`"""
         log.debug("Cards are: %s", self.sequence)
         # fronts
@@ -547,35 +579,44 @@ class DeckOfCards:
                 y=0,
                 fill_stroke=self.bleed_fill,
             )
-            # print(f'*** {self.bleed_fill=} {page_across=}, {page_down=}')
+            # print(f'$$$  {self.bleed_fill=} {page_across=}, {page_down=}')
             rect.draw()
         # ---- bleed areas (custom)
         # for area in self.bleed_areas:
-        #     #print('*** BLEED AREA ***', area)
+        #     #print('$$$  BLEED AREA $$$ ', area)
 
     def export_cards_as_images(
         self,
-        output: str = "png",
+        source: str,
+        output: str = None,
+        fformat: str = "png",
     ):
         """Save individual cards as PNG images using their frames."""
         if self.export_cards and globals.pargs.png:  # pargs.png should default to True
             support.pdf_cards_to_png(
-                globals.filename,
-                output,
-                self.dpi,
-                self.directory,
-                globals.card_frames,
-                globals.page[1],
+                source=source,
+                output=output or source,
+                fformat=fformat,
+                dpi=self.dpi,
+                directory=self.directory,
+                card_frames=globals.card_frames,
+                page_height=globals.page[1],
             )
 
     def draw(self, cnv=None, off_x=0, off_y=0, ID=None, **kwargs):
         """Draw all cards for a DeckOfCards.
 
         Kwargs:
-            * copy - name of column to use to set number of copies of a Card
+            * cards - number of cards to draw
+            * extra - number of extra cards to draw (beyond Data count)
+            * copy - name of Data column used to set number of copies of a Card
             * image_list - list of image filenames
+            * export_cards - if True, then export card as individual images
             * card_rows - maximum number of rows of cards on a page
             * card_cols - maximum number of columns of cards on a page
+            * dpi - resolution for output PNG
+            * directory - path to save output(s)
+            # grid_marks=globals.deck_settings.get("grid_marks", None),
 
         Note:
             DeckOfCards draw() is called by Save() function.
@@ -601,7 +642,7 @@ class DeckOfCards:
             Returns:
                 DeckPrintState at the end of a Page
             """
-            # print(f'*** card_draw {page_number=}')
+            # print(f'$$$  card_draw {page_number=}')
             start_card = state.card_number
             card_count = state.card_count
             if front:
@@ -614,11 +655,11 @@ class DeckOfCards:
                 card_number = card_num
 
                 if front:
-                    # print(f"FRONT {card_num=} {self.fronts[card_num]=}")
+                    # print(f"$$$ FRONT {card_num=} {self.fronts[card_num]=}")
                     card = self.fronts[card_num]
                     deck_length = len(self.fronts)
                 else:
-                    # print(f"BACK {card_num=} {self.backs[card_num]=}")
+                    # print(f"$$$ BACK {card_num=} {self.backs[card_num]=}")
                     card = self.backs[card_num]
                     deck_length = len(self.backs)
 
@@ -698,7 +739,7 @@ class DeckOfCards:
                             else:
                                 pass
                         if row >= max_rows:
-                            # print(f"{front}  {card_num=} => {col=} {row=} // {max_cols=} {max_rows=}")
+                            # print(f"$$$ {front} {card_num=} => {col=} {row=} // {max_cols=} {max_rows=}")
                             if front:
                                 row, col = 0, 0
                             else:
@@ -706,7 +747,7 @@ class DeckOfCards:
                             PageBreak(**kwargs)
                             cnv = globals.canvas  # new one from page break
                             self.draw_bleed(cnv, page_across, page_down)
-                            # print(f'*** card_draw - RETURN FROM rows / {front=} : {card_number + 1}')
+                            # print(f'$$$ card_draw - RETURN FROM rows / {front=} : {card_number + 1}')
                             return cnv, DeckPrintState(
                                 card_count=state.card_count,
                                 card_number=card_number + 1,
@@ -717,14 +758,14 @@ class DeckOfCards:
             PageBreak(**kwargs)
             cnv = globals.canvas  # new one from page break
             self.draw_bleed(cnv, page_across, page_down)
-            # print(f'*** card_draw - RETURN FROM end  / {front=} : {card_number + 1}')
+            # print(f'$$$  card_draw - RETURN FROM end  / {front=} : {card_number + 1}')
             return cnv, DeckPrintState(
                 card_count=state.card_count,
                 card_number=card_number + 1,
                 copies_to_do=0,
             )
 
-        # ---- primary layout settings
+        # ---- primary layout settings for draw()
         cnv = cnv if cnv else globals.canvas
         # tools.feedback(f'$$$ DeckShape.draw {cnv=} KW=> {kwargs}')
         log.debug("Deck cnv:%s type:%s", type(globals.canvas), type(cnv))
@@ -734,6 +775,10 @@ class DeckOfCards:
         # ---- user-defined rows and cols
         max_rows = self.card_rows
         max_cols = self.card_cols
+        # ---- other settings
+        self.export_cards = kwargs.get("export_cards", False)
+        self.dpi = kwargs.get("dpi", 300)
+        prime_globals = None
 
         # ---- gutter-based settings (new doc)
         if self.gutter is not None:
@@ -759,7 +804,7 @@ class DeckOfCards:
             globals.page_width = width / globals.units
             globals.page_height = height / globals.units
             globals.page = (width, height)
-            # print(f"{width=} {height=} {globals.page_width=} {globals.page_height=} ")
+            # print(f"$$$ {width=} {height=} {globals.page_width=} {globals.page_height=} ")
             # ---- BaseCanvas
             globals.base = BaseCanvas(
                 globals.document, paper=globals.paper, defaults=None, kwargs=kwargs
@@ -799,6 +844,7 @@ class DeckOfCards:
                 _card.outline.width,
             )
             _radius = _card.outline.radius
+
         # ---- space calcs for rows/cols
         # Note: units here are user-based
         if not max_rows:
@@ -834,8 +880,8 @@ class DeckOfCards:
                 globals.page_width - margin_left - max_cols * (_width + self.spacing_x)
             )
 
-        # print(f"{globals.page_width=} {_width=} (col_space=} {max_cols=}")
-        # print(f"{globals.page_height=} {_height=} {row_space=} {max_rows=}")
+        # print(f"$$$ {globals.page_width=} {_width=} (col_space=} {max_cols=}")
+        # print(f"$$${globals.page_height=} {_height=} {row_space=} {max_rows=}")
 
         # ---- prep for card drawing
         page_number = -1
@@ -845,17 +891,17 @@ class DeckOfCards:
         state_back = DeckPrintState(
             card_count=len(self.backs), card_number=0, copies_to_do=0
         )
-        show_backs = False
         for back in self.backs:
             if back.elements:
-                show_backs = True
+                self.show_backs = True
                 continue
-        # ---- draw cards
+
+        # ---- actually draw cards!
         while state_front.card_number < len(self.fronts):
-            # print(f'\n*** *** {state_front.card_number=} *** ***')
+            # print(f'\n$$$ {state_front.card_number=} $$$ ')
             page_number += 1  # for back-to-back OR no backs
             cnv, state_front = draw_the_cards(cnv, state_front, page_number, front=True)
-            if show_backs:
+            if self.show_backs:
                 page_number += 1  # for back-to-back
                 shift_x = effective_right - globals.margin_left
                 cnv, state_back = draw_the_cards(
@@ -869,7 +915,9 @@ class DeckOfCards:
             # save gutter document
             globals.document.save(globals.filename)
             # export cards
-            self.export_cards_as_images()  # default to PNG
+            self.export_cards_as_images(
+                source=globals.filename, output=prime_globals.filename
+            )  # default to PNG format
             # reset globals to current doc
             restore_globals(prime_globals)
             cnv = globals.canvas
@@ -907,8 +955,9 @@ class DeckOfCards:
             # delete gutter document
             os.remove(gutter_filename)
         else:
-            # export cards
-            self.export_cards_as_images()  # default to PNG
+            pass
+            # moved to Save() command; otherwise output file not available
+            # self.export_cards_as_images(source=globals.filename)  # default PNG format
 
     def get(self, cid):
         """Return a card based on the internal ID"""
@@ -1127,12 +1176,12 @@ def Save(**kwargs):
     if globals.deck and len(globals.deck.fronts) >= 1:
         globals.deck.draw(
             cnv=globals.canvas,
+            export_cards=cards,
             cards=globals.deck_settings.get("cards", DEFAULT_CARD_COUNT),
             copy=globals.deck_settings.get("copy", None),
             extra=globals.deck_settings.get("extra", 0),
             grid_marks=globals.deck_settings.get("grid_marks", None),
             image_list=globals.image_list,
-            export_cards=cards,
             dpi=dpi,
             directory=directory,
         )
@@ -1151,6 +1200,10 @@ def Save(**kwargs):
         tools.feedback(f'Unable to save "{globals.filename}" - {err} - {msg}', True)
     except pymupdf.mupdf.FzErrorSystem as err:
         tools.feedback(f'Unable to save "{globals.filename}" - {err} - {msg}', True)
+
+    # ---- export Cards (where only Card fronts exist)
+    if globals.deck and len(globals.deck.fronts) >= 1 and not globals.deck.show_backs:
+        globals.deck.export_cards_as_images(source=globals.filename)
 
     # ---- save to PNG image(s) or SVG file(s)
     if output:
@@ -1320,20 +1373,30 @@ def Matrix(labels: list = None, data: list = None) -> list:
     return result
 
 
-def Card(sequence, *elements, **kwargs):
+def Card(sequence: object = None, *elements, **kwargs):
     """Add one or more elements to a card or cards.
 
     NOTE: A Card receives its `draw()` command via Save()!
     """
 
     def add_members_to_card(element):
-        element.members = _cards  # track all related cards
-        card.members = _cards
-        card.elements.append(element)  # may be Group or Shape or Query
+        try:
+            element.members = _cards  # track all related cards
+            card.members = _cards
+            card.elements.append(element)  # may be Group or Shape or Query
+        except AttributeError:
+            if isinstance(element, str):
+                tools.feedback(
+                    f'Cannot use the string "{element}" for a Card or CardBack.', True
+                )
+            else:
+                tools.feedback(f'Cannot use "{element}" for a Card or CardBack.', True)
 
     kwargs = margins(**kwargs)
     if not globals.deck:
         tools.feedback("The Deck() has not been defined or is incorrect.", True)
+    if not sequence:
+        tools.feedback("The Card() needs to have a valid sequence defined.", True)
     _cards = []
     # int - single card
     try:
@@ -1378,7 +1441,7 @@ def Card(sequence, *elements, **kwargs):
         card = globals.deck.fronts[_card - 1]  # cards internally number from ZERO
         if card:
             for element in elements:
-                # print(f'*** Card() {element=} {type(element)=}')
+                # print(f'$$$  Card() {element=} {type(element)=}')
                 if isinstance(element, TemplatingType):
                     add_members_to_card(element)
                 else:
@@ -1390,7 +1453,7 @@ def Card(sequence, *elements, **kwargs):
             tools.feedback(f'Cannot find card#{_card}. (Check "cards" setting in Deck)')
 
 
-def CardBack(sequence, *elements, **kwargs):
+def CardBack(sequence: object = None, *elements, **kwargs):
     """Add one or more elements to the back of a card or cards.
 
     NOTE: A CardBack receives its `draw()` command via Save()!
@@ -1404,6 +1467,9 @@ def CardBack(sequence, *elements, **kwargs):
     kwargs = margins(**kwargs)
     if not globals.deck:
         tools.feedback("The Deck() has not been defined or is incorrect.", True)
+    if not sequence:
+        tools.feedback("The Card() needs to have a valid sequence defined.", True)
+
     _cardbacks = []
     # int - single card
     try:
@@ -1450,7 +1516,7 @@ def CardBack(sequence, *elements, **kwargs):
         cardback = globals.deck.backs[_back - 1]  # cards internally number from ZERO
         if cardback:
             for element in elements:
-                # print(f'*** CardBack() {element=} {type(element)=}')
+                # print(f'$$$  CardBack() {element=} {type(element)=}')
                 if isinstance(element, TemplatingType):
                     add_members_to_back(element)
                 else:
@@ -1481,46 +1547,49 @@ def CounterBack(sequence, *elements, **kwargs):
 
 
 def Deck(**kwargs):
-    """Initialise a deck with all its settings, including source(s) of data.
+    """Initialise a Deck with all its settings, including source(s) of data.
 
-    Args:
+    Kwargs (optional):
 
-    - cards: the number of cards appearing in the deck; defaults to 9.
-      Note that other objects such as Data() and Matrix() can alter this value
-    - height: card height for a *rectangular* card; defaults to 8.89 cm
-    - width: card width for a *rectangular* card; defaults to 6.35 cm
-    - radius: radius for a card of type *hexagon* or *circle*; defaults to 2.54 cm
-    - frame: the default card frame is a *rectangle* (or square, if the
-      height and width match); but can be set to *hexagon* or *circle*
-    - rounding: size of rounding on each corner of a rectangular frame card
-    - grid_marks: if set to ``True``, will cause small marks to be drawn at
-      the border of the page that align with the edges of the card frames
-    - grid_length: the length of the grid mark; defaults to ``0.85`` cm
-      (about one-third of an inch)
     - bleed_fill: background color for the page (up to the margins);
       if no separate **fill** property is set, then this color will be used instead
+    - cards: the number of cards appearing in the deck; defaults to 9
+      Note that other objects such as Data() and Matrix() can alter this value
+    - card_style: a pre-existing card size used to set *width* and *height*
+      (if values for *width* and *height* are set, they will override this); can
+      be one of: ``poker``, ``bridge``, ``tarot`` or ``business``
     - cols: maximum number of card columns that should appear on a page
-    - rows: maximum number of card rows that should appear on a page
     - copy: the name of a column in the dataset defined by Data() that specifies
       how many copies of a card are needed
     - fill: color of the card's area; defaults to ``white``
+    - frame: the default card frame is a *rectangle* (or square, if the
+      height and width match); but can be set to *hexagon* or *circle*
+    - grid_marks: if set to ``True``, will cause small marks to be drawn at
+      the border of the page that align with the edges of the card frames
+    - grid_length: the length of the grid mark; defaults to ``0.85`` cm
     - grouping: number of cards to be drawn adjacent to each other
       before a blank space is added by the **spacing** property (note that
       **grouping** does not apply to  *hexagon* **frame** cards)
+      (about one-third of an inch)
     - grouping_col: number of cards to be drawn adjacent to each other
       in a horizontal direction before a blank space is added by the **spacing**
     - grouping_row: number of cards to be drawn adjacent to each other
       in a vertical direction before a blank space is added by the **spacing**
+    - height: card height for a *rectangular* card; defaults to 8.89 cm
     - mask: an expression which should evaluate to ``True`` or ``False``.
       This expression has the same kind of syntax as T() and it uses data available
       from the Deck object's Data(). If the expression result is ``True``
       then any matching cards will be masked i.e. ignored and not drawn
+    - radius: radius for a card of type *hexagon* or *circle*; defaults to 2.54 cm
+    - rounding: size of rounding on each corner of a rectangular frame card
+    - rows: maximum number of card rows that should appear on a page
     - spacing: size of blank space between each card or grouping in x- and y-direction
     - spacing_x: size of blank space between each card or grouping in a
       horizontal direction
     - spacing_y: size of blank space between each card or grouping in a
       vertical direction
     - stroke: color of the card's border; defaults to ``black``
+    - width: card width for a *rectangular* card; defaults to 6.35 cm
     """
     validate_globals()
 
@@ -1733,7 +1802,7 @@ def L(lookup: str, target: str, result: str, default: Any = "") -> LookupType:
 
 def T(string: str, data: dict = None, function: object = None):
     """Use string to create a Jinja2 Template."""
-    # print(f'*** TEMPLATE {string=} {data=}')
+    # print(f'$$$  TEMPLATE {string=} {data=}')
     environment = jinja2.Environment()
     try:
         template = environment.from_string(str(string))
@@ -1906,7 +1975,7 @@ def equilateraltriangle(row=None, col=None, **kwargs):
 
 def Hexagon(row=None, col=None, **kwargs):
     kwargs = margins(**kwargs)
-    # print(f'Will draw HexShape: {kwargs}')
+    # print(f'$$$ Will draw HexShape: {kwargs}')
     kwargs["row"] = row
     kwargs["col"] = col
     hexagon = HexShape(canvas=globals.canvas, **kwargs)
@@ -2288,7 +2357,7 @@ def Blueprint(**kwargs):
         # z_y = kwargs["units"] * globals.margin_bottom
         # corner_dist = geoms.length_of_line(Point(0, 0), Point(z_x, z_y))
         # corner_frac = corner_dist * 0.66 / kwargs["units"]
-        # # tools.feedback(f'*** {z_x=} {z_y=} {corner_dist=}')
+        # # tools.feedback(f'$$$  {z_x=} {z_y=} {corner_dist=}')
         # zero_pt = geoms.point_on_line(Point(0, 0), Point(z_x, z_y), corner_frac)
         # Text(
         #     x=zero_pt.x / kwargs["units"] - kwargs["side"] / 4.0,
@@ -2424,7 +2493,7 @@ def Hexagons(rows=1, cols=1, sides=None, **kwargs):
                         sequence=sequence,
                         label=hxgn.grid.label,
                     )
-                    # print(f'### locale {ccol=} {_row=} / {hxgn.grid.x=} {hxgn.grid.y=}')
+                    # print(f'$$$ locale {ccol=} {_row=} / {hxgn.grid.x=} {hxgn.grid.y=}')
                     locales.append(_locale)
                     sequence += 1
 
@@ -2497,7 +2566,7 @@ def Hexagons(rows=1, cols=1, sides=None, **kwargs):
                         sequence=sequence,
                         label=hxgn.grid.label,
                     )
-                    # print(f'### locale {col=} {row=} / {hxgn.grid.x=} {hxgn.grid.y=}')
+                    # print(f'$$$ locale {col=} {row=} / {hxgn.grid.x=} {hxgn.grid.y=}')
                     locales.append(_locale)
                     sequence += 1
 
@@ -3108,7 +3177,7 @@ def Track(track=None, **kwargs):
         else:
             shape_rotation = 0
         shape.set_unit_properties()
-        # tools.feedback(f'Track*** {shape._u}')
+        # tools.feedback(f'$$$ Track {shape._u}')
         locale = Locale(
             x=track_point.x,
             y=track_point.y,
@@ -3258,6 +3327,7 @@ def A8BA():
 
 
 # ---- inherited docs ====
+
 
 create.__doc__ = Create.__doc__
 save.__doc__ = Save.__doc__

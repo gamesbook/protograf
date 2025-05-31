@@ -83,6 +83,9 @@ python cards/cards_deck_07.py --no-png -d /tmp/demo
 python cards/cards_deck_08.py --no-png -d /tmp/demo
 python cards/cards_deck_09.py --no-png -d /tmp/demo
 python cards/cards_deck_10.py --no-png -d /tmp/demo
+python cards/cards_deck_11.py --no-png -d /tmp/demo
+python cards/cards_deck_12.py --no-png -d /tmp/demo
+python cards/cards_deck_13.py --no-png -d /tmp/demo
 # -- various
 echo -e "\nCreating various..."
 python various/clock.py --no-png -d /tmp/demo

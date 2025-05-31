@@ -11,7 +11,7 @@ Note:
 from protograf import *
 
 # create deck
-Create(filename='cards_standard.pdf', margin_bottom=1.9)
+Create(filename='cards_standard.pdf', margin=1, margin_bottom=1.9)
 
 # generate data for cards
 combos = Matrix(

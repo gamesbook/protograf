@@ -7,8 +7,7 @@ Created on: 12 August 2024
 from protograf import *
 
 # create deck
-Create(filename='cards_matrix_two.pdf',
-       margin_bottom=1.9)
+Create(filename='cards_matrix_two.pdf', margin=1, margin_bottom=1.9)
 
 # generate data for cards
 # Note: symbols are from https://www.w3schools.com/charsets/ref_utf_dingbats.asp

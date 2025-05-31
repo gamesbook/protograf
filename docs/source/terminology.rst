@@ -177,7 +177,7 @@ to set.
 -  **interval** - the distance between the centres of a series of shapes;
    typically in a repeated pattern of some type
 -  **margin** - used in ``Create`` command to set all margins for a
-   page; the default for any margin is 1.25cm or 12.5mm (half an inch)
+   page; the default for any margin is 0.635cm or 6.35mm (quarter of an inch)
 -  **margin_top** - used in ``Create`` command to set a top margin for a
    page |dash| this overrides the **margin** property, if any
 -  **margin_bottom** - used in ``Create`` command to set a bottom margin

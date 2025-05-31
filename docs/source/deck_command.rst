@@ -35,11 +35,14 @@ in the script.  It's primary purpose is to set the card size, and then
 calculate how many cards appear on a page.  It manages the "flow" of cards as
 they get drawn.
 
+
+.. _deck-command-primary:
+
 Primary Properties
 ------------------
 `↑ <table-of-contents-deck_>`_
 
-The following are key properties that will usually need to be set for a
+The following are key properties that will often need to be set for a
 ``Deck``:
 
 - **cards** - the number of cards appearing in the deck; it defaults
@@ -50,6 +53,9 @@ The following are key properties that will usually need to be set for a
 - **width** - the card width for a rectangular card;
   it defaults to 6.35 cm, or 2.5", i.e. the width of a Poker playing card
 
+
+.. _deck-command-secondary:
+
 Secondary Properties
 --------------------
 `↑ <table-of-contents-deck_>`_
@@ -58,6 +64,9 @@ The following are other properties that can also be set for a ``Deck``:
 
 - **bleed_fill** - set a background color for the page (up to the margins);
   if no separate **fill** property is set, then this color will be used instead
+- **card_style** - a pre-existing card size used to set *width* and *height*
+  (values for *width* and *height*  will override these); can be one of:
+  ``"poker"``, ``"bridge"``, ``"mini"``, ``"tarot"`` or ``"business"``
 - **cols** - the maximum number of card columns that should appear on a
   page
 - **copy** - the name of a column in the dataset defined by
@@ -75,6 +84,16 @@ The following are other properties that can also be set for a ``Deck``:
   **grouping_col** and/or **grouping_row** to set spacing specifically for the
   horizontal (columns) or vertical (rows) direction respectively. Note that
   **grouping** does not apply to  *hexagon* **frame** cards.
+- **gutter** - the value set for this determines the spacing between the fronts
+  and backs of cards being drawn on two halves of the same page; its value is
+  divided in half and each set of cards is drawn that distance away from the
+  centre line of the page
+- **gutter_stroke_width** - if set to a value, will cause a line of that
+  thickness  to be drawn down the centre of the page for which a gutter has
+  been set
+- **gutter_stroke** - if set, will cause a line of that color to be drawn
+  down the centre of the page for which a gutter has been set
+- **gutter_dotted** - sets the style of gutter line
 - **mask** - an expression which should evaluate to ``True`` or ``False``.
   This expression has the same kind of syntax as the
   :ref:`T(emplate) command <the-template-command>`
@@ -105,8 +124,8 @@ Property Examples
 `↑ <table-of-contents-deck_>`_
 
 - `Example 1. Defaults`_
-- `Example 2. Card bleed`_
-- `Example 3. Full bleed`_
+- `Example 2. Card Bleed`_
+- `Example 3. Full Bleed`_
 - `Example 4. Offset`_
 - `Example 5. Grid Marks`_
 - `Example 6. Card Spacing`_
@@ -115,6 +134,7 @@ Property Examples
 - `Example 9. Row Limit`_
 - `Example 10. Circular Frame`_
 - `Example 11. Card Grouping`_
+- `Example 12. CardBack and Gutter`_
 
 These examples are shown on a small A8-sized page, as the purpose is to
 illustrate how the Deck properties are used; normally cards would be
@@ -179,7 +199,7 @@ Example 1. Defaults
 ===== ======
 
 
-Example 2. Card bleed
+Example 2. Card Bleed
 ---------------------
 `^ <property-examples_>`_
 
@@ -207,7 +227,7 @@ Example 2. Card bleed
 ===== ======
 
 
-Example 3. Full bleed
+Example 3. Full Bleed
 ---------------------
 `^ <property-examples_>`_
 
@@ -571,5 +591,59 @@ Example 11. Card Grouping
       This example shows how cards in the same grouping |dash| whether in a row
       or column |dash| are kept together, and how the spacing is inserted
       between each *group* rather than between each *individual card*.
+
+===== ======
+
+
+Example 12. CardBack and Gutter
+-------------------------------
+`^ <property-examples_>`_
+
+.. |d13| image:: images/decks/cards_deck_13.png
+   :width: 330
+
+===== ======
+|d13| This example shows the definition of a deck for a set of small
+      cards.
+
+      The card size means that there would normally be 4 rectangular cards
+      on each A8 page; but the layout is changed to have a mix of normal
+      Cards and CardBacks. In this case, the card backs are created as a
+      small, green rectangle.
+
+      .. code:: python
+
+        Deck(
+            cards=4,
+            height=2.1,
+            width=3.2,
+            bleed_fill="lightsteelblue",
+            offset=0.15,
+            grid_marks=True,
+            grid_length=0.18,
+            gutter=0.4
+            )
+        # design card
+        Card(
+            '*',
+            rectangle(
+                x=0.2, y=0.2,
+                width=2.8, height=1.7,
+                stroke_width=1, rounding=0.2,
+                label='{{sequence}}\n{{id}}'),
+        )
+        # design card back
+        CardBack(
+            '*',
+            rectangle(
+                x=0.3, y=0.3,
+                width=2.5, height=1.5,
+                stroke_width=1, rounding=0.1,
+                fill="yellowgreen",
+                label='{{sequence}}*\n{{id}}'),
+        )
+
+      The ``gutter`` property for Deck() sets the space between the fronts
+      and the backs, which face each other across the page.
 
 ===== ======

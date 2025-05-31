@@ -6,7 +6,7 @@ Created on: 21 December 2024
 """
 from protograf import *
 
-Create(filename='cards_lotr.pdf', margin_bottom=1.9)
+Create(filename='cards_lotr.pdf', margin=1, margin_bottom=1.9)
 
 # deck data
 lotr = [

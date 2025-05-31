@@ -7,14 +7,14 @@ Created on: 12 August 2024
 from protograf import *
 
 # create deck
-Create(filename='cards_matrix_one.pdf', margin_bottom=1.9)
+Create(filename='cards_matrix_one.pdf', margin=1, margin_bottom=1.9)
 
 # generate data for cards
 # Note: symbols are from https://www.w3schools.com/charsets/ref_utf_dingbats.asp
 combos = Matrix(
     labels=['SUIT', 'VALUE', 'IMAGE'],
     data=[
-        # "tomato", "chartreuse", aqua, gold, hotpink
+        # tomato, chartreuse, aqua, gold, hotpink
         ['#FF6347', '#00FF00','#00FFFF', '#FFD700', '#FF69B4'],
         ['5', '3', '1'],
         # plane, star, snowflake

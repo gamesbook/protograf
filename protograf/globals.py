@@ -50,7 +50,7 @@ def initialize():
     dataset = None  # will become a dictionary of data loaded from a file
     dataset_type = None  # set when Data is loaded; enum DatasetType
     image_list = []  # filenames stored when Data is loaded from image dir
-    margin = 1
+    margin = 0.635  # 1/4 inch
     margin_left = margin
     margin_top = margin
     margin_bottom = margin

@@ -163,7 +163,7 @@ class BaseCanvas:
         self.page_width = self.paper[0] / self.units  # user-units e.g. cm
         self.page_height = self.paper[1] / self.units  # user-units e.g. cm
         # print(f"### {self.page_height=} {self.page_width=}")
-        self.margin = self.defaults.get("margin", 1)
+        self.margin = self.defaults.get("margin", 0.635)  # 1/4 inch
         self.margin_top = self.defaults.get("margin_top", self.margin)
         self.margin_bottom = self.defaults.get("margin_bottom", self.margin)
         self.margin_left = self.defaults.get("margin_left", self.margin)

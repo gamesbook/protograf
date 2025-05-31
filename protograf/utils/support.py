@@ -557,7 +557,8 @@ def pdf_export(
 
 
 def pdf_cards_to_png(
-    filename: str,
+    source: str,
+    output: str,
     fformat: str = "png",
     dpi: int = 300,
     directory: str = None,
@@ -567,8 +568,9 @@ def pdf_cards_to_png(
     """Extract individual cards from PDF as PNG image(s).
 
     Args:
-
-    - filename
+    - source
+        the input file name (default prefix is name of script)
+    - output
         the output file name (default prefix is name of script)
     - fformat
         the type of file create (GIF is created from PNGs which get deleted)
@@ -588,17 +590,17 @@ def pdf_cards_to_png(
     - https://pymupdf.io/
     - https://pypi.org/project/imageio/
     """
-    feedback(f'Saving card(s) from "{filename}" as image file(s)...', False)
-    _filename = os.path.basename(filename)
+    feedback(f"Saving card(s) as image file(s)...", False)
+    _filename = os.path.basename(output)
     basename = os.path.splitext(_filename)[0]
-    dirname = directory or os.path.dirname(filename)
+    dirname = directory or os.path.dirname(output)
     # validate directory
     if not os.path.exists(dirname):
         feedback(
             f'Cannot find the directory "{dirname}" - please create this first.', True
         )
     try:
-        doc = pymupdf.open(filename)
+        doc = pymupdf.open(source)
         page_num = 0
         for page in doc:
             outlines = card_frames.get(page_num, [])
@@ -606,7 +608,7 @@ def pdf_cards_to_png(
                 iname = os.path.join(
                     dirname, f"{basename}-{page_num + 1}-{key + 1}.png"
                 )
-                # print(f"~~~ {page_num=} {outline.tl=} {outline.br=}")
+                # print(f"~~~ {page_num=} {iname=} {outline.tl=} {outline.br=} {dpi=}")
                 # https://pymupdf.readthedocs.io/en/latest/rect.html
                 rect = pymupdf.Rect(
                     outline.tl.x,  # top-left x0
@@ -618,7 +620,7 @@ def pdf_cards_to_png(
                 pix.save(iname)  # store image as a PNG
             page_num += 1
     except Exception as err:
-        feedback(f"Unable to extract card images for {filename} - {err}!")
+        feedback(f"Unable to extract card images for {source} - {err}!")
 
 
 def color_set(svg_only: bool = False) -> list:
