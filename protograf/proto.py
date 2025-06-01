@@ -423,23 +423,29 @@ class DeckOfCards:
         self.counters = kwargs.get("counters", default_items)
         # ---- set card size
         self.cards = kwargs.get("cards", self.counters)  # default total number of cards
-        card_style = kwargs.get("card_style", "")
+        card_size = kwargs.get("card_size", "")
         the_height, the_width, size = default_height, default_width, None
-        match str(card_style).lower():
-            case "poker" | "p":
-                size = STANDARD_CARD_SIZES["poker"]["pt"]
+        match str(card_size).lower():
             case "bridge" | "b":
                 size = STANDARD_CARD_SIZES["bridge"]["pt"]
-            case "mini" | "m":
-                size = STANDARD_CARD_SIZES["mini"]["pt"]
-            case "tarot" | "t":
-                size = STANDARD_CARD_SIZES["tarot"]["pt"]
             case "business" | "u":
                 size = STANDARD_CARD_SIZES["business"]["pt"]
+            case "mini" | "m":
+                size = STANDARD_CARD_SIZES["mini"]["pt"]
+            case "miniamerican" | "ma":
+                size = STANDARD_CARD_SIZES["miniamerican"]["pt"]
+            case "minieuropean" | "me":
+                size = STANDARD_CARD_SIZES["minieuropean"]["pt"]
+            case "poker" | "p" | "mtg":
+                size = STANDARD_CARD_SIZES["poker"]["pt"]
+            case "skat" | "s":
+                size = STANDARD_CARD_SIZES["skat"]["pt"]
+            case "tarot" | "t":
+                size = STANDARD_CARD_SIZES["tarot"]["pt"]
             case "":
                 pass
             case _:
-                tools.feedback(f'Card style "{card_style}" is unknown.', True)
+                tools.feedback(f'Card style "{card_size}" is unknown.', True)
         if size:
             the_height, the_width = size[1] / globals.units, size[0] / globals.units
         self.height = kwargs.get("height", the_height)  # OVERWRITE
@@ -1555,7 +1561,7 @@ def Deck(**kwargs):
       if no separate **fill** property is set, then this color will be used instead
     - cards: the number of cards appearing in the deck; defaults to 9
       Note that other objects such as Data() and Matrix() can alter this value
-    - card_style: a pre-existing card size used to set *width* and *height*
+    - card_size: a pre-existing card size used to set *width* and *height*
       (if values for *width* and *height* are set, they will override this); can
       be one of: ``poker``, ``bridge``, ``tarot`` or ``business``
     - cols: maximum number of card columns that should appear on a page

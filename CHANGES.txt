@@ -12,6 +12,7 @@ Changes
 - Added CardBack shape and support alternate front/back card pages
 - Support card front and back on same page (the "gutter")
 - Changed property names used for access to Google Sheets
+- Support named card sizes
 - Changed default card size and page margins
 
 2025-05-23 (0.2.2)

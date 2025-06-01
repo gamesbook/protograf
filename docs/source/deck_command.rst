@@ -64,9 +64,10 @@ The following are other properties that can also be set for a ``Deck``:
 
 - **bleed_fill** - set a background color for the page (up to the margins);
   if no separate **fill** property is set, then this color will be used instead
-- **card_style** - a pre-existing card size used to set *width* and *height*
+- **card_size** - a pre-existing card size used to set *width* and *height*
   (values for *width* and *height*  will override these); can be one of:
-  ``"poker"``, ``"bridge"``, ``"mini"``, ``"tarot"`` or ``"business"``
+  ``"poker"``, ``"bridge"``, ``"mini"``, ``"miniamerican"``, ``"minieuropean"``,
+  ``"skat"``, ``"tarot"`` or ``"business"``
 - **cols** - the maximum number of card columns that should appear on a
   page
 - **copy** - the name of a column in the dataset defined by
