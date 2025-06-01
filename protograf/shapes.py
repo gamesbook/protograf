@@ -3318,6 +3318,10 @@ class RectangleShape(BaseShape):
             radius = rounding / min(self._u.width, self._u.height)
         if self.rounded:
             radius = self.rounded_radius  # hard-coded OR from defaults
+        if radius and radius > 0.5:
+            tools.feedback(
+                f"The rounding radius cannot exceed 50% of the smallest side.", True
+            )
 
         # ---- draw rectangle
         # tools.feedback(f'*** RECT {self.col=} {self.row=} {x=} {y=} {radius=}')

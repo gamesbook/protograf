@@ -117,6 +117,10 @@ from protograf import globals
 log = logging.getLogger(__name__)
 globals_set = False
 
+# user constants
+YES = True
+NO = False
+
 
 def validate_globals():
     """Check that Create has been called to set initialise globals"""
@@ -1558,15 +1562,16 @@ def Deck(**kwargs):
     Kwargs (optional):
 
     - bleed_fill: background color for the page (up to the margins);
-      if no separate **fill** property is set, then this color will be used instead
+      if no separate **fill** property is set, then this color is used instead
     - cards: the number of cards appearing in the deck; defaults to 9
       Note that other objects such as Data() and Matrix() can alter this value
     - card_size: a pre-existing card size used to set *width* and *height*
-      (if values for *width* and *height* are set, they will override this); can
-      be one of: ``poker``, ``bridge``, ``tarot`` or ``business``
+      (if values for *width* and *height* are set, they will override this);
+      can be one of: ``poker``, ``bridge``, ``tarot``, ``business``, ``mini``,
+      ``skat``, ``mini``, ``minieuropean``, ``miniamerican``
     - cols: maximum number of card columns that should appear on a page
-    - copy: the name of a column in the dataset defined by Data() that specifies
-      how many copies of a card are needed
+    - copy: the name of a column in the dataset defined by Data() that
+      specifies how many copies of a card are needed
     - fill: color of the card's area; defaults to ``white``
     - frame: the default card frame is a *rectangle* (or square, if the
       height and width match); but can be set to *hexagon* or *circle*
