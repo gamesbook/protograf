@@ -101,12 +101,9 @@ GlobalDocument = namedtuple(
         "document",
         "doc_page",
         "canvas",
-        "margin",
-        "margin_left",
-        "margin_top",
-        "margin_bottom",
-        "margin_right",
+        "margins",
         "page",
+        "page_fill",
         "page_width",
         "page_height",
         "page_count",
@@ -138,6 +135,18 @@ OffsetProperties = namedtuple(
         "off_y",
         "delta_x",
         "delta_y",
+    ],
+)
+
+PageMargins = namedtuple(
+    "PageMargins",
+    [
+        "margin",  # default
+        "left",
+        "right",
+        "bottom",
+        "top",
+        "debug"  # show the margin?
     ],
 )
 

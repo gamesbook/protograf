@@ -31,6 +31,7 @@ from pymupdf.utils import getColor, getColorList
 
 # local
 from protograf.utils import geoms, tools, support
+from protograf.utils.constants import DEBUG_COLOR, DEFAULT_FONT
 from protograf.utils.fonts import builtin_font, FontInterface
 from protograf.utils.structures import (
     Bounds,
@@ -49,8 +50,6 @@ log = logging.getLogger(__name__)
 BGG_IMAGES = "cf.geekdo-images.com"
 COLOR_NAMES = getColorList()
 DEBUG = False
-DEBUG_COLOR = "#B0C4DE"
-DEFAULT_FONT = "Helvetica"
 WIDTH = 0.1
 
 

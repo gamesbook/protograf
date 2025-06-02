@@ -14,6 +14,7 @@ Changes
 - Changed property names used for access to Google Sheets
 - Support named card sizes
 - Changed default card size and page margins
+- Support "debug" to show dotted margin
 
 2025-05-23 (0.2.2)
 ------------------

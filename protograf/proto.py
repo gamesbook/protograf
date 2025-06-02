@@ -72,12 +72,14 @@ from ._version import __version__
 
 from protograf.utils import geoms, tools, support
 from protograf.utils.constants import (
+    DEBUG_COLOR,
     DEFAULT_CARD_WIDTH,
     DEFAULT_CARD_HEIGHT,
     DEFAULT_CARD_COUNT,
     DEFAULT_CARD_RADIUS,
     DEFAULT_COUNTER_SIZE,
     DEFAULT_DPI,
+    DEFAULT_MARGIN_SIZE,
     GRID_SHAPES_WITH_CENTRE,
     GRID_SHAPES_NO_CENTRE,
     SHAPES_FOR_TRACK,
@@ -100,6 +102,7 @@ from protograf.utils.structures import (
     ExportFormat,
     LookupType,
     Locale,
+    PageMargins,
     Point,
     Place,
     Ray,
@@ -200,16 +203,23 @@ class CardShape(BaseShape):
 
         Pass on `deck_data` to other commands, as needed, for them to draw Shapes
         """
+        # tools.feedback(f'$$$ draw_card {cnv=} KW=> {kwargs}')
+        is_card_back = kwargs.get("card_back", False)
         image = kwargs.get("image", None)
         margin_shift_x = kwargs.get("margin_shift_x", 0)  # cards "at the back"
         margin_shift_y = kwargs.get("margin_shift_y", 0)  # not set/used?
-        # tools.feedback(f'$$$ draw_card {cnv=} KW=> {kwargs}')
+
+        # FIXME - get correct calculation!!!
+        # ---- backs
+        # if is_card_back:
+        #     margin_shift_x = 2 * (self.margin_left + self.margin_right) - 0.5 * margin_shift_x
 
         # ---- draw outline
         label = "ID:%s" % cid if self.show_id else ""
         shape_kwargs = copy(kwargs)
         shape_kwargs["is_cards"] = True
-        shape_kwargs["fill"] = kwargs.get("fill", kwargs.get("bleed_fill", None))
+        if not is_card_back:
+            shape_kwargs["fill"] = kwargs.get("fill", kwargs.get("bleed_fill", None))
         shape_kwargs.pop("image_list", None)  # do NOT draw linked image
         shape_kwargs.pop("image", None)  # do NOT draw get_outline(linked image
         # tools.feedback(f'$$$ draw_card {cid=} {row=} {col=} \nSKW=> {shape_kwargs}')
@@ -311,7 +321,7 @@ class CardShape(BaseShape):
                 )
 
         # ---- track/update frame and store card fronts
-        if not kwargs.get("card_back", False):
+        if not is_card_back:
             mx = self.unit(_dx or 0) + self._o.delta_x
             my = self.unit(_dy or 0) + self._o.delta_y
             # print(f"$$$ {mx=} {my=} {frame_width=} {frame_height=}")
@@ -709,7 +719,7 @@ class DeckOfCards:
 
                     for i in range(state.copies_to_do, copies):
                         if not front:
-                            kwargs["card_back"] = True  # use to de/activate grid marks
+                            kwargs["card_back"] = True  # de/activate grid marks & shift
                         else:
                             kwargs["card_back"] = False
                         card.draw_card(
@@ -819,24 +829,31 @@ class DeckOfCards:
             globals.base = BaseCanvas(
                 globals.document, paper=globals.paper, defaults=None, kwargs=kwargs
             )
-            globals.margin_top = globals.margin_top - gutter / 2.0
+            globals.margins = PageMargins(
+                margin=prime_globals.margins.margin,
+                left=prime_globals.margins.left,
+                right=prime_globals.margins.right,
+                top=prime_globals.margins.top - gutter / 2.0,
+                bottom=prime_globals.margins.bottom,
+                debug=prime_globals.margins.debug
+            )
             cnv = globals.doc_page.new_shape()  # pymupdf Shape
             globals.canvas = cnv
 
         # ---- calculate rows/cols based on page size and margins AND card size
         margin_left = (
-            globals.margin_left if globals.margin_left is not None else globals.margin
+            globals.margins.left if globals.margins.left is not None else globals.margins.margin
         )
         margin_bottom = (
-            globals.margin_bottom
-            if globals.margin_bottom is not None
-            else globals.margin
+            globals.margins.bottom
+            if globals.margins.bottom is not None
+            else globals.margins.margin
         )
         margin_right = (
-            globals.margin_right if globals.margin_right is not None else globals.margin
+            globals.margins.right if globals.margins.right is not None else globals.margins.margin
         )
         margin_top = (
-            globals.margin_top if globals.margin_top is not None else globals.margin
+            globals.margins.top if globals.margins.top is not None else globals.margins.margin
         )
         page_across = globals.page_width - margin_right - margin_left  # user units
         page_down = globals.page_height - margin_top - margin_bottom  # user units
@@ -913,7 +930,7 @@ class DeckOfCards:
             cnv, state_front = draw_the_cards(cnv, state_front, page_number, front=True)
             if self.show_backs:
                 page_number += 1  # for back-to-back
-                shift_x = effective_right - globals.margin_left
+                shift_x = effective_right - globals.margins.left
                 cnv, state_back = draw_the_cards(
                     cnv, state_back, page_number, front=False, shift_x=shift_x
                 )
@@ -983,9 +1000,28 @@ class DeckOfCards:
 
 # ---- page-related ====
 
+def page_setup():
+    """Set the page color and (optionally) show a dotted margin line."""
+    # ---- paper color
+    _fill = get_color(globals.page_fill)
+    if _fill != get_color("white"):
+        globals.doc_page.draw_rect(
+            (0, 0, globals.page[0], globals.page[1]), fill=_fill, color=None)
+    # ---- debug margins
+    if globals.margins.debug:
+        stroke = get_color(DEBUG_COLOR)
+        globals.doc_page.draw_rect(
+            (globals.margins.left * globals.units,
+             globals.margins.top * globals.units,
+             globals.page[0] - (globals.margins.right * globals.units),
+             globals.page[1] - (globals.margins.bottom * globals.units)
+            ),
+            color=stroke,
+            dashes="[1 2] 0")
+
 
 def Create(**kwargs):
-    """Initialisation of globals, page, units and canvas.
+    """Initialisation of globals, page, margins, units and canvas.
 
     Kwargs:
 
@@ -995,6 +1031,7 @@ def Create(**kwargs):
       for example, ``"A3-l"`` is a landscape A3 paper size; default is ``A4``
     - **filename** - name of the output PDF file; by default this is the prefix
       name of the script, with a ``.pdf`` extension
+    - **fill** - the page color; default is ``white``
     - **units** - can be ``cm`` (centimetres), ``in`` (inches), ``mm``
       (millimetres), or ``points``; default is ``cm``
     - **margin** - set the value for *all* margins using the defined *units*;
@@ -1003,6 +1040,7 @@ def Create(**kwargs):
     - **margin_bottom** - set the bottom margin using the defined *units*
     - **margin_left** - set the left margin using the defined *units*
     - **margin_right** - set the the right margin using the defined *units*
+    - **margin_debug** - if True, show the margin as a dotted blue line
 
     Kwargs for to override the default values of any of the various properties
     used for drawing Shapes can be set here as well, for example: ``font_size=18``
@@ -1018,11 +1056,15 @@ def Create(**kwargs):
     globals.initialize()
     globals_set = True
     # ---- margins
-    globals.margin = kwargs.get("margin", globals.margin)
-    globals.margin_left = kwargs.get("margin_left", globals.margin)
-    globals.margin_top = kwargs.get("margin_top", globals.margin)
-    globals.margin_bottom = kwargs.get("margin_bottom", globals.margin)
-    globals.margin_right = kwargs.get("margin_right", globals.margin)
+    the_margin = kwargs.get("margin", DEFAULT_MARGIN_SIZE)
+    globals.margins = PageMargins(
+        margin=the_margin,
+        left=kwargs.get("margin_left", the_margin),
+        top=kwargs.get("margin_top", the_margin),
+        bottom=kwargs.get("margin_bottom", the_margin),
+        right=kwargs.get("margin_right", the_margin),
+        debug=kwargs.get("margin_debug", False)
+    )
     # ---- cards
     _cards = kwargs.get("cards", 0)
     landscape = kwargs.get("landscape", False)
@@ -1031,11 +1073,12 @@ def Create(**kwargs):
     # ---- units
     _units = kwargs.get("units", globals.units)
     globals.units = support.to_units(_units)
-    # ---- paper, page, page sizes
+    # ---- paper, page, page sizes, page color
     globals.paper = kwargs.get("paper", globals.paper)
     globals.page = pymupdf.paper_size(globals.paper)  # (width, height) in points
     globals.page_width = globals.page[0] / globals.units  # width in user units
     globals.page_height = globals.page[1] / globals.units  # height in user units
+    globals.fill = get_color(kwargs.get("fill", "white"))
     # ---- fonts
     base_fonts()
     globals.font_size = kwargs.get("font_size", 12)
@@ -1069,6 +1112,9 @@ def Create(**kwargs):
             if _cards:
                 basename = "cards"
         _filename = f"{basename}.pdf"
+    # ---- validate directory & set filename
+    if globals.pargs.directory and not os.path.exists(globals.pargs.directory):
+        tools.feedback(f'Unable to find directory "{globals.pargs.directory}" for output.', True)
     globals.filename = os.path.join(globals.pargs.directory, _filename)
     # ---- pymupdf doc, page, shape/canvas
     globals.document = pymupdf.open()  # pymupdf Document
@@ -1080,10 +1126,7 @@ def Create(**kwargs):
     globals.base = BaseCanvas(
         globals.document, paper=globals.paper, defaults=defaults, kwargs=kwargs
     )
-    # ---- paper color
-    if kwargs.get("page_fill"):
-        fill = get_color(kwargs.get("page_fill", "white"))
-        globals.canvas.draw_rect((0, 0, globals.page[0], globals.page[1]), fill=fill)
+    page_setup()
     # ---- cards
     if _cards:
         Deck(canvas=globals.canvas, sequence=range(1, _cards + 1), **kwargs)  # deck var
@@ -1126,6 +1169,7 @@ def PageBreak(**kwargs):
         width=globals.page[0], height=globals.page[1]
     )  # pymupdf Page
     globals.canvas = globals.doc_page.new_shape()  # pymupdf Shape/"canvas" for new Page
+    page_setup()
 
     kwargs = margins(**kwargs)
     if kwargs.get("footer", globals.footer_draw):
@@ -1181,6 +1225,10 @@ def Save(**kwargs):
     directory = kwargs.get("directory", None)
     cards = kwargs.get("cards", False)  # export individual cards as PNG
     output = kwargs.get("output", None)  # export document into this format e.g. SVG
+
+    # ---- validate directory
+    if directory and not os.path.exists(directory):
+        tools.feedback(f'Unable to find directory "{directory}" for Save().', True)
 
     # ---- draw Deck (and export cards)
     if globals.deck and len(globals.deck.fronts) >= 1:
@@ -1244,19 +1292,11 @@ def margins(**kwargs):
     """Add margins to a set of kwargs, if not present."""
     validate_globals()
 
-    kwargs["margin"] = kwargs.get("margin", globals.margin)
-    kwargs["margin_left"] = kwargs.get(
-        "margin_left", globals.margin_left or globals.margin
-    )
-    kwargs["margin_top"] = kwargs.get(
-        "margin_top", globals.margin_top or globals.margin
-    )
-    kwargs["margin_bottom"] = kwargs.get(
-        "margin_bottom", globals.margin_bottom or globals.margin
-    )
-    kwargs["margin_right"] = kwargs.get(
-        "margin_right", globals.margin_right or globals.margin
-    )
+    kwargs["margin"] = kwargs.get("margin", globals.margins.margin)
+    kwargs["margin_left"] = kwargs.get("margin_left", globals.margins.left)
+    kwargs["margin_top"] = kwargs.get("margin_top", globals.margins.top)
+    kwargs["margin_bottom"] = kwargs.get("margin_bottom", globals.margins.bottom)
+    kwargs["margin_right"] = kwargs.get("margin_right", globals.margins.right)
     return kwargs
 
 
@@ -2269,8 +2309,8 @@ def Blueprint(**kwargs):
     number_edges = kwargs.get("edges", "S,W")
     kwargs["x"] = kwargs.get("x", 0)
     kwargs["y"] = kwargs.get("y", 0)
-    m_x = kwargs["units"] * (globals.margin_left + globals.margin_right)
-    m_y = kwargs["units"] * (globals.margin_top + globals.margin_bottom)
+    m_x = kwargs["units"] * (globals.margins.left + globals.margins.right)
+    m_y = kwargs["units"] * (globals.margins.top + globals.margins.bottom)
     _cols = (globals.page[0] - m_x) / (kwargs["units"] * float(kwargs["side"]))
     _rows = (globals.page[1] - m_y) / (kwargs["units"] * float(kwargs["side"]))
     rows = int(_rows)
@@ -2350,7 +2390,7 @@ def Blueprint(**kwargs):
         if "e" in edges:
             for y in range(1, kwargs["rows"] + 1):
                 Text(
-                    x=kwargs["x"] + kwargs["cols"] * side + globals.margin_left / 2.0,
+                    x=kwargs["x"] + kwargs["cols"] * side + globals.margins.left / 2.0,
                     y=y * side + offset,
                     text=set_format(y, side),
                     common=_common,
@@ -2358,14 +2398,14 @@ def Blueprint(**kwargs):
         if "w" in edges:
             for y in range(1, kwargs["rows"] + 1):
                 Text(
-                    x=kwargs["x"] - globals.margin_left / 2.0,
+                    x=kwargs["x"] - globals.margins.left / 2.0,
                     y=y * side + offset,
                     text=set_format(y, side),
                     common=_common,
                 )
         # ---- draw "zero" number
-        # z_x = kwargs["units"] * globals.margin_left
-        # z_y = kwargs["units"] * globals.margin_bottom
+        # z_x = kwargs["units"] * globals.margins.left
+        # z_y = kwargs["units"] * globals.margins.bottom
         # corner_dist = geoms.length_of_line(Point(0, 0), Point(z_x, z_y))
         # corner_frac = corner_dist * 0.66 / kwargs["units"]
         # # tools.feedback(f'$$$  {z_x=} {z_y=} {corner_dist=}')
@@ -2801,8 +2841,8 @@ def LinkLine(grid: list, locations: Union[list, str], **kwargs):
 
             _line = line(x=x, y=y, x1=x1, y1=y1, **kwargs)
             # tools.feedback(f"$$$ {x=}, {y=}, {x1=}, {y1=}")
-            delta_x = globals.margin_left
-            delta_y = globals.margin_top
+            delta_x = globals.margins.left
+            delta_y = globals.margins.top
             # tools.feedback(f"$$$ {delta_x=}, {delta_y=}")
             _line.draw(
                 off_x=-delta_x,

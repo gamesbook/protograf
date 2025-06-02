@@ -100,6 +100,7 @@ To customise the command, set its properties as follows:
   for example, ``"A3-l"`` is a landscape A3 paper size
 - **filename** - name of the output PDF file; by default this is the prefix
   name of the script, with a ``.pdf`` extension
+- **fill** - set the color for the page; the default page color is ``white``
 - **units** - these can be ``cm`` (centimetres), ``in`` (inches), ``mm``
   (millimetres), or ``points``; the default is ``cm``
 - **margin** - set the value for *all* margins using the defined *units*
@@ -107,6 +108,7 @@ To customise the command, set its properties as follows:
 - **margin_bottom** - set the bottom margin
 - **margin_left** - set the left margin
 - **margin_right** - set the the right margin
+- **margin_debug** - set to ``True`` to show the margin as a dotted blue line
 
 
 Example 1. Create Options
