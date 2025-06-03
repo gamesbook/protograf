@@ -22,13 +22,14 @@ def initialize():
     global margins
     global footer
     global footer_draw
-    global page_count
     global pargs
     global paper
     global page  #  (width, height) in points
     global page_width  # user units
     global page_height  # user units
     global page_fill
+    global page_count
+    global page_grid
     global font_size
     global units
 
@@ -52,10 +53,11 @@ def initialize():
     footer_draw = False
     page_count = 0
     pargs = None
-    paper = "A4"
-    page_fill = "white"  # page color
-    font_size = 12
     units = unit.cm
+    paper = "A4"
     page = paper_size(paper)  # (width, height) in points
     page_width = page[0] / units  # width in user units
     page_height = page[1] / units  # height in user units
+    page_fill = "white"  # page color
+    page_grid = False
+    font_size = 12

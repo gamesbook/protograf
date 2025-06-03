@@ -204,7 +204,8 @@ class CardShape(BaseShape):
 
         Pass on `deck_data` to other commands, as needed, for them to draw Shapes
         """
-        # tools.feedback(f'$$$ draw_card {cnv=} KW=> {kwargs}')
+        # tools.feedback(f'$$$ draw_card  {cid=} {cnv=} {kwargs["card_back"]=}')
+        # tools.feedback(f'$$$ draw_card  {cid=} KW=> {kwargs}')
         is_card_back = kwargs.get("card_back", False)
         image = kwargs.get("image", None)
         margin_shift_x = kwargs.get("margin_shift_x", 0)  # cards "at the back"
@@ -844,6 +845,7 @@ class DeckOfCards:
             )
             cnv = globals.doc_page.new_shape()  # pymupdf Shape
             globals.canvas = cnv
+            page_setup()  # draw margin/grid
 
         # ---- calculate rows/cols based on page size and margins AND card size
         margin_left = (
@@ -983,7 +985,7 @@ class DeckOfCards:
                 globals.doc_page.show_pdf_page(
                     r1, src, page_number + 1, rotate=r1_rotate
                 )  # backs
-                # draw gutter line
+                # ---- draw gutter line
                 if self.gutter is not None:
                     pt1 = (globals.page[0] / 2.0, 0)
                     pt2 = (globals.page[0] / 2.0, globals.page[1])
@@ -997,8 +999,8 @@ class DeckOfCards:
                 PageBreak()
             # ---- delete extra blank page at the end
             globals.document.delete_page(globals.page_count)
-            # delete gutter document
-            os.remove(gutter_filename)
+            # ---- delete gutter PDF document
+            # os.remove(gutter_filename)
         else:
             pass
             # moved to Save() command; otherwise output file not available
@@ -1029,6 +1031,7 @@ def page_setup():
         )
     # ---- debug margins
     if globals.margins.debug:
+        # print(f'{globals.margins.left=} {globals.margins.right=}')
         stroke = tools.get_color(DEBUG_COLOR)
         globals.doc_page.draw_rect(
             (
@@ -1040,6 +1043,25 @@ def page_setup():
             color=stroke,
             dashes="[1 2] 0",
         )
+    # ---- page grid
+    if globals.page_grid:
+        stroke = tools.get_color(DEBUG_COLOR)
+        cols = int(globals.page[0] // globals.units)
+        rows = int(globals.page[1] // globals.units)
+        for col in range(1, cols + 1):
+            globals.doc_page.draw_line(
+                (col * globals.units, 0),
+                (col * globals.units, globals.page[1]),
+                color=stroke,
+                width=0.1,
+            )
+        for row in range(1, rows + 1):
+            globals.doc_page.draw_line(
+                (0, row * globals.units),
+                (globals.page[0], row * globals.units),
+                color=stroke,
+                width=0.1,
+            )
 
 
 def Create(**kwargs):
@@ -1050,6 +1072,8 @@ def Create(**kwargs):
     - **paper** - a paper size from either of the ISO series - A0 down to A8;
       or B6 down to B0 - or a USA type - letter, legal or elevenSeventeen; to
       change the page orientation to **landscape** append ``-l`` to the name.
+    - **paper_width** - set specific paper width using the defined *units*
+    - **paper_height** - set specific paper height using the defined *units*
       For example, ``"A3-l"`` is a landscape A3 paper size; default is ``A4``
     - **filename** - name of the output PDF file; by default this is the prefix
       name of the script, with a ``.pdf`` extension
@@ -1063,6 +1087,7 @@ def Create(**kwargs):
     - **margin_left** - set the left margin using the defined *units*
     - **margin_right** - set the the right margin using the defined *units*
     - **margin_debug** - if True, show the margin as a dotted blue line
+    - **page_grid* - if True, draw a grid covering the paper (one unit square)
 
     Kwargs to override the default values of any of the various properties
     used for drawing Shapes can be set here as well, for example:
@@ -1098,9 +1123,21 @@ def Create(**kwargs):
     # ---- paper, page, page sizes, page color
     globals.paper = kwargs.get("paper", globals.paper)
     globals.page = pymupdf.paper_size(globals.paper)  # (width, height) in points
+    # user overrides
+    if kwargs.get("paper_width") or kwargs.get("paper_height"):
+        _page_width = tools.as_float(kwargs.get("paper_width", 0), "paper_width")
+        _page_height = tools.as_float(kwargs.get("paper_height", 0), "paper_height")
+        _page_width_pt = (
+            _page_width * globals.units if _page_width > 0 else globals.paper[0]
+        )
+        _page_height_pt = (
+            _page_width * globals.units if _page_height > 0 else globals.paper[1]
+        )
+        globals.page = (_page_width_pt, _page_height_pt)
     globals.page_width = globals.page[0] / globals.units  # width in user units
     globals.page_height = globals.page[1] / globals.units  # height in user units
     globals.fill = tools.get_color(kwargs.get("fill", "white"))
+    globals.page_grid = tools.as_bool(kwargs.get("page_grid", False), "page_grid")
     # ---- fonts
     base_fonts()
     globals.font_size = kwargs.get("font_size", 12)

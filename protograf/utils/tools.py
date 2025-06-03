@@ -1159,6 +1159,7 @@ def save_globals() -> GlobalDocument:
         page_width=globals.page_width,
         page_height=globals.page_height,
         page_count=globals.page_count,
+        page_grid=globals.page_grid,
     )
 
 
@@ -1177,6 +1178,7 @@ def restore_globals(doc: GlobalDocument):
     globals.page_width = doc.page_width
     globals.page_height = doc.page_height
     globals.page_count = doc.page_count
+    globals.page_grid = doc.page_grid
 
 
 def get_color(name: str = None, is_rgb: bool = True) -> tuple:

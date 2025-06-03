@@ -1,4 +1,4 @@
-:==============
+:=============
 Script Anatomy
 ==============
 
@@ -98,6 +98,8 @@ To customise the command, set its properties as follows:
   or B6 down to B0 - or a USA type - letter, legal or elevenSeventeen; to change
   the page orientation to **landscape** simply append ``-l`` to the name |dash|
   for example, ``"A3-l"`` is a landscape A3 paper size
+- **paper_width** - set a specific paper width using the defined *units*
+- **paper_height** - set a specific paper height using the defined *units*
 - **filename** - name of the output PDF file; by default this is the prefix
   name of the script, with a ``.pdf`` extension
 - **fill** - set the color for the page; the default page color is ``white``
@@ -109,6 +111,9 @@ To customise the command, set its properties as follows:
 - **margin_left** - set the left margin
 - **margin_right** - set the the right margin
 - **margin_debug** - set to ``True`` to show the margin as a dotted blue line
+- **page_grid** - if set to ``True``, will show a set of thin horizontal and
+  vertical lines, set 1 "unit" apart |dash| where the distance depends on the
+  current *units*
 
 
 Example 1. Create Options

@@ -107,6 +107,7 @@ GlobalDocument = namedtuple(
         "page_width",
         "page_height",
         "page_count",
+        "page_grid",
     ],
 )
 

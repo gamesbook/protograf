@@ -69,7 +69,7 @@ Text(common=header_font, x=5, y=26,
 Stadium(x=1.503, y=25.003, height=3.003, width=3.003, fill="white", edges="n",
         stroke="#CC0033", stroke_width=5, dashed=[0.3,0.05],)
 Circle(cx=3, cy=25, stroke="sienna", stroke_width=5, fill="skyblue", radius=1.3,
-       radii=[210,270,330], radii_stroke="sienna", radii_stroke_width=3)
+       radii=[150,90,30], radii_stroke="sienna", radii_stroke_width=3)
 Circle(cx=3, cy=25, stroke="sienna", stroke_width=5, fill="sienna", radius=0.3)
 Rectangle(x=1.7, y=25.1, height=2.9, width=2.6,
           stroke="sienna", stroke_width=5, fill="skyblue")

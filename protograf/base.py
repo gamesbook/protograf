@@ -117,6 +117,9 @@ class BaseCanvas:
                     raise ValueError
             except Exception:
                 tools.feedback(f"Unable to use {_paper} as paper size!", True)
+        # ---- paper size overrides
+        self.paper_width = self.defaults.get("paper_width", self.paper[0])
+        self.paper_height = self.defaults.get("paper_height", self.paper[1])
         # ---- paper size in units & margins
         self.page_width = self.paper[0] / self.units  # user-units e.g. cm
         self.page_height = self.paper[1] / self.units  # user-units e.g. cm
@@ -522,6 +525,10 @@ class BaseShape:
                     raise ValueError
             except Exception:
                 tools.feedback(f"Unable to use {_paper} as paper size!", True)
+        # ---- paper overrides
+        self.paper_width = self.kw_float(kwargs.get("paper_width", base.paper_width))
+        self.paper_height = self.kw_float(kwargs.get("paper_height", base.paper_height))
+        self.paper = (self.paper_width * self.units, self.paper_height * self.units)
         # ---- paper size in units
         self.page_width = self.paper[0] / self.units  # user-units e.g. cm
         self.page_height = self.paper[1] / self.units  # user-units e.g. cm

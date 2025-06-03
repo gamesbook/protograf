@@ -7,7 +7,7 @@ Changes
 
 2025-06-00 (0.2.3)
 ------------------
-- Moved the bulk of constant definitions to a single file
+- Moved bulk of constant and structure definitions to their own files
 - Added list() function example
 - Added CardBack shape and support alternate front/back card pages
 - Support card front and back on same page (the "gutter")
