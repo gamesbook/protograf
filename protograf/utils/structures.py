@@ -146,7 +146,7 @@ PageMargins = namedtuple(
         "right",
         "bottom",
         "top",
-        "debug"  # show the margin?
+        "debug",  # show the margin?
     ],
 )
 

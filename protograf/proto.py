@@ -24,7 +24,7 @@ import pymupdf
 
 # local
 from .bgg import BGGGame, BGGGameList
-from .base import BaseCanvas, GroupBase, DEBUG_COLOR, DEFAULT_FONT, get_color, WIDTH
+from .base import BaseCanvas, GroupBase, WIDTH
 from .dice import Dice, DiceD4, DiceD6, DiceD8, DiceD10, DiceD12, DiceD20, DiceD100
 from .shapes import (
     BaseShape,
@@ -72,6 +72,7 @@ from ._version import __version__
 
 from protograf.utils import geoms, tools, support
 from protograf.utils.constants import (
+    DEFAULT_FONT,
     DEBUG_COLOR,
     DEFAULT_CARD_WIDTH,
     DEFAULT_CARD_HEIGHT,
@@ -415,6 +416,10 @@ class DeckOfCards:
     Placeholder for the deck design; storing lists of CardShapes; allowing export
 
     NOTE: A DeckOfCards object receives its `draw()` command from Save()!
+
+    Notes:
+    - Gutter lines are drawn here (one per page)
+    - Any annotations are drawn here (depending on page allocations)
     """
 
     def __init__(self, canvas=None, **kwargs):
@@ -835,14 +840,16 @@ class DeckOfCards:
                 right=prime_globals.margins.right,
                 top=prime_globals.margins.top - gutter / 2.0,
                 bottom=prime_globals.margins.bottom,
-                debug=prime_globals.margins.debug
+                debug=prime_globals.margins.debug,
             )
             cnv = globals.doc_page.new_shape()  # pymupdf Shape
             globals.canvas = cnv
 
         # ---- calculate rows/cols based on page size and margins AND card size
         margin_left = (
-            globals.margins.left if globals.margins.left is not None else globals.margins.margin
+            globals.margins.left
+            if globals.margins.left is not None
+            else globals.margins.margin
         )
         margin_bottom = (
             globals.margins.bottom
@@ -850,10 +857,14 @@ class DeckOfCards:
             else globals.margins.margin
         )
         margin_right = (
-            globals.margins.right if globals.margins.right is not None else globals.margins.margin
+            globals.margins.right
+            if globals.margins.right is not None
+            else globals.margins.margin
         )
         margin_top = (
-            globals.margins.top if globals.margins.top is not None else globals.margins.margin
+            globals.margins.top
+            if globals.margins.top is not None
+            else globals.margins.margin
         )
         page_across = globals.page_width - margin_right - margin_left  # user units
         page_down = globals.page_height - margin_top - margin_bottom  # user units
@@ -974,7 +985,14 @@ class DeckOfCards:
                 )  # backs
                 # draw gutter line
                 if self.gutter is not None:
-                    pass  # TODO  draw_line()
+                    pt1 = (globals.page[0] / 2.0, 0)
+                    pt2 = (globals.page[0] / 2.0, globals.page[1])
+                    globals.canvas.draw_line(pt1, pt2)
+                    gwargs = kwargs
+                    gwargs["stroke"] = self.gutter_stroke or tools.get_color("black")
+                    gwargs["stroke_width"] = self.gutter_stroke_width
+                    gwargs["dotted"] = self.gutter_dotted
+                    tools.set_canvas_props(cnv=globals.canvas, index=None, **gwargs)
                 # if page_number < src.page_count / 2 - 1:
                 PageBreak()
             # ---- delete extra blank page at the end
@@ -1000,24 +1018,28 @@ class DeckOfCards:
 
 # ---- page-related ====
 
+
 def page_setup():
     """Set the page color and (optionally) show a dotted margin line."""
     # ---- paper color
-    _fill = get_color(globals.page_fill)
-    if _fill != get_color("white"):
+    _fill = tools.get_color(globals.page_fill)
+    if _fill != tools.get_color("white"):
         globals.doc_page.draw_rect(
-            (0, 0, globals.page[0], globals.page[1]), fill=_fill, color=None)
+            (0, 0, globals.page[0], globals.page[1]), fill=_fill, color=None
+        )
     # ---- debug margins
     if globals.margins.debug:
-        stroke = get_color(DEBUG_COLOR)
+        stroke = tools.get_color(DEBUG_COLOR)
         globals.doc_page.draw_rect(
-            (globals.margins.left * globals.units,
-             globals.margins.top * globals.units,
-             globals.page[0] - (globals.margins.right * globals.units),
-             globals.page[1] - (globals.margins.bottom * globals.units)
+            (
+                globals.margins.left * globals.units,
+                globals.margins.top * globals.units,
+                globals.page[0] - (globals.margins.right * globals.units),
+                globals.page[1] - (globals.margins.bottom * globals.units),
             ),
             color=stroke,
-            dashes="[1 2] 0")
+            dashes="[1 2] 0",
+        )
 
 
 def Create(**kwargs):
@@ -1026,9 +1048,9 @@ def Create(**kwargs):
     Kwargs:
 
     - **paper** - a paper size from either of the ISO series - A0 down to A8;
-      or B6 down to B0 - or a USA type - letter, legal or elevenSeventeen; to change
-      the page orientation to **landscape** simply append ``-l`` to the name --
-      for example, ``"A3-l"`` is a landscape A3 paper size; default is ``A4``
+      or B6 down to B0 - or a USA type - letter, legal or elevenSeventeen; to
+      change the page orientation to **landscape** append ``-l`` to the name.
+      For example, ``"A3-l"`` is a landscape A3 paper size; default is ``A4``
     - **filename** - name of the output PDF file; by default this is the prefix
       name of the script, with a ``.pdf`` extension
     - **fill** - the page color; default is ``white``
@@ -1042,9 +1064,9 @@ def Create(**kwargs):
     - **margin_right** - set the the right margin using the defined *units*
     - **margin_debug** - if True, show the margin as a dotted blue line
 
-    Kwargs for to override the default values of any of the various properties
-    used for drawing Shapes can be set here as well, for example: ``font_size=18``
-    or ``stroke="red"``.
+    Kwargs to override the default values of any of the various properties
+    used for drawing Shapes can be set here as well, for example:
+    ``font_size=18`` or ``stroke="red"``.
 
     Notes:
 
@@ -1063,7 +1085,7 @@ def Create(**kwargs):
         top=kwargs.get("margin_top", the_margin),
         bottom=kwargs.get("margin_bottom", the_margin),
         right=kwargs.get("margin_right", the_margin),
-        debug=kwargs.get("margin_debug", False)
+        debug=kwargs.get("margin_debug", False),
     )
     # ---- cards
     _cards = kwargs.get("cards", 0)
@@ -1078,7 +1100,7 @@ def Create(**kwargs):
     globals.page = pymupdf.paper_size(globals.paper)  # (width, height) in points
     globals.page_width = globals.page[0] / globals.units  # width in user units
     globals.page_height = globals.page[1] / globals.units  # height in user units
-    globals.fill = get_color(kwargs.get("fill", "white"))
+    globals.fill = tools.get_color(kwargs.get("fill", "white"))
     # ---- fonts
     base_fonts()
     globals.font_size = kwargs.get("font_size", 12)
@@ -1114,7 +1136,9 @@ def Create(**kwargs):
         _filename = f"{basename}.pdf"
     # ---- validate directory & set filename
     if globals.pargs.directory and not os.path.exists(globals.pargs.directory):
-        tools.feedback(f'Unable to find directory "{globals.pargs.directory}" for output.', True)
+        tools.feedback(
+            f'Unable to find directory "{globals.pargs.directory}" for output.', True
+        )
     globals.filename = os.path.join(globals.pargs.directory, _filename)
     # ---- pymupdf doc, page, shape/canvas
     globals.document = pymupdf.open()  # pymupdf Document
@@ -1215,6 +1239,11 @@ def Save(**kwargs):
     - **cards** - if set to ``True`` will cause all the card fronts to be
       exported as PNG files;  the names of the files are derived using the PDF
       filename, with a dash (-) followed by the page number
+
+    Notes:
+
+    - Cards are saved by iterating through all the ``fronts`` and ``backs``
+      in a DeckOfCards object
     """
     validate_globals()
 
@@ -2326,7 +2355,7 @@ def Blueprint(**kwargs):
     kwargs["fill"] = kwargs.get("fill", page_fill)
     # ---- page color (optional)
     if kwargs["fill"] is not None:
-        fill = get_color(kwargs.get("fill", "white"))
+        fill = tools.get_color(kwargs.get("fill", "white"))
         globals.canvas.draw_rect((0, 0, globals.page[0], globals.page[1]))
         globals.canvas.finish(fill=fill)
     kwargs["fill"] = kwargs.get("fill", line_stroke)  # revert back for font

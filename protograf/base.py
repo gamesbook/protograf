@@ -27,7 +27,8 @@ import requests
 from PIL import Image, UnidentifiedImageError
 import pymupdf
 from pymupdf import Shape as muShape, Point as muPoint, Page as muPage, Matrix
-from pymupdf.utils import getColor, getColorList
+
+# from pymupdf.utils import getColor, getColorList
 
 # local
 from protograf.utils import geoms, tools, support
@@ -47,50 +48,8 @@ from protograf import globals
 
 log = logging.getLogger(__name__)
 
-BGG_IMAGES = "cf.geekdo-images.com"
-COLOR_NAMES = getColorList()
 DEBUG = False
 WIDTH = 0.1
-
-
-def get_color(name: str = None, is_rgb: bool = True) -> tuple:
-    """Get a color tuple; by name from a pre-defined dictionary or as a RGB tuple."""
-    if name is None:
-        return None  # it IS valid to say that NO color has been set
-    if isinstance(name, tuple) and len(name) == 3:  # RGB color tuple
-        if (
-            (name[0] >= 0 and name[0] <= 255)
-            and (name[1] >= 0 and name[0] <= 255)
-            and (name[2] >= 0 and name[0] <= 255)
-        ):
-            return name
-        else:
-            tools.feedback(f'The color tuple "{name}" is invalid!')
-    elif isinstance(name, str) and len(name) == 7 and name[0] == "#":  # hexadecimal
-        _rgb = tuple(int(name[i : i + 2], 16) for i in (1, 3, 5))
-        rgb = tuple(i / 255 for i in _rgb)
-        return rgb
-    else:
-        pass  # unknown format
-    if name.upper() not in COLOR_NAMES:
-        tools.feedback(f'The color name "{name}" is not pre-defined!', True)
-    try:
-        color = getColor(name)
-        return color
-    except (AttributeError, ValueError):
-        tools.feedback(f'The color name "{name}" cannot be converted to RGB!', True)
-
-
-def get_opacity(transparency: float = 0) -> float:
-    """Convert from '100% is fully transparent' to '0 is not opaque'."""
-    if transparency is None:
-        return 1.0
-    try:
-        return float(1.0 - transparency / 100.0)
-    except (ValueError, TypeError):
-        tools.feedback(
-            f'The transparency of "{transparency}" is not valid (use 0 to 100)', True
-        )
 
 
 class BaseCanvas:
@@ -200,15 +159,17 @@ class BaseCanvas:
         self.facing = self.defaults.get("facing", "out")  # out/in
         # ---- fill color
         fill = self.defaults.get("fill", self.defaults.get("fill_color")) or "white"
-        self.fill = get_color(fill)
+        self.fill = tools.get_color(fill)
         self.fill_stroke = self.defaults.get("fill_stroke", None)
         self.stroke_fill = self.defaults.get("stroke_fill", None)  # alias
         # ---- stroke
         stroke = (
             self.defaults.get("stroke", self.defaults.get("stroke_color")) or "black"
         )
-        self.stroke = get_color(stroke)
+        self.stroke = tools.get_color(stroke)
         self.stroke_width = self.defaults.get("stroke_width", WIDTH)
+        # pymupdf lineCap: 0 = line ends in sharp edge; 1 = adds semi-circle at end
+        self.stroke_cap = self.defaults.get("stroke_cap", 0)
         self.outline = self.defaults.get("outline", None)
         # ---- overwrite fill & stroke
         if self.stroke_fill:  # alias
@@ -219,7 +180,7 @@ class BaseCanvas:
             self.fill = self.fill_stroke
         # ---- debug color & transparency
         debug_color = self.defaults.get("debug_color", DEBUG_COLOR)
-        self.debug_color = get_color(debug_color)
+        self.debug_color = tools.get_color(debug_color)
         self.transparency = self.defaults.get("transparency", 1)  # NOT transparent
         # if self.outline:
         #     self.stroke = self.outline
@@ -236,7 +197,7 @@ class BaseCanvas:
         # ---- grid cut marks
         self.grid_marks = self.defaults.get("grid_marks", 0)
         grid_stroke = self.defaults.get("grid_stroke", "gray")
-        self.grid_stroke = get_color(grid_stroke)
+        self.grid_stroke = tools.get_color(grid_stroke)
         self.grid_stroke_width = self.defaults.get(
             "grid_stroke_width", self.stroke_width
         )
@@ -252,7 +213,7 @@ class BaseCanvas:
         self.text = self.defaults.get("text", "")
         self.text_size = self.defaults.get("text_size", self.font_size)
         text_stroke = self.defaults.get("text_stroke", self.stroke)
-        self.text_stroke = get_color(text_stroke)
+        self.text_stroke = tools.get_color(text_stroke)
         self.text_stroke_width = self.defaults.get(
             "text_stroke_width", self.stroke_width
         )
@@ -261,7 +222,7 @@ class BaseCanvas:
         self.label_size = self.defaults.get("label_size", self.font_size)
         self.label_face = self.defaults.get("label_face", self.font_name)
         label_stroke = self.defaults.get("label_stroke", self.stroke)
-        self.label_stroke = get_color(label_stroke)
+        self.label_stroke = tools.get_color(label_stroke)
         self.label_stroke_width = self.defaults.get(
             "label_stroke_width", self.stroke_width
         )
@@ -273,7 +234,7 @@ class BaseCanvas:
         self.title_size = self.defaults.get("title_size", self.font_size)
         self.title_face = self.defaults.get("title_face", self.font_name)
         title_stroke = self.defaults.get("title_stroke", self.stroke)
-        self.title_stroke = get_color(title_stroke)
+        self.title_stroke = tools.get_color(title_stroke)
         self.title_stroke_width = self.defaults.get(
             "title_stroke_width", self.stroke_width
         )
@@ -285,7 +246,7 @@ class BaseCanvas:
         self.heading_size = self.defaults.get("heading_size", self.font_size)
         self.heading_face = self.defaults.get("heading_face", self.font_name)
         heading_stroke = self.defaults.get("heading_stroke", self.stroke)
-        self.heading_stroke = get_color(heading_stroke)
+        self.heading_stroke = tools.get_color(heading_stroke)
         self.heading_stroke_width = self.defaults.get(
             "heading_stroke_width", self.stroke_width
         )
@@ -396,7 +357,7 @@ class BaseCanvas:
         self.radii_labels_size = self.defaults.get("radii_labels_size", self.font_size)
         self.radii_labels_face = self.defaults.get("radii_labels_face", self.font_name)
         radii_labels_stroke = self.defaults.get("radii_labels_stroke", self.stroke)
-        self.radii_labels_stroke = get_color(radii_labels_stroke)
+        self.radii_labels_stroke = tools.get_color(radii_labels_stroke)
         self.radii_labels_stroke_width = self.defaults.get(
             "radii_labels_stroke_width", self.stroke_width
         )
@@ -428,12 +389,12 @@ class BaseCanvas:
         self.centre_shape_my = self.defaults.get("centre_shape_my", 0)
         self.dot = self.defaults.get("dot", 0)
         dot_stroke = self.defaults.get("dot_stroke", self.stroke)
-        self.dot_stroke = get_color(dot_stroke)
+        self.dot_stroke = tools.get_color(dot_stroke)
         self.dot_stroke_width = self.defaults.get("dot_stroke_width", self.stroke_width)
         self.dot_fill = self.defaults.get("dot_fill", self.dot_stroke)  # colors match
         self.cross = self.defaults.get("cross", 0)
         cross_stroke = self.defaults.get("cross_stroke", self.stroke)
-        self.cross_stroke = get_color(cross_stroke)
+        self.cross_stroke = tools.get_color(cross_stroke)
         self.cross_stroke_width = self.defaults.get(
             "cross_stroke_width", self.stroke_width
         )
@@ -477,7 +438,7 @@ class BaseCanvas:
             "coord_font_size", int(self.font_size * 0.5)
         )
         coord_stroke = self.defaults.get("coord_stroke", "black")
-        self.coord_stroke = get_color(coord_stroke)
+        self.coord_stroke = tools.get_color(coord_stroke)
         self.coord_padding = self.defaults.get("coord_padding", 2)
         self.coord_separator = self.defaults.get("coord_separator", "")
         self.coord_prefix = self.defaults.get("coord_prefix", "")
@@ -625,6 +586,7 @@ class BaseShape:
         self.fill_stroke = kwargs.get("fill_stroke", base.fill_stroke)
         self.outline = kwargs.get("outline", base.outline)
         self.stroke_width = self.kw_float(kwargs.get("stroke_width", base.stroke_width))
+        self.stroke_cap = self.kw_int(kwargs.get("stroke_cap", base.stroke_cap))
         # ---- overwrite fill&stroke colors
         if self.fill_stroke and self.outline:
             tools.feedback("Cannot set 'fill_stroke' and 'outline' together!", True)
@@ -1094,240 +1056,17 @@ class BaseShape:
         index=None,  # extract from list of potential values (usually Card options)
         **kwargs,
     ):
-        """Set pymupdf Shape properties for fill, font, line and colors
-
-        Notes:
-            If letting default a color parameter to None, then no resp. color selection
-            command will be generated. If fill and color are both None, then the drawing
-            will contain no color specification. But it will still be “stroked”,
-            which causes PDF’s default color “black” be used by PDF viewers.
-
-            The default value of width is 1.
-
-            The values width, color and fill have the following relationship:
-            • If fill=None, then shape elements will *always* be drawn with a border -
-              even if color=None (in which case black is taken) or width=0
-              (in which case 1 is taken).
-            • Shapes without border can only be achieved if a fill color is specified
-              (which may be be white). To achieve this, specify width=0.
-              In this case, the color parameter is ignored.
-        """
-
-        def ext(prop):
-            if isinstance(prop, str):
-                return prop
-            try:
-                return prop[index]
-            except TypeError:
-                return prop
-
-        # Shape.finish(
-        #   width=1, color=(0,), fill=None, lineCap=0, lineJoin=0, dashes=None,
-        #   closePath=True, even_odd=False, morph=(fixpoint, matrix),
-        #   stroke_opacity=1, fill_opacity=1, oc=0
-
-        # ---- set props
-        # print(f'### SetCnvProps: {kwargs.keys()} \n {kwargs.get("fill", "?")=}')
-        cnv = cnv if cnv else globals.canvas
-        if "fill" in kwargs.keys():
-            fill = kwargs.get("fill", None)  # reserve None for 'no fill at all'
-        else:
-            fill = self.fill
-        if "stroke" in kwargs.keys():
-            stroke = kwargs.get("stroke", None)  # reserve None for 'no stroke at all'
-        else:
-            stroke = self.stroke
-        # print(f'### SCP {kwargs.get("fill")=} {fill=} {kwargs.get("stroke")=} {stroke=}')
-        # ---- transparency / opacity
-        opacity = 1
-        _transparency = kwargs.get("transparency", self.transparency)
-        if _transparency:
-            _transparency = self.kw_float(_transparency, "transparency")
-            if _transparency >= 1:
-                _transparency = _transparency / 100.0
-            opacity = 1 - _transparency
-        stroke_width = kwargs.get("stroke_width", None)
-        stroke_cap = kwargs.get("stroke_cap", None)
-        dotted = kwargs.get("dotted", None)
-        dashed = kwargs.get("dashed", None)
-        _rotation = kwargs.get("rotation", None)  # calling Shape must set a tuple!
-        _rotation_point = kwargs.get(
-            "rotation_point", None
-        )  # calling Shape must set a tuple!
-        closed = kwargs.get("closed", False)  # whether to connect last and first points
-        debug = kwargs.get("debug", False)
-        # ---- set line dots / dashed
-        _dotted = ext(dotted) or ext(self.dotted)
-        _dashed = ext(dashed) or ext(self.dashed)
-        if _dotted:
-            the_stwd = (
-                round(ext(stroke_width))
-                if stroke_width
-                else round(ext(self.stroke_width))
-            )
-            the_stwd = max(the_stwd, 1)
-            dashes = f"[{the_stwd} {the_stwd}] 0"
-        elif _dashed:
-            _dlist = (
-                _dashed
-                if isinstance(_dashed, (list, tuple))
-                else tools.sequence_split(_dashed, as_int=False)
-            )
-            doffset = round(self.unit(_dlist[2])) if len(_dlist) >= 3 else 0
-            dspaced = round(self.unit(_dlist[1])) if len(_dlist) >= 2 else ""
-            dlength = round(self.unit(_dlist[0])) if len(_dlist) >= 1 else ""
-            dashes = f"[{dlength} {dspaced}] {doffset}"
-        else:
-            dashes = None
-        # print(f"### SCP{_dotted =} {_dashed=} {dashes=}")
-        # ---- check rotation
-        morph = None
-        # print(f'### SCP {_rotation_point=} {_rotation}')
-        if _rotation_point and not isinstance(_rotation_point, (geoms.Point, muPoint)):
-            tools.feedback(f'Rotation point "{_rotation_point}" is invalid', True)
-        if _rotation is not None and not isinstance(_rotation, (float, int)):
-            tools.feedback(f'Rotation angle "{_rotation}" is invalid', True)
-        if _rotation and _rotation_point:
-            # ---- * set rotation matrix
-            mtrx = Matrix(1, 1)
-            mtrx.prerotate(_rotation)
-            morph = (_rotation_point, mtrx)
-            # print(f'### SCP {morph=}')
-        # ---- get color tuples
-        _color = get_color(stroke)
-        _fill = get_color(fill)
-        # ---- set width
-        _width = stroke_width or self.stroke_width
-        if _color is None and _fill is None:
-            tools.feedback("Cannot have both fill and stroke set to None!", True)
-        # print(f'### SCP {stroke=} {fill=} {_color=} {_fill=}')  # None OR fraction RGB
-        # ---- set/apply properties
-        cnv.finish(
-            width=_width,
-            color=_color,
-            fill=_fill,
-            lineCap=stroke_cap or 0,  # or self.stroke_cap,  # FIXME
-            lineJoin=0,
-            dashes=dashes,
-            fill_opacity=opacity,
-            morph=morph,
-            closePath=closed,
-        )
-        cnv.commit()
-        return None
-
-        """
-        def ext(prop):
-            if isinstance(prop, str):
-                return prop
-            try:
-                return prop[index]
-            except TypeError:
-                return prop
-
-        canvas = cnv if cnv else self.canvas
-        try:
-            canvas.setFont(ext(self.font_name), ext(self.font_size))
-        except AttributeError:
-            pass
-        except KeyError:
-            ff = ext(self.font_name)
-            try:
-                tools.register_font(
-                    font_name=self.font_name,
-                    style=self.font_style,
-                    directory=self.font_directory,
-                )
-            except (KeyError, ValueError):
-                _style = f' with style "{self.font_style}"' if self.font_style else ""
-                _dir = f' in "{self.font_directory}"' if self.font_directory else ""
-                tools.feedback(
-                    f'Unable to find or register font "{ff}"{_style}{_dir}.'
-                    " Please check that it is available on your system.",
-                    stop=True,
-                )
-        try:
-            if fill in [None, []] and self.fill in [None, []]:
-                canvas.setFillColor("white", 0)  # full transparency
-                if debug:
-                    tools.feedback("~~~ NO fill color set!")
-            else:
-                _fill = ext(fill) or ext(self.fill)
-                canvas.setFillColor(_fill)
-                _transparency = ext(self.transparency)
-                if _transparency:
-                    try:
-                        alpha = float(_transparency) / 100.0
-                    except Exception:
-                        tools.feedback(
-                            f'Unable to use "{_transparency}" as transparency'
-                            " value - it must be from 1 to 100",
-                            True,
-                        )
-                    try:
-                        curr_fill = canvas._fillColorObj
-                        alpha_fill = Color(
-                            curr_fill.red, curr_fill.green, curr_fill.blue, alpha
-                        )
-                        if debug:
-                            tools.feedback(
-                                f"~ Transp. color set: {alpha_fill} vs {_fill}"
-                            )
-                        _fill = alpha_fill
-                        canvas.setFillColor(_fill)
-                    except Exception:
-                        tools.feedback("Unable to set transparency for {_fill}")
-                if debug:
-                    tools.feedback(f"~~~ Fill color set: {_fill}")
-
-        except (ValueError, AttributeError):
-            issue = f'"{_fill}" is not a valid value' if _fill else "no value provided!"
-            tools.feedback(f"Unable to set fill color:- {issue}", True)
-
-        try:
-            if stroke in [None, []] and self.stroke in [None, []]:
-                canvas.setStrokeColor("black", 0)  # full transparency
-                if debug:
-                    tools.feedback("~~~ NO stroke color set!")
-            else:
-                _strk = ext(stroke) or ext(self.stroke)
-                canvas.setStrokeColor(_strk)
-        except (TypeError, ValueError):
-            tools.feedback(
-                f'Please check the stroke setting of "{_strk}"; it should be a color value.'
-            )
-        except AttributeError:
-            pass
-        try:
-            the_stwd = ext(stroke_width) or ext(self.stroke_width)
-            canvas.setLineWidth(the_stwd)  # units are points!
-        except TypeError:
-            tools.feedback(
-                f'Please check the stroke_width setting of "{the_stwd}";'
-                " it should be a number."
-            )
-        except AttributeError:
-            pass
-        _stroke_cap = ext(stroke_cap)
-        if _stroke_cap:
-            if _stroke_cap in ["r", "rounded"]:
-                canvas.setLineCap(1)
-            elif _stroke_cap in ["s", "square"]:
-                canvas.setLineCap(2)
-            else:
-                tools.feedback(f'Line cap type "{_stroke_cap}" cannot be used.', False)
-        _dotted = ext(dotted) or ext(self.dotted)
-        _dashed = ext(dashed) or ext(self.dashed)
-        if _dotted:
-            # _dots = self.values_to_points([0.03, 0.03])
-            _dots = [the_stwd, the_stwd]
-            canvas.setDash(array=_dots)
-        elif _dashed:
-            dash_points = self.values_to_points(_dashed)
-            canvas.setDash(array=dash_points)
-        else:
-            canvas.setDash(array=[])
-        """
+        """Wrapper is here to pass self attributes into set_canvas_props."""
+        defaults = {}
+        defaults["fill"] = self.fill
+        defaults["stroke"] = self.stroke
+        defaults["stroke_cap"] = self.stroke_cap
+        defaults["stroke_width"] = self.stroke_width
+        defaults["transparency"] = self.transparency
+        defaults["dotted"] = self.dotted
+        defaults["dashed"] = self.dashed
+        # print(f'### SetCnvProps: {kwargs.keys()} \n {kwargs.get("closed", "?")=}')
+        return tools.set_canvas_props(cnv, index, defaults, **kwargs)
 
     def draw(self, cnv=None, off_x=0, off_y=0, ID=None, **kwargs):
         """Draw an element on a given canvas."""
@@ -2039,10 +1778,10 @@ class BaseShape:
         keys["fontname"] = kwargs.get("font_name", self.font_name)
         # keys['fontfile'] = self.font_file
         _color = kwargs.get("stroke", self.stroke)
-        keys["color"] = get_color(_color)
+        keys["color"] = tools.get_color(_color)
         if kwargs.get("stroke_inner"):
             _fill = kwargs.get("stroke_inner", self.stroke)
-            keys["fill"] = get_color(_fill)
+            keys["fill"] = tools.get_color(_fill)
         else:
             keys["fill"] = keys["color"]
 

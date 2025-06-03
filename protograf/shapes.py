@@ -20,6 +20,12 @@ import segno  # QRCode
 # local
 from protograf import globals
 from protograf.utils import geoms, tools, support
+from protograf.utils.constants import (
+    GRID_SHAPES_WITH_CENTRE,
+    COLOR_NAMES,
+    DEBUG_COLOR,
+    BGG_IMAGES,
+)
 from protograf.utils.structures import (
     BBox,
     DirectionGroup,
@@ -34,13 +40,7 @@ from protograf.base import (
     BaseShape,
     BaseCanvas,
     GridShape,
-    get_color,
-    get_opacity,
-    BGG_IMAGES,
-    COLOR_NAMES,
-    DEBUG_COLOR,
 )
-from protograf.utils.constants import GRID_SHAPES_WITH_CENTRE
 
 log = logging.getLogger(__name__)
 DEBUG = False
@@ -2701,8 +2701,8 @@ class QRCodeShape(BaseShape):
         qrcode.save(
             _source,
             scale=self.scaling or 1,
-            light=tools.rgb_to_hex(get_color(self.fill)),
-            dark=tools.rgb_to_hex(get_color(self.stroke)),
+            light=tools.rgb_to_hex(tools.get_color(self.fill)),
+            dark=tools.rgb_to_hex(tools.get_color(self.stroke)),
         )
         rotation = kwargs.get("rotation", self.rotation)
         # ---- load QR image
@@ -4178,8 +4178,8 @@ class TextShape(BaseShape):
                 keys["fontsize"] = self.font_size
                 keys["fontname"] = self.font_name
                 # keys['fontfile'] = self.font_file
-                keys["color"] = get_color(self.stroke)
-                # keys["fill"] = get_color(self.fill)
+                keys["color"] = tools.get_color(self.stroke)
+                # keys["fill"] = tools.get_color(self.fill)
                 keys["align"] = self.to_alignment()
                 _lineheight = kwargs.get("line_height", None)
                 keys["lineheight"] = self.kw_float(_lineheight, "line_height")
@@ -4218,7 +4218,7 @@ class TextShape(BaseShape):
             # insert_htmlbox(rect, text, *, css=None, scale_low=0,
             #   archive=None, rotate=0, oc=0, opacity=1, overlay=True)
             try:
-                keys["opacity"] = get_opacity(self.transparency)
+                keys["opacity"] = tools.get_opacity(self.transparency)
                 if self.css:
                     keys["css"] = globals.css + " * {%s}" % self.css
                 else:

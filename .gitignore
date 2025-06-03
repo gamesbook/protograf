@@ -155,4 +155,5 @@ cython_debug/
 .pdf
 *.pdf
 /examples/temp
+/examples/cards_test
 default_shapes-*.png

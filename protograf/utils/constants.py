@@ -2,7 +2,10 @@
 """
 Common constants used in protograf
 """
+from pymupdf.utils import getColorList
 
+BGG_IMAGES = "cf.geekdo-images.com"
+COLOR_NAMES = getColorList()
 CACHE_DIRECTORY = ".protograf"  # append to the user's home directory
 DEBUG_COLOR = "#B0C4DE"
 DEFAULT_CARD_WIDTH = 6.35  # cm
