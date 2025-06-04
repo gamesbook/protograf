@@ -229,6 +229,8 @@ class CardShape(BaseShape):
             cnv=cnv, row=row, col=col, cid=cid, label=label, **shape_kwargs
         )
         outline.draw(off_x=margin_shift_x, off_y=margin_shift_y, **shape_kwargs)
+        end_x = outline.calculated_left + outline.width  # max right for card
+        print(f"$$$ {outline.calculated_left=} {outline.width=} {end_x=}")
 
         # ---- track frame outlines for possible image extraction
         match kwargs["frame_type"]:
@@ -410,6 +412,8 @@ class CardShape(BaseShape):
 
             except Exception as err:
                 tools.feedback(f"Unable to draw card #{cid + 1}. (Error:{err})", True)
+
+        return end_x  # right-most point of card
 
 
 class DeckOfCards:
@@ -676,6 +680,7 @@ class DeckOfCards:
             else:
                 row, col = 0, max_cols - 1  # draw left-to-right for back
             card_number = start_card
+            end_x = 0
 
             for card_num in range(start_card, card_count):
                 card_number = card_num
@@ -728,7 +733,7 @@ class DeckOfCards:
                             kwargs["card_back"] = True  # de/activate grid marks & shift
                         else:
                             kwargs["card_back"] = False
-                        card.draw_card(
+                        card_end_x = card.draw_card(
                             cnv,
                             row=row,
                             col=col,
@@ -736,6 +741,9 @@ class DeckOfCards:
                             image=image,
                             **kwargs,
                         )
+                        print(f"A. {col=} {end_x=} {card_end_x=}")
+                        end_x = card_end_x if card_end_x > end_x else end_x  # max right
+                        print(f"B. {col=} {end_x=} {card_end_x=}")
                         if front:
                             col += 1
                             if col >= max_cols:
@@ -773,22 +781,26 @@ class DeckOfCards:
                             PageBreak(**kwargs)
                             cnv = globals.canvas  # new one from page break
                             self.draw_bleed(cnv, page_across, page_down)
-                            # print(f'$$$ card_draw - RETURN FROM rows / {front=} : {card_number + 1}')
+                            print(
+                                f"$$$ card_draw - RETURN FROM rows / {front=} : {card_number + 1}"
+                            )
                             return cnv, DeckPrintState(
                                 card_count=state.card_count,
                                 card_number=card_number + 1,
                                 copies_to_do=copies - i - 1,
+                                end_x=end_x,
                             )
 
             # if card_num >= deck_length:
             PageBreak(**kwargs)
             cnv = globals.canvas  # new one from page break
             self.draw_bleed(cnv, page_across, page_down)
-            # print(f'$$$  card_draw - RETURN FROM end  / {front=} : {card_number + 1}')
+            print(f"$$$  card_draw - RETURN FROM end  / {front=} : {card_number + 1}")
             return cnv, DeckPrintState(
                 card_count=state.card_count,
                 card_number=card_number + 1,
                 copies_to_do=0,
+                end_x=end_x,
             )
 
         # ---- primary layout settings for draw()
@@ -926,10 +938,10 @@ class DeckOfCards:
         # ---- prep for card drawing
         page_number = -1
         state_front = DeckPrintState(
-            card_count=len(self.fronts), card_number=0, copies_to_do=0
+            card_count=len(self.fronts), card_number=0, copies_to_do=0, end_x=0
         )
         state_back = DeckPrintState(
-            card_count=len(self.backs), card_number=0, copies_to_do=0
+            card_count=len(self.backs), card_number=0, copies_to_do=0, end_x=0
         )
         for back in self.backs:
             if back.elements:
@@ -938,12 +950,20 @@ class DeckOfCards:
 
         # ---- actually draw cards!
         while state_front.card_number < len(self.fronts):
-            # print(f'\n$$$ {state_front.card_number=} $$$ ')
+            print(f"\n$$$ {state_front.card_number=} $$$ ")
             page_number += 1  # for back-to-back OR no backs
             cnv, state_front = draw_the_cards(cnv, state_front, page_number, front=True)
             if self.show_backs:
                 page_number += 1  # for back-to-back
-                shift_x = effective_right - globals.margins.left
+                print(
+                    f"$$$ {globals.page_width=} {state_front.end_x=} {globals.margins.right=} "
+                )
+                shift_x = (
+                    globals.page_width
+                    - state_front.end_x
+                    - globals.margins.left
+                    - self.offset_x
+                )
                 cnv, state_back = draw_the_cards(
                     cnv, state_back, page_number, front=False, shift_x=shift_x
                 )

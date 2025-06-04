@@ -833,6 +833,9 @@ class CircleShape(BaseShape):
         self.draw_heading(cnv, ID, self.x_c, self.y_c - self._u.radius, **kwargs)
         self.draw_label(cnv, ID, self.x_c, self.y_c, **kwargs)
         self.draw_title(cnv, ID, self.x_c, self.y_c + self._u.radius, **kwargs)
+        # ---- set calculated top-left in user units
+        self.calculated_left = (self.x_c - self._u.radius) / self.units
+        self.calculated_top = (self.y_c - self._u.radius) / self.units
 
 
 class ChordShape(BaseShape):
@@ -2135,6 +2138,9 @@ class HexShape(BaseShape):
         self.set_coord(cnv, self.x_d, self.y_d, geo.half_flat)
         # ---- set grid property
         self.grid = GridShape(label=self.coord_text, x=self.x_d, y=self.y_d, shape=self)
+        # ---- set calculated top-left in user units
+        self.calculated_left = (self.x_d - offset) / self.units
+        self.calculated_top = (self.y_d - offset) / self.units
 
 
 class LineShape(BaseShape):
@@ -2562,6 +2568,9 @@ class PolygonShape(BaseShape):
         self.draw_heading(cnv, ID, x, y, radius, **kwargs)
         self.draw_label(cnv, ID, x, y, **kwargs)
         self.draw_title(cnv, ID, x, y, radius + 0.5 * self.title_size, **kwargs)
+        # ---- set calculated top-left in user units
+        self.calculated_left = (x - self._u.radius) / self.units
+        self.calculated_top = (x - self._u.radius) / self.units
 
 
 class PolylineShape(BaseShape):
@@ -3428,6 +3437,8 @@ class RectangleShape(BaseShape):
         self.set_coord(cnv, x_d, y_d)
         # ---- set grid property
         self.grid = GridShape(label=self.coord_text, x=x_d, y=y_d, shape=self)
+        # ---- set calculated top-left in user units
+        self.calculated_left, self.calculated_top = x / self.units, y / self.units
 
 
 class RhombusShape(BaseShape):
