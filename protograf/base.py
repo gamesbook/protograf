@@ -190,6 +190,7 @@ class BaseCanvas:
         #     self.fill = None
         # ---- font
         self.font_name = self.defaults.get("font_name", DEFAULT_FONT)
+        self.font_file = self.defaults.get("font_file", None)
         self.font_size = self.defaults.get("font_size", 12)
         self.font_style = self.defaults.get("font_style", None)
         self.font_directory = self.defaults.get("font_directory", None)
@@ -608,6 +609,7 @@ class BaseShape:
         self.transparency = self.kw_float(kwargs.get("transparency", base.transparency))
         # ---- font
         self.font_name = kwargs.get("font_name", base.font_name)
+        self.font_file = kwargs.get("font_file", base.font_file)
         self.font_size = self.kw_float(kwargs.get("font_size", base.font_size))
         self.font_style = kwargs.get("font_style", base.font_style)
         self.font_directory = kwargs.get("font_directory", base.font_directory)

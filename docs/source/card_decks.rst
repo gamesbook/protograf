@@ -122,8 +122,8 @@ The following are key properties that will usually need to be set for a
 ``Deck``:
 
 - **cards** - this is the number of cards appearing in the deck. It defaults
-  to ``9``. (Note that other commands such as ``Data()`` and ``Matrix()`` will
-  alter this value.)
+  to ``9``. (**Note** that other commands such as ``Data()`` and ``Matrix()``
+  will alter this value.)
 - **height** - this is the card height; it defaults to 8.89 cm / 3.5"
 - **width** - this is the card width. It defaults to 6.35 cm / 2.5"
 
@@ -148,6 +148,9 @@ of two A4, portait-mode, pages:
 
 Note that these rectangular cards have a default height (``8.89`` cm) and
 width (``6.35`` cm).
+
+The **actual** number of cards may be changed by `the Data Command`_ or
+`the Matrix Command`.
 
 
 Deck Example 2. Copy & Mask
@@ -321,6 +324,12 @@ This command allows for a dataset |dash| for example, a CSV file or an Excel
 spreadsheet |dash| to be used as the source for values or properties of
 commands making the cards.
 
+.. IMPORTANT::
+
+   The number of cards that are listd in the dataset |dash| CSV file; Excel
+   spreadsheetl; ect. |dash| will **always** take priority over the number
+   of cards specified in  `The Deck Command <deck_command.html>`.
+
 Because values now have "names" they can be
 referenced and used by the `Supporting Commands`_ - this is usually the primary
 reason to supply a data source in this way.
@@ -357,7 +366,7 @@ in some way, for a card:
 - the names for a CSV file must appear in the first line of the file
 - the names for a Excel file, or Google Sheet, must appear in the columns of
   the first row of the spreadsheet
-- the names for `the Matrix Command`_ command must appear as a list assigned
+- the names for `the Matrix Command`_ must appear as a list assigned
   to the *labels* property of the command
 - the names for a "list of lists" must appear in the first list in the lists
 

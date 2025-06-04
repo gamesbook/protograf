@@ -1395,6 +1395,7 @@ def Font(name=None, **kwargs):
             cache_directory = Path(Path.home() / CACHE_DIRECTORY)
             fi = FontInterface(cache_directory=cache_directory)
             _name = fi.get_font_family(name)
+            _file = fi.get_font_file(name)
             if not _name:
                 tools.feedback(
                     f'Cannot find or load a font named "{name}".'
@@ -1410,6 +1411,7 @@ def Font(name=None, **kwargs):
         _name = None
 
     globals.base.font_name = _name or DEFAULT_FONT
+    globals.base.font_file = _file
     globals.base.font_size = kwargs.get("size", 12)
     globals.base.font_style = kwargs.get("style", None)
     globals.base.stroke = kwargs.get("stroke", "black")

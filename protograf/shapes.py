@@ -4187,8 +4187,10 @@ class TextShape(BaseShape):
             try:
                 # style
                 keys["fontsize"] = self.font_size
-                keys["fontname"] = self.font_name
-                # keys['fontfile'] = self.font_file
+                keys["fontname"] = self.font_name.replace(
+                    " ", "_"
+                )  # prevent: bad fontname chars {' '}
+                keys["fontfile"] = self.font_file
                 keys["color"] = tools.get_color(self.stroke)
                 # keys["fill"] = tools.get_color(self.fill)
                 keys["align"] = self.to_alignment()
@@ -4212,7 +4214,7 @@ class TextShape(BaseShape):
                 # tools.feedback(f'*** Text WRAP {keys=} \n=> {rect=} _text:{_text}')
                 current_page.insert_textbox(rect, _text, **keys)
             except ValueError as err:
-                tools.feedback(f"Cannot create Text - {err}", True)
+                tools.feedback(f"Cannot create Text! - {err}", True)
             except IOError as err:
                 _err = str(err)
                 cause, thefile = "", ""
