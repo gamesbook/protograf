@@ -790,7 +790,7 @@ The full code for this example is available as
         FEEDBACK:: Unable to process data with this template ('Ag' is undefined)
 
 Template functions
-~~~~~~~~~~~~~~~~~~
+++++++++++++++++++
 
 It could that you need to perform a more complex operation, or validation,
 on the data returned by the template from the :ref:`Data() <the-data-command>`.
@@ -810,7 +810,7 @@ The name of the function is then passed to the ``T()`` command by that
 command's *function* property.
 
 Template Function Example 1.
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+++++++++++++++++++++++++++++
 
 In this example, the function is called ``greet``, and is assigned and used
 by the ``T()`` command as follows:
@@ -835,7 +835,7 @@ The Text() shape is then assigned, via ``greetings`` to one more cards in
 the usual way.
 
 Template Function Example 2.
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+++++++++++++++++++++++++++++
 
 Here is a more complex example involving deeper knowledge of
 :doc:`Python Commands <python_commands>`; please skip it if the terminology

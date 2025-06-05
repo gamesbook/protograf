@@ -8,14 +8,15 @@ BGG_IMAGES = "cf.geekdo-images.com"
 COLOR_NAMES = getColorList()
 CACHE_DIRECTORY = ".protograf"  # append to the user's home directory
 DEBUG_COLOR = "#B0C4DE"
-DEFAULT_CARD_WIDTH = 6.35  # cm
-DEFAULT_CARD_HEIGHT = 8.89  # cm
-DEFAULT_CARD_RADIUS = 2.54  # cm
+DEFAULT_CARD_WIDTH = 180  # pt (2.5")
+DEFAULT_CARD_HEIGHT = 252  # pt (3.5")
+DEFAULT_CARD_RADIUS = 72  # pt (1")
 DEFAULT_CARD_COUNT = 9
-DEFAULT_COUNTER_SIZE = 2.54  # cm
+DEFAULT_COUNTER_RADIUS = 18  # pt (1/4")
+DEFAULT_COUNTER_SIZE = 72  # pt (1")
 DEFAULT_DPI = 300
 DEFAULT_FONT = "Helvetica"
-DEFAULT_MARGIN_SIZE = 0.635  # cm ~ 1/4"
+DEFAULT_MARGIN_SIZE = 18  # pt (1/4")
 
 GRID_SHAPES_WITH_CENTRE = [
     "CircleShape",

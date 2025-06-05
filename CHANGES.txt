@@ -15,6 +15,7 @@ Changes
 - Support named card sizes
 - Changed default card size and page margins
 - Support "debug" to show dotted margin
+- Fixed issues with default margin and card sizes for non-cm units
 
 2025-05-23 (0.2.2)
 ------------------

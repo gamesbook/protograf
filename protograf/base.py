@@ -32,7 +32,7 @@ from pymupdf import Shape as muShape, Point as muPoint, Page as muPage, Matrix
 
 # local
 from protograf.utils import geoms, tools, support
-from protograf.utils.constants import DEBUG_COLOR, DEFAULT_FONT
+from protograf.utils.constants import DEBUG_COLOR, DEFAULT_FONT, DEFAULT_MARGIN_SIZE
 from protograf.utils.fonts import builtin_font, FontInterface
 from protograf.utils.structures import (
     Bounds,
@@ -67,6 +67,7 @@ class BaseCanvas:
         self.document = document
         self.doc_page = None
         self.defaults = {}
+        # print(f"### {kwargs=}")
         # ---- setup defaults
         if self.jsonfile:
             try:
@@ -105,7 +106,7 @@ class BaseCanvas:
         self.run_debug = False
         _units = self.defaults.get("units", unit.cm)
         self.units = support.to_units(_units)
-        # print(f"### {self.units=} \n {self.defaults=}")
+        # print(f'### {self.units=} {self.defaults=} {self.defaults.get("margin")=}')
         # ---- paper
         _paper = paper or self.defaults.get("paper", "A4")
         if isinstance(_paper, tuple) and len(_paper) == 2:
@@ -123,8 +124,8 @@ class BaseCanvas:
         # ---- paper size in units & margins
         self.page_width = self.paper[0] / self.units  # user-units e.g. cm
         self.page_height = self.paper[1] / self.units  # user-units e.g. cm
-        # print(f"### {self.page_height=} {self.page_width=}")
-        self.margin = self.defaults.get("margin", 0.635)  # 1/4 inch
+        self.margin = self.defaults.get("margin", DEFAULT_MARGIN_SIZE / self.units)
+        # print(f"### {self.page_height=} {self.page_width=} {self.margin=} {self.units=}")
         self.margin_top = self.defaults.get("margin_top", self.margin)
         self.margin_bottom = self.defaults.get("margin_bottom", self.margin)
         self.margin_left = self.defaults.get("margin_left", self.margin)

@@ -86,7 +86,7 @@ class FontInterface:
                     self.font_families = pickle.load(file)
                 if self.font_families:
                     return
-        feedback("Setting up fonts ...please be patient!", False)
+        feedback("Setting up fonts ... ... ... please be patient!", False)
         self.load_font_files()
         for ffile in self.font_files:
             fdt = self.extract_font_summary(ffile)

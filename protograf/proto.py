@@ -74,13 +74,14 @@ from protograf.utils import geoms, tools, support
 from protograf.utils.constants import (
     DEFAULT_FONT,
     DEBUG_COLOR,
-    DEFAULT_CARD_WIDTH,
-    DEFAULT_CARD_HEIGHT,
+    DEFAULT_CARD_WIDTH,  # cm
+    DEFAULT_CARD_HEIGHT,  # cm
     DEFAULT_CARD_COUNT,
-    DEFAULT_CARD_RADIUS,
-    DEFAULT_COUNTER_SIZE,
+    DEFAULT_CARD_RADIUS,  # cm
+    DEFAULT_COUNTER_SIZE,  # cm
+    DEFAULT_COUNTER_RADIUS,  # cm
     DEFAULT_DPI,
-    DEFAULT_MARGIN_SIZE,
+    DEFAULT_MARGIN_SIZE,  # cm
     GRID_SHAPES_WITH_CENTRE,
     GRID_SHAPES_NO_CENTRE,
     SHAPES_FOR_TRACK,
@@ -144,20 +145,23 @@ class CardShape(BaseShape):
     def __init__(self, _object=None, canvas=None, **kwargs):
         super(CardShape, self).__init__(_object=_object, canvas=canvas, **kwargs)
         self.kwargs = kwargs
-        # tools.feedback(f'$$$ CardShape KW=> {self.kwargs}')
+        # tools.feedback(f'\n$$$ CardShape KW=> {self.kwargs}')
         self.elements = []  # container for objects which get added to the card
         self.members = None
         if kwargs.get("_is_countersheet", False):
-            default_height = DEFAULT_COUNTER_SIZE
-            default_width = DEFAULT_COUNTER_SIZE
-            default_radius = 0.635
+            default_height = DEFAULT_COUNTER_SIZE / globals.units
+            default_width = DEFAULT_COUNTER_SIZE / globals.units
+            default_radius = DEFAULT_COUNTER_RADIUS / globals.units
         else:
-            default_height = DEFAULT_CARD_HEIGHT
-            default_width = DEFAULT_CARD_WIDTH
-            default_radius = DEFAULT_CARD_RADIUS
+            default_height = DEFAULT_CARD_HEIGHT / globals.units
+            default_width = DEFAULT_CARD_WIDTH / globals.units
+            default_radius = DEFAULT_CARD_RADIUS / globals.units
+
+        # print(f'$$$ {default_width=} {default_height=} {default_radius=} {globals.units=}')
         self.height = kwargs.get("height", default_height)
         self.width = kwargs.get("width", default_width)
         self.radius = kwargs.get("radius", default_radius)
+        # print(f'$$$ {self.width=} {self.height=} {self.radius=} {globals.units=}')
         self.outline = self.get_outline(
             cnv=canvas, row=None, col=None, cid=None, label=None, **kwargs
         )
@@ -436,14 +440,14 @@ class DeckOfCards:
         self.backs = []  # container for CardShape objects for back of cards
         if kwargs.get("_is_countersheet", False):
             default_items = 70
-            default_height = DEFAULT_COUNTER_SIZE
-            default_width = DEFAULT_COUNTER_SIZE
-            default_radius = 0.635
+            default_height = DEFAULT_COUNTER_SIZE / globals.units
+            default_width = DEFAULT_COUNTER_SIZE / globals.units
+            default_radius = DEFAULT_COUNTER_RADIUS / globals.units
         else:
             default_items = DEFAULT_CARD_COUNT
-            default_height = DEFAULT_CARD_HEIGHT
-            default_width = DEFAULT_CARD_WIDTH
-            default_radius = DEFAULT_CARD_RADIUS
+            default_height = DEFAULT_CARD_HEIGHT / globals.units
+            default_width = DEFAULT_CARD_WIDTH / globals.units
+            default_radius = DEFAULT_CARD_RADIUS / globals.units
         self.counters = kwargs.get("counters", default_items)
         # ---- set card size
         self.cards = kwargs.get("cards", self.counters)  # default total number of cards
@@ -1122,8 +1126,11 @@ def Create(**kwargs):
     # ---- set and confirm globals
     globals.initialize()
     globals_set = True
+    # ---- units
+    _units = kwargs.get("units", globals.units)
+    globals.units = support.to_units(_units)
     # ---- margins
-    the_margin = kwargs.get("margin", DEFAULT_MARGIN_SIZE)
+    the_margin = kwargs.get("margin", DEFAULT_MARGIN_SIZE / globals.units)
     globals.margins = PageMargins(
         margin=the_margin,
         left=kwargs.get("margin_left", the_margin),
@@ -1137,9 +1144,6 @@ def Create(**kwargs):
     landscape = kwargs.get("landscape", False)
     kwargs = margins(**kwargs)
     defaults = kwargs.get("defaults", None)
-    # ---- units
-    _units = kwargs.get("units", globals.units)
-    globals.units = support.to_units(_units)
     # ---- paper, page, page sizes, page color
     globals.paper = kwargs.get("paper", globals.paper)
     globals.page = pymupdf.paper_size(globals.paper)  # (width, height) in points
@@ -1171,6 +1175,14 @@ def Create(**kwargs):
         "--png",
         help="Whether to create PNG during Save (default is True)",
         default=True,
+        action=argparse.BooleanOptionalAction,
+    )
+    # use: --fonts to force Fonts recreation during Create()
+    parser.add_argument(
+        "-f",
+        "--fonts",
+        help="Force reloading of all available fonts at start (default is False)",
+        default=False,
         action=argparse.BooleanOptionalAction,
     )
     parser.add_argument(
@@ -1211,14 +1223,14 @@ def Create(**kwargs):
     # ---- cards
     if _cards:
         Deck(canvas=globals.canvas, sequence=range(1, _cards + 1), **kwargs)  # deck var
-    # ---- pymupdf fonts
+    # ---- pickle font info for pymupdf
     globals.archive = pymupdf.Archive()
     globals.css = ""
     cached_fonts = tools.as_bool(kwargs.get("cached_fonts", True))
-    if not cached_fonts:
+    if not cached_fonts or globals.pargs.fonts:
         cache_directory = Path(Path.home() / CACHE_DIRECTORY)
         fi = FontInterface(cache_directory=cache_directory)
-        fi.load_font_families(cached=cached_fonts)
+        fi.load_font_families(cached=False)
 
 
 def create(**kwargs):

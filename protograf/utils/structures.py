@@ -140,6 +140,7 @@ OffsetProperties = namedtuple(
     ],
 )
 
+# margins are in user units
 PageMargins = namedtuple(
     "PageMargins",
     [

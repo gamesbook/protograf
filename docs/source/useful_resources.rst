@@ -20,6 +20,8 @@ Icons, Art and Images
 -  https://bioart.niaid.nih.gov/ - medical, biological, animal and "various"
    in PNG and SVG formats
 -  https://thenounproject.com/ (some free, provided they are attributed)
+-  https://developers.google.com/fonts/docs/material_icons - downloadable set
+   of free-to-use small icons in PNG/SVG format
 
 There is a collated list of sites with free *artwork* at
 https://www.fairway3games.com/where-do-i-get-art-for-free-an-ongoing-list/

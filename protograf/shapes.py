@@ -4187,9 +4187,8 @@ class TextShape(BaseShape):
             try:
                 # style
                 keys["fontsize"] = self.font_size
-                keys["fontname"] = self.font_name.replace(
-                    " ", "_"
-                )  # prevent: bad fontname chars {' '}
+                # NB - replace spaces to prevent: bad fontname chars {' '}
+                keys["fontname"] = self.font_name.strip().replace(" ", "_")
                 keys["fontfile"] = self.font_file
                 keys["color"] = tools.get_color(self.stroke)
                 # keys["fill"] = tools.get_color(self.fill)
@@ -4212,6 +4211,8 @@ class TextShape(BaseShape):
                 # keys['expandtabs'] = 8
                 # keys['charwidths'] = None
                 # tools.feedback(f'*** Text WRAP {keys=} \n=> {rect=} _text:{_text}')
+                if self.run_debug:
+                    globals.doc_page.draw_rect(rect, color=self.debug_color, dashes="[1 2] 0")
                 current_page.insert_textbox(rect, _text, **keys)
             except ValueError as err:
                 tools.feedback(f"Cannot create Text! - {err}", True)
@@ -4239,6 +4240,8 @@ class TextShape(BaseShape):
                         keys["css"] = globals.css
                 keys["archive"] = globals.archive
                 # tools.feedback(f'*** Text HTML {keys=} {rect=} {_text=} {keys=}')
+                if self.run_debug:
+                    globals.doc_page.draw_rect(rect, color=self.debug_color, dashes="[1 2] 0")
                 current_page.insert_htmlbox(rect, _text, **keys)
             except ValueError as err:
                 tools.feedback(f"Cannot create Text - {err}", True)
