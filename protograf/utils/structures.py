@@ -78,7 +78,7 @@ DeckPrintState = namedtuple(
         "card_count",
         "card_number",
         "copies_to_do",
-        "end_x",  # right-most point of right-most card
+        "start_x",  # left-most point of first card
     ],
 )
 

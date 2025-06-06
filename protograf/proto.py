@@ -85,7 +85,6 @@ from protograf.utils.constants import (
     GRID_SHAPES_WITH_CENTRE,
     GRID_SHAPES_NO_CENTRE,
     SHAPES_FOR_TRACK,
-    STANDARD_CARD_SIZES,
 )
 from protograf.utils.fonts import builtin_font, FontInterface
 from protograf.utils.geoms import equilateral_height  # used in scripts
@@ -214,6 +213,7 @@ class CardShape(BaseShape):
         image = kwargs.get("image", None)
         margin_shift_x = kwargs.get("margin_shift_x", 0)  # cards "at the back"
         margin_shift_y = kwargs.get("margin_shift_y", 0)  # not set/used?
+        print(f"$$$ {margin_shift_x=} ")
 
         # FIXME - get correct calculation!!!
         # ---- backs
@@ -228,13 +228,13 @@ class CardShape(BaseShape):
             shape_kwargs["fill"] = kwargs.get("fill", kwargs.get("bleed_fill", None))
         shape_kwargs.pop("image_list", None)  # do NOT draw linked image
         shape_kwargs.pop("image", None)  # do NOT draw get_outline(linked image
-        # tools.feedback(f'$$$ draw_card {cid=} {row=} {col=} \nSKW=> {shape_kwargs}')
+        # tools.feedback(f'$$$ draw_card)() {cid=} {row=} {col=} \nKW=> {shape_kwargs}')
         outline = self.get_outline(
             cnv=cnv, row=row, col=col, cid=cid, label=label, **shape_kwargs
         )
         outline.draw(off_x=margin_shift_x, off_y=margin_shift_y, **shape_kwargs)
-        end_x = outline.calculated_left + outline.width  # max right for card
-        print(f"$$$ {outline.calculated_left=} {outline.width=} {end_x=}")
+        start_x = outline.calculated_left  # min left for card
+        print(f"$$$ draw_card() {outline.calculated_left=} {start_x=}")
 
         # ---- track frame outlines for possible image extraction
         match kwargs["frame_type"]:
@@ -417,7 +417,7 @@ class CardShape(BaseShape):
             except Exception as err:
                 tools.feedback(f"Unable to draw card #{cid + 1}. (Error:{err})", True)
 
-        return end_x  # right-most point of card
+        return start_x  # left-most point of card
 
 
 class DeckOfCards:
@@ -453,27 +453,7 @@ class DeckOfCards:
         self.cards = kwargs.get("cards", self.counters)  # default total number of cards
         card_size = kwargs.get("card_size", "")
         the_height, the_width, size = default_height, default_width, None
-        match str(card_size).lower():
-            case "bridge" | "b":
-                size = STANDARD_CARD_SIZES["bridge"]["pt"]
-            case "business" | "u":
-                size = STANDARD_CARD_SIZES["business"]["pt"]
-            case "mini" | "m":
-                size = STANDARD_CARD_SIZES["mini"]["pt"]
-            case "miniamerican" | "ma":
-                size = STANDARD_CARD_SIZES["miniamerican"]["pt"]
-            case "minieuropean" | "me":
-                size = STANDARD_CARD_SIZES["minieuropean"]["pt"]
-            case "poker" | "p" | "mtg":
-                size = STANDARD_CARD_SIZES["poker"]["pt"]
-            case "skat" | "s":
-                size = STANDARD_CARD_SIZES["skat"]["pt"]
-            case "tarot" | "t":
-                size = STANDARD_CARD_SIZES["tarot"]["pt"]
-            case "":
-                pass
-            case _:
-                tools.feedback(f'Card style "{card_size}" is unknown.', True)
+        size = tools.card_size(card_size)
         if size:
             the_height, the_width = size[1] / globals.units, size[0] / globals.units
         self.height = kwargs.get("height", the_height)  # OVERWRITE
@@ -565,6 +545,7 @@ class DeckOfCards:
         extra = globals.deck_settings.get("extra", 0)
         self.cards += extra
         log.debug("Card Counts: %s Settings: %s", self.cards, globals.deck_settings)
+        # print(f'$$$ {self.cards=}, {globals.deck_settings=}')
         self.create_cardshapes(self.cards)
 
     def set_dataset(self):
@@ -684,7 +665,7 @@ class DeckOfCards:
             else:
                 row, col = 0, max_cols - 1  # draw left-to-right for back
             card_number = start_card
-            end_x = 0
+            start_x_first = 0
 
             for card_num in range(start_card, card_count):
                 card_number = card_num
@@ -709,7 +690,6 @@ class DeckOfCards:
                 kwargs["grouping_cols"] = self.grouping_cols
                 kwargs["grouping_rows"] = self.grouping_rows
                 kwargs["page_number"] = page_number
-                kwargs["margin_shift_x"] = shift_x
                 image = images[card_num] if images and card_num <= len(images) else None
                 card.deck_data = self.dataset
 
@@ -735,9 +715,10 @@ class DeckOfCards:
                     for i in range(state.copies_to_do, copies):
                         if not front:
                             kwargs["card_back"] = True  # de/activate grid marks & shift
+                            kwargs["margin_shift_x"] = shift_x
                         else:
                             kwargs["card_back"] = False
-                        card_end_x = card.draw_card(
+                        card_start_x = card.draw_card(
                             cnv,
                             row=row,
                             col=col,
@@ -745,9 +726,14 @@ class DeckOfCards:
                             image=image,
                             **kwargs,
                         )
-                        print(f"A. {col=} {end_x=} {card_end_x=}")
-                        end_x = card_end_x if card_end_x > end_x else end_x  # max right
-                        print(f"B. {col=} {end_x=} {card_end_x=}")
+                        print(
+                            f"A. {card_num=} {col=} {card_start_x=} {start_x_first=} "
+                        )
+                        if front and card_num == start_card:
+                            start_x_first = card_start_x  # min left
+                        print(
+                            f"B. {card_num=} {col=} {card_start_x=} {start_x_first=} "
+                        )
                         if front:
                             col += 1
                             if col >= max_cols:
@@ -786,25 +772,27 @@ class DeckOfCards:
                             cnv = globals.canvas  # new one from page break
                             self.draw_bleed(cnv, page_across, page_down)
                             print(
-                                f"$$$ card_draw - RETURN FROM rows / {front=} : {card_number + 1}"
+                                f"$$$ card_draw - RETURN FROM rows / {front=} : {card_number + 1} / {start_x_first=}"
                             )
                             return cnv, DeckPrintState(
                                 card_count=state.card_count,
                                 card_number=card_number + 1,
                                 copies_to_do=copies - i - 1,
-                                end_x=end_x,
+                                start_x=start_x_first,
                             )
 
             # if card_num >= deck_length:
             PageBreak(**kwargs)
             cnv = globals.canvas  # new one from page break
             self.draw_bleed(cnv, page_across, page_down)
-            print(f"$$$  card_draw - RETURN FROM end  / {front=} : {card_number + 1}")
+            print(
+                f"$$$ card_draw - RETURN FROM end  / {front=} : {card_number + 1} / {start_x_first=}"
+            )
             return cnv, DeckPrintState(
                 card_count=state.card_count,
                 card_number=card_number + 1,
                 copies_to_do=0,
-                end_x=end_x,
+                start_x=start_x_first,
             )
 
         # ---- primary layout settings for draw()
@@ -904,7 +892,7 @@ class DeckOfCards:
         # ---- space calcs for rows/cols
         # Note: units here are user-based
         if not max_rows:
-            row_space = globals.page_height - margin_bottom - margin_top
+            row_space = globals.page_height - margin_bottom - margin_top - self.offset_y
             if self.grouping_rows == 1:
                 max_rows = int(
                     (row_space + self.spacing_y) / (float(_height) + self.spacing_y)
@@ -916,7 +904,7 @@ class DeckOfCards:
                 )
                 max_rows = max_groups * self.grouping_rows
         if not max_cols:
-            col_space = globals.page_width - margin_left - margin_right
+            col_space = globals.page_width - margin_left - margin_right - self.offset_x
             if self.grouping_cols == 1:
                 max_cols = int(
                     (col_space + self.spacing_x) / (float(_width) + self.spacing_x)
@@ -942,10 +930,10 @@ class DeckOfCards:
         # ---- prep for card drawing
         page_number = -1
         state_front = DeckPrintState(
-            card_count=len(self.fronts), card_number=0, copies_to_do=0, end_x=0
+            card_count=len(self.fronts), card_number=0, copies_to_do=0, start_x=0
         )
         state_back = DeckPrintState(
-            card_count=len(self.backs), card_number=0, copies_to_do=0, end_x=0
+            card_count=len(self.backs), card_number=0, copies_to_do=0, start_x=0
         )
         for back in self.backs:
             if back.elements:
@@ -954,20 +942,14 @@ class DeckOfCards:
 
         # ---- actually draw cards!
         while state_front.card_number < len(self.fronts):
-            print(f"\n$$$ {state_front.card_number=} $$$ ")
+            print(f"\n$$$ FRONT {state_front.card_number=} $$$ ")
             page_number += 1  # for back-to-back OR no backs
             cnv, state_front = draw_the_cards(cnv, state_front, page_number, front=True)
             if self.show_backs:
+                print(f"\n$$$ BACK  {state_back.card_number=} $$$ ")
                 page_number += 1  # for back-to-back
-                print(
-                    f"$$$ {globals.page_width=} {state_front.end_x=} {globals.margins.right=} "
-                )
-                shift_x = (
-                    globals.page_width
-                    - state_front.end_x
-                    - globals.margins.left
-                    - self.offset_x
-                )
+                shift_x = state_front.start_x
+                print(f"$$$ *** {state_front.start_x=} {shift_x=} ")
                 cnv, state_back = draw_the_cards(
                     cnv, state_back, page_number, front=False, shift_x=shift_x
                 )
@@ -1296,7 +1278,8 @@ def Save(**kwargs):
         removed after the file been created)
     - **dpi** - can be set to the dots-per-inch resolution required; by default
       this is ``300``
-    - **directory** -
+    - **directory** - export path for the PNG or SVG; if None then use the same
+      one as the script
     - **names** - provide a list of names -- without an extension -- for the
       *output* files that will be created from the PDF;
       the first name corresponds to the first page, the second name to the second
@@ -1324,9 +1307,12 @@ def Save(**kwargs):
     cards = kwargs.get("cards", False)  # export individual cards as PNG
     output = kwargs.get("output", None)  # export document into this format e.g. SVG
 
-    # ---- validate directory
-    if directory and not os.path.exists(directory):
-        tools.feedback(f'Unable to find directory "{directory}" for Save().', True)
+    # ---- directory
+    dirname = directory or os.getcwd()
+    if not os.path.exists(dirname):
+        tools.feedback(
+            f'Cannot find the directory "{dirname}" - please create this first.', True
+        )
 
     # ---- draw Deck (and export cards)
     if globals.deck and len(globals.deck.fronts) >= 1:
@@ -1339,7 +1325,7 @@ def Save(**kwargs):
             grid_marks=globals.deck_settings.get("grid_marks", None),
             image_list=globals.image_list,
             dpi=dpi,
-            directory=directory,
+            directory=dirname,
         )
 
     # ---- update current pymupdf Shape
@@ -1375,7 +1361,7 @@ def Save(**kwargs):
 
     if output and globals.pargs.png:  # pargs.png should default to True
         support.pdf_export(
-            globals.filename, fformat, dpi, names, directory, framerate=framerate
+            globals.filename, fformat, dpi, names, dirname, framerate=framerate
         )
 
     # ---- save cards to image(s)

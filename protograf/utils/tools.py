@@ -21,7 +21,7 @@ from pymupdf.utils import getColor
 import requests
 
 # local
-from protograf.utils.constants import COLOR_NAMES
+from protograf.utils.constants import COLOR_NAMES, STANDARD_CARD_SIZES, PAPER_SIZES
 from protograf.utils.support import feedback, to_units
 from protograf.utils.structures import (
     DirectionGroup,
@@ -1361,6 +1361,68 @@ def set_canvas_props(
     )
     cnv.commit()
     return None
+
+
+def card_size(card_size: str = None, units: str = "pt") -> tuple:
+    """Return card width and height in requested units for a named size.
+
+    Doc Test:
+
+    >>> card_size('poker')
+    (180, 252)
+    >>> card_size('poker', 'in')
+    (2.5, 3.5)
+    >>> card_size('miniamerican', 'mm')
+    (41.0, 63.0)
+    """
+    size = None
+    if units not in ["pt", "mm", "in"]:
+        feedback(f'Card size units "{units}" is unknown.', True)
+    match str(card_size).lower():
+        case "bridge" | "b":
+            size = STANDARD_CARD_SIZES["bridge"][units]
+        case "business" | "u":
+            size = STANDARD_CARD_SIZES["business"][units]
+        case "mini" | "m":
+            size = STANDARD_CARD_SIZES["mini"][units]
+        case "miniamerican" | "ma":
+            size = STANDARD_CARD_SIZES["miniamerican"][units]
+        case "minieuropean" | "me":
+            size = STANDARD_CARD_SIZES["minieuropean"][units]
+        case "poker" | "p" | "mtg":
+            size = STANDARD_CARD_SIZES["poker"][units]
+        case "skat" | "s":
+            size = STANDARD_CARD_SIZES["skat"][units]
+        case "tarot" | "t":
+            size = STANDARD_CARD_SIZES["tarot"][units]
+        case "":
+            pass
+        case _:
+            feedback(f'Card size "{card_size}" is unknown.', True)
+    return size
+
+
+def paper_size(paper_size: str = None, units: str = "pt") -> tuple:
+    """Return paper width and height in requested units for a named size.
+
+    Doc Test:
+
+    >>> paper_size('A4')
+    (595, 842)
+    >>> paper_size('Legal', 'in')
+    (8.5, 14)
+    >>> paper_size('Notelet', 'pt')
+    (270, 270)
+
+    # >>> paper_size('A5', 'in')
+    # (180, 252)
+    """
+    if units not in ["pt", "mm", "in"]:
+        feedback(f'Paper size units "{units}" is unknown.', True)
+    try:
+        return PAPER_SIZES[paper_size][units]
+    except KeyError:
+        feedback(f'Paper size "{paper_size}" in "{units}" is unavailable.', True)
 
 
 if __name__ == "__main__":

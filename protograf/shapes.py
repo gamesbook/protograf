@@ -4212,7 +4212,9 @@ class TextShape(BaseShape):
                 # keys['charwidths'] = None
                 # tools.feedback(f'*** Text WRAP {keys=} \n=> {rect=} _text:{_text}')
                 if self.run_debug:
-                    globals.doc_page.draw_rect(rect, color=self.debug_color, dashes="[1 2] 0")
+                    globals.doc_page.draw_rect(
+                        rect, color=self.debug_color, dashes="[1 2] 0"
+                    )
                 current_page.insert_textbox(rect, _text, **keys)
             except ValueError as err:
                 tools.feedback(f"Cannot create Text! - {err}", True)
@@ -4241,7 +4243,9 @@ class TextShape(BaseShape):
                 keys["archive"] = globals.archive
                 # tools.feedback(f'*** Text HTML {keys=} {rect=} {_text=} {keys=}')
                 if self.run_debug:
-                    globals.doc_page.draw_rect(rect, color=self.debug_color, dashes="[1 2] 0")
+                    globals.doc_page.draw_rect(
+                        rect, color=self.debug_color, dashes="[1 2] 0"
+                    )
                 current_page.insert_htmlbox(rect, _text, **keys)
             except ValueError as err:
                 tools.feedback(f"Cannot create Text - {err}", True)
