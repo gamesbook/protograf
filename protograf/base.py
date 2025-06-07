@@ -1027,7 +1027,7 @@ class BaseShape:
         )
 
     def set_offset_props(self, off_x=0, off_y=0):
-        """Get OffsetProperties for a Shape."""
+        """OffsetProperties in point units for a Shape."""
         margin_left = (
             self.unit(self.margin_left) if self.margin_left is not None else self.margin
         )
@@ -1042,7 +1042,10 @@ class BaseShape:
         off_x = self.unit(off_x) if off_x is not None else None
         off_y = self.unit(off_y) if off_y is not None else None
         return OffsetProperties(
-            off_x, off_y, off_x + margin_left, off_y + margin_top  # margin_bottom
+            off_x=off_x,
+            off_y=off_y,
+            delta_x=off_x + margin_left,
+            delta_y=off_y + margin_top,
         )
 
     def draw_polyline_props(self, cnv: muShape, vertexes: list, **kwargs) -> bool:

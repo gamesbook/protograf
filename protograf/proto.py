@@ -211,14 +211,7 @@ class CardShape(BaseShape):
         # tools.feedback(f'$$$ draw_card  {cid=} KW=> {kwargs}')
         is_card_back = kwargs.get("card_back", False)
         image = kwargs.get("image", None)
-        margin_shift_x = kwargs.get("margin_shift_x", 0)  # cards "at the back"
-        margin_shift_y = kwargs.get("margin_shift_y", 0)  # not set/used?
-        print(f"$$$ {margin_shift_x=} ")
-
-        # FIXME - get correct calculation!!!
-        # ---- backs
-        # if is_card_back:
-        #     margin_shift_x = 2 * (self.margin_left + self.margin_right) - 0.5 * margin_shift_x
+        right_gap = kwargs.get("right_gap", 0.0)  # gap between end-of-cards & page edge
 
         # ---- draw outline
         label = "ID:%s" % cid if self.show_id else ""
@@ -232,9 +225,14 @@ class CardShape(BaseShape):
         outline = self.get_outline(
             cnv=cnv, row=row, col=col, cid=cid, label=label, **shape_kwargs
         )
-        outline.draw(off_x=margin_shift_x, off_y=margin_shift_y, **shape_kwargs)
-        start_x = outline.calculated_left  # min left for card
-        print(f"$$$ draw_card() {outline.calculated_left=} {start_x=}")
+
+        # ---- set x-shift to align card backs and fronts (frames)
+        if is_card_back:
+            move_x = right_gap - self.offset_x - globals.margins.left
+            # tools.feedback(f'$$$ {right_gap=} {self.offset_x=} {move_x=}')
+        else:
+            move_x = 0
+        outline.draw(off_x=move_x, off_y=0, **shape_kwargs)
 
         # ---- track frame outlines for possible image extraction
         match kwargs["frame_type"]:
@@ -281,26 +279,17 @@ class CardShape(BaseShape):
         match kwargs["frame_type"]:
             case CardFrame.RECTANGLE | CardFrame.CIRCLE:
                 if kwargs["grouping_cols"] == 1:
-                    _dx = (
-                        col * (outline.width + outline.spacing_x)
-                        + outline.offset_x
-                        + margin_shift_x
-                    )
+                    _dx = col * (outline.width + outline.spacing_x) + outline.offset_x
                 else:
                     group_no = col // kwargs["grouping_cols"]
                     _dx = (
                         col * outline.width
                         + outline.offset_x
                         + outline.spacing_x * group_no
-                        + margin_shift_x
                     )
                 if kwargs["grouping_rows"] == 1:
-                    _dy = (
-                        row * (outline.height + outline.spacing_y)
-                        + outline.offset_y
-                        + margin_shift_y
-                    )
-                    # print(f"$$$ {col=} {outline.width=} {group_no=} {_dx=}")
+                    _dy = row * (outline.height + outline.spacing_y) + outline.offset_y
+
                 else:
                     group_no = row // kwargs["grouping_rows"]
                     _dy = (
@@ -309,24 +298,21 @@ class CardShape(BaseShape):
                         + outline.spacing_y * group_no
                         + margin_shift_y
                     )
-                    # print(f"$$$ {row=} {outline.height=} {group_no=} {_dy=}")
+                # print(f"$$$ {col=} {outline.width=}  {group_no=} {_dx=}")
+                # print(f"$$$ {row=} {outline.height=} {group_no=} {_dy=}")
             case CardFrame.HEXAGON:
-                _dx = (
-                    col * 2.0 * (side + outline.spacing_x)
-                    + outline.offset_x
-                    + margin_shift_x
-                )
-                _dy = (
-                    row * 2.0 * (half_flat + outline.spacing_y)
-                    + outline.offset_y
-                    + margin_shift_y
-                )
+                _dx = col * 2.0 * (side + outline.spacing_x) + outline.offset_x
+                _dy = row * 2.0 * (half_flat + outline.spacing_y) + outline.offset_y
                 if row & 1:
-                    _dx = _dx + side + outline.spacing_x + margin_shift_x
+                    _dx = _dx + side + outline.spacing_x
             case _:
                 raise NotImplementedError(
                     f'Cannot handle card frame type: {kwargs["frame_type"]}'
                 )
+
+        # ---- set x-shift to align card backs and fronts (elements)
+        if is_card_back:
+            _dx = _dx + move_x
 
         # ---- track/update frame and store card fronts
         if not is_card_back:
@@ -416,8 +402,6 @@ class CardShape(BaseShape):
 
             except Exception as err:
                 tools.feedback(f"Unable to draw card #{cid + 1}. (Error:{err})", True)
-
-        return start_x  # left-most point of card
 
 
 class DeckOfCards:
@@ -642,7 +626,7 @@ class DeckOfCards:
             state: DeckPrintState,
             page_number: int = 0,
             front: bool = True,
-            shift_x: float = 0.0,
+            gap_at_right: float = 0.0,
         ) -> DeckPrintState:
             """Process a Page of Cards for front or back of a DeckOfCards
 
@@ -651,8 +635,7 @@ class DeckOfCards:
                 state: track what is being printed on the page
                 page_number: current
                 front: if True, print CardShapes in `deck.fronts`
-                shift_x: amount to move cards "across" when printing `deck.backs`;
-                    used by CardShape.CardShape()
+                gap_at_right: space left after the last card
 
             Returns:
                 DeckPrintState at the end of a Page
@@ -665,7 +648,6 @@ class DeckOfCards:
             else:
                 row, col = 0, max_cols - 1  # draw left-to-right for back
             card_number = start_card
-            start_x_first = 0
 
             for card_num in range(start_card, card_count):
                 card_number = card_num
@@ -679,7 +661,7 @@ class DeckOfCards:
                     card = self.backs[card_num]
                     deck_length = len(self.backs)
 
-                # set meta data
+                # set meta data for draw_card
                 _locale = Locale(
                     col=col + 1,
                     row=row + 1,
@@ -690,6 +672,7 @@ class DeckOfCards:
                 kwargs["grouping_cols"] = self.grouping_cols
                 kwargs["grouping_rows"] = self.grouping_rows
                 kwargs["page_number"] = page_number
+                kwargs["right_gap"] = gap_at_right
                 image = images[card_num] if images and card_num <= len(images) else None
                 card.deck_data = self.dataset
 
@@ -715,24 +698,15 @@ class DeckOfCards:
                     for i in range(state.copies_to_do, copies):
                         if not front:
                             kwargs["card_back"] = True  # de/activate grid marks & shift
-                            kwargs["margin_shift_x"] = shift_x
                         else:
                             kwargs["card_back"] = False
-                        card_start_x = card.draw_card(
+                        card.draw_card(
                             cnv,
                             row=row,
                             col=col,
                             cid=card.shape_id,
                             image=image,
                             **kwargs,
-                        )
-                        print(
-                            f"A. {card_num=} {col=} {card_start_x=} {start_x_first=} "
-                        )
-                        if front and card_num == start_card:
-                            start_x_first = card_start_x  # min left
-                        print(
-                            f"B. {card_num=} {col=} {card_start_x=} {start_x_first=} "
                         )
                         if front:
                             col += 1
@@ -771,28 +745,24 @@ class DeckOfCards:
                             PageBreak(**kwargs)
                             cnv = globals.canvas  # new one from page break
                             self.draw_bleed(cnv, page_across, page_down)
-                            print(
-                                f"$$$ card_draw - RETURN FROM rows / {front=} : {card_number + 1} / {start_x_first=}"
-                            )
+                            # print(f"$$$ card_draw - RETURN FROM rows / {front=} : {card_number + 1}")
                             return cnv, DeckPrintState(
                                 card_count=state.card_count,
                                 card_number=card_number + 1,
                                 copies_to_do=copies - i - 1,
-                                start_x=start_x_first,
+                                start_x=0,
                             )
 
             # if card_num >= deck_length:
             PageBreak(**kwargs)
             cnv = globals.canvas  # new one from page break
             self.draw_bleed(cnv, page_across, page_down)
-            print(
-                f"$$$ card_draw - RETURN FROM end  / {front=} : {card_number + 1} / {start_x_first=}"
-            )
+            # print(f"$$$ card_draw - RETURN FROM end  / {front=} : {card_number + 1}")
             return cnv, DeckPrintState(
                 card_count=state.card_count,
                 card_number=card_number + 1,
                 copies_to_do=0,
-                start_x=start_x_first,
+                start_x=0,
             )
 
         # ---- primary layout settings for draw()
@@ -917,12 +887,18 @@ class DeckOfCards:
                 max_cols = max_groups * self.grouping_cols
         if self.grouping_cols == 1:
             effective_right = (
-                globals.page_width - margin_left - max_cols * (_width + self.spacing_x)
+                max_cols * (_width + self.spacing_x)
+                + globals.margins.left
+                + self.offset_x
             )
         else:
             effective_right = (
-                globals.page_width - margin_left - max_cols * (_width + self.spacing_x)
+                max_cols * (_width + self.spacing_x)
+                + globals.margins.left
+                + self.offset_x
             )
+        # ---- gap-at-right (for card back shift)
+        gap_at_right = globals.page_width - effective_right
 
         # print(f"$$$ {globals.page_width=} {_width=} (col_space=} {max_cols=}")
         # print(f"$$${globals.page_height=} {_height=} {row_space=} {max_rows=}")
@@ -942,16 +918,14 @@ class DeckOfCards:
 
         # ---- actually draw cards!
         while state_front.card_number < len(self.fronts):
-            print(f"\n$$$ FRONT {state_front.card_number=} $$$ ")
+            # print(f"\n$$$ FRONT {state_front.card_number=} $$$ ")
             page_number += 1  # for back-to-back OR no backs
-            cnv, state_front = draw_the_cards(cnv, state_front, page_number, front=True)
+            cnv, state_front = draw_the_cards(cnv, state_front, page_number, True, 0)
             if self.show_backs:
-                print(f"\n$$$ BACK  {state_back.card_number=} $$$ ")
+                # print(f"\n$$$ BACK  {state_back.card_number=} $$$ ")
                 page_number += 1  # for back-to-back
-                shift_x = state_front.start_x
-                print(f"$$$ *** {state_front.start_x=} {shift_x=} ")
                 cnv, state_back = draw_the_cards(
-                    cnv, state_back, page_number, front=False, shift_x=shift_x
+                    cnv, state_back, page_number, False, gap_at_right
                 )
         # ---- delete extra blank page at the end
         globals.document.delete_page(globals.page_count)
@@ -1006,7 +980,7 @@ class DeckOfCards:
             # ---- delete extra blank page at the end
             globals.document.delete_page(globals.page_count)
             # ---- delete gutter PDF document
-            # os.remove(gutter_filename)
+            os.remove(gutter_filename)
         else:
             pass
             # moved to Save() command; otherwise output file not available
