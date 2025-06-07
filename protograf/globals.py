@@ -19,6 +19,7 @@ def initialize():
     global dataset_type
     global image_list
     global filename
+    global directory
     global margins
     global footer
     global footer_draw
@@ -45,6 +46,7 @@ def initialize():
     )  # holds kwargs passed to DeckOfCards ; #cards, copy, extra, grid_marks
     card_frames = {}  # list of proto.BBox card outlines; keyed on page number
     filename = None
+    directory = None  # set by Save() command
     dataset = None  # will become a dictionary of data loaded from a file
     dataset_type = None  # set when Data is loaded; enum DatasetType
     image_list = []  # filenames stored when Data is loaded from image dir

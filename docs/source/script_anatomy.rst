@@ -168,6 +168,8 @@ To customise the command, set its properties as follows:
     by the page number;
   - ``gif`` - to create a GIF file composed of all the PNG pages (these will be
     removed after the file been created)
+- **directory** - sets the location where the output will be created; the
+  default is the directory on which the script is being run
 - **dpi** - can be set to the dots-per-inch resolution required; by default
   this is ``300``
 - **names** - this can be used to provide a list of names |dash| without an
@@ -176,12 +178,12 @@ To customise the command, set its properties as follows:
   and so on.  Each will automatically get the correct extension added to it.
   If the term ``None`` is used in place of a name, then that page will **not**
   have an output file created for it.
-- **framerate** - the delay in seconds between each "page" of a GIF image; by
-  default this is ``1`` second
 - **cards** - when set to ``True`` will cause all the card fronts to be
   exported as PNG files; the names of the files are based on the PDF
   filename, with a dash (-) followed by the page number, and ``.png`` file
   extension
+- **framerate** - the delay in seconds between each "page" of a GIF image; by
+  default this is ``1`` second
 
 
 Example 1. Save PNG
@@ -217,6 +219,46 @@ Here is another example of a customised ``Save`` command:
 In this example, an animated GIF image will be created, assembled out of the
 PNG images; one per page of the PDF.  There will be a delay of half-a-second
 between the showing of each image.
+
+Example 3. Customise Outputs
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Here are various examples of a customised ``Save`` command:
+
+.. code:: python
+
+    # 1.
+    Save()
+    # 2.
+    Save(directory="/tmp/test")
+    # 3.
+    Save(output="png", directory="/tmp/test")
+    # 4.
+    Save(cards=True, directory="/tmp/test")
+    # 5.
+    Save(cards=True, output="png", directory="/tmp/test")
+    # 6.
+    Save(cards=True, output="png")
+
+The outcomes will be as follows:
+
+1. The PDF for the script will be created in the directory where its being run
+2. The PDF for the script will be created in the ``/tmp/test`` directory,
+   which must already exist
+3. The PDF for the script will be created in the ``/tmp/test`` directory,
+   which must already exist, as well as a PNG image for each page in the PDF
+4. The PDF for the script will be created in the ``/tmp/test`` directory,
+   which must already exist, as well as a PNG image for each card in the PDF
+   (this example assumes you are working with the :ref:`Deck <the-deck-command>`
+   command)
+5. The PDF for the script will be created in the ``/tmp/test`` directory,
+   which must already exist, as well as a PNG image for each page in the PDF,
+   and also a PNG image for each card in the PDF (this example assumes you are
+   working with the :ref:`Deck <the-deck-command>` command)
+6. The PDF for the script will be created in the directory where its being run
+   as well as a PNG image for each page in the PDF, and also a PNG image for
+   each card in the PDF (this example assumes you are  working with the
+   :ref:`Deck <the-deck-command>` command)
 
 
 Other Commands

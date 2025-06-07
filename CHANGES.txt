@@ -10,12 +10,14 @@ Changes
 - Moved bulk of constant and structure definitions to their own files
 - Added list() function example
 - Added CardBack shape and support alternate front/back card pages
-- Support card front and back on same page (the "gutter")
+- Support cards fronts and backs on same page (via "gutter")
 - Changed property names used for access to Google Sheets
-- Support named card sizes
+- Support for common named card sizes
 - Changed default card size and page margins
-- Support "debug" to show dotted margin
+- Added "margin_debug" to Create() to show a dotted margin
+- Added "page_grid" to Create() for help design layout
 - Fixed issues with default margin and card sizes for non-cm units
+- Fixed bug with directory for various outputs
 
 2025-05-23 (0.2.2)
 ------------------

@@ -228,7 +228,7 @@ Most modern web browsers should also be able to open and display PDF files.
     at https://www.sumatrapdfreader.org/download-free-pdf-viewer |dash|
     is a useful one for Windows users, as it supports "live reloading"
     i.e. each time you make changes to your **protograf** script the PDF
-    will automatically refresh.
+    will automatically refresh if the Sumatra PDF viewer is running.
 
 Core Fonts (optional)
 ---------------------
@@ -257,7 +257,9 @@ Installing **protograf**
     Windows users will need to install an additional program - a "DLL" -
     which is a required dependency.  Download the ``vc_redist.x64.exe`` file from
     https://learn.microsoft.com/en-gb/cpp/windows/latest-supported-vc-redist?view=msvc-170#latest-microsoft-visual-c-redistributable-version
-    and do the install!
+    and follow the installation process!
+
+    This package is needed for the SVG export option to work.
 
 After `testing that Python is installed`_, you can install **protograf** itself
 via ``pip``.
@@ -269,6 +271,14 @@ After `opening a Terminal`_, and activating the virtual environment::
 If you are using ``uv``::
 
    uv pip install protograf
+
+.. HINT::
+
+    It might be that **protograf** gets upgraded/updated after you have
+    installed it for the first time; in this case, if you are using ``uv``
+    you can use this commmand to update it::
+
+        uv pip install -U pymupdf
 
 
 Checking that protograf works

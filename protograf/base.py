@@ -17,6 +17,7 @@ import logging
 import math
 import os
 from pathlib import Path, PosixPath
+from sys import platform
 from urllib.parse import urlparse
 
 # third party
@@ -1591,9 +1592,15 @@ class BaseShape:
             if is_directory:
                 return img, True
             # check image exists
+            if platform == "linux" or platform == "linux2":
+                image_local = os.path.normpath(image_local.replace("\\", "/")).replace(
+                    os.sep, "/"
+                )
             if not os.path.exists(image_local):
                 tools.feedback(
-                    f'Unable to find or open image "{image_location}"', False, True
+                    f'Unable to find or open image "{image_location}" (also tried in "{image_local}"',
+                    False,
+                    True,
                 )
                 return img, True
 

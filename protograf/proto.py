@@ -296,7 +296,6 @@ class CardShape(BaseShape):
                         row * outline.height
                         + outline.offset_y
                         + outline.spacing_y * group_no
-                        + margin_shift_y
                     )
                 # print(f"$$$ {col=} {outline.width=}  {group_no=} {_dx=}")
                 # print(f"$$$ {row=} {outline.height=} {group_no=} {_dy=}")
@@ -586,18 +585,19 @@ class DeckOfCards:
 
     def export_cards_as_images(
         self,
-        source: str,
+        filename: str,
+        directory: str,
         output: str = None,
         fformat: str = "png",
     ):
         """Save individual cards as PNG images using their frames."""
         if self.export_cards and globals.pargs.png:  # pargs.png should default to True
             support.pdf_cards_to_png(
-                source=source,
-                output=output or source,
+                source=filename,
+                output=output or filename,
                 fformat=fformat,
                 dpi=self.dpi,
-                directory=self.directory,
+                directory=directory or self.directory,
                 card_frames=globals.card_frames,
                 page_height=globals.page[1],
             )
@@ -933,10 +933,13 @@ class DeckOfCards:
         # ---- reset to prime and load-in gutter pages
         if self.gutter is not None:
             # save gutter document
-            globals.document.save(globals.filename)
+            gutterfile = os.path.join(globals.directory, globals.filename)
+            globals.document.save(gutterfile)
             # export cards
             self.export_cards_as_images(
-                source=globals.filename, output=prime_globals.filename
+                filename=globals.filename,
+                directory=globals.directory,
+                output=prime_globals.filename,
             )  # default to PNG format
             # reset globals to current doc
             restore_globals(prime_globals)
@@ -983,8 +986,6 @@ class DeckOfCards:
             os.remove(gutter_filename)
         else:
             pass
-            # moved to Save() command; otherwise output file not available
-            # self.export_cards_as_images(source=globals.filename)  # default PNG format
 
     def get(self, cid):
         """Return a card based on the internal ID"""
@@ -1141,6 +1142,14 @@ def Create(**kwargs):
         default=False,
         action=argparse.BooleanOptionalAction,
     )
+    # use: --no-warning to ignore WARNING:: messages
+    parser.add_argument(
+        "-nw",
+        "--nowarning",
+        help="Do NOT show any WARNING:: messages (default is False)",
+        default=False,
+        action=argparse.BooleanOptionalAction,
+    )
     parser.add_argument(
         "-p", "--pages", help="Specify which pages to process", default=""
     )
@@ -1282,8 +1291,8 @@ def Save(**kwargs):
     output = kwargs.get("output", None)  # export document into this format e.g. SVG
 
     # ---- directory
-    dirname = directory or os.getcwd()
-    if not os.path.exists(dirname):
+    globals.directory = directory if directory else os.getcwd()
+    if not os.path.exists(globals.directory):
         tools.feedback(
             f'Cannot find the directory "{dirname}" - please create this first.', True
         )
@@ -1299,7 +1308,7 @@ def Save(**kwargs):
             grid_marks=globals.deck_settings.get("grid_marks", None),
             image_list=globals.image_list,
             dpi=dpi,
-            directory=dirname,
+            directory=globals.directory,
         )
 
     # ---- update current pymupdf Shape
@@ -1307,19 +1316,22 @@ def Save(**kwargs):
 
     # ---- save all Pages to file
     msg = "Please check folder exists and that you have access rights."
+    output_filename = os.path.join(globals.directory, globals.filename)
     try:
         globals.document.subset_fonts(verbose=True)  # subset fonts to reduce file size
-        globals.document.save(globals.filename)
+        globals.document.save(output_filename)
     except RuntimeError as err:
-        tools.feedback(f'Unable to save "{globals.filename}" - {err} - {msg}', True)
+        tools.feedback(f'Unable to save "{output_filename}" - {err} - {msg}', True)
     except FileNotFoundError as err:
-        tools.feedback(f'Unable to save "{globals.filename}" - {err} - {msg}', True)
+        tools.feedback(f'Unable to save "{output_filename}" - {err} - {msg}', True)
     except pymupdf.mupdf.FzErrorSystem as err:
-        tools.feedback(f'Unable to save "{globals.filename}" - {err} - {msg}', True)
+        tools.feedback(f'Unable to save "{output_filename}" - {err} - {msg}', True)
 
-    # ---- export Cards (where only Card fronts exist)
-    if globals.deck and len(globals.deck.fronts) >= 1 and not globals.deck.show_backs:
-        globals.deck.export_cards_as_images(source=globals.filename)
+    # ---- export individual Cards (where only Card fronts exist)
+    if globals.deck and len(globals.deck.fronts) >= 1:
+        globals.deck.export_cards_as_images(
+            filename=globals.filename, directory=globals.directory
+        )
 
     # ---- save to PNG image(s) or SVG file(s)
     if output:
@@ -1335,7 +1347,12 @@ def Save(**kwargs):
 
     if output and globals.pargs.png:  # pargs.png should default to True
         support.pdf_export(
-            globals.filename, fformat, dpi, names, dirname, framerate=framerate
+            globals.filename,
+            fformat,
+            dpi,
+            names,
+            globals.directory,
+            framerate=framerate,
         )
 
     # ---- save cards to image(s)

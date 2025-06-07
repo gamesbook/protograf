@@ -99,7 +99,7 @@ GlobalDocument = namedtuple(
         "deck",
         "card_frames",
         "filename",
-        "document",
+        "directory" "document",
         "doc_page",
         "canvas",
         "margins",

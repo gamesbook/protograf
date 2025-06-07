@@ -1150,6 +1150,7 @@ def save_globals() -> GlobalDocument:
         deck=globals.deck,
         card_frames=globals.card_frames,
         filename=globals.filename,
+        directory=globals.directory,
         document=globals.document,
         doc_page=globals.doc_page,
         canvas=globals.canvas,
@@ -1169,6 +1170,7 @@ def restore_globals(doc: GlobalDocument):
     globals.deck = doc.deck
     globals.card_frames = doc.card_frames
     globals.filename = doc.filename
+    globals.directory = doc.directory
     globals.document = doc.document
     globals.doc_page = doc.doc_page
     globals.canvas = doc.canvas

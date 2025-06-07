@@ -13,6 +13,7 @@ import imageio
 import pymupdf
 
 # local
+from protograf import globals
 from protograf.utils.constants import (
     BUILT_IN_FONTS,
     CACHE_DIRECTORY,
@@ -23,7 +24,7 @@ from protograf.utils.structures import ExportFormat, unit
 
 def feedback(item, stop=False, warn=False):
     """Placeholder for more complete feedback."""
-    if warn:
+    if warn and not globals.pargs.nowarning:
         print("WARNING:: %s" % item)
     else:
         print("FEEDBACK:: %s" % item)
@@ -468,6 +469,7 @@ def pdf_export(
     _filename = os.path.basename(filename)
     basename = os.path.splitext(_filename)[0]
     dirname = directory or os.path.dirname(filename)
+    pdf_filename = os.path.join(dirname, filename)
     # ---- validate directory
     if not os.path.exists(dirname):
         feedback(
@@ -495,7 +497,7 @@ def pdf_export(
                 True,
             )
     try:
-        doc = pymupdf.open(filename)
+        doc = pymupdf.open(pdf_filename)
         pages = doc.page_count
 
         if fformat == ExportFormat.SVG:
@@ -592,15 +594,17 @@ def pdf_cards_to_png(
     """
     feedback(f"Saving card(s) as image file(s)...", False)
     _filename = os.path.basename(output)
+    _source = os.path.basename(source)
     basename = os.path.splitext(_filename)[0]
     dirname = directory or os.path.dirname(output)
+    pdf_filename = os.path.join(dirname, _source)
     # validate directory
     if not os.path.exists(dirname):
         feedback(
             f'Cannot find the directory "{dirname}" - please create this first.', True
         )
     try:
-        doc = pymupdf.open(source)
+        doc = pymupdf.open(pdf_filename)
         page_num = 0
         for page in doc:
             outlines = card_frames.get(page_num, [])
