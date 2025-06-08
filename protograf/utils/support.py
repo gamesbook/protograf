@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Support utilities for protograf `draw` module
+Support utilities for protograf
 """
 # lib
 import itertools
@@ -14,24 +14,14 @@ import pymupdf
 
 # local
 from protograf import globals
+from protograf.globals import unit
 from protograf.utils.constants import (
     BUILT_IN_FONTS,
     CACHE_DIRECTORY,
     COLORS_SVG as named_colors,
 )
-from protograf.utils.structures import ExportFormat, unit
-
-
-def feedback(item, stop=False, warn=False):
-    """Placeholder for more complete feedback."""
-    if warn and not globals.pargs.nowarning:
-        print("WARNING:: %s" % item)
-    else:
-        print("FEEDBACK:: %s" % item)
-    if stop:
-        print("FEEDBACK:: Could not continue with program.\n")
-        # sys.exit()
-        quit()
+from protograf.utils.structures import ExportFormat
+from protograf.utils.messaging import feedback
 
 
 def numbers(*args):

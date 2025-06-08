@@ -38,7 +38,7 @@ package_logger = logging.getLogger("fontTools")
 package_logger.setLevel(logging.ERROR)
 
 from .support import BUILT_IN_FONTS
-from .tools import feedback
+from .messaging import feedback
 
 
 def builtin_font(name: str) -> Union[str, None]:

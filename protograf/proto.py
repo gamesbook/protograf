@@ -67,6 +67,7 @@ from .layouts import (
     RepeatShape,
     SequenceShape,
 )
+from .globals import unit
 from .groups import Switch, Lookup  # used in scripts
 from ._version import __version__
 
@@ -88,6 +89,7 @@ from protograf.utils.constants import (
 )
 from protograf.utils.fonts import builtin_font, FontInterface
 from protograf.utils.geoms import equilateral_height  # used in scripts
+from protograf.utils.messaging import feedback
 from protograf.utils.support import (  # used in scripts
     steps,
     uni,
@@ -108,7 +110,6 @@ from protograf.utils.structures import (
     Place,
     Ray,
     TemplatingType,
-    unit,
 )
 from protograf.utils.tools import (
     base_fonts,
@@ -130,7 +131,7 @@ def validate_globals():
     """Check that Create has been called to set initialise globals"""
     global globals_set
     if not globals_set:
-        tools.feedback("Please ensure Create() command is called first!", True)
+        feedback("Please ensure Create() command is called first!", True)
 
 
 # ---- Deck / Card related ====
@@ -144,7 +145,7 @@ class CardShape(BaseShape):
     def __init__(self, _object=None, canvas=None, **kwargs):
         super(CardShape, self).__init__(_object=_object, canvas=canvas, **kwargs)
         self.kwargs = kwargs
-        # tools.feedback(f'\n$$$ CardShape KW=> {self.kwargs}')
+        # feedback(f'\n$$$ CardShape KW=> {self.kwargs}')
         self.elements = []  # container for objects which get added to the card
         self.members = None
         if kwargs.get("_is_countersheet", False):
@@ -175,7 +176,7 @@ class CardShape(BaseShape):
 
     def get_outline(self, cnv, row, col, cid, label, **kwargs):
         outline = None
-        # tools.feedback(f"$$$ getoutline {row=}, {col=}, {cid=}, {label=}")
+        # feedback(f"$$$ getoutline {row=}, {col=}, {cid=}, {label=}")
         kwargs["height"] = self.height
         kwargs["width"] = self.width
         kwargs["radius"] = self.radius
@@ -207,8 +208,8 @@ class CardShape(BaseShape):
 
         Pass on `deck_data` to other commands, as needed, for them to draw Shapes
         """
-        # tools.feedback(f'$$$ draw_card  {cid=} {cnv=} {kwargs["card_back"]=}')
-        # tools.feedback(f'$$$ draw_card  {cid=} KW=> {kwargs}')
+        # feedback(f'$$$ draw_card  {cid=} {cnv=} {kwargs["card_back"]=}')
+        # feedback(f'$$$ draw_card  {cid=} KW=> {kwargs}')
         is_card_back = kwargs.get("card_back", False)
         image = kwargs.get("image", None)
         right_gap = kwargs.get("right_gap", 0.0)  # gap between end-of-cards & page edge
@@ -221,7 +222,7 @@ class CardShape(BaseShape):
             shape_kwargs["fill"] = kwargs.get("fill", kwargs.get("bleed_fill", None))
         shape_kwargs.pop("image_list", None)  # do NOT draw linked image
         shape_kwargs.pop("image", None)  # do NOT draw get_outline(linked image
-        # tools.feedback(f'$$$ draw_card)() {cid=} {row=} {col=} \nKW=> {shape_kwargs}')
+        # feedback(f'$$$ draw_card)() {cid=} {row=} {col=} \nKW=> {shape_kwargs}')
         outline = self.get_outline(
             cnv=cnv, row=row, col=col, cid=cid, label=label, **shape_kwargs
         )
@@ -229,7 +230,7 @@ class CardShape(BaseShape):
         # ---- set x-shift to align card backs and fronts (frames)
         if is_card_back:
             move_x = right_gap - self.offset_x - globals.margins.left
-            # tools.feedback(f'$$$ {right_gap=} {self.offset_x=} {move_x=}')
+            # feedback(f'$$$ {right_gap=} {self.offset_x=} {move_x=}')
         else:
             move_x = 0
         outline.draw(off_x=move_x, off_y=0, **shape_kwargs)
@@ -359,7 +360,7 @@ class CardShape(BaseShape):
                 new_ele = self.handle_custom_values(flat_ele, cid)  # calculated values
                 if isinstance(new_ele, (SequenceShape, RepeatShape)):
                     new_ele.deck_data = self.deck_data
-                # tools.feedback(f'$$$ CS draw_card $$$ {new_ele=} {kwargs=}')
+                # feedback(f'$$$ CS draw_card $$$ {new_ele=} {kwargs=}')
                 if isinstance(new_ele, TemplatingType):
                     card_value = self.deck_data[iid]
                     custom_value = new_ele.template.render(card_value)
@@ -371,7 +372,7 @@ class CardShape(BaseShape):
                             )
                             cnv.commit()
                         except AttributeError as err:
-                            tools.feedback(
+                            feedback(
                                 f"Unable to draw card #{cid + 1}.  Check that all"
                                 f" elements created by '{new_ele.function.__name__}'"
                                 " are shapes.",
@@ -393,14 +394,14 @@ class CardShape(BaseShape):
                         custom_new_ele = self.handle_custom_values(flat_new_ele, iid)
                         if isinstance(custom_new_ele, (SequenceShape, RepeatShape)):
                             custom_new_ele.deck_data = self.deck_data
-                        # tools.feedback(f'$$$ draw_card $$$ {custom_new_ele=}')
+                        # feedback(f'$$$ draw_card $$$ {custom_new_ele=}')
                         custom_new_ele.draw(
                             cnv=cnv, off_x=_dx, off_y=_dy, ID=iid, **kwargs
                         )
                         cnv.commit()
 
             except Exception as err:
-                tools.feedback(f"Unable to draw card #{cid + 1}. (Error:{err})", True)
+                feedback(f"Unable to draw card #{cid + 1}. (Error:{err})", True)
 
 
 class DeckOfCards:
@@ -417,7 +418,7 @@ class DeckOfCards:
     def __init__(self, canvas=None, **kwargs):
         self.cnv = canvas  # initial pymupdf.Shape object (need one per Page)
         self.kwargs = kwargs
-        # tools.feedback(f'$$$ DeckShape KW=> {self.kwargs}')
+        # feedback(f'$$$ DeckShape KW=> {self.kwargs}')
         # ---- cards
         self.fronts = []  # container for CardShape objects for front of cards
         self.backs = []  # container for CardShape objects for back of cards
@@ -456,9 +457,7 @@ class DeckOfCards:
                 self.frame_type = CardFrame.HEXAGON
             case _:
                 hint = " Try rectangle, hexagon, or circle."
-                tools.feedback(
-                    f"Unable to draw a {self.frame}-shaped card. {hint}", True
-                )
+                feedback(f"Unable to draw a {self.frame}-shaped card. {hint}", True)
         self.kwargs["frame_type"] = self.frame_type  # used for create_cardshapes()
         # ---- dataset (list of dicts)
         self.dataset = kwargs.get("dataset", None)
@@ -471,9 +470,7 @@ class DeckOfCards:
         self.copy = kwargs.get("copy", None)
         self.mask = kwargs.get("mask", None)
         if self.mask and not self.dataset:
-            tools.feedback(
-                'Cannot set "mask" for a Deck without any existing Data!', True
-            )
+            feedback('Cannot set "mask" for a Deck without any existing Data!', True)
         # ---- bleed
         self.bleed_fill = kwargs.get("bleed_fill", None)
         self.bleed_areas = kwargs.get("bleed_areas", [])
@@ -540,7 +537,7 @@ class DeckOfCards:
         ]:
             log.debug("globals.dataset_type: %s", globals.dataset_type)
             if len(globals.dataset) == 0:
-                tools.feedback("The provided data is empty or cannot be loaded!", True)
+                feedback("The provided data is empty or cannot be loaded!", True)
             else:
                 # globals.deck.create(len(globals.dataset) + globals.extra)
                 self.dataset = globals.dataset
@@ -626,7 +623,7 @@ class DeckOfCards:
             state: DeckPrintState,
             page_number: int = 0,
             front: bool = True,
-            gap_at_right: float = 0.0,
+            right_gap: float = 0.0,
         ) -> DeckPrintState:
             """Process a Page of Cards for front or back of a DeckOfCards
 
@@ -635,7 +632,7 @@ class DeckOfCards:
                 state: track what is being printed on the page
                 page_number: current
                 front: if True, print CardShapes in `deck.fronts`
-                gap_at_right: space left after the last card
+                right_gap: space left after the last card
 
             Returns:
                 DeckPrintState at the end of a Page
@@ -672,7 +669,7 @@ class DeckOfCards:
                 kwargs["grouping_cols"] = self.grouping_cols
                 kwargs["grouping_rows"] = self.grouping_rows
                 kwargs["page_number"] = page_number
-                kwargs["right_gap"] = gap_at_right
+                kwargs["right_gap"] = right_gap
                 image = images[card_num] if images and card_num <= len(images) else None
                 card.deck_data = self.dataset
 
@@ -683,7 +680,7 @@ class DeckOfCards:
                     )
                     mask = tools.as_bool(_check, label="mask", allow_none=False)
                     if not isinstance(mask, bool):
-                        tools.feedback(
+                        feedback(
                             'The "mask" test must result in True or False value!', True
                         )
                 if not mask:
@@ -767,7 +764,7 @@ class DeckOfCards:
 
         # ---- primary layout settings for draw()
         cnv = cnv if cnv else globals.canvas
-        # tools.feedback(f'$$$ DeckShape.draw {cnv=} KW=> {kwargs}')
+        # feedback(f'$$$ DeckShape.draw {cnv=} KW=> {kwargs}')
         log.debug("Deck cnv:%s type:%s", type(globals.canvas), type(cnv))
         kwargs = self.kwargs | kwargs
         images = kwargs.get("image_list", [])
@@ -893,14 +890,18 @@ class DeckOfCards:
             )
         else:
             effective_right = (
-                max_cols * (_width + self.spacing_x)
+                max_cols * _width
                 + globals.margins.left
                 + self.offset_x
+                + (self.grouping_cols - 1) * self.spacing_x
             )
-        # ---- gap-at-right (for card back shift)
-        gap_at_right = globals.page_width - effective_right
 
-        # print(f"$$$ {globals.page_width=} {_width=} (col_space=} {max_cols=}")
+        # ---- gap-at-right (for card back shift)
+        right_gap = globals.page_width - effective_right
+
+        # print(f"$$$ {right_gap=} {globals.page_width=} {effective_right=}")
+        # print(f"$$$ {self.grouping_cols=} {self.spacing_x=}")
+        # print(f"$$$ {globals.page_width=} {_width=} {col_space=} {max_cols=}")
         # print(f"$$${globals.page_height=} {_height=} {row_space=} {max_rows=}")
 
         # ---- prep for card drawing
@@ -925,7 +926,7 @@ class DeckOfCards:
                 # print(f"\n$$$ BACK  {state_back.card_number=} $$$ ")
                 page_number += 1  # for back-to-back
                 cnv, state_back = draw_the_cards(
-                    cnv, state_back, page_number, False, gap_at_right
+                    cnv, state_back, page_number, False, right_gap
                 )
         # ---- delete extra blank page at the end
         globals.document.delete_page(globals.page_count)
@@ -983,7 +984,7 @@ class DeckOfCards:
             # ---- delete extra blank page at the end
             globals.document.delete_page(globals.page_count)
             # ---- delete gutter PDF document
-            os.remove(gutter_filename)
+            # os.remove(gutter_filename)
         else:
             pass
 
@@ -1112,7 +1113,7 @@ def Create(**kwargs):
             _page_width * globals.units if _page_width > 0 else globals.paper[0]
         )
         _page_height_pt = (
-            _page_width * globals.units if _page_height > 0 else globals.paper[1]
+            _page_height * globals.units if _page_height > 0 else globals.paper[1]
         )
         globals.page = (_page_width_pt, _page_height_pt)
     globals.page_width = globals.page[0] / globals.units  # width in user units
@@ -1156,7 +1157,7 @@ def Create(**kwargs):
     globals.pargs = parser.parse_args()
     # NB - pages does not work - see notes in PageBreak()
     if globals.pargs.pages:
-        tools.feedback("--pages is not yet an implemented feature - sorry!")
+        feedback("--pages is not yet an implemented feature - sorry!")
     # ---- filename and fallback
     _filename = kwargs.get("filename", "")
     if not _filename:
@@ -1170,7 +1171,7 @@ def Create(**kwargs):
         _filename = f"{basename}.pdf"
     # ---- validate directory & set filename
     if globals.pargs.directory and not os.path.exists(globals.pargs.directory):
-        tools.feedback(
+        feedback(
             f'Unable to find directory "{globals.pargs.directory}" for output.', True
         )
     globals.filename = os.path.join(globals.pargs.directory, _filename)
@@ -1293,7 +1294,7 @@ def Save(**kwargs):
     # ---- directory
     globals.directory = directory if directory else os.getcwd()
     if not os.path.exists(globals.directory):
-        tools.feedback(
+        feedback(
             f'Cannot find the directory "{dirname}" - please create this first.', True
         )
 
@@ -1321,11 +1322,11 @@ def Save(**kwargs):
         globals.document.subset_fonts(verbose=True)  # subset fonts to reduce file size
         globals.document.save(output_filename)
     except RuntimeError as err:
-        tools.feedback(f'Unable to save "{output_filename}" - {err} - {msg}', True)
+        feedback(f'Unable to save "{output_filename}" - {err} - {msg}', True)
     except FileNotFoundError as err:
-        tools.feedback(f'Unable to save "{output_filename}" - {err} - {msg}', True)
+        feedback(f'Unable to save "{output_filename}" - {err} - {msg}', True)
     except pymupdf.mupdf.FzErrorSystem as err:
-        tools.feedback(f'Unable to save "{output_filename}" - {err} - {msg}', True)
+        feedback(f'Unable to save "{output_filename}" - {err} - {msg}', True)
 
     # ---- export individual Cards (where only Card fronts exist)
     if globals.deck and len(globals.deck.fronts) >= 1:
@@ -1343,7 +1344,7 @@ def Save(**kwargs):
             case "gif":
                 fformat = ExportFormat.GIF
             case _:
-                tools.feedback(f'Unknown output format "{output}"', True)
+                feedback(f'Unknown output format "{output}"', True)
 
     if output and globals.pargs.png:  # pargs.png should default to True
         support.pdf_export(
@@ -1386,7 +1387,7 @@ def Font(name=None, **kwargs):
             _name = fi.get_font_family(name)
             _file = fi.get_font_file(name)
             if not _name:
-                tools.feedback(
+                feedback(
                     f'Cannot find or load a font named "{name}".'
                     f' Defaulting to "{DEFAULT_FONT}".',
                     False,
@@ -1410,11 +1411,11 @@ def Font(name=None, **kwargs):
 
 
 def Version():
-    tools.feedback(f"Running protograf version {__version__}.")
+    feedback(f"Running protograf version {__version__}.")
 
 
 def Feedback(msg):
-    tools.feedback(msg)
+    feedback(msg)
 
 
 def Today(details: str = "datetime", style: str = "iso", formatted: str = None) -> str:
@@ -1431,11 +1432,11 @@ def Today(details: str = "datetime", style: str = "iso", formatted: str = None) 
         try:
             return current.strftime(formatted)
         except Exception:
-            tools.feedback('Unable to use formatted value  "{formatted}".', True)
+            feedback('Unable to use formatted value  "{formatted}".', True)
     try:
         sstyle = style.lower()
     except Exception:
-        tools.feedback('Unable to use style "{style}" - try "eur" or "usa".', True)
+        feedback('Unable to use style "{style}" - try "eur" or "usa".', True)
 
     if details == "date" and sstyle == "usa":
         return current.strftime(f"%B {current.day} %Y")  # USA
@@ -1488,7 +1489,7 @@ def Matrix(labels: list = None, data: list = None) -> list:
         labels = [f"VALUE{item+1}" for item in range(0, data_length)]
     else:
         if len(labels) != data_length:
-            tools.feedback(
+            feedback(
                 "The number of labels must equal the number of combinations!", True
             )
     result = []
@@ -1513,17 +1514,17 @@ def Card(sequence: object = None, *elements, **kwargs):
             card.elements.append(element)  # may be Group or Shape or Query
         except AttributeError:
             if isinstance(element, str):
-                tools.feedback(
+                feedback(
                     f'Cannot use the string "{element}" for a Card or CardBack.', True
                 )
             else:
-                tools.feedback(f'Cannot use "{element}" for a Card or CardBack.', True)
+                feedback(f'Cannot use "{element}" for a Card or CardBack.', True)
 
     kwargs = margins(**kwargs)
     if not globals.deck:
-        tools.feedback("The Deck() has not been defined or is incorrect.", True)
+        feedback("The Deck() has not been defined or is incorrect.", True)
     if not sequence:
-        tools.feedback("The Card() needs to have a valid sequence defined.", True)
+        feedback("The Card() needs to have a valid sequence defined.", True)
     _cards = []
     # int - single card
     try:
@@ -1531,7 +1532,7 @@ def Card(sequence: object = None, *elements, **kwargs):
         _cards = range(_card, _card + 1)
     except Exception:
         pass
-    # string - either 'all'/'*' .OR. a range: '1', '1-2', '1-3,5-6'
+    # string - either 'all'/'*'/'even'/'odd' .OR. a range: '1', '1-2', '1-3,5-6'
     if not _cards:
         try:
             card_count = (
@@ -1551,6 +1552,10 @@ def Card(sequence: object = None, *elements, **kwargs):
                 _cards = sequence
             elif sequence.lower() == "all" or sequence.lower() == "*":
                 _cards = list(range(1, card_count + 1))
+            elif sequence.lower() == "odd" or sequence.lower() == "o":
+                _cards = list(range(1, card_count + 1, 2))
+            elif sequence.lower() == "even" or sequence.lower() == "e":
+                _cards = list(range(2, card_count + 1, 2))
             else:
                 _cards = tools.sequence_split(sequence)
         except Exception as err:
@@ -1561,7 +1566,7 @@ def Card(sequence: object = None, *elements, **kwargs):
                 globals.deck.images_front_list,
                 err,
             )
-            tools.feedback(
+            feedback(
                 f'Unable to convert "{sequence}" into a card or range of cards {globals.deck}.'
             )
     for index, _card in enumerate(_cards):
@@ -1577,7 +1582,7 @@ def Card(sequence: object = None, *elements, **kwargs):
                     # card.elements.append(element)  # may be Group or Shape or Query
                     add_members_to_card(element)
         else:
-            tools.feedback(f'Cannot find card#{_card}. (Check "cards" setting in Deck)')
+            feedback(f'Cannot find card#{_card}. (Check "cards" setting in Deck)')
 
 
 def CardBack(sequence: object = None, *elements, **kwargs):
@@ -1593,9 +1598,9 @@ def CardBack(sequence: object = None, *elements, **kwargs):
 
     kwargs = margins(**kwargs)
     if not globals.deck:
-        tools.feedback("The Deck() has not been defined or is incorrect.", True)
+        feedback("The Deck() has not been defined or is incorrect.", True)
     if not sequence:
-        tools.feedback("The Card() needs to have a valid sequence defined.", True)
+        feedback("The Card() needs to have a valid sequence defined.", True)
 
     _cardbacks = []
     # int - single card
@@ -1604,7 +1609,7 @@ def CardBack(sequence: object = None, *elements, **kwargs):
         _cardbacks = range(_back, _back + 1)
     except Exception:
         pass
-    # string - either 'all'/'*' .OR. a range: '1', '1-2', '1-3,5-6'
+    # string - either 'all'/'*'/'even'/'odd' .OR. a range: '1', '1-2', '1-3,5-6'
     if not _cardbacks:
         try:
             cardback_count = (
@@ -1624,6 +1629,10 @@ def CardBack(sequence: object = None, *elements, **kwargs):
                 _cardbacks = sequence
             elif sequence.lower() == "all" or sequence.lower() == "*":
                 _cardbacks = list(range(1, cardback_count + 1))
+            elif sequence.lower() == "odd" or sequence.lower() == "o":
+                _cardbacks = list(range(1, cardback_count + 1, 2))
+            elif sequence.lower() == "even" or sequence.lower() == "e":
+                _cardbacks = list(range(2, cardback_count + 1, 2))
             else:
                 _cardbacks = tools.sequence_split(sequence)
         except Exception as err:
@@ -1634,12 +1643,12 @@ def CardBack(sequence: object = None, *elements, **kwargs):
                 globals.deck.images_back_list,
                 err,
             )
-            tools.feedback(
+            feedback(
                 f'Unable to convert "{sequence}" into a cardback or range of cardbacks {globals.deck}.'
             )
     for index, _back in enumerate(_cardbacks):
         if _back - 1 >= len(globals.deck.backs):
-            tools.feedback("Number of CardBacks cannot exceed number of Cards!", True)
+            feedback("Number of CardBacks cannot exceed number of Cards!", True)
         cardback = globals.deck.backs[_back - 1]  # cards internally number from ZERO
         if cardback:
             for element in elements:
@@ -1652,9 +1661,7 @@ def CardBack(sequence: object = None, *elements, **kwargs):
                     # cardback.elements.append(element)  # may be Group or Shape or Query
                     add_members_to_back(element)
         else:
-            tools.feedback(
-                f'Cannot find cardback#{_back}. (Check "cards" setting in Deck)'
-            )
+            feedback(f'Cannot find cardback#{_back}. (Check "cards" setting in Deck)')
 
 
 def Counter(sequence, *elements, **kwargs):
@@ -1786,14 +1793,13 @@ def Data(**kwargs):
     filters = tools.sequence_split(images_filter, False, True)
     source = kwargs.get("source", None)  # dict
     google_sheet = kwargs.get("google_sheet", None)  # Google Sheet
+    debug = kwargs.get("debug", False)
     # extra cards added to deck (handle special cases not in the dataset)
     globals.deck_settings["extra"] = tools.as_int(kwargs.get("extra", 0), "extra")
     try:
         int(globals.deck_settings["extra"])
     except Exception:
-        tools.feedback(
-            f'Extra must be a whole number, not "{kwargs.get("extra")}"!', True
-        )
+        feedback(f'Extra must be a whole number, not "{kwargs.get("extra")}"!', True)
 
     if filename:  # handle excel and CSV
         globals.dataset = tools.load_data(filename, **kwargs)
@@ -1806,9 +1812,7 @@ def Data(**kwargs):
         )
         globals.dataset_type = DatasetType.GSHEET
         if not globals.dataset:
-            tools.feedback(
-                "No data accessible from the Google Sheet - please check", True
-            )
+            feedback("No data accessible from the Google Sheet - please check", True)
     elif matrix:  # handle pre-built dict
         globals.dataset = matrix
         globals.dataset_type = DatasetType.MATRIX
@@ -1819,16 +1823,16 @@ def Data(**kwargs):
             globals.dataset = dict_list
             globals.dataset_type = DatasetType.DICT
         except Exception:
-            tools.feedback("The data_list is not valid - please check", True)
+            feedback("The data_list is not valid - please check", True)
     elif source:  # handle pre-built list-of-dict
         if not isinstance(source, list):
             source_type = type(source)
-            tools.feedback(
+            feedback(
                 f"The source must be a list-of-dictionaries, not {source_type}", True
             )
         if not isinstance(source[0], dict):
             sub_type = type(source)
-            tools.feedback(f"The list must contain dictionaries, not {sub_type}", True)
+            feedback(f"The list must contain dictionaries, not {sub_type}", True)
         globals.dataset = source
         globals.dataset_type = DatasetType.DICT
     elif images:  # create list of images
@@ -1839,31 +1843,43 @@ def Data(**kwargs):
             full_path = os.path.join(script_dir, images)
             src = Path(full_path)
             if not src.is_dir():
-                tools.feedback(
+                feedback(
                     f"Cannot locate or access directory: {images} or {full_path}", True
                 )
         for child in src.iterdir():
             if not filters or child.suffix in filters:
                 globals.image_list.append(str(child))
         if globals.image_list is None or len(globals.image_list) == 0:
-            tools.feedback(
+            feedback(
                 f'Directory "{src}" has no relevant files or cannot be loaded!', True
             )
         else:
             globals.dataset_type = DatasetType.IMAGE
     else:
-        tools.feedback("You must provide data for the Data command!", True)
+        feedback("You must provide data for the Data command!", True)
 
     # ---- check keys - cannot use spaces!
     if globals.dataset and len(globals.dataset) > 0:
         first = globals.dataset[0].keys()
         for key in first:
             if not (key.isalpha() or "_" in key):
-                tools.feedback(
+                feedback(
                     "The Data headers must only be characters (without spaces)"
                     f' e.g. not "{key}"',
                     True,
                 )
+    if debug:
+        if len(globals.dataset) > 0:
+            headers = ",".join([*globals.dataset[0]])
+            print(f"Initial rows of {globals.dataset_type} data are:")
+            print(headers)
+            for i in range(0, 3):
+                if len(globals.dataset) >= i:
+                    _data = list(globals.dataset[i].values())
+                    data = ",".join(str(x) for x in _data)
+                    print(data)
+        else:
+            print("No {globals.dataset_type} data was loaded!")
 
     return globals.dataset
 
@@ -1915,15 +1931,15 @@ def L(lookup: str, target: str, result: str, default: Any = "") -> LookupType:
     if globals.dataset and isinstance(globals.dataset, list):
         # validate the lookup column
         if lookup not in globals.dataset[0].keys():
-            tools.feedback(f'The "{lookup}" column is not available.', True)
+            feedback(f'The "{lookup}" column is not available.', True)
         for key, record in enumerate(globals.dataset):
             if target in record.keys():
                 if result in record.keys():
                     lookups[record[target]] = record[result]
                 else:
-                    tools.feedback(f'The "{result}" column is not available.', True)
+                    feedback(f'The "{result}" column is not available.', True)
             else:
-                tools.feedback(f'The "{target}" column is not available.', True)
+                feedback(f'The "{target}" column is not available.', True)
     result = LookupType(column=lookup, lookups=lookups)
     return result
 
@@ -1936,7 +1952,7 @@ def T(string: str, data: dict = None, function: object = None):
         template = environment.from_string(str(string))
     except jinja2.exceptions.TemplateSyntaxError as err:
         template = None
-        tools.feedback(f'Invalid template "{string}" - {err}', True)
+        feedback(f'Invalid template "{string}" - {err}', True)
     # members can assigned when processing cards
     return TemplatingType(template=template, function=function, members=None)
 
@@ -2364,7 +2380,7 @@ def Blueprint(**kwargs):
             case _:
                 color, fill = "#3085AC", None
                 if style_name is not None:
-                    tools.feedback(
+                    feedback(
                         f'The Blueprint style "{style_name}" is unknown', False, True
                     )
         return color, fill
@@ -2374,7 +2390,7 @@ def Blueprint(**kwargs):
 
     kwargs = margins(**kwargs)
     if kwargs.get("common"):
-        tools.feedback('The "common" property cannot be used with a Blueprint.', True)
+        feedback('The "common" property cannot be used with a Blueprint.', True)
     kwargs["units"] = kwargs.get("units", globals.units)
     side = 1.0
     if kwargs["units"] == unit.inch:
@@ -2485,7 +2501,7 @@ def Blueprint(**kwargs):
         # z_y = kwargs["units"] * globals.margins.bottom
         # corner_dist = geoms.length_of_line(Point(0, 0), Point(z_x, z_y))
         # corner_frac = corner_dist * 0.66 / kwargs["units"]
-        # # tools.feedback(f'$$$  {z_x=} {z_y=} {corner_dist=}')
+        # # feedback(f'$$$  {z_x=} {z_y=} {corner_dist=}')
         # zero_pt = geoms.point_on_line(Point(0, 0), Point(z_x, z_y), corner_frac)
         # Text(
         #     x=zero_pt.x / kwargs["units"] - kwargs["side"] / 4.0,
@@ -2604,7 +2620,7 @@ def Hexagons(rows=1, cols=1, sides=None, **kwargs):
             # print('ccol, top_row, end_row', ccol, top_row, end_row)
             for row in range(top_row - 1, end_row + 1):
                 _row = row + 1
-                # tools.feedback(f'{ccol=}, {_row=}')
+                # feedback(f'{ccol=}, {_row=}')
                 if hidden and (_row, ccol) in hidden:
                     pass
                 else:
@@ -2634,7 +2650,7 @@ def Hexagons(rows=1, cols=1, sides=None, **kwargs):
         if kwargs.get("orientation").lower() in ["p", "pointy"] and kwargs.get(
             "hex_layout"
         ) not in ["r", "rec", "rect", "rectangle"]:
-            tools.feedback(
+            feedback(
                 "Cannot use this Hexagons `hex_layout` with pointy hexagons!", True
             )
 
@@ -2642,7 +2658,7 @@ def Hexagons(rows=1, cols=1, sides=None, **kwargs):
         if not sides and (
             (rows is not None and rows < 3) and (cols is not None and cols < 3)
         ):
-            tools.feedback("The minimum values for rows/cols is 3!", True)
+            feedback("The minimum values for rows/cols is 3!", True)
         if rows and rows > 1:
             cols = rows
         if cols and cols > 1:
@@ -2651,14 +2667,14 @@ def Hexagons(rows=1, cols=1, sides=None, **kwargs):
             rows = cols
         if sides:
             if sides < 2:
-                tools.feedback("The minimum value for sides is 2!", True)
+                feedback("The minimum value for sides is 2!", True)
             rows = 2 * sides - 1
             cols = rows
         else:
             if rows & 1 == 0:
-                tools.feedback("An odd number is needed for rows!", True)
+                feedback("An odd number is needed for rows!", True)
             if cols & 1 == 0:
-                tools.feedback("An odd number is needed for cols!", True)
+                feedback("An odd number is needed for cols!", True)
             sides = rows // 2 + 1
         odd_mid = False if sides & 1 == 0 else True
         the_cols = list(range(sides, 0, -1)) + list(range(sides + 1, rows + 1))
@@ -2670,10 +2686,10 @@ def Hexagons(rows=1, cols=1, sides=None, **kwargs):
         locales = draw_hexagons(rows, cols, 0, the_cols)
 
     elif kwargs.get("hex_layout") in ["t", "tri", "triangle"]:
-        tools.feedback(f"Cannot draw triangle-pattern hexagons: {kwargs}", True)
+        feedback(f"Cannot draw triangle-pattern hexagons: {kwargs}", True)
 
     elif kwargs.get("hex_layout") in ["l", "loz", "stadium"]:
-        tools.feedback(f"Cannot draw stadium-pattern hexagons: {kwargs}", True)
+        feedback(f"Cannot draw stadium-pattern hexagons: {kwargs}", True)
 
     else:  # default to rectangular layout
         sequence = 0
@@ -2774,24 +2790,24 @@ def Location(grid: list, label: str, shapes: list, **kwargs):
             x = point.x + pts[0]
             y = point.y + pts[1]
             kwargs["locale"] = locale
-            # tools.feedback(f"$$$ {shape=} :: {loc.x=}, {loc.y=} // {dx=}, {dy=}")
-            # tools.feedback(f"$$$ {kwargs=}")
-            # tools.feedback(f"$$$ {label} :: {shape_name=}")
+            # feedback(f"$$$ {shape=} :: {loc.x=}, {loc.y=} // {dx=}, {dy=}")
+            # feedback(f"$$$ {kwargs=}")
+            # feedback(f"$$$ {label} :: {shape_name=}")
             if shape_name in GRID_SHAPES_WITH_CENTRE:
                 shape.draw(_abs_cx=x, _abs_cy=y, **kwargs)
             elif shape_name in GRID_SHAPES_NO_CENTRE:
                 shape.draw(_abs_x=x, _abs_y=y, **kwargs)
             else:
-                tools.feedback(f"Unable to draw {shape_abbr}s in Location!", True)
+                feedback(f"Unable to draw {shape_abbr}s in Location!", True)
         except Exception as err:
-            tools.feedback(err, False)
-            tools.feedback(
+            feedback(err, False)
+            feedback(
                 f"Unable to draw the '{shape_abbr}' - please check its settings!", True
             )
 
     # checks
     if grid is None or not isinstance(grid, list):
-        tools.feedback("The grid (as a list) must be supplied!", True)
+        feedback("The grid (as a list) must be supplied!", True)
 
     # get location centre from grid via the label
     locale, point = None, None
@@ -2804,16 +2820,16 @@ def Location(grid: list, label: str, shapes: list, **kwargs):
         msg = ""
         if label and "," in label:
             msg = " (Did you mean to use Locations?)"
-        tools.feedback(f"The Location '{label}' is not in the grid!{msg}", True)
+        feedback(f"The Location '{label}' is not in the grid!{msg}", True)
 
     if shapes:
         try:
             iter(shapes)
         except TypeError:
-            tools.feedback("The Location shapes property must contain a list!", True)
+            feedback("The Location shapes property must contain a list!", True)
         for shape in shapes:
             if shape.__class__.__name__ == "GroupBase":
-                tools.feedback(f"Group drawing ({shape}) NOT IMPLEMENTED YET", True)
+                feedback(f"Group drawing ({shape}) NOT IMPLEMENTED YET", True)
             else:
                 draw_shape(shape, point, locale)
 
@@ -2822,11 +2838,11 @@ def Locations(grid: list, labels: Union[str, list], shapes: list, **kwargs):
     kwargs = kwargs
 
     if grid is None or not isinstance(grid, list):
-        tools.feedback("The grid (as a list) must be supplied!", True)
+        feedback("The grid (as a list) must be supplied!", True)
     if labels is None:
-        tools.feedback("No grid location labels supplied!", True)
+        feedback("No grid location labels supplied!", True)
     if shapes is None:
-        tools.feedback("No list of shapes supplied!", True)
+        feedback("No list of shapes supplied!", True)
     if isinstance(labels, str):
         _labels = [_label.strip() for _label in labels.split(",")]
         if labels.lower() == "all" or labels.lower() == "*":
@@ -2837,15 +2853,15 @@ def Locations(grid: list, labels: Union[str, list], shapes: list, **kwargs):
     elif isinstance(labels, list):
         _labels = labels
     else:
-        tools.feedback(
+        feedback(
             "Grid location labels must be a list or a comma-delimited string!", True
         )
 
     if not isinstance(shapes, list):
-        tools.feedback("Shapes must contain a list of shapes!", True)
+        feedback("Shapes must contain a list of shapes!", True)
 
     for label in _labels:
-        # tools.feedback(f'{label=} :: {shapes=}')
+        # feedback(f'{label=} :: {shapes=}')
         Location(grid, label, shapes)
 
 
@@ -2855,16 +2871,16 @@ def LinkLine(grid: list, locations: Union[list, str], **kwargs):
     if isinstance(locations, str):  # should be a comma-delimited string
         locations = tools.sequence_split(locations, False, False)
     if not isinstance(locations, list):
-        tools.feedback(f"'{locations} is not a list - please check!", True)
+        feedback(f"'{locations} is not a list - please check!", True)
     if len(locations) < 2:
-        tools.feedback("There should be at least 2 locations to create links!", True)
+        feedback("There should be at least 2 locations to create links!", True)
     dummy = base_shape()  # a BaseShape - not drawable!
     for index, location in enumerate(locations):
         # precheck
         if isinstance(location, str):
             location = (location, 0, 0)  # reformat into standard notation
         if not isinstance(location, tuple) or len(location) != 3:
-            tools.feedback(
+            feedback(
                 f"The location '{location}' is not valid -- please check its syntax!",
                 True,
             )
@@ -2873,17 +2889,15 @@ def LinkLine(grid: list, locations: Union[list, str], **kwargs):
         try:
             iter(grid)
         except TypeError:
-            tools.feedback(f"The grid '{grid}' is not valid - please check it!", True)
+            feedback(f"The grid '{grid}' is not valid - please check it!", True)
         for position in grid:
             if not isinstance(position, Locale):
-                tools.feedback(
-                    f"The grid '{grid}' is not valid - please check it!", True
-                )
+                feedback(f"The grid '{grid}' is not valid - please check it!", True)
             if location[0] == position.label:
                 loc = Point(position.x, position.y)
                 break
         if loc is None:
-            tools.feedback(f"The location '{location[0]}' is not in the grid!", True)
+            feedback(f"The location '{location[0]}' is not in the grid!", True)
         # new line?
         if index + 1 < len(locations):
             # location #2
@@ -2891,7 +2905,7 @@ def LinkLine(grid: list, locations: Union[list, str], **kwargs):
             if isinstance(location_2, str):
                 location_2 = (location_2, 0, 0)  # reformat into standard notation
             if not isinstance(location_2, tuple) or len(location_2) != 3:
-                tools.feedback(
+                feedback(
                     f"The location '{location_2}' is not valid - please check its syntax!",
                     True,
                 )
@@ -2901,11 +2915,9 @@ def LinkLine(grid: list, locations: Union[list, str], **kwargs):
                     loc_2 = Point(position.x, position.y)
                     break
             if loc_2 is None:
-                tools.feedback(
-                    f"The location '{location_2[0]}' is not in the grid!", True
-                )
+                feedback(f"The location '{location_2[0]}' is not in the grid!", True)
             if location == location_2:
-                tools.feedback(
+                feedback(
                     "Locations must differ from each other - "
                     f"({location} matches {location_2})!",
                     True,
@@ -2917,10 +2929,10 @@ def LinkLine(grid: list, locations: Union[list, str], **kwargs):
             y1 = dummy.points_to_value(loc_2.y) + location_2[2]
 
             _line = line(x=x, y=y, x1=x1, y1=y1, **kwargs)
-            # tools.feedback(f"$$$ {x=}, {y=}, {x1=}, {y1=}")
+            # feedback(f"$$$ {x=}, {y=}, {x1=}, {y1=}")
             delta_x = globals.margins.left
             delta_y = globals.margins.top
-            # tools.feedback(f"$$$ {delta_x=}, {delta_y=}")
+            # feedback(f"$$$ {delta_x=}, {delta_y=}")
             _line.draw(
                 off_x=-delta_x,
                 off_y=-delta_y,
@@ -2950,28 +2962,26 @@ def Layout(grid, **kwargs):
 
     # ---- validate inputs
     if not shapes:
-        tools.feedback("There is no list of shapes to draw!", False, True)
+        feedback("There is no list of shapes to draw!", False, True)
     if shapes and not isinstance(shapes, list):
-        tools.feedback("The values for 'shapes' must be in a list!", True)
+        feedback("The values for 'shapes' must be in a list!", True)
     if not isinstance(grid, VirtualLocations):
-        tools.feedback(f"The grid value '{grid}' is not valid!", True)
+        feedback(f"The grid value '{grid}' is not valid!", True)
     corners_dict = {}
     if corners:
         if not isinstance(corners, list):
-            tools.feedback(f"The corners value '{corners}' is not a valid list!", True)
+            feedback(f"The corners value '{corners}' is not a valid list!", True)
         for corner in corners:
             try:
                 value = corner[0]
                 shape = corner[1]
                 if value.lower() not in ["nw", "ne", "sw", "se", "*"]:
-                    tools.feedback(
+                    feedback(
                         f'The corner must be one of nw, ne, sw, se (not "{value}")!',
                         True,
                     )
                 if not isinstance(shape, BaseShape):
-                    tools.feedback(
-                        f'The corner item must be a shape (not "{shape}") !', True
-                    )
+                    feedback(f'The corner item must be a shape (not "{shape}") !', True)
                 if value == "*":
                     corners_dict["nw"] = shape
                     corners_dict["ne"] = shape
@@ -2980,9 +2990,7 @@ def Layout(grid, **kwargs):
                 else:
                     corners_dict[value] = shape
             except Exception:
-                tools.feedback(
-                    f'The corners setting "{corner}" is not a valid list', True
-                )
+                feedback(f'The corners setting "{corner}" is not a valid list', True)
 
     # ---- setup locations; automatically or via user-specification
     shape_id = 0
@@ -3016,14 +3024,12 @@ def Layout(grid, **kwargs):
     if rotations:
         for rotation in rotations:
             if not isinstance(rotation, tuple):
-                tools.feedback("The 'rotations' must each contain a set!", True)
+                feedback("The 'rotations' must each contain a set!", True)
             if len(rotation) != 2:
-                tools.feedback(
-                    "The 'rotations' must each contain a set of two items!", True
-                )
+                feedback("The 'rotations' must each contain a set of two items!", True)
             _key = rotation[0]
             if not isinstance(_key, str):
-                tools.feedback(
+                feedback(
                     "The first value for rreach 'rotations' entry must be a string!",
                     True,
                 )
@@ -3033,7 +3039,7 @@ def Layout(grid, **kwargs):
             try:
                 _keys = list(tools.sequence_split(_key))
             except Exception:
-                tools.feedback(f'Unable to convert "{_key}" into a range of values.')
+                feedback(f'Unable to convert "{_key}" into a range of values.')
             for the_key in _keys:
                 rotation_sequence[the_key] = rotate
 
@@ -3056,7 +3062,7 @@ def Layout(grid, **kwargs):
             elif isinstance(shapes[shape_id], tuple):
                 _shape = shapes[shape_id][0]
                 if not isinstance(_shape, BaseShape):
-                    tools.feedback(
+                    feedback(
                         f'The first item in "{shapes[shape_id]}" must be a shape!', True
                     )
                 if len(shapes[shape_id]) > 1:
@@ -3064,14 +3070,14 @@ def Layout(grid, **kwargs):
             elif isinstance(shapes[shape_id], Place):
                 _shape = shapes[shape_id].shape
                 if not isinstance(_shape, BaseShape):
-                    tools.feedback(
+                    feedback(
                         f'The value for "{shapes[shape_id].name}" must be a shape!',
                         True,
                     )
                 if shapes[shape_id].rotation:
                     rotation = tools.as_float(shapes[shape_id].rotation, "rotation")
             else:
-                tools.feedback(
+                feedback(
                     f'Use a shape, or set, or Place - not "{shapes[shape_id]}"!', True
                 )
             # ---- * overwrite shape to use for corner
@@ -3153,7 +3159,7 @@ def Layout(grid, **kwargs):
                         fill=DEBUG_COLOR,
                     )
                 case _:
-                    tools.feedback(f'Unknown debug style "{do_debug}"', True)
+                    feedback(f'Unknown debug style "{do_debug}"', True)
 
 
 def Track(track=None, **kwargs):
@@ -3166,7 +3172,7 @@ def Track(track=None, **kwargs):
             shape.heading = shapes[shape_id].heading.format(**data)
         except KeyError as err:
             text = str(err).split()
-            tools.feedback(
+            feedback(
                 f"You cannot use {text[0]} as a special field; remove the {{ }} brackets",
                 True,
             )
@@ -3185,16 +3191,14 @@ def Track(track=None, **kwargs):
     if sequences and isinstance(sequences, str):
         sequences = tools.sequence_split(sequences)
     if sequences and stop:
-        tools.feedback(
-            "Both stop and sequences cannot be used together for a Track!", True
-        )
+        feedback("Both stop and sequences cannot be used together for a Track!", True)
     if not track:
         track = Polygon(sides=4, fill=None)
     track_name = track.__class__.__name__
     track_abbr = track_name.replace("Shape", "")
     if track_name == "CircleShape":
         if not angles or not isinstance(angles, list) or len(angles) < 2:
-            tools.feedback(
+            feedback(
                 f"A list of 2 or more angles is needed for a Circle-based Track!", True
             )
     elif track_name in ["SquareShape", "RectangleShape"]:
@@ -3207,18 +3211,16 @@ def Track(track=None, **kwargs):
     elif track_name == "PolygonShape":
         angles = track.get_angles()
     elif track_name not in SHAPES_FOR_TRACK:
-        tools.feedback(f"Unable to use a {track_abbr} for a Track!", True)
+        feedback(f"Unable to use a {track_abbr} for a Track!", True)
     if rotation_style:
         _rotation_style = str(rotation_style).lower()
         if _rotation_style not in ["o", "outwards", "inwards", "i"]:
-            tools.feedback(f"The rotation_style '{rotation_style}' is not valid", True)
+            feedback(f"The rotation_style '{rotation_style}' is not valid", True)
     else:
         _rotation_style = None
     shapes = kwargs.get("shapes", [])  # shape(s) to draw at the locations
     if not shapes:
-        tools.feedback(
-            "Track needs at least one Shape assigned to shapes list", False, True
-        )
+        feedback("Track needs at least one Shape assigned to shapes list", False, True)
 
     track_points = []  # a list of Ray tuples
     # ---- create Circle vertices and angles
@@ -3251,7 +3253,7 @@ def Track(track=None, **kwargs):
     if start is not None:
         _start = start - 1
         if _start > len(track_points):
-            tools.feedback(
+            feedback(
                 f'The start value "{start}" must be less than the number of vertices!',
                 True,
             )
@@ -3279,13 +3281,13 @@ def Track(track=None, **kwargs):
             "theta": track_point.angle,
             "count": index + 1,
         }
-        # tools.feedback(f'*Track* {index=} {data=}')
+        # feedback(f'*Track* {index=} {data=}')
         # format_label(shape, data)
         # ---- supply data to change shape's location
         # TODO - can choose line centre, not vertex, as the cx,cy position
         shape.cx = shape.points_to_value(track_point.x - track._o.delta_x)
         shape.cy = shape.points_to_value(track_point.y - track._o.delta_y)
-        # tools.feedback(f'*Track* {shape.cx=}, {shape.cy=}')
+        # feedback(f'*Track* {shape.cx=}, {shape.cy=}')
         if _rotation_style:
             match _rotation_style:
                 case "i" | "inwards":
@@ -3305,7 +3307,7 @@ def Track(track=None, **kwargs):
         else:
             shape_rotation = 0
         shape.set_unit_properties()
-        # tools.feedback(f'$$$ Track {shape._u}')
+        # feedback(f'$$$ Track {shape._u}')
         locale = Locale(
             x=track_point.x,
             y=track_point.y,
@@ -3361,21 +3363,21 @@ def BGG(user: str = None, ids: list = None, progress=False, short=500, **kwargs)
                 _game = BGGGame(game_id=item.id, user_game=item, user=user, short=short)
                 gamelist.set_values(_game)
         if not ids:
-            tools.feedback(
+            feedback(
                 f"Sorry - no games could be retrieved for BGG username {user}", True
             )
     elif ids:
-        tools.feedback(
+        feedback(
             "All board game data accessed via this tool is owned by BoardGameGeek"
             " and provided through their XML API"
         )
         for game_id in ids:
             if progress:
-                tools.feedback(f"Retrieving game '{game_id}' from BoardGameGeek...")
+                feedback(f"Retrieving game '{game_id}' from BoardGameGeek...")
             _game = BGGGame(game_id=game_id, short=short)
             gamelist.set_values(_game)
     else:
-        tools.feedback(
+        feedback(
             "Please supply either `ids` or `user` to retrieve games from BGG", True
         )
     return gamelist
@@ -3402,7 +3404,7 @@ def dice(dice="1d6", rolls=None):
         _list = dice.split("d")
         _type, pips = int(_list[0]), int(_list[1])
     except Exception:
-        tools.feedback(f'Unable to determine dice type/roll for "{dice}"', True)
+        feedback(f'Unable to determine dice type/roll for "{dice}"', True)
     return Dice().multi_roll(count=rolls, pips=pips, dice=_type)
 
 

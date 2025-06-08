@@ -2,8 +2,28 @@
 """
 Global variables for proto (import at top-level)
 """
+# lib
+from collections import namedtuple
+
+# third-party
 from pymupdf import paper_size
-from protograf.utils.support import unit
+
+UnitPoints = namedtuple(
+    "UnitPoints",
+    [
+        "cm",
+        "mm",
+        "inch",
+        "pt",
+    ],
+)
+# ---- units point equivalents
+unit = UnitPoints(
+    cm=28.3465,
+    mm=2.83465,
+    inch=72.0,
+    pt=1.0,
+)
 
 
 def initialize():

@@ -25,7 +25,7 @@ import cairosvg
 import jinja2
 from jinja2.environment import Template
 import requests
-from PIL import Image, UnidentifiedImageError
+from PIL import Image, ImageDraw, UnidentifiedImageError
 import pymupdf
 from pymupdf import Shape as muShape, Point as muPoint, Page as muPage, Matrix
 
@@ -35,13 +35,14 @@ from pymupdf import Shape as muShape, Point as muPoint, Page as muPage, Matrix
 from protograf.utils import geoms, tools, support
 from protograf.utils.constants import DEBUG_COLOR, DEFAULT_FONT, DEFAULT_MARGIN_SIZE
 from protograf.utils.fonts import builtin_font, FontInterface
+from protograf.globals import unit
+from protograf.utils.messaging import feedback
 from protograf.utils.structures import (
     Bounds,
     GridShape,
     OffsetProperties,
     LookupType,
     TemplatingType,
-    unit,
     UnitProperties,
 )
 from protograf.utils.support import CACHE_DIRECTORY
@@ -81,7 +82,7 @@ class BaseCanvas:
                     with open(_jsonfile) as data_file:
                         self.defaults = json.load(data_file)
                 except (IOError, ValueError):
-                    tools.feedback(
+                    feedback(
                         f'Unable to find or load the file "{self.jsonfile}"'
                         f' - also checked in "{filepath}".',
                         True,
@@ -118,7 +119,7 @@ class BaseCanvas:
                 if self.paper == (-1, -1):  # pymupdf fallback ...
                     raise ValueError
             except Exception:
-                tools.feedback(f"Unable to use {_paper} as paper size!", True)
+                feedback(f"Unable to use {_paper} as paper size!", True)
         # ---- paper size overrides
         self.paper_width = self.defaults.get("paper_width", self.paper[0])
         self.paper_height = self.defaults.get("paper_height", self.paper[1])
@@ -494,7 +495,7 @@ class BaseShape:
         self, _object: pymupdf.Shape = None, canvas: BaseCanvas = None, **kwargs
     ):
         self.kwargs = kwargs
-        # tools.feedback(f'### BaseShape {_object=} {canvas=} {kwargs=}')
+        # feedback(f'### BaseShape {_object=} {canvas=} {kwargs=}')
         # ---- constants
         self.default_length = 1
         self.show_id = False  # True
@@ -527,7 +528,7 @@ class BaseShape:
                 if self.paper == (-1, -1):  # pymupdf fallback ...
                     raise ValueError
             except Exception:
-                tools.feedback(f"Unable to use {_paper} as paper size!", True)
+                feedback(f"Unable to use {_paper} as paper size!", True)
         # ---- paper overrides
         self.paper_width = self.kw_float(kwargs.get("paper_width", base.paper_width))
         self.paper_height = self.kw_float(kwargs.get("paper_height", base.paper_height))
@@ -599,7 +600,7 @@ class BaseShape:
         self.stroke_cap = self.kw_int(kwargs.get("stroke_cap", base.stroke_cap))
         # ---- overwrite fill&stroke colors
         if self.fill_stroke and self.outline:
-            tools.feedback("Cannot set 'fill_stroke' and 'outline' together!", True)
+            feedback("Cannot set 'fill_stroke' and 'outline' together!", True)
         if self.fill_stroke:
             self.stroke = self.fill_stroke
             self.fill = self.fill_stroke
@@ -668,7 +669,7 @@ class BaseShape:
         self.transform = kwargs.get("transform", base.transform)
         self.html = self.kw_bool(kwargs.get("html", base.html))
         self.css = kwargs.get("css", base.css)
-        # tools.feedback(f"### BShp:"
+        # feedback(f"### BShp:"
         # f"{self} {kwargs.get('fill')=} {self.fill=} {kwargs.get('fill_color')=}")
         # ---- image / file
         self.source = kwargs.get("source", base.source)  # file or http://
@@ -927,13 +928,13 @@ class BaseShape:
         # ---- CHECK ALL
         correct, issue = self.check_settings()
         if not correct:
-            tools.feedback("Problem with settings: %s." % "; ".join(issue))
+            feedback("Problem with settings: %s." % "; ".join(issue))
         # ---- UPDATE SELF WITH COMMON
         if self.common:
             try:
                 attrs = vars(self.common)
             except TypeError:
-                tools.feedback(
+                feedback(
                     f'Cannot process the Common property "{self.common}"'
                     " - please check!",
                     True,
@@ -980,7 +981,7 @@ class BaseShape:
             return _item * units
         except (TypeError, ValueError):
             _label = f" {label}" if label else ""
-            tools.feedback(
+            feedback(
                 f"Unable to set unit value for{_label}: {item}."
                 " Please check that this is a valid value.",
                 stop=True,
@@ -1106,7 +1107,7 @@ class BaseShape:
         self.use_abs_c = (
             True if self._abs_cx is not None and self._abs_cy is not None else False
         )
-        # tools.feedback(f'### draw baseshape: {self._abs_x=} {self._abs_y=} {self._abs_cx=} {self._abs_cy=}')
+        # feedback(f'### draw baseshape: {self._abs_x=} {self._abs_y=} {self._abs_cx=} {self._abs_cy=}')
 
     def check_settings(self) -> tuple:
         """Validate that the user-supplied parameters for choices are correct"""
@@ -1302,13 +1303,13 @@ class BaseShape:
         # ---- rectangle - peaks
         if self.peaks:
             if not isinstance(self.peaks, list):
-                tools.feedback(f"The peaks '{self.peaks}' is not a valid list!", True)
+                feedback(f"The peaks '{self.peaks}' is not a valid list!", True)
             for point in self.peaks:
                 try:
                     _dir = point[0]
                     value = tools.as_float(point[1], " peaks value")
                     if _dir.lower() not in ["n", "e", "w", "s", "*"]:
-                        tools.feedback(
+                        feedback(
                             f'The peaks direction must be one of n, e, s, w (not "{_dir}")!',
                             True,
                         )
@@ -1320,7 +1321,7 @@ class BaseShape:
                     else:
                         self.peaks_dict[_dir] = value
                 except Exception:
-                    tools.feedback(f'The peaks setting "{point}" is not valid!', True)
+                    feedback(f'The peaks setting "{point}" is not valid!', True)
 
         return correct, issue
 
@@ -1348,7 +1349,7 @@ class BaseShape:
                 if value in self.kwargs.get("common")._kwargs:
                     return True
             except AttributeError:
-                tools.feedback(
+                feedback(
                     "Unable to process Common properties"
                     " - has the Common command been set?",
                     True,
@@ -1411,15 +1412,13 @@ class BaseShape:
                 width_height:
                     the (width, height) of the output frame for the image
             """
-            # tools.feedback(f"### {img_path=} {slice_portion=}")
+            # feedback(f"### {img_path=} {slice_portion=}")
             if not slice_portion:
                 return None
             try:
                 _slice = slice_portion.lower()
                 if _slice[0] not in ["t", "m", "b", "l", "c", "r"]:
-                    tools.feedback(
-                        f'The sliced value "{slice_portion}" is not valid!', True
-                    )
+                    feedback(f'The sliced value "{slice_portion}" is not valid!', True)
                 img = Image.open(img_path)
                 iwidth = img.size[0]
                 iheight = img.size[1]
@@ -1459,13 +1458,13 @@ class BaseShape:
                 img2.save(sliced_filename)
                 return sliced_filename
             except Exception as err:
-                tools.feedback(
+                feedback(
                     f'The sliced value "{slice_portion}" is not valid! ({err})', True
                 )
             return None
 
         def get_image_from_svg(image_location: str = None):
-
+            """Load SVG image and convert to PNG."""
             with open(image_location) as f:
                 svg_code = f.read()
             png_bytes = cairosvg.svg2png(bytestring=svg_code.encode("utf-8"), dpi=300)
@@ -1474,7 +1473,7 @@ class BaseShape:
 
         def save_image_from_url(url: str):
             """Download image from network and save locally if not present."""
-            # tools.feedback(f"### image save: {url=} ")
+            # feedback(f"### image save: {url=} ")
             loc = urlparse(url)
             filename = loc.path.split("/")[-1]
             image_local = os.path.join(cache_directory, filename)
@@ -1513,9 +1512,7 @@ class BaseShape:
                 try:
                     img = get_image_from_svg(img_path)
                 except Exception:
-                    tools.feedback(
-                        f'Unable to open and process the image "{img_path}"', True
-                    )
+                    feedback(f'Unable to open and process the image "{img_path}"', True)
             iwidth = img.size[0]
             iheight = img.size[1]
             iratio = iwidth / iheight
@@ -1550,8 +1547,30 @@ class BaseShape:
             if cache_directory:
                 if tools.is_url_valid(image_location):
                     image_local = save_image_from_url(image_location)
+
+            # ---- round image
+            if self.rounding:
+                image_in = Image.open(image_local)
+                mask = Image.new("L", image_in.size, 0)
+                draw = ImageDraw.Draw(mask)
+                # draw.ellipse((0, 0, image_in.size[0], image_in.size[1]), fill=255)
+                draw.rounded_rectangle(
+                    ((0, 0), (image_in.size[0], image_in.size[1])),
+                    self.rounding,
+                    fill=255,
+                )
+                rounded_image = Image.composite(
+                    image_in, Image.new("RGBA", image_in.size, (0, 0, 0, 0)), mask
+                )
+
+                membuf = io.BytesIO()
+                rounded_image.save(membuf, format="png")
+                png_data = membuf.getvalue()
+                imgdoc = pymupdf.open(stream=png_data)  # in-memory image document
+            else:
+                imgdoc = pymupdf.open(image_local)  # open file image as document
+
             # ---- draw image
-            imgdoc = pymupdf.open(image_local)  # open image file as a␣document
             pdfbytes = imgdoc.convert_to_pdf()  # make a 1-page PDF of it
             imgpdf = pymupdf.open("pdf", pdfbytes)
             rct = pymupdf.Rect(scaffold)
@@ -1597,7 +1616,7 @@ class BaseShape:
                     os.sep, "/"
                 )
             if not os.path.exists(image_local):
-                tools.feedback(
+                feedback(
                     f'Unable to find or open image "{image_location}" (also tried in "{image_local}"',
                     False,
                     True,
@@ -1627,7 +1646,7 @@ class BaseShape:
                 img = image_render(image_local)
             return img, is_directory
         except IOError as err:
-            tools.feedback(
+            feedback(
                 f'Unable to find or open image "{base_image_location}"' f" ({err}).",
                 False,
                 True,
@@ -1717,7 +1736,7 @@ class BaseShape:
                     return float(value) / self.units
         except Exception as err:
             log.exception(err)
-            tools.feedback(
+            feedback(
                 f'Unable to do unit conversion from "{value}" using {self.units}!', True
             )
 
@@ -1736,12 +1755,10 @@ class BaseShape:
                 case None:
                     return [float(item) * self.units for item in items]
                 case _:
-                    tools.feedback(
-                        f'Unable to convert units "{units_name}" to points!', True
-                    )
+                    feedback(f'Unable to convert units "{units_name}" to points!', True)
         except Exception as err:
             log.exception(err)
-            tools.feedback(f'Unable to convert value(s) "{items}" to points!', True)
+            feedback(f'Unable to convert value(s) "{items}" to points!', True)
 
     def draw_multi_string(
         self, canvas, xm, ym, string, align=None, rotation=0, **kwargs
@@ -1791,7 +1808,7 @@ class BaseShape:
         # ---- align and font
         align = align or self.align
         mvy = copy.copy(ym)
-        # tools.feedback(f"### {string=} {rotation=}")
+        # feedback(f"### {string=} {rotation=}")
         # ---- text properties
         keys = {}
         keys["fontsize"] = kwargs.get("font_size", self.font_size)
@@ -1829,7 +1846,7 @@ class BaseShape:
             fi = FontInterface(cache_directory=cache_directory)
             keys["fontfile"] = fi.get_font_file(name=keys["fontname"])
             if not keys["fontfile"]:
-                tools.feedback(
+                feedback(
                     f'Cannot find or load a font named `{keys["fontname"]}`.'
                     f' Defaulting to "{DEFAULT_FONT}".',
                     False,
@@ -1867,13 +1884,13 @@ class BaseShape:
             canvas.insert_text(point, string, morph=morph, **keys)
         except Exception as err:
             if "need font file" in str(err):
-                tools.feedback(
+                feedback(
                     f'The font "{self.font_name}" cannot be found -'
                     " please check spelling and/or location",
                     True,
                 )
             else:
-                tools.feedback(f'Cannot write "{string}" (Error: {err})', True)
+                feedback(f'Cannot write "{string}" (Error: {err})', True)
 
     def draw_string(self, canvas, xs, ys, string, align=None, rotation=0, **kwargs):
         """Draw a multi-string on the canvas."""
@@ -2103,7 +2120,7 @@ class BaseShape:
             )
             for step in steps:
                 if step > 1:
-                    tools.feedback("The arrow_position value must be less than 1", True)
+                    feedback("The arrow_position value must be less than 1", True)
                 the_tip = geoms.fraction_along_line(point_start, point_end, step)
                 tips.append(the_tip)
         else:
@@ -2190,7 +2207,7 @@ class BaseShape:
             * Directions of vertex indices in left- and right-sides must be the same
         """
         delta = side / (line_count + 1)
-        # tools.feedback(f'### {side=} {line_count=} {delta=} {skip_ends=}')
+        # feedback(f'### {side=} {line_count=} {delta=} {skip_ends=}')
         for number in range(0, line_count + 2):
             if skip_ends:
                 if number == line_count + 1 or number == 0:
@@ -2257,11 +2274,11 @@ class BaseShape:
 
             elif isinstance(value, Template):
                 if not self.deck_data:
-                    tools.feedback(
+                    feedback(
                         "Cannot use T() or S() command without Data already defined!",
                         False,
                     )
-                    tools.feedback(
+                    feedback(
                         "Check that Data command is used before Deck command.",
                         True,
                     )
@@ -2271,21 +2288,17 @@ class BaseShape:
                     # print('### Template', f'{ID=} {key=} {custom_value=}')
                     return custom_value
                 except jinja2.exceptions.UndefinedError as err:
-                    tools.feedback(
-                        f"Unable to process data with this template ({err})", True
-                    )
+                    feedback(f"Unable to process data with this template ({err})", True)
                 except Exception as err:
-                    tools.feedback(
-                        f"Unable to process data with this template ({err})", True
-                    )
+                    feedback(f"Unable to process data with this template ({err})", True)
 
             elif isinstance(value, TemplatingType):
                 if not self.deck_data:
-                    tools.feedback(
+                    feedback(
                         "Cannot use T() or S() command without Data already defined!",
                         False,
                     )
-                    tools.feedback(
+                    feedback(
                         "Check that Data command is used before Deck command.",
                         True,
                     )
@@ -2297,20 +2310,16 @@ class BaseShape:
                         try:
                             custom_value = value.function(custom_value)
                         except Exception as err:
-                            tools.feedback(
+                            feedback(
                                 f"Unable to process data with function '{ value.function}' ({err})",
                                 True,
                             )
 
                     return custom_value
                 except jinja2.exceptions.UndefinedError as err:
-                    tools.feedback(
-                        f"Unable to process data with this template ({err})", True
-                    )
+                    feedback(f"Unable to process data with this template ({err})", True)
                 except Exception as err:
-                    tools.feedback(
-                        f"Unable to process data with this template ({err})", True
-                    )
+                    feedback(f"Unable to process data with this template ({err})", True)
 
             elif isinstance(value, LookupType):
                 record = self.deck_data[ID]
@@ -2360,7 +2369,7 @@ class BaseShape:
     def draw_border(self, cnv, border: tuple, ID: int = None):
         """Draw a border line based its settings."""
         if not isinstance(border, tuple):
-            tools.feedback(
+            feedback(
                 'The "borders" property must contain a list of one or more sets'
                 f' - not "{border}"',
                 True,
@@ -2382,7 +2391,7 @@ class BaseShape:
             bdirections = border[0]
             bwidth = border[1]
         if len(border) <= 1:
-            tools.feedback(
+            feedback(
                 'A "borders" set must contain: direction, width, color'
                 f' and an optional style - not "{border}"',
                 True,
@@ -2419,7 +2428,7 @@ class BaseShape:
                             x, y = self.vertexes[3][0], self.vertexes[3][1]
                             x_1, y_1 = self.vertexes[0][0], self.vertexes[0][1]
                         case _:
-                            tools.feedback(
+                            feedback(
                                 f"Invalid direction ({bdirection}) for {shape_name} border",
                                 True,
                             )
@@ -2439,7 +2448,7 @@ class BaseShape:
                             x, y = self.vertexes[0][0], self.vertexes[0][1]
                             x_1, y_1 = self.vertexes[1][0], self.vertexes[1][1]
                         case _:
-                            tools.feedback(
+                            feedback(
                                 f"Invalid direction ({bdirection}) for {shape_name} border",
                                 True,
                             )
@@ -2466,7 +2475,7 @@ class BaseShape:
                                 x, y = self.vertexes[1][0], self.vertexes[1][1]
                                 x_1, y_1 = self.vertexes[2][0], self.vertexes[2][1]
                             case _:
-                                tools.feedback(
+                                feedback(
                                     f"Invalid direction ({bdirection}) for pointy {shape_name} border",
                                     True,
                                 )
@@ -2491,7 +2500,7 @@ class BaseShape:
                                 x, y = self.vertexes[0][0], self.vertexes[0][1]
                                 x_1, y_1 = self.vertexes[1][0], self.vertexes[1][1]
                             case _:
-                                tools.feedback(
+                                feedback(
                                     f"Invalid direction ({bdirection}) for flat {shape_name} border",
                                     True,
                                 )
@@ -2503,7 +2512,7 @@ class BaseShape:
                 case _:
                     match bdirection:
                         case _:
-                            tools.feedback(f"Cannot draw borders for a {shape_name}")
+                            feedback(f"Cannot draw borders for a {shape_name}")
 
             # ---- draw line
             cnv.draw_line((x, y), (x_1, y_1))

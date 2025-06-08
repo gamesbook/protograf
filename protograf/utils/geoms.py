@@ -9,8 +9,9 @@ import math
 from typing import Any, List
 
 # local
+from protograf.utils.messaging import feedback
 from protograf.utils.structures import Point
-from protograf.utils.support import numbers, feedback
+from protograf.utils.support import numbers
 
 log = logging.getLogger(__name__)
 DEBUG = False

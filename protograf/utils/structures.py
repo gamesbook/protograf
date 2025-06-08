@@ -99,7 +99,8 @@ GlobalDocument = namedtuple(
         "deck",
         "card_frames",
         "filename",
-        "directory" "document",
+        "directory",
+        "document",
         "doc_page",
         "canvas",
         "margins",
@@ -163,16 +164,6 @@ PolyGeometry = namedtuple(
 
 Ray = namedtuple("Ray", ["x", "y", "angle"])
 
-UnitPoints = namedtuple(
-    "UnitPoints",
-    [
-        "cm",
-        "mm",
-        "inch",
-        "pt",
-    ],
-)
-
 UnitProperties = namedtuple(
     "UnitProperties",
     [
@@ -198,14 +189,6 @@ UnitProperties = namedtuple(
         "offset_x",
         "offset_y",
     ],
-)
-
-# ---- units point equivalents
-unit = UnitPoints(
-    cm=28.3465,
-    mm=2.83465,
-    inch=72.0,
-    pt=1.0,
 )
 
 # ---- DATACLASS

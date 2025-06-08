@@ -8,6 +8,7 @@ import collections
 from itertools import zip_longest
 import jinja2
 import logging
+import io
 import os
 import pathlib
 import string
@@ -22,7 +23,8 @@ import requests
 
 # local
 from protograf.utils.constants import COLOR_NAMES, STANDARD_CARD_SIZES, PAPER_SIZES
-from protograf.utils.support import feedback, to_units
+from protograf.utils.messaging import feedback
+from protograf.utils.support import to_units
 from protograf.utils.structures import (
     DirectionGroup,
     Point,

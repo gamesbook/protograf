@@ -127,6 +127,7 @@ from boardgamegeek.objects.games import CollectionBoardGame
 from boardgamegeek.objects.games import BoardGame
 
 # local
+from protograf.utils.messaging import feedback
 from protograf.utils.support import CACHE_DIRECTORY
 from protograf.utils import tools
 
@@ -186,18 +187,16 @@ class BGGGame:
             try:
                 the_game = self.bgg.game(game_id=game_id)
                 if not the_game:
-                    tools.feedback(
-                        f"Unable to load Game #{game_id} from BGG", False, True
-                    )
+                    feedback(f"Unable to load Game #{game_id} from BGG", False, True)
                 return the_game, False
             except BGGApiError as err:
                 if "Failed to resolve 'boardgamegeek.com'" in str(err):
                     msg = "Test if your internet connection reaches boardgamegeek.com"
                 else:
                     msg = err
-                tools.feedback(f"Unable to access boardgamegeek API ({msg})", True)
+                feedback(f"Unable to access boardgamegeek API ({msg})", True)
             except Exception as err:
-                tools.feedback(f"Unable to create game: {game_id} ({err})", True)
+                feedback(f"Unable to create game: {game_id} ({err})", True)
         return the_game, None
 
     def save_game(self):
