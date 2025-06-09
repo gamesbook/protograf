@@ -202,14 +202,14 @@ class BaseCanvas:
         self.align = self.defaults.get("align", "centre")  # centre,left,right,justify
         self._alignment = pymupdf.TEXT_ALIGN_LEFT  # see to_alignment()
         # ---- grid cut marks
-        self.grid_marks = self.defaults.get("grid_marks", 0)
-        grid_stroke = self.defaults.get("grid_stroke", "gray")
-        self.grid_stroke = tools.get_color(grid_stroke)
-        self.grid_stroke_width = self.defaults.get(
-            "grid_stroke_width", self.stroke_width
+        self.grid_marks = self.defaults.get("grid_marks_marks", False)
+        grid_marks_stroke = self.defaults.get("grid_marks_stroke", "gray")
+        self.grid_marks_stroke = tools.get_color(grid_marks_stroke)
+        self.grid_marks_stroke_width = self.defaults.get(
+            "grid_marks_stroke_width", self.stroke_width
         )
-        self.grid_length = self.defaults.get("grid_length", 0.85)  # 1/3 inch
-        self.grid_offset = self.defaults.get("grid_offset", 0)
+        self.grid_marks_length = self.defaults.get("grid_marks_length", 0.85)  # 1/3 inch
+        self.grid_marks_offset = self.defaults.get("grid_marks_offset", 0)
         # ---- line style
         self.line_stroke = self.defaults.get("line_stroke", WIDTH)
         self.line_width = self.defaults.get("line_width", self.stroke_width)
@@ -545,11 +545,12 @@ class BaseShape:
         self.margin_right = self.kw_float(kwargs.get("margin_right", self.margin))
         # ---- grid marks
         self.grid_marks = self.kw_float(kwargs.get("grid_marks", base.grid_marks))
-        self.grid_stroke = kwargs.get("grid_stroke", base.grid_stroke)
-        self.grid_stroke_width = self.kw_float(
-            kwargs.get("grid_stroke_width", base.grid_stroke_width)
+        self.grid_marks_stroke = kwargs.get("grid_marks_stroke", base.grid_marks_stroke)
+        self.grid_marks_stroke_width = self.kw_float(
+            kwargs.get("grid_marks_stroke_width", base.grid_marks_stroke_width)
         )
-        self.grid_length = self.kw_float(kwargs.get("grid_length", base.grid_length))
+        self.grid_marks_length = self.kw_float(kwargs.get("grid_marks_length", base.grid_marks_length))
+        self.grid_marks_offset = self.kw_float(kwargs.get("grid_marks_offset", base.grid_marks_offset))
         # ---- sizes and positions
         self.row = kwargs.get("row", base.row)
         self.col = self.kw_int(kwargs.get("col", kwargs.get("column", base.col)), "col")

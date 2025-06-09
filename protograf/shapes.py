@@ -774,21 +774,21 @@ class CircleShape(BaseShape):
         cnv.draw_circle((x, y), self._u.radius)
         self.set_canvas_props(cnv=cnv, index=ID, **kwargs)
         # ---- grid marks
-        if self.grid_marks and not kwargs.get("card_back", False):
+        if self.grid_marks:  # and not kwargs.get("card_back", False):
             # print(f'{self._u.radius=} {self._u.diameter=}')
-            deltag = self.unit(self.grid_length)
+            deltag = self.unit(self.grid_marks_length)
             gx, gy = 0, y - self._u.radius  # left-side
             cnv.draw_line((gx, gy), (deltag, gy))
             cnv.draw_line(
                 (0, gy + self._u.radius * 2.0), (deltag, gy + self._u.radius * 2.0)
             )
-            gx, gy = x - self._u.radius, self.paper[1]  # top-side
+            gx, gy = x - self._u.radius, globals.page[1]  # top-side
             cnv.draw_line((gx, gy), (gx, gy - deltag))
             cnv.draw_line(
                 (gx + self._u.radius * 2.0, gy),
                 (gx + self._u.radius * 2.0, gy - deltag),
             )
-            gx, gy = self.paper[0], y - self._u.radius  # right-side
+            gx, gy = globals.page[0], y - self._u.radius  # right-side
             cnv.draw_line((gx, gy), (gx - deltag, gy))
             cnv.draw_line(
                 (gx, gy + self._u.radius * 2.0), (gx - deltag, gy + self._u.radius * 2)
@@ -801,8 +801,8 @@ class CircleShape(BaseShape):
             )
             # done
             keys = kwargs
-            keys["stroke"] = self.grid_stroke
-            keys["stroke_width"] = self.grid_stroke_width
+            gargs["stroke"] = self.grid_marks_stroke
+            gargs["stroke_width"] = self.grid_marks_stroke_width
             self.set_canvas_props(cnv=cnv, index=ID, **keys)
         # ---- draw hatch
         if self.hatch_count:
@@ -3380,15 +3380,15 @@ class RectangleShape(BaseShape):
             self.draw_hatch(cnv, ID, vertices, self.hatch_count, rotation=rotation)
 
         # ---- grid marks
-        if self.grid_marks and not kwargs.get("card_back", False):
-            deltag = self.unit(self.grid_length)
+        if self.grid_marks:  # and not kwargs.get("card_back", False):
+            deltag = self.unit(self.grid_marks_length)
             gx, gy = 0, y  # left-side
             cnv.draw_line((gx, gy), (deltag, gy))
             cnv.draw_line((0, gy + self._u.height), (deltag, gy + self._u.height))
-            gx, gy = x, self.paper[1]  # top-side
+            gx, gy = x, globals.page[1]  # top-side
             cnv.draw_line((gx, gy), (gx, gy - deltag))
             cnv.draw_line((gx + self._u.width, gy), (gx + self._u.width, gy - deltag))
-            gx, gy = self.paper[0], y  # right-side
+            gx, gy = globals.page[0], y  # right-side
             cnv.draw_line((gx, gy), (gx - deltag, gy))
             cnv.draw_line((gx, gy + self._u.height), (gx - deltag, gy + self._u.height))
             gx, gy = x, 0  # bottom-side
@@ -3396,8 +3396,8 @@ class RectangleShape(BaseShape):
             cnv.draw_line((gx + self._u.width, gy), (gx + self._u.width, gy + deltag))
             # done
             gargs = {}
-            gargs["stroke"] = self.grid_stroke
-            gargs["stroke_width"] = self.grid_stroke_width
+            gargs["stroke"] = self.grid_marks_stroke
+            gargs["stroke_width"] = self.grid_marks_stroke_width
             self.set_canvas_props(cnv=None, index=ID, **gargs)
 
         # ---- centred shape (with offset)

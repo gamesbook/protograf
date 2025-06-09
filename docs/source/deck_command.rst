@@ -65,7 +65,7 @@ The following are other properties that can also be set for a ``Deck``:
 - **bleed_fill** - set a background color for the page (up to the margins);
   if no separate **fill** property is set, then this color will be used instead
 - **card_size** - a pre-existing card size used to set *width* and *height*
-  (values for *width* and *height*  will override these); can be one of:
+  (values for *width* and *height* will override these); can be one of:
   ``"poker"``, ``"bridge"``, ``"mini"``, ``"miniamerican"``, ``"minieuropean"``,
   ``"skat"``, ``"tarot"`` or ``"business"``
 - **cols** - the maximum number of card columns that should appear on a
@@ -78,23 +78,24 @@ The following are other properties that can also be set for a ``Deck``:
   height and width match); but can be set to *hexagon* or *circle*
 - **grid_marks** - if set to ``True``, will cause small marks to be drawn at
   the border of the page that align with the edges of the card frames
-- **grid_length** - the length of the grid mark; defaults to ``0.85`` cm
+- **grid_marks_length** - the length of the grid mark; defaults to ``0.85`` cm
   (about one-third of an inch)
+- **grid_marks_stroke** - the color of the grid mark; defaults to ``gray``
+- **grid_marks_stroke_width** - the line width of the grid mark; defaults to 0.1
 - **grouping** - sets the number of cards to be drawn adjacent to each other
   before a blank space is added by the **spacing** property |dash| use
   **grouping_col** and/or **grouping_row** to set spacing specifically for the
   horizontal (columns) or vertical (rows) direction respectively. Note that
   **grouping** does not apply to  *hexagon* **frame** cards.
-- **gutter** - the value set for this determines the spacing between the fronts
-  and backs of cards being drawn on two halves of the same page; its value is
-  divided in half and each set of cards is drawn that distance away from the
-  centre line of the page
+- **gutter** - a value set for this helps determines the spacing between the
+  fronts and backs of cards when these are drawn on two halves of the same
+  page; its value is divided in half, and added to the top margin value, and
+  each set of cards is drawn that distance away from the centre line of the page
+- **gutter_stroke** - if set, will cause a line of that color to be used
+  for the *gutter* line; this defaults to ``gray`` (to match grid marks)
 - **gutter_stroke_width** - if set to a value, will cause a line of that
-  thickness  to be drawn down the centre of the page for which a gutter has
-  been set
-- **gutter_stroke** - if set, will cause a line of that color to be drawn
-  down the centre of the page for which a gutter has been set
-- **gutter_dotted** - sets the style of gutter line
+  thickness to be used for the *gutter* line
+- **gutter_dotted** - sets the style of the *gutter* line
 - **mask** - an expression which should evaluate to ``True`` or ``False``.
   This expression has the same kind of syntax as the
   :ref:`T(emplate) command <the-template-command>`
@@ -110,7 +111,6 @@ The following are other properties that can also be set for a ``Deck``:
   **spacing_x** and/or **spacing_y** to set spacing specifically for the
   horizontal or vertical direction respectively.
 - **stroke** - sets the color of the card's border; defaults to ``black``
-
 
 .. HINT::
 
@@ -139,7 +139,7 @@ Property Examples
 
 These examples are shown on a small A8-sized page, as the purpose is to
 illustrate how the Deck properties are used; normally cards would be
-set out on an A4- or Letter-sized page, but the principle will be the
+set out on A4- or Letter-sized pages, but the principle will be the
 same.
 
 In most cases |dash| except where otherwise shown |dash| a basic

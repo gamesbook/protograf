@@ -233,7 +233,7 @@ class CardShape(BaseShape):
             # feedback(f'$$$ {right_gap=} {self.offset_x=} {move_x=}')
         else:
             move_x = 0
-        outline.draw(off_x=move_x, off_y=0, **shape_kwargs)
+        outline.draw(off_x=move_x, off_y=0, **shape_kwargs)  # inc. grid_marks
 
         # ---- track frame outlines for possible image extraction
         match kwargs["frame_type"]:
@@ -407,12 +407,6 @@ class CardShape(BaseShape):
 class DeckOfCards:
     """
     Placeholder for the deck design; storing lists of CardShapes; allowing export
-
-    NOTE: A DeckOfCards object receives its `draw()` command from Save()!
-
-    Notes:
-    - Gutter lines are drawn here (one per page)
-    - Any annotations are drawn here (depending on page allocations)
     """
 
     def __init__(self, canvas=None, **kwargs):
@@ -946,7 +940,7 @@ class DeckOfCards:
             restore_globals(prime_globals)
             cnv = globals.canvas
             # open gutter document
-            src = pymupdf.open(gutter_filename)
+            src = pymupdf.open(gutterfile)
             if is_landscape:
                 # upper half page (r1: backs)
                 r1 = pymupdf.Rect(0, 0, cnv.width, cnv.height / 2)
@@ -975,7 +969,7 @@ class DeckOfCards:
                     pt2 = (globals.page[0] / 2.0, globals.page[1])
                     globals.canvas.draw_line(pt1, pt2)
                     gwargs = kwargs
-                    gwargs["stroke"] = self.gutter_stroke or tools.get_color("black")
+                    gwargs["stroke"] = self.gutter_stroke or tools.get_color("gray")
                     gwargs["stroke_width"] = self.gutter_stroke_width
                     gwargs["dotted"] = self.gutter_dotted
                     tools.set_canvas_props(cnv=globals.canvas, index=None, **gwargs)
@@ -1681,7 +1675,7 @@ def CounterBack(sequence, *elements, **kwargs):
 
 
 def Deck(**kwargs):
-    """Initialise a Deck with all its settings, including source(s) of data.
+    """Placeholder for the deck design; storing lists of CardShapes; allowing export
 
     Kwargs (optional):
 
@@ -1701,7 +1695,9 @@ def Deck(**kwargs):
       height and width match); but can be set to *hexagon* or *circle*
     - grid_marks: if set to ``True``, will cause small marks to be drawn at
       the border of the page that align with the edges of the card frames
-    - grid_length: the length of the grid mark; defaults to ``0.85`` cm
+    - grid_marks_length: the length of the *grid_marks*; defaults to ``0.85`` cm
+    - grid_marks_stroke: line color of the *grid_marks*; defaults to ``grey``
+    - grid_marks_stroke_width: line width of the *grid_marks*; defaults to 0.1
     - grouping: number of cards to be drawn adjacent to each other
       before a blank space is added by the **spacing** property (note that
       **grouping** does not apply to  *hexagon* **frame** cards)
@@ -1724,7 +1720,13 @@ def Deck(**kwargs):
     - spacing_y: size of blank space between each card or grouping in a
       vertical direction
     - stroke: color of the card's border; defaults to ``black``
-    - width: card width for a *rectangular* card; defaults to 6.35 cm
+    - width: card width for a *rectangular* card; defaults to ``6.35`` cm
+
+    Notes:
+
+    - A DeckOfCards object receives its `draw()` command from Save()!
+    - Gutter lines are drawn here (one per page)
+    - Any annotations are drawn here (depending on page allocations)
     """
     validate_globals()
 
@@ -3461,3 +3463,4 @@ def A8BA():
 
 create.__doc__ = Create.__doc__
 save.__doc__ = Save.__doc__
+DeckOfCards.__doc__ = Deck.__doc__
