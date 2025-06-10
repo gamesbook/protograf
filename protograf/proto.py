@@ -506,7 +506,7 @@ class DeckOfCards:
             kwargs.get("spacing_y", self.spacing), "spacing_y"
         )
         # ---- gutter (put backs of Cards on same page)
-        self.gutter = kwargs.get("gutter", None)  # if zero, then None!
+        self.gutter = tools.as_float(kwargs.get("gutter", 0), "gutter")  # none if zero
         self.gutter_stroke = kwargs.get("gutter_stroke", None)
         self.gutter_stroke_width = kwargs.get("gutter_stroke_width", WIDTH)
         self.gutter_dotted = kwargs.get("gutter_dotted", None)
@@ -772,7 +772,7 @@ class DeckOfCards:
         prime_globals = None
 
         # ---- gutter-based settings (new doc)
-        if self.gutter is not None:
+        if self.gutter > 0:
             prime_globals = save_globals()
             globals_page = copy(globals.page)
             gutter = tools.as_float(kwargs.get("gutter", 0.0), "gutter")
@@ -811,6 +811,12 @@ class DeckOfCards:
             cnv = globals.doc_page.new_shape()  # pymupdf Shape
             globals.canvas = cnv
             page_setup()  # draw margin/grid
+            # ---- validate card fit
+            vspace = globals.page_height - globals.margins.top - globals.margins.bottom
+            if self.height + self.offset_y > vspace:
+                feedback('Rotated cards cannot fit into the available space!'
+                    ' Reduce card height, or top/bottom margins, or offset from top.',
+                    True)
 
         # ---- calculate rows/cols based on page size and margins AND card size
         margin_left = (
@@ -835,8 +841,9 @@ class DeckOfCards:
         )
         page_across = globals.page_width - margin_right - margin_left  # user units
         page_down = globals.page_height - margin_top - margin_bottom  # user units
-        _height, _width, _radius = self.width, self.width, self.radius
+        _height, _width, _radius = self.height, self.width, self.radius
         self.draw_bleed(cnv, page_across, page_down)
+
         # ---- deck settings
         col_space, row_space = 0.0, 0.0
         if self.fronts:
@@ -926,7 +933,7 @@ class DeckOfCards:
         globals.document.delete_page(globals.page_count)
 
         # ---- reset to prime and load-in gutter pages
-        if self.gutter is not None:
+        if self.gutter > 0:
             # save gutter document
             gutterfile = os.path.join(globals.directory, globals.filename)
             globals.document.save(gutterfile)
@@ -964,11 +971,11 @@ class DeckOfCards:
                     r1, src, page_number + 1, rotate=r1_rotate
                 )  # backs
                 # ---- draw gutter line
-                if self.gutter is not None:
+                if self.gutter > 0:
                     pt1 = (globals.page[0] / 2.0, 0)
                     pt2 = (globals.page[0] / 2.0, globals.page[1])
                     globals.canvas.draw_line(pt1, pt2)
-                    gwargs = kwargs
+                    gwargs = {}  # kwargs
                     gwargs["stroke"] = self.gutter_stroke or tools.get_color("gray")
                     gwargs["stroke_width"] = self.gutter_stroke_width
                     gwargs["dotted"] = self.gutter_dotted

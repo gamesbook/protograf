@@ -63,7 +63,7 @@ echo -e "\nCreating cards..."
 python cards/cards_design.py -d /tmp/demo
 python cards/cards_hexagonal.py -d /tmp/demo
 python cards/cards_circular.py -d /tmp/demo
-python cards/cards_lotr.py -d /tmp/demo
+python cards/cards_rectangular.py -d /tmp/demo
 python cards/cards_images.py -d /tmp/demo
 python cards/cards_matrix_one.py -d /tmp/demo
 python cards/cards_matrix_two.py -d /tmp/demo

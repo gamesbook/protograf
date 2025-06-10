@@ -157,3 +157,5 @@ cython_debug/
 /examples/temp
 /examples/cards_test
 default_shapes-*.png
+# Geant Project
+Protograf

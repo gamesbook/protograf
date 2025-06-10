@@ -63,7 +63,7 @@ echo -e "\nCreating cards..."
 python cards/cards_design.py --no-png -d /tmp/demo
 python cards/cards_hexagonal.py --no-png -d /tmp/demo
 python cards/cards_circular.py --no-png -d /tmp/demo
-python cards/cards_lotr.py --no-png -d /tmp/demo
+python cards/cards_rectangular.py --no-png -d /tmp/demo
 python cards/cards_images.py --no-png -d /tmp/demo
 python cards/cards_matrix_one.py --no-png -d /tmp/demo
 python cards/cards_matrix_two.py --no-png -d /tmp/demo

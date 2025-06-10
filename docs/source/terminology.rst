@@ -218,8 +218,9 @@ Amount- and count-orientated Terms
 .. HINT::
 
     The concept of counting is also important when creating a ``Track`` or a
-    ``Sequence`` - each item being created is assigned a *sequence* number
-    which can be used for reference or labelling.
+    ``Sequence`` or a deck of ``Card`` s |dash| each item being created is
+    assigned a **sequence** number which can be used for reference or
+    labels or text.
 
 
 Direction-orientated Terms

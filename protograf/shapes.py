@@ -800,10 +800,15 @@ class CircleShape(BaseShape):
                 (gx + self._u.radius * 2.0, gy + deltag),
             )
             # done
-            keys = kwargs
+            # gargs = kwargs
+            # gargs["stroke"] = self.grid_marks_stroke
+            # gargs["stroke_width"] = self.grid_marks_stroke_width
+            # self.set_canvas_props(cnv=cnv, index=ID, **gargs)
+            gargs = {}
             gargs["stroke"] = self.grid_marks_stroke
             gargs["stroke_width"] = self.grid_marks_stroke_width
-            self.set_canvas_props(cnv=cnv, index=ID, **keys)
+            self.set_canvas_props(cnv=None, index=ID, **gargs)
+
         # ---- draw hatch
         if self.hatch_count:
             self.draw_hatch(
