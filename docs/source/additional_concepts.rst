@@ -74,6 +74,25 @@ If you're interested in what all these functions do, there is a very
 readable guide available at:
 https://www.mattlayman.com/blog/2024/layman-guide-python-built-in-functions/
 
+Constants
+---------
+
+Common to many computer languages is the idea of a *constant*.  This is a
+value used by a program that is not expected to change.  An example in
+"real life" would the value of pi |dash| a mathematical term representing the
+ratio of a circle's circumference to its diameter.
+
+There are not many constants in **protograf** but two that are useful are:
+
+- ``YES`` which is a synonym for ``True``
+- ``NO``  which is a synonym for ``False``
+
+(``True`` and ``False`` are often used to enable/disable various **protograf**
+properties.)
+
+Any constants that are available will be written in capital letters, following
+the convention established for Python.
+
 
 .. _value-types-concept:
 
@@ -365,6 +384,21 @@ be ignored, for example:
 will still draw a ``Rectangle``; the meaning of ``corner`` is unknown so it will
 simply be skipped.
 
+This next error is a simple one but possible hard to "see" why:
+
+.. code:: python
+
+   WIDTH = 6.99,
+   HEIGHT = 12.07
+
+   FEEDBACK:: The value "(6.99,)" is not a valid float number!
+
+The reason for it is the extra ``,`` at the end of the first line; Python will
+"automagically" turn this into a set of numbers |dash| in this case a set with
+only a single value.  The rest of the script is expecting to work with a
+normal number and so it display this error.
+
+
 Python-specific Errors
 ----------------------
 
@@ -420,6 +454,7 @@ might be. Here, you'd need to add a ``,`` (comma) at the end of setting the
 .. code:: python
 
    paper="A8", cards=9
+
 
 .. NOTE::
 

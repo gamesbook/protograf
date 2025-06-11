@@ -96,6 +96,10 @@ The following are other properties that can also be set for a ``Deck``:
 - **gutter_stroke_width** - if set to a value, will cause a line of that
   thickness to be used for the *gutter* line
 - **gutter_dotted** - sets the style of the *gutter* line
+- **gutter_layout** - sets the orientation of the page for the cards drawn in
+  the two gutter "halves"; this can be ``portrait`` (the default) or
+  ``landscape```; the latter is useful when you have very tall cards e.g.
+  ``tarot`` sized ones.
 - **mask** - an expression which should evaluate to ``True`` or ``False``.
   This expression has the same kind of syntax as the
   :ref:`T(emplate) command <the-template-command>`

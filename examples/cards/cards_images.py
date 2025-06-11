@@ -21,7 +21,7 @@ Data(images="pictures", images_filter=".png,.jpg")
 Deck(grid_marks=True, width=6.2, height=8.3)
 
 # add an image to each card
-img = image("*", x=0, y=-0.2, width=6.3, height=8.8)
+img = image("*", x=0, y=-0.2, width=6.3, height=8.8, rounding=15)
 Card('*', img)
 
 # card back

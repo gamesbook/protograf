@@ -510,6 +510,7 @@ class DeckOfCards:
         self.gutter_stroke = kwargs.get("gutter_stroke", None)
         self.gutter_stroke_width = kwargs.get("gutter_stroke_width", WIDTH)
         self.gutter_dotted = kwargs.get("gutter_dotted", None)
+        self.gutter_layout = kwargs.get("gutter_layout", "portrait")
         self.show_backs = False
         # ---- export options
         self.export_cards = kwargs.get("export_cards", False)
@@ -780,14 +781,33 @@ class DeckOfCards:
             gutter_filename = os.path.join(globals.pargs.directory, "gutter.pdf")
             globals.filename = gutter_filename
             globals.document = pymupdf.open()  # pymupdf Document
-            if globals_page[0] > globals_page[1]:
-                width = globals_page[0]
-                height = globals_page[1] / 2
-                is_landscape = True
-            else:
-                width = globals_page[1]
-                height = globals_page[0] / 2
-                is_landscape = False
+
+            if self.gutter_layout:
+                _gutter_layout = str(self.gutter_layout).lower()
+                if _gutter_layout not in ["p", "portrait", "l", "landscape"]:
+                    feedback(
+                        f'The gutter_layout "{self.gutter_layout}" is not valid'
+                        ' - use "portrait" or "landscape"'
+                    )
+            if _gutter_layout:  # in ['p', 'portrait']:
+                if globals_page[0] > globals_page[1]:
+                    width = globals_page[0]
+                    height = globals_page[1] / 2
+                    is_landscape = True
+                else:
+                    width = globals_page[1]
+                    height = globals_page[0] / 2
+                    is_landscape = False
+
+            # WIP for landscape layout with TALL cards
+            # height = globals_page[1] / 2
+            # width = globals_page[0]
+            # if globals_page[0] > globals_page[1]:
+            #     is_landscape = True
+            # else:
+            #     is_landscape = False
+            # print(f"$$$ {globals_page[0]=} {globals_page[1]=} {width=} {height=} ")
+
             globals.doc_page = globals.document.new_page(
                 width=width, height=height
             )  # pymupdf Page
@@ -814,9 +834,11 @@ class DeckOfCards:
             # ---- validate card fit
             vspace = globals.page_height - globals.margins.top - globals.margins.bottom
             if self.height + self.offset_y > vspace:
-                feedback('Rotated cards cannot fit into the available space!'
-                    ' Reduce card height, or top/bottom margins, or offset from top.',
-                    True)
+                feedback(
+                    "Rotated cards cannot fit into the available space!"
+                    " Reduce card height, or top/bottom margins, or offset from top.",
+                    True,
+                )
 
         # ---- calculate rows/cols based on page size and margins AND card size
         margin_left = (
@@ -972,8 +994,12 @@ class DeckOfCards:
                 )  # backs
                 # ---- draw gutter line
                 if self.gutter > 0:
-                    pt1 = (globals.page[0] / 2.0, 0)
-                    pt2 = (globals.page[0] / 2.0, globals.page[1])
+                    if is_landscape:
+                        pt1 = (0, globals.page[1] / 2.0)
+                        pt2 = (globals.page[0], globals.page[1] / 2.0)
+                    else:
+                        pt1 = (globals.page[0] / 2.0, 0)
+                        pt2 = (globals.page[0] / 2.0, globals.page[1])
                     globals.canvas.draw_line(pt1, pt2)
                     gwargs = {}  # kwargs
                     gwargs["stroke"] = self.gutter_stroke or tools.get_color("gray")
@@ -1682,7 +1708,7 @@ def CounterBack(sequence, *elements, **kwargs):
 
 
 def Deck(**kwargs):
-    """Placeholder for the deck design; storing lists of CardShapes; allowing export
+    """Placeholder for a deck design; storing lists of CardShapes; allowing export
 
     Kwargs (optional):
 
@@ -1713,6 +1739,19 @@ def Deck(**kwargs):
       in a horizontal direction before a blank space is added by the **spacing**
     - grouping_row: number of cards to be drawn adjacent to each other
       in a vertical direction before a blank space is added by the **spacing**
+    - gutter: a value set for this helps determines the spacing between the
+      fronts and backs of cards when these are drawn on two halves of the same
+      page; its value is divided in half, and added to the top margin value, and
+      each set of cards is drawn that distance away from the centre line of the page
+    - gutter_stroke: if set, will cause a line of that color to be used
+      for the *gutter* line; this defaults to ``gray`` (to match grid marks)
+    - gutter_stroke_width: if set to a value, will cause a line of that
+      thickness to be used for the *gutter* line
+    - gutter_dotted: sets the style of the *gutter* line
+    - gutter_layout: sets the orientation of the page for the cards drawn in
+      the two gutter "halves"; this can be ``portrait`` (the default) or
+      ``landscape``` (the latter is useful when you have very tall cards e.g.
+      ``tarot`` sized ones)
     - height: card height for a *rectangular* card; defaults to 8.89 cm
     - mask: an expression which should evaluate to ``True`` or ``False``.
       This expression has the same kind of syntax as T() and it uses data available
@@ -1731,9 +1770,11 @@ def Deck(**kwargs):
 
     Notes:
 
-    - A DeckOfCards object receives its `draw()` command from Save()!
-    - Gutter lines are drawn here (one per page)
-    - Any annotations are drawn here (depending on page allocations)
+    - This function instantiates a DeckOfCards object; this object:
+
+        - receives its `draw()` command from Save()
+        - draws any gutter lines (one per page)
+        - adds any annotations (depending on page ranges)
     """
     validate_globals()
 
