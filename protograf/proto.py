@@ -137,13 +137,13 @@ def validate_globals():
 # ---- Deck / Card related ====
 
 
-class CardShape(BaseShape):
+class CardOutline(BaseShape):
     """
-    Card shape on a given canvas.
+    Card outline on a given canvas.
     """
 
     def __init__(self, _object=None, canvas=None, **kwargs):
-        super(CardShape, self).__init__(_object=_object, canvas=canvas, **kwargs)
+        super(CardOutline, self).__init__(_object=_object, canvas=canvas, **kwargs)
         self.kwargs = kwargs
         # feedback(f'\n$$$ CardShape KW=> {self.kwargs}')
         self.elements = []  # container for objects which get added to the card
@@ -161,18 +161,14 @@ class CardShape(BaseShape):
         self.height = kwargs.get("height", default_height)
         self.width = kwargs.get("width", default_width)
         self.radius = kwargs.get("radius", default_radius)
-        # print(f'$$$ {self.width=} {self.height=} {self.radius=} {globals.units=}')
+        self.frame_type = kwargs["frame_type"]
         self.outline = self.get_outline(
             cnv=canvas, row=None, col=None, cid=None, label=None, **kwargs
         )
+        # print(f'$$$ {self.frame_type=} {self.width=} {self.height=} {self.radius=} ')
         self.kwargs.pop("width", None)
         self.kwargs.pop("height", None)
         self.kwargs.pop("radius", None)
-        self.image = kwargs.get("image", None)
-
-    def draw(self, cnv=None, off_x=0, off_y=0, ID=None, **kwargs):
-        """Draw an element on a given canvas."""
-        raise NotImplementedError
 
     def get_outline(self, cnv, row, col, cid, label, **kwargs):
         outline = None
@@ -182,6 +178,7 @@ class CardShape(BaseShape):
         kwargs["radius"] = self.radius
         kwargs["spacing_x"] = self.spacing_x
         kwargs["spacing_y"] = self.spacing_y
+        # NOTE! If other frametypes are allowed, ensure their H/W/R values are set!
         match kwargs["frame_type"]:
             case CardFrame.RECTANGLE:
                 outline = RectangleShape(
@@ -195,13 +192,44 @@ class CardShape(BaseShape):
                 outline = CircleShape(
                     label=label, canvas=cnv, col=col, row=row, **kwargs
                 )
+                self.height = outline.height
+                self.width = outline.width
+                self.radius = outline.radius
             case CardFrame.HEXAGON:
                 outline = HexShape(label=label, canvas=cnv, col=col, row=row, **kwargs)
+                hex_geom = outline.get_geometry()
+                self.height = hex_geom.height_flat / globals.units
+                self.width = hex_geom.diameter / globals.units
+                self.radius = hex_geom.radius / globals.units
             case _:
                 raise NotImplementedError(
                     f'Cannot handle card frame type: {kwargs["frame_type"]}'
                 )
+        self.frame_type = kwargs["frame_type"]
+        self.outline = outline
         return outline
+
+
+class CardShape(BaseShape):
+    """
+    Card shape on a given canvas.
+    """
+
+    def __init__(self, _object=None, canvas=None, **kwargs):
+        super(CardShape, self).__init__(_object=_object, canvas=canvas, **kwargs)
+        self.kwargs = kwargs
+        # feedback(f'\n$$$ CardShape KW=> {self.kwargs}')
+        self.elements = []  # container for objects which get added to the card
+        self.members = None
+        self.outline_shape = CardOutline(_object=_object, canvas=canvas, **kwargs)
+        self.outline = self.outline_shape.get_outline(
+            cnv=canvas, row=None, col=None, cid=None, label=None, **kwargs
+        )
+        self.image = kwargs.get("image", None)
+
+    def draw(self, cnv=None, off_x=0, off_y=0, ID=None, **kwargs):
+        """Draw an element on a given canvas."""
+        raise NotImplementedError
 
     def draw_card(self, cnv, row, col, cid, **kwargs):
         """Draw a card on a given canvas.
@@ -223,7 +251,7 @@ class CardShape(BaseShape):
         shape_kwargs.pop("image_list", None)  # do NOT draw linked image
         shape_kwargs.pop("image", None)  # do NOT draw get_outline(linked image
         # feedback(f'$$$ draw_card)() {cid=} {row=} {col=} \nKW=> {shape_kwargs}')
-        outline = self.get_outline(
+        outline = self.outline_shape.get_outline(
             cnv=cnv, row=row, col=col, cid=cid, label=label, **shape_kwargs
         )
 
@@ -304,7 +332,10 @@ class CardShape(BaseShape):
                 _dx = col * 2.0 * (side + outline.spacing_x) + outline.offset_x
                 _dy = row * 2.0 * (half_flat + outline.spacing_y) + outline.offset_y
                 if row & 1:
-                    _dx = _dx + side + outline.spacing_x
+                    if is_card_back:
+                        _dx = _dx - side - outline.spacing_x
+                    else:
+                        _dx = _dx + side + outline.spacing_x
             case _:
                 raise NotImplementedError(
                     f'Cannot handle card frame type: {kwargs["frame_type"]}'
@@ -545,13 +576,13 @@ class DeckOfCards:
     def create_cardshapes(self, cards: int = 0):
         """Create a Deck of CardShapes (fronts and backs), based on number of `cards`"""
         log.debug("Cards are: %s", self.sequence)
-        # fronts
+        # ---- create cardfronts
         log.debug("Deck Fronts => %s cards with kwargs: %s", cards, self.kwargs)
         for card in range(0, cards):
             _card = CardShape(**self.kwargs)
             _card.shape_id = card
             self.fronts.append(_card)
-        # backs
+        # ---- create card backs
         log.debug("Deck Backs  => %s cards with kwargs: %s", cards, self.kwargs)
         for back in range(0, cards):
             _back = CardShape(**self.kwargs)
@@ -870,14 +901,17 @@ class DeckOfCards:
         col_space, row_space = 0.0, 0.0
         if self.fronts:
             _card = self.fronts[0]
-            (
-                _height,
-                _width,
-            ) = (
-                _card.outline.height,
-                _card.outline.width,
-            )
-            _radius = _card.outline.radius
+        else:
+            _card = self.backs[0]
+        (
+            _height,
+            _width,
+        ) = (
+            _card.outline.height,
+            _card.outline.width,
+        )
+        _radius = _card.outline.radius
+        # print(f'$$$ _card: {_height=} {_width=} {_radius=}')
 
         # ---- space calcs for rows/cols
         # Note: units here are user-based
@@ -895,6 +929,7 @@ class DeckOfCards:
                 max_rows = max_groups * self.grouping_rows
         if not max_cols:
             col_space = globals.page_width - margin_left - margin_right - self.offset_x
+            # print(f'$$$ {globals.page_width=} {margin_left=} {margin_right=} {self.offset_x=}')
             if self.grouping_cols == 1:
                 max_cols = int(
                     (col_space + self.spacing_x) / (float(_width) + self.spacing_x)
@@ -905,6 +940,7 @@ class DeckOfCards:
                     / (float(_width) * self.grouping_cols + self.spacing_x)
                 )
                 max_cols = max_groups * self.grouping_cols
+            # print(f'$$$ {col_space=} {self.spacing_x=} {_width=} {max_cols=}') # w = 6.9282?
         if self.grouping_cols == 1:
             effective_right = (
                 max_cols * (_width + self.spacing_x)
@@ -1322,7 +1358,8 @@ def Save(**kwargs):
     globals.directory = directory if directory else os.getcwd()
     if not os.path.exists(globals.directory):
         feedback(
-            f'Cannot find the directory "{dirname}" - please create this first.', True
+            f'Cannot find the directory "{globals.directory}" - please create this first.',
+            True,
         )
 
     # ---- draw Deck (and export cards)
