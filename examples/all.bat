@@ -8,6 +8,7 @@ ECHO "All examples ouput is saved to: %location%"
 
 REM ----  examples: basic
 ECHO "Creating basic examples..."
+python core\blank.py --no-png -d %location%
 python core\demo.py --no-png -d %location%
 python core\default_shapes.py --no-png -d %location%
 python core\diagram.py --no-png -d %location%

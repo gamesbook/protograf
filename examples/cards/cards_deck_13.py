@@ -14,9 +14,9 @@ Deck(
     height=2.1,
     width=3.2,
     bleed_fill="lightsteelblue",
-    offset=0.15,
+    #offset=0.15,
     grid_marks=True,
-    grid_length=0.18,
+    grid_marks_length=0.2,
     gutter=0.4
     )
 # design card

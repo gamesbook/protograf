@@ -330,9 +330,9 @@ Example 5. Grid Marks
             bleed_fill="silver",
             offset=0.25,
             grid_marks=True,
-            grid_length=0.18,
-            grid_stroke="black",
-            grid_stroke_width=1)
+            grid_marks_length=0.2,
+            grid_marks_stroke="black",
+            grid_marks_stroke_width=1)
 
       In this example, there are two main changes from previous ones.
 
@@ -343,13 +343,13 @@ Example 5. Grid Marks
 
       The edge of the page has small marks that are designed to help with
       card cutting; ``grid_marks=True`` enables these marks, and the optional
-      *grid_length* allows the length of these lines to be set; the default
+      *grid_marks_length* allows the length of these lines to be set; the default
       length is ``0.85`` cm.
 
-      In this example, the ``grid_stroke`` has been changed from the default
-      color of ``"gray"`` to ``"black"`` and the ``grid_stroke_width`` has
-      been increased to ``1`` point.  (Normally, the stroke width should be
-      thin to better aid with cutting.)
+      In this example, the ``grid_marks_stroke`` has been changed from the
+      default color of ``"gray"`` to ``"black"`` and the
+      ``grid_marks_stroke_width`` has been increased to ``1`` point.
+      (Normally, the stroke width should be thin to better aid with cutting.)
 
 ===== ======
 
@@ -378,11 +378,11 @@ Example 6. Card Spacing
             bleed_fill="silver",
             offset=0.15,
             grid_marks=True,
-            grid_length=0.18,
+            grid_marks_length=0.2,
             spacing_x=0.1,
             spacing_y=0.15)
 
-      Depending on the priniting and cutting requirements, it can be useful
+      Depending on the printing and cutting requirements, it can be useful
       to add spacing (unused area) between the cards.
 
       The *spacing* property can sets spacing distance in both x- and
@@ -392,7 +392,7 @@ Example 6. Card Spacing
       using **spacing_x** for horizontal spacing and **spacing_y** for
       vertical spacing.
 
-      Using spacing also adds extra grid marks.
+      Note that using spacing also adds extra grid marks.
 
       .. HINT::
 
@@ -424,7 +424,7 @@ Example 7. Clean Layout
             bleed_fill="silver",
             offset=0.15,
             grid_marks=True,
-            grid_length=0.18,
+            grid_marks_length=0.2,
             spacing=0.15)
 
       Here, all the other adjustments to the Deck layout |dash| *bleed_fill*,
@@ -463,7 +463,7 @@ Example 8. Column Limit
             bleed_fill="silver",
             offset=0.15,
             grid_marks=True,
-            grid_length=0.18,
+            grid_marks_length=0.2,
             cols=1)
 
       By default, **protograf** will fit as many cards as possible into the
@@ -500,7 +500,7 @@ Example 9. Row Limit
             bleed_fill="silver",
             offset=0.15,
             grid_marks=True,
-            grid_length=0.18,
+            grid_marks_length=0.2,
             rows=1)
 
       By default, **protograf** will fit as many cards as possible into the
@@ -535,7 +535,7 @@ Example 10. Circular Frame
             bleed_fill="silver",
             offset=0.15,
             grid_marks=True,
-            grid_length=0.18,
+            grid_marks_length=0.2,
             spacing=0.15,
             frame='circle')
 
@@ -575,7 +575,7 @@ Example 11. Card Grouping
             bleed_fill="silver",
             offset=0.15,
             grid_marks=True,
-            grid_length=0.18,
+            grid_marks_length=0.2,
             spacing_x=0.3,
             spacing_y=0.15,
             grouping_cols=2,
@@ -613,8 +613,9 @@ Example 12. CardBack and Gutter
 
       The card size means that there would normally be 4 rectangular cards
       on each A8 page; but the layout is changed to have a mix of normal
-      Cards and CardBacks. In this case, the card backs are created as a
-      small, green rectangle.
+      Cards and CardBacks. In this case, the card backs are created with a
+      green rectangle |dash| but any type of technique used for graphics for
+      the front of the card can also be used for the back.
 
       .. code:: python
 
@@ -625,7 +626,7 @@ Example 12. CardBack and Gutter
             bleed_fill="lightsteelblue",
             offset=0.15,
             grid_marks=True,
-            grid_length=0.18,
+            grid_marks_length=0.2,
             gutter=0.4
             )
         # design card

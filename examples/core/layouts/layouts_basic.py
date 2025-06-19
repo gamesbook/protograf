@@ -64,7 +64,7 @@ PageBreak()
 
 Blueprint(stroke_width=0.5)
 Text(common=header, text="Rect.Locations: NW/east: odd row shift")
-rect = RectangularLocations(cols=3, rows=4, start="NW", direction="east", row_odd=-0.5)
+rect = RectangularLocations(cols=3, rows=4, start="NW", direction="east", row_odd=0.5)
 Layout(rect, shapes=[a_circle,])
 PageBreak()
 

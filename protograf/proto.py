@@ -236,7 +236,7 @@ class CardShape(BaseShape):
 
         Pass on `deck_data` to other commands, as needed, for them to draw Shapes
         """
-        # feedback(f'$$$ draw_card  {cid=} {cnv=} {kwargs["card_back"]=}')
+        # feedback(f'\n$$$ draw_card  {cid=} {row=} {col=} {kwargs["card_back"]=}')
         # feedback(f'$$$ draw_card  {cid=} KW=> {kwargs}')
         is_card_back = kwargs.get("card_back", False)
         image = kwargs.get("image", None)
@@ -255,12 +255,28 @@ class CardShape(BaseShape):
             cnv=cnv, row=row, col=col, cid=cid, label=label, **shape_kwargs
         )
 
+        # ---- custom geometry
+        if kwargs["frame_type"] == CardFrame.HEXAGON:
+            _geom = outline.get_geometry()
+            radius, diameter, side, half_flat = (
+                _geom.radius,
+                2.0 * _geom.radius,
+                _geom.side,
+                _geom.half_flat,
+            )
+            side = self.points_to_value(side)
+            half_flat = self.points_to_value(half_flat)
+            width = self.points_to_value(diameter)
+
         # ---- set x-shift to align card backs and fronts (frames)
         if is_card_back:
+            # ---- alter right_gap for Hex odd row
+            if kwargs["frame_type"] == CardFrame.HEXAGON and row & 1:  # odd row
+                right_gap = right_gap - width
             move_x = right_gap - self.offset_x - globals.margins.left
-            # feedback(f'$$$ {right_gap=} {self.offset_x=} {move_x=}')
         else:
             move_x = 0
+        # feedback(f'$$$ {right_gap=} {self.offset_x=} {move_x=}')
         outline.draw(off_x=move_x, off_y=0, **shape_kwargs)  # inc. grid_marks
 
         # ---- track frame outlines for possible image extraction
@@ -293,16 +309,6 @@ class CardShape(BaseShape):
 
         # ---- grid marks
         kwargs["grid_marks"] = None  # reset so not used by elements on card
-        if kwargs["frame_type"] == CardFrame.HEXAGON:
-            _geom = outline.get_geometry()
-            radius, diameter, side, half_flat = (
-                _geom.radius,
-                2.0 * _geom.radius,
-                _geom.side,
-                _geom.half_flat,
-            )
-            side = self.points_to_value(side)
-            half_flat = self.points_to_value(half_flat)
 
         # ---- card frame shift
         match kwargs["frame_type"]:
@@ -331,9 +337,10 @@ class CardShape(BaseShape):
             case CardFrame.HEXAGON:
                 _dx = col * 2.0 * (side + outline.spacing_x) + outline.offset_x
                 _dy = row * 2.0 * (half_flat + outline.spacing_y) + outline.offset_y
-                if row & 1:
+                if row & 1:  # odd row
                     if is_card_back:
-                        _dx = _dx - side - outline.spacing_x
+                        _dx = _dx + side - outline.spacing_x
+                        # print('HEX ODD BACK {_dx=}')
                     else:
                         _dx = _dx + side + outline.spacing_x
             case _:
@@ -746,6 +753,7 @@ class DeckOfCards:
                             else:
                                 pass
                         else:
+                            # if row == 1 or row == 2: breakpoint()
                             col += -1
                             if col < 0:
                                 col = max_cols - 1
@@ -755,7 +763,7 @@ class DeckOfCards:
                                 and row % 2
                                 and card.kwargs.get("frame_type") == CardFrame.HEXAGON
                             ):
-                                col = max_cols
+                                col = max_cols - 1
                                 row += 1
                             else:
                                 pass
@@ -1047,7 +1055,7 @@ class DeckOfCards:
             # ---- delete extra blank page at the end
             globals.document.delete_page(globals.page_count)
             # ---- delete gutter PDF document
-            # os.remove(gutter_filename)
+            os.remove(gutter_filename)
         else:
             pass
 
@@ -1067,7 +1075,7 @@ class DeckOfCards:
 
 
 def page_setup():
-    """Set the page color and (optionally) show a dotted margin line."""
+    """Set the page color and (optionally) show a dotted margin line and grid."""
     # ---- paper color
     _fill = tools.get_color(globals.page_fill)
     if _fill != tools.get_color("white"):
@@ -1091,19 +1099,20 @@ def page_setup():
     # ---- page grid
     if globals.page_grid:
         stroke = tools.get_color(DEBUG_COLOR)
-        cols = int(globals.page[0] // globals.units)
-        rows = int(globals.page[1] // globals.units)
+        grid_size = globals.page_grid * globals.units
+        cols = int(globals.page[0] // grid_size)
+        rows = int(globals.page[1] // grid_size)
         for col in range(1, cols + 1):
             globals.doc_page.draw_line(
-                (col * globals.units, 0),
-                (col * globals.units, globals.page[1]),
+                (col * grid_size, 0),
+                (col * grid_size, globals.page[1]),
                 color=stroke,
                 width=0.1,
             )
         for row in range(1, rows + 1):
             globals.doc_page.draw_line(
-                (0, row * globals.units),
-                (globals.page[0], row * globals.units),
+                (0, row * grid_size),
+                (globals.page[0], row * grid_size),
                 color=stroke,
                 width=0.1,
             )
@@ -1132,7 +1141,7 @@ def Create(**kwargs):
     - **margin_left** - set the left margin using the defined *units*
     - **margin_right** - set the the right margin using the defined *units*
     - **margin_debug** - if True, show the margin as a dotted blue line
-    - **page_grid* - if True, draw a grid covering the paper (one unit square)
+    - **page_grid* - if a valid float, draw a squared grid covering the paper
 
     Kwargs to override the default values of any of the various properties
     used for drawing Shapes can be set here as well, for example:
@@ -1182,7 +1191,7 @@ def Create(**kwargs):
     globals.page_width = globals.page[0] / globals.units  # width in user units
     globals.page_height = globals.page[1] / globals.units  # height in user units
     globals.fill = tools.get_color(kwargs.get("fill", "white"))
-    globals.page_grid = tools.as_bool(kwargs.get("page_grid", False), "page_grid")
+    globals.page_grid = tools.as_float(kwargs.get("page_grid", 0), "page_grid")
     # ---- fonts
     base_fonts()
     globals.font_size = kwargs.get("font_size", 12)
@@ -1442,7 +1451,8 @@ def margins(**kwargs):
 
 def Font(name=None, **kwargs):
     validate_globals()
-
+    _name = None
+    _file = None
     if name:
         _name = builtin_font(name)
         if not _name:  # check for custom font
@@ -1461,8 +1471,7 @@ def Font(name=None, **kwargs):
                 font_path, css = fi.font_file_css(_name)
                 globals.css += css
                 globals.archive.add(font_path)
-    else:
-        _name = None
+                _file = font_path
 
     globals.base.font_name = _name or DEFAULT_FONT
     globals.base.font_file = _file

@@ -17,9 +17,9 @@ Deck(
     bleed_fill="lightsteelblue",
     offset=0.25,
     grid_marks=True,
-    grid_length=0.18,
-    grid_stroke="black",
-    grid_stroke_width=1
+    grid_marks_length=0.2,
+    grid_marks_stroke="black",
+    grid_marks_stroke_width=1
     )
 # design card
 Card(

@@ -4,6 +4,7 @@ mkdir -p /tmp/demo
 echo -e "\nAll examples outputs are saved to /tmp/demo"
 # ---- examples: simple
 echo -e "\nCreating basic examples..."
+python core/blank.py -d /tmp/demo
 python core/demo.py -d /tmp/demo
 python core/diagram.py -d /tmp/demo
 python core/default_shapes.py -d /tmp/demo

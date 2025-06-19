@@ -81,5 +81,5 @@ def initialize():
     page_width = page[0] / units  # width in user units
     page_height = page[1] / units  # height in user units
     page_fill = "white"  # page color
-    page_grid = False
+    page_grid = None  # grid interval in user units
     font_size = 12

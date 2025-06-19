@@ -5,6 +5,7 @@ echo -e "\nAll examples output is saved to /tmp/demo"
 # ---- examples: simple
 echo -e "\nCreating basic examples..."
 python core/demo.py --no-png -d /tmp/demo
+python core/blank.py --no-png -d /tmp/demo
 python core/diagram.py --no-png -d /tmp/demo
 python core/default_shapes.py --no-png -d /tmp/demo
 # ----  examples: customised
