@@ -43,7 +43,7 @@ Table of Contents
   - `T(emplate) command`_
   - `S(election) command`_
   - `L(ookup) command`_
-- `Other Resources`_
+- `Other Card Deck Resources`_
 
 
 Introduction
@@ -977,8 +977,8 @@ the card with **ID** of ``1``; and then returns the value from that card's
 
 .. _other-card-resources:
 
-Other Resources
-===============
+Other Card Deck Resources
+=========================
 `↑ <table-of-contents-crddk_>`_
 
 **protograf** is by no means the only tool for creating decks of cards.

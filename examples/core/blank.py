@@ -1,5 +1,5 @@
 """
-Page annotation example for protograf
+Page annotation (grid and margins) example for protograf
 
 Written by: Derek Hohls
 Created on: 13 June 2025
@@ -15,4 +15,12 @@ Create(filename="blank.pdf",
        margin_debug=True,
 )
 
-Save()
+# Save()
+Save(
+    output='png',
+    dpi=300,
+    directory="../docs/source/images/customised",
+    names=[
+        "blank_grid",
+    ]
+)

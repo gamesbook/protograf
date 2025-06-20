@@ -1,4 +1,4 @@
-:=============
+==============
 Script Anatomy
 ==============
 
@@ -88,7 +88,7 @@ elements that will appear after it.
         FEEDBACK:: Please ensure Create() command has been called first!
 
 By default, this command will setup an A4 page |dash| in portrait mode |dash|
-with a margin of one-half inch (1.25cm), and units of centimetres;
+with margins of one-quarter inch (0.625cm), and units of centimetres;
 the resulting output file will have the same name as the script,
 but with a ``.pdf`` extension.
 
@@ -111,8 +111,8 @@ To customise the command, set its properties as follows:
 - **margin_left** - set the left margin
 - **margin_right** - set the the right margin
 - **margin_debug** - set to ``True`` to show the margin as a dotted blue line
-- **page_grid** - if set to ``True``, will show a set of thin horizontal and
-  vertical lines, set 1 "unit" apart |dash| where the distance depends on the
+- **page_grid** - if set to a number, will display a squared grid of thin
+  horizontal and vertical lines, set a distance "unit" apart |dash| where the distance depends on the
   current *units*
 
 
@@ -120,7 +120,8 @@ Example 1. Create Options
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Here is an example of a customised ``Create`` command, for an A3-sized page
-in landscape mode, with top and left margins being 2 inches each:
+in landscape mode, with units of inches (``in``) and top and left margins
+being set to 2 inches each:
 
 .. code:: python
 
@@ -131,6 +132,33 @@ in landscape mode, with top and left margins being 2 inches each:
         margin_top=2,
         margin_left=2,
     )
+
+
+Example 2. Grid and Margin Display
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. |cr1| image:: images/customised/blank_grid.png
+   :width: 330
+
+===== ======
+|cr1| Here is an example of a customised ``Create`` command, for an A8-sized
+      page in portrait mode, with margins being 0.5 cm each. A grid of 0.5 cm
+      is displayed and the margins are shown as dotted lines.
+
+      This type of setup is useful when working on a design but is typically
+      not shown as part of a final product.
+
+      .. code:: python
+
+        Create(
+            filename="blank.pdf",
+            paper='A8',
+            margin=0.5,
+            page_grid=0.5,
+            margin_debug=True,
+        )
+
+===== ======
 
 .. _pagebreak-command:
 

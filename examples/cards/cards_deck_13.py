@@ -41,5 +41,5 @@ Save(
      output='png',
      dpi=300,
      directory="../docs/source/images/decks",
-     names=['cards_deck_13', None]
+     names=['cards_deck_13', None, None, None]
 )

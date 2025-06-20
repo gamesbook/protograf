@@ -22,4 +22,4 @@ Hexagons(
     hidden=[(5, 5)],
 )
 
-Save(output='png')
+Save()

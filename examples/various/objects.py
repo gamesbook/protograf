@@ -156,4 +156,4 @@ Circle(cx=3.5, cy=9, radius=0.35, fill=None, stroke="firebrick", stroke_width=1,
        radii=[30, 90, 147, 213, 270, 330], radii_offset=0.7,
        radii_stroke_width=1, radii_stroke="firebrick")
 
-Save(output='png')
+Save()

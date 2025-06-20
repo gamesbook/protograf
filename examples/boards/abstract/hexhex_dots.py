@@ -21,4 +21,4 @@ Hexagons(
     dot_stroke="gray"
 )
 
-Save(output='png')
+Save()

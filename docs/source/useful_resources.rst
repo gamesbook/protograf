@@ -64,16 +64,16 @@ Other Tools
 ===========
 
 - https://www.ttgda.org/software-tools - lists a number of tools that
-  can be used for game design.
+  can be used for game design
 - https://github.com/christianbachmann/board-game-design-canvas - an outline
   for a game development process that can help choose *what* you need to
   prototype
 
 .. HINT::
 
-    Please also see the sections on
-    :ref:`other hexagonal resources <other-hexagonal-resources>`
-    as well as  :ref:`other playing cards resources <other-card-resources>`
+    Please also refer to the sections on
+    :ref:`hexagonal grid resources <other-hexagonal-resources>`
+    as well as  :ref:`playing cards resources <other-card-resources>`.
 
 
 BoardGameGeek
