@@ -1,10 +1,6 @@
 # -*- coding: utf-8 -*-
 """
 Base shape class for protograf
-
-Notes:
-    * https://www.a2-size.com/american-paper-sizes/
-    * https://en.wikipedia.org/wiki/Paper_size#Overview_of_ISO_paper_sizes
 """
 # lib
 from collections import namedtuple
