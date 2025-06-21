@@ -107,9 +107,10 @@ current / potential areas of work or idea development.
     * [ ] Pod shape
 * [ ] Common objects:
     * [ ] CompassRose (replace Compass Shape)
-    * [ ] Cube (Rhombus composite)
+    * [ ] Cube (Rhombus composite; "3D")
     * [ ] Domino (DotGrid inside Rectangle outline)
-    * [ ] Die (Rectangle with DotGrid; 3D?)
+    * [ ] Die (Rectangle with DotGrid)
+    * [ ] Meeple (Polyshape with Arcs)
     * [ ] Picture Frame (Trapezoid composite)
 * [ ] Hexagons: 18xx tile example (requires `Arcs` below!)
 * [ ] Hexagon Grid: better hexhex creation with notations

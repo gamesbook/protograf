@@ -70,6 +70,10 @@ Check existing dependencies via::
 
     poetry show
 
+Upgrade a dependency via::
+
+    poetry update MyExistingPackage
+
 Update a patch / feature version (the most common case) via::
 
     poetry version patch

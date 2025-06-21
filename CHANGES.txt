@@ -5,21 +5,22 @@ protograf
 Changes
 =======
 
-2025-06-00 (0.2.3)
+2025-06-21 (0.2.3)
 ------------------
-- Moved bulk of constant and structure definitions to their own files
-- Added list() function example
-- Added CardBack shape and support alternate fronts/backs card pages
+- Move bulk of constant and structure definitions to their own files
+- Add list() function example
+- Add CardBack shape and support alternate fronts/backs card pages
 - Support cards fronts and backs on same page (via "gutter")
-- Changed property names used for access to Google Sheets
-- Changed property names used for grid marks
+- Change property names used for access to Google Sheets
+- Change property names used for grid marks
 - Support for common named card sizes
-- Changed default card size and page margins
-- Added "margin_debug" to Create() to show a dotted margin
-- Added "page_grid" to Create() for help design layout
-- Fixed issues with default margin and card sizes for non-cm units
-- Fixed bug with directory used for various outputs
-- Added support for rounding on Images
+- Change default card size and page margins
+- Add "margin_debug" to Create() to show a dotted margin
+- Add "page_grid" to Create() for help design layout
+- Fix issues with default margin and card sizes for non-cm units
+- Fix bug with directory used for various outputs
+- Add support for rounding of Images
+- Update external packages with security patches
 
 2025-05-23 (0.2.2)
 ------------------
