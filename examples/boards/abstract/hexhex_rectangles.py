@@ -21,4 +21,4 @@ Hexagons(
         stroke="black", fill="white", width=1.9, height=2.2, stroke_width=2),
 )
 
-Save(output='png')
+Save()

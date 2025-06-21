@@ -24,7 +24,7 @@ import pymupdf
 
 # local
 from .bgg import BGGGame, BGGGameList
-from .base import BaseCanvas, GroupBase, COLORS, DEBUG_COLOR, DEFAULT_FONT, get_color
+from .base import BaseCanvas, GroupBase, WIDTH
 from .dice import Dice, DiceD4, DiceD6, DiceD8, DiceD10, DiceD12, DiceD20, DiceD100
 from .shapes import (
     BaseShape,
@@ -56,9 +56,6 @@ from .shapes import (
     StarFieldShape,
     TextShape,
     TrapezoidShape,
-    GRID_SHAPES_WITH_CENTRE,
-    GRID_SHAPES_NO_CENTRE,
-    SHAPES_FOR_TRACK,
 )
 from .layouts import (
     GridShape,
@@ -70,90 +67,118 @@ from .layouts import (
     RepeatShape,
     SequenceShape,
 )
+from .globals import unit
 from .groups import Switch, Lookup  # used in scripts
 from ._version import __version__
 
 from protograf.utils import geoms, tools, support
-from protograf.utils.structures import (
-    BBox,
-    CardFrame,
-    DatasetType,
-    DirectionGroup,
-    ExportFormat,
-    LookupType,
-    Locale,
-    Point,
-    Place,
-    Ray,
-    TemplatingType,
-    unit,
+from protograf.utils.constants import (
+    DEFAULT_FONT,
+    DEBUG_COLOR,
+    DEFAULT_CARD_WIDTH,  # cm
+    DEFAULT_CARD_HEIGHT,  # cm
+    DEFAULT_CARD_COUNT,
+    DEFAULT_CARD_RADIUS,  # cm
+    DEFAULT_COUNTER_SIZE,  # cm
+    DEFAULT_COUNTER_RADIUS,  # cm
+    DEFAULT_DPI,
+    DEFAULT_MARGIN_SIZE,  # cm
+    GRID_SHAPES_WITH_CENTRE,
+    GRID_SHAPES_NO_CENTRE,
+    SHAPES_FOR_TRACK,
 )
 from protograf.utils.fonts import builtin_font, FontInterface
-from protograf.utils.tools import base_fonts, split  # used in scripts
 from protograf.utils.geoms import equilateral_height  # used in scripts
+from protograf.utils.messaging import feedback
 from protograf.utils.support import (  # used in scripts
     steps,
     uni,
     uc,
     CACHE_DIRECTORY,
 )
+from protograf.utils.structures import (
+    BBox,
+    CardFrame,
+    DatasetType,
+    DeckPrintState,
+    DirectionGroup,
+    ExportFormat,
+    LookupType,
+    Locale,
+    PageMargins,
+    Point,
+    Place,
+    Ray,
+    TemplatingType,
+)
+from protograf.utils.tools import (
+    base_fonts,
+    split,
+    save_globals,
+    restore_globals,
+)  # used in scripts
 from protograf import globals
 
 log = logging.getLogger(__name__)
 globals_set = False
+
+# user constants
+YES = True
+NO = False
 
 
 def validate_globals():
     """Check that Create has been called to set initialise globals"""
     global globals_set
     if not globals_set:
-        tools.feedback("Please ensure Create() command is called first!", True)
+        feedback("Please ensure Create() command is called first!", True)
 
 
 # ---- Deck / Card related ====
 
 
-class CardShape(BaseShape):
+class CardOutline(BaseShape):
     """
-    Card shape on a given canvas.
+    Card outline on a given canvas.
     """
 
     def __init__(self, _object=None, canvas=None, **kwargs):
-        super(CardShape, self).__init__(_object=_object, canvas=canvas, **kwargs)
+        super(CardOutline, self).__init__(_object=_object, canvas=canvas, **kwargs)
         self.kwargs = kwargs
-        # tools.feedback(f'$$$ CardShape KW=> {self.kwargs}')
+        # feedback(f'\n$$$ CardShape KW=> {self.kwargs}')
         self.elements = []  # container for objects which get added to the card
+        self.members = None
         if kwargs.get("_is_countersheet", False):
-            default_height = 2.54
-            default_width = 2.54
-            default_radius = 0.635
+            default_height = DEFAULT_COUNTER_SIZE / globals.units
+            default_width = DEFAULT_COUNTER_SIZE / globals.units
+            default_radius = DEFAULT_COUNTER_RADIUS / globals.units
         else:
-            default_height = 8.8
-            default_width = 6.3
-            default_radius = 2.54
+            default_height = DEFAULT_CARD_HEIGHT / globals.units
+            default_width = DEFAULT_CARD_WIDTH / globals.units
+            default_radius = DEFAULT_CARD_RADIUS / globals.units
+
+        # print(f'$$$ {default_width=} {default_height=} {default_radius=} {globals.units=}')
         self.height = kwargs.get("height", default_height)
         self.width = kwargs.get("width", default_width)
         self.radius = kwargs.get("radius", default_radius)
+        self.frame_type = kwargs["frame_type"]
         self.outline = self.get_outline(
             cnv=canvas, row=None, col=None, cid=None, label=None, **kwargs
         )
+        # print(f'$$$ {self.frame_type=} {self.width=} {self.height=} {self.radius=} ')
         self.kwargs.pop("width", None)
         self.kwargs.pop("height", None)
         self.kwargs.pop("radius", None)
-        self.image = kwargs.get("image", None)
-
-    def draw(self, cnv=None, off_x=0, off_y=0, ID=None, **kwargs):
-        """Draw an element on a given canvas."""
-        raise NotImplementedError
 
     def get_outline(self, cnv, row, col, cid, label, **kwargs):
         outline = None
-        # tools.feedback(f"$$$ getoutline {row=}, {col=}, {cid=}, {label=}")
+        # feedback(f"$$$ getoutline {row=}, {col=}, {cid=}, {label=}")
         kwargs["height"] = self.height
         kwargs["width"] = self.width
         kwargs["radius"] = self.radius
         kwargs["spacing_x"] = self.spacing_x
         kwargs["spacing_y"] = self.spacing_y
+        # NOTE! If other frametypes are allowed, ensure their H/W/R values are set!
         match kwargs["frame_type"]:
             case CardFrame.RECTANGLE:
                 outline = RectangleShape(
@@ -167,56 +192,70 @@ class CardShape(BaseShape):
                 outline = CircleShape(
                     label=label, canvas=cnv, col=col, row=row, **kwargs
                 )
+                self.height = outline.height
+                self.width = outline.width
+                self.radius = outline.radius
             case CardFrame.HEXAGON:
                 outline = HexShape(label=label, canvas=cnv, col=col, row=row, **kwargs)
+                hex_geom = outline.get_geometry()
+                self.height = hex_geom.height_flat / globals.units
+                self.width = hex_geom.diameter / globals.units
+                self.radius = hex_geom.radius / globals.units
             case _:
                 raise NotImplementedError(
                     f'Cannot handle card frame type: {kwargs["frame_type"]}'
                 )
+        self.frame_type = kwargs["frame_type"]
+        self.outline = outline
         return outline
+
+
+class CardShape(BaseShape):
+    """
+    Card shape on a given canvas.
+    """
+
+    def __init__(self, _object=None, canvas=None, **kwargs):
+        super(CardShape, self).__init__(_object=_object, canvas=canvas, **kwargs)
+        self.kwargs = kwargs
+        # feedback(f'\n$$$ CardShape KW=> {self.kwargs}')
+        self.elements = []  # container for objects which get added to the card
+        self.members = None
+        self.outline_shape = CardOutline(_object=_object, canvas=canvas, **kwargs)
+        self.outline = self.outline_shape.get_outline(
+            cnv=canvas, row=None, col=None, cid=None, label=None, **kwargs
+        )
+        self.image = kwargs.get("image", None)
+
+    def draw(self, cnv=None, off_x=0, off_y=0, ID=None, **kwargs):
+        """Draw an element on a given canvas."""
+        raise NotImplementedError
 
     def draw_card(self, cnv, row, col, cid, **kwargs):
         """Draw a card on a given canvas.
 
         Pass on `deck_data` to other commands, as needed, for them to draw Shapes
         """
+        # feedback(f'\n$$$ draw_card  {cid=} {row=} {col=} {kwargs["card_back"]=}')
+        # feedback(f'$$$ draw_card  {cid=} KW=> {kwargs}')
+        is_card_back = kwargs.get("card_back", False)
         image = kwargs.get("image", None)
-        # tools.feedback(f'$$$ draw_card {cnv=} KW=> {kwargs}')
+        right_gap = kwargs.get("right_gap", 0.0)  # gap between end-of-cards & page edge
+
         # ---- draw outline
         label = "ID:%s" % cid if self.show_id else ""
         shape_kwargs = copy(kwargs)
         shape_kwargs["is_cards"] = True
-        shape_kwargs["fill"] = kwargs.get("fill", kwargs.get("bleed_fill", None))
+        if not is_card_back:
+            shape_kwargs["fill"] = kwargs.get("fill", kwargs.get("bleed_fill", None))
         shape_kwargs.pop("image_list", None)  # do NOT draw linked image
-        shape_kwargs.pop("image", None)  # do NOT draw linked image
-        # tools.feedback(f'$$$ draw_card {cid=} {row=} {col=} \nSKW=> {shape_kwargs}')
-        outline = self.get_outline(
+        shape_kwargs.pop("image", None)  # do NOT draw get_outline(linked image
+        # feedback(f'$$$ draw_card)() {cid=} {row=} {col=} \nKW=> {shape_kwargs}')
+        outline = self.outline_shape.get_outline(
             cnv=cnv, row=row, col=col, cid=cid, label=label, **shape_kwargs
         )
-        outline.draw(**shape_kwargs)
 
-        # ---- track frame outlines for possible image extraction
-        match kwargs["frame_type"]:
-            case CardFrame.RECTANGLE:
-                _vertices = outline.get_vertexes()  # clockwise from bottom-left
-                base_frame_bbox = BBox(bl=_vertices[0], tr=_vertices[2])
-            case CardFrame.CIRCLE:
-                base_frame_bbox = outline.bbox
-            case CardFrame.HEXAGON:
-                _vertices = outline.get_vertexes()  # anti-clockwise from mid-right
-                base_frame_bbox = BBox(
-                    bl=Point(_vertices[3].x, _vertices[4].y),
-                    tr=Point(_vertices[0].x, _vertices[1].y),
-                )
-            case _:
-                raise NotImplementedError(
-                    f'Cannot handle card frame type: {kwargs["frame_type"]}'
-                )
-        frame_height = base_frame_bbox.tr.x - base_frame_bbox.bl.x
-        frame_width = base_frame_bbox.tr.y - base_frame_bbox.bl.y
-
-        # ---- grid marks
-        kwargs["grid_marks"] = None  # reset so not used by elements on card
+        # ---- custom geometry
         if kwargs["frame_type"] == CardFrame.HEXAGON:
             _geom = outline.get_geometry()
             radius, diameter, side, half_flat = (
@@ -227,6 +266,105 @@ class CardShape(BaseShape):
             )
             side = self.points_to_value(side)
             half_flat = self.points_to_value(half_flat)
+            width = self.points_to_value(diameter)
+
+        # ---- set x-shift to align card backs and fronts (frames)
+        if is_card_back:
+            # ---- alter right_gap for Hex odd row
+            if kwargs["frame_type"] == CardFrame.HEXAGON and row & 1:  # odd row
+                right_gap = right_gap - width
+            move_x = right_gap - self.offset_x - globals.margins.left
+        else:
+            move_x = 0
+        # feedback(f'$$$ {right_gap=} {self.offset_x=} {move_x=}')
+        outline.draw(off_x=move_x, off_y=0, **shape_kwargs)  # inc. grid_marks
+
+        # ---- track frame outlines for possible image extraction
+        match kwargs["frame_type"]:
+            case CardFrame.RECTANGLE:
+                _vertices = outline.get_vertexes()  # clockwise from bottom-left
+                base_frame_bbox = BBox(tl=_vertices[0], br=_vertices[2])
+            case CardFrame.CIRCLE:
+                base_frame_bbox = outline.bbox
+            case CardFrame.HEXAGON:
+                _vertices = outline.get_vertexes()  # anti-clockwise from mid-left
+                # print(f"$$$ HEXAGON {_vertices=}")
+                #   5__4
+                #   /  \
+                # 0/    \3
+                #  \    /
+                #  1\__/2
+                base_frame_bbox = BBox(
+                    tl=Point(_vertices[0].x, _vertices[5].y),
+                    br=Point(_vertices[3].x, _vertices[2].y),
+                )
+            case _:
+                raise NotImplementedError(
+                    f'Cannot handle card frame type: {kwargs["frame_type"]}'
+                )
+        frame_width = base_frame_bbox.br.x - base_frame_bbox.tl.x
+        frame_height = base_frame_bbox.br.y - base_frame_bbox.tl.y
+        # print(f"$$$ {base_frame_bbox.tl.x=}  {base_frame_bbox.tl.y=}")
+        # print(f"$$$ {base_frame_bbox.br.x=}  {base_frame_bbox.br.y=}")
+
+        # ---- grid marks
+        kwargs["grid_marks"] = None  # reset so not used by elements on card
+
+        # ---- card frame shift
+        match kwargs["frame_type"]:
+            case CardFrame.RECTANGLE | CardFrame.CIRCLE:
+                if kwargs["grouping_cols"] == 1:
+                    _dx = col * (outline.width + outline.spacing_x) + outline.offset_x
+                else:
+                    group_no = col // kwargs["grouping_cols"]
+                    _dx = (
+                        col * outline.width
+                        + outline.offset_x
+                        + outline.spacing_x * group_no
+                    )
+                if kwargs["grouping_rows"] == 1:
+                    _dy = row * (outline.height + outline.spacing_y) + outline.offset_y
+
+                else:
+                    group_no = row // kwargs["grouping_rows"]
+                    _dy = (
+                        row * outline.height
+                        + outline.offset_y
+                        + outline.spacing_y * group_no
+                    )
+                # print(f"$$$ {col=} {outline.width=}  {group_no=} {_dx=}")
+                # print(f"$$$ {row=} {outline.height=} {group_no=} {_dy=}")
+            case CardFrame.HEXAGON:
+                _dx = col * 2.0 * (side + outline.spacing_x) + outline.offset_x
+                _dy = row * 2.0 * (half_flat + outline.spacing_y) + outline.offset_y
+                if row & 1:  # odd row
+                    if is_card_back:
+                        _dx = _dx + side - outline.spacing_x
+                        # print('HEX ODD BACK {_dx=}')
+                    else:
+                        _dx = _dx + side + outline.spacing_x
+            case _:
+                raise NotImplementedError(
+                    f'Cannot handle card frame type: {kwargs["frame_type"]}'
+                )
+
+        # ---- set x-shift to align card backs and fronts (elements)
+        if is_card_back:
+            _dx = _dx + move_x
+
+        # ---- track/update frame and store card fronts
+        if not is_card_back:
+            mx = self.unit(_dx or 0) + self._o.delta_x
+            my = self.unit(_dy or 0) + self._o.delta_y
+            # print(f"$$$ {mx=} {my=} {frame_width=} {frame_height=}")
+            frame_bbox = BBox(
+                tl=Point(mx, my), br=Point(mx + frame_width, my + frame_height)
+            )
+            page = kwargs.get("page_number", 0)
+            if page not in globals.card_frames:
+                globals.card_frames[page] = [frame_bbox]
+            else:
+                globals.card_frames[page].append(frame_bbox)
 
         # ---- draw card elements
         flat_elements = tools.flatten(self.elements)
@@ -236,58 +374,8 @@ class CardShape(BaseShape):
                 if flat_ele.kwargs.get("source", "").lower() in ["*", "all"]:
                     flat_ele.source = image
 
-            # ---- * calculate card frame shift
-            match kwargs["frame_type"]:
-                case CardFrame.RECTANGLE | CardFrame.CIRCLE:
-                    if kwargs["grouping_cols"] == 1:
-                        _dx = (
-                            col * (outline.width + outline.spacing_x) + outline.offset_x
-                        )
-                    else:
-                        group_no = col // kwargs["grouping_cols"]
-                        _dx = (
-                            col * outline.width
-                            + outline.offset_x
-                            + outline.spacing_x * group_no
-                        )
-                    if kwargs["grouping_rows"] == 1:
-                        _dy = (
-                            row * (outline.height + outline.spacing_y)
-                            + outline.offset_y
-                        )
-                        # print(f"{col=} {outline.width=} {group_no=} {_dx=}")
-                    else:
-                        group_no = row // kwargs["grouping_rows"]
-                        _dy = (
-                            row * outline.height
-                            + outline.offset_y
-                            + outline.spacing_y * group_no
-                        )
-                        # print(f"{row=} {outline.height=} {group_no=} {_dy=}")
-                case CardFrame.HEXAGON:
-                    _dx = col * 2.0 * (side + outline.spacing_x) + outline.offset_x
-                    _dy = row * 2.0 * (half_flat + outline.spacing_y) + outline.offset_y
-                    if row & 1:
-                        _dx = _dx + side + outline.spacing_x
-                case _:
-                    raise NotImplementedError(
-                        f'Cannot handle card frame type: {kwargs["frame_type"]}'
-                    )
-
-            # ---- * track/update frame and store
-            mx = self.unit(_dx or 0) + self._o.delta_x
-            my = self.unit(_dy or 0) + self._o.delta_y
-            frame_bbox = BBox(
-                bl=Point(mx, my), tr=Point(mx + frame_width, my + frame_height)
-            )
-            page = kwargs.get("page_number", 0)
-            if page not in globals.card_frames:
-                globals.card_frames[page] = [frame_bbox]
-            else:
-                globals.card_frames[page].append(frame_bbox)
-
             members = self.members or flat_ele.members
-            # ---- clear kwargs for drawing
+            # ---- * clear kwargs for drawing
             # (otherwise BaseShape self attributes already set are overwritten)
             dargs = {
                 key: kwargs.get(key)
@@ -310,7 +398,7 @@ class CardShape(BaseShape):
                 new_ele = self.handle_custom_values(flat_ele, cid)  # calculated values
                 if isinstance(new_ele, (SequenceShape, RepeatShape)):
                     new_ele.deck_data = self.deck_data
-                # tools.feedback(f'$$$ CS draw_card $$$ {new_ele=} {kwargs=}')
+                # feedback(f'$$$ CS draw_card $$$ {new_ele=} {kwargs=}')
                 if isinstance(new_ele, TemplatingType):
                     card_value = self.deck_data[iid]
                     custom_value = new_ele.template.render(card_value)
@@ -322,7 +410,7 @@ class CardShape(BaseShape):
                             )
                             cnv.commit()
                         except AttributeError as err:
-                            tools.feedback(
+                            feedback(
                                 f"Unable to draw card #{cid + 1}.  Check that all"
                                 f" elements created by '{new_ele.function.__name__}'"
                                 " are shapes.",
@@ -344,45 +432,54 @@ class CardShape(BaseShape):
                         custom_new_ele = self.handle_custom_values(flat_new_ele, iid)
                         if isinstance(custom_new_ele, (SequenceShape, RepeatShape)):
                             custom_new_ele.deck_data = self.deck_data
-                        # tools.feedback(f'$$$ draw_card $$$ {custom_new_ele=}')
+                        # feedback(f'$$$ draw_card $$$ {custom_new_ele=}')
                         custom_new_ele.draw(
                             cnv=cnv, off_x=_dx, off_y=_dy, ID=iid, **kwargs
                         )
                         cnv.commit()
 
             except Exception as err:
-                tools.feedback(f"Unable to draw card #{cid + 1}. (Error:{err})", True)
+                feedback(f"Unable to draw card #{cid + 1}. (Error:{err})", True)
 
 
-class DeckShape(BaseShape):
+class DeckOfCards:
     """
-    Placeholder for the deck design; list of CardShapes and Shapes.
-
-    NOTE: draw() is called via the Deck function in proto.py
+    Placeholder for the deck design; storing lists of CardShapes; allowing export
     """
 
-    def __init__(self, _object=None, canvas=None, **kwargs):
-        super(DeckShape, self).__init__(_object=_object, canvas=canvas, **kwargs)
+    def __init__(self, canvas=None, **kwargs):
+        self.cnv = canvas  # initial pymupdf.Shape object (need one per Page)
         self.kwargs = kwargs
-        # tools.feedback(f'$$$ DeckShape KW=> {self.kwargs}')
+        # feedback(f'$$$ DeckShape KW=> {self.kwargs}')
         # ---- cards
-        self.deck = []  # container for CardShape objects
+        self.fronts = []  # container for CardShape objects for front of cards
+        self.backs = []  # container for CardShape objects for back of cards
         if kwargs.get("_is_countersheet", False):
             default_items = 70
-            default_height = 2.54
-            default_width = 2.54
-            default_radius = 0.635
+            default_height = DEFAULT_COUNTER_SIZE / globals.units
+            default_width = DEFAULT_COUNTER_SIZE / globals.units
+            default_radius = DEFAULT_COUNTER_RADIUS / globals.units
         else:
-            default_items = 9
-            default_height = 8.8
-            default_width = 6.3
-            default_radius = 2.54
+            default_items = DEFAULT_CARD_COUNT
+            default_height = DEFAULT_CARD_HEIGHT / globals.units
+            default_width = DEFAULT_CARD_WIDTH / globals.units
+            default_radius = DEFAULT_CARD_RADIUS / globals.units
         self.counters = kwargs.get("counters", default_items)
+        # ---- set card size
         self.cards = kwargs.get("cards", self.counters)  # default total number of cards
-        self.height = kwargs.get("height", default_height)  # OVERWRITE
-        self.width = kwargs.get("width", default_width)  # OVERWRITE
+        card_size = kwargs.get("card_size", "")
+        the_height, the_width, size = default_height, default_width, None
+        size = tools.card_size(card_size)
+        if size:
+            the_height, the_width = size[1] / globals.units, size[0] / globals.units
+        self.height = kwargs.get("height", the_height)  # OVERWRITE
+        self.width = kwargs.get("width", the_width)  # OVERWRITE
+        # print(f'$$$ {size=}, {self.width=}, {self.height}')
+        self.kwargs["width"] = self.width  # used for create_cardshapes()
+        self.kwargs["height"] = self.height  # used for create_cardshapes()
         self.radius = kwargs.get("radius", default_radius)  # OVERWRITE
         # ----- set card frame type
+        self.frame = kwargs.get("frame", "rectangle")
         match self.frame:
             case "rectangle" | "r":
                 self.frame_type = CardFrame.RECTANGLE
@@ -392,10 +489,8 @@ class DeckShape(BaseShape):
                 self.frame_type = CardFrame.HEXAGON
             case _:
                 hint = " Try rectangle, hexagon, or circle."
-                tools.feedback(
-                    f"Unable to draw a {self.frame}-shaped card. {hint}", True
-                )
-        self.kwargs["frame_type"] = self.frame_type
+                feedback(f"Unable to draw a {self.frame}-shaped card. {hint}", True)
+        self.kwargs["frame_type"] = self.frame_type  # used for create_cardshapes()
         # ---- dataset (list of dicts)
         self.dataset = kwargs.get("dataset", None)
         self.set_dataset()  # globals override : dataset AND cards
@@ -407,9 +502,7 @@ class DeckShape(BaseShape):
         self.copy = kwargs.get("copy", None)
         self.mask = kwargs.get("mask", None)
         if self.mask and not self.dataset:
-            tools.feedback(
-                'Cannot set "mask" for a Deck without any existing Data!', True
-            )
+            feedback('Cannot set "mask" for a Deck without any existing Data!', True)
         # ---- bleed
         self.bleed_fill = kwargs.get("bleed_fill", None)
         self.bleed_areas = kwargs.get("bleed_areas", [])
@@ -422,14 +515,51 @@ class DeckShape(BaseShape):
         self.data_rows = kwargs.get("data_rows", None)
         self.data_header = kwargs.get("data_header", True)
         # ---- images dir and filter
-        self.images = kwargs.get("images", None)
-        self.images_filter = kwargs.get("images_filter", None)
-        self.image_list = []
+        self.images_front = kwargs.get("images", None)
+        self.images_front_filter = kwargs.get("images_filter", None)
+        self.images_front_list = []
+        # ---- images dir and filter
+        self.images_back = kwargs.get("images_back", None)
+        self.images_back_filter = kwargs.get("images_back_filter", None)
+        self.images_back_list = []
+        # ---- card groupings
+        self.grouping = tools.as_int(
+            kwargs.get("grouping", 1), "grouping"
+        )  # no. of cards in a set
+        self.grouping_rows = tools.as_int(
+            kwargs.get("grouping_rows", self.grouping), "grouping_rows"
+        )
+        self.grouping_cols = tools.as_int(
+            kwargs.get("grouping_cols", self.grouping), "grouping_cols"
+        )
+        # ---- spacing and offset
+        self.offset = tools.as_float(kwargs.get("offset", 0), "offset")
+        self.offset_x = tools.as_float(kwargs.get("offset_x", self.offset), "offset_x")
+        self.offset_y = tools.as_float(kwargs.get("offset_y", self.offset), "offset_y")
+        self.spacing = tools.as_float(kwargs.get("spacing", 0), "spacing")
+        self.spacing_x = tools.as_float(
+            kwargs.get("spacing_x", self.spacing), "spacing_x"
+        )
+        self.spacing_y = tools.as_float(
+            kwargs.get("spacing_y", self.spacing), "spacing_y"
+        )
+        # ---- gutter (put backs of Cards on same page)
+        self.gutter = tools.as_float(kwargs.get("gutter", 0), "gutter")  # none if zero
+        self.gutter_stroke = kwargs.get("gutter_stroke", None)
+        self.gutter_stroke_width = kwargs.get("gutter_stroke_width", WIDTH)
+        self.gutter_dotted = kwargs.get("gutter_dotted", None)
+        self.gutter_layout = kwargs.get("gutter_layout", "portrait")
+        self.show_backs = False
+        # ---- export options
+        self.export_cards = kwargs.get("export_cards", False)
+        self.dpi = kwargs.get("dpi", None)
+        self.directory = kwargs.get("directory", None)
         # ---- FINALLY...
         extra = globals.deck_settings.get("extra", 0)
         self.cards += extra
-        log.debug("Cards: %s Settings: %s", self.cards, globals.deck_settings)
-        self.create(self.cards)
+        log.debug("Card Counts: %s Settings: %s", self.cards, globals.deck_settings)
+        # print(f'$$$ {self.cards=}, {globals.deck_settings=}')
+        self.create_cardshapes(self.cards)
 
     def set_dataset(self):
         """Create deck dataset from globals dataset"""
@@ -440,7 +570,7 @@ class DeckShape(BaseShape):
         ]:
             log.debug("globals.dataset_type: %s", globals.dataset_type)
             if len(globals.dataset) == 0:
-                tools.feedback("The provided data is empty or cannot be loaded!", True)
+                feedback("The provided data is empty or cannot be loaded!", True)
             else:
                 # globals.deck.create(len(globals.dataset) + globals.extra)
                 self.dataset = globals.dataset
@@ -450,15 +580,21 @@ class DeckShape(BaseShape):
         else:
             pass  # no Data created
 
-    def create(self, cards: int = 0):
-        """Create a new Deck of CardShapes, based on number of `cards`"""
+    def create_cardshapes(self, cards: int = 0):
+        """Create a Deck of CardShapes (fronts and backs), based on number of `cards`"""
         log.debug("Cards are: %s", self.sequence)
-        self.deck = []
-        log.debug("Deck => %s cards with kwargs: %s", cards, self.kwargs)
+        # ---- create cardfronts
+        log.debug("Deck Fronts => %s cards with kwargs: %s", cards, self.kwargs)
         for card in range(0, cards):
             _card = CardShape(**self.kwargs)
             _card.shape_id = card
-            self.deck.append(_card)
+            self.fronts.append(_card)
+        # ---- create card backs
+        log.debug("Deck Backs  => %s cards with kwargs: %s", cards, self.kwargs)
+        for back in range(0, cards):
+            _back = CardShape(**self.kwargs)
+            _back.shape_id = back
+            self.backs.append(_back)
 
     def draw_bleed(self, cnv, page_across: float, page_down: float):
         # ---- bleed area for page (default)
@@ -471,64 +607,324 @@ class DeckShape(BaseShape):
                 y=0,
                 fill_stroke=self.bleed_fill,
             )
-            # print(f'*** {self.bleed_fill=} {page_across=}, {page_down=}')
+            # print(f'$$$  {self.bleed_fill=} {page_across=}, {page_down=}')
             rect.draw()
         # ---- bleed areas (custom)
         # for area in self.bleed_areas:
-        #     #print('*** BLEED AREA ***', area)
+        #     #print('$$$  BLEED AREA $$$ ', area)
+
+    def export_cards_as_images(
+        self,
+        filename: str,
+        directory: str,
+        output: str = None,
+        fformat: str = "png",
+    ):
+        """Save individual cards as PNG images using their frames."""
+        if self.export_cards and globals.pargs.png:  # pargs.png should default to True
+            support.pdf_cards_to_png(
+                source=filename,
+                output=output or filename,
+                fformat=fformat,
+                dpi=self.dpi,
+                directory=directory or self.directory,
+                card_frames=globals.card_frames,
+                page_height=globals.page[1],
+            )
 
     def draw(self, cnv=None, off_x=0, off_y=0, ID=None, **kwargs):
-        """Method called by Save() in proto.
+        """Draw all cards for a DeckOfCards.
 
         Kwargs:
-            * cards - number of cards in Deck
-            * copy - name of column to use to set number of copies of a Card
+            * cards - number of cards to draw
+            * extra - number of extra cards to draw (beyond Data count)
+            * copy - name of Data column used to set number of copies of a Card
             * image_list - list of image filenames
+            * export_cards - if True, then export card as individual images
             * card_rows - maximum number of rows of cards on a page
             * card_cols - maximum number of columns of cards on a page
+            * dpi - resolution for output PNG
+            * directory - path to save output(s)
+            # grid_marks=globals.deck_settings.get("grid_marks", None),
+
+        Note:
+            DeckOfCards draw() is called by Save() function.
         """
+
+        def draw_the_cards(
+            cnv,
+            state: DeckPrintState,
+            page_number: int = 0,
+            front: bool = True,
+            right_gap: float = 0.0,
+        ) -> DeckPrintState:
+            """Process a Page of Cards for front or back of a DeckOfCards
+
+            Args:
+                cnv: pymupdf.Shape object (one per Page)
+                state: track what is being printed on the page
+                page_number: current
+                front: if True, print CardShapes in `deck.fronts`
+                right_gap: space left after the last card
+
+            Returns:
+                DeckPrintState at the end of a Page
+            """
+            # print(f'$$$  card_draw {page_number=}')
+            start_card = state.card_number
+            card_count = state.card_count
+            if front:
+                row, col = 0, 0
+            else:
+                row, col = 0, max_cols - 1  # draw left-to-right for back
+            card_number = start_card
+
+            for card_num in range(start_card, card_count):
+                card_number = card_num
+
+                if front:
+                    # print(f"$$$ FRONT {card_num=} {self.fronts[card_num]=}")
+                    card = self.fronts[card_num]
+                    deck_length = len(self.fronts)
+                else:
+                    # print(f"$$$ BACK {card_num=} {self.backs[card_num]=}")
+                    card = self.backs[card_num]
+                    deck_length = len(self.backs)
+
+                # set meta data for draw_card
+                _locale = Locale(
+                    col=col + 1,
+                    row=row + 1,
+                    id=f"{col + 1}:{row + 1}",
+                    sequence=card_num + 1,
+                )
+                kwargs["locale"] = _locale._asdict()
+                kwargs["grouping_cols"] = self.grouping_cols
+                kwargs["grouping_rows"] = self.grouping_rows
+                kwargs["page_number"] = page_number
+                kwargs["right_gap"] = right_gap
+                image = images[card_num] if images and card_num <= len(images) else None
+                card.deck_data = self.dataset
+
+                mask = False
+                if self.mask:
+                    _check = tools.eval_template(
+                        self.mask, self.dataset[card_num], label="mask"
+                    )
+                    mask = tools.as_bool(_check, label="mask", allow_none=False)
+                    if not isinstance(mask, bool):
+                        feedback(
+                            'The "mask" test must result in True or False value!', True
+                        )
+                if not mask:
+                    # get number of copies
+                    copies = 1
+                    if card.kwargs.get("dataset") and self.copy:
+                        _copies = card.deck_data[card_num].get(self.copy, None)
+                        copies = (
+                            tools.as_int(_copies, "copy property", allow_none=True) or 1
+                        )
+
+                    for i in range(state.copies_to_do, copies):
+                        if not front:
+                            kwargs["card_back"] = True  # de/activate grid marks & shift
+                        else:
+                            kwargs["card_back"] = False
+                        card.draw_card(
+                            cnv,
+                            row=row,
+                            col=col,
+                            cid=card.shape_id,
+                            image=image,
+                            **kwargs,
+                        )
+                        if front:
+                            col += 1
+                            if col >= max_cols:
+                                col = 0
+                                row += 1
+                            elif (
+                                col == max_cols - 1
+                                and row % 2
+                                and card.kwargs.get("frame_type") == CardFrame.HEXAGON
+                            ):
+                                col = 0
+                                row += 1
+                            else:
+                                pass
+                        else:
+                            # if row == 1 or row == 2: breakpoint()
+                            col += -1
+                            if col < 0:
+                                col = max_cols - 1
+                                row += 1
+                            elif (
+                                col == 0
+                                and row % 2
+                                and card.kwargs.get("frame_type") == CardFrame.HEXAGON
+                            ):
+                                col = max_cols - 1
+                                row += 1
+                            else:
+                                pass
+                        if row >= max_rows:
+                            # print(f"$$$ {front} {card_num=} => {col=} {row=} // {max_cols=} {max_rows=}")
+                            if front:
+                                row, col = 0, 0
+                            else:
+                                row, col = 0, max_cols - 1
+                            PageBreak(**kwargs)
+                            cnv = globals.canvas  # new one from page break
+                            self.draw_bleed(cnv, page_across, page_down)
+                            # print(f"$$$ card_draw - RETURN FROM rows / {front=} : {card_number + 1}")
+                            return cnv, DeckPrintState(
+                                card_count=state.card_count,
+                                card_number=card_number + 1,
+                                copies_to_do=copies - i - 1,
+                                start_x=0,
+                            )
+
+            # if card_num >= deck_length:
+            PageBreak(**kwargs)
+            cnv = globals.canvas  # new one from page break
+            self.draw_bleed(cnv, page_across, page_down)
+            # print(f"$$$ card_draw - RETURN FROM end  / {front=} : {card_number + 1}")
+            return cnv, DeckPrintState(
+                card_count=state.card_count,
+                card_number=card_number + 1,
+                copies_to_do=0,
+                start_x=0,
+            )
+
+        # ---- primary layout settings for draw()
         cnv = cnv if cnv else globals.canvas
-        # tools.feedback(f'$$$ DeckShape.draw {cnv=} KW=> {kwargs}')
+        # feedback(f'$$$ DeckShape.draw {cnv=} KW=> {kwargs}')
         log.debug("Deck cnv:%s type:%s", type(globals.canvas), type(cnv))
-        # ---- handle kwargs
         kwargs = self.kwargs | kwargs
         images = kwargs.get("image_list", [])
-        cards = kwargs.get("cards", None)
         kwargs["frame_type"] = self.frame_type
         # ---- user-defined rows and cols
         max_rows = self.card_rows
         max_cols = self.card_cols
+        # ---- other settings
+        self.export_cards = kwargs.get("export_cards", False)
+        self.dpi = kwargs.get("dpi", 300)
+        prime_globals = None
+
+        # ---- gutter-based settings (new doc)
+        if self.gutter > 0:
+            prime_globals = save_globals()
+            globals_page = copy(globals.page)
+            gutter = tools.as_float(kwargs.get("gutter", 0.0), "gutter")
+            # ---- pymupdf: new file, doc, page, shape/canvas
+            gutter_filename = os.path.join(globals.pargs.directory, "gutter.pdf")
+            globals.filename = gutter_filename
+            globals.document = pymupdf.open()  # pymupdf Document
+
+            if self.gutter_layout:
+                _gutter_layout = str(self.gutter_layout).lower()
+                if _gutter_layout not in ["p", "portrait", "l", "landscape"]:
+                    feedback(
+                        f'The gutter_layout "{self.gutter_layout}" is not valid'
+                        ' - use "portrait" or "landscape"'
+                    )
+            if _gutter_layout:  # in ['p', 'portrait']:
+                if globals_page[0] > globals_page[1]:
+                    width = globals_page[0]
+                    height = globals_page[1] / 2
+                    is_landscape = True
+                else:
+                    width = globals_page[1]
+                    height = globals_page[0] / 2
+                    is_landscape = False
+
+            # WIP for landscape layout with TALL cards
+            # height = globals_page[1] / 2
+            # width = globals_page[0]
+            # if globals_page[0] > globals_page[1]:
+            #     is_landscape = True
+            # else:
+            #     is_landscape = False
+            # print(f"$$$ {globals_page[0]=} {globals_page[1]=} {width=} {height=} ")
+
+            globals.doc_page = globals.document.new_page(
+                width=width, height=height
+            )  # pymupdf Page
+            # ---- new globals for gutter
+            globals.page_width = width / globals.units
+            globals.page_height = height / globals.units
+            globals.page = (width, height)
+            # print(f"$$$ {width=} {height=} {globals.page_width=} {globals.page_height=} ")
+            # ---- BaseCanvas
+            globals.base = BaseCanvas(
+                globals.document, paper=globals.paper, defaults=None, kwargs=kwargs
+            )
+            globals.margins = PageMargins(
+                margin=prime_globals.margins.margin,
+                left=prime_globals.margins.left,
+                right=prime_globals.margins.right,
+                top=prime_globals.margins.top - gutter / 2.0,
+                bottom=prime_globals.margins.bottom,
+                debug=prime_globals.margins.debug,
+            )
+            cnv = globals.doc_page.new_shape()  # pymupdf Shape
+            globals.canvas = cnv
+            page_setup()  # draw margin/grid
+            # ---- validate card fit
+            vspace = globals.page_height - globals.margins.top - globals.margins.bottom
+            if self.height + self.offset_y > vspace:
+                feedback(
+                    "Rotated cards cannot fit into the available space!"
+                    " Reduce card height, or top/bottom margins, or offset from top.",
+                    True,
+                )
+
         # ---- calculate rows/cols based on page size and margins AND card size
-        margin_left = self.margin_left if self.margin_left is not None else self.margin
+        margin_left = (
+            globals.margins.left
+            if globals.margins.left is not None
+            else globals.margins.margin
+        )
         margin_bottom = (
-            self.margin_bottom if self.margin_bottom is not None else self.margin
+            globals.margins.bottom
+            if globals.margins.bottom is not None
+            else globals.margins.margin
         )
         margin_right = (
-            self.margin_right if self.margin_right is not None else self.margin
+            globals.margins.right
+            if globals.margins.right is not None
+            else globals.margins.margin
         )
-        margin_top = self.margin_top if self.margin_top is not None else self.margin
+        margin_top = (
+            globals.margins.top
+            if globals.margins.top is not None
+            else globals.margins.margin
+        )
         page_across = globals.page_width - margin_right - margin_left  # user units
         page_down = globals.page_height - margin_top - margin_bottom  # user units
-        _height, _width, _radius = self.width, self.width, self.radius
-        _spacing_x = self.unit(self.spacing_x)
-        _spacing_y = self.unit(self.spacing_y)
+        _height, _width, _radius = self.height, self.width, self.radius
         self.draw_bleed(cnv, page_across, page_down)
+
         # ---- deck settings
         col_space, row_space = 0.0, 0.0
-        if self.deck:
-            _card = self.deck[0]
-            (
-                _height,
-                _width,
-            ) = (
-                _card.outline.height,
-                _card.outline.width,
-            )
-            _radius = _card.outline.radius
+        if self.fronts:
+            _card = self.fronts[0]
+        else:
+            _card = self.backs[0]
+        (
+            _height,
+            _width,
+        ) = (
+            _card.outline.height,
+            _card.outline.width,
+        )
+        _radius = _card.outline.radius
+        # print(f'$$$ _card: {_height=} {_width=} {_radius=}')
+
         # ---- space calcs for rows/cols
-        # note: units here are user-based
+        # Note: units here are user-based
         if not max_rows:
-            row_space = globals.page_height - margin_bottom - margin_top
+            row_space = globals.page_height - margin_bottom - margin_top - self.offset_y
             if self.grouping_rows == 1:
                 max_rows = int(
                     (row_space + self.spacing_y) / (float(_height) + self.spacing_y)
@@ -540,7 +936,8 @@ class DeckShape(BaseShape):
                 )
                 max_rows = max_groups * self.grouping_rows
         if not max_cols:
-            col_space = globals.page_width - margin_left - margin_right
+            col_space = globals.page_width - margin_left - margin_right - self.offset_x
+            # print(f'$$$ {globals.page_width=} {margin_left=} {margin_right=} {self.offset_x=}')
             if self.grouping_cols == 1:
                 max_cols = int(
                     (col_space + self.spacing_x) / (float(_width) + self.spacing_x)
@@ -551,114 +948,250 @@ class DeckShape(BaseShape):
                     / (float(_width) * self.grouping_cols + self.spacing_x)
                 )
                 max_cols = max_groups * self.grouping_cols
-        # log.warning("PW:%s width :%s c-space:%s max-cols:%s",
-        #             globals.page_width, _width, col_space, max_cols)
-        # log.warning("PH:%s height:%s r-space:%s max-rows:%s",
-        #             globals.page_height, _height, row_space, max_rows)
-
-        # ---- draw cards
-        row, col, page_number = 0, 0, 0
-        for key, card in enumerate(self.deck):
-            # set meta data
-            _locale = Locale(
-                col=col + 1, row=row + 1, id=f"{col + 1}:{row + 1}", sequence=key + 1
+            # print(f'$$$ {col_space=} {self.spacing_x=} {_width=} {max_cols=}') # w = 6.9282?
+        if self.grouping_cols == 1:
+            effective_right = (
+                max_cols * (_width + self.spacing_x)
+                + globals.margins.left
+                + self.offset_x
             )
-            kwargs["locale"] = _locale._asdict()
-            kwargs["grouping_cols"] = self.grouping_cols
-            kwargs["grouping_rows"] = self.grouping_rows
-            kwargs["page_number"] = page_number
-            image = images[key] if images and key <= len(images) else None
-            card.deck_data = self.dataset
+        else:
+            effective_right = (
+                max_cols * _width
+                + globals.margins.left
+                + self.offset_x
+                + (self.grouping_cols - 1) * self.spacing_x
+            )
 
-            mask = False
-            if self.mask:
-                _check = tools.eval_template(self.mask, self.dataset[key], label="mask")
-                mask = tools.as_bool(_check, label="mask", allow_none=False)
-                if not isinstance(mask, bool):
-                    tools.feedback(
-                        'The "mask" test must result in True or False value!', True
-                    )
-            if not mask:
-                # get number of copies
-                copies = 1
-                if card.kwargs.get("dataset") and self.copy:
-                    _copies = card.deck_data[key].get(self.copy, None)
-                    copies = (
-                        tools.as_int(_copies, "copy property", allow_none=True) or 1
-                    )
+        # ---- gap-at-right (for card back shift)
+        right_gap = globals.page_width - effective_right
 
-                for i in range(0, copies):
-                    # breakpoint()
-                    card.draw_card(
-                        cnv, row=row, col=col, cid=card.shape_id, image=image, **kwargs
-                    )
-                    col += 1
-                    if col >= max_cols:
-                        col = 0
-                        row += 1
-                    elif (
-                        col == max_cols - 1
-                        and row % 2
-                        and card.kwargs.get("frame_type") == CardFrame.HEXAGON
-                    ):
-                        col = 0
-                        row += 1
+        # print(f"$$$ {right_gap=} {globals.page_width=} {effective_right=}")
+        # print(f"$$$ {self.grouping_cols=} {self.spacing_x=}")
+        # print(f"$$$ {globals.page_width=} {_width=} {col_space=} {max_cols=}")
+        # print(f"$$${globals.page_height=} {_height=} {row_space=} {max_rows=}")
+
+        # ---- prep for card drawing
+        page_number = -1
+        state_front = DeckPrintState(
+            card_count=len(self.fronts), card_number=0, copies_to_do=0, start_x=0
+        )
+        state_back = DeckPrintState(
+            card_count=len(self.backs), card_number=0, copies_to_do=0, start_x=0
+        )
+        for back in self.backs:
+            if back.elements:
+                self.show_backs = True
+                continue
+
+        # ---- actually draw cards!
+        while state_front.card_number < len(self.fronts):
+            # print(f"\n$$$ FRONT {state_front.card_number=} $$$ ")
+            page_number += 1  # for back-to-back OR no backs
+            cnv, state_front = draw_the_cards(cnv, state_front, page_number, True, 0)
+            if self.show_backs:
+                # print(f"\n$$$ BACK  {state_back.card_number=} $$$ ")
+                page_number += 1  # for back-to-back
+                cnv, state_back = draw_the_cards(
+                    cnv, state_back, page_number, False, right_gap
+                )
+        # ---- delete extra blank page at the end
+        globals.document.delete_page(globals.page_count)
+
+        # ---- reset to prime and load-in gutter pages
+        if self.gutter > 0:
+            # save gutter document
+            gutterfile = os.path.join(globals.directory, globals.filename)
+            globals.document.save(gutterfile)
+            # export cards
+            self.export_cards_as_images(
+                filename=globals.filename,
+                directory=globals.directory,
+                output=prime_globals.filename,
+            )  # default to PNG format
+            # reset globals to current doc
+            restore_globals(prime_globals)
+            cnv = globals.canvas
+            # open gutter document
+            src = pymupdf.open(gutterfile)
+            if is_landscape:
+                # upper half page (r1: backs)
+                r1 = pymupdf.Rect(0, 0, cnv.width, cnv.height / 2)
+                r1_rotate = 180
+                # lower half page (r2: fronts)
+                r2 = r1 + (0, cnv.height / 2, 0, cnv.height / 2)
+                r2_rotate = 0
+            else:
+                # left half page (r2: fronts)
+                r2 = pymupdf.Rect(0, 0, cnv.width / 2, cnv.height)
+                r2_rotate = -90
+                # right half page (r1: backs)
+                r1 = pymupdf.Rect(cnv.width / 2, 0, cnv.width, cnv.height)
+                r1_rotate = 90
+            # insert pages from gutter.pdf
+            for page_number in range(0, src.page_count, 2):
+                globals.doc_page.show_pdf_page(
+                    r2, src, page_number, rotate=r2_rotate
+                )  # fronts
+                globals.doc_page.show_pdf_page(
+                    r1, src, page_number + 1, rotate=r1_rotate
+                )  # backs
+                # ---- draw gutter line
+                if self.gutter > 0:
+                    if is_landscape:
+                        pt1 = (0, globals.page[1] / 2.0)
+                        pt2 = (globals.page[0], globals.page[1] / 2.0)
                     else:
-                        pass
-                    # print(f"{card=} => {col=} {row=} // {max_cols=} {max_rows=}")
-                    if row >= max_rows:
-                        row, col = 0, 0
-                        if key != len(self.deck) - 1 or (i < (copies - 1)):
-                            PageBreak(**kwargs)
-                            cnv = globals.canvas  # new one from page break
-                            self.draw_bleed(cnv, page_across, page_down)
-                            page_number += 1
+                        pt1 = (globals.page[0] / 2.0, 0)
+                        pt2 = (globals.page[0] / 2.0, globals.page[1])
+                    globals.canvas.draw_line(pt1, pt2)
+                    gwargs = {}  # kwargs
+                    gwargs["stroke"] = self.gutter_stroke or tools.get_color("gray")
+                    gwargs["stroke_width"] = self.gutter_stroke_width
+                    gwargs["dotted"] = self.gutter_dotted
+                    tools.set_canvas_props(cnv=globals.canvas, index=None, **gwargs)
+                # if page_number < src.page_count / 2 - 1:
+                PageBreak()
+            # ---- delete extra blank page at the end
+            globals.document.delete_page(globals.page_count)
+            # ---- delete gutter PDF document
+            os.remove(gutter_filename)
+        else:
+            pass
 
     def get(self, cid):
         """Return a card based on the internal ID"""
-        for card in self.deck:
+        for card in self.fronts:
             if card.shape_id == cid:
                 return card
         return None
 
     def count(self):
         """Return number of cards in the deck"""
-        return len(self.deck)
+        return len(self.fronts)
 
 
 # ---- page-related ====
 
 
-def Create(**kwargs):
-    """Initialisation of globals, page, units and canvas.
+def page_setup():
+    """Set the page color and (optionally) show a dotted margin line and grid."""
+    # ---- paper color
+    _fill = tools.get_color(globals.page_fill)
+    if _fill != tools.get_color("white"):
+        globals.doc_page.draw_rect(
+            (0, 0, globals.page[0], globals.page[1]), fill=_fill, color=None
+        )
+    # ---- debug margins
+    if globals.margins.debug:
+        # print(f'{globals.margins.left=} {globals.margins.right=}')
+        stroke = tools.get_color(DEBUG_COLOR)
+        globals.doc_page.draw_rect(
+            (
+                globals.margins.left * globals.units,
+                globals.margins.top * globals.units,
+                globals.page[0] - (globals.margins.right * globals.units),
+                globals.page[1] - (globals.margins.bottom * globals.units),
+            ),
+            color=stroke,
+            dashes="[1 2] 0",
+        )
+    # ---- page grid
+    if globals.page_grid:
+        stroke = tools.get_color(DEBUG_COLOR)
+        grid_size = globals.page_grid * globals.units
+        cols = int(globals.page[0] // grid_size)
+        rows = int(globals.page[1] // grid_size)
+        for col in range(1, cols + 1):
+            globals.doc_page.draw_line(
+                (col * grid_size, 0),
+                (col * grid_size, globals.page[1]),
+                color=stroke,
+                width=0.1,
+            )
+        for row in range(1, rows + 1):
+            globals.doc_page.draw_line(
+                (0, row * grid_size),
+                (globals.page[0], row * grid_size),
+                color=stroke,
+                width=0.1,
+            )
 
-    NOTES:
-        * Will use argparse to process command-line keyword args
-        * Allows shortcut creation of cards
+
+def Create(**kwargs):
+    """Initialisation of globals, page, margins, units and canvas.
+
+    Kwargs:
+
+    - **paper** - a paper size from either of the ISO series - A0 down to A8;
+      or B6 down to B0 - or a USA type - letter, legal or elevenSeventeen; to
+      change the page orientation to **landscape** append ``-l`` to the name.
+    - **paper_width** - set specific paper width using the defined *units*
+    - **paper_height** - set specific paper height using the defined *units*
+      For example, ``"A3-l"`` is a landscape A3 paper size; default is ``A4``
+    - **filename** - name of the output PDF file; by default this is the prefix
+      name of the script, with a ``.pdf`` extension
+    - **fill** - the page color; default is ``white``
+    - **units** - can be ``cm`` (centimetres), ``in`` (inches), ``mm``
+      (millimetres), or ``points``; default is ``cm``
+    - **margin** - set the value for *all* margins using the defined *units*;
+      default is ``1`` centimetre.
+    - **margin_top** - set the top margin using the defined *units*
+    - **margin_bottom** - set the bottom margin using the defined *units*
+    - **margin_left** - set the left margin using the defined *units*
+    - **margin_right** - set the the right margin using the defined *units*
+    - **margin_debug** - if True, show the margin as a dotted blue line
+    - **page_grid* - if a valid float, draw a squared grid covering the paper
+
+    Kwargs to override the default values of any of the various properties
+    used for drawing Shapes can be set here as well, for example:
+    ``font_size=18`` or ``stroke="red"``.
+
+    Notes:
+
+    - Will use argparse to process command-line keyword args
+    - Allows shortcut creation of cards
     """
     global globals_set
     # ---- set and confirm globals
     globals.initialize()
     globals_set = True
+    # ---- units
+    _units = kwargs.get("units", globals.units)
+    globals.units = support.to_units(_units)
     # ---- margins
-    globals.margin = kwargs.get("margin", globals.margin)
-    globals.margin_left = kwargs.get("margin_left", globals.margin)
-    globals.margin_top = kwargs.get("margin_top", globals.margin)
-    globals.margin_bottom = kwargs.get("margin_bottom", globals.margin)
-    globals.margin_right = kwargs.get("margin_right", globals.margin)
+    the_margin = kwargs.get("margin", DEFAULT_MARGIN_SIZE / globals.units)
+    globals.margins = PageMargins(
+        margin=the_margin,
+        left=kwargs.get("margin_left", the_margin),
+        top=kwargs.get("margin_top", the_margin),
+        bottom=kwargs.get("margin_bottom", the_margin),
+        right=kwargs.get("margin_right", the_margin),
+        debug=kwargs.get("margin_debug", False),
+    )
     # ---- cards
     _cards = kwargs.get("cards", 0)
     landscape = kwargs.get("landscape", False)
     kwargs = margins(**kwargs)
     defaults = kwargs.get("defaults", None)
-    # ---- units
-    _units = kwargs.get("units", globals.units)
-    globals.units = support.to_units(_units)
-    # ---- paper, page, page sizes
+    # ---- paper, page, page sizes, page color
     globals.paper = kwargs.get("paper", globals.paper)
     globals.page = pymupdf.paper_size(globals.paper)  # (width, height) in points
+    # user overrides
+    if kwargs.get("paper_width") or kwargs.get("paper_height"):
+        _page_width = tools.as_float(kwargs.get("paper_width", 0), "paper_width")
+        _page_height = tools.as_float(kwargs.get("paper_height", 0), "paper_height")
+        _page_width_pt = (
+            _page_width * globals.units if _page_width > 0 else globals.paper[0]
+        )
+        _page_height_pt = (
+            _page_height * globals.units if _page_height > 0 else globals.paper[1]
+        )
+        globals.page = (_page_width_pt, _page_height_pt)
     globals.page_width = globals.page[0] / globals.units  # width in user units
     globals.page_height = globals.page[1] / globals.units  # height in user units
+    globals.fill = tools.get_color(kwargs.get("fill", "white"))
+    globals.page_grid = tools.as_float(kwargs.get("page_grid", 0), "page_grid")
     # ---- fonts
     base_fonts()
     globals.font_size = kwargs.get("font_size", 12)
@@ -674,13 +1207,29 @@ def Create(**kwargs):
         default=True,
         action=argparse.BooleanOptionalAction,
     )
+    # use: --fonts to force Fonts recreation during Create()
+    parser.add_argument(
+        "-f",
+        "--fonts",
+        help="Force reloading of all available fonts at start (default is False)",
+        default=False,
+        action=argparse.BooleanOptionalAction,
+    )
+    # use: --no-warning to ignore WARNING:: messages
+    parser.add_argument(
+        "-nw",
+        "--nowarning",
+        help="Do NOT show any WARNING:: messages (default is False)",
+        default=False,
+        action=argparse.BooleanOptionalAction,
+    )
     parser.add_argument(
         "-p", "--pages", help="Specify which pages to process", default=""
     )
     globals.pargs = parser.parse_args()
     # NB - pages does not work - see notes in PageBreak()
     if globals.pargs.pages:
-        tools.feedback("--pages is not yet an implemented feature - sorry!")
+        feedback("--pages is not yet an implemented feature - sorry!")
     # ---- filename and fallback
     _filename = kwargs.get("filename", "")
     if not _filename:
@@ -692,6 +1241,11 @@ def Create(**kwargs):
             if _cards:
                 basename = "cards"
         _filename = f"{basename}.pdf"
+    # ---- validate directory & set filename
+    if globals.pargs.directory and not os.path.exists(globals.pargs.directory):
+        feedback(
+            f'Unable to find directory "{globals.pargs.directory}" for output.', True
+        )
     globals.filename = os.path.join(globals.pargs.directory, _filename)
     # ---- pymupdf doc, page, shape/canvas
     globals.document = pymupdf.open()  # pymupdf Document
@@ -703,21 +1257,18 @@ def Create(**kwargs):
     globals.base = BaseCanvas(
         globals.document, paper=globals.paper, defaults=defaults, kwargs=kwargs
     )
-    # ---- paper color
-    if kwargs.get("page_fill"):
-        fill = get_color(kwargs.get("page_fill", "white"))
-        globals.canvas.draw_rect((0, 0, globals.page[0], globals.page[1]), fill=fill)
+    page_setup()
     # ---- cards
     if _cards:
         Deck(canvas=globals.canvas, sequence=range(1, _cards + 1), **kwargs)  # deck var
-    # ---- pymupdf fonts
+    # ---- pickle font info for pymupdf
     globals.archive = pymupdf.Archive()
     globals.css = ""
     cached_fonts = tools.as_bool(kwargs.get("cached_fonts", True))
-    if not cached_fonts:
+    if not cached_fonts or globals.pargs.fonts:
         cache_directory = Path(Path.home() / CACHE_DIRECTORY)
         fi = FontInterface(cache_directory=cache_directory)
-        fi.load_font_families(cached=cached_fonts)
+        fi.load_font_families(cached=False)
 
 
 def create(**kwargs):
@@ -743,12 +1294,13 @@ def Header(**kwargs):
 def PageBreak(**kwargs):
     validate_globals()
 
-    globals.canvas.commit()  # add all drawings (to current pymupdf Shape)
+    globals.canvas.commit()  # add all drawings (to current pymupdf Shape/"canvas")
     globals.page_count += 1
     globals.doc_page = globals.document.new_page(
         width=globals.page[0], height=globals.page[1]
     )  # pymupdf Page
-    globals.canvas = globals.doc_page.new_shape()  # pymupdf Shape for new Page
+    globals.canvas = globals.doc_page.new_shape()  # pymupdf Shape/"canvas" for new Page
+    page_setup()
 
     kwargs = margins(**kwargs)
     if kwargs.get("footer", globals.footer_draw):
@@ -766,17 +1318,71 @@ def page_break():
 
 
 def Save(**kwargs):
+    """Save the result of all commands to a PDF file.
+
+    Kwargs:
+
+    - **output** - can be set to:
+
+      - ``png`` - to create one image file per page of the PDF; by default the
+        names of the PNG files are derived using the PDF filename, with a dash (-)
+        followed by the page number;
+      - ``svg`` - to create one file per page of the PDF; by default the names
+        of the SVG files are derived using the PDF filename, with a dash (-)
+        followed by the page number;
+      - ``gif`` - to create a GIF file composed of all the PNG pages (these will be
+        removed after the file been created)
+    - **dpi** - can be set to the dots-per-inch resolution required; by default
+      this is ``300``
+    - **directory** - export path for the PNG or SVG; if None then use the same
+      one as the script
+    - **names** - provide a list of names -- without an extension -- for the
+      *output* files that will be created from the PDF;
+      the first name corresponds to the first page, the second name to the second
+      and so on.  Each will automatically get the correct extension added to it.
+      If the term ``None`` is used in place of a name, then that page will **not**
+      have an output file created for it.
+    - **framerate** - the delay in seconds between each "page" of a GIF image; by
+      default this is ``1`` second
+    - **cards** - if set to ``True`` will cause all the card fronts to be
+      exported as PNG files;  the names of the files are derived using the PDF
+      filename, with a dash (-) followed by the page number
+
+    Notes:
+
+    - Cards are saved by iterating through all the ``fronts`` and ``backs``
+      in a DeckOfCards object
+    """
     validate_globals()
 
-    # ---- draw Deck
-    if globals.deck and len(globals.deck.deck) >= 1:
+    # ---- set local vars from kwargs
+    dpi = support.to_int(kwargs.get("dpi", DEFAULT_DPI), "dpi")
+    framerate = support.to_float(kwargs.get("framerate", 1), "framerate")
+    names = kwargs.get("names", None)
+    directory = kwargs.get("directory", None)
+    cards = kwargs.get("cards", False)  # export individual cards as PNG
+    output = kwargs.get("output", None)  # export document into this format e.g. SVG
+
+    # ---- directory
+    globals.directory = directory if directory else os.getcwd()
+    if not os.path.exists(globals.directory):
+        feedback(
+            f'Cannot find the directory "{globals.directory}" - please create this first.',
+            True,
+        )
+
+    # ---- draw Deck (and export cards)
+    if globals.deck and len(globals.deck.fronts) >= 1:
         globals.deck.draw(
             cnv=globals.canvas,
-            cards=globals.deck_settings.get("cards", 9),
+            export_cards=cards,
+            cards=globals.deck_settings.get("cards", DEFAULT_CARD_COUNT),
             copy=globals.deck_settings.get("copy", None),
             extra=globals.deck_settings.get("extra", 0),
             grid_marks=globals.deck_settings.get("grid_marks", None),
             image_list=globals.image_list,
+            dpi=dpi,
+            directory=globals.directory,
         )
 
     # ---- update current pymupdf Shape
@@ -784,18 +1390,24 @@ def Save(**kwargs):
 
     # ---- save all Pages to file
     msg = "Please check folder exists and that you have access rights."
+    output_filename = os.path.join(globals.directory, globals.filename)
     try:
         globals.document.subset_fonts(verbose=True)  # subset fonts to reduce file size
-        globals.document.save(globals.filename)
+        globals.document.save(output_filename)
     except RuntimeError as err:
-        tools.feedback(f'Unable to save "{globals.filename}" - {err} - {msg}', True)
+        feedback(f'Unable to save "{output_filename}" - {err} - {msg}', True)
     except FileNotFoundError as err:
-        tools.feedback(f'Unable to save "{globals.filename}" - {err} - {msg}', True)
+        feedback(f'Unable to save "{output_filename}" - {err} - {msg}', True)
     except pymupdf.mupdf.FzErrorSystem as err:
-        tools.feedback(f'Unable to save "{globals.filename}" - {err} - {msg}', True)
+        feedback(f'Unable to save "{output_filename}" - {err} - {msg}', True)
+
+    # ---- export individual Cards (where only Card fronts exist)
+    if globals.deck and len(globals.deck.fronts) >= 1:
+        globals.deck.export_cards_as_images(
+            filename=globals.filename, directory=globals.directory
+        )
 
     # ---- save to PNG image(s) or SVG file(s)
-    output = kwargs.get("output", None)
     if output:
         match str(output).lower():
             case "png":
@@ -805,27 +1417,20 @@ def Save(**kwargs):
             case "gif":
                 fformat = ExportFormat.GIF
             case _:
-                tools.feedback(f'Unknown output format "{output}"', True)
-    dpi = support.to_int(kwargs.get("dpi", 300), "dpi")
-    framerate = support.to_float(kwargs.get("framerate", 1), "framerate")
-    names = kwargs.get("names", None)
-    directory = kwargs.get("directory", None)
+                feedback(f'Unknown output format "{output}"', True)
+
     if output and globals.pargs.png:  # pargs.png should default to True
         support.pdf_export(
-            globals.filename, fformat, dpi, names, directory, framerate=framerate
+            globals.filename,
+            fformat,
+            dpi,
+            names,
+            globals.directory,
+            framerate=framerate,
         )
 
     # ---- save cards to image(s)
-    cards = kwargs.get("cards", None)
-    if cards and globals.pargs.png:  # pargs.png should default to True
-        support.pdf_cards_to_png(
-            globals.filename,
-            output,
-            dpi,
-            directory,
-            globals.card_frames,
-            globals.page[1],
-        )
+    # MOVED TO DECK DRAW - because of use of intermediate pages for gutter-based layout
 
 
 def save(**kwargs):
@@ -836,33 +1441,27 @@ def margins(**kwargs):
     """Add margins to a set of kwargs, if not present."""
     validate_globals()
 
-    kwargs["margin"] = kwargs.get("margin", globals.margin)
-    kwargs["margin_left"] = kwargs.get(
-        "margin_left", globals.margin_left or globals.margin
-    )
-    kwargs["margin_top"] = kwargs.get(
-        "margin_top", globals.margin_top or globals.margin
-    )
-    kwargs["margin_bottom"] = kwargs.get(
-        "margin_bottom", globals.margin_bottom or globals.margin
-    )
-    kwargs["margin_right"] = kwargs.get(
-        "margin_right", globals.margin_right or globals.margin
-    )
+    kwargs["margin"] = kwargs.get("margin", globals.margins.margin)
+    kwargs["margin_left"] = kwargs.get("margin_left", globals.margins.left)
+    kwargs["margin_top"] = kwargs.get("margin_top", globals.margins.top)
+    kwargs["margin_bottom"] = kwargs.get("margin_bottom", globals.margins.bottom)
+    kwargs["margin_right"] = kwargs.get("margin_right", globals.margins.right)
     return kwargs
 
 
 def Font(name=None, **kwargs):
     validate_globals()
-
+    _name = None
+    _file = None
     if name:
         _name = builtin_font(name)
         if not _name:  # check for custom font
             cache_directory = Path(Path.home() / CACHE_DIRECTORY)
             fi = FontInterface(cache_directory=cache_directory)
             _name = fi.get_font_family(name)
+            _file = fi.get_font_file(name)
             if not _name:
-                tools.feedback(
+                feedback(
                     f'Cannot find or load a font named "{name}".'
                     f' Defaulting to "{DEFAULT_FONT}".',
                     False,
@@ -872,10 +1471,10 @@ def Font(name=None, **kwargs):
                 font_path, css = fi.font_file_css(_name)
                 globals.css += css
                 globals.archive.add(font_path)
-    else:
-        _name = None
+                _file = font_path
 
     globals.base.font_name = _name or DEFAULT_FONT
+    globals.base.font_file = _file
     globals.base.font_size = kwargs.get("size", 12)
     globals.base.font_style = kwargs.get("style", None)
     globals.base.stroke = kwargs.get("stroke", "black")
@@ -885,11 +1484,11 @@ def Font(name=None, **kwargs):
 
 
 def Version():
-    tools.feedback(f"Running protograf version {__version__}.")
+    feedback(f"Running protograf version {__version__}.")
 
 
 def Feedback(msg):
-    tools.feedback(msg)
+    feedback(msg)
 
 
 def Today(details: str = "datetime", style: str = "iso", formatted: str = None) -> str:
@@ -906,11 +1505,11 @@ def Today(details: str = "datetime", style: str = "iso", formatted: str = None) 
         try:
             return current.strftime(formatted)
         except Exception:
-            tools.feedback('Unable to use formatted value  "{formatted}".', True)
+            feedback('Unable to use formatted value  "{formatted}".', True)
     try:
         sstyle = style.lower()
     except Exception:
-        tools.feedback('Unable to use style "{style}" - try "eur" or "usa".', True)
+        feedback('Unable to use style "{style}" - try "eur" or "usa".', True)
 
     if details == "date" and sstyle == "usa":
         return current.strftime(f"%B {current.day} %Y")  # USA
@@ -963,7 +1562,7 @@ def Matrix(labels: list = None, data: list = None) -> list:
         labels = [f"VALUE{item+1}" for item in range(0, data_length)]
     else:
         if len(labels) != data_length:
-            tools.feedback(
+            feedback(
                 "The number of labels must equal the number of combinations!", True
             )
     result = []
@@ -975,20 +1574,30 @@ def Matrix(labels: list = None, data: list = None) -> list:
     return result
 
 
-def Card(sequence, *elements, **kwargs):
+def Card(sequence: object = None, *elements, **kwargs):
     """Add one or more elements to a card or cards.
 
     NOTE: A Card receives its `draw()` command via Save()!
     """
 
     def add_members_to_card(element):
-        element.members = _cards  # track all related cards
-        card.members = _cards
-        card.elements.append(element)  # may be Group or Shape or Query
+        try:
+            element.members = _cards  # track all related cards
+            card.members = _cards
+            card.elements.append(element)  # may be Group or Shape or Query
+        except AttributeError:
+            if isinstance(element, str):
+                feedback(
+                    f'Cannot use the string "{element}" for a Card or CardBack.', True
+                )
+            else:
+                feedback(f'Cannot use "{element}" for a Card or CardBack.', True)
 
     kwargs = margins(**kwargs)
     if not globals.deck:
-        tools.feedback("The Deck() has not been defined or is incorrect.", True)
+        feedback("The Deck() has not been defined or is incorrect.", True)
+    if not sequence:
+        feedback("The Card() needs to have a valid sequence defined.", True)
     _cards = []
     # int - single card
     try:
@@ -996,15 +1605,15 @@ def Card(sequence, *elements, **kwargs):
         _cards = range(_card, _card + 1)
     except Exception:
         pass
-    # string - either 'all'/'*' .OR. a range: '1', '1-2', '1-3,5-6'
+    # string - either 'all'/'*'/'even'/'odd' .OR. a range: '1', '1-2', '1-3,5-6'
     if not _cards:
         try:
             card_count = (
                 len(globals.dataset)
                 if globals.dataset
                 else (
-                    len(globals.deck.image_list)
-                    if globals.deck.image_list
+                    len(globals.deck.images_front_list)
+                    if globals.deck.images_front_list
                     else (
                         tools.as_int(globals.deck.cards, "cards")
                         if globals.deck.cards
@@ -1016,6 +1625,10 @@ def Card(sequence, *elements, **kwargs):
                 _cards = sequence
             elif sequence.lower() == "all" or sequence.lower() == "*":
                 _cards = list(range(1, card_count + 1))
+            elif sequence.lower() == "odd" or sequence.lower() == "o":
+                _cards = list(range(1, card_count + 1, 2))
+            elif sequence.lower() == "even" or sequence.lower() == "e":
+                _cards = list(range(2, card_count + 1, 2))
             else:
                 _cards = tools.sequence_split(sequence)
         except Exception as err:
@@ -1023,17 +1636,17 @@ def Card(sequence, *elements, **kwargs):
                 "Handling sequence:%s with dataset:%s & images:%s - %s",
                 sequence,
                 globals.dataset,
-                globals.deck.image_list,
+                globals.deck.images_front_list,
                 err,
             )
-            tools.feedback(
-                f'Unable to convert "{sequence}" into a card or range or cards {globals.deck}.'
+            feedback(
+                f'Unable to convert "{sequence}" into a card or range of cards {globals.deck}.'
             )
     for index, _card in enumerate(_cards):
-        card = globals.deck.get(_card - 1)  # cards internally number from ZERO
+        card = globals.deck.fronts[_card - 1]  # cards internally number from ZERO
         if card:
             for element in elements:
-                # print(f'*** Card() {element=} {type(element)=}')
+                # print(f'$$$  Card() {element=} {type(element)=}')
                 if isinstance(element, TemplatingType):
                     add_members_to_card(element)
                 else:
@@ -1042,7 +1655,86 @@ def Card(sequence, *elements, **kwargs):
                     # card.elements.append(element)  # may be Group or Shape or Query
                     add_members_to_card(element)
         else:
-            tools.feedback(f'Cannot find card#{_card}. (Check "cards" setting in Deck)')
+            feedback(f'Cannot find card#{_card}. (Check "cards" setting in Deck)')
+
+
+def CardBack(sequence: object = None, *elements, **kwargs):
+    """Add one or more elements to the back of a card or cards.
+
+    NOTE: A CardBack receives its `draw()` command via Save()!
+    """
+
+    def add_members_to_back(element):
+        element.members = _cardbacks  # track all related cards
+        cardback.members = _cardbacks
+        cardback.elements.append(element)  # may be Group or Shape or Query
+
+    kwargs = margins(**kwargs)
+    if not globals.deck:
+        feedback("The Deck() has not been defined or is incorrect.", True)
+    if not sequence:
+        feedback("The Card() needs to have a valid sequence defined.", True)
+
+    _cardbacks = []
+    # int - single card
+    try:
+        _back = int(sequence)
+        _cardbacks = range(_back, _back + 1)
+    except Exception:
+        pass
+    # string - either 'all'/'*'/'even'/'odd' .OR. a range: '1', '1-2', '1-3,5-6'
+    if not _cardbacks:
+        try:
+            cardback_count = (
+                len(globals.dataset)
+                if globals.dataset
+                else (
+                    len(globals.deck.images_back_list)
+                    if globals.deck.images_back_list
+                    else (
+                        tools.as_int(globals.deck.cards, "cards")
+                        if globals.deck.cards
+                        else 0
+                    )
+                )
+            )
+            if isinstance(sequence, list) and not isinstance(sequence, str):
+                _cardbacks = sequence
+            elif sequence.lower() == "all" or sequence.lower() == "*":
+                _cardbacks = list(range(1, cardback_count + 1))
+            elif sequence.lower() == "odd" or sequence.lower() == "o":
+                _cardbacks = list(range(1, cardback_count + 1, 2))
+            elif sequence.lower() == "even" or sequence.lower() == "e":
+                _cardbacks = list(range(2, cardback_count + 1, 2))
+            else:
+                _cardbacks = tools.sequence_split(sequence)
+        except Exception as err:
+            log.error(
+                "Handling sequence:%s with dataset:%s & images:%s - %s",
+                sequence,
+                globals.dataset,
+                globals.deck.images_back_list,
+                err,
+            )
+            feedback(
+                f'Unable to convert "{sequence}" into a cardback or range of cardbacks {globals.deck}.'
+            )
+    for index, _back in enumerate(_cardbacks):
+        if _back - 1 >= len(globals.deck.backs):
+            feedback("Number of CardBacks cannot exceed number of Cards!", True)
+        cardback = globals.deck.backs[_back - 1]  # cards internally number from ZERO
+        if cardback:
+            for element in elements:
+                # print(f'$$$  CardBack() {element=} {type(element)=}')
+                if isinstance(element, TemplatingType):
+                    add_members_to_back(element)
+                else:
+                    # element.members = _cardbacks  # track all related cards
+                    # cardback.members = _cardbacks
+                    # cardback.elements.append(element)  # may be Group or Shape or Query
+                    add_members_to_back(element)
+        else:
+            feedback(f'Cannot find cardback#{_back}. (Check "cards" setting in Deck)')
 
 
 def Counter(sequence, *elements, **kwargs):
@@ -1053,16 +1745,88 @@ def Counter(sequence, *elements, **kwargs):
     Card(sequence, *elements, **kwargs)
 
 
-def Deck(**kwargs):
-    """Initialise a deck with all its settings, including source(s) of data.
+def CounterBack(sequence, *elements, **kwargs):
+    """Add one or more elements to a counter or counters.
 
-    NOTE: A Deck receives its `draw()` command from Save()!
+    NOTE: A CounterBack receives its `draw()` command via Save()!
+    """
+    CardBack(sequence, *elements, **kwargs)
+
+
+def Deck(**kwargs):
+    """Placeholder for a deck design; storing lists of CardShapes; allowing export
+
+    Kwargs (optional):
+
+    - bleed_fill: background color for the page (up to the margins);
+      if no separate **fill** property is set, then this color is used instead
+    - cards: the number of cards appearing in the deck; defaults to 9
+      Note that other objects such as Data() and Matrix() can alter this value
+    - card_size: a pre-existing card size used to set *width* and *height*
+      (if values for *width* and *height* are set, they will override this);
+      can be one of: ``poker``, ``bridge``, ``tarot``, ``business``, ``mini``,
+      ``skat``, ``mini``, ``minieuropean``, ``miniamerican``
+    - cols: maximum number of card columns that should appear on a page
+    - copy: the name of a column in the dataset defined by Data() that
+      specifies how many copies of a card are needed
+    - fill: color of the card's area; defaults to ``white``
+    - frame: the default card frame is a *rectangle* (or square, if the
+      height and width match); but can be set to *hexagon* or *circle*
+    - grid_marks: if set to ``True``, will cause small marks to be drawn at
+      the border of the page that align with the edges of the card frames
+    - grid_marks_length: the length of the *grid_marks*; defaults to ``0.85`` cm
+    - grid_marks_stroke: line color of the *grid_marks*; defaults to ``grey``
+    - grid_marks_stroke_width: line width of the *grid_marks*; defaults to 0.1
+    - grouping: number of cards to be drawn adjacent to each other
+      before a blank space is added by the **spacing** property (note that
+      **grouping** does not apply to  *hexagon* **frame** cards)
+      (about one-third of an inch)
+    - grouping_col: number of cards to be drawn adjacent to each other
+      in a horizontal direction before a blank space is added by the **spacing**
+    - grouping_row: number of cards to be drawn adjacent to each other
+      in a vertical direction before a blank space is added by the **spacing**
+    - gutter: a value set for this helps determines the spacing between the
+      fronts and backs of cards when these are drawn on two halves of the same
+      page; its value is divided in half, and added to the top margin value, and
+      each set of cards is drawn that distance away from the centre line of the page
+    - gutter_stroke: if set, will cause a line of that color to be used
+      for the *gutter* line; this defaults to ``gray`` (to match grid marks)
+    - gutter_stroke_width: if set to a value, will cause a line of that
+      thickness to be used for the *gutter* line
+    - gutter_dotted: sets the style of the *gutter* line
+    - gutter_layout: sets the orientation of the page for the cards drawn in
+      the two gutter "halves"; this can be ``portrait`` (the default) or
+      ``landscape``` (the latter is useful when you have very tall cards e.g.
+      ``tarot`` sized ones)
+    - height: card height for a *rectangular* card; defaults to 8.89 cm
+    - mask: an expression which should evaluate to ``True`` or ``False``.
+      This expression has the same kind of syntax as T() and it uses data available
+      from the Deck object's Data(). If the expression result is ``True``
+      then any matching cards will be masked i.e. ignored and not drawn
+    - radius: radius for a card of type *hexagon* or *circle*; defaults to 2.54 cm
+    - rounding: size of rounding on each corner of a rectangular frame card
+    - rows: maximum number of card rows that should appear on a page
+    - spacing: size of blank space between each card or grouping in x- and y-direction
+    - spacing_x: size of blank space between each card or grouping in a
+      horizontal direction
+    - spacing_y: size of blank space between each card or grouping in a
+      vertical direction
+    - stroke: color of the card's border; defaults to ``black``
+    - width: card width for a *rectangular* card; defaults to ``6.35`` cm
+
+    Notes:
+
+    - This function instantiates a DeckOfCards object; this object:
+
+        - receives its `draw()` command from Save()
+        - draws any gutter lines (one per page)
+        - adds any annotations (depending on page ranges)
     """
     validate_globals()
 
     kwargs = margins(**kwargs)
     kwargs["dataset"] = globals.dataset
-    globals.deck = DeckShape(**kwargs)
+    globals.deck = DeckOfCards(canvas=globals.canvas, **kwargs)
     globals.deck_settings["grid_marks"] = kwargs.get("grid_marks", None)
 
 
@@ -1087,7 +1851,34 @@ def group(*args, **kwargs):
 
 
 def Data(**kwargs):
-    """Load data from file, dictionary, list-of-lists, directory or Google Sheet."""
+    """Load data from file, dictionary, list-of-lists, directory or Google Sheet.
+
+    Kwargs:
+
+    - **filename** - the full path to the name (including extension) of the
+      CSV or Excel file being used; if no directory is supplied in the path,
+      then it is assumed to be the same one in which the script is located
+    - Access to a **Google Sheet** document is via three properties:
+
+      - *google_key* - an API key that you must request from Google
+      - *google_sheet* - the unique ID (a mix of numbers and letters) which is
+        randomly assigned by Google to your Google Sheet
+      - *google_name* - the name of the tab in the Google Sheet housing your data
+    - **matrix** - refers to the name assigned to the ``Matrix`` being used
+    - **images** - refers to the directory in which the cards' images are located;
+      if a full path is not given, its assumed to be directly under the one in which
+      the script is located
+    - **images_list** - is used in conjunction with *images* to provide a list of
+      file extensions that filter which type of files will be loaded from the
+      directory e.g. ``.png`` or ``.jpg``; this is important to set if the
+      directory contains files of a type that are not, or cannot be, used
+    - **data_list** refers to the name assigned to the "list of lists" being used;
+      this property is also used when linked to data being sourced from the
+      BoardGameGeek API
+    - **extra** - if additional cards need to be manually created for a Deck,
+      that are *not* part of the data source, then the number of those cards
+      can be specified here.
+    """
     validate_globals()
 
     filename = kwargs.get("filename", None)  # CSV or Excel
@@ -1097,28 +1888,27 @@ def Data(**kwargs):
     images_filter = kwargs.get("images_filter", "")  # e.g. .png
     filters = tools.sequence_split(images_filter, False, True)
     source = kwargs.get("source", None)  # dict
-    sheet = kwargs.get("sheet", None)  # Google Sheet
+    google_sheet = kwargs.get("google_sheet", None)  # Google Sheet
+    debug = kwargs.get("debug", False)
     # extra cards added to deck (handle special cases not in the dataset)
     globals.deck_settings["extra"] = tools.as_int(kwargs.get("extra", 0), "extra")
     try:
         int(globals.deck_settings["extra"])
     except Exception:
-        tools.feedback(
-            f'Extra must be a whole number, not "{kwargs.get("extra")}"!', True
-        )
+        feedback(f'Extra must be a whole number, not "{kwargs.get("extra")}"!', True)
 
     if filename:  # handle excel and CSV
         globals.dataset = tools.load_data(filename, **kwargs)
         globals.dataset_type = DatasetType.FILE
-    elif sheet:  # handle Google Sheet
-        api_key = kwargs.get("api_key", None)
-        name = kwargs.get("name", None)
-        globals.dataset = tools.load_googlesheet(sheet, api_key=api_key, name=name)
+    elif google_sheet:  # handle Google Sheet
+        google_key = kwargs.get("google_key", None)
+        google_name = kwargs.get("google_name", None)
+        globals.dataset = tools.load_googlesheet(
+            google_sheet, api_key=google_key, name=google_name
+        )
         globals.dataset_type = DatasetType.GSHEET
         if not globals.dataset:
-            tools.feedback(
-                "No data accessible from the Google Sheet - please check", True
-            )
+            feedback("No data accessible from the Google Sheet - please check", True)
     elif matrix:  # handle pre-built dict
         globals.dataset = matrix
         globals.dataset_type = DatasetType.MATRIX
@@ -1129,16 +1919,16 @@ def Data(**kwargs):
             globals.dataset = dict_list
             globals.dataset_type = DatasetType.DICT
         except Exception:
-            tools.feedback("The data_list is not valid - please check", True)
+            feedback("The data_list is not valid - please check", True)
     elif source:  # handle pre-built list-of-dict
         if not isinstance(source, list):
             source_type = type(source)
-            tools.feedback(
+            feedback(
                 f"The source must be a list-of-dictionaries, not {source_type}", True
             )
         if not isinstance(source[0], dict):
             sub_type = type(source)
-            tools.feedback(f"The list must contain dictionaries, not {sub_type}", True)
+            feedback(f"The list must contain dictionaries, not {sub_type}", True)
         globals.dataset = source
         globals.dataset_type = DatasetType.DICT
     elif images:  # create list of images
@@ -1149,31 +1939,43 @@ def Data(**kwargs):
             full_path = os.path.join(script_dir, images)
             src = Path(full_path)
             if not src.is_dir():
-                tools.feedback(
+                feedback(
                     f"Cannot locate or access directory: {images} or {full_path}", True
                 )
         for child in src.iterdir():
             if not filters or child.suffix in filters:
                 globals.image_list.append(str(child))
         if globals.image_list is None or len(globals.image_list) == 0:
-            tools.feedback(
+            feedback(
                 f'Directory "{src}" has no relevant files or cannot be loaded!', True
             )
         else:
             globals.dataset_type = DatasetType.IMAGE
     else:
-        tools.feedback("You must provide data for the Data command!", True)
+        feedback("You must provide data for the Data command!", True)
 
     # ---- check keys - cannot use spaces!
     if globals.dataset and len(globals.dataset) > 0:
         first = globals.dataset[0].keys()
         for key in first:
             if not (key.isalpha() or "_" in key):
-                tools.feedback(
+                feedback(
                     "The Data headers must only be characters (without spaces)"
                     f' e.g. not "{key}"',
                     True,
                 )
+    if debug:
+        if len(globals.dataset) > 0:
+            headers = ",".join([*globals.dataset[0]])
+            print(f"Initial rows of {globals.dataset_type} data are:")
+            print(headers)
+            for i in range(0, 3):
+                if len(globals.dataset) >= i:
+                    _data = list(globals.dataset[i].values())
+                    data = ",".join(str(x) for x in _data)
+                    print(data)
+        else:
+            print("No {globals.dataset_type} data was loaded!")
 
     return globals.dataset
 
@@ -1225,28 +2027,28 @@ def L(lookup: str, target: str, result: str, default: Any = "") -> LookupType:
     if globals.dataset and isinstance(globals.dataset, list):
         # validate the lookup column
         if lookup not in globals.dataset[0].keys():
-            tools.feedback(f'The "{lookup}" column is not available.', True)
+            feedback(f'The "{lookup}" column is not available.', True)
         for key, record in enumerate(globals.dataset):
             if target in record.keys():
                 if result in record.keys():
                     lookups[record[target]] = record[result]
                 else:
-                    tools.feedback(f'The "{result}" column is not available.', True)
+                    feedback(f'The "{result}" column is not available.', True)
             else:
-                tools.feedback(f'The "{target}" column is not available.', True)
+                feedback(f'The "{target}" column is not available.', True)
     result = LookupType(column=lookup, lookups=lookups)
     return result
 
 
 def T(string: str, data: dict = None, function: object = None):
     """Use string to create a Jinja2 Template."""
-    # print(f'*** TEMPLATE {string=} {data=}')
+    # print(f'$$$  TEMPLATE {string=} {data=}')
     environment = jinja2.Environment()
     try:
         template = environment.from_string(str(string))
     except jinja2.exceptions.TemplateSyntaxError as err:
         template = None
-        tools.feedback(f'Invalid template "{string}" - {err}', True)
+        feedback(f'Invalid template "{string}" - {err}', True)
     # members can assigned when processing cards
     return TemplatingType(template=template, function=function, members=None)
 
@@ -1413,7 +2215,7 @@ def equilateraltriangle(row=None, col=None, **kwargs):
 
 def Hexagon(row=None, col=None, **kwargs):
     kwargs = margins(**kwargs)
-    # print(f'Will draw HexShape: {kwargs}')
+    # print(f'$$$ Will draw HexShape: {kwargs}')
     kwargs["row"] = row
     kwargs["col"] = col
     hexagon = HexShape(canvas=globals.canvas, **kwargs)
@@ -1674,7 +2476,7 @@ def Blueprint(**kwargs):
             case _:
                 color, fill = "#3085AC", None
                 if style_name is not None:
-                    tools.feedback(
+                    feedback(
                         f'The Blueprint style "{style_name}" is unknown', False, True
                     )
         return color, fill
@@ -1684,7 +2486,7 @@ def Blueprint(**kwargs):
 
     kwargs = margins(**kwargs)
     if kwargs.get("common"):
-        tools.feedback('The "common" property cannot be used with a Blueprint.', True)
+        feedback('The "common" property cannot be used with a Blueprint.', True)
     kwargs["units"] = kwargs.get("units", globals.units)
     side = 1.0
     if kwargs["units"] == unit.inch:
@@ -1696,8 +2498,8 @@ def Blueprint(**kwargs):
     number_edges = kwargs.get("edges", "S,W")
     kwargs["x"] = kwargs.get("x", 0)
     kwargs["y"] = kwargs.get("y", 0)
-    m_x = kwargs["units"] * (globals.margin_left + globals.margin_right)
-    m_y = kwargs["units"] * (globals.margin_top + globals.margin_bottom)
+    m_x = kwargs["units"] * (globals.margins.left + globals.margins.right)
+    m_y = kwargs["units"] * (globals.margins.top + globals.margins.bottom)
     _cols = (globals.page[0] - m_x) / (kwargs["units"] * float(kwargs["side"]))
     _rows = (globals.page[1] - m_y) / (kwargs["units"] * float(kwargs["side"]))
     rows = int(_rows)
@@ -1713,7 +2515,7 @@ def Blueprint(**kwargs):
     kwargs["fill"] = kwargs.get("fill", page_fill)
     # ---- page color (optional)
     if kwargs["fill"] is not None:
-        fill = get_color(kwargs.get("fill", "white"))
+        fill = tools.get_color(kwargs.get("fill", "white"))
         globals.canvas.draw_rect((0, 0, globals.page[0], globals.page[1]))
         globals.canvas.finish(fill=fill)
     kwargs["fill"] = kwargs.get("fill", line_stroke)  # revert back for font
@@ -1777,7 +2579,7 @@ def Blueprint(**kwargs):
         if "e" in edges:
             for y in range(1, kwargs["rows"] + 1):
                 Text(
-                    x=kwargs["x"] + kwargs["cols"] * side + globals.margin_left / 2.0,
+                    x=kwargs["x"] + kwargs["cols"] * side + globals.margins.left / 2.0,
                     y=y * side + offset,
                     text=set_format(y, side),
                     common=_common,
@@ -1785,17 +2587,17 @@ def Blueprint(**kwargs):
         if "w" in edges:
             for y in range(1, kwargs["rows"] + 1):
                 Text(
-                    x=kwargs["x"] - globals.margin_left / 2.0,
+                    x=kwargs["x"] - globals.margins.left / 2.0,
                     y=y * side + offset,
                     text=set_format(y, side),
                     common=_common,
                 )
         # ---- draw "zero" number
-        # z_x = kwargs["units"] * globals.margin_left
-        # z_y = kwargs["units"] * globals.margin_bottom
+        # z_x = kwargs["units"] * globals.margins.left
+        # z_y = kwargs["units"] * globals.margins.bottom
         # corner_dist = geoms.length_of_line(Point(0, 0), Point(z_x, z_y))
         # corner_frac = corner_dist * 0.66 / kwargs["units"]
-        # # tools.feedback(f'*** {z_x=} {z_y=} {corner_dist=}')
+        # # feedback(f'$$$  {z_x=} {z_y=} {corner_dist=}')
         # zero_pt = geoms.point_on_line(Point(0, 0), Point(z_x, z_y), corner_frac)
         # Text(
         #     x=zero_pt.x / kwargs["units"] - kwargs["side"] / 4.0,
@@ -1914,7 +2716,7 @@ def Hexagons(rows=1, cols=1, sides=None, **kwargs):
             # print('ccol, top_row, end_row', ccol, top_row, end_row)
             for row in range(top_row - 1, end_row + 1):
                 _row = row + 1
-                # tools.feedback(f'{ccol=}, {_row=}')
+                # feedback(f'{ccol=}, {_row=}')
                 if hidden and (_row, ccol) in hidden:
                     pass
                 else:
@@ -1931,7 +2733,7 @@ def Hexagons(rows=1, cols=1, sides=None, **kwargs):
                         sequence=sequence,
                         label=hxgn.grid.label,
                     )
-                    # print(f'### locale {ccol=} {_row=} / {hxgn.grid.x=} {hxgn.grid.y=}')
+                    # print(f'$$$ locale {ccol=} {_row=} / {hxgn.grid.x=} {hxgn.grid.y=}')
                     locales.append(_locale)
                     sequence += 1
 
@@ -1944,7 +2746,7 @@ def Hexagons(rows=1, cols=1, sides=None, **kwargs):
         if kwargs.get("orientation").lower() in ["p", "pointy"] and kwargs.get(
             "hex_layout"
         ) not in ["r", "rec", "rect", "rectangle"]:
-            tools.feedback(
+            feedback(
                 "Cannot use this Hexagons `hex_layout` with pointy hexagons!", True
             )
 
@@ -1952,7 +2754,7 @@ def Hexagons(rows=1, cols=1, sides=None, **kwargs):
         if not sides and (
             (rows is not None and rows < 3) and (cols is not None and cols < 3)
         ):
-            tools.feedback("The minimum values for rows/cols is 3!", True)
+            feedback("The minimum values for rows/cols is 3!", True)
         if rows and rows > 1:
             cols = rows
         if cols and cols > 1:
@@ -1961,14 +2763,14 @@ def Hexagons(rows=1, cols=1, sides=None, **kwargs):
             rows = cols
         if sides:
             if sides < 2:
-                tools.feedback("The minimum value for sides is 2!", True)
+                feedback("The minimum value for sides is 2!", True)
             rows = 2 * sides - 1
             cols = rows
         else:
             if rows & 1 == 0:
-                tools.feedback("An odd number is needed for rows!", True)
+                feedback("An odd number is needed for rows!", True)
             if cols & 1 == 0:
-                tools.feedback("An odd number is needed for cols!", True)
+                feedback("An odd number is needed for cols!", True)
             sides = rows // 2 + 1
         odd_mid = False if sides & 1 == 0 else True
         the_cols = list(range(sides, 0, -1)) + list(range(sides + 1, rows + 1))
@@ -1980,10 +2782,10 @@ def Hexagons(rows=1, cols=1, sides=None, **kwargs):
         locales = draw_hexagons(rows, cols, 0, the_cols)
 
     elif kwargs.get("hex_layout") in ["t", "tri", "triangle"]:
-        tools.feedback(f"Cannot draw triangle-pattern hexagons: {kwargs}", True)
+        feedback(f"Cannot draw triangle-pattern hexagons: {kwargs}", True)
 
     elif kwargs.get("hex_layout") in ["l", "loz", "stadium"]:
-        tools.feedback(f"Cannot draw stadium-pattern hexagons: {kwargs}", True)
+        feedback(f"Cannot draw stadium-pattern hexagons: {kwargs}", True)
 
     else:  # default to rectangular layout
         sequence = 0
@@ -2004,7 +2806,7 @@ def Hexagons(rows=1, cols=1, sides=None, **kwargs):
                         sequence=sequence,
                         label=hxgn.grid.label,
                     )
-                    # print(f'### locale {col=} {row=} / {hxgn.grid.x=} {hxgn.grid.y=}')
+                    # print(f'$$$ locale {col=} {row=} / {hxgn.grid.x=} {hxgn.grid.y=}')
                     locales.append(_locale)
                     sequence += 1
 
@@ -2084,24 +2886,24 @@ def Location(grid: list, label: str, shapes: list, **kwargs):
             x = point.x + pts[0]
             y = point.y + pts[1]
             kwargs["locale"] = locale
-            # tools.feedback(f"$$$ {shape=} :: {loc.x=}, {loc.y=} // {dx=}, {dy=}")
-            # tools.feedback(f"$$$ {kwargs=}")
-            # tools.feedback(f"$$$ {label} :: {shape_name=}")
+            # feedback(f"$$$ {shape=} :: {loc.x=}, {loc.y=} // {dx=}, {dy=}")
+            # feedback(f"$$$ {kwargs=}")
+            # feedback(f"$$$ {label} :: {shape_name=}")
             if shape_name in GRID_SHAPES_WITH_CENTRE:
                 shape.draw(_abs_cx=x, _abs_cy=y, **kwargs)
             elif shape_name in GRID_SHAPES_NO_CENTRE:
                 shape.draw(_abs_x=x, _abs_y=y, **kwargs)
             else:
-                tools.feedback(f"Unable to draw {shape_abbr}s in Location!", True)
+                feedback(f"Unable to draw {shape_abbr}s in Location!", True)
         except Exception as err:
-            tools.feedback(err, False)
-            tools.feedback(
+            feedback(err, False)
+            feedback(
                 f"Unable to draw the '{shape_abbr}' - please check its settings!", True
             )
 
     # checks
     if grid is None or not isinstance(grid, list):
-        tools.feedback("The grid (as a list) must be supplied!", True)
+        feedback("The grid (as a list) must be supplied!", True)
 
     # get location centre from grid via the label
     locale, point = None, None
@@ -2114,16 +2916,16 @@ def Location(grid: list, label: str, shapes: list, **kwargs):
         msg = ""
         if label and "," in label:
             msg = " (Did you mean to use Locations?)"
-        tools.feedback(f"The Location '{label}' is not in the grid!{msg}", True)
+        feedback(f"The Location '{label}' is not in the grid!{msg}", True)
 
     if shapes:
         try:
             iter(shapes)
         except TypeError:
-            tools.feedback("The Location shapes property must contain a list!", True)
+            feedback("The Location shapes property must contain a list!", True)
         for shape in shapes:
             if shape.__class__.__name__ == "GroupBase":
-                tools.feedback(f"Group drawing ({shape}) NOT IMPLEMENTED YET", True)
+                feedback(f"Group drawing ({shape}) NOT IMPLEMENTED YET", True)
             else:
                 draw_shape(shape, point, locale)
 
@@ -2132,11 +2934,11 @@ def Locations(grid: list, labels: Union[str, list], shapes: list, **kwargs):
     kwargs = kwargs
 
     if grid is None or not isinstance(grid, list):
-        tools.feedback("The grid (as a list) must be supplied!", True)
+        feedback("The grid (as a list) must be supplied!", True)
     if labels is None:
-        tools.feedback("No grid location labels supplied!", True)
+        feedback("No grid location labels supplied!", True)
     if shapes is None:
-        tools.feedback("No list of shapes supplied!", True)
+        feedback("No list of shapes supplied!", True)
     if isinstance(labels, str):
         _labels = [_label.strip() for _label in labels.split(",")]
         if labels.lower() == "all" or labels.lower() == "*":
@@ -2147,15 +2949,15 @@ def Locations(grid: list, labels: Union[str, list], shapes: list, **kwargs):
     elif isinstance(labels, list):
         _labels = labels
     else:
-        tools.feedback(
+        feedback(
             "Grid location labels must be a list or a comma-delimited string!", True
         )
 
     if not isinstance(shapes, list):
-        tools.feedback("Shapes must contain a list of shapes!", True)
+        feedback("Shapes must contain a list of shapes!", True)
 
     for label in _labels:
-        # tools.feedback(f'{label=} :: {shapes=}')
+        # feedback(f'{label=} :: {shapes=}')
         Location(grid, label, shapes)
 
 
@@ -2165,16 +2967,16 @@ def LinkLine(grid: list, locations: Union[list, str], **kwargs):
     if isinstance(locations, str):  # should be a comma-delimited string
         locations = tools.sequence_split(locations, False, False)
     if not isinstance(locations, list):
-        tools.feedback(f"'{locations} is not a list - please check!", True)
+        feedback(f"'{locations} is not a list - please check!", True)
     if len(locations) < 2:
-        tools.feedback("There should be at least 2 locations to create links!", True)
+        feedback("There should be at least 2 locations to create links!", True)
     dummy = base_shape()  # a BaseShape - not drawable!
     for index, location in enumerate(locations):
         # precheck
         if isinstance(location, str):
             location = (location, 0, 0)  # reformat into standard notation
         if not isinstance(location, tuple) or len(location) != 3:
-            tools.feedback(
+            feedback(
                 f"The location '{location}' is not valid -- please check its syntax!",
                 True,
             )
@@ -2183,18 +2985,15 @@ def LinkLine(grid: list, locations: Union[list, str], **kwargs):
         try:
             iter(grid)
         except TypeError:
-            tools.feedback(f"The grid '{grid}' is not valid - please check it!", True)
-        # breakpoint()
+            feedback(f"The grid '{grid}' is not valid - please check it!", True)
         for position in grid:
             if not isinstance(position, Locale):
-                tools.feedback(
-                    f"The grid '{grid}' is not valid - please check it!", True
-                )
+                feedback(f"The grid '{grid}' is not valid - please check it!", True)
             if location[0] == position.label:
                 loc = Point(position.x, position.y)
                 break
         if loc is None:
-            tools.feedback(f"The location '{location[0]}' is not in the grid!", True)
+            feedback(f"The location '{location[0]}' is not in the grid!", True)
         # new line?
         if index + 1 < len(locations):
             # location #2
@@ -2202,7 +3001,7 @@ def LinkLine(grid: list, locations: Union[list, str], **kwargs):
             if isinstance(location_2, str):
                 location_2 = (location_2, 0, 0)  # reformat into standard notation
             if not isinstance(location_2, tuple) or len(location_2) != 3:
-                tools.feedback(
+                feedback(
                     f"The location '{location_2}' is not valid - please check its syntax!",
                     True,
                 )
@@ -2212,11 +3011,9 @@ def LinkLine(grid: list, locations: Union[list, str], **kwargs):
                     loc_2 = Point(position.x, position.y)
                     break
             if loc_2 is None:
-                tools.feedback(
-                    f"The location '{location_2[0]}' is not in the grid!", True
-                )
+                feedback(f"The location '{location_2[0]}' is not in the grid!", True)
             if location == location_2:
-                tools.feedback(
+                feedback(
                     "Locations must differ from each other - "
                     f"({location} matches {location_2})!",
                     True,
@@ -2228,10 +3025,10 @@ def LinkLine(grid: list, locations: Union[list, str], **kwargs):
             y1 = dummy.points_to_value(loc_2.y) + location_2[2]
 
             _line = line(x=x, y=y, x1=x1, y1=y1, **kwargs)
-            # tools.feedback(f"$$$ {x=}, {y=}, {x1=}, {y1=}")
-            delta_x = globals.margin_left
-            delta_y = globals.margin_top
-            # tools.feedback(f"$$$ {delta_x=}, {delta_y=}")
+            # feedback(f"$$$ {x=}, {y=}, {x1=}, {y1=}")
+            delta_x = globals.margins.left
+            delta_y = globals.margins.top
+            # feedback(f"$$$ {delta_x=}, {delta_y=}")
             _line.draw(
                 off_x=-delta_x,
                 off_y=-delta_y,
@@ -2261,28 +3058,26 @@ def Layout(grid, **kwargs):
 
     # ---- validate inputs
     if not shapes:
-        tools.feedback("There is no list of shapes to draw!", False, True)
+        feedback("There is no list of shapes to draw!", False, True)
     if shapes and not isinstance(shapes, list):
-        tools.feedback("The values for 'shapes' must be in a list!", True)
+        feedback("The values for 'shapes' must be in a list!", True)
     if not isinstance(grid, VirtualLocations):
-        tools.feedback(f"The grid value '{grid}' is not valid!", True)
+        feedback(f"The grid value '{grid}' is not valid!", True)
     corners_dict = {}
     if corners:
         if not isinstance(corners, list):
-            tools.feedback(f"The corners value '{corners}' is not a valid list!", True)
+            feedback(f"The corners value '{corners}' is not a valid list!", True)
         for corner in corners:
             try:
                 value = corner[0]
                 shape = corner[1]
                 if value.lower() not in ["nw", "ne", "sw", "se", "*"]:
-                    tools.feedback(
+                    feedback(
                         f'The corner must be one of nw, ne, sw, se (not "{value}")!',
                         True,
                     )
                 if not isinstance(shape, BaseShape):
-                    tools.feedback(
-                        f'The corner item must be a shape (not "{shape}") !', True
-                    )
+                    feedback(f'The corner item must be a shape (not "{shape}") !', True)
                 if value == "*":
                     corners_dict["nw"] = shape
                     corners_dict["ne"] = shape
@@ -2291,9 +3086,7 @@ def Layout(grid, **kwargs):
                 else:
                     corners_dict[value] = shape
             except Exception:
-                tools.feedback(
-                    f'The corners setting "{corner}" is not a valid list', True
-                )
+                feedback(f'The corners setting "{corner}" is not a valid list', True)
 
     # ---- setup locations; automatically or via user-specification
     shape_id = 0
@@ -2327,14 +3120,12 @@ def Layout(grid, **kwargs):
     if rotations:
         for rotation in rotations:
             if not isinstance(rotation, tuple):
-                tools.feedback("The 'rotations' must each contain a set!", True)
+                feedback("The 'rotations' must each contain a set!", True)
             if len(rotation) != 2:
-                tools.feedback(
-                    "The 'rotations' must each contain a set of two items!", True
-                )
+                feedback("The 'rotations' must each contain a set of two items!", True)
             _key = rotation[0]
             if not isinstance(_key, str):
-                tools.feedback(
+                feedback(
                     "The first value for rreach 'rotations' entry must be a string!",
                     True,
                 )
@@ -2344,7 +3135,7 @@ def Layout(grid, **kwargs):
             try:
                 _keys = list(tools.sequence_split(_key))
             except Exception:
-                tools.feedback(f'Unable to convert "{_key}" into a range of values.')
+                feedback(f'Unable to convert "{_key}" into a range of values.')
             for the_key in _keys:
                 rotation_sequence[the_key] = rotate
 
@@ -2367,7 +3158,7 @@ def Layout(grid, **kwargs):
             elif isinstance(shapes[shape_id], tuple):
                 _shape = shapes[shape_id][0]
                 if not isinstance(_shape, BaseShape):
-                    tools.feedback(
+                    feedback(
                         f'The first item in "{shapes[shape_id]}" must be a shape!', True
                     )
                 if len(shapes[shape_id]) > 1:
@@ -2375,14 +3166,14 @@ def Layout(grid, **kwargs):
             elif isinstance(shapes[shape_id], Place):
                 _shape = shapes[shape_id].shape
                 if not isinstance(_shape, BaseShape):
-                    tools.feedback(
+                    feedback(
                         f'The value for "{shapes[shape_id].name}" must be a shape!',
                         True,
                     )
                 if shapes[shape_id].rotation:
                     rotation = tools.as_float(shapes[shape_id].rotation, "rotation")
             else:
-                tools.feedback(
+                feedback(
                     f'Use a shape, or set, or Place - not "{shapes[shape_id]}"!', True
                 )
             # ---- * overwrite shape to use for corner
@@ -2464,7 +3255,7 @@ def Layout(grid, **kwargs):
                         fill=DEBUG_COLOR,
                     )
                 case _:
-                    tools.feedback(f'Unknown debug style "{do_debug}"', True)
+                    feedback(f'Unknown debug style "{do_debug}"', True)
 
 
 def Track(track=None, **kwargs):
@@ -2477,7 +3268,7 @@ def Track(track=None, **kwargs):
             shape.heading = shapes[shape_id].heading.format(**data)
         except KeyError as err:
             text = str(err).split()
-            tools.feedback(
+            feedback(
                 f"You cannot use {text[0]} as a special field; remove the {{ }} brackets",
                 True,
             )
@@ -2496,16 +3287,14 @@ def Track(track=None, **kwargs):
     if sequences and isinstance(sequences, str):
         sequences = tools.sequence_split(sequences)
     if sequences and stop:
-        tools.feedback(
-            "Both stop and sequences cannot be used together for a Track!", True
-        )
+        feedback("Both stop and sequences cannot be used together for a Track!", True)
     if not track:
         track = Polygon(sides=4, fill=None)
     track_name = track.__class__.__name__
     track_abbr = track_name.replace("Shape", "")
     if track_name == "CircleShape":
         if not angles or not isinstance(angles, list) or len(angles) < 2:
-            tools.feedback(
+            feedback(
                 f"A list of 2 or more angles is needed for a Circle-based Track!", True
             )
     elif track_name in ["SquareShape", "RectangleShape"]:
@@ -2518,18 +3307,16 @@ def Track(track=None, **kwargs):
     elif track_name == "PolygonShape":
         angles = track.get_angles()
     elif track_name not in SHAPES_FOR_TRACK:
-        tools.feedback(f"Unable to use a {track_abbr} for a Track!", True)
+        feedback(f"Unable to use a {track_abbr} for a Track!", True)
     if rotation_style:
         _rotation_style = str(rotation_style).lower()
         if _rotation_style not in ["o", "outwards", "inwards", "i"]:
-            tools.feedback(f"The rotation_style '{rotation_style}' is not valid", True)
+            feedback(f"The rotation_style '{rotation_style}' is not valid", True)
     else:
         _rotation_style = None
     shapes = kwargs.get("shapes", [])  # shape(s) to draw at the locations
     if not shapes:
-        tools.feedback(
-            "Track needs at least one Shape assigned to shapes list", False, True
-        )
+        feedback("Track needs at least one Shape assigned to shapes list", False, True)
 
     track_points = []  # a list of Ray tuples
     # ---- create Circle vertices and angles
@@ -2562,7 +3349,7 @@ def Track(track=None, **kwargs):
     if start is not None:
         _start = start - 1
         if _start > len(track_points):
-            tools.feedback(
+            feedback(
                 f'The start value "{start}" must be less than the number of vertices!',
                 True,
             )
@@ -2590,13 +3377,13 @@ def Track(track=None, **kwargs):
             "theta": track_point.angle,
             "count": index + 1,
         }
-        # tools.feedback(f'*Track* {index=} {data=}')
+        # feedback(f'*Track* {index=} {data=}')
         # format_label(shape, data)
         # ---- supply data to change shape's location
         # TODO - can choose line centre, not vertex, as the cx,cy position
         shape.cx = shape.points_to_value(track_point.x - track._o.delta_x)
         shape.cy = shape.points_to_value(track_point.y - track._o.delta_y)
-        # tools.feedback(f'*Track* {shape.cx=}, {shape.cy=}')
+        # feedback(f'*Track* {shape.cx=}, {shape.cy=}')
         if _rotation_style:
             match _rotation_style:
                 case "i" | "inwards":
@@ -2616,7 +3403,7 @@ def Track(track=None, **kwargs):
         else:
             shape_rotation = 0
         shape.set_unit_properties()
-        # tools.feedback(f'Track*** {shape._u}')
+        # feedback(f'$$$ Track {shape._u}')
         locale = Locale(
             x=track_point.x,
             y=track_point.y,
@@ -2672,21 +3459,21 @@ def BGG(user: str = None, ids: list = None, progress=False, short=500, **kwargs)
                 _game = BGGGame(game_id=item.id, user_game=item, user=user, short=short)
                 gamelist.set_values(_game)
         if not ids:
-            tools.feedback(
+            feedback(
                 f"Sorry - no games could be retrieved for BGG username {user}", True
             )
     elif ids:
-        tools.feedback(
+        feedback(
             "All board game data accessed via this tool is owned by BoardGameGeek"
             " and provided through their XML API"
         )
         for game_id in ids:
             if progress:
-                tools.feedback(f"Retrieving game '{game_id}' from BoardGameGeek...")
+                feedback(f"Retrieving game '{game_id}' from BoardGameGeek...")
             _game = BGGGame(game_id=game_id, short=short)
             gamelist.set_values(_game)
     else:
-        tools.feedback(
+        feedback(
             "Please supply either `ids` or `user` to retrieve games from BGG", True
         )
     return gamelist
@@ -2713,7 +3500,7 @@ def dice(dice="1d6", rolls=None):
         _list = dice.split("d")
         _type, pips = int(_list[0]), int(_list[1])
     except Exception:
-        tools.feedback(f'Unable to determine dice type/roll for "{dice}"', True)
+        feedback(f'Unable to determine dice type/roll for "{dice}"', True)
     return Dice().multi_roll(count=rolls, pips=pips, dice=_type)
 
 
@@ -2763,3 +3550,11 @@ def A8BA():
         font_size=8,
     )
     Blueprint(stroke_width=0.5)
+
+
+# ---- inherited docs ====
+
+
+create.__doc__ = Create.__doc__
+save.__doc__ = Save.__doc__
+DeckOfCards.__doc__ = Deck.__doc__

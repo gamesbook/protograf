@@ -23,6 +23,7 @@ Table of Contents
   - `Deck Example 1. Defaults`_
   - `Deck Example 2. Copy & Mask`_
 - `The Card Command`_
+- `The CardBack Command`_
 - `The Data Command`_
 
   - `Data Sources`_
@@ -42,7 +43,7 @@ Table of Contents
   - `T(emplate) command`_
   - `S(election) command`_
   - `L(ookup) command`_
-- `Other Resources`_
+- `Other Card Deck Resources`_
 
 
 Introduction
@@ -121,10 +122,10 @@ The following are key properties that will usually need to be set for a
 ``Deck``:
 
 - **cards** - this is the number of cards appearing in the deck. It defaults
-  to ``9``. (Note that other commands such as ``Data()`` and ``Matrix()`` will
-  alter this value.)
-- **height** - this is the card height; it defaults to ``8.8`` cm
-- **width** - this is the card width. It defaults to ``6.3`` cm
+  to ``9``. (**Note** that other commands such as ``Data()`` and ``Matrix()``
+  will alter this value.)
+- **height** - this is the card height; it defaults to 8.89 cm / 3.5"
+- **width** - this is the card width. It defaults to 6.35 cm / 2.5"
 
 .. IMPORTANT::
 
@@ -145,8 +146,11 @@ of two A4, portait-mode, pages:
 
       Deck(cards=18)
 
-Note that these rectangular cards have a default height (``8.8`` cm) and
-width (``6.3`` cm).
+Note that these rectangular cards have a default height (``8.89`` cm) and
+width (``6.35`` cm).
+
+The **actual** number of cards may be changed by `the Data Command`_ or
+`the Matrix Command`.
 
 
 Deck Example 2. Copy & Mask
@@ -285,6 +289,31 @@ Here:
   after it in the group list (see below for how the
   `group <group-function_>`_ function works.)
 
+
+.. _the-cardback-command:
+
+The CardBack Command
+====================
+`↑ <table-of-contents-crddk_>`_
+
+This command mirrors its counterpart |dash| :ref:`Card Command <the-card-command>`.
+
+Any element or option that is applicable to that command can be used; for
+example; adding shapes or setting ranges.
+
+There are a few differences.  Any numeric range for a CardBack cannot exceed
+the number of cards |dash| so if there were 9 Cards in the Deck, you cannot
+set a range of ``"1-10"`` for a CardBack.
+
+The default location for CardBacks to be drawn is on alternating pages on the
+assumption that cards will be printed back-to-back and that there are matchiing
+card backs for every front.  The offsets for CardBack positions are changed so
+that the images line-up "behind" the Cards drawn on the front.
+
+Both front and back can be drawn on the same page by using a **gutter**. For
+details on this property, see the `Deck Command <deck_command.html>`_.
+
+
 .. _the-data-command:
 
 The Data Command
@@ -294,6 +323,12 @@ The Data Command
 This command allows for a dataset |dash| for example, a CSV file or an Excel
 spreadsheet |dash| to be used as the source for values or properties of
 commands making the cards.
+
+.. IMPORTANT::
+
+   The number of cards that are listd in the dataset |dash| CSV file; Excel
+   spreadsheetl; ect. |dash| will **always** take priority over the number
+   of cards specified in  `The Deck Command <deck_command.html>`.
 
 Because values now have "names" they can be
 referenced and used by the `Supporting Commands`_ - this is usually the primary
@@ -331,7 +366,7 @@ in some way, for a card:
 - the names for a CSV file must appear in the first line of the file
 - the names for a Excel file, or Google Sheet, must appear in the columns of
   the first row of the spreadsheet
-- the names for `the Matrix Command`_ command must appear as a list assigned
+- the names for `the Matrix Command`_ must appear as a list assigned
   to the *labels* property of the command
 - the names for a "list of lists" must appear in the first list in the lists
 
@@ -504,10 +539,10 @@ Data Example 6. Google Sheets
 
 There are three properties needed to gain access to data from a Google Sheet:
 
-- *api_key* - an API key that you can request from Google
-- *sheet* - the unique ID (a mix of numbers and letters) which is randomly
-  assigned to a Google Sheet
-- *name* - the name of the tab in the Google Sheet housing your data
+- *google_key* - an API Key that you can request from Google
+- *google_sheet* - the unique ID (a mix of numbers and letters) which is randomly
+  assigned by Google to your Google Sheet
+- *google_name* - the name of the tab in the Google Sheet housing your data
 
 The API Key
 +++++++++++
@@ -552,9 +587,9 @@ all the information described above:
     .. code:: python
 
         Data(
-            sheet="1vRfwxVjafnZVmgjazQKr2UQDyGYYK8GXJhQAPlzJ03o",
-            api_key="A1_izC00Lbut2001askHAL4aPodd00rsys3rr0r",
-            name="Characters")
+            google_sheet="1vRfwxVjafnZVmgjazQKr2UQDyGYYK8GXJhQAPlzJ03o",
+            google_key="A1_izC00Lbut2001askHAL4aPodd00rsys3rr0r",
+            google_name="Characters")
 
 If the sheet cannot be reached, or access permissions are not correct,
 or the API key is invalid, then you will get an error.
@@ -755,7 +790,7 @@ The full code for this example is available as
         FEEDBACK:: Unable to process data with this template ('Ag' is undefined)
 
 Template functions
-~~~~~~~~~~~~~~~~~~
+++++++++++++++++++
 
 It could that you need to perform a more complex operation, or validation,
 on the data returned by the template from the :ref:`Data() <the-data-command>`.
@@ -775,7 +810,7 @@ The name of the function is then passed to the ``T()`` command by that
 command's *function* property.
 
 Template Function Example 1.
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+++++++++++++++++++++++++++++
 
 In this example, the function is called ``greet``, and is assigned and used
 by the ``T()`` command as follows:
@@ -800,7 +835,7 @@ The Text() shape is then assigned, via ``greetings`` to one more cards in
 the usual way.
 
 Template Function Example 2.
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+++++++++++++++++++++++++++++
 
 Here is a more complex example involving deeper knowledge of
 :doc:`Python Commands <python_commands>`; please skip it if the terminology
@@ -942,8 +977,8 @@ the card with **ID** of ``1``; and then returns the value from that card's
 
 .. _other-card-resources:
 
-Other Resources
-===============
+Other Card Deck Resources
+=========================
 `↑ <table-of-contents-crddk_>`_
 
 **protograf** is by no means the only tool for creating decks of cards.
@@ -959,6 +994,7 @@ Title              O/S     Language   Link
 Batch Card Maker   Multi   Python     https://github.com/p-dimi/Batch-Card-Maker
 Card Creatr Studio Multi   Electron   https://cardcreatr.sffc.xyz/
 Card Editor        Windows Java       https://bitbucket.org/mattsinger/card-editor/src/release/
+CardFoldr          Multi   JavaScript https://foosel.github.io/cardfoldr/
 CardMaker          Multi   C#         https://github.com/nhmkdev/cardmaker
 DeCard64           Windows Delphi     https://github.com/Dimon-II/DeCard64
 Forge of Cards     Online  JavaScript https://forgeofcards.com/#/

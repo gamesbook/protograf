@@ -2911,12 +2911,16 @@ Image
 `↑ <shape-index_>`_
 
 Pedantically speaking, an image is not like the other shapes in the sense that
-it does not consist of lines and areas drawn by **protograf**  itself.
+it does not consist of lines and areas drawn by **protograf** itself.
 
 An "image" refers to an external file which is simply inserted into the drawing.
 
 The Image shape shares a number of common aspects with other shapes - such as
-an x & y position, a width and height, and the ability to be rotated.
+an x & y position, a width and a height, and the ability to be rotated.
+
+An image can have its corners rounded by setting a value for ``rounding``.
+Be aware this is a pixel-based value and does not correspond to the units
+used elsewhere in **protograf**.
 
 An image can also be "drawn over" by other shapes appearing later on in the
 script.

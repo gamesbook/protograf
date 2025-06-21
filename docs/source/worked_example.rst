@@ -29,7 +29,7 @@ A simple card deck example: Take 1
 
 Open up a new text file |dash| referred to as a **script** |dash|
 with your text file editor and type the following, making sure that
-each line starts **without** any blank spaces!
+each line starts **without** any leading blank spaces!
 
 .. code:: python
 
@@ -50,8 +50,9 @@ As can be seen there are four lines in the file:
    **protograf** instructions/commands are supplied.
 -  *Line 3* - ``Deck()`` means that **protograf** is defining a deck.
    Because there is no other information given, it will create the default
-   number of cards |dash| *9* |dash| with each card having the same default size
-   i.e. a "Poker" card size of 8.8 cm high and 6.3 cm wide.
+   number of cards |dash| *9* |dash| with each card having the same default
+   size of 6.35 cm x 8.89 cm, or 2.5" x 3.5" |dash| the same as a normal
+   Poker card.
 -  *Line 4* - ``Save()`` gives the go-ahead to create the output file on
    disc. Usually, every script you write will have this as the last
    line.  If you don't have it, no file will be created.  The output file
@@ -121,8 +122,8 @@ Type the following::
 
 An output PDF file should now have been created in the same directory as
 your ``cards2.py`` file - it will be called ``example2.pdf``. It should
-contain a set of 9 blank cards appearing in the top half of an A3-sized
-page.
+contain a set of 9 default-sized, blank cards appearing in the top half of
+an A3-sized page.
 
 .. NOTE::
 
@@ -150,7 +151,7 @@ Create this text in a file called ``cards3.py``:
        cards=50,
        height=5,
        width=3.8,
-       fill="#702EB0")
+       fill="purple")
 
    # create the output card file, using the card 'deck'
    Save()
@@ -168,11 +169,12 @@ When you split an instruction, make sure that there are one or more
 spaces at the start of the continuation lines; it's often helpful to
 start the next line indented by four (4) spaces.
 
-In this ``Deck``, the number of cards has been set to 50. The size of
-the cards in the deck have been changed to be 5cm high and 3.8cm wide.
-The fill color is defined by a **hexadecimal** value - this sets the
-red, green and blue components that make up a color. In this case, we
-might see the color as a shade of "purple".
+In this ``Deck``, the number of *cards* has been set to 50. The size of
+the cards in the deck have been changed to be ``5`` cm high and ``3.8`` cm
+wide.
+
+The *fill* color is set to a predefined one called ``purple``. This
+corresponds to the  **hexadecimal** value ``800080``.
 
 In this script, the lines shown starting with a ``#`` are called
 **comments** |dash| these will be ignored by **protograf** but are included
@@ -252,7 +254,7 @@ You can change the default **Font** in use by setting the properties of a
 its size in *points*, and its color |dash| set by the **stroke** property.
 
 This script also shows the use of a **reference** |dash| a reference is
-just a name, followed by an "=" sign, and then an instruction of some kind;
+just a name, followed by an ``=`` sign, and then an instruction of some kind;
 in this script the reference is named ``mytext`` and it is referring to
 text placed at a location.
 

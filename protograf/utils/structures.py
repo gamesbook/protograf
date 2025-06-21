@@ -61,6 +61,58 @@ class HexOrientation(Enum):
 
 # ---- NAMEDTUPLE
 
+Bounds = namedtuple(
+    "Bounds",
+    [
+        "left",
+        "right",
+        "bottom",
+        "top",
+    ],
+)
+
+# track progress of a Deck print (front or back)
+DeckPrintState = namedtuple(
+    "DeckPrintState",
+    [
+        "card_count",
+        "card_number",
+        "copies_to_do",
+        "start_x",  # left-most point of first card
+    ],
+)
+
+GridShape = namedtuple(
+    "GridShape",
+    [
+        "label",
+        "x",
+        "y",
+        "shape",
+    ],
+)
+
+GlobalDocument = namedtuple(
+    "GlobalDocument",
+    [
+        "base",
+        "deck",
+        "card_frames",
+        "filename",
+        "directory",
+        "document",
+        "doc_page",
+        "canvas",
+        "margins",
+        "page",
+        "page_fill",
+        "page_width",
+        "page_height",
+        "page_count",
+        "page_grid",
+    ],
+)
+
 HexGeometry = namedtuple(
     "HexGeometry",
     [
@@ -73,13 +125,34 @@ HexGeometry = namedtuple(
         "z_fraction",
     ],
 )
-
 LookupType = namedtuple("LookupType", ["column", "lookups"])
-
 Link = namedtuple("Link", ["a", "b", "style"])
 
 fields = ("col", "row", "x", "y", "id", "sequence", "corner", "label")
 Locale = namedtuple("Locale", fields, defaults=(None,) * len(fields))
+
+OffsetProperties = namedtuple(
+    "OffsetProperties",
+    [
+        "off_x",
+        "off_y",
+        "delta_x",
+        "delta_y",
+    ],
+)
+
+# margins are in user units
+PageMargins = namedtuple(
+    "PageMargins",
+    [
+        "margin",  # default
+        "left",
+        "right",
+        "bottom",
+        "top",
+        "debug",  # show the margin?
+    ],
+)
 
 Place = namedtuple("Place", ["shape", "rotation"])
 
@@ -91,22 +164,31 @@ PolyGeometry = namedtuple(
 
 Ray = namedtuple("Ray", ["x", "y", "angle"])
 
-UnitPoints = namedtuple(
-    "UnitPoints",
+UnitProperties = namedtuple(
+    "UnitProperties",
     [
-        "cm",
-        "mm",
-        "inch",
-        "pt",
+        "page_width",
+        "page_height",
+        "margin_left",
+        "margin_right",
+        "margin_bottom",
+        "margin_top",
+        "x",
+        "y",
+        "cx",
+        "cy",
+        "height",
+        "width",
+        "top",
+        "radius",
+        "diameter",
+        "side",
+        "length",
+        "spacing_x",
+        "spacing_y",
+        "offset_x",
+        "offset_y",
     ],
-)
-
-# ---- units point equivalents
-unit = UnitPoints(
-    cm=28.3465,
-    mm=2.83465,
-    inch=72.0,
-    pt=1.0,
 )
 
 # ---- DATACLASS
@@ -114,16 +196,22 @@ unit = UnitPoints(
 
 @dataclass
 class BBox:
-    """A spatial bounding box - BL is SouthWest x,y point and TR is NorthEast x,y point"""
+    """Spatial bounding box.
 
-    bl: Tuple[Point, Point]
-    tr: Tuple[Point, Point]
+    Properties:
+
+    - `tl` is minimum x,y point
+    - `br` is maximum x,y point
+    """
+
+    tl: Point
+    br: Point
 
 
 # wrapper around a jinja Template to support operations on an Template output
 @dataclass
 class TemplatingType:
-    """Support dynamic object creation from a jinga Template"""
+    """Support dynamic object creation from a jinja Template"""
 
     template: Template
     function: object

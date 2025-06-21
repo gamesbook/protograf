@@ -26,7 +26,7 @@ Table of Contents
 - `Diamond Hexagonal Grid`_
 - `Grid Locations`_
 - `Grid LinkLine`_
-- `Other Resources`_
+- `Other Hexagonal Grid Resources`_
 
 
 Overview
@@ -1112,8 +1112,8 @@ Example 4. An Offset LinkLine
 
 .. _other-hexagonal-resources:
 
-Other Resources
-===============
+Other Hexagonal Grid Resources
+==============================
 `↑ <table-of-contents-hexg_>`_
 
 There are already a number of software tools available for creating

@@ -9,7 +9,8 @@ import logging
 import jinja2
 
 # local
-from protograf.utils import tools
+from protograf.utils.messaging import feedback
+from protograf.utils.tools import as_bool
 from protograf.base import BaseShape
 from protograf.layouts import SequenceShape, RepeatShape
 from protograf.shapes import (
@@ -51,19 +52,15 @@ class Switch:
         try:
             outcome = self.switch_template.render(record)
             # print('  +++', f'{ID=} {self.test} {outcome=}')
-            boolean = tools.as_bool(outcome)
+            boolean = as_bool(outcome)
             if boolean:
                 return self.result
             else:
                 return self.alternate
         except jinja2.exceptions.UndefinedError as err:
-            tools.feedback(
-                f'Switch "{self.test}" is incorrectly constructed ({err})', True
-            )
+            feedback(f'Switch "{self.test}" is incorrectly constructed ({err})', True)
         except Exception as err:
-            tools.feedback(
-                f'Switch "{self.test}" is incorrectly constructed ({err})', True
-            )
+            feedback(f'Switch "{self.test}" is incorrectly constructed ({err})', True)
         return None
 
 

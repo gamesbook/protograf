@@ -6,7 +6,7 @@ Created on: 21 December 2024
 """
 from protograf import *
 
-Create(filename='cards_hexagonal.pdf', paper="A4-l")
+Create(filename='cards_hexagonal.pdf', margin=1, paper="A4-l")
 
 # deck data
 Data(filename="lotr.csv")

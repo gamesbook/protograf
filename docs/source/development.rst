@@ -16,7 +16,6 @@ Table of Contents
 - `Coding`_
 - `Package Management`_
 - `Documentation`_
-- `Notes`_
 
 Coding
 ======

@@ -10,7 +10,8 @@ from protograf import *
 
 Create(
     filename="squadleader.pdf",
-    margin=0.5, margin_bottom=0,
+    margin=0.5,
+    margin_bottom=0,
     paper="A4-l")
 
 # set primary color

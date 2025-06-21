@@ -106,6 +106,7 @@ current / potential areas of work or idea development.
     * [ ] Cross shape
     * [ ] Pod shape
 * [ ] Common objects:
+    * [ ] CompassRose (replace Compass Shape)
     * [ ] Cube (Rhombus composite)
     * [ ] Domino (DotGrid inside Rectangle outline)
     * [ ] Die (Rectangle with DotGrid; 3D?)
@@ -122,6 +123,7 @@ current / potential areas of work or idea development.
     * [ ] multiple custom bleed areas
     * [x] access to Google Sheets
     * [x] extract rectangular cards as PNG files
+    * [ ] page annotations
 * [ ] Color:
     * [ ] add support for CYMK
 

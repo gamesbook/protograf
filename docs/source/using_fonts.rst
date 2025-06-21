@@ -122,26 +122,42 @@ On an Ubuntu Linux machine, your new font file could be installed into the
 ``/home/USERNAME/.local/share/fonts`` directory.
 
 
-Auto Registration
+Font Registration
 -----------------
 
 The first time that a non-default font |dash| one that is installed specifically
 on your machine |dash| is referred to, :doc:`protograf <index>` will need to
-check all available font files to find it - this can take some time.
-Thereafter, a copy of all the fonts' information is stored in a single file in
+check all available font files to find it - this can take some time!
+
+After this, a copy of all the fonts' information is stored in a single file in
 the settings location used by  :doc:`protograf <index>` (usually in a
 sub-directory called ``.protograph`` located in your home directory). This
 will speed up the font checking process significantly for future.
 
-However, if you install new fonts onto your machine, you need to force the file
-to be recreated so it has access to these.  Use the property
-``cached_fonts=False`` in the script's ``Create`` command e.g.
+However, if you later on install new font(s) onto your machine, you will need
+to force the fonts information file to be recreated so it has access to the
+new font(s).
+
+Use the property ``cached_fonts=False`` in the script's ``Create`` command e.g.
 
 .. code:: python
 
     Create(
         cached_fonts=False
     )
+
+Alternatively, you can also used the ``--fonts`` option when using Python
+to process your script:
+
+.. code::
+
+    python --fonts myscript.py
+
+In either case, you should get feedback from the script about this process:
+
+.. code::
+
+    FEEDBACK:: Setting up fonts ... ... ... please be patient!
 
 
 Common Font Styles
@@ -250,8 +266,9 @@ External Font Resources
 
 Additional fonts are available from:
 
-- https://www.dafont.com/
-- https://fonts.google.com/ - also has very useful explanations about fonts and
-  how to choose them
+- https://www.dafont.com/ - some free to use and some have specific licenses
+- https://fonts.google.com/ - licensed under SIL Open Font License (OFL) - see
+  https://openfontlicense.org/
 
-As always, please check licenses and restrictions associated with these fonts.
+As always, please check for yourself the details of licenses and restrictions
+associated with any fonts you choose to use.

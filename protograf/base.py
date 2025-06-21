@@ -1,10 +1,6 @@
 # -*- coding: utf-8 -*-
 """
 Base shape class for protograf
-
-Notes:
-    * https://www.a2-size.com/american-paper-sizes/
-    * https://en.wikipedia.org/wiki/Paper_size#Overview_of_ISO_paper_sizes
 """
 # lib
 from collections import namedtuple
@@ -17,6 +13,7 @@ import logging
 import math
 import os
 from pathlib import Path, PosixPath
+from sys import platform
 from urllib.parse import urlparse
 
 # third party
@@ -24,286 +21,33 @@ import cairosvg
 import jinja2
 from jinja2.environment import Template
 import requests
-from PIL import Image, UnidentifiedImageError
+from PIL import Image, ImageDraw, UnidentifiedImageError
 import pymupdf
 from pymupdf import Shape as muShape, Point as muPoint, Page as muPage, Matrix
-from pymupdf.utils import getColor, getColorList
+
+# from pymupdf.utils import getColor, getColorList
 
 # local
 from protograf.utils import geoms, tools, support
+from protograf.utils.constants import DEBUG_COLOR, DEFAULT_FONT, DEFAULT_MARGIN_SIZE
 from protograf.utils.fonts import builtin_font, FontInterface
-from protograf.utils.structures import LookupType, TemplatingType, unit
+from protograf.globals import unit
+from protograf.utils.messaging import feedback
+from protograf.utils.structures import (
+    Bounds,
+    GridShape,
+    OffsetProperties,
+    LookupType,
+    TemplatingType,
+    UnitProperties,
+)
 from protograf.utils.support import CACHE_DIRECTORY
 from protograf import globals
 
 log = logging.getLogger(__name__)
 
 DEBUG = False
-DEBUG_COLOR = "#B0C4DE"
-DEFAULT_FONT = "Helvetica"
-BGG_IMAGES = "cf.geekdo-images.com"
-COLOR_NAMES = getColorList()
-
-# ---- named tuples
-UnitProperties = namedtuple(
-    "UnitProperties",
-    [
-        "page_width",
-        "page_height",
-        "margin_left",
-        "margin_right",
-        "margin_bottom",
-        "margin_top",
-        "x",
-        "y",
-        "cx",
-        "cy",
-        "height",
-        "width",
-        "top",
-        "radius",
-        "diameter",
-        "side",
-        "length",
-        "spacing_x",
-        "spacing_y",
-        "offset_x",
-        "offset_y",
-    ],
-)
-OffsetProperties = namedtuple(
-    "OffsetProperties",
-    [
-        "off_x",
-        "off_y",
-        "delta_x",
-        "delta_y",
-    ],
-)
-GridShape = namedtuple(
-    "GridShape",
-    [
-        "label",
-        "x",
-        "y",
-        "shape",
-    ],
-)
-Bounds = namedtuple(
-    "Bounds",
-    [
-        "left",
-        "right",
-        "bottom",
-        "top",
-    ],
-)
-
-
-# ---- colors (SVG named; 18xx Games)
-COLORS = {
-    "aliceblue": "#f0f8ff",
-    "antiquewhite": "#faebd7",
-    "aqua": "#00ffff",
-    "aquamarine": "#7fffd4",
-    "azure": "#f0ffff",
-    "beige": "#f5f5dc",
-    "bisque": "#ffe4c4",
-    "black": "#000000",
-    "blanchedalmond": "#ffebcd",
-    "blue": "#0000ff",
-    "blueviolet": "#8a2be2",
-    "brown": "#a52a2a",
-    "burlywood": "#deb887",
-    "cadetblue": "#5f9ea0",
-    "chartreuse": "#7fff00",
-    "chocolate": "#d2691e",
-    "coral": "#ff7f50",
-    "cornflowerblue": "#6495ed",
-    "cornsilk": "#fff8dc",
-    "crimson": "#dc143c",
-    "cyan": "#00ffff",
-    "darkblue": "#00008b",
-    "darkcyan": "#008b8b",
-    "darkgoldenrod": "#b8860b",
-    "darkgray": "#a9a9a9",
-    "darkgreen": "#006400",
-    "darkgrey": "#a9a9a9",
-    "darkkhaki": "#bdb76b",
-    "darkmagenta": "#8b008b",
-    "darkolivegreen": "#556b2f",
-    "darkorange": "#ff8c00",
-    "darkorchid": "#9932cc",
-    "darkred": "#8b0000",
-    "darksalmon": "#e9967a",
-    "darkseagreen": "#8fbc8f",
-    "darkslateblue": "#483d8b",
-    "darkslategray": "#2f4f4f",
-    "darkslategrey": "#2f4f4f",
-    "darkturquoise": "#00ced1",
-    "darkviolet": "#9400d3",
-    "deeppink": "#ff1493",
-    "deepskyblue": "#00bfff",
-    "dimgray": "#696969",
-    "dimgrey": "#696969",
-    "dodgerblue": "#1e90ff",
-    "firebrick": "#b22222",
-    "floralwhite": "#fffaf0",
-    "forestgreen": "#228b22",
-    "fuchsia": "#ff00ff",
-    "gainsboro": "#dcdcdc",
-    "ghostwhite": "#f8f8ff",
-    "gold": "#ffd700",
-    "goldenrod": "#daa520",
-    "gray": "#808080",
-    "green": "#008000",
-    "greenyellow": "#adff2f",
-    "grey": "#808080",
-    "honeydew": "#f0fff0",
-    "hotpink": "#ff69b4",
-    "indianred": "#cd5c5c",
-    "indigo": "#4b0082",
-    "ivory": "#fffff0",
-    "khaki": "#f0e68c",
-    "lavender": "#e6e6fa",
-    "lavenderblush": "#fff0f5",
-    "lawngreen": "#7cfc00",
-    "lemonchiffon": "#fffacd",
-    "lightblue": "#add8e6",
-    "lightcoral": "#f08080",
-    "lightcyan": "#e0ffff",
-    "lightgoldenrodyellow": "#fafad2",
-    "lightgray": "#d3d3d3",
-    "lightgreen": "#90ee90",
-    "lightgrey": "#d3d3d3",
-    "lightpink": "#ffb6c1",
-    "lightsalmon": "#ffa07a",
-    "lightseagreen": "#20b2aa",
-    "lightskyblue": "#87cefa",
-    "lightslategray": "#778899",
-    "lightslategrey": "#778899",
-    "lightsteelblue": "#b0c4de",
-    "lightyellow": "#ffffe0",
-    "lime": "#00ff00",
-    "limegreen": "#32cd32",
-    "linen": "#faf0e6",
-    "magenta": "#ff00ff",
-    "maroon": "#800000",
-    "mediumaquamarine": "#66cdaa",
-    "mediumblue": "#0000cd",
-    "mediumorchid": "#ba55d3",
-    "mediumpurple": "#9370db",
-    "mediumseagreen": "#3cb371",
-    "mediumslateblue": "#7b68ee",
-    "mediumspringgreen": "#00fa9a",
-    "mediumturquoise": "#48d1cc",
-    "mediumvioletred": "#c71585",
-    "midnightblue": "#191970",
-    "mintcream": "#f5fffa",
-    "mistyrose": "#ffe4e1",
-    "moccasin": "#ffe4b5",
-    "navajowhite": "#ffdead",
-    "navy": "#000080",
-    "oldlace": "#fdf5e6",
-    "olive": "#808000",
-    "olivedrab": "#6b8e23",
-    "orange": "#ffa500",
-    "orangered": "#ff4500",
-    "orchid": "#da70d6",
-    "palegoldenrod": "#eee8aa",
-    "palegreen": "#98fb98",
-    "paleturquoise": "#afeeee",
-    "palevioletred": "#db7093",
-    "papayawhip": "#ffefd5",
-    "peachpuff": "#ffdab9",
-    "peru": "#cd853f",
-    "pink": "#ffc0cb",
-    "plum": "#dda0dd",
-    "powderblue": "#b0e0e6",
-    "purple": "#800080",
-    "red": "#ff0000",
-    "rosybrown": "#bc8f8f",
-    "royalblue": "#4169e1",
-    "saddlebrown": "#8b4513",
-    "salmon": "#fa8072",
-    "sandybrown": "#f4a460",
-    "seagreen": "#2e8b57",
-    "seashell": "#fff5ee",
-    "sienna": "#a0522d",
-    "silver": "#c0c0c0",
-    "skyblue": "#87ceeb",
-    "slateblue": "#6a5acd",
-    "slategray": "#708090",
-    "slategrey": "#708090",
-    "snow": "#fffafa",
-    "springgreen": "#00ff7f",
-    "steelblue": "#4682b4",
-    "tan": "#d2b48c",
-    "teal": "#008080",
-    "thistle": "#d8bfd8",
-    "tomato": "#ff6347",
-    "turquoise": "#40e0d0",
-    "violet": "#ee82ee",
-    "wheat": "#f5deb3",
-    "white": "#ffffff",
-    "whitesmoke": "#f5f5f5",
-    "yellow": "#ffff00",
-    "yellowgreen": "#9acd32",
-    # 18xx colors from https://github.com/XeryusTC/map18xx/blob/master/src/tile.rs
-    "18xx_ground": "#fdd9b5",  # sandy tan
-    "18xx_yellow": "#fdee00",  # aureolin
-    "18xx_green": "#00a550",  # pigment green
-    "18xx_russet": "#cd7f32",  # bronze
-    "18xx_grey": "#acacac",  # silver chalice
-    "18xx_brown": "#7b3f00",  # chocolate
-    "18xx_red": "#dc143c",  # crimson
-    "18xx_blue": "#007fff",  # azure
-    "18xx_barrier": "#660000",  # blood red
-    "18xx_white": "#ffffff",  # white
-}
-
 WIDTH = 0.1
-CLOCK_ANGLES = [60, 90, 120, 150, 180, 210, 240, 270, 300, 330, 0, 30]
-
-
-def get_color(name: str = None, is_rgb: bool = True) -> tuple:
-    """Get a color tuple; by name from a pre-defined dictionary or as a RGB tuple."""
-    if name is None:
-        return None  # it IS valid to say that NO color has been set
-    if isinstance(name, tuple) and len(name) == 3:  # RGB color tuple
-        if (
-            (name[0] >= 0 and name[0] <= 255)
-            and (name[1] >= 0 and name[0] <= 255)
-            and (name[2] >= 0 and name[0] <= 255)
-        ):
-            return name
-        else:
-            tools.feedback(f'The color tuple "{name}" is invalid!')
-    elif isinstance(name, str) and len(name) == 7 and name[0] == "#":  # hexadecimal
-        _rgb = tuple(int(name[i : i + 2], 16) for i in (1, 3, 5))
-        rgb = tuple(i / 255 for i in _rgb)
-        return rgb
-    else:
-        pass  # unknown format
-    if name.upper() not in COLOR_NAMES:
-        tools.feedback(f'The color name "{name}" is not pre-defined!', True)
-    try:
-        color = getColor(name)
-        return color
-    except (AttributeError, ValueError):
-        tools.feedback(f'The color name "{name}" cannot be converted to RGB!', True)
-
-
-def get_opacity(transparency: float = 0) -> float:
-    """Convert from '100% is fully transparent' to '0 is not opaque'."""
-    if transparency is None:
-        return 1.0
-    try:
-        return float(1.0 - transparency / 100.0)
-    except (ValueError, TypeError):
-        tools.feedback(
-            f'The transparency of "{transparency}" is not valid (use 0 to 100)', True
-        )
 
 
 class BaseCanvas:
@@ -321,6 +65,7 @@ class BaseCanvas:
         self.document = document
         self.doc_page = None
         self.defaults = {}
+        # print(f"### {kwargs=}")
         # ---- setup defaults
         if self.jsonfile:
             try:
@@ -333,7 +78,7 @@ class BaseCanvas:
                     with open(_jsonfile) as data_file:
                         self.defaults = json.load(data_file)
                 except (IOError, ValueError):
-                    tools.feedback(
+                    feedback(
                         f'Unable to find or load the file "{self.jsonfile}"'
                         f' - also checked in "{filepath}".',
                         True,
@@ -359,7 +104,7 @@ class BaseCanvas:
         self.run_debug = False
         _units = self.defaults.get("units", unit.cm)
         self.units = support.to_units(_units)
-        # print(f"### {self.units=} \n {self.defaults=}")
+        # print(f'### {self.units=} {self.defaults=} {self.defaults.get("margin")=}')
         # ---- paper
         _paper = paper or self.defaults.get("paper", "A4")
         if isinstance(_paper, tuple) and len(_paper) == 2:
@@ -370,12 +115,15 @@ class BaseCanvas:
                 if self.paper == (-1, -1):  # pymupdf fallback ...
                     raise ValueError
             except Exception:
-                tools.feedback(f"Unable to use {_paper} as paper size!", True)
+                feedback(f"Unable to use {_paper} as paper size!", True)
+        # ---- paper size overrides
+        self.paper_width = self.defaults.get("paper_width", self.paper[0])
+        self.paper_height = self.defaults.get("paper_height", self.paper[1])
         # ---- paper size in units & margins
         self.page_width = self.paper[0] / self.units  # user-units e.g. cm
         self.page_height = self.paper[1] / self.units  # user-units e.g. cm
-        # print(f"### {self.page_height=} {self.page_width=}")
-        self.margin = self.defaults.get("margin", 1)
+        self.margin = self.defaults.get("margin", DEFAULT_MARGIN_SIZE / self.units)
+        # print(f"### {self.page_height=} {self.page_width=} {self.margin=} {self.units=}")
         self.margin_top = self.defaults.get("margin_top", self.margin)
         self.margin_bottom = self.defaults.get("margin_bottom", self.margin)
         self.margin_left = self.defaults.get("margin_left", self.margin)
@@ -413,15 +161,17 @@ class BaseCanvas:
         self.facing = self.defaults.get("facing", "out")  # out/in
         # ---- fill color
         fill = self.defaults.get("fill", self.defaults.get("fill_color")) or "white"
-        self.fill = get_color(fill)
+        self.fill = tools.get_color(fill)
         self.fill_stroke = self.defaults.get("fill_stroke", None)
         self.stroke_fill = self.defaults.get("stroke_fill", None)  # alias
         # ---- stroke
         stroke = (
             self.defaults.get("stroke", self.defaults.get("stroke_color")) or "black"
         )
-        self.stroke = get_color(stroke)
+        self.stroke = tools.get_color(stroke)
         self.stroke_width = self.defaults.get("stroke_width", WIDTH)
+        # pymupdf lineCap: 0 = line ends in sharp edge; 1 = adds semi-circle at end
+        self.stroke_cap = self.defaults.get("stroke_cap", 0)
         self.outline = self.defaults.get("outline", None)
         # ---- overwrite fill & stroke
         if self.stroke_fill:  # alias
@@ -432,13 +182,14 @@ class BaseCanvas:
             self.fill = self.fill_stroke
         # ---- debug color & transparency
         debug_color = self.defaults.get("debug_color", DEBUG_COLOR)
-        self.debug_color = get_color(debug_color)
+        self.debug_color = tools.get_color(debug_color)
         self.transparency = self.defaults.get("transparency", 1)  # NOT transparent
         # if self.outline:
         #     self.stroke = self.outline
         #     self.fill = None
         # ---- font
         self.font_name = self.defaults.get("font_name", DEFAULT_FONT)
+        self.font_file = self.defaults.get("font_file", None)
         self.font_size = self.defaults.get("font_size", 12)
         self.font_style = self.defaults.get("font_style", None)
         self.font_directory = self.defaults.get("font_directory", None)
@@ -447,14 +198,16 @@ class BaseCanvas:
         self.align = self.defaults.get("align", "centre")  # centre,left,right,justify
         self._alignment = pymupdf.TEXT_ALIGN_LEFT  # see to_alignment()
         # ---- grid cut marks
-        self.grid_marks = self.defaults.get("grid_marks", 0)
-        grid_stroke = self.defaults.get("grid_stroke", "gray")
-        self.grid_stroke = get_color(grid_stroke)
-        self.grid_stroke_width = self.defaults.get(
-            "grid_stroke_width", self.stroke_width
+        self.grid_marks = self.defaults.get("grid_marks_marks", False)
+        grid_marks_stroke = self.defaults.get("grid_marks_stroke", "gray")
+        self.grid_marks_stroke = tools.get_color(grid_marks_stroke)
+        self.grid_marks_stroke_width = self.defaults.get(
+            "grid_marks_stroke_width", self.stroke_width
         )
-        self.grid_length = self.defaults.get("grid_length", 0.85)  # 1/3 inch
-        self.grid_offset = self.defaults.get("grid_offset", 0)
+        self.grid_marks_length = self.defaults.get(
+            "grid_marks_length", 0.85
+        )  # 1/3 inch
+        self.grid_marks_offset = self.defaults.get("grid_marks_offset", 0)
         # ---- line style
         self.line_stroke = self.defaults.get("line_stroke", WIDTH)
         self.line_width = self.defaults.get("line_width", self.stroke_width)
@@ -465,7 +218,7 @@ class BaseCanvas:
         self.text = self.defaults.get("text", "")
         self.text_size = self.defaults.get("text_size", self.font_size)
         text_stroke = self.defaults.get("text_stroke", self.stroke)
-        self.text_stroke = get_color(text_stroke)
+        self.text_stroke = tools.get_color(text_stroke)
         self.text_stroke_width = self.defaults.get(
             "text_stroke_width", self.stroke_width
         )
@@ -474,7 +227,7 @@ class BaseCanvas:
         self.label_size = self.defaults.get("label_size", self.font_size)
         self.label_face = self.defaults.get("label_face", self.font_name)
         label_stroke = self.defaults.get("label_stroke", self.stroke)
-        self.label_stroke = get_color(label_stroke)
+        self.label_stroke = tools.get_color(label_stroke)
         self.label_stroke_width = self.defaults.get(
             "label_stroke_width", self.stroke_width
         )
@@ -486,7 +239,7 @@ class BaseCanvas:
         self.title_size = self.defaults.get("title_size", self.font_size)
         self.title_face = self.defaults.get("title_face", self.font_name)
         title_stroke = self.defaults.get("title_stroke", self.stroke)
-        self.title_stroke = get_color(title_stroke)
+        self.title_stroke = tools.get_color(title_stroke)
         self.title_stroke_width = self.defaults.get(
             "title_stroke_width", self.stroke_width
         )
@@ -498,7 +251,7 @@ class BaseCanvas:
         self.heading_size = self.defaults.get("heading_size", self.font_size)
         self.heading_face = self.defaults.get("heading_face", self.font_name)
         heading_stroke = self.defaults.get("heading_stroke", self.stroke)
-        self.heading_stroke = get_color(heading_stroke)
+        self.heading_stroke = tools.get_color(heading_stroke)
         self.heading_stroke_width = self.defaults.get(
             "heading_stroke_width", self.stroke_width
         )
@@ -569,7 +322,7 @@ class BaseCanvas:
         )  # fraction of smallest side
         # ---- stadium
         self.edges = self.defaults.get("edges", "E W")
-        # ---- grid / card layout
+        # ---- grid layout
         self.grid = None  # some Shapes can auto-generate a GridShape
         self.rows = self.defaults.get("rows", 0)
         self.cols = self.defaults.get("cols", self.defaults.get("columns", 0))
@@ -609,7 +362,7 @@ class BaseCanvas:
         self.radii_labels_size = self.defaults.get("radii_labels_size", self.font_size)
         self.radii_labels_face = self.defaults.get("radii_labels_face", self.font_name)
         radii_labels_stroke = self.defaults.get("radii_labels_stroke", self.stroke)
-        self.radii_labels_stroke = get_color(radii_labels_stroke)
+        self.radii_labels_stroke = tools.get_color(radii_labels_stroke)
         self.radii_labels_stroke_width = self.defaults.get(
             "radii_labels_stroke_width", self.stroke_width
         )
@@ -641,12 +394,12 @@ class BaseCanvas:
         self.centre_shape_my = self.defaults.get("centre_shape_my", 0)
         self.dot = self.defaults.get("dot", 0)
         dot_stroke = self.defaults.get("dot_stroke", self.stroke)
-        self.dot_stroke = get_color(dot_stroke)
+        self.dot_stroke = tools.get_color(dot_stroke)
         self.dot_stroke_width = self.defaults.get("dot_stroke_width", self.stroke_width)
         self.dot_fill = self.defaults.get("dot_fill", self.dot_stroke)  # colors match
         self.cross = self.defaults.get("cross", 0)
         cross_stroke = self.defaults.get("cross_stroke", self.stroke)
-        self.cross_stroke = get_color(cross_stroke)
+        self.cross_stroke = tools.get_color(cross_stroke)
         self.cross_stroke_width = self.defaults.get(
             "cross_stroke_width", self.stroke_width
         )
@@ -690,7 +443,7 @@ class BaseCanvas:
             "coord_font_size", int(self.font_size * 0.5)
         )
         coord_stroke = self.defaults.get("coord_stroke", "black")
-        self.coord_stroke = get_color(coord_stroke)
+        self.coord_stroke = tools.get_color(coord_stroke)
         self.coord_padding = self.defaults.get("coord_padding", 2)
         self.coord_separator = self.defaults.get("coord_separator", "")
         self.coord_prefix = self.defaults.get("coord_prefix", "")
@@ -740,7 +493,7 @@ class BaseShape:
         self, _object: pymupdf.Shape = None, canvas: BaseCanvas = None, **kwargs
     ):
         self.kwargs = kwargs
-        # tools.feedback(f'### BaseShape {_object=} {canvas=} {kwargs=}')
+        # feedback(f'### BaseShape {_object=} {canvas=} {kwargs=}')
         # ---- constants
         self.default_length = 1
         self.show_id = False  # True
@@ -773,7 +526,11 @@ class BaseShape:
                 if self.paper == (-1, -1):  # pymupdf fallback ...
                     raise ValueError
             except Exception:
-                tools.feedback(f"Unable to use {_paper} as paper size!", True)
+                feedback(f"Unable to use {_paper} as paper size!", True)
+        # ---- paper overrides
+        self.paper_width = self.kw_float(kwargs.get("paper_width", base.paper_width))
+        self.paper_height = self.kw_float(kwargs.get("paper_height", base.paper_height))
+        self.paper = (self.paper_width * self.units, self.paper_height * self.units)
         # ---- paper size in units
         self.page_width = self.paper[0] / self.units  # user-units e.g. cm
         self.page_height = self.paper[1] / self.units  # user-units e.g. cm
@@ -786,11 +543,16 @@ class BaseShape:
         self.margin_right = self.kw_float(kwargs.get("margin_right", self.margin))
         # ---- grid marks
         self.grid_marks = self.kw_float(kwargs.get("grid_marks", base.grid_marks))
-        self.grid_stroke = kwargs.get("grid_stroke", base.grid_stroke)
-        self.grid_stroke_width = self.kw_float(
-            kwargs.get("grid_stroke_width", base.grid_stroke_width)
+        self.grid_marks_stroke = kwargs.get("grid_marks_stroke", base.grid_marks_stroke)
+        self.grid_marks_stroke_width = self.kw_float(
+            kwargs.get("grid_marks_stroke_width", base.grid_marks_stroke_width)
         )
-        self.grid_length = self.kw_float(kwargs.get("grid_length", base.grid_length))
+        self.grid_marks_length = self.kw_float(
+            kwargs.get("grid_marks_length", base.grid_marks_length)
+        )
+        self.grid_marks_offset = self.kw_float(
+            kwargs.get("grid_marks_offset", base.grid_marks_offset)
+        )
         # ---- sizes and positions
         self.row = kwargs.get("row", base.row)
         self.col = self.kw_int(kwargs.get("col", kwargs.get("column", base.col)), "col")
@@ -838,9 +600,10 @@ class BaseShape:
         self.fill_stroke = kwargs.get("fill_stroke", base.fill_stroke)
         self.outline = kwargs.get("outline", base.outline)
         self.stroke_width = self.kw_float(kwargs.get("stroke_width", base.stroke_width))
+        self.stroke_cap = self.kw_int(kwargs.get("stroke_cap", base.stroke_cap))
         # ---- overwrite fill&stroke colors
         if self.fill_stroke and self.outline:
-            tools.feedback("Cannot set 'fill_stroke' and 'outline' together!", True)
+            feedback("Cannot set 'fill_stroke' and 'outline' together!", True)
         if self.fill_stroke:
             self.stroke = self.fill_stroke
             self.fill = self.fill_stroke
@@ -852,6 +615,7 @@ class BaseShape:
         self.transparency = self.kw_float(kwargs.get("transparency", base.transparency))
         # ---- font
         self.font_name = kwargs.get("font_name", base.font_name)
+        self.font_file = kwargs.get("font_file", base.font_file)
         self.font_size = self.kw_float(kwargs.get("font_size", base.font_size))
         self.font_style = kwargs.get("font_style", base.font_style)
         self.font_directory = kwargs.get("font_directory", base.font_directory)
@@ -908,7 +672,7 @@ class BaseShape:
         self.transform = kwargs.get("transform", base.transform)
         self.html = self.kw_bool(kwargs.get("html", base.html))
         self.css = kwargs.get("css", base.css)
-        # tools.feedback(f"### BShp:"
+        # feedback(f"### BShp:"
         # f"{self} {kwargs.get('fill')=} {self.fill=} {kwargs.get('fill_color')=}")
         # ---- image / file
         self.source = kwargs.get("source", base.source)  # file or http://
@@ -978,7 +742,7 @@ class BaseShape:
         self.rounded_radius = base.rounded_radius
         # ---- stadium
         self.edges = kwargs.get("edges", base.edges)
-        # ---- grid / card layout
+        # ---- grid layout
         self.rows = self.kw_int(kwargs.get("rows", base.rows), "rows")
         self.cols = self.kw_int(
             kwargs.get("cols", kwargs.get("columns", base.cols)), "cols"
@@ -1167,13 +931,13 @@ class BaseShape:
         # ---- CHECK ALL
         correct, issue = self.check_settings()
         if not correct:
-            tools.feedback("Problem with settings: %s." % "; ".join(issue))
+            feedback("Problem with settings: %s." % "; ".join(issue))
         # ---- UPDATE SELF WITH COMMON
         if self.common:
             try:
                 attrs = vars(self.common)
             except TypeError:
-                tools.feedback(
+                feedback(
                     f'Cannot process the Common property "{self.common}"'
                     " - please check!",
                     True,
@@ -1220,7 +984,7 @@ class BaseShape:
             return _item * units
         except (TypeError, ValueError):
             _label = f" {label}" if label else ""
-            tools.feedback(
+            feedback(
                 f"Unable to set unit value for{_label}: {item}."
                 " Please check that this is a valid value.",
                 stop=True,
@@ -1268,7 +1032,7 @@ class BaseShape:
         )
 
     def set_offset_props(self, off_x=0, off_y=0):
-        """Get OffsetProperties for a Shape."""
+        """OffsetProperties in point units for a Shape."""
         margin_left = (
             self.unit(self.margin_left) if self.margin_left is not None else self.margin
         )
@@ -1283,7 +1047,10 @@ class BaseShape:
         off_x = self.unit(off_x) if off_x is not None else None
         off_y = self.unit(off_y) if off_y is not None else None
         return OffsetProperties(
-            off_x, off_y, off_x + margin_left, off_y + margin_top  # margin_bottom
+            off_x=off_x,
+            off_y=off_y,
+            delta_x=off_x + margin_left,
+            delta_y=off_y + margin_top,
         )
 
     def draw_polyline_props(self, cnv: muShape, vertexes: list, **kwargs) -> bool:
@@ -1307,240 +1074,17 @@ class BaseShape:
         index=None,  # extract from list of potential values (usually Card options)
         **kwargs,
     ):
-        """Set pymupdf Shape properties for fill, font, line and colors
-
-        Notes:
-            If letting default a color parameter to None, then no resp. color selection
-            command will be generated. If fill and color are both None, then the drawing
-            will contain no color specification. But it will still be “stroked”,
-            which causes PDF’s default color “black” be used by PDF viewers.
-
-            The default value of width is 1.
-
-            The values width, color and fill have the following relationship:
-            • If fill=None, then shape elements will *always* be drawn with a border -
-              even if color=None (in which case black is taken) or width=0
-              (in which case 1 is taken).
-            • Shapes without border can only be achieved if a fill color is specified
-              (which may be be white). To achieve this, specify width=0.
-              In this case, the color parameter is ignored.
-        """
-
-        def ext(prop):
-            if isinstance(prop, str):
-                return prop
-            try:
-                return prop[index]
-            except TypeError:
-                return prop
-
-        # Shape.finish(
-        #   width=1, color=(0,), fill=None, lineCap=0, lineJoin=0, dashes=None,
-        #   closePath=True, even_odd=False, morph=(fixpoint, matrix),
-        #   stroke_opacity=1, fill_opacity=1, oc=0
-
-        # ---- set props
-        # print(f'### SetCnvProps: {kwargs.keys()} \n {kwargs.get("fill", "?")=}')
-        cnv = cnv if cnv else globals.canvas
-        if "fill" in kwargs.keys():
-            fill = kwargs.get("fill", None)  # reserve None for 'no fill at all'
-        else:
-            fill = self.fill
-        if "stroke" in kwargs.keys():
-            stroke = kwargs.get("stroke", None)  # reserve None for 'no stroke at all'
-        else:
-            stroke = self.stroke
-        # print(f'### SCP {kwargs.get("fill")=} {fill=} {kwargs.get("stroke")=} {stroke=}')
-        # ---- transparency / opacity
-        opacity = 1
-        _transparency = kwargs.get("transparency", self.transparency)
-        if _transparency:
-            _transparency = self.kw_float(_transparency, "transparency")
-            if _transparency >= 1:
-                _transparency = _transparency / 100.0
-            opacity = 1 - _transparency
-        stroke_width = kwargs.get("stroke_width", None)
-        stroke_cap = kwargs.get("stroke_cap", None)
-        dotted = kwargs.get("dotted", None)
-        dashed = kwargs.get("dashed", None)
-        _rotation = kwargs.get("rotation", None)  # calling Shape must set a tuple!
-        _rotation_point = kwargs.get(
-            "rotation_point", None
-        )  # calling Shape must set a tuple!
-        closed = kwargs.get("closed", False)  # whether to connect last and first points
-        debug = kwargs.get("debug", False)
-        # ---- set line dots / dashed
-        _dotted = ext(dotted) or ext(self.dotted)
-        _dashed = ext(dashed) or ext(self.dashed)
-        if _dotted:
-            the_stwd = (
-                round(ext(stroke_width))
-                if stroke_width
-                else round(ext(self.stroke_width))
-            )
-            the_stwd = max(the_stwd, 1)
-            dashes = f"[{the_stwd} {the_stwd}] 0"
-        elif _dashed:
-            _dlist = (
-                _dashed
-                if isinstance(_dashed, (list, tuple))
-                else tools.sequence_split(_dashed, as_int=False)
-            )
-            doffset = round(self.unit(_dlist[2])) if len(_dlist) >= 3 else 0
-            dspaced = round(self.unit(_dlist[1])) if len(_dlist) >= 2 else ""
-            dlength = round(self.unit(_dlist[0])) if len(_dlist) >= 1 else ""
-            dashes = f"[{dlength} {dspaced}] {doffset}"
-        else:
-            dashes = None
-        # print(f"### SCP{_dotted =} {_dashed=} {dashes=}")
-        # ---- check rotation
-        morph = None
-        # print(f'### SCP {_rotation_point=} {_rotation}')
-        if _rotation_point and not isinstance(_rotation_point, (geoms.Point, muPoint)):
-            tools.feedback(f'Rotation point "{_rotation_point}" is invalid', True)
-        if _rotation is not None and not isinstance(_rotation, (float, int)):
-            tools.feedback(f'Rotation angle "{_rotation}" is invalid', True)
-        if _rotation and _rotation_point:
-            # ---- * set rotation matrix
-            mtrx = Matrix(1, 1)
-            mtrx.prerotate(_rotation)
-            morph = (_rotation_point, mtrx)
-            # print(f'### SCP {morph=}')
-        # ---- get color tuples
-        _color = get_color(stroke)
-        _fill = get_color(fill)
-        # ---- set width
-        _width = stroke_width or self.stroke_width
-        if _color is None and _fill is None:
-            tools.feedback("Cannot have both fill and stroke set to None!", True)
-        # print(f'### SCP {stroke=} {fill=} {_color=} {_fill=}')  # None OR fraction RGB
-        # ---- set/apply properties
-        cnv.finish(
-            width=_width,
-            color=_color,
-            fill=_fill,
-            lineCap=stroke_cap or 0,  # or self.stroke_cap,  # FIXME
-            lineJoin=0,
-            dashes=dashes,
-            fill_opacity=opacity,
-            morph=morph,
-            closePath=closed,
-        )
-        cnv.commit()
-        return None
-
-        """
-        def ext(prop):
-            if isinstance(prop, str):
-                return prop
-            try:
-                return prop[index]
-            except TypeError:
-                return prop
-
-        canvas = cnv if cnv else self.canvas
-        try:
-            canvas.setFont(ext(self.font_name), ext(self.font_size))
-        except AttributeError:
-            pass
-        except KeyError:
-            ff = ext(self.font_name)
-            try:
-                tools.register_font(
-                    font_name=self.font_name,
-                    style=self.font_style,
-                    directory=self.font_directory,
-                )
-            except (KeyError, ValueError):
-                _style = f' with style "{self.font_style}"' if self.font_style else ""
-                _dir = f' in "{self.font_directory}"' if self.font_directory else ""
-                tools.feedback(
-                    f'Unable to find or register font "{ff}"{_style}{_dir}.'
-                    " Please check that it is available on your system.",
-                    stop=True,
-                )
-        try:
-            if fill in [None, []] and self.fill in [None, []]:
-                canvas.setFillColor("white", 0)  # full transparency
-                if debug:
-                    tools.feedback("~~~ NO fill color set!")
-            else:
-                _fill = ext(fill) or ext(self.fill)
-                canvas.setFillColor(_fill)
-                _transparency = ext(self.transparency)
-                if _transparency:
-                    try:
-                        alpha = float(_transparency) / 100.0
-                    except Exception:
-                        tools.feedback(
-                            f'Unable to use "{_transparency}" as transparency'
-                            " value - it must be from 1 to 100",
-                            True,
-                        )
-                    try:
-                        curr_fill = canvas._fillColorObj
-                        alpha_fill = Color(
-                            curr_fill.red, curr_fill.green, curr_fill.blue, alpha
-                        )
-                        if debug:
-                            tools.feedback(
-                                f"~ Transp. color set: {alpha_fill} vs {_fill}"
-                            )
-                        _fill = alpha_fill
-                        canvas.setFillColor(_fill)
-                    except Exception:
-                        tools.feedback("Unable to set transparency for {_fill}")
-                if debug:
-                    tools.feedback(f"~~~ Fill color set: {_fill}")
-
-        except (ValueError, AttributeError):
-            issue = f'"{_fill}" is not a valid value' if _fill else "no value provided!"
-            tools.feedback(f"Unable to set fill color:- {issue}", True)
-
-        try:
-            if stroke in [None, []] and self.stroke in [None, []]:
-                canvas.setStrokeColor("black", 0)  # full transparency
-                if debug:
-                    tools.feedback("~~~ NO stroke color set!")
-            else:
-                _strk = ext(stroke) or ext(self.stroke)
-                canvas.setStrokeColor(_strk)
-        except (TypeError, ValueError):
-            tools.feedback(
-                f'Please check the stroke setting of "{_strk}"; it should be a color value.'
-            )
-        except AttributeError:
-            pass
-        try:
-            the_stwd = ext(stroke_width) or ext(self.stroke_width)
-            canvas.setLineWidth(the_stwd)  # units are points!
-        except TypeError:
-            tools.feedback(
-                f'Please check the stroke_width setting of "{the_stwd}";'
-                " it should be a number."
-            )
-        except AttributeError:
-            pass
-        _stroke_cap = ext(stroke_cap)
-        if _stroke_cap:
-            if _stroke_cap in ["r", "rounded"]:
-                canvas.setLineCap(1)
-            elif _stroke_cap in ["s", "square"]:
-                canvas.setLineCap(2)
-            else:
-                tools.feedback(f'Line cap type "{_stroke_cap}" cannot be used.', False)
-        _dotted = ext(dotted) or ext(self.dotted)
-        _dashed = ext(dashed) or ext(self.dashed)
-        if _dotted:
-            # _dots = self.values_to_points([0.03, 0.03])
-            _dots = [the_stwd, the_stwd]
-            canvas.setDash(array=_dots)
-        elif _dashed:
-            dash_points = self.values_to_points(_dashed)
-            canvas.setDash(array=dash_points)
-        else:
-            canvas.setDash(array=[])
-        """
+        """Wrapper is here to pass self attributes into set_canvas_props."""
+        defaults = {}
+        defaults["fill"] = self.fill
+        defaults["stroke"] = self.stroke
+        defaults["stroke_cap"] = self.stroke_cap
+        defaults["stroke_width"] = self.stroke_width
+        defaults["transparency"] = self.transparency
+        defaults["dotted"] = self.dotted
+        defaults["dashed"] = self.dashed
+        # print(f'### SetCnvProps: {kwargs.keys()} \n {kwargs.get("closed", "?")=}')
+        return tools.set_canvas_props(cnv, index, defaults, **kwargs)
 
     def draw(self, cnv=None, off_x=0, off_y=0, ID=None, **kwargs):
         """Draw an element on a given canvas."""
@@ -1566,7 +1110,7 @@ class BaseShape:
         self.use_abs_c = (
             True if self._abs_cx is not None and self._abs_cy is not None else False
         )
-        # tools.feedback(f'### draw baseshape: {self._abs_x=} {self._abs_y=} {self._abs_cx=} {self._abs_cy=}')
+        # feedback(f'### draw baseshape: {self._abs_x=} {self._abs_y=} {self._abs_cx=} {self._abs_cy=}')
 
     def check_settings(self) -> tuple:
         """Validate that the user-supplied parameters for choices are correct"""
@@ -1762,13 +1306,13 @@ class BaseShape:
         # ---- rectangle - peaks
         if self.peaks:
             if not isinstance(self.peaks, list):
-                tools.feedback(f"The peaks '{self.peaks}' is not a valid list!", True)
+                feedback(f"The peaks '{self.peaks}' is not a valid list!", True)
             for point in self.peaks:
                 try:
                     _dir = point[0]
                     value = tools.as_float(point[1], " peaks value")
                     if _dir.lower() not in ["n", "e", "w", "s", "*"]:
-                        tools.feedback(
+                        feedback(
                             f'The peaks direction must be one of n, e, s, w (not "{_dir}")!',
                             True,
                         )
@@ -1780,7 +1324,7 @@ class BaseShape:
                     else:
                         self.peaks_dict[_dir] = value
                 except Exception:
-                    tools.feedback(f'The peaks setting "{point}" is not valid!', True)
+                    feedback(f'The peaks setting "{point}" is not valid!', True)
 
         return correct, issue
 
@@ -1808,7 +1352,7 @@ class BaseShape:
                 if value in self.kwargs.get("common")._kwargs:
                     return True
             except AttributeError:
-                tools.feedback(
+                feedback(
                     "Unable to process Common properties"
                     " - has the Common command been set?",
                     True,
@@ -1871,15 +1415,13 @@ class BaseShape:
                 width_height:
                     the (width, height) of the output frame for the image
             """
-            # tools.feedback(f"### {img_path=} {slice_portion=}")
+            # feedback(f"### {img_path=} {slice_portion=}")
             if not slice_portion:
                 return None
             try:
                 _slice = slice_portion.lower()
                 if _slice[0] not in ["t", "m", "b", "l", "c", "r"]:
-                    tools.feedback(
-                        f'The sliced value "{slice_portion}" is not valid!', True
-                    )
+                    feedback(f'The sliced value "{slice_portion}" is not valid!', True)
                 img = Image.open(img_path)
                 iwidth = img.size[0]
                 iheight = img.size[1]
@@ -1919,13 +1461,13 @@ class BaseShape:
                 img2.save(sliced_filename)
                 return sliced_filename
             except Exception as err:
-                tools.feedback(
+                feedback(
                     f'The sliced value "{slice_portion}" is not valid! ({err})', True
                 )
             return None
 
         def get_image_from_svg(image_location: str = None):
-
+            """Load SVG image and convert to PNG."""
             with open(image_location) as f:
                 svg_code = f.read()
             png_bytes = cairosvg.svg2png(bytestring=svg_code.encode("utf-8"), dpi=300)
@@ -1934,7 +1476,7 @@ class BaseShape:
 
         def save_image_from_url(url: str):
             """Download image from network and save locally if not present."""
-            # tools.feedback(f"### image save: {url=} ")
+            # feedback(f"### image save: {url=} ")
             loc = urlparse(url)
             filename = loc.path.split("/")[-1]
             image_local = os.path.join(cache_directory, filename)
@@ -1973,9 +1515,7 @@ class BaseShape:
                 try:
                     img = get_image_from_svg(img_path)
                 except Exception:
-                    tools.feedback(
-                        f'Unable to open and process the image "{img_path}"', True
-                    )
+                    feedback(f'Unable to open and process the image "{img_path}"', True)
             iwidth = img.size[0]
             iheight = img.size[1]
             iratio = iwidth / iheight
@@ -2010,8 +1550,30 @@ class BaseShape:
             if cache_directory:
                 if tools.is_url_valid(image_location):
                     image_local = save_image_from_url(image_location)
+
+            # ---- round image
+            if self.rounding:
+                image_in = Image.open(image_local)
+                mask = Image.new("L", image_in.size, 0)
+                draw = ImageDraw.Draw(mask)
+                # draw.ellipse((0, 0, image_in.size[0], image_in.size[1]), fill=255)
+                draw.rounded_rectangle(
+                    ((0, 0), (image_in.size[0], image_in.size[1])),
+                    self.rounding,
+                    fill=255,
+                )
+                rounded_image = Image.composite(
+                    image_in, Image.new("RGBA", image_in.size, (0, 0, 0, 0)), mask
+                )
+
+                membuf = io.BytesIO()
+                rounded_image.save(membuf, format="png")
+                png_data = membuf.getvalue()
+                imgdoc = pymupdf.open(stream=png_data)  # in-memory image document
+            else:
+                imgdoc = pymupdf.open(image_local)  # open file image as document
+
             # ---- draw image
-            imgdoc = pymupdf.open(image_local)  # open image file as a␣document
             pdfbytes = imgdoc.convert_to_pdf()  # make a 1-page PDF of it
             imgpdf = pymupdf.open("pdf", pdfbytes)
             rct = pymupdf.Rect(scaffold)
@@ -2052,9 +1614,15 @@ class BaseShape:
             if is_directory:
                 return img, True
             # check image exists
+            if platform == "linux" or platform == "linux2":
+                image_local = os.path.normpath(image_local.replace("\\", "/")).replace(
+                    os.sep, "/"
+                )
             if not os.path.exists(image_local):
-                tools.feedback(
-                    f'Unable to find or open image "{image_location}"', False, True
+                feedback(
+                    f'Unable to find or open image "{image_location}" (also tried in "{image_local}"',
+                    False,
+                    True,
                 )
                 return img, True
 
@@ -2081,7 +1649,7 @@ class BaseShape:
                 img = image_render(image_local)
             return img, is_directory
         except IOError as err:
-            tools.feedback(
+            feedback(
                 f'Unable to find or open image "{base_image_location}"' f" ({err}).",
                 False,
                 True,
@@ -2171,7 +1739,7 @@ class BaseShape:
                     return float(value) / self.units
         except Exception as err:
             log.exception(err)
-            tools.feedback(
+            feedback(
                 f'Unable to do unit conversion from "{value}" using {self.units}!', True
             )
 
@@ -2190,12 +1758,10 @@ class BaseShape:
                 case None:
                     return [float(item) * self.units for item in items]
                 case _:
-                    tools.feedback(
-                        f'Unable to convert units "{units_name}" to points!', True
-                    )
+                    feedback(f'Unable to convert units "{units_name}" to points!', True)
         except Exception as err:
             log.exception(err)
-            tools.feedback(f'Unable to convert value(s) "{items}" to points!', True)
+            feedback(f'Unable to convert value(s) "{items}" to points!', True)
 
     def draw_multi_string(
         self, canvas, xm, ym, string, align=None, rotation=0, **kwargs
@@ -2245,17 +1811,17 @@ class BaseShape:
         # ---- align and font
         align = align or self.align
         mvy = copy.copy(ym)
-        # tools.feedback(f"### {string=} {rotation=}")
+        # feedback(f"### {string=} {rotation=}")
         # ---- text properties
         keys = {}
         keys["fontsize"] = kwargs.get("font_size", self.font_size)
         keys["fontname"] = kwargs.get("font_name", self.font_name)
         # keys['fontfile'] = self.font_file
         _color = kwargs.get("stroke", self.stroke)
-        keys["color"] = get_color(_color)
+        keys["color"] = tools.get_color(_color)
         if kwargs.get("stroke_inner"):
             _fill = kwargs.get("stroke_inner", self.stroke)
-            keys["fill"] = get_color(_fill)
+            keys["fill"] = tools.get_color(_fill)
         else:
             keys["fill"] = keys["color"]
 
@@ -2283,7 +1849,7 @@ class BaseShape:
             fi = FontInterface(cache_directory=cache_directory)
             keys["fontfile"] = fi.get_font_file(name=keys["fontname"])
             if not keys["fontfile"]:
-                tools.feedback(
+                feedback(
                     f'Cannot find or load a font named `{keys["fontname"]}`.'
                     f' Defaulting to "{DEFAULT_FONT}".',
                     False,
@@ -2321,13 +1887,13 @@ class BaseShape:
             canvas.insert_text(point, string, morph=morph, **keys)
         except Exception as err:
             if "need font file" in str(err):
-                tools.feedback(
+                feedback(
                     f'The font "{self.font_name}" cannot be found -'
                     " please check spelling and/or location",
                     True,
                 )
             else:
-                tools.feedback(f'Cannot write "{string}" - {err}', True)
+                feedback(f'Cannot write "{string}" (Error: {err})', True)
 
     def draw_string(self, canvas, xs, ys, string, align=None, rotation=0, **kwargs):
         """Draw a multi-string on the canvas."""
@@ -2557,7 +2123,7 @@ class BaseShape:
             )
             for step in steps:
                 if step > 1:
-                    tools.feedback("The arrow_position value must be less than 1", True)
+                    feedback("The arrow_position value must be less than 1", True)
                 the_tip = geoms.fraction_along_line(point_start, point_end, step)
                 tips.append(the_tip)
         else:
@@ -2644,7 +2210,7 @@ class BaseShape:
             * Directions of vertex indices in left- and right-sides must be the same
         """
         delta = side / (line_count + 1)
-        # tools.feedback(f'### {side=} {line_count=} {delta=} {skip_ends=}')
+        # feedback(f'### {side=} {line_count=} {delta=} {skip_ends=}')
         for number in range(0, line_count + 2):
             if skip_ends:
                 if number == line_count + 1 or number == 0:
@@ -2711,11 +2277,11 @@ class BaseShape:
 
             elif isinstance(value, Template):
                 if not self.deck_data:
-                    tools.feedback(
+                    feedback(
                         "Cannot use T() or S() command without Data already defined!",
                         False,
                     )
-                    tools.feedback(
+                    feedback(
                         "Check that Data command is used before Deck command.",
                         True,
                     )
@@ -2725,21 +2291,17 @@ class BaseShape:
                     # print('### Template', f'{ID=} {key=} {custom_value=}')
                     return custom_value
                 except jinja2.exceptions.UndefinedError as err:
-                    tools.feedback(
-                        f"Unable to process data with this template ({err})", True
-                    )
+                    feedback(f"Unable to process data with this template ({err})", True)
                 except Exception as err:
-                    tools.feedback(
-                        f"Unable to process data with this template ({err})", True
-                    )
+                    feedback(f"Unable to process data with this template ({err})", True)
 
             elif isinstance(value, TemplatingType):
                 if not self.deck_data:
-                    tools.feedback(
+                    feedback(
                         "Cannot use T() or S() command without Data already defined!",
                         False,
                     )
-                    tools.feedback(
+                    feedback(
                         "Check that Data command is used before Deck command.",
                         True,
                     )
@@ -2750,22 +2312,17 @@ class BaseShape:
                     if value.function:
                         try:
                             custom_value = value.function(custom_value)
-                            breakpoint()
                         except Exception as err:
-                            tools.feedback(
+                            feedback(
                                 f"Unable to process data with function '{ value.function}' ({err})",
                                 True,
                             )
 
                     return custom_value
                 except jinja2.exceptions.UndefinedError as err:
-                    tools.feedback(
-                        f"Unable to process data with this template ({err})", True
-                    )
+                    feedback(f"Unable to process data with this template ({err})", True)
                 except Exception as err:
-                    tools.feedback(
-                        f"Unable to process data with this template ({err})", True
-                    )
+                    feedback(f"Unable to process data with this template ({err})", True)
 
             elif isinstance(value, LookupType):
                 record = self.deck_data[ID]
@@ -2815,7 +2372,7 @@ class BaseShape:
     def draw_border(self, cnv, border: tuple, ID: int = None):
         """Draw a border line based its settings."""
         if not isinstance(border, tuple):
-            tools.feedback(
+            feedback(
                 'The "borders" property must contain a list of one or more sets'
                 f' - not "{border}"',
                 True,
@@ -2837,7 +2394,7 @@ class BaseShape:
             bdirections = border[0]
             bwidth = border[1]
         if len(border) <= 1:
-            tools.feedback(
+            feedback(
                 'A "borders" set must contain: direction, width, color'
                 f' and an optional style - not "{border}"',
                 True,
@@ -2874,7 +2431,7 @@ class BaseShape:
                             x, y = self.vertexes[3][0], self.vertexes[3][1]
                             x_1, y_1 = self.vertexes[0][0], self.vertexes[0][1]
                         case _:
-                            tools.feedback(
+                            feedback(
                                 f"Invalid direction ({bdirection}) for {shape_name} border",
                                 True,
                             )
@@ -2894,7 +2451,7 @@ class BaseShape:
                             x, y = self.vertexes[0][0], self.vertexes[0][1]
                             x_1, y_1 = self.vertexes[1][0], self.vertexes[1][1]
                         case _:
-                            tools.feedback(
+                            feedback(
                                 f"Invalid direction ({bdirection}) for {shape_name} border",
                                 True,
                             )
@@ -2921,7 +2478,7 @@ class BaseShape:
                                 x, y = self.vertexes[1][0], self.vertexes[1][1]
                                 x_1, y_1 = self.vertexes[2][0], self.vertexes[2][1]
                             case _:
-                                tools.feedback(
+                                feedback(
                                     f"Invalid direction ({bdirection}) for pointy {shape_name} border",
                                     True,
                                 )
@@ -2946,7 +2503,7 @@ class BaseShape:
                                 x, y = self.vertexes[0][0], self.vertexes[0][1]
                                 x_1, y_1 = self.vertexes[1][0], self.vertexes[1][1]
                             case _:
-                                tools.feedback(
+                                feedback(
                                     f"Invalid direction ({bdirection}) for flat {shape_name} border",
                                     True,
                                 )
@@ -2958,7 +2515,7 @@ class BaseShape:
                 case _:
                     match bdirection:
                         case _:
-                            tools.feedback(f"Cannot draw borders for a {shape_name}")
+                            feedback(f"Cannot draw borders for a {shape_name}")
 
             # ---- draw line
             cnv.draw_line((x, y), (x_1, y_1))

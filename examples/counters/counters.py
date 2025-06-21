@@ -7,7 +7,7 @@ Updated on: 8 April 2025
 """
 from protograf import *
 
-Create(filename='tannenberg.pdf', margin_left=1.5)
+Create(filename='tannenberg.pdf', margin_left=1.5, margin_top=1.5)
 
 # create counters
 CounterSheet(

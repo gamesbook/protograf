@@ -6,7 +6,7 @@ Created on: 19 February 2016
 """
 from protograf import *
 
-Create(filename='cards_design.pdf', margin_bottom=1.9)
+Create(filename='cards_design.pdf', margin=1, margin_bottom=1.9)
 
 # design deck
 Deck(

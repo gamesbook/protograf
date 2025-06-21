@@ -17,7 +17,7 @@ Notes:
 from protograf import *
 
 # create counters
-Create(filename='blocks_csv.pdf')
+Create(filename='blocks_csv.pdf', margin_left=1.5, margin_top=1.5)
 
 # load data; sets no. of counters based on rows in the CSV file
 Data(filename="blocks.csv")

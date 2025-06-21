@@ -46,8 +46,8 @@ numbers - that appears in the design.
 Why not use a professional graphics package?
 ============================================
 
-Obviously, if you use a graphics package as an everyday tool, that will
-probably suit your needs perfectly.
+Obviously, if you're a designer who uses a graphics package as an everyday
+tool, that will suit your needs perfectly.
 
 However, there might be a reason to use something simpler. Daniel, of
 https://daniel.games/ has this to say about making a game prototype which
@@ -58,7 +58,7 @@ is ready to show to a wider audience:
     Your layout (of cards and other objects) should just be flat areas of
     muted colour, with text on top of it. It's simple and functional.
 
-    Don't use textures, bevels, gradients, realistic shadows, or other
+    **Don't** use textures, bevels, gradients, realistic shadows, or other
     embellishments.
 
     The best design is design done by a professional. The second-best design
@@ -72,6 +72,10 @@ is ready to show to a wider audience:
 
 So, **protograf** aims to help you achieve the above |dash| the
 "second-best design"!
+
+To see how a professional graphic designer develops production-ready design
+of game components, watch this interview with Brigette Indelicato at
+https://www.youtube.com/watch?v=_PfOjSAEFUY
 
 
 How do I use **protograf**?

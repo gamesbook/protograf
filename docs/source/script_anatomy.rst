@@ -1,4 +1,4 @@
-:==============
+==============
 Script Anatomy
 ==============
 
@@ -77,7 +77,7 @@ Create Command
 The ``Create()`` command is the essential command that **must** appear first
 in every script.
 
-``Create()`` sets up the basic document framework to support all of the
+``Create()`` to support all of the
 elements that will appear after it.
 
 .. HINT::
@@ -88,7 +88,7 @@ elements that will appear after it.
         FEEDBACK:: Please ensure Create() command has been called first!
 
 By default, this command will setup an A4 page |dash| in portrait mode |dash|
-with a margin of one-half inch (1.25cm), and units of centimetres;
+with margins of one-quarter inch (0.625cm), and units of centimetres;
 the resulting output file will have the same name as the script,
 but with a ``.pdf`` extension.
 
@@ -98,8 +98,11 @@ To customise the command, set its properties as follows:
   or B6 down to B0 - or a USA type - letter, legal or elevenSeventeen; to change
   the page orientation to **landscape** simply append ``-l`` to the name |dash|
   for example, ``"A3-l"`` is a landscape A3 paper size
+- **paper_width** - set a specific paper width using the defined *units*
+- **paper_height** - set a specific paper height using the defined *units*
 - **filename** - name of the output PDF file; by default this is the prefix
   name of the script, with a ``.pdf`` extension
+- **fill** - set the color for the page; the default page color is ``white``
 - **units** - these can be ``cm`` (centimetres), ``in`` (inches), ``mm``
   (millimetres), or ``points``; the default is ``cm``
 - **margin** - set the value for *all* margins using the defined *units*
@@ -107,13 +110,18 @@ To customise the command, set its properties as follows:
 - **margin_bottom** - set the bottom margin
 - **margin_left** - set the left margin
 - **margin_right** - set the the right margin
+- **margin_debug** - set to ``True`` to show the margin as a dotted blue line
+- **page_grid** - if set to a number, will display a squared grid of thin
+  horizontal and vertical lines, set a distance "unit" apart |dash| where the distance depends on the
+  current *units*
 
 
 Example 1. Create Options
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Here is an example of a customised ``Create`` command, for an A3-sized page
-in landscape mode, with top and left margins being 2 inches each:
+in landscape mode, with units of inches (``in``) and top and left margins
+being set to 2 inches each:
 
 .. code:: python
 
@@ -124,6 +132,33 @@ in landscape mode, with top and left margins being 2 inches each:
         margin_top=2,
         margin_left=2,
     )
+
+
+Example 2. Grid and Margin Display
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. |cr1| image:: images/customised/blank_grid.png
+   :width: 330
+
+===== ======
+|cr1| Here is an example of a customised ``Create`` command, for an A8-sized
+      page in portrait mode, with margins being 0.5 cm each. A grid of 0.5 cm
+      is displayed and the margins are shown as dotted lines.
+
+      This type of setup is useful when working on a design but is typically
+      not shown as part of a final product.
+
+      .. code:: python
+
+        Create(
+            filename="blank.pdf",
+            paper='A8',
+            margin=0.5,
+            page_grid=0.5,
+            margin_debug=True,
+        )
+
+===== ======
 
 .. _pagebreak-command:
 
@@ -153,14 +188,16 @@ To customise the command, set its properties as follows:
 
 - **output** - this can be set to:
 
-  - ``png`` - to create one image file per page of the PDF; by default the name
-    of the PNG files are derived using the PDF filename, with a ``-`` followed
-    by the page number;
-  - ``svg`` - to create one file per page of the PDF; by default the name
+  - ``png`` - to create one image file per page of the PDF; by default the
+    names of the PNG files are derived using the PDF filename, with a ``-``
+    followed by the page number;
+  - ``svg`` - to create one file per page of the PDF; by default the names
     of the SVG files are derived using the PDF filename, with a ``-`` followed
     by the page number;
   - ``gif`` - to create a GIF file composed of all the PNG pages (these will be
     removed after the file been created)
+- **directory** - sets the location where the output will be created; the
+  default is the directory on which the script is being run
 - **dpi** - can be set to the dots-per-inch resolution required; by default
   this is ``300``
 - **names** - this can be used to provide a list of names |dash| without an
@@ -169,8 +206,13 @@ To customise the command, set its properties as follows:
   and so on.  Each will automatically get the correct extension added to it.
   If the term ``None`` is used in place of a name, then that page will **not**
   have an output file created for it.
+- **cards** - when set to ``True`` will cause all the card fronts to be
+  exported as PNG files; the names of the files are based on the PDF
+  filename, with a dash (-) followed by the page number, and ``.png`` file
+  extension
 - **framerate** - the delay in seconds between each "page" of a GIF image; by
   default this is ``1`` second
+
 
 Example 1. Save PNG
 ~~~~~~~~~~~~~~~~~~~
@@ -205,6 +247,46 @@ Here is another example of a customised ``Save`` command:
 In this example, an animated GIF image will be created, assembled out of the
 PNG images; one per page of the PDF.  There will be a delay of half-a-second
 between the showing of each image.
+
+Example 3. Customise Outputs
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Here are various examples of a customised ``Save`` command:
+
+.. code:: python
+
+    # 1.
+    Save()
+    # 2.
+    Save(directory="/tmp/test")
+    # 3.
+    Save(output="png", directory="/tmp/test")
+    # 4.
+    Save(cards=True, directory="/tmp/test")
+    # 5.
+    Save(cards=True, output="png", directory="/tmp/test")
+    # 6.
+    Save(cards=True, output="png")
+
+The outcomes will be as follows:
+
+1. The PDF for the script will be created in the directory where its being run
+2. The PDF for the script will be created in the ``/tmp/test`` directory,
+   which must already exist
+3. The PDF for the script will be created in the ``/tmp/test`` directory,
+   which must already exist, as well as a PNG image for each page in the PDF
+4. The PDF for the script will be created in the ``/tmp/test`` directory,
+   which must already exist, as well as a PNG image for each card in the PDF
+   (this example assumes you are working with the :ref:`Deck <the-deck-command>`
+   command)
+5. The PDF for the script will be created in the ``/tmp/test`` directory,
+   which must already exist, as well as a PNG image for each page in the PDF,
+   and also a PNG image for each card in the PDF (this example assumes you are
+   working with the :ref:`Deck <the-deck-command>` command)
+6. The PDF for the script will be created in the directory where its being run
+   as well as a PNG image for each page in the PDF, and also a PNG image for
+   each card in the PDF (this example assumes you are  working with the
+   :ref:`Deck <the-deck-command>` command)
 
 
 Other Commands

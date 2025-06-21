@@ -2,7 +2,7 @@
 Appendix III: Useful Resources
 ==============================
 
-These are resources that can supplement, or aid, with game design when
+These are resources that might supplement, or aid, with game design when
 working with :doc:`protograf <index>`.
 
 .. NOTE::
@@ -10,8 +10,8 @@ working with :doc:`protograf <index>`.
    Inclusion of these links does **not** constitute a recommendation
    of them or their use!
 
-Icons and Images
-================
+Icons, Art and Images
+=====================
 
 -  https://openclipart.org/
 -  https://www.svgrepo.com/
@@ -20,6 +20,14 @@ Icons and Images
 -  https://bioart.niaid.nih.gov/ - medical, biological, animal and "various"
    in PNG and SVG formats
 -  https://thenounproject.com/ (some free, provided they are attributed)
+-  https://developers.google.com/fonts/docs/material_icons - downloadable set
+   of free-to-use small icons in PNG/SVG format
+
+There is a collated list of sites with free *artwork* at
+https://www.fairway3games.com/where-do-i-get-art-for-free-an-ongoing-list/
+(if this site is down, check the archived copy:
+https://web.archive.org/web/20220330035328/https://www.fairway3games.com/where-do-i-get-art-for-free-an-ongoing-list/)
+
 
 Card Images
 ===========
@@ -56,16 +64,16 @@ Other Tools
 ===========
 
 - https://www.ttgda.org/software-tools - lists a number of tools that
-  can be used for game design.
+  can be used for game design
 - https://github.com/christianbachmann/board-game-design-canvas - an outline
   for a game development process that can help choose *what* you need to
   prototype
 
 .. HINT::
 
-    Please also see the sections on
-    :ref:`other hexagonal resources <other-hexagonal-resources>`
-    as well as  :ref:`other playing cards resources <other-card-resources>`
+    Please also refer to the sections on
+    :ref:`hexagonal grid resources <other-hexagonal-resources>`
+    as well as  :ref:`playing cards resources <other-card-resources>`.
 
 
 BoardGameGeek

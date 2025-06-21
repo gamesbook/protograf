@@ -38,6 +38,7 @@ package_logger = logging.getLogger("fontTools")
 package_logger.setLevel(logging.ERROR)
 
 from .support import BUILT_IN_FONTS
+from .messaging import feedback
 
 
 def builtin_font(name: str) -> Union[str, None]:
@@ -85,11 +86,13 @@ class FontInterface:
                     self.font_families = pickle.load(file)
                 if self.font_families:
                     return
+        feedback("Setting up fonts ... ... ... please be patient!", False)
         self.load_font_files()
         for ffile in self.font_files:
             fdt = self.extract_font_summary(ffile)
             if fdt:
                 family = fdt.get("fontFamily")
+                # if 'Eagle' in family: breakpoint()
                 if family:
                     if family not in list(self.font_families.keys()):
                         self.font_families[family] = []
@@ -114,7 +117,6 @@ class FontInterface:
                                 "class": fdt["fontSubfamily"],
                             }
                         )
-        breakpoint()
         if self.font_families:
             with open(cache_file, "wb") as file:
                 pickle.dump(self.font_families, file)

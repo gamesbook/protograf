@@ -11,14 +11,14 @@ Note:
 from protograf import *
 
 # create deck
-Create(filename='cards_standard.pdf', margin_bottom=1.9)
+Create(filename='cards_standard.pdf', margin=1, margin_bottom=1.9)
 
 # generate data for cards
 combos = Matrix(
     labels=['SUIT', 'VALUE'],
     data=[
-        ['\u2660', '\u2663', '\u2665', '\u2666'],  # spade, club, heart, diamond
-        #['\xab', '\xa8', '\xaa', ' \xa9'],  # spade, club, heart, diamond
+        #['\u2660', '\u2663', '\u2665', '\u2666'],  # spade, club, heart, diamond
+        ['\xab', '\xa8', '\xaa', ' \xa9'],  # spade, club, heart, diamond
         ['K', 'Q', 'J', '10', '9', '8', '7', '6', '5', '4', '3', '2', 'A'],
     ])
 Data(matrix=combos, extra=2)  # will (re)set no. of cards based on length

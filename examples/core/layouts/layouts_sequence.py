@@ -52,7 +52,7 @@ PageBreak()
 
 # ---- sequence_shapes
 Blueprint()
-Text(common=txt, text="Sequence: shapes, label")
+Text(common=txt, text="Sequence: shapes, setting")
 Sequence(
     circle(cx=3.5, cy=5, radius=0.3, label="{{sequence}}"),
     setting=[4, 'B?', '', 'C!', 'VI'],
@@ -64,11 +64,17 @@ Sequence(
     interval_x=1.2,
     )
 Sequence(
-    [hexagon(x=0.5, y=1.5, radius=0.5, title_size=8, title="Fig. {{sequence}}"),
-     circle(cx=1, cy=2, radius=0.2, fill="gray")],
+    [hexagon(x=0.25, y=1.5, radius=0.5, title_size=8, title="Fig. {{sequence}}"),
+     circle(cx=0.75, cy=2, radius=0.2, fill="gray")],
     setting=('A', 'C', 1),
     interval_y=1.5,
     interval_x=0.5,
+    )
+Sequence(
+    [square(x=2.5, y=2, side=0.5, rounded=True, label_size=8, label ="{{sequence}}")],
+    setting=list('DIANA'),
+    interval_y=0.6,
+    interval_x=0.0,
     )
 
 #Save()

@@ -8,6 +8,7 @@ import collections
 from itertools import zip_longest
 import jinja2
 import logging
+import io
 import os
 import pathlib
 import string
@@ -15,12 +16,22 @@ import sys
 from urllib.parse import urlparse
 import xlrd
 
-# third-paty
+# third-party
+from pymupdf import Shape as muShape, Point as muPoint, Matrix
+from pymupdf.utils import getColor
 import requests
 
 # local
-from protograf.utils.support import feedback
-from protograf.utils.structures import DirectionGroup, Point, TemplatingType
+from protograf.utils.constants import COLOR_NAMES, STANDARD_CARD_SIZES, PAPER_SIZES
+from protograf.utils.messaging import feedback
+from protograf.utils.support import to_units
+from protograf.utils.structures import (
+    DirectionGroup,
+    Point,
+    TemplatingType,
+    GlobalDocument,
+)
+from protograf import globals
 
 log = logging.getLogger(__name__)
 DEBUG = False
@@ -193,7 +204,6 @@ def as_int(value, label, maximum=None, minimum=None, allow_none=False) -> int:
             )
         return the_value
     except (ValueError, Exception):
-        breakpoint()
         feedback(f'The {_label}"{value}" is not a valid integer!!', True)
 
 
@@ -1133,6 +1143,290 @@ def is_url_valid(url: str, qualifying=MIN_ATTRIBUTES):
         if tokens.netloc[0:4] == "http" or tokens.netloc[0:5] == "https":
             return False
     return all(getattr(tokens, qualifying_attr) for qualifying_attr in qualifying)
+
+
+def save_globals() -> GlobalDocument:
+    """Create a copy of key globals settings"""
+    return GlobalDocument(
+        base=globals.base,
+        deck=globals.deck,
+        card_frames=globals.card_frames,
+        filename=globals.filename,
+        directory=globals.directory,
+        document=globals.document,
+        doc_page=globals.doc_page,
+        canvas=globals.canvas,
+        margins=globals.margins,
+        page=globals.page,
+        page_fill=globals.page_fill,
+        page_width=globals.page_width,
+        page_height=globals.page_height,
+        page_count=globals.page_count,
+        page_grid=globals.page_grid,
+    )
+
+
+def restore_globals(doc: GlobalDocument):
+    """Restore key globals settings"""
+    globals.base = doc.base
+    globals.deck = doc.deck
+    globals.card_frames = doc.card_frames
+    globals.filename = doc.filename
+    globals.directory = doc.directory
+    globals.document = doc.document
+    globals.doc_page = doc.doc_page
+    globals.canvas = doc.canvas
+    globals.margins = doc.margins
+    globals.page = doc.page
+    globals.page_fill = doc.page_fill
+    globals.page_width = doc.page_width
+    globals.page_height = doc.page_height
+    globals.page_count = doc.page_count
+    globals.page_grid = doc.page_grid
+
+
+def get_color(name: str = None, is_rgb: bool = True) -> tuple:
+    """Get a color tuple; by name from a pre-defined dictionary or as a RGB tuple."""
+    if name is None:
+        return None  # it IS valid to say that NO color has been set
+    if isinstance(name, tuple) and len(name) == 3:  # RGB color tuple
+        if (
+            (name[0] >= 0 and name[0] <= 255)
+            and (name[1] >= 0 and name[0] <= 255)
+            and (name[2] >= 0 and name[0] <= 255)
+        ):
+            return name
+        else:
+            feedback(f'The color tuple "{name}" is invalid!')
+    elif isinstance(name, str) and len(name) == 7 and name[0] == "#":  # hexadecimal
+        _rgb = tuple(int(name[i : i + 2], 16) for i in (1, 3, 5))
+        rgb = tuple(i / 255 for i in _rgb)
+        return rgb
+    else:
+        pass  # unknown format
+    if name.upper() not in COLOR_NAMES:
+        feedback(f'The color name "{name}" is not pre-defined!', True)
+    try:
+        color = getColor(name)
+        return color
+    except (AttributeError, ValueError):
+        feedback(f'The color name "{name}" cannot be converted to RGB!', True)
+
+
+def get_opacity(transparency: float = 0) -> float:
+    """Convert from '100% is fully transparent' to '0 is not opaque'."""
+    if transparency is None:
+        return 1.0
+    try:
+        return float(1.0 - transparency / 100.0)
+    except (ValueError, TypeError):
+        feedback(
+            f'The transparency of "{transparency}" is not valid (use 0 to 100)', True
+        )
+
+
+def unit(item, units: str = None, skip_none: bool = False, label: str = ""):
+    """Convert an item into the appropriate unit system."""
+    log.debug("units %s :: label: %s", units, label)
+    if item is None and skip_none:
+        return None
+    units = to_units(units) if units is not None else globals.units
+    try:
+        _item = as_float(item, label)
+        return _item * units
+    except (TypeError, ValueError):
+        _label = f" {label}" if label else ""
+        feedback(
+            f"Unable to set unit value for{_label}: {item}."
+            " Please check that this is a valid value.",
+            stop=True,
+        )
+
+
+def set_canvas_props(
+    cnv=None,
+    index=None,  # extract from list of potential values (usually Card options)
+    defaults=None,
+    **kwargs,
+):
+    """Set pymupdf Shape properties for fill, font, line, line style and colors
+
+    Notes:
+        If letting default a color parameter to None, then no resp. color selection
+        command will be generated. If fill and color are both None, then the drawing
+        will contain no color specification. But it will still be “stroked”,
+        which causes PDF’s default color “black” be used by PDF viewers.
+
+        The default value of width is 1.
+
+        The values width, color and fill have the following relationship:
+        • If fill=None, then shape elements will *always* be drawn with a border -
+          even if color=None (in which case black is taken) or width=0
+          (in which case 1 is taken).
+        • Shapes without border can only be achieved if a fill color is specified
+          (which may be be white). To achieve this, specify width=0.
+          In this case, the color parameter is ignored.
+    """
+
+    def ext(prop):
+        if isinstance(prop, str):
+            return prop
+        try:
+            return prop[index]
+        except TypeError:
+            return prop
+
+    # ---- set props
+    # print(f'^^^ SetCnvProps: {kwargs.keys()} \n {kwargs.get("closed", "?")=}')
+    cnv = cnv if cnv else globals.canvas
+    defaults = defaults if defaults else {}
+    if "fill" in kwargs.keys():
+        fill = kwargs.get("fill", None)  # reserve None for 'no fill at all'
+    else:
+        fill = defaults.get("fill")
+    if "stroke" in kwargs.keys():
+        stroke = kwargs.get("stroke", None)  # reserve None for 'no stroke at all'
+    else:
+        stroke = defaults.get("stroke", None)
+    # print(f'^^^ SCP {kwargs.get("fill")=} {fill=} {kwargs.get("stroke")=} {stroke=}')
+    # ---- transparency / opacity
+    opacity = 1
+    _transparency = kwargs.get("transparency", defaults.get("transparency"))
+    if _transparency:
+        _transparency = as_float(_transparency, "transparency")
+        if _transparency >= 1:
+            _transparency = _transparency / 100.0
+        opacity = 1 - _transparency
+    stroke_width = kwargs.get("stroke_width", None)
+    stroke_cap = kwargs.get("stroke_cap", None)
+    dotted = kwargs.get("dotted", None)
+    dashed = kwargs.get("dashed", None)
+    _rotation = kwargs.get("rotation", None)  # calling Shape must set a tuple!
+    _rotation_point = kwargs.get(
+        "rotation_point", None
+    )  # calling Shape must set a tuple!
+    closed = kwargs.get("closed", False)  # whether to connect last and first points
+    # ---- set line dots / dashed
+    _dotted = ext(dotted) or ext(defaults.get("dotted"))
+    _dashed = ext(dashed) or ext(defaults.get("dashed"))
+    if _dotted:
+        the_stwd = (
+            round(ext(stroke_width))
+            if stroke_width
+            else round(ext(defaults.get("stroke_width")))
+        )
+        the_stwd = max(the_stwd, 1)
+        dashes = f"[{the_stwd} {the_stwd}] 0"
+    elif _dashed:
+        _dlist = (
+            _dashed
+            if isinstance(_dashed, (list, tuple))
+            else sequence_split(_dashed, as_int=False)
+        )
+        doffset = round(unit(_dlist[2])) if len(_dlist) >= 3 else 0
+        dspaced = round(unit(_dlist[1])) if len(_dlist) >= 2 else ""
+        dlength = round(unit(_dlist[0])) if len(_dlist) >= 1 else ""
+        dashes = f"[{dlength} {dspaced}] {doffset}"
+    else:
+        dashes = None
+    # print(f"### SCP{_dotted =} {_dashed=} {dashes=}")
+    # ---- check rotation
+    morph = None
+    # print(f'^^^ SCP {_rotation_point=} {_rotation}')
+    if _rotation_point and not isinstance(_rotation_point, (Point, muPoint)):
+        feedback(f'Rotation point "{_rotation_point}" is invalid', True)
+    if _rotation is not None and not isinstance(_rotation, (float, int)):
+        feedback(f'Rotation angle "{_rotation}" is invalid', True)
+    if _rotation and _rotation_point:
+        # ---- * set rotation matrix
+        mtrx = Matrix(1, 1)
+        mtrx.prerotate(_rotation)
+        morph = (_rotation_point, mtrx)
+        # print(f'^^^ SCP {morph=}')
+    # ---- get color tuples
+    _color = get_color(stroke)
+    _fill = get_color(fill)
+    # ---- set width
+    _width = stroke_width or defaults.get("stroke_width")
+    if _color is None and _fill is None:
+        feedback("Cannot have both fill and stroke set to None!", True)
+    # print(f'^^^ SCP {stroke=} {fill=} {_color=} {_fill=}')  # None OR fraction RGB
+    # ---- set/apply properties
+    cnv.finish(
+        width=_width,
+        color=_color,
+        fill=_fill,
+        lineCap=stroke_cap or 0,  # or self.stroke_cap,  # FIXME
+        lineJoin=0,
+        dashes=dashes,
+        fill_opacity=opacity,
+        morph=morph,
+        closePath=closed,
+    )
+    cnv.commit()
+    return None
+
+
+def card_size(card_size: str = None, units: str = "pt") -> tuple:
+    """Return card width and height in requested units for a named size.
+
+    Doc Test:
+
+    >>> card_size('poker')
+    (180, 252)
+    >>> card_size('poker', 'in')
+    (2.5, 3.5)
+    >>> card_size('miniamerican', 'mm')
+    (41.0, 63.0)
+    """
+    size = None
+    if units not in ["pt", "mm", "in"]:
+        feedback(f'Card size units "{units}" is unknown.', True)
+    match str(card_size).lower():
+        case "bridge" | "b":
+            size = STANDARD_CARD_SIZES["bridge"][units]
+        case "business" | "u":
+            size = STANDARD_CARD_SIZES["business"][units]
+        case "mini" | "m":
+            size = STANDARD_CARD_SIZES["mini"][units]
+        case "miniamerican" | "ma":
+            size = STANDARD_CARD_SIZES["miniamerican"][units]
+        case "minieuropean" | "me":
+            size = STANDARD_CARD_SIZES["minieuropean"][units]
+        case "poker" | "p" | "mtg":
+            size = STANDARD_CARD_SIZES["poker"][units]
+        case "skat" | "s":
+            size = STANDARD_CARD_SIZES["skat"][units]
+        case "tarot" | "t":
+            size = STANDARD_CARD_SIZES["tarot"][units]
+        case "":
+            pass
+        case _:
+            feedback(f'Card size "{card_size}" is unknown.', True)
+    return size
+
+
+def paper_size(paper_size: str = None, units: str = "pt") -> tuple:
+    """Return paper width and height in requested units for a named size.
+
+    Doc Test:
+
+    >>> paper_size('A4')
+    (595, 842)
+    >>> paper_size('Legal', 'in')
+    (8.5, 14)
+    >>> paper_size('Notelet', 'pt')
+    (270, 270)
+
+    # >>> paper_size('A5', 'in')
+    # (180, 252)
+    """
+    if units not in ["pt", "mm", "in"]:
+        feedback(f'Paper size units "{units}" is unknown.', True)
+    try:
+        return PAPER_SIZES[paper_size][units]
+    except KeyError:
+        feedback(f'Paper size "{paper_size}" in "{units}" is unavailable.', True)
 
 
 if __name__ == "__main__":

@@ -70,7 +70,7 @@ cross-reference to the detailed information for that command.
 -  :ref:`Polygon <polygon-command>` * - a geometric shape that can be drawn on a page
 -  :ref:`Polyline <polyline-command>` * - a geometric shape that can be drawn on a page
 -  :ref:`Polyshape <polyshape-command>` * - an irregular geometric shape that can be drawn on a page
--  :ref:`Random <random-command>` - generate a random nunber within a range
+-  :ref:`Random <random-command>` - generate a random number within a range
 -  :doc:`Repeat <layouts_repeat>` - repeat the drawing of a shape across a rectangular grid pattern
 -  :ref:`Rectangle <rectangle-command>` * - a geometric shape that can be drawn on a page
    (see also further :ref:`customisation options <rectangleIndex>`)

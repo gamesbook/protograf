@@ -1,9 +1,10 @@
 # -*- coding: utf-8 -*-
 """
 Logo for protograf (aka "eat your own dogfood")
-s
+
 Written by: Derek Hohls
 Created on: 5 January 2025
+Updated on: 1 June 2025
 
 Notes:
     Not sure what font to use for your logo ... watch
@@ -43,8 +44,17 @@ Polygon(
     radii_stroke_width=0.5,
     sides=8
 )
+Text(x=-0.05, y=2, width=8, height=2,
+     text="""<span style="font-family: Helvetica; font-size: 7pt; color: #3085AC;">
+     <b>making prototypes &#8212;made simple</b></span>""",
+     html=True)
 
 Save(
     output='png',
     directory="../docs/source/examples/images/various"
 )
+
+# Option for resizable version
+# Save(output='svg',
+#      dpi=300,
+#      directory="/tmp/demo")

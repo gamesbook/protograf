@@ -71,7 +71,7 @@ PageBreak()
 
 # # ---- circle track + shape
 Blueprint()
-Text(common=txt, text="Track: circle; clockwise")
+Text(common=txt, text="Track: circle")
 #shp = rhombus(cx=1, cy=1, width=0.25, height=0.5, label='{{sequence}}')
 shp = hexagon(cx=1, cy=1, height=0.5, label='{{sequence}}')
 Track(
@@ -174,16 +174,16 @@ PageBreak()
 
 # ---- multi-type track starts
 Blueprint()
-Text(common=txt, text="Track: multiple types; starts")
+Text(common=txt, text="Track: multiple types; starting")
 shp = circle(cx=0, cy=0, radius=0.25, label='{{sequence}}')
 # square
 Track(
   Square(x=0.75, y=0.75, side=0.75, stroke="red"),
-  shapes=[shp])
+  shapes=[shp],
+  clockwise=False)
 Track(
   Square(x=2.75, y=0.75, side=0.75, stroke="red"),
-  shapes=[shp],
-  clockwise=True)
+  shapes=[shp])
 # circle
 Track(
   Circle(cx=1, cy=3, radius=0.5, stroke="red"),

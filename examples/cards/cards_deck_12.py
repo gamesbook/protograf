@@ -16,7 +16,7 @@ Deck(
     bleed_fill="lightsteelblue",
     offset=0.15,
     grid_marks=True,
-    grid_length=0.18,
+    grid_marks_length=0.2,
     spacing=0.15,
     )
 # design card
@@ -31,6 +31,8 @@ Card(
 )
 # create output
 Save(
-    cards='png',
-    dpi=300,
+     output='png',
+     dpi=300,
+     directory="../docs/source/images/decks",
+     names=['cards_deck_12',]
 )

@@ -8,6 +8,7 @@ ECHO "All examples ouput is saved to: %location%"
 
 REM ----  examples: basic
 ECHO "Creating basic examples..."
+python core\blank.py --no-png -d %location%
 python core\demo.py --no-png -d %location%
 python core\default_shapes.py --no-png -d %location%
 python core\diagram.py --no-png -d %location%
@@ -75,7 +76,7 @@ ECHO "Creating cards..."
 python cards\cards_design.py --no-png -d %location%
 python cards\cards_hexagonal.py --no-png -d %location%
 python cards\cards_circular.py --no-png -d %location%
-python cards\cards_lotr.py --no-png -d %location%
+python cards\cards_rectangular.py --no-png -d %location%
 python cards\cards_images.py --no-png -d %location%
 python cards\cards_matrix_one.py --no-png -d %location%
 python cards\cards_matrix_two.py --no-png -d %location%
@@ -97,6 +98,9 @@ python cards\cards_deck_07.py --no-png -d %location%
 python cards\cards_deck_08.py --no-png -d %location%
 python cards\cards_deck_09.py --no-png -d %location%
 python cards\cards_deck_10.py --no-png -d %location%
+python cards\cards_deck_11.py --no-png -d %location%
+python cards\cards_deck_12.py --no-png -d %location%
+python cards\cards_deck_13.py --no-png -d %location%
 
 REM ---- various
 ECHO "Creating various..."

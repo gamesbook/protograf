@@ -35,20 +35,26 @@ in the script.  It's primary purpose is to set the card size, and then
 calculate how many cards appear on a page.  It manages the "flow" of cards as
 they get drawn.
 
+
+.. _deck-command-primary:
+
 Primary Properties
 ------------------
 `↑ <table-of-contents-deck_>`_
 
-The following are key properties that will usually need to be set for a
+The following are key properties that will often need to be set for a
 ``Deck``:
 
-- **cards** - this is the number of cards appearing in the deck; it defaults
+- **cards** - the number of cards appearing in the deck; it defaults
   to 9; note that other commands such as ``Data()`` and ``Matrix()`` can alter
   this value
-- **height** - this is the card height for a rectangular card;
-  it defaults to 8.8 cm
-- **width** - this is the card width for a rectangular card;
-  it defaults to 6.3 cm
+- **height** - the card height for a rectangular card;
+  it defaults to 8.89 cm, or 3.5", i.e. the height of a Poker playing card
+- **width** - the card width for a rectangular card;
+  it defaults to 6.35 cm, or 2.5", i.e. the width of a Poker playing card
+
+
+.. _deck-command-secondary:
 
 Secondary Properties
 --------------------
@@ -58,6 +64,10 @@ The following are other properties that can also be set for a ``Deck``:
 
 - **bleed_fill** - set a background color for the page (up to the margins);
   if no separate **fill** property is set, then this color will be used instead
+- **card_size** - a pre-existing card size used to set *width* and *height*
+  (values for *width* and *height* will override these); can be one of:
+  ``"poker"``, ``"bridge"``, ``"mini"``, ``"miniamerican"``, ``"minieuropean"``,
+  ``"skat"``, ``"tarot"`` or ``"business"``
 - **cols** - the maximum number of card columns that should appear on a
   page
 - **copy** - the name of a column in the dataset defined by
@@ -68,13 +78,28 @@ The following are other properties that can also be set for a ``Deck``:
   height and width match); but can be set to *hexagon* or *circle*
 - **grid_marks** - if set to ``True``, will cause small marks to be drawn at
   the border of the page that align with the edges of the card frames
-- **grid_length** - the length of the grid mark; defaults to ``0.85`` cm
+- **grid_marks_length** - the length of the grid mark; defaults to ``0.85`` cm
   (about one-third of an inch)
+- **grid_marks_stroke** - the color of the grid mark; defaults to ``gray``
+- **grid_marks_stroke_width** - the line width of the grid mark; defaults to 0.1
 - **grouping** - sets the number of cards to be drawn adjacent to each other
   before a blank space is added by the **spacing** property |dash| use
   **grouping_col** and/or **grouping_row** to set spacing specifically for the
   horizontal (columns) or vertical (rows) direction respectively. Note that
   **grouping** does not apply to  *hexagon* **frame** cards.
+- **gutter** - a value set for this helps determines the spacing between the
+  fronts and backs of cards when these are drawn on two halves of the same
+  page; its value is divided in half, and added to the top margin value, and
+  each set of cards is drawn that distance away from the centre line of the page
+- **gutter_stroke** - if set, will cause a line of that color to be used
+  for the *gutter* line; this defaults to ``gray`` (to match grid marks)
+- **gutter_stroke_width** - if set to a value, will cause a line of that
+  thickness to be used for the *gutter* line
+- **gutter_dotted** - sets the style of the *gutter* line
+- **gutter_layout** - sets the orientation of the page for the cards drawn in
+  the two gutter "halves"; this can be ``portrait`` (the default) or
+  ``landscape```; the latter is useful when you have very tall cards e.g.
+  ``tarot`` sized ones.
 - **mask** - an expression which should evaluate to ``True`` or ``False``.
   This expression has the same kind of syntax as the
   :ref:`T(emplate) command <the-template-command>`
@@ -91,6 +116,12 @@ The following are other properties that can also be set for a ``Deck``:
   horizontal or vertical direction respectively.
 - **stroke** - sets the color of the card's border; defaults to ``black``
 
+.. HINT::
+
+    The one property that does not appear with the ``Deck()`` command is the
+    option to export the cards as individual PNG images.  To this you need
+    to add ``cards=True`` to the :ref:`Save() <save-command>` command.
+
 .. _property-examples:
 
 Property Examples
@@ -98,8 +129,8 @@ Property Examples
 `↑ <table-of-contents-deck_>`_
 
 - `Example 1. Defaults`_
-- `Example 2. Card bleed`_
-- `Example 3. Full bleed`_
+- `Example 2. Card Bleed`_
+- `Example 3. Full Bleed`_
 - `Example 4. Offset`_
 - `Example 5. Grid Marks`_
 - `Example 6. Card Spacing`_
@@ -108,10 +139,11 @@ Property Examples
 - `Example 9. Row Limit`_
 - `Example 10. Circular Frame`_
 - `Example 11. Card Grouping`_
+- `Example 12. CardBack and Gutter`_
 
 These examples are shown on a small A8-sized page, as the purpose is to
 illustrate how the Deck properties are used; normally cards would be
-set out on an A4- or Letter-sized page, but the principle will be the
+set out on A4- or Letter-sized pages, but the principle will be the
 same.
 
 In most cases |dash| except where otherwise shown |dash| a basic
@@ -172,7 +204,7 @@ Example 1. Defaults
 ===== ======
 
 
-Example 2. Card bleed
+Example 2. Card Bleed
 ---------------------
 `^ <property-examples_>`_
 
@@ -200,7 +232,7 @@ Example 2. Card bleed
 ===== ======
 
 
-Example 3. Full bleed
+Example 3. Full Bleed
 ---------------------
 `^ <property-examples_>`_
 
@@ -298,9 +330,9 @@ Example 5. Grid Marks
             bleed_fill="silver",
             offset=0.25,
             grid_marks=True,
-            grid_length=0.18,
-            grid_stroke="black",
-            grid_stroke_width=1)
+            grid_marks_length=0.2,
+            grid_marks_stroke="black",
+            grid_marks_stroke_width=1)
 
       In this example, there are two main changes from previous ones.
 
@@ -311,13 +343,13 @@ Example 5. Grid Marks
 
       The edge of the page has small marks that are designed to help with
       card cutting; ``grid_marks=True`` enables these marks, and the optional
-      *grid_length* allows the length of these lines to be set; the default
+      *grid_marks_length* allows the length of these lines to be set; the default
       length is ``0.85`` cm.
 
-      In this example, the ``grid_stroke`` has been changed from the default
-      color of ``"gray"`` to ``"black"`` and the ``grid_stroke_width`` has
-      been increased to ``1`` point.  (Normally, the stroke width should be
-      thin to better aid with cutting.)
+      In this example, the ``grid_marks_stroke`` has been changed from the
+      default color of ``"gray"`` to ``"black"`` and the
+      ``grid_marks_stroke_width`` has been increased to ``1`` point.
+      (Normally, the stroke width should be thin to better aid with cutting.)
 
 ===== ======
 
@@ -346,11 +378,11 @@ Example 6. Card Spacing
             bleed_fill="silver",
             offset=0.15,
             grid_marks=True,
-            grid_length=0.18,
+            grid_marks_length=0.2,
             spacing_x=0.1,
             spacing_y=0.15)
 
-      Depending on the priniting and cutting requirements, it can be useful
+      Depending on the printing and cutting requirements, it can be useful
       to add spacing (unused area) between the cards.
 
       The *spacing* property can sets spacing distance in both x- and
@@ -360,7 +392,7 @@ Example 6. Card Spacing
       using **spacing_x** for horizontal spacing and **spacing_y** for
       vertical spacing.
 
-      Using spacing also adds extra grid marks.
+      Note that using spacing also adds extra grid marks.
 
       .. HINT::
 
@@ -392,7 +424,7 @@ Example 7. Clean Layout
             bleed_fill="silver",
             offset=0.15,
             grid_marks=True,
-            grid_length=0.18,
+            grid_marks_length=0.2,
             spacing=0.15)
 
       Here, all the other adjustments to the Deck layout |dash| *bleed_fill*,
@@ -431,7 +463,7 @@ Example 8. Column Limit
             bleed_fill="silver",
             offset=0.15,
             grid_marks=True,
-            grid_length=0.18,
+            grid_marks_length=0.2,
             cols=1)
 
       By default, **protograf** will fit as many cards as possible into the
@@ -468,7 +500,7 @@ Example 9. Row Limit
             bleed_fill="silver",
             offset=0.15,
             grid_marks=True,
-            grid_length=0.18,
+            grid_marks_length=0.2,
             rows=1)
 
       By default, **protograf** will fit as many cards as possible into the
@@ -503,7 +535,7 @@ Example 10. Circular Frame
             bleed_fill="silver",
             offset=0.15,
             grid_marks=True,
-            grid_length=0.18,
+            grid_marks_length=0.2,
             spacing=0.15,
             frame='circle')
 
@@ -543,7 +575,7 @@ Example 11. Card Grouping
             bleed_fill="silver",
             offset=0.15,
             grid_marks=True,
-            grid_length=0.18,
+            grid_marks_length=0.2,
             spacing_x=0.3,
             spacing_y=0.15,
             grouping_cols=2,
@@ -564,5 +596,60 @@ Example 11. Card Grouping
       This example shows how cards in the same grouping |dash| whether in a row
       or column |dash| are kept together, and how the spacing is inserted
       between each *group* rather than between each *individual card*.
+
+===== ======
+
+
+Example 12. CardBack and Gutter
+-------------------------------
+`^ <property-examples_>`_
+
+.. |d13| image:: images/decks/cards_deck_13.png
+   :width: 330
+
+===== ======
+|d13| This example shows the definition of a deck for a set of small
+      cards.
+
+      The card size means that there would normally be 4 rectangular cards
+      on each A8 page; but the layout is changed to have a mix of normal
+      Cards and CardBacks. In this case, the card backs are created with a
+      green rectangle |dash| but any type of technique used for graphics for
+      the front of the card can also be used for the back.
+
+      .. code:: python
+
+        Deck(
+            cards=4,
+            height=2.1,
+            width=3.2,
+            bleed_fill="lightsteelblue",
+            offset=0.15,
+            grid_marks=True,
+            grid_marks_length=0.2,
+            gutter=0.4
+            )
+        # design card
+        Card(
+            '*',
+            rectangle(
+                x=0.2, y=0.2,
+                width=2.8, height=1.7,
+                stroke_width=1, rounding=0.2,
+                label='{{sequence}}\n{{id}}'),
+        )
+        # design card back
+        CardBack(
+            '*',
+            rectangle(
+                x=0.3, y=0.3,
+                width=2.5, height=1.5,
+                stroke_width=1, rounding=0.1,
+                fill="yellowgreen",
+                label='{{sequence}}*\n{{id}}'),
+        )
+
+      The ``gutter`` property for Deck() sets the space between the fronts
+      and the backs, which face each other across the page.
 
 ===== ======

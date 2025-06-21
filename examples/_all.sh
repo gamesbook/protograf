@@ -4,6 +4,7 @@ mkdir -p /tmp/demo
 echo -e "\nAll examples outputs are saved to /tmp/demo"
 # ---- examples: simple
 echo -e "\nCreating basic examples..."
+python core/blank.py -d /tmp/demo
 python core/demo.py -d /tmp/demo
 python core/diagram.py -d /tmp/demo
 python core/default_shapes.py -d /tmp/demo
@@ -63,7 +64,7 @@ echo -e "\nCreating cards..."
 python cards/cards_design.py -d /tmp/demo
 python cards/cards_hexagonal.py -d /tmp/demo
 python cards/cards_circular.py -d /tmp/demo
-python cards/cards_lotr.py -d /tmp/demo
+python cards/cards_rectangular.py -d /tmp/demo
 python cards/cards_images.py -d /tmp/demo
 python cards/cards_matrix_one.py -d /tmp/demo
 python cards/cards_matrix_two.py -d /tmp/demo
@@ -83,6 +84,9 @@ python cards/cards_deck_07.py -d /tmp/demo
 python cards/cards_deck_08.py -d /tmp/demo
 python cards/cards_deck_09.py -d /tmp/demo
 python cards/cards_deck_10.py -d /tmp/demo
+python cards/cards_deck_11.py -d /tmp/demo
+python cards/cards_deck_12.py -d /tmp/demo
+python cards/cards_deck_13.py -d /tmp/demo
 # -- various
 echo -e "\nCreating various..."
 python various/clock.py -d /tmp/demo

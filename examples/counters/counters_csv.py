@@ -11,7 +11,7 @@ Notes:
 from protograf import *
 
 # create counters
-Create(filename='tannenberg_csv.pdf', margin_left=1.5)
+Create(filename='tannenberg_csv.pdf', margin_left=1.5, margin_top=1.5)
 
 # load data
 # 1st row has these headers: NATION, TYPE, SIZE, VALUE, ID, COPIES

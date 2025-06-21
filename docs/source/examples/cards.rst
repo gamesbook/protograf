@@ -60,15 +60,26 @@ Discussion  This example shows how to construct a deck of cards using these
             The assignment as to which card (``Card``) can either be done via
             a string e.g. ``"4-6"`` or a list of numbers e.g. ``[1,2,3]``.
 
-            To set changes for cards at intervals; for example, every even
-            card and also every odd card:
+            To set changes for cards at intervals; for example, a set of even
+            cards |dash| as defined by their sequence number |dash| or a set
+            odd cards:
 
               .. code:: python
 
-                # element added to every odd card
+                # element added to every odd card in the range
                 Card(steps(1,9,2), rectangle())
-                # element added to every even card
+                # element added to every even card in the range
                 Card(steps(2,10,2), circle())
+
+            An alternate way to set changes for cards, specifically for odd
+            and even cards:
+
+              .. code:: python
+
+                # element added to every odd card in the deck
+                Card("odd", rectangle())
+                # element added to every even card in the deck
+                Card("even", circle())
 
 ----------- ------------------------------------------------------------------
 Screenshot  .. image:: images/cards/cards_simple.png

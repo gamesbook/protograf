@@ -9,7 +9,8 @@ import math
 
 # third party
 # local
-from protograf.utils.structures import Point, Locale  # named tuples
+from protograf.utils.messaging import feedback
+from protograf.utils.structures import Point, Locale
 from protograf.utils import tools, support
 from protograf.base import BaseShape, BaseCanvas
 from protograf.shapes import (
@@ -66,7 +67,7 @@ class GridShape(BaseShape):
                 (self.page_width - self.margin_left - self.margin_right)
                 / self.points_to_value(width)
             )
-        # tools.feedback(f'+++ {self.rows=} {self.cols=}')
+        # feedback(f'+++ {self.rows=} {self.cols=}')
         y_cols, x_cols = [], []
         for y_col in range(0, self.rows + 1):
             y_cols.append(y + y_col * height)
@@ -122,14 +123,14 @@ class DotGridShape(BaseShape):
         if "side" in self.kwargs and (
             "height" in self.kwargs or "width" in self.kwargs
         ):
-            tools.feedback(
+            feedback(
                 "Set either height&width OR side (not both) for a DotGrid", False, True
             )
-        # ---- number of blocks in grid:
+        # ---- number of blocks in grid
         if self.rows == 0:
-            self.rows = int((self.page_height) / self.points_to_value(height)) + 1
+            self.rows = int((self.page_height) / height) + 1
         if self.cols == 0:
-            self.cols = int((self.page_width) / self.points_to_value(width)) + 1
+            self.cols = int((self.page_width) / width) + 1
         # ---- set canvas
         size = self.dot_point / 2.0  # diameter is 3 points ~ 1mm or 1/32"
         self.fill = self.stroke
@@ -153,7 +154,7 @@ class SequenceShape(BaseShape):
     """
 
     def __init__(self, _object=None, canvas=None, **kwargs):
-        # tools.feedback(f'+++ SequenceShape {_object=} {canvas=} {kwargs=}')
+        # feedback(f'+++ SequenceShape {_object=} {canvas=} {kwargs=}')
         super(SequenceShape, self).__init__(_object=_object, canvas=canvas, **kwargs)
         self.kwargs = kwargs
         self._objects = kwargs.get(
@@ -169,9 +170,9 @@ class SequenceShape(BaseShape):
 
     def calculate_setting_list(self):
         if not isinstance(self.setting, tuple):
-            tools.feedback(f"Sequence setting '{self.setting}' must be a set!", True)
+            feedback(f"Sequence setting '{self.setting}' must be a set!", True)
         if len(self.setting) < 2:
-            tools.feedback(
+            feedback(
                 f"Sequence setting '{self.setting}' must include start and end values!",
                 True,
             )
@@ -231,14 +232,14 @@ class SequenceShape(BaseShape):
                     support.excel_column(int(value)) for value in _setting_list
                 ]
             else:
-                tools.feedback(
+                feedback(
                     f"The settings type '{self.set_type}' must rather be one of:"
                     " number, roman, excel or letter!",
                     True,
                 )
         except Exception as err:
             log.warning(err)
-            tools.feedback(
+            feedback(
                 f"Unable to evaluate Sequence setting '{self.setting}';"
                 " - please check and try again!",
                 True,
@@ -254,8 +255,8 @@ class SequenceShape(BaseShape):
             _ID = ID if ID is not None else self.shape_id
             _locale = Locale(sequence=item)
             kwargs["locale"] = _locale._asdict()
-            # tools.feedback(f'+++ @Seqnc@ {self.interval_x=}, {self.interval_y=}')
-            # tools.feedback(f'+++ @Seqnc@ {kwargs["locale"]}')
+            # feedback(f'+++ @Seqnc@ {self.interval_x=}, {self.interval_y=}')
+            # feedback(f'+++ @Seqnc@ {kwargs["locale"]}')
             off_x = _off_x + key * self.interval_x
             off_y = _off_y + key * self.interval_y
             flat_elements = tools.flatten(self._objects)
@@ -395,16 +396,16 @@ class VirtualShape:
         try:
             int_value = int(value)
             if minimum and int_value < minimum:
-                tools.feedback(
+                feedback(
                     f"{label} integer is less than the minimum of {minimum}!", True
                 )
             if maximum and int_value > maximum:
-                tools.feedback(
+                feedback(
                     f"{label} integer is more than the maximum of {maximum}!", True
                 )
             return int_value
         except Exception:
-            tools.feedback(f"{value} is not a valid {label} integer!", True)
+            feedback(f"{value} is not a valid {label} integer!", True)
 
     def to_float(self, value, label="") -> int:
         """Set a value to a float; or stop if an invalid value."""
@@ -413,7 +414,7 @@ class VirtualShape:
             return float_value
         except Exception:
             _label = f" for {label}" if label else ""
-            tools.feedback(f'"{value}"{_label} is not a valid floating number!', True)
+            feedback(f'"{value}"{_label} is not a valid floating number!', True)
 
 
 # ---- virtual Locations
@@ -463,7 +464,7 @@ class VirtualLocations(VirtualShape):
         self.pattern = str(self.pattern)
         self.direction = str(self.direction)
         if self.pattern.lower() not in ["default", "d", "snake", "s", "outer", "o"]:
-            tools.feedback(
+            feedback(
                 f"{self.pattern} is not a valid pattern - "
                 "use 'default', 'outer', 'snake'",
                 True,
@@ -478,7 +479,7 @@ class VirtualLocations(VirtualShape):
             "east",
             "e",
         ]:
-            tools.feedback(
+            feedback(
                 f"{self.direction} is not a valid direction - "
                 "use 'north', south', 'west', or 'east'",
                 True,
@@ -493,7 +494,7 @@ class VirtualLocations(VirtualShape):
             "east",
             "e",
         ]:
-            tools.feedback(
+            feedback(
                 f"{self.facing} is not a valid facing - "
                 "use 'north', south', 'west', or 'east'",
                 True,
@@ -508,19 +509,19 @@ class VirtualLocations(VirtualShape):
             or "e" in self.start.lower()[0]
             and "e" in self.direction.lower()[0]
         ):
-            tools.feedback(f"Cannot use {self.start} with {self.direction}!", True)
+            feedback(f"Cannot use {self.start} with {self.direction}!", True)
         if self.direction.lower() in ["north", "n", "south", "s"]:
             self.flow = "vert"
         elif self.direction.lower() in ["west", "w", "east", "e"]:
             self.flow = "hori"
         else:
-            tools.feedback(f"{self.direction} is not a valid direction!", True)
+            feedback(f"{self.direction} is not a valid direction!", True)
         if self.label_style and self.label_style.lower() != "excel":
-            tools.feedback(f"{self.label_style } is not a valid label_style !", True)
+            feedback(f"{self.label_style } is not a valid label_style !", True)
         if self.col_odd and self.col_even:
-            tools.feedback("Cannot use 'col_odd' and 'col_even' together!", True)
+            feedback("Cannot use 'col_odd' and 'col_even' together!", True)
         if self.row_odd and self.row_even:
-            tools.feedback("Cannot use 'row_odd' and 'row_even' together!", True)
+            feedback("Cannot use 'row_odd' and 'row_even' together!", True)
 
     def set_id(self, col: int, row: int) -> str:
         """Create an ID from row and col values."""
@@ -573,24 +574,20 @@ class RectangularLocations(VirtualLocations):
             self.interval_y = self.interval
         self.start = kwargs.get("start", "sw")
         if self.cols < 2 or self.rows < 2:
-            tools.feedback(
+            feedback(
                 f"Minimum layout size is 2x2 (cannot use {self.cols }x{self.rows})!",
                 True,
             )
         if self.start.lower() not in ["sw", "se", "nw", "ne"]:
-            tools.feedback(
+            feedback(
                 f"{self.start} is not a valid start - "
                 "use: 'sw', 'se', 'nw', or 'ne'",
                 True,
             )
         if self.side and kwargs.get("interval_x"):
-            tools.feedback(
-                "Using side will override interval_x and offset values!", False
-            )
+            feedback("Using side will override interval_x and offset values!", False)
         if self.side and kwargs.get("interval_y"):
-            tools.feedback(
-                "Using side will override interval_y and offset values!", False
-            )
+            feedback("Using side will override interval_y and offset values!", False)
 
     def next_locale(self) -> Locale:
         """Yield next Location for each call."""
@@ -658,7 +655,7 @@ class RectangularLocations(VirtualLocations):
             match self.pattern.lower():
                 # ---- * snake
                 case "snake" | "snaking" | "s":
-                    # tools.feedback(f'+++ {count=} {self.layout_size=} {self.stop=}')
+                    # feedback(f'+++ {count=} {self.layout_size=} {self.stop=}')
                     if count > self.layout_size or (self.stop and count > self.stop):
                         return
                     yield Locale(col, row, x, y, self.set_id(col, row), count, corner)
@@ -830,7 +827,7 @@ class RectangularLocations(VirtualLocations):
 
                     x = self.x + (col - 1) * self.interval_x
                     y = self.y + (row - 1) * self.interval_y
-                    # tools.feedback(f"+++ {x=}, {y=}, {col=}, {row=}")
+                    # feedback(f"+++ {x=}, {y=}, {col=}, {row=}")
 
 
 class TriangularLocations(VirtualLocations):
@@ -844,7 +841,7 @@ class TriangularLocations(VirtualLocations):
         self.start = kwargs.get("start", "north")
         self.facing = kwargs.get("facing", "north")
         if (self.cols < 2 and self.rows < 1) or (self.cols < 1 and self.rows < 2):
-            tools.feedback(
+            feedback(
                 f"Minimum layout size is 2x1 or 1x2 (cannot use {self.cols }x{self.rows})!",
                 True,
             )
@@ -858,7 +855,7 @@ class TriangularLocations(VirtualLocations):
             "w",
             "s",
         ]:
-            tools.feedback(
+            feedback(
                 f"{self.start} is not a valid start - " "use: 'n', 's', 'e', or 'w'",
                 True,
             )
@@ -872,7 +869,7 @@ class TriangularLocations(VirtualLocations):
 
         # TODO - create logic
         if self.pattern.lower() in ["snake", "snaking", "s"]:
-            tools.feedback("Snake pattern NOT YET IMPLEMENTED", True)
+            feedback("Snake pattern NOT YET IMPLEMENTED", True)
 
         # ---- store row/col as list of lists
         array = []
@@ -888,7 +885,7 @@ class TriangularLocations(VirtualLocations):
                     if _rows:
                         array.append(_rows)
             case _:
-                tools.feedback(f"The facing value {self.facing} is not valid!", True)
+                feedback(f"The facing value {self.facing} is not valid!", True)
         # print(f'+++ {_facing}', f'{self.cols=}',  f'{self.rows=}',array)
 
         # ---- calculate initial conditions
@@ -990,7 +987,7 @@ class DiamondLocations(VirtualLocations):
         super(DiamondLocations, self).__init__(rows, cols, **kwargs)
         self.kwargs = kwargs
         if (self.cols < 2 and self.rows < 1) or (self.cols < 1 and self.rows < 2):
-            tools.feedback(
+            feedback(
                 f"Minimum layout size is 2x1 or 1x2 (cannot use {self.cols }x{self.rows})!",
                 True,
             )
@@ -1151,7 +1148,7 @@ class ConnectShape(BaseShape):
             lin = LineShape(None, base_canvas, **self.kwargs)
             lin.draw(ID=ID)
         else:
-            tools.feedback('Style "{style}" is unknown.')
+            feedback('Style "{style}" is unknown.')
 
     def key_positions(self, _shape, location=None):
         """Calculate a dictionary of key positions around a Rectangle.

@@ -107,7 +107,7 @@ position** of 5.5".
 As the use of margins is common for most documents and drawings, nearly all
 distances in **protograf** are considered to be relative to the margin
 settings i.e. if the page margin, for the A4 page mentioned above,
-was 2.5cm (1") then to locate a point at those same distances would mean
+was set to 2.5cm (1") then to locate a point at those same distances would mean
 using an **x position** of 8cm and a **y position** of 12.3cm, as the margin
 size will be automatically added onto the values you specify for the position.
 
@@ -212,8 +212,10 @@ would likely term "brown", while "basic" colors have their own values;
 Colors in **protograf** can also make use of names from a pre-defined
 list - for example ``#A0522D`` is defined as the color *sienna*. The
 `colorset.pdf <https://github.com/gamesbook/protograf/blob/master/examples/colorset.pdf>`_
-file shows all the names and colors that are available, along with their
-*hexadecimal* value.
+file shows all the names of colors that are available, along with their
+*hexadecimal* value.  The
+`colorset_svg.pdf <https://github.com/gamesbook/protograf/blob/master/examples/colorset_svg.pdf>`_
+shows the subset of names and colors available for SVG documents.
 
 Color properties in **protograf** are typically set either with a *"fill"*,
 which defines the color of a whole area, or a *"stroke"* which determines
@@ -241,9 +243,9 @@ kinds of lengths or sizes all need to be measured in a particular set of
 
 In the USA, people tend to use the so-called Imperial System. In
 **protograf** this means that distances might be measured in units of
-inches. Inches are often shown with an double-quotes symbol (``"``)
-in documents, but in **protograf** inches are referred to using the
-term *inch*.
+*inches*. Inches are often shown with a double-quotes symbol (``"``)
+in documents; in **protograf** inches are often referred to using the
+abbreviation *in*.
 
 In almost all of the rest of the world, the Metric System is in use. In
 **protograf** this means that distances will be measured in units of
@@ -260,13 +262,13 @@ The :ref:`default <default-concept>` **units** in **protograf**  are *cm*.
 **protograf** also allows units of *points*, which are the measurement
 units traditionally used in the printing industry. There are 72 points
 in 1 inch. Internal calculations in **protograf** are all done in
-point units i.e. all inputs, regardless of their being inches, centimetres,
-or anything else, are converted to points.
+point units i.e. all inputs, regardless of being inches, centimetres,
+millimetres |dash| or anything else |dash| are converted to points.
 
 .. NOTE::
 
    In a few cases, **protograf** adopts the word "size" where point units are
-   in use e.g. font size, but because the term is such a general one,  it's
+   in use e.g. font size, but because "size" is such a general word,  it's
    not really used that much.
 
 
@@ -277,11 +279,11 @@ The "stroke" concept
 `↑ <table-of-contents-basic_>`_
 
 While the majority of size-based `element properties`_ in **protograf**
-work with the "normal" units you have chosen - inches or centimetres - some use
-points (see `working with units`_ above). These include *font size*, that you’re
-likely familiar with from word processing programs, and line thickness - termed
-"stroke width". The reason for doing this is to maintain consistency with other,
-existing tools.
+work with the "normal" units you have chosen |dash| inches or centimetres
+|dash| some use points (see `working with units`_ above). These include
+*font size*,  that you’re likely familiar with from word processing programs,
+and line thickness |dash| termed "stroke width". The reason for doing this
+is to maintain consistency with other, existing tools.
 
 
 .. _default-concept:
@@ -291,18 +293,20 @@ The "default" concept
 `↑ <table-of-contents-basic_>`_
 
 A "default", in terms of **protograf**, is a value or setting for
-something |dash| usually a `property <element properties_>`_ |dash| which is used
-unless you specify otherwise.
+something |dash| usually a `property <element properties_>`_ |dash| which is
+used unless you specify otherwise.
 
-Defaults are helpful for quickly drawing or testing something until you're ready
-to make decisions about your own specific settings or values.
+Defaults are helpful for quickly drawing or testing something until you're
+ready to make decisions about your own specific settings or values.
 
 Some examples of defaults are:
 
--  the default *margin* for pages in the output PDF is ``1.25`` cm
-   or half of 1 inch
+-  the default *margin* for pages in the output PDF is ``0.635`` cm
+   or 1/4" (one quarter of one inch); the main reason for this choice is to
+   ensure that a 3x3 grid of Poker-sized cards fits onto one page!
 -  the default *paper* size for pages in the output PDF is ``A4`` |dash| similar
-   to the US Letter size
+   to the US Letter size i.e. A4 is 21 x 29.7 cm (8.268 x 11.693 inch) and
+   Letter is 8.5 x 11 inch (21.59 x 27.94 cm)
 -  the default *units* are centimetres (*cm*)
 -  the default *x* and *y* positions are each ``1`` (one) |dash| with default
    units that equates to *1cm*

@@ -18,6 +18,15 @@ from pymupdf import Shape as muShape, Point as muPoint, Matrix
 import segno  # QRCode
 
 # local
+from protograf import globals
+from protograf.utils import geoms, tools, support
+from protograf.utils.constants import (
+    GRID_SHAPES_WITH_CENTRE,
+    COLOR_NAMES,
+    DEBUG_COLOR,
+    BGG_IMAGES,
+)
+from protograf.utils.messaging import feedback
 from protograf.utils.structures import (
     BBox,
     DirectionGroup,
@@ -27,50 +36,15 @@ from protograf.utils.structures import (
     Point,
     PolyGeometry,
 )  # named tuples
-from protograf.utils import geoms, tools, support
+from protograf.utils.support import CACHE_DIRECTORY
 from protograf.base import (
     BaseShape,
     BaseCanvas,
     GridShape,
-    get_color,
-    get_opacity,
-    BGG_IMAGES,
-    COLOR_NAMES,
-    DEBUG_COLOR,
 )
-from protograf.utils.support import CACHE_DIRECTORY
-from protograf import globals
 
 log = logging.getLogger(__name__)
-
 DEBUG = False
-GRID_SHAPES_WITH_CENTRE = [
-    "CircleShape",
-    "CompassShape",
-    "DotShape",
-    "HexShape",
-    "PolygonShape",
-    "RectangleShape",
-    "RhombusShape",
-    "SquareShape",
-    "StadiumShape",
-    "EllipseShape",
-    "StarShape",
-]
-GRID_SHAPES_NO_CENTRE = [
-    "TextShape",
-]
-# NOT GRID:  ArcShape, BezierShape, PolylineShape, ChordShape
-
-# following shapes must have vertices accessible WITHOUT calling draw()
-SHAPES_FOR_TRACK = [
-    "LineShape",
-    "PolygonShape",
-    "PolylineShape",
-    "RectangleShape",
-    "RhombusShape",
-    "SquareShape",
-]
 
 
 def get_cache(**kwargs):
@@ -79,7 +53,7 @@ def get_cache(**kwargs):
     default_cache.mkdir(parents=True, exist_ok=True)
     cache_directory = kwargs.get("cache_directory", str(default_cache))
     if not os.path.exists(cache_directory):
-        tools.feedback(
+        feedback(
             "Unable to create or find the cache directory:" f" {str(cache_directory)}",
             True,
         )
@@ -125,7 +99,7 @@ class ImageShape(BaseShape):
         # ---- check for Card usage
         cache_directory = str(self.cache_directory)
         _source = self.source
-        # tools.feedback(f'*** IMAGE {ID=} {self.source=}')
+        # feedback(f'*** IMAGE {ID=} {self.source=}')
         if ID is not None and isinstance(self.source, list):
             _source = self.source[ID]
             cache_directory = set_cached_dir(_source) or cache_directory
@@ -142,7 +116,7 @@ class ImageShape(BaseShape):
                 x = self._u.cx - width / 2.0 + self._o.delta_x
                 y = self._u.cy - height / 2.0 + self._o.delta_y
             else:
-                tools.feedback(
+                feedback(
                     "Must supply width and height for use with cx and cy.", stop=True
                 )
         else:
@@ -150,7 +124,7 @@ class ImageShape(BaseShape):
             y = self._u.y + self._o.delta_y
         rotation = kwargs.get("rotation", self.rotation)
         # ---- load image
-        # tools.feedback(f'*** IMAGE {ID=} {_source=} {x=} {y=} {self.rotation=}')
+        # feedback(f'*** IMAGE {ID=} {_source=} {x=} {y=} {self.rotation=}')
         img, is_dir = self.load_image(  # via base.BaseShape
             globals.doc_page,
             _source,
@@ -162,12 +136,12 @@ class ImageShape(BaseShape):
         )
         if not img and not is_dir:
             if _source:
-                tools.feedback(
+                feedback(
                     f'Unable to load image "{_source}" - please check name and location',
                     True,
                 )
             else:
-                tools.feedback(
+                feedback(
                     f"Unable to load image - no name provided",
                     True,
                 )
@@ -191,13 +165,13 @@ class ArcShape(BaseShape):
         # ---- perform overrides
         self.radius = self.radius or self.diameter / 2.0
         if self.cx is None and self.x is None:
-            tools.feedback("Either provide x or cx for Arc", True)
+            feedback("Either provide x or cx for Arc", True)
         if self.cy is None and self.y is None:
-            tools.feedback("Either provide y or cy for Arc", True)
+            feedback("Either provide y or cy for Arc", True)
         if self.cx is not None and self.cy is not None:
             self.x = self.cx - self.radius
             self.y = self.cy - self.radius
-        # tools.feedback(f'***Arc {self.cx=} {self.cy=} {self.x=} {self.y=}')
+        # feedback(f'***Arc {self.cx=} {self.cy=} {self.x=} {self.y=}')
         # ---- calculate centre
         radius = self._u.radius
         if self.row is not None and self.col is not None:
@@ -210,7 +184,7 @@ class ArcShape(BaseShape):
         else:
             self.x_c = self._u.x + radius
             self.y_c = self._u.y + radius
-        # tools.feedback(f'***Arc {self.x_c=} {self.y_c=} {self.radius=}')
+        # feedback(f'***Arc {self.x_c=} {self.y_c=} {self.radius=}')
 
     def draw(self, cnv=None, off_x=0, off_y=0, ID=None, **kwargs):
         """Draw arc on a given canvas."""
@@ -225,7 +199,7 @@ class ArcShape(BaseShape):
         # ---- circumference point in units
         p_P = geoms.point_on_circle(p_C, self._u.radius, self.angle_start)
         # ---- draw sector
-        # tools.feedback(
+        # feedback(
         #     f'***Arc: {p_P=} {p_C=} {self.angle_start=} {self.angle_width=}')
         cnv.draw_sector(  # anti-clockwise from p_P; 90° default
             (p_C.x, p_C.y), (p_P.x, p_P.y), self.angle_width, fullSector=False
@@ -266,9 +240,7 @@ class ArrowShape(BaseShape):
         tail_height = self._u.height
         total_height = self._u.height + self.head_height_u
         if tail_height <= 0:
-            tools.feedback(
-                "The Arrow head height must be less than overall height", True
-            )
+            feedback("The Arrow head height must be less than overall height", True)
         # print(f"***2 {self._u.width=} {self.tail_width_u=}  {self.head_width_u=} {self.fill=} ")
         vertices = []
         vertices.append(Point(x_s, y_s))  # lower-left corner
@@ -313,7 +285,7 @@ class ArrowShape(BaseShape):
             kwargs["rotation_point"] = self.centroid
         # ---- draw arrow
         self.vertexes = self.get_vertexes(cx=cx, cy=cy, x=x, y=y)
-        # tools.feedback(f'***Arrow {x=} {y=} {self.vertexes=}')
+        # feedback(f'***Arrow {x=} {y=} {self.vertexes=}')
         cnv.draw_polyline(self.vertexes)
         kwargs["closed"] = True
         self.set_canvas_props(cnv=cnv, index=ID, **kwargs)
@@ -419,7 +391,7 @@ class CircleShape(BaseShape):
         _dirs = tools.validated_directions(self.hatch, DirectionGroup.CIRCULAR, "hatch")
         lines = tools.as_int(num, "hatch_count")
         if lines < 0:
-            tools.feedback("Cannot draw negative number of lines!", True)
+            feedback("Cannot draw negative number of lines!", True)
         dist = (self._u.radius * 2.0) / (lines + 1)
         partial = lines // 2
 
@@ -549,7 +521,7 @@ class CircleShape(BaseShape):
                     float(angle) for angle in self.radii if angle >= 0 and angle <= 360
                 ]
             except:
-                tools.feedback(
+                feedback(
                     f"The radii {self.radii} are not valid - must be a list of numbers"
                     " from 0 to 360",
                     True,
@@ -691,9 +663,7 @@ class CircleShape(BaseShape):
                         petals_vertices.append((pt1, pt2, pt3))
 
                     case _:
-                        tools.feedback(
-                            f'Unknown petals_style "{self.petals_style}"', True
-                        )
+                        feedback(f'Unknown petals_style "{self.petals_style}"', True)
 
             # ---- draw and fill
             match self.petals_style:
@@ -716,7 +686,7 @@ class CircleShape(BaseShape):
                             (vertex[2].x, vertex[2].y),
                         )
                 case _:
-                    tools.feedback(f'Unknown petals_style "{self.petals_style}"', True)
+                    feedback(f'Unknown petals_style "{self.petals_style}"', True)
 
             self.set_canvas_props(
                 index=ID,
@@ -743,7 +713,7 @@ class CircleShape(BaseShape):
         """Draw circle on a given canvas."""
         kwargs = self.kwargs | kwargs
         _ = kwargs.pop("ID", None)
-        # tools.feedback(f' @@@ Circ.draw {kwargs=}')
+        # feedback(f' @@@ Circ.draw {kwargs=}')
         cnv = cnv if cnv else globals.canvas  # a new Page/Shape may now exist
         super().draw(cnv, off_x, off_y, ID, **kwargs)  # unit-based props
         is_cards = kwargs.get("is_cards", False)
@@ -786,8 +756,8 @@ class CircleShape(BaseShape):
                 )
             self.x_c, self.y_c = x, y
             self.bbox = BBox(
-                bl=Point(self.x_c - self._u.radius, self.y_c + self._u.radius),
-                tr=Point(self.x_c + self._u.radius, self.y_c - self._u.radius),
+                tl=Point(self.x_c - self._u.radius, self.y_c - self._u.radius),
+                br=Point(self.x_c + self._u.radius, self.y_c + self._u.radius),
             )
         # ---- handle rotation
         is_rotated = False
@@ -799,26 +769,26 @@ class CircleShape(BaseShape):
         # ---- draw petals
         if self.petals:
             self.draw_petals(cnv, ID, self.x_c, self.y_c)
-        # tools.feedback(f'*** Circle: {x=} {y=}')
+        # feedback(f'*** Circle: {x=} {y=}')
         # ---- draw circle
         cnv.draw_circle((x, y), self._u.radius)
         self.set_canvas_props(cnv=cnv, index=ID, **kwargs)
         # ---- grid marks
-        if self.grid_marks:
+        if self.grid_marks:  # and not kwargs.get("card_back", False):
             # print(f'{self._u.radius=} {self._u.diameter=}')
-            deltag = self.unit(self.grid_length)
+            deltag = self.unit(self.grid_marks_length)
             gx, gy = 0, y - self._u.radius  # left-side
             cnv.draw_line((gx, gy), (deltag, gy))
             cnv.draw_line(
                 (0, gy + self._u.radius * 2.0), (deltag, gy + self._u.radius * 2.0)
             )
-            gx, gy = x - self._u.radius, self.paper[1]  # top-side
+            gx, gy = x - self._u.radius, globals.page[1]  # top-side
             cnv.draw_line((gx, gy), (gx, gy - deltag))
             cnv.draw_line(
                 (gx + self._u.radius * 2.0, gy),
                 (gx + self._u.radius * 2.0, gy - deltag),
             )
-            gx, gy = self.paper[0], y - self._u.radius  # right-side
+            gx, gy = globals.page[0], y - self._u.radius  # right-side
             cnv.draw_line((gx, gy), (gx - deltag, gy))
             cnv.draw_line(
                 (gx, gy + self._u.radius * 2.0), (gx - deltag, gy + self._u.radius * 2)
@@ -830,10 +800,15 @@ class CircleShape(BaseShape):
                 (gx + self._u.radius * 2.0, gy + deltag),
             )
             # done
-            keys = kwargs
-            keys["stroke"] = self.grid_stroke
-            keys["stroke_width"] = self.grid_stroke_width
-            self.set_canvas_props(cnv=cnv, index=ID, **keys)
+            # gargs = kwargs
+            # gargs["stroke"] = self.grid_marks_stroke
+            # gargs["stroke_width"] = self.grid_marks_stroke_width
+            # self.set_canvas_props(cnv=cnv, index=ID, **gargs)
+            gargs = {}
+            gargs["stroke"] = self.grid_marks_stroke
+            gargs["stroke_width"] = self.grid_marks_stroke_width
+            self.set_canvas_props(cnv=None, index=ID, **gargs)
+
         # ---- draw hatch
         if self.hatch_count:
             self.draw_hatch(
@@ -851,7 +826,7 @@ class CircleShape(BaseShape):
                     _abs_cy=y + self.unit(self.centre_shape_my),
                 )
             elif cshape_name not in GRID_SHAPES_WITH_CENTRE:
-                tools.feedback(f"Cannot draw a centered {cshape_name}!")
+                feedback(f"Cannot draw a centered {cshape_name}!")
         # ---- cross
         self.draw_cross(cnv, self.x_c, self.y_c, rotation=kwargs.get("rotation"))
         # ---- dot
@@ -860,6 +835,9 @@ class CircleShape(BaseShape):
         self.draw_heading(cnv, ID, self.x_c, self.y_c - self._u.radius, **kwargs)
         self.draw_label(cnv, ID, self.x_c, self.y_c, **kwargs)
         self.draw_title(cnv, ID, self.x_c, self.y_c + self._u.radius, **kwargs)
+        # ---- set calculated top-left in user units
+        self.calculated_left = (self.x_c - self._u.radius) / self.units
+        self.calculated_top = (self.y_c - self._u.radius) / self.units
 
 
 class ChordShape(BaseShape):
@@ -873,19 +851,19 @@ class ChordShape(BaseShape):
         cnv = cnv if cnv else globals.canvas  # a new Page/Shape may now exist
         super().draw(cnv, off_x, off_y, ID, **kwargs)  # unit-based props
         if not isinstance(self.shape, CircleShape):
-            tools.feedback("Shape must be a circle!", True)
+            feedback("Shape must be a circle!", True)
         circle = self.shape
         x_c, y_c = circle.calculate_centre()
         centre = Point(circle.cx, circle.cy)
         pt0 = geoms.point_on_circle(centre, circle.radius, self.angle)
         pt1 = geoms.point_on_circle(centre, circle.radius, self.angle_1)
-        # tools.feedback(f"*** {circle.radius=} {pt0=} {pt1=}")
+        # feedback(f"*** {circle.radius=} {pt0=} {pt1=}")
         x = self.unit(pt0.x) + self._o.delta_x
         y = self.unit(pt0.y) + self._o.delta_y
         x_1 = self.unit(pt1.x) + self._o.delta_x
         y_1 = self.unit(pt1.y) + self._o.delta_y
         # ---- draw chord
-        # tools.feedback(f"*** Chord {x=} {y=}, {x_1=} {y_1=}")
+        # feedback(f"*** Chord {x=} {y=}, {x_1=} {y_1=}")
         mid_point = geoms.fraction_along_line(Point(x, y), Point(x_1, y_1), 0.5)
         cnv.draw_line(Point(x, y), Point(x_1, y_1))
         kwargs["rotation"] = self.rotation
@@ -893,7 +871,7 @@ class ChordShape(BaseShape):
         self.set_canvas_props(cnv=cnv, index=ID, **kwargs)  # shape.finish()
         # ---- calculate line rotation
         compass, rotation = geoms.angles_from_points(Point(x, y), Point(x_1, y_1))
-        # tools.feedback(f"*** Chord {compass=} {rotation=}")
+        # feedback(f"*** Chord {compass=} {rotation=}")
         # ---- dot
         self.draw_dot(cnv, (x_1 + x) / 2.0, (y_1 + y) / 2.0)
         # ---- text
@@ -928,7 +906,7 @@ class CompassShape(BaseShape):
         self.directions = self.directions or "*"  # compass should always have!
 
     def draw_radius(self, cnv, ID, x, y, absolute=False):
-        # tools.feedback(
+        # feedback(
         #    f'*** Compass Radius {self.x_c=:.2f} {self.y_c=:.2f}; {x=:.2f} {y=:.2f}')
         if absolute:
             cnv.draw_line((self.x_c, self.y_c), (x, y))
@@ -955,7 +933,7 @@ class CompassShape(BaseShape):
             y = radius * math.cos(radians)
             return x, y
 
-        # tools.feedback(f'*** Compass {angle=}', False)
+        # feedback(f'*** Compass {angle=}', False)
         radians = math.radians(angle)
         match angle:
             # ---- primary directions
@@ -985,7 +963,7 @@ class CompassShape(BaseShape):
                 x, y = vertices[3].x, vertices[3].y
                 self.draw_radius(cnv, ID, x, y, True)
             case _:
-                tools.feedback(f"{angle} not in range", True)
+                feedback(f"{angle} not in range", True)
 
     def draw(self, cnv=None, off_x=0, off_y=0, ID=None, **kwargs):
         """Draw compass on a given canvas."""
@@ -1045,7 +1023,7 @@ class CompassShape(BaseShape):
         # ---- draw compass in rect
         if self.perimeter == "rectangle":
             if self.radii_length is not None:
-                tools.feedback(
+                feedback(
                     "radii_length cannot be used for a rectangle-perimeter Compass",
                     False,
                     True,
@@ -1117,7 +1095,7 @@ class DotShape(BaseShape):
         kwargs = self.kwargs | kwargs
         cnv = cnv if cnv else globals.canvas  # a new Page/Shape may now exist
         super().draw(cnv, off_x, off_y, ID, **kwargs)  # unit-based props
-        # tools.feedback(f"*** Dot {self._o.delta_x=} {self._o.delta_y=}")
+        # feedback(f"*** Dot {self._o.delta_x=} {self._o.delta_y=}")
         if self.use_abs_c:
             x = self._abs_cx
             y = self._abs_cy
@@ -1128,7 +1106,7 @@ class DotShape(BaseShape):
         self.fill = self.stroke
         center = muPoint(x, y)
         # ---- draw dot
-        # tools.feedback(f'*** Dot {size=} {x=} {y=}')
+        # feedback(f'*** Dot {size=} {x=} {y=}')
         cnv.draw_circle(center=center, radius=size)
         kwargs["rotation"] = self.rotation
         kwargs["rotation_point"] = center
@@ -1306,7 +1284,7 @@ class EquilateralTriangleShape(BaseShape):
             x = self._u.cx - side / 2.0
             y = self._u.cy + (height - centroid_to_vertex)
             # print(f'** {side=} {height=} {centroid_to_vertex=} {y_off=}')
-        # tools.feedback(f'*** EQT {side=} {height=} {self.fill=} {self.stroke=}')
+        # feedback(f'*** EQT {side=} {height=} {self.fill=} {self.stroke=}')
         self.vertexes = self.get_vertexes(x, y, side, self.hand, self.flip)
         self.centroid = self.get_centroid(self.vertexes)
         # ---- handle rotation
@@ -1315,7 +1293,7 @@ class EquilateralTriangleShape(BaseShape):
             kwargs["rotation"] = rotation
             kwargs["rotation_point"] = self.centroid
         # ---- draw equilateral triangle
-        # tools.feedback(f'*** EqiTri {x=} {y=} {self.vertexes=} {kwargs=}')
+        # feedback(f'*** EqiTri {x=} {y=} {self.vertexes=} {kwargs=}')
         cnv.draw_polyline(self.vertexes)
         kwargs["closed"] = True
         self.set_canvas_props(cnv=cnv, index=ID, **kwargs)
@@ -1334,7 +1312,7 @@ class EquilateralTriangleShape(BaseShape):
                     _abs_cy=self.centroid.y + self.unit(self.centre_shape_my),
                 )
             elif cshape_name not in GRID_SHAPES_WITH_CENTRE:
-                tools.feedback(f"Cannot draw a centered {cshape_name}!")
+                feedback(f"Cannot draw a centered {cshape_name}!")
         # ---- dot
         self.draw_dot(cnv, self.centroid.x, self.centroid.y)
         # ---- text
@@ -1395,7 +1373,7 @@ class HexShape(BaseShape):
             side = self._u.side
             half_flat = side * math.sqrt(3) / 2.0
         if not self.radius and not self.height and not self.diameter and not self.side:
-            tools.feedback(
+            feedback(
                 "No value for side or height or diameter or radius supplied for hexagon.",
                 True,
             )
@@ -1409,7 +1387,7 @@ class HexShape(BaseShape):
             self.height = 2 * half_flat / self.units
             self.width = 2 * radius / self.units
         else:
-            tools.feedback(
+            feedback(
                 'Invalid orientation "{self.orientation}" supplied for hexagon.', True
             )
         return radius, diameter, side, half_flat
@@ -1431,12 +1409,12 @@ class HexShape(BaseShape):
                 if not invert; two sets of Point tuples (start/end for the two caltrops)
                 if invert; one set of Point tuples (start/end for the mid-caltrops)
         """
-        # tools.feedback(f'*** HEX-CC {p0=} {p1=} {size=} {invert=}')
+        # feedback(f'*** HEX-CC {p0=} {p1=} {size=} {invert=}')
         if invert:
             size = (side - size) / 2
         fraction = size / side
         if fraction > 0.5:
-            tools.feedback(f'Cannot use "{fraction}" for a caltrops fraction', True)
+            feedback(f'Cannot use "{fraction}" for a caltrops fraction', True)
         else:
             # first caltrop end pt
             p0a = geoms.fraction_along_line(p0, p1, fraction)
@@ -1520,9 +1498,7 @@ class HexShape(BaseShape):
                     **keys,
                 )
             else:
-                tools.feedback(
-                    f'Cannot handle a coord_elevation of "{self.coord_elevation}"'
-                )
+                feedback(f'Cannot handle a coord_elevation of "{self.coord_elevation}"')
 
     def calculate_area(self):
         if self.side:
@@ -1548,9 +1524,9 @@ class HexShape(BaseShape):
                     b=int(parts[1]),
                     style=parts[2] if len(parts) > 2 else None,
                 )
-                # tools.feedback(f'*** HEX LINK {the_link=}')
+                # feedback(f'*** HEX LINK {the_link=}')
             except TypeError:
-                tools.feedback(
+                feedback(
                     f"Cannot use {parts[0]} and/or {parts[1]} as hex side numbers.",
                     True,
                 )
@@ -1559,7 +1535,7 @@ class HexShape(BaseShape):
             va_end = the_link.a % 6
             vb_start = the_link.b - 1
             vb_end = the_link.b % 6
-            tools.feedback(f"a:{va_start}-{va_end} b:{vb_start}-{vb_end}")
+            feedback(f"a:{va_start}-{va_end} b:{vb_start}-{vb_end}")
 
             separation = geoms.separation_between_hexsides(the_link.a, the_link.b)
             match separation:
@@ -1602,7 +1578,7 @@ class HexShape(BaseShape):
                             extent=120,
                         )  # anti-clockwise from "east"
 
-                    # tools.feedback(
+                    # feedback(
                     #     f'arc *** x_1={lower_corner.x}, y_1={lower_corner.y}'
                     #     f' x_2={top_corner.x}, y_2={top_corner.y}')
 
@@ -1700,7 +1676,7 @@ class HexShape(BaseShape):
             )
             perbis_dirs = tools.validated_directions(self.perbis, dir_group, "perbis")
             _dirs = []
-            # tools.feedback(f'*** HEX {self.perbis=} {self.orientation=} {perbis_dirs=}')
+            # feedback(f'*** HEX {self.perbis=} {self.orientation=} {perbis_dirs=}')
             if self.orientation in ["p", "pointy"]:
                 if "e" in perbis_dirs:
                     _dirs.append(4)
@@ -1769,7 +1745,7 @@ class HexShape(BaseShape):
         _dirs = tools.validated_directions(self.hatch, dir_group, "hatch")
         _num = tools.as_int(num, "hatch_count")
         lines = int((_num - 1) / 2 + 1)
-        # tools.feedback(f'*** HEX {num=} {lines=} {vertices=} {_dirs=}')
+        # feedback(f'*** HEX {num=} {lines=} {vertices=} {_dirs=}')
         if num >= 1:
             if self.orientation in ["p", "pointy"]:
                 if "ne" in _dirs or "sw" in _dirs:  # slope UP to the right
@@ -1859,7 +1835,7 @@ class HexShape(BaseShape):
             side = self._u.side
             half_flat = side * math.sqrt(3) / 2.0
         if not self.radius and not self.height and not self.diameter and not self.side:
-            tools.feedback(
+            feedback(
                 "No value for side or height or diameter or radius supplied for hexagon.",
                 True,
             )
@@ -1938,7 +1914,7 @@ class HexShape(BaseShape):
                             + self._o.delta_x
                         )
                 else:
-                    tools.feedback(f"Unknown hex_offset value {self.hex_offset}", True)
+                    feedback(f"Unknown hex_offset value {self.hex_offset}", True)
             # ----  ^ set hex centre relative to x,y
             self.x_d = x + geo.half_flat
             self.y_d = y + geo.side
@@ -1957,7 +1933,7 @@ class HexShape(BaseShape):
                 # recalculate start x,y
                 x = self.x_d - geo.half_flat
                 y = self.y_d - geo.half_side - geo.side / 2.0
-            # tools.feedback(f"*** P^: {x=} {y=}{self.x_d=} {self.y_d=} {geo=} ")
+            # feedback(f"*** P^: {x=} {y=}{self.x_d=} {self.y_d=} {geo=} ")
 
         # ---- FLAT~
         else:
@@ -1968,7 +1944,7 @@ class HexShape(BaseShape):
             # x and y are at the bottom-left corner of the box around the hex
             x = self._u.x + self._o.delta_x
             y = self._u.y + self._o.delta_y
-            # tools.feedback(f""*** P~: {x=} {y=} {self.row=} {self.col=} {geo=} ")
+            # feedback(f""*** P~: {x=} {y=} {self.row=} {self.col=} {geo=} ")
             # ---- ~ draw flat by row/col
             if self.row is not None and self.col is not None and is_cards:
                 # x = self.col * 2.0 * geo.side + self._o.delta_x
@@ -2009,7 +1985,7 @@ class HexShape(BaseShape):
                     else:
                         y = y + geo.half_flat
                 else:
-                    tools.feedback(f"Unknown hex_offset value {self.hex_offset}", True)
+                    feedback(f"Unknown hex_offset value {self.hex_offset}", True)
 
             # ----  ~ set hex centre relative to x,y
             self.x_d = x + geo.side
@@ -2029,7 +2005,7 @@ class HexShape(BaseShape):
                 # recalculate start x,y
                 x = self.x_d - geo.half_side - geo.side / 2.0
                 y = self.y_d - geo.half_flat
-            # tools.feedback(f"*** F~: {x=} {y=} {self.x_d=} {self.y_d=} {geo=}")
+            # feedback(f"*** F~: {x=} {y=} {self.x_d=} {self.y_d=} {geo=}")
 
         # ---- ^ pointy hexagon vertices (clockwise)
         if self.orientation.lower() in ["p", "pointy"]:
@@ -2056,10 +2032,10 @@ class HexShape(BaseShape):
     def draw(self, cnv=None, off_x=0, off_y=0, ID=None, **kwargs):
         """Draw a hexagon on a given canvas."""
         kwargs = self.kwargs | kwargs
-        # tools.feedback(f'*** draw hex: {off_x=} {off_y=} {ID=}')
-        # tools.feedback(f'*** draw hex: {self.x=} {self.y=} {self.cx=} {self.cy=}')
-        # tools.feedback(f'*** draw hex: {self.row=} {self.col=}')
-        # tools.feedback(f' @@@ Hexg.draw {kwargs=}')
+        # feedback(f'*** draw hex: {off_x=} {off_y=} {ID=}')
+        # feedback(f'*** draw hex: {self.x=} {self.y=} {self.cx=} {self.cy=}')
+        # feedback(f'*** draw hex: {self.row=} {self.col=}')
+        # feedback(f' @@@ Hexg.draw {kwargs=}')
         cnv = cnv if cnv else globals.canvas  # a new Page/Shape may now exist
         super().draw(cnv, off_x, off_y, ID, **kwargs)  # unit-based props
         # ---- calculate vertexes
@@ -2071,7 +2047,7 @@ class HexShape(BaseShape):
         # ---- remove rotation
         if kwargs and kwargs.get("rotation"):
             kwargs.pop("rotation")
-        # tools.feedback(f'***Hex {x=} {y=} {self.vertexes=} {self.kwargs=')
+        # feedback(f'***Hex {x=} {y=} {self.vertexes=} {self.kwargs=')
 
         # ---- draw hexagon with caltrops
         if self.caltrops:
@@ -2112,7 +2088,7 @@ class HexShape(BaseShape):
                     self.borders,
                 ]
             if not isinstance(self.borders, list):
-                tools.feedback('The "borders" property must be a list of sets or a set')
+                feedback('The "borders" property must be a list of sets or a set')
             for border in self.borders:
                 self.draw_border(cnv, border, ID)  # BaseShape
 
@@ -2123,7 +2099,7 @@ class HexShape(BaseShape):
         # ---- draw hatch
         if self.hatch_count:
             if not self.hatch_count & 1:
-                tools.feedback("Hatch count must be an odd number for a Hexagon", True)
+                feedback("Hatch count must be an odd number for a Hexagon", True)
             self.draw_hatch(cnv, ID, geo.side, self.vertexes, self.hatch_count)
         # ---- draw links
         if self.links:
@@ -2138,14 +2114,14 @@ class HexShape(BaseShape):
         if self.centre_shape:
             cshape_name = self.centre_shape.__class__.__name__
             if cshape_name in GRID_SHAPES_WITH_CENTRE:
-                # tools.feedback(f'*** IN-HEX {cshape_name} at ({self.x_d=},{self.y_d=}, '
+                # feedback(f'*** IN-HEX {cshape_name} at ({self.x_d=},{self.y_d=}, '
                 #               f'{self.centre_shape_x}, {self.centre_shape_y})')
                 self.centre_shape.draw(
                     _abs_cx=self.x_d + self.unit(self.centre_shape_mx),
                     _abs_cy=self.y_d + self.unit(self.centre_shape_my),
                 )
             elif cshape_name not in GRID_SHAPES_WITH_CENTRE:
-                tools.feedback(f"Cannot draw a centered {cshape_name}!")
+                feedback(f"Cannot draw a centered {cshape_name}!")
         # ---- cross
         self.draw_cross(cnv, self.x_d, self.y_d, rotation=kwargs.get("rotation"))
         # ---- dot
@@ -2162,6 +2138,9 @@ class HexShape(BaseShape):
         self.set_coord(cnv, self.x_d, self.y_d, geo.half_flat)
         # ---- set grid property
         self.grid = GridShape(label=self.coord_text, x=self.x_d, y=self.y_d, shape=self)
+        # ---- set calculated top-left in user units
+        self.calculated_left = (self.x_d - offset) / self.units
+        self.calculated_top = (self.y_d - offset) / self.units
 
 
 class LineShape(BaseShape):
@@ -2212,7 +2191,7 @@ class LineShape(BaseShape):
         if self.col is not None and self.col >= 0:
             x = x + self.col * self._u.width
             x_1 = x_1 + self.col * self._u.width  # - self._u.margin_left
-        # tools.feedback(f"*** Line {x=} {x_1=} {y=} {y_1=}")
+        # feedback(f"*** Line {x=} {x_1=} {y=} {y_1=}")
         # ---- calculate line rotation
         match self.rotation_point:
             case "centre" | "center" | "c":
@@ -2273,7 +2252,7 @@ class PolygonShape(BaseShape):
                 else:
                     self.perbis = tools.sequence_split(self.perbis)
             if not isinstance(self.perbis, list):
-                tools.feedback("The perbis value must be a list of numbers!", True)
+                feedback("The perbis value must be a list of numbers!", True)
         if self.cx is not None and self.cy is not None:
             self.x, self.y = self.cx, self.cy
         # ---- class variables
@@ -2310,7 +2289,7 @@ class PolygonShape(BaseShape):
 
     def draw_mesh(self, cnv, ID, vertices: list):
         """Lines connecting each vertex to mid-points of opposing sides."""
-        tools.feedback("Mesh for Polygon is not yet implemented.", True)
+        feedback("Mesh for Polygon is not yet implemented.", True)
         """ TODO - autodraw (without dirs)
         self.set_canvas_props(
             index=ID,
@@ -2556,7 +2535,7 @@ class PolygonShape(BaseShape):
         if not vertices or len(vertices) == 0:
             return
         # ---- draw polygon
-        # tools.feedback(f"***Polygon {self.col=} {self.row=} {x=} {y=} {vertices=}")
+        # feedback(f"***Polygon {self.col=} {self.row=} {x=} {y=} {vertices=}")
         cnv.draw_polyline(vertices)
         kwargs["closed"] = True
         self.set_canvas_props(cnv=cnv, index=ID, **kwargs)
@@ -2578,7 +2557,7 @@ class PolygonShape(BaseShape):
                     _abs_cy=y + self.unit(self.centre_shape_my),
                 )
             elif cshape_name not in GRID_SHAPES_WITH_CENTRE:
-                tools.feedback(f"Cannot draw a centered {cshape_name}!")
+                feedback(f"Cannot draw a centered {cshape_name}!")
         # ---- debug
         self._debug(cnv, vertices=vertices)  # needs: self.run_debug = True
         # ---- dot
@@ -2589,6 +2568,9 @@ class PolygonShape(BaseShape):
         self.draw_heading(cnv, ID, x, y, radius, **kwargs)
         self.draw_label(cnv, ID, x, y, **kwargs)
         self.draw_title(cnv, ID, x, y, radius + 0.5 * self.title_size, **kwargs)
+        # ---- set calculated top-left in user units
+        self.calculated_left = (x - self._u.radius) / self.units
+        self.calculated_top = (x - self._u.radius) / self.units
 
 
 class PolylineShape(BaseShape):
@@ -2601,7 +2583,7 @@ class PolylineShape(BaseShape):
         if not points:
             points = self.points
         if not points or len(points) == 0:
-            tools.feedback("There are no points to draw the Polyline", False, True)
+            feedback("There are no points to draw the Polyline", False, True)
         return points
 
     def get_vertexes(self):
@@ -2631,7 +2613,7 @@ class PolylineShape(BaseShape):
             y = self.unit(y) + self._o.delta_y
             self.vertexes.append((x, y))
         # ---- draw polyline
-        # tools.feedback(f'***PolyLineShp{x=} {y=} {self.vertexes=}')
+        # feedback(f'***PolyLineShp{x=} {y=} {self.vertexes=}')
         if points:
             cnv.draw_polyline(self.vertexes)
             kwargs["closed"] = False
@@ -2675,7 +2657,7 @@ class QRCodeShape(BaseShape):
         # ---- check for Card usage
         cache_directory = str(self.cache_directory)
         _source = self.source
-        # tools.feedback(f'*** QRCode {ID=} {self.source=}')
+        # feedback(f'*** QRCode {ID=} {self.source=}')
         if ID is not None and isinstance(self.source, list):
             _source = self.source[ID]
         elif ID is not None and isinstance(self.source, str):
@@ -2687,7 +2669,7 @@ class QRCodeShape(BaseShape):
         # if no directory in _source, use qrcodes cache directory!
         if Path(_source).name:
             _source = os.path.join(cache_directory, _source)
-        # tools.feedback(f"*** QRC {self._o.delta_x=} {self._o.delta_y=}")
+        # feedback(f"*** QRC {self._o.delta_x=} {self._o.delta_y=}")
         if self.use_abs_c:
             x = self._abs_cx
             y = self._abs_cy
@@ -2703,7 +2685,7 @@ class QRCodeShape(BaseShape):
                 x = self._u.cx - width / 2.0 + self._o.delta_x
                 y = self._u.cy - height / 2.0 + self._o.delta_y
             else:
-                tools.feedback(
+                feedback(
                     "Must supply width and height for use with cx and cy.", stop=True
                 )
         else:
@@ -2716,9 +2698,9 @@ class QRCodeShape(BaseShape):
         if _locale:
             self.text = tools.eval_template(self.text, _locale)
         _text = self.textify(ID)
-        # tools.feedback(f'*** QRC {_locale=} {self.text=} {_text=}', False)
+        # feedback(f'*** QRC {_locale=} {self.text=} {_text=}', False)
         if _text is None or _text == "":
-            tools.feedback("No text supplied for the QRCode shape!", False, True)
+            feedback("No text supplied for the QRCode shape!", False, True)
             return
         _text = str(_text)  # card data could be numeric
         if "\\u" in _text:
@@ -2728,12 +2710,12 @@ class QRCodeShape(BaseShape):
         qrcode.save(
             _source,
             scale=self.scaling or 1,
-            light=tools.rgb_to_hex(get_color(self.fill)),
-            dark=tools.rgb_to_hex(get_color(self.stroke)),
+            light=tools.rgb_to_hex(tools.get_color(self.fill)),
+            dark=tools.rgb_to_hex(tools.get_color(self.stroke)),
         )
         rotation = kwargs.get("rotation", self.rotation)
         # ---- load QR image
-        # tools.feedback(f'*** IMAGE {ID=} {_source=} {x=} {y=} {self.rotation=}')
+        # feedback(f'*** IMAGE {ID=} {_source=} {x=} {y=} {self.rotation=}')
         img, is_dir = self.load_image(  # via base.BaseShape
             globals.doc_page,
             _source,
@@ -2744,7 +2726,7 @@ class QRCodeShape(BaseShape):
             rotation=rotation,
         )
         if not img and not is_dir:
-            tools.feedback(
+            feedback(
                 f'Unable to load image "{_source}!" - please check name and location',
                 True,
             )
@@ -2770,7 +2752,7 @@ class RectangleShape(BaseShape):
         if self.cx is not None and self.cy is not None:
             self.x = self.cx - self.width / 2.0
             self.y = self.cy - self.height / 2.0
-            # tools.feedback(f"*** RectShp {self.cx=} {self.cy=} {self.x=} {self.y=}")
+            # feedback(f"*** RectShp {self.cx=} {self.cy=} {self.x=} {self.y=}")
         self.kwargs = kwargs
 
     def calculate_area(self) -> float:
@@ -2804,7 +2786,7 @@ class RectangleShape(BaseShape):
             Point(x + self._u.width, y + self._u.height),  # w
             Point(x + self._u.width, y),  # n
         ]
-        # tools.feedback(
+        # feedback(
         #     '*** RECT VERTS '
         #     f' /0: {vertices[0][0]:.2f};{vertices[0][1]:.2f}'
         #     f' /1: {vertices[1][0]:.2f};{vertices[1][1]:.2f}'
@@ -2820,7 +2802,7 @@ class RectangleShape(BaseShape):
         # _row = self.rows - the_row + self.coord_start_y
         _row = the_row + 1 if not self.coord_start_y else the_row + self.coord_start_y
         _col = the_col + 1 if not self.coord_start_x else the_col + self.coord_start_x
-        # tools.feedback(f'*** Rect # ---- {_row=},{_col=}')
+        # feedback(f'*** Rect # ---- {_row=},{_col=}')
         # ---- set coord x,y values
         if self.coord_type_x in ["l", "lower"]:
             _x = tools.sheet_column(_col, True)
@@ -2868,13 +2850,11 @@ class RectangleShape(BaseShape):
             elif self.coord_elevation in ["b", "bottom", "bot"]:
                 self.draw_multi_string(cnv, x_d, y_d + coord_offset, self.coord_text)
             else:
-                tools.feedback(
-                    f'Cannot handle a coord_elevation of "{self.coord_elevation}"'
-                )
+                feedback(f'Cannot handle a coord_elevation of "{self.coord_elevation}"')
 
     def calculate_xy(self, **kwargs):
         # ---- adjust start
-        # tools.feedback(f'*** Rect.calc {self.col=} {self.row=}')
+        # feedback(f'*** Rect.calc {self.col=} {self.row=} {self._u.offset_x=} {self._o.off_x=}')
         if self.row is not None and self.col is not None:
             if self.kwargs.get("grouping_cols", 1) == 1:
                 x = (
@@ -2936,7 +2916,7 @@ class RectangleShape(BaseShape):
                 or "nw" in _dirs
                 or "d" in _dirs
             ):
-                tools.feedback(
+                feedback(
                     "No diagonal hatching permissible with rounding in the rectangle",
                     True,
                 )
@@ -2948,7 +2928,7 @@ class RectangleShape(BaseShape):
             elif self.rounded:
                 _rounding = self._u.width * 0.08
             if spaces < _rounding:
-                tools.feedback(
+                feedback(
                     "No hatching permissible with this size of rounding in a rectangle",
                     True,
                 )
@@ -2960,7 +2940,7 @@ class RectangleShape(BaseShape):
                 or "nw" in _dirs
                 or "d" in _dirs
             ):
-                tools.feedback(
+                feedback(
                     "Multi- diagonal hatching not permissible in a notched Rectangle",
                     True,
                 )
@@ -3037,7 +3017,7 @@ class RectangleShape(BaseShape):
     def draw(self, cnv=None, off_x=0, off_y=0, ID=None, **kwargs):
         """Draw a rectangle on a given canvas."""
         kwargs = self.kwargs | kwargs
-        # tools.feedback(f'\n@@@ Rect.draw {kwargs=}')
+        # feedback(f'\n@@@ Rect.draw {kwargs=}')
         cnv = cnv if cnv else globals.canvas  # a new Page/Shape may now exist
         super().draw(cnv, off_x, off_y, ID, **kwargs)  # unit-based props
         # ---- updated based on kwargs
@@ -3049,32 +3029,30 @@ class RectangleShape(BaseShape):
         is_peaks = True if self.peaks else False
         is_borders = True if self.borders else False
         if (self.rounding or self.rounded) and is_borders:
-            tools.feedback("Cannot use rounding or rounded with borders.", True)
+            feedback("Cannot use rounding or rounded with borders.", True)
         if (self.rounding or self.rounded) and is_notched:
-            tools.feedback("Cannot use rounding or rounded with notch.", True)
+            feedback("Cannot use rounding or rounded with notch.", True)
         if (self.rounding or self.rounded) and is_chevron:
-            tools.feedback("Cannot use rounding or rounded with chevron.", True)
+            feedback("Cannot use rounding or rounded with chevron.", True)
         if (self.rounding or self.rounded) and is_peaks:
-            tools.feedback("Cannot use rounding or rounded with peaks.", True)
+            feedback("Cannot use rounding or rounded with peaks.", True)
         if self.hatch_count and is_notched and self.hatch_count > 1:
-            tools.feedback("Cannot use multiple hatches with notch.", True)
+            feedback("Cannot use multiple hatches with notch.", True)
         if self.hatch_count and is_chevron:
-            tools.feedback("Cannot use hatch_count with chevron.", True)
+            feedback("Cannot use hatch_count with chevron.", True)
         if is_notched and is_chevron:
-            tools.feedback("Cannot use notch and chevron together.", True)
+            feedback("Cannot use notch and chevron together.", True)
         if is_notched and is_peaks:
-            tools.feedback("Cannot use notch and peaks together.", True)
+            feedback("Cannot use notch and peaks together.", True)
         if is_chevron and is_peaks:
-            tools.feedback("Cannot use chevron and peaks together.", True)
+            feedback("Cannot use chevron and peaks together.", True)
         if self.hatch_count and is_peaks:
-            tools.feedback("Cannot use hatch_count and peaks together.", True)
+            feedback("Cannot use hatch_count and peaks together.", True)
         if is_borders and (is_chevron or is_peaks or is_notched):
-            tools.feedback(
-                "Cannot use borders with any of: hatch, peaks or chevron.", True
-            )
+            feedback("Cannot use borders with any of: hatch, peaks or chevron.", True)
         # ---- calculate properties
         x, y = self.calculate_xy()
-        # tools.feedback(f'*** RECT      {self.col=} {self.row=} {x=} {y=}')
+        # feedback(f'*** RECT      {self.col=} {self.row=} {x=} {y=}')
         # ---- overrides for grid layout
         if self.use_abs_c:
             x = self._abs_cx - self._u.width / 2.0
@@ -3093,11 +3071,11 @@ class RectangleShape(BaseShape):
         if is_notched:
             _notch_style = self.notch_style.lower()
             if _notch_style in ["b", "bite"]:
-                tools.feedback('The "bite" setting is not implemented yet', False)
+                feedback('The "bite" setting is not implemented yet', False)
             if self.notch_corners:
                 _ntches = self.notch_corners.split()
                 _notches = [str(ntc).upper() for ntc in _ntches]
-            # tools.feedback(f'*** Rect {self.notch_x=} {self.notch_y=} {_notches=} ')
+            # feedback(f'*** Rect {self.notch_x=} {self.notch_y=} {_notches=} ')
             n_x = self.unit(self.notch_x) if self.notch_x else self.unit(self.notch)
             n_y = self.unit(self.notch_y) if self.notch_y else self.unit(self.notch)
             self.vertexes = []
@@ -3278,11 +3256,11 @@ class RectangleShape(BaseShape):
             try:
                 _chevron_height = float(self.chevron_height)
             except:
-                tools.feedback(
+                feedback(
                     f"A chevron_height of {self.chevron_height} is not valid!", True
                 )
             if _chevron_height <= 0:
-                tools.feedback(
+                feedback(
                     "The chevron_height must be greater than zero; "
                     f"not {self.chevron_height}.",
                     True,
@@ -3333,7 +3311,7 @@ class RectangleShape(BaseShape):
                 self.vertexes = self.get_vertexes(**kwargs)
         else:
             self.vertexes = self.get_vertexes(**kwargs)
-        # tools.feedback(f'*** Rect {len(self.vertexes)=}')
+        # feedback(f'*** Rect {len(self.vertexes)=}')
 
         # ---- calculate rounding
         # radius (multiple) – draw rounded rectangle corners. S
@@ -3345,17 +3323,21 @@ class RectangleShape(BaseShape):
             radius = rounding / min(self._u.width, self._u.height)
         if self.rounded:
             radius = self.rounded_radius  # hard-coded OR from defaults
+        if radius and radius > 0.5:
+            feedback(
+                f"The rounding radius cannot exceed 50% of the smallest side.", True
+            )
 
         # ---- draw rectangle
-        # tools.feedback(f'*** RECT {self.col=} {self.row=} {x=} {y=} {radius=}')
+        # feedback(f'*** RECT {self.col=} {self.row=} {x=} {y=} {radius=}')
         if is_notched or is_chevron or is_peaks:
-            # tools.feedback(f'*** RECT  vertices')
+            # feedback(f'*** RECT  vertices')
             cnv.draw_polyline(self.vertexes)
             kwargs["closed"] = True
             self.set_canvas_props(cnv=cnv, index=ID, **kwargs)
             self._debug(cnv, vertices=self.vertexes)
         else:
-            # tools.feedback(f'*** RECT  normal')   )
+            # feedback(f'*** RECT  normal')   )
             cnv.draw_rect((x, y, x + self._u.width, y + self._u.height), radius=radius)
             self.set_canvas_props(cnv=cnv, index=ID, **kwargs)
             self._debug(cnv, vertices=self.vertexes)
@@ -3366,9 +3348,7 @@ class RectangleShape(BaseShape):
                         self.borders,
                     ]
                 if not isinstance(self.borders, list):
-                    tools.feedback(
-                        'The "borders" property must be a list of sets or a set'
-                    )
+                    feedback('The "borders" property must be a list of sets or a set')
                 for border in self.borders:
                     self.draw_border(cnv, border, ID)  # BaseShape
 
@@ -3405,15 +3385,15 @@ class RectangleShape(BaseShape):
             self.draw_hatch(cnv, ID, vertices, self.hatch_count, rotation=rotation)
 
         # ---- grid marks
-        if self.grid_marks:
-            deltag = self.unit(self.grid_length)
+        if self.grid_marks:  # and not kwargs.get("card_back", False):
+            deltag = self.unit(self.grid_marks_length)
             gx, gy = 0, y  # left-side
             cnv.draw_line((gx, gy), (deltag, gy))
             cnv.draw_line((0, gy + self._u.height), (deltag, gy + self._u.height))
-            gx, gy = x, self.paper[1]  # top-side
+            gx, gy = x, globals.page[1]  # top-side
             cnv.draw_line((gx, gy), (gx, gy - deltag))
             cnv.draw_line((gx + self._u.width, gy), (gx + self._u.width, gy - deltag))
-            gx, gy = self.paper[0], y  # right-side
+            gx, gy = globals.page[0], y  # right-side
             cnv.draw_line((gx, gy), (gx - deltag, gy))
             cnv.draw_line((gx, gy + self._u.height), (gx - deltag, gy + self._u.height))
             gx, gy = x, 0  # bottom-side
@@ -3421,8 +3401,8 @@ class RectangleShape(BaseShape):
             cnv.draw_line((gx + self._u.width, gy), (gx + self._u.width, gy + deltag))
             # done
             gargs = {}
-            gargs["stroke"] = self.grid_stroke
-            gargs["stroke_width"] = self.grid_stroke_width
+            gargs["stroke"] = self.grid_marks_stroke
+            gargs["stroke_width"] = self.grid_marks_stroke_width
             self.set_canvas_props(cnv=None, index=ID, **gargs)
 
         # ---- centred shape (with offset)
@@ -3434,7 +3414,7 @@ class RectangleShape(BaseShape):
                     _abs_cy=y_d + self.unit(self.centre_shape_my),
                 )
             elif cshape_name not in GRID_SHAPES_WITH_CENTRE:
-                tools.feedback(f"Cannot draw a centered {cshape_name}!")
+                feedback(f"Cannot draw a centered {cshape_name}!")
         # ---- cross
         self.draw_cross(cnv, x_d, y_d, rotation=kwargs.get("rotation"))
         # ---- dot
@@ -3451,6 +3431,8 @@ class RectangleShape(BaseShape):
         self.set_coord(cnv, x_d, y_d)
         # ---- set grid property
         self.grid = GridShape(label=self.coord_text, x=x_d, y=y_d, shape=self)
+        # ---- set calculated top-left in user units
+        self.calculated_left, self.calculated_top = x / self.units, y / self.units
 
 
 class RhombusShape(BaseShape):
@@ -3492,7 +3474,7 @@ class RhombusShape(BaseShape):
         _dirs = tools.validated_directions(self.hatch, DirectionGroup.CIRCULAR, "hatch")
         _num = tools.as_int(num, "hatch_count")
         lines = int((_num - 1) / 2 + 1)
-        # tools.feedback(f'*** RHOMB {num=} {lines=} {vertices=} {_dirs=} {side=}')
+        # feedback(f'*** RHOMB {num=} {lines=} {vertices=} {_dirs=} {side=}')
         if num >= 1:
             if any(item in _dirs for item in ["e", "w", "o"]):
                 cnv.draw_line(vertices[0], vertices[2])
@@ -3560,7 +3542,7 @@ class RhombusShape(BaseShape):
             kwargs["rotation_point"] = self.centroid
         # ---- draw rhombus
         self.vertexes = self.get_vertexes(cx=cx, cy=cy, x=x, y=y)
-        # tools.feedback(f'***Rhombus {x=} {y=} {self.vertexes=}')
+        # feedback(f'***Rhombus {x=} {y=} {self.vertexes=}')
         cnv.draw_polyline(self.vertexes)
         kwargs["closed"] = True
         self.set_canvas_props(cnv=cnv, index=ID, **kwargs)
@@ -3579,7 +3561,7 @@ class RhombusShape(BaseShape):
                     self.borders,
                 ]
             if not isinstance(self.borders, list):
-                tools.feedback('The "borders" property must be a list of sets or a set')
+                feedback('The "borders" property must be a list of sets or a set')
             for border in self.borders:
                 self.draw_border(cnv, border, ID)  # BaseShape
         # ---- dot
@@ -3617,7 +3599,7 @@ class RightAngledTriangleShape(BaseShape):
         self._vertexes = []
         self._vertexes.append(Point(x, y))
         if not self.hand or not self.flip:
-            tools.feedback(
+            feedback(
                 'Need to supply both "flip" and "hand" options! for triangle.',
                 stop=True,
             )
@@ -3644,7 +3626,7 @@ class RightAngledTriangleShape(BaseShape):
             y_sum += y
             self.vertexes.append((x, y))
         # ---- draw RightAngledTriangle
-        # tools.feedback(f'***RAT {x=} {y=} {self.vertexes=}')
+        # feedback(f'***RAT {x=} {y=} {self.vertexes=}')
         cnv.draw_polyline(self.vertexes)
         kwargs["closed"] = True
         self.set_canvas_props(cnv=cnv, index=ID, **kwargs)
@@ -3675,13 +3657,13 @@ class SectorShape(BaseShape):
         # ---- perform overrides
         self.radius = self.radius or self.diameter / 2.0
         if self.cx is None and self.x is None:
-            tools.feedback("Either provide x or cx for Sector", True)
+            feedback("Either provide x or cx for Sector", True)
         if self.cy is None and self.y is None:
-            tools.feedback("Either provide y or cy for Sector", True)
+            feedback("Either provide y or cy for Sector", True)
         if self.cx is not None and self.cy is not None:
             self.x = self.cx - self.radius
             self.y = self.cy - self.radius
-        # tools.feedback(f'***Sector {self.cx=} {self.cy=} {self.x=} {self.y=}')
+        # feedback(f'***Sector {self.cx=} {self.cy=} {self.x=} {self.y=}')
         # ---- calculate centre
         radius = self._u.radius
         if self.row is not None and self.col is not None:
@@ -3694,7 +3676,7 @@ class SectorShape(BaseShape):
         else:
             self.x_c = self._u.x + radius
             self.y_c = self._u.y + radius
-        # tools.feedback(f'***Sector {self.x_c=} {self.y_c=} {self.radius=}')
+        # feedback(f'***Sector {self.x_c=} {self.y_c=} {self.radius=}')
 
     def draw(self, cnv=None, off_x=0, off_y=0, ID=None, **kwargs):
         """Draw sector on a given canvas."""
@@ -3709,7 +3691,7 @@ class SectorShape(BaseShape):
         # ---- circumference point in units
         p_P = geoms.point_on_circle(p_C, self._u.radius, self.angle_start)
         # ---- draw sector
-        # tools.feedback(
+        # feedback(
         #     f'***Sector: {p_P=} {p_C=} {self.angle_start=} {self.angle_width=}')
         cnv.draw_sector(  # anti-clockwise from p_P; 90° default
             (p_C.x, p_C.y), (p_P.x, p_P.y), self.angle_width, fullSector=True
@@ -3753,7 +3735,7 @@ class ShapeShape(BaseShape):
                 x = self.unit(_x0) + self._o.delta_x + x_offset
                 y = self.unit(_y0) + self._o.delta_y + y_offset
                 self.vertexes.append((x, y))
-            # tools.feedback(f'***RAT {x=} {y=} {self.vertexes=}')
+            # feedback(f'***RAT {x=} {y=} {self.vertexes=}')
             cnv.draw_polyline(self.vertexes)
             kwargs["closed"] = True
             self.set_canvas_props(cnv=cnv, index=ID, **kwargs)
@@ -3768,7 +3750,7 @@ class ShapeShape(BaseShape):
                 # ---- * text
                 self.draw_label(cnv, ID, x, y, **kwargs)
         else:
-            tools.feedback("There are no points to draw the Polyshape", False, True)
+            feedback("There are no points to draw the Polyshape", False, True)
 
 
 class SquareShape(RectangleShape):
@@ -3800,7 +3782,7 @@ class SquareShape(RectangleShape):
 
     def draw(self, cnv=None, off_x=0, off_y=0, ID=None, **kwargs):
         """Draw a square on a given canvas."""
-        # tools.feedback(f'@Square@ {self.label=} // {off_x=}, {off_y=} {kwargs=}')
+        # feedback(f'@Square@ {self.label=} // {off_x=}, {off_y=} {kwargs=}')
         return super().draw(cnv, off_x, off_y, ID, **kwargs)
 
 
@@ -3816,7 +3798,7 @@ class StadiumShape(BaseShape):
         if self.cx is not None and self.cy is not None:
             self.x = self.cx - self.width / 2.0
             self.y = self.cy - self.height / 2.0
-            # tools.feedback(f"*** INIT OldX:{x} OldY:{y} NewX:{self.x} NewY:{self.y}")
+            # feedback(f"*** INIT OldX:{x} OldY:{y} NewX:{self.x} NewY:{self.y}")
         self.kwargs = kwargs
 
     def draw(self, cnv=None, off_x=0, off_y=0, ID=None, **kwargs):
@@ -3826,7 +3808,7 @@ class StadiumShape(BaseShape):
         super().draw(cnv, off_x, off_y, ID, **kwargs)  # unit-based props
         if "fill" in kwargs.keys():
             if kwargs.get("fill") is None:
-                tools.feedback("Cannot have no fill for a Stadium!", True)
+                feedback("Cannot have no fill for a Stadium!", True)
         # ---- adjust start
         if self.row is not None and self.col is not None:
             x = self.col * self._u.width + self._o.delta_x
@@ -3853,7 +3835,7 @@ class StadiumShape(BaseShape):
             Point(x + self._u.width, y + self._u.height),
             Point(x + self._u.width, y),
         ]
-        # tools.feedback(f'*** Stad{len(self.vertexes)=}')
+        # feedback(f'*** Stad{len(self.vertexes)=}')
         # ---- edges
         _edges = tools.validated_directions(
             self.edges, DirectionGroup.CARDINAL, "edges"
@@ -3861,7 +3843,7 @@ class StadiumShape(BaseShape):
         self.vertexes.append(self.vertexes[0])
 
         # ---- draw rect fill only
-        # tools.feedback(f'***Stadium:Rect {x=} {y=} {self.vertexes=}')
+        # feedback(f'***Stadium:Rect {x=} {y=} {self.vertexes=}')
         keys = copy.copy(kwargs)
         keys["stroke"] = None
         cnv.draw_polyline(self.vertexes)
@@ -3989,7 +3971,7 @@ class StarShape(BaseShape):
             kwargs["rotation"] = rotation
             kwargs["rotation_point"] = self.centroid
         # ---- draw star
-        # tools.feedback(f'***Star {x=} {y=} {self.vertexes_list=}')
+        # feedback(f'***Star {x=} {y=} {self.vertexes_list=}')
         self.vertexes_list = self.get_vertexes(x, y)
         cnv.draw_polyline(self.vertexes_list)
         kwargs["closed"] = True
@@ -4037,17 +4019,17 @@ class StarFieldShape(BaseShape):
         """Draw a single star at a Point (x,y)."""
         color = self.colors[random.randint(0, len(self.colors) - 1)]
         size = self.sizes[random.randint(0, len(self.sizes) - 1)]
-        # tools.feedback(f'*** StarFld {color=} {size=} {position=}')
+        # feedback(f'*** StarFld {color=} {size=} {position=}')
         cnv.draw_circle((position.x, position.y), size)
         self.set_canvas_props(cnv=cnv, index=None, stroke=color, fill=color)
 
     def cluster_stars(self, cnv):
-        tools.feedback("CLUSTER NOT IMPLEMENTED", True)
+        feedback("CLUSTER NOT IMPLEMENTED", True)
         for star in range(0, self.star_count):
             pass
 
     def random_stars(self, cnv):
-        # tools.feedback(f'*** StarFld {self.enclosure=}')
+        # feedback(f'*** StarFld {self.enclosure=}')
         if isinstance(self.enclosure, CircleShape):
             x_c, y_c = self.enclosure.calculate_centre()
         if isinstance(self.enclosure, PolygonShape):
@@ -4077,7 +4059,7 @@ class StarFieldShape(BaseShape):
                 if not geoms.point_in_polygon(x_y, vertices):
                     continue
             else:
-                tools.feedback(f"{self.enclosure} IS NOT AN IMPLEMENTED SHAPE!", True)
+                feedback(f"{self.enclosure} IS NOT AN IMPLEMENTED SHAPE!", True)
             self.draw_star(cnv, x_y)
             stars += 1
 
@@ -4093,8 +4075,8 @@ class StarFieldShape(BaseShape):
         random.seed()
         area = math.sqrt(self.enclosure.calculate_area())
         self.star_count = round(self.density * self.points_to_value(area))
-        # tools.feedback(f'*** StarFld {self.star_pattern =} {self.enclosure}')
-        # tools.feedback(f'*** StarFld {area=} {self.density=} {self.star_count=}')
+        # feedback(f'*** StarFld {self.star_pattern =} {self.enclosure}')
+        # feedback(f'*** StarFld {area=} {self.density=} {self.star_count=}')
         # ---- set canvas
         self.set_canvas_props(index=ID)
         # ---- draw starfield
@@ -4147,9 +4129,9 @@ class TextShape(BaseShape):
         if _locale:
             self.text = tools.eval_template(self.text, _locale)
         _text = self.textify(ID)
-        # tools.feedback(f'*** Text {ID=} {_locale=} {self.text=} {_text=}', False)
+        # feedback(f'*** Text {ID=} {_locale=} {self.text=} {_text=}', False)
         if _text is None or _text == "":
-            tools.feedback("No text supplied for the Text shape!", False, True)
+            feedback("No text supplied for the Text shape!", False, True)
             return
         _text = str(_text)  # card data could be numeric
         if "\\u" in _text:
@@ -4173,9 +4155,7 @@ class TextShape(BaseShape):
             ]:
                 _text = _text.title()
             else:
-                tools.feedback(
-                    f"The transform {self.transform} is unknown.", False, True
-                )
+                feedback(f"The transform {self.transform} is unknown.", False, True)
         # ---- rotation
         if self.rotation is None or self.rotation == 0:
             text_rotation = 0
@@ -4199,10 +4179,11 @@ class TextShape(BaseShape):
             try:
                 # style
                 keys["fontsize"] = self.font_size
-                keys["fontname"] = self.font_name
-                # keys['fontfile'] = self.font_file
-                keys["color"] = get_color(self.stroke)
-                # keys["fill"] = get_color(self.fill)
+                # NB - replace spaces to prevent: bad fontname chars {' '}
+                keys["fontname"] = self.font_name.strip().replace(" ", "_")
+                keys["fontfile"] = self.font_file
+                keys["color"] = tools.get_color(self.stroke)
+                # keys["fill"] = tools.get_color(self.fill)
                 keys["align"] = self.to_alignment()
                 _lineheight = kwargs.get("line_height", None)
                 keys["lineheight"] = self.kw_float(_lineheight, "line_height")
@@ -4221,10 +4202,14 @@ class TextShape(BaseShape):
                 # keys['overlay'] = True
                 # keys['expandtabs'] = 8
                 # keys['charwidths'] = None
-                # tools.feedback(f'*** Text WRAP {keys=} \n=> {rect=} _text:{_text}')
+                # feedback(f'*** Text WRAP {keys=} \n=> {rect=} _text:{_text}')
+                if self.run_debug:
+                    globals.doc_page.draw_rect(
+                        rect, color=self.debug_color, dashes="[1 2] 0"
+                    )
                 current_page.insert_textbox(rect, _text, **keys)
             except ValueError as err:
-                tools.feedback(f"Cannot create Text - {err}", True)
+                feedback(f"Cannot create Text! - {err}", True)
             except IOError as err:
                 _err = str(err)
                 cause, thefile = "", ""
@@ -4235,27 +4220,31 @@ class TextShape(BaseShape):
                     thefile = _err.split("Cannot open resource")[1].strip("\n")
                     thefile = f" - unable to open or find {thefile}"
                 msg = f"Cannot create Text{thefile}{cause}"
-                tools.feedback(msg, True, True)
+                feedback(msg, True, True)
         # ---- HTML text
         elif self.html:
             # insert_htmlbox(rect, text, *, css=None, scale_low=0,
             #   archive=None, rotate=0, oc=0, opacity=1, overlay=True)
             try:
-                keys["opacity"] = get_opacity(self.transparency)
+                keys["opacity"] = tools.get_opacity(self.transparency)
                 if self.css:
                     keys["css"] = globals.css + " * {%s}" % self.css
                 else:
                     if globals.css:
                         keys["css"] = globals.css
                 keys["archive"] = globals.archive
-                # tools.feedback(f'*** Text HTML {keys=} {rect=} {_text=} {keys=}')
+                # feedback(f'*** Text HTML {keys=} {rect=} {_text=} {keys=}')
+                if self.run_debug:
+                    globals.doc_page.draw_rect(
+                        rect, color=self.debug_color, dashes="[1 2] 0"
+                    )
                 current_page.insert_htmlbox(rect, _text, **keys)
             except ValueError as err:
-                tools.feedback(f"Cannot create Text - {err}", True)
+                feedback(f"Cannot create Text - {err}", True)
         # ---- text string
         else:
             keys["rotation"] = self.rotation
-            # tools.feedback(f"*** Text PLAIN {x_t=} {y_t=} {_text=} {keys=}")
+            # feedback(f"*** Text PLAIN {x_t=} {y_t=} {_text=} {keys=}")
             self.draw_multi_string(cnv, x_t, y_t, _text, **keys)  # use morph to rotate
 
 
@@ -4269,7 +4258,7 @@ class TrapezoidShape(BaseShape):
         super(TrapezoidShape, self).__init__(_object=_object, canvas=canvas, **kwargs)
         self.kwargs = kwargs
         if self.top >= self.width:
-            tools.feedback("The top cannot be longer than the width!", True)
+            feedback("The top cannot be longer than the width!", True)
         self.delta_width = self._u.width - self._u.top
         # overrides to centre shape
         if self.cx is not None and self.cy is not None:
@@ -4353,7 +4342,7 @@ class TrapezoidShape(BaseShape):
             kwargs["rotation_point"] = self.centroid
         # ---- draw trapezoid
         self.vertexes = self.get_vertexes(cx=cx, cy=cy, x=x, y=y)
-        # tools.feedback(f'***Trap {x=} {y=} {self.vertexes=}')
+        # feedback(f'***Trap {x=} {y=} {self.vertexes=}')
         cnv.draw_polyline(self.vertexes)
         kwargs["closed"] = True
         self.set_canvas_props(cnv=cnv, index=ID, **kwargs)
@@ -4365,7 +4354,7 @@ class TrapezoidShape(BaseShape):
                     self.borders,
                 ]
             if not isinstance(self.borders, list):
-                tools.feedback('The "borders" property must be a list of sets or a set')
+                feedback('The "borders" property must be a list of sets or a set')
             for border in self.borders:
                 self.draw_border(cnv, border, ID)  # BaseShape
         # ---- dot
@@ -4401,7 +4390,7 @@ class CommonShape(BaseShape):
 
     def draw(self, cnv=None, off_x=0, off_y=0, ID=None, **kwargs):
         """Not applicable."""
-        tools.feedback("The Common shape cannot be drawn.", True)
+        feedback("The Common shape cannot be drawn.", True)
 
 
 class FooterShape(BaseShape):
@@ -4424,6 +4413,6 @@ class FooterShape(BaseShape):
         x = self.kwargs.get("x", self._u.page_width / 2.0)  # centre across page
         y = self.unit(self.margin_bottom) / 2.0  # centre in margin
         text = kwargs.get("text") or "Page %s" % ID
-        # tools.feedback(f'*** FooterShape {ID=} {text=} {x=} {y=} {font_size=}')
+        # feedback(f'*** FooterShape {ID=} {text=} {x=} {y=} {font_size=}')
         # ---- draw footer
         self.draw_multi_string(cnv, x, y, text, align="centre", font_size=font_size)

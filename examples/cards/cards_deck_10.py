@@ -15,7 +15,7 @@ Deck(
     bleed_fill="lightsteelblue",
     offset=0.15,
     grid_marks=True,
-    grid_length=0.18,
+    grid_marks_length=0.2,
     spacing=0.15,
     frame='circle'
     )
