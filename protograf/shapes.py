@@ -14,7 +14,7 @@ from urllib.parse import urlparse
 
 # third party
 import pymupdf
-from pymupdf import Shape as muShape, Point as muPoint, Matrix
+from pymupdf import Point as muPoint, Rect as muRect
 import segno  # QRCode
 
 # local
@@ -4168,7 +4168,7 @@ class TextShape(BaseShape):
         keys["rotate"] = text_rotation
         # ---- BOX text
         current_page = globals.doc_page
-        rect = pymupdf.Rect(x_t, y_t, x_t + width, y_t + height)
+        rect = muRect(x_t, y_t, x_t + width, y_t + height)
         if self.wrap:
             # insert_textbox(
             #     rect, buffer, *, fontsize=11, fontname='helv', fontfile=None,

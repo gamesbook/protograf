@@ -3,9 +3,11 @@ Development
 ===========
 
 .. |dash| unicode:: U+2014 .. EM DASH SIGN
+.. |check| unicode:: U+2610 .. BALLOT BOX
 
-These notes are aimed at those who might be developing the code further,
-or who want to use :doc:`protograf <index>` as part of other Python
+These notes are aimed at those who might be developing the
+`protograf code <https://github.com/gamesbook/protograf>`_ further,
+or who just want to use :doc:`protograf <index>` as part of other Python
 projects.
 
 .. _table-of-contents-dev:
@@ -51,8 +53,8 @@ Project packaging is handling via *poetry* (https://python-poetry.org/).  You
 must have installed this before starting development. Follow the guides to
 setup a virtual environment in which to work.
 
-Workflow
---------
+Poetry Workflow
+---------------
 
 As you work, you can update the changes locally by running::
 
@@ -97,25 +99,33 @@ minor 	2.1.4 	2.2.0
 major 	1.3.2 	2.0.0
 ======= ======= =======
 
-Releases on pypi
+Releases to pypi
 ----------------
 
 The software includes a GitHub workflow |dash| see the ``.github/workflows/``
-directory |dash| which handles pushing new releases onto https://pypi.org
+directory |dash| which handles pushing new, tagged releases onto
+https://pypi.org for distribution.
 
-Once all changes have been made and tested a new version can be released.
+Once all code changes have been made and tested |dash| all examples should
+run as normal |dash| a new version can be released.
 
-To trigger such an update, update the version as above using `poetry`, and
-then tag and push::
+Follow this process:
 
-    git tag 0.1.2
-    git push origin --tags
+- |check| If working in a branch, merge changes into master
+- |check| Ensure you are on the ``master`` branch
+- |check| Format code with black (``black protograf``)
+- |check| Finalise release date and notes in ``CHANGES.txt``
+- |check| Update the ``examples.zip`` file with latest example code
+- |check| Update the version using poetry e.g. ``poetry version patch``
+- |check| Commit and push all these changes to GitHub
+- |check| Add a tag that matches the poetry version e.g. ``git tag 0.1.2``
+- |check| Push tag to GitHub i.e. ``git push origin --tags``
 
 If you check the *Actions* tab on the GitHub project page, you should now see
 the workflow in action.
 
-When complete, there should now be an updated version showing if you refresh
-the home page of the project on https://pypi.org/
+When complete, there should now be an updated version showing, if you do a
+refresh of the home page of the project at https://pypi.org/project/protograf/
 
 Working with latest
 -------------------
@@ -124,6 +134,9 @@ If you're just interested in installing the latest version via ``pip``,
 then use::
 
     pip install git+https://github.com/gamesbook/protograf
+
+Or ``uv pip install git+https://github.com/gamesbook/protograf`` if using
+``uv``.
 
 
 Documentation
@@ -156,4 +169,4 @@ Some useful tools:
 - https://github.com/mgedmin/restview - a reStructuredText viewer in your browser;
   it currently does **not** support Sphinx directives
 - https://pypi.org/project/sphinx-view/ - a reStructuredText viewer in your browser
-  that *does* support Sphinx directives (but is quite dated)
+  that **does** support Sphinx directives (but is quite dated)

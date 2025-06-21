@@ -17,7 +17,7 @@ from urllib.parse import urlparse
 import xlrd
 
 # third-party
-from pymupdf import Shape as muShape, Point as muPoint, Matrix
+from pymupdf import Point as muPoint, Matrix
 from pymupdf.utils import getColor
 import requests
 

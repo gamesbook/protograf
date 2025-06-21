@@ -21,6 +21,7 @@ from typing import Union, Any
 # third party
 import jinja2
 import pymupdf
+from pymupdf import Rect as muRect, Archive
 
 # local
 from .bgg import BGGGame, BGGGameList
@@ -448,7 +449,7 @@ class DeckOfCards:
     """
 
     def __init__(self, canvas=None, **kwargs):
-        self.cnv = canvas  # initial pymupdf.Shape object (need one per Page)
+        self.cnv = canvas  # initial pymupdf Shape object (need one per Page)
         self.kwargs = kwargs
         # feedback(f'$$$ DeckShape KW=> {self.kwargs}')
         # ---- cards
@@ -661,7 +662,7 @@ class DeckOfCards:
             """Process a Page of Cards for front or back of a DeckOfCards
 
             Args:
-                cnv: pymupdf.Shape object (one per Page)
+                cnv: pymupdf Shape object (one per Page)
                 state: track what is being printed on the page
                 page_number: current
                 front: if True, print CardShapes in `deck.fronts`
@@ -1016,17 +1017,17 @@ class DeckOfCards:
             src = pymupdf.open(gutterfile)
             if is_landscape:
                 # upper half page (r1: backs)
-                r1 = pymupdf.Rect(0, 0, cnv.width, cnv.height / 2)
+                r1 = muRect(0, 0, cnv.width, cnv.height / 2)
                 r1_rotate = 180
                 # lower half page (r2: fronts)
                 r2 = r1 + (0, cnv.height / 2, 0, cnv.height / 2)
                 r2_rotate = 0
             else:
                 # left half page (r2: fronts)
-                r2 = pymupdf.Rect(0, 0, cnv.width / 2, cnv.height)
+                r2 = muRect(0, 0, cnv.width / 2, cnv.height)
                 r2_rotate = -90
                 # right half page (r1: backs)
-                r1 = pymupdf.Rect(cnv.width / 2, 0, cnv.width, cnv.height)
+                r1 = muRect(cnv.width / 2, 0, cnv.width, cnv.height)
                 r1_rotate = 90
             # insert pages from gutter.pdf
             for page_number in range(0, src.page_count, 2):
@@ -1248,7 +1249,7 @@ def Create(**kwargs):
         )
     globals.filename = os.path.join(globals.pargs.directory, _filename)
     # ---- pymupdf doc, page, shape/canvas
-    globals.document = pymupdf.open()  # pymupdf Document
+    globals.document = pymupdf.open()  # pymupdf.Document
     globals.doc_page = globals.document.new_page(
         width=globals.page[0], height=globals.page[1]
     )  # pymupdf Page
@@ -1262,7 +1263,7 @@ def Create(**kwargs):
     if _cards:
         Deck(canvas=globals.canvas, sequence=range(1, _cards + 1), **kwargs)  # deck var
     # ---- pickle font info for pymupdf
-    globals.archive = pymupdf.Archive()
+    globals.archive = Archive()
     globals.css = ""
     cached_fonts = tools.as_bool(kwargs.get("cached_fonts", True))
     if not cached_fonts or globals.pargs.fonts:

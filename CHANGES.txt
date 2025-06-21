@@ -5,6 +5,11 @@ protograf
 Changes
 =======
 
+2025-06-21 (0.2.4)
+------------------
+- Patched error caused by pyMuPDF upgrade
+- Adjust imports to better handle pyMuPDF dependencies
+
 2025-06-21 (0.2.3)
 ------------------
 - Move bulk of constant and structure definitions to their own files

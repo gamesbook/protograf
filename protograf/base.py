@@ -23,9 +23,21 @@ from jinja2.environment import Template
 import requests
 from PIL import Image, ImageDraw, UnidentifiedImageError
 import pymupdf
-from pymupdf import Shape as muShape, Point as muPoint, Page as muPage, Matrix
-
-# from pymupdf.utils import getColor, getColorList
+from pymupdf import (
+    Document as muDocument,
+    Font as muFont,
+    Matrix,
+    Point as muPoint,
+    Page as muPage,
+    Rect as muRect,
+)
+from pymupdf.utils import Shape as muShape
+from pymupdf import (
+    TEXT_ALIGN_CENTER,
+    TEXT_ALIGN_RIGHT,
+    TEXT_ALIGN_JUSTIFY,
+    TEXT_ALIGN_LEFT,
+)
 
 # local
 from protograf.utils import geoms, tools, support
@@ -55,7 +67,7 @@ class BaseCanvas:
 
     def __init__(
         self,
-        document: pymupdf.Document,
+        document: muDocument,
         paper: str = None,  # e.g. "A4", "Letter"
         defaults: dict = None,
         **kwargs,
@@ -196,7 +208,7 @@ class BaseCanvas:
         self.style = self.defaults.get("style", None)
         self.wrap = self.defaults.get("wrap", False)
         self.align = self.defaults.get("align", "centre")  # centre,left,right,justify
-        self._alignment = pymupdf.TEXT_ALIGN_LEFT  # see to_alignment()
+        self._alignment = TEXT_ALIGN_LEFT  # see to_alignment()
         # ---- grid cut marks
         self.grid_marks = self.defaults.get("grid_marks_marks", False)
         grid_marks_stroke = self.defaults.get("grid_marks_stroke", "gray")
@@ -487,11 +499,9 @@ class BaseCanvas:
 
 
 class BaseShape:
-    """Base class for objects that are drawn on a given canvas aka pymupdf.Shape."""
+    """Base class for objects drawn on a given canvas aka a pymupdf_utils_Shape"""
 
-    def __init__(
-        self, _object: pymupdf.Shape = None, canvas: BaseCanvas = None, **kwargs
-    ):
+    def __init__(self, _object: muShape = None, canvas: BaseCanvas = None, **kwargs):
         self.kwargs = kwargs
         # feedback(f'### BaseShape {_object=} {canvas=} {kwargs=}')
         # ---- constants
@@ -622,7 +632,7 @@ class BaseShape:
         self.style = kwargs.get("style", base.style)
         self.wrap = kwargs.get("wrap", base.wrap)
         self.align = kwargs.get("align", base.align)  # centre,left,right,justify
-        self._alignment = pymupdf.TEXT_ALIGN_LEFT  # see to_alignment()
+        self._alignment = TEXT_ALIGN_LEFT  # see to_alignment()
         # ---- text: base
         self.text = kwargs.get("text", base.text)
         self.text_size = self.kw_float(kwargs.get("text_size", base.text_size))
@@ -1332,15 +1342,15 @@ class BaseShape:
         """Convert local, English-friendly alignments to a PyMuPDF Enum."""
         match self.align:
             case "centre" | "center":
-                self._alignment = pymupdf.TEXT_ALIGN_CENTER
+                self._alignment = TEXT_ALIGN_CENTER
             case "right":
-                self._alignment = pymupdf.TEXT_ALIGN_RIGHT
+                self._alignment = TEXT_ALIGN_RIGHT
             case "justify":
                 # TEXT_ALIGN_JUSTIFY only achievable with “simple” (singlebyte) fonts
                 # this includes the PDF Base 14 Fonts.
-                self._alignment = pymupdf.TEXT_ALIGN_JUSTIFY
+                self._alignment = TEXT_ALIGN_JUSTIFY
             case _:
-                self._alignment = pymupdf.TEXT_ALIGN_LEFT
+                self._alignment = TEXT_ALIGN_LEFT
         return self._alignment
 
     def is_kwarg(self, value) -> bool:
@@ -1486,13 +1496,11 @@ class BaseShape:
                     f.write(image.content)
             return image_local
 
-        def image_box_resize(
-            bbox: pymupdf.Rect, img_path: str, rotation: float
-        ) -> pymupdf.Rect:
+        def image_box_resize(bbox: muRect, img_path: str, rotation: float) -> muRect:
             """Recompute bounding Rect for a rotated image to maintain image size.
 
             Args
-                bbox: Rect; original bounding box for the image
+                bbox: pymupdf Rect; original bounding box for the image
                 image_path: str; full path to image file
                 rotation: angle; degrees of image rotation
             Returns
@@ -1503,7 +1511,7 @@ class BaseShape:
             # Compute Rect center point
             center = (bbox.tl + bbox.br) / 2
             # Define the desired rotation matrix
-            matrx = pymupdf.Matrix(rotation)
+            matrx = Matrix(rotation)
             # Compute the tetragon (Quad) for the Rect rotated around its center `
             quad = bbox.morph(center, matrx)
             # Compute the rectangle hull of the quad for new boundary box
@@ -1538,7 +1546,7 @@ class BaseShape:
                 new_box_width = bbox.width * math.cos(
                     rotation_rad
                 ) + img_height * math.sin(rotation_rad)
-                new_bbox = pymupdf.Rect(
+                new_bbox = muRect(
                     (center.x - new_box_width / 2.0, center.y - new_box_height / 2.0),
                     (center.x + new_box_width / 2.0, center.y + new_box_height / 2.0),
                 )
@@ -1576,7 +1584,7 @@ class BaseShape:
             # ---- draw image
             pdfbytes = imgdoc.convert_to_pdf()  # make a 1-page PDF of it
             imgpdf = pymupdf.open("pdf", pdfbytes)
-            rct = pymupdf.Rect(scaffold)
+            rct = muRect(scaffold)
             pdf_page.show_pdf_page(
                 rct,  # where to place the image (rect-like)
                 imgpdf,  # source PDF
@@ -1631,7 +1639,7 @@ class BaseShape:
         scaffold = (origin[0], origin[1], origin[0] + width, origin[1] + height)
         if rotation is not None:
             # need a larger rect!
-            new_origin = image_box_resize(pymupdf.Rect(scaffold), image_local, rotation)
+            new_origin = image_box_resize(muRect(scaffold), image_local, rotation)
             scaffold = (
                 new_origin[0],
                 new_origin[1],
@@ -1769,7 +1777,7 @@ class BaseShape:
         """Low-level text drawing, split string (\n) if needed, with align and rotation.
 
         Args:
-            * canvas (pymupdf.Shape): set by calling function; which
+            * canvas (pymupdf Shape): set by calling function; which
               should access globals.canvas or BaseShape.canvas
             * xm (float) and ym (float): must be in native units (i.e. points)!
             * string (str): the text to draw/write
@@ -1856,23 +1864,23 @@ class BaseShape:
                     True,
                 )
                 keys["fontname"] = DEFAULT_FONT
-                font = pymupdf.Font(DEFAULT_FONT)  # built-in
+                font = muFont(DEFAULT_FONT)  # built-in
             else:
                 keys["fontname"] = keys["fontname"].replace(" ", "-")
-                font = pymupdf.Font(keys["fontname"], fontfile=keys["fontfile"])
+                font = muFont(keys["fontname"], fontfile=keys["fontfile"])
         else:
-            font = pymupdf.Font(keys["fontname"])  # built-in
+            font = muFont(keys["fontname"])  # built-in
 
         # ---- draw
         # print(f'### multi_string {xm=} {ym=} {string=} {keys}')
-        point = pymupdf.Point(xm, ym)
+        point = muPoint(xm, ym)
         if self.align:
             point = move_string_start(string, point, font, keys["fontsize"], self.align)
         if rotation:
             dx = pymupdf.get_text_length(string, fontsize=keys["fontsize"]) / 2
-            midpt = pymupdf.Point(point.x + dx, point.y)
+            midpt = muPoint(point.x + dx, point.y)
             # self.dot = 0.05; self.draw_dot(canvas, midpt.x, midpt.y)
-            morph = (midpt, pymupdf.Matrix(rotation))
+            morph = (midpt, Matrix(rotation))
         else:
             morph = None
 
@@ -2272,7 +2280,7 @@ class BaseShape:
 
         def processed_value(value):
 
-            if isinstance(value, (BaseShape, pymupdf.utils.Shape, pymupdf.Page)):
+            if isinstance(value, (BaseShape, muShape, muPage)):
                 return None
 
             elif isinstance(value, Template):

@@ -11,6 +11,8 @@ from typing import Any
 # third-party
 import imageio
 import pymupdf
+from pymupdf import Rect as muRect, Identity
+from pymupdf.utils import getColorInfoList
 
 # local
 from protograf import globals
@@ -493,7 +495,7 @@ def pdf_export(
         if fformat == ExportFormat.SVG:
             # ---- save pages as .svg files
             for pg_number, page in enumerate(doc):
-                svg = page.get_svg_image(matrix=pymupdf.Identity)
+                svg = page.get_svg_image(matrix=Identity)
                 if names and pg_number < len(names):
                     if names[pg_number] is not None:
                         fname = os.path.join(dirname, f"{names[pg_number]}.svg")
@@ -604,7 +606,7 @@ def pdf_cards_to_png(
                 )
                 # print(f"~~~ {page_num=} {iname=} {outline.tl=} {outline.br=} {dpi=}")
                 # https://pymupdf.readthedocs.io/en/latest/rect.html
-                rect = pymupdf.Rect(
+                rect = muRect(
                     outline.tl.x,  # top-left x0
                     outline.tl.y,  # top-left y0
                     outline.br.x,  # bottom-right x1
@@ -619,8 +621,6 @@ def pdf_cards_to_png(
 
 def color_set(svg_only: bool = False) -> list:
     """Get a list of PyMuPDF colors as dict: name, RGB and HEX as keys"""
-    from pymupdf.utils import getColorInfoList
-
     svg_color_names = named_colors.keys()
     color_info = getColorInfoList()  # [('ALICEBLUE', 240, 248, 255), ...]
     colors = []

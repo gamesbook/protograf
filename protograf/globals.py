@@ -54,11 +54,11 @@ def initialize():
     global font_size
     global units
 
-    archive = None  # will become a pymupdf.Archive()
+    archive = None  # will become a pymupdf Archive
     css = None  # will become a string containing CSS font details
-    document = None  # will become a pymupdf.Document object
-    doc_page = None  # will become a pymupdf.Page object
-    canvas = None  # will become a pymupdf.Shape object; one created per Page
+    document = None  # will become a pymupdf Document object
+    doc_page = None  # will become a pymupdf Page object
+    canvas = None  # will become a pymupdf Shape object; one created per Page
     base = None  # will become a base.BaseCanvas object
     deck = None  # will become a proto.DeckOfCards object
     deck_settings = (
