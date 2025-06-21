@@ -17,6 +17,7 @@ print(fi.font_file_css('Bookerly'))
 print(fi.font_families.keys()
 
 """
+# lib
 from functools import lru_cache
 import logging
 import os
@@ -27,6 +28,7 @@ import tempfile
 from typing import List, Union
 import unicodedata
 
+# third party
 from find_system_fonts_filename import (
     get_system_fonts_filename,
     FindSystemFontsFilenameException,
@@ -37,6 +39,7 @@ from fontTools.ttLib import TTFont, TTLibFileIsCollectionError
 package_logger = logging.getLogger("fontTools")
 package_logger.setLevel(logging.ERROR)
 
+# local
 from .support import BUILT_IN_FONTS
 from .messaging import feedback
 

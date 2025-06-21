@@ -5,6 +5,11 @@ protograf
 Changes
 =======
 
+2025-06-21 (0.2.5)
+------------------
+- Patched error caused by missing dependencies
+- Remove redundant template file
+
 2025-06-21 (0.2.4)
 ------------------
 - Patched error caused by pyMuPDF upgrade

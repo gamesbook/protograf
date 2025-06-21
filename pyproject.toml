@@ -1,6 +1,6 @@
 [project]
 name = "protograf"
-version = "0.2.4"
+version = "0.2.5"
 description = "Python utility for designing and creating simple, regular, graphic outputs as PDF/PNG files"
 authors = [
     {name = "Derek Hohls", email = "gamesbook@gmail.com"}
@@ -20,7 +20,9 @@ dependencies = [
     "jinja2 (>=3.1.4)",
     "segno (>=1.6.1)",
     "sphinx-copybutton (>=0.5.2,<0.6.0)",
-    "black (>=25.1.0,<26.0.0)"
+    "black (>=25.1.0,<26.0.0)",
+    "fonttools (>=4.58.4,<5.0.0)",
+    "findsystemfontsfilename (>=0.3.2,<0.4.0)"
 ]
 keywords = [ "python", "graphics", "boardgames", "cards", "counters", "tiles" ]
 classifiers = [
