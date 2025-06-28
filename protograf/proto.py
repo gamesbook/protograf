@@ -58,6 +58,7 @@ from .shapes import (
     TextShape,
     TrapezoidShape,
 )
+from .objects import PolyominoObject
 from .layouts import (
     GridShape,
     DotGridShape,
@@ -3478,6 +3479,23 @@ def BGG(user: str = None, ids: list = None, progress=False, short=500, **kwargs)
             "Please supply either `ids` or `user` to retrieve games from BGG", True
         )
     return gamelist
+
+
+# ---- objects ====
+
+
+def Polyomino(row=None, col=None, **kwargs):
+    kwargs = margins(**kwargs)
+    polym = polyomino(row=row, col=col, **kwargs)
+    polym.draw()
+    return polym
+
+
+def polyomino(row=None, col=None, **kwargs):
+    kwargs = margins(**kwargs)
+    kwargs["row"] = row
+    kwargs["col"] = col
+    return PolyominoObject(canvas=globals.canvas, **kwargs)
 
 
 # ---- dice ====
