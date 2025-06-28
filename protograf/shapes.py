@@ -3353,10 +3353,10 @@ class RectangleShape(BaseShape):
                     self.draw_border(cnv, border, ID)  # BaseShape
 
         # ---- fill pattern?
-        if self.pattern:
-            raise NotImplementedError("Pattern is not yet supported!")
+        if self.fill_pattern:
+            raise NotImplementedError("Fill pattern is not yet supported!")
             # TODO - convert to PyMuPDF
-            img, is_svg, is_dir = self.load_image(self.pattern)
+            img, is_svg, is_dir = self.load_image(self.fill_pattern)
             if img:
                 log.debug("IMG %s s%s %s", type(img._image), img._image.size)
                 iwidth = img._image.size[0]

@@ -158,7 +158,7 @@ class BaseCanvas:
         self.area = None
         self.vertexes = []
         # ---- repeats
-        self.pattern = self.defaults.get("pattern", None)
+        self.fill_pattern = self.defaults.get("fill_pattern", None)
         self.repeat = self.defaults.get("repeat", True)
         self.interval = self.defaults.get("interval", 0)
         self.interval_x = self.defaults.get("interval_x", self.interval)
@@ -271,12 +271,15 @@ class BaseCanvas:
         self.heading_my = self.defaults.get("heading_my", 0)
         self.heading_rotation = self.defaults.get("heading_rotation", 0)
         # ---- text block
-        self.outline_stroke = self.defaults.get("outline_stroke", self.fill)
-        self.outline_width = self.defaults.get("outline_width", 0)
         self.leading = self.defaults.get("leading", self.font_size)
         self.transform = self.defaults.get("transform", None)
         self.html = self.defaults.get("html", False)
         self.css = self.defaults.get("css", None)
+        # ---- text block / polyomino
+        self.outline_stroke = self.defaults.get("outline_stroke", self.fill)
+        self.outline_width = self.defaults.get("outline_width", 0)
+        self.outline_dashed = self.defaults.get("outline_dashed", None)
+        self.outline_dotted = self.defaults.get("outline_dotted", None)
         # ---- image / file
         self.source = self.defaults.get("source", None)  # file or http://
         self.cache_directory = None  # should be a pathlib.Path object
@@ -583,7 +586,7 @@ class BaseShape:
         self.area = base.area
         self.vertexes = base.vertexes  # list of shape's "points"
         # ---- repeats
-        self.pattern = kwargs.get("pattern", base.pattern)
+        self.fill_pattern = kwargs.get("fill_pattern", base.fill_pattern)
         self.repeat = kwargs.get("repeat", base.repeat)
         self.interval = self.kw_float(kwargs.get("interval", base.interval))
         self.interval_x = self.kw_float(kwargs.get("interval_x", base.interval_x))
@@ -674,14 +677,17 @@ class BaseShape:
         self.heading_my = self.kw_float(kwargs.get("heading_my", 0))
         self.heading_rotation = self.kw_float(kwargs.get("heading_rotation", 0))
         # ---- text block
+        self.transform = kwargs.get("transform", base.transform)
+        self.html = self.kw_bool(kwargs.get("html", base.html))
+        self.css = kwargs.get("css", base.css)
+        # ---- text block / polyomino
         self.outline_stroke = kwargs.get("outline_stroke", base.outline_stroke)
         self.outline_width = self.kw_float(
             kwargs.get("outline_width", base.outline_width)
         )
+        self.outline_dashed = kwargs.get("outline_dashed", base.outline_dashed)
+        self.outline_dotted = kwargs.get("outline_dotted", base.outline_dotted)
         self.leading = self.kw_float(kwargs.get("leading", self.font_size))
-        self.transform = kwargs.get("transform", base.transform)
-        self.html = self.kw_bool(kwargs.get("html", base.html))
-        self.css = kwargs.get("css", base.css)
         # feedback(f"### BShp:"
         # f"{self} {kwargs.get('fill')=} {self.fill=} {kwargs.get('fill_color')=}")
         # ---- image / file

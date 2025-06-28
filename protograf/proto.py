@@ -58,7 +58,7 @@ from .shapes import (
     TextShape,
     TrapezoidShape,
 )
-from .objects import PolyominoObject
+from .objects import PolyominoObject, PentominoObject
 from .layouts import (
     GridShape,
     DotGridShape,
@@ -3497,6 +3497,19 @@ def polyomino(row=None, col=None, **kwargs):
     kwargs["col"] = col
     return PolyominoObject(canvas=globals.canvas, **kwargs)
 
+
+def Pentomino(row=None, col=None, **kwargs):
+    kwargs = margins(**kwargs)
+    pentm = pentomino(row=row, col=col, **kwargs)
+    pentm.draw()
+    return pentm
+
+
+def pentomino(row=None, col=None, **kwargs):
+    kwargs = margins(**kwargs)
+    kwargs["row"] = row
+    kwargs["col"] = col
+    return PentominoObject(canvas=globals.canvas, **kwargs)
 
 # ---- dice ====
 
