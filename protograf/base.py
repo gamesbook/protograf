@@ -276,7 +276,7 @@ class BaseCanvas:
         self.html = self.defaults.get("html", False)
         self.css = self.defaults.get("css", None)
         # ---- text block / polyomino
-        self.outline_stroke = self.defaults.get("outline_stroke", self.fill)
+        self.outline_stroke = self.defaults.get("outline_stroke", None)
         self.outline_width = self.defaults.get("outline_width", 0)
         self.outline_dashed = self.defaults.get("outline_dashed", None)
         self.outline_dotted = self.defaults.get("outline_dotted", None)
@@ -399,10 +399,10 @@ class BaseCanvas:
         # ---- compass
         self.perimeter = self.defaults.get("perimeter", "circle")
         self.directions = self.defaults.get("directions", None)
-        # ---- triangle / trapezoid
-        self.flip = self.defaults.get("flip", "north")
-        # ---- triangle
-        self.hand = self.defaults.get("hand", "east")
+        # ---- triangle / trapezoid / polyomino
+        self.flip = self.defaults.get("flip", None)
+        # ---- triangle / polyomino
+        self.hand = self.defaults.get("hand", None)
         # ---- hexagon / circle
         self.centre_shape = self.defaults.get("centre_shape", "")
         self.centre_shape_mx = self.defaults.get("centre_shape_mx", 0)
@@ -830,10 +830,10 @@ class BaseShape:
         # ---- compass
         self.perimeter = kwargs.get("perimeter", "circle")  # circle|rectangle|hexagon
         self.directions = kwargs.get("directions", None)
-        # ---- triangle / trapezoid
-        self.flip = kwargs.get("flip", "north")
-        # ---- triangle
-        self.hand = kwargs.get("hand", "east")
+        # ---- triangle / trapezoid / polyomino
+        self.flip = kwargs.get("flip", base.flip)
+        # ---- triangle / polyomino
+        self.hand = kwargs.get("hand", base.hand)
         # ---- hexagon / circle / polygon
         self.centre_shape = kwargs.get("centre_shape", "")
         self.centre_shape_mx = self.kw_float(
@@ -1102,8 +1102,7 @@ class BaseShape:
         # print(f'### SetCnvProps: {kwargs.keys()} \n {kwargs.get("closed", "?")=}')
         return tools.set_canvas_props(cnv, index, defaults, **kwargs)
 
-    def draw(self, cnv=None, off_x=0, off_y=0, ID=None, **kwargs):
-        """Draw an element on a given canvas."""
+    def set_abs_and_offset(self, cnv=None, off_x=0, off_y=0, ID=None, **kwargs):
         self._o = self.set_offset_props(off_x, off_y)
         # self._abs... variable are absolute locations in native units;
         #  They are for internal use only and are not expected
@@ -1126,6 +1125,10 @@ class BaseShape:
         self.use_abs_c = (
             True if self._abs_cx is not None and self._abs_cy is not None else False
         )
+
+    def draw(self, cnv=None, off_x=0, off_y=0, ID=None, **kwargs):
+        """Draw an element on a given canvas."""
+        self.set_abs_and_offset(cnv=cnv, off_x=off_x, off_y=off_y, ID=ID, **kwargs)
         # feedback(f'### draw baseshape: {self._abs_x=} {self._abs_y=} {self._abs_cx=} {self._abs_cy=}')
 
     def check_settings(self) -> tuple:

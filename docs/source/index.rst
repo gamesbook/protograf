@@ -34,6 +34,7 @@ useful information but do build on each other.
    layouts
    hexagonal_grids
    additional_commands
+   objects
    functions
    terminology
    commands

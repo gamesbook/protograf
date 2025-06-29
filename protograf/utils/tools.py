@@ -1108,7 +1108,7 @@ def validated_directions(
 
 
 def transpose_lists(
-    original_list: list, direction: str = None, flip: str = None
+    original_list: list, direction: str = None, invert: str = None
 ) -> list:
     """Reorientate a list-of-lists
 
@@ -1116,30 +1116,30 @@ def transpose_lists(
         original_list (list)
             a list of lists
         direction (str)
-            'down' / '-90' or  'up' / '90' to swop rows with columns
-        flip (str)
+            'south' / 's' / '-90' or  'north' / 'n' / '90' to swop rows with columns
+        invert (str)
             'lr' or 'tb' to reverse order of sub-lists within outer list
 
     Doc Test:
-    >>> transpose_lists([[1, 2, 3], [4, 5, 6]], direction=None, flip=None)
+    >>> transpose_lists([[1, 2, 3], [4, 5, 6]], direction=None, invert=None)
     [[1, 2, 3], [4, 5, 6]]
-    >>> transpose_lists([[1, 2, 3], [4, 5, 6]], direction=None, flip='LR')
+    >>> transpose_lists([[1, 2, 3], [4, 5, 6]], direction=None, invert='LR')
     [[3, 2, 1], [6, 5, 4]]
-    >>> transpose_lists([[1, 2, 3], [4, 5, 6]], direction=None, flip='TB')
+    >>> transpose_lists([[1, 2, 3], [4, 5, 6]], direction=None, invert='TB')
     [[4, 5, 6], [1, 2, 3]]
-    >>> transpose_lists([[1, 2, 3], [4, 5, 6]], direction=90, flip=None)
+    >>> transpose_lists([[1, 2, 3], [4, 5, 6]], direction=90, invert=None)
     [[3, 6], [2, 5], [1, 4]]
-    >>> transpose_lists([[1, 2, 3], [4, 5, 6]], direction=270, flip=None)
+    >>> transpose_lists([[1, 2, 3], [4, 5, 6]], direction=270, invert=None)
     [[4, 1], [5, 2], [6, 3]]
-    >>> transpose_lists([[1, 2, 3], [4, 5, 6]], direction=90, flip='LR')
+    >>> transpose_lists([[1, 2, 3], [4, 5, 6]], direction=90, invert='LR')
     [[1, 4], [2, 5], [3, 6]]
-    >>> transpose_lists([[1, 2, 3], [4, 5, 6]], direction=270, flip='LR')
+    >>> transpose_lists([[1, 2, 3], [4, 5, 6]], direction=270, invert='LR')
     [[6, 3], [5, 2], [4, 1]]
-    >>> transpose_lists([[1, 2, 3], [4, 5, 6]], direction=90, flip='TB')
+    >>> transpose_lists([[1, 2, 3], [4, 5, 6]], direction=90, invert='TB')
     [[6, 3], [5, 2], [4, 1]]
-    >>> transpose_lists([[1, 2, 3], [4, 5, 6]], direction=270, flip='TB')
+    >>> transpose_lists([[1, 2, 3], [4, 5, 6]], direction=270, invert='TB')
     [[1, 4], [2, 5], [3, 6]]
-    >>> transpose_lists([[1,0], [1,0], [1,0], [1,1], ], direction=90, flip='TB')
+    >>> transpose_lists([[1,0], [1,0], [1,0], [1,1], ], direction=90, invert='TB')
     [[1, 0, 0, 0], [1, 1, 1, 1]]
     """
 
@@ -1149,9 +1149,9 @@ def transpose_lists(
         # print(f'^^^ {swopped_matrix=}')
         return swopped_matrix
 
-    # print(f'^^^ transpose_lists {original_list=} {direction=} {flip=}')
+    # print(f'^^^ transpose_lists {original_list=} {direction=} {invert=}')
     transpose_copy = copy.copy(original_list)
-    match str(flip).lower():
+    match str(invert).lower():
         case "lr" | "leftright" | "rl" | "rightleft":
             for al in transpose_copy:
                 al.reverse()
@@ -1162,11 +1162,11 @@ def transpose_lists(
     # print('^^^ PF post-flip', transpose_copy)
 
     match str(direction).lower():
-        case "d" | "down" | "-90" | "270":
+        case "s" | "south" | "-90" | "270":
             transpose_copy = row_col_swop(transpose_copy)
             for al in transpose_copy:
                 al.reverse()
-        case "u" | "up" | "90":
+        case "n" | "north" | "90":
             transpose_copy = row_col_swop(transpose_copy)
             transpose_copy.reverse()
         case _:

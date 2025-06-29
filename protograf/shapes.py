@@ -3594,10 +3594,10 @@ class RightAngledTriangleShape(BaseShape):
             self._u.width = self._u.height
         if self.width and not self.height:
             self._u.height = self._u.width
-        # calculate points
+        # calc directions
         x, y = self._u.x, self._u.y
-        self._vertexes = []
-        self._vertexes.append(Point(x, y))
+        self.hand = kwargs['hand'] or 'north'
+        self.flip = kwargs['flip'] or 'east'
         if not self.hand or not self.flip:
             feedback(
                 'Need to supply both "flip" and "hand" options! for triangle.',
@@ -3605,14 +3605,21 @@ class RightAngledTriangleShape(BaseShape):
             )
         hand = self.hand.lower()
         flip = self.flip.lower()
-        if hand == "west":
+        if hand == "west" or hand == "w":
             x2 = x - self._u.width
-        elif hand == "east":
+        elif hand == "east" or hand == "e":
             x2 = x + self._u.width
+        else:
+            feedback(f'The value "{hand}" for hand is invalid (use east or west)', True)
         if flip == "north":
             y2 = y + self._u.height
         elif flip == "south":
             y2 = y - self._u.height
+        else:
+            feedback(f'The value "{flip}" for flip is invalid (use north or south)', True)
+        # calculate points
+        self._vertexes = []
+        self._vertexes.append(Point(x, y))
         self._vertexes.append(Point(x2, y2))
         self._vertexes.append(Point(x2, y))
         # ---- set vertices
@@ -4298,9 +4305,10 @@ class TrapezoidShape(BaseShape):
             y = self._u.y + self._o.delta_y
         cx = x + self._u.width / 2.0
         cy = y + self._u.height / 2.0
-        if self.flip.lower() in ["s", "south"]:
-            y = y + self._u.height
-            cy = y - self._u.height / 2.0
+        if self.flip:
+            if str(self.flip).lower() in ["s", "south"]:
+                y = y + self._u.height
+                cy = y - self._u.height / 2.0
         if self.cx is not None and self.cy is not None:
             return self._u.cx, self._u.cy, x, y
         else:
