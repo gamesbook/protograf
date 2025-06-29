@@ -38,6 +38,7 @@ There are a number of ways that a Polyomino can be customised.
 - `Invert <polyomInvert_>`_
 - `Flip <polyomFlip_>`_
 - `Outline <polyomOutline_>`_
+- `Properties <polyomProps_>`_
 - `Shapes <polyomShapes_>`_
 - `AdHoc Design <polyomDesign_>`_
 
@@ -58,11 +59,14 @@ Polyomino: Basic
 
          Polyomino()
 
+      This shape can be hard to see as it looks like a simple square
+      with a thin outline.
+
       It uses only defaults.
 
       It takes on all the basic propety settings for size, stroke and color.
 
-      The default ``pattern`` is set to ``[[1]]``.
+      The default ``pattern`` is set to ``[[1]]`` - this is a monimo.
 
 ===== ======
 
@@ -81,7 +85,9 @@ Polyomino: Pattern
 
       .. code:: python
 
-         Polyomino()
+         Polyomino(
+             fill="silver",
+             pattern=['110', '111'])
 
       It...
 
@@ -102,12 +108,16 @@ Polyomino: Gap
 
       .. code:: python
 
-         Polyomino()
+         Polyomino(
+             x=0,
+             fill="silver",
+             pattern=['110', '111'],
+             gap=0.1,
+             rounding=0.1)
 
       It...
 
 ===== ======
-
 
 
 .. _polyomInvert:
@@ -120,16 +130,24 @@ Polyomino: Invert
    :width: 330
 
 ===== ======
-|po4| This example shows a Polyomino constructed using the command:
+|po4| This example shows Polyominoes constructed using these commands:
 
       .. code:: python
 
-         Polyomino()
+        Polyomino(
+            x=0, y=0,
+            fill="silver",
+            pattern=['110', '111'],
+             invert="LR")
+        Polyomino(
+            x=1, y=3,
+            fill="grey"
+            pattern=['110', '111'],
+            invert="TB")
 
       It...
 
 ===== ======
-
 
 
 .. _polyomFlip:
@@ -142,16 +160,24 @@ Polyomino: Flip
    :width: 330
 
 ===== ======
-|po5| This example shows a Polyomino constructed using the command:
+|po5| This example shows Polyominoes constructed using these commands:
 
       .. code:: python
 
-         Polyomino()
+        Polyomino(
+            x=0, y=0,
+            fill="silver",
+            pattern=['110', '111'],
+            flip="north")
+        Polyomino(
+            x=2, y=3,
+            fill="grey",
+            pattern=['110', '111'],
+            flip="south")
 
       It...
 
 ===== ======
-
 
 
 .. _polyomOutline :
@@ -168,12 +194,49 @@ Polyomino: Outline
 
       .. code:: python
 
-         Polyomino()
+         Polyomino(
+             fill_stroke="silver",
+             pattern=['110', '111'],
+             outline_stroke='red',
+             outline_width=2)
 
       It...
 
 ===== ======
 
+
+.. _polyomProps:
+
+Polyomino: Properties
+---------------------
+`^ <polyominoesIndex_>`_
+
+.. |po7| image:: images/objects/polyomino_color.png
+   :width: 330
+
+===== ======
+|po7| This example shows a Polyomino constructed using the command:
+
+      .. code:: python
+
+        Polyomino(
+            x=0, y=1,
+            stroke=None,
+            pattern=['010', '234', '050'],
+            fills=[
+                'red','yellow','silver','blue','green'],
+            strokes=[
+                'yellow','silver','blue','green','red'],
+            stroke_width=2,
+            label_stroke="black",
+            label_size=8,
+            labels=[
+                'red','yellow','silver','blue','green'],
+        )
+
+      It...
+
+===== ======
 
 
 .. _polyomShapes:
@@ -182,20 +245,28 @@ Polyomino: Shapes
 -----------------
 `^ <polyominoesIndex_>`_
 
-.. |po7| image:: images/objects/polyomino_shapes.png
+.. |po8| image:: images/objects/polyomino_shapes.png
    :width: 330
 
 ===== ======
-|po7| This example shows a Polyomino constructed using the command:
+|po8| This example shows a Polyomino constructed using the command:
 
       .. code:: python
 
-         Polyomino()
+        Polyomino(
+            x=0, y=1,
+            fill="silver",
+            pattern=['010', '234'],
+            centre_shapes=[
+                square(side=0.6),
+                circle(radius=0.3),
+                dot(),
+                hexagon(radius=0.3)]
+        )
 
       It...
 
 ===== ======
-
 
 
 .. _polyomDesign:
@@ -204,15 +275,19 @@ Polyomino: Adhoc Design
 -----------------------
 `^ <polyominoesIndex_>`_
 
-.. |po8| image:: images/objects/polyomino_generic.png
+.. |po9| image:: images/objects/polyomino_generic.png
    :width: 330
 
 ===== ======
-|po8| This example shows a Polyomino constructed using the command:
+|po9| This example shows a Polyomino constructed using the command:
 
       .. code:: python
 
-         Polyomino()
+         Polyomino(
+             x=0, y=1,
+             fill="silver",
+             pattern=[
+                 '1001', '0110', '0110', '1001'])
 
       It...
 

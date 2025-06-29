@@ -73,7 +73,11 @@ class PolyominoObject(RectangleShape):
         self.strokes = kwargs.get("strokes", [])
         self.centre_shapes = kwargs.get("centre_shapes", [])
         # defaults
-        self._fill, self._centre_shape, self._stroke = self.fill, self.centre_shape, self.stroke
+        self._fill, self._centre_shape, self._stroke = (
+            self.fill,
+            self.centre_shape,
+            self.stroke,
+        )
         self.is_outline = True if (self.outline_stroke or self.outline_width) else False
         # validate
         correct, issue = self.validate_properties()
@@ -98,7 +102,7 @@ class PolyominoObject(RectangleShape):
         correct = True
         issue = []
         if self.gap > 0 and self.is_outline:
-            issue.append('Both gap and outline cannot be set at the same time!')
+            issue.append("Both gap and outline cannot be set at the same time!")
             correct = False
         if self.invert:
             if str(self.invert).lower() not in [
@@ -162,14 +166,16 @@ class PolyominoObject(RectangleShape):
                 if number == 0:
                     continue
                 off_x = col * self.side
-                super().set_abs_and_offset(cnv=cnv, off_x=off_x, off_y=off_y, ID=ID, **kwargs)
+                super().set_abs_and_offset(
+                    cnv=cnv, off_x=off_x, off_y=off_y, ID=ID, **kwargs
+                )
                 vtx = super().get_vertexes()  # anti-clockwise from top-left
                 # handle edges
                 if col == 0:  # left edge
                     perimeter_lines.append((vtx[1], vtx[0]))
                 if row == 0:  # top edge
                     perimeter_lines.append((vtx[0], vtx[3]))
-                if col == max_col - 1: # right edge
+                if col == max_col - 1:  # right edge
                     perimeter_lines.append((vtx[2], vtx[3]))
                 if row == max_row - 1:  # bottom edge
                     perimeter_lines.append((vtx[1], vtx[2]))
@@ -203,7 +209,6 @@ class PolyominoObject(RectangleShape):
                     pass
         return perimeter_lines
 
-
     def draw(self, cnv=None, off_x=0, off_y=0, ID=None, **kwargs):
         """Draw squares for the Polyomino on a given canvas."""
         # feedback(f'~~~ Polyomino {self.label=} // {off_x=}, {off_y=} {kwargs=}')
@@ -216,23 +221,23 @@ class PolyominoObject(RectangleShape):
                 if number != 0:
                     # set props based on the square's number
                     try:
-                        kwargs['fill'] = self.fills[number - 1]
+                        kwargs["fill"] = self.fills[number - 1]
                     except:
-                        kwargs['fill'] = self.fill
+                        kwargs["fill"] = self.fill
                     try:
                         self.centre_shape = self.centre_shapes[number - 1]
                     except:
                         self.centre_shape = self._centre_shape
                     try:
-                        kwargs['stroke'] = self.strokes[number - 1]
+                        kwargs["stroke"] = self.strokes[number - 1]
                     except:
-                        kwargs['stroke'] = self.stroke
+                        kwargs["stroke"] = self.stroke
                     try:
                         self.label = self.labels[number - 1]
                     except:
                         self.label = self._label
-                    kwargs['row'] = row
-                    kwargs['col'] = col
+                    kwargs["row"] = row
+                    kwargs["col"] = col
                     # print(f"~~~ Polyomino {row=} {col=} {number=} {self.label=}")
                     super().draw(cnv, off_x, off_y, ID, **kwargs)
         # ---- optional perimeter
@@ -240,12 +245,11 @@ class PolyominoObject(RectangleShape):
             cnv = cnv if cnv else globals.canvas  # a new Page/Shape may now exist
             perimeter_lines = self.get_perimeter_lines(cnv=cnv, ID=ID, **kwargs)
             for line in perimeter_lines:
-                cnv.draw_line(
-                    Point(line[0].x, line[0].y), Point(line[1].x, line[1].y))
-            kwargs['stroke'] = self.outline_stroke or self.stroke
-            kwargs['stroke_width'] = self.outline_width or self.stroke_width
-            kwargs['closed'] = False
-            kwargs['fill'] = None
+                cnv.draw_line(Point(line[0].x, line[0].y), Point(line[1].x, line[1].y))
+            kwargs["stroke"] = self.outline_stroke or self.stroke
+            kwargs["stroke_width"] = self.outline_width or self.stroke_width
+            kwargs["closed"] = False
+            kwargs["fill"] = None
             self.set_canvas_props(cnv=cnv, index=ID, **kwargs)  # shape.finish()
 
 
@@ -259,61 +263,61 @@ class PentominoObject(PolyominoObject):
     """
 
     def __init__(self, _object=None, canvas=None, **kwargs):
-        self.letter = kwargs.get('letter', 'I')
+        self.letter = kwargs.get("letter", "I")
         match self.letter:
-            case 'T':
-                pattern = ['111', '010', '010']
-            case 'U':
-                pattern = ['101', '111']
-            case 'V':
-                pattern = ['001', '001', '111']
-            case 'W':
-                pattern = ['001', '011', '110']
-            case 'X':
-                pattern = ['010', '111', '010']
-            case 'Y':
-                pattern = ['01', '11', '01', '01']
-            case 'Z':
-                pattern = ['110', '010', '011']
-            case 'F':
-                pattern = ['011', '110', '010']
-            case 'I':
-                pattern = ['1', '1', '1', '1', '1']
-            case 'L':
-                pattern = ['10', '10', '10', '11']
-            case 'N':
-                pattern = ['01', '11', '10', '10']
-            case 'P':
-                pattern = ['11', '11', '10']
+            case "T":
+                pattern = ["111", "010", "010"]
+            case "U":
+                pattern = ["101", "111"]
+            case "V":
+                pattern = ["001", "001", "111"]
+            case "W":
+                pattern = ["001", "011", "110"]
+            case "X":
+                pattern = ["010", "111", "010"]
+            case "Y":
+                pattern = ["01", "11", "01", "01"]
+            case "Z":
+                pattern = ["110", "010", "011"]
+            case "F":
+                pattern = ["011", "110", "010"]
+            case "I":
+                pattern = ["1", "1", "1", "1", "1"]
+            case "L":
+                pattern = ["10", "10", "10", "11"]
+            case "N":
+                pattern = ["01", "11", "10", "10"]
+            case "P":
+                pattern = ["11", "11", "10"]
             # LOWER - flipped LR
-            case 't':
-                pattern = ['111', '010', '010']
-            case 'u':
-                pattern = ['101', '111']
-            case 'v':
-                pattern = ['100', '100', '111']
-            case 'w':
-                pattern = ['001', '011', '110']
-            case 'x':
-                pattern = ['010', '111', '010']
-            case 'y':
-                pattern = ['10', '11', '10', '10']
-            case 'z':
-                pattern = ['011', '010', '110']
-            case 'f':
-                pattern = ['110', '011', '010']
-            case 'i':
-                pattern = ['1', '1', '1', '1', '1']
-            case 'l':
-                pattern = ['01', '01', '01', '11']
-            case 'n':
-                pattern = ['10', '11', '01', '01']
-            case 'p':
-                pattern = ['11', '11', '01']
+            case "t":
+                pattern = ["111", "010", "010"]
+            case "u":
+                pattern = ["101", "111"]
+            case "v":
+                pattern = ["100", "100", "111"]
+            case "w":
+                pattern = ["001", "011", "110"]
+            case "x":
+                pattern = ["010", "111", "010"]
+            case "y":
+                pattern = ["10", "11", "10", "10"]
+            case "z":
+                pattern = ["011", "010", "110"]
+            case "f":
+                pattern = ["110", "011", "010"]
+            case "i":
+                pattern = ["1", "1", "1", "1", "1"]
+            case "l":
+                pattern = ["01", "01", "01", "11"]
+            case "n":
+                pattern = ["10", "11", "01", "01"]
+            case "p":
+                pattern = ["11", "11", "01"]
             case _:
                 feedback("Pentomino letter must be selected from predefined set!", True)
 
-        kwargs['pattern'] = pattern
+        kwargs["pattern"] = pattern
         super(PentominoObject, self).__init__(_object=_object, canvas=canvas, **kwargs)
 
 
@@ -323,31 +327,41 @@ class TetrominoObject(PolyominoObject):
     """
 
     def __init__(self, _object=None, canvas=None, **kwargs):
-        self.letter = kwargs.get('letter', 'I')
+        self.letter = kwargs.get("letter", "I")
         match self.letter:
-            case 'I':
-                pattern = ['1', '1', '1', '1',]
-            case 'L':
-                pattern = ['10', '10', '11']
-            case 'O':
-                pattern = ['11', '11']
-            case 'S':
-                pattern = ['011', '110']
-            case 'T':
-                pattern = ['111', '010']
+            case "I":
+                pattern = [
+                    "1",
+                    "1",
+                    "1",
+                    "1",
+                ]
+            case "L":
+                pattern = ["10", "10", "11"]
+            case "O":
+                pattern = ["11", "11"]
+            case "S":
+                pattern = ["011", "110"]
+            case "T":
+                pattern = ["111", "010"]
             # LOWER - flipped LR
-            case 'i':
-                pattern = ['1', '1', '1', '1',]
-            case 'l':
-                pattern = ['01', '01', '11']
-            case 'o':
-                pattern = ['11', '11']
-            case 's':
-                pattern = ['110', '011']
-            case 't':
-                pattern = ['111', '010']
+            case "i":
+                pattern = [
+                    "1",
+                    "1",
+                    "1",
+                    "1",
+                ]
+            case "l":
+                pattern = ["01", "01", "11"]
+            case "o":
+                pattern = ["11", "11"]
+            case "s":
+                pattern = ["110", "011"]
+            case "t":
+                pattern = ["111", "010"]
             case _:
                 feedback("Tetromino letter must be selected from predefined set!", True)
 
-        kwargs['pattern'] = pattern
+        kwargs["pattern"] = pattern
         super(TetrominoObject, self).__init__(_object=_object, canvas=canvas, **kwargs)

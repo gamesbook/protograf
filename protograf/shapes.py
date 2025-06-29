@@ -3596,8 +3596,8 @@ class RightAngledTriangleShape(BaseShape):
             self._u.height = self._u.width
         # calc directions
         x, y = self._u.x, self._u.y
-        self.hand = kwargs['hand'] or 'north'
-        self.flip = kwargs['flip'] or 'east'
+        self.hand = kwargs["hand"] or "north"
+        self.flip = kwargs["flip"] or "east"
         if not self.hand or not self.flip:
             feedback(
                 'Need to supply both "flip" and "hand" options! for triangle.',
@@ -3616,7 +3616,9 @@ class RightAngledTriangleShape(BaseShape):
         elif flip == "south":
             y2 = y - self._u.height
         else:
-            feedback(f'The value "{flip}" for flip is invalid (use north or south)', True)
+            feedback(
+                f'The value "{flip}" for flip is invalid (use north or south)', True
+            )
         # calculate points
         self._vertexes = []
         self._vertexes.append(Point(x, y))

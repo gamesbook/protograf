@@ -31,27 +31,27 @@ PageBreak()
 # ---- gap
 Blueprint(stroke_width=0.5)
 Text(common=header, text="Polyomino: Gap (0.1)")
-Polyomino(pattern=['110', '111'], fill="silver", gap=0.1)
+Polyomino(x=0, pattern=['110', '111'], fill="silver", gap=0.1, rounding=0.1)
 PageBreak()
 
 # ---- invert
 Blueprint(stroke_width=0.5)
 Text(common=header, text="Polyomino: Invert")
 Polyomino(x=0, y=0, pattern=['110', '111'], fill="silver", invert="LR")
-Polyomino(x=1, y=3, pattern=['110', '111'], fill="silver", invert="TB")
+Polyomino(x=1, y=3, pattern=['110', '111'], fill="grey", invert="TB")
 PageBreak()
 
 # ---- flip
 Blueprint(stroke_width=0.5)
 Text(common=header, text="Polyomino: Flip")
 Polyomino(x=0, y=0, pattern=['110', '111'], fill="silver", flip="north")
-Polyomino(x=2, y=3, pattern=['110', '111'], fill="silver", flip="south")
+Polyomino(x=2, y=3, pattern=['110', '111'], fill="grey", flip="south")
 PageBreak()
 
 # ---- outline
 Blueprint(stroke_width=0.5)
 Text(common=header, text="Polyomino: Outline")
-Polyomino(pattern=['110', '111'], fill="silver", stroke=None,
+Polyomino(pattern=['110', '111'], fill_stroke="silver",
           outline_stroke='red', outline_width=2)
 PageBreak()
 

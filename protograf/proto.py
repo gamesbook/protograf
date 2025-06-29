@@ -3511,6 +3511,7 @@ def pentomino(row=None, col=None, **kwargs):
     kwargs["col"] = col
     return PentominoObject(canvas=globals.canvas, **kwargs)
 
+
 # ---- dice ====
 
 
