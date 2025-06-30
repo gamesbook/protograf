@@ -31,7 +31,7 @@ PageBreak()
 # ---- gap
 Blueprint(stroke_width=0.5)
 Text(common=header, text="Polyomino: Gap (0.1)")
-Polyomino(x=0, pattern=['110', '111'], fill="silver", gap=0.1, rounding=0.1)
+Polyomino(x=0, fill="silver", pattern=['110', '111'], side=1.2, gap=0.1, rounding=0.1)
 PageBreak()
 
 # ---- invert
@@ -86,8 +86,8 @@ PageBreak()
 
 # ---- generic pattern
 Blueprint(stroke_width=0.5)
-Text(common=header, text="Generic Design")
-Polyomino(x=0, y=1, pattern=['1001', '0110', '0110', '1001'], fill="silver")
+Text(common=header, text="AdHoc Design")
+Polyomino(x=0, y=1, pattern=['1001', '0110', '0100', '1001'], fill="silver")
 
 Save(
     output='png',

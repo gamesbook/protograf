@@ -2190,6 +2190,10 @@ Square
 ~~~~~~
 `↑ <shape-index_>`_
 
+A square shares almost all of the same properties as a `Rectangle`_ and so
+that shape, which has additional customisation options available, should
+also be referenced when working with this shape.
+
 Example 1. Default Square
 +++++++++++++++++++++++++
 

@@ -25,12 +25,41 @@ along one or more sides, but the ``pattern`` property approach used by
 :doc:`protograf <index>` means that any kind of arrangement can be
 constructed.
 
-.. _polyominoesIndex:
+.. _polyominoesProps:
 
 Properties
-=========
+==========
 
-There are a number of ways that a Polyomino can be customised.
+In addition to the properties that are applicable to a
+:ref:`Square <square-command>` or :ref:`Rectangle <rectangle-command>`
+a Polyomino can also be customised with the following properties:
+
+- **pattern** - this is a list of string values; one string per row. Each string
+  contains one or more numbers aka "columns". Each number represents a square,
+  with a zero (0) representing a space.
+- **invert** - this can either be ``leftright`` (``lr``) or ``topbottom``
+  (`trb``) and will reverse the order of the numbers, either in a left-to-right
+  (numbers at the end of a row go to the start and vice-versa) or top-to-bottom
+  (rows at the end go to the start and vice-versa)
+- **flip** - this can either be ``north`` (``n``) or ``south`` (``s``) and
+  transposes rows and columns.
+- **gap** - this is the amount of space to leave between each row and each
+  column in the pattern
+- **outline** - along with **outline_stroke** and **outline_stroke_width**
+  is used to draw a line around the boundary of all connected squares in
+  the pattern |dash| it cannot be used in conjunction with a non-zero gap
+- **fills** - each square can be associated with a different fill color
+- **strokes** - each square can be associated with a different stroke color
+- **labels** - each square can be linked to a different label
+- **shapes** - each square can be linked to a different centred shape
+
+.. _polyominoesIndex:
+
+Examples
+========
+
+The examples below shows how various properties can be used to customise a
+Polyomino.
 
 - `Basic/Default <polyomBasic_>`_
 - `Pattern <polyomPattern_>`_
@@ -62,11 +91,10 @@ Polyomino: Basic
       This shape can be hard to see as it looks like a simple square
       with a thin outline.
 
-      It uses only defaults.
+      It uses only default values for size, stroke and color.
 
-      It takes on all the basic propety settings for size, stroke and color.
-
-      The default ``pattern`` is set to ``[[1]]`` - this is a monimo.
+      The default ``pattern`` is set to ``['1']`` - this is a monimo or
+      "size 1" Polyomino.
 
 ===== ======
 
@@ -89,7 +117,19 @@ Polyomino: Pattern
              fill="silver",
              pattern=['110', '111'])
 
-      It...
+      The *pattern* is a key property for a Polyomino.
+
+      Each string in the pattern's list represents a row, starting with the
+      "top" row. Each number in the string represents a column, with a 0 being
+      a space.
+
+      **NOTE** Each row must be of the same length!
+
+      A square is drawn at each row/column position where the number is not
+      zero.
+
+      In this example, the first row has 2 squares followed by a space (``0``)
+      and the second row has 3 squares.
 
 ===== ======
 
@@ -109,13 +149,23 @@ Polyomino: Gap
       .. code:: python
 
          Polyomino(
-             x=0,
+             x=0, y=1,
              fill="silver",
+             side=1.2,
              pattern=['110', '111'],
              gap=0.1,
              rounding=0.1)
 
-      It...
+      A **gap** ensures space between each square |dash| both in the vertical
+      and the horizontal direction.
+
+      In this example, a few other properties have been set.  These are ones
+      applicable to the drawing of a square - such as its size (``side``), fill
+      color, and corner rounding. Note that these are applicable to all squares
+      that are drawn.
+
+      Note that setting ``x`` and ``y`` determines the top-left corner where
+      the pattern starts |dash| even if that is a space.
 
 ===== ======
 
@@ -287,7 +337,7 @@ Polyomino: Adhoc Design
              x=0, y=1,
              fill="silver",
              pattern=[
-                 '1001', '0110', '0110', '1001'])
+                 '1001', '0110', '0100', '1001'])
 
       It...
 

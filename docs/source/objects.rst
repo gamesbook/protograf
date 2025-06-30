@@ -55,3 +55,5 @@ Tetrominoes
 Similar to Pentominoes, these are each composed of **4** squares in one of 5
 unique patterns. They can also referred to by their shortcut ``letter``
 property.
+
+For more details, see the section on :doc:`Tetrominoes <tetrominoes>`.
