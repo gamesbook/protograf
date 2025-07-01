@@ -1430,7 +1430,27 @@ the final product.
 Typically one would just comment out the Blueprint command when its purpose has
 been served.
 
-It can be styled as described below.
+Properties
+----------
+
+In addition to the basic line styling properties, a Blueprint can also be
+customised with the following properties:
+
+- **subdivisions** - a number indicating how many lines should be drawn
+  within each square; these are evenly spaces; use *subdivisions_dashed*
+  to enhance these lines
+- **style** - set to one of: *blue*, *green* or *grey*
+- **decimals** - set to to an integer number for the decimal points which
+  are used for the grid numbers (default is ``0``)
+- **edges** - can be set to any combination of *n*, *s*, *e*, or *w* in a
+  single comma-delimited string; grid numbers will then be drawn on
+  any of the edges specified
+- **edges_y** - the number set for this determines where a horizontal line
+  of grid numbers will be drawn
+- **edges_x** - the number set for this determines where a vertical line
+  of grid numbers will be drawn
+
+Examples showing how the Blueprint can be styled are described below.
 
 - `Subdivisions <blueSub_>`_
 - `Subdivisions - dashed <blueSubDash_>`_
@@ -1466,8 +1486,10 @@ Subdivisions
       - *subdivisions* - ``5`` thinner lines between each pair of primary lines
       - *stroke_width* - set to ``0.5`` |dash| thicker and more visible
 
-      Note: *subdivisions* are not numbered and are automatically
-      drawn with a thinner line in a *dotted* style.
+      .. NOTE::
+
+          *subdivisions* are **not** numbered and are automatically
+          drawn with a thinner line in a *dotted* style.
 
 ===== ======
 
@@ -1499,8 +1521,10 @@ Subdivisions - Dashed
       - *subdivisions_dashed* - a list with the length of the dash followed by
         the length of the space between two dashes - ``2`` and ``1`` mm.
 
-      Note: *subdivisions* are not numbered and are automatically
-      drawn with a thinner line.
+      .. NOTE::
+
+          *subdivisions* are **not** numbered and are automatically
+          drawn with a thinner line using the dash settings.
 
 ===== ======
 

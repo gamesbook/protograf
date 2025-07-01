@@ -58,7 +58,7 @@ from .shapes import (
     TextShape,
     TrapezoidShape,
 )
-from .objects import PolyominoObject, PentominoObject
+from .objects import PolyominoObject, PentominoObject, TetrominoObject
 from .layouts import (
     GridShape,
     DotGridShape,
@@ -2464,6 +2464,25 @@ def Grid(**kwargs):
 
 
 def Blueprint(**kwargs):
+    """Draw a grid extending between page margins.
+
+    Kwargs:
+
+    - subdivisions (int): a number indicating how many lines should be drawn
+      within each square; these are evenly spaces; use *subdivisions_dashed*
+      to enhance these lines
+    - style (str): set to one of: *blue*, *green* or *grey*
+    - decimals (float): set to to an integer number for the decimal points which
+      are used for the grid numbers (default is ``0``)
+    - edges (str): can be set to any combination of *n*, *s*, *e*, or *w* in a
+      single comma-delimited string; grid numbers will then be drawn on
+      any of the edges specified
+    - edges_y (float): the number set for this determines where a horizontal line
+      of grid numbers will be drawn
+    - edges_x (float): the number set for this determines where a vertical line
+      of grid numbers will be drawn
+
+    """
 
     def set_style(style_name):
         """Set Blueprint color and fill."""
@@ -3543,6 +3562,19 @@ def pentomino(row=None, col=None, **kwargs):
     kwargs["col"] = col
     return PentominoObject(canvas=globals.canvas, **kwargs)
 
+
+def Tetromino(row=None, col=None, **kwargs):
+    kwargs = margins(**kwargs)
+    tetrm = tetromino(row=row, col=col, **kwargs)
+    tetrm.draw()
+    return tetrm
+
+
+def tetromino(row=None, col=None, **kwargs):
+    kwargs = margins(**kwargs)
+    kwargs["row"] = row
+    kwargs["col"] = col
+    return TetrominoObject(canvas=globals.canvas, **kwargs)
 
 # ---- dice ====
 
