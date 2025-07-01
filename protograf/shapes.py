@@ -65,7 +65,7 @@ def set_cached_dir(source):
     if not tools.is_url_valid(url=source):
         return None
     loc = urlparse(source)
-    # print('@http@',  loc)
+    # print('*** @http@',  loc)
     # handle special case of BGG images
     # ... BGG gives thumb and original images the EXACT SAME filename :(
     if loc.netloc == BGG_IMAGES:
@@ -775,7 +775,7 @@ class CircleShape(BaseShape):
         self.set_canvas_props(cnv=cnv, index=ID, **kwargs)
         # ---- grid marks
         if self.grid_marks:  # and not kwargs.get("card_back", False):
-            # print(f'{self._u.radius=} {self._u.diameter=}')
+            # print(f'*** {self._u.radius=} {self._u.diameter=}')
             deltag = self.unit(self.grid_marks_length)
             gx, gy = 0, y - self._u.radius  # left-side
             cnv.draw_line((gx, gy), (deltag, gy))
@@ -1246,6 +1246,9 @@ class EquilateralTriangleShape(BaseShape):
         vertices = []
         pt0 = Point(x + self._o.delta_x, y + self._o.delta_y)
         vertices.append(pt0)
+        hand = hand or "east"
+        flip = flip or "north"
+        print(f"*** {hand=} {flip=}")
         if hand == "west" or hand == "w":
             x2 = pt0.x - side
             y2 = pt0.y
@@ -1254,10 +1257,14 @@ class EquilateralTriangleShape(BaseShape):
             x2 = pt0.x + side
             y2 = pt0.y
             x3 = x2 - 0.5 * side
+        else:
+            raise ValueError(f"The value {hand} is not allowed for hand")
         if flip == "north" or flip == "n":
             y3 = pt0.y - height
         elif flip == "south" or flip == "s":
             y3 = pt0.y + height
+        else:
+            raise ValueError(f"The value {flip} is not allowed for flip")
         vertices.append(Point(x2, y2))
         vertices.append(Point(x3, y3))
         return vertices
@@ -2365,11 +2372,11 @@ class PolygonShape(BaseShape):
                 continue
             # points based on length of line, offset and the angle in degrees
             edge_pt = _perbis_pts[key]
-            # print(f'{pb_angle=} {edge_pt=} {centre=}')
+            # print(f'*** {pb_angle=} {edge_pt=} {centre=}')
             if pb_offset is not None and pb_offset != 0:
                 offset_pt = geoms.point_on_circle(centre, pb_offset, pb_angle)
                 end_pt = geoms.point_on_line(offset_pt, edge_pt, pb_length)
-                # print(f'{end_pt=} {offset_pt=}')
+                # print(f'*** {end_pt=} {offset_pt=}')
                 cnv.draw_line((offset_pt.x, offset_pt.y), (end_pt.x, end_pt.y))
             else:
                 cnv.draw_line((centre.x, centre.y), (edge_pt.x, edge_pt.y))
@@ -2410,7 +2417,7 @@ class PolygonShape(BaseShape):
             if rad_offset is not None and rad_offset != 0:
                 offset_pt = geoms.point_on_circle(centre, rad_offset, rad_angle)
                 end_pt = geoms.point_on_line(offset_pt, diam_pt, rad_length)
-                # print(rad_angle, offset_pt, f'{x_c=}, {y_c=}')
+                # print('***', rad_angle, offset_pt, f'{x_c=}, {y_c=}')
                 cnv.draw_line((offset_pt.x, offset_pt.y), (end_pt.x, end_pt.y))
             else:
                 cnv.draw_line((centre.x, centre.y), (diam_pt.x, diam_pt.y))
@@ -4325,7 +4332,9 @@ class TrapezoidShape(BaseShape):
         x = kwargs.get("x", _x)
         y = kwargs.get("y", _y)
         # build array
-        sign = -1 if self.flip.lower() in ["s", "south"] else 1
+        sign = 1
+        if self.flip and str(self.flip).lower() in ["s", "south"]:
+            sign = -1
         self.delta_width = self._u.width - self._u.top
         vertices = []
         vertices.append(Point(x, y))
@@ -4356,7 +4365,9 @@ class TrapezoidShape(BaseShape):
         cnv.draw_polyline(self.vertexes)
         kwargs["closed"] = True
         self.set_canvas_props(cnv=cnv, index=ID, **kwargs)
-        sign = -1 if self.flip.lower() in ["s", "south"] else 1
+        sign = 1
+        if self.flip and str(self.flip).lower() in ["s", "south"]:
+            sign = -1
         # ---- borders (override)
         if self.borders:
             if isinstance(self.borders, tuple):

@@ -1329,10 +1329,11 @@ def set_canvas_props(
         The default value of width is 1.
 
         The values width, color and fill have the following relationship:
-        • If fill=None, then shape elements will *always* be drawn with a border -
+
+        - If fill=None, then shape elements will *always* be drawn with a border -
           even if color=None (in which case black is taken) or width=0
           (in which case 1 is taken).
-        • Shapes without border can only be achieved if a fill color is specified
+        - Shapes without border can only be achieved if a fill color is specified
           (which may be be white). To achieve this, specify width=0.
           In this case, the color parameter is ignored.
     """
@@ -1367,7 +1368,8 @@ def set_canvas_props(
             _transparency = _transparency / 100.0
         opacity = 1 - _transparency
     stroke_width = kwargs.get("stroke_width", None)
-    stroke_cap = kwargs.get("stroke_cap", None)
+    # stroke_cap = 1 if kwargs.get("stroke_cap", False) else 0  # rounded end line
+    stroke_cap = 1 if kwargs.get("rounded", False) else 0  # rounded end line
     dotted = kwargs.get("dotted", None)
     dashed = kwargs.get("dashed", None)
     _rotation = kwargs.get("rotation", None)  # calling Shape must set a tuple!

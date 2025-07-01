@@ -3576,6 +3576,7 @@ def tetromino(row=None, col=None, **kwargs):
     kwargs["col"] = col
     return TetrominoObject(canvas=globals.canvas, **kwargs)
 
+
 # ---- dice ====
 
 

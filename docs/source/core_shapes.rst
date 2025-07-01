@@ -381,7 +381,11 @@ Example 2. Customised Line
             label="15", font_size=6)
         Line(
             x=0, y=2, length=4,
-            stroke="chartreuse", stroke_width=2)
+            stroke="gold", stroke_width=2)
+        Line(
+            x=1, y=1.5, length=2,
+            stroke="chartreuse", stroke_width=10,
+            rounded=True)
 
       The various black lines have these properties:
 
@@ -395,12 +399,21 @@ Example 2. Customised Line
 
       The thin red line has:
 
-      - *angle* - of 15 |deg| from the baseline, clockwise
+      - *angle* - of ``15`` |deg| from the baseline, clockwise
 
       The angle guides the direction in which the line is drawn; if not
       given |dash| as in the case of the thick green line |dash| this
       will be 0 |deg|. The line length is then calculated based on these
       points.
+
+      The thick green, thick gold and thin red lines all have:
+
+      - *x* and *y* set as their starting point
+      - *length* - sets the specific size of the line
+
+      The thick gold line has:
+
+      - *rounded* set to ``True`` so a semi-circles are drawn at line ends
 
       The thick green line and the thin red line both have:
 
