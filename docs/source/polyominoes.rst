@@ -3,6 +3,8 @@ Polyominoes
 ===========
 
 .. |dash| unicode:: U+2014 .. EM DASH SIGN
+.. |deg|  unicode:: U+00B0 .. DEGREE SIGN
+   :ltrim:
 
 This section assumes you are very familiar with the concepts, terms and ideas
 for :doc:`protograf <index>`  as presented in the
@@ -38,16 +40,16 @@ a Polyomino can also be customised with the following properties:
   contains one or more numbers aka "columns". Each number represents a square,
   with a zero (0) representing a space.
 - **invert** - this can either be ``leftright`` (``lr``) or ``topbottom``
-  (`trb``) and will reverse the order of the numbers, either in a left-to-right
+  (``tb``) and will reverse the order of the numbers, either in a left-to-right
   (numbers at the end of a row go to the start and vice-versa) or top-to-bottom
   (rows at the end go to the start and vice-versa)
 - **flip** - this can either be ``north`` (``n``) or ``south`` (``s``) and
-  transposes rows and columns.
+  transposes rows and columns; effectively rotating the shape 90 |deg|
 - **gap** - this is the amount of space to leave between each row and each
   column in the pattern
 - **outline** - along with **outline_stroke** and **outline_stroke_width**
   is used to draw a line around the boundary of all connected squares in
-  the pattern |dash| it cannot be used in conjunction with a non-zero gap
+  the pattern |dash| it cannot be used in conjunction with a non-zero *gap*
 - **fills** - each square can be associated with a different fill color
 - **strokes** - each square can be associated with a different stroke color
 - **labels** - each square can be linked to a different label
@@ -93,7 +95,7 @@ Polyomino: Basic
 
       It uses only default values for size, stroke and color.
 
-      The default ``pattern`` is set to ``['1']`` - this is a monimo or
+      The default ``pattern`` is set to ``['1']`` - this is a monomino or
       "size 1" Polyomino.
 
 ===== ======
@@ -115,21 +117,20 @@ Polyomino: Pattern
 
          Polyomino(
              fill="silver",
-             pattern=['110', '111'])
+             pattern=['100', '111'])
 
       The *pattern* is a key property for a Polyomino.
 
       Each string in the pattern's list represents a row, starting with the
-      "top" row. Each number in the string represents a column, with a 0 being
-      a space.
+      "top" row. Each number in the string represents a column.
 
       **NOTE** Each row must be of the same length!
 
       A square is drawn at each row/column position where the number is not
-      zero.
+      zero (0).
 
-      In this example, the first row has 2 squares followed by a space (``0``)
-      and the second row has 3 squares.
+      In this example, the first row has 1 square followed by two spaces
+      (the two ``0``), and the second row has 3 squares.
 
 ===== ======
 
@@ -152,7 +153,7 @@ Polyomino: Gap
              x=0, y=1,
              fill="silver",
              side=1.2,
-             pattern=['110', '111'],
+             pattern=['100', '111'],
              gap=0.1,
              rounding=0.1)
 
@@ -161,8 +162,8 @@ Polyomino: Gap
 
       In this example, a few other properties have been set.  These are ones
       applicable to the drawing of a square - such as its size (``side``), fill
-      color, and corner rounding. Note that these are applicable to all squares
-      that are drawn.
+      color, and corner **rounding**. Note that these properties are applied to
+      all the squares that are drawn.
 
       Note that setting ``x`` and ``y`` determines the top-left corner where
       the pattern starts |dash| even if that is a space.
@@ -187,15 +188,21 @@ Polyomino: Invert
         Polyomino(
             x=0, y=0,
             fill="silver",
-            pattern=['110', '111'],
-             invert="LR")
+            pattern=['100', '111'],
+            invert="LR")
         Polyomino(
             x=1, y=3,
             fill="grey"
-            pattern=['110', '111'],
+            pattern=['100', '111'],
             invert="TB")
 
-      It...
+      In this example, the *invert* property is used to alter the order of
+      the squares:
+
+      - ``LR`` or *left-right* changes the order of columns within the rows; in
+        this case the pattern becomes ``['001', '111']``
+      - ``TB`` or *top-bottom* swops the position of the rows; in
+        this case the pattern becomes ``['111', '100']``
 
 ===== ======
 
@@ -217,15 +224,21 @@ Polyomino: Flip
         Polyomino(
             x=0, y=0,
             fill="silver",
-            pattern=['110', '111'],
+            pattern=['100', '111'],
             flip="north")
         Polyomino(
             x=2, y=3,
             fill="grey",
-            pattern=['110', '111'],
+            pattern=['100', '111'],
             flip="south")
 
-      It...
+      In this example, the *flip* property is used to alter the order of
+      the squares:
+
+      - ``north`` transposes rows and columns such that the pattern is
+        rotated 90 |deg| "upwards"
+      - ``south`` transposes rows and columns such that the pattern is
+        rotated 90 |deg| "downwards"
 
 ===== ======
 
@@ -246,11 +259,15 @@ Polyomino: Outline
 
          Polyomino(
              fill_stroke="silver",
-             pattern=['110', '111'],
+             pattern=['100', '111'],
              outline_stroke='red',
              outline_width=2)
 
-      It...
+      In this example, the *flip* property is used to draw a thick red line
+      around the perimeters of all the squares in the Polyomino.
+
+      Note that the *fill_stroke* propery is used to ensure that all the
+      squares are a uniform color.
 
 ===== ======
 
@@ -284,7 +301,13 @@ Polyomino: Properties
                 'red','yellow','silver','blue','green'],
         )
 
-      It...
+      In this example, the pattern is made from numbers other than just ``1``.
+
+      In addition, values are assiged to the *fills*, *strokes* and
+      *labels* properties. The order of these values will determine how
+      they are used: the first value is assigned to square number ``1`` in
+      the pattern (top-centre); the second value is assigned to square number
+      ``2`` in the pattern (middle-left); and so on.
 
 ===== ======
 
@@ -306,15 +329,24 @@ Polyomino: Shapes
         Polyomino(
             x=0, y=1,
             fill="silver",
-            pattern=['010', '234'],
+            pattern=['010', '232'],
             centre_shapes=[
-                square(side=0.6),
                 circle(radius=0.3),
                 dot(),
                 hexagon(radius=0.3)]
         )
 
-      It...
+      In this example, the pattern is made from numbers other than just ``1``.
+
+      In addition, values are assiged to the *centre_shapes* property. The order
+      of these values will determine how they are used: the Circle shape is
+      assigned to, and drawn in, polyomino square number ``1`` in the pattern
+      (top-centre); the Circle shape is assigned to, and drawn in, polyomino
+      square number ``3`` in the pattern (lower-centre); and so on.
+
+      It should be noted that a number can be used multiple times in the
+      pattern; in this example, the number ``2`` appears twice and so both
+      the outer polyomino square in the second row display the Dot().
 
 ===== ======
 
@@ -339,6 +371,10 @@ Polyomino: Adhoc Design
              pattern=[
                  '1001', '0110', '0100', '1001'])
 
-      It...
+      In this example, the pattern is constructed in such a way that the
+      squares comprising it are not all adjacent to another square.
+
+      Technically, this is **not** a Polyomino but can provide a useful way
+      to construct a pattern made up of squares in an arbitrary layout.
 
 ===== ======

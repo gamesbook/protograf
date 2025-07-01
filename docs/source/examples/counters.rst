@@ -30,7 +30,7 @@ Wargame - Basic Counters
 =========== ==================================================================
 Title       *Basic Wargame Counters*
 ----------- ------------------------------------------------------------------
-Source Code `counters.py <https://github.com/gamesbook/protograf/blob/master/examples/counters/counters.py>`_
+Script      `counters.py <https://github.com/gamesbook/protograf/blob/master/examples/counters/counters.py>`_
 ----------- ------------------------------------------------------------------
 Discussion  This example shows how to construct a set of counters.
 
@@ -137,7 +137,7 @@ Wargame - Counters from CSV
 =========== ==================================================================
 Title       *Wargame Counters from a CSV file*
 ----------- ------------------------------------------------------------------
-Source Code `counters_csv.py <https://github.com/gamesbook/protograf/blob/master/examples/counters/counters_csv.py>`_
+Script      `counters_csv.py <https://github.com/gamesbook/protograf/blob/master/examples/counters/counters_csv.py>`_
 ----------- ------------------------------------------------------------------
 Discussion  This example shows how to construct a set of counters using data
             from a plain text CSV (comma-separated values) file.
@@ -235,7 +235,7 @@ Wargame - Counters from Excel
 =========== ==================================================================
 Title       *Wargame Counters from an Excel file*
 ----------- ------------------------------------------------------------------
-Source Code `counters_excel.py <https://github.com/gamesbook/protograf/blob/master/examples/counters/counters_excel.py>`_
+Script      `counters_excel.py <https://github.com/gamesbook/protograf/blob/master/examples/counters/counters_excel.py>`_
 ----------- ------------------------------------------------------------------
 Discussion  This example shows how to construct a set of counters using data
             from an Excel file.
@@ -267,7 +267,7 @@ Wargame - Blocks from CSV
 =========== ==================================================================
 Title       *Wargame Block Labels from a CSV file*
 ----------- ------------------------------------------------------------------
-Source Code `blocks_csv.py <https://github.com/gamesbook/protograf/blob/master/examples/counters/blocks_csv.py>`_
+Script      `blocks_csv.py <https://github.com/gamesbook/protograf/blob/master/examples/counters/blocks_csv.py>`_
 ----------- ------------------------------------------------------------------
 Discussion  This example shows how to construct a set of labels, designed to
             be attached to small wooden blocks, using data from a plain text

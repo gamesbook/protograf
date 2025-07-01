@@ -7,7 +7,7 @@ or demonstrate how different functions or features can be used. They do
 **not** attempt to be comprehensive and cover all features, but they
 **do** give some ideas as to what can be done - and how.
 
-In most cases, you will need to look at the source code to understand how the
+In most cases, you will need to look at the script itself to understand how the
 output has been created.
 
 1. There is a somewhat random tour of various elements in **protograf**
@@ -21,7 +21,7 @@ output has been created.
    constructed
 5. :doc:`BGG <bgg>` - how to retrieve and display data that can be
    accessed from the BoardGameGeek API
-6. :doc:`Various <various>` - examples of miscellaneous "real world" objects;
+6. :doc:`Various <various>` - examples of miscellaneous "real world" things;
    usually constructed using multiple different elements of **protograf**
 
 .. HINT::

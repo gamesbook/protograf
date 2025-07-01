@@ -27,6 +27,9 @@ python core/layouts/layouts_shapes_outer.py -d /tmp/demo
 python core/layouts/layouts_sequence.py -d /tmp/demo
 python core/layouts/layouts_tracks.py -d /tmp/demo
 python core/layouts/layouts_repeat.py -d /tmp/demo
+# ---- examples: objects
+python objects/polyominoes.py -d /tmp/demo
+python objects/pentominoes.py -d /tmp/demo
 # ---- boards: abstract
 echo -e "\nCreating abstract boards..."
 python boards/abstract/chessboard.py -d /tmp/demo

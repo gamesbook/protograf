@@ -1125,32 +1125,31 @@ def Create(**kwargs):
 
     Kwargs:
 
-    - **paper** - a paper size from either of the ISO series - A0 down to A8;
+    - paper (str): a paper size from either of the ISO series - A0 down to A8;
       or B6 down to B0 - or a USA type - letter, legal or elevenSeventeen; to
       change the page orientation to **landscape** append ``-l`` to the name.
-    - **paper_width** - set specific paper width using the defined *units*
-    - **paper_height** - set specific paper height using the defined *units*
+    - paper_width (float): set specific paper width using the defined *units*
+    - paper_height (float): set specific paper height using the defined *units*
       For example, ``"A3-l"`` is a landscape A3 paper size; default is ``A4``
-    - **filename** - name of the output PDF file; by default this is the prefix
+    - filename (str): name of the output PDF file; by default this is the prefix
       name of the script, with a ``.pdf`` extension
-    - **fill** - the page color; default is ``white``
-    - **units** - can be ``cm`` (centimetres), ``in`` (inches), ``mm``
+    - fill (str): the page color; default is ``white``
+    - units (str): can be ``cm`` (centimetres), ``in`` (inches), ``mm``
       (millimetres), or ``points``; default is ``cm``
-    - **margin** - set the value for *all* margins using the defined *units*;
+    - margin (float): set the value for *all* margins using the defined *units*;
       default is ``1`` centimetre.
-    - **margin_top** - set the top margin using the defined *units*
-    - **margin_bottom** - set the bottom margin using the defined *units*
-    - **margin_left** - set the left margin using the defined *units*
-    - **margin_right** - set the the right margin using the defined *units*
-    - **margin_debug** - if True, show the margin as a dotted blue line
-    - **page_grid* - if a valid float, draw a squared grid covering the paper
-
-    Kwargs to override the default values of any of the various properties
-    used for drawing Shapes can be set here as well, for example:
-    ``font_size=18`` or ``stroke="red"``.
+    - margin_top (float): set the top margin using the defined *units*
+    - margin_bottom (float): set the bottom margin using the defined *units*
+    - margin_left (float): set the left margin using the defined *units*
+    - margin_right (float): set the the right margin using the defined *units*
+    - margin_debug (bool): if True, show the margin as a dotted blue line
+    - page_grid (float): if a valid float, draw a squared grid covering the paper
 
     Notes:
 
+    - Kwargs to override the default values of any of the various properties
+      used for drawing Shapes can be set here as well, for example:
+      ``font_size=18`` or ``stroke="red"``.
     - Will use argparse to process command-line keyword args
     - Allows shortcut creation of cards
     """
@@ -1324,7 +1323,7 @@ def Save(**kwargs):
 
     Kwargs:
 
-    - **output** - can be set to:
+    - output (str):can be set to:
 
       - ``png`` - to create one image file per page of the PDF; by default the
         names of the PNG files are derived using the PDF filename, with a dash (-)
@@ -1334,19 +1333,19 @@ def Save(**kwargs):
         followed by the page number;
       - ``gif`` - to create a GIF file composed of all the PNG pages (these will be
         removed after the file been created)
-    - **dpi** - can be set to the dots-per-inch resolution required; by default
+    - dpi (int): can be set to the dots-per-inch resolution required; by default
       this is ``300``
-    - **directory** - export path for the PNG or SVG; if None then use the same
+    - directory (str): export path for the PNG or SVG; if None then use the same
       one as the script
-    - **names** - provide a list of names -- without an extension -- for the
+    - names (list): provide a list of names -- without an extension -- for the
       *output* files that will be created from the PDF;
       the first name corresponds to the first page, the second name to the second
       and so on.  Each will automatically get the correct extension added to it.
       If the term ``None`` is used in place of a name, then that page will **not**
       have an output file created for it.
-    - **framerate** - the delay in seconds between each "page" of a GIF image; by
+    - framerate (float): the delay in seconds between each "page" of a GIF image; by
       default this is ``1`` second
-    - **cards** - if set to ``True`` will cause all the card fronts to be
+    - cards (bool): if set to ``True`` will cause all the card fronts to be
       exported as PNG files;  the names of the files are derived using the PDF
       filename, with a dash (-) followed by the page number
 
@@ -1857,7 +1856,7 @@ def Data(**kwargs):
 
     Kwargs:
 
-    - **filename** - the full path to the name (including extension) of the
+    - filename (str): the full path to the name (including extension) of the
       CSV or Excel file being used; if no directory is supplied in the path,
       then it is assumed to be the same one in which the script is located
     - Access to a **Google Sheet** document is via three properties:
@@ -1866,18 +1865,18 @@ def Data(**kwargs):
       - *google_sheet* - the unique ID (a mix of numbers and letters) which is
         randomly assigned by Google to your Google Sheet
       - *google_name* - the name of the tab in the Google Sheet housing your data
-    - **matrix** - refers to the name assigned to the ``Matrix`` being used
-    - **images** - refers to the directory in which the cards' images are located;
+    - matrix (str): refers to the name assigned to the ``Matrix`` being used
+    - images (str): refers to the directory in which the cards' images are located;
       if a full path is not given, its assumed to be directly under the one in which
       the script is located
-    - **images_list** - is used in conjunction with *images* to provide a list of
+    - images_list (list): is used in conjunction with *images* to provide a list of
       file extensions that filter which type of files will be loaded from the
       directory e.g. ``.png`` or ``.jpg``; this is important to set if the
       directory contains files of a type that are not, or cannot be, used
-    - **data_list** refers to the name assigned to the "list of lists" being used;
+    - data_list (str): refers to the name assigned to the "list of lists" being used;
       this property is also used when linked to data being sourced from the
       BoardGameGeek API
-    - **extra** - if additional cards need to be manually created for a Deck,
+    - extra (int): if additional cards need to be manually created for a Deck,
       that are *not* part of the data source, then the number of those cards
       can be specified here.
     """
@@ -3484,14 +3483,47 @@ def BGG(user: str = None, ids: list = None, progress=False, short=500, **kwargs)
 # ---- objects ====
 
 
-def Polyomino(row=None, col=None, **kwargs):
+def Polyomino(row=None, col=None, **kwargs) -> PolyominoObject:
+    """Create a Polyomino object
+
+    Args:
+        - row (int): row in which Polyomino is drawn.
+        - col (int): column in which Polyomino is drawn.
+
+    Kwargs:
+        - pattern (list): a list of string values; one string per row. Each string
+          contains one or more numbers aka "columns". Each number represents a square,
+          with a zero (0) representing a space.
+        - invert (str): can either be ``leftright`` (``lr``) or ``topbottom``
+          (``tb``) and will reverse the order of the numbers, either in a left-to-right
+          (numbers at the end of a row go to the start and vice-versa) or top-to-bottom
+          (rows at the end go to the start and vice-versa)
+        - flip (str): can either be ``north`` (``n``) or ``south`` (``s``) and
+          transposes rows and columns; effectively rotating the shape 90 degrees
+        - gap (float): the amount of space to leave between each row and each
+          column in the pattern
+        - outline (bool): along with *outline_stroke* and *outline_stroke_width*
+          is used to draw a line around the boundary of all connected squares in
+          the pattern |dash| it cannot be used in conjunction with a non-zero *gap*
+        - outline_stroke (str): color of boundary line around all connected squares
+        - outline_stroke_width (float): width of boundary line around all connected
+          squares
+        - fills (list): each square can be associated with a different fill color
+        - strokes (list): each square can be associated with a different stroke color
+        - labels (list): each square can be linked to a different label
+        - shapes (list): each square can be linked to a different centred shape
+
+    Returns:
+        PolyominoObject
+
+    """
     kwargs = margins(**kwargs)
     polym = polyomino(row=row, col=col, **kwargs)
     polym.draw()
     return polym
 
 
-def polyomino(row=None, col=None, **kwargs):
+def polyomino(row=None, col=None, **kwargs) -> PolyominoObject:
     kwargs = margins(**kwargs)
     kwargs["row"] = row
     kwargs["col"] = col
@@ -3590,4 +3622,5 @@ def A8BA():
 
 create.__doc__ = Create.__doc__
 save.__doc__ = Save.__doc__
+polyomino.__doc__ = Polyomino.__doc__
 DeckOfCards.__doc__ = Deck.__doc__

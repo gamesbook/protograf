@@ -12,7 +12,6 @@ basic scripts of your own using the :doc:`Core Shapes <core_shapes>`. You also
 be familiar with the various types of shape's properties described in the
 :doc:`Customised Shapes <customised_shapes>`
 
-
 Overview
 ========
 
@@ -23,7 +22,7 @@ with customised properties, in addition to the basic set of
 In many cases, these are constructed out of one or more of the core shapes;
 for example, `polyominoes`_ are composed of one or more
 :ref:`squares <square-command>`. Thus they are able to use, or reference, the
-properties of these shapes, in addition to their particular properties.
+properties of these shapes, in addition to their own particular properties.
 
 Polyominoes
 ===========
