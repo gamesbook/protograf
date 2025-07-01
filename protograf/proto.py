@@ -2232,6 +2232,48 @@ def hexagon(row=None, col=None, **kwargs):
 
 
 def Line(row=None, col=None, **kwargs):
+    """Draw a Line shape on the canvas.
+
+    Kwargs:
+
+    - angle (float): the number of degrees clockwise from the baseline; used in
+      conjunction with *length*
+    - cx and cy (floats): if set, will replace the use of *x* and *y* for the
+      starting point, and work in conjunction with *angle* and *length* to
+      create the line around a centre point
+    - dotted (bool): if ``True``, create a series of small lines i.e. the
+      "dots", followed by gaps, of sizes equal to the line's *stroke_width*
+    - dashed (list): a list of two floats: the first is the length of the dash;
+      the second is the length of the space between each dash
+    - length (float): sets the specific size of the line; used in conjunction
+      with *angle* (which defaults to 0 |deg|)
+    - rounded (bool): if ``True``, draw small semicircles at the ends of the line
+    - stroke (float): the color of the line
+    - stroke_width (str): the thickness of the line, in points
+    - x1 and y1 (floats): a fixed endpoint for the line end (if not calculated by
+      *angle* and *length*)
+
+    Arrow-related Kwargs:
+
+    - arrow (bool): if set to ``True`` will cause a default arrow to be drawn
+    - arrow_style (str): can be set to ``notch``, ``angle``, or ``spear`` to change
+      the default shape of the arrow
+    - arrow_fill (str): set the color of the arrow, which otherwise defaults to the
+      color of the line
+    - arrow_stroke (str): set the color of the arrow with style ``angle``, which
+      otherwise defaults to the color of the line
+    - arrow_width (float): set the width of the arrow at its base,  which otherwise
+      defaults to a multiple of the line width
+    - arrow_height (float): set the height of the arrow, which otherwise
+      defaults to a value proportional to the arrow *width* (specifically, the
+      height of the equilateral triangle used for the default arrow style)
+    - arrow_position (float|list): set a value (single number), or values (list of
+      numbers), that represents the fractional distance along the line at which the
+      arrow tip, or tips, must be positioned relative to the start of the line
+    - arrow_double (bool): if True, make a copy of the same arrow, with the same properties as
+      above, but facing in the opposite direction
+
+    """
     kwargs = margins(**kwargs)
     lin = line(row=row, col=col, **kwargs)
     lin.draw()

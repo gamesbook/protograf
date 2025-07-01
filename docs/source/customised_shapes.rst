@@ -22,6 +22,7 @@ Table of Contents
 =================
 
 - `Overview`_
+- `Line`_
 - `Rectangle`_
 - `Hexagon`_
 - `Circle`_
@@ -42,6 +43,371 @@ the small PNG images that were generated from the original PDF output.
 A number of examples also use the :ref:`Common command <the-common-command>`
 |dash| this allows shared properties to be defined once and then used by any
 number of shapes.
+
+
+.. _lineIndex:
+
+Line
+====
+`↑ <table-of-contents-custom_>`_
+
+A Line is a very common shape in many designs; there are a number of ways
+that it can be customised.
+
+- `Dotted, Dashed and Angled <lineDotDash_>`_
+- `Centred <lineCentred_>`_
+- `Arrowheads <line-with-arrow_>`_
+
+Basic Properties
+----------------
+`^ <lineIndex_>`_
+
+A Line has the following properties, in addition to the basic ones of
+*x* and *y* for the starting point, and its *label* properties.
+
+- *angle* - the number of degrees clockwise from the baseline; used in
+  conjunction with *length*
+- *cx* and *cy* - if set, will replace the use of *x* and *y* for the
+  starting point, and work in conjunction with *angle* and *length* to
+  create the line around a centre point
+- *dotted* - if ``True``, create a series of small lines i.e. the
+  "dots", followed by gaps, of sizes equal to the line's *stroke_width*
+- *dashed* - a list of two numbers: the first is the length of the dash;
+  the second is the length of the space between each dash
+- *length* - sets the specific size of the line; used in conjunction
+  with *angle* (which defaults to 0 |deg|)
+- *rounded* - if ``True``, draw small semicircles at the ends of the line
+- *stroke* - the color of the line
+- *stroke_width* - the thickness of the line, in points
+- *x1* and *y1* - a fixed endpoint for the line end (if not calculated by
+  *angle* and *length*)
+
+In addition, a line can have **arrows** at either or both ends. See the
+details in the `arrowheads example <line-with-arrow_>`_.
+
+
+.. _lineDotDash:
+
+Example 1. Dotted, Dashed and Angled Lines
+------------------------------------------
+`^ <lineIndex_>`_
+
+.. |ln2| image:: images/customised/line_custom.png
+   :width: 330
+
+===== ======
+|ln2| This example shows a Line constructed using commands with the
+      following properties:
+
+      .. code:: python
+
+        # black lines
+        Line(
+            x=0, y=0.5,
+            stroke_width=0.2,
+            dotted=True,
+            label="0.2", font_size=6)
+        Line(
+            x=1, y=0.5,
+            stroke_width=0.4, dotted=True,
+            label="0.4", font_size=6)
+        Line(
+            x=2, y=0.5,
+            stroke_width=0.8, dotted=True,
+            label="0.8", font_size=6)
+        Line(
+            x=3, y=0.5,
+            stroke_width=1.6, dotted=True,
+            label="1.6", font_size=6)
+
+        # colored lines
+        Line(
+            x=0, y=4, x1=4, y1=5,
+            stroke="blue", stroke_width=1,
+            dashed=[0.2, 0.1],
+            label="dashed:[0.2,0.1]", font_size=6)
+        Line(
+            x=0, y=3,
+            length=4.1, angle=15,
+            stroke="red",
+            label="15", font_size=6)
+        Line(
+            x=0, y=2, length=4,
+            stroke="gold", stroke_width=2)
+        Line(
+            x=1, y=1.5, length=2,
+            stroke="chartreuse", stroke_width=10,
+            rounded=True)
+
+      The various black lines have these properties:
+
+      - *x* and *y* set as their starting point
+      - a default length of ``1`` cm
+      - *stroke_width* - set as value in points and labelled accordingly
+      - *dotted* - has a value of ``True``
+
+      The dotted line is just a series of small lines i.e. the "dots",
+      followed by gaps, of sizes equal to the line's *stroke_width*.
+
+      The thin red line has:
+
+      - *angle* - of ``15`` |deg| from the baseline, clockwise
+
+      The angle guides the direction in which the line is drawn; if not
+      given |dash| as in the case of the thick green line |dash| this
+      will be 0 |deg|. The line length is then calculated based on these
+      points.
+
+      The thick green, thick gold and thin red lines all have:
+
+      - *x* and *y* set as their starting point
+      - *length* - sets the specific size of the line
+
+      The thick green line and the thick gold line do **not** have
+      any *angle* property; this defaults to 0 |deg| which means the
+      line is drawn to the "east" (or right of the start).
+
+      The thick gold line has:
+
+      - *rounded* set to ``True`` so semi-circles are drawn at line ends
+
+      The medium blue line has:
+
+      - *dashed* - length of ``2`` mm and spacing of ``1`` mm
+      - *x1* and *y1* set as the ending point
+
+      Dashes are a list of two numbers. The first is the length of the dash;
+      the second is the length of the space between each dash.
+
+===== ======
+
+
+.. _lineCentred:
+
+Example 2. Centred Line
+-----------------------
+`^ <lineIndex_>`_
+
+A line can be drawn at a centre point by providing the following properties:
+
+- centre - set using *cx* and *cy* values
+- *length* - the length of the line
+- *angle* - the rotation of the line, anti-clockwise from the baseline
+
+.. |ln4| image:: images/customised/line_centred.png
+   :width: 330
+
+===== ======
+|ln4| This example shows a Line constructed using commands with the
+      following properties:
+
+      .. code:: python
+
+        Line(cx=1, cy=1, angle=45,
+             length=2, stroke="red")
+        Line(cx=3, cy=1, angle=225,
+             length=2, stroke_width=1.5)
+
+        Circle(cx=2, cy=3, radius=1)
+        Line(cx=2, cy=3, angle=45, length=2,
+             stroke="red", arrow_width=0.2)
+        Line(cx=2, cy=3, angle=135, length=2,
+             stroke_width=1.5, arrow_width=0.2)
+
+        Line(cx=1, cy=5, angle=135,
+             length=2, stroke_width=1.5)
+        Line(cx=3, cy=5, angle=315,
+             length=2, stroke="red")
+
+      The top two lines are rotated at 45 |deg| (red) and 255 |deg|
+      (thick black).
+
+      The bottom two lines are rotated at 135 |deg| (thick black) and
+      315 |deg| (red).
+
+      While each pair appears to be "in the same direction", the use of the
+      arrow property will display the actual direction; so the 45 |deg| (red)
+      line in the circle points to 45 |deg|, while the 135 |deg|
+      (thick black) points to 135 |deg|.
+
+===== ======
+
+
+.. _line-with-arrow:
+
+Example 3. Arrowheads on Line
+-----------------------------
+`^ <lineIndex_>`_
+
+In addition to styling a Line, it is also possible to specify an arrow
+(also called an "arrowhead") for the line; a small "pointing" symbol to
+signify direction.
+
+This is different from the standalone :ref:`Arrow <arrow-command>` which
+allows a much higher degree of customisation.
+
+The following properties can be set:
+
+- *arrow* - if set to ``True`` will cause a default arrow to be drawn
+- *arrow_style* - can be set to ``notch``, ``angle``, or ``spear`` to change
+  the default shape of the arrow
+- *arrow_fill* - set the color of the arrow, which otherwise defaults to the
+  color of the line
+- *arrow_stroke* - set the color of the arrow with style ``angle``, which
+  otherwise defaults to the color of the line
+- *arrow_width* - set the width of the arrow at its base,  which otherwise
+  defaults to a multiple of the line width
+- *arrow_height* - set the height of the arrow, which otherwise
+  defaults to a value proportional to the arrow *width* |dash| specifically,
+  the height of the equilateral triangle used for the default arrow style
+- *arrow_position* - set a value (single number), or values (list of numbers),
+  that represents the fractional distance along the line at which the arrow tip,
+  or tips, must be positioned relative to the start of the line
+- *arrow_double* - if set to ``True`` make a copy of the same arrow, with the
+  same properties as above, but facing in the opposite direction
+
+.. |ln3| image:: images/customised/arrowheads.png
+   :width: 330
+
+===== ======
+|ln3| This example shows a Line constructed using commands with the
+      various properties.
+
+      Note the use of the :ref:`Common command <the-common-command>`
+      for when multiple Lines all need to share the same properties.
+
+      .. code:: python
+
+        # black styled arrows
+        Line(x=0.5, y=1, x1=0.5, y1=0,
+             arrow=True)
+        Line(x=1.5, y=1, x1=1.5, y1=0,
+             arrow_style='notch')
+        Line(x=2.5, y=1, x1=2.5, y1=0,
+             arrow_style='angle')
+        Line(x=3.5, y=1, x1=3.5, y1=0,
+             arrow_style='spear')
+        # rotated lines; double arrow
+        dbl_ang = Common(
+            arrow_style='angle',
+            arrow_double=True)
+        Line(common=dbl_ang,
+             x=0, y=1.75, x1=1, y1=1.25)
+        Line(common=dbl_ang,
+             x=2, y=1.5, x1=1, y1=1.5)
+        Line(common=dbl_ang,
+             x=2, y=1.25, x1=3, y1=1.75)
+        Line(common=dbl_ang,
+             x=3, y=1.5, x1=4, y1=1.5)
+        # colored lines and arrows
+        Line(x=0, y=3, x1=1, y1=2,
+             arrow=True)
+        Line(x=1, y=3, x1=2, y1=2,
+             arrow_style='notch',
+             stroke="tomato")
+        Line(x=2, y=3, x1=3, y1=2,
+             arrow_style='angle',
+             stroke="chartreuse")
+        Line(x=3, y=3, x1=4, y1=2,
+             arrow_style='spear',
+             stroke="aqua")
+        # set size of arrow heads
+        bigger = Common(
+            arrow_width=0.2,
+            arrow_height=0.3)
+        Line(common=bigger,
+             x=0, y=4, x1=1, y1=3,)
+        Line(common=bigger,
+             x=1, y=4, x1=2, y1=3,
+             arrow_style='notch')
+        Line(common=bigger,
+             x=2, y=4, x1=3, y1=3,
+             arrow_style='angle')
+        Line(common=bigger,
+             x=3, y=4, x1=4, y1=3,
+             arrow_style='spear')
+        # sized and colored arrow heads
+        big_color = Common(
+            arrow_width=0.2,
+            arrow_height=0.3,
+            arrow_fill="yellow",
+            arrow_stroke="red")
+        Line(common=big_color,
+             x=0, y=5, x1=1, y1=4,)
+        Line(common=big_color,
+             x=1, y=5, x1=2, y1=4,
+             arrow_style='notch')
+        Line(common=big_color,
+             x=2, y=5, x1=3, y1=4,
+             arrow_style='angle')
+        Line(common=big_color,
+             x=3, y=5, x1=4, y1=4,
+             arrow_style='spear')
+        # positioned arrow heads
+        Line(x=0.5, y=6, x1=0.5, y1=5,
+             stroke_width=1,
+             dotted=True,
+             arrow_position=0.66,
+             arrow_double=True)
+        Line(x=1, y=6, x1=2, y1=5,
+             arrow_position=[0.25, 0.5, 0.75])
+        Line(x=2.5, y=6, x1=2.5, y1=5,
+             arrow_position=[1.0, 0.93])
+
+        # two lines superimposed
+        Line(x=3, y=6, x1=4, y1=5,
+             arrow_style='spear',
+             arrow_height=0.15)
+        Line(x=3, y=6, x1=4, y1=5,
+             arrow_style='angle',
+             arrow_width=0.15,
+             arrow_position=[0.1, 0.15, 0.2])
+
+      The first row shows default-sized arrows of differing styles;
+      ``triangle`` (the default), ``notch``,  ``angle``, and ``spear``.
+      As with other types of styles, these can be referred to by their
+      initial letters: *t*, *n*, *a*, or *s*.
+
+      To enable an arrow display, either use ``arrow=True`` **or**  set one
+      of the properties described in this example.
+
+      The second row shows the default arrow but with the line rotated in
+      different directions. In this case ``arrow_double=True`` means the
+      same arrow is drawn twice; facing in each direction.
+
+      The third row shows how arrows take on the stroke color of the line
+      to which they are attached.
+
+      The fourth row shows how the arrow's *height* and *width* (across the
+      "base" of the arrow) can be set to control it's size. **Note** that the
+      ``spear`` arrow is always twice the height of the others!
+
+      The fifth row shows how the arrow can be set to a different color from
+      that of its line.  **Note** that the ``angle`` arrow there is no *fill*
+      color, and that for the other styles, the *stroke* color is set to match
+      the *fill* color.
+
+      The sixth row shows how the *arrow_position* property can be set. The
+      value, or values, represent the fractional distance along the line at
+      which the arrow tip, or tips, is positioned relative to the start of
+      the line. So, ``0.66`` represents a distance 66% along the line from
+      the start towards the end. A list (inside the ``[``..``]`` brackets)
+      of values means the arrow is drawn in multiple places along the line.
+
+      The bottom left image shows how the default arrow expands in size
+      proportional to the thickness (*stroke_width*) of the Line. Again,
+      because ``arrow_double=True`` the same arrow is drawn twice; facing
+      in each direction, but the ``arrow_position=0.66`` property means
+      the arrows are each drawn about two-thirds of the way along the line,
+      relative to their different "starts".
+
+      The bottom right image is a "cheat" of sorts.  Two lines are drawn in
+      the same location but with different styled arrows in different
+      positions.
+
+===== ======
+
+
 
 .. _rectangleIndex:
 

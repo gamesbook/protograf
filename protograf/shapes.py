@@ -1248,7 +1248,7 @@ class EquilateralTriangleShape(BaseShape):
         vertices.append(pt0)
         hand = hand or "east"
         flip = flip or "north"
-        print(f"*** {hand=} {flip=}")
+        # print(f"*** {hand=} {flip=}")
         if hand == "west" or hand == "w":
             x2 = pt0.x - side
             y2 = pt0.y
@@ -3603,15 +3603,15 @@ class RightAngledTriangleShape(BaseShape):
             self._u.height = self._u.width
         # calc directions
         x, y = self._u.x, self._u.y
-        self.hand = kwargs["hand"] or "north"
-        self.flip = kwargs["flip"] or "east"
+        self.flip = kwargs.get("flip", "north") or "north"
+        self.hand = kwargs.get("hand", "east") or "east"
         if not self.hand or not self.flip:
             feedback(
                 'Need to supply both "flip" and "hand" options! for triangle.',
                 stop=True,
             )
-        hand = self.hand.lower()
-        flip = self.flip.lower()
+        hand = str(self.hand).lower()
+        flip = str(self.flip).lower()
         if hand == "west" or hand == "w":
             x2 = x - self._u.width
         elif hand == "east" or hand == "e":

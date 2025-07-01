@@ -7,8 +7,8 @@ Changes
 
 2025-00-00 (0.2.6)
 ------------------
-- Add Polyomino & Pentomino objects
--
+- Add Polyomino, Pentomino and Tetronimo objects
+- Restructure docs: move Lne to customised shapes
 
 2025-06-21 (0.2.5)
 ------------------
