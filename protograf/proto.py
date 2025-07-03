@@ -1144,6 +1144,8 @@ def Create(**kwargs):
     - margin_right (float): set the the right margin using the defined *units*
     - margin_debug (bool): if True, show the margin as a dotted blue line
     - page_grid (float): if a valid float, draw a squared grid covering the paper
+      of square size equal to the value
+    - cached_fonts (bool): if True, will force reload of Font cache
 
     Notes:
 

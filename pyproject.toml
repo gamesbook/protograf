@@ -23,7 +23,8 @@ dependencies = [
     "black (>=25.1.0,<26.0.0)",
     "fonttools (>=4.58.4,<5.0.0)",
     "findsystemfontsfilename (>=0.3.2,<0.4.0)",
-    "rich (>=14.0.0,<15.0.0)"
+    "rich (>=14.0.0,<15.0.0)",
+    "openpyxl (>=3.1.5,<4.0.0)"
 ]
 keywords = [ "python", "graphics", "boardgames", "cards", "counters", "tiles" ]
 classifiers = [

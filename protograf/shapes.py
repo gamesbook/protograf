@@ -2625,6 +2625,8 @@ class PolylineShape(BaseShape):
             cnv.draw_polyline(self.vertexes)
             kwargs["closed"] = False
             kwargs["fill"] = None
+            if kwargs.get("rounded"):
+                kwargs["lineJoin"] = 1
             self.set_canvas_props(cnv=cnv, index=ID, **kwargs)
         # ---- arrowhead
         if (
@@ -4195,14 +4197,15 @@ class TextShape(BaseShape):
             try:
                 # style
                 keys["fontsize"] = self.font_size
-                # NB - replace spaces to prevent: bad fontname chars {' '}
-                keys["fontname"] = self.font_name.strip().replace(" ", "_")
-                keys["fontfile"] = self.font_file
+                font, keys["fontfile"], keys["fontname"] = tools.get_font_by_name(
+                    self.font_name
+                )
                 keys["color"] = tools.get_color(self.stroke)
                 # keys["fill"] = tools.get_color(self.fill)
                 keys["align"] = self.to_alignment()
                 _lineheight = kwargs.get("line_height", None)
                 keys["lineheight"] = self.kw_float(_lineheight, "line_height")
+
                 # keys['stroke_opacity'] = self.show_stroke
                 # keys['fill_opacity'] = self.show_fill
 
@@ -4218,6 +4221,7 @@ class TextShape(BaseShape):
                 # keys['overlay'] = True
                 # keys['expandtabs'] = 8
                 # keys['charwidths'] = None
+
                 # feedback(f'*** Text WRAP {keys=} \n=> {rect=} _text:{_text}')
                 if self.run_debug:
                     globals.doc_page.draw_rect(

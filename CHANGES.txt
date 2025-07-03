@@ -8,7 +8,10 @@ Changes
 2025-00-00 (0.2.6)
 ------------------
 - Add Polyomino, Pentomino and Tetronimo objects
-- Restructure docs: move Lne to customised shapes
+- Restructure docs: move Line to customised shapes
+- Color code feedback messages
+- Patch error with custom fonts for text boxes
+- Add support for XLSX files
 
 2025-06-21 (0.2.5)
 ------------------

@@ -41,8 +41,12 @@ from pymupdf import (
 
 # local
 from protograf.utils import geoms, tools, support
-from protograf.utils.constants import DEBUG_COLOR, DEFAULT_FONT, DEFAULT_MARGIN_SIZE
-from protograf.utils.fonts import builtin_font, FontInterface
+from protograf.utils.constants import (
+    CACHE_DIRECTORY,
+    DEBUG_COLOR,
+    DEFAULT_FONT,
+    DEFAULT_MARGIN_SIZE,
+)
 from protograf.globals import unit
 from protograf.utils.messaging import feedback
 from protograf.utils.structures import (
@@ -53,7 +57,6 @@ from protograf.utils.structures import (
     TemplatingType,
     UnitProperties,
 )
-from protograf.utils.support import CACHE_DIRECTORY
 from protograf import globals
 
 log = logging.getLogger(__name__)
@@ -1833,7 +1836,9 @@ class BaseShape:
         keys = {}
         keys["fontsize"] = kwargs.get("font_size", self.font_size)
         keys["fontname"] = kwargs.get("font_name", self.font_name)
-        # keys['fontfile'] = self.font_file
+        font, keys["fontfile"], keys["fontname"] = tools.get_font_by_name(
+            keys["fontname"]
+        )
         _color = kwargs.get("stroke", self.stroke)
         keys["color"] = tools.get_color(_color)
         if kwargs.get("stroke_inner"):
@@ -1860,26 +1865,6 @@ class BaseShape:
         # TODO - recalculate xm, ym based on align and text width
         # keys["align"] = align or self.align
 
-        # ---- set font (custom/built-in)
-        if not builtin_font(keys["fontname"]):
-            cache_directory = Path(Path.home() / CACHE_DIRECTORY)
-            fi = FontInterface(cache_directory=cache_directory)
-            keys["fontfile"] = fi.get_font_file(name=keys["fontname"])
-            if not keys["fontfile"]:
-                feedback(
-                    f'Cannot find or load a font named `{keys["fontname"]}`.'
-                    f' Defaulting to "{DEFAULT_FONT}".',
-                    False,
-                    True,
-                )
-                keys["fontname"] = DEFAULT_FONT
-                font = muFont(DEFAULT_FONT)  # built-in
-            else:
-                keys["fontname"] = keys["fontname"].replace(" ", "-")
-                font = muFont(keys["fontname"], fontfile=keys["fontfile"])
-        else:
-            font = muFont(keys["fontname"])  # built-in
-
         # ---- draw
         # print(f'### multi_string {xm=} {ym=} {string=} {keys}')
         point = muPoint(xm, ym)
@@ -1900,7 +1885,7 @@ class BaseShape:
             #     lineheight=None, fill=None, render_mode=0, miter_limit=1,
             #     border_width=1, rotate=0, morph=None, stroke_opacity=1,
             #     fill_opacity=1, oc=0)
-            # print(f'### insert_text {point=} {string=} {morph=} {keys}')
+            # print(f'### insert_text:: {point=} {string=} {morph=} \n{keys=}')
             canvas.insert_text(point, string, morph=morph, **keys)
         except Exception as err:
             if "need font file" in str(err):

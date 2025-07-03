@@ -22,5 +22,78 @@ originated in 1985.  Tetrominoes are one type of :doc:`Polyominoes <polyominoes>
 and each one is composed of **4** squares in one of 5 unique patterns.
 
 They can referred to by their shortcut ``letter`` property which has been
-assigned to each of the 5 shapes, based on their similarity to letters in
-the Roman alphabet.
+assigned to each of the 5 unique shapes, based on their similarity to letters
+in the Roman alphabet.
+
+
+Properties
+==========
+
+Tetrominoes share all the properties of :doc:`Polyominoes <polyominoes>` but,
+instead of a *pattern* they are defined using a *letter*.
+
+A *letter* in uppercase format draws a tetromino in such a way that it
+resembles that letter; whereas a lowercase letter draws the same basic shape
+but inverted from left to right.
+
+
+Examples
+========
+
+The examples below shows how letters are used create a Tetromino.
+
+
+Tetromino: Uppercase Letter
+---------------------------
+`^ <tetrominoesOver_>`_
+
+.. |te1| image:: images/objects/tetromino_upper.png
+   :width: 330
+
+===== ======
+|te1| This example shows Tetrominoes constructed using commands like:
+
+      .. code:: python
+
+         tbasics = Common(
+             side=0.75,
+             outline_stroke="black", outline_width=1)
+
+         Tetromino(
+             x=1.5, y=0,
+             letter="S",
+             label="S",
+             common=tbasics)
+
+      Each of the five shapes is constructed in the same way |dash| setting
+      the *letter* property to one of: I, S, L, O, or T.
+
+===== ======
+
+
+Tetromino: Lowercase Letter
+---------------------------
+`^ <tetrominoesOver_>`_
+
+.. |te2| image:: images/objects/tetromino_lower.png
+   :width: 330
+
+===== ======
+|te2| This example shows Tetrominoes constructed using commands like:
+
+      .. code:: python
+
+         tbasics = Common(
+             side=0.75,
+             outline_stroke="black", outline_width=1)
+
+         Tetromino(
+             x=1.5, y=0,
+             letter="s",
+             label="s",
+             common=tbasics)
+
+      Each of the five shapes is constructed in the same way |dash| setting
+      the *letter* property to one of: i, s, l, o, or t.
+
+===== ======

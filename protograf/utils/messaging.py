@@ -12,7 +12,11 @@ from protograf import globals
 def feedback(item, stop=False, warn=False):
     """Placeholder for more complete feedback."""
     console = Console()
-    if warn and not globals.pargs.nowarning:
+    if hasattr(globals, "pargs"):
+        no_warning = globals.pargs.nowarning
+    else:
+        no_warning = False
+    if warn and not no_warning:
         console.print("[bold magenta]WARNING::[/bold magenta] %s" % item)
     elif not warn:
         console.print("[bold green]FEEDBACK::[/bold green] %s" % item)
@@ -20,5 +24,4 @@ def feedback(item, stop=False, warn=False):
         console.print(
             "[bold red]FEEDBACK::[/bold red] Could not continue with program.\n"
         )
-        # sys.exit()
         quit()

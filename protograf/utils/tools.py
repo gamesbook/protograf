@@ -15,15 +15,23 @@ import pathlib
 import string
 import sys
 from urllib.parse import urlparse
-import xlrd
 
 # third-party
-from pymupdf import Point as muPoint, Matrix
+from openpyxl import load_workbook
+from pymupdf import Point as muPoint, Matrix, Font as muFont
 from pymupdf.utils import getColor
 import requests
+import xlrd
 
 # local
-from protograf.utils.constants import COLOR_NAMES, STANDARD_CARD_SIZES, PAPER_SIZES
+from protograf.utils.constants import (
+    CACHE_DIRECTORY,
+    COLOR_NAMES,
+    DEFAULT_FONT,
+    STANDARD_CARD_SIZES,
+    PAPER_SIZES,
+)
+from protograf.utils.fonts import builtin_font, FontInterface
 from protograf.utils.messaging import feedback
 from protograf.utils.support import to_units
 from protograf.utils.structures import (
@@ -65,12 +73,12 @@ def load_data(datasource=None, **kwargs):
             headers = kwargs.get("headers", None)
             selected = kwargs.get("selected", None)
             dataset = open_csv(datasource, headers=headers, selected=selected)
-        elif file_ext.lower() == ".xls":
+        elif file_ext.lower() in [".xls", ".xlsx"]:
             headers = kwargs.get("headers", None)
             selected = kwargs.get("selected", None)
             sheet = kwargs.get("sheet", 0)
             sheetname = kwargs.get("sheetname", None)
-            dataset = open_xls(
+            dataset = open_excel(
                 datasource,
                 sheet=sheet,
                 sheetname=sheetname,
@@ -653,15 +661,163 @@ def open_csv(filename, headers=None, selected=None):
     return dict_list
 
 
+def open_excel(filename, sheet=0, sheetname=None, headers=None, selected=None):
+    """Read data from an Excel file into a list of dictionaries
+
+    Args:
+
+    - filename (str): path to the file
+    - sheet (int): select a sheet number (otherwise first is used)
+    - sheetname (str): select a sheet by name (otherwise first is used)
+    - headers (list): strings to use instead of the first row
+    - selected (list): desired rows e.g. [2,4,7]
+    """
+
+    def cleaned(value):
+        if isinstance(value, float):
+            if float(value) == float(int(value)):
+                return int(value)
+        return value
+
+    if not filename:
+        feedback("A valid Excel filename must be supplied!")
+
+    dict_list = []
+
+    _file_with_path = None
+    norm_filename = os.path.normpath(filename)
+    if not os.path.exists(norm_filename):
+        filepath = script_path()
+        _file_with_path = os.path.join(filepath, norm_filename)
+        if not os.path.exists(_file_with_path):
+            feedback(f'Unable to find "{filename}", including in {filepath}')
+
+    if sheet is None and sheetname is None:
+        feedback(
+            f'Access to Excel file "{filename}" requires either the sheet number or the sheet name!',
+            True,
+        )
+
+    _, file_ext = os.path.splitext(_file_with_path)
+    if file_ext == ".xls":
+        return open_xls(
+            filename=filename,
+            sheet=sheet,
+            sheetname=sheetname,
+            headers=headers,
+            selected=selected,
+        )
+    elif file_ext == ".xlsx":
+        return open_xlsx(
+            filename=filename,
+            sheet=sheet,
+            sheetname=sheetname,
+            headers=headers,
+            selected=selected,
+        )
+    else:
+        feedback(f'Cannot process data files with an extension of "{file_ext}".', True)
+
+
+def open_xlsx(filename, sheet=0, sheetname=None, headers=None, selected=None):
+    """Read data from XLSX file into a list of dictionaries
+
+    Args:
+
+    - filename (str): path to the file
+    - sheet (int): select a sheet number (otherwise first is used)
+    - sheetname (str): select a sheet by name (otherwise first is used)
+    - headers (list): strings to use instead of the first row
+    - selected (list): desired rows e.g. [2,4,7]
+    """
+
+    def cleaned(value):
+        if isinstance(value, float):
+            if float(value) == float(int(value)):
+                return int(value)
+        return value
+
+    if not filename:
+        feedback("A valid Excel filename must be supplied!")
+
+    dict_list = []
+
+    _file_with_path = None
+    norm_filename = os.path.normpath(filename)
+    if not os.path.exists(norm_filename):
+        filepath = script_path()
+        _file_with_path = os.path.join(filepath, norm_filename)
+        if not os.path.exists(_file_with_path):
+            feedback(f'Unable to find "{filename}", including in {filepath}')
+
+    try:
+        excel_filename = _file_with_path or norm_filename
+        book = load_workbook(excel_filename, data_only=True)
+        if sheetname:
+            sheet = book[sheetname]
+        elif sheet is not None:
+            sheet = int(sheet) - 1 if sheet > 0 else int(sheet)
+            _sheetname = book.sheetnames[sheet]
+            sheet = book[_sheetname]
+        else:
+            feedback(
+                f'Access to Excel file "{filename}" requires either the sheet number or the sheet name!',
+                True,
+            )
+        start = 1
+
+        if not headers:
+            keys = [
+                sheet.cell(1, col_index).value
+                for col_index in range(1, sheet.max_column + 1)
+            ]
+            if None in keys:
+                feedback(
+                    f'Please assign headers to all columns in Excel file "{filename}"'
+                    " and/or delete any empty columns.",
+                    True,
+                )
+            start = 2
+        else:
+            start = 1
+            keys = headers
+        if len(keys) < sheet.max_column:
+            feedback(
+                'Too few headers supplied for the existing columns in "%s"' % filename
+            )
+        else:
+            dict_list = []
+            for row_index in range(start, sheet.max_row + 1):
+                item = {
+                    keys[col_index - 1]: cleaned(
+                        sheet.cell(row=row_index, column=col_index).value
+                    )
+                    for col_index in range(1, sheet.max_column + 1)
+                }
+                if not selected:
+                    dict_list.append(item)
+                else:
+                    if row_index + 1 in selected:
+                        dict_list.append(item)
+    except IOError:
+        feedback('Unable to find or open Excel "%s"' % excel_filename)
+    except IndexError:
+        feedback('Unable to open sheet "%s"' % (sheet or sheetname))
+    except Exception:
+        feedback('Unable to open or process sheet "%s"' % (sheet or sheetname))
+    return dict_list
+
+
 def open_xls(filename, sheet=0, sheetname=None, headers=None, selected=None):
     """Read data from XLS file into a list of dictionaries
 
-    Supply:
+    Args:
 
-      * sheet to select a sheet number (otherwise first is used)
-      * sheetname to select a sheet by name (otherwise first is used)
-      * headers is a list of strings to use instead of the first row
-      * selected is a list of desired rows e.g. [2,4,7]
+    - filename (str): path to the file
+    - sheet (int): select a sheet number (otherwise first is used)
+    - sheetname (str): select a sheet by name (otherwise first is used)
+    - headers (list): strings to use instead of the first row
+    - selected (list): desired rows e.g. [2,4,7]
     """
 
     def cleaned(value):
@@ -957,6 +1113,52 @@ def sheet_column(num: int, lower: bool = False) -> string:
             )
 
     return converter(num, lower)
+
+
+def get_font_by_name(font_name: str) -> tuple:
+    """Get font details by name - built-in OR system installed.
+
+    Args:
+        font_name: expected name of font
+
+    Returns:
+
+    - font (pymupdf.Font): the Font object
+    - font_file (str): path to the font's file
+    - font_name (str): actual font name to be used
+
+    Doc Test:
+
+    >>> get_font_by_name('foo')
+    WARNING:: Cannot find or load a font named `foo`. Defaulting to "Helvetica".
+    (Font('Helvetica'), None, 'Helvetica')
+    >>> get_font_by_name('Helvetica')
+    (Font('Helvetica'), None, 'Helvetica')
+
+    #get_font_by_name('Arial')
+    #(Font('Arial Regular'), '/usr/share/fonts/truetype/msttcorefonts/Arial.ttf', 'Arial')
+    """
+
+    font, font_file = None, None
+    if not builtin_font(font_name):
+        cache_directory = pathlib.Path(pathlib.Path.home() / CACHE_DIRECTORY)
+        fi = FontInterface(cache_directory=cache_directory)
+        font_file = fi.get_font_file(name=font_name)
+        if not font_file:
+            feedback(
+                f"Cannot find or load a font named `{font_name}`."
+                f' Defaulting to "{DEFAULT_FONT}".',
+                False,
+                True,
+            )
+            font_name = DEFAULT_FONT
+            font = muFont(DEFAULT_FONT)  # built-in
+        else:
+            font_name = font_name.replace(" ", "-")
+            font = muFont(font_name, font_file)
+    else:
+        font = muFont(font_name)  # built-in
+    return font, font_file, font_name
 
 
 def register_font(name: str, filename: str = None):
@@ -1401,6 +1603,7 @@ def set_canvas_props(
     else:
         dashes = None
     # print(f"### SCP{_dotted =} {_dashed=} {dashes=}")
+    _line_join = kwargs.get("lineJoin", 0)  # set via rounded=True in PolylineShape
     # ---- check rotation
     morph = None
     # print(f'^^^ SCP {_rotation_point=} {_rotation}')
@@ -1428,7 +1631,7 @@ def set_canvas_props(
         color=_color,
         fill=_fill,
         lineCap=stroke_cap or 0,  # or self.stroke_cap,  # FIXME
-        lineJoin=0,
+        lineJoin=_line_join,
         dashes=dashes,
         fill_opacity=opacity,
         morph=morph,
