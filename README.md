@@ -13,7 +13,7 @@ elements; typically a mix of graphics and text.
 > You do not need to know the Python language to be able to use __protograf__
 > but you do need Python installed on your machine!
 
-## Documentation
+## :notebook: Documentation
 
 The online documentation for __protograf__ is available at
 [Read the Docs](https://protograf.readthedocs.io/);
@@ -25,7 +25,7 @@ at least read some of the introductory sections, and especially the
 [installation](https://protograf.readthedocs.io/en/latest/setting_up.html)
 before proceeding...
 
-## Requirements
+## :hammer_and_wrench: Requirements
 
 __protograf__ requires Python (version of 3.13 or higher) to be installed
 and running on your machine.
@@ -37,7 +37,7 @@ which is a cross-platform tool able to [install Python](https://docs.astral.sh/u
 If using [uv](https://docs.astral.sh/uv/), it is recommended to also create and use a
 [virtual environment](https://docs.astral.sh/uv/pip/environments/#creating-a-virtual-environment).
 
-## Quick Start (for the impatient)
+## :toolbox: Quick Start (for the impatient)
 
 Assuming that Python 3.13 or higher is installed on your machine, you can then
 install __protograf__ via:
@@ -91,11 +91,11 @@ If it does not work, you may want to look at more detail provided in the
 [installation](https://protograf.readthedocs.io/en/latest/setting_up.html)
 guide.
 
-## Contributions
+## :handshake: Contributions
 
 Please see the [list of contributors](CONTRIBUTORS.txt).
 
-## Potential Features
+## :game_die: Potential Features
 
 These features are **not** guaranteed to be implemented; they just represent
 current / potential areas of work or idea development.
@@ -128,7 +128,7 @@ current / potential areas of work or idea development.
 * [ ] Color:
     * [ ] add support for CYMK
 
-## Potential Examples
+## :jigsaw: Potential Examples
 
 These are possible examples to show board creation based on existing games:
 
@@ -138,7 +138,7 @@ These are possible examples to show board creation based on existing games:
 * [x] WarpWar board: show a fully-styled example
 * [ ] 18xx board: show a basic map with tracks, towns, cities and off-map areas
 
-## Acknowledgements
+## :mega: Acknowledgements
 
 > *The world is full of power and energy and a person can go far by just
 > skimming off a tiny bit of it.*
@@ -155,7 +155,7 @@ also a very powerful library for supporting this type of application. Internal
 terminology, such as `shapes`, was developed before the adoption of *pyMuPDF*
 and it is coincidental that these are similar!
 
-Additional libraries in use include:
+### :books: Additional Libraries
 
 * `cairoSVG` https://pypi.org/project/cairosvg/ - support for drawing SVG images
 * `bgg-api` https://pypi.org/project/bgg-api/ - support for access to the
@@ -167,6 +167,6 @@ Additional libraries in use include:
 * `pillow` https://github.com/python-pillow/Pillow - support for image processing
 * `segno` https://github.com/heuer/segno/ - support for QRCode creation
 
-## License
+## :scroll: License
 
 __protograf__ is licensed under the GNU General Public License.
