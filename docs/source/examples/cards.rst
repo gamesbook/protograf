@@ -34,7 +34,7 @@ Simple
 =========== ==================================================================
 Title       *Simple set of Cards*
 ----------- ------------------------------------------------------------------
-Source Code `cards_design.py <https://github.com/gamesbook/protograf/blob/master/examples/cards/cards_design.py>`_
+Script      `cards_design.py <https://github.com/gamesbook/protograf/blob/master/examples/cards/cards_design.py>`_
 ----------- ------------------------------------------------------------------
 Discussion  This example shows how to construct a deck of cards using these
             commands (only an extract of the code is shown here):
@@ -95,7 +95,7 @@ Matrix Generated
 =========== ==================================================================
 Title       *Cards generated from a Matrix*
 ----------- ------------------------------------------------------------------
-Source Code `cards_matrix_one.py <https://github.com/gamesbook/protograf/blob/master/examples/cards/cards_matrix_one.py>`_
+Script      `cards_matrix_one.py <https://github.com/gamesbook/protograf/blob/master/examples/cards/cards_matrix_one.py>`_
 ----------- ------------------------------------------------------------------
 Discussion  This example shows how to construct a deck of cards using these
             commands (only an extract of the code is shown here):
@@ -148,7 +148,7 @@ Standard Playing Cards
 =========== ==================================================================
 Title       *Standard Playing Cards generated from a Matrix & Images*
 ----------- ------------------------------------------------------------------
-Source Code `cards_standard.py <https://github.com/gamesbook/protograf/blob/master/examples/cards/cards_standard.py>`_
+Script      `cards_standard.py <https://github.com/gamesbook/protograf/blob/master/examples/cards/cards_standard.py>`_
 ----------- ------------------------------------------------------------------
 Discussion  This example shows how to construct a deck of cards using these
             commands (only an extract of the code is shown here).
@@ -227,7 +227,7 @@ Image-Only Cards
 =========== ==================================================================
 Title       *Cards generated from a directory of images*
 ----------- ------------------------------------------------------------------
-Source Code `cards_images.py <https://github.com/gamesbook/protograf/blob/master/examples/cards/cards_images.py>`_
+Script      `cards_images.py <https://github.com/gamesbook/protograf/blob/master/examples/cards/cards_images.py>`_
 ----------- ------------------------------------------------------------------
 Discussion  This example shows how to construct a deck of cards using these
             commands (only an extract of the code is shown here):
@@ -269,7 +269,7 @@ Hexagonal Cards
 =========== ==================================================================
 Title       *Hexagonal-shaped Cards*
 ----------- ------------------------------------------------------------------
-Source Code `cards_hexagonal.py <https://github.com/gamesbook/protograf/blob/master/examples/cards/cards_hexagonal.py>`_
+Script      `cards_hexagonal.py <https://github.com/gamesbook/protograf/blob/master/examples/cards/cards_hexagonal.py>`_
 ----------- ------------------------------------------------------------------
 Discussion  This example shows how to construct a deck of cards/tiles using
             these commands (only an extract of the code is shown here):
@@ -301,7 +301,7 @@ Circular Cards
 =========== ==================================================================
 Title       *Circular-shaped Cards*
 ----------- ------------------------------------------------------------------
-Source Code `cards_circular.py <https://github.com/gamesbook/protograf/blob/master/examples/cards/cards_circular.py>`_
+Script      `cards_circular.py <https://github.com/gamesbook/protograf/blob/master/examples/cards/cards_circular.py>`_
 ----------- ------------------------------------------------------------------
 Discussion  This example shows how to construct a deck of cards using these
             commands (only an extract of the code is shown here):
@@ -328,9 +328,9 @@ Play Money
 `↑ <table-of-contents-excards_>`_
 
 =========== ==================================================================
-Title       *Play Money Cards*
+Title       *Play Money* (using Cards)
 ----------- ------------------------------------------------------------------
-Source Code `supreme.py <https://github.com/gamesbook/protograf/blob/master/examples/play_money/supreme.py>`_
+Script      `supreme.py <https://github.com/gamesbook/protograf/blob/master/examples/play_money/supreme.py>`_
 ----------- ------------------------------------------------------------------
 Discussion  This example shows how to construct a set of play money using
             ``Deck()`` and ``Card()`` commands.  This example was inspired by

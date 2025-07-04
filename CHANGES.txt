@@ -5,14 +5,22 @@ protograf
 Changes
 =======
 
+2025-00-00 (0.2.6)
+------------------
+- Add Polyomino, Pentomino and Tetronimo objects
+- Restructure docs: move Line to customised shapes
+- Color code feedback messages
+- Patch error with custom fonts for text boxes
+- Add support for XLSX files
+
 2025-06-21 (0.2.5)
 ------------------
-- Patched error caused by missing dependencies
+- Patch error caused by missing dependencies
 - Remove redundant template file
 
 2025-06-21 (0.2.4)
 ------------------
-- Patched error caused by pyMuPDF upgrade
+- Patch error caused by pyMuPDF upgrade
 - Adjust imports to better handle pyMuPDF dependencies
 
 2025-06-21 (0.2.3)

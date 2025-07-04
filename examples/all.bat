@@ -25,6 +25,11 @@ python core\customised_hexagonal_grid_locations.py --no-png -d %location%
 python core\customised_rectangle.py --no-png -d %location%
 python core\customised_shapes.py --no-png -d %location%
 
+REM ---- examples: objects
+ECHO "Creating objects..."
+python objects\polyominoes.py --no-png -d %location%
+python objects\pentominoes.py --no-png -d %location%
+
 REM ---- examples: simple: layouts
 ECHO "Creating customised layouts..."
 python core\layouts\layouts_basic.py --no-png -d %location%

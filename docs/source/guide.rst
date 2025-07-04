@@ -33,22 +33,24 @@ other.
     of hexagonal grids and customise or add to them
 12. :doc:`Additional Commands <additional_commands>` - special commands not part
     of the core shapes; fonts, dates and access to BoardGameGeek data
-13. :doc:`Custom Functions <functions>` - special functions for specific
+13. :doc:`Customised Objects <objects>` - special composite shapes not part
+    of the core shapes; polyominoes, pentominoes
+14. :doc:`Custom Functions <functions>` - special functions for specific
     situations
-14. :doc:`Terminology <terminology>` - summary of common jargon and descriptions
+15. :doc:`Terminology <terminology>` - summary of common jargon and descriptions
     of many of the elements' properties
-15. :doc:`Commands <commands>` - summary of all the commands available
+16. :doc:`Commands <commands>` - summary of all the commands available
 
 The following are supplementary sections that you're likely to need when
 doing more advanced scripts or needing further resources:
 
-16. :doc:`Descriptions of Supplied Examples <examples/index>` - brief
+17. :doc:`Descriptions of Supplied Examples <examples/index>` - brief
     walkthoughs of many of the examples provided with **protograf**
-17. :doc:`Working with Fonts <using_fonts>` - how to install and
+18. :doc:`Working with Fonts <using_fonts>` - how to install and
     use *fonts*, both built-in and additional ones
-18. :doc:`Using Python Commands <python_commands>` - how to work with
+19. :doc:`Using Python Commands <python_commands>` - how to work with
     *loops*, *if/then* statements and *functions* for more flexibility
-19. :doc:`Useful Resources <useful_resources>` - links to
+20. :doc:`Useful Resources <useful_resources>` - links to
     tools and websites related to boardgame prototyping
-20. :doc:`Development Notes <development>` - notes for programmers wanting
+21. :doc:`Development Notes <development>` - notes for programmers wanting
     to develop further in or with  **protograf**

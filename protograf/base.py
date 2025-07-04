@@ -41,8 +41,12 @@ from pymupdf import (
 
 # local
 from protograf.utils import geoms, tools, support
-from protograf.utils.constants import DEBUG_COLOR, DEFAULT_FONT, DEFAULT_MARGIN_SIZE
-from protograf.utils.fonts import builtin_font, FontInterface
+from protograf.utils.constants import (
+    CACHE_DIRECTORY,
+    DEBUG_COLOR,
+    DEFAULT_FONT,
+    DEFAULT_MARGIN_SIZE,
+)
 from protograf.globals import unit
 from protograf.utils.messaging import feedback
 from protograf.utils.structures import (
@@ -53,7 +57,6 @@ from protograf.utils.structures import (
     TemplatingType,
     UnitProperties,
 )
-from protograf.utils.support import CACHE_DIRECTORY
 from protograf import globals
 
 log = logging.getLogger(__name__)
@@ -158,7 +161,7 @@ class BaseCanvas:
         self.area = None
         self.vertexes = []
         # ---- repeats
-        self.pattern = self.defaults.get("pattern", None)
+        self.fill_pattern = self.defaults.get("fill_pattern", None)
         self.repeat = self.defaults.get("repeat", True)
         self.interval = self.defaults.get("interval", 0)
         self.interval_x = self.defaults.get("interval_x", self.interval)
@@ -271,12 +274,15 @@ class BaseCanvas:
         self.heading_my = self.defaults.get("heading_my", 0)
         self.heading_rotation = self.defaults.get("heading_rotation", 0)
         # ---- text block
-        self.outline_stroke = self.defaults.get("outline_stroke", self.fill)
-        self.outline_width = self.defaults.get("outline_width", 0)
         self.leading = self.defaults.get("leading", self.font_size)
         self.transform = self.defaults.get("transform", None)
         self.html = self.defaults.get("html", False)
         self.css = self.defaults.get("css", None)
+        # ---- text block / polyomino
+        self.outline_stroke = self.defaults.get("outline_stroke", None)
+        self.outline_width = self.defaults.get("outline_width", 0)
+        self.outline_dashed = self.defaults.get("outline_dashed", None)
+        self.outline_dotted = self.defaults.get("outline_dotted", None)
         # ---- image / file
         self.source = self.defaults.get("source", None)  # file or http://
         self.cache_directory = None  # should be a pathlib.Path object
@@ -396,10 +402,10 @@ class BaseCanvas:
         # ---- compass
         self.perimeter = self.defaults.get("perimeter", "circle")
         self.directions = self.defaults.get("directions", None)
-        # ---- triangle / trapezoid
-        self.flip = self.defaults.get("flip", "north")
-        # ---- triangle
-        self.hand = self.defaults.get("hand", "east")
+        # ---- triangle / trapezoid / polyomino
+        self.flip = self.defaults.get("flip", None)
+        # ---- triangle / polyomino
+        self.hand = self.defaults.get("hand", None)
         # ---- hexagon / circle
         self.centre_shape = self.defaults.get("centre_shape", "")
         self.centre_shape_mx = self.defaults.get("centre_shape_mx", 0)
@@ -583,7 +589,7 @@ class BaseShape:
         self.area = base.area
         self.vertexes = base.vertexes  # list of shape's "points"
         # ---- repeats
-        self.pattern = kwargs.get("pattern", base.pattern)
+        self.fill_pattern = kwargs.get("fill_pattern", base.fill_pattern)
         self.repeat = kwargs.get("repeat", base.repeat)
         self.interval = self.kw_float(kwargs.get("interval", base.interval))
         self.interval_x = self.kw_float(kwargs.get("interval_x", base.interval_x))
@@ -674,14 +680,17 @@ class BaseShape:
         self.heading_my = self.kw_float(kwargs.get("heading_my", 0))
         self.heading_rotation = self.kw_float(kwargs.get("heading_rotation", 0))
         # ---- text block
+        self.transform = kwargs.get("transform", base.transform)
+        self.html = self.kw_bool(kwargs.get("html", base.html))
+        self.css = kwargs.get("css", base.css)
+        # ---- text block / polyomino
         self.outline_stroke = kwargs.get("outline_stroke", base.outline_stroke)
         self.outline_width = self.kw_float(
             kwargs.get("outline_width", base.outline_width)
         )
+        self.outline_dashed = kwargs.get("outline_dashed", base.outline_dashed)
+        self.outline_dotted = kwargs.get("outline_dotted", base.outline_dotted)
         self.leading = self.kw_float(kwargs.get("leading", self.font_size))
-        self.transform = kwargs.get("transform", base.transform)
-        self.html = self.kw_bool(kwargs.get("html", base.html))
-        self.css = kwargs.get("css", base.css)
         # feedback(f"### BShp:"
         # f"{self} {kwargs.get('fill')=} {self.fill=} {kwargs.get('fill_color')=}")
         # ---- image / file
@@ -824,10 +833,10 @@ class BaseShape:
         # ---- compass
         self.perimeter = kwargs.get("perimeter", "circle")  # circle|rectangle|hexagon
         self.directions = kwargs.get("directions", None)
-        # ---- triangle / trapezoid
-        self.flip = kwargs.get("flip", "north")
-        # ---- triangle
-        self.hand = kwargs.get("hand", "east")
+        # ---- triangle / trapezoid / polyomino
+        self.flip = kwargs.get("flip", base.flip)
+        # ---- triangle / polyomino
+        self.hand = kwargs.get("hand", base.hand)
         # ---- hexagon / circle / polygon
         self.centre_shape = kwargs.get("centre_shape", "")
         self.centre_shape_mx = self.kw_float(
@@ -1096,8 +1105,7 @@ class BaseShape:
         # print(f'### SetCnvProps: {kwargs.keys()} \n {kwargs.get("closed", "?")=}')
         return tools.set_canvas_props(cnv, index, defaults, **kwargs)
 
-    def draw(self, cnv=None, off_x=0, off_y=0, ID=None, **kwargs):
-        """Draw an element on a given canvas."""
+    def set_abs_and_offset(self, cnv=None, off_x=0, off_y=0, ID=None, **kwargs):
         self._o = self.set_offset_props(off_x, off_y)
         # self._abs... variable are absolute locations in native units;
         #  They are for internal use only and are not expected
@@ -1120,6 +1128,10 @@ class BaseShape:
         self.use_abs_c = (
             True if self._abs_cx is not None and self._abs_cy is not None else False
         )
+
+    def draw(self, cnv=None, off_x=0, off_y=0, ID=None, **kwargs):
+        """Draw an element on a given canvas."""
+        self.set_abs_and_offset(cnv=cnv, off_x=off_x, off_y=off_y, ID=ID, **kwargs)
         # feedback(f'### draw baseshape: {self._abs_x=} {self._abs_y=} {self._abs_cx=} {self._abs_cy=}')
 
     def check_settings(self) -> tuple:
@@ -1824,7 +1836,9 @@ class BaseShape:
         keys = {}
         keys["fontsize"] = kwargs.get("font_size", self.font_size)
         keys["fontname"] = kwargs.get("font_name", self.font_name)
-        # keys['fontfile'] = self.font_file
+        font, keys["fontfile"], keys["fontname"] = tools.get_font_by_name(
+            keys["fontname"]
+        )
         _color = kwargs.get("stroke", self.stroke)
         keys["color"] = tools.get_color(_color)
         if kwargs.get("stroke_inner"):
@@ -1851,26 +1865,6 @@ class BaseShape:
         # TODO - recalculate xm, ym based on align and text width
         # keys["align"] = align or self.align
 
-        # ---- set font (custom/built-in)
-        if not builtin_font(keys["fontname"]):
-            cache_directory = Path(Path.home() / CACHE_DIRECTORY)
-            fi = FontInterface(cache_directory=cache_directory)
-            keys["fontfile"] = fi.get_font_file(name=keys["fontname"])
-            if not keys["fontfile"]:
-                feedback(
-                    f'Cannot find or load a font named `{keys["fontname"]}`.'
-                    f' Defaulting to "{DEFAULT_FONT}".',
-                    False,
-                    True,
-                )
-                keys["fontname"] = DEFAULT_FONT
-                font = muFont(DEFAULT_FONT)  # built-in
-            else:
-                keys["fontname"] = keys["fontname"].replace(" ", "-")
-                font = muFont(keys["fontname"], fontfile=keys["fontfile"])
-        else:
-            font = muFont(keys["fontname"])  # built-in
-
         # ---- draw
         # print(f'### multi_string {xm=} {ym=} {string=} {keys}')
         point = muPoint(xm, ym)
@@ -1891,7 +1885,7 @@ class BaseShape:
             #     lineheight=None, fill=None, render_mode=0, miter_limit=1,
             #     border_width=1, rotate=0, morph=None, stroke_opacity=1,
             #     fill_opacity=1, oc=0)
-            # print(f'### insert_text {point=} {string=} {morph=} {keys}')
+            # print(f'### insert_text:: {point=} {string=} {morph=} \n{keys=}')
             canvas.insert_text(point, string, morph=morph, **keys)
         except Exception as err:
             if "need font file" in str(err):

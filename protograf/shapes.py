@@ -65,7 +65,7 @@ def set_cached_dir(source):
     if not tools.is_url_valid(url=source):
         return None
     loc = urlparse(source)
-    # print('@http@',  loc)
+    # print('*** @http@',  loc)
     # handle special case of BGG images
     # ... BGG gives thumb and original images the EXACT SAME filename :(
     if loc.netloc == BGG_IMAGES:
@@ -775,7 +775,7 @@ class CircleShape(BaseShape):
         self.set_canvas_props(cnv=cnv, index=ID, **kwargs)
         # ---- grid marks
         if self.grid_marks:  # and not kwargs.get("card_back", False):
-            # print(f'{self._u.radius=} {self._u.diameter=}')
+            # print(f'*** {self._u.radius=} {self._u.diameter=}')
             deltag = self.unit(self.grid_marks_length)
             gx, gy = 0, y - self._u.radius  # left-side
             cnv.draw_line((gx, gy), (deltag, gy))
@@ -1246,6 +1246,9 @@ class EquilateralTriangleShape(BaseShape):
         vertices = []
         pt0 = Point(x + self._o.delta_x, y + self._o.delta_y)
         vertices.append(pt0)
+        hand = hand or "east"
+        flip = flip or "north"
+        # print(f"*** {hand=} {flip=}")
         if hand == "west" or hand == "w":
             x2 = pt0.x - side
             y2 = pt0.y
@@ -1254,10 +1257,14 @@ class EquilateralTriangleShape(BaseShape):
             x2 = pt0.x + side
             y2 = pt0.y
             x3 = x2 - 0.5 * side
+        else:
+            raise ValueError(f"The value {hand} is not allowed for hand")
         if flip == "north" or flip == "n":
             y3 = pt0.y - height
         elif flip == "south" or flip == "s":
             y3 = pt0.y + height
+        else:
+            raise ValueError(f"The value {flip} is not allowed for flip")
         vertices.append(Point(x2, y2))
         vertices.append(Point(x3, y3))
         return vertices
@@ -2365,11 +2372,11 @@ class PolygonShape(BaseShape):
                 continue
             # points based on length of line, offset and the angle in degrees
             edge_pt = _perbis_pts[key]
-            # print(f'{pb_angle=} {edge_pt=} {centre=}')
+            # print(f'*** {pb_angle=} {edge_pt=} {centre=}')
             if pb_offset is not None and pb_offset != 0:
                 offset_pt = geoms.point_on_circle(centre, pb_offset, pb_angle)
                 end_pt = geoms.point_on_line(offset_pt, edge_pt, pb_length)
-                # print(f'{end_pt=} {offset_pt=}')
+                # print(f'*** {end_pt=} {offset_pt=}')
                 cnv.draw_line((offset_pt.x, offset_pt.y), (end_pt.x, end_pt.y))
             else:
                 cnv.draw_line((centre.x, centre.y), (edge_pt.x, edge_pt.y))
@@ -2410,7 +2417,7 @@ class PolygonShape(BaseShape):
             if rad_offset is not None and rad_offset != 0:
                 offset_pt = geoms.point_on_circle(centre, rad_offset, rad_angle)
                 end_pt = geoms.point_on_line(offset_pt, diam_pt, rad_length)
-                # print(rad_angle, offset_pt, f'{x_c=}, {y_c=}')
+                # print('***', rad_angle, offset_pt, f'{x_c=}, {y_c=}')
                 cnv.draw_line((offset_pt.x, offset_pt.y), (end_pt.x, end_pt.y))
             else:
                 cnv.draw_line((centre.x, centre.y), (diam_pt.x, diam_pt.y))
@@ -2618,6 +2625,8 @@ class PolylineShape(BaseShape):
             cnv.draw_polyline(self.vertexes)
             kwargs["closed"] = False
             kwargs["fill"] = None
+            if kwargs.get("rounded"):
+                kwargs["lineJoin"] = 1
             self.set_canvas_props(cnv=cnv, index=ID, **kwargs)
         # ---- arrowhead
         if (
@@ -3353,10 +3362,10 @@ class RectangleShape(BaseShape):
                     self.draw_border(cnv, border, ID)  # BaseShape
 
         # ---- fill pattern?
-        if self.pattern:
-            raise NotImplementedError("Pattern is not yet supported!")
+        if self.fill_pattern:
+            raise NotImplementedError("Fill pattern is not yet supported!")
             # TODO - convert to PyMuPDF
-            img, is_svg, is_dir = self.load_image(self.pattern)
+            img, is_svg, is_dir = self.load_image(self.fill_pattern)
             if img:
                 log.debug("IMG %s s%s %s", type(img._image), img._image.size)
                 iwidth = img._image.size[0]
@@ -3594,25 +3603,34 @@ class RightAngledTriangleShape(BaseShape):
             self._u.width = self._u.height
         if self.width and not self.height:
             self._u.height = self._u.width
-        # calculate points
+        # calc directions
         x, y = self._u.x, self._u.y
-        self._vertexes = []
-        self._vertexes.append(Point(x, y))
+        self.flip = kwargs.get("flip", "north") or "north"
+        self.hand = kwargs.get("hand", "east") or "east"
         if not self.hand or not self.flip:
             feedback(
                 'Need to supply both "flip" and "hand" options! for triangle.',
                 stop=True,
             )
-        hand = self.hand.lower()
-        flip = self.flip.lower()
-        if hand == "west":
+        hand = str(self.hand).lower()
+        flip = str(self.flip).lower()
+        if hand == "west" or hand == "w":
             x2 = x - self._u.width
-        elif hand == "east":
+        elif hand == "east" or hand == "e":
             x2 = x + self._u.width
+        else:
+            feedback(f'The value "{hand}" for hand is invalid (use east or west)', True)
         if flip == "north":
             y2 = y + self._u.height
         elif flip == "south":
             y2 = y - self._u.height
+        else:
+            feedback(
+                f'The value "{flip}" for flip is invalid (use north or south)', True
+            )
+        # calculate points
+        self._vertexes = []
+        self._vertexes.append(Point(x, y))
         self._vertexes.append(Point(x2, y2))
         self._vertexes.append(Point(x2, y))
         # ---- set vertices
@@ -4179,14 +4197,15 @@ class TextShape(BaseShape):
             try:
                 # style
                 keys["fontsize"] = self.font_size
-                # NB - replace spaces to prevent: bad fontname chars {' '}
-                keys["fontname"] = self.font_name.strip().replace(" ", "_")
-                keys["fontfile"] = self.font_file
+                font, keys["fontfile"], keys["fontname"] = tools.get_font_by_name(
+                    self.font_name
+                )
                 keys["color"] = tools.get_color(self.stroke)
                 # keys["fill"] = tools.get_color(self.fill)
                 keys["align"] = self.to_alignment()
                 _lineheight = kwargs.get("line_height", None)
                 keys["lineheight"] = self.kw_float(_lineheight, "line_height")
+
                 # keys['stroke_opacity'] = self.show_stroke
                 # keys['fill_opacity'] = self.show_fill
 
@@ -4202,6 +4221,7 @@ class TextShape(BaseShape):
                 # keys['overlay'] = True
                 # keys['expandtabs'] = 8
                 # keys['charwidths'] = None
+
                 # feedback(f'*** Text WRAP {keys=} \n=> {rect=} _text:{_text}')
                 if self.run_debug:
                     globals.doc_page.draw_rect(
@@ -4298,9 +4318,10 @@ class TrapezoidShape(BaseShape):
             y = self._u.y + self._o.delta_y
         cx = x + self._u.width / 2.0
         cy = y + self._u.height / 2.0
-        if self.flip.lower() in ["s", "south"]:
-            y = y + self._u.height
-            cy = y - self._u.height / 2.0
+        if self.flip:
+            if str(self.flip).lower() in ["s", "south"]:
+                y = y + self._u.height
+                cy = y - self._u.height / 2.0
         if self.cx is not None and self.cy is not None:
             return self._u.cx, self._u.cy, x, y
         else:
@@ -4315,7 +4336,9 @@ class TrapezoidShape(BaseShape):
         x = kwargs.get("x", _x)
         y = kwargs.get("y", _y)
         # build array
-        sign = -1 if self.flip.lower() in ["s", "south"] else 1
+        sign = 1
+        if self.flip and str(self.flip).lower() in ["s", "south"]:
+            sign = -1
         self.delta_width = self._u.width - self._u.top
         vertices = []
         vertices.append(Point(x, y))
@@ -4346,7 +4369,9 @@ class TrapezoidShape(BaseShape):
         cnv.draw_polyline(self.vertexes)
         kwargs["closed"] = True
         self.set_canvas_props(cnv=cnv, index=ID, **kwargs)
-        sign = -1 if self.flip.lower() in ["s", "south"] else 1
+        sign = 1
+        if self.flip and str(self.flip).lower() in ["s", "south"]:
+            sign = -1
         # ---- borders (override)
         if self.borders:
             if isinstance(self.borders, tuple):

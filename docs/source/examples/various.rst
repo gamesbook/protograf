@@ -31,7 +31,7 @@ A Clock
 =========== ==================================================================
 Title       *A Wall Clock*
 ----------- ------------------------------------------------------------------
-Source Code `clock.py <https://github.com/gamesbook/protograf/blob/master/examples/various/clock.py>`_
+Script      `clock.py <https://github.com/gamesbook/protograf/blob/master/examples/various/clock.py>`_
 ----------- ------------------------------------------------------------------
 Discussion  This example shows how to create a complex element - a clock - by
             combining :ref:`multiple Circles <circleIndex>`, each
@@ -80,7 +80,7 @@ Miscellaneous Objects 1
 =========== ==================================================================
 Title       *Miscellaneous Objects #1*
 ----------- ------------------------------------------------------------------
-Source Code `objects.py <https://github.com/gamesbook/protograf/blob/master/examples/various/objects.py>`_
+Script      `objects.py <https://github.com/gamesbook/protograf/blob/master/examples/various/objects.py>`_
 ----------- ------------------------------------------------------------------
 Discussion  The first page of this set of examples shows how to construct
             various "compound" shapes by making use of various properties of
@@ -98,7 +98,7 @@ Miscellaneous Objects 2
 =========== ==================================================================
 Title       *Miscellaneous Objects #2*
 ----------- ------------------------------------------------------------------
-Source Code `objects.py <https://github.com/gamesbook/protograf/blob/master/examples/various/objects.py>`_
+Script      `objects.py <https://github.com/gamesbook/protograf/blob/master/examples/various/objects.py>`_
 ----------- ------------------------------------------------------------------
 Discussion  The second page of this set of examples shows how to construct
             various "compound" shapes by making use of various properties of
@@ -116,7 +116,7 @@ Chords
 =========== ==================================================================
 Title       *Chords (in a circle)*
 ----------- ------------------------------------------------------------------
-Source Code `large_objects.py <https://github.com/gamesbook/protograf/blob/master/examples/various/large_objects.py>`_
+Script      `large_objects.py <https://github.com/gamesbook/protograf/blob/master/examples/various/large_objects.py>`_
 ----------- ------------------------------------------------------------------
 Discussion  This example shows how to construct a simple effect by combining
             a basic shape |dash| a :ref:`Chord <chord-command>` |dash| with a
@@ -150,7 +150,7 @@ Rondel
 =========== ==================================================================
 Title       *Rondel (circle radii and sectors)*
 ----------- ------------------------------------------------------------------
-Source Code `large_objects.py <https://github.com/gamesbook/protograf/blob/master/examples/various/large_objects.py>`_
+Script      `large_objects.py <https://github.com/gamesbook/protograf/blob/master/examples/various/large_objects.py>`_
 ----------- ------------------------------------------------------------------
 Discussion  This example shows how to construct a simple effect by using
             data from a Python loop combined with radii labels:
@@ -209,7 +209,7 @@ World Clocks
 =========== ==================================================================
 Title       *World Clocks*
 ----------- ------------------------------------------------------------------
-Source Code `world_clocks.py <https://github.com/gamesbook/protograf/blob/master/examples/various/world_clocks.py>`_
+Script      `world_clocks.py <https://github.com/gamesbook/protograf/blob/master/examples/various/world_clocks.py>`_
 ----------- ------------------------------------------------------------------
 Discussion  This example shows how to reuse a complex element |dash| a clock
             |dash| by means of a set of Python functions; see

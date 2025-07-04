@@ -67,8 +67,10 @@ cross-reference to the detailed information for that command.
    for use in a :ref:`deck <the-deck-command>` of cards
 -  :ref:`PageBreak <pagebreak-command>` - set the start of a new page in
    the document; not required for a :ref:`Deck <the-deck-command>`
+-  :ref:`Pentomino <pentominoesOver>` * - a compound shape made up of five squares
 -  :ref:`Polygon <polygon-command>` * - a geometric shape that can be drawn on a page
 -  :ref:`Polyline <polyline-command>` * - a geometric shape that can be drawn on a page
+-  :ref:`Polyomino <polyominoesOver>` * - a compound shape made up of one or more squares
 -  :ref:`Polyshape <polyshape-command>` * - an irregular geometric shape that can be drawn on a page
 -  :ref:`Random <random-command>` - generate a random number within a range
 -  :doc:`Repeat <layouts_repeat>` - repeat the drawing of a shape across a rectangular grid pattern

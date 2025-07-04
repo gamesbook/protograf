@@ -31,7 +31,7 @@ Basic
 =========== ==================================================================
 Title       *Basic BoardGameGeek Example*
 ----------- ------------------------------------------------------------------
-Source Code `cards_bgg_basic.py <https://github.com/gamesbook/protograf/blob/master/examples/bgg/cards_bgg_basic.py>`_
+Script      `cards_bgg_basic.py <https://github.com/gamesbook/protograf/blob/master/examples/bgg/cards_bgg_basic.py>`_
 ----------- ------------------------------------------------------------------
 Discussion  This example shows how to construct a set of cards |dash| one per game
             |dash| using the BoardGameGeek API (BGG API), accessed via the
@@ -50,7 +50,7 @@ Image-based
 =========== ==================================================================
 Title       *BoardGameGeek Example with Thumbnails and Custom Values*
 ----------- ------------------------------------------------------------------
-Source Code `cards_bgg_thumb.py <https://github.com/gamesbook/protograf/blob/master/examples/bgg/cards_bgg_thumb.py>`_
+Script      `cards_bgg_thumb.py <https://github.com/gamesbook/protograf/blob/master/examples/bgg/cards_bgg_thumb.py>`_
 ----------- ------------------------------------------------------------------
 Discussion  This example shows how to construct a set of cards |dash| one per game
             |dash| using the BoardGameGeek API (BGG API), accessed via the
@@ -77,7 +77,7 @@ Images and QR
 =========== ==================================================================
 Title       *BoardGameGeek Example with Images and QRCodes*
 ----------- ------------------------------------------------------------------
-Source Code `cards_bgg_image.py <https://github.com/gamesbook/protograf/blob/master/examples/bgg/cards_bgg_image.py>`_
+Script      `cards_bgg_image.py <https://github.com/gamesbook/protograf/blob/master/examples/bgg/cards_bgg_image.py>`_
 ----------- ------------------------------------------------------------------
 Discussion  This example shows how to construct a set of cards |dash| one per game
             |dash| using the BoardGameGeek API (BGG API), accessed via the
