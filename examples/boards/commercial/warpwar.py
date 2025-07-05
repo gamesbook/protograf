@@ -58,9 +58,9 @@ ww_grid = Hexagons(
 
 # labels for map
 Sequence(
-    text(common=gridnum, x=0.5, y=4.5, text="{{sequence}}"),
+    text(common=gridnum, x=0.2, y=5.2, text="{{sequence}}"),
     setting=('A', 'X'),
-    interval_y=2.2)
+    interval_y=2.21)
 Sequence(
     text(common=gridnum, x=1.9, y=1.5, text="{{sequence}}"),
     setting=(1, 20),

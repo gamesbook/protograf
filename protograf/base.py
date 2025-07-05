@@ -338,6 +338,11 @@ class BaseCanvas:
         self.rounded_radius = self.defaults.get(
             "rounded_radius", 0.05
         )  # fraction of smallest side
+        self.roof = self.defaults.get("roof", [])
+        self.roof_line = self.defaults.get("roof_line", 0)
+        self.roof_stroke = self.defaults.get("roof_stroke", None)
+        self.roof_stroke_width = self.defaults.get("roof_stroke", None)
+        self.roof_reverse = self.defaults.get("roof_reverse", False)
         # ---- stadium
         self.edges = self.defaults.get("edges", "E W")
         # ---- grid layout
@@ -598,7 +603,7 @@ class BaseShape:
         self.rotation = self.kw_float(
             kwargs.get("rotation", kwargs.get("rotation", base.rotation))
         )  # degrees anti-clockwise for text
-        self.rotation_point = kwargs.get("rotation_point", base.rotation_point)
+        self.rotation_point = kwargs.get("rotation_point", None)
         self._rotation_theta = math.radians(self.rotation or 0)  # radians
         self.direction = kwargs.get("direction", base.direction)
         self.position = kwargs.get("position", base.position)
@@ -759,6 +764,11 @@ class BaseShape:
         self.peaks_dict = {}
         self.borders = kwargs.get("borders", base.borders)
         self.rounded_radius = base.rounded_radius
+        self.roof = kwargs.get("roof", base.roof)
+        self.roof_line = kwargs.get("roof_line", base.roof_line)
+        self.roof_reverse = kwargs.get("roof_reverse", base.roof_reverse)
+        self.roof_stroke = kwargs.get("roof_stroke", base.roof_stroke)
+        self.roof_stroke_width = kwargs.get("roof_stroke_width", base.roof_stroke_width)
         # ---- stadium
         self.edges = kwargs.get("edges", base.edges)
         # ---- grid layout

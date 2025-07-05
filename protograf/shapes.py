@@ -2762,6 +2762,7 @@ class RectangleShape(BaseShape):
             self.x = self.cx - self.width / 2.0
             self.y = self.cy - self.height / 2.0
             # feedback(f"*** RectShp {self.cx=} {self.cy=} {self.x=} {self.y=}")
+        self.roof_line_u = self.unit(self.roof_line) if self.roof_line else None
         self.kwargs = kwargs
 
     def calculate_area(self) -> float:
@@ -2905,6 +2906,77 @@ class RectangleShape(BaseShape):
             y = kwargs.get("cy") - self._u.height / 2.0
         return x, y
 
+    def draw_roof(self, cnv, ID, vertexes, rotation=0):
+        """Draw triangles and trapezoids inside the Rectangle
+
+        Args:
+            ID: unique ID
+            vertexes: the rectangle's nodes
+            rotation: degrees anti-clockwise from horizontal "east"
+        """
+        # ---- validate roof color settings
+        err = ("Roof must be a list of colors - either 2 or 4",)
+        if not isinstance(self.roof, list):
+            feedback(err, True)
+        else:
+            if len(self.roof) not in [2, 4]:
+                feedback(err, True)
+        roof_colors = [tools.get_color(rcolor) for rcolor in self.roof]
+        # ---- draw 2 triangles
+        if len(roof_colors) == 2:
+            # top-left
+            vertexes_tl = [vertexes[0], vertexes[1], vertexes[3]]
+            cnv.draw_polyline(vertexes_tl)
+            self.set_canvas_props(
+                index=ID,
+                stroke=self.roof_stroke or self.fill,
+                fill=roof_colors[0],
+                closed=True,
+                rotation=rotation,
+                rotation_point=self.centroid,
+            )
+            # bottom-right
+            vertexes_br = [vertexes[1], vertexes[2], vertexes[3]]
+            cnv.draw_polyline(vertexes_br)
+            self.set_canvas_props(
+                index=ID,
+                stroke=self.roof_stroke or self.fill,
+                fill=roof_colors[1],
+                closed=True,
+                rotation=rotation,
+                rotation_point=self.centroid,
+            )
+        # ---- draw 2 triangles and (maybe) 2 trapezoids
+        elif len(roof_colors) == 4:
+            dx = (vertexes[3].x - vertexes[0].x) / 2.0
+            dy = (vertexes[1].y - vertexes[0].y) / 2.0
+            midpt = Point(vertexes[0].x + dx, vertexes[0].y + dy)
+            if self.roof_line:
+                _line = self.roof_line_u / 2.0
+                midleft = Point(midpt.x - _line, midpt.y)
+                midrite = Point(midpt.x + _line, midpt.y)
+                vert_t = [vertexes[0], midleft, midrite, vertexes[3]]
+                vert_r = [vertexes[3], midrite, vertexes[2]]
+                vert_b = [vertexes[1], midleft, midrite, vertexes[2]]
+                vert_l = [vertexes[0], midleft, vertexes[1]]
+            else:
+                vert_t = [vertexes[0], midpt, vertexes[3]]
+                vert_r = [vertexes[3], midpt, vertexes[2]]
+                vert_b = [vertexes[1], midpt, vertexes[2]]
+                vert_l = [vertexes[0], midpt, vertexes[1]]
+
+            sections = [vert_t, vert_r, vert_b, vert_l]
+            for key, section in enumerate(sections):
+                cnv.draw_polyline(section)
+                self.set_canvas_props(
+                    index=ID,
+                    stroke=self.roof_stroke or self.fill,
+                    fill=roof_colors[key],
+                    closed=True,
+                    rotation=rotation,
+                    rotation_point=self.centroid,
+                )
+
     def draw_hatch(self, cnv, ID, vertices: list, num: int, rotation: float = 0.0):
         """Draw line(s) from one side of Rectangle to the parallel opposite.
 
@@ -3037,13 +3109,16 @@ class RectangleShape(BaseShape):
         is_chevron = True if (self.chevron or self.chevron_height) else False
         is_peaks = True if self.peaks else False
         is_borders = True if self.borders else False
-        if (self.rounding or self.rounded) and is_borders:
+        is_round = True if (self.rounding or self.rounded) else False
+        if self.roof and (is_round or is_notched or is_peaks or is_chevron):
+            feedback("Cannot use roof with other styles.", True)
+        if is_round and is_borders:
             feedback("Cannot use rounding or rounded with borders.", True)
-        if (self.rounding or self.rounded) and is_notched:
+        if is_round and is_notched:
             feedback("Cannot use rounding or rounded with notch.", True)
-        if (self.rounding or self.rounded) and is_chevron:
+        if is_round and is_chevron:
             feedback("Cannot use rounding or rounded with chevron.", True)
-        if (self.rounding or self.rounded) and is_peaks:
+        if is_round and is_peaks:
             feedback("Cannot use rounding or rounded with peaks.", True)
         if self.hatch_count and is_notched and self.hatch_count > 1:
             feedback("Cannot use multiple hatches with notch.", True)
@@ -3076,6 +3151,8 @@ class RectangleShape(BaseShape):
             self.centroid = muPoint(x_d, y_d)
             kwargs["rotation"] = rotation
             kwargs["rotation_point"] = self.centroid
+        else:
+            self.centroid = None
         # ---- * notch vertices
         if is_notched:
             _notch_style = self.notch_style.lower()
@@ -3336,7 +3413,9 @@ class RectangleShape(BaseShape):
             feedback(
                 f"The rounding radius cannot exceed 50% of the smallest side.", True
             )
-
+        # ---- draw roof first
+        if self.roof:
+            self.draw_roof(cnv, ID, self.vertexes, rotation)
         # ---- draw rectangle
         # feedback(f'*** RECT {self.col=} {self.row=} {x=} {y=} {radius=}')
         if is_notched or is_chevron or is_peaks:

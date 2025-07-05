@@ -178,6 +178,24 @@ Rectangle(
 )
 PageBreak()
 
+# ---- roof
+Blueprint(stroke_width=0.5)
+Text(common=txt, text="Rectangle: Roof")
+Rectangle(x=1, y=0.5, roof=['tomato', 'aqua'], fill=None)
+Rectangle(
+    x=1, y=2,
+    height=1.5, width=1.5,
+    roof=['tomato', 'aqua', 'gold', 'chartreuse'],
+    fill=None)
+Rectangle(
+    x=1, y=4,
+    height=2, width=3,
+    roof=['#FDAE74', '#F6965F', '#C66A3D', '#F6965F'],
+    roof_line=1.25,
+    roof_stroke="silver",
+    fill=None)
+PageBreak()
+
 # ---- END
 Text(common=txt, text="Rectangle END...")
 
@@ -188,5 +206,5 @@ Save(
      names=[
         None,
         "centre", "notch", "dot_cross", "hatch", "rounding", "chevron",
-        "peak", "rotation", "notch_style", "borders",
+        "peak", "rotation", "notch_style", "borders", "roof",
         None])
