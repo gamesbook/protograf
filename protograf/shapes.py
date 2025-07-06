@@ -2762,7 +2762,9 @@ class RectangleShape(BaseShape):
             self.x = self.cx - self.width / 2.0
             self.y = self.cy - self.height / 2.0
             # feedback(f"*** RectShp {self.cx=} {self.cy=} {self.x=} {self.y=}")
-        self.roof_line_u = self.unit(self.roof_line) if self.roof_line else None
+        self._u_roof_line = self.unit(self.roof_line) if self.roof_line else None
+        self._u_roof_line_mx = self.unit(self.roof_line_mx) if self.roof_line_mx else 0
+        self._u_roof_line_my = self.unit(self.roof_line_mx) if self.roof_line_my else 0
         self.kwargs = kwargs
 
     def calculate_area(self) -> float:
@@ -2952,9 +2954,15 @@ class RectangleShape(BaseShape):
             dy = (vertexes[1].y - vertexes[0].y) / 2.0
             midpt = Point(vertexes[0].x + dx, vertexes[0].y + dy)
             if self.roof_line:
-                _line = self.roof_line_u / 2.0
-                midleft = Point(midpt.x - _line, midpt.y)
-                midrite = Point(midpt.x + _line, midpt.y)
+                _line = self._u_roof_line / 2.0
+                midleft = Point(
+                    midpt.x - _line + self._u_roof_line_mx,
+                    midpt.y + self._u_roof_line_my,
+                )
+                midrite = Point(
+                    midpt.x + _line + self._u_roof_line_mx,
+                    midpt.y + self._u_roof_line_my,
+                )
                 vert_t = [vertexes[0], midleft, midrite, vertexes[3]]
                 vert_r = [vertexes[3], midrite, vertexes[2]]
                 vert_b = [vertexes[1], midleft, midrite, vertexes[2]]
@@ -2965,7 +2973,7 @@ class RectangleShape(BaseShape):
                 vert_b = [vertexes[1], midpt, vertexes[2]]
                 vert_l = [vertexes[0], midpt, vertexes[1]]
 
-            sections = [vert_t, vert_r, vert_b, vert_l]
+            sections = [vert_l, vert_r, vert_t, vert_b]  # order is important!
             for key, section in enumerate(sections):
                 cnv.draw_polyline(section)
                 self.set_canvas_props(
@@ -3413,9 +3421,7 @@ class RectangleShape(BaseShape):
             feedback(
                 f"The rounding radius cannot exceed 50% of the smallest side.", True
             )
-        # ---- draw roof first
-        if self.roof:
-            self.draw_roof(cnv, ID, self.vertexes, rotation)
+
         # ---- draw rectangle
         # feedback(f'*** RECT {self.col=} {self.row=} {x=} {y=} {radius=}')
         if is_notched or is_chevron or is_peaks:
@@ -3464,6 +3470,10 @@ class RectangleShape(BaseShape):
                         height=self._u.height,
                         mask="auto",
                     )
+
+        # ---- draw roof after base
+        if self.roof:
+            self.draw_roof(cnv, ID, self.vertexes, rotation)
 
         # ---- draw hatch
         if self.hatch_count:

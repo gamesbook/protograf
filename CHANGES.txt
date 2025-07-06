@@ -5,7 +5,11 @@ protograf
 Changes
 =======
 
-2025-00-00 (0.2.6)
+2025-00-00 (0.2.7)
+------------------
+- Add roof property to Rectangle
+
+2025-07-04 (0.2.6)
 ------------------
 - Add Polyomino, Pentomino and Tetronimo objects
 - Restructure docs: move Line to customised shapes
