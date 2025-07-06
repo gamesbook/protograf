@@ -2,16 +2,18 @@
 A WarpWar map example for protograf
 
 The original map was created by Rick Smith and posted to https://groups.io/g/warpwar/
-forum on 3 June 2024.  This is not a complete copy - but serves to illustrate
-how elements of such a map could be created.
+forum on 3 June 2024.
+
+The final map was posted to BaordGameGeek on 24 June 2024 to
+https://boardgamegeek.com/filepage/281452/vedem-sector-ww-map
 
 Code by: Derek Hohls
-Created on: 30 July 2024
+Created on: 3 July 2025
 """
 
 from protograf import *
 
-Create(filename="warpwar.pdf", margin=0.5, paper="A2")
+Create(filename="warpwar_full.pdf", margin=0.5, paper="A2")
 
 # set map colors
 heading = "white"
@@ -102,90 +104,104 @@ def draw_item(system):
         Location(ww_grid, system[0], detail)
 
 systems = [
-    ["2B", "mask"],
-    ["2B", "m", 0.1, -0.8],
-    ["2B", "m", -0.6, 0.5],
-    ["2B", "", 0.4, 0.1, "Redstar\n        3"],
-    ["4B", "m", -0.6, 0.7],
-    ["4B", "", 0.1, 0.1, "Lattur\n     2"],
-    ["4E", "mask"],
-    ["4E", "m", 0.3, -0.8],
-    ["4E", "", 0., 0.1, "Rebb\n1"],
-    ["1C", "k", 0.5, 0.],
     ["1C", "", 0.1, 0.1, "Bezsin\n         4"],
-    ["3G", "d", 0.5, 0.],
-    ["3G", "", 0.4, 0.1, "BD3G\n           1"],
-    ["1H", "mask"],
+    ["1C", "k", 0.5, 0.],
+    ["1H", "", 0.6, 0., "BD1H\n   3"],
     ["1H", "d", -0.6, -0.4],
     ["1H", "d", -0.6, 0.5],
-    ["1H", "", 0.6, 0., "BD1H\n   3"],
-    ["8L", "hex"],
-    ["8L", "k", -0.5, 0.6],
-    ["8L", "", 0.8, -0.1, "Highlakes\n    3"],
-    ["7F", "mask"],
+    ["1H", "mask"],
+    ["1O", "", -0.3, -0.2, "BD1O\n1"],
+    ["1O", "d", 0., 0.2],
+    ["2B", "", 0.4, 0.1, "Redstar\n        3"],
+    ["2B", "m", 0.1, -0.8],
+    ["2B", "m", -0.6, 0.5],
+    ["2B", "mask"],
+    ["2U", "", -0.2, 0.9, "REE+3"],
+    ["2U", "", 0.4, 0., "BD2U\n              2"],
+    ["2U", "d", 0.4, -0.2],
+    ["2W", "", 0.6, -0.2, "Mayem\n          2"],
+    ["2W", "m", 0.2, 0.3],
+    ["3G", "", 0.4, 0.1, "BD3G\n           1"],
+    ["3G", "d", 0.5, 0.],
+    ["3O", "", 0., 0., "BD3O\n\n   2"],
+    ["3O", "", 0., 0., "REE+3"],
+    ["3O", "d", 0., 0.],
+
+    ["4B", "", 0.1, 0.1, "Lattur\n     2"],
+    ["4B", "m", -0.6, 0.7],
+    ["4E", "", 0., 0.1, "Rebb\n1"],
+    ["4E", "m", 0.3, -0.8],
+    ["4E", "mask"],
+
+    ["5E", "m", 0.0, 1.11],
+    ["5N", "", 0., 0., "BD5N\n\n       3"],
+    ["5N", "d", 0.4, -0.4],
+    ["5N", "d", 0.6, -0.1],
+    ["5S", "", -0.2, 0., "Icerock\n   2"],
+    ["5S", "m", 0.4, 0.2],
+    ["5V", "", 0., 0.3, "BD5V\n     2"],
+    ["5V", "d", 0.3, -0.3],
+    ["5V", "d", -0.2, -0.4],
+    ["5Z", "", 0., 0., "Glitee\n   1"],
+    ["5Z", "m", -0.4, 0.4],
+    ["5Z", "m", -0.6, 0.5],
+
     ["7F", "", 0.7, -0.4, "  BD7F\nREE+4\n    2"],
     ["7F", "d", 0.1, 0.7],
-    ["5E", "m", 0.0, 1.11],
-
-    ["9Y", "m", -0.2, 0.5],
-    ["9Y", "d", 0., 0.3],
+    ["7F", "mask"],
+    ["8L", "", 0.8, -0.1, "Highlakes\n    3"],
+    ["8L", "hex"],
+    ["8L", "k", -0.5, 0.6],
+    ["8Q", "", -0.2, -0.4, "REE+5"],
+    ["8Q", "", -0.2, -0.6, "Oontoo\n            2"],
+    ["8Q", "m", 0.2, 0.4],
+    ["8S", "", 0., 0., "Nayhoe\n          4"],
+    ["8S", "m", 0., 0.6],
+    ["9P", "", 0., 0.4, "BD9P\n  2"],
+    ["9P", "d", 0., 0.6],
     ["9Y", "", 0., -0.5, "Veex\      3"],
+    ["9Y", "d", 0., 0.3],
+    ["9Y", "m", -0.2, 0.5],
 
-    ["11F", "m", 0., 0.],
-    ["11F", "", 0., 0., "BD11F"],
-    ["19J", "m", 0., 0.],
-    ["19J", "", 0., 0., "Pullap\    2"],
-    ["15I", "m", 0., 0.],
-    ["15I", "", 0., 0., "Lexmar\    3"],
-
-    ["15S", "m", -0.4, -0.4],
-    ["15S", "d", 0., 0.8],
-    ["15S", "", 0.4, -0.5, "Vedem\5"],
-    ["15S", "", 0.4, 0.0, "REE+5"],
-
-    ["10L", "m", 0., 0.],
-    ["10L", "", 0., 0., "Forseason\   3"],
+    ["10L", "", 0., 0., "Forseason\n   3"],
     ["10L", "", 0., 0., "REE+4"],
-    ["13M", "m", 0., 0.],
+    ["10L", "m", 0., 0.],
+    ["10P", "", 0., -0.6, "BD10P\n2"],
+    ["10P", "d", 0., -0.1],
+    ["11F", "", 0., 0., "BD11F"],
+    ["11F", "m", 0., 0.],
     ["13M", "", 0., 0., "Tidal\    2"],
-    ["17P", "m", 0., 0.],
+    ["13M", "m", 0., 0.],
+    ["14Y", "", 0., 0., "Ushee\n     2"],
+    ["14Y", "m", -0.6, 0.2],
+    ["15I", "", 0., 0., "Lexmar\n    3"],
+    ["15I", "m", 0., 0.],
+    ["15S", "", 0.4, 0.0, "REE+5"],
+    ["15S", "", 0.4, -0.5, "Vedem\n5"],
+    ["15S", "d", 0., 0.8],
+    ["15S", "m", -0.4, -0.4],
+    ["16BB", "", 0., 0., "BD16BB\n    2"],
+    ["16BB", "d", 0., -0.6],
     ["17P", "", 0., 0., "Peff\            2"],
-    ["20Q", "m", 0., 0.],
-    ["20Q", "", 0., 0., "BD2OQ\       1"],
-    ["20Q", "m", 0., 0.],
-    ["20Q", "", 0., 0., "BD2OQ\       1"],
+    ["17P", "m", 0., 0.],
+    ["19J", "", 0., 0., "Pullap\n    2"],
+    ["19J", "m", 0., 0.],
+    ["19W", "", -0.4, -0.2, "Asollem\n  2"],
+    ["19W", "", -0.6, 0.4, "REE+3"],
+    ["19W", "m", 0.4, 0.2],
+    ["19W", "m", 0.4, 0.2],
 
-    ["20CC", "m", 0.2, -0.2],
+    ["20CC", "", 0.1, 0., "Valtol\n5"],
     ["20CC", "d", -0.8, 0.],
-    ["20CC", "", 0.1, 0., "Valtol\5"],
+    ["20CC", "m", 0.2, -0.2],
+    ["20Q", "", 0., 0., "BD2OQ\       1"],
+    ["20Q", "", 0., 0., "BD2OQ\       1"],
+    ["20Q", "m", 0., 0.],
+    ["20Q", "m", 0., 0.],
+    ["20W", "", 0., 0., "Dimdenk\n  2"],
+    ["20W", "m", 0.4, 0.4],
 
     """
-    ["", "m", 0., 0.],
-    ["", "", 0., 0., ""],
-
-    ["", "m", 0., 0.],
-    ["", "", 0., 0., ""],
-
-    ["", "m", 0., 0.],
-    ["", "", 0., 0., ""],
-
-    ["", "m", 0., 0.],
-    ["", "", 0., 0., ""],
-
-    ["", "m", 0., 0.],
-    ["", "", 0., 0., ""],
-
-    ["", "m", 0., 0.],
-    ["", "", 0., 0., ""],
-
-    ["", "m", 0., 0.],
-    ["", "", 0., 0., ""],
-
-    ["", "m", 0., 0.],
-    ["", "", 0., 0., ""],
-
-    ["", "m", 0., 0.],
-    ["", "", 0., 0., ""],
 
     ["", "m", 0., 0.],
     ["", "", 0., 0., ""],
@@ -269,39 +285,41 @@ if False:
 warp_line = Common(stroke=warp, stroke_width=3, rounded=True)
 LinkLine(ww_grid, [("1C",  0.75,  0.2),  ("8L",  -0.6,   0.3)], common=warp_line)
 LinkLine(ww_grid, [("1H",  0.0,  -0.7),  ("3G",   0.0,   0.4)], common=warp_line)
+LinkLine(ww_grid, [("1O",  0.40,  0.50), ("3O",  0.00,  0.00)], common=warp_line)
+
 LinkLine(ww_grid, [("2B", -0.5,   0.7),  ("4E",   0.05, -0.9)], common=warp_line)
 LinkLine(ww_grid, [("2B",  0.15, -0.85), ("4B", -0.75,  0.8)], common=warp_line)
+LinkLine(ww_grid, [("2U",  0.80,  -0.40), ("5V",  -0.40,  -0.40)], common=warp_line)
+LinkLine(ww_grid, [("2W",  0.60,  0.60), ("5Z",  0.00,  0.00)], common=warp_line)
+
+LinkLine(ww_grid, [("3O",  0.00,  0.00), ("5N",  0.00,  0.00)], common=warp_line)
 LinkLine(ww_grid, [("4E",  0.25, -1.05), ("4B", -0.6,   0.9)], common=warp_line)
 
+LinkLine(ww_grid, [("5N",  0.00,  0.00), ("9P",  0.00,  0.00)], common=warp_line)
+LinkLine(ww_grid, [("5S",  0.00,  0.00), ("8Q",  0.00,  0.00)], common=warp_line)
+LinkLine(ww_grid, [("5S",  0.00,  0.00), ("9Y",  0.00,  0.00)], common=warp_line)
+LinkLine(ww_grid, [("5V", 0.60,  -0.30), ("9Y",  0.00,  0.00)], common=warp_line)
+LinkLine(ww_grid, [("5Z",  0.00,  0.00), ("9Y",  0.00,  0.00)], common=warp_line)
+
 LinkLine(ww_grid, [("7F",  0.00,  0.00), ("11F",  0.00,  0.00)], common=warp_line)
+LinkLine(ww_grid, [("8L",  0.00,  0.00), ("15S",  0.00,  0.00)], common=warp_line)
+LinkLine(ww_grid, [("8S",  0.00,  0.00), ("20CC",  0.00,  0.00)], common=warp_line)
+LinkLine(ww_grid, [("9P",  0.00,  0.00), ("10P",  0.00,  0.00)], common=warp_line)
+LinkLine(ww_grid, [("9Y",  0.00,  0.00), ("14Y",  0.00,  0.00)], common=warp_line)
+
+LinkLine(ww_grid, [("10L",  0.00,  0.00), ("13M",  0.00,  0.00)], common=warp_line)
 LinkLine(ww_grid, [("11F",  0.00,  0.00), ("15I",  0.00,  0.00)], common=warp_line)
+LinkLine(ww_grid, [("13M",  0.00,  0.00), ("17P",  0.00,  0.00)], common=warp_line)
+
 LinkLine(ww_grid, [("15I",  0.00,  0.00), ("19J",  0.00,  0.00)], common=warp_line)
 LinkLine(ww_grid, [("15I",  0.00,  0.00), ("13M",  0.00,  0.00)], common=warp_line)
-LinkLine(ww_grid, [("10L",  0.00,  0.00), ("13M",  0.00,  0.00)], common=warp_line)
-LinkLine(ww_grid, [("13M",  0.00,  0.00), ("17P",  0.00,  0.00)], common=warp_line)
-LinkLine(ww_grid, [("17P",  0.00,  0.00), ("20Q",  0.00,  0.00)], common=warp_line)
-
-LinkLine(ww_grid, [("1O",  0.00,  0.00), ("3O",  0.00,  0.00)], common=warp_line)
-LinkLine(ww_grid, [("3O",  0.00,  0.00), ("5N",  0.00,  0.00)], common=warp_line)
-LinkLine(ww_grid, [("5N",  0.00,  0.00), ("9P",  0.00,  0.00)], common=warp_line)
-LinkLine(ww_grid, [("9P",  0.00,  0.00), ("10P",  0.00,  0.00)], common=warp_line)
-
-LinkLine(ww_grid, [("8L",  0.00,  0.00), ("15S",  0.00,  0.00)], common=warp_line)
 LinkLine(ww_grid, [("15S",  0.00,  0.00), ("18U",  0.00,  0.00)], common=warp_line)
 LinkLine(ww_grid, [("15S",  0.00,  0.00), ("8S",  0.00,  0.00)], common=warp_line)
 LinkLine(ww_grid, [("15S",  0.00,  0.00), ("20CC",  0.00,  0.00)], common=warp_line)
-LinkLine(ww_grid, [("19W",  0.00,  0.00), ("20W",  0.00,  0.00)], common=warp_line)
-LinkLine(ww_grid, [("8S",  0.00,  0.00), ("20CC",  0.00,  0.00)], common=warp_line)
 
-LinkLine(ww_grid, [("5S",  0.00,  0.00), ("8Q",  0.00,  0.00)], common=warp_line)
-LinkLine(ww_grid, [("5S",  0.00,  0.00), ("9Y",  0.00,  0.00)], common=warp_line)
-LinkLine(ww_grid, [("2U",  0.00,  0.00), ("5V",  0.00,  0.00)], common=warp_line)
-LinkLine(ww_grid, [("5V",  0.00,  0.00), ("9Y",  0.00,  0.00)], common=warp_line)
-LinkLine(ww_grid, [("9Y",  0.00,  0.00), ("14Y",  0.00,  0.00)], common=warp_line)
-
-LinkLine(ww_grid, [("2W",  0.00,  0.00), ("5Z",  0.00,  0.00)], common=warp_line)
-LinkLine(ww_grid, [("5Z",  0.00,  0.00), ("9Y",  0.00,  0.00)], common=warp_line)
 LinkLine(ww_grid, [("16BB",  0.00,  0.00), ("20CC",  0.00,  0.00)], common=warp_line)
+LinkLine(ww_grid, [("17P",  0.00,  0.00), ("20Q",  0.00,  0.00)], common=warp_line)
+LinkLine(ww_grid, [("19W",  0.00,  0.00), ("20W",  0.00,  0.00)], common=warp_line)
 
 # LinkLine(ww_grid, [("1A",  0.00,  0.00), ("1A",  0.00,  0.00)], common=warp_line)
 

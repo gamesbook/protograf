@@ -867,6 +867,11 @@ colored triangular or quadilateral shapes.  Depending on the settings
 in use, this can be thought of to resemble a certain type of house roof,
 as viewed from above.
 
+.. NOTE::
+
+    Roof areas are drawn **after** the rectangle has been drawn, and so
+    may obscure the stroke outline and fill color of the rectangle.
+
 .. |rf1| image:: images/custom/rectangle/roof.png
    :width: 330
 
@@ -940,13 +945,15 @@ as viewed from above.
       rectangle itself (``4`` and ``2`` cm respectively).
 
       The right-hand rectangle shows how it appears to be subdivided into
-      two areas; the end triangles have a height of zero and effectively
-      become "invisible".  Because the rectangle has been rotated 90 |deg|
-      the dividing line appears vertical.
+      two areas; this is because the *roof_line* runs the full length of the
+      rectangle so the end triangles have a height of zero and effectively
+      become "invisible".  In addition, because the rectangle has been
+      rotated by 90 |deg| (around its centre) the dividing line displays as
+      vertical.
 
       The left-hand rectangle has an additional property *roof_line_mx*
-      which causes the middle-line to shift that distance to the right (or
-      to the left, if it was a negative values).  This causes the right-hand
+      which causes the middle-line to move that distance to the right (or
+      to the left, if it was a negative value).  This causes the right-hand
       triangle to "project" to the right of the rectangle.
 
 ===== ======

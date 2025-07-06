@@ -2201,13 +2201,17 @@ class LineShape(BaseShape):
         # feedback(f"*** Line {x=} {x_1=} {y=} {y_1=}")
         # ---- calculate line rotation
         match self.rotation_point:
-            case "centre" | "center" | "c":
+            case "centre" | "center" | "c" | None:  # default
                 mid_point = geoms.fraction_along_line(Point(x, y), Point(x_1, y_1), 0.5)
                 the_point = muPoint(mid_point[0], mid_point[1])
             case "start" | "s":
                 the_point = muPoint(x, y)
             case "end" | "e":
                 the_point = muPoint(x_1, y_1)
+            case _:
+                raise ValueError(
+                    f'Cannot calculate rotation point "{self.rotation_point}"', True
+                )
         # ---- draw line
         cnv.draw_line(Point(x, y), Point(x_1, y_1))
         self.set_canvas_props(cnv=cnv, index=ID, **kwargs)  # shape.finish()
