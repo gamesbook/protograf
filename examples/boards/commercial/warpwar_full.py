@@ -15,15 +15,27 @@ from protograf import *
 
 Create(filename="warpwar_full.pdf", margin=0.5, paper="A2")
 
+# switches (YES or NO)
+SHOW_TITLE = YES
+SHOW_LABELS = YES
+SHOW_SYSTEMS = YES
+SHOW_WARPLINES = YES
+SHOW_NEBULA = YES
+SHOW_KEY = YES
+INVERSE = NO
+
 # set map colors
-heading = "white"
-map_fill = "black"
-if map_fill == "white":
+if INVERSE:
+    map_fill = "white"
     heading = "black"
+    system_label = "#3366CC"
+else:
+    heading = "white"
+    map_fill = "black"
+    system_label = "#1CAEE5"
 
 map_border = "lightgray"
 grid_line = "#AA9A38"
-system_label = "#1CAEE5"
 warp = "#2ACD21"
 # set star colors
 m_red = "#FE1200"
@@ -38,11 +50,12 @@ cloud_dark = "#4D173E"
 
 Rectangle(x=0.0, y=0.0, width=41, height=58.3, stroke=map_border, fill=map_fill)
 
-# title line
-txt = Common(y=0.6, font_size=21, align="left", stroke=heading)
-gridnum = Common(font_size=21, align="left", stroke=grid_line)
-Text(common=txt, x=3, text="2 Player Warp War Map:      Vedem Sector")
-Text(common=txt, x=22, text="(c) 2024 by Richard W. Smith")
+if SHOW_TITLE:
+    # title line
+    txt = Common(y=0.6, font_size=21, align="left", stroke=heading)
+    gridnum = Common(font_size=21, align="left", stroke=grid_line)
+    Text(common=txt, x=3, text="2 Player Warp War Map:      Vedem Sector")
+    Text(common=txt, x=22, text="(c) 2024 by Richard W. Smith")
 
 # numbered map grid
 ww_grid = Hexagons(
@@ -63,15 +76,16 @@ ww_grid = Hexagons(
     stroke_width=2,
 )
 
-# labels for map edges
-Sequence(
-    text(common=gridnum, x=0.3, y=5.2, text="{{sequence}}"),
-    setting=('A', 'X'),
-    interval_y=2.21)
-Sequence(
-    text(common=gridnum, x=1.9, y=1.5, text="{{sequence}}"),
-    setting=(1, 20),
-    interval_x=1.92)
+if SHOW_LABELS:
+    # labels for map edges
+    Sequence(
+        text(common=gridnum, x=0.3, y=5.2, text="{{sequence}}"),
+        setting=('A', 'X'),
+        interval_y=2.21)
+    Sequence(
+        text(common=gridnum, x=1.9, y=1.5, text="{{sequence}}"),
+        setting=(1, 20),
+        interval_x=1.92)
 
 # star properties
 dstar = Common(fill=d_brown, stroke=d_brown, radius=0.18, dot=0.04, dot_stroke="black")
@@ -218,109 +232,143 @@ systems = [
     ["20W", "", 0.3, 0., "Dimdenk\n  2"],
     ["20W", "m", 0.4, 0.5],
 ]
-for system in systems:
-    draw_item(system)
 
-if True:
-    # borders - appear in multiple locations
-    nebul = Common(fill=cloud_dark, stroke=grid_line, height=2.22, dx=0, dy=0, transparency=50)
+if SHOW_SYSTEMS:
+    for system in systems:
+        draw_item(system)
+
+
+nebul = Common(
+    fill=cloud_dark, stroke=grid_line, height=2.22, dx=0, dy=0, transparency=50)
+cluod = Common(
+    fill=None, stroke=grid_line, height=2.22, dx=0, dy=0, transparency=50)
+
+def hex_edges(hexes, solid, dotted, common=nebul):
     Locations(
         ww_grid,
-        ["8P", "9Q", "10R" ], [hexagon(
-            common=nebul,
-            borders=[("n nw", 4, cloud_edge),
-                     ("se ne", 4, cloud_edge)])
-        ]
-    )
-    Locations(
-        ww_grid, ["8O", "10Q", ], [hexagon(
-            common=nebul,
-            borders=[("nw sw s", 4, cloud_edge),
-                     ("n ne se", 4, cloud_edge, True)])])
-    Locations(
-        ww_grid, ["8L", ], [hexagon(
-            fill=None, stroke=grid_line, height=2.22, dx=0, dy=0, transparency=50,
-            borders=[("nw sw", 4, cloud_edge),
-                     ("n s", 4, cloud_edge, True)])])
-    Locations(
-        ww_grid, ["8M", ], [hexagon(
-            common=nebul,
-            borders=[("n se nw sw", 4, cloud_edge, True)])])
-    Locations(
-        ww_grid, ["8N", ], [hexagon(
-            common=nebul,
-            borders=[("n se nw sw", 4, cloud_edge),
-                     ("ne s", 4, cloud_edge, True)])])
-    Locations(
-        ww_grid, ["8K", ], [hexagon(
-            common=nebul,
-            borders=[("ne nw s", 4, cloud_edge, True),
-                     ("sw", 4, cloud_edge)])])
-    Locations(
-        ww_grid, ["7K", ], [hexagon(
-            common=nebul,
-            borders=[("s", 4, cloud_edge, True),
-                     ("sw ne", 4, cloud_edge)])])
-    Locations(
-        ww_grid, ["6J", ], [hexagon(
-            common=nebul,
-            borders=[("nw", 4, cloud_edge, True),
-                     ("s", 4, cloud_edge)])])
+        hexes,
+        [hexagon(
+            common=common,
+            borders=[
+                (solid, 4, cloud_edge),
+                (dotted, 4, cloud_edge, True)])])
 
-# warp lines
-warp_line = Common(stroke=warp, stroke_width=3, rounded=True)
-LinkLine(ww_grid, [("1C", 0.75, 0.2), ("8L", -0.6,  0.3)], common=warp_line)
-LinkLine(ww_grid, [("1H", 0.0, -0.7), ("3G",  0.0,  0.4)], common=warp_line)
-LinkLine(ww_grid, [("1O", 0.4, 0.5), ("3O", 0.0, 0.4)], common=warp_line)
-LinkLine(ww_grid, [("2B", -0.5,  0.7), ("4E",  0.05, -0.9)], common=warp_line)
-LinkLine(ww_grid, [("2B", 0.15, -0.85), ("4B", -0.75, 0.8)], common=warp_line)
-LinkLine(ww_grid, [("2U", 0.4, -0.4), ("5V", -0.4, -0.4)], common=warp_line)
-LinkLine(ww_grid, [("2W", 0.4, 0.6), ("5Z", -0.4, 0.4)], common=warp_line)
-LinkLine(ww_grid, [("3O", 0.4, -0.2), ("5N", 0.4, -0.2)], common=warp_line)
-LinkLine(ww_grid, [("4E", 0.25, -1.05), ("4B", -0.6,  0.9)], common=warp_line)
-LinkLine(ww_grid, [("5N", 0.4, -0.70), ("9P", -0.4, -0.4)], common=warp_line)
-LinkLine(ww_grid, [("5S", 0.4, -0.1), ("8Q", 0.0, 0.6)], common=warp_line)
-LinkLine(ww_grid, [("5S", 0.4, 0.3), ("9Y", -0.5, -0.2)], common=warp_line)
-LinkLine(ww_grid, [("5V", 0.4, -0.3), ("9Y", -0.4, 0.2)], common=warp_line)
-LinkLine(ww_grid, [("5Z", 0.4, 0.2), ("9Y", -0.4, 0.8)], common=warp_line)
-LinkLine(ww_grid, [("7F", 0.5, 0.2), ("11F", -0.4, 0.3)], common=warp_line)
-LinkLine(ww_grid, [("8L", 0.4, 0.8), ("15S", -0.4, -0.8)], common=warp_line)
-LinkLine(ww_grid, [("8S", 0.5, 0.8), ("20CC", -0.4, -0.4)], common=warp_line)
-LinkLine(ww_grid, [("9P", 0.4, -0.4), ("10P", -0.4, 0.6)], common=warp_line)
-LinkLine(ww_grid, [("9Y", 0.4, 0.5), ("14Y", -0.4, 0.4)], common=warp_line)
-LinkLine(ww_grid, [("10L", 0.4, 0.0), ("13M", -0.0, -0.2)], common=warp_line)
-LinkLine(ww_grid, [("11F", 0.5, 0.2), ("15I", -0.4, -0.4)], common=warp_line)
-LinkLine(ww_grid, [("13M", 0.4, 0.0), ("17P", -0.4, -0.8)], common=warp_line)
-LinkLine(ww_grid, [("15I", 0.4, -0.5), ("19J", -0.4, -0.6)], common=warp_line)
-LinkLine(ww_grid, [("15I", -0.4, 0.4), ("13M", 0.4, -0.70)], common=warp_line)
-LinkLine(ww_grid, [("15S", 0.4, 0.5), ("18U", -0.4, -0.2)], common=warp_line)
-LinkLine(ww_grid, [("15S", -0.4, -0.1), ("8S", 0.4, -0.1)], common=warp_line)
-LinkLine(ww_grid, [("15S", -0.4, 0.2), ("20CC", 0.0, -0.8)], common=warp_line)
-LinkLine(ww_grid, [("16BB", 0.5, -0.8), ("20CC", -0.85, 0.1)], common=warp_line)
-LinkLine(ww_grid, [("17P", 0.4, -0.4), ("20Q", -0.95, 0.0)], common=warp_line)
-LinkLine(ww_grid, [("19W", 0.5, 0.1), ("20W", -0.4, 0.70)], common=warp_line)
-# LinkLine(ww_grid, [("1A", 0.0, 0.0), ("1A", 0.0, 0.0)], common=warp_line)
 
-# KEY BOX
-Rectangle(x=21, y=50.5, width=17, height=6.5, fill=map_fill, stroke=heading)
-Text(text="KEY:", font_size=24, x=23, y=52, stroke=heading)
-Text(text="(All stars are main sequence)", font_size=12, x=28, y=52, stroke=heading)
-Circle(common=dstar, cx=23, cy=53); Text(text="Brown dwarf", font_size=15, x=25, y=53.2, stroke=heading)
-Circle(common=mstar, cx=23, cy=53.5); Text(text="M Class Star", font_size=15, x=25, y=53.7, stroke=heading)
-Circle(common=kstar, cx=23, cy=54); Text(text="K Class Star", font_size=15, x=25, y=54.2, stroke=heading)
+if SHOW_NEBULA:
+    # borders - appear in multiple locations
+    hex_edges(["6J", ], "s", "nw")
+    hex_edges(["7K", ], "sw ne se", "s")
+    hex_edges(["7L", ], "", "nw")
 
-Text(text="Vedeem", font_size=15, x=23, y=55, stroke=system_label)
-Text(text="Lettering gives the system name", font_size=15, x=25, y=55, stroke=heading, align="left")
-Text(text="REE+5", font_size=15, x=23, y=55.7, stroke=system_label)
-Text(text="Number shows the economic value of the system", font_size=15, x=25, y=55.5, stroke=heading, align="left")
-Text(text="REE+# the system is rich in Rare Earth Minerals", font_size=15, x=25, y=56, stroke=heading, align="left")
-Line(x=22, y=56.5, x1=24, y1=56, common=warp_line)
-Text(text="Green lines show Warp Lines between the stars", font_size=15, x=25, y=56.5, stroke=heading, align="left")
+    hex_edges(["8P", ], "n nw ne se", "sw s")
+    hex_edges(["8K", ], "sw", "ne nw s")
+    hex_edges(["8L", ], "nw sw", "n s")
+    hex_edges(["8M", ], "", "n se nw sw")
+    hex_edges(["8N", ], "n se ne sw", "nw s")
+    hex_edges(["8O", "10Q", ], "nw sw s", "n ne se")
+    # hex_edges(["8P", ], "nw n ne se", "s sw")
+    hex_edges(["9K", ], "n nw", "sw")
+    hex_edges(["9L", ], "", "ne")
+    hex_edges(["9O", ], "n nw", "sw s")
+    hex_edges(["9Q", ], "n nw ne se s", "sw")
+    hex_edges(["9P", ], "s sw se", "nw ne n")
 
-Line(x=33, y=53, x1=34.5, y1=53, stroke=cloud_edge, stroke_width=3)
-Line(x=33, y=54, x1=34.5, y1=54, stroke=cloud_edge, stroke_width=3, dotted=True)
-Text(text="Dust Cloud:", font_size=15, x=33, y=52, stroke=heading, align="left")
-Text(text="Max 10 PD", font_size=15, x=35, y=53, stroke=heading, align="left")
-Text(text="Max 20 PD", font_size=15, x=35, y=54, stroke=heading, align="left")
+    hex_edges(["10K", ], "", "n")
+    hex_edges(["10R" ], "n nw ne se", "s")
+
+    hex_edges(["11K", ], "", "nw")
+    hex_edges(["11N", ], "", "n sw")
+    hex_edges(["11P", ], "", "ne sw s")
+    hex_edges(["11Q", ], "nw", "n ne s sw se")
+    hex_edges(["11R", ], "se s ne sw", "nw se")
+    hex_edges(["11S", ], "", "n nw ne sw")
+    hex_edges(["11T", ], "", "nw")
+
+    hex_edges(["12P", ], "", "se sw")
+    hex_edges(["12Q", ], "", "ne s sw se")
+    hex_edges(["12R", ], "nw se s sw", "n ne")
+    hex_edges(["12S", ], "n nw s sw", "ne se")
+    hex_edges(["12T", ], "n", "s se")
+    hex_edges(["12U", ], "", "n ne ne")
+
+    hex_edges(["13Q", ], "", "nw s sw")
+    hex_edges(["13R", ], "sw", "n nw se")
+    hex_edges(["13S", ], "nw", "sw se s")
+    hex_edges(["13T", ], "", "n ne nw")
+    hex_edges(["13U", ], "", "sw ne nw")
+    hex_edges(["13V", ], "", "nw sw s")
+
+    hex_edges(["14U", "16U" ], "", "s")
+
+    hex_edges(["15U", ], "", "n s")
+    hex_edges(["15V", ], "", "nw sw n")
+
+    # hex_edges(["", ], "", "")
+
+    pass
+
+if SHOW_WARPLINES:
+    # warp lines
+    warp_line = Common(stroke=warp, stroke_width=3, rounded=True)
+    LinkLine(ww_grid, [("1C", 0.75, 0.2), ("8L", -0.6,  0.3)], common=warp_line)
+    LinkLine(ww_grid, [("1H", 0.0, -0.7), ("3G",  0.0,  0.4)], common=warp_line)
+    LinkLine(ww_grid, [("1O", 0.4, 0.5), ("3O", 0.0, 0.4)], common=warp_line)
+    LinkLine(ww_grid, [("2B", -0.5,  0.7), ("4E",  0.05, -0.9)], common=warp_line)
+    LinkLine(ww_grid, [("2B", 0.15, -0.85), ("4B", -0.75, 0.8)], common=warp_line)
+    LinkLine(ww_grid, [("2U", 0.4, -0.4), ("5V", -0.4, -0.4)], common=warp_line)
+    LinkLine(ww_grid, [("2W", 0.4, 0.6), ("5Z", -0.4, 0.4)], common=warp_line)
+    LinkLine(ww_grid, [("3O", 0.4, -0.2), ("5N", 0.4, -0.2)], common=warp_line)
+    LinkLine(ww_grid, [("4E", 0.25, -1.05), ("4B", -0.6,  0.9)], common=warp_line)
+    LinkLine(ww_grid, [("5N", 0.4, -0.70), ("9P", -0.4, -0.4)], common=warp_line)
+    LinkLine(ww_grid, [("5S", 0.4, -0.1), ("8Q", 0.0, 0.6)], common=warp_line)
+    LinkLine(ww_grid, [("5S", 0.4, 0.3), ("9Y", -0.5, -0.2)], common=warp_line)
+    LinkLine(ww_grid, [("5V", 0.4, -0.3), ("9Y", -0.4, 0.2)], common=warp_line)
+    LinkLine(ww_grid, [("5Z", 0.4, 0.2), ("9Y", -0.4, 0.8)], common=warp_line)
+    LinkLine(ww_grid, [("7F", 0.5, 0.2), ("11F", -0.4, 0.3)], common=warp_line)
+    LinkLine(ww_grid, [("8L", 0.4, 0.8), ("15S", -0.4, -0.8)], common=warp_line)
+    LinkLine(ww_grid, [("8S", 0.5, 0.8), ("20CC", -0.4, -0.4)], common=warp_line)
+    LinkLine(ww_grid, [("9P", 0.4, -0.4), ("10P", -0.4, 0.6)], common=warp_line)
+    LinkLine(ww_grid, [("9Y", 0.4, 0.5), ("14Y", -0.4, 0.4)], common=warp_line)
+    LinkLine(ww_grid, [("10L", 0.4, 0.0), ("13M", -0.0, -0.2)], common=warp_line)
+    LinkLine(ww_grid, [("11F", 0.5, 0.2), ("15I", -0.4, -0.4)], common=warp_line)
+    LinkLine(ww_grid, [("13M", 0.4, 0.0), ("17P", -0.4, -0.8)], common=warp_line)
+    LinkLine(ww_grid, [("15I", 0.4, -0.5), ("19J", -0.4, -0.6)], common=warp_line)
+    LinkLine(ww_grid, [("15I", -0.4, 0.4), ("13M", 0.4, -0.70)], common=warp_line)
+    LinkLine(ww_grid, [("15S", 0.4, 0.5), ("18U", -0.4, -0.2)], common=warp_line)
+    LinkLine(ww_grid, [("15S", -0.4, -0.1), ("8S", 0.4, -0.1)], common=warp_line)
+    LinkLine(ww_grid, [("15S", -0.4, 0.2), ("20CC", 0.0, -0.8)], common=warp_line)
+    LinkLine(ww_grid, [("16BB", 0.5, -0.8), ("20CC", -0.85, 0.1)], common=warp_line)
+    LinkLine(ww_grid, [("17P", 0.4, -0.4), ("20Q", -0.95, 0.0)], common=warp_line)
+    LinkLine(ww_grid, [("19W", 0.5, 0.1), ("20W", -0.4, 0.70)], common=warp_line)
+    # LinkLine(ww_grid, [("1A", 0.0, 0.0), ("1A", 0.0, 0.0)], common=warp_line)
+
+if SHOW_KEY:
+    # KEY BOX
+    Rectangle(x=21, y=50.5, width=17, height=6.5, fill=map_fill, stroke=heading)
+    Text(text="KEY:", font_size=24, x=23, y=52, stroke=heading)
+    Text(text="(All stars are main sequence)", font_size=12, x=28, y=52, stroke=heading)
+    Circle(common=dstar, cx=23, cy=53)
+    Text(text="Brown dwarf", font_size=15, x=25, y=53.2, stroke=heading)
+    Circle(common=mstar, cx=23, cy=53.5)
+    Text(text="M Class Star", font_size=15, x=25, y=53.7, stroke=heading)
+    Circle(common=kstar, cx=23, cy=54)
+    Text(text="K Class Star", font_size=15, x=25, y=54.2, stroke=heading)
+    Text(text="Vedeem", font_size=15, x=23, y=55, stroke=system_label)
+    Text(text="Lettering gives the system name",
+         font_size=15, x=25, y=55, stroke=heading, align="left")
+    Text(text="REE+5", font_size=15, x=23, y=55.7,
+         stroke=system_label)
+    Text(text="Number shows the economic value of the system",
+         font_size=15, x=25, y=55.5, stroke=heading, align="left")
+    Text(text="REE+# the system is rich in Rare Earth Minerals",
+         font_size=15, x=25, y=56, stroke=heading, align="left")
+    Line(x=22, y=56.5, x1=24, y1=56, common=warp_line)
+    Text(text="Green lines show Warp Lines between the stars",
+         font_size=15, x=25, y=56.5, stroke=heading, align="left")
+    Line(x=33, y=53, x1=34.5, y1=53, stroke=cloud_edge, stroke_width=3)
+    Line(x=33, y=54, x1=34.5, y1=54, stroke=cloud_edge, stroke_width=3, dotted=True)
+    Text(text="Dust Cloud:", font_size=15, x=33, y=52, stroke=heading, align="left")
+    Text(text="Max 10 PD", font_size=15, x=35, y=53, stroke=heading, align="left")
+    Text(text="Max 20 PD", font_size=15, x=35, y=54, stroke=heading, align="left")
 
 Save()
