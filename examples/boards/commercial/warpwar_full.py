@@ -49,6 +49,7 @@ cloud_med = "#711F61"
 cloud_dark = "#4D173E"
 
 Rectangle(x=0.0, y=0.0, width=41, height=58.3, stroke=map_border, fill=map_fill)
+# Image("vedem.png", x=0.8, y=0.11, width=39.47, height=58.1)
 
 if SHOW_TITLE:
     # title line
@@ -71,7 +72,8 @@ ww_grid = Hexagons(
     coord_stroke=grid_line,
     coord_padding=0,
     coord_style="diagonal",
-    fill=map_fill,
+    #fill=map_fill,
+    fill=None,
     stroke=grid_line,
     stroke_width=2,
 )
@@ -97,6 +99,75 @@ mask = rectangle(height=0.6, width=1.2, fill_stroke=map_fill, dx=0, dy=-0.75)
 dwarf_outer = circle(fill=d_brown, stroke=d_brown, radius=0.2),
 dwarf_inner = rectangle(height=0.1, width=0.1, fill=map_fill, stroke=map_fill),
 
+# nebula
+nebul = Common(
+    fill=cloud_dark, stroke=grid_line, height=2.22, dx=0, dy=0, transparency=50)
+cluod = Common(
+    fill=None, stroke=grid_line, height=2.22, dx=0, dy=0, transparency=50)
+
+
+def hex_edges(hexes, solid, dotted, common=nebul):
+    Locations(
+        ww_grid,
+        hexes,
+        [hexagon(
+            common=common,
+            borders=[
+                (solid, 4, cloud_edge),
+                (dotted, 4, cloud_edge, True)])])
+
+if SHOW_NEBULA:
+    # borders - appear in multiple locations
+    hex_edges(["5T", ], "", "s")
+    hex_edges(["5U", ], "", "n")
+    hex_edges(["6U", ], "", "nw")
+    hex_edges(["6J", ], "s", "nw")
+    hex_edges(["7K", ], "sw ne se", "s")
+    hex_edges(["7L", ], "", "nw")
+    hex_edges(["8P", ], "n nw ne se", "sw s")
+    hex_edges(["8K", ], "sw", "ne nw s")
+    hex_edges(["8L", ], "nw sw", "n s")
+    hex_edges(["8M", ], "", "n se nw sw")
+    hex_edges(["8N", ], "n se ne sw", "nw s")
+    hex_edges(["8O", "10Q", ], "nw sw s", "n ne se")
+    hex_edges(["9K", ], "n nw", "sw")
+    hex_edges(["9L", ], "", "ne")
+    hex_edges(["9N", ], "", "")
+    hex_edges(["9O", ], "n nw", "sw s")
+    hex_edges(["9Q", ], "n nw ne se s", "sw")
+    hex_edges(["9P", ], "s sw se", "nw ne n")
+    hex_edges(["10K", ], "", "n")
+    hex_edges(["10O", ], "", "n nw")
+    hex_edges(["10P", ], "", "")
+    hex_edges(["10R" ], "n nw ne se", "s")
+    hex_edges(["11K", ], "", "nw")
+    hex_edges(["11N", ], "", "n sw")
+    hex_edges(["11P", ], "", "ne sw s")
+    hex_edges(["11Q", ], "nw", "n ne s sw se")
+    hex_edges(["11R", ], "se s ne sw", "nw se")
+    hex_edges(["11S", ], "", "n nw ne sw")
+    hex_edges(["11T", ], "", "nw")
+    hex_edges(["12P", ], "", "se sw")
+    hex_edges(["12Q", ], "", "ne s sw se")
+    hex_edges(["12R", ], "nw se s sw", "n ne")
+    hex_edges(["12S", ], "n nw s sw", "ne se")
+    hex_edges(["12T", ], "n", "s se")
+    hex_edges(["12U", ], "", "n ne ne")
+    hex_edges(["13Q", ], "", "nw s sw")
+    hex_edges(["13R", ], "sw", "n nw se")
+    hex_edges(["13S", ], "nw", "sw se s")
+    hex_edges(["13T", ], "", "n ne nw")
+    hex_edges(["13U", ], "", "sw ne nw")
+    hex_edges(["13V", ], "", "nw sw s")
+    hex_edges(["14S", ], "", "")
+    hex_edges(["14T", ], "", "")
+    hex_edges(["14U", "16U" ], "", "s")
+    hex_edges(["14W", ], "s", "")
+    hex_edges(["15U", ], "", "n s")
+    hex_edges(["15V", ], "", "nw sw n")
+    hex_edges(["15X", ], "", "se")
+
+
 # system details at a map Location
 def draw_item(system):
     """Draw an object in hex"""
@@ -120,6 +191,7 @@ def draw_item(system):
         pass
     if detail:
         Location(ww_grid, system[0], detail)
+
 
 systems = [
     ["1C", "", 0.1, 0.1, "Bezsin\n         4"],
@@ -238,109 +310,39 @@ if SHOW_SYSTEMS:
         draw_item(system)
 
 
-nebul = Common(
-    fill=cloud_dark, stroke=grid_line, height=2.22, dx=0, dy=0, transparency=50)
-cluod = Common(
-    fill=None, stroke=grid_line, height=2.22, dx=0, dy=0, transparency=50)
-
-def hex_edges(hexes, solid, dotted, common=nebul):
-    Locations(
-        ww_grid,
-        hexes,
-        [hexagon(
-            common=common,
-            borders=[
-                (solid, 4, cloud_edge),
-                (dotted, 4, cloud_edge, True)])])
-
-
-if SHOW_NEBULA:
-    # borders - appear in multiple locations
-    hex_edges(["6J", ], "s", "nw")
-    hex_edges(["7K", ], "sw ne se", "s")
-    hex_edges(["7L", ], "", "nw")
-
-    hex_edges(["8P", ], "n nw ne se", "sw s")
-    hex_edges(["8K", ], "sw", "ne nw s")
-    hex_edges(["8L", ], "nw sw", "n s")
-    hex_edges(["8M", ], "", "n se nw sw")
-    hex_edges(["8N", ], "n se ne sw", "nw s")
-    hex_edges(["8O", "10Q", ], "nw sw s", "n ne se")
-    # hex_edges(["8P", ], "nw n ne se", "s sw")
-    hex_edges(["9K", ], "n nw", "sw")
-    hex_edges(["9L", ], "", "ne")
-    hex_edges(["9O", ], "n nw", "sw s")
-    hex_edges(["9Q", ], "n nw ne se s", "sw")
-    hex_edges(["9P", ], "s sw se", "nw ne n")
-
-    hex_edges(["10K", ], "", "n")
-    hex_edges(["10R" ], "n nw ne se", "s")
-
-    hex_edges(["11K", ], "", "nw")
-    hex_edges(["11N", ], "", "n sw")
-    hex_edges(["11P", ], "", "ne sw s")
-    hex_edges(["11Q", ], "nw", "n ne s sw se")
-    hex_edges(["11R", ], "se s ne sw", "nw se")
-    hex_edges(["11S", ], "", "n nw ne sw")
-    hex_edges(["11T", ], "", "nw")
-
-    hex_edges(["12P", ], "", "se sw")
-    hex_edges(["12Q", ], "", "ne s sw se")
-    hex_edges(["12R", ], "nw se s sw", "n ne")
-    hex_edges(["12S", ], "n nw s sw", "ne se")
-    hex_edges(["12T", ], "n", "s se")
-    hex_edges(["12U", ], "", "n ne ne")
-
-    hex_edges(["13Q", ], "", "nw s sw")
-    hex_edges(["13R", ], "sw", "n nw se")
-    hex_edges(["13S", ], "nw", "sw se s")
-    hex_edges(["13T", ], "", "n ne nw")
-    hex_edges(["13U", ], "", "sw ne nw")
-    hex_edges(["13V", ], "", "nw sw s")
-
-    hex_edges(["14U", "16U" ], "", "s")
-
-    hex_edges(["15U", ], "", "n s")
-    hex_edges(["15V", ], "", "nw sw n")
-
-    # hex_edges(["", ], "", "")
-
-    pass
-
+warp_line = Common(stroke=warp, stroke_width=3, rounded=True)
 if SHOW_WARPLINES:
     # warp lines
-    warp_line = Common(stroke=warp, stroke_width=3, rounded=True)
-    LinkLine(ww_grid, [("1C", 0.75, 0.2), ("8L", -0.6,  0.3)], common=warp_line)
+    LinkLine(ww_grid, [("1C", 0.75, 0.2), ("8L", -0.6,  -0.1)], common=warp_line)
     LinkLine(ww_grid, [("1H", 0.0, -0.7), ("3G",  0.0,  0.4)], common=warp_line)
     LinkLine(ww_grid, [("1O", 0.4, 0.5), ("3O", 0.0, 0.4)], common=warp_line)
+    LinkLine(ww_grid, [("2B", 0.2, -0.85), ("4B", -0.75, 0.8)], common=warp_line)
     LinkLine(ww_grid, [("2B", -0.5,  0.7), ("4E",  0.05, -0.9)], common=warp_line)
-    LinkLine(ww_grid, [("2B", 0.15, -0.85), ("4B", -0.75, 0.8)], common=warp_line)
-    LinkLine(ww_grid, [("2U", 0.4, -0.4), ("5V", -0.4, -0.4)], common=warp_line)
-    LinkLine(ww_grid, [("2W", 0.4, 0.6), ("5Z", -0.4, 0.4)], common=warp_line)
-    LinkLine(ww_grid, [("3O", 0.4, -0.2), ("5N", 0.4, -0.2)], common=warp_line)
+    LinkLine(ww_grid, [("2U", 0.6, -0.4), ("5V", -0.6, -0.4)], common=warp_line)
+    LinkLine(ww_grid, [("2W", 0.4, 0.6), ("5Z", -0.6, 0.4)], common=warp_line)
+    LinkLine(ww_grid, [("3O", 0.7, 0.0), ("5N", 0.3, -0.2)], common=warp_line)
     LinkLine(ww_grid, [("4E", 0.25, -1.05), ("4B", -0.6,  0.9)], common=warp_line)
-    LinkLine(ww_grid, [("5N", 0.4, -0.70), ("9P", -0.4, -0.4)], common=warp_line)
-    LinkLine(ww_grid, [("5S", 0.4, -0.1), ("8Q", 0.0, 0.6)], common=warp_line)
-    LinkLine(ww_grid, [("5S", 0.4, 0.3), ("9Y", -0.5, -0.2)], common=warp_line)
-    LinkLine(ww_grid, [("5V", 0.4, -0.3), ("9Y", -0.4, 0.2)], common=warp_line)
-    LinkLine(ww_grid, [("5Z", 0.4, 0.2), ("9Y", -0.4, 0.8)], common=warp_line)
+    LinkLine(ww_grid, [("5N", 0.6, -0.60), ("9P", -0.4, -0.4)], common=warp_line)
+    LinkLine(ww_grid, [("5S", 0.7, 0.), ("8Q", 0.0, 0.6)], common=warp_line)
+    LinkLine(ww_grid, [("5S", 0.6, 0.4), ("9Y", -0.5, -0.2)], common=warp_line)
+    LinkLine(ww_grid, [("5V", 0.6, -0.3), ("9Y", -0.4, 0.2)], common=warp_line)
+    LinkLine(ww_grid, [("5Z", 0.4, 0.3), ("9Y", -0.6, 0.9)], common=warp_line)
     LinkLine(ww_grid, [("7F", 0.5, 0.2), ("11F", -0.4, 0.3)], common=warp_line)
-    LinkLine(ww_grid, [("8L", 0.4, 0.8), ("15S", -0.4, -0.8)], common=warp_line)
+    LinkLine(ww_grid, [("8L", 0.4, 0.8), ("15S", -0.6, -0.8)], common=warp_line)
     LinkLine(ww_grid, [("8S", 0.5, 0.8), ("20CC", -0.4, -0.4)], common=warp_line)
-    LinkLine(ww_grid, [("9P", 0.4, -0.4), ("10P", -0.4, 0.6)], common=warp_line)
-    LinkLine(ww_grid, [("9Y", 0.4, 0.5), ("14Y", -0.4, 0.4)], common=warp_line)
-    LinkLine(ww_grid, [("10L", 0.4, 0.0), ("13M", -0.0, -0.2)], common=warp_line)
+    LinkLine(ww_grid, [("9P", 0.4, -0.4), ("10P", -0.2, 0.6)], common=warp_line)
+    LinkLine(ww_grid, [("9Y", 0.4, 0.5), ("14Y", -0.6, 0.4)], common=warp_line)
+    LinkLine(ww_grid, [("10L", 0.7, 0.0), ("13M", -0.0, -0.2)], common=warp_line)
     LinkLine(ww_grid, [("11F", 0.5, 0.2), ("15I", -0.4, -0.4)], common=warp_line)
-    LinkLine(ww_grid, [("13M", 0.4, 0.0), ("17P", -0.4, -0.8)], common=warp_line)
-    LinkLine(ww_grid, [("15I", 0.4, -0.5), ("19J", -0.4, -0.6)], common=warp_line)
+    LinkLine(ww_grid, [("13M", 0.6, 0.0), ("17P", -0.4, -0.8)], common=warp_line)
+    LinkLine(ww_grid, [("15I", 0.4, -0.5), ("19J", -0.7, -0.6)], common=warp_line)
     LinkLine(ww_grid, [("15I", -0.4, 0.4), ("13M", 0.4, -0.70)], common=warp_line)
     LinkLine(ww_grid, [("15S", 0.4, 0.5), ("18U", -0.4, -0.2)], common=warp_line)
-    LinkLine(ww_grid, [("15S", -0.4, -0.1), ("8S", 0.4, -0.1)], common=warp_line)
-    LinkLine(ww_grid, [("15S", -0.4, 0.2), ("20CC", 0.0, -0.8)], common=warp_line)
+    LinkLine(ww_grid, [("15S", -0.9, -0.1), ("8S", 0.7, -0.1)], common=warp_line)
+    LinkLine(ww_grid, [("15S", -0.7, 0.2), ("20CC", 0.0, -0.8)], common=warp_line)
     LinkLine(ww_grid, [("16BB", 0.5, -0.8), ("20CC", -0.85, 0.1)], common=warp_line)
-    LinkLine(ww_grid, [("17P", 0.4, -0.4), ("20Q", -0.95, 0.0)], common=warp_line)
-    LinkLine(ww_grid, [("19W", 0.5, 0.1), ("20W", -0.4, 0.70)], common=warp_line)
-    # LinkLine(ww_grid, [("1A", 0.0, 0.0), ("1A", 0.0, 0.0)], common=warp_line)
+    LinkLine(ww_grid, [("17P", 0.6, -0.4), ("20Q", -0.95, 0.0)], common=warp_line)
+    LinkLine(ww_grid, [("19W", 0.5, 0.1), ("20W", -0.2, 0.70)], common=warp_line)
 
 if SHOW_KEY:
     # KEY BOX
@@ -365,6 +367,8 @@ if SHOW_KEY:
     Line(x=22, y=56.5, x1=24, y1=56, common=warp_line)
     Text(text="Green lines show Warp Lines between the stars",
          font_size=15, x=25, y=56.5, stroke=heading, align="left")
+    # dust cloud
+    Rectangle(x=33, y=52.75, width=1.5, height=0.5, fill_stroke=cloud_dark, transparency=50)
     Line(x=33, y=53, x1=34.5, y1=53, stroke=cloud_edge, stroke_width=3)
     Line(x=33, y=54, x1=34.5, y1=54, stroke=cloud_edge, stroke_width=3, dotted=True)
     Text(text="Dust Cloud:", font_size=15, x=33, y=52, stroke=heading, align="left")
