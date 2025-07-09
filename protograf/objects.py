@@ -34,6 +34,7 @@ from protograf.utils.structures import (
     Locale,
     Point,
     PolyGeometry,
+    Tetris3D,
 )  # named tuples
 from protograf.utils.support import CACHE_DIRECTORY
 from protograf.base import (
@@ -89,6 +90,10 @@ class PolyominoObject(RectangleShape):
             self.int_pattern = tools.transpose_lists(
                 self.int_pattern, direction=self.flip, invert=self.invert
             )
+        # tetris
+        self.letter = kwargs.get("letter", None)
+        self.tetris = kwargs.get("tetris", False)
+        self.is_tetronimo = kwargs.get("is_tetromino", False)
 
     def numeric_pattern(self):
         """Generate numeric-equivalent of pattern matrix."""
@@ -209,6 +214,49 @@ class PolyominoObject(RectangleShape):
                     pass
         return perimeter_lines
 
+    def set_tetris_style(self, **kwargs):
+        """Set colors and centre-shape for Tetris Tetronimo"""
+        match self.letter.lower():
+            case "i":
+                t3dcolors = Tetris3D(
+                    inner="#00CDCD",
+                    outer_tl="#00C3C3",
+                    outer_br="#008989",
+                    tritop="#00FFFF",
+                    tribtm="#009898",
+                )
+            case "l":
+                t3dcolors = Tetris3D(
+                    inner="", outer_tl="", outer_br="", tritop="", tribtm=""
+                )
+            case "o":
+                t3dcolors = Tetris3D(
+                    inner="", outer_tl="", outer_br="", tritop="", tribtm=""
+                )
+            case "s":
+                t3dcolors = Tetris3D(
+                    inner="", outer_tl="", outer_br="", tritop="", tribtm=""
+                )
+            case "t":
+                t3dcolors = Tetris3D(
+                    inner="", oouter_tl="", outer_br="", tritop="", tribtm=""
+                )
+            case _:
+                feedback(f"The Tetronimo letter {self.letter} is unknown", True)
+
+        swidth = 0.247 * self.unit(self.width)
+        self.centre_shape = RectangleShape(
+            height=0.8 * self.height,
+            width=0.8 * self.width,
+            fill=t3dcolors.inner,
+            stroke=None,
+            borders=[
+                ("n w", swidth, t3dcolors.outer_tl),
+                ("s e", swidth, t3dcolors.outer_br),
+            ],
+        )
+        return t3dcolors.tritop, t3dcolors.tribtm
+
     def draw(self, cnv=None, off_x=0, off_y=0, ID=None, **kwargs):
         """Draw squares for the Polyomino on a given canvas."""
         # feedback(f'~~~ Polyomino {self.label=} // {off_x=}, {off_y=} {kwargs=}')
@@ -236,6 +284,13 @@ class PolyominoObject(RectangleShape):
                         self.label = self.labels[number - 1]
                     except:
                         self.label = self._label
+                    # ---- Tetris: overide colors and shape centre
+                    if self.tetris and self.is_tetronimo:
+                        color_top, color_btm = self.set_tetris_style(**kwargs)
+                        if color_top and color_btm:
+                            self.roof = [color_top, color_btm]
+                            print(f"{self.letter=} {self.roof=}")
+
                     kwargs["row"] = row
                     kwargs["col"] = col
                     # print(f"~~~ Polyomino {row=} {col=} {number=} {self.label=}")
@@ -364,4 +419,6 @@ class TetrominoObject(PolyominoObject):
                 feedback("Tetromino letter must be selected from predefined set!", True)
 
         kwargs["pattern"] = pattern
+        kwargs["is_tetromino"] = True
+        kwargs["letter"] = self.letter
         super(TetrominoObject, self).__init__(_object=_object, canvas=canvas, **kwargs)

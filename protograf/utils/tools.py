@@ -1259,24 +1259,21 @@ def validated_directions(
     """Check and return a list of lowercase, direction abbreviations.
 
     Doc Test:
-    # >>> validated_directions('', DirectionGroup.CARDINAL)
-    # []
-    # >>> validated_directions([], DirectionGroup.CARDINAL)
-    # []
-    # >>> validated_directions(['n', 's'], DirectionGroup.CARDINAL)
-    # ['n', 's']
-    # >>> validated_directions('n s', DirectionGroup.CARDINAL)
-    # ['n', 's']
-    # >>> validated_directions('n s', DirectionGroup.HEX_FLAT)
-    # ['w', 'e']
-    # >>> validated_directions('w e', DirectionGroup.HEX_POINTY)
-    # ['n', 's']
-    # >>> validated_directions('w e n s ne', DirectionGroup.COMPASS)
-    # ['w', 'e', 'n', 's', 'ne']
+    >>> validated_directions('n s', DirectionGroup.CARDINAL)
+    ['n', 's']
+    >>> validated_directions('ne se', DirectionGroup.HEX_FLAT)
+    ['ne', 'se']
+    >>> validated_directions('n s', DirectionGroup.HEX_POINTY)
+    ['n', 's']
+    >>> validated_directions('w e n s ne', DirectionGroup.COMPASS)
+    ['w', 'e', 'n', 's', 'ne']
+    >>> validated_directions(' w e n s ne ', DirectionGroup.COMPASS)  # spaces at ends
+    ['w', 'e', 'n', 's', 'ne']
     """
     if not value:
         return []
     if isinstance(value, str):
+        value = value.strip()
         values = split(value.lower())
     else:
         if not isinstance(value, list):

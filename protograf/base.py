@@ -2422,14 +2422,14 @@ class BaseShape:
         else:
             dashed = bstyle
         # ---- multi-directions
+        shape_name = self.__class__.__name__.replace("Shape", "")
         _bdirections = tools.validated_directions(
-            bdirections, tools.DirectionGroup.COMPASS, "border"
+            bdirections, tools.DirectionGroup.COMPASS, f"{shape_name.lower()} border"
         )
         for bdirection in _bdirections:
             if not bdirection:
                 continue
             # ---- line start & end
-            shape_name = self.__class__.__name__.replace("Shape", "")
             match self.__class__.__name__:
 
                 case "RectangleShape" | "SquareShape" | "TrapezoidShape":

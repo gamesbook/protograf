@@ -2585,7 +2585,9 @@ def Blueprint(**kwargs):
     kwargs["fill"] = kwargs.get("fill", line_stroke)  # revert back for font
     # ---- number edges
     if number_edges:
-        edges = tools.validated_directions(number_edges, DirectionGroup.CARDINAL)
+        edges = tools.validated_directions(
+            number_edges, DirectionGroup.CARDINAL, "blueprint edges"
+        )
     else:
         edges = []
     # ---- numbering

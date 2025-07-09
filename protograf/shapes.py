@@ -388,7 +388,9 @@ class CircleShape(BaseShape):
             y_c: y-centre of circle
             rotation: degrees anti-clockwise from horizontal "east"
         """
-        _dirs = tools.validated_directions(self.hatch, DirectionGroup.CIRCULAR, "hatch")
+        _dirs = tools.validated_directions(
+            self.hatch, DirectionGroup.CIRCULAR, "circle hatch"
+        )
         lines = tools.as_int(num, "hatch_count")
         if lines < 0:
             feedback("Cannot draw negative number of lines!", True)
@@ -997,7 +999,7 @@ class CompassShape(BaseShape):
             self.set_canvas_props(cnv=cnv, index=ID, **kwargs)
         # ---- draw compass in circle
         _directions = tools.validated_directions(
-            self.directions, DirectionGroup.COMPASS, "directions"
+            self.directions, DirectionGroup.COMPASS, "compass directions"
         )
         if self.perimeter == "circle":
             for direction in _directions:
@@ -1196,7 +1198,7 @@ class EquilateralTriangleShape(BaseShape):
         self, cnv, ID, side: float, vertices: list, num: int, rotation: float = 0.0
     ):
         _dirs = tools.validated_directions(
-            self.hatch, DirectionGroup.HEX_POINTY_EDGE, "hatch"
+            self.hatch, DirectionGroup.HEX_POINTY_EDGE, "triangle hatch"
         )
         lines = tools.as_int(num, "hatch_count")
         if lines >= 1:
@@ -1613,7 +1615,7 @@ class HexShape(BaseShape):
             if self.orientation == "pointy"
             else DirectionGroup.HEX_FLAT
         )
-        _dirs = tools.validated_directions(self.radii, dir_group, "radii")
+        _dirs = tools.validated_directions(self.radii, dir_group, "hex radii")
         if "ne" in _dirs:  # slope UP to the right
             cnv.draw_line(centre, vertices[4])
         if "sw" in _dirs:  # slope DOWN to the left
@@ -1681,7 +1683,9 @@ class HexShape(BaseShape):
                 if self.orientation == "pointy"
                 else DirectionGroup.HEX_FLAT_EDGE
             )
-            perbis_dirs = tools.validated_directions(self.perbis, dir_group, "perbis")
+            perbis_dirs = tools.validated_directions(
+                self.perbis, dir_group, "hex perbis"
+            )
             _dirs = []
             # feedback(f'*** HEX {self.perbis=} {self.orientation=} {perbis_dirs=}')
             if self.orientation in ["p", "pointy"]:
@@ -1735,7 +1739,7 @@ class HexShape(BaseShape):
     def draw_hatch(
         self, cnv, ID, side: float, vertices: list, num: int, rotation: float = 0.0
     ):
-        """Draw lines connecting two opposite sides and parallel to adjacent side.
+        """Draw lines connecting two opposite sides and parallel to adjacent Hex side.
 
         Args:
             ID: unique ID
@@ -1749,7 +1753,7 @@ class HexShape(BaseShape):
             if self.orientation == "pointy"
             else DirectionGroup.HEX_FLAT
         )
-        _dirs = tools.validated_directions(self.hatch, dir_group, "hatch")
+        _dirs = tools.validated_directions(self.hatch, dir_group, "hexagon hatch")
         _num = tools.as_int(num, "hatch_count")
         lines = int((_num - 1) / 2 + 1)
         # feedback(f'*** HEX {num=} {lines=} {vertices=} {_dirs=}')
@@ -2920,14 +2924,19 @@ class RectangleShape(BaseShape):
             vertexes: the rectangle's nodes
             rotation: degrees anti-clockwise from horizontal "east"
         """
+        # ---- get roof color list from string
+        if isinstance(self.roof, str):
+            _roof = tools.split(self.roof.strip())
+        else:
+            _roof = self.roof
         # ---- validate roof color settings
         err = ("Roof must be a list of colors - either 2 or 4",)
-        if not isinstance(self.roof, list):
+        if not isinstance(_roof, list):
             feedback(err, True)
         else:
-            if len(self.roof) not in [2, 4]:
+            if len(_roof) not in [2, 4]:
                 feedback(err, True)
-        roof_colors = [tools.get_color(rcolor) for rcolor in self.roof]
+        roof_colors = [tools.get_color(rcolor) for rcolor in _roof]
         # ---- draw 2 triangles
         if len(roof_colors) == 2:
             # top-left
@@ -2935,7 +2944,7 @@ class RectangleShape(BaseShape):
             cnv.draw_polyline(vertexes_tl)
             self.set_canvas_props(
                 index=ID,
-                stroke=self.roof_stroke or self.fill,
+                stroke=self.roof_stroke or roof_colors[0],
                 fill=roof_colors[0],
                 closed=True,
                 rotation=rotation,
@@ -2946,7 +2955,7 @@ class RectangleShape(BaseShape):
             cnv.draw_polyline(vertexes_br)
             self.set_canvas_props(
                 index=ID,
-                stroke=self.roof_stroke or self.fill,
+                stroke=self.roof_stroke or roof_colors[1],
                 fill=roof_colors[1],
                 closed=True,
                 rotation=rotation,
@@ -2982,7 +2991,7 @@ class RectangleShape(BaseShape):
                 cnv.draw_polyline(section)
                 self.set_canvas_props(
                     index=ID,
-                    stroke=self.roof_stroke or self.fill,
+                    stroke=self.roof_stroke or roof_colors[key],
                     fill=roof_colors[key],
                     closed=True,
                     rotation=rotation,
@@ -3573,7 +3582,9 @@ class RhombusShape(BaseShape):
             num: number of lines
             rotation: degrees anti-clockwise from horizontal "east"
         """
-        _dirs = tools.validated_directions(self.hatch, DirectionGroup.CIRCULAR, "hatch")
+        _dirs = tools.validated_directions(
+            self.hatch, DirectionGroup.CIRCULAR, "rhombus hatch"
+        )
         _num = tools.as_int(num, "hatch_count")
         lines = int((_num - 1) / 2 + 1)
         # feedback(f'*** RHOMB {num=} {lines=} {vertices=} {_dirs=} {side=}')
@@ -3949,7 +3960,7 @@ class StadiumShape(BaseShape):
         # feedback(f'*** Stad{len(self.vertexes)=}')
         # ---- edges
         _edges = tools.validated_directions(
-            self.edges, DirectionGroup.CARDINAL, "edges"
+            self.edges, DirectionGroup.CARDINAL, "stadium edges"
         )  # need curves on these edges
         self.vertexes.append(self.vertexes[0])
 

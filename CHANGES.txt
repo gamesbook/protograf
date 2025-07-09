@@ -8,6 +8,8 @@ Changes
 2025-00-00 (0.2.7)
 ------------------
 - Add roof property to Rectangle
+- Added full WarWar map example script
+- Pacthed issue with hex border notation
 
 2025-07-04 (0.2.6)
 ------------------
