@@ -2387,6 +2387,7 @@ class BaseShape:
 
     def draw_border(self, cnv, border: tuple, ID: int = None):
         """Draw a border line based its settings."""
+        # feedback(f'### border {self.__class__.__name__} {border=} {ID=}')
         if not isinstance(border, tuple):
             feedback(
                 'The "borders" property must contain a list of one or more sets'

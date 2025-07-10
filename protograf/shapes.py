@@ -2315,12 +2315,16 @@ class PolygonShape(BaseShape):
 
     def get_centre(self) -> Point:
         """Calculate the centre as a Point (in units)"""
-        if self.cx is not None and self.cy is not None:
-            x = self._u.cx + self._o.delta_x
-            y = self._u.cy + self._o.delta_y
+        if self._abs_cx is not None and self._abs_cy is not None:
+            x = self._abs_cx
+            y = self._abs_cy
         else:
-            x = self._u.x + self._o.delta_x
-            y = self._u.y + self._o.delta_y
+            if self.cx is not None and self.cy is not None:
+                x = self._u.cx + self._o.delta_x
+                y = self._u.cy + self._o.delta_y
+            else:
+                x = self._u.x + self._o.delta_x
+                y = self._u.y + self._o.delta_y
         return Point(x, y)
 
     def get_angles(self, rotation: float = 0, is_rotated: bool = False) -> list:
@@ -3210,7 +3214,7 @@ class RectangleShape(BaseShape):
             else:
                 self.vertexes.append(Point(x, y))
 
-            if "SW" in _notches:  ###
+            if "SW" in _notches:
                 self.vertexes.append(Point(x, y + self._u.height - n_y))
                 match _notch_style:
                     case "snip" | "s":
@@ -3280,7 +3284,7 @@ class RectangleShape(BaseShape):
             else:
                 self.vertexes.append(Point(x + self._u.width, y + self._u.height))
 
-            if "NE" in _notches:  ###
+            if "NE" in _notches:
                 self.vertexes.append(Point(x + self._u.width, y + n_y))
                 match _notch_style:
                     case "snip" | "s":
@@ -3526,6 +3530,7 @@ class RectangleShape(BaseShape):
                 )
             elif cshape_name not in GRID_SHAPES_WITH_CENTRE:
                 feedback(f"Cannot draw a centered {cshape_name}!")
+
         # ---- cross
         self.draw_cross(cnv, x_d, y_d, rotation=kwargs.get("rotation"))
         # ---- dot

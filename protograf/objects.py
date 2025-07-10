@@ -215,9 +215,9 @@ class PolyominoObject(RectangleShape):
         return perimeter_lines
 
     def set_tetris_style(self, **kwargs):
-        """Set colors and centre-shape for Tetris Tetronimo"""
-        match self.letter.lower():
-            case "i":
+        """Get colors and set centre-shape for Tetris Tetronimo"""
+        match self.letter:
+            case "i" | "I":  # aqua
                 t3dcolors = Tetris3D(
                     inner="#00CDCD",
                     outer_tl="#00C3C3",
@@ -225,29 +225,70 @@ class PolyominoObject(RectangleShape):
                     tritop="#00FFFF",
                     tribtm="#009898",
                 )
-            case "l":
+            case "l":  # dark blue
                 t3dcolors = Tetris3D(
-                    inner="", outer_tl="", outer_br="", tritop="", tribtm=""
+                    inner="#0000CD",
+                    outer_tl="#0000B5",
+                    outer_br="#00008D",
+                    tritop="#0000FF",
+                    tribtm="#020198",
                 )
-            case "o":
+            case "L":  # orange
                 t3dcolors = Tetris3D(
-                    inner="", outer_tl="", outer_br="", tritop="", tribtm=""
+                    inner="#CD6600",
+                    outer_tl="#B55D00",
+                    outer_br="#7F3700",
+                    tritop="#FF8900",
+                    tribtm="#9A4200",
                 )
-            case "s":
+            case "o" | "O":  # yellow
                 t3dcolors = Tetris3D(
-                    inner="", outer_tl="", outer_br="", tritop="", tribtm=""
+                    inner="#CDCD00",
+                    outer_tl="#BBBB00",
+                    outer_br="#8D8D00",
+                    tritop="#FFFF00",
+                    tribtm="#9A9A00",
                 )
-            case "t":
+            case "S":  # light green
                 t3dcolors = Tetris3D(
-                    inner="", oouter_tl="", outer_br="", tritop="", tribtm=""
+                    inner="#00CD00",
+                    outer_tl="#00CD00",
+                    outer_br="#008F00",
+                    tritop="#00FF00",
+                    tribtm="#009A00",
+                )
+            case "s":  # red
+                t3dcolors = Tetris3D(
+                    inner="#CD0000",
+                    outer_tl="#C20000",
+                    outer_br="#8A0000",
+                    tritop="#F60000",
+                    tribtm="#990700",
+                )
+            case "t" | "T":  # purple
+                t3dcolors = Tetris3D(
+                    inner="#9A00CD",
+                    outer_tl="#9100C1",
+                    outer_br="#660199",
+                    tritop="#CB00FC",
+                    tribtm="#66009A",
+                )
+            case "*" | ".":  # grey
+                t3dcolors = Tetris3D(
+                    inner="#787878",
+                    outer_tl="#969696",
+                    outer_br="#515151",
+                    tritop="#9A9A9A",
+                    tribtm="#313131",
                 )
             case _:
                 feedback(f"The Tetronimo letter {self.letter} is unknown", True)
 
-        swidth = 0.247 * self.unit(self.width)
+        swidth = 0.0247 * self.unit(self.width)
+        # breakpoint()
         self.centre_shape = RectangleShape(
-            height=0.8 * self.height,
             width=0.8 * self.width,
+            height=0.8 * self.height,
             fill=t3dcolors.inner,
             stroke=None,
             borders=[
@@ -289,7 +330,7 @@ class PolyominoObject(RectangleShape):
                         color_top, color_btm = self.set_tetris_style(**kwargs)
                         if color_top and color_btm:
                             self.roof = [color_top, color_btm]
-                            print(f"{self.letter=} {self.roof=}")
+                            # print(f"{self.letter=} {self.roof=}")
 
                     kwargs["row"] = row
                     kwargs["col"] = col
@@ -415,6 +456,8 @@ class TetrominoObject(PolyominoObject):
                 pattern = ["110", "011"]
             case "t":
                 pattern = ["111", "010"]
+            case "*" | ".":
+                pattern = ["1"]
             case _:
                 feedback("Tetromino letter must be selected from predefined set!", True)
 
