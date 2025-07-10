@@ -29,10 +29,12 @@ if INVERSE:
     map_fill = "white"
     heading = "black"
     system_label = "#3366CC"
+    CLOUDINESS = 80
 else:
     heading = "white"
     map_fill = "black"
     system_label = "#1CAEE5"
+    CLOUDINESS = 50
 
 map_border = "lightgray"
 grid_line = "#AA9A38"
@@ -88,6 +90,18 @@ if SHOW_LABELS:
         text(common=gridnum, x=1.9, y=1.5, text="{{sequence}}"),
         setting=(1, 20),
         interval_x=1.92)
+    Sequence(
+        text(common=gridnum, x=3.5, y=57, text="{{sequence}}"),
+        setting=('Y', 'Z'),
+        interval_x=3.84)
+    Sequence(
+        text(common=gridnum, x=11.18, y=57, text="{{sequence}}"),
+        setting=('A', 'C'),
+        interval_x=3.84)
+    Sequence(
+        text(common=gridnum, x=11.7, y=57, text="{{sequence}}"),
+        setting=('A', 'C'),
+        interval_x=3.84)
 
 # star properties
 dstar = Common(fill=d_brown, stroke=d_brown, radius=0.18, dot=0.04, dot_stroke="black")
@@ -101,9 +115,9 @@ dwarf_inner = rectangle(height=0.1, width=0.1, fill=map_fill, stroke=map_fill),
 
 # nebula
 nebul = Common(
-    fill=cloud_dark, stroke=grid_line, height=2.22, dx=0, dy=0, transparency=50)
+    fill=cloud_dark, stroke=grid_line, height=2.22, dx=0, dy=0, transparency=CLOUDINESS)
 cluod = Common(
-    fill=None, stroke=grid_line, height=2.22, dx=0, dy=0, transparency=50)
+    fill=None, stroke=grid_line, height=2.22, dx=0, dy=0, transparency=CLOUDINESS)
 
 
 def hex_edges(hexes, solid, dotted, common=nebul):
@@ -257,8 +271,7 @@ systems = [
     ["10L", "", 0.4, 0.7, "REE+4"],
     ["10L", "m", 0.55, 0.],
     ["10L", "m", 0.65, -0.4],
-    ["10P", "mask"],
-    ["10P", "", 0.4, -0.5, "BD10P\n      2"],
+    ["10P", "", 0.4, -0.2, "BD10P\n      2"],
     ["10P", "d", 0.3, 0.6],
     ["11F", "", 0.5, -0.2, "BD11F\n     1"],
     ["11F", "d", -0.2, 0.],
@@ -282,13 +295,13 @@ systems = [
     ["17P", "", 0.2, 0.2, "Peff\n            2"],
     ["17P", "m", 0., -0.8],
     ["17P", "d", 0.3, -0.4],
-    ["18U", "", 0.3, 0.3, "BD18U\n       1"],
+    ["18U", "", 0.3, 0.4, "BD18U\n       1"],
     ["18U", "d", 0.1, -0.2],
     ["19J", "mask"],
     ["19J", "", 0.4, 0.4, "Pullap\n    2"],
     ["19J", "m", -0.4, -0.8],
     ["19J", "d", -0.45, -0.45],
-    ["19J", "p", 0.5, -0.9],
+    ["19J", "p", 0.4, -0.9],
     ["19W", "mask"],
     ["19W", "", 0.1, -0.4, "Asollem\n  1"],
     ["19W", "", -0.6, 0.8, "REE+3"],
@@ -316,7 +329,7 @@ if SHOW_WARPLINES:
     LinkLine(ww_grid, [("1C", 0.75, 0.2), ("8L", -0.6,  -0.1)], common=warp_line)
     LinkLine(ww_grid, [("1H", 0.0, -0.7), ("3G",  0.0,  0.4)], common=warp_line)
     LinkLine(ww_grid, [("1O", 0.4, 0.5), ("3O", 0.0, 0.4)], common=warp_line)
-    LinkLine(ww_grid, [("2B", 0.2, -0.85), ("4B", -0.75, 0.8)], common=warp_line)
+    LinkLine(ww_grid, [("2B", 0.3, -0.85), ("4B", -0.75, 0.8)], common=warp_line)
     LinkLine(ww_grid, [("2B", -0.5,  0.7), ("4E",  0.05, -0.9)], common=warp_line)
     LinkLine(ww_grid, [("2U", 0.6, -0.4), ("5V", -0.6, -0.4)], common=warp_line)
     LinkLine(ww_grid, [("2W", 0.4, 0.6), ("5Z", -0.6, 0.4)], common=warp_line)
@@ -342,37 +355,37 @@ if SHOW_WARPLINES:
     LinkLine(ww_grid, [("15S", -0.7, 0.2), ("20CC", 0.0, -0.8)], common=warp_line)
     LinkLine(ww_grid, [("16BB", 0.5, -0.8), ("20CC", -0.85, 0.1)], common=warp_line)
     LinkLine(ww_grid, [("17P", 0.6, -0.4), ("20Q", -0.95, 0.0)], common=warp_line)
-    LinkLine(ww_grid, [("19W", 0.5, 0.1), ("20W", -0.2, 0.70)], common=warp_line)
+    LinkLine(ww_grid, [("19W", 0.6, 0.1), ("20W", 0.1, 0.65)], common=warp_line)
 
 if SHOW_KEY:
     # KEY BOX
-    Rectangle(x=21, y=50.5, width=17, height=6.5, fill=map_fill, stroke=heading)
-    Text(text="KEY:", font_size=24, x=23, y=52, stroke=heading)
-    Text(text="(All stars are main sequence)", font_size=12, x=28, y=52, stroke=heading)
-    Circle(common=dstar, cx=23, cy=53)
-    Text(text="Brown dwarf", font_size=15, x=25, y=53.2, stroke=heading)
-    Circle(common=mstar, cx=23, cy=53.5)
-    Text(text="M Class Star", font_size=15, x=25, y=53.7, stroke=heading)
-    Circle(common=kstar, cx=23, cy=54)
-    Text(text="K Class Star", font_size=15, x=25, y=54.2, stroke=heading)
-    Text(text="Vedeem", font_size=15, x=23, y=55, stroke=system_label)
+    Rectangle(x=21, y=49.5, width=17.2, height=6.7, fill=map_fill, stroke=heading)
+    Text(text="KEY:", font_size=24, x=23, y=51, stroke=heading)
+    Text(text="(All stars are main sequence)", font_size=12, x=28, y=51, stroke=heading)
+    Circle(common=dstar, cx=23, cy=52)
+    Text(text="Brown dwarf", font_size=15, x=25, y=52.2, stroke=heading)
+    Circle(common=mstar, cx=23, cy=52.5)
+    Text(text="M Class Star", font_size=15, x=25, y=52.7, stroke=heading)
+    Circle(common=kstar, cx=23, cy=53)
+    Text(text="K Class Star", font_size=15, x=25, y=53.2, stroke=heading)
+    Text(text="Vedeem", font_size=15, x=23, y=54, stroke=system_label)
     Text(text="Lettering gives the system name",
-         font_size=15, x=25, y=55, stroke=heading, align="left")
-    Text(text="REE+5", font_size=15, x=23, y=55.7,
+         font_size=15, x=25, y=54, stroke=heading, align="left")
+    Text(text="REE+5", font_size=15, x=23, y=54.7,
          stroke=system_label)
     Text(text="Number shows the economic value of the system",
-         font_size=15, x=25, y=55.5, stroke=heading, align="left")
+         font_size=15, x=25, y=54.5, stroke=heading, align="left")
     Text(text="REE+# the system is rich in Rare Earth Minerals",
-         font_size=15, x=25, y=56, stroke=heading, align="left")
-    Line(x=22, y=56.5, x1=24, y1=56, common=warp_line)
+         font_size=15, x=25, y=55, stroke=heading, align="left")
+    Line(x=22, y=55.5, x1=24, y1=55, common=warp_line)
     Text(text="Green lines show Warp Lines between the stars",
-         font_size=15, x=25, y=56.5, stroke=heading, align="left")
+         font_size=15, x=25, y=55.5, stroke=heading, align="left")
     # dust cloud
-    Rectangle(x=33, y=52.75, width=1.5, height=0.5, fill_stroke=cloud_dark, transparency=50)
-    Line(x=33, y=53, x1=34.5, y1=53, stroke=cloud_edge, stroke_width=3)
-    Line(x=33, y=54, x1=34.5, y1=54, stroke=cloud_edge, stroke_width=3, dotted=True)
-    Text(text="Dust Cloud:", font_size=15, x=33, y=52, stroke=heading, align="left")
-    Text(text="Max 10 PD", font_size=15, x=35, y=53, stroke=heading, align="left")
-    Text(text="Max 20 PD", font_size=15, x=35, y=54, stroke=heading, align="left")
+    Rectangle(x=33, y=51.75, width=1.5, height=0.5, fill_stroke=cloud_dark, transparency=50)
+    Line(x=33, y=52, x1=34.5, y1=52, stroke=cloud_edge, stroke_width=3)
+    Line(x=33, y=53, x1=34.5, y1=53, stroke=cloud_edge, stroke_width=3, dotted=True)
+    Text(text="Dust Cloud:", font_size=15, x=33, y=51, stroke=heading, align="left")
+    Text(text="Max 10 PD", font_size=15, x=35, y=52, stroke=heading, align="left")
+    Text(text="Max 20 PD", font_size=15, x=35, y=53, stroke=heading, align="left")
 
 Save()
