@@ -821,14 +821,11 @@ class CircleShape(BaseShape):
             self.draw_radii(cnv, ID, self.x_c, self.y_c)
         # ---- centred shape (with offset)
         if self.centre_shape:
-            cshape_name = self.centre_shape.__class__.__name__
-            if cshape_name in GRID_SHAPES_WITH_CENTRE:
+            if self.can_draw_centred_shape(self.centre_shape):
                 self.centre_shape.draw(
                     _abs_cx=x + self.unit(self.centre_shape_mx),
                     _abs_cy=y + self.unit(self.centre_shape_my),
                 )
-            elif cshape_name not in GRID_SHAPES_WITH_CENTRE:
-                feedback(f"Cannot draw a centered {cshape_name}!")
         # ---- cross
         self.draw_cross(cnv, self.x_c, self.y_c, rotation=kwargs.get("rotation"))
         # ---- dot
@@ -1314,14 +1311,11 @@ class EquilateralTriangleShape(BaseShape):
             self.draw_hatch(cnv, ID, side, self.vertexes, self.hatch_count, rotation)
         # ---- centred shape (with offset)
         if self.centre_shape:
-            cshape_name = self.centre_shape.__class__.__name__
-            if cshape_name in GRID_SHAPES_WITH_CENTRE:
+            if self.can_draw_centred_shape(self.centre_shape):
                 self.centre_shape.draw(
                     _abs_cx=self.centroid.x + self.unit(self.centre_shape_mx),
                     _abs_cy=self.centroid.y + self.unit(self.centre_shape_my),
                 )
-            elif cshape_name not in GRID_SHAPES_WITH_CENTRE:
-                feedback(f"Cannot draw a centered {cshape_name}!")
         # ---- dot
         self.draw_dot(cnv, self.centroid.x, self.centroid.y)
         # ---- text
@@ -2123,16 +2117,11 @@ class HexShape(BaseShape):
             self.draw_perbis(cnv, ID, Point(self.x_d, self.y_d), self.vertexes)
         # ---- centred shape (with offset)
         if self.centre_shape:
-            cshape_name = self.centre_shape.__class__.__name__
-            if cshape_name in GRID_SHAPES_WITH_CENTRE:
-                # feedback(f'*** IN-HEX {cshape_name} at ({self.x_d=},{self.y_d=}, '
-                #               f'{self.centre_shape_x}, {self.centre_shape_y})')
+            if self.can_draw_centred_shape(self.centre_shape):
                 self.centre_shape.draw(
                     _abs_cx=self.x_d + self.unit(self.centre_shape_mx),
                     _abs_cy=self.y_d + self.unit(self.centre_shape_my),
                 )
-            elif cshape_name not in GRID_SHAPES_WITH_CENTRE:
-                feedback(f"Cannot draw a centered {cshape_name}!")
         # ---- cross
         self.draw_cross(cnv, self.x_d, self.y_d, rotation=kwargs.get("rotation"))
         # ---- dot
@@ -2321,9 +2310,11 @@ class PolygonShape(BaseShape):
         else:
             x = self._u.x + self._o.delta_x
             y = self._u.y + self._o.delta_y
-        if self._abs_cx is not None and self._abs_cy is not None:
-            x = self._abs_cx
-            y = self._abs_cy
+        # ---- recalculate centre if preset
+        if self.use_abs_c:
+            if self._abs_cx is not None and self._abs_cy is not None:
+                x = self._abs_cx
+                y = self._abs_cy
         return Point(x, y)
 
     def get_angles(self, rotation: float = 0, is_rotated: bool = False) -> list:
@@ -2568,14 +2559,11 @@ class PolygonShape(BaseShape):
             self.draw_mesh(cnv, ID, vertices)
         # ---- centred shape (with offset)
         if self.centre_shape:
-            cshape_name = self.centre_shape.__class__.__name__
-            if cshape_name in GRID_SHAPES_WITH_CENTRE:
+            if self.can_draw_centred_shape(self.centre_shape):
                 self.centre_shape.draw(
                     _abs_cx=x + self.unit(self.centre_shape_mx),
                     _abs_cy=y + self.unit(self.centre_shape_my),
                 )
-            elif cshape_name not in GRID_SHAPES_WITH_CENTRE:
-                feedback(f"Cannot draw a centered {cshape_name}!")
         # ---- debug
         self._debug(cnv, vertices=vertices)  # needs: self.run_debug = True
         # ---- dot
@@ -2803,6 +2791,10 @@ class RectangleShape(BaseShape):
     def get_vertexes(self, **kwargs):
         """Get vertices for rectangle without notches."""
         x, y = self.calculate_xy(**kwargs)
+        # ---- overrides for grid layout
+        if self.use_abs_c:
+            x = self._abs_cx - self._u.width / 2.0
+            y = self._abs_cy - self._u.height / 2.0
         vertices = [  # anti-clockwise from top-left; relative to centre
             Point(x, y),  # e
             Point(x, y + self._u.height),  # s
@@ -3521,15 +3513,11 @@ class RectangleShape(BaseShape):
 
         # ---- centred shape (with offset)
         if self.centre_shape:
-            cshape_name = self.centre_shape.__class__.__name__
-            if cshape_name in GRID_SHAPES_WITH_CENTRE:
+            if self.can_draw_centred_shape(self.centre_shape):
                 self.centre_shape.draw(
                     _abs_cx=x_d + self.unit(self.centre_shape_mx),
                     _abs_cy=y_d + self.unit(self.centre_shape_my),
                 )
-            elif cshape_name not in GRID_SHAPES_WITH_CENTRE:
-                feedback(f"Cannot draw a centered {cshape_name}!")
-
         # ---- cross
         self.draw_cross(cnv, x_d, y_d, rotation=kwargs.get("rotation"))
         # ---- dot
@@ -3557,7 +3545,12 @@ class RhombusShape(BaseShape):
 
     def get_vertexes(self, **kwargs):
         """Calculate vertices of rhombus."""
-        x_s, y_s = kwargs.get("x"), kwargs.get("y") + self._u.height / 2.0
+        x, y = kwargs.get("x"), kwargs.get("y")
+        # ---- overrides for grid layout
+        if self.use_abs_c:
+            x = self._abs_cx - self._u.width / 2.0
+            y = self._abs_cy - self._u.height / 2.0
+        x_s, y_s = x, y + self._u.height / 2.0
         vertices = []
         vertices.append(Point(x_s, y_s))
         vertices.append(Point(x_s + self._u.width / 2.0, y_s + self._u.height / 2.0))
@@ -4418,10 +4411,7 @@ class TrapezoidShape(BaseShape):
 
     def calculate_xy(self):
         # ---- adjust start
-        if self.use_abs_c:
-            x = self._abs_cx
-            y = self._abs_cy
-        elif self.cx is not None and self.cy is not None:
+        if self.cx is not None and self.cy is not None:
             x = self._u.cx - self._u.width / 2.0 + self._o.delta_x
             y = self._u.cy - self._u.height / 2.0 + self._o.delta_y
         elif self.use_abs:
@@ -4430,8 +4420,15 @@ class TrapezoidShape(BaseShape):
         else:
             x = self._u.x + self._o.delta_x
             y = self._u.y + self._o.delta_y
-        cx = x + self._u.width / 2.0
-        cy = y + self._u.height / 2.0
+        # ---- overrides for grid layout
+        if self.use_abs_c:
+            cx = self._abs_cx
+            cy = self._abs_cy
+            x = cx - self._u.width / 2.0
+            y = cy - self._u.height / 2.0
+        else:
+            cx = x + self._u.width / 2.0
+            cy = y + self._u.height / 2.0
         if self.flip:
             if str(self.flip).lower() in ["s", "south"]:
                 y = y + self._u.height

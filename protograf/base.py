@@ -46,6 +46,7 @@ from protograf.utils.constants import (
     DEBUG_COLOR,
     DEFAULT_FONT,
     DEFAULT_MARGIN_SIZE,
+    GRID_SHAPES_WITH_CENTRE,
 )
 from protograf.globals import unit
 from protograf.utils.messaging import feedback
@@ -2256,7 +2257,7 @@ class BaseShape:
                         canvas,
                         vert.x,
                         vert.y,
-                        f"{key}",
+                        f"{key}:{vert.x:.1f},{vert.y:.1f}",
                         **kwargs,
                     )
                     canvas.draw_circle((vert.x, vert.y), 1)
@@ -2271,7 +2272,7 @@ class BaseShape:
                 x = self.points_to_value(point.x)
                 y = self.points_to_value(point.y)
                 self.draw_multi_string(
-                    canvas, point.x, point.y, f"{label} {point.x:.2f},{point.y:.2f}"
+                    canvas, point.x, point.y, f"{label}:{point.x:.1f},{point.y:.1f}"
                 )
                 canvas.draw_circle((point.x, point.y), 1)
             self.set_canvas_props(cnv=canvas, index=None, **kwargs)
@@ -2430,9 +2431,9 @@ class BaseShape:
         for bdirection in _bdirections:
             if not bdirection:
                 continue
-            # ---- line start & end
+            # ---- get line start & end
             match self.__class__.__name__:
-
+                # ---- * Rect, Sq, Trap
                 case "RectangleShape" | "SquareShape" | "TrapezoidShape":
                     match bdirection:  # vertices anti-clockwise from top-left
                         case "w":
@@ -2452,7 +2453,7 @@ class BaseShape:
                                 f"Invalid direction ({bdirection}) for {shape_name} border",
                                 True,
                             )
-
+                # ---- * Rhombus
                 case "RhombusShape":
                     match bdirection:
                         case "se":
@@ -2472,7 +2473,7 @@ class BaseShape:
                                 f"Invalid direction ({bdirection}) for {shape_name} border",
                                 True,
                             )
-
+                # ---- * Hex
                 case "HexShape":
                     if self.orientation == "pointy":
                         match bdirection:
@@ -2543,6 +2544,16 @@ class BaseShape:
                 dotted=dotted,
                 dashed=dashed,
             )
+
+    def can_draw_centred_shape(self, centre_shape) -> bool:
+        """Test if a given Shape can be drawn at centre of another."""
+        cshape_name = centre_shape.__class__.__name__
+        if cshape_name in GRID_SHAPES_WITH_CENTRE:
+            return True
+        else:
+            _name = cshape_name.replace("Shape", "")
+            feedback(f"Cannot draw a centered {_name}!")
+        return False
 
 
 class GroupBase(list):

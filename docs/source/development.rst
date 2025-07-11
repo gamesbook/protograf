@@ -110,8 +110,9 @@ Follow this process:
 
 - |check| If working in a branch, merge changes into master
 - |check| Ensure you are on the ``master`` branch
-- |check| Format code with black (``black protograf``)
+- |check| Format primary code with black (``black protograf``)
 - |check| Finalise release date and notes in ``CHANGES.txt``
+- |check| Ensure all the examples can be run by using a shell script
 - |check| Update the ``examples.zip`` file with latest example code
 - |check| Update the version using poetry e.g. ``poetry version patch``
 - |check| Commit and push all these changes to GitHub

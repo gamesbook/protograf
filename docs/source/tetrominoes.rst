@@ -113,12 +113,16 @@ Tetromino: Tetris-styled
 
          Tetromino(
              x=1.5, y=0,
-             letter="s",
-             label="s",
+             side=0.5,
+             letter="I",
              tetris=True)
 
       Each of the five shapes is constructed in the same way |dash| setting
-      the *letter* property to one of: i, s, l, o, or t.
+      the *letter* property to one of: I, S, L, O, or T (or their lowercase
+      equivalent).
+
+      In addition, the ``*`` value for the letter can be used to create a
+      single grey monominoe.
 
       The *tetris* property overrides the default color and stroke of the
       shapes and creates a style that mimics that used in the original

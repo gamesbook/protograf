@@ -603,6 +603,60 @@ Hexagon(x=1, y=3, height=2,
         centre_shape_mx=0.3, centre_shape_my=0.6)
 PageBreak()
 
+# ---- Centred Shapes - customised
+Blueprint()
+Text(common=txt, text="Centred Shape: customised")
+Rectangle(x=0, y=1, side=1,
+          centre_shape=polygon(
+              radius=0.4,
+              sides=7,
+              fill=None,
+              perbis='*',
+              stroke="red"))
+Rectangle(x=1, y=2, side=1,
+          centre_shape=circle(
+              radius=0.3,
+              radii=[0,60,120,180,240,300],
+              fill=None,
+              stroke="green"))
+Rectangle(x=2, y=1, side=1,
+          centre_shape=hexagon(
+              radius=0.4,
+              stroke="purple",
+              fill=None,
+              borders=[("sw n se", 2)]))
+Rectangle(x=3, y=2, side=1,
+          centre_shape=stadium(
+              side=0.4,
+              stroke="orange"))
+Rectangle(x=0, y=3, side=1,
+          centre_shape=ellipse(
+              height=0.8,
+              width=0.5,
+              fill=None,
+              stroke="olive"))
+Rectangle(x=1, y=4, side=1,
+          centre_shape=square(
+              side=0.6,
+              stroke="gold",
+              fill=None,
+              hatch='d', hatch_count=5,
+              borders=[("n s", 2, "black")]))
+Rectangle(x=2, y=3, side=1,
+          centre_shape=rhombus(
+              side=0.8,
+              stroke="gray",
+              fill=None,
+              borders=[("ne sw", 2, "black")]))
+Rectangle(x=3, y=4, side=1,
+          centre_shape=trapezoid(
+              width=0.6, top=0.4, height=0.8,
+              stroke="aqua",
+              fill=None,
+              flip='south',
+              borders=[("e w", 2, "black")]))
+PageBreak()
+
 # ---- QR Code
 Blueprint()
 Text(common=txt, text="QR Code")
@@ -781,7 +835,8 @@ Save(
         "rectangles_rowcol", "rectangles_custom", "rhombus_custom",
         "rhombus_borders", "trapezoid_borders",
         "arrow_sizes", "arrow_rotate", "arrowheads", "polyline_arrow",
-        "shape_centred", "shape_centred_move", "qr_code", "image_sliced",
+        "shape_centred", "shape_centred_move", "shape_centred_custom",
+        "qr_code", "image_sliced",
         "shape_rotation", "shape_hatch_and_rotation",
         "text_style", "text_custom", "text_rotate",
         None])

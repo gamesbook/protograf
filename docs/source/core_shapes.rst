@@ -3580,3 +3580,74 @@ The centre-shape can be shifted from the centre by setting values for
       negative values move it up and to the left.
 
 ===== ======
+
+Example 3. Customised Centres
++++++++++++++++++++++++++++++
+
+.. |cs2| image:: images/customised/shape_centred_custom.png
+   :width: 330
+
+The centre-shape can be any type of shape that has a defined centre;
+and this shape itself can be customised.
+
+===== ======
+|cs2| This example shows Rectangle shapes, each constructed with a
+      ``centre_shape`` as follows:
+
+      .. code:: python
+
+        Rectangle(x=0, y=1, side=1,
+                  centre_shape=polygon(
+                      radius=0.4,
+                      sides=7,
+                      fill=None,
+                      perbis='*',
+                      stroke="red"))
+        Rectangle(x=1, y=2, side=1,
+                  centre_shape=circle(
+                      radius=0.3,
+                      radii=[0,60,120,180,240,300],
+                      fill=None,
+                      stroke="green"))
+        Rectangle(x=2, y=1, side=1,
+                  centre_shape=hexagon(
+                      radius=0.4,
+                      stroke="purple",
+                      fill=None,
+                      borders=[("sw n se", 2)]))
+        Rectangle(x=3, y=2, side=1,
+                  centre_shape=stadium(
+                      side=0.4,
+                      stroke="orange"))
+        Rectangle(x=0, y=3, side=1,
+                  centre_shape=ellipse(
+                      height=0.8,
+                      width=0.5,
+                      fill=None,
+                      stroke="olive"))
+        Rectangle(x=1, y=4, side=1,
+                  centre_shape=square(
+                      side=0.6,
+                      stroke="gold",
+                      fill=None,
+                      hatch='d', hatch_count=5,
+                      borders=[("n s", 2, "black")]))
+        Rectangle(x=2, y=3, side=1,
+                  centre_shape=rhombus(
+                      side=0.8,
+                      stroke="gray",
+                      fill=None,
+                      borders=[("ne sw", 2, "black")]))
+        Rectangle(x=3, y=4, side=1,
+                  centre_shape=trapezoid(
+                      width=0.6, top=0.4, height=0.8,
+                      stroke="aqua",
+                      fill=None,
+                      flip='south',
+                      borders=[("e w", 2, "black")]))
+
+      These various shapes and their custom properties are described
+      elsewhere in the documentation; this example just serves to show
+      how they can be used together.
+
+===== ======
