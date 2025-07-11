@@ -16,7 +16,7 @@ Create(filename="pentominoes_basic.pdf",
 
 header = Common(x=0, y=0, font_size=12, align="left")
 
-# ---- basic
+# ---- basic Pentomino - upper
 Blueprint(stroke_width=0.5, subdivisions=1)
 Text(common=header, text="Pentomino: Basic")
 
@@ -38,6 +38,8 @@ Pentomino(x=1.5, y=4.5, letter="X", label="X", common=basics, fill="silver")
 Pentomino(x=2.5, y=4.5, letter="Z", label="Z", common=basics)
 PageBreak()
 
+
+# ---- basic Pentomino - lower
 Blueprint(stroke_width=0.5, subdivisions=1)
 Text(common=header, text="Pentomino: Lowercase")
 Pentomino(x=0, y=0, letter="i", label="i", common=basics)
@@ -56,7 +58,7 @@ Pentomino(x=1.5, y=4.5, letter="x", label="x", common=basics, fill="silver")
 Pentomino(x=2.5, y=4.5, letter="z", label="z", common=basics)
 PageBreak()
 
-# ---- basic
+# ---- basic Tetromino - upper
 Blueprint(stroke_width=0.5, subdivisions=1)
 Text(common=header, text="Tetromino: Basic")
 
@@ -69,6 +71,7 @@ Tetromino(x=0, y=3.75, letter="L", label="L", common=tbasics)
 Tetromino(x=1.75, y=4, letter="T", label="T", common=tbasics)
 PageBreak()
 
+# ---- basic Tetromino - lower
 Blueprint(stroke_width=0.5, subdivisions=1)
 Text(common=header, text="Tetromino: Lowercase")
 
@@ -79,6 +82,22 @@ Tetromino(x=1.5, y=0, letter="s", label="s", common=tbasics)
 Tetromino(x=2, y=2, letter="o", label="o", common=tbasics)
 Tetromino(x=0, y=3.75, letter="l", label="l", common=tbasics)
 Tetromino(x=1.75, y=4, letter="t", label="t", common=tbasics)
+PageBreak()
+
+
+# ---- Tetromino - tetris style
+Blueprint(stroke_width=0.5, subdivisions=1)
+Text(common=header, text="Tetromino: Tetris")
+
+Tetromino(x=0.5, y=0.5, letter="I", tetris=True, side=0.5)
+Tetromino(x=1.5, y=0.5, letter="T", tetris=True, side=0.5)
+Tetromino(x=0.5, y=2.5, letter="S", tetris=True, side=0.5)
+Tetromino(x=2.5, y=2.5, letter="s", tetris=True, side=0.5)
+Tetromino(x=1.5, y=4, letter="O", tetris=True, side=0.5)
+Tetromino(x=0.5, y=4, letter="L", tetris=True, side=0.5)
+Tetromino(x=2.5, y=4, letter="l", tetris=True, side=0.5)
+Tetromino(x=0.5, y=0.5, letter="I", tetris=True, side=0.5)
+Tetromino(x=3, y=1.5, letter="*", tetris=True, side=0.5)
 
 Save(
     output='png',
@@ -89,5 +108,6 @@ Save(
         'pentomino_lower',
         'tetromino_upper',
         'tetromino_lower',
+        'tetromino_tetris',
     ]
 )

@@ -16,9 +16,6 @@ It also assumes you have read through the section on
 
 .. _table-of-contents-deck:
 
-Table of Contents
-=================
-
 - `Overview`_
 
   - `Primary Properties`_

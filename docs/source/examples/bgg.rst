@@ -16,9 +16,6 @@ will demonstrate full scalability.
 
 .. _table-of-contents-exbgg:
 
-Table of Contents
-=================
-
 - `Basic`_
 - `Image-based`_
 - `Images and QR`_

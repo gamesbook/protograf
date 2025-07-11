@@ -1,6 +1,6 @@
-===========
-Development
-===========
+=========================
+Appendix III: Development
+=========================
 
 .. |dash| unicode:: U+2014 .. EM DASH SIGN
 .. |check| unicode:: U+2610 .. BALLOT BOX
@@ -11,9 +11,6 @@ or who just want to use :doc:`protograf <index>` as part of other Python
 projects.
 
 .. _table-of-contents-dev:
-
-Table of Contents
-=================
 
 - `Coding`_
 - `Package Management`_

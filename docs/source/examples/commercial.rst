@@ -20,9 +20,6 @@ will demonstrate full scalability.
 
 .. _table-of-contents-excomm:
 
-Table of Contents
-=================
-
 - `Squad Leader`_
 - `Orion`_
 - `Adventurer Conqueror King`_

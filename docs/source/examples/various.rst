@@ -14,9 +14,6 @@ will demonstrate full scalability.
 
 .. _table-of-contents-exvar:
 
-Table of Contents
-=================
-
 - `A Clock`_
 - `Chords`_
 - `Rondel`_

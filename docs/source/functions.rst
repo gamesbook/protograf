@@ -15,8 +15,19 @@ This list provides a guide to using all the custom functions specific to
   `Python packages <https://pypi.org>`_  |dash| can be also be used to
   further enhance your own script.
 
+.. _table-of-contents-func:
+
+- `Overview`_
+- `Summary`_
+- `split()`_
+- `steps()`_
+- `uni()`_
+- `group()`_
+
+
 Overview
 ========
+`↑ <table-of-contents-func_>`_
 
 Functions |dash| in both :doc:`protograf <index>` and Python |dash| represent
 "tools" designed to process or create data to achieve a specific outcome.
@@ -38,6 +49,7 @@ function's behaviour.
 
 Summary
 =======
+`↑ <table-of-contents-func_>`_
 
 - `split()`_ -  turn a string into a list
 - `steps()`_ - generate a list of numbers
@@ -49,7 +61,7 @@ Summary
 
 split()
 =======
-`↑ <summary-func_>`_
+`^ <summary-func_>`_
 
 The ``split()`` function is used to turn a string into a list; for example:
 
@@ -97,7 +109,7 @@ generates this list: ``["A", "B", "C"]``
 
 steps()
 =======
-`↑ <summary-func_>`_
+`^ <summary-func_>`_
 
 The ``steps()`` function is used to generate a list of numbers.
 
@@ -131,8 +143,8 @@ which generates this list: ``[10.5, 8.25, 6.0, 3.75, 1.5]``
 .. _uni-function:
 
 uni()
-=======
-`↑ <summary-func_>`_
+=====
+`^ <summary-func_>`_
 
 The ``uni()`` function is used to access a symbol, or glyph, from a font's
 character set by providing its Unicode text value as ``U+`` value.
@@ -153,7 +165,7 @@ To use this in a script, simply wrap it in the function as:
 
 group()
 =======
-`↑ <summary-func_>`_
+`^ <summary-func_>`_
 
 The ``group()`` function is used when working with
 :doc:`Card Decks <card_decks>`  - see :ref:`group() <group-function>`

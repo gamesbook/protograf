@@ -4,10 +4,10 @@ Worked Example for a Deck of Cards
 
 .. |dash| unicode:: U+2014 .. EM DASH SIGN
 
-These examples assumes that you have set-up your computer with Python and
-have tested to **check that you can create a test file which generates a
-blank PDF**. If not, please first see the :doc:`Setting Up <setting_up>`
-document.
+These examples assume that you have set-up your computer with Python,
+installed :doc:`protograf <index>` and have tested to **check that you
+can create a test file which generates a blank PDF**.
+If not, please first see the :doc:`Setting Up <setting_up>` document.
 
 It will also be helpful if you have read the
 :doc:`Basic Concepts <basic_concepts>` section.  However, do note that
@@ -70,7 +70,7 @@ Type the following::
 The output PDF file should now have been created, in the same directory
 as your ``cards1.py`` file, called ``cards1.pdf``. If you open this in a
 PDF reader program, you should see that it contains a set of 9 blank,
-Poker-card sized, rectangular outlines (which we are calling "cards")
+Poker-card sized, rectangular frames (which we are calling "cards")
 laid out in a grid on an A4-sized page.
 
 .. NOTE::
@@ -78,7 +78,7 @@ laid out in a grid on an A4-sized page.
     The default paper size for **protograf** is *A4* which is a standard
     ISO paper size of about 21 x 30 centimetres (approximately 8.3 x 11.7
     inches), chosen because this is most common type of paper encountered
-    globally.
+    globally. Thie can be changed if needed; see below!
 
 
 A simple card deck example: Take 2

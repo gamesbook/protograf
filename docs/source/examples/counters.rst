@@ -14,9 +14,6 @@ will demonstrate full scalability.
 
 .. _table-of-contents-excntr:
 
-Table of Contents
-=================
-
 - `Wargame - Basic Counters`_
 - `Wargame - Counters from CSV`_
 - `Wargame - Counters from Excel`_

@@ -12,9 +12,6 @@ and that you've created some basic scripts of your own using the
 
 .. _table-of-contents-trilay:
 
-Table of Contents
-=================
-
 - `Overview`_
 - `Usage`_
 - `Key Properties`_

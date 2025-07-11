@@ -18,9 +18,6 @@ in :doc:`Core Shapes <core_shapes>`.
 
 .. _table-of-contents-custom:
 
-Table of Contents
-=================
-
 - `Overview`_
 - `Line`_
 - `Rectangle`_

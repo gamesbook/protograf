@@ -1,6 +1,6 @@
-==============================
-Appendix III: Useful Resources
-==============================
+=============================
+Appendix IV: Useful Resources
+=============================
 
 These are resources that might supplement, or aid, with game design when
 working with :doc:`protograf <index>`.
@@ -29,14 +29,15 @@ https://www.fairway3games.com/where-do-i-get-art-for-free-an-ongoing-list/
 https://web.archive.org/web/20220330035328/https://www.fairway3games.com/where-do-i-get-art-for-free-an-ongoing-list/)
 
 
-Card Images
-===========
+Card Suit Icons
+===============
 
 -  Playing Cards - the section has a table showing a number of symbols
    linked to image files:
    https://en.wikipedia.org/wiki/Playing_card#Modern_formats
 
 -  New Suit Icons - https://boardgamegeek.com/image/7928106/bmorayta1
+
 
 .. _unicode-characters:
 

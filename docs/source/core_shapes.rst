@@ -19,9 +19,6 @@ the section on :doc:`Additional Concepts <additional_concepts>`.
 
 .. _table-of-contents-core:
 
-Table of Contents
------------------
-
 -  `Shape Index`_
 -  `Overview`_
 -  `Commonalities`_

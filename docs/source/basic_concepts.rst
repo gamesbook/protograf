@@ -15,9 +15,6 @@ detailed definitions of some of the terms in the section covering
 
 .. _table-of-contents-basic:
 
-Table of Contents
-=================
-
 - `How you’ll use protograf`_
 - `The "script" concept`_
 - `The "position" concept`_
@@ -183,12 +180,12 @@ Element properties
 For example, settings can include:
 
 - the *height* |dash| size in the vertical direction and *width* |dash| the
-  size in the horizontal direction, of a rectangle;
-- the *width* and *stroke*, i.e. color, of the line used to draw a rectangle;
-- the *radius* or *diameter* of a circle;
-- the  *color*, *paper* size, and so on for the document.
+  size in the horizontal direction, of some shapes
+- the *width* and *stroke*, i.e. color, of the line used to draw a shape
+- the *radius* or *diameter* |dash| to set the size of a circle or polygon
+- the  *color*, *paper* size, and so on for the document
 
-All of these kinds of settings are termed **properties**.
+All of these types of settings are termed **properties**.
 
 Most of the common properties are defined in the section covering
 :doc:`terminology <terminology>` and their usage is covered in
@@ -268,8 +265,8 @@ millimetres |dash| or anything else |dash| are converted to points.
 .. NOTE::
 
    In a few cases, **protograf** adopts the word "size" where point units are
-   in use e.g. font size, but because "size" is such a general word,  it's
-   not really used that much.
+   in use e.g. font size and stroke width, but because "size" is such a general
+   term,  it's not really used elsewhere.
 
 
 .. _stroke-concept:
@@ -327,3 +324,6 @@ Some examples of defaults are:
   extension is changed to ``.pdf`` because this is the default output type
   that is created. So, if your script is called ``test01.py`` then the
   default output file that is created will be called ``test01.pdf``.
+
+  Use the :ref:`Create <create-command>` command to set your own output
+  filename.

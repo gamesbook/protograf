@@ -13,9 +13,6 @@ or two basic scripts on your own, along the lines described in the
 
 .. _table-of-contents-addcon:
 
-Table of Contents
-=================
-
 -  `Names and Naming`_
 -  `Value Types: Text, Numbers and Booleans`_
 -  `Assigned Names`_

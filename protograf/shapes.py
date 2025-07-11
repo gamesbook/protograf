@@ -2315,16 +2315,15 @@ class PolygonShape(BaseShape):
 
     def get_centre(self) -> Point:
         """Calculate the centre as a Point (in units)"""
+        if self.cx is not None and self.cy is not None:
+            x = self._u.cx + self._o.delta_x
+            y = self._u.cy + self._o.delta_y
+        else:
+            x = self._u.x + self._o.delta_x
+            y = self._u.y + self._o.delta_y
         if self._abs_cx is not None and self._abs_cy is not None:
             x = self._abs_cx
             y = self._abs_cy
-        else:
-            if self.cx is not None and self.cy is not None:
-                x = self._u.cx + self._o.delta_x
-                y = self._u.cy + self._o.delta_y
-            else:
-                x = self._u.x + self._o.delta_x
-                y = self._u.y + self._o.delta_y
         return Point(x, y)
 
     def get_angles(self, rotation: float = 0, is_rotated: bool = False) -> list:
@@ -2448,8 +2447,8 @@ class PolygonShape(BaseShape):
         if is_rotated:
             x, y = 0.0, 0.0  # centre for now-rotated canvas
         else:
-            x = self._u.x + self._o.delta_x
-            y = self._u.y + self._o.delta_y
+            centre = self.get_centre()
+            x, y = centre.x, centre.y
         # calculate side
         if self.height:
             side = self._u.height / math.sqrt(3)
@@ -3946,9 +3945,15 @@ class StadiumShape(BaseShape):
         else:
             x = self._u.x + self._o.delta_x
             y = self._u.y + self._o.delta_y
-        # ---- overrides to centre the shape
+        # ---- calculate centre of the shape
         cx = x + self._u.width / 2.0
         cy = y + self._u.height / 2.0
+        # ---- overrides for grid layout
+        if self._abs_cx is not None and self._abs_cy is not None:
+            cx = self._abs_cx
+            cy = self._abs_cy
+            x = cx - self._u.width / 2.0
+            y = cy - self._u.height / 2.0
         # ---- handle rotation
         rotation = kwargs.get("rotation", self.rotation)
         if rotation:

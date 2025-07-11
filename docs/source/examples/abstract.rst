@@ -14,9 +14,6 @@ will demonstrate full scalability.
 
 .. _table-of-contents-exabs:
 
-Table of Contents
-=================
-
 - `Chess`_
 - `Backgammon`_
 - `Go`_
