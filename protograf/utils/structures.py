@@ -164,6 +164,21 @@ PolyGeometry = namedtuple(
 
 Ray = namedtuple("Ray", ["x", "y", "angle"])
 
+ShapeProperties = namedtuple(
+    "ShapeProperties",
+    [
+        "width",
+        "color",
+        "fill",
+        "lineCap",
+        "lineJoin",
+        "dashes",
+        "fill_opacity",
+        "morph",
+        "closePath",
+    ],
+)
+
 Tetris3D = namedtuple(
     "Tetris3D",
     [

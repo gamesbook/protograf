@@ -189,6 +189,7 @@ class BaseCanvas:
         # pymupdf lineCap: 0 = line ends in sharp edge; 1 = adds semi-circle at end
         self.stroke_cap = self.defaults.get("stroke_cap", 0)
         self.outline = self.defaults.get("outline", None)
+        self.outlined = self.defaults.get("outlined", False)
         # ---- overwrite fill & stroke
         if self.stroke_fill:  # alias
             self.stroke = self.stroke_fill
@@ -200,9 +201,6 @@ class BaseCanvas:
         debug_color = self.defaults.get("debug_color", DEBUG_COLOR)
         self.debug_color = tools.get_color(debug_color)
         self.transparency = self.defaults.get("transparency", 1)  # NOT transparent
-        # if self.outline:
-        #     self.stroke = self.outline
-        #     self.fill = None
         # ---- font
         self.font_name = self.defaults.get("font_name", DEFAULT_FONT)
         self.font_file = self.defaults.get("font_file", None)
@@ -279,11 +277,21 @@ class BaseCanvas:
         self.transform = self.defaults.get("transform", None)
         self.html = self.defaults.get("html", False)
         self.css = self.defaults.get("css", None)
-        # ---- text block / polyomino
+        # ---- polyomino / text outline
         self.outline_stroke = self.defaults.get("outline_stroke", None)
         self.outline_width = self.defaults.get("outline_width", 0)
         self.outline_dashed = self.defaults.get("outline_dashed", None)
         self.outline_dotted = self.defaults.get("outline_dotted", None)
+        # if self.outlined:
+        #     self.stroke = self.outline_stroke
+        #     self.fill = None
+        # ---- text block rectangle
+        self.block_fill = self.defaults.get("block_fill", None)
+        self.block_stroke = self.defaults.get("block_stroke", None)
+        self.block_stroke_width = self.defaults.get("block_stroke_width", 0)
+        self.block_dashed = self.defaults.get("block_dashed", None)
+        self.block_dotted = self.defaults.get("block_dotted", None)
+        self.block_transparency = self.defaults.get("block_transparency", None)
         # ---- image / file
         self.source = self.defaults.get("source", None)  # file or http://
         self.cache_directory = None  # should be a pathlib.Path object
@@ -623,6 +631,7 @@ class BaseShape:
         self.stroke = kwargs.get("stroke", kwargs.get("stroke_color", base.stroke))
         self.fill_stroke = kwargs.get("fill_stroke", base.fill_stroke)
         self.outline = kwargs.get("outline", base.outline)
+        self.outlined = kwargs.get("outlined", base.outlined)
         self.stroke_width = self.kw_float(kwargs.get("stroke_width", base.stroke_width))
         self.stroke_cap = self.kw_int(kwargs.get("stroke_cap", base.stroke_cap))
         # ---- overwrite fill&stroke colors
@@ -631,9 +640,6 @@ class BaseShape:
         if self.fill_stroke:
             self.stroke = self.fill_stroke
             self.fill = self.fill_stroke
-        if self.outline:
-            self.stroke = self.outline
-            self.fill = None
         # ---- debug color & transparency
         self.debug_color = kwargs.get("debug_color", base.debug_color)
         self.transparency = self.kw_float(kwargs.get("transparency", base.transparency))
@@ -691,14 +697,28 @@ class BaseShape:
         self.transform = kwargs.get("transform", base.transform)
         self.html = self.kw_bool(kwargs.get("html", base.html))
         self.css = kwargs.get("css", base.css)
-        # ---- text block / polyomino
+        self.leading = self.kw_float(kwargs.get("leading", self.font_size))
+        # ---- polyomino / text outline
         self.outline_stroke = kwargs.get("outline_stroke", base.outline_stroke)
         self.outline_width = self.kw_float(
             kwargs.get("outline_width", base.outline_width)
         )
         self.outline_dashed = kwargs.get("outline_dashed", base.outline_dashed)
         self.outline_dotted = kwargs.get("outline_dotted", base.outline_dotted)
-        self.leading = self.kw_float(kwargs.get("leading", self.font_size))
+        # if self.outlined:
+        #     self.stroke = self.outline_stroke
+        #     self.fill = None
+        # ---- text block
+        self.block_stroke = kwargs.get("block_stroke", base.block_stroke)
+        self.block_fill = kwargs.get("block_fill", base.block_fill)
+        self.block_stroke_width = self.kw_float(
+            kwargs.get("block_stroke_width", base.block_stroke_width)
+        )
+        self.block_dashed = kwargs.get("block_dashed", base.block_dashed)
+        self.block_dotted = kwargs.get("block_dotted", base.block_dotted)
+        self.block_transparency = kwargs.get(
+            "block_transparency", base.block_transparency
+        )
         # feedback(f"### BShp:"
         # f"{self} {kwargs.get('fill')=} {self.fill=} {kwargs.get('fill_color')=}")
         # ---- image / file
@@ -1117,6 +1137,8 @@ class BaseShape:
         defaults["transparency"] = self.transparency
         defaults["dotted"] = self.dotted
         defaults["dashed"] = self.dashed
+        if kwargs.get("rounded"):
+            kwargs["lineJoin"] = 1
         # print(f'### SetCnvProps: {kwargs.keys()} \n {kwargs.get("closed", "?")=}')
         return tools.set_canvas_props(cnv, index, defaults, **kwargs)
 

@@ -4291,9 +4291,35 @@ class TextShape(BaseShape):
         # https://pymupdf.readthedocs.io/en/latest/shape.html#Shape.insert_textbox
         keys = {}
         keys["rotate"] = text_rotation
-        # ---- BOX text
+        # ---- rectangle for text
         current_page = globals.doc_page
         rect = muRect(x_t, y_t, x_t + width, y_t + height)
+        if (
+            self.block_stroke
+            or self.block_fill
+            or self.block_dashed
+            or self.block_dotted
+        ):
+            rkwargs = copy.copy(kwargs)
+            rkwargs["fill"] = self.block_fill
+            rkwargs["stroke"] = self.block_stroke
+            rkwargs["stroke_width"] = self.block_stroke_width or self.stroke_width
+            rkwargs["dashed"] = self.block_dashed
+            rkwargs["dotted"] = self.block_dotted
+            rkwargs["transparency"] = self.block_transparency
+            pymu_props = tools.get_pymupdf_props(**rkwargs)
+            globals.doc_page.draw_rect(
+                rect,
+                width=pymu_props.width,
+                color=pymu_props.color,
+                fill=pymu_props.fill,
+                lineCap=pymu_props.lineCap,
+                lineJoin=pymu_props.lineJoin,
+                dashes=pymu_props.dashes,
+                fill_opacity=pymu_props.fill_opacity,
+            )
+            # self.set_canvas_props(cnv=cnv, index=ID, **rkwargs)
+        # ---- BOX text
         if self.wrap:
             # insert_textbox(
             #     rect, buffer, *, fontsize=11, fontname='helv', fontfile=None,
@@ -4349,7 +4375,7 @@ class TextShape(BaseShape):
                 msg = f"Cannot create Text{thefile}{cause}"
                 feedback(msg, True, True)
         # ---- HTML text
-        elif self.html:
+        elif self.html or self.css:
             # insert_htmlbox(rect, text, *, css=None, scale_low=0,
             #   archive=None, rotate=0, oc=0, opacity=1, overlay=True)
             try:

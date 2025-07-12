@@ -758,11 +758,16 @@ Text(html=True,
           'HTML Times-Roman 9pt<br/>'
           '<b>bold</b> <i>ital</i> <b><i>bold ital</i></b></span>'
 )
-Text(html=True,
-     x=0, y=3, width=4, height=2,
+Text(x=0, y=3, width=4, height=2,
      css="font-family: Courier; font-size: 8pt; color: blue;",
      text='HTML/CSS Courier 8pt<br/>'
           '<b>bold</b> <i>ital</i> <b><i>bold ital</i></b>'
+)
+Text(x=0, y=4, width=4, height=1,
+     block_stroke="red", block_fill="yellow",
+     block_dotted=True, block_transparency=50,
+     css="font-family: Courier; font-size: 8pt; color: blue;",
+     text='HTML/CSS Courier 8pt<br/>'
 )
 PageBreak()
 

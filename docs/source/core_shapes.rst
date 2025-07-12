@@ -555,15 +555,20 @@ Example 3. Styled Text
                   'HTML Times-Roman 9pt<br/>'
                   '<b>bold</b> <i>ital</i> <b><i>bold ital</i></b></span>'
         )
-        Text(html=True,
-             x=0, y=3, width=4, height=2,
+        Text(x=0, y=3, width=4, height=2,
              css="font-family: Courier; font-size: 8pt; color: blue;",
              text='HTML/CSS Courier 8pt<br/>'
                   '<b>bold</b> <i>ital</i> <b><i>bold ital</i></b>'
         )
+        Text(x=0, y=4, width=4, height=1,
+             block_stroke="red", block_fill="yellow",
+             block_dotted=True, block_transparency=50,
+             css="font-family: Courier; font-size: 8pt; color: blue;",
+             text='HTML/CSS Courier 8pt<br/>')
 
       In this example, the use of ``html=True`` signifies the use of "styled"
-      multi-line, HTML-formatted, text.
+      multi-line, HTML-formatted, text.  If the *css* property is supplied,
+      then it is not necessary to also set the *html* property.
 
       "Styled" means that various CSS styling properties can be applied to it.
 
@@ -572,6 +577,10 @@ Example 3. Styled Text
       - via the ``Font`` command
       - via *css* property
       - via the ``font-family: ...">`` embedded in the *text*
+
+      The last HTML text shows how the rectangular "block" that forms the
+      text boundary can itself be styled by using the various *block_*
+      properties.
 
 ===== ======
 

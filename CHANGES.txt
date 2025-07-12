@@ -1,18 +1,15 @@
-=========
-protograf
-=========
-
-Changes
-=======
+protograf Changes
+=================
 
 2025-00-00 (0.2.7)
 ------------------
 - Add roof property to Rectangle
 - Added full WarWar map example script
-- Patched issue with hex border notation
-- Patched issues with centred shapes and added examples
-- Added Tetris style option to Tetronimo
+- Patch issue with hex border notation
+- Patch issues with centred shapes and added examples
+- Add Tetris style option for Tetronimo
 - Restructure docs: removed "Table of Contents" headers
+- Add styling for Text blocks (html and wrap formats)
 
 2025-07-04 (0.2.6)
 ------------------

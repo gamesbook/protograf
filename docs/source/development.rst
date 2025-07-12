@@ -103,8 +103,8 @@ The software includes a GitHub workflow |dash| see the ``.github/workflows/``
 directory |dash| which handles pushing new, tagged releases onto
 https://pypi.org for distribution.
 
-Once all code changes have been made and tested |dash| all examples should
-run as normal |dash| a new version can be released.
+Once all code changes have been made and tested |dash| all examples must
+run as normal |dash| then a new version can be released.
 
 Follow this process:
 
@@ -115,6 +115,7 @@ Follow this process:
 - |check| Ensure all the examples can be run by using a shell script
 - |check| Update the ``examples.zip`` file with latest example code
 - |check| Update the version using poetry e.g. ``poetry version patch``
+- |check| Update the ``release`` in ``docs/source/conf.py``
 - |check| Commit and push all these changes to GitHub
 - |check| Add a tag that matches the poetry version e.g. ``git tag 0.1.2``
 - |check| Push tag to GitHub i.e. ``git push origin --tags``
