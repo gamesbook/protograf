@@ -4281,16 +4281,6 @@ class TextShape(BaseShape):
                 _text = _text.title()
             else:
                 feedback(f"The transform {self.transform} is unknown.", False, True)
-        # ---- rotation
-        if self.rotation is None or self.rotation == 0:
-            text_rotation = 0
-        else:
-            text_rotation = self.rotation // 90 * 90  # multiple of 90 for HTML/Box
-        # ---- text styles - htmlbox & textbox
-        # https://pymupdf.readthedocs.io/en/latest/page.html#Page.insert_htmlbox
-        # https://pymupdf.readthedocs.io/en/latest/shape.html#Shape.insert_textbox
-        keys = {}
-        keys["rotate"] = text_rotation
         # ---- rectangle for text
         current_page = globals.doc_page
         rect = muRect(x_t, y_t, x_t + width, y_t + height)
@@ -4327,35 +4317,18 @@ class TextShape(BaseShape):
             #     render_mode=0, miter_limit=1, border_width=1, expandtabs=8,
             #     align=TEXT_ALIGN_LEFT, rotate=0, lineheight=None, morph=None,
             #     stroke_opacity=1, fill_opacity=1, oc=0)
+            # ---- rotation
+            if self.rotation is None or self.rotation == 0:
+                text_rotation = 0
+            else:
+                text_rotation = self.rotation // 90 * 90  # multiple of 90 for HTML/Box
+            # ---- text styles - htmlbox & textbox
+            # https://pymupdf.readthedocs.io/en/latest/page.html#Page.insert_htmlbox
+            # https://pymupdf.readthedocs.io/en/latest/shape.html#Shape.insert_textbox
             try:
-                # style
-                keys["fontsize"] = self.font_size
-                font, keys["fontfile"], keys["fontname"] = tools.get_font_by_name(
-                    self.font_name
-                )
-                keys["color"] = tools.get_color(self.stroke)
-                # keys["fill"] = tools.get_color(self.fill)
-                keys["align"] = self.to_alignment()
-                _lineheight = kwargs.get("line_height", None)
-                keys["lineheight"] = self.kw_float(_lineheight, "line_height")
-
-                # keys['stroke_opacity'] = self.show_stroke
-                # keys['fill_opacity'] = self.show_fill
-
-                # potential other properties
-                # expandtabs=8, charwidths=None,
-                # keys['idx'] = 0
-                # keys['render_mode'] = 0
-                # keys['miter_limit'] = 1
-                # keys['border_width'] = 1
-                # keys['encoding'] = pymupdf.TEXT_ENCODING_LATIN
-                # keys['morph'] = None
-                # keys['oc'] = 0
-                # keys['overlay'] = True
-                # keys['expandtabs'] = 8
-                # keys['charwidths'] = None
-
-                # feedback(f'*** Text WRAP {keys=} \n=> {rect=} _text:{_text}')
+                keys = self.text_properties(string=_text, **kwargs)
+                keys["rotate"] = text_rotation
+                # feedback(f'*** Text WRAP {kwargs=} \n=> {keys=} \n=> {rect=} \n=>{_text=}')
                 if self.run_debug:
                     globals.doc_page.draw_rect(
                         rect, color=self.debug_color, dashes="[1 2] 0"
@@ -4378,6 +4351,7 @@ class TextShape(BaseShape):
         elif self.html or self.css:
             # insert_htmlbox(rect, text, *, css=None, scale_low=0,
             #   archive=None, rotate=0, oc=0, opacity=1, overlay=True)
+            keys = {}
             try:
                 keys["opacity"] = tools.get_opacity(self.transparency)
                 if self.css:
@@ -4396,6 +4370,7 @@ class TextShape(BaseShape):
                 feedback(f"Cannot create Text - {err}", True)
         # ---- text string
         else:
+            keys = {}
             keys["rotation"] = self.rotation
             # feedback(f"*** Text PLAIN {x_t=} {y_t=} {_text=} {keys=}")
             self.draw_multi_string(cnv, x_t, y_t, _text, **keys)  # use morph to rotate

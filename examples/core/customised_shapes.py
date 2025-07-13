@@ -771,7 +771,6 @@ Text(x=0, y=4, width=4, height=1,
 )
 PageBreak()
 
-
 # ---- text custom
 Blueprint()
 Text(common=txt, text="Text - font, case & align")
@@ -793,6 +792,44 @@ Text(wrap=True,
      font_name="Times-Roman", align="centre",
      transform='lowercase',
      text="I'm lower case Times-Roman in the centre")
+PageBreak()
+
+# ---- text outlined
+Blueprint()
+Text(common=txt, text="Text - font outlined")
+basic = Common(
+    wrap=True,
+    width=5, height=1.5,
+    font_size=10,
+    stroke="black",
+    font_name="Helvetica",
+    align="left")
+Text(common=basic,
+     x=0, y=0.5,
+     fill="white",
+     text="Default; no outline")
+Text(common=basic,
+     x=0, y=1.5,
+     fill="white",
+     outlined=True,
+     text="Outlined; white fill")
+Text(common=basic,
+     x=0, y=2.5,
+     fill="red",
+     outlined=True,
+     text="Outlined; red fill")
+Text(common=basic,
+     x=0, y=3.5,
+     fill=None,
+     outlined=True,
+     text_stroke_width=0.1,
+     text="Outlined; no fill; text_stroke_width=0.1")
+Text(common=basic,
+     x=0, y=5,
+     fill="yellow",
+     outlined=True,
+     text_stroke_width=0.07,
+     text="Outlined; yellow fill; text_stroke_width=0.07")
 PageBreak()
 
 # ---- text rotate
@@ -843,5 +880,5 @@ Save(
         "shape_centred", "shape_centred_move", "shape_centred_custom",
         "qr_code", "image_sliced",
         "shape_rotation", "shape_hatch_and_rotation",
-        "text_style", "text_custom", "text_rotate",
+        "text_style", "text_custom",  "text_outlined", "text_rotate",
         None])

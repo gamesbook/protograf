@@ -9,7 +9,7 @@ protograf Changes
 - Patch issues with centred shapes and added examples
 - Add Tetris style option for Tetronimo
 - Restructure docs: removed "Table of Contents" headers
-- Add styling for Text blocks (html and wrap formats)
+- Add more styling for Text blocks (simple and wrap formats)
 
 2025-07-04 (0.2.6)
 ------------------

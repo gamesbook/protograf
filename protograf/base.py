@@ -177,6 +177,9 @@ class BaseCanvas:
         self.facing = self.defaults.get("facing", "out")  # out/in
         # ---- fill color
         fill = self.defaults.get("fill", self.defaults.get("fill_color")) or "white"
+        self.fill_transparency = self.defaults.get(
+            "fill_transparency", 1
+        )  # NOT transparent
         self.fill = tools.get_color(fill)
         self.fill_stroke = self.defaults.get("fill_stroke", None)
         self.stroke_fill = self.defaults.get("stroke_fill", None)  # alias
@@ -186,8 +189,12 @@ class BaseCanvas:
         )
         self.stroke = tools.get_color(stroke)
         self.stroke_width = self.defaults.get("stroke_width", WIDTH)
+        self.stroke_width_border = self.defaults.get("stroke_width_border", None)
         # pymupdf lineCap: 0 = line ends in sharp edge; 1 = adds semi-circle at end
         self.stroke_cap = self.defaults.get("stroke_cap", 0)
+        self.stroke_transparency = self.defaults.get(
+            "stroke_transparency", 1
+        )  # NOT transparent
         self.outline = self.defaults.get("outline", None)
         self.outlined = self.defaults.get("outlined", False)
         # ---- overwrite fill & stroke
@@ -233,9 +240,8 @@ class BaseCanvas:
         self.text_size = self.defaults.get("text_size", self.font_size)
         text_stroke = self.defaults.get("text_stroke", self.stroke)
         self.text_stroke = tools.get_color(text_stroke)
-        self.text_stroke_width = self.defaults.get(
-            "text_stroke_width", self.stroke_width
-        )
+        self.text_stroke_width = self.defaults.get("text_stroke_width", 0.05)  # pymu
+        self.invisible = self.defaults.get("invisible", False)
         # ---- text: label
         self.label = self.defaults.get("label", "")
         self.label_size = self.defaults.get("label_size", self.font_size)
@@ -627,12 +633,19 @@ class BaseShape:
         self.dashed = kwargs.get("dashed", base.dashed)
         # ---- fill color
         self.fill = kwargs.get("fill", kwargs.get("fill_color", base.fill))
+        self.fill_transparency = kwargs.get("fill_transparency", base.fill_transparency)
         # ---- stroke
         self.stroke = kwargs.get("stroke", kwargs.get("stroke_color", base.stroke))
+        self.stroke_transparency = kwargs.get(
+            "stroke_transparency", base.stroke_transparency
+        )
         self.fill_stroke = kwargs.get("fill_stroke", base.fill_stroke)
         self.outline = kwargs.get("outline", base.outline)
         self.outlined = kwargs.get("outlined", base.outlined)
         self.stroke_width = self.kw_float(kwargs.get("stroke_width", base.stroke_width))
+        self.stroke_width_border = self.kw_float(
+            kwargs.get("stroke_width_border", base.stroke_width_border)
+        )
         self.stroke_cap = self.kw_int(kwargs.get("stroke_cap", base.stroke_cap))
         # ---- overwrite fill&stroke colors
         if self.fill_stroke and self.outline:
@@ -660,6 +673,7 @@ class BaseShape:
         self.text_stroke_width = self.kw_float(
             kwargs.get("text_stroke_width", base.text_stroke_width)
         )
+        self.invisible = self.kw_bool(kwargs.get("invisible", base.invisible))
         # ---- text: label
         self.label = kwargs.get("label", base.label)
         self.label_size = self.kw_float(kwargs.get("label_size", self.font_size))
@@ -1820,6 +1834,66 @@ class BaseShape:
             log.exception(err)
             feedback(f'Unable to convert value(s) "{items}" to points!', True)
 
+    def text_properties(self, string=None, **kwargs) -> dict:
+        """Set properties used by PyMuPDF to draw text."""
+        keys = {}
+        keys["fontsize"] = kwargs.get("font_size", self.font_size)
+        keys["fontname"] = kwargs.get("font_name", self.font_name)
+        font, keys["fontfile"], keys["fontname"] = tools.get_font_by_name(
+            keys["fontname"]
+        )
+
+        _outlined = kwargs.get("outlined", self.outlined)
+        if _outlined:
+            keys["render_mode"] = 2  # default render_mode=0
+
+        _color = kwargs.get("stroke", self.stroke)
+        keys["color"] = tools.get_color(_color)
+
+        if kwargs.get("fill") and _outlined:
+            _fill = kwargs.get("fill", self.fill)
+            keys["fill"] = tools.get_color(_fill)
+        else:
+            keys["fill"] = keys["color"]
+
+        keys["align"] = self.to_alignment()
+
+        _lineheight = kwargs.get("line_height", None)
+        keys["lineheight"] = self.kw_float(_lineheight, "line_height")
+
+        _border_width = kwargs.get("text_stroke_width", self.text_stroke_width)
+        if _border_width is not None:
+            keys["border_width"] = tools.as_float(_border_width, "border_width")
+
+        _invisible = kwargs.get("invisible", self.invisible)
+        if _invisible:
+            keys["render_mode"] = 3
+
+        _stroke_transparency = kwargs.get(
+            "stroke_transparency", self.stroke_transparency
+        )
+        if _stroke_transparency is not None:
+            _stroke_opacity = tools.as_float(
+                _stroke_transparency, "stroke_transparency"
+            )
+            keys["stroke_opacity"] = tools.get_opacity(_stroke_opacity)
+
+        _fill_transparency = kwargs.get("fill_transparency", self.fill_transparency)
+        if _fill_transparency is not None:
+            _fill_opacity = tools.as_float(_fill_transparency, "fill_transparency")
+            keys["fill_opacity"] = tools.get_opacity(_fill_opacity)
+
+        # potential other properties
+        # keys['idx'] = 0
+        # keys['miter_limit'] = 1
+        # keys['encoding'] = pymupdf.TEXT_ENCODING_LATIN
+        # keys['oc'] = 0
+        # keys['overlay'] = True
+        # keys['expandtabs'] = 8
+        # keys['charwidths'] = None
+
+        return keys
+
     def draw_multi_string(
         self, canvas, xm, ym, string, align=None, rotation=0, **kwargs
     ):
@@ -1834,11 +1908,16 @@ class BaseShape:
             * rotation (float): an angle in degrees; anti-clockwise from East
 
         Kwargs:
-            * locale - dict created from Locale namedtuple
-            * font_size -
-            * font_name -
-            * stroke -
-            * fill -
+            * locale (dict): created from Locale namedtuple
+            * font_size (float): height of characters
+            * font_name (str): name pf font
+            * stroke (str): color of text outline
+            * fill (str): color of text fill
+            * fill_transparency (float): percent transparent (100 is non-transparent)
+            * stroke_transparency (float): percent transparent (100 is non-transparent)
+            * outlined (bool): draw outline without fill
+            * invisible (bool): do not draw text at all
+            * stroke_width (float): thickness of text outline
 
         Notes:
             Drawing using HTML CSS-styling is handled in the Text shape
@@ -1856,6 +1935,7 @@ class BaseShape:
                 origin = point
             return origin
 
+        # feedback(f"### {string=} {kwargs=} {rotation=}")
         if not string:
             return
         # ---- deprecated
@@ -1868,42 +1948,13 @@ class BaseShape:
         # ---- align and font
         align = align or self.align
         mvy = copy.copy(ym)
-        # feedback(f"### {string=} {rotation=}")
         # ---- text properties
-        keys = {}
-        keys["fontsize"] = kwargs.get("font_size", self.font_size)
-        keys["fontname"] = kwargs.get("font_name", self.font_name)
-        font, keys["fontfile"], keys["fontname"] = tools.get_font_by_name(
-            keys["fontname"]
-        )
-        _color = kwargs.get("stroke", self.stroke)
-        keys["color"] = tools.get_color(_color)
-        if kwargs.get("stroke_inner"):
-            _fill = kwargs.get("stroke_inner", self.stroke)
-            keys["fill"] = tools.get_color(_fill)
-        else:
-            keys["fill"] = keys["color"]
-
-        _lineheight = kwargs.get("line_height", None)
-        keys["lineheight"] = self.kw_float(_lineheight, "line_height")
-
-        # keys['stroke_opacity'] = self.show_stroke or 1
-        # keys['fill_opacity'] = self.show_fill or 1
-
-        # potential other properties
-        # keys['idx'] = 0
-        # keys['render_mode'] = 0
-        # keys['miter_limit'] = 1
-        # keys['border_width'] = 1
-        # keys['encoding'] = pymupdf.TEXT_ENCODING_LATIN
-        # keys['oc'] = 0
-        # keys['overlay'] = True
-
+        keys = self.text_properties(**kwargs)
+        keys.pop("align")
         # TODO - recalculate xm, ym based on align and text width
         # keys["align"] = align or self.align
-
+        font, _, _ = tools.get_font_by_name(keys["fontname"])
         # ---- draw
-        # print(f'### multi_string {xm=} {ym=} {string=} {keys}')
         point = muPoint(xm, ym)
         if self.align:
             point = move_string_start(string, point, font, keys["fontsize"], self.align)
