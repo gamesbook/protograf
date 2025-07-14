@@ -429,19 +429,19 @@ Text
 
 It may seem strange to view text as a "shape" but, from a drawing point of
 view, it's really just a series of complex lines drawn in a particular pattern!
-Thus text has a position in common with many other shapes, as well as its own
-special properties.
+Thus text has a position in common with many other shapes, along with *stroke*
+to set its line color, as well as its own special properties.
 
 The basic properties that can be set are:
 
-- *text* - the text string
+- *text* - the text string to be displayed
 - *font_size* - default is ``12`` points
 - *font_name* - the default is ``Helvetica``
 - *stroke* - the default text color is ``black``
 - *align* - the default alignment is ``centre``; it can be changed to be
   ``left`` or ``right``
 
-See Examples 2 and 3 below for additional properties.
+See Examples 2 to 5 below for additional properties.
 
 
 Example 1. Default Text
@@ -451,11 +451,11 @@ Example 1. Default Text
    :width: 330
 
 ===== ======
-|t01| This example shows the shape constructed using the command with mostly.
+|t01| This example shows the shape constructed using the command with mostly
       defaults.
 
-      Only the **text** property is changed from a blank
-      string |dash| otherwise there would nothing to see!:
+      Only the *text* property is changed from a blank string |dash| otherwise
+      there would nothing to see!
 
       .. code:: python
 
@@ -629,7 +629,6 @@ Example 4. Rotated Text
             text="<i>HTML text</i> - 1-by-3 - rotate 90",
             rotation=90)
 
-
       This example shows how the text can be rotated using the *rotation*
       property.
 
@@ -658,6 +657,73 @@ Example 4. Rotated Text
         90 (ninety) degrees!!
 
 ===== ======
+
+Example 5. Styled Text
+++++++++++++++++++++++
+
+.. |t05| image:: images/customised/text_outlined.png
+   :width: 330
+
+===== ======
+|t05| This example shows the shape constructed using various properties:
+
+      .. code:: python
+
+        basic = Common(
+            wrap=True,
+            width=5, height=1.5,
+            font_size=10,
+            stroke="black",
+            font_name="Helvetica",
+            align="left")
+        Text(common=basic,
+             x=0, y=0.5,
+             fill="white",
+             text="Default; no outline")
+        Text(common=basic,
+             x=0, y=1.5,
+             fill="white",
+             outlined=True,
+             text="Outlined; white fill")
+        Text(common=basic,
+             x=0, y=2.5,
+             fill="red",
+             outlined=True,
+             text="Outlined; red fill")
+        Text(common=basic,
+             x=0, y=3.5,
+             fill=None,
+             outlined=True,
+             text_stroke_width=0.1,
+             text="Outlined; no fill; text_stroke_width=0.1")
+        Text(common=basic,
+             x=0, y=5,
+             fill="yellow",
+             outlined=True,
+             text_stroke_width=0.07,
+             text="Outlined; yellow fill; text_stroke_width=0.07")
+
+      This example shows how the text can be styled using the *outlined*
+      property.
+
+      The first example shows what the text, with given font, size and color,
+      looks like without any styling applied.
+
+      The other examples show how the *outlined* property, when set to
+      ``True``, will cause the outline of the text to be drawn.
+
+      Depending on what value is set for the *fill* property, the "inside"
+      color of the text will be changed.
+
+      The last two examples show the effect of setting the *text_stroke_width*,
+      which has a default of ``0.05``, so as to make the outline stroke width
+      thicker.
+
+      The fourth example shows how this effect can be used to simulate a
+      "bold" styling for the text.
+
+===== ======
+
 
 Enclosed Shapes
 ---------------

@@ -189,7 +189,7 @@ Discussion  This example shows how to construct a map for the "Warp War" game.
             variety of ways, so there is currently no automated way of
             achieving this.
 
-            ..HINT::
+            .. HINT::
 
                 The full map script can be found at
                 `warpwar_full.py <https://github.com/gamesbook/protograf/blob/master/examples/boards/commercial/warpwar_full.py>`_
@@ -199,7 +199,7 @@ Discussion  This example shows how to construct a map for the "Warp War" game.
 
 ----------- ------------------------------------------------------------------
 Screenshot  .. image:: images/boards/commercial/warpwar.png
-               :width: 90%
+               :width: 95%
 =========== ==================================================================
 
 
