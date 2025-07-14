@@ -6,9 +6,6 @@ Setting Up
 
 .. _table-of-contents-setup:
 
-Table of Contents
-=================
-
 - `Outline`_
 - `Python in 1 minute`_
 - `Opening a Terminal`_

@@ -603,6 +603,60 @@ Hexagon(x=1, y=3, height=2,
         centre_shape_mx=0.3, centre_shape_my=0.6)
 PageBreak()
 
+# ---- Centred Shapes - customised
+Blueprint()
+Text(common=txt, text="Centred Shape: customised")
+Rectangle(x=0, y=1, side=1,
+          centre_shape=polygon(
+              radius=0.4,
+              sides=7,
+              fill=None,
+              perbis='*',
+              stroke="red"))
+Rectangle(x=1, y=2, side=1,
+          centre_shape=circle(
+              radius=0.3,
+              radii=[0,60,120,180,240,300],
+              fill=None,
+              stroke="green"))
+Rectangle(x=2, y=1, side=1,
+          centre_shape=hexagon(
+              radius=0.4,
+              stroke="purple",
+              fill=None,
+              borders=[("sw n se", 2)]))
+Rectangle(x=3, y=2, side=1,
+          centre_shape=stadium(
+              side=0.4,
+              stroke="orange"))
+Rectangle(x=0, y=3, side=1,
+          centre_shape=ellipse(
+              height=0.8,
+              width=0.5,
+              fill=None,
+              stroke="olive"))
+Rectangle(x=1, y=4, side=1,
+          centre_shape=square(
+              side=0.6,
+              stroke="gold",
+              fill=None,
+              hatch='d', hatch_count=5,
+              borders=[("n s", 2, "black")]))
+Rectangle(x=2, y=3, side=1,
+          centre_shape=rhombus(
+              side=0.8,
+              stroke="gray",
+              fill=None,
+              borders=[("ne sw", 2, "black")]))
+Rectangle(x=3, y=4, side=1,
+          centre_shape=trapezoid(
+              width=0.6, top=0.4, height=0.8,
+              stroke="aqua",
+              fill=None,
+              flip='south',
+              borders=[("e w", 2, "black")]))
+PageBreak()
+
 # ---- QR Code
 Blueprint()
 Text(common=txt, text="QR Code")
@@ -704,14 +758,18 @@ Text(html=True,
           'HTML Times-Roman 9pt<br/>'
           '<b>bold</b> <i>ital</i> <b><i>bold ital</i></b></span>'
 )
-Text(html=True,
-     x=0, y=3, width=4, height=2,
+Text(x=0, y=3, width=4, height=2,
      css="font-family: Courier; font-size: 8pt; color: blue;",
      text='HTML/CSS Courier 8pt<br/>'
           '<b>bold</b> <i>ital</i> <b><i>bold ital</i></b>'
 )
+Text(x=0, y=4, width=4, height=1,
+     block_stroke="red", block_fill="yellow",
+     block_dotted=True, block_transparency=50,
+     css="font-family: Courier; font-size: 8pt; color: blue;",
+     text='HTML/CSS Courier 8pt<br/>'
+)
 PageBreak()
-
 
 # ---- text custom
 Blueprint()
@@ -734,6 +792,44 @@ Text(wrap=True,
      font_name="Times-Roman", align="centre",
      transform='lowercase',
      text="I'm lower case Times-Roman in the centre")
+PageBreak()
+
+# ---- text outlined
+Blueprint()
+Text(common=txt, text="Text - font outlined")
+basic = Common(
+    wrap=True,
+    width=5, height=1.5,
+    font_size=10,
+    stroke="black",
+    font_name="Helvetica",
+    align="left")
+Text(common=basic,
+     x=0, y=0.5,
+     fill="white",
+     text="Default; no outline")
+Text(common=basic,
+     x=0, y=1.5,
+     fill="white",
+     outlined=True,
+     text="Outlined; white fill")
+Text(common=basic,
+     x=0, y=2.5,
+     fill="red",
+     outlined=True,
+     text="Outlined; red fill")
+Text(common=basic,
+     x=0, y=3.5,
+     fill=None,
+     outlined=True,
+     text_stroke_width=0.1,
+     text="Outlined; no fill; text_stroke_width=0.1")
+Text(common=basic,
+     x=0, y=5,
+     fill="yellow",
+     outlined=True,
+     text_stroke_width=0.07,
+     text="Outlined; yellow fill; text_stroke_width=0.07")
 PageBreak()
 
 # ---- text rotate
@@ -781,7 +877,8 @@ Save(
         "rectangles_rowcol", "rectangles_custom", "rhombus_custom",
         "rhombus_borders", "trapezoid_borders",
         "arrow_sizes", "arrow_rotate", "arrowheads", "polyline_arrow",
-        "shape_centred", "shape_centred_move", "qr_code", "image_sliced",
+        "shape_centred", "shape_centred_move", "shape_centred_custom",
+        "qr_code", "image_sliced",
         "shape_rotation", "shape_hatch_and_rotation",
-        "text_style", "text_custom", "text_rotate",
+        "text_style", "text_custom",  "text_outlined", "text_rotate",
         None])

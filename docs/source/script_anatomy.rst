@@ -16,9 +16,6 @@ an extension of ``.py``
 
 .. _table-of-contents-anat:
 
-Table of Contents
-=================
-
 - `Start, Middle and End`_
 - `Key Commands`_
 

@@ -17,9 +17,6 @@ and that you've created some basic scripts of your own using the
 
 .. _table-of-contents-hexg:
 
-Table of Contents
-=================
-
 - `Overview`_
 - `Rectangular Hexagonal Grid`_
 - `Circular Hexagonal Grid`_

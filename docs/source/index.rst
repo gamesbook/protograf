@@ -9,8 +9,14 @@ Welcome to protograf's documentation!
   :alt: protograf logo
   :target: https://github.com/gamesbook/protograf
 
-The `protograf <https://github.com/gamesbook/protograf>`_  documentation consists
-of the sections listed below.
+`protograf <https://github.com/gamesbook/protograf>`_ is a utility written in
+Python for designing and creating simple, regular, graphical outputs in PDF
+(or PNG/GIF/SVG) format via a script.
+
+**protograf**  has been primarily created to handle the prototyping of cards,
+counters, tiles and boards for board games, including hexagonal grids, but can
+also be used for creating any simple design that has regular or repetitive
+elements; typically a mix of graphics and text.
 
 If it's your first time here, please consult the `guide <guide.html>`_
 which presents the sections designed to be read in order; they all contain
@@ -46,8 +52,8 @@ useful information but do build on each other.
    examples/counters
    examples/various
    using_fonts
-   development
    python_commands
+   development
    useful_resources
 
 

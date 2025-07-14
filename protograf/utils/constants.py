@@ -26,14 +26,15 @@ GRID_SHAPES_WITH_CENTRE = [
     "CircleShape",
     "CompassShape",
     "DotShape",
+    "EllipseShape",
     "HexShape",
     "PolygonShape",
     "RectangleShape",
     "RhombusShape",
     "SquareShape",
     "StadiumShape",
-    "EllipseShape",
     "StarShape",
+    "TrapezoidShape",
 ]
 GRID_SHAPES_NO_CENTRE = [
     "TextShape",

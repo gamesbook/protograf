@@ -32,7 +32,7 @@ Properties
 Tetrominoes share all the properties of :doc:`Polyominoes <polyominoes>` but,
 instead of a *pattern* they are defined using a *letter*.
 
-A *letter* in uppercase format draws a tetromino in such a way that it
+A *letter* in uppercase format draws a Tetromino in such a way that it
 resembles that letter; whereas a lowercase letter draws the same basic shape
 but inverted from left to right.
 
@@ -40,7 +40,7 @@ but inverted from left to right.
 Examples
 ========
 
-The examples below shows how letters are used create a Tetromino.
+The examples below shows how letters are used to create a Tetromino.
 
 
 Tetromino: Uppercase Letter
@@ -95,5 +95,37 @@ Tetromino: Lowercase Letter
 
       Each of the five shapes is constructed in the same way |dash| setting
       the *letter* property to one of: i, s, l, o, or t.
+
+===== ======
+
+
+Tetromino: Tetris-styled
+------------------------
+`^ <tetrominoesOver_>`_
+
+.. |te3| image:: images/objects/tetromino_tetris.png
+   :width: 330
+
+===== ======
+|te3| This example shows Tetrominoes constructed using commands like:
+
+      .. code:: python
+
+         Tetromino(
+             x=1.5, y=0,
+             side=0.5,
+             letter="I",
+             tetris=True)
+
+      Each of the five shapes is constructed in the same way |dash| setting
+      the *letter* property to one of: I, S, L, O, or T (or their lowercase
+      equivalent).
+
+      In addition, the ``*`` value for the letter can be used to create a
+      single grey monominoe.
+
+      The *tetris* property overrides the default color and stroke of the
+      shapes and creates a style that mimics that used in the original
+      Tetris computer game.
 
 ===== ======

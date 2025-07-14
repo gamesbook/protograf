@@ -13,9 +13,6 @@ basic scripts of your own using the :doc:`Core Shapes <core_shapes>`.
 
 .. _table-of-contents-addcmd:
 
-Table of Contents
-=================
-
 -  `Common Command`_
 -  `Font Command`_
 -  `Random Command`_

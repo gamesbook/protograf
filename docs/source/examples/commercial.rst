@@ -20,9 +20,6 @@ will demonstrate full scalability.
 
 .. _table-of-contents-excomm:
 
-Table of Contents
-=================
-
 - `Squad Leader`_
 - `Orion`_
 - `Adventurer Conqueror King`_
@@ -181,17 +178,28 @@ Discussion  This example shows how to construct a map for the "Warp War" game.
             which represent the edges of a nebula; unfortunately, its quite
             tedious to define all of these one-by-one!
 
-            The hexagon numbering for this game, which  **protograf** terms
-            ``diagonal`` is fairly unusual.
+            The hexagon numbering for this game, which **protograf** terms
+            ``diagonal`` is fairly unusual.  It also uses ``upper-multiple``
+            for the *coord_type_y* property, as opposed to the more
+            conventional spreadsheet alphanumeric style.
 
             The hexagon identifers across the top and side are created with a
             ``Sequence(`` command; they are not "built-in" to the grid.  Not
-            many games seem to use these, or use them in a wide variety of
-            ways, so there is currently no automated way of doing this.
+            many games seem to use these, or else they use them in a wide
+            variety of ways, so there is currently no automated way of
+            achieving this.
+
+            .. HINT::
+
+                The full map script can be found at
+                `warpwar_full.py <https://github.com/gamesbook/protograf/blob/master/examples/boards/commercial/warpwar_full.py>`_
+                but it uses various :doc:`Python Commands <python_commands>`
+                in order to simplify the map generation; it may be of interest
+                if you want to see how **protograf** can pull in such commands.
 
 ----------- ------------------------------------------------------------------
 Screenshot  .. image:: images/boards/commercial/warpwar.png
-               :width: 90%
+               :width: 95%
 =========== ==================================================================
 
 

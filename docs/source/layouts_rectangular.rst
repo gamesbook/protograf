@@ -17,9 +17,6 @@ This is part of the set of commands use for :doc:`Layouts <layouts>`.
 
 .. _table-of-contents-rect:
 
-Table of Contents
-=================
-
 - `Overview`_
 - `Usage`_
 

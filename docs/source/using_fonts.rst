@@ -12,9 +12,6 @@ Appendix I: Working with Fonts
 
 .. _table-of-contents-fonts:
 
-Table of Contents
-=================
-
 - `The Basics`_
 - `Built-In Fonts`_
 - `Using Additional Fonts`_

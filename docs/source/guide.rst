@@ -50,7 +50,7 @@ doing more advanced scripts or needing further resources:
     use *fonts*, both built-in and additional ones
 19. :doc:`Using Python Commands <python_commands>` - how to work with
     *loops*, *if/then* statements and *functions* for more flexibility
-20. :doc:`Useful Resources <useful_resources>` - links to
-    tools and websites related to boardgame prototyping
-21. :doc:`Development Notes <development>` - notes for programmers wanting
+20. :doc:`Development Notes <development>` - notes for programmers wanting
     to develop further in or with  **protograf**
+21. :doc:`Useful Resources <useful_resources>` - links to
+    tools and websites related to boardgame prototyping

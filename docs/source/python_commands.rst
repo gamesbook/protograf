@@ -18,9 +18,6 @@ and that you've created some basic scripts of your own using the
 
 .. _table-of-contents-pyc:
 
-Table of Contents
-=================
-
 -  `Background`_
 -  `Introduction`_
 -  `Loops`_

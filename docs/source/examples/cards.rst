@@ -14,9 +14,6 @@ will demonstrate full scalability.
 
 .. _table-of-contents-excards:
 
-Table of Contents
-=================
-
 - `Simple`_
 - `Matrix Generated`_
 - `Standard Playing Cards`_

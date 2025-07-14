@@ -19,9 +19,6 @@ the section on :doc:`Additional Concepts <additional_concepts>`.
 
 .. _table-of-contents-core:
 
-Table of Contents
------------------
-
 -  `Shape Index`_
 -  `Overview`_
 -  `Commonalities`_
@@ -432,19 +429,19 @@ Text
 
 It may seem strange to view text as a "shape" but, from a drawing point of
 view, it's really just a series of complex lines drawn in a particular pattern!
-Thus text has a position in common with many other shapes, as well as its own
-special properties.
+Thus text has a position in common with many other shapes, along with *stroke*
+to set its line color, as well as its own special properties.
 
 The basic properties that can be set are:
 
-- *text* - the text string
+- *text* - the text string to be displayed
 - *font_size* - default is ``12`` points
 - *font_name* - the default is ``Helvetica``
 - *stroke* - the default text color is ``black``
 - *align* - the default alignment is ``centre``; it can be changed to be
   ``left`` or ``right``
 
-See Examples 2 and 3 below for additional properties.
+See Examples 2 to 5 below for additional properties.
 
 
 Example 1. Default Text
@@ -454,11 +451,11 @@ Example 1. Default Text
    :width: 330
 
 ===== ======
-|t01| This example shows the shape constructed using the command with mostly.
+|t01| This example shows the shape constructed using the command with mostly
       defaults.
 
-      Only the **text** property is changed from a blank
-      string |dash| otherwise there would nothing to see!:
+      Only the *text* property is changed from a blank string |dash| otherwise
+      there would nothing to see!
 
       .. code:: python
 
@@ -558,15 +555,20 @@ Example 3. Styled Text
                   'HTML Times-Roman 9pt<br/>'
                   '<b>bold</b> <i>ital</i> <b><i>bold ital</i></b></span>'
         )
-        Text(html=True,
-             x=0, y=3, width=4, height=2,
+        Text(x=0, y=3, width=4, height=2,
              css="font-family: Courier; font-size: 8pt; color: blue;",
              text='HTML/CSS Courier 8pt<br/>'
                   '<b>bold</b> <i>ital</i> <b><i>bold ital</i></b>'
         )
+        Text(x=0, y=4, width=4, height=1,
+             block_stroke="red", block_fill="yellow",
+             block_dotted=True, block_transparency=50,
+             css="font-family: Courier; font-size: 8pt; color: blue;",
+             text='HTML/CSS Courier 8pt<br/>')
 
       In this example, the use of ``html=True`` signifies the use of "styled"
-      multi-line, HTML-formatted, text.
+      multi-line, HTML-formatted, text.  If the *css* property is supplied,
+      then it is not necessary to also set the *html* property.
 
       "Styled" means that various CSS styling properties can be applied to it.
 
@@ -575,6 +577,10 @@ Example 3. Styled Text
       - via the ``Font`` command
       - via *css* property
       - via the ``font-family: ...">`` embedded in the *text*
+
+      The last HTML text shows how the rectangular "block" that forms the
+      text boundary can itself be styled by using the various *block_*
+      properties.
 
 ===== ======
 
@@ -623,7 +629,6 @@ Example 4. Rotated Text
             text="<i>HTML text</i> - 1-by-3 - rotate 90",
             rotation=90)
 
-
       This example shows how the text can be rotated using the *rotation*
       property.
 
@@ -652,6 +657,73 @@ Example 4. Rotated Text
         90 (ninety) degrees!!
 
 ===== ======
+
+Example 5. Styled Text
+++++++++++++++++++++++
+
+.. |t05| image:: images/customised/text_outlined.png
+   :width: 330
+
+===== ======
+|t05| This example shows the shape constructed using various properties:
+
+      .. code:: python
+
+        basic = Common(
+            wrap=True,
+            width=5, height=1.5,
+            font_size=10,
+            stroke="black",
+            font_name="Helvetica",
+            align="left")
+        Text(common=basic,
+             x=0, y=0.5,
+             fill="white",
+             text="Default; no outline")
+        Text(common=basic,
+             x=0, y=1.5,
+             fill="white",
+             outlined=True,
+             text="Outlined; white fill")
+        Text(common=basic,
+             x=0, y=2.5,
+             fill="red",
+             outlined=True,
+             text="Outlined; red fill")
+        Text(common=basic,
+             x=0, y=3.5,
+             fill=None,
+             outlined=True,
+             text_stroke_width=0.1,
+             text="Outlined; no fill; text_stroke_width=0.1")
+        Text(common=basic,
+             x=0, y=5,
+             fill="yellow",
+             outlined=True,
+             text_stroke_width=0.07,
+             text="Outlined; yellow fill; text_stroke_width=0.07")
+
+      This example shows how the text can be styled using the *outlined*
+      property.
+
+      The first example shows what the text, with given font, size and color,
+      looks like without any styling applied.
+
+      The other examples show how the *outlined* property, when set to
+      ``True``, will cause the outline of the text to be drawn.
+
+      Depending on what value is set for the *fill* property, the "inside"
+      color of the text will be changed.
+
+      The last two examples show the effect of setting the *text_stroke_width*,
+      which has a default of ``0.05``, so as to make the outline stroke width
+      thicker.
+
+      The fourth example shows how this effect can be used to simulate a
+      "bold" styling for the text.
+
+===== ======
+
 
 Enclosed Shapes
 ---------------
@@ -3581,5 +3653,76 @@ The centre-shape can be shifted from the centre by setting values for
 
       Positive values move the shape down and to the right while
       negative values move it up and to the left.
+
+===== ======
+
+Example 3. Customised Centres
++++++++++++++++++++++++++++++
+
+.. |cs2| image:: images/customised/shape_centred_custom.png
+   :width: 330
+
+The centre-shape can be any type of shape that has a defined centre;
+and this shape itself can be customised.
+
+===== ======
+|cs2| This example shows Rectangle shapes, each constructed with a
+      ``centre_shape`` as follows:
+
+      .. code:: python
+
+        Rectangle(x=0, y=1, side=1,
+                  centre_shape=polygon(
+                      radius=0.4,
+                      sides=7,
+                      fill=None,
+                      perbis='*',
+                      stroke="red"))
+        Rectangle(x=1, y=2, side=1,
+                  centre_shape=circle(
+                      radius=0.3,
+                      radii=[0,60,120,180,240,300],
+                      fill=None,
+                      stroke="green"))
+        Rectangle(x=2, y=1, side=1,
+                  centre_shape=hexagon(
+                      radius=0.4,
+                      stroke="purple",
+                      fill=None,
+                      borders=[("sw n se", 2)]))
+        Rectangle(x=3, y=2, side=1,
+                  centre_shape=stadium(
+                      side=0.4,
+                      stroke="orange"))
+        Rectangle(x=0, y=3, side=1,
+                  centre_shape=ellipse(
+                      height=0.8,
+                      width=0.5,
+                      fill=None,
+                      stroke="olive"))
+        Rectangle(x=1, y=4, side=1,
+                  centre_shape=square(
+                      side=0.6,
+                      stroke="gold",
+                      fill=None,
+                      hatch='d', hatch_count=5,
+                      borders=[("n s", 2, "black")]))
+        Rectangle(x=2, y=3, side=1,
+                  centre_shape=rhombus(
+                      side=0.8,
+                      stroke="gray",
+                      fill=None,
+                      borders=[("ne sw", 2, "black")]))
+        Rectangle(x=3, y=4, side=1,
+                  centre_shape=trapezoid(
+                      width=0.6, top=0.4, height=0.8,
+                      stroke="aqua",
+                      fill=None,
+                      flip='south',
+                      borders=[("e w", 2, "black")]))
+
+      These various shapes and their custom properties are described
+      elsewhere in the documentation; this example just serves to show
+      how they can be used together.
 
 ===== ======

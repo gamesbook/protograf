@@ -36,9 +36,10 @@ from protograf.utils.messaging import feedback
 from protograf.utils.support import to_units
 from protograf.utils.structures import (
     DirectionGroup,
-    Point,
-    TemplatingType,
     GlobalDocument,
+    Point,
+    ShapeProperties,
+    TemplatingType,
 )
 from protograf import globals
 
@@ -1259,24 +1260,21 @@ def validated_directions(
     """Check and return a list of lowercase, direction abbreviations.
 
     Doc Test:
-    # >>> validated_directions('', DirectionGroup.CARDINAL)
-    # []
-    # >>> validated_directions([], DirectionGroup.CARDINAL)
-    # []
-    # >>> validated_directions(['n', 's'], DirectionGroup.CARDINAL)
-    # ['n', 's']
-    # >>> validated_directions('n s', DirectionGroup.CARDINAL)
-    # ['n', 's']
-    # >>> validated_directions('n s', DirectionGroup.HEX_FLAT)
-    # ['w', 'e']
-    # >>> validated_directions('w e', DirectionGroup.HEX_POINTY)
-    # ['n', 's']
-    # >>> validated_directions('w e n s ne', DirectionGroup.COMPASS)
-    # ['w', 'e', 'n', 's', 'ne']
+    >>> validated_directions('n s', DirectionGroup.CARDINAL)
+    ['n', 's']
+    >>> validated_directions('ne se', DirectionGroup.HEX_FLAT)
+    ['ne', 'se']
+    >>> validated_directions('n s', DirectionGroup.HEX_POINTY)
+    ['n', 's']
+    >>> validated_directions('w e n s ne', DirectionGroup.COMPASS)
+    ['w', 'e', 'n', 's', 'ne']
+    >>> validated_directions(' w e n s ne ', DirectionGroup.COMPASS)  # spaces at ends
+    ['w', 'e', 'n', 's', 'ne']
     """
     if not value:
         return []
     if isinstance(value, str):
+        value = value.strip()
         values = split(value.lower())
     else:
         if not isinstance(value, list):
@@ -1475,9 +1473,9 @@ def get_color(name: str = None, is_rgb: bool = True) -> tuple:
         return rgb
     else:
         pass  # unknown format
-    if name.upper() not in COLOR_NAMES:
-        feedback(f'The color name "{name}" is not pre-defined!', True)
     try:
+        if name.upper() not in COLOR_NAMES:
+            feedback(f'The color name "{name}" is not pre-defined!', True)
         color = getColor(name)
         return color
     except (AttributeError, ValueError):
@@ -1514,13 +1512,12 @@ def unit(item, units: str = None, skip_none: bool = False, label: str = ""):
         )
 
 
-def set_canvas_props(
-    cnv=None,
-    index=None,  # extract from list of potential values (usually Card options)
+def get_pymupdf_props(
     defaults=None,
+    index=None,  # extract from list of potential values (usually Card options)
     **kwargs,
 ):
-    """Set pymupdf Shape properties for fill, font, line, line style and colors
+    """Get pymupdf properties for fill, font, line, line style and colors
 
     Notes:
         If letting default a color parameter to None, then no resp. color selection
@@ -1548,10 +1545,8 @@ def set_canvas_props(
         except TypeError:
             return prop
 
-    # ---- set props
-    # print(f'^^^ SetCnvProps: {kwargs.keys()} \n {kwargs.get("closed", "?")=}')
-    cnv = cnv if cnv else globals.canvas
     defaults = defaults if defaults else {}
+    # print(f'^^^ pymuProps: {kwargs.keys()} \n {kwargs.get("closed", "?")=}')
     if "fill" in kwargs.keys():
         fill = kwargs.get("fill", None)  # reserve None for 'no fill at all'
     else:
@@ -1626,7 +1621,7 @@ def set_canvas_props(
         feedback("Cannot have both fill and stroke set to None!", True)
     # print(f'^^^ SCP {stroke=} {fill=} {_color=} {_fill=}')  # None OR fraction RGB
     # ---- set/apply properties
-    cnv.finish(
+    pymu_props = ShapeProperties(
         width=_width,
         color=_color,
         fill=_fill,
@@ -1636,6 +1631,31 @@ def set_canvas_props(
         fill_opacity=opacity,
         morph=morph,
         closePath=closed,
+    )
+    return pymu_props
+
+
+def set_canvas_props(
+    cnv=None,
+    index=None,  # extract from list of potential values (usually Card options)
+    defaults=None,
+    **kwargs,
+):
+    """Set pymupdf Shape properties for fill, font, line, line style and colors"""
+    # print(f'^^^ SetCnvProps: {kwargs.keys()} \n {kwargs.get("closed", "?")=}')
+    cnv = cnv if cnv else globals.canvas
+    defaults = defaults if defaults else {}
+    pymu_props = get_pymupdf_props(defaults=defaults, index=index, **kwargs)
+    cnv.finish(
+        width=pymu_props.width,
+        color=pymu_props.color,
+        fill=pymu_props.fill,
+        lineCap=pymu_props.lineCap,
+        lineJoin=pymu_props.lineJoin,
+        dashes=pymu_props.dashes,
+        fill_opacity=pymu_props.fill_opacity,
+        morph=pymu_props.morph,
+        closePath=pymu_props.closePath,
     )
     cnv.commit()
     return None

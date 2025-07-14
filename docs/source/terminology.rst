@@ -9,16 +9,13 @@ hopefully! |dash| be fairly obvious by their name, or by the context in
 which they are used.
 
 However, in order to help with clarity, below is a reasonably comprehensive
-list of terms used in different places, grouped by what they affect.
+list of terms used in different places, grouped by what aspects they affect.
 
 Note that some shapes, such as the :ref:`Hexagon <hexIndex>`, have
 extensive customisation properties available; rather refer to their
 specific descriptions to understand exactly how these can used.
 
 .. _table-of-contents-terms:
-
-Table of Contents
-=================
 
 - `protograf Jargon`_
 - `Color-orientated Terms`_
@@ -28,6 +25,7 @@ Table of Contents
 - `Direction-orientated Terms`_
 - `Styling-orientated Terms`_
 - `Display-orientated Terms`_
+- `Area-orientated Terms`_
 - `Miscellaneous Terms`_
 
 
@@ -38,30 +36,34 @@ protograf Jargon
 **protograf** uses a number of 'generic' terms which you'll see in many
 places in the documentation:
 
-- **command** - an instruction that is specified in a **protograf** script
+- **command** - an instruction that is specified in a **protograf** script;
+  see a full list in the :doc:`Commands <commands>` section
 - **default**  - a value set by **protograf** if no other is given;
   for example, the line length defaults to being 1 centimetre long
 - **list** - a number of comma-separated values enclosed in square brackets
-  e.g. ``[1, 2, 3]`` |dash| usually assigned to a **property**
+  e.g. ``[1, 2, 3]`` |dash| whihc are usually assigned to a **property**
 - **property** - an aspect of a command or shape that helps define how it works
   or looks; for example, a circle might have its size defined by using a radius
   property of 2 centimetres - in a script this would be shown as ``radius=2``
 - **shape** - a geometric element, for example, a circle, square, text or
-  line |dash| something that can be drawn
+  line i.e. something that can be drawn |dash| see a list in the
+  :doc:`Shapes <core_shapes>` section
 - **script** - a file,  that can be **run**, containing various **protograf**
-  commands
+  commands |dash| see an outline in :doc:`Script Anatomy <script_anatomy>`
 - **set** - a number of comma-separated values enclosed in round brackets
-  e.g. ``(1, "a")`` |dash| usually assigned to a **property**
+  e.g. ``(1, "a")`` |dash| these are usually assigned to a **property**
 - **run** - to cause Python to act on the script so that all instructions in
   it are carried out |dash| this should usually cause an output file to be
   created (or recreated)
 - **vertex** / **vertices** - the sharp "points" at the intersection of the
-  lines used to construct a shape; for example, a triangle has 3 vertices and
-  a square has 4 vertices.
+  lines used to construct a shape; for example, a triangle has 3 verticesl;
+  a square has 4 vertices and a hexagon has 6 vertices.
 - **_x** and **_y** - some terms can be modified to be specific for
   *x* (left to right) or *y* (top to bottom) distances by appending one of
-  these to it
+  these underscore-prefixed terms to them
 
+
+.. _termsColor:
 
 Color-orientated Terms
 ======================
@@ -109,6 +111,8 @@ In general, color can be set for the lines (**stroke**) and areas
    there - this results in an "invisible" line or area!
 
 
+.. _termsPosition:
+
 Position- and Location-orientated Terms
 =======================================
 `↑ <table-of-contents-terms_>`_
@@ -146,7 +150,9 @@ at the *top* of a Hexagon.
    other value e.g. distance from a margin; or the top edge of a ``Card``
 
 
-Size- and length-orientated Terms
+.. _termsSize:
+
+Size- and Length-orientated Terms
 =================================
 `↑ <table-of-contents-terms_>`_
 
@@ -208,7 +214,9 @@ to set.
    or a bitmap ``Image``
 
 
-Amount- and count-orientated Terms
+.. _termsAmount:
+
+Amount- and Count-orientated Terms
 ==================================
 `↑ <table-of-contents-terms_>`_
 
@@ -223,6 +231,8 @@ Amount- and count-orientated Terms
     labels or text.
 
 
+.. _termsDirection:
+
 Direction-orientated Terms
 ==========================
 
@@ -233,7 +243,7 @@ Other, more descriptive directions are also used.
 The *angle* is the amount of rotation, in degrees, starting from a value
 of zero (0) which is assumed to be the line parallel to the bottom of
 the page as you would normally look at it. Ninety (90) degrees is the
-angle of a line parallel to the side of the page, and so on.
+angle of a line parallel to the vertical sides of the page, and so on.
 
 The maximum allowed rotation is 360 degrees i.e. a full sweep around a
 circle.
@@ -287,6 +297,8 @@ Properties that use direction include:
    should first placed when creating a track
 
 
+.. _termsStyling:
+
 Styling-orientated Terms
 ========================
 `↑ <table-of-contents-terms_>`_
@@ -300,6 +312,8 @@ Styling-orientated Terms
    the dash; the second is the length of the space between two dashes |dash|
    note that sizes will be rounded to the nearest whole point value; so ``2cm``
    which is equivalent to ``56.693`` points will be changed to ``57`` points
+-  **rounded** - causes the end of a line to be drawn with a semi-circle; to
+   make a line rounded, simply use ``rounded=True``
 -  **transform** - will change text in a ``Text`` command to *uppercase*,
    *lowercase*, or *capitalise* it
 -  **transparency** - a percentage value from 1 to 100 that determines how
@@ -309,6 +323,7 @@ Styling-orientated Terms
    programs use the term *opacity*; but note that that is the inverse of
    transparency.
 
+.. _termsDisplay:
 
 Display-orientated Terms
 ========================
@@ -317,11 +332,14 @@ Display-orientated Terms
 -  **hidden** - a list of locations, indicated by their *row and
    column* identifier, which should **not** be used for display - the rest
    are displayed as normal
+-  **hatch** - when used in combination with **hatch_count** will draw a series
+   of parallel lines between two opposing sides of a regular shape in the
+   specified direction
 -  **masked** - a list of locations, indicated by their *sequence
    number* |dash| i.e. their position in the drawing order |dash| which
    should **not** be used for display |dash| the rest are displayed as normal
 -  **radii** - if given a value of ``True`` will cause the radii of a
-   ``Polygon`` to be shown
+   ``Polygon``or ``Hexagon`` to be shown
 -  **perbis** - if given one or more numbers will cause the perpendicular
    bisectors |dash| lines from centre to the middle of the edges |dash| of
    a ``Polygon`` or ``Hexagon`` to be shown; edges are numbered from the
@@ -333,14 +351,12 @@ Display-orientated Terms
    number* |dash| i.e. their position in the drawing order |dash| that
    **must** be used for display - the rest are ignored
 
+.. _termsArea:
 
-Miscellaneous Terms
-===================
+Area-orientated Terms
+=====================
 `↑ <table-of-contents-terms_>`_
 
--  **debug** - a value can be set for this that will cause underlying
-   values or locations or positions to be displayed e.g. using ``debug="n"``
-   for a layout will show small dots where each point in that layout exists
 -  **frame** - used to demarcate the boundary of a ``Card``; one of
    *rectangle*, *hexagon*, or *circle*
 -  **perimeter** - used to demarcate the boundary of a ``StarField``;
@@ -349,6 +365,21 @@ Miscellaneous Terms
    direction and a value, that designate that the edge of a rectangle
    should be drawn as a triangular "peak"; e.g. a **set** of ``('n', 2)``
    would draw a 2cm high triangle on the upper (north) edge
+-  **roof** - a way to fill in triangular sections of a square or rectangle
+   by supplying a list of colors; a **roof_line** can be used to create both
+   trapezoids and triangles to give the appearance of roof viewed from above
+-  **tetris** - when set to ``True`` will cause a ``Tetronimo`` to be styled
+   as per the original Tetris game pieces
+
+.. _termsMiscellaneous:
+
+Miscellaneous Terms
+===================
+`↑ <table-of-contents-terms_>`_
+
+-  **debug** - a value can be set for this that will cause underlying
+   values or locations or positions to be displayed e.g. using ``debug="n"``
+   for a layout will show small dots where each point in that layout exists
 -  **GIF** - Graphics Interchange Format. A file format in which an image
    can be stored; its useful because it supports multiple layers and can be
    animated

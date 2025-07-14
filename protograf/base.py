@@ -46,6 +46,7 @@ from protograf.utils.constants import (
     DEBUG_COLOR,
     DEFAULT_FONT,
     DEFAULT_MARGIN_SIZE,
+    GRID_SHAPES_WITH_CENTRE,
 )
 from protograf.globals import unit
 from protograf.utils.messaging import feedback
@@ -176,6 +177,9 @@ class BaseCanvas:
         self.facing = self.defaults.get("facing", "out")  # out/in
         # ---- fill color
         fill = self.defaults.get("fill", self.defaults.get("fill_color")) or "white"
+        self.fill_transparency = self.defaults.get(
+            "fill_transparency", 1
+        )  # NOT transparent
         self.fill = tools.get_color(fill)
         self.fill_stroke = self.defaults.get("fill_stroke", None)
         self.stroke_fill = self.defaults.get("stroke_fill", None)  # alias
@@ -185,9 +189,14 @@ class BaseCanvas:
         )
         self.stroke = tools.get_color(stroke)
         self.stroke_width = self.defaults.get("stroke_width", WIDTH)
+        self.stroke_width_border = self.defaults.get("stroke_width_border", None)
         # pymupdf lineCap: 0 = line ends in sharp edge; 1 = adds semi-circle at end
         self.stroke_cap = self.defaults.get("stroke_cap", 0)
+        self.stroke_transparency = self.defaults.get(
+            "stroke_transparency", 1
+        )  # NOT transparent
         self.outline = self.defaults.get("outline", None)
+        self.outlined = self.defaults.get("outlined", False)
         # ---- overwrite fill & stroke
         if self.stroke_fill:  # alias
             self.stroke = self.stroke_fill
@@ -199,9 +208,6 @@ class BaseCanvas:
         debug_color = self.defaults.get("debug_color", DEBUG_COLOR)
         self.debug_color = tools.get_color(debug_color)
         self.transparency = self.defaults.get("transparency", 1)  # NOT transparent
-        # if self.outline:
-        #     self.stroke = self.outline
-        #     self.fill = None
         # ---- font
         self.font_name = self.defaults.get("font_name", DEFAULT_FONT)
         self.font_file = self.defaults.get("font_file", None)
@@ -234,9 +240,8 @@ class BaseCanvas:
         self.text_size = self.defaults.get("text_size", self.font_size)
         text_stroke = self.defaults.get("text_stroke", self.stroke)
         self.text_stroke = tools.get_color(text_stroke)
-        self.text_stroke_width = self.defaults.get(
-            "text_stroke_width", self.stroke_width
-        )
+        self.text_stroke_width = self.defaults.get("text_stroke_width", 0.05)  # pymu
+        self.invisible = self.defaults.get("invisible", False)
         # ---- text: label
         self.label = self.defaults.get("label", "")
         self.label_size = self.defaults.get("label_size", self.font_size)
@@ -278,11 +283,21 @@ class BaseCanvas:
         self.transform = self.defaults.get("transform", None)
         self.html = self.defaults.get("html", False)
         self.css = self.defaults.get("css", None)
-        # ---- text block / polyomino
+        # ---- polyomino / text outline
         self.outline_stroke = self.defaults.get("outline_stroke", None)
         self.outline_width = self.defaults.get("outline_width", 0)
         self.outline_dashed = self.defaults.get("outline_dashed", None)
         self.outline_dotted = self.defaults.get("outline_dotted", None)
+        # if self.outlined:
+        #     self.stroke = self.outline_stroke
+        #     self.fill = None
+        # ---- text block rectangle
+        self.block_fill = self.defaults.get("block_fill", None)
+        self.block_stroke = self.defaults.get("block_stroke", None)
+        self.block_stroke_width = self.defaults.get("block_stroke_width", 0)
+        self.block_dashed = self.defaults.get("block_dashed", None)
+        self.block_dotted = self.defaults.get("block_dotted", None)
+        self.block_transparency = self.defaults.get("block_transparency", None)
         # ---- image / file
         self.source = self.defaults.get("source", None)  # file or http://
         self.cache_directory = None  # should be a pathlib.Path object
@@ -338,6 +353,13 @@ class BaseCanvas:
         self.rounded_radius = self.defaults.get(
             "rounded_radius", 0.05
         )  # fraction of smallest side
+        self.roof = self.defaults.get("roof", [])
+        self.roof_line = self.defaults.get("roof_line", 0)
+        self.roof_line_mx = self.defaults.get("roof_line_mx", 0)
+        self.roof_line_my = self.defaults.get("roof_line_my", 0)
+        self.roof_stroke = self.defaults.get("roof_stroke", None)
+        self.roof_stroke_width = self.defaults.get("roof_stroke", None)
+        self.roof_reverse = self.defaults.get("roof_reverse", False)
         # ---- stadium
         self.edges = self.defaults.get("edges", "E W")
         # ---- grid layout
@@ -598,7 +620,7 @@ class BaseShape:
         self.rotation = self.kw_float(
             kwargs.get("rotation", kwargs.get("rotation", base.rotation))
         )  # degrees anti-clockwise for text
-        self.rotation_point = kwargs.get("rotation_point", base.rotation_point)
+        self.rotation_point = kwargs.get("rotation_point", None)
         self._rotation_theta = math.radians(self.rotation or 0)  # radians
         self.direction = kwargs.get("direction", base.direction)
         self.position = kwargs.get("position", base.position)
@@ -611,11 +633,19 @@ class BaseShape:
         self.dashed = kwargs.get("dashed", base.dashed)
         # ---- fill color
         self.fill = kwargs.get("fill", kwargs.get("fill_color", base.fill))
+        self.fill_transparency = kwargs.get("fill_transparency", base.fill_transparency)
         # ---- stroke
         self.stroke = kwargs.get("stroke", kwargs.get("stroke_color", base.stroke))
+        self.stroke_transparency = kwargs.get(
+            "stroke_transparency", base.stroke_transparency
+        )
         self.fill_stroke = kwargs.get("fill_stroke", base.fill_stroke)
         self.outline = kwargs.get("outline", base.outline)
+        self.outlined = kwargs.get("outlined", base.outlined)
         self.stroke_width = self.kw_float(kwargs.get("stroke_width", base.stroke_width))
+        self.stroke_width_border = self.kw_float(
+            kwargs.get("stroke_width_border", base.stroke_width_border)
+        )
         self.stroke_cap = self.kw_int(kwargs.get("stroke_cap", base.stroke_cap))
         # ---- overwrite fill&stroke colors
         if self.fill_stroke and self.outline:
@@ -623,9 +653,6 @@ class BaseShape:
         if self.fill_stroke:
             self.stroke = self.fill_stroke
             self.fill = self.fill_stroke
-        if self.outline:
-            self.stroke = self.outline
-            self.fill = None
         # ---- debug color & transparency
         self.debug_color = kwargs.get("debug_color", base.debug_color)
         self.transparency = self.kw_float(kwargs.get("transparency", base.transparency))
@@ -646,6 +673,7 @@ class BaseShape:
         self.text_stroke_width = self.kw_float(
             kwargs.get("text_stroke_width", base.text_stroke_width)
         )
+        self.invisible = self.kw_bool(kwargs.get("invisible", base.invisible))
         # ---- text: label
         self.label = kwargs.get("label", base.label)
         self.label_size = self.kw_float(kwargs.get("label_size", self.font_size))
@@ -683,14 +711,28 @@ class BaseShape:
         self.transform = kwargs.get("transform", base.transform)
         self.html = self.kw_bool(kwargs.get("html", base.html))
         self.css = kwargs.get("css", base.css)
-        # ---- text block / polyomino
+        self.leading = self.kw_float(kwargs.get("leading", self.font_size))
+        # ---- polyomino / text outline
         self.outline_stroke = kwargs.get("outline_stroke", base.outline_stroke)
         self.outline_width = self.kw_float(
             kwargs.get("outline_width", base.outline_width)
         )
         self.outline_dashed = kwargs.get("outline_dashed", base.outline_dashed)
         self.outline_dotted = kwargs.get("outline_dotted", base.outline_dotted)
-        self.leading = self.kw_float(kwargs.get("leading", self.font_size))
+        # if self.outlined:
+        #     self.stroke = self.outline_stroke
+        #     self.fill = None
+        # ---- text block
+        self.block_stroke = kwargs.get("block_stroke", base.block_stroke)
+        self.block_fill = kwargs.get("block_fill", base.block_fill)
+        self.block_stroke_width = self.kw_float(
+            kwargs.get("block_stroke_width", base.block_stroke_width)
+        )
+        self.block_dashed = kwargs.get("block_dashed", base.block_dashed)
+        self.block_dotted = kwargs.get("block_dotted", base.block_dotted)
+        self.block_transparency = kwargs.get(
+            "block_transparency", base.block_transparency
+        )
         # feedback(f"### BShp:"
         # f"{self} {kwargs.get('fill')=} {self.fill=} {kwargs.get('fill_color')=}")
         # ---- image / file
@@ -759,6 +801,13 @@ class BaseShape:
         self.peaks_dict = {}
         self.borders = kwargs.get("borders", base.borders)
         self.rounded_radius = base.rounded_radius
+        self.roof = kwargs.get("roof", base.roof)
+        self.roof_line = kwargs.get("roof_line", base.roof_line)
+        self.roof_line_mx = kwargs.get("roof_line_mx", base.roof_line_mx)
+        self.roof_line_my = kwargs.get("roof_line_my", base.roof_line_my)
+        self.roof_reverse = kwargs.get("roof_reverse", base.roof_reverse)
+        self.roof_stroke = kwargs.get("roof_stroke", base.roof_stroke)
+        self.roof_stroke_width = kwargs.get("roof_stroke_width", base.roof_stroke_width)
         # ---- stadium
         self.edges = kwargs.get("edges", base.edges)
         # ---- grid layout
@@ -1102,6 +1151,8 @@ class BaseShape:
         defaults["transparency"] = self.transparency
         defaults["dotted"] = self.dotted
         defaults["dashed"] = self.dashed
+        if kwargs.get("rounded"):
+            kwargs["lineJoin"] = 1
         # print(f'### SetCnvProps: {kwargs.keys()} \n {kwargs.get("closed", "?")=}')
         return tools.set_canvas_props(cnv, index, defaults, **kwargs)
 
@@ -1783,6 +1834,66 @@ class BaseShape:
             log.exception(err)
             feedback(f'Unable to convert value(s) "{items}" to points!', True)
 
+    def text_properties(self, string=None, **kwargs) -> dict:
+        """Set properties used by PyMuPDF to draw text."""
+        keys = {}
+        keys["fontsize"] = kwargs.get("font_size", self.font_size)
+        keys["fontname"] = kwargs.get("font_name", self.font_name)
+        font, keys["fontfile"], keys["fontname"] = tools.get_font_by_name(
+            keys["fontname"]
+        )
+
+        _outlined = kwargs.get("outlined", self.outlined)
+        if _outlined:
+            keys["render_mode"] = 2  # default render_mode=0
+
+        _color = kwargs.get("stroke", self.stroke)
+        keys["color"] = tools.get_color(_color)
+
+        if kwargs.get("fill") and _outlined:
+            _fill = kwargs.get("fill", self.fill)
+            keys["fill"] = tools.get_color(_fill)
+        else:
+            keys["fill"] = keys["color"]
+
+        keys["align"] = self.to_alignment()
+
+        _lineheight = kwargs.get("line_height", None)
+        keys["lineheight"] = self.kw_float(_lineheight, "line_height")
+
+        _border_width = kwargs.get("text_stroke_width", self.text_stroke_width)
+        if _border_width is not None:
+            keys["border_width"] = tools.as_float(_border_width, "border_width")
+
+        _invisible = kwargs.get("invisible", self.invisible)
+        if _invisible:
+            keys["render_mode"] = 3
+
+        _stroke_transparency = kwargs.get(
+            "stroke_transparency", self.stroke_transparency
+        )
+        if _stroke_transparency is not None:
+            _stroke_opacity = tools.as_float(
+                _stroke_transparency, "stroke_transparency"
+            )
+            keys["stroke_opacity"] = tools.get_opacity(_stroke_opacity)
+
+        _fill_transparency = kwargs.get("fill_transparency", self.fill_transparency)
+        if _fill_transparency is not None:
+            _fill_opacity = tools.as_float(_fill_transparency, "fill_transparency")
+            keys["fill_opacity"] = tools.get_opacity(_fill_opacity)
+
+        # potential other properties
+        # keys['idx'] = 0
+        # keys['miter_limit'] = 1
+        # keys['encoding'] = pymupdf.TEXT_ENCODING_LATIN
+        # keys['oc'] = 0
+        # keys['overlay'] = True
+        # keys['expandtabs'] = 8
+        # keys['charwidths'] = None
+
+        return keys
+
     def draw_multi_string(
         self, canvas, xm, ym, string, align=None, rotation=0, **kwargs
     ):
@@ -1797,11 +1908,16 @@ class BaseShape:
             * rotation (float): an angle in degrees; anti-clockwise from East
 
         Kwargs:
-            * locale - dict created from Locale namedtuple
-            * font_size -
-            * font_name -
-            * stroke -
-            * fill -
+            * locale (dict): created from Locale namedtuple
+            * font_size (float): height of characters
+            * font_name (str): name pf font
+            * stroke (str): color of text outline
+            * fill (str): color of text fill
+            * fill_transparency (float): percent transparent (100 is non-transparent)
+            * stroke_transparency (float): percent transparent (100 is non-transparent)
+            * outlined (bool): draw outline without fill
+            * invisible (bool): do not draw text at all
+            * stroke_width (float): thickness of text outline
 
         Notes:
             Drawing using HTML CSS-styling is handled in the Text shape
@@ -1819,6 +1935,7 @@ class BaseShape:
                 origin = point
             return origin
 
+        # feedback(f"### {string=} {kwargs=} {rotation=}")
         if not string:
             return
         # ---- deprecated
@@ -1831,42 +1948,13 @@ class BaseShape:
         # ---- align and font
         align = align or self.align
         mvy = copy.copy(ym)
-        # feedback(f"### {string=} {rotation=}")
         # ---- text properties
-        keys = {}
-        keys["fontsize"] = kwargs.get("font_size", self.font_size)
-        keys["fontname"] = kwargs.get("font_name", self.font_name)
-        font, keys["fontfile"], keys["fontname"] = tools.get_font_by_name(
-            keys["fontname"]
-        )
-        _color = kwargs.get("stroke", self.stroke)
-        keys["color"] = tools.get_color(_color)
-        if kwargs.get("stroke_inner"):
-            _fill = kwargs.get("stroke_inner", self.stroke)
-            keys["fill"] = tools.get_color(_fill)
-        else:
-            keys["fill"] = keys["color"]
-
-        _lineheight = kwargs.get("line_height", None)
-        keys["lineheight"] = self.kw_float(_lineheight, "line_height")
-
-        # keys['stroke_opacity'] = self.show_stroke or 1
-        # keys['fill_opacity'] = self.show_fill or 1
-
-        # potential other properties
-        # keys['idx'] = 0
-        # keys['render_mode'] = 0
-        # keys['miter_limit'] = 1
-        # keys['border_width'] = 1
-        # keys['encoding'] = pymupdf.TEXT_ENCODING_LATIN
-        # keys['oc'] = 0
-        # keys['overlay'] = True
-
+        keys = self.text_properties(**kwargs)
+        keys.pop("align")
         # TODO - recalculate xm, ym based on align and text width
         # keys["align"] = align or self.align
-
+        font, _, _ = tools.get_font_by_name(keys["fontname"])
         # ---- draw
-        # print(f'### multi_string {xm=} {ym=} {string=} {keys}')
         point = muPoint(xm, ym)
         if self.align:
             point = move_string_start(string, point, font, keys["fontsize"], self.align)
@@ -2242,7 +2330,7 @@ class BaseShape:
                         canvas,
                         vert.x,
                         vert.y,
-                        f"{key}",
+                        f"{key}:{vert.x:.1f},{vert.y:.1f}",
                         **kwargs,
                     )
                     canvas.draw_circle((vert.x, vert.y), 1)
@@ -2257,7 +2345,7 @@ class BaseShape:
                 x = self.points_to_value(point.x)
                 y = self.points_to_value(point.y)
                 self.draw_multi_string(
-                    canvas, point.x, point.y, f"{label} {point.x:.2f},{point.y:.2f}"
+                    canvas, point.x, point.y, f"{label}:{point.x:.1f},{point.y:.1f}"
                 )
                 canvas.draw_circle((point.x, point.y), 1)
             self.set_canvas_props(cnv=canvas, index=None, **kwargs)
@@ -2373,6 +2461,7 @@ class BaseShape:
 
     def draw_border(self, cnv, border: tuple, ID: int = None):
         """Draw a border line based its settings."""
+        # feedback(f'### border {self.__class__.__name__} {border=} {ID=}')
         if not isinstance(border, tuple):
             feedback(
                 'The "borders" property must contain a list of one or more sets'
@@ -2408,16 +2497,16 @@ class BaseShape:
         else:
             dashed = bstyle
         # ---- multi-directions
+        shape_name = self.__class__.__name__.replace("Shape", "")
         _bdirections = tools.validated_directions(
-            bdirections, tools.DirectionGroup.COMPASS, "border"
+            bdirections, tools.DirectionGroup.COMPASS, f"{shape_name.lower()} border"
         )
         for bdirection in _bdirections:
             if not bdirection:
                 continue
-            # ---- line start & end
-            shape_name = self.__class__.__name__.replace("Shape", "")
+            # ---- get line start & end
             match self.__class__.__name__:
-
+                # ---- * Rect, Sq, Trap
                 case "RectangleShape" | "SquareShape" | "TrapezoidShape":
                     match bdirection:  # vertices anti-clockwise from top-left
                         case "w":
@@ -2437,7 +2526,7 @@ class BaseShape:
                                 f"Invalid direction ({bdirection}) for {shape_name} border",
                                 True,
                             )
-
+                # ---- * Rhombus
                 case "RhombusShape":
                     match bdirection:
                         case "se":
@@ -2457,7 +2546,7 @@ class BaseShape:
                                 f"Invalid direction ({bdirection}) for {shape_name} border",
                                 True,
                             )
-
+                # ---- * Hex
                 case "HexShape":
                     if self.orientation == "pointy":
                         match bdirection:
@@ -2528,6 +2617,16 @@ class BaseShape:
                 dotted=dotted,
                 dashed=dashed,
             )
+
+    def can_draw_centred_shape(self, centre_shape) -> bool:
+        """Test if a given Shape can be drawn at centre of another."""
+        cshape_name = centre_shape.__class__.__name__
+        if cshape_name in GRID_SHAPES_WITH_CENTRE:
+            return True
+        else:
+            _name = cshape_name.replace("Shape", "")
+            feedback(f"Cannot draw a centered {_name}!")
+        return False
 
 
 class GroupBase(list):

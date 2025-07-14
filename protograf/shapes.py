@@ -388,7 +388,9 @@ class CircleShape(BaseShape):
             y_c: y-centre of circle
             rotation: degrees anti-clockwise from horizontal "east"
         """
-        _dirs = tools.validated_directions(self.hatch, DirectionGroup.CIRCULAR, "hatch")
+        _dirs = tools.validated_directions(
+            self.hatch, DirectionGroup.CIRCULAR, "circle hatch"
+        )
         lines = tools.as_int(num, "hatch_count")
         if lines < 0:
             feedback("Cannot draw negative number of lines!", True)
@@ -819,14 +821,11 @@ class CircleShape(BaseShape):
             self.draw_radii(cnv, ID, self.x_c, self.y_c)
         # ---- centred shape (with offset)
         if self.centre_shape:
-            cshape_name = self.centre_shape.__class__.__name__
-            if cshape_name in GRID_SHAPES_WITH_CENTRE:
+            if self.can_draw_centred_shape(self.centre_shape):
                 self.centre_shape.draw(
                     _abs_cx=x + self.unit(self.centre_shape_mx),
                     _abs_cy=y + self.unit(self.centre_shape_my),
                 )
-            elif cshape_name not in GRID_SHAPES_WITH_CENTRE:
-                feedback(f"Cannot draw a centered {cshape_name}!")
         # ---- cross
         self.draw_cross(cnv, self.x_c, self.y_c, rotation=kwargs.get("rotation"))
         # ---- dot
@@ -997,7 +996,7 @@ class CompassShape(BaseShape):
             self.set_canvas_props(cnv=cnv, index=ID, **kwargs)
         # ---- draw compass in circle
         _directions = tools.validated_directions(
-            self.directions, DirectionGroup.COMPASS, "directions"
+            self.directions, DirectionGroup.COMPASS, "compass directions"
         )
         if self.perimeter == "circle":
             for direction in _directions:
@@ -1196,7 +1195,7 @@ class EquilateralTriangleShape(BaseShape):
         self, cnv, ID, side: float, vertices: list, num: int, rotation: float = 0.0
     ):
         _dirs = tools.validated_directions(
-            self.hatch, DirectionGroup.HEX_POINTY_EDGE, "hatch"
+            self.hatch, DirectionGroup.HEX_POINTY_EDGE, "triangle hatch"
         )
         lines = tools.as_int(num, "hatch_count")
         if lines >= 1:
@@ -1312,14 +1311,11 @@ class EquilateralTriangleShape(BaseShape):
             self.draw_hatch(cnv, ID, side, self.vertexes, self.hatch_count, rotation)
         # ---- centred shape (with offset)
         if self.centre_shape:
-            cshape_name = self.centre_shape.__class__.__name__
-            if cshape_name in GRID_SHAPES_WITH_CENTRE:
+            if self.can_draw_centred_shape(self.centre_shape):
                 self.centre_shape.draw(
                     _abs_cx=self.centroid.x + self.unit(self.centre_shape_mx),
                     _abs_cy=self.centroid.y + self.unit(self.centre_shape_my),
                 )
-            elif cshape_name not in GRID_SHAPES_WITH_CENTRE:
-                feedback(f"Cannot draw a centered {cshape_name}!")
         # ---- dot
         self.draw_dot(cnv, self.centroid.x, self.centroid.y)
         # ---- text
@@ -1613,7 +1609,7 @@ class HexShape(BaseShape):
             if self.orientation == "pointy"
             else DirectionGroup.HEX_FLAT
         )
-        _dirs = tools.validated_directions(self.radii, dir_group, "radii")
+        _dirs = tools.validated_directions(self.radii, dir_group, "hex radii")
         if "ne" in _dirs:  # slope UP to the right
             cnv.draw_line(centre, vertices[4])
         if "sw" in _dirs:  # slope DOWN to the left
@@ -1681,7 +1677,9 @@ class HexShape(BaseShape):
                 if self.orientation == "pointy"
                 else DirectionGroup.HEX_FLAT_EDGE
             )
-            perbis_dirs = tools.validated_directions(self.perbis, dir_group, "perbis")
+            perbis_dirs = tools.validated_directions(
+                self.perbis, dir_group, "hex perbis"
+            )
             _dirs = []
             # feedback(f'*** HEX {self.perbis=} {self.orientation=} {perbis_dirs=}')
             if self.orientation in ["p", "pointy"]:
@@ -1735,7 +1733,7 @@ class HexShape(BaseShape):
     def draw_hatch(
         self, cnv, ID, side: float, vertices: list, num: int, rotation: float = 0.0
     ):
-        """Draw lines connecting two opposite sides and parallel to adjacent side.
+        """Draw lines connecting two opposite sides and parallel to adjacent Hex side.
 
         Args:
             ID: unique ID
@@ -1749,7 +1747,7 @@ class HexShape(BaseShape):
             if self.orientation == "pointy"
             else DirectionGroup.HEX_FLAT
         )
-        _dirs = tools.validated_directions(self.hatch, dir_group, "hatch")
+        _dirs = tools.validated_directions(self.hatch, dir_group, "hexagon hatch")
         _num = tools.as_int(num, "hatch_count")
         lines = int((_num - 1) / 2 + 1)
         # feedback(f'*** HEX {num=} {lines=} {vertices=} {_dirs=}')
@@ -2119,16 +2117,11 @@ class HexShape(BaseShape):
             self.draw_perbis(cnv, ID, Point(self.x_d, self.y_d), self.vertexes)
         # ---- centred shape (with offset)
         if self.centre_shape:
-            cshape_name = self.centre_shape.__class__.__name__
-            if cshape_name in GRID_SHAPES_WITH_CENTRE:
-                # feedback(f'*** IN-HEX {cshape_name} at ({self.x_d=},{self.y_d=}, '
-                #               f'{self.centre_shape_x}, {self.centre_shape_y})')
+            if self.can_draw_centred_shape(self.centre_shape):
                 self.centre_shape.draw(
                     _abs_cx=self.x_d + self.unit(self.centre_shape_mx),
                     _abs_cy=self.y_d + self.unit(self.centre_shape_my),
                 )
-            elif cshape_name not in GRID_SHAPES_WITH_CENTRE:
-                feedback(f"Cannot draw a centered {cshape_name}!")
         # ---- cross
         self.draw_cross(cnv, self.x_d, self.y_d, rotation=kwargs.get("rotation"))
         # ---- dot
@@ -2201,13 +2194,17 @@ class LineShape(BaseShape):
         # feedback(f"*** Line {x=} {x_1=} {y=} {y_1=}")
         # ---- calculate line rotation
         match self.rotation_point:
-            case "centre" | "center" | "c":
+            case "centre" | "center" | "c" | None:  # default
                 mid_point = geoms.fraction_along_line(Point(x, y), Point(x_1, y_1), 0.5)
                 the_point = muPoint(mid_point[0], mid_point[1])
             case "start" | "s":
                 the_point = muPoint(x, y)
             case "end" | "e":
                 the_point = muPoint(x_1, y_1)
+            case _:
+                raise ValueError(
+                    f'Cannot calculate rotation point "{self.rotation_point}"', True
+                )
         # ---- draw line
         cnv.draw_line(Point(x, y), Point(x_1, y_1))
         self.set_canvas_props(cnv=cnv, index=ID, **kwargs)  # shape.finish()
@@ -2313,6 +2310,11 @@ class PolygonShape(BaseShape):
         else:
             x = self._u.x + self._o.delta_x
             y = self._u.y + self._o.delta_y
+        # ---- recalculate centre if preset
+        if self.use_abs_c:
+            if self._abs_cx is not None and self._abs_cy is not None:
+                x = self._abs_cx
+                y = self._abs_cy
         return Point(x, y)
 
     def get_angles(self, rotation: float = 0, is_rotated: bool = False) -> list:
@@ -2436,8 +2438,8 @@ class PolygonShape(BaseShape):
         if is_rotated:
             x, y = 0.0, 0.0  # centre for now-rotated canvas
         else:
-            x = self._u.x + self._o.delta_x
-            y = self._u.y + self._o.delta_y
+            centre = self.get_centre()
+            x, y = centre.x, centre.y
         # calculate side
         if self.height:
             side = self._u.height / math.sqrt(3)
@@ -2557,14 +2559,11 @@ class PolygonShape(BaseShape):
             self.draw_mesh(cnv, ID, vertices)
         # ---- centred shape (with offset)
         if self.centre_shape:
-            cshape_name = self.centre_shape.__class__.__name__
-            if cshape_name in GRID_SHAPES_WITH_CENTRE:
+            if self.can_draw_centred_shape(self.centre_shape):
                 self.centre_shape.draw(
                     _abs_cx=x + self.unit(self.centre_shape_mx),
                     _abs_cy=y + self.unit(self.centre_shape_my),
                 )
-            elif cshape_name not in GRID_SHAPES_WITH_CENTRE:
-                feedback(f"Cannot draw a centered {cshape_name}!")
         # ---- debug
         self._debug(cnv, vertices=vertices)  # needs: self.run_debug = True
         # ---- dot
@@ -2762,6 +2761,9 @@ class RectangleShape(BaseShape):
             self.x = self.cx - self.width / 2.0
             self.y = self.cy - self.height / 2.0
             # feedback(f"*** RectShp {self.cx=} {self.cy=} {self.x=} {self.y=}")
+        self._u_roof_line = self.unit(self.roof_line) if self.roof_line else None
+        self._u_roof_line_mx = self.unit(self.roof_line_mx) if self.roof_line_mx else 0
+        self._u_roof_line_my = self.unit(self.roof_line_mx) if self.roof_line_my else 0
         self.kwargs = kwargs
 
     def calculate_area(self) -> float:
@@ -2789,6 +2791,10 @@ class RectangleShape(BaseShape):
     def get_vertexes(self, **kwargs):
         """Get vertices for rectangle without notches."""
         x, y = self.calculate_xy(**kwargs)
+        # ---- overrides for grid layout
+        if self.use_abs_c:
+            x = self._abs_cx - self._u.width / 2.0
+            y = self._abs_cy - self._u.height / 2.0
         vertices = [  # anti-clockwise from top-left; relative to centre
             Point(x, y),  # e
             Point(x, y + self._u.height),  # s
@@ -2904,6 +2910,88 @@ class RectangleShape(BaseShape):
             x = kwargs.get("cx") - self._u.width / 2.0
             y = kwargs.get("cy") - self._u.height / 2.0
         return x, y
+
+    def draw_roof(self, cnv, ID, vertexes, rotation=0):
+        """Draw triangles and trapezoids inside the Rectangle
+
+        Args:
+            ID: unique ID
+            vertexes: the rectangle's nodes
+            rotation: degrees anti-clockwise from horizontal "east"
+        """
+        # ---- get roof color list from string
+        if isinstance(self.roof, str):
+            _roof = tools.split(self.roof.strip())
+        else:
+            _roof = self.roof
+        # ---- validate roof color settings
+        err = ("Roof must be a list of colors - either 2 or 4",)
+        if not isinstance(_roof, list):
+            feedback(err, True)
+        else:
+            if len(_roof) not in [2, 4]:
+                feedback(err, True)
+        roof_colors = [tools.get_color(rcolor) for rcolor in _roof]
+        # ---- draw 2 triangles
+        if len(roof_colors) == 2:
+            # top-left
+            vertexes_tl = [vertexes[0], vertexes[1], vertexes[3]]
+            cnv.draw_polyline(vertexes_tl)
+            self.set_canvas_props(
+                index=ID,
+                stroke=self.roof_stroke or roof_colors[0],
+                fill=roof_colors[0],
+                closed=True,
+                rotation=rotation,
+                rotation_point=self.centroid,
+            )
+            # bottom-right
+            vertexes_br = [vertexes[1], vertexes[2], vertexes[3]]
+            cnv.draw_polyline(vertexes_br)
+            self.set_canvas_props(
+                index=ID,
+                stroke=self.roof_stroke or roof_colors[1],
+                fill=roof_colors[1],
+                closed=True,
+                rotation=rotation,
+                rotation_point=self.centroid,
+            )
+        # ---- draw 2 triangles and (maybe) 2 trapezoids
+        elif len(roof_colors) == 4:
+            dx = (vertexes[3].x - vertexes[0].x) / 2.0
+            dy = (vertexes[1].y - vertexes[0].y) / 2.0
+            midpt = Point(vertexes[0].x + dx, vertexes[0].y + dy)
+            if self.roof_line:
+                _line = self._u_roof_line / 2.0
+                midleft = Point(
+                    midpt.x - _line + self._u_roof_line_mx,
+                    midpt.y + self._u_roof_line_my,
+                )
+                midrite = Point(
+                    midpt.x + _line + self._u_roof_line_mx,
+                    midpt.y + self._u_roof_line_my,
+                )
+                vert_t = [vertexes[0], midleft, midrite, vertexes[3]]
+                vert_r = [vertexes[3], midrite, vertexes[2]]
+                vert_b = [vertexes[1], midleft, midrite, vertexes[2]]
+                vert_l = [vertexes[0], midleft, vertexes[1]]
+            else:
+                vert_t = [vertexes[0], midpt, vertexes[3]]
+                vert_r = [vertexes[3], midpt, vertexes[2]]
+                vert_b = [vertexes[1], midpt, vertexes[2]]
+                vert_l = [vertexes[0], midpt, vertexes[1]]
+
+            sections = [vert_l, vert_r, vert_t, vert_b]  # order is important!
+            for key, section in enumerate(sections):
+                cnv.draw_polyline(section)
+                self.set_canvas_props(
+                    index=ID,
+                    stroke=self.roof_stroke or roof_colors[key],
+                    fill=roof_colors[key],
+                    closed=True,
+                    rotation=rotation,
+                    rotation_point=self.centroid,
+                )
 
     def draw_hatch(self, cnv, ID, vertices: list, num: int, rotation: float = 0.0):
         """Draw line(s) from one side of Rectangle to the parallel opposite.
@@ -3037,13 +3125,16 @@ class RectangleShape(BaseShape):
         is_chevron = True if (self.chevron or self.chevron_height) else False
         is_peaks = True if self.peaks else False
         is_borders = True if self.borders else False
-        if (self.rounding or self.rounded) and is_borders:
+        is_round = True if (self.rounding or self.rounded) else False
+        if self.roof and (is_round or is_notched or is_peaks or is_chevron):
+            feedback("Cannot use roof with other styles.", True)
+        if is_round and is_borders:
             feedback("Cannot use rounding or rounded with borders.", True)
-        if (self.rounding or self.rounded) and is_notched:
+        if is_round and is_notched:
             feedback("Cannot use rounding or rounded with notch.", True)
-        if (self.rounding or self.rounded) and is_chevron:
+        if is_round and is_chevron:
             feedback("Cannot use rounding or rounded with chevron.", True)
-        if (self.rounding or self.rounded) and is_peaks:
+        if is_round and is_peaks:
             feedback("Cannot use rounding or rounded with peaks.", True)
         if self.hatch_count and is_notched and self.hatch_count > 1:
             feedback("Cannot use multiple hatches with notch.", True)
@@ -3076,6 +3167,8 @@ class RectangleShape(BaseShape):
             self.centroid = muPoint(x_d, y_d)
             kwargs["rotation"] = rotation
             kwargs["rotation_point"] = self.centroid
+        else:
+            self.centroid = None
         # ---- * notch vertices
         if is_notched:
             _notch_style = self.notch_style.lower()
@@ -3112,7 +3205,7 @@ class RectangleShape(BaseShape):
             else:
                 self.vertexes.append(Point(x, y))
 
-            if "SW" in _notches:  ###
+            if "SW" in _notches:
                 self.vertexes.append(Point(x, y + self._u.height - n_y))
                 match _notch_style:
                     case "snip" | "s":
@@ -3182,7 +3275,7 @@ class RectangleShape(BaseShape):
             else:
                 self.vertexes.append(Point(x + self._u.width, y + self._u.height))
 
-            if "NE" in _notches:  ###
+            if "NE" in _notches:
                 self.vertexes.append(Point(x + self._u.width, y + n_y))
                 match _notch_style:
                     case "snip" | "s":
@@ -3386,6 +3479,10 @@ class RectangleShape(BaseShape):
                         mask="auto",
                     )
 
+        # ---- draw roof after base
+        if self.roof:
+            self.draw_roof(cnv, ID, self.vertexes, rotation)
+
         # ---- draw hatch
         if self.hatch_count:
             # if 'rotation' in kwargs.keys():
@@ -3416,14 +3513,11 @@ class RectangleShape(BaseShape):
 
         # ---- centred shape (with offset)
         if self.centre_shape:
-            cshape_name = self.centre_shape.__class__.__name__
-            if cshape_name in GRID_SHAPES_WITH_CENTRE:
+            if self.can_draw_centred_shape(self.centre_shape):
                 self.centre_shape.draw(
                     _abs_cx=x_d + self.unit(self.centre_shape_mx),
                     _abs_cy=y_d + self.unit(self.centre_shape_my),
                 )
-            elif cshape_name not in GRID_SHAPES_WITH_CENTRE:
-                feedback(f"Cannot draw a centered {cshape_name}!")
         # ---- cross
         self.draw_cross(cnv, x_d, y_d, rotation=kwargs.get("rotation"))
         # ---- dot
@@ -3451,7 +3545,12 @@ class RhombusShape(BaseShape):
 
     def get_vertexes(self, **kwargs):
         """Calculate vertices of rhombus."""
-        x_s, y_s = kwargs.get("x"), kwargs.get("y") + self._u.height / 2.0
+        x, y = kwargs.get("x"), kwargs.get("y")
+        # ---- overrides for grid layout
+        if self.use_abs_c:
+            x = self._abs_cx - self._u.width / 2.0
+            y = self._abs_cy - self._u.height / 2.0
+        x_s, y_s = x, y + self._u.height / 2.0
         vertices = []
         vertices.append(Point(x_s, y_s))
         vertices.append(Point(x_s + self._u.width / 2.0, y_s + self._u.height / 2.0))
@@ -3480,7 +3579,9 @@ class RhombusShape(BaseShape):
             num: number of lines
             rotation: degrees anti-clockwise from horizontal "east"
         """
-        _dirs = tools.validated_directions(self.hatch, DirectionGroup.CIRCULAR, "hatch")
+        _dirs = tools.validated_directions(
+            self.hatch, DirectionGroup.CIRCULAR, "rhombus hatch"
+        )
         _num = tools.as_int(num, "hatch_count")
         lines = int((_num - 1) / 2 + 1)
         # feedback(f'*** RHOMB {num=} {lines=} {vertices=} {_dirs=} {side=}')
@@ -3837,9 +3938,15 @@ class StadiumShape(BaseShape):
         else:
             x = self._u.x + self._o.delta_x
             y = self._u.y + self._o.delta_y
-        # ---- overrides to centre the shape
+        # ---- calculate centre of the shape
         cx = x + self._u.width / 2.0
         cy = y + self._u.height / 2.0
+        # ---- overrides for grid layout
+        if self._abs_cx is not None and self._abs_cy is not None:
+            cx = self._abs_cx
+            cy = self._abs_cy
+            x = cx - self._u.width / 2.0
+            y = cy - self._u.height / 2.0
         # ---- handle rotation
         rotation = kwargs.get("rotation", self.rotation)
         if rotation:
@@ -3856,7 +3963,7 @@ class StadiumShape(BaseShape):
         # feedback(f'*** Stad{len(self.vertexes)=}')
         # ---- edges
         _edges = tools.validated_directions(
-            self.edges, DirectionGroup.CARDINAL, "edges"
+            self.edges, DirectionGroup.CARDINAL, "stadium edges"
         )  # need curves on these edges
         self.vertexes.append(self.vertexes[0])
 
@@ -4174,19 +4281,35 @@ class TextShape(BaseShape):
                 _text = _text.title()
             else:
                 feedback(f"The transform {self.transform} is unknown.", False, True)
-        # ---- rotation
-        if self.rotation is None or self.rotation == 0:
-            text_rotation = 0
-        else:
-            text_rotation = self.rotation // 90 * 90  # multiple of 90 for HTML/Box
-        # ---- text styles - htmlbox & textbox
-        # https://pymupdf.readthedocs.io/en/latest/page.html#Page.insert_htmlbox
-        # https://pymupdf.readthedocs.io/en/latest/shape.html#Shape.insert_textbox
-        keys = {}
-        keys["rotate"] = text_rotation
-        # ---- BOX text
+        # ---- rectangle for text
         current_page = globals.doc_page
         rect = muRect(x_t, y_t, x_t + width, y_t + height)
+        if (
+            self.block_stroke
+            or self.block_fill
+            or self.block_dashed
+            or self.block_dotted
+        ):
+            rkwargs = copy.copy(kwargs)
+            rkwargs["fill"] = self.block_fill
+            rkwargs["stroke"] = self.block_stroke
+            rkwargs["stroke_width"] = self.block_stroke_width or self.stroke_width
+            rkwargs["dashed"] = self.block_dashed
+            rkwargs["dotted"] = self.block_dotted
+            rkwargs["transparency"] = self.block_transparency
+            pymu_props = tools.get_pymupdf_props(**rkwargs)
+            globals.doc_page.draw_rect(
+                rect,
+                width=pymu_props.width,
+                color=pymu_props.color,
+                fill=pymu_props.fill,
+                lineCap=pymu_props.lineCap,
+                lineJoin=pymu_props.lineJoin,
+                dashes=pymu_props.dashes,
+                fill_opacity=pymu_props.fill_opacity,
+            )
+            # self.set_canvas_props(cnv=cnv, index=ID, **rkwargs)
+        # ---- BOX text
         if self.wrap:
             # insert_textbox(
             #     rect, buffer, *, fontsize=11, fontname='helv', fontfile=None,
@@ -4194,35 +4317,18 @@ class TextShape(BaseShape):
             #     render_mode=0, miter_limit=1, border_width=1, expandtabs=8,
             #     align=TEXT_ALIGN_LEFT, rotate=0, lineheight=None, morph=None,
             #     stroke_opacity=1, fill_opacity=1, oc=0)
+            # ---- rotation
+            if self.rotation is None or self.rotation == 0:
+                text_rotation = 0
+            else:
+                text_rotation = self.rotation // 90 * 90  # multiple of 90 for HTML/Box
+            # ---- text styles - htmlbox & textbox
+            # https://pymupdf.readthedocs.io/en/latest/page.html#Page.insert_htmlbox
+            # https://pymupdf.readthedocs.io/en/latest/shape.html#Shape.insert_textbox
             try:
-                # style
-                keys["fontsize"] = self.font_size
-                font, keys["fontfile"], keys["fontname"] = tools.get_font_by_name(
-                    self.font_name
-                )
-                keys["color"] = tools.get_color(self.stroke)
-                # keys["fill"] = tools.get_color(self.fill)
-                keys["align"] = self.to_alignment()
-                _lineheight = kwargs.get("line_height", None)
-                keys["lineheight"] = self.kw_float(_lineheight, "line_height")
-
-                # keys['stroke_opacity'] = self.show_stroke
-                # keys['fill_opacity'] = self.show_fill
-
-                # potential other properties
-                # expandtabs=8, charwidths=None,
-                # keys['idx'] = 0
-                # keys['render_mode'] = 0
-                # keys['miter_limit'] = 1
-                # keys['border_width'] = 1
-                # keys['encoding'] = pymupdf.TEXT_ENCODING_LATIN
-                # keys['morph'] = None
-                # keys['oc'] = 0
-                # keys['overlay'] = True
-                # keys['expandtabs'] = 8
-                # keys['charwidths'] = None
-
-                # feedback(f'*** Text WRAP {keys=} \n=> {rect=} _text:{_text}')
+                keys = self.text_properties(string=_text, **kwargs)
+                keys["rotate"] = text_rotation
+                # feedback(f'*** Text WRAP {kwargs=} \n=> {keys=} \n=> {rect=} \n=>{_text=}')
                 if self.run_debug:
                     globals.doc_page.draw_rect(
                         rect, color=self.debug_color, dashes="[1 2] 0"
@@ -4242,9 +4348,10 @@ class TextShape(BaseShape):
                 msg = f"Cannot create Text{thefile}{cause}"
                 feedback(msg, True, True)
         # ---- HTML text
-        elif self.html:
+        elif self.html or self.css:
             # insert_htmlbox(rect, text, *, css=None, scale_low=0,
             #   archive=None, rotate=0, oc=0, opacity=1, overlay=True)
+            keys = {}
             try:
                 keys["opacity"] = tools.get_opacity(self.transparency)
                 if self.css:
@@ -4263,6 +4370,7 @@ class TextShape(BaseShape):
                 feedback(f"Cannot create Text - {err}", True)
         # ---- text string
         else:
+            keys = {}
             keys["rotation"] = self.rotation
             # feedback(f"*** Text PLAIN {x_t=} {y_t=} {_text=} {keys=}")
             self.draw_multi_string(cnv, x_t, y_t, _text, **keys)  # use morph to rotate
@@ -4304,10 +4412,7 @@ class TrapezoidShape(BaseShape):
 
     def calculate_xy(self):
         # ---- adjust start
-        if self.use_abs_c:
-            x = self._abs_cx
-            y = self._abs_cy
-        elif self.cx is not None and self.cy is not None:
+        if self.cx is not None and self.cy is not None:
             x = self._u.cx - self._u.width / 2.0 + self._o.delta_x
             y = self._u.cy - self._u.height / 2.0 + self._o.delta_y
         elif self.use_abs:
@@ -4316,8 +4421,15 @@ class TrapezoidShape(BaseShape):
         else:
             x = self._u.x + self._o.delta_x
             y = self._u.y + self._o.delta_y
-        cx = x + self._u.width / 2.0
-        cy = y + self._u.height / 2.0
+        # ---- overrides for grid layout
+        if self.use_abs_c:
+            cx = self._abs_cx
+            cy = self._abs_cy
+            x = cx - self._u.width / 2.0
+            y = cy - self._u.height / 2.0
+        else:
+            cx = x + self._u.width / 2.0
+            cy = y + self._u.height / 2.0
         if self.flip:
             if str(self.flip).lower() in ["s", "south"]:
                 y = y + self._u.height
