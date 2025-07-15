@@ -302,11 +302,12 @@ class PolyominoObject(RectangleShape):
         """Draw squares for the Polyomino on a given canvas."""
         # feedback(f'~~~ Polyomino {self.label=} // {off_x=}, {off_y=} {kwargs=}')
         # print(f"~~~ {self.int_pattern=}")
+        base_x, base_y = off_x, off_y
         # ---- squares
         for row, item in enumerate(self.int_pattern):
-            off_y = row * self.side + row * self.gap
+            off_y = base_y + row * self.side + row * self.gap
             for col, number in enumerate(item):
-                off_x = col * self.side + col * self.gap
+                off_x = base_x + col * self.side + col * self.gap
                 if number != 0:
                     # set props based on the square's number
                     try:
@@ -335,7 +336,7 @@ class PolyominoObject(RectangleShape):
                     kwargs["row"] = row
                     kwargs["col"] = col
                     # print(f"~~~ Polyomino {row=} {col=} {number=} {self.label=}")
-                    super().draw(cnv, off_x, off_y, ID, **kwargs)
+                    super().draw(cnv, off_x=off_x, off_y=off_y, ID=ID, **kwargs)
         # ---- optional perimeter
         if self.outline_stroke or self.outline_width:
             cnv = cnv if cnv else globals.canvas  # a new Page/Shape may now exist

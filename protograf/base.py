@@ -1839,8 +1839,8 @@ class BaseShape:
         keys = {}
         keys["fontsize"] = kwargs.get("font_size", self.font_size)
         keys["fontname"] = kwargs.get("font_name", self.font_name)
-        font, keys["fontfile"], keys["fontname"] = tools.get_font_by_name(
-            keys["fontname"]
+        font, keys["fontfile"], keys["fontname"], keys["mu_font"] = (
+            tools.get_font_by_name(keys["fontname"])
         )
 
         _outlined = kwargs.get("outlined", self.outlined)
@@ -1953,7 +1953,9 @@ class BaseShape:
         keys.pop("align")
         # TODO - recalculate xm, ym based on align and text width
         # keys["align"] = align or self.align
-        font, _, _ = tools.get_font_by_name(keys["fontname"])
+        font, _, _, _ = tools.get_font_by_name(keys["fontname"])
+        keys["fontname"] = keys["mu_font"]
+        keys.pop("mu_font")
         # ---- draw
         point = muPoint(xm, ym)
         if self.align:

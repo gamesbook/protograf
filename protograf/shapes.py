@@ -4333,6 +4333,8 @@ class TextShape(BaseShape):
                     globals.doc_page.draw_rect(
                         rect, color=self.debug_color, dashes="[1 2] 0"
                     )
+                keys["fontname"] = keys["mu_font"]
+                keys.pop("mu_font")
                 current_page.insert_textbox(rect, _text, **keys)
             except ValueError as err:
                 feedback(f"Cannot create Text! - {err}", True)

@@ -1,6 +1,13 @@
 protograf Changes
 =================
 
+
+2025-07-15 (0.2.8)
+------------------
+- Patch issue with font cache initialisation
+- Patch issue with font name usage with PyMuPDF
+- Patch issue with usage of Polyomino on Card
+
 2025-07-14 (0.2.7)
 ------------------
 - Add roof property to Rectangle

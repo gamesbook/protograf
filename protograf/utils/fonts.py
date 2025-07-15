@@ -80,8 +80,14 @@ class FontInterface:
             cached (bool): if False, will reload available font_families from the OS
             cache_path (str): location of pickle file; defaults to OS's temp directory
         """
+        self.font_families = None
         if not cache_path:
             cache_path = self.cache_directory
+        if not os.path.exists(cache_path):
+            try:
+                os.mkdir(cache_path)
+            except Exception as err:
+                feedback(f"Unable to create Font cache directory: {err}")
         cache_file = os.path.join(cache_path, "font_families.pickle")
         if cached:
             if os.path.exists(cache_file):
@@ -121,8 +127,13 @@ class FontInterface:
                             }
                         )
         if self.font_families:
-            with open(cache_file, "wb") as file:
-                pickle.dump(self.font_families, file)
+            try:
+                with open(cache_file, "wb") as file:
+                    pickle.dump(self.font_families, file)
+            except Exception as err:
+                feedback(f"Unable to create Font cache file {cache_file}: {err}", True)
+        else:
+            feedback("Unable to locate custom Fonts on your machine!", True)
 
     @lru_cache(maxsize=256)  # limits cache
     def get_font_family(self, name: str) -> Union[str, None]:

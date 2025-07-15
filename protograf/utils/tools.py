@@ -1127,14 +1127,15 @@ def get_font_by_name(font_name: str) -> tuple:
     - font (pymupdf.Font): the Font object
     - font_file (str): path to the font's file
     - font_name (str): actual font name to be used
+    - mu_font_name (str): font name to be used for HTML Text
 
     Doc Test:
 
     >>> get_font_by_name('foo')
     WARNING:: Cannot find or load a font named `foo`. Defaulting to "Helvetica".
-    (Font('Helvetica'), None, 'Helvetica')
+    (Font('Helvetica'), None, 'Helvetica', 'Helvetica')
     >>> get_font_by_name('Helvetica')
-    (Font('Helvetica'), None, 'Helvetica')
+    (Font('Helvetica'), None, 'Helvetica', 'Helvetica')
 
     #get_font_by_name('Arial')
     #(Font('Arial Regular'), '/usr/share/fonts/truetype/msttcorefonts/Arial.ttf', 'Arial')
@@ -1155,11 +1156,12 @@ def get_font_by_name(font_name: str) -> tuple:
             font_name = DEFAULT_FONT
             font = muFont(DEFAULT_FONT)  # built-in
         else:
-            font_name = font_name.replace(" ", "-")
             font = muFont(font_name, font_file)
     else:
         font = muFont(font_name)  # built-in
-    return font, font_file, font_name
+
+    mu_font_name = font_name.replace(" ", "-")
+    return font, font_file, font_name, mu_font_name
 
 
 def register_font(name: str, filename: str = None):
