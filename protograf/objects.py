@@ -84,12 +84,6 @@ class PolyominoObject(RectangleShape):
         correct, issue = self.validate_properties()
         if not correct:
             feedback("Problem with polyomino settings: %s." % "; ".join(issue), True)
-        # set props
-        self.int_pattern = self.numeric_pattern()  # numeric version of string pattern
-        if self.flip or self.invert:
-            self.int_pattern = tools.transpose_lists(
-                self.int_pattern, direction=self.flip, invert=self.invert
-            )
         # tetris
         self.letter = kwargs.get("letter", None)
         self.tetris = kwargs.get("tetris", False)
@@ -301,6 +295,12 @@ class PolyominoObject(RectangleShape):
     def draw(self, cnv=None, off_x=0, off_y=0, ID=None, **kwargs):
         """Draw squares for the Polyomino on a given canvas."""
         # feedback(f'~~~ Polyomino {self.label=} // {off_x=}, {off_y=} {kwargs=}')
+        # set props
+        self.int_pattern = self.numeric_pattern()  # numeric version of string pattern
+        if self.flip or self.invert:
+            self.int_pattern = tools.transpose_lists(
+                self.int_pattern, direction=self.flip, invert=self.invert
+            )
         # print(f"~~~ {self.int_pattern=}")
         base_x, base_y = off_x, off_y
         # ---- squares
@@ -359,8 +359,15 @@ class PentominoObject(PolyominoObject):
           Games & Puzzles Issue 9 (1973)
     """
 
-    def __init__(self, _object=None, canvas=None, **kwargs):
-        self.letter = kwargs.get("letter", "I")
+    def draw(self, cnv=None, off_x=0, off_y=0, ID=None, **kwargs):
+        """Draw squares for the Pentomino on a given canvas."""
+        # feedback(f'~~~ Pentomino {self.label=} // {off_x=}, {off_y=} {kwargs=}')
+        if not self.letter:
+            self.letter = kwargs.get("letter", "I")
+        # ---- overrides for self.letter (via a card value)
+        _locale = kwargs.get("locale", None)
+        if _locale:
+            self.letter = tools.eval_template(self.letter, _locale)
         match self.letter:
             case "T":
                 pattern = ["111", "010", "010"]
@@ -414,8 +421,10 @@ class PentominoObject(PolyominoObject):
             case _:
                 feedback("Pentomino letter must be selected from predefined set!", True)
 
-        kwargs["pattern"] = pattern
-        super(PentominoObject, self).__init__(_object=_object, canvas=canvas, **kwargs)
+        self.pattern = pattern
+        super(PentominoObject, self).draw(
+            cnv=cnv, off_x=off_x, off_y=off_y, ID=ID, **kwargs
+        )
 
 
 class TetrominoObject(PolyominoObject):
@@ -423,8 +432,15 @@ class TetrominoObject(PolyominoObject):
     A plane geometric figure formed by joining four equal squares edge to edge.
     """
 
-    def __init__(self, _object=None, canvas=None, **kwargs):
-        self.letter = kwargs.get("letter", "I")
+    def draw(self, cnv=None, off_x=0, off_y=0, ID=None, **kwargs):
+        """Draw squares for the Tetromino on a given canvas."""
+        # feedback(f'~~~ Tetromino {self.label=} // {off_x=}, {off_y=} {kwargs=}')
+        if not self.letter:
+            self.letter = kwargs.get("letter", "I")
+        # ---- overrides for self.letter (via a card value)
+        _locale = kwargs.get("locale", None)
+        if _locale:
+            self.letter = tools.eval_template(self.letter, _locale)
         match self.letter:
             case "I":
                 pattern = [
@@ -462,7 +478,9 @@ class TetrominoObject(PolyominoObject):
             case _:
                 feedback("Tetromino letter must be selected from predefined set!", True)
 
-        kwargs["pattern"] = pattern
         kwargs["is_tetromino"] = True
         kwargs["letter"] = self.letter
-        super(TetrominoObject, self).__init__(_object=_object, canvas=canvas, **kwargs)
+        self.pattern = pattern
+        super(TetrominoObject, self).draw(
+            cnv=cnv, off_x=off_x, off_y=off_y, ID=ID, **kwargs
+        )

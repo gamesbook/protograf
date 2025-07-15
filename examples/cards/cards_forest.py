@@ -14,28 +14,27 @@ Create(filename='cards_forest.pdf', margin_left=0.9, margin_top=1.5)
 
 # deck data
 the_forest = [
-    ['No', 'Title', 'Class', 'Value', 'Image', 'Pentomino', 'Quote', 'Copies'],
-    [1, "Shadows...", "OTHER", '*', "shadows.png", "X",
+    ['No', 'Title', 'Class', 'Value', 'Image', 'Pentomino', 'Invert', 'Quote', 'Copies'],
+    [1, "Shadows...", "OTHER", '*', "shadows.png", "X", 0,
      "The question is not what you look at but what you see", 2],
-    [2, "Still, Pond", "BIOTA", 3, "pond.png", "P",
+    [2, "Still, Pond", "BIOTA", 3, "pond.png", "P", 0,
      "Its smooth reflecting surface was revealed", 1],
-    [3, "Its Moss", "BIOTA", 2, "moss.png", "F",
+    [3, "Its Moss", "BIOTA", 2, "moss.png", "F", 0,
      "Let us spend one day as deliberately as Nature", 2],
-    [4, "Wrapped Up", "BIOTA", 2, "vines.png", "Z",
+    [4, "Wrapped Up", "BIOTA", 2, "vines.png", "Z", 0,
      "We can never have enough of nature", 2],
-    [5, "Going Up", "MINERAL", 2, "stairs.png", "W",
+    [5, "Going Places", "MINERAL", 2, "stairs.png", "W", 0,
      "...the pleasure of construction...", 2],
-    [6, "More Trees", "BIOTA", 1, "trees.png", "Y",
+    [6, "More Trees", "BIOTA", 1, "trees.png", "T", 0,
      "I went to the woods because I wished to live", 3],
-    [7, "Over And", "MINERAL", 3, "bridge.png", "U",
+    [7, "Over And", "MINERAL", 3, "bridge.png", "U", 1,
      "Meet with a success unexpected in common hours", 1],
-    [8, "Solid As A", "MINERAL", 2, "rock.png", "V",
+    [8, "Solid As A", "MINERAL", 2, "rock.png", "V", 0,
      "Things do not change; we change", 2],
-    [9, "The Grey Path", "MINERAL", 1, "stone.png", "T",
+    [9, "The Grey Path", "MINERAL", 1, "stone.png", "Y", 0,
     "Heaven is under our feet as well as over our heads", 3],
 ]
 Data(data_list=the_forest)
-
 # design the deck
 Deck(
     cards=1,
@@ -44,7 +43,6 @@ Deck(
     fill="black",
     stroke="gray",
     copy='Copies')
-
 # card Frame
 Card("all",
      rectangle(x=0.4, y=4.75, width=5.5, height=3.5,
@@ -76,12 +74,16 @@ Card("all",
 
 )
 # card Symbol
-Card("all",
-     pentomino(x=2.5, y=5.7, side=0.5,
-               fill="darkslategrey", stroke="sienna",
-               # letter=T("{{ Pentomino }}"))
-               letter="F")
-)
+pent_normal = pentomino(x=2.5, y=5.4, side=0.5,
+          fill="darkslategrey", stroke="sienna",
+          letter=T("{{ Pentomino }}"))
+pent_invert = pentomino(x=2.5, y=5.4, side=0.5,
+          fill="darkslategrey", stroke="sienna",
+          invert="tb",
+          letter=T("{{ Pentomino }}"))
+Card("all", S("{{ Invert != 1 }}", pent_normal))
+Card("all", S("{{ Invert == 1 }}", pent_invert))
+
 # card ID
 Card("all",
      text(x=0.15, y=7.5, width=6, height=1,
@@ -94,5 +96,4 @@ Card("all",
      text(x=5.7, y=8.6,
           text=T("{{ No }}"), stroke="white", font_size=6)
 )
-
 Save()

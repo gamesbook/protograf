@@ -1,6 +1,9 @@
 protograf Changes
 =================
 
+2025-00-00 (0.2.9)
+------------------
+- Enable use of Pentomino letters for Card
 
 2025-07-15 (0.2.8)
 ------------------
