@@ -245,7 +245,7 @@ class BaseCanvas:
         # ---- text: label
         self.label = self.defaults.get("label", "")
         self.label_size = self.defaults.get("label_size", self.font_size)
-        self.label_face = self.defaults.get("label_face", self.font_name)
+        self.label_font = self.defaults.get("label_font", self.font_name)
         label_stroke = self.defaults.get("label_stroke", self.stroke)
         self.label_stroke = tools.get_color(label_stroke)
         self.label_stroke_width = self.defaults.get(
@@ -257,7 +257,7 @@ class BaseCanvas:
         # ---- text: title
         self.title = self.defaults.get("title", "")
         self.title_size = self.defaults.get("title_size", self.font_size)
-        self.title_face = self.defaults.get("title_face", self.font_name)
+        self.title_font = self.defaults.get("title_font", self.font_name)
         title_stroke = self.defaults.get("title_stroke", self.stroke)
         self.title_stroke = tools.get_color(title_stroke)
         self.title_stroke_width = self.defaults.get(
@@ -269,7 +269,7 @@ class BaseCanvas:
         # ---- text: heading
         self.heading = self.defaults.get("heading", "")
         self.heading_size = self.defaults.get("heading_size", self.font_size)
-        self.heading_face = self.defaults.get("heading_face", self.font_name)
+        self.heading_font = self.defaults.get("heading_font", self.font_name)
         heading_stroke = self.defaults.get("heading_stroke", self.stroke)
         self.heading_stroke = tools.get_color(heading_stroke)
         self.heading_stroke_width = self.defaults.get(
@@ -400,7 +400,7 @@ class BaseCanvas:
         self.radii_dashed = self.defaults.get("radii_dashed", self.dashed)
         self.radii_labels = self.defaults.get("radii_labels", "")
         self.radii_labels_size = self.defaults.get("radii_labels_size", self.font_size)
-        self.radii_labels_face = self.defaults.get("radii_labels_face", self.font_name)
+        self.radii_labels_font = self.defaults.get("radii_labels_font", self.font_name)
         radii_labels_stroke = self.defaults.get("radii_labels_stroke", self.stroke)
         self.radii_labels_stroke = tools.get_color(radii_labels_stroke)
         self.radii_labels_stroke_width = self.defaults.get(
@@ -677,7 +677,7 @@ class BaseShape:
         # ---- text: label
         self.label = kwargs.get("label", base.label)
         self.label_size = self.kw_float(kwargs.get("label_size", self.font_size))
-        self.label_face = kwargs.get("label_face", self.font_name)
+        self.label_font = kwargs.get("label_font", self.font_name)
         self.label_stroke = kwargs.get("label_stroke", self.stroke)
         self.label_stroke_width = self.kw_float(
             kwargs.get("label_stroke_width", self.stroke_width)
@@ -688,7 +688,7 @@ class BaseShape:
         # ---- text: title
         self.title = kwargs.get("title", base.title)
         self.title_size = self.kw_float(kwargs.get("title_size", self.font_size))
-        self.title_face = kwargs.get("title_face", self.font_name)
+        self.title_font = kwargs.get("title_font", self.font_name)
         self.title_stroke = kwargs.get("title_stroke", self.stroke)
         self.title_stroke_width = self.kw_float(
             kwargs.get("title_stroke_width", self.stroke_width)
@@ -699,7 +699,7 @@ class BaseShape:
         # ---- text: heading
         self.heading = kwargs.get("heading", base.heading)
         self.heading_size = self.kw_float(kwargs.get("heading_size", self.font_size))
-        self.heading_face = kwargs.get("heading_face", self.font_name)
+        self.heading_font = kwargs.get("heading_font", self.font_name)
         self.heading_stroke = kwargs.get("heading_stroke", self.stroke)
         self.heading_stroke_width = self.kw_float(
             kwargs.get("heading_stroke_width", self.stroke_width)
@@ -853,7 +853,7 @@ class BaseShape:
         self.radii_labels_size = self.kw_float(
             kwargs.get("radii_labels_size", self.font_size)
         )
-        self.radii_labels_face = kwargs.get("radii_labels_face", self.font_name)
+        self.radii_labels_font = kwargs.get("radii_labels_font", self.font_name)
         self.radii_labels_stroke = kwargs.get("radii_labels_stroke", self.stroke)
         self.radii_labels_stroke_width = self.kw_float(
             kwargs.get("radii_labels_stroke_width", self.stroke_width)
@@ -2013,7 +2013,7 @@ class BaseShape:
             y_off = y_offset or self.title_size / 2.0
             y = yh + self.unit(self.heading_my)
             x = xh + self.unit(self.heading_mx)
-            kwargs["font_name"] = self.heading_face or self.font_name
+            kwargs["font_name"] = self.heading_font or self.font_name
             kwargs["stroke"] = self.heading_stroke
             kwargs["font_size"] = self.heading_size
             center_point = kwargs.get("rotation_point", None)
@@ -2060,7 +2060,7 @@ class BaseShape:
             yl = yl + (self.label_size / 3.0) if centred else yl
             y = yl + self.unit(self.label_my)
             x = xl + self.unit(self.label_mx)
-            kwargs["font_name"] = self.label_face or self.font_name
+            kwargs["font_name"] = self.label_font or self.font_name
             kwargs["stroke"] = self.label_stroke
             kwargs["font_size"] = self.label_size
             center_point = kwargs.get("rotation_point", None)
@@ -2101,7 +2101,7 @@ class BaseShape:
             y_off = y_offset or self.title_size
             y = yt + self.unit(self.title_my)
             x = xt + self.unit(self.title_mx)
-            kwargs["font_name"] = self.title_face or self.font_name
+            kwargs["font_name"] = self.title_font or self.font_name
             kwargs["stroke"] = self.title_stroke
             kwargs["font_size"] = self.title_size
             center_point = kwargs.get("rotation_point", None)
@@ -2150,7 +2150,7 @@ class BaseShape:
             yl = yl - (self.radii_labels_size / 3.0) if centred else yl
             y = yl + self.unit(self.radii_labels_my)
             x = xl + self.unit(self.radii_labels_mx)
-            kwargs["font_name"] = self.radii_labels_face
+            kwargs["font_name"] = self.radii_labels_font
             kwargs["stroke"] = self.radii_labels_stroke
             kwargs["font_size"] = self.radii_labels_size
             # print(f'*** draw_radii_label {rotation=}')

@@ -1,6 +1,10 @@
 protograf Changes
 =================
 
+2025-07-16 (0.2.9)
+------------------
+- Patch issue with font cache creation
+- Rename "face" for "font" for shape labels and headings
 
 2025-07-15 (0.2.8)
 ------------------

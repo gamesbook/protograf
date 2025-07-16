@@ -80,7 +80,7 @@ class FontInterface:
             cached (bool): if False, will reload available font_families from the OS
             cache_path (str): location of pickle file; defaults to OS's temp directory
         """
-        self.font_families = None
+        self.font_families = {}
         if not cache_path:
             cache_path = self.cache_directory
         if not os.path.exists(cache_path):
@@ -101,7 +101,7 @@ class FontInterface:
             fdt = self.extract_font_summary(ffile)
             if fdt:
                 family = fdt.get("fontFamily")
-                # if 'Eagle' in family: breakpoint()
+                # if 'Quintessential' in family: breakpoint()
                 if family:
                     if family not in list(self.font_families.keys()):
                         self.font_families[family] = []

@@ -1409,10 +1409,10 @@ Text: Flat
       All of this text is, by default, centred horizontally.
 
       Each text item can be further customised in terms of its color, size and
-      font face.
+      font family.
 
-      The can be done by appending *_stroke*, *_size* and *_face* respectively
-      to the text type's name.
+      The can be done by appending *_stroke*, *_stroke_width*, *_size* and
+      *_font* respectively to the text type's name.
 
 ===== ======
 
@@ -1448,10 +1448,11 @@ Text: Pointy
       All of this text is, by default, centred horizontally.
 
       Each text item can be further customised in terms of its color, size and
-      font face.
+      font family.
 
-      The can be done by appending *_stroke*, *_size* and *_face* respectively
-      to the text type's name.
+      The can be done by appending *_stroke*, *_stroke_width*, *_size* and
+      *_font* respectively to the text type's name. For example, using
+      ``label_stroke_width=2`` to create a thicker line for the label.
 
 ===== ======
 
@@ -1726,7 +1727,7 @@ on |dash| and styled with stroke color, size, and face.
                radii_labels=["A", "B", "C"],
                radii_labels_rotation=270,
                radii_labels_stroke="red",
-               radii_labels_face="Courier",
+               radii_labels_font="Courier",
                dot=0.05)
 
         Circle(cx=3, cy=3, radius=1,
@@ -1744,7 +1745,7 @@ on |dash| and styled with stroke color, size, and face.
       properties can be set:
 
       - *radii_labels* - a string or list of strings used for text
-      - *radii_labels_face* - the font used for the labels
+      - *radii_labels_font* - name of the font used for the labels
       - *radii_labels_rotation* - rotation in degrees relative to radius angle
       - *radii_labels_size* - point size of labels
       - *radii_labels_stroke* - the color of the labels
@@ -1903,18 +1904,18 @@ Properties
 In addition to the basic line styling properties, a Blueprint can also be
 customised with the following properties:
 
-- **subdivisions** - a number indicating how many lines should be drawn
+- *subdivisions* - a number indicating how many lines should be drawn
   within each square; these are evenly spaces; use *subdivisions_dashed*
   to enhance these lines
-- **style** - set to one of: *blue*, *green* or *grey*
-- **decimals** - set to to an integer number for the decimal points which
+- *style* - set to one of: *blue*, *green* or *grey*
+- *decimals* - set to to an integer number for the decimal points which
   are used for the grid numbers (default is ``0``)
-- **edges** - can be set to any combination of *n*, *s*, *e*, or *w* in a
+- *edges* - can be set to any combination of *n*, *s*, *e*, or *w* in a
   single comma-delimited string; grid numbers will then be drawn on
   any of the edges specified
-- **edges_y** - the number set for this determines where a horizontal line
+- *edges_y* - the number set for this determines where a horizontal line
   of grid numbers will be drawn
-- **edges_x** - the number set for this determines where a vertical line
+- *edges_x* - the number set for this determines where a vertical line
   of grid numbers will be drawn
 
 Examples showing how the Blueprint can be styled are described below.

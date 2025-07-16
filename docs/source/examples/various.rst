@@ -150,7 +150,7 @@ Title       *Rondel (circle radii and sectors)*
 Script      `large_objects.py <https://github.com/gamesbook/protograf/blob/master/examples/various/large_objects.py>`_
 ----------- ------------------------------------------------------------------
 Discussion  This example shows how to construct a simple effect by using
-            data from a Python loop combined with radii labels:
+            data from a Python loop combined with *radii labels*:
 
               .. code:: python
 
@@ -184,7 +184,7 @@ Discussion  This example shows how to construct a simple effect by using
                     radii_length=1,
                     radii_stroke_width=0.01,
                     radii_labels=labels,
-                    radii_labels_face="Times-Roman",
+                    radii_labels_font="Times-Roman",
                     dot=0.2)
 
             In this example, using the "offset" for the radii allows the
