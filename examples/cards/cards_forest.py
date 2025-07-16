@@ -16,11 +16,11 @@ Create(filename='cards_forest.pdf', margin_left=1, margin_top=1.5)
 the_forest = [
     ['ID', 'Title', 'Class', 'Value', 'Image', 'Pentomino', 'Invert', 'Quote', 'Copies'],
     [1, "Shadows...", "OTHER", '*', "shadows.png", "X", 0,
-     "The question is not what you look at but what you see", 2],
+     "... not what you look at but what you see", 2],
     [2, "Still, Pond", "BIOTA", 3, "pond.png", "P", 0,
      "Its smooth reflecting surface was revealed", 1],
     [3, "It's Moss", "BIOTA", 2, "moss.png", "F", 0,
-     "Let us spend one day as deliberately as Nature", 2],
+     "Spend one day as deliberately as Nature", 2],
     [4, "Wrapped Up", "BIOTA", 2, "vines.png", "Z", 0,
      "We can never have enough of nature", 2],
     [5, "Going Places", "MINERAL", 2, "stairs.png", "W", 0,
@@ -46,7 +46,7 @@ Deck(
 # card Frame
 Card("all",
      rectangle(x=0.4, y=4.75, width=5.5, height=3.5,
-               stroke="darkred", fill=None,
+               stroke="saddlebrown", fill=None,
                stroke_width=3, rounding=0.1))
 # card Image
 Card("all",
@@ -60,12 +60,13 @@ Card("all",
 # card Title
 Card("all",
      text(text=T('<div style="text-align: center;">{{ Title }}</div>'),
-          css="font-family:Quintessential; color:white; font-size:14px",
+          html=True,
+          css='font-family:"Quintessential"; color:white; font-size:14px',
           x=1.5, y=4.5, width=3.5, height=1.25, block_fill="black"))
 # card Class
 Card("all",
      stadium(x=2.2, y=8, width=2, height=0.5,
-             stroke="darkred", stroke_width=3, fill="black",
+             stroke="saddlebrown", stroke_width=3, fill="black",
              label=T("{{ Class }}"), label_stroke="white", label_size=8))
 # card Symbol
 pent_normal = pentomino(x=2.5, y=5.4, side=0.5,
@@ -89,6 +90,6 @@ Card("all",
           text=T("{{ ID }}"), stroke="white", font_size=6))
 # card Attribution
 Card("all",
-     text(x=0.5, y=8.6, align="left",
-          text="~protograf~ out of the woods", stroke="white", font_size=6))
+     text(x=0.5, y=8.75, align="left",
+          text="protograf // out of the woods", stroke="dimgray", font_size=6))
 Save()
