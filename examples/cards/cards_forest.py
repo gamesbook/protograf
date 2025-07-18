@@ -29,9 +29,9 @@ the_forest = [
      "I went to the woods because I wished to live", 3],
     [7, "Over And", "MINERAL", 3, "bridge.png", "U", 1,
      "Meet with a success unexpected in common hours", 1],
-    [8, "Solid As A", "MINERAL", 2, "rock.png", "V", 0,
+    [8, "Solid As", "MINERAL", 2, "rock.png", "V", 0,
      "Things do not change; we change", 2],
-    [9, "The Grey Path", "MINERAL", 1, "stone.png", "Y", 0,
+    [9, "Greyer Path", "MINERAL", 1, "stone.png", "Y", 0,
     "Heaven is under our feet as well as over our heads", 3],
 ]
 Data(data_list=the_forest)
@@ -60,8 +60,7 @@ Card("all",
 # card Title
 Card("all",
      text(text=T('<div style="text-align: center;">{{ Title }}</div>'),
-          html=True,
-          css='font-family:"Quintessential"; color:white; font-size:14px',
+          style='font-family:Quintessential; color:white; font-size:14px',
           x=1.5, y=4.5, width=3.5, height=1.25, block_fill="black"))
 # card Class
 Card("all",

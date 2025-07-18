@@ -4357,34 +4357,33 @@ class TextShape(BaseShape):
             keys = {}
             try:
                 keys["opacity"] = tools.get_opacity(self.transparency)
-                _font_name = self.font_name.replace(' ', '-')
-                if not fonts.builtin_font(self.font_name):
+                _font_name = self.font_name.replace(" ", "-")
+                if not fonts.builtin_font(self.font_name):  # local check
                     _, _path, font_file = tools.get_font_file(self.font_name)
-                    if font_file:
-                        keys["css"] = '@font-face {font-family: %s; src: url(%s);}' % (
-                            _font_name, font_file)
-                else:
-                    keys["css"] = globals.css
+                    # if font_file:
+                    #     keys["css"] = '@font-face {font-family: %s; src: url(%s);}' % (
+                    #         _font_name, font_file)
+                keys["css"] = globals.css
                 if self.style:
-                    _text = f'<div style="{self.css}">{_text}</div>'
+                    _text = f'<div style="{self.style}">{_text}</div>'
                 else:
-                    # create the wrapper for the text
+                    # create a wrapper for the text
                     css_style = []
                     if self.font_name:
-                        css_style.append(f'font-family: {_font_name};')
+                        css_style.append(f"font-family: {_font_name};")
                     if self.font_size:
-                        css_style.append(f'font-size: {self.font_size}px;')
+                        css_style.append(f"font-size: {self.font_size}px;")
                     if self.stroke:
                         if isinstance(self.stroke, tuple):
                             _stroke = tools.rgb_to_hex(self.stroke)
                         else:
                             _stroke = self.stroke
-                        css_style.append(f'color: {_stroke};')
+                        css_style.append(f"color: {_stroke};")
                     if self.align:
-                        if _lower(self.align) == 'centre':
-                            self.align = 'center'
-                        css_style.append(f'text-align: {self.align};')
-                    styling = ' '.join(css_style)
+                        if _lower(self.align) == "centre":
+                            self.align = "center"
+                        css_style.append(f"text-align: {self.align};")
+                    styling = " ".join(css_style)
                     _text = f'<div style="{styling}">{_text}</div>'
                 keys["archive"] = globals.archive
                 # feedback(f'*** Text HTML {keys=} {rect=} {_text=} {keys=}')

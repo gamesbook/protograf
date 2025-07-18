@@ -168,7 +168,7 @@ class FontInterface:
             font_details = self.font_families[font_family]
             for font in font_details:
                 _filename = None
-                if  str(name).strip().lower() == font["name"].lower():
+                if str(name).strip().lower() == font["name"].lower():
                     _filename = font["file"]
                 if "Gras" in font["name"]:
                     if (

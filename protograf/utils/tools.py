@@ -1690,10 +1690,10 @@ def set_canvas_props(
 def get_font_file(font_name: str) -> tuple:
     """Access and track a font and its file."""
     _name = None
-    _file = None
     font_path = None
+    _file = None
     if not font_name:
-        return _name, _file
+        return _name, font_path, _file
     _font_name = str(font_name).strip()
     if _font_name:
         _name = builtin_font(_font_name)
@@ -1701,7 +1701,6 @@ def get_font_file(font_name: str) -> tuple:
             cache_directory = Path(Path.home() / CACHE_DIRECTORY)
             fi = FontInterface(cache_directory=cache_directory)
             _name = fi.get_font_family(font_name)
-            _file = fi.get_font_file(font_name, fullpath=False)
             if not _name:
                 feedback(
                     f'Cannot find or load a font named "{font_name}".'
@@ -1710,9 +1709,12 @@ def get_font_file(font_name: str) -> tuple:
                     True,
                 )
             else:
+                _file = fi.get_font_file(font_name, fullpath=False)
                 font_path, css = fi.font_file_css(_name)
-                globals.css += css
+                if css not in globals.css:
+                    globals.css += css + "\n"
                 globals.archive.add(font_path)
+                # print(font_path, globals.archive, globals.css)
     return _name, font_path, _file
 
 
