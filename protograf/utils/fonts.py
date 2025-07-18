@@ -147,16 +147,18 @@ class FontInterface:
         if not self.font_families:
             self.load_font_families()
         for font_family in list(self.font_families.keys()):
-            if str(name).lower() == font_family.lower():
+            if str(name).strip().lower() == font_family.lower():
                 return font_family
         return None
 
     @lru_cache(maxsize=256)  # limits cache
-    def get_font_file(self, name: str) -> str:
+    def get_font_file(self, name: str, fullpath: bool = True) -> str:
         """Get file name for a specific font style if it exists
 
         Args:
-            name: case-insensitive name of a font style e.g. "bookerly Bold"
+
+        - name (str): case-insensitive name of a font style e.g. "bookerly Bold"
+        - fullpath (bool): if True, include full path
         """
         if not name:
             return None
@@ -165,20 +167,27 @@ class FontInterface:
         for font_family in list(self.font_families.keys()):
             font_details = self.font_families[font_family]
             for font in font_details:
-                if str(name).lower() == font["name"].lower():
-                    return font["file"]
+                _filename = None
+                if  str(name).strip().lower() == font["name"].lower():
+                    _filename = font["file"]
                 if "Gras" in font["name"]:
                     if (
-                        str(name).lower()
+                        str(name).strip().lower()
                         == font["name"].replace("Gras", "Bold").lower()
                     ):
-                        return font["file"]
+                        _filename = font["file"]
                 if "Italique" in font["name"]:
                     if (
-                        str(name).lower()
+                        str(name).strip().lower()
                         == font["name"].replace("Italique", "Italic").lower()
                     ):
-                        return font["file"]
+                        _filename = font["file"]
+                if _filename:
+                    if fullpath:
+                        return _filename
+                    else:
+                        _fileonly = Path(_filename).name
+                        return _fileonly
 
         return None
 

@@ -12,6 +12,7 @@ import math
 from protograf.utils.messaging import feedback
 from protograf.utils.structures import Point, Locale
 from protograf.utils import tools, support
+from protograf.utils.tools import _lower
 from protograf.base import BaseShape, BaseCanvas
 from protograf.shapes import (
     # CircleShape,
@@ -190,7 +191,7 @@ class SequenceShape(BaseShape):
         # ---- store sequence values in setting_list
         self.setting_list = []
         try:
-            if self.set_type.lower() in ["n", "number"]:
+            if _lower(self.set_type) in ["n", "number"]:
                 self.set_stop = (
                     self.setting[1] + 1 if self.set_inc > 0 else self.setting[1] - 1
                 )
@@ -198,7 +199,7 @@ class SequenceShape(BaseShape):
                     self.set_start, self.set_stop, self.set_inc
                 )
                 self.setting_list = list(self.setting_iterator)
-            elif self.set_type.lower() in ["l", "letter"]:
+            elif _lower(self.set_type) in ["l", "letter"]:
                 self.setting_list = []
                 start, stop = ord(self.set_start), ord(self.set_stop)
                 curr = start
@@ -209,7 +210,7 @@ class SequenceShape(BaseShape):
                         break
                     self.setting_list.append(chr(curr))
                     curr += self.set_inc
-            elif self.set_type.lower() in ["r", "roman"]:
+            elif _lower(self.set_type) in ["r", "roman"]:
                 self.set_stop = (
                     self.setting[1] + 1 if self.set_inc > 0 else self.setting[1] - 1
                 )
@@ -220,7 +221,7 @@ class SequenceShape(BaseShape):
                 self.setting_list = [
                     support.roman(int(value)) for value in _setting_list
                 ]
-            elif self.set_type.lower() in ["e", "excel"]:
+            elif _lower(self.set_type) in ["e", "excel"]:
                 self.set_stop = (
                     self.setting[1] + 1 if self.set_inc > 0 else self.setting[1] - 1
                 )
@@ -463,13 +464,13 @@ class VirtualLocations(VirtualShape):
         self.start = str(self.start)
         self.pattern = str(self.pattern)
         self.direction = str(self.direction)
-        if self.pattern.lower() not in ["default", "d", "snake", "s", "outer", "o"]:
+        if _lower(self.pattern) not in ["default", "d", "snake", "s", "outer", "o"]:
             feedback(
                 f"{self.pattern} is not a valid pattern - "
                 "use 'default', 'outer', 'snake'",
                 True,
             )
-        if self.direction.lower() not in [
+        if _lower(self.direction) not in [
             "north",
             "n",
             "south",
@@ -484,7 +485,7 @@ class VirtualLocations(VirtualShape):
                 "use 'north', south', 'west', or 'east'",
                 True,
             )
-        if self.facing.lower() not in [
+        if _lower(self.facing) not in [
             "north",
             "n",
             "south",
@@ -500,23 +501,23 @@ class VirtualLocations(VirtualShape):
                 True,
             )
         if (
-            "n" in self.start.lower()[0]
-            and "n" in self.direction.lower()[0]
-            or "s" in self.start.lower()[0]
-            and "s" in self.direction.lower()[0]
-            or "w" in self.start.lower()[0]
-            and "w" in self.direction.lower()[0]
-            or "e" in self.start.lower()[0]
-            and "e" in self.direction.lower()[0]
+            "n" in _lower(self.start)[0]
+            and "n" in _lower(self.direction)[0]
+            or "s" in _lower(self.start)[0]
+            and "s" in _lower(self.direction)[0]
+            or "w" in _lower(self.start)[0]
+            and "w" in _lower(self.direction)[0]
+            or "e" in _lower(self.start)[0]
+            and "e" in _lower(self.direction)[0]
         ):
             feedback(f"Cannot use {self.start} with {self.direction}!", True)
-        if self.direction.lower() in ["north", "n", "south", "s"]:
+        if _lower(self.direction) in ["north", "n", "south", "s"]:
             self.flow = "vert"
-        elif self.direction.lower() in ["west", "w", "east", "e"]:
+        elif _lower(self.direction) in ["west", "w", "east", "e"]:
             self.flow = "hori"
         else:
             feedback(f"{self.direction} is not a valid direction!", True)
-        if self.label_style and self.label_style.lower() != "excel":
+        if self.label_style and _lower(self.label_style) != "excel":
             feedback(f"{self.label_style } is not a valid label_style !", True)
         if self.col_odd and self.col_even:
             feedback("Cannot use 'col_odd' and 'col_even' together!", True)
@@ -525,7 +526,7 @@ class VirtualLocations(VirtualShape):
 
     def set_id(self, col: int, row: int) -> str:
         """Create an ID from row and col values."""
-        if self.label_style and self.label_style.lower() == "excel":
+        if self.label_style and _lower(self.label_style) == "excel":
             return "%s%s" % (tools.sheet_column(col), row)
         else:
             return "%s,%s" % (col, row)
@@ -534,7 +535,7 @@ class VirtualLocations(VirtualShape):
         """Return full lower-case value of primary compass direction."""
         if not compass:
             return None
-        _compass = str(compass).lower()
+        _compass = _lower(compass)
         match _compass:
             case "n" | "north":
                 return "north"
@@ -578,7 +579,7 @@ class RectangularLocations(VirtualLocations):
                 f"Minimum layout size is 2x2 (cannot use {self.cols }x{self.rows})!",
                 True,
             )
-        if self.start.lower() not in ["sw", "se", "nw", "ne"]:
+        if _lower(self.start) not in ["sw", "se", "nw", "ne"]:
             feedback(
                 f"{self.start} is not a valid start - "
                 "use: 'sw', 'se', 'nw', or 'ne'",
@@ -591,8 +592,8 @@ class RectangularLocations(VirtualLocations):
 
     def next_locale(self) -> Locale:
         """Yield next Location for each call."""
-        _start = self.start.lower()
-        _dir = self.direction.lower()
+        _start = _lower(self.start)
+        _dir = _lower(self.direction)
         current_dir = _dir
         match _start:
             case "sw":
@@ -652,7 +653,7 @@ class RectangularLocations(VirtualLocations):
                     x = x + self.row_even
             # print(f'+++ {count=} {row=},{col=} // {x=},{y=}')
             # ---- set next grid location
-            match self.pattern.lower():
+            match _lower(self.pattern):
                 # ---- * snake
                 case "snake" | "snaking" | "s":
                     # feedback(f'+++ {count=} {self.layout_size=} {self.stop=}')
@@ -660,7 +661,7 @@ class RectangularLocations(VirtualLocations):
                         return
                     yield Locale(col, row, x, y, self.set_id(col, row), count, corner)
                     # next grid location
-                    match self.direction.lower():
+                    match _lower(self.direction):
                         case "e" | "east":
                             col = col + 1
                             if col > self.cols:
@@ -775,7 +776,7 @@ class RectangularLocations(VirtualLocations):
                 case _:  # default pattern
                     yield Locale(col, row, x, y, self.set_id(col, row), count, corner)
                     # next grid location
-                    match self.direction.lower():
+                    match _lower(self.direction):
                         case "e" | "east":
                             col = col + 1
                             if col > self.cols:
@@ -845,7 +846,7 @@ class TriangularLocations(VirtualLocations):
                 f"Minimum layout size is 2x1 or 1x2 (cannot use {self.cols }x{self.rows})!",
                 True,
             )
-        if self.start.lower() not in [
+        if _lower(self.start) not in [
             "north",
             "south",
             "east",
@@ -862,13 +863,13 @@ class TriangularLocations(VirtualLocations):
 
     def next_locale(self) -> Locale:
         """Yield next Location for each call."""
-        _start = self.set_compass(self.start.lower())
-        _dir = self.set_compass(self.direction.lower())
-        _facing = self.set_compass(self.facing.lower())
+        _start = self.set_compass(_lower(self.start))
+        _dir = self.set_compass(_lower(self.direction))
+        _facing = self.set_compass(_lower(self.facing))
         current_dir = _dir
 
         # TODO - create logic
-        if self.pattern.lower() in ["snake", "snaking", "s"]:
+        if _lower(self.pattern) in ["snake", "snaking", "s"]:
             feedback("Snake pattern NOT YET IMPLEMENTED", True)
 
         # ---- store row/col as list of lists
@@ -1027,7 +1028,7 @@ class ConnectShape(BaseShape):
         cnv = cnv if cnv else self.canvas
         super().draw(cnv, off_x, off_y, ID, **kwargs)  # unit-based props
         # ---- style
-        style = self.style or "direct"
+        style = "direct"  # TODO: self.connect or "direct"
         # ---- shapes and positions
         try:
             shp_from, shape_from_position = self.shape_from  # tuple form

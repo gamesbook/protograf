@@ -74,6 +74,7 @@ from .groups import Switch, Lookup  # used in scripts
 from ._version import __version__
 
 from protograf.utils import geoms, tools, support
+from protograf.utils.tools import _lower
 from protograf.utils.constants import (
     DEFAULT_FONT,
     DEBUG_COLOR,
@@ -373,7 +374,7 @@ class CardShape(BaseShape):
         for index, flat_ele in enumerate(flat_elements):
             # ---- * replace image source placeholder
             if image and isinstance(flat_ele, ImageShape):
-                if flat_ele.kwargs.get("source", "").lower() in ["*", "all"]:
+                if _lower(flat_ele.kwargs.get("source", "")) in ["*", "all"]:
                     flat_ele.source = image
 
             members = self.members or flat_ele.members
@@ -642,7 +643,8 @@ class DeckOfCards:
             * extra - number of extra cards to draw (beyond Data count)
             * copy - name of Data column used to set number of copies of a Card
             * image_list - list of image filenames
-            * export_cards - if True, then export card as individual images
+            * export_cards - if True, then export Card fronts as individual images
+            * card_name - name of Data column used to create filename for export Cards
             * card_rows - maximum number of rows of cards on a page
             * card_cols - maximum number of columns of cards on a page
             * dpi - resolution for output PNG
@@ -704,6 +706,7 @@ class DeckOfCards:
                 kwargs["grouping_cols"] = self.grouping_cols
                 kwargs["grouping_rows"] = self.grouping_rows
                 kwargs["page_number"] = page_number
+                kwargs["card_number"] = card_number
                 kwargs["right_gap"] = right_gap
                 image = images[card_num] if images and card_num <= len(images) else None
                 card.deck_data = self.dataset
@@ -824,7 +827,7 @@ class DeckOfCards:
             globals.document = pymupdf.open()  # pymupdf Document
 
             if self.gutter_layout:
-                _gutter_layout = str(self.gutter_layout).lower()
+                _gutter_layout = _lower(self.gutter_layout)
                 if _gutter_layout not in ["p", "portrait", "l", "landscape"]:
                     feedback(
                         f'The gutter_layout "{self.gutter_layout}" is not valid'
@@ -1381,6 +1384,7 @@ def Save(**kwargs):
             export_cards=cards,
             cards=globals.deck_settings.get("cards", DEFAULT_CARD_COUNT),
             copy=globals.deck_settings.get("copy", None),
+            card_name=globals.deck_settings.get("card_name", None),
             extra=globals.deck_settings.get("extra", 0),
             grid_marks=globals.deck_settings.get("grid_marks", None),
             image_list=globals.image_list,
@@ -1412,7 +1416,7 @@ def Save(**kwargs):
 
     # ---- save to PNG image(s) or SVG file(s)
     if output:
-        match str(output).lower():
+        match _lower(output):
             case "png":
                 fformat = ExportFormat.PNG
             case "svg":
@@ -1454,28 +1458,7 @@ def margins(**kwargs):
 
 def Font(name=None, **kwargs):
     validate_globals()
-    _name = None
-    _file = None
-    if name:
-        _name = builtin_font(name)
-        if not _name:  # check for custom font
-            cache_directory = Path(Path.home() / CACHE_DIRECTORY)
-            fi = FontInterface(cache_directory=cache_directory)
-            _name = fi.get_font_family(name)
-            _file = fi.get_font_file(name)
-            if not _name:
-                feedback(
-                    f'Cannot find or load a font named "{name}".'
-                    f' Defaulting to "{DEFAULT_FONT}".',
-                    False,
-                    True,
-                )
-            else:
-                font_path, css = fi.font_file_css(_name)
-                globals.css += css
-                globals.archive.add(font_path)
-                _file = font_path
-
+    _name, _path, _file = tools.get_font_file(name)
     globals.base.font_name = _name or DEFAULT_FONT
     globals.base.font_file = _file
     globals.base.font_size = kwargs.get("size", 12)
@@ -1626,11 +1609,11 @@ def Card(sequence: object = None, *elements, **kwargs):
             )
             if isinstance(sequence, list) and not isinstance(sequence, str):
                 _cards = sequence
-            elif sequence.lower() == "all" or sequence.lower() == "*":
+            elif _lower(sequence) == "all" or _lower(sequence) == "*":
                 _cards = list(range(1, card_count + 1))
-            elif sequence.lower() == "odd" or sequence.lower() == "o":
+            elif _lower(sequence) == "odd" or _lower(sequence) == "o":
                 _cards = list(range(1, card_count + 1, 2))
-            elif sequence.lower() == "even" or sequence.lower() == "e":
+            elif _lower(sequence) == "even" or _lower(sequence) == "e":
                 _cards = list(range(2, card_count + 1, 2))
             else:
                 _cards = tools.sequence_split(sequence)
@@ -1703,11 +1686,11 @@ def CardBack(sequence: object = None, *elements, **kwargs):
             )
             if isinstance(sequence, list) and not isinstance(sequence, str):
                 _cardbacks = sequence
-            elif sequence.lower() == "all" or sequence.lower() == "*":
+            elif _lower(sequence) == "all" or _lower(sequence) == "*":
                 _cardbacks = list(range(1, cardback_count + 1))
-            elif sequence.lower() == "odd" or sequence.lower() == "o":
+            elif _lower(sequence) == "odd" or _lower(sequence) == "o":
                 _cardbacks = list(range(1, cardback_count + 1, 2))
-            elif sequence.lower() == "even" or sequence.lower() == "e":
+            elif _lower(sequence) == "even" or _lower(sequence) == "e":
                 _cardbacks = list(range(2, cardback_count + 1, 2))
             else:
                 _cardbacks = tools.sequence_split(sequence)
@@ -2809,7 +2792,7 @@ def Hexagons(rows=1, cols=1, sides=None, **kwargs):
         return locales
 
     if kwargs.get("hex_layout") and kwargs.get("orientation"):
-        if kwargs.get("orientation").lower() in ["p", "pointy"] and kwargs.get(
+        if _lower(kwargs.get("orientation")) in ["p", "pointy"] and kwargs.get(
             "hex_layout"
         ) not in ["r", "rec", "rect", "rectangle"]:
             feedback(
@@ -2974,7 +2957,7 @@ def Location(grid: list, label: str, shapes: list, **kwargs):
     # get location centre from grid via the label
     locale, point = None, None
     for _locale in grid:
-        if _locale.label.lower() == str(label).lower():
+        if _lower(_locale.label) == _lower(label):
             point = Point(_locale.x, _locale.y)
             locale = _locale
             break
@@ -3007,7 +2990,7 @@ def Locations(grid: list, labels: Union[str, list], shapes: list, **kwargs):
         feedback("No list of shapes supplied!", True)
     if isinstance(labels, str):
         _labels = [_label.strip() for _label in labels.split(",")]
-        if labels.lower() == "all" or labels.lower() == "*":
+        if _lower(labels) == "all" or _lower(labels) == "*":
             _labels = []
             for loc in grid:
                 if isinstance(loc, Locale):
@@ -3137,7 +3120,7 @@ def Layout(grid, **kwargs):
             try:
                 value = corner[0]
                 shape = corner[1]
-                if value.lower() not in ["nw", "ne", "sw", "se", "*"]:
+                if _lower(value) not in ["nw", "ne", "sw", "se", "*"]:
                     feedback(
                         f'The corner must be one of nw, ne, sw, se (not "{value}")!',
                         True,
@@ -3269,7 +3252,7 @@ def Layout(grid, **kwargs):
         # ---- display debug
         do_debug = kwargs.get("debug", None)
         if do_debug:
-            match str(do_debug).lower():
+            match _lower(do_debug):
                 case "normal" | "none" | "null" | "n":
                     Dot(x=loc.x, y=loc.y, stroke=DEBUG_COLOR, fill=DEBUG_COLOR)
                 case "id" | "i":
@@ -3375,7 +3358,7 @@ def Track(track=None, **kwargs):
     elif track_name not in SHAPES_FOR_TRACK:
         feedback(f"Unable to use a {track_abbr} for a Track!", True)
     if rotation_style:
-        _rotation_style = str(rotation_style).lower()
+        _rotation_style = _lower(rotation_style)
         if _rotation_style not in ["o", "outwards", "inwards", "i"]:
             feedback(f"The rotation_style '{rotation_style}' is not valid", True)
     else:

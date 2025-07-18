@@ -55,7 +55,7 @@ def initialize():
     global units
 
     archive = None  # will become a pymupdf Archive
-    css = None  # will become a string containing CSS font details
+    css = None  # will become a string containing CSS font location
     document = None  # will become a pymupdf Document object
     doc_page = None  # will become a pymupdf Page object
     canvas = None  # will become a pymupdf Shape object; one created per Page
@@ -63,7 +63,7 @@ def initialize():
     deck = None  # will become a proto.DeckOfCards object
     deck_settings = (
         {}
-    )  # holds kwargs passed to DeckOfCards ; #cards, copy, extra, grid_marks
+    )  # holds kwargs passed to DeckOfCards ; #cards, copy, card_name, extra, grid_marks
     card_frames = {}  # list of proto.BBox card outlines; keyed on page number
     filename = None
     directory = None  # set by Save() command

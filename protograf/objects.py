@@ -19,6 +19,7 @@ from pymupdf import Point as muPoint, Rect as muRect
 # local
 from protograf import globals
 from protograf.utils import geoms, tools, support
+from protograf.utils.tools import _lower
 from protograf.utils.constants import (
     GRID_SHAPES_WITH_CENTRE,
     COLOR_NAMES,
@@ -104,7 +105,7 @@ class PolyominoObject(RectangleShape):
             issue.append("Both gap and outline cannot be set at the same time!")
             correct = False
         if self.invert:
-            if str(self.invert).lower() not in [
+            if _lower(self.invert) not in [
                 "lr",
                 "leftright",
                 "rl",

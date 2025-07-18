@@ -41,6 +41,7 @@ from pymupdf import (
 
 # local
 from protograf.utils import geoms, tools, support
+from protograf.utils.tools import _lower
 from protograf.utils.constants import (
     CACHE_DIRECTORY,
     DEBUG_COLOR,
@@ -214,7 +215,7 @@ class BaseCanvas:
         self.font_size = self.defaults.get("font_size", 12)
         self.font_style = self.defaults.get("font_style", None)
         self.font_directory = self.defaults.get("font_directory", None)
-        self.style = self.defaults.get("style", None)
+        self.style = self.defaults.get("style", None)  # HTML/CSS style
         self.wrap = self.defaults.get("wrap", False)
         self.align = self.defaults.get("align", "centre")  # centre,left,right,justify
         self._alignment = TEXT_ALIGN_LEFT  # see to_alignment()
@@ -662,7 +663,7 @@ class BaseShape:
         self.font_size = self.kw_float(kwargs.get("font_size", base.font_size))
         self.font_style = kwargs.get("font_style", base.font_style)
         self.font_directory = kwargs.get("font_directory", base.font_directory)
-        self.style = kwargs.get("style", base.style)
+        self.style = kwargs.get("style", base.style)  # HTML/CSS style
         self.wrap = kwargs.get("wrap", base.wrap)
         self.align = kwargs.get("align", base.align)  # centre,left,right,justify
         self._alignment = TEXT_ALIGN_LEFT  # see to_alignment()
@@ -1190,7 +1191,7 @@ class BaseShape:
         correct = True
         issue = []
         if self.align:
-            if str(self.align).lower() not in [
+            if _lower(self.align) not in [
                 "left",
                 "right",
                 "justify",
@@ -1210,7 +1211,7 @@ class BaseShape:
             else:
                 _edges = self.edges
             for edge in _edges:
-                if str(edge).lower() not in [
+                if _lower(edge) not in [
                     "north",
                     "south",
                     "east",
@@ -1225,11 +1226,11 @@ class BaseShape:
                     )
                     correct = False
         if self.flip:
-            if str(self.flip).lower() not in ["north", "south", "n", "s"]:
+            if _lower(self.flip) not in ["north", "south", "n", "s"]:
                 issue.append(f'"{self.flip}" is an invalid flip!')
                 correct = False
         if self.hand:
-            if str(self.hand).lower() not in [
+            if _lower(self.hand) not in [
                 "west",
                 "east",
                 "w",
@@ -1238,7 +1239,7 @@ class BaseShape:
                 issue.append(f'"{self.hand}" is an invalid hand!')
                 correct = False
         if self.lines:
-            if str(self.lines).lower() not in [
+            if _lower(self.lines) not in [
                 "all",
                 "vertical",
                 "horizontal",
@@ -1251,7 +1252,7 @@ class BaseShape:
                 issue.append(f'"{self.lines}" is an invalid lines setting!')
                 correct = False
         if self.elevation:
-            if str(self.elevation).lower() not in [
+            if _lower(self.elevation) not in [
                 "vertical",
                 "horizontal",
                 "v",
@@ -1260,11 +1261,11 @@ class BaseShape:
                 issue.append(f'"{self.elevation}" is an invalid elevation!')
                 correct = False
         if self.orientation:
-            if str(self.orientation).lower() not in ["flat", "pointy", "f", "p"]:
+            if _lower(self.orientation) not in ["flat", "pointy", "f", "p"]:
                 issue.append(f'"{self.orientation}" is an invalid orientation!')
                 correct = False
         if self.perimeter:
-            if str(self.perimeter).lower() not in [
+            if _lower(self.perimeter) not in [
                 "circle",
                 "rectangle",
                 "hexagon",
@@ -1275,7 +1276,7 @@ class BaseShape:
                 issue.append(f'"{self.perimeter}" is an invalid perimeter!')
                 correct = False
         if self.position:
-            if str(self.position).lower() not in [
+            if _lower(self.position) not in [
                 "top",
                 "bottom",
                 "center",
@@ -1288,7 +1289,7 @@ class BaseShape:
                 issue.append(f'"{self.position}" is an invalid position!')
                 correct = False
         if self.petals_style:
-            if str(self.petals_style).lower() not in [
+            if _lower(self.petals_style) not in [
                 "triangle",
                 "curve",
                 "rectangle",
@@ -1304,7 +1305,7 @@ class BaseShape:
                 correct = False
         # ---- line / arrow
         if self.rotation_point:
-            if str(self.rotation_point).lower() not in [
+            if _lower(self.rotation_point) not in [
                 "start",
                 "centre",
                 "end",
@@ -1316,12 +1317,12 @@ class BaseShape:
                 correct = False
         # ---- hexagons
         if self.coord_style:
-            if str(self.coord_style).lower() not in ["linear", "diagonal", "l", "d"]:
+            if _lower(self.coord_style) not in ["linear", "diagonal", "l", "d"]:
                 issue.append(f'"{self.coord_style}" is an invalid coord style!')
                 correct = False
         # ---- arrowhead style
         if self.arrow_style:
-            if str(self.arrow_style).lower() not in [
+            if _lower(self.arrow_style) not in [
                 "angle",
                 "angled",
                 "a",
@@ -1339,7 +1340,7 @@ class BaseShape:
                 correct = False
         # ---- line arrows
         # if self.arrow_tail_style:
-        #     if str(self.arrow_tail_style).lower() not in [
+        #     if _lower(self.arrow_tail_style) not in [
         #         "line",
         #         "l",
         #         "line2",
@@ -1357,12 +1358,12 @@ class BaseShape:
         #         correct = False
         # ---- starfield
         if self.star_pattern:
-            if str(self.star_pattern).lower() not in ["random", "cluster", "r", "c"]:
+            if _lower(self.star_pattern) not in ["random", "cluster", "r", "c"]:
                 issue.append(f'"{self.pattern}" is an invalid starfield pattern!')
                 correct = False
         # ---- rectangle - notches
         if self.notch_style:
-            if str(self.notch_style).lower() not in [
+            if _lower(self.notch_style) not in [
                 "snip",
                 "s",
                 "fold",
@@ -1384,7 +1385,7 @@ class BaseShape:
                 try:
                     _dir = point[0]
                     value = tools.as_float(point[1], " peaks value")
-                    if _dir.lower() not in ["n", "e", "w", "s", "*"]:
+                    if _lower(_dir) not in ["n", "e", "w", "s", "*"]:
                         feedback(
                             f'The peaks direction must be one of n, e, s, w (not "{_dir}")!',
                             True,
@@ -1492,7 +1493,7 @@ class BaseShape:
             if not slice_portion:
                 return None
             try:
-                _slice = slice_portion.lower()
+                _slice = _lower(slice_portion)
                 if _slice[0] not in ["t", "m", "b", "l", "c", "r"]:
                     feedback(f'The sliced value "{slice_portion}" is not valid!', True)
                 img = Image.open(img_path)
@@ -1530,7 +1531,7 @@ class BaseShape:
                         raise NotImplementedError(f"Cannot process {slice_portion}")
                 # create new file with sliced image
                 img2_filename = img_path.stem + "_" + _slice[0] + img_path.suffix
-                sliced_filename = os.path.join(str(img_path.parent), img2_filename)
+                sliced_filename = os.path.join(_lower(img_path.parent), img2_filename)
                 img2.save(sliced_filename)
                 return sliced_filename
             except Exception as err:
@@ -2254,7 +2255,7 @@ class BaseShape:
                     kwargs["rotation"] = 0
                     kwargs["rotation_point"] = None
 
-            match str(self.arrow_style).lower():
+            match _lower(self.arrow_style):
                 case "triangle" | "t":
                     pass
                 case "spear" | "s":
