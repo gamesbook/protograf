@@ -3161,16 +3161,17 @@ specify their location or other details.
 
 The three "simple" text types that can be added to a shape are:
 
-- *heading* - this appears above the shape  (slightly offset)
+- *heading* - this appears above the shape (slightly offset)
 - *label* - this appears in the middle of the shape
 - *title* - this appears below the shape (slightly offset)
 
 All types are, by default, centred horizontally. Each type can be customised
-in terms of its color, size and face by appending *_stroke*, *_size* and
-*_face* respectively to the type's name.
+in terms of its color, size and font family by appending *_stroke*, *_size*
+and *_font* respectively to the text type's name; so ``heading_font="Courier``
+will set the font family for the heading appearing above the shape.
 
 The *label* text can, in addition, be **moved** relative to the shape's centre
-by using *mx* and *my* properties; positive values will move the text to
+by using the *mx* and *my* properties; positive values will move the text to
 the right and down; and negative values will move the text to the left and up.
 
 Example 1. Heading, Label and Title

@@ -126,9 +126,9 @@ Card("49-51",
 # circle + icons ['\x28', 'H', '\x64']
 circle_icon = Common(fill="black", stroke="white", radius=1.25, font_size=48)
 Card("52-54",
-     circle(common=circle_icon, cx=1.8, cy=1.8, label='\x28', label_face='zapfdingbats'),
-     circle(common=circle_icon, cx=3.1, cy=4.4, label='H', label_face='zapfdingbats'),
-     circle(common=circle_icon, cx=4.4, cy=7.0, label='\x64', label_face='zapfdingbats'),
+     circle(common=circle_icon, cx=1.8, cy=1.8, label='\x28', label_font='zapfdingbats'),
+     circle(common=circle_icon, cx=3.1, cy=4.4, label='H', label_font='zapfdingbats'),
+     circle(common=circle_icon, cx=4.4, cy=7.0, label='\x64', label_font='zapfdingbats'),
 )
 
 Save()

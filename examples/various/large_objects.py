@@ -55,7 +55,7 @@ Circle(
     radii_stroke=colrs,
     radii_stroke_width=0.01,
     radii_labels=labels,
-    radii_labels_face="Times-Roman",
+    radii_labels_font="Times-Roman",
     dot=0.2)
 
 

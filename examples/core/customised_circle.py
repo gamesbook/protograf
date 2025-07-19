@@ -134,7 +134,7 @@ Circle(cx=1, cy=1, radius=1,
        radii_labels=["A", "B", "C"],
        radii_labels_rotation=270,
        radii_labels_stroke="red",
-       radii_labels_face="Courier",
+       radii_labels_font="Courier",
        dot=0.05)
 PageBreak()
 
