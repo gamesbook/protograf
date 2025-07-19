@@ -61,6 +61,10 @@ The following are other properties that can also be set for a ``Deck``:
 
 - **bleed_fill** - set a background color for the page (up to the margins);
   if no separate **fill** property is set, then this color will be used instead
+- **card_name**  - the name of a column in the dataset defined by
+  :ref:`the Data Command <the-data-command>` that specifies
+  what file name will be given to the card when it is exported as an image
+  (if not supplied, will default to using the page number and card number)
 - **card_size** - a pre-existing card size used to set *width* and *height*
   (values for *width* and *height* will override these); can be one of:
   ``"poker"``, ``"bridge"``, ``"mini"``, ``"miniamerican"``, ``"minieuropean"``,

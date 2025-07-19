@@ -67,6 +67,19 @@ DEBUG = False
 WIDTH = 0.1
 
 
+def get_cache(**kwargs):
+    """Get and/or set a cache directory for to save file images."""
+    default_cache = Path(Path.home(), CACHE_DIRECTORY, "images")
+    default_cache.mkdir(parents=True, exist_ok=True)
+    cache_directory = kwargs.get("cache_directory", str(default_cache))
+    if not os.path.exists(cache_directory):
+        feedback(
+            "Unable to create or find the cache directory:" f" {str(cache_directory)}",
+            True,
+        )
+    return cache_directory
+
+
 class BaseCanvas:
     """Wrapper/extension for a PyMuPDF Page."""
 
@@ -1449,26 +1462,27 @@ class BaseShape:
         If image_location not found; try path in which script located.
 
         Args:
-            image_location:
+            image_location (str):
                 full path or URL for image
-            origin:
+            origin (tuple):
                 x, y location of image on Page
-            sliced:
+            sliced (str):
                 what fraction of the image to return; one of
                 't', 'm', 'b', 'l', 'c', or 'r'
-            width_height:
+            width_height (tuple):
                 the (width, height) of the output frame for the image;
                 will be used along with x,y to set size and position;
                 will be recalcuated if image is rotated
-            cache_directory:
+            cache_directory (str):
                 where to store a local for copy for URL-sourced images
-            rotation:
+            rotation (float):
                 angle of image rotation (in degrees)
 
         Returns:
             tuple:
-                * Image
-                * boolean (True if file is a directory)
+
+            - Image
+            - boolean (True if file is a directory)
 
         Notes:
 
@@ -1476,16 +1490,22 @@ class BaseShape:
 
         def slice_image(
             img_path, slice_portion: str = None, width_height: tuple = (1, 1)
-        ):
+        ) -> str:
             """Slice off a portion of an image while maintaining its aspect ratio
 
             Args:
-                img_path:
+                img_path (Pathlib):
                     Pathlib file
-                sliced:
+                slice_portion (str):
                     what portion of the image to return
-                width_height:
+                width_height (tuple):
                     the (width, height) of the output frame for the image
+
+            Returns:
+                filename (str): path to sliced image
+
+            Note:
+                Uses the CACHE_DIRECTORY to store these (temporary) images
             """
             # feedback(f"### {img_path=} {slice_portion=}")
             if not slice_portion:
@@ -1528,10 +1548,16 @@ class BaseShape:
                     case _:
                         raise NotImplementedError(f"Cannot process {slice_portion}")
                 # create new file with sliced image
-                img2_filename = img_path.stem + "_" + _slice[0] + img_path.suffix
-                sliced_filename = os.path.join(_lower(img_path.parent), img2_filename)
-                img2.save(sliced_filename)
-                return sliced_filename
+                try:
+                    cache_directory = get_cache()
+                    img2_filename = img_path.stem + "_" + _slice[0] + img_path.suffix
+                    sliced_filename = os.path.join(cache_directory, img2_filename)
+                    img2.save(sliced_filename)
+                    return sliced_filename
+                except Exception as err:
+                    feedback(
+                        f'Unable to save image slice "{slice_portion}" - {err}', True
+                    )
             except Exception as err:
                 feedback(
                     f'The sliced value "{slice_portion}" is not valid! ({err})', True

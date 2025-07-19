@@ -42,23 +42,11 @@ from protograf.base import (
     BaseShape,
     BaseCanvas,
     GridShape,
+    get_cache,
 )
 
 log = logging.getLogger(__name__)
 DEBUG = False
-
-
-def get_cache(**kwargs):
-    """Get and/or set a cache directory for to save file images."""
-    default_cache = Path(Path.home(), CACHE_DIRECTORY, "images")
-    default_cache.mkdir(parents=True, exist_ok=True)
-    cache_directory = kwargs.get("cache_directory", str(default_cache))
-    if not os.path.exists(cache_directory):
-        feedback(
-            "Unable to create or find the cache directory:" f" {str(cache_directory)}",
-            True,
-        )
-    return cache_directory
 
 
 def set_cached_dir(source):
