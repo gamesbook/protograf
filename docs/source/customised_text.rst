@@ -37,15 +37,16 @@ Adding text to a design is a very common practice.
 :doc:`protograf <index>` offers four similar, but differing, ways to this.
 
 The first is through directly "embedding" the text as part of a shape. The
- :doc:`Customised Shapes <customised_shapes>` section has many examples
- showing how, for example, properties such as *label_text* or *heading_text*
- can be used to display text at predefined locations relative to where the
- shape is positioned.  Such text has the advantage that it automatically
- "moves" when the shape is repositioned; but it cannot really be styled.
+:doc:`Customised Shapes <customised_shapes>` section has many examples
+showing how, for example, properties such as *label_text* or *heading_text*
+can be used to display text at predefined locations relative to where the
+shape is positioned.  Such text has the advantage that it automatically
+"moves" when the shape is repositioned; but the styling options for such
+text are limited.
 
-The other three ways make use of the ``Text`()`` command as described below.
+The other three ways make use of the ``Text()`` command as described below.
 These ways require you to identify exactly where on a page (or card) the text
-must be appear.  In the case of HTML-type text, many more styling options also
+must appear.  In the case of HTML-type text, many more styling options also
 exist.
 
 .. _textProperties:
@@ -57,7 +58,7 @@ Properties
 Basic Properties
 ++++++++++++++++
 
-The basic properties that can be set for text are:
+The basic properties that can be set for ``Text()`` are:
 
 - *text* - the text string to be displayed
 - *font_size* - default is ``12`` points
@@ -66,18 +67,21 @@ The basic properties that can be set for text are:
 - *align* - the default alignment is ``centre``; it can be changed to be
   ``left`` or ``right``
 - *transform* - convert the text to ``upper`` (``u``) or ``lower`` (``l``)
-   or ``title`` (``t``) case
+  or ``title`` (``t``) case
 
 Advanced Properties
 +++++++++++++++++++
 
-The more advanced properties that can be set for "box" text are:
+The more advanced properties that can be set for "box" ``Text()`` are:
 
 - *wrap* - set to ``True`` to enable the text to wrap
 - *html* - set to ``True`` to both enable the text to wrap and also to use
   embedded HTML/CSS styling options
 - *width* - width of the box in which the text appears
 - *height* - height of the box in which the text appears
+- *box_* - various properties, similar to the that of most areas, can be set
+  to style the box in some way, including *box_fill*, *box_stroke*,
+  *box_stoke_width*, *box_dotted*, *box_dashed*, and *box_transparency*
 - *style* - set HTML/CSS properties that will apply to all of the text; this
   will **automatically** also set the *html* property to ``True`
 
@@ -96,21 +100,25 @@ For example:
 
 .. code:: python
 
-    Text(x=1, y=1, text="This is default 12pt Helvetica")
+    Text(x=3, y=1, text="This is default 12pt Helvetica")
 
 Line text can make also use of the basic properties to set ``Font``
-attributes, and do transformation and alignment.
+attributes, and carry out transformation and alignment.
 
 For example:
 
 .. code:: python
 
-    Text(x=0, y=1,
-         font_size=7, stroke="red",
-         font_name="Courier",
+    Text(x=4, y=0,
+         font_size=6, stroke="red",
+         font_name="Times-Roman",
          align="right",
          transform='t',  # titlecase!
-         text="Red 7pt Courier in titlecase aligned right")
+         text="Red 6pt Times titlecase aligned right")
+
+Note the the "alignment" is based on the *x* and *y* position; so ``right``
+aligned text will **end** on that position and ``left`` aligned text will
+**start** on that position.
 
 
 .. _textWrap:
@@ -119,7 +127,30 @@ Wrapped Text Box
 ================
 `↑ <table-of-contents-text_>`_
 
+A wrapped text box is created by setting ``wrap=True`` in a ``Text()`` command.
 
+A wrapped text box is very similar to the single line text, but in addition
+to the *x* and *y* position, it also requires *height* and *width* to be set.
+
+The text is then "wrapped" within the boundaries of the rectangle defined by
+these settings.
+
+For example:
+
+.. code:: python
+
+    Text(x=0, y=3,
+         height=2, width=4,
+         wrap="True",
+         font_size=7, stroke="red",
+         font_name="Courier",
+         align="right",
+         transform='t',  # titlecase!
+         text="""Red 7pt Courier in title case aligned right
+    and wrapped around""")
+
+In this example, it can be seen how use of triple quotes |dash| `"""` |dash|
+enables the text to be written over multiple lines.
 
 .. IMPORTANT::
 
@@ -133,6 +164,12 @@ HTML Text Box
 ================
 `↑ <table-of-contents-text_>`_
 
+An HTML text box is created by setting ``html=True`` in a ``Text()`` command.
+
+An HTML text box is very similar to the single line text, but in addition
+to the *x* and *y* position, it also requires *height* and *width* to be set.
+The text is then "wrapped" within the boundaries of the rectangle defined by
+these settings.
 
 .. IMPORTANT::
 
@@ -140,6 +177,25 @@ HTML Text Box
   displayed using the given font family and size, then the text will be
   **RESIZED** to fit!
 
+An HTML text box is most useful when fine-grained control of text is required.
+
+An HTML text box is also required if you need to insert Unicode-referenced
+characters as part of the text, using the ``\u0041`` notation.
+
+Knowledge of CSS, as used to style HTML web pages, is required if you to
+achieve specific effects. This can be done in two ways (neither is exclusive
+of the other):
+
+- the *style* property can be used to set style values for a ``<div>`` that
+  will "wrap" all of the text supplied
+- CSS styling and HTML elements can be used within the text itself;
+  for example: ``<p style="color:green">this is a green paragraph</p>``.
+
+.. IMPORTANT::
+
+  If you use ``font-family`` setting in the *style* property (and/or in the
+  *text* itself), you **must** have already activated that font via the
+  ``Font()`` command; for example ``Font("Eagle Lake")``.
 
 .. _textExamples:
 
@@ -149,10 +205,11 @@ Examples
 
 To make it easier to see where and how text has been drawn, most of these
 examples have been created with a background grid (which **protograf**
-refers to as a `Blueprint`_ shape) added to the page |dash| a small A8
-"business card" size |dash| for cross-reference. In addition, the default
-line width (aka *stroke_width*) has been made thicker for easier viewing of
-the small PNG images that are generated from the original PDF output.
+refers to as a :ref:`Blueprint <blueprint-command>` shape) added to the
+page |dash| a small A8 "business card" size |dash| for cross-reference.
+In addition, the default line width (aka *stroke_width*) has been made
+thicker for easier viewing of the small PNG images that are generated from
+the original PDF output.
 
 A number of examples also use the :ref:`Common command <the-common-command>`
 |dash| this allows shared properties to be defined once and then used by any
@@ -206,7 +263,7 @@ Example 1. Customised Text
       - *align* - can be ``left``, ``centre`` or ``right``
       - *transform* - ``uppercase`` (``u``), ``lowercase`` (``l``) or
         ``titlecase`` (``t``)
-      - various font properties
+      - various font related properties
 
       The box **must** be big enough to show the text, otherwise none will be
       displayed!
@@ -260,8 +317,8 @@ Example 2. Styled Text
                   '<b>bold</b> <i>ital</i> <b><i>bold ital</i></b>'
         )
         Text(x=0, y=4, width=4, height=1,
-             block_stroke="red", block_fill="yellow",
-             block_dotted=True, block_transparency=50,
+             box_stroke="red", box_fill="yellow",
+             box_dotted=True, box_transparency=50,
              style="font-family: Courier; font-size: 8pt; color: blue;",
              text='HTML/CSS Courier 8pt<br/>')
 
@@ -280,7 +337,7 @@ Example 2. Styled Text
         that font.
 
       The last HTML text shows how the rectangular "block" that forms the
-      text boundary can itself be styled by using the various *block_*
+      text boundary can itself be styled by using the various *box_*
       properties.
 
 ===== ======
@@ -434,14 +491,25 @@ Example 5. Custom Fonts
 +++++++++++++++++++++++
 `^ <textIndex_>`_
 
-These fonts are typically not installed by default on a machine and so this
-example will not work as expected. The fonts used can be sourced from:
+Many fonts, such as the ones shown in this example, are typically **not**
+installed by default on a machine. If you want to run this example as expected,
+then the fonts used can be obtained from:
 
-    * https://fonts.google.com/specimen/Quintessential
-    * https://fonts.google.com/specimen/Eagle+Lake
-    * https://fontmeme.com/fonts/freemono-font/
-    * https://fonts.google.com/specimen/Tektur
+- https://fonts.google.com/specimen/Quintessential
+- https://fonts.google.com/specimen/Eagle+Lake
+- https://fontmeme.com/fonts/freemono-font/
+- https://fonts.google.com/specimen/Tektur
 
+The best way to use custom fonts in a script is to "activate" them with the
+``Font()`` command, as shown in the example near the start of the script.
+
+.. IMPORTANT::
+
+  If you have previously run a script, then all fonts available at that time
+  would have been indexed.  If you later install new fonts you want to use,
+  then you need to add in the ``cached_fonts=False`` property to the
+  ``Create()`` command at the start of the script. You only need to do this
+  once after new font install, and then the property can be removed.
 
 
 .. |t06| image:: images/customised/text_fonts.png
@@ -463,16 +531,16 @@ example will not work as expected. The fonts used can be sourced from:
 
         Text(x=0, y=1, width=4, height=1.25, wrap=True,
              align="right", stroke="green", font_size=14,
-             font_name="Eagle Lake", block_fill="lightcyan",
+             font_name="Eagle Lake", box_fill="lightcyan",
              text="AbcEJZ?0&")
 
         Text(x=0, y=2.5, width=4, height=1.25, html=True,
              align="left", stroke="red", font_size=14,
-             font_name="Quintessential", block_fill="pink",
+             font_name="Quintessential", box_fill="pink",
              text="AbcEJZ?0&")
 
         Text(x=0, y=4, width=4, height=1.25,
-             block_fill="greenyellow",  # NO html!
+             box_fill="greenyellow",  # NO html!
              style="""
                  font-family: FreeMono;
                  font-size: 15.0px;
@@ -481,7 +549,7 @@ example will not work as expected. The fonts used can be sourced from:
              text="AbcEJZ?0&")
 
         Text(x=0, y=5.5, width=4, height=2.5,
-             html=True, block_fill="silver",
+             html=True, box_fill="silver",
              text="""
              <div style="
                  font-family: Eagle Lake;

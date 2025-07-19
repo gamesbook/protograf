@@ -355,7 +355,7 @@ class CardShape(BaseShape):
         if is_card_back:
             _dx = _dx + move_x
 
-        # ---- track/update frame and store card fronts
+        # ---- track/update frame and store card fronts (plus card name)
         if not is_card_back:
             mx = self.unit(_dx or 0) + self._o.delta_x
             my = self.unit(_dy or 0) + self._o.delta_y
@@ -364,10 +364,12 @@ class CardShape(BaseShape):
                 tl=Point(mx, my), br=Point(mx + frame_width, my + frame_height)
             )
             page = kwargs.get("page_number", 0)
+            _cframe = (frame_bbox, kwargs.get("cardname", None))
+            # store for use by pdf_cards_to_png()
             if page not in globals.card_frames:
-                globals.card_frames[page] = [frame_bbox]
+                globals.card_frames[page] = [_cframe]
             else:
-                globals.card_frames[page].append(frame_bbox)
+                globals.card_frames[page].append(_cframe)
 
         # ---- draw card elements
         flat_elements = tools.flatten(self.elements)
@@ -503,6 +505,7 @@ class DeckOfCards:
         self.sequence = kwargs.get("sequence", [])  # e.g. "1-2" or "1-5,8,10"
         self.template = kwargs.get("template", None)
         self.copy = kwargs.get("copy", None)
+        self.card_name = kwargs.get("card_name", None)
         self.mask = kwargs.get("mask", None)
         if self.mask and not self.dataset:
             feedback('Cannot set "mask" for a Deck without any existing Data!', True)
@@ -626,7 +629,7 @@ class DeckOfCards:
         """Save individual cards as PNG images using their frames."""
         if self.export_cards and globals.pargs.png:  # pargs.png should default to True
             support.pdf_cards_to_png(
-                source=filename,
+                source_file=filename,
                 output=output or filename,
                 fformat=fformat,
                 dpi=self.dpi,
@@ -707,6 +710,7 @@ class DeckOfCards:
                 kwargs["grouping_rows"] = self.grouping_rows
                 kwargs["page_number"] = page_number
                 kwargs["card_number"] = card_number
+                kwargs["cardname"] = None
                 kwargs["right_gap"] = right_gap
                 image = images[card_num] if images and card_num <= len(images) else None
                 card.deck_data = self.dataset
@@ -729,6 +733,10 @@ class DeckOfCards:
                         copies = (
                             tools.as_int(_copies, "copy property", allow_none=True) or 1
                         )
+                    # get card name (for output png image)
+                    if card.kwargs.get("dataset") and self.card_name:
+                        cardname = card.deck_data[card_num].get(self.card_name, None)
+                        kwargs["cardname"] = cardname
 
                     for i in range(state.copies_to_do, copies):
                         if not front:
@@ -1351,8 +1359,9 @@ def Save(**kwargs):
     - framerate (float): the delay in seconds between each "page" of a GIF image; by
       default this is ``1`` second
     - cards (bool): if set to ``True`` will cause all the card fronts to be
-      exported as PNG files;  the names of the files are derived using the PDF
-      filename, with a dash (-) followed by the page number
+      exported as PNG files;  the names of the files are either derived using the
+      PDF filename, with a dash (-) followed by the page number OR set by the user
+      with ``card_name`` property in the Deck()
 
     Notes:
 

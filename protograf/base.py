@@ -279,7 +279,7 @@ class BaseCanvas:
         self.heading_mx = self.defaults.get("heading_mx", 0)
         self.heading_my = self.defaults.get("heading_my", 0)
         self.heading_rotation = self.defaults.get("heading_rotation", 0)
-        # ---- text block
+        # ---- text box (wrap/HTML)
         self.leading = self.defaults.get("leading", self.font_size)
         self.transform = self.defaults.get("transform", None)
         self.html = self.defaults.get("html", False)
@@ -292,13 +292,13 @@ class BaseCanvas:
         # if self.outlined:
         #     self.stroke = self.outline_stroke
         #     self.fill = None
-        # ---- text block rectangle
-        self.block_fill = self.defaults.get("block_fill", None)
-        self.block_stroke = self.defaults.get("block_stroke", None)
-        self.block_stroke_width = self.defaults.get("block_stroke_width", 0)
-        self.block_dashed = self.defaults.get("block_dashed", None)
-        self.block_dotted = self.defaults.get("block_dotted", None)
-        self.block_transparency = self.defaults.get("block_transparency", None)
+        # ---- text box rectangle
+        self.box_fill = self.defaults.get("box_fill", None)
+        self.box_stroke = self.defaults.get("box_stroke", None)
+        self.box_stroke_width = self.defaults.get("box_stroke_width", 0)
+        self.box_dashed = self.defaults.get("box_dashed", None)
+        self.box_dotted = self.defaults.get("box_dotted", None)
+        self.box_transparency = self.defaults.get("box_transparency", None)
         # ---- image / file
         self.source = self.defaults.get("source", None)  # file or http://
         self.cache_directory = None  # should be a pathlib.Path object
@@ -724,16 +724,14 @@ class BaseShape:
         #     self.stroke = self.outline_stroke
         #     self.fill = None
         # ---- text block
-        self.block_stroke = kwargs.get("block_stroke", base.block_stroke)
-        self.block_fill = kwargs.get("block_fill", base.block_fill)
-        self.block_stroke_width = self.kw_float(
-            kwargs.get("block_stroke_width", base.block_stroke_width)
+        self.box_stroke = kwargs.get("box_stroke", base.box_stroke)
+        self.box_fill = kwargs.get("box_fill", base.box_fill)
+        self.box_stroke_width = self.kw_float(
+            kwargs.get("box_stroke_width", base.box_stroke_width)
         )
-        self.block_dashed = kwargs.get("block_dashed", base.block_dashed)
-        self.block_dotted = kwargs.get("block_dotted", base.block_dotted)
-        self.block_transparency = kwargs.get(
-            "block_transparency", base.block_transparency
-        )
+        self.box_dashed = kwargs.get("box_dashed", base.box_dashed)
+        self.box_dotted = kwargs.get("box_dotted", base.box_dotted)
+        self.box_transparency = kwargs.get("box_transparency", base.box_transparency)
         # feedback(f"### BShp:"
         # f"{self} {kwargs.get('fill')=} {self.fill=} {kwargs.get('fill_color')=}")
         # ---- image / file
@@ -1560,7 +1558,7 @@ class BaseShape:
                     f.write(image.content)
             return image_local
 
-        def image_box_resize(bbox: muRect, img_path: str, rotation: float) -> muRect:
+        def image_bbox_resize(bbox: muRect, img_path: str, rotation: float) -> muRect:
             """Recompute bounding Rect for a rotated image to maintain image size.
 
             Args
@@ -1604,15 +1602,15 @@ class BaseShape:
                     _rotation = rotation
                 rotation_rad = math.radians(_rotation)
                 img_height = bbox.width * iheight / iwidth
-                new_box_height = bbox.width * math.sin(
+                new_bbox_height = bbox.width * math.sin(
                     rotation_rad
                 ) + img_height * math.cos(rotation_rad)
-                new_box_width = bbox.width * math.cos(
+                new_bbox_width = bbox.width * math.cos(
                     rotation_rad
                 ) + img_height * math.sin(rotation_rad)
                 new_bbox = muRect(
-                    (center.x - new_box_width / 2.0, center.y - new_box_height / 2.0),
-                    (center.x + new_box_width / 2.0, center.y + new_box_height / 2.0),
+                    (center.x - new_bbox_width / 2.0, center.y - new_bbox_height / 2.0),
+                    (center.x + new_bbox_width / 2.0, center.y + new_bbox_height / 2.0),
                 )
             return new_bbox
 
@@ -1660,7 +1658,7 @@ class BaseShape:
                 overlay=True,  # put in foreground
             )
             if self.run_debug:
-                pdf_page.draw_rect(rct, color=get_color(DEBUG_COLOR))
+                pdf_page.draw_rect(rct, color=tools.get_color(DEBUG_COLOR))
             return image_local
 
         img = False
@@ -1703,7 +1701,7 @@ class BaseShape:
         scaffold = (origin[0], origin[1], origin[0] + width, origin[1] + height)
         if rotation is not None:
             # need a larger rect!
-            new_origin = image_box_resize(muRect(scaffold), image_local, rotation)
+            new_origin = image_bbox_resize(muRect(scaffold), image_local, rotation)
             scaffold = (
                 new_origin[0],
                 new_origin[1],

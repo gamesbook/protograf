@@ -21,9 +21,8 @@ Create(filename="customised_text.pdf",
        margin_top=0.5,
        font_size=8,
        stroke_width=0.5,
+       # cached_fonts=False,  # force reindex of all fonts
        )
-
-Footer(draw=False)
 
 txt = Common(x=0, y=0, font_size=8, align="left")
 
@@ -56,8 +55,8 @@ Text(x=0, y=3, width=4, height=2,
           '<b>bold</b> <i>ital</i> <b><i>bold ital</i></b>'
 )
 Text(x=0, y=4, width=4, height=1,
-     block_stroke="red", block_fill="yellow",
-     block_dotted=True, block_transparency=50,
+     box_stroke="red", box_fill="yellow",
+     box_dotted=True, box_transparency=50,
      style="font-family: Courier; font-size: 8pt; color: blue;",
      text='HTML/CSS Courier 8pt<br/>'
 )
@@ -161,25 +160,25 @@ Text(x=0, y=0.5, width=4, height=1.5,
 
 Text(x=0, y=1, width=4, height=1.25, wrap=True,
      align="right", stroke="green", font_size=14,
-     font_name="Eagle Lake", block_fill="lightcyan",
+     font_name="Eagle Lake", box_fill="lightcyan",
      text="AbcEJZ?0&")
 
 Text(x=0, y=2.5, width=4, height=1.25, html=True,
      align="left", stroke="red", font_size=14,
-     font_name="Quintessential", block_fill="pink",
+     font_name="Quintessential", box_fill="pink",
      text="AbcEJZ?0&")
 
 Text(x=0, y=4, width=4, height=1.25,
-     block_fill="greenyellow",  # NO html!
+     box_fill="greenyellow",  # NO html! font-family: FreeMono;
      style="""
-         font-family: FreeMono;
+         font-family: Quintessential;
          font-size: 15.0px;
          color:gray;
          font-weight: bold;""",
      text="AbcEJZ?0&")
 
 Text(x=0, y=5.5, width=4, height=2.5,
-     html=True, block_fill="silver",
+     html=True, box_fill="silver",
      text="""
      <div style="
          font-family: Eagle Lake;

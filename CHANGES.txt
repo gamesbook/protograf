@@ -4,6 +4,7 @@ protograf Changes
 2025-00-00 (0.2.10)
 -------------------
 - Enable use of Pentomino letters for Card
+- Revise and expand Text documentation
 
 2025-07-16 (0.2.9)
 ------------------

@@ -166,12 +166,16 @@ class FontInterface:
             return None
         if not self.font_families:
             self.load_font_families()
+        _filename_regular = None  # fallback in case of no exact match
         for font_family in list(self.font_families.keys()):
             font_details = self.font_families[font_family]
             for font in font_details:
                 _filename = None
                 if str(name).strip().lower() == font["name"].lower():
                     _filename = font["file"]
+                # fallback - use Regular if available
+                if str(name).strip().lower() + " regular" == font["name"].lower():
+                    _filename_regular = font["file"]
                 if "Gras" in font["name"]:
                     if (
                         str(name).strip().lower()
@@ -191,7 +195,15 @@ class FontInterface:
                         _fileonly = Path(_filename).name
                         return _fileonly
 
-        return None
+        # is fallback available?
+        if _filename_regular:
+            if fullpath:
+                return _filename_regular
+            else:
+                _fileonly = Path(_filename_regular).name
+                return _fileonly
+        else:
+            return None
 
     @lru_cache(maxsize=256)  # limits cache
     def font_file_css(self, font_family: str) -> Union[str, None]:

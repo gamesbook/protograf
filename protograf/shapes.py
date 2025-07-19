@@ -4285,19 +4285,14 @@ class TextShape(BaseShape):
         # ---- rectangle for text
         current_page = globals.doc_page
         rect = muRect(x_t, y_t, x_t + width, y_t + height)
-        if (
-            self.block_stroke
-            or self.block_fill
-            or self.block_dashed
-            or self.block_dotted
-        ):
+        if self.box_stroke or self.box_fill or self.box_dashed or self.box_dotted:
             rkwargs = copy.copy(kwargs)
-            rkwargs["fill"] = self.block_fill
-            rkwargs["stroke"] = self.block_stroke
-            rkwargs["stroke_width"] = self.block_stroke_width or self.stroke_width
-            rkwargs["dashed"] = self.block_dashed
-            rkwargs["dotted"] = self.block_dotted
-            rkwargs["transparency"] = self.block_transparency
+            rkwargs["fill"] = self.box_fill
+            rkwargs["stroke"] = self.box_stroke
+            rkwargs["stroke_width"] = self.box_stroke_width or self.stroke_width
+            rkwargs["dashed"] = self.box_dashed
+            rkwargs["dotted"] = self.box_dotted
+            rkwargs["transparency"] = self.box_transparency
             pymu_props = tools.get_pymupdf_props(**rkwargs)
             globals.doc_page.draw_rect(
                 rect,

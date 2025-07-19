@@ -551,7 +551,7 @@ def pdf_export(
 
 
 def pdf_cards_to_png(
-    source: str,
+    source_file: str,
     output: str,
     fformat: str = "png",
     dpi: int = 300,
@@ -562,7 +562,7 @@ def pdf_cards_to_png(
     """Extract individual cards from PDF as PNG image(s).
 
     Args:
-    - source
+    - source_file
         the input file name (default prefix is name of script)
     - output
         the output file name (default prefix is name of script)
@@ -574,8 +574,10 @@ def pdf_cards_to_png(
         output directory (default is current)
     - card_frames
         dict key is page number; value is a list of lists;
-        each item in the nested list is a Bounding Box (top-left and
-        bottom-right x,y coordinates)
+        each item in the nested list is a tuple of:
+
+        - Bounding Box (top-left and bottom-right x,y coordinates)
+        - optional card name (from a data column which is user-defined)
     - page_height:
         size of page
 
@@ -586,10 +588,14 @@ def pdf_cards_to_png(
     """
     feedback(f"Saving card(s) as image file(s)...", False)
     _filename = os.path.basename(output)
-    _source = os.path.basename(source)
+    _source = os.path.basename(source_file)
     basename = os.path.splitext(_filename)[0]
     dirname = directory or os.path.dirname(output)
-    pdf_filename = os.path.join(dirname, _source)
+    if os.path.exists(source_file):
+        pdf_filename = source_file
+        dirname = os.path.dirname(source_file)
+    else:
+        pdf_filename = os.path.join(dirname, _source)
     # validate directory
     if not os.path.exists(dirname):
         feedback(
@@ -600,10 +606,17 @@ def pdf_cards_to_png(
         page_num = 0
         for page in doc:
             outlines = card_frames.get(page_num, [])
-            for key, outline in enumerate(outlines):
-                iname = os.path.join(
-                    dirname, f"{basename}-{page_num + 1}-{key + 1}.png"
-                )
+            inames = []
+            for key, item in enumerate(outlines):
+                outline = item[0]  # Rect
+                cname = item[1]  # user-specified name
+                if not cname:
+                    cname = f"{basename}-{page_num + 1}-{key + 1}"
+                else:
+                    if cname in inames:
+                        cname = f"{cname}-{page_num + 1}-{key + 1}"
+                inames.append(cname)
+                iname = os.path.join(dirname, f"{cname}.png")
                 # print(f"~~~ {page_num=} {iname=} {outline.tl=} {outline.br=} {dpi=}")
                 # https://pymupdf.readthedocs.io/en/latest/rect.html
                 rect = muRect(
@@ -616,7 +629,7 @@ def pdf_cards_to_png(
                 pix.save(iname)  # store image as a PNG
             page_num += 1
     except Exception as err:
-        feedback(f"Unable to extract card images for {source} - {err}!")
+        feedback(f"Unable to extract card images for {source_file} - {err}!")
 
 
 def color_set(svg_only: bool = False) -> list:
