@@ -193,7 +193,7 @@ Discussion  This example shows how to construct a map for the "Warp War" game.
 
                 The full map script can be found at
                 `warpwar_full.py <https://github.com/gamesbook/protograf/blob/master/examples/boards/commercial/warpwar_full.py>`_
-                but it uses various :doc:`Python Commands <python_commands>`
+                but it uses various :ref:`Python Commands <table-of-contents-pyc>`
                 in order to simplify the map generation; it may be of interest
                 if you want to see how **protograf** can pull in such commands.
 

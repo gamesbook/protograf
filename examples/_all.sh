@@ -18,6 +18,7 @@ python core/customised_hexagonal_grid.py -d /tmp/demo
 python core/customised_hexagonal_grid_locations.py -d /tmp/demo
 python core/customised_rectangle.py -d /tmp/demo
 python core/customised_shapes.py -d /tmp/demo
+python core/customised_text.py -d /tmp/demo
 # ---- examples: simple: layouts
 echo -e "\nCreating customised layouts..."
 python core/layouts/layouts_basic.py -d /tmp/demo

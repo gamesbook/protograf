@@ -19,7 +19,8 @@ import segno  # QRCode
 
 # local
 from protograf import globals
-from protograf.utils import geoms, tools, support
+from protograf.utils import geoms, tools, support, fonts
+from protograf.utils.tools import _lower
 from protograf.utils.constants import (
     GRID_SHAPES_WITH_CENTRE,
     COLOR_NAMES,
@@ -41,23 +42,11 @@ from protograf.base import (
     BaseShape,
     BaseCanvas,
     GridShape,
+    get_cache,
 )
 
 log = logging.getLogger(__name__)
 DEBUG = False
-
-
-def get_cache(**kwargs):
-    """Get and/or set a cache directory for to save file images."""
-    default_cache = Path(Path.home(), CACHE_DIRECTORY, "images")
-    default_cache.mkdir(parents=True, exist_ok=True)
-    cache_directory = kwargs.get("cache_directory", str(default_cache))
-    if not os.path.exists(cache_directory):
-        feedback(
-            "Unable to create or find the cache directory:" f" {str(cache_directory)}",
-            True,
-        )
-    return cache_directory
 
 
 def set_cached_dir(source):
@@ -629,7 +618,7 @@ class CircleShape(BaseShape):
             # print(f' ^ {self.petals=} {angles=}')
             for index, angle in enumerate(angles):
                 angle = angle - 360.0 if angle > 360.0 else angle
-                petals_style = self.petals_style.lower()
+                petals_style = _lower(self.petals_style)
                 if petals_style not in ["triangle", "t"]:
                     if len(angles) < self.petals + 1:
                         angles.append(angles[-1] + gap)
@@ -1383,10 +1372,10 @@ class HexShape(BaseShape):
         # ---- diameter and radius
         diameter = 2.0 * side
         radius = side
-        if self.orientation.lower() in ["p", "pointy"]:
+        if _lower(self.orientation) in ["p", "pointy"]:
             self.width = 2 * half_flat / self.units
             self.height = 2 * radius / self.units
-        elif self.orientation.lower() in ["f", "flat"]:
+        elif _lower(self.orientation) in ["f", "flat"]:
             self.height = 2 * half_flat / self.units
             self.width = 2 * radius / self.units
         else:
@@ -1436,7 +1425,7 @@ class HexShape(BaseShape):
         _col = the_col + 1 if not self.coord_start_x else the_col + self.coord_start_x
         # ---- set coord label value
         if self.coord_style:
-            if str(self.coord_style).lower() in ["d", "diagonal"]:
+            if _lower(self.coord_style) in ["d", "diagonal"]:
                 col_group = (_col - 1) // 2
                 _row += col_group
         # ---- set coord x,y values
@@ -1603,7 +1592,7 @@ class HexShape(BaseShape):
 
     def draw_radii(self, cnv, ID, centre: Point, vertices: list):
         """Draw line(s) connecting the Hexagon centre to a vertex."""
-        # _dirs = self.radii.lower().split()
+        # _dirs = _lower(self.radii).split()
         dir_group = (
             DirectionGroup.HEX_POINTY
             if self.orientation == "pointy"
@@ -1857,7 +1846,7 @@ class HexShape(BaseShape):
         """Calculate vertices of hexagon."""
         geo = self.get_geometry()
         # ---- POINTY^
-        if self.orientation.lower() in ["p", "pointy"]:
+        if _lower(self.orientation) in ["p", "pointy"]:
             #          .
             #         / \`
             # x,y .. |  |
@@ -2013,7 +2002,7 @@ class HexShape(BaseShape):
             # feedback(f"*** F~: {x=} {y=} {self.x_d=} {self.y_d=} {geo=}")
 
         # ---- ^ pointy hexagon vertices (clockwise)
-        if self.orientation.lower() in ["p", "pointy"]:
+        if _lower(self.orientation) in ["p", "pointy"]:
             self.vertexes = [  # clockwise from bottom-left; relative to centre
                 muPoint(x, y + geo.z_fraction),
                 muPoint(x, y + geo.z_fraction + geo.side),
@@ -2023,7 +2012,7 @@ class HexShape(BaseShape):
                 muPoint(x + geo.half_flat, y),
             ]
         # ---- ~ flat hexagon vertices (clockwise)
-        else:  # self.orientation.lower() in ['f',  'flat']:
+        else:  # _lower(self.orientation) in ['f',  'flat']:
             self.vertexes = [  # clockwise from left; relative to centre
                 muPoint(x, y + geo.half_flat),
                 muPoint(x + geo.z_fraction, y + geo.height_flat),
@@ -2127,7 +2116,7 @@ class HexShape(BaseShape):
         # ---- dot
         self.draw_dot(cnv, self.x_d, self.y_d)
         # ---- text
-        if self.orientation.lower() in ["p", "pointy"]:
+        if _lower(self.orientation) in ["p", "pointy"]:
             offset = geo.side  # == radius
         else:
             offset = geo.half_flat
@@ -2250,7 +2239,7 @@ class PolygonShape(BaseShape):
         # ---- perform overrides
         if self.perbis:
             if isinstance(self.perbis, str):
-                if self.perbis.strip().lower() in ["all", "*"]:
+                if _lower(self.perbis) in ["all", "*"]:
                     sides = tools.as_int(self.sides, "sides")
                     self.perbis = list(range(1, sides + 1))
                 else:
@@ -2261,8 +2250,8 @@ class PolygonShape(BaseShape):
             self.x, self.y = self.cx, self.cy
         # ---- class variables
         self.flatten_angle = 0
-        if (self.orientation.lower() == "flat" and not (self.sides - 2) % 4 == 0) or (
-            self.orientation.lower() == "pointy" and (self.sides - 2) % 4 == 0
+        if (_lower(self.orientation) == "flat" and not (self.sides - 2) % 4 == 0) or (
+            _lower(self.orientation) == "pointy" and (self.sides - 2) % 4 == 0
         ):
             interior = ((self.sides - 2) * 180.0) / self.sides
             self.flatten_angle = (180 - interior) / 2.0
@@ -3171,7 +3160,7 @@ class RectangleShape(BaseShape):
             self.centroid = None
         # ---- * notch vertices
         if is_notched:
-            _notch_style = self.notch_style.lower()
+            _notch_style = _lower(self.notch_style)
             if _notch_style in ["b", "bite"]:
                 feedback('The "bite" setting is not implemented yet', False)
             if self.notch_corners:
@@ -3713,8 +3702,8 @@ class RightAngledTriangleShape(BaseShape):
                 'Need to supply both "flip" and "hand" options! for triangle.',
                 stop=True,
             )
-        hand = str(self.hand).lower()
-        flip = str(self.flip).lower()
+        hand = _lower(self.hand)
+        flip = _lower(self.flip)
         if hand == "west" or hand == "w":
             x2 = x - self._u.width
         elif hand == "east" or hand == "e":
@@ -4263,7 +4252,7 @@ class TextShape(BaseShape):
             _text = codecs.decode(_text, "unicode_escape")
         # ---- validations
         if self.transform is not None:
-            _trans = str(self.transform).lower()
+            _trans = _lower(self.transform)
             if _trans in ["u", "up", "upper", "uppercase"]:
                 _text = _text.upper()
             elif _trans in ["l", "low", "lower", "lowercase"]:
@@ -4284,19 +4273,14 @@ class TextShape(BaseShape):
         # ---- rectangle for text
         current_page = globals.doc_page
         rect = muRect(x_t, y_t, x_t + width, y_t + height)
-        if (
-            self.block_stroke
-            or self.block_fill
-            or self.block_dashed
-            or self.block_dotted
-        ):
+        if self.box_stroke or self.box_fill or self.box_dashed or self.box_dotted:
             rkwargs = copy.copy(kwargs)
-            rkwargs["fill"] = self.block_fill
-            rkwargs["stroke"] = self.block_stroke
-            rkwargs["stroke_width"] = self.block_stroke_width or self.stroke_width
-            rkwargs["dashed"] = self.block_dashed
-            rkwargs["dotted"] = self.block_dotted
-            rkwargs["transparency"] = self.block_transparency
+            rkwargs["fill"] = self.box_fill
+            rkwargs["stroke"] = self.box_stroke
+            rkwargs["stroke_width"] = self.box_stroke_width or self.stroke_width
+            rkwargs["dashed"] = self.box_dashed
+            rkwargs["dotted"] = self.box_dotted
+            rkwargs["transparency"] = self.box_transparency
             pymu_props = tools.get_pymupdf_props(**rkwargs)
             globals.doc_page.draw_rect(
                 rect,
@@ -4350,17 +4334,40 @@ class TextShape(BaseShape):
                 msg = f"Cannot create Text{thefile}{cause}"
                 feedback(msg, True, True)
         # ---- HTML text
-        elif self.html or self.css:
+        elif self.html or self.style:
             # insert_htmlbox(rect, text, *, css=None, scale_low=0,
             #   archive=None, rotate=0, oc=0, opacity=1, overlay=True)
             keys = {}
             try:
                 keys["opacity"] = tools.get_opacity(self.transparency)
-                if self.css:
-                    keys["css"] = globals.css + " * {%s}" % self.css
+                _font_name = self.font_name.replace(" ", "-")
+                if not fonts.builtin_font(self.font_name):  # local check
+                    _, _path, font_file = tools.get_font_file(self.font_name)
+                    # if font_file:
+                    #     keys["css"] = '@font-face {font-family: %s; src: url(%s);}' % (
+                    #         _font_name, font_file)
+                keys["css"] = globals.css
+                if self.style:
+                    _text = f'<div style="{self.style}">{_text}</div>'
                 else:
-                    if globals.css:
-                        keys["css"] = globals.css
+                    # create a wrapper for the text
+                    css_style = []
+                    if self.font_name:
+                        css_style.append(f"font-family: {_font_name};")
+                    if self.font_size:
+                        css_style.append(f"font-size: {self.font_size}px;")
+                    if self.stroke:
+                        if isinstance(self.stroke, tuple):
+                            _stroke = tools.rgb_to_hex(self.stroke)
+                        else:
+                            _stroke = self.stroke
+                        css_style.append(f"color: {_stroke};")
+                    if self.align:
+                        if _lower(self.align) == "centre":
+                            self.align = "center"
+                        css_style.append(f"text-align: {self.align};")
+                    styling = " ".join(css_style)
+                    _text = f'<div style="{styling}">{_text}</div>'
                 keys["archive"] = globals.archive
                 # feedback(f'*** Text HTML {keys=} {rect=} {_text=} {keys=}')
                 if self.run_debug:
@@ -4433,7 +4440,7 @@ class TrapezoidShape(BaseShape):
             cx = x + self._u.width / 2.0
             cy = y + self._u.height / 2.0
         if self.flip:
-            if str(self.flip).lower() in ["s", "south"]:
+            if _lower(self.flip) in ["s", "south"]:
                 y = y + self._u.height
                 cy = y - self._u.height / 2.0
         if self.cx is not None and self.cy is not None:
@@ -4451,7 +4458,7 @@ class TrapezoidShape(BaseShape):
         y = kwargs.get("y", _y)
         # build array
         sign = 1
-        if self.flip and str(self.flip).lower() in ["s", "south"]:
+        if self.flip and _lower(self.flip) in ["s", "south"]:
             sign = -1
         self.delta_width = self._u.width - self._u.top
         vertices = []
@@ -4484,7 +4491,7 @@ class TrapezoidShape(BaseShape):
         kwargs["closed"] = True
         self.set_canvas_props(cnv=cnv, index=ID, **kwargs)
         sign = 1
-        if self.flip and str(self.flip).lower() in ["s", "south"]:
+        if self.flip and _lower(self.flip) in ["s", "south"]:
             sign = -1
         # ---- borders (override)
         if self.borders:

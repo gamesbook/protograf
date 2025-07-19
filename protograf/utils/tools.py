@@ -12,6 +12,7 @@ import logging
 import io
 import os
 import pathlib
+from pathlib import Path
 import string
 import sys
 from urllib.parse import urlparse
@@ -177,6 +178,29 @@ def boolean_join(items):
     except NameError:
         return None
     return result
+
+
+def _lower(value) -> str | None:
+    """Convert value into a lowercase string without any space around it
+
+    Doc Test:
+    >>> _lower(None)
+
+    >>> _lower(1)
+    '1'
+    >>> _lower('a')
+    'a'
+    >>> _lower('AbA')
+    'aba'
+    >>> _lower( 'aB ')
+    'ab'
+    """
+    if value is None:
+        return None
+    try:
+        return str(value).lower().strip()
+    except Exception:
+        raise ValueError(f"Cannot convert {value} into a string!")
 
 
 def as_int(value, label, maximum=None, minimum=None, allow_none=False) -> int:
@@ -1661,6 +1685,37 @@ def set_canvas_props(
     )
     cnv.commit()
     return None
+
+
+def get_font_file(font_name: str) -> tuple:
+    """Access and track a font and its file."""
+    _name = None
+    font_path = None
+    _file = None
+    if not font_name:
+        return _name, font_path, _file
+    _font_name = str(font_name).strip()
+    if _font_name:
+        _name = builtin_font(_font_name)
+        if not _name:  # check for custom font
+            cache_directory = Path(Path.home() / CACHE_DIRECTORY)
+            fi = FontInterface(cache_directory=cache_directory)
+            _name = fi.get_font_family(font_name)
+            if not _name:
+                feedback(
+                    f'Cannot find or load a font named "{font_name}".'
+                    f' Defaulting to "{DEFAULT_FONT}".',
+                    False,
+                    True,
+                )
+            else:
+                _file = fi.get_font_file(font_name, fullpath=False)
+                font_path, css = fi.font_file_css(_name)
+                if css not in globals.css:
+                    globals.css += css + "\n"
+                globals.archive.add(font_path)
+                # print(font_path, globals.archive, globals.css)
+    return _name, font_path, _file
 
 
 def card_size(card_size: str = None, units: str = "pt") -> tuple:

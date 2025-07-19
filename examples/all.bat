@@ -24,6 +24,7 @@ python core\customised_hexagonal_grid.py --no-png -d %location%
 python core\customised_hexagonal_grid_locations.py --no-png -d %location%
 python core\customised_rectangle.py --no-png -d %location%
 python core\customised_shapes.py --no-png -d %location%
+python core\customised_text.py --no-png -d %location%
 
 REM ---- examples: objects
 ECHO "Creating objects..."

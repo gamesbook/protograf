@@ -3,10 +3,12 @@
 Font utility functions for protograf
 
 Notes:
-    There is a noticable "startup"" cost to gather details of all fonts on a
-    machine; a cached file is then created and stored in a temp direcory which
-    makes this faster in subsequent iterations. Restarting the machine or
-    clearing the temp/cache directory will cause this delay again.
+
+    There is a noticable "startup" time to gather details of all fonts on a
+    machine; a cached file is then created and stored in a custom directory
+    which makes this faster in subsequent iterations. Removing or
+    clearing the directory will cause this delay again, but is needed if new
+    fonts are loaded.
 
 Example usage:
 
@@ -147,40 +149,61 @@ class FontInterface:
         if not self.font_families:
             self.load_font_families()
         for font_family in list(self.font_families.keys()):
-            if str(name).lower() == font_family.lower():
+            if str(name).strip().lower() == font_family.lower():
                 return font_family
         return None
 
     @lru_cache(maxsize=256)  # limits cache
-    def get_font_file(self, name: str) -> str:
+    def get_font_file(self, name: str, fullpath: bool = True) -> str:
         """Get file name for a specific font style if it exists
 
         Args:
-            name: case-insensitive name of a font style e.g. "bookerly Bold"
+
+        - name (str): case-insensitive name of a font style e.g. "bookerly Bold"
+        - fullpath (bool): if True, include full path
         """
         if not name:
             return None
         if not self.font_families:
             self.load_font_families()
+        _filename_regular = None  # fallback in case of no exact match
         for font_family in list(self.font_families.keys()):
             font_details = self.font_families[font_family]
             for font in font_details:
-                if str(name).lower() == font["name"].lower():
-                    return font["file"]
+                _filename = None
+                if str(name).strip().lower() == font["name"].lower():
+                    _filename = font["file"]
+                # fallback - use Regular if available
+                if str(name).strip().lower() + " regular" == font["name"].lower():
+                    _filename_regular = font["file"]
                 if "Gras" in font["name"]:
                     if (
-                        str(name).lower()
+                        str(name).strip().lower()
                         == font["name"].replace("Gras", "Bold").lower()
                     ):
-                        return font["file"]
+                        _filename = font["file"]
                 if "Italique" in font["name"]:
                     if (
-                        str(name).lower()
+                        str(name).strip().lower()
                         == font["name"].replace("Italique", "Italic").lower()
                     ):
-                        return font["file"]
+                        _filename = font["file"]
+                if _filename:
+                    if fullpath:
+                        return _filename
+                    else:
+                        _fileonly = Path(_filename).name
+                        return _fileonly
 
-        return None
+        # is fallback available?
+        if _filename_regular:
+            if fullpath:
+                return _filename_regular
+            else:
+                _fileonly = Path(_filename_regular).name
+                return _fileonly
+        else:
+            return None
 
     @lru_cache(maxsize=256)  # limits cache
     def font_file_css(self, font_family: str) -> Union[str, None]:

@@ -41,6 +41,7 @@ from pymupdf import (
 
 # local
 from protograf.utils import geoms, tools, support
+from protograf.utils.tools import _lower
 from protograf.utils.constants import (
     CACHE_DIRECTORY,
     DEBUG_COLOR,
@@ -64,6 +65,19 @@ log = logging.getLogger(__name__)
 
 DEBUG = False
 WIDTH = 0.1
+
+
+def get_cache(**kwargs):
+    """Get and/or set a cache directory for to save file images."""
+    default_cache = Path(Path.home(), CACHE_DIRECTORY, "images")
+    default_cache.mkdir(parents=True, exist_ok=True)
+    cache_directory = kwargs.get("cache_directory", str(default_cache))
+    if not os.path.exists(cache_directory):
+        feedback(
+            "Unable to create or find the cache directory:" f" {str(cache_directory)}",
+            True,
+        )
+    return cache_directory
 
 
 class BaseCanvas:
@@ -214,7 +228,7 @@ class BaseCanvas:
         self.font_size = self.defaults.get("font_size", 12)
         self.font_style = self.defaults.get("font_style", None)
         self.font_directory = self.defaults.get("font_directory", None)
-        self.style = self.defaults.get("style", None)
+        self.style = self.defaults.get("style", None)  # HTML/CSS style
         self.wrap = self.defaults.get("wrap", False)
         self.align = self.defaults.get("align", "centre")  # centre,left,right,justify
         self._alignment = TEXT_ALIGN_LEFT  # see to_alignment()
@@ -278,7 +292,7 @@ class BaseCanvas:
         self.heading_mx = self.defaults.get("heading_mx", 0)
         self.heading_my = self.defaults.get("heading_my", 0)
         self.heading_rotation = self.defaults.get("heading_rotation", 0)
-        # ---- text block
+        # ---- text box (wrap/HTML)
         self.leading = self.defaults.get("leading", self.font_size)
         self.transform = self.defaults.get("transform", None)
         self.html = self.defaults.get("html", False)
@@ -291,13 +305,13 @@ class BaseCanvas:
         # if self.outlined:
         #     self.stroke = self.outline_stroke
         #     self.fill = None
-        # ---- text block rectangle
-        self.block_fill = self.defaults.get("block_fill", None)
-        self.block_stroke = self.defaults.get("block_stroke", None)
-        self.block_stroke_width = self.defaults.get("block_stroke_width", 0)
-        self.block_dashed = self.defaults.get("block_dashed", None)
-        self.block_dotted = self.defaults.get("block_dotted", None)
-        self.block_transparency = self.defaults.get("block_transparency", None)
+        # ---- text box rectangle
+        self.box_fill = self.defaults.get("box_fill", None)
+        self.box_stroke = self.defaults.get("box_stroke", None)
+        self.box_stroke_width = self.defaults.get("box_stroke_width", 0)
+        self.box_dashed = self.defaults.get("box_dashed", None)
+        self.box_dotted = self.defaults.get("box_dotted", None)
+        self.box_transparency = self.defaults.get("box_transparency", None)
         # ---- image / file
         self.source = self.defaults.get("source", None)  # file or http://
         self.cache_directory = None  # should be a pathlib.Path object
@@ -662,7 +676,7 @@ class BaseShape:
         self.font_size = self.kw_float(kwargs.get("font_size", base.font_size))
         self.font_style = kwargs.get("font_style", base.font_style)
         self.font_directory = kwargs.get("font_directory", base.font_directory)
-        self.style = kwargs.get("style", base.style)
+        self.style = kwargs.get("style", base.style)  # HTML/CSS style
         self.wrap = kwargs.get("wrap", base.wrap)
         self.align = kwargs.get("align", base.align)  # centre,left,right,justify
         self._alignment = TEXT_ALIGN_LEFT  # see to_alignment()
@@ -723,16 +737,14 @@ class BaseShape:
         #     self.stroke = self.outline_stroke
         #     self.fill = None
         # ---- text block
-        self.block_stroke = kwargs.get("block_stroke", base.block_stroke)
-        self.block_fill = kwargs.get("block_fill", base.block_fill)
-        self.block_stroke_width = self.kw_float(
-            kwargs.get("block_stroke_width", base.block_stroke_width)
+        self.box_stroke = kwargs.get("box_stroke", base.box_stroke)
+        self.box_fill = kwargs.get("box_fill", base.box_fill)
+        self.box_stroke_width = self.kw_float(
+            kwargs.get("box_stroke_width", base.box_stroke_width)
         )
-        self.block_dashed = kwargs.get("block_dashed", base.block_dashed)
-        self.block_dotted = kwargs.get("block_dotted", base.block_dotted)
-        self.block_transparency = kwargs.get(
-            "block_transparency", base.block_transparency
-        )
+        self.box_dashed = kwargs.get("box_dashed", base.box_dashed)
+        self.box_dotted = kwargs.get("box_dotted", base.box_dotted)
+        self.box_transparency = kwargs.get("box_transparency", base.box_transparency)
         # feedback(f"### BShp:"
         # f"{self} {kwargs.get('fill')=} {self.fill=} {kwargs.get('fill_color')=}")
         # ---- image / file
@@ -1190,7 +1202,7 @@ class BaseShape:
         correct = True
         issue = []
         if self.align:
-            if str(self.align).lower() not in [
+            if _lower(self.align) not in [
                 "left",
                 "right",
                 "justify",
@@ -1210,7 +1222,7 @@ class BaseShape:
             else:
                 _edges = self.edges
             for edge in _edges:
-                if str(edge).lower() not in [
+                if _lower(edge) not in [
                     "north",
                     "south",
                     "east",
@@ -1225,11 +1237,11 @@ class BaseShape:
                     )
                     correct = False
         if self.flip:
-            if str(self.flip).lower() not in ["north", "south", "n", "s"]:
+            if _lower(self.flip) not in ["north", "south", "n", "s"]:
                 issue.append(f'"{self.flip}" is an invalid flip!')
                 correct = False
         if self.hand:
-            if str(self.hand).lower() not in [
+            if _lower(self.hand) not in [
                 "west",
                 "east",
                 "w",
@@ -1238,7 +1250,7 @@ class BaseShape:
                 issue.append(f'"{self.hand}" is an invalid hand!')
                 correct = False
         if self.lines:
-            if str(self.lines).lower() not in [
+            if _lower(self.lines) not in [
                 "all",
                 "vertical",
                 "horizontal",
@@ -1251,7 +1263,7 @@ class BaseShape:
                 issue.append(f'"{self.lines}" is an invalid lines setting!')
                 correct = False
         if self.elevation:
-            if str(self.elevation).lower() not in [
+            if _lower(self.elevation) not in [
                 "vertical",
                 "horizontal",
                 "v",
@@ -1260,11 +1272,11 @@ class BaseShape:
                 issue.append(f'"{self.elevation}" is an invalid elevation!')
                 correct = False
         if self.orientation:
-            if str(self.orientation).lower() not in ["flat", "pointy", "f", "p"]:
+            if _lower(self.orientation) not in ["flat", "pointy", "f", "p"]:
                 issue.append(f'"{self.orientation}" is an invalid orientation!')
                 correct = False
         if self.perimeter:
-            if str(self.perimeter).lower() not in [
+            if _lower(self.perimeter) not in [
                 "circle",
                 "rectangle",
                 "hexagon",
@@ -1275,7 +1287,7 @@ class BaseShape:
                 issue.append(f'"{self.perimeter}" is an invalid perimeter!')
                 correct = False
         if self.position:
-            if str(self.position).lower() not in [
+            if _lower(self.position) not in [
                 "top",
                 "bottom",
                 "center",
@@ -1288,7 +1300,7 @@ class BaseShape:
                 issue.append(f'"{self.position}" is an invalid position!')
                 correct = False
         if self.petals_style:
-            if str(self.petals_style).lower() not in [
+            if _lower(self.petals_style) not in [
                 "triangle",
                 "curve",
                 "rectangle",
@@ -1304,7 +1316,7 @@ class BaseShape:
                 correct = False
         # ---- line / arrow
         if self.rotation_point:
-            if str(self.rotation_point).lower() not in [
+            if _lower(self.rotation_point) not in [
                 "start",
                 "centre",
                 "end",
@@ -1316,12 +1328,12 @@ class BaseShape:
                 correct = False
         # ---- hexagons
         if self.coord_style:
-            if str(self.coord_style).lower() not in ["linear", "diagonal", "l", "d"]:
+            if _lower(self.coord_style) not in ["linear", "diagonal", "l", "d"]:
                 issue.append(f'"{self.coord_style}" is an invalid coord style!')
                 correct = False
         # ---- arrowhead style
         if self.arrow_style:
-            if str(self.arrow_style).lower() not in [
+            if _lower(self.arrow_style) not in [
                 "angle",
                 "angled",
                 "a",
@@ -1339,7 +1351,7 @@ class BaseShape:
                 correct = False
         # ---- line arrows
         # if self.arrow_tail_style:
-        #     if str(self.arrow_tail_style).lower() not in [
+        #     if _lower(self.arrow_tail_style) not in [
         #         "line",
         #         "l",
         #         "line2",
@@ -1357,12 +1369,12 @@ class BaseShape:
         #         correct = False
         # ---- starfield
         if self.star_pattern:
-            if str(self.star_pattern).lower() not in ["random", "cluster", "r", "c"]:
+            if _lower(self.star_pattern) not in ["random", "cluster", "r", "c"]:
                 issue.append(f'"{self.pattern}" is an invalid starfield pattern!')
                 correct = False
         # ---- rectangle - notches
         if self.notch_style:
-            if str(self.notch_style).lower() not in [
+            if _lower(self.notch_style) not in [
                 "snip",
                 "s",
                 "fold",
@@ -1384,7 +1396,7 @@ class BaseShape:
                 try:
                     _dir = point[0]
                     value = tools.as_float(point[1], " peaks value")
-                    if _dir.lower() not in ["n", "e", "w", "s", "*"]:
+                    if _lower(_dir) not in ["n", "e", "w", "s", "*"]:
                         feedback(
                             f'The peaks direction must be one of n, e, s, w (not "{_dir}")!',
                             True,
@@ -1450,26 +1462,27 @@ class BaseShape:
         If image_location not found; try path in which script located.
 
         Args:
-            image_location:
+            image_location (str):
                 full path or URL for image
-            origin:
+            origin (tuple):
                 x, y location of image on Page
-            sliced:
+            sliced (str):
                 what fraction of the image to return; one of
                 't', 'm', 'b', 'l', 'c', or 'r'
-            width_height:
+            width_height (tuple):
                 the (width, height) of the output frame for the image;
                 will be used along with x,y to set size and position;
                 will be recalcuated if image is rotated
-            cache_directory:
+            cache_directory (str):
                 where to store a local for copy for URL-sourced images
-            rotation:
+            rotation (float):
                 angle of image rotation (in degrees)
 
         Returns:
             tuple:
-                * Image
-                * boolean (True if file is a directory)
+
+            - Image
+            - boolean (True if file is a directory)
 
         Notes:
 
@@ -1477,22 +1490,28 @@ class BaseShape:
 
         def slice_image(
             img_path, slice_portion: str = None, width_height: tuple = (1, 1)
-        ):
+        ) -> str:
             """Slice off a portion of an image while maintaining its aspect ratio
 
             Args:
-                img_path:
+                img_path (Pathlib):
                     Pathlib file
-                sliced:
+                slice_portion (str):
                     what portion of the image to return
-                width_height:
+                width_height (tuple):
                     the (width, height) of the output frame for the image
+
+            Returns:
+                filename (str): path to sliced image
+
+            Note:
+                Uses the CACHE_DIRECTORY to store these (temporary) images
             """
             # feedback(f"### {img_path=} {slice_portion=}")
             if not slice_portion:
                 return None
             try:
-                _slice = slice_portion.lower()
+                _slice = _lower(slice_portion)
                 if _slice[0] not in ["t", "m", "b", "l", "c", "r"]:
                     feedback(f'The sliced value "{slice_portion}" is not valid!', True)
                 img = Image.open(img_path)
@@ -1529,10 +1548,16 @@ class BaseShape:
                     case _:
                         raise NotImplementedError(f"Cannot process {slice_portion}")
                 # create new file with sliced image
-                img2_filename = img_path.stem + "_" + _slice[0] + img_path.suffix
-                sliced_filename = os.path.join(str(img_path.parent), img2_filename)
-                img2.save(sliced_filename)
-                return sliced_filename
+                try:
+                    cache_directory = get_cache()
+                    img2_filename = img_path.stem + "_" + _slice[0] + img_path.suffix
+                    sliced_filename = os.path.join(cache_directory, img2_filename)
+                    img2.save(sliced_filename)
+                    return sliced_filename
+                except Exception as err:
+                    feedback(
+                        f'Unable to save image slice "{slice_portion}" - {err}', True
+                    )
             except Exception as err:
                 feedback(
                     f'The sliced value "{slice_portion}" is not valid! ({err})', True
@@ -1559,7 +1584,7 @@ class BaseShape:
                     f.write(image.content)
             return image_local
 
-        def image_box_resize(bbox: muRect, img_path: str, rotation: float) -> muRect:
+        def image_bbox_resize(bbox: muRect, img_path: str, rotation: float) -> muRect:
             """Recompute bounding Rect for a rotated image to maintain image size.
 
             Args
@@ -1603,15 +1628,15 @@ class BaseShape:
                     _rotation = rotation
                 rotation_rad = math.radians(_rotation)
                 img_height = bbox.width * iheight / iwidth
-                new_box_height = bbox.width * math.sin(
+                new_bbox_height = bbox.width * math.sin(
                     rotation_rad
                 ) + img_height * math.cos(rotation_rad)
-                new_box_width = bbox.width * math.cos(
+                new_bbox_width = bbox.width * math.cos(
                     rotation_rad
                 ) + img_height * math.sin(rotation_rad)
                 new_bbox = muRect(
-                    (center.x - new_box_width / 2.0, center.y - new_box_height / 2.0),
-                    (center.x + new_box_width / 2.0, center.y + new_box_height / 2.0),
+                    (center.x - new_bbox_width / 2.0, center.y - new_bbox_height / 2.0),
+                    (center.x + new_bbox_width / 2.0, center.y + new_bbox_height / 2.0),
                 )
             return new_bbox
 
@@ -1659,7 +1684,7 @@ class BaseShape:
                 overlay=True,  # put in foreground
             )
             if self.run_debug:
-                pdf_page.draw_rect(rct, color=get_color(DEBUG_COLOR))
+                pdf_page.draw_rect(rct, color=tools.get_color(DEBUG_COLOR))
             return image_local
 
         img = False
@@ -1702,7 +1727,7 @@ class BaseShape:
         scaffold = (origin[0], origin[1], origin[0] + width, origin[1] + height)
         if rotation is not None:
             # need a larger rect!
-            new_origin = image_box_resize(muRect(scaffold), image_local, rotation)
+            new_origin = image_bbox_resize(muRect(scaffold), image_local, rotation)
             scaffold = (
                 new_origin[0],
                 new_origin[1],
@@ -2254,7 +2279,7 @@ class BaseShape:
                     kwargs["rotation"] = 0
                     kwargs["rotation_point"] = None
 
-            match str(self.arrow_style).lower():
+            match _lower(self.arrow_style):
                 case "triangle" | "t":
                     pass
                 case "spear" | "s":
