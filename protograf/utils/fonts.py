@@ -3,10 +3,12 @@
 Font utility functions for protograf
 
 Notes:
-    There is a noticable "startup"" cost to gather details of all fonts on a
-    machine; a cached file is then created and stored in a temp direcory which
-    makes this faster in subsequent iterations. Restarting the machine or
-    clearing the temp/cache directory will cause this delay again.
+
+    There is a noticable "startup" time to gather details of all fonts on a
+    machine; a cached file is then created and stored in a custom directory
+    which makes this faster in subsequent iterations. Removing or
+    clearing the directory will cause this delay again, but is needed if new
+    fonts are loaded.
 
 Example usage:
 

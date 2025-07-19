@@ -5,7 +5,10 @@ Written by: Derek Hohls
 Created on: 19 July 2025
 
 Font sources:
-    *
+    * https://fonts.google.com/specimen/Quintessential
+    * https://fonts.google.com/specimen/Eagle+Lake
+    * https://fontmeme.com/fonts/freemono-font/
+    * https://fonts.google.com/specimen/Tektur
 """
 
 from protograf import *
@@ -68,19 +71,19 @@ Text(wrap=True,
      font_size=7,  fill="black", stroke="black",
      font_name="Courier", align="right",
      transform='t',
-     text="I am Courier in title case to the right")
+     text="Courier 7pt in title case to the right")
 Text(wrap=True,
      x=0, y=2.5, width=4, height=1,
      font_size=8,  fill="black", stroke="black",
      font_name="Helvetica", align="left",
      transform='upper',
-     text="I am Helvetica in upper case to the left")
+     text="Helvetica 8pt in upper case to the left")
 Text(wrap=True,
      x=0, y=4, width=4, height=1,
      font_size=9,  fill="black", stroke="black",
      font_name="Times-Roman", align="centre",
      transform='lowercase',
-     text="I'm lower case Times-Roman in the centre")
+     text="Times-Roman 9pt in lower case in the centre")
 PageBreak()
 
 # ---- text outlined
@@ -145,15 +148,15 @@ PageBreak()
 
 # ---- text fonts
 Blueprint(stroke_width=0.5, edges="w")
-Text(common=txt, text="Text - fonts")
+Text(common=txt, text="Text - custom fonts")
 
-Font("Eurostar")  #
-Font("FreeMono")  #
-Font("Quintessential")  #
-Font("Eagle Lake")  #
+Font("Quintessential")
+Font("Eagle Lake")
+Font("Tektur")
+Font("FreeMono")
 
 Text(x=0, y=0.5, width=4, height=1.5,
-     align="left", font_name="Eurostar",
+     align="left", font_name="Tektur",
      text="AbcEJZ?0&")
 
 Text(x=0, y=1, width=4, height=1.25, wrap=True,
