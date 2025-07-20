@@ -1,6 +1,10 @@
 protograf Changes
 =================
 
+2025-00-00 (0.2.11)
+-------------------
+- Add zones property to Card (including page)
+
 2025-07-19 (0.2.10)
 -------------------
 - Enable use of Pentomino letters for Card

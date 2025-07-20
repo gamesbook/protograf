@@ -423,14 +423,27 @@ def sequence_split(
     as_float: bool = False,
     msg: str = "",
     clean: bool = False,
-):
+    star: bool = False
+) -> list:
     """
     Split a string into a list of individual values
+
+    Args:
+        string: the item to be split
+        as_int (bool): if True, convert values to integers
+        unique (bool): if True, create a list of unique
+        sep (str): expected delimiter between values - defaults to ","
+        as_float (bool): if True, convert values to floats
+        msg (str): return as part of the error
+        clean (bool): if True, strip any surrounding spaces
+        star (bool): if True, allow for "all" or "*" as the only list value
 
     Note:
         * If `unique` is True, order will NOT be maintained!
 
     Doc Test:
+    >>> sequence_split('*', star=True)
+    ['*']
     >>> sequence_split('')
     []
     >>> sequence_split('3')
@@ -467,7 +480,7 @@ def sequence_split(
                 _string = string.replace('"', "").replace("'", "").strip()
             else:
                 _string = string
-                if clean:
+                if clean or star:
                     _string = _string.strip()
         except Exception:
             return values
@@ -494,6 +507,11 @@ def sequence_split(
             feedback(f"The script may not be using T() correctly", True)
         else:
             feedback(f"", True)
+
+    # star test
+    if star and len(_strings) == 1:
+        if _strings[0] == '*' or _strings[0] == 'all':
+            return ['*']
 
     # log.debug('strings:%s', _strings)
     for item in _strings:
@@ -1644,7 +1662,8 @@ def get_pymupdf_props(
     # ---- set width
     _width = stroke_width or defaults.get("stroke_width")
     if _color is None and _fill is None:
-        feedback("Cannot have both fill and stroke set to None!", True)
+        # feedback("Cannot have both fill and stroke set to None!", True)
+        return None
     # print(f'^^^ SCP {stroke=} {fill=} {_color=} {_fill=}')  # None OR fraction RGB
     # ---- set/apply properties
     pymu_props = ShapeProperties(
@@ -1672,17 +1691,18 @@ def set_canvas_props(
     cnv = cnv if cnv else globals.canvas
     defaults = defaults if defaults else {}
     pymu_props = get_pymupdf_props(defaults=defaults, index=index, **kwargs)
-    cnv.finish(
-        width=pymu_props.width,
-        color=pymu_props.color,
-        fill=pymu_props.fill,
-        lineCap=pymu_props.lineCap,
-        lineJoin=pymu_props.lineJoin,
-        dashes=pymu_props.dashes,
-        fill_opacity=pymu_props.fill_opacity,
-        morph=pymu_props.morph,
-        closePath=pymu_props.closePath,
-    )
+    if pymu_props:
+        cnv.finish(
+            width=pymu_props.width,
+            color=pymu_props.color,
+            fill=pymu_props.fill,
+            lineCap=pymu_props.lineCap,
+            lineJoin=pymu_props.lineJoin,
+            dashes=pymu_props.dashes,
+            fill_opacity=pymu_props.fill_opacity,
+            morph=pymu_props.morph,
+            closePath=pymu_props.closePath,
+        )
     cnv.commit()
     return None
 

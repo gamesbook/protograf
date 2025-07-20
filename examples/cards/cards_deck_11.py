@@ -21,6 +21,7 @@ Deck(
     spacing_y=0.15,
     grouping_cols=2,
     grouping_rows=5,
+    stroke=None,
     )
 # design card
 Card(

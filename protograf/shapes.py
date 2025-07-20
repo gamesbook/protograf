@@ -33,14 +33,12 @@ from protograf.utils.structures import (
     DirectionGroup,
     HexGeometry,
     Link,
-    Locale,
     Point,
     PolyGeometry,
 )  # named tuples
 from protograf.utils.support import CACHE_DIRECTORY
 from protograf.base import (
     BaseShape,
-    BaseCanvas,
     GridShape,
     get_cache,
 )
@@ -762,6 +760,7 @@ class CircleShape(BaseShape):
             self.draw_petals(cnv, ID, self.x_c, self.y_c)
         # feedback(f'*** Circle: {x=} {y=}')
         # ---- draw circle
+        breakpoint()
         cnv.draw_circle((x, y), self._u.radius)
         self.set_canvas_props(cnv=cnv, index=ID, **kwargs)
         # ---- grid marks
@@ -4111,7 +4110,7 @@ class StarFieldShape(BaseShape):
      * enclosure (regular shape inside which its drawn; default is a rectangle)
      * sizes (list of individual star sizes; default is [0.1])
      * star_pattern (random | cluster) - NOT YET IMPLEMENTED
-     * seeding (float, that if set, predetermines the randomisation sequence)
+     * seeding (float, that if set, predetermines the randomisation sequenc)
 
     Ref:
         https://codeboje.de/starfields-and-galaxies-python/
@@ -4123,7 +4122,7 @@ class StarFieldShape(BaseShape):
     def __init__(self, _object=None, canvas=None, **kwargs):
         super(StarFieldShape, self).__init__(_object=_object, canvas=canvas, **kwargs)
         self.kwargs = kwargs
-        # override to set the randomisation sequence
+        # override to set the randomisation sequenc
         if self.seeding:
             self.seed = tools.as_float(self.seeding, "seeding")
         else:

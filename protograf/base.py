@@ -551,6 +551,7 @@ class BaseShape:
         self.show_id = False  # True
         # ---- KEY
         self.doc_page = globals.doc_page
+        self.page_number = globals.page_count + 1
         self.canvas = canvas or globals.canvas  # pymupdf Shape
         base = _object or globals.base  # protograf BaseCanvas
         # print(f"### {type(self.canvas)=} {type(cnv)=} {type(base=)}")
@@ -1961,12 +1962,14 @@ class BaseShape:
             return origin
 
         # feedback(f"### {string=} {kwargs=} {rotation=}")
+        # if string == '{{sequence}}':  breakpoint()
         if not string:
             return
         # ---- deprecated
         if kwargs.get("text_sequence", None):
             raise NotImplementedError("No text_sequence please!")
-        # ---- process locale data (from Locale namedtuple) via jinja2
+        # ---- process locale data (dict via Locale namedtuple) using jinja2
+        #      this may include the item's sequence number and current page
         _locale = kwargs.get("locale", None)
         if _locale:
             string = tools.eval_template(string, _locale)
