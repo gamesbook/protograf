@@ -1915,6 +1915,12 @@ def Data(**kwargs):
     - filename (str): the full path to the name (including extension) of the
       CSV or Excel file being used; if no directory is supplied in the path,
       then it is assumed to be the same one in which the script is located
+    - sheet (int): the number of sheet in the Excel file being used; defaults
+      to the first one
+    - sheetname (str): the name of sheet in the Excel file being used; defaults
+      to the first one
+    - cells (str): a range of cells delimiting data in the col:row format
+      from top-left to bottom-right e.g. 'A3:E12'
     - Access to a **Google Sheet** document is via three properties:
 
       - *google_key* - an API key that you must request from Google
@@ -1954,7 +1960,7 @@ def Data(**kwargs):
     except Exception:
         feedback(f'Extra must be a whole number, not "{kwargs.get("extra")}"!', True)
 
-    if filename:  # handle excel and CSV
+    if filename:  # handle excel and CSV; kwargs include cell, sheet, sheetname
         globals.dataset = tools.load_data(filename, **kwargs)
         globals.dataset_type = DatasetType.FILE
     elif google_sheet:  # handle Google Sheet

@@ -6,6 +6,7 @@ General purpose utility functions for protograf
 import csv
 import collections
 import copy
+from functools import lru_cache
 from itertools import zip_longest
 import jinja2
 import logging
@@ -14,6 +15,7 @@ import os
 import pathlib
 from pathlib import Path
 import string
+from string import ascii_uppercase, digits
 import sys
 from urllib.parse import urlparse
 
@@ -50,6 +52,10 @@ MIN_ATTRIBUTES = ("scheme", "netloc")
 BUILTIN_FONTS = ["Times-Roman", "Courier", "Helvetica"]
 
 
+__alpha_to_decimal = {letter: pos for pos, letter in enumerate(ascii_uppercase, 1)}
+__powers = (1, 26, 676)
+
+
 def script_path():
     """Get the path for a script being called from command line.
 
@@ -80,12 +86,13 @@ def load_data(datasource=None, **kwargs):
             selected = kwargs.get("selected", None)
             sheet = kwargs.get("sheet", 0)
             sheetname = kwargs.get("sheetname", None)
+            cells = kwargs.get("cells", None)
             dataset = open_excel(
                 datasource,
                 sheet=sheet,
                 sheetname=sheetname,
+                cells=cells,
                 headers=headers,
-                selected=selected,
             )
         else:
             feedback('Unable to process a file %s of type "%s"' % (filename, file_ext))
@@ -704,7 +711,7 @@ def open_csv(filename, headers=None, selected=None):
     return dict_list
 
 
-def open_excel(filename, sheet=0, sheetname=None, headers=None, selected=None):
+def open_excel(filename, sheet=0, sheetname=None, cells=None, headers=None):
     """Read data from an Excel file into a list of dictionaries
 
     Args:
@@ -712,8 +719,9 @@ def open_excel(filename, sheet=0, sheetname=None, headers=None, selected=None):
     - filename (str): path to the file
     - sheet (int): select a sheet number (otherwise first is used)
     - sheetname (str): select a sheet by name (otherwise first is used)
+    - cells (str): a range of cells delimiting data in the col:row format
+      from top-left to bottom-right e.g. 'A3:E12'
     - headers (list): strings to use instead of the first row
-    - selected (list): desired rows e.g. [2,4,7]
     """
 
     def cleaned(value):
@@ -747,22 +755,22 @@ def open_excel(filename, sheet=0, sheetname=None, headers=None, selected=None):
             filename=filename,
             sheet=sheet,
             sheetname=sheetname,
+            cells=cells,
             headers=headers,
-            selected=selected,
         )
     elif file_ext == ".xlsx":
         return open_xlsx(
             filename=filename,
             sheet=sheet,
             sheetname=sheetname,
+            cells=cells,
             headers=headers,
-            selected=selected,
         )
     else:
         feedback(f'Cannot process data files with an extension of "{file_ext}".', True)
 
 
-def open_xlsx(filename, sheet=0, sheetname=None, headers=None, selected=None):
+def open_xlsx(filename, sheet=0, sheetname=None, headers=None, cells=None):
     """Read data from XLSX file into a list of dictionaries
 
     Args:
@@ -771,7 +779,8 @@ def open_xlsx(filename, sheet=0, sheetname=None, headers=None, selected=None):
     - sheet (int): select a sheet number (otherwise first is used)
     - sheetname (str): select a sheet by name (otherwise first is used)
     - headers (list): strings to use instead of the first row
-    - selected (list): desired rows e.g. [2,4,7]
+    - cells (str): a range of cells delimiting data in the col:row format
+      from top-left to bottom-right e.g. 'A3:E12'
     """
 
     def cleaned(value):
@@ -830,18 +839,25 @@ def open_xlsx(filename, sheet=0, sheetname=None, headers=None, selected=None):
             )
         else:
             dict_list = []
-            for row_index in range(start, sheet.max_row + 1):
-                item = {
-                    keys[col_index - 1]: cleaned(
-                        sheet.cell(row=row_index, column=col_index).value
-                    )
-                    for col_index in range(1, sheet.max_column + 1)
-                }
-                if not selected:
+            if cells:
+                _cells = cells.split(":")
+                cell_range = sheet[_cells[0] : _cells[1]]
+                for row_index, row in enumerate(cell_range):
+                    item = {
+                        keys[col_index]: cleaned(cell.value)
+                        for col_index, cell in enumerate(row)
+                    }
                     dict_list.append(item)
-                else:
-                    if row_index + 1 in selected:
-                        dict_list.append(item)
+            else:
+                for row_index in range(start, sheet.max_row + 1):
+                    item = {
+                        keys[col_index - 1]: cleaned(
+                            sheet.cell(row=row_index, column=col_index).value
+                        )
+                        for col_index in range(1, sheet.max_column + 1)
+                    }
+                    dict_list.append(item)
+            print(f"{dict_list=}")
     except IOError:
         feedback('Unable to find or open Excel "%s"' % excel_filename)
     except IndexError:
@@ -851,7 +867,7 @@ def open_xlsx(filename, sheet=0, sheetname=None, headers=None, selected=None):
     return dict_list
 
 
-def open_xls(filename, sheet=0, sheetname=None, headers=None, selected=None):
+def open_xls(filename, sheet=0, sheetname=None, headers=None, cells=None):
     """Read data from XLS file into a list of dictionaries
 
     Args:
@@ -860,7 +876,8 @@ def open_xls(filename, sheet=0, sheetname=None, headers=None, selected=None):
     - sheet (int): select a sheet number (otherwise first is used)
     - sheetname (str): select a sheet by name (otherwise first is used)
     - headers (list): strings to use instead of the first row
-    - selected (list): desired rows e.g. [2,4,7]
+    - cells (str): a range of cells delimiting data in the col:row format
+      from top-left to bottom-right e.g. 'A3:E12'
     """
 
     def cleaned(value):
@@ -906,16 +923,23 @@ def open_xls(filename, sheet=0, sheetname=None, headers=None, selected=None):
             )
         else:
             dict_list = []
-            for row_index in range(start, sheet.nrows):
-                item = {
-                    keys[col_index]: cleaned(sheet.cell(row_index, col_index).value)
-                    for col_index in range(sheet.ncols)
-                }
-                if not selected:
+            if cells:
+                _cells = cells.split(":")
+                _topleft = coordinate_to_tuple(_cells[0], True)  # (col, row)
+                _btmrite = coordinate_to_tuple(_cells[1], True)  # (col, row)
+                for row_index in range(_topleft[1], _btmrite[1] + 1):
+                    item = {
+                        keys[col_index]: cleaned(sheet.cell(row_index, col_index).value)
+                        for col_index in range(_topleft[0], _btmrite[0] + 1)
+                    }
                     dict_list.append(item)
-                else:
-                    if row_index + 1 in selected:
-                        dict_list.append(item)
+            else:
+                for row_index in range(start, sheet.nrows):
+                    item = {
+                        keys[col_index]: cleaned(sheet.cell(row_index, col_index).value)
+                        for col_index in range(sheet.ncols)
+                    }
+                    dict_list.append(item)
     except IOError:
         feedback('Unable to find or open Excel "%s"' % excel_filename)
     except IndexError:
@@ -1124,6 +1148,63 @@ def alpha_column(num: int, lower: bool = False) -> string:
         return string.ascii_uppercase[divmod(num - 1, 26)[1] % 26] * (
             divmod(num - 1, 26)[0] + 1
         )
+
+
+@lru_cache(maxsize=None)
+def column_from_string(col: str) -> int:
+    """Convert ASCII column name (base 26) to decimal with 1-based index
+
+    Characters represent descending multiples of powers of 26
+
+    "AFZ" == 26 * pow(26, 0) + 6 * pow(26, 1) + 1 * pow(26, 2)
+
+    Doc Test:
+    >>> column_from_string('A')
+    1
+    >>> column_from_string('AA')
+    27
+    """
+    error_msg = f"'{col}' is not a valid column name. Column names are from A to ZZZ"
+    if len(col) > 3:
+        raise ValueError(error_msg)
+    idx = 0
+    col = reversed(col.upper())
+    for letter, power in zip(col, __powers):
+        try:
+            pos = __alpha_to_decimal[letter]
+        except KeyError:
+            raise ValueError(error_msg)
+        idx += pos * power
+    if not 0 < idx < 18279:
+        raise ValueError(error_msg)
+    return idx
+
+
+def coordinate_to_tuple(coordinate: str, zeroed: bool = False) -> tuple:
+    """Convert Excel style coordinate to 1-based (column, row) tuple
+
+    Args:
+        zeroed (bool): if True, use zero base
+
+    Doc Test:
+    >>> coordinate_to_tuple('A1')
+    (1, 1)
+    >>> coordinate_to_tuple('AB31')
+    (28, 31)
+    >>> coordinate_to_tuple('A1', True)
+    (0, 0)
+    >>> coordinate_to_tuple('AB31', True)
+    (27, 30)
+    """
+    for idx, c in enumerate(coordinate):
+        if c in digits:
+            break
+    col = coordinate[:idx]
+    row = coordinate[idx:]
+    if zeroed:
+        return column_from_string(col) - 1, int(row) - 1
+    else:
+        return column_from_string(col), int(row)
 
 
 def sheet_column(num: int, lower: bool = False) -> string:
