@@ -882,6 +882,12 @@ as viewed from above.
             roof=['tomato', 'aqua'],
             fill=None)
         Rectangle(
+            x=3, y=0.5,
+            roof=['#D7D8D5', '#7E7347'],
+            fill=None,
+            centre_shape=square(
+                side=0.8, fill_stroke="#BEBC9D"))
+        Rectangle(
             x=1, y=2,
             height=1.5, width=1.5,
             roof=['tomato', 'aqua', 'gold', 'chartreuse'],
@@ -894,10 +900,13 @@ as viewed from above.
             roof_stroke="silver",
             fill=None)
 
-      The top example shows the minimum required; the *roof* property is a
-      list of **two** colors (``[ ]`` with comma-separated color strings).
+      The top-left example shows the minimum required; the *roof* property is
+      a list of **two** colors (``[ ]`` with comma-separated color strings).
       This causes **two** triangles to be drawn |dash| one in the top-left,
       and one in the bottom-right of the rectangle.
+
+      The top-right example is similar to the top-left, but the addition of
+      a centred square of intermediate color creates a "3D" effect.
 
       The middle example shows what happens when the *roof* property is given
       a list of **four** colors (``[ ]`` with comma-separated color strings).

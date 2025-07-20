@@ -665,9 +665,7 @@ class DeckOfCards:
         """
 
         def draw_the_zones(
-            cnv,
-            page_number: int = 0,
-            zones: list = None
+            cnv, page_number: int = 0, zones: list = None
         ) -> DeckPrintState:
             """Process a list of Zones for a page
 
@@ -693,20 +691,28 @@ class DeckOfCards:
                         numbers = tools.sequence_split(zone[0], unique=True, star=True)
                         shape = zone[1]
                         if not isinstance(shape, BaseShape):
-                            feedback(f'Cannot process zones item "{zone}" -'
-                                     ' only a shape can be used for drawing!', True)
+                            feedback(
+                                f'Cannot process zones item "{zone}" -'
+                                " only a shape can be used for drawing!",
+                                True,
+                            )
                         for number in numbers:
-                            if number == page_number + 1 or number == '*':
+                            if number == page_number + 1 or number == "*":
                                 rkwargs = copy(kwargs)
-                                rkwargs.pop('grid_marks', None)
-                                rkwargs.pop('stroke', None)
-                                rkwargs.pop('fill', None)
+                                rkwargs.pop("grid_marks", None)
+                                rkwargs.pop("stroke", None)
+                                rkwargs.pop("fill", None)
                                 shape.draw(cnv=cnv, **rkwargs)
                     except IndexError:
-                        feedback(f'Cannot process zones item "{zone}" -'
-                                 ' please check formatting and values!', True)
+                        feedback(
+                            f'Cannot process zones item "{zone}" -'
+                            " please check formatting and values!",
+                            True,
+                        )
             else:
-                feedback(f'Cannot process zones "{zones}" - needs a list of paired items!')
+                feedback(
+                    f'Cannot process zones "{zones}" - needs a list of paired items!'
+                )
 
         def draw_the_cards(
             cnv,

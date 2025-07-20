@@ -135,6 +135,7 @@ class BaseCanvas:
         _units = self.defaults.get("units", unit.cm)
         self.units = support.to_units(_units)
         # print(f'### {self.units=} {self.defaults=} {self.defaults.get("margin")=}')
+        self.page_number = None
         # ---- paper
         _paper = paper or self.defaults.get("paper", "A4")
         if isinstance(_paper, tuple) and len(_paper) == 2:
@@ -243,6 +244,7 @@ class BaseCanvas:
             "grid_marks_length", 0.85
         )  # 1/3 inch
         self.grid_marks_offset = self.defaults.get("grid_marks_offset", 0)
+        self.grid_marks_dotted = self.defaults.get("grid_marks_dotted", False)
         # ---- line style
         self.line_stroke = self.defaults.get("line_stroke", WIDTH)
         self.line_width = self.defaults.get("line_width", self.stroke_width)
@@ -605,6 +607,9 @@ class BaseShape:
         )
         self.grid_marks_offset = self.kw_float(
             kwargs.get("grid_marks_offset", base.grid_marks_offset)
+        )
+        self.grid_marks_dotted = self.kw_bool(
+            kwargs.get("grid_marks_dotted", base.grid_marks_dotted)
         )
         # ---- sizes and positions
         self.row = kwargs.get("row", base.row)

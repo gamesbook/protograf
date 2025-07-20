@@ -24,7 +24,7 @@ Deck(
     height=0.65,
     offset=1,
     grid_marks=True,
-    grid_marks_length=0.2,
+    grid_marks_length=0.4,
     spacing_x=0.3,
     spacing_y=0.25,
     grouping_cols=2,

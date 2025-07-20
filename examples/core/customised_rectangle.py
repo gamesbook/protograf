@@ -183,6 +183,11 @@ Blueprint(stroke_width=0.5)
 Text(common=txt, text="Rectangle: Roof")
 Rectangle(x=1, y=0.5, roof=['tomato', 'aqua'], fill=None)
 Rectangle(
+    x=3, y=0.5,
+    roof=['#D7D8D5', '#7E7347'],
+    fill=None,
+    centre_shape=square(side=0.8, fill_stroke="#BEBC9D"))
+Rectangle(
     x=1, y=2,
     height=1.5, width=1.5,
     roof=['tomato', 'aqua', 'gold', 'chartreuse'],

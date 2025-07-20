@@ -62,9 +62,7 @@ def initialize():
     base = None  # will become a base.BaseCanvas object
     deck = None  # will become a proto.DeckOfCards object
     # store kwargs for DeckOfCards; #cards, copy, card_name, extra, grid_marks, zones
-    deck_settings = (
-        {}
-    )
+    deck_settings = {}
     card_frames = {}  # list of proto.BBox card outlines; keyed on page number
     filename = None
     directory = None  # set by Save() command

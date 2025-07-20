@@ -760,7 +760,6 @@ class CircleShape(BaseShape):
             self.draw_petals(cnv, ID, self.x_c, self.y_c)
         # feedback(f'*** Circle: {x=} {y=}')
         # ---- draw circle
-        breakpoint()
         cnv.draw_circle((x, y), self._u.radius)
         self.set_canvas_props(cnv=cnv, index=ID, **kwargs)
         # ---- grid marks
@@ -797,6 +796,7 @@ class CircleShape(BaseShape):
             gargs = {}
             gargs["stroke"] = self.grid_marks_stroke
             gargs["stroke_width"] = self.grid_marks_stroke_width
+            gargs["dotted"] = self.grid_marks_dotted
             self.set_canvas_props(cnv=None, index=ID, **gargs)
 
         # ---- draw hatch
@@ -3497,6 +3497,7 @@ class RectangleShape(BaseShape):
             gargs = {}
             gargs["stroke"] = self.grid_marks_stroke
             gargs["stroke_width"] = self.grid_marks_stroke_width
+            gargs["dotted"] = self.grid_marks_dotted
             self.set_canvas_props(cnv=None, index=ID, **gargs)
 
         # ---- centred shape (with offset)

@@ -423,7 +423,7 @@ def sequence_split(
     as_float: bool = False,
     msg: str = "",
     clean: bool = False,
-    star: bool = False
+    star: bool = False,
 ) -> list:
     """
     Split a string into a list of individual values
@@ -510,8 +510,8 @@ def sequence_split(
 
     # star test
     if star and len(_strings) == 1:
-        if _strings[0] == '*' or _strings[0] == 'all':
-            return ['*']
+        if _strings[0] == "*" or _strings[0] == "all":
+            return ["*"]
 
     # log.debug('strings:%s', _strings)
     for item in _strings:

@@ -45,7 +45,7 @@ Deck(
     copy='Copies',
     card_name="Image"
 )
-# Font
+# default Font
 Font("Quintessential")
 # card Frame
 Card("all",
@@ -97,5 +97,4 @@ Card("all",
 Card("all",
      text(x=0.5, y=8.8, align="left", font_name="Helvetica",
           text="protograf // out of the woods", stroke="dimgray", font_size=6))
-
 Save(cards=True)
