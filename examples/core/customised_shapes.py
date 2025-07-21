@@ -272,6 +272,26 @@ Stadium(cx=2, cy=3, width=1.25, height=2,
         stroke="red", stroke_width=.3, rotation=60, dot=0.04)
 PageBreak()
 
+# ---- slices: rhombus
+Blueprint()
+Text(common=txt, text="Rhombus: Slices")
+Rhombus(cx=2, cy=3, height=3, width=2,
+        slices=["red", "blue", "gold", "aqua"],
+)
+Rhombus(cx=1, cy=1, height=2, width=1,
+        slices=["red", "blue"],
+)
+Rhombus(cx=3, cy=5, height=2, width=1,
+        slices=["gold", "aqua", True],
+)
+Rhombus(cx=3, cy=1, height=2, width=1,
+        slices=[None, "blue", None, "aqua"],
+)
+Rhombus(cx=1, cy=5, height=2, width=1,
+        slices=["red", None, "gold", None],
+)
+PageBreak()
+
 # ---- rotation: polygon
 Blueprint()
 Text(common=txt, text="Polygon: rotation (flat)")
@@ -756,7 +776,9 @@ Save(
         "polygon_radii", "polygon_perbis",
         "dates_formats",
         "images_normal_rotation", "rhombus_red_rotation",
-        "stadium_red_rotation", "polygon_rotation_flat",
+        "stadium_red_rotation",
+        "slices_rhombus",
+        "polygon_rotation_flat",
         "polygon_rotation_pointy", "polygon_sizes", "grid_3x4",
         "line_custom", "line_centred",
         "bezier_custom", "ellipse_custom", "rectangle_custom",

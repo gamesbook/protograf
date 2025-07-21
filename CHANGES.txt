@@ -6,6 +6,7 @@ protograf Changes
 - Add zones property to Card (including page)
 - Add dotted style for grid marks
 - Add cells (range) option for Data from spreadsheet
+- Add slices property to Rectangle
 
 2025-07-19 (0.2.10)
 -------------------

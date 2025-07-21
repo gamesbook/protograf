@@ -2944,7 +2944,7 @@ class RectangleShape(BaseShape):
                 rotation=rotation,
                 rotation_point=self.centroid,
             )
-        # ---- draw 2 triangles and (maybe) 2 trapezoids
+        # ---- draw 2 (or 4) triangles and (maybe) 2 trapezoids
         elif len(roof_colors) == 4:
             dx = (vertexes[3].x - vertexes[0].x) / 2.0
             dy = (vertexes[1].y - vertexes[0].y) / 2.0
@@ -3612,6 +3612,101 @@ class RhombusShape(BaseShape):
             rotation_point=muPoint(x_c, y_c),
         )
 
+    def draw_slices(self, cnv, ID, vertexes, centre: tuple, rotation=0):
+        """Draw triangles inside the Rhombus
+
+        Args:
+            ID: unique ID
+            vertexes: the Rhombus's nodes
+            centre: the centre Point of the Rhombus
+            rotation: degrees anti-clockwise from horizontal "east"
+        """
+        # ---- get slices color list from string
+        if isinstance(self.slices, str):
+            _slices = tools.split(self.slices.strip())
+        else:
+            _slices = self.slices
+        # ---- validate slices color settings
+        err = ("slices must be a list of colors - either 2 or 4",)
+        if not isinstance(_slices, list):
+            feedback(err, True)
+        else:
+            if len(_slices) not in [2, 3, 4]:
+                feedback(err, True)
+        slices_colors = [
+            tools.get_color(rcolor)
+            for rcolor in _slices
+            if not isinstance(rcolor, bool)
+        ]
+        # ---- draw 2 triangles
+        if len(_slices) == 2:
+            # left
+            vertexes_left = [vertexes[1], vertexes[2], vertexes[3]]
+            cnv.draw_polyline(vertexes_left)
+            self.set_canvas_props(
+                index=ID,
+                stroke=self.slices_stroke or slices_colors[0],
+                fill=slices_colors[0],
+                closed=True,
+                rotation=rotation,
+                rotation_point=self.centroid,
+            )
+            # right
+            vertexes_right = [vertexes[0], vertexes[1], vertexes[3]]
+            cnv.draw_polyline(vertexes_right)
+            self.set_canvas_props(
+                index=ID,
+                stroke=self.slices_stroke or slices_colors[1],
+                fill=slices_colors[1],
+                closed=True,
+                rotation=rotation,
+                rotation_point=self.centroid,
+            )
+
+        elif len(_slices) == 3 and _slices[2]:
+            # top
+            vertexes_top = [vertexes[0], vertexes[3], vertexes[2]]
+            cnv.draw_polyline(vertexes_top)
+            self.set_canvas_props(
+                index=ID,
+                stroke=self.slices_stroke or slices_colors[0],
+                fill=slices_colors[0],
+                closed=True,
+                rotation=rotation,
+                rotation_point=self.centroid,
+            )
+            # bottom
+            vertexes_btm = [vertexes[0], vertexes[1], vertexes[2]]
+            cnv.draw_polyline(vertexes_btm)
+            self.set_canvas_props(
+                index=ID,
+                stroke=self.slices_stroke or slices_colors[1],
+                fill=slices_colors[1],
+                closed=True,
+                rotation=rotation,
+                rotation_point=self.centroid,
+            )
+
+        # ---- draw 4 triangles
+        elif len(_slices) == 4:
+            midpt = Point(centre[0], centre[1])
+            vert_bl = [vertexes[0], midpt, vertexes[1]]
+            vert_br = [vertexes[1], midpt, vertexes[2]]
+            vert_tr = [vertexes[2], midpt, vertexes[3]]
+            vert_tl = [vertexes[3], midpt, vertexes[0]]
+            # sections = [vert_l, vert_r, vert_t, vert_b]  # order is important!
+            sections = [vert_tr, vert_br, vert_bl, vert_tl]  # order is important!
+            for key, section in enumerate(sections):
+                cnv.draw_polyline(section)
+                self.set_canvas_props(
+                    index=ID,
+                    stroke=self.slices_stroke or slices_colors[key],
+                    fill=slices_colors[key],
+                    closed=True,
+                    rotation=rotation,
+                    rotation_point=self.centroid,
+                )
+
     def draw(self, cnv=None, off_x=0, off_y=0, ID=None, **kwargs):
         """Draw a rhombus (diamond) on a given canvas."""
         kwargs = self.kwargs | kwargs
@@ -3631,6 +3726,7 @@ class RhombusShape(BaseShape):
             y = self._u.y + self._o.delta_y
         cx = x + self._u.width / 2.0
         cy = y + self._u.height / 2.0
+        centre = (cx, cy)
         # ---- calculated properties
         self.area = (self._u.width * self._u.height) / 2.0
         # ---- handle rotation
@@ -3639,12 +3735,17 @@ class RhombusShape(BaseShape):
             self.centroid = muPoint(cx, cy)
             kwargs["rotation"] = rotation
             kwargs["rotation_point"] = self.centroid
+        else:
+            self.centroid = None
         # ---- draw rhombus
         self.vertexes = self.get_vertexes(cx=cx, cy=cy, x=x, y=y)
         # feedback(f'***Rhombus {x=} {y=} {self.vertexes=}')
         cnv.draw_polyline(self.vertexes)
         kwargs["closed"] = True
         self.set_canvas_props(cnv=cnv, index=ID, **kwargs)
+        # ---- draw roof after base
+        if self.slices:
+            self.draw_slices(cnv, ID, self.vertexes, centre, rotation)
         # ---- draw hatch
         if self.hatch_count:
             self.side = math.sqrt(
