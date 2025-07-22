@@ -331,8 +331,8 @@ class PolyominoObject(RectangleShape):
                     if self.tetris and self.is_tetronimo:
                         color_top, color_btm = self.set_tetris_style(**kwargs)
                         if color_top and color_btm:
-                            self.roof = [color_top, color_btm]
-                            # print(f"{self.letter=} {self.roof=}")
+                            self.slices = [color_top, color_btm]
+                            # print(f"{self.letter=} {self.slices=}")
 
                     kwargs["row"] = row
                     kwargs["col"] = col

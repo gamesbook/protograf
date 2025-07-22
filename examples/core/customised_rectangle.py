@@ -178,46 +178,46 @@ Rectangle(
 )
 PageBreak()
 
-# ---- roof
+# ---- slices
 Blueprint(stroke_width=0.5)
 Text(common=txt, text="Rectangle: Roof")
-Rectangle(x=1, y=0.5, roof=['tomato', 'aqua'], fill=None)
+Rectangle(x=1, y=0.5, slices=['tomato', 'aqua'], fill=None)
 Rectangle(
     x=3, y=0.5,
-    roof=['#D7D8D5', '#7E7347'],
+    slices=['#D7D8D5', '#7E7347'],
     fill=None,
     centre_shape=square(side=0.8, fill_stroke="#BEBC9D"))
 Rectangle(
     x=1, y=2,
     height=1.5, width=1.5,
-    roof=['tomato', 'aqua', 'gold', 'chartreuse'],
+    slices=['tomato', 'aqua', 'gold', 'chartreuse'],
     fill=None)
 Rectangle(
     x=1, y=4,
     height=2, width=3,
-    roof=['#FDAE74', '#F6965F', '#C66A3D', '#F6965F'],
-    roof_line=1.25,
-    roof_stroke="silver",
+    slices=['#FDAE74', '#F6965F', '#C66A3D', '#F6965F'],
+    slices_line=1.25,
+    slices_stroke="silver",
     fill=None)
 PageBreak()
 
-# ---- roof
+# ---- slices - custom
 Blueprint(stroke_width=0.5)
 Text(common=txt, text="Rectangle: Roof - custom")
 Rectangle(
     x=1, y=2,
     height=2, width=4,
-    roof=['#555656', '#555656', '#767982', '#555656'],
-    roof_line=4,
-    roof_stroke="#767982",
+    slices=['#555656', '#555656', '#767982', '#555656'],
+    slices_line=4,
+    slices_stroke="#767982",
     rotation=90)
 Rectangle(
     x=0, y=3,
     height=2, width=2,
-    roof=['#767982', '#636C73', '#555656', '#636C73'],
-    roof_line=2,
-    roof_line_mx=0.5,
-    roof_stroke="#767982")
+    slices=['#767982', '#636C73', '#555656', '#636C73'],
+    slices_line=2,
+    slices_line_mx=0.5,
+    slices_stroke="#767982")
 PageBreak()
 
 # ---- END
@@ -230,5 +230,6 @@ Save(
      names=[
         None,
         "centre", "notch", "dot_cross", "hatch", "rounding", "chevron",
-        "peak", "rotation", "notch_style", "borders", "roof", "roof_custom",
+        "peak", "rotation", "notch_style", "borders",
+        "slices", "slices_custom",
         None])

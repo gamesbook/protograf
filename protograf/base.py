@@ -370,13 +370,13 @@ class BaseCanvas:
             "rounded_radius", 0.05
         )  # fraction of smallest side
         # ---- rectangle / rhombus
-        self.roof = self.defaults.get("roof", [])
-        self.roof_line = self.defaults.get("roof_line", 0)
-        self.roof_line_mx = self.defaults.get("roof_line_mx", 0)
-        self.roof_line_my = self.defaults.get("roof_line_my", 0)
-        self.roof_stroke = self.defaults.get("roof_stroke", None)
-        self.roof_stroke_width = self.defaults.get("roof_stroke", None)
-        self.roof_reverse = self.defaults.get("roof_reverse", False)
+        self.slices = self.defaults.get("slices", [])
+        self.slices_line = self.defaults.get("slices_line", 0)
+        self.slices_line_mx = self.defaults.get("slices_line_mx", 0)
+        self.slices_line_my = self.defaults.get("slices_line_my", 0)
+        self.slices_stroke = self.defaults.get("slices_stroke", None)
+        self.slices_stroke_width = self.defaults.get("slices_stroke", None)
+        self.slices_reverse = self.defaults.get("slices_reverse", False)
 
         self.slices = self.defaults.get("slices", [])
         self.slices_stroke = self.defaults.get("slices_stroke", None)
@@ -826,13 +826,13 @@ class BaseShape:
         self.borders = kwargs.get("borders", base.borders)
         self.rounded_radius = base.rounded_radius
         # ---- rectangle / rhombus
-        self.roof = kwargs.get("roof", base.roof)
-        self.roof_line = kwargs.get("roof_line", base.roof_line)
-        self.roof_line_mx = kwargs.get("roof_line_mx", base.roof_line_mx)
-        self.roof_line_my = kwargs.get("roof_line_my", base.roof_line_my)
-        self.roof_reverse = kwargs.get("roof_reverse", base.roof_reverse)
-        self.roof_stroke = kwargs.get("roof_stroke", base.roof_stroke)
-        self.roof_stroke_width = kwargs.get("roof_stroke_width", base.roof_stroke_width)
+        self.slices = kwargs.get("slices", base.slices)
+        self.slices_line = kwargs.get("slices_line", base.slices_line)
+        self.slices_line_mx = kwargs.get("slices_line_mx", base.slices_line_mx)
+        self.slices_line_my = kwargs.get("slices_line_my", base.slices_line_my)
+        self.slices_reverse = kwargs.get("slices_reverse", base.slices_reverse)
+        self.slices_stroke = kwargs.get("slices_stroke", base.slices_stroke)
+        self.slices_stroke_width = kwargs.get("slices_stroke_width", base.slices_stroke_width)
 
         self.slices = kwargs.get("slices", base.slices)
         self.slices_reverse = kwargs.get("slices_reverse", base.slices_reverse)

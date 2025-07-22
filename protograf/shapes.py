@@ -2749,9 +2749,9 @@ class RectangleShape(BaseShape):
             self.x = self.cx - self.width / 2.0
             self.y = self.cy - self.height / 2.0
             # feedback(f"*** RectShp {self.cx=} {self.cy=} {self.x=} {self.y=}")
-        self._u_roof_line = self.unit(self.roof_line) if self.roof_line else None
-        self._u_roof_line_mx = self.unit(self.roof_line_mx) if self.roof_line_mx else 0
-        self._u_roof_line_my = self.unit(self.roof_line_mx) if self.roof_line_my else 0
+        self._u_slices_line = self.unit(self.slices_line) if self.slices_line else None
+        self._u_slices_line_mx = self.unit(self.slices_line_mx) if self.slices_line_mx else 0
+        self._u_slices_line_my = self.unit(self.slices_line_mx) if self.slices_line_my else 0
         self.kwargs = kwargs
 
     def calculate_area(self) -> float:
@@ -2899,7 +2899,7 @@ class RectangleShape(BaseShape):
             y = kwargs.get("cy") - self._u.height / 2.0
         return x, y
 
-    def draw_roof(self, cnv, ID, vertexes, rotation=0):
+    def draw_slices(self, cnv, ID, vertexes, rotation=0):
         """Draw triangles and trapezoids inside the Rectangle
 
         Args:
@@ -2907,28 +2907,28 @@ class RectangleShape(BaseShape):
             vertexes: the rectangle's nodes
             rotation: degrees anti-clockwise from horizontal "east"
         """
-        # ---- get roof color list from string
-        if isinstance(self.roof, str):
-            _roof = tools.split(self.roof.strip())
+        # ---- get slices color list from string
+        if isinstance(self.slices, str):
+            _slices = tools.split(self.slices.strip())
         else:
-            _roof = self.roof
-        # ---- validate roof color settings
+            _slices = self.slices
+        # ---- validate slices color settings
         err = ("Roof must be a list of colors - either 2 or 4",)
-        if not isinstance(_roof, list):
+        if not isinstance(_slices, list):
             feedback(err, True)
         else:
-            if len(_roof) not in [2, 4]:
+            if len(_slices) not in [2, 4]:
                 feedback(err, True)
-        roof_colors = [tools.get_color(rcolor) for rcolor in _roof]
+        slices_colors = [tools.get_color(slcolor) for slcolor in _slices]
         # ---- draw 2 triangles
-        if len(roof_colors) == 2:
+        if len(slices_colors) == 2:
             # top-left
             vertexes_tl = [vertexes[0], vertexes[1], vertexes[3]]
             cnv.draw_polyline(vertexes_tl)
             self.set_canvas_props(
                 index=ID,
-                stroke=self.roof_stroke or roof_colors[0],
-                fill=roof_colors[0],
+                stroke=self.slices_stroke or slices_colors[0],
+                fill=slices_colors[0],
                 closed=True,
                 rotation=rotation,
                 rotation_point=self.centroid,
@@ -2938,26 +2938,26 @@ class RectangleShape(BaseShape):
             cnv.draw_polyline(vertexes_br)
             self.set_canvas_props(
                 index=ID,
-                stroke=self.roof_stroke or roof_colors[1],
-                fill=roof_colors[1],
+                stroke=self.slices_stroke or slices_colors[1],
+                fill=slices_colors[1],
                 closed=True,
                 rotation=rotation,
                 rotation_point=self.centroid,
             )
         # ---- draw 2 (or 4) triangles and (maybe) 2 trapezoids
-        elif len(roof_colors) == 4:
+        elif len(slices_colors) == 4:
             dx = (vertexes[3].x - vertexes[0].x) / 2.0
             dy = (vertexes[1].y - vertexes[0].y) / 2.0
             midpt = Point(vertexes[0].x + dx, vertexes[0].y + dy)
-            if self.roof_line:
-                _line = self._u_roof_line / 2.0
+            if self.slices_line:
+                _line = self._u_slices_line / 2.0
                 midleft = Point(
-                    midpt.x - _line + self._u_roof_line_mx,
-                    midpt.y + self._u_roof_line_my,
+                    midpt.x - _line + self._u_slices_line_mx,
+                    midpt.y + self._u_slices_line_my,
                 )
                 midrite = Point(
-                    midpt.x + _line + self._u_roof_line_mx,
-                    midpt.y + self._u_roof_line_my,
+                    midpt.x + _line + self._u_slices_line_mx,
+                    midpt.y + self._u_slices_line_my,
                 )
                 vert_t = [vertexes[0], midleft, midrite, vertexes[3]]
                 vert_r = [vertexes[3], midrite, vertexes[2]]
@@ -2974,8 +2974,8 @@ class RectangleShape(BaseShape):
                 cnv.draw_polyline(section)
                 self.set_canvas_props(
                     index=ID,
-                    stroke=self.roof_stroke or roof_colors[key],
-                    fill=roof_colors[key],
+                    stroke=self.slices_stroke or slices_colors[key],
+                    fill=slices_colors[key],
                     closed=True,
                     rotation=rotation,
                     rotation_point=self.centroid,
@@ -3114,8 +3114,8 @@ class RectangleShape(BaseShape):
         is_peaks = True if self.peaks else False
         is_borders = True if self.borders else False
         is_round = True if (self.rounding or self.rounded) else False
-        if self.roof and (is_round or is_notched or is_peaks or is_chevron):
-            feedback("Cannot use roof with other styles.", True)
+        if self.slices and (is_round or is_notched or is_peaks or is_chevron):
+            feedback("Cannot use slices with other styles.", True)
         if is_round and is_borders:
             feedback("Cannot use rounding or rounded with borders.", True)
         if is_round and is_notched:
@@ -3467,9 +3467,9 @@ class RectangleShape(BaseShape):
                         mask="auto",
                     )
 
-        # ---- draw roof after base
-        if self.roof:
-            self.draw_roof(cnv, ID, self.vertexes, rotation)
+        # ---- draw slices after base
+        if self.slices:
+            self.draw_slices(cnv, ID, self.vertexes, rotation)
 
         # ---- draw hatch
         if self.hatch_count:
@@ -3634,9 +3634,9 @@ class RhombusShape(BaseShape):
             if len(_slices) not in [2, 3, 4]:
                 feedback(err, True)
         slices_colors = [
-            tools.get_color(rcolor)
-            for rcolor in _slices
-            if not isinstance(rcolor, bool)
+            tools.get_color(slcolor)
+            for slcolor in _slices
+            if not isinstance(slcolor, bool)
         ]
         # ---- draw 2 triangles
         if len(_slices) == 2:
@@ -3743,7 +3743,7 @@ class RhombusShape(BaseShape):
         cnv.draw_polyline(self.vertexes)
         kwargs["closed"] = True
         self.set_canvas_props(cnv=cnv, index=ID, **kwargs)
-        # ---- draw roof after base
+        # ---- draw slices after base
         if self.slices:
             self.draw_slices(cnv, ID, self.vertexes, centre, rotation)
         # ---- draw hatch

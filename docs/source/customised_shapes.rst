@@ -424,7 +424,7 @@ that it can be customised.
 - `Peak <rectPeak_>`_
 - `Rotation <rectRotation_>`_
 - `Rounding <rectRounding_>`_
-- `Roof <rectRoof_>`_
+- `Slices <rectSlices_>`_
 
 .. _rectCentred:
 
@@ -853,23 +853,21 @@ into the arc of a quarter-circle.
 
 ===== ======
 
-.. _rectRoof:
+.. _rectSlices:
 
-Roof
-----
+Slices
+------
 `^ <rectangleIndex_>`_
 
-The roof-related command enables the rectangle to be filled with
-colored triangular or quadilateral shapes.  Depending on the settings
-in use, this can be thought of to resemble a certain type of house roof,
-as viewed from above.
+The slices-related command enables the rectangle to be filled with
+colored triangular or quadilateral shapes.
 
 .. NOTE::
 
-    Roof areas are drawn **after** the rectangle has been drawn, and so
+    Slices are drawn **after** the rectangle has been drawn, and so
     may obscure the stroke outline and fill color of the rectangle.
 
-.. |rf1| image:: images/custom/rectangle/roof.png
+.. |rf1| image:: images/custom/rectangle/slices.png
    :width: 330
 
 ===== ======
@@ -879,28 +877,28 @@ as viewed from above.
 
         Rectangle(
             x=1, y=0.5,
-            roof=['tomato', 'aqua'],
+            slices=['tomato', 'aqua'],
             fill=None)
         Rectangle(
             x=3, y=0.5,
-            roof=['#D7D8D5', '#7E7347'],
+            slices=['#D7D8D5', '#7E7347'],
             fill=None,
             centre_shape=square(
                 side=0.8, fill_stroke="#BEBC9D"))
         Rectangle(
             x=1, y=2,
             height=1.5, width=1.5,
-            roof=['tomato', 'aqua', 'gold', 'chartreuse'],
+            slices=['tomato', 'aqua', 'gold', 'chartreuse'],
             fill=None)
         Rectangle(
             x=1, y=4,
             height=2, width=3,
-            roof=['#FDAE74', '#F6965F', '#C66A3D', '#F6965F'],
-            roof_line=1.25,
-            roof_stroke="silver",
+            slices=['#FDAE74', '#F6965F', '#C66A3D', '#F6965F'],
+            slices_line=1.25,
+            slices_stroke="silver",
             fill=None)
 
-      The top-left example shows the minimum required; the *roof* property is
+      The top-left example shows the minimum required; the *slices* property is
       a list of **two** colors (``[ ]`` with comma-separated color strings).
       This causes **two** triangles to be drawn |dash| one in the top-left,
       and one in the bottom-right of the rectangle.
@@ -908,21 +906,21 @@ as viewed from above.
       The top-right example is similar to the top-left, but the addition of
       a centred square of intermediate color creates a "3D" effect.
 
-      The middle example shows what happens when the *roof* property is given
+      The middle example shows what happens when the *slices* property is given
       a list of **four** colors (``[ ]`` with comma-separated color strings).
       This causes **four** triangles to be drawn |dash| the rectangle is thus
       subdivided into four triangular spaces.  Colors are allocated from the
       top-most triangle, going clock-wise.
 
-      The lower example shows what happens when the *roof* property is given
-      a list of **four** colors, plus a *roof_line* and a *roof_stroke*.
-      The *roof_line* is drawn centered in the rectangle, and then the two
+      The lower example shows what happens when the *slices* property is given
+      a list of **four** colors, plus a *slices_line* and a *slices_stroke*.
+      The *slices_line* is drawn centered in the rectangle, and then the two
       triangles are created at either end, with quadilaterals forming the top
-      and bottom shapes. All lines are drawn with the  *roof_stroke* color.
+      and bottom shapes. All lines are drawn with the  *slices_stroke* color.
 
 ===== ======
 
-.. |rf2| image:: images/custom/rectangle/roof_custom.png
+.. |rf2| image:: images/custom/rectangle/slices_custom.png
    :width: 330
 
 ===== ======
@@ -933,31 +931,31 @@ as viewed from above.
         Rectangle(
             x=1, y=2,
             height=2, width=4,
-            roof=['#555656', '#555656', '#767982', '#555656'],
-            roof_line=4,
-            roof_stroke="#767982",
+            slices=['#555656', '#555656', '#767982', '#555656'],
+            slices_line=4,
+            slices_stroke="#767982",
             rotation=90)
         Rectangle(
             x=0, y=3,
             height=2, width=2,
-            roof=['#767982', '#636C73', '#555656', '#636C73'],
-            roof_line=2,
-            roof_stroke="#767982",
-            roof_line_mx=0.5)
+            slices=['#767982', '#636C73', '#555656', '#636C73'],
+            slices_line=2,
+            slices_stroke="#767982",
+            slices_line_mx=0.5)
 
-      Both examples shows what happens when the *roof* property is given
-      a list of **four** colors, plus a *roof_line* and a *roof_stroke*.
-      In both cases, the *roof_line* length is equal to the length of the
+      Both examples shows what happens when the *slices* property is given
+      a list of **four** colors, plus a *slices_line* and a *slices_stroke*.
+      In both cases, the *slices_line* length is equal to the length of the
       rectangle itself (``4`` and ``2`` cm respectively).
 
       The right-hand rectangle shows how it appears to be subdivided into
-      two areas; this is because the *roof_line* runs the full length of the
+      two areas; this is because the *slices_line* runs the full length of the
       rectangle so the end triangles have a height of zero and effectively
       become "invisible".  In addition, because the rectangle has been
       rotated by 90 |deg| (around its centre) the dividing line displays as
       vertical.
 
-      The left-hand rectangle has an additional property *roof_line_mx*
+      The left-hand rectangle has an additional property *slices_line_mx*
       which causes the middle-line to move that distance to the right (or
       to the left, if it was a negative value).  This causes the right-hand
       triangle to "project" to the right of the rectangle.
