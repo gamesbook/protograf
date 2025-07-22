@@ -374,6 +374,8 @@ def tuple_split(
     [(3.0,)]
     >>> print(tuple_split('3,4'))
     [(3.0, 4.0)]
+    >>> print(tuple_split('  3,4  5.1,6.2   -7,8.1'))
+    [(3.0, 4.0), (5.1, 6.2), (-7.0, 8.1)]
     >>> print(tuple_split('3,5 6,1 4,2'))
     [(3.0, 5.0), (6.0, 1.0), (4.0, 2.0)]
     >>> print(tuple_split('3,5 6,1 4,2', all_ints=True))
@@ -389,13 +391,19 @@ def tuple_split(
     if string:
         try:
             _string_list = string.strip(" ").replace(";", ",").split(" ")
+            # print(f'^^^ {_string_list=}')
             for _str in _string_list:
                 items = _str.split(",")
-                if all_ints:
-                    _items = [int(itm) for itm in items]
-                else:
-                    _items = [float(itm) for itm in items]
-                values.append(tuple(_items))
+                _items = []
+                for itm in items:
+                    _itm = itm.strip(" ")
+                    if _itm:
+                        if all_ints:
+                            _items.append(int(_itm))
+                        else:
+                            _items.append(float(_itm))
+                if _items:
+                    values.append(tuple(_items))
             if pairs_list:
                 for value in values:
                     if len(value) != 2:
@@ -405,7 +413,7 @@ def tuple_split(
                             True,
                         )
             return values
-        except ValueError:
+        except ValueError as err:
             if all_ints:
                 feedback(
                     f"Cannot convert {label} into a list of integer sets!"
@@ -413,7 +421,9 @@ def tuple_split(
                     True,
                 )
             else:
-                feedback(f"Cannot convert {label} into a list of numeric sets!", True)
+                feedback(
+                    f"Cannot convert {label} into a list of numeric sets ({err})!", True
+                )
             return values
 
         except Exception:

@@ -405,6 +405,7 @@ class BaseCanvas:
         self.vertices = self.defaults.get("vertices", 5)
         self.sides = self.defaults.get("sides", 6)
         self.points = self.defaults.get("points", [])
+        self.steps = self.defaults.get("steps", [])
         self.x_c = self.defaults.get("xc", 0)
         self.y_c = self.defaults.get("yc", 0)
         # ---- radii (circle, hex & polygon)
@@ -832,7 +833,9 @@ class BaseShape:
         self.slices_line_my = kwargs.get("slices_line_my", base.slices_line_my)
         self.slices_reverse = kwargs.get("slices_reverse", base.slices_reverse)
         self.slices_stroke = kwargs.get("slices_stroke", base.slices_stroke)
-        self.slices_stroke_width = kwargs.get("slices_stroke_width", base.slices_stroke_width)
+        self.slices_stroke_width = kwargs.get(
+            "slices_stroke_width", base.slices_stroke_width
+        )
 
         self.slices = kwargs.get("slices", base.slices)
         self.slices_reverse = kwargs.get("slices_reverse", base.slices_reverse)
@@ -871,6 +874,7 @@ class BaseShape:
         self.vertices = self.kw_int(kwargs.get("vertices", base.vertices), "vertices")
         self.sides = kwargs.get("sides", base.sides)
         self.points = kwargs.get("points", base.points)
+        self.steps = kwargs.get("steps", base.steps)
         # ---- radii (circle / hexagon / polygon / compass)
         self.radii = kwargs.get("radii", base.radii)
         self.radii_stroke = kwargs.get("radii_stroke", self.stroke)

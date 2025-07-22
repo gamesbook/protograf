@@ -2572,43 +2572,78 @@ class PolylineShape(BaseShape):
     Multi-part line on a given canvas.
     """
 
+    def get_steps(self) -> list:
+        """Get a list of step tuples."""
+        steps = tools.tuple_split(self.steps)
+        if not steps:
+            steps = self.steps
+        if not steps or len(steps) == 0:
+            return None
+        return steps
+
     def get_points(self) -> list:
+        """Get a list of point tuples."""
         points = tools.tuple_split(self.points)
         if not points:
             points = self.points
         if not points or len(points) == 0:
-            feedback("There are no points to draw the Polyline", False, True)
+            return None
         return points
 
     def get_vertexes(self):
         """Return polyline vertices in canvas units"""
         points = self.get_points()
-        vertices = [
-            Point(
-                self.unit(pt[0]) + self._o.delta_x, self.unit(pt[1]) + self._o.delta_y
+        if points:
+            vertices = [
+                Point(
+                    self.unit(pt[0]) + self._o.delta_x,
+                    self.unit(pt[1]) + self._o.delta_y,
+                )
+                for pt in points
+            ]
+            return vertices
+        steps = self.get_steps()
+        # print('***', f'{steps=}')
+        if steps:
+            vertices = []
+            # start here...
+            vertices.append(
+                Point(
+                    self.unit(self.x) + self._o.delta_x,
+                    self.unit(self.y) + self._o.delta_y,
+                )
             )
-            for pt in points
-        ]
-        return vertices
+            if len(steps) > 0:
+                for index, stp in enumerate(steps):
+                    vertices.append(
+                        Point(
+                            vertices[index].x + self.unit(stp[0]),
+                            vertices[index].y + self.unit(stp[1]),
+                        )
+                    )
+                return vertices
+        feedback("There are no points or steps to draw the Polyline", False, True)
+        return None
 
     def draw(self, cnv=None, off_x=0, off_y=0, ID=None, **kwargs):
         """Draw a polyline on a given canvas."""
         kwargs = self.kwargs | kwargs
         cnv = cnv if cnv else globals.canvas  # a new Page/Shape may now exist
         super().draw(cnv, off_x, off_y, ID, **kwargs)  # unit-based props
-        points = self.get_points()
+        self.vertexes = self.get_vertexes()
         # ---- set vertices
-        x_sum, y_sum = 0, 0
-        self.vertexes = []
-        for key, vertex in enumerate(points):
-            x, y = vertex
-            # convert to using units
-            x = self.unit(x) + self._o.delta_x
-            y = self.unit(y) + self._o.delta_y
-            self.vertexes.append((x, y))
+        # points = self.get_vertexes()
+        # x_sum, y_sum = 0, 0
+        # self.vertexes = []
+        # for key, vertex in enumerate(points):
+        #     x, y = vertex
+        #     # convert to using units
+        #     x = self.unit(x) + self._o.delta_x
+        #     y = self.unit(y) + self._o.delta_y
+        #     self.vertexes.append((x, y))
         # ---- draw polyline
         # feedback(f'***PolyLineShp{x=} {y=} {self.vertexes=}')
-        if points:
+        if self.vertexes:
             cnv.draw_polyline(self.vertexes)
             kwargs["closed"] = False
             kwargs["fill"] = None
@@ -2623,7 +2658,7 @@ class PolylineShape(BaseShape):
             or self.arrow_height
             or self.arrow_width
             or self.arrow_double
-        ) and points:
+        ) and self.vertexes:
             _vertexes = tools.as_point(self.vertexes)
             start, end = _vertexes[-2], _vertexes[-1]
             self.draw_arrowhead(cnv, start, end, **kwargs)
@@ -2750,8 +2785,12 @@ class RectangleShape(BaseShape):
             self.y = self.cy - self.height / 2.0
             # feedback(f"*** RectShp {self.cx=} {self.cy=} {self.x=} {self.y=}")
         self._u_slices_line = self.unit(self.slices_line) if self.slices_line else None
-        self._u_slices_line_mx = self.unit(self.slices_line_mx) if self.slices_line_mx else 0
-        self._u_slices_line_my = self.unit(self.slices_line_mx) if self.slices_line_my else 0
+        self._u_slices_line_mx = (
+            self.unit(self.slices_line_mx) if self.slices_line_mx else 0
+        )
+        self._u_slices_line_my = (
+            self.unit(self.slices_line_mx) if self.slices_line_my else 0
+        )
         self.kwargs = kwargs
 
     def calculate_area(self) -> float:
