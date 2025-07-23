@@ -2593,6 +2593,11 @@ class PolylineShape(BaseShape):
     def get_vertexes(self):
         """Return polyline vertices in canvas units"""
         points = self.get_points()
+        steps = self.get_steps()
+        if points and steps:
+            feedback(
+                "Point values will supercede steps to draw the Polyline", False, True
+            )
         if points:
             vertices = [
                 Point(
@@ -2602,7 +2607,6 @@ class PolylineShape(BaseShape):
                 for pt in points
             ]
             return vertices
-        steps = self.get_steps()
         # print('***', f'{steps=}')
         if steps:
             vertices = []
@@ -2630,17 +2634,8 @@ class PolylineShape(BaseShape):
         kwargs = self.kwargs | kwargs
         cnv = cnv if cnv else globals.canvas  # a new Page/Shape may now exist
         super().draw(cnv, off_x, off_y, ID, **kwargs)  # unit-based props
-        self.vertexes = self.get_vertexes()
         # ---- set vertices
-        # points = self.get_vertexes()
-        # x_sum, y_sum = 0, 0
-        # self.vertexes = []
-        # for key, vertex in enumerate(points):
-        #     x, y = vertex
-        #     # convert to using units
-        #     x = self.unit(x) + self._o.delta_x
-        #     y = self.unit(y) + self._o.delta_y
-        #     self.vertexes.append((x, y))
+        self.vertexes = self.get_vertexes()
         # ---- draw polyline
         # feedback(f'***PolyLineShp{x=} {y=} {self.vertexes=}')
         if self.vertexes:
@@ -3959,35 +3954,81 @@ class ShapeShape(BaseShape):
         self.x = kwargs.get("x", kwargs.get("left", 0))
         self.y = kwargs.get("y", kwargs.get("bottom", 0))
 
+    def get_steps(self) -> list:
+        """Get a list of step tuples."""
+        steps = tools.tuple_split(self.steps)
+        if not steps:
+            steps = self.steps
+        if not steps or len(steps) == 0:
+            return None
+        return steps
+
+    def get_points(self) -> list:
+        """Get a list of point tuples."""
+        points = tools.tuple_split(self.points)
+        if not points:
+            points = self.points
+        if not points or len(points) == 0:
+            return None
+        return points
+
+    def get_vertexes(self):
+        """Return polyline vertices in canvas units"""
+        points = self.get_points()
+        steps = self.get_steps()
+        if points and steps:
+            feedback(
+                "Point values will supercede steps to draw the Polyshape", False, True
+            )
+        if points:
+            vertices = [
+                Point(
+                    self.unit(pt[0]) + self.unit(self.x) + self._o.delta_x,
+                    self.unit(pt[1]) + self.unit(self.y) + self._o.delta_y,
+                )
+                for pt in points
+            ]
+            return vertices
+        # print('***', f'{steps=}')
+        if steps:
+            vertices = []
+            # start here...
+            vertices.append(
+                Point(
+                    self.unit(self.x) + self._o.delta_x,
+                    self.unit(self.y) + self._o.delta_y,
+                )
+            )
+            if len(steps) > 0:
+                for index, stp in enumerate(steps):
+                    vertices.append(
+                        Point(
+                            vertices[index].x + self.unit(stp[0]),
+                            vertices[index].y + self.unit(stp[1]),
+                        )
+                    )
+                return vertices
+        feedback("There are no points or steps to draw the Polyshape", False, True)
+        return None
+
     def draw(self, cnv=None, off_x=0, off_y=0, ID=None, **kwargs):
         """Draw an irregular polygon on a given canvas."""
         super().draw(cnv, off_x, off_y, ID, **kwargs)  # unit-based props
         cnv = cnv if cnv else globals.canvas  # a new Page/Shape may now exist
         # ---- set canvas
         self.set_canvas_props(index=ID)
-        # ---- draw Shape
-        if isinstance(self.points, str):
-            # SPLIT STRING e.g. "1,2  3,4  4.5,8.8"
-            _points = self.points.split(" ")
-            points = [_point.split(",") for _point in _points]
-        else:
-            points = self.points
-        if points and len(points) > 0:
-            x_offset, y_offset = self.unit(self.x or 0), self.unit(self.y or 0)
-            # ---- set vertices
-            x_sum, y_sum = 0, 0
-            self.vertexes = []
-            for key, vertex in enumerate(points):
-                _x0, _y0 = float(vertex[0]), float(vertex[1])
-                # convert to using units
-                x = self.unit(_x0) + self._o.delta_x + x_offset
-                y = self.unit(_y0) + self._o.delta_y + y_offset
-                self.vertexes.append((x, y))
-            # feedback(f'***RAT {x=} {y=} {self.vertexes=}')
+        x_offset, y_offset = self.unit(self.x or 0), self.unit(self.y or 0)
+        # ---- set vertices
+        self.vertexes = self.get_vertexes()
+        # ---- draw polyshape
+        # feedback(f'***PolyShape{x=} {y=} {self.vertexes=}')
+        if self.vertexes:
             cnv.draw_polyline(self.vertexes)
             kwargs["closed"] = True
+            if kwargs.get("rounded"):
+                kwargs["lineJoin"] = 1
             self.set_canvas_props(cnv=cnv, index=ID, **kwargs)
-            # ---- centre?
+            # ---- is there a centre?
             if self.cx and self.cy:
                 x = self._u.cx + self._o.delta_x + x_offset
                 y = self._u.cy + self._o.delta_y + y_offset
@@ -3998,7 +4039,7 @@ class ShapeShape(BaseShape):
                 # ---- * text
                 self.draw_label(cnv, ID, x, y, **kwargs)
         else:
-            feedback("There are no points to draw the Polyshape", False, True)
+            feedback("There are no points or steps to draw the Polyshape", False, True)
 
 
 class SquareShape(RectangleShape):

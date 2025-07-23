@@ -847,10 +847,16 @@ class BaseShape:
         # ---- stadium
         self.edges = kwargs.get("edges", base.edges)
         # ---- grid layout
-        self.rows = self.kw_int(kwargs.get("rows", base.rows), "rows")
-        self.cols = self.kw_int(
-            kwargs.get("cols", kwargs.get("columns", base.cols)), "cols"
-        )
+        _rows = kwargs.get("rows", base.rows)
+        if not isinstance(_rows, list):
+            self.rows = self.kw_int(_rows, "rows")
+        else:
+            self.rows = _rows
+        _cols = kwargs.get("cols", base.cols)
+        if not isinstance(_cols, list):
+            self.cols = self.kw_int(_cols, "cols")
+        else:
+            self.cols = _cols
         self.frame = kwargs.get("frame", base.frame)
         self.offset = self.kw_float(kwargs.get("offset", base.offset))
         self.offset_x = self.kw_float(kwargs.get("offset_x", self.offset))

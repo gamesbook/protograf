@@ -94,6 +94,7 @@ cross-reference to the detailed information for that command.
 -  :ref:`T <the-template-command>` - short for *Template*; the way to access an
    item in a column from a set of :ref:`data <the-data-command>` for a
    :ref:`card <the-card-command>`
+-  :ref:`Table <grid-command>` - a grid of rectangles that can be drawn on a page
 -  :ref:`Text <text-command>` * - a shape containing text that can be displayed on a page
 -  :ref:`Today <the-today-command>` - display - as text - the current date and time
 -  :doc:`Track <layouts_track>` - draw any number of shapes at the vertices of another shape

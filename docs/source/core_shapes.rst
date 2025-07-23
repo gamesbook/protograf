@@ -61,6 +61,7 @@ Shape Index
 -  `Stadium`_
 -  `Star`_
 -  `Starfield`_
+-  `Table`_
 -  `Text`_
 -  `Trapezoid`_
 
@@ -347,10 +348,15 @@ Polyline
 ~~~~~~~~
 `↑ <shape-index_>`_
 
-A polyline is a series of one or more lines joining two or more points.
+A Polyline is a series of one or more lines joining two or more points.
 
-Example 1. Customised Polyline
-++++++++++++++++++++++++++++++
+In addition to setting points directly, the Polyline can also be constructed
+using the *steps* property.  This define a series of values that represent
+the **relative** distance from the last point drawn.
+
+
+Example 1. Basic Polyline
++++++++++++++++++++++++++
 
 .. |py1| image:: images/defaults/polyline.png
    :width: 330
@@ -366,8 +372,8 @@ Example 1. Customised Polyline
 
         WARNING:: There are no points to draw the Polyline
 
-      This example then shows the shape constructed using the command with these
-      properties:
+      The upper example then shows the shape constructed using the command with
+      these properties:
 
       .. code:: python
 
@@ -389,14 +395,51 @@ Example 1. Customised Polyline
 ===== ======
 
 
-Example 2. Polyline with Arrow
+Example 2. Customised Polyline
 ++++++++++++++++++++++++++++++
 
-.. |py2| image:: images/customised/polyline_arrow.png
+.. |py2| image:: images/customised/polyline_basic.png
    :width: 330
 
 ===== ======
-|py2| The shape is constructed with these properties:
+|py2| The upper example shows the shape constructed using the command with
+      these properties:
+
+      .. code:: python
+
+        Polyline(
+          points=[(1, 2), (1, 1), (2, 0), (3, 1), (3, 2)],
+          stroke_width=1, stroke="red")
+
+      Here the points are arranged so as to create a basic 'house' outline.
+
+      The lower example also shows how to create a Polyline using the command
+      with these properties:
+
+      .. code:: python
+
+        Polyline(
+          x=1, y=3, stroke_width=1,
+          steps='0.5,0 0,1.5 1.5,0 0,-1.5 0.5,0 0,0.5 -2.5,0')
+
+      Here, the *steps* property results in the drawing of an outline
+      using a series of distances |dash| or offsets |dash| from the last
+      point.  The start is provided by the *x* and *y* values.
+
+      Each pair of comma-separated values are x- and y-distances
+      respectively.
+
+===== ======
+
+
+Example 3. Polyline with Arrow
+++++++++++++++++++++++++++++++
+
+.. |py3| image:: images/customised/polyline_arrow.png
+   :width: 330
+
+===== ======
+|py3| The shape is constructed with these properties:
 
       .. code:: python
 
@@ -1308,10 +1351,11 @@ Example 1. Default Polyshape
       line from the last to the first**.
 
       The default *stroke* and *fill* apply to this example of a Polyshape.
+
 ===== ======
 
-Example 2. Polyshape with Centre
-++++++++++++++++++++++++++++++++
+Example 2. Polyshape: Centre and Steps
+++++++++++++++++++++++++++++++++++++++
 
 While the Polyshape does not have the ability to be constructed using a
 *cx* and *cy* pair to set its centre location |dash| like the symmetric
@@ -1322,6 +1366,11 @@ to those other shapes.
 **NOTE** - the program has no way of knowing or "checking" that the values
 for the *cx* and *cy* pair that you supply to it are correct!
 
+In addition to setting points directly, the Polyshape can also be constructed
+using the *steps* property.  This define a series of values that represent
+the **relative** distance from the last point drawn.
+
+
 .. |sh2| image:: images/customised/polyshape_custom.png
    :width: 330
 
@@ -1331,17 +1380,17 @@ for the *cx* and *cy* pair that you supply to it are correct!
       .. code:: python
 
         Polyshape(
-              points=[(1, 2), (1, 1), (2, 0), (3, 1), (3, 2)],
-              cx=2, cy=1,
-              label='A House',
-              label_stroke="seagreen",
-              cross=0.5,
-              fill="sandybrown",
-              stroke="peru",
+            points=[(1, 2), (1, 1), (2, 0), (3, 1), (3, 2)],
+            cx=2, cy=1,
+            label='A House',
+            label_stroke="seagreen",
+            cross=0.5,
+            fill="sandybrown",
+            stroke="peru",
         )
 
       As in Example 1, the *points* are used to construct the outline of the
-      shape. Other properties:
+      "house" shape. Other properties:
 
       - the centre is *defined* to be at x-position ``2`` cm and y-position
         ``1`` cm
@@ -1354,6 +1403,26 @@ for the *cx* and *cy* pair that you supply to it are correct!
 
       *Reminder:* ``cx`` and ``cy`` affect the drawing of the cross and label
       but do **not** affect the drawing of the shape itself.
+
+      The lower shape shows how create a Polyshape using the command with
+      these properties:
+
+      .. code:: python
+
+        Polyshape(
+          x=1, y=3,
+          steps='0.5,0 0,1.5 1.5,0 0,-1.5 0.5,0 0,0.5 -2.5,0 0,-0.5',
+          stroke="sandybrown",
+          stroke_width=3,
+          fill="seagreen")
+
+      Here, the *steps* property results in the drawing of an outline
+      using a series of distances |dash| or offsets |dash| from the last
+      point.  The start is provided by the *x* and *y* values.
+
+      Each pair of comma-separated values are x- and y-distances
+      respectively.
+
 ===== ======
 
 Example 3. Polyshape Offset
@@ -2192,6 +2261,7 @@ The following are all such shapes:
 - `Image`_
 - `Lines`_
 - `Rectangles`_
+- `Table`_
 
 
 .. _blueprint-command:
@@ -2764,6 +2834,95 @@ Example 2. Customised Rectangles
       - *height* - ``1.25`` cm set for each Rectangle's height
       - *fill* color of ``chartreuse``
       - *dotted* border lines for each Rectangle
+
+===== ======
+
+
+.. _table-command:
+
+Table
+~~~~~~~~~~
+`↑ <shape-index_>`_
+
+Tables are an arrangement of rectangles in a row-by-column layout.
+
+Either the rows and columns are split evenly across the Table's
+height and width, or the values of each row and column can be set via
+lists of values.
+
+Example 1. Table: Basic
++++++++++++++++++++++++
+
+.. |tb0| image:: images/customised/table_defaults.png
+   :width: 330
+
+===== ======
+|tb0| This example shows the Table constructed using the command with these
+      properties:
+
+      .. code:: python
+
+        Table(cols=2, rows=2)
+
+        Table(y=2.5,
+              width=3, height=2,
+              cols=3, rows=4)
+
+      The first Table has the following properties:
+
+      - top-left corner at defaults of x-position ``1`` cm and
+        y-position ``1`` cm
+      - *height* and *width* of default ``1`` cm each
+
+      There are 2 rows |dash| in the y-direction |dash| and 2 columns in
+      |dash| the x-direction.  This is the minimum allowed.
+
+      The second Table has the following properties:
+
+      - top-left corner at x-position ``1`` cm and
+        y-position ``2.5`` cm
+      - *height* and *width* of ``3`` cm and ``2`` cm respectively
+
+      There are 4 rows |dash| in the y-direction |dash| and 3 columns in
+      |dash| the x-direction. Each row is equal in size as is each column.
+
+===== ======
+
+Example 2. Customised Table
++++++++++++++++++++++++++++
+
+.. |rn1| image:: images/customised/table_custom.png
+   :width: 330
+
+===== ======
+|rn1| This example shows the Table constructed using the command with
+      these properties:
+
+      .. code:: python
+
+        Table(y=0,
+              width=3, height=2.5,
+              cols=5, rows=6,
+              stroke="red", dotted=True)
+        Table(y=3, x=0,
+              cols=[0.5, 1, 1.25, 0.75],
+              rows=[0.75, 0.5, 0.5, 0.75],
+              stroke="blue", fill="aqua")
+
+      The first Table has the following properties:
+
+      - starts at x-position ``1`` cm and y-position ``0`` cm
+      - *height* and *width* of ``2.5`` cm and ``3`` cm respectively
+      - *stroke* color of ``red``
+      - *dotted* border lines for each Rectangle
+
+      The second Table has the following properties:
+
+      - starts at x-position ``1`` cm and y-position ``3`` cm
+      - *cols* is a list of column widths
+      - *rows* is a list of row heights
+      - *stroke* color of ``blue``
+      - *fill* color of ``aqua``
 
 ===== ======
 

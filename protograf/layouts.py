@@ -143,6 +143,95 @@ class DotGridShape(BaseShape):
         cnv.commit()  # if not, then Page objects e.g. Image not layered
 
 
+class TableShape(BaseShape):
+    """
+    Table on a given canvas.
+    """
+
+    def __init__(self, _object=None, canvas=None, **kwargs):
+        super(TableShape, self).__init__(_object=_object, canvas=canvas, **kwargs)
+        self.kwargs = kwargs
+        # print(f'\n+++ {self.cols=} {self.rows=}')
+        self.locales = []
+        self.use_side = False
+        if "side" in kwargs:
+            self.use_side = True
+            if "width" in kwargs or "height" in kwargs:
+                self.use_side = False
+        self.col_count, self.row_count = 0, 0
+        # validate settings
+        if isinstance(self.cols, int):
+            self.col_count = self.cols
+            self.col_widths = [
+                self.width / self.col_count for col in range(0, self.col_count)
+            ]
+        elif isinstance(self.cols, list):
+            if all(isinstance(item, (int, float)) for item in self.cols):
+                self.col_count = len(self.cols)
+                self.col_widths = self.cols
+        else:
+            pass
+        if self.col_count < 2:
+            feedback(
+                "The cols value must be a number greater than one or list of numbers!",
+                True,
+            )
+        if isinstance(self.rows, int):
+            self.row_count = self.rows
+            self.row_heights = [
+                self.height / self.row_count for row in range(0, self.row_count)
+            ]
+        elif isinstance(self.rows, list):
+            if all(isinstance(item, (int, float)) for item in self.rows):
+                self.row_count = len(self.rows)
+                self.row_heights = self.rows
+        else:
+            pass
+        if self.row_count < 2:
+            feedback(
+                "The rows value must be a number greater than one or list of numbers!",
+                True,
+            )
+        # combined?
+        if self.col_count < 2 or self.row_count < 2:
+            feedback("Minimum layout size is 2 columns x 2 rows!", True)
+
+    def draw(self, cnv=None, off_x=0, off_y=0, ID=None, **kwargs):
+        """Draw a table on a given canvas."""
+        kwargs = self.kwargs | kwargs
+        cnv = cnv if cnv else self.canvas
+        super().draw(cnv, off_x, off_y, ID, **kwargs)  # unit-based props
+        # ---- convert to using units
+        x = self._u.x + self._o.delta_x
+        y = self._u.y + self._o.delta_y
+        # ---- iterate cols and rows
+        cell_y = y
+        sequence = 0
+        for row_no in range(0, self.row_count):
+            cell_x = x
+            rheight = self.unit(self.row_heights[row_no], label="row height")
+            for col_no in range(0, self.col_count):
+                cwidth = self.unit(self.col_widths[col_no], label="column width")
+                cnv.draw_rect((cell_x, cell_y, cell_x + cwidth, cell_y + rheight))
+                cx, cy = cell_x + cwidth / 2.0, cell_y + rheight / 2.0
+                ID = tools.sheet_column(col_no + 1) + str(row_no + 1)
+                locale = Locale(
+                    col=col_no, row=row_no, x=cx, y=cy, id=ID, sequence=sequence
+                )
+                self.locales.append(locale)
+                # finally ...
+                cell_x = cell_x + cwidth
+                sequence += 1
+            cell_y = cell_y + rheight
+        self.set_canvas_props(  # shape.finish()
+            cnv=cnv,
+            index=ID,
+            **kwargs,
+        )
+        cnv.commit()  # if not, then Page objects e.g. Image not layered
+        return self.locales
+
+
 # ---- sequence
 
 

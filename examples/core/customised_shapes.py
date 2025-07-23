@@ -364,25 +364,25 @@ PageBreak()
 
 # ---- ellipse - custom
 Blueprint()
-Text(common=txt, text="Ellipse - centre; tall")
+Text(common=txt, text="Ellipse: centre; tall")
 Ellipse(cx=2, cy=3, width=3, height=4, dot=0.1)
 PageBreak()
 
 # ---- rectangle - custom
 Blueprint()
-Text(common=txt, text="Rectangle - centre; tall")
+Text(common=txt, text="Rectangle: centre; tall")
 Rectangle(cx=2, cy=3, width=3, height=4, dot=0.1)
 PageBreak()
 
 # ---- square - custom
 Blueprint()
-Text(common=txt, text="Square - centre; dot")
+Text(common=txt, text="Square: centre; dot")
 Square(cx=2, cy=3, side=3, dot=0.1)
 PageBreak()
 
 # ---- trapezoid - custom
 Blueprint()
-Text(common=txt, text="Trapezoid - centre; dot")
+Text(common=txt, text="Trapezoid: centre; dot")
 Trapezoid(cx=2, cy=3, width=3, top=2, height=4, flip='s', dot=0.1)
 PageBreak()
 
@@ -427,6 +427,8 @@ PageBreak()
 Blueprint(stroke_width=0.5)
 Text(common=txt, text="Polyshape: default")
 Polyshape(points=[(1, 2), (1, 1), (2, 0), (3, 1), (3, 2)])
+Polyshape(x=1, y=3,
+         steps='0.5,0 0,1.5 1.5,0 0,-1.5 0.5,0 0,0.5 -2.5,0 0,-0.5')
 PageBreak()
 
 # ---- polyshape - custom
@@ -441,6 +443,9 @@ Polyshape(
       fill="sandybrown",
       stroke="peru",
 )
+Polyshape(x=1, y=3,
+         steps='0.5,0 0,1.5 1.5,0 0,-1.5 0.5,0 0,0.5 -2.5,0 0,-0.5',
+         stroke="sandybrown", stroke_width=3, fill="seagreen")
 PageBreak()
 
 # ---- shapeshape - offset + string
@@ -471,13 +476,13 @@ PageBreak()
 
 # ---- rhombus - custom
 Blueprint()
-Text(common=txt, text="Rhombus - centre; dot")
+Text(common=txt, text="Rhombus: centre; dot")
 Rhombus(cx=2, cy=3, width=2, height=3, dot=0.1)
 PageBreak()
 
 # ---- rhombus - borders
 Blueprint()
-Text(common=txt, text="Rhombus - borders")
+Text(common=txt, text="Rhombus: borders")
 Rhombus(cx=2, cy=3, width=2, height=3, stroke_width=1.9,
     borders=[
         ("nw", 2, "gold"),
@@ -490,7 +495,7 @@ PageBreak()
 
 # ---- trapezoid - borders
 Blueprint()
-Text(common=txt, text="Trapezoid - borders")
+Text(common=txt, text="Trapezoid: borders")
 Trapezoid(
     cx=2, cy=3,
     width=2, height=2, top=1.5, stroke_width=2,
@@ -578,6 +583,15 @@ Line(x=3, y=6, x1=4, y1=5,
      arrow_style='angle',
      arrow_width=0.15,
      arrow_position=[0.1, 0.15, 0.2])
+PageBreak()
+
+# ---- polyline custom
+Blueprint(stroke_width=0.5)
+Text(common=txt, text="Polyline: Custom")
+Polyline(points=[(1, 2), (1, 1), (2, 0), (3, 1), (3, 2)],
+         stroke_width=1, stroke="red")
+Polyline(x=1, y=3, stroke_width=1,
+         steps='0.5,0 0,1.5 1.5,0 0,-1.5 0.5,0 0,0.5 -2.5,0')
 PageBreak()
 
 # ---- polyline arrows
@@ -759,6 +773,26 @@ Rhombus(
 )
 PageBreak()
 
+# ---- table - defaults
+Blueprint()
+Text(common=txt, text="Table: defaults")
+Table(cols=2, rows=2)
+Table(y=2.5, width=3, height=2, cols=3, rows=4)
+PageBreak()
+
+# ---- table - styled
+Blueprint()
+Text(common=txt, text="Table: styled")
+Table(y=0,
+      width=3, height=2.5,
+      cols=5, rows=6,
+      stroke="red", dotted=True)
+Table(y=3, x=0,
+      cols=[0.5, 1, 1.25, 0.75],
+      rows=[0.75, 0.5, 0.5, 0.75],
+      stroke="blue", fill="aqua")
+PageBreak()
+
 # ---- END
 Text(common=txt, text="Shapes END...")
 
@@ -787,8 +821,10 @@ Save(
         "polyshape_default", "polyshape_custom", "polyshape_offset",
         "rectangles_rowcol", "rectangles_custom", "rhombus_custom",
         "rhombus_borders", "trapezoid_borders",
-        "arrow_sizes", "arrow_rotate", "arrowheads", "polyline_arrow",
+        "arrow_sizes", "arrow_rotate", "arrowheads",
+        "polyline_basic", "polyline_arrow",
         "shape_centred", "shape_centred_move", "shape_centred_custom",
         "qr_code", "image_sliced",
         "shape_rotation", "shape_hatch_and_rotation",
+        "table_defaults", "table_custom",
         None])

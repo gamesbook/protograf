@@ -9,6 +9,7 @@ protograf Changes
 - Add slices property to Rhombus
 - Change "roof" to "slices" as a property for Rectangle
 - Add steps property to Polyline and Polyshape
+- Add Table shape
 
 2025-07-19 (0.2.10)
 -------------------

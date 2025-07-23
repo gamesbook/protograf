@@ -68,6 +68,7 @@ from .layouts import (
     ConnectShape,
     RepeatShape,
     SequenceShape,
+    TableShape,
 )
 from .globals import unit
 from .groups import Switch, Lookup  # used in scripts
@@ -2786,7 +2787,7 @@ def connect(shape_from, shape_to, **kwargs):
     return ConnectShape(canvas=globals.canvas, **kwargs)
 
 
-# ---- repeats ====
+# ---- layouts ====
 
 
 def Repeat(shapes=None, **kwargs):
@@ -2798,6 +2799,7 @@ def Repeat(shapes=None, **kwargs):
 
 
 def repeat(shapes=None, **kwargs):
+    """Create multiple copies of a Shape across rows and columns."""
     kwargs = margins(**kwargs)
     return RepeatShape(shapes=shapes, **kwargs)
 
@@ -2809,9 +2811,6 @@ def Lines(rows=1, cols=1, **kwargs):
             Line(row=row, col=col, **kwargs)
 
 
-# ---- sequence ====
-
-
 def Sequence(shapes=None, **kwargs):
     """Draw a list of Shapes in a line."""
     kwargs = margins(**kwargs)
@@ -2821,8 +2820,22 @@ def Sequence(shapes=None, **kwargs):
 
 
 def sequence(shapes=None, **kwargs):
-    """Draw a list of Shapes in a line."""
+    """Create a list of Shapes in a line."""
     return SequenceShape(shapes=shapes, **kwargs)
+
+
+def Table(shapes=None, **kwargs):
+    """Draw a grid of rectangles."""
+    kwargs = margins(**kwargs)
+    kwargs["shapes"] = shapes
+    Table = TableShape(**kwargs)
+    locales = Table.draw()
+    return locales
+
+
+def table(shapes=None, **kwargs):
+    """Create a grid of rectangles."""
+    return TableShape(shapes=shapes, **kwargs)
 
 
 # ---- patterns (grid) ====
