@@ -7,6 +7,7 @@ Note:
 """
 # lib
 import argparse
+from collections import namedtuple
 from copy import copy
 from datetime import datetime
 import itertools
@@ -235,12 +236,28 @@ class CardShape(BaseShape):
         """Draw an element on a given canvas."""
         raise NotImplementedError
 
+    def draw_new_elements(
+        self, the_function, new_eles, cnv, off_x, off_y, ID, cid, **kwargs
+    ):
+        """Draw a list of elements created via a Template or Card function call."""
+        for the_new_ele in new_eles:
+            try:
+                the_new_ele.draw(cnv=cnv, off_x=off_x, off_y=off_y, ID=ID, **kwargs)
+                cnv.commit()
+            except AttributeError as err:
+                feedback(
+                    f"Unable to draw card #{cid + 1}.  Check that the"
+                    f" elements created by '{the_function.__name__}'"
+                    " are all shapes.",
+                    True,
+                )
+
     def draw_card(self, cnv, row, col, cid, **kwargs):
         """Draw a card on a given canvas.
 
         Pass on `deck_data` to other commands, as needed, for them to draw Shapes
         """
-        # feedback(f'\n$$$ draw_card  {cid=} {row=} {col=} {kwargs["card_back"]=}')
+        # feedback(f'\n$$$ draw_card  {cid=} {row=} {col=} {self.elements=}')
         # feedback(f'$$$ draw_card  {cid=} KW=> {kwargs}')
         is_card_back = kwargs.get("card_back", False)
         image = kwargs.get("image", None)
@@ -400,28 +417,43 @@ class CardShape(BaseShape):
             try:
                 # ---- * normal element
                 iid = members.index(cid + 1)
-                # convert Template into a string via render
                 new_ele = self.handle_custom_values(flat_ele, cid)  # calculated values
+                # feedback(f'$$$ CS draw_card $$$ {new_ele=} {kwargs=}')
                 if isinstance(new_ele, (SequenceShape, RepeatShape)):
                     new_ele.deck_data = self.deck_data
-                # feedback(f'$$$ CS draw_card $$$ {new_ele=} {kwargs=}')
                 if isinstance(new_ele, TemplatingType):
+                    # convert Template into a string via render
                     card_value = self.deck_data[iid]
                     custom_value = new_ele.template.render(card_value)
                     new_eles = new_ele.function(custom_value) or []
-                    for the_new_ele in new_eles:
-                        try:
-                            the_new_ele.draw(
-                                cnv=cnv, off_x=_dx, off_y=_dy, ID=iid, **kwargs
-                            )
-                            cnv.commit()
-                        except AttributeError as err:
-                            feedback(
-                                f"Unable to draw card #{cid + 1}.  Check that all"
-                                f" elements created by '{new_ele.function.__name__}'"
-                                " are shapes.",
-                                True,
-                            )
+                    self.draw_new_elements(
+                        new_ele.function,
+                        new_eles,
+                        cnv=cnv,
+                        off_x=_dx,
+                        off_y=_dy,
+                        ID=iid,
+                        cid=cid,
+                        **kwargs,
+                    )
+                if callable(new_ele) and not isinstance(new_ele, BaseShape):
+                    # call user-defined function-like objects!
+                    card_values = self.deck_data[cid]
+                    card_values_tuple = namedtuple("Data", card_values.keys())(
+                        **card_values
+                    )
+                    new_eles = new_ele(card_values_tuple) or []
+                    # print(f'{card_values_tuple=} {new_eles=}')
+                    self.draw_new_elements(
+                        new_ele,
+                        new_eles,
+                        cnv=cnv,
+                        off_x=_dx,
+                        off_y=_dy,
+                        ID=iid,
+                        cid=cid,
+                        **kwargs,
+                    )
                 else:
                     new_ele.draw(cnv=cnv, off_x=_dx, off_y=_dy, ID=iid, **kwargs)
                     cnv.commit()

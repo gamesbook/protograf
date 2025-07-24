@@ -738,7 +738,8 @@ def open_excel(filename, sheet=0, sheetname=None, cells=None, headers=None):
         if isinstance(value, float):
             if float(value) == float(int(value)):
                 return int(value)
-        return value
+        result = "" if value is None else value
+        return result
 
     if not filename:
         feedback("A valid Excel filename must be supplied!")
@@ -797,7 +798,8 @@ def open_xlsx(filename, sheet=0, sheetname=None, headers=None, cells=None):
         if isinstance(value, float):
             if float(value) == float(int(value)):
                 return int(value)
-        return value
+        result = "" if value is None else value
+        return result
 
     if not filename:
         feedback("A valid Excel filename must be supplied!")

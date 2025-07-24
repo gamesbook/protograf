@@ -1053,6 +1053,8 @@ customised in a similar way.
 - `Radii: Pointy <hexRadiiPointy_>`_
 - `Perbis: Flat <hexPerbisFlat_>`_
 - `Perbis: Pointy <hexPerbisPointy_>`_
+- `Slices: Flat <hexSlicesFlat_>`_
+- `Slices: Pointy <hexSlicesPointy_>`_
 - `Text: Flat <hexTextFlat_>`_
 - `Text: Pointy <hexTextPointy_>`_
 
@@ -1383,6 +1385,93 @@ the mid-points of the edges.
       - *label* - the text displayed in the centre
 
 ===== ======
+
+.. _hexSlicesFlat:
+
+Slices: Flat
+-----------
+`^ <hexagon_>`_
+
+Slices are a set of colors that are drawn as triangles inside a
+a Hexagon in a clockwise direction starting from the "North East".
+If there are fewer colors than the six possible triangles, then the
+colors are repeated, starting from the first one.
+
+.. |hsf| image:: images/custom/hexagon/slices_flat.png
+   :width: 330
+
+===== ======
+|hsf| This example shows Hexagons constructed using these commands:
+
+      .. code:: python
+
+        hxg = Common(height=1.5, dot=0.05, dot_stroke="white", font_size=8)
+        Hexagon(
+            common=hxg,
+            cx=1.5, cy=1.5,
+            slices=['red', 'blue'],
+            orientation="flat")
+        Hexagon(
+            common=hxg, cx=1.5, cy=3.5,
+            slices=['red', 'orange', 'yellow', 'green', 'blue', 'pink'],
+            orientation="flat")
+
+      These Hexagons all share the following Common properties that differ
+      from the defaults:
+
+      - *height*, *dot* and *dot_stroke* - set the basic configuration
+      - *orientation* - set to ``flat``, so there will be no "peak" at the top
+
+      Each Hexagon has its own setting for:
+
+      - *slices* - slices are drawn seqentially
+
+===== ======
+
+.. _hexSlicesPointy:
+
+Slices: Pointy
+-------------
+`^ <hexagon_>`_
+
+Slices are a set of colors that are drawn as triangles inside a
+a Hexagon in a clockwise direction starting from the "North East".
+If there are fewer colors than the six possible triangles, then the
+colors are repeated, starting from the first one.
+
+.. |hsp| image:: images/custom/hexagon/slices_pointy.png
+   :width: 330
+
+===== ======
+|hsp| This example shows Hexagons constructed using these commands:
+
+      .. code:: python
+
+        hxg = Common(
+            height=1.5,
+            dot=0.05, dot_stroke="white")
+        Hexagon(
+            common=hxg,
+            cx=1.5, cy=1.5,
+            slices=['red', 'blue'], orientation="pointy")
+        Hexagon(
+            common=hxg,
+            cx=1.5, cy=3.5,
+            slices=['red', 'orange', 'yellow', 'green', 'blue', 'pink'],
+            orientation="pointy")
+
+      These Hexagons all share the following Common properties that differ
+      from the defaults:
+
+      - *height*, *dot* and *dot_stroke* - set the basic configuration
+      - *orientation* - set to ``pointy``, so there will be a "peak" at the top
+
+      Each Hexagon has its own setting for:
+
+      - *slices* - slices are drawn seqentially
+
+===== ======
+
 
 
 .. _hexTextFlat:

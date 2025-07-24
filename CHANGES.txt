@@ -13,6 +13,7 @@ protograf Changes
 - Add progress bar for Font cache creation
 - Patch over-zealous Data header check
 - Add function handling at Card level
+- Add slices property to Hex
 
 2025-07-19 (0.2.10)
 -------------------

@@ -164,6 +164,26 @@ Hexagon(common=hxg, cx=2, cy=2, perbis='*', orientation="flat")
 Hexagon(common=hxg, cx=2, cy=4, perbis='*', orientation="pointy")
 PageBreak()
 
+# ---- slices_flat
+Blueprint(stroke_width=0.5)
+Text(common=txt, text="Hex Flat: slices")
+hxg = Common(height=1.5, dot=0.05, dot_stroke="white", font_size=8)
+Hexagon(common=hxg, cx=1.5, cy=1.5, slices=['red', 'blue'], orientation="flat")
+Hexagon(common=hxg, cx=1.5, cy=3.5,
+        slices=['red', 'orange', 'yellow', 'green', 'blue', 'pink'],
+        orientation="flat")
+PageBreak()
+
+# ---- slices_pointy
+Blueprint(stroke_width=0.5)
+Text(common=txt, text="Hex Pointy: slices")
+hxg = Common(height=1.5, dot=0.05, dot_stroke="white", font_size=8)
+Hexagon(common=hxg, cx=1.5, cy=1.5,  slices=['red', 'blue'], orientation="pointy")
+Hexagon(common=hxg, cx=1.5, cy=3.5,
+        slices=['red', 'orange', 'yellow', 'green', 'blue', 'pink'],
+        orientation="pointy")
+PageBreak()
+
 # ---- END
 Text(common=txt, text="Hexagon END...")
 
@@ -181,4 +201,5 @@ Save(
         "borders_flat", "borders_pointy",
         "perbis_flat", "perbis_pointy",
         "perbis_all",
+        "slices_flat", "slices_pointy",
         None])

@@ -1810,6 +1810,48 @@ class HexShape(BaseShape):
             dotted=self.hatch_dots,
         )
 
+    def draw_slices(self, cnv, ID, vertexes, centre: tuple, rotation=0):
+        """Draw triangles inside the Hexagon
+
+        Args:
+            ID: unique ID
+            vertexes: the Hex'es nodes
+            centre: the centre Point of the Hex
+            rotation: degrees anti-clockwise from horizontal "east"
+        """
+        # ---- get slices color list from string
+        if isinstance(self.slices, str):
+            _slices = tools.split(self.slices.strip())
+        else:
+            _slices = self.slices
+        # ---- validate slices color settings
+        slices_colors = [
+            tools.get_color(slcolor)
+            for slcolor in _slices
+            if not isinstance(slcolor, bool)
+        ]
+        # ---- draw triangles for each sector, repeat as needed!
+        sid = 0
+        nodes = [4, 3, 2, 1, 0, 5]
+        if _lower(self.orientation) in ["p", "pointy"]:
+            nodes = [5, 4, 3, 2, 1, 0]
+        for vid in nodes:
+            if sid > len(slices_colors) - 1:
+                sid = 0
+            vnext = vid - 1 if vid > 0 else 5
+            vertexes_slice = [vertexes[vid], centre, vertexes[vnext]]
+            cnv.draw_polyline(vertexes_slice)
+            self.set_canvas_props(
+                index=ID,
+                stroke=self.slices_stroke or slices_colors[sid],
+                fill=slices_colors[sid],
+                closed=True,
+                rotation=rotation,
+                rotation_point=muPoint(centre[0], centre[1]),
+            )
+            sid += 1
+            vid += 1
+
     def get_geometry(self):
         """Calculate geometric settings of a Hexagon."""
         # ---- calculate half_flat & half_side
@@ -2089,6 +2131,9 @@ class HexShape(BaseShape):
         # self._debug(cnv, Point(x, y), 'start')
         # self._debug(cnv, Point(self.x_d, self.y_d), 'centre')
         self._debug(cnv, vertices=self.vertexes)
+        # ---- draw slices
+        if self.slices:
+            self.draw_slices(cnv, ID, self.vertexes, (self.x_d, self.y_d), rotation=kwargs.get("rotation"))
         # ---- draw hatch
         if self.hatch_count:
             if not self.hatch_count & 1:
