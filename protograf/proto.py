@@ -2022,10 +2022,16 @@ def Data(**kwargs):
     if globals.dataset and len(globals.dataset) > 0:
         first = globals.dataset[0].keys()
         for key in first:
-            if not (key.isalpha() or "_" in key):
+            if not (key.isalnum() or "_" in key):
                 feedback(
                     "The Data headers must only be characters (without spaces)"
                     f' e.g. not "{key}"',
+                    True,
+                )
+            if not key[0].isalpha():
+                feedback(
+                    "The Data headers must start with a character"
+                    f' - it cannot be "{key[0]}"',
                     True,
                 )
     if debug:

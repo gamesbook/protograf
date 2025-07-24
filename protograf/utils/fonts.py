@@ -36,6 +36,7 @@ from find_system_fonts_filename import (
     FindSystemFontsFilenameException,
 )
 from fontTools.ttLib import TTFont, TTLibFileIsCollectionError
+from tqdm import tqdm
 
 # raise log level for fontTools
 package_logger = logging.getLogger("fontTools")
@@ -99,11 +100,10 @@ class FontInterface:
                     return
         feedback("Setting up fonts ... ... ... please be patient!", False)
         self.load_font_files()
-        for ffile in self.font_files:
+        for ffile in tqdm(self.font_files):
             fdt = self.extract_font_summary(ffile)
             if fdt:
                 family = fdt.get("fontFamily")
-                # if 'Quintessential' in family: breakpoint()
                 if family:
                     if family not in list(self.font_families.keys()):
                         self.font_families[family] = []

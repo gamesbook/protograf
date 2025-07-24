@@ -867,7 +867,6 @@ def open_xlsx(filename, sheet=0, sheetname=None, headers=None, cells=None):
                         for col_index in range(1, sheet.max_column + 1)
                     }
                     dict_list.append(item)
-            print(f"{dict_list=}")
     except IOError:
         feedback('Unable to find or open Excel "%s"' % excel_filename)
     except IndexError:
