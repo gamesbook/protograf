@@ -1992,7 +1992,7 @@ class BaseShape:
             return origin
 
         # feedback(f"### {string=} {kwargs=} {rotation=}")
-        # if string == '{{sequence}}':  breakpoint()
+        # if string == '{{sequence}}':  break point()
         if not string:
             return
         # ---- deprecated

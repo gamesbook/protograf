@@ -1389,7 +1389,7 @@ the mid-points of the edges.
 .. _hexSlicesFlat:
 
 Slices: Flat
------------
+------------
 `^ <hexagon_>`_
 
 Slices are a set of colors that are drawn as triangles inside a
@@ -1431,7 +1431,7 @@ colors are repeated, starting from the first one.
 .. _hexSlicesPointy:
 
 Slices: Pointy
--------------
+--------------
 `^ <hexagon_>`_
 
 Slices are a set of colors that are drawn as triangles inside a

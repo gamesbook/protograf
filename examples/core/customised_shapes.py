@@ -81,7 +81,7 @@ PageBreak()
 
 # ---- starfield
 Blueprint()
-Text(common=txt, text="StarField: Rectangle; multi-color")
+Text(common=txt, text="StarField: rectangle; multi-color")
 Rectangle(x=0, y=0, height=3, width=3, fill="black")
 StarField(
     enclosure=rectangle(x=0, y=0, height=3, width=3),
@@ -92,7 +92,7 @@ StarField(
 PageBreak()
 
 Blueprint()
-Text(common=txt, text="StarField: Circle; multi-size")
+Text(common=txt, text="StarField: circle; multi-size")
 Circle(x=0, y=0, radius=1.5, fill="black")
 StarField(
     enclosure=circle(x=0, y=0, radius=1.5),
@@ -102,7 +102,7 @@ StarField(
 PageBreak()
 
 Blueprint()
-Text(common=txt, text="StarField: Poly; multi-color&size")
+Text(common=txt, text="StarField: poly; multi-color&size")
 plys = Common(x=1.5, y=1.4, sides=10, radius=1.5)
 Polygon(common=plys, fill="black")
 StarField(
@@ -274,7 +274,7 @@ PageBreak()
 
 # ---- slices: rhombus
 Blueprint()
-Text(common=txt, text="Rhombus: Slices")
+Text(common=txt, text="Rhombus: slices")
 Rhombus(cx=2, cy=3, height=3, width=2,
         slices=["red", "blue", "gold", "aqua"],
 )
@@ -343,7 +343,7 @@ PageBreak()
 
 # ---- center line from angle
 Blueprint(stroke_width=0.5)
-Text(common=txt, text="Line: Angled")
+Text(common=txt, text="Line: angle")
 
 Line(cx=1, cy=1, angle=45, length=2, stroke="red")
 Line(cx=3, cy=1, angle=225, length=2, stroke_width=1.5)
@@ -536,7 +536,7 @@ PageBreak()
 
 # ---- arrowhead
 Blueprint(stroke_width=0.5)
-Text(common=txt, text="Line: Arrowheads")
+Text(common=txt, text="Line: arrow styles")
 Line(x=0.5, y=1, x1=0.5, y1=0, arrow=True, stroke="black")
 Line(x=1.5, y=1, x1=1.5, y1=0, arrow_style='notch')
 Line(x=2.5, y=1, x1=2.5, y1=0, arrow_style='angle')
@@ -587,7 +587,7 @@ PageBreak()
 
 # ---- polyline custom
 Blueprint(stroke_width=0.5)
-Text(common=txt, text="Polyline: Custom")
+Text(common=txt, text="Polyline: custom")
 Polyline(points=[(1, 2), (1, 1), (2, 0), (3, 1), (3, 2)],
          stroke_width=1, stroke="red")
 Polyline(x=1, y=3, stroke_width=1,
@@ -596,7 +596,7 @@ PageBreak()
 
 # ---- polyline arrows
 Blueprint(stroke_width=0.5)
-Text(common=txt, text="Polyline: Arrow")
+Text(common=txt, text="Polyline: arrow")
 Polyline(
     points=[(1, 3), (2, 4), (2.5, 2), (3, 3), (3.5, 1)],
     stroke_width=1,
@@ -740,7 +740,7 @@ PageBreak()
 
 # ---- shape hatch-and-rotation
 Blueprint()
-Text(common=txt, text="Hatch and Rotate")
+Text(common=txt, text="Hatch & Rotate")
 htch = Common(
     fill='lightgray', stroke=None,
     hatch_count=5, hatch_width=0.75,

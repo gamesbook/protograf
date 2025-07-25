@@ -180,7 +180,7 @@ PageBreak()
 
 # ---- slices
 Blueprint(stroke_width=0.5)
-Text(common=txt, text="Rectangle: Roof")
+Text(common=txt, text="Rectangle: slices")
 Rectangle(x=1, y=0.5, slices=['tomato', 'aqua'], fill=None)
 Rectangle(
     x=3, y=0.5,
@@ -203,7 +203,7 @@ PageBreak()
 
 # ---- slices - custom
 Blueprint(stroke_width=0.5)
-Text(common=txt, text="Rectangle: Roof - custom")
+Text(common=txt, text="Rectangle: slices - custom")
 Rectangle(
     x=1, y=2,
     height=2, width=4,

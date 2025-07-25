@@ -2891,11 +2891,11 @@ Example 1. Table: Basic
 Example 2. Customised Table
 +++++++++++++++++++++++++++
 
-.. |rn1| image:: images/customised/table_custom.png
+.. |tb1| image:: images/customised/table_custom.png
    :width: 330
 
 ===== ======
-|rn1| This example shows the Table constructed using the command with
+|tb1| This example shows the Table constructed using the command with
       these properties:
 
       .. code:: python

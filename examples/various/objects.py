@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Example code for various "real world" objects protograf
+Example code for various "real world" things for protograf
 
 Written by: Derek Hohls
 Created on: 19 August 2024
@@ -17,7 +17,7 @@ fidred = "#CC0033"
 
 # ---- PAGE 1 ===>
 
-Text(common=header, text="Miscellaneous Objects #1")
+Text(common=header, text="Miscellaneous Things #1")
 
 
 Text(common=header_font, x=6, y=4,
@@ -79,7 +79,7 @@ PageBreak()
 # ---- PAGE 2 ===>
 
 Text(common=header,
-     text="Miscellaneous Objects #2")
+     text="Miscellaneous Things #2")
 
 
 Text(common=header_font, x=7, y=2.5, text="Sets of check boxes (loop + 3 x sequence)")
@@ -126,7 +126,7 @@ Circle(cx=2, cy=19, radius=0.15, fill_stroke="dimgray")
 
 Text(common=header_font, x=5, y=16,
      text="Atom: ellipses with rotation + centre circle")
-atom = Common(cx=2, cy=16, width=3, height=1, stroke_width=1, outline="red")
+atom = Common(cx=2, cy=16, width=3, height=1, stroke_width=1, stroke="red", fill=None)
 for degrees in [30,150,270]:
     Ellipse(common=atom, rotation=degrees)
 Circle(cx=2, cy=16, radius=0.2, fill_stroke="red")

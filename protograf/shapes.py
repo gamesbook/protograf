@@ -2133,7 +2133,13 @@ class HexShape(BaseShape):
         self._debug(cnv, vertices=self.vertexes)
         # ---- draw slices
         if self.slices:
-            self.draw_slices(cnv, ID, self.vertexes, (self.x_d, self.y_d), rotation=kwargs.get("rotation"))
+            self.draw_slices(
+                cnv,
+                ID,
+                self.vertexes,
+                (self.x_d, self.y_d),
+                rotation=kwargs.get("rotation"),
+            )
         # ---- draw hatch
         if self.hatch_count:
             if not self.hatch_count & 1:

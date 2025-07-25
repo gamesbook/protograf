@@ -418,7 +418,8 @@ class CardShape(BaseShape):
                 # ---- * normal element
                 iid = members.index(cid + 1)
                 new_ele = self.handle_custom_values(flat_ele, cid)  # calculated values
-                # feedback(f'$$$ CS draw_card $$$ {new_ele=} {kwargs=}')
+                # feedback(f'$$$ CS draw_card ele $$$ {new_ele=}')
+                # breakpoint()
                 if isinstance(new_ele, (SequenceShape, RepeatShape)):
                     new_ele.deck_data = self.deck_data
                 if isinstance(new_ele, TemplatingType):
@@ -436,7 +437,7 @@ class CardShape(BaseShape):
                         cid=cid,
                         **kwargs,
                     )
-                if callable(new_ele) and not isinstance(new_ele, BaseShape):
+                if callable(new_ele) and not isinstance(new_ele, (BaseShape, Switch)):
                     # call user-defined function-like objects!
                     card_values = self.deck_data[cid]
                     card_values_tuple = namedtuple("Data", card_values.keys())(
@@ -1959,7 +1960,7 @@ def Data(**kwargs):
       - *google_key* - an API key that you must request from Google
       - *google_sheet* - the unique ID (a mix of numbers and letters) which is
         randomly assigned by Google to your Google Sheet
-      - *google_name* - the name of the tab in the Google Sheet housing your data
+      - *sheetname* - the name of the tab in the Google Sheet housing your data
     - matrix (str): refers to the name assigned to the ``Matrix`` being used
     - images (str): refers to the directory in which the cards' images are located;
       if a full path is not given, its assumed to be directly under the one in which
@@ -1998,9 +1999,9 @@ def Data(**kwargs):
         globals.dataset_type = DatasetType.FILE
     elif google_sheet:  # handle Google Sheet
         google_key = kwargs.get("google_key", None)
-        google_name = kwargs.get("google_name", None)
+        sheetname = kwargs.get("sheetname", None)
         globals.dataset = tools.load_googlesheet(
-            google_sheet, api_key=google_key, name=google_name
+            google_sheet, api_key=google_key, name=sheetname
         )
         globals.dataset_type = DatasetType.GSHEET
         if not globals.dataset:
@@ -2060,9 +2061,9 @@ def Data(**kwargs):
                     f' e.g. not "{key}"',
                     True,
                 )
-            if not key[0].isalpha():
+            if not (key[0].isalpha() or key[0] == "_"):
                 feedback(
-                    "The Data headers must start with a character"
+                    "The Data headers must start with a character or underscore"
                     f' - it cannot be "{key[0]}"',
                     True,
                 )
