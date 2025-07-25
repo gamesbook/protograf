@@ -37,7 +37,7 @@ other.
     of the core shapes; fonts, dates and access to BoardGameGeek data
 14. :doc:`Customised Objects <objects>` - special composite shapes not part
     of the core shapes; polyominoes, pentominoes
-16. :doc:`Custom Functions <functions>` - special functions for specific
+15. :doc:`Custom Functions <functions>` - special functions for specific
     situations
 16. :doc:`Terminology <terminology>` - summary of common jargon and descriptions
     of many of the elements' properties

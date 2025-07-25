@@ -81,7 +81,7 @@ PageBreak()
 
 # ---- starfield
 Blueprint()
-Text(common=txt, text="StarField: Rectangle; multi-color")
+Text(common=txt, text="StarField: rectangle; multi-color")
 Rectangle(x=0, y=0, height=3, width=3, fill="black")
 StarField(
     enclosure=rectangle(x=0, y=0, height=3, width=3),
@@ -92,7 +92,7 @@ StarField(
 PageBreak()
 
 Blueprint()
-Text(common=txt, text="StarField: Circle; multi-size")
+Text(common=txt, text="StarField: circle; multi-size")
 Circle(x=0, y=0, radius=1.5, fill="black")
 StarField(
     enclosure=circle(x=0, y=0, radius=1.5),
@@ -102,7 +102,7 @@ StarField(
 PageBreak()
 
 Blueprint()
-Text(common=txt, text="StarField: Poly; multi-color&size")
+Text(common=txt, text="StarField: poly; multi-color&size")
 plys = Common(x=1.5, y=1.4, sides=10, radius=1.5)
 Polygon(common=plys, fill="black")
 StarField(
@@ -272,6 +272,26 @@ Stadium(cx=2, cy=3, width=1.25, height=2,
         stroke="red", stroke_width=.3, rotation=60, dot=0.04)
 PageBreak()
 
+# ---- slices: rhombus
+Blueprint()
+Text(common=txt, text="Rhombus: slices")
+Rhombus(cx=2, cy=3, height=3, width=2,
+        slices=["red", "blue", "gold", "aqua"],
+)
+Rhombus(cx=1, cy=1, height=2, width=1,
+        slices=["red", "blue"],
+)
+Rhombus(cx=3, cy=5, height=2, width=1,
+        slices=["gold", "aqua", True],
+)
+Rhombus(cx=3, cy=1, height=2, width=1,
+        slices=[None, "blue", None, "aqua"],
+)
+Rhombus(cx=1, cy=5, height=2, width=1,
+        slices=["red", None, "gold", None],
+)
+PageBreak()
+
 # ---- rotation: polygon
 Blueprint()
 Text(common=txt, text="Polygon: rotation (flat)")
@@ -323,7 +343,7 @@ PageBreak()
 
 # ---- center line from angle
 Blueprint(stroke_width=0.5)
-Text(common=txt, text="Line: Angled")
+Text(common=txt, text="Line: angle")
 
 Line(cx=1, cy=1, angle=45, length=2, stroke="red")
 Line(cx=3, cy=1, angle=225, length=2, stroke_width=1.5)
@@ -344,25 +364,25 @@ PageBreak()
 
 # ---- ellipse - custom
 Blueprint()
-Text(common=txt, text="Ellipse - centre; tall")
+Text(common=txt, text="Ellipse: centre; tall")
 Ellipse(cx=2, cy=3, width=3, height=4, dot=0.1)
 PageBreak()
 
 # ---- rectangle - custom
 Blueprint()
-Text(common=txt, text="Rectangle - centre; tall")
+Text(common=txt, text="Rectangle: centre; tall")
 Rectangle(cx=2, cy=3, width=3, height=4, dot=0.1)
 PageBreak()
 
 # ---- square - custom
 Blueprint()
-Text(common=txt, text="Square - centre; dot")
+Text(common=txt, text="Square: centre; dot")
 Square(cx=2, cy=3, side=3, dot=0.1)
 PageBreak()
 
 # ---- trapezoid - custom
 Blueprint()
-Text(common=txt, text="Trapezoid - centre; dot")
+Text(common=txt, text="Trapezoid: centre; dot")
 Trapezoid(cx=2, cy=3, width=3, top=2, height=4, flip='s', dot=0.1)
 PageBreak()
 
@@ -407,6 +427,8 @@ PageBreak()
 Blueprint(stroke_width=0.5)
 Text(common=txt, text="Polyshape: default")
 Polyshape(points=[(1, 2), (1, 1), (2, 0), (3, 1), (3, 2)])
+Polyshape(x=1, y=3,
+         steps='0.5,0 0,1.5 1.5,0 0,-1.5 0.5,0 0,0.5 -2.5,0 0,-0.5')
 PageBreak()
 
 # ---- polyshape - custom
@@ -421,6 +443,9 @@ Polyshape(
       fill="sandybrown",
       stroke="peru",
 )
+Polyshape(x=1, y=3,
+         steps='0.5,0 0,1.5 1.5,0 0,-1.5 0.5,0 0,0.5 -2.5,0 0,-0.5',
+         stroke="sandybrown", stroke_width=3, fill="seagreen")
 PageBreak()
 
 # ---- shapeshape - offset + string
@@ -451,13 +476,13 @@ PageBreak()
 
 # ---- rhombus - custom
 Blueprint()
-Text(common=txt, text="Rhombus - centre; dot")
+Text(common=txt, text="Rhombus: centre; dot")
 Rhombus(cx=2, cy=3, width=2, height=3, dot=0.1)
 PageBreak()
 
 # ---- rhombus - borders
 Blueprint()
-Text(common=txt, text="Rhombus - borders")
+Text(common=txt, text="Rhombus: borders")
 Rhombus(cx=2, cy=3, width=2, height=3, stroke_width=1.9,
     borders=[
         ("nw", 2, "gold"),
@@ -470,7 +495,7 @@ PageBreak()
 
 # ---- trapezoid - borders
 Blueprint()
-Text(common=txt, text="Trapezoid - borders")
+Text(common=txt, text="Trapezoid: borders")
 Trapezoid(
     cx=2, cy=3,
     width=2, height=2, top=1.5, stroke_width=2,
@@ -511,7 +536,7 @@ PageBreak()
 
 # ---- arrowhead
 Blueprint(stroke_width=0.5)
-Text(common=txt, text="Line: Arrowheads")
+Text(common=txt, text="Line: arrow styles")
 Line(x=0.5, y=1, x1=0.5, y1=0, arrow=True, stroke="black")
 Line(x=1.5, y=1, x1=1.5, y1=0, arrow_style='notch')
 Line(x=2.5, y=1, x1=2.5, y1=0, arrow_style='angle')
@@ -560,9 +585,18 @@ Line(x=3, y=6, x1=4, y1=5,
      arrow_position=[0.1, 0.15, 0.2])
 PageBreak()
 
+# ---- polyline custom
+Blueprint(stroke_width=0.5)
+Text(common=txt, text="Polyline: custom")
+Polyline(points=[(1, 2), (1, 1), (2, 0), (3, 1), (3, 2)],
+         stroke_width=1, stroke="red")
+Polyline(x=1, y=3, stroke_width=1,
+         steps='0.5,0 0,1.5 1.5,0 0,-1.5 0.5,0 0,0.5 -2.5,0')
+PageBreak()
+
 # ---- polyline arrows
 Blueprint(stroke_width=0.5)
-Text(common=txt, text="Polyline: Arrow")
+Text(common=txt, text="Polyline: arrow")
 Polyline(
     points=[(1, 3), (2, 4), (2.5, 2), (3, 3), (3.5, 1)],
     stroke_width=1,
@@ -706,7 +740,7 @@ PageBreak()
 
 # ---- shape hatch-and-rotation
 Blueprint()
-Text(common=txt, text="Hatch and Rotate")
+Text(common=txt, text="Hatch & Rotate")
 htch = Common(
     fill='lightgray', stroke=None,
     hatch_count=5, hatch_width=0.75,
@@ -739,6 +773,26 @@ Rhombus(
 )
 PageBreak()
 
+# ---- table - defaults
+Blueprint()
+Text(common=txt, text="Table: defaults")
+Table(cols=2, rows=2)
+Table(y=2.5, width=3, height=2, cols=3, rows=4)
+PageBreak()
+
+# ---- table - styled
+Blueprint()
+Text(common=txt, text="Table: styled")
+Table(y=0,
+      width=3, height=2.5,
+      cols=5, rows=6,
+      stroke="red", dotted=True)
+Table(y=3, x=0,
+      cols=[0.5, 1, 1.25, 0.75],
+      rows=[0.75, 0.5, 0.5, 0.75],
+      stroke="blue", fill="aqua")
+PageBreak()
+
 # ---- END
 Text(common=txt, text="Shapes END...")
 
@@ -756,7 +810,9 @@ Save(
         "polygon_radii", "polygon_perbis",
         "dates_formats",
         "images_normal_rotation", "rhombus_red_rotation",
-        "stadium_red_rotation", "polygon_rotation_flat",
+        "stadium_red_rotation",
+        "slices_rhombus",
+        "polygon_rotation_flat",
         "polygon_rotation_pointy", "polygon_sizes", "grid_3x4",
         "line_custom", "line_centred",
         "bezier_custom", "ellipse_custom", "rectangle_custom",
@@ -765,8 +821,10 @@ Save(
         "polyshape_default", "polyshape_custom", "polyshape_offset",
         "rectangles_rowcol", "rectangles_custom", "rhombus_custom",
         "rhombus_borders", "trapezoid_borders",
-        "arrow_sizes", "arrow_rotate", "arrowheads", "polyline_arrow",
+        "arrow_sizes", "arrow_rotate", "arrowheads",
+        "polyline_basic", "polyline_arrow",
         "shape_centred", "shape_centred_move", "shape_centred_custom",
         "qr_code", "image_sliced",
         "shape_rotation", "shape_hatch_and_rotation",
+        "table_defaults", "table_custom",
         None])

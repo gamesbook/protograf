@@ -7,6 +7,7 @@ Note:
 """
 # lib
 import argparse
+from collections import namedtuple
 from copy import copy
 from datetime import datetime
 import itertools
@@ -68,6 +69,7 @@ from .layouts import (
     ConnectShape,
     RepeatShape,
     SequenceShape,
+    TableShape,
 )
 from .globals import unit
 from .groups import Switch, Lookup  # used in scripts
@@ -234,12 +236,28 @@ class CardShape(BaseShape):
         """Draw an element on a given canvas."""
         raise NotImplementedError
 
+    def draw_new_elements(
+        self, the_function, new_eles, cnv, off_x, off_y, ID, cid, **kwargs
+    ):
+        """Draw a list of elements created via a Template or Card function call."""
+        for the_new_ele in new_eles:
+            try:
+                the_new_ele.draw(cnv=cnv, off_x=off_x, off_y=off_y, ID=ID, **kwargs)
+                cnv.commit()
+            except AttributeError as err:
+                feedback(
+                    f"Unable to draw card #{cid + 1}.  Check that the"
+                    f" elements created by '{the_function.__name__}'"
+                    " are all shapes.",
+                    True,
+                )
+
     def draw_card(self, cnv, row, col, cid, **kwargs):
         """Draw a card on a given canvas.
 
         Pass on `deck_data` to other commands, as needed, for them to draw Shapes
         """
-        # feedback(f'\n$$$ draw_card  {cid=} {row=} {col=} {kwargs["card_back"]=}')
+        # feedback(f'\n$$$ draw_card  {cid=} {row=} {col=} {self.elements=}')
         # feedback(f'$$$ draw_card  {cid=} KW=> {kwargs}')
         is_card_back = kwargs.get("card_back", False)
         image = kwargs.get("image", None)
@@ -399,28 +417,44 @@ class CardShape(BaseShape):
             try:
                 # ---- * normal element
                 iid = members.index(cid + 1)
-                # convert Template into a string via render
                 new_ele = self.handle_custom_values(flat_ele, cid)  # calculated values
+                # feedback(f'$$$ CS draw_card ele $$$ {new_ele=}')
+                # breakpoint()
                 if isinstance(new_ele, (SequenceShape, RepeatShape)):
                     new_ele.deck_data = self.deck_data
-                # feedback(f'$$$ CS draw_card $$$ {new_ele=} {kwargs=}')
                 if isinstance(new_ele, TemplatingType):
+                    # convert Template into a string via render
                     card_value = self.deck_data[iid]
                     custom_value = new_ele.template.render(card_value)
                     new_eles = new_ele.function(custom_value) or []
-                    for the_new_ele in new_eles:
-                        try:
-                            the_new_ele.draw(
-                                cnv=cnv, off_x=_dx, off_y=_dy, ID=iid, **kwargs
-                            )
-                            cnv.commit()
-                        except AttributeError as err:
-                            feedback(
-                                f"Unable to draw card #{cid + 1}.  Check that all"
-                                f" elements created by '{new_ele.function.__name__}'"
-                                " are shapes.",
-                                True,
-                            )
+                    self.draw_new_elements(
+                        new_ele.function,
+                        new_eles,
+                        cnv=cnv,
+                        off_x=_dx,
+                        off_y=_dy,
+                        ID=iid,
+                        cid=cid,
+                        **kwargs,
+                    )
+                if callable(new_ele) and not isinstance(new_ele, (BaseShape, Switch)):
+                    # call user-defined function-like objects!
+                    card_values = self.deck_data[cid]
+                    card_values_tuple = namedtuple("Data", card_values.keys())(
+                        **card_values
+                    )
+                    new_eles = new_ele(card_values_tuple) or []
+                    # print(f'{card_values_tuple=} {new_eles=}')
+                    self.draw_new_elements(
+                        new_ele,
+                        new_eles,
+                        cnv=cnv,
+                        off_x=_dx,
+                        off_y=_dy,
+                        ID=iid,
+                        cid=cid,
+                        **kwargs,
+                    )
                 else:
                     new_ele.draw(cnv=cnv, off_x=_dx, off_y=_dy, ID=iid, **kwargs)
                     cnv.commit()
@@ -556,6 +590,8 @@ class DeckOfCards:
         self.gutter_dotted = kwargs.get("gutter_dotted", None)
         self.gutter_layout = kwargs.get("gutter_layout", "portrait")
         self.show_backs = False
+        # ---- zones (non-card shapes)
+        self.zones = kwargs.get("zones", None)
         # ---- export options
         self.export_cards = kwargs.get("export_cards", False)
         self.dpi = kwargs.get("dpi", None)
@@ -642,21 +678,75 @@ class DeckOfCards:
         """Draw all cards for a DeckOfCards.
 
         Kwargs:
-            * cards - number of cards to draw
-            * extra - number of extra cards to draw (beyond Data count)
-            * copy - name of Data column used to set number of copies of a Card
-            * image_list - list of image filenames
-            * export_cards - if True, then export Card fronts as individual images
-            * card_name - name of Data column used to create filename for export Cards
-            * card_rows - maximum number of rows of cards on a page
-            * card_cols - maximum number of columns of cards on a page
-            * dpi - resolution for output PNG
-            * directory - path to save output(s)
-            # grid_marks=globals.deck_settings.get("grid_marks", None),
+
+        - cards (int): number of cards to draw
+        - extra (int): number of extra cards to draw (beyond Data count)
+        - copy - name of Data column used to set number of copies of a Card
+        - image_list (list): list of image filenames
+        - export_cards (bool): if True, then export Card fronts as individual images
+        - card_name (str): name of Data column used to create filename for export Cards
+        - card_rows (int): maximum number of rows of cards on a page
+        - card_cols (int): maximum number of columns of cards on a page
+        - dpi (int): resolution for output PNG
+        - directory (str): path to save output(s)
+        - zones (list): tuples of form (str|int, Shape), where 0-position is the
+          page number, and 1-position is the Shape to be drawn there
+
+        # grid_marks=globals.deck_settings.get("grid_marks", None)
 
         Note:
             DeckOfCards draw() is called by Save() function.
         """
+
+        def draw_the_zones(
+            cnv, page_number: int = 0, zones: list = None
+        ) -> DeckPrintState:
+            """Process a list of Zones for a page
+
+            Args:
+                cnv: pymupdf Shape object (one per Page)
+                page_number: current page (0-based)
+            """
+            # print(f'$$$ draw_the_zones {page_number=}')
+            if zones is None:
+                return
+            if zones and isinstance(zones, list):
+                # set meta data for shape draw
+                _locale = Locale(
+                    col=0,
+                    row=0,
+                    id=None,
+                    sequence=0,
+                    page=page_number + 1,
+                )
+                kwargs["locale"] = _locale._asdict()
+                for zone in zones:
+                    try:
+                        numbers = tools.sequence_split(zone[0], unique=True, star=True)
+                        shape = zone[1]
+                        if not isinstance(shape, BaseShape):
+                            feedback(
+                                f'Cannot process zones item "{zone}" -'
+                                " only a shape can be used for drawing!",
+                                True,
+                            )
+                        for number in numbers:
+                            if number == page_number + 1 or number == "*":
+                                rkwargs = copy(kwargs)
+                                rkwargs.pop("grid_marks", None)
+                                rkwargs.pop("stroke", None)
+                                rkwargs.pop("fill", None)
+                                shape.draw(cnv=cnv, **rkwargs)
+                    except IndexError:
+                        feedback(
+                            f'Cannot process zones item "{zone}" -'
+                            " please check formatting and values!",
+                            True,
+                        )
+            else:
+                feedback(
+                    f'Cannot process zones "{zones}" - needs a list of paired items!'
+                )
 
         def draw_the_cards(
             cnv,
@@ -665,19 +755,19 @@ class DeckOfCards:
             front: bool = True,
             right_gap: float = 0.0,
         ) -> DeckPrintState:
-            """Process a Page of Cards for front or back of a DeckOfCards
+            """Process a page of Cards for front or back of a DeckOfCards
 
             Args:
                 cnv: pymupdf Shape object (one per Page)
                 state: track what is being printed on the page
-                page_number: current
+                page_number: current page
                 front: if True, print CardShapes in `deck.fronts`
                 right_gap: space left after the last card
 
             Returns:
                 DeckPrintState at the end of a Page
             """
-            # print(f'$$$  card_draw {page_number=}')
+            # print(f'$$$ draw_the_cards {page_number=} {front=}')
             start_card = state.card_number
             card_count = state.card_count
             if front:
@@ -704,6 +794,7 @@ class DeckOfCards:
                     row=row + 1,
                     id=f"{col + 1}:{row + 1}",
                     sequence=card_num + 1,
+                    page=page_number + 1,
                 )
                 kwargs["locale"] = _locale._asdict()
                 kwargs["grouping_cols"] = self.grouping_cols
@@ -997,14 +1088,16 @@ class DeckOfCards:
                 self.show_backs = True
                 continue
 
-        # ---- actually draw cards!
+        # ---- actually draw cards and the zones!
         while state_front.card_number < len(self.fronts):
             # print(f"\n$$$ FRONT {state_front.card_number=} $$$ ")
             page_number += 1  # for back-to-back OR no backs
+            draw_the_zones(cnv, page_number, self.zones)
             cnv, state_front = draw_the_cards(cnv, state_front, page_number, True, 0)
             if self.show_backs:
                 # print(f"\n$$$ BACK  {state_back.card_number=} $$$ ")
                 page_number += 1  # for back-to-back
+                draw_the_zones(cnv, page_number, self.zones)
                 cnv, state_back = draw_the_cards(
                     cnv, state_back, page_number, False, right_gap
                 )
@@ -1367,6 +1460,7 @@ def Save(**kwargs):
 
     - Cards are saved by iterating through all the ``fronts`` and ``backs``
       in a DeckOfCards object
+    - Zones (defined in the Deck) are drawn before the Cards
     """
     validate_globals()
 
@@ -1396,6 +1490,7 @@ def Save(**kwargs):
             card_name=globals.deck_settings.get("card_name", None),
             extra=globals.deck_settings.get("extra", 0),
             grid_marks=globals.deck_settings.get("grid_marks", None),
+            zones=globals.deck_settings.get("zones", None),
             image_list=globals.image_list,
             dpi=dpi,
             directory=globals.directory,
@@ -1808,6 +1903,7 @@ def Deck(**kwargs):
       vertical direction
     - stroke: color of the card's border; defaults to ``black``
     - width: card width for a *rectangular* card; defaults to ``6.35`` cm
+    - zones: list of tuples; each with page number(s) and a shape
 
     Notes:
 
@@ -1853,12 +1949,18 @@ def Data(**kwargs):
     - filename (str): the full path to the name (including extension) of the
       CSV or Excel file being used; if no directory is supplied in the path,
       then it is assumed to be the same one in which the script is located
+    - sheet (int): the number of sheet in the Excel file being used; defaults
+      to the first one
+    - sheetname (str): the name of sheet in the Excel file being used; defaults
+      to the first one
+    - cells (str): a range of cells delimiting data in the col:row format
+      from top-left to bottom-right e.g. 'A3:E12'
     - Access to a **Google Sheet** document is via three properties:
 
       - *google_key* - an API key that you must request from Google
       - *google_sheet* - the unique ID (a mix of numbers and letters) which is
         randomly assigned by Google to your Google Sheet
-      - *google_name* - the name of the tab in the Google Sheet housing your data
+      - *sheetname* - the name of the tab in the Google Sheet housing your data
     - matrix (str): refers to the name assigned to the ``Matrix`` being used
     - images (str): refers to the directory in which the cards' images are located;
       if a full path is not given, its assumed to be directly under the one in which
@@ -1892,14 +1994,14 @@ def Data(**kwargs):
     except Exception:
         feedback(f'Extra must be a whole number, not "{kwargs.get("extra")}"!', True)
 
-    if filename:  # handle excel and CSV
+    if filename:  # handle excel and CSV; kwargs include cell, sheet, sheetname
         globals.dataset = tools.load_data(filename, **kwargs)
         globals.dataset_type = DatasetType.FILE
     elif google_sheet:  # handle Google Sheet
         google_key = kwargs.get("google_key", None)
-        google_name = kwargs.get("google_name", None)
+        sheetname = kwargs.get("sheetname", None)
         globals.dataset = tools.load_googlesheet(
-            google_sheet, api_key=google_key, name=google_name
+            google_sheet, api_key=google_key, name=sheetname
         )
         globals.dataset_type = DatasetType.GSHEET
         if not globals.dataset:
@@ -1953,10 +2055,16 @@ def Data(**kwargs):
     if globals.dataset and len(globals.dataset) > 0:
         first = globals.dataset[0].keys()
         for key in first:
-            if not (key.isalpha() or "_" in key):
+            if not (key.isalnum() or "_" in key):
                 feedback(
                     "The Data headers must only be characters (without spaces)"
                     f' e.g. not "{key}"',
+                    True,
+                )
+            if not (key[0].isalpha() or key[0] == "_"):
+                feedback(
+                    "The Data headers must start with a character or underscore"
+                    f' - it cannot be "{key[0]}"',
                     True,
                 )
     if debug:
@@ -2438,6 +2546,17 @@ def star(row=None, col=None, **kwargs):
 
 
 def StarField(**kwargs):
+    """StarField pattern on a given canvas.
+
+    Kwargs:
+
+    - density (int): average number of stars per square unit; default is 10
+    - colors (list): the individual star colors; default is ["white"]
+    - enclosure (Shape): regular shape inside which its drawn; default is a rectangle
+    - sizes (list): list of individual star sizes as floats; default is [0.1]
+    - star_pattern (str): (random | cluster) - NOT YET IMPLEMENTED
+    - seeding (float): if set, predetermines the randomisation sequence
+    """
     kwargs = margins(**kwargs)
     starfield = StarFieldShape(canvas=globals.canvas, **kwargs)
     starfield.draw()
@@ -2707,7 +2826,7 @@ def connect(shape_from, shape_to, **kwargs):
     return ConnectShape(canvas=globals.canvas, **kwargs)
 
 
-# ---- repeats ====
+# ---- layouts ====
 
 
 def Repeat(shapes=None, **kwargs):
@@ -2719,6 +2838,7 @@ def Repeat(shapes=None, **kwargs):
 
 
 def repeat(shapes=None, **kwargs):
+    """Create multiple copies of a Shape across rows and columns."""
     kwargs = margins(**kwargs)
     return RepeatShape(shapes=shapes, **kwargs)
 
@@ -2730,9 +2850,6 @@ def Lines(rows=1, cols=1, **kwargs):
             Line(row=row, col=col, **kwargs)
 
 
-# ---- sequence ====
-
-
 def Sequence(shapes=None, **kwargs):
     """Draw a list of Shapes in a line."""
     kwargs = margins(**kwargs)
@@ -2742,8 +2859,22 @@ def Sequence(shapes=None, **kwargs):
 
 
 def sequence(shapes=None, **kwargs):
-    """Draw a list of Shapes in a line."""
+    """Create a list of Shapes in a line."""
     return SequenceShape(shapes=shapes, **kwargs)
+
+
+def Table(shapes=None, **kwargs):
+    """Draw a grid of rectangles."""
+    kwargs = margins(**kwargs)
+    kwargs["shapes"] = shapes
+    Table = TableShape(**kwargs)
+    locales = Table.draw()
+    return locales
+
+
+def table(shapes=None, **kwargs):
+    """Create a grid of rectangles."""
+    return TableShape(shapes=shapes, **kwargs)
 
 
 # ---- patterns (grid) ====
@@ -2790,6 +2921,7 @@ def Hexagons(rows=1, cols=1, sides=None, **kwargs):
                         id=f"{ccol - 1}:{row}",
                         sequence=sequence,
                         label=hxgn.grid.label,
+                        page=globals.page_count + 1,
                     )
                     # print(f'$$$ locale {ccol=} {_row=} / {hxgn.grid.x=} {hxgn.grid.y=}')
                     locales.append(_locale)
@@ -2863,6 +2995,7 @@ def Hexagons(rows=1, cols=1, sides=None, **kwargs):
                         id=f"{col}:{row}",
                         sequence=sequence,
                         label=hxgn.grid.label,
+                        page=globals.page_count + 1,
                     )
                     # print(f'$$$ locale {col=} {row=} / {hxgn.grid.x=} {hxgn.grid.y=}')
                     locales.append(_locale)
@@ -2897,6 +3030,7 @@ def Rectangles(rows=1, cols=1, **kwargs):
                     id=f"{col}:{row}",
                     sequence=sequence,
                     label=rect.label,
+                    page=globals.page_count + 1,
                 )
                 kwargs["locale"] = _locale._asdict()
                 # Note: Rectangle.calculate_xy() uses the row&col to get y&x
@@ -3168,6 +3302,7 @@ def Layout(grid, **kwargs):
                             id=f"{loc[1].col}:{loc[1].row}",  # ,loc[1].id,
                             sequence=key,
                             corner=loc[1].corner,
+                            page=globals.page_count + 1,
                         ),
                     )
                     _locations.append(new_loc)
@@ -3252,6 +3387,7 @@ def Layout(grid, **kwargs):
                 y=loc.y,
                 id=f"{loc.col}:{loc.row}",
                 sequence=loc.sequence,
+                page=globals.page_count + 1,
             )
             _locale = locale._asdict()
             shape.draw(_abs_cx=cx, _abs_cy=cy, rotation=rotation, locale=_locale)
@@ -3467,6 +3603,7 @@ def Track(track=None, **kwargs):
             y=track_point.y,
             id=index,
             sequence=index + 1,
+            page=globals.page_count + 1,
         )
         _locale = locale._asdict()
         shape.draw(cnv=globals.canvas, rotation=shape_rotation, locale=_locale)

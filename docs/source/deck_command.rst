@@ -116,12 +116,14 @@ The following are other properties that can also be set for a ``Deck``:
   **spacing_x** and/or **spacing_y** to set spacing specifically for the
   horizontal or vertical direction respectively.
 - **stroke** - sets the color of the card's border; defaults to ``black``
+- **zones** - a list that defines shapes that must appear on one or more pages
 
 .. HINT::
 
     The one property that does not appear with the ``Deck()`` command is the
     option to export the cards as individual PNG images.  To this you need
     to add ``cards=True`` to the :ref:`Save() <save-command>` command.
+
 
 .. _property-examples:
 
@@ -141,6 +143,7 @@ Property Examples
 - `Example 10. Circular Frame`_
 - `Example 11. Card Grouping`_
 - `Example 12. CardBack and Gutter`_
+- `Example 13. Deck Zones`_
 
 These examples are shown on a small A8-sized page, as the purpose is to
 illustrate how the Deck properties are used; normally cards would be
@@ -148,13 +151,14 @@ set out on A4- or Letter-sized pages, but the principle will be the
 same.
 
 In most cases |dash| except where otherwise shown |dash| a basic
-``Rectangle``, with a thick border, is used as the shape that is drawn
-on each card.  This purely for illustration purposes; your cards would
-have their own set of shapes that you would want to draw on them.
+``Rectangle``, with a thick rounded border, is used as the shape that is
+drawn on each card.  This purely for illustration purposes; your cards
+would have their own set of one or more shapes that you would want to
+draw on  them.
 
 The ``Rectangle`` also has its *label* set to show the Card's *sequence*
 number i.e. the order in  which it is drawn (usually top-to-bottom and
-left-to-right), followed by its *column* and *row* number.
+left-to-right), sometimes followed by its *column* and *row* number.
 
 The part of the script for doing this is:
 
@@ -169,13 +173,14 @@ The part of the script for doing this is:
             label='{{sequence}}\n{{id}}')
     )
 
-In your script, the ``Deck()`` command should appear first, followed
-by one or more ``Card()`` commands.
+In your script, the ``Deck()`` command should appear first before
+any of the ``Card()`` commands.
 
 .. HINT::
 
   Remember that **any number** of ``Card()`` commands, each drawing one or
   more shapes on one or more cards, can be used in a script!
+
 
 Example 1. Defaults
 -------------------
@@ -581,6 +586,7 @@ Example 11. Card Grouping
             spacing_y=0.15,
             grouping_cols=2,
             grouping_rows=5,
+            stroke=None,
             )
         Card(
             '*',
@@ -652,5 +658,84 @@ Example 12. CardBack and Gutter
 
       The ``gutter`` property for Deck() sets the space between the fronts
       and the backs, which face each other across the page.
+
+===== ======
+
+
+Example 13. Deck Zones
+----------------------
+`^ <property-examples_>`_
+
+.. |d14| image:: images/decks/cards_deck_14.png
+   :width: 330
+
+===== ======
+|d14| This example shows the definition of a deck for a set of very small
+      cards |dash| these are more likely to be game counters.
+
+      The card size means that there will be 32 small square cards
+      on each A8 page:
+
+      .. code:: python
+
+        # design deck
+        page_header = text(
+            text="protograf-cards_deck#14 // page:{{page}}",
+            x=2.5, y=0.5, font_size=6, )
+        silver = rectangle(
+             x=0.5, y=0.75, width=4, height=4,
+             fill_stroke="silver")
+        gold = rectangle(
+             x=0.5, y=3.75, width=4, height=3,
+             fill_stroke="gold")
+        Deck(
+            cards=32,
+            width=0.65,
+            height=0.65,
+            offset=1,
+            grid_marks=True,
+            grid_marks_length=0.2,
+            spacing_x=0.3,
+            spacing_y=0.25,
+            grouping_cols=2,
+            grouping_rows=4,
+            stroke=None,
+            zones=[
+                ('*', page_header),
+                ('1', silver),
+                ('1', gold)]
+            )
+        # design cards
+        Card(
+            '1-16',
+            rectangle(
+                x=0.05, y=0.05, width=0.55, height=0.55,
+                stroke_width=0.75, rounding=0.1,
+                fill="silver",
+                label='{{sequence}}'),
+        )
+        Card(
+            '17-32',
+            rectangle(
+                x=0.05, y=0.05, width=0.55, height=0.55,
+                stroke_width=0.75, rounding=0.1,
+                fill="gold",
+                label='{{sequence}}'),
+        )
+
+      This example is similar to `Example 11. Card Grouping`_.
+
+      The ``zones`` property for ``Deck()`` defines a list of shapes that must
+      be drawn on the specified pages.
+
+      Each item in the list is a set of two values: the first is the page
+      number |dash| or range of page numbers |dash| and the second is the
+      shape to be drawn on the page(s); this is defined as usual for such
+      a shape i.e. the *x* and *y* values are relative to the page margins
+      and not those of the card.
+
+      In this case, there is ``Text()`` that is drawn on every page |dash|
+      using the ``*`` value |dash| and colored rectangles that are drawn on
+      page one; ``silver`` colored at the top and ``gold`` colored lower down.
 
 ===== ======

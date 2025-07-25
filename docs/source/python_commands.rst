@@ -391,14 +391,15 @@ Function Example 1. Drawing Shapes
 
       The values have defaults - ``0``, ``0`` and ``red``
       - respectively, which are used if no values are provided;
-      this can be seen in the first example on the lower left.
+      this can be seen in the first example on the upper left.
 
       If values are provided to *a* and *b*,
       these will change where the shapes are drawn; if a value
       is provided to *c* it will change the shape's color.
 
       These changes to the function's properties can be seen in
-      the other uses made of it above.
+      the other uses made of it above; the shapes are drawn in
+      different colors and different locations.
 
       The function is activated by simply including its name as
       part of the script, along with its brackets, such as in the line:

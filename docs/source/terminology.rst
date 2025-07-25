@@ -365,9 +365,10 @@ Area-orientated Terms
    direction and a value, that designate that the edge of a rectangle
    should be drawn as a triangular "peak"; e.g. a **set** of ``('n', 2)``
    would draw a 2cm high triangle on the upper (north) edge
--  **roof** - a way to fill in triangular sections of a square or rectangle
-   by supplying a list of colors; a **roof_line** can be used to create both
-   trapezoids and triangles to give the appearance of roof viewed from above
+-  **slices** - a way to fill in triangular sections of a square, rectangle or
+   rhombus by supplying a list of colors; for square or rectangle, a
+   **slices_line** can also be used to create both trapezoids and triangles
+   which gives the appearance of a building's roof when viewed from above
 -  **tetris** - when set to ``True`` will cause a ``Tetronimo`` to be styled
    as per the original Tetris game pieces
 

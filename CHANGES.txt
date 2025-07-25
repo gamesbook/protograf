@@ -1,6 +1,21 @@
 protograf Changes
 =================
 
+2025-07-25 (0.2.11)
+-------------------
+- Add zones property to Card (including page)
+- Add dotted style for grid marks
+- Add cells (range) option for Data from spreadsheet
+- Add slices property to Rhombus
+- Change "roof" to "slices" as a property for Rectangle
+- Add steps property to Polyline and Polyshape
+- Add Table shape
+- Add progress bar for Font cache creation
+- Patch over-zealous Data header check
+- Add function handling at a Card level
+- Add slices property to Hex
+- Rename "google_name" property to "sheetname"
+
 2025-07-19 (0.2.10)
 -------------------
 - Enable use of Pentomino letters for Card

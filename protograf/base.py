@@ -135,6 +135,7 @@ class BaseCanvas:
         _units = self.defaults.get("units", unit.cm)
         self.units = support.to_units(_units)
         # print(f'### {self.units=} {self.defaults=} {self.defaults.get("margin")=}')
+        self.page_number = None
         # ---- paper
         _paper = paper or self.defaults.get("paper", "A4")
         if isinstance(_paper, tuple) and len(_paper) == 2:
@@ -243,6 +244,7 @@ class BaseCanvas:
             "grid_marks_length", 0.85
         )  # 1/3 inch
         self.grid_marks_offset = self.defaults.get("grid_marks_offset", 0)
+        self.grid_marks_dotted = self.defaults.get("grid_marks_dotted", False)
         # ---- line style
         self.line_stroke = self.defaults.get("line_stroke", WIDTH)
         self.line_width = self.defaults.get("line_width", self.stroke_width)
@@ -367,13 +369,19 @@ class BaseCanvas:
         self.rounded_radius = self.defaults.get(
             "rounded_radius", 0.05
         )  # fraction of smallest side
-        self.roof = self.defaults.get("roof", [])
-        self.roof_line = self.defaults.get("roof_line", 0)
-        self.roof_line_mx = self.defaults.get("roof_line_mx", 0)
-        self.roof_line_my = self.defaults.get("roof_line_my", 0)
-        self.roof_stroke = self.defaults.get("roof_stroke", None)
-        self.roof_stroke_width = self.defaults.get("roof_stroke", None)
-        self.roof_reverse = self.defaults.get("roof_reverse", False)
+        # ---- rectangle / rhombus
+        self.slices = self.defaults.get("slices", [])
+        self.slices_line = self.defaults.get("slices_line", 0)
+        self.slices_line_mx = self.defaults.get("slices_line_mx", 0)
+        self.slices_line_my = self.defaults.get("slices_line_my", 0)
+        self.slices_stroke = self.defaults.get("slices_stroke", None)
+        self.slices_stroke_width = self.defaults.get("slices_stroke", None)
+        self.slices_reverse = self.defaults.get("slices_reverse", False)
+
+        self.slices = self.defaults.get("slices", [])
+        self.slices_stroke = self.defaults.get("slices_stroke", None)
+        self.slices_stroke_width = self.defaults.get("slices_stroke", None)
+        self.slices_reverse = self.defaults.get("slices_reverse", False)
         # ---- stadium
         self.edges = self.defaults.get("edges", "E W")
         # ---- grid layout
@@ -397,6 +405,7 @@ class BaseCanvas:
         self.vertices = self.defaults.get("vertices", 5)
         self.sides = self.defaults.get("sides", 6)
         self.points = self.defaults.get("points", [])
+        self.steps = self.defaults.get("steps", [])
         self.x_c = self.defaults.get("xc", 0)
         self.y_c = self.defaults.get("yc", 0)
         # ---- radii (circle, hex & polygon)
@@ -551,6 +560,7 @@ class BaseShape:
         self.show_id = False  # True
         # ---- KEY
         self.doc_page = globals.doc_page
+        self.page_number = globals.page_count + 1
         self.canvas = canvas or globals.canvas  # pymupdf Shape
         base = _object or globals.base  # protograf BaseCanvas
         # print(f"### {type(self.canvas)=} {type(cnv)=} {type(base=)}")
@@ -604,6 +614,9 @@ class BaseShape:
         )
         self.grid_marks_offset = self.kw_float(
             kwargs.get("grid_marks_offset", base.grid_marks_offset)
+        )
+        self.grid_marks_dotted = self.kw_bool(
+            kwargs.get("grid_marks_dotted", base.grid_marks_dotted)
         )
         # ---- sizes and positions
         self.row = kwargs.get("row", base.row)
@@ -813,20 +826,37 @@ class BaseShape:
         self.peaks_dict = {}
         self.borders = kwargs.get("borders", base.borders)
         self.rounded_radius = base.rounded_radius
-        self.roof = kwargs.get("roof", base.roof)
-        self.roof_line = kwargs.get("roof_line", base.roof_line)
-        self.roof_line_mx = kwargs.get("roof_line_mx", base.roof_line_mx)
-        self.roof_line_my = kwargs.get("roof_line_my", base.roof_line_my)
-        self.roof_reverse = kwargs.get("roof_reverse", base.roof_reverse)
-        self.roof_stroke = kwargs.get("roof_stroke", base.roof_stroke)
-        self.roof_stroke_width = kwargs.get("roof_stroke_width", base.roof_stroke_width)
+        # ---- rectangle / rhombus
+        self.slices = kwargs.get("slices", base.slices)
+        self.slices_line = kwargs.get("slices_line", base.slices_line)
+        self.slices_line_mx = kwargs.get("slices_line_mx", base.slices_line_mx)
+        self.slices_line_my = kwargs.get("slices_line_my", base.slices_line_my)
+        self.slices_reverse = kwargs.get("slices_reverse", base.slices_reverse)
+        self.slices_stroke = kwargs.get("slices_stroke", base.slices_stroke)
+        self.slices_stroke_width = kwargs.get(
+            "slices_stroke_width", base.slices_stroke_width
+        )
+
+        self.slices = kwargs.get("slices", base.slices)
+        self.slices_reverse = kwargs.get("slices_reverse", base.slices_reverse)
+        self.slices_stroke = kwargs.get("slices_stroke", base.slices_stroke)
+        self.slices_stroke_width = kwargs.get(
+            "slices_stroke_width", base.slices_stroke_width
+        )
+
         # ---- stadium
         self.edges = kwargs.get("edges", base.edges)
         # ---- grid layout
-        self.rows = self.kw_int(kwargs.get("rows", base.rows), "rows")
-        self.cols = self.kw_int(
-            kwargs.get("cols", kwargs.get("columns", base.cols)), "cols"
-        )
+        _rows = kwargs.get("rows", base.rows)
+        if not isinstance(_rows, list):
+            self.rows = self.kw_int(_rows, "rows")
+        else:
+            self.rows = _rows
+        _cols = kwargs.get("cols", base.cols)
+        if not isinstance(_cols, list):
+            self.cols = self.kw_int(_cols, "cols")
+        else:
+            self.cols = _cols
         self.frame = kwargs.get("frame", base.frame)
         self.offset = self.kw_float(kwargs.get("offset", base.offset))
         self.offset_x = self.kw_float(kwargs.get("offset_x", self.offset))
@@ -850,6 +880,7 @@ class BaseShape:
         self.vertices = self.kw_int(kwargs.get("vertices", base.vertices), "vertices")
         self.sides = kwargs.get("sides", base.sides)
         self.points = kwargs.get("points", base.points)
+        self.steps = kwargs.get("steps", base.steps)
         # ---- radii (circle / hexagon / polygon / compass)
         self.radii = kwargs.get("radii", base.radii)
         self.radii_stroke = kwargs.get("radii_stroke", self.stroke)
@@ -1961,12 +1992,14 @@ class BaseShape:
             return origin
 
         # feedback(f"### {string=} {kwargs=} {rotation=}")
+        # if string == '{{sequence}}':  break point()
         if not string:
             return
         # ---- deprecated
         if kwargs.get("text_sequence", None):
             raise NotImplementedError("No text_sequence please!")
-        # ---- process locale data (from Locale namedtuple) via jinja2
+        # ---- process locale data (dict via Locale namedtuple) using jinja2
+        #      this may include the item's sequence number and current page
         _locale = kwargs.get("locale", None)
         if _locale:
             string = tools.eval_template(string, _locale)

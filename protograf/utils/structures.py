@@ -128,7 +128,7 @@ HexGeometry = namedtuple(
 LookupType = namedtuple("LookupType", ["column", "lookups"])
 Link = namedtuple("Link", ["a", "b", "style"])
 
-fields = ("col", "row", "x", "y", "id", "sequence", "corner", "label")
+fields = ("col", "row", "x", "y", "id", "sequence", "corner", "label", "page")
 Locale = namedtuple("Locale", fields, defaults=(None,) * len(fields))
 
 OffsetProperties = namedtuple(

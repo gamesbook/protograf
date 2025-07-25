@@ -91,6 +91,7 @@ python cards/cards_deck_10.py -d /tmp/demo
 python cards/cards_deck_11.py -d /tmp/demo
 python cards/cards_deck_12.py -d /tmp/demo
 python cards/cards_deck_13.py -d /tmp/demo
+python cards/cards_deck_14.py -d /tmp/demo
 # -- various
 echo -e "\nCreating various..."
 python various/clock.py -d /tmp/demo

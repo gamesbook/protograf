@@ -33,14 +33,12 @@ from protograf.utils.structures import (
     DirectionGroup,
     HexGeometry,
     Link,
-    Locale,
     Point,
     PolyGeometry,
 )  # named tuples
 from protograf.utils.support import CACHE_DIRECTORY
 from protograf.base import (
     BaseShape,
-    BaseCanvas,
     GridShape,
     get_cache,
 )
@@ -798,6 +796,7 @@ class CircleShape(BaseShape):
             gargs = {}
             gargs["stroke"] = self.grid_marks_stroke
             gargs["stroke_width"] = self.grid_marks_stroke_width
+            gargs["dotted"] = self.grid_marks_dotted
             self.set_canvas_props(cnv=None, index=ID, **gargs)
 
         # ---- draw hatch
@@ -1811,6 +1810,48 @@ class HexShape(BaseShape):
             dotted=self.hatch_dots,
         )
 
+    def draw_slices(self, cnv, ID, vertexes, centre: tuple, rotation=0):
+        """Draw triangles inside the Hexagon
+
+        Args:
+            ID: unique ID
+            vertexes: the Hex'es nodes
+            centre: the centre Point of the Hex
+            rotation: degrees anti-clockwise from horizontal "east"
+        """
+        # ---- get slices color list from string
+        if isinstance(self.slices, str):
+            _slices = tools.split(self.slices.strip())
+        else:
+            _slices = self.slices
+        # ---- validate slices color settings
+        slices_colors = [
+            tools.get_color(slcolor)
+            for slcolor in _slices
+            if not isinstance(slcolor, bool)
+        ]
+        # ---- draw triangles for each sector, repeat as needed!
+        sid = 0
+        nodes = [4, 3, 2, 1, 0, 5]
+        if _lower(self.orientation) in ["p", "pointy"]:
+            nodes = [5, 4, 3, 2, 1, 0]
+        for vid in nodes:
+            if sid > len(slices_colors) - 1:
+                sid = 0
+            vnext = vid - 1 if vid > 0 else 5
+            vertexes_slice = [vertexes[vid], centre, vertexes[vnext]]
+            cnv.draw_polyline(vertexes_slice)
+            self.set_canvas_props(
+                index=ID,
+                stroke=self.slices_stroke or slices_colors[sid],
+                fill=slices_colors[sid],
+                closed=True,
+                rotation=rotation,
+                rotation_point=muPoint(centre[0], centre[1]),
+            )
+            sid += 1
+            vid += 1
+
     def get_geometry(self):
         """Calculate geometric settings of a Hexagon."""
         # ---- calculate half_flat & half_side
@@ -2090,6 +2131,15 @@ class HexShape(BaseShape):
         # self._debug(cnv, Point(x, y), 'start')
         # self._debug(cnv, Point(self.x_d, self.y_d), 'centre')
         self._debug(cnv, vertices=self.vertexes)
+        # ---- draw slices
+        if self.slices:
+            self.draw_slices(
+                cnv,
+                ID,
+                self.vertexes,
+                (self.x_d, self.y_d),
+                rotation=kwargs.get("rotation"),
+            )
         # ---- draw hatch
         if self.hatch_count:
             if not self.hatch_count & 1:
@@ -2573,43 +2623,73 @@ class PolylineShape(BaseShape):
     Multi-part line on a given canvas.
     """
 
+    def get_steps(self) -> list:
+        """Get a list of step tuples."""
+        steps = tools.tuple_split(self.steps)
+        if not steps:
+            steps = self.steps
+        if not steps or len(steps) == 0:
+            return None
+        return steps
+
     def get_points(self) -> list:
+        """Get a list of point tuples."""
         points = tools.tuple_split(self.points)
         if not points:
             points = self.points
         if not points or len(points) == 0:
-            feedback("There are no points to draw the Polyline", False, True)
+            return None
         return points
 
     def get_vertexes(self):
         """Return polyline vertices in canvas units"""
         points = self.get_points()
-        vertices = [
-            Point(
-                self.unit(pt[0]) + self._o.delta_x, self.unit(pt[1]) + self._o.delta_y
+        steps = self.get_steps()
+        if points and steps:
+            feedback(
+                "Point values will supercede steps to draw the Polyline", False, True
             )
-            for pt in points
-        ]
-        return vertices
+        if points:
+            vertices = [
+                Point(
+                    self.unit(pt[0]) + self._o.delta_x,
+                    self.unit(pt[1]) + self._o.delta_y,
+                )
+                for pt in points
+            ]
+            return vertices
+        # print('***', f'{steps=}')
+        if steps:
+            vertices = []
+            # start here...
+            vertices.append(
+                Point(
+                    self.unit(self.x) + self._o.delta_x,
+                    self.unit(self.y) + self._o.delta_y,
+                )
+            )
+            if len(steps) > 0:
+                for index, stp in enumerate(steps):
+                    vertices.append(
+                        Point(
+                            vertices[index].x + self.unit(stp[0]),
+                            vertices[index].y + self.unit(stp[1]),
+                        )
+                    )
+                return vertices
+        feedback("There are no points or steps to draw the Polyline", False, True)
+        return None
 
     def draw(self, cnv=None, off_x=0, off_y=0, ID=None, **kwargs):
         """Draw a polyline on a given canvas."""
         kwargs = self.kwargs | kwargs
         cnv = cnv if cnv else globals.canvas  # a new Page/Shape may now exist
         super().draw(cnv, off_x, off_y, ID, **kwargs)  # unit-based props
-        points = self.get_points()
         # ---- set vertices
-        x_sum, y_sum = 0, 0
-        self.vertexes = []
-        for key, vertex in enumerate(points):
-            x, y = vertex
-            # convert to using units
-            x = self.unit(x) + self._o.delta_x
-            y = self.unit(y) + self._o.delta_y
-            self.vertexes.append((x, y))
+        self.vertexes = self.get_vertexes()
         # ---- draw polyline
         # feedback(f'***PolyLineShp{x=} {y=} {self.vertexes=}')
-        if points:
+        if self.vertexes:
             cnv.draw_polyline(self.vertexes)
             kwargs["closed"] = False
             kwargs["fill"] = None
@@ -2624,7 +2704,7 @@ class PolylineShape(BaseShape):
             or self.arrow_height
             or self.arrow_width
             or self.arrow_double
-        ) and points:
+        ) and self.vertexes:
             _vertexes = tools.as_point(self.vertexes)
             start, end = _vertexes[-2], _vertexes[-1]
             self.draw_arrowhead(cnv, start, end, **kwargs)
@@ -2750,9 +2830,13 @@ class RectangleShape(BaseShape):
             self.x = self.cx - self.width / 2.0
             self.y = self.cy - self.height / 2.0
             # feedback(f"*** RectShp {self.cx=} {self.cy=} {self.x=} {self.y=}")
-        self._u_roof_line = self.unit(self.roof_line) if self.roof_line else None
-        self._u_roof_line_mx = self.unit(self.roof_line_mx) if self.roof_line_mx else 0
-        self._u_roof_line_my = self.unit(self.roof_line_mx) if self.roof_line_my else 0
+        self._u_slices_line = self.unit(self.slices_line) if self.slices_line else None
+        self._u_slices_line_mx = (
+            self.unit(self.slices_line_mx) if self.slices_line_mx else 0
+        )
+        self._u_slices_line_my = (
+            self.unit(self.slices_line_mx) if self.slices_line_my else 0
+        )
         self.kwargs = kwargs
 
     def calculate_area(self) -> float:
@@ -2900,7 +2984,7 @@ class RectangleShape(BaseShape):
             y = kwargs.get("cy") - self._u.height / 2.0
         return x, y
 
-    def draw_roof(self, cnv, ID, vertexes, rotation=0):
+    def draw_slices(self, cnv, ID, vertexes, rotation=0):
         """Draw triangles and trapezoids inside the Rectangle
 
         Args:
@@ -2908,28 +2992,28 @@ class RectangleShape(BaseShape):
             vertexes: the rectangle's nodes
             rotation: degrees anti-clockwise from horizontal "east"
         """
-        # ---- get roof color list from string
-        if isinstance(self.roof, str):
-            _roof = tools.split(self.roof.strip())
+        # ---- get slices color list from string
+        if isinstance(self.slices, str):
+            _slices = tools.split(self.slices.strip())
         else:
-            _roof = self.roof
-        # ---- validate roof color settings
+            _slices = self.slices
+        # ---- validate slices color settings
         err = ("Roof must be a list of colors - either 2 or 4",)
-        if not isinstance(_roof, list):
+        if not isinstance(_slices, list):
             feedback(err, True)
         else:
-            if len(_roof) not in [2, 4]:
+            if len(_slices) not in [2, 4]:
                 feedback(err, True)
-        roof_colors = [tools.get_color(rcolor) for rcolor in _roof]
+        slices_colors = [tools.get_color(slcolor) for slcolor in _slices]
         # ---- draw 2 triangles
-        if len(roof_colors) == 2:
+        if len(slices_colors) == 2:
             # top-left
             vertexes_tl = [vertexes[0], vertexes[1], vertexes[3]]
             cnv.draw_polyline(vertexes_tl)
             self.set_canvas_props(
                 index=ID,
-                stroke=self.roof_stroke or roof_colors[0],
-                fill=roof_colors[0],
+                stroke=self.slices_stroke or slices_colors[0],
+                fill=slices_colors[0],
                 closed=True,
                 rotation=rotation,
                 rotation_point=self.centroid,
@@ -2939,26 +3023,26 @@ class RectangleShape(BaseShape):
             cnv.draw_polyline(vertexes_br)
             self.set_canvas_props(
                 index=ID,
-                stroke=self.roof_stroke or roof_colors[1],
-                fill=roof_colors[1],
+                stroke=self.slices_stroke or slices_colors[1],
+                fill=slices_colors[1],
                 closed=True,
                 rotation=rotation,
                 rotation_point=self.centroid,
             )
-        # ---- draw 2 triangles and (maybe) 2 trapezoids
-        elif len(roof_colors) == 4:
+        # ---- draw 2 (or 4) triangles and (maybe) 2 trapezoids
+        elif len(slices_colors) == 4:
             dx = (vertexes[3].x - vertexes[0].x) / 2.0
             dy = (vertexes[1].y - vertexes[0].y) / 2.0
             midpt = Point(vertexes[0].x + dx, vertexes[0].y + dy)
-            if self.roof_line:
-                _line = self._u_roof_line / 2.0
+            if self.slices_line:
+                _line = self._u_slices_line / 2.0
                 midleft = Point(
-                    midpt.x - _line + self._u_roof_line_mx,
-                    midpt.y + self._u_roof_line_my,
+                    midpt.x - _line + self._u_slices_line_mx,
+                    midpt.y + self._u_slices_line_my,
                 )
                 midrite = Point(
-                    midpt.x + _line + self._u_roof_line_mx,
-                    midpt.y + self._u_roof_line_my,
+                    midpt.x + _line + self._u_slices_line_mx,
+                    midpt.y + self._u_slices_line_my,
                 )
                 vert_t = [vertexes[0], midleft, midrite, vertexes[3]]
                 vert_r = [vertexes[3], midrite, vertexes[2]]
@@ -2975,8 +3059,8 @@ class RectangleShape(BaseShape):
                 cnv.draw_polyline(section)
                 self.set_canvas_props(
                     index=ID,
-                    stroke=self.roof_stroke or roof_colors[key],
-                    fill=roof_colors[key],
+                    stroke=self.slices_stroke or slices_colors[key],
+                    fill=slices_colors[key],
                     closed=True,
                     rotation=rotation,
                     rotation_point=self.centroid,
@@ -3115,8 +3199,8 @@ class RectangleShape(BaseShape):
         is_peaks = True if self.peaks else False
         is_borders = True if self.borders else False
         is_round = True if (self.rounding or self.rounded) else False
-        if self.roof and (is_round or is_notched or is_peaks or is_chevron):
-            feedback("Cannot use roof with other styles.", True)
+        if self.slices and (is_round or is_notched or is_peaks or is_chevron):
+            feedback("Cannot use slices with other styles.", True)
         if is_round and is_borders:
             feedback("Cannot use rounding or rounded with borders.", True)
         if is_round and is_notched:
@@ -3468,9 +3552,9 @@ class RectangleShape(BaseShape):
                         mask="auto",
                     )
 
-        # ---- draw roof after base
-        if self.roof:
-            self.draw_roof(cnv, ID, self.vertexes, rotation)
+        # ---- draw slices after base
+        if self.slices:
+            self.draw_slices(cnv, ID, self.vertexes, rotation)
 
         # ---- draw hatch
         if self.hatch_count:
@@ -3498,6 +3582,7 @@ class RectangleShape(BaseShape):
             gargs = {}
             gargs["stroke"] = self.grid_marks_stroke
             gargs["stroke_width"] = self.grid_marks_stroke_width
+            gargs["dotted"] = self.grid_marks_dotted
             self.set_canvas_props(cnv=None, index=ID, **gargs)
 
         # ---- centred shape (with offset)
@@ -3612,6 +3697,101 @@ class RhombusShape(BaseShape):
             rotation_point=muPoint(x_c, y_c),
         )
 
+    def draw_slices(self, cnv, ID, vertexes, centre: tuple, rotation=0):
+        """Draw triangles inside the Rhombus
+
+        Args:
+            ID: unique ID
+            vertexes: the Rhombus's nodes
+            centre: the centre Point of the Rhombus
+            rotation: degrees anti-clockwise from horizontal "east"
+        """
+        # ---- get slices color list from string
+        if isinstance(self.slices, str):
+            _slices = tools.split(self.slices.strip())
+        else:
+            _slices = self.slices
+        # ---- validate slices color settings
+        err = ("slices must be a list of colors - either 2 or 4",)
+        if not isinstance(_slices, list):
+            feedback(err, True)
+        else:
+            if len(_slices) not in [2, 3, 4]:
+                feedback(err, True)
+        slices_colors = [
+            tools.get_color(slcolor)
+            for slcolor in _slices
+            if not isinstance(slcolor, bool)
+        ]
+        # ---- draw 2 triangles
+        if len(_slices) == 2:
+            # left
+            vertexes_left = [vertexes[1], vertexes[2], vertexes[3]]
+            cnv.draw_polyline(vertexes_left)
+            self.set_canvas_props(
+                index=ID,
+                stroke=self.slices_stroke or slices_colors[0],
+                fill=slices_colors[0],
+                closed=True,
+                rotation=rotation,
+                rotation_point=self.centroid,
+            )
+            # right
+            vertexes_right = [vertexes[0], vertexes[1], vertexes[3]]
+            cnv.draw_polyline(vertexes_right)
+            self.set_canvas_props(
+                index=ID,
+                stroke=self.slices_stroke or slices_colors[1],
+                fill=slices_colors[1],
+                closed=True,
+                rotation=rotation,
+                rotation_point=self.centroid,
+            )
+
+        elif len(_slices) == 3 and _slices[2]:
+            # top
+            vertexes_top = [vertexes[0], vertexes[3], vertexes[2]]
+            cnv.draw_polyline(vertexes_top)
+            self.set_canvas_props(
+                index=ID,
+                stroke=self.slices_stroke or slices_colors[0],
+                fill=slices_colors[0],
+                closed=True,
+                rotation=rotation,
+                rotation_point=self.centroid,
+            )
+            # bottom
+            vertexes_btm = [vertexes[0], vertexes[1], vertexes[2]]
+            cnv.draw_polyline(vertexes_btm)
+            self.set_canvas_props(
+                index=ID,
+                stroke=self.slices_stroke or slices_colors[1],
+                fill=slices_colors[1],
+                closed=True,
+                rotation=rotation,
+                rotation_point=self.centroid,
+            )
+
+        # ---- draw 4 triangles
+        elif len(_slices) == 4:
+            midpt = Point(centre[0], centre[1])
+            vert_bl = [vertexes[0], midpt, vertexes[1]]
+            vert_br = [vertexes[1], midpt, vertexes[2]]
+            vert_tr = [vertexes[2], midpt, vertexes[3]]
+            vert_tl = [vertexes[3], midpt, vertexes[0]]
+            # sections = [vert_l, vert_r, vert_t, vert_b]  # order is important!
+            sections = [vert_tr, vert_br, vert_bl, vert_tl]  # order is important!
+            for key, section in enumerate(sections):
+                cnv.draw_polyline(section)
+                self.set_canvas_props(
+                    index=ID,
+                    stroke=self.slices_stroke or slices_colors[key],
+                    fill=slices_colors[key],
+                    closed=True,
+                    rotation=rotation,
+                    rotation_point=self.centroid,
+                )
+
     def draw(self, cnv=None, off_x=0, off_y=0, ID=None, **kwargs):
         """Draw a rhombus (diamond) on a given canvas."""
         kwargs = self.kwargs | kwargs
@@ -3631,6 +3811,7 @@ class RhombusShape(BaseShape):
             y = self._u.y + self._o.delta_y
         cx = x + self._u.width / 2.0
         cy = y + self._u.height / 2.0
+        centre = (cx, cy)
         # ---- calculated properties
         self.area = (self._u.width * self._u.height) / 2.0
         # ---- handle rotation
@@ -3639,12 +3820,17 @@ class RhombusShape(BaseShape):
             self.centroid = muPoint(cx, cy)
             kwargs["rotation"] = rotation
             kwargs["rotation_point"] = self.centroid
+        else:
+            self.centroid = None
         # ---- draw rhombus
         self.vertexes = self.get_vertexes(cx=cx, cy=cy, x=x, y=y)
         # feedback(f'***Rhombus {x=} {y=} {self.vertexes=}')
         cnv.draw_polyline(self.vertexes)
         kwargs["closed"] = True
         self.set_canvas_props(cnv=cnv, index=ID, **kwargs)
+        # ---- draw slices after base
+        if self.slices:
+            self.draw_slices(cnv, ID, self.vertexes, centre, rotation)
         # ---- draw hatch
         if self.hatch_count:
             self.side = math.sqrt(
@@ -3819,35 +4005,81 @@ class ShapeShape(BaseShape):
         self.x = kwargs.get("x", kwargs.get("left", 0))
         self.y = kwargs.get("y", kwargs.get("bottom", 0))
 
+    def get_steps(self) -> list:
+        """Get a list of step tuples."""
+        steps = tools.tuple_split(self.steps)
+        if not steps:
+            steps = self.steps
+        if not steps or len(steps) == 0:
+            return None
+        return steps
+
+    def get_points(self) -> list:
+        """Get a list of point tuples."""
+        points = tools.tuple_split(self.points)
+        if not points:
+            points = self.points
+        if not points or len(points) == 0:
+            return None
+        return points
+
+    def get_vertexes(self):
+        """Return polyline vertices in canvas units"""
+        points = self.get_points()
+        steps = self.get_steps()
+        if points and steps:
+            feedback(
+                "Point values will supercede steps to draw the Polyshape", False, True
+            )
+        if points:
+            vertices = [
+                Point(
+                    self.unit(pt[0]) + self.unit(self.x) + self._o.delta_x,
+                    self.unit(pt[1]) + self.unit(self.y) + self._o.delta_y,
+                )
+                for pt in points
+            ]
+            return vertices
+        # print('***', f'{steps=}')
+        if steps:
+            vertices = []
+            # start here...
+            vertices.append(
+                Point(
+                    self.unit(self.x) + self._o.delta_x,
+                    self.unit(self.y) + self._o.delta_y,
+                )
+            )
+            if len(steps) > 0:
+                for index, stp in enumerate(steps):
+                    vertices.append(
+                        Point(
+                            vertices[index].x + self.unit(stp[0]),
+                            vertices[index].y + self.unit(stp[1]),
+                        )
+                    )
+                return vertices
+        feedback("There are no points or steps to draw the Polyshape", False, True)
+        return None
+
     def draw(self, cnv=None, off_x=0, off_y=0, ID=None, **kwargs):
         """Draw an irregular polygon on a given canvas."""
         super().draw(cnv, off_x, off_y, ID, **kwargs)  # unit-based props
         cnv = cnv if cnv else globals.canvas  # a new Page/Shape may now exist
         # ---- set canvas
         self.set_canvas_props(index=ID)
-        # ---- draw Shape
-        if isinstance(self.points, str):
-            # SPLIT STRING e.g. "1,2  3,4  4.5,8.8"
-            _points = self.points.split(" ")
-            points = [_point.split(",") for _point in _points]
-        else:
-            points = self.points
-        if points and len(points) > 0:
-            x_offset, y_offset = self.unit(self.x or 0), self.unit(self.y or 0)
-            # ---- set vertices
-            x_sum, y_sum = 0, 0
-            self.vertexes = []
-            for key, vertex in enumerate(points):
-                _x0, _y0 = float(vertex[0]), float(vertex[1])
-                # convert to using units
-                x = self.unit(_x0) + self._o.delta_x + x_offset
-                y = self.unit(_y0) + self._o.delta_y + y_offset
-                self.vertexes.append((x, y))
-            # feedback(f'***RAT {x=} {y=} {self.vertexes=}')
+        x_offset, y_offset = self.unit(self.x or 0), self.unit(self.y or 0)
+        # ---- set vertices
+        self.vertexes = self.get_vertexes()
+        # ---- draw polyshape
+        # feedback(f'***PolyShape{x=} {y=} {self.vertexes=}')
+        if self.vertexes:
             cnv.draw_polyline(self.vertexes)
             kwargs["closed"] = True
+            if kwargs.get("rounded"):
+                kwargs["lineJoin"] = 1
             self.set_canvas_props(cnv=cnv, index=ID, **kwargs)
-            # ---- centre?
+            # ---- is there a centre?
             if self.cx and self.cy:
                 x = self._u.cx + self._o.delta_x + x_offset
                 y = self._u.cy + self._o.delta_y + y_offset
@@ -3858,7 +4090,7 @@ class ShapeShape(BaseShape):
                 # ---- * text
                 self.draw_label(cnv, ID, x, y, **kwargs)
         else:
-            feedback("There are no points to draw the Polyshape", False, True)
+            feedback("There are no points or steps to draw the Polyshape", False, True)
 
 
 class SquareShape(RectangleShape):
@@ -4111,7 +4343,7 @@ class StarFieldShape(BaseShape):
      * enclosure (regular shape inside which its drawn; default is a rectangle)
      * sizes (list of individual star sizes; default is [0.1])
      * star_pattern (random | cluster) - NOT YET IMPLEMENTED
-     * seeding (float, that if set, predetermines the randomisation sequence)
+     * seeding (float, that if set, predetermines the randomisation sequenc)
 
     Ref:
         https://codeboje.de/starfields-and-galaxies-python/
@@ -4123,7 +4355,7 @@ class StarFieldShape(BaseShape):
     def __init__(self, _object=None, canvas=None, **kwargs):
         super(StarFieldShape, self).__init__(_object=_object, canvas=canvas, **kwargs)
         self.kwargs = kwargs
-        # override to set the randomisation sequence
+        # override to set the randomisation sequenc
         if self.seeding:
             self.seed = tools.as_float(self.seeding, "seeding")
         else:

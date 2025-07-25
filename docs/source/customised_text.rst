@@ -83,7 +83,7 @@ The more advanced properties that can be set for "box" ``Text()`` are:
   to style the box in some way, including *box_fill*, *box_stroke*,
   *box_stoke_width*, *box_dotted*, *box_dashed*, and *box_transparency*
 - *style* - set HTML/CSS properties that will apply to all of the text; this
-  will **automatically** also set the *html* property to ``True`
+  will **automatically** also set the *html* property to ``True``
 
 
 .. _textLineOfText:

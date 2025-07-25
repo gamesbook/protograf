@@ -40,6 +40,7 @@ and that you've created some basic scripts of your own using the
   - `T(emplate) command`_
   - `S(election) command`_
   - `L(ookup) command`_
+  - `Card functions`_
 - `Other Card Deck Resources`_
 
 
@@ -440,6 +441,21 @@ This example shows how data is sourced from an Excel file:
 
        Data(filename="card_data.xls")
 
+Along with the filename, two other properties can be used:
+
+- *sheetname* - the name of sheet in the Excel file that must be used; this
+  defaults to the first one
+- *cells* - a range of cells delimiting the data to be used; this will use
+  a ``col:row`` format, indicating a block - from the top-left cell to the
+  bottom-right cell e.g. ``'A3:E12'``
+
+For example:
+
+    .. code:: python
+
+       Data(filename="card_data.xls", sheetname="Characters", cells="B2:F13")
+
+
 .. _deck-data-matrix:
 
 Data Example 3. Matrix
@@ -539,7 +555,7 @@ There are three properties needed to gain access to data from a Google Sheet:
 - *google_key* - an API Key that you can request from Google
 - *google_sheet* - the unique ID (a mix of numbers and letters) which is randomly
   assigned by Google to your Google Sheet
-- *google_name* - the name of the tab in the Google Sheet housing your data
+- *sheetname* - the name of the tab in the Google Sheet housing your data
 
 The API Key
 +++++++++++
@@ -577,7 +593,6 @@ The Sheet Name
 The name of the sheet you want to access is displayed in the bottom section of
 display on a tab.  The default name of the first sheet is ``Sheet1``.
 
-
 This next example shows how data is sourced from a Google Sheet, once you have
 all the information described above:
 
@@ -586,7 +601,7 @@ all the information described above:
         Data(
             google_sheet="1vRfwxVjafnZVmgjazQKr2UQDyGYYK8GXJhQAPlzJ03o",
             google_key="A1_izC00Lbut2001askHAL4aPodd00rsys3rr0r",
-            google_name="Characters")
+            sheetname="Characters")
 
 If the sheet cannot be reached, or access permissions are not correct,
 or the API key is invalid, then you will get an error.
@@ -775,7 +790,7 @@ an alternate value |dash| in this case the infinity sign |dash| for use when
 there is no *Age* value (for example, for the "Gandalf" row).
 
 The full code for this example is available as
-`cards_lotr.py <https://github.com/gamesbook/protograf/blob/master/examples/cards/cards_lotr.py>`_
+`cards_rectangular.py <https://github.com/gamesbook/protograf/blob/master/examples/cards/cards_rectangular.py>`_
 
 .. HINT::
 
@@ -795,11 +810,14 @@ on the data returned by the template from the :ref:`Data() <the-data-command>`.
 In this case, you can write a :ref:`Python function <python-function>` which
 can be used to generate one or more shapes to be drawn on the card.
 
-The function should accept one incoming value; this incoming data for this
+The function should accept one incoming value; the incoming data for this
 value will be that created by the ``T()`` command.
 
 The function should **return** one or more shapes; anything else will trigger
-this error::
+an error.
+
+For example, if the function was called ``icon_list`` and it returned a
+number, then this error would be displayed::
 
     FEEDBACK:: Check that all elements created by 'icon_list' are shapes.
 
@@ -816,7 +834,7 @@ by the ``T()`` command as follows:
 
     def greet(data):
         greeting = 'Hi ' + data
-        return text(greeting, x=1, y=1)
+        return text(text=greeting, x=1, y=1)
 
     greetings = T('{{Name}}', function=greet)
     Card("*", greetings)
@@ -971,6 +989,61 @@ The program takes the value from the *plug*'s **USES** column; then finds
 a Card whose **NAME** column contains a matching value |dash| in this case,
 the card with **ID** of ``1``; and then returns the value from that card's
 **IMAGE** column |dash| in this case, the value **wire.png**.
+
+
+Card functions
+--------------
+
+It could be that you need to perform a more complex operation, or validation,
+on any or all of the data assigned to a Card or Cards.
+
+In this case, you can write a :ref:`Python function <python-function>` which
+can be used to generate one or more shapes to be drawn on the card.
+
+The function should accept one incoming value; this will hold the data
+associated with  a card |dash| for example, the row of data in a
+spreadsheet.  The function can then work with this data.
+
+The function should **return** one or more shapes; anything else will trigger
+an error.
+
+For example, if the function was called ``icon_list`` and it returned a
+number, then this error would be displayed::
+
+    FEEDBACK:: Check that all elements created by 'icon_list' are shapes.
+
+The name of the function is assigned directly to the Card in the same way
+that shapes are usually assigned.
+
+Card Function Example 1.
+++++++++++++++++++++++++
+
+In this example, the function is called ``greet``, and is assigned and used
+by the ``Card()`` command as follows:
+
+.. code:: python
+
+    def greet(data):
+        if data.Birth < 1977:
+            greeting = 'Hi ' + data.Name
+        if data.Birth >= 1977:
+            greeting = 'Well, hello there ' + data.Name
+        return text(text=greeting, x=1, y=1)
+
+    Card("1-3", greet)
+
+A card's data is accessed by the use of the "." (dot) notation; in this
+case the value of the ``Name`` column for the card is accessed by using
+``data.Name`` and the value of the ``Birth`` column for the card is accessed
+by using ``data.Birth``.
+
+The function makes use of a :ref:`Python if <python-if>` switch to choose
+different ``greeting`` values depending on the ``Birth`` value.  The text
+created is then returned by the ``greet`` function.
+
+The Text() shape created by ``greet`` is then assigned to the first
+three cards in the usual way.
+
 
 .. _other-card-resources:
 

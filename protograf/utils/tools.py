@@ -6,6 +6,7 @@ General purpose utility functions for protograf
 import csv
 import collections
 import copy
+from functools import lru_cache
 from itertools import zip_longest
 import jinja2
 import logging
@@ -14,6 +15,7 @@ import os
 import pathlib
 from pathlib import Path
 import string
+from string import ascii_uppercase, digits
 import sys
 from urllib.parse import urlparse
 
@@ -50,6 +52,10 @@ MIN_ATTRIBUTES = ("scheme", "netloc")
 BUILTIN_FONTS = ["Times-Roman", "Courier", "Helvetica"]
 
 
+__alpha_to_decimal = {letter: pos for pos, letter in enumerate(ascii_uppercase, 1)}
+__powers = (1, 26, 676)
+
+
 def script_path():
     """Get the path for a script being called from command line.
 
@@ -80,12 +86,13 @@ def load_data(datasource=None, **kwargs):
             selected = kwargs.get("selected", None)
             sheet = kwargs.get("sheet", 0)
             sheetname = kwargs.get("sheetname", None)
+            cells = kwargs.get("cells", None)
             dataset = open_excel(
                 datasource,
                 sheet=sheet,
                 sheetname=sheetname,
+                cells=cells,
                 headers=headers,
-                selected=selected,
             )
         else:
             feedback('Unable to process a file %s of type "%s"' % (filename, file_ext))
@@ -367,6 +374,8 @@ def tuple_split(
     [(3.0,)]
     >>> print(tuple_split('3,4'))
     [(3.0, 4.0)]
+    >>> print(tuple_split('  3,4  5.1,6.2   -7,8.1'))
+    [(3.0, 4.0), (5.1, 6.2), (-7.0, 8.1)]
     >>> print(tuple_split('3,5 6,1 4,2'))
     [(3.0, 5.0), (6.0, 1.0), (4.0, 2.0)]
     >>> print(tuple_split('3,5 6,1 4,2', all_ints=True))
@@ -382,13 +391,19 @@ def tuple_split(
     if string:
         try:
             _string_list = string.strip(" ").replace(";", ",").split(" ")
+            # print(f'^^^ {_string_list=}')
             for _str in _string_list:
                 items = _str.split(",")
-                if all_ints:
-                    _items = [int(itm) for itm in items]
-                else:
-                    _items = [float(itm) for itm in items]
-                values.append(tuple(_items))
+                _items = []
+                for itm in items:
+                    _itm = itm.strip(" ")
+                    if _itm:
+                        if all_ints:
+                            _items.append(int(_itm))
+                        else:
+                            _items.append(float(_itm))
+                if _items:
+                    values.append(tuple(_items))
             if pairs_list:
                 for value in values:
                     if len(value) != 2:
@@ -398,7 +413,7 @@ def tuple_split(
                             True,
                         )
             return values
-        except ValueError:
+        except ValueError as err:
             if all_ints:
                 feedback(
                     f"Cannot convert {label} into a list of integer sets!"
@@ -406,7 +421,9 @@ def tuple_split(
                     True,
                 )
             else:
-                feedback(f"Cannot convert {label} into a list of numeric sets!", True)
+                feedback(
+                    f"Cannot convert {label} into a list of numeric sets ({err})!", True
+                )
             return values
 
         except Exception:
@@ -423,14 +440,27 @@ def sequence_split(
     as_float: bool = False,
     msg: str = "",
     clean: bool = False,
-):
+    star: bool = False,
+) -> list:
     """
     Split a string into a list of individual values
+
+    Args:
+        string: the item to be split
+        as_int (bool): if True, convert values to integers
+        unique (bool): if True, create a list of unique
+        sep (str): expected delimiter between values - defaults to ","
+        as_float (bool): if True, convert values to floats
+        msg (str): return as part of the error
+        clean (bool): if True, strip any surrounding spaces
+        star (bool): if True, allow for "all" or "*" as the only list value
 
     Note:
         * If `unique` is True, order will NOT be maintained!
 
     Doc Test:
+    >>> sequence_split('*', star=True)
+    ['*']
     >>> sequence_split('')
     []
     >>> sequence_split('3')
@@ -467,7 +497,7 @@ def sequence_split(
                 _string = string.replace('"', "").replace("'", "").strip()
             else:
                 _string = string
-                if clean:
+                if clean or star:
                     _string = _string.strip()
         except Exception:
             return values
@@ -494,6 +524,11 @@ def sequence_split(
             feedback(f"The script may not be using T() correctly", True)
         else:
             feedback(f"", True)
+
+    # star test
+    if star and len(_strings) == 1:
+        if _strings[0] == "*" or _strings[0] == "all":
+            return ["*"]
 
     # log.debug('strings:%s', _strings)
     for item in _strings:
@@ -686,7 +721,7 @@ def open_csv(filename, headers=None, selected=None):
     return dict_list
 
 
-def open_excel(filename, sheet=0, sheetname=None, headers=None, selected=None):
+def open_excel(filename, sheet=0, sheetname=None, cells=None, headers=None):
     """Read data from an Excel file into a list of dictionaries
 
     Args:
@@ -694,15 +729,17 @@ def open_excel(filename, sheet=0, sheetname=None, headers=None, selected=None):
     - filename (str): path to the file
     - sheet (int): select a sheet number (otherwise first is used)
     - sheetname (str): select a sheet by name (otherwise first is used)
+    - cells (str): a range of cells delimiting data in the col:row format
+      from top-left to bottom-right e.g. 'A3:E12'
     - headers (list): strings to use instead of the first row
-    - selected (list): desired rows e.g. [2,4,7]
     """
 
     def cleaned(value):
         if isinstance(value, float):
             if float(value) == float(int(value)):
                 return int(value)
-        return value
+        result = "" if value is None else value
+        return result
 
     if not filename:
         feedback("A valid Excel filename must be supplied!")
@@ -729,22 +766,22 @@ def open_excel(filename, sheet=0, sheetname=None, headers=None, selected=None):
             filename=filename,
             sheet=sheet,
             sheetname=sheetname,
+            cells=cells,
             headers=headers,
-            selected=selected,
         )
     elif file_ext == ".xlsx":
         return open_xlsx(
             filename=filename,
             sheet=sheet,
             sheetname=sheetname,
+            cells=cells,
             headers=headers,
-            selected=selected,
         )
     else:
         feedback(f'Cannot process data files with an extension of "{file_ext}".', True)
 
 
-def open_xlsx(filename, sheet=0, sheetname=None, headers=None, selected=None):
+def open_xlsx(filename, sheet=0, sheetname=None, headers=None, cells=None):
     """Read data from XLSX file into a list of dictionaries
 
     Args:
@@ -753,14 +790,16 @@ def open_xlsx(filename, sheet=0, sheetname=None, headers=None, selected=None):
     - sheet (int): select a sheet number (otherwise first is used)
     - sheetname (str): select a sheet by name (otherwise first is used)
     - headers (list): strings to use instead of the first row
-    - selected (list): desired rows e.g. [2,4,7]
+    - cells (str): a range of cells delimiting data in the col:row format
+      from top-left to bottom-right e.g. 'A3:E12'
     """
 
     def cleaned(value):
         if isinstance(value, float):
             if float(value) == float(int(value)):
                 return int(value)
-        return value
+        result = "" if value is None else value
+        return result
 
     if not filename:
         feedback("A valid Excel filename must be supplied!")
@@ -812,18 +851,24 @@ def open_xlsx(filename, sheet=0, sheetname=None, headers=None, selected=None):
             )
         else:
             dict_list = []
-            for row_index in range(start, sheet.max_row + 1):
-                item = {
-                    keys[col_index - 1]: cleaned(
-                        sheet.cell(row=row_index, column=col_index).value
-                    )
-                    for col_index in range(1, sheet.max_column + 1)
-                }
-                if not selected:
+            if cells:
+                _cells = cells.split(":")
+                cell_range = sheet[_cells[0] : _cells[1]]
+                for row_index, row in enumerate(cell_range):
+                    item = {
+                        keys[col_index]: cleaned(cell.value)
+                        for col_index, cell in enumerate(row)
+                    }
                     dict_list.append(item)
-                else:
-                    if row_index + 1 in selected:
-                        dict_list.append(item)
+            else:
+                for row_index in range(start, sheet.max_row + 1):
+                    item = {
+                        keys[col_index - 1]: cleaned(
+                            sheet.cell(row=row_index, column=col_index).value
+                        )
+                        for col_index in range(1, sheet.max_column + 1)
+                    }
+                    dict_list.append(item)
     except IOError:
         feedback('Unable to find or open Excel "%s"' % excel_filename)
     except IndexError:
@@ -833,7 +878,7 @@ def open_xlsx(filename, sheet=0, sheetname=None, headers=None, selected=None):
     return dict_list
 
 
-def open_xls(filename, sheet=0, sheetname=None, headers=None, selected=None):
+def open_xls(filename, sheet=0, sheetname=None, headers=None, cells=None):
     """Read data from XLS file into a list of dictionaries
 
     Args:
@@ -842,7 +887,8 @@ def open_xls(filename, sheet=0, sheetname=None, headers=None, selected=None):
     - sheet (int): select a sheet number (otherwise first is used)
     - sheetname (str): select a sheet by name (otherwise first is used)
     - headers (list): strings to use instead of the first row
-    - selected (list): desired rows e.g. [2,4,7]
+    - cells (str): a range of cells delimiting data in the col:row format
+      from top-left to bottom-right e.g. 'A3:E12'
     """
 
     def cleaned(value):
@@ -888,16 +934,23 @@ def open_xls(filename, sheet=0, sheetname=None, headers=None, selected=None):
             )
         else:
             dict_list = []
-            for row_index in range(start, sheet.nrows):
-                item = {
-                    keys[col_index]: cleaned(sheet.cell(row_index, col_index).value)
-                    for col_index in range(sheet.ncols)
-                }
-                if not selected:
+            if cells:
+                _cells = cells.split(":")
+                _topleft = coordinate_to_tuple(_cells[0], True)  # (col, row)
+                _btmrite = coordinate_to_tuple(_cells[1], True)  # (col, row)
+                for row_index in range(_topleft[1], _btmrite[1] + 1):
+                    item = {
+                        keys[col_index]: cleaned(sheet.cell(row_index, col_index).value)
+                        for col_index in range(_topleft[0], _btmrite[0] + 1)
+                    }
                     dict_list.append(item)
-                else:
-                    if row_index + 1 in selected:
-                        dict_list.append(item)
+            else:
+                for row_index in range(start, sheet.nrows):
+                    item = {
+                        keys[col_index]: cleaned(sheet.cell(row_index, col_index).value)
+                        for col_index in range(sheet.ncols)
+                    }
+                    dict_list.append(item)
     except IOError:
         feedback('Unable to find or open Excel "%s"' % excel_filename)
     except IndexError:
@@ -1106,6 +1159,63 @@ def alpha_column(num: int, lower: bool = False) -> string:
         return string.ascii_uppercase[divmod(num - 1, 26)[1] % 26] * (
             divmod(num - 1, 26)[0] + 1
         )
+
+
+@lru_cache(maxsize=None)
+def column_from_string(col: str) -> int:
+    """Convert ASCII column name (base 26) to decimal with 1-based index
+
+    Characters represent descending multiples of powers of 26
+
+    "AFZ" == 26 * pow(26, 0) + 6 * pow(26, 1) + 1 * pow(26, 2)
+
+    Doc Test:
+    >>> column_from_string('A')
+    1
+    >>> column_from_string('AA')
+    27
+    """
+    error_msg = f"'{col}' is not a valid column name. Column names are from A to ZZZ"
+    if len(col) > 3:
+        raise ValueError(error_msg)
+    idx = 0
+    col = reversed(col.upper())
+    for letter, power in zip(col, __powers):
+        try:
+            pos = __alpha_to_decimal[letter]
+        except KeyError:
+            raise ValueError(error_msg)
+        idx += pos * power
+    if not 0 < idx < 18279:
+        raise ValueError(error_msg)
+    return idx
+
+
+def coordinate_to_tuple(coordinate: str, zeroed: bool = False) -> tuple:
+    """Convert Excel style coordinate to 1-based (column, row) tuple
+
+    Args:
+        zeroed (bool): if True, use zero base
+
+    Doc Test:
+    >>> coordinate_to_tuple('A1')
+    (1, 1)
+    >>> coordinate_to_tuple('AB31')
+    (28, 31)
+    >>> coordinate_to_tuple('A1', True)
+    (0, 0)
+    >>> coordinate_to_tuple('AB31', True)
+    (27, 30)
+    """
+    for idx, c in enumerate(coordinate):
+        if c in digits:
+            break
+    col = coordinate[:idx]
+    row = coordinate[idx:]
+    if zeroed:
+        return column_from_string(col) - 1, int(row) - 1
+    else:
+        return column_from_string(col), int(row)
 
 
 def sheet_column(num: int, lower: bool = False) -> string:
@@ -1644,7 +1754,8 @@ def get_pymupdf_props(
     # ---- set width
     _width = stroke_width or defaults.get("stroke_width")
     if _color is None and _fill is None:
-        feedback("Cannot have both fill and stroke set to None!", True)
+        # feedback("Cannot have both fill and stroke set to None!", True)
+        return None
     # print(f'^^^ SCP {stroke=} {fill=} {_color=} {_fill=}')  # None OR fraction RGB
     # ---- set/apply properties
     pymu_props = ShapeProperties(
@@ -1672,17 +1783,18 @@ def set_canvas_props(
     cnv = cnv if cnv else globals.canvas
     defaults = defaults if defaults else {}
     pymu_props = get_pymupdf_props(defaults=defaults, index=index, **kwargs)
-    cnv.finish(
-        width=pymu_props.width,
-        color=pymu_props.color,
-        fill=pymu_props.fill,
-        lineCap=pymu_props.lineCap,
-        lineJoin=pymu_props.lineJoin,
-        dashes=pymu_props.dashes,
-        fill_opacity=pymu_props.fill_opacity,
-        morph=pymu_props.morph,
-        closePath=pymu_props.closePath,
-    )
+    if pymu_props:
+        cnv.finish(
+            width=pymu_props.width,
+            color=pymu_props.color,
+            fill=pymu_props.fill,
+            lineCap=pymu_props.lineCap,
+            lineJoin=pymu_props.lineJoin,
+            dashes=pymu_props.dashes,
+            fill_opacity=pymu_props.fill_opacity,
+            morph=pymu_props.morph,
+            closePath=pymu_props.closePath,
+        )
     cnv.commit()
     return None
 
