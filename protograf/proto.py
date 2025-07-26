@@ -76,7 +76,6 @@ from .groups import Switch, Lookup  # used in scripts
 from ._version import __version__
 
 from protograf.utils import geoms, tools, support
-from protograf.utils.tools import _lower
 from protograf.utils.constants import (
     DEFAULT_FONT,
     DEBUG_COLOR,
@@ -118,9 +117,11 @@ from protograf.utils.structures import (
 )
 from protograf.utils.tools import (
     base_fonts,
+    _lower,
     split,
     save_globals,
     restore_globals,
+    uniques,
 )  # used in scripts
 from protograf import globals
 
@@ -422,11 +423,21 @@ class CardShape(BaseShape):
                 # breakpoint()
                 if isinstance(new_ele, (SequenceShape, RepeatShape)):
                     new_ele.deck_data = self.deck_data
-                if isinstance(new_ele, TemplatingType):
+                elif isinstance(new_ele, TemplatingType):
                     # convert Template into a string via render
                     card_value = self.deck_data[iid]
                     custom_value = new_ele.template.render(card_value)
-                    new_eles = new_ele.function(custom_value) or []
+                    _one_or_more_eles = new_ele.function(custom_value)
+                    if isinstance(_one_or_more_eles, list):
+                        new_eles = _one_or_more_eles
+                    else:
+                        new_eles = (
+                            [
+                                _one_or_more_eles,
+                            ]
+                            if _one_or_more_eles
+                            else []
+                        )
                     self.draw_new_elements(
                         new_ele.function,
                         new_eles,
@@ -437,48 +448,55 @@ class CardShape(BaseShape):
                         cid=cid,
                         **kwargs,
                     )
-                if callable(new_ele) and not isinstance(new_ele, (BaseShape, Switch)):
-                    # call user-defined function-like objects!
-                    card_values = self.deck_data[cid]
-                    card_values_tuple = namedtuple("Data", card_values.keys())(
-                        **card_values
-                    )
-                    new_eles = new_ele(card_values_tuple) or []
-                    # print(f'{card_values_tuple=} {new_eles=}')
-                    self.draw_new_elements(
-                        new_ele,
-                        new_eles,
-                        cnv=cnv,
-                        off_x=_dx,
-                        off_y=_dy,
-                        ID=iid,
-                        cid=cid,
-                        **kwargs,
-                    )
                 else:
-                    new_ele.draw(cnv=cnv, off_x=_dx, off_y=_dy, ID=iid, **kwargs)
-                    cnv.commit()
+                    if callable(new_ele) and not isinstance(
+                        new_ele, (BaseShape, Switch)
+                    ):
+                        # call user-defined function-like objects!
+                        card_values = self.deck_data[cid]
+                        card_values_tuple = namedtuple("Data", card_values.keys())(
+                            **card_values
+                        )
+                        new_eles = new_ele(card_values_tuple) or []
+                        # print(f'{card_values_tuple=} {new_eles=}')
+                        self.draw_new_elements(
+                            new_ele,
+                            new_eles,
+                            cnv=cnv,
+                            off_x=_dx,
+                            off_y=_dy,
+                            ID=iid,
+                            cid=cid,
+                            **kwargs,
+                        )
+                    else:
+                        new_ele.draw(cnv=cnv, off_x=_dx, off_y=_dy, ID=iid, **kwargs)
+                        cnv.commit()
             except AttributeError:
                 # ---- * switch ... get a new element ... or not!?
-                new_ele = (
-                    flat_ele(cid=self.shape_id) if flat_ele else None
-                )  # uses __call__ on Switch
-                if new_ele:
-                    flat_new_eles = tools.flatten(new_ele)
-                    for flat_new_ele in flat_new_eles:
-                        members = flat_new_ele.members or self.members
-                        iid = members.index(cid + 1)
-                        custom_new_ele = self.handle_custom_values(flat_new_ele, iid)
-                        if isinstance(custom_new_ele, (SequenceShape, RepeatShape)):
-                            custom_new_ele.deck_data = self.deck_data
-                        # feedback(f'$$$ draw_card $$$ {custom_new_ele=}')
-                        custom_new_ele.draw(
-                            cnv=cnv, off_x=_dx, off_y=_dy, ID=iid, **kwargs
-                        )
-                        cnv.commit()
-
+                try:
+                    new_ele = (
+                        flat_ele(cid=self.shape_id) if flat_ele else None
+                    )  # uses __call__ on Switch
+                    if new_ele:
+                        flat_new_eles = tools.flatten(new_ele)
+                        for flat_new_ele in flat_new_eles:
+                            members = flat_new_ele.members or self.members
+                            iid = members.index(cid + 1)
+                            custom_new_ele = self.handle_custom_values(
+                                flat_new_ele, iid
+                            )
+                            if isinstance(custom_new_ele, (SequenceShape, RepeatShape)):
+                                custom_new_ele.deck_data = self.deck_data
+                            # feedback(f'$$$ draw_card $$$ {custom_new_ele=}')
+                            custom_new_ele.draw(
+                                cnv=cnv, off_x=_dx, off_y=_dy, ID=iid, **kwargs
+                            )
+                            cnv.commit()
+                except Exception as err:
+                    feedback(f"Unable to create card #{cid + 1}. (Error: {err})", True)
             except Exception as err:
-                feedback(f"Unable to draw card #{cid + 1}. (Error:{err})", True)
+                feedback(f"Unable to draw card #{cid + 1}. (Error: {err})", True)
 
 
 class DeckOfCards:
@@ -612,7 +630,7 @@ class DeckOfCards:
         ]:
             log.debug("globals.dataset_type: %s", globals.dataset_type)
             if len(globals.dataset) == 0:
-                feedback("The provided data is empty or cannot be loaded!", True)
+                feedback("The provided data is empty or cannot be loaded!")
             else:
                 # globals.deck.create(len(globals.dataset) + globals.extra)
                 self.dataset = globals.dataset
@@ -1443,6 +1461,7 @@ def Save(**kwargs):
       this is ``300``
     - directory (str): export path for the PNG or SVG; if None then use the same
       one as the script
+    - filename (str): name of export PDF; if None then use the one from Create()
     - names (list): provide a list of names -- without an extension -- for the
       *output* files that will be created from the PDF;
       the first name corresponds to the first page, the second name to the second
@@ -1471,6 +1490,7 @@ def Save(**kwargs):
     directory = kwargs.get("directory", None)
     cards = kwargs.get("cards", False)  # export individual cards as PNG
     output = kwargs.get("output", None)  # export document into this format e.g. SVG
+    local_filename = kwargs.get("filename", None)  # override Create()
 
     # ---- directory
     globals.directory = directory if directory else os.getcwd()
@@ -1501,7 +1521,8 @@ def Save(**kwargs):
 
     # ---- save all Pages to file
     msg = "Please check folder exists and that you have access rights."
-    output_filename = os.path.join(globals.directory, globals.filename)
+    the_filename = local_filename or globals.filename
+    output_filename = os.path.join(globals.directory, the_filename)
     try:
         globals.document.subset_fonts(verbose=True)  # subset fonts to reduce file size
         globals.document.save(output_filename)
@@ -1542,6 +1563,20 @@ def Save(**kwargs):
 
     # ---- save cards to image(s)
     # MOVED TO DECK DRAW - because of use of intermediate pages for gutter-based layout
+
+    # ---- reset key globals to allow for new Deck()
+    # ---- pymupdf doc, page, shape/canvas
+    globals.document = pymupdf.open()  # pymupdf.Document
+    globals.doc_page = globals.document.new_page(
+        width=globals.page[0], height=globals.page[1]
+    )  # pymupdf Page
+    globals.canvas = globals.doc_page.new_shape()  # pymupdf Shape
+    # ---- BaseCanvas
+    globals.base = BaseCanvas(
+        globals.document, paper=globals.paper  # , defaults=defaults, kwargs=kwargs
+    )
+    globals.page_count = 0
+    page_setup()
 
 
 def save(**kwargs):
@@ -1975,6 +2010,8 @@ def Data(**kwargs):
     - extra (int): if additional cards need to be manually created for a Deck,
       that are *not* part of the data source, then the number of those cards
       can be specified here.
+    - filters (list): a list of ('key', 'value') items on which the data must be
+      filtered
     """
     validate_globals()
 
@@ -1983,10 +2020,11 @@ def Data(**kwargs):
     data_list = kwargs.get("data_list", None)  # list-of-lists
     images = kwargs.get("images", None)  # directory
     images_filter = kwargs.get("images_filter", "")  # e.g. .png
-    filters = tools.sequence_split(images_filter, False, True)
+    image_filter_list = tools.sequence_split(images_filter, False, True)
     source = kwargs.get("source", None)  # dict
     google_sheet = kwargs.get("google_sheet", None)  # Google Sheet
     debug = kwargs.get("debug", False)
+    filters = kwargs.get("filters", None)  # directory
     # extra cards added to deck (handle special cases not in the dataset)
     globals.deck_settings["extra"] = tools.as_int(kwargs.get("extra", 0), "extra")
     try:
@@ -2040,7 +2078,7 @@ def Data(**kwargs):
                     f"Cannot locate or access directory: {images} or {full_path}", True
                 )
         for child in src.iterdir():
-            if not filters or child.suffix in filters:
+            if not image_filter_list or child.suffix in image_filter_list:
                 globals.image_list.append(str(child))
         if globals.image_list is None or len(globals.image_list) == 0:
             feedback(
@@ -2079,6 +2117,44 @@ def Data(**kwargs):
                     print(data)
         else:
             print("No {globals.dataset_type} data was loaded!")
+
+    # ---- FILTERS
+    if filters:
+        if not isinstance(filters, list):
+            feedback(
+                "Data() filters must be a list of sets of the form (key, value).", True
+            )
+        for _filter in filters:
+            # validate filter
+            if not isinstance(_filter, tuple) and len(_filter) < 2:
+                feedback(
+                    "Data() filters must be a list of sets of the form (key, value, type).",
+                    True,
+                )
+            key, value = _filter[0], _filter[1]
+            if key not in globals.dataset[0].keys():
+                feedback(
+                    f'Data filter key "{key}" is not in the available columns.', True
+                )
+            # do filtering
+            if len(_filter) == 2:
+                globals.dataset = [d for d in globals.dataset if d[key] == value]
+            if len(_filter) == 3:
+                ftype = _lower(_filter[2])
+                match ftype:
+                    case "<" | "less than" | "less" | "fewer than" | "fewer" | "lt":
+                        globals.dataset = [d for d in globals.dataset if d[key] < value]
+                    case ">" | "greater than" | "greater" | "more than" | "more" | "gt":
+                        globals.dataset = [d for d in globals.dataset if d[key] > value]
+                    case "<>" | "!=" | "not equal" | "not" | "ne":
+                        globals.dataset = [
+                            d for d in globals.dataset if d[key] != value
+                        ]
+                    case _:
+                        feedback(
+                            f'Data filter type "{ftype}" is not an available option.',
+                            True,
+                        )
 
     return globals.dataset
 

@@ -22,6 +22,7 @@ or two basic scripts on your own, along the lines described in the
 -  `Quote Marks in Text`_
 -  `Properties and Short-cuts`_
 -  `Lists`_
+-  `Reusable Script`_
 -  `Errors`_
 
 .. _names-concept:
@@ -84,8 +85,11 @@ There are not many constants in **protograf** but two that are useful are:
 - ``YES`` which is a synonym for ``True``
 - ``NO``  which is a synonym for ``False``
 
-(``True`` and ``False`` are often used to enable/disable various **protograf**
-properties.)
+.. HINT::
+
+    ``True`` and ``False`` are often used to enable/disable various
+    **protograf** properties; but ``YES`` and ``NO`` can be used as
+    substitutes if that is clearer for you.
 
 Any constants that are available will be written in capital letters, following
 the convention established for Python.
@@ -117,6 +121,9 @@ Booleans are commonly referred to a "true" or "false" values. In Python, the
 reserved names ``True`` and ``False`` can be used whenever such values are
 required.  Some of the properties for some commands require a ``True`` value
 to be set before they are activated.
+
+Text and numbers are often grouped into `Lists`_ and this is an important
+concept to understand.
 
 
 .. _assigned-names-concept:
@@ -168,7 +175,7 @@ will create and draw a ``Rectangle`` shape on the page; but:
 
 will create a ``Rectangle`` shape, and assign a reference to it in the
 property named ``area`` |dash| for use later on in the script |dash| but
-will **not** draw the Rectangle on the page.
+will **not** draw the Rectangle on the page at this point in the script.
 
 
 .. _calculation-concept:
@@ -345,6 +352,31 @@ shorthand reference name |dash| in this case ``groceries``. There are various
 examples of the use of lists of elsewhere in these documents and also in
 the script examples.
 
+
+.. _reusable-script:
+
+Reusable Script
+===============
+`↑ <table-of-contents-addcon_>`_
+
+It could be that you need to share snippets or sections of code between
+different scripts.  In this case, these can be added to a common script
+and then **imported** (in a similar way to how  **protograf** itself is
+imported) for use.
+
+For example, in a script called ``mystuff.py`` you could have:
+
+.. code:: python
+
+   groceries = ['apples', 'oranges', 'bananas', 'plums']
+
+And then in another script, in the same directory, you could use this:
+
+.. code:: python
+
+   from mystuff import groceries
+
+
 .. _script-errors:
 
 Errors
@@ -367,9 +399,9 @@ been assigned to properties; so:
 will cause this error when the script is run::
 
     FEEDBACK:: The "a" is not a valid float number!
-    FEEDBACK:: Could not continue with program.
+    FEEDBACK:: Could not continue with script.
 
-because the ``height`` is meant to be a number, not text.
+because the ``height`` property is meant to be assigned a number, not text.
 
 In some cases, instructions will **not** cause an error, but they will simply
 be ignored, for example:
@@ -378,10 +410,10 @@ be ignored, for example:
 
     Rectangle(corner="a")
 
-will still draw a ``Rectangle``; the meaning of ``corner`` is unknown so it will
-simply be skipped.
+will still draw a ``Rectangle``; the meaning of ``corner`` is unknown and so
+it will simply be skipped.
 
-This next error is a simple one but possible hard to "see" why:
+This next error is a simple one but possibly quite hard to "see" why:
 
 .. code:: python
 
@@ -393,7 +425,7 @@ This next error is a simple one but possible hard to "see" why:
 The reason for it is the extra ``,`` at the end of the first line; Python will
 "automagically" turn this into a set of numbers |dash| in this case a set with
 only a single value.  The rest of the script is expecting to work with a
-normal number and so it display this error.
+normal number and so it displays this error.
 
 
 Python-specific Errors
@@ -407,11 +439,11 @@ Python-specific Errors
                  ^^^
    SyntaxError: keyword argument repeated: x
 
-Python attempts to identify the type and location of the error - a
-``SyntaxError`` is just a grammar error of some type - as well as what
+Python attempts to identify the type and location of the error |dash| a
+``SyntaxError`` is just a grammar error of some type |dash| as well as what
 the cause *might* be. Here, it found that you have used the property ``x``
-twice, so in this case you might need to change the second one to ``x1`` --
-which  is probably the intended one:
+twice, so in this case you might need to change the second one to ``x1``
+which is probably what was intended in this example:
 
 .. code:: python
 
@@ -427,8 +459,9 @@ Another example:
 
 In this case, the script uses the name of something - ``bred`` - which
 is unknown. It could be a simple spelling mistake e.g. here it should be
-``"red"`` *or* possibly you'd meant to assign the word ``bred`` to a
-particular customised color before using it for the ``Rectangle``:
+perhaps be ``"red"`` *or*, possibly, you'd meant to assign the term
+``bred`` to a customised color value before using it for the ``Rectangle``,
+for example:
 
 .. code:: python
 
@@ -446,7 +479,7 @@ Another example:
 Another ``SyntaxError`` where Python tries to assess what the cause
 might be. Here, you'd need to add a ``,`` (comma) at the end of setting the
 ``paper="A8"`` property as each property in the list **must** be comma-separated
-(a space is not sufficient) as follows:
+|dash| a space is not sufficient |dash| as follows:
 
 .. code:: python
 
@@ -457,5 +490,5 @@ might be. Here, you'd need to add a ``,`` (comma) at the end of setting the
 
   Needless to say, many articles and book chapters have been devoted to how
   one goes about finding problems or errors - one example is:
-  http://greenteapress.com/thinkpython/html/thinkpython002.html#toc6 (and there
-  are other chapters in this same book that may also be of help).
+  http://greenteapress.com/thinkpython/html/thinkpython002.html#toc6 |dash|
+  there are other chapters in this same book that may also be of help!

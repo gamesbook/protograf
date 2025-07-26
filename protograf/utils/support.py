@@ -590,17 +590,19 @@ def pdf_cards_to_png(
     _filename = os.path.basename(output)
     _source = os.path.basename(source_file)
     basename = os.path.splitext(_filename)[0]
-    dirname = directory or os.path.dirname(output)
-    if os.path.exists(source_file):
-        pdf_filename = source_file
-        dirname = os.path.dirname(source_file)
-    else:
-        pdf_filename = os.path.join(dirname, _source)
     # validate directory
+    dirname = directory or os.path.dirname(output)
     if not os.path.exists(dirname):
         feedback(
-            f'Cannot find the directory "{dirname}" - please create this first.', True
+            f'Cannot locate the directory "{dirname}" - please create this first.', True
         )
+    # set PDF filename
+    pdf_filename = os.path.join(dirname, _source)
+    if os.path.exists(pdf_filename):
+        dirname = os.path.dirname(pdf_filename)
+    else:
+        pdf_filename = source_file
+        dirname = os.path.dirname(source_file)
     try:
         doc = pymupdf.open(pdf_filename)
         page_num = 0

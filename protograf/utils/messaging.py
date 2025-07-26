@@ -22,6 +22,6 @@ def feedback(item, stop=False, warn=False):
         console.print("[bold green]FEEDBACK::[/bold green] %s" % item)
     if stop:
         console.print(
-            "[bold red]FEEDBACK::[/bold red] Could not continue with program.\n"
+            "[bold red]FEEDBACK::[/bold red] Could not continue with script.\n"
         )
         quit()

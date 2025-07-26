@@ -475,7 +475,7 @@ the ``y`` location a value of ``a`` instead of a number. The script will
 stop at this point and give you a feedback message::
 
     FEEDBACK:: The "a" is not a valid float number!
-    FEEDBACK:: Could not continue with program.
+    FEEDBACK:: Could not continue with script.
 
 Supplying the script a **property that does not exist**, for example,
 using ``u=2.0`` when you meant to say ``y=2.0``. This can happen

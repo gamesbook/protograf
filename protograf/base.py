@@ -2432,7 +2432,7 @@ class BaseShape:
                         False,
                     )
                     feedback(
-                        "Check that Data command is used before Deck command.",
+                        "Check that Data command is used and has valid data before Deck command is called.",
                         True,
                     )
                 record = self.deck_data[ID]
@@ -2452,7 +2452,7 @@ class BaseShape:
                         False,
                     )
                     feedback(
-                        "Check that Data command is used before Deck command.",
+                        "Check that Data command is used and has valid data before Deck command is called.",
                         True,
                     )
                 record = self.deck_data[ID]
