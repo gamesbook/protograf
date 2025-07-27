@@ -77,11 +77,13 @@ def load_data(datasource=None, **kwargs):
     log.debug("Load data from a 'tabular' source (CSV, XLS) %s", datasource)
     if datasource:
         filename, file_ext = os.path.splitext(datasource)
-        if file_ext.lower() == ".csv":
+        if not filename:
+            feedback("Unable to process a file without valid filename!", True)
+        if file_ext and _lower(file_ext) == ".csv":
             headers = kwargs.get("headers", None)
             selected = kwargs.get("selected", None)
             dataset = open_csv(datasource, headers=headers, selected=selected)
-        elif file_ext.lower() in [".xls", ".xlsx"]:
+        elif file_ext and _lower(file_ext) in [".xls", ".xlsx"]:
             headers = kwargs.get("headers", None)
             selected = kwargs.get("selected", None)
             sheet = kwargs.get("sheet", 0)
@@ -744,8 +746,6 @@ def open_excel(filename, sheet=0, sheetname=None, cells=None, headers=None):
     if not filename:
         feedback("A valid Excel filename must be supplied!")
 
-    dict_list = []
-
     _file_with_path = None
     norm_filename = os.path.normpath(filename)
     if not os.path.exists(norm_filename):
@@ -753,6 +753,8 @@ def open_excel(filename, sheet=0, sheetname=None, cells=None, headers=None):
         _file_with_path = os.path.join(filepath, norm_filename)
         if not os.path.exists(_file_with_path):
             feedback(f'Unable to find "{filename}", including in {filepath}')
+    else:
+        _file_with_path = norm_filename  # in same dir as script!
 
     if sheet is None and sheetname is None:
         feedback(
@@ -1890,6 +1892,21 @@ def paper_size(paper_size: str = None, units: str = "pt") -> tuple:
         return PAPER_SIZES[paper_size][units]
     except KeyError:
         feedback(f'Paper size "{paper_size}" in "{units}" is unavailable.', True)
+
+
+def uniques(key: str) -> list:
+    """Unique values in a Data() dataset i.e. a list of equivalent dicts.
+
+    Args:
+        key (str): a key in each dict in the list of dicts
+    """
+    if not key:
+        return []
+    unique_values = set()
+    for d in globals.dataset:
+        if key in d:
+            unique_values.add(d[key])
+    return unique_values
 
 
 if __name__ == "__main__":

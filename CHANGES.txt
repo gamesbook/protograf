@@ -1,6 +1,15 @@
 protograf Changes
 =================
 
+2025-07-27 (0.2.12)
+-------------------
+- Patch bug with displaying 0 for a text value
+- Patch bug with setting filename with a predefined directory
+- Patch bug with Card function handling of a non-list return
+- Add uniques function to extract Deck values
+- Enable multiple Decks from a single set of Data
+- Add filters to Deck
+
 2025-07-25 (0.2.11)
 -------------------
 - Add zones property to Card (including page)
