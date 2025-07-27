@@ -457,7 +457,17 @@ class CardShape(BaseShape):
                         card_values_tuple = namedtuple("Data", card_values.keys())(
                             **card_values
                         )
-                        new_eles = new_ele(card_values_tuple) or []
+                        _one_or_more_eles = new_ele(card_values_tuple) or []
+                        if isinstance(_one_or_more_eles, list):
+                            new_eles = _one_or_more_eles
+                        else:
+                            new_eles = (
+                                [
+                                    _one_or_more_eles,
+                                ]
+                                if _one_or_more_eles
+                                else []
+                            )
                         # print(f'{card_values_tuple=} {new_eles=}')
                         self.draw_new_elements(
                             new_ele,
@@ -1997,21 +2007,22 @@ def Data(**kwargs):
         randomly assigned by Google to your Google Sheet
       - *sheetname* - the name of the tab in the Google Sheet housing your data
     - matrix (str): refers to the name assigned to the ``Matrix`` being used
-    - images (str): refers to the directory in which the cards' images are located;
-      if a full path is not given, its assumed to be directly under the one in which
-      the script is located
-    - images_list (list): is used in conjunction with *images* to provide a list of
-      file extensions that filter which type of files will be loaded from the
-      directory e.g. ``.png`` or ``.jpg``; this is important to set if the
-      directory contains files of a type that are not, or cannot be, used
-    - data_list (str): refers to the name assigned to the "list of lists" being used;
-      this property is also used when linked to data being sourced from the
-      BoardGameGeek API
+    - images (str): refers to the directory in which the cards' images are
+      located;  if a full path is not given, its assumed to be directly under
+      the one in which the script is located
+    - images_list (list): is used in conjunction with *images* to provide a
+      list of file extensions that filter which type of files will be loaded
+      from the directory e.g. ``.png`` or ``.jpg``; this is important to set if
+      the directory contains files of a type that are not, or cannot be, used
+    - data_list (str): refers to the name assigned to the "list of lists" being
+      used; this property is also used when linked to data being sourced from
+      the BoardGameGeek API
     - extra (int): if additional cards need to be manually created for a Deck,
       that are *not* part of the data source, then the number of those cards
       can be specified here.
-    - filters (list): a list of ('key', 'value') items on which the data must be
-      filtered
+    - filters (list): a list of ('key', 'value', 'type') items on which the
+      data must be filtered; 'type' is optional and defaults to '='
+    - randoms: a number of records to be randomly selected from the data
     """
     validate_globals()
 
@@ -2024,7 +2035,8 @@ def Data(**kwargs):
     source = kwargs.get("source", None)  # dict
     google_sheet = kwargs.get("google_sheet", None)  # Google Sheet
     debug = kwargs.get("debug", False)
-    filters = kwargs.get("filters", None)  # directory
+    filters = kwargs.get("filters", None)
+    randoms = kwargs.get("randoms", None)
     # extra cards added to deck (handle special cases not in the dataset)
     globals.deck_settings["extra"] = tools.as_int(kwargs.get("extra", 0), "extra")
     try:
@@ -2118,7 +2130,7 @@ def Data(**kwargs):
         else:
             print("No {globals.dataset_type} data was loaded!")
 
-    # ---- FILTERS
+    # ---- filters
     if filters:
         if not isinstance(filters, list):
             feedback(
@@ -2150,11 +2162,26 @@ def Data(**kwargs):
                         globals.dataset = [
                             d for d in globals.dataset if d[key] != value
                         ]
+                    case "=" | "==" | "equals" | "equal to" | "eq":
+                        globals.dataset = [
+                            d for d in globals.dataset if d[key] != value
+                        ]
+                    case "~" | "in" | "is in" | "contains":
+                        globals.dataset = [
+                            d for d in globals.dataset if value in d[key]
+                        ]
                     case _:
                         feedback(
                             f'Data filter type "{ftype}" is not an available option.',
                             True,
                         )
+    # ---- randoms
+    if randoms:
+        if not isinstance(randoms, int):
+            feedback("Data() randoms must be a single integer.", True)
+        records = random.sample(range(0, len(globals.dataset)), randoms)
+        _dataset = [globals.dataset[r] for r in records]
+        globals.dataset = _dataset
 
     return globals.dataset
 

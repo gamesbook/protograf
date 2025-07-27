@@ -2066,7 +2066,7 @@ class BaseShape:
         """
         ttext = self.textify(index=ID, text=self.heading, default=False)
         _rotation = rotation or self.heading_rotation
-        if ttext:
+        if ttext is not None or ttext != "":
             _ttext = str(ttext)
             y_off = y_offset or self.title_size / 2.0
             y = yh + self.unit(self.heading_my)
@@ -2113,7 +2113,7 @@ class BaseShape:
         """
         ttext = self.textify(index=ID, text=self.label, default=False)
         _rotation = rotation or self.label_rotation
-        if ttext:
+        if ttext is not None or ttext != "":
             _ttext = str(ttext)
             yl = yl + (self.label_size / 3.0) if centred else yl
             y = yl + self.unit(self.label_my)
@@ -2154,7 +2154,7 @@ class BaseShape:
         """
         ttext = self.textify(index=ID, text=self.title, default=False)
         _rotation = rotation or self.title_rotation
-        if ttext:
+        if ttext is not None or ttext != "":
             _ttext = str(ttext)
             y_off = y_offset or self.title_size
             y = yt + self.unit(self.title_my)
@@ -2203,7 +2203,7 @@ class BaseShape:
             return
         ttext = self.textify(index=ID, text=self.radii_label, default=False)
         _rotation = rotation or self.radii_labels_rotation
-        if ttext:
+        if ttext is not None or ttext != "":
             _ttext = str(ttext)
             yl = yl - (self.radii_labels_size / 3.0) if centred else yl
             y = yl + self.unit(self.radii_labels_my)

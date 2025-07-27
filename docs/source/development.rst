@@ -114,8 +114,8 @@ Follow this process:
 - |check| Finalise release date and notes in ``CHANGES.txt``
 - |check| Ensure all the examples can be run by using a shell script
 - |check| Update the ``examples.zip`` file with latest example code
-- |check| Update the version using poetry e.g. ``poetry version patch``
 - |check| Update the ``release`` in ``docs/source/conf.py``
+- |check| Update the version using poetry e.g. ``poetry version patch``
 - |check| Commit and push all these changes to GitHub
 - |check| Add a tag that matches the poetry version e.g. ``git tag 0.1.2``
 - |check| Push tag to GitHub i.e. ``git push origin --tags``

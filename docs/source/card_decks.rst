@@ -32,6 +32,7 @@ and that you've created some basic scripts of your own using the
   - `Data Example 5. Lists`_
   - `Data Example 6. Google Sheets`_
   - `Data Example 7. BoardGameGeek API`_
+  - `Data Example 8. Filters`_
 - `The Matrix Command`_
 - `Countersheet and Counter Commands`_
 - `Supporting Commands`_
@@ -408,7 +409,7 @@ Data Properties
 ---------------
 `↑ <table-of-contents-crddk_>`_
 
-The other property that can be used for the ``Data`` command is:
+The other properties that can be used for the ``Data`` command are:
 
 - **extra** - if additional cards need to be manually created for a Deck,
   that are *not* part of the data source, then the number of those cards
@@ -416,6 +417,10 @@ The other property that can be used for the ``Data`` command is:
   :ref:`standard playing cards <standard-playing-cards>`
   example, where the primary cards are created through `the Matrix Command`_
   and the two Jokers are the "extras".
+- **randoms** - if you want to create a subset of the full set of data, then
+  supply a whole number indicating how many random records should be created
+- **filters** - a list of ``(key, value, type)`` filter on which the data
+  must be filtered - see `Data Example 8. Filters`_
 
 .. _deck-data-csv:
 
@@ -557,6 +562,39 @@ There are three properties needed to gain access to data from a Google Sheet:
   assigned by Google to your Google Sheet
 - *sheetname* - the name of the tab in the Google Sheet housing your data
 
+
+.. _deck-data-bgg:
+
+Data Example 7. BoardGameGeek API
+---------------------------------
+`↑ <table-of-contents-crddk_>`_
+
+This example shows how data is loaded for boardgame details obtained from the
+:ref:`BoardGameGeek API <the-bgg-command>`.
+
+.. code:: python
+
+    boardgames = BGG(ids=[1, 2, 3], progress=True)
+    Data(data_list=boardgames.data_list)
+
+If access to the BoardGameGeek API works, then it returns the game data
+|dash| in this case games with ID's ``1``, ``2``, and ``3`` |dash|
+and these data are assigned to the name ``boardgames``.
+
+The ``data_list`` required for Data can be obtained from the stored set of
+games  |dash| in this case ``boardgames`` |dash| by appending the term
+``.data_list`` to it.
+
+The game information can then be used as it would for other data sources.
+
+A collection of games, linked to a BoardGameGeek user, can also be retrieved
+by supplying their username, for example:
+
+.. code:: python
+
+    boardgames = BGG(user='BenKenobi1976', progress=True)
+    Data(data_list=boardgames.data_list)
+
 The API Key
 +++++++++++
 
@@ -615,37 +653,77 @@ and its developers!
     be aware of what your usage rights and limits are!
 
 
-.. _deck-data-bgg:
+.. _deck-data-filters:
 
-Data Example 7. BoardGameGeek API
----------------------------------
+Data Example 8. Filters
+-----------------------
 `↑ <table-of-contents-crddk_>`_
 
-This example shows how data is loaded for boardgame details obtained from the
-:ref:`BoardGameGeek API <the-bgg-command>`.
+This example shows how data, in this case sourced from a "list of lists"
+|dash| but note that filters can be applied to *any* data source |dash|,
+can be filtered.
 
-.. code:: python
+    .. code:: python
 
-    boardgames = BGG(ids=[1, 2, 3], progress=True)
-    Data(data_list=boardgames.data_list)
+        lotr = [
+            ['ID', 'Name', 'Age', 'Race', 'Stage'],
+            [2, "Legolas", 656, "Elf", 3],
+            [1, "Galadriel", 8372, "Elf", 3],
+            [3, "Aragorn", 88, "Human", 2],
+            [10, "Barliman", 62, "Human", 2],
+            [4, "Frodo", 51, "Hobbit", 1],
+            [5, "Pippin", 29, "Hobbit", 2],
+            [6, "Merry", 37, "Hobbit", 2],
+            [7, "Samwise", 39, "Hobbit", 1],
+            [8, "Boromir", 41, "Human", 3],
+            [9, "Arwen", 2778, "Elf", 2],]
 
-If access to the BoardGameGeek API works, then it returns the game data
-|dash| in this case games with ID's ``1``, ``2``, and ``3`` |dash|
-and these data are assigned to the name ``boardgames``.
+        Data(
+            data_list=lotr,
+            filters=[('Race', 'Elf'), ('Age', 700, '>')])
 
-The ``data_list`` required for Data can be obtained from the stored set of
-games  |dash| in this case ``boardgames`` |dash| by appending the term
-``.data_list`` to it.
 
-The game information can then be used as it would for other data sources.
+In this example, there are two filters.  One for "Race" and one for "Age".
 
-A collection of games, linked to a BoardGameGeek user, can also be retrieved
-by supplying their username, for example:
+The "Race" filter only has two values; the name of the column to which the
+filter is being applied, and the value being filtered on |dash| ``Elf``.
+This is the default filter which is an exact match.
 
-.. code:: python
+The "Age" filter has three values; the name of the column to which the
+filter is being applied; the value being filtered on |dash| ``700``; and
+the type of filter |dash| ``>`` or "greater than" which selects records
+with values for "Age" that exceed this number.
 
-    boardgames = BGG(user='BenKenobi1976', progress=True)
-    Data(data_list=boardgames.data_list)
+The outcome of these filters would be a dataset that looked like:
+
+    .. code:: python
+
+        lotr = [
+            ['ID', 'Name', 'Age', 'Race', 'Stage'],
+            [1, "Galadriel", 8372, "Elf", 3],
+            [9, "Arwen", 2778, "Elf", 2],]
+
+Filters are always applied in the order listed.
+
+Filter **types** |dash| the third option for each filter |dash| are
+listed below.
+
+- One of "<", "less than", "less", "fewer than", "fewer", "lt":
+  here the value in the record must be *less than* that supplied
+- One of ">", "greater than", "greater", "more than", "more", "gt":
+  here the value in the record must be *greater than* that supplied
+- One of "<>", "!=", "not equal", "not", "ne":
+  here the value in the record must be *not the same* as that supplied
+- One of "=", "==", "equals", "equal to", "eq":
+  here the value in the record must be *the same* as that supplied
+- One of "~", "in", "is in", "contains":
+  here the value in the record must contain, or be a *partial match*
+  to, that supplied
+
+Although far more comprehensive filtering could be developed, its probably
+best to do that in your original data source; tools like Excel or Open Office
+have very sophisticated options to filter and extract data.
+
 
 
 .. _the-matrix-command:
