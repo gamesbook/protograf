@@ -73,7 +73,8 @@ A Line has the following properties, in addition to the basic ones of
   the second is the length of the space between each dash
 - *length* - sets the specific size of the line; used in conjunction
   with *angle* (which defaults to 0 |deg|)
-- *rounded* - if ``True``, draw small semicircles at the ends of the line
+- *rounded* - if ``True``, draw small circles, centred at the ends of the line
+- *squared* - if ``True``, draw small squares, centred at the ends of the line
 - *stroke* - the color of the line
 - *stroke_width* - the thickness of the line, in points
 - *x1* and *y1* - a fixed endpoint for the line end (if not calculated by
@@ -117,24 +118,35 @@ Example 1. Dotted, Dashed and Angled Lines
             stroke_width=1.6, dotted=True,
             label="1.6", font_size=6)
 
-        # colored lines
+        # thick colored lines
         Line(
-            x=0, y=4, x1=4, y1=5,
+            x=1, y=1, stroke_width=10,
+            length=2, stroke="chartreuse",
+            )
+        Line(
+            x=1, y=1.5, stroke_width=10,
+            length=2, stroke="aqua",
+            rounded=True)
+        Line(
+            x=1, y=2, stroke_width=10,
+            length=2, stroke="gold",
+            squared=True)
+
+        # thin colored lines
+        Line(
+            x=0, y=4.5, x1=4, y1=5.5,
             stroke="blue", stroke_width=1,
             dashed=[0.2, 0.1],
             label="dashed:[0.2,0.1]", font_size=6)
         Line(
-            x=0, y=3,
+            x=0, y=3.6,
             length=4.1, angle=15,
             stroke="red",
             label="15", font_size=6)
         Line(
-            x=0, y=2, length=4,
-            stroke="gold", stroke_width=2)
-        Line(
-            x=1, y=1.5, length=2,
-            stroke="chartreuse", stroke_width=10,
-            rounded=True)
+            x=0, y=2.5, length=4,
+            stroke="pink", stroke_width=2)
+
 
       The various black lines have these properties:
 
@@ -143,32 +155,36 @@ Example 1. Dotted, Dashed and Angled Lines
       - *stroke_width* - set as value in points and labelled accordingly
       - *dotted* - has a value of ``True``
 
-      The dotted line is just a series of small lines i.e. the "dots",
-      followed by gaps, of sizes equal to the line's *stroke_width*.
+      The dotted line is just a series of small lines i.e. all of the "dots",
+      followed by gaps, are of sizes equal to the line's *stroke_width*.
 
       The thin red line has:
 
       - *angle* - of ``15`` |deg| from the baseline, clockwise
 
       The angle guides the direction in which the line is drawn; if not
-      given |dash| as in the case of the thick green line |dash| this
+      given |dash| as in the case of most of the other lines |dash| this
       will be 0 |deg|. The line length is then calculated based on these
       points.
 
-      The thick green, thick gold and thin red lines all have:
+      The green, gold, pink, red and aqua lines all have:
 
       - *x* and *y* set as their starting point
       - *length* - sets the specific size of the line
 
-      The thick green line and the thick gold line do **not** have
+      The thick green, gold, aqua and pink lines do **not** have
       any *angle* property; this defaults to 0 |deg| which means the
       line is drawn to the "east" (or right of the start).
 
+      The thick aqua line has:
+
+      - *rounded* set to ``True`` so circles are drawn at line end centres
+
       The thick gold line has:
 
-      - *rounded* set to ``True`` so semi-circles are drawn at line ends
+      - *squared* set to ``True`` so squares are drawn at line end centres
 
-      The medium blue line has:
+      The dark blue line has:
 
       - *dashed* - length of ``2`` mm and spacing of ``1`` mm
       - *x1* and *y1* set as the ending point
@@ -403,7 +419,6 @@ The following properties can be set:
       positions.
 
 ===== ======
-
 
 
 .. _rectangleIndex:

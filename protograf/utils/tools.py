@@ -1704,7 +1704,11 @@ def get_pymupdf_props(
         opacity = 1 - _transparency
     stroke_width = kwargs.get("stroke_width", None)
     # stroke_cap = 1 if kwargs.get("stroke_cap", False) else 0  # rounded end line
-    stroke_cap = 1 if kwargs.get("rounded", False) else 0  # rounded end line
+    stroke_cap = 0
+    if kwargs.get("rounded", False):
+        stroke_cap = 1  # rounded end line
+    if kwargs.get("squared", False):
+        stroke_cap = 2  # semi-square; edge length of line width & center at line end
     dotted = kwargs.get("dotted", None)
     dashed = kwargs.get("dashed", None)
     _rotation = kwargs.get("rotation", None)  # calling Shape must set a tuple!
