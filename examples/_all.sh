@@ -72,6 +72,7 @@ python cards/cards_rectangular.py -d /tmp/demo
 python cards/cards_images.py -d /tmp/demo
 python cards/cards_matrix_one.py -d /tmp/demo
 python cards/cards_matrix_two.py -d /tmp/demo
+python cards/cards_multideck.py -d /tmp/demo
 python cards/cards_standard.py -d /tmp/demo
 # ---- play_money
 echo -e "\nCreating play money..."
