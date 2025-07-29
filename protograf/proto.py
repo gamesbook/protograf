@@ -91,6 +91,7 @@ from protograf.utils.constants import (
     GRID_SHAPES_NO_CENTRE,
     SHAPES_FOR_TRACK,
 )
+from protograf.utils.docstrings import (docstring_base, docstring_card)
 from protograf.utils.fonts import builtin_font, FontInterface
 from protograf.utils.geoms import equilateral_height  # used in scripts
 from protograf.utils.messaging import feedback
@@ -1427,6 +1428,13 @@ def Header(**kwargs):
 
 
 def PageBreak(**kwargs):
+    """Start a new page in the output PDF.
+
+    Kwargs:
+
+    - footer (bool): whether a Footer objetct should be drawn before starting next page
+
+    """
     validate_globals()
 
     globals.canvas.commit()  # add all drawings (to current pymupdf Shape/"canvas")
@@ -1594,7 +1602,17 @@ def save(**kwargs):
 
 
 def margins(**kwargs):
-    """Add margins to a set of kwargs, if not present."""
+    """Add margins, based on globals settings to a set of kwargs, if not present.
+
+    Kwargs:
+
+    - margin (float): default size of every margin on the page
+    - margin_left (float): size of left margin on the page
+    - margin_top (float): size of top margin on the page
+    - margin_bottom (float): size of bottom margin on the page
+    - margin_right (float): size of right margin on the page
+
+    """
     validate_globals()
 
     kwargs["margin"] = kwargs.get("margin", globals.margins.margin)
@@ -1606,6 +1624,19 @@ def margins(**kwargs):
 
 
 def Font(name=None, **kwargs):
+    """Set the Font for all subsequent text in the output PDF.
+
+    Args:
+
+    - name (str): the name of the Font
+
+    Kwargs:
+
+    - size (float): the point size of the Font; default is 12
+    - stroke (str): the named or hexadecimal color of the Font; default is "black"
+    - style (str): the style, if available, for the Font e.g. "bold", "italic"
+
+    """
     validate_globals()
     _name, _path, _file = tools.get_font_file(name)
     globals.base.font_name = _name or DEFAULT_FONT
@@ -1619,10 +1650,12 @@ def Font(name=None, **kwargs):
 
 
 def Version():
+    """Display the version information."""
     feedback(f"Running protograf version {__version__}.")
 
 
 def Feedback(msg):
+    """Use the feedback() function to display a feedback message."""
     feedback(msg)
 
 
@@ -1630,10 +1663,11 @@ def Today(details: str = "datetime", style: str = "iso", formatted: str = None) 
     """Return string-formatted current date / datetime in a pre-defined style
 
     Args:
-        details (str): what part of the datetime to format
-        style (str): usa, eur (european), or iso - default
-        formatted (str): formatting string following Python conventions;
-            https://docs.python.org/3/library/datetime.html#strftime-and-strptime-behavior
+
+    - details (str): what part of the datetime to format
+    - style (str): usa, eur (european), or iso - default
+    - formatted (str): formatting string following Python conventions;
+      https://docs.python.org/3/library/datetime.html#strftime-and-strptime-behavior
     """
     current = datetime.now()
     if formatted:
@@ -1675,8 +1709,15 @@ def Today(details: str = "datetime", style: str = "iso", formatted: str = None) 
     return current.isoformat(timespec="seconds")  # ISO
 
 
-def Random(end: int = 1, start: int = 0, decimals: int = 2):
-    """Return a random number, in a range (`start` to `end`), rounded to `decimals`."""
+def Random(end: int = 1, start: int = 0, decimals: int = 2) -> float:
+    """Return a random number, in a range, with decimal rounding.
+
+    Args:
+
+    - end (int): maximum last value in the range; defaults to 1
+    - start (int): minimum first value in the range; defaults to 0
+    - decimals (int): formatting of decimal number being returned; defaults to 2
+    """
     rrr = random.random() * end + start
     if decimals == 0:
         return int(rrr)
@@ -1687,13 +1728,21 @@ def Random(end: int = 1, start: int = 0, decimals: int = 2):
 
 
 def Matrix(labels: list = None, data: list = None) -> list:
-    """Return list of dicts; each element is a unique combo of all the items in `data`"""
+    """Return list of dicts; each element is a unique combo of all the items in `data`
+
+    Args:
+
+    - labels (list): a list of strings representing key names
+    - data (list):  a list of lists; each nested list contains one or more string or
+      numbers representing a set of common attributes e.g. card suits
+
+    """
     if data is None:
         return []
     combos = list(itertools.product(*data))
     # check labels
     data_length = len(combos[0])
-    if labels == []:
+    if labels == [] or labels is None:
         labels = [f"VALUE{item+1}" for item in range(0, data_length)]
     else:
         if len(labels) != data_length:
@@ -1709,8 +1758,12 @@ def Matrix(labels: list = None, data: list = None) -> list:
     return result
 
 
+@docstring_card
 def Card(sequence: object = None, *elements, **kwargs):
     """Add one or more elements to a card or cards.
+
+    Args:
+    <card>
 
     NOTE: A Card receives its `draw()` command via Save()!
     """
@@ -1793,8 +1846,12 @@ def Card(sequence: object = None, *elements, **kwargs):
             feedback(f'Cannot find card#{_card}. (Check "cards" setting in Deck)')
 
 
+@docstring_card
 def CardBack(sequence: object = None, *elements, **kwargs):
     """Add one or more elements to the back of a card or cards.
+
+    Args:
+    <card>
 
     NOTE: A CardBack receives its `draw()` command via Save()!
     """
@@ -1872,16 +1929,24 @@ def CardBack(sequence: object = None, *elements, **kwargs):
             feedback(f'Cannot find cardback#{_back}. (Check "cards" setting in Deck)')
 
 
+@docstring_card
 def Counter(sequence, *elements, **kwargs):
     """Add one or more elements to a counter or counters.
+
+    Args:
+    <card>
 
     NOTE: A Counter receives its `draw()` command via Save()!
     """
     Card(sequence, *elements, **kwargs)
 
 
+@docstring_card
 def CounterBack(sequence, *elements, **kwargs):
-    """Add one or more elements to a counter or counters.
+    """Add one or more elements to the back of a counter or counters.
+
+    Args:
+    <card>
 
     NOTE: A CounterBack receives its `draw()` command via Save()!
     """
@@ -1893,66 +1958,66 @@ def Deck(**kwargs):
 
     Kwargs (optional):
 
-    - bleed_fill: background color for the page (up to the margins);
+    - bleed_fill (str): background color for the page (up to the margins);
       if no separate **fill** property is set, then this color is used instead
-    - cards: the number of cards appearing in the deck; defaults to 9
+    - cards (int): the number of cards appearing in the deck; defaults to 9
       Note that other objects such as Data() and Matrix() can alter this value
-    - card_size: a pre-existing card size used to set *width* and *height*
+    - card_size (str): a pre-existing card size used to set *width* and *height*
       (if values for *width* and *height* are set, they will override this);
       can be one of: ``poker``, ``bridge``, ``tarot``, ``business``, ``mini``,
       ``skat``, ``mini``, ``minieuropean``, ``miniamerican``
-    - cols: maximum number of card columns that should appear on a page
-    - copy: the name of a column in the dataset defined by Data() that
+    - cols (int): maximum number of card columns that should appear on a page
+    - copy (str): the name of a column in the dataset defined by Data() that
       specifies how many copies of a card are needed
-    - fill: color of the card's area; defaults to ``white``
-    - frame: the default card frame is a *rectangle* (or square, if the
+    - fill (str): color of the card's area; defaults to ``white``
+    - frame (str): the default card frame is a *rectangle* (or square, if the
       height and width match); but can be set to *hexagon* or *circle*
-    - grid_marks: if set to ``True``, will cause small marks to be drawn at
+    - grid_marks (bool): if set to ``True``, will cause small marks to be drawn at
       the border of the page that align with the edges of the card frames
-    - grid_marks_length: the length of the *grid_marks*; defaults to ``0.85`` cm
-    - grid_marks_stroke: line color of the *grid_marks*; defaults to ``grey``
-    - grid_marks_stroke_width: line width of the *grid_marks*; defaults to 0.1
-    - grouping: number of cards to be drawn adjacent to each other
+    - grid_marks_length (float): the length of the *grid_marks*; defaults to ``0.85`` cm
+    - grid_marks_stroke (str): line color of the *grid_marks*; defaults to ``grey``
+    - grid_marks_stroke_width (float): line width of the *grid_marks*; defaults to 0.1
+    - grouping (int): number of cards to be drawn adjacent to each other
       before a blank space is added by the **spacing** property (note that
       **grouping** does not apply to  *hexagon* **frame** cards)
       (about one-third of an inch)
-    - grouping_col: number of cards to be drawn adjacent to each other
+    - grouping_col (int): number of cards to be drawn adjacent to each other
       in a horizontal direction before a blank space is added by the **spacing**
-    - grouping_row: number of cards to be drawn adjacent to each other
+    - grouping_row (int): number of cards to be drawn adjacent to each other
       in a vertical direction before a blank space is added by the **spacing**
-    - gutter: a value set for this helps determines the spacing between the
+    - gutter (float): a value set for this helps determines the spacing between the
       fronts and backs of cards when these are drawn on two halves of the same
       page; its value is divided in half, and added to the top margin value, and
       each set of cards is drawn that distance away from the centre line of the page
-    - gutter_stroke: if set, will cause a line of that color to be used
+    - gutter_stroke (str): if set, will cause a line of that color to be used
       for the *gutter* line; this defaults to ``gray`` (to match grid marks)
-    - gutter_stroke_width: if set to a value, will cause a line of that
+    - gutter_stroke_width (float): if set to a value, will cause a line of that
       thickness to be used for the *gutter* line
-    - gutter_dotted: sets the style of the *gutter* line
-    - gutter_layout: sets the orientation of the page for the cards drawn in
+    - gutter_dotted (bool): sets the style of the *gutter* line
+    - gutter_layout (str): sets the orientation of the page for the cards drawn in
       the two gutter "halves"; this can be ``portrait`` (the default) or
       ``landscape``` (the latter is useful when you have very tall cards e.g.
       ``tarot`` sized ones)
-    - height: card height for a *rectangular* card; defaults to 8.89 cm
-    - mask: an expression which should evaluate to ``True`` or ``False``.
+    - height (float): card height for a *rectangular* card; defaults to 8.89 cm
+    - mask (str): an expression which should evaluate to ``True`` or ``False``.
       This expression has the same kind of syntax as T() and it uses data available
       from the Deck object's Data(). If the expression result is ``True``
       then any matching cards will be masked i.e. ignored and not drawn
-    - radius: radius for a card of type *hexagon* or *circle*; defaults to 2.54 cm
-    - rounding: size of rounding on each corner of a rectangular frame card
-    - rows: maximum number of card rows that should appear on a page
-    - spacing: size of blank space between each card or grouping in x- and y-direction
-    - spacing_x: size of blank space between each card or grouping in a
+    - radius (float): radius for a card of type *hexagon* or *circle*; defaults to 2.54 cm
+    - rounding: (float) size of rounding on each corner of a rectangular frame card
+    - rows (int): maximum number of card rows that should appear on a page
+    - spacing (float): size of blank space between each card or grouping in x- and y-direction
+    - spacing_x (float): size of blank space between each card or grouping in a
       horizontal direction
-    - spacing_y: size of blank space between each card or grouping in a
+    - spacing_y (float): size of blank space between each card or grouping in a
       vertical direction
-    - stroke: color of the card's border; defaults to ``black``
-    - width: card width for a *rectangular* card; defaults to ``6.35`` cm
-    - zones: list of tuples; each with page number(s) and a shape
+    - stroke (str): color of the card's border; defaults to ``black``
+    - width (float): card width for a *rectangular* card; defaults to ``6.35`` cm
+    - zones (list): list of tuples; each with page number(s) and a shape
 
     Notes:
 
-    - This function instantiates a DeckOfCards object; this object:
+    - This function instantiates the object; the object in turn:
 
         - receives its `draw()` command from Save()
         - draws any gutter lines (one per page)
@@ -1968,15 +2033,14 @@ def Deck(**kwargs):
 
 def CounterSheet(**kwargs):
     """Initialise a countersheet with all its settings, including source(s) of data.
-
-    NOTE: A CounterSheet (aka Deck) receives its `draw()` command from Save()!
     """
     kwargs["_is_countersheet"] = True
     Deck(**kwargs)
 
 
-def group(*args, **kwargs):
-
+def group(*args, **kwargs) -> GroupBase:
+    """Store a list of Shapes to be drawn by a Card-type object.
+    """
     gb = GroupBase(kwargs)
     for arg in args:
         gb.append(arg)
@@ -2187,17 +2251,16 @@ def Data(**kwargs):
 
 
 def S(test="", result=None, alternate=None):
-    """
-    Enable Selection of data from a dataset list
+    """Enable selection of data from a dataset list
 
-        test: str
-            boolean-type Jinja2 expression which can be evaluated to return True/False
-            e.g. {{ NAME == 'fred' }} gets the column "NAME" value from the dataset
-            and tests its equivalence to the value "fred"
-        result: str or element
-            returned if `test` evaluates to True
-        alternate: str or element
-            OPTIONAL; returned if `test` evaluates to False; if not supplied, then None
+    Args:
+
+    - test (str): a boolean-type Jinja2 expression which can be evaluated to return
+      True/False e.g. {{ NAME == 'fred' }} gets the column "NAME" value from the
+      dataset and tests its equivalence to the value "fred"
+    - result (str / element): returned if `test` evaluates to True
+    - alternate (str / element): OPTIONAL; returned if `test` evaluates to False;
+      if not supplied, then defaults to None
     """
 
     if globals.dataset and isinstance(globals.dataset, list):
@@ -2215,19 +2278,21 @@ def S(test="", result=None, alternate=None):
 def L(lookup: str, target: str, result: str, default: Any = "") -> LookupType:
     """Enable Lookup of data in a record of a dataset
 
-        lookup: str
-            the lookup column whose value must be used for the match ("source" record)
-        target: str
-            the name of the column of the data being searched ("target" record)
-        result: str
-            name of result column containing the data to be returned ("target" record)
-        default: Any
-            the data to be returned if NO match is made
+    Args:
 
-    In short:
-        lookup and target enable finding a matching record in the dataset;
-        the data in the 'result' column of that record is stored as an
-        `lookup: result` entry in the returned lookups dictionary of the LookupType
+    - lookup (str): lookup column whose value must be used for the match
+      ("source" record)
+    - target (str): name of the column of the data being searched ("target" record)
+    - result (str):  name of result column containing the data to be returned
+      ("target" record)
+    - default (Any):  the data to be returned if NO match is made
+
+    Notes:
+
+    The lookup and target enable finding a matching record in the dataset;
+    the data in the result column of that record is stored as an
+    `lookup: result` entry in the returned lookups dictionary of the LookupType
+
     """
     lookups = {}
     if globals.dataset and isinstance(globals.dataset, list):
@@ -2278,6 +2343,7 @@ def base_shape(source=None, **kwargs):
 
 
 def Common(source=None, **kwargs):
+    """Store properties that will be used by one or more other Shapes."""
     kwargs = margins(**kwargs)
     kwargs["source"] = source
     cshape = CommonShape(canvas=globals.canvas, **kwargs)
@@ -2436,25 +2502,19 @@ def hexagon(row=None, col=None, **kwargs):
     return HexShape(canvas=globals.canvas, **kwargs)
 
 
+@docstring_base
 def Line(row=None, col=None, **kwargs):
     """Draw a Line shape on the canvas.
 
     Kwargs:
-
+    <base>
     - angle (float): the number of degrees clockwise from the baseline; used in
       conjunction with *length*
     - cx and cy (floats): if set, will replace the use of *x* and *y* for the
       starting point, and work in conjunction with *angle* and *length* to
       create the line around a centre point
-    - dotted (bool): if ``True``, create a series of small lines i.e. the
-      "dots", followed by gaps, of sizes equal to the line's *stroke_width*
-    - dashed (list): a list of two floats: the first is the length of the dash;
-      the second is the length of the space between each dash
     - length (float): sets the specific size of the line; used in conjunction
       with *angle* (which defaults to 0 |deg|)
-    - rounded (bool): if ``True``, draw small semicircles at the ends of the line
-    - stroke (float): the color of the line
-    - stroke_width (str): the thickness of the line, in points
     - x1 and y1 (floats): a fixed endpoint for the line end (if not calculated by
       *angle* and *length*)
 
@@ -3916,7 +3976,7 @@ def named(variable):
 
 
 def A8BA():
-    """Shortcut to setup A8 page with Blueprint; use for examples."""
+    """Shortcut to setup an A8 page with a Blueprint; use for examples."""
     Create(
         paper="A8",
         margin_left=0.5,
@@ -3927,7 +3987,6 @@ def A8BA():
     )
     Blueprint(stroke_width=0.5)
 
-
 # ---- inherited docs ====
 
 
@@ -3935,3 +3994,7 @@ create.__doc__ = Create.__doc__
 save.__doc__ = Save.__doc__
 polyomino.__doc__ = Polyomino.__doc__
 DeckOfCards.__doc__ = Deck.__doc__
+page_break.__doc__ = PageBreak.__doc__
+CounterSheet.__doc__ = Deck.__doc__
+common.__doc__ = Common.__doc__
+line.__doc__ = Line.__doc__
