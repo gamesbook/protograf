@@ -132,13 +132,17 @@ class ImageShape(BaseShape):
                     f"Unable to load image - no name provided",
                     True,
                 )
+        # ---- centre
+        x_c = x + width / 2.0
+        y_c = y + height / 2.0
+        # ---- cross
+        self.draw_cross(cnv, x_c, y_c, rotation=kwargs.get("rotation"))
+        # ---- dot
+        self.draw_dot(cnv, x_c, y_c)
         # ---- text
-        xc = x + width / 2.0
-        yc = y + height / 2.0
-        _off = self.heading_size / 2.0
-        self.draw_heading(cnv, ID, xc, yc - height / 2.0 - _off, **kwargs)
-        self.draw_label(cnv, ID, xc, yc + _off, **kwargs)
-        self.draw_title(cnv, ID, xc, yc + height / 2.0 + _off * 3.5, **kwargs)
+        self.draw_heading(cnv, ID, x_c, y_c - height / 2.0, **kwargs)
+        self.draw_label(cnv, ID, x_c, y_c, **kwargs)
+        self.draw_title(cnv, ID, x_c, y_c + height / 2.0, **kwargs)
 
 
 class ArcShape(BaseShape):

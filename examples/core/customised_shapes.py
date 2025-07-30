@@ -727,6 +727,24 @@ Image("sholes_typewriter.png", sliced='b',
       width=3, height=1, x=1.25, y=5)
 PageBreak()
 
+# ---- image - label heading title
+Blueprint()
+Text(common=txt, text="Image: label, heading, title")
+Rectangle(width=2.26, height=2, x=1, y=0.5,
+          dotted=True, fill="silver")
+Image("sholes_typewriter.png",
+      width=2.26, height=2, x=1, y=0.5,
+      label="Label", label_stroke='red',
+      cross=True)
+Rectangle(width=2.26, height=2, x=1, y=3.5,
+          dotted=True, fill="silver")
+Image("sholes_typewriter.png",
+      width=2.26, height=2, x=1, y=3.5,
+      heading="Heading",
+      title="Title",
+      dot=0.1, dot_stroke='red')
+PageBreak()
+
 # ---- shape rotation
 Blueprint()
 Text(common=txt, text="Rotation (cross & label)")
@@ -828,7 +846,8 @@ Save(
         "arrow_sizes", "arrow_rotate", "arrowheads",
         "polyline_basic", "polyline_arrow",
         "shape_centred", "shape_centred_move", "shape_centred_custom",
-        "qr_code", "image_sliced",
+        "qr_code",
+        "image_sliced", "image_label",
         "shape_rotation", "shape_hatch_and_rotation",
         "table_defaults", "table_custom",
         None])
