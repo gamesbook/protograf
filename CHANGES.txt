@@ -5,6 +5,8 @@ protograf Changes
 -------------------
 - Add example for use of API to create Card Data
 - Add squared line ends
+- Add card_grid for Card shapes
+- Add docstrings for Shapes
 
 2025-07-27 (0.2.12)
 -------------------

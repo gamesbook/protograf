@@ -27,7 +27,7 @@ Example Usage:
 
 def docstring_base(func):
     func.__doc__ = func.__doc__.replace(
-        '<base>',
+        "<base>",
         """
     - x (float): The left-most edge of the shape; defaults to 1
     - y (float): The top-most edge of the shape; defaults to 1
@@ -40,14 +40,24 @@ def docstring_base(func):
     - dashed (list): a list of two floats: the first is the length of
       the dash; the second is the length of the space between each dash
     - rounded (bool): if True, draw small semicircles at the ends of the line
-    - squared (bool): if True, draw small squares, centred at the ends of the line"""
-     )
+    - squared (bool): if True, draw small squares, centred at the ends of the line""",
+    )
+    return func
+
+
+def docstring_loc(func):
+    func.__doc__ = func.__doc__.replace(
+        "<loc>",
+        """
+    - x (float): The left-most edge of the shape; defaults to 1
+    - y (float): The top-most edge of the shape; defaults to 1""",
+    )
     return func
 
 
 def docstring_card(func):
     func.__doc__ = func.__doc__.replace(
-        '<card>',
+        "<card>",
         """
     - The first argument must be an expression that can be evaulated to
       create a list of one or more numbers; e.g. "1-10", "1,3,5-10",
@@ -56,14 +66,29 @@ def docstring_card(func):
       - a Shape
       - a T() expression
       - a S() expression
-      - the name of a function that returns one or more Shapes"""
+      - the name of a function that returns one or more Shapes""",
     )
+    return func
 
 
 def docstring_area(func):
     func.__doc__ = func.__doc__.replace(
-        '<area>',
+        "<area>",
         """
      - fill (str): The named or hexadecimal color of shape's area;
-       defaults to ``white``."""
+       defaults to ``white``.""",
     )
+    return func
+
+
+def docstring_center(func):
+    func.__doc__ = func.__doc__.replace(
+        "<area>",
+        """
+     - cx (float): the centre position of the shape, relative to the left edge
+     - cy (float): the centre position of the shape, relative to the top edge
+     - rotation (float): the rotation of the shape in degrees, anti-clockwise
+       from the baseline
+    """,
+    )
+    return func
