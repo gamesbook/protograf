@@ -121,3 +121,30 @@ def docstring_center(func):
     """,
     )
     return func
+
+
+def docstring_onimo(func):
+    func.__doc__ = func.__doc__.replace(
+        "<onimo>",
+        """
+    - invert (str): can either be ``leftright`` (``lr``) or ``topbottom``
+      (``tb``) and will reverse the order of the numbers, either in a left-to-right
+      (numbers at the end of a row go to the start and vice-versa) or top-to-bottom
+      (rows at the end go to the start and vice-versa)
+    - flip (str): can either be ``north`` (``n``) or ``south`` (``s``) and
+      transposes rows and columns; effectively rotating the shape 90 degrees
+    - gap (float): the amount of space to leave between each row and each
+      column in the pattern
+    - outline (bool): along with *outline_stroke* and *outline_stroke_width*
+      is used to draw a line around the boundary of all connected squares in
+      the pattern |dash| it cannot be used in conjunction with a non-zero *gap*
+    - outline_stroke (str): color of boundary line around all connected squares
+    - outline_stroke_width (float): width of boundary line around all connected
+      squares
+    - fills (list): each square can be associated with a different fill color
+    - strokes (list): each square can be associated with a different stroke color
+    - labels (list): each square can be linked to a different label
+    - shapes (list): each square can be linked to a different centred shape
+    """,
+    )
+    return func

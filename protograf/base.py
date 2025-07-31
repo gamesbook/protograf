@@ -521,6 +521,10 @@ class BaseCanvas:
         self.density = self.defaults.get("density", 10)
         self.star_pattern = "random"
         self.seeding = self.defaults.get("seeding", None)
+        # ---- dice / domino
+        self.pip_stroke = self.defaults.get("pip_stroke", self.stroke)
+        self.pip_fill = self.defaults.get("pip_fill", self.stroke)  # see draw_piphead()
+        self.pip_fraction = self.defaults.get("pip_fraction", 0.2)
         # ---- mesh
         self.mesh = self.defaults.get("mesh", None)
         # ---- hatches
@@ -1021,6 +1025,12 @@ class BaseShape:
         self.density = self.kw_int(kwargs.get("density", base.density), "density")
         self.star_pattern = kwargs.get("star_pattern", base.star_pattern)
         self.seeding = kwargs.get("seeding", base.seeding)
+        # ---- dice / domino
+        self.pip_stroke = kwargs.get("pip_stroke", base.pip_stroke)
+        self.pip_fill = kwargs.get("pip_fill", base.pip_fill)
+        self.pip_fraction = self.kw_float(
+            kwargs.get("pip_fraction", base.pip_fraction), "pip_fraction"
+        )
         # ---- mesh
         self.mesh = kwargs.get("mesh", base.mesh)
         # ---- hatches

@@ -3234,8 +3234,9 @@ class RectangleShape(BaseShape):
         if self.use_abs_c:
             x = self._abs_cx - self._u.width / 2.0
             y = self._abs_cy - self._u.height / 2.0
-        x_d = x + self._u.width / 2.0  # centre
-        y_d = y + self._u.height / 2.0  # centre
+        # ---- calculate centre
+        x_d = x + self._u.width / 2.0
+        y_d = y + self._u.height / 2.0
         self.area = self.calculate_area()
         delta_m_up, delta_m_down = 0.0, 0.0  # potential text offset from chevron
         # ---- handle rotation
@@ -3516,7 +3517,7 @@ class RectangleShape(BaseShape):
             self.set_canvas_props(cnv=cnv, index=ID, **kwargs)
             self._debug(cnv, vertices=self.vertexes)
         else:
-            # feedback(f'*** RECT  normal')   )
+            # feedback(f'*** RECT  normal {radius=} {kwargs=}')
             cnv.draw_rect((x, y, x + self._u.width, y + self._u.height), radius=radius)
             self.set_canvas_props(cnv=cnv, index=ID, **kwargs)
             self._debug(cnv, vertices=self.vertexes)

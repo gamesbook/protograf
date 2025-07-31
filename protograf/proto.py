@@ -58,7 +58,13 @@ from .shapes import (
     TextShape,
     TrapezoidShape,
 )
-from .objects import PolyominoObject, PentominoObject, TetrominoObject, StarFieldObject
+from .objects import (
+    D6Object,
+    PolyominoObject,
+    PentominoObject,
+    TetrominoObject,
+    StarFieldObject,
+)
 from .layouts import (
     GridShape,
     DotGridShape,
@@ -91,11 +97,12 @@ from protograf.utils.constants import (
     SHAPES_FOR_TRACK,
 )
 from protograf.utils.docstrings import (
+    docstring_area,
     docstring_base,
     docstring_card,
     docstring_center,
     docstring_loc,
-    docstring_area,
+    docstring_onimo,
 )
 from protograf.utils.fonts import builtin_font, FontInterface
 from protograf.utils.geoms import equilateral_height  # used in scripts
@@ -3082,7 +3089,7 @@ def Trapezoid(row=None, col=None, **kwargs):
     - row (int): row in which the shape is drawn.
     - col (int): column in which the shape is drawn.
 
-    Kwargs:
+    Kwargs:null
 
     <base>
 
@@ -4257,6 +4264,38 @@ def BGG(user: str = None, ids: list = None, progress=False, short=500, **kwargs)
 
 
 @docstring_base
+def D6(row=None, col=None, **kwargs):
+    """Draw a D6 shape with "pips" on the canvas.
+
+    Args:
+
+    - row (int): row in which the shape is drawn.
+    - col (int): column in which the shape is drawn.
+
+    Kwargs:
+
+    - random (bool):
+    - roll (int): a number from 1 to 6 representing the number of pips
+    - pip_stroke (str):
+    - pip_fill (str):
+    - pip_fraction (float):
+    <base>
+
+    """
+    kwargs = margins(**kwargs)
+    d6 = D6Object(canvas=globals.canvas, **kwargs)
+    d6.draw()
+    return d6
+
+
+def d6(*args, **kwargs):
+    kwargs = margins(**kwargs)
+    _obj = args[0] if args else None
+    return D6Object(_object=_obj, canvas=globals.canvas, **kwargs)
+
+
+@docstring_base
+@docstring_onimo
 def Polyomino(row=None, col=None, **kwargs) -> PolyominoObject:
     """Create a Polyomino object
 
@@ -4267,28 +4306,11 @@ def Polyomino(row=None, col=None, **kwargs) -> PolyominoObject:
 
     Kwargs:
 
-    <base>
     - pattern (list): a list of string values; one string per row. Each string
       contains one or more numbers aka "columns". Each number represents a square,
       with a zero (0) representing a space.
-    - invert (str): can either be ``leftright`` (``lr``) or ``topbottom``
-      (``tb``) and will reverse the order of the numbers, either in a left-to-right
-      (numbers at the end of a row go to the start and vice-versa) or top-to-bottom
-      (rows at the end go to the start and vice-versa)
-    - flip (str): can either be ``north`` (``n``) or ``south`` (``s``) and
-      transposes rows and columns; effectively rotating the shape 90 degrees
-    - gap (float): the amount of space to leave between each row and each
-      column in the pattern
-    - outline (bool): along with *outline_stroke* and *outline_stroke_width*
-      is used to draw a line around the boundary of all connected squares in
-      the pattern |dash| it cannot be used in conjunction with a non-zero *gap*
-    - outline_stroke (str): color of boundary line around all connected squares
-    - outline_stroke_width (float): width of boundary line around all connected
-      squares
-    - fills (list): each square can be associated with a different fill color
-    - strokes (list): each square can be associated with a different stroke color
-    - labels (list): each square can be linked to a different label
-    - shapes (list): each square can be linked to a different centred shape
+    <onimo>
+    <base>
 
     Returns:
         PolyominoObject
@@ -4307,7 +4329,25 @@ def polyomino(row=None, col=None, **kwargs) -> PolyominoObject:
     return PolyominoObject(canvas=globals.canvas, **kwargs)
 
 
+@docstring_base
+@docstring_onimo
 def Pentomino(row=None, col=None, **kwargs):
+    """Create a Polyomino object
+
+    Args:
+
+    - row (int): row in which Pentomino is drawn.
+    - col (int): column in which Pentomino is drawn.
+
+    Kwargs:
+
+    - letter (str): a single character representing a unique arrangement of 5 squares
+    <onimo>
+    <base>
+
+    Returns:
+        PentominoObject
+    """
     kwargs = margins(**kwargs)
     pentm = pentomino(row=row, col=col, **kwargs)
     pentm.draw()
@@ -4322,6 +4362,24 @@ def pentomino(row=None, col=None, **kwargs):
 
 
 def Tetromino(row=None, col=None, **kwargs):
+    """Create a Tetromino object
+
+    Args:
+
+    - row (int): row in which Tetromino is drawn.
+    - col (int): column in which Tetromino is drawn.
+
+    Kwargs:
+
+    - letter (str): a single character representing a unique arrangement
+      of 4 squares
+    <onimo>
+    <base>
+
+    Returns:
+
+        TetrominoObject
+    """
     kwargs = margins(**kwargs)
     tetrm = tetromino(row=row, col=col, **kwargs)
     tetrm.draw()
@@ -4339,20 +4397,20 @@ def tetromino(row=None, col=None, **kwargs):
 def StarField(**kwargs):
     """Draw a Starfield object on the canvas.
 
-    Args:
-
-    - row (int): row in which the shape is drawn.
-    - col (int): column in which the shape is drawn.
-
     Kwargs:
 
     <base>
     - density (int): average number of stars per square unit; default is 10
     - colors (list): the individual star colors; default is ["white"]
-    - enclosure (Shape): regular shape inside which its drawn; default is a rectangle
-    - sizes (list): list of individual star sizes as floats; default is [0.1]
-    - star_pattern (str): (random | cluster) - NOT YET IMPLEMENTED
-    - seeding (float): if set, predetermines the randomisation sequence
+    - enclosure (str): the name of the regular shape inside which the
+      StarFieldObject is drawn; default is a `rectangle`
+    - sizes (list): the individual star sizes; default is [0.1]
+    - star_pattern (random | cluster) - NOT YET IMPLEMENTED
+    - seeding (float): if set, predetermines the randomisation sequenc
+
+    Reference:
+
+        https://codeboje.de/starfields-and-galaxies-python/
     """
     kwargs = margins(**kwargs)
     starfield = StarFieldObject(canvas=globals.canvas, **kwargs)
@@ -4368,15 +4426,15 @@ def starfield(**kwargs):
 # ---- dice ====
 
 
-def dice(dice="1d6", rolls=None):
+def roll_dice(dice="1d6", rolls=None):
     """Roll multiple totals for a type of die.
 
     Examples:
-    >>> dice('2d6')  # Catan dice roll
+    >>> roll_dice('2d6')  # Catan dice roll
     [9]
-    >>> dice('3D6', 6)  # D&D Basic Character Attributes
+    >>> roll_dice('3D6', 6)  # D&D Basic Character Attributes
     [14, 11, 8, 10, 9, 7]
-    >>> dice()  # single D6 roll
+    >>> roll_dice()  # single D6 roll
     [3]
     """
     if not dice:
@@ -4390,37 +4448,37 @@ def dice(dice="1d6", rolls=None):
     return Dice().multi_roll(count=rolls, pips=pips, dice=_type)
 
 
-def d4(rolls=None):
+def roll_d4(rolls=None):
     """Roll multiple totals for a 4-sided die."""
     return DiceD4().roll(count=rolls)
 
 
-def d6(rolls=None):
+def roll_d6(rolls=None):
     """Roll multiple totals for a 6-sided die."""
     return DiceD6().roll(count=rolls)
 
 
-def d8(rolls=None):
+def roll_d8(rolls=None):
     """Roll multiple totals for a 8-sided die."""
     return DiceD8().roll(count=rolls)
 
 
-def d10(rolls=None):
+def roll_d10(rolls=None):
     """Roll multiple totals for a 10-sided die."""
     return DiceD10().roll(count=rolls)
 
 
-def d12(rolls=None):
+def roll_d12(rolls=None):
     """Roll multiple totals for a 12-sided die."""
     return DiceD12().roll(count=rolls)
 
 
-def d20(rolls=None):
+def roll_d20(rolls=None):
     """Roll multiple totals for a 20-sided die."""
     return DiceD20().roll(count=rolls)
 
 
-def d100(rolls=None):
+def roll_d100(rolls=None):
     """Roll multiple totals for a 100-sided die."""
     return DiceD100().roll(count=rolls)
 
@@ -4477,5 +4535,6 @@ rectangle.__doc__ = Rectangle.__doc__
 rhombus.__doc__ = Rhombus.__doc__
 rightangledtriangle.__doc__ = RightAngledTriangle.__doc__
 star.__doc__ = Star.__doc__
+starfield.__doc__ = StarField.__doc__
 tetromino.__doc__ = Tetromino.__doc__
 # .__doc__ = .__doc__
