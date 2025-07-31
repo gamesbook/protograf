@@ -55,11 +55,10 @@ from .shapes import (
     SquareShape,
     StadiumShape,
     StarShape,
-    StarFieldShape,
     TextShape,
     TrapezoidShape,
 )
-from .objects import PolyominoObject, PentominoObject, TetrominoObject
+from .objects import PolyominoObject, PentominoObject, TetrominoObject, StarFieldObject
 from .layouts import (
     GridShape,
     DotGridShape,
@@ -3049,36 +3048,6 @@ def star(row=None, col=None, **kwargs):
 
 
 @docstring_base
-def StarField(**kwargs):
-    """Draw a Starfield shape on the canvas.
-
-    Args:
-
-    - row (int): row in which the shape is drawn.
-    - col (int): column in which the shape is drawn.
-
-    Kwargs:
-
-    <base>
-    - density (int): average number of stars per square unit; default is 10
-    - colors (list): the individual star colors; default is ["white"]
-    - enclosure (Shape): regular shape inside which its drawn; default is a rectangle
-    - sizes (list): list of individual star sizes as floats; default is [0.1]
-    - star_pattern (str): (random | cluster) - NOT YET IMPLEMENTED
-    - seeding (float): if set, predetermines the randomisation sequence
-    """
-    kwargs = margins(**kwargs)
-    starfield = StarFieldShape(canvas=globals.canvas, **kwargs)
-    starfield.draw()
-    return starfield
-
-
-def starfield(**kwargs):
-    kwargs = margins(**kwargs)
-    return StarFieldShape(canvas=globals.canvas, **kwargs)
-
-
-@docstring_base
 def Text(row=None, col=None, **kwargs):
     """Draw a Text shape on the canvas.
 
@@ -4287,6 +4256,7 @@ def BGG(user: str = None, ids: list = None, progress=False, short=500, **kwargs)
 # ---- objects ====
 
 
+@docstring_base
 def Polyomino(row=None, col=None, **kwargs) -> PolyominoObject:
     """Create a Polyomino object
 
@@ -4297,6 +4267,7 @@ def Polyomino(row=None, col=None, **kwargs) -> PolyominoObject:
 
     Kwargs:
 
+    <base>
     - pattern (list): a list of string values; one string per row. Each string
       contains one or more numbers aka "columns". Each number represents a square,
       with a zero (0) representing a space.
@@ -4362,6 +4333,36 @@ def tetromino(row=None, col=None, **kwargs):
     kwargs["row"] = row
     kwargs["col"] = col
     return TetrominoObject(canvas=globals.canvas, **kwargs)
+
+
+@docstring_base
+def StarField(**kwargs):
+    """Draw a Starfield object on the canvas.
+
+    Args:
+
+    - row (int): row in which the shape is drawn.
+    - col (int): column in which the shape is drawn.
+
+    Kwargs:
+
+    <base>
+    - density (int): average number of stars per square unit; default is 10
+    - colors (list): the individual star colors; default is ["white"]
+    - enclosure (Shape): regular shape inside which its drawn; default is a rectangle
+    - sizes (list): list of individual star sizes as floats; default is [0.1]
+    - star_pattern (str): (random | cluster) - NOT YET IMPLEMENTED
+    - seeding (float): if set, predetermines the randomisation sequence
+    """
+    kwargs = margins(**kwargs)
+    starfield = StarFieldObject(canvas=globals.canvas, **kwargs)
+    starfield.draw()
+    return starfield
+
+
+def starfield(**kwargs):
+    kwargs = margins(**kwargs)
+    return StarFieldObject(canvas=globals.canvas, **kwargs)
 
 
 # ---- dice ====
@@ -4467,6 +4468,7 @@ equilateraltriangle.__doc__ = EquilateralTriangle.__doc__
 hexagon.__doc__ = Hexagon.__doc__
 image.__doc__ = Image.__doc__
 line.__doc__ = Line.__doc__
+pentomino.__doc__ = Pentomino.__doc__
 polygon.__doc__ = Polygon.__doc__
 polyline.__doc__ = Polyline.__doc__
 polyomino.__doc__ = Polyomino.__doc__
@@ -4475,4 +4477,5 @@ rectangle.__doc__ = Rectangle.__doc__
 rhombus.__doc__ = Rhombus.__doc__
 rightangledtriangle.__doc__ = RightAngledTriangle.__doc__
 star.__doc__ = Star.__doc__
+tetromino.__doc__ = Tetromino.__doc__
 # .__doc__ = .__doc__

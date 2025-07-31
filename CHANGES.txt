@@ -8,6 +8,7 @@ protograf Changes
 - Add card_grid for Card shapes
 - Add docstrings for Shapes
 - Patch caption location for Image
+- Shift Starfield into objects module (no API change)
 
 2025-07-27 (0.2.12)
 -------------------

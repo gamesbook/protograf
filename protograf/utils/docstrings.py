@@ -29,11 +29,11 @@ def docstring_base(func):
     func.__doc__ = func.__doc__.replace(
         "<base>",
         """
-    - x (float): The left-most edge of the shape; defaults to 1
-    - y (float): The top-most edge of the shape; defaults to 1
-    - stroke (str): The named or hexadecimal color of shape's line;
+    - x (float): the left-most edge of the shape; defaults to 1
+    - y (float): the top-most edge of the shape; defaults to 1
+    - stroke (str): the named or hexadecimal color of shape's line;
       defaults to ``black``
-    - stroke_width (float): The point width of the shape's line;
+    - stroke_width (float): the point width of the shape's line;
       defaults to 0.1.
     - dotted (bool): if True, create a series of small lines i.e. the
       "dots", followed by gaps, of size equal to the lines *stroke_width*
@@ -49,8 +49,8 @@ def docstring_loc(func):
     func.__doc__ = func.__doc__.replace(
         "<loc>",
         """
-    - x (float): The left-most edge of the shape; defaults to 1
-    - y (float): The top-most edge of the shape; defaults to 1""",
+    - x (float): the left-most edge of the shape; defaults to 1
+    - y (float): the top-most edge of the shape; defaults to 1""",
     )
     return func
 
@@ -75,20 +75,49 @@ def docstring_area(func):
     func.__doc__ = func.__doc__.replace(
         "<area>",
         """
-     - fill (str): The named or hexadecimal color of shape's area;
-       defaults to ``white``.""",
+    - fill (str): the named or hexadecimal color of shape's area;
+      defaults to ``white``.
+    - fill_stroke(str): the named or hexadecimal color for the shape's
+      line and area colors.""",
     )
     return func
 
 
 def docstring_center(func):
     func.__doc__ = func.__doc__.replace(
-        "<area>",
+        "center>",
         """
-     - cx (float): the centre position of the shape, relative to the left edge
-     - cy (float): the centre position of the shape, relative to the top edge
-     - rotation (float): the rotation of the shape in degrees, anti-clockwise
-       from the baseline
+    - cx (float): the centre position of the shape, relative to the left edge
+    - cy (float): the centre position of the shape, relative to the top edge
+    - rotation (float): the rotation of the shape in degrees, anti-clockwise
+      from the baseline
+    - dot (int): the size of a small dot to be drawn at the centre of the shape
+    - dot_stroke (str): the named or hexadecimal color of dot's line;
+      defaults to ``black``
+    - dot_stroke_width (float): the point width of the dot's line;
+      defaults to 0.1
+    - cross (int): the size of a small cross to be drawn at the centre of the
+      shape
+    - cross_stroke (str): the named or hexadecimal color of the cross's line;
+      defaults to ``black``
+    - cross_stroke_width (float): the point width of the cross's line;
+      defaults to 0.1.
+    - label (str): text to be displayed in the middle of the shape
+    - label_stroke (str): the named or hexadecimal color of the label's line;
+      defaults to ``black``
+    - label_size (float): the point size of the label's text; defaults to 12
+    - heading (str): text to be displayed above the shape
+    - label_mx (float): the distance the label should be shifted away from the
+      centre of the shape to the left or right
+    - label_my (float): the distance the label should be shifted away from the
+      centre of the shape either up or down
+    - heading_stroke (str): the named or hexadecimal color of the heading's line;
+      defaults to ``black``
+    - heading_size (float): the point size of the heading's text; defaults to 12
+    - title (str): text to be displayed below the shape
+    - title_stroke (str): the named or hexadecimal color of the title's line;
+      defaults to ``black``
+    - title_size (float): the point size of the title's text; defaults to 12
     """,
     )
     return func
