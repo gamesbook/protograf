@@ -92,6 +92,7 @@ python cards/cards_deck_11.py --no-png -d /tmp/demo
 python cards/cards_deck_12.py --no-png -d /tmp/demo
 python cards/cards_deck_13.py --no-png -d /tmp/demo
 python cards/cards_deck_14.py --no-png -d /tmp/demo
+python cards/cards_deck_15.py --no-png -d /tmp/demo
 # -- various
 echo -e "\nCreating various..."
 python various/clock.py --no-png -d /tmp/demo

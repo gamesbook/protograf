@@ -144,6 +144,7 @@ Property Examples
 - `Example 11. Card Grouping`_
 - `Example 12. CardBack and Gutter`_
 - `Example 13. Deck Zones`_
+- `Example 14. Card Grid`_
 
 These examples are shown on a small A8-sized page, as the purpose is to
 illustrate how the Deck properties are used; normally cards would be
@@ -522,7 +523,19 @@ Example 9. Row Limit
 Example 10. Circular Frame
 --------------------------
 `^ <property-examples_>`_
-
+Deck(
+    cards=4,
+    height=3.2,
+    width=2.1,
+    card_grid=0.25)
+# design card
+Card(
+    '*',
+    rectangle(
+        x=0.2, y=0.2, width=1.7, height=2.8, stroke_width=1, rounding=0.2,
+        fill=None,
+        label='{{sequence}}\n{{id}}')
+)
 .. |d10| image:: images/decks/cards_deck_10.png
    :width: 330
 
@@ -737,5 +750,45 @@ Example 13. Deck Zones
       In this case, there is ``Text()`` that is drawn on every page |dash|
       using the ``*`` value |dash| and colored rectangles that are drawn on
       page one; ``silver`` colored at the top and ``gold`` colored lower down.
+
+===== ======
+
+
+Example 14. Card Grid
+---------------------
+`^ <property-examples_>`_
+
+.. |d15| image:: images/decks/cards_deck_15.png
+   :width: 330
+
+===== ======
+|d15| This example shows the definition of a deck for a set of small
+      cards. The card size means that there will be 4 rectangular cards
+      on each A8 page:
+
+      .. code:: python
+
+        Deck(
+            cards=4,
+            height=3.2,
+            width=2.1,
+            card_grid=0.25)
+        # design card
+        Card(
+            '*',
+            rectangle(
+                x=0.2, y=0.2,
+                width=1.7, height=2.8,
+                stroke_width=1, rounding=0.2,
+                fill=None,
+                label='{{sequence}}\n{{id}}')
+        )
+
+      Here, the *card_grid* property for ``Deck()`` is used to draw a grid
+      of lines inside of every Card's frame.  The value assigned to this
+      property sets the spacing between the lines.
+
+      In this example, fill of the Rectangle is disabled by setting
+      ``fill=None`` and so the grid is visible "through" it.
 
 ===== ======

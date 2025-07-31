@@ -400,10 +400,11 @@ class CardShape(BaseShape):
 
         # ---- draw card grid for Rectangle cards
         if card_grid and kwargs["frame_type"] == CardFrame.RECTANGLE:
+            _card_grid = tools.as_float(card_grid, "card_grid")
             mx = self.unit(_dx or 0) + self._o.delta_x
             my = self.unit(_dy or 0) + self._o.delta_y
             stroke = tools.get_color(DEBUG_COLOR)
-            grid_size = card_grid * globals.units
+            grid_size = _card_grid * globals.units
             cols = int(frame_width // grid_size)
             rows = int(frame_height // grid_size)
             for col in range(1, cols + 1):
