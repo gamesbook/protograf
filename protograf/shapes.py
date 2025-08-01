@@ -4143,7 +4143,7 @@ class StadiumShape(BaseShape):
         if self.cx is not None and self.cy is not None:
             self.x = self.cx - self.width / 2.0
             self.y = self.cy - self.height / 2.0
-            # feedback(f"*** INIT OldX:{x} OldY:{y} NewX:{self.x} NewY:{self.y}")
+            # feedback(f"*** STADIUM OldX:{x} OldY:{y} NewX:{self.x} NewY:{self.y}")
         self.kwargs = kwargs
 
     def draw(self, cnv=None, off_x=0, off_y=0, ID=None, **kwargs):

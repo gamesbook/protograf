@@ -21,8 +21,29 @@ with customised properties, in addition to the basic set of
 
 In many cases, these are constructed out of one or more of the core shapes;
 for example, `polyominoes`_ are composed of one or more
-:ref:`squares <square-command>`. Thus they are able to use, or reference, the
-properties of these shapes, in addition to their own particular properties.
+:ref:`squares <square-command>` and simple `dice`_ are also a single square.
+Thus they are able to use, or reference, many of the properties of these
+shapes, in addition to their own particular properties.
+
+
+Dice
+====
+
+Dice are used in many games, and being able to readily create a basic
+depiction of them can be useful.
+
+For more details, see the section on :doc:`Dice <dice>`.
+
+
+Tetrominoes
+===========
+
+Similar to Pentominoes, these are each composed of **4** squares in one of 5
+unique patterns. They can also referred to by their shortcut ``letter``
+property.
+
+For more details, see the section on :doc:`Tetrominoes <tetrominoes>`.
+
 
 Polyominoes
 ===========

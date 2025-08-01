@@ -50,10 +50,9 @@ D6(x=1, y=4, roll=4, common=blu_wite)
 D6(x=0, y=5, roll=5, common=blu_wite)
 D6(x=1, y=5, roll=6, common=blu_wite)
 
-# ---- sized and rotated D6
-D6(x=2.5, y=3.5, side=0.75, roll=4, title="Title", heading="D6", label="5")
-D6(cx=3, cy=5, side=0.75, roll=6)
-D6(x=3, y=5, side=0.75, roll=5, rotation=30)
+# ---- sized, labelled & rotated D6
+D6(x=2.6, y=3.6, side=0.8, roll=4, title="Title", heading="D6", label="4")
+D6(cx=3.5, cy=5.5, side=0.5, roll=5, stroke_width=0.5, rotation=30)
 
 Save(
     output='png',

@@ -590,6 +590,7 @@ class D6Object(BaseShape):
         if self.cx is not None and self.cy is not None:
             self.x = self.cx - self.width / 2.0
             self.y = self.cy - self.height / 2.0
+            # feedback(f"*** D6 OldX:{x} OldY:{y} NewX:{self.x} NewY:{self.y}")
         # overrides to make a "square rectangle"
         if self.width and not self.side:
             self.side = self.width
@@ -633,23 +634,29 @@ class D6Object(BaseShape):
         kwargs = self.kwargs | kwargs
         cnv = cnv if cnv else globals.canvas  # a new Page/Shape may now exist
         super().draw(cnv, off_x, off_y, ID, **kwargs)  # unit-based props
-        if self.cx is not None and self.cy is not None:
+        # ---- adjust start
+        if self.row is not None and self.col is not None:
+            x = self.col * self._u.width + self._o.delta_x
+            y = self.row * self._u.height + self._o.delta_y
+        elif self.cx is not None and self.cy is not None:
             x = self._u.cx - self._u.width / 2.0 + self._o.delta_x
             y = self._u.cy - self._u.height / 2.0 + self._o.delta_y
         else:
             x = self._u.x + self._o.delta_x
             y = self._u.y + self._o.delta_y
-        # ---- overrides to centre the shape
-        if kwargs.get("cx") and kwargs.get("cy"):
-            x = kwargs.get("cx") - self._u.width / 2.0
-            y = kwargs.get("cy") - self._u.height / 2.0
-        # ---- calculate centre
-        x_d = x + self._u.width / 2.0
-        y_d = y + self._u.height / 2.0
+        # ---- calculate centre of the shape
+        cx = x + self._u.width / 2.0
+        cy = y + self._u.height / 2.0
+        # ---- overrides for grid layout
+        if self._abs_cx is not None and self._abs_cy is not None:
+            cx = self._abs_cx
+            cy = self._abs_cy
+            x = cx - self._u.width / 2.0
+            y = cy - self._u.height / 2.0
         # ---- handle rotation
         rotation = kwargs.get("rotation", self.rotation)
         if rotation:
-            self.centroid = muPoint(x_d, y_d)
+            self.centroid = muPoint(cx, cy)
             kwargs["rotation"] = rotation
             kwargs["rotation_point"] = self.centroid
         else:
@@ -664,9 +671,7 @@ class D6Object(BaseShape):
             rounding = self.unit(self.rounding)
             radius = rounding / min(self._u.width, self._u.height)
         if radius and radius > 0.5:
-            feedback(
-                "The rounding radius cannot exceed 50% of the D6 side.", True
-            )
+            feedback("The rounding radius cannot exceed 50% of the D6 side.", True)
         # ---- draw the outline
         # feedback(f'*** D6 normal {radius=} {kwargs=}')
         cnv.draw_rect((x, y, x + self._u.width, y + self._u.height), radius=radius)
@@ -714,12 +719,15 @@ class D6Object(BaseShape):
         pargs = {}
         pargs["stroke"] = self.pip_stroke
         pargs["fill"] = self.pip_fill
+        if rotation:
+            pargs["rotation"] = rotation
+            pargs["rotation_point"] = self.centroid
         self.set_canvas_props(cnv=None, index=ID, **pargs)
+        # ---- cross
+        self.draw_cross(cnv, cx, cy, rotation=kwargs.get("rotation"))
+        # ---- dot
+        self.draw_dot(cnv, cx, cy)
         # ---- text
-        self.draw_heading(
-            cnv, ID, x_d, y_d - 0.5 * self._u.height, **kwargs
-        )
-        self.draw_label(cnv, ID, x_d, y_d, **kwargs)
-        self.draw_title(
-            cnv, ID, x_d, y_d + 0.5 * self._u.height, **kwargs
-        )
+        self.draw_heading(cnv, ID, cx, cy - 0.5 * self._u.height, **kwargs)
+        self.draw_label(cnv, ID, cx, cy, **kwargs)
+        self.draw_title(cnv, ID, cx, cy + 0.5 * self._u.height, **kwargs)
