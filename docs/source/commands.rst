@@ -41,6 +41,7 @@ cross-reference to the detailed information for that command.
    a :ref:`deck <the-deck-command>` or a
    :ref:`countersheet <the-countersheet-command>` ; typically sourced from a CSV or
    Excel file
+-  :ref:`D6 <d6-object>` - create top-down view of a six-sided die
 -  :ref:`Deck <the-deck-command>`  - details for a deck, containing one or
    more :ref:`cards <the-card-command>`
 -  :ref:`Dot <dot-command>` * - a geometric shape that can be drawn on a page

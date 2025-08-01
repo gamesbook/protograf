@@ -132,7 +132,14 @@ def load_googlesheet(sheet, **kwargs):
         _data_list = data_dict.get("values")
         if _data_list:
             keys = _data_list[0]  # get keys/names from first sub-list
-            dict_list = [dict(zip(keys, values)) for values in _data_list[1:]]
+            dict_list = []
+            for row in _data_list[1:]:
+                _dict = {}
+                for idx, key in enumerate(keys):
+                    # handles the "bug" that Sheet does not return all of a row
+                    # if the last cell is "empty"
+                    _dict[key] = row[idx] if idx < len(row) else ""
+                dict_list.append(_dict)
             return dict_list
 
     return data_list

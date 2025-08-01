@@ -20,11 +20,13 @@ Overview
 Dice are widely used in many games, so being able to easily add them to
 a graphic layout can be useful.
 
+.. _d6-object:
+
 D6 Properties
 =============
 
 The six-sided die object ``D6`` shares some of basic properties of many
-other :doc:`shapes <core_shapes>`, with the extra properties of *roll* and
+other :doc:`shapes <core_shapes>`, with additional properties of *roll* and
 *random*, as well as the various *pip_* properties.
 
 d6 Examples
@@ -40,7 +42,7 @@ D6 Styling
    :width: 330
 
 ===== ======
-|d61| This example shows Pentominoes constructed using commands like:
+|d61| This example shows D6 objects constructed using commands like:
 
       .. code:: python
 
@@ -86,5 +88,15 @@ D6 Styling
       All of the D6 shapes are constructed in the same way |dash| setting an *x*
       and *y* value (or *cx* and *cy*).
 
+      The red dice show how the pip *stroke* and *fill* can be set to different
+      colors.
+
+      The blue dice show how the pip size can be changed.  Size is represented
+      as a fraction of the width/height of the die.  The default is one-fifth
+      (``0.2``) but it can be as small as ``0.1`` or as large as ``0.33``.
+
+      The white dice in the lower-right show how the D6, like many other
+      shapes, can be assigned text captions, and that it can be rotated.
+      The *stroke_width* of the rotated die has also been made thicker.
 
 ===== ======

@@ -57,6 +57,7 @@ constructed.
 
 For more details, see the section on :doc:`Polyominoes <polyominoes>`.
 
+
 Pentominoes
 ===========
 
@@ -68,6 +69,7 @@ assigned to each of the 12 shapes, based on their similarity to letters in
 the Roman alphabet.
 
 For more details, see the section on :doc:`Pentominoes <pentominoes>`.
+
 
 Tetrominoes
 ===========

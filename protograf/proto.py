@@ -2075,12 +2075,13 @@ def Deck(**kwargs):
     kwargs["dataset"] = globals.dataset
     globals.deck = DeckOfCards(canvas=globals.canvas, **kwargs)
     globals.deck_settings["grid_marks"] = kwargs.get("grid_marks", None)
+    return globals.deck
 
 
 def CounterSheet(**kwargs):
     """Initialise a countersheet with all its settings, including source(s) of data."""
     kwargs["_is_countersheet"] = True
-    Deck(**kwargs)
+    return Deck(**kwargs)
 
 
 def group(*args, **kwargs) -> GroupBase:
