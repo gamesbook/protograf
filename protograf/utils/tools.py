@@ -1334,6 +1334,7 @@ def sheet_column(num: int, lower: bool = False) -> string:
     return converter(num, lower)
 
 
+@lru_cache(maxsize=256)
 def get_font_by_name(font_name: str) -> tuple:
     """Get font details by name - built-in OR system installed.
 
@@ -1366,7 +1367,7 @@ def get_font_by_name(font_name: str) -> tuple:
         font_file = fi.get_font_file(name=font_name)
         if not font_file:
             feedback(
-                f"Cannot find or load a font named `{font_name}`."
+                f"Cannot find or load the font named `{font_name}`."
                 f' Defaulting to "{DEFAULT_FONT}".',
                 False,
                 True,
@@ -1907,7 +1908,7 @@ def get_font_file(font_name: str) -> tuple:
             _name = fi.get_font_family(font_name)
             if not _name:
                 feedback(
-                    f'Cannot find or load a font named "{font_name}".'
+                    f'Cannot find or load a Font named "{font_name}".'
                     f' Defaulting to "{DEFAULT_FONT}".',
                     False,
                     True,

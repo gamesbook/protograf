@@ -1,7 +1,7 @@
 protograf Changes
 =================
 
-2025-00-00 (0.2.13)
+2025-08-02 (0.2.13)
 -------------------
 - Add example for use of API to create Card Data
 - Add squared line ends
@@ -11,6 +11,7 @@ protograf Changes
 - Shift Starfield into objects module (no API change)
 - Patch bug loading last, empty cell from Google Sheet
 - Add D6 object
+- Add example for full wargame countersheet
 
 2025-07-27 (0.2.12)
 -------------------

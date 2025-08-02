@@ -142,14 +142,23 @@ class FontInterface:
         """Get proper name for a font family if it exists
 
         Args:
-            name: case-insensitive name of a font family e.g. "bookerly"
+
+        - name: case-insensitive name of a font family e.g. "bookerly"
+
+        Notes:
+            In some cases, the font name contains spaces but the font family does not!
         """
         if not name:
             return None
         if not self.font_families:
             self.load_font_families()
         for font_family in list(self.font_families.keys()):
-            if str(name).strip().lower() == font_family.lower():
+            # if font_family[0] == 'U' and name[0] == 'U':
+            #     print(f"{name=}", 'vs.', f'+{font_family=}+')
+            if (
+                str(name).strip().lower() == font_family.lower()
+                or str(name).strip().lower().replace(" ", "") == font_family.lower()
+            ):
                 return font_family
         return None
 
@@ -171,7 +180,11 @@ class FontInterface:
             font_details = self.font_families[font_family]
             for font in font_details:
                 _filename = None
-                if str(name).strip().lower() == font["name"].lower():
+                if (
+                    str(name).strip().lower() == font["name"].lower()
+                    or str(name).strip().lower().replace(" ", "")
+                    == font["name"].lower()
+                ):
                     _filename = font["file"]
                 # fallback - use Regular if available
                 if str(name).strip().lower() + " regular" == font["name"].lower():

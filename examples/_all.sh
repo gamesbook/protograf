@@ -30,6 +30,7 @@ python core/layouts/layouts_tracks.py -d /tmp/demo
 python core/layouts/layouts_repeat.py -d /tmp/demo
 # ---- examples: objects
 python objects/polyominoes.py -d /tmp/demo
+python objects/ominoes_basic.py -d /tmp/demo
 python objects/pentominoes.py -d /tmp/demo
 python objects/dice_d6.py -d /tmp/demo
 # ---- boards: abstract
@@ -63,6 +64,7 @@ echo -e "\nCreating counters..."
 python counters/counters.py -d /tmp/demo
 python counters/counters_excel.py -d /tmp/demo
 python counters/counters_csv.py -d /tmp/demo
+python counters/counters_doagc.py -d /tmp/demo
 python counters/blocks_csv.py -d /tmp/demo
 # ---- cards
 echo -e "\nCreating cards..."
@@ -73,7 +75,7 @@ python cards/cards_rectangular.py -d /tmp/demo
 python cards/cards_images.py -d /tmp/demo
 python cards/cards_matrix_one.py -d /tmp/demo
 python cards/cards_matrix_two.py -d /tmp/demo
-python cards/cards_multideck.py -d /tmp/demo
+python cards/cards_multi_deck.py -d /tmp/demo
 python cards/cards_standard.py -d /tmp/demo
 # ---- play_money
 echo -e "\nCreating play money..."
