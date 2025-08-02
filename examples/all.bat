@@ -30,6 +30,7 @@ REM ---- examples: objects
 ECHO "Creating objects..."
 python objects\polyominoes.py --no-png -d %location%
 python objects\pentominoes.py --no-png -d %location%
+python objects\ominoes_basic.py --no-png -d %location%
 python objects\dice_d6.py --no-png -d %location%
 
 REM ---- examples: simple: layouts
@@ -76,6 +77,7 @@ ECHO "Creating counters..."
 python counters\counters.py --no-png -d %location%
 python counters\counters_excel.py --no-png -d %location%
 python counters\counters_csv.py --no-png -d %location%
+python counters\counters_doagc.py --no-png -d %location%
 python counters\blocks_csv.py --no-png -d %location%
 
 REM ---- cards
@@ -88,6 +90,7 @@ python cards\cards_images.py --no-png -d %location%
 python cards\cards_matrix_one.py --no-png -d %location%
 python cards\cards_matrix_two.py --no-png -d %location%
 python cards\cards_standard.py --no-png -d %location%
+python cards\cards_multi_deck.py --no-png -d %location%
 
 REM ---- play_money
 ECHO "Creating play money..."

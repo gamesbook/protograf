@@ -31,6 +31,7 @@ python core/layouts/layouts_repeat.py --no-png -d /tmp/demo
 # ---- examples: objects
 python objects/polyominoes.py --no-png -d /tmp/demo
 python objects/pentominoes.py --no-png -d /tmp/demo
+python objects/ominoes_basic.py --no-png -d /tmp/demo
 python objects/dice_d6.py --no-png -d /tmp/demo
 # ---- boards: abstract
 echo -e "\nCreating abstract boards..."
@@ -62,6 +63,7 @@ python boards/maps/honorverse.py --no-png -d /tmp/demo
 echo -e "\nCreating counters..."
 python counters/counters.py --no-png -d /tmp/demo
 python counters/counters_excel.py --no-png -d /tmp/demo
+python counters/counters_doagc.py --no-png -d /tmp/demo
 python counters/counters_csv.py --no-png -d /tmp/demo
 python counters/blocks_csv.py --no-png -d /tmp/demo
 # ---- cards
@@ -73,6 +75,7 @@ python cards/cards_rectangular.py --no-png -d /tmp/demo
 python cards/cards_images.py --no-png -d /tmp/demo
 python cards/cards_matrix_one.py --no-png -d /tmp/demo
 python cards/cards_matrix_two.py --no-png -d /tmp/demo
+python cards/cards_multi_deck.py --no-png -d /tmp/demo
 python cards/cards_standard.py --no-png -d /tmp/demo
 # ---- play_money
 echo -e "\nCreating play money..."
