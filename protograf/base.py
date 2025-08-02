@@ -40,7 +40,7 @@ from pymupdf import (
 )
 
 # local
-from protograf.utils import geoms, tools, support
+from protograf.utils import colrs, geoms, tools, support
 from protograf.utils.tools import _lower
 from protograf.utils.constants import (
     CACHE_DIRECTORY,
@@ -195,14 +195,14 @@ class BaseCanvas:
         self.fill_transparency = self.defaults.get(
             "fill_transparency", 1
         )  # NOT transparent
-        self.fill = tools.get_color(fill)
+        self.fill = colrs.get_color(fill)
         self.fill_stroke = self.defaults.get("fill_stroke", None)
         self.stroke_fill = self.defaults.get("stroke_fill", None)  # alias
         # ---- stroke
         stroke = (
             self.defaults.get("stroke", self.defaults.get("stroke_color")) or "black"
         )
-        self.stroke = tools.get_color(stroke)
+        self.stroke = colrs.get_color(stroke)
         self.stroke_width = self.defaults.get("stroke_width", WIDTH)
         self.stroke_width_border = self.defaults.get("stroke_width_border", None)
         # pymupdf lineCap: 0 = line ends in sharp edge; 1 = adds semi-circle at end
@@ -221,7 +221,7 @@ class BaseCanvas:
             self.fill = self.fill_stroke
         # ---- debug color & transparency
         debug_color = self.defaults.get("debug_color", DEBUG_COLOR)
-        self.debug_color = tools.get_color(debug_color)
+        self.debug_color = colrs.get_color(debug_color)
         self.transparency = self.defaults.get("transparency", 1)  # NOT transparent
         # ---- font
         self.font_name = self.defaults.get("font_name", DEFAULT_FONT)
@@ -236,7 +236,7 @@ class BaseCanvas:
         # ---- grid cut marks
         self.grid_marks = self.defaults.get("grid_marks_marks", False)
         grid_marks_stroke = self.defaults.get("grid_marks_stroke", "gray")
-        self.grid_marks_stroke = tools.get_color(grid_marks_stroke)
+        self.grid_marks_stroke = colrs.get_color(grid_marks_stroke)
         self.grid_marks_stroke_width = self.defaults.get(
             "grid_marks_stroke_width", self.stroke_width
         )
@@ -256,7 +256,7 @@ class BaseCanvas:
         self.text = self.defaults.get("text", "")
         self.text_size = self.defaults.get("text_size", self.font_size)
         text_stroke = self.defaults.get("text_stroke", self.stroke)
-        self.text_stroke = tools.get_color(text_stroke)
+        self.text_stroke = colrs.get_color(text_stroke)
         self.text_stroke_width = self.defaults.get("text_stroke_width", 0.05)  # pymu
         self.invisible = self.defaults.get("invisible", False)
         # ---- text: label
@@ -264,7 +264,7 @@ class BaseCanvas:
         self.label_size = self.defaults.get("label_size", self.font_size)
         self.label_font = self.defaults.get("label_font", self.font_name)
         label_stroke = self.defaults.get("label_stroke", self.stroke)
-        self.label_stroke = tools.get_color(label_stroke)
+        self.label_stroke = colrs.get_color(label_stroke)
         self.label_stroke_width = self.defaults.get(
             "label_stroke_width", self.stroke_width
         )
@@ -276,7 +276,7 @@ class BaseCanvas:
         self.title_size = self.defaults.get("title_size", self.font_size)
         self.title_font = self.defaults.get("title_font", self.font_name)
         title_stroke = self.defaults.get("title_stroke", self.stroke)
-        self.title_stroke = tools.get_color(title_stroke)
+        self.title_stroke = colrs.get_color(title_stroke)
         self.title_stroke_width = self.defaults.get(
             "title_stroke_width", self.stroke_width
         )
@@ -288,7 +288,7 @@ class BaseCanvas:
         self.heading_size = self.defaults.get("heading_size", self.font_size)
         self.heading_font = self.defaults.get("heading_font", self.font_name)
         heading_stroke = self.defaults.get("heading_stroke", self.stroke)
-        self.heading_stroke = tools.get_color(heading_stroke)
+        self.heading_stroke = colrs.get_color(heading_stroke)
         self.heading_stroke_width = self.defaults.get(
             "heading_stroke_width", self.stroke_width
         )
@@ -426,7 +426,7 @@ class BaseCanvas:
         self.radii_labels_size = self.defaults.get("radii_labels_size", self.font_size)
         self.radii_labels_font = self.defaults.get("radii_labels_font", self.font_name)
         radii_labels_stroke = self.defaults.get("radii_labels_stroke", self.stroke)
-        self.radii_labels_stroke = tools.get_color(radii_labels_stroke)
+        self.radii_labels_stroke = colrs.get_color(radii_labels_stroke)
         self.radii_labels_stroke_width = self.defaults.get(
             "radii_labels_stroke_width", self.stroke_width
         )
@@ -458,12 +458,12 @@ class BaseCanvas:
         self.centre_shape_my = self.defaults.get("centre_shape_my", 0)
         self.dot = self.defaults.get("dot", 0)
         dot_stroke = self.defaults.get("dot_stroke", self.stroke)
-        self.dot_stroke = tools.get_color(dot_stroke)
+        self.dot_stroke = colrs.get_color(dot_stroke)
         self.dot_stroke_width = self.defaults.get("dot_stroke_width", self.stroke_width)
         self.dot_fill = self.defaults.get("dot_fill", self.dot_stroke)  # colors match
         self.cross = self.defaults.get("cross", 0)
         cross_stroke = self.defaults.get("cross_stroke", self.stroke)
-        self.cross_stroke = tools.get_color(cross_stroke)
+        self.cross_stroke = colrs.get_color(cross_stroke)
         self.cross_stroke_width = self.defaults.get(
             "cross_stroke_width", self.stroke_width
         )
@@ -507,7 +507,7 @@ class BaseCanvas:
             "coord_font_size", int(self.font_size * 0.5)
         )
         coord_stroke = self.defaults.get("coord_stroke", "black")
-        self.coord_stroke = tools.get_color(coord_stroke)
+        self.coord_stroke = colrs.get_color(coord_stroke)
         self.coord_padding = self.defaults.get("coord_padding", 2)
         self.coord_separator = self.defaults.get("coord_separator", "")
         self.coord_prefix = self.defaults.get("coord_prefix", "")
@@ -1727,7 +1727,7 @@ class BaseShape:
                 overlay=True,  # put in foreground
             )
             if self.run_debug:
-                pdf_page.draw_rect(rct, color=tools.get_color(DEBUG_COLOR))
+                pdf_page.draw_rect(rct, color=colrs.get_color(DEBUG_COLOR))
             return image_local
 
         img = False
@@ -1916,11 +1916,11 @@ class BaseShape:
             keys["render_mode"] = 2  # default render_mode=0
 
         _color = kwargs.get("stroke", self.stroke)
-        keys["color"] = tools.get_color(_color)
+        keys["color"] = colrs.get_color(_color)
 
         if kwargs.get("fill") and _outlined:
             _fill = kwargs.get("fill", self.fill)
-            keys["fill"] = tools.get_color(_fill)
+            keys["fill"] = colrs.get_color(_fill)
         else:
             keys["fill"] = keys["color"]
 
@@ -1944,12 +1944,12 @@ class BaseShape:
             _stroke_opacity = tools.as_float(
                 _stroke_transparency, "stroke_transparency"
             )
-            keys["stroke_opacity"] = tools.get_opacity(_stroke_opacity)
+            keys["stroke_opacity"] = colrs.get_opacity(_stroke_opacity)
 
         _fill_transparency = kwargs.get("fill_transparency", self.fill_transparency)
         if _fill_transparency is not None:
             _fill_opacity = tools.as_float(_fill_transparency, "fill_transparency")
-            keys["fill_opacity"] = tools.get_opacity(_fill_opacity)
+            keys["fill_opacity"] = colrs.get_opacity(_fill_opacity)
 
         # potential other properties
         # keys['idx'] = 0

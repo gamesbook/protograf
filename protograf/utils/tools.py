@@ -22,14 +22,13 @@ from urllib.parse import urlparse
 # third-party
 from openpyxl import load_workbook
 from pymupdf import Point as muPoint, Matrix, Font as muFont
-from pymupdf.utils import getColor
 import requests
 import xlrd
 
 # local
+from protograf.utils import colrs
 from protograf.utils.constants import (
     CACHE_DIRECTORY,
-    COLOR_NAMES,
     DEFAULT_FONT,
     STANDARD_CARD_SIZES,
     PAPER_SIZES,
@@ -1190,30 +1189,6 @@ def comparer(val: str, operator: str, target: str | list) -> bool:
     return False
 
 
-def color_to_hex(name):
-    """Convert a named color (Color class) to a hexadecimal string"""
-    if isinstance(name, str):
-        return name
-    _tuple = (int(name.red * 255), int(name.green * 255), int(name.blue * 255))
-    _string = "#%02x%02x%02x" % _tuple
-    return _string.upper()
-
-
-def rgb_to_hex(color: tuple) -> str:
-    """Convert a RGB tuple color to a hexadecimal string
-
-    Doc Test:
-
-    >>> rgb_to_hex((123,45,6))
-    '#7A852CD35FA'
-    """
-    if color is None:
-        return color
-    _tuple = (int(color[0] * 255), int(color[1] * 255), int(color[2] * 255))
-    _string = "#%02x%02x%02x" % _tuple
-    return _string.upper()
-
-
 def alpha_column(num: int, lower: bool = False) -> string:
     """Convert a number to a letter-based notation
 
@@ -1679,46 +1654,6 @@ def restore_globals(doc: GlobalDocument):
     globals.page_grid = doc.page_grid
 
 
-def get_color(name: str = None, is_rgb: bool = True) -> tuple:
-    """Get a color tuple; by name from a pre-defined dictionary or as a RGB tuple."""
-    if name is None:
-        return None  # it IS valid to say that NO color has been set
-    if isinstance(name, tuple) and len(name) == 3:  # RGB color tuple
-        if (
-            (name[0] >= 0 and name[0] <= 255)
-            and (name[1] >= 0 and name[0] <= 255)
-            and (name[2] >= 0 and name[0] <= 255)
-        ):
-            return name
-        else:
-            feedback(f'The color tuple "{name}" is invalid!')
-    elif isinstance(name, str) and len(name) == 7 and name[0] == "#":  # hexadecimal
-        _rgb = tuple(int(name[i : i + 2], 16) for i in (1, 3, 5))
-        rgb = tuple(i / 255 for i in _rgb)
-        return rgb
-    else:
-        pass  # unknown format
-    try:
-        if name.upper() not in COLOR_NAMES:
-            feedback(f'The color name "{name}" is not pre-defined!', True)
-        color = getColor(name)
-        return color
-    except (AttributeError, ValueError):
-        feedback(f'The color name "{name}" cannot be converted to RGB!', True)
-
-
-def get_opacity(transparency: float = 0) -> float:
-    """Convert from '100% is fully transparent' to '0 is not opaque'."""
-    if transparency is None:
-        return 1.0
-    try:
-        return float(1.0 - transparency / 100.0)
-    except (ValueError, TypeError):
-        feedback(
-            f'The transparency of "{transparency}" is not valid (use 0 to 100)', True
-        )
-
-
 def unit(item, units: str = None, skip_none: bool = False, label: str = ""):
     """Convert an item into the appropriate unit system."""
     log.debug("units %s :: label: %s", units, label)
@@ -1842,8 +1777,8 @@ def get_pymupdf_props(
         morph = (_rotation_point, mtrx)
         # print(f'^^^ SCP {morph=}')
     # ---- get color tuples
-    _color = get_color(stroke)
-    _fill = get_color(fill)
+    _color = colrs.get_color(stroke)
+    _fill = colrs.get_color(fill)
     # ---- set width
     _width = stroke_width or defaults.get("stroke_width")
     if _color is None and _fill is None:

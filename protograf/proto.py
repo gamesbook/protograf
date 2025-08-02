@@ -80,7 +80,7 @@ from .globals import unit
 from .groups import Switch, Lookup  # used in scripts
 from ._version import __version__
 
-from protograf.utils import geoms, tools, support
+from protograf.utils import colrs, geoms, tools, support
 from protograf.utils.constants import (
     DEFAULT_FONT,
     DEBUG_COLOR,
@@ -104,6 +104,7 @@ from protograf.utils.docstrings import (
     docstring_loc,
     docstring_onimo,
 )
+from protograf.utils.colrs import lighten, darken  # used in scripts
 from protograf.utils.fonts import builtin_font, FontInterface
 from protograf.utils.geoms import equilateral_height  # used in scripts
 from protograf.utils.messaging import feedback
@@ -409,7 +410,7 @@ class CardShape(BaseShape):
             _card_grid = tools.as_float(card_grid, "card_grid")
             mx = self.unit(_dx or 0) + self._o.delta_x
             my = self.unit(_dy or 0) + self._o.delta_y
-            stroke = tools.get_color(DEBUG_COLOR)
+            stroke = colrs.get_color(DEBUG_COLOR)
             grid_size = _card_grid * globals.units
             cols = int(frame_width // grid_size)
             rows = int(frame_height // grid_size)
@@ -1222,7 +1223,7 @@ class DeckOfCards:
                         pt2 = (globals.page[0] / 2.0, globals.page[1])
                     globals.canvas.draw_line(pt1, pt2)
                     gwargs = {}  # kwargs
-                    gwargs["stroke"] = self.gutter_stroke or tools.get_color("gray")
+                    gwargs["stroke"] = self.gutter_stroke or colrs.get_color("gray")
                     gwargs["stroke_width"] = self.gutter_stroke_width
                     gwargs["dotted"] = self.gutter_dotted
                     tools.set_canvas_props(cnv=globals.canvas, index=None, **gwargs)
@@ -1253,15 +1254,15 @@ class DeckOfCards:
 def page_setup():
     """Set the page color and (optionally) show a dotted margin line and grid."""
     # ---- paper color
-    _fill = tools.get_color(globals.page_fill)
-    if _fill != tools.get_color("white"):
+    _fill = colrs.get_color(globals.page_fill)
+    if _fill != colrs.get_color("white"):
         globals.doc_page.draw_rect(
             (0, 0, globals.page[0], globals.page[1]), fill=_fill, color=None
         )
     # ---- debug margins
     if globals.margins.debug:
         # print(f'{globals.margins.left=} {globals.margins.right=}')
-        stroke = tools.get_color(DEBUG_COLOR)
+        stroke = colrs.get_color(DEBUG_COLOR)
         globals.doc_page.draw_rect(
             (
                 globals.margins.left * globals.units,
@@ -1274,7 +1275,7 @@ def page_setup():
         )
     # ---- page grid
     if globals.page_grid:
-        stroke = tools.get_color(DEBUG_COLOR)
+        stroke = colrs.get_color(DEBUG_COLOR)
         grid_size = globals.page_grid * globals.units
         cols = int(globals.page[0] // grid_size)
         rows = int(globals.page[1] // grid_size)
@@ -1367,7 +1368,7 @@ def Create(**kwargs):
         globals.page = (_page_width_pt, _page_height_pt)
     globals.page_width = globals.page[0] / globals.units  # width in user units
     globals.page_height = globals.page[1] / globals.units  # height in user units
-    globals.fill = tools.get_color(kwargs.get("fill", "white"))
+    globals.fill = colrs.get_color(kwargs.get("fill", "white"))
     globals.page_grid = tools.as_float(kwargs.get("page_grid", 0), "page_grid")
     # ---- fonts
     base_fonts()
@@ -3211,7 +3212,7 @@ def Blueprint(**kwargs):
     kwargs["fill"] = kwargs.get("fill", page_fill)
     # ---- page color (optional)
     if kwargs["fill"] is not None:
-        fill = tools.get_color(kwargs.get("fill", "white"))
+        fill = colrs.get_color(kwargs.get("fill", "white"))
         globals.canvas.draw_rect((0, 0, globals.page[0], globals.page[1]))
         globals.canvas.finish(fill=fill)
     kwargs["fill"] = kwargs.get("fill", line_stroke)  # revert back for font

@@ -19,7 +19,7 @@ import segno  # QRCode
 
 # local
 from protograf import globals
-from protograf.utils import geoms, tools, support, fonts
+from protograf.utils import colrs, geoms, tools, support, fonts
 from protograf.utils.tools import _lower
 from protograf.utils.constants import (
     GRID_SHAPES_WITH_CENTRE,
@@ -1830,7 +1830,7 @@ class HexShape(BaseShape):
             _slices = self.slices
         # ---- validate slices color settings
         slices_colors = [
-            tools.get_color(slcolor)
+            colrs.get_color(slcolor)
             for slcolor in _slices
             if not isinstance(slcolor, bool)
         ]
@@ -2791,8 +2791,8 @@ class QRCodeShape(BaseShape):
         qrcode.save(
             _source,
             scale=self.scaling or 1,
-            light=tools.rgb_to_hex(tools.get_color(self.fill)),
-            dark=tools.rgb_to_hex(tools.get_color(self.stroke)),
+            light=colrs.rgb_to_hex(colrs.get_color(self.fill)),
+            dark=colrs.rgb_to_hex(colrs.get_color(self.stroke)),
         )
         rotation = kwargs.get("rotation", self.rotation)
         # ---- load QR image
@@ -3008,7 +3008,7 @@ class RectangleShape(BaseShape):
         else:
             if len(_slices) not in [2, 4]:
                 feedback(err, True)
-        slices_colors = [tools.get_color(slcolor) for slcolor in _slices]
+        slices_colors = [colrs.get_color(slcolor) for slcolor in _slices]
         # ---- draw 2 triangles
         if len(slices_colors) == 2:
             # top-left
@@ -3724,7 +3724,7 @@ class RhombusShape(BaseShape):
             if len(_slices) not in [2, 3, 4]:
                 feedback(err, True)
         slices_colors = [
-            tools.get_color(slcolor)
+            colrs.get_color(slcolor)
             for slcolor in _slices
             if not isinstance(slcolor, bool)
         ]
@@ -4476,7 +4476,7 @@ class TextShape(BaseShape):
             #   archive=None, rotate=0, oc=0, opacity=1, overlay=True)
             keys = {}
             try:
-                keys["opacity"] = tools.get_opacity(self.transparency)
+                keys["opacity"] = colrs.get_opacity(self.transparency)
                 _font_name = self.font_name.replace(" ", "-")
                 if not fonts.builtin_font(self.font_name):  # local check
                     _, _path, font_file = tools.get_font_file(self.font_name)
@@ -4495,7 +4495,7 @@ class TextShape(BaseShape):
                         css_style.append(f"font-size: {self.font_size}px;")
                     if self.stroke:
                         if isinstance(self.stroke, tuple):
-                            _stroke = tools.rgb_to_hex(self.stroke)
+                            _stroke = colrs.rgb_to_hex(self.stroke)
                         else:
                             _stroke = self.stroke
                         css_style.append(f"color: {_stroke};")
