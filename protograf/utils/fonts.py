@@ -155,8 +155,10 @@ class FontInterface:
         for font_family in list(self.font_families.keys()):
             # if font_family[0] == 'U' and name[0] == 'U':
             #     print(f"{name=}", 'vs.', f'+{font_family=}+')
-            if str(name).strip().lower() == font_family.lower() or \
-                    str(name).strip().lower().replace(' ', '') == font_family.lower():
+            if (
+                str(name).strip().lower() == font_family.lower()
+                or str(name).strip().lower().replace(" ", "") == font_family.lower()
+            ):
                 return font_family
         return None
 
@@ -178,8 +180,11 @@ class FontInterface:
             font_details = self.font_families[font_family]
             for font in font_details:
                 _filename = None
-                if str(name).strip().lower() == font["name"].lower() or \
-                        str(name).strip().lower().replace(' ', '') == font["name"].lower():
+                if (
+                    str(name).strip().lower() == font["name"].lower()
+                    or str(name).strip().lower().replace(" ", "")
+                    == font["name"].lower()
+                ):
                     _filename = font["file"]
                 # fallback - use Regular if available
                 if str(name).strip().lower() + " regular" == font["name"].lower():
