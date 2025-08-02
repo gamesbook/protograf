@@ -251,6 +251,7 @@ class BaseCanvas:
         self.line_cap = self.defaults.get("line_cap", None)
         self.dotted = self.defaults.get("dotted", self.defaults.get("dotted", False))
         self.dashed = self.defaults.get("dashed", None)
+        self.squared = self.defaults.get("squared", False)
         # ---- text: base
         self.text = self.defaults.get("text", "")
         self.text_size = self.defaults.get("text_size", self.font_size)
@@ -355,7 +356,7 @@ class BaseCanvas:
         self.y_3 = self.defaults.get("y3", 1)
         # ---- rectangle / card
         self.rounding = self.defaults.get("rounding", 0)
-        self.rounded = self.defaults.get("rounded", False)
+        self.rounded = self.defaults.get("rounded", False)  # also line end
         self.notch = self.defaults.get("notch", 0)
         self.notch_corners = self.defaults.get("notch_corners", "sw nw ne se")
         self.notch_x = self.defaults.get("notch_x", 0)
@@ -520,6 +521,10 @@ class BaseCanvas:
         self.density = self.defaults.get("density", 10)
         self.star_pattern = "random"
         self.seeding = self.defaults.get("seeding", None)
+        # ---- dice / domino
+        self.pip_stroke = self.defaults.get("pip_stroke", self.stroke)
+        self.pip_fill = self.defaults.get("pip_fill", self.stroke)  # see draw_piphead()
+        self.pip_fraction = self.defaults.get("pip_fraction", 0.2)
         # ---- mesh
         self.mesh = self.defaults.get("mesh", None)
         # ---- hatches
@@ -658,6 +663,7 @@ class BaseShape:
         self.line_cap = kwargs.get("line_cap", base.line_cap)
         self.dotted = kwargs.get("dotted", kwargs.get("dots", base.dotted))
         self.dashed = kwargs.get("dashed", base.dashed)
+        self.squared = kwargs.get("squared", base.squared)
         # ---- fill color
         self.fill = kwargs.get("fill", kwargs.get("fill_color", base.fill))
         self.fill_transparency = kwargs.get("fill_transparency", base.fill_transparency)
@@ -812,7 +818,7 @@ class BaseShape:
         self.y_3 = self.kw_float(kwargs.get("y3", base.y_3))
         # ---- rectangle / card
         self.rounding = self.kw_float(kwargs.get("rounding", base.rounding))
-        self.rounded = kwargs.get("rounded", base.rounded)
+        self.rounded = kwargs.get("rounded", base.rounded)  # also line end
         self.notch = self.kw_float(kwargs.get("notch", base.notch))
         self.notch_corners = kwargs.get("notch_corners", base.notch_corners)
         self.notch_x = self.kw_float(kwargs.get("notch_x", base.notch_x))
@@ -1019,6 +1025,12 @@ class BaseShape:
         self.density = self.kw_int(kwargs.get("density", base.density), "density")
         self.star_pattern = kwargs.get("star_pattern", base.star_pattern)
         self.seeding = kwargs.get("seeding", base.seeding)
+        # ---- dice / domino
+        self.pip_stroke = kwargs.get("pip_stroke", base.pip_stroke)
+        self.pip_fill = kwargs.get("pip_fill", base.pip_fill)
+        self.pip_fraction = self.kw_float(
+            kwargs.get("pip_fraction", base.pip_fraction), "pip_fraction"
+        )
         # ---- mesh
         self.mesh = kwargs.get("mesh", base.mesh)
         # ---- hatches

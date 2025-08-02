@@ -55,11 +55,16 @@ from .shapes import (
     SquareShape,
     StadiumShape,
     StarShape,
-    StarFieldShape,
     TextShape,
     TrapezoidShape,
 )
-from .objects import PolyominoObject, PentominoObject, TetrominoObject
+from .objects import (
+    D6Object,
+    PolyominoObject,
+    PentominoObject,
+    TetrominoObject,
+    StarFieldObject,
+)
 from .layouts import (
     GridShape,
     DotGridShape,
@@ -90,6 +95,14 @@ from protograf.utils.constants import (
     GRID_SHAPES_WITH_CENTRE,
     GRID_SHAPES_NO_CENTRE,
     SHAPES_FOR_TRACK,
+)
+from protograf.utils.docstrings import (
+    docstring_area,
+    docstring_base,
+    docstring_card,
+    docstring_center,
+    docstring_loc,
+    docstring_onimo,
 )
 from protograf.utils.fonts import builtin_font, FontInterface
 from protograf.utils.geoms import equilateral_height  # used in scripts
@@ -263,6 +276,7 @@ class CardShape(BaseShape):
         is_card_back = kwargs.get("card_back", False)
         image = kwargs.get("image", None)
         right_gap = kwargs.get("right_gap", 0.0)  # gap between end-of-cards & page edge
+        card_grid = kwargs.get("card_grid", None)
 
         # ---- draw outline
         label = "ID:%s" % cid if self.show_id else ""
@@ -389,6 +403,30 @@ class CardShape(BaseShape):
                 globals.card_frames[page] = [_cframe]
             else:
                 globals.card_frames[page].append(_cframe)
+
+        # ---- draw card grid for Rectangle cards
+        if card_grid and kwargs["frame_type"] == CardFrame.RECTANGLE:
+            _card_grid = tools.as_float(card_grid, "card_grid")
+            mx = self.unit(_dx or 0) + self._o.delta_x
+            my = self.unit(_dy or 0) + self._o.delta_y
+            stroke = tools.get_color(DEBUG_COLOR)
+            grid_size = _card_grid * globals.units
+            cols = int(frame_width // grid_size)
+            rows = int(frame_height // grid_size)
+            for col in range(1, cols + 1):
+                globals.doc_page.draw_line(
+                    (mx + col * grid_size, my),
+                    (mx + col * grid_size, my + frame_height),
+                    color=stroke,
+                    width=0.1,
+                )
+            for row in range(1, rows + 1):
+                globals.doc_page.draw_line(
+                    (mx, my + row * grid_size),
+                    (mx + frame_width, my + row * grid_size),
+                    color=stroke,
+                    width=0.1,
+                )
 
         # ---- draw card elements
         flat_elements = tools.flatten(self.elements)
@@ -568,6 +606,7 @@ class DeckOfCards:
         self.template = kwargs.get("template", None)
         self.copy = kwargs.get("copy", None)
         self.card_name = kwargs.get("card_name", None)
+        self.card_grid = kwargs.get("card_grid", None)
         self.mask = kwargs.get("mask", None)
         if self.mask and not self.dataset:
             feedback('Cannot set "mask" for a Deck without any existing Data!', True)
@@ -786,11 +825,13 @@ class DeckOfCards:
             """Process a page of Cards for front or back of a DeckOfCards
 
             Args:
-                cnv: pymupdf Shape object (one per Page)
-                state: track what is being printed on the page
-                page_number: current page
-                front: if True, print CardShapes in `deck.fronts`
-                right_gap: space left after the last card
+
+            - cnv (pymupdf.Shape): shape object; one per Page
+            - state (DeckPrintState): track what is being printed on the page
+            - page_number (int): current page
+            - front (bool): if True, print CardShapes in `deck.fronts`
+            - right_gap (float): space left after the last card
+            - card_grid (float): interval between card grid lines
 
             Returns:
                 DeckPrintState at the end of a Page
@@ -831,6 +872,7 @@ class DeckOfCards:
                 kwargs["card_number"] = card_number
                 kwargs["cardname"] = None
                 kwargs["right_gap"] = right_gap
+                kwargs["card_grid"] = self.card_grid
                 image = images[card_num] if images and card_num <= len(images) else None
                 card.deck_data = self.dataset
 
@@ -1427,6 +1469,13 @@ def Header(**kwargs):
 
 
 def PageBreak(**kwargs):
+    """Start a new page in the output PDF.
+
+    Kwargs:
+
+    - footer (bool): whether a Footer objetct should be drawn before starting next page
+
+    """
     validate_globals()
 
     globals.canvas.commit()  # add all drawings (to current pymupdf Shape/"canvas")
@@ -1594,7 +1643,17 @@ def save(**kwargs):
 
 
 def margins(**kwargs):
-    """Add margins to a set of kwargs, if not present."""
+    """Add margins, based on globals settings to a set of kwargs, if not present.
+
+    Kwargs:
+
+    - margin (float): default size of every margin on the page
+    - margin_left (float): size of left margin on the page
+    - margin_top (float): size of top margin on the page
+    - margin_bottom (float): size of bottom margin on the page
+    - margin_right (float): size of right margin on the page
+
+    """
     validate_globals()
 
     kwargs["margin"] = kwargs.get("margin", globals.margins.margin)
@@ -1606,6 +1665,19 @@ def margins(**kwargs):
 
 
 def Font(name=None, **kwargs):
+    """Set the Font for all subsequent text in the output PDF.
+
+    Args:
+
+    - name (str): the name of the Font
+
+    Kwargs:
+
+    - size (float): the point size of the Font; default is 12
+    - stroke (str): the named or hexadecimal color of the Font; default is "black"
+    - style (str): the style, if available, for the Font e.g. "bold", "italic"
+
+    """
     validate_globals()
     _name, _path, _file = tools.get_font_file(name)
     globals.base.font_name = _name or DEFAULT_FONT
@@ -1619,10 +1691,17 @@ def Font(name=None, **kwargs):
 
 
 def Version():
+    """Display the version information."""
     feedback(f"Running protograf version {__version__}.")
 
 
 def Feedback(msg):
+    """Use the feedback() function to display a feedback message.
+
+    Args:
+
+    - msg (str): the message to be displayed
+    """
     feedback(msg)
 
 
@@ -1630,10 +1709,11 @@ def Today(details: str = "datetime", style: str = "iso", formatted: str = None) 
     """Return string-formatted current date / datetime in a pre-defined style
 
     Args:
-        details (str): what part of the datetime to format
-        style (str): usa, eur (european), or iso - default
-        formatted (str): formatting string following Python conventions;
-            https://docs.python.org/3/library/datetime.html#strftime-and-strptime-behavior
+
+    - details (str): what part of the datetime to format
+    - style (str): usa, eur (european), or iso - default
+    - formatted (str): formatting string following Python conventions;
+      https://docs.python.org/3/library/datetime.html#strftime-and-strptime-behavior
     """
     current = datetime.now()
     if formatted:
@@ -1675,8 +1755,15 @@ def Today(details: str = "datetime", style: str = "iso", formatted: str = None) 
     return current.isoformat(timespec="seconds")  # ISO
 
 
-def Random(end: int = 1, start: int = 0, decimals: int = 2):
-    """Return a random number, in a range (`start` to `end`), rounded to `decimals`."""
+def Random(end: int = 1, start: int = 0, decimals: int = 2) -> float:
+    """Return a random number, in a range, with decimal rounding.
+
+    Args:
+
+    - end (int): maximum last value in the range; defaults to 1
+    - start (int): minimum first value in the range; defaults to 0
+    - decimals (int): formatting of decimal number being returned; defaults to 2
+    """
     rrr = random.random() * end + start
     if decimals == 0:
         return int(rrr)
@@ -1687,13 +1774,21 @@ def Random(end: int = 1, start: int = 0, decimals: int = 2):
 
 
 def Matrix(labels: list = None, data: list = None) -> list:
-    """Return list of dicts; each element is a unique combo of all the items in `data`"""
+    """Return list of dicts; each element is a unique combo of all the items in `data`
+
+    Args:
+
+    - labels (list): a list of strings representing key names
+    - data (list):  a list of lists; each nested list contains one or more string or
+      numbers representing a set of common attributes e.g. card suits
+
+    """
     if data is None:
         return []
     combos = list(itertools.product(*data))
     # check labels
     data_length = len(combos[0])
-    if labels == []:
+    if labels == [] or labels is None:
         labels = [f"VALUE{item+1}" for item in range(0, data_length)]
     else:
         if len(labels) != data_length:
@@ -1709,8 +1804,12 @@ def Matrix(labels: list = None, data: list = None) -> list:
     return result
 
 
+@docstring_card
 def Card(sequence: object = None, *elements, **kwargs):
     """Add one or more elements to a card or cards.
+
+    Args:
+    <card>
 
     NOTE: A Card receives its `draw()` command via Save()!
     """
@@ -1793,8 +1892,12 @@ def Card(sequence: object = None, *elements, **kwargs):
             feedback(f'Cannot find card#{_card}. (Check "cards" setting in Deck)')
 
 
+@docstring_card
 def CardBack(sequence: object = None, *elements, **kwargs):
     """Add one or more elements to the back of a card or cards.
+
+    Args:
+    <card>
 
     NOTE: A CardBack receives its `draw()` command via Save()!
     """
@@ -1872,16 +1975,24 @@ def CardBack(sequence: object = None, *elements, **kwargs):
             feedback(f'Cannot find cardback#{_back}. (Check "cards" setting in Deck)')
 
 
+@docstring_card
 def Counter(sequence, *elements, **kwargs):
     """Add one or more elements to a counter or counters.
+
+    Args:
+    <card>
 
     NOTE: A Counter receives its `draw()` command via Save()!
     """
     Card(sequence, *elements, **kwargs)
 
 
+@docstring_card
 def CounterBack(sequence, *elements, **kwargs):
-    """Add one or more elements to a counter or counters.
+    """Add one or more elements to the back of a counter or counters.
+
+    Args:
+    <card>
 
     NOTE: A CounterBack receives its `draw()` command via Save()!
     """
@@ -1893,66 +2004,66 @@ def Deck(**kwargs):
 
     Kwargs (optional):
 
-    - bleed_fill: background color for the page (up to the margins);
+    - bleed_fill (str): background color for the page (up to the margins);
       if no separate **fill** property is set, then this color is used instead
-    - cards: the number of cards appearing in the deck; defaults to 9
+    - cards (int): the number of cards appearing in the deck; defaults to 9
       Note that other objects such as Data() and Matrix() can alter this value
-    - card_size: a pre-existing card size used to set *width* and *height*
+    - card_size (str): a pre-existing card size used to set *width* and *height*
       (if values for *width* and *height* are set, they will override this);
       can be one of: ``poker``, ``bridge``, ``tarot``, ``business``, ``mini``,
       ``skat``, ``mini``, ``minieuropean``, ``miniamerican``
-    - cols: maximum number of card columns that should appear on a page
-    - copy: the name of a column in the dataset defined by Data() that
+    - cols (int): maximum number of card columns that should appear on a page
+    - copy (str): the name of a column in the dataset defined by Data() that
       specifies how many copies of a card are needed
-    - fill: color of the card's area; defaults to ``white``
-    - frame: the default card frame is a *rectangle* (or square, if the
+    - fill (str): color of the card's area; defaults to ``white``
+    - frame (str): the default card frame is a *rectangle* (or square, if the
       height and width match); but can be set to *hexagon* or *circle*
-    - grid_marks: if set to ``True``, will cause small marks to be drawn at
+    - grid_marks (bool): if set to ``True``, will cause small marks to be drawn at
       the border of the page that align with the edges of the card frames
-    - grid_marks_length: the length of the *grid_marks*; defaults to ``0.85`` cm
-    - grid_marks_stroke: line color of the *grid_marks*; defaults to ``grey``
-    - grid_marks_stroke_width: line width of the *grid_marks*; defaults to 0.1
-    - grouping: number of cards to be drawn adjacent to each other
+    - grid_marks_length (float): the length of the *grid_marks*; defaults to ``0.85`` cm
+    - grid_marks_stroke (str): line color of the *grid_marks*; defaults to ``grey``
+    - grid_marks_stroke_width (float): line width of the *grid_marks*; defaults to 0.1
+    - grouping (int): number of cards to be drawn adjacent to each other
       before a blank space is added by the **spacing** property (note that
       **grouping** does not apply to  *hexagon* **frame** cards)
       (about one-third of an inch)
-    - grouping_col: number of cards to be drawn adjacent to each other
+    - grouping_col (int): number of cards to be drawn adjacent to each other
       in a horizontal direction before a blank space is added by the **spacing**
-    - grouping_row: number of cards to be drawn adjacent to each other
+    - grouping_row (int): number of cards to be drawn adjacent to each other
       in a vertical direction before a blank space is added by the **spacing**
-    - gutter: a value set for this helps determines the spacing between the
+    - gutter (float): a value set for this helps determines the spacing between the
       fronts and backs of cards when these are drawn on two halves of the same
       page; its value is divided in half, and added to the top margin value, and
       each set of cards is drawn that distance away from the centre line of the page
-    - gutter_stroke: if set, will cause a line of that color to be used
+    - gutter_stroke (str): if set, will cause a line of that color to be used
       for the *gutter* line; this defaults to ``gray`` (to match grid marks)
-    - gutter_stroke_width: if set to a value, will cause a line of that
+    - gutter_stroke_width (float): if set to a value, will cause a line of that
       thickness to be used for the *gutter* line
-    - gutter_dotted: sets the style of the *gutter* line
-    - gutter_layout: sets the orientation of the page for the cards drawn in
+    - gutter_dotted (bool): sets the style of the *gutter* line
+    - gutter_layout (str): sets the orientation of the page for the cards drawn in
       the two gutter "halves"; this can be ``portrait`` (the default) or
       ``landscape``` (the latter is useful when you have very tall cards e.g.
       ``tarot`` sized ones)
-    - height: card height for a *rectangular* card; defaults to 8.89 cm
-    - mask: an expression which should evaluate to ``True`` or ``False``.
+    - height (float): card height for a *rectangular* card; defaults to 8.89 cm
+    - mask (str): an expression which should evaluate to ``True`` or ``False``.
       This expression has the same kind of syntax as T() and it uses data available
       from the Deck object's Data(). If the expression result is ``True``
       then any matching cards will be masked i.e. ignored and not drawn
-    - radius: radius for a card of type *hexagon* or *circle*; defaults to 2.54 cm
-    - rounding: size of rounding on each corner of a rectangular frame card
-    - rows: maximum number of card rows that should appear on a page
-    - spacing: size of blank space between each card or grouping in x- and y-direction
-    - spacing_x: size of blank space between each card or grouping in a
+    - radius (float): radius for a card of type *hexagon* or *circle*; defaults to 2.54 cm
+    - rounding: (float) size of rounding on each corner of a rectangular frame card
+    - rows (int): maximum number of card rows that should appear on a page
+    - spacing (float): size of blank space between each card or grouping in x- and y-direction
+    - spacing_x (float): size of blank space between each card or grouping in a
       horizontal direction
-    - spacing_y: size of blank space between each card or grouping in a
+    - spacing_y (float): size of blank space between each card or grouping in a
       vertical direction
-    - stroke: color of the card's border; defaults to ``black``
-    - width: card width for a *rectangular* card; defaults to ``6.35`` cm
-    - zones: list of tuples; each with page number(s) and a shape
+    - stroke (str): color of the card's border; defaults to ``black``
+    - width (float): card width for a *rectangular* card; defaults to ``6.35`` cm
+    - zones (list): list of tuples; each with page number(s) and a shape
 
     Notes:
 
-    - This function instantiates a DeckOfCards object; this object:
+    - This function instantiates the object; the object in turn:
 
         - receives its `draw()` command from Save()
         - draws any gutter lines (one per page)
@@ -1964,19 +2075,17 @@ def Deck(**kwargs):
     kwargs["dataset"] = globals.dataset
     globals.deck = DeckOfCards(canvas=globals.canvas, **kwargs)
     globals.deck_settings["grid_marks"] = kwargs.get("grid_marks", None)
+    return globals.deck
 
 
 def CounterSheet(**kwargs):
-    """Initialise a countersheet with all its settings, including source(s) of data.
-
-    NOTE: A CounterSheet (aka Deck) receives its `draw()` command from Save()!
-    """
+    """Initialise a countersheet with all its settings, including source(s) of data."""
     kwargs["_is_countersheet"] = True
-    Deck(**kwargs)
+    return Deck(**kwargs)
 
 
-def group(*args, **kwargs):
-
+def group(*args, **kwargs) -> GroupBase:
+    """Store a list of Shapes to be drawn by a Card-type object."""
     gb = GroupBase(kwargs)
     for arg in args:
         gb.append(arg)
@@ -2186,18 +2295,17 @@ def Data(**kwargs):
     return globals.dataset
 
 
-def S(test="", result=None, alternate=None):
-    """
-    Enable Selection of data from a dataset list
+def S(test="", result=None, alternate=None) -> Switch:
+    """Enable selection of data from a dataset list
 
-        test: str
-            boolean-type Jinja2 expression which can be evaluated to return True/False
-            e.g. {{ NAME == 'fred' }} gets the column "NAME" value from the dataset
-            and tests its equivalence to the value "fred"
-        result: str or element
-            returned if `test` evaluates to True
-        alternate: str or element
-            OPTIONAL; returned if `test` evaluates to False; if not supplied, then None
+    Args:
+
+    - test (str): a boolean-type Jinja2 expression which can be evaluated to return
+      True/False e.g. {{ NAME == 'fred' }} gets the column "NAME" value from the
+      dataset and tests its equivalence to the value "fred"
+    - result (str / element): returned if `test` evaluates to True
+    - alternate (str / element): OPTIONAL; returned if `test` evaluates to False;
+      if not supplied, then defaults to None
     """
 
     if globals.dataset and isinstance(globals.dataset, list):
@@ -2215,19 +2323,21 @@ def S(test="", result=None, alternate=None):
 def L(lookup: str, target: str, result: str, default: Any = "") -> LookupType:
     """Enable Lookup of data in a record of a dataset
 
-        lookup: str
-            the lookup column whose value must be used for the match ("source" record)
-        target: str
-            the name of the column of the data being searched ("target" record)
-        result: str
-            name of result column containing the data to be returned ("target" record)
-        default: Any
-            the data to be returned if NO match is made
+    Args:
 
-    In short:
-        lookup and target enable finding a matching record in the dataset;
-        the data in the 'result' column of that record is stored as an
-        `lookup: result` entry in the returned lookups dictionary of the LookupType
+    - lookup (str): lookup column whose value must be used for the match
+      ("source" record)
+    - target (str): name of the column of the data being searched ("target" record)
+    - result (str):  name of result column containing the data to be returned
+      ("target" record)
+    - default (Any):  the data to be returned if NO match is made
+
+    Notes:
+
+    The lookup and target enable finding a matching record in the dataset;
+    the data in the result column of that record is stored as an
+    `lookup: result` entry in the returned lookups dictionary of the LookupType
+
     """
     lookups = {}
     if globals.dataset and isinstance(globals.dataset, list):
@@ -2246,8 +2356,17 @@ def L(lookup: str, target: str, result: str, default: Any = "") -> LookupType:
     return result
 
 
-def T(string: str, data: dict = None, function: object = None):
-    """Use string to create a Jinja2 Template."""
+def T(string: str, data: dict = None, function: object = None) -> TemplatingType:
+    """
+
+    Args:
+
+    - string (str): a Jinja2 expression which can be evaluated using data
+    - data (dict): keys from the dict can be used for the Jinja2 expression
+    - function (object): a local function provided in the script that must return
+      one or more shapes
+
+    """
     # print(f'$$$  TEMPLATE {string=} {data=}')
     environment = jinja2.Environment()
     try:
@@ -2278,6 +2397,16 @@ def base_shape(source=None, **kwargs):
 
 
 def Common(source=None, **kwargs):
+    """Store properties that will be used by one or more other Shapes.
+
+    Args:
+
+    - source (object): any object can be the source
+
+    Notes:
+
+    Any kwargs can be used; they are stored for further use by other Shapes
+    """
     kwargs = margins(**kwargs)
     kwargs["source"] = source
     cshape = CommonShape(canvas=globals.canvas, **kwargs)
@@ -2291,7 +2420,27 @@ def common(source=None, **kwargs):
     return cshape
 
 
+@docstring_base
 def Image(source=None, **kwargs):
+    """Draw an image on the canvas.
+
+    Args:
+    - the first argument must be the filename of the image, prefixed by the
+      path or URL where the image can be sourced, if not in the same directory
+      as the script.
+
+    Kwargs:
+    <base>
+    -  *sliced* (str) - a letter used to indicate which portion of the
+       image to extract:
+       - *l* - the left fraction, matching the image's width:height ratio
+       - *c* - the centre fraction, matching the image's width:height ratio
+       - *r* - the right fraction, matching the image's width:height ratio
+       - *t* - the top fraction, matching the image's height:width ratio
+       - *m* - the middle fraction, matching the image's height:width ratio
+       - *b* - the botttom fraction, matching the image's height:width ratio
+
+    """
     kwargs = margins(**kwargs)
     kwargs["source"] = source
     image = ImageShape(canvas=globals.canvas, **kwargs)
@@ -2305,7 +2454,15 @@ def image(source=None, **kwargs):
     return ImageShape(canvas=globals.canvas, **kwargs)
 
 
+@docstring_base
 def Arc(**kwargs):
+    """Draw an Arc shape on the canvas.
+
+    Kwargs:
+
+    <base>
+
+    """
     kwargs = margins(**kwargs)
     arc = ArcShape(canvas=globals.canvas, **kwargs)
     arc.draw()
@@ -2317,7 +2474,20 @@ def arc(**kwargs):
     return ArcShape(canvas=globals.canvas, **kwargs)
 
 
+@docstring_base
 def Arrow(row=None, col=None, **kwargs):
+    """Draw a Arrow shape on the canvas.
+
+    Args:
+
+    - row (int): row in which the shape is drawn.
+    - col (int): column in which shape is drawn.
+
+    Kwargs:
+
+    <base>
+
+    """
     kwargs = margins(**kwargs)
     arr = arrow(row=row, col=col, **kwargs)
     arr.draw()
@@ -2331,7 +2501,15 @@ def arrow(row=None, col=None, **kwargs):
     return ArrowShape(canvas=globals.canvas, **kwargs)
 
 
+@docstring_base
 def Bezier(**kwargs):
+    """Draw a Bezier shape on the canvas.
+
+    Kwargs:
+
+    <base>
+
+    """
     kwargs = margins(**kwargs)
     bezier = BezierShape(canvas=globals.canvas, **kwargs)
     bezier.draw()
@@ -2343,7 +2521,20 @@ def bezier(**kwargs):
     return BezierShape(canvas=globals.canvas, **kwargs)
 
 
+@docstring_base
 def Chord(row=None, col=None, **kwargs):
+    """Draw a Chord shape on the canvas.
+
+    Args:
+
+    - row (int): row in which the shape is drawn.
+    - col (int): column in which shape is drawn.
+
+    Kwargs:
+
+    <base>
+
+    """
     kwargs = margins(**kwargs)
     chd = chord(row=row, col=col, **kwargs)
     chd.draw()
@@ -2357,7 +2548,20 @@ def chord(row=None, col=None, **kwargs):
     return ChordShape(canvas=globals.canvas, **kwargs)
 
 
-def Circle(**kwargs):
+@docstring_base
+def Circle(row=None, col=None, **kwargs):
+    """Draw a Circle shape on the canvas.
+
+    Args:
+
+    - row (int): row in which the shape is drawn.
+    - col (int): column in which shape is drawn.
+
+    Kwargs:
+
+    <base>
+
+    """
     kwargs = margins(**kwargs)
     circle = CircleShape(canvas=globals.canvas, **kwargs)
     circle.draw()
@@ -2369,7 +2573,20 @@ def circle(**kwargs):
     return CircleShape(canvas=globals.canvas, **kwargs)
 
 
+@docstring_base
 def Compass(row=None, col=None, **kwargs):
+    """Draw a Compass shape on the canvas.
+
+    Args:
+
+    - row (int): row in which the shape is drawn.
+    - col (int): column in which shape is drawn.
+
+    Kwargs:
+
+    <base>
+
+    """
     kwargs = margins(**kwargs)
     cmpss = compass(row=row, col=col, **kwargs)
     cmpss.draw()
@@ -2381,7 +2598,20 @@ def compass(row=None, col=None, **kwargs):
     return CompassShape(canvas=globals.canvas, **kwargs)
 
 
+@docstring_base
 def Dot(row=None, col=None, **kwargs):
+    """Draw a Dot shape on the canvas.
+
+    Args:
+
+    - row (int): row in which the shape is drawn.
+    - col (int): column in which shape is drawn.
+
+    Kwargs:
+
+    <base>
+
+    """
     kwargs = margins(**kwargs)
     dtt = dot(row=row, col=col, **kwargs)
     dtt.draw()
@@ -2393,7 +2623,20 @@ def dot(row=None, col=None, **kwargs):
     return DotShape(canvas=globals.canvas, **kwargs)
 
 
+@docstring_base
 def Ellipse(**kwargs):
+    """Draw a Ellipse shape on the canvas.
+
+    Args:
+
+    - row (int): row in which the shape is drawn.
+    - col (int): column in which shape is drawn.
+
+    Kwargs:
+
+    <base>
+
+    """
     kwargs = margins(**kwargs)
     ellipse = EllipseShape(canvas=globals.canvas, **kwargs)
     ellipse.draw()
@@ -2405,7 +2648,20 @@ def ellipse(**kwargs):
     return EllipseShape(canvas=globals.canvas, **kwargs)
 
 
+@docstring_base
 def EquilateralTriangle(row=None, col=None, **kwargs):
+    """Draw a EquilateralTriangle shape on the canvas.
+
+    Args:
+
+    - row (int): row in which the shape is drawn.
+    - col (int): column in which shape is drawn.
+
+    Kwargs:
+
+    <base>
+
+    """
     kwargs = margins(**kwargs)
     kwargs["row"] = row
     kwargs["col"] = col
@@ -2419,7 +2675,20 @@ def equilateraltriangle(row=None, col=None, **kwargs):
     return EquilateralTriangleShape(canvas=globals.canvas, **kwargs)
 
 
+@docstring_base
 def Hexagon(row=None, col=None, **kwargs):
+    """Draw a Hexagon shape on the canvas.
+
+    Args:
+
+    - row (int): row in which the shape is drawn.
+    - col (int): column in which shape is drawn.
+
+    Kwargs:
+
+    <base>
+
+    """
     kwargs = margins(**kwargs)
     # print(f'$$$ Will draw HexShape: {kwargs}')
     kwargs["row"] = row
@@ -2436,25 +2705,20 @@ def hexagon(row=None, col=None, **kwargs):
     return HexShape(canvas=globals.canvas, **kwargs)
 
 
+@docstring_base
 def Line(row=None, col=None, **kwargs):
     """Draw a Line shape on the canvas.
 
     Kwargs:
 
+    <base>
     - angle (float): the number of degrees clockwise from the baseline; used in
       conjunction with *length*
     - cx and cy (floats): if set, will replace the use of *x* and *y* for the
       starting point, and work in conjunction with *angle* and *length* to
       create the line around a centre point
-    - dotted (bool): if ``True``, create a series of small lines i.e. the
-      "dots", followed by gaps, of sizes equal to the line's *stroke_width*
-    - dashed (list): a list of two floats: the first is the length of the dash;
-      the second is the length of the space between each dash
     - length (float): sets the specific size of the line; used in conjunction
       with *angle* (which defaults to 0 |deg|)
-    - rounded (bool): if ``True``, draw small semicircles at the ends of the line
-    - stroke (float): the color of the line
-    - stroke_width (str): the thickness of the line, in points
     - x1 and y1 (floats): a fixed endpoint for the line end (if not calculated by
       *angle* and *length*)
 
@@ -2492,7 +2756,20 @@ def line(row=None, col=None, **kwargs):
     return LineShape(canvas=globals.canvas, **kwargs)
 
 
+@docstring_base
 def Polygon(row=None, col=None, **kwargs):
+    """Draw a Polygon shape on the canvas.
+
+    Args:
+
+    - row (int): row in which the shape is drawn.
+    - col (int): column in which shape is drawn.
+
+    Kwargs:
+
+    <base>
+
+    """
     kwargs = margins(**kwargs)
     poly = polygon(row=row, col=col, **kwargs)
     poly.draw()
@@ -2506,7 +2783,20 @@ def polygon(row=None, col=None, **kwargs):
     return PolygonShape(canvas=globals.canvas, **kwargs)
 
 
+@docstring_base
 def Polyline(row=None, col=None, **kwargs):
+    """Draw a Polyline shape on the canvas.
+
+    Args:
+
+    - row (int): row in which the shape is drawn.
+    - col (int): column in which the shape is drawn.
+
+    Kwargs:
+
+    <base>
+
+    """
     kwargs = margins(**kwargs)
     polylin = polyline(row=row, col=col, **kwargs)
     polylin.draw()
@@ -2520,7 +2810,20 @@ def polyline(row=None, col=None, **kwargs):
     return PolylineShape(canvas=globals.canvas, **kwargs)
 
 
+@docstring_base
 def RightAngledTriangle(row=None, col=None, **kwargs):
+    """Draw a RightAngledTriangle shape on the canvas.
+
+    Args:
+
+    - row (int): row in which the shape is drawn.
+    - col (int): column in which the shape is drawn.
+
+    Kwargs:
+
+    <base>
+
+    """
     kwargs = margins(**kwargs)
     kwargs["row"] = row
     kwargs["col"] = col
@@ -2534,7 +2837,20 @@ def rightangledtriangle(row=None, col=None, **kwargs):
     return RightAngledTriangleShape(canvas=globals.canvas, **kwargs)
 
 
+@docstring_base
 def Rhombus(row=None, col=None, **kwargs):
+    """Draw a Rhombus shape on the canvas.
+
+    Args:
+
+    - row (int): row in which the shape is drawn.
+    - col (int): column in which the shape is drawn.
+
+    Kwargs:
+
+    <base>
+
+    """
     kwargs = margins(**kwargs)
     rhomb = rhombus(row=row, col=col, **kwargs)
     rhomb.draw()
@@ -2546,7 +2862,20 @@ def rhombus(row=None, col=None, **kwargs):
     return RhombusShape(canvas=globals.canvas, **kwargs)
 
 
+@docstring_base
 def Rectangle(row=None, col=None, **kwargs):
+    """Draw a Rectangle shape on the canvas.
+
+    Args:
+
+    - row (int): row in which the shape is drawn.
+    - col (int): column in which the shape is drawn.
+
+    Kwargs:
+
+    <base>
+
+    """
     kwargs = margins(**kwargs)
     rect = rectangle(row=row, col=col, **kwargs)
     rect.draw()
@@ -2560,7 +2889,20 @@ def rectangle(row=None, col=None, **kwargs):
     return RectangleShape(canvas=globals.canvas, **kwargs)
 
 
+@docstring_base
 def Polyshape(row=None, col=None, **kwargs):
+    """Draw a Polyshape shape on the canvas.
+
+    Args:
+
+    - row (int): row in which the shape is drawn.
+    - col (int): column in which the shape is drawn.
+
+    Kwargs:
+
+    <base>
+
+    """
     kwargs = margins(**kwargs)
     shapeshape = polyshape(row=row, col=col, **kwargs)
     shapeshape.draw()
@@ -2574,7 +2916,20 @@ def polyshape(row=None, col=None, **kwargs):
     return ShapeShape(canvas=globals.canvas, **kwargs)
 
 
+@docstring_base
 def QRCode(source=None, **kwargs):
+    """Draw a QRCode shape on the canvas.
+
+    Args:
+
+    - row (int): row in which the shape is drawn.
+    - col (int): column in which the shape is drawn.
+
+    Kwargs:
+
+    <base>
+
+    """
     kwargs = margins(**kwargs)
     kwargs["source"] = source
     image = QRCodeShape(canvas=globals.canvas, **kwargs)
@@ -2588,7 +2943,20 @@ def qrcode(source=None, **kwargs):
     return QRCodeShape(canvas=globals.canvas, **kwargs)
 
 
+@docstring_base
 def Sector(row=None, col=None, **kwargs):
+    """Draw a Sector shape on the canvas.
+
+    Args:
+
+    - row (int): row in which the shape is drawn.
+    - col (int): column in which the shape is drawn.
+
+    Kwargs:
+
+    <base>
+
+    """
     kwargs = margins(**kwargs)
     sct = sector(row=row, col=col, **kwargs)
     sct.draw()
@@ -2602,7 +2970,20 @@ def sector(row=None, col=None, **kwargs):
     return SectorShape(canvas=globals.canvas, **kwargs)
 
 
+@docstring_base
 def Square(row=None, col=None, **kwargs):
+    """Draw a Square shape on the canvas.
+
+    Args:
+
+    - row (int): row in which the shape is drawn.
+    - col (int): column in which the shape is drawn.
+
+    Kwargs:
+
+    <base>
+
+    """
     kwargs = margins(**kwargs)
     sqr = square(row=row, col=col, **kwargs)
     sqr.draw()
@@ -2616,7 +2997,20 @@ def square(row=None, col=None, **kwargs):
     return SquareShape(canvas=globals.canvas, **kwargs)
 
 
+@docstring_base
 def Stadium(row=None, col=None, **kwargs):
+    """Draw a Stadium shape on the canvas.
+
+    Args:
+
+    - row (int): row in which the shape is drawn.
+    - col (int): column in which the shape is drawn.
+
+    Kwargs:
+
+    <base>
+
+    """
     kwargs = margins(**kwargs)
     kwargs["row"] = row
     kwargs["col"] = col
@@ -2632,7 +3026,20 @@ def stadium(row=None, col=None, **kwargs):
     return StadiumShape(canvas=globals.canvas, **kwargs)
 
 
+@docstring_base
 def Star(row=None, col=None, **kwargs):
+    """Draw a Star shape on the canvas.
+
+    Args:
+
+    - row (int): row in which the shape is drawn.
+    - col (int): column in which the shape is drawn.
+
+    Kwargs:
+
+    <base>
+
+    """
     kwargs = margins(**kwargs)
     kwargs["row"] = row
     kwargs["col"] = col
@@ -2648,30 +3055,20 @@ def star(row=None, col=None, **kwargs):
     return StarShape(canvas=globals.canvas, **kwargs)
 
 
-def StarField(**kwargs):
-    """StarField pattern on a given canvas.
+@docstring_base
+def Text(row=None, col=None, **kwargs):
+    """Draw a Text shape on the canvas.
+
+    Args:
+
+    - row (int): row in which the shape is drawn.
+    - col (int): column in which the shape is drawn.
 
     Kwargs:
 
-    - density (int): average number of stars per square unit; default is 10
-    - colors (list): the individual star colors; default is ["white"]
-    - enclosure (Shape): regular shape inside which its drawn; default is a rectangle
-    - sizes (list): list of individual star sizes as floats; default is [0.1]
-    - star_pattern (str): (random | cluster) - NOT YET IMPLEMENTED
-    - seeding (float): if set, predetermines the randomisation sequence
+    <base>
+
     """
-    kwargs = margins(**kwargs)
-    starfield = StarFieldShape(canvas=globals.canvas, **kwargs)
-    starfield.draw()
-    return starfield
-
-
-def starfield(**kwargs):
-    kwargs = margins(**kwargs)
-    return StarFieldShape(canvas=globals.canvas, **kwargs)
-
-
-def Text(**kwargs):
     kwargs = margins(**kwargs)
     text = TextShape(canvas=globals.canvas, **kwargs)
     text.draw()
@@ -2684,7 +3081,20 @@ def text(*args, **kwargs):
     return TextShape(_object=_obj, canvas=globals.canvas, **kwargs)
 
 
+@docstring_base
 def Trapezoid(row=None, col=None, **kwargs):
+    """Draw a Trapezoid shape on the canvas.
+
+    Args:
+
+    - row (int): row in which the shape is drawn.
+    - col (int): column in which the shape is drawn.
+
+    Kwargs:null
+
+    <base>
+
+    """
     kwargs = margins(**kwargs)
     trp = trapezoid(row=row, col=col, **kwargs)
     trp.draw()
@@ -2711,7 +3121,15 @@ def DotGrid(**kwargs):
     return dgrd
 
 
+@docstring_loc
 def Grid(**kwargs):
+    """Draw a lined grid on the canvas.
+
+    Kwargs:
+
+    <base>
+
+    """
     kwargs = margins(**kwargs)
     # override defaults ... otherwise grid not "next" to margins
     kwargs["x"] = kwargs.get("x", 0)
@@ -2914,6 +3332,18 @@ def Blueprint(**kwargs):
 
 
 def Connect(shape_from, shape_to, **kwargs):
+    """Connect two shapes on the canvas.
+
+    Args:
+
+    - row (int): row in which the shape is drawn.
+    - col (int): column in which the shape is drawn.
+
+    Kwargs:
+
+    <base>
+
+    """
     kwargs = margins(**kwargs)
     kwargs["shape_from"] = shape_from
     kwargs["shape_to"] = shape_to
@@ -2933,7 +3363,15 @@ def connect(shape_from, shape_to, **kwargs):
 
 
 def Repeat(shapes=None, **kwargs):
-    """Draw multiple copies of a Shape across rows and columns."""
+    """Draw multiple copies of a Shape across rows and columns.
+
+    Args:
+
+    - shapes (list): the Shapes to be drawn
+
+    Kwargs:
+
+    """
     kwargs = margins(**kwargs)
     kwargs["shapes"] = shapes
     repeat = RepeatShape(**kwargs)
@@ -2947,6 +3385,18 @@ def repeat(shapes=None, **kwargs):
 
 
 def Lines(rows=1, cols=1, **kwargs):
+    """Draw multiple copies of a Line across rows and columns.
+
+    Args:
+
+    - rows (int): the number to be drawn in the vertical direction
+    - cols (int): the number to be drawn in the horizontal direction
+
+    Notes:
+
+    The same kwargs as used for a Line shape can be applied here.
+
+    """
     kwargs = margins(**kwargs)
     for row in range(rows):
         for col in range(cols):
@@ -2984,7 +3434,19 @@ def table(shapes=None, **kwargs):
 
 
 def Hexagons(rows=1, cols=1, sides=None, **kwargs):
-    """Draw a set of hexagons in a pattern."""
+    """Draw multiple copies of a Hexagon across rows and columns.
+
+    Args:
+
+    - rows (int): the number to be drawn in the vertical direction
+    - cols (int): the number to be drawn in the horizontal direction
+    - sides (int): the number of hexagons along the edge of a HexHex frame
+
+    Notes:
+
+    The same kwargs as used for a Hexagon shape can be applied here.
+
+    """
     kwargs = kwargs
     locales = []  # list of Locale namedtuples
     if kwargs.get("hidden"):
@@ -3108,7 +3570,18 @@ def Hexagons(rows=1, cols=1, sides=None, **kwargs):
 
 
 def Rectangles(rows=1, cols=1, **kwargs):
-    """Draw a set of rectangles in a pattern."""
+    """Draw multiple copies of a Rectangle across rows and columns.
+
+    Args:
+
+    - rows (int): the number to be drawn in the vertical direction
+    - cols (int): the number to be drawn in the horizontal direction
+
+    Notes:
+
+    The same kwargs as used for a Rectangle shape can be applied here.
+
+    """
     kwargs = kwargs
     locales = []  # list of Locale namedtuples
     if kwargs.get("hidden"):
@@ -3145,7 +3618,18 @@ def Rectangles(rows=1, cols=1, **kwargs):
 
 
 def Squares(rows=1, cols=1, **kwargs):
-    """Draw a set of squares in a pattern."""
+    """Draw multiple copies of a Square across rows and columns.
+
+    Args:
+
+    - rows (int): the number to be drawn in the vertical direction
+    - cols (int): the number to be drawn in the horizontal direction
+
+    Notes:
+
+    The same kwargs as used for a Square shape can be applied here.
+
+    """
     kwargs = kwargs
     locations = []
     if kwargs.get("hidden"):
@@ -3780,35 +4264,54 @@ def BGG(user: str = None, ids: list = None, progress=False, short=500, **kwargs)
 # ---- objects ====
 
 
+@docstring_base
+def D6(row=None, col=None, **kwargs):
+    """Draw a D6 shape with "pips" on the canvas.
+
+    Args:
+
+    - row (int): row in which the shape is drawn.
+    - col (int): column in which the shape is drawn.
+
+    Kwargs:
+
+    - random (bool):
+    - roll (int): a number from 1 to 6 representing the number of pips
+    - pip_stroke (str):
+    - pip_fill (str):
+    - pip_fraction (float):
+    <base>
+
+    """
+    kwargs = margins(**kwargs)
+    d6 = D6Object(canvas=globals.canvas, **kwargs)
+    d6.draw()
+    return d6
+
+
+def d6(*args, **kwargs):
+    kwargs = margins(**kwargs)
+    _obj = args[0] if args else None
+    return D6Object(_object=_obj, canvas=globals.canvas, **kwargs)
+
+
+@docstring_base
+@docstring_onimo
 def Polyomino(row=None, col=None, **kwargs) -> PolyominoObject:
     """Create a Polyomino object
 
     Args:
-        - row (int): row in which Polyomino is drawn.
-        - col (int): column in which Polyomino is drawn.
+
+    - row (int): row in which Polyomino is drawn.
+    - col (int): column in which Polyomino is drawn.
 
     Kwargs:
-        - pattern (list): a list of string values; one string per row. Each string
-          contains one or more numbers aka "columns". Each number represents a square,
-          with a zero (0) representing a space.
-        - invert (str): can either be ``leftright`` (``lr``) or ``topbottom``
-          (``tb``) and will reverse the order of the numbers, either in a left-to-right
-          (numbers at the end of a row go to the start and vice-versa) or top-to-bottom
-          (rows at the end go to the start and vice-versa)
-        - flip (str): can either be ``north`` (``n``) or ``south`` (``s``) and
-          transposes rows and columns; effectively rotating the shape 90 degrees
-        - gap (float): the amount of space to leave between each row and each
-          column in the pattern
-        - outline (bool): along with *outline_stroke* and *outline_stroke_width*
-          is used to draw a line around the boundary of all connected squares in
-          the pattern |dash| it cannot be used in conjunction with a non-zero *gap*
-        - outline_stroke (str): color of boundary line around all connected squares
-        - outline_stroke_width (float): width of boundary line around all connected
-          squares
-        - fills (list): each square can be associated with a different fill color
-        - strokes (list): each square can be associated with a different stroke color
-        - labels (list): each square can be linked to a different label
-        - shapes (list): each square can be linked to a different centred shape
+
+    - pattern (list): a list of string values; one string per row. Each string
+      contains one or more numbers aka "columns". Each number represents a square,
+      with a zero (0) representing a space.
+    <onimo>
+    <base>
 
     Returns:
         PolyominoObject
@@ -3827,7 +4330,25 @@ def polyomino(row=None, col=None, **kwargs) -> PolyominoObject:
     return PolyominoObject(canvas=globals.canvas, **kwargs)
 
 
+@docstring_base
+@docstring_onimo
 def Pentomino(row=None, col=None, **kwargs):
+    """Create a Polyomino object
+
+    Args:
+
+    - row (int): row in which Pentomino is drawn.
+    - col (int): column in which Pentomino is drawn.
+
+    Kwargs:
+
+    - letter (str): a single character representing a unique arrangement of 5 squares
+    <onimo>
+    <base>
+
+    Returns:
+        PentominoObject
+    """
     kwargs = margins(**kwargs)
     pentm = pentomino(row=row, col=col, **kwargs)
     pentm.draw()
@@ -3842,6 +4363,24 @@ def pentomino(row=None, col=None, **kwargs):
 
 
 def Tetromino(row=None, col=None, **kwargs):
+    """Create a Tetromino object
+
+    Args:
+
+    - row (int): row in which Tetromino is drawn.
+    - col (int): column in which Tetromino is drawn.
+
+    Kwargs:
+
+    - letter (str): a single character representing a unique arrangement
+      of 4 squares
+    <onimo>
+    <base>
+
+    Returns:
+
+        TetrominoObject
+    """
     kwargs = margins(**kwargs)
     tetrm = tetromino(row=row, col=col, **kwargs)
     tetrm.draw()
@@ -3855,18 +4394,48 @@ def tetromino(row=None, col=None, **kwargs):
     return TetrominoObject(canvas=globals.canvas, **kwargs)
 
 
+@docstring_base
+def StarField(**kwargs):
+    """Draw a Starfield object on the canvas.
+
+    Kwargs:
+
+    <base>
+    - density (int): average number of stars per square unit; default is 10
+    - colors (list): the individual star colors; default is ["white"]
+    - enclosure (str): the name of the regular shape inside which the
+      StarFieldObject is drawn; default is a `rectangle`
+    - sizes (list): the individual star sizes; default is [0.1]
+    - star_pattern (random | cluster) - NOT YET IMPLEMENTED
+    - seeding (float): if set, predetermines the randomisation sequenc
+
+    Reference:
+
+        https://codeboje.de/starfields-and-galaxies-python/
+    """
+    kwargs = margins(**kwargs)
+    starfield = StarFieldObject(canvas=globals.canvas, **kwargs)
+    starfield.draw()
+    return starfield
+
+
+def starfield(**kwargs):
+    kwargs = margins(**kwargs)
+    return StarFieldObject(canvas=globals.canvas, **kwargs)
+
+
 # ---- dice ====
 
 
-def dice(dice="1d6", rolls=None):
-    """Roll multiple totals for a kind of die.
+def roll_dice(dice="1d6", rolls=None):
+    """Roll multiple totals for a type of die.
 
     Examples:
-    >>> dice('2d6')  # Catan dice roll
+    >>> roll_dice('2d6')  # Catan dice roll
     [9]
-    >>> dice('3D6', 6)  # D&D Basic Character Attributes
+    >>> roll_dice('3D6', 6)  # D&D Basic Character Attributes
     [14, 11, 8, 10, 9, 7]
-    >>> dice()  # single D6 roll
+    >>> roll_dice()  # single D6 roll
     [3]
     """
     if not dice:
@@ -3880,31 +4449,38 @@ def dice(dice="1d6", rolls=None):
     return Dice().multi_roll(count=rolls, pips=pips, dice=_type)
 
 
-def d4(rolls=None):
+def roll_d4(rolls=None):
+    """Roll multiple totals for a 4-sided die."""
     return DiceD4().roll(count=rolls)
 
 
-def d6(rolls=None):
+def roll_d6(rolls=None):
+    """Roll multiple totals for a 6-sided die."""
     return DiceD6().roll(count=rolls)
 
 
-def d8(rolls=None):
+def roll_d8(rolls=None):
+    """Roll multiple totals for a 8-sided die."""
     return DiceD8().roll(count=rolls)
 
 
-def d10(rolls=None):
+def roll_d10(rolls=None):
+    """Roll multiple totals for a 10-sided die."""
     return DiceD10().roll(count=rolls)
 
 
-def d12(rolls=None):
+def roll_d12(rolls=None):
+    """Roll multiple totals for a 12-sided die."""
     return DiceD12().roll(count=rolls)
 
 
-def d20(rolls=None):
+def roll_d20(rolls=None):
+    """Roll multiple totals for a 20-sided die."""
     return DiceD20().roll(count=rolls)
 
 
-def d100(rolls=None):
+def roll_d100(rolls=None):
+    """Roll multiple totals for a 100-sided die."""
     return DiceD100().roll(count=rolls)
 
 
@@ -3916,7 +4492,7 @@ def named(variable):
 
 
 def A8BA():
-    """Shortcut to setup A8 page with Blueprint; use for examples."""
+    """Shortcut to setup an A8 page with a Blueprint; use for examples."""
     Create(
         paper="A8",
         margin_left=0.5,
@@ -3932,6 +4508,34 @@ def A8BA():
 
 
 create.__doc__ = Create.__doc__
+common.__doc__ = Common.__doc__
+page_break.__doc__ = PageBreak.__doc__
 save.__doc__ = Save.__doc__
-polyomino.__doc__ = Polyomino.__doc__
+
 DeckOfCards.__doc__ = Deck.__doc__
+CounterSheet.__doc__ = Deck.__doc__
+
+arc.__doc__ = Arc.__doc__
+arrow.__doc__ = Arrow.__doc__
+bezier.__doc__ = Bezier.__doc__
+chord.__doc__ = Chord.__doc__
+circle.__doc__ = Circle.__doc__
+compass.__doc__ = Compass.__doc__
+dot.__doc__ = Dot.__doc__
+ellipse.__doc__ = Ellipse.__doc__
+equilateraltriangle.__doc__ = EquilateralTriangle.__doc__
+hexagon.__doc__ = Hexagon.__doc__
+image.__doc__ = Image.__doc__
+line.__doc__ = Line.__doc__
+pentomino.__doc__ = Pentomino.__doc__
+polygon.__doc__ = Polygon.__doc__
+polyline.__doc__ = Polyline.__doc__
+polyomino.__doc__ = Polyomino.__doc__
+polyshape.__doc__ = Polyshape.__doc__
+rectangle.__doc__ = Rectangle.__doc__
+rhombus.__doc__ = Rhombus.__doc__
+rightangledtriangle.__doc__ = RightAngledTriangle.__doc__
+star.__doc__ = Star.__doc__
+starfield.__doc__ = StarField.__doc__
+tetromino.__doc__ = Tetromino.__doc__
+# .__doc__ = .__doc__

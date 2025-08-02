@@ -43,7 +43,7 @@ from protograf.base import (
     BaseCanvas,
     GridShape,
 )
-from protograf.shapes import RectangleShape
+from protograf.shapes import CircleShape, PolygonShape, RectangleShape
 
 log = logging.getLogger(__name__)
 DEBUG = False
@@ -485,3 +485,249 @@ class TetrominoObject(PolyominoObject):
         super(TetrominoObject, self).draw(
             cnv=cnv, off_x=off_x, off_y=off_y, ID=ID, **kwargs
         )
+
+
+class StarFieldObject(BaseShape):
+    """Draw StarField pattern on a given canvas.
+
+    Reference:
+
+        https://codeboje.de/starfields-and-galaxies-python/
+
+    TODO:
+
+        Implement the createElipticStarfield()
+    """
+
+    def __init__(self, _object=None, canvas=None, **kwargs):
+        super(StarFieldObject, self).__init__(_object=_object, canvas=canvas, **kwargs)
+        self.kwargs = kwargs
+        # override to set the randomisation sequenc
+        if self.seeding:
+            self.seed = tools.as_float(self.seeding, "seeding")
+        else:
+            self.seed = None
+
+    def draw_star(self, cnv, position: Point):
+        """Draw a single star at a Point (x,y)."""
+        color = self.colors[random.randint(0, len(self.colors) - 1)]
+        size = self.sizes[random.randint(0, len(self.sizes) - 1)]
+        # feedback(f'*** StarFld {color=} {size=} {position=}')
+        cnv.draw_circle((position.x, position.y), size)
+        self.set_canvas_props(cnv=cnv, index=None, stroke=color, fill=color)
+
+    def cluster_stars(self, cnv):
+        feedback("CLUSTER NOT IMPLEMENTED", True)
+        for star in range(0, self.star_count):
+            pass
+
+    def random_stars(self, cnv):
+        # feedback(f'*** StarFld {self.enclosure=}')
+        if isinstance(self.enclosure, CircleShape):
+            x_c, y_c = self.enclosure.calculate_centre()
+        if isinstance(self.enclosure, PolygonShape):
+            _geom = self.enclosure.get_geometry()
+            x_c, y_c, radius, vertices = _geom.x, _geom.y, _geom.radius, _geom.vertices
+        stars = 0
+        if self.seed:
+            random.seed(self.seed)
+        while stars < self.star_count:
+            if isinstance(self.enclosure, RectangleShape):
+                x_y = Point(
+                    random.random() * self.enclosure._u.width + self._o.delta_x,
+                    random.random() * self.enclosure._u.height + self._o.delta_y,
+                )
+            elif isinstance(self.enclosure, CircleShape):
+                r_fraction = random.random() * self.enclosure._u.radius
+                angle = math.radians(random.random() * 360.0)
+                x = r_fraction * math.cos(angle) + x_c
+                y = r_fraction * math.sin(angle) + y_c
+                x_y = Point(x, y)
+            elif isinstance(self.enclosure, PolygonShape):
+                r_fraction = random.random() * radius
+                angle = math.radians(random.random() * 360.0)
+                x = r_fraction * math.cos(angle) + x_c
+                y = r_fraction * math.sin(angle) + y_c
+                x_y = Point(x, y)
+                if not geoms.point_in_polygon(x_y, vertices):
+                    continue
+            else:
+                feedback(f"{self.enclosure} IS NOT AN IMPLEMENTED SHAPE!", True)
+            self.draw_star(cnv, x_y)
+            stars += 1
+
+    def draw(self, cnv=None, off_x=0, off_y=0, ID=None, **kwargs):
+        """Draw StarField pattern on a given canvas."""
+        kwargs = self.kwargs | kwargs
+        cnv = cnv if cnv else globals.canvas  # a new Page/Shape may now exist
+        super().draw(cnv, off_x, off_y, ID, **kwargs)  # unit-based props
+        # ---- settings
+        if self.enclosure is None:
+            self.enclosure = RectangleShape()
+        # ---- calculations
+        random.seed()
+        area = math.sqrt(self.enclosure.calculate_area())
+        self.star_count = round(self.density * self.points_to_value(area))
+        # feedback(f'*** StarFld {self.star_pattern =} {self.enclosure}')
+        # feedback(f'*** StarFld {area=} {self.density=} {self.star_count=}')
+        # ---- set canvas
+        self.set_canvas_props(index=ID)
+        # ---- draw starfield
+        if self.star_pattern in ["r", "random"]:
+            self.random_stars(cnv)
+        if self.star_pattern in ["c", "cluster"]:
+            self.cluster_stars(cnv)
+
+
+class D6Object(BaseShape):
+    """
+    A top-down view of a six-sided (cubic) die
+    """
+
+    def __init__(self, _object=None, canvas=None, **kwargs):
+        super(D6Object, self).__init__(_object=_object, canvas=canvas, **kwargs)
+        # overrides to centre shape
+        if self.cx is not None and self.cy is not None:
+            self.x = self.cx - self.width / 2.0
+            self.y = self.cy - self.height / 2.0
+            # feedback(f"*** D6 OldX:{x} OldY:{y} NewX:{self.x} NewY:{self.y}")
+        # overrides to make a "square rectangle"
+        if self.width and not self.side:
+            self.side = self.width
+        if self.height and not self.side:
+            self.side = self.height
+        self.height, self.width = self.side, self.side
+        self.set_unit_properties()
+        self.kwargs = kwargs
+        self._label = self.label
+        # custom/unique properties
+        self.roll = tools.as_int(kwargs.get("roll", 1), "roll")
+        self.random = tools.as_bool(kwargs.get("random", False), "random")
+        # defaults
+        self._fill, self._stroke = (
+            self.fill,
+            self.stroke,
+        )
+        if "rounded" not in kwargs and "rounding" not in kwargs:
+            self.rounded = True
+        # validate
+        correct, issue = self.validate_properties()
+        if not correct:
+            feedback("Problem with D6 settings: %s." % "; ".join(issue), True)
+
+    def validate_properties(self):
+        correct = True
+        issue = []
+        if self.random and self.roll is not None:
+            issue.append("Both random and roll cannot be set at the same time!")
+            correct = False
+        if not self.random and self.roll not in [1, 2, 3, 4, 5, 6]:
+            issue.append("The roll must be a number from 1 to 6")
+            correct = False
+        if self.pip_fraction > 0.33 or self.pip_fraction < 0.1:
+            issue.append("The pip_fraction must be between 0.1 and 0.33")
+            correct = False
+        return correct, issue
+
+    def draw(self, cnv=None, off_x=0, off_y=0, ID=None, **kwargs):
+        """Draw the D6 on a given canvas."""
+        kwargs = self.kwargs | kwargs
+        cnv = cnv if cnv else globals.canvas  # a new Page/Shape may now exist
+        super().draw(cnv, off_x, off_y, ID, **kwargs)  # unit-based props
+        # ---- adjust start
+        if self.row is not None and self.col is not None:
+            x = self.col * self._u.width + self._o.delta_x
+            y = self.row * self._u.height + self._o.delta_y
+        elif self.cx is not None and self.cy is not None:
+            x = self._u.cx - self._u.width / 2.0 + self._o.delta_x
+            y = self._u.cy - self._u.height / 2.0 + self._o.delta_y
+        else:
+            x = self._u.x + self._o.delta_x
+            y = self._u.y + self._o.delta_y
+        # ---- calculate centre of the shape
+        cx = x + self._u.width / 2.0
+        cy = y + self._u.height / 2.0
+        # ---- overrides for grid layout
+        if self._abs_cx is not None and self._abs_cy is not None:
+            cx = self._abs_cx
+            cy = self._abs_cy
+            x = cx - self._u.width / 2.0
+            y = cy - self._u.height / 2.0
+        # ---- handle rotation
+        rotation = kwargs.get("rotation", self.rotation)
+        if rotation:
+            self.centroid = muPoint(cx, cy)
+            kwargs["rotation"] = rotation
+            kwargs["rotation_point"] = self.centroid
+        else:
+            self.centroid = None
+        # ---- calculate rounding
+        # Specifies the radius of the curvature as percentage of rectangle side length
+        # where 0.5 corresponds to 50% of the respective side.
+        radius = None
+        if self.rounded:
+            radius = self.rounded_radius  # hard-coded OR from defaults
+        if self.rounding:
+            rounding = self.unit(self.rounding)
+            radius = rounding / min(self._u.width, self._u.height)
+        if radius and radius > 0.5:
+            feedback("The rounding radius cannot exceed 50% of the D6 side.", True)
+        # ---- draw the outline
+        # feedback(f'*** D6 normal {radius=} {kwargs=}')
+        cnv.draw_rect((x, y, x + self._u.width, y + self._u.height), radius=radius)
+        self.set_canvas_props(cnv=cnv, index=ID, **kwargs)
+        # ---- draw the pips
+        if self.random:
+            number = random.randint(1, 6)
+        else:
+            number = self.roll
+        pip_radius = self.pip_fraction * self._u.width / 2.0
+        px = x + self._u.width / 2.0
+        py = y + self._u.height / 2.0
+        offset = 3 * (0.2 * self._u.width / 2.0)  # fixed regardless of pip size
+        match number:
+            case 1:
+                cnv.draw_circle((px, py), pip_radius)
+            case 2:
+                cnv.draw_circle((px - offset, py - offset), pip_radius)
+                cnv.draw_circle((px + offset, py + offset), pip_radius)
+            case 3:
+                cnv.draw_circle((px - offset, py - offset), pip_radius)
+                cnv.draw_circle((px, py), pip_radius)
+                cnv.draw_circle((px + offset, py + offset), pip_radius)
+            case 4:
+                cnv.draw_circle((px - offset, py + offset), pip_radius)
+                cnv.draw_circle((px + offset, py - offset), pip_radius)
+                cnv.draw_circle((px - offset, py - offset), pip_radius)
+                cnv.draw_circle((px + offset, py + offset), pip_radius)
+            case 5:
+                cnv.draw_circle((px - offset, py + offset), pip_radius)
+                cnv.draw_circle((px + offset, py - offset), pip_radius)
+                cnv.draw_circle((px - offset, py - offset), pip_radius)
+                cnv.draw_circle((px, py), pip_radius)
+                cnv.draw_circle((px + offset, py + offset), pip_radius)
+            case 6:
+                cnv.draw_circle((px - offset, py + offset), pip_radius)
+                cnv.draw_circle((px + offset, py - offset), pip_radius)
+                cnv.draw_circle((px - offset, py - offset), pip_radius)
+                cnv.draw_circle((px + offset, py + offset), pip_radius)
+                cnv.draw_circle((px - offset, py), pip_radius)
+                cnv.draw_circle((px + offset, py), pip_radius)
+            case _:
+                feedback("D6 must use a number from 1 to 6", True)
+        # add style
+        pargs = {}
+        pargs["stroke"] = self.pip_stroke
+        pargs["fill"] = self.pip_fill
+        if rotation:
+            pargs["rotation"] = rotation
+            pargs["rotation_point"] = self.centroid
+        self.set_canvas_props(cnv=None, index=ID, **pargs)
+        # ---- cross
+        self.draw_cross(cnv, cx, cy, rotation=kwargs.get("rotation"))
+        # ---- dot
+        self.draw_dot(cnv, cx, cy)
+        # ---- text
+        self.draw_heading(cnv, ID, cx, cy - 0.5 * self._u.height, **kwargs)
+        self.draw_label(cnv, ID, cx, cy, **kwargs)
+        self.draw_title(cnv, ID, cx, cy + 0.5 * self._u.height, **kwargs)

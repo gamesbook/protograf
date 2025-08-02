@@ -60,6 +60,7 @@ def script_path():
     """Get the path for a script being called from command line.
 
     Doc Test:
+
     >>> R = script_path()
     >>> 'utils' in R.parts
     True
@@ -131,7 +132,14 @@ def load_googlesheet(sheet, **kwargs):
         _data_list = data_dict.get("values")
         if _data_list:
             keys = _data_list[0]  # get keys/names from first sub-list
-            dict_list = [dict(zip(keys, values)) for values in _data_list[1:]]
+            dict_list = []
+            for row in _data_list[1:]:
+                _dict = {}
+                for idx, key in enumerate(keys):
+                    # handles the "bug" that Sheet does not return all of a row
+                    # if the last cell is "empty"
+                    _dict[key] = row[idx] if idx < len(row) else ""
+                dict_list.append(_dict)
             return dict_list
 
     return data_list
@@ -148,6 +156,7 @@ def grouper(n, iterable, fillvalue=None):
         for item1, item2, item3 in grouper(3, 'ABCDEFG', 'x'):
 
     Doc Test:
+
     >>> list(grouper(3, 'ABCDEFG', 'x'))
     [('A', 'B', 'C'), ('D', 'E', 'F'), ('G', 'x', 'x')]
     """
@@ -160,6 +169,7 @@ def boolean_join(items):
     """Create a result from a Boolean concatenation
 
     Doc Test:
+
     >>> items = [True, '+', False]
     >>> boolean_join(items)
     False
@@ -193,6 +203,7 @@ def _lower(value) -> str | None:
     """Convert value into a lowercase string without any space around it
 
     Doc Test:
+
     >>> _lower(None)
 
     >>> _lower(1)
@@ -212,8 +223,22 @@ def _lower(value) -> str | None:
         raise ValueError(f"Cannot convert {value} into a string!")
 
 
-def as_int(value, label, maximum=None, minimum=None, allow_none=False) -> int:
-    """Set a value to an int; or stop if an invalid value
+def as_int(
+    value,
+    label: str = None,
+    maximum: int = None,
+    minimum: int = None,
+    allow_none: bool = False,
+) -> int:
+    """Convert a value to an int
+
+    Args:
+
+    - value (Any): the value to be converted to a float
+    - label (str): assigned as part of the error message to ID the type of value
+    - maximum (int): the upper allowed value for the conversion
+    - lower (int): the lower allowed value for the conversion
+    - allow_none (bool): if True, return None if value is None
 
     Doc Test:
 
@@ -250,10 +275,17 @@ def as_int(value, label, maximum=None, minimum=None, allow_none=False) -> int:
         feedback(f'The {_label}"{value}" is not a valid integer!!', True)
 
 
-def as_bool(value, label=None, allow_none=True) -> bool:
+def as_bool(value, label: str = None, allow_none: bool = True) -> bool:
     """Convert a value to a Boolean
 
+    Args:
+
+    - value (Any): the value to be converted to a float
+    - label (str): assigned as part of the error message to ID the type of value
+    - allow_none (bool): if True, return None if value is None
+
     Doc Test:
+
     >>> as_bool(value='3', label='N')
     False
     >>> as_bool(value='Y', label='Y')
@@ -268,11 +300,20 @@ def as_bool(value, label=None, allow_none=True) -> bool:
 
 
 def as_float(
-    value, label, maximum=None, minimum=None, stop=True, default=None
+    value, label: str, maximum: float = None, minimum: float = None, stop: bool = True
 ) -> float:
     """Set a value to an float; or end program if an invalid value and stop is True
 
+    Args:
+
+    - value (Any): the value to be converted to a float
+    - label (str): assigned as part of the error message to ID the type of value
+    - maximum (float): the upper allowed value for the conversion
+    - lower (float): the lower allowed value for the conversion
+    - stop (bool): if True, halt program and display error message
+
     Doc Test:
+
     >>> as_float(value='3', label='N')
     3.0
 
@@ -311,6 +352,7 @@ def as_point(value) -> list | Point:
     """Convert one or more tuples to a Point or list of Points
 
     Doc Test:
+
     >>> as_point((1,2))
     Point(x=1, y=2)
     >>> as_point([(1,2), (3,4)])
@@ -332,10 +374,11 @@ def as_point(value) -> list | Point:
         raise ValueError(f"Cannot convert {value} into a Point!")
 
 
-def json_strings_to_numbers(json_data):
-    """Iteratively convert JSON string data into numbers, if possible.
+def json_strings_to_numbers(json_data: str | dict | list):
+    """Iteratively convert JSON data into numbers, if possible.
 
     Doc Test:
+
     >>> json_strings_to_numbers({})
     {}
     >>> json_strings_to_numbers([])
@@ -370,6 +413,7 @@ def tuple_split(
     """Split a string into a list of tuple numbers
 
     Doc Test:
+
     >>> print(tuple_split(''))
     []
     >>> print(tuple_split('3'))
@@ -448,19 +492,21 @@ def sequence_split(
     Split a string into a list of individual values
 
     Args:
-        string: the item to be split
-        as_int (bool): if True, convert values to integers
-        unique (bool): if True, create a list of unique
-        sep (str): expected delimiter between values - defaults to ","
-        as_float (bool): if True, convert values to floats
-        msg (str): return as part of the error
-        clean (bool): if True, strip any surrounding spaces
-        star (bool): if True, allow for "all" or "*" as the only list value
+
+    - string: the item to be split
+    - as_int (bool): if True, convert values to integers
+    - unique (bool): if True, create a list of unique
+    - sep (str): expected delimiter between values - defaults to ","
+    - as_float (bool): if True, convert values to floats
+    - msg (str): return as part of the error
+    - clean (bool): if True, strip any surrounding spaces
+    - star (bool): if True, allow for "all" or "*" as the only list value
 
     Note:
         * If `unique` is True, order will NOT be maintained!
 
     Doc Test:
+
     >>> sequence_split('*', star=True)
     ['*']
     >>> sequence_split('')
@@ -563,6 +609,7 @@ def split(
     Split a string into a list of individual characters
 
     Doc Test:
+
     >>> split('A,1,B')
     ['A', '1', 'B']
     >>> split('A 1 B')
@@ -595,6 +642,7 @@ def integer_pairs(pairs, label: str = "list") -> list:
     """Convert a list or string into a list of tuples; each with a pair of integers.
 
     Doc Test:
+
     >>> integer_pairs(pairs=[(1,2), (3,4)])
     [(1, 2), (3, 4)]
     >>> integer_pairs(pairs="1,2 3,4")
@@ -640,7 +688,8 @@ def splitq(seq, sep=None, pairs=("()", "[]", "{}"), quote="\"'"):
         split-string-except-inside-brackets-or-quotes
 
     Doc Test:
-        TODO
+
+    >>> # TODO
     """
     if not seq:
         yield []
@@ -686,13 +735,14 @@ def splitq(seq, sep=None, pairs=("()", "[]", "{}"), quote="\"'"):
             yield seq[start:]
 
 
-def open_csv(filename, headers=None, selected=None):
+def open_csv(filename: str = None, headers: list = None, selected: list = None):
     """Read data from CSV file into a list of dictionaries
 
-    Supply:
+    Args:
 
-      * headers is a list of strings to use instead of the first row
-      * selected is a list of desired rows e.g. [2,4,7]
+    - filename (str): path to CSV file
+    - headers (list): a list of strings to use instead of the first row
+    - selected (list): a list of desired rows e.g. [2,4,7]
     """
     if not filename:
         feedback("A valid CSV filename must be supplied!")
@@ -723,7 +773,13 @@ def open_csv(filename, headers=None, selected=None):
     return dict_list
 
 
-def open_excel(filename, sheet=0, sheetname=None, cells=None, headers=None):
+def open_excel(
+    filename: str,
+    sheet: int = 0,
+    sheetname: str = None,
+    cells: str = None,
+    headers: list = None,
+):
     """Read data from an Excel file into a list of dictionaries
 
     Args:
@@ -783,7 +839,13 @@ def open_excel(filename, sheet=0, sheetname=None, cells=None, headers=None):
         feedback(f'Cannot process data files with an extension of "{file_ext}".', True)
 
 
-def open_xlsx(filename, sheet=0, sheetname=None, headers=None, cells=None):
+def open_xlsx(
+    filename: str,
+    sheet: int = 0,
+    sheetname: str = None,
+    cells: str = None,
+    headers: list = None,
+):
     """Read data from XLSX file into a list of dictionaries
 
     Args:
@@ -880,7 +942,13 @@ def open_xlsx(filename, sheet=0, sheetname=None, headers=None, cells=None):
     return dict_list
 
 
-def open_xls(filename, sheet=0, sheetname=None, headers=None, cells=None):
+def open_xls(
+    filename: str,
+    sheet: int = 0,
+    sheetname: str = None,
+    cells: str = None,
+    headers: list = None,
+):
     """Read data from XLS file into a list of dictionaries
 
     Args:
@@ -962,10 +1030,11 @@ def open_xls(filename, sheet=0, sheetname=None, headers=None, cells=None):
     return dict_list
 
 
-def flatten(lst):
+def flatten(lst: list):
     """Flatten nested lists into a single list
 
     Doc Test:
+
     >>> list(flatten([0, [1, 2], [3,4, [5,6]]]))
     [0, 1, 2, 3, 4, 5, 6]
     """
@@ -988,6 +1057,7 @@ def flatten_keys(d: dict):
         * See: https://www.geeksforgeeks.org/python-flatten-nested-keys/
 
     Doc Test:
+
     >>> flatten_keys({'height': 8, 'cards': 1, 'image': None, 'kwargs': {'kwargs': {'image': 'FOO', 'kwargs': {'cards': 9}}}})
     {'height': 8, 'cards': 9, 'image': 'FOO'}
     """
@@ -1013,10 +1083,17 @@ def flatten_keys(d: dict):
     return result
 
 
-def comparer(val, operator, target):
-    """target could be list?? - split a string by , or ~
+def comparer(val: str, operator: str, target: str | list) -> bool:
+    """Compare value with a target.
+
+    Args:
+
+    - val (str): the value to be checked
+    - operator (str): one of - < | > | ~ | *
+    - target: a single value or a list of values; a list the operator must be a ~
 
     Doc Test:
+
     >>> comparer(None, None, None)
     True
     >>> comparer("1", '*', "1")
@@ -1126,6 +1203,7 @@ def rgb_to_hex(color: tuple) -> str:
     """Convert a RGB tuple color to a hexadecimal string
 
     Doc Test:
+
     >>> rgb_to_hex((123,45,6))
     '#7A852CD35FA'
     """
@@ -1146,6 +1224,7 @@ def alpha_column(num: int, lower: bool = False) -> string:
           each multiple of 26.
 
     Doc Test:
+
     >>> alpha_column(1)
     'A'
     >>> alpha_column(26, lower=True)
@@ -1172,6 +1251,7 @@ def column_from_string(col: str) -> int:
     "AFZ" == 26 * pow(26, 0) + 6 * pow(26, 1) + 1 * pow(26, 2)
 
     Doc Test:
+
     >>> column_from_string('A')
     1
     >>> column_from_string('AA')
@@ -1200,6 +1280,7 @@ def coordinate_to_tuple(coordinate: str, zeroed: bool = False) -> tuple:
         zeroed (bool): if True, use zero base
 
     Doc Test:
+
     >>> coordinate_to_tuple('A1')
     (1, 1)
     >>> coordinate_to_tuple('AB31')
@@ -1227,6 +1308,7 @@ def sheet_column(num: int, lower: bool = False) -> string:
         https://stackoverflow.com/questions/23861680/
 
     Doc Test:
+
     >>> sheet_column(num=3, lower=True)
     'c'
     >>> sheet_column(num=27, lower=False)
@@ -1364,6 +1446,7 @@ def eval_template(string: str, data: dict = None, label: str = ""):
     """Process data dict via jinja2 template in source.
 
     Doc Test:
+
     >>> eval_template("2+{{x}}", {'x': 2})
     '2+2'
     >>> eval_template("2+{{x}}", {'y': 2})
@@ -1398,6 +1481,7 @@ def validated_directions(
     """Check and return a list of lowercase, direction abbreviations.
 
     Doc Test:
+
     >>> validated_directions('n s', DirectionGroup.CARDINAL)
     ['n', 's']
     >>> validated_directions('ne se', DirectionGroup.HEX_FLAT)
@@ -1459,6 +1543,7 @@ def transpose_lists(
             'lr' or 'tb' to reverse order of sub-lists within outer list
 
     Doc Test:
+
     >>> transpose_lists([[1, 2, 3], [4, 5, 6]], direction=None, invert=None)
     [[1, 2, 3], [4, 5, 6]]
     >>> transpose_lists([[1, 2, 3], [4, 5, 6]], direction=None, invert='LR')
@@ -1519,6 +1604,7 @@ def is_url_valid(url: str, qualifying=MIN_ATTRIBUTES):
     See: https://stackoverflow.com/a/36283503/154858
 
     Doc Test:
+
     >>> is_url_valid(None)
     False
     >>> is_url_valid('')
@@ -1704,7 +1790,11 @@ def get_pymupdf_props(
         opacity = 1 - _transparency
     stroke_width = kwargs.get("stroke_width", None)
     # stroke_cap = 1 if kwargs.get("stroke_cap", False) else 0  # rounded end line
-    stroke_cap = 1 if kwargs.get("rounded", False) else 0  # rounded end line
+    stroke_cap = 0
+    if kwargs.get("rounded", False):
+        stroke_cap = 1  # rounded end line
+    if kwargs.get("squared", False):
+        stroke_cap = 2  # semi-square; edge length of line width & center at line end
     dotted = kwargs.get("dotted", None)
     dashed = kwargs.get("dashed", None)
     _rotation = kwargs.get("rotation", None)  # calling Shape must set a tuple!

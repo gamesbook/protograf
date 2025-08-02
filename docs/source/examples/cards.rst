@@ -6,7 +6,7 @@ Examples: Decks of Cards
 
 These examples are meant to demonstrate the type of output you can expect
 to create with **protograf**.  They are *not* meant to be exhaustive or
-comprehensive!
+fully comprehensive!
 
 Bear in mind that the images shown in these examples are lower-resolution
 screenshots; the original PDFs that can be generated from the source scripts
@@ -21,6 +21,7 @@ will demonstrate full scalability.
 - `Hexagonal Cards`_
 - `Circular Cards`_
 - `Play Money`_
+- `Access to an API`_
 
 .. _simple-cards:
 
@@ -317,7 +318,6 @@ Screenshot  .. image:: images/cards/cards_circular.png
                :width: 90%
 =========== ==================================================================
 
-
 .. _play-money:
 
 Play Money
@@ -344,4 +344,71 @@ Discussion  This example shows how to construct a set of play money using
 ----------- ------------------------------------------------------------------
 Screenshot  .. image:: images/play_money/supreme.png
                :width: 95%
+=========== ==================================================================
+
+
+.. _access-api:
+
+Access to an API
+================
+`↑ <table-of-contents-excards_>`_
+
+=========== ==================================================================
+Title       *Data Accessed from an API*
+----------- ------------------------------------------------------------------
+Script      `cards_api.py <https://github.com/gamesbook/protograf/blob/master/examples/cards/cards_api.py>`_
+----------- ------------------------------------------------------------------
+Discussion  This example shows how to construct a deck of cards using data
+            obtained from an API (only an extract of the code is shown here):
+
+            .. code:: python
+
+              import requests
+
+                def get_api_data():
+                    result = requests.get(
+                        'https://restcountries.com/v3.1/all?'
+                        'fields=name,area,population,fifa,continents')
+                    data = result.json()
+                    countries = []
+                    for d in data:
+                        countries.append(
+                            {'name': d['name']['common'],
+                             'area': d['area'],
+                             'pop': d['population'],
+                             'fifa': d['fifa'],
+                             'continent': d['continents'][0]}
+                        )
+                    return countries
+
+                Data(
+                    source=get_api_data(),
+                    filters=[('fifa', '', 'ne')])
+
+            This example makes use of the following Python features:
+
+            - ``def`` to create a new function
+            - ``import`` to load another library
+            - ``for`` to create a loop
+            - ``append`` to add items to a list
+
+            In this example, an API is called.  This is a web site that is
+            able to provide a data set in a structured format.  The Python
+            ``requests`` library makes this very straightforward to do.
+
+            A loop allows each item of data in the data set to be accessed.
+            Columns from each item can then be accessed using the ``[]``
+            notation.  This allows the chosen columns to be added as a set
+            of key/value of pairs using the ``{}`` notation to a list.
+
+            The ``Data()`` command allows the new function, which creates
+            the dataset in format usuable by **protograf**, to be accessed
+            via the *source* property.
+
+            Use of the *filters* property allows a subset of the data to be
+            chosen for the Cards.
+
+----------- ------------------------------------------------------------------
+Screenshot  .. image:: images/cards/countries_cards.png
+               :width: 90%
 =========== ==================================================================

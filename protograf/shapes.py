@@ -132,13 +132,17 @@ class ImageShape(BaseShape):
                     f"Unable to load image - no name provided",
                     True,
                 )
+        # ---- centre
+        x_c = x + width / 2.0
+        y_c = y + height / 2.0
+        # ---- cross
+        self.draw_cross(cnv, x_c, y_c, rotation=kwargs.get("rotation"))
+        # ---- dot
+        self.draw_dot(cnv, x_c, y_c)
         # ---- text
-        xc = x + width / 2.0
-        yc = y + height / 2.0
-        _off = self.heading_size / 2.0
-        self.draw_heading(cnv, ID, xc, yc - height / 2.0 - _off, **kwargs)
-        self.draw_label(cnv, ID, xc, yc + _off, **kwargs)
-        self.draw_title(cnv, ID, xc, yc + height / 2.0 + _off * 3.5, **kwargs)
+        self.draw_heading(cnv, ID, x_c, y_c - height / 2.0, **kwargs)
+        self.draw_label(cnv, ID, x_c, y_c, **kwargs)
+        self.draw_title(cnv, ID, x_c, y_c + height / 2.0, **kwargs)
 
 
 class ArcShape(BaseShape):
@@ -3230,8 +3234,9 @@ class RectangleShape(BaseShape):
         if self.use_abs_c:
             x = self._abs_cx - self._u.width / 2.0
             y = self._abs_cy - self._u.height / 2.0
-        x_d = x + self._u.width / 2.0  # centre
-        y_d = y + self._u.height / 2.0  # centre
+        # ---- calculate centre
+        x_d = x + self._u.width / 2.0
+        y_d = y + self._u.height / 2.0
         self.area = self.calculate_area()
         delta_m_up, delta_m_down = 0.0, 0.0  # potential text offset from chevron
         # ---- handle rotation
@@ -3512,7 +3517,7 @@ class RectangleShape(BaseShape):
             self.set_canvas_props(cnv=cnv, index=ID, **kwargs)
             self._debug(cnv, vertices=self.vertexes)
         else:
-            # feedback(f'*** RECT  normal')   )
+            # feedback(f'*** RECT  normal {radius=} {kwargs=}')
             cnv.draw_rect((x, y, x + self._u.width, y + self._u.height), radius=radius)
             self.set_canvas_props(cnv=cnv, index=ID, **kwargs)
             self._debug(cnv, vertices=self.vertexes)
@@ -4138,7 +4143,7 @@ class StadiumShape(BaseShape):
         if self.cx is not None and self.cy is not None:
             self.x = self.cx - self.width / 2.0
             self.y = self.cy - self.height / 2.0
-            # feedback(f"*** INIT OldX:{x} OldY:{y} NewX:{self.x} NewY:{self.y}")
+            # feedback(f"*** STADIUM OldX:{x} OldY:{y} NewX:{self.x} NewY:{self.y}")
         self.kwargs = kwargs
 
     def draw(self, cnv=None, off_x=0, off_y=0, ID=None, **kwargs):
@@ -4330,106 +4335,6 @@ class StarShape(BaseShape):
         self.draw_heading(cnv, ID, x, y - radius, **kwargs)
         self.draw_label(cnv, ID, x, y, **kwargs)
         self.draw_title(cnv, ID, x, y + radius, **kwargs)
-
-
-class StarFieldShape(BaseShape):
-    """
-    StarField pattern on a given canvas.
-
-    A StarField is specified by the following properties:
-
-     * density (average number of stars per square unit; default is 10)
-     * colors (list of individual star colors; default is [white])
-     * enclosure (regular shape inside which its drawn; default is a rectangle)
-     * sizes (list of individual star sizes; default is [0.1])
-     * star_pattern (random | cluster) - NOT YET IMPLEMENTED
-     * seeding (float, that if set, predetermines the randomisation sequenc)
-
-    Ref:
-        https://codeboje.de/starfields-and-galaxies-python/
-
-    TODO:
-        Implement : createElipticStarfield()
-    """
-
-    def __init__(self, _object=None, canvas=None, **kwargs):
-        super(StarFieldShape, self).__init__(_object=_object, canvas=canvas, **kwargs)
-        self.kwargs = kwargs
-        # override to set the randomisation sequenc
-        if self.seeding:
-            self.seed = tools.as_float(self.seeding, "seeding")
-        else:
-            self.seed = None
-
-    def draw_star(self, cnv, position: Point):
-        """Draw a single star at a Point (x,y)."""
-        color = self.colors[random.randint(0, len(self.colors) - 1)]
-        size = self.sizes[random.randint(0, len(self.sizes) - 1)]
-        # feedback(f'*** StarFld {color=} {size=} {position=}')
-        cnv.draw_circle((position.x, position.y), size)
-        self.set_canvas_props(cnv=cnv, index=None, stroke=color, fill=color)
-
-    def cluster_stars(self, cnv):
-        feedback("CLUSTER NOT IMPLEMENTED", True)
-        for star in range(0, self.star_count):
-            pass
-
-    def random_stars(self, cnv):
-        # feedback(f'*** StarFld {self.enclosure=}')
-        if isinstance(self.enclosure, CircleShape):
-            x_c, y_c = self.enclosure.calculate_centre()
-        if isinstance(self.enclosure, PolygonShape):
-            _geom = self.enclosure.get_geometry()
-            x_c, y_c, radius, vertices = _geom.x, _geom.y, _geom.radius, _geom.vertices
-        stars = 0
-        if self.seed:
-            random.seed(self.seed)
-        while stars < self.star_count:
-            if isinstance(self.enclosure, RectangleShape):
-                x_y = Point(
-                    random.random() * self.enclosure._u.width + self._o.delta_x,
-                    random.random() * self.enclosure._u.height + self._o.delta_y,
-                )
-            elif isinstance(self.enclosure, CircleShape):
-                r_fraction = random.random() * self.enclosure._u.radius
-                angle = math.radians(random.random() * 360.0)
-                x = r_fraction * math.cos(angle) + x_c
-                y = r_fraction * math.sin(angle) + y_c
-                x_y = Point(x, y)
-            elif isinstance(self.enclosure, PolygonShape):
-                r_fraction = random.random() * radius
-                angle = math.radians(random.random() * 360.0)
-                x = r_fraction * math.cos(angle) + x_c
-                y = r_fraction * math.sin(angle) + y_c
-                x_y = Point(x, y)
-                if not geoms.point_in_polygon(x_y, vertices):
-                    continue
-            else:
-                feedback(f"{self.enclosure} IS NOT AN IMPLEMENTED SHAPE!", True)
-            self.draw_star(cnv, x_y)
-            stars += 1
-
-    def draw(self, cnv=None, off_x=0, off_y=0, ID=None, **kwargs):
-        """Draw StarField pattern on a given canvas."""
-        kwargs = self.kwargs | kwargs
-        cnv = cnv if cnv else globals.canvas  # a new Page/Shape may now exist
-        super().draw(cnv, off_x, off_y, ID, **kwargs)  # unit-based props
-        # ---- settings
-        if self.enclosure is None:
-            self.enclosure = RectangleShape()
-        # ---- calculations
-        random.seed()
-        area = math.sqrt(self.enclosure.calculate_area())
-        self.star_count = round(self.density * self.points_to_value(area))
-        # feedback(f'*** StarFld {self.star_pattern =} {self.enclosure}')
-        # feedback(f'*** StarFld {area=} {self.density=} {self.star_count=}')
-        # ---- set canvas
-        self.set_canvas_props(index=ID)
-        # ---- draw starfield
-        if self.star_pattern in ["r", "random"]:
-            self.random_stars(cnv)
-        if self.star_pattern in ["c", "cluster"]:
-            self.cluster_stars(cnv)
 
 
 class TextShape(BaseShape):

@@ -94,7 +94,7 @@ PNG images that were generated from the original PDF output.
    scripts;
    `default_shapes <https://github.com/gamesbook/protograf/blob/master/examples/simple/default_shapes.py>`_ or
    `customised_shapes <https://github.com/gamesbook/protograf/blob/master/examples/simple/customised_shapes.py>`_.
-   The program first creates a PDF, then generates a PNG file for each page
+   **protograf** first creates a PDF, then generates a PNG file for each page
    in the PDF.
 
 Commonalities
@@ -107,7 +107,7 @@ at the end, rather than being described in detail for every single shape.
 
 .. HINT::
 
-   Bear in mind that if a property that it does not support is
+   Bear in mind that if a property that it does **not** support is
    provided for a shape, then that property and its value will simply be
    ignored.
 
@@ -1330,13 +1330,14 @@ Example 1. Default Polyshape
 
       .. code:: python
 
-        Polyshape(points=[(1, 2), (1, 1), (2, 0), (3, 1), (3, 2)])
+        Polyshape(
+          points=[(1, 2), (1, 1), (2, 0), (3, 1), (3, 2)])
 
       It has the following properties:
 
-      - starts at x-position ``1`` cm and at y-position ``2`` cm
-      - second point is at x-position ``1`` cm and at y-position ``1`` cm
-      - third point is at x-position ``2`` cm and at y-position ``0`` cm
+      - starts at x-position ``1`` cm and y-position ``2`` cm
+      - second point is at x-position ``1`` cm and y-position ``1`` cm
+      - third point is at x-position ``2`` cm and y-position ``0`` cm
       - etc.
 
       The *points* for a Polyshape which represent its vertices are given in a
@@ -2518,7 +2519,8 @@ it does not consist of lines and areas drawn by **protograf** itself.
 An "image" refers to an external file which is simply inserted into the drawing.
 
 The Image shape shares a number of common aspects with other shapes - such as
-an x & y position, a width and a height, and the ability to be rotated.
+an x & y position, a width and a height, the ability to be rotated, and the
+setting of labl, heading or title text.
 
 An image can have its corners rounded by setting a value for ``rounding``.
 Be aware this is a pixel-based value and does not correspond to the units
@@ -2528,8 +2530,10 @@ An image can also be "drawn over" by other shapes appearing later on in the
 script.
 
 If an image has a transparent area, this will be respected and shapes
-appearing earlier on in the script may then be visible "below" it.
+appearing earlier on in the script may then be visible "below" it (see
+example below).
 
+.. _image-default:
 
 Example 1. Default Image
 ++++++++++++++++++++++++
@@ -2569,6 +2573,8 @@ Example 1. Default Image
       those of the image itself.
 
 ===== ======
+
+.. _image-rotation:
 
 Example 2. Rotation & Scaling
 +++++++++++++++++++++++++++++
@@ -2617,14 +2623,60 @@ Example 2. Rotation & Scaling
 
 ===== ======
 
-Example 3. Sliced
-+++++++++++++++++
+.. _image-caption:
 
-.. |im3| image:: images/customised/image_sliced.png
+Example 3. Captions and Markings
+++++++++++++++++++++++++++++++++
+
+.. |im3| image:: images/customised/image_label.png
    :width: 330
 
 ===== ======
 |im3| This example shows the shape constructed using the command with the
+      following properties:
+
+      .. code:: python
+
+        Text(common=txt, text="Image: label, heading, title")
+        Rectangle(
+            width=2.26, height=2, x=1, y=0.5,
+            dotted=True, fill="silver")
+        Image("sholes_typewriter.png",
+              width=2.26, height=2, x=1, y=0.5,
+              label="Label", label_stroke='red',
+              cross=True)
+        Rectangle(
+            width=2.26, height=2, x=1, y=3.5,
+            dotted=True, fill="silver")
+        Image("sholes_typewriter.png",
+              width=2.26, height=2, x=1, y=3.5,
+              heading="Heading",
+              title="Title",
+              dot=0.1, dot_stroke='red')
+
+      In this example, a grey-filled rectangle, with dotted border, is
+      drawn just prior to the image.
+
+      The same image is used in two places here to demonstrate the following:
+
+      - how a "background" or "lower level" shape is visible through the
+        transparency of a PNG image;
+      - where the label, heading and title for an image will appear;
+      - where the cross for an image will appear;
+      - where the dot for an image will appear.
+
+===== ======
+
+.. _image-sliced:
+
+Example 4. Sliced
++++++++++++++++++
+
+.. |im4| image:: images/customised/image_sliced.png
+   :width: 330
+
+===== ======
+|im4| This example shows the shape constructed using the command with the
       following properties:
 
       .. code:: python

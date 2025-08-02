@@ -1,6 +1,17 @@
 protograf Changes
 =================
 
+2025-00-00 (0.2.13)
+-------------------
+- Add example for use of API to create Card Data
+- Add squared line ends
+- Add card_grid for Card shapes
+- Add docstrings for Shapes
+- Patch caption locations for Image
+- Shift Starfield into objects module (no API change)
+- Patch bug loading last, empty cell from Google Sheet
+- Add D6 object
+
 2025-07-27 (0.2.12)
 -------------------
 - Patch bug with displaying 0 for a text value

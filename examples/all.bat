@@ -30,6 +30,7 @@ REM ---- examples: objects
 ECHO "Creating objects..."
 python objects\polyominoes.py --no-png -d %location%
 python objects\pentominoes.py --no-png -d %location%
+python objects\dice_d6.py --no-png -d %location%
 
 REM ---- examples: simple: layouts
 ECHO "Creating customised layouts..."
@@ -108,6 +109,7 @@ python cards\cards_deck_11.py --no-png -d %location%
 python cards\cards_deck_12.py --no-png -d %location%
 python cards\cards_deck_13.py --no-png -d %location%
 python cards\cards_deck_14.py --no-png -d %location%
+python cards\cards_deck_15.py --no-png -d %location%
 
 REM ---- various
 ECHO "Creating various..."
