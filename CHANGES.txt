@@ -5,6 +5,7 @@ protograf Changes
 -------------------
 - Add example for full wargame countersheet
 - New colrs utils
+- Add Cube object and examples
 
 2025-08-02 (0.2.13)
 -------------------

@@ -1834,7 +1834,7 @@ class HexShape(BaseShape):
             for slcolor in _slices
             if not isinstance(slcolor, bool)
         ]
-        # ---- draw triangles for each sector, repeat as needed!
+        # ---- draw triangle per slice; repeat as needed!
         sid = 0
         nodes = [4, 3, 2, 1, 0, 5]
         if _lower(self.orientation) in ["p", "pointy"]:
@@ -1855,6 +1855,54 @@ class HexShape(BaseShape):
             )
             sid += 1
             vid += 1
+
+    def draw_shades(self, cnv, ID, vertexes, centre: tuple, rotation=0):
+        """Draw rhombuses inside the Hexagon
+
+        Args:
+
+            ID: unique ID
+            vertexes: the Hex'es nodes
+            centre: the centre Point of the Hex
+            rotation: degrees anti-clockwise from horizontal "east"
+        """
+        # ---- get shades color list from string
+        if isinstance(self.shades, str):
+            _shades = tools.split(self.shades.strip())
+        else:
+            _shades = self.shades
+        # ---- validate shades color settings
+        shades_colors = [
+            colrs.get_color(slcolor)
+            for slcolor in _shades
+            if not isinstance(slcolor, bool)
+        ]
+        # ---- add shades (if not provided)
+        if len(shades_colors) == 1:
+            shades_colors = [
+                colrs.lighten_pymu(shades_colors[0], factor=0.2),
+                colrs.darken_pymu(shades_colors[0], factor=0.2),
+                shades_colors[0],
+            ]
+        elif len(shades_colors) != 3:
+            feedback(
+                "There must be exactly 1 or 3 shades provided.",
+                True,
+            )
+        # ---- draw a rhombus per shade
+        vertexes.append(centre)  # becomes vertex no. 6
+        nodes = ([5, 4, 6, 0], [4, 3, 2, 6], [2, 1, 0, 6])
+        for sid, rhombus in enumerate(nodes):
+            pl_points = [vertexes[vid] for vid in rhombus]
+            cnv.draw_polyline(pl_points)
+            self.set_canvas_props(
+                index=ID,
+                stroke=self.shades_stroke or shades_colors[sid],
+                fill=shades_colors[sid],
+                closed=True,
+                rotation=rotation,
+                rotation_point=muPoint(centre[0], centre[1]),
+            )
 
     def get_geometry(self):
         """Calculate geometric settings of a Hexagon."""
@@ -2135,6 +2183,15 @@ class HexShape(BaseShape):
         # self._debug(cnv, Point(x, y), 'start')
         # self._debug(cnv, Point(self.x_d, self.y_d), 'centre')
         self._debug(cnv, vertices=self.vertexes)
+        # ---- draw shades
+        if self.shades:
+            self.draw_shades(
+                cnv,
+                ID,
+                self.vertexes,
+                (self.x_d, self.y_d),
+                rotation=kwargs.get("rotation"),
+            )
         # ---- draw slices
         if self.slices:
             self.draw_slices(

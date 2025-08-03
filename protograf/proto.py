@@ -59,6 +59,7 @@ from .shapes import (
     TrapezoidShape,
 )
 from .objects import (
+    CubeObject,
     D6Object,
     PolyominoObject,
     PentominoObject,
@@ -4263,6 +4264,38 @@ def BGG(user: str = None, ids: list = None, progress=False, short=500, **kwargs)
 
 
 # ---- objects ====
+
+
+@docstring_base
+def Cube(row=None, col=None, **kwargs):
+    """Draw a Cube shape with shading on the canvas.
+
+    Args:
+
+    - row (int): row in which the shape is drawn.
+    - col (int): column in which the shape is drawn.
+
+    Kwargs:
+
+    - shades (list|str): list of one or three colors used to shade 'sides'
+      of the cube; a single string is converted into light and dark shading
+    - shades_stroke (str): line color used to outline the shade areas;
+      defaults to match shade color
+    - shades_stroke_width (str): line width used to outline the shade areas;
+      defaults to match shape stroke width
+    <base>
+
+    """
+    kwargs = margins(**kwargs)
+    Cube = CubeObject(canvas=globals.canvas, **kwargs)
+    Cube.draw()
+    return Cube
+
+
+def cube(*args, **kwargs):
+    kwargs = margins(**kwargs)
+    _obj = args[0] if args else None
+    return CubeObject(_object=_obj, canvas=globals.canvas, **kwargs)
 
 
 @docstring_base

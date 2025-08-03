@@ -18,7 +18,7 @@ from pymupdf import Point as muPoint, Rect as muRect
 
 # local
 from protograf import globals
-from protograf.utils import geoms, tools, support
+from protograf.utils import colrs, geoms, tools, support
 from protograf.utils.tools import _lower
 from protograf.utils.constants import (
     GRID_SHAPES_WITH_CENTRE,
@@ -43,7 +43,7 @@ from protograf.base import (
     BaseCanvas,
     GridShape,
 )
-from protograf.shapes import CircleShape, PolygonShape, RectangleShape
+from protograf.shapes import CircleShape, PolygonShape, RectangleShape, HexShape
 
 log = logging.getLogger(__name__)
 DEBUG = False
@@ -731,3 +731,21 @@ class D6Object(BaseShape):
         self.draw_heading(cnv, ID, cx, cy - 0.5 * self._u.height, **kwargs)
         self.draw_label(cnv, ID, cx, cy, **kwargs)
         self.draw_title(cnv, ID, cx, cy + 0.5 * self._u.height, **kwargs)
+
+
+class CubeObject(HexShape):
+    """
+    A pseudo-3D view of a cube as an isometric drawing.
+    """
+
+    def __init__(self, _object=None, canvas=None, **kwargs):
+        super(CubeObject, self).__init__(_object=_object, canvas=canvas, **kwargs)
+        # overrides
+        self.orientation = "pointy"
+        breakpoint()
+        if not self.shades or self.radii_stroke != colrs.get_color("black"):
+            self.radii = "s ne nw"
+
+    def draw(self, cnv=None, off_x=0, off_y=0, ID=None, **kwargs):
+        """Draw a cube on a given canvas."""
+        return super().draw(cnv, off_x, off_y, ID, **kwargs)

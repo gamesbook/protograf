@@ -77,7 +77,7 @@ def rgb_to_hex(color: tuple) -> str:
     return _string.upper()
 
 
-def adjust_color_lightness(red, grn, blu, factor, as_hex=True):
+def adjust_color_brightness(red, grn, blu, factor, as_hex=True):
     """Alter brightness of a RGB colour - lighter or darker.
 
     Args:
@@ -109,7 +109,7 @@ def lighten_color(red, grn, blu, factor=0.1, as_hex=True):
     - factor (float): amount of change to brightness
     - as_hex (bool): if True, return value as a Hexadecimal color string
     """
-    return adjust_color_lightness(red, grn, blu, 1 + factor, as_hex)
+    return adjust_color_brightness(red, grn, blu, 1 + factor, as_hex)
 
 
 def darken_color(red, grn, blu, factor=0.1, as_hex=True):
@@ -123,7 +123,43 @@ def darken_color(red, grn, blu, factor=0.1, as_hex=True):
     - factor (float): amount of change to brightness
     - as_hex (bool): if True, return value as a Hexadecimal color string
     """
-    return adjust_color_lightness(red, grn, blu, 1 - factor, as_hex)
+    return adjust_color_brightness(red, grn, blu, 1 - factor, as_hex)
+
+
+def lighten_pymu(color, factor=0.1) -> tuple:
+    """Increase brightness of a PyMuPDF colour tuple
+
+    Args:
+
+    - color (tuple): a (red, green, blue) fractional color channel tuple; from 0 to 1
+    - factor (float): amount of change to brightness
+
+    Returns:
+        tuple: fractional R, G, B colors
+    """
+    red = color[0] * 255
+    grn = color[1] * 255
+    blu = color[2] * 255
+    result = adjust_color_brightness(red, grn, blu, 1 + factor, False)
+    return result[0] / 255, result[1] / 255, result[2] / 255
+
+
+def darken_pymu(color, factor=0.1) -> tuple:
+    """Decrease brightness of a PyMuPDF colour tuple
+
+    Args:
+
+    - color (tuple): a (red, green, blue) fractional color channel tuple; from 0 to 1
+    - factor (float): amount of change to brightness
+
+    Returns:
+        tuple: fractional R, G, B colors
+    """
+    red = color[0] * 255
+    grn = color[1] * 255
+    blu = color[2] * 255
+    result = adjust_color_brightness(red, grn, blu, 1 - factor, False)
+    return result[0] / 255, result[1] / 255, result[2] / 255
 
 
 def lighten(hex_color, factor=0.2, as_hex=True):
@@ -137,10 +173,19 @@ def lighten(hex_color, factor=0.2, as_hex=True):
 
     Notes:
 
-        Factor set to 0.2 for use in cube shading
+        Factor set to 0.2 for use in Cube shades
     """
-    red, grn, blu = tuple(int(hex_color[i : i + 2], 16) for i in (1, 3, 5))
-    return lighten_color(red, grn, blu, factor, as_hex)
+    if not hex_color:
+        return None
+    if hex_color[0] != "#":
+        feedback(f'"{hex_color}" is not a valid hexadecimal color', True)
+    try:
+        red, grn, blu = tuple(int(hex_color[i : i + 2], 16) for i in (1, 3, 5))
+        return lighten_color(red, grn, blu, factor, as_hex)
+    except (ValueError, TypeError):
+        feedback(
+            f'Unable to lighten "{hex_color}"; please check it is a valid color', True
+        )
 
 
 def darken(hex_color, factor=0.2, as_hex=True):
@@ -154,10 +199,19 @@ def darken(hex_color, factor=0.2, as_hex=True):
 
     Notes:
 
-        Factor set to 0.2 for use in cube shading
+        Factor set to 0.2 for use in Cube shades
     """
-    red, grn, blu = tuple(int(hex_color[i : i + 2], 16) for i in (1, 3, 5))
-    return darken_color(red, grn, blu, factor, as_hex)
+    if not hex_color:
+        return None
+    if hex_color[0] != "#":
+        feedback(f'"{hex_color}" is not a valid hexadecimal color', True)
+    try:
+        red, grn, blu = tuple(int(hex_color[i : i + 2], 16) for i in (1, 3, 5))
+        return darken_color(red, grn, blu, factor, as_hex)
+    except (ValueError, TypeError):
+        feedback(
+            f'Unable to darken "{hex_color}"; please check it is a valid color', True
+        )
 
 
 if __name__ == "__main__":

@@ -370,16 +370,11 @@ class BaseCanvas:
         self.rounded_radius = self.defaults.get(
             "rounded_radius", 0.05
         )  # fraction of smallest side
-        # ---- rectangle / rhombus
+        # ---- rectangle / rhombus / hexagon
         self.slices = self.defaults.get("slices", [])
         self.slices_line = self.defaults.get("slices_line", 0)
         self.slices_line_mx = self.defaults.get("slices_line_mx", 0)
         self.slices_line_my = self.defaults.get("slices_line_my", 0)
-        self.slices_stroke = self.defaults.get("slices_stroke", None)
-        self.slices_stroke_width = self.defaults.get("slices_stroke", None)
-        self.slices_reverse = self.defaults.get("slices_reverse", False)
-
-        self.slices = self.defaults.get("slices", [])
         self.slices_stroke = self.defaults.get("slices_stroke", None)
         self.slices_stroke_width = self.defaults.get("slices_stroke", None)
         self.slices_reverse = self.defaults.get("slices_reverse", False)
@@ -488,6 +483,9 @@ class BaseCanvas:
         )
         self.link_stroke = self.defaults.get("link_stroke", self.stroke)
         self.link_cap = self.defaults.get("link_cap", self.line_cap)
+        self.shades = self.defaults.get("shades", [])
+        self.shades_stroke = self.defaults.get("shades_stroke", None)
+        self.shades_stroke_width = self.defaults.get("shades_stroke", None)
         # ---- hexagons
         self.hid = self.defaults.get("id", "")  # HEX ID
         self.hex_rows = self.defaults.get("hex_rows", 0)
@@ -832,7 +830,7 @@ class BaseShape:
         self.peaks_dict = {}
         self.borders = kwargs.get("borders", base.borders)
         self.rounded_radius = base.rounded_radius
-        # ---- rectangle / rhombus
+        # ---- rectangle / rhombus/ hexagon
         self.slices = kwargs.get("slices", base.slices)
         self.slices_line = kwargs.get("slices_line", base.slices_line)
         self.slices_line_mx = kwargs.get("slices_line_mx", base.slices_line_mx)
@@ -842,14 +840,6 @@ class BaseShape:
         self.slices_stroke_width = kwargs.get(
             "slices_stroke_width", base.slices_stroke_width
         )
-
-        self.slices = kwargs.get("slices", base.slices)
-        self.slices_reverse = kwargs.get("slices_reverse", base.slices_reverse)
-        self.slices_stroke = kwargs.get("slices_stroke", base.slices_stroke)
-        self.slices_stroke_width = kwargs.get(
-            "slices_stroke_width", base.slices_stroke_width
-        )
-
         # ---- stadium
         self.edges = kwargs.get("edges", base.edges)
         # ---- grid layout
@@ -981,6 +971,11 @@ class BaseShape:
         )
         self.link_stroke = kwargs.get("link_stroke", base.stroke)
         self.link_cap = kwargs.get("link_cap", base.link_cap)
+        self.shades = kwargs.get("shades", base.shades)
+        self.shades_stroke = kwargs.get("shades_stroke", base.shades_stroke)
+        self.shades_stroke_width = kwargs.get(
+            "shades_stroke_width", base.shades_stroke_width
+        )
         # ---- hexagons
         self.hid = kwargs.get("id", base.hid)  # HEX ID
         self.hex_rows = self.kw_int(kwargs.get("hex_rows", base.hex_rows), "hex_rows")

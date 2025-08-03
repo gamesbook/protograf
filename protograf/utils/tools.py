@@ -103,7 +103,7 @@ def load_data(datasource=None, **kwargs):
 
 def load_googlesheet(sheet, **kwargs):
     """
-    Load data from a Google Sheet into a dict
+    Read data from a Google Sheet into a dict
     """
     data_list = []
     spreadsheet_id = sheet
