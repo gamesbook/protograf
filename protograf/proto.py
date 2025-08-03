@@ -81,7 +81,7 @@ from .globals import unit
 from .groups import Switch, Lookup  # used in scripts
 from ._version import __version__
 
-from protograf.utils import colrs, geoms, tools, support
+from protograf.utils import colrs, geoms, loadr, tools, support
 from protograf.utils.constants import (
     DEFAULT_FONT,
     DEBUG_COLOR,
@@ -2156,12 +2156,12 @@ def Data(**kwargs):
         feedback(f'Extra must be a whole number, not "{kwargs.get("extra")}"!', True)
 
     if filename:  # handle excel and CSV; kwargs include cell, sheet, sheetname
-        globals.dataset = tools.load_data(filename, **kwargs)
+        globals.dataset = loadr.load_data(filename, **kwargs)
         globals.dataset_type = DatasetType.FILE
     elif google_sheet:  # handle Google Sheet
         google_key = kwargs.get("google_key", None)
         sheetname = kwargs.get("sheetname", None)
-        globals.dataset = tools.load_googlesheet(
+        globals.dataset = loadr.load_googlesheet(
             google_sheet, api_key=google_key, name=sheetname
         )
         globals.dataset_type = DatasetType.GSHEET

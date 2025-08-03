@@ -4,7 +4,8 @@ protograf Changes
 2025-00-00 (0.2.14)
 -------------------
 - Add example for full wargame countersheet
-- New colrs utils
+- New colrs utils module
+- New loadr utils module
 - Add Cube object and examples
 
 2025-08-02 (0.2.13)
