@@ -18,6 +18,7 @@ will demonstrate full scalability.
 - `Wargame - Counters from CSV`_
 - `Wargame - Counters from Excel`_
 - `Wargame - Blocks from CSV`_
+- `Wargame - Counters from Excel - Commercial`_
 
 
 Wargame - Basic Counters
@@ -235,7 +236,7 @@ Title       *Wargame Counters from an Excel file*
 Script      `counters_excel.py <https://github.com/gamesbook/protograf/blob/master/examples/counters/counters_excel.py>`_
 ----------- ------------------------------------------------------------------
 Discussion  This example shows how to construct a set of counters using data
-            from an Excel file.
+            from an Excel file  (".xls" format).
 
             This example is effectively exactly the same as the ones above,
             with the only difference being the data source file:
@@ -327,5 +328,55 @@ Discussion  This example shows how to construct a set of labels, designed to
 
 ----------- ------------------------------------------------------------------
 Screenshot  .. image:: images/counters/blocks_csv.png
+               :width: 100%
+=========== ==================================================================
+
+
+Wargame - Counters from Excel - Commercial
+==========================================
+`↑ <table-of-contents-excntr_>`_
+
+=========== ==================================================================
+Title       *Commercial Wargame Counters with data in an Excel file*
+----------- ------------------------------------------------------------------
+Script      `counters_doagc.py <https://github.com/gamesbook/protograf/blob/master/examples/counters/counters_doagc.py>`_
+----------- ------------------------------------------------------------------
+Data        `DOAGC.xlsx <https://github.com/gamesbook/protograf/blob/master/examples/counters/DOAGC.xlsx>`_
+----------- ------------------------------------------------------------------
+Discussion  This example shows how to construct a set of counters using data
+            from an Excel file (".xlsx" format).
+
+            This example is similar the same as the ones that use Excel as
+            a data source:
+
+              .. code:: python
+
+                Data(filename="DOAGC.xlsx")
+
+            Here, the full counter sheet for a commercial game, published by
+            SPI in 1973 |dash| *Destruction of Army Group Center* |dash| has
+            been reproduced.
+
+            It makes use of the *JZNATO* font available from:
+            https://github.com/jzedwards/jzfonts to display common/standard
+            military unit icons, and the *Univers LT Std* font from
+            https://www.cdnfonts.com/univers-lt-std.font to display text.
+
+            In addition to this, the example also shows how to use *zones*
+            property of the ``CounterSheet`` command to add text and blocks
+            of color to the counter sheet |dash| note that these are drawn
+            first, before any counters!
+
+            Note that while the counters here are outlined in black for
+            ease of viewing, in practice these outlines would be turned off
+            as the cut marks visible around the edge of the page are the
+            preferred method for enabling cutting out a prototype.
+
+----------- ------------------------------------------------------------------
+Screenshot  .. image:: images/counters/doagc_full.png
+               :width: 100%
+
+----------- ------------------------------------------------------------------
+Zoom-In     .. image:: images/counters/doagc_zoom.png
                :width: 100%
 =========== ==================================================================

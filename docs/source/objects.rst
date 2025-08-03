@@ -26,6 +26,15 @@ Thus they are able to use, or reference, many of the properties of these
 shapes, in addition to their own particular properties.
 
 
+Cube
+====
+
+Cubes are used in many games, and being able to readily create a basic
+depiction of them can be useful.
+
+For more details, see the section on :doc:`Cubes <cubes>`.
+
+
 Dice
 ====
 

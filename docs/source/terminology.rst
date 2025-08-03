@@ -11,9 +11,10 @@ which they are used.
 However, in order to help with clarity, below is a reasonably comprehensive
 list of terms used in different places, grouped by what aspects they affect.
 
-Note that some shapes, such as the :ref:`Hexagon <hexIndex>`, have
-extensive customisation properties available; rather refer to their
-specific descriptions to understand exactly how these can used.
+Note that some shapes, such as the :ref:`Hexagon <hexIndex>`, or
+:ref:`Circle <circleIndex>`, have extensive customisation properties
+available; its better to refer to their specific descriptions to understand
+exactly how these can used.
 
 .. _table-of-contents-terms:
 
@@ -365,8 +366,10 @@ Area-orientated Terms
    direction and a value, that designate that the edge of a rectangle
    should be drawn as a triangular "peak"; e.g. a **set** of ``('n', 2)``
    would draw a 2cm high triangle on the upper (north) edge
+-  **shades** - a way to fill in the rhombus-shaped subsections of a hexagon
+   in order to create the effect of a ``Cube``
 -  **slices** - a way to fill in triangular sections of a square, rectangle or
-   rhombus by supplying a list of colors; for square or rectangle, a
+   rhombus by supplying a list of colors; for a square or rectangle, a
    **slices_line** can also be used to create both trapezoids and triangles
    which gives the appearance of a building's roof when viewed from above
 -  **tetris** - when set to ``True`` will cause a ``Tetronimo`` to be styled

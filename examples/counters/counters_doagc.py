@@ -8,6 +8,8 @@ Notes:
     * The "Destruction of Army Group Center" game is copyright SPI, 1973
     * The fonts used for counters are `Univers LT Std` and `JZNATO V11  3x2`
 
+      * https://github.com/jzedwards/jzfonts
+      * https://www.cdnfonts.com/univers-lt-std.font
 """
 from protograf import *
 

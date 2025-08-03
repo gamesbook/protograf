@@ -37,6 +37,7 @@ cross-reference to the detailed information for that command.
    countersheet, containing one or more counters
 -  :ref:`Create <create-command>` - start of a script; define the
    paper size, output filename, margins, units, fill color etc.
+-  :ref:`Cube <cube-object>` - create isometric and shaded view of a cube
 -  :ref:`Data <the-data-command>` - provides a setof information for
    a :ref:`deck <the-deck-command>` or a
    :ref:`countersheet <the-countersheet-command>` ; typically sourced from a CSV or

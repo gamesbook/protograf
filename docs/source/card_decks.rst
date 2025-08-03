@@ -562,6 +562,12 @@ There are three properties needed to gain access to data from a Google Sheet:
   assigned by Google to your Google Sheet
 - *sheetname* - the name of the tab in the Google Sheet housing your data
 
+.. HINT::
+
+    Access to a Google Sheet is done in such a way that it is possible for
+    empty cells to **not** be included in the downloaded data.  In this case
+    **protograf** will "fill-in" blank values.
+
 
 .. _deck-data-bgg:
 

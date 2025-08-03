@@ -29,10 +29,12 @@ Cube(x=0.75, y=1.5,
      shades=YELLOW)
 Cube(x=1.5, y=3, height=1.5,
      shades=YELLOW,
-     radii_stroke="white")
+     radii_stroke="white",
+     radii_stroke_width=0.4)
 Cube(x=2.5, y=4.5, height=1.5,
      shades=["#FFDC17", "#957F0A", "#CCB412"],
-     radii_stroke="dimgray")
+     radii_stroke="dimgray",
+     radii_stroke_width=0.4)
 
 Save(
     output='png',

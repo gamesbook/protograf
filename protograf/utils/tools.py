@@ -864,6 +864,22 @@ def open_xlsx(
         result = "" if value is None else value
         return result
 
+    def maximum_columns(worksheet):
+        """Find the actual max column by iterating through cells.
+
+        Notes:
+
+            worksheet.max_column can have an inflated value if
+            spreadsheet was created or modified by other software
+        """
+        actual_max_column = 0
+        for row in worksheet.iter_rows():
+            for cell in row:
+                if cell.value is not None:
+                    if cell.column > actual_max_column:
+                        actual_max_column = cell.column
+        return actual_max_column
+
     if not filename:
         feedback("A valid Excel filename must be supplied!")
 
@@ -893,10 +909,11 @@ def open_xlsx(
             )
         start = 1
 
+        max_cols = maximum_columns(sheet)
         if not headers:
             keys = [
                 sheet.cell(1, col_index).value
-                for col_index in range(1, sheet.max_column + 1)
+                for col_index in range(1, max_cols + 1)
             ]
             if None in keys:
                 feedback(
@@ -908,7 +925,7 @@ def open_xlsx(
         else:
             start = 1
             keys = headers
-        if len(keys) < sheet.max_column:
+        if len(keys) < max_cols:
             feedback(
                 'Too few headers supplied for the existing columns in "%s"' % filename
             )
@@ -929,7 +946,7 @@ def open_xlsx(
                         keys[col_index - 1]: cleaned(
                             sheet.cell(row=row_index, column=col_index).value
                         )
-                        for col_index in range(1, sheet.max_column + 1)
+                        for col_index in range(1, max_cols + 1)
                     }
                     dict_list.append(item)
     except IOError:
