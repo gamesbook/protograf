@@ -1503,6 +1503,90 @@ def page_break():
     PageBreak()
 
 
+def Extract(pages: object, **kwargs):
+    """Extract one or more parts from the final PDF file as images.
+
+    Args:
+
+    - pages (str|list): one or more numbers - either space-separated in
+      text form or in a list.
+
+    Kwargs:
+
+    - names (list): a set of strings as names for the images.  If the list is
+      not long enough for all the images, naming reverts back to defaults.
+    - cols_rows (str|list): two numbers - either space-separated in text form
+      or in a list. The first number is how many columns the page should be
+      divided into and the second number is how many rows the page should be
+      divided into.
+    - areas (list): a list of sets of numbers, with four numbers
+      in each.  The set numbers represent the top-left *x* and *y* and the
+      bottom-right *x* and *y* locations on the page of a rectangle that must be
+      extracted
+
+    Notes:
+
+      All areas are specified as BBox and added to a list keyed
+      on page and stored in  globals.extracts. They are processed
+      during/after document Save()
+    """
+    _pages = tools.sequence_split(pages)
+    if not _pages:
+        feedback("At least one page must be specified for Extract.", True)
+    # ---- set local vars from kwargs
+    names = kwargs.get("names", [])
+    areas = kwargs.get("areas", None)
+    cols_rows = kwargs.get("cols_rows", None)
+    if (cols_rows and areas) or (not areas and not cols_rows):
+        feedback("Specify either areas or cols_rows for Extract, but not both.", True)
+    if areas:
+        if not isinstance(areas, list):
+            feedback("The areas specified for Extract must be a list.", True)
+        for area in areas:
+            if not isinstance(area, tuple) or len(area) != 4:
+                feedback(
+                    "The area bounds specified for Extract must be a set of 4 numbers.",
+                    True,
+                )
+            for item in area:
+                if not isinstance(area, (int, float)):
+                    feedback(
+                        "The area bounds specified for Extract must all be numeric.",
+                        True,
+                    )
+
+    if cols_rows:
+        _cols_rows = tools.sequence_split(cols_rows)
+        if len(_cols_rows) != 2:
+            feedback(
+                "The cols_rows specified for Extract must be a set of 2 numbers.", True
+            )
+        for item in _cols_rows:
+            if not isinstance(area, int):
+                feedback(
+                    "The cols_rows specified for Extract must all be integers.", True
+                )
+
+    extract_dict = globals.extracts
+    for _page in pages:
+        if _page in extract_dict:
+            data = extract_dict[_page]
+        else:
+            data = []
+        if areas:
+            pass  # TODO calculate BBox with point units
+        elif _cols_rows:
+            pass  # TODO calculate BBox with point units
+        else:
+            pass
+        # TODO pass in names here?
+        globals.extracts[_page] = data
+
+
+def extract(pages: object, **kwargs):
+    Extract(pages=pages, **kwargs)
+
+
 def Save(**kwargs):
     """Save the result of all commands to a PDF file.
 
@@ -1625,6 +1709,15 @@ def Save(**kwargs):
     # ---- save cards to image(s)
     # MOVED TO DECK DRAW - because of use of intermediate pages for gutter-based layout
 
+    # ---- process extracts
+    support.areas_to_png(
+        source_file=globals.filename,
+        fformat="png",
+        dpi=300,
+        directory=globals.directory,
+        areas=globals.extracts,
+    )
+
     # ---- reset key globals to allow for new Deck()
     # ---- pymupdf doc, page, shape/canvas
     globals.document = pymupdf.open()  # pymupdf.Document
@@ -1637,6 +1730,7 @@ def Save(**kwargs):
         globals.document, paper=globals.paper  # , defaults=defaults, kwargs=kwargs
     )
     globals.page_count = 0
+    globals.extracts = {}
     page_setup()
 
 

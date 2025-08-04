@@ -550,6 +550,16 @@ def pdf_export(
         feedback(f"Unable to extract images for {filename} - {err}!")
 
 
+def areas_to_png(
+    source_file: str,
+    fformat: str = "png",
+    dpi: int = 300,
+    directory: str = None,
+    areas: list = None,
+):
+    pass
+
+
 def pdf_cards_to_png(
     source_file: str,
     output: str,

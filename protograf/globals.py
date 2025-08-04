@@ -38,6 +38,7 @@ def initialize():
     global dataset
     global dataset_type
     global image_list
+    global extracts
     global filename
     global directory
     global margins
@@ -69,6 +70,7 @@ def initialize():
     dataset = None  # will become a dictionary of data loaded from a file
     dataset_type = None  # set when Data is loaded; enum DatasetType
     image_list = []  # filenames stored when Data is loaded from image dir
+    extracts = {}  # list of proto.BBox areas to be extracted, keyed on page number
     margins = None  # will become a proto.PageMargins object
     footer = None
     footer_draw = False

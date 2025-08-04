@@ -157,10 +157,10 @@ be extracted:
   e.g. ``"3 4"`` or ``[5, 6]``.  The first number is how many columns the page
   should be divided into and the second number is how many rows the page
   should be divided into.  So a `"2 2"`` value divides the page into quarters.
-- *areas* - this is a list of sets, or strings, of numbers, with four numbers
-  in each.  These numbers represent the top-left *x* and *y* and the
-  bottom-right *x* and *y* locations on the page of a rectangle that must be
-  extracted e.g. ``[(1, 1, 5, 5), "2 2 6 7"]`` will extract two rectangular
+- *areas* - this is a list of sets of numbers, with four number in each.
+  The set numbers represent the top-left *x* and *y* and the bottom-right
+  *x* and *y* locations on the page of a rectangle that must b extracted
+  e.g. ``[(1, 1, 5, 5), (2, 2, 6, 7)]`` will extract two rectangular
   images |dash| the first being 4cm in height and width and starting 1cm away
   from the top and left of the page, and the second being 4cm width by 5cm in
   height and starting 2cm away from the top and left of the page
@@ -175,7 +175,7 @@ A *areas* example:
 
 .. code:: python
 
-    Extract("2,4,6", areas=[(1, 1, 5, 5), "2 2 6 7"])
+    Extract("2,4,6", areas=[(1, 1, 5, 5), (2, 2, 6, 7)])
 
 
 By default, the images are named after the PDF file being created, along with
