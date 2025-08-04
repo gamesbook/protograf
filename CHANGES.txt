@@ -4,9 +4,11 @@ protograf Changes
 2025-00-00 (0.2.14)
 -------------------
 - Add example for full wargame countersheet
-- New colrs utils module
-- New loadr utils module
+- New colrs utils module (no API change)
+- New loadr utils module (no API change)
 - Add Cube object and examples
+- Add Extract command
+- Add example for player board
 
 2025-08-02 (0.2.13)
 -------------------
@@ -17,7 +19,7 @@ protograf Changes
 - Patch caption locations for Image
 - Shift Starfield into objects module (no API change)
 - Patch bug loading last, empty cell from Google Sheet
-- Add D6 object
+- Add D6 object and examples
 - Patch bug with Font name with spaces
 
 2025-07-27 (0.2.12)

@@ -16,6 +16,7 @@ Icons, Art and Images
 -  https://openclipart.org/
 -  https://www.svgrepo.com/
 -  https://game-icons.net/
+-  https://publicdomainicons.firebaseapp.com/icons
 -  https://creazilla.com/
 -  https://bioart.niaid.nih.gov/ - medical, biological, animal and "various"
    in PNG and SVG formats

@@ -15,6 +15,7 @@ basic scripts of your own using the :doc:`Core Shapes <core_shapes>`.
 
 -  `Common Command`_
 -  `Font Command`_
+-  `Extract Command`_
 -  `Random Command`_
 -  `Today Command`_
 -  `BGG Command`_
@@ -130,6 +131,80 @@ Example 1. Common Fonts
 
 ===== ======
 
+.. _the-extract-command:
+
+Extract Command
+===============
+`↑ <table-of-contents-addcmd_>`_
+
+The ``Extract()`` command allows portions of pages to be extracted as PNG
+images.
+
+Specifying which page, or pages, are affected, along with the portions
+required, will automatically create these images after the final PDF is
+produced by **protograf**.
+
+There are a number of properties that can be assigned to an ``Extract``.
+
+The first must always be the page, or pages, where the extraction must happen.
+These can be specified in as text e.g.: ``"43"``, ``"2-4"``, or ``"3-5,7,9"``,
+or in a list e.g.: ``[43]``, ``[2, 3, 4]``, or ``[3, 4, 5, 7, 9]``.
+
+Either one of two properties can be used to specify what part of the page must
+be extracted:
+
+- *cols_rows*: two numbers - either space-separated in text **or** in a list
+  e.g. ``"3 4"`` or ``[5, 6]``.  The first number is how many columns the page
+  should be divided into and the second number is how many rows the page
+  should be divided into.  So a `"2 2"`` value divides the page into quarters.
+- *areas* - this is a list of sets, or strings, of numbers, with four numbers
+  in each.  These numbers represent the top-left *x* and *y* and the
+  bottom-right *x* and *y* locations on the page of a rectangle that must be
+  extracted e.g. ``[(1, 1, 5, 5), "2 2 6 7"]`` will extract two rectangular
+  images |dash| the first being 4cm in height and width and starting 1cm away
+  from the top and left of the page, and the second being 4cm width by 5cm in
+  height and starting 2cm away from the top and left of the page
+
+A *cols_rows* example:
+
+.. code:: python
+
+    Extract("1-3" , cols_rows='2 2')
+
+A *areas* example:
+
+.. code:: python
+
+    Extract("2,4,6", areas=[(1, 1, 5, 5), "2 2 6 7"])
+
+
+By default, the images are named after the PDF file being created, along with
+a ``_N`` suffix, where N is the page number, and then a ``_M`` where M is the
+sequence number of the image. For example, the fourth image on the third page
+extracted from a file called ``demo.pdf`` would be called ``demo_3_4.png``.
+
+There is an optional *name* property that can be used to specify names for the
+images.  This is just a list of text values.  If the list is not long enough
+for all the images, the naming will revert back to the default approach.
+
+For example:
+
+.. code:: python
+
+    Extract(
+        "1-3" ,
+        cols_rows='2 2',
+        names=[
+            'top-left-quarter',
+            'top-right-quarter',
+            'bottom-left-quarter',
+            'bottom-right-quarter',
+        ]
+    )
+
+This extract will create images named ``top-left-quarter.png``,
+``top-right-quarter.png``, ``bottom-left-quarter.png``, and
+``bottom-right-quarter.png``.
 
 .. _random-command:
 

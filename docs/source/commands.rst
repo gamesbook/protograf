@@ -37,18 +37,19 @@ cross-reference to the detailed information for that command.
    countersheet, containing one or more counters
 -  :ref:`Create <create-command>` - start of a script; define the
    paper size, output filename, margins, units, fill color etc.
--  :ref:`Cube <cube-object>` - create isometric and shaded view of a cube
--  :ref:`Data <the-data-command>` - provides a setof information for
+-  :ref:`Cube <cube-object>` * - create isometric and shaded view of a cube
+-  :ref:`Data <the-data-command>` - provides a set of information for
    a :ref:`deck <the-deck-command>` or a
-   :ref:`countersheet <the-countersheet-command>` ; typically sourced from a CSV or
-   Excel file
--  :ref:`D6 <d6-object>` - create top-down view of a six-sided die
+   :ref:`countersheet <the-countersheet-command>` - typically sourced from a CSV or
+   Excel file, or a Google Sheet
+-  :ref:`D6 <d6-object>` * - create top-down view of a six-sided die
 -  :ref:`Deck <the-deck-command>`  - details for a deck, containing one or
    more :ref:`cards <the-card-command>`
 -  :ref:`Dot <dot-command>` * - a geometric shape that can be drawn on a page
 -  :ref:`DotGrid <dotgrid-command>` - a set, or group, of dots that can be drawn on a page
 -  :ref:`Ellipse <ellipse-command>` * - a geometric shape that can be drawn on a page
 -  :ref:`EquilateralTriangle <equilateraltriangle-command>` * - a geometric shape that can be drawn on a page
+-  :ref:`Extract <the-extract-command>` - allows portions of pages to be extracted as PNG images
 -  :ref:`Font <the-font-command>` - set the font properties for any :ref:`Text <text-command>` drawn on a page
 -  :ref:`Grid <grid-command>` - a set, or group, of lines that can be drawn on a page
 -  :ref:`group <group-function>` - a way to  reference a stack of shapes that
@@ -108,6 +109,6 @@ cross-reference to the detailed information for that command.
 .. IMPORTANT::
 
    Commands marked with an asterisk (``*``) can be given with a uppercase or
-   lowercase initial (``Commmand`` vs ``command``); meaning the shape should
-   either be drawn directly at that point in the script, or that it should be
-   "stored" to be drawn later.
+   lowercase initial (``Commmand`` vs ``command``); the former meaning that
+   the shape should be drawn directly at that point in the script; and the
+   latter that it should be "stored" to be drawn later.
