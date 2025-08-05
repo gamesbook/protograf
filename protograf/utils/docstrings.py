@@ -28,8 +28,7 @@ Example Usage:
 def docstring_base(func):
     func.__doc__ = func.__doc__.replace(
         "<base>",
-        """
-    - x (float): the left-most edge of the shape; defaults to 1
+        """- x (float): the left-most edge of the shape; defaults to 1
     - y (float): the top-most edge of the shape; defaults to 1
     - stroke (str): the named or hexadecimal color of shape's line;
       defaults to ``black``
@@ -48,8 +47,7 @@ def docstring_base(func):
 def docstring_loc(func):
     func.__doc__ = func.__doc__.replace(
         "<loc>",
-        """
-    - x (float): the left-most edge of the shape; defaults to 1
+        """- x (float): the left-most edge of the shape; defaults to 1
     - y (float): the top-most edge of the shape; defaults to 1""",
     )
     return func
@@ -58,8 +56,7 @@ def docstring_loc(func):
 def docstring_card(func):
     func.__doc__ = func.__doc__.replace(
         "<card>",
-        """
-    - The first argument must be an expression that can be evaulated to
+        """- The first argument must be an expression that can be evaulated to
       create a list of one or more numbers; e.g. "1-10", "1,3,5-10",
       [1,3,7,9]; the terms "*" or "all" represent all possible values
     - The second and further arguments must one of these type of objects:
@@ -74,8 +71,7 @@ def docstring_card(func):
 def docstring_area(func):
     func.__doc__ = func.__doc__.replace(
         "<area>",
-        """
-    - fill (str): the named or hexadecimal color of shape's area;
+        """- fill (str): the named or hexadecimal color of shape's area;
       defaults to ``white``.
     - fill_stroke(str): the named or hexadecimal color for the shape's
       line and area colors.""",
@@ -85,8 +81,9 @@ def docstring_area(func):
 
 def docstring_center(func):
     func.__doc__ = func.__doc__.replace(
-        "center>",
-        """
+        "<center>",
+        """- x (float): the left-most edge of the shape; defaults to 1
+    - y (float): the top-most edge of the shape; defaults to 1
     - cx (float): the centre position of the shape, relative to the left edge
     - cy (float): the centre position of the shape, relative to the top edge
     - rotation (float): the rotation of the shape in degrees, anti-clockwise
@@ -117,8 +114,7 @@ def docstring_center(func):
     - title (str): text to be displayed below the shape
     - title_stroke (str): the named or hexadecimal color of the title's line;
       defaults to ``black``
-    - title_size (float): the point size of the title's text; defaults to 12
-    """,
+    - title_size (float): the point size of the title's text; defaults to 12""",
     )
     return func
 
@@ -126,8 +122,7 @@ def docstring_center(func):
 def docstring_onimo(func):
     func.__doc__ = func.__doc__.replace(
         "<onimo>",
-        """
-    - invert (str): can either be ``leftright`` (``lr``) or ``topbottom``
+        """- invert (str): can either be ``leftright`` (``lr``) or ``topbottom``
       (``tb``) and will reverse the order of the numbers, either in a left-to-right
       (numbers at the end of a row go to the start and vice-versa) or top-to-bottom
       (rows at the end go to the start and vice-versa)
@@ -144,7 +139,6 @@ def docstring_onimo(func):
     - fills (list): each square can be associated with a different fill color
     - strokes (list): each square can be associated with a different stroke color
     - labels (list): each square can be linked to a different label
-    - shapes (list): each square can be linked to a different centred shape
-    """,
+    - shapes (list): each square can be linked to a different centred shape""",
     )
     return func

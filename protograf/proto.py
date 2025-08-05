@@ -1504,7 +1504,7 @@ def page_break():
 
 
 def Extract(pages: object, **kwargs):
-    """Extract one or more parts from the final PDF file as images.
+    """Extract one or more page parts from the final PDF file as images.
 
     Args:
 
@@ -1526,8 +1526,8 @@ def Extract(pages: object, **kwargs):
 
     Notes:
 
-      All areas are specified as a (BBox, name) tuple and added to a list
-      keyed on page number and stored in `globals.extracts`. They are
+      All areas are specified as a (BBox, name) tuple, added to a list
+      keyed on page number, and stored in `globals.extracts`. They are
       processed during/after document Save()
     """
     _pages = tools.sequence_split(pages)
@@ -1545,13 +1545,15 @@ def Extract(pages: object, **kwargs):
         for area in areas:
             if not isinstance(area, tuple) or len(area) != 4:
                 feedback(
-                    "The area bounds specified for Extract must be a set of 4 numbers.",
+                    "The area bounds specified for Extract must be a set of 4 numbers,"
+                    f' not "{area}".',
                     True,
                 )
             for item in area:
-                if not isinstance(area, (int, float)):
+                if not isinstance(item, (int, float)):
                     feedback(
-                        "The area bounds specified for Extract must all be numeric.",
+                        "The area bounds specified for Extract must all be numeric,"
+                        f' not "{area}".',
                         True,
                     )
 
@@ -1559,12 +1561,16 @@ def Extract(pages: object, **kwargs):
         _cols_rows = tools.sequence_split(cols_rows, unique=False)
         if len(_cols_rows) != 2:
             feedback(
-                "The cols_rows specified for Extract must be a set of 2 numbers.", True
+                "The cols_rows specified for Extract must be a set of 2 numbers,"
+                f' not "{_cols_rows}".',
+                True,
             )
         for item in _cols_rows:
             if not isinstance(item, int):
                 feedback(
-                    "The cols_rows specified for Extract must all be integers.", True
+                    "The cols_rows specified for Extract must all be integers,"
+                    f' not "{_cols_rows}".',
+                    True,
                 )
 
     extract_dict = globals.extracts
@@ -1582,9 +1588,23 @@ def Extract(pages: object, **kwargs):
                     name = None
                 name_idx += 1
                 # check x1<x2 and y1<y2
-                # xl = globals.units * area[0]
-                # BBox(tl=Point(xl, yt), br=Point(xr, yb))
-                # data.append((BBox(tl=Point(xl, yt), br=Point(xr, yb)), name)
+                if area[2] < area[0]:
+                    feedback(
+                        "The second x location must be to the right (higher value)"
+                        f' than the first for "{area}".',
+                        True,
+                    )
+                if area[3] < area[1]:
+                    feedback(
+                        "The second y location must be below (higher value)"
+                        f' the first for "{area}".,',
+                        True,
+                    )
+                xl = globals.units * area[0]
+                yt = globals.units * area[1]
+                xr = globals.units * area[2]
+                yb = globals.units * area[3]
+                data.append((BBox(tl=Point(xl, yt), br=Point(xr, yb)), name))
         elif _cols_rows:
             col_width = globals.page[0] / _cols_rows[0]
             row_width = globals.page[1] / _cols_rows[1]
@@ -2665,7 +2685,7 @@ def chord(row=None, col=None, **kwargs):
     return ChordShape(canvas=globals.canvas, **kwargs)
 
 
-@docstring_base
+@docstring_center
 def Circle(row=None, col=None, **kwargs):
     """Draw a Circle shape on the canvas.
 
@@ -2676,8 +2696,53 @@ def Circle(row=None, col=None, **kwargs):
 
     Kwargs:
 
-    <base>
+    <center>
+    - hatch (str): if not specified, hatches will be drawn
+      in all directions - otherwise:
 
+      - ``n`` (North) or ``s`` (South) draws vertical lines;
+      - ``w`` (West) or ``e`` (East) draws horizontal lines;
+      - ``nw`` (North-West) or ``se`` (South-East) draws diagonal lines
+        from top-left to bottom-right;
+      - ``ne`` (North-East) or ``sw`` (South-West) draws diagonal lines
+        from bottom-left to top-right;
+      - ``o`` (orthogonal) draws vertical **and** horizontal lines;
+      - ``d`` (diagonal) draws diagonal lines between adjacent sides.
+    - hatch_count (int): sets the **number** of lines to be drawn; the
+      intervals between them are equal and depend on the direction
+    - hatch_width (float): hatch line thickness defaults to 0.1 points
+    - hatch_stroke (str): the named or hexadecimal color of the hatch line;
+      defaults to ``black``
+    - petals (int): sets the number of petals to drawn
+    - petals_style (str): a style of ``p`` or ``petal`` causes petals
+      to be drawn as arcs; a style of ``t`` or ``triangle`` causes petals
+      to be drawn as sharp triangle
+    - petals_offset (float): sets the distance of the lowest point of the petal
+      line away from the circle's circumference
+    - petals_stroke_width (float): sets the thickness of the line used to draw
+      the petals
+    - petals_fill (str): the named or hexadecimal color of the area inside the
+      line used to draw the petals. Any *fill* or *stroke* settings for the
+      circle itself may appear superimposed on this area.
+    - petals_dotted (bool): if ``True``, sets the line style to *dotted*
+    - petals_height (float): sets the distance between the highest and the lowest
+      points of the petal line
+    - radii (float): a list of angles (in N|deg|) sets the directions at which
+      the radii lines are drawn
+    - radii_stroke_width (float): determines the thickness of the radii
+    - radii_dotted (bool): if set to True, will make the radii lines dotted
+    - radii_stroke (str): the named or hexadecimal color of the hatch line;
+      defaults to ``black``
+    - radii_length (float): changes the length of the radii lines
+      (centre to circumference)
+    - radii_offset (float): moves the endpoint of the radii line
+      **away** from the centre
+    - radii_labels (str|list): a string or list of strings used for text labels
+    - radii_labels_font (str): name of the font used for the labels
+    - radii_labels_rotation(float): rotation in degrees relative to radius angle
+    - radii_labels_size (float): point size of label text
+    - radii_labels_stroke (str): the named or hexadecimal color of the label text
+    - radii_labels_stroke_width (float): thickness of the label text
     """
     kwargs = margins(**kwargs)
     circle = CircleShape(canvas=globals.canvas, **kwargs)
@@ -2979,7 +3044,7 @@ def rhombus(row=None, col=None, **kwargs):
     return RhombusShape(canvas=globals.canvas, **kwargs)
 
 
-@docstring_base
+@docstring_center
 def Rectangle(row=None, col=None, **kwargs):
     """Draw a Rectangle shape on the canvas.
 
@@ -2990,20 +3055,21 @@ def Rectangle(row=None, col=None, **kwargs):
 
     Kwargs:
 
-    <base>
+    <center>
+
     - rounding (float): the radius of the circle used to round the corner
-    - *border* - a set of values, which are comma-separated inside round
+    - border (list): a set of values, which are comma-separated inside round
       brackets, in the following order:
 
       - direction - one of (n)orth, (s)outh, (e)ast or (w)est
       - width - the line thickness
       - color - either a named or hexadecimal color
       - style - ``True`` makes it dotted; or a list of values creates dashes
-    - *chevron (str): the primary compass direction in which a peak is
+    - chevron (str): the primary compass direction in which a peak is
       pointing; n(orth), s(outh), e(ast) or w(est)
     - chevron_height (float): the distance of the chevron peak from the side of
       the rectangle it is adjacent to
-    - *hatch (str): if not specified, hatches will be drawn
+    - hatch (str): if not specified, hatches will be drawn
       in all directions - otherwise:
 
       - ``n`` (North) or ``s`` (South) draws vertical lines;
@@ -3027,23 +3093,23 @@ def Rectangle(row=None, col=None, **kwargs):
       notch will start
     - notch_corners (str): the specific corners of the rectangle where the notch
       is applied, given as secondary compass directions - ne, se, sw, nw
-    - *notch_style (str): defineSsthe notch appearance:
+    - notch_style (str): defineSsthe notch appearance:
 
       - *snip* - is a small triangle "cut out"; this is the default style
       - *step* - is sillohette of a step "cut out"
       - *fold* - makes it appear there is a crease across the corner
       - *flap* - makes it appear that the corner has a small, liftable flap
-    - *peaks (list): a list of one or more sets, each enclosed by round brackets,
+    - peaks (list): a list of one or more sets, each enclosed by round brackets,
       consisting of a *direction* and a peak *size*:
 
       - Directions are the primary compass directions - (n)orth,
         (s)outh, (e)ast and (w)est
         Sizes are the distances of the centre of the peak from the edge
         of the Rectangle
-    - *slices (list): list of two or four  named or hexadecimal colors, as
+    - slices (list): list of two or four  named or hexadecimal colors, as
       comma-separated strings
     - slices_line (float): the width of a line drawn centered in the rectangle
-    - *slices_stroke (str): the named or hexadecimal color of the slice line;
+    - slices_stroke (str): the named or hexadecimal color of the slice line;
       defaults to ``black``
     """
     kwargs = margins(**kwargs)
