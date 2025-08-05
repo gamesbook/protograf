@@ -668,7 +668,7 @@ Example 1. Size & Location
 
       - *notch_x* - the distance from the corner in the x-direction where the
         notch will start
-      - *notch_y* - the distance from the corner in the Y-direction where the
+      - *notch_y* - the distance from the corner in the y-direction where the
         notch will start
       - *notch_corners* - the specific corners of the rectangle where the notch
         will be applied

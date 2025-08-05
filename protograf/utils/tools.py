@@ -476,9 +476,21 @@ def sequence_split(
                 feedback(f'Cannot set a range of decimal numbers ("{item}"){msg}', True)
         else:
             if as_int:
-                values.append(int(item))
+                try:
+                    values.append(int(item))
+                except ValueError as err:
+                    feedback(
+                        f'Unable to use "{item}"; check for whole numbers (with a {sep} between each)',
+                        True,
+                    )
             elif as_float:
-                values.append(float(item))
+                try:
+                    values.append(float(item))
+                except ValueError as err:
+                    feedback(
+                        f'Unable to use "{item}"; check for numbers (with a {sep} between each)',
+                        True,
+                    )
             else:
                 _item = str(item).strip() if clean else str(item)
                 values.append(_item)

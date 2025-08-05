@@ -733,13 +733,13 @@ class DeckOfCards:
     ):
         """Save individual cards as PNG images using their frames."""
         if self.export_cards and globals.pargs.png:  # pargs.png should default to True
-            support.pdf_cards_to_png(
+            support.pdf_frames_to_png(
                 source_file=filename,
                 output=output or filename,
                 fformat=fformat,
                 dpi=self.dpi,
                 directory=directory or self.directory,
-                card_frames=globals.card_frames,
+                frames=globals.card_frames,
                 page_height=globals.page[1],
             )
 
@@ -1515,9 +1515,9 @@ def Extract(pages: object, **kwargs):
 
     - names (list): a set of strings as names for the images.  If the list is
       not long enough for all the images, naming reverts back to defaults.
-    - cols_rows (str|list): two numbers - either space-separated in text form
+    - cols_rows (str|list): two numbers - either comma-separated in text form
       or in a list. The first number is how many columns the page should be
-      divided into and the second number is how many rows the page should be
+      divided into, and the second number is how many rows the page should be
       divided into.
     - areas (list): a list of sets of numbers, with four numbers
       in each.  The set numbers represent the top-left *x* and *y* and the
@@ -1526,9 +1526,9 @@ def Extract(pages: object, **kwargs):
 
     Notes:
 
-      All areas are specified as BBox and added to a list keyed
-      on page and stored in  globals.extracts. They are processed
-      during/after document Save()
+      All areas are specified as a (BBox, name) tuple and added to a list
+      keyed on page number and stored in `globals.extracts`. They are
+      processed during/after document Save()
     """
     _pages = tools.sequence_split(pages)
     if not _pages:
@@ -1538,7 +1538,7 @@ def Extract(pages: object, **kwargs):
     areas = kwargs.get("areas", None)
     cols_rows = kwargs.get("cols_rows", None)
     if (cols_rows and areas) or (not areas and not cols_rows):
-        feedback("Specify either areas or cols_rows for Extract, but not both.", True)
+        feedback("Specify either areas OR cols_rows for Extract, but not both.", True)
     if areas:
         if not isinstance(areas, list):
             feedback("The areas specified for Extract must be a list.", True)
@@ -1556,31 +1556,53 @@ def Extract(pages: object, **kwargs):
                     )
 
     if cols_rows:
-        _cols_rows = tools.sequence_split(cols_rows)
+        _cols_rows = tools.sequence_split(cols_rows, unique=False)
         if len(_cols_rows) != 2:
             feedback(
                 "The cols_rows specified for Extract must be a set of 2 numbers.", True
             )
         for item in _cols_rows:
-            if not isinstance(area, int):
+            if not isinstance(item, int):
                 feedback(
                     "The cols_rows specified for Extract must all be integers.", True
                 )
 
     extract_dict = globals.extracts
-    for _page in pages:
+    name_idx = 0
+    for _page in _pages:
         if _page in extract_dict:
             data = extract_dict[_page]
         else:
             data = []
         if areas:
-            pass  # TODO calculate BBox with point units
+            for area in areas:
+                try:
+                    name = names[name_idx]
+                except IndexError:
+                    name = None
+                name_idx += 1
+                # check x1<x2 and y1<y2
+                # xl = globals.units * area[0]
+                # BBox(tl=Point(xl, yt), br=Point(xr, yb))
+                # data.append((BBox(tl=Point(xl, yt), br=Point(xr, yb)), name)
         elif _cols_rows:
-            pass  # TODO calculate BBox with point units
+            col_width = globals.page[0] / _cols_rows[0]
+            row_width = globals.page[1] / _cols_rows[1]
+            for col in range(0, _cols_rows[0]):
+                xl = col * col_width
+                xr = (col + 1) * col_width
+                for row in range(0, _cols_rows[1]):
+                    yt = row * row_width
+                    yb = (row + 1) * row_width
+                    try:
+                        name = names[name_idx]
+                    except IndexError:
+                        name = None
+                    name_idx += 1
+                    data.append((BBox(tl=Point(xl, yt), br=Point(xr, yb)), name))
         else:
             pass
-        # TODO pass in names here?
-        globals.extracts[_page] = data
+        globals.extracts[_page - 1] = data
 
 
 def extract(pages: object, **kwargs):
@@ -1706,16 +1728,15 @@ def Save(**kwargs):
             framerate=framerate,
         )
 
-    # ---- save cards to image(s)
-    # MOVED TO DECK DRAW - because of use of intermediate pages for gutter-based layout
-
-    # ---- process extracts
-    support.areas_to_png(
+    # ---- process area/cols_rows extracts
+    support.pdf_frames_to_png(
         source_file=globals.filename,
+        output=None,  # ??? FIXME
         fformat="png",
-        dpi=300,
-        directory=globals.directory,
-        areas=globals.extracts,
+        dpi=300,  # ??? FIXME
+        directory=directory or globals.directory,
+        frames=globals.extracts,
+        page_height=globals.page[1],
     )
 
     # ---- reset key globals to allow for new Deck()
@@ -2205,12 +2226,12 @@ def Data(**kwargs):
       to the first one
     - cells (str): a range of cells delimiting data in the col:row format
       from top-left to bottom-right e.g. 'A3:E12'
-    - Access to a **Google Sheet** document is via three properties:
+    - a **Google Sheet** document is accessed via three properties:
 
-      - *google_key* - an API key that you must request from Google
-      - *google_sheet* - the unique ID (a mix of numbers and letters) which is
+      - google_key (str): an API key that you must request from Google
+      - google_sheet (str): the unique ID (a mix of numbers and letters) which is
         randomly assigned by Google to your Google Sheet
-      - *sheetname* - the name of the tab in the Google Sheet housing your data
+      - sheetname (str): the name of the tab in the Google Sheet housing your data
     - matrix (str): refers to the name assigned to the ``Matrix`` being used
     - images (str): refers to the directory in which the cards' images are
       located;  if a full path is not given, its assumed to be directly under
@@ -2970,7 +2991,60 @@ def Rectangle(row=None, col=None, **kwargs):
     Kwargs:
 
     <base>
+    - rounding (float): the radius of the circle used to round the corner
+    - *border* - a set of values, which are comma-separated inside round
+      brackets, in the following order:
 
+      - direction - one of (n)orth, (s)outh, (e)ast or (w)est
+      - width - the line thickness
+      - color - either a named or hexadecimal color
+      - style - ``True`` makes it dotted; or a list of values creates dashes
+    - *chevron (str): the primary compass direction in which a peak is
+      pointing; n(orth), s(outh), e(ast) or w(est)
+    - chevron_height (float): the distance of the chevron peak from the side of
+      the rectangle it is adjacent to
+    - *hatch (str): if not specified, hatches will be drawn
+      in all directions - otherwise:
+
+      - ``n`` (North) or ``s`` (South) draws vertical lines;
+      - ``w`` (West) or ``e`` (East) draws horizontal lines;
+      - ``nw`` (North-West) or ``se`` (South-East) draws diagonal lines
+        from top-left to bottom-right;
+      - ``ne`` (North-East) or ``sw`` (South-West) draws diagonal lines
+        from bottom-left to top-right;
+      - ``o`` (orthogonal) draws vertical **and** horizontal lines;
+      - ``d`` (diagonal) draws diagonal lines between adjacent sides.
+    - hatch_count (int): sets the **number** of lines to be drawn; the
+      intervals between them are equal and depend on the direction
+    - hatch_width (float): hatch line thickness defaults to 0.1 points
+    - hatch_stroke (str): the named or hexadecimal color of the hatch line;
+      defaults to ``black``
+    - notch (float): the size of the triangular shape that will be "cut" off the
+      corners of the rectangle
+    - notch_x (float): the distance from the corner in the x-direction where the
+      notch will start
+    - notch_y (float): the distance from the corner in the y-direction where the
+      notch will start
+    - notch_corners (str): the specific corners of the rectangle where the notch
+      is applied, given as secondary compass directions - ne, se, sw, nw
+    - *notch_style (str): defineSsthe notch appearance:
+
+      - *snip* - is a small triangle "cut out"; this is the default style
+      - *step* - is sillohette of a step "cut out"
+      - *fold* - makes it appear there is a crease across the corner
+      - *flap* - makes it appear that the corner has a small, liftable flap
+    - *peaks (list): a list of one or more sets, each enclosed by round brackets,
+      consisting of a *direction* and a peak *size*:
+
+      - Directions are the primary compass directions - (n)orth,
+        (s)outh, (e)ast and (w)est
+        Sizes are the distances of the centre of the peak from the edge
+        of the Rectangle
+    - *slices (list): list of two or four  named or hexadecimal colors, as
+      comma-separated strings
+    - slices_line (float): the width of a line drawn centered in the rectangle
+    - *slices_stroke (str): the named or hexadecimal color of the slice line;
+      defaults to ``black``
     """
     kwargs = margins(**kwargs)
     rect = rectangle(row=row, col=col, **kwargs)
