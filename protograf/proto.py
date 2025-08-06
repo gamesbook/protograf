@@ -2710,7 +2710,7 @@ def Circle(row=None, col=None, **kwargs):
       - ``d`` (diagonal) draws diagonal lines between adjacent sides.
     - hatch_count (int): sets the **number** of lines to be drawn; the
       intervals between them are equal and depend on the direction
-    - hatch_width (float): hatch line thickness defaults to 0.1 points
+    - hatch_stroke_width (float): hatch line thickness; defaults to 0.1 points
     - hatch_stroke (str): the named or hexadecimal color of the hatch line;
       defaults to ``black``
     - petals (int): sets the number of petals to drawn
@@ -3082,7 +3082,7 @@ def Rectangle(row=None, col=None, **kwargs):
       - ``d`` (diagonal) draws diagonal lines between adjacent sides.
     - hatch_count (int): sets the **number** of lines to be drawn; the
       intervals between them are equal and depend on the direction
-    - hatch_width (float): hatch line thickness defaults to 0.1 points
+    - hatch_stroke_width (float): hatch line thickness; defaults to 0.1 points
     - hatch_stroke (str): the named or hexadecimal color of the hatch line;
       defaults to ``black``
     - notch (float): the size of the triangular shape that will be "cut" off the

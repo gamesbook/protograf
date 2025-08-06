@@ -57,7 +57,9 @@ PageBreak()
 # ---- hatches
 Blueprint()
 Text(common=txt, text="Rectangle: hatches + directions")
-htch = Common(height=1.5, width=1, hatch_count=5, hatch_width=0.5, hatch_stroke="red")
+htch = Common(height=1.5, width=1, hatch_count=5,
+              hatch_stroke_width=0.5, hatch_stroke="red")
+
 Rectangle(common=htch, x=0, y=0,  hatch='w', label="W")
 Rectangle(common=htch, x=1.5, y=0, hatch='e', label="E")
 Rectangle(common=htch, x=3, y=0, hatch='ne', label="NE\nSW")

@@ -8,7 +8,8 @@ protograf Changes
 - New loadr utils module (no API change)
 - Add Cube object and examples
 - Add Extract command
-- Add example for player board
+- Add example for a player board
+- Renamed `hatch_width` to `hatch_stroke_width`
 
 2025-08-02 (0.2.13)
 -------------------

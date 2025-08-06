@@ -36,7 +36,7 @@ Text(text="<b>I.</b> PLAY GREEN <b>II.</b> PLAY BLUE or RED <b>III.</b> ACTION <
 
 # resource areas
 rsrc = Common(x=7.5, width=6, rounding=0.1, stroke=None,
-              hatch='w', hatch_width=2)
+              hatch='w', hatch_stroke_width=2)
 Rectangle(common=rsrc,
           y=1.4, height=6.8, fill=LT_YELLOW,
           hatch_stroke=DK_YELLOW, hatch_count=36,

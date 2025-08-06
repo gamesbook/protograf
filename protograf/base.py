@@ -1032,7 +1032,7 @@ class BaseShape:
         self.hatch_count = kwargs.get("hatch_count", base.hatch_count)
         self.hatch = kwargs.get("hatch", base.hatch)
         self.hatch_stroke_width = self.kw_float(
-            kwargs.get("hatch_width", base.hatch_stroke_width)
+            kwargs.get("hatch_stroke_width", base.hatch_stroke_width)
         )
         self.hatch_stroke = kwargs.get("hatch_stroke", base.stroke)
         self.hatch_cap = kwargs.get("hatch_cap", base.hatch_cap)
