@@ -19,7 +19,7 @@ import segno  # QRCode
 
 # local
 from protograf import globals
-from protograf.utils import geoms, tools, support, fonts
+from protograf.utils import colrs, geoms, tools, support, fonts
 from protograf.utils.tools import _lower
 from protograf.utils.constants import (
     GRID_SHAPES_WITH_CENTRE,
@@ -1830,11 +1830,11 @@ class HexShape(BaseShape):
             _slices = self.slices
         # ---- validate slices color settings
         slices_colors = [
-            tools.get_color(slcolor)
+            colrs.get_color(slcolor)
             for slcolor in _slices
             if not isinstance(slcolor, bool)
         ]
-        # ---- draw triangles for each sector, repeat as needed!
+        # ---- draw triangle per slice; repeat as needed!
         sid = 0
         nodes = [4, 3, 2, 1, 0, 5]
         if _lower(self.orientation) in ["p", "pointy"]:
@@ -1855,6 +1855,54 @@ class HexShape(BaseShape):
             )
             sid += 1
             vid += 1
+
+    def draw_shades(self, cnv, ID, vertexes, centre: tuple, rotation=0):
+        """Draw rhombuses inside the Hexagon
+
+        Args:
+
+            ID: unique ID
+            vertexes: the Hex'es nodes
+            centre: the centre Point of the Hex
+            rotation: degrees anti-clockwise from horizontal "east"
+        """
+        # ---- get shades color list from string
+        if isinstance(self.shades, str):
+            _shades = tools.split(self.shades.strip())
+        else:
+            _shades = self.shades
+        # ---- validate shades color settings
+        shades_colors = [
+            colrs.get_color(slcolor)
+            for slcolor in _shades
+            if not isinstance(slcolor, bool)
+        ]
+        # ---- add shades (if not provided)
+        if len(shades_colors) == 1:
+            shades_colors = [
+                colrs.lighten_pymu(shades_colors[0], factor=0.2),
+                colrs.darken_pymu(shades_colors[0], factor=0.2),
+                shades_colors[0],
+            ]
+        elif len(shades_colors) != 3:
+            feedback(
+                "There must be exactly 1 or 3 shades provided.",
+                True,
+            )
+        # ---- draw a rhombus per shade
+        vertexes.append(centre)  # becomes vertex no. 6
+        nodes = ([5, 4, 6, 0], [4, 3, 2, 6], [2, 1, 0, 6])
+        for sid, rhombus in enumerate(nodes):
+            pl_points = [vertexes[vid] for vid in rhombus]
+            cnv.draw_polyline(pl_points)
+            self.set_canvas_props(
+                index=ID,
+                stroke=self.shades_stroke or shades_colors[sid],
+                fill=shades_colors[sid],
+                closed=True,
+                rotation=rotation,
+                rotation_point=muPoint(centre[0], centre[1]),
+            )
 
     def get_geometry(self):
         """Calculate geometric settings of a Hexagon."""
@@ -2135,6 +2183,15 @@ class HexShape(BaseShape):
         # self._debug(cnv, Point(x, y), 'start')
         # self._debug(cnv, Point(self.x_d, self.y_d), 'centre')
         self._debug(cnv, vertices=self.vertexes)
+        # ---- draw shades
+        if self.shades:
+            self.draw_shades(
+                cnv,
+                ID,
+                self.vertexes,
+                (self.x_d, self.y_d),
+                rotation=kwargs.get("rotation"),
+            )
         # ---- draw slices
         if self.slices:
             self.draw_slices(
@@ -2791,8 +2848,8 @@ class QRCodeShape(BaseShape):
         qrcode.save(
             _source,
             scale=self.scaling or 1,
-            light=tools.rgb_to_hex(tools.get_color(self.fill)),
-            dark=tools.rgb_to_hex(tools.get_color(self.stroke)),
+            light=colrs.rgb_to_hex(colrs.get_color(self.fill)),
+            dark=colrs.rgb_to_hex(colrs.get_color(self.stroke)),
         )
         rotation = kwargs.get("rotation", self.rotation)
         # ---- load QR image
@@ -3008,7 +3065,7 @@ class RectangleShape(BaseShape):
         else:
             if len(_slices) not in [2, 4]:
                 feedback(err, True)
-        slices_colors = [tools.get_color(slcolor) for slcolor in _slices]
+        slices_colors = [colrs.get_color(slcolor) for slcolor in _slices]
         # ---- draw 2 triangles
         if len(slices_colors) == 2:
             # top-left
@@ -3724,7 +3781,7 @@ class RhombusShape(BaseShape):
             if len(_slices) not in [2, 3, 4]:
                 feedback(err, True)
         slices_colors = [
-            tools.get_color(slcolor)
+            colrs.get_color(slcolor)
             for slcolor in _slices
             if not isinstance(slcolor, bool)
         ]
@@ -4476,7 +4533,7 @@ class TextShape(BaseShape):
             #   archive=None, rotate=0, oc=0, opacity=1, overlay=True)
             keys = {}
             try:
-                keys["opacity"] = tools.get_opacity(self.transparency)
+                keys["opacity"] = colrs.get_opacity(self.transparency)
                 _font_name = self.font_name.replace(" ", "-")
                 if not fonts.builtin_font(self.font_name):  # local check
                     _, _path, font_file = tools.get_font_file(self.font_name)
@@ -4495,7 +4552,7 @@ class TextShape(BaseShape):
                         css_style.append(f"font-size: {self.font_size}px;")
                     if self.stroke:
                         if isinstance(self.stroke, tuple):
-                            _stroke = tools.rgb_to_hex(self.stroke)
+                            _stroke = colrs.rgb_to_hex(self.stroke)
                         else:
                             _stroke = self.stroke
                         css_style.append(f"color: {_stroke};")

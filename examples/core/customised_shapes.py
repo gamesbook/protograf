@@ -765,8 +765,10 @@ Blueprint()
 Text(common=txt, text="Hatch & Rotate")
 htch = Common(
     fill='lightgray', stroke=None,
-    hatch_count=5, hatch_width=0.75,
-    hatch='w', hatch_stroke="red")
+    hatch_count=5,
+    hatch='w',
+    hatch_stroke_width=0.75,
+    hatch_stroke="red")
 
 Hexagon(
     common=htch,

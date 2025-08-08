@@ -3,14 +3,12 @@
 General purpose utility functions for protograf
 """
 # lib
-import csv
 import collections
 import copy
 from functools import lru_cache
 from itertools import zip_longest
 import jinja2
 import logging
-import io
 import os
 import pathlib
 from pathlib import Path
@@ -20,16 +18,12 @@ import sys
 from urllib.parse import urlparse
 
 # third-party
-from openpyxl import load_workbook
 from pymupdf import Point as muPoint, Matrix, Font as muFont
-from pymupdf.utils import getColor
-import requests
-import xlrd
 
 # local
+from protograf.utils import colrs
 from protograf.utils.constants import (
     CACHE_DIRECTORY,
-    COLOR_NAMES,
     DEFAULT_FONT,
     STANDARD_CARD_SIZES,
     PAPER_SIZES,
@@ -68,81 +62,6 @@ def script_path():
     fname = os.path.abspath(sys.argv[0])
     if fname:
         return pathlib.Path(fname).resolve().parent
-
-
-def load_data(datasource=None, **kwargs):
-    """
-    Load data from a 'tabular' source (CSV, XLS) into a dict
-    """
-    dataset = {}
-    log.debug("Load data from a 'tabular' source (CSV, XLS) %s", datasource)
-    if datasource:
-        filename, file_ext = os.path.splitext(datasource)
-        if not filename:
-            feedback("Unable to process a file without valid filename!", True)
-        if file_ext and _lower(file_ext) == ".csv":
-            headers = kwargs.get("headers", None)
-            selected = kwargs.get("selected", None)
-            dataset = open_csv(datasource, headers=headers, selected=selected)
-        elif file_ext and _lower(file_ext) in [".xls", ".xlsx"]:
-            headers = kwargs.get("headers", None)
-            selected = kwargs.get("selected", None)
-            sheet = kwargs.get("sheet", 0)
-            sheetname = kwargs.get("sheetname", None)
-            cells = kwargs.get("cells", None)
-            dataset = open_excel(
-                datasource,
-                sheet=sheet,
-                sheetname=sheetname,
-                cells=cells,
-                headers=headers,
-            )
-        else:
-            feedback('Unable to process a file %s of type "%s"' % (filename, file_ext))
-    return dataset
-
-
-def load_googlesheet(sheet, **kwargs):
-    """
-    Load data from a Google Sheet into a dict
-    """
-    data_list = []
-    spreadsheet_id = sheet
-    api_key = kwargs.get("api_key", None)
-    if not api_key:
-        feedback('Cannot access a Google Sheet without an "api_key"', True)
-    sheet_name = kwargs.get("name", None)
-    if not sheet_name:
-        feedback('Using default tab name of "Sheet1"', False, True)
-        sheet_name = "Sheet1"
-    log.debug("Load data from a Google Sheet %s", sheet)
-
-    if sheet:
-        url = f"https://sheets.googleapis.com/v4/spreadsheets/{spreadsheet_id}/values/{sheet_name}?alt=json&key={api_key}"
-        try:
-            response = requests.get(url)
-            response.raise_for_status()  # raise exception for HTTP errors
-            raw_data = response.json()
-            data_dict = json_strings_to_numbers(raw_data)
-        except requests.exceptions.RequestException as err:
-            feedback(f"Unable to load Google Sheet: {err}")
-            return []
-
-    if data_dict:
-        _data_list = data_dict.get("values")
-        if _data_list:
-            keys = _data_list[0]  # get keys/names from first sub-list
-            dict_list = []
-            for row in _data_list[1:]:
-                _dict = {}
-                for idx, key in enumerate(keys):
-                    # handles the "bug" that Sheet does not return all of a row
-                    # if the last cell is "empty"
-                    _dict[key] = row[idx] if idx < len(row) else ""
-                dict_list.append(_dict)
-            return dict_list
-
-    return data_list
 
 
 def grouper(n, iterable, fillvalue=None):
@@ -374,39 +293,6 @@ def as_point(value) -> list | Point:
         raise ValueError(f"Cannot convert {value} into a Point!")
 
 
-def json_strings_to_numbers(json_data: str | dict | list):
-    """Iteratively convert JSON data into numbers, if possible.
-
-    Doc Test:
-
-    >>> json_strings_to_numbers({})
-    {}
-    >>> json_strings_to_numbers([])
-    []
-    >>> json_strings_to_numbers('[]')
-    '[]'
-    >>> json_strings_to_numbers('["a", "1", "2.3"]')
-    '["a", "1", "2.3"]'
-    >>> json_strings_to_numbers(["a", "1", "2.3", {"a": "0.123"}])
-    ['a', 1, 2.3, {'a': 0.123}]
-    """
-    if isinstance(json_data, dict):
-        for key, value in json_data.items():
-            json_data[key] = json_strings_to_numbers(value)
-    elif isinstance(json_data, list):
-        for i, item in enumerate(json_data):
-            json_data[i] = json_strings_to_numbers(item)
-    elif isinstance(json_data, str):
-        try:
-            return int(json_data)
-        except ValueError:
-            try:
-                return float(json_data)
-            except ValueError:
-                return json_data
-    return json_data
-
-
 def tuple_split(
     string: str, label: str = "list", pairs_list: bool = False, all_ints: bool = False
 ) -> list:
@@ -590,9 +476,21 @@ def sequence_split(
                 feedback(f'Cannot set a range of decimal numbers ("{item}"){msg}', True)
         else:
             if as_int:
-                values.append(int(item))
+                try:
+                    values.append(int(item))
+                except ValueError as err:
+                    feedback(
+                        f'Unable to use "{item}"; check for whole numbers (with a {sep} between each)',
+                        True,
+                    )
             elif as_float:
-                values.append(float(item))
+                try:
+                    values.append(float(item))
+                except ValueError as err:
+                    feedback(
+                        f'Unable to use "{item}"; check for numbers (with a {sep} between each)',
+                        True,
+                    )
             else:
                 _item = str(item).strip() if clean else str(item)
                 values.append(_item)
@@ -733,301 +631,6 @@ def splitq(seq, sep=None, pairs=("()", "[]", "{}"), quote="\"'"):
                 index += 1
         if seq[start:]:
             yield seq[start:]
-
-
-def open_csv(filename: str = None, headers: list = None, selected: list = None):
-    """Read data from CSV file into a list of dictionaries
-
-    Args:
-
-    - filename (str): path to CSV file
-    - headers (list): a list of strings to use instead of the first row
-    - selected (list): a list of desired rows e.g. [2,4,7]
-    """
-    if not filename:
-        feedback("A valid CSV filename must be supplied!")
-
-    dict_list = []
-    _file_with_path = None
-    norm_filename = os.path.normpath(filename)
-    if not os.path.exists(norm_filename):
-        filepath = script_path()
-        _file_with_path = os.path.join(filepath, norm_filename)
-        if not os.path.exists(_file_with_path):
-            feedback(f'Unable to find CSV "{filename}", including in {filepath}')
-
-    try:
-        csv_filename = _file_with_path or norm_filename
-        if headers:
-            reader = csv.DictReader(open(csv_filename), fieldnames=headers)
-        else:
-            reader = csv.DictReader(open(csv_filename))
-        for key, item in enumerate(reader):
-            if not selected:
-                dict_list.append(item)
-            else:
-                if key + 1 in selected:
-                    dict_list.append(item)
-    except IOError:
-        feedback('Unable to find or open CSV "%s"' % csv_filename)
-    return dict_list
-
-
-def open_excel(
-    filename: str,
-    sheet: int = 0,
-    sheetname: str = None,
-    cells: str = None,
-    headers: list = None,
-):
-    """Read data from an Excel file into a list of dictionaries
-
-    Args:
-
-    - filename (str): path to the file
-    - sheet (int): select a sheet number (otherwise first is used)
-    - sheetname (str): select a sheet by name (otherwise first is used)
-    - cells (str): a range of cells delimiting data in the col:row format
-      from top-left to bottom-right e.g. 'A3:E12'
-    - headers (list): strings to use instead of the first row
-    """
-
-    def cleaned(value):
-        if isinstance(value, float):
-            if float(value) == float(int(value)):
-                return int(value)
-        result = "" if value is None else value
-        return result
-
-    if not filename:
-        feedback("A valid Excel filename must be supplied!")
-
-    _file_with_path = None
-    norm_filename = os.path.normpath(filename)
-    if not os.path.exists(norm_filename):
-        filepath = script_path()
-        _file_with_path = os.path.join(filepath, norm_filename)
-        if not os.path.exists(_file_with_path):
-            feedback(f'Unable to find "{filename}", including in {filepath}')
-    else:
-        _file_with_path = norm_filename  # in same dir as script!
-
-    if sheet is None and sheetname is None:
-        feedback(
-            f'Access to Excel file "{filename}" requires either the sheet number or the sheet name!',
-            True,
-        )
-
-    _, file_ext = os.path.splitext(_file_with_path)
-    if file_ext == ".xls":
-        return open_xls(
-            filename=filename,
-            sheet=sheet,
-            sheetname=sheetname,
-            cells=cells,
-            headers=headers,
-        )
-    elif file_ext == ".xlsx":
-        return open_xlsx(
-            filename=filename,
-            sheet=sheet,
-            sheetname=sheetname,
-            cells=cells,
-            headers=headers,
-        )
-    else:
-        feedback(f'Cannot process data files with an extension of "{file_ext}".', True)
-
-
-def open_xlsx(
-    filename: str,
-    sheet: int = 0,
-    sheetname: str = None,
-    cells: str = None,
-    headers: list = None,
-):
-    """Read data from XLSX file into a list of dictionaries
-
-    Args:
-
-    - filename (str): path to the file
-    - sheet (int): select a sheet number (otherwise first is used)
-    - sheetname (str): select a sheet by name (otherwise first is used)
-    - headers (list): strings to use instead of the first row
-    - cells (str): a range of cells delimiting data in the col:row format
-      from top-left to bottom-right e.g. 'A3:E12'
-    """
-
-    def cleaned(value):
-        if isinstance(value, float):
-            if float(value) == float(int(value)):
-                return int(value)
-        result = "" if value is None else value
-        return result
-
-    if not filename:
-        feedback("A valid Excel filename must be supplied!")
-
-    dict_list = []
-
-    _file_with_path = None
-    norm_filename = os.path.normpath(filename)
-    if not os.path.exists(norm_filename):
-        filepath = script_path()
-        _file_with_path = os.path.join(filepath, norm_filename)
-        if not os.path.exists(_file_with_path):
-            feedback(f'Unable to find "{filename}", including in {filepath}')
-
-    try:
-        excel_filename = _file_with_path or norm_filename
-        book = load_workbook(excel_filename, data_only=True)
-        if sheetname:
-            sheet = book[sheetname]
-        elif sheet is not None:
-            sheet = int(sheet) - 1 if sheet > 0 else int(sheet)
-            _sheetname = book.sheetnames[sheet]
-            sheet = book[_sheetname]
-        else:
-            feedback(
-                f'Access to Excel file "{filename}" requires either the sheet number or the sheet name!',
-                True,
-            )
-        start = 1
-
-        if not headers:
-            keys = [
-                sheet.cell(1, col_index).value
-                for col_index in range(1, sheet.max_column + 1)
-            ]
-            if None in keys:
-                feedback(
-                    f'Please assign headers to all columns in Excel file "{filename}"'
-                    " and/or delete any empty columns.",
-                    True,
-                )
-            start = 2
-        else:
-            start = 1
-            keys = headers
-        if len(keys) < sheet.max_column:
-            feedback(
-                'Too few headers supplied for the existing columns in "%s"' % filename
-            )
-        else:
-            dict_list = []
-            if cells:
-                _cells = cells.split(":")
-                cell_range = sheet[_cells[0] : _cells[1]]
-                for row_index, row in enumerate(cell_range):
-                    item = {
-                        keys[col_index]: cleaned(cell.value)
-                        for col_index, cell in enumerate(row)
-                    }
-                    dict_list.append(item)
-            else:
-                for row_index in range(start, sheet.max_row + 1):
-                    item = {
-                        keys[col_index - 1]: cleaned(
-                            sheet.cell(row=row_index, column=col_index).value
-                        )
-                        for col_index in range(1, sheet.max_column + 1)
-                    }
-                    dict_list.append(item)
-    except IOError:
-        feedback('Unable to find or open Excel "%s"' % excel_filename)
-    except IndexError:
-        feedback('Unable to open sheet "%s"' % (sheet or sheetname))
-    except Exception:
-        feedback('Unable to open or process sheet "%s"' % (sheet or sheetname))
-    return dict_list
-
-
-def open_xls(
-    filename: str,
-    sheet: int = 0,
-    sheetname: str = None,
-    cells: str = None,
-    headers: list = None,
-):
-    """Read data from XLS file into a list of dictionaries
-
-    Args:
-
-    - filename (str): path to the file
-    - sheet (int): select a sheet number (otherwise first is used)
-    - sheetname (str): select a sheet by name (otherwise first is used)
-    - headers (list): strings to use instead of the first row
-    - cells (str): a range of cells delimiting data in the col:row format
-      from top-left to bottom-right e.g. 'A3:E12'
-    """
-
-    def cleaned(value):
-        if isinstance(value, float):
-            if float(value) == float(int(value)):
-                return int(value)
-        # if isinstance(value, str):
-        #     return value.encode('utf8')
-        return value
-
-    if not filename:
-        feedback("A valid Excel filename must be supplied!")
-
-    dict_list = []
-
-    _file_with_path = None
-    norm_filename = os.path.normpath(filename)
-    if not os.path.exists(norm_filename):
-        filepath = script_path()
-        _file_with_path = os.path.join(filepath, norm_filename)
-        if not os.path.exists(_file_with_path):
-            feedback(f'Unable to find "{filename}", including in {filepath}')
-
-    try:
-        excel_filename = _file_with_path or norm_filename
-        book = xlrd.open_workbook(excel_filename)
-        if sheet:
-            sheet = sheet - 1
-            sheet = book.sheet_by_index(sheet)
-        elif sheetname:
-            sheet = book.sheet_by_name(sheetname)
-        else:
-            sheet = book.sheet_by_index(0)
-        start = 1
-        if not headers:
-            keys = [sheet.cell(0, col_index).value for col_index in range(sheet.ncols)]
-        else:
-            start = 0
-            keys = headers
-        if len(keys) < sheet.ncols:
-            feedback(
-                'Too few headers supplied for the existing columns in "%s"' % filename
-            )
-        else:
-            dict_list = []
-            if cells:
-                _cells = cells.split(":")
-                _topleft = coordinate_to_tuple(_cells[0], True)  # (col, row)
-                _btmrite = coordinate_to_tuple(_cells[1], True)  # (col, row)
-                for row_index in range(_topleft[1], _btmrite[1] + 1):
-                    item = {
-                        keys[col_index]: cleaned(sheet.cell(row_index, col_index).value)
-                        for col_index in range(_topleft[0], _btmrite[0] + 1)
-                    }
-                    dict_list.append(item)
-            else:
-                for row_index in range(start, sheet.nrows):
-                    item = {
-                        keys[col_index]: cleaned(sheet.cell(row_index, col_index).value)
-                        for col_index in range(sheet.ncols)
-                    }
-                    dict_list.append(item)
-    except IOError:
-        feedback('Unable to find or open Excel "%s"' % excel_filename)
-    except IndexError:
-        feedback('Unable to open sheet "%s"' % (sheet or sheetname))
-    except xlrd.biffh.XLRDError:
-        feedback('Unable to open sheet "%s"' % sheetname)
-    return dict_list
 
 
 def flatten(lst: list):
@@ -1188,30 +791,6 @@ def comparer(val: str, operator: str, target: str | list) -> bool:
     else:
         feedback("Unknown operator: %s (%s and %s)" % (operator, val, target))
     return False
-
-
-def color_to_hex(name):
-    """Convert a named color (Color class) to a hexadecimal string"""
-    if isinstance(name, str):
-        return name
-    _tuple = (int(name.red * 255), int(name.green * 255), int(name.blue * 255))
-    _string = "#%02x%02x%02x" % _tuple
-    return _string.upper()
-
-
-def rgb_to_hex(color: tuple) -> str:
-    """Convert a RGB tuple color to a hexadecimal string
-
-    Doc Test:
-
-    >>> rgb_to_hex((123,45,6))
-    '#7A852CD35FA'
-    """
-    if color is None:
-        return color
-    _tuple = (int(color[0] * 255), int(color[1] * 255), int(color[2] * 255))
-    _string = "#%02x%02x%02x" % _tuple
-    return _string.upper()
 
 
 def alpha_column(num: int, lower: bool = False) -> string:
@@ -1679,46 +1258,6 @@ def restore_globals(doc: GlobalDocument):
     globals.page_grid = doc.page_grid
 
 
-def get_color(name: str = None, is_rgb: bool = True) -> tuple:
-    """Get a color tuple; by name from a pre-defined dictionary or as a RGB tuple."""
-    if name is None:
-        return None  # it IS valid to say that NO color has been set
-    if isinstance(name, tuple) and len(name) == 3:  # RGB color tuple
-        if (
-            (name[0] >= 0 and name[0] <= 255)
-            and (name[1] >= 0 and name[0] <= 255)
-            and (name[2] >= 0 and name[0] <= 255)
-        ):
-            return name
-        else:
-            feedback(f'The color tuple "{name}" is invalid!')
-    elif isinstance(name, str) and len(name) == 7 and name[0] == "#":  # hexadecimal
-        _rgb = tuple(int(name[i : i + 2], 16) for i in (1, 3, 5))
-        rgb = tuple(i / 255 for i in _rgb)
-        return rgb
-    else:
-        pass  # unknown format
-    try:
-        if name.upper() not in COLOR_NAMES:
-            feedback(f'The color name "{name}" is not pre-defined!', True)
-        color = getColor(name)
-        return color
-    except (AttributeError, ValueError):
-        feedback(f'The color name "{name}" cannot be converted to RGB!', True)
-
-
-def get_opacity(transparency: float = 0) -> float:
-    """Convert from '100% is fully transparent' to '0 is not opaque'."""
-    if transparency is None:
-        return 1.0
-    try:
-        return float(1.0 - transparency / 100.0)
-    except (ValueError, TypeError):
-        feedback(
-            f'The transparency of "{transparency}" is not valid (use 0 to 100)', True
-        )
-
-
 def unit(item, units: str = None, skip_none: bool = False, label: str = ""):
     """Convert an item into the appropriate unit system."""
     log.debug("units %s :: label: %s", units, label)
@@ -1842,8 +1381,8 @@ def get_pymupdf_props(
         morph = (_rotation_point, mtrx)
         # print(f'^^^ SCP {morph=}')
     # ---- get color tuples
-    _color = get_color(stroke)
-    _fill = get_color(fill)
+    _color = colrs.get_color(stroke)
+    _fill = colrs.get_color(fill)
     # ---- set width
     _width = stroke_width or defaults.get("stroke_width")
     if _color is None and _fill is None:

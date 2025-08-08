@@ -3319,14 +3319,16 @@ Example 4. Rotation with Hatches
 
 ===== ======
 |rt4| This example shows different shapes constructed using commands with
-      some ``Common`` properties:
+      some ``Common`` properties for the ``hatch`` effect:
 
       .. code:: python
 
         htch = Common(
             fill='lightgray', stroke=None,
-            hatch_count=5, hatch_width=0.75,
-            hatch='w', hatch_stroke="red",
+            hatch_count=5,
+            hatch='w',
+            hatch_stroke="red",
+            hatch_stroke_width=0.75,
             rotation=30)
 
         Hexagon(

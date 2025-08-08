@@ -59,6 +59,7 @@ from .shapes import (
     TrapezoidShape,
 )
 from .objects import (
+    CubeObject,
     D6Object,
     PolyominoObject,
     PentominoObject,
@@ -80,7 +81,7 @@ from .globals import unit
 from .groups import Switch, Lookup  # used in scripts
 from ._version import __version__
 
-from protograf.utils import geoms, tools, support
+from protograf.utils import colrs, geoms, loadr, tools, support
 from protograf.utils.constants import (
     DEFAULT_FONT,
     DEBUG_COLOR,
@@ -104,6 +105,7 @@ from protograf.utils.docstrings import (
     docstring_loc,
     docstring_onimo,
 )
+from protograf.utils.colrs import lighten, darken  # used in scripts
 from protograf.utils.fonts import builtin_font, FontInterface
 from protograf.utils.geoms import equilateral_height  # used in scripts
 from protograf.utils.messaging import feedback
@@ -409,7 +411,7 @@ class CardShape(BaseShape):
             _card_grid = tools.as_float(card_grid, "card_grid")
             mx = self.unit(_dx or 0) + self._o.delta_x
             my = self.unit(_dy or 0) + self._o.delta_y
-            stroke = tools.get_color(DEBUG_COLOR)
+            stroke = colrs.get_color(DEBUG_COLOR)
             grid_size = _card_grid * globals.units
             cols = int(frame_width // grid_size)
             rows = int(frame_height // grid_size)
@@ -731,13 +733,13 @@ class DeckOfCards:
     ):
         """Save individual cards as PNG images using their frames."""
         if self.export_cards and globals.pargs.png:  # pargs.png should default to True
-            support.pdf_cards_to_png(
+            support.pdf_frames_to_png(
                 source_file=filename,
                 output=output or filename,
                 fformat=fformat,
                 dpi=self.dpi,
                 directory=directory or self.directory,
-                card_frames=globals.card_frames,
+                frames=globals.card_frames,
                 page_height=globals.page[1],
             )
 
@@ -1222,7 +1224,7 @@ class DeckOfCards:
                         pt2 = (globals.page[0] / 2.0, globals.page[1])
                     globals.canvas.draw_line(pt1, pt2)
                     gwargs = {}  # kwargs
-                    gwargs["stroke"] = self.gutter_stroke or tools.get_color("gray")
+                    gwargs["stroke"] = self.gutter_stroke or colrs.get_color("gray")
                     gwargs["stroke_width"] = self.gutter_stroke_width
                     gwargs["dotted"] = self.gutter_dotted
                     tools.set_canvas_props(cnv=globals.canvas, index=None, **gwargs)
@@ -1253,15 +1255,15 @@ class DeckOfCards:
 def page_setup():
     """Set the page color and (optionally) show a dotted margin line and grid."""
     # ---- paper color
-    _fill = tools.get_color(globals.page_fill)
-    if _fill != tools.get_color("white"):
+    _fill = colrs.get_color(globals.page_fill)
+    if _fill != colrs.get_color("white"):
         globals.doc_page.draw_rect(
             (0, 0, globals.page[0], globals.page[1]), fill=_fill, color=None
         )
     # ---- debug margins
     if globals.margins.debug:
         # print(f'{globals.margins.left=} {globals.margins.right=}')
-        stroke = tools.get_color(DEBUG_COLOR)
+        stroke = colrs.get_color(DEBUG_COLOR)
         globals.doc_page.draw_rect(
             (
                 globals.margins.left * globals.units,
@@ -1274,7 +1276,7 @@ def page_setup():
         )
     # ---- page grid
     if globals.page_grid:
-        stroke = tools.get_color(DEBUG_COLOR)
+        stroke = colrs.get_color(DEBUG_COLOR)
         grid_size = globals.page_grid * globals.units
         cols = int(globals.page[0] // grid_size)
         rows = int(globals.page[1] // grid_size)
@@ -1367,7 +1369,7 @@ def Create(**kwargs):
         globals.page = (_page_width_pt, _page_height_pt)
     globals.page_width = globals.page[0] / globals.units  # width in user units
     globals.page_height = globals.page[1] / globals.units  # height in user units
-    globals.fill = tools.get_color(kwargs.get("fill", "white"))
+    globals.fill = colrs.get_color(kwargs.get("fill", "white"))
     globals.page_grid = tools.as_float(kwargs.get("page_grid", 0), "page_grid")
     # ---- fonts
     base_fonts()
@@ -1501,6 +1503,132 @@ def page_break():
     PageBreak()
 
 
+def Extract(pages: object, **kwargs):
+    """Extract one or more page parts from the final PDF file as images.
+
+    Args:
+
+    - pages (str|list): one or more numbers - either space-separated in
+      text form or in a list.
+
+    Kwargs:
+
+    - names (list): a set of strings as names for the images.  If the list is
+      not long enough for all the images, naming reverts back to defaults.
+    - cols_rows (str|list): two numbers - either comma-separated in text form
+      or in a list. The first number is how many columns the page should be
+      divided into, and the second number is how many rows the page should be
+      divided into.
+    - areas (list): a list of sets of numbers, with four numbers
+      in each.  The set numbers represent the top-left *x* and *y* and the
+      bottom-right *x* and *y* locations on the page of a rectangle that must be
+      extracted
+
+    Notes:
+
+      All areas are specified as a (BBox, name) tuple, added to a list
+      keyed on page number, and stored in `globals.extracts`. They are
+      processed during/after document Save()
+    """
+    _pages = tools.sequence_split(pages)
+    if not _pages:
+        feedback("At least one page must be specified for Extract.", True)
+    # ---- set local vars from kwargs
+    names = kwargs.get("names", [])
+    areas = kwargs.get("areas", None)
+    cols_rows = kwargs.get("cols_rows", None)
+    if (cols_rows and areas) or (not areas and not cols_rows):
+        feedback("Specify either areas OR cols_rows for Extract, but not both.", True)
+    if areas:
+        if not isinstance(areas, list):
+            feedback("The areas specified for Extract must be a list.", True)
+        for area in areas:
+            if not isinstance(area, tuple) or len(area) != 4:
+                feedback(
+                    "The area bounds specified for Extract must be a set of 4 numbers,"
+                    f' not "{area}".',
+                    True,
+                )
+            for item in area:
+                if not isinstance(item, (int, float)):
+                    feedback(
+                        "The area bounds specified for Extract must all be numeric,"
+                        f' not "{area}".',
+                        True,
+                    )
+
+    if cols_rows:
+        _cols_rows = tools.sequence_split(cols_rows, unique=False)
+        if len(_cols_rows) != 2:
+            feedback(
+                "The cols_rows specified for Extract must be a set of 2 numbers,"
+                f' not "{_cols_rows}".',
+                True,
+            )
+        for item in _cols_rows:
+            if not isinstance(item, int):
+                feedback(
+                    "The cols_rows specified for Extract must all be integers,"
+                    f' not "{_cols_rows}".',
+                    True,
+                )
+
+    extract_dict = globals.extracts
+    name_idx = 0
+    for _page in _pages:
+        if _page in extract_dict:
+            data = extract_dict[_page]
+        else:
+            data = []
+        if areas:
+            for area in areas:
+                try:
+                    name = names[name_idx]
+                except IndexError:
+                    name = None
+                name_idx += 1
+                # check x1<x2 and y1<y2
+                if area[2] < area[0]:
+                    feedback(
+                        "The second x location must be to the right (higher value)"
+                        f' than the first for "{area}".',
+                        True,
+                    )
+                if area[3] < area[1]:
+                    feedback(
+                        "The second y location must be below (higher value)"
+                        f' the first for "{area}".,',
+                        True,
+                    )
+                xl = globals.units * area[0]
+                yt = globals.units * area[1]
+                xr = globals.units * area[2]
+                yb = globals.units * area[3]
+                data.append((BBox(tl=Point(xl, yt), br=Point(xr, yb)), name))
+        elif _cols_rows:
+            col_width = globals.page[0] / _cols_rows[0]
+            row_width = globals.page[1] / _cols_rows[1]
+            for col in range(0, _cols_rows[0]):
+                xl = col * col_width
+                xr = (col + 1) * col_width
+                for row in range(0, _cols_rows[1]):
+                    yt = row * row_width
+                    yb = (row + 1) * row_width
+                    try:
+                        name = names[name_idx]
+                    except IndexError:
+                        name = None
+                    name_idx += 1
+                    data.append((BBox(tl=Point(xl, yt), br=Point(xr, yb)), name))
+        else:
+            pass
+        globals.extracts[_page - 1] = data
+
+
+def extract(pages: object, **kwargs):
+    Extract(pages=pages, **kwargs)
+
+
 def Save(**kwargs):
     """Save the result of all commands to a PDF file.
 
@@ -1620,8 +1748,16 @@ def Save(**kwargs):
             framerate=framerate,
         )
 
-    # ---- save cards to image(s)
-    # MOVED TO DECK DRAW - because of use of intermediate pages for gutter-based layout
+    # ---- process area/cols_rows extracts
+    support.pdf_frames_to_png(
+        source_file=globals.filename,
+        output=None,  # ??? FIXME
+        fformat="png",
+        dpi=300,  # ??? FIXME
+        directory=directory or globals.directory,
+        frames=globals.extracts,
+        page_height=globals.page[1],
+    )
 
     # ---- reset key globals to allow for new Deck()
     # ---- pymupdf doc, page, shape/canvas
@@ -1635,6 +1771,7 @@ def Save(**kwargs):
         globals.document, paper=globals.paper  # , defaults=defaults, kwargs=kwargs
     )
     globals.page_count = 0
+    globals.extracts = {}
     page_setup()
 
 
@@ -2109,12 +2246,12 @@ def Data(**kwargs):
       to the first one
     - cells (str): a range of cells delimiting data in the col:row format
       from top-left to bottom-right e.g. 'A3:E12'
-    - Access to a **Google Sheet** document is via three properties:
+    - a **Google Sheet** document is accessed via three properties:
 
-      - *google_key* - an API key that you must request from Google
-      - *google_sheet* - the unique ID (a mix of numbers and letters) which is
+      - google_key (str): an API key that you must request from Google
+      - google_sheet (str): the unique ID (a mix of numbers and letters) which is
         randomly assigned by Google to your Google Sheet
-      - *sheetname* - the name of the tab in the Google Sheet housing your data
+      - sheetname (str): the name of the tab in the Google Sheet housing your data
     - matrix (str): refers to the name assigned to the ``Matrix`` being used
     - images (str): refers to the directory in which the cards' images are
       located;  if a full path is not given, its assumed to be directly under
@@ -2154,12 +2291,12 @@ def Data(**kwargs):
         feedback(f'Extra must be a whole number, not "{kwargs.get("extra")}"!', True)
 
     if filename:  # handle excel and CSV; kwargs include cell, sheet, sheetname
-        globals.dataset = tools.load_data(filename, **kwargs)
+        globals.dataset = loadr.load_data(filename, **kwargs)
         globals.dataset_type = DatasetType.FILE
     elif google_sheet:  # handle Google Sheet
         google_key = kwargs.get("google_key", None)
         sheetname = kwargs.get("sheetname", None)
-        globals.dataset = tools.load_googlesheet(
+        globals.dataset = loadr.load_googlesheet(
             google_sheet, api_key=google_key, name=sheetname
         )
         globals.dataset_type = DatasetType.GSHEET
@@ -2548,7 +2685,7 @@ def chord(row=None, col=None, **kwargs):
     return ChordShape(canvas=globals.canvas, **kwargs)
 
 
-@docstring_base
+@docstring_center
 def Circle(row=None, col=None, **kwargs):
     """Draw a Circle shape on the canvas.
 
@@ -2559,8 +2696,53 @@ def Circle(row=None, col=None, **kwargs):
 
     Kwargs:
 
-    <base>
+    <center>
+    - hatch (str): if not specified, hatches will be drawn
+      in all directions - otherwise:
 
+      - ``n`` (North) or ``s`` (South) draws vertical lines;
+      - ``w`` (West) or ``e`` (East) draws horizontal lines;
+      - ``nw`` (North-West) or ``se`` (South-East) draws diagonal lines
+        from top-left to bottom-right;
+      - ``ne`` (North-East) or ``sw`` (South-West) draws diagonal lines
+        from bottom-left to top-right;
+      - ``o`` (orthogonal) draws vertical **and** horizontal lines;
+      - ``d`` (diagonal) draws diagonal lines between adjacent sides.
+    - hatch_count (int): sets the **number** of lines to be drawn; the
+      intervals between them are equal and depend on the direction
+    - hatch_stroke_width (float): hatch line thickness; defaults to 0.1 points
+    - hatch_stroke (str): the named or hexadecimal color of the hatch line;
+      defaults to ``black``
+    - petals (int): sets the number of petals to drawn
+    - petals_style (str): a style of ``p`` or ``petal`` causes petals
+      to be drawn as arcs; a style of ``t`` or ``triangle`` causes petals
+      to be drawn as sharp triangle
+    - petals_offset (float): sets the distance of the lowest point of the petal
+      line away from the circle's circumference
+    - petals_stroke_width (float): sets the thickness of the line used to draw
+      the petals
+    - petals_fill (str): the named or hexadecimal color of the area inside the
+      line used to draw the petals. Any *fill* or *stroke* settings for the
+      circle itself may appear superimposed on this area.
+    - petals_dotted (bool): if ``True``, sets the line style to *dotted*
+    - petals_height (float): sets the distance between the highest and the lowest
+      points of the petal line
+    - radii (float): a list of angles (in N|deg|) sets the directions at which
+      the radii lines are drawn
+    - radii_stroke_width (float): determines the thickness of the radii
+    - radii_dotted (bool): if set to True, will make the radii lines dotted
+    - radii_stroke (str): the named or hexadecimal color of the hatch line;
+      defaults to ``black``
+    - radii_length (float): changes the length of the radii lines
+      (centre to circumference)
+    - radii_offset (float): moves the endpoint of the radii line
+      **away** from the centre
+    - radii_labels (str|list): a string or list of strings used for text labels
+    - radii_labels_font (str): name of the font used for the labels
+    - radii_labels_rotation(float): rotation in degrees relative to radius angle
+    - radii_labels_size (float): point size of label text
+    - radii_labels_stroke (str): the named or hexadecimal color of the label text
+    - radii_labels_stroke_width (float): thickness of the label text
     """
     kwargs = margins(**kwargs)
     circle = CircleShape(canvas=globals.canvas, **kwargs)
@@ -2862,7 +3044,7 @@ def rhombus(row=None, col=None, **kwargs):
     return RhombusShape(canvas=globals.canvas, **kwargs)
 
 
-@docstring_base
+@docstring_center
 def Rectangle(row=None, col=None, **kwargs):
     """Draw a Rectangle shape on the canvas.
 
@@ -2873,8 +3055,62 @@ def Rectangle(row=None, col=None, **kwargs):
 
     Kwargs:
 
-    <base>
+    <center>
 
+    - rounding (float): the radius of the circle used to round the corner
+    - border (list): a set of values, which are comma-separated inside round
+      brackets, in the following order:
+
+      - direction - one of (n)orth, (s)outh, (e)ast or (w)est
+      - width - the line thickness
+      - color - either a named or hexadecimal color
+      - style - ``True`` makes it dotted; or a list of values creates dashes
+    - chevron (str): the primary compass direction in which a peak is
+      pointing; n(orth), s(outh), e(ast) or w(est)
+    - chevron_height (float): the distance of the chevron peak from the side of
+      the rectangle it is adjacent to
+    - hatch (str): if not specified, hatches will be drawn
+      in all directions - otherwise:
+
+      - ``n`` (North) or ``s`` (South) draws vertical lines;
+      - ``w`` (West) or ``e`` (East) draws horizontal lines;
+      - ``nw`` (North-West) or ``se`` (South-East) draws diagonal lines
+        from top-left to bottom-right;
+      - ``ne`` (North-East) or ``sw`` (South-West) draws diagonal lines
+        from bottom-left to top-right;
+      - ``o`` (orthogonal) draws vertical **and** horizontal lines;
+      - ``d`` (diagonal) draws diagonal lines between adjacent sides.
+    - hatch_count (int): sets the **number** of lines to be drawn; the
+      intervals between them are equal and depend on the direction
+    - hatch_stroke_width (float): hatch line thickness; defaults to 0.1 points
+    - hatch_stroke (str): the named or hexadecimal color of the hatch line;
+      defaults to ``black``
+    - notch (float): the size of the triangular shape that will be "cut" off the
+      corners of the rectangle
+    - notch_x (float): the distance from the corner in the x-direction where the
+      notch will start
+    - notch_y (float): the distance from the corner in the y-direction where the
+      notch will start
+    - notch_corners (str): the specific corners of the rectangle where the notch
+      is applied, given as secondary compass directions - ne, se, sw, nw
+    - notch_style (str): defineSsthe notch appearance:
+
+      - *snip* - is a small triangle "cut out"; this is the default style
+      - *step* - is sillohette of a step "cut out"
+      - *fold* - makes it appear there is a crease across the corner
+      - *flap* - makes it appear that the corner has a small, liftable flap
+    - peaks (list): a list of one or more sets, each enclosed by round brackets,
+      consisting of a *direction* and a peak *size*:
+
+      - Directions are the primary compass directions - (n)orth,
+        (s)outh, (e)ast and (w)est
+        Sizes are the distances of the centre of the peak from the edge
+        of the Rectangle
+    - slices (list): list of two or four  named or hexadecimal colors, as
+      comma-separated strings
+    - slices_line (float): the width of a line drawn centered in the rectangle
+    - slices_stroke (str): the named or hexadecimal color of the slice line;
+      defaults to ``black``
     """
     kwargs = margins(**kwargs)
     rect = rectangle(row=row, col=col, **kwargs)
@@ -3211,7 +3447,7 @@ def Blueprint(**kwargs):
     kwargs["fill"] = kwargs.get("fill", page_fill)
     # ---- page color (optional)
     if kwargs["fill"] is not None:
-        fill = tools.get_color(kwargs.get("fill", "white"))
+        fill = colrs.get_color(kwargs.get("fill", "white"))
         globals.canvas.draw_rect((0, 0, globals.page[0], globals.page[1]))
         globals.canvas.finish(fill=fill)
     kwargs["fill"] = kwargs.get("fill", line_stroke)  # revert back for font
@@ -4262,6 +4498,38 @@ def BGG(user: str = None, ids: list = None, progress=False, short=500, **kwargs)
 
 
 # ---- objects ====
+
+
+@docstring_base
+def Cube(row=None, col=None, **kwargs):
+    """Draw a Cube shape with shading on the canvas.
+
+    Args:
+
+    - row (int): row in which the shape is drawn.
+    - col (int): column in which the shape is drawn.
+
+    Kwargs:
+
+    - shades (list|str): list of one or three colors used to shade 'sides'
+      of the cube; a single string is converted into light and dark shading
+    - shades_stroke (str): line color used to outline the shade areas;
+      defaults to match shade color
+    - shades_stroke_width (str): line width used to outline the shade areas;
+      defaults to match shape stroke width
+    <base>
+
+    """
+    kwargs = margins(**kwargs)
+    Cube = CubeObject(canvas=globals.canvas, **kwargs)
+    Cube.draw()
+    return Cube
+
+
+def cube(*args, **kwargs):
+    kwargs = margins(**kwargs)
+    _obj = args[0] if args else None
+    return CubeObject(_object=_obj, canvas=globals.canvas, **kwargs)
 
 
 @docstring_base

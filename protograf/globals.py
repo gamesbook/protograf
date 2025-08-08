@@ -38,6 +38,7 @@ def initialize():
     global dataset
     global dataset_type
     global image_list
+    global extracts
     global filename
     global directory
     global margins
@@ -63,12 +64,13 @@ def initialize():
     deck = None  # will become a proto.DeckOfCards object
     # store kwargs for DeckOfCards; #cards, copy, card_name, extra, grid_marks, zones
     deck_settings = {}
-    card_frames = {}  # list of proto.BBox card outlines; keyed on page number
+    card_frames = {}  # list of proto.BBox card frames; keyed on page number
     filename = None
     directory = None  # set by Save() command
     dataset = None  # will become a dictionary of data loaded from a file
     dataset_type = None  # set when Data is loaded; enum DatasetType
     image_list = []  # filenames stored when Data is loaded from image dir
+    extracts = {}  # list of proto.BBox areas to be extracted, keyed on page number
     margins = None  # will become a proto.PageMargins object
     footer = None
     footer_draw = False

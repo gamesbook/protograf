@@ -550,16 +550,16 @@ def pdf_export(
         feedback(f"Unable to extract images for {filename} - {err}!")
 
 
-def pdf_cards_to_png(
+def pdf_frames_to_png(
     source_file: str,
     output: str,
     fformat: str = "png",
     dpi: int = 300,
     directory: str = None,
-    card_frames: dict = None,
+    frames: dict = None,
     page_height: float = 0,
 ):
-    """Extract individual cards from PDF as PNG image(s).
+    """Extract framed areas from PDF as PNG image(s).
 
     Args:
     - source_file
@@ -572,12 +572,12 @@ def pdf_cards_to_png(
         resolution of PNG files (default is 300)
     - directory
         output directory (default is current)
-    - card_frames
+    - frames
         dict key is page number; value is a list of lists;
         each item in the nested list is a tuple of:
 
         - Bounding Box (top-left and bottom-right x,y coordinates)
-        - optional card name (from a data column which is user-defined)
+        - optional name (which is user-defined)
     - page_height:
         size of page
 
@@ -586,12 +586,14 @@ def pdf_cards_to_png(
     - https://pymupdf.io/
     - https://pypi.org/project/imageio/
     """
-    feedback(f"Saving card(s) as image file(s)...", False)
-    _filename = os.path.basename(output)
+    if frames:
+        feedback(f"Saving frames(s) as image file(s)...", False)
     _source = os.path.basename(source_file)
+    _output = output or source_file  # default to same as input name
+    _filename = os.path.basename(_output)
     basename = os.path.splitext(_filename)[0]
     # validate directory
-    dirname = directory or os.path.dirname(output)
+    dirname = directory or os.path.dirname(_output)
     if not os.path.exists(dirname):
         feedback(
             f'Cannot locate the directory "{dirname}" - please create this first.', True
@@ -607,7 +609,7 @@ def pdf_cards_to_png(
         doc = pymupdf.open(pdf_filename)
         page_num = 0
         for page in doc:
-            outlines = card_frames.get(page_num, [])
+            outlines = frames.get(page_num, [])
             inames = []
             for key, item in enumerate(outlines):
                 outline = item[0]  # Rect
@@ -631,7 +633,7 @@ def pdf_cards_to_png(
                 pix.save(iname)  # store image as a PNG
             page_num += 1
     except Exception as err:
-        feedback(f"Unable to extract card images for {source_file} - {err}!")
+        feedback(f"Unable to extract images for {source_file} - {err}!")
 
 
 def color_set(svg_only: bool = False) -> list:

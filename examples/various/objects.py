@@ -43,7 +43,7 @@ Text(common=header_font, x=5, y=13,
 Rectangle(
     x=2, y=12,
     height=3, width=2,
-    hatch_count=7, hatch_width=0.1, hatch='d', hatch_stroke="black",
+    hatch_count=7, hatch_stroke_width=0.1, hatch='d', hatch_stroke="black",
     stroke="saddlebrown", stroke_width=2, fill="lightcyan")
 
 
@@ -52,7 +52,7 @@ Text(common=header_font, x=5, y=17,
 Rectangle(
     x=2, y=16,
     height=3, width=2,
-    hatch_count=1, hatch_width=1, hatch='o', hatch_stroke="sienna",
+    hatch_count=1, hatch_stroke_width=1, hatch='o', hatch_stroke="sienna",
     stroke="sienna", stroke_width=3, fill="lightcyan")
 
 
@@ -136,7 +136,7 @@ Text(common=header_font, x=5, y=12.5,
      text="German Cross: rectangle with 'o' hatch and 'step' notch")
 Rectangle(
     height=2.8, width=2.8, x=0.5, y=11, fill="white", stroke="black", stroke_width=2,
-    hatch_width=22, hatch_stroke="black", hatch='o', hatch_count=1,
+    hatch_stroke_width=22, hatch_stroke="black", hatch='o', hatch_count=1,
     notch=0.7, notch_style='step')
 Rectangle(
      height=2.8, width=2.8, x=0.5, y=11, fill=None, stroke="white", stroke_width=3)

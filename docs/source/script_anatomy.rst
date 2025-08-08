@@ -295,8 +295,9 @@ sets of shapes, or to control how and where sets of shapes appear on a page.
 See:
 
 - :doc:`Core Shapes <core_shapes>`
+- :doc:`Object commands (specialised shapes) <objects>`
 - :doc:`Card and Deck commands <card_decks>`
-- :doc:`Further commands <additional_commands>`
+- :doc:`Further script commands <additional_commands>`
 - :doc:`Layout <layouts>` commands
 - :doc:`Hexagonal Grid <hexagonal_grids>` commands
 

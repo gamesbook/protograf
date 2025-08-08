@@ -567,7 +567,7 @@ the length or width of the Rectangle in a vertical, horizontal or diagonal direc
 
         htch = Common(
           height=1.5, width=1, hatch_count=5,
-          hatch_width=0.1, hatch_stroke="red")
+          hatch_stroke_width=0.1, hatch_stroke="red")
 
         Rectangle(
           common=htch, x=0, y=0,  hatch='w', label="W")
@@ -596,7 +596,7 @@ the length or width of the Rectangle in a vertical, horizontal or diagonal direc
       - *height* and *width* - set the basic configuration
       - *hatch_count* - sets the **number** of lines to be drawn; the
         intervals between them are equal and depend on the direction
-      - *hatch_width* - set to ``0.1`` point; a fairly thin line
+      - *hatch_stroke_width* - set to ``0.1`` point; a fairly thin line
       - *hatch_stroke* - set to the color ``red`` to make it stand out
         from the rectangle sides
 
@@ -668,7 +668,7 @@ Example 1. Size & Location
 
       - *notch_x* - the distance from the corner in the x-direction where the
         notch will start
-      - *notch_y* - the distance from the corner in the Y-direction where the
+      - *notch_y* - the distance from the corner in the y-direction where the
         notch will start
       - *notch_corners* - the specific corners of the rectangle where the notch
         will be applied

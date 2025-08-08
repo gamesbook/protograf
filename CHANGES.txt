@@ -1,6 +1,16 @@
 protograf Changes
 =================
 
+2025-08-08 (0.2.14)
+-------------------
+- Add example for full wargame countersheet
+- New colrs utils module (no API change)
+- New loadr utils module (no API change)
+- Add Cube object and examples
+- Add Extract command
+- Add example for a player board
+- Renamed `hatch_width` to `hatch_stroke_width`
+
 2025-08-02 (0.2.13)
 -------------------
 - Add example for use of API to create Card Data
@@ -10,8 +20,8 @@ protograf Changes
 - Patch caption locations for Image
 - Shift Starfield into objects module (no API change)
 - Patch bug loading last, empty cell from Google Sheet
-- Add D6 object
-- Add example for full wargame countersheet
+- Add D6 object and examples
+- Patch bug with Font name with spaces
 
 2025-07-27 (0.2.12)
 -------------------
