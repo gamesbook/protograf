@@ -142,4 +142,6 @@ Sequence(
     setting=(20, 10, -10, 'number'),
     interval_y=0.9)
 
+# TODO - icons and text at the bottom
+
 Save()

@@ -1,7 +1,7 @@
 protograf Changes
 =================
 
-2025-00-00 (0.2.14)
+2025-08-08 (0.2.14)
 -------------------
 - Add example for full wargame countersheet
 - New colrs utils module (no API change)
