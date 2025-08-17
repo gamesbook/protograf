@@ -486,6 +486,15 @@ class BaseCanvas:
         self.shades = self.defaults.get("shades", [])
         self.shades_stroke = self.defaults.get("shades_stroke", None)
         self.shades_stroke_width = self.defaults.get("shades_stroke", None)
+        self.paths = self.defaults.get("paths", [])
+        self.paths_stroke = self.defaults.get("paths_stroke", self.stroke)
+        self.paths_stroke_width = self.defaults.get(
+            "paths_stroke_width", self.stroke_width
+        )
+        self.paths_length = self.defaults.get("paths_length", None)
+        self.paths_cap = self.defaults.get("paths_cap", None)
+        self.paths_dotted = self.defaults.get("paths_dotted", self.dotted)
+        self.paths_dashed = self.defaults.get("paths_dashed", self.dashed)
         # ---- hexagons
         self.hid = self.defaults.get("id", "")  # HEX ID
         self.hex_rows = self.defaults.get("hex_rows", 0)
@@ -976,6 +985,15 @@ class BaseShape:
         self.shades_stroke_width = kwargs.get(
             "shades_stroke_width", base.shades_stroke_width
         )
+        self.paths = kwargs.get("paths", base.paths)
+        self.paths_stroke = kwargs.get("paths_stroke", self.stroke)
+        self.paths_stroke_width = self.kw_float(
+            kwargs.get("paths_stroke_width", base.paths_stroke_width)
+        )
+        self.paths_length = self.kw_float(kwargs.get("paths_length", base.paths_length))
+        self.paths_cap = kwargs.get("paths_cap", base.paths_cap)
+        self.paths_dotted = kwargs.get("paths_dotted", base.dotted)
+        self.paths_dashed = kwargs.get("paths_dashed", self.dashed)
         # ---- hexagons
         self.hid = kwargs.get("id", base.hid)  # HEX ID
         self.hex_rows = self.kw_int(kwargs.get("hex_rows", base.hex_rows), "hex_rows")

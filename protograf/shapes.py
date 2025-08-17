@@ -1502,6 +1502,98 @@ class HexShape(BaseShape):
             side = self._u.height / math.sqrt(3)
         return (3.0 * math.sqrt(3.0) * side * side) / 2.0
 
+    def draw_hatch(
+        self, cnv, ID, side: float, vertices: list, num: int, rotation: float = 0.0
+    ):
+        """Draw lines connecting two opposite sides and parallel to adjacent Hex side.
+
+        Args:
+            ID: unique ID
+            side: length of a hexagon side
+            vertices: the hexagons's nodes
+            num: number of lines
+            rotation: degrees anti-clockwise from horizontal "east"
+        """
+        dir_group = (
+            DirectionGroup.HEX_POINTY
+            if self.orientation == "pointy"
+            else DirectionGroup.HEX_FLAT
+        )
+        _dirs = tools.validated_directions(self.hatch, dir_group, "hexagon hatch")
+        _num = tools.as_int(num, "hatch_count")
+        lines = int((_num - 1) / 2 + 1)
+        # feedback(f'*** HEX {num=} {lines=} {vertices=} {_dirs=}')
+        if num >= 1:
+            if self.orientation in ["p", "pointy"]:
+                if "ne" in _dirs or "sw" in _dirs:  # slope UP to the right
+                    self.make_path_vertices(cnv, vertices, 1, 4)
+                if "se" in _dirs or "nw" in _dirs:  # slope down to the right
+                    self.make_path_vertices(cnv, vertices, 0, 3)
+                if "n" in _dirs or "s" in _dirs:  # vertical
+                    self.make_path_vertices(cnv, vertices, 2, 5)
+            if self.orientation in ["f", "flat"]:
+                if "ne" in _dirs or "sw" in _dirs:  # slope UP to the right
+                    self.make_path_vertices(cnv, vertices, 1, 4)
+                if "se" in _dirs or "nw" in _dirs:  # slope down to the right
+                    self.make_path_vertices(cnv, vertices, 2, 5)
+                if "e" in _dirs or "w" in _dirs:  # horizontal
+                    self.make_path_vertices(cnv, vertices, 0, 3)
+        if num >= 3:
+            _lines = lines - 1
+            if self.orientation in ["p", "pointy"]:
+                if "ne" in _dirs or "sw" in _dirs:  # slope UP to the right
+                    self.draw_lines_between_sides(
+                        cnv, side, _lines, vertices, (4, 5), (1, 0)
+                    )
+                    self.draw_lines_between_sides(
+                        cnv, side, _lines, vertices, (4, 3), (1, 2)
+                    )
+                if "se" in _dirs or "nw" in _dirs:  # slope down to the right
+                    self.draw_lines_between_sides(
+                        cnv, side, _lines, vertices, (0, 5), (3, 4)
+                    )
+                    self.draw_lines_between_sides(
+                        cnv, side, _lines, vertices, (3, 2), (0, 1)
+                    )
+                if "n" in _dirs or "s" in _dirs:  # vertical
+                    self.draw_lines_between_sides(
+                        cnv, side, _lines, vertices, (1, 2), (0, 5)
+                    )
+                    self.draw_lines_between_sides(
+                        cnv, side, _lines, vertices, (2, 3), (5, 4)
+                    )
+            if self.orientation in ["f", "flat"]:
+                if "ne" in _dirs or "sw" in _dirs:  # slope UP to the right
+                    self.draw_lines_between_sides(
+                        cnv, side, _lines, vertices, (0, 1), (5, 4)
+                    )
+                    self.draw_lines_between_sides(
+                        cnv, side, _lines, vertices, (3, 4), (2, 1)
+                    )
+                if "se" in _dirs or "nw" in _dirs:  # slope down to the right
+                    self.draw_lines_between_sides(
+                        cnv, side, _lines, vertices, (4, 5), (3, 2)
+                    )
+                    self.draw_lines_between_sides(
+                        cnv, side, _lines, vertices, (2, 1), (5, 0)
+                    )
+                if "e" in _dirs or "w" in _dirs:  # horizontal
+                    self.draw_lines_between_sides(
+                        cnv, side, _lines, vertices, (0, 1), (3, 2)
+                    )
+                    self.draw_lines_between_sides(
+                        cnv, side, _lines, vertices, (0, 5), (3, 4)
+                    )
+        # ---- set canvas
+        self.set_canvas_props(
+            index=ID,
+            stroke=self.hatch_stroke,
+            stroke_width=self.hatch_stroke_width,
+            stroke_cap=self.hatch_cap,
+            dashed=self.hatch_dashed,
+            dotted=self.hatch_dots,
+        )
+
     def draw_links(self, cnv, ID, side: float, vertices: list, links: list):
         """Draw arcs or lines to link two sides of a hexagon."""
         self.set_canvas_props(
@@ -1593,44 +1685,106 @@ class HexShape(BaseShape):
                 case _:
                     raise NotImplementedError(f'Unable to handle hex "{separation=}"')
 
-    def draw_radii(self, cnv, ID, centre: Point, vertices: list):
-        """Draw line(s) connecting the Hexagon centre to a vertex."""
-        # _dirs = _lower(self.radii).split()
+    def draw_paths(self, cnv, ID, centre: Point, vertices: list):
+        """Draw arc(s) connecting Hexagon edge-to-edge."""
+
+        def arc(centre: Point, start: Point, angle: float):
+            cnv.draw_sector(centre, start, angle, fullSector=False)
+
+        # validation
         dir_group = (
-            DirectionGroup.HEX_POINTY
+            DirectionGroup.HEX_POINTY_EDGE
             if self.orientation == "pointy"
-            else DirectionGroup.HEX_FLAT
+            else DirectionGroup.HEX_FLAT_EDGE
         )
-        _dirs = tools.validated_directions(self.radii, dir_group, "hex radii")
-        if "ne" in _dirs:  # slope UP to the right
-            cnv.draw_line(centre, vertices[4])
-        if "sw" in _dirs:  # slope DOWN to the left
-            cnv.draw_line(centre, vertices[1])
-        if "se" in _dirs:  # slope DOWN to the right
-            if self.orientation in ["p", "pointy"]:
-                cnv.draw_line(centre, vertices[3])
-            else:
-                cnv.draw_line(centre, vertices[2])
-        if "nw" in _dirs:  # slope UP to the left
-            if self.orientation in ["p", "pointy"]:
-                cnv.draw_line(centre, vertices[0])
-            else:
-                cnv.draw_line(centre, vertices[5])
-        if "n" in _dirs and self.orientation in ["p", "pointy"]:  # vertical UP
-            cnv.draw_line(centre, vertices[5])
-        if "s" in _dirs and self.orientation in ["p", "pointy"]:  # vertical DOWN
-            cnv.draw_line(centre, vertices[2])
-        if "e" in _dirs and self.orientation in ["f", "flat"]:  # horizontal RIGHT
-            cnv.draw_line(centre, vertices[3])
-        if "w" in _dirs and self.orientation in ["f", "flat"]:  # horizontal LEFT
-            cnv.draw_line(centre, vertices[0])
-        # color, thickness etc.
+        if self.paths is not None and not isinstance(self.paths, list):
+            feedback(f"A Hexagon's paths must be in the form of a list!", True)
+
+        # --- calculate offset centres
+        hex_geom = self.get_geometry()
+        side_plus = hex_geom.side * 1.5
+        if self.orientation == "pointy":
+            #          .
+            #    F/ \`A
+            #   E|  |B
+            #   D\ /C
+            #
+            ptA = Point(centre.x, centre.y)
+
+        else:
+            #     _A_
+            #  .F/  \B
+            #   E\__/C
+            #     D
+            ptA = Point(centre.x, centre.y - hex_geom.height_flat)
+            ptB = Point(centre.x + side_plus, centre.y - hex_geom.half_flat)
+            ptC = Point(centre.x + side_plus, centre.y + hex_geom.half_flat)
+            ptD = Point(centre.x, centre.y + hex_geom.height_flat)
+            ptE = Point(centre.x - side_plus, centre.y + hex_geom.half_flat)
+            ptF = Point(centre.x - side_plus, centre.y + hex_geom.height_flat)
+
+        # ---- calculate centres of sides
+        _, perbis_pts = self.calculate_perbises(centre, vertices)
+
+        for item in self.paths:
+            dir_pair = tools.validated_directions(item, dir_group, "hexagon paths")
+            if len(dir_pair) != 2:
+                feedback(f"A Hexagon's paths must be in the form of a list of direction pairs!", True)
+            # ---- calculate line draw
+            if self.orientation == "flat":
+                match dir_pair:
+                    # 120 degrees
+                    case ['n', 'ne'] | ['ne', 'n']:
+                        arc(vertices[4], perbis_pts[5], 120.)
+                    case ['se', 'ne'] | ['ne', 'se']:
+                        arc(vertices[3], perbis_pts[4], 120.)
+                    case ['se', 's'] | ['s', 'se']:
+                        arc(vertices[2], perbis_pts[3], 120.)
+                    case ['sw', 's'] | ['s', 'sw']:
+                        arc(vertices[1], perbis_pts[2], 120.)
+                    case ['sw', 'nw'] | ['nw', 'sw']:
+                        arc(vertices[0], perbis_pts[1], 120.)
+                    case ['n', 'nw'] | ['nw', 'n']:
+                        arc(vertices[5], perbis_pts[0], 120.)
+                    # 60 degrees
+                    case ['n', 'se'] | ['se', 'n']:
+                        arc(ptB, perbis_pts[5], 60.)
+                    case ['ne', 's'] | ['s', 'ne']:
+                        arc(ptC, perbis_pts[4], 60.)
+                    case ['se', 'sw'] | ['sw', 'se']:
+                        arc(ptD, perbis_pts[3], 60.)
+                    case ['s', 'nw'] | ['nw', 's']:
+                        arc(ptE, perbis_pts[2], 60.)
+                    case ['sw', 'n'] | ['n', 'sw']:
+                        arc(ptF, perbis_pts[1], 60.)
+                    case ['nw', 'ne'] | ['ne', 'nw']:
+                        arc(ptA, perbis_pts[0], 60.)
+        # ---- set color, thickness etc.
         self.set_canvas_props(
             index=ID,
-            stroke=self.radii_stroke or self.stroke,
-            stroke_width=self.radii_stroke_width or self.stroke_width,
-            stroke_cap=self.radii_cap or self.line_cap,
+            fill=None,
+            stroke=self.paths_stroke or self.stroke,
+            stroke_width=self.paths_stroke_width or self.stroke_width,
+            stroke_cap=self.paths_cap or self.line_cap,
         )
+
+    def calculate_perbises(self, centre: Point, vertices: list) -> tuple:
+        """."""
+        _perbis_angles = []  # store angles to centre of edges (the "chords")
+        _perbis_pts = []  # store centre Points of edges
+        vcount = len(vertices) - 1
+        for key, vertex in enumerate(vertices):
+            if key == 0:
+                p1 = Point(vertex.x, vertex.y)
+                p2 = Point(vertices[vcount].x, vertices[vcount].y)
+            else:
+                p1 = Point(vertex.x, vertex.y)
+                p2 = Point(vertices[key - 1].x, vertices[key - 1].y)
+            pc = geoms.fraction_along_line(p1, p2, 0.5)  # centre pt of edge
+            _perbis_pts.append(pc)
+            _, angle = geoms.angles_from_points(centre, pc)
+            _perbis_angles.append(angle)
+        return _perbis_angles, _perbis_pts
 
     def draw_perbis(
         self, cnv, ID, centre: Point, vertices: list, rotation: float = None
@@ -1643,20 +1797,7 @@ class HexShape(BaseShape):
             chord into two equal parts and meets the chord at a right angle;
             for a polygon, each edge is effectively a chord.
         """
-        _perbis = []  # store angles to centre of edges (the "chords")
-        _perbis_pts = []  # store centre Point of edges
-        vcount = len(vertices) - 1
-        for key, vertex in enumerate(vertices):
-            if key == 0:
-                p1 = Point(vertex.x, vertex.y)
-                p2 = Point(vertices[vcount].x, vertices[vcount].y)
-            else:
-                p1 = Point(vertex.x, vertex.y)
-                p2 = Point(vertices[key - 1].x, vertices[key - 1].y)
-            pc = geoms.fraction_along_line(p1, p2, 0.5)  # centre pt of edge
-            _perbis_pts.append(pc)
-            _, angle = geoms.angles_from_points(centre, pc)
-            _perbis.append(angle)
+        _perbis, _perbis_pts = self.calculate_perbises(centre, vertices)
         pb_offset = self.unit(self.perbis_offset, label="perbis offset") or 0
         pb_length = (
             self.unit(self.perbis_length, label="perbis length")
@@ -1722,96 +1863,43 @@ class HexShape(BaseShape):
             dotted=self.perbis_dotted,
         )
 
-    def draw_hatch(
-        self, cnv, ID, side: float, vertices: list, num: int, rotation: float = 0.0
-    ):
-        """Draw lines connecting two opposite sides and parallel to adjacent Hex side.
-
-        Args:
-            ID: unique ID
-            side: length of a hexagon side
-            vertices: the hexagons's nodes
-            num: number of lines
-            rotation: degrees anti-clockwise from horizontal "east"
-        """
+    def draw_radii(self, cnv, ID, centre: Point, vertices: list):
+        """Draw line(s) connecting the Hexagon centre to a vertex."""
+        # _dirs = _lower(self.radii).split()
         dir_group = (
             DirectionGroup.HEX_POINTY
             if self.orientation == "pointy"
             else DirectionGroup.HEX_FLAT
         )
-        _dirs = tools.validated_directions(self.hatch, dir_group, "hexagon hatch")
-        _num = tools.as_int(num, "hatch_count")
-        lines = int((_num - 1) / 2 + 1)
-        # feedback(f'*** HEX {num=} {lines=} {vertices=} {_dirs=}')
-        if num >= 1:
+        _dirs = tools.validated_directions(self.radii, dir_group, "hex radii")
+        if "ne" in _dirs:  # slope UP to the right
+            cnv.draw_line(centre, vertices[4])
+        if "sw" in _dirs:  # slope DOWN to the left
+            cnv.draw_line(centre, vertices[1])
+        if "se" in _dirs:  # slope DOWN to the right
             if self.orientation in ["p", "pointy"]:
-                if "ne" in _dirs or "sw" in _dirs:  # slope UP to the right
-                    self.make_path_vertices(cnv, vertices, 1, 4)
-                if "se" in _dirs or "nw" in _dirs:  # slope down to the right
-                    self.make_path_vertices(cnv, vertices, 0, 3)
-                if "n" in _dirs or "s" in _dirs:  # vertical
-                    self.make_path_vertices(cnv, vertices, 2, 5)
-            if self.orientation in ["f", "flat"]:
-                if "ne" in _dirs or "sw" in _dirs:  # slope UP to the right
-                    self.make_path_vertices(cnv, vertices, 1, 4)
-                if "se" in _dirs or "nw" in _dirs:  # slope down to the right
-                    self.make_path_vertices(cnv, vertices, 2, 5)
-                if "e" in _dirs or "w" in _dirs:  # horizontal
-                    self.make_path_vertices(cnv, vertices, 0, 3)
-        if num >= 3:
-            _lines = lines - 1
+                cnv.draw_line(centre, vertices[3])
+            else:
+                cnv.draw_line(centre, vertices[2])
+        if "nw" in _dirs:  # slope UP to the left
             if self.orientation in ["p", "pointy"]:
-                if "ne" in _dirs or "sw" in _dirs:  # slope UP to the right
-                    self.draw_lines_between_sides(
-                        cnv, side, _lines, vertices, (4, 5), (1, 0)
-                    )
-                    self.draw_lines_between_sides(
-                        cnv, side, _lines, vertices, (4, 3), (1, 2)
-                    )
-                if "se" in _dirs or "nw" in _dirs:  # slope down to the right
-                    self.draw_lines_between_sides(
-                        cnv, side, _lines, vertices, (0, 5), (3, 4)
-                    )
-                    self.draw_lines_between_sides(
-                        cnv, side, _lines, vertices, (3, 2), (0, 1)
-                    )
-                if "n" in _dirs or "s" in _dirs:  # vertical
-                    self.draw_lines_between_sides(
-                        cnv, side, _lines, vertices, (1, 2), (0, 5)
-                    )
-                    self.draw_lines_between_sides(
-                        cnv, side, _lines, vertices, (2, 3), (5, 4)
-                    )
-            if self.orientation in ["f", "flat"]:
-                if "ne" in _dirs or "sw" in _dirs:  # slope UP to the right
-                    self.draw_lines_between_sides(
-                        cnv, side, _lines, vertices, (0, 1), (5, 4)
-                    )
-                    self.draw_lines_between_sides(
-                        cnv, side, _lines, vertices, (3, 4), (2, 1)
-                    )
-                if "se" in _dirs or "nw" in _dirs:  # slope down to the right
-                    self.draw_lines_between_sides(
-                        cnv, side, _lines, vertices, (4, 5), (3, 2)
-                    )
-                    self.draw_lines_between_sides(
-                        cnv, side, _lines, vertices, (2, 1), (5, 0)
-                    )
-                if "e" in _dirs or "w" in _dirs:  # horizontal
-                    self.draw_lines_between_sides(
-                        cnv, side, _lines, vertices, (0, 1), (3, 2)
-                    )
-                    self.draw_lines_between_sides(
-                        cnv, side, _lines, vertices, (0, 5), (3, 4)
-                    )
-        # ---- set canvas
+                cnv.draw_line(centre, vertices[0])
+            else:
+                cnv.draw_line(centre, vertices[5])
+        if "n" in _dirs and self.orientation in ["p", "pointy"]:  # vertical UP
+            cnv.draw_line(centre, vertices[5])
+        if "s" in _dirs and self.orientation in ["p", "pointy"]:  # vertical DOWN
+            cnv.draw_line(centre, vertices[2])
+        if "e" in _dirs and self.orientation in ["f", "flat"]:  # horizontal RIGHT
+            cnv.draw_line(centre, vertices[3])
+        if "w" in _dirs and self.orientation in ["f", "flat"]:  # horizontal LEFT
+            cnv.draw_line(centre, vertices[0])
+        # color, thickness etc.
         self.set_canvas_props(
             index=ID,
-            stroke=self.hatch_stroke,
-            stroke_width=self.hatch_stroke_width,
-            stroke_cap=self.hatch_cap,
-            dashed=self.hatch_dashed,
-            dotted=self.hatch_dots,
+            stroke=self.radii_stroke or self.stroke,
+            stroke_width=self.radii_stroke_width or self.stroke_width,
+            stroke_cap=self.radii_cap or self.line_cap,
         )
 
     def draw_slices(self, cnv, ID, vertexes, centre: tuple, rotation=0):
@@ -2215,6 +2303,9 @@ class HexShape(BaseShape):
         # ---- draw perbis
         if self.perbis:
             self.draw_perbis(cnv, ID, Point(self.x_d, self.y_d), self.vertexes)
+        # ---- draw paths
+        if self.paths is not None:
+            self.draw_paths(cnv, ID, Point(self.x_d, self.y_d), self.vertexes)
         # ---- centred shape (with offset)
         if self.centre_shape:
             if self.can_draw_centred_shape(self.centre_shape):
