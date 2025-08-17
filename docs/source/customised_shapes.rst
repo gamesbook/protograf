@@ -1488,7 +1488,6 @@ colors are repeated, starting from the first one.
 ===== ======
 
 
-
 .. _hexTextFlat:
 
 Text: Flat

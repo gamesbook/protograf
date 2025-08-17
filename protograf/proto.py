@@ -2755,7 +2755,7 @@ def circle(**kwargs):
     return CircleShape(canvas=globals.canvas, **kwargs)
 
 
-@docstring_base
+@docstring_center
 def Compass(row=None, col=None, **kwargs):
     """Draw a Compass shape on the canvas.
 
@@ -2766,7 +2766,7 @@ def Compass(row=None, col=None, **kwargs):
 
     Kwargs:
 
-    <base>
+    <center>
 
     """
     kwargs = margins(**kwargs)
@@ -2805,7 +2805,7 @@ def dot(row=None, col=None, **kwargs):
     return DotShape(canvas=globals.canvas, **kwargs)
 
 
-@docstring_base
+@docstring_center
 def Ellipse(**kwargs):
     """Draw a Ellipse shape on the canvas.
 
@@ -2816,7 +2816,7 @@ def Ellipse(**kwargs):
 
     Kwargs:
 
-    <base>
+    <center>
 
     """
     kwargs = margins(**kwargs)
@@ -2830,7 +2830,7 @@ def ellipse(**kwargs):
     return EllipseShape(canvas=globals.canvas, **kwargs)
 
 
-@docstring_base
+@docstring_center
 def EquilateralTriangle(row=None, col=None, **kwargs):
     """Draw a EquilateralTriangle shape on the canvas.
 
@@ -2841,7 +2841,7 @@ def EquilateralTriangle(row=None, col=None, **kwargs):
 
     Kwargs:
 
-    <base>
+    <center>
 
     """
     kwargs = margins(**kwargs)
@@ -2857,7 +2857,7 @@ def equilateraltriangle(row=None, col=None, **kwargs):
     return EquilateralTriangleShape(canvas=globals.canvas, **kwargs)
 
 
-@docstring_base
+@docstring_center
 def Hexagon(row=None, col=None, **kwargs):
     """Draw a Hexagon shape on the canvas.
 
@@ -2869,7 +2869,23 @@ def Hexagon(row=None, col=None, **kwargs):
     Kwargs:
 
     <center>
+    - orientation (str): either *float*, the default, or *pointy*
+    - perbis (str): a compass direction in which a bisector is drawn
+      (from centre to mid-point of the edge in that direction); directions:
 
+      - ``n`` (North) / ``s`` (South) draws vertical perbis for flat hex;
+      - ``w`` (West) / ``e`` (East) draws horizontal perbis for pointy hex;
+      - ``nw`` (North-West) / ``se`` (South-East) draws diagonal perbis lines.
+    - slices (list): set of colors that are drawn as triangles  in a clockwise
+      direction starting from the "North East"
+    - border (list): overide the normal edge line; specify a set of values, which
+      are comma-separated inside round brackets, in the following order:
+
+      - direction (str): one of (n)orth, (s)outh, (e)ast or (w)est,
+        nw (north-west) or se (south-east)
+      - width (float): the line thickness
+      - color (str): either a named or hexadecimal color
+      - style  (bool): True makes a dotted line; or a list of values creates dashes
     - hatch (str): edge-to-edge lines that, if not specified, will
       be drawn in all directions - otherwise:
 
@@ -2963,7 +2979,7 @@ def line(row=None, col=None, **kwargs):
     return LineShape(canvas=globals.canvas, **kwargs)
 
 
-@docstring_base
+@docstring_center
 def Polygon(row=None, col=None, **kwargs):
     """Draw a Polygon shape on the canvas.
 
@@ -2974,7 +2990,7 @@ def Polygon(row=None, col=None, **kwargs):
 
     Kwargs:
 
-    <base>
+    <center>
 
     """
     kwargs = margins(**kwargs)
@@ -3044,7 +3060,7 @@ def rightangledtriangle(row=None, col=None, **kwargs):
     return RightAngledTriangleShape(canvas=globals.canvas, **kwargs)
 
 
-@docstring_base
+@docstring_center
 def Rhombus(row=None, col=None, **kwargs):
     """Draw a Rhombus shape on the canvas.
 
@@ -3055,7 +3071,7 @@ def Rhombus(row=None, col=None, **kwargs):
 
     Kwargs:
 
-    <base>
+    <center>
 
     """
     kwargs = margins(**kwargs)
@@ -3083,13 +3099,14 @@ def Rectangle(row=None, col=None, **kwargs):
     <center>
 
     - rounding (float): the radius of the circle used to round the corner
-    - border (list): a set of values, which are comma-separated inside round
-      brackets, in the following order:
+    - border (list): overide the normal edge line; specify a set of values, which
+      are comma-separated inside round brackets, in the following order:
 
-      - direction - one of (n)orth, (s)outh, (e)ast or (w)est
-      - width - the line thickness
-      - color - either a named or hexadecimal color
-      - style - ``True`` makes it dotted; or a list of values creates dashes
+      - direction (str): one of (n)orth, (s)outh, (e)ast or (w)est,
+        nw (north-west) or se (south-east)
+      - width (float): the line thickness
+      - color (str): either a named or hexadecimal color
+      - style  (bool): True makes a dotted line; or a list of values creates dashes
     - chevron (str): the primary compass direction in which a peak is
       pointing; n(orth), s(outh), e(ast) or w(est)
     - chevron_height (float): the distance of the chevron peak from the side of
@@ -3231,7 +3248,7 @@ def sector(row=None, col=None, **kwargs):
     return SectorShape(canvas=globals.canvas, **kwargs)
 
 
-@docstring_base
+@docstring_center
 def Square(row=None, col=None, **kwargs):
     """Draw a Square shape on the canvas.
 
@@ -3242,7 +3259,7 @@ def Square(row=None, col=None, **kwargs):
 
     Kwargs:
 
-    <base>
+    <center>
 
     """
     kwargs = margins(**kwargs)
@@ -3258,7 +3275,7 @@ def square(row=None, col=None, **kwargs):
     return SquareShape(canvas=globals.canvas, **kwargs)
 
 
-@docstring_base
+@docstring_center
 def Stadium(row=None, col=None, **kwargs):
     """Draw a Stadium shape on the canvas.
 
@@ -3269,7 +3286,7 @@ def Stadium(row=None, col=None, **kwargs):
 
     Kwargs:
 
-    <base>
+    <center>
 
     """
     kwargs = margins(**kwargs)
@@ -3287,7 +3304,7 @@ def stadium(row=None, col=None, **kwargs):
     return StadiumShape(canvas=globals.canvas, **kwargs)
 
 
-@docstring_base
+@docstring_center
 def Star(row=None, col=None, **kwargs):
     """Draw a Star shape on the canvas.
 
@@ -3298,7 +3315,7 @@ def Star(row=None, col=None, **kwargs):
 
     Kwargs:
 
-    <base>
+    <center>
 
     """
     kwargs = margins(**kwargs)
@@ -3342,7 +3359,7 @@ def text(*args, **kwargs):
     return TextShape(_object=_obj, canvas=globals.canvas, **kwargs)
 
 
-@docstring_base
+@docstring_center
 def Trapezoid(row=None, col=None, **kwargs):
     """Draw a Trapezoid shape on the canvas.
 
@@ -3351,9 +3368,9 @@ def Trapezoid(row=None, col=None, **kwargs):
     - row (int): row in which the shape is drawn.
     - col (int): column in which the shape is drawn.
 
-    Kwargs:null
+    Kwargs:
 
-    <base>
+    <center>
 
     """
     kwargs = margins(**kwargs)
