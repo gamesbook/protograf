@@ -2697,8 +2697,8 @@ def Circle(row=None, col=None, **kwargs):
     Kwargs:
 
     <center>
-    - hatch (str): if not specified, hatches will be drawn
-      in all directions - otherwise:
+    - hatch (str): edge-to-edge lines that, if not specified, will
+      be drawn in all directions - otherwise:
 
       - ``n`` (North) or ``s`` (South) draws vertical lines;
       - ``w`` (West) or ``e`` (East) draws horizontal lines;
@@ -2868,8 +2868,33 @@ def Hexagon(row=None, col=None, **kwargs):
 
     Kwargs:
 
-    <base>
+    <center>
 
+    - hatch (str): edge-to-edge lines that, if not specified, will
+      be drawn in all directions - otherwise:
+
+      - ``n`` (North) or ``s`` (South) draws vertical lines for flat hex;
+      - ``w`` (West) or ``e`` (East) draws horizontal lines for pointy hex;
+      - ``nw`` (North-West) or ``se`` (South-East) draws diagonal lines.
+    - hatch_count (int): sets the **number** of lines to be drawn the
+      intervals between them are equal and depend on the direction
+    - hatch_stroke_width (float): hatch line thickness; defaults to 0.1 points
+    - hatch_stroke (str): the named or hexadecimal color of the hatch line;
+      defaults to ``black``
+    - radii_stroke_width (float): determines the thickness of the radii
+    - radii_dotted (bool): if set to True, will make the radii lines dotted
+    - radii_stroke (str): the named or hexadecimal color of the hatch line;
+      defaults to ``black``
+    - radii_length (float): changes the length of the radii lines
+      (centre to circumference)
+    - radii_offset (float): moves the endpoint of the radii line
+      **away** from the centre
+    - radii_labels (str|list): a string or list of strings used for text labels
+    - radii_labels_font (str): name of the font used for the labels
+    - radii_labels_rotation(float): rotation in degrees relative to radius angle
+    - radii_labels_size (float): point size of label text
+    - radii_labels_stroke (str): the named or hexadecimal color of the label text
+    - radii_labels_stroke_width (float): thickness of the label text
     """
     kwargs = margins(**kwargs)
     # print(f'$$$ Will draw HexShape: {kwargs}')

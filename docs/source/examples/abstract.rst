@@ -22,6 +22,7 @@ will demonstrate full scalability.
 - `Morabaraba`_
 - `Octagons`_
 - `TicTacToe`_
+- `Meridians`_
 
 Chess
 =====
@@ -281,4 +282,25 @@ Discussion  This example shows how to construct a board and then show a series
 ----------- ------------------------------------------------------------------
 Screenshot  .. image:: images/boards/abstract/tictactoe.gif
                :width: 50%
+=========== ==================================================================
+
+
+Meridians
+=========
+`↑ <table-of-contents-exabs_>`_
+
+In *Meridians*, players alternate taking turns to place stones and capture
+the opponent's pieces.
+
+=========== ==================================================================
+Title       *Meridians Board*
+----------- ------------------------------------------------------------------
+Script      `meridians.py <https://github.com/gamesbook/protograf/blob/master/examples/boards/abstract/meridians.py>`_
+----------- ------------------------------------------------------------------
+Discussion  The code uses a basic ``Hexagon()``, with the *hatch_count*
+            property being set to construct the internal lines..
+
+----------- ------------------------------------------------------------------
+Screenshot  .. image:: images/boards/abstract/meridians.png
+               :width: 90%
 =========== ==================================================================
