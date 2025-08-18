@@ -2897,8 +2897,14 @@ def Hexagon(row=None, col=None, **kwargs):
     - hatch_stroke_width (float): hatch line thickness; defaults to 0.1 points
     - hatch_stroke (str): the named or hexadecimal color of the hatch line;
       defaults to ``black``
-    - radii_stroke_width (float): determines the thickness of the radii
+    - paths (list): one or more pairs of compass directions between
+      which a line - straight or an arc - is drawn
+    - paths_dotted (bool): if set to True, will make the paths lines dotted
+    - paths_stroke_width (float): determines the thickness of the paths
+    - paths_stroke (str): the named or hexadecimal color of the paths line;
+      defaults to ``black`
     - radii_dotted (bool): if set to True, will make the radii lines dotted
+    - radii_stroke_width (float): determines the thickness of the radii
     - radii_stroke (str): the named or hexadecimal color of the hatch line;
       defaults to ``black``
     - radii_length (float): changes the length of the radii lines

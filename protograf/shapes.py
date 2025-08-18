@@ -32,6 +32,7 @@ from protograf.utils.structures import (
     BBox,
     DirectionGroup,
     HexGeometry,
+    HexOrientation,
     Link,
     Point,
     PolyGeometry,
@@ -1341,6 +1342,18 @@ class HexShape(BaseShape):
         # fallback / default
         if not self.use_diameter and not self.use_radius and not self.use_side:
             self.use_height = True
+        self.ORIENTATION = self.get_orientation()
+
+    def get_orientation(self):
+        if _lower(self.orientation) in ["p", "pointy"]:
+            orientation = HexOrientation.POINTY
+        elif _lower(self.orientation) in ["f", "flat"]:
+            orientation = HexOrientation.FLAT
+        else:
+            feedback(
+                'Invalid orientation "{self.orientation}" supplied for hexagon.', True
+            )
+        return orientation
 
     def hex_height_width(self) -> tuple:
         """Calculate vertical and horizontal point dimensions of a hexagon
@@ -1375,16 +1388,13 @@ class HexShape(BaseShape):
         # ---- diameter and radius
         diameter = 2.0 * side
         radius = side
-        if _lower(self.orientation) in ["p", "pointy"]:
+        self.ORIENTATION = self.get_orientation()
+        if self.ORIENTATION == HexOrientation.POINTY:
             self.width = 2 * half_flat / self.units
             self.height = 2 * radius / self.units
-        elif _lower(self.orientation) in ["f", "flat"]:
+        elif self.ORIENTATION == HexOrientation.FLAT:
             self.height = 2 * half_flat / self.units
             self.width = 2 * radius / self.units
-        else:
-            feedback(
-                'Invalid orientation "{self.orientation}" supplied for hexagon.', True
-            )
         return radius, diameter, side, half_flat
 
     def calculate_caltrop_lines(
@@ -1540,7 +1550,8 @@ class HexShape(BaseShape):
                     self.make_path_vertices(cnv, vertices, 0, 3)
         if num >= 3:
             _lines = lines - 1
-            if self.orientation in ["p", "pointy"]:
+            self.ORIENTATION = self.get_orientation()
+            if self.ORIENTATION == HexOrientation.POINTY:
                 if "ne" in _dirs or "sw" in _dirs:  # slope UP to the right
                     self.draw_lines_between_sides(
                         cnv, side, _lines, vertices, (4, 5), (1, 0)
@@ -1562,7 +1573,7 @@ class HexShape(BaseShape):
                     self.draw_lines_between_sides(
                         cnv, side, _lines, vertices, (2, 3), (5, 4)
                     )
-            if self.orientation in ["f", "flat"]:
+            elif self.ORIENTATION == HexOrientation.FLAT:
                 if "ne" in _dirs or "sw" in _dirs:  # slope UP to the right
                     self.draw_lines_between_sides(
                         cnv, side, _lines, vertices, (0, 1), (5, 4)
@@ -1622,7 +1633,7 @@ class HexShape(BaseShape):
             va_end = the_link.a % 6
             vb_start = the_link.b - 1
             vb_end = the_link.b % 6
-            feedback(f"a:{va_start}-{va_end} b:{vb_start}-{vb_end}")
+            # feedback(f"*** a:{va_start}-{va_end} b:{vb_start}-{vb_end}")
 
             separation = geoms.separation_between_hexsides(the_link.a, the_link.b)
             match separation:
@@ -1703,25 +1714,31 @@ class HexShape(BaseShape):
         # --- calculate offset centres
         hex_geom = self.get_geometry()
         side_plus = hex_geom.side * 1.5
-        if self.orientation == "pointy":
+        h_flat = hex_geom.half_flat
+        self.ORIENTATION = self.get_orientation()
+        if self.ORIENTATION == HexOrientation.POINTY:
             #          .
             #    F/ \`A
             #   E|  |B
             #   D\ /C
             #
-            ptA = Point(centre.x, centre.y)
-
-        else:
+            ptA = Point(centre.x + h_flat, centre.y - side_plus)
+            ptB = Point(centre.x + 2 * h_flat, centre.y)
+            ptC = Point(centre.x + h_flat, centre.y + side_plus)
+            ptD = Point(centre.x - h_flat, centre.y + side_plus)
+            ptE = Point(centre.x - 2 * h_flat, centre.y)
+            ptF = Point(centre.x - h_flat, centre.y - side_plus)
+        elif self.ORIENTATION == HexOrientation.FLAT:
             #     _A_
             #  .F/  \B
             #   E\__/C
             #     D
             ptA = Point(centre.x, centre.y - hex_geom.height_flat)
-            ptB = Point(centre.x + side_plus, centre.y - hex_geom.half_flat)
-            ptC = Point(centre.x + side_plus, centre.y + hex_geom.half_flat)
+            ptB = Point(centre.x + side_plus, centre.y - h_flat)
+            ptC = Point(centre.x + side_plus, centre.y + h_flat)
             ptD = Point(centre.x, centre.y + hex_geom.height_flat)
-            ptE = Point(centre.x - side_plus, centre.y + hex_geom.half_flat)
-            ptF = Point(centre.x - side_plus, centre.y + hex_geom.height_flat)
+            ptE = Point(centre.x - side_plus, centre.y + h_flat)
+            ptF = Point(centre.x - side_plus, centre.y - h_flat)
 
         # ---- calculate centres of sides
         _, perbis_pts = self.calculate_perbises(centre, vertices)
@@ -1729,36 +1746,81 @@ class HexShape(BaseShape):
         for item in self.paths:
             dir_pair = tools.validated_directions(item, dir_group, "hexagon paths")
             if len(dir_pair) != 2:
-                feedback(f"A Hexagon's paths must be in the form of a list of direction pairs!", True)
+                feedback(
+                    f"A Hexagon's paths must be in the form of a list of direction pairs!",
+                    True,
+                )
             # ---- calculate line draw
-            if self.orientation == "flat":
+            if self.ORIENTATION == HexOrientation.FLAT:
                 match dir_pair:
-                    # 120 degrees
-                    case ['n', 'ne'] | ['ne', 'n']:
-                        arc(vertices[4], perbis_pts[5], 120.)
-                    case ['se', 'ne'] | ['ne', 'se']:
-                        arc(vertices[3], perbis_pts[4], 120.)
-                    case ['se', 's'] | ['s', 'se']:
-                        arc(vertices[2], perbis_pts[3], 120.)
-                    case ['sw', 's'] | ['s', 'sw']:
-                        arc(vertices[1], perbis_pts[2], 120.)
-                    case ['sw', 'nw'] | ['nw', 'sw']:
-                        arc(vertices[0], perbis_pts[1], 120.)
-                    case ['n', 'nw'] | ['nw', 'n']:
-                        arc(vertices[5], perbis_pts[0], 120.)
-                    # 60 degrees
-                    case ['n', 'se'] | ['se', 'n']:
-                        arc(ptB, perbis_pts[5], 60.)
-                    case ['ne', 's'] | ['s', 'ne']:
-                        arc(ptC, perbis_pts[4], 60.)
-                    case ['se', 'sw'] | ['sw', 'se']:
-                        arc(ptD, perbis_pts[3], 60.)
-                    case ['s', 'nw'] | ['nw', 's']:
-                        arc(ptE, perbis_pts[2], 60.)
-                    case ['sw', 'n'] | ['n', 'sw']:
-                        arc(ptF, perbis_pts[1], 60.)
-                    case ['nw', 'ne'] | ['ne', 'nw']:
-                        arc(ptA, perbis_pts[0], 60.)
+                    # 120 degrees / short arc
+                    case ["n", "ne"] | ["ne", "n"]:
+                        arc(vertices[4], perbis_pts[5], 120.0)
+                    case ["se", "ne"] | ["ne", "se"]:
+                        arc(vertices[3], perbis_pts[4], 120.0)
+                    case ["se", "s"] | ["s", "se"]:
+                        arc(vertices[2], perbis_pts[3], 120.0)
+                    case ["sw", "s"] | ["s", "sw"]:
+                        arc(vertices[1], perbis_pts[2], 120.0)
+                    case ["sw", "nw"] | ["nw", "sw"]:
+                        arc(vertices[0], perbis_pts[1], 120.0)
+                    case ["n", "nw"] | ["nw", "n"]:
+                        arc(vertices[5], perbis_pts[0], 120.0)
+                    # 60 degrees / long arc
+                    case ["n", "se"] | ["se", "n"]:
+                        arc(ptB, perbis_pts[5], 60.0)
+                    case ["ne", "s"] | ["s", "ne"]:
+                        arc(ptC, perbis_pts[4], 60.0)
+                    case ["se", "sw"] | ["sw", "se"]:
+                        arc(ptD, perbis_pts[3], 60.0)
+                    case ["s", "nw"] | ["nw", "s"]:
+                        arc(ptE, perbis_pts[2], 60.0)
+                    case ["sw", "n"] | ["n", "sw"]:
+                        arc(ptF, perbis_pts[1], 60.0)
+                    case ["nw", "ne"] | ["ne", "nw"]:
+                        arc(ptA, perbis_pts[0], 60.0)
+                    # 90 degrees
+                    case ["nw", "se"] | ["se", "nw"]:
+                        cnv.draw_line(perbis_pts[3], perbis_pts[0])
+                    case ["ne", "sw"] | ["sw", "ne"]:
+                        cnv.draw_line(perbis_pts[4], perbis_pts[1])
+                    case ["n", "s"] | ["s", "n"]:
+                        cnv.draw_line(perbis_pts[5], perbis_pts[2])
+            if self.ORIENTATION == HexOrientation.POINTY:
+                match dir_pair:
+                    # 120 degrees / short arc
+                    case ["e", "ne"] | ["ne", "e"]:
+                        arc(vertices[4], perbis_pts[5], 120.0)
+                    case ["e", "se"] | ["se", "e"]:
+                        arc(vertices[3], perbis_pts[4], 120.0)
+                    case ["sw", "se"] | ["se", "sw"]:
+                        arc(vertices[2], perbis_pts[3], 120.0)
+                    case ["w", "sw"] | ["sw", "w"]:
+                        arc(vertices[1], perbis_pts[2], 120.0)
+                    case ["w", "nw"] | ["nw", "w"]:
+                        arc(vertices[0], perbis_pts[1], 120.0)
+                    case ["nw", "ne"] | ["nw", "ne"]:
+                        arc(vertices[5], perbis_pts[0], 120.0)
+                    # 60 degrees / long arc
+                    case ["ne", "se"] | ["se", "ne"]:
+                        arc(ptB, perbis_pts[5], 60.0)
+                    case ["e", "sw"] | ["sw", "e"]:
+                        arc(ptC, perbis_pts[4], 60.0)
+                    case ["w", "se"] | ["se", "w"]:
+                        arc(ptD, perbis_pts[3], 60.0)
+                    case ["nw", "sw"] | ["sw", "nw"]:
+                        arc(ptE, perbis_pts[2], 60.0)
+                    case ["ne", "w"] | ["w", "ne"]:
+                        arc(ptF, perbis_pts[1], 60.0)
+                    case ["e", "nw"] | ["nw", "e"]:
+                        arc(ptA, perbis_pts[0], 60.0)
+                    # 90 degrees
+                    case ["ne", "sw"] | ["sw", "ne"]:
+                        cnv.draw_line(perbis_pts[5], perbis_pts[2])
+                    case ["e", "w"] | ["w", "e"]:
+                        cnv.draw_line(perbis_pts[4], perbis_pts[1])
+                    case ["nw", "se"] | ["se", "nw"]:
+                        cnv.draw_line(perbis_pts[3], perbis_pts[0])
         # ---- set color, thickness etc.
         self.set_canvas_props(
             index=ID,
@@ -1766,6 +1828,8 @@ class HexShape(BaseShape):
             stroke=self.paths_stroke or self.stroke,
             stroke_width=self.paths_stroke_width or self.stroke_width,
             stroke_cap=self.paths_cap or self.line_cap,
+            dashed=self.paths_dashed,
+            dotted=self.paths_dotted,
         )
 
     def calculate_perbises(self, centre: Point, vertices: list) -> tuple:
@@ -1815,7 +1879,7 @@ class HexShape(BaseShape):
             )
             _dirs = []
             # feedback(f'*** HEX {self.perbis=} {self.orientation=} {perbis_dirs=}')
-            if self.orientation in ["p", "pointy"]:
+            if self.ORIENTATION == HexOrientation.POINTY:
                 if "e" in perbis_dirs:
                     _dirs.append(4)
                 if "ne" in perbis_dirs:
@@ -1828,7 +1892,7 @@ class HexShape(BaseShape):
                     _dirs.append(2)
                 if "se" in perbis_dirs:
                     _dirs.append(3)
-            if self.orientation in ["f", "flat"]:
+            elif self.ORIENTATION == HexOrientation.FLAT:
                 if "ne" in perbis_dirs:
                     _dirs.append(4)
                 if "n" in perbis_dirs:
@@ -2019,6 +2083,7 @@ class HexShape(BaseShape):
         diameter = 2.0 * side
         radius = side
         z_fraction = (diameter - side) / 2.0
+        self.ORIENTATION = self.get_orientation()
         return HexGeometry(
             radius, diameter, side, half_side, half_flat, height_flat, z_fraction
         )
@@ -2027,7 +2092,8 @@ class HexShape(BaseShape):
         """Calculate vertices of hexagon."""
         geo = self.get_geometry()
         # ---- POINTY^
-        if _lower(self.orientation) in ["p", "pointy"]:
+        self.ORIENTATION = self.get_orientation()
+        if self.ORIENTATION == HexOrientation.POINTY:
             #          .
             #         / \`
             # x,y .. |  |
@@ -2111,7 +2177,7 @@ class HexShape(BaseShape):
             # feedback(f"*** P^: {x=} {y=}{self.x_d=} {self.y_d=} {geo=} ")
 
         # ---- FLAT~
-        else:
+        elif self.ORIENTATION == HexOrientation.FLAT:
             #         __
             # x,y .. /  \
             #        \__/
@@ -2183,7 +2249,7 @@ class HexShape(BaseShape):
             # feedback(f"*** F~: {x=} {y=} {self.x_d=} {self.y_d=} {geo=}")
 
         # ---- ^ pointy hexagon vertices (clockwise)
-        if _lower(self.orientation) in ["p", "pointy"]:
+        if self.ORIENTATION == HexOrientation.POINTY:
             self.vertexes = [  # clockwise from bottom-left; relative to centre
                 muPoint(x, y + geo.z_fraction),
                 muPoint(x, y + geo.z_fraction + geo.side),
@@ -2193,7 +2259,7 @@ class HexShape(BaseShape):
                 muPoint(x + geo.half_flat, y),
             ]
         # ---- ~ flat hexagon vertices (clockwise)
-        else:  # _lower(self.orientation) in ['f',  'flat']:
+        elif self.ORIENTATION == HexOrientation.FLAT:
             self.vertexes = [  # clockwise from left; relative to centre
                 muPoint(x, y + geo.half_flat),
                 muPoint(x + geo.z_fraction, y + geo.height_flat),

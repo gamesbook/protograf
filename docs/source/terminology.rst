@@ -341,6 +341,9 @@ Display-orientated Terms
    should **not** be used for display |dash| the rest are displayed as normal
 -  **radii** - if given a value of ``True`` will cause the radii of a
    ``Polygon``or ``Hexagon`` to be shown
+-  *paths* - a list of one or more pairs of *compass directions*, representing
+   two edges of a hexagon shap,e between which a line |dash| straight or an
+   arc |dash| is drawns
 -  **perbis** - if given one or more numbers will cause the perpendicular
    bisectors |dash| lines from centre to the middle of the edges |dash| of
    a ``Polygon`` or ``Hexagon`` to be shown; edges are numbered from the

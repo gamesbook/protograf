@@ -1068,6 +1068,7 @@ customised in a similar way.
 - `Radii: Pointy <hexRadiiPointy_>`_
 - `Perbis: Flat <hexPerbisFlat_>`_
 - `Perbis: Pointy <hexPerbisPointy_>`_
+- `Path: Flat & Pointy <hexPath_>`_
 - `Slices: Flat <hexSlicesFlat_>`_
 - `Slices: Pointy <hexSlicesPointy_>`_
 - `Text: Flat <hexTextFlat_>`_
@@ -1394,10 +1395,76 @@ the mid-points of the edges.
 
       - *common* - all Hexagons drawn with the Common value of ``hxg`` will
         share the same properties; height, font size, dot and orientation
-      - *x* and *y* to set the lower-left position
+      - *x* and *y* to set the upper-left position
       - *perbis* - a compass direction in which the bisector is drawn
         (centre to mid-point)
       - *label* - the text displayed in the centre
+
+===== ======
+
+.. _hexPath:
+
+Path: Flat & Pointy
+-------------------
+`^ <hexagon_>`__
+
+Path lines are drawn between the mid-points of two edges; they can be arcs
+or straight lines depending on which edges they connnect.
+
+.. |pp1| image:: images/custom/hexagon/hex_paths.png
+   :width: 330
+
+===== ======
+|pp1| This example shows Hexagons constructed using these commands:
+
+      .. code:: python
+
+        hxg = Common(
+            height=1.5, font_size=8,
+            dot=0.05, dot_stroke="red")
+
+        Hexagon(
+            common=hxg, x=0.25, y=0.25,
+            orientation="pointy",
+            paths=["ne sw", "e w",  "se nw"])
+        Hexagon(
+            common=hxg, x=0.25, y=2.15,
+            orientation="pointy",
+            paths=["ne e", "e se", "se sw", "sw w", "w nw", "nw ne"],
+            paths_stroke="gold")
+        Hexagon(
+            common=hxg, x=0.25, y=4.1,
+            paths=["sw ne", "se nw", "s n"])
+        Hexagon(
+            common=hxg, x=2.25, y=4.1,
+            paths=["s ne", "se sw", "s nw", "nw ne", "n se", "n sw"],
+            paths_dotted=True)
+        Hexagon(
+            common=hxg, x=2.25, y=2.15,
+            paths=["ne n", "ne se", "se s", "sw s", "sw nw", "nw n"],
+            paths_stroke="gold")
+        Hexagon(
+            common=hxg, x=2.25, y=0.25,
+            orientation="pointy",
+            paths=["ne se", "e sw", "se w", "sw nw", "w ne", "nw e"],
+            paths_dotted=True)
+
+      These have the following properties:
+
+      - *common* - all Hexagons drawn with the Common value of ``hxg`` will
+        share the same properties; height, font size, dot and orientation
+      - *x* and *y* to set the upper-left position
+      - *paths* - a list of one or more pairs of compass directions between
+        which a line |dash| straight or an arc |dash| is drawn
+
+      The Hexagons with normal line styles have connections between opposing
+      edges.
+
+      The Hexagons with gold colored line have connections between adjacent
+      edges.
+
+      The Hexagons with dotteed line styles have connections between edges
+      that are not opposite or adjacent.
 
 ===== ======
 
@@ -1604,12 +1671,24 @@ Example 1. Flat
         hxg = Common(
           height=1.5, orientation="flat", font_size=8)
 
-        Hexagon(common=hxg, x=0.25, y=0.25, borders=('sw', 2, "gold"), label="SW")
-        Hexagon(common=hxg, x=0.25, y=2.15, borders=('nw', 2, "gold"), label="NW")
-        Hexagon(common=hxg, x=0.25, y=4.00, borders=('n', 2, "gold"), label="N")
-        Hexagon(common=hxg, x=2.25, y=4.00, borders=('s', 2, "gold"), label="S")
-        Hexagon(common=hxg, x=2.25, y=0.25, borders=('ne', 2, "gold"), label="NE")
-        Hexagon(common=hxg, x=2.25, y=2.15, borders=('se', 2, "gold"), label="SE")
+        Hexagon(
+            common=hxg, x=0.25, y=0.25,
+            borders=('sw', 2, "gold"), label="SW")
+        Hexagon(
+            common=hxg, x=0.25, y=2.15,
+            borders=('nw', 2, "gold"), label="NW")
+        Hexagon(
+            common=hxg, x=0.25, y=4.00,
+            borders=('n', 2, "gold"), label="N")
+        Hexagon(
+            common=hxg, x=2.25, y=4.00,
+            borders=('s', 2, "gold"), label="S")
+        Hexagon(
+            common=hxg, x=2.25, y=0.25,
+            borders=('ne', 2, "gold"), label="NE")
+        Hexagon(
+            common=hxg, x=2.25, y=2.15,
+            borders=('se', 2, "gold"), label="SE")
 
       Each Hexagon has a normal *stroke_width* as its outline, with a
       default *fill* and *stroke* color of black.
@@ -1633,12 +1712,25 @@ Example 2. Pointy
         hxg = Common(
           height=1.5, orientation="pointy", font_size=8)
 
-        Hexagon(common=hxg, x=0.25, y=0.25, borders=('sw', 2, "gold"), label="SW")
-        Hexagon(common=hxg, x=0.25, y=2.15, borders=('nw', 2, "gold"), label="NW")
-        Hexagon(common=hxg, x=0.25, y=4.00, borders=('w', 2, "gold"), label="W")
-        Hexagon(common=hxg, x=2.25, y=4.00, borders=('e', 2, "gold"), label="E")
-        Hexagon(common=hxg, x=2.25, y=0.25, borders=('ne', 2, "gold"), label="NE")
-        Hexagon(common=hxg, x=2.25, y=2.15, borders=('se', 2, "gold"), label="SE")
+        Hexagon(
+            common=hxg, x=2.25, y=4.00,
+            common=hxg, x=0.25, y=0.25,
+            borders=('sw', 2, "gold"), label="SW")
+        Hexagon(
+            common=hxg, x=0.25, y=2.15,
+            borders=('nw', 2, "gold"), label="NW")
+        Hexagon(
+            common=hxg, x=0.25, y=4.00,
+            borders=('w', 2, "gold"), label="W")
+        Hexagon(
+            common=hxg, x=2.25, y=4.00,
+            borders=('e', 2, "gold"), label="E")
+        Hexagon(
+            common=hxg, x=2.25, y=0.25,
+            borders=('ne', 2, "gold"), label="NE")
+        Hexagon(
+            common=hxg, x=2.25, y=2.15,
+            borders=('se', 2, "gold"), label="SE")
 
       Each Hexagon has a normal *stroke_width* as its outline, with a
       default *fill* and *stroke* color of black.
@@ -1786,7 +1878,8 @@ of a Circle towards its circumference.
                radii_stroke="red")
 
         Circle(cx=3, cy=5, radius=1,
-               fill="green", stroke="orange", stroke_width=1,
+               fill="green",
+               sstroke="orange", stroke_width=1,
                radii=[0,90,180,270,45,135,225,315],
                radii_stroke_width=8,
                radii_stroke="orange",
