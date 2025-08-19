@@ -126,11 +126,11 @@ Example 1. Dotted, Dashed and Angled Lines
         Line(
             x=1, y=1.5, stroke_width=10,
             length=2, stroke="aqua",
-            rounded=True)
+            stroke_ends="rounded")
         Line(
             x=1, y=2, stroke_width=10,
             length=2, stroke="gold",
-            squared=True)
+            stroke_ends="squared")
 
         # thin colored lines
         Line(
@@ -178,11 +178,11 @@ Example 1. Dotted, Dashed and Angled Lines
 
       The thick aqua line has:
 
-      - *rounded* set to ``True`` so circles are drawn at line end centres
+      - *stroke_ends* set to ``rounded`` so circles are drawn at line ends centres
 
       The thick gold line has:
 
-      - *squared* set to ``True`` so squares are drawn at line end centres
+      - *stroke_ends* set to ``squared`` so squares are drawn at line end centres
 
       The dark blue line has:
 

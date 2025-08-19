@@ -313,8 +313,11 @@ Styling-orientated Terms
    the dash; the second is the length of the space between two dashes |dash|
    note that sizes will be rounded to the nearest whole point value; so ``2cm``
    which is equivalent to ``56.693`` points will be changed to ``57`` points
--  **rounded** - causes the end of a line to be drawn with a semi-circle; to
-   make a line rounded, simply use ``rounded=True``
+-  **_ends** - this is part of a line property e.g. *stroke_ends* that changes
+   the style of the line ends; it can be ``rounded`` which causes the ends of
+   a line to be extended with a semi-circle; or ``squared`` which causes the
+   ends of a line to be extened with an extra half-square. (In graphics terms,
+   this can also be termed an *end cap*.)
 -  **transform** - will change text in a ``Text`` command to *uppercase*,
    *lowercase*, or *capitalise* it
 -  **transparency** - a percentage value from 1 to 100 that determines how

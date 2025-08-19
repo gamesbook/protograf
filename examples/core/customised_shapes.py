@@ -336,8 +336,8 @@ Line(x=2, y=0.5, stroke_width=0.8, dotted=True, label="0.8", font_size=6)
 Line(x=3, y=0.5, stroke_width=1.6, dotted=True, label="1.6", font_size=6)
 
 Line(x=1, y=1, length=2, stroke="chartreuse", stroke_width=10)
-Line(x=1, y=1.5, length=2, stroke="aqua", stroke_width=10, rounded=True)
-Line(x=1, y=2, length=2, stroke="gold", stroke_width=10, squared=True)
+Line(x=1, y=1.5, length=2, stroke="aqua", stroke_width=10, stroke_ends="rounded")
+Line(x=1, y=2, length=2, stroke="gold", stroke_width=10, stroke_ends="squared")
 
 Line(x=0, y=2.5, length=4, stroke="pink", stroke_width=2)
 Line(x=0, y=3.6, length=4.1, angle=15, stroke="red", label="15", font_size=6)

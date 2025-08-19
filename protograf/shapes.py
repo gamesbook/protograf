@@ -491,7 +491,7 @@ class CircleShape(BaseShape):
             index=ID,
             stroke=self.hatch_stroke,
             stroke_width=self.hatch_stroke_width,
-            stroke_cap=self.hatch_cap,
+            stroke_ends=self.hatch_ends,
             dashed=self.hatch_dashed,
             dotted=self.hatch_dots,
             rotation=rotation,
@@ -574,6 +574,7 @@ class CircleShape(BaseShape):
                     index=ID,
                     stroke=_radii_stroke,
                     stroke_width=self.radii_stroke_width,
+                    stroke_ends=self.radii_ends,
                     dashed=self.radii_dashed,
                     dotted=self.radii_dotted,
                 )
@@ -687,6 +688,7 @@ class CircleShape(BaseShape):
                 fill=self.petals_fill,
                 stroke=self.petals_stroke,
                 stroke_width=self.petals_stroke_width,
+                stroke_ends=self.petals_ends,
                 dashed=self.petals_dashed,
                 dotted=self.petals_dotted,
             )
@@ -907,6 +909,7 @@ class CompassShape(BaseShape):
         keys = {}
         keys["stroke"] = self.radii_stroke
         keys["stroke_width"] = self.radii_stroke_width
+        keys["stroke_ends"] = self.radii_ends
         keys["dashed"] = self.radii_dashed
         keys["dotted"] = self.radii_dotted
         self.set_canvas_props(cnv=cnv, index=ID, **keys)
@@ -1211,7 +1214,7 @@ class EquilateralTriangleShape(BaseShape):
             index=ID,
             stroke=self.hatch_stroke,
             stroke_width=self.hatch_stroke_width,
-            stroke_cap=self.hatch_cap,
+            stroke_ends=self.hatch_ends,
             dashed=self.hatch_dashed,
             dotted=self.hatch_dots,
             rotation=rotation,
@@ -1600,7 +1603,7 @@ class HexShape(BaseShape):
             index=ID,
             stroke=self.hatch_stroke,
             stroke_width=self.hatch_stroke_width,
-            stroke_cap=self.hatch_cap,
+            stroke_ends=self.hatch_ends,
             dashed=self.hatch_dashed,
             dotted=self.hatch_dots,
         )
@@ -1611,7 +1614,7 @@ class HexShape(BaseShape):
             index=ID,
             stroke=self.link_stroke,
             stroke_width=self.link_width,
-            stroke_cap=self.link_cap,
+            stroke_ends=self.link_ends,
         )
         _links = links.split(",")
         for _link in _links:
@@ -1827,7 +1830,7 @@ class HexShape(BaseShape):
             fill=None,
             stroke=self.paths_stroke or self.stroke,
             stroke_width=self.paths_stroke_width or self.stroke_width,
-            stroke_cap=self.paths_cap or self.line_cap,
+            stroke_ends=self.paths_ends,
             dashed=self.paths_dashed,
             dotted=self.paths_dotted,
         )
@@ -1923,6 +1926,7 @@ class HexShape(BaseShape):
             index=ID,
             stroke=self.perbis_stroke,
             stroke_width=self.perbis_stroke_width,
+            stroke_ends=self.perbis_ends,
             dashed=self.perbis_dashed,
             dotted=self.perbis_dotted,
         )
@@ -1963,7 +1967,7 @@ class HexShape(BaseShape):
             index=ID,
             stroke=self.radii_stroke or self.stroke,
             stroke_width=self.radii_stroke_width or self.stroke_width,
-            stroke_cap=self.radii_cap or self.line_cap,
+            stroke_ends=self.radii_ends,
         )
 
     def draw_slices(self, cnv, ID, vertexes, centre: tuple, rotation=0):
@@ -2000,6 +2004,7 @@ class HexShape(BaseShape):
             self.set_canvas_props(
                 index=ID,
                 stroke=self.slices_stroke or slices_colors[sid],
+                stroke_ends=self.slices_ends,
                 fill=slices_colors[sid],
                 closed=True,
                 rotation=rotation,
@@ -2318,6 +2323,7 @@ class HexShape(BaseShape):
         else:
             kwargs["fill"] = kwargs.get("fill", self.fill)
             kwargs["stroke"] = kwargs.get("stroke", self.stroke)
+            kwargs["stroke_ends"] = kwargs.get("stroke_ends", self.stroke_ends)
             if self.draw_polyline_props(cnv, self.vertexes, **kwargs):
                 kwargs["closed"] = True
                 self.set_canvas_props(cnv=cnv, index=ID, **kwargs)
@@ -2556,7 +2562,8 @@ class PolygonShape(BaseShape):
             index=ID,
             stroke=self.mesh_stroke or self.stroke,
             stroke_width=self.mesh_stroke_width or self.stroke_width,
-            stroke_cap=self.mesh_cap or self.line_cap)
+            stroke_ends=self.mesh_ends,
+        )
         """
 
     def get_centre(self) -> Point:
@@ -2643,6 +2650,7 @@ class PolygonShape(BaseShape):
             index=ID,
             stroke=self.perbis_stroke,
             stroke_width=self.perbis_stroke_width,
+            stroke_ends=self.perbis_ends,
             dashed=self.perbis_dashed,
             dotted=self.perbis_dotted,
         )
@@ -2911,8 +2919,6 @@ class PolylineShape(BaseShape):
             cnv.draw_polyline(self.vertexes)
             kwargs["closed"] = False
             kwargs["fill"] = None
-            if kwargs.get("rounded"):
-                kwargs["lineJoin"] = 1
             self.set_canvas_props(cnv=cnv, index=ID, **kwargs)
         # ---- arrowhead
         if (
@@ -3231,6 +3237,7 @@ class RectangleShape(BaseShape):
             self.set_canvas_props(
                 index=ID,
                 stroke=self.slices_stroke or slices_colors[0],
+                stroke_ends=self.slices_ends,
                 fill=slices_colors[0],
                 closed=True,
                 rotation=rotation,
@@ -3242,6 +3249,7 @@ class RectangleShape(BaseShape):
             self.set_canvas_props(
                 index=ID,
                 stroke=self.slices_stroke or slices_colors[1],
+                stroke_ends=self.slices_ends,
                 fill=slices_colors[1],
                 closed=True,
                 rotation=rotation,
@@ -3278,6 +3286,7 @@ class RectangleShape(BaseShape):
                 self.set_canvas_props(
                     index=ID,
                     stroke=self.slices_stroke or slices_colors[key],
+                    stroke_ends=self.slices_ends,
                     fill=slices_colors[key],
                     closed=True,
                     rotation=rotation,
@@ -3395,7 +3404,7 @@ class RectangleShape(BaseShape):
             index=ID,
             stroke=self.hatch_stroke,
             stroke_width=self.hatch_stroke_width,
-            stroke_cap=self.hatch_cap,
+            stroke_ends=self.hatch_ends,
             dashed=self.hatch_dashed,
             dotted=self.hatch_dots,
             rotation=rotation,
@@ -3801,6 +3810,7 @@ class RectangleShape(BaseShape):
             gargs = {}
             gargs["stroke"] = self.grid_marks_stroke
             gargs["stroke_width"] = self.grid_marks_stroke_width
+            gargs["stroke_ends"] = self.grid_marks_ends
             gargs["dotted"] = self.grid_marks_dotted
             self.set_canvas_props(cnv=None, index=ID, **gargs)
 
@@ -3909,7 +3919,7 @@ class RhombusShape(BaseShape):
             index=ID,
             stroke=self.hatch_stroke,
             stroke_width=self.hatch_stroke_width,
-            stroke_cap=self.hatch_cap,
+            stroke_ends=self.hatch_ends,
             dashed=self.hatch_dashed,
             dotted=self.hatch_dots,
             rotation=rotation,
@@ -3950,6 +3960,7 @@ class RhombusShape(BaseShape):
             self.set_canvas_props(
                 index=ID,
                 stroke=self.slices_stroke or slices_colors[0],
+                stroke_ends=self.slices_ends,
                 fill=slices_colors[0],
                 closed=True,
                 rotation=rotation,
@@ -3961,6 +3972,7 @@ class RhombusShape(BaseShape):
             self.set_canvas_props(
                 index=ID,
                 stroke=self.slices_stroke or slices_colors[1],
+                stroke_ends=self.slices_ends,
                 fill=slices_colors[1],
                 closed=True,
                 rotation=rotation,
@@ -3974,6 +3986,7 @@ class RhombusShape(BaseShape):
             self.set_canvas_props(
                 index=ID,
                 stroke=self.slices_stroke or slices_colors[0],
+                stroke_ends=self.slices_ends,
                 fill=slices_colors[0],
                 closed=True,
                 rotation=rotation,
@@ -3985,6 +3998,7 @@ class RhombusShape(BaseShape):
             self.set_canvas_props(
                 index=ID,
                 stroke=self.slices_stroke or slices_colors[1],
+                stroke_ends=self.slices_ends,
                 fill=slices_colors[1],
                 closed=True,
                 rotation=rotation,
@@ -4005,6 +4019,7 @@ class RhombusShape(BaseShape):
                 self.set_canvas_props(
                     index=ID,
                     stroke=self.slices_stroke or slices_colors[key],
+                    stroke_ends=self.slices_ends,
                     fill=slices_colors[key],
                     closed=True,
                     rotation=rotation,

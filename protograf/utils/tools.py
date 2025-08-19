@@ -1329,20 +1329,31 @@ def get_pymupdf_props(
             _transparency = _transparency / 100.0
         opacity = 1 - _transparency
     stroke_width = kwargs.get("stroke_width", None)
-    # stroke_cap = 1 if kwargs.get("stroke_cap", False) else 0  # rounded end line
-    stroke_cap = 0
-    if kwargs.get("rounded", False):
-        stroke_cap = 1  # rounded end line
-    if kwargs.get("squared", False):
-        stroke_cap = 2  # semi-square; edge length of line width & center at line end
-    dotted = kwargs.get("dotted", None)
-    dashed = kwargs.get("dashed", None)
+    # ---- set line end style
+    stroke_cap = 0  # default is "sharp"
+    line_join = kwargs.get("lineJoin", 0)  # default is "sharp"
+    # print(f"^^^ color: {stroke}", kwargs.get("stroke_ends", None))
+    if kwargs.get("stroke_ends", None):  # shape centered at end-of-line
+        ends = _lower(kwargs.get("stroke_ends"))
+        if ends in ["rounded", "r", "round"]:
+            stroke_cap = 1  # circle; diameter equal to line width
+            line_join = 1  # rounded
+        elif ends in ["squared", "s", "square"]:
+            stroke_cap = 2  # square; side equal to line width
+            line_join = 2  # butt; cut-off edge
+        else:
+            feedback(
+                f'The ends value "{kwargs.get("stroke_ends")}" is not valid.', True
+            )
+    # ---- set rotation
     _rotation = kwargs.get("rotation", None)  # calling Shape must set a tuple!
     _rotation_point = kwargs.get(
         "rotation_point", None
     )  # calling Shape must set a tuple!
     closed = kwargs.get("closed", False)  # whether to connect last and first points
     # ---- set line dots / dashed
+    dotted = kwargs.get("dotted", None)
+    dashed = kwargs.get("dashed", None)
     _dotted = ext(dotted) or ext(defaults.get("dotted"))
     _dashed = ext(dashed) or ext(defaults.get("dashed"))
     if _dotted:
@@ -1366,7 +1377,6 @@ def get_pymupdf_props(
     else:
         dashes = None
     # print(f"### SCP{_dotted =} {_dashed=} {dashes=}")
-    _line_join = kwargs.get("lineJoin", 0)  # set via rounded=True in PolylineShape
     # ---- check rotation
     morph = None
     # print(f'^^^ SCP {_rotation_point=} {_rotation}')
@@ -1394,8 +1404,8 @@ def get_pymupdf_props(
         width=_width,
         color=_color,
         fill=_fill,
-        lineCap=stroke_cap or 0,  # or self.stroke_cap,  # FIXME
-        lineJoin=_line_join,
+        lineCap=stroke_cap or 0,
+        lineJoin=line_join,
         dashes=dashes,
         fill_opacity=opacity,
         morph=morph,
@@ -1415,6 +1425,7 @@ def set_canvas_props(
     cnv = cnv if cnv else globals.canvas
     defaults = defaults if defaults else {}
     pymu_props = get_pymupdf_props(defaults=defaults, index=index, **kwargs)
+    # print(f"^^^ pymuProps: {pymu_props}")
     if pymu_props:
         cnv.finish(
             width=pymu_props.width,
