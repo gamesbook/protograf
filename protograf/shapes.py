@@ -66,6 +66,44 @@ def set_cached_dir(source):
     return None
 
 
+def draw_line(
+    cnv=None, start: Point = None, end: Point = None, shape: BaseShape = None, **kwargs
+) -> bool:
+    """Draw a line on the canvas (Page) between two points for a Shape.
+
+    Returns:
+        True if line has a pattern
+    """
+    if start and end and cnv:
+        if kwargs.get("wave_height"):
+            _height = tools.as_float(kwargs.get("wave_height", 0.5), "wave_height")
+            try:
+                if _lower(kwargs.get("wave_style", "w")) in ["w", "wave", "squiggle"]:
+                    cnv.draw_squiggle(start, end, tools.unit(_height))
+                    return True
+                elif _lower(kwargs.get("wave_style", "w")) in [
+                    "s",
+                    "sawtooth",
+                    "zigzag",
+                    "z",
+                ]:
+                    cnv.draw_zigzag(start, end, tools.unit(_height))
+                    return True
+                else:
+                    feedback(
+                        f'Unable to handle wave_style {kwargs.get("wave_style")}.', True
+                    )
+            except ValueError:
+                feedback(
+                    f'The height of {kwargs.get("wave_height")} is too large'
+                    " to allow the line pattern to be drawn.",
+                    True,
+                )
+        else:
+            cnv.draw_line(start, end)
+            return False
+
+
 class ImageShape(BaseShape):
     """
     Image (bitmap or SVG) on a given canvas.
@@ -2469,7 +2507,9 @@ class LineShape(BaseShape):
                     f'Cannot calculate rotation point "{self.rotation_point}"', True
                 )
         # ---- draw line
-        cnv.draw_line(Point(x, y), Point(x_1, y_1))
+        pattern = draw_line(cnv, Point(x, y), Point(x_1, y_1), shape=self, **kwargs)
+        if pattern:
+            kwargs["fill"] = None
         self.set_canvas_props(cnv=cnv, index=ID, **kwargs)  # shape.finish()
         # ---- dot
         self.draw_dot(cnv, (x_1 + x) / 2.0, (y_1 + y) / 2.0)

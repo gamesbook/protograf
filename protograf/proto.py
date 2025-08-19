@@ -2950,6 +2950,8 @@ def Line(row=None, col=None, **kwargs):
       with *angle* (which defaults to 0 |deg|)
     - x1 and y1 (floats): a fixed endpoint for the line end (if not calculated by
       *angle* and *length*)
+    - wave_style (str):  either wave or sawtooth
+    - wave_height (float): the height of each peak
 
     Arrow-related Kwargs:
 

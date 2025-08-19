@@ -134,7 +134,7 @@ Example 1. Dotted, Dashed and Angled Lines
 
         # thin colored lines
         Line(
-            x=0, y=4.5, x1=4, y1=5.5,
+            x=0, y=5, x1=4, y1=5.9,
             stroke="blue", stroke_width=1,
             dashed=[0.2, 0.1],
             label="dashed:[0.2,0.1]", font_size=6)
@@ -147,6 +147,16 @@ Example 1. Dotted, Dashed and Angled Lines
             x=0, y=2.5, length=4,
             stroke="pink", stroke_width=2)
 
+        Line(
+            x=0, y=4, x1=4, y1=4,
+            stroke="purple", stroke_width=1,
+            wave_style='wave', wave_height=1.9)
+
+        Line(
+            x=0, y=4, x1=4, y1=4,
+            stroke="firebrick", stroke_width=1,
+            wave_style='sawtooth', wave_height=0.1)
+
 
       The various black lines have these properties:
 
@@ -158,7 +168,7 @@ Example 1. Dotted, Dashed and Angled Lines
       The dotted line is just a series of small lines i.e. all of the "dots",
       followed by gaps, are of sizes equal to the line's *stroke_width*.
 
-      The thin red line has:
+      The thin, bright red line has:
 
       - *angle* - of ``15`` |deg| from the baseline, clockwise
 
@@ -167,7 +177,7 @@ Example 1. Dotted, Dashed and Angled Lines
       will be 0 |deg|. The line length is then calculated based on these
       points.
 
-      The green, gold, pink, red and aqua lines all have:
+      The green, gold, pink, bright red and aqua lines all have:
 
       - *x* and *y* set as their starting point
       - *length* - sets the specific size of the line
@@ -191,6 +201,16 @@ Example 1. Dotted, Dashed and Angled Lines
 
       Dashes are a list of two numbers. The first is the length of the dash;
       the second is the length of the space between each dash.
+
+      The purple line has:
+
+      - *wave_style*  set to ``'wave'`` creating a wave-like effect
+      - *wave_height* set to ``1.9`` for the height of each "peak"
+
+      The dark red line has:
+
+      - *wave_style*  set to ``'sawtooth'`` creating a "zig-zag" effect
+      - *wave_height* set to ``0.1`` for the height of each "peak"
 
 ===== ======
 

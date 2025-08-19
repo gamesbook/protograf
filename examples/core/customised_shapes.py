@@ -341,8 +341,13 @@ Line(x=1, y=2, length=2, stroke="gold", stroke_width=10, stroke_ends="squared")
 
 Line(x=0, y=2.5, length=4, stroke="pink", stroke_width=2)
 Line(x=0, y=3.6, length=4.1, angle=15, stroke="red", label="15", font_size=6)
-Line(x=0, y=4.5, x1=4, y1=5.5, stroke="blue", stroke_width=1,
+Line(x=0, y=5, x1=4, y1=5.9, stroke="blue", stroke_width=1,
      dashed=[0.2, 0.1], label="dashed:[0.2,0.1]", font_size=6)
+
+Line(x=0, y=4, x1=4, y1=4, stroke="purple", stroke_width=1,
+     wave_style='wave', wave_height=1.9)
+Line(x=0, y=4, x1=4, y1=4, stroke="firebrick", stroke_width=1,
+     wave_style='sawtooth', wave_height=0.1)
 PageBreak()
 
 # ---- center line from angle
