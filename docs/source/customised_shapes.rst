@@ -2113,8 +2113,24 @@ Slices
 ------
 `^ <circleIndex_>`_
 
-The slices command enables the Circle to be filled with
-colored pie-shaped wedges.
+The slices command enables the Circle to be filled with colored pie-shaped
+wedges.
+
+These are relevant properties that can be set:
+
+- *slices* - this is a list of colors (named or hexadecimal); if ``None`` is
+  used then no slice will be drawn in that position
+- *slices_fractions* - this is the "length" of the slices; if not specified,
+  then by default all slices will have their fraction set to ``1`` meaning they
+  are equal to the radius of the circle |dash| values smaller than ``1`` will
+  result in them being drawn inside the circle and values larger than ``1``
+  will  result in them extending outside of the circle
+- *slices_angles* - this is the "width" of the slices; if not specified,
+  then by default all slices will be of equally-sized angles and will occupy
+  the full circumference of the circle
+
+Both the list of  *slice_fractions*  and  *slice_angles* must be of equal
+length to the  *slice* list.
 
 .. NOTE::
 
@@ -2142,34 +2158,38 @@ colored pie-shaped wedges.
         Circle(cx=3, cy=1, radius=1,
                slices=["black", "grey", "silver"],
                slices_fractions=[0.33, 0.75, 0.5])
-        Circle(cx=1, cy=5, radius=1,
+        Circle(cx=1, cy=5, radius=1, fill="gold",
                slices=["black", None, "grey", "silver"],
-               slices_fractions=[0.33, None, 1, 0.66])
+               slices_fractions=[0.33, None, 1.5, 0.75],
+               slices_angles=[60, 45, 45, 120])
 
       The top-left example shows the minimum required; the *slices* property is
       a list of colors (``[ ]`` with comma-separated color strings).
-
-      This causes **three** slices to be drawn |dash| starting from 0|deg| to the
-      east, and continuing anti-clockwise.
+      This causes **three** slices to be drawn |dash| starting from 0 |deg| to the
+      east, and continuing anti-clockwise.  Each slice is 120 |deg| in width.
 
       The middle example shows what happens when the *slices* property includes
-      the ``None`` value; in this case, no slice is drawn.
+      the ``None`` value; in this case, no slice is drawn between each ``red``
+      slice.  Each slice, including the "blanks" is 60 |deg| in width.
 
       The lower-right example shows what happens when the *rotation* property
       is also set; the slices start position is offset that many degrees
-      anti-clockwise from the  0|deg| position.
+      anti-clockwise from the 0 |deg| (east) position.
 
-      The top-right example show the use of the *slices_fractions* property;
-      this causes the "length" of the pie-slice to be shortened to that fraction
-      of the circle's radius.
+      The top-right example shows the use of the *slices_fractions* property;
+      because values are less than ``1`` this causes the "length" of the
+      pie-slice to be shortened to that fraction of the circle's radius.
 
       The bottom-left example show the use of the *slices_fractions* property
       and what happens when the *slices* property and the matching
       *slices_fractions* property both include the ``None`` value; in this
-      case, no slice is drawn.  A fraction of ```1`` means a normal size slice
-      will be drawn.
+      case, no slice is drawn.  A fraction of ``1.5`` means the slice will
+      extend beyond the circumference of the circle.  This example also
+      shows the use of *slices_angles* to control the width of the slices;
+      in this case they do not occupy the full circumference because the total
+      angles amount is less than 360 |deg|.
 
-      NOTE All slice lines are drawn with the  *slices_stroke* color,
+      **NOTE** All slice lines are drawn with the  *slices_stroke* color,
       which defaults to the slice color itself.
 
 ===== ======

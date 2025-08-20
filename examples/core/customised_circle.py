@@ -154,9 +154,10 @@ Circle(cx=3, cy=5, radius=1,
 Circle(cx=3, cy=1, radius=1,
        slices=["black", "grey", "silver"],
        slices_fractions=[0.33, 0.75, 0.5])
-Circle(cx=1, cy=5, radius=1,
+Circle(cx=1, cy=5, radius=1, fill="gold",
        slices=["black", None, "grey", "silver"],
-       slices_fractions=[0.33, None, 1, 0.66])
+       slices_fractions=[0.33, None, 1.5, 0.75],
+       slices_angles=[60, 45, 45, 120])
 PageBreak()
 
 # ---- END

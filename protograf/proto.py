@@ -2751,6 +2751,15 @@ def Circle(row=None, col=None, **kwargs):
     - radii_labels_size (float): point size of label text
     - radii_labels_stroke (str): the named or hexadecimal color of the label text
     - radii_labels_stroke_width (float): thickness of the label text
+    - slices (list): colors (named or hexadecimal) used to draw pie slices; if
+      None is used then no slice will be drawn in that position
+    - slices_fractions (list): the "length" of the slices; if not specified,
+      then by default all slices will have their fraction set to 1 i.e. equal
+      to the radius of the circle - values smaller than 1 will be drawn inside
+      the circle and values larger than 1 will extend slices outside the circle
+    - slices_angles (list): the "width" of the slices; if not specified,
+      then by default all slices will be of equally-sized angles and occupy
+      the full circumference of the circle
     """
     kwargs = margins(**kwargs)
     circle = CircleShape(canvas=globals.canvas, **kwargs)

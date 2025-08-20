@@ -771,18 +771,36 @@ class CircleShape(BaseShape):
         # ---- validate slices fractions values
         for _frac in _slices_frac:
             _frac = _frac or 1
-            if not isinstance(_frac, (float, int)) or _frac > 1:
-                feedback("The slices_fractions must be a list of fractions.", True)
+            if not isinstance(_frac, (float, int)):
+                feedback("The slices_fractions must be a list of values.", True)
         if len(_slices_frac) != len(_slices):
             feedback(
                 "The number of slices_fractions must match number of colors.", True
             )
+        # ---- get slices_angles list from string
+        if isinstance(self.slices_angles, str):
+            _slices_ang = tools.split(self.slices_angles.strip())
+        else:  # degrees "size" of slice
+            _slices_ang = self.slices_angles or [360.0 / len(_slices) ] * len(_slices)
+        # ---- validate slices anfle values
+        for _frac in _slices_ang:
+            _frac = _frac or 0
+            if not isinstance(_frac, (float, int)):
+                feedback("The slices_angles must be a list of values.", True)
+        if len(_slices_ang) != len(_slices):
+            feedback(
+                "The number of slices_angles must match number of colors.", True
+            )
+        if sum(_slices_ang) > 360.0:
+            feedback(
+                "The sum of the slices_angles cannot exceed 360 (degrees).", True
+            )
         slices_colors = [colrs.get_color(slcolor) for slcolor in _slices]
         # ---- draw sectors
-        slice_angle = 360.0 / len(slices_colors)  # degrees "size" of slice
         angle = 0.0 + rotation
         for idx, _color in enumerate(slices_colors):
             radius_frac = radius * (_slices_frac[idx] or 1)
+            slice_angle = _slices_ang[idx]
             start = geoms.point_on_circle(centre, radius_frac, angle)
             if _color:
                 cnv.draw_sector(centre, start, slice_angle, fullSector=True)

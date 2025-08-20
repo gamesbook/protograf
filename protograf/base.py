@@ -373,6 +373,7 @@ class BaseCanvas:
         # ---- rectangle / rhombus / hexagon / circle
         self.slices = self.defaults.get("slices", [])
         self.slices_fractions = self.defaults.get("slices_fractions", [])
+        self.slices_angles = self.defaults.get("slices_angles", [])
         self.slices_line = self.defaults.get("slices_line", 0)
         self.slices_line_mx = self.defaults.get("slices_line_mx", 0)
         self.slices_line_my = self.defaults.get("slices_line_my", 0)
@@ -844,9 +845,10 @@ class BaseShape:
         self.peaks_dict = {}
         self.borders = kwargs.get("borders", base.borders)
         self.rounded_radius = base.rounded_radius
-        # ---- rectangle / rhombus/ hexagon
+        # ---- rectangle / rhombus/ hexagon / circle
         self.slices = kwargs.get("slices", base.slices)
         self.slices_fractions = kwargs.get("slices_fractions", base.slices_fractions)
+        self.slices_angles = kwargs.get("slices_angles", base.slices_angles)
         self.slices_line = kwargs.get("slices_line", base.slices_line)
         self.slices_line_mx = kwargs.get("slices_line_mx", base.slices_line_mx)
         self.slices_line_my = kwargs.get("slices_line_my", base.slices_line_my)
