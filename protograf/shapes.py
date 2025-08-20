@@ -743,6 +743,59 @@ class CircleShape(BaseShape):
                 dotted=None,
             )
 
+    def draw_slices(
+        self, cnv, ID: int, centre: Point, radius: float, rotation: float = 0
+    ):
+        """Draw pie-shaped slices inside the Circle
+
+        Args:
+            ID: unique ID
+            centre: Point at centre of circle
+            radius: length of circle's radius
+            rotation: degrees anti-clockwise from horizontal "east"
+
+        """
+        # ---- get slices color list from string
+        if isinstance(self.slices, str):
+            _slices = tools.split(self.slices.strip())
+        else:
+            _slices = self.slices
+        # ---- validate slices color settings
+        if not isinstance(_slices, list):
+            feedback("Slices must be a list of colors", True)
+        # ---- get slices fractions list from string
+        if isinstance(self.slices_fractions, str):
+            _slices_frac = tools.split(self.slices_fractions.strip())
+        else:
+            _slices_frac = self.slices_fractions or [1] * len(_slices)
+        # ---- validate slices fractions values
+        for _frac in _slices_frac:
+            _frac = _frac or 1
+            if not isinstance(_frac, (float, int)) or _frac > 1:
+                feedback("The slices_fractions must be a list of fractions.", True)
+        if len(_slices_frac) != len(_slices):
+            feedback(
+                "The number of slices_fractions must match number of colors.", True
+            )
+        slices_colors = [colrs.get_color(slcolor) for slcolor in _slices]
+        # ---- draw sectors
+        slice_angle = 360.0 / len(slices_colors)  # degrees "size" of slice
+        angle = 0.0 + rotation
+        for idx, _color in enumerate(slices_colors):
+            radius_frac = radius * (_slices_frac[idx] or 1)
+            start = geoms.point_on_circle(centre, radius_frac, angle)
+            if _color:
+                cnv.draw_sector(centre, start, slice_angle, fullSector=True)
+                self.set_canvas_props(
+                    index=ID,
+                    fill=_color,
+                    stroke=_color,
+                    stroke_width=0.001,
+                    dashed=None,
+                    dotted=None,
+                )
+            angle += slice_angle
+
     def draw(self, cnv=None, off_x=0, off_y=0, ID=None, **kwargs):
         """Draw circle on a given canvas."""
         kwargs = self.kwargs | kwargs
@@ -798,8 +851,10 @@ class CircleShape(BaseShape):
         rotation = kwargs.get("rotation", self.rotation)
         if rotation:
             self.centroid = muPoint(x, y)
-            kwargs["rotation"] = rotation
+            kwargs["rotation"] = tools.as_float(rotation, "rotation")
             kwargs["rotation_point"] = self.centroid
+        else:
+            kwargs["rotation"] = 0
         # ---- draw petals
         if self.petals:
             self.draw_petals(cnv, ID, self.x_c, self.y_c)
@@ -844,10 +899,24 @@ class CircleShape(BaseShape):
             gargs["dotted"] = self.grid_marks_dotted
             self.set_canvas_props(cnv=None, index=ID, **gargs)
 
+        # ---- draw slices
+        if self.slices:
+            self.draw_slices(
+                cnv,
+                ID,
+                Point(self.x_c, self.y_c),
+                self._u.radius,
+                rotation=kwargs["rotation"],
+            )
         # ---- draw hatch
         if self.hatch_count:
             self.draw_hatch(
-                cnv, ID, self.hatch_count, self.x_c, self.y_c, rotation=rotation
+                cnv,
+                ID,
+                self.hatch_count,
+                self.x_c,
+                self.y_c,
+                rotation=kwargs["rotation"],
             )
         # ---- draw radii
         if self.radii:

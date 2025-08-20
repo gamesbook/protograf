@@ -894,7 +894,7 @@ Slices
 ------
 `^ <rectangleIndex_>`_
 
-The slices-related command enables the rectangle to be filled with
+The slices-related command enables the Rectangle to be filled with
 colored triangular or quadilateral shapes.
 
 .. NOTE::
@@ -1776,6 +1776,7 @@ ways that it can be customised.
 - `Radii Labels <circleRadiiLabels_>`_
 - `Petals: petal <circlePetalsPetal_>`_
 - `Petals: triangle <circlePetalsTriangle_>`_
+- `Slices <circleSlices_>`_
 
 .. _circleCross:
 
@@ -2102,6 +2103,74 @@ effect.
 
       Note that these petals have a default *petals_style* of
       ``t`` or ``triangle``.
+
+===== ======
+
+
+.. _circleSlices:
+
+Slices
+------
+`^ <circleIndex_>`_
+
+The slices command enables the Circle to be filled with
+colored pie-shaped wedges.
+
+.. NOTE::
+
+    Slices are drawn **after** the circle has been drawn, and so
+    may obscure the stroke outline and fill color of the circle.
+
+.. |cs1| image:: images/custom/circle/circle_slices.png
+   :width: 330
+
+===== ======
+|cs1| This example shows Circles constructed using the commands:
+
+      .. code:: python
+
+        Circle(cx=1, cy=1, radius=1,
+               slices=["red", "gold", "aqua"],
+               dot=0.05)
+        Circle(cx=2, cy=3, radius=1,
+               slices=["red", None, "red", None, "red", None],
+               dot=0.05)
+        Circle(cx=3, cy=5, radius=1,
+               slices=["red", "gold", "aqua", "red", "gold", "aqua"],
+               rotation=30,
+               dot=0.05)
+        Circle(cx=3, cy=1, radius=1,
+               slices=["black", "grey", "silver"],
+               slices_fractions=[0.33, 0.75, 0.5])
+        Circle(cx=1, cy=5, radius=1,
+               slices=["black", None, "grey", "silver"],
+               slices_fractions=[0.33, None, 1, 0.66])
+
+      The top-left example shows the minimum required; the *slices* property is
+      a list of colors (``[ ]`` with comma-separated color strings).
+
+      This causes **three** slices to be drawn |dash| starting from 0|deg| to the
+      east, and continuing anti-clockwise.
+
+      The middle example shows what happens when the *slices* property includes
+      the ``None`` value; in this case, no slice is drawn.
+
+      The lower-right example shows what happens when the *rotation* property
+      is also set; the slices start position is offset that many degrees
+      anti-clockwise from the  0|deg| position.
+
+      The top-right example show the use of the *slices_fractions* property;
+      this causes the "length" of the pie-slice to be shortened to that fraction
+      of the circle's radius.
+
+      The bottom-left example show the use of the *slices_fractions* property
+      and what happens when the *slices* property and the matching
+      *slices_fractions* property both include the ``None`` value; in this
+      case, no slice is drawn.  A fraction of ```1`` means a normal size slice
+      will be drawn.
+
+      NOTE All slice lines are drawn with the  *slices_stroke* color,
+      which defaults to the slice color itself.
 
 ===== ======
 

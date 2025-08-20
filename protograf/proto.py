@@ -581,6 +581,14 @@ class DeckOfCards:
             the_height, the_width = size[1] / globals.units, size[0] / globals.units
         self.height = kwargs.get("height", the_height)  # OVERWRITE
         self.width = kwargs.get("width", the_width)  # OVERWRITE
+        if self.height > (
+            globals.page_height - globals.margins.top - globals.margins.bottom
+        ):
+            feedback("Card height cannot exceed available page space.", True)
+        if self.width > (
+            globals.page_width - globals.margins.left - globals.margins.right
+        ):
+            feedback("Card width cannot exceed available page space.", True)
         # print(f'$$$ {size=}, {self.width=}, {self.height}')
         self.kwargs["width"] = self.width  # used for create_cardshapes()
         self.kwargs["height"] = self.height  # used for create_cardshapes()

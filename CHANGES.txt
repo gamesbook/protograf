@@ -6,7 +6,8 @@ protograf Changes
 - Add Meridians board example
 - Add paths property for Hexagon shape
 - Add _ends property for line style (replaces squared line ends)
-- Add wave_style property for Line
+- Add wave_style property to Line
+- Add slices property to Circle
 
 2025-08-08 (0.2.14)
 -------------------

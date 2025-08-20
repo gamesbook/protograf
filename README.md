@@ -2,8 +2,8 @@
 
 ![protograf](logo.png "protograf logo")
 
-__protograf__ is a utility written in Python for designing and creating
-simple, regular, graphical outputs in PDF (or PNG/GIF/SVG) format via a script.
+__protograf__ is a utility written in Python for creating simple, regular,
+graphical designs in PDF (or PNG/GIF/SVG) format via a script.
 
 __protograf__  has been primarily created to handle the prototyping of cards,
 counters, tiles and boards for board games, including hexagonal grids, but can
@@ -98,7 +98,7 @@ Please see the [list of contributors](CONTRIBUTORS.txt).
 ## :game_die: Potential Features
 
 These features are **not** guaranteed to be implemented; they just represent
-current / potential areas of work or idea development.
+current / potential areas of work or ideas.
 
 * [ ] New Shapes:
     * [ ] Diamond shape
@@ -107,24 +107,24 @@ current / potential areas of work or idea development.
     * [ ] Pod shape
 * [ ] Common objects:
     * [ ] CompassRose (replace Compass Shape)
-    * [ ] Cube (Rhombus composite; "3D")
-    * [ ] Domino (DotGrid inside Rectangle outline)
-    * [ ] Die (Rectangle with DotGrid)
+    * [x] Cube
+    * [ ] Domino
+    * [x] Die
     * [ ] Meeple (Polyshape with Arcs)
+    * [x] Pentomino
     * [ ] Picture Frame (Trapezoid composite)
 * [ ] Hexagons: 18xx tile example (requires `Arcs` below!)
-* [ ] Hexagon Grid: better hexhex creation with notations
+* [ ] HexHex Grid: better hexhex creation with notations
 * [ ] Polyline: define arcs along the path
-* [ ] Arcs (pathways) inside a hexagon (**in progress**)
+* [x] Paths (arcs) inside a Hexagon
 * [ ] Shortcut notation for styling of a Shape
 * [ ] Stripes: interior "areas" for a Rectangle
 * [ ] Cards:
-    * [ ] support card-back designs
+    * [x] support card-back designs
     * [ ] grid lines for hexagonal cards
-    * [ ] multiple custom bleed areas
     * [x] access to Google Sheets
     * [x] extract rectangular cards as PNG files
-    * [ ] page annotations
+    * [x] page annotations
 * [ ] Color:
     * [ ] add support for CYMK
 
@@ -154,6 +154,9 @@ Earlier versions of  __protograf__  used the *ReportLab PDF Toolkit*, which is
 also a very powerful library for supporting this type of application. Internal
 terminology, such as `shapes`, was developed before the adoption of *pyMuPDF*
 and it is coincidental that these are similar!
+
+Users on  [BoardGameGeek](https://boardgamegeek.com) have provided invaluable
+feedback and suggestions!
 
 ### :books: Additional Libraries
 
