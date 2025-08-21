@@ -490,7 +490,7 @@ class BaseCanvas:
         self.link_ends = self.defaults.get("link_ends", self.line_ends)
         self.shades = self.defaults.get("shades", [])
         self.shades_stroke = self.defaults.get("shades_stroke", None)
-        self.shades_stroke_width = self.defaults.get("shades_stroke", None)
+        self.shades_stroke_width = self.defaults.get("shades_stroke_width", None)
         self.paths = self.defaults.get("paths", [])
         self.paths_stroke = self.defaults.get("paths_stroke", self.stroke)
         self.paths_stroke_width = self.defaults.get(
@@ -526,6 +526,16 @@ class BaseCanvas:
         self.coord_suffix = self.defaults.get("coord_suffix", "")
         self.coord_style = self.defaults.get("coord_style", "")
         self.hidden = self.defaults.get("hidden", [])
+        self.spikes = self.defaults.get("spikes", [])
+        self.spikes_height = kwargs.get("spikes_height", 0)
+        self.spikes_width = kwargs.get("spikes_width", 0)
+        self.spikes_stroke = self.defaults.get("spikes_stroke", "black")
+        self.spikes_stroke_width = self.defaults.get(
+            "spikes_stroke_width", self.stroke_width
+        )
+        self.spikes_ends = self.defaults.get("spikes_ends", None)
+        self.spikes_dotted = self.defaults.get("spikes_dotted", self.dotted)
+        self.spikes_dashed = self.defaults.get("spikes_dashed", self.dashed)
         # ---- starfield
         self.enclosure = None
         self.colors = ["white"]
@@ -1042,6 +1052,18 @@ class BaseShape:
         self.coord_suffix = kwargs.get("coord_suffix", base.coord_suffix)
         self.coord_style = kwargs.get("coord_style", "")  # linear|diagonal
         self.hidden = kwargs.get("hidden", base.hidden)
+        self.spikes = kwargs.get("spikes", base.spikes)
+        self.spikes_stroke = kwargs.get("spikes_stroke", base.spikes_stroke)
+        self.spikes_stroke_width = self.kw_float(
+            kwargs.get("spikes_stroke_width", base.spikes_stroke_width)
+        )
+        self.spikes_height = self.kw_float(
+            kwargs.get("spikes_height", base.spikes_height)
+        )
+        self.spikes_width = self.kw_float(kwargs.get("spikes_width", base.spikes_width))
+        self.spikes_ends = kwargs.get("spikes_ends", base.spikes_ends)
+        self.spikes_dotted = kwargs.get("spikes_dotted", base.dotted)
+        self.spikes_dashed = kwargs.get("spikes_dashed", self.dashed)
         # ---- starfield
         self.enclosure = kwargs.get("enclosure", base.enclosure)
         self.colors = kwargs.get("colors", base.colors)

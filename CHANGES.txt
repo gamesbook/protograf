@@ -8,6 +8,8 @@ protograf Changes
 - Add _ends property for line style (replaces squared line ends)
 - Add wave_style property to Line
 - Add slices property to Circle
+- Add spikes property for Hexagon shape
+- Patch page color fill error
 
 2025-08-08 (0.2.14)
 -------------------

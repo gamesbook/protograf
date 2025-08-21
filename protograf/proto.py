@@ -1377,7 +1377,7 @@ def Create(**kwargs):
         globals.page = (_page_width_pt, _page_height_pt)
     globals.page_width = globals.page[0] / globals.units  # width in user units
     globals.page_height = globals.page[1] / globals.units  # height in user units
-    globals.fill = colrs.get_color(kwargs.get("fill", "white"))
+    globals.page_fill = colrs.get_color(kwargs.get("fill", "white"))
     globals.page_grid = tools.as_float(kwargs.get("page_grid", 0), "page_grid")
     # ---- fonts
     base_fonts()

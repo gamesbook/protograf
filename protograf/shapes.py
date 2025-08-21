@@ -781,20 +781,16 @@ class CircleShape(BaseShape):
         if isinstance(self.slices_angles, str):
             _slices_ang = tools.split(self.slices_angles.strip())
         else:  # degrees "size" of slice
-            _slices_ang = self.slices_angles or [360.0 / len(_slices) ] * len(_slices)
+            _slices_ang = self.slices_angles or [360.0 / len(_slices)] * len(_slices)
         # ---- validate slices anfle values
         for _frac in _slices_ang:
             _frac = _frac or 0
             if not isinstance(_frac, (float, int)):
                 feedback("The slices_angles must be a list of values.", True)
         if len(_slices_ang) != len(_slices):
-            feedback(
-                "The number of slices_angles must match number of colors.", True
-            )
+            feedback("The number of slices_angles must match number of colors.", True)
         if sum(_slices_ang) > 360.0:
-            feedback(
-                "The sum of the slices_angles cannot exceed 360 (degrees).", True
-            )
+            feedback("The sum of the slices_angles cannot exceed 360 (degrees).", True)
         slices_colors = [colrs.get_color(slcolor) for slcolor in _slices]
         # ---- draw sectors
         angle = 0.0 + rotation
@@ -1647,8 +1643,8 @@ class HexShape(BaseShape):
 
         Args:
             ID: unique ID
-            side: length of a hexagon side
-            vertices: the hexagons's nodes
+            side: length of a Hex side
+            vertices: list of Hex'es nodes as Points
             num: number of lines
             rotation: degrees anti-clockwise from horizontal "east"
         """
@@ -1734,7 +1730,13 @@ class HexShape(BaseShape):
         )
 
     def draw_links(self, cnv, ID, side: float, vertices: list, links: list):
-        """Draw arcs or lines to link two sides of a hexagon."""
+        """Draw arcs or lines to link two sides of a hexagon.
+
+        Args:
+            ID: unique ID
+            side: length of Hex side
+            vertices: list of Hex'es nodes as Points
+        """
         self.set_canvas_props(
             index=ID,
             stroke=self.link_stroke,
@@ -1825,7 +1827,13 @@ class HexShape(BaseShape):
                     raise NotImplementedError(f'Unable to handle hex "{separation=}"')
 
     def draw_paths(self, cnv, ID, centre: Point, vertices: list):
-        """Draw arc(s) connecting Hexagon edge-to-edge."""
+        """Draw arc(s) connecting Hexagon edge-to-edge.
+
+        Args:
+            ID: unique ID
+            vertices: list of Hex'es nodes as Points
+            centre: the centre Point of the Hex
+        """
 
         def arc(centre: Point, start: Point, angle: float):
             cnv.draw_sector(centre, start, angle, fullSector=False)
@@ -1869,7 +1877,7 @@ class HexShape(BaseShape):
             ptF = Point(centre.x - side_plus, centre.y - h_flat)
 
         # ---- calculate centres of sides
-        _, perbis_pts = self.calculate_perbises(centre, vertices)
+        _, perbis_pts = self.calculate_perbises(centre=centre, vertices=vertices)
 
         for item in self.paths:
             dir_pair = tools.validated_directions(item, dir_group, "hexagon paths")
@@ -1961,10 +1969,16 @@ class HexShape(BaseShape):
         )
 
     def calculate_perbises(self, centre: Point, vertices: list) -> tuple:
-        """."""
+        """Calculate centre points for each Hex edge and angles from centre.
+
+        Args:
+            vertices: list of Hex'es nodes as Points
+            centre: the centre Point of the Hex
+        """
         _perbis_angles = []  # store angles to centre of edges (the "chords")
         _perbis_pts = []  # store centre Points of edges
         vcount = len(vertices) - 1
+        print(f"*** HEX perbis {centre=} {vertices=}")
         for key, vertex in enumerate(vertices):
             if key == 0:
                 p1 = Point(vertex.x, vertex.y)
@@ -1983,13 +1997,19 @@ class HexShape(BaseShape):
     ):
         """Draw lines connecting the Hexagon centre to the centre of each edge.
 
-        Def:
-        A perpendicular bisector ("perbis") of a chord is:
-            A line passing through the center of circle such that it divides the
-            chord into two equal parts and meets the chord at a right angle;
-            for a polygon, each edge is effectively a chord.
+        Args:
+            ID: unique ID
+            vertices: list of Hex'es nodes as Points
+            centre: the centre Point of the Hex
+            rotation: degrees anti-clockwise from horizontal "east"
+
+        Notes:
+            A perpendicular bisector ("perbis") of a chord is:
+                A line passing through the center of circle such that it divides
+                the chord into two equal parts and meets the chord at a right angle;
+                for a polygon, each edge is effectively a chord.
         """
-        _perbis, _perbis_pts = self.calculate_perbises(centre, vertices)
+        _perbis, _perbis_pts = self.calculate_perbises(centre=centre, vertices=vertices)
         pb_offset = self.unit(self.perbis_offset, label="perbis offset") or 0
         pb_length = (
             self.unit(self.perbis_length, label="perbis length")
@@ -2057,7 +2077,13 @@ class HexShape(BaseShape):
         )
 
     def draw_radii(self, cnv, ID, centre: Point, vertices: list):
-        """Draw line(s) connecting the Hexagon centre to a vertex."""
+        """Draw line(s) connecting the Hexagon centre to a vertex.
+
+        Args:
+            ID: unique ID
+            vertices: list of Hex'es nodes as Points
+            centre: the centre Point of the Hex
+        """
         # _dirs = _lower(self.radii).split()
         dir_group = (
             DirectionGroup.HEX_POINTY
@@ -2095,12 +2121,12 @@ class HexShape(BaseShape):
             stroke_ends=self.radii_ends,
         )
 
-    def draw_slices(self, cnv, ID, vertexes, centre: tuple, rotation=0):
+    def draw_slices(self, cnv, ID, centre: Point, vertexes: list, rotation=0):
         """Draw triangles inside the Hexagon
 
         Args:
             ID: unique ID
-            vertexes: the Hex'es nodes
+            vertexes: list of Hex'es nodes as Points
             centre: the centre Point of the Hex
             rotation: degrees anti-clockwise from horizontal "east"
         """
@@ -2138,13 +2164,13 @@ class HexShape(BaseShape):
             sid += 1
             vid += 1
 
-    def draw_shades(self, cnv, ID, vertexes, centre: tuple, rotation=0):
+    def draw_shades(self, cnv, ID, centre: Point, vertexes: list, rotation=0):
         """Draw rhombuses inside the Hexagon
 
         Args:
 
             ID: unique ID
-            vertexes: the Hex'es nodes
+            vertexes: list of Hex'es nodes as Points
             centre: the centre Point of the Hex
             rotation: degrees anti-clockwise from horizontal "east"
         """
@@ -2186,6 +2212,92 @@ class HexShape(BaseShape):
                 rotation_point=muPoint(centre[0], centre[1]),
             )
 
+    def draw_spikes(
+        self, cnv, ID, centre: Point, vertices: list, rotation: float = None
+    ):
+        """Draw triangles extending from the centre of each edge.
+
+        Args:
+
+            ID: unique ID
+            vertices: list of Hex'es nodes as Points
+            centre: the centre Point of the Hex
+            rotation: degrees anti-clockwise from horizontal "east"
+        """
+        _perbis, _perbis_pts = self.calculate_perbises(centre=centre, vertices=vertices)
+        print(f"*** HEX { _perbis=}")
+        print(f"*** HEX { _perbis_pts=}")
+        spk_length = (
+            self.unit(self.spikes_height + self.radius, label="spikes height")
+            if self.spikes_height
+            else self.radius
+        )
+        spk_width = (
+            self.unit(self.spikes_width, label="spikes width")
+            if self.spikes_width
+            else self.side * 0.1
+        )
+        if self.spikes:
+            dir_group = (
+                DirectionGroup.HEX_POINTY_EDGE
+                if self.orientation == "pointy"
+                else DirectionGroup.HEX_FLAT_EDGE
+            )
+            spikes_dirs = tools.validated_directions(
+                self.spikes, dir_group, "hex perbis"
+            )
+            _dirs = []
+            feedback(f"*** HEX {self.spikes=} {self.orientation=} {spikes_dirs=}")
+            if self.ORIENTATION == HexOrientation.POINTY:
+                if "e" in spikes_dirs:
+                    _dirs.append(4)
+                if "ne" in spikes_dirs:
+                    _dirs.append(5)
+                if "nw" in spikes_dirs:
+                    _dirs.append(0)
+                if "w" in spikes_dirs:
+                    _dirs.append(1)
+                if "sw" in spikes_dirs:
+                    _dirs.append(2)
+                if "se" in spikes_dirs:
+                    _dirs.append(3)
+            elif self.ORIENTATION == HexOrientation.FLAT:
+                if "ne" in spikes_dirs:
+                    _dirs.append(4)
+                if "n" in spikes_dirs:
+                    _dirs.append(5)
+                if "nw" in spikes_dirs:
+                    _dirs.append(0)
+                if "sw" in spikes_dirs:
+                    _dirs.append(1)
+                if "s" in spikes_dirs:
+                    _dirs.append(2)
+                if "se" in spikes_dirs:
+                    _dirs.append(3)
+
+        for key, spk_angle in enumerate(_perbis):
+            if self.spikes and key not in _dirs:
+                continue
+            # points based on spike height, width and perbis angle in degrees
+            edge_pt = _perbis_pts[key]
+            top_pt = geoms.point_on_circle(centre, spk_length, spk_angle)
+            left_pt = geoms.point_from_angle(edge_pt, spk_width / 2.0, 90.0 + spk_angle)
+            right_pt = geoms.point_from_angle(
+                edge_pt, spk_width / 2.0, 180.0 + spk_angle
+            )
+            print(f"*** HEX {spk_angle=} {top_pt=} {left_pt=}, {right_pt=}")
+            cnv.draw_polyline([left_pt, top_pt, right_pt])
+
+        self.set_canvas_props(
+            index=ID,
+            closed=True,  # for triangle
+            stroke=self.spikes_stroke,
+            stroke_width=self.spikes_stroke_width,
+            stroke_ends=self.spikes_ends,
+            dashed=self.spikes_dashed,
+            dotted=self.spikes_dotted,
+        )
+
     def get_geometry(self):
         """Calculate geometric settings of a Hexagon."""
         # ---- calculate half_flat & half_side
@@ -2218,8 +2330,12 @@ class HexShape(BaseShape):
             radius, diameter, side, half_side, half_flat, height_flat, z_fraction
         )
 
-    def get_vertexes(self, is_cards=False):
-        """Calculate vertices of hexagon."""
+    def get_vertexes(self, is_cards=False) -> list:
+        """Calculate vertices of the Hexagon.
+
+        Returns:
+            list of Hex'es nodes as Points
+        """
         geo = self.get_geometry()
         # ---- POINTY^
         self.ORIENTATION = self.get_orientation()
@@ -2473,8 +2589,8 @@ class HexShape(BaseShape):
             self.draw_shades(
                 cnv,
                 ID,
+                Point(self.x_d, self.y_d),
                 self.vertexes,
-                (self.x_d, self.y_d),
                 rotation=kwargs.get("rotation"),
             )
         # ---- draw slices
@@ -2482,8 +2598,17 @@ class HexShape(BaseShape):
             self.draw_slices(
                 cnv,
                 ID,
+                Point(self.x_d, self.y_d),
                 self.vertexes,
-                (self.x_d, self.y_d),
+                rotation=kwargs.get("rotation"),
+            )
+        # ---- draw spikes
+        if self.spikes:
+            self.draw_spikes(
+                cnv,
+                ID,
+                Point(self.x_d, self.y_d),
+                self.vertexes,
                 rotation=kwargs.get("rotation"),
             )
         # ---- draw hatch
