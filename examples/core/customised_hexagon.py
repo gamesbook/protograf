@@ -205,6 +205,35 @@ Hexagon(common=hxg, x=2.25, y=0.25,  orientation="pointy",
         paths_dotted=True)
 PageBreak()
 
+# ---- spikes
+Blueprint(stroke_width=0.5)
+Text(common=txt, text="Hex Spikes")
+hxg = Common(height=1.5, dot=0.05, dot_stroke="red", font_size=8,
+             spikes_width=0.25)
+Hexagon(common=hxg, x=0.25, y=0.25, orientation="pointy",
+        spikes=["ne", "w",  "se"],
+        spikes_height=0.5)
+Hexagon(common=hxg, x=2.25, y=4.1,
+        spikes=["s", "sw", "nw", "ne", "se", "n"],
+        spikes_dotted=True,
+        spikes_height=-0.5)
+Hexagon(common=hxg, x=2.25, y=0.25,  orientation="pointy",
+        spikes=["ne", "se", "sw", "w", "nw", "e"],
+        spikes_height=-0.5,
+        spikes_dotted=True)
+Hexagon(common=hxg, x=0.25, y=2.15,  orientation="pointy",
+        spikes=["ne", "se", "sw", "w", "nw", "e"],
+        spikes_stroke="gold",
+        spikes_fill="gold")
+Hexagon(common=hxg, x=0.25, y=4.1,
+        spikes=["ne", "nw", "s"],
+        spikes_height=0.5)
+Hexagon(common=hxg, x=2.25, y=2.15,
+        spikes=["s", "sw", "nw", "ne", "se", "n"],
+        spikes_height=0.5,
+        spikes_stroke="gold",
+        spikes_fill="gold")
+PageBreak()
 
 # ---- END
 Text(common=txt, text="Hexagon END...")
@@ -225,4 +254,5 @@ Save(
         "perbis_all",
         "slices_flat", "slices_pointy",
         'hex_paths',
+        'hex_spikes',
         None])

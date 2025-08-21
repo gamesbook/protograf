@@ -373,7 +373,7 @@ def angles_from_points(first: Point, second: Point) -> tuple:
             compass = 180.0
     rotation = (450 - compass) % 360.0
     # print(f'angle fn: {compass=}, {rotation=}')
-    return compass, rotation
+    return round_tiny_float(compass), round_tiny_float(rotation)
 
 
 def separation_between_hexsides(side_a: int, side_b: int) -> int:

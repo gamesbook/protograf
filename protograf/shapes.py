@@ -34,6 +34,7 @@ from protograf.utils.structures import (
     HexGeometry,
     HexOrientation,
     Link,
+    Perbis,
     Point,
     PolyGeometry,
 )  # named tuples
@@ -1877,7 +1878,7 @@ class HexShape(BaseShape):
             ptF = Point(centre.x - side_plus, centre.y - h_flat)
 
         # ---- calculate centres of sides
-        _, perbis_pts = self.calculate_perbises(centre=centre, vertices=vertices)
+        perbises = self.calculate_perbises(cnv=cnv, centre=centre, vertices=vertices)
 
         for item in self.paths:
             dir_pair = tools.validated_directions(item, dir_group, "hexagon paths")
@@ -1891,72 +1892,72 @@ class HexShape(BaseShape):
                 match dir_pair:
                     # 120 degrees / short arc
                     case ["n", "ne"] | ["ne", "n"]:
-                        arc(vertices[4], perbis_pts[5], 120.0)
+                        arc(vertices[4], perbises['n'].point, 120.0)  # p5
                     case ["se", "ne"] | ["ne", "se"]:
-                        arc(vertices[3], perbis_pts[4], 120.0)
+                        arc(vertices[3], perbises['ne'].point, 120.0)  # p4
                     case ["se", "s"] | ["s", "se"]:
-                        arc(vertices[2], perbis_pts[3], 120.0)
+                        arc(vertices[2], perbises['se'].point, 120.0)  # p3
                     case ["sw", "s"] | ["s", "sw"]:
-                        arc(vertices[1], perbis_pts[2], 120.0)
+                        arc(vertices[1], perbises['s'].point, 120.0)  # p2
                     case ["sw", "nw"] | ["nw", "sw"]:
-                        arc(vertices[0], perbis_pts[1], 120.0)
+                        arc(vertices[0], perbises['sw'].point, 120.0)  # p1
                     case ["n", "nw"] | ["nw", "n"]:
-                        arc(vertices[5], perbis_pts[0], 120.0)
+                        arc(vertices[5], perbises['nw'].point, 120.0)  # p5
                     # 60 degrees / long arc
                     case ["n", "se"] | ["se", "n"]:
-                        arc(ptB, perbis_pts[5], 60.0)
+                        arc(ptB, perbises['n'].point, 60.0)  # p5
                     case ["ne", "s"] | ["s", "ne"]:
-                        arc(ptC, perbis_pts[4], 60.0)
+                        arc(ptC, perbises['ne'].point, 60.0)  # p4
                     case ["se", "sw"] | ["sw", "se"]:
-                        arc(ptD, perbis_pts[3], 60.0)
+                        arc(ptD, perbises['se'].point, 60.0)  # p3
                     case ["s", "nw"] | ["nw", "s"]:
-                        arc(ptE, perbis_pts[2], 60.0)
+                        arc(ptE, perbises['s'].point, 60.0)  # p2
                     case ["sw", "n"] | ["n", "sw"]:
-                        arc(ptF, perbis_pts[1], 60.0)
+                        arc(ptF, perbises['sw'].point, 60.0)  # p1
                     case ["nw", "ne"] | ["ne", "nw"]:
-                        arc(ptA, perbis_pts[0], 60.0)
+                        arc(ptA, perbises['nw'].point, 60.0)  # p0
                     # 90 degrees
                     case ["nw", "se"] | ["se", "nw"]:
-                        cnv.draw_line(perbis_pts[3], perbis_pts[0])
+                        cnv.draw_line(perbises['se'].point, perbises['nw'].point)  # p3-0
                     case ["ne", "sw"] | ["sw", "ne"]:
-                        cnv.draw_line(perbis_pts[4], perbis_pts[1])
+                        cnv.draw_line(perbises['ne'].point, perbises['sw'].point)  # p4-1
                     case ["n", "s"] | ["s", "n"]:
-                        cnv.draw_line(perbis_pts[5], perbis_pts[2])
+                        cnv.draw_line(perbises['n'].point, perbises['s'].point)  # p5-2
             if self.ORIENTATION == HexOrientation.POINTY:
                 match dir_pair:
                     # 120 degrees / short arc
                     case ["e", "ne"] | ["ne", "e"]:
-                        arc(vertices[4], perbis_pts[5], 120.0)
+                        arc(vertices[4], perbises['ne'].point, 120.0)  # p5
                     case ["e", "se"] | ["se", "e"]:
-                        arc(vertices[3], perbis_pts[4], 120.0)
+                        arc(vertices[3], perbises['e'].point, 120.0)  # p4
                     case ["sw", "se"] | ["se", "sw"]:
-                        arc(vertices[2], perbis_pts[3], 120.0)
+                        arc(vertices[2], perbises['se'].point, 120.0)  # p3
                     case ["w", "sw"] | ["sw", "w"]:
-                        arc(vertices[1], perbis_pts[2], 120.0)
+                        arc(vertices[1], perbises['sw'].point, 120.0)  # p2
                     case ["w", "nw"] | ["nw", "w"]:
-                        arc(vertices[0], perbis_pts[1], 120.0)
+                        arc(vertices[0], perbises['w'].point, 120.0)  # p1
                     case ["nw", "ne"] | ["nw", "ne"]:
-                        arc(vertices[5], perbis_pts[0], 120.0)
+                        arc(vertices[5], perbises['nw'].point, 120.0)  # p0
                     # 60 degrees / long arc
                     case ["ne", "se"] | ["se", "ne"]:
-                        arc(ptB, perbis_pts[5], 60.0)
+                        arc(ptB, perbises['ne'].point, 60.0)  # p5
                     case ["e", "sw"] | ["sw", "e"]:
-                        arc(ptC, perbis_pts[4], 60.0)
+                        arc(ptC, perbises['e'].point, 60.0)  # p4
                     case ["w", "se"] | ["se", "w"]:
-                        arc(ptD, perbis_pts[3], 60.0)
+                        arc(ptD, perbises['se'].point, 60.0)  # p3
                     case ["nw", "sw"] | ["sw", "nw"]:
-                        arc(ptE, perbis_pts[2], 60.0)
+                        arc(ptE, perbises['sw'].point, 60.0)  # p2
                     case ["ne", "w"] | ["w", "ne"]:
-                        arc(ptF, perbis_pts[1], 60.0)
+                        arc(ptF, perbises['w'].point, 60.0)  # p1
                     case ["e", "nw"] | ["nw", "e"]:
-                        arc(ptA, perbis_pts[0], 60.0)
+                        arc(ptA, perbises['nw'].point, 60.0)  # p0
                     # 90 degrees
                     case ["ne", "sw"] | ["sw", "ne"]:
-                        cnv.draw_line(perbis_pts[5], perbis_pts[2])
+                        cnv.draw_line(perbises['ne'].point, perbises['sw'].point)  # p5-2
                     case ["e", "w"] | ["w", "e"]:
-                        cnv.draw_line(perbis_pts[4], perbis_pts[1])
+                        cnv.draw_line(perbises['e'].point, perbises['w'].point)  # p4-1
                     case ["nw", "se"] | ["se", "nw"]:
-                        cnv.draw_line(perbis_pts[3], perbis_pts[0])
+                        cnv.draw_line(perbises['se'].point, perbises['nw'].point)  # p3-0
         # ---- set color, thickness etc.
         self.set_canvas_props(
             index=ID,
@@ -1968,17 +1969,24 @@ class HexShape(BaseShape):
             dotted=self.paths_dotted,
         )
 
-    def calculate_perbises(self, centre: Point, vertices: list) -> tuple:
+    def calculate_perbises(self, cnv, centre: Point, vertices: list, debug: bool = False) -> list:
         """Calculate centre points for each Hex edge and angles from centre.
 
         Args:
             vertices: list of Hex'es nodes as Points
             centre: the centre Point of the Hex
+
+        Returns:
+            dict of Perbis objects keyed on direction
         """
-        _perbis_angles = []  # store angles to centre of edges (the "chords")
-        _perbis_pts = []  # store centre Points of edges
+        if self.ORIENTATION == HexOrientation.POINTY:
+            directions = ['nw', 'w', 'sw', 'se', 'e', 'ne']
+        if self.ORIENTATION == HexOrientation.FLAT:
+            directions = ['nw', 'sw', 's', 'se', 'ne', 'n']
+        perbises = {}
         vcount = len(vertices) - 1
-        print(f"*** HEX perbis {centre=} {vertices=}")
+        _perbis_pts = []
+        # print(f"*** HEX perbis {centre=} {vertices=}")
         for key, vertex in enumerate(vertices):
             if key == 0:
                 p1 = Point(vertex.x, vertex.y)
@@ -1987,10 +1995,22 @@ class HexShape(BaseShape):
                 p1 = Point(vertex.x, vertex.y)
                 p2 = Point(vertices[key - 1].x, vertices[key - 1].y)
             pc = geoms.fraction_along_line(p1, p2, 0.5)  # centre pt of edge
-            _perbis_pts.append(pc)
-            _, angle = geoms.angles_from_points(centre, pc)
-            _perbis_angles.append(angle)
-        return _perbis_angles, _perbis_pts
+            _perbis_pts.append(pc)  # debug use
+            compass, angle = geoms.angles_from_points(centre, pc)
+            # print(f"*** HEX *** perbis {key=} {pc=} {compass=} {angle=}")
+            _perbis = Perbis(
+                point=pc,
+                direction=directions[key],
+                v1=p1,
+                v2=p2,
+                compass=compass,
+                angle=angle
+                )
+            perbises[directions[key]] = _perbis
+        # if debug:
+        #     self.run_debug = True
+        #     self._debug(cnv, vertices=_perbis_pts)
+        return perbises
 
     def draw_perbis(
         self, cnv, ID, centre: Point, vertices: list, rotation: float = None
@@ -2009,7 +2029,8 @@ class HexShape(BaseShape):
                 the chord into two equal parts and meets the chord at a right angle;
                 for a polygon, each edge is effectively a chord.
         """
-        _perbis, _perbis_pts = self.calculate_perbises(centre=centre, vertices=vertices)
+        perbises = self.calculate_perbises(
+            cnv=cnv, centre=centre, vertices=vertices)
         pb_offset = self.unit(self.perbis_offset, label="perbis offset") or 0
         pb_length = (
             self.unit(self.perbis_length, label="perbis length")
@@ -2025,42 +2046,14 @@ class HexShape(BaseShape):
             perbis_dirs = tools.validated_directions(
                 self.perbis, dir_group, "hex perbis"
             )
-            _dirs = []
-            # feedback(f'*** HEX {self.perbis=} {self.orientation=} {perbis_dirs=}')
-            if self.ORIENTATION == HexOrientation.POINTY:
-                if "e" in perbis_dirs:
-                    _dirs.append(4)
-                if "ne" in perbis_dirs:
-                    _dirs.append(5)
-                if "nw" in perbis_dirs:
-                    _dirs.append(0)
-                if "w" in perbis_dirs:
-                    _dirs.append(1)
-                if "sw" in perbis_dirs:
-                    _dirs.append(2)
-                if "se" in perbis_dirs:
-                    _dirs.append(3)
-            elif self.ORIENTATION == HexOrientation.FLAT:
-                if "ne" in perbis_dirs:
-                    _dirs.append(4)
-                if "n" in perbis_dirs:
-                    _dirs.append(5)
-                if "nw" in perbis_dirs:
-                    _dirs.append(0)
-                if "sw" in perbis_dirs:
-                    _dirs.append(1)
-                if "s" in perbis_dirs:
-                    _dirs.append(2)
-                if "se" in perbis_dirs:
-                    _dirs.append(3)
 
-        for key, pb_angle in enumerate(_perbis):
-            if self.perbis and key not in _dirs:
+        for key, a_perbis in perbises.items():
+            if self.perbis and key not in perbis_dirs:
                 continue
             # points based on length of line, offset and the angle in degrees
-            edge_pt = _perbis_pts[key]
+            edge_pt = a_perbis.point
             if pb_offset is not None and pb_offset != 0:
-                offset_pt = geoms.point_on_circle(centre, pb_offset, pb_angle)
+                offset_pt = geoms.point_on_circle(centre, pb_offset, a_perbis.angle)
                 end_pt = geoms.point_on_line(offset_pt, edge_pt, pb_length)
                 # print(f'{pb_angle=} {offset_pt=} {x_c=}, {y_c=}')
                 cnv.draw_line((offset_pt.x, offset_pt.y), (end_pt.x, end_pt.y))
@@ -2224,74 +2217,59 @@ class HexShape(BaseShape):
             centre: the centre Point of the Hex
             rotation: degrees anti-clockwise from horizontal "east"
         """
-        _perbis, _perbis_pts = self.calculate_perbises(centre=centre, vertices=vertices)
-        print(f"*** HEX { _perbis=}")
-        print(f"*** HEX { _perbis_pts=}")
+        if not self.spikes:
+            return
+        dir_group = (
+            DirectionGroup.HEX_POINTY_EDGE
+            if self.orientation == "pointy"
+            else DirectionGroup.HEX_FLAT_EDGE
+        )
+        spikes_dirs = tools.validated_directions(
+            self.spikes, dir_group, "hex perbis"
+        )
+        if not spikes_dirs:
+            return
+
+        spikes_fill = colrs.get_color(self.spikes_fill)
+        geo = self.get_geometry()
+        perbises = self.calculate_perbises(
+            cnv=cnv, centre=centre, vertices=vertices, debug=True)
         spk_length = (
-            self.unit(self.spikes_height + self.radius, label="spikes height")
+            self.unit(self.spikes_height, label="spikes height")
             if self.spikes_height
-            else self.radius
+            else geo.half_flat
         )
         spk_width = (
             self.unit(self.spikes_width, label="spikes width")
             if self.spikes_width
-            else self.side * 0.1
+            else geo.side * 0.1
         )
-        if self.spikes:
-            dir_group = (
-                DirectionGroup.HEX_POINTY_EDGE
-                if self.orientation == "pointy"
-                else DirectionGroup.HEX_FLAT_EDGE
-            )
-            spikes_dirs = tools.validated_directions(
-                self.spikes, dir_group, "hex perbis"
-            )
-            _dirs = []
-            feedback(f"*** HEX {self.spikes=} {self.orientation=} {spikes_dirs=}")
-            if self.ORIENTATION == HexOrientation.POINTY:
-                if "e" in spikes_dirs:
-                    _dirs.append(4)
-                if "ne" in spikes_dirs:
-                    _dirs.append(5)
-                if "nw" in spikes_dirs:
-                    _dirs.append(0)
-                if "w" in spikes_dirs:
-                    _dirs.append(1)
-                if "sw" in spikes_dirs:
-                    _dirs.append(2)
-                if "se" in spikes_dirs:
-                    _dirs.append(3)
-            elif self.ORIENTATION == HexOrientation.FLAT:
-                if "ne" in spikes_dirs:
-                    _dirs.append(4)
-                if "n" in spikes_dirs:
-                    _dirs.append(5)
-                if "nw" in spikes_dirs:
-                    _dirs.append(0)
-                if "sw" in spikes_dirs:
-                    _dirs.append(1)
-                if "s" in spikes_dirs:
-                    _dirs.append(2)
-                if "se" in spikes_dirs:
-                    _dirs.append(3)
+        # feedback(f"*** HEX {self.spikes=} {self.orientation=} {spikes_dirs=}")
 
-        for key, spk_angle in enumerate(_perbis):
-            if self.spikes and key not in _dirs:
+        for key, a_perbis in perbises.items():
+            if self.spikes and key not in spikes_dirs:
                 continue
-            # points based on spike height, width and perbis angle in degrees
-            edge_pt = _perbis_pts[key]
-            top_pt = geoms.point_on_circle(centre, spk_length, spk_angle)
-            left_pt = geoms.point_from_angle(edge_pt, spk_width / 2.0, 90.0 + spk_angle)
-            right_pt = geoms.point_from_angle(
-                edge_pt, spk_width / 2.0, 180.0 + spk_angle
-            )
-            print(f"*** HEX {spk_angle=} {top_pt=} {left_pt=}, {right_pt=}")
+            # points based on spike height, width and inverted perbis angle (degrees)
+            spk_angle = 360. - a_perbis.angle
+            edge_pt = a_perbis.point
+
+            if spk_length < 0:
+                top_pt = geoms.point_on_circle(
+                    centre, geo.half_flat - abs(spk_length), spk_angle)
+            else:
+                # print(f'*** HEX {spk_length=}  {geo.half_flat=} {spk_width=} {edge_pt=}')
+                top_pt = geoms.point_on_circle(
+                    centre, spk_length + geo.half_flat, spk_angle)
+            left_pt = geoms.point_on_line(edge_pt, a_perbis.v1, spk_width / 2.0)
+            right_pt = geoms.point_on_line(edge_pt, a_perbis.v2, spk_width / 2.0)
+            # print(f"*** HEX {spk_angle=} {top_pt=} {left_pt=}, {right_pt=}")
             cnv.draw_polyline([left_pt, top_pt, right_pt])
 
         self.set_canvas_props(
             index=ID,
             closed=True,  # for triangle
             stroke=self.spikes_stroke,
+            fill=spikes_fill,
             stroke_width=self.spikes_stroke_width,
             stroke_ends=self.spikes_ends,
             dashed=self.spikes_dashed,

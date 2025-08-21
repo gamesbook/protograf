@@ -234,6 +234,18 @@ class BBox:
     br: Point
 
 
+@dataclass
+class Perbis:
+    """Perbis is the centre of an edge of a Hexagon
+    """
+    point: Point
+    direction: str
+    v1: Point
+    v2: Point
+    compass: float
+    angle: float
+
+
 # wrapper around a jinja Template to support operations on an Template output
 @dataclass
 class TemplatingType:

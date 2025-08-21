@@ -527,8 +527,9 @@ class BaseCanvas:
         self.coord_style = self.defaults.get("coord_style", "")
         self.hidden = self.defaults.get("hidden", [])
         self.spikes = self.defaults.get("spikes", [])
-        self.spikes_height = kwargs.get("spikes_height", 0)
-        self.spikes_width = kwargs.get("spikes_width", 0)
+        self.spikes_height = self.defaults.get("spikes_height", 0)
+        self.spikes_width = self.defaults.get("spikes_width", 0)
+        self.spikes_fill = self.defaults.get("spikes_fill", self.fill)
         self.spikes_stroke = self.defaults.get("spikes_stroke", "black")
         self.spikes_stroke_width = self.defaults.get(
             "spikes_stroke_width", self.stroke_width
@@ -1053,6 +1054,7 @@ class BaseShape:
         self.coord_style = kwargs.get("coord_style", "")  # linear|diagonal
         self.hidden = kwargs.get("hidden", base.hidden)
         self.spikes = kwargs.get("spikes", base.spikes)
+        self.spikes_fill = kwargs.get("spikes_fill", base.spikes_fill)
         self.spikes_stroke = kwargs.get("spikes_stroke", base.spikes_stroke)
         self.spikes_stroke_width = self.kw_float(
             kwargs.get("spikes_stroke_width", base.spikes_stroke_width)
