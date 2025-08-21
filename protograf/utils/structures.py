@@ -236,8 +236,8 @@ class BBox:
 
 @dataclass
 class Perbis:
-    """Perbis is the centre of an edge of a Hexagon
-    """
+    """Perbis is the centre of an edge of a Hexagon"""
+
     point: Point
     direction: str
     v1: Point
