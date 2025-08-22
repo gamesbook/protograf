@@ -257,6 +257,34 @@ class SequenceShape(BaseShape):
             self.calculate_setting_list()
         self.interval_x = self.interval_x or self.interval
         self.interval_y = self.interval_y or self.interval
+        # convert/use interval lists
+        if isinstance(self.interval_x, list):
+            if len(self.interval_x) != len(self.setting_list):
+                feedback(
+                    'The number of items in "interval_x" must match those in'
+                    ' the "setting".',
+                    True,
+                )
+        else:
+            int_x = tools.as_float(self.interval_x, "interval_x")
+            self.interval_x = [int_x] * len(self.setting_list)
+        if isinstance(self.interval_y, list):
+            if len(self.interval_y) != len(self.setting_list):
+                feedback(
+                    'The number of items in "interval_y" must match those in'
+                    ' the "setting".',
+                    True,
+                )
+        else:
+            int_y = tools.as_float(self.interval_y, "interval_y")
+            self.interval_y = [int_y] * len(self.setting_list)
+        # validate intervals
+        for item in self.interval_y:
+            if not isinstance(item, (float, int)):
+                feedback('Values for "interval_y" must be numeric!', True)
+        for item in self.interval_x:
+            if not isinstance(item, (float, int)):
+                feedback('Values for "interval_x" must be numeric!', True)
 
     def calculate_setting_list(self):
         if not isinstance(self.setting, tuple):
@@ -347,8 +375,6 @@ class SequenceShape(BaseShape):
             kwargs["locale"] = _locale._asdict()
             # feedback(f'+++ @Seqnc@ {self.interval_x=}, {self.interval_y=}')
             # feedback(f'+++ @Seqnc@ {kwargs["locale"]}')
-            off_x = _off_x + key * self.interval_x
-            off_y = _off_y + key * self.interval_y
             flat_elements = tools.flatten(self._objects)
             log.debug("flat_eles:%s", flat_elements)
             for each_flat_ele in flat_elements:
@@ -375,6 +401,9 @@ class SequenceShape(BaseShape):
                             new_flat_new_ele.draw(
                                 off_x=off_x, off_y=off_y, ID=_ID, **kwargs
                             )
+
+            off_x = off_x + self.interval_x[key]
+            off_y = off_y + self.interval_y[key]
 
 
 # ---- repeats

@@ -56,21 +56,18 @@ The ``Sequence()`` command accepts the following properties:
   the right and up)
 
 
-Example 1.Sequence Values
--------------------------
+Example 1. Sequence Values #1
+-----------------------------
 
-.. |sqv| image:: images/layouts/sequence_values.png
+.. |sv1| image:: images/layouts/sequence_values1.png
    :width: 330
 
 ===== ======
-|sqv| This example shows the element constructed using differing values for the
-      its properties.
-
-      In each case the ``Text()`` shape is used to display the
+|sv1| This example shows how the ``Text()`` shape is used to display the
       values in the sequence; the values are automatically assigned to its
       **text** property.
 
-      The example with **normal integer numbers** (bottom of example) is created by:
+      This example with **normal integer numbers** is created by:
 
       .. code:: python
 
@@ -92,7 +89,20 @@ Example 1.Sequence Values
       The shapes drawn will be in a level line, because the default
       ``interval_y`` value is zero.
 
-      The example with **lowercase letters** (lower middle) is created by:
+===== ======
+
+Example 2. Sequence Values #2
+-----------------------------
+
+.. |sv2| image:: images/layouts/sequence_values2.png
+   :width: 330
+
+===== ======
+|sv2| This example shows how the ``Text()`` shape is used to display the
+      values in the sequence; the values are automatically assigned to its
+      **text** property.
+
+      This example with **lowercase letters** is created by:
 
       .. code:: python
 
@@ -117,7 +127,20 @@ Example 1.Sequence Values
       be ``0.5`` cm to the right (``interval_x``) and ``0.5`` cm
       above (``interval_y``) the previous one.
 
-      The example with **uppercase letters** (upper middle) is created by:
+===== ======
+
+Example 3. Sequence Values #3
+-----------------------------
+
+.. |sv3| image:: images/layouts/sequence_values3.png
+   :width: 330
+
+===== ======
+|sv3| This example shows how the ``Text()`` shape is used to display the
+      values in the sequence; the values are automatically assigned to its
+      **text** property.
+
+      This example with **uppercase letters** is created by:
 
       .. code:: python
 
@@ -135,7 +158,20 @@ Example 1.Sequence Values
       ``0.5`` cm to the right and above |dash| because ``interval_y`` is
       negative |dash| the previous one.
 
-      The example with **Roman numerals** (upper top) is created by:
+===== ======
+
+Example 4. Sequence Values #4
+-----------------------------
+
+.. |sv4| image:: images/layouts/sequence_values4.png
+   :width: 330
+
+===== ======
+|sv4| This example shows how the ``Text()`` shape is used to display the
+      values in the sequence; the values are automatically assigned to its
+      **text** property.
+
+      This example with **Roman numerals** is created by:
 
       .. code:: python
 
@@ -150,7 +186,22 @@ Example 1.Sequence Values
       The range starts at ``5``, which is a ``V`` in Roman, and ends at
       ``11`` which is a ``XI`` in Roman.
 
-      The example with **Excel columns** (top edge of example) is created by:
+
+
+===== ======
+
+Example 5. Sequence Values #5
+-----------------------------
+
+.. |sv5| image:: images/layouts/sequence_values5.png
+   :width: 330
+
+===== ======
+|sv5| This example shows how the ``Text()`` shape is used to display the
+      values in the sequence; the values are automatically assigned to its
+      **text** property.
+
+      Ths example with **Excel columns** is created by:
 
       .. code:: python
 
@@ -174,23 +225,21 @@ Example 1.Sequence Values
 
 ===== ======
 
-Example 2. Sequence Shapes
---------------------------
 
-.. |sq2| image:: images/layouts/sequence_shapes.png
+Example 6. Sequence Shapes #1
+-----------------------------
+
+.. |sq1| image:: images/layouts/sequence_shape2.png
    :width: 330
 
 ===== ======
-|sq2| This example shows the element constructed using differing values for the
-      its properties.
-
-      In these cases, values in the sequence are being assigned
+|sq1| In this example, values in the sequence are being assigned
       to a text-based property using the special ``{{sequence}}`` keyword.
 
       The keyword is replaced by the **actual** value of the sequence number
       for the item.
 
-      The example with **rectangles** (top edge) is created by:
+      This example with **rectangles** is created by:
 
       .. code:: python
 
@@ -208,15 +257,35 @@ Example 2. Sequence Shapes
       and substituted into the text as part of the ``Rectangle`` 's label;
       the ``$`` is just a normal character.
 
-      The example with **hexagons** and **nested circles** (middle left) is
+===== ======
+
+
+Example 7. Sequence Shapes #2
+-----------------------------
+
+.. |sq2| image:: images/layouts/sequence_shape3.png
+   :width: 330
+
+===== ======
+|sq2| In this example, values in the sequence are being assigned
+      to a text-based property using the special ``{{sequence}}`` keyword.
+
+      The keyword is replaced by the **actual** value of the sequence number
+      for the item.
+
+      This example with **hexagons** and **nested circles** is
       created by:
 
       .. code:: python
 
           Sequence(
-              [hexagon(x=0.25, y=1.5, radius=0.5,
-                       title_size=8, title="Fig. {{sequence}}"),
-               circle(cx=1, cy=2, radius=0.2, fill="gray")],
+              [hexagon(
+                  x=0.25, y=1.5, radius=0.5,
+                  title_size=8,
+                  title="Fig. {{sequence}}"),
+               circle(
+                   cx=1, cy=2, radius=0.2,
+                   fill="gray")],
               setting=('A', 'C', 1),
               interval_y=1.5,
               interval_x=0.5,
@@ -239,7 +308,23 @@ Example 2. Sequence Shapes
       As always the shapes are drawn in order |dash| the hexagon first and then
       the grey circle |dash| downwards and to the right (postive intervals).
 
-      The example with **circles** (middle right) is created by:
+===== ======
+
+
+Example 8. Sequence Shapes #3
+-----------------------------
+
+.. |sq3| image:: images/layouts/sequence_shape1.png
+   :width: 330
+
+===== ======
+|sq3| In this example, values in the sequence are being assigned
+      to a text-based property using the special ``{{sequence}}`` keyword.
+
+      The keyword is replaced by the **actual** value of the sequence number
+      for the item.
+
+      This example with **circles** is created by:
 
       .. code:: python
 
@@ -266,7 +351,23 @@ Example 2. Sequence Shapes
           ``setting`` mean that nothing is assigned to the ``{{sequence}}``
           but that the ``Cirle`` itself is still drawn!
 
-      The example with **squares** (middle centre) is created by:
+===== ======
+
+
+Example 9. Sequence Shapes #4
+-----------------------------
+
+.. |sq4| image:: images/layouts/sequence_shape4.png
+   :width: 330
+
+===== ======
+|sq4| In this example, values in the sequence are being assigned
+      to a text-based property using the special ``{{sequence}}`` keyword.
+
+      The keyword is replaced by the **actual** value of the sequence number
+      for the item.
+
+      This example with **squares** is created by:
 
       .. code:: python
 
@@ -278,10 +379,52 @@ Example 2. Sequence Shapes
             setting=list('DIANA'),
             interval_y=0.6,
             interval_x=0.0,
-            )
+        )
 
       Here the **setting** is generated by a Python function called ``list``
       which splits the word into a list of values; these are assigned to the
       ``{{sequence}}`` to use for the Square's label.
+
+===== ======
+
+
+Example 10. Sequence Shapes #5
+------------------------------
+
+.. |sq5| image:: images/layouts/sequence_shape5.png
+   :width: 330
+
+===== ======
+|sq5| In this example, values in the sequence are being assigned
+      to a text-based property using the special ``{{sequence}}`` keyword.
+
+      The keyword is replaced by the **actual** value of the sequence number
+      for the item.
+
+      This example with **polygons** is created by:
+
+      .. code:: python
+
+        Sequence(
+            [polygon(
+                cx=2, cy=0.5,
+                sides=7, radius=0.5,
+                label_size=7,
+                label="{{sequence}}")],
+            setting=[
+                "red", "orange", "yellow",
+                "green", "blue"],
+            interval_y=[1.25, 1.5, 1, 1.25, 0.75],
+            interval_x=0.0,
+        )
+
+      Here the **setting** is a list of words; these are assigned to the
+      ``{{sequence}}`` to use for the Polygon's label.
+
+      The *interval_y* property is a set of incremental values; these can be
+      used to position the shape at any y-position on a page. This can be
+      combined,  if needed, with a list of any incremental *interval_x* values.
+      The result is allow complete flexibility over where items in the sequence
+      can be placed.
 
 ===== ======

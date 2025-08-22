@@ -673,8 +673,8 @@ class BaseShape:
         self.fill_pattern = kwargs.get("fill_pattern", base.fill_pattern)
         self.repeat = kwargs.get("repeat", base.repeat)
         self.interval = self.kw_float(kwargs.get("interval", base.interval))
-        self.interval_x = self.kw_float(kwargs.get("interval_x", base.interval_x))
-        self.interval_y = self.kw_float(kwargs.get("interval_y", base.interval_y))
+        self.interval_x = kwargs.get("interval_x", base.interval_x)
+        self.interval_y = kwargs.get("interval_y", base.interval_y)
         # ---- rotation / position /elevation
         self.rotation = self.kw_float(
             kwargs.get("rotation", kwargs.get("rotation", base.rotation))

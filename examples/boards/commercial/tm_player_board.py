@@ -18,9 +18,11 @@ LT_GREEN = "#8BB846"
 DK_GREEN = "#77A943"
 LT_RED = "#FA903A"
 DK_RED = "#F37C37"
+VERY_RED = "#E57847"
 LT_YELLOW = "#FFC32C"
 DK_YELLOW = "#E1C82E"
 LT_BLUE = "#91AAC8"
+DK_BLUE = "#3C5FA0"
 LT_BROWN = "#A26A23"
 LT_GREY = "#AAA8AB"
 LEAF = "forestgreen"
@@ -46,7 +48,7 @@ Rectangle(common=rsrc,
 Rectangle(common=rsrc,
           y=8.8, height=3.1, fill=LT_RED,
           hatch_stroke=DK_RED, hatch_count=16,
-          centre_shape=rectangle(height=0.9, width=0.9, fill="#E57847", stroke='dimgray'))
+          centre_shape=rectangle(height=0.9, width=0.9, fill=VERY_RED, stroke='dimgray'))
 Rectangle(common=rsrc,
           y=12.4, height=3.1, fill=LT_GREEN,
           hatch_stroke=DK_GREEN, hatch_count=16,
@@ -153,34 +155,46 @@ Square(common=money, x=1.7, label="20")
 Square(common=money, x=4.2, label="14")
 Square(common=money, x=11, label="15")
 
+# resource multipliers
+Text(text="8", y=20, x=8.9, stroke="red", font_size=15)  # heat
+Text(text="8", y=20, x=6.3, stroke="forestgreen", font_size=15)  # leaf
+
 # resource icons
 Font("game-icons-net-20200315a")
 Text(text="\uE8A4", y=5, x=10.5, stroke="goldenrod")  # coin
 Text(text="\uE6C5", y=10.5, x=10.5, stroke="yellow")  # fire
 Text(text="\uEC14", y=14.1, x=10.5, stroke=LEAF)  # leaf
+Text(text="\uED73", y=20, x=10.6, stroke=VERY_RED, font_size=15)  # therm
+Text(text="\uED73", y=20, x=5.6, stroke=VERY_RED, font_size=15)  # therm
 
-# TODO - icons and text at the bottom
 forest = Common(
-    cy=19.8, label="\uEC14", orientation="pointy",
-    height=0.5, fill_stroke=LT_GREEN)
+    cy=19.8, orientation="pointy",
+    height=0.5, fill_stroke=LT_GREEN,
+    label_stroke=LEAF, label_size=8,
+    label="\uEDD4") # tree
 Hexagon(common=forest, cx=3.2)
 Hexagon(common=forest, cx=8)
-Square(y=19.5, x=6.5, side=0.6, fill_stroke=LT_GREEN)
+Square(y=19.5, x=6.5, side=0.6, fill_stroke=LT_GREEN,
+       label_stroke=LEAF, label_size=8,
+       label="\uEC14")  # leaf
+Square(y=19.5, x=9.1, side=0.6, fill_stroke=VERY_RED,
+       label_stroke="yellow", label_size=10,
+       label="\uE6C5")  # fire
 water = Common(
-    cy=19.8, label="\uE494", orientation="pointy",
-    height=0.5, fill_stroke=LT_BLUE)
+    cy=19.8, orientation="pointy",
+    height=0.5, fill_stroke=LT_BLUE,
+    label_stroke=DK_BLUE, label_size=10,
+    label="\uE494",)  # water droplet
 Hexagon(common=water, cx=12.6)
 
-
+# arrows
 arrow = Common(
     y=19.8, length=0.4, arrow_style='notch',
-    arrow_height=0.3,
-    arrow_width=0.3,
+    arrow_height=0.3, arrow_width=0.3,
     stroke="red", stroke_width=2.5)
-Line(common=arrow, x=2.4)
-Line(common=arrow, x=7.2)
-Line(common=arrow, x=4.9)
-Line(common=arrow, x=9.9)
-Line(common=arrow, x=11.8)
+Sequence(
+    [Line(common=arrow, x=2.4)],
+    setting=(1, 5),
+    interval_x=[2.5, 2.4, 2.5, 2.0, 2])
 
 Save()

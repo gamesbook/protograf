@@ -10,6 +10,7 @@ protograf Changes
 - Add slices property to Circle
 - Add spikes property for Hexagon shape
 - Patch page color fill error
+- Extend Sequence for irregular intervals
 
 2025-08-08 (0.2.14)
 -------------------

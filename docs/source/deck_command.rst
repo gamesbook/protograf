@@ -523,19 +523,7 @@ Example 9. Row Limit
 Example 10. Circular Frame
 --------------------------
 `^ <property-examples_>`_
-Deck(
-    cards=4,
-    height=3.2,
-    width=2.1,
-    card_grid=0.25)
-# design card
-Card(
-    '*',
-    rectangle(
-        x=0.2, y=0.2, width=1.7, height=2.8, stroke_width=1, rounding=0.2,
-        fill=None,
-        label='{{sequence}}\n{{id}}')
-)
+
 .. |d10| image:: images/decks/cards_deck_10.png
    :width: 330
 
