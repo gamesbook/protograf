@@ -500,6 +500,8 @@ class BaseCanvas:
         self.paths_ends = self.defaults.get("paths_ends", None)
         self.paths_dotted = self.defaults.get("paths_dotted", self.dotted)
         self.paths_dashed = self.defaults.get("paths_dashed", self.dashed)
+        self.paths_wave_style = self.defaults.get("paths_wave_style", None)
+        self.paths_wave_height = self.defaults.get("paths_wave_height", 0)
         # ---- hexagons
         self.hid = self.defaults.get("id", "")  # HEX ID
         self.hex_rows = self.defaults.get("hex_rows", 0)
@@ -1016,6 +1018,8 @@ class BaseShape:
         self.paths_ends = kwargs.get("paths_ends", base.paths_ends)
         self.paths_dotted = kwargs.get("paths_dotted", base.dotted)
         self.paths_dashed = kwargs.get("paths_dashed", self.dashed)
+        self.paths_wave_style = kwargs.get("paths_wave_style", base.paths_wave_style)
+        self.paths_wave_height = kwargs.get("paths_wave_height", base.paths_wave_height)
         # ---- hexagons
         self.hid = kwargs.get("id", base.hid)  # HEX ID
         self.hex_rows = self.kw_int(kwargs.get("hex_rows", base.hex_rows), "hex_rows")

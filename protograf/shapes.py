@@ -69,19 +69,20 @@ def set_cached_dir(source):
 
 def draw_line(
     cnv=None, start: Point = None, end: Point = None, shape: BaseShape = None, **kwargs
-) -> bool:
+) -> dict:
     """Draw a line on the canvas (Page) between two points for a Shape.
 
     Returns:
-        True if line has a pattern
+        kwargs (modified for styled lines)
     """
+    result = False
     if start and end and cnv:
         if kwargs.get("wave_height"):
             _height = tools.as_float(kwargs.get("wave_height", 0.5), "wave_height")
             try:
                 if _lower(kwargs.get("wave_style", "w")) in ["w", "wave", "squiggle"]:
                     cnv.draw_squiggle(start, end, tools.unit(_height))
-                    return True
+                    result = True
                 elif _lower(kwargs.get("wave_style", "w")) in [
                     "s",
                     "sawtooth",
@@ -89,7 +90,7 @@ def draw_line(
                     "z",
                 ]:
                     cnv.draw_zigzag(start, end, tools.unit(_height))
-                    return True
+                    result = True
                 else:
                     feedback(
                         f'Unable to handle wave_style {kwargs.get("wave_style")}.', True
@@ -102,7 +103,12 @@ def draw_line(
                 )
         else:
             cnv.draw_line(start, end)
-            return False
+            result = False
+    if result:
+        klargs = copy.copy(kwargs)
+        klargs["fill"] = None
+        return klargs
+    return kwargs
 
 
 class ImageShape(BaseShape):
@@ -1887,7 +1893,11 @@ class HexShape(BaseShape):
                     f"A Hexagon's paths must be in the form of a list of direction pairs!",
                     True,
                 )
-            # ---- calculate line draw
+            # ---- set line styles
+            lkwargs = {}
+            lkwargs["wave_style"] = self.kwargs.get("paths_wave_style", None)
+            lkwargs["wave_height"] = self.kwargs.get("paths_wave_height", 0)
+            # ---- draw line/arc
             if self.ORIENTATION == HexOrientation.FLAT:
                 match dir_pair:
                     # 120 degrees / short arc
@@ -1918,15 +1928,29 @@ class HexShape(BaseShape):
                         arc(ptA, perbises["nw"].point, 60.0)  # p0
                     # 90 degrees
                     case ["nw", "se"] | ["se", "nw"]:
-                        cnv.draw_line(
-                            perbises["se"].point, perbises["nw"].point
-                        )  # p3-0
+                        klargs = draw_line(
+                            cnv,
+                            perbises["se"].point,
+                            perbises["nw"].point,
+                            shape=self,
+                            **lkwargs,
+                        )
                     case ["ne", "sw"] | ["sw", "ne"]:
-                        cnv.draw_line(
-                            perbises["ne"].point, perbises["sw"].point
-                        )  # p4-1
+                        klargs = draw_line(
+                            cnv,
+                            perbises["ne"].point,
+                            perbises["sw"].point,
+                            shape=self,
+                            **lkwargs,
+                        )
                     case ["n", "s"] | ["s", "n"]:
-                        cnv.draw_line(perbises["n"].point, perbises["s"].point)  # p5-2
+                        klargs = draw_line(
+                            cnv,
+                            perbises["n"].point,
+                            perbises["s"].point,
+                            shape=self,
+                            **lkwargs,
+                        )
             if self.ORIENTATION == HexOrientation.POINTY:
                 match dir_pair:
                     # 120 degrees / short arc
@@ -1957,15 +1981,29 @@ class HexShape(BaseShape):
                         arc(ptA, perbises["nw"].point, 60.0)  # p0
                     # 90 degrees
                     case ["ne", "sw"] | ["sw", "ne"]:
-                        cnv.draw_line(
-                            perbises["ne"].point, perbises["sw"].point
-                        )  # p5-2
+                        klargs = draw_line(
+                            cnv,
+                            perbises["ne"].point,
+                            perbises["sw"].point,
+                            shape=self,
+                            **lkwargs,
+                        )
                     case ["e", "w"] | ["w", "e"]:
-                        cnv.draw_line(perbises["e"].point, perbises["w"].point)  # p4-1
+                        klargs = draw_line(
+                            cnv,
+                            perbises["e"].point,
+                            perbises["w"].point,
+                            shape=self,
+                            **lkwargs,
+                        )
                     case ["nw", "se"] | ["se", "nw"]:
-                        cnv.draw_line(
-                            perbises["se"].point, perbises["nw"].point
-                        )  # p3-0
+                        klargs = draw_line(
+                            cnv,
+                            perbises["se"].point,
+                            perbises["nw"].point,
+                            shape=self,
+                            **lkwargs,
+                        )
         # ---- set color, thickness etc.
         self.set_canvas_props(
             index=ID,
@@ -2707,10 +2745,8 @@ class LineShape(BaseShape):
                     f'Cannot calculate rotation point "{self.rotation_point}"', True
                 )
         # ---- draw line
-        pattern = draw_line(cnv, Point(x, y), Point(x_1, y_1), shape=self, **kwargs)
-        if pattern:
-            kwargs["fill"] = None
-        self.set_canvas_props(cnv=cnv, index=ID, **kwargs)  # shape.finish()
+        klargs = draw_line(cnv, Point(x, y), Point(x_1, y_1), shape=self, **kwargs)
+        self.set_canvas_props(cnv=cnv, index=ID, **klargs)  # shape.finish()
         # ---- dot
         self.draw_dot(cnv, (x_1 + x) / 2.0, (y_1 + y) / 2.0)
         # ---- text

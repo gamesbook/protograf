@@ -1091,6 +1091,7 @@ customised in a similar way.
 - `Path: Flat & Pointy <hexPath_>`_
 - `Slices: Flat <hexSlicesFlat_>`_
 - `Slices: Pointy <hexSlicesPointy_>`_
+- `Spikes <hexSpikes_>`_
 - `Text: Flat <hexTextFlat_>`_
 - `Text: Pointy <hexTextPointy_>`_
 
@@ -1111,7 +1112,7 @@ Centre
           Hexagon(cx=2, cy=1)
           Hexagon(cx=2, cy=3, orientation='pointy')
 
-      Both Hexagons are located via their centres - *cx* and *cy*.
+      Both Hexagons are positioned via their centres - *cx* and *cy*.
 
       The upper Hexagon has the default *orientation* value of ``flat``.
 
@@ -1571,6 +1572,86 @@ colors are repeated, starting from the first one.
       Each Hexagon has its own setting for:
 
       - *slices* - slices are drawn seqentially
+
+===== ======
+
+.. _hexSpikes:
+
+Spikes
+------
+`^ <hexagon_>`_
+
+Spikes are a set of one or more triangles drawn at the "perbis points" i.e.
+with the base of the triangles centred on the middle of Hexagon edges.
+
+If the height of the spike is given as a **negative** number, then the
+triangle will point to the **inside** of the Hexagon.
+
+.. |hsa| image:: images/custom/hexagon/hex_spikes.png
+   :width: 330
+
+===== ======
+|hsa| This example shows Hexagons constructed using these commands:
+
+      .. code:: python
+
+        hxg = Common(
+            height=1.5,
+            dot=0.05, dot_stroke="red",
+            spikes_width=0.25)
+        Hexagon(
+            common=hxg, x=0.25, y=0.25,
+            orientation="pointy",
+            spikes=["ne", "w",  "se"],
+            spikes_height=0.5)
+        Hexagon(
+            common=hxg, x=2.25, y=4.1,
+            spikes=["s", "sw", "nw", "ne", "se", "n"],
+            spikes_dotted=True,
+            spikes_height=-0.5)
+        Hexagon(
+            common=hxg, x=2.25, y=0.25,
+            orientation="pointy",
+            spikes=["ne", "se", "sw", "w", "nw", "e"],
+            spikes_height=-0.5,
+            spikes_dotted=True)
+        Hexagon(
+            common=hxg, x=0.25, y=2.15,
+            orientation="pointy",
+            spikes=["ne", "se", "sw", "w", "nw", "e"],
+            spikes_stroke="gold",
+            spikes_fill="gold")
+        Hexagon(
+            common=hxg, x=0.25, y=4.1,
+            spikes=["ne", "nw", "s"],
+            spikes_height=0.5)
+        Hexagon(
+            common=hxg, x=2.25, y=2.15,
+            spikes=["s", "sw", "nw", "ne", "se", "n"],
+            spikes_height=0.5,
+            spikes_stroke="gold",
+            spikes_fill="gold")
+
+      These Hexagons all share the following Common properties that differ
+      from the defaults:
+
+      - *height*, *dot* and *dot_stroke* - set the basic Hexagon properties
+      - *spikes_width* - sets the width at base of the triangle; if not
+        given, this will default to one-tenth of the edge length
+
+      The directions of all of the *spikes* are given in list form; but a
+      string format such as ``"n ne nw"`` is also usable.
+
+      The top- and bottom-left hexagons show typical spikes, each with a
+      *spikes_height* of ``0.5`` cm.
+
+      The centre left and right hexagons show spikes with a default height
+      equal to the hexagon's edge length.  They also have their line and fill
+      color both set to ``gold``.
+
+      The top- and bottom-right hexagons show inner-facing spikes, each with a
+      *spikes_height* of ``-0.5`` cm.  They also have their line style set to
+      ``dotted``.
 
 ===== ======
 

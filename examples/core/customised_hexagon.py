@@ -208,7 +208,7 @@ PageBreak()
 # ---- spikes
 Blueprint(stroke_width=0.5)
 Text(common=txt, text="Hex Spikes")
-hxg = Common(height=1.5, dot=0.05, dot_stroke="red", font_size=8,
+hxg = Common(height=1.5, dot=0.05, dot_stroke="red",
              spikes_width=0.25)
 Hexagon(common=hxg, x=0.25, y=0.25, orientation="pointy",
         spikes=["ne", "w",  "se"],
