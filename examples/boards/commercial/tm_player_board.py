@@ -23,6 +23,7 @@ DK_YELLOW = "#E1C82E"
 LT_BLUE = "#91AAC8"
 LT_BROWN = "#A26A23"
 LT_GREY = "#AAA8AB"
+LEAF = "forestgreen"
 
 Rectangle(x=0, y=0.2, height=20.2, width=14.5, fill=BLACK, stroke=BLACK)
 
@@ -142,6 +143,44 @@ Sequence(
     setting=(20, 10, -10, 'number'),
     interval_y=0.9)
 
+Rectangle(x=1.5, y=19, height=1, width=11.5, fill_stroke=BLACK)
+
+# cash
+Font("Helvetica-Bold")
+money = Common(
+    y=19.5, side=0.6, fill="gold", stroke='black', notch=0.08)
+Square(common=money, x=1.7, label="20")
+Square(common=money, x=4.2, label="14")
+Square(common=money, x=11, label="15")
+
+# resource icons
+Font("game-icons-net-20200315a")
+Text(text="\uE8A4", y=5, x=10.5, stroke="goldenrod")  # coin
+Text(text="\uE6C5", y=10.5, x=10.5, stroke="yellow")  # fire
+Text(text="\uEC14", y=14.1, x=10.5, stroke=LEAF)  # leaf
+
 # TODO - icons and text at the bottom
+forest = Common(
+    cy=19.8, label="\uEC14", orientation="pointy",
+    height=0.5, fill_stroke=LT_GREEN)
+Hexagon(common=forest, cx=3.2)
+Hexagon(common=forest, cx=8)
+Square(y=19.5, x=6.5, side=0.6, fill_stroke=LT_GREEN)
+water = Common(
+    cy=19.8, label="\uE494", orientation="pointy",
+    height=0.5, fill_stroke=LT_BLUE)
+Hexagon(common=water, cx=12.6)
+
+
+arrow = Common(
+    y=19.8, length=0.4, arrow_style='notch',
+    arrow_height=0.3,
+    arrow_width=0.3,
+    stroke="red", stroke_width=2.5)
+Line(common=arrow, x=2.4)
+Line(common=arrow, x=7.2)
+Line(common=arrow, x=4.9)
+Line(common=arrow, x=9.9)
+Line(common=arrow, x=11.8)
 
 Save()
