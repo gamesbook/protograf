@@ -19,15 +19,16 @@ Overview
 The `Sequence()` command is designed to lay out a number of values - letters or
 numbers, or shapes - in a straight line.
 
-Apart from the ``Sequence()`` command described here,
-there are also these other commands which allow you to layout
-elements in a more repetitive or regular way within a page:
+Apart from the ``Sequence()`` command described here, there are also these
+other commands which allow you to layout elements in a more repetitive or
+regular way within a page:
 
 - :doc:`Repeat <layouts_repeat>`
 - :doc:`Track <layouts_track>`
 - :doc:`RectangularLocations <layouts_rectangular>`
 - :doc:`TriangularLocations <layouts_triangular>`
 
+.. _the-sequence-command:
 
 Usage
 =====
@@ -50,32 +51,34 @@ The ``Sequence()`` command accepts the following properties:
 - **setting** - [2] alternatively, the setting can be specified by providing a
   list of values (using square ``[...]`` brackets); these are drawn in the order
   provided and can be a mix of letters or numbers
-- **interval_x** and **interval_y** - the distance between the centre of each shape
-  that is drawn, starting from the location of the first as the reference point;
-  negative numbers means the distances are to the left and down (rather than to
-  the right and up)
+- **interval_x** and **interval_y** - [1] the distance between the centre of
+  each shape that is drawn, starting from the location of the first as the
+  reference point; negative numbers means the distances are to the left and up
+  (rather than to the right and down)
+- **interval_x** and **interval_y** - [2] a list of values representing the
+  incremental distance between the centre of each shape that is drawn, starting
+  from the location of the first as the reference point; negative numbers means
+  the distances are to the left and up (rather than to the right and down)
 
 
-Example 1.Sequence Values
--------------------------
+Example 1. Sequence Values #1
+-----------------------------
+`↑ <the-sequence-command_>`_
 
-.. |sqv| image:: images/layouts/sequence_values.png
+.. |sv1| image:: images/layouts/sequence_values1.png
    :width: 330
 
 ===== ======
-|sqv| This example shows the element constructed using differing values for the
-      its properties.
-
-      In each case the ``Text()`` shape is used to display the
+|sv1| This example shows how the ``Text()`` shape is used to display the
       values in the sequence; the values are automatically assigned to its
       **text** property.
 
-      The example with **normal integer numbers** (bottom of example) is created by:
+      This example with **normal integer numbers** is created by:
 
       .. code:: python
 
           Sequence(
-              text(x=1, y=5.5),
+              text(x=1, y=3),
               setting=(10, 0, -2, 'number'),
               interval_x=0.5,
           )
@@ -92,12 +95,26 @@ Example 1.Sequence Values
       The shapes drawn will be in a level line, because the default
       ``interval_y`` value is zero.
 
-      The example with **lowercase letters** (lower middle) is created by:
+===== ======
+
+Example 2. Sequence Values #2
+-----------------------------
+`↑ <the-sequence-command_>`_
+
+.. |sv2| image:: images/layouts/sequence_values2.png
+   :width: 330
+
+===== ======
+|sv2| This example shows how the ``Text()`` shape is used to display the
+      values in the sequence; the values are automatically assigned to its
+      **text** property.
+
+      This example with **lowercase letters** is created by:
 
       .. code:: python
 
           Sequence(
-              text(x=1, y=3.5),
+              text(x=1, y=2.5),
               setting=('h', 'b', -2, 'letter'),
               interval_y=0.5,
               interval_x=0.5,
@@ -117,13 +134,27 @@ Example 1.Sequence Values
       be ``0.5`` cm to the right (``interval_x``) and ``0.5`` cm
       above (``interval_y``) the previous one.
 
-      The example with **uppercase letters** (upper middle) is created by:
+===== ======
+
+Example 3. Sequence Values #3
+-----------------------------
+`↑ <the-sequence-command_>`_
+
+.. |sv3| image:: images/layouts/sequence_values3.png
+   :width: 330
+
+===== ======
+|sv3| This example shows how the ``Text()`` shape is used to display the
+      values in the sequence; the values are automatically assigned to its
+      **text** property.
+
+      This example with **uppercase letters** is created by:
 
       .. code:: python
 
           Sequence(
-              text(x=1, y=3),
-              setting=('B', 'H', 2, 'letter'),
+              text(x=1, y=4),
+              setting=('B', 'J', 2, 'letter'),
               interval_y=-0.5,
               interval_x=0.5,
           )
@@ -135,7 +166,21 @@ Example 1.Sequence Values
       ``0.5`` cm to the right and above |dash| because ``interval_y`` is
       negative |dash| the previous one.
 
-      The example with **Roman numerals** (upper top) is created by:
+===== ======
+
+Example 4. Sequence Values #4
+-----------------------------
+`↑ <the-sequence-command_>`_
+
+.. |sv4| image:: images/layouts/sequence_values4.png
+   :width: 330
+
+===== ======
+|sv4| This example shows how the ``Text()`` shape is used to display the
+      values in the sequence; the values are automatically assigned to its
+      **text** property.
+
+      This example with **Roman numerals** is created by:
 
       .. code:: python
 
@@ -150,12 +195,26 @@ Example 1.Sequence Values
       The range starts at ``5``, which is a ``V`` in Roman, and ends at
       ``11`` which is a ``XI`` in Roman.
 
-      The example with **Excel columns** (top edge of example) is created by:
+===== ======
+
+Example 5. Sequence Values #5
+-----------------------------
+`↑ <the-sequence-command_>`_
+
+.. |sv5| image:: images/layouts/sequence_values5.png
+   :width: 330
+
+===== ======
+|sv5| This example shows how the ``Text()`` shape is used to display the
+      values in the sequence; the values are automatically assigned to its
+      **text** property.
+
+      This example with **Excel columns** is created by:
 
       .. code:: python
 
           Sequence(
-              text(x=0.5, y=0.25),
+              text(x=0.5, y=3),
               setting=(27, 52, 5, 'excel'),
               interval_x=0.5,
           )
@@ -174,23 +233,21 @@ Example 1.Sequence Values
 
 ===== ======
 
-Example 2. Sequence Shapes
---------------------------
+Example 6. Sequence Shapes #1
+-----------------------------
+`↑ <the-sequence-command_>`_
 
-.. |sq2| image:: images/layouts/sequence_shapes.png
+.. |sq1| image:: images/layouts/sequence_shape2.png
    :width: 330
 
 ===== ======
-|sq2| This example shows the element constructed using differing values for the
-      its properties.
-
-      In these cases, values in the sequence are being assigned
+|sq1| In this example, values in the sequence are being assigned
       to a text-based property using the special ``{{sequence}}`` keyword.
 
       The keyword is replaced by the **actual** value of the sequence number
       for the item.
 
-      The example with **rectangles** (top edge) is created by:
+      This example with **rectangles** is created by:
 
       .. code:: python
 
@@ -208,15 +265,35 @@ Example 2. Sequence Shapes
       and substituted into the text as part of the ``Rectangle`` 's label;
       the ``$`` is just a normal character.
 
-      The example with **hexagons** and **nested circles** (middle left) is
+===== ======
+
+Example 7. Sequence Shapes #2
+-----------------------------
+`↑ <the-sequence-command_>`_
+
+.. |sq2| image:: images/layouts/sequence_shape3.png
+   :width: 330
+
+===== ======
+|sq2| In this example, values in the sequence are being assigned
+      to a text-based property using the special ``{{sequence}}`` keyword.
+
+      The keyword is replaced by the **actual** value of the sequence number
+      for the item.
+
+      This example with **hexagons** and **circles** is
       created by:
 
       .. code:: python
 
           Sequence(
-              [hexagon(x=0.25, y=1.5, radius=0.5,
-                       title_size=8, title="Fig. {{sequence}}"),
-               circle(cx=1, cy=2, radius=0.2, fill="gray")],
+              [hexagon(
+                  cx=1, cy=1, radius=0.5,
+                  title_size=8,
+                  title="Fig. {{sequence}}"),
+               circle(
+                   cx=1, cy=1, radius=0.2,
+                   fill="gray")],
               setting=('A', 'C', 1),
               interval_y=1.5,
               interval_x=0.5,
@@ -237,15 +314,31 @@ Example 2. Sequence Shapes
       (enclosed with square brackets ``[...]``).
 
       As always the shapes are drawn in order |dash| the hexagon first and then
-      the grey circle |dash| downwards and to the right (postive intervals).
+      the grey circle |dash| downwards and to the right (positive intervals).
 
-      The example with **circles** (middle right) is created by:
+===== ======
+
+Example 8. Sequence Shapes #3
+-----------------------------
+`↑ <the-sequence-command_>`_
+
+.. |sq3| image:: images/layouts/sequence_shape1.png
+   :width: 330
+
+===== ======
+|sq3| In this example, values in the sequence are being assigned
+      to a text-based property using the special ``{{sequence}}`` keyword.
+
+      The keyword is replaced by the **actual** value of the sequence number
+      for the item.
+
+      This example with **circles** is created by:
 
       .. code:: python
 
           Sequence(
               circle(
-                  cx=3.5, cy=5, radius=0.3,
+                  cx=2, cy=4, radius=0.3,
                   label="{{sequence}}"),
               setting=[4, 'B?', '', 10, 'VI'],
               interval_y=-0.7,
@@ -266,22 +359,81 @@ Example 2. Sequence Shapes
           ``setting`` mean that nothing is assigned to the ``{{sequence}}``
           but that the ``Cirle`` itself is still drawn!
 
-      The example with **squares** (middle centre) is created by:
+===== ======
+
+Example 9. Sequence Shapes #4
+-----------------------------
+`↑ <the-sequence-command_>`_
+
+.. |sq4| image:: images/layouts/sequence_shape4.png
+   :width: 330
+
+===== ======
+|sq4| In this example, values in the sequence are being assigned
+      to a text-based property using the special ``{{sequence}}`` keyword.
+
+      The keyword is replaced by the **actual** value of the sequence number
+      for the item.
+
+      This example with **squares** is created by:
 
       .. code:: python
 
         Sequence(
             [square(
-                x=2.5, y=2, side=0.5,
+                x=1.5, y=1, side=0.5,
                 rounded=True,
                 label_size=8, label ="{{sequence}}")],
             setting=list('DIANA'),
             interval_y=0.6,
             interval_x=0.0,
-            )
+        )
 
-      Here the **setting** is generated by a Python function called ``list``
-      which splits the word into a list of values; these are assigned to the
-      ``{{sequence}}`` to use for the Square's label.
+      Here the **setting** values are generated by a Python function called
+      ``list()`` which splits the word into a list of single letters; these
+      5 letters are assigned in turn to the ``{{sequence}}`` to use for the
+      Squares' labels.
+
+===== ======
+
+Example 10. Sequence Shapes #5
+------------------------------
+`↑ <the-sequence-command_>`_
+
+.. |sq5| image:: images/layouts/sequence_shape5.png
+   :width: 330
+
+===== ======
+|sq5| In this example, values in the sequence are being assigned
+      to a text-based property using the special ``{{sequence}}`` keyword.
+
+      The keyword is replaced by the **actual** value of the sequence number
+      for the item.
+
+      This example with **polygons** is created by:
+
+      .. code:: python
+
+        Sequence(
+            [polygon(
+                cx=2, cy=0.5,
+                sides=7, radius=0.5,
+                label_size=7,
+                label="{{sequence}}")],
+            setting=[
+                "red", "orange", "yellow",
+                "green", "blue"],
+            interval_y=[1.25, 1.5, 1, 1.25, 0.75],
+            interval_x=0.0,
+        )
+
+      Here the **setting** is a list of words; these are assigned to the
+      ``{{sequence}}`` to use for the Polygon's label.
+
+      The *interval_y* property is a list of incremental values; these can be
+      used to position the shape at any y-position on a page.  This can be
+      combined, if needed, with a list of any incremental *interval_x* values.
+      The result is to allow complete flexibility over where items in the
+      sequence can be placed.
 
 ===== ======

@@ -23,13 +23,13 @@ a graphic layout can be useful.
 .. _cube-object:
 
 Cube Properties
-=============
+===============
 
 The hexagonal-shaped object ``Cube`` shares all of the properties of the
 :ref:`Hexagon <hexIndex>`, with additional properties of *shades*.
 
 Cube Examples
-==============
+=============
 
 The examples below shows how a Cube can be created and styled.
 

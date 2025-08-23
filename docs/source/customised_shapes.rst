@@ -126,15 +126,15 @@ Example 1. Dotted, Dashed and Angled Lines
         Line(
             x=1, y=1.5, stroke_width=10,
             length=2, stroke="aqua",
-            rounded=True)
+            stroke_ends="rounded")
         Line(
             x=1, y=2, stroke_width=10,
             length=2, stroke="gold",
-            squared=True)
+            stroke_ends="squared")
 
         # thin colored lines
         Line(
-            x=0, y=4.5, x1=4, y1=5.5,
+            x=0, y=5, x1=4, y1=5.9,
             stroke="blue", stroke_width=1,
             dashed=[0.2, 0.1],
             label="dashed:[0.2,0.1]", font_size=6)
@@ -147,6 +147,16 @@ Example 1. Dotted, Dashed and Angled Lines
             x=0, y=2.5, length=4,
             stroke="pink", stroke_width=2)
 
+        Line(
+            x=0, y=4, x1=4, y1=4,
+            stroke="purple", stroke_width=1,
+            wave_style='wave', wave_height=1.9)
+
+        Line(
+            x=0, y=4, x1=4, y1=4,
+            stroke="firebrick", stroke_width=1,
+            wave_style='sawtooth', wave_height=0.1)
+
 
       The various black lines have these properties:
 
@@ -158,7 +168,7 @@ Example 1. Dotted, Dashed and Angled Lines
       The dotted line is just a series of small lines i.e. all of the "dots",
       followed by gaps, are of sizes equal to the line's *stroke_width*.
 
-      The thin red line has:
+      The thin, bright red line has:
 
       - *angle* - of ``15`` |deg| from the baseline, clockwise
 
@@ -167,7 +177,7 @@ Example 1. Dotted, Dashed and Angled Lines
       will be 0 |deg|. The line length is then calculated based on these
       points.
 
-      The green, gold, pink, red and aqua lines all have:
+      The green, gold, pink, bright red and aqua lines all have:
 
       - *x* and *y* set as their starting point
       - *length* - sets the specific size of the line
@@ -178,11 +188,11 @@ Example 1. Dotted, Dashed and Angled Lines
 
       The thick aqua line has:
 
-      - *rounded* set to ``True`` so circles are drawn at line end centres
+      - *stroke_ends* set to ``rounded`` so circles are drawn at line ends centres
 
       The thick gold line has:
 
-      - *squared* set to ``True`` so squares are drawn at line end centres
+      - *stroke_ends* set to ``squared`` so squares are drawn at line end centres
 
       The dark blue line has:
 
@@ -191,6 +201,16 @@ Example 1. Dotted, Dashed and Angled Lines
 
       Dashes are a list of two numbers. The first is the length of the dash;
       the second is the length of the space between each dash.
+
+      The purple line has:
+
+      - *wave_style*  set to ``'wave'`` creating a wave-like effect
+      - *wave_height* set to ``1.9`` for the height of each "peak"
+
+      The dark red line has:
+
+      - *wave_style*  set to ``'sawtooth'`` creating a "zig-zag" effect
+      - *wave_height* set to ``0.1`` for the height of each "peak"
 
 ===== ======
 
@@ -874,7 +894,7 @@ Slices
 ------
 `^ <rectangleIndex_>`_
 
-The slices-related command enables the rectangle to be filled with
+The slices-related command enables the Rectangle to be filled with
 colored triangular or quadilateral shapes.
 
 .. NOTE::
@@ -1068,8 +1088,10 @@ customised in a similar way.
 - `Radii: Pointy <hexRadiiPointy_>`_
 - `Perbis: Flat <hexPerbisFlat_>`_
 - `Perbis: Pointy <hexPerbisPointy_>`_
+- `Path: Flat & Pointy <hexPath_>`_
 - `Slices: Flat <hexSlicesFlat_>`_
 - `Slices: Pointy <hexSlicesPointy_>`_
+- `Spikes <hexSpikes_>`_
 - `Text: Flat <hexTextFlat_>`_
 - `Text: Pointy <hexTextPointy_>`_
 
@@ -1090,7 +1112,7 @@ Centre
           Hexagon(cx=2, cy=1)
           Hexagon(cx=2, cy=3, orientation='pointy')
 
-      Both Hexagons are located via their centres - *cx* and *cy*.
+      Both Hexagons are positioned via their centres - *cx* and *cy*.
 
       The upper Hexagon has the default *orientation* value of ``flat``.
 
@@ -1394,10 +1416,76 @@ the mid-points of the edges.
 
       - *common* - all Hexagons drawn with the Common value of ``hxg`` will
         share the same properties; height, font size, dot and orientation
-      - *x* and *y* to set the lower-left position
+      - *x* and *y* to set the upper-left position
       - *perbis* - a compass direction in which the bisector is drawn
         (centre to mid-point)
       - *label* - the text displayed in the centre
+
+===== ======
+
+.. _hexPath:
+
+Path: Flat & Pointy
+-------------------
+`^ <hexagon_>`__
+
+Path lines are drawn between the mid-points of two edges; they can be arcs
+or straight lines depending on which edges they connnect.
+
+.. |pp1| image:: images/custom/hexagon/hex_paths.png
+   :width: 330
+
+===== ======
+|pp1| This example shows Hexagons constructed using these commands:
+
+      .. code:: python
+
+        hxg = Common(
+            height=1.5, font_size=8,
+            dot=0.05, dot_stroke="red")
+
+        Hexagon(
+            common=hxg, x=0.25, y=0.25,
+            orientation="pointy",
+            paths=["ne sw", "e w",  "se nw"])
+        Hexagon(
+            common=hxg, x=0.25, y=2.15,
+            orientation="pointy",
+            paths=["ne e", "e se", "se sw", "sw w", "w nw", "nw ne"],
+            paths_stroke="gold")
+        Hexagon(
+            common=hxg, x=0.25, y=4.1,
+            paths=["sw ne", "se nw", "s n"])
+        Hexagon(
+            common=hxg, x=2.25, y=4.1,
+            paths=["s ne", "se sw", "s nw", "nw ne", "n se", "n sw"],
+            paths_dotted=True)
+        Hexagon(
+            common=hxg, x=2.25, y=2.15,
+            paths=["ne n", "ne se", "se s", "sw s", "sw nw", "nw n"],
+            paths_stroke="gold")
+        Hexagon(
+            common=hxg, x=2.25, y=0.25,
+            orientation="pointy",
+            paths=["ne se", "e sw", "se w", "sw nw", "w ne", "nw e"],
+            paths_dotted=True)
+
+      These have the following properties:
+
+      - *common* - all Hexagons drawn with the Common value of ``hxg`` will
+        share the same properties; height, font size, dot and orientation
+      - *x* and *y* to set the upper-left position
+      - *paths* - a list of one or more pairs of compass directions between
+        which a line |dash| straight or an arc |dash| is drawn
+
+      The Hexagons with normal line styles have connections between opposing
+      edges.
+
+      The Hexagons with gold colored line have connections between adjacent
+      edges.
+
+      The Hexagons with dotteed line styles have connections between edges
+      that are not opposite or adjacent.
 
 ===== ======
 
@@ -1487,6 +1575,85 @@ colors are repeated, starting from the first one.
 
 ===== ======
 
+.. _hexSpikes:
+
+Spikes
+------
+`^ <hexagon_>`_
+
+Spikes are a set of one or more triangles drawn at the "perbis points" i.e.
+with the base of the triangles centred on the middle of Hexagon edges.
+
+If the height of the spike is given as a **negative** number, then the
+triangle will point to the **inside** of the Hexagon.
+
+.. |hsa| image:: images/custom/hexagon/hex_spikes.png
+   :width: 330
+
+===== ======
+|hsa| This example shows Hexagons constructed using these commands:
+
+      .. code:: python
+
+        hxg = Common(
+            height=1.5,
+            dot=0.05, dot_stroke="red",
+            spikes_width=0.25)
+        Hexagon(
+            common=hxg, x=0.25, y=0.25,
+            orientation="pointy",
+            spikes=["ne", "w",  "se"],
+            spikes_height=0.5)
+        Hexagon(
+            common=hxg, x=2.25, y=4.1,
+            spikes=["s", "sw", "nw", "ne", "se", "n"],
+            spikes_dotted=True,
+            spikes_height=-0.5)
+        Hexagon(
+            common=hxg, x=2.25, y=0.25,
+            orientation="pointy",
+            spikes=["ne", "se", "sw", "w", "nw", "e"],
+            spikes_height=-0.5,
+            spikes_dotted=True)
+        Hexagon(
+            common=hxg, x=0.25, y=2.15,
+            orientation="pointy",
+            spikes=["ne", "se", "sw", "w", "nw", "e"],
+            spikes_stroke="gold",
+            spikes_fill="gold")
+        Hexagon(
+            common=hxg, x=0.25, y=4.1,
+            spikes=["ne", "nw", "s"],
+            spikes_height=0.5)
+        Hexagon(
+            common=hxg, x=2.25, y=2.15,
+            spikes=["s", "sw", "nw", "ne", "se", "n"],
+            spikes_height=0.5,
+            spikes_stroke="gold",
+            spikes_fill="gold")
+
+      These Hexagons all share the following Common properties that differ
+      from the defaults:
+
+      - *height*, *dot* and *dot_stroke* - set the basic Hexagon properties
+      - *spikes_width* - sets the width at base of the triangle; if not
+        given, this will default to one-tenth of the edge length
+
+      The directions of all of the *spikes* are given in list form; but a
+      string format such as ``"n ne nw"`` is also usable.
+
+      The top- and bottom-left hexagons show typical spikes, each with a
+      *spikes_height* of ``0.5`` cm.
+
+      The centre left and right hexagons show spikes with a default height
+      equal to the hexagon's edge length.  They also have their line and fill
+      color both set to ``gold``.
+
+      The top- and bottom-right hexagons show inner-facing spikes, each with a
+      *spikes_height* of ``-0.5`` cm.  They also have their line style set to
+      ``dotted``.
+
+===== ======
 
 
 .. _hexTextFlat:
@@ -1605,12 +1772,24 @@ Example 1. Flat
         hxg = Common(
           height=1.5, orientation="flat", font_size=8)
 
-        Hexagon(common=hxg, x=0.25, y=0.25, borders=('sw', 2, "gold"), label="SW")
-        Hexagon(common=hxg, x=0.25, y=2.15, borders=('nw', 2, "gold"), label="NW")
-        Hexagon(common=hxg, x=0.25, y=4.00, borders=('n', 2, "gold"), label="N")
-        Hexagon(common=hxg, x=2.25, y=4.00, borders=('s', 2, "gold"), label="S")
-        Hexagon(common=hxg, x=2.25, y=0.25, borders=('ne', 2, "gold"), label="NE")
-        Hexagon(common=hxg, x=2.25, y=2.15, borders=('se', 2, "gold"), label="SE")
+        Hexagon(
+            common=hxg, x=0.25, y=0.25,
+            borders=('sw', 2, "gold"), label="SW")
+        Hexagon(
+            common=hxg, x=0.25, y=2.15,
+            borders=('nw', 2, "gold"), label="NW")
+        Hexagon(
+            common=hxg, x=0.25, y=4.00,
+            borders=('n', 2, "gold"), label="N")
+        Hexagon(
+            common=hxg, x=2.25, y=4.00,
+            borders=('s', 2, "gold"), label="S")
+        Hexagon(
+            common=hxg, x=2.25, y=0.25,
+            borders=('ne', 2, "gold"), label="NE")
+        Hexagon(
+            common=hxg, x=2.25, y=2.15,
+            borders=('se', 2, "gold"), label="SE")
 
       Each Hexagon has a normal *stroke_width* as its outline, with a
       default *fill* and *stroke* color of black.
@@ -1634,12 +1813,25 @@ Example 2. Pointy
         hxg = Common(
           height=1.5, orientation="pointy", font_size=8)
 
-        Hexagon(common=hxg, x=0.25, y=0.25, borders=('sw', 2, "gold"), label="SW")
-        Hexagon(common=hxg, x=0.25, y=2.15, borders=('nw', 2, "gold"), label="NW")
-        Hexagon(common=hxg, x=0.25, y=4.00, borders=('w', 2, "gold"), label="W")
-        Hexagon(common=hxg, x=2.25, y=4.00, borders=('e', 2, "gold"), label="E")
-        Hexagon(common=hxg, x=2.25, y=0.25, borders=('ne', 2, "gold"), label="NE")
-        Hexagon(common=hxg, x=2.25, y=2.15, borders=('se', 2, "gold"), label="SE")
+        Hexagon(
+            common=hxg, x=2.25, y=4.00,
+            common=hxg, x=0.25, y=0.25,
+            borders=('sw', 2, "gold"), label="SW")
+        Hexagon(
+            common=hxg, x=0.25, y=2.15,
+            borders=('nw', 2, "gold"), label="NW")
+        Hexagon(
+            common=hxg, x=0.25, y=4.00,
+            borders=('w', 2, "gold"), label="W")
+        Hexagon(
+            common=hxg, x=2.25, y=4.00,
+            borders=('e', 2, "gold"), label="E")
+        Hexagon(
+            common=hxg, x=2.25, y=0.25,
+            borders=('ne', 2, "gold"), label="NE")
+        Hexagon(
+            common=hxg, x=2.25, y=2.15,
+            borders=('se', 2, "gold"), label="SE")
 
       Each Hexagon has a normal *stroke_width* as its outline, with a
       default *fill* and *stroke* color of black.
@@ -1665,6 +1857,7 @@ ways that it can be customised.
 - `Radii Labels <circleRadiiLabels_>`_
 - `Petals: petal <circlePetalsPetal_>`_
 - `Petals: triangle <circlePetalsTriangle_>`_
+- `Slices <circleSlices_>`_
 
 .. _circleCross:
 
@@ -1787,7 +1980,8 @@ of a Circle towards its circumference.
                radii_stroke="red")
 
         Circle(cx=3, cy=5, radius=1,
-               fill="green", stroke="orange", stroke_width=1,
+               fill="green",
+               sstroke="orange", stroke_width=1,
                radii=[0,90,180,270,45,135,225,315],
                radii_stroke_width=8,
                radii_stroke="orange",
@@ -1990,6 +2184,94 @@ effect.
 
       Note that these petals have a default *petals_style* of
       ``t`` or ``triangle``.
+
+===== ======
+
+
+.. _circleSlices:
+
+Slices
+------
+`^ <circleIndex_>`_
+
+The slices command enables the Circle to be filled with colored pie-shaped
+wedges.
+
+These are relevant properties that can be set:
+
+- *slices* - this is a list of colors (named or hexadecimal); if ``None`` is
+  used then no slice will be drawn in that position
+- *slices_fractions* - this is the "length" of the slices; if not specified,
+  then by default all slices will have their fraction set to ``1`` meaning they
+  are equal to the radius of the circle |dash| values smaller than ``1`` will
+  result in them being drawn inside the circle and values larger than ``1``
+  will  result in them extending outside of the circle
+- *slices_angles* - this is the "width" of the slices; if not specified,
+  then by default all slices will be of equally-sized angles and will occupy
+  the full circumference of the circle
+
+Both the list of  *slice_fractions*  and  *slice_angles* must be of equal
+length to the  *slice* list.
+
+.. NOTE::
+
+    Slices are drawn **after** the circle has been drawn, and so
+    may obscure the stroke outline and fill color of the circle.
+
+.. |cs1| image:: images/custom/circle/circle_slices.png
+   :width: 330
+
+===== ======
+|cs1| This example shows Circles constructed using the commands:
+
+      .. code:: python
+
+        Circle(cx=1, cy=1, radius=1,
+               slices=["red", "gold", "aqua"],
+               dot=0.05)
+        Circle(cx=2, cy=3, radius=1,
+               slices=["red", None, "red", None, "red", None],
+               dot=0.05)
+        Circle(cx=3, cy=5, radius=1,
+               slices=["red", "gold", "aqua", "red", "gold", "aqua"],
+               rotation=30,
+               dot=0.05)
+        Circle(cx=3, cy=1, radius=1,
+               slices=["black", "grey", "silver"],
+               slices_fractions=[0.33, 0.75, 0.5])
+        Circle(cx=1, cy=5, radius=1, fill="gold",
+               slices=["black", None, "grey", "silver"],
+               slices_fractions=[0.33, None, 1.5, 0.75],
+               slices_angles=[60, 45, 45, 120])
+
+      The top-left example shows the minimum required; the *slices* property is
+      a list of colors (``[ ]`` with comma-separated color strings).
+      This causes **three** slices to be drawn |dash| starting from 0 |deg| to the
+      east, and continuing anti-clockwise.  Each slice is 120 |deg| in width.
+
+      The middle example shows what happens when the *slices* property includes
+      the ``None`` value; in this case, no slice is drawn between each ``red``
+      slice.  Each slice, including the "blanks" is 60 |deg| in width.
+
+      The lower-right example shows what happens when the *rotation* property
+      is also set; the slices start position is offset that many degrees
+      anti-clockwise from the 0 |deg| (east) position.
+
+      The top-right example shows the use of the *slices_fractions* property;
+      because values are less than ``1`` this causes the "length" of the
+      pie-slice to be shortened to that fraction of the circle's radius.
+
+      The bottom-left example show the use of the *slices_fractions* property
+      and what happens when the *slices* property and the matching
+      *slices_fractions* property both include the ``None`` value; in this
+      case, no slice is drawn.  A fraction of ``1.5`` means the slice will
+      extend beyond the circumference of the circle.  This example also
+      shows the use of *slices_angles* to control the width of the slices;
+      in this case they do not occupy the full circumference because the total
+      angles amount is less than 360 |deg|.
+
+      **NOTE** All slice lines are drawn with the  *slices_stroke* color,
+      which defaults to the slice color itself.
 
 ===== ======
 

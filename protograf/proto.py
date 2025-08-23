@@ -533,12 +533,14 @@ class CardShape(BaseShape):
                         for flat_new_ele in flat_new_eles:
                             members = flat_new_ele.members or self.members
                             iid = members.index(cid + 1)
+                            # feedback(f'$$$ draw_card $$$ {iid=} {flat_new_ele=}')
                             custom_new_ele = self.handle_custom_values(
                                 flat_new_ele, iid
                             )
+                            # feedback(f'$$$ draw_card $$$ {iid=} {custom_new_ele=}')
                             if isinstance(custom_new_ele, (SequenceShape, RepeatShape)):
                                 custom_new_ele.deck_data = self.deck_data
-                            # feedback(f'$$$ draw_card $$$ {custom_new_ele=}')
+                            # feedback(f'$$$ draw_card $$$ {self.shape_id=} {custom_new_ele=}')
                             custom_new_ele.draw(
                                 cnv=cnv, off_x=_dx, off_y=_dy, ID=iid, **kwargs
                             )
@@ -590,10 +592,34 @@ class DeckOfCards:
         match self.frame:
             case "rectangle" | "r":
                 self.frame_type = CardFrame.RECTANGLE
+                if self.height > (
+                    globals.page_height - globals.margins.top - globals.margins.bottom
+                ):
+                    feedback("Card height cannot exceed available page height.", True)
+                if self.width > (
+                    globals.page_width - globals.margins.left - globals.margins.right
+                ):
+                    feedback("Card width cannot exceed available page width.", True)
             case "circle" | "c":
                 self.frame_type = CardFrame.CIRCLE
+                if 2 * self.radius > (
+                    globals.page_height - globals.margins.top - globals.margins.bottom
+                ):
+                    feedback("Card diameter cannot exceed available page height.", True)
+                if 2 * self.radius > (
+                    globals.page_width - globals.margins.left - globals.margins.right
+                ):
+                    feedback("Card diameter cannot exceed available page width.", True)
             case "hexagon" | "h":
                 self.frame_type = CardFrame.HEXAGON
+                if 2 * self.radius > (
+                    globals.page_height - globals.margins.top - globals.margins.bottom
+                ):
+                    feedback("Card diameter cannot exceed available page height.", True)
+                if 2 * self.radius > (
+                    globals.page_width - globals.margins.left - globals.margins.right
+                ):
+                    feedback("Card diameter cannot exceed available page width.", True)
             case _:
                 hint = " Try rectangle, hexagon, or circle."
                 feedback(f"Unable to draw a {self.frame}-shaped card. {hint}", True)
@@ -1262,7 +1288,7 @@ def page_setup():
         )
     # ---- debug margins
     if globals.margins.debug:
-        # print(f'{globals.margins.left=} {globals.margins.right=}')
+        # print(f'$$$ {globals.margins.left=} {globals.margins.right=}')
         stroke = colrs.get_color(DEBUG_COLOR)
         globals.doc_page.draw_rect(
             (
@@ -1369,7 +1395,7 @@ def Create(**kwargs):
         globals.page = (_page_width_pt, _page_height_pt)
     globals.page_width = globals.page[0] / globals.units  # width in user units
     globals.page_height = globals.page[1] / globals.units  # height in user units
-    globals.fill = colrs.get_color(kwargs.get("fill", "white"))
+    globals.page_fill = colrs.get_color(kwargs.get("fill", "white"))
     globals.page_grid = tools.as_float(kwargs.get("page_grid", 0), "page_grid")
     # ---- fonts
     base_fonts()
@@ -1475,7 +1501,7 @@ def PageBreak(**kwargs):
 
     Kwargs:
 
-    - footer (bool): whether a Footer objetct should be drawn before starting next page
+    - footer (bool): should a Footer object be drawn before starting next page
 
     """
     validate_globals()
@@ -1680,7 +1706,13 @@ def Save(**kwargs):
     local_filename = kwargs.get("filename", None)  # override Create()
 
     # ---- directory
-    globals.directory = directory if directory else os.getcwd()
+    if globals.pargs.directory:
+        globals.directory = globals.pargs.directory
+    elif directory:
+        globals.directory = directory
+    else:
+        globals.directory = os.getcwd()
+    # print(f'$$$ {globals.directory=}')
     if not os.path.exists(globals.directory):
         feedback(
             f'Cannot find the directory "{globals.directory}" - please create this first.',
@@ -1707,23 +1739,24 @@ def Save(**kwargs):
     globals.canvas.commit()  # add all drawings (to current pymupdf Shape)
 
     # ---- save all Pages to file
-    msg = "Please check folder exists and that you have access rights."
+    msg = "Please check the folder exists and that you have access rights."
     the_filename = local_filename or globals.filename
-    output_filename = os.path.join(globals.directory, the_filename)
+    output_filepath = os.path.join(globals.directory, the_filename)
+    # print(f'$$$ {output_filepath=}')
     try:
         globals.document.subset_fonts(verbose=True)  # subset fonts to reduce file size
-        globals.document.save(output_filename)
+        globals.document.save(output_filepath)
     except RuntimeError as err:
-        feedback(f'Unable to save "{output_filename}" - {err} - {msg}', True)
+        feedback(f'Unable to save "{output_filepath}" - {err} - {msg}', True)
     except FileNotFoundError as err:
-        feedback(f'Unable to save "{output_filename}" - {err} - {msg}', True)
+        feedback(f'Unable to save "{output_filepath}" - {err} - {msg}', True)
     except pymupdf.mupdf.FzErrorSystem as err:
-        feedback(f'Unable to save "{output_filename}" - {err} - {msg}', True)
+        feedback(f'Unable to save "{output_filepath}" - {err} - {msg}', True)
 
     # ---- export individual Cards (where only Card fronts exist)
     if globals.deck and len(globals.deck.fronts) >= 1:
         globals.deck.export_cards_as_images(
-            filename=globals.filename, directory=globals.directory
+            filename=the_filename, directory=globals.directory
         )
 
     # ---- save to PNG image(s) or SVG file(s)
@@ -1740,7 +1773,7 @@ def Save(**kwargs):
 
     if output and globals.pargs.png:  # pargs.png should default to True
         support.pdf_export(
-            globals.filename,
+            the_filename,
             fformat,
             dpi,
             names,
@@ -1750,7 +1783,7 @@ def Save(**kwargs):
 
     # ---- process area/cols_rows extracts
     support.pdf_frames_to_png(
-        source_file=globals.filename,
+        source_file=the_filename,
         output=None,  # ??? FIXME
         fformat="png",
         dpi=300,  # ??? FIXME
@@ -2697,8 +2730,8 @@ def Circle(row=None, col=None, **kwargs):
     Kwargs:
 
     <center>
-    - hatch (str): if not specified, hatches will be drawn
-      in all directions - otherwise:
+    - hatch (str): edge-to-edge lines that, if not specified, will
+      be drawn in all directions - otherwise:
 
       - ``n`` (North) or ``s`` (South) draws vertical lines;
       - ``w`` (West) or ``e`` (East) draws horizontal lines;
@@ -2743,6 +2776,15 @@ def Circle(row=None, col=None, **kwargs):
     - radii_labels_size (float): point size of label text
     - radii_labels_stroke (str): the named or hexadecimal color of the label text
     - radii_labels_stroke_width (float): thickness of the label text
+    - slices (list): colors (named or hexadecimal) used to draw pie slices; if
+      None is used then no slice will be drawn in that position
+    - slices_fractions (list): the "length" of the slices; if not specified,
+      then by default all slices will have their fraction set to 1 i.e. equal
+      to the radius of the circle - values smaller than 1 will be drawn inside
+      the circle and values larger than 1 will extend slices outside the circle
+    - slices_angles (list): the "width" of the slices; if not specified,
+      then by default all slices will be of equally-sized angles and occupy
+      the full circumference of the circle
     """
     kwargs = margins(**kwargs)
     circle = CircleShape(canvas=globals.canvas, **kwargs)
@@ -2755,7 +2797,7 @@ def circle(**kwargs):
     return CircleShape(canvas=globals.canvas, **kwargs)
 
 
-@docstring_base
+@docstring_center
 def Compass(row=None, col=None, **kwargs):
     """Draw a Compass shape on the canvas.
 
@@ -2766,7 +2808,7 @@ def Compass(row=None, col=None, **kwargs):
 
     Kwargs:
 
-    <base>
+    <center>
 
     """
     kwargs = margins(**kwargs)
@@ -2805,7 +2847,7 @@ def dot(row=None, col=None, **kwargs):
     return DotShape(canvas=globals.canvas, **kwargs)
 
 
-@docstring_base
+@docstring_center
 def Ellipse(**kwargs):
     """Draw a Ellipse shape on the canvas.
 
@@ -2816,7 +2858,7 @@ def Ellipse(**kwargs):
 
     Kwargs:
 
-    <base>
+    <center>
 
     """
     kwargs = margins(**kwargs)
@@ -2830,7 +2872,7 @@ def ellipse(**kwargs):
     return EllipseShape(canvas=globals.canvas, **kwargs)
 
 
-@docstring_base
+@docstring_center
 def EquilateralTriangle(row=None, col=None, **kwargs):
     """Draw a EquilateralTriangle shape on the canvas.
 
@@ -2841,7 +2883,7 @@ def EquilateralTriangle(row=None, col=None, **kwargs):
 
     Kwargs:
 
-    <base>
+    <center>
 
     """
     kwargs = margins(**kwargs)
@@ -2857,7 +2899,7 @@ def equilateraltriangle(row=None, col=None, **kwargs):
     return EquilateralTriangleShape(canvas=globals.canvas, **kwargs)
 
 
-@docstring_base
+@docstring_center
 def Hexagon(row=None, col=None, **kwargs):
     """Draw a Hexagon shape on the canvas.
 
@@ -2868,8 +2910,55 @@ def Hexagon(row=None, col=None, **kwargs):
 
     Kwargs:
 
-    <base>
+    <center>
+    - orientation (str): either *float*, the default, or *pointy*
+    - perbis (str): a compass direction in which a bisector is drawn
+      (from centre to mid-point of the edge in that direction); directions:
 
+      - ``n`` (North) / ``s`` (South) draws vertical perbis for flat hex;
+      - ``w`` (West) / ``e`` (East) draws horizontal perbis for pointy hex;
+      - ``nw`` (North-West) / ``se`` (South-East) draws diagonal perbis lines.
+    - slices (list): set of colors that are drawn as triangles  in a clockwise
+      direction starting from the "North East"
+    - border (list): overide the normal edge line; specify a set of values, which
+      are comma-separated inside round brackets, in the following order:
+
+      - direction (str): one of (n)orth, (s)outh, (e)ast or (w)est,
+        nw (north-west) or se (south-east)
+      - width (float): the line thickness
+      - color (str): either a named or hexadecimal color
+      - style  (bool): True makes a dotted line; or a list of values creates dashes
+    - hatch (str): edge-to-edge lines that, if not specified, will
+      be drawn in all directions - otherwise:
+
+      - ``n`` (North) or ``s`` (South) draws vertical lines for flat hex;
+      - ``w`` (West) or ``e`` (East) draws horizontal lines for pointy hex;
+      - ``nw`` (North-West) or ``se`` (South-East) draws diagonal lines.
+    - hatch_count (int): sets the **number** of lines to be drawn the
+      intervals between them are equal and depend on the direction
+    - hatch_stroke_width (float): hatch line thickness; defaults to 0.1 points
+    - hatch_stroke (str): the named or hexadecimal color of the hatch line;
+      defaults to ``black``
+    - paths (list): one or more pairs of compass directions between
+      which a line - straight or an arc - is drawn
+    - paths_dotted (bool): if set to True, will make the paths lines dotted
+    - paths_stroke_width (float): determines the thickness of the paths
+    - paths_stroke (str): the named or hexadecimal color of the paths line;
+      defaults to ``black`
+    - radii_dotted (bool): if set to True, will make the radii lines dotted
+    - radii_stroke_width (float): determines the thickness of the radii
+    - radii_stroke (str): the named or hexadecimal color of the hatch line;
+      defaults to ``black``
+    - radii_length (float): changes the length of the radii lines
+      (centre to circumference)
+    - radii_offset (float): moves the endpoint of the radii line
+      **away** from the centre
+    - radii_labels (str|list): a string or list of strings used for text labels
+    - radii_labels_font (str): name of the font used for the labels
+    - radii_labels_rotation(float): rotation in degrees relative to radius angle
+    - radii_labels_size (float): point size of label text
+    - radii_labels_stroke (str): the named or hexadecimal color of the label text
+    - radii_labels_stroke_width (float): thickness of the label text
     """
     kwargs = margins(**kwargs)
     # print(f'$$$ Will draw HexShape: {kwargs}')
@@ -2903,6 +2992,8 @@ def Line(row=None, col=None, **kwargs):
       with *angle* (which defaults to 0 |deg|)
     - x1 and y1 (floats): a fixed endpoint for the line end (if not calculated by
       *angle* and *length*)
+    - wave_style (str):  either wave or sawtooth
+    - wave_height (float): the height of each peak
 
     Arrow-related Kwargs:
 
@@ -2938,7 +3029,7 @@ def line(row=None, col=None, **kwargs):
     return LineShape(canvas=globals.canvas, **kwargs)
 
 
-@docstring_base
+@docstring_center
 def Polygon(row=None, col=None, **kwargs):
     """Draw a Polygon shape on the canvas.
 
@@ -2949,7 +3040,7 @@ def Polygon(row=None, col=None, **kwargs):
 
     Kwargs:
 
-    <base>
+    <center>
 
     """
     kwargs = margins(**kwargs)
@@ -3019,7 +3110,7 @@ def rightangledtriangle(row=None, col=None, **kwargs):
     return RightAngledTriangleShape(canvas=globals.canvas, **kwargs)
 
 
-@docstring_base
+@docstring_center
 def Rhombus(row=None, col=None, **kwargs):
     """Draw a Rhombus shape on the canvas.
 
@@ -3030,7 +3121,7 @@ def Rhombus(row=None, col=None, **kwargs):
 
     Kwargs:
 
-    <base>
+    <center>
 
     """
     kwargs = margins(**kwargs)
@@ -3058,13 +3149,14 @@ def Rectangle(row=None, col=None, **kwargs):
     <center>
 
     - rounding (float): the radius of the circle used to round the corner
-    - border (list): a set of values, which are comma-separated inside round
-      brackets, in the following order:
+    - border (list): overide the normal edge line; specify a set of values, which
+      are comma-separated inside round brackets, in the following order:
 
-      - direction - one of (n)orth, (s)outh, (e)ast or (w)est
-      - width - the line thickness
-      - color - either a named or hexadecimal color
-      - style - ``True`` makes it dotted; or a list of values creates dashes
+      - direction (str): one of (n)orth, (s)outh, (e)ast or (w)est,
+        nw (north-west) or se (south-east)
+      - width (float): the line thickness
+      - color (str): either a named or hexadecimal color
+      - style  (bool): True makes a dotted line; or a list of values creates dashes
     - chevron (str): the primary compass direction in which a peak is
       pointing; n(orth), s(outh), e(ast) or w(est)
     - chevron_height (float): the distance of the chevron peak from the side of
@@ -3206,7 +3298,7 @@ def sector(row=None, col=None, **kwargs):
     return SectorShape(canvas=globals.canvas, **kwargs)
 
 
-@docstring_base
+@docstring_center
 def Square(row=None, col=None, **kwargs):
     """Draw a Square shape on the canvas.
 
@@ -3217,7 +3309,7 @@ def Square(row=None, col=None, **kwargs):
 
     Kwargs:
 
-    <base>
+    <center>
 
     """
     kwargs = margins(**kwargs)
@@ -3233,7 +3325,7 @@ def square(row=None, col=None, **kwargs):
     return SquareShape(canvas=globals.canvas, **kwargs)
 
 
-@docstring_base
+@docstring_center
 def Stadium(row=None, col=None, **kwargs):
     """Draw a Stadium shape on the canvas.
 
@@ -3244,7 +3336,7 @@ def Stadium(row=None, col=None, **kwargs):
 
     Kwargs:
 
-    <base>
+    <center>
 
     """
     kwargs = margins(**kwargs)
@@ -3262,7 +3354,7 @@ def stadium(row=None, col=None, **kwargs):
     return StadiumShape(canvas=globals.canvas, **kwargs)
 
 
-@docstring_base
+@docstring_center
 def Star(row=None, col=None, **kwargs):
     """Draw a Star shape on the canvas.
 
@@ -3273,7 +3365,7 @@ def Star(row=None, col=None, **kwargs):
 
     Kwargs:
 
-    <base>
+    <center>
 
     """
     kwargs = margins(**kwargs)
@@ -3317,7 +3409,7 @@ def text(*args, **kwargs):
     return TextShape(_object=_obj, canvas=globals.canvas, **kwargs)
 
 
-@docstring_base
+@docstring_center
 def Trapezoid(row=None, col=None, **kwargs):
     """Draw a Trapezoid shape on the canvas.
 
@@ -3326,9 +3418,9 @@ def Trapezoid(row=None, col=None, **kwargs):
     - row (int): row in which the shape is drawn.
     - col (int): column in which the shape is drawn.
 
-    Kwargs:null
+    Kwargs:
 
-    <base>
+    <center>
 
     """
     kwargs = margins(**kwargs)

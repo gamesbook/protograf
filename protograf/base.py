@@ -205,8 +205,8 @@ class BaseCanvas:
         self.stroke = colrs.get_color(stroke)
         self.stroke_width = self.defaults.get("stroke_width", WIDTH)
         self.stroke_width_border = self.defaults.get("stroke_width_border", None)
-        # pymupdf lineCap: 0 = line ends in sharp edge; 1 = adds semi-circle at end
-        self.stroke_cap = self.defaults.get("stroke_cap", 0)
+        # use for pymupdf lineCap: 0 = line ends in sharp edge; 1 = semi-circle at end
+        self.stroke_ends = self.defaults.get("stroke_ends", None)
         self.stroke_transparency = self.defaults.get(
             "stroke_transparency", 1
         )  # NOT transparent
@@ -236,6 +236,7 @@ class BaseCanvas:
         # ---- grid cut marks
         self.grid_marks = self.defaults.get("grid_marks_marks", False)
         grid_marks_stroke = self.defaults.get("grid_marks_stroke", "gray")
+        self.grid_marks_ends = self.defaults.get("grid_marks_ends", None)
         self.grid_marks_stroke = colrs.get_color(grid_marks_stroke)
         self.grid_marks_stroke_width = self.defaults.get(
             "grid_marks_stroke_width", self.stroke_width
@@ -248,10 +249,9 @@ class BaseCanvas:
         # ---- line style
         self.line_stroke = self.defaults.get("line_stroke", WIDTH)
         self.line_width = self.defaults.get("line_width", self.stroke_width)
-        self.line_cap = self.defaults.get("line_cap", None)
+        self.line_ends = self.defaults.get("line_ends", None)
         self.dotted = self.defaults.get("dotted", self.defaults.get("dotted", False))
         self.dashed = self.defaults.get("dashed", None)
-        self.squared = self.defaults.get("squared", False)
         # ---- text: base
         self.text = self.defaults.get("text", "")
         self.text_size = self.defaults.get("text_size", self.font_size)
@@ -370,12 +370,15 @@ class BaseCanvas:
         self.rounded_radius = self.defaults.get(
             "rounded_radius", 0.05
         )  # fraction of smallest side
-        # ---- rectangle / rhombus / hexagon
+        # ---- rectangle / rhombus / hexagon / circle
         self.slices = self.defaults.get("slices", [])
+        self.slices_fractions = self.defaults.get("slices_fractions", [])
+        self.slices_angles = self.defaults.get("slices_angles", [])
         self.slices_line = self.defaults.get("slices_line", 0)
         self.slices_line_mx = self.defaults.get("slices_line_mx", 0)
         self.slices_line_my = self.defaults.get("slices_line_my", 0)
         self.slices_stroke = self.defaults.get("slices_stroke", None)
+        self.slices_ends = self.defaults.get("slices_ends", None)
         self.slices_stroke_width = self.defaults.get("slices_stroke", None)
         self.slices_reverse = self.defaults.get("slices_reverse", False)
         # ---- stadium
@@ -414,7 +417,7 @@ class BaseCanvas:
             "radii_length", None
         )  # default: circle radius
         self.radii_offset = self.defaults.get("radii_offset", 0)
-        self.radii_cap = self.defaults.get("radii_cap", None)
+        self.radii_ends = self.defaults.get("radii_ends", None)
         self.radii_dotted = self.defaults.get("radii_dotted", self.dotted)
         self.radii_dashed = self.defaults.get("radii_dashed", self.dashed)
         self.radii_labels = self.defaults.get("radii_labels", "")
@@ -434,6 +437,7 @@ class BaseCanvas:
         self.petals_height = self.defaults.get("petals_height", 1)
         self.petals_offset = self.defaults.get("petals_offset", 0)
         self.petals_stroke = self.defaults.get("petals_stroke", self.stroke)
+        self.petals_ends = self.defaults.get("petals_ends", self.stroke_ends)
         self.petals_stroke_width = self.defaults.get(
             "petals_stroke_width", self.stroke_width
         )
@@ -458,6 +462,7 @@ class BaseCanvas:
         self.dot_fill = self.defaults.get("dot_fill", self.dot_stroke)  # colors match
         self.cross = self.defaults.get("cross", 0)
         cross_stroke = self.defaults.get("cross_stroke", self.stroke)
+        self.cross_ends = self.defaults.get("cross_ends", self.stroke_ends)
         self.cross_stroke = colrs.get_color(cross_stroke)
         self.cross_stroke_width = self.defaults.get(
             "cross_stroke_width", self.stroke_width
@@ -471,7 +476,7 @@ class BaseCanvas:
         )
         self.perbis_length = self.defaults.get("perbis_length", None)
         self.perbis_offset = self.defaults.get("perbis_offset", 0)
-        self.perbis_cap = self.defaults.get("perbis_cap", None)
+        self.perbis_ends = self.defaults.get("perbis_ends", None)
         self.perbis_dotted = self.defaults.get("perbis_dotted", self.dotted)
         self.perbis_dashed = self.defaults.get("perbis_dashed", self.dashed)
         # ---- hexagon
@@ -482,10 +487,21 @@ class BaseCanvas:
             "link_stroke_width", self.stroke_width
         )
         self.link_stroke = self.defaults.get("link_stroke", self.stroke)
-        self.link_cap = self.defaults.get("link_cap", self.line_cap)
+        self.link_ends = self.defaults.get("link_ends", self.line_ends)
         self.shades = self.defaults.get("shades", [])
         self.shades_stroke = self.defaults.get("shades_stroke", None)
-        self.shades_stroke_width = self.defaults.get("shades_stroke", None)
+        self.shades_stroke_width = self.defaults.get("shades_stroke_width", None)
+        self.paths = self.defaults.get("paths", [])
+        self.paths_stroke = self.defaults.get("paths_stroke", self.stroke)
+        self.paths_stroke_width = self.defaults.get(
+            "paths_stroke_width", self.stroke_width
+        )
+        self.paths_length = self.defaults.get("paths_length", None)
+        self.paths_ends = self.defaults.get("paths_ends", None)
+        self.paths_dotted = self.defaults.get("paths_dotted", self.dotted)
+        self.paths_dashed = self.defaults.get("paths_dashed", self.dashed)
+        self.paths_wave_style = self.defaults.get("paths_wave_style", None)
+        self.paths_wave_height = self.defaults.get("paths_wave_height", 0)
         # ---- hexagons
         self.hid = self.defaults.get("id", "")  # HEX ID
         self.hex_rows = self.defaults.get("hex_rows", 0)
@@ -512,6 +528,17 @@ class BaseCanvas:
         self.coord_suffix = self.defaults.get("coord_suffix", "")
         self.coord_style = self.defaults.get("coord_style", "")
         self.hidden = self.defaults.get("hidden", [])
+        self.spikes = self.defaults.get("spikes", [])
+        self.spikes_height = self.defaults.get("spikes_height", 0)
+        self.spikes_width = self.defaults.get("spikes_width", 0)
+        self.spikes_fill = self.defaults.get("spikes_fill", self.fill)
+        self.spikes_stroke = self.defaults.get("spikes_stroke", "black")
+        self.spikes_stroke_width = self.defaults.get(
+            "spikes_stroke_width", self.stroke_width
+        )
+        self.spikes_ends = self.defaults.get("spikes_ends", None)
+        self.spikes_dotted = self.defaults.get("spikes_dotted", self.dotted)
+        self.spikes_dashed = self.defaults.get("spikes_dashed", self.dashed)
         # ---- starfield
         self.enclosure = None
         self.colors = ["white"]
@@ -525,6 +552,7 @@ class BaseCanvas:
         self.pip_fraction = self.defaults.get("pip_fraction", 0.2)
         # ---- mesh
         self.mesh = self.defaults.get("mesh", None)
+        self.mesh_ends = self.defaults.get("mesh_ends", self.line_ends)
         # ---- hatches
         self.hatch_count = self.defaults.get("hatch_count", 0)
         self.hatch = self.defaults.get("hatch", "*")
@@ -533,7 +561,7 @@ class BaseCanvas:
             "hatch_stroke_width", self.stroke_width
         )
         self.hatch_dots = self.defaults.get("hatch_dots", None)
-        self.hatch_cap = self.defaults.get("hatch_cap", self.line_cap)
+        self.hatch_ends = self.defaults.get("hatch_ends", self.line_ends)
         self.hatch_dashed = self.defaults.get("hatch_dashed", None)  # ---- OTHER
         # defaults for attributes called/set elsewhere e.g. in draw()
         self.use_abs = False
@@ -609,6 +637,7 @@ class BaseShape:
         # ---- grid marks
         self.grid_marks = self.kw_float(kwargs.get("grid_marks", base.grid_marks))
         self.grid_marks_stroke = kwargs.get("grid_marks_stroke", base.grid_marks_stroke)
+        self.grid_marks_ends = kwargs.get("grid_marks_ends", base.grid_marks_ends)
         self.grid_marks_stroke_width = self.kw_float(
             kwargs.get("grid_marks_stroke_width", base.grid_marks_stroke_width)
         )
@@ -644,8 +673,8 @@ class BaseShape:
         self.fill_pattern = kwargs.get("fill_pattern", base.fill_pattern)
         self.repeat = kwargs.get("repeat", base.repeat)
         self.interval = self.kw_float(kwargs.get("interval", base.interval))
-        self.interval_x = self.kw_float(kwargs.get("interval_x", base.interval_x))
-        self.interval_y = self.kw_float(kwargs.get("interval_y", base.interval_y))
+        self.interval_x = kwargs.get("interval_x", base.interval_x)
+        self.interval_y = kwargs.get("interval_y", base.interval_y)
         # ---- rotation / position /elevation
         self.rotation = self.kw_float(
             kwargs.get("rotation", kwargs.get("rotation", base.rotation))
@@ -658,10 +687,9 @@ class BaseShape:
         self.facing = kwargs.get("facing", base.facing)
         # ---- line style
         self.line_width = self.kw_float(kwargs.get("line_width", base.line_width))
-        self.line_cap = kwargs.get("line_cap", base.line_cap)
+        self.line_ends = kwargs.get("line_ends", base.line_ends)
         self.dotted = kwargs.get("dotted", kwargs.get("dots", base.dotted))
         self.dashed = kwargs.get("dashed", base.dashed)
-        self.squared = kwargs.get("squared", base.squared)
         # ---- fill color
         self.fill = kwargs.get("fill", kwargs.get("fill_color", base.fill))
         self.fill_transparency = kwargs.get("fill_transparency", base.fill_transparency)
@@ -677,7 +705,7 @@ class BaseShape:
         self.stroke_width_border = self.kw_float(
             kwargs.get("stroke_width_border", base.stroke_width_border)
         )
-        self.stroke_cap = self.kw_int(kwargs.get("stroke_cap", base.stroke_cap))
+        self.stroke_ends = kwargs.get("stroke_ends", base.stroke_ends)
         # ---- overwrite fill&stroke colors
         if self.fill_stroke and self.outline:
             feedback("Cannot set 'fill_stroke' and 'outline' together!", True)
@@ -830,13 +858,16 @@ class BaseShape:
         self.peaks_dict = {}
         self.borders = kwargs.get("borders", base.borders)
         self.rounded_radius = base.rounded_radius
-        # ---- rectangle / rhombus/ hexagon
+        # ---- rectangle / rhombus/ hexagon / circle
         self.slices = kwargs.get("slices", base.slices)
+        self.slices_fractions = kwargs.get("slices_fractions", base.slices_fractions)
+        self.slices_angles = kwargs.get("slices_angles", base.slices_angles)
         self.slices_line = kwargs.get("slices_line", base.slices_line)
         self.slices_line_mx = kwargs.get("slices_line_mx", base.slices_line_mx)
         self.slices_line_my = kwargs.get("slices_line_my", base.slices_line_my)
         self.slices_reverse = kwargs.get("slices_reverse", base.slices_reverse)
         self.slices_stroke = kwargs.get("slices_stroke", base.slices_stroke)
+        self.slices_ends = kwargs.get("slices_ends", base.slices_ends)
         self.slices_stroke_width = kwargs.get(
             "slices_stroke_width", base.slices_stroke_width
         )
@@ -885,7 +916,7 @@ class BaseShape:
         )
         self.radii_length = self.kw_float(kwargs.get("radii_length", base.radii_length))
         self.radii_offset = self.kw_float(kwargs.get("radii_offset", base.radii_offset))
-        self.radii_cap = kwargs.get("radii_cap", base.radii_cap)
+        self.radii_ends = kwargs.get("radii_ends", base.radii_ends)
         self.radii_dotted = kwargs.get("radii_dotted", base.dotted)
         self.radii_dashed = kwargs.get("radii_dashed", self.dashed)
         self.radii_labels = kwargs.get("radii_labels", base.radii_labels)
@@ -912,6 +943,7 @@ class BaseShape:
             kwargs.get("petals_offset", base.petals_offset)
         )
         self.petals_stroke = kwargs.get("petals_stroke", base.petals_stroke)
+        self.petals_ends = kwargs.get("petals_ends", base.petals_ends)
         self.petals_stroke_width = self.kw_float(
             kwargs.get("petals_stroke_width", base.petals_stroke_width)
         )
@@ -944,6 +976,7 @@ class BaseShape:
             kwargs.get("cross_stroke_width", base.cross_stroke_width)
         )
         self.cross = self.kw_float(kwargs.get("cross", base.cross))
+        self.cross_ends = kwargs.get("cross_ends", base.cross_ends)
         # ---- hexagon / polygon
         self.orientation = kwargs.get("orientation", base.orientation)
         self.perbis = kwargs.get("perbis", base.perbis)  # directions
@@ -957,7 +990,7 @@ class BaseShape:
         self.perbis_offset = self.kw_float(
             kwargs.get("perbis_offset", base.perbis_offset)
         )
-        self.perbis_cap = kwargs.get("perbis_cap", base.perbis_cap)
+        self.perbis_ends = kwargs.get("perbis_ends", base.perbis_ends)
         self.perbis_dotted = kwargs.get("perbis_dotted", base.dotted)
         self.perbis_dashed = kwargs.get("perbis_dashed", self.dashed)
         # ---- hexagon
@@ -970,12 +1003,23 @@ class BaseShape:
             kwargs.get("link_stroke_width", base.link_stroke_width)
         )
         self.link_stroke = kwargs.get("link_stroke", base.stroke)
-        self.link_cap = kwargs.get("link_cap", base.link_cap)
+        self.link_ends = kwargs.get("link_ends", base.link_ends)
         self.shades = kwargs.get("shades", base.shades)
         self.shades_stroke = kwargs.get("shades_stroke", base.shades_stroke)
         self.shades_stroke_width = kwargs.get(
             "shades_stroke_width", base.shades_stroke_width
         )
+        self.paths = kwargs.get("paths", base.paths)
+        self.paths_stroke = kwargs.get("paths_stroke", self.stroke)
+        self.paths_stroke_width = self.kw_float(
+            kwargs.get("paths_stroke_width", base.paths_stroke_width)
+        )
+        self.paths_length = self.kw_float(kwargs.get("paths_length", base.paths_length))
+        self.paths_ends = kwargs.get("paths_ends", base.paths_ends)
+        self.paths_dotted = kwargs.get("paths_dotted", base.dotted)
+        self.paths_dashed = kwargs.get("paths_dashed", self.dashed)
+        self.paths_wave_style = kwargs.get("paths_wave_style", base.paths_wave_style)
+        self.paths_wave_height = kwargs.get("paths_wave_height", base.paths_wave_height)
         # ---- hexagons
         self.hid = kwargs.get("id", base.hid)  # HEX ID
         self.hex_rows = self.kw_int(kwargs.get("hex_rows", base.hex_rows), "hex_rows")
@@ -1013,6 +1057,19 @@ class BaseShape:
         self.coord_suffix = kwargs.get("coord_suffix", base.coord_suffix)
         self.coord_style = kwargs.get("coord_style", "")  # linear|diagonal
         self.hidden = kwargs.get("hidden", base.hidden)
+        self.spikes = kwargs.get("spikes", base.spikes)
+        self.spikes_fill = kwargs.get("spikes_fill", base.spikes_fill)
+        self.spikes_stroke = kwargs.get("spikes_stroke", base.spikes_stroke)
+        self.spikes_stroke_width = self.kw_float(
+            kwargs.get("spikes_stroke_width", base.spikes_stroke_width)
+        )
+        self.spikes_height = self.kw_float(
+            kwargs.get("spikes_height", base.spikes_height)
+        )
+        self.spikes_width = self.kw_float(kwargs.get("spikes_width", base.spikes_width))
+        self.spikes_ends = kwargs.get("spikes_ends", base.spikes_ends)
+        self.spikes_dotted = kwargs.get("spikes_dotted", base.dotted)
+        self.spikes_dashed = kwargs.get("spikes_dashed", self.dashed)
         # ---- starfield
         self.enclosure = kwargs.get("enclosure", base.enclosure)
         self.colors = kwargs.get("colors", base.colors)
@@ -1028,6 +1085,7 @@ class BaseShape:
         )
         # ---- mesh
         self.mesh = kwargs.get("mesh", base.mesh)
+        self.mesh_ends = kwargs.get("mesh_ends", base.mesh_ends)
         # ---- hatches
         self.hatch_count = kwargs.get("hatch_count", base.hatch_count)
         self.hatch = kwargs.get("hatch", base.hatch)
@@ -1035,7 +1093,7 @@ class BaseShape:
             kwargs.get("hatch_stroke_width", base.hatch_stroke_width)
         )
         self.hatch_stroke = kwargs.get("hatch_stroke", base.stroke)
-        self.hatch_cap = kwargs.get("hatch_cap", base.hatch_cap)
+        self.hatch_ends = kwargs.get("hatch_ends", base.hatch_ends)
         self.hatch_dots = kwargs.get("hatch_dots", base.dotted)
         self.hatch_dashed = kwargs.get("hatch_dashed", self.dashed)
         # ---- deck
@@ -1196,7 +1254,7 @@ class BaseShape:
         defaults = {}
         defaults["fill"] = self.fill
         defaults["stroke"] = self.stroke
-        defaults["stroke_cap"] = self.stroke_cap
+        defaults["stroke_ends"] = self.stroke_ends
         defaults["stroke_width"] = self.stroke_width
         defaults["transparency"] = self.transparency
         defaults["dotted"] = self.dotted
@@ -2249,6 +2307,7 @@ class BaseShape:
             kwargs["fill"] = self.cross_stroke
             kwargs["stroke"] = self.cross_stroke
             kwargs["stroke_width"] = self.cross_stroke_width
+            kwargs["stroke_ends"] = self.cross_ends
             # ---- horizontal line
             pt1 = geoms.Point(xd - cross_size / 2.0, yd)
             pt2 = geoms.Point(xd + cross_size / 2.0, yd)
@@ -2496,14 +2555,15 @@ class BaseShape:
             return None
 
         new_element = None
-        # print('### ShapeType ::', type(the_element))
+        # print('### handle_custom_values ShapeType ::', type(the_element))
         if isinstance(the_element, BaseShape):
             new_element = copy.copy(the_element)
             keys = vars(the_element).keys()
             for key in keys:
                 value = getattr(the_element, key)
+                # Note - Hexagon orientation is an example of an Enum
                 if value is None or isinstance(
-                    value, (str, int, float, list, tuple, range)
+                    value, (str, int, float, list, tuple, range, Enum)
                 ):
                     continue
                 elif isinstance(value, dict):
@@ -2681,6 +2741,7 @@ class BaseShape:
                 index=ID,
                 stroke=bcolor,
                 stroke_width=bwidth,
+                # stroke_ends=bends, # TODO - allow this setting
                 dotted=dotted,
                 dashed=dashed,
             )

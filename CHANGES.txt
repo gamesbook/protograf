@@ -1,6 +1,17 @@
 protograf Changes
 =================
 
+2025-08-23 (0.2.15)
+-------------------
+- Add Meridians board example
+- Add paths property for Hexagon shape
+- Add _ends property for line style (replaces squared line ends)
+- Add wave_style property to Line
+- Add slices property to Circle
+- Add spikes property for Hexagon shape
+- Patch page color fill error
+- Extend Sequence for irregular intervals
+
 2025-08-08 (0.2.14)
 -------------------
 - Add example for full wargame countersheet

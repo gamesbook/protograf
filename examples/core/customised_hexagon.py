@@ -90,8 +90,8 @@ Text(common=txt, text="Hexagon: flat; radii")
 hxg = Common(height=1.5, dot=0.05, dot_stroke="red", orientation="flat", font_size=8)
 Hexagon(common=hxg, x=0.25, y=0.25, radii='sw', label="SW")
 Hexagon(common=hxg, x=0.25, y=2.15, radii='w', label="W")
-Hexagon(common=hxg, x=0.25, y=4, radii='nw', label="NW")
-Hexagon(common=hxg, x=2.25, y=4, radii='ne', label="NE")
+Hexagon(common=hxg, x=0.25, y=4.1, radii='nw', label="NW")
+Hexagon(common=hxg, x=2.25, y=4.1, radii='ne', label="NE")
 Hexagon(common=hxg, x=2.25, y=2.15, radii='e', label="E")
 Hexagon(common=hxg, x=2.25, y=0.25, radii='se', label="SE")
 PageBreak()
@@ -102,8 +102,8 @@ Text(common=txt, text="Hexagon: pointy; radii")
 hxg = Common(height=1.5, dot=0.05, dot_stroke="red", orientation="pointy", font_size=8)
 Hexagon(common=hxg, x=0.25, y=0.25, radii='sw', label="SW")
 Hexagon(common=hxg, x=0.25, y=2.15, radii='nw', label="NW")
-Hexagon(common=hxg, x=0.25, y=4, radii='n', label="N")
-Hexagon(common=hxg, x=2.25, y=4, radii='ne', label="NE")
+Hexagon(common=hxg, x=0.25, y=4.1, radii='n', label="N")
+Hexagon(common=hxg, x=2.25, y=4.1, radii='ne', label="NE")
 Hexagon(common=hxg, x=2.25, y=0.25, radii='s', label="S")
 Hexagon(common=hxg, x=2.25, y=2.15, radii='se', label="SE")
 PageBreak()
@@ -114,8 +114,8 @@ Text(common=txt, text="Hexagon: flat; borders")
 hxg = Common(height=1.5, orientation="flat", font_size=8)
 Hexagon(common=hxg, x=0.25, y=0.25, borders=('sw', 2, "gold"), label="SW")
 Hexagon(common=hxg, x=0.25, y=2.15, borders=('nw', 2, "gold"), label="NW")
-Hexagon(common=hxg, x=0.25, y=4.00, borders=('n', 2, "gold"), label="N")
-Hexagon(common=hxg, x=2.25, y=4.00, borders=('s', 2, "gold"), label="S")
+Hexagon(common=hxg, x=0.25, y=4.10, borders=('n', 2, "gold"), label="N")
+Hexagon(common=hxg, x=2.25, y=4.10, borders=('s', 2, "gold"), label="S")
 Hexagon(common=hxg, x=2.25, y=0.25, borders=('ne', 2, "gold"), label="NE")
 Hexagon(common=hxg, x=2.25, y=2.15, borders=('se', 2, "gold"), label="SE")
 PageBreak()
@@ -126,8 +126,8 @@ Text(common=txt, text="Hexagon: pointy; borders")
 hxg = Common(height=1.5, orientation="pointy", font_size=8)
 Hexagon(common=hxg, x=0.25, y=0.25, borders=('sw', 2, "gold"), label="SW")
 Hexagon(common=hxg, x=0.25, y=2.15, borders=('nw', 2, "gold"), label="NW")
-Hexagon(common=hxg, x=0.25, y=4.00, borders=('w', 2, "gold"), label="W")
-Hexagon(common=hxg, x=2.25, y=4.00, borders=('e', 2, "gold"), label="E")
+Hexagon(common=hxg, x=0.25, y=4.10, borders=('w', 2, "gold"), label="W")
+Hexagon(common=hxg, x=2.25, y=4.10, borders=('e', 2, "gold"), label="E")
 Hexagon(common=hxg, x=2.25, y=0.25, borders=('ne', 2, "gold"), label="NE")
 Hexagon(common=hxg, x=2.25, y=2.15, borders=('se', 2, "gold"), label="SE")
 PageBreak()
@@ -138,8 +138,8 @@ Text(common=txt, text="Hex Flat: perbis")
 hxg = Common(height=1.5, dot=0.05, dot_stroke="red", orientation="flat", font_size=8)
 Hexagon(common=hxg, x=0.25, y=0.25, perbis='sw', label="SW")
 Hexagon(common=hxg, x=0.25, y=2.15, perbis='nw', label="NW")
-Hexagon(common=hxg, x=0.25, y=4, perbis='n', label="N")
-Hexagon(common=hxg, x=2.25, y=4, perbis='ne', label="NE")
+Hexagon(common=hxg, x=0.25, y=4.1, perbis='n', label="N")
+Hexagon(common=hxg, x=2.25, y=4.1, perbis='ne', label="NE")
 Hexagon(common=hxg, x=2.25, y=0.25, perbis='s', label="S")
 Hexagon(common=hxg, x=2.25, y=2.15, perbis='se', label="SE")
 PageBreak()
@@ -150,8 +150,8 @@ Text(common=txt, text="Hex Pointy: perbis")
 hxg = Common(height=1.5, dot=0.05, dot_stroke="red", orientation="pointy", font_size=8)
 Hexagon(common=hxg, x=0.25, y=0.25, perbis='sw', label="SW")
 Hexagon(common=hxg, x=0.25, y=2.15, perbis='w', label="W")
-Hexagon(common=hxg, x=0.25, y=4, perbis='nw', label="NW")
-Hexagon(common=hxg, x=2.25, y=4, perbis='ne', label="NE")
+Hexagon(common=hxg, x=0.25, y=4.1, perbis='nw', label="NW")
+Hexagon(common=hxg, x=2.25, y=4.1, perbis='ne', label="NE")
 Hexagon(common=hxg, x=2.25, y=2.15, perbis='e', label="E")
 Hexagon(common=hxg, x=2.25, y=0.25, perbis='se', label="SE")
 PageBreak()
@@ -184,6 +184,57 @@ Hexagon(common=hxg, cx=1.5, cy=3.5,
         orientation="pointy")
 PageBreak()
 
+# ---- paths
+Blueprint(stroke_width=0.5)
+Text(common=txt, text="Hex Paths")
+hxg = Common(height=1.5, dot=0.05, dot_stroke="red", font_size=8)
+Hexagon(common=hxg, x=0.25, y=0.25, orientation="pointy",
+        paths=["ne sw", "e w",  "se nw"])
+Hexagon(common=hxg, x=0.25, y=2.15,  orientation="pointy",
+        paths=["ne e", "e se", "se sw", "sw w", "w nw", "nw ne"],
+        paths_stroke="gold")
+Hexagon(common=hxg, x=0.25, y=4.1,  paths=["sw ne", "se nw", "s n"])
+Hexagon(common=hxg, x=2.25, y=4.1,
+        paths=["s ne", "se sw", "s nw", "nw ne", "n se", "n sw"],
+        paths_dotted=True)
+Hexagon(common=hxg, x=2.25, y=2.15,
+        paths=["ne n", "ne se", "se s", "sw s", "sw nw", "nw n"],
+        paths_stroke="gold")
+Hexagon(common=hxg, x=2.25, y=0.25,  orientation="pointy",
+        paths=["ne se", "e sw", "se w", "sw nw", "w ne", "nw e"],
+        paths_dotted=True)
+PageBreak()
+
+# ---- spikes
+Blueprint(stroke_width=0.5)
+Text(common=txt, text="Hex Spikes")
+hxg = Common(height=1.5, dot=0.05, dot_stroke="red",
+             spikes_width=0.25)
+Hexagon(common=hxg, x=0.25, y=0.25, orientation="pointy",
+        spikes=["ne", "w",  "se"],
+        spikes_height=0.5)
+Hexagon(common=hxg, x=2.25, y=4.1,
+        spikes=["s", "sw", "nw", "ne", "se", "n"],
+        spikes_dotted=True,
+        spikes_height=-0.5)
+Hexagon(common=hxg, x=2.25, y=0.25,  orientation="pointy",
+        spikes=["ne", "se", "sw", "w", "nw", "e"],
+        spikes_height=-0.5,
+        spikes_dotted=True)
+Hexagon(common=hxg, x=0.25, y=2.15,  orientation="pointy",
+        spikes=["ne", "se", "sw", "w", "nw", "e"],
+        spikes_stroke="gold",
+        spikes_fill="gold")
+Hexagon(common=hxg, x=0.25, y=4.1,
+        spikes=["ne", "nw", "s"],
+        spikes_height=0.5)
+Hexagon(common=hxg, x=2.25, y=2.15,
+        spikes=["s", "sw", "nw", "ne", "se", "n"],
+        spikes_height=0.5,
+        spikes_stroke="gold",
+        spikes_fill="gold")
+PageBreak()
+
 # ---- END
 Text(common=txt, text="Hexagon END...")
 
@@ -202,4 +253,6 @@ Save(
         "perbis_flat", "perbis_pointy",
         "perbis_all",
         "slices_flat", "slices_pointy",
+        'hex_paths',
+        'hex_spikes',
         None])

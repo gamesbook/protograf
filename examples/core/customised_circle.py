@@ -138,6 +138,28 @@ Circle(cx=1, cy=1, radius=1,
        dot=0.05)
 PageBreak()
 
+# ---- circle slices
+Blueprint()
+Text(common=txt, text="Slices")
+Circle(cx=1, cy=1, radius=1,
+       slices=["red", "gold", "aqua"],
+       dot=0.05)
+Circle(cx=2, cy=3, radius=1,
+       slices=["red", None, "red", None, "red", None],
+       dot=0.05)
+Circle(cx=3, cy=5, radius=1,
+       slices=["red", "gold", "aqua", "red", "gold", "aqua"],
+       rotation=30,
+       dot=0.05)
+Circle(cx=3, cy=1, radius=1,
+       slices=["black", "grey", "silver"],
+       slices_fractions=[0.33, 0.75, 0.5])
+Circle(cx=1, cy=5, radius=1, fill="gold",
+       slices=["black", None, "grey", "silver"],
+       slices_fractions=[0.33, None, 1.5, 0.75],
+       slices_angles=[60, 45, 45, 120])
+PageBreak()
+
 # ---- END
 Text(common=txt, text="Circle END...")
 
@@ -153,4 +175,5 @@ Save(
         "petals_triangle",
         "petals_petal",
         "radii_labels",
+        "circle_slices",
         None])

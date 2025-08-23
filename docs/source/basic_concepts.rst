@@ -45,7 +45,7 @@ design!
 
 If you want to make changes to the design, then you add to, delete, or
 change, the instructions in your script and use Python to process it
-again to create the updated version.
+again to create an updated version.
 
 .. _script-concept:
 
@@ -93,11 +93,11 @@ this, you provide values for both **x** - the horizontal position - and
 **y** - the vertical position - for each thing that you want to appear
 on the page.
 
-If you look at an upright A4 page - which is 21cm wide and just less
+If you look at upright A4 paper - which is 21cm wide and just less
 than 30cm high - then a point in the middle of the page will have an **x
 position** of 10.5cm - its distance from the left edge of the page; and
 a **y position** of 14.8cm - its distance from the top edge of the
-page. Similarly, for a US letter-sized page of 8.5" by 11", a point in
+page. Similarly, for a US Letter-sized page of 8.5" by 11", a point in
 the middle of the page would have an **x position** of 4.25" and a **y
 position** of 5.5".
 
@@ -181,9 +181,9 @@ For example, settings can include:
 
 - the *height* |dash| size in the vertical direction and *width* |dash| the
   size in the horizontal direction, of some shapes
-- the *width* and *stroke*, i.e. color, of the line used to draw a shape
+- the *stroke*, i.e. color, of the line used to draw a shape
 - the *radius* or *diameter* |dash| to set the size of a circle or polygon
-- the  *color*, *paper* size, and so on for the document
+- the *paper* size, *margins*, and so forth for the document as a whole
 
 All of these types of settings are termed **properties**.
 
@@ -326,4 +326,4 @@ Some examples of defaults are:
   default output file that is created will be called ``test01.pdf``.
 
   Use the :ref:`Create <create-command>` command to set your own output
-  filename.
+  *filename*.
