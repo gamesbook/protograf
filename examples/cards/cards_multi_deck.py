@@ -11,7 +11,7 @@ Notes:
 """
 from protograf import *
 
-Create(filename='cards_multi_deck.pdf', margin=0.75)
+Create(margin=0.75)
 
 lotr = [
     ['ID', 'Name', 'Age', 'Race', 'Stage'],
@@ -39,4 +39,4 @@ for race in races:
             Deck(grid_marks=True, rounded=True)
             Card("*", circle(cx=3.2, cy=4.4, radius=2, label=T("{{ Name }}")))
             Card("*", text(x=3.2, y=5, text=T("{{ Race }}")))
-            Save(filename=f'cards_{race}-{stage}.pdf')
+            Save(filename=f'cards_multi_deck_{race}-{stage}.pdf')

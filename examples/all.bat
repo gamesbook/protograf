@@ -68,6 +68,7 @@ python boards\commercial\traveller_draft.py --no-png -d %location%
 python boards\commercial\traveller_black.py --no-png -d %location%
 python boards\commercial\underwater_cities.py --no-png -d %location%
 python boards\commercial\warpwar.py --no-png -d %location%
+python boards\commercial\tm_player_board.py --no-png -d %location%
 
 REM ---- boards: maps
 ECHO "Creating maps..."

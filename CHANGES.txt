@@ -1,7 +1,7 @@
 protograf Changes
 =================
 
-2025-00-00 (0.2.15)
+2025-08-23 (0.2.15)
 -------------------
 - Add Meridians board example
 - Add paths property for Hexagon shape

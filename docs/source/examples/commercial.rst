@@ -28,6 +28,7 @@ will demonstrate full scalability.
 - `Warp War`_
 - `Underwater Cities`_
 - `The Honorverse`_
+- `Terraforming Mars: Ares Player Board`_
 
 
 Squad Leader
@@ -254,7 +255,7 @@ Discussion  This example shows a map with the locations of stars described in th
             sometimes termed the `Honorverse <https://en.wikipedia.org/wiki/Honorverse>`_
 
             The backdrop to the series is that FTL travel is possible; both with
-            spaceships travelling through hyperspace as well as through wormholes.
+            spaceships travelling through hyperspace as well as through "wormholes".
             However wormholes are very limited in number, and so the stars that have
             both habitable planets, as well as multiple wormhole junctions, become
             obvious focal points for development and expansion. The main character
@@ -264,22 +265,22 @@ Discussion  This example shows a map with the locations of stars described in th
 
             The data is sourced from:
 
-            * https://www.gotshifted.com/honorverseglossary/MAPS.html
-            * https://www.gotshifted.com/honorverseglossary/Book%20Originals.html
+            - https://www.gotshifted.com/honorverseglossary/MAPS.html
+            - https://www.gotshifted.com/honorverseglossary/Book%20Originals.html
 
-            Any errors in transcription are mine |dash| *NOT* the original
+            Any errors in transcription are mine |dash| and *NOT* the original
             sources!
 
             Some items of interest:
 
-            * The "stars" are just point locations on the grid; a Python loop
+            - The "stars" are just point locations on the grid; a Python loop
               processes them and styles each according to its information; using
               ``if`` and ``else``, while the ZapfDingbats font provides icons
               used to show the star.
-            * The names of stars allow their point locations to be "looked" up
-              in the list, and the stars locations form the start and end points
-              of lines showing the connecting wormholes.
-            * The script has a boolean "toggle" (called ``DARK_MODE``) which can
+            - The names of stars allow their point locations to be "looked up"
+              in the list, and the stars' locations form the start and end points
+              of lines for the connecting wormholes (green lines).
+            - The script has a boolean "toggle" (called ``DARK_MODE``) which can
               be set to change the background color of the map to black and
               the stars to white.
 
@@ -291,4 +292,33 @@ Screenshot  .. image:: images/boards/maps/honorverse.png
 "Zoomed"    .. image:: images/boards/maps/manticore.png
                :width: 90%
 
+=========== ==================================================================
+
+
+Terraforming Mars: Ares Player Board
+====================================
+`↑ <table-of-contents-excomm_>`_
+
+=========== ==================================================================
+Title       *Terraforming Mars: Ares Player Board*
+----------- ------------------------------------------------------------------
+Script      `<https://github.com/gamesbook/protograf/blob/master/examples/boards/commercial/tm_player_board.py>`_
+----------- ------------------------------------------------------------------
+Discussion  This example shows a version of the player board from the
+            "Terraforming Mars: Ares" card game.
+
+            It is *not* an exact reproduction and omits some of the text.
+
+            Some items of interest:
+
+            - Use of the ``Common()`` command to avoid duplication between
+              similar items
+            - Use of a font derived from the https://game-icons.net/ to create
+              the small graphic elements, such as the heat and tree symbols
+            - Use of the ``Sequence()`` command to create the various tracks,
+              as well as some of the different elements (arrows and money)
+              on the lower edge
+----------- ------------------------------------------------------------------
+Screenshot  .. image:: images/boards/commercial/tm_player_board.png
+               :width: 90%
 =========== ==================================================================

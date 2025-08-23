@@ -72,7 +72,6 @@ Sequence(
     text(text="{{sequence}}", x=2, y=1),
     setting=(27, 57, 5, 'excel'),
     interval_y=[.5, .75, .65, .55, 1.25, .85, 1.05]
-    #interval_y=[.5, .75, .5, .75, .5, .5, .5]
     )
 PageBreak()
 
@@ -89,7 +88,7 @@ PageBreak()
 Blueprint()
 Text(common=txt, text="Sequence: Shapes #1")
 Sequence(
-    rectangle(x=0.25, y=2, height=1, width=1,
+    rectangle(x=0.25, y=0.25, height=1, width=1,
               label_size=8, label="${{sequence}}"),
     setting=(1, 3, 1, 'number'),
     interval_x=1.2,

@@ -56,6 +56,7 @@ python boards/commercial/traveller_draft.py -d /tmp/demo
 python boards/commercial/traveller_black.py -d /tmp/demo
 python boards/commercial/underwater_cities.py -d /tmp/demo
 python boards/commercial/warpwar.py -d /tmp/demo
+python boards/commercial/tm_player_board.py -d /tmp/demo
 # ---- boards: maps
 echo -e "\nCreating maps..."
 python boards/maps/honorverse.py -d /tmp/demo

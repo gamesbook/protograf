@@ -867,7 +867,7 @@ class BaseShape:
         self.slices_line_my = kwargs.get("slices_line_my", base.slices_line_my)
         self.slices_reverse = kwargs.get("slices_reverse", base.slices_reverse)
         self.slices_stroke = kwargs.get("slices_stroke", base.slices_stroke)
-        self.slices_ends = kwargs.get("slices_stroke", base.slices_ends)
+        self.slices_ends = kwargs.get("slices_ends", base.slices_ends)
         self.slices_stroke_width = kwargs.get(
             "slices_stroke_width", base.slices_stroke_width
         )
@@ -2555,14 +2555,15 @@ class BaseShape:
             return None
 
         new_element = None
-        # print('### ShapeType ::', type(the_element))
+        # print('### handle_custom_values ShapeType ::', type(the_element))
         if isinstance(the_element, BaseShape):
             new_element = copy.copy(the_element)
             keys = vars(the_element).keys()
             for key in keys:
                 value = getattr(the_element, key)
+                # Note - Hexagon orientation is an example of an Enum
                 if value is None or isinstance(
-                    value, (str, int, float, list, tuple, range)
+                    value, (str, int, float, list, tuple, range, Enum)
                 ):
                     continue
                 elif isinstance(value, dict):

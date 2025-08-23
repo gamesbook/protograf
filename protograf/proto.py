@@ -533,12 +533,14 @@ class CardShape(BaseShape):
                         for flat_new_ele in flat_new_eles:
                             members = flat_new_ele.members or self.members
                             iid = members.index(cid + 1)
+                            # feedback(f'$$$ draw_card $$$ {iid=} {flat_new_ele=}')
                             custom_new_ele = self.handle_custom_values(
                                 flat_new_ele, iid
                             )
+                            # feedback(f'$$$ draw_card $$$ {iid=} {custom_new_ele=}')
                             if isinstance(custom_new_ele, (SequenceShape, RepeatShape)):
                                 custom_new_ele.deck_data = self.deck_data
-                            # feedback(f'$$$ draw_card $$$ {custom_new_ele=}')
+                            # feedback(f'$$$ draw_card $$$ {self.shape_id=} {custom_new_ele=}')
                             custom_new_ele.draw(
                                 cnv=cnv, off_x=_dx, off_y=_dy, ID=iid, **kwargs
                             )
@@ -581,14 +583,6 @@ class DeckOfCards:
             the_height, the_width = size[1] / globals.units, size[0] / globals.units
         self.height = kwargs.get("height", the_height)  # OVERWRITE
         self.width = kwargs.get("width", the_width)  # OVERWRITE
-        if self.height > (
-            globals.page_height - globals.margins.top - globals.margins.bottom
-        ):
-            feedback("Card height cannot exceed available page space.", True)
-        if self.width > (
-            globals.page_width - globals.margins.left - globals.margins.right
-        ):
-            feedback("Card width cannot exceed available page space.", True)
         # print(f'$$$ {size=}, {self.width=}, {self.height}')
         self.kwargs["width"] = self.width  # used for create_cardshapes()
         self.kwargs["height"] = self.height  # used for create_cardshapes()
@@ -598,10 +592,34 @@ class DeckOfCards:
         match self.frame:
             case "rectangle" | "r":
                 self.frame_type = CardFrame.RECTANGLE
+                if self.height > (
+                    globals.page_height - globals.margins.top - globals.margins.bottom
+                ):
+                    feedback("Card height cannot exceed available page height.", True)
+                if self.width > (
+                    globals.page_width - globals.margins.left - globals.margins.right
+                ):
+                    feedback("Card width cannot exceed available page width.", True)
             case "circle" | "c":
                 self.frame_type = CardFrame.CIRCLE
+                if 2 * self.radius > (
+                    globals.page_height - globals.margins.top - globals.margins.bottom
+                ):
+                    feedback("Card diameter cannot exceed available page height.", True)
+                if 2 * self.radius > (
+                    globals.page_width - globals.margins.left - globals.margins.right
+                ):
+                    feedback("Card diameter cannot exceed available page width.", True)
             case "hexagon" | "h":
                 self.frame_type = CardFrame.HEXAGON
+                if 2 * self.radius > (
+                    globals.page_height - globals.margins.top - globals.margins.bottom
+                ):
+                    feedback("Card diameter cannot exceed available page height.", True)
+                if 2 * self.radius > (
+                    globals.page_width - globals.margins.left - globals.margins.right
+                ):
+                    feedback("Card diameter cannot exceed available page width.", True)
             case _:
                 hint = " Try rectangle, hexagon, or circle."
                 feedback(f"Unable to draw a {self.frame}-shaped card. {hint}", True)
@@ -1270,7 +1288,7 @@ def page_setup():
         )
     # ---- debug margins
     if globals.margins.debug:
-        # print(f'{globals.margins.left=} {globals.margins.right=}')
+        # print(f'$$$ {globals.margins.left=} {globals.margins.right=}')
         stroke = colrs.get_color(DEBUG_COLOR)
         globals.doc_page.draw_rect(
             (
@@ -1483,7 +1501,7 @@ def PageBreak(**kwargs):
 
     Kwargs:
 
-    - footer (bool): whether a Footer objetct should be drawn before starting next page
+    - footer (bool): should a Footer object be drawn before starting next page
 
     """
     validate_globals()
@@ -1688,7 +1706,13 @@ def Save(**kwargs):
     local_filename = kwargs.get("filename", None)  # override Create()
 
     # ---- directory
-    globals.directory = directory if directory else os.getcwd()
+    if globals.pargs.directory:
+        globals.directory = globals.pargs.directory
+    elif directory:
+        globals.directory = directory
+    else:
+        globals.directory = os.getcwd()
+    # print(f'$$$ {globals.directory=}')
     if not os.path.exists(globals.directory):
         feedback(
             f'Cannot find the directory "{globals.directory}" - please create this first.',
@@ -1715,23 +1739,24 @@ def Save(**kwargs):
     globals.canvas.commit()  # add all drawings (to current pymupdf Shape)
 
     # ---- save all Pages to file
-    msg = "Please check folder exists and that you have access rights."
+    msg = "Please check the folder exists and that you have access rights."
     the_filename = local_filename or globals.filename
-    output_filename = os.path.join(globals.directory, the_filename)
+    output_filepath = os.path.join(globals.directory, the_filename)
+    # print(f'$$$ {output_filepath=}')
     try:
         globals.document.subset_fonts(verbose=True)  # subset fonts to reduce file size
-        globals.document.save(output_filename)
+        globals.document.save(output_filepath)
     except RuntimeError as err:
-        feedback(f'Unable to save "{output_filename}" - {err} - {msg}', True)
+        feedback(f'Unable to save "{output_filepath}" - {err} - {msg}', True)
     except FileNotFoundError as err:
-        feedback(f'Unable to save "{output_filename}" - {err} - {msg}', True)
+        feedback(f'Unable to save "{output_filepath}" - {err} - {msg}', True)
     except pymupdf.mupdf.FzErrorSystem as err:
-        feedback(f'Unable to save "{output_filename}" - {err} - {msg}', True)
+        feedback(f'Unable to save "{output_filepath}" - {err} - {msg}', True)
 
     # ---- export individual Cards (where only Card fronts exist)
     if globals.deck and len(globals.deck.fronts) >= 1:
         globals.deck.export_cards_as_images(
-            filename=globals.filename, directory=globals.directory
+            filename=the_filename, directory=globals.directory
         )
 
     # ---- save to PNG image(s) or SVG file(s)
@@ -1748,7 +1773,7 @@ def Save(**kwargs):
 
     if output and globals.pargs.png:  # pargs.png should default to True
         support.pdf_export(
-            globals.filename,
+            the_filename,
             fformat,
             dpi,
             names,
@@ -1758,7 +1783,7 @@ def Save(**kwargs):
 
     # ---- process area/cols_rows extracts
     support.pdf_frames_to_png(
-        source_file=globals.filename,
+        source_file=the_filename,
         output=None,  # ??? FIXME
         fformat="png",
         dpi=300,  # ??? FIXME

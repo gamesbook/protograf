@@ -1853,6 +1853,8 @@ class HexShape(BaseShape):
         )
         if self.paths is not None and not isinstance(self.paths, list):
             feedback(f"A Hexagon's paths must be in the form of a list!", True)
+        if self.paths == []:
+            feedback(f"A Hexagon's path list cannot be empty!", False, True)
 
         # --- calculate offset centres
         hex_geom = self.get_geometry()
@@ -2652,7 +2654,7 @@ class HexShape(BaseShape):
         if self.perbis:
             self.draw_perbis(cnv, ID, Point(self.x_d, self.y_d), self.vertexes)
         # ---- draw paths
-        if self.paths is not None:
+        if self.paths is not None and self.paths != []:
             self.draw_paths(cnv, ID, Point(self.x_d, self.y_d), self.vertexes)
         # ---- centred shape (with offset)
         if self.centre_shape:

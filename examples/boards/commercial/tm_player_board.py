@@ -164,8 +164,8 @@ Font("game-icons-net-20200315a")
 Text(text="\uE8A4", y=5, x=10.5, stroke="goldenrod")  # coin
 Text(text="\uE6C5", y=10.5, x=10.5, stroke="yellow")  # fire
 Text(text="\uEC14", y=14.1, x=10.5, stroke=LEAF)  # leaf
-Text(text="\uED73", y=20, x=10.6, stroke=VERY_RED, font_size=15)  # therm
-Text(text="\uED73", y=20, x=5.6, stroke=VERY_RED, font_size=15)  # therm
+Text(text="\uE890", y=20, x=10.6, stroke=VERY_RED, font_size=15)  # thermometer
+Text(text="\uE890", y=20, x=5.6, stroke=VERY_RED, font_size=15)  # thermometer
 
 forest = Common(
     cy=19.8, orientation="pointy",
