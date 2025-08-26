@@ -2487,7 +2487,8 @@ Example 3. Fixed Size
               x=0.5, y=0.5,
               height=1.25, width=1,
               cols=3, rows=4,
-              stroke="gray", stroke_width=1
+              stroke="gray", stroke_width=1,
+              heading="Heading", label="Label", title="Title"
           )
 
       It has the following properties set for it:
@@ -2499,7 +2500,8 @@ Example 3. Fixed Size
       - *cols* and *rows* - ``3`` columns wide by ``4`` rows high
       - *stroke_width* - set to ``1`` point; the thicker line makes
         the grid clearly visible
-      - *stroke* -set to ``gray`` i.e. a lighter color than the default black
+      - *stroke* - set to ``gray`` i.e. a lighter color than the default black
+      - *heading*, *label* and *title* - see `Text Descriptions`_
 
       The grid now has a fixed "rows by columns" size, rather than being
       automatically calculated to fill up the page.

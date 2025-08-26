@@ -324,7 +324,9 @@ PageBreak()
 # ---- grid cols and rows
 Blueprint()
 Text(common=txt, text='Grid: gray; 3x4; thick')
-Grid(x=0.5, y=0.5, cols=3, rows=4, height=1.25, width=1, stroke="gray", stroke_width=1)
+Grid(x=0.5, y=0.5, cols=3, rows=4, height=1.25, width=1,
+     stroke="gray", stroke_width=1,
+     heading="Heading", label="Label", title="Title")
 PageBreak()
 
 # ---- line - custom
