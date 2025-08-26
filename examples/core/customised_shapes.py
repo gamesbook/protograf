@@ -227,6 +227,14 @@ Polygon(
     dot=0.1, dot_stroke="red")
 PageBreak()
 
+# ---- polygon slices
+Text(common=txt, text="Polygon: slices")
+Polygon(
+    cx=2, cy=1, sides=8, radius=1,
+    slices=['red', 'orange', 'yellow', 'green',
+            'aqua', 'pink', 'violet', 'purple'])
+PageBreak()
+
 # ---- dates
 Blueprint()
 Text(common=txt, text="Dates: format and styles")
@@ -438,8 +446,8 @@ PageBreak()
 Blueprint(stroke_width=0.5)
 Text(common=txt, text="Polyshape: default")
 Polyshape(points=[(1, 2), (1, 1), (2, 0), (3, 1), (3, 2)])
-Polyshape(x=1, y=3,
-         steps='0.5,0 0,1.5 1.5,0 0,-1.5 0.5,0 0,0.5 -2.5,0 0,-0.5')
+# Polyshape(x=1, y=3,
+#          steps='0.5,0 0,1.5 1.5,0 0,-1.5 0.5,0 0,0.5 -2.5,0 0,-0.5')
 PageBreak()
 
 # ---- polyshape - custom
@@ -838,7 +846,7 @@ Save(
         "starfield_poly", "equilateral_triangle", "right_angled_triangle_flip",
         "sectors", "grid_gray", "dotgrid_moleskine", "dotgrid_rowscols", "arc",
         "stadium_edges", "trapezoid_flip", "chord",
-        "polygon_radii", "polygon_perbis",
+        "polygon_radii", "polygon_perbis", "polygon_slices",
         "dates_formats",
         "images_normal_rotation", "rhombus_red_rotation",
         "stadium_red_rotation",

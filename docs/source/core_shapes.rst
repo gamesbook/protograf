@@ -1104,8 +1104,12 @@ is a polygon with 8 sides.
 
     **HINT** Unlike the `Hexagon`_ shape, a Polygon can be rotated!
 
+The following examples
+
+
 Example 1. Default Polygon
 ++++++++++++++++++++++++++
+`^ <polygon-command_>`_
 
 .. |pol| image:: images/defaults/polygon.png
    :width: 330
@@ -1127,6 +1131,7 @@ Example 1. Default Polygon
 
 Example 2. Polygon with Sides
 +++++++++++++++++++++++++++++
+`^ <polygon-command_>`_
 
 .. |pl1| image:: images/customised/polygon_sizes.png
    :width: 330
@@ -1137,9 +1142,15 @@ Example 2. Polygon with Sides
 
       .. code:: python
 
-        Polygon(cx=1, cy=5, sides=7, radius=1, label="Seven")
-        Polygon(cx=2, cy=3, sides=6, radius=1, label="Six")
-        Polygon(cx=3, cy=1, sides=5, radius=1, label="Five")
+        Polygon(
+            cx=1, cy=5, sides=7,
+            radius=1, label="Seven")
+        Polygon(
+            cx=2, cy=3, sides=6,
+            radius=1, label="Six")
+        Polygon(
+            cx=3, cy=1, sides=5,
+            radius=1, label="Five")
 
       It can be seen that each shape is constructed as follows:
 
@@ -1153,6 +1164,7 @@ Example 2. Polygon with Sides
 
 Example 3. Polygon Radii
 ++++++++++++++++++++++++
+`^ <polygon-command_>`_
 
 .. |pl2| image:: images/customised/polygon_radii.png
    :width: 330
@@ -1165,7 +1177,9 @@ Example 3. Polygon Radii
 
       .. code:: python
 
-          Polygon(cx=2, cy=4, sides=8, radius=1, radii=True)
+          Polygon(
+              cx=2, cy=4, sides=8, radius=1,
+              radii=True)
 
       It has the following properties:
 
@@ -1182,7 +1196,9 @@ Example 3. Polygon Radii
           Polygon(
               cx=2, cy=1, sides=10, radius=1,
               radii=True,
-              radii_offset=0.75, radii_length=0.25, radii_stroke_width=1,
+              radii_offset=0.75,
+              radii_length=0.25,
+              radii_stroke_width=1,
               dot=0.1, dot_stroke="red"
           )
 
@@ -1209,6 +1225,7 @@ Example 3. Polygon Radii
 
 Example 4. Polygon with Perbis
 ++++++++++++++++++++++++++++++
+`^ <polygon-command_>`_
 
 The *perbis* |dash| short for "perpendicular bisector" |dash| defines
 lines that should be drawn from the centres of the sides of the polygon
@@ -1225,7 +1242,9 @@ to the polygon's centre.
 
       .. code:: python
 
-          Polygon(cx=2, cy=4, sides=8, radius=1, perbis='*')
+          Polygon(
+              cx=2, cy=4, sides=8,
+              radius=1, perbis='*')
 
       It has the following properties:
 
@@ -1242,7 +1261,9 @@ to the polygon's centre.
           Polygon(
             cx=2, cy=1, sides=8, radius=1,
             perbis="2,4,7",
-            perbis_offset=0.25, perbis_length=0.5, perbis_stroke_width=1,
+            perbis_offset=0.25,
+            perbis_length=0.5,
+            perbis_stroke_width=1,
             dot=0.1, dot_stroke="red")
 
       It has the following properties:
@@ -1271,6 +1292,7 @@ to the polygon's centre.
 
 Example 5. Polygon Rotation
 +++++++++++++++++++++++++++
+`^ <polygon-command_>`_
 
 .. |pl4| image:: images/customised/polygon_rotation_flat.png
    :width: 330
@@ -1281,11 +1303,25 @@ Example 5. Polygon Rotation
 
       .. code:: python
 
-        Polygon(common=poly6, y=1, x=1.0, label="0")
-        Polygon(common=poly6, y=2, x=1.5, rotation=15, label="15")
-        Polygon(common=poly6, y=3, x=2.0, rotation=30, label="30")
-        Polygon(common=poly6, y=4, x=2.5, rotation=45, label="45")
-        Polygon(common=poly6, y=5, x=3.0, rotation=60, label="60")
+        Polygon(
+            common=poly6,
+            y=1, x=1.0, label="0")
+        Polygon(
+            common=poly6,
+            y=2, x=1.5,
+            rotation=15, label="15")
+        Polygon(
+            common=poly6,
+            y=3, x=2.0,
+            rotation=30, label="30")
+        Polygon(
+            common=poly6,
+            y=4, x=2.5,
+            rotation=45, label="45")
+        Polygon(
+            common=poly6,
+            y=5, x=3.0,
+            rotation=60, label="60")
 
       The examples have the following properties:
 
@@ -1298,6 +1334,36 @@ Example 5. Polygon Rotation
 
 ===== ======
 
+Example 6. Polygon Slices
++++++++++++++++++++++++++
+`^ <polygon-command_>`_
+
+Slices are a set of colors that are drawn as triangles inside a
+a Polygon in a clockwise direction starting from the "South East".
+If there are fewer colors than all the possible triangles, then the
+colors are repeated, starting from the first one.
+
+.. |pl5| image:: images/customised/polygon_slices.png
+   :width: 330
+
+===== ======
+|pl5| This example shows a Polygon constructed using these commands:
+
+      .. code:: python
+
+        Polygon(
+            cx=2, cy=1, sides=8, radius=1,
+            slices=['red', 'orange', 'yellow', 'green',
+                    'aqua', 'pink', 'violet', 'purple'])
+
+      This example has the following properties:
+
+      - *cx* and *cy* - set the centre location
+      - *radius* - ``1`` cm
+      - *sides* - set to ``8`` (an octagon)
+      - *slices* - list of named colors that will be drawn
+        seqentially
+===== ======
 
 .. _polyshape-command:
 
@@ -1331,7 +1397,12 @@ Example 1. Default Polyshape
       .. code:: python
 
         Polyshape(
-          points=[(1, 2), (1, 1), (2, 0), (3, 1), (3, 2)])
+          points=[
+              (1, 2),
+              (1, 1),
+              (2, 0),
+              (3, 1),
+              (3, 2)])
 
       It has the following properties:
 

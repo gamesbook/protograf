@@ -2975,6 +2975,47 @@ class PolygonShape(BaseShape):
             dotted=self.radii_dotted,
         )
 
+    def draw_slices(self, cnv, ID, centre: Point, vertexes: list, rotation=0):
+        """Draw triangles inside the Polygon
+
+        Args:
+            ID: unique ID
+            vertexes: list of Polygon's nodes as Points
+            centre: the centre Point of the Polygon
+            rotation: degrees anti-clockwise from horizontal "east"
+        """
+        # ---- get slices color list from string
+        if isinstance(self.slices, str):
+            _slices = tools.split(self.slices.strip())
+        else:
+            _slices = self.slices
+        # ---- validate slices color settings
+        slices_colors = [
+            colrs.get_color(slcolor)
+            for slcolor in _slices
+            if not isinstance(slcolor, bool)
+        ]
+        # ---- draw triangle per slice; iterate through colors as needed!
+        # print(f'*** PS {slices_colors=} {vertexes=}')
+        cid = 0
+        for vid in range(0, len(vertexes)):
+            scolor = slices_colors[cid]
+            vnext = vid + 1 if vid < len(vertexes) - 1 else 0
+            vertexes_slice = [vertexes[vid], centre, vertexes[vnext]]
+            cnv.draw_polyline(vertexes_slice)
+            self.set_canvas_props(
+                index=ID,
+                stroke=self.slices_stroke or scolor,
+                stroke_ends=self.slices_ends,
+                fill=scolor,
+                closed=True,
+                rotation=rotation,
+                rotation_point=muPoint(centre[0], centre[1]),
+            )
+            cid += 1
+            if cid > len(slices_colors) - 1:
+                cid = 0
+
     def get_geometry(self, rotation: float = None, is_rotated: bool = False):
         """Calculate centre, radius, side and vertices of Polygon."""
         # convert to using units
@@ -3091,6 +3132,15 @@ class PolygonShape(BaseShape):
         cnv.draw_polyline(vertices)
         kwargs["closed"] = True
         self.set_canvas_props(cnv=cnv, index=ID, **kwargs)
+        # ---- draw slices
+        if self.slices:
+            self.draw_slices(
+                cnv,
+                ID,
+                Point(x, y),
+                vertices,
+                rotation=kwargs.get("rotation"),
+            )
         # ---- draw radii
         if self.radii:
             self.draw_radii(cnv, ID, Point(x, y), vertices)
