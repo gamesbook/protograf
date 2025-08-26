@@ -451,7 +451,8 @@ class BaseCanvas:
         self.flip = self.defaults.get("flip", None)
         # ---- triangle / polyomino
         self.hand = self.defaults.get("hand", None)
-        # ---- hexagon / circle
+        # ---- shapes with centr (hexagon / circle / square / rhombus / poly / ellipse)
+        self.centre_shapes = self.defaults.get("centre_shapes", [])
         self.centre_shape = self.defaults.get("centre_shape", "")
         self.centre_shape_mx = self.defaults.get("centre_shape_mx", 0)
         self.centre_shape_my = self.defaults.get("centre_shape_my", 0)
@@ -957,7 +958,8 @@ class BaseShape:
         self.flip = kwargs.get("flip", base.flip)
         # ---- triangle / polyomino
         self.hand = kwargs.get("hand", base.hand)
-        # ---- hexagon / circle / polygon
+        # ---- shapes with centr (hexagon / circle / square / rhombus / poly / ellipse)
+        self.centre_shapes = kwargs.get("centre_shapes", [])
         self.centre_shape = kwargs.get("centre_shape", "")
         self.centre_shape_mx = self.kw_float(
             kwargs.get("centre_shape_mx", base.centre_shape_mx)
@@ -2755,6 +2757,23 @@ class BaseShape:
             _name = cshape_name.replace("Shape", "")
             feedback(f"Cannot draw a centered {_name}!")
         return False
+
+    def draw_centred_shapes(self, centre_shapes, cx: float, cy: float):
+        for item in centre_shapes:
+            _shape_mx, _shape_my = 0, 0
+            if isinstance(item, tuple):
+                _shape = item[0]
+                if len(item) >= 2:
+                    _shape_mx = item[1]
+                if len(item) == 3:
+                    _shape_my = item[2]
+            else:
+                _shape = item
+            if self.can_draw_centred_shape(_shape):
+                _shape.draw(
+                    _abs_cx=cx + self.unit(_shape_mx),
+                    _abs_cy=cy + self.unit(_shape_my),
+                )
 
 
 class GroupBase(list):

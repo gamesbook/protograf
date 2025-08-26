@@ -949,6 +949,9 @@ class CircleShape(BaseShape):
                     _abs_cx=x + self.unit(self.centre_shape_mx),
                     _abs_cy=y + self.unit(self.centre_shape_my),
                 )
+        # ---- centred shapes (with offsets)
+        if self.centre_shapes:
+            self.draw_centred_shapes(self.centre_shapes, x, y)
         # ---- cross
         self.draw_cross(cnv, self.x_c, self.y_c, rotation=kwargs.get("rotation"))
         # ---- dot
@@ -1296,6 +1299,16 @@ class EllipseShape(BaseShape):
         # ---- draw ellipse
         cnv.draw_oval((x, y, x + self._u.width, y + self._u.height))
         self.set_canvas_props(cnv=cnv, index=ID, **kwargs)  # shape.finish()
+        # ---- centred shape (with offset)
+        if self.centre_shape:
+            if self.can_draw_centred_shape(self.centre_shape):
+                self.centre_shape.draw(
+                    _abs_cx=x + self.unit(self.centre_shape_mx),
+                    _abs_cy=y + self.unit(self.centre_shape_my),
+                )
+        # ---- centred shapes (with offsets)
+        if self.centre_shapes:
+            self.draw_centred_shapes(self.centre_shapes, x, y)
         # ---- cross
         self.draw_cross(cnv, x_d, y_d, rotation=kwargs.get("rotation"))
         # ---- dot
@@ -1440,6 +1453,11 @@ class EquilateralTriangleShape(BaseShape):
                     _abs_cx=self.centroid.x + self.unit(self.centre_shape_mx),
                     _abs_cy=self.centroid.y + self.unit(self.centre_shape_my),
                 )
+        # ---- centred shapes (with offsets)
+        if self.centre_shapes:
+            self.draw_centred_shapes(
+                self.centre_shapes, self.centroid.x, self.centroid.y
+            )
         # ---- dot
         self.draw_dot(cnv, self.centroid.x, self.centroid.y)
         # ---- text
@@ -2663,6 +2681,9 @@ class HexShape(BaseShape):
                     _abs_cx=self.x_d + self.unit(self.centre_shape_mx),
                     _abs_cy=self.y_d + self.unit(self.centre_shape_my),
                 )
+        # ---- centred shapes (with offsets)
+        if self.centre_shapes:
+            self.draw_centred_shapes(self.centre_shapes, self.x_d, self.y_d)
         # ---- cross
         self.draw_cross(cnv, self.x_d, self.y_d, rotation=kwargs.get("rotation"))
         # ---- dot
@@ -3157,6 +3178,9 @@ class PolygonShape(BaseShape):
                     _abs_cx=x + self.unit(self.centre_shape_mx),
                     _abs_cy=y + self.unit(self.centre_shape_my),
                 )
+        # ---- centred shapes (with offsets)
+        if self.centre_shapes:
+            self.draw_centred_shapes(self.centre_shapes, x, y)
         # ---- debug
         self._debug(cnv, vertices=vertices)  # needs: self.run_debug = True
         # ---- dot
@@ -4149,6 +4173,9 @@ class RectangleShape(BaseShape):
                     _abs_cx=x_d + self.unit(self.centre_shape_mx),
                     _abs_cy=y_d + self.unit(self.centre_shape_my),
                 )
+        # ---- centred shapes (with offsets)
+        if self.centre_shapes:
+            self.draw_centred_shapes(self.centre_shapes, x_d, y_d)
         # ---- cross
         self.draw_cross(cnv, x_d, y_d, rotation=kwargs.get("rotation"))
         # ---- dot
@@ -4401,6 +4428,7 @@ class RhombusShape(BaseShape):
             self.draw_hatch(
                 cnv, ID, cx, cy, self.side, self.vertexes, self.hatch_count, rotation
             )
+
         # ---- borders (override)
         if self.borders:
             if isinstance(self.borders, tuple):
@@ -4411,20 +4439,31 @@ class RhombusShape(BaseShape):
                 feedback('The "borders" property must be a list of sets or a set')
             for border in self.borders:
                 self.draw_border(cnv, border, ID)  # BaseShape
+
+        # ---- centred shape (with offset)
+        if self.centre_shape:
+            if self.can_draw_centred_shape(self.centre_shape):
+                self.centre_shape.draw(
+                    _abs_cx=cx + self.unit(self.centre_shape_mx),
+                    _abs_cy=cy + self.unit(self.centre_shape_my),
+                )
+        # ---- centred shapes (with offsets)
+        if self.centre_shapes:
+            self.draw_centred_shapes(self.centre_shapes, cx, cy)
         # ---- dot
-        self.draw_dot(cnv, x + self._u.width / 2.0, y + self._u.height / 2.0)
+        self.draw_dot(cnv, cx, y + self._u.height / 2.0)
         # ---- cross
         self.draw_cross(
             cnv,
-            x + self._u.width / 2.0,
+            cx,
             y + self._u.height / 2.0,
             rotation=kwargs.get("rotation"),
         )
         # ---- text
         y_off = self._u.height / 2.0
-        self.draw_heading(cnv, ID, x + self._u.width / 2.0, cy - y_off, **kwargs)
-        self.draw_label(cnv, ID, x + self._u.width / 2.0, cy, **kwargs)
-        self.draw_title(cnv, ID, x + self._u.width / 2.0, cy + y_off, **kwargs)
+        self.draw_heading(cnv, ID, cx, cy - y_off, **kwargs)
+        self.draw_label(cnv, ID, cx, cy, **kwargs)
+        self.draw_title(cnv, ID, cx, cy + y_off, **kwargs)
 
 
 class RightAngledTriangleShape(BaseShape):
@@ -4804,32 +4843,40 @@ class StadiumShape(BaseShape):
         kwargs["closed"] = False
         self.set_canvas_props(cnv=cnv, index=ID, **kwargs)
 
+        # ---- centred shape (with offset)
+        if self.centre_shape:
+            if self.can_draw_centred_shape(self.centre_shape):
+                self.centre_shape.draw(
+                    _abs_cx=cx + self.unit(self.centre_shape_mx),
+                    _abs_cy=cy + self.unit(self.centre_shape_my),
+                )
+        # ---- centred shapes (with offsets)
+        if self.centre_shapes:
+            self.draw_centred_shapes(self.centre_shapes, cx, cy)
         # ---- cross
         self.draw_cross(
             cnv,
-            x + self._u.width / 2.0,
-            y + self._u.height / 2.0,
+            cx,
+            cy,
             rotation=kwargs.get("rotation"),
         )
         # ---- dot
-        self.draw_dot(cnv, x + self._u.width / 2.0, y + self._u.height / 2.0)
+        self.draw_dot(cnv, cx, cy)
         # ---- text
         delta = radius_tb if "n" in _edges or "north" in _edges else 0.0
         self.draw_heading(
             cnv,
             ID,
-            x + self._u.width / 2.0,
-            cy - self._u.height / 2.0 - delta,
+            cx,
+            cy - delta,
             **kwargs,
         )
-        self.draw_label(
-            cnv, ID, x + self._u.width / 2.0, y + self._u.height / 2.0, **kwargs
-        )
+        self.draw_label(cnv, ID, cx, cy, **kwargs)
         self.draw_title(
             cnv,
             ID,
-            x + self._u.width / 2.0,
-            cy + self._u.height / 2.0 + delta,
+            cx,
+            cy + delta,
             **kwargs,
         )
 

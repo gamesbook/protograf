@@ -630,9 +630,9 @@ Polyline(
 )
 PageBreak()
 
-# ---- Centred Shapes
+# ---- centred shapes
 Blueprint()
-Text(common=txt, text="Centred Shapes")
+Text(common=txt, text="Centre Shape")
 small_star = star(radius=0.25)
 Hexagon(x=0.5, y=0.5, height=1, centre_shape=small_star)
 Square(x=2.5, y=0.5, height=1, centre_shape=small_star)
@@ -642,9 +642,9 @@ Polygon(cx=1, cy=5, radius=0.5, sides=8, centre_shape=small_star)
 EquilateralTriangle(x=2.35, y=5.5, side=1.25, centre_shape=small_star)
 PageBreak()
 
-# ---- Centred Shapes - move
+# ---- centre shape - move
 Blueprint()
-Text(common=txt, text="Centred Shape: move + double")
+Text(common=txt, text="Centre Shape: move + double")
 small_star = star(radius=0.25)
 small_circle = circle(radius=0.33, fill="gray", centre_shape=small_star)
 Hexagon(x=1, y=0.5, height=2,
@@ -656,9 +656,9 @@ Hexagon(x=1, y=3, height=2,
         centre_shape_mx=0.3, centre_shape_my=0.6)
 PageBreak()
 
-# ---- Centred Shapes - customised
+# ---- centred shapes - customised
 Blueprint()
-Text(common=txt, text="Centred Shape: customised")
+Text(common=txt, text="Centre shape: customised")
 Rectangle(x=0, y=1, side=1,
           centre_shape=polygon(
               radius=0.4,
@@ -709,6 +709,20 @@ Rectangle(x=3, y=4, side=1,
               flip='south',
               borders=[("e w", 2, "black")]))
 PageBreak()
+
+# ---- Centred Shapes
+Blueprint()
+Text(common=txt, text="Centred Shapes (with offsets)")
+small_dot = dot(dot_point=4, fill="red")
+big_dot = dot(dot_point=8)
+Hexagon(x=0.5, y=0.5, height=1, centre_shapes=[(small_dot), (big_dot, 0.2, 0.2)])
+Rhombus(x=2.4, y=0.3, height=1.5,  width=1.25, centre_shapes=[(small_dot), (big_dot, 0.2, 0.2)])
+Rectangle(x=0.5, y=2.5, height=1, width=1.25, centre_shapes=[(small_dot), (big_dot, 0.2, 0.2)])
+Circle(cx=3, cy=3, radius=0.5, centre_shapes=[(small_dot), (big_dot, 0.2, 0.2)])
+Polygon(cx=1, cy=5, radius=0.5, sides=8, centre_shapes=[(small_dot), (big_dot, 0.2, 0.2)])
+EquilateralTriangle(x=2.35, y=5.5, side=1.25, centre_shapes=[(small_dot), (big_dot, 0.2, 0.2)])
+PageBreak()
+
 
 # ---- QR Code
 Blueprint()
@@ -863,6 +877,7 @@ Save(
         "arrow_sizes", "arrow_rotate", "arrowheads",
         "polyline_basic", "polyline_arrow",
         "shape_centred", "shape_centred_move", "shape_centred_custom",
+        "shapes_centred",
         "qr_code",
         "image_sliced", "image_label",
         "shape_rotation", "shape_hatch_and_rotation",

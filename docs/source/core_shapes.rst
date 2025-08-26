@@ -3069,6 +3069,7 @@ the desired output:
 - `Text Descriptions`_
 - `Transparency`_
 - `Centre Shape`_
+- `Centre Shapes`_
 
 
 x and y
@@ -3761,5 +3762,82 @@ and this shape itself can be customised.
       These various shapes and their custom properties are described
       elsewhere in the documentation; this example just serves to show
       how they can be used together.
+
+===== ======
+
+
+Centre Shapes
+~~~~~~~~~~~~~
+`^ <shapes-common-properties_>`_
+
+Any shape that can be defined using its centre, may have multiple shapes |dash|
+called "centre shapes" |dash| placed inside of it.
+
+These shapes are supplied as a list of sets; for example ``[(shape1), (shape2)]``
+
+.. NOTE::
+
+   In terms of drawing order, the  "centre shapes" are drawn after most of the
+   shape's other properties: only a dot, cross or label (if any of these are
+   defined) will be drawn superimposed on the centre shapes.
+
+Example 1. Centres
+++++++++++++++++++
+
+.. |ss1| image:: images/customised/shapes_centred.png
+   :width: 330
+
+Any centre-shape can be shifted from the centre by setting values for
+the change in ``x`` and ``y`` values as part of the set.
+
+===== ======
+|ss1| This example shows centre shapes constructed as follows:
+
+      .. code:: python
+
+        small_dot = dot(dot_point=4, fill="red")
+        big_dot = dot(dot_point=8)
+
+        Hexagon(
+            x=0.5, y=0.5, height=1,
+            centre_shapes=[
+                (small_dot), (big_dot, 0.2, 0.2)])
+        Rhombus(
+            x=2.4, y=0.3,
+            height=1.5, width=1.25,
+            centre_shapes=[
+                (small_dot), (big_dot, 0.2, 0.2)])
+        Rectangle(
+            x=0.5, y=2.5,
+            height=1, width=1.25,
+            centre_shapes=[
+                (small_dot), (big_dot, 0.2, 0.2)])
+        Circle(
+            cx=3, cy=3,
+            radius=0.5,
+            centre_shapes=[
+                (small_dot), (big_dot, 0.2, 0.2)])
+        Polygon(
+            cx=1, cy=5,
+            radius=0.5, sides=8,
+            centre_shapes=[
+                (small_dot), (big_dot, 0.2, 0.2)])
+        EquilateralTriangle(
+            x=2.35, y=5.5, side=1.25,
+            centre_shapes=[
+                (small_dot), (big_dot, 0.2, 0.2)])
+
+      At the start, two Dot shapes are defined by the lowercase ``dot()``
+
+      A lowercase command means the shapes are not drawn at this time but
+      assigned to named values and can be referred to further on.
+
+      Each of the other shapes in the script can now use these named shapes
+      as their ``centre_shapes``.
+
+      The ``small_dot`` (which is red )is used "as is" and so by default is
+      drawn at the centre of its parent shape; the ``big_dot`` is given offset
+      values for the x and y positions - so is drawn below and to the right
+      of centre.
 
 ===== ======
