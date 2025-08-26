@@ -97,15 +97,11 @@ class GridShape(BaseShape):
         # ---- text
         x = self._u.x + self._o.delta_x
         y = self._u.y + self._o.delta_y
-        x_d = x + (self.cols * width) / 2.
-        y_d = y + (self.rows * height) / 2.
-        self.draw_heading(
-            cnv, ID, x_d, y, **kwargs
-        )
+        x_d = x + (self.cols * width) / 2.0
+        y_d = y + (self.rows * height) / 2.0
+        self.draw_heading(cnv, ID, x_d, y, **kwargs)
         self.draw_label(cnv, ID, x_d, y_d, **kwargs)
-        self.draw_title(
-            cnv, ID, x_d, y + (self.rows * height), **kwargs
-        )
+        self.draw_title(cnv, ID, x_d, y + (self.rows * height), **kwargs)
 
 
 class DotGridShape(BaseShape):
