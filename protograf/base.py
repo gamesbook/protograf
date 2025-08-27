@@ -346,6 +346,8 @@ class BaseCanvas:
             "arrow_stroke", None
         )  # see draw_arrowhead()
         self.arrow_fill = self.defaults.get("arrow_fill", None)  # see draw_arrowhead()
+        # ---- line
+        self.connections = self.defaults.get("connections", None)
         # ---- line / bezier
         self.x_1 = self.defaults.get("x1", 0)
         self.y_1 = self.defaults.get("y1", 0)
@@ -379,7 +381,7 @@ class BaseCanvas:
         self.slices_line_my = self.defaults.get("slices_line_my", 0)
         self.slices_stroke = self.defaults.get("slices_stroke", None)
         self.slices_ends = self.defaults.get("slices_ends", None)
-        self.slices_stroke_width = self.defaults.get("slices_stroke", None)
+        self.slices_stroke_width = self.defaults.get("slices_stroke_width", None)
         self.slices_reverse = self.defaults.get("slices_reverse", False)
         # ---- stadium
         self.edges = self.defaults.get("edges", "E W")
@@ -835,6 +837,8 @@ class BaseShape:
         self.arrow_height = kwargs.get("arrow_height", base.arrow_height)
         self.arrow_stroke = kwargs.get("arrow_stroke", base.arrow_stroke)
         self.arrow_fill = kwargs.get("arrow_fill", base.arrow_fill)
+        # ---- line
+        self.connections = kwargs.get("connections", base.connections)
         # ---- line / bezier / sector
         self.x_1 = self.kw_float(kwargs.get("x1", base.x_1))
         self.y_1 = self.kw_float(kwargs.get("y1", base.y_1))

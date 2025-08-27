@@ -393,21 +393,22 @@ class CircleShape(BaseShape):
         # ---- RESET UNIT PROPS (last!)
         self.set_unit_properties()
 
-    def calculate_centre(self):
-        # ---- calculated centre
+    def calculate_centre(self) -> Point:
+        """Calculate centre of Circle."""
         if self.use_abs_c:
             self.x_c = self._abs_cx
             self.y_c = self._abs_cy
         else:
             self.x_c = self._u.cx + self._o.delta_x
             self.y_c = self._u.cy + self._o.delta_y
-        return self.x_c, self.y_c
+        return Point(self.x_c, self.y_c)
 
-    def calculate_area(self):
+    def calculate_area(self) -> float:
+        """Calculate area of Circle."""
         return math.pi * self._u.radius * self._u.radius
 
     def calculate_perimeter(self, units: bool = False) -> float:
-        """Total length of bounding line (circumference)."""
+        """Calculate length of circumference of Circle"""
         length = math.pi * 2.0 * self._u.radius
         if units:
             return self.points_to_value(length)
@@ -826,7 +827,8 @@ class CircleShape(BaseShape):
         super().draw(cnv, off_x, off_y, ID, **kwargs)  # unit-based props
         is_cards = kwargs.get("is_cards", False)
         # ---- set centre & area
-        x, y = self.calculate_centre()  # self.x_c, self.y_c
+        ccentre = self.calculate_centre()  # self.x_c, self.y_c
+        x, y = ccentre.x, ccentre.y
         self.area = self.calculate_area()
         # ---- draw by row/col
         if self.row is not None and self.col is not None and is_cards:
@@ -978,8 +980,7 @@ class ChordShape(BaseShape):
         if not isinstance(self.shape, CircleShape):
             feedback("Shape must be a circle!", True)
         circle = self.shape
-        x_c, y_c = circle.calculate_centre()
-        centre = Point(circle.cx, circle.cy)
+        centre = circle.calculate_centre()
         pt0 = geoms.point_on_circle(centre, circle.radius, self.angle)
         pt1 = geoms.point_on_circle(centre, circle.radius, self.angle_1)
         # feedback(f"*** {circle.radius=} {pt0=} {pt1=}")
@@ -2710,11 +2711,77 @@ class LineShape(BaseShape):
     Line on a given canvas.
     """
 
+    def connect(self, cnv=None, off_x=0, off_y=0, ID=None, shapes: list = None, **kwargs):
+        """Draw a line between two or more shapes."""
+        if not isinstance(shapes, (list, tuple)) or len(shapes) < 2:
+            feedback('Connections can only be made using a list of two or more shapes!', False, True)
+            return False
+        connections = []
+        for idx, cshape in enumerate(shapes):
+            if not isinstance(cshape, CircleShape):
+                feedback('Can only connect Circles!', True)
+            if idx == len(shapes) - 1:
+                continue
+            shape_a, shape_b = cshape, shapes[idx + 1]
+            centre_a = shape_a.calculate_centre()
+            centre_b = shape_b.calculate_centre()
+            # print(f"{centre_a=}, {centre_b=}")
+            if isinstance(shape_a, CircleShape) and isinstance(shape_b, CircleShape):
+                compass, rotation = geoms.angles_from_points(centre_a, centre_b)
+                if centre_b.x < centre_a.x and centre_b.y < centre_a.y:
+                    rotation_a = 360. - rotation
+                    rotation_b = 180 + rotation_a
+                elif centre_b.x < centre_a.x and centre_b.y > centre_a.y:
+                    rotation_b = 180 - rotation
+                    rotation_a = 180 + rotation_b
+                elif centre_b.x > centre_a.x and centre_b.y < centre_a.y:
+                    rotation_a = 360 - rotation
+                    rotation_b = 180 + rotation_a
+                elif centre_b.x > centre_a.x and centre_b.y > centre_a.y:
+                    rotation_b = 180 - rotation
+                    rotation_a = 180 + rotation_b
+                elif centre_b.y == centre_a.y:
+                    rotation_a = rotation
+                    rotation_b = 180 - rotation
+                elif centre_b.x == centre_a.x:
+                    rotation_a = 360 - rotation
+                    rotation_b = rotation
+                else:
+                    rotation_a = rotation - 90
+                    rotation_b = rotation + 90
+                # print(f"{rotation_a=}, {rotation_b=}")
+                pt_a = geoms.point_on_circle(centre_a, shape_a._u.radius, rotation_a)
+                pt_b = geoms.point_on_circle(centre_b, shape_b._u.radius, rotation_b)
+                connections.append((pt_a, pt_b))
+        for conn in connections:
+            klargs = draw_line(cnv, conn[0], conn[1], shape=self, **kwargs)
+            self.set_canvas_props(cnv=cnv, index=ID, **klargs)  # shape.finish()
+            self.draw_arrow(cnv, conn[0], conn[1], **kwargs)
+        return True
+
+    def draw_arrow(self, cnv, point_a, point_b, **kwargs):
+        if (
+             self.arrow
+             or self.arrow_style
+             or self.arrow_position
+             or self.arrow_height
+             or self.arrow_width
+             or self.arrow_double
+        ):
+            self.draw_arrowhead(cnv, point_a, point_b, **kwargs)
+            if self.arrow_double:
+                self.draw_arrowhead(cnv, point_a, point_b, **kwargs)
+
     def draw(self, cnv=None, off_x=0, off_y=0, ID=None, **kwargs):
         """Draw a line on a given canvas."""
         kwargs = self.kwargs | kwargs
         cnv = cnv if cnv else globals.canvas  # a new Page/Shape may now exist
         super().draw(cnv, off_x, off_y, ID, **kwargs)  # unit-based props
+        # connection draw
+        if self.connections:
+            if self.connect(cnv, off_x, off_y, ID, self.connections, **kwargs):
+                return
+        # "normal" draw
         if self.use_abs:
             x = self._abs_x
             y = self._abs_y
@@ -2785,17 +2852,7 @@ class LineShape(BaseShape):
             **kwargs,
         )
         # ---- arrowhead
-        if (
-            self.arrow
-            or self.arrow_style
-            or self.arrow_position
-            or self.arrow_height
-            or self.arrow_width
-            or self.arrow_double
-        ):
-            self.draw_arrowhead(cnv, Point(x, y), Point(x_1, y_1), **kwargs)
-            if self.arrow_double:
-                self.draw_arrowhead(cnv, Point(x_1, y_1), Point(x, y), **kwargs)
+        self.draw_arrow(cnv, Point(x, y), Point(x_1, y_1), **kwargs)
 
 
 class PolygonShape(BaseShape):
