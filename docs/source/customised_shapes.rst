@@ -54,6 +54,9 @@ that it can be customised.
 - `Dotted, Dashed and Angled <lineDotDash_>`_
 - `Centred <lineCentred_>`_
 - `Arrowheads <line-with-arrow_>`_
+- `Connections <lineConnections_>`_
+- `Connections with Arrows <lineConnectionsArrow_>`_
+- `Connections as Spokes <lineConnectionsSpoke_>`_
 
 Basic Properties
 ----------------
@@ -67,6 +70,10 @@ A Line has the following properties, in addition to the basic ones of
 - *cx* and *cy* - if set, will replace the use of *x* and *y* for the
   starting point, and work in conjunction with *angle* and *length* to
   create the line around a centre point
+- *connections* - a list of circular shapes (Circle or Dot) that will be
+  connected by the line
+- *connections_style* - if set to ``spoke``, will draw lines from the first
+  shape to each of the other shapes in the *connections* list
 - *dotted* - if ``True``, create a series of small lines i.e. the
   "dots", followed by gaps, of sizes equal to the line's *stroke_width*
 - *dashed* - a list of two numbers: the first is the length of the dash;
@@ -437,6 +444,138 @@ The following properties can be set:
       The bottom right image is a "cheat" of sorts.  Two lines are drawn in
       the same location but with different styled arrows in different
       positions.
+
+===== ======
+
+.. _lineConnections:
+
+Example 4. Connections
+------------------------------------------
+`^ <lineIndex_>`_
+
+.. |ln4| image:: images/customised/line_connections.png
+   :width: 330
+
+===== ======
+|ln4| This example shows a Line constructed using commands with the
+      following properties:
+
+      .. code:: python
+
+        cc = Circle(cx=2, cy=3, radius=0.5)
+
+        cy = Circle(cx=1, cy=1, radius=0.5,
+                    fill_stroke="yellow")
+        Line(connections=[cc, cy])
+
+        ca = Circle(cx=1, cy=5, radius=0.5,
+                    fill_stroke="aqua")
+        Line(connections=[cc, ca])
+
+        cr = Circle(cx=3, cy=1,
+                    radius=0.5, fill_stroke="red")
+        Line(connections=[cc, cr])
+
+        co = Circle(cx=3, cy=5, radius=0.5,
+                    fill_stroke="orange")
+        Line(connections=[cc, co])
+
+        # orthogonal
+        Line(
+            connections=[cy, cr, co, ca, cy],
+            stroke_width=2)
+
+      This example shows how Circles that are defined and drawn as normal
+      can be assigned to a name e.g. ``cc`` for the white Circle, and then
+      connected by a Line via the *connections* property.
+
+      The *connections* property requires two or more circular shapes in a
+      list so that the Line can be drawn between them.
+
+      Using the *connections* property means that the normal point locations,
+      or line angle, are **not** used but are superceded by calculated values.
+      The "start" of the line is at the centre of the first circular shape
+      and the "end" of the line is at the centre of the second circular shape.
+      However, the line itself is only drawn between the boundaries of those
+      shapes.
+
+      The thick black line is drawn between a series of shapes, starting and
+      ending at the yellow circle.
+
+===== ======
+
+.. _lineConnectionsArrow:
+
+Example 5. Connections - Arrow
+------------------------------
+`^ <lineIndex_>`_
+
+.. |ln5| image:: images/customised/line_connections_arrow.png
+   :width: 330
+
+===== ======
+|ln5| This example shows a Line constructed using commands with the
+      following properties:
+
+      .. code:: python
+
+        cc = Circle(cx=1.5, cy=3.5, radius=0.5)
+        cy = Circle(cx=1, cy=1, radius=0.5,
+                    fill_stroke="yellow")
+        co = Circle(cx=3, cy=5, radius=0.5,
+                    fill_stroke="orange")
+        Line(connections=[cy, cc, co],
+             stroke="red",
+             stroke_width=1,
+             arrow=True,
+             )
+
+      Similarly to `Example 4 <lineConnections_>`_, the line is drawn
+      between a series of shapes.
+
+      In this case, the line has been styled with color and thickness, and
+      the *arrow* has been "switched on".  The arrow points in the direction
+      corresponding to the order of the shapes in the *connections* list.
+
+===== ======
+
+.. _lineConnectionsSpoke:
+
+Example 6. Connections - Spoke
+------------------------------
+`^ <lineIndex_>`_
+
+.. |ln6| image:: images/customised/line_connections_spoke.png
+   :width: 330
+
+===== ======
+|ln6| This example shows a Line constructed using commands with the
+      following properties:
+
+      .. code:: python
+
+        cc = Dot(cx=1.5, cy=3.5, dot_point=2)
+        cr = Circle(cx=3, cy=1, radius=0.5,
+                    fill_stroke="red")
+        co = Circle(cx=3, cy=5, radius=0.5,
+                    fill_stroke="orange")
+        ca = Circle(cx=1, cy=5, radius=0.5,
+                    fill_stroke="aqua")
+        Line(connections=[cc, cr, co, ca],
+             connections_style='spoke',
+             stroke="green",
+             stroke_width=1,
+             arrow=True,
+             )
+
+      Similarly to `Example 5 <lineConnectionsArrow_>`_, the line is drawn
+      as an arrow between the shapes.
+
+      However, the use of the ``connections_style='spoke'`` property means
+      each line is drawn from the first shape in the list to each of the
+      others, rather than as a series of connections.
+
+      Note that ``Dot()`` shape is used here instead of a ``Circle()``.
 
 ===== ======
 

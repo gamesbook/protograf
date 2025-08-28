@@ -1428,7 +1428,7 @@ def set_canvas_props(
     # print(f"^^^ pymuProps: {pymu_props}")
     if pymu_props:
         cnv.finish(
-            width=as_float(pymu_props.width, 'width'),
+            width=as_float(pymu_props.width, "width"),
             color=pymu_props.color,
             fill=pymu_props.fill,
             lineCap=pymu_props.lineCap,

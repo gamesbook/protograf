@@ -5,6 +5,7 @@ protograf Changes
 -------------------
 - Add text descriptors for Grid
 - Add slices property to Polygon
+- Add connections property to Line
 
 2025-08-23 (0.2.15)
 -------------------

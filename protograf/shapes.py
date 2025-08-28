@@ -1217,24 +1217,39 @@ class DotShape(BaseShape):
     Dot of fixed radius on a given canvas.
     """
 
+    def __init__(self, _object=None, canvas=None, **kwargs):
+        super(DotShape, self).__init__(_object=_object, canvas=canvas, **kwargs)
+        self.kwargs = kwargs
+        # ---- perform overrides
+        self.size = self.dot_point / 2.0  # diameter is 3 points ~ 1mm or 1/32"
+        self.radius = self.points_to_value(self.size, globals.units)
+        # ---- RESET UNIT PROPS (last!)
+        self.set_unit_properties()
+
+    def calculate_centre(self) -> Point:
+        """Calculate centre of Dot."""
+        if self.use_abs_c:
+            self.x_c = self._abs_cx
+            self.y_c = self._abs_cy
+        else:
+            self.x_c = self._u.cx + self._o.delta_x
+            self.y_c = self._u.cy + self._o.delta_y
+        return Point(self.x_c, self.y_c)
+
     def draw(self, cnv=None, off_x=0, off_y=0, ID=None, **kwargs):
         """Draw a dot on a given canvas."""
         kwargs = self.kwargs | kwargs
         cnv = cnv if cnv else globals.canvas  # a new Page/Shape may now exist
         super().draw(cnv, off_x, off_y, ID, **kwargs)  # unit-based props
         # feedback(f"*** Dot {self._o.delta_x=} {self._o.delta_y=}")
-        if self.use_abs_c:
-            x = self._abs_cx
-            y = self._abs_cy
-        else:
-            x = self._u.x + self._o.delta_x
-            y = self._u.y + self._o.delta_y
-        size = self.dot_point / 2.0  # diameter is 3 points ~ 1mm or 1/32"
+        # ---- set centre
+        ccentre = self.calculate_centre()  # self.x_c, self.y_c
+        x, y = ccentre.x, ccentre.y
         self.fill = self.stroke
         center = muPoint(x, y)
         # ---- draw dot
         # feedback(f'*** Dot {size=} {x=} {y=}')
-        cnv.draw_circle(center=center, radius=size)
+        cnv.draw_circle(center=center, radius=self._u.radius)
         kwargs["rotation"] = self.rotation
         kwargs["rotation_point"] = center
         self.set_canvas_props(cnv=cnv, index=ID, **kwargs)  # shape.finish()
@@ -2711,25 +2726,39 @@ class LineShape(BaseShape):
     Line on a given canvas.
     """
 
-    def connect(self, cnv=None, off_x=0, off_y=0, ID=None, shapes: list = None, **kwargs):
+    def draw_connections(
+        self, cnv=None, off_x=0, off_y=0, ID=None, shapes: list = None, **kwargs
+    ):
         """Draw a line between two or more shapes."""
         if not isinstance(shapes, (list, tuple)) or len(shapes) < 2:
-            feedback('Connections can only be made using a list of two or more shapes!', False, True)
+            feedback(
+                "Connections can only be made using a list of two or more shapes!",
+                False,
+                True,
+            )
             return False
         connections = []
         for idx, cshape in enumerate(shapes):
-            if not isinstance(cshape, CircleShape):
-                feedback('Can only connect Circles!', True)
+            if not isinstance(cshape, (CircleShape, DotShape)):
+                feedback("Can only connect Circles or Dots!", True)
             if idx == len(shapes) - 1:
                 continue
-            shape_a, shape_b = cshape, shapes[idx + 1]
+            if self.connections_style and _lower(self.connections_style) in [
+                "s",
+                "spoke",
+            ]:
+                shape_a, shape_b = shapes[0], shapes[idx + 1]
+            else:
+                shape_a, shape_b = cshape, shapes[idx + 1]
             centre_a = shape_a.calculate_centre()
             centre_b = shape_b.calculate_centre()
             # print(f"{centre_a=}, {centre_b=}")
-            if isinstance(shape_a, CircleShape) and isinstance(shape_b, CircleShape):
+            if isinstance(shape_a, (CircleShape, DotShape)) and isinstance(
+                shape_b, (CircleShape, DotShape)
+            ):
                 compass, rotation = geoms.angles_from_points(centre_a, centre_b)
                 if centre_b.x < centre_a.x and centre_b.y < centre_a.y:
-                    rotation_a = 360. - rotation
+                    rotation_a = 360.0 - rotation
                     rotation_b = 180 + rotation_a
                 elif centre_b.x < centre_a.x and centre_b.y > centre_a.y:
                     rotation_b = 180 - rotation
@@ -2761,12 +2790,12 @@ class LineShape(BaseShape):
 
     def draw_arrow(self, cnv, point_a, point_b, **kwargs):
         if (
-             self.arrow
-             or self.arrow_style
-             or self.arrow_position
-             or self.arrow_height
-             or self.arrow_width
-             or self.arrow_double
+            self.arrow
+            or self.arrow_style
+            or self.arrow_position
+            or self.arrow_height
+            or self.arrow_width
+            or self.arrow_double
         ):
             self.draw_arrowhead(cnv, point_a, point_b, **kwargs)
             if self.arrow_double:
@@ -2777,9 +2806,9 @@ class LineShape(BaseShape):
         kwargs = self.kwargs | kwargs
         cnv = cnv if cnv else globals.canvas  # a new Page/Shape may now exist
         super().draw(cnv, off_x, off_y, ID, **kwargs)  # unit-based props
-        # connection draw
+        # ---- connections draw
         if self.connections:
-            if self.connect(cnv, off_x, off_y, ID, self.connections, **kwargs):
+            if self.draw_connections(cnv, off_x, off_y, ID, self.connections, **kwargs):
                 return
         # "normal" draw
         if self.use_abs:

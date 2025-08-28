@@ -348,6 +348,7 @@ class BaseCanvas:
         self.arrow_fill = self.defaults.get("arrow_fill", None)  # see draw_arrowhead()
         # ---- line
         self.connections = self.defaults.get("connections", None)
+        self.connections_style = self.defaults.get("connections_style", None)
         # ---- line / bezier
         self.x_1 = self.defaults.get("x1", 0)
         self.y_1 = self.defaults.get("y1", 0)
@@ -839,6 +840,7 @@ class BaseShape:
         self.arrow_fill = kwargs.get("arrow_fill", base.arrow_fill)
         # ---- line
         self.connections = kwargs.get("connections", base.connections)
+        self.connections_style = kwargs.get("connections_style", base.connections_style)
         # ---- line / bezier / sector
         self.x_1 = self.kw_float(kwargs.get("x1", base.x_1))
         self.y_1 = self.kw_float(kwargs.get("y1", base.y_1))

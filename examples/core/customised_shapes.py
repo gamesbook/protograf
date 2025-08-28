@@ -375,6 +375,50 @@ Line(cx=1, cy=5, angle=135, length=2, stroke_width=1.5)
 Line(cx=3, cy=5, angle=315, length=2, stroke="red")
 PageBreak()
 
+# ---- line: connections -
+Blueprint(stroke_width=0.5)
+Text(common=txt, text="Line: connections")
+cc = Circle(cx=2, cy=3, radius=0.5)
+cy = Circle(cx=1, cy=1, radius=0.5, fill_stroke="yellow")
+Line(connections=[cc, cy])
+ca = Circle(cx=1, cy=5, radius=0.5, fill_stroke="aqua")
+Line(connections=[cc, ca])
+cr = Circle(cx=3, cy=1, radius=0.5, fill_stroke="red")
+Line(connections=[cc, cr])
+co = Circle(cx=3, cy=5, radius=0.5, fill_stroke="orange")
+Line(connections=[cc, co])
+# orthogonal
+Line(connections=[cy, cr, co, ca, cy], stroke_width=2)
+PageBreak()
+
+# ---- line: connections - arrow
+Blueprint(stroke_width=0.5)
+Text(common=txt, text="Line: connections; arrow")
+cc = Circle(cx=1.5, cy=3.5, radius=0.5)
+cy = Circle(cx=1, cy=1, radius=0.5, fill_stroke="yellow")
+co = Circle(cx=3, cy=5, radius=0.5, fill_stroke="orange")
+Line(connections=[cy, cc, co],
+     stroke="red",
+     stroke_width=1,
+     arrow=True,
+     )
+PageBreak()
+
+# ---- line: connections - dot&spoke
+Blueprint(stroke_width=0.5)
+Text(common=txt, text="Line: connections; dot&spoke")
+cc = Dot(cx=1.5, cy=3.5, dot_point=2)
+cr = Circle(cx=3, cy=1, radius=0.5, fill_stroke="red")
+co = Circle(cx=3, cy=5, radius=0.5, fill_stroke="orange")
+ca = Circle(cx=1, cy=5, radius=0.5, fill_stroke="aqua")
+Line(connections=[cc, cr, co, ca],
+     connections_style='spoke',
+     stroke="green",
+     stroke_width=1,
+     arrow=True,
+     )
+PageBreak()
+
 # ---- bezier - custom
 Blueprint()
 Text(common=txt, text="Bezier line")
@@ -868,6 +912,7 @@ Save(
         "polygon_rotation_flat",
         "polygon_rotation_pointy", "polygon_sizes", "grid_3x4",
         "line_custom", "line_centred",
+        "line_connections", "line_connections_arrow", "line_connections_spoke",
         "bezier_custom", "ellipse_custom", "rectangle_custom",
         "square_custom", "trapezoid_custom", "image_default",
         "descriptions", "label_offset", "star_custom",
