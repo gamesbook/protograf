@@ -544,6 +544,31 @@ class CircleShape(BaseShape):
             rotation_point=muPoint(x_c, y_c),
         )
 
+    def draw_nested(self, cnv, ID, x_c: float, y_c: float, **kwargs):
+        """Draw concentric circles from the circumference inwards.
+        """
+        if self.nested:
+            intervals = []
+            if isinstance(self.nested, int):
+                if self.nested <= 0:
+                    feedback('The nested value must be greater than zero!', True)
+                interval_size = 1. / (self.nested + 1.)
+                for item in range(1, self.nested + 1):
+                    intervals.append(interval_size * item)
+            elif isinstance(self.nested, list):
+                intervals = [tools.as_float(item, 'a nested fraction') for item in self.nested]
+                for inter in intervals:
+                    if inter < 0 or inter >= 1:
+                        feedback('The nested list values must be fractions!', True)
+            else:
+                feedback('The nested value must either be a whole number or a list of fractions.', True)
+            if intervals:
+                intervals.sort(reverse=True)
+                # print(f'*** nested {intervals=}')
+                for inter in intervals:
+                    cnv.draw_circle((x_c, y_c), self._u.radius * inter)
+                    self.set_canvas_props(cnv=cnv, index=ID, **kwargs)
+
     def draw_radii(self, cnv, ID, x_c: float, y_c: float):
         """Draw radius lines from the centre outwards to the circumference.
 
@@ -885,6 +910,9 @@ class CircleShape(BaseShape):
         # ---- draw circle
         cnv.draw_circle((x, y), self._u.radius)
         self.set_canvas_props(cnv=cnv, index=ID, **kwargs)
+        # ---- draw nested
+        if self.nested:
+            self.draw_nested(cnv, ID, x, y, **kwargs)
         # ---- grid marks
         if self.grid_marks:  # and not kwargs.get("card_back", False):
             # print(f'*** {self._u.radius=} {self._u.diameter=}')

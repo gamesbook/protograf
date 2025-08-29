@@ -435,6 +435,7 @@ class BaseCanvas:
         self.radii_labels_my = self.defaults.get("radii_labels_my", 0)
         self.radii_labels_mx = self.defaults.get("radii_labels_mx", 0)
         # ---- circle
+        self.nested = self.defaults.get("nested", None)
         self.petals = self.defaults.get("petals", 0)
         self.petals_style = self.defaults.get("petals_style", "triangle")
         self.petals_height = self.defaults.get("petals_height", 1)
@@ -941,6 +942,7 @@ class BaseShape:
         self.radii_labels_my = self.kw_float(kwargs.get("radii_labels_my", 0))
         self.radii_labels_mx = self.kw_float(kwargs.get("radii_labels_mx", 0))
         # ---- circle
+        self.nested = kwargs.get("nested", base.nested)
         self.petals = self.kw_int(kwargs.get("petals", base.petals), "petals")
         self.petals_style = kwargs.get("petals_style", base.petals_style)
         self.petals_height = self.kw_float(

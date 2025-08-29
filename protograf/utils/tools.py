@@ -262,7 +262,7 @@ def as_float(
         return the_value
     except (ValueError, Exception):
         if stop:
-            feedback(f'The value "{value}"{label} is not a valid float number!', True)
+            feedback(f'The value "{value}"{_label} is not a valid float number!', True)
         else:
             return None
 

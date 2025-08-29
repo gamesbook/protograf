@@ -3071,6 +3071,7 @@ the desired output:
 - `Centre Shape`_
 - `Centre Shapes`_
 
+.. _coreShapeXY:
 
 x and y
 ~~~~~~~
@@ -3092,6 +3093,7 @@ to the top edge of the shape.
     just fits inside it; the "position" is the point corresponding to the
     top-left of that imaginary Rectangle.
 
+.. _coreShapeCxCy:
 
 cx and cy
 ~~~~~~~~~
@@ -3105,6 +3107,7 @@ For shapes that support it, the way to do this is by setting a value for **cx**
 position of the shape and/or **cy** |dash| the distance from the bottom margin
 of the page (or card) to the centre position of the shape.
 
+.. _coreShapeFillStroke:
 
 Fill and Stroke
 ~~~~~~~~~~~~~~~
@@ -3131,6 +3134,7 @@ becomes transparent.
 
 Example 1. Fill & Stroke
 ++++++++++++++++++++++++
+`↑ <coreShapeFillStroke_>`_
 
 .. |fsb| image:: images/defaults/fill-stroke.png
    :width: 330
@@ -3161,6 +3165,7 @@ Example 1. Fill & Stroke
 
 Example 2. Fill_Stroke
 ++++++++++++++++++++++
+`↑ <coreShapeFillStroke_>`_
 
 The *fill_stroke* property is a "shortcut" which sets **both** the
 *fill* and *stroke* color at same time.
@@ -3184,6 +3189,7 @@ The *fill_stroke* property is a "shortcut" which sets **both** the
 
 ===== ======
 
+.. _coreShapeDotCross:
 
 Dot and Cross
 ~~~~~~~~~~~~~
@@ -3250,6 +3256,7 @@ below.
       - *cross_stroke_width* - sets the thickness of the cross lines
 ===== ======
 
+.. _coreShapeRotation:
 
 Rotation
 ~~~~~~~~
@@ -3261,6 +3268,7 @@ around the centre of the shape, in *degrees*.
 
 Example 1. Rhombus Rotation
 +++++++++++++++++++++++++++
+`↑ <coreShapeRotation_>`_
 
 .. |rt1| image:: images/customised/rhombus_red_rotation.png
    :width: 330
@@ -3301,6 +3309,7 @@ Example 1. Rhombus Rotation
 
 Example 2. Polygon Rotation
 +++++++++++++++++++++++++++
+`↑ <coreShapeRotation_>`_
 
 .. |rt2| image:: images/customised/polygon_rotation_pointy.png
    :width: 330
@@ -3345,6 +3354,7 @@ Example 2. Polygon Rotation
 
 Example 3. Shapes Rotation
 ++++++++++++++++++++++++++
+`↑ <coreShapeRotation_>`_
 
 .. |rt3| image:: images/customised/shape_rotation.png
    :width: 330
@@ -3387,6 +3397,7 @@ Example 3. Shapes Rotation
 
 Example 4. Rotation with Hatches
 ++++++++++++++++++++++++++++++++
+`↑ <coreShapeRotation_>`_
 
 .. |rt4| image:: images/customised/shape_hatch_and_rotation.png
    :width: 330
@@ -3431,6 +3442,8 @@ Example 4. Rotation with Hatches
 
 ===== ======
 
+.. _coreShapeText:
+
 Text Descriptions
 ~~~~~~~~~~~~~~~~~
 `^ <shapes-common-properties_>`_
@@ -3463,6 +3476,7 @@ the right and down; and negative values will move the text to the left and up.
 
 Example 1. Heading, Label and Title
 +++++++++++++++++++++++++++++++++++
+`↑ <coreShapeText_>`_
 
 .. |tx1| image:: images/customised/descriptions.png
    :width: 330
@@ -3493,6 +3507,7 @@ Example 1. Heading, Label and Title
 
 Example 2. Label Offsets
 ++++++++++++++++++++++++
+`↑ <coreShapeText_>`_
 
 .. |tx2| image:: images/customised/label_offset.png
    :width: 330
@@ -3540,6 +3555,7 @@ Example 2. Label Offsets
 
 ===== ======
 
+.. _coreTransparency:
 
 Transparency
 ~~~~~~~~~~~~
@@ -3591,6 +3607,7 @@ visible - then set the *fill* value to ``None``.
       i.e. "bleed through" occurs.
 ===== ======
 
+.. _coreCentreShape:
 
 Centre Shape
 ~~~~~~~~~~~~
@@ -3607,6 +3624,7 @@ called a "centre shape" |dash| placed inside of it.
 
 Example 1. Default Centre Shape
 +++++++++++++++++++++++++++++++
+`↑ <coreCentreShape_>`_
 
 .. |cs0| image:: images/customised/shape_centred.png
    :width: 330
@@ -3619,17 +3637,23 @@ Example 1. Default Centre Shape
         small_star = star(radius=0.25)
 
         Polygon(
-            cx=1, cy=5, radius=0.5, sides=8, centre_shape=small_star)
+            cx=1, cy=5, radius=0.5, sides=8,
+            centre_shape=small_star)
         EquilateralTriangle(
-            x=2.35, y=5.5, side=1.25, centre_shape=small_star)
+            x=2.35, y=5.5, side=1.25,
+            centre_shape=small_star)
         Rectangle(
-            x=0.5, y=2.5, height=1, width=1.25, centre_shape=small_star)
+            x=0.5, y=2.5, height=1, width=1.25,
+            centre_shape=small_star)
         Circle(
-            cx=3, cy=3, radius=0.5, centre_shape=small_star)
+            cx=3, cy=3, radius=0.5,
+            centre_shape=small_star)
         Hexagon(
-            x=0.5, y=0.5, height=1, centre_shape=small_star)
+            x=0.5, y=0.5, height=1,
+            centre_shape=small_star)
         Square(
-            x=2.5, y=0.5, height=1, centre_shape=small_star)
+            x=2.5, y=0.5, height=1,
+            centre_shape=small_star)
 
       At the start, a Star shape is defined by the lowercase ``star()``
 
@@ -3647,6 +3671,7 @@ Example 1. Default Centre Shape
 
 Example 2. Off-Centre
 +++++++++++++++++++++
+`↑ <coreCentreShape_>`_
 
 .. |cs1| image:: images/customised/shape_centred_move.png
    :width: 330
@@ -3661,7 +3686,8 @@ The centre-shape can be shifted from the centre by setting values for
 
         small_star = star(radius=0.25)
         small_circle = circle(
-            radius=0.33, fill="gray", centre_shape=small_star)
+            radius=0.33, fill="gray",
+            centre_shape=small_star)
 
         Hexagon(
             x=1, y=0.5, height=2,
@@ -3696,6 +3722,7 @@ The centre-shape can be shifted from the centre by setting values for
 
 Example 3. Customised Centres
 +++++++++++++++++++++++++++++
+`↑ <coreCentreShape_>`_
 
 .. |cs2| image:: images/customised/shape_centred_custom.png
    :width: 330
@@ -3765,6 +3792,7 @@ and this shape itself can be customised.
 
 ===== ======
 
+.. _coreCentreShapes:
 
 Centre Shapes
 ~~~~~~~~~~~~~

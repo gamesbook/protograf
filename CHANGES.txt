@@ -6,6 +6,8 @@ protograf Changes
 - Add text descriptors for Grid
 - Add slices property to Polygon
 - Add connections property to Line
+- Add landscape mode to standard card sizes
+- Add nested property to Circle
 
 2025-08-23 (0.2.15)
 -------------------

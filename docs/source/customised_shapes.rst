@@ -453,11 +453,11 @@ Example 4. Connections
 ------------------------------------------
 `^ <lineIndex_>`_
 
-.. |ln4| image:: images/customised/line_connections.png
+.. |ln7| image:: images/customised/line_connections.png
    :width: 330
 
 ===== ======
-|ln4| This example shows a Line constructed using commands with the
+|ln7| This example shows a Line constructed using commands with the
       following properties:
 
       .. code:: python
@@ -1997,6 +1997,7 @@ ways that it can be customised.
 - `Petals: petal <circlePetalsPetal_>`_
 - `Petals: triangle <circlePetalsTriangle_>`_
 - `Slices <circleSlices_>`_
+- `Nested <circleNested_>`_
 
 .. _circleCross:
 
@@ -2326,17 +2327,16 @@ effect.
 
 ===== ======
 
-
 .. _circleSlices:
 
 Slices
 ------
 `^ <circleIndex_>`_
 
-The slices command enables the Circle to be filled with colored pie-shaped
+The slices property enables the Circle to be filled with colored pie-shaped
 wedges.
 
-These are relevant properties that can be set:
+These are the relevant properties that can be set:
 
 - *slices* - this is a list of colors (named or hexadecimal); if ``None`` is
   used then no slice will be drawn in that position
@@ -2414,6 +2414,46 @@ length to the  *slice* list.
 
 ===== ======
 
+.. _circleNested:
+
+Nested
+------
+`^ <circleIndex_>`_
+
+The *nested* property enables the Circle to be filled with a series of
+concentric circles.
+
+.. |cn1| image:: images/custom/circle/circle_nested.png
+   :width: 330
+
+===== ======
+|cn1| This example shows Circles constructed using the commands:
+
+      .. code:: python
+
+        Circle(
+            cx=1, cy=1, radius=1,
+            nested=2)
+        Circle(
+            cx=2, cy=3, radius=1,
+            nested=[0.8, 0.1, 0.4])
+        Circle(
+            cx=3, cy=5, radius=1,
+            nested=4,
+            dotted=True,
+            stroke="red",
+            fill="yellow")
+
+      The *nested* property can either be a single whole number or a list of
+      fractional numbers.
+
+      **NOTE** All nested Circles are drawn with the same line and fill
+      properties as the Circle shape to which they are part of.  For control
+      over such features, use the *centre_shape* property
+      instead, as this will permit construction of such a Circle with any/all
+      properties being set.
+
+===== ======
 
 .. _blueprintIndex:
 
