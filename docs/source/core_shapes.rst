@@ -123,7 +123,8 @@ Arc
 ~~~
 `↑ <shape-index_>`_
 
-An arc is a curved line.
+An Arc is a curved line between two points located along the circumference
+of a circle.
 
 Example 1. Default Arc
 ++++++++++++++++++++++
@@ -157,8 +158,11 @@ Example 2. Customised Arc
       .. code:: python
 
           Arc(cx=1, cy=3, radius=2)
+          Arc(cx=1, cy=6, radius=2,
+              nested=6,
+              angle_start=15, angle_width=60)
 
-      To help with visualisation, the Arc is surrounded by a red Rectangle:
+      To help with visualisation, the top Arc is surrounded by a red Rectangle:
 
       .. code:: python
 
@@ -168,10 +172,24 @@ Example 2. Customised Arc
                 title="Arc(cx=1, cy=3, radius=2)")
             )
 
-      The Arc has the following properties:
+      The top Arc has the following properties:
 
-      - origin is at x-position ``1`` cm and at y-position ``3`` cm
-      - the arc radius is ``2`` cm
+      - origin is at x-position ``1`` cm and y-position ``3`` cm
+      - the arc *radius* is ``2`` cm
+
+      The default arc extent is from 0 |deg| (the line parallel to the
+      top edge of the page) to 90 |deg| (the line parallel to the
+      side edges of the page).
+
+      The lower Arc has the following properties:
+
+      - origin is at x-position ``1`` cm and y-position ``6`` cm
+      - the arc *radius* is ``2`` cm
+      - the arc extends from 15 |deg| to 75 |deg|  (ie. *angle_start* of
+        15 |deg| + *angle_width* of 60 |deg|)
+      - there are ``6`` *nested* arcs equally spaced between the arc
+        origin position and the arc itself.
+
 ===== ======
 
 

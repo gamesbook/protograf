@@ -173,11 +173,12 @@ PageBreak()
 
 # ---- arc
 Blueprint()
-Text(common=txt, text="Arc; 'inside' square")
+Text(common=txt, text="Arc: 'inside' square & nested")
 Rectangle(x=1, y=1, height=2, width=2, dot=0.02,
           stroke="red", fill=None,
           title="Arc(cx=1, cy=3, radius=2)")
 Arc(cx=1, cy=3, radius=2)  #, angle_start=0, angle_width=90)
+Arc(cx=1, cy=6, radius=2, nested=6, angle_start=15, angle_width=60)
 PageBreak()
 
 # ---- stadium edges

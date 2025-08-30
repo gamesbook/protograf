@@ -381,6 +381,9 @@ class BaseCanvas:
         self.slices_line_mx = self.defaults.get("slices_line_mx", 0)
         self.slices_line_my = self.defaults.get("slices_line_my", 0)
         self.slices_stroke = self.defaults.get("slices_stroke", None)
+        self.slices_transparency = self.defaults.get(
+            "slices_transparency", 1
+        )  # NOT transparent
         self.slices_ends = self.defaults.get("slices_ends", None)
         self.slices_stroke_width = self.defaults.get("slices_stroke_width", None)
         self.slices_reverse = self.defaults.get("slices_reverse", False)
@@ -878,6 +881,9 @@ class BaseShape:
         self.slices_ends = kwargs.get("slices_ends", base.slices_ends)
         self.slices_stroke_width = kwargs.get(
             "slices_stroke_width", base.slices_stroke_width
+        )
+        self.slices_transparency = self.kw_float(
+            kwargs.get("slices_transparency"), base.slices_transparency
         )
         # ---- stadium
         self.edges = kwargs.get("edges", base.edges)

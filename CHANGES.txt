@@ -8,6 +8,7 @@ protograf Changes
 - Add connections property to Line
 - Add landscape mode to standard card sizes
 - Add nested property to Circle
+- Add nested property to Arc
 
 2025-08-23 (0.2.15)
 -------------------

@@ -2346,8 +2346,10 @@ These are the relevant properties that can be set:
   result in them being drawn inside the circle and values larger than ``1``
   will  result in them extending outside of the circle
 - *slices_angles* - this is the "width" of the slices; if not specified,
-  then by default all slices will be of equally-sized angles and will occupy
-  the full circumference of the circle
+  then by default all slices will be of equally-sized angles and will extend
+  from the centre to the full circumference of the circle
+- *slices_transparency* - the higher the value (on a scale of 0 to 100),
+  the more "see through" the fill of the slices will be
 
 Both the list of  *slice_fractions*  and  *slice_angles* must be of equal
 length to the  *slice* list.
@@ -2355,7 +2357,8 @@ length to the  *slice* list.
 .. NOTE::
 
     Slices are drawn **after** the circle has been drawn, and so
-    may obscure the stroke outline and fill color of the circle.
+    may obscure the stroke outline, fill color and other properties
+    of the circle.
 
 .. |cs1| image:: images/custom/circle/circle_slices.png
    :width: 330
@@ -2448,9 +2451,9 @@ concentric circles.
       fractional numbers.
 
       **NOTE** All nested Circles are drawn with the same line and fill
-      properties as the Circle shape to which they are part of.  For control
-      over such features, use the *centre_shape* property
-      instead, as this will permit construction of such a Circle with any/all
+      properties as the Circle shape to which they are part of.  For more
+      control over such features, rather use the *centre_shape* property
+      instead, as this will permit construction of such a circle with any/all
       properties being set.
 
 ===== ======

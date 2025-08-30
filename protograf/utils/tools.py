@@ -1425,7 +1425,6 @@ def set_canvas_props(
     cnv = cnv if cnv else globals.canvas
     defaults = defaults if defaults else {}
     pymu_props = get_pymupdf_props(defaults=defaults, index=index, **kwargs)
-    # print(f"^^^ pymuProps: {pymu_props}")
     if pymu_props:
         cnv.finish(
             width=as_float(pymu_props.width, "width"),

@@ -223,6 +223,45 @@ class ArcShape(BaseShape):
             self.y_c = self._u.y + radius
         # feedback(f'***Arc {self.x_c=} {self.y_c=} {self.radius=}')
 
+    def draw_nested(self, cnv, ID, centre: Point, **kwargs):
+        """Draw concentric Arcs from the outer Arc inwards."""
+        if self.nested:
+            intervals = []
+            if isinstance(self.nested, int):
+                if self.nested <= 0:
+                    feedback("The nested value must be greater than zero!", True)
+                interval_size = 1.0 / (self.nested + 1.0)
+                for item in range(1, self.nested + 1):
+                    intervals.append(interval_size * item)
+            elif isinstance(self.nested, list):
+                intervals = [
+                    tools.as_float(item, "a nested fraction") for item in self.nested
+                ]
+                for inter in intervals:
+                    if inter < 0 or inter >= 1:
+                        feedback("The nested list values must be fractions!", True)
+            else:
+                feedback(
+                    "The nested value must either be a whole number or a list of fractions.",
+                    True,
+                )
+            if intervals:
+                intervals.sort(reverse=True)
+                # print(f'*** nested {intervals=}')
+                for inter in intervals:
+                    # ---- circumference point in units
+                    p_P = geoms.point_on_circle(
+                        centre, self._u.radius * inter, self.angle_start)
+                    # ---- draw sector
+                    # feedback(
+                    #     f'***Arc: {p_P=} {centre=} {self.angle_start=} {self.angle_width=}')
+                    cnv.draw_sector(  # anti-clockwise from p_P; 90° default
+                        (centre.x, centre.y), (p_P.x, p_P.y), self.angle_width, fullSector=False
+                    )
+                    kwargs["closed"] = False
+                    kwargs["fill"] = None
+                    self.set_canvas_props(cnv=cnv, index=ID, **kwargs)
+
     def draw(self, cnv=None, off_x=0, off_y=0, ID=None, **kwargs):
         """Draw arc on a given canvas."""
         kwargs = self.kwargs | kwargs
@@ -244,6 +283,9 @@ class ArcShape(BaseShape):
         kwargs["closed"] = False
         kwargs["fill"] = None
         self.set_canvas_props(cnv=cnv, index=ID, **kwargs)
+        # ---- draw nested
+        if self.nested:
+            self.draw_nested(cnv, ID, p_C, **kwargs)
 
 
 class ArrowShape(BaseShape):
@@ -545,23 +587,27 @@ class CircleShape(BaseShape):
         )
 
     def draw_nested(self, cnv, ID, x_c: float, y_c: float, **kwargs):
-        """Draw concentric circles from the circumference inwards.
-        """
+        """Draw concentric circles from the circumference inwards."""
         if self.nested:
             intervals = []
             if isinstance(self.nested, int):
                 if self.nested <= 0:
-                    feedback('The nested value must be greater than zero!', True)
-                interval_size = 1. / (self.nested + 1.)
+                    feedback("The nested value must be greater than zero!", True)
+                interval_size = 1.0 / (self.nested + 1.0)
                 for item in range(1, self.nested + 1):
                     intervals.append(interval_size * item)
             elif isinstance(self.nested, list):
-                intervals = [tools.as_float(item, 'a nested fraction') for item in self.nested]
+                intervals = [
+                    tools.as_float(item, "a nested fraction") for item in self.nested
+                ]
                 for inter in intervals:
                     if inter < 0 or inter >= 1:
-                        feedback('The nested list values must be fractions!', True)
+                        feedback("The nested list values must be fractions!", True)
             else:
-                feedback('The nested value must either be a whole number or a list of fractions.', True)
+                feedback(
+                    "The nested value must either be a whole number or a list of fractions.",
+                    True,
+                )
             if intervals:
                 intervals.sort(reverse=True)
                 # print(f'*** nested {intervals=}')
@@ -836,6 +882,7 @@ class CircleShape(BaseShape):
                 self.set_canvas_props(
                     index=ID,
                     fill=_color,
+                    transparency=self.slices_transparency,
                     stroke=_color,
                     stroke_width=0.001,
                     dashed=None,
@@ -1251,6 +1298,12 @@ class DotShape(BaseShape):
         # ---- perform overrides
         self.size = self.dot_point / 2.0  # diameter is 3 points ~ 1mm or 1/32"
         self.radius = self.points_to_value(self.size, globals.units)
+        if self.cx is not None and self.cy is not None:
+            self.x = self.cx - self.radius
+            self.y = self.cy - self.radius
+        else:
+            self.cx = self.x + self.radius
+            self.cy = self.y + self.radius
         # ---- RESET UNIT PROPS (last!)
         self.set_unit_properties()
 
@@ -2261,6 +2314,7 @@ class HexShape(BaseShape):
                 stroke=self.slices_stroke or slices_colors[sid],
                 stroke_ends=self.slices_ends,
                 fill=slices_colors[sid],
+                transparency=self.slices_transparency,
                 closed=True,
                 rotation=rotation,
                 rotation_point=muPoint(centre[0], centre[1]),
@@ -3143,6 +3197,7 @@ class PolygonShape(BaseShape):
                 stroke=self.slices_stroke or scolor,
                 stroke_ends=self.slices_ends,
                 fill=scolor,
+                transparency=self.slices_transparency,
                 closed=True,
                 rotation=rotation,
                 rotation_point=muPoint(centre[0], centre[1]),
@@ -3705,6 +3760,7 @@ class RectangleShape(BaseShape):
                 stroke=self.slices_stroke or slices_colors[0],
                 stroke_ends=self.slices_ends,
                 fill=slices_colors[0],
+                transparency=self.slices_transparency,
                 closed=True,
                 rotation=rotation,
                 rotation_point=self.centroid,
@@ -3717,6 +3773,7 @@ class RectangleShape(BaseShape):
                 stroke=self.slices_stroke or slices_colors[1],
                 stroke_ends=self.slices_ends,
                 fill=slices_colors[1],
+                transparency=self.slices_transparency,
                 closed=True,
                 rotation=rotation,
                 rotation_point=self.centroid,
@@ -3754,6 +3811,7 @@ class RectangleShape(BaseShape):
                     stroke=self.slices_stroke or slices_colors[key],
                     stroke_ends=self.slices_ends,
                     fill=slices_colors[key],
+                    transparency=self.slices_transparency,
                     closed=True,
                     rotation=rotation,
                     rotation_point=self.centroid,
@@ -4431,6 +4489,7 @@ class RhombusShape(BaseShape):
                 stroke=self.slices_stroke or slices_colors[0],
                 stroke_ends=self.slices_ends,
                 fill=slices_colors[0],
+                transparency=self.slices_transparency,
                 closed=True,
                 rotation=rotation,
                 rotation_point=self.centroid,
@@ -4443,6 +4502,7 @@ class RhombusShape(BaseShape):
                 stroke=self.slices_stroke or slices_colors[1],
                 stroke_ends=self.slices_ends,
                 fill=slices_colors[1],
+                transparency=self.slices_transparency,
                 closed=True,
                 rotation=rotation,
                 rotation_point=self.centroid,
@@ -4457,6 +4517,7 @@ class RhombusShape(BaseShape):
                 stroke=self.slices_stroke or slices_colors[0],
                 stroke_ends=self.slices_ends,
                 fill=slices_colors[0],
+                transparency=self.slices_transparency,
                 closed=True,
                 rotation=rotation,
                 rotation_point=self.centroid,
@@ -4469,6 +4530,7 @@ class RhombusShape(BaseShape):
                 stroke=self.slices_stroke or slices_colors[1],
                 stroke_ends=self.slices_ends,
                 fill=slices_colors[1],
+                transparency=self.slices_transparency,
                 closed=True,
                 rotation=rotation,
                 rotation_point=self.centroid,
@@ -4490,6 +4552,7 @@ class RhombusShape(BaseShape):
                     stroke=self.slices_stroke or slices_colors[key],
                     stroke_ends=self.slices_ends,
                     fill=slices_colors[key],
+                    transparency=self.slices_transparency,
                     closed=True,
                     rotation=rotation,
                     rotation_point=self.centroid,
