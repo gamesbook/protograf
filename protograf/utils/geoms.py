@@ -591,6 +591,39 @@ def round_tiny_float(number: float, threshold: float = 1e-10):
     return number
 
 
+def rectangles_overlap(rect1, rect2) -> bool:
+    """Check if rectangles overlap, given top-left and bottom-right coordinates
+    Y-coordinates increase downwards.
+
+    Args:
+        rect1 (tuple): (x1, y1, x2, y2) for the first rectangle.
+        rect2 (tuple): (x1, y1, x2, y2) for the second rectangle.
+
+    Returns:
+        bool: True if rectangles overlap, else False
+
+    Doc Test:
+
+    >>> rect_a = (0, 0, 10, 10)  # Top-left (0,0), Bottom-right (10,10)
+    >>> rect_b = (5, 5, 15, 15)  # Top-left (5,5), Bottom-right (15,15)
+    >>> rect_c = (20, 20, 30, 30) # Top-left (20,20), Bottom-right (30,30)
+    >>> rectangles_overlap(rect_a, rect_b)
+    True
+    >>> rectangles_overlap(rect_a, rect_c)
+    False
+    """
+    x1_a, y1_a, x2_a, y2_a = rect1
+    x1_b, y1_b, x2_b, y2_b = rect2
+    # Check for horizontal separation
+    if x2_a < x1_b or x1_a > x2_b:
+        return False
+    # Check for vertical separation (y-coordinates increase downwards)
+    if y2_a < y1_b or y1_a > y2_b:
+        return False
+    # Overlap found
+    return True
+
+
 if __name__ == "__main__":
     import doctest
 

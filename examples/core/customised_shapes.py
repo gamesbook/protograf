@@ -229,6 +229,7 @@ Polygon(
 PageBreak()
 
 # ---- polygon slices
+Blueprint()
 Text(common=txt, text="Polygon: slices")
 Polygon(
     cx=2, cy=1, sides=8, radius=1,

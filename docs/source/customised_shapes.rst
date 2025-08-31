@@ -599,6 +599,7 @@ that it can be customised.
 - `Rotation <rectRotation_>`_
 - `Rounding <rectRounding_>`_
 - `Slices <rectSlices_>`_
+- `Ordering of Properties <rectOrder_>`_
 
 .. _rectCentred:
 
@@ -1208,6 +1209,37 @@ e.g. ``n s`` to draw both lines on both north **and** south sides.
 ===== ======
 
 
+.. _rectOrder:
+
+Ordering of Properties
+----------------------
+`^ <rectangleIndex_>`_
+
+There is a default order in which the various properties of a Rectangle are
+drawn. There are three ways to change this drawing order:
+
+- *order_first* - a list of properties that will be drawn, in the order given
+  in the list, **before** any others
+- *order_last* - a list of properties that will be drawn, in the order given
+  in the list, **after** any others
+- *order_all* - a list of the **only** properties that will be drawn, in the
+  order given in the list
+
+The available property names, shown in their default order, are:
+
+#. base - this represents the Rectangle itself
+#. pattern
+#. slices
+#. hatches
+#. radii
+#. centre_shape
+#. centre_shapes
+#. cross
+#. dot
+#. text
+#. numbering
+
+
 .. _hexIndex:
 
 Hexagon
@@ -1233,6 +1265,7 @@ customised in a similar way.
 - `Spikes <hexSpikes_>`_
 - `Text: Flat <hexTextFlat_>`_
 - `Text: Pointy <hexTextPointy_>`_
+- `Ordering of Properties <hexOrder_>`_
 
 .. _hexCentre:
 
@@ -1981,6 +2014,96 @@ Example 2. Pointy
 ===== ======
 
 
+.. _hexOrder:
+
+Ordering of Properties
+----------------------
+`^ <hexagon_>`_
+
+There is a default order in which the various properties of a Hexagon are
+drawn. There are three ways to change this drawing order:
+
+- *order_first* - a list of properties that will be drawn, in the order given
+  in the list, **before** any others
+- *order_last* - a list of properties that will be drawn, in the order given
+  in the list, **after** any others
+- *order_all* - a list of the **only** properties that will be drawn, in the
+  order given in the list
+
+The available property names, shown in their default order, are:
+
+#. base - this represents the Hexagon itself
+#. borders
+#. shades
+#. slices
+#. spikes
+#. hatches
+#. links
+#. perbises
+#. paths
+#. radii
+#. centre_shape
+#. centre_shapes
+#. cross
+#. dot
+#. text
+#. numbering
+
+.. |ho1| image:: images/custom/hexagon/hex_order.png
+   :width: 330
+
+Example 1.
+++++++++++
+
+===== ======
+|ho1| This example shows ``flat`` Hexagons constructed using these commands:
+
+      .. code:: python
+
+        hxg = Common(height=1.5,
+                     dot=0.05, dot_stroke="red")
+
+        Hexagon(common=hxg, x=0.25, y=0.1,
+                slices=['red', 'orange', 'yellow'],
+                spikes=["ne", "nw", "s"],
+                spikes_height=-0.7,
+                spikes_width=0.25)
+        Hexagon(common=hxg, x=2.25, y=0.1,
+                slices=['red', 'orange', 'yellow'],
+                spikes=["ne", "nw", "s"],
+                spikes_height=-0.7,
+                spikes_width=0.25
+                order_first=["spikes"])
+        Hexagon(common=hxg, x=0.25, y=2.1,
+                hatch_count=5, hatch_stroke="red",
+                hatch_stroke_width=2, hatch='nw',
+                radii='sw e',
+                radii_stroke_width=2)
+        Hexagon(common=hxg, x=2.25, y=2.1,
+                hatch_count=5, hatch_stroke="red",
+                hatch_stroke_width=2, hatch='nw',
+                radii='sw e',
+                radii_stroke_width=2,
+                order_last=["hatches"])
+        Hexagon(common=hxg, x=0.25, y=4.1,
+                perbis='sw n')
+        Hexagon(common=hxg, x=2.25, y=4.1,
+                perbis='sw n',
+                order_all=["base", "dot"])
+
+      The top-most pair of Hexagons show how changing the *order_first* property
+      means that the *spikes* are not visible because they are drawn before the
+      *slices* (which overwrite them).
+
+      The middle pair of Hexagons show how changing the *order_last* property
+      means that *hatches* are drawn after the *radii*, instead of before.
+
+      The lower pair of Hexagons show how setting the *order_all* property
+      means that only the Hexagon and the centre Dot will drawn, and not the
+      *perbis*.
+
+===== ======
+
 .. _circleIndex:
 
 Circle
@@ -1998,6 +2121,7 @@ ways that it can be customised.
 - `Petals: triangle <circlePetalsTriangle_>`_
 - `Slices <circleSlices_>`_
 - `Nested <circleNested_>`_
+- `Ordering of Properties <circleOrder_>`_
 
 .. _circleCross:
 
@@ -2457,6 +2581,38 @@ concentric circles.
       properties being set.
 
 ===== ======
+
+
+.. _circleOrder:
+
+Ordering of Properties
+----------------------
+`^ <circleIndex_>`_
+
+There is a default order in which the various properties of a Circle are
+drawn. There are three ways to change this drawing order:
+
+- *order_first* - a list of properties that will be drawn, in the order given
+  in the list, **before** any others
+- *order_last* - a list of properties that will be drawn, in the order given
+  in the list, **after** any others
+- *order_all* - a list of the **only** properties that will be drawn, in the
+  order given in the list
+
+The available property names, shown in their default order, are:
+
+#. petals
+#. base - this represents the Circle itself
+#. nested
+#. slices
+#. hatches
+#. radii
+#. centre_shape
+#. centre_shapes
+#. cross
+#. dot
+#. text
+
 
 .. _blueprintIndex:
 

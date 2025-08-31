@@ -9,6 +9,7 @@ protograf Changes
 - Add landscape mode to standard card sizes
 - Add nested property to Circle
 - Add nested property to Arc
+- Add order_* propery to Hexagon, Circle and Rectangle
 
 2025-08-23 (0.2.15)
 -------------------

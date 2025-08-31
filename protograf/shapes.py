@@ -251,12 +251,16 @@ class ArcShape(BaseShape):
                 for inter in intervals:
                     # ---- circumference point in units
                     p_P = geoms.point_on_circle(
-                        centre, self._u.radius * inter, self.angle_start)
+                        centre, self._u.radius * inter, self.angle_start
+                    )
                     # ---- draw sector
                     # feedback(
                     #     f'***Arc: {p_P=} {centre=} {self.angle_start=} {self.angle_width=}')
                     cnv.draw_sector(  # anti-clockwise from p_P; 90° default
-                        (centre.x, centre.y), (p_P.x, p_P.y), self.angle_width, fullSector=False
+                        (centre.x, centre.y),
+                        (p_P.x, p_P.y),
+                        self.angle_width,
+                        fullSector=False,
                     )
                     kwargs["closed"] = False
                     kwargs["fill"] = None
@@ -342,7 +346,7 @@ class ArrowShape(BaseShape):
         return vertices
 
     def draw(self, cnv=None, off_x=0, off_y=0, ID=None, **kwargs):
-        """Draw an arrow shape on a given canvas."""
+        """Draw an arrow on a given canvas."""
         kwargs = self.kwargs | kwargs
         cnv = cnv if cnv else globals.canvas  # a new Page/Shape may now exist
         super().draw(cnv, off_x, off_y, ID, **kwargs)  # unit-based props
@@ -950,16 +954,102 @@ class CircleShape(BaseShape):
             kwargs["rotation_point"] = self.centroid
         else:
             kwargs["rotation"] = 0
-        # ---- draw petals
-        if self.petals:
-            self.draw_petals(cnv, ID, self.x_c, self.y_c)
         # feedback(f'*** Circle: {x=} {y=}')
-        # ---- draw circle
-        cnv.draw_circle((x, y), self._u.radius)
-        self.set_canvas_props(cnv=cnv, index=ID, **kwargs)
-        # ---- draw nested
-        if self.nested:
-            self.draw_nested(cnv, ID, x, y, **kwargs)
+        # ---- determine ordering
+        base_ordering = [
+            "petals",
+            "base",
+            "nested",
+            "slices",
+            "hatches",
+            "radii",
+            "centre_shape",
+            "centre_shapes",
+            "cross",
+            "dot",
+            "text",
+        ]
+        ordering = base_ordering
+        if self.order_all:
+            ordering = tools.list_ordering(base_ordering, self.order_all, only=True)
+        else:
+            if self.order_first:
+                ordering = tools.list_ordering(
+                    base_ordering, self.order_first, start=True
+                )
+            if self.order_last:
+                ordering = tools.list_ordering(
+                    base_ordering, self.order_last, end=True
+                )
+        # feedback(f'*** Circle: {ordering=}')
+
+        # ---- ORDERING
+        for item in ordering:
+            if item == "petals":
+                # ---- * draw petals
+                if self.petals:
+                    self.draw_petals(cnv, ID, self.x_c, self.y_c)
+            if item == "base":
+                # ---- * draw circle
+                cnv.draw_circle((x, y), self._u.radius)
+                self.set_canvas_props(cnv=cnv, index=ID, **kwargs)
+            if item == "nested":
+                # ---- * draw nested
+                if self.nested:
+                    self.draw_nested(cnv, ID, x, y, **kwargs)
+            if item == "slices":
+                # ---- * draw slices
+                if self.slices:
+                    self.draw_slices(
+                        cnv,
+                        ID,
+                        Point(self.x_c, self.y_c),
+                        self._u.radius,
+                        rotation=kwargs["rotation"],
+                    )
+            if item == "hatches":
+                # ---- * draw hatches
+                if self.hatch_count:
+                    self.draw_hatch(
+                        cnv,
+                        ID,
+                        self.hatch_count,
+                        self.x_c,
+                        self.y_c,
+                        rotation=kwargs["rotation"],
+                    )
+            if item == "radii":
+                # ---- * draw radii
+                if self.radii:
+                    self.draw_radii(cnv, ID, self.x_c, self.y_c)
+            if item == "centre_shape" or item == "center_shape":
+                # ---- * centre shape (with offset)
+                if self.centre_shape:
+                    if self.can_draw_centred_shape(self.centre_shape):
+                        self.centre_shape.draw(
+                            _abs_cx=x + self.unit(self.centre_shape_mx),
+                            _abs_cy=y + self.unit(self.centre_shape_my),
+                        )
+            if item == "centre_shapes" or item == "center_shapes":
+                # ---- * centre shapes (with offsets)
+                if self.centre_shapes:
+                    self.draw_centred_shapes(self.centre_shapes, x, y)
+            if item == "cross":
+                # ---- * cross
+                self.draw_cross(
+                    cnv, self.x_c, self.y_c, rotation=kwargs.get("rotation")
+                )
+            if item == "dot":
+                # ---- * dot
+                self.draw_dot(cnv, self.x_c, self.y_c)
+            if item == "text":
+                # ---- * text
+                self.draw_heading(
+                    cnv, ID, self.x_c, self.y_c - self._u.radius, **kwargs
+                )
+                self.draw_label(cnv, ID, self.x_c, self.y_c, **kwargs)
+                self.draw_title(cnv, ID, self.x_c, self.y_c + self._u.radius, **kwargs)
+
         # ---- grid marks
         if self.grid_marks:  # and not kwargs.get("card_back", False):
             # print(f'*** {self._u.radius=} {self._u.diameter=}')
@@ -996,47 +1086,6 @@ class CircleShape(BaseShape):
             gargs["stroke_width"] = self.grid_marks_stroke_width
             gargs["dotted"] = self.grid_marks_dotted
             self.set_canvas_props(cnv=None, index=ID, **gargs)
-
-        # ---- draw slices
-        if self.slices:
-            self.draw_slices(
-                cnv,
-                ID,
-                Point(self.x_c, self.y_c),
-                self._u.radius,
-                rotation=kwargs["rotation"],
-            )
-        # ---- draw hatch
-        if self.hatch_count:
-            self.draw_hatch(
-                cnv,
-                ID,
-                self.hatch_count,
-                self.x_c,
-                self.y_c,
-                rotation=kwargs["rotation"],
-            )
-        # ---- draw radii
-        if self.radii:
-            self.draw_radii(cnv, ID, self.x_c, self.y_c)
-        # ---- centred shape (with offset)
-        if self.centre_shape:
-            if self.can_draw_centred_shape(self.centre_shape):
-                self.centre_shape.draw(
-                    _abs_cx=x + self.unit(self.centre_shape_mx),
-                    _abs_cy=y + self.unit(self.centre_shape_my),
-                )
-        # ---- centred shapes (with offsets)
-        if self.centre_shapes:
-            self.draw_centred_shapes(self.centre_shapes, x, y)
-        # ---- cross
-        self.draw_cross(cnv, self.x_c, self.y_c, rotation=kwargs.get("rotation"))
-        # ---- dot
-        self.draw_dot(cnv, self.x_c, self.y_c)
-        # ---- text
-        self.draw_heading(cnv, ID, self.x_c, self.y_c - self._u.radius, **kwargs)
-        self.draw_label(cnv, ID, self.x_c, self.y_c, **kwargs)
-        self.draw_title(cnv, ID, self.x_c, self.y_c + self._u.radius, **kwargs)
         # ---- set calculated top-left in user units
         self.calculated_left = (self.x_c - self._u.radius) / self.units
         self.calculated_top = (self.y_c - self._u.radius) / self.units
@@ -1508,7 +1557,7 @@ class EquilateralTriangleShape(BaseShape):
         return Point(x_c, y_c)
 
     def draw(self, cnv=None, off_x=0, off_y=0, ID=None, **kwargs):
-        """Draw an equilateraltriangle on a given canvas."""
+        """Draw an equilateral triangle on a given canvas."""
         kwargs = self.kwargs | kwargs
         cnv = cnv if cnv else globals.canvas  # a new Page/Shape may now exist
         super().draw(cnv, off_x, off_y, ID, **kwargs)  # unit-based props
@@ -2678,126 +2727,177 @@ class HexShape(BaseShape):
         # ---- remove rotation
         if kwargs and kwargs.get("rotation"):
             kwargs.pop("rotation")
+        # ---- calculate offset
+        if _lower(self.orientation) in ["p", "pointy"]:
+            offset = geo.side  # == radius
+        else:
+            offset = geo.half_flat
         # feedback(f'***Hex {x=} {y=} {self.vertexes=} {self.kwargs=')
 
-        # ---- draw hexagon with caltrops
-        if self.caltrops:
-            # draw fill
-            _stroke = kwargs.get("stroke", self.stroke)
-            if self.fill:
-                cnv.draw_polyline(self.vertexes)
-                kwargs["stroke"] = None
-                kwargs["closed"] = True
-                self.set_canvas_props(cnv=cnv, index=ID, **kwargs)
-            # draw lines
-            kwargs["stroke"] = _stroke
-            self.vertexes.append(self.vertexes[0])
-            for key, vertex0 in enumerate(self.vertexes):
-                if key + 1 != len(self.vertexes):
-                    vertex1 = self.vertexes[key + 1]
-                    caltrop_points = self.calculate_caltrop_lines(
-                        vertex0, vertex1, self.side, self.caltrops, self.caltrops_invert
-                    )
-                    if self.caltrops_invert:
-                        cnv.draw_line(caltrop_points[0], caltrop_points[1])
-                    else:
-                        for caltrop_point in caltrop_points:
-                            cnv.draw_line(caltrop_point[0], caltrop_point[1])
-            self.set_canvas_props(cnv=cnv, index=ID, **kwargs)
-        # ---- draw normal hexagon
+        # ---- determine ordering
+        base_ordering = [
+            "base",
+            "borders",
+            "shades",
+            "slices",
+            "spikes",
+            "hatches",
+            "links",
+            "perbises",
+            "paths",
+            "radii",
+            "centre_shape",
+            "centre_shapes",
+            "cross",
+            "dot",
+            "text",
+            "numbering",
+        ]
+        ordering = base_ordering
+        if self.order_all:
+            ordering = tools.list_ordering(base_ordering, self.order_all, only=True)
         else:
-            kwargs["fill"] = kwargs.get("fill", self.fill)
-            kwargs["stroke"] = kwargs.get("stroke", self.stroke)
-            kwargs["stroke_ends"] = kwargs.get("stroke_ends", self.stroke_ends)
-            if self.draw_polyline_props(cnv, self.vertexes, **kwargs):
-                kwargs["closed"] = True
-                self.set_canvas_props(cnv=cnv, index=ID, **kwargs)
+            if self.order_first:
+                ordering = tools.list_ordering(
+                    base_ordering, self.order_first, start=True
+                )
+            if self.order_last:
+                ordering = tools.list_ordering(
+                    base_ordering, self.order_last, end=True
+                )
+        # feedback(f'*** Hexagon: {ordering=}')
 
-        # ---- * borders (override)
-        if self.borders:
-            if isinstance(self.borders, tuple):
-                self.borders = [
-                    self.borders,
-                ]
-            if not isinstance(self.borders, list):
-                feedback('The "borders" property must be a list of sets or a set')
-            for border in self.borders:
-                self.draw_border(cnv, border, ID)  # BaseShape
+        # ---- ORDERING
+        for item in ordering:
+            if item == "base":
+                # ---- * hexagon with caltrops
+                if self.caltrops:
+                    # draw fill
+                    _stroke = kwargs.get("stroke", self.stroke)
+                    if self.fill:
+                        cnv.draw_polyline(self.vertexes)
+                        kwargs["stroke"] = None
+                        kwargs["closed"] = True
+                        self.set_canvas_props(cnv=cnv, index=ID, **kwargs)
+                    # draw lines
+                    kwargs["stroke"] = _stroke
+                    self.vertexes.append(self.vertexes[0])
+                    for key, vertex0 in enumerate(self.vertexes):
+                        if key + 1 != len(self.vertexes):
+                            vertex1 = self.vertexes[key + 1]
+                            caltrop_points = self.calculate_caltrop_lines(
+                                vertex0, vertex1, self.side, self.caltrops, self.caltrops_invert
+                            )
+                            if self.caltrops_invert:
+                                cnv.draw_line(caltrop_points[0], caltrop_points[1])
+                            else:
+                                for caltrop_point in caltrop_points:
+                                    cnv.draw_line(caltrop_point[0], caltrop_point[1])
+                    self.set_canvas_props(cnv=cnv, index=ID, **kwargs)
+                # ---- * normal hexagon
+                else:
+                    kwargs["fill"] = kwargs.get("fill", self.fill)
+                    kwargs["stroke"] = kwargs.get("stroke", self.stroke)
+                    kwargs["stroke_ends"] = kwargs.get("stroke_ends", self.stroke_ends)
+                    if self.draw_polyline_props(cnv, self.vertexes, **kwargs):
+                        kwargs["closed"] = True
+                        self.set_canvas_props(cnv=cnv, index=ID, **kwargs)
+            if item == "borders":
+                # ---- * borders (override)
+                if self.borders:
+                    if isinstance(self.borders, tuple):
+                        self.borders = [
+                            self.borders,
+                        ]
+                    if not isinstance(self.borders, list):
+                        feedback('The "borders" property must be a list of sets or a set')
+                    for border in self.borders:
+                        self.draw_border(cnv, border, ID)  # BaseShape
+            if item == "shades":
+                # ---- * draw shades
+                if self.shades:
+                    self.draw_shades(
+                        cnv,
+                        ID,
+                        Point(self.x_d, self.y_d),
+                        self.vertexes,
+                        rotation=kwargs.get("rotation"),
+                    )
+            if item == "slices":
+                # ---- * draw slices
+                if self.slices:
+                    self.draw_slices(
+                        cnv,
+                        ID,
+                        Point(self.x_d, self.y_d),
+                        self.vertexes,
+                        rotation=kwargs.get("rotation"),
+                    )
+            if item == "spikes":
+                # ---- * draw spikes
+                if self.spikes:
+                    self.draw_spikes(
+                        cnv,
+                        ID,
+                        Point(self.x_d, self.y_d),
+                        self.vertexes,
+                        rotation=kwargs.get("rotation"),
+                    )
+            if item == "hatches":
+                # ---- * draw hatches
+                if self.hatch_count:
+                    if not self.hatch_count & 1:
+                        feedback("Hatch count must be an odd number for a Hexagon", True)
+                    self.draw_hatch(cnv, ID, geo.side, self.vertexes, self.hatch_count)
+            if item == "links":
+                # ---- * draw links
+                if self.links:
+                    self.draw_links(cnv, ID, geo.side, self.vertexes, self.links)
+            if item == "radii":
+                # ---- * draw radii
+                if self.radii:
+                    self.draw_radii(cnv, ID, Point(self.x_d, self.y_d), self.vertexes)
+            if item == "perbises":
+                # ---- * draw perbises
+                if self.perbis:
+                    self.draw_perbis(cnv, ID, Point(self.x_d, self.y_d), self.vertexes)
+            if item == "paths":
+                # ---- * draw paths
+                if self.paths is not None and self.paths != []:
+                    self.draw_paths(cnv, ID, Point(self.x_d, self.y_d), self.vertexes)
+            if item == "centre_shape" or item == "center_shape":
+                # ---- * centred shape (with offset)
+                if self.centre_shape:
+                    if self.can_draw_centred_shape(self.centre_shape):
+                        self.centre_shape.draw(
+                            _abs_cx=self.x_d + self.unit(self.centre_shape_mx),
+                            _abs_cy=self.y_d + self.unit(self.centre_shape_my),
+                        )
+            if item == "centre_shapes" or item == "center_shapes":
+                # ---- * centred shapes (with offsets)
+                if self.centre_shapes:
+                    self.draw_centred_shapes(self.centre_shapes, self.x_d, self.y_d)
+            if item == "cross":
+                # ---- * cross
+                self.draw_cross(cnv, self.x_d, self.y_d, rotation=kwargs.get("rotation"))
+            if item == "dot":
+                # ---- * dot
+                self.draw_dot(cnv, self.x_d, self.y_d)
+            if item == "text":
+                # ---- * text
+                self.draw_heading(cnv, ID, self.x_d, self.y_d - offset, **kwargs)
+                self.draw_label(cnv, ID, self.x_d, self.y_d, **kwargs)
+                self.draw_title(cnv, ID, self.x_d, self.y_d + offset, **kwargs)
+            if item == "numbering":
+                # ---- * numbering
+                self.set_coord(cnv, self.x_d, self.y_d, geo.half_flat)
+                # ---- * set grid property
+                self.grid = GridShape(label=self.coord_text, x=self.x_d, y=self.y_d, shape=self)
 
         # ---- debug
         # self._debug(cnv, Point(x, y), 'start')
         # self._debug(cnv, Point(self.x_d, self.y_d), 'centre')
         self._debug(cnv, vertices=self.vertexes)
-        # ---- draw shades
-        if self.shades:
-            self.draw_shades(
-                cnv,
-                ID,
-                Point(self.x_d, self.y_d),
-                self.vertexes,
-                rotation=kwargs.get("rotation"),
-            )
-        # ---- draw slices
-        if self.slices:
-            self.draw_slices(
-                cnv,
-                ID,
-                Point(self.x_d, self.y_d),
-                self.vertexes,
-                rotation=kwargs.get("rotation"),
-            )
-        # ---- draw spikes
-        if self.spikes:
-            self.draw_spikes(
-                cnv,
-                ID,
-                Point(self.x_d, self.y_d),
-                self.vertexes,
-                rotation=kwargs.get("rotation"),
-            )
-        # ---- draw hatch
-        if self.hatch_count:
-            if not self.hatch_count & 1:
-                feedback("Hatch count must be an odd number for a Hexagon", True)
-            self.draw_hatch(cnv, ID, geo.side, self.vertexes, self.hatch_count)
-        # ---- draw links
-        if self.links:
-            self.draw_links(cnv, ID, geo.side, self.vertexes, self.links)
-        # ---- draw radii
-        if self.radii:
-            self.draw_radii(cnv, ID, Point(self.x_d, self.y_d), self.vertexes)
-        # ---- draw perbis
-        if self.perbis:
-            self.draw_perbis(cnv, ID, Point(self.x_d, self.y_d), self.vertexes)
-        # ---- draw paths
-        if self.paths is not None and self.paths != []:
-            self.draw_paths(cnv, ID, Point(self.x_d, self.y_d), self.vertexes)
-        # ---- centred shape (with offset)
-        if self.centre_shape:
-            if self.can_draw_centred_shape(self.centre_shape):
-                self.centre_shape.draw(
-                    _abs_cx=self.x_d + self.unit(self.centre_shape_mx),
-                    _abs_cy=self.y_d + self.unit(self.centre_shape_my),
-                )
-        # ---- centred shapes (with offsets)
-        if self.centre_shapes:
-            self.draw_centred_shapes(self.centre_shapes, self.x_d, self.y_d)
-        # ---- cross
-        self.draw_cross(cnv, self.x_d, self.y_d, rotation=kwargs.get("rotation"))
-        # ---- dot
-        self.draw_dot(cnv, self.x_d, self.y_d)
-        # ---- text
-        if _lower(self.orientation) in ["p", "pointy"]:
-            offset = geo.side  # == radius
-        else:
-            offset = geo.half_flat
-        self.draw_heading(cnv, ID, self.x_d, self.y_d - offset, **kwargs)
-        self.draw_label(cnv, ID, self.x_d, self.y_d, **kwargs)
-        self.draw_title(cnv, ID, self.x_d, self.y_d + offset, **kwargs)
-        # ----  numbering
-        self.set_coord(cnv, self.x_d, self.y_d, geo.half_flat)
-        # ---- set grid property
-        self.grid = GridShape(label=self.coord_text, x=self.x_d, y=self.y_d, shape=self)
         # ---- set calculated top-left in user units
         self.calculated_left = (self.x_d - offset) / self.units
         self.calculated_top = (self.y_d - offset) / self.units
@@ -3428,7 +3528,7 @@ class PolylineShape(BaseShape):
         return None
 
     def draw(self, cnv=None, off_x=0, off_y=0, ID=None, **kwargs):
-        """Draw a polyline on a given canvas."""
+        """Draw a polyline (multi-part line) on a given canvas."""
         kwargs = self.kwargs | kwargs
         cnv = cnv if cnv else globals.canvas  # a new Page/Shape may now exist
         super().draw(cnv, off_x, off_y, ID, **kwargs)  # unit-based props
@@ -3460,7 +3560,7 @@ class PolylineShape(BaseShape):
 
 class QRCodeShape(BaseShape):
     """
-    QRCode drawn on a given canvas.
+    QRCode on a given canvas.
     """
 
     def __init__(self, _object=None, canvas=None, **kwargs):
@@ -4147,8 +4247,7 @@ class RectangleShape(BaseShape):
             else:
                 self.vertexes.append(Point(x, y))
 
-            # ---- debug
-            self._debug(cnv, vertices=self.vertexes)
+
         # ---- * peaks vertices
         elif is_peaks:
             half_height = self._u.height / 2.0
@@ -4254,66 +4353,126 @@ class RectangleShape(BaseShape):
             feedback(
                 f"The rounding radius cannot exceed 50% of the smallest side.", True
             )
-
-        # ---- draw rectangle
-        # feedback(f'*** RECT {self.col=} {self.row=} {x=} {y=} {radius=}')
-        if is_notched or is_chevron or is_peaks:
-            # feedback(f'*** RECT  vertices')
-            cnv.draw_polyline(self.vertexes)
-            kwargs["closed"] = True
-            self.set_canvas_props(cnv=cnv, index=ID, **kwargs)
-            self._debug(cnv, vertices=self.vertexes)
+        # ---- determine ordering
+        base_ordering = [
+            "base",
+            "pattern",
+            "slices",
+            "hatches",
+            "radii",
+            "centre_shape",
+            "centre_shapes",
+            "cross",
+            "dot",
+            "text",
+            "numbering",
+        ]
+        ordering = base_ordering
+        if self.order_all:
+            ordering = tools.list_ordering(base_ordering, self.order_all, only=True)
         else:
-            # feedback(f'*** RECT  normal {radius=} {kwargs=}')
-            cnv.draw_rect((x, y, x + self._u.width, y + self._u.height), radius=radius)
-            self.set_canvas_props(cnv=cnv, index=ID, **kwargs)
-            self._debug(cnv, vertices=self.vertexes)
-            # ---- * borders (override)
-            if self.borders:
-                if isinstance(self.borders, tuple):
-                    self.borders = [
-                        self.borders,
-                    ]
-                if not isinstance(self.borders, list):
-                    feedback('The "borders" property must be a list of sets or a set')
-                for border in self.borders:
-                    self.draw_border(cnv, border, ID)  # BaseShape
+            if self.order_first:
+                ordering = tools.list_ordering(
+                    base_ordering, self.order_first, start=True
+                )
+            if self.order_last:
+                ordering = tools.list_ordering(
+                    base_ordering, self.order_last, end=True
+                )
+        # feedback(f'*** Rectangle: {ordering=}')
 
-        # ---- fill pattern?
-        if self.fill_pattern:
-            raise NotImplementedError("Fill pattern is not yet supported!")
-            # TODO - convert to PyMuPDF
-            img, is_svg, is_dir = self.load_image(self.fill_pattern)
-            if img:
-                log.debug("IMG %s s%s %s", type(img._image), img._image.size)
-                iwidth = img._image.size[0]
-                iheight = img._image.size[1]
-                # repeat?
-                if self.repeat:
-                    cnv.drawImage(
-                        img, x=x, y=y, width=iwidth, height=iheight, mask="auto"
-                    )
+        # ---- ORDERING
+        for item in ordering:
+            if item == "base":
+                # ---- * draw rectangle
+                # feedback(f'*** RECT {self.col=} {self.row=} {x=} {y=} {radius=}')
+                if is_notched or is_chevron or is_peaks:
+                    # feedback(f'*** RECT  vertices')
+                    cnv.draw_polyline(self.vertexes)
+                    kwargs["closed"] = True
+                    self.set_canvas_props(cnv=cnv, index=ID, **kwargs)
+                    self._debug(cnv, vertices=self.vertexes)
                 else:
-                    # stretch
-                    cnv.drawImage(
-                        img,
-                        x=x,
-                        y=y,
-                        width=self._u.width,
-                        height=self._u.height,
-                        mask="auto",
-                    )
-
-        # ---- draw slices after base
-        if self.slices:
-            self.draw_slices(cnv, ID, self.vertexes, rotation)
-
-        # ---- draw hatch
-        if self.hatch_count:
-            # if 'rotation' in kwargs.keys():
-            #     kwargs.pop('rotation')
-            vertices = self.get_vertexes(**kwargs)
-            self.draw_hatch(cnv, ID, vertices, self.hatch_count, rotation=rotation)
+                    # feedback(f'*** RECT  normal {radius=} {kwargs=}')
+                    cnv.draw_rect((x, y, x + self._u.width, y + self._u.height), radius=radius)
+                    self.set_canvas_props(cnv=cnv, index=ID, **kwargs)
+                    self._debug(cnv, vertices=self.vertexes)
+                    # ---- * borders (override)
+                    if self.borders:
+                        if isinstance(self.borders, tuple):
+                            self.borders = [
+                                self.borders,
+                            ]
+                        if not isinstance(self.borders, list):
+                            feedback('The "borders" property must be a list of sets or a set')
+                        for border in self.borders:
+                            self.draw_border(cnv, border, ID)  # BaseShape
+            if item == "pattern":
+                # ---- * fill pattern?
+                if self.fill_pattern:
+                    raise NotImplementedError("Fill pattern is not yet supported!")
+                    # TODO - convert to PyMuPDF
+                    img, is_svg, is_dir = self.load_image(self.fill_pattern)
+                    if img:
+                        log.debug("IMG %s s%s %s", type(img._image), img._image.size)
+                        iwidth = img._image.size[0]
+                        iheight = img._image.size[1]
+                        # repeat?
+                        if self.repeat:
+                            cnv.drawImage(
+                                img, x=x, y=y, width=iwidth, height=iheight, mask="auto"
+                            )
+                        else:
+                            # stretch
+                            cnv.drawImage(
+                                img,
+                                x=x,
+                                y=y,
+                                width=self._u.width,
+                                height=self._u.height,
+                                mask="auto",
+                            )
+            if item == "slices":
+                # ---- * draw slices
+                if self.slices:
+                    self.draw_slices(cnv, ID, self.vertexes, rotation)
+            if item == "hatches":
+                # ---- * draw hatches
+                if self.hatch_count:
+                    # if 'rotation' in kwargs.keys():
+                    #     kwargs.pop('rotation')
+                    vertices = self.get_vertexes(**kwargs)
+                    self.draw_hatch(cnv, ID, vertices, self.hatch_count, rotation=rotation)
+            if item == "centre_shape" or item == "center_shape":
+                # ---- * centre shape (with offset)
+                if self.centre_shape:
+                    if self.can_draw_centred_shape(self.centre_shape):
+                        self.centre_shape.draw(
+                            _abs_cx=x_d + self.unit(self.centre_shape_mx),
+                            _abs_cy=y_d + self.unit(self.centre_shape_my),
+                        )
+            if item == "centre_shapes" or item == "center_shapes":
+                # * ---- centre shapes (with offsets)
+                if self.centre_shapes:
+                    self.draw_centred_shapes(self.centre_shapes, x_d, y_d)
+            if item == "cross":
+                # ---- * cross
+                self.draw_cross(cnv, x_d, y_d, rotation=kwargs.get("rotation"))
+            if item == "dot":
+                # ---- * dot
+                self.draw_dot(cnv, x_d, y_d)
+            if item == "text ":
+                # ---- * text
+                self.draw_heading(
+                    cnv, ID, x_d, y_d - 0.5 * self._u.height - delta_m_up, **kwargs
+                )
+                self.draw_label(cnv, ID, x_d, y_d, **kwargs)
+                self.draw_title(
+                    cnv, ID, x_d, y_d + 0.5 * self._u.height + delta_m_down, **kwargs
+                )
+            if item == "numbering":
+                # ---- * numbering
+                self.set_coord(cnv, x_d, y_d)
 
         # ---- grid marks
         if self.grid_marks:  # and not kwargs.get("card_back", False):
@@ -4337,33 +4496,10 @@ class RectangleShape(BaseShape):
             gargs["stroke_ends"] = self.grid_marks_ends
             gargs["dotted"] = self.grid_marks_dotted
             self.set_canvas_props(cnv=None, index=ID, **gargs)
-
-        # ---- centred shape (with offset)
-        if self.centre_shape:
-            if self.can_draw_centred_shape(self.centre_shape):
-                self.centre_shape.draw(
-                    _abs_cx=x_d + self.unit(self.centre_shape_mx),
-                    _abs_cy=y_d + self.unit(self.centre_shape_my),
-                )
-        # ---- centred shapes (with offsets)
-        if self.centre_shapes:
-            self.draw_centred_shapes(self.centre_shapes, x_d, y_d)
-        # ---- cross
-        self.draw_cross(cnv, x_d, y_d, rotation=kwargs.get("rotation"))
-        # ---- dot
-        self.draw_dot(cnv, x_d, y_d)
-        # ---- text
-        self.draw_heading(
-            cnv, ID, x_d, y_d - 0.5 * self._u.height - delta_m_up, **kwargs
-        )
-        self.draw_label(cnv, ID, x_d, y_d, **kwargs)
-        self.draw_title(
-            cnv, ID, x_d, y_d + 0.5 * self._u.height + delta_m_down, **kwargs
-        )
-        # ----  numbering
-        self.set_coord(cnv, x_d, y_d)
         # ---- set grid property
         self.grid = GridShape(label=self.coord_text, x=x_d, y=y_d, shape=self)
+        # ---- debug
+        self._debug(cnv, vertices=self.vertexes)
         # ---- set calculated top-left in user units
         self.calculated_left, self.calculated_top = x / self.units, y / self.units
 
@@ -4649,6 +4785,7 @@ class RightAngledTriangleShape(BaseShape):
     """
 
     def draw(self, cnv=None, off_x=0, off_y=0, ID=None, **kwargs):
+        """Draw a right-angled triangle on a given canvas."""
         kwargs = self.kwargs | kwargs
         cnv = cnv if cnv else globals.canvas  # a new Page/Shape may now exist
         super().draw(cnv, off_x, off_y, ID, **kwargs)  # unit-based props
@@ -4712,9 +4849,10 @@ class RightAngledTriangleShape(BaseShape):
 
 class SectorShape(BaseShape):
     """
-    Sector on a given canvas. Aka "wedge". Aka "slice" or "pie slice".
+    Sector on a given canvas.
 
     Note:
+        * Sector can be referred to as a "wedge", "slice" or "pie slice".
         * User supplies a "compass" angle i.e. degrees anti-clockwise from East;
           which determines the "width" of the sector at the circumference;
           default is 90°

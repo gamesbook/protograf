@@ -686,6 +686,60 @@ def flatten_keys(d: dict):
     return result
 
 
+def list_ordering(
+    base: list,
+    changes: list,
+    start: bool = False,
+    end: bool = False,
+    only: bool = False,
+) -> list:
+    """Alter ordering in base list to match order in changes.
+
+    Args:
+        base (list): canonical list of all values with default order
+        changes (list): selected values in required order
+        start (bool): changes must appear at the start of the altered list
+        end (bool): changes must appear at the end of the altered list
+        only (bool): return only values in changes
+
+    Returns:
+        list
+
+    Doc Test:
+
+    >>> list_ordering([1], [1], False, False)
+    [1]
+    >>> list_ordering([1, 2, 3, 4, 5, 6, 7], [4, 5, 6], True, False)
+    [4, 5, 6, 1, 2, 3, 7]
+    >>> list_ordering([1, 2, 3, 4, 5, 6, 7], [2, 3, 4], False, True)
+    [1, 5, 6, 7, 2, 3, 4]
+    >>> list_ordering([1, 2, 3, 4, 5, 6, 7], [2, 3, 4], False, False, True)
+    [2, 3, 4]
+    """
+    if not changes:
+        return base
+    if not isinstance(changes, list):
+        feedback("Ordering values must be in a list", True)
+    # validate changes
+    for item in changes:
+        if item not in base:
+            allowed = ", ".join(base)
+            feedback(f'Ordering values must be any of: "{allowed}" - not "{item}"', True)
+    # first
+    if start:
+        combined_list = changes + base
+        result_list = list(dict.fromkeys(combined_list))
+        return result_list
+    if end:
+        result_list = [item for item in base if item not in changes]
+        combined_list = result_list + changes
+        final_list = list(dict.fromkeys(combined_list))
+        return final_list
+    if only:
+        return changes
+    return base
+
+
 def comparer(val: str, operator: str, target: str | list) -> bool:
     """Compare value with a target.
 
@@ -930,7 +984,7 @@ def get_font_by_name(font_name: str) -> tuple:
     Doc Test:
 
     >>> get_font_by_name('foo')
-    WARNING:: Cannot find or load a font named `foo`. Defaulting to "Helvetica".
+    WARNING:: Cannot find or load the font named `foo`. Defaulting to "Helvetica".
     (Font('Helvetica'), None, 'Helvetica', 'Helvetica')
     >>> get_font_by_name('Helvetica')
     (Font('Helvetica'), None, 'Helvetica', 'Helvetica')
