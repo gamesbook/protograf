@@ -113,7 +113,7 @@ current / potential areas of work or ideas.
     * [ ] Meeple (Polyshape with Arcs)
     * [x] Pentomino
     * [ ] Picture Frame (Trapezoid composite)
-* [ ] Hexagons: 18xx tile example (requires `Arcs` below!)
+* [ ] Hexagons: 18xx tile example
 * [ ] HexHex Grid: better hexhex creation with notations
 * [ ] Polyline: define arcs along the path
 * [x] Paths (arcs) inside a Hexagon
