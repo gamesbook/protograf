@@ -173,11 +173,12 @@ PageBreak()
 
 # ---- arc
 Blueprint()
-Text(common=txt, text="Arc; 'inside' square")
+Text(common=txt, text="Arc: 'inside' square & nested")
 Rectangle(x=1, y=1, height=2, width=2, dot=0.02,
           stroke="red", fill=None,
           title="Arc(cx=1, cy=3, radius=2)")
 Arc(cx=1, cy=3, radius=2)  #, angle_start=0, angle_width=90)
+Arc(cx=1, cy=6, radius=2, nested=6, angle_start=15, angle_width=60)
 PageBreak()
 
 # ---- stadium edges
@@ -225,6 +226,15 @@ Polygon(
     perbis="2,4,7",
     perbis_offset=0.25, perbis_length=0.5, perbis_stroke_width=1,
     dot=0.1, dot_stroke="red")
+PageBreak()
+
+# ---- polygon slices
+Blueprint()
+Text(common=txt, text="Polygon: slices")
+Polygon(
+    cx=2, cy=1, sides=8, radius=1,
+    slices=['red', 'orange', 'yellow', 'green',
+            'aqua', 'pink', 'violet', 'purple'])
 PageBreak()
 
 # ---- dates
@@ -324,7 +334,9 @@ PageBreak()
 # ---- grid cols and rows
 Blueprint()
 Text(common=txt, text='Grid: gray; 3x4; thick')
-Grid(x=0.5, y=0.5, cols=3, rows=4, height=1.25, width=1, stroke="gray", stroke_width=1)
+Grid(x=0.5, y=0.5, cols=3, rows=4, height=1.25, width=1,
+     stroke="gray", stroke_width=1,
+     heading="Heading", label="Label", title="Title")
 PageBreak()
 
 # ---- line - custom
@@ -363,6 +375,50 @@ Line(cx=2, cy=3, angle=135, length=2, stroke_width=1.5, arrow_width=0.2)
 
 Line(cx=1, cy=5, angle=135, length=2, stroke_width=1.5)
 Line(cx=3, cy=5, angle=315, length=2, stroke="red")
+PageBreak()
+
+# ---- line: connections -
+Blueprint(stroke_width=0.5)
+Text(common=txt, text="Line: connections")
+cc = Circle(cx=2, cy=3, radius=0.5)
+cy = Circle(cx=1, cy=1, radius=0.5, fill_stroke="yellow")
+Line(connections=[cc, cy])
+ca = Circle(cx=1, cy=5, radius=0.5, fill_stroke="aqua")
+Line(connections=[cc, ca])
+cr = Circle(cx=3, cy=1, radius=0.5, fill_stroke="red")
+Line(connections=[cc, cr])
+co = Circle(cx=3, cy=5, radius=0.5, fill_stroke="orange")
+Line(connections=[cc, co])
+# orthogonal
+Line(connections=[cy, cr, co, ca, cy], stroke_width=2)
+PageBreak()
+
+# ---- line: connections - arrow
+Blueprint(stroke_width=0.5)
+Text(common=txt, text="Line: connections; arrow")
+cc = Circle(cx=1.5, cy=3.5, radius=0.5)
+cy = Circle(cx=1, cy=1, radius=0.5, fill_stroke="yellow")
+co = Circle(cx=3, cy=5, radius=0.5, fill_stroke="orange")
+Line(connections=[cy, cc, co],
+     stroke="red",
+     stroke_width=1,
+     arrow=True,
+     )
+PageBreak()
+
+# ---- line: connections - dot&spoke
+Blueprint(stroke_width=0.5)
+Text(common=txt, text="Line: connections; dot&spoke")
+cc = Dot(cx=1.5, cy=3.5, dot_point=2)
+cr = Circle(cx=3, cy=1, radius=0.5, fill_stroke="red")
+co = Circle(cx=3, cy=5, radius=0.5, fill_stroke="orange")
+ca = Circle(cx=1, cy=5, radius=0.5, fill_stroke="aqua")
+Line(connections=[cc, cr, co, ca],
+     connections_style='spoke',
+     stroke="green",
+     stroke_width=1,
+     arrow=True,
+     )
 PageBreak()
 
 # ---- bezier - custom
@@ -436,8 +492,8 @@ PageBreak()
 Blueprint(stroke_width=0.5)
 Text(common=txt, text="Polyshape: default")
 Polyshape(points=[(1, 2), (1, 1), (2, 0), (3, 1), (3, 2)])
-Polyshape(x=1, y=3,
-         steps='0.5,0 0,1.5 1.5,0 0,-1.5 0.5,0 0,0.5 -2.5,0 0,-0.5')
+# Polyshape(x=1, y=3,
+#          steps='0.5,0 0,1.5 1.5,0 0,-1.5 0.5,0 0,0.5 -2.5,0 0,-0.5')
 PageBreak()
 
 # ---- polyshape - custom
@@ -620,9 +676,9 @@ Polyline(
 )
 PageBreak()
 
-# ---- Centred Shapes
+# ---- centred shapes
 Blueprint()
-Text(common=txt, text="Centred Shapes")
+Text(common=txt, text="Centre Shape")
 small_star = star(radius=0.25)
 Hexagon(x=0.5, y=0.5, height=1, centre_shape=small_star)
 Square(x=2.5, y=0.5, height=1, centre_shape=small_star)
@@ -632,9 +688,9 @@ Polygon(cx=1, cy=5, radius=0.5, sides=8, centre_shape=small_star)
 EquilateralTriangle(x=2.35, y=5.5, side=1.25, centre_shape=small_star)
 PageBreak()
 
-# ---- Centred Shapes - move
+# ---- centre shape - move
 Blueprint()
-Text(common=txt, text="Centred Shape: move + double")
+Text(common=txt, text="Centre Shape: move + double")
 small_star = star(radius=0.25)
 small_circle = circle(radius=0.33, fill="gray", centre_shape=small_star)
 Hexagon(x=1, y=0.5, height=2,
@@ -646,9 +702,9 @@ Hexagon(x=1, y=3, height=2,
         centre_shape_mx=0.3, centre_shape_my=0.6)
 PageBreak()
 
-# ---- Centred Shapes - customised
+# ---- centred shapes - customised
 Blueprint()
-Text(common=txt, text="Centred Shape: customised")
+Text(common=txt, text="Centre shape: customised")
 Rectangle(x=0, y=1, side=1,
           centre_shape=polygon(
               radius=0.4,
@@ -699,6 +755,20 @@ Rectangle(x=3, y=4, side=1,
               flip='south',
               borders=[("e w", 2, "black")]))
 PageBreak()
+
+# ---- Centred Shapes
+Blueprint()
+Text(common=txt, text="Centred Shapes (with offsets)")
+small_dot = dot(dot_point=4, fill="red")
+big_dot = dot(dot_point=8)
+Hexagon(x=0.5, y=0.5, height=1, centre_shapes=[(small_dot), (big_dot, 0.2, 0.2)])
+Rhombus(x=2.4, y=0.3, height=1.5,  width=1.25, centre_shapes=[(small_dot), (big_dot, 0.2, 0.2)])
+Rectangle(x=0.5, y=2.5, height=1, width=1.25, centre_shapes=[(small_dot), (big_dot, 0.2, 0.2)])
+Circle(cx=3, cy=3, radius=0.5, centre_shapes=[(small_dot), (big_dot, 0.2, 0.2)])
+Polygon(cx=1, cy=5, radius=0.5, sides=8, centre_shapes=[(small_dot), (big_dot, 0.2, 0.2)])
+EquilateralTriangle(x=2.35, y=5.5, side=1.25, centre_shapes=[(small_dot), (big_dot, 0.2, 0.2)])
+PageBreak()
+
 
 # ---- QR Code
 Blueprint()
@@ -836,7 +906,7 @@ Save(
         "starfield_poly", "equilateral_triangle", "right_angled_triangle_flip",
         "sectors", "grid_gray", "dotgrid_moleskine", "dotgrid_rowscols", "arc",
         "stadium_edges", "trapezoid_flip", "chord",
-        "polygon_radii", "polygon_perbis",
+        "polygon_radii", "polygon_perbis", "polygon_slices",
         "dates_formats",
         "images_normal_rotation", "rhombus_red_rotation",
         "stadium_red_rotation",
@@ -844,6 +914,7 @@ Save(
         "polygon_rotation_flat",
         "polygon_rotation_pointy", "polygon_sizes", "grid_3x4",
         "line_custom", "line_centred",
+        "line_connections", "line_connections_arrow", "line_connections_spoke",
         "bezier_custom", "ellipse_custom", "rectangle_custom",
         "square_custom", "trapezoid_custom", "image_default",
         "descriptions", "label_offset", "star_custom",
@@ -853,6 +924,7 @@ Save(
         "arrow_sizes", "arrow_rotate", "arrowheads",
         "polyline_basic", "polyline_arrow",
         "shape_centred", "shape_centred_move", "shape_centred_custom",
+        "shapes_centred",
         "qr_code",
         "image_sliced", "image_label",
         "shape_rotation", "shape_hatch_and_rotation",

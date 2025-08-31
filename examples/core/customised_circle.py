@@ -140,7 +140,7 @@ PageBreak()
 
 # ---- circle slices
 Blueprint()
-Text(common=txt, text="Slices")
+Text(common=txt, text="Circle: Slices")
 Circle(cx=1, cy=1, radius=1,
        slices=["red", "gold", "aqua"],
        dot=0.05)
@@ -160,6 +160,15 @@ Circle(cx=1, cy=5, radius=1, fill="gold",
        slices_angles=[60, 45, 45, 120])
 PageBreak()
 
+# ---- circle nested
+Blueprint(stroke_width=0.5)
+Text(common=txt, text="Circle: Nested")
+Circle(cx=1, cy=1, radius=1, nested=2)
+Circle(cx=2, cy=3, radius=1, nested=[0.8, 0.1, 0.4])
+Circle(cx=3, cy=5, radius=1, nested=4,
+       dotted=True, stroke="red", fill="yellow")
+PageBreak()
+
 # ---- END
 Text(common=txt, text="Circle END...")
 
@@ -176,4 +185,5 @@ Save(
         "petals_petal",
         "radii_labels",
         "circle_slices",
+        "circle_nested",
         None])

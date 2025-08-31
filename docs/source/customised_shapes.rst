@@ -54,6 +54,9 @@ that it can be customised.
 - `Dotted, Dashed and Angled <lineDotDash_>`_
 - `Centred <lineCentred_>`_
 - `Arrowheads <line-with-arrow_>`_
+- `Connections <lineConnections_>`_
+- `Connections with Arrows <lineConnectionsArrow_>`_
+- `Connections as Spokes <lineConnectionsSpoke_>`_
 
 Basic Properties
 ----------------
@@ -67,6 +70,10 @@ A Line has the following properties, in addition to the basic ones of
 - *cx* and *cy* - if set, will replace the use of *x* and *y* for the
   starting point, and work in conjunction with *angle* and *length* to
   create the line around a centre point
+- *connections* - a list of circular shapes (Circle or Dot) that will be
+  connected by the line
+- *connections_style* - if set to ``spoke``, will draw lines from the first
+  shape to each of the other shapes in the *connections* list
 - *dotted* - if ``True``, create a series of small lines i.e. the
   "dots", followed by gaps, of sizes equal to the line's *stroke_width*
 - *dashed* - a list of two numbers: the first is the length of the dash;
@@ -440,6 +447,138 @@ The following properties can be set:
 
 ===== ======
 
+.. _lineConnections:
+
+Example 4. Connections
+------------------------------------------
+`^ <lineIndex_>`_
+
+.. |ln7| image:: images/customised/line_connections.png
+   :width: 330
+
+===== ======
+|ln7| This example shows a Line constructed using commands with the
+      following properties:
+
+      .. code:: python
+
+        cc = Circle(cx=2, cy=3, radius=0.5)
+
+        cy = Circle(cx=1, cy=1, radius=0.5,
+                    fill_stroke="yellow")
+        Line(connections=[cc, cy])
+
+        ca = Circle(cx=1, cy=5, radius=0.5,
+                    fill_stroke="aqua")
+        Line(connections=[cc, ca])
+
+        cr = Circle(cx=3, cy=1,
+                    radius=0.5, fill_stroke="red")
+        Line(connections=[cc, cr])
+
+        co = Circle(cx=3, cy=5, radius=0.5,
+                    fill_stroke="orange")
+        Line(connections=[cc, co])
+
+        # orthogonal
+        Line(
+            connections=[cy, cr, co, ca, cy],
+            stroke_width=2)
+
+      This example shows how Circles that are defined and drawn as normal
+      can be assigned to a name e.g. ``cc`` for the white Circle, and then
+      connected by a Line via the *connections* property.
+
+      The *connections* property requires two or more circular shapes in a
+      list so that the Line can be drawn between them.
+
+      Using the *connections* property means that the normal point locations,
+      or line angle, are **not** used but are superceded by calculated values.
+      The "start" of the line is at the centre of the first circular shape
+      and the "end" of the line is at the centre of the second circular shape.
+      However, the line itself is only drawn between the boundaries of those
+      shapes.
+
+      The thick black line is drawn between a series of shapes, starting and
+      ending at the yellow circle.
+
+===== ======
+
+.. _lineConnectionsArrow:
+
+Example 5. Connections - Arrow
+------------------------------
+`^ <lineIndex_>`_
+
+.. |ln5| image:: images/customised/line_connections_arrow.png
+   :width: 330
+
+===== ======
+|ln5| This example shows a Line constructed using commands with the
+      following properties:
+
+      .. code:: python
+
+        cc = Circle(cx=1.5, cy=3.5, radius=0.5)
+        cy = Circle(cx=1, cy=1, radius=0.5,
+                    fill_stroke="yellow")
+        co = Circle(cx=3, cy=5, radius=0.5,
+                    fill_stroke="orange")
+        Line(connections=[cy, cc, co],
+             stroke="red",
+             stroke_width=1,
+             arrow=True,
+             )
+
+      Similarly to `Example 4 <lineConnections_>`_, the line is drawn
+      between a series of shapes.
+
+      In this case, the line has been styled with color and thickness, and
+      the *arrow* has been "switched on".  The arrow points in the direction
+      corresponding to the order of the shapes in the *connections* list.
+
+===== ======
+
+.. _lineConnectionsSpoke:
+
+Example 6. Connections - Spoke
+------------------------------
+`^ <lineIndex_>`_
+
+.. |ln6| image:: images/customised/line_connections_spoke.png
+   :width: 330
+
+===== ======
+|ln6| This example shows a Line constructed using commands with the
+      following properties:
+
+      .. code:: python
+
+        cc = Dot(cx=1.5, cy=3.5, dot_point=2)
+        cr = Circle(cx=3, cy=1, radius=0.5,
+                    fill_stroke="red")
+        co = Circle(cx=3, cy=5, radius=0.5,
+                    fill_stroke="orange")
+        ca = Circle(cx=1, cy=5, radius=0.5,
+                    fill_stroke="aqua")
+        Line(connections=[cc, cr, co, ca],
+             connections_style='spoke',
+             stroke="green",
+             stroke_width=1,
+             arrow=True,
+             )
+
+      Similarly to `Example 5 <lineConnectionsArrow_>`_, the line is drawn
+      as an arrow between the shapes.
+
+      However, the use of the ``connections_style='spoke'`` property means
+      each line is drawn from the first shape in the list to each of the
+      others, rather than as a series of connections.
+
+      Note that ``Dot()`` shape is used here instead of a ``Circle()``.
+
+===== ======
+
 
 .. _rectangleIndex:
 
@@ -460,6 +599,7 @@ that it can be customised.
 - `Rotation <rectRotation_>`_
 - `Rounding <rectRounding_>`_
 - `Slices <rectSlices_>`_
+- `Ordering of Properties <rectOrder_>`_
 
 .. _rectCentred:
 
@@ -1069,6 +1209,37 @@ e.g. ``n s`` to draw both lines on both north **and** south sides.
 ===== ======
 
 
+.. _rectOrder:
+
+Ordering of Properties
+----------------------
+`^ <rectangleIndex_>`_
+
+There is a default order in which the various properties of a Rectangle are
+drawn. There are three ways to change this drawing order:
+
+- *order_first* - a list of properties that will be drawn, in the order given
+  in the list, **before** any others
+- *order_last* - a list of properties that will be drawn, in the order given
+  in the list, **after** any others
+- *order_all* - a list of the **only** properties that will be drawn, in the
+  order given in the list
+
+The available property names, shown in their default order, are:
+
+#. base - this represents the Rectangle itself
+#. pattern
+#. slices
+#. hatches
+#. radii
+#. centre_shape
+#. centre_shapes
+#. cross
+#. dot
+#. text
+#. numbering
+
+
 .. _hexIndex:
 
 Hexagon
@@ -1094,6 +1265,7 @@ customised in a similar way.
 - `Spikes <hexSpikes_>`_
 - `Text: Flat <hexTextFlat_>`_
 - `Text: Pointy <hexTextPointy_>`_
+- `Ordering of Properties <hexOrder_>`_
 
 .. _hexCentre:
 
@@ -1842,6 +2014,96 @@ Example 2. Pointy
 ===== ======
 
 
+.. _hexOrder:
+
+Ordering of Properties
+----------------------
+`^ <hexagon_>`_
+
+There is a default order in which the various properties of a Hexagon are
+drawn. There are three ways to change this drawing order:
+
+- *order_first* - a list of properties that will be drawn, in the order given
+  in the list, **before** any others
+- *order_last* - a list of properties that will be drawn, in the order given
+  in the list, **after** any others
+- *order_all* - a list of the **only** properties that will be drawn, in the
+  order given in the list
+
+The available property names, shown in their default order, are:
+
+#. base - this represents the Hexagon itself
+#. borders
+#. shades
+#. slices
+#. spikes
+#. hatches
+#. links
+#. perbises
+#. paths
+#. radii
+#. centre_shape
+#. centre_shapes
+#. cross
+#. dot
+#. text
+#. numbering
+
+.. |ho1| image:: images/custom/hexagon/hex_order.png
+   :width: 330
+
+Example 1.
+++++++++++
+
+===== ======
+|ho1| This example shows ``flat`` Hexagons constructed using these commands:
+
+      .. code:: python
+
+        hxg = Common(height=1.5,
+                     dot=0.05, dot_stroke="red")
+
+        Hexagon(common=hxg, x=0.25, y=0.1,
+                slices=['red', 'orange', 'yellow'],
+                spikes=["ne", "nw", "s"],
+                spikes_height=-0.7,
+                spikes_width=0.25)
+        Hexagon(common=hxg, x=2.25, y=0.1,
+                slices=['red', 'orange', 'yellow'],
+                spikes=["ne", "nw", "s"],
+                spikes_height=-0.7,
+                spikes_width=0.25
+                order_first=["spikes"])
+        Hexagon(common=hxg, x=0.25, y=2.1,
+                hatch_count=5, hatch_stroke="red",
+                hatch_stroke_width=2, hatch='nw',
+                radii='sw e',
+                radii_stroke_width=2)
+        Hexagon(common=hxg, x=2.25, y=2.1,
+                hatch_count=5, hatch_stroke="red",
+                hatch_stroke_width=2, hatch='nw',
+                radii='sw e',
+                radii_stroke_width=2,
+                order_last=["hatches"])
+        Hexagon(common=hxg, x=0.25, y=4.1,
+                perbis='sw n')
+        Hexagon(common=hxg, x=2.25, y=4.1,
+                perbis='sw n',
+                order_all=["base", "dot"])
+
+      The top-most pair of Hexagons show how changing the *order_first* property
+      means that the *spikes* are not visible because they are drawn before the
+      *slices* (which overwrite them).
+
+      The middle pair of Hexagons show how changing the *order_last* property
+      means that *hatches* are drawn after the *radii*, instead of before.
+
+      The lower pair of Hexagons show how setting the *order_all* property
+      means that only the Hexagon and the centre Dot will drawn, and not the
+      *perbis*.
+
+===== ======
+
 .. _circleIndex:
 
 Circle
@@ -1858,6 +2120,8 @@ ways that it can be customised.
 - `Petals: petal <circlePetalsPetal_>`_
 - `Petals: triangle <circlePetalsTriangle_>`_
 - `Slices <circleSlices_>`_
+- `Nested <circleNested_>`_
+- `Ordering of Properties <circleOrder_>`_
 
 .. _circleCross:
 
@@ -2187,17 +2451,16 @@ effect.
 
 ===== ======
 
-
 .. _circleSlices:
 
 Slices
 ------
 `^ <circleIndex_>`_
 
-The slices command enables the Circle to be filled with colored pie-shaped
+The slices property enables the Circle to be filled with colored pie-shaped
 wedges.
 
-These are relevant properties that can be set:
+These are the relevant properties that can be set:
 
 - *slices* - this is a list of colors (named or hexadecimal); if ``None`` is
   used then no slice will be drawn in that position
@@ -2207,8 +2470,10 @@ These are relevant properties that can be set:
   result in them being drawn inside the circle and values larger than ``1``
   will  result in them extending outside of the circle
 - *slices_angles* - this is the "width" of the slices; if not specified,
-  then by default all slices will be of equally-sized angles and will occupy
-  the full circumference of the circle
+  then by default all slices will be of equally-sized angles and will extend
+  from the centre to the full circumference of the circle
+- *slices_transparency* - the higher the value (on a scale of 0 to 100),
+  the more "see through" the fill of the slices will be
 
 Both the list of  *slice_fractions*  and  *slice_angles* must be of equal
 length to the  *slice* list.
@@ -2216,7 +2481,8 @@ length to the  *slice* list.
 .. NOTE::
 
     Slices are drawn **after** the circle has been drawn, and so
-    may obscure the stroke outline and fill color of the circle.
+    may obscure the stroke outline, fill color and other properties
+    of the circle.
 
 .. |cs1| image:: images/custom/circle/circle_slices.png
    :width: 330
@@ -2274,6 +2540,78 @@ length to the  *slice* list.
       which defaults to the slice color itself.
 
 ===== ======
+
+.. _circleNested:
+
+Nested
+------
+`^ <circleIndex_>`_
+
+The *nested* property enables the Circle to be filled with a series of
+concentric circles.
+
+.. |cn1| image:: images/custom/circle/circle_nested.png
+   :width: 330
+
+===== ======
+|cn1| This example shows Circles constructed using the commands:
+
+      .. code:: python
+
+        Circle(
+            cx=1, cy=1, radius=1,
+            nested=2)
+        Circle(
+            cx=2, cy=3, radius=1,
+            nested=[0.8, 0.1, 0.4])
+        Circle(
+            cx=3, cy=5, radius=1,
+            nested=4,
+            dotted=True,
+            stroke="red",
+            fill="yellow")
+
+      The *nested* property can either be a single whole number or a list of
+      fractional numbers.
+
+      **NOTE** All nested Circles are drawn with the same line and fill
+      properties as the Circle shape to which they are part of.  For more
+      control over such features, rather use the *centre_shape* property
+      instead, as this will permit construction of such a circle with any/all
+      properties being set.
+
+===== ======
+
+
+.. _circleOrder:
+
+Ordering of Properties
+----------------------
+`^ <circleIndex_>`_
+
+There is a default order in which the various properties of a Circle are
+drawn. There are three ways to change this drawing order:
+
+- *order_first* - a list of properties that will be drawn, in the order given
+  in the list, **before** any others
+- *order_last* - a list of properties that will be drawn, in the order given
+  in the list, **after** any others
+- *order_all* - a list of the **only** properties that will be drawn, in the
+  order given in the list
+
+The available property names, shown in their default order, are:
+
+#. petals
+#. base - this represents the Circle itself
+#. nested
+#. slices
+#. hatches
+#. radii
+#. centre_shape
+#. centre_shapes
+#. cross
+#. dot
+#. text
 
 
 .. _blueprintIndex:

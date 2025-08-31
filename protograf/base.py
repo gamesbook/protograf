@@ -252,6 +252,10 @@ class BaseCanvas:
         self.line_ends = self.defaults.get("line_ends", None)
         self.dotted = self.defaults.get("dotted", self.defaults.get("dotted", False))
         self.dashed = self.defaults.get("dashed", None)
+        # ---- order - Hexagon / Circle / Rectangle
+        self.order_all = self.defaults.get("order_all", None)
+        self.order_first = self.defaults.get("order_first", None)
+        self.order_last = self.defaults.get("order_last", None)
         # ---- text: base
         self.text = self.defaults.get("text", "")
         self.text_size = self.defaults.get("text_size", self.font_size)
@@ -346,6 +350,9 @@ class BaseCanvas:
             "arrow_stroke", None
         )  # see draw_arrowhead()
         self.arrow_fill = self.defaults.get("arrow_fill", None)  # see draw_arrowhead()
+        # ---- line
+        self.connections = self.defaults.get("connections", None)
+        self.connections_style = self.defaults.get("connections_style", None)
         # ---- line / bezier
         self.x_1 = self.defaults.get("x1", 0)
         self.y_1 = self.defaults.get("y1", 0)
@@ -378,8 +385,11 @@ class BaseCanvas:
         self.slices_line_mx = self.defaults.get("slices_line_mx", 0)
         self.slices_line_my = self.defaults.get("slices_line_my", 0)
         self.slices_stroke = self.defaults.get("slices_stroke", None)
+        self.slices_transparency = self.defaults.get(
+            "slices_transparency", 1
+        )  # NOT transparent
         self.slices_ends = self.defaults.get("slices_ends", None)
-        self.slices_stroke_width = self.defaults.get("slices_stroke", None)
+        self.slices_stroke_width = self.defaults.get("slices_stroke_width", None)
         self.slices_reverse = self.defaults.get("slices_reverse", False)
         # ---- stadium
         self.edges = self.defaults.get("edges", "E W")
@@ -432,6 +442,7 @@ class BaseCanvas:
         self.radii_labels_my = self.defaults.get("radii_labels_my", 0)
         self.radii_labels_mx = self.defaults.get("radii_labels_mx", 0)
         # ---- circle
+        self.nested = self.defaults.get("nested", None)
         self.petals = self.defaults.get("petals", 0)
         self.petals_style = self.defaults.get("petals_style", "triangle")
         self.petals_height = self.defaults.get("petals_height", 1)
@@ -451,7 +462,8 @@ class BaseCanvas:
         self.flip = self.defaults.get("flip", None)
         # ---- triangle / polyomino
         self.hand = self.defaults.get("hand", None)
-        # ---- hexagon / circle
+        # ---- shapes with centr (hexagon / circle / square / rhombus / poly / ellipse)
+        self.centre_shapes = self.defaults.get("centre_shapes", [])
         self.centre_shape = self.defaults.get("centre_shape", "")
         self.centre_shape_mx = self.defaults.get("centre_shape_mx", 0)
         self.centre_shape_my = self.defaults.get("centre_shape_my", 0)
@@ -725,6 +737,10 @@ class BaseShape:
         self.wrap = kwargs.get("wrap", base.wrap)
         self.align = kwargs.get("align", base.align)  # centre,left,right,justify
         self._alignment = TEXT_ALIGN_LEFT  # see to_alignment()
+        # ---- order - Hexagon / Circle / Rectangle
+        self.order_all = kwargs.get("order_all", base.order_all)
+        self.order_first = kwargs.get("order_first", base.order_first)
+        self.order_last = kwargs.get("order_last", base.order_last)
         # ---- text: base
         self.text = kwargs.get("text", base.text)
         self.text_size = self.kw_float(kwargs.get("text_size", base.text_size))
@@ -834,6 +850,9 @@ class BaseShape:
         self.arrow_height = kwargs.get("arrow_height", base.arrow_height)
         self.arrow_stroke = kwargs.get("arrow_stroke", base.arrow_stroke)
         self.arrow_fill = kwargs.get("arrow_fill", base.arrow_fill)
+        # ---- line
+        self.connections = kwargs.get("connections", base.connections)
+        self.connections_style = kwargs.get("connections_style", base.connections_style)
         # ---- line / bezier / sector
         self.x_1 = self.kw_float(kwargs.get("x1", base.x_1))
         self.y_1 = self.kw_float(kwargs.get("y1", base.y_1))
@@ -870,6 +889,9 @@ class BaseShape:
         self.slices_ends = kwargs.get("slices_ends", base.slices_ends)
         self.slices_stroke_width = kwargs.get(
             "slices_stroke_width", base.slices_stroke_width
+        )
+        self.slices_transparency = self.kw_float(
+            kwargs.get("slices_transparency"), base.slices_transparency
         )
         # ---- stadium
         self.edges = kwargs.get("edges", base.edges)
@@ -934,6 +956,7 @@ class BaseShape:
         self.radii_labels_my = self.kw_float(kwargs.get("radii_labels_my", 0))
         self.radii_labels_mx = self.kw_float(kwargs.get("radii_labels_mx", 0))
         # ---- circle
+        self.nested = kwargs.get("nested", base.nested)
         self.petals = self.kw_int(kwargs.get("petals", base.petals), "petals")
         self.petals_style = kwargs.get("petals_style", base.petals_style)
         self.petals_height = self.kw_float(
@@ -957,7 +980,8 @@ class BaseShape:
         self.flip = kwargs.get("flip", base.flip)
         # ---- triangle / polyomino
         self.hand = kwargs.get("hand", base.hand)
-        # ---- hexagon / circle / polygon
+        # ---- shapes with centr (hexagon / circle / square / rhombus / poly / ellipse)
+        self.centre_shapes = kwargs.get("centre_shapes", [])
         self.centre_shape = kwargs.get("centre_shape", "")
         self.centre_shape_mx = self.kw_float(
             kwargs.get("centre_shape_mx", base.centre_shape_mx)
@@ -2755,6 +2779,23 @@ class BaseShape:
             _name = cshape_name.replace("Shape", "")
             feedback(f"Cannot draw a centered {_name}!")
         return False
+
+    def draw_centred_shapes(self, centre_shapes, cx: float, cy: float):
+        for item in centre_shapes:
+            _shape_mx, _shape_my = 0, 0
+            if isinstance(item, tuple):
+                _shape = item[0]
+                if len(item) >= 2:
+                    _shape_mx = item[1]
+                if len(item) == 3:
+                    _shape_my = item[2]
+            else:
+                _shape = item
+            if self.can_draw_centred_shape(_shape):
+                _shape.draw(
+                    _abs_cx=cx + self.unit(_shape_mx),
+                    _abs_cy=cy + self.unit(_shape_my),
+                )
 
 
 class GroupBase(list):

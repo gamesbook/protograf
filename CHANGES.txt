@@ -1,6 +1,17 @@
 protograf Changes
 =================
 
+2025-08-30 (0.2.16)
+-------------------
+- Add text descriptors for Grid
+- Add slices property to Polygon
+- Add connections property to Line
+- Add landscape mode to standard card sizes
+- Add nested property to Circle
+- Add nested property to Arc
+- Add order_* propery to Hexagon, Circle and Rectangle
+- Pacth bug with gutter file
+
 2025-08-23 (0.2.15)
 -------------------
 - Add Meridians board example

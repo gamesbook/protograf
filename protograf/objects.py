@@ -524,7 +524,8 @@ class StarFieldObject(BaseShape):
     def random_stars(self, cnv):
         # feedback(f'*** StarFld {self.enclosure=}')
         if isinstance(self.enclosure, CircleShape):
-            x_c, y_c = self.enclosure.calculate_centre()
+            ccentre = self.enclosure.calculate_centre()
+            x_c, y_c = ccentre.x, ccentre.y
         if isinstance(self.enclosure, PolygonShape):
             _geom = self.enclosure.get_geometry()
             x_c, y_c, radius, vertices = _geom.x, _geom.y, _geom.radius, _geom.vertices

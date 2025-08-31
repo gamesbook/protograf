@@ -61,7 +61,7 @@ Hexagon(common=hxgn, y=2, hatch='ne', label="ne/sw")
 Hexagon(common=hxgn, y=4, hatch='nw', label="nw/se")
 PageBreak()
 
-# ---- hatch_text_flat
+# ---- text_flat
 Blueprint()
 Text(common=txt, text="Hexagon: flat; text")
 Hexagon(
@@ -72,7 +72,7 @@ Hexagon(
     heading="Heading")
 PageBreak()
 
-# ---- hatch_text_pointy
+# ---- text_pointy
 Blueprint()
 Text(common=txt, text="Hexagon: pointy; text")
 Hexagon(
@@ -235,6 +235,40 @@ Hexagon(common=hxg, x=2.25, y=2.15,
         spikes_fill="gold")
 PageBreak()
 
+# ---- order
+Blueprint(stroke_width=0.5)
+Text(common=txt, text="Hex Order")
+hxg = Common(height=1.5,
+             dot=0.05, dot_stroke="red",
+             spikes_width=0.25)
+Hexagon(common=hxg, x=0.25, y=0.1,
+        slices=['red', 'orange', 'yellow'],
+        spikes=["ne", "nw", "s"],
+        spikes_height=-0.7)
+Hexagon(common=hxg, x=2.25, y=0.1,
+        slices=['red', 'orange', 'yellow'],
+        spikes=["ne", "nw", "s"],
+        spikes_height=-0.7,
+        order_first=["spikes"])
+Hexagon(common=hxg, x=0.25, y=2.1,
+        hatch_count=5, hatch_stroke="red",
+        hatch_stroke_width=2, hatch='nw',
+        radii='sw e',
+        radii_stroke_width=2)
+Hexagon(common=hxg, x=2.25, y=2.1,
+        hatch_count=5, hatch_stroke="red",
+        hatch_stroke_width=2, hatch='nw',
+        radii='sw e',
+        radii_stroke_width=2,
+        order_last=["hatches"])
+Hexagon(common=hxg, x=0.25, y=4.1,
+        perbis='sw n')
+Hexagon(common=hxg, x=2.25, y=4.1,
+        perbis='sw n',
+        order_all=["base", "dot"])
+
+PageBreak()
+
 # ---- END
 Text(common=txt, text="Hexagon END...")
 
@@ -255,4 +289,5 @@ Save(
         "slices_flat", "slices_pointy",
         'hex_paths',
         'hex_spikes',
+        'hex_order',
         None])

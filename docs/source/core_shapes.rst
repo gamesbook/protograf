@@ -123,7 +123,8 @@ Arc
 ~~~
 `↑ <shape-index_>`_
 
-An arc is a curved line.
+An Arc is a curved line between two points located along the circumference
+of a circle.
 
 Example 1. Default Arc
 ++++++++++++++++++++++
@@ -157,8 +158,11 @@ Example 2. Customised Arc
       .. code:: python
 
           Arc(cx=1, cy=3, radius=2)
+          Arc(cx=1, cy=6, radius=2,
+              nested=6,
+              angle_start=15, angle_width=60)
 
-      To help with visualisation, the Arc is surrounded by a red Rectangle:
+      To help with visualisation, the top Arc is surrounded by a red Rectangle:
 
       .. code:: python
 
@@ -168,10 +172,24 @@ Example 2. Customised Arc
                 title="Arc(cx=1, cy=3, radius=2)")
             )
 
-      The Arc has the following properties:
+      The top Arc has the following properties:
 
-      - origin is at x-position ``1`` cm and at y-position ``3`` cm
-      - the arc radius is ``2`` cm
+      - origin is at x-position ``1`` cm and y-position ``3`` cm
+      - the arc *radius* is ``2`` cm
+
+      The default arc extent is from 0 |deg| (the line parallel to the
+      top edge of the page) to 90 |deg| (the line parallel to the
+      side edges of the page).
+
+      The lower Arc has the following properties:
+
+      - origin is at x-position ``1`` cm and y-position ``6`` cm
+      - the arc *radius* is ``2`` cm
+      - the arc extends from 15 |deg| to 75 |deg|  (ie. *angle_start* of
+        15 |deg| + *angle_width* of 60 |deg|)
+      - there are ``6`` *nested* arcs equally spaced between the arc
+        origin position and the arc itself.
+
 ===== ======
 
 
@@ -1104,8 +1122,12 @@ is a polygon with 8 sides.
 
     **HINT** Unlike the `Hexagon`_ shape, a Polygon can be rotated!
 
+The following examples
+
+
 Example 1. Default Polygon
 ++++++++++++++++++++++++++
+`^ <polygon-command_>`_
 
 .. |pol| image:: images/defaults/polygon.png
    :width: 330
@@ -1127,6 +1149,7 @@ Example 1. Default Polygon
 
 Example 2. Polygon with Sides
 +++++++++++++++++++++++++++++
+`^ <polygon-command_>`_
 
 .. |pl1| image:: images/customised/polygon_sizes.png
    :width: 330
@@ -1137,9 +1160,15 @@ Example 2. Polygon with Sides
 
       .. code:: python
 
-        Polygon(cx=1, cy=5, sides=7, radius=1, label="Seven")
-        Polygon(cx=2, cy=3, sides=6, radius=1, label="Six")
-        Polygon(cx=3, cy=1, sides=5, radius=1, label="Five")
+        Polygon(
+            cx=1, cy=5, sides=7,
+            radius=1, label="Seven")
+        Polygon(
+            cx=2, cy=3, sides=6,
+            radius=1, label="Six")
+        Polygon(
+            cx=3, cy=1, sides=5,
+            radius=1, label="Five")
 
       It can be seen that each shape is constructed as follows:
 
@@ -1153,6 +1182,7 @@ Example 2. Polygon with Sides
 
 Example 3. Polygon Radii
 ++++++++++++++++++++++++
+`^ <polygon-command_>`_
 
 .. |pl2| image:: images/customised/polygon_radii.png
    :width: 330
@@ -1165,7 +1195,9 @@ Example 3. Polygon Radii
 
       .. code:: python
 
-          Polygon(cx=2, cy=4, sides=8, radius=1, radii=True)
+          Polygon(
+              cx=2, cy=4, sides=8, radius=1,
+              radii=True)
 
       It has the following properties:
 
@@ -1182,7 +1214,9 @@ Example 3. Polygon Radii
           Polygon(
               cx=2, cy=1, sides=10, radius=1,
               radii=True,
-              radii_offset=0.75, radii_length=0.25, radii_stroke_width=1,
+              radii_offset=0.75,
+              radii_length=0.25,
+              radii_stroke_width=1,
               dot=0.1, dot_stroke="red"
           )
 
@@ -1209,6 +1243,7 @@ Example 3. Polygon Radii
 
 Example 4. Polygon with Perbis
 ++++++++++++++++++++++++++++++
+`^ <polygon-command_>`_
 
 The *perbis* |dash| short for "perpendicular bisector" |dash| defines
 lines that should be drawn from the centres of the sides of the polygon
@@ -1225,7 +1260,9 @@ to the polygon's centre.
 
       .. code:: python
 
-          Polygon(cx=2, cy=4, sides=8, radius=1, perbis='*')
+          Polygon(
+              cx=2, cy=4, sides=8,
+              radius=1, perbis='*')
 
       It has the following properties:
 
@@ -1242,7 +1279,9 @@ to the polygon's centre.
           Polygon(
             cx=2, cy=1, sides=8, radius=1,
             perbis="2,4,7",
-            perbis_offset=0.25, perbis_length=0.5, perbis_stroke_width=1,
+            perbis_offset=0.25,
+            perbis_length=0.5,
+            perbis_stroke_width=1,
             dot=0.1, dot_stroke="red")
 
       It has the following properties:
@@ -1271,6 +1310,7 @@ to the polygon's centre.
 
 Example 5. Polygon Rotation
 +++++++++++++++++++++++++++
+`^ <polygon-command_>`_
 
 .. |pl4| image:: images/customised/polygon_rotation_flat.png
    :width: 330
@@ -1281,11 +1321,25 @@ Example 5. Polygon Rotation
 
       .. code:: python
 
-        Polygon(common=poly6, y=1, x=1.0, label="0")
-        Polygon(common=poly6, y=2, x=1.5, rotation=15, label="15")
-        Polygon(common=poly6, y=3, x=2.0, rotation=30, label="30")
-        Polygon(common=poly6, y=4, x=2.5, rotation=45, label="45")
-        Polygon(common=poly6, y=5, x=3.0, rotation=60, label="60")
+        Polygon(
+            common=poly6,
+            y=1, x=1.0, label="0")
+        Polygon(
+            common=poly6,
+            y=2, x=1.5,
+            rotation=15, label="15")
+        Polygon(
+            common=poly6,
+            y=3, x=2.0,
+            rotation=30, label="30")
+        Polygon(
+            common=poly6,
+            y=4, x=2.5,
+            rotation=45, label="45")
+        Polygon(
+            common=poly6,
+            y=5, x=3.0,
+            rotation=60, label="60")
 
       The examples have the following properties:
 
@@ -1298,6 +1352,36 @@ Example 5. Polygon Rotation
 
 ===== ======
 
+Example 6. Polygon Slices
++++++++++++++++++++++++++
+`^ <polygon-command_>`_
+
+Slices are a set of colors that are drawn as triangles inside a
+a Polygon in a clockwise direction starting from the "South East".
+If there are fewer colors than all the possible triangles, then the
+colors are repeated, starting from the first one.
+
+.. |pl5| image:: images/customised/polygon_slices.png
+   :width: 330
+
+===== ======
+|pl5| This example shows a Polygon constructed using these commands:
+
+      .. code:: python
+
+        Polygon(
+            cx=2, cy=1, sides=8, radius=1,
+            slices=['red', 'orange', 'yellow', 'green',
+                    'aqua', 'pink', 'violet', 'purple'])
+
+      This example has the following properties:
+
+      - *cx* and *cy* - set the centre location
+      - *radius* - ``1`` cm
+      - *sides* - set to ``8`` (an octagon)
+      - *slices* - list of named colors that will be drawn
+        seqentially
+===== ======
 
 .. _polyshape-command:
 
@@ -1331,7 +1415,12 @@ Example 1. Default Polyshape
       .. code:: python
 
         Polyshape(
-          points=[(1, 2), (1, 1), (2, 0), (3, 1), (3, 2)])
+          points=[
+              (1, 2),
+              (1, 1),
+              (2, 0),
+              (3, 1),
+              (3, 2)])
 
       It has the following properties:
 
@@ -2487,7 +2576,8 @@ Example 3. Fixed Size
               x=0.5, y=0.5,
               height=1.25, width=1,
               cols=3, rows=4,
-              stroke="gray", stroke_width=1
+              stroke="gray", stroke_width=1,
+              heading="Heading", label="Label", title="Title"
           )
 
       It has the following properties set for it:
@@ -2499,7 +2589,8 @@ Example 3. Fixed Size
       - *cols* and *rows* - ``3`` columns wide by ``4`` rows high
       - *stroke_width* - set to ``1`` point; the thicker line makes
         the grid clearly visible
-      - *stroke* -set to ``gray`` i.e. a lighter color than the default black
+      - *stroke* - set to ``gray`` i.e. a lighter color than the default black
+      - *heading*, *label* and *title* - see `Text Descriptions`_
 
       The grid now has a fixed "rows by columns" size, rather than being
       automatically calculated to fill up the page.
@@ -2996,7 +3087,9 @@ the desired output:
 - `Text Descriptions`_
 - `Transparency`_
 - `Centre Shape`_
+- `Centre Shapes`_
 
+.. _coreShapeXY:
 
 x and y
 ~~~~~~~
@@ -3018,6 +3111,7 @@ to the top edge of the shape.
     just fits inside it; the "position" is the point corresponding to the
     top-left of that imaginary Rectangle.
 
+.. _coreShapeCxCy:
 
 cx and cy
 ~~~~~~~~~
@@ -3031,6 +3125,7 @@ For shapes that support it, the way to do this is by setting a value for **cx**
 position of the shape and/or **cy** |dash| the distance from the bottom margin
 of the page (or card) to the centre position of the shape.
 
+.. _coreShapeFillStroke:
 
 Fill and Stroke
 ~~~~~~~~~~~~~~~
@@ -3057,6 +3152,7 @@ becomes transparent.
 
 Example 1. Fill & Stroke
 ++++++++++++++++++++++++
+`↑ <coreShapeFillStroke_>`_
 
 .. |fsb| image:: images/defaults/fill-stroke.png
    :width: 330
@@ -3087,6 +3183,7 @@ Example 1. Fill & Stroke
 
 Example 2. Fill_Stroke
 ++++++++++++++++++++++
+`↑ <coreShapeFillStroke_>`_
 
 The *fill_stroke* property is a "shortcut" which sets **both** the
 *fill* and *stroke* color at same time.
@@ -3110,6 +3207,7 @@ The *fill_stroke* property is a "shortcut" which sets **both** the
 
 ===== ======
 
+.. _coreShapeDotCross:
 
 Dot and Cross
 ~~~~~~~~~~~~~
@@ -3176,6 +3274,7 @@ below.
       - *cross_stroke_width* - sets the thickness of the cross lines
 ===== ======
 
+.. _coreShapeRotation:
 
 Rotation
 ~~~~~~~~
@@ -3187,6 +3286,7 @@ around the centre of the shape, in *degrees*.
 
 Example 1. Rhombus Rotation
 +++++++++++++++++++++++++++
+`↑ <coreShapeRotation_>`_
 
 .. |rt1| image:: images/customised/rhombus_red_rotation.png
    :width: 330
@@ -3227,6 +3327,7 @@ Example 1. Rhombus Rotation
 
 Example 2. Polygon Rotation
 +++++++++++++++++++++++++++
+`↑ <coreShapeRotation_>`_
 
 .. |rt2| image:: images/customised/polygon_rotation_pointy.png
    :width: 330
@@ -3271,6 +3372,7 @@ Example 2. Polygon Rotation
 
 Example 3. Shapes Rotation
 ++++++++++++++++++++++++++
+`↑ <coreShapeRotation_>`_
 
 .. |rt3| image:: images/customised/shape_rotation.png
    :width: 330
@@ -3313,6 +3415,7 @@ Example 3. Shapes Rotation
 
 Example 4. Rotation with Hatches
 ++++++++++++++++++++++++++++++++
+`↑ <coreShapeRotation_>`_
 
 .. |rt4| image:: images/customised/shape_hatch_and_rotation.png
    :width: 330
@@ -3357,6 +3460,8 @@ Example 4. Rotation with Hatches
 
 ===== ======
 
+.. _coreShapeText:
+
 Text Descriptions
 ~~~~~~~~~~~~~~~~~
 `^ <shapes-common-properties_>`_
@@ -3389,6 +3494,7 @@ the right and down; and negative values will move the text to the left and up.
 
 Example 1. Heading, Label and Title
 +++++++++++++++++++++++++++++++++++
+`↑ <coreShapeText_>`_
 
 .. |tx1| image:: images/customised/descriptions.png
    :width: 330
@@ -3419,6 +3525,7 @@ Example 1. Heading, Label and Title
 
 Example 2. Label Offsets
 ++++++++++++++++++++++++
+`↑ <coreShapeText_>`_
 
 .. |tx2| image:: images/customised/label_offset.png
    :width: 330
@@ -3466,6 +3573,7 @@ Example 2. Label Offsets
 
 ===== ======
 
+.. _coreTransparency:
 
 Transparency
 ~~~~~~~~~~~~
@@ -3517,6 +3625,7 @@ visible - then set the *fill* value to ``None``.
       i.e. "bleed through" occurs.
 ===== ======
 
+.. _coreCentreShape:
 
 Centre Shape
 ~~~~~~~~~~~~
@@ -3533,6 +3642,7 @@ called a "centre shape" |dash| placed inside of it.
 
 Example 1. Default Centre Shape
 +++++++++++++++++++++++++++++++
+`↑ <coreCentreShape_>`_
 
 .. |cs0| image:: images/customised/shape_centred.png
    :width: 330
@@ -3545,17 +3655,23 @@ Example 1. Default Centre Shape
         small_star = star(radius=0.25)
 
         Polygon(
-            cx=1, cy=5, radius=0.5, sides=8, centre_shape=small_star)
+            cx=1, cy=5, radius=0.5, sides=8,
+            centre_shape=small_star)
         EquilateralTriangle(
-            x=2.35, y=5.5, side=1.25, centre_shape=small_star)
+            x=2.35, y=5.5, side=1.25,
+            centre_shape=small_star)
         Rectangle(
-            x=0.5, y=2.5, height=1, width=1.25, centre_shape=small_star)
+            x=0.5, y=2.5, height=1, width=1.25,
+            centre_shape=small_star)
         Circle(
-            cx=3, cy=3, radius=0.5, centre_shape=small_star)
+            cx=3, cy=3, radius=0.5,
+            centre_shape=small_star)
         Hexagon(
-            x=0.5, y=0.5, height=1, centre_shape=small_star)
+            x=0.5, y=0.5, height=1,
+            centre_shape=small_star)
         Square(
-            x=2.5, y=0.5, height=1, centre_shape=small_star)
+            x=2.5, y=0.5, height=1,
+            centre_shape=small_star)
 
       At the start, a Star shape is defined by the lowercase ``star()``
 
@@ -3573,6 +3689,7 @@ Example 1. Default Centre Shape
 
 Example 2. Off-Centre
 +++++++++++++++++++++
+`↑ <coreCentreShape_>`_
 
 .. |cs1| image:: images/customised/shape_centred_move.png
    :width: 330
@@ -3587,7 +3704,8 @@ The centre-shape can be shifted from the centre by setting values for
 
         small_star = star(radius=0.25)
         small_circle = circle(
-            radius=0.33, fill="gray", centre_shape=small_star)
+            radius=0.33, fill="gray",
+            centre_shape=small_star)
 
         Hexagon(
             x=1, y=0.5, height=2,
@@ -3622,6 +3740,7 @@ The centre-shape can be shifted from the centre by setting values for
 
 Example 3. Customised Centres
 +++++++++++++++++++++++++++++
+`↑ <coreCentreShape_>`_
 
 .. |cs2| image:: images/customised/shape_centred_custom.png
    :width: 330
@@ -3688,5 +3807,83 @@ and this shape itself can be customised.
       These various shapes and their custom properties are described
       elsewhere in the documentation; this example just serves to show
       how they can be used together.
+
+===== ======
+
+.. _coreCentreShapes:
+
+Centre Shapes
+~~~~~~~~~~~~~
+`^ <shapes-common-properties_>`_
+
+Any shape that can be defined using its centre, may have multiple shapes |dash|
+called "centre shapes" |dash| placed inside of it.
+
+These shapes are supplied as a list of sets; for example ``[(shape1), (shape2)]``
+
+.. NOTE::
+
+   In terms of drawing order, the  "centre shapes" are drawn after most of the
+   shape's other properties: only a dot, cross or label (if any of these are
+   defined) will be drawn superimposed on the centre shapes.
+
+Example 1. Centres
+++++++++++++++++++
+
+.. |ss1| image:: images/customised/shapes_centred.png
+   :width: 330
+
+Any centre-shape can be shifted from the centre by setting values for
+the change in ``x`` and ``y`` values as part of the set.
+
+===== ======
+|ss1| This example shows centre shapes constructed as follows:
+
+      .. code:: python
+
+        small_dot = dot(dot_point=4, fill="red")
+        big_dot = dot(dot_point=8)
+
+        Hexagon(
+            x=0.5, y=0.5, height=1,
+            centre_shapes=[
+                (small_dot), (big_dot, 0.2, 0.2)])
+        Rhombus(
+            x=2.4, y=0.3,
+            height=1.5, width=1.25,
+            centre_shapes=[
+                (small_dot), (big_dot, 0.2, 0.2)])
+        Rectangle(
+            x=0.5, y=2.5,
+            height=1, width=1.25,
+            centre_shapes=[
+                (small_dot), (big_dot, 0.2, 0.2)])
+        Circle(
+            cx=3, cy=3,
+            radius=0.5,
+            centre_shapes=[
+                (small_dot), (big_dot, 0.2, 0.2)])
+        Polygon(
+            cx=1, cy=5,
+            radius=0.5, sides=8,
+            centre_shapes=[
+                (small_dot), (big_dot, 0.2, 0.2)])
+        EquilateralTriangle(
+            x=2.35, y=5.5, side=1.25,
+            centre_shapes=[
+                (small_dot), (big_dot, 0.2, 0.2)])
+
+      At the start, two Dot shapes are defined by the lowercase ``dot()``
+
+      A lowercase command means the shapes are not drawn at this time but
+      assigned to named values and can be referred to further on.
+
+      Each of the other shapes in the script can now use these named shapes
+      as their ``centre_shapes``.
+
+      The ``small_dot`` (which is red )is used "as is" and so by default is
+      drawn at the centre of its parent shape; the ``big_dot`` is given offset
+      values for the x and y positions - so is drawn below and to the right
+      of centre.
 
 ===== ======

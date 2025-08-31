@@ -17,8 +17,8 @@ will demonstrate full scalability.
 - `A Clock`_
 - `Chords`_
 - `Rondel`_
-- `Miscellaneous Objects 1`_
-- `Miscellaneous Objects 2`_
+- `Miscellaneous Things 1`_
+- `Miscellaneous Things 2`_
 - `World Clocks`_
 
 A Clock
@@ -70,39 +70,40 @@ Screenshot  .. image:: images/various/clock.png
                :width: 50%
 =========== ==================================================================
 
-Miscellaneous Objects 1
-=======================
+
+Miscellaneous Things 1
+======================
 `↑ <table-of-contents-exvar_>`_
 
 =========== ==================================================================
-Title       *Miscellaneous Objects #1*
+Title       *Miscellaneous Things #1*
 ----------- ------------------------------------------------------------------
 Script      `objects.py <https://github.com/gamesbook/protograf/blob/master/examples/various/objects.py>`_
 ----------- ------------------------------------------------------------------
 Discussion  The first page of this set of examples shows how to construct
-            various "compound" shapes by making use of various properties of
+            various "compound" shapes by making use of special properties of
             different shapes.
 ----------- ------------------------------------------------------------------
 Screenshot  .. image:: images/various/objects_1.png
-               :width: 80%
+               :width: 90%
 =========== ==================================================================
 
 
-Miscellaneous Objects 2
-=======================
+Miscellaneous Things 2
+======================
 `↑ <table-of-contents-exvar_>`_
 
 =========== ==================================================================
-Title       *Miscellaneous Objects #2*
+Title       *Miscellaneous Things #2*
 ----------- ------------------------------------------------------------------
 Script      `objects.py <https://github.com/gamesbook/protograf/blob/master/examples/various/objects.py>`_
 ----------- ------------------------------------------------------------------
 Discussion  The second page of this set of examples shows how to construct
-            various "compound" shapes by making use of various properties of
+            various "compound" shapes by making use of special properties of
             different shapes.
 ----------- ------------------------------------------------------------------
 Screenshot  .. image:: images/various/objects_2.png
-               :width: 80%
+               :width: 90%
 =========== ==================================================================
 
 
