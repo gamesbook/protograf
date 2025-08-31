@@ -1019,7 +1019,8 @@ class DeckOfCards:
             globals_page = copy(globals.page)
             gutter = tools.as_float(kwargs.get("gutter", 0.0), "gutter")
             # ---- pymupdf: new file, doc, page, shape/canvas
-            gutter_filename = os.path.join(globals.pargs.directory, "gutter.pdf")
+            cache_directory = Path(Path.home() / CACHE_DIRECTORY)
+            gutter_filename = os.path.join(cache_directory, "gutter.pdf")
             globals.filename = gutter_filename
             globals.document = pymupdf.open()  # pymupdf Document
 
@@ -1259,7 +1260,8 @@ class DeckOfCards:
             # ---- delete extra blank page at the end
             globals.document.delete_page(globals.page_count)
             # ---- delete gutter PDF document
-            os.remove(gutter_filename)
+            if os.path.exists(gutter_filename):
+                os.remove(gutter_filename)
         else:
             pass
 
@@ -1712,7 +1714,7 @@ def Save(**kwargs):
         globals.directory = directory
     else:
         globals.directory = os.getcwd()
-    # print(f'$$$ {globals.directory=}')
+    # print(f'$$$ SAVE {globals.directory=}')
     if not os.path.exists(globals.directory):
         feedback(
             f'Cannot find the directory "{globals.directory}" - please create this first.',
@@ -1742,7 +1744,7 @@ def Save(**kwargs):
     msg = "Please check the folder exists and that you have access rights."
     the_filename = local_filename or globals.filename
     output_filepath = os.path.join(globals.directory, the_filename)
-    # print(f'$$$ {output_filepath=}')
+    # print(f'$$$ SAVE {output_filepath=}')
     try:
         globals.document.subset_fonts(verbose=True)  # subset fonts to reduce file size
         globals.document.save(output_filepath)
