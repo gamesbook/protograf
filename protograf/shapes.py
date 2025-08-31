@@ -978,9 +978,7 @@ class CircleShape(BaseShape):
                     base_ordering, self.order_first, start=True
                 )
             if self.order_last:
-                ordering = tools.list_ordering(
-                    base_ordering, self.order_last, end=True
-                )
+                ordering = tools.list_ordering(base_ordering, self.order_last, end=True)
         # feedback(f'*** Circle: {ordering=}')
 
         # ---- ORDERING
@@ -2762,9 +2760,7 @@ class HexShape(BaseShape):
                     base_ordering, self.order_first, start=True
                 )
             if self.order_last:
-                ordering = tools.list_ordering(
-                    base_ordering, self.order_last, end=True
-                )
+                ordering = tools.list_ordering(base_ordering, self.order_last, end=True)
         # feedback(f'*** Hexagon: {ordering=}')
 
         # ---- ORDERING
@@ -2786,7 +2782,11 @@ class HexShape(BaseShape):
                         if key + 1 != len(self.vertexes):
                             vertex1 = self.vertexes[key + 1]
                             caltrop_points = self.calculate_caltrop_lines(
-                                vertex0, vertex1, self.side, self.caltrops, self.caltrops_invert
+                                vertex0,
+                                vertex1,
+                                self.side,
+                                self.caltrops,
+                                self.caltrops_invert,
                             )
                             if self.caltrops_invert:
                                 cnv.draw_line(caltrop_points[0], caltrop_points[1])
@@ -2810,7 +2810,9 @@ class HexShape(BaseShape):
                             self.borders,
                         ]
                     if not isinstance(self.borders, list):
-                        feedback('The "borders" property must be a list of sets or a set')
+                        feedback(
+                            'The "borders" property must be a list of sets or a set'
+                        )
                     for border in self.borders:
                         self.draw_border(cnv, border, ID)  # BaseShape
             if item == "shades":
@@ -2847,7 +2849,9 @@ class HexShape(BaseShape):
                 # ---- * draw hatches
                 if self.hatch_count:
                     if not self.hatch_count & 1:
-                        feedback("Hatch count must be an odd number for a Hexagon", True)
+                        feedback(
+                            "Hatch count must be an odd number for a Hexagon", True
+                        )
                     self.draw_hatch(cnv, ID, geo.side, self.vertexes, self.hatch_count)
             if item == "links":
                 # ---- * draw links
@@ -2879,7 +2883,9 @@ class HexShape(BaseShape):
                     self.draw_centred_shapes(self.centre_shapes, self.x_d, self.y_d)
             if item == "cross":
                 # ---- * cross
-                self.draw_cross(cnv, self.x_d, self.y_d, rotation=kwargs.get("rotation"))
+                self.draw_cross(
+                    cnv, self.x_d, self.y_d, rotation=kwargs.get("rotation")
+                )
             if item == "dot":
                 # ---- * dot
                 self.draw_dot(cnv, self.x_d, self.y_d)
@@ -2892,7 +2898,9 @@ class HexShape(BaseShape):
                 # ---- * numbering
                 self.set_coord(cnv, self.x_d, self.y_d, geo.half_flat)
                 # ---- * set grid property
-                self.grid = GridShape(label=self.coord_text, x=self.x_d, y=self.y_d, shape=self)
+                self.grid = GridShape(
+                    label=self.coord_text, x=self.x_d, y=self.y_d, shape=self
+                )
 
         # ---- debug
         # self._debug(cnv, Point(x, y), 'start')
@@ -4247,7 +4255,6 @@ class RectangleShape(BaseShape):
             else:
                 self.vertexes.append(Point(x, y))
 
-
         # ---- * peaks vertices
         elif is_peaks:
             half_height = self._u.height / 2.0
@@ -4376,9 +4383,7 @@ class RectangleShape(BaseShape):
                     base_ordering, self.order_first, start=True
                 )
             if self.order_last:
-                ordering = tools.list_ordering(
-                    base_ordering, self.order_last, end=True
-                )
+                ordering = tools.list_ordering(base_ordering, self.order_last, end=True)
         # feedback(f'*** Rectangle: {ordering=}')
 
         # ---- ORDERING
@@ -4394,7 +4399,9 @@ class RectangleShape(BaseShape):
                     self._debug(cnv, vertices=self.vertexes)
                 else:
                     # feedback(f'*** RECT  normal {radius=} {kwargs=}')
-                    cnv.draw_rect((x, y, x + self._u.width, y + self._u.height), radius=radius)
+                    cnv.draw_rect(
+                        (x, y, x + self._u.width, y + self._u.height), radius=radius
+                    )
                     self.set_canvas_props(cnv=cnv, index=ID, **kwargs)
                     self._debug(cnv, vertices=self.vertexes)
                     # ---- * borders (override)
@@ -4404,7 +4411,9 @@ class RectangleShape(BaseShape):
                                 self.borders,
                             ]
                         if not isinstance(self.borders, list):
-                            feedback('The "borders" property must be a list of sets or a set')
+                            feedback(
+                                'The "borders" property must be a list of sets or a set'
+                            )
                         for border in self.borders:
                             self.draw_border(cnv, border, ID)  # BaseShape
             if item == "pattern":
@@ -4442,7 +4451,9 @@ class RectangleShape(BaseShape):
                     # if 'rotation' in kwargs.keys():
                     #     kwargs.pop('rotation')
                     vertices = self.get_vertexes(**kwargs)
-                    self.draw_hatch(cnv, ID, vertices, self.hatch_count, rotation=rotation)
+                    self.draw_hatch(
+                        cnv, ID, vertices, self.hatch_count, rotation=rotation
+                    )
             if item == "centre_shape" or item == "center_shape":
                 # ---- * centre shape (with offset)
                 if self.centre_shape:

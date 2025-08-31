@@ -724,7 +724,9 @@ def list_ordering(
     for item in changes:
         if item not in base:
             allowed = ", ".join(base)
-            feedback(f'Ordering values must be any of: "{allowed}" - not "{item}"', True)
+            feedback(
+                f'Ordering values must be any of: "{allowed}" - not "{item}"', True
+            )
     # first
     if start:
         combined_list = changes + base
