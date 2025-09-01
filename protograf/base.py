@@ -1542,7 +1542,8 @@ class BaseShape:
             for item in self.prows:
                 if not isinstance(item, tuple):
                     feedback(
-                        f'Each item in prows must be a set (not "{item}")!', True,
+                        f'Each item in prows must be a set (not "{item}")!',
+                        True,
                     )
                 try:
                     _dir = item[0]
