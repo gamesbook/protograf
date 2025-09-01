@@ -4056,6 +4056,7 @@ class RectangleShape(BaseShape):
         is_notched = True if (self.notch or self.notch_x or self.notch_y) else False
         is_chevron = True if (self.chevron or self.chevron_height) else False
         is_peaks = True if self.peaks else False
+        is_prows = True if self.prows else False
         is_borders = True if self.borders else False
         is_round = True if (self.rounding or self.rounded) else False
         if self.slices and (is_round or is_notched or is_peaks or is_chevron):
@@ -4068,6 +4069,8 @@ class RectangleShape(BaseShape):
             feedback("Cannot use rounding or rounded with chevron.", True)
         if is_round and is_peaks:
             feedback("Cannot use rounding or rounded with peaks.", True)
+        if is_round and is_prows:
+            feedback("Cannot use rounding or rounded with prows.", True)
         if self.hatch_count and is_notched and self.hatch_count > 1:
             feedback("Cannot use multiple hatches with notch.", True)
         if self.hatch_count and is_chevron:
@@ -4080,8 +4083,14 @@ class RectangleShape(BaseShape):
             feedback("Cannot use chevron and peaks together.", True)
         if self.hatch_count and is_peaks:
             feedback("Cannot use hatch_count and peaks together.", True)
-        if is_borders and (is_chevron or is_peaks or is_notched):
-            feedback("Cannot use borders with any of: hatch, peaks or chevron.", True)
+        if is_notched and is_prows:
+            feedback("Cannot use notch and prows together.", True)
+        if is_chevron and is_prows:
+            feedback("Cannot use chevron and prows together.", True)
+        if self.hatch_count and is_prows:
+            feedback("Cannot use hatch_count and prows together.", True)
+        if is_borders and (is_chevron or is_peaks or is_notched or is_prows):
+            feedback("Cannot use borders with any of: hatch, peaks or chevron or prows.", True)
         # ---- calculate properties
         x, y = self.calculate_xy()
         # feedback(f'*** RECT      {self.col=} {self.row=} {x=} {y=}')
@@ -4255,6 +4264,63 @@ class RectangleShape(BaseShape):
             else:
                 self.vertexes.append(Point(x, y))
 
+        # ---- * prows - line/arc endpoints
+        elif is_prows:
+            # NB! cheating here... "point" actually stores the offset from the side!
+            for key, data in self.prows_dict.items():
+                _prow = {}
+                _prow["height"] = self.unit(1, label="prow height")
+                if len(data) == 0:
+                    if key in ["w", "e"]:
+                        _prow["point"] = Point(self.unit(1), self._u.height / 2.)
+                    if key in ["n", "s"]:
+                        _prow["point"] = Point(self._u.width / 2., self.unit(1))
+                if len(data) >= 1:
+                    _prow["height"] = self.unit(data[0], label="prow height")
+                if len(data) >= 2:
+                    _prow["point"] = Point(
+                        self.unit(data[1][0]), self.unit(data[1][1]))
+                self.prows_dict[key] = _prow
+
+            self.lines = []
+            # print(f'*** {self.prows_dict=}')
+            if "w" in self.prows_dict.keys():
+                prow = self.prows_dict["w"]
+                # top curve
+                self.lines.append([
+                    Point(x, y),
+                    Point(x - prow["point"].x, y + self._u.height / 2. - prow["point"].y),
+                    Point(x - prow["height"], y + self._u.height / 2.)
+                ])
+                # bottom curve
+                self.lines.append([
+                    Point(x - prow["height"], y + self._u.height / 2.),
+                    Point(x - prow["point"].x, y + self._u.height / 2. + prow["point"].y),
+                    Point(x, y + self._u.height)
+                ])
+            else:
+                self.lines.append([
+                    Point(x, y),
+                    Point(x, y + self._u.height)])
+            if "s" in self.prows_dict.keys():
+                pass
+            else:
+                self.lines.append([
+                    Point(x, y + self._u.height),
+                    Point(x + self._u.width, y + self._u.height)])
+            if "e" in self.prows_dict.keys():
+                pass
+            else:
+                self.lines.append([
+                    Point(x + self._u.width, y + self._u.height),
+                    Point(x + self._u.width, y)])
+            if "n" in self.prows_dict.keys():
+                pass
+            else:
+                self.lines.append([
+                    Point(x + self._u.width, y),
+                    Point(x, y)])  # line back to start
+
         # ---- * peaks vertices
         elif is_peaks:
             half_height = self._u.height / 2.0
@@ -4397,6 +4463,16 @@ class RectangleShape(BaseShape):
                     kwargs["closed"] = True
                     self.set_canvas_props(cnv=cnv, index=ID, **kwargs)
                     self._debug(cnv, vertices=self.vertexes)
+                elif is_prows:
+                    for line in self.lines:
+                        if len(line) == 2:
+                            print('*** PROWS  line', line[0], line[1])
+                            cnv.draw_line(line[0], line[1])
+                        if len(line) == 3:
+                            print('*** PROWS curve', line[0], line[1], line[2])
+                            cnv.draw_curve(line[0], line[1], line[2])
+                    kwargs["closed"] = True
+                    self.set_canvas_props(cnv=cnv, index=ID, **kwargs)
                 else:
                     # feedback(f'*** RECT  normal {radius=} {kwargs=}')
                     cnv.draw_rect(

@@ -18,6 +18,7 @@ Icons, Art and Images
 -  https://game-icons.net/
 -  https://publicdomainicons.firebaseapp.com/icons
 -  https://creazilla.com/
+-  https://www.irasutoya.com/
 -  https://bioart.niaid.nih.gov/ - medical, biological, animal and "various"
    in PNG and SVG formats
 -  https://thenounproject.com/ (some free, provided they are attributed)

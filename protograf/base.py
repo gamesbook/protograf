@@ -373,6 +373,8 @@ class BaseCanvas:
         self.chevron_height = kwargs.get("chevron_height", 0)
         self.peaks = kwargs.get("peaks", [])
         self.peaks_dict = {}
+        self.prows = kwargs.get("prows", [])
+        self.prows_dict = {}
         self.borders = kwargs.get("borders", [])
         self.rounded_radius = self.defaults.get(
             "rounded_radius", 0.05
@@ -875,6 +877,8 @@ class BaseShape:
         )
         self.peaks = kwargs.get("peaks", base.peaks)
         self.peaks_dict = {}
+        self.prows = kwargs.get("prows", base.prows)
+        self.prows_dict = {}
         self.borders = kwargs.get("borders", base.borders)
         self.rounded_radius = base.rounded_radius
         # ---- rectangle / rhombus/ hexagon / circle
@@ -1527,9 +1531,36 @@ class BaseShape:
                         self.peaks_dict["w"] = value
                         self.peaks_dict["s"] = value
                     else:
-                        self.peaks_dict[_dir] = value
+                        if not self.peaks_dict.get(_dir):
+                            self.peaks_dict[_dir] = value
                 except Exception:
                     feedback(f'The peaks setting "{point}" is not valid!', True)
+        # ---- rectangle - prows
+        if self.prows:
+            if not isinstance(self.prows, list):
+                feedback(f"The prows '{self.prows}' is not a valid list!", True)
+            for item in self.prows:
+                if not isinstance(item, tuple):
+                    feedback(
+                        f'Each item in prows must be a set (not "{item}")!', True,
+                    )
+                try:
+                    _dir = item[0]
+                    if _lower(_dir) not in ["n", "e", "w", "s", "*"]:
+                        feedback(
+                            f'The prows direction must be one of n, e, s, w (not "{_dir}")!',
+                            True,
+                        )
+                    if _dir == "*":
+                        self.prows_dict["n"] = item[1:] if len(item) > 1 else []
+                        self.prows_dict["e"] = item[1:] if len(item) > 1 else []
+                        self.prows_dict["w"] = item[1:] if len(item) > 1 else []
+                        self.prows_dict["s"] = item[1:] if len(item) > 1 else []
+                    else:
+                        if not self.prows_dict.get(_dir):
+                            self.prows_dict[_dir] = item[1:] if len(item) > 1 else []
+                except Exception:
+                    feedback(f'The prows setting "{point}" is not valid!', True)
 
         return correct, issue
 
@@ -1592,7 +1623,7 @@ class BaseShape:
             width_height (tuple):
                 the (width, height) of the output frame for the image;
                 will be used along with x,y to set size and position;
-                will be recalcuated if image is rotated
+                will be recalculated if image has a rotation
             cache_directory (str):
                 where to store a local for copy for URL-sourced images
             rotation (float):
@@ -1705,7 +1736,7 @@ class BaseShape:
             return image_local
 
         def image_bbox_resize(bbox: muRect, img_path: str, rotation: float) -> muRect:
-            """Recompute bounding Rect for a rotated image to maintain image size.
+            """Recompute bounding Rect for image with rotation to maintain image size.
 
             Args
                 bbox: pymupdf Rect; original bounding box for the image
@@ -1718,11 +1749,11 @@ class BaseShape:
                 return bbox
             # Compute Rect center point
             center = (bbox.tl + bbox.br) / 2
-            # Define the desired rotation matrix
+            # Define the desired rotation Matrix
             matrx = Matrix(rotation)
-            # Compute the tetragon (Quad) for the Rect rotated around its center `
+            # Compute the tetragon (Quad) for the Rect rotation (around its center)
             quad = bbox.morph(center, matrx)
-            # Compute the rectangle hull of the quad for new boundary box
+            # Compute the rectangle hull of the Quad for new boundary box
             new_bbox = quad.rect
             # Check image dimensions and ratios
             try:
