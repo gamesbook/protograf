@@ -596,6 +596,7 @@ that it can be customised.
 - `Hatch <rectHatch_>`_
 - `Notch <rectNotch_>`_
 - `Peak <rectPeak_>`_
+- `Prows <rectProws_>`_
 - `Rotation <rectRotation_>`_
 - `Rounding <rectRounding_>`_
 - `Slices <rectSlices_>`_
@@ -926,6 +927,102 @@ a specified direction.
       meaning that peaks should drawn in all four directions.
 
 ===== ======
+
+.. _rectProws:
+
+Prows
+-----
+`^ <rectangleIndex_>`_
+
+A prow is a pair of curved lines that jut out from the side of a Rectangle in
+a specified direction to a specifed distance.
+
+Example 1. Defaults etc.
+++++++++++++++++++++++++
+
+.. |rw1| image:: images/custom/rectangle/prows_defaults.png
+   :width: 330
+
+===== ======
+|rw1| This example shows Rectangles constructed using these commands:
+
+      .. code:: python
+
+        Rectangle(
+            cx=1, cy=1, width=1, height=1,
+            prows=[("e",)]
+        )
+        Rectangle(
+            cx=1, cy=3, width=1, height=1,
+            prows=[("n", 0.5)]
+        )
+        Rectangle(
+            cx=3, cy=3, width=1, height=1,
+            fill="silver",
+            prows=[("*", -0.1)]
+        )
+        Rectangle(
+            cx=1, cy=5, width=1, height=1,
+            prows=[("*", 0.8, (0.3, 0.45))]
+        )
+        Rectangle(
+            cx=3, cy=5, width=1, height=1,
+            fill="gold",
+            prows=[("*", -0.8, (-0.3, -0.45))]
+        )
+
+===== ======
+
+Example 2. Inwards
+++++++++++++++++++
+
+.. |rw2| image:: images/custom/rectangle/prows_inwards.png
+   :width: 330
+
+===== ======
+|rw2| This example shows a Rectangle constructed using these properties:
+
+      .. code:: python
+
+        Rectangle(
+            x=1.5, y=2, width=1, height=2,
+            fill="gold",
+            stroke="orange",
+            stroke_width=2,
+            prows=[
+                ("n", 2, (0.22, 0.22)),
+                ("s", 2, (0.22, 0.22)),
+                ("e", 1.5, (0.33, 0.33)),
+                ("w", 1.5, (0.33, 0.33)),
+            ]
+        )
+
+===== ======
+
+Example 3. Outwards
++++++++++++++++++++
+
+.. |rw3| image:: images/custom/rectangle/prows_outwards.png
+   :width: 330
+
+===== ======
+|rw3| This example shows a Rectangle constructed using these properties:
+
+      .. code:: python
+
+        Rectangle(
+            x=1.5, y=2, width=1, height=3,
+            fill="silver",
+            stroke="darkgrey",
+            stroke_width=2,
+            prows=[
+                ("n", 1, (0.44, 0.44)),
+                ("s", 0.2, (0.2, 0.2)),
+            ]
+        )
+
+===== ======
+
 
 .. _rectRotation:
 

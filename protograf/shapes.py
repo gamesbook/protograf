@@ -4273,13 +4273,13 @@ class RectangleShape(BaseShape):
             for key, data in self.prows_dict.items():
                 _prow = {}
                 _prow["height"] = self.unit(1, label="prow height")
-                if len(data) == 0:
-                    if key in ["w", "e"]:
-                        _prow["point"] = Point(self.unit(1), self._u.height / 2.0)
-                    if key in ["n", "s"]:
-                        _prow["point"] = Point(self._u.width / 2.0, self.unit(1))
                 if len(data) >= 1:
                     _prow["height"] = self.unit(data[0], label="prow height")
+                if len(data) < 2:
+                    if key in ["w", "e"]:
+                        _prow["point"] = Point(_prow["height"], self._u.height / 2.0)
+                    if key in ["n", "s"]:
+                        _prow["point"] = Point(self._u.width / 2.0, _prow["height"])
                 if len(data) >= 2:
                     _prow["point"] = Point(self.unit(data[1][0]), self.unit(data[1][1]))
                 self.prows_dict[key] = _prow
@@ -4313,7 +4313,29 @@ class RectangleShape(BaseShape):
             else:
                 self.lines.append([Point(x, y), Point(x, y + self._u.height)])
             if "s" in self.prows_dict.keys():
-                pass
+                prow = self.prows_dict["s"]
+                # left-hand curve
+                self.lines.append(
+                    [
+                        Point(x, y + self._u.height),
+                        Point(
+                            x + self._u.width / 2.0 - prow["point"].x,
+                            y + self._u.height + prow["point"].y,
+                        ),
+                        Point(x + self._u.width / 2., y + self._u.height + prow["height"]),
+                    ]
+                )
+                # right-hand curve
+                self.lines.append(
+                    [
+                        Point(x + self._u.width / 2., y + self._u.height + prow["height"]),
+                        Point(
+                            x + self._u.width / 2.0 + prow["point"].x,
+                            y + self._u.height + prow["point"].y,
+                        ),
+                        Point(x + self._u.width, y + self._u.height),
+                    ]
+                )
             else:
                 self.lines.append(
                     [
@@ -4322,7 +4344,29 @@ class RectangleShape(BaseShape):
                     ]
                 )
             if "e" in self.prows_dict.keys():
-                pass
+                prow = self.prows_dict["e"]
+                # bottom curve
+                self.lines.append(
+                    [
+                        Point(x + self._u.width, y + self._u.height),
+                        Point(
+                            x + self._u.width + prow["point"].x,
+                            y + self._u.height / 2.0 + prow["point"].y,
+                        ),
+                        Point(x + self._u.width + prow["height"], y + self._u.height / 2.0),
+                    ]
+                )
+                # top curve
+                self.lines.append(
+                    [
+                        Point(x + self._u.width + prow["height"], y + self._u.height / 2.0),
+                        Point(
+                            x + self._u.width + prow["point"].x,
+                            y + self._u.height / 2.0 - prow["point"].y,
+                        ),
+                        Point(x + self._u.width, y),
+                    ]
+                )
             else:
                 self.lines.append(
                     [
@@ -4331,7 +4375,29 @@ class RectangleShape(BaseShape):
                     ]
                 )
             if "n" in self.prows_dict.keys():
-                pass
+                prow = self.prows_dict["n"]
+                # right-hand curve
+                self.lines.append(
+                    [
+                        Point(x + self._u.width, y),
+                        Point(
+                            x + self._u.width / 2.0 + prow["point"].x,
+                            y - prow["point"].y,
+                        ),
+                        Point(x + self._u.width / 2., y - prow["height"]),
+                    ]
+                )
+                # left-hand curve
+                self.lines.append(
+                    [
+                        Point(x + self._u.width / 2., y - prow["height"]),
+                        Point(
+                            x + self._u.width / 2.0 - prow["point"].x,
+                            y - prow["point"].y,
+                        ),
+                        Point(x, y),
+                    ]
+                )
             else:
                 self.lines.append(
                     [Point(x + self._u.width, y), Point(x, y)]
@@ -4482,10 +4548,10 @@ class RectangleShape(BaseShape):
                 elif is_prows:
                     for line in self.lines:
                         if len(line) == 2:
-                            print("*** PROWS  line", line[0], line[1])
+                            # print("*** PROWS  line", line[0], line[1])
                             cnv.draw_line(line[0], line[1])
                         if len(line) == 3:
-                            print("*** PROWS curve", line[0], line[1], line[2])
+                            # print("*** PROWS curve", line[0], line[1], line[2])
                             cnv.draw_curve(line[0], line[1], line[2])
                     kwargs["closed"] = True
                     self.set_canvas_props(cnv=cnv, index=ID, **kwargs)

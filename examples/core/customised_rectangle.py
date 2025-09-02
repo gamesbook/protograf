@@ -222,6 +222,61 @@ Rectangle(
     slices_stroke="#767982")
 PageBreak()
 
+# ---- prows
+Blueprint(stroke_width=0.5)
+Text(common=txt, text='Prow: defaults+')
+Rectangle(
+    cx=1, cy=1, width=1, height=1,
+    prows=[("e",)]
+)
+Rectangle(
+    cx=1, cy=3, width=1, height=1,
+    prows=[("n", 0.5)]
+)
+Rectangle(
+    cx=3, cy=3, width=1, height=1,
+    fill="silver",
+    prows=[("*", -0.1)]
+)
+Rectangle(
+    cx=1, cy=5, width=1, height=1,
+    prows=[("*", 0.8, (0.3, 0.45))]
+)
+Rectangle(
+    cx=3, cy=5, width=1, height=1,
+    fill="gold",
+    prows=[("*", -0.8, (-0.3, -0.45))]
+)
+PageBreak()
+
+Blueprint(stroke_width=0.5)
+Text(common=txt, text='Prow: "inwards" (star)')
+Rectangle(
+    x=1.5, y=2, width=1, height=2,
+    fill="gold",
+    stroke="orange", stroke_width=2,
+    prows=[
+        ("n", 2, (0.22, 0.22)),
+        ("s", 2, (0.22, 0.22)),
+        ("e", 1.5, (0.33, 0.33)),
+        ("w", 1.5, (0.33, 0.33)),
+    ]
+)
+PageBreak()
+
+Blueprint(stroke_width=0.5)
+Text(common=txt, text='Prow: "outwards" (ship)')
+Rectangle(
+    x=1.5, y=2, width=1, height=3,
+    fill="silver",
+    stroke="darkgrey", stroke_width=2,
+    prows=[
+        ("n", 1, (0.44, 0.44)),
+        ("s", 0.2, (0.2, 0.2)),
+    ]
+)
+PageBreak()
+
 # ---- END
 Text(common=txt, text="Rectangle END...")
 
@@ -234,4 +289,5 @@ Save(
         "centre", "notch", "dot_cross", "hatch", "rounding", "chevron",
         "peak", "rotation", "notch_style", "borders",
         "slices", "slices_custom",
+        "prows_defaults", "prows_inwards", "prows_outwards",
         None])
