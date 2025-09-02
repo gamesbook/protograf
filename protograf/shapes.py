@@ -4322,13 +4322,17 @@ class RectangleShape(BaseShape):
                             x + self._u.width / 2.0 - prow["point"].x,
                             y + self._u.height + prow["point"].y,
                         ),
-                        Point(x + self._u.width / 2., y + self._u.height + prow["height"]),
+                        Point(
+                            x + self._u.width / 2.0, y + self._u.height + prow["height"]
+                        ),
                     ]
                 )
                 # right-hand curve
                 self.lines.append(
                     [
-                        Point(x + self._u.width / 2., y + self._u.height + prow["height"]),
+                        Point(
+                            x + self._u.width / 2.0, y + self._u.height + prow["height"]
+                        ),
                         Point(
                             x + self._u.width / 2.0 + prow["point"].x,
                             y + self._u.height + prow["point"].y,
@@ -4353,13 +4357,17 @@ class RectangleShape(BaseShape):
                             x + self._u.width + prow["point"].x,
                             y + self._u.height / 2.0 + prow["point"].y,
                         ),
-                        Point(x + self._u.width + prow["height"], y + self._u.height / 2.0),
+                        Point(
+                            x + self._u.width + prow["height"], y + self._u.height / 2.0
+                        ),
                     ]
                 )
                 # top curve
                 self.lines.append(
                     [
-                        Point(x + self._u.width + prow["height"], y + self._u.height / 2.0),
+                        Point(
+                            x + self._u.width + prow["height"], y + self._u.height / 2.0
+                        ),
                         Point(
                             x + self._u.width + prow["point"].x,
                             y + self._u.height / 2.0 - prow["point"].y,
@@ -4384,13 +4392,13 @@ class RectangleShape(BaseShape):
                             x + self._u.width / 2.0 + prow["point"].x,
                             y - prow["point"].y,
                         ),
-                        Point(x + self._u.width / 2., y - prow["height"]),
+                        Point(x + self._u.width / 2.0, y - prow["height"]),
                     ]
                 )
                 # left-hand curve
                 self.lines.append(
                     [
-                        Point(x + self._u.width / 2., y - prow["height"]),
+                        Point(x + self._u.width / 2.0, y - prow["height"]),
                         Point(
                             x + self._u.width / 2.0 - prow["point"].x,
                             y - prow["point"].y,
