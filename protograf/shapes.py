@@ -3817,7 +3817,11 @@ class RectangleShape(BaseShape):
             p3 = p2
             cnv.draw_line(p1, p3)
         if "SE" in _notches:
-            pass
+            p4 = Point(x + self._u.width - n_x, y + self._u.height)
+            p5 = Point(x + self._u.width, y + self._u.height - n_y)
+            pm = Point(x + self._u.width - n_x, y + self._u.height - n_y)
+            cnv.draw_line(p3, p4)
+            cnv.draw_curve(p4, pm, p5)
         else:
             p4 = Point(x + self._u.width, y + self._u.height)
             p5 = p4
