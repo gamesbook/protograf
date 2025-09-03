@@ -787,7 +787,7 @@ Notch
 `^ <rectangleIndex_>`_
 
 Notches are small indents |dash| or outdents |dash| that are drawn in the
-corners of the Rectangle.
+specified corners of the Rectangle.
 
 .. |rnt| image:: images/custom/rectangle/notch.png
    :width: 330
@@ -823,7 +823,8 @@ Example 1. Size & Location
       The first Rectangle has:
 
       - *notch* - the size of the triangular shape that will be "cut" off the
-        corners of the rectangle
+        corners of the rectangle'; because no *notch_corners* property is set,
+        **all** corners will have a notch
 
       The second Rectangle has:
 
@@ -831,8 +832,8 @@ Example 1. Size & Location
         notch will start
       - *notch_y* - the distance from the corner in the y-direction where the
         notch will start
-      - *notch_corners* - the specific corners of the rectangle where the notch
-        will be applied
+      - *notch_corners* - the locations (compass direction) of the specific
+        corner or corners of the rectangle where the notch will be applied
 
 ===== ======
 
@@ -852,14 +853,18 @@ Example 2. Styles
           common=styles, y=0,  notch_style='snip',
           label='Notch: snip (s)')
         Rectangle(
-          common=styles, y=1.5, notch_style='step',
+          common=styles, y=1.25, notch_style='step',
           label='Notch: step (t)')
         Rectangle(
-          common=styles, y=3, notch_style='fold',
+          common=styles, y=3.5, notch_style='fold',
           label='Notch: fold (o)')
         Rectangle(
-          common=styles, y=4.5, notch_style='flap',
+          common=styles, y=4.25, notch_style='flap',
           label='Notch: flap (l)')
+        Rectangle(
+          common=styles,
+          y=5.0, notch_style='bite',
+          label='Notch: bite (b)')
 
       These Rectangles all share the following Common properties that differ from the
       defaults:
@@ -869,12 +874,14 @@ Example 2. Styles
       - *fill* - set to the color ``lightsteelblue``
       - *notch* - size of notch, in terms of distance from the corner
 
-      Each *notch_style* results in a slightly different effect:
+      Each *notch_style* results in a slightly different corner effect:
 
       - *snip* - is a small triangle "cut out"; this is the default style
       - *step* - is sillohette of a step "cut out"
       - *fold* - makes it appear there is a crease across the corner
       - *flap* - makes it appear that the corner has a small, liftable flap
+      - *bite* - a curved portion is "cut out"; this will be a quarter-circle
+        if *notch_x* and *notch_y* are equal
 
 ===== ======
 
@@ -934,8 +941,29 @@ Prows
 -----
 `^ <rectangleIndex_>`_
 
-A prow is a pair of curved lines that jut out from the side of a Rectangle in
-a specified direction to a specifed distance.
+A *prow* is a pair of curved lines that jut out from the side of a Rectangle
+in a specified direction to a specifed distance.
+
+The *prow* property is a list of one or more sets of values |dash|
+``[(..), (...), ...]``.
+
+Each set **must** start with a compass direction |dash| n, s, e, or w |dash|
+indicating at which side the prow must be drawn. Using a value of ``"*"``
+means that the prow will be drawn in all directions.
+
+The default *prow* will be two curves extending to a point ``1`` unit away
+from the edge of the rectangle.
+
+A set can also contain the *prow* height |dash| the distance away from the
+from the edge of the rectangle.
+
+Finally, a set can contain a pair of values that represent the positioning of
+a "control" point that will change the amount of the curvature of the prow
+lines.  This pair is: the *x* distance relative to the perpendicular line
+through the centre of the edge; and the *y* distance relative to the edge
+|dash| for top- and bottom edges; and vice-versa for the vertical edges.
+Both height and control values can be negative which will affect the direction
+of drawing.
 
 Example 1. Defaults etc.
 ++++++++++++++++++++++++
@@ -971,6 +999,25 @@ Example 1. Defaults etc.
             prows=[("*", -0.8, (-0.3, -0.45))]
         )
 
+      The top rectangle has a single prow extending in the east direction;
+      this has a default distance of ``1`` cm away from the edge.
+
+      The middle-left rectangle has a single prow extending in the north
+      direction; this has a specified distance of ``0.5`` cm.  Because the
+      prow distance is equal to half the length of the edge, each curve of the
+      prow forms a quarter-circle and the prow as a whole forms a semi-circle.
+
+      The bottom-left rectangle has prows extending in all directions (``*``)
+      to a specified distance of ``0.8`` cm. The settings of *x* and *y*
+      values for the control point affect the shape of the prow curves.
+
+      The grey middle-right rectangle has a negative height of ``-0.1`` cm
+      for all directions and so all the lines are drawn inwards.
+
+      The yellow bottom-right rectangle has prows extending in all directions
+      and negative height and negative control point values.  This results in
+      the unusual pattern shown.
+
 ===== ======
 
 Example 2. Inwards
@@ -997,6 +1044,9 @@ Example 2. Inwards
             ]
         )
 
+      This example shows how an almost-seamless star-like shape can be formed
+      by appropriate setting of the control points for a rectangle.
+
 ===== ======
 
 Example 3. Outwards
@@ -1020,6 +1070,9 @@ Example 3. Outwards
                 ("s", 0.2, (0.2, 0.2)),
             ]
         )
+
+      This example shows how a ship-like shape can be formed by appropriate
+      setting of the heights and control points for a rectangle.
 
 ===== ======
 

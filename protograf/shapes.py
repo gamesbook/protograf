@@ -3827,13 +3827,20 @@ class RectangleShape(BaseShape):
             p5 = p4
             cnv.draw_line(p3, p5)
         if "NE" in _notches:
-            pass
+            p6 = Point(x + self._u.width, y + n_y)
+            p7 = Point(x + self._u.width - n_x, y)
+            pm = Point(x + self._u.width - n_x, y + n_y)
+            cnv.draw_line(p5, p6)
+            cnv.draw_curve(p6, pm, p7)
         else:
             p6 = Point(x + self._u.width, y)
             p7 = p6
             cnv.draw_line(p5, p7)
         if "NW" in _notches:
-            pass
+            p8 = Point(x + n_x, y)
+            pm = Point(x + n_x, y + n_y)
+            cnv.draw_line(p7, p8)
+            cnv.draw_curve(p8, pm, p1)
         else:
             cnv.draw_line(p7, p1)
 
