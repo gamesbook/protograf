@@ -365,12 +365,26 @@ class BaseCanvas:
         self.rounding = self.defaults.get("rounding", 0)
         self.rounded = self.defaults.get("rounded", False)  # also line end
         self.notch = self.defaults.get("notch", 0)
-        self.notch_corners = self.defaults.get("notch_corners", "sw nw ne se")
+        self.notch_directions = self.defaults.get("notch_directions", "sw nw ne se")
         self.notch_x = self.defaults.get("notch_x", 0)
         self.notch_y = self.defaults.get("notch_y", 0)
         self.notch_style = self.defaults.get("notch_style", "snip")
         self.chevron = self.defaults.get("chevron", "")
         self.chevron_height = kwargs.get("chevron_height", 0)
+        self.corner = self.defaults.get("corner", 0)
+        self.corner_directions = self.defaults.get("corner_directions", "sw nw ne se")
+        self.corner_x = self.defaults.get("corner_x", 0)
+        self.corner_y = self.defaults.get("corner_y", 0)
+        self.corner_style = self.defaults.get("corner_style", "line")
+        self.corner_stroke = self.defaults.get("corner_stroke", self.stroke)
+        self.corner_fill = self.defaults.get("corner_fill", self.fill)
+        self.corner_stroke_width = self.defaults.get(
+            "corner_stroke_width", self.stroke_width
+        )
+        self.corner_dotted = self.defaults.get("corner_dotted", None)
+        self.corner_ends = self.defaults.get("corner_ends", self.line_ends)
+        self.corner_dashed = self.defaults.get("corner_dashed", None)  # ---- OTHER
+
         self.peaks = kwargs.get("peaks", [])
         self.peaks_dict = {}
         self.prows = kwargs.get("prows", [])
@@ -867,7 +881,7 @@ class BaseShape:
         self.rounding = self.kw_float(kwargs.get("rounding", base.rounding))
         self.rounded = kwargs.get("rounded", base.rounded)  # also line end
         self.notch = self.kw_float(kwargs.get("notch", base.notch))
-        self.notch_corners = kwargs.get("notch_corners", base.notch_corners)
+        self.notch_directions = kwargs.get("notch_directions", base.notch_directions)
         self.notch_x = self.kw_float(kwargs.get("notch_x", base.notch_x))
         self.notch_y = self.kw_float(kwargs.get("notch_y", base.notch_y))
         self.notch_style = kwargs.get("notch_style", base.notch_style)
@@ -875,6 +889,21 @@ class BaseShape:
         self.chevron_height = self.kw_float(
             kwargs.get("chevron_height", base.chevron_height)
         )
+        self.corner = self.kw_float(kwargs.get("corner", base.corner))
+        self.corner_directions = kwargs.get("corner_directions", base.corner_directions)
+        self.corner_x = self.kw_float(kwargs.get("corner_x", base.corner_x))
+        self.corner_y = self.kw_float(kwargs.get("corner_y", base.corner_y))
+        self.corner_style = kwargs.get("corner_style", base.corner_style)
+        self.corner_stroke = kwargs.get("corner_stroke", base.corner_stroke)
+        self.corner_fill = kwargs.get("corner_fill", base.corner_fill)
+        self.corner_stroke_width = kwargs.get(
+            "corner_stroke_width", base.corner_stroke_width
+        )
+        self.corner_dotted = kwargs.get("corner_dotted", base.corner_dotted)
+        self.corner_ends = kwargs.get("corner_ends", base.corner_ends)
+        self.corner_dashed = kwargs.get(
+            "corner_dashed", base.corner_dashed
+        )  # ---- OTHER
         self.peaks = kwargs.get("peaks", base.peaks)
         self.peaks_dict = {}
         self.prows = kwargs.get("prows", base.prows)
@@ -1495,6 +1524,20 @@ class BaseShape:
         if self.star_pattern:
             if _lower(self.star_pattern) not in ["random", "cluster", "r", "c"]:
                 issue.append(f'"{self.pattern}" is an invalid starfield pattern!')
+                correct = False
+        # ---- rectangle - corners
+        if self.corner_style:
+            if _lower(self.corner_style) not in [
+                "line",
+                "l",
+                "curve",
+                "c",
+                "photo",
+                "p",
+                "triangle",
+                "t",
+            ]:
+                issue.append(f'"{self.corner_style}" is an invalid corner_style!')
                 correct = False
         # ---- rectangle - notches
         if self.notch_style:

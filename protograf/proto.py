@@ -3174,6 +3174,24 @@ def Rectangle(row=None, col=None, **kwargs):
         from bottom-left to top-right;
       - ``o`` (orthogonal) draws vertical **and** horizontal lines;
       - ``d`` (diagonal) draws diagonal lines between adjacent sides.
+    - corner (float): the size of the shape that will be drawn in the
+      corner of the rectangle
+    - corner_stroke_width (float): corner line thickness; defaults to 0.1 points
+    - corner_stroke (str): the named or hexadecimal color of the corner line;
+      defaults to ``black`
+    - corner_fill (str): the named or hexadecimal color of the corner area;
+      defaults to ``white`
+    - corner_x (float): the length of the corner in the x-direction
+    - corner_y (float): the length of the corner in the y-direction
+    - corner_directions (str): the specific corners of the rectangle where the
+      corner is drawn, given as secondary compass directions - ne, se, sw, nw
+    - corner_style (str): defines the corner appearance:
+
+      - *normal* - a simple line
+      - *triangle* - a triangular shape
+      - *curve* - a triangular shape with a curved lower edge
+      - *arch* - an arrow-shape with with a cut-out curved notch
+      - *photo* - a triangular shape with a cut-out notch
     - hatch_count (int): sets the **number** of lines to be drawn; the
       intervals between them are equal and depend on the direction
     - hatch_stroke_width (float): hatch line thickness; defaults to 0.1 points
@@ -3185,9 +3203,9 @@ def Rectangle(row=None, col=None, **kwargs):
       notch will start
     - notch_y (float): the distance from the corner in the y-direction where the
       notch will start
-    - notch_corners (str): the specific corners of the rectangle where the notch
+    - notch_directions (str): the specific corners of the rectangle where the notch
       is applied, given as secondary compass directions - ne, se, sw, nw
-    - notch_style (str): defineSsthe notch appearance:
+    - notch_style (str): defines the notch appearance:
 
       - *snip* - is a small triangle "cut out"; this is the default style
       - *step* - is sillohette of a step "cut out"
@@ -3200,6 +3218,10 @@ def Rectangle(row=None, col=None, **kwargs):
         (s)outh, (e)ast and (w)est
         Sizes are the distances of the centre of the peak from the edge
         of the Rectangle
+    - prows (list): a list of one or more sets, each enclosed by round brackets.
+      A set contains a *direction* (secondary compass - ne, se, sw, nw), a
+      peak *distance* (away from the edge), and a pair of *x* and *y* offsets
+      for the control points of the curves drawn for the prows
     - slices (list): list of two or four  named or hexadecimal colors, as
       comma-separated strings
     - slices_line (float): the width of a line drawn centered in the rectangle

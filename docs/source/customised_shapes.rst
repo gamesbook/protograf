@@ -812,7 +812,7 @@ Example 1. Size & Location
             x=1, y=4, height=1, width=2,
             label="notch:.25/.5 loc: NW, SE", label_size=5,
             notch_x=0.5, notch_y=0.25,
-            notch_corners="NW SE",
+            notch_directions="NW SE",
         )
 
       These share the following properties:
@@ -823,7 +823,7 @@ Example 1. Size & Location
       The first Rectangle has:
 
       - *notch* - the size of the triangular shape that will be "cut" off the
-        corners of the rectangle'; because no *notch_corners* property is set,
+        corners of the rectangle'; because no *notch_directions* property is set,
         **all** corners will have a notch
 
       The second Rectangle has:
@@ -832,8 +832,8 @@ Example 1. Size & Location
         notch will start
       - *notch_y* - the distance from the corner in the y-direction where the
         notch will start
-      - *notch_corners* - the locations (compass direction) of the specific
-        corner or corners of the rectangle where the notch will be applied
+      - *notch_directions* - the direction of the specific corner or corners of
+        the rectangle where the notch will be applied
 
 ===== ======
 
@@ -1377,7 +1377,9 @@ drawn. There are three ways to change this drawing order:
 
 The available property names, shown in their default order, are:
 
-#. base - this represents the Rectangle itself
+#. base - this represents the Rectangle itself including those properties
+   which control the way the edges are drawn; for example, the *peak* or
+   *prow* settings
 #. pattern
 #. slices
 #. hatches

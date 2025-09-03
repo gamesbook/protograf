@@ -42,7 +42,7 @@ Rectangle(
     height=1, width=2,
     notch_y=0.25,
     notch_x=0.5,
-    notch_corners="NW SE",
+    notch_directions="NW SE",
     label="notch:.25/.5 loc: NW, SE",
     label_size=5,
     )

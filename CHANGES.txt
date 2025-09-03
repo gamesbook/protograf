@@ -5,6 +5,7 @@ protograf Changes
 -------------------
 - Add prow property for Rectangle
 - Patch label error for Rectangle
+- Renamed `notch_corners` to `notch_directions`
 
 2025-08-30 (0.2.16)
 -------------------
@@ -14,7 +15,7 @@ protograf Changes
 - Add landscape mode to standard card sizes
 - Add nested property to Circle
 - Add nested property to Arc
-- Add order_* propery to Hexagon, Circle and Rectangle
+- Add order_* property to Hexagon, Circle and Rectangle
 - Patch bug with gutter file
 
 2025-08-23 (0.2.15)

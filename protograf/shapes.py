@@ -3793,10 +3793,173 @@ class RectangleShape(BaseShape):
             else:
                 feedback(f'Cannot handle a coord_elevation of "{self.coord_elevation}"')
 
+    def draw_corners(self, cnv, ID, x, y):
+        """Add corner lines/shapes to a Rectangle."""
+        _corner_style = _lower(self.corner_style)
+        if self.corner_directions:
+            _crnrs = self.corner_directions.split()
+            _corners = [str(crn).upper() for crn in _crnrs]
+        # feedback(f'*** Rect corners {_corners=} ')
+        o_x = self.unit(self.corner_x) if self.corner_x else self.unit(self.corner)
+        o_y = self.unit(self.corner_y) if self.corner_y else self.unit(self.corner)
+        # feedback(f'*** Rect corners {o_x=} {o_y=} ')
+        ox3 = o_x / 3.0
+        oy3 = o_y / 3.0
+        if "NW" in _corners:
+            match _corner_style:
+                case "line" | "l":
+                    cnv.draw_line(Point(x, y), Point(x, y + o_y))
+                    cnv.draw_line(Point(x, y), Point(x + o_x, y))
+                case "triangle" | "t":
+                    cnv.draw_line(Point(x, y), Point(x, y + o_y))
+                    cnv.draw_line(Point(x, y + o_y), Point(x + o_x, y)),
+                    cnv.draw_line(Point(x + o_x, y), Point(x, y))
+                case "curve" | "c":
+                    cnv.draw_line(Point(x, y), Point(x, y + o_y))
+                    cnv.draw_curve(
+                        Point(x, y + o_y),
+                        Point(x, y),
+                        Point(x + o_x, y),
+                    )
+                    cnv.draw_line(Point(x + o_x, y), Point(x, y))
+                case "photo" | "p":
+                    cnv.draw_line(Point(x, y), Point(x, y + o_y))
+                    cnv.draw_line(Point(x, y + o_y), Point(x + ox3, y + o_y - oy3)),
+                    cnv.draw_line(
+                        Point(x + ox3, y + o_y - oy3), Point(x + ox3, y + oy3)
+                    ),
+                    cnv.draw_line(Point(x + ox3, y + oy3), Point(x + 2 * ox3, y + oy3)),
+                    cnv.draw_line(Point(x + 2 * ox3, y + oy3), Point(x + o_x, y)),
+                    cnv.draw_line(Point(x + o_x, y), Point(x, y))
+        if "SE" in _corners:
+            match _corner_style:
+                case "line" | "l":
+                    cnv.draw_line(
+                        Point(x + self._u.width, y + self._u.height),
+                        Point(x + self._u.width, y + self._u.height - o_y),
+                    )
+                    cnv.draw_line(
+                        Point(x + self._u.width, y + self._u.height),
+                        Point(x + self._u.width - o_x, y + self._u.height),
+                    )
+                case "triangle" | "t":
+                    cnv.draw_line(
+                        Point(x + self._u.width, y + self._u.height),
+                        Point(x + self._u.width, y + self._u.height - o_y),
+                    )
+                    cnv.draw_line(
+                        Point(x + self._u.width, y + self._u.height - o_y),
+                        Point(x + self._u.width - o_x, y + self._u.height),
+                    )
+                    cnv.draw_line(
+                        Point(x + self._u.width - o_x, y + self._u.height),
+                        Point(x + self._u.width, y + self._u.height),
+                    )
+                case "curve" | "c":
+                    cnv.draw_line(
+                        Point(x + self._u.width, y + self._u.height),
+                        Point(x + self._u.width, y + self._u.height - o_y),
+                    )
+                    cnv.draw_curve(
+                        Point(x + self._u.width, y + self._u.height - o_y),
+                        Point(x + self._u.width, y + self._u.height),
+                        Point(x + self._u.width - o_x, y + self._u.height),
+                    )
+                    cnv.draw_line(
+                        Point(x + self._u.width - o_x, y + self._u.height),
+                        Point(x + self._u.width, y + self._u.height),
+                    )
+                case "photo" | "p":
+                    pass
+        if "NE" in _corners:
+            match _corner_style:
+                case "line" | "l":
+                    cnv.draw_line(
+                        Point(x + self._u.width, y),
+                        Point(x + self._u.width, y + o_y),
+                    )
+                    cnv.draw_line(
+                        Point(x + self._u.width, y),
+                        Point(x + self._u.width - o_x, y),
+                    )
+                case "triangle" | "t":
+                    cnv.draw_line(
+                        Point(x + self._u.width, y),
+                        Point(x + self._u.width, y + o_y),
+                    )
+                    cnv.draw_line(
+                        Point(x + self._u.width, y + o_y),
+                        Point(x + self._u.width - o_x, y),
+                    )
+                    cnv.draw_line(
+                        Point(x + self._u.width - o_x, y),
+                        Point(x + self._u.width, y),
+                    )
+                case "curve" | "c":
+                    cnv.draw_line(
+                        Point(x + self._u.width, y),
+                        Point(x + self._u.width, y + o_y),
+                    )
+                    cnv.draw_curve(
+                        Point(x + self._u.width, y + o_y),
+                        Point(x + self._u.width, y),
+                        Point(x + self._u.width - o_x, y),
+                    )
+                    cnv.draw_line(
+                        Point(x + self._u.width - o_x, y),
+                        Point(x + self._u.width, y),
+                    )
+                case "photo" | "p":
+                    pass
+        if "SW" in _corners:
+            match _corner_style:
+                case "line" | "l":
+                    cnv.draw_line(
+                        Point(x, y + self._u.height), Point(x, y + self._u.height - o_y)
+                    )
+                    cnv.draw_line(
+                        Point(x, y + self._u.height), Point(x + o_x, y + self._u.height)
+                    )
+                case "triangle" | "t":
+                    cnv.draw_line(
+                        Point(x, y + self._u.height), Point(x, y + self._u.height - o_y)
+                    )
+                    cnv.draw_line(
+                        Point(x, y + self._u.height - o_y),
+                        Point(x + o_x, y + self._u.height),
+                    )
+                    cnv.draw_line(
+                        Point(x + o_x, y + self._u.height),
+                        Point(x, y + self._u.height),
+                    )
+                case "curve" | "c":
+                    cnv.draw_line(
+                        Point(x, y + self._u.height), Point(x, y + self._u.height - o_y)
+                    )
+                    cnv.draw_curve(
+                        Point(x, y + self._u.height - o_y),
+                        Point(x, y + self._u.height),
+                        Point(x + o_x, y + self._u.height),
+                    )
+                    cnv.draw_line(
+                        Point(x + o_x, y + self._u.height),
+                        Point(x, y + self._u.height),
+                    )
+                case "photo" | "p":
+                    pass
+        # apply
+        gargs = {}
+        gargs["fill"] = self.corner_fill
+        gargs["stroke"] = self.corner_stroke
+        gargs["stroke_width"] = self.corner_stroke_width
+        gargs["stroke_ends"] = self.corner_ends
+        gargs["dotted"] = self.corner_dotted
+        self.set_canvas_props(cnv=None, index=ID, **gargs)
+
     def draw_bite_rectangle(self, cnv, x, y):
         """Draw a Rectangle with inward curved corners."""
-        if self.notch_corners:
-            _ntches = self.notch_corners.split()
+        if self.notch_directions:
+            _ntches = self.notch_directions.split()
             _notches = [str(ntc).upper() for ntc in _ntches]
         # feedback(f'*** Rect bite {self.notch_x=} {self.notch_y=} {_notches=} ')
         n_x = self.unit(self.notch_x) if self.notch_x else self.unit(self.notch)
@@ -3847,8 +4010,8 @@ class RectangleShape(BaseShape):
     def set_notch_vertexes(self, x, y):
         """Calculate vertices needed to draw a Rectangle."""
         _notch_style = _lower(self.notch_style)
-        if self.notch_corners:
-            _ntches = self.notch_corners.split()
+        if self.notch_directions:
+            _ntches = self.notch_directions.split()
             _notches = [str(ntc).upper() for ntc in _ntches]
         # feedback(f'*** Rect {self.notch_x=} {self.notch_y=} {_notches=} ')
         n_x = self.unit(self.notch_x) if self.notch_x else self.unit(self.notch)
@@ -4559,6 +4722,7 @@ class RectangleShape(BaseShape):
             "slices",
             "hatches",
             "radii",
+            "corners",
             "centre_shape",
             "centre_shapes",
             "cross",
@@ -4656,6 +4820,9 @@ class RectangleShape(BaseShape):
                     self.draw_hatch(
                         cnv, ID, vertices, self.hatch_count, rotation=rotation
                     )
+            if item == "corners":
+                # ---- * draw corners
+                self.draw_corners(cnv, ID, x, y)
             if item == "centre_shape" or item == "center_shape":
                 # ---- * centre shape (with offset)
                 if self.centre_shape:

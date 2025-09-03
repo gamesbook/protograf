@@ -372,7 +372,7 @@ Function Example 1. Drawing Shapes
             Rectangle(
                 x=a, y=b, height=1, width=2, fill_stroke=c,
                 notch_y=0.1, notch_x=0.5,
-                notch_corners="nw ne",)
+                notch_directions="nw ne",)
             EquilateralTriangle(
                 cx=a+1, cy=b+1.5, side=0.25, fill_stroke=c)
 
