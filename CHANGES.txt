@@ -7,6 +7,7 @@ protograf Changes
 - Patch label error for Rectangle
 - Renamed `notch_corners` to `notch_directions`
 - Add corner property for Rectangle
+- Add perbis property for Rectangle
 
 2025-08-30 (0.2.16)
 -------------------

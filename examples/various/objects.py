@@ -202,4 +202,34 @@ PageBreak()
 Text(common=header,
      text="Miscellaneous Things #3")
 
+Text(common=header_font, x=8, y=3,
+     text="Camera Frame:")
+Text(common=header_font, x=8, y=4,
+     text="Rectangle corners; centred shape; Texts")
+Image("tmwtgg.jpg",
+      width=6.4, height=4,
+      x=1, y=2)
+Rectangle(
+    width=6, height=3.2, x=1.2, y=2.4,
+    fill=None, stroke=None,
+    corner=0.4, corner_stroke_width=2,
+    centre_shape=rectangle(
+        width=2, height=2,
+        fill=None, stroke=None,
+        corner=0.3,
+        corner_stroke="silver",
+        corner_stroke_width=1.5),
+    cross=0.5,
+    cross_stroke="white",
+    cross_stroke_width=1.5)
+Dot(fill_stroke="red", dot_point=9, x=1.3, y=2.5)
+Text(text="REC",
+     x=2.25, y=2.75, stroke="red")
+Text(text="00:00:00",
+     x=6.5, y=5.5, stroke="white", font_size=10)
+
+# rectangle(
+#     width=2, height=1.1, fill=None,
+#     stroke=None, corner=0.3, corner_stroke_width=2_
+
 Save()

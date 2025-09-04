@@ -74,6 +74,19 @@ Rectangle(common=htch, x=3, y=4, hatch='d', label="D")
 
 PageBreak()
 
+# ---- perbises
+Blueprint()
+Text(common=txt, text="Rectangle: perbises + directions")
+prbs = Common(height=2, width=1,
+              perbis_stroke_width=2,
+              perbis_stroke="red")
+Rectangle(common=prbs, x=1, y=1, perbis='n', label="N")
+Rectangle(common=prbs, x=2, y=1, perbis='s', label="S")
+Rectangle(common=prbs, x=1, y=3, perbis='w', label="W")
+Rectangle(common=prbs, x=2, y=3, perbis='e', label="E")
+
+PageBreak()
+
 # ---- rounding
 Blueprint()
 Text(common=txt, text="Rectangle: rounding; hatches")
@@ -303,7 +316,10 @@ Save(
      directory="../docs/source/images/custom/rectangle",
      names=[
         None,
-        "centre", "notch", "dot_cross", "hatch", "rounding", "chevron",
+        "centre", "notch", "dot_cross",
+        "hatch",
+        "perbis",
+        "rounding", "chevron",
         "peak", "rotation", "notch_style", "borders",
         "slices", "slices_custom",
         "prows_defaults", "prows_inwards", "prows_outwards",

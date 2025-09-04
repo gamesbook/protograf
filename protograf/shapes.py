@@ -3703,6 +3703,103 @@ class RectangleShape(BaseShape):
         else:
             return length
 
+    def calculate_perbises(
+        self, cnv, centre: Point, rotation: float = None, **kwargs
+    ) -> list:
+        """Calculate centre points for each edge and angles from centre.
+
+        Args:
+            vertices: list of Rect nodes as Points
+            centre: the centre Point of the Hex
+
+        Returns:
+            dict of Perbis objects keyed on direction
+        """
+        directions = ["n", "w", "s", "e"]
+        perbises = {}
+        vertices = self.get_vertexes(rotation=rotation, **kwargs)
+        vcount = len(vertices) - 1
+        _perbis_pts = []
+        print(f"*** RECT perbis {centre=} {vertices=}")
+        for key, vertex in enumerate(vertices):
+            if key == 0:
+                p1 = Point(vertex.x, vertex.y)
+                p2 = Point(vertices[vcount].x, vertices[vcount].y)
+            else:
+                p1 = Point(vertex.x, vertex.y)
+                p2 = Point(vertices[key - 1].x, vertices[key - 1].y)
+            pc = geoms.fraction_along_line(p1, p2, 0.5)  # centre pt of edge
+            _perbis_pts.append(pc)  # debug use
+            compass, angle = geoms.angles_from_points(centre, pc)
+            print(
+                f"*** RECT *** perbis {key=} {directions[key]=} {pc=} {compass=} {angle=}"
+            )
+            _perbis = Perbis(
+                point=pc,
+                direction=directions[key],
+                v1=p1,
+                v2=p2,
+                compass=compass,
+                angle=angle,
+            )
+            perbises[directions[key]] = _perbis
+        return perbises
+
+    def draw_perbis(self, cnv, ID, centre: Point, rotation: float = None, **kwargs):
+        """Draw lines connecting the Rectangle centre to the centre of each edge.
+
+        Args:
+            ID: unique ID
+            centre: the centre Point of the Rectangle
+            rotation: degrees anti-clockwise from horizontal "east"
+
+        Notes:
+            A perpendicular bisector ("perbis") of a chord is:
+                A line passing through the center of circle such that it divides
+                the chord into two equal parts and meets the chord at a right angle;
+                for a polygon, each edge is effectively a chord.
+        """
+        vertices = self.get_vertexes(rotation=rotation, **kwargs)
+        perbises = self.calculate_perbises(cnv=cnv, centre=centre, vertices=vertices)
+        pb_offset = self.unit(self.perbis_offset, label="perbis offset") or 0
+        pb_length = (
+            self.unit(self.perbis_length, label="perbis length")
+            if self.perbis_length
+            else None  # see below for default length
+        )
+        if self.perbis:
+            perbis_dirs = tools.validated_directions(
+                self.perbis, DirectionGroup.CARDINAL, "rectangle perbis"
+            )
+
+        for key, a_perbis in perbises.items():
+            if self.perbis and key not in perbis_dirs:
+                continue
+            # length based on dir
+            if not pb_length:
+                if key in ["n", "s"]:
+                    pb_length = self._u.height / 2.0
+                if key in ["e", "w"]:
+                    pb_length = self._u.width / 2.0
+            # points based on length of line, offset and the angle in degrees
+            edge_pt = a_perbis.point
+            if pb_offset is not None and pb_offset != 0:
+                offset_pt = geoms.point_on_circle(centre, pb_offset, a_perbis.angle)
+                end_pt = geoms.point_on_line(offset_pt, edge_pt, pb_length)
+                print(f"{key=} {pb_angle=} {offset_pt=} {x_c=}, {y_c=}")
+                cnv.draw_line((offset_pt.x, offset_pt.y), (end_pt.x, end_pt.y))
+            else:
+                cnv.draw_line((centre.x, centre.y), (edge_pt.x, edge_pt.y))
+
+        self.set_canvas_props(
+            index=ID,
+            stroke=self.perbis_stroke,
+            stroke_width=self.perbis_stroke_width,
+            stroke_ends=self.perbis_ends,
+            dashed=self.perbis_dashed,
+            dotted=self.perbis_dotted,
+        )
+
     def get_angles(self, rotation=0, **kwargs):
         """Get angles from centre to vertices for rectangle without notches."""
         x, y = self.calculate_xy(**kwargs)
@@ -4799,6 +4896,7 @@ class RectangleShape(BaseShape):
             "pattern",
             "slices",
             "hatches",
+            "perbises",
             "radii",
             "corners",
             "centre_shape",
@@ -4898,6 +4996,10 @@ class RectangleShape(BaseShape):
                     self.draw_hatch(
                         cnv, ID, vertices, self.hatch_count, rotation=rotation
                     )
+            if item == "perbises":
+                # ---- * draw perbises
+                if self.perbis:
+                    self.draw_perbis(cnv, ID, Point(x_d, y_d), **kwargs)
             if item == "corners":
                 # ---- * draw corners
                 self.draw_corners(cnv, ID, x, y)

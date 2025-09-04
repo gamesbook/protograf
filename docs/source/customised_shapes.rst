@@ -597,6 +597,7 @@ that it can be customised.
 - `Hatch <rectHatch_>`_
 - `Notch <rectNotch_>`_
 - `Peak <rectPeak_>`_
+- `Perbises <rectPerbis_>`_
 - `Prows <rectProws_>`_
 - `Rotation <rectRotation_>`_
 - `Rounding <rectRounding_>`_
@@ -861,7 +862,7 @@ the length or width of the Rectangle in a vertical, horizontal or diagonal direc
         corner
       - *label* - text to help identify it
       - *hatch* - if not specified, hatches will be drawn
-        in all directions - otherwise:
+        in all directions |dash| otherwise:
 
         - ``n`` (North) or ``s`` (South) draws vertical lines;
         - ``w`` (West) or ``e`` (East) draws horizontal lines;
@@ -1028,6 +1029,63 @@ a specified direction.
       meaning that peaks should drawn in all four directions.
 
 ===== ======
+
+
+.. _rectPerbis:
+
+Perbis
+------
+`^ <rectangleIndex_>`_
+
+"Perbis" is a shortcut name for "perpendicular bisector". These lines are
+drawn from the centre of a Rectangle towards the mid-points of its edges.
+
+.. |rpb| image:: images/custom/rectangle/perbis.png
+   :width: 330
+
+===== ======
+|rpb| This example shows Rectangles constructed using these commands:
+
+      .. code:: python
+
+        prbs = Common(
+            height=2, width=1,
+            perbis_stroke_width=2,
+            perbis_stroke="red")
+        Rectangle(
+            common=prbs, x=1, y=1,
+            perbis='n', label="N")
+        Rectangle(
+            common=prbs, x=2, y=1,
+            perbis='s', label="S")
+        Rectangle(
+            common=prbs, x=1, y=3,
+            perbis='w', label="W")
+        Rectangle(
+            common=prbs, x=2, y=3,
+            perbis='e', label="E")
+
+      These Rectangles all share the following Common properties that
+      differ from the defaults:
+
+      - *height* and *width* - set the basic configuration
+      - *perbis_stroke_width* - set to ``2`` points; a thick line
+      - *perbis_stroke* - set to the color ``red`` to make it stand out
+        from the Rectangle
+
+      Each Rectangle has its own setting for:
+
+      - *x* and *y* - different positions on the page for the upper-left
+        corner
+      - *label* - text to help identify it
+      - *perbis* - if specified with a ``*`` then perbises will be drawn
+        in all directions |dash| otherwise:
+
+        - ``n`` (North) or ``s`` (South) draw a vertical line
+        - ``w`` (West) or ``e`` (East) draw a horizontal line
+
+===== ======
+
 
 .. _rectProws:
 
