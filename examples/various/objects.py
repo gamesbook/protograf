@@ -1,9 +1,13 @@
 # -*- coding: utf-8 -*-
 """
-Example code for various "real world" things for protograf
+Example protograf code for creating various "real world" things
 
 Written by: Derek Hohls
 Created on: 19 August 2024
+
+Credits:
+    tmwtgg.jpg: https://unsplash.com/photos/tropical-islands-rise-from-the-emerald-green-ocean-5xMpaSXnBwc
+
 """
 from protograf import *
 
@@ -190,5 +194,12 @@ Circle(cx=2, cy=25, radius=1.25,
        radii=steps(0, 360, 5),
        radii_offset=1.1, radii_length=0.125,
        radii_stroke="#01F91E", radii_stroke_width=1.25)
+
+PageBreak()
+
+# ---- PAGE 3 ===>
+
+Text(common=header,
+     text="Miscellaneous Things #3")
 
 Save()

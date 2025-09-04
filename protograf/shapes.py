@@ -3870,7 +3870,40 @@ class RectangleShape(BaseShape):
                         Point(x + self._u.width, y + self._u.height),
                     )
                 case "photo" | "p":
-                    pass
+                    cnv.draw_line(
+                        Point(x + self._u.width, y + self._u.height),
+                        Point(x + self._u.width, y + self._u.height - o_y),
+                    )
+                    cnv.draw_line(
+                        Point(x + self._u.width, y + self._u.height - o_y),
+                        Point(x + self._u.width - ox3, y + self._u.height - o_y + oy3),
+                    )
+                    cnv.draw_line(
+                        Point(x + self._u.width - ox3, y + self._u.height - o_y + oy3),
+                        Point(
+                            x + self._u.width - ox3, y + self._u.height - o_y + 2 * oy3
+                        ),
+                    )
+                    cnv.draw_line(
+                        Point(
+                            x + self._u.width - ox3, y + self._u.height - o_y + 2 * oy3
+                        ),
+                        Point(
+                            x + self._u.width - 2 * ox3,
+                            y + self._u.height - o_y + 2 * oy3,
+                        ),
+                    )
+                    cnv.draw_line(
+                        Point(
+                            x + self._u.width - 2 * ox3,
+                            y + self._u.height - o_y + 2 * oy3,
+                        ),
+                        Point(x + self._u.width - o_x, y + self._u.height),
+                    )
+                    cnv.draw_line(
+                        Point(x + self._u.width - o_x, y + self._u.height),
+                        Point(x + self._u.width, y + self._u.height),
+                    )
         if "NE" in _corners:
             match _corner_style:
                 case "line" | "l":
@@ -3910,7 +3943,30 @@ class RectangleShape(BaseShape):
                         Point(x + self._u.width, y),
                     )
                 case "photo" | "p":
-                    pass
+                    cnv.draw_line(
+                        Point(x + self._u.width, y),
+                        Point(x + self._u.width, y + o_y),
+                    )
+                    cnv.draw_line(
+                        Point(x + self._u.width, y + o_y),
+                        Point(x + self._u.width - ox3, y + o_y - oy3),
+                    )
+                    cnv.draw_line(
+                        Point(x + self._u.width - ox3, y + o_y - oy3),
+                        Point(x + self._u.width - ox3, y + o_y - 2 * oy3),
+                    )
+                    cnv.draw_line(
+                        Point(x + self._u.width - ox3, y + o_y - 2 * oy3),
+                        Point(x + self._u.width - 2 * ox3, y + o_y - 2 * oy3),
+                    )
+                    cnv.draw_line(
+                        Point(x + self._u.width - 2 * ox3, y + o_y - 2 * oy3),
+                        Point(x + self._u.width - o_x, y),
+                    )
+                    cnv.draw_line(
+                        Point(x + self._u.width - o_x, y),
+                        Point(x + self._u.width, y),
+                    )
         if "SW" in _corners:
             match _corner_style:
                 case "line" | "l":
@@ -3946,7 +4002,29 @@ class RectangleShape(BaseShape):
                         Point(x, y + self._u.height),
                     )
                 case "photo" | "p":
-                    pass
+                    cnv.draw_line(
+                        Point(x, y + self._u.height), Point(x, y + self._u.height - o_y)
+                    )
+                    cnv.draw_line(
+                        Point(x, y + self._u.height - o_y),
+                        Point(x + ox3, y + self._u.height - o_y + oy3),
+                    )
+                    cnv.draw_line(
+                        Point(x + ox3, y + self._u.height - o_y + oy3),
+                        Point(x + ox3, y + self._u.height - o_y + 2 * oy3),
+                    )
+                    cnv.draw_line(
+                        Point(x + ox3, y + self._u.height - o_y + 2 * oy3),
+                        Point(x + 2 * ox3, y + self._u.height - o_y + 2 * oy3),
+                    )
+                    cnv.draw_line(
+                        Point(x + 2 * ox3, y + self._u.height - o_y + 2 * oy3),
+                        Point(x + o_x, y + self._u.height),
+                    )
+                    cnv.draw_line(
+                        Point(x + o_x, y + self._u.height),
+                        Point(x, y + self._u.height),
+                    )
         # apply
         gargs = {}
         gargs["fill"] = self.corner_fill

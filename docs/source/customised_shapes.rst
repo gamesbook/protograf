@@ -591,6 +591,7 @@ that it can be customised.
 
 - `Borders <rectBorders_>`_
 - `Centred <rectCentred_>`_
+- `Corners <rectCorners_>`_
 - `Cross and Dot <rectCross_>`_
 - `Chevron <rectChevron_>`_
 - `Hatch <rectHatch_>`_
@@ -624,6 +625,73 @@ Centred
         ``2`` and ``3`` centimetres respectively
 
 ===== ======
+
+.. _rectCorners:
+
+Corners
+-------
+`^ <rectangleIndex_>`_
+
+The corners property can superimpose a drawing onto each corner of the
+Rectangle.  Each corner drawing can support customisation of its size,
+stroke color, fill color and style.  The available styles are:
+
+- *line* - a simple line
+- *triangle* - a triangular shape
+- *curve* - a triangular shape with a curved inner edge
+- *photo* - a triangular shape with a cut-out notch
+
+It is possible to limit where the corners are drawn by setting the
+*corner_directions* property to one or more of the secondary compass
+directions e.g. ``corner_directions="ne sw"``.
+
+.. |rcr| image:: images/custom/rectangle/corners.png
+   :width: 330
+
+===== ======
+|rcr| This example shows a Rectangle constructed using the command:
+
+      .. code:: python
+
+        styles = Common(
+            height=1, width=3.5, x=0.25,
+            label_size=7,
+            fill="lightsteelblue",
+            corner=0.4,
+            corner_stroke="gold",
+            corner_fill='red',
+        )
+        Rectangle(
+            common=styles, y=0,
+            label='Corner (default)')
+        Rectangle(
+            common=styles, y=1.25,
+              corner_style='line',
+              corner_stroke_width=2,
+              label='Corner: line (l)')
+        Rectangle(
+            common=styles, y=2.5,
+            corner_style='triangle',
+            label='Corner: triangle (t)')
+        Rectangle(
+            common=styles, y=3.75,
+            corner_style='curve',
+            label='Corner: curve (s)')
+        Rectangle(
+            common=styles, y=5,
+            corner_style='photo',
+            label='Corner: photo (p)')
+
+      Here all corners share a common stroke (``red``) and fill (``gold``),
+      as well as a size (``0.4``).  The "size" is the length of the corner
+      drawing along the side of the Rectangle.  It is possible to set different
+      sizes in the x- and y- direction by using the properties *corner_x* and
+      *corner_y*.
+
+      The default corner is a simple line, as shown in the top rectangle.
+
+===== ======
+
 
 .. _rectCross:
 
@@ -673,38 +741,62 @@ that both point in a specified direction.  This creates an arrow-like effect.
 
       .. code:: python
 
-        Rectangle(
-            x=3, y=2, height=2, width=1, font_size=4,
-            label="chevron:N:0.5", title="title-N", heading="head-N",
-            chevron='N', chevron_height=0.5
-        )
-        Rectangle(
-            x=0, y=2, height=2, width=1, font_size=4,
-            label="chevron:S:0.5", title="title-S", heading="head-S",
-            chevron='S', chevron_height=0.5
-        )
-        Rectangle(
-            x=1, y=4.5, height=1, width=2, font_size=4,
-            label="chevron:W:0.5", title="title-W", heading="head-W",
-            chevron='W', chevron_height=0.5
-        )
-        Rectangle(
-            x=1, y=0.5, height=1, width=2, font_size=4,
-            label="chevron:E:0.5", title="title-E", heading="head-E",
-            chevron='E', chevron_height=0.5
-        )
+        styles = Common(
+            height=2, width=1,
+            font_size=4)
 
-      The Rectangles all have the following properties that differ from
-      the defaults:
+        Rectangle(
+            common=styles,
+            x=3, y=2,
+            chevron='N',
+            chevron_height=0.5,
+            label="chevron:N:0.5",
+            title="title-N",
+            heading="head-N",
+            )
+        Rectangle(
+            x=0, y=2,
+            chevron='S',
+            chevron_height=0.5,
+            label="chevron:S:0.5",
+            title="title-S",
+            heading="head-S",
+            )
+        Rectangle(
+            x=1, y=4.5,
+            chevron='W',
+            chevron_height=0.5,
+            label="chevron:W:0.5",
+            title="title-W",
+            heading="head-W",
+            )
+        Rectangle(
+            x=1, y=0.5,
+            chevron='E',
+            chevron_height=0.5,
+            label="chevron:E:0.5",
+            title="title-E",
+            heading="head-E",
+            )
 
-      - *x* and *y*, *height* and *width* - set the basic configuration
+      These Rectangles all share the following Common properties that
+      differ from the defaults:
+
+      - *height* and *width* - set the basic configuration
+      - *font_size* - the default size for any text associated with the
+        Rectangle
+
+      Each Rectangle has its own setting for:
+
+      - *x* and *y* - different positions on the page for the upper-left
+        corner
       - *label*, *title* and *heading* - text to describe the shape's setting
       - *chevron* - the primary compass direction in which the chevron is
         pointing; N(orth), S(outh), E(ast) or W(est)
       - *chevron_height* - the distance of the chevron peak from the side of
-        the rectangle it is adjacent to
+        the Rectangle it is adjacent to
 
-      Note that the *label* is centered in the rectangle and **not** between
+      Note that the *label* is centered in the Rectangle and **not** between
       the chevrons.
 
 ===== ======
@@ -727,8 +819,10 @@ the length or width of the Rectangle in a vertical, horizontal or diagonal direc
       .. code:: python
 
         htch = Common(
-          height=1.5, width=1, hatch_count=5,
-          hatch_stroke_width=0.1, hatch_stroke="red")
+          height=1.5, width=1,
+          hatch_count=5,
+          hatch_stroke_width=0.1,
+          hatch_stroke="red")
 
         Rectangle(
           common=htch, x=0, y=0,  hatch='w', label="W")
@@ -763,7 +857,7 @@ the length or width of the Rectangle in a vertical, horizontal or diagonal direc
 
       Each Rectangle has its own setting for:
 
-      - *x* and *y* - different positions on the page for the lower-left
+      - *x* and *y* - different positions on the page for the upper-left
         corner
       - *label* - text to help identify it
       - *hatch* - if not specified, hatches will be drawn
@@ -1135,18 +1229,25 @@ into the arc of a quarter-circle.
       .. code:: python
 
         rct = Common(
-            x=0.5, height=1.5, width=3.0, stroke_width=.5,
-            hatch_stroke="red", hatch='o')
+            x=0.5,
+            height=1.5, width=3.0,
+            stroke_width=.5,
+            hatch_stroke="red",
+            hatch='o')
 
         Rectangle(
-            common=rct, y=1, rounding=0.1, hatch_count=10)
+            common=rct, y=1,
+            rounding=0.1,
+            hatch_count=10)
         Rectangle(
-            common=rct, y=4, rounding=0.5,  hatch_count=3)
+            common=rct, y=4,
+            rounding=0.5,
+            hatch_count=3)
 
       Both Rectangles share the Common properties of:
 
       - *x* - left side location
-      - *height* and *width* - ``1.5`` and ``3.0`` cm respectively
+      - *height* and *width* - ``1.5`` and ``3.0`` cm
       - *hatch_stroke* - set to ``red``
       - *hatch* directions of ``o`` (for orthogonal)
 
@@ -1155,13 +1256,13 @@ into the arc of a quarter-circle.
 
       The upper Rectangle has these specific properties:
 
-      - *rounding* - set to ``0.1``; the radius of the circle used for the corner
+      - *rounding* - set to ``0.1``; circle corner radius
       - *hatch_count* - set to  ``10``; the number of lines
         in both vertical and horizontal directions
 
       The lower Rectangle has these specific properties:
 
-      - *rounding* - set to ``0.5``; the radius of the circle used for the corner
+      - *rounding* - set to ``0.5``; circle corner radius
       - *hatch_count* - set to ``3``; the number of lines
         in both vertical and horizontal directions.
 
@@ -1170,11 +1271,14 @@ into the arc of a quarter-circle.
 
         .. code:: python
 
-          Rectangle(common=rct, y=2, rounding=0.5, hatch_count=10)
+          Rectangle(
+              common=rct, y=2,
+              rounding=0.5,
+              hatch_count=10)
 
       then the program will issue an error::
 
-        No hatching permissible with this size rounding in the rectangle
+        No hatching permissible with this size rounding
 
 ===== ======
 
@@ -1237,11 +1341,12 @@ colored triangular or quadilateral shapes.
       subdivided into four triangular spaces.  Colors are allocated from the
       top-most triangle, going clock-wise.
 
-      The lower example shows what happens when the *slices* property is given
-      a list of **four** colors, plus a *slices_line* and a *slices_stroke*.
-      The *slices_line* is drawn centered in the rectangle, and then the two
-      triangles are created at either end, with quadilaterals forming the top
-      and bottom shapes. All lines are drawn with the  *slices_stroke* color.
+      The lower-most example shows what happens when the *slices* property is
+      given a list of **four** colors, plus a *slices_line* and a
+      *slices_stroke*. The *slices_line* is drawn centered in the rectangle,
+      and then the two triangles are created at either end, with quadilaterals
+      forming the top and bottom shapes. All lines are drawn with the
+      *slices_stroke* color.
 
 ===== ======
 
@@ -1318,14 +1423,18 @@ e.g. ``n s`` to draw both lines on both north **and** south sides.
       .. code:: python
 
         Rectangle(
-            x=0.5, y=3.5, height=2, width=3, stroke=None, fill="gold",
+            x=0.5, y=3.5,
+            height=2, width=3,
+            stroke=None, fill="gold",
             borders=[
                 ("n", 2, "lightsteelblue", True),
                 ("s", 2),
             ]
         )
         Rectangle(
-         x=0.5, y=0.5, height=2, width=3, stroke_width=1.9,
+            x=0.5, y=0.5,
+            height=2, width=3,
+            stroke_width=1.9,
             borders=[
                 ("w", 2, "gold"),
                 ("n", 2, "chartreuse", True),
@@ -1434,7 +1543,9 @@ Centre
       .. code:: python
 
           Hexagon(cx=2, cy=1)
-          Hexagon(cx=2, cy=3, orientation='pointy')
+          Hexagon(
+              cx=2, cy=3,
+              orientation='pointy')
 
       Both Hexagons are positioned via their centres - *cx* and *cy*.
 
@@ -1459,23 +1570,26 @@ Dot & Cross
 
       .. code:: python
 
-        Hexagon(x=0, y=1, height=2,
-                dot=0.1, dot_stroke="red",
-                orientation='pointy')
-        Hexagon(x=2, y=1, height=2,
-                cross=0.25, cross_stroke="red",
-                cross_stroke_width=1,
-                orientation='pointy')
-
-        Hexagon(x=-0.25, y=4, height=2,
-                dot=0.1, dot_stroke="red")
-        Hexagon(x=1.75, y=3.5, height=2,
-                cross=0.25, cross_stroke="red",
-                cross_stroke_width=1)
+        Hexagon(
+            x=0, y=1, height=2,
+            dot=0.1, dot_stroke="red",
+            orientation='pointy')
+        Hexagon(
+            x=2, y=1, height=2,
+            cross=0.25, cross_stroke="red",
+            cross_stroke_width=1,
+            orientation='pointy')
+        Hexagon(
+            x=-0.25, y=4, height=2,
+            dot=0.1, dot_stroke="red")
+        Hexagon(
+            x=1.75, y=3.5, height=2,
+            cross=0.25, cross_stroke="red",
+            cross_stroke_width=1)
 
       These Hexagons have properties set as follows:
 
-      - *x* and *y* - set the lower-left position of the Hexagon
+      - *x* and *y* - set the upper-left position of the Hexagon
       - *height* - sets the distance from flat-edge to flat-edge
       - *dot* - sets the size of dot at the centre
       - *dot_stroke*  - sets the color of the dot (the dot is "filled
@@ -1509,9 +1623,15 @@ diagonal direction.
             x=1, height=1.5, orientation='flat',
             hatch_count=5, hatch_stroke="red")
 
-        Hexagon(common=hxgn, y=0, hatch='e', label="e/w")
-        Hexagon(common=hxgn, y=2, hatch='ne', label="ne/sw")
-        Hexagon(common=hxgn, y=4, hatch='nw', label="nw/se")
+        Hexagon(
+            common=hxgn, y=0,
+            hatch='e', label="e/w")
+        Hexagon(
+            common=hxgn, y=2,
+            hatch='ne', label="ne/sw")
+        Hexagon(
+            common=hxgn, y=4,
+            hatch='nw', label="nw/se")
 
       These Hexagons all share the following Common properties that differ
       from the defaults:
@@ -1556,12 +1676,20 @@ or diagonal direction.
       .. code:: python
 
         hxgn = Common(
-            x=1, height=1.5, orientation='pointy',
-            hatch_count=5, hatch_stroke="red")
+            x=1, height=1.5,
+            orientation='pointy',
+            hatch_count=5,
+            hatch_stroke="red")
 
-        Hexagon(common=hxgn, y=0, hatch='n', label="n/s")
-        Hexagon(common=hxgn, y=2, hatch='ne', label="ne/sw")
-        Hexagon(common=hxgn, y=4, hatch='nw', label="nw/se")
+        Hexagon(
+            common=hxgn, y=0,
+            hatch='n', label="n/s")
+        Hexagon(
+            common=hxgn, y=2,
+            hatch='ne', label="ne/sw")
+        Hexagon(
+            common=hxgn, y=4,
+            hatch='nw', label="nw/se")
 
       These Hexagons all share the following Common properties that differ
       from the defaults:
@@ -1606,20 +1734,33 @@ of a Hexagon towards its vertices.
 
         hxg = Common(
             height=1.5, font_size=8,
-            dot=0.05, dot_stroke="red",
+            dot=0.05,
+            dot_stroke="red",
             orientation="flat")
 
-        Hexagon(common=hxg, x=0.25, y=0.25, radii='sw', label="SW")
-        Hexagon(common=hxg, x=0.25, y=2.15, radii='w', label="W")
-        Hexagon(common=hxg, x=0.25, y=4, radii='nw', label="NW")
-        Hexagon(common=hxg, x=2.25, y=4, radii='ne', label="NE")
-        Hexagon(common=hxg, x=2.25, y=2.15, radii='e', label="E")
-        Hexagon(common=hxg, x=2.25, y=0.25, radii='se', label="SE")
+        Hexagon(
+            common=hxg, x=0.25, y=0.25,
+            radii='sw', label="SW")
+        Hexagon(
+            common=hxg, x=0.25, y=2.15,
+            radii='w', label="W")
+        Hexagon(
+            common=hxg, x=0.25, y=4,
+            radii='nw', label="NW")
+        Hexagon(
+            common=hxg, x=2.25, y=4,
+            radii='ne', label="NE")
+        Hexagon(
+            common=hxg, x=2.25, y=2.15,
+            radii='e', label="E")
+        Hexagon(
+            common=hxg, x=2.25, y=0.25,
+            radii='se', label="SE")
 
       These have the following properties:
 
       - *common* - sets Common values assigned to ``hxg``
-      - *x* and *y* to set the lower-left position
+      - *x* and *y* to set the upper-left position
       - *radii* - a compass direction in which the radius is drawn
         (centre to vertex)
       - *label* - the text displayed in the centre shows the compass direction
@@ -1648,17 +1789,29 @@ of a Hexagon towards its vertices.
             dot=0.05, dot_stroke="red",
             orientation="pointy")
 
-        Hexagon(common=hxg, x=0.25, y=0.25, radii='sw', label="SW")
-        Hexagon(common=hxg, x=0.25, y=2.15, radii='nw', label="NW")
-        Hexagon(common=hxg, x=0.25, y=4, radii='n', label="N")
-        Hexagon(common=hxg, x=2.25, y=4, radii='ne', label="NE")
-        Hexagon(common=hxg, x=2.25, y=0.25, radii='s', label="S")
-        Hexagon(common=hxg, x=2.25, y=2.15, radii='se', label="SE")
+        Hexagon(
+            common=hxg, x=0.25, y=0.25,
+            radii='sw', label="SW")
+        Hexagon(
+            common=hxg, x=0.25, y=2.15,
+            radii='nw', label="NW")
+        Hexagon(
+            common=hxg, x=0.25, y=4,
+            radii='n', label="N")
+        Hexagon(
+            common=hxg, x=2.25, y=4,
+            radii='ne', label="NE")
+        Hexagon(
+            common=hxg, x=2.25, y=0.25,
+            radii='s', label="S")
+        Hexagon(
+            common=hxg, x=2.25, y=2.15,
+            radii='se', label="SE")
 
       These have the following properties:
 
       - *common* - sets Common values assigned to ``hxg``
-      - *x* and *y* to set the lower-left position
+      - *x* and *y* to set the upper-left position
       - *radii* - a compass direction in which the radius is drawn
         (centre to vertex)
       - *label* - the text displayed in the centre
@@ -1689,17 +1842,29 @@ the mid-points of the edges.
             dot=0.05, dot_stroke="red",
             orientation="flat")
 
-        Hexagon(common=hxg, x=0.25, y=0.25, perbis='sw', label="SW")
-        Hexagon(common=hxg, x=0.25, y=2.15, perbis='w', label="W")
-        Hexagon(common=hxg, x=0.25, y=4, perbis='nw', label="NW")
-        Hexagon(common=hxg, x=2.25, y=4, perbis='ne', label="NE")
-        Hexagon(common=hxg, x=2.25, y=2.15, perbis='e', label="E")
-        Hexagon(common=hxg, x=2.25, y=0.25, perbis='se', label="SE")
+        Hexagon(
+            common=hxg, x=0.25, y=0.25,
+            perbis='sw', label="SW")
+        Hexagon(
+            common=hxg, x=0.25, y=2.15,
+            perbis='w', label="W")
+        Hexagon(
+            common=hxg, x=0.25, y=4,
+            perbis='nw', label="NW")
+        Hexagon(
+            common=hxg, x=2.25, y=4,
+            perbis='ne', label="NE")
+        Hexagon(
+            common=hxg, x=2.25, y=2.15,
+            perbis='e', label="E")
+        Hexagon(
+            common=hxg, x=2.25, y=0.25,
+            perbis='se', label="SE")
 
       These have the following properties:
 
       - *common* - sets Common values assigned to ``hxg``
-      - *x* and *y* to set the lower-left position
+      - *x* and *y* to set the upper-left position
       - *perbis* - a compass direction in which the bisector is drawn
         (centre to mid-point)
       - *label* - the text displayed in the centre shows the compass direction
@@ -1729,12 +1894,24 @@ the mid-points of the edges.
             dot=0.05, dot_stroke="red",
             orientation="pointy")
 
-        Hexagon(common=hxg, x=0.25, y=0.25, perbis='sw', label="SW")
-        Hexagon(common=hxg, x=0.25, y=2.15, perbis='nw', label="NW")
-        Hexagon(common=hxg, x=0.25, y=4, perbis='n', label="N")
-        Hexagon(common=hxg, x=2.25, y=4, perbis='ne', label="NE")
-        Hexagon(common=hxg, x=2.25, y=0.25, perbis='s', label="S")
-        Hexagon(common=hxg, x=2.25, y=2.15, perbis='se', label="SE")
+        Hexagon(
+            common=hxg, x=0.25, y=0.25,
+            perbis='sw', label="SW")
+        Hexagon(
+            common=hxg, x=0.25, y=2.15,
+            perbis='nw', label="NW")
+        Hexagon(
+            common=hxg, x=0.25, y=4,
+            perbis='n', label="N")
+        Hexagon(
+            common=hxg, x=2.25, y=4,
+            perbis='ne', label="NE")
+        Hexagon(
+            common=hxg, x=2.25, y=0.25,
+            perbis='s', label="S")
+        Hexagon(
+            common=hxg, x=2.25, y=2.15,
+            perbis='se', label="SE")
 
       These have the following properties:
 
@@ -2250,7 +2427,7 @@ Example 1.
       The middle pair of Hexagons show how changing the *order_last* property
       means that *hatches* are drawn after the *radii*, instead of before.
 
-      The lower pair of Hexagons show how setting the *order_all* property
+      The lower-most pair of Hexagons show how setting the *order_all* property
       means that only the Hexagon and the centre Dot will drawn, and not the
       *perbis*.
 
@@ -2410,7 +2587,7 @@ of a Circle towards its circumference.
       These Circles also have some of the following properties, which
       demonstrate how radii can be set and customised:
 
-      - *x* and *y* to set the lower-left position; or *cx* and *cy* to set the
+      - *x* and *y* to set the upper-left position; or *cx* and *cy* to set the
         centre
       - *radii* - a list of angles (in N|deg|) sets the directions at which the
         radii lines are drawn
@@ -2472,12 +2649,12 @@ on |dash| and styled with stroke color, size, and face.
       - *radii_labels_stroke* - the color of the labels
       - *radii_labels_stroke_width* - thickness of the labels
 
-      The top example shows how text strings are created with a list.
+      The top-most example shows how text strings are created with a list.
 
       The middle example shows how the text string is split using commas;
       this results in a list whose members are used to create the labels.
 
-      The lower example shows how the same text is repeated for all radii.
+      The lower-most example shows how the same text is repeated for all radii.
 
       The top example also shows how text is rotated and styled. The radii
       lines' stroke color is set to match the circle fill, thereby making it

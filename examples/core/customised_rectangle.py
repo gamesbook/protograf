@@ -87,10 +87,12 @@ PageBreak()
 # ---- chevron
 Blueprint()
 Text(common=txt, text="Rectangle: chevron")
-Rectangle(
-    x=3, y=2,
+styles = Common(
     height=2, width=1,
-    font_size=4,
+    font_size=4)
+Rectangle(
+    common=styles,
+    x=3, y=2,
     chevron='N',
     chevron_height=0.5,
     label="chevron:N:0.5",
@@ -99,8 +101,6 @@ Rectangle(
     )
 Rectangle(
     x=0, y=2,
-    height=2, width=1,
-    font_size=4,
     chevron='S',
     chevron_height=0.5,
     label="chevron:S:0.5",
@@ -109,8 +109,6 @@ Rectangle(
     )
 Rectangle(
     x=1, y=4.5,
-    height=1, width=2,
-    font_size=4,
     chevron='W',
     chevron_height=0.5,
     label="chevron:W:0.5",
@@ -119,8 +117,6 @@ Rectangle(
     )
 Rectangle(
     x=1, y=0.5,
-    height=1, width=2,
-    font_size=4,
     chevron='E',
     chevron_height=0.5,
     label="chevron:E:0.5",
@@ -277,6 +273,27 @@ Rectangle(
 )
 PageBreak()
 
+# ---- corner_style
+Blueprint()
+Text(common=txt, text="Rectangle : Corner Styles")
+styles = Common(
+    height=1, width=3.5, x=0.25,
+    label_size=7, fill="lightsteelblue",
+    corner=0.4,
+    corner_stroke="gold",
+    corner_fill='red',
+)
+Rectangle(common=styles, y=0, label='Corner (default)')
+Rectangle(common=styles, y=1.25,
+          corner_style='line',
+          corner_stroke_width=2,
+          label='Corner: line (l)')
+Rectangle(common=styles, y=2.5, corner_style='triangle', label='Corner: triangle (t)')
+Rectangle(common=styles, y=3.75, corner_style='curve', label='Corner: curve (s)')
+Rectangle(common=styles, y=5, corner_style='photo', label='Corner: photo (p)')
+PageBreak()
+
+
 # ---- END
 Text(common=txt, text="Rectangle END...")
 
@@ -290,4 +307,5 @@ Save(
         "peak", "rotation", "notch_style", "borders",
         "slices", "slices_custom",
         "prows_defaults", "prows_inwards", "prows_outwards",
+        "corners",
         None])
