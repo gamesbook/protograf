@@ -18,18 +18,13 @@ Footer()
 Hexagon(
     cx=9.5, cy=14,
     side=10,
-    fill_stroke="forestgreen",
-    label="Welcome to\na protograf\ndemo",
-    label_size=30,
-    label_stroke="white",
-    label_my=-1.5,
-    label_mx=4.1)
+    fill_stroke="forestgreen")
 # the track of the signs...
 sign = circle(
     cx=0, cy=0, radius=2.7,
     label='{{sequence}}',
     fill=None, stroke_width=18,
-    radii=[0,90,180,270], radii_stroke_width=18,)
+    radii=[60,150,240,330], radii_stroke_width=18,)
 iron = circle(common=sign, stroke="black")
 wood = circle(common=sign, stroke="sienna")
 bronze = circle(common=sign, stroke="goldenrod")
@@ -42,6 +37,14 @@ Track(
     clockwise=True,
     rotation_style='i',
     start=6)
+Text(wrap=True,
+     height=4.5, width=5,
+     x=7, y=12,
+     # box_stroke="white",
+     text="Welcome to a protograf demo!",
+     align="centre",
+     font_size=26,
+     stroke="white")
 PageBreak()
 
 # ---- header text
@@ -178,12 +181,12 @@ Blueprint()
 Text(common=header, text="Rotated shapes with labels")
 Arrow(x=3, y=6, height=3, width=1.25, head_height=1, head_width=2, rotation=45, stroke_width=2, label="arrow")
 Polygon(x=4, y=24.5, radius=2, rotation=45, stroke_width=2, label="polygon6")
-Polygon(x=10, y=24.5, radius=2, sides=8, angle=22.5, rotation=45, stroke_width=2, label="polygon8")
+Polygon(x=10, y=24.5, radius=2, sides=8, rotation=45, stroke_width=2, label="polygon8")
 Polygon(x=15, y=24.5, radius=2, sides=5, rotation=45, stroke_width=2, label="polygon5")
 Rectangle(x=2, y=18.5, width=4, height=3, rotation=45, stroke_width=2, label="rectangle")
 Trapezoid(x=14, y=13, width=4, top=2, height=3, rotation=45, stroke_width=2, label="trapezoid")
 Stadium(x=14.5, y=19, width=3, height=2, rotation=45, stroke_width=2, label="stadium")
-EquilateralTriangle(cx=10, cy=20, side=4, rotation=45, stroke_width=2, label="equ.tri.")
+EquilateralTriangle(cx=10, cy=20, side=4, rotation=45, stroke_width=2, label="equ.triangle")
 Hexagon(x=2, y=13, side=2, rotation=45, stroke_width=2, label="hexagon")
 Hexagon(x=8, y=13, side=2, orientation="pointy", rotation=45, stroke_width=2, label="hexagon")
 Star(x=10, y=9, vertices=5, radius=2, rotation=45, stroke_width=2, label="star")
@@ -209,9 +212,13 @@ Line(
     dashed=[0.2, 0.1],
     stroke="chartreuse",
     stroke_width=2,
+    label_size=18,
     label="dashed=[0.2,0.1]",
 )
-Line(x=0, y=5, x1=19, y1=5, dotted=True, stroke="blue", stroke_width=2, label="dotted")
+Line(x=0, y=5, x1=19, y1=5,
+     dotted=True,
+     stroke="blue", stroke_width=2,
+     label_size=18, label="dotted")
 # house
 points = [
     (2, 23),
@@ -234,13 +241,16 @@ PageBreak()
 Blueprint()
 Text(common=header, text="Bezier line and arc")
 Bezier(x=2, y=7, x1=12, y1=9, x2=12, y2=16, x3=17, y3=20, stroke="blue", stroke_width=2)
-Arc(x=1, y=7, x1=4, y1=4, stroke="tomato", stroke_width=4)
+Arc(cx=0, cy=21, radius=8, angle_start=15, angle_width=60, stroke="tomato", stroke_width=4)
 PageBreak()
 
 # ---- common, with angled lines
 Blueprint()
 Text(common=header, text="Lines drawn manually using angles (default origin)")
-cmm = Common(x=0, y=18, length=18, dots=True, stroke="darkmagenta", stroke_width=2)
+cmm = Common(
+    x=0, y=18, length=18,
+    font_size=18,
+    dots=True, stroke="darkmagenta", stroke_width=2)
 Line(common=cmm, label="No angle (flat)")
 Line(common=cmm, angle=15, label="15 degrees")
 Line(common=cmm, angle=30, label="30 degrees")
@@ -300,7 +310,7 @@ Hexagons(
     dot=0.05,
     dot_stroke="black",
     coord_elevation="top",
-    coord_font_size=9,
+    coord_font_size=12,
     coord_stroke="darkslategray",
     fill="white",
     stroke="darkslategray",
