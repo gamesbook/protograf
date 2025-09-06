@@ -304,23 +304,13 @@ PageBreak()
 
 # ---- rotation: polygon
 Blueprint()
-Text(common=txt, text="Polygon: rotation (flat)")
-poly6 = Common(fill=None, sides=6, diameter=1, stroke_width=1, orientation='flat')
-Polygon(common=poly6, y=1, x=1.0, label="0")
-Polygon(common=poly6, y=2, x=1.5, rotation=15, label="15")
-Polygon(common=poly6, y=3, x=2.0, rotation=30, label="30")
-Polygon(common=poly6, y=4, x=2.5, rotation=45, label="45")
-Polygon(common=poly6, y=5, x=3.0, rotation=60, label="60")
-PageBreak()
-
-Blueprint()
-Text(common=txt, text="Polygon: rotation (pointy)")
-poly6 = Common(fill=None, sides=6, diameter=1, stroke_width=1, orientation='pointy')
-Polygon(common=poly6, y=1, x=1.0, label="0")
-Polygon(common=poly6, y=2, x=1.5, rotation=15, label="15")
-Polygon(common=poly6, y=3, x=2.0, rotation=30, label="30")
-Polygon(common=poly6, y=4, x=2.5, rotation=45, label="45")
-Polygon(common=poly6, y=5, x=3.0, rotation=60, label="60")
+Text(common=txt, text="Polygon: rotation")
+poly6 = Common(fill=None, sides=6, diameter=1, stroke_width=1)
+Polygon(common=poly6, cy=1, cx=1.0, label="0")
+Polygon(common=poly6, cy=2, cx=1.5, rotation=15, label="15")
+Polygon(common=poly6, cy=3, cx=2.0, rotation=30, label="30")
+Polygon(common=poly6, cy=4, cx=2.5, rotation=45, label="45")
+Polygon(common=poly6, cy=5, cx=3.0, rotation=60, label="60")
 PageBreak()
 
 # ---- polygon sizes
@@ -912,7 +902,7 @@ Save(
         "stadium_red_rotation",
         "slices_rhombus",
         "polygon_rotation_flat",
-        "polygon_rotation_pointy", "polygon_sizes", "grid_3x4",
+        "polygon_sizes", "grid_3x4",
         "line_custom", "line_centred",
         "line_connections", "line_connections_arrow", "line_connections_spoke",
         "bezier_custom", "ellipse_custom", "rectangle_custom",

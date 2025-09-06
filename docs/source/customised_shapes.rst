@@ -599,6 +599,7 @@ that it can be customised.
 - `Peak <rectPeak_>`_
 - `Perbises <rectPerbis_>`_
 - `Prows <rectProws_>`_
+- `Radii <rectRadii_>`_
 - `Rotation <rectRotation_>`_
 - `Rounding <rectRounding_>`_
 - `Slices <rectSlices_>`_
@@ -1053,16 +1054,16 @@ drawn from the centre of a Rectangle towards the mid-points of its edges.
             perbis_stroke_width=2,
             perbis_stroke="red")
         Rectangle(
-            common=prbs, x=1, y=1,
+            common=prbs, x=0.5, y=1,
             perbis='n', label="N")
         Rectangle(
-            common=prbs, x=2, y=1,
+            common=prbs, x=2.5, y=1,
             perbis='s', label="S")
         Rectangle(
-            common=prbs, x=1, y=3,
+            common=prbs, x=0.5, y=4,
             perbis='w', label="W")
         Rectangle(
-            common=prbs, x=2, y=3,
+            common=prbs, x=2.5, y=4,
             perbis='e', label="E")
 
       These Rectangles all share the following Common properties that
@@ -1225,6 +1226,60 @@ Example 3. Outwards
 
       This example shows how a ship-like shape can be formed by appropriate
       setting of the heights and control points for a rectangle.
+
+===== ======
+
+.. _rectRadii:
+
+Radii
+-----
+`^ <rectangleIndex_>`_
+
+Radii are lines from the centre of a Rectangle towards its vertices.
+
+.. |rpi| image:: images/custom/rectangle/radii.png
+   :width: 330
+
+===== ======
+|rpi| This example shows Rectangles constructed using these commands:
+
+      .. code:: python
+
+        rds = Common(
+            height=2, width=1,
+            radii_stroke_width=2,
+            radii_stroke="red")
+        Rectangle(
+            common=rds, x=0.5, y=1,
+            radii='nw', label="NW")
+        Rectangle(
+            common=rds, x=2.5, y=1,
+            radii='ne', label="NE")
+        Rectangle(
+            common=rds, x=0.5, y=4,
+            radii='sw', label="SW")
+        Rectangle(
+            common=rds, x=2.5, y=4,
+            radii='se', label="SE")
+
+      These Rectangles all share the following Common properties that
+      differ from the defaults:
+
+      - *height* and *width* - set the basic configuration
+      - *radii_stroke_width* - set to ``2`` points; a thick line
+      - *radii_stroke* - set to the color ``red`` to make it stand out
+        from the Rectangle
+
+      Each Rectangle has its own setting for:
+
+      - *x* and *y* - different positions on the page for the upper-left
+        corner
+      - *label* - text to help identify it
+      - *radii* - if specified with a ``*`` then radii will be drawn
+        in all directions |dash| otherwise:
+
+        - ``ne`` (NorthEast) or ``nw`` (NorthWest) draw a upward sloping line
+        - ``se`` (SouthEast) or ``sw`` (SouthWest) draw a downward sloping line
 
 ===== ======
 

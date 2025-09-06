@@ -1316,34 +1316,41 @@ Example 5. Polygon Rotation
    :width: 330
 
 ===== ======
-|pl4| This example shows five shapes constructed using the command with
+|pl4| This example shows five Polygons constructed using the command with
       additional properties:
 
       .. code:: python
 
+        poly6 = Common(
+            fill=None,
+            sides=6,
+            diameter=1,
+            stroke_width=1)
+
         Polygon(
             common=poly6,
-            y=1, x=1.0, label="0")
+            cy=1, cx=1.0, label="0")
         Polygon(
             common=poly6,
-            y=2, x=1.5,
+            cy=2, cx=1.5,
             rotation=15, label="15")
         Polygon(
             common=poly6,
-            y=3, x=2.0,
+            cy=3, cx=2.0,
             rotation=30, label="30")
         Polygon(
             common=poly6,
-            y=4, x=2.5,
+            cy=4, cx=2.5,
             rotation=45, label="45")
         Polygon(
             common=poly6,
-            y=5, x=3.0,
+            cy=5, cx=3.0,
             rotation=60, label="60")
 
       The examples have the following properties:
 
-      - *x* and *y* - set the upper-left location
+      - *common* - set shared diameter, sides and fill for all Polygons
+      - *cx* and *cy* - set the centre location for the Polygon
       - *radius* - ``1`` cm in each case
       - *sides* - the default of ``6`` in each case (a `hexagon`_ shape)
       - *rotation* - varies from 0 |deg| to 60 |deg|
@@ -3329,7 +3336,7 @@ Example 2. Polygon Rotation
 +++++++++++++++++++++++++++
 `↑ <coreShapeRotation_>`_
 
-.. |rt2| image:: images/customised/polygon_rotation_pointy.png
+.. |rt2| image:: images/customised/polygon_rotation_flat.png
    :width: 330
 
 ===== ======
@@ -3342,8 +3349,10 @@ Example 2. Polygon Rotation
       .. code:: python
 
         poly6 = Common(
-          fill=None, sides=6, diameter=1,
-          stroke_width=1, orientation='flat')
+          fill=None,
+          sides=6,
+          diameter=1,
+          stroke_width=1)
 
         Polygon(common=poly6,
                 y=1, x=1.0, label="0")

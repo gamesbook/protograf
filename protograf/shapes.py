@@ -3097,13 +3097,6 @@ class PolygonShape(BaseShape):
                 feedback("The perbis value must be a list of numbers!", True)
         if self.cx is not None and self.cy is not None:
             self.x, self.y = self.cx, self.cy
-        # ---- class variables
-        self.flatten_angle = 0
-        if (_lower(self.orientation) == "flat" and not (self.sides - 2) % 4 == 0) or (
-            _lower(self.orientation) == "pointy" and (self.sides - 2) % 4 == 0
-        ):
-            interior = ((self.sides - 2) * 180.0) / self.sides
-            self.flatten_angle = (180 - interior) / 2.0
         # ---- RESET UNIT PROPS (last!)
         self.set_unit_properties()
 
@@ -3335,8 +3328,7 @@ class PolygonShape(BaseShape):
         # radius
         radius = self.get_radius()
         # calculate vertices - assumes x,y marks the centre point
-        _rotation = self.flatten_angle
-        vertices = geoms.polygon_vertices(self.sides, radius, Point(x, y), _rotation)
+        vertices = geoms.polygon_vertices(self.sides, radius, Point(x, y), None)
         # for p in vertices: print(f'*G* {p.x / 28.3465}, {p.y / 28.3465}')
         return PolyGeometry(x, y, radius, side, half_flat, vertices)
 
@@ -3350,8 +3342,7 @@ class PolygonShape(BaseShape):
             y = self._u.y + self._o.delta_y
         radius = self.get_radius()
         # calculate vertices - assumes x,y marks the centre point
-        _rotation = self.flatten_angle
-        vertices = geoms.polygon_vertices(self.sides, radius, Point(x, y), _rotation)
+        vertices = geoms.polygon_vertices(self.sides, radius, Point(x, y), None)
         # for p in vertices: print(f'*V* {p.x / 28.3465}, {p.y / 28.3465}')
         return vertices
 
@@ -3420,8 +3411,7 @@ class PolygonShape(BaseShape):
             kwargs["rotation_point"] = self.centroid
             is_rotated = True
         # ---- updated geom
-        # _rotation = rotation or self.flatten_angle
-        # vertices = geoms.polygon_vertices(self.sides, radius, Point(x, y), _rotation)
+        # vertices = geoms.polygon_vertices(self.sides, radius, Point(x, y), None)
         # ---- invalid polygon?
         if not vertices or len(vertices) == 0:
             return
@@ -3720,7 +3710,7 @@ class RectangleShape(BaseShape):
         vertices = self.get_vertexes(rotation=rotation, **kwargs)
         vcount = len(vertices) - 1
         _perbis_pts = []
-        print(f"*** RECT perbis {centre=} {vertices=}")
+        # print(f"*** RECT perbis {centre=} {vertices=}")
         for key, vertex in enumerate(vertices):
             if key == 0:
                 p1 = Point(vertex.x, vertex.y)
@@ -3731,9 +3721,7 @@ class RectangleShape(BaseShape):
             pc = geoms.fraction_along_line(p1, p2, 0.5)  # centre pt of edge
             _perbis_pts.append(pc)  # debug use
             compass, angle = geoms.angles_from_points(centre, pc)
-            print(
-                f"*** RECT *** perbis {key=} {directions[key]=} {pc=} {compass=} {angle=}"
-            )
+            # f"*** RECT *** perbis {key=} {directions[key]=} {pc=} {compass=} {angle=}"
             _perbis = Perbis(
                 point=pc,
                 direction=directions[key],
@@ -3786,7 +3774,7 @@ class RectangleShape(BaseShape):
             if pb_offset is not None and pb_offset != 0:
                 offset_pt = geoms.point_on_circle(centre, pb_offset, a_perbis.angle)
                 end_pt = geoms.point_on_line(offset_pt, edge_pt, pb_length)
-                print(f"{key=} {pb_angle=} {offset_pt=} {x_c=}, {y_c=}")
+                # print(f"{key=} {offset_pt=} {x_c=}, {y_c=}")
                 cnv.draw_line((offset_pt.x, offset_pt.y), (end_pt.x, end_pt.y))
             else:
                 cnv.draw_line((centre.x, centre.y), (edge_pt.x, edge_pt.y))
@@ -3798,6 +3786,36 @@ class RectangleShape(BaseShape):
             stroke_ends=self.perbis_ends,
             dashed=self.perbis_dashed,
             dotted=self.perbis_dotted,
+        )
+
+    def draw_radii(self, cnv, ID, centre: Point, vertices: list):
+        """Draw line(s) connecting the Rectangle centre to a vertex.
+
+        Args:
+            ID: unique ID
+            vertices: list of Rectangle nodes as Points
+            centre: the centre Point of the Rectangle
+
+        Note:
+            * vertices start top-left and are ordered anti-clockwise
+        """
+        _dirs = tools.validated_directions(
+            self.radii, DirectionGroup.ORDINAL, "rectangle radii"
+        )
+        if "nw" in _dirs:  # slope UP to the left
+            cnv.draw_line(centre, vertices[0])
+        if "sw" in _dirs:  # slope DOWN to the left
+            cnv.draw_line(centre, vertices[1])
+        if "se" in _dirs:  # slope DOWN to the right
+            cnv.draw_line(centre, vertices[2])
+        if "ne" in _dirs:  # slope UP to the right
+            cnv.draw_line(centre, vertices[3])
+        # color, thickness etc.
+        self.set_canvas_props(
+            index=ID,
+            stroke=self.radii_stroke or self.stroke,
+            stroke_width=self.radii_stroke_width or self.stroke_width,
+            stroke_ends=self.radii_ends,
         )
 
     def get_angles(self, rotation=0, **kwargs):
@@ -5000,6 +5018,10 @@ class RectangleShape(BaseShape):
                 # ---- * draw perbises
                 if self.perbis:
                     self.draw_perbis(cnv, ID, Point(x_d, y_d), **kwargs)
+            if item == "radii":
+                # ---- * draw radii
+                if self.radii:
+                    self.draw_radii(cnv, ID, Point(x_d, y_d), self.vertexes)
             if item == "corners":
                 # ---- * draw corners
                 self.draw_corners(cnv, ID, x, y)
