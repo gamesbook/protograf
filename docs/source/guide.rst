@@ -37,9 +37,9 @@ other.
     of hexagonal grids and customise or add to them
 13. :doc:`Additional Commands <additional_commands>` - special commands not part
     of the core shapes; fonts, dates and access to BoardGameGeek data
-14. :doc:`Customised Objects <objects>` - special composite shapes not part
-    of the core shapes; polyominoes, pentominoes
-15. :doc:`Custom Functions <functions>` - special functions for specific
+14. :doc:`Compound Objects <objects>` - special composite shapes not part
+    of the core shapes e.g. cubes, dice, polyominoes, pentominoes
+15. :doc:`Special Functions <functions>` - special functions for specific
     situations
 16. :doc:`Terminology <terminology>` - summary of common jargon and descriptions
     of many of the elements' properties

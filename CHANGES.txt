@@ -9,6 +9,8 @@ protograf Changes
 - Add corner property for Rectangle
 - Add perbis property for Rectangle
 - Add radii property for Rectangle
+- Alter default orientation for Polygon (flat "down")
+- Restructure documentation
 
 2025-08-30 (0.2.16)
 -------------------

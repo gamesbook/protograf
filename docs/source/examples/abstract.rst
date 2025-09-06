@@ -1,6 +1,6 @@
-==============================
-Examples: Abstract Board Games
-==============================
+====================
+Abstract Board Games
+====================
 
 These examples are meant to demonstrate the type of output you can expect
 to create with **protograf**.  They are *not* meant to be exhaustive or

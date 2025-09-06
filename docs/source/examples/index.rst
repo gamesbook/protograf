@@ -1,11 +1,13 @@
-==================
-Examples: Overview
-==================
+========================
+Overview of the Examples
+========================
+
+.. |dash| unicode:: U+2014 .. EM DASH SIGN
 
 The examples supplied with :doc:`protograf <../index>` attempt to highlight
 or demonstrate how different functions or features can be used. They do
 **not** attempt to be comprehensive and cover all features, but they
-**do** give some ideas as to what can be done - and how.
+**do** give some ideas as to what can be done |dash| and how.
 
 In most cases, you will need to look at the script itself to understand how the
 output has been created.
@@ -21,8 +23,9 @@ output has been created.
    constructed
 5. :doc:`BGG <bgg>` - how to retrieve and display data that can be
    accessed from the BoardGameGeek API
-6. :doc:`Various <various>` - examples of miscellaneous "real world" things;
+6. :doc:`Assorted <various>` - examples of various "real world" things;
    usually constructed using multiple different elements of **protograf**
+   to give ideas of what might be used in a game design
 
 .. HINT::
 

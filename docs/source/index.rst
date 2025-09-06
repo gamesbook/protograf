@@ -24,27 +24,58 @@ useful information but do build on each other.
 
 .. toctree::
    :maxdepth: 2
-   :caption: Contents:
+   :caption: Getting Setup:
 
-   guide
-   overview
    setting_up
+
+.. toctree::
+   :maxdepth: 2
+   :caption: Introduction:
+
+   overview
+   guide
    basic_concepts
-   worked_example
+
+.. toctree::
+   :maxdepth: 2
+   :caption: Concepts:
+
    script_anatomy
    additional_concepts
+   terminology
+
+.. toctree::
+   :maxdepth: 2
+   :caption: Text & Shapes:
+
    core_shapes
-   card_decks
-   deck_command
    customised_shapes
    customised_text
+
+.. toctree::
+   :maxdepth: 2
+   :caption: Making Cards:
+
+   card_decks
+   worked_example
+   deck_command
+
+.. toctree::
+   :maxdepth: 2
+   :caption: Advanced Topics:
+
    layouts
    hexagonal_grids
    additional_commands
    objects
    functions
-   terminology
-   commands
+   using_fonts
+   python_commands
+
+.. toctree::
+   :maxdepth: 2
+   :caption: Examples:
+
    examples/index
    examples/abstract
    examples/commercial
@@ -52,9 +83,14 @@ useful information but do build on each other.
    examples/cards
    examples/counters
    examples/various
-   using_fonts
-   python_commands
+
+.. toctree::
+   :maxdepth: 2
+   :caption: References:
+
+   commands
    development
+   rationale
    useful_resources
 
 

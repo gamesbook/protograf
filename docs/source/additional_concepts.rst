@@ -114,7 +114,7 @@ The string can contain numbers as well - ``"ABC 123"``. Strings are usually
 Also see below on `using quotes in text <Quotes in Text>`_.
 
 Numbers are either *integers* |dash| "whole" or "counting" numbers, such as
-``21`` or ``100``|dash| or *floats* which are numbers with fractions, such as
+``21`` or ``100`` |dash| or *floats* which are numbers with fractions, such as
 ``3.141``. In most cases,  **protograf** will handle these differences for you.
 
 Booleans are commonly referred to a "true" or "false" values. In Python, the
@@ -157,7 +157,7 @@ Case-sensitivity
 ================
 `↑ <table-of-contents-addcon_>`_
 
-**protograf**, like Python, is case-sensitive - unlike some computer
+**protograf**, like Python, is case-sensitive |dash| unlike some computer
 languages or, for example, the file names that are used in Windows; so a
 lowercase name is **NOT** the same as an uppercase version of it.
 

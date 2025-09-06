@@ -1,9 +1,9 @@
-=============================
-Appendix IV: Useful Resources
-=============================
+=========================
+Useful External Resources
+=========================
 
-These are resources that might supplement, or aid, with game design when
-working with :doc:`protograf <index>`.
+These are resources, available on the web, that might supplement, or aid, with
+game design when working with :doc:`protograf <index>`.
 
 .. NOTE::
 

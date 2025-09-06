@@ -1,13 +1,13 @@
-=========
-Functions
-=========
+=================
+Special Functions
+=================
 
 .. |dash| unicode:: U+2014 .. EM DASH SIGN
 
-This list provides a guide to using all the custom functions specific to
+This list provides a guide to using all the functions that are specific to
 :doc:`protograf <index>`.
 
-.. HINT::
+.. NOTE::
 
   :doc:`protograf <index>` is a small, specialised tool; but its part of a
   much greater Python language "ecosystem", and functions from the
@@ -41,7 +41,7 @@ of enabling creation of cards and other graphic layouts.
 
 In all cases, a function is used or activated through its name followed by
 round brackets; something like this |dash| ``the_function_name()``.  In some
-cases, additional properties |dash| much like the ones used in
+cases, additional properties |dash| much like the ones used for a
 :ref:`Command() <command-concept>` |dash| can be set to customise the
 function's behaviour.
 
