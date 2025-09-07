@@ -227,8 +227,8 @@ Rectangle(
     perbis="*",
     perbis_stroke_width=2,
     perbis_length=0.4,
-    perbis_offset=1.8,
-    # perbis_offset_y=3,
+    perbis_offset_y=1.8,
+    perbis_offset_x=2.8,
     cross=0.5,
     cross_stroke="white",
     cross_stroke_width=1.5)

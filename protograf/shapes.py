@@ -9,7 +9,6 @@ import logging
 import math
 import os
 from pathlib import Path
-import random
 from urllib.parse import urlparse
 
 # third party
@@ -22,9 +21,6 @@ from protograf import globals
 from protograf.utils import colrs, geoms, tools, support, fonts
 from protograf.utils.tools import _lower
 from protograf.utils.constants import (
-    GRID_SHAPES_WITH_CENTRE,
-    COLOR_NAMES,
-    DEBUG_COLOR,
     BGG_IMAGES,
 )
 from protograf.utils.messaging import feedback
@@ -71,6 +67,13 @@ def draw_line(
     cnv=None, start: Point = None, end: Point = None, shape: BaseShape = None, **kwargs
 ) -> dict:
     """Draw a line on the canvas (Page) between two points for a Shape.
+
+    Args:
+
+    - cnv (PyMuPDF Page object): where the line is drawn
+    - start (Point): start of the line
+    - end (Point): end of the line
+    - shape (BaseShape): shape for which line is being drawn
 
     Returns:
         kwargs (modified for styled lines)
@@ -242,7 +245,8 @@ class ArcShape(BaseShape):
                         feedback("The nested list values must be fractions!", True)
             else:
                 feedback(
-                    "The nested value must either be a whole number or a list of fractions.",
+                    "The nested value must either be a whole number "
+                    "or a list of fractions.",
                     True,
                 )
             if intervals:
@@ -255,7 +259,7 @@ class ArcShape(BaseShape):
                     )
                     # ---- draw sector
                     # feedback(
-                    #     f'***Arc: {p_P=} {centre=} {self.angle_start=} {self.angle_width=}')
+                    #     f'***Arc: {centre=} {self.angle_start=} {self.angle_width=}')
                     cnv.draw_sector(  # anti-clockwise from p_P; 90° default
                         (centre.x, centre.y),
                         (p_P.x, p_P.y),
@@ -324,7 +328,7 @@ class ArrowShape(BaseShape):
         total_height = self._u.height + self.head_height_u
         if tail_height <= 0:
             feedback("The Arrow head height must be less than overall height", True)
-        # print(f"***2 {self._u.width=} {self.tail_width_u=}  {self.head_width_u=} {self.fill=} ")
+        # print(f"***2 {self._u.width=} {self.tail_width_u=}  {self.head_width_u=}  ")
         vertices = []
         vertices.append(Point(x_s, y_s))  # lower-left corner
         vertices.append(Point(x_c - self._u.width / 2.0, y_s - tail_height))
@@ -609,7 +613,8 @@ class CircleShape(BaseShape):
                         feedback("The nested list values must be fractions!", True)
             else:
                 feedback(
-                    "The nested value must either be a whole number or a list of fractions.",
+                    "The nested value must either be a whole number"
+                    " or a list of fractions.",
                     True,
                 )
             if intervals:
@@ -635,7 +640,7 @@ class CircleShape(BaseShape):
                 _radii = [
                     float(angle) for angle in self.radii if angle >= 0 and angle <= 360
                 ]
-            except:
+            except Exception:
                 feedback(
                     f"The radii {self.radii} are not valid - must be a list of numbers"
                     " from 0 to 360",
@@ -665,6 +670,11 @@ class CircleShape(BaseShape):
             # print(f'*** {_radii_labels=} {_radii_strokes=}')
             label_key, stroke_key = 0, 0
             label_points = []
+
+            # ---- set radii styles
+            lkwargs = {}
+            lkwargs["wave_style"] = self.kwargs.get("radii_wave_style", None)
+            lkwargs["wave_height"] = self.kwargs.get("radii_wave_height", 0)
             for key, rad_angle in enumerate(_radii):
                 # points based on length of line, offset and the angle in degrees
                 diam_pt = geoms.point_on_circle(
@@ -687,9 +697,11 @@ class CircleShape(BaseShape):
                 label_points.append(
                     (Point((x_start + x_end) / 2.0, (y_start + y_end) / 2.0), rad_angle)
                 )
-                # ---- draw radii line
-                cnv.draw_line((x_start, y_start), (x_end, y_end))
-                # ---- style radii lines
+                # ---- draw a radii line
+                draw_line(
+                    cnv, (x_start, y_start), (x_end, y_end), shape=self, **lkwargs
+                )
+                # ---- style radii line
                 _radii_stroke = _radii_strokes[stroke_key]
                 self.set_canvas_props(
                     index=ID,
@@ -946,7 +958,6 @@ class CircleShape(BaseShape):
                 br=Point(self.x_c + self._u.radius, self.y_c + self._u.radius),
             )
         # ---- handle rotation
-        is_rotated = False
         rotation = kwargs.get("rotation", self.rotation)
         if rotation:
             self.centroid = muPoint(x, y)
@@ -1567,7 +1578,7 @@ class EquilateralTriangleShape(BaseShape):
         if self.cx and self.cy:
             self.centroid = Point(self._u.cx, self._u.cy)
             centroid_to_vertex = side / math.sqrt(3)
-            y_off = height + centroid_to_vertex
+            # y_off = height + centroid_to_vertex
             x = self._u.cx - side / 2.0
             y = self._u.cy + (height - centroid_to_vertex)
             # print(f'** {side=} {height=} {centroid_to_vertex=} {y_off=}')
@@ -1675,7 +1686,8 @@ class HexShape(BaseShape):
             half_flat = side * math.sqrt(3) / 2.0
         if not self.radius and not self.height and not self.diameter and not self.side:
             feedback(
-                "No value for side or height or diameter or radius supplied for hexagon.",
+                "No value for side or height or diameter or radius"
+                " supplied for hexagon.",
                 True,
             )
         # ---- diameter and radius
@@ -2014,9 +2026,9 @@ class HexShape(BaseShape):
             else DirectionGroup.HEX_FLAT_EDGE
         )
         if self.paths is not None and not isinstance(self.paths, list):
-            feedback(f"A Hexagon's paths must be in the form of a list!", True)
+            feedback("A Hexagon's paths must be in the form of a list!", True)
         if self.paths == []:
-            feedback(f"A Hexagon's path list cannot be empty!", False, True)
+            feedback("A Hexagon's path list cannot be empty!", False, True)
 
         # --- calculate offset centres
         hex_geom = self.get_geometry()
@@ -2258,6 +2270,10 @@ class HexShape(BaseShape):
                 self.perbis, dir_group, "hex perbis"
             )
 
+        # ---- set perbis styles
+        lkwargs = {}
+        lkwargs["wave_style"] = self.kwargs.get("perbis_wave_style", None)
+        lkwargs["wave_height"] = self.kwargs.get("perbis_wave_height", 0)
         for key, a_perbis in perbises.items():
             if self.perbis and key not in perbis_dirs:
                 continue
@@ -2267,9 +2283,19 @@ class HexShape(BaseShape):
                 offset_pt = geoms.point_on_circle(centre, pb_offset, a_perbis.angle)
                 end_pt = geoms.point_on_line(offset_pt, edge_pt, pb_length)
                 # print(f'{pb_angle=} {offset_pt=} {x_c=}, {y_c=}')
-                cnv.draw_line((offset_pt.x, offset_pt.y), (end_pt.x, end_pt.y))
+                start_point = offset_pt.x, offset_pt.y
+                end_point = end_pt.x, end_pt.y
             else:
-                cnv.draw_line((centre.x, centre.y), (edge_pt.x, edge_pt.y))
+                start_point = centre.x, centre.y
+                end_point = edge_pt.x, edge_pt.y
+            # ---- draw a perbis line
+            draw_line(
+                cnv,
+                start_point,
+                end_point,
+                shape=self,
+                **lkwargs,
+            )
 
         self.set_canvas_props(
             index=ID,
@@ -2295,28 +2321,32 @@ class HexShape(BaseShape):
             else DirectionGroup.HEX_FLAT
         )
         _dirs = tools.validated_directions(self.radii, dir_group, "hex radii")
+        # ---- set radii styles
+        lkwargs = {}
+        lkwargs["wave_style"] = self.kwargs.get("radii_wave_style", None)
+        lkwargs["wave_height"] = self.kwargs.get("radii_wave_height", 0)
         if "ne" in _dirs:  # slope UP to the right
-            cnv.draw_line(centre, vertices[4])
+            draw_line(cnv, centre, vertices[4], shape=self, **lkwargs)
         if "sw" in _dirs:  # slope DOWN to the left
-            cnv.draw_line(centre, vertices[1])
+            draw_line(cnv, centre, vertices[1], shape=self, **lkwargs)
         if "se" in _dirs:  # slope DOWN to the right
             if self.orientation in ["p", "pointy"]:
-                cnv.draw_line(centre, vertices[3])
+                draw_line(cnv, centre, vertices[3], shape=self, **lkwargs)
             else:
-                cnv.draw_line(centre, vertices[2])
+                draw_line(cnv, centre, vertices[2], shape=self, **lkwargs)
         if "nw" in _dirs:  # slope UP to the left
             if self.orientation in ["p", "pointy"]:
-                cnv.draw_line(centre, vertices[0])
+                draw_line(cnv, centre, vertices[0], shape=self, **lkwargs)
             else:
-                cnv.draw_line(centre, vertices[5])
+                draw_line(cnv, centre, vertices[5], shape=self, **lkwargs)
         if "n" in _dirs and self.orientation in ["p", "pointy"]:  # vertical UP
-            cnv.draw_line(centre, vertices[5])
+            draw_line(cnv, centre, vertices[5], shape=self, **lkwargs)
         if "s" in _dirs and self.orientation in ["p", "pointy"]:  # vertical DOWN
-            cnv.draw_line(centre, vertices[2])
+            draw_line(cnv, centre, vertices[2], shape=self, **lkwargs)
         if "e" in _dirs and self.orientation in ["f", "flat"]:  # horizontal RIGHT
-            cnv.draw_line(centre, vertices[3])
+            draw_line(cnv, centre, vertices[3], shape=self, **lkwargs)
         if "w" in _dirs and self.orientation in ["f", "flat"]:  # horizontal LEFT
-            cnv.draw_line(centre, vertices[0])
+            draw_line(cnv, centre, vertices[0], shape=self, **lkwargs)
         # color, thickness etc.
         self.set_canvas_props(
             index=ID,
@@ -2469,7 +2499,7 @@ class HexShape(BaseShape):
                     centre, geo.half_flat - abs(spk_length), spk_angle
                 )
             else:
-                # print(f'*** HEX {spk_length=}  {geo.half_flat=} {spk_width=} {edge_pt=}')
+                # print(f'***HEX{spk_length=} {geo.half_flat=} {spk_width=} {edge_pt=}')
                 top_pt = geoms.point_on_circle(
                     centre, spk_length + geo.half_flat, spk_angle
                 )
@@ -2508,7 +2538,8 @@ class HexShape(BaseShape):
             half_flat = side * math.sqrt(3) / 2.0
         if not self.radius and not self.height and not self.diameter and not self.side:
             feedback(
-                "No value for side or height or diameter or radius supplied for hexagon.",
+                "No value for side or height or diameter or radius"
+                " supplied for hexagon.",
                 True,
             )
         half_side = side / 2.0
@@ -2628,7 +2659,7 @@ class HexShape(BaseShape):
                 # x = self.col * 2.0 * geo.side + self._o.delta_x
                 # if self.row & 1:
                 #     x = x + geo.side
-                # y = self.row * 2.0 * geo.half_flat + self._o.delta_y  # do NOT add half_flat
+                # y = self.row * 2.0 * geo.half_flat + self._o.delta_y  # NO half_flat
                 x = (
                     self.col * 2.0 * (geo.side + self._u.spacing_x)
                     + self._o.delta_x
@@ -3201,6 +3232,11 @@ class PolygonShape(BaseShape):
             if self.perbis_length
             else self.get_radius()
         )
+
+        # ---- set perbis styles
+        lkwargs = {}
+        lkwargs["wave_style"] = self.kwargs.get("perbis_wave_style", None)
+        lkwargs["wave_height"] = self.kwargs.get("perbis_wave_height", 0)
         for key, pb_angle in enumerate(_perbis):
             if self.perbis and key + 1 not in self.perbis:
                 continue
@@ -3211,9 +3247,20 @@ class PolygonShape(BaseShape):
                 offset_pt = geoms.point_on_circle(centre, pb_offset, pb_angle)
                 end_pt = geoms.point_on_line(offset_pt, edge_pt, pb_length)
                 # print(f'*** {end_pt=} {offset_pt=}')
-                cnv.draw_line((offset_pt.x, offset_pt.y), (end_pt.x, end_pt.y))
+                start_point = offset_pt.x, offset_pt.y
+                end_point = end_pt.x, end_pt.y
             else:
-                cnv.draw_line((centre.x, centre.y), (edge_pt.x, edge_pt.y))
+                start_point = centre.x, centre.y
+                end_point = edge_pt.x, edge_pt.y
+            # ---- draw a perbis line
+            draw_line(
+                cnv,
+                start_point,
+                end_point,
+                shape=self,
+                **lkwargs,
+            )
+
         self.set_canvas_props(
             index=ID,
             stroke=self.perbis_stroke,
@@ -3246,6 +3293,10 @@ class PolygonShape(BaseShape):
             if self.radii_length
             else self.get_radius()
         )
+        # ---- set radii styles
+        lkwargs = {}
+        lkwargs["wave_style"] = self.kwargs.get("radii_wave_style", None)
+        lkwargs["wave_height"] = self.kwargs.get("radii_wave_height", 0)
         for rad_angle in _radii:
             # points based on length of line, offset and the angle in degrees
             diam_pt = geoms.point_on_circle(centre, rad_length, rad_angle)
@@ -3253,9 +3304,20 @@ class PolygonShape(BaseShape):
                 offset_pt = geoms.point_on_circle(centre, rad_offset, rad_angle)
                 end_pt = geoms.point_on_line(offset_pt, diam_pt, rad_length)
                 # print('***', rad_angle, offset_pt, f'{x_c=}, {y_c=}')
-                cnv.draw_line((offset_pt.x, offset_pt.y), (end_pt.x, end_pt.y))
+                start_point = offset_pt.x, offset_pt.y
+                end_point = end_pt.x, end_pt.y
             else:
-                cnv.draw_line((centre.x, centre.y), (diam_pt.x, diam_pt.y))
+                start_point = centre.x, centre.y
+                end_point = diam_pt.x, diam_pt.y
+            # ---- draw a radii line
+            draw_line(
+                cnv,
+                start_point,
+                end_point,
+                shape=self,
+                **lkwargs,
+            )
+
         self.set_canvas_props(
             cnv=cnv,
             index=ID,
@@ -3749,7 +3811,6 @@ class RectangleShape(BaseShape):
         """
         vertices = self.get_vertexes(rotation=rotation, **kwargs)
         perbises = self.calculate_perbises(cnv=cnv, centre=centre, vertices=vertices)
-        pb_offset = self.unit(self.perbis_offset, label="perbis offset") or 0
         pb_length = (
             self.unit(self.perbis_length, label="perbis length")
             if self.perbis_length
@@ -3760,9 +3821,24 @@ class RectangleShape(BaseShape):
                 self.perbis, DirectionGroup.CARDINAL, "rectangle perbis"
             )
 
+        # ---- set perbis styles
+        lkwargs = {}
+        lkwargs["wave_style"] = self.kwargs.get("perbis_wave_style", None)
+        lkwargs["wave_height"] = self.kwargs.get("perbis_wave_height", 0)
         for key, a_perbis in perbises.items():
             if self.perbis and key not in perbis_dirs:
                 continue
+            # offset based on dir
+            if key in ["n", "s"]:
+                pb_offset = self.unit(self.perbis_offset, label="perbis offset") or 0
+                pb_offset = (
+                    self.unit(self.perbis_offset_y, label="perbis offset") or pb_offset
+                )
+            if key in ["e", "w"]:
+                pb_offset = self.unit(self.perbis_offset, label="perbis offset") or 0
+                pb_offset = (
+                    self.unit(self.perbis_offset_x, label="perbis offset") or pb_offset
+                )
             # length based on dir
             if not pb_length:
                 if key in ["n", "s"]:
@@ -3774,10 +3850,20 @@ class RectangleShape(BaseShape):
             if pb_offset is not None and pb_offset != 0:
                 offset_pt = geoms.point_on_circle(centre, pb_offset, a_perbis.angle)
                 end_pt = geoms.point_on_line(offset_pt, edge_pt, pb_length)
-                # print(f"{key=} {offset_pt=} {x_c=}, {y_c=}")
-                cnv.draw_line((offset_pt.x, offset_pt.y), (end_pt.x, end_pt.y))
+                # print(f"{key=} {centre=} {pb_offset=} {a_perbis.angle=} {offset_pt=}")
+                start_point = offset_pt.x, offset_pt.y
+                end_point = end_pt.x, end_pt.y
             else:
-                cnv.draw_line((centre.x, centre.y), (edge_pt.x, edge_pt.y))
+                start_point = centre.x, centre.y
+                end_point = edge_pt.x, edge_pt.y
+            # ---- draw a perbis line
+            draw_line(
+                cnv,
+                start_point,
+                end_point,
+                shape=self,
+                **lkwargs,
+            )
 
         self.set_canvas_props(
             index=ID,
@@ -4336,7 +4422,7 @@ class RectangleShape(BaseShape):
 
     def calculate_xy(self, **kwargs):
         # ---- adjust start
-        # feedback(f'*** Rect.calc {self.col=} {self.row=} {self._u.offset_x=} {self._o.off_x=}')
+        # feedback(f'***Rect{self.col=}{self.row=} {self._u.offset_x=}{self._o.off_x=}')
         if self.row is not None and self.col is not None:
             if self.kwargs.get("grouping_cols", 1) == 1:
                 x = (
@@ -4836,7 +4922,7 @@ class RectangleShape(BaseShape):
         elif is_chevron:
             try:
                 _chevron_height = float(self.chevron_height)
-            except:
+            except Exception:
                 feedback(
                     f"A chevron_height of {self.chevron_height} is not valid!", True
                 )
@@ -5694,7 +5780,7 @@ class StadiumShape(BaseShape):
         self.set_canvas_props(cnv=cnv, index=ID, **keys)
 
         # ---- draw stadium - lines or curves
-        radius_lr = self._u.height / 2.0
+        # radius_lr = self._u.height / 2.0
         radius_tb = self._u.width / 2.0
 
         for key, vertex in enumerate(self.vertexes):
@@ -5872,8 +5958,8 @@ class TextShape(BaseShape):
             height = self._u.height
         if self.width:
             width = self._u.width
-        rotation = kwargs.get("rotation", self.rotation)
         # TODO => text rotation
+        # rotation = kwargs.get("rotation", self.rotation)
         # ---- set canvas
         self.set_canvas_props(index=ID)
         # ---- overrides for self.text / text value
@@ -5950,7 +6036,7 @@ class TextShape(BaseShape):
             try:
                 keys = self.text_properties(string=_text, **kwargs)
                 keys["rotate"] = text_rotation
-                # feedback(f'*** Text WRAP {kwargs=} \n=> {keys=} \n=> {rect=} \n=>{_text=}')
+                # feedback(f'*** Text WRAP {kwargs=}=> \n{keys=} \n{rect=} \n{_text=}')
                 if self.run_debug:
                     globals.doc_page.draw_rect(
                         rect, color=self.debug_color, dashes="[1 2] 0"
@@ -5982,8 +6068,8 @@ class TextShape(BaseShape):
                 if not fonts.builtin_font(self.font_name):  # local check
                     _, _path, font_file = tools.get_font_file(self.font_name)
                     # if font_file:
-                    #     keys["css"] = '@font-face {font-family: %s; src: url(%s);}' % (
-                    #         _font_name, font_file)
+                    #   keys["css"] = '@font-face {font-family: %s; src: url(%s);}' % (
+                    #     _font_name, font_file)
                 keys["css"] = globals.css
                 if self.style:
                     _text = f'<div style="{self.style}">{_text}</div>'
@@ -6090,8 +6176,8 @@ class TrapezoidShape(BaseShape):
         """Calculate vertices of trapezoid."""
         # set start
         _cx, _cy, _x, _y = self.calculate_xy()  # for direct call without draw()
-        cx = kwargs.get("cx", _cx)
-        cy = kwargs.get("cy", _cy)
+        # cx = kwargs.get("cx", _cx)
+        # cy = kwargs.get("cy", _cy)
         x = kwargs.get("x", _x)
         y = kwargs.get("y", _y)
         # build array

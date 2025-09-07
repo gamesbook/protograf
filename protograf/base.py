@@ -443,9 +443,6 @@ class BaseCanvas:
             "radii_length", None
         )  # default: circle radius
         self.radii_offset = self.defaults.get("radii_offset", 0)
-        self.radii_ends = self.defaults.get("radii_ends", None)
-        self.radii_dotted = self.defaults.get("radii_dotted", self.dotted)
-        self.radii_dashed = self.defaults.get("radii_dashed", self.dashed)
         self.radii_labels = self.defaults.get("radii_labels", "")
         self.radii_labels_size = self.defaults.get("radii_labels_size", self.font_size)
         self.radii_labels_font = self.defaults.get("radii_labels_font", self.font_name)
@@ -457,6 +454,11 @@ class BaseCanvas:
         self.radii_labels_rotation = self.defaults.get("radii_labels_rotation", 0)
         self.radii_labels_my = self.defaults.get("radii_labels_my", 0)
         self.radii_labels_mx = self.defaults.get("radii_labels_mx", 0)
+        self.radii_ends = self.defaults.get("radii_ends", None)
+        self.radii_dotted = self.defaults.get("radii_dotted", self.dotted)
+        self.radii_dashed = self.defaults.get("radii_dashed", self.dashed)
+        self.radii_wave_style = self.defaults.get("radii_wave_style", None)
+        self.radii_wave_height = self.defaults.get("radii_wave_height", 0)
         # ---- circle
         self.nested = self.defaults.get("nested", None)
         self.petals = self.defaults.get("petals", 0)
@@ -504,9 +506,17 @@ class BaseCanvas:
         )
         self.perbis_length = self.defaults.get("perbis_length", None)
         self.perbis_offset = self.defaults.get("perbis_offset", 0)
+        self.perbis_offset_x = self.defaults.get(
+            "perbis_offset_x", self.perbis_offset
+        )  # Rectangle
+        self.perbis_offset_y = self.defaults.get(
+            "perbis_offset_y", self.perbis_offset
+        )  # Rectangle
         self.perbis_ends = self.defaults.get("perbis_ends", None)
         self.perbis_dotted = self.defaults.get("perbis_dotted", self.dotted)
         self.perbis_dashed = self.defaults.get("perbis_dashed", self.dashed)
+        self.perbis_wave_style = self.defaults.get("paths_wave_style", None)
+        self.perbis_wave_height = self.defaults.get("paths_wave_height", 0)
         # ---- hexagon
         self.caltrops = self.defaults.get("caltrops", None)
         self.caltrops_invert = self.defaults.get("caltrops_invert", False)
@@ -986,6 +996,8 @@ class BaseShape:
         self.radii_labels_rotation = self.kw_float(
             kwargs.get("radii_labels_rotation", 0)
         )
+        self.radii_wave_style = kwargs.get("radii_wave_style", base.radii_wave_style)
+        self.radii_wave_height = kwargs.get("radii_wave_height", base.radii_wave_height)
         self.radii_labels_my = self.kw_float(kwargs.get("radii_labels_my", 0))
         self.radii_labels_mx = self.kw_float(kwargs.get("radii_labels_mx", 0))
         # ---- circle
@@ -1047,6 +1059,12 @@ class BaseShape:
         self.perbis_offset = self.kw_float(
             kwargs.get("perbis_offset", base.perbis_offset)
         )
+        self.perbis_offset_x = self.kw_float(
+            kwargs.get("perbis_offset_x", base.perbis_offset_x)
+        )  # Rectangle
+        self.perbis_offset_y = self.kw_float(
+            kwargs.get("perbis_offset_y", base.perbis_offset_y)
+        )  # Rectangle
         self.perbis_ends = kwargs.get("perbis_ends", base.perbis_ends)
         self.perbis_dotted = kwargs.get("perbis_dotted", base.dotted)
         self.perbis_dashed = kwargs.get("perbis_dashed", self.dashed)

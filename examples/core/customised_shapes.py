@@ -882,41 +882,93 @@ Table(y=3, x=0,
       stroke="blue", fill="aqua")
 PageBreak()
 
+# ---- perbis - styled
+Blueprint()
+Text(common=txt, text="Line: wave/sawtooth")
+
+pwave = Common(
+    perbis_stroke="purple", perbis_stroke_width=1,
+    perbis_wave_style='wave', perbis_wave_height=0.1)
+rsaw = Common(
+    radii_stroke="firebrick", radii_stroke_width=1,
+    radii_wave_style='sawtooth', radii_wave_height=0.1)
+
+Line(
+    x=0, y=0.5, length=1.5, stroke="purple", stroke_width=1,
+    wave_style='wave', wave_height=0.1)
+Line(
+    x=2, y=0.5, length=1.5, stroke="firebrick", stroke_width=1,
+    wave_style='sawtooth', wave_height=0.1)
+Polygon(
+    common=pwave,
+    cx=1, cy=1.5, sides=8, radius=0.75,
+    perbis="2,4,7")
+Polygon(
+    common=rsaw,
+    cx=3, cy=1.5, sides=8, radius=0.75,
+    radii="*")
+Circle(
+    common=pwave,
+    cx=1, cy=3.25, radius=0.75,
+    radii=[60,180,300],
+    radii_wave_style='sawtooth', radii_wave_height=0.1
+)
+Circle(
+    common=rsaw,
+    cx=3, cy=3.25, radius=0.75,
+    radii=[60,180,300],
+)
+Hexagon(
+    cx=1, cy=5, radius=0.75,
+    perbis='*',
+    perbis_stroke="purple", perbis_stroke_width=1,
+    perbis_wave_style='wave', perbis_wave_height=0.1
+)
+Hexagon(
+    cx=3, cy=5, radius=0.75,
+    radii="ne se w",
+    radii_stroke="firebrick", radii_stroke_width=1,
+    radii_wave_style='sawtooth', radii_wave_height=0.1
+)
+PageBreak()
+
 # ---- END
 Text(common=txt, text="Shapes END...")
 
-Save(
-     output='png',
-     dpi=300,
-     directory="../docs/source/images/customised",
-     names=[
-        None,
-        "blueprint_subdiv", "dots_crosses", "centred", "right_angled_triangle",
-        "compass", "lines", "starfield_rectangle", "starfield_circle",
-        "starfield_poly", "equilateral_triangle", "right_angled_triangle_flip",
-        "sectors", "grid_gray", "dotgrid_moleskine", "dotgrid_rowscols", "arc",
-        "stadium_edges", "trapezoid_flip", "chord",
-        "polygon_radii", "polygon_perbis", "polygon_slices",
-        "dates_formats",
-        "images_normal_rotation", "rhombus_red_rotation",
-        "stadium_red_rotation",
-        "slices_rhombus",
-        "polygon_rotation_flat",
-        "polygon_sizes", "grid_3x4",
-        "line_custom", "line_centred",
-        "line_connections", "line_connections_arrow", "line_connections_spoke",
-        "bezier_custom", "ellipse_custom", "rectangle_custom",
-        "square_custom", "trapezoid_custom", "image_default",
-        "descriptions", "label_offset", "star_custom",
-        "polyshape_default", "polyshape_custom", "polyshape_offset",
-        "rectangles_rowcol", "rectangles_custom", "rhombus_custom",
-        "rhombus_borders", "trapezoid_borders",
-        "arrow_sizes", "arrow_rotate", "arrowheads",
-        "polyline_basic", "polyline_arrow",
-        "shape_centred", "shape_centred_move", "shape_centred_custom",
-        "shapes_centred",
-        "qr_code",
-        "image_sliced", "image_label",
-        "shape_rotation", "shape_hatch_and_rotation",
-        "table_defaults", "table_custom",
-        None])
+Save()
+# Save(
+#      output='png',
+#      dpi=300,
+#      directory="../docs/source/images/customised",
+#      names=[
+#         None,
+#         "blueprint_subdiv", "dots_crosses", "centred", "right_angled_triangle",
+#         "compass", "lines", "starfield_rectangle", "starfield_circle",
+#         "starfield_poly", "equilateral_triangle", "right_angled_triangle_flip",
+#         "sectors", "grid_gray", "dotgrid_moleskine", "dotgrid_rowscols", "arc",
+#         "stadium_edges", "trapezoid_flip", "chord",
+#         "polygon_radii", "polygon_perbis", "polygon_slices",
+#         "dates_formats",
+#         "images_normal_rotation", "rhombus_red_rotation",
+#         "stadium_red_rotation",
+#         "slices_rhombus",
+#         "polygon_rotation_flat",
+#         "polygon_sizes", "grid_3x4",
+#         "line_custom", "line_centred",
+#         "line_connections", "line_connections_arrow", "line_connections_spoke",
+#         "bezier_custom", "ellipse_custom", "rectangle_custom",
+#         "square_custom", "trapezoid_custom", "image_default",
+#         "descriptions", "label_offset", "star_custom",
+#         "polyshape_default", "polyshape_custom", "polyshape_offset",
+#         "rectangles_rowcol", "rectangles_custom", "rhombus_custom",
+#         "rhombus_borders", "trapezoid_borders",
+#         "arrow_sizes", "arrow_rotate", "arrowheads",
+#         "polyline_basic", "polyline_arrow",
+#         "shape_centred", "shape_centred_move", "shape_centred_custom",
+#         "shapes_centred",
+#         "qr_code",
+#         "image_sliced", "image_label",
+#         "shape_rotation", "shape_hatch_and_rotation",
+#         "table_defaults", "table_custom",
+#         "perbis_styled",
+#         None])
