@@ -54,14 +54,14 @@ Rectangular Hexagonal Grid
 The basic hexagonal grid is laid out in a rectangular fashion. It can be
 customised in a number of ways.
 
-- `Rows and Columns <rectRowsCols_>`_
-- `Coordinates <rectCoords_>`_
-- `Caltrops <rectCaltrops_>`_
-- `Hidden <rectHidden_>`_
-- `Offset <rectOffset_>`_
-- `Radii <rectRadii_>`_
+- `Rows and Columns <rectHGRowsCols_>`_
+- `Coordinates <rectHGCoords_>`_
+- `Caltrops <rectHGCaltrops_>`_
+- `Hidden <rectHGHidden_>`_
+- `Offset <rectHGOffset_>`_
+- `Radii <rectHGRadii_>`_
 
-.. _rectRowsCols:
+.. _rectHGRowsCols:
 
 Rows and Columns
 ----------------
@@ -117,7 +117,7 @@ Rows and Columns
 
 ===== ======
 
-.. _rectCoords:
+.. _rectHGCoords:
 
 Coordinates
 -----------
@@ -247,7 +247,7 @@ Most coordinate property names are prefixed with ``coord_``.
 
 ===== ======
 
-.. _rectCaltrops:
+.. _rectHGCaltrops:
 
 Caltrops
 --------
@@ -319,7 +319,7 @@ a set of three small lines; these replace the normal edge of the hexagon.
 
 ===== ======
 
-.. _rectHidden:
+.. _rectHGHidden:
 
 Hidden
 ------
@@ -381,7 +381,7 @@ when a grid is designed for a scenario where not all hexagons are needed.
 
 ===== ======
 
-.. _rectOffset:
+.. _rectHGOffset:
 
 Offset
 ------
@@ -428,11 +428,11 @@ Offset
         grid |dash| or every even row |dash| for a pointy grid |dash| is
         offset by one-half hexagon from those on either side
       - *coord_...* - various settings to control the appearance of the
-        `hex coordinates <rectCoords_>`_
+        `hex coordinates <rectHGCoords_>`_
 
 ===== ======
 
-.. _rectRadii:
+.. _rectHGRadii:
 
 Radii
 -----

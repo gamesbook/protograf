@@ -63,4 +63,4 @@ particular shape.
 *protograf* is not in any way at a "professional software level" for creating
 production-ready graphics and does *NOT* handle "special effects" such kerning,
 skewing, image tiling, gradient colors, text-effects (e.g. drop shadows; 3D),
- etc. etc.
+etc. etc.

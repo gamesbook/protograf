@@ -19,7 +19,7 @@ other.
 3.  :doc:`Basic Concepts <basic_concepts>` - core aspects of
     **protograf** that you **must** know
 4.  :doc:`A First Example <worked_example>` - step-by-step
-    example of setting up and running a script to generate a deck of cards
+    example of setting up and running a script to generate a *deck of cards*
 5.  :doc:`Script Anatomy <script_anatomy>` - how a script is constructed
 6.  :doc:`Additional Concepts <additional_concepts>` - additional
     aspects of **protograf** that can also help with script creation
@@ -28,7 +28,7 @@ other.
 8.  :doc:`Card Decks <card_decks>` - how to create a deck, or set, of
     cards/tiles; more detail also in the :doc:`Deck command <deck_command>`
 9.  :doc:`Customised Shapes <customised_shapes>` - how to refine the
-    appearance of certain shapes; circles, hexagons and rectangles
+    appearance of certain shapes; circles, hexagons, lines and rectangles
 10. :doc:`Customised Text <customised_text>` - how to refine the
     appearance of text
 11. :doc:`Repetitive Elements <layouts>` - how to work with repeats, sequences,

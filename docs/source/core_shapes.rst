@@ -3088,13 +3088,14 @@ the desired output:
 
 - `x and y`_
 - `cx and cy`_
-- `Fill and Stroke`_
+- `Centre Shape`_
+- `Centre Shapes`_
 - `Dot and Cross`_
+- `Fill and Stroke`_
 - `Rotation`_
 - `Text Descriptions`_
 - `Transparency`_
-- `Centre Shape`_
-- `Centre Shapes`_
+- `Wave Styles`_
 
 .. _coreShapeXY:
 
@@ -3894,5 +3895,101 @@ the change in ``x`` and ``y`` values as part of the set.
       drawn at the centre of its parent shape; the ``big_dot`` is given offset
       values for the x and y positions - so is drawn below and to the right
       of centre.
+
+===== ======
+
+
+.. _coreWave:
+
+Wave Styles
+~~~~~~~~~~~
+`^ <shapes-common-properties_>`_
+
+A number of shapes, that make use of straight line properties, can be styled
+using their "wave" property.
+
+These include the *radii* and *perbis* properties of Circle, Hexagon, Polygon
+and Rectangle (for details on those properties, see the section on
+:doc:`Customised Shapes <customised_shapes>`).
+
+
+Example 1. Radii and Perbis
++++++++++++++++++++++++++++
+
+.. |ws1| image:: images/customised/perbis_styled.png
+   :width: 330
+
+===== ======
+|ws1| This example shows centre shapes constructed as follows:
+
+      .. code:: python
+
+        Line(
+            x=0, y=0.5, length=1.5,
+            stroke="purple", stroke_width=1,
+            wave_style='wave', wave_height=0.1
+        )
+        Line(
+            x=2, y=0.5, length=1.5,
+            stroke="firebrick", stroke_width=1,
+            wave_style='sawtooth', wave_height=0.1
+        )
+        Polygon(
+            perbis_stroke="purple",
+            perbis_stroke_width=1,
+            perbis_wave_style='wave',
+            perbis_wave_height=0.1,
+            cx=1, cy=1.5, sides=8, radius=0.75,
+            perbis="2,4,7"
+        )
+        Polygon(
+            radii_stroke="firebrick",
+            radii_stroke_width=1,
+            radii_wave_style='sawtooth',
+            radii_wave_height=0.1,
+            cx=3, cy=1.5, sides=8, radius=0.75,
+            radii="*")
+        Rectangle(
+            perbis_stroke="purple",
+            perbis_stroke_width=1,
+            perbis_wave_style='wave',
+            perbis_wave_height=0.1,
+            cx=1, cy=3.25, height=1, width=2,
+            perbis="n s e w",
+        )
+        Circle(
+            radii_stroke="firebrick",
+            radii_stroke_width=1,
+            radii_wave_style='sawtooth',
+            radii_wave_height=0.1,
+            cx=3, cy=3.25, radius=0.75,
+            radii=[60, 180, 300],
+        )
+        Hexagon(
+            cx=1, cy=5, radius=0.75,
+            perbis='*',
+            perbis_stroke="purple",
+            perbis_stroke_width=1,
+            perbis_wave_style='wave',
+            perbis_wave_height=0.1
+        )
+        Hexagon(
+            cx=3, cy=5, radius=0.75,
+            radii="ne se w",
+            radii_stroke="firebrick",
+            radii_stroke_width=1,
+            radii_wave_style='sawtooth',
+            radii_wave_height=0.1
+        )
+
+      The purple lines have:
+
+      - *perbis_wave_style*  set to ``'wave'`` creating a wave-like effect
+      - *perbis_wave_height* set to ``0.1`` for the height of each "peak"
+
+      The dark red lines have:
+
+      - *radii_wave_style*  set to ``'sawtooth'`` creating a "zig-zag" effect
+      - *radii_wave_height* set to ``0.1`` for the height of each "peak"
 
 ===== ======
