@@ -56,6 +56,7 @@ useful information but do build on each other.
    :maxdepth: 2
    :caption: Making Cards:
 
+   card_deck_introduction
    card_decks
    worked_example
    deck_command

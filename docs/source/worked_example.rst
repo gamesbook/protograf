@@ -13,7 +13,8 @@ It will also be helpful if you have read the
 :doc:`Basic Concepts <basic_concepts>` section.  However, do note that
 not all aspects of the examples shown here are described in depth, and
 many of these will only become clear once you have read other parts of
-the full documentation.
+the full documentation such as the one on
+:doc:`Working with Cards <card_deck_introduction>`.
 
 .. HINT::
 

@@ -10,7 +10,8 @@ protograf Changes
 - Add perbis property for Rectangle (with x,y offsets)
 - Add radii property for Rectangle
 - Alter default orientation for Polygon (flat "down")
-- Restructure documentation
+- Add wave styling for perbis and radii
+- Restructure documentation; add Deck & Cards introduction
 
 2025-08-30 (0.2.16)
 -------------------

@@ -1,6 +1,6 @@
-==============
-Decks of Cards
-==============
+====================
+Deck & Card Commands
+====================
 
 .. |dash| unicode:: U+2014 .. EM DASH SIGN
 
@@ -11,10 +11,14 @@ ideas for :doc:`protograf <index>` as presented in the
 and that you've created some basic scripts of your own using the
 :doc:`Core Shapes <core_shapes>`.
 
+.. NOTE::
+
+    This section provides all the details, along with supporting examples,
+    of commands used in card creation. A high-level overview can be found in
+    the section on :doc:`Working with Cards <card_deck_introduction>`.
+
 .. _table-of-contents-crddk:
 
-- `Introduction`_
-- `Basic Concepts`_
 - `The Deck Command`_
 
   - `Deck Example 1. Defaults`_
@@ -42,69 +46,6 @@ and that you've created some basic scripts of your own using the
   - `S(election) command`_
   - `L(ookup) command`_
   - `Card functions`_
-- `Other Card Deck Resources`_
-
-
-Introduction
-============
-`↑ <table-of-contents-crddk_>`_
-
-Cards are a common and widely used method of storing and displaying
-small sets of related data.
-
-Scientists have used index cards since the 17th century and, of course,
-libraries have long-used card catalogues as a way to track information
-about books. Businesses in the 20th century used Rolodexes and business
-cards as means to track and exchange information about individuals. Early
-computers used perforated cards called "punch" cards to store their
-data. In gaming, playing cards have been popular both in China and
-Europe, coming into more widespread use somewhere in the 9th and 14th
-centuries respectively.
-
-The massive rise in popularity of a game like
-`Magic the Gathering <https://en.wikipedia.org/wiki/Magic:_The_Gathering>`_,
-from the early 1990s onwards, has inspired the much greater use of cards in
-all aspects of the modern board gaming experience, with cards or tiles
-taking the predominant role in many of them.
-
-
-Basic Concepts
-==============
-`↑ <table-of-contents-crddk_>`_
-
-Unlike some other designs, where you are specifying exactly where to locate
-elements on a page, **protograf** is designed to handle the flow of placing
-cards onto multiple pages, based on their size and the size of paper chosen.
-Then, for a card, you will set out elements exactly as you want them to appear.
-
-There are two core commands needed; the ``Card()`` and the ``Deck()``:
-
--  A ``Card()`` command is used to specify the design for a card, or range
-   of cards, typically using elements that have already been defined.
-   The patterns or designs can be set to appear on single or multiple cards.
--  A ``Deck()`` command is used to specify type, size and number of cards,
-   as well as any spacing between them, that will be used to create "frames"
-   for all of the cards in the deck and then lay them out on one or more pages.
-
-.. NOTE::
-
-    **protograf** also considers items such tiles or counters to be "cards" as
-    they are really just "shapes containing other shapes". See the section
-    on `Countersheet and Counter Commands`_
-
-In many cases, the ``Data()`` command will be needed in order to provide
-settings for the properties of the elements appearing on a card from another
-source; for example, an Excel or CSV file.  This will typically be text that
-needs to appear, but could also include colors and links to images.
-
-In some cases, the ``Matrix()`` command will be needed. This is an alternate
-method of providing the settings for the properties of the elements appearing
-on a card.
-
-These commands, and the ones supporting them, are described in detail below.
-
-For additional examples that illustrate the use of some of these commands,
-see the :doc:`card and deck examples <examples/cards>` section.
 
 .. _the-deck-command:
 
@@ -171,7 +112,7 @@ For the **copy** property to work, it is expected that there is a column
 with the label **Copies** available in the Deck's dataset (which is created
 by `the Data Command`_); in this case, the number in that column will be
 used to make that many copies of the card (unless it has a **mask**).
-id
+
 For the **mask** property to work, it is expected that there is a column
 with the label **Race** available in the Deck's dataset (which is created
 by `the Data Command`_); in this case, any card with data matching the
@@ -210,16 +151,27 @@ The Card Command
 `↑ <table-of-contents-crddk_>`_
 
 This command is both simple and flexible. It allows for a complex design, with
-many elements, to be added to any |dash| or all |dash| of the cards in a deck.
+many elements, to be added to one, some |dash| or all |dash| of the cards in
+a deck.
 
 The **key concept** to note about a card is that its essentially a "small page".
-Any x- and y-locations are therefore defined relative to the card
+Any x- and y-locations are therefore defined relative to the card edges
 and **not** to the page.
 
-A Card is defined slightly differently from other shapes in **protograf**
-in that the properties are not named.
+A Card is defined somewhat differently from other shapes in **protograf**
+in that the properties are not named... a typical Card command looks like:
 
-The **first value** supplied to the ``Card()`` command must be one or more
+    .. code:: python
+
+        Card("1", rectangle(), text())
+        Card("2-5", circle())
+
+This format is explained in the next two sections.
+
+Card Numbering
+--------------
+
+The **first** value supplied to the ``Card()`` command **must** be one or more
 sequence numbers of the relevant cards.  This value can be supplied either
 as a *string*, or a *list* (numbers between square brackets ``[`` and ``]``).
 
@@ -243,6 +195,9 @@ Examples of Card sequence numbers supplied as a *list*:
 - ``[10]`` -  a single number; card number 10
 - ``[10,11,12,13,15]`` - a set of numbers; in this case the cards numbered
   10 through to 15, but not number 14
+
+Card Elements
+-------------
 
 The **second value**, and **all further values**, supplied to the ``Card()``
 command must be a :doc:`core shape <core_shapes>` or a
@@ -666,7 +621,7 @@ Data Example 8. Filters
 `↑ <table-of-contents-crddk_>`_
 
 This example shows how data, in this case sourced from a "list of lists"
-|dash| but note that filters can be applied to *any* data source |dash|,
+|dash| note that filters can be applied to *any* data source |dash|
 can be filtered.
 
     .. code:: python
@@ -785,6 +740,8 @@ as to its purpose and use.
     although its "grammar" is specific to Inkscape, the principle and approach
     can be adapted to **protograf**
 
+
+.. _deck-supporting-commands:
 
 Supporting Commands
 ===================
@@ -1127,33 +1084,3 @@ created is then returned by the ``greet`` function.
 
 The Text() shape created by ``greet`` is then assigned to the first
 three cards in the usual way.
-
-
-.. _other-card-resources:
-
-Other Card Deck Resources
-=========================
-`↑ <table-of-contents-crddk_>`_
-
-**protograf** is by no means the only tool for creating decks of cards.
-Numerous other options exist, both free and commercial.  Some of the free /
-open-source ones are listed below.
-
-Inclusion of these links does **not** constitute a recommendation of them or
-their use!
-
-================== ======= ========== =========================================================
-Title              O/S     Language   Link
-================== ======= ========== =========================================================
-Batch Card Maker   Multi   Python     https://github.com/p-dimi/Batch-Card-Maker
-Card Creatr Studio Multi   Electron   https://cardcreatr.sffc.xyz/
-Card Editor        Windows Java       https://bitbucket.org/mattsinger/card-editor/src/release/
-CardFoldr          Multi   JavaScript https://foosel.github.io/cardfoldr/
-CardMaker          Multi   C#         https://github.com/nhmkdev/cardmaker
-DeCard64           Windows Delphi     https://github.com/Dimon-II/DeCard64
-Forge of Cards     Online  JavaScript https://forgeofcards.com/#/
-NanDeck            Windows ?          https://www.nandeck.com/
-Paperize           Online  JavaScript https://beta.editor.paperize.io/#/
-Strange Eons       Multi   Java       https://strangeeons.cgjennings.ca/index.html
-Squib              Multi   Ruby       https://github.com/andymeneely/squib
-================== ======= ========== =========================================================
