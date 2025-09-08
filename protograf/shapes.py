@@ -3594,10 +3594,16 @@ class PolylineShape(BaseShape):
         super().draw(cnv, off_x, off_y, ID, **kwargs)  # unit-based props
         # ---- set vertices
         self.vertexes = self.get_vertexes()
+        # ---- set line style
+        lkwargs = {}
+        lkwargs["wave_style"] = self.kwargs.get("wave_style", None)
+        lkwargs["wave_height"] = self.kwargs.get("wave_height", 0)
         # ---- draw polyline
         # feedback(f'***PolyLineShp{x=} {y=} {self.vertexes=}')
         if self.vertexes:
-            cnv.draw_polyline(self.vertexes)
+            for key, vertex in enumerate(self.vertexes):
+                if key < len(self.vertexes) - 1:
+                    draw_line(cnv, vertex, self.vertexes[key + 1], shape=self, **lkwargs)
             kwargs["closed"] = False
             kwargs["fill"] = None
             self.set_canvas_props(cnv=cnv, index=ID, **kwargs)
@@ -5655,10 +5661,19 @@ class ShapeShape(BaseShape):
         x_offset, y_offset = self.unit(self.x or 0), self.unit(self.y or 0)
         # ---- set vertices
         self.vertexes = self.get_vertexes()
+        # ---- set line style
+        lkwargs = {}
+        lkwargs["wave_style"] = self.kwargs.get("wave_style", None)
+        lkwargs["wave_height"] = self.kwargs.get("wave_height", 0)
         # ---- draw polyshape
         # feedback(f'***PolyShape{x=} {y=} {self.vertexes=}')
         if self.vertexes:
-            cnv.draw_polyline(self.vertexes)
+            for key, vertex in enumerate(self.vertexes):
+                if key < len(self.vertexes) - 1:
+                    draw_line(cnv, vertex, self.vertexes[key + 1], shape=self, **lkwargs)
+                else:
+                    draw_line(cnv, vertex, self.vertexes[0], shape=self, **lkwargs)
+            # cnv.draw_polyline(self.vertexes)
             kwargs["closed"] = True
             if kwargs.get("rounded"):
                 kwargs["lineJoin"] = 1
