@@ -180,7 +180,7 @@ Circle(cx=2, cy=22, radius=1,
        radii_offset=0.5, radii_length=1,
        radii_stroke="white", radii_stroke_width=15)
 Circle(cx=2, cy=22, radius=0.75, fill="#63B1BB", stroke="#63B1BB")
-Dot(x=2.5, y=21.5, stroke="white", dot_point=5)
+Dot(x=2.5, y=21.5, stroke="white", dot_width=5)
 
 
 Text(common=header_font, x=5, y=25,
@@ -232,7 +232,7 @@ Rectangle(
     cross=0.5,
     cross_stroke="white",
     cross_stroke_width=1.5)
-Dot(fill_stroke="red", dot_point=9, x=1.3, y=2.3)
+Dot(fill_stroke="red", dot_width=9, x=1.3, y=2.3)
 Text(text="REC",
      x=2.25, y=2.55, stroke="red")
 Text(text="00:00:00",

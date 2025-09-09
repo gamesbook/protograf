@@ -554,7 +554,7 @@ Example 6. Connections - Spoke
 
       .. code:: python
 
-        cc = Dot(cx=1.5, cy=3.5, dot_point=2)
+        cc = Dot(cx=1.5, cy=3.5, dot_width=2)
         cr = Circle(cx=3, cy=1, radius=0.5,
                     fill_stroke="red")
         co = Circle(cx=3, cy=5, radius=0.5,

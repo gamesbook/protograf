@@ -141,7 +141,7 @@ class DotGridShape(BaseShape):
         if self.cols == 0:
             self.cols = int((self.page_width) / width) + 1
         # ---- set canvas
-        size = self.dot_point / 2.0  # diameter is 3 points ~ 1mm or 1/32"
+        size = self.dot_width / 2.0  # diameter is 3 points ~ 1mm or 1/32"
         self.fill = self.stroke
         # ---- draw dot grid
         for y_col in range(0, self.rows):

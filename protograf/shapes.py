@@ -1354,8 +1354,8 @@ class DotShape(BaseShape):
         super(DotShape, self).__init__(_object=_object, canvas=canvas, **kwargs)
         self.kwargs = kwargs
         # ---- perform overrides
-        self.size = self.dot_point / 2.0  # diameter is 3 points ~ 1mm or 1/32"
-        self.radius = self.points_to_value(self.size, globals.units)
+        self.point_size = self.dot_width / 2.0  # diameter is 3 points ~ 1mm or 1/32"
+        self.radius = self.points_to_value(self.point_size, globals.units)
         if self.cx is not None and self.cy is not None:
             self.x = self.cx - self.radius
             self.y = self.cy - self.radius
@@ -3603,7 +3603,9 @@ class PolylineShape(BaseShape):
         if self.vertexes:
             for key, vertex in enumerate(self.vertexes):
                 if key < len(self.vertexes) - 1:
-                    draw_line(cnv, vertex, self.vertexes[key + 1], shape=self, **lkwargs)
+                    draw_line(
+                        cnv, vertex, self.vertexes[key + 1], shape=self, **lkwargs
+                    )
             kwargs["closed"] = False
             kwargs["fill"] = None
             self.set_canvas_props(cnv=cnv, index=ID, **kwargs)
@@ -5670,7 +5672,9 @@ class ShapeShape(BaseShape):
         if self.vertexes:
             for key, vertex in enumerate(self.vertexes):
                 if key < len(self.vertexes) - 1:
-                    draw_line(cnv, vertex, self.vertexes[key + 1], shape=self, **lkwargs)
+                    draw_line(
+                        cnv, vertex, self.vertexes[key + 1], shape=self, **lkwargs
+                    )
                 else:
                     draw_line(cnv, vertex, self.vertexes[0], shape=self, **lkwargs)
             # cnv.draw_polyline(self.vertexes)

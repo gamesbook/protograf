@@ -172,7 +172,7 @@ class BaseCanvas:
         self.cx = self.defaults.get("cx", None)  # NB! not 0; needed for internal check
         self.cy = self.defaults.get("cy", None)  # NB! not 0; needed for internal check
         self.scaling = self.defaults.get("scaling", None)
-        self.dot_point = self.defaults.get("dot_point", 3.0)  # points
+        self.dot_width = self.defaults.get("dot_width", 3.0)  # points
         # ---- to be calculated ...
         self.area = None
         self.vertexes = []
@@ -701,8 +701,8 @@ class BaseShape:
         self.cx = self.kw_float(kwargs.get("cx", base.cx))  # centre (for some shapes)
         self.cy = self.kw_float(kwargs.get("cy", base.cy))  # centre (for some shapes)
         self.scaling = self.kw_float(kwargs.get("scaling", None))  # SVG images
-        self.dot_point = self.kw_float(
-            kwargs.get("dot_point", base.dot_point)
+        self.dot_width = self.kw_float(
+            kwargs.get("dot_width", base.dot_width)
         )  # points
         # ---- to be calculated ...
         self.area = base.area

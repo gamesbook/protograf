@@ -264,9 +264,9 @@ millimetres |dash| or anything else |dash| are converted to points.
 
 .. NOTE::
 
-   In a few cases, **protograf** adopts the word "size" where point units are
-   in use e.g. font size and stroke width, but because "size" is such a general
-   term,  it's not really used elsewhere.
+   In a few cases, **protograf** adopts the word "size" or "width" where
+   point units are in use e.g. font size, stroke width and dot width, but
+   because "size" is such a general term, it's not really used elsewhere.
 
 
 .. _stroke-concept:

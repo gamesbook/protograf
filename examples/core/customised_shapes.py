@@ -159,7 +159,7 @@ PageBreak()
 
 # ---- dotgrid - Moleskin
 Text(common=txt, text='DotGrid: "Moleskine" setting')
-DotGrid(stroke="darkgray", width=0.5, height=0.5, dot_point=1, offset_y=0.25)
+DotGrid(stroke="darkgray", width=0.5, height=0.5, dot_width=1, offset_y=0.25)
 PageBreak()
 
 # ---- dotgrid - rows & cols
@@ -168,7 +168,7 @@ Text(common=txt, text="DotGrid: rows&cols")
 DotGrid(stroke="darkgray",
         width=0.5, height=0.5,
         rows=14, cols=10,
-        dot_point=1)
+        dot_width=1)
 PageBreak()
 
 # ---- arc
@@ -399,7 +399,7 @@ PageBreak()
 # ---- line: connections - dot&spoke
 Blueprint(stroke_width=0.5)
 Text(common=txt, text="Line: connections; dot&spoke")
-cc = Dot(cx=1.5, cy=3.5, dot_point=2)
+cc = Dot(cx=1.5, cy=3.5, dot_width=2)
 cr = Circle(cx=3, cy=1, radius=0.5, fill_stroke="red")
 co = Circle(cx=3, cy=5, radius=0.5, fill_stroke="orange")
 ca = Circle(cx=1, cy=5, radius=0.5, fill_stroke="aqua")
@@ -749,8 +749,8 @@ PageBreak()
 # ---- Centred Shapes
 Blueprint()
 Text(common=txt, text="Centred Shapes (with offsets)")
-small_dot = dot(dot_point=4, fill="red")
-big_dot = dot(dot_point=8)
+small_dot = dot(dot_width=4, fill="red")
+big_dot = dot(dot_width=8)
 Hexagon(x=0.5, y=0.5, height=1, centre_shapes=[(small_dot), (big_dot, 0.2, 0.2)])
 Rhombus(x=2.4, y=0.3, height=1.5,  width=1.25, centre_shapes=[(small_dot), (big_dot, 0.2, 0.2)])
 Rectangle(x=0.5, y=2.5, height=1, width=1.25, centre_shapes=[(small_dot), (big_dot, 0.2, 0.2)])
@@ -928,6 +928,21 @@ Hexagon(
 )
 PageBreak()
 
+# ---- poly wave styles
+Blueprint()
+Text(common=txt, text="Poly... waves")
+Polyshape(
+    points=[(1, 2), (1, 1), (2, 0), (3, 1), (3, 2)],
+    wave_style="wave", wave_height=0.03,
+    fill="gold")
+Polyline(points='1,3 1,4 2,4 4,3',
+         stroke="red", stroke_width=2,
+         wave_style="sawtooth", wave_height=0.03,)
+Polyline(points='1,5 1,6 2,6 4,5',
+         stroke="purple", stroke_width=2,
+         wave_style="wave", wave_height=0.05,)
+PageBreak()
+
 # ---- END
 Text(common=txt, text="Shapes END...")
 
@@ -966,4 +981,5 @@ Save(
         "shape_rotation", "shape_hatch_and_rotation",
         "table_defaults", "table_custom",
         "perbis_styled",
+        "poly_waves",
         None])

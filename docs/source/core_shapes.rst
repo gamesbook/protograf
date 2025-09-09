@@ -298,7 +298,7 @@ Dot
 ~~~
 `↑ <shape-index_>`_
 
-A dot is a small, filled `Circle`_.
+A Dot shape is essentially a very small, pre-filled `Circle`_.
 
 Example 1. Default Dot
 ++++++++++++++++++++++
@@ -316,10 +316,14 @@ Example 1. Default Dot
 
       It has the following properties based on the defaults:
 
-      - centre at x-position ``1`` cm and at y-position ``1`` cm
-      - diameter of ``3`` points; there are 72 points in an inch, so this is 1/24th
-        of an inch, or approximately 1mm (``0.1`` cm), in size
+      - top-left at x-position ``1`` cm and at y-position ``1`` cm
+      - diameter of ``3`` points; there are 72 points in an inch, so this is
+        1/24th of an inch, or approximately ``1`` mm (``0.1`` cm), in size
       - fill color for a Dot is the same as the stroke |dash| default is black
+
+      The default diameter for a Dot can be changed by setting its *dot_width*
+      which, like *stroke_width* for Text, is in point units.
+
 ===== ======
 
 
@@ -2489,14 +2493,15 @@ Example 2. Moleskine Grid
         DotGrid(
             stroke="darkgray",
             width=0.5, height=0.5,
-            dot_point=1, offset_y=-0.25)
+            dot_width=1,
+            offset_y=-0.25)
 
       To simulate the dot grid found in Moleskine notebooks, it
       has the following properties set:
 
       - *width* and *height* - intervals between the centre of the dots
         in the x- and y-directions respectively
-      - *dot_point* - set to be smaller than the default of ``3``
+      - *dot_width* - set to be smaller than the default of ``3``
       - *stroke*  - set to ``darkgrey`` i.e. lighter than the default black
       - *offset_y* - moves the start of the grid slightly downwards by 1/4 cm
 
@@ -3851,8 +3856,8 @@ the change in ``x`` and ``y`` values as part of the set.
 
       .. code:: python
 
-        small_dot = dot(dot_point=4, fill="red")
-        big_dot = dot(dot_point=8)
+        small_dot = dot(dot_width=4, fill="red")
+        big_dot = dot(dot_width=8)
 
         Hexagon(
             x=0.5, y=0.5, height=1,
@@ -3910,7 +3915,8 @@ using their "wave" property.
 
 These include the *radii* and *perbis* properties of Circle, Hexagon, Polygon
 and Rectangle (for details on those properties, see the section on
-:doc:`Customised Shapes <customised_shapes>`).
+:doc:`Customised Shapes <customised_shapes>`).  In addition, the lines used
+to construct a Polyshape and Polyline can also be styled like waves.
 
 
 Example 1. Radii and Perbis
@@ -3991,5 +3997,47 @@ Example 1. Radii and Perbis
 
       - *radii_wave_style*  set to ``'sawtooth'`` creating a "zig-zag" effect
       - *radii_wave_height* set to ``0.1`` for the height of each "peak"
+
+===== ======
+
+
+Example 2. Polyshape and Polyline
++++++++++++++++++++++++++++++++++
+
+.. |ws2| image:: images/customised/poly_waves.png
+   :width: 330
+
+===== ======
+|ws2| This example shows poly-shapes constructed as follows:
+
+      .. code:: python
+
+        Polyshape(
+            points=[(1,2), (1,1), (2 0), (3,1), (3,2)],
+            wave_style="wave", wave_height=0.03,
+            fill="gold")
+        Polyline(
+            points='1,3 1,4 2,4 4,3',
+            stroke="red", stroke_width=2,
+            wave_style="sawtooth", wave_height=0.03)
+        Polyline(
+            points='1,5 1,6 2,6 4,5',
+            stroke="purple", stroke_width=2,
+            wave_style="wave", wave_height=0.05)
+
+      The top Polyshape, with a default line stroke, has:
+
+      - *perbis_wave_style*  set to ``'wave'`` creating a wave-like effect
+      - *perbis_wave_height* set to ``0.03`` for the height of each "peak"
+
+      The dark red thick Polyline has:
+
+      - *radii_wave_style*  set to ``'sawtooth'`` creating a "zig-zag" effect
+      - *radii_wave_height* set to ``0.03`` for the height of each "peak"
+
+      The purple thick Polyline has:
+
+      - *perbis_wave_style*  set to ``'wave'`` creating a wave-like effect
+      - *perbis_wave_height* set to ``0.05`` for the height of each "peak"
 
 ===== ======

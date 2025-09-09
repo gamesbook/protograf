@@ -91,7 +91,7 @@ Star(cx=3, cy=5, vertices=5, radius=2, label="star:3-5", common=dot)
 Rhombus(cx=16, cy=5, width=3, height=5, label="rhombus:16-5", common=dot)
 Square(cx=9, cy=5, side=3, label="square:9-5", common=dot)
 
-Dot(x=9, y=1, dot_point=6, label="dot:1-9")
+Dot(x=9, y=1, dot_width=6, label="dot:1-9")
 
 PageBreak()
 
@@ -116,7 +116,7 @@ Star(cx=3, cy=5, vertices=5, radius=2, heading="star:3-5", common=dot)
 Rhombus(cx=16, cy=5, width=3, height=5, heading="rhombus:16-5", common=dot)
 Square(cx=9, cy=5, side=3, heading="square:9-5", common=dot)
 
-Dot(x=9, y=1, dot_point=6, heading="dot:1-9")
+Dot(x=9, y=1, dot_width=6, heading="dot:1-9")
 
 PageBreak()
 
@@ -141,7 +141,7 @@ Star(cx=3, cy=5, vertices=5, radius=2, title="star:3-5", common=dot)
 Rhombus(cx=16, cy=5, width=3, height=5, title="rhombus:16-5", common=dot)
 Square(cx=9, cy=5, side=3, title="square:9-5", common=dot)
 
-Dot(x=9, y=1, dot_point=6, title="dot:1-9")
+Dot(x=9, y=1, dot_width=6, title="dot:1-9")
 
 PageBreak()
 
@@ -173,7 +173,7 @@ Rhombus(cx=16, cy=5, width=3, height=5,
         title="rhombus:16-5", title_stroke="black", fill_stroke="cyan")
 Square(cx=9, cy=5, side=3,
        title="square:9-5", title_stroke="black", fill_stroke="cyan")
-Dot(x=9, y=1, dot_point=6, title="dot:1-9")
+Dot(x=9, y=1, dot_width=6, title="dot:1-9")
 PageBreak()
 
 # ---- rotation all shapes + label
