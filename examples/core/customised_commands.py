@@ -35,7 +35,7 @@ PageBreak()
 def capitol(a=0, b=1, c="red"):
     Circle(cx=a+1, cy=b, radius=0.5, fill_stroke=c)
     Rectangle(x=a, y=b, height=1, width=2, fill_stroke=c,
-              notch_y=0.1, notch_x=0.5, notch_corners="nw ne",)
+              notch_y=0.1, notch_x=0.5, notch_directions="nw ne",)
     EquilateralTriangle(cx=a+1, cy=b-0.5, side=0.25, fill_stroke=c)
 
 Blueprint()

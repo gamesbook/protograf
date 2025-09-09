@@ -1,6 +1,6 @@
-==================
-Examples: Counters
-==================
+========
+Counters
+========
 
 .. |dash| unicode:: U+2014 .. EM DASH SIGN
 

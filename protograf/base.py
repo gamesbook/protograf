@@ -172,7 +172,7 @@ class BaseCanvas:
         self.cx = self.defaults.get("cx", None)  # NB! not 0; needed for internal check
         self.cy = self.defaults.get("cy", None)  # NB! not 0; needed for internal check
         self.scaling = self.defaults.get("scaling", None)
-        self.dot_point = self.defaults.get("dot_point", 3.0)  # points
+        self.dot_width = self.defaults.get("dot_width", 3.0)  # points
         # ---- to be calculated ...
         self.area = None
         self.vertexes = []
@@ -365,14 +365,30 @@ class BaseCanvas:
         self.rounding = self.defaults.get("rounding", 0)
         self.rounded = self.defaults.get("rounded", False)  # also line end
         self.notch = self.defaults.get("notch", 0)
-        self.notch_corners = self.defaults.get("notch_corners", "sw nw ne se")
+        self.notch_directions = self.defaults.get("notch_directions", "sw nw ne se")
         self.notch_x = self.defaults.get("notch_x", 0)
         self.notch_y = self.defaults.get("notch_y", 0)
         self.notch_style = self.defaults.get("notch_style", "snip")
         self.chevron = self.defaults.get("chevron", "")
         self.chevron_height = kwargs.get("chevron_height", 0)
+        self.corner = self.defaults.get("corner", 0)
+        self.corner_directions = self.defaults.get("corner_directions", "sw nw ne se")
+        self.corner_x = self.defaults.get("corner_x", 0)
+        self.corner_y = self.defaults.get("corner_y", 0)
+        self.corner_style = self.defaults.get("corner_style", "line")
+        self.corner_stroke = self.defaults.get("corner_stroke", self.stroke)
+        self.corner_fill = self.defaults.get("corner_fill", self.fill)
+        self.corner_stroke_width = self.defaults.get(
+            "corner_stroke_width", self.stroke_width
+        )
+        self.corner_dotted = self.defaults.get("corner_dotted", None)
+        self.corner_ends = self.defaults.get("corner_ends", self.line_ends)
+        self.corner_dashed = self.defaults.get("corner_dashed", None)  # ---- OTHER
+
         self.peaks = kwargs.get("peaks", [])
         self.peaks_dict = {}
+        self.prows = kwargs.get("prows", [])
+        self.prows_dict = {}
         self.borders = kwargs.get("borders", [])
         self.rounded_radius = self.defaults.get(
             "rounded_radius", 0.05
@@ -427,9 +443,6 @@ class BaseCanvas:
             "radii_length", None
         )  # default: circle radius
         self.radii_offset = self.defaults.get("radii_offset", 0)
-        self.radii_ends = self.defaults.get("radii_ends", None)
-        self.radii_dotted = self.defaults.get("radii_dotted", self.dotted)
-        self.radii_dashed = self.defaults.get("radii_dashed", self.dashed)
         self.radii_labels = self.defaults.get("radii_labels", "")
         self.radii_labels_size = self.defaults.get("radii_labels_size", self.font_size)
         self.radii_labels_font = self.defaults.get("radii_labels_font", self.font_name)
@@ -441,6 +454,11 @@ class BaseCanvas:
         self.radii_labels_rotation = self.defaults.get("radii_labels_rotation", 0)
         self.radii_labels_my = self.defaults.get("radii_labels_my", 0)
         self.radii_labels_mx = self.defaults.get("radii_labels_mx", 0)
+        self.radii_ends = self.defaults.get("radii_ends", None)
+        self.radii_dotted = self.defaults.get("radii_dotted", self.dotted)
+        self.radii_dashed = self.defaults.get("radii_dashed", self.dashed)
+        self.radii_wave_style = self.defaults.get("radii_wave_style", None)
+        self.radii_wave_height = self.defaults.get("radii_wave_height", 0)
         # ---- circle
         self.nested = self.defaults.get("nested", None)
         self.petals = self.defaults.get("petals", 0)
@@ -488,9 +506,17 @@ class BaseCanvas:
         )
         self.perbis_length = self.defaults.get("perbis_length", None)
         self.perbis_offset = self.defaults.get("perbis_offset", 0)
+        self.perbis_offset_x = self.defaults.get(
+            "perbis_offset_x", self.perbis_offset
+        )  # Rectangle
+        self.perbis_offset_y = self.defaults.get(
+            "perbis_offset_y", self.perbis_offset
+        )  # Rectangle
         self.perbis_ends = self.defaults.get("perbis_ends", None)
         self.perbis_dotted = self.defaults.get("perbis_dotted", self.dotted)
         self.perbis_dashed = self.defaults.get("perbis_dashed", self.dashed)
+        self.perbis_wave_style = self.defaults.get("paths_wave_style", None)
+        self.perbis_wave_height = self.defaults.get("paths_wave_height", 0)
         # ---- hexagon
         self.caltrops = self.defaults.get("caltrops", None)
         self.caltrops_invert = self.defaults.get("caltrops_invert", False)
@@ -675,8 +701,8 @@ class BaseShape:
         self.cx = self.kw_float(kwargs.get("cx", base.cx))  # centre (for some shapes)
         self.cy = self.kw_float(kwargs.get("cy", base.cy))  # centre (for some shapes)
         self.scaling = self.kw_float(kwargs.get("scaling", None))  # SVG images
-        self.dot_point = self.kw_float(
-            kwargs.get("dot_point", base.dot_point)
+        self.dot_width = self.kw_float(
+            kwargs.get("dot_width", base.dot_width)
         )  # points
         # ---- to be calculated ...
         self.area = base.area
@@ -865,7 +891,7 @@ class BaseShape:
         self.rounding = self.kw_float(kwargs.get("rounding", base.rounding))
         self.rounded = kwargs.get("rounded", base.rounded)  # also line end
         self.notch = self.kw_float(kwargs.get("notch", base.notch))
-        self.notch_corners = kwargs.get("notch_corners", base.notch_corners)
+        self.notch_directions = kwargs.get("notch_directions", base.notch_directions)
         self.notch_x = self.kw_float(kwargs.get("notch_x", base.notch_x))
         self.notch_y = self.kw_float(kwargs.get("notch_y", base.notch_y))
         self.notch_style = kwargs.get("notch_style", base.notch_style)
@@ -873,8 +899,25 @@ class BaseShape:
         self.chevron_height = self.kw_float(
             kwargs.get("chevron_height", base.chevron_height)
         )
+        self.corner = self.kw_float(kwargs.get("corner", base.corner))
+        self.corner_directions = kwargs.get("corner_directions", base.corner_directions)
+        self.corner_x = self.kw_float(kwargs.get("corner_x", base.corner_x))
+        self.corner_y = self.kw_float(kwargs.get("corner_y", base.corner_y))
+        self.corner_style = kwargs.get("corner_style", base.corner_style)
+        self.corner_stroke = kwargs.get("corner_stroke", base.corner_stroke)
+        self.corner_fill = kwargs.get("corner_fill", base.corner_fill)
+        self.corner_stroke_width = kwargs.get(
+            "corner_stroke_width", base.corner_stroke_width
+        )
+        self.corner_dotted = kwargs.get("corner_dotted", base.corner_dotted)
+        self.corner_ends = kwargs.get("corner_ends", base.corner_ends)
+        self.corner_dashed = kwargs.get(
+            "corner_dashed", base.corner_dashed
+        )  # ---- OTHER
         self.peaks = kwargs.get("peaks", base.peaks)
         self.peaks_dict = {}
+        self.prows = kwargs.get("prows", base.prows)
+        self.prows_dict = {}
         self.borders = kwargs.get("borders", base.borders)
         self.rounded_radius = base.rounded_radius
         # ---- rectangle / rhombus/ hexagon / circle
@@ -953,6 +996,8 @@ class BaseShape:
         self.radii_labels_rotation = self.kw_float(
             kwargs.get("radii_labels_rotation", 0)
         )
+        self.radii_wave_style = kwargs.get("radii_wave_style", base.radii_wave_style)
+        self.radii_wave_height = kwargs.get("radii_wave_height", base.radii_wave_height)
         self.radii_labels_my = self.kw_float(kwargs.get("radii_labels_my", 0))
         self.radii_labels_mx = self.kw_float(kwargs.get("radii_labels_mx", 0))
         # ---- circle
@@ -1014,6 +1059,12 @@ class BaseShape:
         self.perbis_offset = self.kw_float(
             kwargs.get("perbis_offset", base.perbis_offset)
         )
+        self.perbis_offset_x = self.kw_float(
+            kwargs.get("perbis_offset_x", base.perbis_offset_x)
+        )  # Rectangle
+        self.perbis_offset_y = self.kw_float(
+            kwargs.get("perbis_offset_y", base.perbis_offset_y)
+        )  # Rectangle
         self.perbis_ends = kwargs.get("perbis_ends", base.perbis_ends)
         self.perbis_dotted = kwargs.get("perbis_dotted", base.dotted)
         self.perbis_dashed = kwargs.get("perbis_dashed", self.dashed)
@@ -1492,6 +1543,20 @@ class BaseShape:
             if _lower(self.star_pattern) not in ["random", "cluster", "r", "c"]:
                 issue.append(f'"{self.pattern}" is an invalid starfield pattern!')
                 correct = False
+        # ---- rectangle - corners
+        if self.corner_style:
+            if _lower(self.corner_style) not in [
+                "line",
+                "l",
+                "curve",
+                "c",
+                "photo",
+                "p",
+                "triangle",
+                "t",
+            ]:
+                issue.append(f'"{self.corner_style}" is an invalid corner_style!')
+                correct = False
         # ---- rectangle - notches
         if self.notch_style:
             if _lower(self.notch_style) not in [
@@ -1527,9 +1592,37 @@ class BaseShape:
                         self.peaks_dict["w"] = value
                         self.peaks_dict["s"] = value
                     else:
-                        self.peaks_dict[_dir] = value
+                        if not self.peaks_dict.get(_dir):
+                            self.peaks_dict[_dir] = value
                 except Exception:
                     feedback(f'The peaks setting "{point}" is not valid!', True)
+        # ---- rectangle - prows
+        if self.prows:
+            if not isinstance(self.prows, list):
+                feedback(f"The prows '{self.prows}' is not a valid list!", True)
+            for item in self.prows:
+                if not isinstance(item, tuple):
+                    feedback(
+                        f'Each item in prows must be a set (not "{item}")!',
+                        True,
+                    )
+                try:
+                    _dir = item[0]
+                    if _lower(_dir) not in ["n", "e", "w", "s", "*"]:
+                        feedback(
+                            f'The prows direction must be one of n, e, s, w (not "{_dir}")!',
+                            True,
+                        )
+                    if _dir == "*":
+                        self.prows_dict["n"] = item[1:] if len(item) > 1 else []
+                        self.prows_dict["e"] = item[1:] if len(item) > 1 else []
+                        self.prows_dict["w"] = item[1:] if len(item) > 1 else []
+                        self.prows_dict["s"] = item[1:] if len(item) > 1 else []
+                    else:
+                        if not self.prows_dict.get(_dir):
+                            self.prows_dict[_dir] = item[1:] if len(item) > 1 else []
+                except Exception:
+                    feedback(f'The prows setting "{point}" is not valid!', True)
 
         return correct, issue
 
@@ -1592,7 +1685,7 @@ class BaseShape:
             width_height (tuple):
                 the (width, height) of the output frame for the image;
                 will be used along with x,y to set size and position;
-                will be recalcuated if image is rotated
+                will be recalculated if image has a rotation
             cache_directory (str):
                 where to store a local for copy for URL-sourced images
             rotation (float):
@@ -1705,7 +1798,7 @@ class BaseShape:
             return image_local
 
         def image_bbox_resize(bbox: muRect, img_path: str, rotation: float) -> muRect:
-            """Recompute bounding Rect for a rotated image to maintain image size.
+            """Recompute bounding Rect for image with rotation to maintain image size.
 
             Args
                 bbox: pymupdf Rect; original bounding box for the image
@@ -1718,11 +1811,11 @@ class BaseShape:
                 return bbox
             # Compute Rect center point
             center = (bbox.tl + bbox.br) / 2
-            # Define the desired rotation matrix
+            # Define the desired rotation Matrix
             matrx = Matrix(rotation)
-            # Compute the tetragon (Quad) for the Rect rotated around its center `
+            # Compute the tetragon (Quad) for the Rect rotation (around its center)
             quad = bbox.morph(center, matrx)
-            # Compute the rectangle hull of the quad for new boundary box
+            # Compute the rectangle hull of the Quad for new boundary box
             new_bbox = quad.rect
             # Check image dimensions and ratios
             try:

@@ -39,6 +39,7 @@ class DirectionGroup(Enum):
     HEX_FLAT_EDGE = 4  # edge
     HEX_POINTY_EDGE = 5
     CIRCULAR = 6
+    ORDINAL = 7
 
 
 class ExportFormat(Enum):

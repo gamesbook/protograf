@@ -1,6 +1,6 @@
-========================
-Examples: Decks of Cards
-========================
+==============
+Decks of Cards
+==============
 
 .. |dash| unicode:: U+2014 .. EM DASH SIGN
 

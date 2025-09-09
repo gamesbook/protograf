@@ -24,7 +24,7 @@ Deck(cards=1, grid_marks=True, stroke=None, fill="white")  # number of cards res
 # format the text and numeric boxes used
 numbers = Common(
     font_name="Helvetica", font_size=9, height=0.8, width=2.6, x=0.2,
-    notch=0.15, notch_corners="NW SW")
+    notch=0.15, notch_directions="NW SW")
 title = Common(font_name="Times-Roman", font_size=12, stroke="red")
 
 # create an image for the card

@@ -1142,6 +1142,8 @@ def validated_directions(
     match direction_group:
         case DirectionGroup.CARDINAL:
             valid = {"n", "e", "w", "s"}
+        case DirectionGroup.ORDINAL:
+            valid = {"ne", "se", "sw", "nw"}
         case DirectionGroup.COMPASS:
             valid = {"n", "e", "w", "s", "ne", "se", "sw", "nw"}
         case DirectionGroup.HEX_FLAT:

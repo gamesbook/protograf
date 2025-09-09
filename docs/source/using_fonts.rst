@@ -1,14 +1,14 @@
-==============================
-Appendix I: Working with Fonts
-==============================
+==================
+Working with Fonts
+==================
 
 .. |dash| unicode:: U+2014 .. EM DASH SIGN
 
 .. IMPORTANT::
 
-   This section represents the **very** limited understanding of the program's
-   author - certainly any feedback to help correct and make it clearer will be
-   more than welcome!
+   This section represents information presented with the **very** limited
+   understanding of the program's author |dash| certainly, any feedback to
+   help correct it and make it clearer will be more than welcome!
 
 .. _table-of-contents-fonts:
 
@@ -223,7 +223,10 @@ On Ubuntu Linux these font files are typically installed into the
 If you do not install these fonts, or have them already installed, you may
 see a warning message every time you run a script:
 
-    WARNING:: Unable to register the MS font(s): Arial, Verdana, Courier New, Times New Roman, Trebuchet MS, Georgia, Webdings
+.. code::
+
+    WARNING:: Unable to register the MS font(s): Arial, Verdana,
+    Courier New, Times New Roman, Trebuchet MS, Georgia, Webdings
 
 
 Word Processor fonts vs protograf

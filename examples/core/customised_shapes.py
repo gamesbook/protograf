@@ -159,7 +159,7 @@ PageBreak()
 
 # ---- dotgrid - Moleskin
 Text(common=txt, text='DotGrid: "Moleskine" setting')
-DotGrid(stroke="darkgray", width=0.5, height=0.5, dot_point=1, offset_y=0.25)
+DotGrid(stroke="darkgray", width=0.5, height=0.5, dot_width=1, offset_y=0.25)
 PageBreak()
 
 # ---- dotgrid - rows & cols
@@ -168,7 +168,7 @@ Text(common=txt, text="DotGrid: rows&cols")
 DotGrid(stroke="darkgray",
         width=0.5, height=0.5,
         rows=14, cols=10,
-        dot_point=1)
+        dot_width=1)
 PageBreak()
 
 # ---- arc
@@ -304,23 +304,13 @@ PageBreak()
 
 # ---- rotation: polygon
 Blueprint()
-Text(common=txt, text="Polygon: rotation (flat)")
-poly6 = Common(fill=None, sides=6, diameter=1, stroke_width=1, orientation='flat')
-Polygon(common=poly6, y=1, x=1.0, label="0")
-Polygon(common=poly6, y=2, x=1.5, rotation=15, label="15")
-Polygon(common=poly6, y=3, x=2.0, rotation=30, label="30")
-Polygon(common=poly6, y=4, x=2.5, rotation=45, label="45")
-Polygon(common=poly6, y=5, x=3.0, rotation=60, label="60")
-PageBreak()
-
-Blueprint()
-Text(common=txt, text="Polygon: rotation (pointy)")
-poly6 = Common(fill=None, sides=6, diameter=1, stroke_width=1, orientation='pointy')
-Polygon(common=poly6, y=1, x=1.0, label="0")
-Polygon(common=poly6, y=2, x=1.5, rotation=15, label="15")
-Polygon(common=poly6, y=3, x=2.0, rotation=30, label="30")
-Polygon(common=poly6, y=4, x=2.5, rotation=45, label="45")
-Polygon(common=poly6, y=5, x=3.0, rotation=60, label="60")
+Text(common=txt, text="Polygon: rotation")
+poly6 = Common(fill=None, sides=6, diameter=1, stroke_width=1)
+Polygon(common=poly6, cy=1, cx=1.0, label="0")
+Polygon(common=poly6, cy=2, cx=1.5, rotation=15, label="15")
+Polygon(common=poly6, cy=3, cx=2.0, rotation=30, label="30")
+Polygon(common=poly6, cy=4, cx=2.5, rotation=45, label="45")
+Polygon(common=poly6, cy=5, cx=3.0, rotation=60, label="60")
 PageBreak()
 
 # ---- polygon sizes
@@ -409,7 +399,7 @@ PageBreak()
 # ---- line: connections - dot&spoke
 Blueprint(stroke_width=0.5)
 Text(common=txt, text="Line: connections; dot&spoke")
-cc = Dot(cx=1.5, cy=3.5, dot_point=2)
+cc = Dot(cx=1.5, cy=3.5, dot_width=2)
 cr = Circle(cx=3, cy=1, radius=0.5, fill_stroke="red")
 co = Circle(cx=3, cy=5, radius=0.5, fill_stroke="orange")
 ca = Circle(cx=1, cy=5, radius=0.5, fill_stroke="aqua")
@@ -759,8 +749,8 @@ PageBreak()
 # ---- Centred Shapes
 Blueprint()
 Text(common=txt, text="Centred Shapes (with offsets)")
-small_dot = dot(dot_point=4, fill="red")
-big_dot = dot(dot_point=8)
+small_dot = dot(dot_width=4, fill="red")
+big_dot = dot(dot_width=8)
 Hexagon(x=0.5, y=0.5, height=1, centre_shapes=[(small_dot), (big_dot, 0.2, 0.2)])
 Rhombus(x=2.4, y=0.3, height=1.5,  width=1.25, centre_shapes=[(small_dot), (big_dot, 0.2, 0.2)])
 Rectangle(x=0.5, y=2.5, height=1, width=1.25, centre_shapes=[(small_dot), (big_dot, 0.2, 0.2)])
@@ -892,6 +882,67 @@ Table(y=3, x=0,
       stroke="blue", fill="aqua")
 PageBreak()
 
+# ---- wave styles
+Blueprint()
+Text(common=txt, text="Wave Styles")
+
+Line(
+    x=0, y=0.5, length=1.5, stroke="purple", stroke_width=1,
+    wave_style='wave', wave_height=0.1)
+Line(
+    x=2, y=0.5, length=1.5, stroke="firebrick", stroke_width=1,
+    wave_style='sawtooth', wave_height=0.1)
+Polygon(
+    perbis_stroke="purple", perbis_stroke_width=1,
+    perbis_wave_style='wave', perbis_wave_height=0.1,
+    cx=1, cy=1.5, sides=8, radius=0.75,
+    perbis="2,4,7")
+Polygon(
+    radii_stroke="firebrick", radii_stroke_width=1,
+    radii_wave_style='sawtooth', radii_wave_height=0.1,
+    cx=3, cy=1.5, sides=8, radius=0.75,
+    radii="*")
+Rectangle(
+    perbis_stroke="purple", perbis_stroke_width=1,
+    perbis_wave_style='wave', perbis_wave_height=0.1,
+    cx=1, cy=3.25, height=1, width=2,
+    perbis="n s e w",
+)
+Circle(
+    radii_stroke="firebrick", radii_stroke_width=1,
+    radii_wave_style='sawtooth', radii_wave_height=0.1,
+    cx=3, cy=3.25, radius=0.75,
+    radii=[60,180,300],
+)
+Hexagon(
+    cx=1, cy=5, radius=0.75,
+    perbis='*',
+    perbis_stroke="purple", perbis_stroke_width=1,
+    perbis_wave_style='wave', perbis_wave_height=0.1
+)
+Hexagon(
+    cx=3, cy=5, radius=0.75,
+    radii="ne se w",
+    radii_stroke="firebrick", radii_stroke_width=1,
+    radii_wave_style='sawtooth', radii_wave_height=0.1
+)
+PageBreak()
+
+# ---- poly wave styles
+Blueprint()
+Text(common=txt, text="Poly... waves")
+Polyshape(
+    points=[(1, 2), (1, 1), (2, 0), (3, 1), (3, 2)],
+    wave_style="wave", wave_height=0.03,
+    fill="gold")
+Polyline(points='1,3 1,4 2,4 4,3',
+         stroke="red", stroke_width=2,
+         wave_style="sawtooth", wave_height=0.03,)
+Polyline(points='1,5 1,6 2,6 4,5',
+         stroke="purple", stroke_width=2,
+         wave_style="wave", wave_height=0.05,)
+PageBreak()
+
 # ---- END
 Text(common=txt, text="Shapes END...")
 
@@ -912,7 +963,7 @@ Save(
         "stadium_red_rotation",
         "slices_rhombus",
         "polygon_rotation_flat",
-        "polygon_rotation_pointy", "polygon_sizes", "grid_3x4",
+        "polygon_sizes", "grid_3x4",
         "line_custom", "line_centred",
         "line_connections", "line_connections_arrow", "line_connections_spoke",
         "bezier_custom", "ellipse_custom", "rectangle_custom",
@@ -929,4 +980,6 @@ Save(
         "image_sliced", "image_label",
         "shape_rotation", "shape_hatch_and_rotation",
         "table_defaults", "table_custom",
+        "perbis_styled",
+        "poly_waves",
         None])

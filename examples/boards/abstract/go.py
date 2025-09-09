@@ -18,7 +18,7 @@ DotGrid(
     offset_x=4.5, offset_y=4.5,
     side=6,
     cols=3, rows=3,
-    dot_point=8
+    dot_width=8
 )
 
 Save()

@@ -18,7 +18,7 @@ DEBUG = False
 
 
 def polygon_vertices(
-    sides: int, radius: float, centre: Point, starting_angle: float = 0.0
+    sides: int, radius: float, centre: Point, starting_angle: float = None
 ) -> list:
     """Calculate array of Points for a polygon's vertices.
 
@@ -31,11 +31,13 @@ def polygon_vertices(
     Doc Test:
 
     >>> P = polygon_vertices(6, 1.0, Point(2,2))
-    >>> assert P == [Point(x=3.0, y=2.0), Point(x=2.5, y=2.8660254037844384), \
-                     Point(x=1.5000000000000002, y=2.866025403784439), \
-                     Point(x=1.0, y=2.0), \
-                     Point(x=1.4999999999999996, y=1.1339745962155616), \
-                     Point(x=2.5, y=1.1339745962155614)]
+     >>> assert P == [ \
+         Point(x=2.866025403784439, y=1.5), \
+         Point(x=2.866025403784439, y=2.5), \
+         Point(x=2.0, y=3.0), \
+         Point(x=1.1339745962155612, y=2.5), \
+         Point(x=1.1339745962155614, y=1.5), \
+         Point(x=1.9999999999999998, y=1.0)]
     """
     try:
         sides = int(sides)
@@ -45,11 +47,22 @@ def polygon_vertices(
         feedback("Polygon's sides must be an integer of 3 or more.")
         return []
     points = []
+    # starting_angle is effectively the "rotation"
+    interior_angle = ((sides - 2) * 180.0) / sides
+    if sides % 2 != 0:
+        _start = -90.0  # odd sides
+    else:
+        _start = -interior_angle / 2.0  # even sides
+    starting_angle = _start if starting_angle is None else starting_angle
+    try:
+        _starting_angle = float(starting_angle)
+    except ValueError:
+        feedback("Polygon's start angle must be an decimal or integer number.")
+        return []
+    # print(f'\n+++ poly {sides=} {interior_angle=} {starting_angle=} {_starting_angle=} +++')
+    # angles go around a full circle, anti-clockwise, starting from the "top"
     _step = 360.0 / sides
-    # rotate = starting_angle  # this is effectively the "rotation"
-    data_generator = numbers(
-        starting_angle, 360.0 + starting_angle, _step
-    )  # go in a full circle
+    data_generator = numbers(_starting_angle, 360.0 + _starting_angle, _step)
     try:
         _rotate = next(data_generator)
         while True:

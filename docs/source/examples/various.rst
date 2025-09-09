@@ -1,6 +1,6 @@
-=================
-Examples: Various
-=================
+========
+Assorted
+========
 
 .. |dash| unicode:: U+2014 .. EM DASH SIGN
 

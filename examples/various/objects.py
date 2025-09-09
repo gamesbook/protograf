@@ -1,9 +1,13 @@
 # -*- coding: utf-8 -*-
 """
-Example code for various "real world" things for protograf
+Example protograf code for creating various "real world" things
 
 Written by: Derek Hohls
 Created on: 19 August 2024
+
+Credits:
+    tmwtgg.jpg: https://unsplash.com/photos/tropical-islands-rise-from-the-emerald-green-ocean-5xMpaSXnBwc
+
 """
 from protograf import *
 
@@ -176,7 +180,7 @@ Circle(cx=2, cy=22, radius=1,
        radii_offset=0.5, radii_length=1,
        radii_stroke="white", radii_stroke_width=15)
 Circle(cx=2, cy=22, radius=0.75, fill="#63B1BB", stroke="#63B1BB")
-Dot(x=2.5, y=21.5, stroke="white", dot_point=5)
+Dot(x=2.5, y=21.5, stroke="white", dot_width=5)
 
 
 Text(common=header_font, x=5, y=25,
@@ -190,5 +194,52 @@ Circle(cx=2, cy=25, radius=1.25,
        radii=steps(0, 360, 5),
        radii_offset=1.1, radii_length=0.125,
        radii_stroke="#01F91E", radii_stroke_width=1.25)
+
+PageBreak()
+
+# ---- PAGE 3 ===>
+
+Text(common=header,
+     text="Miscellaneous Things #3")
+
+Text(common=header_font, x=8, y=3,
+     text="Camera Frame:")
+Text(common=header_font, x=8, y=4,
+     text="- Image")
+Text(common=header_font, x=8, y=4.75,
+     text="- Rectangle: corners; centred shape; perbis")
+Text(common=header_font, x=8, y=5.5,
+     text="- Dot & Texts")
+Image("tmwtgg.jpg",
+      width=6.4, height=3.6,
+      x=1, y=2)
+Rectangle(
+    width=6, height=3.2, x=1.2, y=2.2,
+    fill=None, stroke=None,
+    corner=0.4,
+    corner_stroke_width=2,
+    centre_shape=rectangle(
+        width=2, height=2,
+        fill=None, stroke=None,
+        corner=0.3,
+        corner_stroke="silver",
+        corner_stroke_width=1.5),
+    perbis="*",
+    perbis_stroke_width=2,
+    perbis_length=0.4,
+    perbis_offset_y=1.8,
+    perbis_offset_x=2.8,
+    cross=0.5,
+    cross_stroke="white",
+    cross_stroke_width=1.5)
+Dot(fill_stroke="red", dot_width=9, x=1.3, y=2.3)
+Text(text="REC",
+     x=2.25, y=2.55, stroke="red")
+Text(text="00:00:00",
+     x=6.5, y=5.3, stroke="white", font_size=10)
+
+# rectangle(
+#     width=2, height=1.1, fill=None,
+#     stroke=None, corner=0.3, corner_stroke_width=2_
 
 Save()

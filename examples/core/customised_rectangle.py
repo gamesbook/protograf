@@ -42,7 +42,7 @@ Rectangle(
     height=1, width=2,
     notch_y=0.25,
     notch_x=0.5,
-    notch_corners="NW SE",
+    notch_directions="NW SE",
     label="notch:.25/.5 loc: NW, SE",
     label_size=5,
     )
@@ -74,6 +74,32 @@ Rectangle(common=htch, x=3, y=4, hatch='d', label="D")
 
 PageBreak()
 
+# ---- perbises
+Blueprint()
+Text(common=txt, text="Rectangle: perbises + directions")
+prbs = Common(height=2, width=1,
+              perbis_stroke_width=2,
+              perbis_stroke="red")
+Rectangle(common=prbs, x=0.5, y=1, perbis='n', label="N")
+Rectangle(common=prbs, x=2.5, y=1, perbis='s', label="S")
+Rectangle(common=prbs, x=0.5, y=4, perbis='w', label="W")
+Rectangle(common=prbs, x=2.5, y=4, perbis='e', label="E")
+
+PageBreak()
+
+# ---- radii
+Blueprint()
+Text(common=txt, text="Rectangle: radii + directions")
+rds = Common(height=2, width=1,
+             radii_stroke_width=2,
+             radii_stroke="red")
+Rectangle(common=rds, x=0.5, y=1, radii='nw', label="NW")
+Rectangle(common=rds, x=2.5, y=1, radii='ne', label="NE")
+Rectangle(common=rds, x=0.5, y=4, radii='sw', label="SW")
+Rectangle(common=rds, x=2.5, y=4, radii='se', label="SE")
+
+PageBreak()
+
 # ---- rounding
 Blueprint()
 Text(common=txt, text="Rectangle: rounding; hatches")
@@ -87,10 +113,12 @@ PageBreak()
 # ---- chevron
 Blueprint()
 Text(common=txt, text="Rectangle: chevron")
-Rectangle(
-    x=3, y=2,
+styles = Common(
     height=2, width=1,
-    font_size=4,
+    font_size=4)
+Rectangle(
+    common=styles,
+    x=3, y=2,
     chevron='N',
     chevron_height=0.5,
     label="chevron:N:0.5",
@@ -99,8 +127,6 @@ Rectangle(
     )
 Rectangle(
     x=0, y=2,
-    height=2, width=1,
-    font_size=4,
     chevron='S',
     chevron_height=0.5,
     label="chevron:S:0.5",
@@ -109,8 +135,6 @@ Rectangle(
     )
 Rectangle(
     x=1, y=4.5,
-    height=1, width=2,
-    font_size=4,
     chevron='W',
     chevron_height=0.5,
     label="chevron:W:0.5",
@@ -119,8 +143,6 @@ Rectangle(
     )
 Rectangle(
     x=1, y=0.5,
-    height=1, width=2,
-    font_size=4,
     chevron='E',
     chevron_height=0.5,
     label="chevron:E:0.5",
@@ -153,11 +175,11 @@ Blueprint()
 Text(common=txt, text="Rectangle : Notch Styles")
 styles = Common(height=1, width=3.5, x=0.25,
                 notch=0.25, label_size=7, fill="lightsteelblue")
-Rectangle(common=styles, y=0, notch_style='snip', label='Notch: snip (s)')
-Rectangle(common=styles, y=1.5, notch_style='step', label='Notch: step (t)')
-Rectangle(common=styles, y=3, notch_style='fold', label='Notch: fold (d)')
-Rectangle(common=styles, y=4.5, notch_style='flap', label='Notch: flap (p)')
-# Rectangle(common=styles, y=6, label='Notch: bite (NOT WORKING)')
+Rectangle(common=styles, y=0.0, notch_style='snip', label='Notch: snip (s)')
+Rectangle(common=styles, y=1.25, notch_style='step', label='Notch: step (t)')
+Rectangle(common=styles, y=2.5, notch_style='fold', label='Notch: fold (d)')
+Rectangle(common=styles, y=3.75, notch_style='flap', label='Notch: flap (p)')
+Rectangle(common=styles, y=5.0, notch_style='bite', label='Notch: bite (b)')
 PageBreak()
 
 # ---- borders
@@ -222,6 +244,82 @@ Rectangle(
     slices_stroke="#767982")
 PageBreak()
 
+# ---- prows
+Blueprint(stroke_width=0.5)
+Text(common=txt, text='Prow: defaults+')
+Rectangle(
+    cx=1, cy=1, width=1, height=1,
+    prows=[("e",)]
+)
+Rectangle(
+    cx=1, cy=3, width=1, height=1,
+    prows=[("n", 0.5)]
+)
+Rectangle(
+    cx=3, cy=3, width=1, height=1,
+    fill="silver",
+    prows=[("*", -0.1)]
+)
+Rectangle(
+    cx=1, cy=5, width=1, height=1,
+    prows=[("*", 0.8, (0.3, 0.45))]
+)
+Rectangle(
+    cx=3, cy=5, width=1, height=1,
+    fill="gold",
+    prows=[("*", -0.8, (-0.3, -0.45))]
+)
+PageBreak()
+
+Blueprint(stroke_width=0.5)
+Text(common=txt, text='Prow: "inwards" (star)')
+Rectangle(
+    x=1.5, y=2, width=1, height=2,
+    fill="gold",
+    stroke="orange", stroke_width=2,
+    prows=[
+        ("n", 2, (0.22, 0.22)),
+        ("s", 2, (0.22, 0.22)),
+        ("e", 1.5, (0.33, 0.33)),
+        ("w", 1.5, (0.33, 0.33)),
+    ]
+)
+PageBreak()
+
+Blueprint(stroke_width=0.5)
+Text(common=txt, text='Prow: "outwards" (ship)')
+Rectangle(
+    x=1.5, y=2, width=1, height=3,
+    fill="silver",
+    stroke="darkgrey", stroke_width=2,
+    prows=[
+        ("n", 1, (0.44, 0.44)),
+        ("s", 0.2, (0.2, 0.2)),
+    ]
+)
+PageBreak()
+
+# ---- corner_style
+Blueprint()
+Text(common=txt, text="Rectangle : Corner Styles")
+styles = Common(
+    height=1, width=3.5, x=0.25,
+    label_size=7, fill="lightsteelblue",
+    corner=0.4,
+    corner_stroke="gold",
+    corner_fill='red',
+)
+Rectangle(common=styles, y=0, label='Corner (default)')
+Rectangle(common=styles, y=1.25,
+          corner_style='line',
+          corner_stroke_width=2,
+          label='Corner: line (l)')
+Rectangle(common=styles, y=2.5, corner_style='triangle', label='Corner: triangle (t)')
+Rectangle(common=styles, y=3.75, corner_style='curve', label='Corner: curve (s)')
+Rectangle(common=styles, y=5, corner_style='photo', label='Corner: photo (p)')
+PageBreak()
+
+
 # ---- END
 Text(common=txt, text="Rectangle END...")
 
@@ -231,7 +329,13 @@ Save(
      directory="../docs/source/images/custom/rectangle",
      names=[
         None,
-        "centre", "notch", "dot_cross", "hatch", "rounding", "chevron",
+        "centre", "notch", "dot_cross",
+        "hatch",
+        "perbis",
+        "radii",
+        "rounding", "chevron",
         "peak", "rotation", "notch_style", "borders",
         "slices", "slices_custom",
+        "prows_defaults", "prows_inwards", "prows_outwards",
+        "corners",
         None])

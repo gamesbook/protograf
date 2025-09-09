@@ -39,7 +39,7 @@ cross-reference to the detailed information for that command.
    paper size, output filename, margins, units, fill color etc.
 -  :ref:`Cube <cube-object>` * - create isometric and shaded view of a cube
 -  :ref:`Data <the-data-command>` - provides a set of information for
-   a :ref:`deck <the-deck-command>` or a
+   a :ref:`deck <the-deck-command>` of :ref:`cards <the-card-command>`
    :ref:`countersheet <the-countersheet-command>` - typically sourced from a CSV or
    Excel file, or a Google Sheet
 -  :ref:`D6 <d6-object>` * - create top-down view of a six-sided die
@@ -50,7 +50,8 @@ cross-reference to the detailed information for that command.
 -  :ref:`Ellipse <ellipse-command>` * - a geometric shape that can be drawn on a page
 -  :ref:`EquilateralTriangle <equilateraltriangle-command>` * - a geometric shape that can be drawn on a page
 -  :ref:`Extract <the-extract-command>` - allows portions of pages to be extracted as PNG images
--  :ref:`Font <the-font-command>` - set the font properties for any :ref:`Text <text-command>` drawn on a page
+-  :ref:`Font <the-font-command>` - set the font properties for any
+   :ref:`Text <text-command>` drawn on a page
 -  :ref:`Grid <grid-command>` - a set, or group, of lines that can be drawn on a page
 -  :ref:`group <group-function>` - a way to  reference a stack of shapes that
    all need to be drawn together on a :ref:`card <the-card-command>`
@@ -58,16 +59,17 @@ cross-reference to the detailed information for that command.
    (see also further :ref:`customisation options <hexIndex>`)
 -  :ref:`Hexagons <hexagons-command>` - a set, or group, of hexagons that can be
    drawn on a page (see also :doc:`hexagonal grids <hexagonal_grids>`)
--  :ref:`Image <image-command>` - an external image that can be shown on a page
+-  :ref:`Image <image-command>` - an external image to be shown on a page or card
 -  :ref:`L <the-lookup-command>` - short for *Lookup*; a way to access data in a set
    from another :ref:`card <the-card-command>` in a :ref:`deck <the-deck-command>`
 -  :ref:`Layout <layoutIndex>` -  used in conjuction with a location-based
    grid and specifies the shapes that are to be drawn at the grid locations
 -  :ref:`Line <line-command>` * - a geometric shape that can be drawn on a page
 -  :ref:`Lines <lines-command>` - a set, or group, of lines that can be drawn on a page
--  :ref:`LinkLine <linkline-command>` - a line joining one or more hexagons inside a hexagonal grid
+-  :ref:`LinkLine <linkline-command>` - a line joining one or more hexagons inside a
+   hexagonal grid
 -  :ref:`Matrix <the-matrix-command>` - a way to create a set of data, inside a script,
-   for use in a :ref:`deck <the-deck-command>` of cards
+   for use in a :ref:`deck <the-deck-command>` of :ref:`cards <the-card-command>`
 -  :ref:`PageBreak <pagebreak-command>` - set the start of a new page in
    the document; not required for a :ref:`Deck <the-deck-command>`
 -  :ref:`Pentomino <pentominoesOver>` * - a compound shape made up of five squares
@@ -98,13 +100,14 @@ cross-reference to the detailed information for that command.
    item in a column from a set of :ref:`data <the-data-command>` for a
    :ref:`card <the-card-command>`
 -  :ref:`Table <grid-command>` - a grid of rectangles that can be drawn on a page
+-  :ref:`Tetromino <tetrominoesOver>` * - a compound shape made up of four squares
 -  :ref:`Text <text-command>` * - a shape containing text that can be displayed on a page
 -  :ref:`Today <the-today-command>` - display - as text - the current date and time
 -  :doc:`Track <layouts_track>` - draw any number of shapes at the vertices of another shape
 -  :ref:`Trapezoid <trapezoid-command>` * - a geometric shape that can be drawn on a page
 -  :doc:`TriangularLocations <layouts_triangular>`- defines an ordered series of
    row and column locations that create a triangular grid of shapes - the grid itself
-   is not displayed; it is used in a :ref:`Layout <layoutIndex>` command.
+   is not displayed; it is used in a :ref:`Layout <layoutIndex>` command
 
 .. IMPORTANT::
 

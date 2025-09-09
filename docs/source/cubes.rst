@@ -26,7 +26,8 @@ Cube Properties
 ===============
 
 The hexagonal-shaped object ``Cube`` shares all of the properties of the
-:ref:`Hexagon <hexIndex>`, with additional properties of *shades*.
+:ref:`Hexagon <hexIndex>`; in addition, it has its own property called
+*shades*.
 
 Cube Examples
 =============

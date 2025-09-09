@@ -1,6 +1,6 @@
-=========================
-Appendix III: Development
-=========================
+========================
+Development of protograf
+========================
 
 .. |dash| unicode:: U+2014 .. EM DASH SIGN
 .. |check| unicode:: U+2610 .. BALLOT BOX

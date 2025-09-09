@@ -298,7 +298,7 @@ Dot
 ~~~
 `↑ <shape-index_>`_
 
-A dot is a small, filled `Circle`_.
+A Dot shape is essentially a very small, pre-filled `Circle`_.
 
 Example 1. Default Dot
 ++++++++++++++++++++++
@@ -316,10 +316,14 @@ Example 1. Default Dot
 
       It has the following properties based on the defaults:
 
-      - centre at x-position ``1`` cm and at y-position ``1`` cm
-      - diameter of ``3`` points; there are 72 points in an inch, so this is 1/24th
-        of an inch, or approximately 1mm (``0.1`` cm), in size
+      - top-left at x-position ``1`` cm and at y-position ``1`` cm
+      - diameter of ``3`` points; there are 72 points in an inch, so this is
+        1/24th of an inch, or approximately ``1`` mm (``0.1`` cm), in size
       - fill color for a Dot is the same as the stroke |dash| default is black
+
+      The default diameter for a Dot can be changed by setting its *dot_width*
+      which, like *stroke_width* for Text, is in point units.
+
 ===== ======
 
 
@@ -1316,34 +1320,41 @@ Example 5. Polygon Rotation
    :width: 330
 
 ===== ======
-|pl4| This example shows five shapes constructed using the command with
+|pl4| This example shows five Polygons constructed using the command with
       additional properties:
 
       .. code:: python
 
+        poly6 = Common(
+            fill=None,
+            sides=6,
+            diameter=1,
+            stroke_width=1)
+
         Polygon(
             common=poly6,
-            y=1, x=1.0, label="0")
+            cy=1, cx=1.0, label="0")
         Polygon(
             common=poly6,
-            y=2, x=1.5,
+            cy=2, cx=1.5,
             rotation=15, label="15")
         Polygon(
             common=poly6,
-            y=3, x=2.0,
+            cy=3, cx=2.0,
             rotation=30, label="30")
         Polygon(
             common=poly6,
-            y=4, x=2.5,
+            cy=4, cx=2.5,
             rotation=45, label="45")
         Polygon(
             common=poly6,
-            y=5, x=3.0,
+            cy=5, cx=3.0,
             rotation=60, label="60")
 
       The examples have the following properties:
 
-      - *x* and *y* - set the upper-left location
+      - *common* - set shared diameter, sides and fill for all Polygons
+      - *cx* and *cy* - set the centre location for the Polygon
       - *radius* - ``1`` cm in each case
       - *sides* - the default of ``6`` in each case (a `hexagon`_ shape)
       - *rotation* - varies from 0 |deg| to 60 |deg|
@@ -2482,14 +2493,15 @@ Example 2. Moleskine Grid
         DotGrid(
             stroke="darkgray",
             width=0.5, height=0.5,
-            dot_point=1, offset_y=-0.25)
+            dot_width=1,
+            offset_y=-0.25)
 
       To simulate the dot grid found in Moleskine notebooks, it
       has the following properties set:
 
       - *width* and *height* - intervals between the centre of the dots
         in the x- and y-directions respectively
-      - *dot_point* - set to be smaller than the default of ``3``
+      - *dot_width* - set to be smaller than the default of ``3``
       - *stroke*  - set to ``darkgrey`` i.e. lighter than the default black
       - *offset_y* - moves the start of the grid slightly downwards by 1/4 cm
 
@@ -3081,13 +3093,14 @@ the desired output:
 
 - `x and y`_
 - `cx and cy`_
-- `Fill and Stroke`_
+- `Centre Shape`_
+- `Centre Shapes`_
 - `Dot and Cross`_
+- `Fill and Stroke`_
 - `Rotation`_
 - `Text Descriptions`_
 - `Transparency`_
-- `Centre Shape`_
-- `Centre Shapes`_
+- `Wave Styles`_
 
 .. _coreShapeXY:
 
@@ -3329,7 +3342,7 @@ Example 2. Polygon Rotation
 +++++++++++++++++++++++++++
 `↑ <coreShapeRotation_>`_
 
-.. |rt2| image:: images/customised/polygon_rotation_pointy.png
+.. |rt2| image:: images/customised/polygon_rotation_flat.png
    :width: 330
 
 ===== ======
@@ -3342,8 +3355,10 @@ Example 2. Polygon Rotation
       .. code:: python
 
         poly6 = Common(
-          fill=None, sides=6, diameter=1,
-          stroke_width=1, orientation='flat')
+          fill=None,
+          sides=6,
+          diameter=1,
+          stroke_width=1)
 
         Polygon(common=poly6,
                 y=1, x=1.0, label="0")
@@ -3841,8 +3856,8 @@ the change in ``x`` and ``y`` values as part of the set.
 
       .. code:: python
 
-        small_dot = dot(dot_point=4, fill="red")
-        big_dot = dot(dot_point=8)
+        small_dot = dot(dot_width=4, fill="red")
+        big_dot = dot(dot_width=8)
 
         Hexagon(
             x=0.5, y=0.5, height=1,
@@ -3885,5 +3900,144 @@ the change in ``x`` and ``y`` values as part of the set.
       drawn at the centre of its parent shape; the ``big_dot`` is given offset
       values for the x and y positions - so is drawn below and to the right
       of centre.
+
+===== ======
+
+
+.. _coreWave:
+
+Wave Styles
+~~~~~~~~~~~
+`^ <shapes-common-properties_>`_
+
+A number of shapes, that make use of straight line properties, can be styled
+using their "wave" property.
+
+These include the *radii* and *perbis* properties of Circle, Hexagon, Polygon
+and Rectangle (for details on those properties, see the section on
+:doc:`Customised Shapes <customised_shapes>`).  In addition, the lines used
+to construct a Polyshape and Polyline can also be styled like waves.
+
+
+Example 1. Radii and Perbis
++++++++++++++++++++++++++++
+
+.. |ws1| image:: images/customised/perbis_styled.png
+   :width: 330
+
+===== ======
+|ws1| This example shows centre shapes constructed as follows:
+
+      .. code:: python
+
+        Line(
+            x=0, y=0.5, length=1.5,
+            stroke="purple", stroke_width=1,
+            wave_style='wave', wave_height=0.1
+        )
+        Line(
+            x=2, y=0.5, length=1.5,
+            stroke="firebrick", stroke_width=1,
+            wave_style='sawtooth', wave_height=0.1
+        )
+        Polygon(
+            perbis_stroke="purple",
+            perbis_stroke_width=1,
+            perbis_wave_style='wave',
+            perbis_wave_height=0.1,
+            cx=1, cy=1.5, sides=8, radius=0.75,
+            perbis="2,4,7"
+        )
+        Polygon(
+            radii_stroke="firebrick",
+            radii_stroke_width=1,
+            radii_wave_style='sawtooth',
+            radii_wave_height=0.1,
+            cx=3, cy=1.5, sides=8, radius=0.75,
+            radii="*")
+        Rectangle(
+            perbis_stroke="purple",
+            perbis_stroke_width=1,
+            perbis_wave_style='wave',
+            perbis_wave_height=0.1,
+            cx=1, cy=3.25, height=1, width=2,
+            perbis="n s e w",
+        )
+        Circle(
+            radii_stroke="firebrick",
+            radii_stroke_width=1,
+            radii_wave_style='sawtooth',
+            radii_wave_height=0.1,
+            cx=3, cy=3.25, radius=0.75,
+            radii=[60, 180, 300],
+        )
+        Hexagon(
+            cx=1, cy=5, radius=0.75,
+            perbis='*',
+            perbis_stroke="purple",
+            perbis_stroke_width=1,
+            perbis_wave_style='wave',
+            perbis_wave_height=0.1
+        )
+        Hexagon(
+            cx=3, cy=5, radius=0.75,
+            radii="ne se w",
+            radii_stroke="firebrick",
+            radii_stroke_width=1,
+            radii_wave_style='sawtooth',
+            radii_wave_height=0.1
+        )
+
+      The purple lines have:
+
+      - *perbis_wave_style*  set to ``'wave'`` creating a wave-like effect
+      - *perbis_wave_height* set to ``0.1`` for the height of each "peak"
+
+      The dark red lines have:
+
+      - *radii_wave_style*  set to ``'sawtooth'`` creating a "zig-zag" effect
+      - *radii_wave_height* set to ``0.1`` for the height of each "peak"
+
+===== ======
+
+
+Example 2. Polyshape and Polyline
++++++++++++++++++++++++++++++++++
+
+.. |ws2| image:: images/customised/poly_waves.png
+   :width: 330
+
+===== ======
+|ws2| This example shows poly-shapes constructed as follows:
+
+      .. code:: python
+
+        Polyshape(
+            points=[(1,2), (1,1), (2 0), (3,1), (3,2)],
+            wave_style="wave", wave_height=0.03,
+            fill="gold")
+        Polyline(
+            points='1,3 1,4 2,4 4,3',
+            stroke="red", stroke_width=2,
+            wave_style="sawtooth", wave_height=0.03)
+        Polyline(
+            points='1,5 1,6 2,6 4,5',
+            stroke="purple", stroke_width=2,
+            wave_style="wave", wave_height=0.05)
+
+      The top Polyshape, with a default line stroke, has:
+
+      - *perbis_wave_style*  set to ``'wave'`` creating a wave-like effect
+      - *perbis_wave_height* set to ``0.03`` for the height of each "peak"
+
+      The dark red thick Polyline has:
+
+      - *radii_wave_style*  set to ``'sawtooth'`` creating a "zig-zag" effect
+      - *radii_wave_height* set to ``0.03`` for the height of each "peak"
+
+      The purple thick Polyline has:
+
+      - *perbis_wave_style*  set to ``'wave'`` creating a wave-like effect
+      - *perbis_wave_height* set to ``0.05`` for the height of each "peak"
 
 ===== ======

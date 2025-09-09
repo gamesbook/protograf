@@ -9,7 +9,6 @@ import logging
 import math
 import os
 from pathlib import Path
-import random
 from urllib.parse import urlparse
 
 # third party
@@ -22,9 +21,6 @@ from protograf import globals
 from protograf.utils import colrs, geoms, tools, support, fonts
 from protograf.utils.tools import _lower
 from protograf.utils.constants import (
-    GRID_SHAPES_WITH_CENTRE,
-    COLOR_NAMES,
-    DEBUG_COLOR,
     BGG_IMAGES,
 )
 from protograf.utils.messaging import feedback
@@ -71,6 +67,13 @@ def draw_line(
     cnv=None, start: Point = None, end: Point = None, shape: BaseShape = None, **kwargs
 ) -> dict:
     """Draw a line on the canvas (Page) between two points for a Shape.
+
+    Args:
+
+    - cnv (PyMuPDF Page object): where the line is drawn
+    - start (Point): start of the line
+    - end (Point): end of the line
+    - shape (BaseShape): shape for which line is being drawn
 
     Returns:
         kwargs (modified for styled lines)
@@ -242,7 +245,8 @@ class ArcShape(BaseShape):
                         feedback("The nested list values must be fractions!", True)
             else:
                 feedback(
-                    "The nested value must either be a whole number or a list of fractions.",
+                    "The nested value must either be a whole number "
+                    "or a list of fractions.",
                     True,
                 )
             if intervals:
@@ -255,7 +259,7 @@ class ArcShape(BaseShape):
                     )
                     # ---- draw sector
                     # feedback(
-                    #     f'***Arc: {p_P=} {centre=} {self.angle_start=} {self.angle_width=}')
+                    #     f'***Arc: {centre=} {self.angle_start=} {self.angle_width=}')
                     cnv.draw_sector(  # anti-clockwise from p_P; 90° default
                         (centre.x, centre.y),
                         (p_P.x, p_P.y),
@@ -324,7 +328,7 @@ class ArrowShape(BaseShape):
         total_height = self._u.height + self.head_height_u
         if tail_height <= 0:
             feedback("The Arrow head height must be less than overall height", True)
-        # print(f"***2 {self._u.width=} {self.tail_width_u=}  {self.head_width_u=} {self.fill=} ")
+        # print(f"***2 {self._u.width=} {self.tail_width_u=}  {self.head_width_u=}  ")
         vertices = []
         vertices.append(Point(x_s, y_s))  # lower-left corner
         vertices.append(Point(x_c - self._u.width / 2.0, y_s - tail_height))
@@ -609,7 +613,8 @@ class CircleShape(BaseShape):
                         feedback("The nested list values must be fractions!", True)
             else:
                 feedback(
-                    "The nested value must either be a whole number or a list of fractions.",
+                    "The nested value must either be a whole number"
+                    " or a list of fractions.",
                     True,
                 )
             if intervals:
@@ -635,7 +640,7 @@ class CircleShape(BaseShape):
                 _radii = [
                     float(angle) for angle in self.radii if angle >= 0 and angle <= 360
                 ]
-            except:
+            except Exception:
                 feedback(
                     f"The radii {self.radii} are not valid - must be a list of numbers"
                     " from 0 to 360",
@@ -665,6 +670,11 @@ class CircleShape(BaseShape):
             # print(f'*** {_radii_labels=} {_radii_strokes=}')
             label_key, stroke_key = 0, 0
             label_points = []
+
+            # ---- set radii styles
+            lkwargs = {}
+            lkwargs["wave_style"] = self.kwargs.get("radii_wave_style", None)
+            lkwargs["wave_height"] = self.kwargs.get("radii_wave_height", 0)
             for key, rad_angle in enumerate(_radii):
                 # points based on length of line, offset and the angle in degrees
                 diam_pt = geoms.point_on_circle(
@@ -687,9 +697,11 @@ class CircleShape(BaseShape):
                 label_points.append(
                     (Point((x_start + x_end) / 2.0, (y_start + y_end) / 2.0), rad_angle)
                 )
-                # ---- draw radii line
-                cnv.draw_line((x_start, y_start), (x_end, y_end))
-                # ---- style radii lines
+                # ---- draw a radii line
+                draw_line(
+                    cnv, (x_start, y_start), (x_end, y_end), shape=self, **lkwargs
+                )
+                # ---- style radii line
                 _radii_stroke = _radii_strokes[stroke_key]
                 self.set_canvas_props(
                     index=ID,
@@ -946,7 +958,6 @@ class CircleShape(BaseShape):
                 br=Point(self.x_c + self._u.radius, self.y_c + self._u.radius),
             )
         # ---- handle rotation
-        is_rotated = False
         rotation = kwargs.get("rotation", self.rotation)
         if rotation:
             self.centroid = muPoint(x, y)
@@ -1343,8 +1354,8 @@ class DotShape(BaseShape):
         super(DotShape, self).__init__(_object=_object, canvas=canvas, **kwargs)
         self.kwargs = kwargs
         # ---- perform overrides
-        self.size = self.dot_point / 2.0  # diameter is 3 points ~ 1mm or 1/32"
-        self.radius = self.points_to_value(self.size, globals.units)
+        self.point_size = self.dot_width / 2.0  # diameter is 3 points ~ 1mm or 1/32"
+        self.radius = self.points_to_value(self.point_size, globals.units)
         if self.cx is not None and self.cy is not None:
             self.x = self.cx - self.radius
             self.y = self.cy - self.radius
@@ -1567,7 +1578,7 @@ class EquilateralTriangleShape(BaseShape):
         if self.cx and self.cy:
             self.centroid = Point(self._u.cx, self._u.cy)
             centroid_to_vertex = side / math.sqrt(3)
-            y_off = height + centroid_to_vertex
+            # y_off = height + centroid_to_vertex
             x = self._u.cx - side / 2.0
             y = self._u.cy + (height - centroid_to_vertex)
             # print(f'** {side=} {height=} {centroid_to_vertex=} {y_off=}')
@@ -1675,7 +1686,8 @@ class HexShape(BaseShape):
             half_flat = side * math.sqrt(3) / 2.0
         if not self.radius and not self.height and not self.diameter and not self.side:
             feedback(
-                "No value for side or height or diameter or radius supplied for hexagon.",
+                "No value for side or height or diameter or radius"
+                " supplied for hexagon.",
                 True,
             )
         # ---- diameter and radius
@@ -2014,9 +2026,9 @@ class HexShape(BaseShape):
             else DirectionGroup.HEX_FLAT_EDGE
         )
         if self.paths is not None and not isinstance(self.paths, list):
-            feedback(f"A Hexagon's paths must be in the form of a list!", True)
+            feedback("A Hexagon's paths must be in the form of a list!", True)
         if self.paths == []:
-            feedback(f"A Hexagon's path list cannot be empty!", False, True)
+            feedback("A Hexagon's path list cannot be empty!", False, True)
 
         # --- calculate offset centres
         hex_geom = self.get_geometry()
@@ -2258,6 +2270,10 @@ class HexShape(BaseShape):
                 self.perbis, dir_group, "hex perbis"
             )
 
+        # ---- set perbis styles
+        lkwargs = {}
+        lkwargs["wave_style"] = self.kwargs.get("perbis_wave_style", None)
+        lkwargs["wave_height"] = self.kwargs.get("perbis_wave_height", 0)
         for key, a_perbis in perbises.items():
             if self.perbis and key not in perbis_dirs:
                 continue
@@ -2267,9 +2283,19 @@ class HexShape(BaseShape):
                 offset_pt = geoms.point_on_circle(centre, pb_offset, a_perbis.angle)
                 end_pt = geoms.point_on_line(offset_pt, edge_pt, pb_length)
                 # print(f'{pb_angle=} {offset_pt=} {x_c=}, {y_c=}')
-                cnv.draw_line((offset_pt.x, offset_pt.y), (end_pt.x, end_pt.y))
+                start_point = offset_pt.x, offset_pt.y
+                end_point = end_pt.x, end_pt.y
             else:
-                cnv.draw_line((centre.x, centre.y), (edge_pt.x, edge_pt.y))
+                start_point = centre.x, centre.y
+                end_point = edge_pt.x, edge_pt.y
+            # ---- draw a perbis line
+            draw_line(
+                cnv,
+                start_point,
+                end_point,
+                shape=self,
+                **lkwargs,
+            )
 
         self.set_canvas_props(
             index=ID,
@@ -2295,28 +2321,32 @@ class HexShape(BaseShape):
             else DirectionGroup.HEX_FLAT
         )
         _dirs = tools.validated_directions(self.radii, dir_group, "hex radii")
+        # ---- set radii styles
+        lkwargs = {}
+        lkwargs["wave_style"] = self.kwargs.get("radii_wave_style", None)
+        lkwargs["wave_height"] = self.kwargs.get("radii_wave_height", 0)
         if "ne" in _dirs:  # slope UP to the right
-            cnv.draw_line(centre, vertices[4])
+            draw_line(cnv, centre, vertices[4], shape=self, **lkwargs)
         if "sw" in _dirs:  # slope DOWN to the left
-            cnv.draw_line(centre, vertices[1])
+            draw_line(cnv, centre, vertices[1], shape=self, **lkwargs)
         if "se" in _dirs:  # slope DOWN to the right
             if self.orientation in ["p", "pointy"]:
-                cnv.draw_line(centre, vertices[3])
+                draw_line(cnv, centre, vertices[3], shape=self, **lkwargs)
             else:
-                cnv.draw_line(centre, vertices[2])
+                draw_line(cnv, centre, vertices[2], shape=self, **lkwargs)
         if "nw" in _dirs:  # slope UP to the left
             if self.orientation in ["p", "pointy"]:
-                cnv.draw_line(centre, vertices[0])
+                draw_line(cnv, centre, vertices[0], shape=self, **lkwargs)
             else:
-                cnv.draw_line(centre, vertices[5])
+                draw_line(cnv, centre, vertices[5], shape=self, **lkwargs)
         if "n" in _dirs and self.orientation in ["p", "pointy"]:  # vertical UP
-            cnv.draw_line(centre, vertices[5])
+            draw_line(cnv, centre, vertices[5], shape=self, **lkwargs)
         if "s" in _dirs and self.orientation in ["p", "pointy"]:  # vertical DOWN
-            cnv.draw_line(centre, vertices[2])
+            draw_line(cnv, centre, vertices[2], shape=self, **lkwargs)
         if "e" in _dirs and self.orientation in ["f", "flat"]:  # horizontal RIGHT
-            cnv.draw_line(centre, vertices[3])
+            draw_line(cnv, centre, vertices[3], shape=self, **lkwargs)
         if "w" in _dirs and self.orientation in ["f", "flat"]:  # horizontal LEFT
-            cnv.draw_line(centre, vertices[0])
+            draw_line(cnv, centre, vertices[0], shape=self, **lkwargs)
         # color, thickness etc.
         self.set_canvas_props(
             index=ID,
@@ -2469,7 +2499,7 @@ class HexShape(BaseShape):
                     centre, geo.half_flat - abs(spk_length), spk_angle
                 )
             else:
-                # print(f'*** HEX {spk_length=}  {geo.half_flat=} {spk_width=} {edge_pt=}')
+                # print(f'***HEX{spk_length=} {geo.half_flat=} {spk_width=} {edge_pt=}')
                 top_pt = geoms.point_on_circle(
                     centre, spk_length + geo.half_flat, spk_angle
                 )
@@ -2508,7 +2538,8 @@ class HexShape(BaseShape):
             half_flat = side * math.sqrt(3) / 2.0
         if not self.radius and not self.height and not self.diameter and not self.side:
             feedback(
-                "No value for side or height or diameter or radius supplied for hexagon.",
+                "No value for side or height or diameter or radius"
+                " supplied for hexagon.",
                 True,
             )
         half_side = side / 2.0
@@ -2628,7 +2659,7 @@ class HexShape(BaseShape):
                 # x = self.col * 2.0 * geo.side + self._o.delta_x
                 # if self.row & 1:
                 #     x = x + geo.side
-                # y = self.row * 2.0 * geo.half_flat + self._o.delta_y  # do NOT add half_flat
+                # y = self.row * 2.0 * geo.half_flat + self._o.delta_y  # NO half_flat
                 x = (
                     self.col * 2.0 * (geo.side + self._u.spacing_x)
                     + self._o.delta_x
@@ -3097,13 +3128,6 @@ class PolygonShape(BaseShape):
                 feedback("The perbis value must be a list of numbers!", True)
         if self.cx is not None and self.cy is not None:
             self.x, self.y = self.cx, self.cy
-        # ---- class variables
-        self.flatten_angle = 0
-        if (_lower(self.orientation) == "flat" and not (self.sides - 2) % 4 == 0) or (
-            _lower(self.orientation) == "pointy" and (self.sides - 2) % 4 == 0
-        ):
-            interior = ((self.sides - 2) * 180.0) / self.sides
-            self.flatten_angle = (180 - interior) / 2.0
         # ---- RESET UNIT PROPS (last!)
         self.set_unit_properties()
 
@@ -3208,6 +3232,11 @@ class PolygonShape(BaseShape):
             if self.perbis_length
             else self.get_radius()
         )
+
+        # ---- set perbis styles
+        lkwargs = {}
+        lkwargs["wave_style"] = self.kwargs.get("perbis_wave_style", None)
+        lkwargs["wave_height"] = self.kwargs.get("perbis_wave_height", 0)
         for key, pb_angle in enumerate(_perbis):
             if self.perbis and key + 1 not in self.perbis:
                 continue
@@ -3218,9 +3247,20 @@ class PolygonShape(BaseShape):
                 offset_pt = geoms.point_on_circle(centre, pb_offset, pb_angle)
                 end_pt = geoms.point_on_line(offset_pt, edge_pt, pb_length)
                 # print(f'*** {end_pt=} {offset_pt=}')
-                cnv.draw_line((offset_pt.x, offset_pt.y), (end_pt.x, end_pt.y))
+                start_point = offset_pt.x, offset_pt.y
+                end_point = end_pt.x, end_pt.y
             else:
-                cnv.draw_line((centre.x, centre.y), (edge_pt.x, edge_pt.y))
+                start_point = centre.x, centre.y
+                end_point = edge_pt.x, edge_pt.y
+            # ---- draw a perbis line
+            draw_line(
+                cnv,
+                start_point,
+                end_point,
+                shape=self,
+                **lkwargs,
+            )
+
         self.set_canvas_props(
             index=ID,
             stroke=self.perbis_stroke,
@@ -3253,6 +3293,10 @@ class PolygonShape(BaseShape):
             if self.radii_length
             else self.get_radius()
         )
+        # ---- set radii styles
+        lkwargs = {}
+        lkwargs["wave_style"] = self.kwargs.get("radii_wave_style", None)
+        lkwargs["wave_height"] = self.kwargs.get("radii_wave_height", 0)
         for rad_angle in _radii:
             # points based on length of line, offset and the angle in degrees
             diam_pt = geoms.point_on_circle(centre, rad_length, rad_angle)
@@ -3260,9 +3304,20 @@ class PolygonShape(BaseShape):
                 offset_pt = geoms.point_on_circle(centre, rad_offset, rad_angle)
                 end_pt = geoms.point_on_line(offset_pt, diam_pt, rad_length)
                 # print('***', rad_angle, offset_pt, f'{x_c=}, {y_c=}')
-                cnv.draw_line((offset_pt.x, offset_pt.y), (end_pt.x, end_pt.y))
+                start_point = offset_pt.x, offset_pt.y
+                end_point = end_pt.x, end_pt.y
             else:
-                cnv.draw_line((centre.x, centre.y), (diam_pt.x, diam_pt.y))
+                start_point = centre.x, centre.y
+                end_point = diam_pt.x, diam_pt.y
+            # ---- draw a radii line
+            draw_line(
+                cnv,
+                start_point,
+                end_point,
+                shape=self,
+                **lkwargs,
+            )
+
         self.set_canvas_props(
             cnv=cnv,
             index=ID,
@@ -3335,8 +3390,7 @@ class PolygonShape(BaseShape):
         # radius
         radius = self.get_radius()
         # calculate vertices - assumes x,y marks the centre point
-        _rotation = self.flatten_angle
-        vertices = geoms.polygon_vertices(self.sides, radius, Point(x, y), _rotation)
+        vertices = geoms.polygon_vertices(self.sides, radius, Point(x, y), None)
         # for p in vertices: print(f'*G* {p.x / 28.3465}, {p.y / 28.3465}')
         return PolyGeometry(x, y, radius, side, half_flat, vertices)
 
@@ -3350,8 +3404,7 @@ class PolygonShape(BaseShape):
             y = self._u.y + self._o.delta_y
         radius = self.get_radius()
         # calculate vertices - assumes x,y marks the centre point
-        _rotation = self.flatten_angle
-        vertices = geoms.polygon_vertices(self.sides, radius, Point(x, y), _rotation)
+        vertices = geoms.polygon_vertices(self.sides, radius, Point(x, y), None)
         # for p in vertices: print(f'*V* {p.x / 28.3465}, {p.y / 28.3465}')
         return vertices
 
@@ -3420,8 +3473,7 @@ class PolygonShape(BaseShape):
             kwargs["rotation_point"] = self.centroid
             is_rotated = True
         # ---- updated geom
-        # _rotation = rotation or self.flatten_angle
-        # vertices = geoms.polygon_vertices(self.sides, radius, Point(x, y), _rotation)
+        # vertices = geoms.polygon_vertices(self.sides, radius, Point(x, y), None)
         # ---- invalid polygon?
         if not vertices or len(vertices) == 0:
             return
@@ -3542,10 +3594,18 @@ class PolylineShape(BaseShape):
         super().draw(cnv, off_x, off_y, ID, **kwargs)  # unit-based props
         # ---- set vertices
         self.vertexes = self.get_vertexes()
+        # ---- set line style
+        lkwargs = {}
+        lkwargs["wave_style"] = self.kwargs.get("wave_style", None)
+        lkwargs["wave_height"] = self.kwargs.get("wave_height", 0)
         # ---- draw polyline
         # feedback(f'***PolyLineShp{x=} {y=} {self.vertexes=}')
         if self.vertexes:
-            cnv.draw_polyline(self.vertexes)
+            for key, vertex in enumerate(self.vertexes):
+                if key < len(self.vertexes) - 1:
+                    draw_line(
+                        cnv, vertex, self.vertexes[key + 1], shape=self, **lkwargs
+                    )
             kwargs["closed"] = False
             kwargs["fill"] = None
             self.set_canvas_props(cnv=cnv, index=ID, **kwargs)
@@ -3703,6 +3763,155 @@ class RectangleShape(BaseShape):
         else:
             return length
 
+    def calculate_perbises(
+        self, cnv, centre: Point, rotation: float = None, **kwargs
+    ) -> list:
+        """Calculate centre points for each edge and angles from centre.
+
+        Args:
+            vertices: list of Rect nodes as Points
+            centre: the centre Point of the Hex
+
+        Returns:
+            dict of Perbis objects keyed on direction
+        """
+        directions = ["n", "w", "s", "e"]
+        perbises = {}
+        vertices = self.get_vertexes(rotation=rotation, **kwargs)
+        vcount = len(vertices) - 1
+        _perbis_pts = []
+        # print(f"*** RECT perbis {centre=} {vertices=}")
+        for key, vertex in enumerate(vertices):
+            if key == 0:
+                p1 = Point(vertex.x, vertex.y)
+                p2 = Point(vertices[vcount].x, vertices[vcount].y)
+            else:
+                p1 = Point(vertex.x, vertex.y)
+                p2 = Point(vertices[key - 1].x, vertices[key - 1].y)
+            pc = geoms.fraction_along_line(p1, p2, 0.5)  # centre pt of edge
+            _perbis_pts.append(pc)  # debug use
+            compass, angle = geoms.angles_from_points(centre, pc)
+            # f"*** RECT *** perbis {key=} {directions[key]=} {pc=} {compass=} {angle=}"
+            _perbis = Perbis(
+                point=pc,
+                direction=directions[key],
+                v1=p1,
+                v2=p2,
+                compass=compass,
+                angle=angle,
+            )
+            perbises[directions[key]] = _perbis
+        return perbises
+
+    def draw_perbis(self, cnv, ID, centre: Point, rotation: float = None, **kwargs):
+        """Draw lines connecting the Rectangle centre to the centre of each edge.
+
+        Args:
+            ID: unique ID
+            centre: the centre Point of the Rectangle
+            rotation: degrees anti-clockwise from horizontal "east"
+
+        Notes:
+            A perpendicular bisector ("perbis") of a chord is:
+                A line passing through the center of circle such that it divides
+                the chord into two equal parts and meets the chord at a right angle;
+                for a polygon, each edge is effectively a chord.
+        """
+        vertices = self.get_vertexes(rotation=rotation, **kwargs)
+        perbises = self.calculate_perbises(cnv=cnv, centre=centre, vertices=vertices)
+        pb_length = (
+            self.unit(self.perbis_length, label="perbis length")
+            if self.perbis_length
+            else None  # see below for default length
+        )
+        if self.perbis:
+            perbis_dirs = tools.validated_directions(
+                self.perbis, DirectionGroup.CARDINAL, "rectangle perbis"
+            )
+
+        # ---- set perbis styles
+        lkwargs = {}
+        lkwargs["wave_style"] = self.kwargs.get("perbis_wave_style", None)
+        lkwargs["wave_height"] = self.kwargs.get("perbis_wave_height", 0)
+        for key, a_perbis in perbises.items():
+            if self.perbis and key not in perbis_dirs:
+                continue
+            # offset based on dir
+            if key in ["n", "s"]:
+                pb_offset = self.unit(self.perbis_offset, label="perbis offset") or 0
+                pb_offset = (
+                    self.unit(self.perbis_offset_y, label="perbis offset") or pb_offset
+                )
+            if key in ["e", "w"]:
+                pb_offset = self.unit(self.perbis_offset, label="perbis offset") or 0
+                pb_offset = (
+                    self.unit(self.perbis_offset_x, label="perbis offset") or pb_offset
+                )
+            # length based on dir
+            if not pb_length:
+                if key in ["n", "s"]:
+                    pb_length = self._u.height / 2.0
+                if key in ["e", "w"]:
+                    pb_length = self._u.width / 2.0
+            # points based on length of line, offset and the angle in degrees
+            edge_pt = a_perbis.point
+            if pb_offset is not None and pb_offset != 0:
+                offset_pt = geoms.point_on_circle(centre, pb_offset, a_perbis.angle)
+                end_pt = geoms.point_on_line(offset_pt, edge_pt, pb_length)
+                # print(f"{key=} {centre=} {pb_offset=} {a_perbis.angle=} {offset_pt=}")
+                start_point = offset_pt.x, offset_pt.y
+                end_point = end_pt.x, end_pt.y
+            else:
+                start_point = centre.x, centre.y
+                end_point = edge_pt.x, edge_pt.y
+            # ---- draw a perbis line
+            draw_line(
+                cnv,
+                start_point,
+                end_point,
+                shape=self,
+                **lkwargs,
+            )
+
+        self.set_canvas_props(
+            index=ID,
+            stroke=self.perbis_stroke,
+            stroke_width=self.perbis_stroke_width,
+            stroke_ends=self.perbis_ends,
+            dashed=self.perbis_dashed,
+            dotted=self.perbis_dotted,
+        )
+
+    def draw_radii(self, cnv, ID, centre: Point, vertices: list):
+        """Draw line(s) connecting the Rectangle centre to a vertex.
+
+        Args:
+            ID: unique ID
+            vertices: list of Rectangle nodes as Points
+            centre: the centre Point of the Rectangle
+
+        Note:
+            * vertices start top-left and are ordered anti-clockwise
+        """
+        _dirs = tools.validated_directions(
+            self.radii, DirectionGroup.ORDINAL, "rectangle radii"
+        )
+        if "nw" in _dirs:  # slope UP to the left
+            cnv.draw_line(centre, vertices[0])
+        if "sw" in _dirs:  # slope DOWN to the left
+            cnv.draw_line(centre, vertices[1])
+        if "se" in _dirs:  # slope DOWN to the right
+            cnv.draw_line(centre, vertices[2])
+        if "ne" in _dirs:  # slope UP to the right
+            cnv.draw_line(centre, vertices[3])
+        # color, thickness etc.
+        self.set_canvas_props(
+            index=ID,
+            stroke=self.radii_stroke or self.stroke,
+            stroke_width=self.radii_stroke_width or self.stroke_width,
+            stroke_ends=self.radii_ends,
+        )
+
     def get_angles(self, rotation=0, **kwargs):
         """Get angles from centre to vertices for rectangle without notches."""
         x, y = self.calculate_xy(**kwargs)
@@ -3793,9 +4002,435 @@ class RectangleShape(BaseShape):
             else:
                 feedback(f'Cannot handle a coord_elevation of "{self.coord_elevation}"')
 
+    def draw_corners(self, cnv, ID, x, y):
+        """Add corner lines/shapes to a Rectangle."""
+        _corner_style = _lower(self.corner_style)
+        if self.corner_directions:
+            _crnrs = self.corner_directions.split()
+            _corners = [str(crn).upper() for crn in _crnrs]
+        # feedback(f'*** Rect corners {_corners=} ')
+        o_x = self.unit(self.corner_x) if self.corner_x else self.unit(self.corner)
+        o_y = self.unit(self.corner_y) if self.corner_y else self.unit(self.corner)
+        # feedback(f'*** Rect corners {o_x=} {o_y=} ')
+        ox3 = o_x / 3.0
+        oy3 = o_y / 3.0
+        if "NW" in _corners:
+            match _corner_style:
+                case "line" | "l":
+                    cnv.draw_line(Point(x, y), Point(x, y + o_y))
+                    cnv.draw_line(Point(x, y), Point(x + o_x, y))
+                case "triangle" | "t":
+                    cnv.draw_line(Point(x, y), Point(x, y + o_y))
+                    cnv.draw_line(Point(x, y + o_y), Point(x + o_x, y)),
+                    cnv.draw_line(Point(x + o_x, y), Point(x, y))
+                case "curve" | "c":
+                    cnv.draw_line(Point(x, y), Point(x, y + o_y))
+                    cnv.draw_curve(
+                        Point(x, y + o_y),
+                        Point(x, y),
+                        Point(x + o_x, y),
+                    )
+                    cnv.draw_line(Point(x + o_x, y), Point(x, y))
+                case "photo" | "p":
+                    cnv.draw_line(Point(x, y), Point(x, y + o_y))
+                    cnv.draw_line(Point(x, y + o_y), Point(x + ox3, y + o_y - oy3)),
+                    cnv.draw_line(
+                        Point(x + ox3, y + o_y - oy3), Point(x + ox3, y + oy3)
+                    ),
+                    cnv.draw_line(Point(x + ox3, y + oy3), Point(x + 2 * ox3, y + oy3)),
+                    cnv.draw_line(Point(x + 2 * ox3, y + oy3), Point(x + o_x, y)),
+                    cnv.draw_line(Point(x + o_x, y), Point(x, y))
+        if "SE" in _corners:
+            match _corner_style:
+                case "line" | "l":
+                    cnv.draw_line(
+                        Point(x + self._u.width, y + self._u.height),
+                        Point(x + self._u.width, y + self._u.height - o_y),
+                    )
+                    cnv.draw_line(
+                        Point(x + self._u.width, y + self._u.height),
+                        Point(x + self._u.width - o_x, y + self._u.height),
+                    )
+                case "triangle" | "t":
+                    cnv.draw_line(
+                        Point(x + self._u.width, y + self._u.height),
+                        Point(x + self._u.width, y + self._u.height - o_y),
+                    )
+                    cnv.draw_line(
+                        Point(x + self._u.width, y + self._u.height - o_y),
+                        Point(x + self._u.width - o_x, y + self._u.height),
+                    )
+                    cnv.draw_line(
+                        Point(x + self._u.width - o_x, y + self._u.height),
+                        Point(x + self._u.width, y + self._u.height),
+                    )
+                case "curve" | "c":
+                    cnv.draw_line(
+                        Point(x + self._u.width, y + self._u.height),
+                        Point(x + self._u.width, y + self._u.height - o_y),
+                    )
+                    cnv.draw_curve(
+                        Point(x + self._u.width, y + self._u.height - o_y),
+                        Point(x + self._u.width, y + self._u.height),
+                        Point(x + self._u.width - o_x, y + self._u.height),
+                    )
+                    cnv.draw_line(
+                        Point(x + self._u.width - o_x, y + self._u.height),
+                        Point(x + self._u.width, y + self._u.height),
+                    )
+                case "photo" | "p":
+                    cnv.draw_line(
+                        Point(x + self._u.width, y + self._u.height),
+                        Point(x + self._u.width, y + self._u.height - o_y),
+                    )
+                    cnv.draw_line(
+                        Point(x + self._u.width, y + self._u.height - o_y),
+                        Point(x + self._u.width - ox3, y + self._u.height - o_y + oy3),
+                    )
+                    cnv.draw_line(
+                        Point(x + self._u.width - ox3, y + self._u.height - o_y + oy3),
+                        Point(
+                            x + self._u.width - ox3, y + self._u.height - o_y + 2 * oy3
+                        ),
+                    )
+                    cnv.draw_line(
+                        Point(
+                            x + self._u.width - ox3, y + self._u.height - o_y + 2 * oy3
+                        ),
+                        Point(
+                            x + self._u.width - 2 * ox3,
+                            y + self._u.height - o_y + 2 * oy3,
+                        ),
+                    )
+                    cnv.draw_line(
+                        Point(
+                            x + self._u.width - 2 * ox3,
+                            y + self._u.height - o_y + 2 * oy3,
+                        ),
+                        Point(x + self._u.width - o_x, y + self._u.height),
+                    )
+                    cnv.draw_line(
+                        Point(x + self._u.width - o_x, y + self._u.height),
+                        Point(x + self._u.width, y + self._u.height),
+                    )
+        if "NE" in _corners:
+            match _corner_style:
+                case "line" | "l":
+                    cnv.draw_line(
+                        Point(x + self._u.width, y),
+                        Point(x + self._u.width, y + o_y),
+                    )
+                    cnv.draw_line(
+                        Point(x + self._u.width, y),
+                        Point(x + self._u.width - o_x, y),
+                    )
+                case "triangle" | "t":
+                    cnv.draw_line(
+                        Point(x + self._u.width, y),
+                        Point(x + self._u.width, y + o_y),
+                    )
+                    cnv.draw_line(
+                        Point(x + self._u.width, y + o_y),
+                        Point(x + self._u.width - o_x, y),
+                    )
+                    cnv.draw_line(
+                        Point(x + self._u.width - o_x, y),
+                        Point(x + self._u.width, y),
+                    )
+                case "curve" | "c":
+                    cnv.draw_line(
+                        Point(x + self._u.width, y),
+                        Point(x + self._u.width, y + o_y),
+                    )
+                    cnv.draw_curve(
+                        Point(x + self._u.width, y + o_y),
+                        Point(x + self._u.width, y),
+                        Point(x + self._u.width - o_x, y),
+                    )
+                    cnv.draw_line(
+                        Point(x + self._u.width - o_x, y),
+                        Point(x + self._u.width, y),
+                    )
+                case "photo" | "p":
+                    cnv.draw_line(
+                        Point(x + self._u.width, y),
+                        Point(x + self._u.width, y + o_y),
+                    )
+                    cnv.draw_line(
+                        Point(x + self._u.width, y + o_y),
+                        Point(x + self._u.width - ox3, y + o_y - oy3),
+                    )
+                    cnv.draw_line(
+                        Point(x + self._u.width - ox3, y + o_y - oy3),
+                        Point(x + self._u.width - ox3, y + o_y - 2 * oy3),
+                    )
+                    cnv.draw_line(
+                        Point(x + self._u.width - ox3, y + o_y - 2 * oy3),
+                        Point(x + self._u.width - 2 * ox3, y + o_y - 2 * oy3),
+                    )
+                    cnv.draw_line(
+                        Point(x + self._u.width - 2 * ox3, y + o_y - 2 * oy3),
+                        Point(x + self._u.width - o_x, y),
+                    )
+                    cnv.draw_line(
+                        Point(x + self._u.width - o_x, y),
+                        Point(x + self._u.width, y),
+                    )
+        if "SW" in _corners:
+            match _corner_style:
+                case "line" | "l":
+                    cnv.draw_line(
+                        Point(x, y + self._u.height), Point(x, y + self._u.height - o_y)
+                    )
+                    cnv.draw_line(
+                        Point(x, y + self._u.height), Point(x + o_x, y + self._u.height)
+                    )
+                case "triangle" | "t":
+                    cnv.draw_line(
+                        Point(x, y + self._u.height), Point(x, y + self._u.height - o_y)
+                    )
+                    cnv.draw_line(
+                        Point(x, y + self._u.height - o_y),
+                        Point(x + o_x, y + self._u.height),
+                    )
+                    cnv.draw_line(
+                        Point(x + o_x, y + self._u.height),
+                        Point(x, y + self._u.height),
+                    )
+                case "curve" | "c":
+                    cnv.draw_line(
+                        Point(x, y + self._u.height), Point(x, y + self._u.height - o_y)
+                    )
+                    cnv.draw_curve(
+                        Point(x, y + self._u.height - o_y),
+                        Point(x, y + self._u.height),
+                        Point(x + o_x, y + self._u.height),
+                    )
+                    cnv.draw_line(
+                        Point(x + o_x, y + self._u.height),
+                        Point(x, y + self._u.height),
+                    )
+                case "photo" | "p":
+                    cnv.draw_line(
+                        Point(x, y + self._u.height), Point(x, y + self._u.height - o_y)
+                    )
+                    cnv.draw_line(
+                        Point(x, y + self._u.height - o_y),
+                        Point(x + ox3, y + self._u.height - o_y + oy3),
+                    )
+                    cnv.draw_line(
+                        Point(x + ox3, y + self._u.height - o_y + oy3),
+                        Point(x + ox3, y + self._u.height - o_y + 2 * oy3),
+                    )
+                    cnv.draw_line(
+                        Point(x + ox3, y + self._u.height - o_y + 2 * oy3),
+                        Point(x + 2 * ox3, y + self._u.height - o_y + 2 * oy3),
+                    )
+                    cnv.draw_line(
+                        Point(x + 2 * ox3, y + self._u.height - o_y + 2 * oy3),
+                        Point(x + o_x, y + self._u.height),
+                    )
+                    cnv.draw_line(
+                        Point(x + o_x, y + self._u.height),
+                        Point(x, y + self._u.height),
+                    )
+        # apply
+        gargs = {}
+        gargs["fill"] = self.corner_fill
+        gargs["stroke"] = self.corner_stroke
+        gargs["stroke_width"] = self.corner_stroke_width
+        gargs["stroke_ends"] = self.corner_ends
+        gargs["dotted"] = self.corner_dotted
+        self.set_canvas_props(cnv=None, index=ID, **gargs)
+
+    def draw_bite_rectangle(self, cnv, x, y):
+        """Draw a Rectangle with inward curved corners."""
+        if self.notch_directions:
+            _ntches = self.notch_directions.split()
+            _notches = [str(ntc).upper() for ntc in _ntches]
+        # feedback(f'*** Rect bite {self.notch_x=} {self.notch_y=} {_notches=} ')
+        n_x = self.unit(self.notch_x) if self.notch_x else self.unit(self.notch)
+        n_y = self.unit(self.notch_y) if self.notch_y else self.unit(self.notch)
+        # feedback(f'*** Rect bite {n_x=} {n_y=} ')
+        if "NW" in _notches:
+            p1 = Point(x, y + n_y)
+        else:
+            p1 = Point(x, y)
+        if "SW" in _notches:
+            p2 = Point(x, y + self._u.height - n_y)
+            p3 = Point(x + n_x, y + self._u.height)
+            pm = Point(x + n_x, y + self._u.height - n_y)
+            cnv.draw_line(p1, p2)
+            cnv.draw_curve(p2, pm, p3)
+        else:
+            p2 = Point(x, y + self._u.height)
+            p3 = p2
+            cnv.draw_line(p1, p3)
+        if "SE" in _notches:
+            p4 = Point(x + self._u.width - n_x, y + self._u.height)
+            p5 = Point(x + self._u.width, y + self._u.height - n_y)
+            pm = Point(x + self._u.width - n_x, y + self._u.height - n_y)
+            cnv.draw_line(p3, p4)
+            cnv.draw_curve(p4, pm, p5)
+        else:
+            p4 = Point(x + self._u.width, y + self._u.height)
+            p5 = p4
+            cnv.draw_line(p3, p5)
+        if "NE" in _notches:
+            p6 = Point(x + self._u.width, y + n_y)
+            p7 = Point(x + self._u.width - n_x, y)
+            pm = Point(x + self._u.width - n_x, y + n_y)
+            cnv.draw_line(p5, p6)
+            cnv.draw_curve(p6, pm, p7)
+        else:
+            p6 = Point(x + self._u.width, y)
+            p7 = p6
+            cnv.draw_line(p5, p7)
+        if "NW" in _notches:
+            p8 = Point(x + n_x, y)
+            pm = Point(x + n_x, y + n_y)
+            cnv.draw_line(p7, p8)
+            cnv.draw_curve(p8, pm, p1)
+        else:
+            cnv.draw_line(p7, p1)
+
+    def set_notch_vertexes(self, x, y):
+        """Calculate vertices needed to draw a Rectangle."""
+        _notch_style = _lower(self.notch_style)
+        if self.notch_directions:
+            _ntches = self.notch_directions.split()
+            _notches = [str(ntc).upper() for ntc in _ntches]
+        # feedback(f'*** Rect {self.notch_x=} {self.notch_y=} {_notches=} ')
+        n_x = self.unit(self.notch_x) if self.notch_x else self.unit(self.notch)
+        n_y = self.unit(self.notch_y) if self.notch_y else self.unit(self.notch)
+        self.vertexes = []
+
+        if "NW" in _notches:
+            match _notch_style:
+                case "snip" | "s":
+                    self.vertexes.append(Point(x + n_x, y))
+                    self.vertexes.append(Point(x, y + n_y))
+                case "fold" | "d":
+                    self.vertexes.append(Point(x, y))
+                    self.vertexes.append(Point(x + n_x, y))
+                    self.vertexes.append(Point(x, y + n_y))
+                case "flap" | "p":
+                    self.vertexes.append(Point(x + n_x, y))
+                    self.vertexes.append(Point(x, y + n_y))
+                    self.vertexes.append(Point(x + n_x, y + n_y))
+                    self.vertexes.append(Point(x + n_x, y))
+                    self.vertexes.append(Point(x, y + n_y))
+                case "step" | "t":
+                    pass
+        else:
+            self.vertexes.append(Point(x, y))
+
+        if "SW" in _notches:
+            self.vertexes.append(Point(x, y + self._u.height - n_y))
+            match _notch_style:
+                case "snip" | "s":
+                    self.vertexes.append(Point(x + n_x, y + self._u.height))
+                case "fold" | "d":
+                    self.vertexes.append(Point(x + n_x, y + self._u.height))
+                    self.vertexes.append(Point(x, y + self._u.height))
+                    self.vertexes.append(Point(x, y + self._u.height - n_y))
+                    self.vertexes.append(Point(x + n_x, y + self._u.height))
+                case "flap" | "p":
+                    self.vertexes.append(Point(x + n_x, y + self._u.height))
+                    self.vertexes.append(Point(x + n_x, y + self._u.height - n_y))
+                    self.vertexes.append(Point(x, y + self._u.height - n_y))
+                    self.vertexes.append(Point(x + n_x, y + self._u.height))
+                case "step" | "t":
+                    self.vertexes.append(Point(x + n_x, y + self._u.height - n_y))
+                    self.vertexes.append(Point(x + n_x, y + self._u.height))
+        else:
+            self.vertexes.append(Point(x, y + self._u.height))
+
+        if "SE" in _notches:
+            self.vertexes.append(Point(x + self._u.width - n_x, y + self._u.height))
+            match _notch_style:
+                case "snip" | "s":
+                    self.vertexes.append(
+                        Point(x + self._u.width, y + self._u.height - n_y)
+                    )
+                case "fold" | "d":
+                    self.vertexes.append(
+                        Point(x + self._u.width, y + self._u.height - n_y)
+                    )
+                    self.vertexes.append(Point(x + self._u.width, y + self._u.height))
+                    self.vertexes.append(
+                        Point(x + self._u.width - n_x, y + self._u.height)
+                    )
+                    self.vertexes.append(
+                        Point(x + self._u.width, y + self._u.height - n_y)
+                    )
+                case "flap" | "p":
+                    self.vertexes.append(
+                        Point(x + self._u.width, y + self._u.height - n_y)
+                    )
+                    self.vertexes.append(
+                        Point(x + self._u.width - n_x, y + self._u.height - n_y)
+                    )
+                    self.vertexes.append(
+                        Point(x + self._u.width - n_x, y + self._u.height)
+                    )
+                    self.vertexes.append(
+                        Point(x + self._u.width, y + self._u.height - n_y)
+                    )
+                case "step" | "t":
+                    self.vertexes.append(
+                        Point(x + self._u.width - n_x, y + self._u.height - n_y)
+                    )
+                    self.vertexes.append(
+                        Point(x + self._u.width, y + self._u.height - n_y)
+                    )
+        else:
+            self.vertexes.append(Point(x + self._u.width, y + self._u.height))
+
+        if "NE" in _notches:
+            self.vertexes.append(Point(x + self._u.width, y + n_y))
+            match _notch_style:
+                case "snip" | "s":
+                    self.vertexes.append(Point(x + self._u.width - n_x, y))
+                case "fold" | "d":
+                    self.vertexes.append(Point(x + self._u.width - n_x, y))
+                    self.vertexes.append(Point(x + self._u.width, y))
+                    self.vertexes.append(Point(x + self._u.width, y + n_y))
+                    self.vertexes.append(Point(x + self._u.width - n_x, y))
+                case "flap" | "p":
+                    self.vertexes.append(Point(x + self._u.width - n_x, y))
+                    self.vertexes.append(Point(x + self._u.width - n_x, y + n_y))
+                    self.vertexes.append(Point(x + self._u.width, y + n_y))
+                    self.vertexes.append(Point(x + self._u.width - n_x, y))
+                case "step" | "t":
+                    self.vertexes.append(Point(x + self._u.width - n_x, y + n_y))
+                    self.vertexes.append(Point(x + self._u.width - n_x, y))
+        else:
+            self.vertexes.append(Point(x + self._u.width, y))
+
+        if "NW" in _notches:
+            match _notch_style:
+                case "snip" | "s":
+                    pass
+                case "fold" | "d":
+                    self.vertexes.append(Point(x, y))
+                    self.vertexes.append(Point(x + n_x, y))
+                    self.vertexes.append(Point(x, y + n_y))
+                case "flap" | "p":
+                    pass
+                    # self.vertexes.append(Point(x + n_x, y + n_y))
+                    # self.vertexes.append(Point(x + n_x, y))
+                    # self.vertexes.append(Point(x, y + n_y))
+                case "step" | "t":
+                    self.vertexes.append(Point(x + n_x, y))
+                    self.vertexes.append(Point(x + n_x, y + n_y))
+                    self.vertexes.append(Point(x, y + n_y))
+        else:
+            self.vertexes.append(Point(x, y))
+
     def calculate_xy(self, **kwargs):
         # ---- adjust start
-        # feedback(f'*** Rect.calc {self.col=} {self.row=} {self._u.offset_x=} {self._o.off_x=}')
+        # feedback(f'***Rect{self.col=}{self.row=} {self._u.offset_x=}{self._o.off_x=}')
         if self.row is not None and self.col is not None:
             if self.kwargs.get("grouping_cols", 1) == 1:
                 x = (
@@ -4056,6 +4691,7 @@ class RectangleShape(BaseShape):
         is_notched = True if (self.notch or self.notch_x or self.notch_y) else False
         is_chevron = True if (self.chevron or self.chevron_height) else False
         is_peaks = True if self.peaks else False
+        is_prows = True if self.prows else False
         is_borders = True if self.borders else False
         is_round = True if (self.rounding or self.rounded) else False
         if self.slices and (is_round or is_notched or is_peaks or is_chevron):
@@ -4068,6 +4704,8 @@ class RectangleShape(BaseShape):
             feedback("Cannot use rounding or rounded with chevron.", True)
         if is_round and is_peaks:
             feedback("Cannot use rounding or rounded with peaks.", True)
+        if is_round and is_prows:
+            feedback("Cannot use rounding or rounded with prows.", True)
         if self.hatch_count and is_notched and self.hatch_count > 1:
             feedback("Cannot use multiple hatches with notch.", True)
         if self.hatch_count and is_chevron:
@@ -4080,8 +4718,17 @@ class RectangleShape(BaseShape):
             feedback("Cannot use chevron and peaks together.", True)
         if self.hatch_count and is_peaks:
             feedback("Cannot use hatch_count and peaks together.", True)
-        if is_borders and (is_chevron or is_peaks or is_notched):
-            feedback("Cannot use borders with any of: hatch, peaks or chevron.", True)
+        if is_notched and is_prows:
+            feedback("Cannot use notch and prows together.", True)
+        if is_chevron and is_prows:
+            feedback("Cannot use chevron and prows together.", True)
+        if self.hatch_count and is_prows:
+            feedback("Cannot use hatch_count and prows together.", True)
+        if is_borders and (is_chevron or is_peaks or is_notched or is_prows):
+            feedback(
+                "Cannot use borders with any of: hatch, peaks or chevron or prows.",
+                True,
+            )
         # ---- calculate properties
         x, y = self.calculate_xy()
         # feedback(f'*** RECT      {self.col=} {self.row=} {x=} {y=}')
@@ -4104,156 +4751,151 @@ class RectangleShape(BaseShape):
             self.centroid = None
         # ---- * notch vertices
         if is_notched:
-            _notch_style = _lower(self.notch_style)
-            if _notch_style in ["b", "bite"]:
-                feedback('The "bite" setting is not implemented yet', False)
-            if self.notch_corners:
-                _ntches = self.notch_corners.split()
-                _notches = [str(ntc).upper() for ntc in _ntches]
-            # feedback(f'*** Rect {self.notch_x=} {self.notch_y=} {_notches=} ')
-            n_x = self.unit(self.notch_x) if self.notch_x else self.unit(self.notch)
-            n_y = self.unit(self.notch_y) if self.notch_y else self.unit(self.notch)
-            self.vertexes = []
+            if _lower(self.notch_style) not in ["b", "bite"]:
+                self.set_notch_vertexes(x, y)
+        # ---- * prows - line/arc endpoints
+        elif is_prows:
+            # NB! cheating here... "point" actually stores the offset from the side!
+            for key, data in self.prows_dict.items():
+                _prow = {}
+                _prow["height"] = self.unit(1, label="prow height")
+                if len(data) >= 1:
+                    _prow["height"] = self.unit(data[0], label="prow height")
+                if len(data) < 2:
+                    if key in ["w", "e"]:
+                        _prow["point"] = Point(_prow["height"], self._u.height / 2.0)
+                    if key in ["n", "s"]:
+                        _prow["point"] = Point(self._u.width / 2.0, _prow["height"])
+                if len(data) >= 2:
+                    _prow["point"] = Point(self.unit(data[1][0]), self.unit(data[1][1]))
+                self.prows_dict[key] = _prow
 
-            if "NW" in _notches:
-                match _notch_style:
-                    case "snip" | "s":
-                        self.vertexes.append(Point(x + n_x, y))
-                        self.vertexes.append(Point(x, y + n_y))
-                    case "fold" | "d":
-                        self.vertexes.append(Point(x, y))
-                        self.vertexes.append(Point(x + n_x, y))
-                        self.vertexes.append(Point(x, y + n_y))
-                    case "flap" | "p":
-                        self.vertexes.append(Point(x + n_x, y))
-                        self.vertexes.append(Point(x, y + n_y))
-                        self.vertexes.append(Point(x + n_x, y + n_y))
-                        self.vertexes.append(Point(x + n_x, y))
-                        self.vertexes.append(Point(x, y + n_y))
-                    case "step" | "t":
-                        pass
-                    case "bite" | "b":
-                        # TODO - write code ...
-                        pass
+            self.lines = []
+            # print(f'*** {self.prows_dict=}')
+            if "w" in self.prows_dict.keys():
+                prow = self.prows_dict["w"]
+                # top curve
+                self.lines.append(
+                    [
+                        Point(x, y),
+                        Point(
+                            x - prow["point"].x,
+                            y + self._u.height / 2.0 - prow["point"].y,
+                        ),
+                        Point(x - prow["height"], y + self._u.height / 2.0),
+                    ]
+                )
+                # bottom curve
+                self.lines.append(
+                    [
+                        Point(x - prow["height"], y + self._u.height / 2.0),
+                        Point(
+                            x - prow["point"].x,
+                            y + self._u.height / 2.0 + prow["point"].y,
+                        ),
+                        Point(x, y + self._u.height),
+                    ]
+                )
             else:
-                self.vertexes.append(Point(x, y))
-
-            if "SW" in _notches:
-                self.vertexes.append(Point(x, y + self._u.height - n_y))
-                match _notch_style:
-                    case "snip" | "s":
-                        self.vertexes.append(Point(x + n_x, y + self._u.height))
-                    case "fold" | "d":
-                        self.vertexes.append(Point(x + n_x, y + self._u.height))
-                        self.vertexes.append(Point(x, y + self._u.height))
-                        self.vertexes.append(Point(x, y + self._u.height - n_y))
-                        self.vertexes.append(Point(x + n_x, y + self._u.height))
-                    case "flap" | "p":
-                        self.vertexes.append(Point(x + n_x, y + self._u.height))
-                        self.vertexes.append(Point(x + n_x, y + self._u.height - n_y))
-                        self.vertexes.append(Point(x, y + self._u.height - n_y))
-                        self.vertexes.append(Point(x + n_x, y + self._u.height))
-                    case "step" | "t":
-                        self.vertexes.append(Point(x + n_x, y + self._u.height - n_y))
-                        self.vertexes.append(Point(x + n_x, y + self._u.height))
-                    case "bite" | "b":
-                        # TODO - write code ...
-                        pass
+                self.lines.append([Point(x, y), Point(x, y + self._u.height)])
+            if "s" in self.prows_dict.keys():
+                prow = self.prows_dict["s"]
+                # left-hand curve
+                self.lines.append(
+                    [
+                        Point(x, y + self._u.height),
+                        Point(
+                            x + self._u.width / 2.0 - prow["point"].x,
+                            y + self._u.height + prow["point"].y,
+                        ),
+                        Point(
+                            x + self._u.width / 2.0, y + self._u.height + prow["height"]
+                        ),
+                    ]
+                )
+                # right-hand curve
+                self.lines.append(
+                    [
+                        Point(
+                            x + self._u.width / 2.0, y + self._u.height + prow["height"]
+                        ),
+                        Point(
+                            x + self._u.width / 2.0 + prow["point"].x,
+                            y + self._u.height + prow["point"].y,
+                        ),
+                        Point(x + self._u.width, y + self._u.height),
+                    ]
+                )
             else:
-                self.vertexes.append(Point(x, y + self._u.height))
-
-            if "SE" in _notches:  ##
-                self.vertexes.append(Point(x + self._u.width - n_x, y + self._u.height))
-                match _notch_style:
-                    case "snip" | "s":
-                        self.vertexes.append(
-                            Point(x + self._u.width, y + self._u.height - n_y)
-                        )
-                    case "fold" | "d":
-                        self.vertexes.append(
-                            Point(x + self._u.width, y + self._u.height - n_y)
-                        )
-                        self.vertexes.append(
-                            Point(x + self._u.width, y + self._u.height)
-                        )
-                        self.vertexes.append(
-                            Point(x + self._u.width - n_x, y + self._u.height)
-                        )
-                        self.vertexes.append(
-                            Point(x + self._u.width, y + self._u.height - n_y)
-                        )
-                    case "flap" | "p":
-                        self.vertexes.append(
-                            Point(x + self._u.width, y + self._u.height - n_y)
-                        )
-                        self.vertexes.append(
-                            Point(x + self._u.width - n_x, y + self._u.height - n_y)
-                        )
-                        self.vertexes.append(
-                            Point(x + self._u.width - n_x, y + self._u.height)
-                        )
-                        self.vertexes.append(
-                            Point(x + self._u.width, y + self._u.height - n_y)
-                        )
-                    case "step" | "t":
-                        self.vertexes.append(
-                            Point(x + self._u.width - n_x, y + self._u.height - n_y)
-                        )
-                        self.vertexes.append(
-                            Point(x + self._u.width, y + self._u.height - n_y)
-                        )
-                    case "bite" | "b":
-                        # TODO - write code ...
-                        pass
+                self.lines.append(
+                    [
+                        Point(x, y + self._u.height),
+                        Point(x + self._u.width, y + self._u.height),
+                    ]
+                )
+            if "e" in self.prows_dict.keys():
+                prow = self.prows_dict["e"]
+                # bottom curve
+                self.lines.append(
+                    [
+                        Point(x + self._u.width, y + self._u.height),
+                        Point(
+                            x + self._u.width + prow["point"].x,
+                            y + self._u.height / 2.0 + prow["point"].y,
+                        ),
+                        Point(
+                            x + self._u.width + prow["height"], y + self._u.height / 2.0
+                        ),
+                    ]
+                )
+                # top curve
+                self.lines.append(
+                    [
+                        Point(
+                            x + self._u.width + prow["height"], y + self._u.height / 2.0
+                        ),
+                        Point(
+                            x + self._u.width + prow["point"].x,
+                            y + self._u.height / 2.0 - prow["point"].y,
+                        ),
+                        Point(x + self._u.width, y),
+                    ]
+                )
             else:
-                self.vertexes.append(Point(x + self._u.width, y + self._u.height))
-
-            if "NE" in _notches:
-                self.vertexes.append(Point(x + self._u.width, y + n_y))
-                match _notch_style:
-                    case "snip" | "s":
-                        self.vertexes.append(Point(x + self._u.width - n_x, y))
-                    case "fold" | "d":
-                        self.vertexes.append(Point(x + self._u.width - n_x, y))
-                        self.vertexes.append(Point(x + self._u.width, y))
-                        self.vertexes.append(Point(x + self._u.width, y + n_y))
-                        self.vertexes.append(Point(x + self._u.width - n_x, y))
-                    case "flap" | "p":
-                        self.vertexes.append(Point(x + self._u.width - n_x, y))
-                        self.vertexes.append(Point(x + self._u.width - n_x, y + n_y))
-                        self.vertexes.append(Point(x + self._u.width, y + n_y))
-                        self.vertexes.append(Point(x + self._u.width - n_x, y))
-                    case "step" | "t":
-                        self.vertexes.append(Point(x + self._u.width - n_x, y + n_y))
-                        self.vertexes.append(Point(x + self._u.width - n_x, y))
-                    case "bite" | "b":
-                        # TODO - write code ...
-                        pass
+                self.lines.append(
+                    [
+                        Point(x + self._u.width, y + self._u.height),
+                        Point(x + self._u.width, y),
+                    ]
+                )
+            if "n" in self.prows_dict.keys():
+                prow = self.prows_dict["n"]
+                # right-hand curve
+                self.lines.append(
+                    [
+                        Point(x + self._u.width, y),
+                        Point(
+                            x + self._u.width / 2.0 + prow["point"].x,
+                            y - prow["point"].y,
+                        ),
+                        Point(x + self._u.width / 2.0, y - prow["height"]),
+                    ]
+                )
+                # left-hand curve
+                self.lines.append(
+                    [
+                        Point(x + self._u.width / 2.0, y - prow["height"]),
+                        Point(
+                            x + self._u.width / 2.0 - prow["point"].x,
+                            y - prow["point"].y,
+                        ),
+                        Point(x, y),
+                    ]
+                )
             else:
-                self.vertexes.append(Point(x + self._u.width, y))
-
-            if "NW" in _notches:
-                match _notch_style:
-                    case "snip" | "s":
-                        pass
-                    case "fold" | "d":
-                        self.vertexes.append(Point(x, y))
-                        self.vertexes.append(Point(x + n_x, y))
-                        self.vertexes.append(Point(x, y + n_y))
-                    case "flap" | "p":
-                        pass
-                        # self.vertexes.append(Point(x + n_x, y + n_y))
-                        # self.vertexes.append(Point(x + n_x, y))
-                        # self.vertexes.append(Point(x, y + n_y))
-                    case "step" | "t":
-                        self.vertexes.append(Point(x + n_x, y))
-                        self.vertexes.append(Point(x + n_x, y + n_y))
-                        self.vertexes.append(Point(x, y + n_y))
-                    case "bite" | "b":
-                        # TODO - write code ...
-                        pass
-            else:
-                self.vertexes.append(Point(x, y))
+                self.lines.append(
+                    [Point(x + self._u.width, y), Point(x, y)]
+                )  # line back to start
 
         # ---- * peaks vertices
         elif is_peaks:
@@ -4288,7 +4930,7 @@ class RectangleShape(BaseShape):
         elif is_chevron:
             try:
                 _chevron_height = float(self.chevron_height)
-            except:
+            except Exception:
                 feedback(
                     f"A chevron_height of {self.chevron_height} is not valid!", True
                 )
@@ -4366,7 +5008,9 @@ class RectangleShape(BaseShape):
             "pattern",
             "slices",
             "hatches",
+            "perbises",
             "radii",
+            "corners",
             "centre_shape",
             "centre_shapes",
             "cross",
@@ -4384,7 +5028,6 @@ class RectangleShape(BaseShape):
                 )
             if self.order_last:
                 ordering = tools.list_ordering(base_ordering, self.order_last, end=True)
-        # feedback(f'*** Rectangle: {ordering=}')
 
         # ---- ORDERING
         for item in ordering:
@@ -4393,10 +5036,21 @@ class RectangleShape(BaseShape):
                 # feedback(f'*** RECT {self.col=} {self.row=} {x=} {y=} {radius=}')
                 if is_notched or is_chevron or is_peaks:
                     # feedback(f'*** RECT  vertices')
-                    cnv.draw_polyline(self.vertexes)
-                    kwargs["closed"] = True
+                    if _lower(self.notch_style) in ["b", "bite"]:
+                        self.draw_bite_rectangle(cnv, x, y)
+                    else:
+                        cnv.draw_polyline(self.vertexes)
+                        kwargs["closed"] = True
                     self.set_canvas_props(cnv=cnv, index=ID, **kwargs)
                     self._debug(cnv, vertices=self.vertexes)
+                elif is_prows:
+                    for line in self.lines:
+                        if len(line) == 2:
+                            cnv.draw_line(line[0], line[1])
+                        if len(line) == 3:
+                            cnv.draw_curve(line[0], line[1], line[2])
+                    kwargs["closed"] = True
+                    self.set_canvas_props(cnv=cnv, index=ID, **kwargs)
                 else:
                     # feedback(f'*** RECT  normal {radius=} {kwargs=}')
                     cnv.draw_rect(
@@ -4454,6 +5108,17 @@ class RectangleShape(BaseShape):
                     self.draw_hatch(
                         cnv, ID, vertices, self.hatch_count, rotation=rotation
                     )
+            if item == "perbises":
+                # ---- * draw perbises
+                if self.perbis:
+                    self.draw_perbis(cnv, ID, Point(x_d, y_d), **kwargs)
+            if item == "radii":
+                # ---- * draw radii
+                if self.radii:
+                    self.draw_radii(cnv, ID, Point(x_d, y_d), self.vertexes)
+            if item == "corners":
+                # ---- * draw corners
+                self.draw_corners(cnv, ID, x, y)
             if item == "centre_shape" or item == "center_shape":
                 # ---- * centre shape (with offset)
                 if self.centre_shape:
@@ -4472,7 +5137,7 @@ class RectangleShape(BaseShape):
             if item == "dot":
                 # ---- * dot
                 self.draw_dot(cnv, x_d, y_d)
-            if item == "text ":
+            if item == "text":
                 # ---- * text
                 self.draw_heading(
                     cnv, ID, x_d, y_d - 0.5 * self._u.height - delta_m_up, **kwargs
@@ -4998,10 +5663,21 @@ class ShapeShape(BaseShape):
         x_offset, y_offset = self.unit(self.x or 0), self.unit(self.y or 0)
         # ---- set vertices
         self.vertexes = self.get_vertexes()
+        # ---- set line style
+        lkwargs = {}
+        lkwargs["wave_style"] = self.kwargs.get("wave_style", None)
+        lkwargs["wave_height"] = self.kwargs.get("wave_height", 0)
         # ---- draw polyshape
         # feedback(f'***PolyShape{x=} {y=} {self.vertexes=}')
         if self.vertexes:
-            cnv.draw_polyline(self.vertexes)
+            for key, vertex in enumerate(self.vertexes):
+                if key < len(self.vertexes) - 1:
+                    draw_line(
+                        cnv, vertex, self.vertexes[key + 1], shape=self, **lkwargs
+                    )
+                else:
+                    draw_line(cnv, vertex, self.vertexes[0], shape=self, **lkwargs)
+            # cnv.draw_polyline(self.vertexes)
             kwargs["closed"] = True
             if kwargs.get("rounded"):
                 kwargs["lineJoin"] = 1
@@ -5123,7 +5799,7 @@ class StadiumShape(BaseShape):
         self.set_canvas_props(cnv=cnv, index=ID, **keys)
 
         # ---- draw stadium - lines or curves
-        radius_lr = self._u.height / 2.0
+        # radius_lr = self._u.height / 2.0
         radius_tb = self._u.width / 2.0
 
         for key, vertex in enumerate(self.vertexes):
@@ -5301,8 +5977,8 @@ class TextShape(BaseShape):
             height = self._u.height
         if self.width:
             width = self._u.width
-        rotation = kwargs.get("rotation", self.rotation)
         # TODO => text rotation
+        # rotation = kwargs.get("rotation", self.rotation)
         # ---- set canvas
         self.set_canvas_props(index=ID)
         # ---- overrides for self.text / text value
@@ -5379,7 +6055,7 @@ class TextShape(BaseShape):
             try:
                 keys = self.text_properties(string=_text, **kwargs)
                 keys["rotate"] = text_rotation
-                # feedback(f'*** Text WRAP {kwargs=} \n=> {keys=} \n=> {rect=} \n=>{_text=}')
+                # feedback(f'*** Text WRAP {kwargs=}=> \n{keys=} \n{rect=} \n{_text=}')
                 if self.run_debug:
                     globals.doc_page.draw_rect(
                         rect, color=self.debug_color, dashes="[1 2] 0"
@@ -5411,8 +6087,8 @@ class TextShape(BaseShape):
                 if not fonts.builtin_font(self.font_name):  # local check
                     _, _path, font_file = tools.get_font_file(self.font_name)
                     # if font_file:
-                    #     keys["css"] = '@font-face {font-family: %s; src: url(%s);}' % (
-                    #         _font_name, font_file)
+                    #   keys["css"] = '@font-face {font-family: %s; src: url(%s);}' % (
+                    #     _font_name, font_file)
                 keys["css"] = globals.css
                 if self.style:
                     _text = f'<div style="{self.style}">{_text}</div>'
@@ -5519,8 +6195,8 @@ class TrapezoidShape(BaseShape):
         """Calculate vertices of trapezoid."""
         # set start
         _cx, _cy, _x, _y = self.calculate_xy()  # for direct call without draw()
-        cx = kwargs.get("cx", _cx)
-        cy = kwargs.get("cy", _cy)
+        # cx = kwargs.get("cx", _cx)
+        # cy = kwargs.get("cy", _cy)
         x = kwargs.get("x", _x)
         y = kwargs.get("y", _y)
         # build array

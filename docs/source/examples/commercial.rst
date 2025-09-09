@@ -1,6 +1,6 @@
-=========================================
-Examples: Commercial Board Games and Maps
-=========================================
+===============================
+Commercial Board Games and Maps
+===============================
 
 .. |dash| unicode:: U+2014 .. EM DASH SIGN
 
