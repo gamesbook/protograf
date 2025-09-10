@@ -252,7 +252,7 @@ class BaseCanvas:
         self.line_ends = self.defaults.get("line_ends", None)
         self.dotted = self.defaults.get("dotted", self.defaults.get("dotted", False))
         self.dashed = self.defaults.get("dashed", None)
-        # ---- order - Hexagon / Circle / Rectangle
+        # ---- order  (hex, circle, rect)
         self.order_all = self.defaults.get("order_all", None)
         self.order_first = self.defaults.get("order_first", None)
         self.order_last = self.defaults.get("order_last", None)
@@ -393,7 +393,7 @@ class BaseCanvas:
         self.rounded_radius = self.defaults.get(
             "rounded_radius", 0.05
         )  # fraction of smallest side
-        # ---- rectangle / rhombus / hexagon / circle
+        # ---- slices (rect, rhombus, hex, circle)
         self.slices = self.defaults.get("slices", [])
         self.slices_fractions = self.defaults.get("slices_fractions", [])
         self.slices_angles = self.defaults.get("slices_angles", [])
@@ -433,7 +433,7 @@ class BaseCanvas:
         self.steps = self.defaults.get("steps", [])
         self.x_c = self.defaults.get("xc", 0)
         self.y_c = self.defaults.get("yc", 0)
-        # ---- radii (circle, hex & polygon)
+        # ---- radii (circle, hex, rect, polygon)
         self.radii = self.defaults.get("radii", [])
         self.radii_stroke = self.defaults.get("radii_stroke", self.stroke)
         self.radii_stroke_width = self.defaults.get(
@@ -459,7 +459,18 @@ class BaseCanvas:
         self.radii_dashed = self.defaults.get("radii_dashed", self.dashed)
         self.radii_wave_style = self.defaults.get("radii_wave_style", None)
         self.radii_wave_height = self.defaults.get("radii_wave_height", 0)
-        # ---- circle
+        # ---- stripes (circle, hex, rect)
+        self.stripes = self.defaults.get("stripes", 0)
+        self.stripes_directions = self.defaults.get("stripes_directions", "n")
+        self.stripes_fill = self.defaults.get("stripes_fill", self.fill)
+        self.stripes_stroke = self.defaults.get("stripes_stroke", self.stroke)
+        self.stripes_stroke_width = self.defaults.get(
+            "stripes_stroke_width", self.stroke_width
+        )
+        self.stripes_buffer = self.defaults.get("stripes_buffer", None)  # default: edge
+        self.stripes_dotted = self.defaults.get("stripes_dotted", self.dotted)
+        self.stripes_dashed = self.defaults.get("stripes_dashed", self.dashed)
+        # ---- petals - circle
         self.nested = self.defaults.get("nested", None)
         self.petals = self.defaults.get("petals", 0)
         self.petals_style = self.defaults.get("petals_style", "triangle")
@@ -480,7 +491,7 @@ class BaseCanvas:
         self.flip = self.defaults.get("flip", None)
         # ---- triangle / polyomino
         self.hand = self.defaults.get("hand", None)
-        # ---- shapes with centr (hexagon / circle / square / rhombus / poly / ellipse)
+        # ---- shapes with centre (hex, circle, rect, rhombus, poly, ellipse)
         self.centre_shapes = self.defaults.get("centre_shapes", [])
         self.centre_shape = self.defaults.get("centre_shape", "")
         self.centre_shape_mx = self.defaults.get("centre_shape_mx", 0)
@@ -497,7 +508,7 @@ class BaseCanvas:
         self.cross_stroke_width = self.defaults.get(
             "cross_stroke_width", self.stroke_width
         )
-        # ---- hexagon / polygon
+        # ---- perbis (hex, rect, polygon)
         self.orientation = self.defaults.get("orientation", "flat")  # flat|pointy
         self.perbis = self.defaults.get("perbis", None)  # directions
         self.perbis_stroke = self.defaults.get("perbis_stroke", "black")
@@ -591,7 +602,7 @@ class BaseCanvas:
         # ---- mesh
         self.mesh = self.defaults.get("mesh", None)
         self.mesh_ends = self.defaults.get("mesh_ends", self.line_ends)
-        # ---- hatches
+        # ---- hatches (hex, circle, rect)
         self.hatch_count = self.defaults.get("hatch_count", 0)
         self.hatch = self.defaults.get("hatch", "*")
         self.hatch_stroke = self.defaults.get("hatch_stroke", self.stroke)
@@ -763,7 +774,7 @@ class BaseShape:
         self.wrap = kwargs.get("wrap", base.wrap)
         self.align = kwargs.get("align", base.align)  # centre,left,right,justify
         self._alignment = TEXT_ALIGN_LEFT  # see to_alignment()
-        # ---- order - Hexagon / Circle / Rectangle
+        # ---- order (hex, circle, rect)
         self.order_all = kwargs.get("order_all", base.order_all)
         self.order_first = kwargs.get("order_first", base.order_first)
         self.order_last = kwargs.get("order_last", base.order_last)
@@ -920,7 +931,7 @@ class BaseShape:
         self.prows_dict = {}
         self.borders = kwargs.get("borders", base.borders)
         self.rounded_radius = base.rounded_radius
-        # ---- rectangle / rhombus/ hexagon / circle
+        # ---- slices (rect, rhombus, hex, circle)
         self.slices = kwargs.get("slices", base.slices)
         self.slices_fractions = kwargs.get("slices_fractions", base.slices_fractions)
         self.slices_angles = kwargs.get("slices_angles", base.slices_angles)
@@ -973,7 +984,7 @@ class BaseShape:
         self.sides = kwargs.get("sides", base.sides)
         self.points = kwargs.get("points", base.points)
         self.steps = kwargs.get("steps", base.steps)
-        # ---- radii (circle / hexagon / polygon / compass)
+        # ---- radii (circle, hex, polygon, rect, compass)
         self.radii = kwargs.get("radii", base.radii)
         self.radii_stroke = kwargs.get("radii_stroke", self.stroke)
         self.radii_stroke_width = self.kw_float(
@@ -1000,7 +1011,20 @@ class BaseShape:
         self.radii_wave_height = kwargs.get("radii_wave_height", base.radii_wave_height)
         self.radii_labels_my = self.kw_float(kwargs.get("radii_labels_my", 0))
         self.radii_labels_mx = self.kw_float(kwargs.get("radii_labels_mx", 0))
-        # ---- circle
+        # ---- stripes (circle, hex, rect)
+        self.stripes = self.kw_int(kwargs.get("stripes", base.stripes))
+        self.stripes_directions = kwargs.get(
+            "stripes_directions", base.stripes_directions
+        )
+        self.stripes_fill = kwargs.get("stripes_fill", base.fill)
+        self.stripes_stroke = kwargs.get("stripes_stroke", base.stroke)
+        self.stripes_stroke_width = self.kw_float(
+            kwargs.get("stripes_stroke_width", base.stripes_stroke_width)
+        )
+        self.stripes_buffer = kwargs.get("stripes_buffer", base.stripes_buffer)
+        self.stripes_dotted = kwargs.get("stripes_dotted", base.dotted)
+        self.stripes_dashed = kwargs.get("stripes_dashed", self.dashed)
+        # ---- petals (circle)
         self.nested = kwargs.get("nested", base.nested)
         self.petals = self.kw_int(kwargs.get("petals", base.petals), "petals")
         self.petals_style = kwargs.get("petals_style", base.petals_style)
@@ -1025,7 +1049,7 @@ class BaseShape:
         self.flip = kwargs.get("flip", base.flip)
         # ---- triangle / polyomino
         self.hand = kwargs.get("hand", base.hand)
-        # ---- shapes with centr (hexagon / circle / square / rhombus / poly / ellipse)
+        # ---- shapes with centre (hex, circle, rect, rhombus, poly, ellipse)
         self.centre_shapes = kwargs.get("centre_shapes", [])
         self.centre_shape = kwargs.get("centre_shape", "")
         self.centre_shape_mx = self.kw_float(
@@ -1046,7 +1070,7 @@ class BaseShape:
         )
         self.cross = self.kw_float(kwargs.get("cross", base.cross))
         self.cross_ends = kwargs.get("cross_ends", base.cross_ends)
-        # ---- hexagon / polygon
+        # ---- perbis (hex, rect, polygon)
         self.orientation = kwargs.get("orientation", base.orientation)
         self.perbis = kwargs.get("perbis", base.perbis)  # directions
         self.perbis_stroke = kwargs.get("perbis_stroke", base.perbis_stroke)
@@ -1132,6 +1156,7 @@ class BaseShape:
         self.coord_suffix = kwargs.get("coord_suffix", base.coord_suffix)
         self.coord_style = kwargs.get("coord_style", "")  # linear|diagonal
         self.hidden = kwargs.get("hidden", base.hidden)
+        # ---- spikes - Hexagon
         self.spikes = kwargs.get("spikes", base.spikes)
         self.spikes_fill = kwargs.get("spikes_fill", base.spikes_fill)
         self.spikes_stroke = kwargs.get("spikes_stroke", base.spikes_stroke)
@@ -1161,7 +1186,7 @@ class BaseShape:
         # ---- mesh
         self.mesh = kwargs.get("mesh", base.mesh)
         self.mesh_ends = kwargs.get("mesh_ends", base.mesh_ends)
-        # ---- hatches
+        # ---- hatches (hex, rect, circle)
         self.hatch_count = kwargs.get("hatch_count", base.hatch_count)
         self.hatch = kwargs.get("hatch", base.hatch)
         self.hatch_stroke_width = self.kw_float(

@@ -34,20 +34,17 @@ from .shapes import (
     ArrowShape,
     BezierShape,
     ChordShape,
-    CircleShape,
     CommonShape,
     CompassShape,
     DotShape,
     EllipseShape,
     EquilateralTriangleShape,
     FooterShape,
-    HexShape,
     ImageShape,
     LineShape,
     QRCodeShape,
     PolygonShape,
     PolylineShape,
-    RectangleShape,
     RhombusShape,
     RightAngledTriangleShape,
     SectorShape,
@@ -58,6 +55,9 @@ from .shapes import (
     TextShape,
     TrapezoidShape,
 )
+from .shapes_circle import CircleShape
+from .shapes_hexagon import HexShape
+from .shapes_rectangle import RectangleShape
 from .objects import (
     CubeObject,
     D6Object,
