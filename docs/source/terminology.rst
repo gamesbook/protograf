@@ -101,7 +101,7 @@ In general, color can be set for the lines (**stroke**) and areas
    many strokes for particular types of lines that are set by prefixing
    this term with the name of the item in question; for example:
    **cross_stroke**; **grid_stroke**; **label_stroke**; **petals_stroke**,
-   **perbis_stroke**; **radii_stroke**; etc.
+   **perbii_stroke**; **radii_stroke**; etc.
 -  **stroke_fill** - sets both the line ("stroke") and area ("fill") to
    be the *same* color
 
@@ -347,10 +347,11 @@ Display-orientated Terms
 -  *paths* - a list of one or more pairs of *compass directions*, representing
    two edges of a hexagon shap,e between which a line |dash| straight or an
    arc |dash| is drawns
--  **perbis** - if given one or more numbers will cause the perpendicular
-   bisectors |dash| lines from centre to the middle of the edges |dash| of
-   a ``Polygon`` or ``Hexagon`` to be shown; edges are numbered from the
-   east-facing one in an anti-clockwise direction
+-  **perbii** - if given one or more numbers will cause the perpendicular
+   bisectors ("perbii" is plural for the shortcut "perbis") -  |dash| lines
+   from centre to the middle of the edges |dash| of a ``Polygon``, ``Hexagon``
+   or ``Rectangle`` to be drawn; a ``Polygon`` unnamed edges are numbered from
+   the east-facing one in an anti-clockwise direction
 -  **shown** - a list of locations, indicated by their *row and
    column* identifier which are the only ones that **must** be used for
    display - the rest are ignored

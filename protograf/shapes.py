@@ -1050,15 +1050,15 @@ class PolygonShape(BaseShape):
         self.use_width = True if self.is_kwarg("width") else False
         self.use_radius = True if self.is_kwarg("radius") else False
         # ---- perform overrides
-        if self.perbis:
-            if isinstance(self.perbis, str):
-                if _lower(self.perbis) in ["all", "*"]:
+        if self.perbii:
+            if isinstance(self.perbii, str):
+                if _lower(self.perbii) in ["all", "*"]:
                     sides = tools.as_int(self.sides, "sides")
-                    self.perbis = list(range(1, sides + 1))
+                    self.perbii = list(range(1, sides + 1))
                 else:
-                    self.perbis = tools.sequence_split(self.perbis)
-            if not isinstance(self.perbis, list):
-                feedback("The perbis value must be a list of numbers!", True)
+                    self.perbii = tools.sequence_split(self.perbii)
+            if not isinstance(self.perbii, list):
+                feedback("The perbii value must be a list of numbers!", True)
         if self.cx is not None and self.cy is not None:
             self.x, self.y = self.cx, self.cy
         # ---- RESET UNIT PROPS (last!)
@@ -1123,7 +1123,7 @@ class PolygonShape(BaseShape):
             angles.append(angle)
         return angles
 
-    def draw_perbis(
+    def draw_perbii(
         self,
         cnv,
         ID,
@@ -1134,7 +1134,7 @@ class PolygonShape(BaseShape):
         """Draw lines connecting the Polygon centre to the centre of each edge.
 
         Def:
-            A perpendicular bisector ("perbis") of a chord is:
+            A perpendicular bisector ("perbii") of a chord is:
             A line passing through the center of circle such that it divides the
             chord into two equal parts and meets the chord at a right angle;
             for a polygon, each edge is effectively a chord.
@@ -1143,8 +1143,8 @@ class PolygonShape(BaseShape):
             centre = self.get_center()
         if not vertices:
             vertices = self.get_vertexes(rotation=rotation)
-        _perbis = []  # store angles to centre of edges (the "chords")
-        _perbis_pts = []  # store centre Point of edges
+        _perbii = []  # store angles to centre of edges (the "chords")
+        _perbii_pts = []  # store centre Point of edges
         vcount = len(vertices) - 1
         vertices.reverse()
         for key, vertex in enumerate(vertices):
@@ -1155,26 +1155,26 @@ class PolygonShape(BaseShape):
                 p1 = Point(vertex.x, vertex.y)
                 p2 = Point(vertices[key - 1].x, vertices[key - 1].y)
             pc = geoms.fraction_along_line(p1, p2, 0.5)  # centre pt of edge
-            _perbis_pts.append(pc)
+            _perbii_pts.append(pc)
             _, angle = geoms.angles_from_points(centre, pc)
             angle = 360.0 - angle if angle > 0.0 else angle
-            _perbis.append(angle)
-        pb_offset = self.unit(self.perbis_offset, label="perbis offset") or 0
+            _perbii.append(angle)
+        pb_offset = self.unit(self.perbii_offset, label="perbii offset") or 0
         pb_length = (
-            self.unit(self.perbis_length, label="perbis length")
-            if self.perbis_length
+            self.unit(self.perbii_length, label="perbii length")
+            if self.perbii_length
             else self.get_radius()
         )
 
-        # ---- set perbis styles
+        # ---- set perbii styles
         lkwargs = {}
-        lkwargs["wave_style"] = self.kwargs.get("perbis_wave_style", None)
-        lkwargs["wave_height"] = self.kwargs.get("perbis_wave_height", 0)
-        for key, pb_angle in enumerate(_perbis):
-            if self.perbis and key + 1 not in self.perbis:
+        lkwargs["wave_style"] = self.kwargs.get("perbii_wave_style", None)
+        lkwargs["wave_height"] = self.kwargs.get("perbii_wave_height", 0)
+        for key, pb_angle in enumerate(_perbii):
+            if self.perbii and key + 1 not in self.perbii:
                 continue
             # points based on length of line, offset and the angle in degrees
-            edge_pt = _perbis_pts[key]
+            edge_pt = _perbii_pts[key]
             # print(f'*** {pb_angle=} {edge_pt=} {centre=}')
             if pb_offset is not None and pb_offset != 0:
                 offset_pt = geoms.point_on_circle(centre, pb_offset, pb_angle)
@@ -1185,7 +1185,7 @@ class PolygonShape(BaseShape):
             else:
                 start_point = centre.x, centre.y
                 end_point = edge_pt.x, edge_pt.y
-            # ---- draw a perbis line
+            # ---- draw a perbii line
             draw_line(
                 cnv,
                 start_point,
@@ -1196,11 +1196,11 @@ class PolygonShape(BaseShape):
 
         self.set_canvas_props(
             index=ID,
-            stroke=self.perbis_stroke,
-            stroke_width=self.perbis_stroke_width,
-            stroke_ends=self.perbis_ends,
-            dashed=self.perbis_dashed,
-            dotted=self.perbis_dotted,
+            stroke=self.perbii_stroke,
+            stroke_width=self.perbii_stroke_width,
+            stroke_ends=self.perbii_ends,
+            dashed=self.perbii_dashed,
+            dotted=self.perbii_dotted,
         )
 
     def draw_radii(
@@ -1427,9 +1427,9 @@ class PolygonShape(BaseShape):
         # ---- draw radii
         if self.radii:
             self.draw_radii(cnv, ID, Point(x, y), vertices)
-        # ---- draw perbis
-        if self.perbis:
-            self.draw_perbis(cnv, ID, Point(x, y), vertices)
+        # ---- draw perbii
+        if self.perbii:
+            self.draw_perbii(cnv, ID, Point(x, y), vertices)
         # ---- draw mesh
         if self.mesh:
             self.draw_mesh(cnv, ID, vertices)

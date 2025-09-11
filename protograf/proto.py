@@ -2914,12 +2914,12 @@ def Hexagon(row=None, col=None, **kwargs):
 
     <center>
     - orientation (str): either *float*, the default, or *pointy*
-    - perbis (str): a compass direction in which a bisector is drawn
+    - perbii (str): a compass direction in which a bisector is drawn
       (from centre to mid-point of the edge in that direction); directions:
 
-      - ``n`` (North) / ``s`` (South) draws vertical perbis for flat hex;
-      - ``w`` (West) / ``e`` (East) draws horizontal perbis for pointy hex;
-      - ``nw`` (North-West) / ``se`` (South-East) draws diagonal perbis lines.
+      - ``n`` (North) / ``s`` (South) draws vertical perbii for flat hex;
+      - ``w`` (West) / ``e`` (East) draws horizontal perbii for pointy hex;
+      - ``nw`` (North-West) / ``se`` (South-East) draws diagonal perbii.
     - slices (list): set of colors that are drawn as triangles  in a clockwise
       direction starting from the "North East"
     - border (list): overide the normal edge line; specify a set of values, which

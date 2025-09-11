@@ -207,7 +207,7 @@ Text(common=header_font, x=8, y=3,
 Text(common=header_font, x=8, y=4,
      text="- Image")
 Text(common=header_font, x=8, y=4.75,
-     text="- Rectangle: corners; centred shape; perbis")
+     text="- Rectangle: corners; centred shape; perbii")
 Text(common=header_font, x=8, y=5.5,
      text="- Dot & Texts")
 Image("tmwtgg.jpg",
@@ -224,11 +224,11 @@ Rectangle(
         corner=0.3,
         corner_stroke="silver",
         corner_stroke_width=1.5),
-    perbis="*",
-    perbis_stroke_width=2,
-    perbis_length=0.4,
-    perbis_offset_y=1.8,
-    perbis_offset_x=2.8,
+    perbii="*",
+    perbii_stroke_width=2,
+    perbii_length=0.4,
+    perbii_offset_y=1.8,
+    perbii_offset_x=2.8,
     cross=0.5,
     cross_stroke="white",
     cross_stroke_width=1.5)

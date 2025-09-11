@@ -218,7 +218,7 @@ Title       *Octagons Board*
 ----------- ------------------------------------------------------------------
 Script      `octagons.py <https://github.com/gamesbook/protograf/blob/master/examples/boards/abstract/octagons.py>`_
 ----------- ------------------------------------------------------------------
-Discussion  The code uses a basic 8-sided ``Polygon()``, with the *perbis*
+Discussion  The code uses a basic 8-sided ``Polygon()``, with the *perbii*
             property being set to construct either a horizontal or vertical
             line inside it.
 

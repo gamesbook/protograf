@@ -78,7 +78,7 @@ class RectangleShape(BaseShape):
         else:
             return length
 
-    def calculate_perbises(
+    def calculate_perbii(
         self, cnv, centre: Point, rotation: float = None, **kwargs
     ) -> list:
         """Calculate centre points for each edge and angles from centre.
@@ -91,11 +91,11 @@ class RectangleShape(BaseShape):
             dict of Perbis objects keyed on direction
         """
         directions = ["n", "w", "s", "e"]
-        perbises = {}
+        perbii_dict = {}
         vertices = self.get_vertexes(rotation=rotation, **kwargs)
         vcount = len(vertices) - 1
-        _perbis_pts = []
-        # print(f"*** RECT perbis {centre=} {vertices=}")
+        _perbii_pts = []
+        # print(f"*** RECT perbii {centre=} {vertices=}")
         for key, vertex in enumerate(vertices):
             if key == 0:
                 p1 = Point(vertex.x, vertex.y)
@@ -104,10 +104,10 @@ class RectangleShape(BaseShape):
                 p1 = Point(vertex.x, vertex.y)
                 p2 = Point(vertices[key - 1].x, vertices[key - 1].y)
             pc = geoms.fraction_along_line(p1, p2, 0.5)  # centre pt of edge
-            _perbis_pts.append(pc)  # debug use
+            _perbii_pts.append(pc)  # debug use
             compass, angle = geoms.angles_from_points(centre, pc)
-            # f"*** RECT *** perbis {key=} {directions[key]=} {pc=} {compass=} {angle=}"
-            _perbis = Perbis(
+            # f"*** RECT *** perbii {key=} {directions[key]=} {pc=} {compass=} {angle=}"
+            _perbii = Perbis(
                 point=pc,
                 direction=directions[key],
                 v1=p1,
@@ -115,8 +115,8 @@ class RectangleShape(BaseShape):
                 compass=compass,
                 angle=angle,
             )
-            perbises[directions[key]] = _perbis
-        return perbises
+            perbii_dict[directions[key]] = _perbii
+        return perbii_dict
 
     def calculate_xy(self, **kwargs):
         # ---- adjust start
@@ -796,7 +796,7 @@ class RectangleShape(BaseShape):
             rotation_point=muPoint(cx, cy),
         )
 
-    def draw_perbis(self, cnv, ID, centre: Point, rotation: float = None, **kwargs):
+    def draw_perbii(self, cnv, ID, centre: Point, rotation: float = None, **kwargs):
         """Draw lines connecting the Rectangle centre to the centre of each edge.
 
         Args:
@@ -811,34 +811,34 @@ class RectangleShape(BaseShape):
                 for a polygon, each edge is effectively a chord.
         """
         vertices = self.get_vertexes(rotation=rotation, **kwargs)
-        perbises = self.calculate_perbises(cnv=cnv, centre=centre, vertices=vertices)
+        perbii_dict = self.calculate_perbii(cnv=cnv, centre=centre, vertices=vertices)
         pb_length = (
-            self.unit(self.perbis_length, label="perbis length")
-            if self.perbis_length
+            self.unit(self.perbii_length, label="perbii length")
+            if self.perbii_length
             else None  # see below for default length
         )
-        if self.perbis:
-            perbis_dirs = tools.validated_directions(
-                self.perbis, DirectionGroup.CARDINAL, "rectangle perbis"
+        if self.perbii:
+            perbii_dirs = tools.validated_directions(
+                self.perbii, DirectionGroup.CARDINAL, "rectangle perbii"
             )
 
-        # ---- set perbis styles
+        # ---- set perbii styles
         lkwargs = {}
-        lkwargs["wave_style"] = self.kwargs.get("perbis_wave_style", None)
-        lkwargs["wave_height"] = self.kwargs.get("perbis_wave_height", 0)
-        for key, a_perbis in perbises.items():
-            if self.perbis and key not in perbis_dirs:
+        lkwargs["wave_style"] = self.kwargs.get("perbii_wave_style", None)
+        lkwargs["wave_height"] = self.kwargs.get("perbii_wave_height", 0)
+        for key, a_perbii in perbii_dict.items():
+            if self.perbii and key not in perbii_dirs:
                 continue
             # offset based on dir
             if key in ["n", "s"]:
-                pb_offset = self.unit(self.perbis_offset, label="perbis offset") or 0
+                pb_offset = self.unit(self.perbii_offset, label="perbii offset") or 0
                 pb_offset = (
-                    self.unit(self.perbis_offset_y, label="perbis offset") or pb_offset
+                    self.unit(self.perbii_offset_y, label="perbii offset") or pb_offset
                 )
             if key in ["e", "w"]:
-                pb_offset = self.unit(self.perbis_offset, label="perbis offset") or 0
+                pb_offset = self.unit(self.perbii_offset, label="perbii offset") or 0
                 pb_offset = (
-                    self.unit(self.perbis_offset_x, label="perbis offset") or pb_offset
+                    self.unit(self.perbii_offset_x, label="perbii offset") or pb_offset
                 )
             # length based on dir
             if not pb_length:
@@ -847,17 +847,17 @@ class RectangleShape(BaseShape):
                 if key in ["e", "w"]:
                     pb_length = self._u.width / 2.0
             # points based on length of line, offset and the angle in degrees
-            edge_pt = a_perbis.point
+            edge_pt = a_perbii.point
             if pb_offset is not None and pb_offset != 0:
-                offset_pt = geoms.point_on_circle(centre, pb_offset, a_perbis.angle)
+                offset_pt = geoms.point_on_circle(centre, pb_offset, a_perbii.angle)
                 end_pt = geoms.point_on_line(offset_pt, edge_pt, pb_length)
-                # print(f"{key=} {centre=} {pb_offset=} {a_perbis.angle=} {offset_pt=}")
+                # print(f"{key=} {centre=} {pb_offset=} {a_perbii.angle=} {offset_pt=}")
                 start_point = offset_pt.x, offset_pt.y
                 end_point = end_pt.x, end_pt.y
             else:
                 start_point = centre.x, centre.y
                 end_point = edge_pt.x, edge_pt.y
-            # ---- draw a perbis line
+            # ---- draw a perbii line
             draw_line(
                 cnv,
                 start_point,
@@ -868,120 +868,11 @@ class RectangleShape(BaseShape):
 
         self.set_canvas_props(
             index=ID,
-            stroke=self.perbis_stroke,
-            stroke_width=self.perbis_stroke_width,
-            stroke_ends=self.perbis_ends,
-            dashed=self.perbis_dashed,
-            dotted=self.perbis_dotted,
-        )
-
-    def draw_radii(self, cnv, ID, centre: Point, vertices: list):
-        """Draw line(s) connecting the Rectangle centre to a vertex.
-
-        Args:
-            ID: unique ID
-            vertices: list of Rectangle nodes as Points
-            centre: the centre Point of the Rectangle
-
-        Note:
-            * vertices start top-left and are ordered anti-clockwise
-        """
-        _dirs = tools.validated_directions(
-            self.radii, DirectionGroup.ORDINAL, "rectangle radii"
-        )
-        if "nw" in _dirs:  # slope UP to the left
-            cnv.draw_line(centre, vertices[0])
-        if "sw" in _dirs:  # slope DOWN to the left
-            cnv.draw_line(centre, vertices[1])
-        if "se" in _dirs:  # slope DOWN to the right
-            cnv.draw_line(centre, vertices[2])
-        if "ne" in _dirs:  # slope UP to the right
-            cnv.draw_line(centre, vertices[3])
-        # color, thickness etc.
-        self.set_canvas_props(
-            index=ID,
-            stroke=self.radii_stroke or self.stroke,
-            stroke_width=self.radii_stroke_width or self.stroke_width,
-            stroke_ends=self.radii_ends,
-        )
-
-    def draw_perbis(self, cnv, ID, centre: Point, rotation: float = None, **kwargs):
-        """Draw lines connecting the Rectangle centre to the centre of each edge.
-
-        Args:
-            ID: unique ID
-            centre: the centre Point of the Rectangle
-            rotation: degrees anti-clockwise from horizontal "east"
-
-        Notes:
-            A perpendicular bisector ("perbis") of a chord is:
-                A line passing through the center of circle such that it divides
-                the chord into two equal parts and meets the chord at a right angle;
-                for a polygon, each edge is effectively a chord.
-        """
-        vertices = self.get_vertexes(rotation=rotation, **kwargs)
-        perbises = self.calculate_perbises(cnv=cnv, centre=centre, vertices=vertices)
-        pb_length = (
-            self.unit(self.perbis_length, label="perbis length")
-            if self.perbis_length
-            else None  # see below for default length
-        )
-        if self.perbis:
-            perbis_dirs = tools.validated_directions(
-                self.perbis, DirectionGroup.CARDINAL, "rectangle perbis"
-            )
-
-        # ---- set perbis styles
-        lkwargs = {}
-        lkwargs["wave_style"] = self.kwargs.get("perbis_wave_style", None)
-        lkwargs["wave_height"] = self.kwargs.get("perbis_wave_height", 0)
-        for key, a_perbis in perbises.items():
-            if self.perbis and key not in perbis_dirs:
-                continue
-            # offset based on dir
-            if key in ["n", "s"]:
-                pb_offset = self.unit(self.perbis_offset, label="perbis offset") or 0
-                pb_offset = (
-                    self.unit(self.perbis_offset_y, label="perbis offset") or pb_offset
-                )
-            if key in ["e", "w"]:
-                pb_offset = self.unit(self.perbis_offset, label="perbis offset") or 0
-                pb_offset = (
-                    self.unit(self.perbis_offset_x, label="perbis offset") or pb_offset
-                )
-            # length based on dir
-            if not pb_length:
-                if key in ["n", "s"]:
-                    pb_length = self._u.height / 2.0
-                if key in ["e", "w"]:
-                    pb_length = self._u.width / 2.0
-            # points based on length of line, offset and the angle in degrees
-            edge_pt = a_perbis.point
-            if pb_offset is not None and pb_offset != 0:
-                offset_pt = geoms.point_on_circle(centre, pb_offset, a_perbis.angle)
-                end_pt = geoms.point_on_line(offset_pt, edge_pt, pb_length)
-                # print(f"{key=} {centre=} {pb_offset=} {a_perbis.angle=} {offset_pt=}")
-                start_point = offset_pt.x, offset_pt.y
-                end_point = end_pt.x, end_pt.y
-            else:
-                start_point = centre.x, centre.y
-                end_point = edge_pt.x, edge_pt.y
-            # ---- draw a perbis line
-            draw_line(
-                cnv,
-                start_point,
-                end_point,
-                shape=self,
-                **lkwargs,
-            )
-
-        self.set_canvas_props(
-            index=ID,
-            stroke=self.perbis_stroke,
-            stroke_width=self.perbis_stroke_width,
-            stroke_ends=self.perbis_ends,
-            dashed=self.perbis_dashed,
-            dotted=self.perbis_dotted,
+            stroke=self.perbii_stroke,
+            stroke_width=self.perbii_stroke_width,
+            stroke_ends=self.perbii_ends,
+            dashed=self.perbii_dashed,
+            dotted=self.perbii_dotted,
         )
 
     def draw_radii(self, cnv, ID, centre: Point, vertices: list):
@@ -1553,7 +1444,7 @@ class RectangleShape(BaseShape):
             "slices",
             "stripes",
             "hatches",
-            "perbises",
+            "perbii",
             "radii",
             "corners",
             "centre_shape",
@@ -1657,10 +1548,10 @@ class RectangleShape(BaseShape):
                     self.draw_hatch(
                         cnv, ID, vertices, self.hatch_count, rotation=rotation
                     )
-            if item == "perbises":
-                # ---- * draw perbises
-                if self.perbis:
-                    self.draw_perbis(cnv, ID, Point(x_d, y_d), **kwargs)
+            if item == "perbii":
+                # ---- * draw perbii
+                if self.perbii:
+                    self.draw_perbii(cnv, ID, Point(x_d, y_d), **kwargs)
             if item == "radii":
                 # ---- * draw radii
                 if self.radii:

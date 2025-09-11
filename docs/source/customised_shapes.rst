@@ -597,7 +597,7 @@ that it can be customised.
 - `Hatch <rectHatch_>`_
 - `Notch <rectNotch_>`_
 - `Peak <rectPeak_>`_
-- `Perbises <rectPerbis_>`_
+- `Perbii <rectPerbii_>`_
 - `Prows <rectProws_>`_
 - `Radii <rectRadii_>`_
 - `Rotation <rectRotation_>`_
@@ -1032,16 +1032,17 @@ a specified direction.
 ===== ======
 
 
-.. _rectPerbis:
+.. _rectPerbii:
 
-Perbis
+Perbii
 ------
 `^ <rectangleIndex_>`_
 
-"Perbis" is a shortcut name for "perpendicular bisector". These lines are
-drawn from the centre of a Rectangle towards the mid-points of its edges.
+"Perbis" is a shortcut name for "perpendicular bisector"; and "perbii" is the
+the plural. These lines are drawn from the centre of a Rectangle towards the
+mid-points of its edges.
 
-.. |rpb| image:: images/custom/rectangle/perbis.png
+.. |rpb| image:: images/custom/rectangle/perbii.png
    :width: 330
 
 ===== ======
@@ -1051,27 +1052,27 @@ drawn from the centre of a Rectangle towards the mid-points of its edges.
 
         prbs = Common(
             height=2, width=1,
-            perbis_stroke_width=2,
-            perbis_stroke="red")
+            perbii_stroke_width=2,
+            perbii_stroke="red")
         Rectangle(
             common=prbs, x=0.5, y=1,
-            perbis='n', label="N")
+            perbii='n', label="N")
         Rectangle(
             common=prbs, x=2.5, y=1,
-            perbis='s', label="S")
+            perbii='s', label="S")
         Rectangle(
             common=prbs, x=0.5, y=4,
-            perbis='w', label="W")
+            perbii='w', label="W")
         Rectangle(
             common=prbs, x=2.5, y=4,
-            perbis='e', label="E")
+            perbii='e', label="E")
 
       These Rectangles all share the following Common properties that
       differ from the defaults:
 
       - *height* and *width* - set the basic configuration
-      - *perbis_stroke_width* - set to ``2`` points; a thick line
-      - *perbis_stroke* - set to the color ``red`` to make it stand out
+      - *perbii_stroke_width* - set to ``2`` points; a thick line
+      - *perbii_stroke* - set to the color ``red`` to make it stand out
         from the Rectangle
 
       Each Rectangle has its own setting for:
@@ -1079,7 +1080,7 @@ drawn from the centre of a Rectangle towards the mid-points of its edges.
       - *x* and *y* - different positions on the page for the upper-left
         corner
       - *label* - text to help identify it
-      - *perbis* - if specified with a ``*`` then perbises will be drawn
+      - *perbii* - if specified with a ``*`` then perbii will be drawn
         in all directions |dash| otherwise:
 
         - ``n`` (North) or ``s`` (South) draw a vertical line
@@ -1631,8 +1632,8 @@ customised in a similar way.
 - `Hatch: Pointy <hexHatchPointy_>`_
 - `Radii: Flat <hexRadiiFlat_>`_
 - `Radii: Pointy <hexRadiiPointy_>`_
-- `Perbis: Flat <hexPerbisFlat_>`_
-- `Perbis: Pointy <hexPerbisPointy_>`_
+- `Perbii: Flat <hexPerbiiFlat_>`_
+- `Perbii: Pointy <hexPerbiiPointy_>`_
 - `Path: Flat & Pointy <hexPath_>`_
 - `Slices: Flat <hexSlicesFlat_>`_
 - `Slices: Pointy <hexSlicesPointy_>`_
@@ -1932,17 +1933,17 @@ of a Hexagon towards its vertices.
 ===== ======
 
 
-.. _hexPerbisFlat:
+.. _hexPerbiiFlat:
 
-Perbis: Flat
+Perbii: Flat
 ------------
 `^ <hexagon_>`_
 
-"Perbis" is a shortcut name for "perpendicular bisector". These lines are like
-spokes of a bicycle wheel; they are drawn from the centre of a Hexagon towards
-the mid-points of the edges.
+"Perbis" is a shortcut name for a "perpendicular bisector"; and "perbii" is the
+the plural. These lines are like spokes of a bicycle wheel; they are drawn from
+the centre of a Hexagon towards the mid-points of the edges.
 
-.. |hpf| image:: images/custom/hexagon/perbis_flat.png
+.. |hpf| image:: images/custom/hexagon/perbii_flat.png
    :width: 330
 
 ===== ======
@@ -1957,44 +1958,44 @@ the mid-points of the edges.
 
         Hexagon(
             common=hxg, x=0.25, y=0.25,
-            perbis='sw', label="SW")
+            perbii='sw', label="SW")
         Hexagon(
             common=hxg, x=0.25, y=2.15,
-            perbis='w', label="W")
+            perbii='w', label="W")
         Hexagon(
             common=hxg, x=0.25, y=4,
-            perbis='nw', label="NW")
+            perbii='nw', label="NW")
         Hexagon(
             common=hxg, x=2.25, y=4,
-            perbis='ne', label="NE")
+            perbii='ne', label="NE")
         Hexagon(
             common=hxg, x=2.25, y=2.15,
-            perbis='e', label="E")
+            perbii='e', label="E")
         Hexagon(
             common=hxg, x=2.25, y=0.25,
-            perbis='se', label="SE")
+            perbii='se', label="SE")
 
       These have the following properties:
 
       - *common* - sets Common values assigned to ``hxg``
       - *x* and *y* to set the upper-left position
-      - *perbis* - a compass direction in which the bisector is drawn
+      - *perbii* - a compass direction in which the bisector is drawn
         (centre to mid-point)
       - *label* - the text displayed in the centre shows the compass direction
 
 ===== ======
 
-.. _hexPerbisPointy:
+.. _hexPerbiiPointy:
 
-Perbis: Pointy
+Perbii: Pointy
 --------------
 `^ <hexagon_>`__
 
-"Perbis" is a shortcut name for "perpendicular bisector". These lines are like
+"Perbii" is a shortcut name for "perpendicular bisector". These lines are like
 spokes of a bicycle wheel; they are drawn from the centre of a Hexagon towards
 the mid-points of the edges.
 
-.. |hpp| image:: images/custom/hexagon/perbis_pointy.png
+.. |hpp| image:: images/custom/hexagon/perbii_pointy.png
    :width: 330
 
 ===== ======
@@ -2009,29 +2010,29 @@ the mid-points of the edges.
 
         Hexagon(
             common=hxg, x=0.25, y=0.25,
-            perbis='sw', label="SW")
+            perbii='sw', label="SW")
         Hexagon(
             common=hxg, x=0.25, y=2.15,
-            perbis='nw', label="NW")
+            perbii='nw', label="NW")
         Hexagon(
             common=hxg, x=0.25, y=4,
-            perbis='n', label="N")
+            perbii='n', label="N")
         Hexagon(
             common=hxg, x=2.25, y=4,
-            perbis='ne', label="NE")
+            perbii='ne', label="NE")
         Hexagon(
             common=hxg, x=2.25, y=0.25,
-            perbis='s', label="S")
+            perbii='s', label="S")
         Hexagon(
             common=hxg, x=2.25, y=2.15,
-            perbis='se', label="SE")
+            perbii='se', label="SE")
 
       These have the following properties:
 
       - *common* - all Hexagons drawn with the Common value of ``hxg`` will
         share the same properties; height, font size, dot and orientation
       - *x* and *y* to set the upper-left position
-      - *perbis* - a compass direction in which the bisector is drawn
+      - *perbii* - a compass direction in which the bisector is drawn
         (centre to mid-point)
       - *label* - the text displayed in the centre
 
@@ -2195,7 +2196,7 @@ Spikes
 ------
 `^ <hexagon_>`_
 
-Spikes are a set of one or more triangles drawn at the "perbis points" i.e.
+Spikes are a set of one or more triangles drawn at the "perbii points" i.e.
 with the base of the triangles centred on the middle of Hexagon edges.
 
 If the height of the spike is given as a **negative** number, then the
@@ -2481,7 +2482,7 @@ The available property names, shown in their default order, are:
 #. spikes
 #. hatches
 #. links
-#. perbises
+#. perbii
 #. paths
 #. radii
 #. centre_shape
@@ -2528,9 +2529,9 @@ Example 1.
                 radii_stroke_width=2,
                 order_last=["hatches"])
         Hexagon(common=hxg, x=0.25, y=4.1,
-                perbis='sw n')
+                perbii='sw n')
         Hexagon(common=hxg, x=2.25, y=4.1,
-                perbis='sw n',
+                perbii='sw n',
                 order_all=["base", "dot"])
 
       The top-most pair of Hexagons show how changing the *order_first* property
@@ -2542,7 +2543,7 @@ Example 1.
 
       The lower-most pair of Hexagons show how setting the *order_all* property
       means that only the Hexagon and the centre Dot will drawn, and not the
-      *perbis*.
+      *perbii*.
 
 ===== ======
 

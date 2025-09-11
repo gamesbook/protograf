@@ -74,16 +74,16 @@ Rectangle(common=htch, x=3, y=4, hatch='d', label="D")
 
 PageBreak()
 
-# ---- perbises
+# ---- perbii
 Blueprint()
-Text(common=txt, text="Rectangle: perbises + directions")
+Text(common=txt, text="Rectangle: perbii + directions")
 prbs = Common(height=2, width=1,
-              perbis_stroke_width=2,
-              perbis_stroke="red")
-Rectangle(common=prbs, x=0.5, y=1, perbis='n', label="N")
-Rectangle(common=prbs, x=2.5, y=1, perbis='s', label="S")
-Rectangle(common=prbs, x=0.5, y=4, perbis='w', label="W")
-Rectangle(common=prbs, x=2.5, y=4, perbis='e', label="E")
+              perbii_stroke_width=2,
+              perbii_stroke="red")
+Rectangle(common=prbs, x=0.5, y=1, perbii='n', label="N")
+Rectangle(common=prbs, x=2.5, y=1, perbii='s', label="S")
+Rectangle(common=prbs, x=0.5, y=4, perbii='w', label="W")
+Rectangle(common=prbs, x=2.5, y=4, perbii='e', label="E")
 
 PageBreak()
 
@@ -331,7 +331,7 @@ Save(
         None,
         "centre", "notch", "dot_cross",
         "hatch",
-        "perbis",
+        "perbii",
         "radii",
         "rounding", "chevron",
         "peak", "rotation", "notch_style", "borders",

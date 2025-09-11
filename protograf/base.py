@@ -508,26 +508,26 @@ class BaseCanvas:
         self.cross_stroke_width = self.defaults.get(
             "cross_stroke_width", self.stroke_width
         )
-        # ---- perbis (hex, rect, polygon)
+        # ---- perbii (hex, rect, polygon)
         self.orientation = self.defaults.get("orientation", "flat")  # flat|pointy
-        self.perbis = self.defaults.get("perbis", None)  # directions
-        self.perbis_stroke = self.defaults.get("perbis_stroke", "black")
-        self.perbis_stroke_width = self.defaults.get(
-            "perbis_stroke_width", self.stroke_width
+        self.perbii = self.defaults.get("perbii", None)  # directions
+        self.perbii_stroke = self.defaults.get("perbii_stroke", "black")
+        self.perbii_stroke_width = self.defaults.get(
+            "perbii_stroke_width", self.stroke_width
         )
-        self.perbis_length = self.defaults.get("perbis_length", None)
-        self.perbis_offset = self.defaults.get("perbis_offset", 0)
-        self.perbis_offset_x = self.defaults.get(
-            "perbis_offset_x", self.perbis_offset
+        self.perbii_length = self.defaults.get("perbii_length", None)
+        self.perbii_offset = self.defaults.get("perbii_offset", 0)
+        self.perbii_offset_x = self.defaults.get(
+            "perbii_offset_x", self.perbii_offset
         )  # Rectangle
-        self.perbis_offset_y = self.defaults.get(
-            "perbis_offset_y", self.perbis_offset
+        self.perbii_offset_y = self.defaults.get(
+            "perbii_offset_y", self.perbii_offset
         )  # Rectangle
-        self.perbis_ends = self.defaults.get("perbis_ends", None)
-        self.perbis_dotted = self.defaults.get("perbis_dotted", self.dotted)
-        self.perbis_dashed = self.defaults.get("perbis_dashed", self.dashed)
-        self.perbis_wave_style = self.defaults.get("paths_wave_style", None)
-        self.perbis_wave_height = self.defaults.get("paths_wave_height", 0)
+        self.perbii_ends = self.defaults.get("perbii_ends", None)
+        self.perbii_dotted = self.defaults.get("perbii_dotted", self.dotted)
+        self.perbii_dashed = self.defaults.get("perbii_dashed", self.dashed)
+        self.perbii_wave_style = self.defaults.get("paths_wave_style", None)
+        self.perbii_wave_height = self.defaults.get("paths_wave_height", 0)
         # ---- hexagon
         self.caltrops = self.defaults.get("caltrops", None)
         self.caltrops_invert = self.defaults.get("caltrops_invert", False)
@@ -1070,28 +1070,28 @@ class BaseShape:
         )
         self.cross = self.kw_float(kwargs.get("cross", base.cross))
         self.cross_ends = kwargs.get("cross_ends", base.cross_ends)
-        # ---- perbis (hex, rect, polygon)
+        # ---- perbii (hex, rect, polygon)
         self.orientation = kwargs.get("orientation", base.orientation)
-        self.perbis = kwargs.get("perbis", base.perbis)  # directions
-        self.perbis_stroke = kwargs.get("perbis_stroke", base.perbis_stroke)
-        self.perbis_stroke_width = self.kw_float(
-            kwargs.get("perbis_stroke_width", base.perbis_stroke_width)
+        self.perbii = kwargs.get("perbii", base.perbii)  # directions
+        self.perbii_stroke = kwargs.get("perbii_stroke", base.perbii_stroke)
+        self.perbii_stroke_width = self.kw_float(
+            kwargs.get("perbii_stroke_width", base.perbii_stroke_width)
         )
-        self.perbis_length = self.kw_float(
-            kwargs.get("perbis_length", base.perbis_length)
+        self.perbii_length = self.kw_float(
+            kwargs.get("perbii_length", base.perbii_length)
         )
-        self.perbis_offset = self.kw_float(
-            kwargs.get("perbis_offset", base.perbis_offset)
+        self.perbii_offset = self.kw_float(
+            kwargs.get("perbii_offset", base.perbii_offset)
         )
-        self.perbis_offset_x = self.kw_float(
-            kwargs.get("perbis_offset_x", base.perbis_offset_x)
+        self.perbii_offset_x = self.kw_float(
+            kwargs.get("perbii_offset_x", base.perbii_offset_x)
         )  # Rectangle
-        self.perbis_offset_y = self.kw_float(
-            kwargs.get("perbis_offset_y", base.perbis_offset_y)
+        self.perbii_offset_y = self.kw_float(
+            kwargs.get("perbii_offset_y", base.perbii_offset_y)
         )  # Rectangle
-        self.perbis_ends = kwargs.get("perbis_ends", base.perbis_ends)
-        self.perbis_dotted = kwargs.get("perbis_dotted", base.dotted)
-        self.perbis_dashed = kwargs.get("perbis_dashed", self.dashed)
+        self.perbii_ends = kwargs.get("perbii_ends", base.perbii_ends)
+        self.perbii_dotted = kwargs.get("perbii_dotted", base.dotted)
+        self.perbii_dashed = kwargs.get("perbii_dashed", self.dashed)
         # ---- hexagon
         self.caltrops = self.kw_float(kwargs.get("caltrops", base.caltrops))
         self.caltrops_invert = self.kw_bool(
