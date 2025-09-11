@@ -90,7 +90,7 @@ class CircleShape(BaseShape):
         else:
             return length
 
-    def draw_hatch(
+    def draw_hatches(
         self, cnv, ID, num: int, x_c: float, y_c: float, rotation: float = 0.0
     ):
         """Draw parallel line(s) across the Circle
@@ -102,9 +102,9 @@ class CircleShape(BaseShape):
             rotation: degrees anti-clockwise from horizontal "east"
         """
         _dirs = tools.validated_directions(
-            self.hatch, DirectionGroup.CIRCULAR, "circle hatch"
+            self.hatches, DirectionGroup.CIRCULAR, "circle hatches"
         )
-        lines = tools.as_int(num, "hatch_count")
+        lines = tools.as_int(num, "hatches_count")
         if lines < 0:
             feedback("Cannot draw negative number of lines!", True)
         dist = (self._u.radius * 2.0) / (lines + 1)
@@ -210,11 +210,11 @@ class CircleShape(BaseShape):
         # ---- set canvas
         self.set_canvas_props(
             index=ID,
-            stroke=self.hatch_stroke,
-            stroke_width=self.hatch_stroke_width,
-            stroke_ends=self.hatch_ends,
-            dashed=self.hatch_dashed,
-            dotted=self.hatch_dots,
+            stroke=self.hatches_stroke,
+            stroke_width=self.hatches_stroke_width,
+            stroke_ends=self.hatches_ends,
+            dashed=self.hatches_dashed,
+            dotted=self.hatches_dots,
             rotation=rotation,
             rotation_point=muPoint(x_c, y_c),
         )
@@ -643,11 +643,11 @@ class CircleShape(BaseShape):
                     )
             if item == "hatches":
                 # ---- * draw hatches
-                if self.hatch_count:
-                    self.draw_hatch(
+                if self.hatches_count:
+                    self.draw_hatches(
                         cnv,
                         ID,
-                        self.hatch_count,
+                        self.hatches_count,
                         self.x_c,
                         self.y_c,
                         rotation=kwargs["rotation"],

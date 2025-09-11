@@ -54,16 +54,16 @@ Text(common=header_font, x=5, y=13,
 Rectangle(
     x=2, y=12,
     height=3, width=2,
-    hatch_count=7, hatch_stroke_width=0.1, hatch='d', hatch_stroke="black",
+    hatches_count=7, hatches_stroke_width=0.1, hatches='d', hatches_stroke="black",
     stroke="saddlebrown", stroke_width=2, fill="lightcyan")
 
 
 Text(common=header_font, x=5, y=17,
-     text="Paned Window: rectangle with single orthogonal hatch")
+     text="Paned Window: rectangle with single orthogonal hatches")
 Rectangle(
     x=2, y=16,
     height=3, width=2,
-    hatch_count=1, hatch_stroke_width=1, hatch='o', hatch_stroke="sienna",
+    hatches_count=1, hatches_stroke_width=1, hatches='o', hatches_stroke="sienna",
     stroke="sienna", stroke_width=3, fill="lightcyan")
 
 
@@ -142,12 +142,12 @@ Circle(cx=3.5, cy=9, radius=0.35, fill=None,
 
 
 Text(common=header_font, x=5, y=12.5,
-     text="German Cross: rectangle with 'o' hatch and 'step' notch")
+     text="German Cross: rectangle with 'o' hatches and 'step' notch")
 Rectangle(
     height=2.8, width=2.8, x=0.5, y=11,
     fill="white", stroke="black", stroke_width=2,
-    hatch_stroke_width=22, hatch_stroke="black",
-    hatch='o', hatch_count=1,
+    hatches_stroke_width=22, hatches_stroke="black",
+    hatches='o', hatches_count=1,
     notch=0.7, notch_style='step')
 Rectangle(
     height=2.8, width=2.8, x=0.5, y=11,
@@ -190,7 +190,7 @@ Circle(cx=2, cy=25, radius=1.25,
        nested=6,
        slices=["#077D25"], slices_angles=[30],
        slices_transparency=20,
-       # hatches='o', hatch_stroke="#035320",
+       # hatches='o', hatches_stroke="#035320",
        radii=steps(0, 360, 5),
        radii_offset=1.1, radii_length=0.125,
        radii_stroke="#01F91E", radii_stroke_width=1.25)
@@ -216,14 +216,14 @@ Image("tmwtgg.jpg",
 Rectangle(
     width=6, height=3.2, x=1.2, y=2.2,
     fill=None, stroke=None,
-    corner=0.4,
-    corner_stroke_width=2,
+    corners=0.4,
+    corners_stroke_width=2,
     centre_shape=rectangle(
         width=2, height=2,
         fill=None, stroke=None,
-        corner=0.3,
-        corner_stroke="silver",
-        corner_stroke_width=1.5),
+        corners=0.3,
+        corners_stroke="silver",
+        corners_stroke_width=1.5),
     perbii="*",
     perbii_stroke_width=2,
     perbii_length=0.4,
@@ -237,9 +237,5 @@ Text(text="REC",
      x=2.25, y=2.55, stroke="red")
 Text(text="00:00:00",
      x=6.5, y=5.3, stroke="white", font_size=10)
-
-# rectangle(
-#     width=2, height=1.1, fill=None,
-#     stroke=None, corner=0.3, corner_stroke_width=2_
 
 Save()

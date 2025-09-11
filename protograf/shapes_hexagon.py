@@ -238,7 +238,7 @@ class HexShape(BaseShape):
             side = self._u.height / math.sqrt(3)
         return (3.0 * math.sqrt(3.0) * side * side) / 2.0
 
-    def draw_hatch(
+    def draw_hatches(
         self, cnv, ID, side: float, vertices: list, num: int, rotation: float = 0.0
     ):
         """Draw lines connecting two opposite sides and parallel to adjacent Hex side.
@@ -255,8 +255,8 @@ class HexShape(BaseShape):
             if self.orientation == "pointy"
             else DirectionGroup.HEX_FLAT
         )
-        _dirs = tools.validated_directions(self.hatch, dir_group, "hexagon hatch")
-        _num = tools.as_int(num, "hatch_count")
+        _dirs = tools.validated_directions(self.hatches, dir_group, "hexagon hatches")
+        _num = tools.as_int(num, "hatches_count")
         lines = int((_num - 1) / 2 + 1)
         # feedback(f'*** HEX {num=} {lines=} {vertices=} {_dirs=}')
         if num >= 1:
@@ -324,11 +324,11 @@ class HexShape(BaseShape):
         # ---- set canvas
         self.set_canvas_props(
             index=ID,
-            stroke=self.hatch_stroke,
-            stroke_width=self.hatch_stroke_width,
-            stroke_ends=self.hatch_ends,
-            dashed=self.hatch_dashed,
-            dotted=self.hatch_dots,
+            stroke=self.hatches_stroke,
+            stroke_width=self.hatches_stroke_width,
+            stroke_ends=self.hatches_ends,
+            dashed=self.hatches_dashed,
+            dotted=self.hatches_dots,
         )
 
     def draw_links(self, cnv, ID, side: float, vertices: list, links: list):
@@ -1299,12 +1299,12 @@ class HexShape(BaseShape):
                     )
             if item == "hatches":
                 # ---- * draw hatches
-                if self.hatch_count:
-                    if not self.hatch_count & 1:
+                if self.hatches_count:
+                    if not self.hatches_count & 1:
                         feedback(
-                            "Hatch count must be an odd number for a Hexagon", True
+                            "hatches count must be an odd number for a Hexagon", True
                         )
-                    self.draw_hatch(cnv, ID, geo.side, self.vertexes, self.hatch_count)
+                    self.draw_hatches(cnv, ID, geo.side, self.vertexes, self.hatches_count)
             if item == "links":
                 # ---- * draw links
                 if self.links:

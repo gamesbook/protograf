@@ -16,6 +16,10 @@ and ideas for :doc:`protograf <index>` as presented in the
 You should have already seen how these shapes were created, with defaults,
 in :doc:`Core Shapes <core_shapes>`.
 
+However, while all shapes can be customised to some extent, and share some
+customisation options, these shapes in particular provide many more options
+which are described here.
+
 .. _table-of-contents-custom:
 
 - `Overview`_
@@ -34,8 +38,9 @@ To make it easier to see where and how a shape has been drawn, most of these
 examples have been created with a background grid (which **protograf**
 refers to as a `Blueprint`_ shape) added to the page |dash| a small A8
 "business card" size |dash| for cross-reference. In addition, the default
-line width (aka *stroke_width*) has been made thicker for easier viewing of
-the small PNG images that were generated from the original PDF output.
+Blueprint line width (aka *stroke_width*) has been made thicker for easier
+viewing of the small PNG images that were generated from the original PDF
+output.
 
 A number of examples also use the :ref:`Common command <the-common-command>`
 |dash| this allows shared properties to be defined once and then used by any
@@ -594,7 +599,7 @@ that it can be customised.
 - `Corners <rectCorners_>`_
 - `Cross and Dot <rectCross_>`_
 - `Chevron <rectChevron_>`_
-- `Hatch <rectHatch_>`_
+- `Hatches <rectHatches_>`_
 - `Notch <rectNotch_>`_
 - `Peak <rectPeak_>`_
 - `Perbii <rectPerbii_>`_
@@ -803,16 +808,16 @@ that both point in a specified direction.  This creates an arrow-like effect.
 
 ===== ======
 
-.. _rectHatch:
+.. _rectHatches:
 
-Hatch
------
+Hatches
+-------
 `^ <rectangleIndex_>`_
 
 Hatches are a set of parallel lines that are drawn, in a specified direction, across
 the length or width of the Rectangle in a vertical, horizontal or diagonal direction.
 
-.. |rht| image:: images/custom/rectangle/hatch.png
+.. |rht| image:: images/custom/rectangle/hatches.png
    :width: 330
 
 ===== ======
@@ -822,39 +827,39 @@ the length or width of the Rectangle in a vertical, horizontal or diagonal direc
 
         htch = Common(
           height=1.5, width=1,
-          hatch_count=5,
-          hatch_stroke_width=0.1,
-          hatch_stroke="red")
+          hatches_count=5,
+          hatches_stroke_width=0.1,
+          hatches_stroke="red")
 
         Rectangle(
-          common=htch, x=0, y=0,  hatch='w', label="W")
+          common=htch, x=0, y=0,  hatches='w', label="W")
         Rectangle(
-          common=htch, x=1.5, y=0, hatch='e', label="E")
+          common=htch, x=1.5, y=0, hatches='e', label="E")
         Rectangle(
-          common=htch, x=3, y=0, hatch='ne', label="NE\nSW")
+          common=htch, x=3, y=0, hatches='ne', label="NE\nSW")
 
         Rectangle(
-          common=htch, x=0, y=2,  hatch='s', label="S")
+          common=htch, x=0, y=2,  hatches='s', label="S")
         Rectangle(
-          common=htch, x=1.5, y=2, hatch='n', label="N")
+          common=htch, x=1.5, y=2, hatches='n', label="N")
         Rectangle(
-          common=htch, x=3, y=2, hatch='nw', label="NW\nSE")
+          common=htch, x=3, y=2, hatches='nw', label="NW\nSE")
 
         Rectangle(
           common=htch, x=0, y=4, label="all")
         Rectangle(
-          common=htch, x=1.5, y=4, hatch='o', label="O")
+          common=htch, x=1.5, y=4, hatches='o', label="O")
         Rectangle(
-          common=htch, x=3, y=4, hatch='d', label="D")
+          common=htch, x=3, y=4, hatches='d', label="D")
 
       These Rectangles all share the following Common properties that
       differ from the defaults:
 
       - *height* and *width* - set the basic configuration
-      - *hatch_count* - sets the **number** of lines to be drawn; the
+      - *hatches_count* - sets the **number** of lines to be drawn; the
         intervals between them are equal and depend on the direction
-      - *hatch_stroke_width* - set to ``0.1`` point; a fairly thin line
-      - *hatch_stroke* - set to the color ``red`` to make it stand out
+      - *hatches_stroke_width* - set to ``0.1`` point; a fairly thin line
+      - *hatches_stroke* - set to the color ``red`` to make it stand out
         from the rectangle sides
 
       Each Rectangle has its own setting for:
@@ -862,7 +867,7 @@ the length or width of the Rectangle in a vertical, horizontal or diagonal direc
       - *x* and *y* - different positions on the page for the upper-left
         corner
       - *label* - text to help identify it
-      - *hatch* - if not specified, hatches will be drawn
+      - *hatches* - if not specified, hatches will be drawn
         in all directions |dash| otherwise:
 
         - ``n`` (North) or ``s`` (South) draws vertical lines;
@@ -1346,24 +1351,24 @@ into the arc of a quarter-circle.
             x=0.5,
             height=1.5, width=3.0,
             stroke_width=.5,
-            hatch_stroke="red",
-            hatch='o')
+            hatches_stroke="red",
+            hatches='o')
 
         Rectangle(
             common=rct, y=1,
             rounding=0.1,
-            hatch_count=10)
+            hatches_count=10)
         Rectangle(
             common=rct, y=4,
             rounding=0.5,
-            hatch_count=3)
+            hatches_count=3)
 
       Both Rectangles share the Common properties of:
 
       - *x* - left side location
       - *height* and *width* - ``1.5`` and ``3.0`` cm
-      - *hatch_stroke* - set to ``red``
-      - *hatch* directions of ``o`` (for orthogonal)
+      - *hatches_stroke* - set to ``red``
+      - *hatches* directions of ``o`` (for orthogonal)
 
       These properties set the color and directions of the lines crossing
       the Rectangles.
@@ -1371,13 +1376,13 @@ into the arc of a quarter-circle.
       The upper Rectangle has these specific properties:
 
       - *rounding* - set to ``0.1``; circle corner radius
-      - *hatch_count* - set to  ``10``; the number of lines
+      - *hatches_count* - set to  ``10``; the number of lines
         in both vertical and horizontal directions
 
       The lower Rectangle has these specific properties:
 
       - *rounding* - set to ``0.5``; circle corner radius
-      - *hatch_count* - set to ``3``; the number of lines
+      - *hatches_count* - set to ``3``; the number of lines
         in both vertical and horizontal directions.
 
       It should be noted that if the rounding is too large in comparison with
@@ -1388,7 +1393,7 @@ into the arc of a quarter-circle.
           Rectangle(
               common=rct, y=2,
               rounding=0.5,
-              hatch_count=10)
+              hatches_count=10)
 
       then the program will issue an error::
 
@@ -1628,8 +1633,8 @@ customised in a similar way.
 - `Borders <hexBorders_>`_
 - `Centre <hexCentre_>`_
 - `Dot and Cross <hexCross_>`_
-- `Hatch: Flat <hexHatchFlat_>`_
-- `Hatch: Pointy <hexHatchPointy_>`_
+- `Hatches: Flat <hexHatchesFlat_>`_
+- `Hatches: Pointy <hexHatchesPointy_>`_
 - `Radii: Flat <hexRadiiFlat_>`_
 - `Radii: Pointy <hexRadiiPointy_>`_
 - `Perbii: Flat <hexPerbiiFlat_>`_
@@ -1715,17 +1720,17 @@ Dot & Cross
 
 ===== ======
 
-.. _hexHatchFlat:
+.. _hexHatchesFlat:
 
-Hatch: Flat
------------
+Hatches: Flat
+-------------
 `^ <hexagon_>`_
 
 Hatches are a set of parallel lines that are drawn across
 a Hexagon from one opposing side to another in a vertical, horizontal or
 diagonal direction.
 
-.. |hhf| image:: images/custom/hexagon/hatch_flat.png
+.. |hhf| image:: images/custom/hexagon/hatches_flat.png
    :width: 330
 
 ===== ======
@@ -1735,32 +1740,32 @@ diagonal direction.
 
         hxgn = Common(
             x=1, height=1.5, orientation='flat',
-            hatch_count=5, hatch_stroke="red")
+            hatches_count=5, hatches_stroke="red")
 
         Hexagon(
             common=hxgn, y=0,
-            hatch='e', label="e/w")
+            hatches='e', label="e/w")
         Hexagon(
             common=hxgn, y=2,
-            hatch='ne', label="ne/sw")
+            hatches='ne', label="ne/sw")
         Hexagon(
             common=hxgn, y=4,
-            hatch='nw', label="nw/se")
+            hatches='nw', label="nw/se")
 
       These Hexagons all share the following Common properties that differ
       from the defaults:
 
       - *x* and *height* - set the basic configuration
       - *orientation* - set to ``flat``, so there will be no "peak" at the top
-      - *hatch_count* - sets the **number** of equally-spaced lines
-      - *hatch_stroke* - set to the color ``red`` to make it stand out from the
+      - *hatches_count* - sets the **number** of equally-spaced lines
+      - *hatches_stroke* - set to the color ``red`` to make it stand out from the
         hexagon sides
 
       Each Hexagon has its own setting for:
 
       - *y* - different positions on the page for the upper "corner"
       - *label* - text for identification
-      - *hatch* - if not specified, hatches will be drawn in all directions;
+      - *hatches* - if not specified, hatches will be drawn in all directions;
         otherwise:
 
         - ``e`` (East) or ``w`` (West) draws horizontal lines
@@ -1771,17 +1776,17 @@ diagonal direction.
 
 ===== ======
 
-.. _hexHatchPointy:
+.. _hexHatchesPointy:
 
-Hatch: Pointy
--------------
+Hatches: Pointy
+---------------
 `^ <hexagon_>`_
 
 Hatches are a set of parallel lines that are drawn, in a specified direction,
 across the Hexagon from one opposing side to another in a vertical, horizontal
 or diagonal direction.
 
-.. |hhp| image:: images/custom/hexagon/hatch_pointy.png
+.. |hhp| image:: images/custom/hexagon/hatches_pointy.png
    :width: 330
 
 ===== ======
@@ -1792,33 +1797,33 @@ or diagonal direction.
         hxgn = Common(
             x=1, height=1.5,
             orientation='pointy',
-            hatch_count=5,
-            hatch_stroke="red")
+            hatches_count=5,
+            hatches_stroke="red")
 
         Hexagon(
             common=hxgn, y=0,
-            hatch='n', label="n/s")
+            hatches='n', label="n/s")
         Hexagon(
             common=hxgn, y=2,
-            hatch='ne', label="ne/sw")
+            hatches='ne', label="ne/sw")
         Hexagon(
             common=hxgn, y=4,
-            hatch='nw', label="nw/se")
+            hatches='nw', label="nw/se")
 
       These Hexagons all share the following Common properties that differ
       from the defaults:
 
       - *x* and *height* - set the basic configuration
       - *orientation* - set to ``pointy``, so there will be a "peak" at the top
-      - *hatch_count* - sets the **number** of equally-spaced lines
-      - *hatch_stroke* - set to the color ``red`` to make it stand out from the
+      - *hatches_count* - sets the **number** of equally-spaced lines
+      - *hatches_stroke* - set to the color ``red`` to make it stand out from the
         Hexagon sides
 
       Each Hexagon has its own setting for:
 
       - *y* - different positions on the page for the upper corner
       - *label* -text for identification
-      - *hatch* - if not specified, hatches will be drawn in all directions;
+      - *hatches* - if not specified, hatches will be drawn in all directions;
         otherwise:
 
         - ```n`` (North) or ``s`` (South) draws vertical lines
@@ -2277,7 +2282,7 @@ Text: Flat
 ----------
 `^ <hexagon_>`_
 
-.. |htf| image:: images/custom/hexagon/hatch_text_flat.png
+.. |htf| image:: images/custom/hexagon/hatches_text_flat.png
    :width: 330
 
 ===== ======
@@ -2315,7 +2320,7 @@ Text: Pointy
 ------------
 `^ <hexagon_>`_
 
-.. |htp| image:: images/custom/hexagon/hatch_text_pointy.png
+.. |htp| image:: images/custom/hexagon/hatches_text_pointy.png
    :width: 330
 
 ===== ======
@@ -2518,16 +2523,16 @@ Example 1.
                 spikes_width=0.25
                 order_first=["spikes"])
         Hexagon(common=hxg, x=0.25, y=2.1,
-                hatch_count=5, hatch_stroke="red",
-                hatch_stroke_width=2, hatch='nw',
+                hatches_count=5, hatches_stroke="red",
+                hatches_stroke_width=2, hatches='nw',
                 radii='sw e',
                 radii_stroke_width=2)
         Hexagon(common=hxg, x=2.25, y=2.1,
-                hatch_count=5, hatch_stroke="red",
-                hatch_stroke_width=2, hatch='nw',
+                hatches_count=5, hatches_stroke="red",
+                hatches_stroke_width=2, hatches='nw',
                 radii='sw e',
                 radii_stroke_width=2,
-                order_last=["hatches"])
+                order_last=["hatcheses"])
         Hexagon(common=hxg, x=0.25, y=4.1,
                 perbii='sw n')
         Hexagon(common=hxg, x=2.25, y=4.1,
@@ -2557,7 +2562,7 @@ A Circle is a very common shape in many designs; it provides a number of
 ways that it can be customised.
 
 - `Dot and Cross <circleCross_>`_
-- `Hatch <circleHatch_>`_
+- `Hatches <circleHatches_>`_
 - `Radii <circleRadii_>`_
 - `Radii Labels <circleRadiiLabels_>`_
 - `Petals: petal <circlePetalsPetal_>`_
@@ -2602,17 +2607,17 @@ Dot & Cross
 
 ===== ======
 
-.. _circleHatch:
+.. _circleHatches:
 
-Hatch
------
+Hatches
+-------
 `^ <circle_>`_
 
 Hatches are a set of parallel lines that are drawn, in a specified direction,
 across the Circle from one opposing side to another in a vertical, horizontal
 or diagonal direction.
 
-.. |chf| image:: images/custom/circle/hatch.png
+.. |chf| image:: images/custom/circle/hatches.png
    :width: 330
 
 ===== ======
@@ -2621,28 +2626,45 @@ or diagonal direction.
       .. code:: python
 
         htc = Common(
-          radius=0.7, hatch_count=5, hatch_stroke="red")
-        Circle(common=htc, cx=2, cy=5.2, label='5')
-        Circle(common=htc, cx=1, cy=3.7, hatch='o', label='o')
-        Circle(common=htc, cx=3, cy=3.7, hatch='d', label='d')
-        Circle(common=htc, cx=1, cy=2.2, hatch='e', label='e')
-        Circle(common=htc, cx=3, cy=2.2, hatch='n', label='n')
-        Circle(common=htc, cx=1, cy=0.7, hatch='ne', label='ne')
-        Circle(common=htc, cx=3, cy=0.7, hatch='nw', label='nw')
+          radius=0.7,
+          hatches_count=5,
+          hatches_stroke="red")
+
+        Circle(
+            common=htc, cx=2, cy=5.2,
+            label='5')
+        Circle(
+            common=htc, cx=1, cy=3.7,
+            hatches='o', label='o')
+        Circle(
+            common=htc, cx=3, cy=3.7,
+            hatches='d', label='d')
+        Circle(
+            common=htc, cx=1, cy=2.2,
+            hatches='e', label='e')
+        Circle(
+            common=htc, cx=3, cy=2.2,
+            hatches='n', label='n')
+        Circle(
+            common=htc, cx=1, cy=0.7,
+            hatches='ne', label='ne')
+        Circle(
+            common=htc, cx=3, cy=0.7,
+            hatches='nw', label='nw')
 
       These Circles all share the following Common properties that differ
       from the defaults:
 
       - *radius* - sets the basic size
-      - *hatch_count* - sets the **number** of equi-spaced lines to be drawn
-      - *hatch_stroke* - set to the color `red` to set the line off from the
+      - *hatches_count* - sets the **number** of equi-spaced lines to be drawn
+      - *hatches_stroke* - set to the color `red` to set the line off from the
         circumference
 
       Each Circle has its own setting for:
 
       - *cx* and *cy* - different positions on the page for the centres
       - *label* - text to help identify it
-      - *hatch* - if not specified, hatches will be drawn in **all**
+      - *hatches* - if not specified, hatches will be drawn in **all**
         directions |dash| as seen in lower-most circle |dash| otherwise:
 
         - ``ne`` (North-East) or ``sw`` (South-West) draws diagonal lines from

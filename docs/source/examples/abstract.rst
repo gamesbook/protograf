@@ -297,8 +297,9 @@ Title       *Meridians Board*
 ----------- ------------------------------------------------------------------
 Script      `meridians.py <https://github.com/gamesbook/protograf/blob/master/examples/boards/abstract/meridians.py>`_
 ----------- ------------------------------------------------------------------
-Discussion  The code uses a basic ``Hexagon()``, with the *hatch_count*
-            property being set to construct the internal lines..
+Discussion  The code uses a basic ``Hexagon()``, with the *hatches_count*
+            property being set to construct the internal lines to create
+            the effect of triangular spaces.
 
 ----------- ------------------------------------------------------------------
 Screenshot  .. image:: images/boards/abstract/meridians.png

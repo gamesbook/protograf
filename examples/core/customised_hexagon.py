@@ -43,22 +43,22 @@ Hexagon(x=2, y=1, height=2,
         orientation='pointy')
 PageBreak()
 
-# ---- hatch_flat
+# ---- hatches_flat
 Blueprint()
 Text(common=txt, text="Hexagon: flat; hatches")
-hxgn = Common(x=1, height=1.5, hatch_count=5, hatch_stroke="red", orientation='flat')
-Hexagon(common=hxgn, y=0, hatch='e', label="e/w")
-Hexagon(common=hxgn, y=2, hatch='ne', label="ne/sw")
-Hexagon(common=hxgn, y=4, hatch='nw', label="nw/se")
+hxgn = Common(x=1, height=1.5, hatches_count=5, hatches_stroke="red", orientation='flat')
+Hexagon(common=hxgn, y=0, hatches='e', label="e/w")
+Hexagon(common=hxgn, y=2, hatches='ne', label="ne/sw")
+Hexagon(common=hxgn, y=4, hatches='nw', label="nw/se")
 PageBreak()
 
-# ---- hatch_pointy
+# ---- hatches_pointy
 Blueprint()
 Text(common=txt, text="Hexagon: pointy; hatches")
-hxgn = Common(x=1, height=1.5, hatch_count=5, hatch_stroke="red", orientation='pointy')
-Hexagon(common=hxgn, y=0, hatch='n', label="n/s")
-Hexagon(common=hxgn, y=2, hatch='ne', label="ne/sw")
-Hexagon(common=hxgn, y=4, hatch='nw', label="nw/se")
+hxgn = Common(x=1, height=1.5, hatches_count=5, hatches_stroke="red", orientation='pointy')
+Hexagon(common=hxgn, y=0, hatches='n', label="n/s")
+Hexagon(common=hxgn, y=2, hatches='ne', label="ne/sw")
+Hexagon(common=hxgn, y=4, hatches='nw', label="nw/se")
 PageBreak()
 
 # ---- text_flat
@@ -251,13 +251,13 @@ Hexagon(common=hxg, x=2.25, y=0.1,
         spikes_height=-0.7,
         order_first=["spikes"])
 Hexagon(common=hxg, x=0.25, y=2.1,
-        hatch_count=5, hatch_stroke="red",
-        hatch_stroke_width=2, hatch='nw',
+        hatches_count=5, hatches_stroke="red",
+        hatches_stroke_width=2, hatches='nw',
         radii='sw e',
         radii_stroke_width=2)
 Hexagon(common=hxg, x=2.25, y=2.1,
-        hatch_count=5, hatch_stroke="red",
-        hatch_stroke_width=2, hatch='nw',
+        hatches_count=5, hatches_stroke="red",
+        hatches_stroke_width=2, hatches='nw',
         radii='sw e',
         radii_stroke_width=2,
         order_last=["hatches"])
@@ -280,8 +280,8 @@ Save(
         None,
         "centre",
         "dot_cross",
-        "hatch_flat", "hatch_pointy",
-        "hatch_text_flat", "hatch_text_pointy",
+        "hatches_flat", "hatches_pointy",
+        "hatches_text_flat", "hatches_text_pointy",
         "radii_flat", "radii_pointy",
         "borders_flat", "borders_pointy",
         "perbii_flat", "perbii_pointy",

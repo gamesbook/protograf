@@ -387,19 +387,19 @@ class RectangleShape(BaseShape):
             self.vertexes.append(Point(x, y))
 
     def draw_corners(self, cnv, ID, x, y):
-        """Add corner lines/shapes to a Rectangle."""
-        _corner_style = _lower(self.corner_style)
-        if self.corner_directions:
-            _crnrs = self.corner_directions.split()
+        """Add corners (lines/shapes) to a Rectangle."""
+        _corners_style = _lower(self.corners_style)
+        if self.corners_directions:
+            _crnrs = self.corners_directions.split()
             _corners = [str(crn).upper() for crn in _crnrs]
         # feedback(f'*** Rect corners {_corners=} ')
-        o_x = self.unit(self.corner_x) if self.corner_x else self.unit(self.corner)
-        o_y = self.unit(self.corner_y) if self.corner_y else self.unit(self.corner)
+        o_x = self.unit(self.corners_x) if self.corners_x else self.unit(self.corners)
+        o_y = self.unit(self.corners_y) if self.corners_y else self.unit(self.corners)
         # feedback(f'*** Rect corners {o_x=} {o_y=} ')
         ox3 = o_x / 3.0
         oy3 = o_y / 3.0
         if "NW" in _corners:
-            match _corner_style:
+            match _corners_style:
                 case "line" | "l":
                     cnv.draw_line(Point(x, y), Point(x, y + o_y))
                     cnv.draw_line(Point(x, y), Point(x + o_x, y))
@@ -425,7 +425,7 @@ class RectangleShape(BaseShape):
                     cnv.draw_line(Point(x + 2 * ox3, y + oy3), Point(x + o_x, y)),
                     cnv.draw_line(Point(x + o_x, y), Point(x, y))
         if "SE" in _corners:
-            match _corner_style:
+            match _corners_style:
                 case "line" | "l":
                     cnv.draw_line(
                         Point(x + self._u.width, y + self._u.height),
@@ -498,7 +498,7 @@ class RectangleShape(BaseShape):
                         Point(x + self._u.width, y + self._u.height),
                     )
         if "NE" in _corners:
-            match _corner_style:
+            match _corners_style:
                 case "line" | "l":
                     cnv.draw_line(
                         Point(x + self._u.width, y),
@@ -561,7 +561,7 @@ class RectangleShape(BaseShape):
                         Point(x + self._u.width, y),
                     )
         if "SW" in _corners:
-            match _corner_style:
+            match _corners_style:
                 case "line" | "l":
                     cnv.draw_line(
                         Point(x, y + self._u.height), Point(x, y + self._u.height - o_y)
@@ -620,11 +620,11 @@ class RectangleShape(BaseShape):
                     )
         # apply
         gargs = {}
-        gargs["fill"] = self.corner_fill
-        gargs["stroke"] = self.corner_stroke
-        gargs["stroke_width"] = self.corner_stroke_width
-        gargs["stroke_ends"] = self.corner_ends
-        gargs["dotted"] = self.corner_dotted
+        gargs["fill"] = self.corners_fill
+        gargs["stroke"] = self.corners_stroke
+        gargs["stroke_width"] = self.corners_stroke_width
+        gargs["stroke_ends"] = self.corners_ends
+        gargs["dotted"] = self.corners_dots
         self.set_canvas_props(cnv=None, index=ID, **gargs)
 
     def draw_bite_rectangle(self, cnv, x, y):
@@ -678,7 +678,7 @@ class RectangleShape(BaseShape):
         else:
             cnv.draw_line(p7, p1)
 
-    def draw_hatch(self, cnv, ID, vertices: list, num: int, rotation: float = 0.0):
+    def draw_hatches(self, cnv, ID, vertices: list, num: int, rotation: float = 0.0):
         """Draw line(s) from one side of Rectangle to the parallel opposite.
 
         Args:
@@ -687,8 +687,8 @@ class RectangleShape(BaseShape):
             num: number of lines
             rotation: degrees anti-clockwise from horizontal "east"
         """
-        _dirs = tools.validated_directions(self.hatch, DirectionGroup.CIRCULAR, "hatch")
-        lines = tools.as_int(num, "hatch_count")
+        _dirs = tools.validated_directions(self.hatches, DirectionGroup.CIRCULAR, "hatches")
+        lines = tools.as_int(num, "hatches_count")
         # ---- check dirs
         if self.rounding or self.rounded:
             if (
@@ -699,7 +699,7 @@ class RectangleShape(BaseShape):
                 or "d" in _dirs
             ):
                 feedback(
-                    "No diagonal hatching permissible with rounding in the rectangle",
+                    "No diagonal hatches permissible with rounding in the rectangle",
                     True,
                 )
         # ---- check spaces
@@ -711,10 +711,10 @@ class RectangleShape(BaseShape):
                 _rounding = self._u.width * 0.08
             if spaces < _rounding:
                 feedback(
-                    "No hatching permissible with this size of rounding in a rectangle",
+                    "No hatches permissible with this size of rounding in a rectangle",
                     True,
                 )
-        if self.notch and self.hatch_count > 1 or self.notch_x or self.notch_y:
+        if self.notch and self.hatches_count > 1 or self.notch_x or self.notch_y:
             if (
                 "ne" in _dirs
                 or "sw" in _dirs
@@ -723,7 +723,7 @@ class RectangleShape(BaseShape):
                 or "d" in _dirs
             ):
                 feedback(
-                    "Multi- diagonal hatching not permissible in a notched Rectangle",
+                    "Multi-diagonal hatches not permissible in a notched Rectangle",
                     True,
                 )
         # ---- draw items
@@ -787,11 +787,11 @@ class RectangleShape(BaseShape):
         cy = vertices[0].y + 0.5 * self._u.height
         self.set_canvas_props(
             index=ID,
-            stroke=self.hatch_stroke,
-            stroke_width=self.hatch_stroke_width,
-            stroke_ends=self.hatch_ends,
-            dashed=self.hatch_dashed,
-            dotted=self.hatch_dots,
+            stroke=self.hatches_stroke,
+            stroke_width=self.hatches_stroke_width,
+            stroke_ends=self.hatches_ends,
+            dashed=self.hatches_dashed,
+            dotted=self.hatches_dots,
             rotation=rotation,
             rotation_point=muPoint(cx, cy),
         )
@@ -1141,27 +1141,27 @@ class RectangleShape(BaseShape):
             feedback("Cannot use rounding or rounded with peaks.", True)
         if is_round and is_prows:
             feedback("Cannot use rounding or rounded with prows.", True)
-        if self.hatch_count and is_notched and self.hatch_count > 1:
+        if self.hatches_count and is_notched and self.hatches_count > 1:
             feedback("Cannot use multiple hatches with notch.", True)
-        if self.hatch_count and is_chevron:
-            feedback("Cannot use hatch_count with chevron.", True)
+        if self.hatches_count and is_chevron:
+            feedback("Cannot use hatches_count with chevron.", True)
         if is_notched and is_chevron:
             feedback("Cannot use notch and chevron together.", True)
         if is_notched and is_peaks:
             feedback("Cannot use notch and peaks together.", True)
         if is_chevron and is_peaks:
             feedback("Cannot use chevron and peaks together.", True)
-        if self.hatch_count and is_peaks:
-            feedback("Cannot use hatch_count and peaks together.", True)
+        if self.hatches_count and is_peaks:
+            feedback("Cannot use hatches_count and peaks together.", True)
         if is_notched and is_prows:
             feedback("Cannot use notch and prows together.", True)
         if is_chevron and is_prows:
             feedback("Cannot use chevron and prows together.", True)
-        if self.hatch_count and is_prows:
-            feedback("Cannot use hatch_count and prows together.", True)
+        if self.hatches_count and is_prows:
+            feedback("Cannot use hatches_count and prows together.", True)
         if is_borders and (is_chevron or is_peaks or is_notched or is_prows):
             feedback(
-                "Cannot use borders with any of: hatch, peaks or chevron or prows.",
+                "Cannot use borders with any of: hatches, peaks or chevron or prows.",
                 True,
             )
         # ---- calculate properties
@@ -1541,12 +1541,12 @@ class RectangleShape(BaseShape):
                     self.draw_stripes(cnv, ID, self.vertexes, rotation)
             if item == "hatches":
                 # ---- * draw hatches
-                if self.hatch_count:
+                if self.hatches_count:
                     # if 'rotation' in kwargs.keys():
                     #     kwargs.pop('rotation')
                     vertices = self.get_vertexes(**kwargs)
-                    self.draw_hatch(
-                        cnv, ID, vertices, self.hatch_count, rotation=rotation
+                    self.draw_hatches(
+                        cnv, ID, vertices, self.hatches_count, rotation=rotation
                     )
             if item == "perbii":
                 # ---- * draw perbii

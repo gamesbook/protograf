@@ -2732,7 +2732,7 @@ def Circle(row=None, col=None, **kwargs):
     Kwargs:
 
     <center>
-    - hatch (str): edge-to-edge lines that, if not specified, will
+    - hatches (str): edge-to-edge lines that, if not specified, will
       be drawn in all directions - otherwise:
 
       - ``n`` (North) or ``s`` (South) draws vertical lines;
@@ -2743,10 +2743,10 @@ def Circle(row=None, col=None, **kwargs):
         from bottom-left to top-right;
       - ``o`` (orthogonal) draws vertical **and** horizontal lines;
       - ``d`` (diagonal) draws diagonal lines between adjacent sides.
-    - hatch_count (int): sets the **number** of lines to be drawn; the
+    - hatches_count (int): sets the **number** of lines to be drawn; the
       intervals between them are equal and depend on the direction
-    - hatch_stroke_width (float): hatch line thickness; defaults to 0.1 points
-    - hatch_stroke (str): the named or hexadecimal color of the hatch line;
+    - hatches_stroke_width (float): hatches line thickness; defaults to 0.1 points
+    - hatches_stroke (str): the named or hexadecimal color of the hatches line;
       defaults to ``black``
     - petals (int): sets the number of petals to drawn
     - petals_style (str): a style of ``p`` or ``petal`` causes petals
@@ -2766,7 +2766,7 @@ def Circle(row=None, col=None, **kwargs):
       the radii lines are drawn
     - radii_stroke_width (float): determines the thickness of the radii
     - radii_dotted (bool): if set to True, will make the radii lines dotted
-    - radii_stroke (str): the named or hexadecimal color of the hatch line;
+    - radii_stroke (str): the named or hexadecimal color of the hatches line;
       defaults to ``black``
     - radii_length (float): changes the length of the radii lines
       (centre to circumference)
@@ -2930,16 +2930,16 @@ def Hexagon(row=None, col=None, **kwargs):
       - width (float): the line thickness
       - color (str): either a named or hexadecimal color
       - style  (bool): True makes a dotted line; or a list of values creates dashes
-    - hatch (str): edge-to-edge lines that, if not specified, will
+    - hatches (str): edge-to-edge lines that, if not specified, will
       be drawn in all directions - otherwise:
 
       - ``n`` (North) or ``s`` (South) draws vertical lines for flat hex;
       - ``w`` (West) or ``e`` (East) draws horizontal lines for pointy hex;
       - ``nw`` (North-West) or ``se`` (South-East) draws diagonal lines.
-    - hatch_count (int): sets the **number** of lines to be drawn the
+    - hatches_count (int): sets the **number** of lines to be drawn the
       intervals between them are equal and depend on the direction
-    - hatch_stroke_width (float): hatch line thickness; defaults to 0.1 points
-    - hatch_stroke (str): the named or hexadecimal color of the hatch line;
+    - hatches_stroke_width (float): hatches line thickness; defaults to 0.1 points
+    - hatches_stroke (str): the named or hexadecimal color of the hatches line;
       defaults to ``black``
     - paths (list): one or more pairs of compass directions between
       which a line - straight or an arc - is drawn
@@ -2949,7 +2949,7 @@ def Hexagon(row=None, col=None, **kwargs):
       defaults to ``black`
     - radii_dotted (bool): if set to True, will make the radii lines dotted
     - radii_stroke_width (float): determines the thickness of the radii
-    - radii_stroke (str): the named or hexadecimal color of the hatch line;
+    - radii_stroke (str): the named or hexadecimal color of the hatches line;
       defaults to ``black``
     - radii_length (float): changes the length of the radii lines
       (centre to circumference)
@@ -3163,7 +3163,7 @@ def Rectangle(row=None, col=None, **kwargs):
       pointing; n(orth), s(outh), e(ast) or w(est)
     - chevron_height (float): the distance of the chevron peak from the side of
       the rectangle it is adjacent to
-    - hatch (str): if not specified, hatches will be drawn
+    - hatches (str): if not specified, hatches will be drawn
       in all directions - otherwise:
 
       - ``n`` (North) or ``s`` (South) draws vertical lines;
@@ -3174,28 +3174,28 @@ def Rectangle(row=None, col=None, **kwargs):
         from bottom-left to top-right;
       - ``o`` (orthogonal) draws vertical **and** horizontal lines;
       - ``d`` (diagonal) draws diagonal lines between adjacent sides.
-    - corner (float): the size of the shape that will be drawn in the
-      corner of the rectangle
-    - corner_stroke_width (float): corner line thickness; defaults to 0.1 points
-    - corner_stroke (str): the named or hexadecimal color of the corner line;
+    - corners (float): the size of the shape that will be drawn in the
+      corners of the rectangle
+    - corners_stroke_width (float): corners line thickness; defaults to 0.1 points
+    - corners_stroke (str): the named or hexadecimal color of the corners line;
       defaults to ``black`
-    - corner_fill (str): the named or hexadecimal color of the corner area;
+    - corners_fill (str): the named or hexadecimal color of the corners area;
       defaults to ``white`
-    - corner_x (float): the length of the corner in the x-direction
-    - corner_y (float): the length of the corner in the y-direction
-    - corner_directions (str): the specific corners of the rectangle where the
-      corner is drawn, given as secondary compass directions - ne, se, sw, nw
-    - corner_style (str): defines the corner appearance:
+    - corners_x (float): the length of the corners in the x-direction
+    - corners_y (float): the length of the corners in the y-direction
+    - corners_directions (str): the specific corners of the rectangle where the
+      corners is drawn, given as secondary compass directions - ne, se, sw, nw
+    - corners_style (str): defines the corners appearance:
 
       - *normal* - a simple line
       - *triangle* - a triangular shape
       - *curve* - a triangular shape with a curved lower edge
       - *arch* - an arrow-shape with with a cut-out curved notch
       - *photo* - a triangular shape with a cut-out notch
-    - hatch_count (int): sets the **number** of lines to be drawn; the
+    - hatches_count (int): sets the **number** of lines to be drawn; the
       intervals between them are equal and depend on the direction
-    - hatch_stroke_width (float): hatch line thickness; defaults to 0.1 points
-    - hatch_stroke (str): the named or hexadecimal color of the hatch line;
+    - hatches_stroke_width (float): hatches line thickness; defaults to 0.1 points
+    - hatches_stroke (str): the named or hexadecimal color of the hatches line;
       defaults to ``black``
     - notch (float): the size of the triangular shape that will be "cut" off the
       corners of the rectangle
@@ -3645,10 +3645,10 @@ def Blueprint(**kwargs):
         # ---- draw "zero" number
         # z_x = kwargs["units"] * globals.margins.left
         # z_y = kwargs["units"] * globals.margins.bottom
-        # corner_dist = geoms.length_of_line(Point(0, 0), Point(z_x, z_y))
-        # corner_frac = corner_dist * 0.66 / kwargs["units"]
-        # # feedback(f'$$$  {z_x=} {z_y=} {corner_dist=}')
-        # zero_pt = geoms.point_on_line(Point(0, 0), Point(z_x, z_y), corner_frac)
+        # crner_dist = geoms.length_of_line(Point(0, 0), Point(z_x, z_y))
+        # crner_frac = crner_dist * 0.66 / kwargs["units"]
+        # # feedback(f'$$$  {z_x=} {z_y=} {crner_dist=}')
+        # zero_pt = geoms.point_on_line(Point(0, 0), Point(z_x, z_y), crner_frac)
         # Text(
         #     x=zero_pt.x / kwargs["units"] - kwargs["side"] / 4.0,
         #     y=zero_pt.y / kwargs["units"] - kwargs["side"] / 4.0,

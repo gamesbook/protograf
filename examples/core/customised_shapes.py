@@ -126,7 +126,7 @@ EquilateralTriangle(
     x=2, y=1, flip="south", hand="west", label="SW", fill="blue")
 EquilateralTriangle(
     x=1, y=4, side=1.5,
-    hatch_count=5, hatch_stroke="red",
+    hatches_count=5, hatches_stroke="red",
     title='Title', heading='Head')
 EquilateralTriangle(
     x=1, y=5.5, side=1.5, stroke_width=1,
@@ -685,7 +685,7 @@ small_star = star(radius=0.25)
 small_circle = circle(radius=0.33, fill="gray", centre_shape=small_star)
 Hexagon(x=1, y=0.5, height=2,
         dot=0.1,
-        hatch_count=5,
+        hatches_count=5,
         centre_shape=small_circle)
 Hexagon(x=1, y=3, height=2,
         centre_shape=small_circle,
@@ -729,7 +729,7 @@ Rectangle(x=1, y=4, side=1,
               side=0.6,
               stroke="gold",
               fill=None,
-              hatch='d', hatch_count=5,
+              hatches='d', hatches_count=5,
               borders=[("n s", 2, "black")]))
 Rectangle(x=2, y=3, side=1,
           centre_shape=rhombus(
@@ -825,15 +825,15 @@ Star(x=1, y=1, vertices=5, radius=0.75, common=props, label="star")
 Ellipse(cx=3, cy=1, height=1, width=1.5, common=props, label="ellipse")
 PageBreak()
 
-# ---- shape hatch-and-rotation
+# ---- shape hatches-and-rotation
 Blueprint()
-Text(common=txt, text="Hatch & Rotate")
+Text(common=txt, text="Hatches & Rotate")
 htch = Common(
     fill='lightgray', stroke=None,
-    hatch_count=5,
-    hatch='w',
-    hatch_stroke_width=0.75,
-    hatch_stroke="red")
+    hatches_count=5,
+    hatches='w',
+    hatches_stroke_width=0.75,
+    hatches_stroke="red")
 
 Hexagon(
     common=htch,
@@ -978,7 +978,7 @@ Save(
         "shapes_centred",
         "qr_code",
         "image_sliced", "image_label",
-        "shape_rotation", "shape_hatch_and_rotation",
+        "shape_rotation", "shape_hatches_and_rotation",
         "table_defaults", "table_custom",
         "perbii_styled",
         "poly_waves",

@@ -1032,14 +1032,14 @@ Example 2. Customised EquilateralTriangle
 
         EquilateralTriangle(
             x=1, y=4, side=1.5,
-            hatch_count=5, hatch_stroke="red",
+            hatches_count=5, hatches_stroke="red",
             title="Title", heading="Head")
 
       - starting position - *x* is ``1`` cm and *y* is ``4`` cm
       - *side* of ``1.5`` cm; all sides are equal
-      - *hatch_count* of ``5`` - this means there will be 5 equally spaced lines drawn
+      - *hatches_count* of ``5`` - this means there will be 5 equally spaced lines drawn
         between opposing sides and running parallel to the third side
-      - *hatch_stroke* - customise the hatches to show them as ``red``
+      - *hatches_stroke* - customise the hatches to show them as ``red``
 
       The top section shows:
 
@@ -3432,21 +3432,21 @@ Example 4. Rotation with Hatches
 ++++++++++++++++++++++++++++++++
 `↑ <coreShapeRotation_>`_
 
-.. |rt4| image:: images/customised/shape_hatch_and_rotation.png
+.. |rt4| image:: images/customised/shape_hatches_and_rotation.png
    :width: 330
 
 ===== ======
 |rt4| This example shows different shapes constructed using commands with
-      some ``Common`` properties for the ``hatch`` effect:
+      some ``Common`` properties for the ``hatches`` effect:
 
       .. code:: python
 
         htch = Common(
             fill='lightgray', stroke=None,
-            hatch_count=5,
-            hatch='w',
-            hatch_stroke="red",
-            hatch_stroke_width=0.75,
+            hatches_count=5,
+            hatches='w',
+            hatches_stroke="red",
+            hatches_stroke_width=0.75,
             rotation=30)
 
         Hexagon(
@@ -3724,7 +3724,7 @@ The centre-shape can be shifted from the centre by setting values for
 
         Hexagon(
             x=1, y=0.5, height=2,
-            hatch_count=5,
+            hatches_count=5,
             dot=0.1,
             centre_shape=small_circle)
 
@@ -3803,7 +3803,7 @@ and this shape itself can be customised.
                       side=0.6,
                       stroke="gold",
                       fill=None,
-                      hatch='d', hatch_count=5,
+                      hatches='d', hatches_count=5,
                       borders=[("n s", 2, "black")]))
         Rectangle(x=2, y=3, side=1,
                   centre_shape=rhombus(

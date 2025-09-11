@@ -733,13 +733,13 @@ class EquilateralTriangleShape(BaseShape):
     Equilateral Triangle on a given canvas.
     """
 
-    def draw_hatch(
+    def draw_hatches(
         self, cnv, ID, side: float, vertices: list, num: int, rotation: float = 0.0
     ):
         _dirs = tools.validated_directions(
-            self.hatch, DirectionGroup.HEX_POINTY_EDGE, "triangle hatch"
+            self.hatches, DirectionGroup.HEX_POINTY_EDGE, "triangle hatch"
         )
-        lines = tools.as_int(num, "hatch_count")
+        lines = tools.as_int(num, "hatcheses_count")
         if lines >= 1:
             # v_tl, v_tr, v_bl, v_br
             if "ne" in _dirs or "sw" in _dirs:  # slope UP to the right
@@ -758,11 +758,11 @@ class EquilateralTriangleShape(BaseShape):
         centre = self.get_centroid(vertices)
         self.set_canvas_props(
             index=ID,
-            stroke=self.hatch_stroke,
-            stroke_width=self.hatch_stroke_width,
-            stroke_ends=self.hatch_ends,
-            dashed=self.hatch_dashed,
-            dotted=self.hatch_dots,
+            stroke=self.hatches_stroke,
+            stroke_width=self.hatches_stroke_width,
+            stroke_ends=self.hatches_ends,
+            dashed=self.hatches_dashed,
+            dotted=self.hatches_dots,
             rotation=rotation,
             rotation_point=centre,
         )
@@ -848,9 +848,9 @@ class EquilateralTriangleShape(BaseShape):
 
         # ---- debug
         self._debug(cnv, vertices=self.vertexes)
-        # ---- draw hatch
-        if self.hatch_count:
-            self.draw_hatch(cnv, ID, side, self.vertexes, self.hatch_count, rotation)
+        # ---- draw hatches
+        if self.hatches_count:
+            self.draw_hatches(cnv, ID, side, self.vertexes, self.hatches_count, rotation)
         # ---- centred shape (with offset)
         if self.centre_shape:
             if self.can_draw_centred_shape(self.centre_shape):
@@ -1684,7 +1684,7 @@ class RhombusShape(BaseShape):
         vertices.append(Point(x_s + self._u.width / 2.0, y_s - self._u.height / 2.0))
         return vertices
 
-    def draw_hatch(
+    def draw_hatches(
         self,
         cnv,
         ID,
@@ -1706,9 +1706,9 @@ class RhombusShape(BaseShape):
             rotation: degrees anti-clockwise from horizontal "east"
         """
         _dirs = tools.validated_directions(
-            self.hatch, DirectionGroup.CIRCULAR, "rhombus hatch"
+            self.hatches, DirectionGroup.CIRCULAR, "rhombus hatches"
         )
-        _num = tools.as_int(num, "hatch_count")
+        _num = tools.as_int(num, "hatches_count")
         lines = int((_num - 1) / 2 + 1)
         # feedback(f'*** RHOMB {num=} {lines=} {vertices=} {_dirs=} {side=}')
         if num >= 1:
@@ -1740,11 +1740,11 @@ class RhombusShape(BaseShape):
         # ---- set canvas
         self.set_canvas_props(
             index=ID,
-            stroke=self.hatch_stroke,
-            stroke_width=self.hatch_stroke_width,
-            stroke_ends=self.hatch_ends,
-            dashed=self.hatch_dashed,
-            dotted=self.hatch_dots,
+            stroke=self.hatches_stroke,
+            stroke_width=self.hatches_stroke_width,
+            stroke_ends=self.hatches_ends,
+            dashed=self.hatches_dashed,
+            dotted=self.hatches_dots,
             rotation=rotation,
             rotation_point=muPoint(x_c, y_c),
         )
@@ -1893,13 +1893,13 @@ class RhombusShape(BaseShape):
         # ---- draw slices after base
         if self.slices:
             self.draw_slices(cnv, ID, self.vertexes, centre, rotation)
-        # ---- draw hatch
-        if self.hatch_count:
+        # ---- draw hatches
+        if self.hatches_count:
             self.side = math.sqrt(
                 (self._u.width / 2.0) ** 2 + (self._u.height / 2.0) ** 2
             )
-            self.draw_hatch(
-                cnv, ID, cx, cy, self.side, self.vertexes, self.hatch_count, rotation
+            self.draw_hatches(
+                cnv, ID, cx, cy, self.side, self.vertexes, self.hatches_count, rotation
             )
 
         # ---- borders (override)

@@ -371,19 +371,19 @@ class BaseCanvas:
         self.notch_style = self.defaults.get("notch_style", "snip")
         self.chevron = self.defaults.get("chevron", "")
         self.chevron_height = kwargs.get("chevron_height", 0)
-        self.corner = self.defaults.get("corner", 0)
-        self.corner_directions = self.defaults.get("corner_directions", "sw nw ne se")
-        self.corner_x = self.defaults.get("corner_x", 0)
-        self.corner_y = self.defaults.get("corner_y", 0)
-        self.corner_style = self.defaults.get("corner_style", "line")
-        self.corner_stroke = self.defaults.get("corner_stroke", self.stroke)
-        self.corner_fill = self.defaults.get("corner_fill", self.fill)
-        self.corner_stroke_width = self.defaults.get(
-            "corner_stroke_width", self.stroke_width
+        self.corners = self.defaults.get("corners", 0)
+        self.corners_directions = self.defaults.get("corners_directions", "sw nw ne se")
+        self.corners_x = self.defaults.get("corners_x", 0)
+        self.corners_y = self.defaults.get("corners_y", 0)
+        self.corners_style = self.defaults.get("corners_style", "line")
+        self.corners_stroke = self.defaults.get("corners_stroke", self.stroke)
+        self.corners_fill = self.defaults.get("corners_fill", self.fill)
+        self.corners_stroke_width = self.defaults.get(
+            "corners_stroke_width", self.stroke_width
         )
-        self.corner_dotted = self.defaults.get("corner_dotted", None)
-        self.corner_ends = self.defaults.get("corner_ends", self.line_ends)
-        self.corner_dashed = self.defaults.get("corner_dashed", None)  # ---- OTHER
+        self.corners_dots = self.defaults.get("corners_dots", None)
+        self.corners_ends = self.defaults.get("corners_ends", self.line_ends)
+        self.corners_dashed = self.defaults.get("corners_dashed", None)  # ---- OTHER
 
         self.peaks = kwargs.get("peaks", [])
         self.peaks_dict = {}
@@ -467,6 +467,7 @@ class BaseCanvas:
         self.stripes_stroke_width = self.defaults.get(
             "stripes_stroke_width", self.stroke_width
         )
+        self.stripes_breadth = self.defaults.get("stripes_breadth", None)  # default: edge
         self.stripes_buffer = self.defaults.get("stripes_buffer", None)  # default: edge
         self.stripes_dotted = self.defaults.get("stripes_dotted", self.dotted)
         self.stripes_dashed = self.defaults.get("stripes_dashed", self.dashed)
@@ -603,15 +604,15 @@ class BaseCanvas:
         self.mesh = self.defaults.get("mesh", None)
         self.mesh_ends = self.defaults.get("mesh_ends", self.line_ends)
         # ---- hatches (hex, circle, rect)
-        self.hatch_count = self.defaults.get("hatch_count", 0)
-        self.hatch = self.defaults.get("hatch", "*")
-        self.hatch_stroke = self.defaults.get("hatch_stroke", self.stroke)
-        self.hatch_stroke_width = self.defaults.get(
-            "hatch_stroke_width", self.stroke_width
+        self.hatches_count = self.defaults.get("hatches_count", 0)
+        self.hatches = self.defaults.get("hatches", "*")
+        self.hatches_stroke = self.defaults.get("hatches_stroke", self.stroke)
+        self.hatches_stroke_width = self.defaults.get(
+            "hatches_stroke_width", self.stroke_width
         )
-        self.hatch_dots = self.defaults.get("hatch_dots", None)
-        self.hatch_ends = self.defaults.get("hatch_ends", self.line_ends)
-        self.hatch_dashed = self.defaults.get("hatch_dashed", None)  # ---- OTHER
+        self.hatches_dots = self.defaults.get("hatches_dots", None)
+        self.hatches_ends = self.defaults.get("hatches_ends", self.line_ends)
+        self.hatches_dashed = self.defaults.get("hatches_dashed", None)  # ---- OTHER
         # defaults for attributes called/set elsewhere e.g. in draw()
         self.use_abs = False
         self.use_abs_1 = False
@@ -910,20 +911,20 @@ class BaseShape:
         self.chevron_height = self.kw_float(
             kwargs.get("chevron_height", base.chevron_height)
         )
-        self.corner = self.kw_float(kwargs.get("corner", base.corner))
-        self.corner_directions = kwargs.get("corner_directions", base.corner_directions)
-        self.corner_x = self.kw_float(kwargs.get("corner_x", base.corner_x))
-        self.corner_y = self.kw_float(kwargs.get("corner_y", base.corner_y))
-        self.corner_style = kwargs.get("corner_style", base.corner_style)
-        self.corner_stroke = kwargs.get("corner_stroke", base.corner_stroke)
-        self.corner_fill = kwargs.get("corner_fill", base.corner_fill)
-        self.corner_stroke_width = kwargs.get(
-            "corner_stroke_width", base.corner_stroke_width
+        self.corners = self.kw_float(kwargs.get("corners", base.corners))
+        self.corners_directions = kwargs.get("corners_directions", base.corners_directions)
+        self.corners_x = self.kw_float(kwargs.get("corners_x", base.corners_x))
+        self.corners_y = self.kw_float(kwargs.get("corners_y", base.corners_y))
+        self.corners_style = kwargs.get("corners_style", base.corners_style)
+        self.corners_stroke = kwargs.get("corners_stroke", base.corners_stroke)
+        self.corners_fill = kwargs.get("corners_fill", base.corners_fill)
+        self.corners_stroke_width = kwargs.get(
+            "corners_stroke_width", base.corners_stroke_width
         )
-        self.corner_dotted = kwargs.get("corner_dotted", base.corner_dotted)
-        self.corner_ends = kwargs.get("corner_ends", base.corner_ends)
-        self.corner_dashed = kwargs.get(
-            "corner_dashed", base.corner_dashed
+        self.corners_dots = kwargs.get("corners_dots", base.corners_dots)
+        self.corners_ends = kwargs.get("corners_ends", base.corners_ends)
+        self.corners_dashed = kwargs.get(
+            "corners_dashed", base.corners_dashed
         )  # ---- OTHER
         self.peaks = kwargs.get("peaks", base.peaks)
         self.peaks_dict = {}
@@ -1021,6 +1022,7 @@ class BaseShape:
         self.stripes_stroke_width = self.kw_float(
             kwargs.get("stripes_stroke_width", base.stripes_stroke_width)
         )
+        self.stripes_breadth = kwargs.get("stripes_breadth", base.stripes_breadth)
         self.stripes_buffer = kwargs.get("stripes_buffer", base.stripes_buffer)
         self.stripes_dotted = kwargs.get("stripes_dotted", base.dotted)
         self.stripes_dashed = kwargs.get("stripes_dashed", self.dashed)
@@ -1187,15 +1189,15 @@ class BaseShape:
         self.mesh = kwargs.get("mesh", base.mesh)
         self.mesh_ends = kwargs.get("mesh_ends", base.mesh_ends)
         # ---- hatches (hex, rect, circle)
-        self.hatch_count = kwargs.get("hatch_count", base.hatch_count)
-        self.hatch = kwargs.get("hatch", base.hatch)
-        self.hatch_stroke_width = self.kw_float(
-            kwargs.get("hatch_stroke_width", base.hatch_stroke_width)
+        self.hatches_count = kwargs.get("hatches_count", base.hatches_count)
+        self.hatches = kwargs.get("hatches", base.hatches)
+        self.hatches_stroke_width = self.kw_float(
+            kwargs.get("hatches_stroke_width", base.hatches_stroke_width)
         )
-        self.hatch_stroke = kwargs.get("hatch_stroke", base.stroke)
-        self.hatch_ends = kwargs.get("hatch_ends", base.hatch_ends)
-        self.hatch_dots = kwargs.get("hatch_dots", base.dotted)
-        self.hatch_dashed = kwargs.get("hatch_dashed", self.dashed)
+        self.hatches_stroke = kwargs.get("hatches_stroke", base.stroke)
+        self.hatches_ends = kwargs.get("hatches_ends", base.hatches_ends)
+        self.hatches_dots = kwargs.get("hatches_dots", base.dotted)
+        self.hatches_dashed = kwargs.get("hatches_dashed", self.dashed)
         # ---- deck
         self.deck_data = kwargs.get("deck_data", [])  # list of dicts
 
@@ -1569,8 +1571,8 @@ class BaseShape:
                 issue.append(f'"{self.pattern}" is an invalid starfield pattern!')
                 correct = False
         # ---- rectangle - corners
-        if self.corner_style:
-            if _lower(self.corner_style) not in [
+        if self.corners_style:
+            if _lower(self.corners_style) not in [
                 "line",
                 "l",
                 "curve",
@@ -1580,7 +1582,7 @@ class BaseShape:
                 "triangle",
                 "t",
             ]:
-                issue.append(f'"{self.corner_style}" is an invalid corner_style!')
+                issue.append(f'"{self.corners_style}" is an invalid corners_style!')
                 correct = False
         # ---- rectangle - notches
         if self.notch_style:

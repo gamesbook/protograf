@@ -333,12 +333,15 @@ Display-orientated Terms
 ========================
 `↑ <table-of-contents-terms_>`_
 
+-  **corners** - if assigned a number will cause short lines of that length
+   to be drawn from each corner of a ``Rectangle`` |dash| these lines can be
+   further styled e.g. to show as small, triangular photograph holders
 -  **hidden** - a list of locations, indicated by their *row and
    column* identifier, which should **not** be used for display - the rest
    are displayed as normal
--  **hatch** - when used in combination with **hatch_count** will draw a series
-   of parallel lines between two opposing sides of a regular shape in the
-   specified direction
+-  **hatches** - when used in combination with **hatches_count** will draw a
+   series of parallel lines between two opposing sides of a regular shape in
+   the specified direction(s)
 -  **masked** - a list of locations, indicated by their *sequence
    number* |dash| i.e. their position in the drawing order |dash| which
    should **not** be used for display |dash| the rest are displayed as normal
@@ -348,13 +351,16 @@ Display-orientated Terms
    two edges of a hexagon shap,e between which a line |dash| straight or an
    arc |dash| is drawns
 -  **perbii** - if given one or more numbers will cause the perpendicular
-   bisectors ("perbii" is plural for the shortcut "perbis") -  |dash| lines
+   bisectors ("perbii" is plural for the shortcut "perbis") |dash| lines
    from centre to the middle of the edges |dash| of a ``Polygon``, ``Hexagon``
-   or ``Rectangle`` to be drawn; a ``Polygon`` unnamed edges are numbered from
-   the east-facing one in an anti-clockwise direction
+   or ``Rectangle`` to be drawn; a ``Polygon's`` unnamed edges are numbered
+   from the east-facing one in an anti-clockwise direction
 -  **shown** - a list of locations, indicated by their *row and
    column* identifier which are the only ones that **must** be used for
    display - the rest are ignored
+-  **stripes** - when used in combination with **stripes_count** will draw a
+   series of parallel lines between two opposing sides of a ``Rectangle`` in
+   the specified direction(s)
 -  **visible** - a list of locations, indicated by their *sequence
    number* |dash| i.e. their position in the drawing order |dash| that
    **must** be used for display - the rest are ignored
