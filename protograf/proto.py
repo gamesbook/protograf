@@ -1362,6 +1362,8 @@ def Create(**kwargs):
     global globals_set
     # ---- set and confirm globals
     globals.initialize()
+    if globals_set:
+        feedback("Another document is already open or initialised", True)
     globals_set = True
     # ---- units
     _units = kwargs.get("units", globals.units)
@@ -1482,6 +1484,149 @@ def create(**kwargs):
     Create(**kwargs)
 
 
+def Load(**kwargs):
+    """Set globals, page, margins, units and canvas from existing PDF
+
+    Kwargs:
+
+    - filename (str): name of the input PDF file
+    - units (str): can be ``cm`` (centimetres), ``in`` (inches), ``mm``
+      (millimetres), or ``points``; default is ``cm``
+    - margin (float): set the value for *all* margins using the defined *units*;
+      default is ``1`` centimetre.
+    - margin_top (float): set the top margin using the defined *units*
+    - margin_bottom (float): set the bottom margin using the defined *units*
+    - margin_left (float): set the left margin using the defined *units*
+    - margin_right (float): set the the right margin using the defined *units*
+    - margin_debug (bool): if True, show the margin as a dotted blue line
+    - cached_fonts (bool): if True, will force reload of Font cache
+
+    Notes:
+
+    - Kwargs to override the default values of any of the various properties
+      used for drawing Shapes can be set here as well, for example:
+      ``font_size=18`` or ``stroke="red"``.
+    - Will use argparse to process command-line keyword args
+    - Allows shortcut creation of cards
+    """
+    global globals_set
+    # ---- set and confirm globals
+    globals.initialize()
+    if globals_set:
+        feedback("Another document is already open or initialised", True)
+    globals_set = True
+    # ---- units
+    _units = kwargs.get("units", globals.units)
+    globals.units = support.to_units(_units)
+    # ---- margins
+    the_margin = kwargs.get("margin", DEFAULT_MARGIN_SIZE / globals.units)
+    globals.margins = PageMargins(
+        margin=the_margin,
+        left=kwargs.get("margin_left", the_margin),
+        top=kwargs.get("margin_top", the_margin),
+        bottom=kwargs.get("margin_bottom", the_margin),
+        right=kwargs.get("margin_right", the_margin),
+        debug=kwargs.get("margin_debug", False),
+    )
+    # ---- defaults
+    defaults = kwargs.get("defaults", None)
+    # ---- paper, page, page sizes
+    globals.paper = kwargs.get("paper", globals.paper)
+    globals.page = pymupdf.paper_size(globals.paper)  # (width, height) in points
+    # ---- fonts
+    base_fonts()
+    globals.font_size = kwargs.get("font_size", 12)
+    # ---- command-line arguments
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        "-d", "--directory", help="Specify output directory", default=""
+    )
+    # use: --no-png to skip PNG output during Save()
+    parser.add_argument(
+        "--png",
+        help="Whether to create PNG during Save (default is True)",
+        default=True,
+        action=argparse.BooleanOptionalAction,
+    )
+    # use: --fonts to force Fonts recreation during Create()
+    parser.add_argument(
+        "-f",
+        "--fonts",
+        help="Force reloading of all available fonts at start (default is False)",
+        default=False,
+        action=argparse.BooleanOptionalAction,
+    )
+    # use: --no-warning to ignore WARNING:: messages
+    parser.add_argument(
+        "-nw",
+        "--nowarning",
+        help="Do NOT show any WARNING:: messages (default is False)",
+        default=False,
+        action=argparse.BooleanOptionalAction,
+    )
+    parser.add_argument(
+        "-p", "--pages", help="Specify which pages to process", default=""
+    )
+    globals.pargs = parser.parse_args()
+    # NB - pages does not work - see notes in PageBreak()
+    if globals.pargs.pages:
+        feedback("--pages is not yet an implemented feature - sorry!")
+    # ---- filename and fallback
+    _filename = kwargs.get("filename", "")
+    if not _filename:
+        basename = "test"
+        # log.debug('basename: "%s" sys.argv[0]: "%s"', basename, sys.argv[0])
+        if sys.argv[0]:
+            basename = os.path.basename(sys.argv[0]).split(".")[0]
+        _filename = f"{basename}.pdf"
+    # ---- validate directory & set filename
+    if globals.pargs.directory and not os.path.exists(globals.pargs.directory):
+        feedback(
+            f'Unable to find directory "{globals.pargs.directory}" for output.', True
+        )
+    globals.filename = os.path.join(globals.pargs.directory, _filename)
+    # ---- Open pymupdf doc, page, shape/canvas
+    if not os.path.exists(globals.filename):
+        script_path = os.path.abspath(__file__)
+        script_directory = os.path.dirname(script_path)
+        globals.filename = os.path.join(script_directory, globals.filename)
+    try:
+        globals.document = pymupdf.open(globals.filename)  # existing Document
+    except Exception as err:
+        feedback(f"Unable to load {globals.filename} ({err})", True)
+    globals.doc_page = globals.document.new_page(
+        width=globals.page[0], height=globals.page[1]
+    )  # pymupdf Page
+    # ---- Extract doc info
+    page = globals.document[0]
+    # page.rect represents the visible area of the page
+    _page_width_pt = page.rect.width
+    _page_height_pt = page.rect.height
+    globals.page = (_page_width_pt, _page_height_pt)
+    globals.page_width = globals.page[0] / globals.units  # width in user units
+    globals.page_height = globals.page[1] / globals.units  # height in user units
+    globals.page_fill = colrs.get_color(kwargs.get("fill", "white"))
+    globals.page_grid = tools.as_float(kwargs.get("page_grid", 0), "page_grid")
+    globals.canvas = globals.doc_page.new_shape()  # pymupdf Shape
+    # ---- BaseCanvas
+    globals.base = BaseCanvas(
+        globals.document, paper=globals.paper, defaults=defaults, kwargs=kwargs
+    )
+    page_setup()
+    # ---- pickle font info for pymupdf
+    globals.archive = Archive()
+    globals.css = ""
+    cached_fonts = tools.as_bool(kwargs.get("cached_fonts", True))
+    if not cached_fonts or globals.pargs.fonts:
+        cache_directory = Path(Path.home() / CACHE_DIRECTORY)
+        fi = FontInterface(cache_directory=cache_directory)
+        fi.load_font_families(cached=False)
+
+
+def load(**kwargs):
+    Load(**kwargs)
+
+
 def Footer(**kwargs):
     validate_globals()
 
@@ -1551,6 +1696,13 @@ def Extract(pages: object, **kwargs):
       in each.  The set numbers represent the top-left *x* and *y* and the
       bottom-right *x* and *y* locations on the page of a rectangle that must be
       extracted
+    - height (float): the height of an area to be extracted
+    - width (float): the width of an area to be extracted
+    - x (float): the X-value of top-left corner of an area to be extracted
+    - y (float): the Y-value top-left corner of an area to be extracted
+    - repeat (bool): if True, extract the height & width area multiple times
+    - x_gap (float): the x gap used when extracting a repeated area
+    - y_gap (float): the y gap used when extracting a repeated area
 
     Notes:
 
@@ -1558,15 +1710,32 @@ def Extract(pages: object, **kwargs):
       keyed on page number, and stored in `globals.extracts`. They are
       processed during/after document Save()
     """
-    _pages = tools.sequence_split(pages)
+    _pages = tools.sequence_split(pages, star=True)
     if not _pages:
         feedback("At least one page must be specified for Extract.", True)
     # ---- set local vars from kwargs
     names = kwargs.get("names", [])
     areas = kwargs.get("areas", None)
     cols_rows = kwargs.get("cols_rows", None)
-    if (cols_rows and areas) or (not areas and not cols_rows):
-        feedback("Specify either areas OR cols_rows for Extract, but not both.", True)
+    if ("*" in _pages or "all" in _pages) and names:
+        feedback(
+            "Must specify actual page numbers for Extract if also using names.", True
+        )
+    # settings used for card area extraction
+    height = tools.as_float(kwargs.get("height", 0), "height")
+    width = tools.as_float(kwargs.get("width", 0), "width")
+    tl_x = tools.as_float(kwargs.get("x", 1), "x")
+    tl_y = tools.as_float(kwargs.get("y", 1), "y")
+    gap_x = tools.as_float(kwargs.get("x_gap", 0), "x_gap")
+    gap_y = tools.as_float(kwargs.get("y_gap", 0), "y_gap")
+    repeat = tools.as_bool(kwargs.get("repeat", False), "repeat")
+    cards = True if (height and width) else False
+    if (cols_rows and areas and cards) or (not areas and not cols_rows and not cards):
+        feedback(
+            "Specify either areas OR cols_rows OR height & width for Extract -"
+            " only one of these options must be chosen.",
+            True,
+        )
     if areas:
         if not isinstance(areas, list):
             feedback("The areas specified for Extract must be a list.", True)
@@ -1600,11 +1769,42 @@ def Extract(pages: object, **kwargs):
                     f' not "{_cols_rows}".',
                     True,
                 )
+    if cards:
+        if height > globals.page_height:
+            feedback(
+                "The height specified for Extract is greater than the page height",
+                True,
+            )
+        if width > globals.page_width:
+            feedback(
+                "The width specified for Extract is greater than the page width",
+                True,
+            )
+        if tl_y > globals.page_height:
+            feedback(
+                "The y specified for Extract is greater than the page height",
+                True,
+            )
+        if tl_x > globals.page_width:
+            feedback(
+                "The x specified for Extract is greater than the page width",
+                True,
+            )
+        if gap_y > globals.page_height:
+            feedback(
+                "The y_gap specified for Extract is greater than the page height",
+                True,
+            )
+        if gap_x > globals.page_width:
+            feedback(
+                "The x_gap specified for Extract is greater than the page width",
+                True,
+            )
 
     extract_dict = globals.extracts
     name_idx = 0
     for _page in _pages:
-        if _page in extract_dict:
+        if _page in extract_dict or "*" in extract_dict or "all" in extract_dict:
             data = extract_dict[_page]
         else:
             data = []
@@ -1633,7 +1833,7 @@ def Extract(pages: object, **kwargs):
                 xr = globals.units * area[2]
                 yb = globals.units * area[3]
                 data.append((BBox(tl=Point(xl, yt), br=Point(xr, yb)), name))
-        elif _cols_rows:
+        elif cols_rows:
             col_width = globals.page[0] / _cols_rows[0]
             row_width = globals.page[1] / _cols_rows[1]
             for col in range(0, _cols_rows[0]):
@@ -1648,9 +1848,42 @@ def Extract(pages: object, **kwargs):
                         name = None
                     name_idx += 1
                     data.append((BBox(tl=Point(xl, yt), br=Point(xr, yb)), name))
+        elif cards:
+            _height = height * globals.units
+            _width = width * globals.units
+            _gap_x = gap_x * globals.units
+            _gap_y = gap_y * globals.units
+
+            start_y = tl_y * globals.units
+            while start_y + _height < globals.page[1]:
+                start_x = tl_x * globals.units
+                while start_x + _width < globals.page[0]:
+                    try:
+                        name = names[name_idx]
+                    except IndexError:
+                        name = None
+                    name_idx += 1
+                    data.append(
+                        (
+                            BBox(
+                                tl=Point(start_x, start_y),
+                                br=Point(start_x + _width, start_y + _height),
+                            ),
+                            name,
+                        )
+                    )
+                    start_x = start_x + _width + _gap_x
+                    if not repeat:
+                        break
+                start_y = start_y + _height + _gap_y
+                if not repeat:
+                    break
         else:
             pass
-        globals.extracts[_page - 1] = data
+        if isinstance(_page, int):
+            globals.extracts[_page - 1] = data
+        else:
+            globals.extracts[_page] = data  # handle `*` and `all`
 
 
 def extract(pages: object, **kwargs):
@@ -1748,6 +1981,9 @@ def Save(**kwargs):
     try:
         globals.document.subset_fonts(verbose=True)  # subset fonts to reduce file size
         globals.document.save(output_filepath)
+    # TODO - allow appending?
+    except ValueError as err:
+        feedback(f'Unable to overwrite "{output_filepath}"', False, True)
     except RuntimeError as err:
         feedback(f'Unable to save "{output_filepath}" - {err} - {msg}', True)
     except FileNotFoundError as err:
