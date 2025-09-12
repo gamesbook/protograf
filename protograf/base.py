@@ -463,12 +463,16 @@ class BaseCanvas:
         self.stripes = self.defaults.get("stripes", 0)
         self.stripes_directions = self.defaults.get("stripes_directions", "n")
         self.stripes_fill = self.defaults.get("stripes_fill", self.fill)
+        self.stripes_flush = self.defaults.get("stripes_flush", False)
+        self.stripes_transparency = self.defaults.get(
+            "stripes_transparency", 1
+        )  # NOT transparent
         self.stripes_stroke = self.defaults.get("stripes_stroke", self.stroke)
         self.stripes_stroke_width = self.defaults.get(
             "stripes_stroke_width", self.stroke_width
         )
-        self.stripes_breadth = self.defaults.get("stripes_breadth", None)  # default: edge
-        self.stripes_buffer = self.defaults.get("stripes_buffer", None)  # default: edge
+        self.stripes_breadth = self.defaults.get("stripes_breadth", 1)
+        self.stripes_buffer = self.defaults.get("stripes_buffer", None)
         self.stripes_dotted = self.defaults.get("stripes_dotted", self.dotted)
         self.stripes_dashed = self.defaults.get("stripes_dashed", self.dashed)
         # ---- petals - circle
@@ -912,7 +916,9 @@ class BaseShape:
             kwargs.get("chevron_height", base.chevron_height)
         )
         self.corners = self.kw_float(kwargs.get("corners", base.corners))
-        self.corners_directions = kwargs.get("corners_directions", base.corners_directions)
+        self.corners_directions = kwargs.get(
+            "corners_directions", base.corners_directions
+        )
         self.corners_x = self.kw_float(kwargs.get("corners_x", base.corners_x))
         self.corners_y = self.kw_float(kwargs.get("corners_y", base.corners_y))
         self.corners_style = kwargs.get("corners_style", base.corners_style)
@@ -1017,7 +1023,11 @@ class BaseShape:
         self.stripes_directions = kwargs.get(
             "stripes_directions", base.stripes_directions
         )
+        self.stripes_flush = kwargs.get("stripes_flush", base.stripes_flush)
         self.stripes_fill = kwargs.get("stripes_fill", base.fill)
+        self.stripes_transparency = self.kw_float(
+            kwargs.get("stripes_transparency"), base.stripes_transparency
+        )
         self.stripes_stroke = kwargs.get("stripes_stroke", base.stroke)
         self.stripes_stroke_width = self.kw_float(
             kwargs.get("stripes_stroke_width", base.stripes_stroke_width)

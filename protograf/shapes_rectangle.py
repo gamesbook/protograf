@@ -687,7 +687,9 @@ class RectangleShape(BaseShape):
             num: number of lines
             rotation: degrees anti-clockwise from horizontal "east"
         """
-        _dirs = tools.validated_directions(self.hatches, DirectionGroup.CIRCULAR, "hatches")
+        _dirs = tools.validated_directions(
+            self.hatches, DirectionGroup.CIRCULAR, "hatches"
+        )
         lines = tools.as_int(num, "hatches_count")
         # ---- check dirs
         if self.rounding or self.rounded:
@@ -801,7 +803,7 @@ class RectangleShape(BaseShape):
 
         Args:
             ID: unique ID
-            centre: the centre Point of the Rectangle
+            centre (Point): the centre Point of the Rectangle
             rotation: degrees anti-clockwise from horizontal "east"
 
         Notes:
@@ -997,17 +999,29 @@ class RectangleShape(BaseShape):
         """Draw tetragons between two sides of a Rectangle.
 
         Args:
-            ID: unique ID
-            vertices: the rectangle's nodes
-            num: number of stripes
-            rotation: degrees anti-clockwise from horizontal "east"
+            cnv: PyMuPDF Page object
+            ID (int): unique ID
+            vertices (list): the Rectangle's nodes
+            rotation (float): degrees anti-clockwise from horizontal "east"
         """
+        # ---- basic checks
         _dirs = tools.validated_directions(
             self.stripes_directions, DirectionGroup.CIRCULAR, "stripes directions"
         )
+        if not _dirs:
+            _dirs = ["n"]  # default
         lines = tools.as_int(self.stripes, "stripes")
-        # ---- check dirs
+        if lines % 2 == 0 or lines < 1:
+            feedback(
+                f"Stripes must be an odd number, greater than zero (not {lines}).", True
+            )
+        # ---- check rounding limits
         if self.rounding or self.rounded:
+            if self.stripes_flush:
+                feedback(
+                    "No flush stripes permissible with rounding in the rectangle",
+                    True,
+                )
             if (
                 "ne" in _dirs
                 or "sw" in _dirs
@@ -1019,19 +1033,55 @@ class RectangleShape(BaseShape):
                     "No diagonal stripes permissible with rounding in the rectangle",
                     True,
                 )
-        # ---- check spaces
+        # ---- calculate gaps and breadth
+        default_breadth = min(self.height, self.width) / 2.0
+        _breadth = self.unit(self.stripes_breadth or default_breadth)
+        if lines == 1:
+            gaps = 2
+        else:
+            if self.stripes_flush:
+                gaps = lines - 1
+            else:
+                gaps = lines + 1
+        # ---- calculate and check gap size
+        over_allocated = False
+        allocations = []
+        if "n" in _dirs or "s" in _dirs:
+            space_vert = self._u.height
+            allocations.append(space_vert)
+        if "e" in _dirs or "w" in _dirs:
+            space_horiz = self._u.width
+            allocations.append(space_horiz)
+        if "o" in _dirs:
+            space_ortho = min(self._u.height, self._u.width)
+            allocations.append(space_ortho)
+        if "ne" in _dirs or "sw" in _dirs or "nw" in _dirs or "se" in _dirs:
+            x, y = self.calculate_xy()
+            space_diag = geoms.length_of_line(
+                Point(x, y), Point(x + self._u.width, y + self._u.height)
+            )
+            allocations.append(space_diag)
+        space_min = min(allocations)
+        gap_size_min = (space_min - lines * _breadth) / gaps  # also calc per dir
+        if lines * _breadth > space_min:
+            feedback(
+                f"The number ({lines}) and breadth ({self.stripes_breadth}) of stripes"
+                " together exceeds the available space!",
+                True,
+            )
+        # ---- check space available vs round corners
         if self.rounding or self.rounded:
-            spaces = max(self._u.width / (lines + 1), self._u.height / (lines + 1))
             if self.rounding:
                 _rounding = self.unit(self.rounding)
             elif self.rounded:
                 _rounding = self._u.width * 0.08
-            if spaces < _rounding:
+            if gap_size_min < _rounding:
                 feedback(
-                    "No stripes permissible with this size of rounding in a rectangle",
+                    "No stripes permissible with this size of rounding in a Rectangle",
                     True,
                 )
-        if self.notch and self.stripes > 1 or self.notch_x or self.notch_y:
+        # ---- notches
+        if self.notch and self.stripes > 0 or self.notch_x or self.notch_y:
             if (
                 "ne" in _dirs
                 or "sw" in _dirs
@@ -1040,7 +1090,7 @@ class RectangleShape(BaseShape):
                 or "d" in _dirs
             ):
                 feedback(
-                    "Multi-diagonal stripes not permissible in a notched Rectangle",
+                    "Stripes not permissible in a notched Rectangle",
                     True,
                 )
         # ---- draw items
@@ -1107,6 +1157,7 @@ class RectangleShape(BaseShape):
             fill=self.stripes_fill,
             stroke=self.stripes_stroke,
             stroke_width=self.stripes_stroke_width,
+            transparency=self.stripes_transparency,
             dashed=self.stripes_dashed,
             dotted=self.stripes_dotted,
             rotation=rotation,

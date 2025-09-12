@@ -1304,7 +1304,9 @@ class HexShape(BaseShape):
                         feedback(
                             "hatches count must be an odd number for a Hexagon", True
                         )
-                    self.draw_hatches(cnv, ID, geo.side, self.vertexes, self.hatches_count)
+                    self.draw_hatches(
+                        cnv, ID, geo.side, self.vertexes, self.hatches_count
+                    )
             if item == "links":
                 # ---- * draw links
                 if self.links:

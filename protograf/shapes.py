@@ -850,7 +850,9 @@ class EquilateralTriangleShape(BaseShape):
         self._debug(cnv, vertices=self.vertexes)
         # ---- draw hatches
         if self.hatches_count:
-            self.draw_hatches(cnv, ID, side, self.vertexes, self.hatches_count, rotation)
+            self.draw_hatches(
+                cnv, ID, side, self.vertexes, self.hatches_count, rotation
+            )
         # ---- centred shape (with offset)
         if self.centre_shape:
             if self.can_draw_centred_shape(self.centre_shape):
