@@ -1028,7 +1028,9 @@ class BaseShape:
         self.stripes_transparency = self.kw_float(
             kwargs.get("stripes_transparency"), base.stripes_transparency
         )
-        self.stripes_stroke = kwargs.get("stripes_stroke", base.stroke)
+        self.stripes_stroke = kwargs.get(
+            "stripes_stroke", kwargs.get("stripes_fill", base.stroke)
+        )
         self.stripes_stroke_width = self.kw_float(
             kwargs.get("stripes_stroke_width", base.stripes_stroke_width)
         )
