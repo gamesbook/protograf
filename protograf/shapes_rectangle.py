@@ -46,6 +46,18 @@ log = logging.getLogger(__name__)
 DEBUG = False
 
 
+def _sin(degrees: float) -> float:
+    return math.sin(math.radians(degrees))
+
+
+def _cos(degrees: float) -> float:
+    return math.cos(math.radians(degrees))
+
+
+def _tan(degrees: float) -> float:
+    return math.tan(math.radians(degrees))
+
+
 class RectangleShape(BaseShape):
     """
     Rectangle on a given canvas.
@@ -1103,44 +1115,65 @@ class RectangleShape(BaseShape):
         # ---- draw items
         if lines >= 1:
             # ---- * diagonal DOWN
-            if "se" in _dirs or "nw" in _dirs or "d" in _dirs:
-                gap_size = (space_diag - lines * _breadth) / gaps  # calc per dir
+            if "nw" in _dirs or "se" in _dirs or "d" in _dirs:
+                # interior angles
+                _, alpha = geoms.angles_from_points(  # diag_angle
+                    Point(vertices[0].x, vertices[0].y),
+                    Point(vertices[2].x, vertices[2].y),
+                )
+                kappa = 180 - alpha
+                zeta = 90 - alpha
+                beta = kappa - alpha
+                # print(f'*** NW angles {kappa=} {alpha=} {zeta=} {beta=}')
+                # line spacing
+                d_breadth = _breadth / _sin(beta)
+                gap_size = (space_diag - lines * d_breadth) / gaps  # calc for ne/sw
+                # print(f'*** NW lines {_breadth=} {d_breadth=} {gap_size=}')
+                off_y = gap_size / _sin(zeta)
+                off_x = gap_size / _sin(alpha)
+                stripe_y = _breadth / _sin(zeta)
+                stripe_x = _breadth / _sin(alpha)
+                # print(f'*** NW deltas {off_x=} {off_y=} {stripe_x=} {stripe_y=}')
+
                 if self.stripes_flush:
                     x_offset = 0
+                    y_offset = 0
                 else:
                     x_offset = gap_size
-                alpha = math.sqrt(_breadth * _breadth / 2.0)
+                    y_offset = gap_size
+
                 # primary diagonal (always)
+                prime_y = (_breadth / 2.0) / _sin(zeta)
+                prime_x = (_breadth / 2.0) / _sin(90 - zeta)
+                # print(f'*** NW primary {prime_x=} {prime_y=}')
                 vertexes = [
                     (vertices[0].x, vertices[0].y),
-                    (vertices[0].x, vertices[0].y + alpha),
-                    (vertices[2].x - alpha, vertices[2].y),
+                    (vertices[0].x, vertices[0].y + prime_y),
+                    (vertices[2].x - prime_x, vertices[2].y),
                     (vertices[2].x, vertices[2].y),
-                    (vertices[2].x, vertices[2].y - alpha),
-                    (vertices[0].x + alpha, vertices[0].y),
+                    (vertices[2].x, vertices[2].y - prime_y),
+                    (vertices[0].x + prime_x, vertices[0].y),
                     (vertices[0].x, vertices[0].y),
                 ]
                 cnv.draw_polyline(vertexes)
                 # secondary diagonals
                 if lines > 1:
-                    _, diag_angle = geoms.angles_from_points(
-                        Point(vertices[0].x, vertices[0].y),
-                        Point(vertices[2].x, vertices[2].y),
-                    )
-                    theta = math.radians(180 - diag_angle)
-                    delta = _breadth / math.sin(theta)  # length of line along a side
-                    beta = gap_size / math.sin(theta)  # gap between lines along a side
-
-                    # first offset line
+                    # first offset line: below
                     vertexes = [
-                        (vertices[0].x, vertices[0].y + alpha + beta),
-                        (vertices[0].x, vertices[0].y + alpha + beta + delta),
-                        (vertices[2].x - alpha - beta - delta, vertices[2].y),
-                        (vertices[2].x - alpha - beta, vertices[2].y),
+                        (vertices[0].x, vertices[0].y + prime_y + off_y),
+                        (vertices[0].x, vertices[0].y + prime_y + off_y + stripe_y),
+                        (vertices[2].x - prime_x - off_x - stripe_x, vertices[2].y),
+                        (vertices[2].x - prime_x - off_x, vertices[2].y),
                     ]
                     cnv.draw_polyline(vertexes)
-
-                    pass
+                    # first offset line: above
+                    vertexes = [
+                        (vertices[0].x + prime_x + off_x, vertices[0].y),
+                        (vertices[2].x, vertices[2].y - prime_y - off_y),
+                        (vertices[2].x, vertices[2].y - prime_y - off_y - stripe_y),
+                        (vertices[0].x + prime_x + off_x + stripe_x, vertices[0].y),
+                    ]
+                    cnv.draw_polyline(vertexes)
             # ---- * diagonal UP
             if "sw" in _dirs or "ne" in _dirs or "d" in _dirs:
                 gap_size = (space_diag - lines * _breadth) / gaps  # calc per dir
