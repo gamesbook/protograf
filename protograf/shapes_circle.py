@@ -617,7 +617,7 @@ class CircleShape(BaseShape):
                 ordering = tools.list_ordering(base_ordering, self.order_last, end=True)
         # feedback(f'*** Circle: {ordering=}')
 
-        # ---- ORDERING
+        # ---- draw in ORDER
         for item in ordering:
             if item == "petals":
                 # ---- * draw petals

@@ -1215,7 +1215,7 @@ class HexShape(BaseShape):
                 ordering = tools.list_ordering(base_ordering, self.order_last, end=True)
         # feedback(f'*** Hexagon: {ordering=}')
 
-        # ---- ORDERING
+        # ---- draw in ORDER
         for item in ordering:
             if item == "base":
                 # ---- * hexagon with caltrops

@@ -319,6 +319,48 @@ Rectangle(common=styles, y=3.75, corners_style='curve', label='Corner: curve (s)
 Rectangle(common=styles, y=5, corners_style='photo', label='Corner: photo (p)')
 PageBreak()
 
+# ---- stripes
+Text(common=txt, text="Rectangle: stripes")
+Blueprint(stroke_width=0.5)
+strp = Common(
+    height=1.75, width=1.25,
+    stripes=3,
+    stripes_breadth=0.2,
+    stripes_stroke="red",
+    stripes_fill="gold"
+)
+Rectangle(common=strp, x=0, y=0, stripes_directions='w', label="W")
+Rectangle(common=strp, x=1.5, y=0, stripes_directions='e', label="E")
+Rectangle(common=strp, x=3, y=0, stripes_directions='ne', label="ne/sw")
+Rectangle(common=strp, x=1.5, y=2, stripes_directions='s', label="S")
+Rectangle(common=strp, x=0, y=2, stripes_directions='n', label="N")
+Rectangle(common=strp, x=3, y=2, stripes_directions='nw', label="nw/se")
+Rectangle(common=strp, x=0, y=4, stripes_directions='*', label="all")
+Rectangle(common=strp, x=1.5, y=4, stripes_directions='o', label="O")
+Rectangle(common=strp, x=3, y=4, stripes_directions='d', label="D")
+PageBreak()
+
+# ---- stripes_flush
+Text(common=txt, text="Rectangle: stripes (flush)")
+Blueprint(stroke_width=0.5)
+strp = Common(
+    height=1.75, width=1.25,
+    stripes=3,
+    stripes_breadth=0.2,
+    stripes_stroke="red",
+    stripes_fill="aqua",
+    stripes_flush=True
+)
+Rectangle(common=strp, x=0, y=0, stripes_directions='w', label="W")
+Rectangle(common=strp, x=1.5, y=0, stripes_directions='e', label="E")
+Rectangle(common=strp, x=3, y=0, stripes_directions='ne', label="ne/sw")
+Rectangle(common=strp, x=1.5, y=2, stripes_directions='', label="S")
+Rectangle(common=strp, x=0, y=2, stripes_directions='n', label="N")
+Rectangle(common=strp, x=3, y=2, stripes_directions='nw', label="nw/se")
+Rectangle(common=strp, x=0, y=4,  stripes_directions='*', label="all")
+Rectangle(common=strp, x=1.5, y=4, stripes_directions='o', label="O")
+Rectangle(common=strp, x=3, y=4, stripes_directions='d', label="D")
+PageBreak()
 
 # ---- END
 Text(common=txt, text="Rectangle END...")
@@ -338,4 +380,5 @@ Save(
         "slices", "slices_custom",
         "prows_defaults", "prows_inwards", "prows_outwards",
         "corners",
+        "stripes", "stripes_flush",
         None])

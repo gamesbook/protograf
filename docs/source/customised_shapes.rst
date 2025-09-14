@@ -608,6 +608,7 @@ that it can be customised.
 - `Rotation <rectRotation_>`_
 - `Rounding <rectRounding_>`_
 - `Slices <rectSlices_>`_
+- `Stripes <rectStripes_>`_
 - `Ordering of Properties <rectOrder_>`_
 
 .. _rectCentred:
@@ -1512,6 +1513,106 @@ colored triangular or quadilateral shapes.
 ===== ======
 
 
+.. _rectStripes:
+
+Stripes
+-------
+`^ <rectangleIndex_>`_
+
+Stripes are a set of parallel areas that are drawn, in a specified direction, across
+the length or width of the Rectangle in vertical, horizontal or diagonal directions.
+
+The key properties to draw stripes are:
+
+- *stripes* - sets the **number** of stripes to be drawn; the intervals
+  between them are calculated equally and depend on the direction
+- *stripes_directions* - sets the compass direction for the stripes to be
+  drawn; defaults to the ``n`` (North)
+- *stripes_breadth* - sets **width** of the stripe to be drawn; defaults to
+  ``1``
+
+In addition, the usual properties for stroke, stroke_width, fill and
+transparency can also be set.
+
+
+.. |rs1| image:: images/custom/rectangle/stripes.png
+   :width: 330
+
+===== ======
+|rs1| This example shows Rectangles constructed using these commands:
+
+      .. code:: python
+
+        strp = Common(
+           height=1.75, width=1.25,
+           stripes=3,
+           stripes_breadth=0.2,
+           stripes_stroke="red",
+           stripes_fill="gold"
+
+        Rectangle(
+          common=strp, x=0, y=0,
+          stripes_directions='w', label="W")
+        Rectangle(
+          common=strp, x=1.5, y=0,
+          stripes_directions='e', label="E")
+        Rectangle(
+          common=strp, x=3, y=0,
+          stripes_directions='ne', label="NE\nSW")
+
+        Rectangle(
+          common=strp, x=0, y=2,
+          stripes_directions='s', label="S")
+        Rectangle(
+          common=strp, x=1.5, y=2,
+          stripes_directions='n', label="N")
+        Rectangle(
+          common=strp, x=3, y=2,
+          stripes_directions='nw', label="NW\nSE")
+
+        Rectangle(
+          common=strp, x=0, y=4,
+          stripes_directions='*',
+          label="all")
+        Rectangle(
+          common=strp, x=1.5, y=4,
+          stripes_directions='o', label="O")
+        Rectangle(
+          common=strp, x=3, y=4,
+          stripes_directions='d', label="D")
+
+      These Rectangles all share the following Common properties that
+      differ from the defaults:
+
+      - *height* and *width* - set the basic configuration
+      - *stripes* - sets the **number** of stripes to be drawn; the
+        intervals between them are equal and depend on the direction
+      - *stripes_breadth* - sets **width** of the stripe to be drawn
+      - *stripes_stroke* - set to the color ``red`` to make it stand out
+        from the rectangle sides
+      - *stripes_fill* - set to the color ``gold``
+
+      Each Rectangle has its own setting for:
+
+      - *x* and *y* - different positions on the page for the upper-left
+        corner
+      - *label* - text to help identify it
+      - *stripes_directions* - if not specified, stripes will be drawn
+        in the ``n`` (North) direction |dash|:
+
+        - ``n`` (North) or ``s`` (South) draws vertical lines;
+        - ``w`` (West) or ``e`` (East) draws horizontal lines;
+        - ``nw`` (North-West) or ``se`` (South-East) draws diagonal lines
+          from top-left to bottom-right;
+        - ``ne`` (North-East) or ``sw`` (South-West) draws diagonal lines
+          from bottom-left to top-right;
+        - ``o`` (orthogonal) draws vertical **and** horizontal lines;
+        - ``d`` (diagonal) draws diagonal lines between adjacent sides;
+        - ``*`` draws diagonal **and** othorgonal lines between **all** sides.
+
+===== ======
+
+
 .. _rectBorders:
 
 Borders
@@ -1610,6 +1711,7 @@ The available property names, shown in their default order, are:
    *prow* settings
 #. pattern
 #. slices
+#. stripes
 #. hatches
 #. radii
 #. centre_shape

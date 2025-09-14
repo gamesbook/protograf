@@ -1016,12 +1016,34 @@ class RectangleShape(BaseShape):
             vertices (list): the Rectangle's nodes
             rotation (float): degrees anti-clockwise from horizontal "east"
         """
+
+        def apply_props(cx, cy):
+            self.set_canvas_props(
+                index=ID,
+                fill=self.stripes_fill,
+                stroke=self.stripes_stroke,
+                stroke_width=self.stripes_stroke_width,
+                transparency=self.stripes_transparency,
+                dashed=self.stripes_dashed,
+                dotted=self.stripes_dotted,
+                rotation=rotation,
+                rotation_point=muPoint(cx, cy),
+                closed=True,
+            )
+
+        # ---- set canvas
+        cx = vertices[0].x + 0.5 * self._u.width
+        cy = vertices[0].y + 0.5 * self._u.height
         # ---- basic checks
         _dirs = tools.validated_directions(
             self.stripes_directions, DirectionGroup.CIRCULAR, "stripes directions"
         )
         if not _dirs:
             _dirs = ["n"]  # default
+        if "*" in _dirs or "all" in _dirs:
+            is_all = True
+        else:
+            is_all = False
         lines = tools.as_int(self.stripes, "stripes")
         if lines % 2 == 0 or lines < 1:
             feedback(
@@ -1071,10 +1093,10 @@ class RectangleShape(BaseShape):
         # ---- calculate and check gap size
         over_allocated = False
         allocations = []
-        if "n" in _dirs or "s" in _dirs or "*" in _dirs or "o" in _dirs:
+        if "n" in _dirs or "s" in _dirs or "o" in _dirs or is_all:
             space_horz = self._u.width
             allocations.append(space_horz)
-        if "e" in _dirs or "w" in _dirs or "*" in _dirs or "o" in _dirs:
+        if "e" in _dirs or "w" in _dirs or "o" in _dirs or is_all:
             space_vert = self._u.height
             allocations.append(space_vert)
         if "o" in _dirs:
@@ -1085,7 +1107,7 @@ class RectangleShape(BaseShape):
             or "sw" in _dirs
             or "nw" in _dirs
             or "se" in _dirs
-            or "*" in _dirs
+            or is_all
             or "d" in _dirs
         ):
             x, y = self.calculate_xy()
@@ -1114,25 +1136,32 @@ class RectangleShape(BaseShape):
                 )
         # ---- draw items
         if lines >= 1:
-            # ---- * diagonal DOWN
-            if "nw" in _dirs or "se" in _dirs or "d" in _dirs:
+            # ---- supports
+            if (
+                "nw" in _dirs
+                or "se" in _dirs
+                or "sw" in _dirs
+                or "ne" in _dirs
+                or "d" in _dirs
+                or is_all
+            ):
                 # interior angles
-                _, alpha = geoms.angles_from_points(  # diag_angle
+                _, alpha = geoms.angles_from_points(  # diag. angle; interior; upwards
                     Point(vertices[0].x, vertices[0].y),
                     Point(vertices[2].x, vertices[2].y),
                 )
-                kappa = 180 - alpha
-                zeta = 90 - alpha
+                kappa = 180 - alpha  # diag. angle measured from zero east
+                zeta = 90 - alpha  # diag. angle; interior; downwards
                 beta = kappa - alpha
                 # print(f'*** NW angles {kappa=} {alpha=} {zeta=} {beta=}')
                 # line spacing
-                d_breadth = _breadth / _sin(beta)
+                d_breadth = _breadth / _sin(beta)  # stripe "width" along diag. angle
                 gap_size = (space_diag - lines * d_breadth) / gaps  # calc for ne/sw
                 # print(f'*** NW lines {_breadth=} {d_breadth=} {gap_size=}')
-                off_y = gap_size / _sin(zeta)
-                off_x = gap_size / _sin(alpha)
-                stripe_y = _breadth / _sin(zeta)
-                stripe_x = _breadth / _sin(alpha)
+                off_y = gap_size / _sin(zeta)  # gap length between stripes on V-edge
+                off_x = gap_size / _sin(alpha)  # gap length between stripes on H-edge
+                stripe_y = _breadth / _sin(zeta)  # stripe length intersecting V-edge
+                stripe_x = _breadth / _sin(alpha)  # stripe length intersecting H-edge
                 # print(f'*** NW deltas {off_x=} {off_y=} {stripe_x=} {stripe_y=}')
 
                 if self.stripes_flush:
@@ -1145,58 +1174,82 @@ class RectangleShape(BaseShape):
                 # primary diagonal (always)
                 prime_y = (_breadth / 2.0) / _sin(zeta)
                 prime_x = (_breadth / 2.0) / _sin(90 - zeta)
-                # print(f'*** NW primary {prime_x=} {prime_y=}')
-                vertexes = [
-                    (vertices[0].x, vertices[0].y),
-                    (vertices[0].x, vertices[0].y + prime_y),
-                    (vertices[2].x - prime_x, vertices[2].y),
-                    (vertices[2].x, vertices[2].y),
-                    (vertices[2].x, vertices[2].y - prime_y),
-                    (vertices[0].x + prime_x, vertices[0].y),
-                    (vertices[0].x, vertices[0].y),
-                ]
-                cnv.draw_polyline(vertexes)
-                # secondary diagonals
-                if lines > 1:
-                    # first offset line: below
-                    vertexes = [
-                        (vertices[0].x, vertices[0].y + prime_y + off_y),
-                        (vertices[0].x, vertices[0].y + prime_y + off_y + stripe_y),
-                        (vertices[2].x - prime_x - off_x - stripe_x, vertices[2].y),
-                        (vertices[2].x - prime_x - off_x, vertices[2].y),
-                    ]
-                    cnv.draw_polyline(vertexes)
-                    # first offset line: above
-                    vertexes = [
-                        (vertices[0].x + prime_x + off_x, vertices[0].y),
-                        (vertices[2].x, vertices[2].y - prime_y - off_y),
-                        (vertices[2].x, vertices[2].y - prime_y - off_y - stripe_y),
-                        (vertices[0].x + prime_x + off_x + stripe_x, vertices[0].y),
-                    ]
-                    cnv.draw_polyline(vertexes)
+                # secondary diagonals (sometimes)
+                diagonals_per_side = int((self.stripes - 1) / 2)
+                # print(f'*** NW primary {diagonals_per_side=}')
+
             # ---- * diagonal UP
-            if "sw" in _dirs or "ne" in _dirs or "d" in _dirs:
-                gap_size = (space_diag - lines * _breadth) / gaps  # calc per dir
-                if self.stripes_flush:
-                    x_offset = 0
-                else:
-                    x_offset = gap_size
-                alpha = math.sqrt(_breadth * _breadth / 2.0)
+            if "sw" in _dirs or "ne" in _dirs or "d" in _dirs or is_all:
                 # primary diagonal (always)
-                vertexes = [
-                    (vertices[1].x, vertices[1].y),
-                    (vertices[1].x + alpha, vertices[1].y),
-                    (vertices[3].x, vertices[3].y + alpha),
-                    (vertices[3].x, vertices[3].y),
-                    (vertices[3].x - alpha, vertices[3].y),
-                    (vertices[1].x, vertices[1].y - alpha),
-                ]
+                # print(f'*** NW primary {prime_x=} {prime_y=}')
+                p1 = Point(vertices[3].x, vertices[3].y)
+                pb2 = Point(vertices[3].x, vertices[3].y + prime_y)
+                pb3 = Point(vertices[1].x + prime_x, vertices[1].y)
+                p4 = Point(vertices[1].x, vertices[1].y)
+                pu3 = Point(vertices[1].x, vertices[1].y - prime_y)
+                pu4 = Point(vertices[3].x - prime_x, vertices[3].y)
+                vertexes = [p1, pb2, pb3, p4, pu3, pu4, p1]
                 cnv.draw_polyline(vertexes)
-                # secondary diagonals
-                if lines > 1:
-                    pass
+                apply_props(cx, cy)
+                # self._debug(cnv, vertices=vertexes)
+
+                # secondary diagonals (sometimes)
+                for each_stripe in range(0, diagonals_per_side):
+                    # offset line: below
+                    p1 = Point(vertices[3].x, pb2.y + off_y)
+                    pb2 = Point(vertices[3].x, pb2.y + off_y + stripe_y)
+                    p4 = Point(pb3.x + off_x, vertices[1].y)
+                    pb3 = Point(pb3.x + off_x + stripe_x, vertices[1].y)
+                    vertexes = [p1, pb2, pb3, p4, p1]
+                    cnv.draw_polyline(vertexes)
+                    # print(f'NE offset below: {vertexes=}')
+                    # offset line: above
+                    p1 = Point(pu4.x - off_x, vertices[3].y)
+                    p2 = Point(vertices[1].x, pu3.y - off_y)
+                    pu3 = Point(vertices[1].x, pu3.y - off_y - stripe_y)
+                    pu4 = Point(pu4.x - off_x - stripe_x, vertices[3].y)
+                    vertexes = [p1, p2, pu3, pu4, p1]
+                    cnv.draw_polyline(vertexes)
+                    # print(f'NW offset above: {vertexes=}')
+                apply_props(cx, cy)
+
+            # ---- * diagonal DOWN
+            if "nw" in _dirs or "se" in _dirs or "d" in _dirs or is_all:
+                # primary diagonal (always)
+                # print(f'*** NW primary {prime_x=} {prime_y=}')
+                p1 = Point(vertices[0].x, vertices[0].y)
+                pb2 = Point(vertices[0].x, vertices[0].y + prime_y)
+                pb3 = Point(vertices[2].x - prime_x, vertices[2].y)
+                p4 = Point(vertices[2].x, vertices[2].y)
+                pu3 = Point(vertices[2].x, vertices[2].y - prime_y)
+                pu4 = Point(vertices[0].x + prime_x, vertices[0].y)
+                vertexes = [p1, pb2, pb3, p4, pu3, pu4, p1]
+                cnv.draw_polyline(vertexes)
+                apply_props(cx, cy)
+
+                # secondary diagonals (sometimes)
+                for each_stripe in range(0, diagonals_per_side):
+                    # offset line: below
+                    p1 = Point(vertices[0].x, pb2.y + off_y)
+                    pb2 = Point(vertices[0].x, pb2.y + off_y + stripe_y)
+                    p4 = Point(pb3.x - off_x, vertices[2].y)
+                    pb3 = Point(pb3.x - off_x - stripe_x, vertices[2].y)
+                    vertexes = [p1, pb2, pb3, p4, p1]
+                    cnv.draw_polyline(vertexes)
+                    apply_props(cx, cy)
+                    # print(f'NW offset below: {vertexes=}')
+                    # offset line: above
+                    p1 = Point(pu4.x + off_x, vertices[0].y)
+                    p2 = Point(vertices[2].x, pu3.y - off_y)
+                    pu3 = Point(vertices[2].x, pu3.y - off_y - stripe_y)
+                    pu4 = Point(pu4.x + off_x + stripe_x, vertices[0].y)
+                    vertexes = [p1, p2, pu3, pu4, p1]
+                    cnv.draw_polyline(vertexes)
+                    # print(f'NW offset above: {vertexes=}')
+                apply_props(cx, cy)
+
             # ---- * vertical
-            if "n" in _dirs or "s" in _dirs or "o" in _dirs:  # vertical
+            if "n" in _dirs or "s" in _dirs or "o" in _dirs or is_all:  # vertical
                 gap_size = (space_horz - lines * _breadth) / gaps  # calc per dir
                 if self.stripes_flush:
                     x_offset = 0
@@ -1213,8 +1266,10 @@ class RectangleShape(BaseShape):
                             vertices[1].y,
                         ),
                     )
+                apply_props(cx, cy)
+
             # ---- * horizontal
-            if "e" in _dirs or "w" in _dirs or "o" in _dirs:
+            if "e" in _dirs or "w" in _dirs or "o" in _dirs or is_all:
                 gap_size = (space_vert - lines * _breadth) / gaps  # calc per dir
                 if self.stripes_flush:
                     y_offset = 0
@@ -1231,54 +1286,7 @@ class RectangleShape(BaseShape):
                             vertices[0].y + i * delta_y + y_offset + _breadth,
                         ),
                     )
-
-        # if lines >= 1:
-        #     diag_num = int((lines - 1) / 2 + 1)
-        #     x_dist = self._u.width / diag_num
-        #     y_dist = self._u.height / diag_num
-        #     top_pt, btm_pt, left_pt, rite_pt = [], [], [], []
-        #     for number in range(0, diag_num + 1):
-        #         left_pt.append(
-        #             geoms.point_on_line(vertices[0], vertices[1], y_dist * number)
-        #         )
-        #         top_pt.append(
-        #             geoms.point_on_line(vertices[1], vertices[2], x_dist * number)
-        #         )
-        #         rite_pt.append(
-        #             geoms.point_on_line(vertices[3], vertices[2], y_dist * number)
-        #         )
-        #         btm_pt.append(
-        #             geoms.point_on_line(vertices[0], vertices[3], x_dist * number)
-        #         )
-
-        # if "se" in _dirs or "nw" in _dirs or "d" in _dirs:  # slope UP to the right
-        #     for i in range(1, diag_num):  # top-left side
-        #         j = diag_num - i
-        #         cnv.draw_line((left_pt[i].x, left_pt[i].y), (top_pt[j].x, top_pt[j].y))
-        #     for i in range(1, diag_num):  # bottom-right side
-        #         j = diag_num - i
-        #         cnv.draw_line((btm_pt[i].x, btm_pt[i].y), (rite_pt[j].x, rite_pt[j].y))
-        # if "ne" in _dirs or "sw" in _dirs or "d" in _dirs:  # slope down to the right
-        #     for i in range(1, diag_num):  # bottom-left side
-        #         cnv.draw_line((left_pt[i].x, left_pt[i].y), (btm_pt[i].x, btm_pt[i].y))
-        #     for i in range(1, diag_num):  # top-right side
-        #         cnv.draw_line((top_pt[i].x, top_pt[i].y), (rite_pt[i].x, rite_pt[i].y))
-
-        # ---- set canvas
-        cx = vertices[0].x + 0.5 * self._u.width
-        cy = vertices[0].y + 0.5 * self._u.height
-        self.set_canvas_props(
-            index=ID,
-            fill=self.stripes_fill,
-            stroke=self.stripes_stroke,
-            stroke_width=self.stripes_stroke_width,
-            transparency=self.stripes_transparency,
-            dashed=self.stripes_dashed,
-            dotted=self.stripes_dotted,
-            rotation=rotation,
-            rotation_point=muPoint(cx, cy),
-            closed=True,
-        )
+                apply_props(cx, cy)
 
     def draw(self, cnv=None, off_x=0, off_y=0, ID=None, **kwargs):
         """Draw a rectangle on a given canvas."""
@@ -1632,7 +1640,7 @@ class RectangleShape(BaseShape):
             if self.order_last:
                 ordering = tools.list_ordering(base_ordering, self.order_last, end=True)
 
-        # ---- ORDERING
+        # ---- draw in ORDER
         for item in ordering:
             if item == "base":
                 # ---- * draw rectangle
