@@ -68,6 +68,8 @@ cross-reference to the detailed information for that command.
 -  :ref:`Lines <lines-command>` - a set, or group, of lines that can be drawn on a page
 -  :ref:`LinkLine <linkline-command>` - a line joining one or more hexagons inside a
    hexagonal grid
+-  :ref:`Load <load-command>` - at the start of a script; define an existing
+   PDF file to be loaded
 -  :ref:`Matrix <the-matrix-command>` - a way to create a set of data, inside a script,
    for use in a :ref:`deck <the-deck-command>` of :ref:`cards <the-card-command>`
 -  :ref:`PageBreak <pagebreak-command>` - set the start of a new page in

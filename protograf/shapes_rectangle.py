@@ -1081,8 +1081,11 @@ class RectangleShape(BaseShape):
                     True,
                 )
         # ---- calculate gaps and breadth
-        default_breadth = min(self.height, self.width) / 2.0
-        _breadth = self.unit(self.stripes_breadth or default_breadth)
+        if self.stripes_breadth:
+            _ubreadth = tools.as_float(self.stripes_breadth, "stripes_breadth")
+            _breadth = self.unit(_ubreadth)
+        else:
+            _breadth = None
         if lines == 1:
             gaps = 2
         else:
@@ -1090,7 +1093,7 @@ class RectangleShape(BaseShape):
                 gaps = lines - 1
             else:
                 gaps = lines + 1
-        # ---- calculate and check gap size
+        # ---- calculate and check gap size for preset breadth
         over_allocated = False
         allocations = []
         if "n" in _dirs or "s" in _dirs or "o" in _dirs or is_all:
@@ -1116,13 +1119,14 @@ class RectangleShape(BaseShape):
             )
             allocations.append(space_diag)
         space_min = min(allocations)
-        gap_size_min = (space_min - lines * _breadth) / gaps  # also calc per dir
-        if lines * _breadth > space_min:
-            feedback(
-                f"The number ({lines}) and breadth ({self.stripes_breadth}) of stripes"
-                " together exceeds the available space!",
-                True,
-            )
+        if _breadth:
+            gap_size_min = (space_min - lines * _breadth) / gaps  # also calc per dir
+            if lines * _breadth > space_min:
+                feedback(
+                    f"The number ({lines}) and breadth ({self.stripes_breadth}) of stripes"
+                    " together exceeds the available space!",
+                    True,
+                )
         # ---- check space available vs round corners
         if self.rounding or self.rounded:
             if self.rounding:
@@ -1155,6 +1159,8 @@ class RectangleShape(BaseShape):
                 beta = kappa - alpha
                 # print(f'*** NW angles {kappa=} {alpha=} {zeta=} {beta=}')
                 # line spacing
+                if not _breadth:
+                    _breadth = space_diag / (lines + gaps)  # divide equally
                 d_breadth = _breadth / _sin(beta)  # stripe "width" along diag. angle
                 gap_size = (space_diag - lines * d_breadth) / gaps  # calc for ne/sw
                 # print(f'*** NW lines {_breadth=} {d_breadth=} {gap_size=}')
@@ -1250,7 +1256,9 @@ class RectangleShape(BaseShape):
 
             # ---- * vertical
             if "n" in _dirs or "s" in _dirs or "o" in _dirs or is_all:  # vertical
-                gap_size = (space_horz - lines * _breadth) / gaps  # calc per dir
+                if not _breadth:
+                    _breadth = space_horz / (lines + gaps)  # divide equally
+                gap_size = (space_horz - lines * _breadth) / gaps
                 if self.stripes_flush:
                     x_offset = 0
                 else:
@@ -1270,6 +1278,8 @@ class RectangleShape(BaseShape):
 
             # ---- * horizontal
             if "e" in _dirs or "w" in _dirs or "o" in _dirs or is_all:
+                if not _breadth:
+                    _breadth = space_vert / (lines + gaps)  # divide equally
                 gap_size = (space_vert - lines * _breadth) / gaps  # calc per dir
                 if self.stripes_flush:
                     y_offset = 0

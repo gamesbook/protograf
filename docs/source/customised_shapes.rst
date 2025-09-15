@@ -1519,17 +1519,20 @@ Stripes
 -------
 `^ <rectangleIndex_>`_
 
-Stripes are a set of parallel areas that are drawn, in a specified direction, across
-the length or width of the Rectangle in vertical, horizontal or diagonal directions.
+Stripes are a set of equal-width parallel areas that are drawn, in a specified
+direction, across the length or width of the Rectangle in vertical, horizontal
+or diagonal directions.
 
 The key properties to draw stripes are:
 
 - *stripes* - sets the **number** of stripes to be drawn; the intervals
-  between them are calculated equally and depend on the direction
+  between them are calculated equally and depend on the direction and the
+  breadth of the stripes
 - *stripes_directions* - sets the compass direction for the stripes to be
-  drawn; defaults to the ``n`` (North)
-- *stripes_breadth* - sets **width** of the stripe to be drawn; defaults to
-  ``1``
+  drawn; defaults to ``n`` (North)
+- *stripes_breadth* - sets **width** of the stripe to be drawn; if not given,
+  will be calculated to give 0a size that will result in equally sized stripes
+  and gaps
 
 In addition, the usual properties for stroke, stroke_width, fill and
 transparency can also be set.

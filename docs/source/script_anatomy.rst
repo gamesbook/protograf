@@ -23,6 +23,8 @@ an extension of ``.py``
   - `PageBreak Command`_
   - `Save Command`_
 - `Other Commands`_
+
+  - `Load Command`_
 - `Comments`_
 - `Drawing vs Assigning`_
 - `Basic Shapes`_
@@ -63,7 +65,6 @@ Key Commands
 - `Create Command`_
 - `PageBreak Command`_
 - `Save Command`_
-- `Other Commands`_
 
 .. _create-command:
 
@@ -287,8 +288,37 @@ The outcomes will be as follows:
 
 
 Other Commands
---------------
-`^ <key-commands_>`_
+==============
+`↑ <table-of-contents-anat_>`_
+
+.. _load-command:
+
+Load Command
+------------
+
+The ``Load()`` command is an alternative to the ``Create()`` command,
+and should appear first in the script, instead of it.
+
+.. HINT::
+
+    If you omit the ``Create()`` command **and** the ``Load()`` command,
+    you should get a `FEEDBACK <feedback-message_>`_ message::
+
+        FEEDBACK:: Please ensure Create() command has been called first!
+
+To use this command, set its properties as follows:
+
+- **filename** - name of the input PDF file
+
+Note that **paper_width** and **paper_height** will be calculated from the
+first page loaded.
+
+The ``Load()`` command is useful in conjunction with the
+:ref:`Extract <the-extract-command>` command.
+
+
+Shape, Grid,  Card and Deck Commands
+------------------------------------
 
 There are numerous other commands which are either used to draw shapes, or
 sets of shapes, or to control how and where sets of shapes appear on a page.

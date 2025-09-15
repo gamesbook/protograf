@@ -471,7 +471,7 @@ class BaseCanvas:
         self.stripes_stroke_width = self.defaults.get(
             "stripes_stroke_width", self.stroke_width
         )
-        self.stripes_breadth = self.defaults.get("stripes_breadth", 1)
+        self.stripes_breadth = self.defaults.get("stripes_breadth", None)
         self.stripes_buffer = self.defaults.get("stripes_buffer", None)
         self.stripes_dotted = self.defaults.get("stripes_dotted", self.dotted)
         self.stripes_dashed = self.defaults.get("stripes_dashed", self.dashed)

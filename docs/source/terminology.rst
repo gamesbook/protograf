@@ -358,9 +358,8 @@ Display-orientated Terms
 -  **shown** - a list of locations, indicated by their *row and
    column* identifier which are the only ones that **must** be used for
    display - the rest are ignored
--  **stripes** - when used in combination with **stripes_count** will draw a
-   series of parallel lines between two opposing sides of a ``Rectangle`` in
-   the specified direction(s)
+-  **stripes** - will draw a series of parallel areas between two opposing
+   locations of a ``Rectangle`` in any/all of the specified direction(s)
 -  **visible** - a list of locations, indicated by their *sequence
    number* |dash| i.e. their position in the drawing order |dash| that
    **must** be used for display - the rest are ignored
