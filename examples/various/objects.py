@@ -238,4 +238,22 @@ Text(text="REC",
 Text(text="00:00:00",
      x=6.5, y=5.3, stroke="white", font_size=10)
 
+Text(common=header_font, x=8, y=7.5,
+     text="Tanzanian Flag")
+Text(common=header_font, x=8, y=8.5,
+     text=" - Rectangle: slices and black diagonal stripe")
+Text(common=header_font, x=8, y=9.5,
+     text=" - Rectangle: yellow diagonal stripe")
+Rectangle(
+    width=5.76, height=3.76, x=1.2, y=7,
+    fill="white", stroke=None,
+    slices=["#18B367", "#00A5DE"],
+    stripes=1, stripes_directions="ne",
+    stripes_fill="#FCD20E", stripes_breadth=1.52)
+Rectangle(
+    width=5.76, height=3.76, x=1.2, y=7,
+    stroke="white", fill=None,
+    stripes=1, stripes_directions="ne",
+    stripes_fill="black", stripes_breadth=1.04)
+
 Save()
