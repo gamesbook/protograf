@@ -13,13 +13,10 @@ from protograf.utils.messaging import feedback
 from protograf.utils.tools import as_bool
 from protograf.base import BaseShape
 from protograf.layouts import SequenceShape, RepeatShape
-from protograf.shapes import (
-    CircleShape,
-    HexShape,
-    ImageShape,
-    PolygonShape,
-    RectangleShape,
-)
+from protograf.shapes import ImageShape, PolygonShape
+from protograf.shapes_circle import CircleShape
+from protograf.shapes_rectangle import RectangleShape
+from protograf.shapes_hexagon import HexShape
 from protograf import globals
 
 log = logging.getLogger(__name__)

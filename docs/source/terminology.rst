@@ -101,7 +101,7 @@ In general, color can be set for the lines (**stroke**) and areas
    many strokes for particular types of lines that are set by prefixing
    this term with the name of the item in question; for example:
    **cross_stroke**; **grid_stroke**; **label_stroke**; **petals_stroke**,
-   **perbis_stroke**; **radii_stroke**; etc.
+   **perbii_stroke**; **radii_stroke**; etc.
 -  **stroke_fill** - sets both the line ("stroke") and area ("fill") to
    be the *same* color
 
@@ -333,12 +333,15 @@ Display-orientated Terms
 ========================
 `↑ <table-of-contents-terms_>`_
 
+-  **corners** - if assigned a number will cause short lines of that length
+   to be drawn from each corner of a ``Rectangle`` |dash| these lines can be
+   further styled e.g. to show as small, triangular photograph holders
 -  **hidden** - a list of locations, indicated by their *row and
    column* identifier, which should **not** be used for display - the rest
    are displayed as normal
--  **hatch** - when used in combination with **hatch_count** will draw a series
-   of parallel lines between two opposing sides of a regular shape in the
-   specified direction
+-  **hatches** - when used in combination with **hatches_count** will draw a
+   series of parallel lines between two opposing sides of a regular shape in
+   the specified direction(s)
 -  **masked** - a list of locations, indicated by their *sequence
    number* |dash| i.e. their position in the drawing order |dash| which
    should **not** be used for display |dash| the rest are displayed as normal
@@ -347,13 +350,16 @@ Display-orientated Terms
 -  *paths* - a list of one or more pairs of *compass directions*, representing
    two edges of a hexagon shap,e between which a line |dash| straight or an
    arc |dash| is drawns
--  **perbis** - if given one or more numbers will cause the perpendicular
-   bisectors |dash| lines from centre to the middle of the edges |dash| of
-   a ``Polygon`` or ``Hexagon`` to be shown; edges are numbered from the
-   east-facing one in an anti-clockwise direction
+-  **perbii** - if given one or more numbers will cause the perpendicular
+   bisectors ("perbii" is plural for the shortcut "perbis") |dash| lines
+   from centre to the middle of the edges |dash| of a ``Polygon``, ``Hexagon``
+   or ``Rectangle`` to be drawn; a ``Polygon's`` unnamed edges are numbered
+   from the east-facing one in an anti-clockwise direction
 -  **shown** - a list of locations, indicated by their *row and
    column* identifier which are the only ones that **must** be used for
    display - the rest are ignored
+-  **stripes** - will draw a series of parallel areas between two opposing
+   locations of a ``Rectangle`` in any/all of the specified direction(s)
 -  **visible** - a list of locations, indicated by their *sequence
    number* |dash| i.e. their position in the drawing order |dash| that
    **must** be used for display - the rest are ignored

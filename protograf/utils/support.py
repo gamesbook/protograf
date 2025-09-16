@@ -610,6 +610,10 @@ def pdf_frames_to_png(
         page_num = 0
         for page in doc:
             outlines = frames.get(page_num, [])
+            if outlines == []:
+                outlines = frames.get("*", [])
+            if outlines == []:
+                outlines = frames.get("all", [])
             inames = []
             for key, item in enumerate(outlines):
                 outline = item[0]  # Rect

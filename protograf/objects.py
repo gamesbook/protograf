@@ -43,7 +43,10 @@ from protograf.base import (
     BaseCanvas,
     GridShape,
 )
-from protograf.shapes import CircleShape, PolygonShape, RectangleShape, HexShape
+from protograf.shapes import PolygonShape
+from protograf.shapes_circle import CircleShape
+from protograf.shapes_rectangle import RectangleShape
+from protograf.shapes_hexagon import HexShape
 
 log = logging.getLogger(__name__)
 DEBUG = False

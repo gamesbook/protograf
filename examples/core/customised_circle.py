@@ -22,17 +22,17 @@ txt = Common(x=0, y=0, font_size=8, align="left")
 Text(common=txt, text="Circle START...")
 PageBreak()
 
-# ---- circle hatch
+# ---- circle hatches
 Blueprint()
 Text(common=txt, text="Circle: hatches")
-htc = Common(radius=0.7, hatch_count=5, hatch_stroke="red")
+htc = Common(radius=0.7, hatches_count=5, hatches_stroke="red")
 Circle(common=htc, cx=2, cy=5.2, label='5')  # all directions
-Circle(common=htc, cx=1, cy=3.7, hatch='o', label='o')
-Circle(common=htc, cx=3, cy=3.7, hatch='d', label='d')
-Circle(common=htc, cx=1, cy=2.2, hatch='e', label='e')
-Circle(common=htc, cx=3, cy=2.2, hatch='n', label='n')
-Circle(common=htc, cx=1, cy=0.7, hatch='ne', label='ne')
-Circle(common=htc, cx=3, cy=0.7, hatch='nw', label='nw')
+Circle(common=htc, cx=1, cy=3.7, hatches='o', label='o')
+Circle(common=htc, cx=3, cy=3.7, hatches='d', label='d')
+Circle(common=htc, cx=1, cy=2.2, hatches='e', label='e')
+Circle(common=htc, cx=3, cy=2.2, hatches='n', label='n')
+Circle(common=htc, cx=1, cy=0.7, hatches='ne', label='ne')
+Circle(common=htc, cx=3, cy=0.7, hatches='nw', label='nw')
 PageBreak()
 
 # ---- circle dot_cross
@@ -178,7 +178,7 @@ Save(
      directory="../docs/source/images/custom/circle",
      names=[
         None,
-        "hatch",
+        "hatches",
         "dot_cross",
         "radii",
         "petals_triangle",

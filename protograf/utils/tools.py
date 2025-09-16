@@ -1150,9 +1150,9 @@ def validated_directions(
             valid = {"e", "se", "sw", "w", "ne", "nw"}
         case DirectionGroup.HEX_POINTY:
             valid = {"s", "se", "sw", "n", "ne", "nw"}
-        case DirectionGroup.HEX_FLAT_EDGE:  # perbis
+        case DirectionGroup.HEX_FLAT_EDGE:  # perbii
             valid = {"s", "se", "sw", "n", "ne", "nw"}
-        case DirectionGroup.HEX_POINTY_EDGE:  # perbis
+        case DirectionGroup.HEX_POINTY_EDGE:  # perbii
             valid = {"e", "se", "sw", "w", "ne", "nw"}
         case DirectionGroup.CIRCULAR:
             valid = {"n", "e", "w", "s", "ne", "se", "sw", "nw", "o", "d"}

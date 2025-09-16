@@ -34,20 +34,17 @@ from .shapes import (
     ArrowShape,
     BezierShape,
     ChordShape,
-    CircleShape,
     CommonShape,
     CompassShape,
     DotShape,
     EllipseShape,
     EquilateralTriangleShape,
     FooterShape,
-    HexShape,
     ImageShape,
     LineShape,
     QRCodeShape,
     PolygonShape,
     PolylineShape,
-    RectangleShape,
     RhombusShape,
     RightAngledTriangleShape,
     SectorShape,
@@ -58,6 +55,9 @@ from .shapes import (
     TextShape,
     TrapezoidShape,
 )
+from .shapes_circle import CircleShape
+from .shapes_hexagon import HexShape
+from .shapes_rectangle import RectangleShape
 from .objects import (
     CubeObject,
     D6Object,
@@ -1362,6 +1362,8 @@ def Create(**kwargs):
     global globals_set
     # ---- set and confirm globals
     globals.initialize()
+    if globals_set:
+        feedback("Another document is already open or initialised", True)
     globals_set = True
     # ---- units
     _units = kwargs.get("units", globals.units)
@@ -1482,6 +1484,149 @@ def create(**kwargs):
     Create(**kwargs)
 
 
+def Load(**kwargs):
+    """Set globals, page, margins, units and canvas from existing PDF
+
+    Kwargs:
+
+    - filename (str): name of the input PDF file
+    - units (str): can be ``cm`` (centimetres), ``in`` (inches), ``mm``
+      (millimetres), or ``points``; default is ``cm``
+    - margin (float): set the value for *all* margins using the defined *units*;
+      default is ``1`` centimetre.
+    - margin_top (float): set the top margin using the defined *units*
+    - margin_bottom (float): set the bottom margin using the defined *units*
+    - margin_left (float): set the left margin using the defined *units*
+    - margin_right (float): set the the right margin using the defined *units*
+    - margin_debug (bool): if True, show the margin as a dotted blue line
+    - cached_fonts (bool): if True, will force reload of Font cache
+
+    Notes:
+
+    - Kwargs to override the default values of any of the various properties
+      used for drawing Shapes can be set here as well, for example:
+      ``font_size=18`` or ``stroke="red"``.
+    - Will use argparse to process command-line keyword args
+    - Allows shortcut creation of cards
+    """
+    global globals_set
+    # ---- set and confirm globals
+    globals.initialize()
+    if globals_set:
+        feedback("Another document is already open or initialised", True)
+    globals_set = True
+    # ---- units
+    _units = kwargs.get("units", globals.units)
+    globals.units = support.to_units(_units)
+    # ---- margins
+    the_margin = kwargs.get("margin", DEFAULT_MARGIN_SIZE / globals.units)
+    globals.margins = PageMargins(
+        margin=the_margin,
+        left=kwargs.get("margin_left", the_margin),
+        top=kwargs.get("margin_top", the_margin),
+        bottom=kwargs.get("margin_bottom", the_margin),
+        right=kwargs.get("margin_right", the_margin),
+        debug=kwargs.get("margin_debug", False),
+    )
+    # ---- defaults
+    defaults = kwargs.get("defaults", None)
+    # ---- paper, page, page sizes
+    globals.paper = kwargs.get("paper", globals.paper)
+    globals.page = pymupdf.paper_size(globals.paper)  # (width, height) in points
+    # ---- fonts
+    base_fonts()
+    globals.font_size = kwargs.get("font_size", 12)
+    # ---- command-line arguments
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        "-d", "--directory", help="Specify output directory", default=""
+    )
+    # use: --no-png to skip PNG output during Save()
+    parser.add_argument(
+        "--png",
+        help="Whether to create PNG during Save (default is True)",
+        default=True,
+        action=argparse.BooleanOptionalAction,
+    )
+    # use: --fonts to force Fonts recreation during Create()
+    parser.add_argument(
+        "-f",
+        "--fonts",
+        help="Force reloading of all available fonts at start (default is False)",
+        default=False,
+        action=argparse.BooleanOptionalAction,
+    )
+    # use: --no-warning to ignore WARNING:: messages
+    parser.add_argument(
+        "-nw",
+        "--nowarning",
+        help="Do NOT show any WARNING:: messages (default is False)",
+        default=False,
+        action=argparse.BooleanOptionalAction,
+    )
+    parser.add_argument(
+        "-p", "--pages", help="Specify which pages to process", default=""
+    )
+    globals.pargs = parser.parse_args()
+    # NB - pages does not work - see notes in PageBreak()
+    if globals.pargs.pages:
+        feedback("--pages is not yet an implemented feature - sorry!")
+    # ---- filename and fallback
+    _filename = kwargs.get("filename", "")
+    if not _filename:
+        basename = "test"
+        # log.debug('basename: "%s" sys.argv[0]: "%s"', basename, sys.argv[0])
+        if sys.argv[0]:
+            basename = os.path.basename(sys.argv[0]).split(".")[0]
+        _filename = f"{basename}.pdf"
+    # ---- validate directory & set filename
+    if globals.pargs.directory and not os.path.exists(globals.pargs.directory):
+        feedback(
+            f'Unable to find directory "{globals.pargs.directory}" for output.', True
+        )
+    globals.filename = os.path.join(globals.pargs.directory, _filename)
+    # ---- Open pymupdf doc, page, shape/canvas
+    if not os.path.exists(globals.filename):
+        script_path = os.path.abspath(__file__)
+        script_directory = os.path.dirname(script_path)
+        globals.filename = os.path.join(script_directory, globals.filename)
+    try:
+        globals.document = pymupdf.open(globals.filename)  # existing Document
+    except Exception as err:
+        feedback(f"Unable to load {globals.filename} ({err})", True)
+    globals.doc_page = globals.document.new_page(
+        width=globals.page[0], height=globals.page[1]
+    )  # pymupdf Page
+    # ---- Extract doc info
+    page = globals.document[0]
+    # page.rect represents the visible area of the page
+    _page_width_pt = page.rect.width
+    _page_height_pt = page.rect.height
+    globals.page = (_page_width_pt, _page_height_pt)
+    globals.page_width = globals.page[0] / globals.units  # width in user units
+    globals.page_height = globals.page[1] / globals.units  # height in user units
+    globals.page_fill = colrs.get_color(kwargs.get("fill", "white"))
+    globals.page_grid = tools.as_float(kwargs.get("page_grid", 0), "page_grid")
+    globals.canvas = globals.doc_page.new_shape()  # pymupdf Shape
+    # ---- BaseCanvas
+    globals.base = BaseCanvas(
+        globals.document, paper=globals.paper, defaults=defaults, kwargs=kwargs
+    )
+    page_setup()
+    # ---- pickle font info for pymupdf
+    globals.archive = Archive()
+    globals.css = ""
+    cached_fonts = tools.as_bool(kwargs.get("cached_fonts", True))
+    if not cached_fonts or globals.pargs.fonts:
+        cache_directory = Path(Path.home() / CACHE_DIRECTORY)
+        fi = FontInterface(cache_directory=cache_directory)
+        fi.load_font_families(cached=False)
+
+
+def load(**kwargs):
+    Load(**kwargs)
+
+
 def Footer(**kwargs):
     validate_globals()
 
@@ -1551,6 +1696,13 @@ def Extract(pages: object, **kwargs):
       in each.  The set numbers represent the top-left *x* and *y* and the
       bottom-right *x* and *y* locations on the page of a rectangle that must be
       extracted
+    - height (float): the height of an area to be extracted
+    - width (float): the width of an area to be extracted
+    - x (float): the X-value of top-left corner of an area to be extracted
+    - y (float): the Y-value top-left corner of an area to be extracted
+    - repeat (bool): if True, extract the height & width area multiple times
+    - x_gap (float): the x gap used when extracting a repeated area
+    - y_gap (float): the y gap used when extracting a repeated area
 
     Notes:
 
@@ -1558,15 +1710,32 @@ def Extract(pages: object, **kwargs):
       keyed on page number, and stored in `globals.extracts`. They are
       processed during/after document Save()
     """
-    _pages = tools.sequence_split(pages)
+    _pages = tools.sequence_split(pages, star=True)
     if not _pages:
         feedback("At least one page must be specified for Extract.", True)
     # ---- set local vars from kwargs
     names = kwargs.get("names", [])
     areas = kwargs.get("areas", None)
     cols_rows = kwargs.get("cols_rows", None)
-    if (cols_rows and areas) or (not areas and not cols_rows):
-        feedback("Specify either areas OR cols_rows for Extract, but not both.", True)
+    if ("*" in _pages or "all" in _pages) and names:
+        feedback(
+            "Must specify actual page numbers for Extract if also using names.", True
+        )
+    # settings used for card area extraction
+    height = tools.as_float(kwargs.get("height", 0), "height")
+    width = tools.as_float(kwargs.get("width", 0), "width")
+    tl_x = tools.as_float(kwargs.get("x", 1), "x")
+    tl_y = tools.as_float(kwargs.get("y", 1), "y")
+    gap_x = tools.as_float(kwargs.get("x_gap", 0), "x_gap")
+    gap_y = tools.as_float(kwargs.get("y_gap", 0), "y_gap")
+    repeat = tools.as_bool(kwargs.get("repeat", False), "repeat")
+    cards = True if (height and width) else False
+    if (cols_rows and areas and cards) or (not areas and not cols_rows and not cards):
+        feedback(
+            "Specify either areas OR cols_rows OR height & width for Extract -"
+            " only one of these options must be chosen.",
+            True,
+        )
     if areas:
         if not isinstance(areas, list):
             feedback("The areas specified for Extract must be a list.", True)
@@ -1600,11 +1769,42 @@ def Extract(pages: object, **kwargs):
                     f' not "{_cols_rows}".',
                     True,
                 )
+    if cards:
+        if height > globals.page_height:
+            feedback(
+                "The height specified for Extract is greater than the page height",
+                True,
+            )
+        if width > globals.page_width:
+            feedback(
+                "The width specified for Extract is greater than the page width",
+                True,
+            )
+        if tl_y > globals.page_height:
+            feedback(
+                "The y specified for Extract is greater than the page height",
+                True,
+            )
+        if tl_x > globals.page_width:
+            feedback(
+                "The x specified for Extract is greater than the page width",
+                True,
+            )
+        if gap_y > globals.page_height:
+            feedback(
+                "The y_gap specified for Extract is greater than the page height",
+                True,
+            )
+        if gap_x > globals.page_width:
+            feedback(
+                "The x_gap specified for Extract is greater than the page width",
+                True,
+            )
 
     extract_dict = globals.extracts
     name_idx = 0
     for _page in _pages:
-        if _page in extract_dict:
+        if _page in extract_dict or "*" in extract_dict or "all" in extract_dict:
             data = extract_dict[_page]
         else:
             data = []
@@ -1633,7 +1833,7 @@ def Extract(pages: object, **kwargs):
                 xr = globals.units * area[2]
                 yb = globals.units * area[3]
                 data.append((BBox(tl=Point(xl, yt), br=Point(xr, yb)), name))
-        elif _cols_rows:
+        elif cols_rows:
             col_width = globals.page[0] / _cols_rows[0]
             row_width = globals.page[1] / _cols_rows[1]
             for col in range(0, _cols_rows[0]):
@@ -1648,9 +1848,42 @@ def Extract(pages: object, **kwargs):
                         name = None
                     name_idx += 1
                     data.append((BBox(tl=Point(xl, yt), br=Point(xr, yb)), name))
+        elif cards:
+            _height = height * globals.units
+            _width = width * globals.units
+            _gap_x = gap_x * globals.units
+            _gap_y = gap_y * globals.units
+
+            start_y = tl_y * globals.units
+            while start_y + _height < globals.page[1]:
+                start_x = tl_x * globals.units
+                while start_x + _width < globals.page[0]:
+                    try:
+                        name = names[name_idx]
+                    except IndexError:
+                        name = None
+                    name_idx += 1
+                    data.append(
+                        (
+                            BBox(
+                                tl=Point(start_x, start_y),
+                                br=Point(start_x + _width, start_y + _height),
+                            ),
+                            name,
+                        )
+                    )
+                    start_x = start_x + _width + _gap_x
+                    if not repeat:
+                        break
+                start_y = start_y + _height + _gap_y
+                if not repeat:
+                    break
         else:
             pass
-        globals.extracts[_page - 1] = data
+        if isinstance(_page, int):
+            globals.extracts[_page - 1] = data
+        else:
+            globals.extracts[_page] = data  # handle `*` and `all`
 
 
 def extract(pages: object, **kwargs):
@@ -1748,6 +1981,9 @@ def Save(**kwargs):
     try:
         globals.document.subset_fonts(verbose=True)  # subset fonts to reduce file size
         globals.document.save(output_filepath)
+    # TODO - allow appending?
+    except ValueError as err:
+        feedback(f'Unable to overwrite "{output_filepath}"', False, True)
     except RuntimeError as err:
         feedback(f'Unable to save "{output_filepath}" - {err} - {msg}', True)
     except FileNotFoundError as err:
@@ -2732,7 +2968,7 @@ def Circle(row=None, col=None, **kwargs):
     Kwargs:
 
     <center>
-    - hatch (str): edge-to-edge lines that, if not specified, will
+    - hatches (str): edge-to-edge lines that, if not specified, will
       be drawn in all directions - otherwise:
 
       - ``n`` (North) or ``s`` (South) draws vertical lines;
@@ -2743,10 +2979,10 @@ def Circle(row=None, col=None, **kwargs):
         from bottom-left to top-right;
       - ``o`` (orthogonal) draws vertical **and** horizontal lines;
       - ``d`` (diagonal) draws diagonal lines between adjacent sides.
-    - hatch_count (int): sets the **number** of lines to be drawn; the
+    - hatches_count (int): sets the **number** of lines to be drawn; the
       intervals between them are equal and depend on the direction
-    - hatch_stroke_width (float): hatch line thickness; defaults to 0.1 points
-    - hatch_stroke (str): the named or hexadecimal color of the hatch line;
+    - hatches_stroke_width (float): hatches line thickness; defaults to 0.1 points
+    - hatches_stroke (str): the named or hexadecimal color of the hatches line;
       defaults to ``black``
     - petals (int): sets the number of petals to drawn
     - petals_style (str): a style of ``p`` or ``petal`` causes petals
@@ -2766,7 +3002,7 @@ def Circle(row=None, col=None, **kwargs):
       the radii lines are drawn
     - radii_stroke_width (float): determines the thickness of the radii
     - radii_dotted (bool): if set to True, will make the radii lines dotted
-    - radii_stroke (str): the named or hexadecimal color of the hatch line;
+    - radii_stroke (str): the named or hexadecimal color of the hatches line;
       defaults to ``black``
     - radii_length (float): changes the length of the radii lines
       (centre to circumference)
@@ -2914,12 +3150,12 @@ def Hexagon(row=None, col=None, **kwargs):
 
     <center>
     - orientation (str): either *float*, the default, or *pointy*
-    - perbis (str): a compass direction in which a bisector is drawn
+    - perbii (str): a compass direction in which a bisector is drawn
       (from centre to mid-point of the edge in that direction); directions:
 
-      - ``n`` (North) / ``s`` (South) draws vertical perbis for flat hex;
-      - ``w`` (West) / ``e`` (East) draws horizontal perbis for pointy hex;
-      - ``nw`` (North-West) / ``se`` (South-East) draws diagonal perbis lines.
+      - ``n`` (North) / ``s`` (South) draws vertical perbii for flat hex;
+      - ``w`` (West) / ``e`` (East) draws horizontal perbii for pointy hex;
+      - ``nw`` (North-West) / ``se`` (South-East) draws diagonal perbii.
     - slices (list): set of colors that are drawn as triangles  in a clockwise
       direction starting from the "North East"
     - border (list): overide the normal edge line; specify a set of values, which
@@ -2930,16 +3166,16 @@ def Hexagon(row=None, col=None, **kwargs):
       - width (float): the line thickness
       - color (str): either a named or hexadecimal color
       - style  (bool): True makes a dotted line; or a list of values creates dashes
-    - hatch (str): edge-to-edge lines that, if not specified, will
+    - hatches (str): edge-to-edge lines that, if not specified, will
       be drawn in all directions - otherwise:
 
       - ``n`` (North) or ``s`` (South) draws vertical lines for flat hex;
       - ``w`` (West) or ``e`` (East) draws horizontal lines for pointy hex;
       - ``nw`` (North-West) or ``se`` (South-East) draws diagonal lines.
-    - hatch_count (int): sets the **number** of lines to be drawn the
+    - hatches_count (int): sets the **number** of lines to be drawn the
       intervals between them are equal and depend on the direction
-    - hatch_stroke_width (float): hatch line thickness; defaults to 0.1 points
-    - hatch_stroke (str): the named or hexadecimal color of the hatch line;
+    - hatches_stroke_width (float): hatches line thickness; defaults to 0.1 points
+    - hatches_stroke (str): the named or hexadecimal color of the hatches line;
       defaults to ``black``
     - paths (list): one or more pairs of compass directions between
       which a line - straight or an arc - is drawn
@@ -2949,7 +3185,7 @@ def Hexagon(row=None, col=None, **kwargs):
       defaults to ``black`
     - radii_dotted (bool): if set to True, will make the radii lines dotted
     - radii_stroke_width (float): determines the thickness of the radii
-    - radii_stroke (str): the named or hexadecimal color of the hatch line;
+    - radii_stroke (str): the named or hexadecimal color of the hatches line;
       defaults to ``black``
     - radii_length (float): changes the length of the radii lines
       (centre to circumference)
@@ -3163,7 +3399,7 @@ def Rectangle(row=None, col=None, **kwargs):
       pointing; n(orth), s(outh), e(ast) or w(est)
     - chevron_height (float): the distance of the chevron peak from the side of
       the rectangle it is adjacent to
-    - hatch (str): if not specified, hatches will be drawn
+    - hatches (str): if not specified, hatches will be drawn
       in all directions - otherwise:
 
       - ``n`` (North) or ``s`` (South) draws vertical lines;
@@ -3174,28 +3410,28 @@ def Rectangle(row=None, col=None, **kwargs):
         from bottom-left to top-right;
       - ``o`` (orthogonal) draws vertical **and** horizontal lines;
       - ``d`` (diagonal) draws diagonal lines between adjacent sides.
-    - corner (float): the size of the shape that will be drawn in the
-      corner of the rectangle
-    - corner_stroke_width (float): corner line thickness; defaults to 0.1 points
-    - corner_stroke (str): the named or hexadecimal color of the corner line;
+    - corners (float): the size of the shape that will be drawn in the
+      corners of the rectangle
+    - corners_stroke_width (float): corners line thickness; defaults to 0.1 points
+    - corners_stroke (str): the named or hexadecimal color of the corners line;
       defaults to ``black`
-    - corner_fill (str): the named or hexadecimal color of the corner area;
+    - corners_fill (str): the named or hexadecimal color of the corners area;
       defaults to ``white`
-    - corner_x (float): the length of the corner in the x-direction
-    - corner_y (float): the length of the corner in the y-direction
-    - corner_directions (str): the specific corners of the rectangle where the
-      corner is drawn, given as secondary compass directions - ne, se, sw, nw
-    - corner_style (str): defines the corner appearance:
+    - corners_x (float): the length of the corners in the x-direction
+    - corners_y (float): the length of the corners in the y-direction
+    - corners_directions (str): the specific corners of the rectangle where the
+      corners is drawn, given as secondary compass directions - ne, se, sw, nw
+    - corners_style (str): defines the corners appearance:
 
       - *normal* - a simple line
       - *triangle* - a triangular shape
       - *curve* - a triangular shape with a curved lower edge
       - *arch* - an arrow-shape with with a cut-out curved notch
       - *photo* - a triangular shape with a cut-out notch
-    - hatch_count (int): sets the **number** of lines to be drawn; the
+    - hatches_count (int): sets the **number** of lines to be drawn; the
       intervals between them are equal and depend on the direction
-    - hatch_stroke_width (float): hatch line thickness; defaults to 0.1 points
-    - hatch_stroke (str): the named or hexadecimal color of the hatch line;
+    - hatches_stroke_width (float): hatches line thickness; defaults to 0.1 points
+    - hatches_stroke (str): the named or hexadecimal color of the hatches line;
       defaults to ``black``
     - notch (float): the size of the triangular shape that will be "cut" off the
       corners of the rectangle
@@ -3645,10 +3881,10 @@ def Blueprint(**kwargs):
         # ---- draw "zero" number
         # z_x = kwargs["units"] * globals.margins.left
         # z_y = kwargs["units"] * globals.margins.bottom
-        # corner_dist = geoms.length_of_line(Point(0, 0), Point(z_x, z_y))
-        # corner_frac = corner_dist * 0.66 / kwargs["units"]
-        # # feedback(f'$$$  {z_x=} {z_y=} {corner_dist=}')
-        # zero_pt = geoms.point_on_line(Point(0, 0), Point(z_x, z_y), corner_frac)
+        # crner_dist = geoms.length_of_line(Point(0, 0), Point(z_x, z_y))
+        # crner_frac = crner_dist * 0.66 / kwargs["units"]
+        # # feedback(f'$$$  {z_x=} {z_y=} {crner_dist=}')
+        # zero_pt = geoms.point_on_line(Point(0, 0), Point(z_x, z_y), crner_frac)
         # Text(
         #     x=zero_pt.x / kwargs["units"] - kwargs["side"] / 4.0,
         #     y=zero_pt.y / kwargs["units"] - kwargs["side"] / 4.0,
