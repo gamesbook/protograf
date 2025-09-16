@@ -84,11 +84,11 @@ low1 = square(
 dots3 = group(top3, right2, low1)
 
 # shields
-shield = Common(x=1.1, y=1.1, height=0.9, width=0.7, hatch_count=1, hatch_stroke_width=3)
+shield = Common(x=1.1, y=1.1, height=0.9, width=0.7, hatches_count=1, hatches_stroke_width=3)
 shield_blue = rectangle(
-    common=shield, fill=blue, hatch_stroke="white", hatch='ne nw')
+    common=shield, fill=blue, hatches_stroke="white", hatches='ne nw')
 shield_red = rectangle(
-    common=shield, fill="white", hatch_stroke=red, hatch='n e')
+    common=shield, fill="white", hatches_stroke=red, hatches='n e')
 
 # counter assembly
 Counter("all", S("{{ SIDE == 'English' }}", tile_red))

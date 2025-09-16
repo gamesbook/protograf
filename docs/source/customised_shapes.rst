@@ -16,6 +16,10 @@ and ideas for :doc:`protograf <index>` as presented in the
 You should have already seen how these shapes were created, with defaults,
 in :doc:`Core Shapes <core_shapes>`.
 
+However, while all shapes can be customised to some extent, and share some
+customisation options, these shapes in particular provide many more options
+which are described here.
+
 .. _table-of-contents-custom:
 
 - `Overview`_
@@ -34,8 +38,9 @@ To make it easier to see where and how a shape has been drawn, most of these
 examples have been created with a background grid (which **protograf**
 refers to as a `Blueprint`_ shape) added to the page |dash| a small A8
 "business card" size |dash| for cross-reference. In addition, the default
-line width (aka *stroke_width*) has been made thicker for easier viewing of
-the small PNG images that were generated from the original PDF output.
+Blueprint line width (aka *stroke_width*) has been made thicker for easier
+viewing of the small PNG images that were generated from the original PDF
+output.
 
 A number of examples also use the :ref:`Common command <the-common-command>`
 |dash| this allows shared properties to be defined once and then used by any
@@ -594,15 +599,16 @@ that it can be customised.
 - `Corners <rectCorners_>`_
 - `Cross and Dot <rectCross_>`_
 - `Chevron <rectChevron_>`_
-- `Hatch <rectHatch_>`_
+- `Hatches <rectHatches_>`_
 - `Notch <rectNotch_>`_
 - `Peak <rectPeak_>`_
-- `Perbises <rectPerbis_>`_
+- `Perbii <rectPerbii_>`_
 - `Prows <rectProws_>`_
 - `Radii <rectRadii_>`_
 - `Rotation <rectRotation_>`_
 - `Rounding <rectRounding_>`_
 - `Slices <rectSlices_>`_
+- `Stripes <rectStripes_>`_
 - `Ordering of Properties <rectOrder_>`_
 
 .. _rectCentred:
@@ -803,16 +809,16 @@ that both point in a specified direction.  This creates an arrow-like effect.
 
 ===== ======
 
-.. _rectHatch:
+.. _rectHatches:
 
-Hatch
------
+Hatches
+-------
 `^ <rectangleIndex_>`_
 
 Hatches are a set of parallel lines that are drawn, in a specified direction, across
 the length or width of the Rectangle in a vertical, horizontal or diagonal direction.
 
-.. |rht| image:: images/custom/rectangle/hatch.png
+.. |rht| image:: images/custom/rectangle/hatches.png
    :width: 330
 
 ===== ======
@@ -822,39 +828,39 @@ the length or width of the Rectangle in a vertical, horizontal or diagonal direc
 
         htch = Common(
           height=1.5, width=1,
-          hatch_count=5,
-          hatch_stroke_width=0.1,
-          hatch_stroke="red")
+          hatches_count=5,
+          hatches_stroke_width=0.1,
+          hatches_stroke="red")
 
         Rectangle(
-          common=htch, x=0, y=0,  hatch='w', label="W")
+          common=htch, x=0, y=0,  hatches='w', label="W")
         Rectangle(
-          common=htch, x=1.5, y=0, hatch='e', label="E")
+          common=htch, x=1.5, y=0, hatches='e', label="E")
         Rectangle(
-          common=htch, x=3, y=0, hatch='ne', label="NE\nSW")
+          common=htch, x=3, y=0, hatches='ne', label="NE\nSW")
 
         Rectangle(
-          common=htch, x=0, y=2,  hatch='s', label="S")
+          common=htch, x=0, y=2,  hatches='s', label="S")
         Rectangle(
-          common=htch, x=1.5, y=2, hatch='n', label="N")
+          common=htch, x=1.5, y=2, hatches='n', label="N")
         Rectangle(
-          common=htch, x=3, y=2, hatch='nw', label="NW\nSE")
+          common=htch, x=3, y=2, hatches='nw', label="NW\nSE")
 
         Rectangle(
           common=htch, x=0, y=4, label="all")
         Rectangle(
-          common=htch, x=1.5, y=4, hatch='o', label="O")
+          common=htch, x=1.5, y=4, hatches='o', label="O")
         Rectangle(
-          common=htch, x=3, y=4, hatch='d', label="D")
+          common=htch, x=3, y=4, hatches='d', label="D")
 
       These Rectangles all share the following Common properties that
       differ from the defaults:
 
       - *height* and *width* - set the basic configuration
-      - *hatch_count* - sets the **number** of lines to be drawn; the
+      - *hatches_count* - sets the **number** of lines to be drawn; the
         intervals between them are equal and depend on the direction
-      - *hatch_stroke_width* - set to ``0.1`` point; a fairly thin line
-      - *hatch_stroke* - set to the color ``red`` to make it stand out
+      - *hatches_stroke_width* - set to ``0.1`` point; a fairly thin line
+      - *hatches_stroke* - set to the color ``red`` to make it stand out
         from the rectangle sides
 
       Each Rectangle has its own setting for:
@@ -862,7 +868,7 @@ the length or width of the Rectangle in a vertical, horizontal or diagonal direc
       - *x* and *y* - different positions on the page for the upper-left
         corner
       - *label* - text to help identify it
-      - *hatch* - if not specified, hatches will be drawn
+      - *hatches* - if not specified, hatches will be drawn
         in all directions |dash| otherwise:
 
         - ``n`` (North) or ``s`` (South) draws vertical lines;
@@ -1032,16 +1038,17 @@ a specified direction.
 ===== ======
 
 
-.. _rectPerbis:
+.. _rectPerbii:
 
-Perbis
+Perbii
 ------
 `^ <rectangleIndex_>`_
 
-"Perbis" is a shortcut name for "perpendicular bisector". These lines are
-drawn from the centre of a Rectangle towards the mid-points of its edges.
+"Perbis" is a shortcut name for "perpendicular bisector"; and "perbii" is the
+the plural. These lines are drawn from the centre of a Rectangle towards the
+mid-points of its edges.
 
-.. |rpb| image:: images/custom/rectangle/perbis.png
+.. |rpb| image:: images/custom/rectangle/perbii.png
    :width: 330
 
 ===== ======
@@ -1051,27 +1058,27 @@ drawn from the centre of a Rectangle towards the mid-points of its edges.
 
         prbs = Common(
             height=2, width=1,
-            perbis_stroke_width=2,
-            perbis_stroke="red")
+            perbii_stroke_width=2,
+            perbii_stroke="red")
         Rectangle(
             common=prbs, x=0.5, y=1,
-            perbis='n', label="N")
+            perbii='n', label="N")
         Rectangle(
             common=prbs, x=2.5, y=1,
-            perbis='s', label="S")
+            perbii='s', label="S")
         Rectangle(
             common=prbs, x=0.5, y=4,
-            perbis='w', label="W")
+            perbii='w', label="W")
         Rectangle(
             common=prbs, x=2.5, y=4,
-            perbis='e', label="E")
+            perbii='e', label="E")
 
       These Rectangles all share the following Common properties that
       differ from the defaults:
 
       - *height* and *width* - set the basic configuration
-      - *perbis_stroke_width* - set to ``2`` points; a thick line
-      - *perbis_stroke* - set to the color ``red`` to make it stand out
+      - *perbii_stroke_width* - set to ``2`` points; a thick line
+      - *perbii_stroke* - set to the color ``red`` to make it stand out
         from the Rectangle
 
       Each Rectangle has its own setting for:
@@ -1079,7 +1086,7 @@ drawn from the centre of a Rectangle towards the mid-points of its edges.
       - *x* and *y* - different positions on the page for the upper-left
         corner
       - *label* - text to help identify it
-      - *perbis* - if specified with a ``*`` then perbises will be drawn
+      - *perbii* - if specified with a ``*`` then perbii will be drawn
         in all directions |dash| otherwise:
 
         - ``n`` (North) or ``s`` (South) draw a vertical line
@@ -1345,24 +1352,24 @@ into the arc of a quarter-circle.
             x=0.5,
             height=1.5, width=3.0,
             stroke_width=.5,
-            hatch_stroke="red",
-            hatch='o')
+            hatches_stroke="red",
+            hatches='o')
 
         Rectangle(
             common=rct, y=1,
             rounding=0.1,
-            hatch_count=10)
+            hatches_count=10)
         Rectangle(
             common=rct, y=4,
             rounding=0.5,
-            hatch_count=3)
+            hatches_count=3)
 
       Both Rectangles share the Common properties of:
 
       - *x* - left side location
       - *height* and *width* - ``1.5`` and ``3.0`` cm
-      - *hatch_stroke* - set to ``red``
-      - *hatch* directions of ``o`` (for orthogonal)
+      - *hatches_stroke* - set to ``red``
+      - *hatches* directions of ``o`` (for orthogonal)
 
       These properties set the color and directions of the lines crossing
       the Rectangles.
@@ -1370,13 +1377,13 @@ into the arc of a quarter-circle.
       The upper Rectangle has these specific properties:
 
       - *rounding* - set to ``0.1``; circle corner radius
-      - *hatch_count* - set to  ``10``; the number of lines
+      - *hatches_count* - set to  ``10``; the number of lines
         in both vertical and horizontal directions
 
       The lower Rectangle has these specific properties:
 
       - *rounding* - set to ``0.5``; circle corner radius
-      - *hatch_count* - set to ``3``; the number of lines
+      - *hatches_count* - set to ``3``; the number of lines
         in both vertical and horizontal directions.
 
       It should be noted that if the rounding is too large in comparison with
@@ -1387,7 +1394,7 @@ into the arc of a quarter-circle.
           Rectangle(
               common=rct, y=2,
               rounding=0.5,
-              hatch_count=10)
+              hatches_count=10)
 
       then the program will issue an error::
 
@@ -1506,6 +1513,109 @@ colored triangular or quadilateral shapes.
 ===== ======
 
 
+.. _rectStripes:
+
+Stripes
+-------
+`^ <rectangleIndex_>`_
+
+Stripes are a set of equal-width parallel areas that are drawn, in a specified
+direction, across the length or width of the Rectangle in vertical, horizontal
+or diagonal directions.
+
+The key properties to draw stripes are:
+
+- *stripes* - sets the **number** of stripes to be drawn; the intervals
+  between them are calculated equally and depend on the direction and the
+  breadth of the stripes
+- *stripes_directions* - sets the compass direction for the stripes to be
+  drawn; defaults to ``n`` (North)
+- *stripes_breadth* - sets **width** of the stripe to be drawn; if not given,
+  will be calculated to give 0a size that will result in equally sized stripes
+  and gaps
+
+In addition, the usual properties for stroke, stroke_width, fill and
+transparency can also be set.
+
+
+.. |rs1| image:: images/custom/rectangle/stripes.png
+   :width: 330
+
+===== ======
+|rs1| This example shows Rectangles constructed using these commands:
+
+      .. code:: python
+
+        strp = Common(
+           height=1.75, width=1.25,
+           stripes=3,
+           stripes_breadth=0.2,
+           stripes_stroke="red",
+           stripes_fill="gold"
+
+        Rectangle(
+          common=strp, x=0, y=0,
+          stripes_directions='w', label="W")
+        Rectangle(
+          common=strp, x=1.5, y=0,
+          stripes_directions='e', label="E")
+        Rectangle(
+          common=strp, x=3, y=0,
+          stripes_directions='ne', label="NE\nSW")
+
+        Rectangle(
+          common=strp, x=0, y=2,
+          stripes_directions='s', label="S")
+        Rectangle(
+          common=strp, x=1.5, y=2,
+          stripes_directions='n', label="N")
+        Rectangle(
+          common=strp, x=3, y=2,
+          stripes_directions='nw', label="NW\nSE")
+
+        Rectangle(
+          common=strp, x=0, y=4,
+          stripes_directions='*',
+          label="all")
+        Rectangle(
+          common=strp, x=1.5, y=4,
+          stripes_directions='o', label="O")
+        Rectangle(
+          common=strp, x=3, y=4,
+          stripes_directions='d', label="D")
+
+      These Rectangles all share the following Common properties that
+      differ from the defaults:
+
+      - *height* and *width* - set the basic configuration
+      - *stripes* - sets the **number** of stripes to be drawn; the
+        intervals between them are equal and depend on the direction
+      - *stripes_breadth* - sets **width** of the stripe to be drawn
+      - *stripes_stroke* - set to the color ``red`` to make it stand out
+        from the rectangle sides
+      - *stripes_fill* - set to the color ``gold``
+
+      Each Rectangle has its own setting for:
+
+      - *x* and *y* - different positions on the page for the upper-left
+        corner
+      - *label* - text to help identify it
+      - *stripes_directions* - if not specified, stripes will be drawn
+        in the ``n`` (North) direction |dash|:
+
+        - ``n`` (North) or ``s`` (South) draws vertical lines;
+        - ``w`` (West) or ``e`` (East) draws horizontal lines;
+        - ``nw`` (North-West) or ``se`` (South-East) draws diagonal lines
+          from top-left to bottom-right;
+        - ``ne`` (North-East) or ``sw`` (South-West) draws diagonal lines
+          from bottom-left to top-right;
+        - ``o`` (orthogonal) draws vertical **and** horizontal lines;
+        - ``d`` (diagonal) draws diagonal lines between adjacent sides;
+        - ``*`` draws diagonal **and** othorgonal lines between **all** sides.
+
+===== ======
+
+
 .. _rectBorders:
 
 Borders
@@ -1604,6 +1714,7 @@ The available property names, shown in their default order, are:
    *prow* settings
 #. pattern
 #. slices
+#. stripes
 #. hatches
 #. radii
 #. centre_shape
@@ -1627,12 +1738,12 @@ customised in a similar way.
 - `Borders <hexBorders_>`_
 - `Centre <hexCentre_>`_
 - `Dot and Cross <hexCross_>`_
-- `Hatch: Flat <hexHatchFlat_>`_
-- `Hatch: Pointy <hexHatchPointy_>`_
+- `Hatches: Flat <hexHatchesFlat_>`_
+- `Hatches: Pointy <hexHatchesPointy_>`_
 - `Radii: Flat <hexRadiiFlat_>`_
 - `Radii: Pointy <hexRadiiPointy_>`_
-- `Perbis: Flat <hexPerbisFlat_>`_
-- `Perbis: Pointy <hexPerbisPointy_>`_
+- `Perbii: Flat <hexPerbiiFlat_>`_
+- `Perbii: Pointy <hexPerbiiPointy_>`_
 - `Path: Flat & Pointy <hexPath_>`_
 - `Slices: Flat <hexSlicesFlat_>`_
 - `Slices: Pointy <hexSlicesPointy_>`_
@@ -1714,17 +1825,17 @@ Dot & Cross
 
 ===== ======
 
-.. _hexHatchFlat:
+.. _hexHatchesFlat:
 
-Hatch: Flat
------------
+Hatches: Flat
+-------------
 `^ <hexagon_>`_
 
 Hatches are a set of parallel lines that are drawn across
 a Hexagon from one opposing side to another in a vertical, horizontal or
 diagonal direction.
 
-.. |hhf| image:: images/custom/hexagon/hatch_flat.png
+.. |hhf| image:: images/custom/hexagon/hatches_flat.png
    :width: 330
 
 ===== ======
@@ -1734,32 +1845,32 @@ diagonal direction.
 
         hxgn = Common(
             x=1, height=1.5, orientation='flat',
-            hatch_count=5, hatch_stroke="red")
+            hatches_count=5, hatches_stroke="red")
 
         Hexagon(
             common=hxgn, y=0,
-            hatch='e', label="e/w")
+            hatches='e', label="e/w")
         Hexagon(
             common=hxgn, y=2,
-            hatch='ne', label="ne/sw")
+            hatches='ne', label="ne/sw")
         Hexagon(
             common=hxgn, y=4,
-            hatch='nw', label="nw/se")
+            hatches='nw', label="nw/se")
 
       These Hexagons all share the following Common properties that differ
       from the defaults:
 
       - *x* and *height* - set the basic configuration
       - *orientation* - set to ``flat``, so there will be no "peak" at the top
-      - *hatch_count* - sets the **number** of equally-spaced lines
-      - *hatch_stroke* - set to the color ``red`` to make it stand out from the
+      - *hatches_count* - sets the **number** of equally-spaced lines
+      - *hatches_stroke* - set to the color ``red`` to make it stand out from the
         hexagon sides
 
       Each Hexagon has its own setting for:
 
       - *y* - different positions on the page for the upper "corner"
       - *label* - text for identification
-      - *hatch* - if not specified, hatches will be drawn in all directions;
+      - *hatches* - if not specified, hatches will be drawn in all directions;
         otherwise:
 
         - ``e`` (East) or ``w`` (West) draws horizontal lines
@@ -1770,17 +1881,17 @@ diagonal direction.
 
 ===== ======
 
-.. _hexHatchPointy:
+.. _hexHatchesPointy:
 
-Hatch: Pointy
--------------
+Hatches: Pointy
+---------------
 `^ <hexagon_>`_
 
 Hatches are a set of parallel lines that are drawn, in a specified direction,
 across the Hexagon from one opposing side to another in a vertical, horizontal
 or diagonal direction.
 
-.. |hhp| image:: images/custom/hexagon/hatch_pointy.png
+.. |hhp| image:: images/custom/hexagon/hatches_pointy.png
    :width: 330
 
 ===== ======
@@ -1791,33 +1902,33 @@ or diagonal direction.
         hxgn = Common(
             x=1, height=1.5,
             orientation='pointy',
-            hatch_count=5,
-            hatch_stroke="red")
+            hatches_count=5,
+            hatches_stroke="red")
 
         Hexagon(
             common=hxgn, y=0,
-            hatch='n', label="n/s")
+            hatches='n', label="n/s")
         Hexagon(
             common=hxgn, y=2,
-            hatch='ne', label="ne/sw")
+            hatches='ne', label="ne/sw")
         Hexagon(
             common=hxgn, y=4,
-            hatch='nw', label="nw/se")
+            hatches='nw', label="nw/se")
 
       These Hexagons all share the following Common properties that differ
       from the defaults:
 
       - *x* and *height* - set the basic configuration
       - *orientation* - set to ``pointy``, so there will be a "peak" at the top
-      - *hatch_count* - sets the **number** of equally-spaced lines
-      - *hatch_stroke* - set to the color ``red`` to make it stand out from the
+      - *hatches_count* - sets the **number** of equally-spaced lines
+      - *hatches_stroke* - set to the color ``red`` to make it stand out from the
         Hexagon sides
 
       Each Hexagon has its own setting for:
 
       - *y* - different positions on the page for the upper corner
       - *label* -text for identification
-      - *hatch* - if not specified, hatches will be drawn in all directions;
+      - *hatches* - if not specified, hatches will be drawn in all directions;
         otherwise:
 
         - ```n`` (North) or ``s`` (South) draws vertical lines
@@ -1932,17 +2043,17 @@ of a Hexagon towards its vertices.
 ===== ======
 
 
-.. _hexPerbisFlat:
+.. _hexPerbiiFlat:
 
-Perbis: Flat
+Perbii: Flat
 ------------
 `^ <hexagon_>`_
 
-"Perbis" is a shortcut name for "perpendicular bisector". These lines are like
-spokes of a bicycle wheel; they are drawn from the centre of a Hexagon towards
-the mid-points of the edges.
+"Perbis" is a shortcut name for a "perpendicular bisector"; and "perbii" is the
+the plural. These lines are like spokes of a bicycle wheel; they are drawn from
+the centre of a Hexagon towards the mid-points of the edges.
 
-.. |hpf| image:: images/custom/hexagon/perbis_flat.png
+.. |hpf| image:: images/custom/hexagon/perbii_flat.png
    :width: 330
 
 ===== ======
@@ -1957,44 +2068,44 @@ the mid-points of the edges.
 
         Hexagon(
             common=hxg, x=0.25, y=0.25,
-            perbis='sw', label="SW")
+            perbii='sw', label="SW")
         Hexagon(
             common=hxg, x=0.25, y=2.15,
-            perbis='w', label="W")
+            perbii='w', label="W")
         Hexagon(
             common=hxg, x=0.25, y=4,
-            perbis='nw', label="NW")
+            perbii='nw', label="NW")
         Hexagon(
             common=hxg, x=2.25, y=4,
-            perbis='ne', label="NE")
+            perbii='ne', label="NE")
         Hexagon(
             common=hxg, x=2.25, y=2.15,
-            perbis='e', label="E")
+            perbii='e', label="E")
         Hexagon(
             common=hxg, x=2.25, y=0.25,
-            perbis='se', label="SE")
+            perbii='se', label="SE")
 
       These have the following properties:
 
       - *common* - sets Common values assigned to ``hxg``
       - *x* and *y* to set the upper-left position
-      - *perbis* - a compass direction in which the bisector is drawn
+      - *perbii* - a compass direction in which the bisector is drawn
         (centre to mid-point)
       - *label* - the text displayed in the centre shows the compass direction
 
 ===== ======
 
-.. _hexPerbisPointy:
+.. _hexPerbiiPointy:
 
-Perbis: Pointy
+Perbii: Pointy
 --------------
 `^ <hexagon_>`__
 
-"Perbis" is a shortcut name for "perpendicular bisector". These lines are like
+"Perbii" is a shortcut name for "perpendicular bisector". These lines are like
 spokes of a bicycle wheel; they are drawn from the centre of a Hexagon towards
 the mid-points of the edges.
 
-.. |hpp| image:: images/custom/hexagon/perbis_pointy.png
+.. |hpp| image:: images/custom/hexagon/perbii_pointy.png
    :width: 330
 
 ===== ======
@@ -2009,29 +2120,29 @@ the mid-points of the edges.
 
         Hexagon(
             common=hxg, x=0.25, y=0.25,
-            perbis='sw', label="SW")
+            perbii='sw', label="SW")
         Hexagon(
             common=hxg, x=0.25, y=2.15,
-            perbis='nw', label="NW")
+            perbii='nw', label="NW")
         Hexagon(
             common=hxg, x=0.25, y=4,
-            perbis='n', label="N")
+            perbii='n', label="N")
         Hexagon(
             common=hxg, x=2.25, y=4,
-            perbis='ne', label="NE")
+            perbii='ne', label="NE")
         Hexagon(
             common=hxg, x=2.25, y=0.25,
-            perbis='s', label="S")
+            perbii='s', label="S")
         Hexagon(
             common=hxg, x=2.25, y=2.15,
-            perbis='se', label="SE")
+            perbii='se', label="SE")
 
       These have the following properties:
 
       - *common* - all Hexagons drawn with the Common value of ``hxg`` will
         share the same properties; height, font size, dot and orientation
       - *x* and *y* to set the upper-left position
-      - *perbis* - a compass direction in which the bisector is drawn
+      - *perbii* - a compass direction in which the bisector is drawn
         (centre to mid-point)
       - *label* - the text displayed in the centre
 
@@ -2195,7 +2306,7 @@ Spikes
 ------
 `^ <hexagon_>`_
 
-Spikes are a set of one or more triangles drawn at the "perbis points" i.e.
+Spikes are a set of one or more triangles drawn at the "perbii points" i.e.
 with the base of the triangles centred on the middle of Hexagon edges.
 
 If the height of the spike is given as a **negative** number, then the
@@ -2276,7 +2387,7 @@ Text: Flat
 ----------
 `^ <hexagon_>`_
 
-.. |htf| image:: images/custom/hexagon/hatch_text_flat.png
+.. |htf| image:: images/custom/hexagon/hatches_text_flat.png
    :width: 330
 
 ===== ======
@@ -2314,7 +2425,7 @@ Text: Pointy
 ------------
 `^ <hexagon_>`_
 
-.. |htp| image:: images/custom/hexagon/hatch_text_pointy.png
+.. |htp| image:: images/custom/hexagon/hatches_text_pointy.png
    :width: 330
 
 ===== ======
@@ -2481,7 +2592,7 @@ The available property names, shown in their default order, are:
 #. spikes
 #. hatches
 #. links
-#. perbises
+#. perbii
 #. paths
 #. radii
 #. centre_shape
@@ -2517,20 +2628,20 @@ Example 1.
                 spikes_width=0.25
                 order_first=["spikes"])
         Hexagon(common=hxg, x=0.25, y=2.1,
-                hatch_count=5, hatch_stroke="red",
-                hatch_stroke_width=2, hatch='nw',
+                hatches_count=5, hatches_stroke="red",
+                hatches_stroke_width=2, hatches='nw',
                 radii='sw e',
                 radii_stroke_width=2)
         Hexagon(common=hxg, x=2.25, y=2.1,
-                hatch_count=5, hatch_stroke="red",
-                hatch_stroke_width=2, hatch='nw',
+                hatches_count=5, hatches_stroke="red",
+                hatches_stroke_width=2, hatches='nw',
                 radii='sw e',
                 radii_stroke_width=2,
-                order_last=["hatches"])
+                order_last=["hatcheses"])
         Hexagon(common=hxg, x=0.25, y=4.1,
-                perbis='sw n')
+                perbii='sw n')
         Hexagon(common=hxg, x=2.25, y=4.1,
-                perbis='sw n',
+                perbii='sw n',
                 order_all=["base", "dot"])
 
       The top-most pair of Hexagons show how changing the *order_first* property
@@ -2542,7 +2653,7 @@ Example 1.
 
       The lower-most pair of Hexagons show how setting the *order_all* property
       means that only the Hexagon and the centre Dot will drawn, and not the
-      *perbis*.
+      *perbii*.
 
 ===== ======
 
@@ -2556,7 +2667,7 @@ A Circle is a very common shape in many designs; it provides a number of
 ways that it can be customised.
 
 - `Dot and Cross <circleCross_>`_
-- `Hatch <circleHatch_>`_
+- `Hatches <circleHatches_>`_
 - `Radii <circleRadii_>`_
 - `Radii Labels <circleRadiiLabels_>`_
 - `Petals: petal <circlePetalsPetal_>`_
@@ -2601,17 +2712,17 @@ Dot & Cross
 
 ===== ======
 
-.. _circleHatch:
+.. _circleHatches:
 
-Hatch
------
+Hatches
+-------
 `^ <circle_>`_
 
 Hatches are a set of parallel lines that are drawn, in a specified direction,
 across the Circle from one opposing side to another in a vertical, horizontal
 or diagonal direction.
 
-.. |chf| image:: images/custom/circle/hatch.png
+.. |chf| image:: images/custom/circle/hatches.png
    :width: 330
 
 ===== ======
@@ -2620,28 +2731,45 @@ or diagonal direction.
       .. code:: python
 
         htc = Common(
-          radius=0.7, hatch_count=5, hatch_stroke="red")
-        Circle(common=htc, cx=2, cy=5.2, label='5')
-        Circle(common=htc, cx=1, cy=3.7, hatch='o', label='o')
-        Circle(common=htc, cx=3, cy=3.7, hatch='d', label='d')
-        Circle(common=htc, cx=1, cy=2.2, hatch='e', label='e')
-        Circle(common=htc, cx=3, cy=2.2, hatch='n', label='n')
-        Circle(common=htc, cx=1, cy=0.7, hatch='ne', label='ne')
-        Circle(common=htc, cx=3, cy=0.7, hatch='nw', label='nw')
+          radius=0.7,
+          hatches_count=5,
+          hatches_stroke="red")
+
+        Circle(
+            common=htc, cx=2, cy=5.2,
+            label='5')
+        Circle(
+            common=htc, cx=1, cy=3.7,
+            hatches='o', label='o')
+        Circle(
+            common=htc, cx=3, cy=3.7,
+            hatches='d', label='d')
+        Circle(
+            common=htc, cx=1, cy=2.2,
+            hatches='e', label='e')
+        Circle(
+            common=htc, cx=3, cy=2.2,
+            hatches='n', label='n')
+        Circle(
+            common=htc, cx=1, cy=0.7,
+            hatches='ne', label='ne')
+        Circle(
+            common=htc, cx=3, cy=0.7,
+            hatches='nw', label='nw')
 
       These Circles all share the following Common properties that differ
       from the defaults:
 
       - *radius* - sets the basic size
-      - *hatch_count* - sets the **number** of equi-spaced lines to be drawn
-      - *hatch_stroke* - set to the color `red` to set the line off from the
+      - *hatches_count* - sets the **number** of equi-spaced lines to be drawn
+      - *hatches_stroke* - set to the color `red` to set the line off from the
         circumference
 
       Each Circle has its own setting for:
 
       - *cx* and *cy* - different positions on the page for the centres
       - *label* - text to help identify it
-      - *hatch* - if not specified, hatches will be drawn in **all**
+      - *hatches* - if not specified, hatches will be drawn in **all**
         directions |dash| as seen in lower-most circle |dash| otherwise:
 
         - ``ne`` (North-East) or ``sw`` (South-West) draws diagonal lines from

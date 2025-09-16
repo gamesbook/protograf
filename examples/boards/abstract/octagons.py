@@ -11,10 +11,10 @@ Create(filename="octagons.pdf", margin=1.25)
 
 oct_flat = polygon(
     sides=8, x=1.1, y=3.75, width=2.35, height=2.35, stroke_width=2, fill="white",
-    perbis='1,5', perbis_stroke_width=2)
+    perbii='1,5', perbii_stroke_width=2)
 oct_vert = polygon(
     sides=8, x=1.1, y=3.75, width=2.35, height=2.35, stroke_width=2, fill="white",
-    perbis='3,7', perbis_stroke_width=2)
+    perbii='3,7', perbii_stroke_width=2)
 
 Trapezoid(x=-0.25, y=2, height=3, width=18, top=14, fill_stroke="gray")
 Trapezoid(x=-0.25, y=18, height=3, width=18, top=14, fill_stroke="gray", flip='s')

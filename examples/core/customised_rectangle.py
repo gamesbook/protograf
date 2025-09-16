@@ -57,33 +57,33 @@ PageBreak()
 # ---- hatches
 Blueprint()
 Text(common=txt, text="Rectangle: hatches + directions")
-htch = Common(height=1.5, width=1, hatch_count=5,
-              hatch_stroke_width=0.5, hatch_stroke="red")
+htch = Common(height=1.5, width=1, hatches_count=5,
+              hatches_stroke_width=0.5, hatches_stroke="red")
 
-Rectangle(common=htch, x=0, y=0,  hatch='w', label="W")
-Rectangle(common=htch, x=1.5, y=0, hatch='e', label="E")
-Rectangle(common=htch, x=3, y=0, hatch='ne', label="NE\nSW")
+Rectangle(common=htch, x=0, y=0,  hatches='w', label="W")
+Rectangle(common=htch, x=1.5, y=0, hatches='e', label="E")
+Rectangle(common=htch, x=3, y=0, hatches='ne', label="NE\nSW")
 
-Rectangle(common=htch, x=1.5, y=2, hatch='n', label="N")
-Rectangle(common=htch, x=0, y=2,  hatch='s', label="S")
-Rectangle(common=htch, x=3, y=2, hatch='nw', label="NW\nSE")
+Rectangle(common=htch, x=1.5, y=2, hatches='n', label="N")
+Rectangle(common=htch, x=0, y=2,  hatches='s', label="S")
+Rectangle(common=htch, x=3, y=2, hatches='nw', label="NW\nSE")
 
 Rectangle(common=htch, x=0, y=4, label="all")
-Rectangle(common=htch, x=1.5, y=4, hatch='o', label="O")
-Rectangle(common=htch, x=3, y=4, hatch='d', label="D")
+Rectangle(common=htch, x=1.5, y=4, hatches='o', label="O")
+Rectangle(common=htch, x=3, y=4, hatches='d', label="D")
 
 PageBreak()
 
-# ---- perbises
+# ---- perbii
 Blueprint()
-Text(common=txt, text="Rectangle: perbises + directions")
+Text(common=txt, text="Rectangle: perbii + directions")
 prbs = Common(height=2, width=1,
-              perbis_stroke_width=2,
-              perbis_stroke="red")
-Rectangle(common=prbs, x=0.5, y=1, perbis='n', label="N")
-Rectangle(common=prbs, x=2.5, y=1, perbis='s', label="S")
-Rectangle(common=prbs, x=0.5, y=4, perbis='w', label="W")
-Rectangle(common=prbs, x=2.5, y=4, perbis='e', label="E")
+              perbii_stroke_width=2,
+              perbii_stroke="red")
+Rectangle(common=prbs, x=0.5, y=1, perbii='n', label="N")
+Rectangle(common=prbs, x=2.5, y=1, perbii='s', label="S")
+Rectangle(common=prbs, x=0.5, y=4, perbii='w', label="W")
+Rectangle(common=prbs, x=2.5, y=4, perbii='e', label="E")
 
 PageBreak()
 
@@ -104,10 +104,10 @@ PageBreak()
 Blueprint()
 Text(common=txt, text="Rectangle: rounding; hatches")
 rct = Common(x=0.5, height=1.5, width=3.0, stroke_width=.5,
-             hatch_stroke="red", hatch='o')
-Rectangle(common=rct, y=1, rounding=0.1, hatch_count=10)
-Rectangle(common=rct, y=4, rounding=0.5, hatch_count=3)
-# Rectangle(common=rct, y=4, rounding=0.5, hatch_count=15)  # THIS FAILS!
+             hatches_stroke="red", hatches='o')
+Rectangle(common=rct, y=1, rounding=0.1, hatches_count=10)
+Rectangle(common=rct, y=4, rounding=0.5, hatches_count=3)
+# Rectangle(common=rct, y=4, rounding=0.5, hatches_count=15)  # THIS FAILS!
 PageBreak()
 
 # ---- chevron
@@ -299,26 +299,68 @@ Rectangle(
 )
 PageBreak()
 
-# ---- corner_style
+# ---- corners_style
 Blueprint()
-Text(common=txt, text="Rectangle : Corner Styles")
+Text(common=txt, text="Rectangle : Corners Styles")
 styles = Common(
     height=1, width=3.5, x=0.25,
     label_size=7, fill="lightsteelblue",
-    corner=0.4,
-    corner_stroke="gold",
-    corner_fill='red',
+    corners=0.4,
+    corners_stroke="gold",
+    corners_fill='red',
 )
-Rectangle(common=styles, y=0, label='Corner (default)')
+Rectangle(common=styles, y=0, label='Corners (default)')
 Rectangle(common=styles, y=1.25,
-          corner_style='line',
-          corner_stroke_width=2,
-          label='Corner: line (l)')
-Rectangle(common=styles, y=2.5, corner_style='triangle', label='Corner: triangle (t)')
-Rectangle(common=styles, y=3.75, corner_style='curve', label='Corner: curve (s)')
-Rectangle(common=styles, y=5, corner_style='photo', label='Corner: photo (p)')
+          corners_style='line',
+          corners_stroke_width=2,
+          label='Corners: line (l)')
+Rectangle(common=styles, y=2.5, corners_style='triangle', label='Corner: triangle (t)')
+Rectangle(common=styles, y=3.75, corners_style='curve', label='Corner: curve (s)')
+Rectangle(common=styles, y=5, corners_style='photo', label='Corner: photo (p)')
 PageBreak()
 
+# ---- stripes
+Text(common=txt, text="Rectangle: stripes")
+Blueprint(stroke_width=0.5)
+strp = Common(
+    height=1.75, width=1.25,
+    stripes=3,
+    stripes_breadth=0.2,
+    stripes_stroke="red",
+    stripes_fill="gold"
+)
+Rectangle(common=strp, x=0, y=0, stripes_directions='w', label="W")
+Rectangle(common=strp, x=1.5, y=0, stripes_directions='e', label="E")
+Rectangle(common=strp, x=3, y=0, stripes_directions='ne', label="ne/sw")
+Rectangle(common=strp, x=1.5, y=2, stripes_directions='s', label="S")
+Rectangle(common=strp, x=0, y=2, stripes_directions='n', label="N")
+Rectangle(common=strp, x=3, y=2, stripes_directions='nw', label="nw/se")
+Rectangle(common=strp, x=0, y=4, stripes_directions='*', label="all")
+Rectangle(common=strp, x=1.5, y=4, stripes_directions='o', label="O")
+Rectangle(common=strp, x=3, y=4, stripes_directions='d', label="D")
+PageBreak()
+
+# ---- stripes_flush
+Text(common=txt, text="Rectangle: stripes (flush)")
+Blueprint(stroke_width=0.5)
+strp = Common(
+    height=1.75, width=1.25,
+    stripes=3,
+    stripes_breadth=0.2,
+    stripes_stroke="red",
+    stripes_fill="aqua",
+    stripes_flush=True
+)
+Rectangle(common=strp, x=0, y=0, stripes_directions='w', label="W")
+Rectangle(common=strp, x=1.5, y=0, stripes_directions='e', label="E")
+Rectangle(common=strp, x=3, y=0, stripes_directions='ne', label="ne/sw")
+Rectangle(common=strp, x=1.5, y=2, stripes_directions='', label="S")
+Rectangle(common=strp, x=0, y=2, stripes_directions='n', label="N")
+Rectangle(common=strp, x=3, y=2, stripes_directions='nw', label="nw/se")
+Rectangle(common=strp, x=0, y=4,  stripes_directions='*', label="all")
+Rectangle(common=strp, x=1.5, y=4, stripes_directions='o', label="O")
+Rectangle(common=strp, x=3, y=4, stripes_directions='d', label="D")
+PageBreak()
 
 # ---- END
 Text(common=txt, text="Rectangle END...")
@@ -330,12 +372,13 @@ Save(
      names=[
         None,
         "centre", "notch", "dot_cross",
-        "hatch",
-        "perbis",
+        "hatches",
+        "perbii",
         "radii",
         "rounding", "chevron",
         "peak", "rotation", "notch_style", "borders",
         "slices", "slices_custom",
         "prows_defaults", "prows_inwards", "prows_outwards",
         "corners",
+        "stripes", "stripes_flush",
         None])

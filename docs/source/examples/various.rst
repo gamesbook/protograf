@@ -19,6 +19,7 @@ will demonstrate full scalability.
 - `Rondel`_
 - `Miscellaneous Things 1`_
 - `Miscellaneous Things 2`_
+- `Miscellaneous Things 3`_
 - `World Clocks`_
 
 A Clock
@@ -103,6 +104,24 @@ Discussion  The second page of this set of examples shows how to construct
             different shapes.
 ----------- ------------------------------------------------------------------
 Screenshot  .. image:: images/various/objects_2.png
+               :width: 90%
+=========== ==================================================================
+
+
+Miscellaneous Things 3
+======================
+`↑ <table-of-contents-exvar_>`_
+
+=========== ==================================================================
+Title       *Miscellaneous Things #3*
+----------- ------------------------------------------------------------------
+Script      `objects.py <https://github.com/gamesbook/protograf/blob/master/examples/various/objects.py>`_
+----------- ------------------------------------------------------------------
+Discussion  The third page of this set of examples shows how to construct
+            various "compound" shapes by making use of special properties of
+            different shapes.
+----------- ------------------------------------------------------------------
+Screenshot  .. image:: images/various/objects_3.png
                :width: 90%
 =========== ==================================================================
 

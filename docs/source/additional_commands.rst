@@ -153,7 +153,7 @@ The first must always be the page, or pages, where the extraction must happen.
 These can be specified as text e.g.: ``"42"``, ``"2-4"``, or ``"3-5,7,9"``,
 or in a list form e.g.: ``[42]``, ``[2, 3, 4]``, or ``[3, 4, 5, 7, 9]``.
 
-Either one of two properties can be used to specify what part of the page must
+The following properties can be used to specify what part of the page must
 be extracted:
 
 - *cols_rows*: two numbers - either comma-separated in text **or** in a list
@@ -167,12 +167,21 @@ be extracted:
   images |dash| the first being 4cm in height and width and starting 1cm away
   from the top and left of the page, and the second being 4cm width by 5cm in
   height and starting 2cm away from the top and left of the page
+- *width* and *height* - together with *x* and *y* these specify a rectangular
+  area of a page; when used with ``repeat=True`` this area will be repeatedly
+  extracted for as many times as the area fits into the page in terms of its
+  width across and height down.
 
 .. NOTE::
 
     Areas are **always** relative to the edges of the page; they do
     **not** make use of any page margins. Similarly *cols_rows* always
-    divide up the whole page, ignoring any page margins.
+    divide up the whole page, ignoring any page margins. The *x* and *y*
+    values also ignore any page margins
+
+.. WARNING::
+
+   Do **NOT** use different extraction types in the same command!
 
 A *cols_rows* example:
 
@@ -186,6 +195,11 @@ An *areas* example:
 
     Extract("2,4,6", areas=[(1, 1, 5, 5), (2, 2, 6, 7)])
 
+A *width* and *height* example:
+
+.. code:: python
+
+    Extract("2,4-6", width=6.5, height=9, x=1.25, y=1.25, repeat=True)
 
 By default, the images are named after the PDF file being created, along with
 a ``-N`` suffix, where N is the page number, and then a ``-M`` where M is the
@@ -221,8 +235,9 @@ followed by all the rows in that column.
 .. HINT::
 
     It is possible to have multiple ``Extract()`` commands in a script;
-    so different *areas* and/or *cols_rows* can be extracted from the same
-    page or pages.
+    so different *areas* and/or *cols_rows* and/or *width*/*height*
+    rectangles can be extracted from the same page or pages.
+
 
 
 .. _random-command:

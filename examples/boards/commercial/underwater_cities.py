@@ -15,7 +15,7 @@ Create(filename="underwater_cities.pdf", margin=0.0, paper="A2-l")
 # Icons
 money = rectangle(
     fill_stroke="gold", height=1.2, width=0.8, rounding=0.1,
-    hatch_count=5, hatch='w', hatch_stroke="dimgray",
+    hatches_count=5, hatches='w', hatches_stroke="dimgray",
     label_stroke="black", label_size=16)
 pipe = image("images/pipe.png", width=2, height=0.75)
 card_icon = rectangle(fill="white", label_stroke="black", label_size=32)
@@ -138,7 +138,7 @@ Layout(score_track,
 Rectangle(x=57, y=4.5, width=5, height=33, fill_stroke="#D4D4DB", rounding=1.5)
 Rectangle(
     x=57.4, y=6, width=2.4, height=30, fill_stroke="#554F52", rounding=0.4,
-    hatch_count=12, hatch='w', hatch_stroke="#4E6B9A")
+    hatches_count=12, hatches='w', hatches_stroke="#4E6B9A")
 Sequence(
     text(x=58.5, y=35.2, font_size=24, stroke="gray", text="{{sequence}}"),
     setting=[1,2,3,4,' ',5,6,7,' ',8,9,10],
@@ -150,11 +150,11 @@ Rectangle(x=9, y=21, width=6.5, height=12, fill_stroke=play_order, rounding=0.5)
 Rectangle(
     x=11.6, y=22, width=3.7, height=8.5, fill="#2F4769",
     stroke=play_order, rounding=0.4,
-    hatch_count=3, hatch='w', hatch_stroke=play_order)
+    hatches_count=3, hatches='w', hatches_stroke=play_order)
 Rectangle(
     x=9.2, y=22, width=2.4, height=8.5, fill="#2F4769",
     stroke=play_order, rounding=0.4,
-    hatch_count=3, hatch='w', hatch_stroke=play_order)
+    hatches_count=3, hatches='w', hatches_stroke=play_order)
 Rectangle(
     x=9.2, y=30.4, width=6.1, height=2.4, fill="#2F4769",
     stroke=play_order, rounding=0.4)

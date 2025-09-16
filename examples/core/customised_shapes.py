@@ -126,7 +126,7 @@ EquilateralTriangle(
     x=2, y=1, flip="south", hand="west", label="SW", fill="blue")
 EquilateralTriangle(
     x=1, y=4, side=1.5,
-    hatch_count=5, hatch_stroke="red",
+    hatches_count=5, hatches_stroke="red",
     title='Title', heading='Head')
 EquilateralTriangle(
     x=1, y=5.5, side=1.5, stroke_width=1,
@@ -217,14 +217,14 @@ Polygon(
     dot=0.1, dot_stroke="red")
 PageBreak()
 
-# ---- polygon perbis
+# ---- polygon perbii
 Blueprint()
-Text(common=txt, text="Polygon: perbis (default & custom)")
-Polygon(cx=2, cy=4, sides=8, radius=1, perbis='*')
+Text(common=txt, text="Polygon: perbii (default & custom)")
+Polygon(cx=2, cy=4, sides=8, radius=1, perbii='*')
 Polygon(
     cx=2, cy=1, sides=8, radius=1,
-    perbis="2,4,7",
-    perbis_offset=0.25, perbis_length=0.5, perbis_stroke_width=1,
+    perbii="2,4,7",
+    perbii_offset=0.25, perbii_length=0.5, perbii_stroke_width=1,
     dot=0.1, dot_stroke="red")
 PageBreak()
 
@@ -685,7 +685,7 @@ small_star = star(radius=0.25)
 small_circle = circle(radius=0.33, fill="gray", centre_shape=small_star)
 Hexagon(x=1, y=0.5, height=2,
         dot=0.1,
-        hatch_count=5,
+        hatches_count=5,
         centre_shape=small_circle)
 Hexagon(x=1, y=3, height=2,
         centre_shape=small_circle,
@@ -700,7 +700,7 @@ Rectangle(x=0, y=1, side=1,
               radius=0.4,
               sides=7,
               fill=None,
-              perbis='*',
+              perbii='*',
               stroke="red"))
 Rectangle(x=1, y=2, side=1,
           centre_shape=circle(
@@ -729,7 +729,7 @@ Rectangle(x=1, y=4, side=1,
               side=0.6,
               stroke="gold",
               fill=None,
-              hatch='d', hatch_count=5,
+              hatches='d', hatches_count=5,
               borders=[("n s", 2, "black")]))
 Rectangle(x=2, y=3, side=1,
           centre_shape=rhombus(
@@ -825,15 +825,15 @@ Star(x=1, y=1, vertices=5, radius=0.75, common=props, label="star")
 Ellipse(cx=3, cy=1, height=1, width=1.5, common=props, label="ellipse")
 PageBreak()
 
-# ---- shape hatch-and-rotation
+# ---- shape hatches-and-rotation
 Blueprint()
-Text(common=txt, text="Hatch & Rotate")
+Text(common=txt, text="Hatches & Rotate")
 htch = Common(
     fill='lightgray', stroke=None,
-    hatch_count=5,
-    hatch='w',
-    hatch_stroke_width=0.75,
-    hatch_stroke="red")
+    hatches_count=5,
+    hatches='w',
+    hatches_stroke_width=0.75,
+    hatches_stroke="red")
 
 Hexagon(
     common=htch,
@@ -893,20 +893,20 @@ Line(
     x=2, y=0.5, length=1.5, stroke="firebrick", stroke_width=1,
     wave_style='sawtooth', wave_height=0.1)
 Polygon(
-    perbis_stroke="purple", perbis_stroke_width=1,
-    perbis_wave_style='wave', perbis_wave_height=0.1,
+    perbii_stroke="purple", perbii_stroke_width=1,
+    perbii_wave_style='wave', perbii_wave_height=0.1,
     cx=1, cy=1.5, sides=8, radius=0.75,
-    perbis="2,4,7")
+    perbii="2,4,7")
 Polygon(
     radii_stroke="firebrick", radii_stroke_width=1,
     radii_wave_style='sawtooth', radii_wave_height=0.1,
     cx=3, cy=1.5, sides=8, radius=0.75,
     radii="*")
 Rectangle(
-    perbis_stroke="purple", perbis_stroke_width=1,
-    perbis_wave_style='wave', perbis_wave_height=0.1,
+    perbii_stroke="purple", perbii_stroke_width=1,
+    perbii_wave_style='wave', perbii_wave_height=0.1,
     cx=1, cy=3.25, height=1, width=2,
-    perbis="n s e w",
+    perbii="n s e w",
 )
 Circle(
     radii_stroke="firebrick", radii_stroke_width=1,
@@ -916,9 +916,9 @@ Circle(
 )
 Hexagon(
     cx=1, cy=5, radius=0.75,
-    perbis='*',
-    perbis_stroke="purple", perbis_stroke_width=1,
-    perbis_wave_style='wave', perbis_wave_height=0.1
+    perbii='*',
+    perbii_stroke="purple", perbii_stroke_width=1,
+    perbii_wave_style='wave', perbii_wave_height=0.1
 )
 Hexagon(
     cx=3, cy=5, radius=0.75,
@@ -957,7 +957,7 @@ Save(
         "starfield_poly", "equilateral_triangle", "right_angled_triangle_flip",
         "sectors", "grid_gray", "dotgrid_moleskine", "dotgrid_rowscols", "arc",
         "stadium_edges", "trapezoid_flip", "chord",
-        "polygon_radii", "polygon_perbis", "polygon_slices",
+        "polygon_radii", "polygon_perbii", "polygon_slices",
         "dates_formats",
         "images_normal_rotation", "rhombus_red_rotation",
         "stadium_red_rotation",
@@ -978,8 +978,8 @@ Save(
         "shapes_centred",
         "qr_code",
         "image_sliced", "image_label",
-        "shape_rotation", "shape_hatch_and_rotation",
+        "shape_rotation", "shape_hatches_and_rotation",
         "table_defaults", "table_custom",
-        "perbis_styled",
+        "perbii_styled",
         "poly_waves",
         None])

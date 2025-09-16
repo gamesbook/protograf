@@ -39,19 +39,19 @@ Text(text="<b>I.</b> PLAY GREEN <b>II.</b> PLAY BLUE or RED <b>III.</b> ACTION <
 
 # resource areas
 rsrc = Common(x=7.5, width=6, rounding=0.1, stroke=None,
-              hatch='w', hatch_stroke_width=2)
+              hatches='w', hatches_stroke_width=2)
 Rectangle(common=rsrc,
           y=1.4, height=6.8, fill=LT_YELLOW,
-          hatch_stroke=DK_YELLOW, hatch_count=36,
+          hatches_stroke=DK_YELLOW, hatches_count=36,
           centre_shape=rectangle(
               height=0.9, width=0.9, fill="gold", stroke='dimgray', notch=0.1))
 Rectangle(common=rsrc,
           y=8.8, height=3.1, fill=LT_RED,
-          hatch_stroke=DK_RED, hatch_count=16,
+          hatches_stroke=DK_RED, hatches_count=16,
           centre_shape=rectangle(height=0.9, width=0.9, fill=VERY_RED, stroke='dimgray'))
 Rectangle(common=rsrc,
           y=12.4, height=3.1, fill=LT_GREEN,
-          hatch_stroke=DK_GREEN, hatch_count=16,
+          hatches_stroke=DK_GREEN, hatches_count=16,
           centre_shape=rectangle(height=0.9, width=0.9, fill="#8CC352", stroke='dimgray'))
 
 # horizontal sections

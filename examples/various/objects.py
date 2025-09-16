@@ -54,16 +54,16 @@ Text(common=header_font, x=5, y=13,
 Rectangle(
     x=2, y=12,
     height=3, width=2,
-    hatch_count=7, hatch_stroke_width=0.1, hatch='d', hatch_stroke="black",
+    hatches_count=7, hatches_stroke_width=0.1, hatches='d', hatches_stroke="black",
     stroke="saddlebrown", stroke_width=2, fill="lightcyan")
 
 
 Text(common=header_font, x=5, y=17,
-     text="Paned Window: rectangle with single orthogonal hatch")
+     text="Paned Window: rectangle with single orthogonal hatches")
 Rectangle(
     x=2, y=16,
     height=3, width=2,
-    hatch_count=1, hatch_stroke_width=1, hatch='o', hatch_stroke="sienna",
+    hatches_count=1, hatches_stroke_width=1, hatches='o', hatches_stroke="sienna",
     stroke="sienna", stroke_width=3, fill="lightcyan")
 
 
@@ -142,12 +142,12 @@ Circle(cx=3.5, cy=9, radius=0.35, fill=None,
 
 
 Text(common=header_font, x=5, y=12.5,
-     text="German Cross: rectangle with 'o' hatch and 'step' notch")
+     text="German Cross: rectangle with 'o' hatches and 'step' notch")
 Rectangle(
     height=2.8, width=2.8, x=0.5, y=11,
     fill="white", stroke="black", stroke_width=2,
-    hatch_stroke_width=22, hatch_stroke="black",
-    hatch='o', hatch_count=1,
+    hatches_stroke_width=22, hatches_stroke="black",
+    hatches='o', hatches_count=1,
     notch=0.7, notch_style='step')
 Rectangle(
     height=2.8, width=2.8, x=0.5, y=11,
@@ -190,7 +190,7 @@ Circle(cx=2, cy=25, radius=1.25,
        nested=6,
        slices=["#077D25"], slices_angles=[30],
        slices_transparency=20,
-       # hatches='o', hatch_stroke="#035320",
+       # hatches='o', hatches_stroke="#035320",
        radii=steps(0, 360, 5),
        radii_offset=1.1, radii_length=0.125,
        radii_stroke="#01F91E", radii_stroke_width=1.25)
@@ -207,7 +207,7 @@ Text(common=header_font, x=8, y=3,
 Text(common=header_font, x=8, y=4,
      text="- Image")
 Text(common=header_font, x=8, y=4.75,
-     text="- Rectangle: corners; centred shape; perbis")
+     text="- Rectangle: corners; centred shape; perbii")
 Text(common=header_font, x=8, y=5.5,
      text="- Dot & Texts")
 Image("tmwtgg.jpg",
@@ -216,19 +216,19 @@ Image("tmwtgg.jpg",
 Rectangle(
     width=6, height=3.2, x=1.2, y=2.2,
     fill=None, stroke=None,
-    corner=0.4,
-    corner_stroke_width=2,
+    corners=0.4,
+    corners_stroke_width=2,
     centre_shape=rectangle(
         width=2, height=2,
         fill=None, stroke=None,
-        corner=0.3,
-        corner_stroke="silver",
-        corner_stroke_width=1.5),
-    perbis="*",
-    perbis_stroke_width=2,
-    perbis_length=0.4,
-    perbis_offset_y=1.8,
-    perbis_offset_x=2.8,
+        corners=0.3,
+        corners_stroke="silver",
+        corners_stroke_width=1.5),
+    perbii="*",
+    perbii_stroke_width=2,
+    perbii_length=0.4,
+    perbii_offset_y=1.8,
+    perbii_offset_x=2.8,
     cross=0.5,
     cross_stroke="white",
     cross_stroke_width=1.5)
@@ -238,8 +238,22 @@ Text(text="REC",
 Text(text="00:00:00",
      x=6.5, y=5.3, stroke="white", font_size=10)
 
-# rectangle(
-#     width=2, height=1.1, fill=None,
-#     stroke=None, corner=0.3, corner_stroke_width=2_
+Text(common=header_font, x=8, y=7.5,
+     text="Tanzanian Flag")
+Text(common=header_font, x=8, y=8.5,
+     text=" - Rectangle: slices and black diagonal stripe")
+Text(common=header_font, x=8, y=9.5,
+     text=" - Rectangle: yellow diagonal stripe")
+Rectangle(
+    width=5.76, height=3.76, x=1.2, y=7,
+    fill="white", stroke=None,
+    slices=["#18B367", "#00A5DE"],
+    stripes=1, stripes_directions="ne",
+    stripes_fill="#FCD20E", stripes_breadth=1.52)
+Rectangle(
+    width=5.76, height=3.76, x=1.2, y=7,
+    stroke="white", fill=None,
+    stripes=1, stripes_directions="ne",
+    stripes_fill="black", stripes_breadth=1.04)
 
 Save()

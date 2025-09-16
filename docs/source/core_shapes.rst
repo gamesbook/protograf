@@ -1032,14 +1032,14 @@ Example 2. Customised EquilateralTriangle
 
         EquilateralTriangle(
             x=1, y=4, side=1.5,
-            hatch_count=5, hatch_stroke="red",
+            hatches_count=5, hatches_stroke="red",
             title="Title", heading="Head")
 
       - starting position - *x* is ``1`` cm and *y* is ``4`` cm
       - *side* of ``1.5`` cm; all sides are equal
-      - *hatch_count* of ``5`` - this means there will be 5 equally spaced lines drawn
+      - *hatches_count* of ``5`` - this means there will be 5 equally spaced lines drawn
         between opposing sides and running parallel to the third side
-      - *hatch_stroke* - customise the hatches to show them as ``red``
+      - *hatches_stroke* - customise the hatches to show them as ``red``
 
       The top section shows:
 
@@ -1245,15 +1245,15 @@ Example 3. Polygon Radii
 
 ===== ======
 
-Example 4. Polygon with Perbis
+Example 4. Polygon with Perbii
 ++++++++++++++++++++++++++++++
 `^ <polygon-command_>`_
 
-The *perbis* |dash| short for "perpendicular bisector" |dash| defines
-lines that should be drawn from the centres of the sides of the polygon
-to the polygon's centre.
+The *perbii* |dash| "perbis" is short for "perpendicular bisector" and "perbii"
+is the plural form |dash| defines lines that should be drawn from the centres
+of the sides of the polygon to the polygon's centre.
 
-.. |pl3| image:: images/customised/polygon_perbis.png
+.. |pl3| image:: images/customised/polygon_perbii.png
    :width: 330
 
 ===== ======
@@ -1266,14 +1266,14 @@ to the polygon's centre.
 
           Polygon(
               cx=2, cy=4, sides=8,
-              radius=1, perbis='*')
+              radius=1, perbii='*')
 
       It has the following properties:
 
       - *centre* at x-position ``2`` cm and at y-position ``4`` cm, with a *radius*
         size of ``1`` cm
       - *sides* - ``8`` sides (an octagon)
-      - *perbis* - set to ``*``; this means lines are drawn from each of the
+      - *perbii* - set to ``*``; this means lines are drawn from each of the
         centres of the sides of the polygon to its centre
 
       The **top** example:
@@ -1282,10 +1282,10 @@ to the polygon's centre.
 
           Polygon(
             cx=2, cy=1, sides=8, radius=1,
-            perbis="2,4,7",
-            perbis_offset=0.25,
-            perbis_length=0.5,
-            perbis_stroke_width=1,
+            perbii="2,4,7",
+            perbii_offset=0.25,
+            perbii_length=0.5,
+            perbii_stroke_width=1,
             dot=0.1, dot_stroke="red")
 
       It has the following properties:
@@ -1293,22 +1293,22 @@ to the polygon's centre.
       - *centre* at x-position ``2`` cm and at y-position ``1`` cm
       - *radius* size of ``1`` cm
       - *sides* - ``8`` (an octagon)
-      - *perbis* - lines drawn to sides 2, 4 and 7
+      - *perbii* - lines drawn to sides 2, 4 and 7
 
       The edges of the polygon are numbered; the east-most facing edge is 1,
       and then numbers increase in an clockwise direction.
 
       Its properties can be set as follows:
 
-      - *perbis* - a list of edges to use
-      - *perbis_offset* - set to ``0.25`` cm; the distance away from the centre
+      - *perbii* - a list of edges to use
+      - *perbii_offset* - set to ``0.25`` cm; the distance away from the centre
         that the lines will start to be drawn
-      - *perbis_length*  - set to ``0.5`` cm
-      - *perbis_stroke_width* - set to ``1`` point; a slightly thicker line
+      - *perbii_length*  - set to ``0.5`` cm
+      - *perbii_stroke_width* - set to ``1`` point; a slightly thicker line
 
-      Note that when the perbis length is shorter than that the distance from
-      centre point to edge, the line will still go in the same direction but never
-      touch the vertex or the edge.
+      Note that when the *perbii length* is shorter than that the distance from
+      centre point to edge, the line will still go in the same direction but
+      never touch the vertex or the edge.
 
 ===== ======
 
@@ -3432,21 +3432,21 @@ Example 4. Rotation with Hatches
 ++++++++++++++++++++++++++++++++
 `↑ <coreShapeRotation_>`_
 
-.. |rt4| image:: images/customised/shape_hatch_and_rotation.png
+.. |rt4| image:: images/customised/shape_hatches_and_rotation.png
    :width: 330
 
 ===== ======
 |rt4| This example shows different shapes constructed using commands with
-      some ``Common`` properties for the ``hatch`` effect:
+      some ``Common`` properties for the ``hatches`` effect:
 
       .. code:: python
 
         htch = Common(
             fill='lightgray', stroke=None,
-            hatch_count=5,
-            hatch='w',
-            hatch_stroke="red",
-            hatch_stroke_width=0.75,
+            hatches_count=5,
+            hatches='w',
+            hatches_stroke="red",
+            hatches_stroke_width=0.75,
             rotation=30)
 
         Hexagon(
@@ -3724,7 +3724,7 @@ The centre-shape can be shifted from the centre by setting values for
 
         Hexagon(
             x=1, y=0.5, height=2,
-            hatch_count=5,
+            hatches_count=5,
             dot=0.1,
             centre_shape=small_circle)
 
@@ -3774,7 +3774,7 @@ and this shape itself can be customised.
                       radius=0.4,
                       sides=7,
                       fill=None,
-                      perbis='*',
+                      perbii='*',
                       stroke="red"))
         Rectangle(x=1, y=2, side=1,
                   centre_shape=circle(
@@ -3803,7 +3803,7 @@ and this shape itself can be customised.
                       side=0.6,
                       stroke="gold",
                       fill=None,
-                      hatch='d', hatch_count=5,
+                      hatches='d', hatches_count=5,
                       borders=[("n s", 2, "black")]))
         Rectangle(x=2, y=3, side=1,
                   centre_shape=rhombus(
@@ -3913,16 +3913,16 @@ Wave Styles
 A number of shapes, that make use of straight line properties, can be styled
 using their "wave" property.
 
-These include the *radii* and *perbis* properties of Circle, Hexagon, Polygon
+These include the *radii* and *perbii* properties of Circle, Hexagon, Polygon
 and Rectangle (for details on those properties, see the section on
 :doc:`Customised Shapes <customised_shapes>`).  In addition, the lines used
 to construct a Polyshape and Polyline can also be styled like waves.
 
 
-Example 1. Radii and Perbis
+Example 1. Radii and perbii
 +++++++++++++++++++++++++++
 
-.. |ws1| image:: images/customised/perbis_styled.png
+.. |ws1| image:: images/customised/perbii_styled.png
    :width: 330
 
 ===== ======
@@ -3941,12 +3941,12 @@ Example 1. Radii and Perbis
             wave_style='sawtooth', wave_height=0.1
         )
         Polygon(
-            perbis_stroke="purple",
-            perbis_stroke_width=1,
-            perbis_wave_style='wave',
-            perbis_wave_height=0.1,
+            perbii_stroke="purple",
+            perbii_stroke_width=1,
+            perbii_wave_style='wave',
+            perbii_wave_height=0.1,
             cx=1, cy=1.5, sides=8, radius=0.75,
-            perbis="2,4,7"
+            perbii="2,4,7"
         )
         Polygon(
             radii_stroke="firebrick",
@@ -3956,12 +3956,12 @@ Example 1. Radii and Perbis
             cx=3, cy=1.5, sides=8, radius=0.75,
             radii="*")
         Rectangle(
-            perbis_stroke="purple",
-            perbis_stroke_width=1,
-            perbis_wave_style='wave',
-            perbis_wave_height=0.1,
+            perbii_stroke="purple",
+            perbii_stroke_width=1,
+            perbii_wave_style='wave',
+            perbii_wave_height=0.1,
             cx=1, cy=3.25, height=1, width=2,
-            perbis="n s e w",
+            perbii="n s e w",
         )
         Circle(
             radii_stroke="firebrick",
@@ -3973,11 +3973,11 @@ Example 1. Radii and Perbis
         )
         Hexagon(
             cx=1, cy=5, radius=0.75,
-            perbis='*',
-            perbis_stroke="purple",
-            perbis_stroke_width=1,
-            perbis_wave_style='wave',
-            perbis_wave_height=0.1
+            perbii='*',
+            perbii_stroke="purple",
+            perbii_stroke_width=1,
+            perbii_wave_style='wave',
+            perbii_wave_height=0.1
         )
         Hexagon(
             cx=3, cy=5, radius=0.75,
@@ -3990,8 +3990,8 @@ Example 1. Radii and Perbis
 
       The purple lines have:
 
-      - *perbis_wave_style*  set to ``'wave'`` creating a wave-like effect
-      - *perbis_wave_height* set to ``0.1`` for the height of each "peak"
+      - *perbii_wave_style*  set to ``'wave'`` creating a wave-like effect
+      - *perbii_wave_height* set to ``0.1`` for the height of each "peak"
 
       The dark red lines have:
 
@@ -4027,8 +4027,8 @@ Example 2. Polyshape and Polyline
 
       The top Polyshape, with a default line stroke, has:
 
-      - *perbis_wave_style*  set to ``'wave'`` creating a wave-like effect
-      - *perbis_wave_height* set to ``0.03`` for the height of each "peak"
+      - *perbii_wave_style*  set to ``'wave'`` creating a wave-like effect
+      - *perbii_wave_height* set to ``0.03`` for the height of each "peak"
 
       The dark red thick Polyline has:
 
@@ -4037,7 +4037,7 @@ Example 2. Polyshape and Polyline
 
       The purple thick Polyline has:
 
-      - *perbis_wave_style*  set to ``'wave'`` creating a wave-like effect
-      - *perbis_wave_height* set to ``0.05`` for the height of each "peak"
+      - *perbii_wave_style*  set to ``'wave'`` creating a wave-like effect
+      - *perbii_wave_height* set to ``0.05`` for the height of each "peak"
 
 ===== ======
