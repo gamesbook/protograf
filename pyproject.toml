@@ -1,6 +1,6 @@
 [project]
 name = "protograf"
-version = "0.2.17"
+version = "0.3.0"
 description = "Python utility for designing and creating simple, regular, graphic outputs as PDF/PNG files"
 authors = [
     {name = "Derek Hohls", email = "gamesbook@gmail.com"}
