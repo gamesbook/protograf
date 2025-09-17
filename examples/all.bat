@@ -120,6 +120,7 @@ REM ---- various
 ECHO "Creating various..."
 python various\clock.py --no-png -d %location%
 python various\logo.py --no-png -d %location%
+python various\math-2.py --no-png -d %location%
 python various\objects.py --no-png -d %location%
 python various\large_objects.py --no-png -d %location%
 python various\rolling.py --no-png -d %location%

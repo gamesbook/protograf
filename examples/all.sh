@@ -103,6 +103,7 @@ python cards/cards_deck_15.py --no-png -d /tmp/demo
 echo -e "\nCreating various..."
 python various/clock.py --no-png -d /tmp/demo
 python various/logo.py --no-png -d /tmp/demo
+python various/math-2.py --no-png -d /tmp/demo
 python various/large_objects.py --no-png -d /tmp/demo
 python various/objects.py --no-png -d /tmp/demo
 python various/rolling.py --no-png -d /tmp/demo

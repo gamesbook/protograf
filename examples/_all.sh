@@ -102,6 +102,7 @@ python cards/cards_deck_15.py
 echo -e "\nCreating various..."
 python various/clock.py
 python various/logo.py
+python various/math-2.py
 python various/large_objects.py
 python various/objects.py
 python various/rolling.py

@@ -56,7 +56,7 @@ Line
 A Line is a very common shape in many designs; there are a number of ways
 that it can be customised.
 
-- `Dotted, Dashed and Angled <lineDotDash_>`_
+- `Dotted, Dashed, Angled and Wavy <lineDotDash_>`_
 - `Centred <lineCentred_>`_
 - `Arrowheads <line-with-arrow_>`_
 - `Connections <lineConnections_>`_
@@ -89,6 +89,8 @@ A Line has the following properties, in addition to the basic ones of
 - *squared* - if ``True``, draw small squares, centred at the ends of the line
 - *stroke* - the color of the line
 - *stroke_width* - the thickness of the line, in points
+- *wave_style* - can be set to ``'wave'`` or ``'sawtooth'``
+- *wave_height* - a numeric value for the height of each wave's "peak"
 - *x1* and *y1* - a fixed endpoint for the line end (if not calculated by
   *angle* and *length*)
 
@@ -98,8 +100,8 @@ details in the `arrowheads example <line-with-arrow_>`_.
 
 .. _lineDotDash:
 
-Example 1. Dotted, Dashed and Angled Lines
-------------------------------------------
+Example 1. Dotted, Dashed, Angled and Wavy Lines
+------------------------------------------------
 `^ <lineIndex_>`_
 
 .. |ln2| image:: images/customised/line_custom.png
