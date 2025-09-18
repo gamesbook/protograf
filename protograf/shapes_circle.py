@@ -398,15 +398,34 @@ class CircleShape(BaseShape):
                                 center, self._u.radius + offset, angle
                             )
                         )
-
                     case "petal" | "p":
+                        # first half
                         pt1 = geoms.point_on_circle(
                             center,
                             self._u.radius + offset,
                             angle - gap / 2.0,
                         )
                         pt2 = geoms.point_on_circle(
-                            center, self._u.radius + offset + height, angle
+                            center,
+                            self._u.radius + offset + height,
+                            angle - gap / 2.0,
+                        )
+                        pt3 = geoms.point_on_circle(
+                            center,
+                            self._u.radius + offset + height,
+                            angle,
+                        )
+                        petals_vertices.append((pt1, pt2, pt3))
+                        # second half
+                        pt1 = geoms.point_on_circle(
+                            center,
+                            self._u.radius + offset + height,
+                            angle,
+                        )
+                        pt2 = geoms.point_on_circle(
+                            center,
+                            self._u.radius + offset + height,
+                            angle + gap / 2.0,
                         )
                         pt3 = geoms.point_on_circle(
                             center,
@@ -414,7 +433,43 @@ class CircleShape(BaseShape):
                             angle + gap / 2.0,
                         )
                         petals_vertices.append((pt1, pt2, pt3))
-
+                    case "sun" | "s":
+                        # first half
+                        pt1 = geoms.point_on_circle(
+                            center,
+                            self._u.radius + offset + height,
+                            angle - gap / 2.0,
+                        )
+                        pt2 = geoms.point_on_circle(
+                            center,
+                            self._u.radius + offset,
+                            angle - gap / 2.0
+                        )
+                        pt3 = geoms.point_on_circle(
+                            center,
+                            self._u.radius + offset,
+                            angle,
+                        )
+                        # print(f'1st {angle=} {pt1=} {pt2=} {pt3=}')
+                        petals_vertices.append((pt1, pt2, pt3))
+                        # second half
+                        pt1 = geoms.point_on_circle(
+                            center,
+                            self._u.radius + offset,
+                            angle,
+                        )
+                        pt2 = geoms.point_on_circle(
+                            center,
+                            self._u.radius + offset,
+                            angle + gap / 2.0
+                        )
+                        pt3 = geoms.point_on_circle(
+                            center,
+                            self._u.radius + offset + height,
+                            angle + gap / 2.0,
+                        )
+                        # print(f'2nd {angle=} {pt1=} {pt2=} {pt3=}')
+                        petals_vertices.append((pt1, pt2, pt3))
                     case _:
                         feedback(f'Unknown petals_style "{self.petals_style}"', True)
 
@@ -430,6 +485,15 @@ class CircleShape(BaseShape):
                             (petals_vertices[key + 1].x, petals_vertices[key + 1].y),
                         )
                 case "petal" | "p":
+                    for key, vertex in enumerate(petals_vertices):
+                        # if key == 0:
+                        #     continue  # already have a "start" location on path
+                        cnv.draw_curve(  # was curveTo
+                            (vertex[0].x, vertex[0].y),
+                            (vertex[1].x, vertex[1].y),
+                            (vertex[2].x, vertex[2].y),
+                        )
+                case "sun" | "s":
                     for key, vertex in enumerate(petals_vertices):
                         # if key == 0:
                         #     continue  # already have a "start" location on path

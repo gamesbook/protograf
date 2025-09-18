@@ -1512,12 +1512,12 @@ class BaseShape:
         if self.petals_style:
             if _lower(self.petals_style) not in [
                 "triangle",
-                "curve",
+                "sun",
                 "rectangle",
                 "petal",
                 "windmill",
                 "t",
-                "c",
+                "s",
                 "r",
                 "p",
                 "w",
