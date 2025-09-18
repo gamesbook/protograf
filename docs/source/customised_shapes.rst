@@ -2674,6 +2674,7 @@ ways that it can be customised.
 - `Radii Labels <circleRadiiLabels_>`_
 - `Petals: petal <circlePetalsPetal_>`_
 - `Petals: triangle <circlePetalsTriangle_>`_
+- `Petals: sun <circlePetalsSun_>`_
 - `Slices <circleSlices_>`_
 - `Nested <circleNested_>`_
 - `Ordering of Properties <circleOrder_>`_
@@ -2933,7 +2934,7 @@ effect.
                petals_offset=0.2,
                petals_stroke_width=1,
                petals_dotted=1,
-               petals_height=0.5,
+               petals_height=0.25,
                petals_fill="gray")
 
         Circle(cx=2, cy=4.5, radius=1,
@@ -2942,7 +2943,7 @@ effect.
                petals_style="p",
                petals_offset=0.1,
                petals_stroke_width=2,
-               petals_height=0.8,
+               petals_height=0.25,
                petals_stroke="red",
                petals_fill="yellow")
 
@@ -3020,6 +3021,63 @@ effect.
 
       Note that these petals have a default *petals_style* of
       ``t`` or ``triangle``.
+
+===== ======
+
+
+.. _circlePetalsSun:
+
+Petals - sun
+------------
+`^ <circle_>`_
+
+Petals are projecting shapes drawn from the circumference of a Circle outwards
+at regular intervals.  They are typically used to create a "flower" or "sun"
+effect.
+
+.. |cps| image:: images/custom/circle/petals_sun.png
+   :width: 330
+
+===== ======
+|cps| This example shows Circles constructed using these commands:
+
+      .. code:: python
+
+        Circle(cx=2, cy=1.5, radius=1,
+               petals=11,
+               petals_style="sun",
+               petals_offset=0.25,
+               petals_stroke_width=1,
+               petals_dotted=True,
+               petals_height=0.5,
+               petals_fill="grey")
+        Circle(cx=2, cy=4.5, radius=1,
+               stroke=None, fill=None,
+               petals=8,
+               petals_style="s",
+               petals_stroke_width=3,
+               petals_height=0.5,
+               petals_stroke="red",
+               petals_fill="yellow")
+
+      These Circles have the following properties:
+
+      - *cx*, *cy*, *radius*, *stroke* and *fill* - set the properties of the
+        `Circle`_; if these are set to ``None`` then the *petal_fill*
+        setting will be used for the whole area
+      - *petals* - sets the number of petals to drawn
+      - *petals_offset* - sets the distance of the lowest point of the petal
+        line away from the circle's circumference
+      - *petals_stroke_width* - sets the thickness of the line used to draw
+        the petals
+      - *petals_fill* - sets the color of the area inside the line used to
+        draw the petals. Any *fill* or *stroke* settings for the circle itself
+        may appear superimposed on this area.
+      - *petals_dotted* - if ``True``, sets the line style to *dotted*
+      - *petals_height* - sets the distance between the highest and the lowest
+        points of the petal line
+
+      Note that these petals have the *petals_style* of ``s`` or ``sun``.
 
 ===== ======
 

@@ -379,7 +379,13 @@ class CircleShape(BaseShape):
             angles = support.steps(90 - shift, 450 - shift, gap)
             # print(f' ^ {self.petals=} {angles=}')
             for index, angle in enumerate(angles):
-                angle = angle - 360.0 if angle > 360.0 else angle
+                _angle = angle
+                angle = _angle - 360.0 if _angle > 360.0 else _angle
+                if index == 0:
+                    start_angle = angle
+                else:
+                    if round(start_angle, 3) == round(angle, 3):
+                        break  # avoid a repeat
                 petals_style = _lower(self.petals_style)
                 if petals_style not in ["triangle", "t"]:
                     if len(angles) < self.petals + 1:
@@ -437,38 +443,32 @@ class CircleShape(BaseShape):
                         # first half
                         pt1 = geoms.point_on_circle(
                             center,
-                            self._u.radius + offset + height,
-                            angle - gap / 2.0,
-                        )
-                        pt2 = geoms.point_on_circle(
-                            center,
-                            self._u.radius + offset,
-                            angle - gap / 2.0
-                        )
-                        pt3 = geoms.point_on_circle(
-                            center,
                             self._u.radius + offset,
                             angle,
                         )
-                        # print(f'1st {angle=} {pt1=} {pt2=} {pt3=}')
+                        pt2 = geoms.point_on_circle(
+                            center, self._u.radius + offset, angle - gap / 2.0
+                        )
+                        pt3 = geoms.point_on_circle(
+                            center,
+                            self._u.radius + offset + height,
+                            angle - gap / 2.0,
+                        )
                         petals_vertices.append((pt1, pt2, pt3))
                         # second half
                         pt1 = geoms.point_on_circle(
                             center,
-                            self._u.radius + offset,
-                            angle,
+                            self._u.radius + offset + height,
+                            angle - gap / 2.0,
                         )
                         pt2 = geoms.point_on_circle(
-                            center,
-                            self._u.radius + offset,
-                            angle + gap / 2.0
+                            center, self._u.radius + offset, angle - gap / 2.0
                         )
                         pt3 = geoms.point_on_circle(
                             center,
-                            self._u.radius + offset + height,
-                            angle + gap / 2.0,
+                            self._u.radius + offset,
+                            angle - gap,
                         )
-                        # print(f'2nd {angle=} {pt1=} {pt2=} {pt3=}')
                         petals_vertices.append((pt1, pt2, pt3))
                     case _:
                         feedback(f'Unknown petals_style "{self.petals_style}"', True)
