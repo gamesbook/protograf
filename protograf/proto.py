@@ -3666,7 +3666,7 @@ def StarLine(row=None, col=None, **kwargs):
     return starline
 
 
-def star(row=None, col=None, **kwargs):
+def starline(row=None, col=None, **kwargs):
     kwargs = margins(**kwargs)
     kwargs["row"] = row
     kwargs["col"] = col

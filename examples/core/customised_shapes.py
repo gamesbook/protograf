@@ -683,11 +683,11 @@ PageBreak()
 
 # ---- centred shapes
 Blueprint()
-Text(common=txt, text="Centre Shape")
+Text(common=txt, text="Centred Shape")
 small_star = star(radius=0.25)
 Hexagon(x=0.5, y=0.5, height=1, centre_shape=small_star)
 Square(x=2.5, y=0.5, height=1, centre_shape=small_star)
-Rectangle(x=0.5, y=2.5, height=1, width=1.25, centre_shape=small_star)
+Rectangle(x=0.25, y=2.5, height=1, width=1.5, centre_shape=small_star)
 Circle(cx=3, cy=3, radius=0.5, centre_shape=small_star)
 Polygon(cx=1, cy=5, radius=0.5, sides=8, centre_shape=small_star)
 EquilateralTriangle(x=2.35, y=5.5, side=1.25, centre_shape=small_star)
@@ -695,7 +695,7 @@ PageBreak()
 
 # ---- centre shape - move
 Blueprint()
-Text(common=txt, text="Centre Shape: move + double")
+Text(common=txt, text="Centred Shape: move + double")
 small_star = star(radius=0.25)
 small_circle = circle(radius=0.33, fill="gray", centre_shape=small_star)
 Hexagon(x=1, y=0.5, height=2,
