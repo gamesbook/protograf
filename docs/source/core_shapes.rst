@@ -2026,11 +2026,24 @@ Star
 ~~~~
 `↑ <shape-index_>`_
 
-A Star is a fivepointed shape; essentially made by joining points spaced
-equally around the circumference of a circle.
+A Star is a multi-pointed shape; essentially made by joining points spaced
+equally around the circumference of a circle to points spaced
+equally around the circumference of a smaller "inner" circle.
 
-To create more varied kinds of stars, see the triangle petal shapes that can
-be created using a :ref:`customised Circle <circleIndex>`.
+To create other kinds of stars, see the "triangle" or "sun" petal shapes
+that can be created using a :ref:`customised Circle <circleIndex>`.
+
+Properties
+++++++++++
+
+A Star shape has the following additional properties:
+
+- *rays* - number of arms of the Star; defaults to ``5``
+- *inner_fraction* - used to calulate the inner circle on which the other
+  points used to draw the Star are placed; as this gets smaller, the width
+  of the arms gets narrower; defaults to ``0.5`` (one-half)
+- *show_radii* - if ``True``, then lines are drawn from the Star centre
+  to all of the points (inner and outer); default is ``False``
 
 Example 1. Default Star
 +++++++++++++++++++++++
@@ -2049,8 +2062,10 @@ Example 1. Default Star
       It has the following properties based on the defaults:
 
       - centre at x-position ``1`` cm and at y-position ``1`` cm
-      - "height" of ``1`` cm
-      - default of 5 points
+      - default *radius* of ``1`` cm
+      - default of ``5`` *rays*
+      - default *inner_fraction* of ``0.5``
+
 ===== ======
 
 Example 2. Customised Star
@@ -2065,19 +2080,49 @@ Example 2. Customised Star
 
       .. code:: python
 
-          Star(
-            cx=2, cy=3, radius=2,
-            fill="yellow",
-            stroke="yellow",
-            rotation=36)
+        Star(cx=1, cy=1, radius=1,
+             fill="red",
+             stroke="gold",
+             stroke_width=2,
+             inner_fraction=0.4,
+        )
+        Star(cx=2, cy=3, radius=1,
+             rays=6,
+             show_radii=True,
+             rotation=30,
+        )
+        Star(cx=3, cy=5, radius=1,
+             fill=None,
+             rays=12,
+             inner_fraction=0.1,
+        )
 
-      It has the following properties that differ from the defaults:
+      These have the following properties that differ from the defaults:
 
-      - centre at x-position ``2`` cm and at y-position ``3`` cm
-      - *radius* - ``2`` cm; length of the "arms"
-      - *fill* color - ``yellow`` for the interior of the Star
+      - centre defined at *cx* and  *cy*-position in cm
+      - *radius* - ``1`` cm; length of the "rays" from centre to outer points
+
+      The upper star has the default number of *rays* i.e. ``5``, plus:
+
+      - *fill* color - ``red`` for the interior of the Star
       - *stroke* color - ``yellow`` for the outline of the Star
-      - *rotation* - 36 |deg| anti-clockwise about the centre
+      - *stroke_width*  - ``2`` for the line thickness of the outline of the Star
+      - *inner_fraction* - changed to ``0.4``; which cause the lines to
+        appear to "flatten" and align
+
+      The middle star has:
+
+      - *rays* - changed to ``6``
+      - *show_radii* - if ``True``, then lines are drawn from the Star centre
+        to all of the points (inner and outer)
+      - *rotation* - 30 |deg| anti-clockwise about the centre
+
+      The lower star has:
+
+      - *rays* - changed to ``12``
+      - *inner_fraction* - changed to ``0.1``; which causes the "spiky"
+        appearance
+
 ===== ======
 
 

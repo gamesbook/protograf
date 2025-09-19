@@ -25,7 +25,7 @@ from protograf.base import (
 )
 from protograf.shapes_circle import CircleShape
 from protograf.shapes_rectangle import RectangleShape
-from protograf.utils import colrs, geoms, tools, fonts
+from protograf.utils import colrs, geoms, support, tools, fonts
 from protograf.utils.tools import _lower
 from protograf.utils.constants import (
     BGG_IMAGES,
@@ -2374,20 +2374,81 @@ class StarShape(BaseShape):
     Star on a given canvas.
     """
 
-    def get_vertexes(self, x, y, **kwargs):
-        """Calculate vertices of star"""
-        vertices = []
-        radius = self._u.radius
-        vertices.append(muPoint(x, y + radius))
-        angle = (2 * math.pi) * 2.0 / 5.0
-        start_angle = math.pi / 2.0
-        log.debug("Start # self.vertices:%s", self.vertices)
-        for vertex in range(self.vertices - 1):
-            next_angle = angle * (vertex + 1) + start_angle
-            x_1 = x + radius * math.cos(next_angle)
-            y_1 = y + radius * math.sin(next_angle)
-            vertices.append(muPoint(x_1, y_1))
-        return vertices
+    def get_vertexes(self, x, y, **kwargs) -> tuple:
+        """Calculate vertices of star
+
+        Args:
+            x (float):
+                center-x of Star
+            y (float):
+                center-x of Star
+
+        Kwargs:
+            inner_fraction (float):
+                fraction of radius of Star along which inner
+                vertices are located
+
+        Returns:
+            tuple:
+                list of all vertices; list of 'ray' (outer) vertices
+        """
+        center = Point(x, y)
+        outer_vertices = []
+        all_vertices = []
+        inner_radius = self._u.radius * kwargs.get("inner_fraction", 0.5)
+        gap = 360.0 / self.rays
+        angles = support.steps(90, 450, gap)
+        for index, angle in enumerate(angles):
+            _angle = angle
+            angle = _angle - 360.0 if _angle > 360.0 else _angle
+            if index == 0:
+                start_angle = angle
+            else:
+                if round(start_angle, 3) == round(angle, 3):
+                    break  # avoid a repeat
+            outer_vertices.append(geoms.point_on_circle(center, self._u.radius, angle))
+            all_vertices.append(geoms.point_on_circle(center, self._u.radius, angle))
+            all_vertices.append(
+                geoms.point_on_circle(center, inner_radius, angle + gap / 2.0)
+            )
+        return all_vertices, outer_vertices
+
+    def draw_radii(
+        self, cnv, ID, x_c: float, y_c: float, rotation: float, all_vertexes: list
+    ):
+        """Draw radius lines from the centre to the inner and outer vertices.
+
+        Args:
+            x_c (float):
+                center-x of Star
+            y_c (float):
+                center-x of Star
+            rotation (float):
+                degrees of rotation of Star
+            all_vertexes (list):
+                outer- and inner- Points used to draw Star
+        """
+        centre = muPoint(x_c, y_c)
+        # ---- set radii styles
+        lkwargs = {}
+        lkwargs["wave_style"] = self.kwargs.get("radii_wave_style", None)
+        lkwargs["wfave_height"] = self.kwargs.get("radii_wave_height", 0)
+        for diam_pt in all_vertexes:
+            x_start, y_start = x_c, y_c
+            x_end, y_end = diam_pt.x, diam_pt.y
+            # ---- draw the radii line
+            draw_line(cnv, (x_start, y_start), (x_end, y_end), shape=self, **lkwargs)
+        # ---- style radii lines
+        self.set_canvas_props(
+            index=ID,
+            stroke=self.radii_stroke,
+            stroke_width=self.radii_stroke_width,
+            stroke_ends=self.radii_ends,
+            dashed=self.radii_dashed,
+            dotted=self.radii_dotted,
+            rotation=rotation,
+            rotation_point=centre,
+        )
 
     def draw(self, cnv=None, off_x=0, off_y=0, ID=None, **kwargs):
         """Draw a star on a given canvas."""
@@ -2414,7 +2475,88 @@ class StarShape(BaseShape):
             kwargs["rotation"] = rotation
             kwargs["rotation_point"] = self.centroid
         # ---- draw star
+        if self.inner_fraction > 1 or self.inner_fraction < 0:
+            feedback(
+                "The inner_fraction must be greater than 0 and less than 1"
+                f' (not "{self.inner_fraction}"',
+                True,
+            )
+        self.vertexes_list, self.vertices = self.get_vertexes(
+            x, y, inner_fraction=self.inner_fraction
+        )
         # feedback(f'***Star {x=} {y=} {self.vertexes_list=}')
+        cnv.draw_polyline(self.vertexes_list)
+        kwargs["closed"] = True
+        self.set_canvas_props(cnv=cnv, index=ID, **kwargs)
+        # ---- draw centre shape (with offset)
+        if self.centre_shape:
+            if self.can_draw_centred_shape(self.centre_shape):
+                self.centre_shape.draw(
+                    _abs_cx=x + self.unit(self.centre_shape_mx),
+                    _abs_cy=y + self.unit(self.centre_shape_my),
+                )
+        # ---- draw centre shapes (with offsets)
+        if self.centre_shapes:
+            self.draw_centred_shapes(self.centre_shapes, x, y)
+        # ---- draw radii
+        if self.show_radii:
+            self.draw_radii(cnv, ID, x, y, rotation, self.vertexes_list)
+        # ---- dot
+        self.draw_dot(cnv, x, y)
+        # ---- cross
+        self.draw_cross(cnv, x, y, rotation=kwargs.get("rotation"))
+        # ---- text
+        self.draw_heading(cnv, ID, x, y - radius, **kwargs)
+        self.draw_label(cnv, ID, x, y, **kwargs)
+        self.draw_title(cnv, ID, x, y + radius, **kwargs)
+
+
+class StarLineShape(BaseShape):
+    """
+    Star made of line on a given canvas.
+    """
+
+    def get_vertexes(self, x, y, **kwargs):
+        """Calculate vertices of StarLine"""
+        vertices = []
+        radius = self._u.radius
+        vertices.append(muPoint(x, y + radius))
+        angle = (2 * math.pi) * 2.0 / 5.0
+        start_angle = math.pi / 2.0
+        log.debug("Start # self.vertices:%s", self.vertices)
+        for vertex in range(self.vertices - 1):
+            next_angle = angle * (vertex + 1) + start_angle
+            x_1 = x + radius * math.cos(next_angle)
+            y_1 = y + radius * math.sin(next_angle)
+            vertices.append(muPoint(x_1, y_1))
+        return vertices
+
+    def draw(self, cnv=None, off_x=0, off_y=0, ID=None, **kwargs):
+        """Draw a StarLine on a given canvas."""
+        super().draw(cnv, off_x, off_y, ID, **kwargs)  # unit-based props
+        cnv = cnv if cnv else globals.canvas  # a new Page/Shape may now exist
+        # convert to using units
+        x = self._u.x + self._o.delta_x
+        y = self._u.y + self._o.delta_y
+        # ---- overrides to centre the shape
+        if self.use_abs_c:
+            x = self._abs_cx
+            y = self._abs_cy
+        elif self.cx is not None and self.cy is not None:
+            x = self._u.cx + self._o.delta_x
+            y = self._u.cy + self._o.delta_y
+        # calc - assumes x and y are the centre!
+        radius = self._u.radius
+        # ---- set canvas
+        self.set_canvas_props(index=ID)
+        # ---- handle rotation
+        rotation = kwargs.get("rotation", self.rotation)
+        if rotation:
+            self.centroid = muPoint(x, y)
+            kwargs["rotation"] = rotation
+            kwargs["rotation_point"] = self.centroid
+        # ---- draw starline
+        # feedback(f'***StarLine {x=} {y=} {self.vertexes_list=}')
         self.vertexes_list = self.get_vertexes(x, y)
         cnv.draw_polyline(self.vertexes_list)
         kwargs["closed"] = True

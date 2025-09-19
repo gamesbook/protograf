@@ -433,6 +433,10 @@ class BaseCanvas:
         self.steps = self.defaults.get("steps", [])
         self.x_c = self.defaults.get("xc", 0)
         self.y_c = self.defaults.get("yc", 0)
+        # ---- star
+        self.rays = self.defaults.get("rays", 5)
+        self.inner_fraction = self.defaults.get("inner_fraction", 0.5)
+        self.show_radii = self.defaults.get("show_radii", False)
         # ---- radii (circle, hex, rect, polygon)
         self.radii = self.defaults.get("radii", [])
         self.radii_stroke = self.defaults.get("radii_stroke", self.stroke)
@@ -991,6 +995,12 @@ class BaseShape:
         self.sides = kwargs.get("sides", base.sides)
         self.points = kwargs.get("points", base.points)
         self.steps = kwargs.get("steps", base.steps)
+        # ---- star
+        self.rays = self.kw_int(kwargs.get("rays", base.rays))
+        self.inner_fraction = self.kw_float(
+            kwargs.get("inner_fraction", base.inner_fraction)
+        )  # star
+        self.show_radii = self.kw_bool(kwargs.get("show_radii", base.show_radii))
         # ---- radii (circle, hex, polygon, rect, compass)
         self.radii = kwargs.get("radii", base.radii)
         self.radii_stroke = kwargs.get("radii_stroke", self.stroke)

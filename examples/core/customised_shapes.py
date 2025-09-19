@@ -474,8 +474,23 @@ PageBreak()
 
 # ---- star shape
 Blueprint(stroke_width=0.5)
-Text(common=txt, text="Star: rotation (36\u00B0)")
-Star(cx=2, cy=3, radius=2, fill_stroke="yellow", rotation=36)
+Text(common=txt, text="Star: custom")
+Star(cx=1, cy=1, radius=1,
+     fill="red",
+     stroke="gold",
+     stroke_width=2,
+     inner_fraction=0.4,
+)
+Star(cx=2, cy=3, radius=1,
+     rays=6,
+     show_radii=True,
+     rotation=30,
+)
+Star(cx=3, cy=5, radius=1,
+     fill=None,
+     rays=12,
+     inner_fraction=0.1,
+)
 PageBreak()
 
 # ---- polyshape

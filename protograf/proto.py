@@ -52,6 +52,7 @@ from .shapes import (
     SquareShape,
     StadiumShape,
     StarShape,
+    StarLineShape,
     TextShape,
     TrapezoidShape,
 )
@@ -3641,6 +3642,35 @@ def star(row=None, col=None, **kwargs):
     kwargs["row"] = row
     kwargs["col"] = col
     return StarShape(canvas=globals.canvas, **kwargs)
+
+
+@docstring_center
+def StarLine(row=None, col=None, **kwargs):
+    """Draw a StarLine shape on the canvas.
+
+    Args:
+
+    - row (int): row in which the shape is drawn.
+    - col (int): column in which the shape is drawn.
+
+    Kwargs:
+
+    <center>
+
+    """
+    kwargs = margins(**kwargs)
+    kwargs["row"] = row
+    kwargs["col"] = col
+    starline = StarLineShape(canvas=globals.canvas, **kwargs)
+    starline.draw()
+    return starline
+
+
+def star(row=None, col=None, **kwargs):
+    kwargs = margins(**kwargs)
+    kwargs["row"] = row
+    kwargs["col"] = col
+    return StarLineShape(canvas=globals.canvas, **kwargs)
 
 
 @docstring_base
