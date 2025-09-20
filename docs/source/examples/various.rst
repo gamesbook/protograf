@@ -17,6 +17,7 @@ will demonstrate full scalability.
 - `A Clock`_
 - `Chords`_
 - `Rondel`_
+- `Compass Rose`_
 - `Miscellaneous Things 1`_
 - `Miscellaneous Things 2`_
 - `Miscellaneous Things 3`_
@@ -157,6 +158,63 @@ Discussion  This example shows how to construct a simple effect by combining
 ----------- ------------------------------------------------------------------
 Screenshot  .. image:: images/various/chords.png
                :width: 40%
+=========== ==================================================================
+
+
+Compass Rose
+============
+`↑ <table-of-contents-exvar_>`_
+
+=========== ==================================================================
+Title       *Compass Rose (circles and stars)*
+----------- ------------------------------------------------------------------
+Script      `large_objects.py <https://github.com/gamesbook/protograf/blob/master/examples/various/large_objects.py>`_
+----------- ------------------------------------------------------------------
+Discussion  This example shows how to construct the effects of a compass by
+            overlapping :ref:`Stars <star-command>` onto
+            :ref:`Circles <circle-command>`
+
+              .. code:: python
+
+                Font("Times-Italic", size=14)
+                eye = Common(cx=2, cy=3)
+                Circle(
+                    common=eye,
+                    radius=2,
+                    stroke_width=1,
+                    fill=None,
+                    radii=steps(0, 360, 5),
+                    radii_offset=1.85,
+                    radii_length=0.1,
+                    radii_stroke_width=1,
+                    heading="N")
+                Circle(
+                    common=eye,
+                    radius=1.2,
+                    stroke_width=1,
+                    fill=None)
+                Star(
+                     common=eye,
+                     radius=1.4,
+                     rays=4,
+                     show_radii=True,
+                     rotation=45,
+                     stroke_width=1,
+                     slices=["black", "white"],
+                     radii_stroke_width=1,
+                     inner_fraction=0.25,
+                )
+                Star(common=eye,
+                     radius=2.2,
+                     rays=4,
+                     inner_fraction=0.25,
+                     stroke_width=1,
+                     slices=["black", "white"],
+                 )
+
+----------- ------------------------------------------------------------------
+Screenshot  .. image:: images/various/compass_rose.png
+               :width: 50%
 =========== ==================================================================
 
 

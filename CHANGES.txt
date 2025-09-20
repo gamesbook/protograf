@@ -5,7 +5,7 @@ protograf Changes
 -------------------
 - Add `sun` to Circle's petal style
 - Recreate Star shape with revised properties
-- Add slices property to Star shape
+- Add slices property to Star shape (plus Compass Rose example)
 - Patch Chord shape
 - Add arrow property to Chord shape
 
