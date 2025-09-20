@@ -355,6 +355,19 @@ class ChordShape(BaseShape):
     Chord line on a Circle on a given canvas.
     """
 
+    def draw_arrow(self, cnv, point_a, point_b, **kwargs):
+        if (
+            self.arrow
+            or self.arrow_style
+            or self.arrow_position
+            or self.arrow_height
+            or self.arrow_width
+            or self.arrow_double
+        ):
+            self.draw_arrowhead(cnv, point_a, point_b, **kwargs)
+            if self.arrow_double:
+                self.draw_arrowhead(cnv, point_a, point_b, **kwargs)
+
     def draw(self, cnv=None, off_x=0, off_y=0, ID=None, **kwargs):
         """Draw a chord on a given canvas."""
         kwargs = self.kwargs | kwargs
@@ -363,16 +376,16 @@ class ChordShape(BaseShape):
         if not isinstance(self.shape, CircleShape):
             feedback("Shape must be a circle!", True)
         circle = self.shape
-        centre = circle.calculate_centre()
-        pt0 = geoms.point_on_circle(centre, circle.radius, self.angle)
-        pt1 = geoms.point_on_circle(centre, circle.radius, self.angle_1)
-        # feedback(f"*** {circle.radius=} {pt0=} {pt1=}")
-        x = self.unit(pt0.x) + self._o.delta_x
-        y = self.unit(pt0.y) + self._o.delta_y
-        x_1 = self.unit(pt1.x) + self._o.delta_x
-        y_1 = self.unit(pt1.y) + self._o.delta_y
+        centre = circle.calculate_centre()  # pt units!
+        pt0 = geoms.point_on_circle(centre, circle._u.radius, self.angle)
+        pt1 = geoms.point_on_circle(centre, circle._u.radius, self.angle_1)
+        # feedback(f"*** {circle._u.radius=} {pt0=} {pt1=}")
+        x = pt0.x  # + self._o.delta_x
+        y = pt0.y  # + self._o.delta_y
+        x_1 = pt1.x  # + self._o.delta_x
+        y_1 = pt1.y  # + self._o.delta_y
         # ---- draw chord
-        feedback(f"*** Chord {x=} {y=}, {x_1=} {y_1=}")
+        # feedback(f"*** Chord {x=} {y=}, {x_1=} {y_1=}")
         mid_point = geoms.fraction_along_line(Point(x, y), Point(x_1, y_1), 0.5)
         cnv.draw_line(Point(x, y), Point(x_1, y_1))
         kwargs["rotation"] = self.rotation
@@ -383,6 +396,8 @@ class ChordShape(BaseShape):
         # feedback(f"*** Chord {compass=} {rotation=}")
         # ---- dot
         self.draw_dot(cnv, (x_1 + x) / 2.0, (y_1 + y) / 2.0)
+        # ---- arrowhead
+        self.draw_arrow(cnv, Point(x, y), Point(x_1, y_1), **kwargs)
         # ---- text
         kwargs["rotation"] = rotation
         kwargs["rotation_point"] = mid_point
@@ -1024,6 +1039,8 @@ class LineShape(BaseShape):
         self.set_canvas_props(cnv=cnv, index=ID, **klargs)  # shape.finish()
         # ---- dot
         self.draw_dot(cnv, (x_1 + x) / 2.0, (y_1 + y) / 2.0)
+        # ---- arrowhead
+        self.draw_arrow(cnv, Point(x, y), Point(x_1, y_1), **kwargs)
         # ---- text
         _, _rotation = geoms.angles_from_points(Point(x, y), Point(x_1, y_1))
         kwargs["rotation"] = -1 * _rotation
@@ -1036,8 +1053,6 @@ class LineShape(BaseShape):
             centred=False,
             **kwargs,
         )
-        # ---- arrowhead
-        self.draw_arrow(cnv, Point(x, y), Point(x_1, y_1), **kwargs)
 
 
 class PolygonShape(BaseShape):
