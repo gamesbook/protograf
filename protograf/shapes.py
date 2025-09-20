@@ -372,7 +372,7 @@ class ChordShape(BaseShape):
         x_1 = self.unit(pt1.x) + self._o.delta_x
         y_1 = self.unit(pt1.y) + self._o.delta_y
         # ---- draw chord
-        # feedback(f"*** Chord {x=} {y=}, {x_1=} {y_1=}")
+        feedback(f"*** Chord {x=} {y=}, {x_1=} {y_1=}")
         mid_point = geoms.fraction_along_line(Point(x, y), Point(x_1, y_1), 0.5)
         cnv.draw_line(Point(x, y), Point(x_1, y_1))
         kwargs["rotation"] = self.rotation
@@ -2450,10 +2450,72 @@ class StarShape(BaseShape):
             rotation_point=centre,
         )
 
+    def draw_slices(self, cnv, ID, centre: Point, vertexes: list, rotation=0):
+        """Draw two triangles on each arm of the Star
+
+        Args:
+            ID: unique ID
+            vertexes: list of Star's vertices as Points
+            centre: the centre Point of the Star
+            rotation: degrees anti-clockwise from horizontal "east"
+        """
+        # ---- get slices color list from string
+        if isinstance(self.slices, str):
+            _slices = tools.split(self.slices.strip())
+        else:
+            _slices = self.slices
+        # ---- validate slices color settings
+        slices_colors = [
+            colrs.get_color(slcolor)
+            for slcolor in _slices
+            if not isinstance(slcolor, bool)
+        ]
+        # ---- draw pair of triangles per arm
+        sid = 0
+        for idx in range(0, len(vertexes) - 1, 2):
+            if sid > len(slices_colors) - 1:
+                sid = 0  # reuse slice colors
+            # trailing
+            trail_id = idx - 1 if idx > 0 else len(vertexes) - 1
+            vertexes_slice = [vertexes[idx], centre, vertexes[trail_id]]
+            cnv.draw_polyline(vertexes_slice)
+            self.set_canvas_props(
+                index=ID,
+                stroke=self.slices_stroke or slices_colors[sid],
+                stroke_width=0.01,  # self.slices_stroke_width or 0.01,
+                stroke_ends=self.slices_ends,
+                fill=slices_colors[sid],
+                transparency=self.slices_transparency,
+                closed=True,
+                rotation=rotation,
+                rotation_point=muPoint(centre[0], centre[1]),
+            )
+            sid += 1
+            # leading
+            if sid > len(slices_colors) - 1:
+                sid = 0  # reuse slice colors
+            vertexes_slice = [vertexes[idx], centre, vertexes[idx + 1]]
+            cnv.draw_polyline(vertexes_slice)
+            self.set_canvas_props(
+                index=ID,
+                stroke=self.slices_stroke or slices_colors[sid],
+                stroke_width=0.01,  # self.slices_stroke_width or 0.01,
+                stroke_ends=self.slices_ends,
+                fill=slices_colors[sid],
+                transparency=self.slices_transparency,
+                closed=True,
+                rotation=rotation,
+                rotation_point=muPoint(centre[0], centre[1]),
+            )
+            sid += 1
+
     def draw(self, cnv=None, off_x=0, off_y=0, ID=None, **kwargs):
         """Draw a star on a given canvas."""
         super().draw(cnv, off_x, off_y, ID, **kwargs)  # unit-based props
         cnv = cnv if cnv else globals.canvas  # a new Page/Shape may now exist
+        # ---- validate
+        if self.rays < 3:
+            feedback(f"Cannot draw a Star with less than 3 rays!", True)
         # convert to using units
         x = self._u.x + self._o.delta_x
         y = self._u.y + self._o.delta_y
@@ -2495,12 +2557,21 @@ class StarShape(BaseShape):
                     _abs_cx=x + self.unit(self.centre_shape_mx),
                     _abs_cy=y + self.unit(self.centre_shape_my),
                 )
-        # ---- draw centre shapes (with offsets)
-        if self.centre_shapes:
-            self.draw_centred_shapes(self.centre_shapes, x, y)
+        # ---- draw slieces
+        if self.slices:
+            self.draw_slices(
+                cnv,
+                ID,
+                Point(x, y),
+                self.vertexes_list,
+                rotation=rotation,
+            )
         # ---- draw radii
         if self.show_radii:
             self.draw_radii(cnv, ID, x, y, rotation, self.vertexes_list)
+        # ---- draw centre shapes (with offsets)
+        if self.centre_shapes:
+            self.draw_centred_shapes(self.centre_shapes, x, y)
         # ---- dot
         self.draw_dot(cnv, x, y)
         # ---- cross

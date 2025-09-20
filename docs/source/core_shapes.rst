@@ -2027,7 +2027,7 @@ Star
 `↑ <shape-index_>`_
 
 A Star is a multi-pointed shape; essentially made by joining points spaced
-equally around the circumference of a circle to points spaced
+equally around the circumference of an outer circle to points spaced
 equally around the circumference of a smaller "inner" circle.
 
 To create other kinds of stars, see the "triangle" or "sun" petal shapes
@@ -2044,6 +2044,8 @@ A Star shape has the following additional properties:
   of the arms gets narrower; defaults to ``0.5`` (one-half)
 - *show_radii* - if ``True``, then lines are drawn from the Star centre
   to all of the points (inner and outer); default is ``False``
+- *slices* - a list of color values that will be used to color the triangles
+  formed between the centre and the points of the rays
 
 Example 1. Default Star
 +++++++++++++++++++++++
@@ -2059,7 +2061,7 @@ Example 1. Default Star
 
           Star()
 
-      It has the following properties based on the defaults:
+      The Star has the following properties based on the defaults:
 
       - centre at x-position ``1`` cm and at y-position ``1`` cm
       - default *radius* of ``1`` cm
@@ -2102,7 +2104,7 @@ Example 2. Customised Star
       - centre defined at *cx* and  *cy*-position in cm
       - *radius* - ``1`` cm; length of the "rays" from centre to outer points
 
-      The upper star has the default number of *rays* i.e. ``5``, plus:
+      The upper Star has the default number of *rays* i.e. ``5``, plus:
 
       - *fill* color - ``red`` for the interior of the Star
       - *stroke* color - ``yellow`` for the outline of the Star
@@ -2110,14 +2112,14 @@ Example 2. Customised Star
       - *inner_fraction* - changed to ``0.4``; which cause the lines to
         appear to "flatten" and align
 
-      The middle star has:
+      The middle Star has:
 
       - *rays* - changed to ``6``
       - *show_radii* - if ``True``, then lines are drawn from the Star centre
         to all of the points (inner and outer)
       - *rotation* - 30 |deg| anti-clockwise about the centre
 
-      The lower star has:
+      The lower Star has:
 
       - *rays* - changed to ``12``
       - *inner_fraction* - changed to ``0.1``; which causes the "spiky"
@@ -2125,6 +2127,58 @@ Example 2. Customised Star
 
 ===== ======
 
+Example 3. Star with Slices
++++++++++++++++++++++++++++
+
+.. |st3| image:: images/customised/star_slices.png
+   :width: 330
+
+===== ======
+|st3| This example shows the shape constructed using the command with these
+      properties:
+
+      .. code:: python
+
+        Star(cx=2, cy=1, radius=1,
+             rays=4,
+             inner_fraction=0.33,
+             stroke_width=2,
+             slices=["black", "white"],
+             dot=0.02,
+             dot_stroke="red",
+         )
+        Star(cx=2, cy=4, radius=1,
+             slices=[
+                "#CE8F0C",
+                "#F8C40C",
+                "#F3BA0B",
+                "#DB9F0D",
+                "#F8C609",
+                "#CE8F0C",
+                "#F7C30D",
+                "#D59A0E",
+                "#CE8F0C",
+                "#F7C615",
+            ]
+        )
+
+      The upper Star has the following changes:
+
+      - *rays* - changed to ``4``
+      - *inner_fraction* - changed to ``0.33``; which makes rays more "spiky"
+      - *dot* -  a small red dot is drawn in the centre of the Star
+      - *slices* - only two colors are provided in the list, so they will be
+        reused across all the rays
+
+      The lower Star has the default number of *rays* i.e. ``5``, plus:
+
+      - *slices* - the list contains a unique color for each triangle.
+
+      **NOTE** that the coloring for the triangles starts in the righthand
+      side of the "top" triangle |dash| by default, a Star's rays always start
+      from 90 |deg|, or "north".
+
+===== ======
 
 .. _starfield-command:
 

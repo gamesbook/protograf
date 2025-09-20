@@ -472,7 +472,7 @@ Rectangle(common=rct, x=2, y=3.0, label="offset +x, +y", label_mx=0.2, label_my=
 Rectangle(common=rct, x=2, y=4.5, label="offset -y", label_my=-0.2)
 PageBreak()
 
-# ---- star shape
+# ---- star_custom
 Blueprint(stroke_width=0.5)
 Text(common=txt, text="Star: custom")
 Star(cx=1, cy=1, radius=1,
@@ -490,6 +490,33 @@ Star(cx=3, cy=5, radius=1,
      fill=None,
      rays=12,
      inner_fraction=0.1,
+)
+PageBreak()
+
+# ---- star_slices
+Blueprint()
+Text(common=txt, text="Star: slices")
+Star(cx=2, cy=1, radius=1,
+     rays=4,
+     inner_fraction=0.33,
+     stroke_width=2,
+     slices=["black", "white"],
+     dot=0.02,
+     dot_stroke="red",
+ )
+Star(cx=2, cy=4, radius=1,
+     slices=[
+        "#CE8F0C",
+        "#F8C40C",
+        "#F3BA0B",
+        "#DB9F0D",
+        "#F8C609",
+        "#CE8F0C",
+        "#F7C30D",
+        "#D59A0E",
+        "#CE8F0C",
+        "#F7C615",
+    ]
 )
 PageBreak()
 
@@ -983,7 +1010,8 @@ Save(
         "line_connections", "line_connections_arrow", "line_connections_spoke",
         "bezier_custom", "ellipse_custom", "rectangle_custom",
         "square_custom", "trapezoid_custom", "image_default",
-        "descriptions", "label_offset", "star_custom",
+        "descriptions", "label_offset",
+        "star_custom", "star_slices",
         "polyshape_default", "polyshape_custom", "polyshape_offset",
         "rectangles_rowcol", "rectangles_custom", "rhombus_custom",
         "rhombus_borders", "trapezoid_borders",
