@@ -170,8 +170,9 @@ class RectangleShape(BaseShape):
             y = self._u.y + self._o.delta_y
         # ---- overrides to centre the shape
         if kwargs.get("cx") and kwargs.get("cy"):
-            x = kwargs.get("cx") - self._u.width / 2.0
-            y = kwargs.get("cy") - self._u.height / 2.0
+            x = kwargs.get("cx") * self.units - self._u.width / 2.0 + self._o.delta_x
+            y = kwargs.get("cy") * self.units - self._u.height / 2.0 + self._o.delta_y
+            # breakpoint()
         return x, y
 
     def get_angles(self, rotation=0, **kwargs):
@@ -1369,6 +1370,7 @@ class RectangleShape(BaseShape):
             kwargs["rotation_point"] = self.centroid
         else:
             self.centroid = None
+        self.vertexes = []
         # ---- * notch vertices
         if is_notched:
             if _lower(self.notch_style) not in ["b", "bite"]:
@@ -1634,6 +1636,7 @@ class RectangleShape(BaseShape):
             "corners",
             "centre_shape",
             "centre_shapes",
+            "vertex_shapes",
             "cross",
             "dot",
             "text",
@@ -1756,6 +1759,16 @@ class RectangleShape(BaseShape):
                 # * ---- centre shapes (with offsets)
                 if self.centre_shapes:
                     self.draw_centred_shapes(self.centre_shapes, x_d, y_d)
+            if item == "vertex_shapes":
+                # ---- * draw vertex shapes
+                if self.vertex_shapes:
+                    base_vertexes = self.get_vertexes(**kwargs)
+                    self.draw_vertex_shapes(
+                        self.vertex_shapes,
+                        base_vertexes,
+                        Point(x_d, y_d),
+                        self.vertex_shapes_rotated,
+                    )
             if item == "cross":
                 # ---- * cross
                 self.draw_cross(cnv, x_d, y_d, rotation=kwargs.get("rotation"))

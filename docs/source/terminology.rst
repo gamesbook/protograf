@@ -327,6 +327,7 @@ Styling-orientated Terms
    programs use the term *opacity*; but note that that is the inverse of
    transparency.
 
+
 .. _termsDisplay:
 
 Display-orientated Terms
@@ -360,9 +361,12 @@ Display-orientated Terms
    display - the rest are ignored
 -  **stripes** - will draw a series of parallel areas between two opposing
    locations of a ``Rectangle`` in any/all of the specified direction(s)
+-  **vertex_shapes** - will cause a list of shapes to be drawn at the vertices
+   of the parent shape
 -  **visible** - a list of locations, indicated by their *sequence
    number* |dash| i.e. their position in the drawing order |dash| that
    **must** be used for display - the rest are ignored
+
 
 .. _termsArea:
 
@@ -386,6 +390,7 @@ Area-orientated Terms
    which gives the appearance of a building's roof when viewed from above
 -  **tetris** - when set to ``True`` will cause a ``Tetronimo`` to be styled
    as per the original Tetris game pieces
+
 
 .. _termsMiscellaneous:
 

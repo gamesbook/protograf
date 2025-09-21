@@ -3199,6 +3199,7 @@ the desired output:
 - `Rotation`_
 - `Text Descriptions`_
 - `Transparency`_
+- `Vertex Shapes`_
 - `Wave Styles`_
 
 .. _coreShapeXY:
@@ -4003,6 +4004,98 @@ the change in ``x`` and ``y`` values as part of the set.
 ===== ======
 
 
+. _coreVertexShapes:
+
+Vertex Shapes
+~~~~~~~~~~~~~
+`^ <shapes-common-properties_>`_
+
+A number of shapes, that are formed by drawing lines between a set of
+vertices ("corner points"), can be styled by placing other shapes which
+will be centered on those points.
+
+Vertex shapes are constructed using the following properties:
+
+- *vertex_shapes* - this a list (values in ``[...]``) of shapes that
+  should be placed on vertices, in the order that these vertices are
+  drawn
+- *vertex_shapes_rotated* - an optional setting which, if ``True``, will
+  rotate the vertex shapes such they "point" away from the centre of the
+  parent shape
+
+Vertex shapes can be constructed for:
+
+- :ref:`EquilateralTriangle <equilateraltriangle-command>`
+- :ref:`Hexagon <hexagon-command>`
+- :ref:`Polygon <polygon-command>`
+- :ref:`Rectangle <rectangle-command>`
+- :ref:`Rhombus <rhombus-command>`
+- :ref:`Star <star-command>`
+
+Example 1. Vertex Shapes
+++++++++++++++++++++++++
+
+.. |vs1| image:: images/customised/vertex_shapes.png
+   :width: 330
+
+===== ======
+|vs1| This example shows vertex shapes constructed as follows:
+
+      .. code:: python
+
+        Rectangle(
+            cx=1, cy=1,
+            height=1,
+            width=1.5,
+            vertex_shapes=[
+                circle(radius=0.15, label="R")] * 4,
+            vertex_shapes_rotated=True)
+        Hexagon(
+            cx=3, cy=1,
+            radius=1,
+            vertex_shapes=[
+                circle(radius=0.15, label="H")] * 6,
+            vertex_shapes_rotated=True)
+        Polygon(
+            cx=1, cy=3,
+            sides=5,
+            radius=1,
+            vertex_shapes=[
+                circle(radius=0.15, label="P")] * 5,
+            vertex_shapes_rotated=True)
+        Trapezoid(
+            cx=3, cy=3,
+            width=1.5, top=1, height=1.25,
+            vertex_shapes=[
+                circle(radius=0.15, label="T")] * 5,
+            vertex_shapes_rotated=True)
+        EquilateralTriangle(
+            cx=1, cy=5,
+            side=1.5,
+            vertex_shapes=[
+                circle(radius=0.15, label="E")] * 3,
+            vertex_shapes_rotated=True)
+        Star(
+            cx=3, cy=5,
+            radius=1,
+            rays=5,
+            vertex_shapes=[
+                circle(radius=0.15, label="S")] * 5,
+            vertex_shapes_rotated=True)
+
+      All of these examples use the shortcut approach to create the correct
+      number of vertex shapes i.e. ``[SomeShape] * N`` where ``N`` is the
+      number of repeats of that shape.  In other cases, it could be that
+      this is a list of distinctly different shapes.  Any vertices which
+      should be omitted can just use the ``None`` value to indicate that.
+
+      The use of ``vertex_shapes_rotated=True`` will means all of these
+      examples have the vertex shapes rotated to face "away" from the
+      parent shape's centre.
+
+===== ======
+
+
 .. _coreWave:
 
 Wave Styles
@@ -4017,7 +4110,6 @@ and Rectangle (for details on those properties, see the section on
 :doc:`Customised Shapes <customised_shapes>`).  In addition, the lines used
 to construct a Polyshape and Polyline can also be styled like waves.
 
-
 Example 1. Radii and perbii
 +++++++++++++++++++++++++++
 
@@ -4025,7 +4117,7 @@ Example 1. Radii and perbii
    :width: 330
 
 ===== ======
-|ws1| This example shows centre shapes constructed as follows:
+|ws1| This example shows various shapes constructed as follows:
 
       .. code:: python
 

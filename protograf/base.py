@@ -55,6 +55,7 @@ from protograf.utils.structures import (
     Bounds,
     GridShape,
     OffsetProperties,
+    Point,
     LookupType,
     TemplatingType,
     UnitProperties,
@@ -500,7 +501,12 @@ class BaseCanvas:
         self.flip = self.defaults.get("flip", None)
         # ---- triangle / polyomino
         self.hand = self.defaults.get("hand", None)
-        # ---- shapes with centre (hex, circle, rect, rhombus, poly, ellipse)
+        # ---- shapes with vertices (hex, circle, rect, rhombus, poly, ellipse, star)
+        self.vertex_shapes = self.defaults.get("vertex_shapes", [])
+        self.vertex_shapes_rotated = self.defaults.get(
+            "self.vertex_shapes_rotated", False
+        )
+        # ---- shapes with centre (hex, circle, rect, rhombus, poly, ellipse, star)
         self.centre_shapes = self.defaults.get("centre_shapes", [])
         self.centre_shape = self.defaults.get("centre_shape", "")
         self.centre_shape_mx = self.defaults.get("centre_shape_mx", 0)
@@ -1073,7 +1079,12 @@ class BaseShape:
         self.flip = kwargs.get("flip", base.flip)
         # ---- triangle / polyomino
         self.hand = kwargs.get("hand", base.hand)
-        # ---- shapes with centre (hex, circle, rect, rhombus, poly, ellipse)
+        # ---- shapes with vertices (hex, circle, rect, rhombus, poly, ellipse, star)
+        self.vertex_shapes = kwargs.get("vertex_shapes", [])
+        self.vertex_shapes_rotated = self.kw_bool(
+            kwargs.get("vertex_shapes_rotated", False)
+        )
+        # ---- shapes with centre (hex, circle, rect, rhombus, poly, ellipse, star)
         self.centre_shapes = kwargs.get("centre_shapes", [])
         self.centre_shape = kwargs.get("centre_shape", "")
         self.centre_shape_mx = self.kw_float(
@@ -2937,6 +2948,27 @@ class BaseShape:
                 _shape.draw(
                     _abs_cx=cx + self.unit(_shape_mx),
                     _abs_cy=cy + self.unit(_shape_my),
+                )
+
+    def draw_vertex_shapes(
+        self, vertex_shapes: list, vertices: list, centre: Point, rotated: bool = False
+    ):
+        for idx, vshape in enumerate(vertex_shapes):
+            if vshape is None or vshape == "":
+                continue
+            if idx > len(vertices) - 1:
+                continue
+            if self.can_draw_centred_shape(vshape):
+                cx, cy = vertices[idx][0], vertices[idx][1]
+                if rotated:
+                    compass, rotation = geoms.angles_from_points(centre, vertices[idx])
+                    # print(f"{idx} {compass=} {rotation=}")
+                else:
+                    rotation = 0
+                vshape.draw(
+                    _abs_cx=cx,  # + self.unit(vshape.mx),  # NO default move
+                    _abs_cy=cy,  # + self.unit(vshape.my),  # NO default move
+                    rotation=compass - 180.0,
                 )
 
 

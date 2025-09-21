@@ -1721,6 +1721,7 @@ The available property names, shown in their default order, are:
 #. radii
 #. centre_shape
 #. centre_shapes
+#. vertex_shapes
 #. cross
 #. dot
 #. text
@@ -2599,6 +2600,7 @@ The available property names, shown in their default order, are:
 #. radii
 #. centre_shape
 #. centre_shapes
+#. vertex_shapes
 #. cross
 #. dot
 #. text

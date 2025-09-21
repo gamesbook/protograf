@@ -1171,7 +1171,7 @@ class HexShape(BaseShape):
         # ---- calculate vertexes
         geo = self.get_geometry()
         is_cards = kwargs.get("is_cards", False)
-        self.get_vertexes(is_cards)
+        self.vertices = self.get_vertexes(is_cards)
         # ---- calculate area
         self.area = self.calculate_area()
         # ---- remove rotation
@@ -1198,6 +1198,7 @@ class HexShape(BaseShape):
             "radii",
             "centre_shape",
             "centre_shapes",
+            "vertex_shapes",
             "cross",
             "dot",
             "text",
@@ -1335,6 +1336,15 @@ class HexShape(BaseShape):
                 # ---- * centred shapes (with offsets)
                 if self.centre_shapes:
                     self.draw_centred_shapes(self.centre_shapes, self.x_d, self.y_d)
+            if item == "vertex_shapes":
+                # ---- * draw vertex shapes
+                if self.vertex_shapes:
+                    self.draw_vertex_shapes(
+                        self.vertex_shapes,
+                        self.vertices,
+                        Point(self.x_d, self.y_d),
+                        self.vertex_shapes_rotated,
+                    )
             if item == "cross":
                 # ---- * cross
                 self.draw_cross(

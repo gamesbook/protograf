@@ -985,6 +985,44 @@ Polyline(points='1,5 1,6 2,6 4,5',
          wave_style="wave", wave_height=0.05,)
 PageBreak()
 
+# ---- vertex shapes
+Blueprint()
+Text(common=txt, text="Vertex Shapes")
+Rectangle(
+    cx=1, cy=1,
+    height=1,
+    width=1.5,
+    vertex_shapes=[circle(radius=0.15, label="R")]*4,
+    vertex_shapes_rotated=True)
+Hexagon(
+    cx=3, cy=1,
+    radius=1,
+    vertex_shapes=[circle(radius=0.15, label="H")]*6,
+    vertex_shapes_rotated=True)
+Polygon(
+    cx=1, cy=3,
+    sides=5,
+    radius=1,
+    vertex_shapes=[circle(radius=0.15, label="P")]*5,
+    vertex_shapes_rotated=True)
+Trapezoid(
+    cx=3, cy=3,
+    width=1.5, top=1, height=1.25,
+    vertex_shapes=[circle(radius=0.15, label="T")]*5,
+    vertex_shapes_rotated=True)
+EquilateralTriangle(
+    cx=1, cy=5,
+    side=1.5,
+    vertex_shapes=[circle(radius=0.15, label="E")]*3,
+    vertex_shapes_rotated=True)
+Star(
+    cx=3, cy=5,
+    radius=1,
+    rays=5,
+    vertex_shapes=[circle(radius=0.15, label="S")]*5,
+    vertex_shapes_rotated=True)
+PageBreak()
+
 # ---- END
 Text(common=txt, text="Shapes END...")
 
@@ -1025,4 +1063,5 @@ Save(
         "table_defaults", "table_custom",
         "perbii_styled",
         "poly_waves",
+        "vertex_shapes",
         None])

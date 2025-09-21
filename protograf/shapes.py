@@ -880,6 +880,14 @@ class EquilateralTriangleShape(BaseShape):
             self.draw_centred_shapes(
                 self.centre_shapes, self.centroid.x, self.centroid.y
             )
+        # ---- draw vertex shapes
+        if self.vertex_shapes:
+            self.draw_vertex_shapes(
+                self.vertex_shapes,
+                self.vertexes,
+                Point(self.centroid.x, self.centroid.y),
+                self.vertex_shapes_rotated,
+            )
         # ---- dot
         self.draw_dot(cnv, self.centroid.x, self.centroid.y)
         # ---- text
@@ -1368,7 +1376,7 @@ class PolygonShape(BaseShape):
         x, y = centre.x, centre.y
         # ---- calculate vertices
         pre_geom = self.get_geometry()
-        x, y, radius, vertices = (
+        x, y, radius, self.vertices = (
             pre_geom.x,
             pre_geom.y,
             pre_geom.radius,
@@ -1423,13 +1431,13 @@ class PolygonShape(BaseShape):
             kwargs["rotation_point"] = self.centroid
             is_rotated = True
         # ---- updated geom
-        # vertices = geoms.polygon_vertices(self.sides, radius, Point(x, y), None)
+        # self.vertices = geoms.polygon_vertices(self.sides, radius, Point(x, y), None)
         # ---- invalid polygon?
-        if not vertices or len(vertices) == 0:
+        if not self.vertices or len(self.vertices) == 0:
             return
         # ---- draw polygon
-        # feedback(f"***Polygon {self.col=} {self.row=} {x=} {y=} {vertices=}")
-        cnv.draw_polyline(vertices)
+        # feedback(f"***Polygon {self.col=} {self.row=} {x=} {y=} {self.vertices=}")
+        cnv.draw_polyline(self.vertices)
         kwargs["closed"] = True
         self.set_canvas_props(cnv=cnv, index=ID, **kwargs)
         # ---- draw slices
@@ -1438,18 +1446,18 @@ class PolygonShape(BaseShape):
                 cnv,
                 ID,
                 Point(x, y),
-                vertices,
+                self.vertices,
                 rotation=kwargs.get("rotation"),
             )
         # ---- draw radii
         if self.radii:
-            self.draw_radii(cnv, ID, Point(x, y), vertices)
+            self.draw_radii(cnv, ID, Point(x, y), self.vertices)
         # ---- draw perbii
         if self.perbii:
-            self.draw_perbii(cnv, ID, Point(x, y), vertices)
+            self.draw_perbii(cnv, ID, Point(x, y), self.vertices)
         # ---- draw mesh
         if self.mesh:
-            self.draw_mesh(cnv, ID, vertices)
+            self.draw_mesh(cnv, ID, self.vertices)
         # ---- centred shape (with offset)
         if self.centre_shape:
             if self.can_draw_centred_shape(self.centre_shape):
@@ -1460,8 +1468,16 @@ class PolygonShape(BaseShape):
         # ---- centred shapes (with offsets)
         if self.centre_shapes:
             self.draw_centred_shapes(self.centre_shapes, x, y)
+        # ---- draw vertex shapes
+        if self.vertex_shapes:
+            self.draw_vertex_shapes(
+                self.vertex_shapes,
+                self.vertices,
+                Point(x, y),
+                self.vertex_shapes_rotated,
+            )
         # ---- debug
-        self._debug(cnv, vertices=vertices)  # needs: self.run_debug = True
+        self._debug(cnv, vertices=self.vertices)  # needs: self.run_debug = True
         # ---- dot
         self.draw_dot(cnv, x, y)
         # ---- cross
@@ -2587,6 +2603,14 @@ class StarShape(BaseShape):
         # ---- draw centre shapes (with offsets)
         if self.centre_shapes:
             self.draw_centred_shapes(self.centre_shapes, x, y)
+        # ---- draw vertex shapes
+        if self.vertex_shapes:
+            self.draw_vertex_shapes(
+                self.vertex_shapes,
+                self.vertices,
+                Point(x, y),
+                self.vertex_shapes_rotated,
+            )
         # ---- dot
         self.draw_dot(cnv, x, y)
         # ---- cross
@@ -2960,23 +2984,34 @@ class TrapezoidShape(BaseShape):
                 feedback('The "borders" property must be a list of sets or a set')
             for border in self.borders:
                 self.draw_border(cnv, border, ID)  # BaseShape
+        # ---- calculate centre
+        x_d, y_d = x + self._u.width / 2.0, y + sign * self._u.height / 2.0
+        # ---- draw vertex shapes
+        if self.vertex_shapes:
+            self.draw_vertex_shapes(
+                self.vertex_shapes,
+                self.vertexes,
+                Point(x, y),
+                self.vertex_shapes_rotated,
+            )
         # ---- dot
-        self.draw_dot(cnv, x + self._u.width / 2.0, y + sign * self._u.height / 2.0)
+        self.draw_dot(cnv, x_d, y_d)
         # ---- cross
-        self.draw_cross(
-            cnv,
-            x + self._u.width / 2.0,
-            y + sign * self._u.height / 2.0,
-            rotation=kwargs.get("rotation"),
-        )
+        self.draw_cross(cnv, x_d, y_d, rotation=kwargs.get("rotation"))
         # ---- text
-        self.draw_heading(cnv, ID, x + self._u.width / 2.0, y, **kwargs)
-        self.draw_label(
-            cnv, ID, x + self._u.width / 2.0, y + sign * self._u.height / 2.0, **kwargs
-        )
-        self.draw_title(
-            cnv, ID, x + self._u.width / 2.0, y + sign * self._u.height, **kwargs
-        )
+        self.draw_label(cnv, ID, x_d, y_d, **kwargs)
+        if sign == 1:
+            self.draw_heading(cnv, ID, x + self._u.width / 2.0, y, **kwargs)
+            self.draw_title(
+                cnv, ID, x + self._u.width / 2.0, y + sign * self._u.height, **kwargs
+            )
+        elif sign == -1:
+            self.draw_title(cnv, ID, x + self._u.width / 2.0, y, **kwargs)
+            self.draw_heading(
+                cnv, ID, x + self._u.width / 2.0, y + sign * self._u.height, **kwargs
+            )
+        else:
+            raise ValueError("Invalid Trapezoid sign")
 
 
 # ---- Other
