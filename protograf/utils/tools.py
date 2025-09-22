@@ -1157,14 +1157,18 @@ def validated_directions(
         case DirectionGroup.CIRCULAR:
             valid = {"n", "e", "w", "s", "ne", "se", "sw", "nw", "o", "d"}
         case _:
-            raise NotImplementedError("Cannot handle {direction_group} type!")
+            raise NotImplementedError(f"Cannot handle {direction_group} type!")
     if "all" in values or "*" in values:
         values = list(valid)
         values_set = set(values)
     if values_set.issubset(valid):
         return values
     _label = f"the {label} value" if label else f'"{value}"'
-    feedback(f"Cannot use {_label} - it must contain valid directions {valid}!", True)
+    feedback(
+        f'Cannot use {_label} "{value}" - it must correspond with '
+        f"the valid directions {valid}!",
+        True,
+    )
 
 
 def transpose_lists(

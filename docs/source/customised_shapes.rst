@@ -2598,6 +2598,7 @@ The available property names, shown in their default order, are:
 #. perbii
 #. paths
 #. radii
+#. sector_shapes
 #. centre_shape
 #. centre_shapes
 #. vertex_shapes

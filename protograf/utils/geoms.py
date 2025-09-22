@@ -11,7 +11,7 @@ from typing import Any, List
 # local
 from protograf.utils.messaging import feedback
 from protograf.utils.structures import Point
-from protograf.utils.support import numbers
+from protograf.utils.support import numbers, round_tiny_float
 
 log = logging.getLogger(__name__)
 DEBUG = False
@@ -587,21 +587,6 @@ def rotate_point_around_point(
     final_x = rotated_x + cx
     final_y = rotated_y + cy
     return Point(round(final_x, 8), round(final_y, 8))
-
-
-def round_tiny_float(number: float, threshold: float = 1e-10):
-    """If the absolute value of float is less than threshold, set to zero.
-
-    Doc Test:
-
-    >>> round_tiny_float(1e-12)
-    0.0
-    >>> round_tiny_float(0.001)
-    0.001
-    """
-    if abs(number) < threshold:
-        return 0.0
-    return number
 
 
 def rectangles_overlap(rect1, rect2) -> bool:

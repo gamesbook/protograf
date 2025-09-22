@@ -672,6 +672,21 @@ def uc(code: str):
     return uni(code)
 
 
+def round_tiny_float(number: float, threshold: float = 1e-10):
+    """If the absolute value of float is less than threshold, set to zero.
+
+    Doc Test:
+
+    >>> round_tiny_float(1e-12)
+    0.0
+    >>> round_tiny_float(0.001)
+    0.001
+    """
+    if abs(number) < threshold:
+        return 0.0
+    return number
+
+
 if __name__ == "__main__":
     import doctest
 

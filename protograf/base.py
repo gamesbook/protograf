@@ -566,6 +566,10 @@ class BaseCanvas:
         self.paths_dashed = self.defaults.get("paths_dashed", self.dashed)
         self.paths_wave_style = self.defaults.get("paths_wave_style", None)
         self.paths_wave_height = self.defaults.get("paths_wave_height", 0)
+        self.sector_shapes = self.defaults.get("sector_shapes", [])
+        self.sector_shapes_rotated = self.defaults.get(
+            "self.sector_shapes_rotated", False
+        )
         # ---- hexagons
         self.hid = self.defaults.get("id", "")  # HEX ID
         self.hex_rows = self.defaults.get("hex_rows", 0)
@@ -1154,6 +1158,10 @@ class BaseShape:
         self.paths_dashed = kwargs.get("paths_dashed", self.dashed)
         self.paths_wave_style = kwargs.get("paths_wave_style", base.paths_wave_style)
         self.paths_wave_height = kwargs.get("paths_wave_height", base.paths_wave_height)
+        self.sector_shapes = kwargs.get("sector_shapes", [])
+        self.sector_shapes_rotated = self.kw_bool(
+            kwargs.get("sector_shapes_rotated", False)
+        )
         # ---- hexagons
         self.hid = kwargs.get("id", base.hid)  # HEX ID
         self.hex_rows = self.kw_int(kwargs.get("hex_rows", base.hex_rows), "hex_rows")
@@ -2923,17 +2931,27 @@ class BaseShape:
                 dashed=dashed,
             )
 
-    def can_draw_centred_shape(self, centre_shape) -> bool:
+    def can_draw_centred_shape(
+        self, centre_shape, fail_on_invalid: bool = True
+    ) -> bool:
         """Test if a given Shape can be drawn at centre of another."""
+        if fail_on_invalid and not isinstance(centre_shape, BaseShape):
+            _type = type(centre_shape)
+            feedback(f"A shape is required not a {_type} ({centre_shape})!", True)
         cshape_name = centre_shape.__class__.__name__
         if cshape_name in GRID_SHAPES_WITH_CENTRE:
             return True
         else:
             _name = cshape_name.replace("Shape", "")
-            feedback(f"Cannot draw a centered {_name}!")
+            feedback(f"Cannot draw a centered {_name}!", True)
         return False
 
-    def draw_centred_shapes(self, centre_shapes, cx: float, cy: float):
+    def draw_centred_shapes(self, centre_shapes: list, cx: float, cy: float):
+        """Draw one or more shapes with thei centre at a Point.
+
+        Args:
+
+        """
         for item in centre_shapes:
             _shape_mx, _shape_my = 0, 0
             if isinstance(item, tuple):
