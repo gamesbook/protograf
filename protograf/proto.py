@@ -35,7 +35,6 @@ from .shapes import (
     BezierShape,
     ChordShape,
     CommonShape,
-    CompassShape,
     DotShape,
     EllipseShape,
     EquilateralTriangleShape,
@@ -3036,31 +3035,6 @@ def circle(**kwargs):
     return CircleShape(canvas=globals.canvas, **kwargs)
 
 
-@docstring_center
-def Compass(row=None, col=None, **kwargs):
-    """Draw a Compass shape on the canvas.
-
-    Args:
-
-    - row (int): row in which the shape is drawn.
-    - col (int): column in which shape is drawn.
-
-    Kwargs:
-
-    <center>
-
-    """
-    kwargs = margins(**kwargs)
-    cmpss = compass(row=row, col=col, **kwargs)
-    cmpss.draw()
-    return cmpss
-
-
-def compass(row=None, col=None, **kwargs):
-    kwargs = margins(**kwargs)
-    return CompassShape(canvas=globals.canvas, **kwargs)
-
-
 @docstring_base
 def Dot(row=None, col=None, **kwargs):
     """Draw a Dot shape on the canvas.
@@ -5170,7 +5144,6 @@ arrow.__doc__ = Arrow.__doc__
 bezier.__doc__ = Bezier.__doc__
 chord.__doc__ = Chord.__doc__
 circle.__doc__ = Circle.__doc__
-compass.__doc__ = Compass.__doc__
 dot.__doc__ = Dot.__doc__
 ellipse.__doc__ = Ellipse.__doc__
 equilateraltriangle.__doc__ = EquilateralTriangle.__doc__

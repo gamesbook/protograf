@@ -28,7 +28,6 @@ cross-reference to the detailed information for that command.
    :ref:`deck <the-deck-command>`
 -  :ref:`Circle <circle-command>` * - a geometric shape that can be drawn on a page
    (see also further :ref:`customisation options <circleIndex>`)
--  :ref:`Compass <compass-command>` * - a geometric shape that can be drawn on a page
 -  :ref:`Chord <chord-command>` * - a geometric shape that can be drawn on a page
 -  :ref:`Common <the-common-command>` - set the properties for any shape that can be drawn on a page
 -  :ref:`Counter <the-countersheet-command>`  - details for a counter that is part

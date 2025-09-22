@@ -10,6 +10,7 @@ protograf Changes
 - Add `arrow` property to Chord shape
 - Add `vertex_shapes` property to key shapes
 - Add `sector_shapes` property to Hexagon
+- Removed Compass shape
 
 2025-09-16 (0.3.0)
 -------------------

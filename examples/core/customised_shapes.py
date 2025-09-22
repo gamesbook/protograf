@@ -64,14 +64,6 @@ RightAngledTriangle(x=2, y=3, flip="north", hand="west", label="NW", fill="red")
 RightAngledTriangle(x=3, y=4, flip="south", hand="west", label="SW", fill="blue")
 PageBreak()
 
-# ---- compass
-Blueprint()
-Text(common=txt, text="Compass")
-Compass(cx=3, cy=1, perimeter='hexagon', radius=0.5, radii_stroke_width=2)
-Compass(cx=1, cy=5, perimeter='circle', radius=0.5, directions="ne nw s")
-Compass(cx=2, cy=3, perimeter='rectangle', directions="*", height=2, width=3, radii_stroke="red")
-PageBreak()
-
 # ---- lines (multiple) labels
 Blueprint()
 Text(common=txt, text="Lines")
@@ -1033,7 +1025,7 @@ Save(
      names=[
         None,
         "blueprint_subdiv", "dots_crosses", "centred", "right_angled_triangle",
-        "compass", "lines", "starfield_rectangle", "starfield_circle",
+        "lines", "starfield_rectangle", "starfield_circle",
         "starfield_poly", "equilateral_triangle", "right_angled_triangle_flip",
         "sectors", "grid_gray", "dotgrid_moleskine", "dotgrid_rowscols", "arc",
         "stadium_edges", "trapezoid_flip", "chord",

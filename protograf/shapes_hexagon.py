@@ -1155,8 +1155,8 @@ class HexShape(BaseShape):
                 y = self.y_d - geo.half_side - geo.side / 2.0
             elif self.cx is not None and self.cy is not None:
                 # cx,cy are centre; create x_d, y_d as the unit-formatted hex centre
-                self.x_d = self._u.cx + self._o.delta_y
-                self.y_d = self._u.cy + self._o.delta_x
+                self.x_d = self._u.cx + self._o.delta_x
+                self.y_d = self._u.cy + self._o.delta_y
                 # recalculate start x,y
                 x = self.x_d - geo.half_flat
                 y = self.y_d - geo.half_side - geo.side / 2.0
