@@ -3112,6 +3112,32 @@ def equilateraltriangle(row=None, col=None, **kwargs):
     return EquilateralTriangleShape(canvas=globals.canvas, **kwargs)
 
 
+def EquiTri(row=None, col=None, **kwargs):
+    """Draw a EquilateralTriangle shape on the canvas.
+
+    Args:
+
+    - row (int): row in which the shape is drawn.
+    - col (int): column in which shape is drawn.
+
+    Kwargs:
+
+    <center>
+
+    """
+    kwargs = margins(**kwargs)
+    kwargs["row"] = row
+    kwargs["col"] = col
+    eqt = EquilateralTriangleShape(canvas=globals.canvas, **kwargs)
+    eqt.draw()
+    return eqt
+
+
+def equitri(row=None, col=None, **kwargs):
+    kwargs = margins(**kwargs)
+    return EquilateralTriangleShape(canvas=globals.canvas, **kwargs)
+
+
 @docstring_center
 def Hexagon(row=None, col=None, **kwargs):
     """Draw a Hexagon shape on the canvas.

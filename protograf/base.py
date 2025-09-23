@@ -566,9 +566,9 @@ class BaseCanvas:
         self.paths_dashed = self.defaults.get("paths_dashed", self.dashed)
         self.paths_wave_style = self.defaults.get("paths_wave_style", None)
         self.paths_wave_height = self.defaults.get("paths_wave_height", 0)
-        self.sector_shapes = self.defaults.get("sector_shapes", [])
-        self.sector_shapes_rotated = self.defaults.get(
-            "self.sector_shapes_rotated", False
+        self.slice_shapes = self.defaults.get("slice_shapes", [])
+        self.slice_shapes_rotated = self.defaults.get(
+            "self.slice_shapes_rotated", False
         )
         # ---- hexagons
         self.hid = self.defaults.get("id", "")  # HEX ID
@@ -1158,9 +1158,9 @@ class BaseShape:
         self.paths_dashed = kwargs.get("paths_dashed", self.dashed)
         self.paths_wave_style = kwargs.get("paths_wave_style", base.paths_wave_style)
         self.paths_wave_height = kwargs.get("paths_wave_height", base.paths_wave_height)
-        self.sector_shapes = kwargs.get("sector_shapes", [])
-        self.sector_shapes_rotated = self.kw_bool(
-            kwargs.get("sector_shapes_rotated", False)
+        self.slice_shapes = kwargs.get("slice_shapes", [])
+        self.slice_shapes_rotated = self.kw_bool(
+            kwargs.get("slice_shapes_rotated", False)
         )
         # ---- hexagons
         self.hid = kwargs.get("id", base.hid)  # HEX ID

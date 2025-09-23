@@ -670,13 +670,13 @@ class HexShape(BaseShape):
         #     self._debug(cnv, vertices=_perbii_pts)
         return perbii_dict
 
-    def draw_sector_shapes(
-        self, sector_shapes: list, vertexes: list, centre: Point, rotated: bool = False
+    def draw_slice_shapes(
+        self, slice_shapes: list, vertexes: list, centre: Point, rotated: bool = False
     ):
         """Draw a shape inside one or more triangular slices of a Hexagon.
 
         Args:
-            sector_shapes (list):
+            slice_shapes (list):
                 list of tuples of (dir, shape, offset_x, offset_y) where
                 offset_x and offset_y are optional floats
             vertexes (list):
@@ -684,7 +684,7 @@ class HexShape(BaseShape):
             centre (Point):
                 the centre of the Hexagon
             rotated (bool):
-                if True, rotate sector shapes relative to centre
+                if True, rotate slice_shapes relative to centre
         """
 
         def get_centroid(vertices: list) -> Point:
@@ -692,8 +692,8 @@ class HexShape(BaseShape):
             y_c = (vertices[0].y + vertices[1].y + vertices[2].y) / 3.0
             return Point(x_c, y_c)
 
-        err = "A Hexagon's sector_shapes must contain direction(s) and shape"
-        for item in sector_shapes:
+        err = "A Hexagon's slice_shapes must contain direction(s) and shape"
+        for item in slice_shapes:
             _shape_mx, _shape_my = 0, 0
             if isinstance(item, tuple):
                 if len(item) < 2:
@@ -713,44 +713,45 @@ class HexShape(BaseShape):
                 # ---- centre of sector
                 if self.ORIENTATION == HexOrientation.POINTY:
                     match _dir:
-                        case "nw":
-                            tverts = [centre, vertexes[1], vertexes[2]]
                         case "ne":
-                            tverts = [centre, vertexes[2], vertexes[3]]
+                            tverts = [centre, vertexes[5], vertexes[4]]
                         case "e":
-                            tverts = [centre, vertexes[3], vertexes[4]]
+                            tverts = [centre, vertexes[4], vertexes[3]]
                         case "se":
-                            tverts = [centre, vertexes[4], vertexes[5]]
+                            tverts = [centre, vertexes[3], vertexes[2]]
                         case "sw":
-                            tverts = [centre, vertexes[5], vertexes[0]]
+                            tverts = [centre, vertexes[2], vertexes[1]]
                         case "w":
-                            tverts = [centre, vertexes[0], vertexes[1]]
+                            tverts = [centre, vertexes[1], vertexes[0]]
+                        case "nw":
+                            tverts = [centre, vertexes[0], vertexes[5]]
                 elif self.ORIENTATION == HexOrientation.FLAT:
                     match _dir:
                         case "n":
-                            tverts = [centre, vertexes[1], vertexes[2]]
+                            tverts = [centre, vertexes[5], vertexes[4]]
                         case "ne":
-                            tverts = [centre, vertexes[2], vertexes[3]]
+                            tverts = [centre, vertexes[4], vertexes[3]]
                         case "se":
-                            tverts = [centre, vertexes[3], vertexes[4]]
+                            tverts = [centre, vertexes[3], vertexes[2]]
                         case "s":
-                            tverts = [centre, vertexes[4], vertexes[5]]
+                            tverts = [centre, vertexes[2], vertexes[1]]
                         case "sw":
-                            tverts = [centre, vertexes[5], vertexes[0]]
+                            tverts = [centre, vertexes[1], vertexes[0]]
                         case "nw":
-                            tverts = [centre, vertexes[0], vertexes[1]]
+                            tverts = [centre, vertexes[0], vertexes[5]]
                 sector_centre = get_centroid(tverts)
+                print(f"*** {self.ORIENTATION=} {_dir=} {tverts=} {sector_centre=}")
                 # ---- rotation
                 if rotated:
                     compass, rotation = geoms.angles_from_points(centre, sector_centre)
-                    # print(f"{_dir} {compass=} {rotation=}")
+                    print(f"{_dir} {compass=} {rotation=}")
                     _rotation = compass - 180.0
                 else:
                     _rotation = 0
                 # ---- draw
                 _shape.draw(
-                    _abs_cx=centre.x + self.unit(_shape_mx),
-                    _abs_cy=centre.y + self.unit(_shape_my),
+                    _abs_cx=sector_centre.x + self.unit(_shape_mx),
+                    _abs_cy=sector_centre.y + self.unit(_shape_my),
                     rotation=_rotation,
                 )
 
@@ -1237,11 +1238,11 @@ class HexShape(BaseShape):
         # ---- VERTICES:
         # ---- ^ pointy hexagon vertices (clockwise)
         if self.ORIENTATION == HexOrientation.POINTY:
-            #     2
-            #  1 / \3
-            #  0|  |4
+            #     4
+            #  5 / \3
+            #  0|  |2
             #   \ /
-            #    5
+            #    1
             self.vertexes = [  # clockwise from bottom-left; relative to centre
                 muPoint(x, y + geo.z_fraction),
                 muPoint(x, y + geo.z_fraction + geo.side),
@@ -1252,10 +1253,10 @@ class HexShape(BaseShape):
             ]
         # ---- ~ flat hexagon vertices (clockwise)
         elif self.ORIENTATION == HexOrientation.FLAT:
-            #   1__2
+            #   5__4
             # 0 /  \3
             #   \__/
-            #  5    4
+            #  1    2
             self.vertexes = [  # clockwise from left; relative to centre
                 muPoint(x, y + geo.half_flat),
                 muPoint(x + geo.z_fraction, y + geo.height_flat),
@@ -1303,7 +1304,7 @@ class HexShape(BaseShape):
             "perbii",
             "paths",
             "radii",
-            "sector_shapes",
+            "slice_shapes",
             "centre_shape",
             "centre_shapes",
             "vertex_shapes",
@@ -1432,14 +1433,14 @@ class HexShape(BaseShape):
                 # ---- * draw paths
                 if self.paths is not None and self.paths != []:
                     self.draw_paths(cnv, ID, Point(self.x_d, self.y_d), self.vertexes)
-            if item == "sector_shapes":
+            if item == "slice_shapes":
                 # ---- * draw sector shapes
-                if self.sector_shapes:
-                    self.draw_sector_shapes(
-                        self.sector_shapes,
+                if self.slice_shapes:
+                    self.draw_slice_shapes(
+                        self.slice_shapes,
                         self.vertices,
                         Point(self.x_d, self.y_d),
-                        self.sector_shapes_rotated,
+                        self.slice_shapes_rotated,
                     )
             if item == "centre_shape" or item == "center_shape":
                 # ---- * centred shape (with offset)

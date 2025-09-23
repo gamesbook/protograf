@@ -47,7 +47,8 @@ cross-reference to the detailed information for that command.
 -  :ref:`Dot <dot-command>` * - a geometric shape that can be drawn on a page
 -  :ref:`DotGrid <dotgrid-command>` - a set, or group, of dots that can be drawn on a page
 -  :ref:`Ellipse <ellipse-command>` * - a geometric shape that can be drawn on a page
--  :ref:`EquilateralTriangle <equilateraltriangle-command>` * - a geometric shape that can be drawn on a page
+-  :ref:`EquilateralTriangle <equilateraltriangle-command>` * - a geometric shape that
+   can be drawn on a page (also referenced by `EquTri`)
 -  :ref:`Extract <the-extract-command>` - allows portions of pages to be extracted as PNG images
 -  :ref:`Font <the-font-command>` - set the font properties for any
    :ref:`Text <text-command>` drawn on a page

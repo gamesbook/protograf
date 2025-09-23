@@ -843,6 +843,11 @@ EquilateralTriangle
 ~~~~~~~~~~~~~~~~~~~
 `↑ <shape-index_>`_
 
+.. HINT::
+
+    For convenience, an `EquilateralTriangle()` can also be referenced as
+    an `EquTri()`.
+
 Example 1. Default EquilateralTriangle
 ++++++++++++++++++++++++++++++++++++++
 
