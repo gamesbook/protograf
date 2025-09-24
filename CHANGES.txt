@@ -11,6 +11,7 @@ protograf Changes
 - Add `vertex_shapes` property to key shapes
 - Add `slice_shapes` property to Hexagon
 - Removed Compass shape
+- Add shortcut to include image references in HTML text
 - Patch pointy Hexagon (centre error)
 
 2025-09-16 (0.3.0)

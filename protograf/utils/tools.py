@@ -12,6 +12,7 @@ import logging
 import os
 import pathlib
 from pathlib import Path
+import re
 import string
 from string import ascii_uppercase, digits
 import sys
@@ -1609,6 +1610,50 @@ def uniques(key: str) -> list:
         if key in d:
             unique_values.add(d[key])
     return unique_values
+
+
+def html_img(text: str) -> str:
+    """Replace an image placeholder with an HTML <img> tag.
+
+    Note:
+        * placeholder pattern is |:filename.png:| or |:filename.png 00:|
+          where 00 will be a number representing the height
+        * the filename for an image must NOT contain spaces!
+        * a `.png` will be added to the filename, if there is no extension
+
+    Doc Test:
+
+    >>> html_img('A.png')
+    'A.png'
+    >>> html_img('|:A.png')
+    '|:A.png'
+    >>> html_img('A.png:|')
+    'A.png:|'
+    >>> html_img('|:A.png and |:B:|')  # POOR OUTCOME!
+    '<img src="A.png" height=and>'
+    >>> html_img(' |:A.png:| and |:B:| ')
+    ' <img src="A.png"> and <img src="B.png"> '
+    >>> html_img('an |:A:| or')
+    'an <img src="A.png"> or'
+    >>> html_img('an |: A 20 :| or')
+    'an <img src="A.png" height=20> or'
+    """
+    images = re.findall("\|\:(.*?)\:\|", text)
+    txt = text
+    for img in images:
+        _img = img.strip(' ')
+        items = _img.split(' ')
+        image_name = items[0]
+        base, ext = os.path.splitext(image_name)
+        if not ext:
+            image_name = image_name + '.png'
+        if len(items) > 1:
+            txt = txt.replace(img, f'<img src="{image_name}" height={items[1]}>')
+        else:
+            txt = txt.replace(img, f'<img src="{image_name}">')
+    if images:
+        txt = txt.replace('|:', '').replace(':|', '')
+    return txt
 
 
 if __name__ == "__main__":

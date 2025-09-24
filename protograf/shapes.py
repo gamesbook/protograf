@@ -9,6 +9,7 @@ import logging
 import math
 import os
 from pathlib import Path
+import sys
 from urllib.parse import urlparse
 
 # third party
@@ -2650,12 +2651,21 @@ class TextShape(BaseShape):
                         css_style.append(f"text-align: {self.align};")
                     styling = " ".join(css_style)
                     _text = f'<div style="{styling}">{_text}</div>'
+
+                script_dir = os.path.dirname(os.path.abspath(sys.argv[0]))
+                # NOTE - this add stores ALL filenames in the subarchives dict
+                # {'_subarchives': [{'fmt': 'dir', 'entries': ['foo.png', ...
+                globals.archive.add(script_dir)  # append "current" to use img in HTML
+                globals.archive.add(".")  # append "current" to use img in HTML
+
                 keys["archive"] = globals.archive
                 # feedback(f'*** Text HTML {keys=} {rect=} {_text=} {keys=}')
                 if self.run_debug:
                     globals.doc_page.draw_rect(
                         rect, color=self.debug_color, dashes="[1 2] 0"
                     )
+                # image placeholders => <img> tags
+                _text = tools.html_img(_text)
                 current_page.insert_htmlbox(rect, _text, **keys)
             except ValueError as err:
                 feedback(f"Cannot create Text - {err}", True)
