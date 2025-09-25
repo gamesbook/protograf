@@ -1641,18 +1641,18 @@ def html_img(text: str) -> str:
     images = re.findall("\|\:(.*?)\:\|", text)
     txt = text
     for img in images:
-        _img = img.strip(' ')
-        items = _img.split(' ')
+        _img = img.strip(" ")
+        items = _img.split(" ")
         image_name = items[0]
         base, ext = os.path.splitext(image_name)
         if not ext:
-            image_name = image_name + '.png'
+            image_name = image_name + ".png"
         if len(items) > 1:
             txt = txt.replace(img, f'<img src="{image_name}" height={items[1]}>')
         else:
             txt = txt.replace(img, f'<img src="{image_name}">')
     if images:
-        txt = txt.replace('|:', '').replace(':|', '')
+        txt = txt.replace("|:", "").replace(":|", "")
     return txt
 
 

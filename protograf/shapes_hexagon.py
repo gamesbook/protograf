@@ -34,6 +34,7 @@ from protograf.utils.structures import (
     Perbis,
     Point,
     PolyGeometry,
+    Radius,
 )  # named tuples
 from protograf.utils.support import CACHE_DIRECTORY
 from protograf.base import (
@@ -670,31 +671,63 @@ class HexShape(BaseShape):
         #     self._debug(cnv, vertices=_perbii_pts)
         return perbii_dict
 
-    def draw_slice_shapes(
-        self, slice_shapes: list, vertexes: list, centre: Point, rotated: bool = False
-    ):
-        """Draw a shape inside one or more triangular slices of a Hexagon.
+    def calculate_radii(
+        self, cnv, centre: Point, vertices: list, debug: bool = False
+    ) -> list:
+        """Calculate radii for each Hex vertex and angles from centre.
 
         Args:
-            slice_shapes (list):
-                list of tuples of (dir, shape, offset_x, offset_y) where
-                offset_x and offset_y are optional floats
+            vertices: list of Hex'es nodes as Points
+            centre: the centre Point of the Hex
+
+        Returns:
+            dict of Radius objects keyed on direction
+        """
+        if self.ORIENTATION == HexOrientation.POINTY:
+            directions = ["nw", "w", "sw", "se", "e", "ne"]
+        if self.ORIENTATION == HexOrientation.FLAT:
+            directions = ["nw", "sw", "s", "se", "ne", "n"]
+        radii_dict = {}
+        # print(f"*** HEX radii {centre=} {vertices=}")
+        for key, vertex in enumerate(vertices):
+            compass, angle = geoms.angles_from_points(centre, vertex)
+            # print(f"*** HEX *** radii {key=} {pc=} {compass=} {angle=}")
+            _radii = Radius(
+                point=vertex,
+                direction=directions[key],
+                compass=compass,
+                angle=angle,
+            )
+            radii_dict[directions[key]] = _radii
+        return radii_dict
+
+    def draw_radii_shapes(
+        self,
+        cnv,
+        radii_shapes: list,
+        vertexes: list,
+        centre: Point,
+        rotated: bool = False,
+    ):
+        """Draw a shape along the radii lines of a Hexagon.
+
+        Args:
+            radii_shapes (list):
+                list of tuples of (dir, shape, offset) where
+                offset is optional float - the fractional distance along the
+                line from the centre to the edge at which the shape is drawn;
+                default is 0.5
             vertexes (list):
                 list of points for the Hexagon vertices
             centre (Point):
                 the centre of the Hexagon
             rotated (bool):
-                if True, rotate slice_shapes relative to centre
+                if True, rotate radii_shapes relative to centre
         """
 
-        def get_centroid(vertices: list) -> Point:
-            x_c = (vertices[0].x + vertices[1].x + vertices[2].x) / 3.0
-            y_c = (vertices[0].y + vertices[1].y + vertices[2].y) / 3.0
-            return Point(x_c, y_c)
-
-        err = "A Hexagon's slice_shapes must contain direction(s) and shape"
-        for item in slice_shapes:
-            _shape_mx, _shape_my = 0, 0
+        err = "A Hexagon's radii_shapes must contain direction(s) and shape"
+        radii_dict = self.calculate_radii(cnv, centre, vertexes)
+        for item in radii_shapes:
             if isinstance(item, tuple):
                 if len(item) < 2:
                     feedback(f"{err} - not {item}")
@@ -702,56 +735,24 @@ class HexShape(BaseShape):
                 _dirs = tools.validated_directions(item[0], direction, "direction")
                 _shape = item[1]
                 if len(item) >= 3:
-                    _shape_mx = item[1]
-                if len(item) == 4:
-                    _shape_my = item[2]
+                    _shape_fraction = item[1]
             else:
                 feedback(f"{err} - not {item}")
             self.can_draw_centred_shape(_shape, True)  # could stop here
             for _dir in _dirs:
-                tverts = []
-                # ---- centre of sector
-                if self.ORIENTATION == HexOrientation.POINTY:
-                    match _dir:
-                        case "ne":
-                            tverts = [centre, vertexes[5], vertexes[4]]
-                        case "e":
-                            tverts = [centre, vertexes[4], vertexes[3]]
-                        case "se":
-                            tverts = [centre, vertexes[3], vertexes[2]]
-                        case "sw":
-                            tverts = [centre, vertexes[2], vertexes[1]]
-                        case "w":
-                            tverts = [centre, vertexes[1], vertexes[0]]
-                        case "nw":
-                            tverts = [centre, vertexes[0], vertexes[5]]
-                elif self.ORIENTATION == HexOrientation.FLAT:
-                    match _dir:
-                        case "n":
-                            tverts = [centre, vertexes[5], vertexes[4]]
-                        case "ne":
-                            tverts = [centre, vertexes[4], vertexes[3]]
-                        case "se":
-                            tverts = [centre, vertexes[3], vertexes[2]]
-                        case "s":
-                            tverts = [centre, vertexes[2], vertexes[1]]
-                        case "sw":
-                            tverts = [centre, vertexes[1], vertexes[0]]
-                        case "nw":
-                            tverts = [centre, vertexes[0], vertexes[5]]
-                sector_centre = get_centroid(tverts)
-                print(f"*** {self.ORIENTATION=} {_dir=} {tverts=} {sector_centre=}")
+                shape_centre = 1  # TODO - calculate from fraction dist!!
+                print(f"*** {self.ORIENTATION=} {_dir=} {shape_centre=}")
                 # ---- rotation
                 if rotated:
-                    compass, rotation = geoms.angles_from_points(centre, sector_centre)
+                    compass, rotation = geoms.angles_from_points(centre, shape_centre)
                     print(f"{_dir} {compass=} {rotation=}")
                     _rotation = compass - 180.0
                 else:
                     _rotation = 0
                 # ---- draw
                 _shape.draw(
-                    _abs_cx=sector_centre.x + self.unit(_shape_mx),
-                    _abs_cy=sector_centre.y + self.unit(_shape_my),
+                    _abs_cx=shape_centre.x,
+                    _abs_cy=shape_centre.y,
                     rotation=_rotation,
                 )
 
@@ -1304,7 +1305,7 @@ class HexShape(BaseShape):
             "perbii",
             "paths",
             "radii",
-            "slice_shapes",
+            "radii_shapes",
             "centre_shape",
             "centre_shapes",
             "vertex_shapes",
@@ -1433,14 +1434,15 @@ class HexShape(BaseShape):
                 # ---- * draw paths
                 if self.paths is not None and self.paths != []:
                     self.draw_paths(cnv, ID, Point(self.x_d, self.y_d), self.vertexes)
-            if item == "slice_shapes":
-                # ---- * draw sector shapes
-                if self.slice_shapes:
-                    self.draw_slice_shapes(
-                        self.slice_shapes,
+            if item == "radii_shapes":
+                # ---- * draw radii_shapes
+                if self.radii_shapes:
+                    self.draw_radii_shapes(
+                        cnv,
+                        self.radii_shapes,
                         self.vertices,
                         Point(self.x_d, self.y_d),
-                        self.slice_shapes_rotated,
+                        self.radii_shapes_rotated,
                     )
             if item == "centre_shape" or item == "center_shape":
                 # ---- * centred shape (with offset)

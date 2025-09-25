@@ -566,9 +566,13 @@ class BaseCanvas:
         self.paths_dashed = self.defaults.get("paths_dashed", self.dashed)
         self.paths_wave_style = self.defaults.get("paths_wave_style", None)
         self.paths_wave_height = self.defaults.get("paths_wave_height", 0)
-        self.slice_shapes = self.defaults.get("slice_shapes", [])
-        self.slice_shapes_rotated = self.defaults.get(
-            "self.slice_shapes_rotated", False
+        self.perbii_shapes = self.defaults.get("perbii_shapes", [])
+        self.perbii_shapes_rotated = self.defaults.get(
+            "self.perbii_shapes_rotated", False
+        )
+        self.radii_shapes = self.defaults.get("radii_shapes", [])
+        self.radii_shapes_rotated = self.defaults.get(
+            "self.radii_shapes_rotated", False
         )
         # ---- hexagons
         self.hid = self.defaults.get("id", "")  # HEX ID
@@ -1158,9 +1162,13 @@ class BaseShape:
         self.paths_dashed = kwargs.get("paths_dashed", self.dashed)
         self.paths_wave_style = kwargs.get("paths_wave_style", base.paths_wave_style)
         self.paths_wave_height = kwargs.get("paths_wave_height", base.paths_wave_height)
-        self.slice_shapes = kwargs.get("slice_shapes", [])
-        self.slice_shapes_rotated = self.kw_bool(
-            kwargs.get("slice_shapes_rotated", False)
+        self.perbii_shapes = kwargs.get("perbii_shapes", [])
+        self.perbii_shapes_rotated = self.kw_bool(
+            kwargs.get("perbii_shapes_rotated", False)
+        )
+        self.radii_shapes = kwargs.get("radii_shapes", [])
+        self.radii_shapes_rotated = self.kw_bool(
+            kwargs.get("radii_shapes_rotated", False)
         )
         # ---- hexagons
         self.hid = kwargs.get("id", base.hid)  # HEX ID

@@ -9,7 +9,8 @@ protograf Changes
 - Patch Chord shape
 - Add `arrow` property to Chord shape
 - Add `vertex_shapes` property to key shapes
-- Add `slice_shapes` property to Hexagon
+- Add `perbii_shapes` property to key shapes
+- Add `radii_shapes` property to key shapes
 - Removed Compass shape
 - Add shortcut to include image references in HTML text
 - Patch pointy Hexagon (centre error)
