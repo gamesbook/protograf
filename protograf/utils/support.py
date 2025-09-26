@@ -540,9 +540,13 @@ def pdf_export(
             gif_name = os.path.join(dirname, f"{basename}.gif")
             for filename in all_pngs:
                 images.append(imageio.imread(filename))
-                imageio.mimsave(
-                    gif_name, images, duration=framerate * 1000
-                )  # ms -> sec
+            imageio.mimsave(
+                gif_name,
+                images,
+                duration=framerate * 1000,
+                optimize=True,
+                loop=0,  # keep looping
+            )  # ms -> sec
             for filename in all_pngs:
                 if os.path.isfile(filename):
                     os.remove(filename)

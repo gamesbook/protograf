@@ -14,6 +14,8 @@ protograf Changes
 - Removed Compass shape
 - Add shortcut to include image references in HTML text
 - Patch pointy Hexagon (centre error)
+- Patch issue with speed of GIF creation; add looping
+- Patch centering for Images on a Layout
 
 2025-09-16 (0.3.0)
 -------------------

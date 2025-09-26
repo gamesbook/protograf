@@ -3388,14 +3388,14 @@ def Rectangle(row=None, col=None, **kwargs):
     <center>
 
     - rounding (float): the radius of the circle used to round the corner
-    - border (list): overide the normal edge line; specify a set of values, which
+    - borders (list): overide the normal edge lines; specify a set of values, which
       are comma-separated inside round brackets, in the following order:
 
       - direction (str): one of (n)orth, (s)outh, (e)ast or (w)est,
         nw (north-west) or se (south-east)
       - width (float): the line thickness
       - color (str): either a named or hexadecimal color
-      - style  (bool): True makes a dotted line; or a list of values creates dashes
+      - style (bool): True makes a dotted line; or a list of values creates dashes
     - chevron (str): the primary compass direction in which a peak is
       pointing; n(orth), s(outh), e(ast) or w(est)
     - chevron_height (float): the distance of the chevron peak from the side of

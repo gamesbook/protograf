@@ -88,6 +88,9 @@ class ImageShape(BaseShape):
         else:
             x = self._u.x + self._o.delta_x
             y = self._u.y + self._o.delta_y
+        if self.use_abs_c:
+            x = self._abs_cx - width / 2.0
+            y = self._abs_cy - height / 2.0
         rotation = kwargs.get("rotation", self.rotation)
         # ---- load image
         # feedback(f'*** IMAGE {ID=} {_source=} {x=} {y=} {self.rotation=}')
@@ -112,8 +115,12 @@ class ImageShape(BaseShape):
                     True,
                 )
         # ---- centre
-        x_c = x + width / 2.0
-        y_c = y + height / 2.0
+        if self.use_abs_c:
+            x_c = self._abs_cx
+            y_c = self._abs_cy
+        else:
+            x_c = x + width / 2.0
+            y_c = y + height / 2.0
         # ---- cross
         self.draw_cross(cnv, x_c, y_c, rotation=kwargs.get("rotation"))
         # ---- dot

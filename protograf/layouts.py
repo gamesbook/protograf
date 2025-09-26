@@ -557,8 +557,8 @@ class VirtualLocations(VirtualShape):
 
     def __init__(self, rows, cols, **kwargs):
         kwargs = kwargs
-        self.x = self.to_float(kwargs.get("x", 1.0), "x")  # left(lower) corner
-        self.y = self.to_float(kwargs.get("y", 1.0), "y")  # left(lower) corner
+        self.x = self.to_float(kwargs.get("x", 1.0), "x")  # left(upper) corner
+        self.y = self.to_float(kwargs.get("y", 1.0), "y")  # top(uppper) corner
         self.rows = self.to_int(rows, "rows")
         self.cols = self.to_int(cols, "cols")
         self.side = self.to_float(kwargs.get("side", 0), "side")
