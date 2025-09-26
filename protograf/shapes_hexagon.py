@@ -82,16 +82,35 @@ class HexShape(BaseShape):
             )
         return orientation
 
-    def get_direction(self) -> DirectionGroup:
-        """Return DirectionGroup for the Hexagon."""
-        if _lower(self.orientation) in ["p", "pointy"]:
-            direction = DirectionGroup.HEX_POINTY_EDGE
-        elif _lower(self.orientation) in ["f", "flat"]:
-            direction = DirectionGroup.HEX_FLAT_EDGE
+    def get_direction(self, lines="radii") -> DirectionGroup:
+        """Return DirectionGroup for the Hexagon.
+
+        Args:
+            lines (str): either radii (default) or perbii
+        """
+        if lines == "radii":
+            if _lower(self.orientation) in ["p", "pointy"]:
+                direction = DirectionGroup.HEX_POINTY
+            elif _lower(self.orientation) in ["f", "flat"]:
+                direction = DirectionGroup.HEX_FLAT
+            else:
+                feedback(
+                    'Invalid orientation "{self.orientation}" supplied for hexagon radii.',
+                    True,
+                )
+        elif lines == "perbii":
+            if _lower(self.orientation) in ["p", "pointy"]:
+                direction = DirectionGroup.HEX_POINTY_EDGE
+            elif _lower(self.orientation) in ["f", "flat"]:
+                direction = DirectionGroup.HEX_FLAT_EDGE
+            else:
+                feedback(
+                    'Invalid orientation "{self.orientation}" supplied for hexagon perbii.',
+                    True,
+                )
         else:
-            feedback(
-                'Invalid orientation "{self.orientation}" supplied for hexagon.', True
-            )
+            LINES = ["radii", "perbii"]
+            raise ValueError("get_direction `lines` must be one of: {LINES}")
         return direction
 
     def hex_height_width(self) -> tuple:
@@ -684,20 +703,21 @@ class HexShape(BaseShape):
             dict of Radius objects keyed on direction
         """
         if self.ORIENTATION == HexOrientation.POINTY:
-            directions = ["nw", "w", "sw", "se", "e", "ne"]
-        if self.ORIENTATION == HexOrientation.FLAT:
             directions = ["nw", "sw", "s", "se", "ne", "n"]
+        if self.ORIENTATION == HexOrientation.FLAT:
+            directions = ["w", "sw", "se", "e", "ne", "nw"]
         radii_dict = {}
-        # print(f"*** HEX radii {centre=} {vertices=}")
+        # print(f"*** HEX radii {self.ORIENTATION=} {centre=} {vertices=}")
         for key, vertex in enumerate(vertices):
             compass, angle = geoms.angles_from_points(centre, vertex)
-            # print(f"*** HEX *** radii {key=} {pc=} {compass=} {angle=}")
+            # print(f"*** HEX *** radii {key=} {directions[key]=} {compass=} {angle=}")
             _radii = Radius(
                 point=vertex,
                 direction=directions[key],
                 compass=compass,
-                angle=angle,
+                angle=360 - angle,  # inverse flip (y is reveresed)
             )
+            # print(f"*** HEX radii {self.ORIENTATION=} {_radii}")
             radii_dict[directions[key]] = _radii
         return radii_dict
 
@@ -709,14 +729,16 @@ class HexShape(BaseShape):
         centre: Point,
         rotated: bool = False,
     ):
-        """Draw a shape along the radii lines of a Hexagon.
+        """Draw shape(s) along the radii lines of a Hexagon.
 
         Args:
             radii_shapes (list):
-                list of tuples of (dir, shape, offset) where
-                offset is optional float - the fractional distance along the
-                line from the centre to the edge at which the shape is drawn;
-                default is 0.5
+                list of tuples of (dir, shape, offset) where:
+                * dir is a direction name
+                * shape is an instance of a Shape
+                * offset is optional float - the fractional distance along the
+                  line from the centre to the edge at which the shape is drawn;
+                  default is 0.5
             vertexes (list):
                 list of points for the Hexagon vertices
             centre (Point):
@@ -725,27 +747,32 @@ class HexShape(BaseShape):
                 if True, rotate radii_shapes relative to centre
         """
 
-        err = "A Hexagon's radii_shapes must contain direction(s) and shape"
+        err = "The radii_shapes must contain direction(s) and shape"
         radii_dict = self.calculate_radii(cnv, centre, vertexes)
         for item in radii_shapes:
             if isinstance(item, tuple):
+                _shape_fraction = 0.5
                 if len(item) < 2:
                     feedback(f"{err} - not {item}")
-                direction = self.get_direction()
+                direction = self.get_direction(lines="radii")
                 _dirs = tools.validated_directions(item[0], direction, "direction")
                 _shape = item[1]
                 if len(item) >= 3:
-                    _shape_fraction = item[1]
+                    _shape_fraction = tools.as_float(item[2], "fraction")
             else:
                 feedback(f"{err} - not {item}")
             self.can_draw_centred_shape(_shape, True)  # could stop here
             for _dir in _dirs:
-                shape_centre = 1  # TODO - calculate from fraction dist!!
-                print(f"*** {self.ORIENTATION=} {_dir=} {shape_centre=}")
+                _radii = radii_dict[_dir]
+                shape_centre = geoms.fraction_along_line(
+                    centre, _radii.point, _shape_fraction
+                )
+                # print(f"*** {self.ORIENTATION=} {_radii=} {shape_centre=}")
                 # ---- rotation
                 if rotated:
-                    compass, rotation = geoms.angles_from_points(centre, shape_centre)
-                    print(f"{_dir} {compass=} {rotation=}")
+                    # compass, rotation = geoms.angles_from_points(centre, shape_centre)
+                    compass, rotation = _radii.compass, _radii.angle
+                    # print(f"*** {_dir} {compass=} {rotation=}")
                     _rotation = compass - 180.0
                 else:
                     _rotation = 0

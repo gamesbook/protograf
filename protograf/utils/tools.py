@@ -1147,9 +1147,9 @@ def validated_directions(
             valid = {"ne", "se", "sw", "nw"}
         case DirectionGroup.COMPASS:
             valid = {"n", "e", "w", "s", "ne", "se", "sw", "nw"}
-        case DirectionGroup.HEX_FLAT:
+        case DirectionGroup.HEX_FLAT:  # radii
             valid = {"e", "se", "sw", "w", "ne", "nw"}
-        case DirectionGroup.HEX_POINTY:
+        case DirectionGroup.HEX_POINTY:  # radii
             valid = {"s", "se", "sw", "n", "ne", "nw"}
         case DirectionGroup.HEX_FLAT_EDGE:  # perbii
             valid = {"s", "se", "sw", "n", "ne", "nw"}
