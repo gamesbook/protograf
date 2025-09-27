@@ -15,7 +15,8 @@ protograf Changes
 - Patch pointy Hexagon (centre error)
 - Patch issue with speed of GIF creation; add looping
 - Patch centering for Images on a Layout
-- Add `radii` for Rhomus and EquilateralTriangle
+- Add `radii` for Rhombus and EquilateralTriangle
+- Add `diamond` as a pip shape for D6
 
 2025-09-16 (0.3.0)
 -------------------

@@ -1015,6 +1015,73 @@ Star(
     vertex_shapes_rotated=True)
 PageBreak()
 
+# ---- radii shapes
+Blueprint()
+Text(common=txt, text="Radii shapes")
+ccom = Common(radius=0.15, fill="gold", label_size=6)
+Hexagon(
+    cx=1, cy=1,
+    radius=0.8,
+    orientation="pointy",
+    radii_shapes=[
+        ('n', circle(common=ccom, label="n")),
+        ('se', circle(common=ccom, label="se"), 1.25),
+        ('sw', circle(common=ccom, label="sw"), 0.5 ),
+    ],
+    radii_shapes_rotated=True,
+)
+Hexagon(
+    cx=3, cy=1,
+    radius=0.8,
+    radii_shapes=[
+       ('ne', circle(common=ccom, label="ne")),
+       ('se', circle(common=ccom, label="se"), 1.25),
+       ('sw', circle(common=ccom, label="sw"), 0.5),
+    ],
+    radii_shapes_rotated=True,
+)
+Rectangle(
+    cx=1, cy=3,
+    height=1, width=1.5,
+    radii_shapes=[
+        ('ne', circle(common=ccom, label="ne")),
+        ('se', circle(common=ccom, label="se")),
+        ('sw', circle(common=ccom, label="sw")),
+        ('nw', circle(common=ccom, label="nw")),
+    ],
+    radii_shapes_rotated=True,
+)
+Rhombus(
+    cx=3, cy=3,
+    width=1, height=1.5,
+    radii_shapes=[
+        ('n', circle(common=ccom, label="n")),
+        ('s', circle(common=ccom, label="s")),
+        ('e', circle(common=ccom, label="e")),
+        ('w', circle(common=ccom, label="w")),
+    ],
+    radii_shapes_rotated=True,
+)
+EquilateralTriangle(
+    cx=1, cy=5,
+    side=1.25,
+    radii_shapes=[
+        ('n', circle(common=ccom, label="n")),
+        ('se', circle(common=ccom, label="se")),
+        ('sw', circle(common=ccom, label="sw")),
+    ],
+    radii_shapes_rotated=True,
+)
+Circle(
+    cx=3, cy=5,
+    radius=0.75,
+    radii_shapes=[
+        ('30 90 150 210 270 330', circle(common=ccom, label="A")),
+    ],
+    radii_shapes_rotated=True,
+)
+PageBreak()
+
 # ---- END
 Text(common=txt, text="Shapes END...")
 
@@ -1056,4 +1123,5 @@ Save(
         "perbii_styled",
         "poly_waves",
         "vertex_shapes",
+        "radii_shapes",
         None])

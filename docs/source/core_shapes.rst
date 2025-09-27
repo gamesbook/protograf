@@ -3083,6 +3083,7 @@ the desired output:
 - `Dot and Cross`_
 - `Fill and Stroke`_
 - `Rotation`_
+- `Radii Shapes`_
 - `Text Descriptions`_
 - `Transparency`_
 - `Vertex Shapes`_
@@ -3460,6 +3461,160 @@ Example 4. Rotation with Hatches
       with a rotation of 30 |deg| each.
 
 ===== ======
+
+
+. _coreRadiiShapes:
+
+Radii Shapes
+~~~~~~~~~~~~
+`^ <shapes-common-properties_>`_
+
+A number of shapes, that are formed by drawing lines between a set of
+vertices ("corner points"), can be styled by placing other shapes which
+can be located those lines.
+
+Radii shapes are constructed using the following properties:
+
+- *radii_shapes* - this a list (values in ``[...]``) of value sets that
+  determine the "where and what" should be drawn along the line of
+  specific radius.  Each set, enclosed in brackets``(...)`` can consist
+  of three comma-separated parts:
+
+  - the first is the **direction**, or directions, of the relevant radii;
+    this can be a string e.g. ``"n e"`` or a list e.g. ``["n", "e"]``.
+    Note that for a ``Circle`` the direction is the number of degrees
+    (anti-clockwise from 0 |deg| in the east direction) whereas for
+    other shapes it will be a :ref:`compass direction <termsDirection>`.
+  - the second is the **shape** to be drawn
+  - the optional third part is the **fractional distance** along the line
+    at which the shape should be drawm; dy default this is ``1`` i.e. the
+    length of the radial line |dash| if it is less than ``1`` the radii
+    shape will be drawn inside of the parent shape; and if it is more than
+    ``1`` the radii shape will be drawn outside of, or away from, the parent
+    shape
+- *radii_shapes_rotated* - an optional property which, if ``True``, will
+  rotate the vertex shapes such they "point" away from the centre of the
+  parent shape
+
+Radii shapes can be constructed for:
+
+- :ref:`EquilateralTriangle <equilateraltriangle-command>`
+- :ref:`Hexagon <hexagon-command>`
+- :ref:`Rectangle <rectangle-command>`
+- :ref:`Rhombus <rhombus-command>`
+- :ref:`Circle <circle-command>`
+
+Example 1. Radii Shapes
+++++++++++++++++++++++++
+
+.. |vr1| image:: images/customised/radii_shapes.png
+   :width: 330
+
+===== ======
+|vr1| This example shows radii shapes constructed as follows:
+
+      .. code:: python
+
+        ccom = Common(radius=0.15, fill="gold", label_size=6)
+
+        Hexagon(
+            cx=1, cy=1,
+            radius=0.8,
+            orientation="pointy",
+            radii_shapes=[
+                ('n', circle(common=ccom, label="n")),
+                ('se', circle(common=ccom, label="se"), 1.25),
+                ('sw', circle(common=ccom, label="sw"), 0.5 ),
+            ],
+            radii_shapes_rotated=True,
+        )
+        Hexagon(
+            cx=3, cy=1,
+            radius=0.8,
+            radii_shapes=[
+               ('ne', circle(common=ccom, label="ne")),
+               ('se', circle(common=ccom, label="se"), 1.25),
+               ('sw', circle(common=ccom, label="sw"), 0.5),
+            ],
+            radii_shapes_rotated=True,
+        )
+        Rectangle(
+            cx=1, cy=3,
+            height=1, width=1.5,
+            radii_shapes=[
+                ('ne', circle(common=ccom, label="ne")),
+                ('se', circle(common=ccom, label="se")),
+                ('sw', circle(common=ccom, label="sw")),
+                ('nw', circle(common=ccom, label="nw")),
+            ],
+            radii_shapes_rotated=True,
+        )
+        Rhombus(
+            cx=3, cy=3,
+            width=1, height=1.5,
+            radii_shapes=[
+                ('n', circle(common=ccom, label="n")),
+                ('s', circle(common=ccom, label="s")),
+                ('e', circle(common=ccom, label="e")),
+                ('w', circle(common=ccom, label="w")),
+            ],
+            radii_shapes_rotated=True,
+        )
+        EquilateralTriangle(
+            cx=1, cy=5,
+            side=1.25,
+            radii_shapes=[
+                ('n', circle(common=ccom, label="n")),
+                ('se', circle(common=ccom, label="se")),
+                ('sw', circle(common=ccom, label="sw")),
+            ],
+            radii_shapes_rotated=True,
+        )
+        Circle(
+            cx=3, cy=5,
+            radius=0.75,
+            radii_shapes=[
+                ('30 90 150 210 270 330',
+                  circle(common=ccom, label="A")),
+            ],
+            radii_shapes_rotated=True,
+        )
+
+      All of these examples use a common settings in ``ccom`` to draw
+      the vertex shape |dash| a circle; but the *label* property set as
+      a visual indicator
+
+      Note that in some cases, setting the *fractional_distance* (the
+      third value in the set) causes the radii shape to be moved
+      closer to, or further away from, the centre.
+
+      The use of ``radii_shapes_rotated=True`` will means all of these
+      examples have the radii shapes rotated to face "away" from the
+      parent shape's centre.
+
+      .. HINT::
+
+          Although not shown above, multiple entries can be made for a given
+          direction; for example, to draw a circle and a dot along the ``ne``
+          radius for a rectangle |dash| in the case below the ``Dot()`` will
+          be drawn halfway along:
+
+          .. code:: python
+
+            Rectangle(
+                cx=1, cy=3,
+                height=1, width=1.5,
+                radii_shapes=[
+                    ('ne', circle(common=ccom, label="ne")),
+                    ('ne', dot(), 0.5),
+                ],
+                radii_shapes_rotated=True,
+            )
+
+===== ======
+
+
+
 
 .. _coreShapeText:
 

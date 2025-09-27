@@ -623,6 +623,7 @@ class BaseCanvas:
         # ---- dice / domino
         self.pip_stroke = self.defaults.get("pip_stroke", self.stroke)
         self.pip_fill = self.defaults.get("pip_fill", self.stroke)  # see draw_piphead()
+        self.pip_shape = self.defaults.get("pip_shape", "circle")
         self.pip_fraction = self.defaults.get("pip_fraction", 0.2)
         # ---- mesh
         self.mesh = self.defaults.get("mesh", None)
@@ -1233,6 +1234,7 @@ class BaseShape:
         # ---- dice / domino
         self.pip_stroke = kwargs.get("pip_stroke", base.pip_stroke)
         self.pip_fill = kwargs.get("pip_fill", base.pip_fill)
+        self.pip_shape = kwargs.get("pip_shape", base.pip_shape)
         self.pip_fraction = self.kw_float(
             kwargs.get("pip_fraction", base.pip_fraction), "pip_fraction"
         )
@@ -1620,6 +1622,11 @@ class BaseShape:
         if self.star_pattern:
             if _lower(self.star_pattern) not in ["random", "cluster", "r", "c"]:
                 issue.append(f'"{self.pattern}" is an invalid starfield pattern!')
+                correct = False
+        # ---- dice pip shape
+        if self.pip_shape:
+            if _lower(self.pip_shape) not in ["circle", "diamond", "d", "c"]:
+                issue.append(f'"{self.pip_shape}" is an invalid pip_shape!')
                 correct = False
         # ---- rectangle - corners
         if self.corners_style:

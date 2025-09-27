@@ -635,6 +635,16 @@ class D6Object(BaseShape):
 
     def draw(self, cnv=None, off_x=0, off_y=0, ID=None, **kwargs):
         """Draw the D6 on a given canvas."""
+
+        def draw_diamond(middle, radius):
+            """Draw a Diamond shape based on a centre and radius."""
+            centre = Point(middle[0], middle[1])
+            pt1 = Point(centre.x, centre.y - radius)
+            pt2 = Point(centre.x + radius, centre.y)
+            pt3 = Point(centre.x, centre.y + radius)
+            pt4 = Point(centre.x - radius, centre.y)
+            cnv.draw_polyline((pt1, pt2, pt3, pt4, pt1))
+
         kwargs = self.kwargs | kwargs
         cnv = cnv if cnv else globals.canvas  # a new Page/Shape may now exist
         super().draw(cnv, off_x, off_y, ID, **kwargs)  # unit-based props
@@ -689,36 +699,69 @@ class D6Object(BaseShape):
         px = x + self._u.width / 2.0
         py = y + self._u.height / 2.0
         offset = 3 * (0.2 * self._u.width / 2.0)  # fixed regardless of pip size
-        match number:
-            case 1:
-                cnv.draw_circle((px, py), pip_radius)
-            case 2:
-                cnv.draw_circle((px - offset, py - offset), pip_radius)
-                cnv.draw_circle((px + offset, py + offset), pip_radius)
-            case 3:
-                cnv.draw_circle((px - offset, py - offset), pip_radius)
-                cnv.draw_circle((px, py), pip_radius)
-                cnv.draw_circle((px + offset, py + offset), pip_radius)
-            case 4:
-                cnv.draw_circle((px - offset, py + offset), pip_radius)
-                cnv.draw_circle((px + offset, py - offset), pip_radius)
-                cnv.draw_circle((px - offset, py - offset), pip_radius)
-                cnv.draw_circle((px + offset, py + offset), pip_radius)
-            case 5:
-                cnv.draw_circle((px - offset, py + offset), pip_radius)
-                cnv.draw_circle((px + offset, py - offset), pip_radius)
-                cnv.draw_circle((px - offset, py - offset), pip_radius)
-                cnv.draw_circle((px, py), pip_radius)
-                cnv.draw_circle((px + offset, py + offset), pip_radius)
-            case 6:
-                cnv.draw_circle((px - offset, py + offset), pip_radius)
-                cnv.draw_circle((px + offset, py - offset), pip_radius)
-                cnv.draw_circle((px - offset, py - offset), pip_radius)
-                cnv.draw_circle((px + offset, py + offset), pip_radius)
-                cnv.draw_circle((px - offset, py), pip_radius)
-                cnv.draw_circle((px + offset, py), pip_radius)
-            case _:
-                feedback("D6 must use a number from 1 to 6", True)
+        if _lower(self.pip_shape) in ["circle", "c"]:
+            match number:
+                case 1:
+                    cnv.draw_circle((px, py), pip_radius)
+                case 2:
+                    cnv.draw_circle((px - offset, py - offset), pip_radius)
+                    cnv.draw_circle((px + offset, py + offset), pip_radius)
+                case 3:
+                    cnv.draw_circle((px - offset, py - offset), pip_radius)
+                    cnv.draw_circle((px, py), pip_radius)
+                    cnv.draw_circle((px + offset, py + offset), pip_radius)
+                case 4:
+                    cnv.draw_circle((px - offset, py + offset), pip_radius)
+                    cnv.draw_circle((px + offset, py - offset), pip_radius)
+                    cnv.draw_circle((px - offset, py - offset), pip_radius)
+                    cnv.draw_circle((px + offset, py + offset), pip_radius)
+                case 5:
+                    cnv.draw_circle((px - offset, py + offset), pip_radius)
+                    cnv.draw_circle((px + offset, py - offset), pip_radius)
+                    cnv.draw_circle((px - offset, py - offset), pip_radius)
+                    cnv.draw_circle((px, py), pip_radius)
+                    cnv.draw_circle((px + offset, py + offset), pip_radius)
+                case 6:
+                    cnv.draw_circle((px - offset, py + offset), pip_radius)
+                    cnv.draw_circle((px + offset, py - offset), pip_radius)
+                    cnv.draw_circle((px - offset, py - offset), pip_radius)
+                    cnv.draw_circle((px + offset, py + offset), pip_radius)
+                    cnv.draw_circle((px - offset, py), pip_radius)
+                    cnv.draw_circle((px + offset, py), pip_radius)
+                case _:
+                    feedback("D6 must use a number from 1 to 6", True)
+        if _lower(self.pip_shape) in ["diamond", "d"]:
+            match number:
+                case 1:
+                    draw_diamond((px, py), pip_radius)
+                case 2:
+                    draw_diamond((px - offset, py - offset), pip_radius)
+                    draw_diamond((px + offset, py + offset), pip_radius)
+                case 3:
+                    draw_diamond((px - offset, py - offset), pip_radius)
+                    draw_diamond((px, py), pip_radius)
+                    draw_diamond((px + offset, py + offset), pip_radius)
+                case 4:
+                    draw_diamond((px - offset, py + offset), pip_radius)
+                    draw_diamond((px + offset, py - offset), pip_radius)
+                    draw_diamond((px - offset, py - offset), pip_radius)
+                    draw_diamond((px + offset, py + offset), pip_radius)
+                case 5:
+                    draw_diamond((px - offset, py + offset), pip_radius)
+                    draw_diamond((px + offset, py - offset), pip_radius)
+                    draw_diamond((px - offset, py - offset), pip_radius)
+                    draw_diamond((px, py), pip_radius)
+                    draw_diamond((px + offset, py + offset), pip_radius)
+                case 6:
+                    draw_diamond((px - offset, py + offset), pip_radius)
+                    draw_diamond((px + offset, py - offset), pip_radius)
+                    draw_diamond((px - offset, py - offset), pip_radius)
+                    draw_diamond((px + offset, py + offset), pip_radius)
+                    draw_diamond((px - offset, py), pip_radius)
+                    draw_diamond((px + offset, py), pip_radius)
+                case _:
+                    feedback("D6 must use a number from 1 to 6", True)
+
         # add style
         pargs = {}
         pargs["stroke"] = self.pip_stroke

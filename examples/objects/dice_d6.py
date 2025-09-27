@@ -41,7 +41,9 @@ D6(x=3, y=2, roll=6, common=red_yello)
 
 # ---- color smaller D6
 blu_wite = Common(
-    pip_fill="white", pip_stroke="aqua",
+    pip_fill="white",
+    pip_shape="diamond",
+    pip_stroke="aqua",
     fill="blue", pip_fraction=0.15)
 D6(x=0, y=3, common=blu_wite)
 D6(x=1, y=3, roll=2, common=blu_wite)

@@ -293,6 +293,8 @@ Properties that use direction include:
 -  **pointy** - the *orientation* of a ``Hexagon``, meaning the top of it will
    make a "peak" relative to the bottom edge of the paper, and the flat edge
    will be parallel to the left side of the paper.
+-  **radii_shapes** - a shape is drawn on the line of the compass direction of
+   a shape's radius
 -  **start** - can be any secondary compass direction; for example, it is
    used to show in which corner of a ``RectangularLayout`` that shapes
    should first placed when creating a track
