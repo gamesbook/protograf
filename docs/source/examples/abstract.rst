@@ -2,7 +2,7 @@
 Abstract Board Games
 ====================
 
-These examples are meant to demonstrate the type of output you can expect
+These examples are meant to demonstrate the type of output you are able
 to create with **protograf**.  They are *not* meant to be exhaustive or
 comprehensive!
 
@@ -21,6 +21,7 @@ will demonstrate full scalability.
 - `HexHex Games`_
 - `Morabaraba`_
 - `Octagons`_
+- `Snex`_
 - `TicTacToe`_
 - `Meridians`_
 
@@ -233,6 +234,64 @@ Screenshot  .. image:: images/boards/abstract/octagons.png
 =========== ==================================================================
 
 
+Snex
+====
+`↑ <table-of-contents-exabs_>`_
+
+=========== ==================================================================
+Title       *Snex Board and Game*
+----------- ------------------------------------------------------------------
+Script      `snex.py <https://github.com/gamesbook/protograf/blob/master/examples/boards/abstract/snex.py>`_
+----------- ------------------------------------------------------------------
+Discussion  This example shows how to construct a board and then show a series
+            of moves played out on that board.
+
+            This example uses ``RectangularLocations()`` to create a virtual
+            grid representing grid locations on a square board.  The
+            ``Grid()`` command constructs the lines of the board for the grid ;
+            and a ``Layout()`` command then places a set of ``Image`` s,
+            representing all pieces placed on the board up to that turn, using
+            their grid-location as a reference.  The ``Star`` command places
+            a yellow-colored star on the most recently placed piece.
+
+            The example requires the use of a Python list to store the moves,
+            showing for each side on which grid row/column intesection their
+            piece was placed:
+
+              .. code:: python
+
+                turns = [
+                    (blk,7,6), (wht,4,2), (blk,3,4), (wht,7,3), (blk,2,2),
+                    (wht,3,6), (blk,5,5), (wht,6,6), (blk,6,5), (wht,4,4),
+                ]
+
+            The use of a loop allows the program to process the moves and
+            create one page for the board state as it would be after **all**
+            moves *up to that point* have been carried out:
+
+              .. code:: python
+
+                for number, turn in enumerate(turns):
+                   # create board for all turns up to this one
+
+            Finally, the ``Save()`` command specifies output to a GIF image,
+            along with the framerate (interval in seconds between showing each
+            new image) and the image DPI resolution (a higher value creates
+            larger images).
+
+              .. code:: python
+
+                Save(output='gif', dpi=150, framerate=1)
+
+            The GIF will always "loop" |dash| starting the animation again
+            once all frames have been shown.
+
+----------- ------------------------------------------------------------------
+Screenshot  .. image:: images/boards/abstract/snex.gif
+               :width: 50%
+=========== ==================================================================
+
+
 TicTacToe
 =========
 `↑ <table-of-contents-exabs_>`_
@@ -270,14 +329,15 @@ Discussion  This example shows how to construct a board and then show a series
                    # create board for all turns up to this one
 
             Finally, the ``Save()`` command specifies output to a GIF image,
-            along with the framerate (interval between showing each new image).
+            along with the framerate (interval in seconds between showing
+            each new image).
 
               .. code:: python
 
-                Save(output='gif',framerate=0.5)
+                Save(output='gif', framerate=0.5)
 
-            (*Hint:* normally, you will need to do a "refresh" of this page to
-            see the GIF animation in action.)
+            The GIF will always "loop" |dash| starting the animation again
+            once all images have been shown.
 
 ----------- ------------------------------------------------------------------
 Screenshot  .. image:: images/boards/abstract/tictactoe.gif

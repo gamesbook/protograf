@@ -47,6 +47,7 @@ python boards/abstract/hexhex_hexagons.py --no-png -d /tmp/demo
 python boards/abstract/hexhex_rectangles.py --no-png -d /tmp/demo
 python boards/abstract/morabaraba.py --no-png -d /tmp/demo
 python boards/abstract/octagons.py --no-png -d /tmp/demo
+python boards/abstract/snex.py --no-png -d /tmp/demo
 python boards/abstract/tictactoe.py --no-png -d /tmp/demo
 # ---- boards: commercial
 echo -e "\nCreating commercial boards..."

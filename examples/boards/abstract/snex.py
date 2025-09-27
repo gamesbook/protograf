@@ -45,7 +45,6 @@ for number, turn in enumerate(turns):
 # output to PDF and GIF
 Save(
     output='gif',
-    #output='png',
     directory="../docs/source/examples/images/boards/abstract/",
     dpi=150,
     framerate=1)
