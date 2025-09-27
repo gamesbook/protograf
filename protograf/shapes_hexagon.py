@@ -647,12 +647,14 @@ class HexShape(BaseShape):
 
     def calculate_perbii(
         self, cnv, centre: Point, vertices: list, debug: bool = False
-    ) -> list:
+    ) -> dict:
         """Calculate centre points for each Hex edge and angles from centre.
 
         Args:
-            vertices: list of Hex'es nodes as Points
-            centre: the centre Point of the Hex
+            vertices (list):
+                list of Hex'es nodes as Points
+            centre (Point):
+                the centre Point of the Hex
 
         Returns:
             dict of Perbis objects keyed on direction
@@ -692,7 +694,7 @@ class HexShape(BaseShape):
 
     def calculate_radii(
         self, cnv, centre: Point, vertices: list, debug: bool = False
-    ) -> list:
+    ) -> dict:
         """Calculate radii for each Hex vertex and angles from centre.
 
         Args:
@@ -720,68 +722,6 @@ class HexShape(BaseShape):
             # print(f"*** HEX radii {self.ORIENTATION=} {_radii}")
             radii_dict[directions[key]] = _radii
         return radii_dict
-
-    def draw_radii_shapes(
-        self,
-        cnv,
-        radii_shapes: list,
-        vertexes: list,
-        centre: Point,
-        rotated: bool = False,
-    ):
-        """Draw shape(s) along the radii lines of a Hexagon.
-
-        Args:
-            radii_shapes (list):
-                list of tuples of (dir, shape, offset) where:
-                * dir is a direction name
-                * shape is an instance of a Shape
-                * offset is optional float - the fractional distance along the
-                  line from the centre to the edge at which the shape is drawn;
-                  default is 0.5
-            vertexes (list):
-                list of points for the Hexagon vertices
-            centre (Point):
-                the centre of the Hexagon
-            rotated (bool):
-                if True, rotate radii_shapes relative to centre
-        """
-
-        err = "The radii_shapes must contain direction(s) and shape"
-        radii_dict = self.calculate_radii(cnv, centre, vertexes)
-        for item in radii_shapes:
-            if isinstance(item, tuple):
-                _shape_fraction = 0.5
-                if len(item) < 2:
-                    feedback(f"{err} - not {item}")
-                direction = self.get_direction(lines="radii")
-                _dirs = tools.validated_directions(item[0], direction, "direction")
-                _shape = item[1]
-                if len(item) >= 3:
-                    _shape_fraction = tools.as_float(item[2], "fraction")
-            else:
-                feedback(f"{err} - not {item}")
-            self.can_draw_centred_shape(_shape, True)  # could stop here
-            for _dir in _dirs:
-                _radii = radii_dict[_dir]
-                shape_centre = geoms.fraction_along_line(
-                    centre, _radii.point, _shape_fraction
-                )
-                # print(f"*** {self.ORIENTATION=} {_radii=} {shape_centre=}")
-                # ---- rotation
-                if rotated:
-                    # compass, rotation = geoms.angles_from_points(centre, shape_centre)
-                    compass, rotation = _radii.compass, _radii.angle
-                    # print(f"*** {_dir} {compass=} {rotation=}")
-                    _rotation = compass - 180.0
-                else:
-                    _rotation = 0
-                # ---- draw
-                _shape.draw(
-                    _abs_cx=shape_centre.x,
-                    _abs_cy=shape_centre.y,
-                    rotation=_rotation,
-                )
 
     def draw_perbii(
         self, cnv, ID, centre: Point, vertices: list, rotation: float = None
@@ -1464,11 +1404,13 @@ class HexShape(BaseShape):
             if item == "radii_shapes":
                 # ---- * draw radii_shapes
                 if self.radii_shapes:
+                    direction_group = self.get_direction(lines="radii")
                     self.draw_radii_shapes(
                         cnv,
                         self.radii_shapes,
                         self.vertices,
                         Point(self.x_d, self.y_d),
+                        direction_group,
                         self.radii_shapes_rotated,
                     )
             if item == "centre_shape" or item == "center_shape":

@@ -37,6 +37,7 @@ from protograf.utils.structures import (
     DirectionGroup,
     Point,
     PolyGeometry,
+    Radius,
 )  # named tuples
 from protograf.utils.support import CACHE_DIRECTORY
 
@@ -557,40 +558,6 @@ class EquilateralTriangleShape(BaseShape):
     Equilateral Triangle on a given canvas.
     """
 
-    def draw_hatches(
-        self, cnv, ID, side: float, vertices: list, num: int, rotation: float = 0.0
-    ):
-        _dirs = tools.validated_directions(
-            self.hatches, DirectionGroup.HEX_POINTY_EDGE, "triangle hatch"
-        )
-        lines = tools.as_int(num, "hatcheses_count")
-        if lines >= 1:
-            # v_tl, v_tr, v_bl, v_br
-            if "ne" in _dirs or "sw" in _dirs:  # slope UP to the right
-                self.draw_lines_between_sides(
-                    cnv, side, lines, vertices, (0, 1), (2, 1), True
-                )
-            if "se" in _dirs or "nw" in _dirs:  # slope DOWN to the right
-                self.draw_lines_between_sides(
-                    cnv, side, lines, vertices, (0, 2), (0, 1), True
-                )
-            if "e" in _dirs or "w" in _dirs:  # horizontal
-                self.draw_lines_between_sides(
-                    cnv, side, lines, vertices, (0, 2), (1, 2), True
-                )
-        # ---- set canvas
-        centre = self.get_centroid(vertices)
-        self.set_canvas_props(
-            index=ID,
-            stroke=self.hatches_stroke,
-            stroke_width=self.hatches_stroke_width,
-            stroke_ends=self.hatches_ends,
-            dashed=self.hatches_dashed,
-            dotted=self.hatches_dots,
-            rotation=rotation,
-            rotation_point=centre,
-        )
-
     def calculate_area(self) -> float:
         _side = self._u.side if self._u.side else self._u.width
         return math.sqrt(3) / 4.0 * _side**2
@@ -603,6 +570,34 @@ class EquilateralTriangleShape(BaseShape):
             return self.points_to_value(length)
         else:
             return length
+
+    def calculate_radii(
+        self, cnv, centre: Point, vertices: list, debug: bool = False
+    ) -> dict:
+        """Calculate radii for each Triangle vertex and angles from centre.
+
+        Args:
+            vertices: list of Triangle's nodes as Points
+            centre: the centre Point of the Triangle
+
+        Returns:
+            dict of Radius objects keyed on direction
+        """
+        directions = ["sw", "se", "n"]
+        radii_dict = {}
+        # print(f"*** TRI radii {centre=} {vertices=}")
+        for key, vertex in enumerate(vertices):
+            compass, angle = geoms.angles_from_points(centre, vertex)
+            # print(f"*** TRI *** radii {key=} {directions[key]=} {compass=} {angle=}")
+            _radii = Radius(
+                point=vertex,
+                direction=directions[key],
+                compass=compass,
+                angle=360 - angle,  # inverse flip (y is reveresed)
+            )
+            # print(f"*** TRI radii {_radii}")
+            radii_dict[directions[key]] = _radii
+        return radii_dict
 
     def get_vertexes(
         self, x: float, y: float, side: float, hand: str, flip: str
@@ -638,6 +633,69 @@ class EquilateralTriangleShape(BaseShape):
         x_c = (vertices[0].x + vertices[1].x + vertices[2].x) / 3.0
         y_c = (vertices[0].y + vertices[1].y + vertices[2].y) / 3.0
         return Point(x_c, y_c)
+
+    def draw_hatches(
+        self, cnv, ID, side: float, vertices: list, num: int, rotation: float = 0.0
+    ):
+        _dirs = tools.validated_directions(
+            self.hatches, DirectionGroup.HEX_POINTY_EDGE, "triangle hatch"
+        )
+        lines = tools.as_int(num, "hatches_count")
+        if lines >= 1:
+            # v_tl, v_tr, v_bl, v_br
+            if "ne" in _dirs or "sw" in _dirs:  # slope UP to the right
+                self.draw_lines_between_sides(
+                    cnv, side, lines, vertices, (0, 1), (2, 1), True
+                )
+            if "se" in _dirs or "nw" in _dirs:  # slope DOWN to the right
+                self.draw_lines_between_sides(
+                    cnv, side, lines, vertices, (0, 2), (0, 1), True
+                )
+            if "e" in _dirs or "w" in _dirs:  # horizontal
+                self.draw_lines_between_sides(
+                    cnv, side, lines, vertices, (0, 2), (1, 2), True
+                )
+        # ---- set canvas
+        centre = self.get_centroid(vertices)
+        self.set_canvas_props(
+            index=ID,
+            stroke=self.hatches_stroke,
+            stroke_width=self.hatches_stroke_width,
+            stroke_ends=self.hatches_ends,
+            dashed=self.hatches_dashed,
+            dotted=self.hatches_dots,
+            rotation=rotation,
+            rotation_point=centre,
+        )
+
+    def draw_radii(self, cnv, ID, centre: Point, vertices: list):
+        """Draw line(s) connecting the Triangle centre to a vertex.
+
+        Args:
+            ID: unique ID
+            vertices: list of Triangle nodes as Points
+            centre: the centre Triangle of the Rhombus
+
+        Note:
+            * vertices start at SW and are ordered anti-clockwise
+              ["sw", "se", "n"]
+        """
+        _dirs = tools.validated_directions(
+            self.radii, DirectionGroup.TRIANGULAR, "equilateral triangle radii"
+        )
+        if "sw" in _dirs:  # slope DOWN to the left
+            cnv.draw_line(centre, vertices[0])
+        if "se" in _dirs:  # slope DOWN to the right
+            cnv.draw_line(centre, vertices[1])
+        if "n" in _dirs:  # slope UP
+            cnv.draw_line(centre, vertices[2])
+        # color, thickness etc.
+        self.set_canvas_props(
+            index=ID,
+            stroke=self.radii_stroke or self.stroke,
+            stroke_width=self.radii_stroke_width or self.stroke_width,
+            stroke_ends=self.radii_ends,
+        )
 
     def draw(self, cnv=None, off_x=0, off_y=0, ID=None, **kwargs):
         """Draw an equilateral triangle on a given canvas."""
@@ -676,6 +734,19 @@ class EquilateralTriangleShape(BaseShape):
         if self.hatches_count:
             self.draw_hatches(
                 cnv, ID, side, self.vertexes, self.hatches_count, rotation
+            )
+        # ---- draw radii
+        if self.radii:
+            self.draw_radii(cnv, ID, self.centroid, self.vertexes)
+        # ---- draw radii_shapes
+        if self.radii_shapes:
+            self.draw_radii_shapes(
+                cnv,
+                self.radii_shapes,
+                self.vertexes,
+                self.centroid,
+                DirectionGroup.TRIANGULAR,
+                self.radii_shapes_rotated,
             )
         # ---- centred shape (with offset)
         if self.centre_shape:
@@ -1526,6 +1597,34 @@ class RhombusShape(BaseShape):
         vertices.append(Point(x_s + self._u.width / 2.0, y_s - self._u.height / 2.0))
         return vertices
 
+    def calculate_radii(
+        self, cnv, centre: Point, vertices: list, debug: bool = False
+    ) -> dict:
+        """Calculate radii for each Rhombus vertex and angles from centre.
+
+        Args:
+            vertices: list of Rhombus's nodes as Points
+            centre: the centre Point of the Rhombus
+
+        Returns:
+            dict of Radius objects keyed on direction
+        """
+        directions = ["w", "s", "e", "n"]
+        radii_dict = {}
+        # print(f"*** RHMB radii {centre=} {vertices=}")
+        for key, vertex in enumerate(vertices):
+            compass, angle = geoms.angles_from_points(centre, vertex)
+            # print(f"*** RHMB *** radii {key=} {directions[key]=} {compass=} {angle=}")
+            _radii = Radius(
+                point=vertex,
+                direction=directions[key],
+                compass=compass,
+                angle=360 - angle,  # inverse flip (y is reveresed)
+            )
+            # print(f"*** RHMB radii {_radii}")
+            radii_dict[directions[key]] = _radii
+        return radii_dict
+
     def draw_hatches(
         self,
         cnv,
@@ -1589,6 +1688,36 @@ class RhombusShape(BaseShape):
             dotted=self.hatches_dots,
             rotation=rotation,
             rotation_point=muPoint(x_c, y_c),
+        )
+
+    def draw_radii(self, cnv, ID, centre: Point, vertices: list):
+        """Draw line(s) connecting the Rhombus centre to a vertex.
+
+        Args:
+            ID: unique ID
+            vertices: list of Rhombus nodes as Points
+            centre: the centre Point of the Rhombus
+
+        Note:
+            * vertices start on left and are ordered anti-clockwise
+        """
+        _dirs = tools.validated_directions(
+            self.radii, DirectionGroup.CARDINAL, "rhombus radii"
+        )
+        if "w" in _dirs:  # slope to the left
+            cnv.draw_line(centre, vertices[0])
+        if "s" in _dirs:  # slope DOWN
+            cnv.draw_line(centre, vertices[1])
+        if "e" in _dirs:  # slope to the right
+            cnv.draw_line(centre, vertices[2])
+        if "n" in _dirs:  # slope UP
+            cnv.draw_line(centre, vertices[3])
+        # color, thickness etc.
+        self.set_canvas_props(
+            index=ID,
+            stroke=self.radii_stroke or self.stroke,
+            stroke_width=self.radii_stroke_width or self.stroke_width,
+            stroke_ends=self.radii_ends,
         )
 
     def draw_slices(self, cnv, ID, vertexes, centre: tuple, rotation=0):
@@ -1754,6 +1883,21 @@ class RhombusShape(BaseShape):
                 feedback('The "borders" property must be a list of sets or a set')
             for border in self.borders:
                 self.draw_border(cnv, border, ID)  # BaseShape
+
+        # ---- draw radii
+        if self.radii:
+            self.draw_radii(cnv, ID, Point(cx, cy), self.vertexes)
+
+        # ---- draw radii_shapes
+        if self.radii_shapes:
+            self.draw_radii_shapes(
+                cnv,
+                self.radii_shapes,
+                self.vertexes,
+                Point(cx, cy),
+                DirectionGroup.CARDINAL,
+                self.radii_shapes_rotated,
+            )
 
         # ---- centred shape (with offset)
         if self.centre_shape:

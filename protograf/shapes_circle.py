@@ -34,6 +34,7 @@ from protograf.utils.structures import (
     Perbis,
     Point,
     PolyGeometry,
+    Radius,
 )  # named tuples
 from protograf.utils.support import CACHE_DIRECTORY
 from protograf.base import (
@@ -89,6 +90,33 @@ class CircleShape(BaseShape):
             return self.points_to_value(length)
         else:
             return length
+
+    def calculate_radii(
+        self, cnv, centre: Point, vertices: list, debug: bool = False
+    ) -> dict:
+        """Calculate radii for each Circle vertex and angles from centre.
+
+        Args:
+            vertices: list of Circle nodes as Points
+            centre: the centre Point of the Circle
+
+        Returns:
+            dict of Radius objects keyed on angle
+        """
+        radii_dict = {}
+        # print(f"*** CIRC radii {centre=} {vertices=}")
+        for key, vertex in enumerate(vertices):
+            compass, angle = geoms.angles_from_points(centre, vertex)
+            # print(f"*** CIRC *** radii {key=} {directions[key]=} {compass=} {angle=}")
+            _radii = Radius(
+                point=vertex,
+                direction=angle,
+                compass=compass,
+                angle=360 - angle,  # inverse flip (y is reveresed)
+            )
+            # print(f"*** CIRC radii {_radii}")
+            radii_dict[angle] = _radii
+        return radii_dict
 
     def draw_hatches(
         self, cnv, ID, num: int, x_c: float, y_c: float, rotation: float = 0.0
@@ -663,6 +691,7 @@ class CircleShape(BaseShape):
             "slices",
             "hatches",
             "radii",
+            "radii_shapes",
             "centre_shape",
             "centre_shapes",
             "cross",
@@ -720,6 +749,17 @@ class CircleShape(BaseShape):
                 # ---- * draw radii
                 if self.radii:
                     self.draw_radii(cnv, ID, self.x_c, self.y_c)
+            if item == "radii_shapes":
+                # ---- * draw radii_shapes
+                if self.radii_shapes:
+                    self.draw_radii_shapes(
+                        cnv,
+                        self.radii_shapes,
+                        self.vertexes,
+                        Point(self.x_c, self.y_c),
+                        DirectionGroup.CIRCULAR,
+                        self.radii_shapes_rotated,
+                    )
             if item == "centre_shape" or item == "center_shape":
                 # ---- * centre shape (with offset)
                 if self.centre_shape:

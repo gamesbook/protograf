@@ -40,6 +40,7 @@ class DirectionGroup(Enum):
     HEX_POINTY_EDGE = 5
     CIRCULAR = 6
     ORDINAL = 7
+    TRIANGULAR = 8
 
 
 class ExportFormat(Enum):

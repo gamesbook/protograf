@@ -5,17 +5,17 @@ protograf Changes
 -------------------
 - Add `sun` to Circle's petal style
 - Recreate Star shape with revised properties
-- Add slices property to Star shape (Compass Rose example)
+- Add `slices` property to Star shape (Compass Rose example)
 - Patch Chord shape
 - Add `arrow` property to Chord shape
 - Add `vertex_shapes` property to key shapes
-- Add `perbii_shapes` property to key shapes
 - Add `radii_shapes` property to key shapes
 - Removed Compass shape
 - Add shortcut to include image references in HTML text
 - Patch pointy Hexagon (centre error)
 - Patch issue with speed of GIF creation; add looping
 - Patch centering for Images on a Layout
+- Add `radii` for Rhomus and EquilateralTriangle
 
 2025-09-16 (0.3.0)
 -------------------

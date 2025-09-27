@@ -6,6 +6,7 @@ Base shape class for protograf
 from collections import namedtuple
 import copy
 from enum import Enum
+import functools
 import inspect
 import json
 import io
@@ -53,6 +54,7 @@ from protograf.globals import unit
 from protograf.utils.messaging import feedback
 from protograf.utils.structures import (
     Bounds,
+    DirectionGroup,
     GridShape,
     OffsetProperties,
     Point,
@@ -2208,6 +2210,116 @@ class BaseShape:
 
         return keys
 
+    def handle_custom_values(self, the_element, ID):
+        """Process custom values for a Shape's properties.
+
+        Custom values should be stored in self.deck_data as a list of dicts:
+        e.g. [{'SUIT': 'hearts', 'VALUE': 10}, {'SUIT': 'clubs', 'VALUE': 10}]
+        which are used for a set of Cards, or similar placeholder items.
+
+        Values can be accessed via a Jinja template using e.g. T("{{ SUIT }}")
+        """
+
+        def processed_value(value):
+
+            if isinstance(value, (BaseShape, muShape, muPage)):
+                return None
+
+            elif isinstance(value, Template):
+                if not self.deck_data:
+                    feedback(
+                        "Cannot use T() or S() command without Data already defined!",
+                        False,
+                    )
+                    feedback(
+                        "Check that Data command is used and has valid data before Deck command is called.",
+                        True,
+                    )
+                record = self.deck_data[ID]
+                try:
+                    custom_value = value.render(record)
+                    # print('### Template', f'{ID=} {key=} {custom_value=}')
+                    return custom_value
+                except jinja2.exceptions.UndefinedError as err:
+                    feedback(f"Unable to process data with this template ({err})", True)
+                except Exception as err:
+                    feedback(f"Unable to process data with this template ({err})", True)
+
+            elif isinstance(value, TemplatingType):
+                if not self.deck_data:
+                    feedback(
+                        "Cannot use T() or S() command without Data already defined!",
+                        False,
+                    )
+                    feedback(
+                        "Check that Data command is used and has valid data before Deck command is called.",
+                        True,
+                    )
+                record = self.deck_data[ID]
+                try:
+                    custom_value = value.template.render(record)
+                    # print('### TT', f'{ID=} {key=} {custom_value=} {value.function=}')
+                    if value.function:
+                        try:
+                            custom_value = value.function(custom_value)
+                        except Exception as err:
+                            feedback(
+                                f"Unable to process data with function '{ value.function}' ({err})",
+                                True,
+                            )
+
+                    return custom_value
+                except jinja2.exceptions.UndefinedError as err:
+                    feedback(f"Unable to process data with this template ({err})", True)
+                except Exception as err:
+                    feedback(f"Unable to process data with this template ({err})", True)
+
+            elif isinstance(value, LookupType):
+                record = self.deck_data[ID]
+                lookup_value = record[value.column]
+                custom_value = value.lookups.get(lookup_value, None)
+                return custom_value
+                # print('### LookupType', f'{ID=} {key=} {custom_value=}', '=>', getattr(new_element, key))
+            elif isinstance(value, PosixPath):
+                # print(f'### HCV {ID=} {key=} {value=}')
+                return None
+            else:
+                raise NotImplementedError(f"Cannot handle value of type: {type(value)}")
+
+            return None
+
+        new_element = None
+        # print('### handle_custom_values ShapeType ::', type(the_element))
+        if isinstance(the_element, BaseShape):
+            new_element = copy.copy(the_element)
+            keys = vars(the_element).keys()
+            for key in keys:
+                value = getattr(the_element, key)
+                # Note - Hexagon orientation is an example of an Enum
+                if value is None or isinstance(
+                    value, (str, int, float, list, tuple, range, Enum)
+                ):
+                    continue
+                elif isinstance(value, dict):
+                    updated = False
+                    for dkey, val in value.items():
+                        if val is None or isinstance(
+                            val, (str, int, float, list, tuple, range)
+                        ):
+                            continue
+                        custom_value = processed_value(val)
+                        if custom_value is not None:
+                            value[dkey] = custom_value
+                            updated = True
+                    if updated:
+                        setattr(new_element, key, value)
+                else:
+                    custom_value = processed_value(value)
+                    if custom_value is not None:
+                        setattr(new_element, key, custom_value)
+            return new_element
+        return the_element  # no changes needed or made
+
     def draw_multi_string(
         self, canvas, xm, ym, string, align=None, rotation=0, **kwargs
     ):
@@ -2669,116 +2781,6 @@ class BaseShape:
                 canvas.draw_circle((point.x, point.y), 1)
             self.set_canvas_props(cnv=canvas, index=None, **kwargs)
 
-    def handle_custom_values(self, the_element, ID):
-        """Process custom values for a Shape's properties.
-
-        Custom values should be stored in self.deck_data as a list of dicts:
-        e.g. [{'SUIT': 'hearts', 'VALUE': 10}, {'SUIT': 'clubs', 'VALUE': 10}]
-        which are used for a set of Cards, or similar placeholder items.
-
-        Values can be accessed via a Jinja template using e.g. T("{{ SUIT }}")
-        """
-
-        def processed_value(value):
-
-            if isinstance(value, (BaseShape, muShape, muPage)):
-                return None
-
-            elif isinstance(value, Template):
-                if not self.deck_data:
-                    feedback(
-                        "Cannot use T() or S() command without Data already defined!",
-                        False,
-                    )
-                    feedback(
-                        "Check that Data command is used and has valid data before Deck command is called.",
-                        True,
-                    )
-                record = self.deck_data[ID]
-                try:
-                    custom_value = value.render(record)
-                    # print('### Template', f'{ID=} {key=} {custom_value=}')
-                    return custom_value
-                except jinja2.exceptions.UndefinedError as err:
-                    feedback(f"Unable to process data with this template ({err})", True)
-                except Exception as err:
-                    feedback(f"Unable to process data with this template ({err})", True)
-
-            elif isinstance(value, TemplatingType):
-                if not self.deck_data:
-                    feedback(
-                        "Cannot use T() or S() command without Data already defined!",
-                        False,
-                    )
-                    feedback(
-                        "Check that Data command is used and has valid data before Deck command is called.",
-                        True,
-                    )
-                record = self.deck_data[ID]
-                try:
-                    custom_value = value.template.render(record)
-                    # print('### TT', f'{ID=} {key=} {custom_value=} {value.function=}')
-                    if value.function:
-                        try:
-                            custom_value = value.function(custom_value)
-                        except Exception as err:
-                            feedback(
-                                f"Unable to process data with function '{ value.function}' ({err})",
-                                True,
-                            )
-
-                    return custom_value
-                except jinja2.exceptions.UndefinedError as err:
-                    feedback(f"Unable to process data with this template ({err})", True)
-                except Exception as err:
-                    feedback(f"Unable to process data with this template ({err})", True)
-
-            elif isinstance(value, LookupType):
-                record = self.deck_data[ID]
-                lookup_value = record[value.column]
-                custom_value = value.lookups.get(lookup_value, None)
-                return custom_value
-                # print('### LookupType', f'{ID=} {key=} {custom_value=}', '=>', getattr(new_element, key))
-            elif isinstance(value, PosixPath):
-                # print(f'### HCV {ID=} {key=} {value=}')
-                return None
-            else:
-                raise NotImplementedError(f"Cannot handle value of type: {type(value)}")
-
-            return None
-
-        new_element = None
-        # print('### handle_custom_values ShapeType ::', type(the_element))
-        if isinstance(the_element, BaseShape):
-            new_element = copy.copy(the_element)
-            keys = vars(the_element).keys()
-            for key in keys:
-                value = getattr(the_element, key)
-                # Note - Hexagon orientation is an example of an Enum
-                if value is None or isinstance(
-                    value, (str, int, float, list, tuple, range, Enum)
-                ):
-                    continue
-                elif isinstance(value, dict):
-                    updated = False
-                    for dkey, val in value.items():
-                        if val is None or isinstance(
-                            val, (str, int, float, list, tuple, range)
-                        ):
-                            continue
-                        custom_value = processed_value(val)
-                        if custom_value is not None:
-                            value[dkey] = custom_value
-                            updated = True
-                    if updated:
-                        setattr(new_element, key, value)
-                else:
-                    custom_value = processed_value(value)
-                    if custom_value is not None:
-                        setattr(new_element, key, custom_value)
-            return new_element
-        return the_element  # no changes needed or made
-
     def draw_border(self, cnv, border: tuple, ID: int = None):
         """Draw a border line based its settings."""
         # feedback(f'### border {self.__class__.__name__} {border=} {ID=}')
@@ -2819,7 +2821,7 @@ class BaseShape:
         # ---- multi-directions
         shape_name = self.__class__.__name__.replace("Shape", "")
         _bdirections = tools.validated_directions(
-            bdirections, tools.DirectionGroup.COMPASS, f"{shape_name.lower()} border"
+            bdirections, DirectionGroup.COMPASS, f"{shape_name.lower()} border"
         )
         for bdirection in _bdirections:
             if not bdirection:
@@ -2995,6 +2997,102 @@ class BaseShape:
                     _abs_cx=cx,  # + self.unit(vshape.mx),  # NO default move
                     _abs_cy=cy,  # + self.unit(vshape.my),  # NO default move
                     rotation=compass - 180.0,
+                )
+
+    def draw_radii_shapes(
+        self,
+        cnv,
+        radii_shapes: list,
+        vertexes: list,
+        centre: Point,
+        direction_group: DirectionGroup = None,
+        rotated: bool = False,
+    ):
+        """Draw shape(s) along the radii lines of a Shape.
+
+        Args:
+            radii_shapes (list):
+                list of tuples of (dir, shape, offset) where:
+                * dir is a direction name
+                * shape is an instance of a Shape
+                * offset is optional float - the fractional distance along the
+                  line from the centre to the edge at which the shape is drawn;
+                  default is 1 i.e. at the edge
+            vertexes (list):
+                list of points for the vertices
+            centre (Point):
+                the centre of the Shape
+            direction_group (DirectionGroup):
+                used to define list of permissible directions for the Shape
+            rotated (bool):
+                if True, rotate radii_shapes relative to centre
+        """
+
+        @functools.cache
+        def get_circle_vertexes(directions, centre) -> list:
+            """Get a list of vertexes where radii intersect the circumference"""
+            angles = tools.sequence_split(
+                directions,
+                unique=False,
+                as_int=False,
+                as_float=True,
+                sep=" ",
+                msg="ABC",
+            )
+            vertexes = []
+            radius = self._u.radius
+            for angle in angles:
+                vtx = geoms.point_on_circle(centre, radius, angle)
+                vertexes.append(vtx)
+            return vertexes
+
+        err = "The radii_shapes must contain direction(s) and shape"
+        if direction_group != DirectionGroup.CIRCULAR:  # see below for calc.
+            radii_dict = self.calculate_radii(cnv, centre, vertexes)
+        for item in radii_shapes:
+            if isinstance(item, tuple):
+                _shape_fraction = 1.0
+                if len(item) < 2:
+                    feedback(f"{err} - not {item}")
+                if direction_group == DirectionGroup.CIRCULAR:
+                    vertexes = get_circle_vertexes(item[0], centre)
+                    radii_dict = self.calculate_radii(cnv, centre, vertexes)
+                    _dirs = radii_dict.keys()
+                else:
+                    _dirs = tools.validated_directions(
+                        item[0], direction_group, "direction"
+                    )
+                _shape = item[1]
+                if len(item) >= 3:
+                    _shape_fraction = tools.as_float(item[2], "fraction")
+            else:
+                feedback(f"{err} - not {item}")
+            self.can_draw_centred_shape(_shape, True)  # could stop here
+            for _dir in _dirs:
+                # ---- calculate shape centre
+                _radii = radii_dict[_dir]
+                if _shape_fraction <= 1:
+                    shape_centre = geoms.fraction_along_line(
+                        centre, _radii.point, _shape_fraction
+                    )  # inside Shape boundaries
+                else:
+                    shape_centre = geoms.point_in_direction(
+                        centre, _radii.point, _shape_fraction - 1
+                    )  # outside Shape boundaries
+                # print(f"*** {direction_group} {_radii=} {shape_centre=}")
+                # ---- calculate shape rotation
+                if rotated:
+                    # compass, rotation = geoms.angles_from_points(centre, shape_centre)
+                    compass, _rotation = _radii.compass, _radii.angle
+                    # print(f"*** {self.__class__.__name__} {_dir} {compass=} {_rotation=}")
+                    _rotation = compass - 180.0
+                else:
+                    _rotation = 0
+                # ---- draw radii shape
+                _shape.draw(
+                    _abs_cx=shape_centre.x,
+                    _abs_cy=shape_centre.y,
+                    rotation=_rotation,
                 )
 
 

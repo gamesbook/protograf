@@ -246,17 +246,23 @@ Script      `snex.py <https://github.com/gamesbook/protograf/blob/master/example
 Discussion  This example shows how to construct a board and then show a series
             of moves played out on that board.
 
-            This example uses ``RectangularLocations()`` to create a virtual
-            grid representing grid locations on a square board.  The
-            ``Grid()`` command constructs the lines of the board for the grid ;
-            and a ``Layout()`` command then places a set of ``Image`` s,
-            representing all pieces placed on the board up to that turn, using
-            their grid-location as a reference.  The ``Star`` command places
-            a yellow-colored star on the most recently placed piece.
+            This example uses a number of different commands:
+
+            - ``RectangularLocations()`` creates a virtual grid representing
+              possible locations on a square board;
+            - The ``Grid()`` command constructs the lines of the board;
+            - The ``Layout()`` command places a set of ``Image`` s,
+              representing all pieces placed on the board up to that turn,
+              using their grid-locations as a reference;
+            - The ``Star()`` command places a yellow-colored star at the
+              grid-location corresponding to that of the most recently placed
+              piece.
 
             The example requires the use of a Python list to store the moves,
-            showing for each side on which grid row/column intesection their
-            piece was placed:
+            showing for each side on which grid row/column intersection their
+            piece was placed.  Here ``blk`` corresponds to the black-colored
+            pieces of the Black player, and ``wht`` corresponds to the
+            white-colored pieces of the White player.
 
               .. code:: python
 
@@ -265,8 +271,8 @@ Discussion  This example shows how to construct a board and then show a series
                     (wht,3,6), (blk,5,5), (wht,6,6), (blk,6,5), (wht,4,4),
                 ]
 
-            The use of a loop allows the program to process the moves and
-            create one page for the board state as it would be after **all**
+            The use of a `for` loop allows the program to process the moves
+            and create a page for the board state as it would be after **all**
             moves *up to that point* have been carried out:
 
               .. code:: python
