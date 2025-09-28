@@ -16,7 +16,7 @@ and that you've created some basic scripts of your own using the
 - `Introduction`_
 - `The Development Process`_
 - `Key Concepts and Commands`_
-- `Images, Icons and Fonts`_
+- `Images, Symbols and Fonts`_
 - `Supporting Commands`_
 - `A Simple Deck, Card & Data Example`_
 - `Countersheet and Counter Commands`_
@@ -162,23 +162,24 @@ For full details, see the section on the
 :ref:`Matrix Command <the-matrix-command>`.
 
 
-Images, Icons and Fonts
-=======================
+Images, Symbols and Fonts
+=========================
 `↑ <table-of-contents-wwc_>`_
 
-Many cards require the addition of graphics of some type |dash| artwork,
-icons, symbols etc. **protograf** supports those through the use of various
-commands, as well as the properties and special capabilities of those commands.
+Many cards require the addition of graphics of some type |dash| artwork
+as well as symbols. **protograf** supports the display of those through the
+use of various commands, as well as the properties and special capabilities
+of those commands.
 
 For full details, see the section on
-:doc:`Cards: Images, Icons and Fonts <card_images>`
+:doc:`Cards: Images, Symbols and Fonts <card_images>`
 
 
 Supporting Commands
 ===================
 `↑ <table-of-contents-wwc_>`_
 
-The following commands are helpful in terms of increased flexibilty and
+The following commands are helpful in terms of increased flexibility and
 reduced repetition when designing a deck of cards.
 
 -  The ``group()`` function provides a "shortcut" way to reference a set of

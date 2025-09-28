@@ -141,7 +141,9 @@ Text(common=props, x=3, y=3, width=1, height=3, html=True,
          font-family: Helvetica;
          font-size: 7pt;
          color: black;""",
-     text="<i>HTML text</i> - 1-by-3 - rotate 90", rotation=90)
+     text="<i>HTML text</i> - 1-by-3 - rotate 90",
+     rotation=90
+ )
 PageBreak()
 
 
@@ -175,7 +177,8 @@ Text(x=0, y=4, width=4, height=1.25,
          font-size: 15.0px;
          color:gray;
          font-weight: bold;""",
-     text="AbcEJZ?0&")
+     text="AbcEJZ?0&"
+ )
 
 Text(x=0, y=5.5, width=4, height=2.5,
      html=True, box_fill="silver",
@@ -194,9 +197,42 @@ Text(x=0, y=5.5, width=4, height=2.5,
          text-align:center;">
      AbcEJZ?0&
      </div>"""
-     )
+ )
 
 PageBreak()
+
+# ---- text symbols
+Blueprint(stroke_width=0.5)
+Text(common=txt, text="Text -images and symbols")
+IconFont("Arial")
+Text(x=0.5, y=1, width=3, height=2,
+     html=True,
+     # box_fill="white",
+     box_fill="silver",
+     text="""
+     <div style="
+         font-family: Quintessential;
+         font-size:14.0px;
+         color:blue;
+         text-align:center;">
+     Return 2 |:openmoji--fish 14:| and get 3 |!\u2666!|
+     </div>"""
+ )
+IconFont("game-icons-net-20200315a")
+Text(x=0.5, y=3.5, width=3, height=2,
+     html=True,
+     box_fill="silver",
+     text="""
+     <div style="
+         font-family: Quintessential;
+         font-size:14.0px;
+         color:blue;
+         text-align:center;">
+     Recyle 2 |;openmoji--fish 16;| and get 4 |!\uEB73 16 green!|
+     </div>"""
+ )
+PageBreak()
+
 
 # ---- END
 Text(common=txt, text="Text END...")
@@ -210,4 +246,5 @@ Save(
         "text_style", "text_custom",
         "text_outlined", "text_rotate",
         "text_fonts",
+        "text_images",
         None])

@@ -1681,6 +1681,57 @@ def html_img(text: str) -> str:
     return txt
 
 
+def html_glyph(text: str, font_name: str) -> str:
+    """Replace a Unicode glyph placeholder with font details in a <span> tag.
+
+    Note:
+        * placeholder pattern is |!unicode!| or |!unicode 00!|
+          |!unicode 00 #COLOR !|
+          where 00 will be a number representing the font size and #COLOR
+          is a hexadecimal color for the font color
+        * the glyph's unicode MUST appear in the Font matching `font_name`
+
+    Doc Test:
+
+    >>> html_glyph('E001', "Helvetica")
+    'E001'
+    >>> html_glyph('|!E001', "Helvetica")
+    '|!E001'
+    >>> html_glyph('E001!|', "Helvetica")
+    'E001!|'
+    >>> html_glyph('an |! E001 12 !| or', "Helvetica")
+    'an <span style="font-family: Helvetica"; font-size: 12px;>E001</span> or'
+    >>> html_glyph('an |! E001 12 #000 !| or', "Helvetica")
+    'an <span style="font-family: Helvetica"; font-size: 12px; color: #000;>E001</span> or'
+
+    """
+    glyphs = re.findall("\|\!(.*?)\!\|", text)
+    txt = text
+    for glp in glyphs:
+        _glp = glp.strip(" ")
+        items = _glp.split(" ")
+        glyph_name = items[0]
+        # <span style="font-family: sans-serif; font-size: 14px; color: blue;">Hello World!</span>
+        if len(items) > 2:
+            txt = txt.replace(
+                glp,
+                f'<span style="font-family: {font_name}; font-size: {items[1]}px; color: {items[2]};">{glyph_name}</span>',
+            )
+        if len(items) > 1:
+            txt = txt.replace(
+                glp,
+                f'<span style="font-family: {font_name}; font-size: {items[1]}px;">{glyph_name}</span>',
+            )
+        else:
+            txt = txt.replace(
+                glp, f'<span style="font-family: {font_name}">{glyph_name}</span'
+            )
+    if glyphs:
+        txt = txt.replace("|!", "").replace("!|", "")
+    # print(f"glyph text: {txt=}")
+    return txt
+
+
 if __name__ == "__main__":
     import doctest
 

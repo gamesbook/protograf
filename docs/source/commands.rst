@@ -52,6 +52,8 @@ cross-reference to the detailed information for that command.
 -  :ref:`Extract <the-extract-command>` - allows portions of pages to be extracted as PNG images
 -  :ref:`Font <the-font-command>` - set the font properties for any
    :ref:`Text <text-command>` drawn on a page
+-  :ref:`IconFont <the-iconfont-command>` - set the font properties for any
+   referenced Unicode symbols embedded in subsequent :ref:`Text <text-command>`
 -  :ref:`Grid <grid-command>` - a set, or group, of lines that can be drawn on a page
 -  :ref:`group <group-function>` - a way to  reference a stack of shapes that
    all need to be drawn together on a :ref:`card <the-card-command>`
