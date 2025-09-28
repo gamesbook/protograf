@@ -17,6 +17,7 @@ protograf Changes
 - Patch centering for Images on a Layout
 - Add `radii` for Rhombus and EquilateralTriangle
 - Add `diamond` as a pip shape for D6
+- Update docs for `Working with Cards`
 
 2025-09-16 (0.3.0)
 -------------------

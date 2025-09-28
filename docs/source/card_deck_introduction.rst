@@ -14,12 +14,13 @@ and that you've created some basic scripts of your own using the
 .. _table-of-contents-wwc:
 
 - `Introduction`_
+- `The Development Process`_
 - `Key Concepts and Commands`_
 - `Images, Icons and Fonts`_
 - `Supporting Commands`_
 - `A Simple Deck, Card & Data Example`_
 - `Countersheet and Counter Commands`_
-- `Other Card Deck Resources`_
+- `Other Card Deck Programs`_
 
 
 .. NOTE::
@@ -53,13 +54,37 @@ all aspects of the modern board gaming experience, with cards or tiles
 taking the predominant role in many of them.
 
 
+The Development Process
+=======================
+`↑ <table-of-contents-wwc_>`_
+
+The aim of prototyping is to encapsulate a simple but effective representation
+of your ideas into a design.
+
+The heart of the design process for prototyping cards is a three step process:
+
+- define **what** "things" you want to appear on the cards
+- define **where** you want those "things" to appear
+- define **how** you want those "things" to look
+
+You probably will iterate |dash| repeat |dash| those steps a number of times,
+adding and adjusting until you are happy with the result.
+
+In brief; the "things" for your cards are typically text, along with the names
+of  icons and images, stored in a CSV file or spreadsheet; while in your script
+the ``Card()`` command is used, multiple times, to provide the "glue" needed to
+position the elements containing these "things".
+
+A complete script with all commands, is what some software terms a "template".
+
+
 Key Concepts and Commands
 =========================
 `↑ <table-of-contents-wwc_>`_
 
 Unlike the case where you specify where to locate elements on a single page,
-you can also use **protograf** to handle the flow of placing cards onto
-multiple pages, based on the cards' size and the size of the paper chosen.
+here **protograf** will handle the flow of placing cards onto multiple pages,
+based on the cards' size and the size of the paper chosen.
 
 In your script, for one or more cards, you will set out the elements exactly
 as you want them to appear |dash| in effect, the card becomes a "mini page".
@@ -70,8 +95,8 @@ supporting commands including the ``Data()`` and ``Matrix()`` commands.
 Deck Command
 ------------
 
-A ``Deck()`` command is used to set up the framework for creating one or more
-cards.
+A ``Deck()`` command is used, **once** per script, to set up the framework
+needed for creating one or more cards.
 
 Using its properties, you can specify aspects such type, size and the expected
 number of cards, as well as any spacing and color swathes between them, that
@@ -88,13 +113,14 @@ For full details on how to configure a ``Deck``, see the section on the
 Card Command
 ------------
 
-A ``Card()`` command is used to specify the design for a card, or a range
-of cards.
+A ``Card()`` command is used, usually **many times** per script, to specify
+part of the design for a card, or a range of cards, in a deck.
 
-A card design typically uses shapes and text elements |dash| some of which
-may have already been defined.
+A card design typically makes use of various shapes and text elements |dash|
+some of which may have already been defined elsewhere in the script |dash| to
+both position and style the card's data.
 
-Patterns or designs can be used (or re-used) for single or multiple cards.
+Elements can be used (or re-used) for single or multiple cards.
 
 .. NOTE::
 
@@ -109,17 +135,16 @@ Data Command
 ------------
 
 In many cases, the ``Data()`` command will be needed in order to provide
-settings for the properties of the elements appearing on a card.  The source
-of this data can be from places such as: an Excel or CSV file; or a Google
-sheet.  Data can also be stored directly in the script.
+settings for the properties of the elements appearing on a card. This can
+be text, but can also be the names of icons, or images filenames, or the
+names of colors to be used to draw shapes, in the ``Card()`` designs.
+
+The source of the data can be from places such as: an Excel or CSV file;
+or a Google sheet.  Data can also be stored directly in the script.
 
 All such data is **column-based** data; the names of the columns will be cross-
 referenced by the cards; and each data record (the "row of a spreadsheet")
 effectively correponds to one card of your prototype deck.
-
-The data will typically include text that needs to appear on cards, but could
-also include names of colors used to draw shapes, or links to images that will
-need to be shown on the card.
 
 Data can also be sub-setted by using some simple filter options.
 
@@ -130,7 +155,7 @@ Matrix Command
 --------------
 
 In some cases, the ``Matrix()`` command will be needed. This is an alternate
-method of providing the settings for the properties of the elements appearing
+method of creating repetitive data for the properties of the elements appearing
 on a card.
 
 For full details, see the section on the
@@ -141,7 +166,12 @@ Images, Icons and Fonts
 =======================
 `↑ <table-of-contents-wwc_>`_
 
-<TBD>
+Many cards require the addition of graphics of some type |dash| artwork,
+icons, symbols etc. **protograf** supports those through the use of various
+commands, as well as the properties and special capabilities of those commands.
+
+For full details, see the section on
+:doc:`Cards: Images, Icons and Fonts <card_images>`
 
 
 Supporting Commands
@@ -171,10 +201,18 @@ A Simple Deck, Card & Data Example
 ==================================
 
 This script shows a simple script that displays a few cards using some
-of the commands discussed briefly above.
+of the commands discussed briefly above. A "real" script will obviously
+be longer and more complex, but the basic flow is likely to be similar
+and will need to contain the key commands in the order shown:
 
-Note that the data for these cards is embedded in the script; it looks
-similar to a CSV file, but each row of data is "wrapped" in square
+- ``Create()`` - setup the script
+- ``Data()`` - link to the source of data used
+- ``Deck()`` - define the common card structure
+- ``Card()`` - multiple uses define exactly the "what and where"
+- ``Save()`` - generate the PDF (and optional PNG card images)
+
+Note that the data for these cards is embedded in the script; this dataset
+looks similar to a CSV file, but each row of data is "wrapped" in square
 brackets with a comma at the end: ``[...],``
 
 .. code:: python
@@ -225,8 +263,8 @@ in a default of 70 counters. You can see this with a short script:
 
 .. _other-card-resources:
 
-Other Card Deck Resources
-=========================
+Other Card Deck Programs
+========================
 `↑ <table-of-contents-wwc_>`_
 
 **protograf** is by no means the only tool for creating decks of cards.

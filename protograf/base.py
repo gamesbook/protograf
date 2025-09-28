@@ -236,6 +236,11 @@ class BaseCanvas:
         self.wrap = self.defaults.get("wrap", False)
         self.align = self.defaults.get("align", "centre")  # centre,left,right,justify
         self._alignment = TEXT_ALIGN_LEFT  # see to_alignment()
+        # ---- icon font
+        self.icon_font_name = self.defaults.get("font_name", DEFAULT_FONT)
+        self.icon_font_file = self.defaults.get("font_file", None)
+        self.icon_font_size = self.defaults.get("font_size", 12)
+        self.icon_font_style = self.defaults.get("font_style", None)
         # ---- grid cut marks
         self.grid_marks = self.defaults.get("grid_marks_marks", False)
         grid_marks_stroke = self.defaults.get("grid_marks_stroke", "gray")
@@ -800,6 +805,13 @@ class BaseShape:
         self.wrap = kwargs.get("wrap", base.wrap)
         self.align = kwargs.get("align", base.align)  # centre,left,right,justify
         self._alignment = TEXT_ALIGN_LEFT  # see to_alignment()
+        # ---- icon font
+        self.icon_font_name = kwargs.get("icon_font_name", base.icon_font_name)
+        self.icon_font_file = kwargs.get("icon_font_file", base.icon_font_file)
+        self.icon_font_size = self.kw_float(
+            kwargs.get("icon_font_size", base.icon_font_size)
+        )
+        self.icon_font_style = kwargs.get("icon_font_style", base.icon_font_style)
         # ---- order (hex, circle, rect)
         self.order_all = kwargs.get("order_all", base.order_all)
         self.order_first = kwargs.get("order_first", base.order_first)

@@ -2095,6 +2095,29 @@ def Font(name=None, **kwargs):
     globals.base.stroke = kwargs.get("stroke", "black")
 
 
+def IconFont(name=None, **kwargs):
+    """Set the Font for all subsequent icons in the output PDF.
+
+    Args:
+
+    - name (str): the name of the Font
+
+    Kwargs:
+
+    - size (float): the point size of the Font; default is 12
+    - stroke (str): the named or hexadecimal color of the Font; default is "black"
+    - style (str): the style, if available, for the Font e.g. "bold", "italic"
+
+    """
+    validate_globals()
+    _name, _path, _file = tools.get_font_file(name)
+    globals.base.icon_font_name = _name or DEFAULT_FONT
+    globals.base.icon_font_file = _file
+    globals.base.icon_font_size = kwargs.get("size", 12)
+    globals.base.icon_font_style = kwargs.get("style", None)
+    globals.base.icon_stroke = kwargs.get("stroke", "black")
+
+
 # ---- various ====
 
 

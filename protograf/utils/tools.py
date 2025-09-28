@@ -1620,6 +1620,10 @@ def html_img(text: str) -> str:
     Note:
         * placeholder pattern is |:filename.png:| or |:filename.png 00:|
           where 00 will be a number representing the height
+        * alternative placeholder pattern for SVG is |;filename.svg;| or
+          |;filename 00 name;|
+          where 00 will be a number representing the height and the name is
+          a hexadecimal color to apply to replace ALL other colors in the SVG
         * the filename for an image must NOT contain spaces!
         * a `.png` will be added to the filename, if there is no extension
 
@@ -1640,6 +1644,7 @@ def html_img(text: str) -> str:
     >>> html_img('an |: A 20 :| or')
     'an <img src="A.png" height=20> or'
     """
+    # ---- PNG
     images = re.findall("\|\:(.*?)\:\|", text)
     txt = text
     for img in images:
@@ -1655,6 +1660,24 @@ def html_img(text: str) -> str:
             txt = txt.replace(img, f'<img src="{image_name}">')
     if images:
         txt = txt.replace("|:", "").replace(":|", "")
+    # ---- SVG
+    svg_images = re.findall("\|\;(.*?)\;\|", txt)
+    for img in svg_images:
+        _img = img.strip(" ")
+        items = _img.split(" ")
+        image_name = items[0]
+        base, ext = os.path.splitext(image_name)
+        if not ext:
+            image_name = image_name + ".svg"
+        if len(items) > 1 and len(items) < 3:
+            txt = txt.replace(img, f'<img src="{image_name}" height={items[1]}>')
+        elif len(items) >= 3:
+            transform = True
+            txt = txt.replace(img, f'<img src="{image_name}" height={items[1]}>')
+        else:
+            txt = txt.replace(img, f'<img src="{image_name}">')
+    if svg_images:
+        txt = txt.replace("|;", "").replace(";|", "")
     return txt
 
 
