@@ -2820,9 +2820,10 @@ class TextShape(BaseShape):
                 # glyph placeholders => <span> tags with font style
                 try:
                     icon_font = globals.base.icon_font_name
+                    icon_size = globals.base.icon_font_size
                 except:
                     icon_font = "Helvetica"
-                _text = tools.html_glyph(_text, icon_font)
+                _text = tools.html_glyph(_text, icon_font, icon_size)
                 current_page.insert_htmlbox(rect, _text, **keys)
             except ValueError as err:
                 feedback(f"Cannot create Text - {err}", True)

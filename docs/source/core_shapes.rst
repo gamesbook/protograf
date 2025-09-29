@@ -2604,7 +2604,7 @@ Image
 Pedantically speaking, an image is not like the other shapes in the sense that
 it does not consist of lines and areas drawn by **protograf** itself.
 
-An "image" refers to an external file which is simply inserted into the drawing.
+An "image" refers to an external file which is simply inserted into the page.
 
 The Image shape shares a number of common aspects with other shapes - such as
 an x & y position, a width and a height, the ability to be rotated, and the
@@ -3612,8 +3612,6 @@ Example 1. Radii Shapes
             )
 
 ===== ======
-
-
 
 
 .. _coreShapeText:

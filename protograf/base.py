@@ -239,7 +239,7 @@ class BaseCanvas:
         # ---- icon font
         self.icon_font_name = self.defaults.get("font_name", DEFAULT_FONT)
         self.icon_font_file = self.defaults.get("font_file", None)
-        self.icon_font_size = self.defaults.get("font_size", 12)
+        self.icon_font_size = self.defaults.get("font_size", None)
         self.icon_font_style = self.defaults.get("font_style", None)
         # ---- grid cut marks
         self.grid_marks = self.defaults.get("grid_marks_marks", False)

@@ -1681,7 +1681,7 @@ def html_img(text: str) -> str:
     return txt
 
 
-def html_glyph(text: str, font_name: str) -> str:
+def html_glyph(text: str, font_name: str, font_size: str = "") -> str:
     """Replace a Unicode glyph placeholder with font details in a <span> tag.
 
     Note:
@@ -1690,6 +1690,8 @@ def html_glyph(text: str, font_name: str) -> str:
           where 00 will be a number representing the font size and #COLOR
           is a hexadecimal color for the font color
         * the glyph's unicode MUST appear in the Font matching `font_name`
+        * the font_size, if any, will be overridden by any value used in the
+          placeholder
 
     Doc Test:
 

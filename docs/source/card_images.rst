@@ -24,7 +24,8 @@ and that you've created some basic scripts of your own using the
 - `Terminology`_
 - `Stand-alone Images`_
 - `Inline / Embedded Images and Symbols`_
-- `The IconFont Command`_
+- `IconFont Command`_
+- `Example of Embedded Images and Symbols`_
 
 
 Overview
@@ -47,9 +48,8 @@ Terminology
 Images
 ------
 
-Image is the term used for any kind of illustration - artwork, line drawings,
+*Image* is the term used for any kind of illustration - artwork, line drawings,
 photographs, AI-generated images and so on.
-
 
 Symbols, Glyphs and Icons
 -------------------------
@@ -64,9 +64,10 @@ a few lines of drawing, and containing only a few colors.
 - A *glyph* is an instance of a typographic character or a recognizable image
   e.g. the @ sign
 
-They can be found as "stand alone" image files or embedded in a font.
+These graphics can be found as "stand alone" images |dash| typically as
+small ``.png`` or ``.svg`` format files |dash| or embedded in a font.
 If part of a font, they are often accessed via their Unicode "address" |dash|
-typically a 4 character string prefixed with a ``\u``.
+usually a 4 character string prefixed with a ``\u``.
 
 In **protograf** the term *symbol* will be used to encompass all of the above.
 
@@ -75,7 +76,9 @@ Stand-alone Images
 ==================
 `↑ <table-of-contents-ciif_>`_
 
-TBD
+A "stand-alone" image is **not** part of a text string and can be displayed
+directly on any part of a card; this is fully described in the
+:ref:`Image Command <image-command>`.
 
 
 Inline / Embedded Images and Symbols
@@ -85,15 +88,93 @@ Inline / Embedded Images and Symbols
 .. |gld| image:: gold.png
    :width: 12
 
-.. |shm| image:: shamrock.png
-   :width: 12
-
 It is not uncommon to "embed" or "inline" a symbol or image in the text
 itself; so, for example, instead of the phrase *take 2 gold*, the text will
 display *+2* |gld| |dash| in this case the picture of the gold could either
 be an image or a symbol from a font.
 
-The following example illustrates how either of these can be done.
+Image References
+----------------
+
+The way to reference an image file within :ref:`HTML Text <textHTML> is to
+surround it with a pair of marker symbols:  ``|: ... :|``.  At the start,
+the ``|:`` is used and at the end the ``:|`` is used.  These symbols should
+enclose the name of the image file.
+
+The name can also be followed by a space and a number |dash| where the number
+represents the required *height* of the image; larger images will be shrunk
+to this size. If the extension is missing from the filename, the ``.png``
+extension will be added.  For example:
+
+.. code::
+
+    |:openmoji--fish 14:|
+
+will be replaced in the text by:
+
+.. code::
+
+    <img src="openmoji--fish.png" height="14" />
+
+.. HINT::
+
+    An alternative pair of marker symbols that can be used for SVG files is:
+    ``|; ... ;|``. In this case, if the extension is missing from the filename,
+    the ``.svg`` extension will be added.
+
+
+Symbol References
+-----------------
+
+The way to reference a font symbol within :ref:`HTML Text <textHTML> is to
+surround it with a pair of marker symbols:  ``|! ... !|``.  At the start,
+the ``|!`` is used and at the end the ``!|`` is used.  These symbols should
+enclose the character symbol being referenced.
+
+The name can also be followed by a space and a number |dash| where the number
+represents the required *point size* of the symbol.  It can be further followed
+by a color reference  |dash| either a name or hexadecimal code |dash| that will
+be used to change the symbol's color.
+
+For example:
+
+.. code::
+
+    |!\u2666 14 red!|
+
+will be replaced in the text by a red diamond shape |dash| assuming that the
+default symbol font is not changed (see below for the `IconFont Command`_).
+
+.. code::
+
+    <img src="openmoji--fish.png" height="14" />
+
+
+.. _the-iconfont-command:
+
+IconFont Command
+================
+`↑ <table-of-contents-ciif_>`_
+
+The ``IconFont()`` command is very similar to the
+:ref:`Font command <the-font-command>` but with one significant difference.
+
+The **only** purpose of this command is to set a different font that is used,
+from the point onwards from where it is set in the script, for the symbols
+that are being referenced in :ref:`HTML Text <textHTML>`.
+
+If not set, **protograf** will default to using **Helvetica** font as the
+source for any symbol references.
+
+
+Example of Embedded Images and Symbols
+======================================
+
+.. |shm| image:: shamrock.png
+   :width: 12
+
+Both of the following examples below show how images or font symbols can be
+embedded in :ref:`HTML Text <textHTML>`.
 
 .. |ti1| image:: images/customised/text_images.png
    :width: 330
@@ -135,13 +216,28 @@ The following example illustrates how either of these can be done.
              </div>"""
          )
 
+      In the :ref:`HTML Text <textHTML>`, markup is used to format
+      the main text; in this case to set the *style* within a ``<div>``
+      to use a certain font family, color and size.
+
+      The top example shows how the image marker symbols ``|: ... :|`` are
+      used to reference an image called ``openmoji--fish.png`` which is set
+      to size *14*.  In addition, because the ``IconFont()`` has been set
+      to *Arial*, the character symbol of a diamond is shown when using the
+      symbol markers ``|! ... !|`` and referencing Unicode *\u2666*
+
+      The top example shows how the image marker symbols ``|; ... ;|`` are
+      used to reference an image called ``openmoji--fish.svg`` |dash| this is
+      set to size *16* with a *green* color.  In addition, because the
+      ``IconFont()`` has been set to *game-icons-net-20200315a*, the character
+      symbol of a shamrock |shm| is shown when using the symbol markers
+      ``|! ... !|`` and referencing  Unicode *\uEB73*
+
+      .. HINT::
+
+        The fonts used in this example can be sourced from:
+
+        - https://fonts.google.com/specimen/Quintessential
+        - https://github.com/toddfast/game-icons-net-font/tree/master/distro
+
 ===== ======
-
-
-.. _the-iconfont-command:
-
-The IconFont Command
-====================
-`↑ <table-of-contents-ciif_>`_
-
-TBD
