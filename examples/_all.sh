@@ -99,6 +99,7 @@ python cards/cards_deck_12.py
 python cards/cards_deck_13.py
 python cards/cards_deck_14.py
 python cards/cards_deck_15.py
+python cards/cards_symbols.py
 # -- various
 echo -e "\nCreating various..."
 python various/clock.py

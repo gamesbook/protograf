@@ -25,7 +25,8 @@ and that you've created some basic scripts of your own using the
 - `Stand-alone Images`_
 - `Inline / Embedded Images and Symbols`_
 - `IconFont Command`_
-- `Example of Embedded Images and Symbols`_
+- `Text with Embedded Images and Symbols`_
+- `Cards with Text Embedded Images and Symbols`_
 
 
 Overview
@@ -122,6 +123,10 @@ will be replaced in the text by:
     ``|; ... ;|``. In this case, if the extension is missing from the filename,
     the ``.svg`` extension will be added.
 
+    **NOTE** The current underlying software does *not* support transparency
+    for SVG images |dash| ensure the images you use have a background color
+    that matches the area where they are being used!
+
 
 Symbol References
 -----------------
@@ -167,8 +172,8 @@ If not set, **protograf** will default to using **Helvetica** font as the
 source for any symbol references.
 
 
-Example of Embedded Images and Symbols
-======================================
+Text with Embedded Images and Symbols
+=====================================
 
 .. |shm| image:: shamrock.png
    :width: 12
@@ -226,12 +231,12 @@ embedded in :ref:`HTML Text <textHTML>`.
       to *Arial*, the character symbol of a diamond is shown when using the
       symbol markers ``|! ... !|`` and referencing Unicode *\u2666*
 
-      The top example shows how the image marker symbols ``|; ... ;|`` are
-      used to reference an image called ``openmoji--fish.svg`` |dash| this is
-      set to size *16* with a *green* color.  In addition, because the
-      ``IconFont()`` has been set to *game-icons-net-20200315a*, the character
-      symbol of a shamrock |shm| is shown when using the symbol markers
-      ``|! ... !|`` and referencing  Unicode *\uEB73*
+      The lower example shows how the image marker symbols ``|; ... ;|`` are
+      used to reference an image called ``openmoji--fish.svg``. In addition,
+      because the ``IconFont()`` has been set to *game-icons-net-20200315a*,
+      the character symbol of a shamrock |shm| is shown when using the symbol
+      markers ``|! ... !|`` and referencing  Unicode *\uEB73*` |dash| this is
+      set to size *16* with a *green* color.
 
       .. HINT::
 
@@ -239,5 +244,95 @@ embedded in :ref:`HTML Text <textHTML>`.
 
         - https://fonts.google.com/specimen/Quintessential
         - https://github.com/toddfast/game-icons-net-font/tree/master/distro
+
+===== ======
+
+
+Cards with Text Embedded Images and Symbols
+===========================================
+
+.. |shm| image:: shamrock.png
+   :width: 12
+
+Both of the following examples below show how images or font symbols can be
+embedded in :ref:`HTML Text <textHTML>` used in cards.
+
+.. |ti2| image:: images/decks/card_symbols.png
+   :width: 330
+
+===== ======
+|ti2| This example shows Cards constructed using commands with the
+      following properties:
+
+      .. code:: python
+
+        Create(
+           filename='cards_symbols.pdf',
+           margin=1.25,
+           paper="A6")
+
+        # deck data
+        lotr = [
+            ['ID', 'Name', 'Age', 'Race', 'Ability', 'Copies'],
+            [1, "Gimli", 140, "Dwarf",
+             "Gain 1 |!\u2666 12 red!| per turn", 1],
+            [6, "Merry", 37, "Hobbit",
+             "Gain 1 |!\uEB73 12 green!| per round", 1],
+            [7, "Samwise", 39, "Hobbit",
+             "Gain 1 |;openmoji--fish 14;| per turn", 1],
+            [9, "Gollum", None, "Hobbit",
+             "Use 2 |:openmoji--fish 12:| to get 1 |!\u2666 12 blue!|", 1],
+        ]
+        Data(data_list=lotr)
+
+        # design the deck
+        Deck(
+            cards=1,
+            height=6, width=4,
+            grid_marks=True,
+            rounding=0.3,
+            fill=None,
+            stroke="gray",
+            copy='Copies')
+
+        # character Name
+        name_box = rectangle(
+            x=0.5, y=0.5,
+            width=3, height=1,
+            rounding=0.2)
+        Card("*", name_box)
+        Card("all",
+             text(
+                 text=T("{{ Name }}"),
+                 x=2, y=1.2,
+                 font_size=14))
+
+        # character Ability
+        IconFont("game-icons-net-20200315a")
+        able = text(
+            x=0.25, y=2,
+            width=3.5, height=2,
+            font_size=10,
+            box_fill="lightgrey",
+            html=True,
+            text=T("{{ Ability }}")
+        )
+        Card("all", able)
+
+      For the :ref:`HTML Text <textHTML>`, along with the ```T()`` function
+      is used to access and display a character's *Ability* data.
+
+      This example shows how the image marker symbols ``|: ... :|`` are
+      used to reference an image called ``openmoji--fish.png`` which is set
+      to size *12*. It also shows how the image marker symbols ``|; ... ;|``
+      are used to reference an image called ``openmoji--fish.svg`` which is
+      set to size *14*.
+
+      Because the ``IconFont()`` has been set to *game-icons-net-20200315a*,
+      the character symbol of a shamrock |shm| is shown when using the symbol
+      markers ``|! ... !|`` and referencing  Unicode *\uEB73*, and the character
+      of a diamond is shown when using the symbol markers ``|! ... !|``
+      and referencing Unicode *\u2666* |dash| the color is set differently for
+      two different characters.
 
 ===== ======
