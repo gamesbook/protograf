@@ -117,7 +117,7 @@ Follow this process:
 - |check| Update the ``release`` in ``docs/source/conf.py``
 - |check| Update the ``__version_info__`` in ``_version.py``
 - |check| Update the version using poetry e.g. ``poetry version patch``
-- |check| Commit and push all these changes to GitHub
+- |check| Git commit and push all these changes to GitHub
 - |check| Add a tag that matches the poetry version e.g. ``git tag 0.1.2``
 - |check| Push tag to GitHub i.e. ``git push origin --tags``
 
