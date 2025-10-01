@@ -294,6 +294,38 @@ def as_point(value) -> list | Point:
         raise ValueError(f"Cannot convert {value} into a Point!")
 
 
+def compass_to_rotation(value: str) -> float:
+    """Convert a compass direction to a rotation number.
+
+    Doc Test:
+
+    >>> compass_to_rotation('n')
+    90
+    >>> compass_to_rotation('s')
+    270
+    """
+    _value = _lower(value)
+    match _value:
+        case "n":
+            return 90
+        case "e":
+            return 0
+        case "w":
+            return 180
+        case "s":
+            return 270
+        case "ne":
+            return 45
+        case "nw":
+            return 135
+        case "sw":
+            return 225
+        case "se":
+            return 315
+        case _:
+            feedback(f'Compass direction "{value}" is not valid!', True)
+
+
 def tuple_split(
     string: str, label: str = "list", pairs_list: bool = False, all_ints: bool = False
 ) -> list:

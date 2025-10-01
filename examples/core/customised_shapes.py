@@ -359,7 +359,7 @@ Line(cx=1, cy=5, angle=135, length=2, stroke_width=1.5)
 Line(cx=3, cy=5, angle=315, length=2, stroke="red")
 PageBreak()
 
-# ---- line: connections -
+# ---- line: connections
 Blueprint(stroke_width=0.5)
 Text(common=txt, text="Line: connections")
 cc = Circle(cx=2, cy=3, radius=0.5)
@@ -674,7 +674,7 @@ Line(x=3, y=6, x1=4, y1=5,
      arrow_position=[0.1, 0.15, 0.2])
 PageBreak()
 
-# ---- polyline custom
+# ---- polyline - custom
 Blueprint(stroke_width=0.5)
 Text(common=txt, text="Polyline: custom")
 Polyline(points=[(1, 2), (1, 1), (2, 0), (3, 1), (3, 2)],
@@ -683,7 +683,7 @@ Polyline(x=1, y=3, stroke_width=1,
          steps='0.5,0 0,1.5 1.5,0 0,-1.5 0.5,0 0,0.5 -2.5,0')
 PageBreak()
 
-# ---- polyline arrows
+# ---- polyline - arrows
 Blueprint(stroke_width=0.5)
 Text(common=txt, text="Polyline: arrow")
 Polyline(
@@ -698,6 +698,26 @@ Polyline(
     arrow_style='notch',
     arrow_double=True
 )
+PageBreak()
+
+# ---- polyline - snail
+Blueprint(stroke_width=0.5)
+Text(common=txt, text="Polyline: snail")
+Polyline(
+    y=0.5,
+    snail="2 s 1 w 2 n 1",
+    stroke_width=2,
+    stroke="red")
+Polyline(
+    x=0, y=5,
+    stroke_width=1,
+    snail="n 3 e 2 -45 2 w 1 sw 3 a118 0.64"
+)
+Polyline(
+    y=3, x=2,
+    snail="e 1 s 1 w 1 n 1 s j1 "*3,
+    stroke_width=2,
+    stroke="blue")
 PageBreak()
 
 # ---- centred shapes
@@ -1113,7 +1133,7 @@ Save(
         "rectangles_rowcol", "rectangles_custom", "rhombus_custom",
         "rhombus_borders", "trapezoid_borders",
         "arrow_sizes", "arrow_rotate", "arrowheads",
-        "polyline_basic", "polyline_arrow",
+        "polyline_basic", "polyline_arrow", "polyline_snail",
         "shape_centred", "shape_centred_move", "shape_centred_custom",
         "shapes_centred",
         "qr_code",
