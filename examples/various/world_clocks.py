@@ -70,9 +70,9 @@ def clock_angles(hours: int, minutes: int) -> tuple:
     except Exception:
         raise ValueError("Invalid hours or minutes!")
     if hours < 0 or hours > 23:
-        raise ValueError("Invalid hours!")
+        raise ValueError(f"Invalid hours - {hours}!")
     if minutes < 0 or minutes > 59:
-        raise ValueError("Invalid minutes!")
+        raise ValueError(f"Invalid minutes- {minutes}!")
 
     hours = hours % 12  # 12-hour format
     # minute hand: 360° in 60 minutes → 6° per minute
@@ -103,6 +103,8 @@ def the_clock(
     hand = "red" if detail[1] == "AM" else "black"
     # ---- adjust hours for GMT
     hours = hours + gmt
+    if hours < 0:
+        hours = 24 - hours
     hours = hours if hours <= 12 else hours - 12
     # ---- draw basic clock frame
     Circle(
@@ -203,7 +205,7 @@ def main(
         label (str):
             label for Home clock in the centre
         hours (int):
-            absolute value for hours (1 to 12)
+            absolute value for hours (1 to 24)
         minutes (int):
             absolute value for minutes (0 to 60)
 

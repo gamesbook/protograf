@@ -3,6 +3,8 @@ Cards: Images, Symbols and Fonts
 ================================
 
 .. |dash| unicode:: U+2014 .. EM DASH SIGN
+.. |shm| image:: shamrock.png
+   :width: 12
 
 This section assumes you are very familiar with the concepts, terms and
 ideas for :doc:`protograf <index>` as presented in the
@@ -174,9 +176,7 @@ source for any symbol references.
 
 Text with Embedded Images and Symbols
 =====================================
-
-.. |shm| image:: shamrock.png
-   :width: 12
+`↑ <table-of-contents-ciif_>`_
 
 Both of the following examples below show how images or font symbols can be
 embedded in :ref:`HTML Text <textHTML>`.
@@ -229,13 +229,13 @@ embedded in :ref:`HTML Text <textHTML>`.
       used to reference an image called ``openmoji--fish.png`` which is set
       to size *14*.  In addition, because the ``IconFont()`` has been set
       to *Arial*, the character symbol of a diamond is shown when using the
-      symbol markers ``|! ... !|`` and referencing Unicode *\u2666*
+      symbol markers ``|! ... !|`` and referencing Unicode *2666*.
 
       The lower example shows how the image marker symbols ``|; ... ;|`` are
       used to reference an image called ``openmoji--fish.svg``. In addition,
-      because the ``IconFont()`` has been set to *game-icons-net-20200315a*,
+      because the ``IconFont()`` has now been set to *game-icons-net-20200315a*,
       the character symbol of a shamrock |shm| is shown when using the symbol
-      markers ``|! ... !|`` and referencing  Unicode *\uEB73*` |dash| this is
+      markers ``|! ... !|`` and referencing  Unicode *EB73* |dash| this is
       set to size *16* with a *green* color.
 
       .. HINT::
@@ -245,14 +245,15 @@ embedded in :ref:`HTML Text <textHTML>`.
         - https://fonts.google.com/specimen/Quintessential
         - https://github.com/toddfast/game-icons-net-font/tree/master/distro
 
+        The small fish image marker is part of a set available from
+        https://icon-sets.iconify.design/openmoji/
+
 ===== ======
 
 
 Cards with Text Embedded Images and Symbols
 ===========================================
-
-.. |shm| image:: shamrock.png
-   :width: 12
+`↑ <table-of-contents-ciif_>`_
 
 Both of the following examples below show how images or font symbols can be
 embedded in :ref:`HTML Text <textHTML>` used in cards.
@@ -261,7 +262,7 @@ embedded in :ref:`HTML Text <textHTML>` used in cards.
    :width: 330
 
 ===== ======
-|ti2| This example shows Cards constructed using commands with the
+|ti2| This example shows character Cards constructed using commands with the
       following properties:
 
       .. code:: python
@@ -319,8 +320,8 @@ embedded in :ref:`HTML Text <textHTML>` used in cards.
         )
         Card("all", able)
 
-      For the :ref:`HTML Text <textHTML>`, along with the ```T()`` function
-      is used to access and display a character's *Ability* data.
+      For the :ref:`HTML Text <textHTML>` *text*, the ``T()`` function
+      is used to access and display the character's *Ability* data.
 
       This example shows how the image marker symbols ``|: ... :|`` are
       used to reference an image called ``openmoji--fish.png`` which is set
@@ -328,11 +329,12 @@ embedded in :ref:`HTML Text <textHTML>` used in cards.
       are used to reference an image called ``openmoji--fish.svg`` which is
       set to size *14*.
 
-      Because the ``IconFont()`` has been set to *game-icons-net-20200315a*,
-      the character symbol of a shamrock |shm| is shown when using the symbol
-      markers ``|! ... !|`` and referencing  Unicode *\uEB73*, and the character
-      of a diamond is shown when using the symbol markers ``|! ... !|``
-      and referencing Unicode *\u2666* |dash| the color is set differently for
-      two different characters.
+      Because the ``IconFont()`` has been set to *game-icons-net-20200315a*:
+
+      - a shamrock |shm| is shown when using the symbol
+        markers ``|! ... !|`` and referencing  Unicode *EB73*, and
+      - a diamond is shown when using the symbol markers ``|! ... !|``
+        and referencing Unicode *2666* |dash| the color is set differently for
+        two different card characters.
 
 ===== ======

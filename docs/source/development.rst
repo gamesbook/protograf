@@ -112,7 +112,7 @@ Follow this process:
 - |check| Ensure you are on the ``master`` branch
 - |check| Format primary code with black (``black protograf``)
 - |check| Finalise release date and notes in ``CHANGES.txt``
-- |check| Ensure all the examples can be run by using a shell script
+- |check| Ensure all the examples can be run by using shell script(s)
 - |check| Update the ``examples.zip`` file with latest example code
 - |check| Update the ``release`` in ``docs/source/conf.py``
 - |check| Update the ``__version_info__`` in ``_version.py``

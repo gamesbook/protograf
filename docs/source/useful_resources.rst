@@ -7,8 +7,8 @@ game design when working with :doc:`protograf <index>`.
 
 .. NOTE::
 
-   Inclusion of these links does **not** constitute a recommendation
-   of them or their use!
+   Inclusion of these links does **not** constitute a recommendation!
+   As always, check the conditions of use and any terms and conditions.
 
 Icons, Art and Images
 =====================
@@ -16,6 +16,7 @@ Icons, Art and Images
 -  https://openclipart.org/
 -  https://www.svgrepo.com/
 -  https://game-icons.net/
+-  https://icon-sets.iconify.design/ (check license and attribution)
 -  https://publicdomainicons.firebaseapp.com/icons
 -  https://creazilla.com/
 -  https://www.irasutoya.com/
