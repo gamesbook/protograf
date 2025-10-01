@@ -51,6 +51,38 @@ PageBreak()
 header_font = Common(font_size=18, align="left")
 header = Common(x=0, y=28, font_size=24, align="left")
 
+# ---- filled shapes
+Blueprint()
+Text(common=header, text="Filled shapes")
+Rectangle(cx=3, cy=23, width=5, height=3,
+          title="rectangle:3-23", title_stroke="black", fill_stroke="tomato")
+EquilateralTriangle(
+    x=7, y=24, side=4,
+    title="triangle:9-24", title_stroke="black", fill_stroke="tomato")
+Stadium(x=13.5, y=22, width=3, height=2,
+        title="stadium:15-23", title_stroke="black", fill_stroke="tomato")
+Hexagon(cx=3, cy=17, side=2, orientation="flat",
+        title="hexagon:3-17", title_stroke="black", fill_stroke="gold")
+Ellipse(cx=9, cy=17, width=5, height=3,
+        title="ellipse:9-17", title_stroke="black", fill_stroke="gold")
+Trapezoid(cx=16, cy=17, width=4, top=2, height=3,
+          title="trapezoid:16-17", title_stroke="black", fill_stroke="gold")
+Hexagon(cx=3, cy=11, side=2, orientation="pointy",
+        title="hexagon:3-11", title_stroke="black", fill_stroke="chartreuse")
+Polygon(cx=9, cy=11, radius=2, sides=8,
+        title="polygon:9-11", title_stroke="black", fill_stroke="chartreuse")
+Circle(cx=16, cy=11, radius=2,
+       title="circle:16-11", title_stroke="black", fill_stroke="chartreuse")
+Star(cx=3, cy=5, vertices=5, radius=2,
+     title="star:3-5", title_stroke="black", fill_stroke="cyan")
+Rhombus(cx=16, cy=5, width=3, height=5,
+        title="rhombus:16-5", title_stroke="black", fill_stroke="cyan")
+Square(cx=9, cy=5, side=3,
+       title="square:9-5", title_stroke="black", fill_stroke="cyan")
+Dot(x=9, y=1, dot_width=6, title="dot:1-9")
+PageBreak()
+
+
 # ---- default labels and blueprint
 Blueprint()
 Text(common=header, text="Blueprint plus shapes with labels")
@@ -66,7 +98,7 @@ Star(x=11, y=9, vertices=5, radius=2, label="star")
 Circle(cx=16, cy=9, radius=2, label="circle")
 Ellipse(x=2, y=7, width=5, height=3, label="ellipse")
 Rhombus(x=8.5, y=1, width=3, height=5, label="rhombus")
-Compass(cx=4, cy=3, radius=2, title="compass")
+Polygon(cx=4, cy=3, radius=2, sides=8, title="polygon")
 Square(x=14, y=1, side=4, label="square")
 PageBreak()
 
@@ -84,7 +116,7 @@ Ellipse(cx=9, cy=17, width=5, height=3, label="ellipse:9-17", common=dot)
 Trapezoid(cx=16, cy=17, width=4, top=2, height=3, label="trapezoid:16-17", common=dot)
 
 Hexagon(cx=3, cy=11, side=2, label="hexagon:3-11", orientation="pointy", common=dot)
-Compass(cx=9, cy=11, radius=2, label="compass:9-11", common=dot)
+Polygon(cx=9, cy=11, radius=2, sides=8, label="polygon:9-11", common=dot)
 Circle(cx=16, cy=11, radius=2, label="circle:16-11", common=dot)
 
 Star(cx=3, cy=5, vertices=5, radius=2, label="star:3-5", common=dot)
@@ -100,21 +132,21 @@ Blueprint()
 Text(common=header, text="Centred shapes with centre point and x-y heading")
 dot = Common(dot=0.2, dot_stroke="blue")
 
-Rectangle(cx=3, cy=23, width=5, height=3, heading="rectangle:3-23", common=dot)
-EquilateralTriangle(x=7, y=24, side=4, heading="triangle:9-24", common=dot)
-Stadium(cx=15, cy=23, width=3, height=2, heading="stadium:15-23", common=dot)
+Star(cx=3, cy=5, vertices=5, radius=2, heading="star:3-5", common=dot)
+Rhombus(cx=16, cy=5, width=3, height=5, heading="rhombus:16-5", common=dot)
+Square(cx=9, cy=5, side=3, heading="square:9-5", common=dot)
+
+Hexagon(cx=3, cy=11, side=2, heading="hexagon:3-11", orientation="pointy", common=dot)
+Polygon(cx=9, cy=11, radius=2, sides=8, heading="polygon:9-11", common=dot)
+Circle(cx=16, cy=11, radius=2, heading="circle:16-11", common=dot)
 
 Hexagon(cx=3, cy=17, side=2, heading="hexagon:3-17", orientation="flat", common=dot)
 Ellipse(cx=9, cy=17, width=5, height=3, heading="ellipse:9-17", common=dot)
 Trapezoid(cx=16, cy=17, width=4, top=2, height=3, heading="trapezoid:16-17", common=dot)
 
-Hexagon(cx=3, cy=11, side=2, heading="hexagon:3-11", orientation="pointy", common=dot)
-Compass(cx=9, cy=11, radius=2, heading="compass:9-11", common=dot)
-Circle(cx=16, cy=11, radius=2, heading="circle:16-11", common=dot)
-
-Star(cx=3, cy=5, vertices=5, radius=2, heading="star:3-5", common=dot)
-Rhombus(cx=16, cy=5, width=3, height=5, heading="rhombus:16-5", common=dot)
-Square(cx=9, cy=5, side=3, heading="square:9-5", common=dot)
+Rectangle(cx=3, cy=23, width=5, height=3, heading="rectangle:3-23", common=dot)
+EquilateralTriangle(cx=9, cy=23, side=4, heading="triangle:9-23", common=dot)
+Stadium(cx=15, cy=23, width=3, height=2, heading="stadium:15-23", common=dot)
 
 Dot(x=9, y=1, dot_width=6, heading="dot:1-9")
 
@@ -134,7 +166,7 @@ Ellipse(cx=9, cy=17, width=5, height=3, title="ellipse:9-17", common=dot)
 Trapezoid(cx=16, cy=17, width=4, top=2, height=3, title="trapezoid:16-17", common=dot)
 
 Hexagon(cx=3, cy=11, side=2, title="hexagon:3-11", orientation="pointy", common=dot)
-Compass(cx=9, cy=11, radius=2, title="compass:9-11", common=dot)
+Polygon(cx=9, cy=11, radius=2, sides=8, title="polygon:9-11", common=dot)
 Circle(cx=16, cy=11, radius=2, title="circle:16-11", common=dot)
 
 Star(cx=3, cy=5, vertices=5, radius=2, title="star:3-5", common=dot)
@@ -145,40 +177,9 @@ Dot(x=9, y=1, dot_width=6, title="dot:1-9")
 
 PageBreak()
 
-# ---- filled shapes
-Blueprint()
-Text(common=header, text="Filled shapes")
-Rectangle(cx=3, cy=23, width=5, height=3,
-          title="rectangle:3-23", title_stroke="black", fill_stroke="tomato")
-EquilateralTriangle(
-    x=7, y=24, side=4,
-    title="triangle:9-24", title_stroke="black", fill_stroke="tomato")
-Stadium(x=13.5, y=22, width=3, height=2,
-        title="stadium:15-23", title_stroke="black", fill_stroke="tomato")
-Hexagon(cx=3, cy=17, side=2, orientation="flat",
-        title="hexagon:3-17", title_stroke="black", fill_stroke="gold")
-Ellipse(cx=9, cy=17, width=5, height=3,
-        title="ellipse:9-17", title_stroke="black", fill_stroke="gold")
-Trapezoid(cx=16, cy=17, width=4, top=2, height=3,
-          title="trapezoid:16-17", title_stroke="black", fill_stroke="gold")
-Hexagon(cx=3, cy=11, side=2, orientation="pointy",
-        title="hexagon:3-11", title_stroke="black", fill_stroke="chartreuse")
-Compass(cx=9, cy=11, radius=2,
-        title="compass:9-11", title_stroke="black", fill_stroke="chartreuse")
-Circle(cx=16, cy=11, radius=2,
-       title="circle:16-11", title_stroke="black", fill_stroke="chartreuse")
-Star(cx=3, cy=5, vertices=5, radius=2,
-     title="star:3-5", title_stroke="black", fill_stroke="cyan")
-Rhombus(cx=16, cy=5, width=3, height=5,
-        title="rhombus:16-5", title_stroke="black", fill_stroke="cyan")
-Square(cx=9, cy=5, side=3,
-       title="square:9-5", title_stroke="black", fill_stroke="cyan")
-Dot(x=9, y=1, dot_width=6, title="dot:1-9")
-PageBreak()
-
 # ---- rotation all shapes + label
 Blueprint()
-Text(common=header, text="Rotated shapes with labels")
+Text(common=header, text="Rotated shapes (45 degrees) with labels")
 Arrow(x=3, y=6, height=3, width=1.25, head_height=1, head_width=2, rotation=45, stroke_width=2, label="arrow")
 Polygon(x=4, y=24.5, radius=2, rotation=45, stroke_width=2, label="polygon6")
 Polygon(x=10, y=24.5, radius=2, sides=8, rotation=45, stroke_width=2, label="polygon8")
@@ -187,8 +188,8 @@ Rectangle(x=2, y=18.5, width=4, height=3, rotation=45, stroke_width=2, label="re
 Trapezoid(x=14, y=13, width=4, top=2, height=3, rotation=45, stroke_width=2, label="trapezoid")
 Stadium(x=14.5, y=19, width=3, height=2, rotation=45, stroke_width=2, label="stadium")
 EquilateralTriangle(cx=10, cy=20, side=4, rotation=45, stroke_width=2, label="equ.triangle")
-Hexagon(x=2, y=13, side=2, rotation=45, stroke_width=2, label="hexagon")
-Hexagon(x=8, y=13, side=2, orientation="pointy", rotation=45, stroke_width=2, label="hexagon")
+Hexagon(cx=4, cy=15, side=2, rotation=45, stroke_width=2, label="hexagon")
+Hexagon(cx=10, cy=15, side=2, orientation="pointy", rotation=45, stroke_width=2, label="hexagon")
 Star(x=10, y=9, vertices=5, radius=2, rotation=45, stroke_width=2, label="star")
 Circle(cx=16, cy=9, radius=2, rotation=45, stroke_width=2, label="circle")
 Ellipse(cx=4, cy=9, width=5, height=3, rotation=45, stroke_width=2, label="ellipse")
@@ -235,13 +236,6 @@ points = [
 Polyshape(cx=5, cy=20.5, points=points, stroke="bisque", fill="tomato",
           label="Store", label_size=24)
 Polyshape(x=25, y=4, points="0,0 0,1 2,0 2,1 0,0", fill_stroke="gold")
-PageBreak()
-
-# ---- bezier / arc
-Blueprint()
-Text(common=header, text="Bezier line and arc")
-Bezier(x=2, y=7, x1=12, y1=9, x2=12, y2=16, x3=17, y3=20, stroke="blue", stroke_width=2)
-Arc(cx=0, cy=21, radius=8, angle_start=15, angle_width=60, stroke="tomato", stroke_width=4)
 PageBreak()
 
 # ---- common, with angled lines
@@ -387,9 +381,7 @@ Id vis viris antiopam gloriatur, muscipit ex has, an ius mazim.
 header = Common(x=1, font_size=24, align="left", width=2.5, height=2)
 Text(common=header, y=3, text="HTML\nStyled")
 Rectangle(x=4.5, y=1, width=10, height=6, stroke_width=1, stroke="gray", fill=None)
-Text(
-    x=4.5, y=1, width=10, height=6, html=True, text=LATIN
-)
+Text(x=4.5, y=1, width=10, height=6, html=True, text=LATIN)
 
 LATIN_PLAIN = """At cum perfecto praesent, ne causae voluptua reprimique usu, his id odio tamquam senserit.
 

@@ -57,6 +57,7 @@ python boards\abstract\hexhex_hexagons.py --no-png -d %location%
 python boards\abstract\hexhex_rectangles.py --no-png -d %location%
 python boards\abstract\morabaraba.py --no-png -d %location%
 python boards\abstract\octagons.py --no-png -d %location%
+python boards\abstract\snex.py --no-png -d %location%
 python boards\abstract\tictactoe.py --no-png -d %location%
 
 REM ---- boards: commercial
@@ -115,11 +116,13 @@ python cards\cards_deck_12.py --no-png -d %location%
 python cards\cards_deck_13.py --no-png -d %location%
 python cards\cards_deck_14.py --no-png -d %location%
 python cards\cards_deck_15.py --no-png -d %location%
+python cards\cards_symbols.py --no-png -d %location%
 
 REM ---- various
 ECHO "Creating various..."
 python various\clock.py --no-png -d %location%
 python various\logo.py --no-png -d %location%
+python various\math-2.py --no-png -d %location%
 python various\objects.py --no-png -d %location%
 python various\large_objects.py --no-png -d %location%
 python various\rolling.py --no-png -d %location%

@@ -27,16 +27,18 @@ and that you've created some basic scripts of your own using the
 - `The CardBack Command`_
 - `The Data Command`_
 
-  - `Data Sources`_
-  - `Data Properties`_
-  - `Data Example 1. CSV`_
-  - `Data Example 2. Excel`_
-  - `Data Example 3. Matrix`_
-  - `Data Example 4. Images`_
-  - `Data Example 5. Lists`_
-  - `Data Example 6. Google Sheets`_
-  - `Data Example 7. BoardGameGeek API`_
-  - `Data Example 8. Filters`_
+  - `The Data Source Property`_
+  - `Other Data Properties`_
+  - `Data Examples`_
+
+      - `Data Example 1. CSV`_
+      - `Data Example 2. Excel`_
+      - `Data Example 3. Matrix`_
+      - `Data Example 4. Images`_
+      - `Data Example 5. Lists`_
+      - `Data Example 6. Google Sheets`_
+      - `Data Example 7. BoardGameGeek API`_
+      - `Data Example 8. Filters`_
 - `The Matrix Command`_
 - `Countersheet and Counter Commands`_
 - `Supporting Commands`_
@@ -280,9 +282,9 @@ commands making the cards.
 
 .. IMPORTANT::
 
-   The number of cards that are listd in the dataset |dash| CSV file; Excel
-   spreadsheetl; ect. |dash| will **always** take priority over the number
-   of cards specified in  `The Deck Command <deck_command.html>`.
+   The number of cards that are listed in the dataset |dash| CSV file; Excel
+   spreadsheet; etc. |dash| will **always** take priority over the number
+   of cards specified in the :ref:`Deck Command <the-deck-command>`..
 
 Because values now have "names" they can be
 referenced and used by the `Supporting Commands`_ - this is usually the primary
@@ -298,19 +300,41 @@ reason to supply a data source in this way.
      FEEDBACK:: Cannot use T() or S() command without Data already defined!
 
 
-Data Sources
-------------
+The Data Source Property
+------------------------
 `↑ <table-of-contents-crddk_>`_
 
-There are six possible types of data sources to create a dataset:
+There are six possible types of data sources to create a dataset, and
+**protograf** uses a different property name, or set of names, for each:
 
-1. A CSV file
-2. An Excel file
-3. A ``Matrix`` command
-4. A directory (containing images)
-5. A "list of lists" (included in the script)
-6. A Google Sheet
-7. The :ref:`BoardGameGeek API <the-bgg-command>` (available as a list-of-lists)
+1. A CSV or Excel file (**filename**)
+2. A ``Matrix`` command (**matrix**)
+3. A directory containing image files (**images** and **images_list**)
+4. A "list of lists" ( **data_list**)
+5. A Google Sheet (**google_key**, **google_sheet** and **sheetname**)
+6. The :ref:`BoardGameGeek API <the-bgg-command>`, which makes data available
+   as a list-of-lists (as per 4.)
+
+The ``Data`` command's different property names are described below:
+
+- **filename** - the full path to the name (including extension) of the
+  CSV or Excel file being used; if no directory is supplied in the path,
+  then it is assumed to be the same one in which the script is located
+- **sheet** - refers to the ID of the Google Sheet being accessed (see
+  the example below for more details)
+- **matrix** - refers to the name assigned to the ``Matrix`` being used
+- **images** - refers to the directory in which the images are located; if
+  a full path is not given, its assumed to be directly under the one in which
+  the script is located
+- **images_list** - is used in conjunction with *images* to provide a list of
+  file extensions which filter which type of files will be loaded from the
+  directory e.g. ``.png`` or ``.jpg``; this is important to set if the
+  directory contains files of a type that are not, or cannot be, used
+- **data_list** refers to the name assigned to a "list of lists" that is being
+  used; this property is also used when linked to data being sourced from the
+  :ref:`BoardGameGeek API <the-bgg-command>`
+- **google_key**, **google_sheet** and **sheetname** - used to access a
+  Google Sheet - see `Data Example 6. Google Sheets`_
 
 Apart from the images directory, each data source is essentially a set of rows
 and columns.  Each **row** represents data that must appear on a card.
@@ -330,25 +354,6 @@ in some way, for a card:
     |dash| upper- or lower-case |dash| and **not** other numbers, symbols,
     punctuation marks, spaces etc. except for an underscore (``_``).
 
-The ``Data`` command uses different property names to refer to these
-different types of data sources:
-
-- **filename** - the full path to the name (including extension) of the
-  CSV or Excel file being used; if no directory is supplied in the path,
-  then it is assumed to be the same one in which the script is located
-- **sheet** - refers to the ID of the Google Sheet being accessed (see
-  the example below for more details)
-- **matrix** - refers to the name assigned to the ``Matrix`` being used
-- **images** - refers to the directory in which the images are located; if
-  a full path is not given, its assumed to be directly under the one in which
-  the script is located
-- **images_list** - is used in conjunction with *images* to provide a list of
-  file extensions which filter which type of files will be loaded from the
-  directory e.g. ``.png`` or ``.jpg``; this is important to set if the
-  directory contains files of a type that are not, or cannot be, used
-- **data_list** refers to the name assigned to the "list of lists" being used;
-  this property is also used when linked to data being sources from the
-  :ref:`BoardGameGeek API <the-bgg-command>`
 
 .. HINT::
 
@@ -360,8 +365,8 @@ different types of data sources:
    directly to ``Data`` via a **source** property.  The onus is on *you*
    to ensure that the dictionary is correctly formatted.
 
-Data Properties
----------------
+Other Data Properties
+---------------------
 `↑ <table-of-contents-crddk_>`_
 
 The other properties that can be used for the ``Data`` command are:
@@ -377,10 +382,14 @@ The other properties that can be used for the ``Data`` command are:
 - **filters** - a list of ``(key, value, type)`` filter on which the data
   must be filtered - see `Data Example 8. Filters`_
 
+
+Data Examples
+-------------
+
 .. _deck-data-csv:
 
 Data Example 1. CSV
--------------------
++++++++++++++++++++
 `↑ <table-of-contents-crddk_>`_
 
 This example shows how data is sourced from a CSV file:
@@ -392,7 +401,7 @@ This example shows how data is sourced from a CSV file:
 .. _deck-data-excel:
 
 Data Example 2. Excel
----------------------
++++++++++++++++++++++
 `↑ <table-of-contents-crddk_>`_
 
 This example shows how data is sourced from an Excel file:
@@ -419,7 +428,7 @@ For example:
 .. _deck-data-matrix:
 
 Data Example 3. Matrix
-----------------------
+++++++++++++++++++++++
 `↑ <table-of-contents-crddk_>`_
 
 This example shows how data is sourced from a Matrix; in this case the data
@@ -445,7 +454,7 @@ For more detail on these properties see `The Matrix Command`_.
 .. _deck-data-images:
 
 Data Example 4. Images
-----------------------
+++++++++++++++++++++++
 `↑ <table-of-contents-crddk_>`_
 
 This example shows how data is sourced from an image directory:
@@ -461,7 +470,7 @@ located in the ``pictures`` subdirectory.
 .. _deck-data-lists:
 
 Data Example 5. Lists
----------------------
++++++++++++++++++++++
 `↑ <table-of-contents-crddk_>`_
 
 This example shows how data is sourced from a "list of lists":
@@ -507,7 +516,7 @@ See below under the `T(emplate) command`_ and also under the
 
 
 Data Example 6. Google Sheets
------------------------------
++++++++++++++++++++++++++++++
 `↑ <table-of-contents-crddk_>`_
 
 There are three properties needed to gain access to data from a Google Sheet:
@@ -527,7 +536,7 @@ There are three properties needed to gain access to data from a Google Sheet:
 .. _deck-data-bgg:
 
 Data Example 7. BoardGameGeek API
----------------------------------
++++++++++++++++++++++++++++++++++
 `↑ <table-of-contents-crddk_>`_
 
 This example shows how data is loaded for boardgame details obtained from the
@@ -557,7 +566,7 @@ by supplying their username, for example:
     Data(data_list=boardgames.data_list)
 
 The API Key
-+++++++++++
+~~~~~~~~~~~
 
 Getting a Google API Key is beyond the scope of this document; one method is
 provided by Google https://support.google.com/googleapi/answer/6158862?hl=en
@@ -571,7 +580,7 @@ Cloud Dashboard (https://console.cloud.google.com/apis/dashboard) and then
 select/enable the Google Sheets API from the list of services.
 
 The Sheet ID
-++++++++++++
+~~~~~~~~~~~~
 
 A Google Sheet is only accessible by you when first created. To make it
 allow **protograf** code access to the data, you **must** share the
@@ -587,7 +596,7 @@ https://docs.google.com/spreadsheets/d/1vRfwxVjafnZVmgjazQKr2UQDyGYYK8GXJhQAPlzJ
 The string of characters between the ``/d/`` and the ``/edit`` is the **sheet ID**.
 
 The Sheet Name
-++++++++++++++
+~~~~~~~~~~~~~~
 
 The name of the sheet you want to access is displayed in the bottom section of
 display on a tab.  The default name of the first sheet is ``Sheet1``.
@@ -617,7 +626,7 @@ and its developers!
 .. _deck-data-filters:
 
 Data Example 8. Filters
------------------------
++++++++++++++++++++++++
 `↑ <table-of-contents-crddk_>`_
 
 This example shows how data, in this case sourced from a "list of lists"
@@ -684,7 +693,6 @@ listed below.
 Although far more comprehensive filtering could be developed, its probably
 best to do that in your original data source; tools like Excel or Open Office
 have very sophisticated options to filter and extract data.
-
 
 
 .. _the-matrix-command:

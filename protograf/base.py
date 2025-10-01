@@ -6,6 +6,7 @@ Base shape class for protograf
 from collections import namedtuple
 import copy
 from enum import Enum
+import functools
 import inspect
 import json
 import io
@@ -53,8 +54,10 @@ from protograf.globals import unit
 from protograf.utils.messaging import feedback
 from protograf.utils.structures import (
     Bounds,
+    DirectionGroup,
     GridShape,
     OffsetProperties,
+    Point,
     LookupType,
     TemplatingType,
     UnitProperties,
@@ -233,6 +236,11 @@ class BaseCanvas:
         self.wrap = self.defaults.get("wrap", False)
         self.align = self.defaults.get("align", "centre")  # centre,left,right,justify
         self._alignment = TEXT_ALIGN_LEFT  # see to_alignment()
+        # ---- icon font
+        self.icon_font_name = self.defaults.get("font_name", DEFAULT_FONT)
+        self.icon_font_file = self.defaults.get("font_file", None)
+        self.icon_font_size = self.defaults.get("font_size", None)
+        self.icon_font_style = self.defaults.get("font_style", None)
         # ---- grid cut marks
         self.grid_marks = self.defaults.get("grid_marks_marks", False)
         grid_marks_stroke = self.defaults.get("grid_marks_stroke", "gray")
@@ -433,6 +441,10 @@ class BaseCanvas:
         self.steps = self.defaults.get("steps", [])
         self.x_c = self.defaults.get("xc", 0)
         self.y_c = self.defaults.get("yc", 0)
+        # ---- star
+        self.rays = self.defaults.get("rays", 5)
+        self.inner_fraction = self.defaults.get("inner_fraction", 0.5)
+        self.show_radii = self.defaults.get("show_radii", False)
         # ---- radii (circle, hex, rect, polygon)
         self.radii = self.defaults.get("radii", [])
         self.radii_stroke = self.defaults.get("radii_stroke", self.stroke)
@@ -496,7 +508,12 @@ class BaseCanvas:
         self.flip = self.defaults.get("flip", None)
         # ---- triangle / polyomino
         self.hand = self.defaults.get("hand", None)
-        # ---- shapes with centre (hex, circle, rect, rhombus, poly, ellipse)
+        # ---- shapes with vertices (hex, circle, rect, rhombus, poly, ellipse, star)
+        self.vertex_shapes = self.defaults.get("vertex_shapes", [])
+        self.vertex_shapes_rotated = self.defaults.get(
+            "self.vertex_shapes_rotated", False
+        )
+        # ---- shapes with centre (hex, circle, rect, rhombus, poly, ellipse, star)
         self.centre_shapes = self.defaults.get("centre_shapes", [])
         self.centre_shape = self.defaults.get("centre_shape", "")
         self.centre_shape_mx = self.defaults.get("centre_shape_mx", 0)
@@ -556,6 +573,14 @@ class BaseCanvas:
         self.paths_dashed = self.defaults.get("paths_dashed", self.dashed)
         self.paths_wave_style = self.defaults.get("paths_wave_style", None)
         self.paths_wave_height = self.defaults.get("paths_wave_height", 0)
+        self.perbii_shapes = self.defaults.get("perbii_shapes", [])
+        self.perbii_shapes_rotated = self.defaults.get(
+            "self.perbii_shapes_rotated", False
+        )
+        self.radii_shapes = self.defaults.get("radii_shapes", [])
+        self.radii_shapes_rotated = self.defaults.get(
+            "self.radii_shapes_rotated", False
+        )
         # ---- hexagons
         self.hid = self.defaults.get("id", "")  # HEX ID
         self.hex_rows = self.defaults.get("hex_rows", 0)
@@ -603,6 +628,7 @@ class BaseCanvas:
         # ---- dice / domino
         self.pip_stroke = self.defaults.get("pip_stroke", self.stroke)
         self.pip_fill = self.defaults.get("pip_fill", self.stroke)  # see draw_piphead()
+        self.pip_shape = self.defaults.get("pip_shape", "circle")
         self.pip_fraction = self.defaults.get("pip_fraction", 0.2)
         # ---- mesh
         self.mesh = self.defaults.get("mesh", None)
@@ -779,6 +805,13 @@ class BaseShape:
         self.wrap = kwargs.get("wrap", base.wrap)
         self.align = kwargs.get("align", base.align)  # centre,left,right,justify
         self._alignment = TEXT_ALIGN_LEFT  # see to_alignment()
+        # ---- icon font
+        self.icon_font_name = kwargs.get("icon_font_name", base.icon_font_name)
+        self.icon_font_file = kwargs.get("icon_font_file", base.icon_font_file)
+        self.icon_font_size = self.kw_float(
+            kwargs.get("icon_font_size", base.icon_font_size)
+        )
+        self.icon_font_style = kwargs.get("icon_font_style", base.icon_font_style)
         # ---- order (hex, circle, rect)
         self.order_all = kwargs.get("order_all", base.order_all)
         self.order_first = kwargs.get("order_first", base.order_first)
@@ -991,6 +1024,12 @@ class BaseShape:
         self.sides = kwargs.get("sides", base.sides)
         self.points = kwargs.get("points", base.points)
         self.steps = kwargs.get("steps", base.steps)
+        # ---- star
+        self.rays = self.kw_int(kwargs.get("rays", base.rays))
+        self.inner_fraction = self.kw_float(
+            kwargs.get("inner_fraction", base.inner_fraction)
+        )  # star
+        self.show_radii = self.kw_bool(kwargs.get("show_radii", base.show_radii))
         # ---- radii (circle, hex, polygon, rect, compass)
         self.radii = kwargs.get("radii", base.radii)
         self.radii_stroke = kwargs.get("radii_stroke", self.stroke)
@@ -1063,7 +1102,12 @@ class BaseShape:
         self.flip = kwargs.get("flip", base.flip)
         # ---- triangle / polyomino
         self.hand = kwargs.get("hand", base.hand)
-        # ---- shapes with centre (hex, circle, rect, rhombus, poly, ellipse)
+        # ---- shapes with vertices (hex, circle, rect, rhombus, poly, ellipse, star)
+        self.vertex_shapes = kwargs.get("vertex_shapes", [])
+        self.vertex_shapes_rotated = self.kw_bool(
+            kwargs.get("vertex_shapes_rotated", False)
+        )
+        # ---- shapes with centre (hex, circle, rect, rhombus, poly, ellipse, star)
         self.centre_shapes = kwargs.get("centre_shapes", [])
         self.centre_shape = kwargs.get("centre_shape", "")
         self.centre_shape_mx = self.kw_float(
@@ -1133,6 +1177,14 @@ class BaseShape:
         self.paths_dashed = kwargs.get("paths_dashed", self.dashed)
         self.paths_wave_style = kwargs.get("paths_wave_style", base.paths_wave_style)
         self.paths_wave_height = kwargs.get("paths_wave_height", base.paths_wave_height)
+        self.perbii_shapes = kwargs.get("perbii_shapes", [])
+        self.perbii_shapes_rotated = self.kw_bool(
+            kwargs.get("perbii_shapes_rotated", False)
+        )
+        self.radii_shapes = kwargs.get("radii_shapes", [])
+        self.radii_shapes_rotated = self.kw_bool(
+            kwargs.get("radii_shapes_rotated", False)
+        )
         # ---- hexagons
         self.hid = kwargs.get("id", base.hid)  # HEX ID
         self.hex_rows = self.kw_int(kwargs.get("hex_rows", base.hex_rows), "hex_rows")
@@ -1194,6 +1246,7 @@ class BaseShape:
         # ---- dice / domino
         self.pip_stroke = kwargs.get("pip_stroke", base.pip_stroke)
         self.pip_fill = kwargs.get("pip_fill", base.pip_fill)
+        self.pip_shape = kwargs.get("pip_shape", base.pip_shape)
         self.pip_fraction = self.kw_float(
             kwargs.get("pip_fraction", base.pip_fraction), "pip_fraction"
         )
@@ -1512,12 +1565,12 @@ class BaseShape:
         if self.petals_style:
             if _lower(self.petals_style) not in [
                 "triangle",
-                "curve",
+                "sun",
                 "rectangle",
                 "petal",
                 "windmill",
                 "t",
-                "c",
+                "s",
                 "r",
                 "p",
                 "w",
@@ -1581,6 +1634,11 @@ class BaseShape:
         if self.star_pattern:
             if _lower(self.star_pattern) not in ["random", "cluster", "r", "c"]:
                 issue.append(f'"{self.pattern}" is an invalid starfield pattern!')
+                correct = False
+        # ---- dice pip shape
+        if self.pip_shape:
+            if _lower(self.pip_shape) not in ["circle", "diamond", "d", "c"]:
+                issue.append(f'"{self.pip_shape}" is an invalid pip_shape!')
                 correct = False
         # ---- rectangle - corners
         if self.corners_style:
@@ -2171,6 +2229,116 @@ class BaseShape:
 
         return keys
 
+    def handle_custom_values(self, the_element, ID):
+        """Process custom values for a Shape's properties.
+
+        Custom values should be stored in self.deck_data as a list of dicts:
+        e.g. [{'SUIT': 'hearts', 'VALUE': 10}, {'SUIT': 'clubs', 'VALUE': 10}]
+        which are used for a set of Cards, or similar placeholder items.
+
+        Values can be accessed via a Jinja template using e.g. T("{{ SUIT }}")
+        """
+
+        def processed_value(value):
+
+            if isinstance(value, (BaseShape, muShape, muPage)):
+                return None
+
+            elif isinstance(value, Template):
+                if not self.deck_data:
+                    feedback(
+                        "Cannot use T() or S() command without Data already defined!",
+                        False,
+                    )
+                    feedback(
+                        "Check that Data command is used and has valid data before Deck command is called.",
+                        True,
+                    )
+                record = self.deck_data[ID]
+                try:
+                    custom_value = value.render(record)
+                    # print('### Template', f'{ID=} {key=} {custom_value=}')
+                    return custom_value
+                except jinja2.exceptions.UndefinedError as err:
+                    feedback(f"Unable to process data with this template ({err})", True)
+                except Exception as err:
+                    feedback(f"Unable to process data with this template ({err})", True)
+
+            elif isinstance(value, TemplatingType):
+                if not self.deck_data:
+                    feedback(
+                        "Cannot use T() or S() command without Data already defined!",
+                        False,
+                    )
+                    feedback(
+                        "Check that Data command is used and has valid data before Deck command is called.",
+                        True,
+                    )
+                record = self.deck_data[ID]
+                try:
+                    custom_value = value.template.render(record)
+                    # print('### TT', f'{ID=} {key=} {custom_value=} {value.function=}')
+                    if value.function:
+                        try:
+                            custom_value = value.function(custom_value)
+                        except Exception as err:
+                            feedback(
+                                f"Unable to process data with function '{ value.function}' ({err})",
+                                True,
+                            )
+
+                    return custom_value
+                except jinja2.exceptions.UndefinedError as err:
+                    feedback(f"Unable to process data with this template ({err})", True)
+                except Exception as err:
+                    feedback(f"Unable to process data with this template ({err})", True)
+
+            elif isinstance(value, LookupType):
+                record = self.deck_data[ID]
+                lookup_value = record[value.column]
+                custom_value = value.lookups.get(lookup_value, None)
+                return custom_value
+                # print('### LookupType', f'{ID=} {key=} {custom_value=}', '=>', getattr(new_element, key))
+            elif isinstance(value, PosixPath):
+                # print(f'### HCV {ID=} {key=} {value=}')
+                return None
+            else:
+                raise NotImplementedError(f"Cannot handle value of type: {type(value)}")
+
+            return None
+
+        new_element = None
+        # print('### handle_custom_values ShapeType ::', type(the_element))
+        if isinstance(the_element, BaseShape):
+            new_element = copy.copy(the_element)
+            keys = vars(the_element).keys()
+            for key in keys:
+                value = getattr(the_element, key)
+                # Note - Hexagon orientation is an example of an Enum
+                if value is None or isinstance(
+                    value, (str, int, float, list, tuple, range, Enum)
+                ):
+                    continue
+                elif isinstance(value, dict):
+                    updated = False
+                    for dkey, val in value.items():
+                        if val is None or isinstance(
+                            val, (str, int, float, list, tuple, range)
+                        ):
+                            continue
+                        custom_value = processed_value(val)
+                        if custom_value is not None:
+                            value[dkey] = custom_value
+                            updated = True
+                    if updated:
+                        setattr(new_element, key, value)
+                else:
+                    custom_value = processed_value(value)
+                    if custom_value is not None:
+                        setattr(new_element, key, custom_value)
+            return new_element
+        return the_element  # no changes needed or made
+
     def draw_multi_string(
         self, canvas, xm, ym, string, align=None, rotation=0, **kwargs
     ):
@@ -2632,116 +2800,6 @@ class BaseShape:
                 canvas.draw_circle((point.x, point.y), 1)
             self.set_canvas_props(cnv=canvas, index=None, **kwargs)
 
-    def handle_custom_values(self, the_element, ID):
-        """Process custom values for a Shape's properties.
-
-        Custom values should be stored in self.deck_data as a list of dicts:
-        e.g. [{'SUIT': 'hearts', 'VALUE': 10}, {'SUIT': 'clubs', 'VALUE': 10}]
-        which are used for a set of Cards, or similar placeholder items.
-
-        Values can be accessed via a Jinja template using e.g. T("{{ SUIT }}")
-        """
-
-        def processed_value(value):
-
-            if isinstance(value, (BaseShape, muShape, muPage)):
-                return None
-
-            elif isinstance(value, Template):
-                if not self.deck_data:
-                    feedback(
-                        "Cannot use T() or S() command without Data already defined!",
-                        False,
-                    )
-                    feedback(
-                        "Check that Data command is used and has valid data before Deck command is called.",
-                        True,
-                    )
-                record = self.deck_data[ID]
-                try:
-                    custom_value = value.render(record)
-                    # print('### Template', f'{ID=} {key=} {custom_value=}')
-                    return custom_value
-                except jinja2.exceptions.UndefinedError as err:
-                    feedback(f"Unable to process data with this template ({err})", True)
-                except Exception as err:
-                    feedback(f"Unable to process data with this template ({err})", True)
-
-            elif isinstance(value, TemplatingType):
-                if not self.deck_data:
-                    feedback(
-                        "Cannot use T() or S() command without Data already defined!",
-                        False,
-                    )
-                    feedback(
-                        "Check that Data command is used and has valid data before Deck command is called.",
-                        True,
-                    )
-                record = self.deck_data[ID]
-                try:
-                    custom_value = value.template.render(record)
-                    # print('### TT', f'{ID=} {key=} {custom_value=} {value.function=}')
-                    if value.function:
-                        try:
-                            custom_value = value.function(custom_value)
-                        except Exception as err:
-                            feedback(
-                                f"Unable to process data with function '{ value.function}' ({err})",
-                                True,
-                            )
-
-                    return custom_value
-                except jinja2.exceptions.UndefinedError as err:
-                    feedback(f"Unable to process data with this template ({err})", True)
-                except Exception as err:
-                    feedback(f"Unable to process data with this template ({err})", True)
-
-            elif isinstance(value, LookupType):
-                record = self.deck_data[ID]
-                lookup_value = record[value.column]
-                custom_value = value.lookups.get(lookup_value, None)
-                return custom_value
-                # print('### LookupType', f'{ID=} {key=} {custom_value=}', '=>', getattr(new_element, key))
-            elif isinstance(value, PosixPath):
-                # print(f'### HCV {ID=} {key=} {value=}')
-                return None
-            else:
-                raise NotImplementedError(f"Cannot handle value of type: {type(value)}")
-
-            return None
-
-        new_element = None
-        # print('### handle_custom_values ShapeType ::', type(the_element))
-        if isinstance(the_element, BaseShape):
-            new_element = copy.copy(the_element)
-            keys = vars(the_element).keys()
-            for key in keys:
-                value = getattr(the_element, key)
-                # Note - Hexagon orientation is an example of an Enum
-                if value is None or isinstance(
-                    value, (str, int, float, list, tuple, range, Enum)
-                ):
-                    continue
-                elif isinstance(value, dict):
-                    updated = False
-                    for dkey, val in value.items():
-                        if val is None or isinstance(
-                            val, (str, int, float, list, tuple, range)
-                        ):
-                            continue
-                        custom_value = processed_value(val)
-                        if custom_value is not None:
-                            value[dkey] = custom_value
-                            updated = True
-                    if updated:
-                        setattr(new_element, key, value)
-                else:
-                    custom_value = processed_value(value)
-                    if custom_value is not None:
-                        setattr(new_element, key, custom_value)
-            return new_element
-        return the_element  # no changes needed or made
-
     def draw_border(self, cnv, border: tuple, ID: int = None):
         """Draw a border line based its settings."""
         # feedback(f'### border {self.__class__.__name__} {border=} {ID=}')
@@ -2782,7 +2840,7 @@ class BaseShape:
         # ---- multi-directions
         shape_name = self.__class__.__name__.replace("Shape", "")
         _bdirections = tools.validated_directions(
-            bdirections, tools.DirectionGroup.COMPASS, f"{shape_name.lower()} border"
+            bdirections, DirectionGroup.COMPASS, f"{shape_name.lower()} border"
         )
         for bdirection in _bdirections:
             if not bdirection:
@@ -2902,17 +2960,27 @@ class BaseShape:
                 dashed=dashed,
             )
 
-    def can_draw_centred_shape(self, centre_shape) -> bool:
+    def can_draw_centred_shape(
+        self, centre_shape, fail_on_invalid: bool = True
+    ) -> bool:
         """Test if a given Shape can be drawn at centre of another."""
+        if fail_on_invalid and not isinstance(centre_shape, BaseShape):
+            _type = type(centre_shape)
+            feedback(f"A shape is required not a {_type} ({centre_shape})!", True)
         cshape_name = centre_shape.__class__.__name__
         if cshape_name in GRID_SHAPES_WITH_CENTRE:
             return True
         else:
             _name = cshape_name.replace("Shape", "")
-            feedback(f"Cannot draw a centered {_name}!")
+            feedback(f"Cannot draw a centered {_name}!", True)
         return False
 
-    def draw_centred_shapes(self, centre_shapes, cx: float, cy: float):
+    def draw_centred_shapes(self, centre_shapes: list, cx: float, cy: float):
+        """Draw one or more shapes with thei centre at a Point.
+
+        Args:
+
+        """
         for item in centre_shapes:
             _shape_mx, _shape_my = 0, 0
             if isinstance(item, tuple):
@@ -2927,6 +2995,123 @@ class BaseShape:
                 _shape.draw(
                     _abs_cx=cx + self.unit(_shape_mx),
                     _abs_cy=cy + self.unit(_shape_my),
+                )
+
+    def draw_vertex_shapes(
+        self, vertex_shapes: list, vertices: list, centre: Point, rotated: bool = False
+    ):
+        for idx, vshape in enumerate(vertex_shapes):
+            if vshape is None or vshape == "":
+                continue
+            if idx > len(vertices) - 1:
+                continue
+            if self.can_draw_centred_shape(vshape):
+                cx, cy = vertices[idx][0], vertices[idx][1]
+                if rotated:
+                    compass, rotation = geoms.angles_from_points(centre, vertices[idx])
+                    # print(f"{idx} {compass=} {rotation=}")
+                else:
+                    rotation = 0
+                vshape.draw(
+                    _abs_cx=cx,  # + self.unit(vshape.mx),  # NO default move
+                    _abs_cy=cy,  # + self.unit(vshape.my),  # NO default move
+                    rotation=compass - 180.0,
+                )
+
+    def draw_radii_shapes(
+        self,
+        cnv,
+        radii_shapes: list,
+        vertexes: list,
+        centre: Point,
+        direction_group: DirectionGroup = None,
+        rotated: bool = False,
+    ):
+        """Draw shape(s) along the radii lines of a Shape.
+
+        Args:
+            radii_shapes (list):
+                list of tuples of (dir, shape, offset) where:
+                * dir is a direction name
+                * shape is an instance of a Shape
+                * offset is optional float - the fractional distance along the
+                  line from the centre to the edge at which the shape is drawn;
+                  default is 1 i.e. at the edge
+            vertexes (list):
+                list of points for the vertices
+            centre (Point):
+                the centre of the Shape
+            direction_group (DirectionGroup):
+                used to define list of permissible directions for the Shape
+            rotated (bool):
+                if True, rotate radii_shapes relative to centre
+        """
+
+        @functools.cache
+        def get_circle_vertexes(directions, centre) -> list:
+            """Get a list of vertexes where radii intersect the circumference"""
+            angles = tools.sequence_split(
+                directions,
+                unique=False,
+                as_int=False,
+                as_float=True,
+                sep=" ",
+                msg="ABC",
+            )
+            vertexes = []
+            radius = self._u.radius
+            for angle in angles:
+                vtx = geoms.point_on_circle(centre, radius, angle)
+                vertexes.append(vtx)
+            return vertexes
+
+        err = "The radii_shapes must contain direction(s) and shape"
+        if direction_group != DirectionGroup.CIRCULAR:  # see below for calc.
+            radii_dict = self.calculate_radii(cnv, centre, vertexes)
+        for item in radii_shapes:
+            if isinstance(item, tuple):
+                _shape_fraction = 1.0
+                if len(item) < 2:
+                    feedback(f"{err} - not {item}")
+                if direction_group == DirectionGroup.CIRCULAR:
+                    vertexes = get_circle_vertexes(item[0], centre)
+                    radii_dict = self.calculate_radii(cnv, centre, vertexes)
+                    _dirs = radii_dict.keys()
+                else:
+                    _dirs = tools.validated_directions(
+                        item[0], direction_group, "direction"
+                    )
+                _shape = item[1]
+                if len(item) >= 3:
+                    _shape_fraction = tools.as_float(item[2], "fraction")
+            else:
+                feedback(f"{err} - not {item}")
+            self.can_draw_centred_shape(_shape, True)  # could stop here
+            for _dir in _dirs:
+                # ---- calculate shape centre
+                _radii = radii_dict[_dir]
+                if _shape_fraction <= 1:
+                    shape_centre = geoms.fraction_along_line(
+                        centre, _radii.point, _shape_fraction
+                    )  # inside Shape boundaries
+                else:
+                    shape_centre = geoms.point_in_direction(
+                        centre, _radii.point, _shape_fraction - 1
+                    )  # outside Shape boundaries
+                # print(f"*** {direction_group} {_radii=} {shape_centre=}")
+                # ---- calculate shape rotation
+                if rotated:
+                    # compass, rotation = geoms.angles_from_points(centre, shape_centre)
+                    compass, _rotation = _radii.compass, _radii.angle
+                    # print(f"*** {self.__class__.__name__} {_dir} {compass=} {_rotation=}")
+                    _rotation = compass - 180.0
+                else:
+                    _rotation = 0
+                # ---- draw radii shape
+                _shape.draw(
+                    _abs_cx=shape_centre.x,
+                    _abs_cy=shape_centre.y,
+                    rotation=_rotation,
                 )
 
 

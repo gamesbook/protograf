@@ -102,7 +102,7 @@ Circle(cx=2, cy=1.5, radius=1,
        petals_offset=0.2,
        petals_stroke_width=1,
        petals_dotted=1,
-       petals_height=0.5,
+       petals_height=0.25,
        petals_fill="gray")
 
 Circle(cx=2, cy=4.5, radius=1,
@@ -111,7 +111,30 @@ Circle(cx=2, cy=4.5, radius=1,
        petals_style="p",
        petals_offset=0.1,
        petals_stroke_width=2,
-       petals_height=0.8,
+       petals_height=0.25,
+       petals_stroke="red",
+       petals_fill="yellow")
+PageBreak()
+
+# ---- circle petals_sun
+Blueprint()
+Text(common=txt, text="Circle: petals; sun style")
+Circle(cx=2, cy=1.5, radius=1,
+       petals=11,
+       petals_style="sun",
+       petals_offset=0.2,
+       petals_stroke_width=1,
+       petals_dotted=1,
+       petals_height=0.5,
+       petals_fill="gray")
+
+Circle(cx=2, cy=4.5, radius=1,
+       fill_stroke="yellow",
+       petals=8,
+       petals_style="s",
+       petals_offset=0.1,
+       petals_stroke_width=2,
+       petals_height=0.5,
        petals_stroke="red",
        petals_fill="yellow")
 PageBreak()
@@ -183,6 +206,7 @@ Save(
         "radii",
         "petals_triangle",
         "petals_petal",
+        "petals_sun",
         "radii_labels",
         "circle_slices",
         "circle_nested",

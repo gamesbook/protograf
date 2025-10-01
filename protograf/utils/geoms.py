@@ -11,7 +11,7 @@ from typing import Any, List
 # local
 from protograf.utils.messaging import feedback
 from protograf.utils.structures import Point
-from protograf.utils.support import numbers
+from protograf.utils.support import numbers, round_tiny_float
 
 log = logging.getLogger(__name__)
 DEBUG = False
@@ -31,13 +31,13 @@ def polygon_vertices(
     Doc Test:
 
     >>> P = polygon_vertices(6, 1.0, Point(2,2))
-     >>> assert P == [ \
-         Point(x=2.866025403784439, y=1.5), \
-         Point(x=2.866025403784439, y=2.5), \
-         Point(x=2.0, y=3.0), \
-         Point(x=1.1339745962155612, y=2.5), \
-         Point(x=1.1339745962155614, y=1.5), \
-         Point(x=1.9999999999999998, y=1.0)]
+    >>> assert P == [ \
+    Point(x=2.5, y=1.1339745962155614), \
+    Point(x=3.0, y=2.0), \
+    Point(x=2.5, y=2.8660254037844384), \
+    Point(x=1.5000000000000002, y=2.866025403784439), \
+    Point(x=1.0, y=2.0), \
+    Point(x=1.4999999999999996, y=1.1339745962155616)]
     """
     try:
         sides = int(sides)
@@ -289,6 +289,42 @@ def fraction_along_line(point_start: Point, point_end: Point, fraction: float) -
         point_start=point_start, point_end=point_end, distance=fraction_length
     )
     return fraction_point
+
+
+def point_in_direction(
+    point_start: Point, point_end: Point, distance_factor: float = 1.0
+) -> Point:
+    """
+    Calculate new Point in the same direction as a line segment defined by end Points
+
+    Args:
+        point_start (Point):
+            coordinates of the first point (x1, y1)
+        point_end (Point):
+            coordinates of the second point (x2, y2)
+        distance_factor (float):
+             Distance of the third point relative to the line segment.
+             If 1.0, then third point is same distance from point_end as
+             point_end is from point_start
+
+    Returns:
+        Point: coordinates of the third point (x3, y3).
+
+    Doc Test:
+    >>> point1 = Point(1, 2)
+    >>> point2 = Point(4, 6)
+    >>> point_in_direction(point1, point2)
+    Point(x=7.0, y=10.0)
+    >>> point_in_direction(point1, point2, distance_factor=0.5)
+    Point(x=5.5, y=8.0)
+    """
+    # direction vector from point_start to point_end
+    dx = point_end.x - point_start.x
+    dy = point_end.y - point_start.y
+    # extend the vector from point_end by the distance_factor
+    x3 = point_end.x + dx * distance_factor
+    y3 = point_end.y + dy * distance_factor
+    return Point(x3, y3)  # coordinates of the third point
 
 
 def point_from_angle(start: Point, length: float, angle: float) -> Point:
@@ -587,21 +623,6 @@ def rotate_point_around_point(
     final_x = rotated_x + cx
     final_y = rotated_y + cy
     return Point(round(final_x, 8), round(final_y, 8))
-
-
-def round_tiny_float(number: float, threshold: float = 1e-10):
-    """If the absolute value of float is less than threshold, set to zero.
-
-    Doc Test:
-
-    >>> round_tiny_float(1e-12)
-    0.0
-    >>> round_tiny_float(0.001)
-    0.001
-    """
-    if abs(number) < threshold:
-        return 0.0
-    return number
 
 
 def rectangles_overlap(rect1, rect2) -> bool:

@@ -99,11 +99,6 @@ EquilateralTriangle()
 PageBreak()
 
 Blueprint(stroke_width=blue_width)
-Text(common=header, text="Compass")
-Compass()
-PageBreak()
-
-Blueprint(stroke_width=blue_width)
 Text(common=header, text="Hexagons: rows=2, cols=2")
 Hexagons(rows=2, cols=2, margin_bottom=0, margin_left=0)
 PageBreak()
@@ -220,7 +215,7 @@ Save(output='png',
         'blueprint', 'blueprint-sub', 'text', 'line', 'rectangle',
         'circle', 'hexagon-flat', 'hexagon-pointy', 'rhombus',
         'trapezoid', 'star', 'ellipse', 'polygon',  'arrow',
-        'rightangle',  'equiangle', 'compass',  'hexagons-2x2',
+        'rightangle',  'equiangle',  'hexagons-2x2',
         'grid', 'arc', 'bezier', 'polyline',
         'shape', 'sector', 'sequence', 'square',
         'stadium', 'starfield', 'dot', 'dotgrid', 'fill-stroke',

@@ -1,6 +1,25 @@
 protograf Changes
 =================
 
+2025-10-01 (0.3.1)
+-------------------
+- Add `sun` to Circle's petal style
+- Recreate Star shape with revised properties
+- Add `slices` property to Star shape (Compass Rose example)
+- Patch Chord shape
+- Add `arrow` property to Chord shape
+- Add `vertex_shapes` property to key shapes
+- Add `radii_shapes` property to key shapes
+- Removed Compass shape
+- Patch pointy Hexagon (centre error)
+- Patch issue with speed of GIF creation; add looping
+- Patch centering for Images on a Layout
+- Add `radii` for Rhombus and EquilateralTriangle
+- Add `diamond` as a pip shape for D6
+- Update docs for `Working with Cards`
+- Add inline delimiters to show images in HTML Text
+- Add docs for `Cards: Images, Symbols and Fonts`
+
 2025-09-16 (0.3.0)
 -------------------
 - Refactor large complex shapes into own modules

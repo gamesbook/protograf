@@ -37,7 +37,6 @@ Shape Index
 -  `Blueprint`_
 -  `Bezier`_
 -  `Circle`_
--  `Compass`_
 -  `Chord`_
 -  `Dot`_
 -  `DotGrid`_
@@ -783,124 +782,6 @@ Example 1. Default Circle
 ===== ======
 
 
-.. _compass-command:
-
-Compass
-~~~~~~~
-`↑ <shape-index_>`_
-
-A Compass is often thought of a specific device used for navigation. Here,
-its abstracted somewhat to indicate directional lines - specified by traditional
-compass directions - drawn within an enclosing shape; by default, circle.
-
-Example 1. Default Compass
-++++++++++++++++++++++++++
-
-.. |cmp| image:: images/defaults/compass.png
-   :width: 330
-
-===== ======
-|cmp| This example shows the shape constructed using the command with only
-      defaults:
-
-      .. code:: python
-
-          Compass()
-
-      It has the following properties based on the defaults:
-
-      - upper-left at x-position ``1`` cm and at y-position ``1`` cm
-      - diameter of ``1`` cm
-      - lines in all 8 directions, extending from the centre outwards
-
-      The lines  represent the primary |dash| North, South, East and West |dash| and
-      secondary |dash| North-East, South-East, North-West and South-West |dash|
-      directions.
-
-===== ======
-
-Example 2. Customised Compass
-+++++++++++++++++++++++++++++
-
-.. |cm2| image:: images/customised/compass.png
-   :width: 330
-
-===== ======
-|cm2| This example shows the shape constructed using the command with different
-      properties.
-
-      The **top-right  Compass** shape:
-
-      .. code:: python
-
-          Compass(
-              cx=3, cy=1,
-              radius=0.5,
-              perimeter='hexagon',
-              radii_stroke_width=2)
-
-      This Compass shape has the following properties:
-
-      - centred at x-position ``3`` cm and at y-position ``1`` cm
-      - *perimeter* - set as ``hexagon`` to define
-        where the six radial lines of the compass extend
-      - *radii_stroke_width* - set to ``2`` points; a much thicker line
-
-      For this Compass, the perimeter is a hexagon with a radius of ``0.5`` cm.
-
-      A hexagon has 6 possible radii, corresponding to its vertices.
-
-      .. NOTE::
-
-        Where *directions*, which define where the radial lines extend,
-        are not given, the default is ``*``, which means "all" radial lines.
-
-      The **centre Compass** shape:
-
-      .. code:: python
-
-          Compass(
-              cx=2, cy=3,
-              height=2, width=3,
-              perimeter='rectangle',
-              directions="*",
-              radii_stroke="red")
-
-      This Compass shape has the following properties:
-
-      - centred at x-position ``2`` cm and at y-position ``3`` cm
-      - *perimeter* - set as ``rectangle`` to define
-        where the radial lines of the compass extend
-      - *directions* - where the radial lines extend; in this case
-        the ``*`` means "all" eight compass points
-      - *radii_stroke* - the line colors used
-
-      For this Compass, the perimeter is a rectangle with a height of ``2`` cm
-      and a width of ``3`` cm.
-
-      A rectangle has 8 possible radii, corresponding to its corners and the
-      centre of its sides.
-
-      The **lower-left Compass** shape:
-
-      .. code:: python
-
-          Compass(
-              cx=1, cy=5, radius=0.5,
-              perimeter='circle',
-              directions="ne nw s"
-          )
-
-      This Compass shape has the following properties:
-
-      - centred at x-position ``1`` cm and at y-position ``5`` cm
-      - radius - ``0.5`` cm
-      - *directions* - define where the radial lines extend; in this case to the
-        North-East, North-West and South
-
-===== ======
-
-
 .. _ellipse-command:
 
 Ellipse
@@ -961,6 +842,11 @@ Example 2. Customised Ellipse
 EquilateralTriangle
 ~~~~~~~~~~~~~~~~~~~
 `↑ <shape-index_>`_
+
+.. HINT::
+
+    For convenience, an `EquilateralTriangle()` can also be referenced as
+    an `EquTri()`.
 
 Example 1. Default EquilateralTriangle
 ++++++++++++++++++++++++++++++++++++++
@@ -2026,11 +1912,26 @@ Star
 ~~~~
 `↑ <shape-index_>`_
 
-A Star is a fivepointed shape; essentially made by joining points spaced
-equally around the circumference of a circle.
+A Star is a multi-pointed shape; essentially made by joining points spaced
+equally around the circumference of an outer circle to points spaced
+equally around the circumference of a smaller "inner" circle.
 
-To create more varied kinds of stars, see the triangle petal shapes that can
-be created using a :ref:`customised Circle <circleIndex>`.
+To create other kinds of stars, see the "triangle" or "sun" petal shapes
+that can be created using a :ref:`customised Circle <circleIndex>`.
+
+Properties
+++++++++++
+
+A Star shape has the following additional properties:
+
+- *rays* - number of arms of the Star; defaults to ``5``
+- *inner_fraction* - used to calulate the inner circle on which the other
+  points used to draw the Star are placed; as this gets smaller, the width
+  of the arms gets narrower; defaults to ``0.5`` (one-half)
+- *show_radii* - if ``True``, then lines are drawn from the Star centre
+  to all of the points (inner and outer); default is ``False``
+- *slices* - a list of color values that will be used to color the triangles
+  formed between the centre and the points of the rays
 
 Example 1. Default Star
 +++++++++++++++++++++++
@@ -2046,11 +1947,13 @@ Example 1. Default Star
 
           Star()
 
-      It has the following properties based on the defaults:
+      The Star has the following properties based on the defaults:
 
       - centre at x-position ``1`` cm and at y-position ``1`` cm
-      - "height" of ``1`` cm
-      - default of 5 points
+      - default *radius* of ``1`` cm
+      - default of ``5`` *rays*
+      - default *inner_fraction* of ``0.5``
+
 ===== ======
 
 Example 2. Customised Star
@@ -2065,21 +1968,103 @@ Example 2. Customised Star
 
       .. code:: python
 
-          Star(
-            cx=2, cy=3, radius=2,
-            fill="yellow",
-            stroke="yellow",
-            rotation=36)
+        Star(cx=1, cy=1, radius=1,
+             fill="red",
+             stroke="gold",
+             stroke_width=2,
+             inner_fraction=0.4,
+        )
+        Star(cx=2, cy=3, radius=1,
+             rays=6,
+             show_radii=True,
+             rotation=30,
+        )
+        Star(cx=3, cy=5, radius=1,
+             fill=None,
+             rays=12,
+             inner_fraction=0.1,
+        )
 
-      It has the following properties that differ from the defaults:
+      These have the following properties that differ from the defaults:
 
-      - centre at x-position ``2`` cm and at y-position ``3`` cm
-      - *radius* - ``2`` cm; length of the "arms"
-      - *fill* color - ``yellow`` for the interior of the Star
+      - centre defined at *cx* and  *cy*-position in cm
+      - *radius* - ``1`` cm; length of the "rays" from centre to outer points
+
+      The upper Star has the default number of *rays* i.e. ``5``, plus:
+
+      - *fill* color - ``red`` for the interior of the Star
       - *stroke* color - ``yellow`` for the outline of the Star
-      - *rotation* - 36 |deg| anti-clockwise about the centre
+      - *stroke_width*  - ``2`` for the line thickness of the outline of the Star
+      - *inner_fraction* - changed to ``0.4``; which cause the lines to
+        appear to "flatten" and align
+
+      The middle Star has:
+
+      - *rays* - changed to ``6``
+      - *show_radii* - if ``True``, then lines are drawn from the Star centre
+        to all of the points (inner and outer)
+      - *rotation* - 30 |deg| anti-clockwise about the centre
+
+      The lower Star has:
+
+      - *rays* - changed to ``12``
+      - *inner_fraction* - changed to ``0.1``; which causes the "spiky"
+        appearance
+
 ===== ======
 
+Example 3. Star with Slices
++++++++++++++++++++++++++++
+
+.. |st3| image:: images/customised/star_slices.png
+   :width: 330
+
+===== ======
+|st3| This example shows the shape constructed using the command with these
+      properties:
+
+      .. code:: python
+
+        Star(cx=2, cy=1, radius=1,
+             rays=4,
+             inner_fraction=0.33,
+             stroke_width=2,
+             slices=["black", "white"],
+             dot=0.02,
+             dot_stroke="red",
+         )
+        Star(cx=2, cy=4, radius=1,
+             slices=[
+                "#CE8F0C",
+                "#F8C40C",
+                "#F3BA0B",
+                "#DB9F0D",
+                "#F8C609",
+                "#CE8F0C",
+                "#F7C30D",
+                "#D59A0E",
+                "#CE8F0C",
+                "#F7C615",
+            ]
+        )
+
+      The upper Star has the following changes:
+
+      - *rays* - changed to ``4``
+      - *inner_fraction* - changed to ``0.33``; which makes rays more "spiky"
+      - *dot* -  a small red dot is drawn in the centre of the Star
+      - *slices* - only two colors are provided in the list, so they will be
+        reused across all the rays
+
+      The lower Star has the default number of *rays* i.e. ``5``, plus:
+
+      - *slices* - the list contains a unique color for each triangle.
+
+      **NOTE** that the coloring for the triangles starts in the righthand
+      side of the "top" triangle |dash| by default, a Star's rays always start
+      from 90 |deg|, or "north".
+
+===== ======
 
 .. _starfield-command:
 
@@ -2619,7 +2604,7 @@ Image
 Pedantically speaking, an image is not like the other shapes in the sense that
 it does not consist of lines and areas drawn by **protograf** itself.
 
-An "image" refers to an external file which is simply inserted into the drawing.
+An "image" refers to an external file which is simply inserted into the page.
 
 The Image shape shares a number of common aspects with other shapes - such as
 an x & y position, a width and a height, the ability to be rotated, and the
@@ -3098,8 +3083,10 @@ the desired output:
 - `Dot and Cross`_
 - `Fill and Stroke`_
 - `Rotation`_
+- `Radii Shapes`_
 - `Text Descriptions`_
 - `Transparency`_
+- `Vertex Shapes`_
 - `Wave Styles`_
 
 .. _coreShapeXY:
@@ -3474,6 +3461,158 @@ Example 4. Rotation with Hatches
       with a rotation of 30 |deg| each.
 
 ===== ======
+
+
+. _coreRadiiShapes:
+
+Radii Shapes
+~~~~~~~~~~~~
+`^ <shapes-common-properties_>`_
+
+A number of shapes, that are formed by drawing lines between a set of
+vertices ("corner points"), can be styled by placing other shapes which
+can be located those lines.
+
+Radii shapes are constructed using the following properties:
+
+- *radii_shapes* - this a list (values in ``[...]``) of value sets that
+  determine the "where and what" should be drawn along the line of
+  specific radius.  Each set, enclosed in brackets``(...)`` can consist
+  of three comma-separated parts:
+
+  - the first is the **direction**, or directions, of the relevant radii;
+    this can be a string e.g. ``"n e"`` or a list e.g. ``["n", "e"]``.
+    Note that for a ``Circle`` the direction is the number of degrees
+    (anti-clockwise from 0 |deg| in the east direction) whereas for
+    other shapes it will be a :ref:`compass direction <termsDirection>`.
+  - the second is the **shape** to be drawn
+  - the optional third part is the **fractional distance** along the line
+    at which the shape should be drawm; dy default this is ``1`` i.e. the
+    length of the radial line |dash| if it is less than ``1`` the radii
+    shape will be drawn inside of the parent shape; and if it is more than
+    ``1`` the radii shape will be drawn outside of, or away from, the parent
+    shape
+- *radii_shapes_rotated* - an optional property which, if ``True``, will
+  rotate the vertex shapes such they "point" away from the centre of the
+  parent shape
+
+Radii shapes can be constructed for:
+
+- :ref:`EquilateralTriangle <equilateraltriangle-command>`
+- :ref:`Hexagon <hexagon-command>`
+- :ref:`Rectangle <rectangle-command>`
+- :ref:`Rhombus <rhombus-command>`
+- :ref:`Circle <circle-command>`
+
+Example 1. Radii Shapes
+++++++++++++++++++++++++
+
+.. |vr1| image:: images/customised/radii_shapes.png
+   :width: 330
+
+===== ======
+|vr1| This example shows radii shapes constructed as follows:
+
+      .. code:: python
+
+        ccom = Common(radius=0.15, fill="gold", label_size=6)
+
+        Hexagon(
+            cx=1, cy=1,
+            radius=0.8,
+            orientation="pointy",
+            radii_shapes=[
+                ('n', circle(common=ccom, label="n")),
+                ('se', circle(common=ccom, label="se"), 1.25),
+                ('sw', circle(common=ccom, label="sw"), 0.5 ),
+            ],
+            radii_shapes_rotated=True,
+        )
+        Hexagon(
+            cx=3, cy=1,
+            radius=0.8,
+            radii_shapes=[
+               ('ne', circle(common=ccom, label="ne")),
+               ('se', circle(common=ccom, label="se"), 1.25),
+               ('sw', circle(common=ccom, label="sw"), 0.5),
+            ],
+            radii_shapes_rotated=True,
+        )
+        Rectangle(
+            cx=1, cy=3,
+            height=1, width=1.5,
+            radii_shapes=[
+                ('ne', circle(common=ccom, label="ne")),
+                ('se', circle(common=ccom, label="se")),
+                ('sw', circle(common=ccom, label="sw")),
+                ('nw', circle(common=ccom, label="nw")),
+            ],
+            radii_shapes_rotated=True,
+        )
+        Rhombus(
+            cx=3, cy=3,
+            width=1, height=1.5,
+            radii_shapes=[
+                ('n', circle(common=ccom, label="n")),
+                ('s', circle(common=ccom, label="s")),
+                ('e', circle(common=ccom, label="e")),
+                ('w', circle(common=ccom, label="w")),
+            ],
+            radii_shapes_rotated=True,
+        )
+        EquilateralTriangle(
+            cx=1, cy=5,
+            side=1.25,
+            radii_shapes=[
+                ('n', circle(common=ccom, label="n")),
+                ('se', circle(common=ccom, label="se")),
+                ('sw', circle(common=ccom, label="sw")),
+            ],
+            radii_shapes_rotated=True,
+        )
+        Circle(
+            cx=3, cy=5,
+            radius=0.75,
+            radii_shapes=[
+                ('30 90 150 210 270 330',
+                  circle(common=ccom, label="A")),
+            ],
+            radii_shapes_rotated=True,
+        )
+
+      All of these examples use a common settings in ``ccom`` to draw
+      the vertex shape |dash| a circle; but the *label* property set as
+      a visual indicator
+
+      Note that in some cases, setting the *fractional_distance* (the
+      third value in the set) causes the radii shape to be moved
+      closer to, or further away from, the centre.
+
+      The use of ``radii_shapes_rotated=True`` will means all of these
+      examples have the radii shapes rotated to face "away" from the
+      parent shape's centre.
+
+      .. HINT::
+
+          Although not shown above, multiple entries can be made for a given
+          direction; for example, to draw a circle and a dot along the ``ne``
+          radius for a rectangle |dash| in the case below the ``Dot()`` will
+          be drawn halfway along:
+
+          .. code:: python
+
+            Rectangle(
+                cx=1, cy=3,
+                height=1, width=1.5,
+                radii_shapes=[
+                    ('ne', circle(common=ccom, label="ne")),
+                    ('ne', dot(), 0.5),
+                ],
+                radii_shapes_rotated=True,
+            )
+
+===== ======
+
 
 .. _coreShapeText:
 
@@ -3904,6 +4043,98 @@ the change in ``x`` and ``y`` values as part of the set.
 ===== ======
 
 
+. _coreVertexShapes:
+
+Vertex Shapes
+~~~~~~~~~~~~~
+`^ <shapes-common-properties_>`_
+
+A number of shapes, that are formed by drawing lines between a set of
+vertices ("corner points"), can be styled by placing other shapes which
+will be centered on those points.
+
+Vertex shapes are constructed using the following properties:
+
+- *vertex_shapes* - this a list (values in ``[...]``) of shapes that
+  should be placed on vertices, in the order that these vertices are
+  drawn
+- *vertex_shapes_rotated* - an optional setting which, if ``True``, will
+  rotate the vertex shapes such they "point" away from the centre of the
+  parent shape
+
+Vertex shapes can be constructed for:
+
+- :ref:`EquilateralTriangle <equilateraltriangle-command>`
+- :ref:`Hexagon <hexagon-command>`
+- :ref:`Polygon <polygon-command>`
+- :ref:`Rectangle <rectangle-command>`
+- :ref:`Rhombus <rhombus-command>`
+- :ref:`Star <star-command>`
+
+Example 1. Vertex Shapes
+++++++++++++++++++++++++
+
+.. |vs1| image:: images/customised/vertex_shapes.png
+   :width: 330
+
+===== ======
+|vs1| This example shows vertex shapes constructed as follows:
+
+      .. code:: python
+
+        Rectangle(
+            cx=1, cy=1,
+            height=1,
+            width=1.5,
+            vertex_shapes=[
+                circle(radius=0.15, label="R")] * 4,
+            vertex_shapes_rotated=True)
+        Hexagon(
+            cx=3, cy=1,
+            radius=1,
+            vertex_shapes=[
+                circle(radius=0.15, label="H")] * 6,
+            vertex_shapes_rotated=True)
+        Polygon(
+            cx=1, cy=3,
+            sides=5,
+            radius=1,
+            vertex_shapes=[
+                circle(radius=0.15, label="P")] * 5,
+            vertex_shapes_rotated=True)
+        Trapezoid(
+            cx=3, cy=3,
+            width=1.5, top=1, height=1.25,
+            vertex_shapes=[
+                circle(radius=0.15, label="T")] * 5,
+            vertex_shapes_rotated=True)
+        EquilateralTriangle(
+            cx=1, cy=5,
+            side=1.5,
+            vertex_shapes=[
+                circle(radius=0.15, label="E")] * 3,
+            vertex_shapes_rotated=True)
+        Star(
+            cx=3, cy=5,
+            radius=1,
+            rays=5,
+            vertex_shapes=[
+                circle(radius=0.15, label="S")] * 5,
+            vertex_shapes_rotated=True)
+
+      All of these examples use the shortcut approach to create the correct
+      number of vertex shapes i.e. ``[SomeShape] * N`` where ``N`` is the
+      number of repeats of that shape.  In other cases, it could be that
+      this is a list of distinctly different shapes.  Any vertices which
+      should be omitted can just use the ``None`` value to indicate that.
+
+      The use of ``vertex_shapes_rotated=True`` will means all of these
+      examples have the vertex shapes rotated to face "away" from the
+      parent shape's centre.
+
+===== ======
+
+
 .. _coreWave:
 
 Wave Styles
@@ -3918,7 +4149,6 @@ and Rectangle (for details on those properties, see the section on
 :doc:`Customised Shapes <customised_shapes>`).  In addition, the lines used
 to construct a Polyshape and Polyline can also be styled like waves.
 
-
 Example 1. Radii and perbii
 +++++++++++++++++++++++++++
 
@@ -3926,7 +4156,7 @@ Example 1. Radii and perbii
    :width: 330
 
 ===== ======
-|ws1| This example shows centre shapes constructed as follows:
+|ws1| This example shows various shapes constructed as follows:
 
       .. code:: python
 

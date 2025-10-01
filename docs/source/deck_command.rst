@@ -17,10 +17,9 @@ It also assumes you have read through the section on
 .. _table-of-contents-deck:
 
 - `Overview`_
-
-  - `Primary Properties`_
-  - `Secondary Properties`_
-- `Property Examples`_
+- `Primary Deck Properties`_
+- `Secondary Deck Properties`_
+- `Deck Property Examples`_
 
 
 Overview
@@ -35,8 +34,8 @@ they get drawn.
 
 .. _deck-command-primary:
 
-Primary Properties
-------------------
+Primary Deck Properties
+=======================
 `↑ <table-of-contents-deck_>`_
 
 The following are key properties that will often need to be set for a
@@ -53,8 +52,8 @@ The following are key properties that will often need to be set for a
 
 .. _deck-command-secondary:
 
-Secondary Properties
---------------------
+Secondary Deck Properties
+=========================
 `↑ <table-of-contents-deck_>`_
 
 The following are other properties that can also be set for a ``Deck``:
@@ -127,8 +126,8 @@ The following are other properties that can also be set for a ``Deck``:
 
 .. _property-examples:
 
-Property Examples
-=================
+Deck Property Examples
+=======================
 `↑ <table-of-contents-deck_>`_
 
 - `Example 1. Defaults`_
@@ -681,13 +680,15 @@ Example 13. Deck Zones
 
         # design deck
         page_header = text(
-            text="protograf-cards_deck#14 // page:{{page}}",
+            text="protograf-cards // page:{{page}}",
             x=2.5, y=0.5, font_size=6, )
         silver = rectangle(
-             x=0.5, y=0.75, width=4, height=4,
+             x=0.5, y=0.75,
+             width=4, height=4,
              fill_stroke="silver")
         gold = rectangle(
-             x=0.5, y=3.75, width=4, height=3,
+             x=0.5, y=3.75,
+             width=4, height=3,
              fill_stroke="gold")
         Deck(
             cards=32,
@@ -710,7 +711,8 @@ Example 13. Deck Zones
         Card(
             '1-16',
             rectangle(
-                x=0.05, y=0.05, width=0.55, height=0.55,
+                x=0.05, y=0.05,
+                width=0.55, height=0.55,
                 stroke_width=0.75, rounding=0.1,
                 fill="silver",
                 label='{{sequence}}'),
@@ -718,7 +720,8 @@ Example 13. Deck Zones
         Card(
             '17-32',
             rectangle(
-                x=0.05, y=0.05, width=0.55, height=0.55,
+                x=0.05, y=0.05,
+                width=0.55, height=0.55,
                 stroke_width=0.75, rounding=0.1,
                 fill="gold",
                 label='{{sequence}}'),

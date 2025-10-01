@@ -9,6 +9,7 @@ import logging
 import math
 import os
 from pathlib import Path
+import sys
 from urllib.parse import urlparse
 
 # third party
@@ -25,7 +26,7 @@ from protograf.base import (
 )
 from protograf.shapes_circle import CircleShape
 from protograf.shapes_rectangle import RectangleShape
-from protograf.utils import colrs, geoms, tools, fonts
+from protograf.utils import colrs, geoms, support, tools, fonts
 from protograf.utils.tools import _lower
 from protograf.utils.constants import (
     BGG_IMAGES,
@@ -36,6 +37,7 @@ from protograf.utils.structures import (
     DirectionGroup,
     Point,
     PolyGeometry,
+    Radius,
 )  # named tuples
 from protograf.utils.support import CACHE_DIRECTORY
 
@@ -87,6 +89,9 @@ class ImageShape(BaseShape):
         else:
             x = self._u.x + self._o.delta_x
             y = self._u.y + self._o.delta_y
+        if self.use_abs_c:
+            x = self._abs_cx - width / 2.0
+            y = self._abs_cy - height / 2.0
         rotation = kwargs.get("rotation", self.rotation)
         # ---- load image
         # feedback(f'*** IMAGE {ID=} {_source=} {x=} {y=} {self.rotation=}')
@@ -111,8 +116,12 @@ class ImageShape(BaseShape):
                     True,
                 )
         # ---- centre
-        x_c = x + width / 2.0
-        y_c = y + height / 2.0
+        if self.use_abs_c:
+            x_c = self._abs_cx
+            y_c = self._abs_cy
+        else:
+            x_c = x + width / 2.0
+            y_c = y + height / 2.0
         # ---- cross
         self.draw_cross(cnv, x_c, y_c, rotation=kwargs.get("rotation"))
         # ---- dot
@@ -355,6 +364,19 @@ class ChordShape(BaseShape):
     Chord line on a Circle on a given canvas.
     """
 
+    def draw_arrow(self, cnv, point_a, point_b, **kwargs):
+        if (
+            self.arrow
+            or self.arrow_style
+            or self.arrow_position
+            or self.arrow_height
+            or self.arrow_width
+            or self.arrow_double
+        ):
+            self.draw_arrowhead(cnv, point_a, point_b, **kwargs)
+            if self.arrow_double:
+                self.draw_arrowhead(cnv, point_a, point_b, **kwargs)
+
     def draw(self, cnv=None, off_x=0, off_y=0, ID=None, **kwargs):
         """Draw a chord on a given canvas."""
         kwargs = self.kwargs | kwargs
@@ -363,14 +385,14 @@ class ChordShape(BaseShape):
         if not isinstance(self.shape, CircleShape):
             feedback("Shape must be a circle!", True)
         circle = self.shape
-        centre = circle.calculate_centre()
-        pt0 = geoms.point_on_circle(centre, circle.radius, self.angle)
-        pt1 = geoms.point_on_circle(centre, circle.radius, self.angle_1)
-        # feedback(f"*** {circle.radius=} {pt0=} {pt1=}")
-        x = self.unit(pt0.x) + self._o.delta_x
-        y = self.unit(pt0.y) + self._o.delta_y
-        x_1 = self.unit(pt1.x) + self._o.delta_x
-        y_1 = self.unit(pt1.y) + self._o.delta_y
+        centre = circle.calculate_centre()  # pt units!
+        pt0 = geoms.point_on_circle(centre, circle._u.radius, self.angle)
+        pt1 = geoms.point_on_circle(centre, circle._u.radius, self.angle_1)
+        # feedback(f"*** {circle._u.radius=} {pt0=} {pt1=}")
+        x = pt0.x  # + self._o.delta_x
+        y = pt0.y  # + self._o.delta_y
+        x_1 = pt1.x  # + self._o.delta_x
+        y_1 = pt1.y  # + self._o.delta_y
         # ---- draw chord
         # feedback(f"*** Chord {x=} {y=}, {x_1=} {y_1=}")
         mid_point = geoms.fraction_along_line(Point(x, y), Point(x_1, y_1), 0.5)
@@ -383,6 +405,8 @@ class ChordShape(BaseShape):
         # feedback(f"*** Chord {compass=} {rotation=}")
         # ---- dot
         self.draw_dot(cnv, (x_1 + x) / 2.0, (y_1 + y) / 2.0)
+        # ---- arrowhead
+        self.draw_arrow(cnv, Point(x, y), Point(x_1, y_1), **kwargs)
         # ---- text
         kwargs["rotation"] = rotation
         kwargs["rotation_point"] = mid_point
@@ -394,205 +418,6 @@ class ChordShape(BaseShape):
             centred=False,
             **kwargs,
         )
-
-
-class CompassShape(BaseShape):
-    """
-    Compass on a given canvas.
-    """
-
-    def __init__(self, _object=None, canvas=None, **kwargs):
-        super(CompassShape, self).__init__(_object=_object, canvas=canvas, **kwargs)
-        # overrides
-        self.radius = self.radius or self.diameter / 2.0
-        if self.cx is not None and self.cy is not None:
-            self.x = self.cx - self.radius
-            self.y = self.cy - self.radius
-            self.width = 2.0 * self.radius
-            self.height = 2.0 * self.radius
-        self.x_c = None
-        self.y_c = None
-        self.directions = self.directions or "*"  # compass should always have!
-
-    def draw_radius(self, cnv, ID, x, y, absolute=False):
-        # feedback(
-        #    f'*** Compass Radius {self.x_c=:.2f} {self.y_c=:.2f}; {x=:.2f} {y=:.2f}')
-        if absolute:
-            cnv.draw_line((self.x_c, self.y_c), (x, y))
-        else:
-            cnv.draw_line((self.x_c, self.y_c), (x + self.x_c, y + self.y_c))
-        keys = {}
-        keys["stroke"] = self.radii_stroke
-        keys["stroke_width"] = self.radii_stroke_width
-        keys["stroke_ends"] = self.radii_ends
-        keys["dashed"] = self.radii_dashed
-        keys["dotted"] = self.radii_dotted
-        self.set_canvas_props(cnv=cnv, index=ID, **keys)
-
-    def circle_radius(self, cnv, ID, angle):
-        """Calc x,y on circle and draw line from centre to it."""
-        x = self._u.radius * math.sin(math.radians(angle))
-        y = self._u.radius * math.cos(math.radians(angle))
-        self.draw_radius(cnv, ID, x, y)
-
-    def rectangle_radius(self, cnv, ID, vertices, angle, height, width):
-        """Calc x,y on rectangle and draw line from centre to it."""
-
-        def get_xy(radians, radius):
-            x = radius * math.sin(radians)
-            y = radius * math.cos(radians)
-            return x, y
-
-        # feedback(f'*** Compass {angle=}', False)
-        radians = math.radians(angle)
-        match angle:
-            # ---- primary directions
-            case 0:
-                x, y = get_xy(radians, 0.5 * height)
-                self.draw_radius(cnv, ID, x, y)
-            case 90:
-                x, y = get_xy(radians, 0.5 * width)
-                self.draw_radius(cnv, ID, x, y)
-            case 180:
-                x, y = get_xy(radians, 0.5 * height)
-                self.draw_radius(cnv, ID, x, y)
-            case 270:
-                x, y = get_xy(radians, 0.5 * width)
-                self.draw_radius(cnv, ID, x, y)
-            # ---- secondary directions
-            case 45:
-                x, y = vertices[2].x, vertices[2].y
-                self.draw_radius(cnv, ID, x, y, True)
-            case 135:
-                x, y = vertices[1].x, vertices[1].y
-                self.draw_radius(cnv, ID, x, y, True)
-            case 225:
-                x, y = vertices[0].x, vertices[0].y
-                self.draw_radius(cnv, ID, x, y, True)
-            case 315:
-                x, y = vertices[3].x, vertices[3].y
-                self.draw_radius(cnv, ID, x, y, True)
-            case _:
-                feedback(f"{angle} not in range", True)
-
-    def draw(self, cnv=None, off_x=0, off_y=0, ID=None, **kwargs):
-        """Draw compass on a given canvas."""
-        super().draw(cnv, off_x, off_y, ID, **kwargs)  # unit-based props
-        cnv = cnv if cnv else globals.canvas  # a new Page/Shape may now exist
-        # convert to using units
-        height = self._u.height
-        width = self._u.width
-        radius = self._u.radius
-        # ---- overrides to centre the shape
-        if self.use_abs_c:
-            self.x_c = self._abs_cx
-            self.y_c = self._abs_cy
-        elif self.row is not None and self.col is not None:
-            self.x_c = self.col * 2.0 * radius + radius + self._o.delta_x
-            self.y_c = self.row * 2.0 * radius + radius + self._o.delta_y
-            log.debug("row:%s col:%s x:%s y:%s", self.col, self.row, self.x_c, self.y_c)
-        elif self.cx is not None and self.cy is not None:
-            self.x_c = self._u.cx + self._o.delta_x
-            self.y_c = self._u.cy + self._o.delta_y
-        else:
-            if self.perimeter == "rectangle":
-                self.x_c = self._u.x + width / 2.0 + self._o.delta_x
-                self.y_c = self._u.y + height / 2.0 + self._o.delta_x
-            else:
-                self.x_c = self._u.x + self._o.delta_x + radius
-                self.y_c = self._u.y + self._o.delta_y + radius
-        # ---- draw perimeter
-        if self.perimeter == "circle":
-            cnv.draw_circle((self.x_c, self.y_c), radius)
-            self.set_canvas_props(cnv=cnv, index=ID, **kwargs)
-        # ---- draw compass in circle
-        _directions = tools.validated_directions(
-            self.directions, DirectionGroup.COMPASS, "compass directions"
-        )
-        if self.perimeter == "circle":
-            for direction in _directions:
-                match direction:
-                    case "n":
-                        self.circle_radius(cnv, ID, 0)
-                    case "ne":
-                        self.circle_radius(cnv, ID, 45)
-                    case "e":
-                        self.circle_radius(cnv, ID, 90)
-                    case "se":
-                        self.circle_radius(cnv, ID, 135)
-                    case "s":
-                        self.circle_radius(cnv, ID, 180)
-                    case "sw":
-                        self.circle_radius(cnv, ID, 225)
-                    case "w":
-                        self.circle_radius(cnv, ID, 270)
-                    case "nw":
-                        self.circle_radius(cnv, ID, 315)
-                    case _:
-                        pass
-        # ---- draw compass in rect
-        if self.perimeter == "rectangle":
-            if self.radii_length is not None:
-                feedback(
-                    "radii_length cannot be used for a rectangle-perimeter Compass",
-                    False,
-                    True,
-                )
-            rect = RectangleShape(**self.kwargs)
-            rotation = 0
-            vertices = rect.get_vertexes(**kwargs)
-
-            for direction in _directions:
-                match direction:
-                    case "n":
-                        self.rectangle_radius(cnv, ID, vertices, 0, height, width)
-                    case "ne":
-                        self.rectangle_radius(cnv, ID, vertices, 45, height, width)
-                    case "e":
-                        self.rectangle_radius(cnv, ID, vertices, 90, height, width)
-                    case "se":
-                        self.rectangle_radius(cnv, ID, vertices, 315, height, width)
-                    case "s":
-                        self.rectangle_radius(cnv, ID, vertices, 180, height, width)
-                    case "sw":
-                        self.rectangle_radius(cnv, ID, vertices, 225, height, width)
-                    case "w":
-                        self.rectangle_radius(cnv, ID, vertices, 270, height, width)
-                    case "nw":
-                        self.rectangle_radius(cnv, ID, vertices, 135, height, width)
-                    case _:
-                        pass
-        # ---- draw compass in hex
-        if self.perimeter == "hexagon":
-            for direction in _directions:
-                match direction:
-                    case "n":
-                        self.circle_radius(cnv, ID, 0)
-                    case "ne":
-                        self.circle_radius(cnv, ID, 60)
-                    case "e":
-                        pass
-                    case "se":
-                        self.circle_radius(cnv, ID, 120)
-                    case "s":
-                        self.circle_radius(cnv, ID, 180)
-                    case "sw":
-                        self.circle_radius(cnv, ID, 240)
-                    case "w":
-                        pass
-                    case "nw":
-                        self.circle_radius(cnv, ID, 300)
-                    case _:
-                        pass
-
-        # ---- cross
-        self.draw_cross(cnv, self.x_c, self.y_c, rotation=kwargs.get("rotation"))
-        # ---- dot
-        self.draw_dot(cnv, self.x_c, self.y_c)
-        # ---- text
-        self.draw_heading(cnv, ID, self.x_c, self.y_c - radius, **kwargs)
-        self.draw_label(cnv, ID, self.x_c, self.y_c, **kwargs)
-        self.draw_title(cnv, ID, self.x_c, self.y_c + radius, **kwargs)
 
 
 class DotShape(BaseShape):
@@ -733,40 +558,6 @@ class EquilateralTriangleShape(BaseShape):
     Equilateral Triangle on a given canvas.
     """
 
-    def draw_hatches(
-        self, cnv, ID, side: float, vertices: list, num: int, rotation: float = 0.0
-    ):
-        _dirs = tools.validated_directions(
-            self.hatches, DirectionGroup.HEX_POINTY_EDGE, "triangle hatch"
-        )
-        lines = tools.as_int(num, "hatcheses_count")
-        if lines >= 1:
-            # v_tl, v_tr, v_bl, v_br
-            if "ne" in _dirs or "sw" in _dirs:  # slope UP to the right
-                self.draw_lines_between_sides(
-                    cnv, side, lines, vertices, (0, 1), (2, 1), True
-                )
-            if "se" in _dirs or "nw" in _dirs:  # slope DOWN to the right
-                self.draw_lines_between_sides(
-                    cnv, side, lines, vertices, (0, 2), (0, 1), True
-                )
-            if "e" in _dirs or "w" in _dirs:  # horizontal
-                self.draw_lines_between_sides(
-                    cnv, side, lines, vertices, (0, 2), (1, 2), True
-                )
-        # ---- set canvas
-        centre = self.get_centroid(vertices)
-        self.set_canvas_props(
-            index=ID,
-            stroke=self.hatches_stroke,
-            stroke_width=self.hatches_stroke_width,
-            stroke_ends=self.hatches_ends,
-            dashed=self.hatches_dashed,
-            dotted=self.hatches_dots,
-            rotation=rotation,
-            rotation_point=centre,
-        )
-
     def calculate_area(self) -> float:
         _side = self._u.side if self._u.side else self._u.width
         return math.sqrt(3) / 4.0 * _side**2
@@ -779,6 +570,34 @@ class EquilateralTriangleShape(BaseShape):
             return self.points_to_value(length)
         else:
             return length
+
+    def calculate_radii(
+        self, cnv, centre: Point, vertices: list, debug: bool = False
+    ) -> dict:
+        """Calculate radii for each Triangle vertex and angles from centre.
+
+        Args:
+            vertices: list of Triangle's nodes as Points
+            centre: the centre Point of the Triangle
+
+        Returns:
+            dict of Radius objects keyed on direction
+        """
+        directions = ["sw", "se", "n"]
+        radii_dict = {}
+        # print(f"*** TRI radii {centre=} {vertices=}")
+        for key, vertex in enumerate(vertices):
+            compass, angle = geoms.angles_from_points(centre, vertex)
+            # print(f"*** TRI *** radii {key=} {directions[key]=} {compass=} {angle=}")
+            _radii = Radius(
+                point=vertex,
+                direction=directions[key],
+                compass=compass,
+                angle=360 - angle,  # inverse flip (y is reveresed)
+            )
+            # print(f"*** TRI radii {_radii}")
+            radii_dict[directions[key]] = _radii
+        return radii_dict
 
     def get_vertexes(
         self, x: float, y: float, side: float, hand: str, flip: str
@@ -814,6 +633,69 @@ class EquilateralTriangleShape(BaseShape):
         x_c = (vertices[0].x + vertices[1].x + vertices[2].x) / 3.0
         y_c = (vertices[0].y + vertices[1].y + vertices[2].y) / 3.0
         return Point(x_c, y_c)
+
+    def draw_hatches(
+        self, cnv, ID, side: float, vertices: list, num: int, rotation: float = 0.0
+    ):
+        _dirs = tools.validated_directions(
+            self.hatches, DirectionGroup.HEX_POINTY_EDGE, "triangle hatch"
+        )
+        lines = tools.as_int(num, "hatches_count")
+        if lines >= 1:
+            # v_tl, v_tr, v_bl, v_br
+            if "ne" in _dirs or "sw" in _dirs:  # slope UP to the right
+                self.draw_lines_between_sides(
+                    cnv, side, lines, vertices, (0, 1), (2, 1), True
+                )
+            if "se" in _dirs or "nw" in _dirs:  # slope DOWN to the right
+                self.draw_lines_between_sides(
+                    cnv, side, lines, vertices, (0, 2), (0, 1), True
+                )
+            if "e" in _dirs or "w" in _dirs:  # horizontal
+                self.draw_lines_between_sides(
+                    cnv, side, lines, vertices, (0, 2), (1, 2), True
+                )
+        # ---- set canvas
+        centre = self.get_centroid(vertices)
+        self.set_canvas_props(
+            index=ID,
+            stroke=self.hatches_stroke,
+            stroke_width=self.hatches_stroke_width,
+            stroke_ends=self.hatches_ends,
+            dashed=self.hatches_dashed,
+            dotted=self.hatches_dots,
+            rotation=rotation,
+            rotation_point=centre,
+        )
+
+    def draw_radii(self, cnv, ID, centre: Point, vertices: list):
+        """Draw line(s) connecting the Triangle centre to a vertex.
+
+        Args:
+            ID: unique ID
+            vertices: list of Triangle nodes as Points
+            centre: the centre Triangle of the Rhombus
+
+        Note:
+            * vertices start at SW and are ordered anti-clockwise
+              ["sw", "se", "n"]
+        """
+        _dirs = tools.validated_directions(
+            self.radii, DirectionGroup.TRIANGULAR, "equilateral triangle radii"
+        )
+        if "sw" in _dirs:  # slope DOWN to the left
+            cnv.draw_line(centre, vertices[0])
+        if "se" in _dirs:  # slope DOWN to the right
+            cnv.draw_line(centre, vertices[1])
+        if "n" in _dirs:  # slope UP
+            cnv.draw_line(centre, vertices[2])
+        # color, thickness etc.
+        self.set_canvas_props(
+            index=ID,
+            stroke=self.radii_stroke or self.stroke,
+            stroke_width=self.radii_stroke_width or self.stroke_width,
+            stroke_ends=self.radii_ends,
+        )
 
     def draw(self, cnv=None, off_x=0, off_y=0, ID=None, **kwargs):
         """Draw an equilateral triangle on a given canvas."""
@@ -853,6 +735,19 @@ class EquilateralTriangleShape(BaseShape):
             self.draw_hatches(
                 cnv, ID, side, self.vertexes, self.hatches_count, rotation
             )
+        # ---- draw radii
+        if self.radii:
+            self.draw_radii(cnv, ID, self.centroid, self.vertexes)
+        # ---- draw radii_shapes
+        if self.radii_shapes:
+            self.draw_radii_shapes(
+                cnv,
+                self.radii_shapes,
+                self.vertexes,
+                self.centroid,
+                DirectionGroup.TRIANGULAR,
+                self.radii_shapes_rotated,
+            )
         # ---- centred shape (with offset)
         if self.centre_shape:
             if self.can_draw_centred_shape(self.centre_shape):
@@ -864,6 +759,14 @@ class EquilateralTriangleShape(BaseShape):
         if self.centre_shapes:
             self.draw_centred_shapes(
                 self.centre_shapes, self.centroid.x, self.centroid.y
+            )
+        # ---- draw vertex shapes
+        if self.vertex_shapes:
+            self.draw_vertex_shapes(
+                self.vertex_shapes,
+                self.vertexes,
+                Point(self.centroid.x, self.centroid.y),
+                self.vertex_shapes_rotated,
             )
         # ---- dot
         self.draw_dot(cnv, self.centroid.x, self.centroid.y)
@@ -1024,6 +927,8 @@ class LineShape(BaseShape):
         self.set_canvas_props(cnv=cnv, index=ID, **klargs)  # shape.finish()
         # ---- dot
         self.draw_dot(cnv, (x_1 + x) / 2.0, (y_1 + y) / 2.0)
+        # ---- arrowhead
+        self.draw_arrow(cnv, Point(x, y), Point(x_1, y_1), **kwargs)
         # ---- text
         _, _rotation = geoms.angles_from_points(Point(x, y), Point(x_1, y_1))
         kwargs["rotation"] = -1 * _rotation
@@ -1036,8 +941,6 @@ class LineShape(BaseShape):
             centred=False,
             **kwargs,
         )
-        # ---- arrowhead
-        self.draw_arrow(cnv, Point(x, y), Point(x_1, y_1), **kwargs)
 
 
 class PolygonShape(BaseShape):
@@ -1353,7 +1256,7 @@ class PolygonShape(BaseShape):
         x, y = centre.x, centre.y
         # ---- calculate vertices
         pre_geom = self.get_geometry()
-        x, y, radius, vertices = (
+        x, y, radius, self.vertices = (
             pre_geom.x,
             pre_geom.y,
             pre_geom.radius,
@@ -1408,13 +1311,13 @@ class PolygonShape(BaseShape):
             kwargs["rotation_point"] = self.centroid
             is_rotated = True
         # ---- updated geom
-        # vertices = geoms.polygon_vertices(self.sides, radius, Point(x, y), None)
+        # self.vertices = geoms.polygon_vertices(self.sides, radius, Point(x, y), None)
         # ---- invalid polygon?
-        if not vertices or len(vertices) == 0:
+        if not self.vertices or len(self.vertices) == 0:
             return
         # ---- draw polygon
-        # feedback(f"***Polygon {self.col=} {self.row=} {x=} {y=} {vertices=}")
-        cnv.draw_polyline(vertices)
+        # feedback(f"***Polygon {self.col=} {self.row=} {x=} {y=} {self.vertices=}")
+        cnv.draw_polyline(self.vertices)
         kwargs["closed"] = True
         self.set_canvas_props(cnv=cnv, index=ID, **kwargs)
         # ---- draw slices
@@ -1423,18 +1326,18 @@ class PolygonShape(BaseShape):
                 cnv,
                 ID,
                 Point(x, y),
-                vertices,
+                self.vertices,
                 rotation=kwargs.get("rotation"),
             )
         # ---- draw radii
         if self.radii:
-            self.draw_radii(cnv, ID, Point(x, y), vertices)
+            self.draw_radii(cnv, ID, Point(x, y), self.vertices)
         # ---- draw perbii
         if self.perbii:
-            self.draw_perbii(cnv, ID, Point(x, y), vertices)
+            self.draw_perbii(cnv, ID, Point(x, y), self.vertices)
         # ---- draw mesh
         if self.mesh:
-            self.draw_mesh(cnv, ID, vertices)
+            self.draw_mesh(cnv, ID, self.vertices)
         # ---- centred shape (with offset)
         if self.centre_shape:
             if self.can_draw_centred_shape(self.centre_shape):
@@ -1445,8 +1348,16 @@ class PolygonShape(BaseShape):
         # ---- centred shapes (with offsets)
         if self.centre_shapes:
             self.draw_centred_shapes(self.centre_shapes, x, y)
+        # ---- draw vertex shapes
+        if self.vertex_shapes:
+            self.draw_vertex_shapes(
+                self.vertex_shapes,
+                self.vertices,
+                Point(x, y),
+                self.vertex_shapes_rotated,
+            )
         # ---- debug
-        self._debug(cnv, vertices=vertices)  # needs: self.run_debug = True
+        self._debug(cnv, vertices=self.vertices)  # needs: self.run_debug = True
         # ---- dot
         self.draw_dot(cnv, x, y)
         # ---- cross
@@ -1686,6 +1597,34 @@ class RhombusShape(BaseShape):
         vertices.append(Point(x_s + self._u.width / 2.0, y_s - self._u.height / 2.0))
         return vertices
 
+    def calculate_radii(
+        self, cnv, centre: Point, vertices: list, debug: bool = False
+    ) -> dict:
+        """Calculate radii for each Rhombus vertex and angles from centre.
+
+        Args:
+            vertices: list of Rhombus's nodes as Points
+            centre: the centre Point of the Rhombus
+
+        Returns:
+            dict of Radius objects keyed on direction
+        """
+        directions = ["w", "s", "e", "n"]
+        radii_dict = {}
+        # print(f"*** RHMB radii {centre=} {vertices=}")
+        for key, vertex in enumerate(vertices):
+            compass, angle = geoms.angles_from_points(centre, vertex)
+            # print(f"*** RHMB *** radii {key=} {directions[key]=} {compass=} {angle=}")
+            _radii = Radius(
+                point=vertex,
+                direction=directions[key],
+                compass=compass,
+                angle=360 - angle,  # inverse flip (y is reveresed)
+            )
+            # print(f"*** RHMB radii {_radii}")
+            radii_dict[directions[key]] = _radii
+        return radii_dict
+
     def draw_hatches(
         self,
         cnv,
@@ -1749,6 +1688,36 @@ class RhombusShape(BaseShape):
             dotted=self.hatches_dots,
             rotation=rotation,
             rotation_point=muPoint(x_c, y_c),
+        )
+
+    def draw_radii(self, cnv, ID, centre: Point, vertices: list):
+        """Draw line(s) connecting the Rhombus centre to a vertex.
+
+        Args:
+            ID: unique ID
+            vertices: list of Rhombus nodes as Points
+            centre: the centre Point of the Rhombus
+
+        Note:
+            * vertices start on left and are ordered anti-clockwise
+        """
+        _dirs = tools.validated_directions(
+            self.radii, DirectionGroup.CARDINAL, "rhombus radii"
+        )
+        if "w" in _dirs:  # slope to the left
+            cnv.draw_line(centre, vertices[0])
+        if "s" in _dirs:  # slope DOWN
+            cnv.draw_line(centre, vertices[1])
+        if "e" in _dirs:  # slope to the right
+            cnv.draw_line(centre, vertices[2])
+        if "n" in _dirs:  # slope UP
+            cnv.draw_line(centre, vertices[3])
+        # color, thickness etc.
+        self.set_canvas_props(
+            index=ID,
+            stroke=self.radii_stroke or self.stroke,
+            stroke_width=self.radii_stroke_width or self.stroke_width,
+            stroke_ends=self.radii_ends,
         )
 
     def draw_slices(self, cnv, ID, vertexes, centre: tuple, rotation=0):
@@ -1914,6 +1883,21 @@ class RhombusShape(BaseShape):
                 feedback('The "borders" property must be a list of sets or a set')
             for border in self.borders:
                 self.draw_border(cnv, border, ID)  # BaseShape
+
+        # ---- draw radii
+        if self.radii:
+            self.draw_radii(cnv, ID, Point(cx, cy), self.vertexes)
+
+        # ---- draw radii_shapes
+        if self.radii_shapes:
+            self.draw_radii_shapes(
+                cnv,
+                self.radii_shapes,
+                self.vertexes,
+                Point(cx, cy),
+                DirectionGroup.CARDINAL,
+                self.radii_shapes_rotated,
+            )
 
         # ---- centred shape (with offset)
         if self.centre_shape:
@@ -2374,8 +2358,229 @@ class StarShape(BaseShape):
     Star on a given canvas.
     """
 
+    def get_vertexes(self, x, y, **kwargs) -> tuple:
+        """Calculate vertices of star
+
+        Args:
+            x (float):
+                center-x of Star
+            y (float):
+                center-x of Star
+
+        Kwargs:
+            inner_fraction (float):
+                fraction of radius of Star along which inner
+                vertices are located
+
+        Returns:
+            tuple:
+                list of all vertices; list of 'ray' (outer) vertices
+        """
+        center = Point(x, y)
+        outer_vertices = []
+        all_vertices = []
+        inner_radius = self._u.radius * kwargs.get("inner_fraction", 0.5)
+        gap = 360.0 / self.rays
+        angles = support.steps(90, 450, gap)
+        for index, angle in enumerate(angles):
+            _angle = angle
+            angle = _angle - 360.0 if _angle > 360.0 else _angle
+            if index == 0:
+                start_angle = angle
+            else:
+                if round(start_angle, 3) == round(angle, 3):
+                    break  # avoid a repeat
+            outer_vertices.append(geoms.point_on_circle(center, self._u.radius, angle))
+            all_vertices.append(geoms.point_on_circle(center, self._u.radius, angle))
+            all_vertices.append(
+                geoms.point_on_circle(center, inner_radius, angle + gap / 2.0)
+            )
+        return all_vertices, outer_vertices
+
+    def draw_radii(
+        self, cnv, ID, x_c: float, y_c: float, rotation: float, all_vertexes: list
+    ):
+        """Draw radius lines from the centre to the inner and outer vertices.
+
+        Args:
+            x_c (float):
+                center-x of Star
+            y_c (float):
+                center-x of Star
+            rotation (float):
+                degrees of rotation of Star
+            all_vertexes (list):
+                outer- and inner- Points used to draw Star
+        """
+        centre = muPoint(x_c, y_c)
+        # ---- set radii styles
+        lkwargs = {}
+        lkwargs["wave_style"] = self.kwargs.get("radii_wave_style", None)
+        lkwargs["wfave_height"] = self.kwargs.get("radii_wave_height", 0)
+        for diam_pt in all_vertexes:
+            x_start, y_start = x_c, y_c
+            x_end, y_end = diam_pt.x, diam_pt.y
+            # ---- draw the radii line
+            draw_line(cnv, (x_start, y_start), (x_end, y_end), shape=self, **lkwargs)
+        # ---- style radii lines
+        self.set_canvas_props(
+            index=ID,
+            stroke=self.radii_stroke,
+            stroke_width=self.radii_stroke_width,
+            stroke_ends=self.radii_ends,
+            dashed=self.radii_dashed,
+            dotted=self.radii_dotted,
+            rotation=rotation,
+            rotation_point=centre,
+        )
+
+    def draw_slices(self, cnv, ID, centre: Point, vertexes: list, rotation=0):
+        """Draw two triangles on each arm of the Star
+
+        Args:
+            ID: unique ID
+            vertexes: list of Star's vertices as Points
+            centre: the centre Point of the Star
+            rotation: degrees anti-clockwise from horizontal "east"
+        """
+        # ---- get slices color list from string
+        if isinstance(self.slices, str):
+            _slices = tools.split(self.slices.strip())
+        else:
+            _slices = self.slices
+        # ---- validate slices color settings
+        slices_colors = [
+            colrs.get_color(slcolor)
+            for slcolor in _slices
+            if not isinstance(slcolor, bool)
+        ]
+        # ---- draw pair of triangles per arm
+        sid = 0
+        for idx in range(0, len(vertexes) - 1, 2):
+            if sid > len(slices_colors) - 1:
+                sid = 0  # reuse slice colors
+            # trailing
+            trail_id = idx - 1 if idx > 0 else len(vertexes) - 1
+            vertexes_slice = [vertexes[idx], centre, vertexes[trail_id]]
+            cnv.draw_polyline(vertexes_slice)
+            self.set_canvas_props(
+                index=ID,
+                stroke=self.slices_stroke or slices_colors[sid],
+                stroke_width=0.01,  # self.slices_stroke_width or 0.01,
+                stroke_ends=self.slices_ends,
+                fill=slices_colors[sid],
+                transparency=self.slices_transparency,
+                closed=True,
+                rotation=rotation,
+                rotation_point=muPoint(centre[0], centre[1]),
+            )
+            sid += 1
+            # leading
+            if sid > len(slices_colors) - 1:
+                sid = 0  # reuse slice colors
+            vertexes_slice = [vertexes[idx], centre, vertexes[idx + 1]]
+            cnv.draw_polyline(vertexes_slice)
+            self.set_canvas_props(
+                index=ID,
+                stroke=self.slices_stroke or slices_colors[sid],
+                stroke_width=0.01,  # self.slices_stroke_width or 0.01,
+                stroke_ends=self.slices_ends,
+                fill=slices_colors[sid],
+                transparency=self.slices_transparency,
+                closed=True,
+                rotation=rotation,
+                rotation_point=muPoint(centre[0], centre[1]),
+            )
+            sid += 1
+
+    def draw(self, cnv=None, off_x=0, off_y=0, ID=None, **kwargs):
+        """Draw a star on a given canvas."""
+        super().draw(cnv, off_x, off_y, ID, **kwargs)  # unit-based props
+        cnv = cnv if cnv else globals.canvas  # a new Page/Shape may now exist
+        # ---- validate
+        if self.rays < 3:
+            feedback(f"Cannot draw a Star with less than 3 rays!", True)
+        # convert to using units
+        x = self._u.x + self._o.delta_x
+        y = self._u.y + self._o.delta_y
+        # ---- overrides to centre the shape
+        if self.use_abs_c:
+            x = self._abs_cx
+            y = self._abs_cy
+        elif self.cx is not None and self.cy is not None:
+            x = self._u.cx + self._o.delta_x
+            y = self._u.cy + self._o.delta_y
+        # calc - assumes x and y are the centre!
+        radius = self._u.radius
+        # ---- set canvas
+        self.set_canvas_props(index=ID)
+        # ---- handle rotation
+        rotation = kwargs.get("rotation", self.rotation)
+        if rotation:
+            self.centroid = muPoint(x, y)
+            kwargs["rotation"] = rotation
+            kwargs["rotation_point"] = self.centroid
+        # ---- draw star
+        if self.inner_fraction > 1 or self.inner_fraction < 0:
+            feedback(
+                "The inner_fraction must be greater than 0 and less than 1"
+                f' (not "{self.inner_fraction}"',
+                True,
+            )
+        self.vertexes_list, self.vertices = self.get_vertexes(
+            x, y, inner_fraction=self.inner_fraction
+        )
+        # feedback(f'***Star {x=} {y=} {self.vertexes_list=}')
+        cnv.draw_polyline(self.vertexes_list)
+        kwargs["closed"] = True
+        self.set_canvas_props(cnv=cnv, index=ID, **kwargs)
+        # ---- draw centre shape (with offset)
+        if self.centre_shape:
+            if self.can_draw_centred_shape(self.centre_shape):
+                self.centre_shape.draw(
+                    _abs_cx=x + self.unit(self.centre_shape_mx),
+                    _abs_cy=y + self.unit(self.centre_shape_my),
+                )
+        # ---- draw slieces
+        if self.slices:
+            self.draw_slices(
+                cnv,
+                ID,
+                Point(x, y),
+                self.vertexes_list,
+                rotation=rotation,
+            )
+        # ---- draw radii
+        if self.show_radii:
+            self.draw_radii(cnv, ID, x, y, rotation, self.vertexes_list)
+        # ---- draw centre shapes (with offsets)
+        if self.centre_shapes:
+            self.draw_centred_shapes(self.centre_shapes, x, y)
+        # ---- draw vertex shapes
+        if self.vertex_shapes:
+            self.draw_vertex_shapes(
+                self.vertex_shapes,
+                self.vertices,
+                Point(x, y),
+                self.vertex_shapes_rotated,
+            )
+        # ---- dot
+        self.draw_dot(cnv, x, y)
+        # ---- cross
+        self.draw_cross(cnv, x, y, rotation=kwargs.get("rotation"))
+        # ---- text
+        self.draw_heading(cnv, ID, x, y - radius, **kwargs)
+        self.draw_label(cnv, ID, x, y, **kwargs)
+        self.draw_title(cnv, ID, x, y + radius, **kwargs)
+
+
+class StarLineShape(BaseShape):
+    """
+    Star made of line on a given canvas.
+    """
+
     def get_vertexes(self, x, y, **kwargs):
-        """Calculate vertices of star"""
+        """Calculate vertices of StarLine"""
         vertices = []
         radius = self._u.radius
         vertices.append(muPoint(x, y + radius))
@@ -2390,7 +2595,7 @@ class StarShape(BaseShape):
         return vertices
 
     def draw(self, cnv=None, off_x=0, off_y=0, ID=None, **kwargs):
-        """Draw a star on a given canvas."""
+        """Draw a StarLine on a given canvas."""
         super().draw(cnv, off_x, off_y, ID, **kwargs)  # unit-based props
         cnv = cnv if cnv else globals.canvas  # a new Page/Shape may now exist
         # convert to using units
@@ -2413,8 +2618,8 @@ class StarShape(BaseShape):
             self.centroid = muPoint(x, y)
             kwargs["rotation"] = rotation
             kwargs["rotation_point"] = self.centroid
-        # ---- draw star
-        # feedback(f'***Star {x=} {y=} {self.vertexes_list=}')
+        # ---- draw starline
+        # feedback(f'***StarLine {x=} {y=} {self.vertexes_list=}')
         self.vertexes_list = self.get_vertexes(x, y)
         cnv.draw_polyline(self.vertexes_list)
         kwargs["closed"] = True
@@ -2597,12 +2802,28 @@ class TextShape(BaseShape):
                         css_style.append(f"text-align: {self.align};")
                     styling = " ".join(css_style)
                     _text = f'<div style="{styling}">{_text}</div>'
+
+                script_dir = os.path.dirname(os.path.abspath(sys.argv[0]))
+                # NOTE - this add stores ALL filenames in the subarchives dict
+                # {'_subarchives': [{'fmt': 'dir', 'entries': ['foo.png', ...
+                globals.archive.add(script_dir)  # append "current" to use img in HTML
+                globals.archive.add(".")  # append "current" to use img in HTML
+
                 keys["archive"] = globals.archive
                 # feedback(f'*** Text HTML {keys=} {rect=} {_text=} {keys=}')
                 if self.run_debug:
                     globals.doc_page.draw_rect(
                         rect, color=self.debug_color, dashes="[1 2] 0"
                     )
+                # image placeholders => <img> tags
+                _text = tools.html_img(_text)
+                # glyph placeholders => <span> tags with font style
+                try:
+                    icon_font = globals.base.icon_font_name
+                    icon_size = globals.base.icon_font_size
+                except:
+                    icon_font = "Helvetica"
+                _text = tools.html_glyph(_text, icon_font, icon_size)
                 current_page.insert_htmlbox(rect, _text, **keys)
             except ValueError as err:
                 feedback(f"Cannot create Text - {err}", True)
@@ -2732,23 +2953,34 @@ class TrapezoidShape(BaseShape):
                 feedback('The "borders" property must be a list of sets or a set')
             for border in self.borders:
                 self.draw_border(cnv, border, ID)  # BaseShape
+        # ---- calculate centre
+        x_d, y_d = x + self._u.width / 2.0, y + sign * self._u.height / 2.0
+        # ---- draw vertex shapes
+        if self.vertex_shapes:
+            self.draw_vertex_shapes(
+                self.vertex_shapes,
+                self.vertexes,
+                Point(x, y),
+                self.vertex_shapes_rotated,
+            )
         # ---- dot
-        self.draw_dot(cnv, x + self._u.width / 2.0, y + sign * self._u.height / 2.0)
+        self.draw_dot(cnv, x_d, y_d)
         # ---- cross
-        self.draw_cross(
-            cnv,
-            x + self._u.width / 2.0,
-            y + sign * self._u.height / 2.0,
-            rotation=kwargs.get("rotation"),
-        )
+        self.draw_cross(cnv, x_d, y_d, rotation=kwargs.get("rotation"))
         # ---- text
-        self.draw_heading(cnv, ID, x + self._u.width / 2.0, y, **kwargs)
-        self.draw_label(
-            cnv, ID, x + self._u.width / 2.0, y + sign * self._u.height / 2.0, **kwargs
-        )
-        self.draw_title(
-            cnv, ID, x + self._u.width / 2.0, y + sign * self._u.height, **kwargs
-        )
+        self.draw_label(cnv, ID, x_d, y_d, **kwargs)
+        if sign == 1:
+            self.draw_heading(cnv, ID, x + self._u.width / 2.0, y, **kwargs)
+            self.draw_title(
+                cnv, ID, x + self._u.width / 2.0, y + sign * self._u.height, **kwargs
+            )
+        elif sign == -1:
+            self.draw_title(cnv, ID, x + self._u.width / 2.0, y, **kwargs)
+            self.draw_heading(
+                cnv, ID, x + self._u.width / 2.0, y + sign * self._u.height, **kwargs
+            )
+        else:
+            raise ValueError("Invalid Trapezoid sign")
 
 
 # ---- Other

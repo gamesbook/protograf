@@ -46,6 +46,7 @@ python boards/abstract/hexhex_hexagons.py
 python boards/abstract/hexhex_rectangles.py
 python boards/abstract/morabaraba.py
 python boards/abstract/octagons.py
+python boards/abstract/snex.py
 python boards/abstract/tictactoe.py
 # ---- boards: commercial
 echo -e "\nCreating commercial boards..."
@@ -98,10 +99,12 @@ python cards/cards_deck_12.py
 python cards/cards_deck_13.py
 python cards/cards_deck_14.py
 python cards/cards_deck_15.py
+python cards/cards_symbols.py
 # -- various
 echo -e "\nCreating various..."
 python various/clock.py
 python various/logo.py
+python various/math-2.py
 python various/large_objects.py
 python various/objects.py
 python various/rolling.py

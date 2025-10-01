@@ -540,9 +540,13 @@ def pdf_export(
             gif_name = os.path.join(dirname, f"{basename}.gif")
             for filename in all_pngs:
                 images.append(imageio.imread(filename))
-                imageio.mimsave(
-                    gif_name, images, duration=framerate * 1000
-                )  # ms -> sec
+            imageio.mimsave(
+                gif_name,
+                images,
+                duration=framerate * 1000,
+                optimize=True,
+                loop=0,  # keep looping
+            )  # ms -> sec
             for filename in all_pngs:
                 if os.path.isfile(filename):
                     os.remove(filename)
@@ -670,6 +674,21 @@ def uni(code: str):
 def uc(code: str):
     """Convert U+nnnn into Python chr()"""
     return uni(code)
+
+
+def round_tiny_float(number: float, threshold: float = 1e-10):
+    """If the absolute value of float is less than threshold, set to zero.
+
+    Doc Test:
+
+    >>> round_tiny_float(1e-12)
+    0.0
+    >>> round_tiny_float(0.001)
+    0.001
+    """
+    if abs(number) < threshold:
+        return 0.0
+    return number
 
 
 if __name__ == "__main__":

@@ -12,6 +12,7 @@ import logging
 import os
 import pathlib
 from pathlib import Path
+import re
 import string
 from string import ascii_uppercase, digits
 import sys
@@ -1146,9 +1147,9 @@ def validated_directions(
             valid = {"ne", "se", "sw", "nw"}
         case DirectionGroup.COMPASS:
             valid = {"n", "e", "w", "s", "ne", "se", "sw", "nw"}
-        case DirectionGroup.HEX_FLAT:
+        case DirectionGroup.HEX_FLAT:  # radii
             valid = {"e", "se", "sw", "w", "ne", "nw"}
-        case DirectionGroup.HEX_POINTY:
+        case DirectionGroup.HEX_POINTY:  # radii
             valid = {"s", "se", "sw", "n", "ne", "nw"}
         case DirectionGroup.HEX_FLAT_EDGE:  # perbii
             valid = {"s", "se", "sw", "n", "ne", "nw"}
@@ -1156,15 +1157,21 @@ def validated_directions(
             valid = {"e", "se", "sw", "w", "ne", "nw"}
         case DirectionGroup.CIRCULAR:
             valid = {"n", "e", "w", "s", "ne", "se", "sw", "nw", "o", "d"}
+        case DirectionGroup.TRIANGULAR:  # equilateral
+            valid = {"se", "sw", "n"}
         case _:
-            raise NotImplementedError("Cannot handle {direction_group} type!")
+            raise NotImplementedError(f"Cannot handle {direction_group} type!")
     if "all" in values or "*" in values:
         values = list(valid)
         values_set = set(values)
     if values_set.issubset(valid):
         return values
     _label = f"the {label} value" if label else f'"{value}"'
-    feedback(f"Cannot use {_label} - it must contain valid directions {valid}!", True)
+    feedback(
+        f'Cannot use {_label} "{value}" - it must correspond with '
+        f"the valid directions {valid}!",
+        True,
+    )
 
 
 def transpose_lists(
@@ -1605,6 +1612,126 @@ def uniques(key: str) -> list:
         if key in d:
             unique_values.add(d[key])
     return unique_values
+
+
+def html_img(text: str) -> str:
+    """Replace an image placeholder with an HTML <img> tag.
+
+    Note:
+        * placeholder pattern is |:filename.png:| or |:filename.png 00:|
+          where 00 will be a number representing the height
+        * alternative placeholder pattern for SVG is |;filename.svg;| or
+          |;filename 00 name;|
+          where 00 will be a number representing the height and the name is
+          a hexadecimal color to apply to replace ALL other colors in the SVG
+        * the filename for an image must NOT contain spaces!
+        * a `.png` will be added to the filename, if there is no extension
+
+    Doc Test:
+
+    >>> html_img('A.png')
+    'A.png'
+    >>> html_img('|:A.png')
+    '|:A.png'
+    >>> html_img('A.png:|')
+    'A.png:|'
+    >>> html_img('|:A.png and |:B:|')  # POOR OUTCOME!
+    '<img src="A.png" height=and>'
+    >>> html_img(' |:A.png:| and |:B:| ')
+    ' <img src="A.png"> and <img src="B.png"> '
+    >>> html_img('an |:A:| or')
+    'an <img src="A.png"> or'
+    >>> html_img('an |: A 20 :| or')
+    'an <img src="A.png" height=20> or'
+    """
+    # ---- PNG
+    images = re.findall("\|\:(.*?)\:\|", text)
+    txt = text
+    for img in images:
+        _img = img.strip(" ")
+        items = _img.split(" ")
+        image_name = items[0]
+        base, ext = os.path.splitext(image_name)
+        if not ext:
+            image_name = image_name + ".png"
+        if len(items) > 1:
+            txt = txt.replace(img, f'<img src="{image_name}" height={items[1]}>')
+        else:
+            txt = txt.replace(img, f'<img src="{image_name}">')
+    if images:
+        txt = txt.replace("|:", "").replace(":|", "")
+    # ---- SVG
+    svg_images = re.findall("\|\;(.*?)\;\|", txt)
+    for img in svg_images:
+        _img = img.strip(" ")
+        items = _img.split(" ")
+        image_name = items[0]
+        base, ext = os.path.splitext(image_name)
+        if not ext:
+            image_name = image_name + ".svg"
+        if len(items) > 1 and len(items) < 3:
+            txt = txt.replace(img, f'<img src="{image_name}" height={items[1]}>')
+        elif len(items) >= 3:
+            transform = True
+            txt = txt.replace(img, f'<img src="{image_name}" height={items[1]}>')
+        else:
+            txt = txt.replace(img, f'<img src="{image_name}">')
+    if svg_images:
+        txt = txt.replace("|;", "").replace(";|", "")
+    return txt
+
+
+def html_glyph(text: str, font_name: str, font_size: str = "") -> str:
+    """Replace a Unicode glyph placeholder with font details in a <span> tag.
+
+    Note:
+        * placeholder pattern is |!unicode!| or |!unicode 00!|
+          |!unicode 00 #COLOR !|
+          where 00 will be a number representing the font size and #COLOR
+          is a hexadecimal color for the font color
+        * the glyph's unicode MUST appear in the Font matching `font_name`
+        * the font_size, if any, will be overridden by any value used in the
+          placeholder
+
+    Doc Test:
+
+    >>> html_glyph('E001', "Helvetica")
+    'E001'
+    >>> html_glyph('|!E001', "Helvetica")
+    '|!E001'
+    >>> html_glyph('E001!|', "Helvetica")
+    'E001!|'
+    >>> html_glyph('an |! E001 12 !| or', "Helvetica")
+    'an <span style="font-family: Helvetica"; font-size: 12px;>E001</span> or'
+    >>> html_glyph('an |! E001 12 #000 !| or', "Helvetica")
+    'an <span style="font-family: Helvetica"; font-size: 12px; color: #000;>E001</span> or'
+
+    """
+    glyphs = re.findall("\|\!(.*?)\!\|", text)
+    txt = text
+    for glp in glyphs:
+        _glp = glp.strip(" ")
+        items = _glp.split(" ")
+        glyph_name = items[0]
+        # <span style="font-family: sans-serif; font-size: 14px; color: blue;">Hello World!</span>
+        if len(items) > 2:
+            txt = txt.replace(
+                glp,
+                f'<span style="font-family: {font_name}; font-size: {items[1]}px; color: {items[2]};">{glyph_name}</span>',
+            )
+        if len(items) > 1:
+            txt = txt.replace(
+                glp,
+                f'<span style="font-family: {font_name}; font-size: {items[1]}px;">{glyph_name}</span>',
+            )
+        else:
+            txt = txt.replace(
+                glp, f'<span style="font-family: {font_name}">{glyph_name}</span'
+            )
+    if glyphs:
+        txt = txt.replace("|!", "").replace("!|", "")
+    # print(f"glyph text: {txt=}")
+    return txt
 
 
 if __name__ == "__main__":

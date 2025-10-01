@@ -35,7 +35,6 @@ from .shapes import (
     BezierShape,
     ChordShape,
     CommonShape,
-    CompassShape,
     DotShape,
     EllipseShape,
     EquilateralTriangleShape,
@@ -52,6 +51,7 @@ from .shapes import (
     SquareShape,
     StadiumShape,
     StarShape,
+    StarLineShape,
     TextShape,
     TrapezoidShape,
 )
@@ -2095,6 +2095,29 @@ def Font(name=None, **kwargs):
     globals.base.stroke = kwargs.get("stroke", "black")
 
 
+def IconFont(name=None, **kwargs):
+    """Set the Font for all subsequent icons in the output PDF.
+
+    Args:
+
+    - name (str): the name of the Font
+
+    Kwargs:
+
+    - size (float): the point size of the Font; default is 12
+    - stroke (str): the named or hexadecimal color of the Font; default is "black"
+    - style (str): the style, if available, for the Font e.g. "bold", "italic"
+
+    """
+    validate_globals()
+    _name, _path, _file = tools.get_font_file(name)
+    globals.base.icon_font_name = _name or DEFAULT_FONT
+    globals.base.icon_font_file = _file
+    globals.base.icon_font_size = kwargs.get("size", 12)
+    globals.base.icon_font_style = kwargs.get("style", None)
+    globals.base.icon_stroke = kwargs.get("stroke", "black")
+
+
 # ---- various ====
 
 
@@ -3035,31 +3058,6 @@ def circle(**kwargs):
     return CircleShape(canvas=globals.canvas, **kwargs)
 
 
-@docstring_center
-def Compass(row=None, col=None, **kwargs):
-    """Draw a Compass shape on the canvas.
-
-    Args:
-
-    - row (int): row in which the shape is drawn.
-    - col (int): column in which shape is drawn.
-
-    Kwargs:
-
-    <center>
-
-    """
-    kwargs = margins(**kwargs)
-    cmpss = compass(row=row, col=col, **kwargs)
-    cmpss.draw()
-    return cmpss
-
-
-def compass(row=None, col=None, **kwargs):
-    kwargs = margins(**kwargs)
-    return CompassShape(canvas=globals.canvas, **kwargs)
-
-
 @docstring_base
 def Dot(row=None, col=None, **kwargs):
     """Draw a Dot shape on the canvas.
@@ -3133,6 +3131,32 @@ def EquilateralTriangle(row=None, col=None, **kwargs):
 
 
 def equilateraltriangle(row=None, col=None, **kwargs):
+    kwargs = margins(**kwargs)
+    return EquilateralTriangleShape(canvas=globals.canvas, **kwargs)
+
+
+def EquiTri(row=None, col=None, **kwargs):
+    """Draw a EquilateralTriangle shape on the canvas.
+
+    Args:
+
+    - row (int): row in which the shape is drawn.
+    - col (int): column in which shape is drawn.
+
+    Kwargs:
+
+    <center>
+
+    """
+    kwargs = margins(**kwargs)
+    kwargs["row"] = row
+    kwargs["col"] = col
+    eqt = EquilateralTriangleShape(canvas=globals.canvas, **kwargs)
+    eqt.draw()
+    return eqt
+
+
+def equitri(row=None, col=None, **kwargs):
     kwargs = margins(**kwargs)
     return EquilateralTriangleShape(canvas=globals.canvas, **kwargs)
 
@@ -3387,14 +3411,14 @@ def Rectangle(row=None, col=None, **kwargs):
     <center>
 
     - rounding (float): the radius of the circle used to round the corner
-    - border (list): overide the normal edge line; specify a set of values, which
+    - borders (list): overide the normal edge lines; specify a set of values, which
       are comma-separated inside round brackets, in the following order:
 
       - direction (str): one of (n)orth, (s)outh, (e)ast or (w)est,
         nw (north-west) or se (south-east)
       - width (float): the line thickness
       - color (str): either a named or hexadecimal color
-      - style  (bool): True makes a dotted line; or a list of values creates dashes
+      - style (bool): True makes a dotted line; or a list of values creates dashes
     - chevron (str): the primary compass direction in which a peak is
       pointing; n(orth), s(outh), e(ast) or w(est)
     - chevron_height (float): the distance of the chevron peak from the side of
@@ -3641,6 +3665,35 @@ def star(row=None, col=None, **kwargs):
     kwargs["row"] = row
     kwargs["col"] = col
     return StarShape(canvas=globals.canvas, **kwargs)
+
+
+@docstring_center
+def StarLine(row=None, col=None, **kwargs):
+    """Draw a StarLine shape on the canvas.
+
+    Args:
+
+    - row (int): row in which the shape is drawn.
+    - col (int): column in which the shape is drawn.
+
+    Kwargs:
+
+    <center>
+
+    """
+    kwargs = margins(**kwargs)
+    kwargs["row"] = row
+    kwargs["col"] = col
+    starline = StarLineShape(canvas=globals.canvas, **kwargs)
+    starline.draw()
+    return starline
+
+
+def starline(row=None, col=None, **kwargs):
+    kwargs = margins(**kwargs)
+    kwargs["row"] = row
+    kwargs["col"] = col
+    return StarLineShape(canvas=globals.canvas, **kwargs)
 
 
 @docstring_base
@@ -5140,7 +5193,6 @@ arrow.__doc__ = Arrow.__doc__
 bezier.__doc__ = Bezier.__doc__
 chord.__doc__ = Chord.__doc__
 circle.__doc__ = Circle.__doc__
-compass.__doc__ = Compass.__doc__
 dot.__doc__ = Dot.__doc__
 ellipse.__doc__ = Ellipse.__doc__
 equilateraltriangle.__doc__ = EquilateralTriangle.__doc__

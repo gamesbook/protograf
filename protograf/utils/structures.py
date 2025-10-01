@@ -40,6 +40,7 @@ class DirectionGroup(Enum):
     HEX_POINTY_EDGE = 5
     CIRCULAR = 6
     ORDINAL = 7
+    TRIANGULAR = 8
 
 
 class ExportFormat(Enum):
@@ -237,12 +238,22 @@ class BBox:
 
 @dataclass
 class Perbis:
-    """Perbis is the centre of an edge of a Hexagon"""
+    """Perbis is the centre of an edge of a Shape"""
 
     point: Point
     direction: str
     v1: Point
     v2: Point
+    compass: float
+    angle: float
+
+
+@dataclass
+class Radius:
+    """Radius is the line from centre to circumference around a Shape"""
+
+    point: Point
+    direction: str
     compass: float
     angle: float
 

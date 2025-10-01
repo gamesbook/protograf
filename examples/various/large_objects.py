@@ -58,12 +58,53 @@ Circle(
     radii_labels_font="Times-Roman",
     dot=0.2)
 
+PageBreak()
+
+# ---- Compass Rose
+# Blueprint(stroke_width=0.5,)
+Text(common=header, text="Compass Rose")
+Font("Times-Italic", size=14)
+eye = Common(cx=2, cy=3)
+Circle(
+    common=eye,
+    radius=2,
+    stroke_width=1,
+    fill=None,
+    radii=steps(0, 360, 5),
+    radii_offset=1.85,
+    radii_length=0.1,
+    radii_stroke_width=1,
+    heading="N")
+Circle(
+    common=eye,
+    radius=1.2,
+    stroke_width=1,
+    fill=None)
+Star(
+     common=eye,
+     radius=1.4,
+     rays=4,
+     show_radii=True,
+     rotation=45,
+     stroke_width=1,
+     slices=["black", "white"],
+     radii_stroke_width=1,
+     inner_fraction=0.25,
+)
+Star(common=eye,
+     radius=2.2,
+     rays=4,
+     inner_fraction=0.25,
+     stroke_width=1,
+     slices=["black", "white"],
+ )
+
 
 Save(
     output='png',
     dpi=300,
     directory="../docs/source/examples/images/various",
     names=[
-        'chords', 'rondel'
+        'chords', 'rondel', 'compass_rose'
     ]
 )

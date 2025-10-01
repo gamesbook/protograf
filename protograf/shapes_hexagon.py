@@ -34,6 +34,7 @@ from protograf.utils.structures import (
     Perbis,
     Point,
     PolyGeometry,
+    Radius,
 )  # named tuples
 from protograf.utils.support import CACHE_DIRECTORY
 from protograf.base import (
@@ -69,7 +70,8 @@ class HexShape(BaseShape):
             self.use_height = True
         self.ORIENTATION = self.get_orientation()
 
-    def get_orientation(self):
+    def get_orientation(self) -> HexOrientation:
+        """Return HexOrientation for the Hexagon."""
         if _lower(self.orientation) in ["p", "pointy"]:
             orientation = HexOrientation.POINTY
         elif _lower(self.orientation) in ["f", "flat"]:
@@ -79,6 +81,37 @@ class HexShape(BaseShape):
                 'Invalid orientation "{self.orientation}" supplied for hexagon.', True
             )
         return orientation
+
+    def get_direction(self, lines="radii") -> DirectionGroup:
+        """Return DirectionGroup for the Hexagon.
+
+        Args:
+            lines (str): either radii (default) or perbii
+        """
+        if lines == "radii":
+            if _lower(self.orientation) in ["p", "pointy"]:
+                direction = DirectionGroup.HEX_POINTY
+            elif _lower(self.orientation) in ["f", "flat"]:
+                direction = DirectionGroup.HEX_FLAT
+            else:
+                feedback(
+                    'Invalid orientation "{self.orientation}" supplied for hexagon radii.',
+                    True,
+                )
+        elif lines == "perbii":
+            if _lower(self.orientation) in ["p", "pointy"]:
+                direction = DirectionGroup.HEX_POINTY_EDGE
+            elif _lower(self.orientation) in ["f", "flat"]:
+                direction = DirectionGroup.HEX_FLAT_EDGE
+            else:
+                feedback(
+                    'Invalid orientation "{self.orientation}" supplied for hexagon perbii.',
+                    True,
+                )
+        else:
+            LINES = ["radii", "perbii"]
+            raise ValueError("get_direction `lines` must be one of: {LINES}")
+        return direction
 
     def hex_height_width(self) -> tuple:
         """Calculate vertical and horizontal point dimensions of a hexagon
@@ -614,12 +647,14 @@ class HexShape(BaseShape):
 
     def calculate_perbii(
         self, cnv, centre: Point, vertices: list, debug: bool = False
-    ) -> list:
+    ) -> dict:
         """Calculate centre points for each Hex edge and angles from centre.
 
         Args:
-            vertices: list of Hex'es nodes as Points
-            centre: the centre Point of the Hex
+            vertices (list):
+                list of Hex'es nodes as Points
+            centre (Point):
+                the centre Point of the Hex
 
         Returns:
             dict of Perbis objects keyed on direction
@@ -656,6 +691,37 @@ class HexShape(BaseShape):
         #     self.run_debug = True
         #     self._debug(cnv, vertices=_perbii_pts)
         return perbii_dict
+
+    def calculate_radii(
+        self, cnv, centre: Point, vertices: list, debug: bool = False
+    ) -> dict:
+        """Calculate radii for each Hex vertex and angles from centre.
+
+        Args:
+            vertices: list of Hex'es nodes as Points
+            centre: the centre Point of the Hex
+
+        Returns:
+            dict of Radius objects keyed on direction
+        """
+        if self.ORIENTATION == HexOrientation.POINTY:
+            directions = ["nw", "sw", "s", "se", "ne", "n"]
+        if self.ORIENTATION == HexOrientation.FLAT:
+            directions = ["w", "sw", "se", "e", "ne", "nw"]
+        radii_dict = {}
+        # print(f"*** HEX radii {self.ORIENTATION=} {centre=} {vertices=}")
+        for key, vertex in enumerate(vertices):
+            compass, angle = geoms.angles_from_points(centre, vertex)
+            # print(f"*** HEX *** radii {key=} {directions[key]=} {compass=} {angle=}")
+            _radii = Radius(
+                point=vertex,
+                direction=directions[key],
+                compass=compass,
+                angle=360 - angle,  # inverse flip (y is reveresed)
+            )
+            # print(f"*** HEX radii {self.ORIENTATION=} {_radii}")
+            radii_dict[directions[key]] = _radii
+        return radii_dict
 
     def draw_perbii(
         self, cnv, ID, centre: Point, vertices: list, rotation: float = None
@@ -1058,8 +1124,8 @@ class HexShape(BaseShape):
                 y = self.y_d - geo.half_side - geo.side / 2.0
             elif self.cx is not None and self.cy is not None:
                 # cx,cy are centre; create x_d, y_d as the unit-formatted hex centre
-                self.x_d = self._u.cx + self._o.delta_y
-                self.y_d = self._u.cy + self._o.delta_x
+                self.x_d = self._u.cx + self._o.delta_x
+                self.y_d = self._u.cy + self._o.delta_y
                 # recalculate start x,y
                 x = self.x_d - geo.half_flat
                 y = self.y_d - geo.half_side - geo.side / 2.0
@@ -1137,8 +1203,14 @@ class HexShape(BaseShape):
                 y = self.y_d - geo.half_flat
             # feedback(f"*** F~: {x=} {y=} {self.x_d=} {self.y_d=} {geo=}")
 
+        # ---- VERTICES:
         # ---- ^ pointy hexagon vertices (clockwise)
         if self.ORIENTATION == HexOrientation.POINTY:
+            #     4
+            #  5 / \3
+            #  0|  |2
+            #   \ /
+            #    1
             self.vertexes = [  # clockwise from bottom-left; relative to centre
                 muPoint(x, y + geo.z_fraction),
                 muPoint(x, y + geo.z_fraction + geo.side),
@@ -1149,6 +1221,10 @@ class HexShape(BaseShape):
             ]
         # ---- ~ flat hexagon vertices (clockwise)
         elif self.ORIENTATION == HexOrientation.FLAT:
+            #   5__4
+            # 0 /  \3
+            #   \__/
+            #  1    2
             self.vertexes = [  # clockwise from left; relative to centre
                 muPoint(x, y + geo.half_flat),
                 muPoint(x + geo.z_fraction, y + geo.height_flat),
@@ -1171,7 +1247,7 @@ class HexShape(BaseShape):
         # ---- calculate vertexes
         geo = self.get_geometry()
         is_cards = kwargs.get("is_cards", False)
-        self.get_vertexes(is_cards)
+        self.vertices = self.get_vertexes(is_cards)
         # ---- calculate area
         self.area = self.calculate_area()
         # ---- remove rotation
@@ -1196,8 +1272,10 @@ class HexShape(BaseShape):
             "perbii",
             "paths",
             "radii",
+            "radii_shapes",
             "centre_shape",
             "centre_shapes",
+            "vertex_shapes",
             "cross",
             "dot",
             "text",
@@ -1323,6 +1401,18 @@ class HexShape(BaseShape):
                 # ---- * draw paths
                 if self.paths is not None and self.paths != []:
                     self.draw_paths(cnv, ID, Point(self.x_d, self.y_d), self.vertexes)
+            if item == "radii_shapes":
+                # ---- * draw radii_shapes
+                if self.radii_shapes:
+                    direction_group = self.get_direction(lines="radii")
+                    self.draw_radii_shapes(
+                        cnv,
+                        self.radii_shapes,
+                        self.vertices,
+                        Point(self.x_d, self.y_d),
+                        direction_group,
+                        self.radii_shapes_rotated,
+                    )
             if item == "centre_shape" or item == "center_shape":
                 # ---- * centred shape (with offset)
                 if self.centre_shape:
@@ -1335,6 +1425,15 @@ class HexShape(BaseShape):
                 # ---- * centred shapes (with offsets)
                 if self.centre_shapes:
                     self.draw_centred_shapes(self.centre_shapes, self.x_d, self.y_d)
+            if item == "vertex_shapes":
+                # ---- * draw vertex shapes
+                if self.vertex_shapes:
+                    self.draw_vertex_shapes(
+                        self.vertex_shapes,
+                        self.vertices,
+                        Point(self.x_d, self.y_d),
+                        self.vertex_shapes_rotated,
+                    )
             if item == "cross":
                 # ---- * cross
                 self.draw_cross(

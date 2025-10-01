@@ -60,6 +60,7 @@ useful information but do build on each other.
    card_decks
    worked_example
    deck_command
+   card_images
 
 .. toctree::
    :maxdepth: 2

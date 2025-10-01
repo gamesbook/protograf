@@ -64,14 +64,6 @@ RightAngledTriangle(x=2, y=3, flip="north", hand="west", label="NW", fill="red")
 RightAngledTriangle(x=3, y=4, flip="south", hand="west", label="SW", fill="blue")
 PageBreak()
 
-# ---- compass
-Blueprint()
-Text(common=txt, text="Compass")
-Compass(cx=3, cy=1, perimeter='hexagon', radius=0.5, radii_stroke_width=2)
-Compass(cx=1, cy=5, perimeter='circle', radius=0.5, directions="ne nw s")
-Compass(cx=2, cy=3, perimeter='rectangle', directions="*", height=2, width=3, radii_stroke="red")
-PageBreak()
-
 # ---- lines (multiple) labels
 Blueprint()
 Text(common=txt, text="Lines")
@@ -472,10 +464,52 @@ Rectangle(common=rct, x=2, y=3.0, label="offset +x, +y", label_mx=0.2, label_my=
 Rectangle(common=rct, x=2, y=4.5, label="offset -y", label_my=-0.2)
 PageBreak()
 
-# ---- star shape
+# ---- star_custom
 Blueprint(stroke_width=0.5)
-Text(common=txt, text="Star: rotation (36\u00B0)")
-Star(cx=2, cy=3, radius=2, fill_stroke="yellow", rotation=36)
+Text(common=txt, text="Star: custom")
+Star(cx=1, cy=1, radius=1,
+     fill="red",
+     stroke="gold",
+     stroke_width=2,
+     inner_fraction=0.4,
+)
+Star(cx=2, cy=3, radius=1,
+     rays=6,
+     show_radii=True,
+     rotation=30,
+)
+Star(cx=3, cy=5, radius=1,
+     fill=None,
+     rays=12,
+     inner_fraction=0.1,
+)
+PageBreak()
+
+# ---- star_slices
+Blueprint()
+Text(common=txt, text="Star: slices")
+Star(cx=2, cy=1, radius=1,
+     rays=4,
+     inner_fraction=0.33,
+     stroke_width=2,
+     slices=["black", "white"],
+     dot=0.02,
+     dot_stroke="red",
+ )
+Star(cx=2, cy=4, radius=1,
+     slices=[
+        "#CE8F0C",
+        "#F8C40C",
+        "#F3BA0B",
+        "#DB9F0D",
+        "#F8C609",
+        "#CE8F0C",
+        "#F7C30D",
+        "#D59A0E",
+        "#CE8F0C",
+        "#F7C615",
+    ]
+)
 PageBreak()
 
 # ---- polyshape
@@ -668,11 +702,11 @@ PageBreak()
 
 # ---- centred shapes
 Blueprint()
-Text(common=txt, text="Centre Shape")
+Text(common=txt, text="Centred Shape")
 small_star = star(radius=0.25)
 Hexagon(x=0.5, y=0.5, height=1, centre_shape=small_star)
 Square(x=2.5, y=0.5, height=1, centre_shape=small_star)
-Rectangle(x=0.5, y=2.5, height=1, width=1.25, centre_shape=small_star)
+Rectangle(x=0.25, y=2.5, height=1, width=1.5, centre_shape=small_star)
 Circle(cx=3, cy=3, radius=0.5, centre_shape=small_star)
 Polygon(cx=1, cy=5, radius=0.5, sides=8, centre_shape=small_star)
 EquilateralTriangle(x=2.35, y=5.5, side=1.25, centre_shape=small_star)
@@ -680,7 +714,7 @@ PageBreak()
 
 # ---- centre shape - move
 Blueprint()
-Text(common=txt, text="Centre Shape: move + double")
+Text(common=txt, text="Centred Shape: move + double")
 small_star = star(radius=0.25)
 small_circle = circle(radius=0.33, fill="gray", centre_shape=small_star)
 Hexagon(x=1, y=0.5, height=2,
@@ -943,6 +977,111 @@ Polyline(points='1,5 1,6 2,6 4,5',
          wave_style="wave", wave_height=0.05,)
 PageBreak()
 
+# ---- vertex shapes
+Blueprint()
+Text(common=txt, text="Vertex Shapes")
+Rectangle(
+    cx=1, cy=1,
+    height=1,
+    width=1.5,
+    vertex_shapes=[circle(radius=0.15, label="R")]*4,
+    vertex_shapes_rotated=True)
+Hexagon(
+    cx=3, cy=1,
+    radius=1,
+    vertex_shapes=[circle(radius=0.15, label="H")]*6,
+    vertex_shapes_rotated=True)
+Polygon(
+    cx=1, cy=3,
+    sides=5,
+    radius=1,
+    vertex_shapes=[circle(radius=0.15, label="P")]*5,
+    vertex_shapes_rotated=True)
+Trapezoid(
+    cx=3, cy=3,
+    width=1.5, top=1, height=1.25,
+    vertex_shapes=[circle(radius=0.15, label="T")]*5,
+    vertex_shapes_rotated=True)
+EquilateralTriangle(
+    cx=1, cy=5,
+    side=1.5,
+    vertex_shapes=[circle(radius=0.15, label="E")]*3,
+    vertex_shapes_rotated=True)
+Star(
+    cx=3, cy=5,
+    radius=1,
+    rays=5,
+    vertex_shapes=[circle(radius=0.15, label="S")]*5,
+    vertex_shapes_rotated=True)
+PageBreak()
+
+# ---- radii shapes
+Blueprint()
+Text(common=txt, text="Radii shapes")
+ccom = Common(radius=0.15, fill="gold", label_size=6)
+Hexagon(
+    cx=1, cy=1,
+    radius=0.8,
+    orientation="pointy",
+    radii_shapes=[
+        ('n', circle(common=ccom, label="n")),
+        ('se', circle(common=ccom, label="se"), 1.25),
+        ('sw', circle(common=ccom, label="sw"), 0.5 ),
+    ],
+    radii_shapes_rotated=True,
+)
+Hexagon(
+    cx=3, cy=1,
+    radius=0.8,
+    radii_shapes=[
+       ('ne', circle(common=ccom, label="ne")),
+       ('se', circle(common=ccom, label="se"), 1.25),
+       ('sw', circle(common=ccom, label="sw"), 0.5),
+    ],
+    radii_shapes_rotated=True,
+)
+Rectangle(
+    cx=1, cy=3,
+    height=1, width=1.5,
+    radii_shapes=[
+        ('ne', circle(common=ccom, label="ne")),
+        ('se', circle(common=ccom, label="se")),
+        ('sw', circle(common=ccom, label="sw")),
+        ('nw', circle(common=ccom, label="nw")),
+    ],
+    radii_shapes_rotated=True,
+)
+Rhombus(
+    cx=3, cy=3,
+    width=1, height=1.5,
+    radii_shapes=[
+        ('n', circle(common=ccom, label="n")),
+        ('s', circle(common=ccom, label="s")),
+        ('e', circle(common=ccom, label="e")),
+        ('w', circle(common=ccom, label="w")),
+    ],
+    radii_shapes_rotated=True,
+)
+EquilateralTriangle(
+    cx=1, cy=5,
+    side=1.25,
+    radii_shapes=[
+        ('n', circle(common=ccom, label="n")),
+        ('se', circle(common=ccom, label="se")),
+        ('sw', circle(common=ccom, label="sw")),
+    ],
+    radii_shapes_rotated=True,
+)
+Circle(
+    cx=3, cy=5,
+    radius=0.75,
+    radii_shapes=[
+        ('30 90 150 210 270 330', circle(common=ccom, label="A")),
+    ],
+    radii_shapes_rotated=True,
+)
+PageBreak()
+
 # ---- END
 Text(common=txt, text="Shapes END...")
 
@@ -953,7 +1092,7 @@ Save(
      names=[
         None,
         "blueprint_subdiv", "dots_crosses", "centred", "right_angled_triangle",
-        "compass", "lines", "starfield_rectangle", "starfield_circle",
+        "lines", "starfield_rectangle", "starfield_circle",
         "starfield_poly", "equilateral_triangle", "right_angled_triangle_flip",
         "sectors", "grid_gray", "dotgrid_moleskine", "dotgrid_rowscols", "arc",
         "stadium_edges", "trapezoid_flip", "chord",
@@ -968,7 +1107,8 @@ Save(
         "line_connections", "line_connections_arrow", "line_connections_spoke",
         "bezier_custom", "ellipse_custom", "rectangle_custom",
         "square_custom", "trapezoid_custom", "image_default",
-        "descriptions", "label_offset", "star_custom",
+        "descriptions", "label_offset",
+        "star_custom", "star_slices",
         "polyshape_default", "polyshape_custom", "polyshape_offset",
         "rectangles_rowcol", "rectangles_custom", "rhombus_custom",
         "rhombus_borders", "trapezoid_borders",
@@ -982,4 +1122,6 @@ Save(
         "table_defaults", "table_custom",
         "perbii_styled",
         "poly_waves",
+        "vertex_shapes",
+        "radii_shapes",
         None])

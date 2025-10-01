@@ -28,7 +28,6 @@ cross-reference to the detailed information for that command.
    :ref:`deck <the-deck-command>`
 -  :ref:`Circle <circle-command>` * - a geometric shape that can be drawn on a page
    (see also further :ref:`customisation options <circleIndex>`)
--  :ref:`Compass <compass-command>` * - a geometric shape that can be drawn on a page
 -  :ref:`Chord <chord-command>` * - a geometric shape that can be drawn on a page
 -  :ref:`Common <the-common-command>` - set the properties for any shape that can be drawn on a page
 -  :ref:`Counter <the-countersheet-command>`  - details for a counter that is part
@@ -48,10 +47,13 @@ cross-reference to the detailed information for that command.
 -  :ref:`Dot <dot-command>` * - a geometric shape that can be drawn on a page
 -  :ref:`DotGrid <dotgrid-command>` - a set, or group, of dots that can be drawn on a page
 -  :ref:`Ellipse <ellipse-command>` * - a geometric shape that can be drawn on a page
--  :ref:`EquilateralTriangle <equilateraltriangle-command>` * - a geometric shape that can be drawn on a page
+-  :ref:`EquilateralTriangle <equilateraltriangle-command>` * - a geometric shape that
+   can be drawn on a page (also referenced by `EquTri`)
 -  :ref:`Extract <the-extract-command>` - allows portions of pages to be extracted as PNG images
 -  :ref:`Font <the-font-command>` - set the font properties for any
    :ref:`Text <text-command>` drawn on a page
+-  :ref:`IconFont <the-iconfont-command>` - set the font properties for any
+   referenced Unicode symbols embedded in subsequent :ref:`Text <text-command>`
 -  :ref:`Grid <grid-command>` - a set, or group, of lines that can be drawn on a page
 -  :ref:`group <group-function>` - a way to  reference a stack of shapes that
    all need to be drawn together on a :ref:`card <the-card-command>`

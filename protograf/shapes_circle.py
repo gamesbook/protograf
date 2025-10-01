@@ -34,6 +34,7 @@ from protograf.utils.structures import (
     Perbis,
     Point,
     PolyGeometry,
+    Radius,
 )  # named tuples
 from protograf.utils.support import CACHE_DIRECTORY
 from protograf.base import (
@@ -89,6 +90,33 @@ class CircleShape(BaseShape):
             return self.points_to_value(length)
         else:
             return length
+
+    def calculate_radii(
+        self, cnv, centre: Point, vertices: list, debug: bool = False
+    ) -> dict:
+        """Calculate radii for each Circle vertex and angles from centre.
+
+        Args:
+            vertices: list of Circle nodes as Points
+            centre: the centre Point of the Circle
+
+        Returns:
+            dict of Radius objects keyed on angle
+        """
+        radii_dict = {}
+        # print(f"*** CIRC radii {centre=} {vertices=}")
+        for key, vertex in enumerate(vertices):
+            compass, angle = geoms.angles_from_points(centre, vertex)
+            # print(f"*** CIRC *** radii {key=} {directions[key]=} {compass=} {angle=}")
+            _radii = Radius(
+                point=vertex,
+                direction=angle,
+                compass=compass,
+                angle=360 - angle,  # inverse flip (y is reveresed)
+            )
+            # print(f"*** CIRC radii {_radii}")
+            radii_dict[angle] = _radii
+        return radii_dict
 
     def draw_hatches(
         self, cnv, ID, num: int, x_c: float, y_c: float, rotation: float = 0.0
@@ -379,7 +407,13 @@ class CircleShape(BaseShape):
             angles = support.steps(90 - shift, 450 - shift, gap)
             # print(f' ^ {self.petals=} {angles=}')
             for index, angle in enumerate(angles):
-                angle = angle - 360.0 if angle > 360.0 else angle
+                _angle = angle
+                angle = _angle - 360.0 if _angle > 360.0 else _angle
+                if index == 0:
+                    start_angle = angle
+                else:
+                    if round(start_angle, 3) == round(angle, 3):
+                        break  # avoid a repeat
                 petals_style = _lower(self.petals_style)
                 if petals_style not in ["triangle", "t"]:
                     if len(angles) < self.petals + 1:
@@ -398,15 +432,34 @@ class CircleShape(BaseShape):
                                 center, self._u.radius + offset, angle
                             )
                         )
-
                     case "petal" | "p":
+                        # first half
                         pt1 = geoms.point_on_circle(
                             center,
                             self._u.radius + offset,
                             angle - gap / 2.0,
                         )
                         pt2 = geoms.point_on_circle(
-                            center, self._u.radius + offset + height, angle
+                            center,
+                            self._u.radius + offset + height,
+                            angle - gap / 2.0,
+                        )
+                        pt3 = geoms.point_on_circle(
+                            center,
+                            self._u.radius + offset + height,
+                            angle,
+                        )
+                        petals_vertices.append((pt1, pt2, pt3))
+                        # second half
+                        pt1 = geoms.point_on_circle(
+                            center,
+                            self._u.radius + offset + height,
+                            angle,
+                        )
+                        pt2 = geoms.point_on_circle(
+                            center,
+                            self._u.radius + offset + height,
+                            angle + gap / 2.0,
                         )
                         pt3 = geoms.point_on_circle(
                             center,
@@ -414,7 +467,37 @@ class CircleShape(BaseShape):
                             angle + gap / 2.0,
                         )
                         petals_vertices.append((pt1, pt2, pt3))
-
+                    case "sun" | "s":
+                        # first half
+                        pt1 = geoms.point_on_circle(
+                            center,
+                            self._u.radius + offset,
+                            angle,
+                        )
+                        pt2 = geoms.point_on_circle(
+                            center, self._u.radius + offset, angle - gap / 2.0
+                        )
+                        pt3 = geoms.point_on_circle(
+                            center,
+                            self._u.radius + offset + height,
+                            angle - gap / 2.0,
+                        )
+                        petals_vertices.append((pt1, pt2, pt3))
+                        # second half
+                        pt1 = geoms.point_on_circle(
+                            center,
+                            self._u.radius + offset + height,
+                            angle - gap / 2.0,
+                        )
+                        pt2 = geoms.point_on_circle(
+                            center, self._u.radius + offset, angle - gap / 2.0
+                        )
+                        pt3 = geoms.point_on_circle(
+                            center,
+                            self._u.radius + offset,
+                            angle - gap,
+                        )
+                        petals_vertices.append((pt1, pt2, pt3))
                     case _:
                         feedback(f'Unknown petals_style "{self.petals_style}"', True)
 
@@ -430,6 +513,15 @@ class CircleShape(BaseShape):
                             (petals_vertices[key + 1].x, petals_vertices[key + 1].y),
                         )
                 case "petal" | "p":
+                    for key, vertex in enumerate(petals_vertices):
+                        # if key == 0:
+                        #     continue  # already have a "start" location on path
+                        cnv.draw_curve(  # was curveTo
+                            (vertex[0].x, vertex[0].y),
+                            (vertex[1].x, vertex[1].y),
+                            (vertex[2].x, vertex[2].y),
+                        )
+                case "sun" | "s":
                     for key, vertex in enumerate(petals_vertices):
                         # if key == 0:
                         #     continue  # already have a "start" location on path
@@ -599,6 +691,7 @@ class CircleShape(BaseShape):
             "slices",
             "hatches",
             "radii",
+            "radii_shapes",
             "centre_shape",
             "centre_shapes",
             "cross",
@@ -656,6 +749,17 @@ class CircleShape(BaseShape):
                 # ---- * draw radii
                 if self.radii:
                     self.draw_radii(cnv, ID, self.x_c, self.y_c)
+            if item == "radii_shapes":
+                # ---- * draw radii_shapes
+                if self.radii_shapes:
+                    self.draw_radii_shapes(
+                        cnv,
+                        self.radii_shapes,
+                        self.vertexes,
+                        Point(self.x_c, self.y_c),
+                        DirectionGroup.CIRCULAR,
+                        self.radii_shapes_rotated,
+                    )
             if item == "centre_shape" or item == "center_shape":
                 # ---- * centre shape (with offset)
                 if self.centre_shape:

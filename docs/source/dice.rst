@@ -64,7 +64,9 @@ D6 Styling
         D6(x=3, y=2, roll=6, common=red_yello)
 
         blu_wite = Common(
-            pip_fill="white", pip_stroke="aqua",
+            pip_fill="white",
+            pip_stroke="aqua",
+            pip_shape="diamond",
             fill="blue", pip_fraction=0.15)
         D6(x=0, y=3, common=blu_wite)
         D6(x=1, y=3, roll=2, common=blu_wite)
@@ -91,9 +93,11 @@ D6 Styling
       The red dice show how the pip *stroke* and *fill* can be set to different
       colors.
 
-      The blue dice show how the pip size can be changed.  Size is represented
-      as a fraction of the width/height of the die.  The default is one-fifth
-      (``0.2``) but it can be as small as ``0.1`` or as large as ``0.33``.
+      The blue dice show how the pip size and shape can be changed.  Size is
+      represented as a fraction of the width/height of the die.  The default
+      size is one-fifth (``0.2``) but it can be as small as ``0.1`` or as large
+      as ``0.33``.  The default pip shape is a ``circle``, but can also be
+      assigned to be a ``diamond``.
 
       The white dice in the lower-right show how the D6, like many other
       shapes, can be assigned text captions, and that it can be rotated.
