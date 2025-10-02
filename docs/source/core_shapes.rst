@@ -485,6 +485,68 @@ Example 3. Polyline with Arrow
 ===== ======
 
 
+Example 4. Polyline with Snail
+++++++++++++++++++++++++++++++
+
+The *snail* property is loosely based on the Turtle graphics drawing module
+available for Python (see: https://docs.python.org/3/library/turtle.html).
+
+Instead of using points, the idea of the *snail* is to create a polyline
+based on a series of lines where the line direction |dash| or orientation
+|dash| will already have been set.   Each line is then drawn from the end
+point of the previous line.
+
+A *snail* property consists of a series of terms, each separated by a space.
+Each term either relates to a direction changes or to drawing line of a
+certain length.
+
+
+.. raw:: html
+
+   <small>Apologies for using "jump" as the term to cause a move to
+   happen without drawing a line; the idea of a snail jumping was just
+   too absurd not to use!</small>
+
+
+.. |py4| image:: images/customised/polyline_snail.png
+   :width: 330
+
+===== ======
+|py4| The Polyline shape is constructed with these properties:
+
+      .. code:: python
+
+        snail_line = "n 3 e 2 -45 2 w 1 sw 3 **"
+        Polyline(
+            y=0.5,
+            snail="2 s 1 w 2 n 1",
+            stroke_width=2,
+            stroke="red")
+        Polyline(
+            x=0, y=5,
+            snail=snail_line,
+            stroke_width=1)
+        Polyline(
+            x=0, y=5,
+            snail=snail_line,
+            stroke_width=1,
+            scaling=0.5)
+        Polyline(
+            y=3, x=2,
+            snail="e 1 s 1 w 1 n 1 s j1 "*3,
+            stroke_width=2,
+            stroke="blue")
+        Polyline(
+            x=3.5, y=1,
+            snail="s 0.4 j0.1 "*8,
+            stroke_width=1,
+            stroke="green")
+
+      This example makes use of the "snail" property.
+
+
+===== ======
+
 .. _text-command:
 
 Text

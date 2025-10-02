@@ -24,6 +24,9 @@ from protograf.base import (
     BaseShape,
     get_cache,
 )
+from protograf.base_extended import (
+    BasePolyShape,
+)
 from protograf.shapes_circle import CircleShape
 from protograf.shapes_rectangle import RectangleShape
 from protograf.utils import colrs, geoms, support, tools, fonts
@@ -1371,199 +1374,15 @@ class PolygonShape(BaseShape):
         self.calculated_top = (x - self._u.radius) / self.units
 
 
-class PolylineShape(BaseShape):
+class PolylineShape(BasePolyShape):
     """
     Multi-part line on a given canvas.
     """
 
-    def get_steps(self) -> list:
-        """Get a list of step tuples."""
-        steps = tools.tuple_split(self.steps)
-        if not steps:
-            steps = self.steps
-        if not steps or len(steps) == 0:
-            return None
-        return steps
-
-    def get_points(self) -> list:
-        """Get a list of point tuples."""
-        points = tools.tuple_split(self.points)
-        if not points:
-            points = self.points
-        if not points or len(points) == 0:
-            return None
-        return points
-
-    def get_vertexes(self):
-        """Return polyline vertices in canvas units"""
-        points = self.get_points()
-        steps = self.get_steps()
-        _snail = self.snail
-        if points and _snail:
-            feedback(
-                "Snail values will supercede points to draw the Polyline", False, True
-            )
-            return None
-        if steps and _snail:
-            feedback(
-                "Snail values will supercede steps to draw the Polyline", False, True
-            )
-            return None
-        if points and steps:
-            feedback(
-                "Point values will supercede steps to draw the Polyline", False, True
-            )
-        if points:
-            vertices = [
-                Point(
-                    self.unit(pt[0]) + self._o.delta_x,
-                    self.unit(pt[1]) + self._o.delta_y,
-                )
-                for pt in points
-            ]
-            return vertices
-        # print('***', f'{steps=}')
-        if steps:
-            vertices = []
-            # start here...
-            vertices.append(
-                Point(
-                    self.unit(self.x) + self._o.delta_x,
-                    self.unit(self.y) + self._o.delta_y,
-                )
-            )
-            if len(steps) > 0:
-                for index, stp in enumerate(steps):
-                    vertices.append(
-                        Point(
-                            vertices[index].x + self.unit(stp[0]),
-                            vertices[index].y + self.unit(stp[1]),
-                        )
-                    )
-                return vertices
-        if not self.snail:
-            feedback(
-                "There are no points or steps or snail to draw the Polyline.",
-                False,
-                True,
-            )
-        return None
-
-    def draw_snail(self, cnv=None, off_x=0, off_y=0, ID=None, **kwargs):
-        """Draw a polyline (multi-part line) on a given canvas via snail."""
-
-        def is_float(value: str) -> bool:
-            try:
-                the_value = float(value)
-                return True
-            except (ValueError, Exception):
-                return False
-
-        def draw_or_jump(current_point: Point, distance: float, jump: bool) -> Point:
-            """Draw a line or move to a new Point."""
-            # convert distance to units
-            u_distance = self.unit(distance)
-            # print('snail', current_dir, distance, u_distance)
-            # calculate new point based on current_dir, u_distance
-            new_point = geoms.point_from_angle(
-                current_point, u_distance, 360 - current_dir
-            )
-            # draw line from current_point to new_point
-            if not jump:
-                draw_line(
-                    cnv,
-                    current_point,
-                    new_point,
-                    shape=self,
-                    **kwargs,
-                )
-            # save new_point as current_point
-            return new_point
-
-        if not isinstance(self.snail, str):
-            feedback("The Polyline snail must be a space-separated string!", True)
-        items = self.snail.split(" ")
-        # print(f'*** snail {items=}')
-        current_dir = 0  # face E by default
-        start_point = Point(self._u.x + self._o.delta_x, self._u.y + self._o.delta_y)
-        current_point = start_point
-        for item in items:
-            if not item:
-                continue
-            _item = str(item).lower()
-            if _item in ["n", "e", "w", "s", "ne", "se", "sw", "nw"]:
-                current_dir = tools.compass_to_rotation(_item)
-            elif _item == "*":
-                current_point = start_point
-            elif _item == "**":
-                draw_line(
-                    cnv,
-                    current_point,
-                    start_point,
-                    shape=self,
-                    **kwargs,
-                )
-                current_point = start_point
-            elif _item[0] == "a":
-                a_item = _item.strip("a")
-                if not is_float(a_item):
-                    tools.feedback(
-                        f'The Polyline snail angle "{_item}" is not valid.', True, True
-                    )
-                else:
-                    current_dir = float(a_item)
-                    if current_dir < 0 or current_dir > 360:
-                        tools.feedback(
-                            f'The Polyline snail angle "{a_item}" must be in the range 0 to 360.',
-                            True,
-                            True,
-                        )
-            elif _item[0] == "+":
-                a_item = _item.strip("+")
-                if not is_float(a_item):
-                    tools.feedback(
-                        f'The Polyline snail angle "{_item}" is not valid.', True, True
-                    )
-                else:
-                    current_dir = current_dir + float(a_item)
-                    if current_dir > 360:
-                        current_dir = 360 - current_dir
-                    if current_dir < 0 or current_dir > 360:
-                        tools.feedback(
-                            f'The Polyline snail angle change "{_item}" must result in 0 to 360.',
-                            True,
-                            True,
-                        )
-            elif _item[0] == "-":
-                a_item = _item.strip("-")
-                if not is_float(a_item):
-                    tools.feedback(
-                        f'The Polyline snail angle "{_item}" is not valid.', True, True
-                    )
-                else:
-                    current_dir = current_dir - float(a_item)
-                    if current_dir < 0:
-                        current_dir = 360 + current_dir
-                    if current_dir < 0 or current_dir > 360:
-                        tools.feedback(
-                            f'The Polyline snail angle change "{_item}" must result in 0 to 360.',
-                            True,
-                            True,
-                        )
-            elif _item[0] == "j":
-                a_item = _item.strip("j")
-                if not is_float(a_item):
-                    tools.feedback(
-                        f'The Polyline snail jump "{_item}" is not valid.', True, True
-                    )
-                else:
-                    current_point = draw_or_jump(current_point, float(a_item), True)
-            elif is_float(_item):
-                current_point = draw_or_jump(current_point, float(_item), False)
-            else:
-                tools.feedback(
-                    f'The Polyline snail cannot contain "{_item}".', True, True
-                )
+    def __init__(self, _object=None, canvas=None, **kwargs):
+        super(PolylineShape, self).__init__(_object=_object, canvas=canvas, **kwargs)
+        # overrides / extra args
+        self.scaling = tools.as_float(kwargs.get("scaling", 1.0), "scaling")
 
     def draw(self, cnv=None, off_x=0, off_y=0, ID=None, **kwargs):
         """Draw a polyline (multi-part line) on a given canvas."""
@@ -2193,7 +2012,7 @@ class SectorShape(BaseShape):
         self.set_canvas_props(cnv=cnv, index=ID, **kwargs)
 
 
-class ShapeShape(BaseShape):
+class ShapeShape(BasePolyShape):
     """
     Irregular polygon, based on a set of points, on a given canvas.
     """
@@ -2203,68 +2022,7 @@ class ShapeShape(BaseShape):
         # overrides
         self.x = kwargs.get("x", kwargs.get("left", 0))
         self.y = kwargs.get("y", kwargs.get("bottom", 0))
-
-    def get_steps(self) -> list:
-        """Get a list of step tuples."""
-        steps = tools.tuple_split(self.steps)
-        if not steps:
-            steps = self.steps
-        if not steps or len(steps) == 0:
-            return None
-        return steps
-
-    def get_points(self) -> list:
-        """Get a list of point tuples."""
-        points = tools.tuple_split(self.points)
-        if not points:
-            points = self.points
-        if not points or len(points) == 0:
-            return None
-        return points
-
-    def get_vertexes(self):
-        """Return polyline vertices in canvas units"""
-        points = self.get_points()
-        steps = self.get_steps()
-        if points and steps:
-            feedback(
-                "Point values will supercede steps to draw the Polyshape", False, True
-            )
-        if points:
-            vertices = [
-                Point(
-                    self.unit(pt[0]) + self.unit(self.x) + self._o.delta_x,
-                    self.unit(pt[1]) + self.unit(self.y) + self._o.delta_y,
-                )
-                for pt in points
-            ]
-            return vertices
-        # print('***', f'{steps=}')
-        if steps:
-            vertices = []
-            # start here...
-            vertices.append(
-                Point(
-                    self.unit(self.x) + self._o.delta_x,
-                    self.unit(self.y) + self._o.delta_y,
-                )
-            )
-            if len(steps) > 0:
-                for index, stp in enumerate(steps):
-                    vertices.append(
-                        Point(
-                            vertices[index].x + self.unit(stp[0]),
-                            vertices[index].y + self.unit(stp[1]),
-                        )
-                    )
-                return vertices
-        if not self.snail:
-            feedback(
-                "There are no points or steps or snail to draw the Polyshape",
-                False,
-                True,
-            )
-        return None
+        self.scaling = tools.as_float(kwargs.get("scaling", 1.0), "scaling")
 
     def draw(self, cnv=None, off_x=0, off_y=0, ID=None, **kwargs):
         """Draw an irregular polygon on a given canvas."""
@@ -2294,18 +2052,20 @@ class ShapeShape(BaseShape):
             if kwargs.get("rounded"):
                 kwargs["lineJoin"] = 1
             self.set_canvas_props(cnv=cnv, index=ID, **kwargs)
-            # ---- is there a centre?
-            if self.cx and self.cy:
-                x = self._u.cx + self._o.delta_x + x_offset
-                y = self._u.cy + self._o.delta_y + y_offset
-                # ---- * dot
-                self.draw_dot(cnv, x, y)
-                # ---- * cross
-                self.draw_cross(cnv, x, y, rotation=kwargs.get("rotation"))
-                # ---- * text
-                self.draw_label(cnv, ID, x, y, **kwargs)
-        else:
-            feedback("There are no points or steps to draw the Polyshape", False, True)
+        if self.snail:
+            self.draw_snail(cnv=cnv, off_x=off_x, off_y=off_y, ID=ID, **kwargs)
+            kwargs["closed"] = True
+            self.set_canvas_props(cnv=cnv, index=ID, **kwargs)
+        # ---- is there a centre?
+        if self.cx and self.cy:
+            x = self._u.cx + self._o.delta_x + x_offset
+            y = self._u.cy + self._o.delta_y + y_offset
+            # ---- * dot
+            self.draw_dot(cnv, x, y)
+            # ---- * cross
+            self.draw_cross(cnv, x, y, rotation=kwargs.get("rotation"))
+            # ---- * text
+            self.draw_label(cnv, ID, x, y, **kwargs)
 
 
 class SquareShape(RectangleShape):

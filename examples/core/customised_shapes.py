@@ -703,6 +703,7 @@ PageBreak()
 # ---- polyline - snail
 Blueprint(stroke_width=0.5)
 Text(common=txt, text="Polyline: snail")
+snail_line = "n 3 e 2 -45 2 w 1 sw 3 **"
 Polyline(
     y=0.5,
     snail="2 s 1 w 2 n 1",
@@ -710,14 +711,25 @@ Polyline(
     stroke="red")
 Polyline(
     x=0, y=5,
+    snail=snail_line,
     stroke_width=1,
-    snail="n 3 e 2 -45 2 w 1 sw 3 a118 0.64"
+)
+Polyline(
+    x=0, y=5,
+    snail=snail_line,
+    stroke_width=1,
+    scaling=0.5
 )
 Polyline(
     y=3, x=2,
     snail="e 1 s 1 w 1 n 1 s j1 "*3,
     stroke_width=2,
     stroke="blue")
+Polyline(
+    x=3.5, y=1,
+    snail="s 0.4 j0.1 "*8,
+    stroke_width=1,
+    stroke="green")
 PageBreak()
 
 # ---- centred shapes

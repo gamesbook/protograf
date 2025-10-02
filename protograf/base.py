@@ -174,7 +174,7 @@ class BaseCanvas:
         self.y = self.defaults.get("y", self.defaults.get("bottom", 1))
         self.cx = self.defaults.get("cx", None)  # NB! not 0; needed for internal check
         self.cy = self.defaults.get("cy", None)  # NB! not 0; needed for internal check
-        self.scaling = self.defaults.get("scaling", None)
+        self.scaling = self.defaults.get("scaling", None)  # SVG; snail
         self.dot_width = self.defaults.get("dot_width", 3.0)  # points
         # ---- to be calculated ...
         self.area = None
@@ -744,7 +744,7 @@ class BaseShape:
         self.y = self.kw_float(kwargs.get("y", kwargs.get("top", base.y)))
         self.cx = self.kw_float(kwargs.get("cx", base.cx))  # centre (for some shapes)
         self.cy = self.kw_float(kwargs.get("cy", base.cy))  # centre (for some shapes)
-        self.scaling = self.kw_float(kwargs.get("scaling", None))  # SVG images
+        self.scaling = self.kw_float(kwargs.get("scaling", None))  # SVG; snail
         self.dot_width = self.kw_float(
             kwargs.get("dot_width", base.dot_width)
         )  # points
