@@ -16,6 +16,9 @@ Note that some shapes, such as the :ref:`Hexagon <hexIndex>`, or
 available; its better to refer to their specific descriptions to understand
 exactly how these can used.
 
+This section is meant to be complementary to the concepts, terms and ideas for
+:doc:`protograf <index>` discussed in :doc:`Basic Concepts <basic_concepts>`.
+
 .. _table-of-contents-terms:
 
 - `protograf Jargon`_

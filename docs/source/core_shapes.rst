@@ -375,9 +375,17 @@ In addition to setting points directly, the Polyline can also be constructed
 using the *steps* property.  This define a series of values that represent
 the **relative** distance from the last point drawn.
 
+The following examples illustrate these properties:
+
+- `Example 1. Basic Polyline`_
+- `Example 2. Customised Polyline`_
+- `Example 3. Polyline with Arrow`_
+- `Example 4. Polyline with Snail`_
+
 
 Example 1. Basic Polyline
 +++++++++++++++++++++++++
+`^ <polyline-command_>`_
 
 .. |py1| image:: images/defaults/polyline.png
    :width: 330
@@ -418,6 +426,7 @@ Example 1. Basic Polyline
 
 Example 2. Customised Polyline
 ++++++++++++++++++++++++++++++
+`^ <polyline-command_>`_
 
 .. |py2| image:: images/customised/polyline_basic.png
    :width: 330
@@ -455,6 +464,7 @@ Example 2. Customised Polyline
 
 Example 3. Polyline with Arrow
 ++++++++++++++++++++++++++++++
+`^ <polyline-command_>`_
 
 .. |py3| image:: images/customised/polyline_arrow.png
    :width: 330
@@ -487,18 +497,51 @@ Example 3. Polyline with Arrow
 
 Example 4. Polyline with Snail
 ++++++++++++++++++++++++++++++
+`^ <polyline-command_>`_
 
 The *snail* property is loosely based on the Turtle graphics drawing module
 available for Python (see: https://docs.python.org/3/library/turtle.html).
 
 Instead of using points, the idea of the *snail* is to create a polyline
-based on a series of lines where the line direction |dash| or orientation
-|dash| will already have been set.   Each line is then drawn from the end
-point of the previous line.
+based on a series of lines of given length, where the line direction |dash|
+or orientation |dash| will already have been set.   Each line is then drawn
+from the end point of the previous line.
 
 A *snail* property consists of a series of terms, each separated by a space.
-Each term either relates to a direction changes or to drawing line of a
+Each term either relates to a direction change or to drawing a line of a
 certain length.
+
+Directions can be set as follows:
+
+- a *compass direction*: one of n, e, w, s, ne, se, sw, or nw
+- an **absolute** *angle*: an ``a`` followed by a value in degrees, from
+  0 to 360, measured counter-clockwise from the east direction
+- a **relative** angle:
+
+  - a ``r`` or ``-`` sign (followed by a value in degrees): will *decrease*
+    the current angle i.e. alter it in a clockwise direction
+  - a ``l`` or ``+`` sign (followed by a value in degrees): will *increase*
+    the current angle i.e. alter it in an anti-clockwise direction
+
+Creating a line is done as follows:
+
+- a normal value |dash| whole or fractional |dash| will draw a line that
+  distance, in the last direction that was set
+- using a ``**`` will draw a line from the current point back to the start
+
+Moving - **without** creating a line - is done as follows:
+
+- a **relative** amount: a ``j`` followed by a value which is the distance,
+  at which the new point will be set |dash| according to the last direction
+  that was set; no line will be dreawn between the points.
+- a **fixed point** move: a ``*`` will set the next, new point to match the
+  one at the start; no line will be dreawn between the points.
+
+.. NOTE::
+
+    The *snail* line always starts at the x- and y-point defined for the
+    Polyline; and the starting direction is "e" or 0 |deg|.  The first term
+    in the *snail* property can either be a direction or a distance.
 
 
 .. raw:: html
@@ -532,17 +575,40 @@ certain length.
             stroke_width=1,
             scaling=0.5)
         Polyline(
-            y=3, x=2,
-            snail="e 1 s 1 w 1 n 1 s j1 "*3,
-            stroke_width=2,
-            stroke="blue")
-        Polyline(
             x=3.5, y=1,
             snail="s 0.4 j0.1 "*8,
             stroke_width=1,
             stroke="green")
+        Polyline(
+            y=3, x=2,
+            snail="e 1 s 1 w 1 n 1 s j1 "*3,
+            stroke_width=2,
+            stroke="blue")
 
-      This example makes use of the "snail" property.
+      The top example is a simple red line going in a square.  It starts by
+      going east |dash| the default direction |dash| for ``2cm`` then south
+      for ``1cm``, west for ``2cm`` and finally north for ``1cm``.
+
+      The two examples with the black lines share the same *snail* line,
+      assigned to ``snail_line``.  This example shows the use of the ``-``
+      to represent turning right, in this case by 45 |deg|.  It also shows
+      how the ``**`` term constructs a line back to the start.  The "smaller"
+      example is constructed using the *scaling* fraction |dash| in this case
+      set to ``0.5`` to make it half the size. Note that both lines have the
+      same starting point.
+
+      The example with the green line shows how a dotted line can be
+      constructed using the "jump" (``j``) term to create a space in the same
+      direction as the drawn line.  The ``*8`` then repeats the snail line
+      eight times |dash| actually, the full string get constructed by joining
+      eight copies of this same string, so that is why a space is needed at
+      the end.
+
+      The example with the blue line shows how a shape |dash| in this case a
+      square |dash| is constructed multiple times using the `*3`` to
+      repeat the outline three times. Again, the "jump" (``j``) term is used
+      to move to a different location before the next shape is drawn. Note
+      that start direction is set explicitly, rather than using a default!
 
 
 ===== ======
@@ -1350,8 +1416,21 @@ Polyshape
 
 A Polyshape is an irregular `polygon`_, constructed using a series of points.
 
+It's basic setup and construction  shares much in common with the
+`Polyline <polyline-command_>`_ but with  some differences, such as its
+*fill* and centre properties.
+
+The following examples illustrate these properties:
+
+- `Example 1. Default Polyshape`_
+- `Example 2. Polyshape: Centre and Steps`_
+- `Example 3. Polyshape Offset`_
+- `Example 4. Polyshape with Snail`_
+
+
 Example 1. Default Polyshape
 ++++++++++++++++++++++++++++
+`^ <polyshape-command_>`_
 
 .. |shp| image:: images/customised/polyshape_default.png
    :width: 330
@@ -1405,6 +1484,7 @@ Example 1. Default Polyshape
 
 Example 2. Polyshape: Centre and Steps
 ++++++++++++++++++++++++++++++++++++++
+`^ <polyshape-command_>`_
 
 While the Polyshape does not have the ability to be constructed using a
 *cx* and *cy* pair to set its centre location |dash| like the symmetric
@@ -1476,6 +1556,7 @@ the **relative** distance from the last point drawn.
 
 Example 3. Polyshape Offset
 +++++++++++++++++++++++++++
+`^ <polyshape-command_>`_
 
 There are two other options available.
 
@@ -1490,7 +1571,7 @@ pairs of values; so instead of ``[(0,0), (1,1)]`` just use ``"0,0 1,1"``.
    :width: 330
 
 ===== ======
-|sh3| The shapes are constructed using the command with these properties:
+|sh3| The Polyshapes are constructed using the command with these properties:
 
         .. code:: python
 
@@ -1521,6 +1602,106 @@ pairs of values; so instead of ``[(0,0), (1,1)]`` just use ``"0,0 1,1"``.
       So, even though the points used to define the ``gold`` Polyshape are
       the same as those used for ``green`` one, these values cause the whole
       shape to be moved down and to the right.
+
+===== ======
+
+
+Example 4. Polyshape with Snail
++++++++++++++++++++++++++++++++
+`^ <polyshape-command_>`_
+
+The *snail* property is loosely based on the Turtle graphics drawing module
+available for Python (see: https://docs.python.org/3/library/turtle.html).
+
+Instead of using points, the idea of the *snail* is to create a Polyshape
+based on a series of lines of given length, where the line direction |dash|
+or orientation |dash| will already have been set.   Each line is then drawn
+from the end point of the previous line.
+
+A *snail* property consists of a series of terms, each separated by a space.
+Each term either relates to a direction change or to drawing a line of a
+certain length.
+
+Directions can be set as follows:
+
+- a *compass direction*: one of n, e, w, s, ne, se, sw, or nw
+- an **absolute** *angle*: an ``a`` followed by a value in degrees, from
+  0 to 360, measured counter-clockwise from the east direction
+- a **relative** angle:
+
+  - a ``r`` or ``-`` sign (followed by a value in degrees): will *decrease*
+    the current angle i.e. alter it in a clockwise direction
+  - a ``l`` or ``+`` sign (followed by a value in degrees): will *increase*
+    the current angle i.e. alter it in an anti-clockwise direction
+
+Creating a line is done as follows:
+
+- a normal value |dash| whole or fractional |dash| will draw a line that
+  distance, in the last direction that was set
+- using a ``**`` will draw a line from the current point back to the start
+
+.. NOTE::
+
+    The *snail* line always starts at the x- and y-point defined for the
+    Polyshape; and the starting direction is "e" or 0 |deg|.  The first term
+    in the *snail* property can either be a direction or a distance.
+
+    Unlike the Polyline *snail*, no "jump" type movement is allowed; there
+    must be a continuous line.
+
+.. |sh4| image:: images/customised/polyshape_snail.png
+   :width: 330
+
+===== ======
+|sh4| The Polyshapes are constructed using the command with these properties:
+
+      .. code:: python
+
+        Polyshape(
+            x=0.5, y=1.5,
+            snail="ne 1 r65 1 ne 1.5 r125 1.44 **",
+            stroke_width=1,
+            #scaling=0.25,
+            stroke="red",
+            fill="tan")
+        Polyshape(
+            x=1, y=2.5,
+            snail="2 r160 "*9,
+            stroke_width=0.5,
+            #scaling=0.25,
+            stroke="red",
+            fill="yellow")
+        Polyshape(
+            x=1.5, y=4,
+            snail='w .5 s .5 e 2.5 n .5 w .5 s 1.5 w 1.5 n .5',
+            stroke="sandybrown",
+            stroke_width=3,
+            fill="seagreen")
+        Polyshape(
+            x=2, y=4.75,
+            snail='w .5 s .5 e 2.5 n .5 w .5 s 1.5 w 1.5 n .5',
+            scaling=0.25,
+            stroke="sandybrown",
+            stroke_width=1,
+            fill="seagreen")
+
+
+      The top example ilustrates the use of the ``r`` term to change the angle
+      of the line to the "right" of the direction it was aimed at before (north
+      east, in the first case). It also shows how the ``**`` term constructs a
+      line back to the start.
+
+      The middle example |dash| based on the one shown for the Turtle |dash|
+      shows how a simple move-and-turn can be repeated multiple times (using
+      the ``*`` multiplier to make copies) to construct a more complex shape.
+
+      The lower example is a repeat of the one shown for
+      `Example 2. Polyshape: Centre and Steps`_ but constructed with simple
+      compass directions.  It may not be that much shorter, but it could be
+      clearer.  In addition it can easily be scaled, as can be seen from the
+      small "inset" shape - the same *snail* but shrunk in size using
+      ``scaling=0.25``.
+
 ===== ======
 
 

@@ -99,7 +99,7 @@ be an image or a symbol from a font.
 Image References
 ----------------
 
-The way to reference an image file within :ref:`HTML Text <textHTML> is to
+The way to reference an image file within :ref:`HTML Text <textHTML>` is to
 surround it with a pair of marker symbols:  ``|: ... :|``.  At the start,
 the ``|:`` is used and at the end the ``:|`` is used.  These symbols should
 enclose the name of the image file.
@@ -133,7 +133,7 @@ will be replaced in the text by:
 Symbol References
 -----------------
 
-The way to reference a font symbol within :ref:`HTML Text <textHTML> is to
+The way to reference a font symbol within :ref:`HTML Text <textHTML>` is to
 surround it with a pair of marker symbols:  ``|! ... !|``.  At the start,
 the ``|!`` is used and at the end the ``!|`` is used.  These symbols should
 enclose the character symbol being referenced.

@@ -28,7 +28,8 @@ other.
 8.  :doc:`Working with Cards <card_deck_introduction>` - introduces key
     concepts to create decks of cards; and then :doc:`Card Decks <card_decks>`
     provide details of all the relevant commands, as does the
-    :doc:`Deck command <deck_command>` and the :doc:`Card images <card_images>`
+    :doc:`Deck command <deck_command>` and the use of
+    :doc:`images, symbols and fonts <card_images>`
 9.  :doc:`Customised Shapes <customised_shapes>` - how to refine the
     appearance of certain shapes; circles, hexagons, lines and rectangles
 10. :doc:`Customised Text <customised_text>` - how to refine the

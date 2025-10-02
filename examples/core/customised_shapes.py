@@ -551,6 +551,38 @@ Polyshape(
     x=1, y=2)
 PageBreak()
 
+# ---- polyshape - snail
+Blueprint(stroke_width=0.5)
+Text(common=txt, text="Polyshape: snail")
+Polyshape(
+    x=0.5, y=1.5,
+    snail="ne 1 r65 1 ne 1.5 r125 1.44 **",
+    stroke_width=1,
+    #scaling=0.25,
+    stroke="red",
+    fill="tan")
+Polyshape(
+    x=1, y=2.5,
+    snail="2 r160 "*9,
+    stroke_width=0.5,
+    #scaling=0.25,
+    stroke="red",
+    fill="yellow")
+Polyshape(
+    x=1.5, y=4,
+    snail='w .5 s .5 e 2.5 n .5 w .5 s 1.5 w 1.5 n .5',
+    stroke="sandybrown",
+    stroke_width=3,
+    fill="seagreen")
+Polyshape(
+    x=2, y=4.75,
+    snail='w .5 s .5 e 2.5 n .5 w .5 s 1.5 w 1.5 n .5',
+    scaling=0.25,
+    stroke="sandybrown",
+    stroke_width=1,
+    fill="seagreen")
+PageBreak()
+
 # ---- rectangles - basic
 Blueprint(stroke_width=0.5)
 Text(common=txt, text="Rectangles: rows & cols")
@@ -1142,6 +1174,7 @@ Save(
         "descriptions", "label_offset",
         "star_custom", "star_slices",
         "polyshape_default", "polyshape_custom", "polyshape_offset",
+        "polyshape_snail",
         "rectangles_rowcol", "rectangles_custom", "rhombus_custom",
         "rhombus_borders", "trapezoid_borders",
         "arrow_sizes", "arrow_rotate", "arrowheads",
