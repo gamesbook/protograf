@@ -1006,69 +1006,63 @@ Example 2. Customised EquilateralTriangle
 |eq2| This example shows the shape constructed using the command with the
       various properties.
 
-      In the top section:
-
       .. code:: python
 
         EquilateralTriangle(
-            x=2, y=1,
-            flip="north", hand="west",
-            label="NW",
-            fill="red")
+            cx=2, cy=2, side=2,
+            hatches_count=5,
+            hatches_stroke="red",
+            title='Title', heading='Head')
         EquilateralTriangle(
-            x=2, y=1,
-            flip="north", hand="east",
-            label="NE",
-            fill="gold")
-        EquilateralTriangle(
-            x=2, y=1,
-            flip="south", hand="west",
-            label="SW",
-            fill="blue")
-        EquilateralTriangle(
-            x=2, y=1,
-            flip="south", hand="east",
-            label="SE",
-            fill="chartreuse")
-
-      These shapes have the following properties:
-
-      - starting position - *x* is``2`` cm and *y* is ``1`` cm
-      - default side of ``1`` cm; all sides are equal
-      - *flip* - can be ``north`` or ``south`` |dash| the triangle
-        to either point up or down relative to the starting position
-      - *hand*  - can be ``west`` or ``east`` |dash| the triangle
-        to be drawn to the left or the right relative to the starting position
-
-      The middle section shows:
-
-      .. code:: python
-
-        EquilateralTriangle(
-            x=1, y=4, side=1.5,
-            hatches_count=5, hatches_stroke="red",
-            title="Title", heading="Head")
-
-      - starting position - *x* is ``1`` cm and *y* is ``4`` cm
-      - *side* of ``1.5`` cm; all sides are equal
-      - *hatches_count* of ``5`` - this means there will be 5 equally spaced lines drawn
-        between opposing sides and running parallel to the third side
-      - *hatches_stroke* - customise the hatches to show them as ``red``
-
-      The top section shows:
-
-      .. code:: python
-
-        EquilateralTriangle(
-            x=1, y=5.5, side=1.5,
+            cx=2, cy=5, side=2,
             stroke_width=1,
             rotation=45,
             dot=.05)
 
-      - starting position -  *x* is ``1`` cm and *y* is ``5.5`` cm
-      - *dot* - in the centre
-      - *rotation* - of 45 |deg| anti-clockwise about
-        the centre
+      These shapes have the following properties:
+
+      - starting position - *cx* is``2`` cm
+      - default side of ``2`` cm; all sides are equal
+
+
+===== ======
+
+.. _equtriSlices:
+
+Example 3. EquilateralTriangle: Lines and Slices
+++++++++++++++++++++++++++++++++++++++++++++++++
+
+*Slices* are a set of colors that are drawn as triangles inside a
+an EquilateralTriangle in a clockwise direction starting from the
+"North East". If there are fewer colors than the thre possible triangles,
+then the colors are repeated, starting from the first one.
+
+.. |eq3| image:: images/customised/equtri_perbii_slice.png
+   :width: 330
+
+===== ======
+|eq3| This example shows EquilateralTriangles constructed using these
+      commands:
+
+      .. code:: python
+
+        EquilateralTriangle(
+            cx=1, cy=1,
+            side=1.5,
+            radii="n se sw",
+            title="radii",
+            fill="tomato")
+        EquilateralTriangle(
+            cx=2, cy=3,
+            side=1.5,
+            perbii="s ne nw",
+            title="perbii",
+            fill="gold")
+        EquilateralTriangle(
+            cx=3, cy=5,
+            side=1.5,
+            title="slices",
+            slices=["tomato", "gold", "lime"])
 
 ===== ======
 
@@ -3700,13 +3694,13 @@ Example 4. Rotation with Hatches
            cx=3, cy=5, height=2, width=1.5,
         )
 
-      The shapes share common properties for the number and style of hatches,
-      with a rotation of 30 |deg| each.
+      The shapes share common properties for the number, direction and style
+      of hatches, with a rotation of 30 |deg| each.
 
 ===== ======
 
 
-. _coreRadiiShapes:
+.. _coreRadiiShapes:
 
 Radii Shapes
 ~~~~~~~~~~~~

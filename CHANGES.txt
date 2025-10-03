@@ -5,7 +5,7 @@ protograf Changes
 -------------------
 - Start of new `base_extended` module
 - Add `snail` property to Polyline and Polyshape
-
+- Add `slices` and `perbii` properties to EquilateralTriangle
 
 2025-10-01 (0.3.1)
 -------------------

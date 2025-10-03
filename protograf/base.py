@@ -190,7 +190,7 @@ class BaseCanvas:
         self.rotation_point = self.defaults.get("rotation_point", "centre")
         self.direction = self.defaults.get("direction", "north")
         self.position = self.defaults.get("position", None)
-        self.flip = self.defaults.get("flip", "north")  # north/south
+        self.flip = self.defaults.get("flip", None)  # north/south
         self.elevation = self.defaults.get("elevation", "horizontal")
         self.facing = self.defaults.get("facing", "out")  # out/in
         # ---- fill color

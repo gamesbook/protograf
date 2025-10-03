@@ -100,7 +100,7 @@ class RectangleShape(BaseShape):
             vertices (list):
                 list of Rect nodes as Points
             centre (Point):
-                the centre Point of the Hex
+                the centre Point of the Rect
 
         Returns:
             dict of Perbis objects keyed on direction
@@ -219,7 +219,7 @@ class RectangleShape(BaseShape):
         return angles
 
     def get_vertexes(self, **kwargs):
-        """Get vertices for rectangle without notches."""
+        """Get vertices for Rectangle without notches."""
         x, y = self.calculate_xy(**kwargs)
         # ---- overrides for grid layout
         if self.use_abs_c:

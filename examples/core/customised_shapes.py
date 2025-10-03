@@ -105,24 +105,41 @@ StarField(
     seeding=42.3)
 PageBreak()
 
-# ---- equilateral triangle: hatch
+# ---- equilateral triangle - hatch
 Blueprint()
-Text(common=txt, text="Equilateral Triangle; flip; hatch")
+Text(common=txt, text="Equilateral Triangle: hatch; rotation")
 EquilateralTriangle(
-    x=2, y=1, flip="north", hand="east", label="NE", fill="gold")
-EquilateralTriangle(
-    x=2, y=1, flip="south", hand="east", label="SE", fill="chartreuse")
-EquilateralTriangle(
-    x=2, y=1, flip="north", hand="west", label="NW", fill="red")
-EquilateralTriangle(
-    x=2, y=1, flip="south", hand="west", label="SW", fill="blue")
-EquilateralTriangle(
-    x=1, y=4, side=1.5,
-    hatches_count=5, hatches_stroke="red",
+    cx=2, cy=2, side=2,
+    hatches_count=5,
+    hatches_stroke="red",
     title='Title', heading='Head')
 EquilateralTriangle(
-    x=1, y=5.5, side=1.5, stroke_width=1,
-    rotation=45, dot=.05)
+    cx=2, cy=5, side=2,
+    stroke_width=1,
+    rotation=45,
+    dot=.05)
+PageBreak()
+
+# ---- equilateral triangle - perbis slice
+Blueprint()
+Text(common=txt, text="Equi. Tri.; radii; perbii; slice ")
+EquilateralTriangle(
+    cx=1, cy=1,
+    side=1.5,
+    radii="n se sw",
+    title="radii",
+    fill="tomato")
+EquilateralTriangle(
+    cx=2, cy=3,
+    side=1.5,
+    perbii="s ne nw",
+    title="perbii",
+    fill="gold")
+EquilateralTriangle(
+    cx=3, cy=5,
+    side=1.5,
+    title="slices",
+    slices=["tomato", "gold", "lime"])
 PageBreak()
 
 # ---- RA Triangle
@@ -240,7 +257,7 @@ Text(common=dtext, y=4, text="4.  "+Today(details="datetime", style="usa"))
 Text(common=dtext, y=5, text="5.  "+Today(details="datetime", style="eur"))
 PageBreak()
 
-# ---- rotation: image
+# ---- rotation - image
 Blueprint()
 Text(common=txt, text="Images: normal & rotation")
 Image("sholes_typewriter.png",
@@ -257,7 +274,7 @@ Image("noun-typewriter-3933515.svg",
       x=2, y=3, title="45\u00B0", rotation=45)
 PageBreak()
 
-# ---- rotation: rhombus
+# ---- rotation - rhombus
 Blueprint()
 Text(common=txt, text="Rhombus: red => rotation 60\u00B0")
 Rhombus(cx=2, cy=3, width=1.5, height=2*equilateral_height(1.5), dot=0.06,
@@ -266,7 +283,7 @@ Rhombus(cx=2, cy=3, width=1.5, height=2*equilateral_height(1.5), dot=0.03,
         fill=None, stroke="red", rotation=60)
 PageBreak()
 
-# ---- rotation: stadium
+# ---- rotation - stadium
 Blueprint()
 Text(common=txt, text="Stadium: red => rotation 60\u00B0")
 Stadium(cx=2, cy=3, width=1.25, height=2, dot=0.06)
@@ -274,7 +291,7 @@ Stadium(cx=2, cy=3, width=1.25, height=2,
         stroke="red", stroke_width=.3, rotation=60, dot=0.04)
 PageBreak()
 
-# ---- slices: rhombus
+# ---- slices - rhombus
 Blueprint()
 Text(common=txt, text="Rhombus: slices")
 Rhombus(cx=2, cy=3, height=3, width=2,
@@ -294,7 +311,7 @@ Rhombus(cx=1, cy=5, height=2, width=1,
 )
 PageBreak()
 
-# ---- rotation: polygon
+# ---- rotation - polygon
 Blueprint()
 Text(common=txt, text="Polygon: rotation")
 poly6 = Common(fill=None, sides=6, diameter=1, stroke_width=1)
@@ -1149,16 +1166,20 @@ PageBreak()
 # ---- END
 Text(common=txt, text="Shapes END...")
 
+#Save()
 Save(
      output='png',
      dpi=300,
      directory="../docs/source/images/customised",
      names=[
         None,
-        "blueprint_subdiv", "dots_crosses", "centred", "right_angled_triangle",
-        "lines", "starfield_rectangle", "starfield_circle",
-        "starfield_poly", "equilateral_triangle", "right_angled_triangle_flip",
-        "sectors", "grid_gray", "dotgrid_moleskine", "dotgrid_rowscols", "arc",
+        "blueprint_subdiv", "dots_crosses", "centred",
+        "right_angled_triangle", "lines",
+        "starfield_rectangle", "starfield_circle", "starfield_poly",
+        "equilateral_triangle", "equtri_perbii_slice",
+        "right_angled_triangle_flip",
+        "sectors", "grid_gray",
+        "dotgrid_moleskine", "dotgrid_rowscols", "arc",
         "stadium_edges", "trapezoid_flip", "chord",
         "polygon_radii", "polygon_perbii", "polygon_slices",
         "dates_formats",
