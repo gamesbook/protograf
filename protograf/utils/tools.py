@@ -1189,9 +1189,9 @@ def validated_directions(
             valid = {"e", "se", "sw", "w", "ne", "nw"}
         case DirectionGroup.CIRCULAR:
             valid = {"n", "e", "w", "s", "ne", "se", "sw", "nw", "o", "d"}
-        case DirectionGroup.TRIANGULAR:  # equilateral
+        case DirectionGroup.TRIANGULAR:  # equilateral triangle
             valid = {"se", "sw", "n"}
-        case DirectionGroup.TRIANGULAR_EDGES:  # equilateral
+        case DirectionGroup.TRIANGULAR_EDGES:  # equilateral triangle
             valid = {"ne", "nw", "s"}
         case _:
             raise NotImplementedError(f"Cannot handle {direction_group} type!")

@@ -1163,6 +1163,66 @@ Circle(
 )
 PageBreak()
 
+# ---- perbii shapes
+Blueprint()
+Text(common=txt, text="Perbii shapes")
+ccom = Common(radius=0.15, fill="gold", label_size=6)
+Hexagon(
+    cx=1, cy=1,
+    radius=0.8,
+    orientation="pointy",
+    perbii_shapes=[
+        ('ne', circle(common=ccom, label="ne")),
+        ('se', circle(common=ccom, label="se"), 1.25),
+        ('w', circle(common=ccom, label="w"), 0.5 ),
+    ],
+    perbii_shapes_rotated=True,
+)
+Hexagon(
+    cx=3, cy=1,
+    radius=0.8,
+    perbii_shapes=[
+       ('n', circle(common=ccom, label="n")),
+       ('se', circle(common=ccom, label="se"), 1.25),
+       ('sw', circle(common=ccom, label="sw"), 0.5),
+    ],
+    perbii_shapes_rotated=True,
+)
+Rectangle(
+    cx=1, cy=3,
+    height=1, width=1.5,
+    perbii_shapes=[
+        ('n', circle(common=ccom, label="n")),
+        ('s', circle(common=ccom, label="s.")),
+        ('w', circle(common=ccom, label="w")),
+        ('e', circle(common=ccom, label="e")),
+    ],
+    perbii_shapes_rotated=True,
+)
+Rhombus(
+    cx=3, cy=3,
+    width=1, height=1.5,
+    perbii="ne se nw sw",
+    perbii_shapes=[
+        ('ne', circle(common=ccom, label="ne")),
+        ('se', circle(common=ccom, label="se")),
+        ('nw', circle(common=ccom, label="nw")),
+        ('sw', circle(common=ccom, label="sw")),
+    ],
+    perbii_shapes_rotated=True,
+)
+EquilateralTriangle(
+    cx=1, cy=5,
+    side=1.25,
+    perbii_shapes=[
+        ('ne', circle(common=ccom, label="ne")),
+        ('s', circle(common=ccom, label="s.")),
+        ('nw', circle(common=ccom, label="nw")),
+    ],
+    perbii_shapes_rotated=True,
+)
+PageBreak()
+
 # ---- END
 Text(common=txt, text="Shapes END...")
 
@@ -1210,4 +1270,5 @@ Save(
         "poly_waves",
         "vertex_shapes",
         "radii_shapes",
+        "perbii_shapes",
         None])

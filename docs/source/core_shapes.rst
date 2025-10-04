@@ -3343,6 +3343,7 @@ the desired output:
 - `Fill and Stroke`_
 - `Rotation`_
 - `Radii Shapes`_
+- `Perbii Shapes`_
 - `Text Descriptions`_
 - `Transparency`_
 - `Vertex Shapes`_
@@ -3730,13 +3731,13 @@ Radii Shapes
 
 A number of shapes, that are formed by drawing lines between a set of
 vertices ("corner points"), can be styled by placing other shapes which
-can be located those lines.
+can be located relative to those vertices.
 
 Radii shapes are constructed using the following properties:
 
 - *radii_shapes* - this a list (values in ``[...]``) of value sets that
   determine the "where and what" should be drawn along the line of
-  specific radius.  Each set, enclosed in brackets``(...)`` can consist
+  specific radius.  Each set, enclosed in brackets ``(...)`` can consist
   of three comma-separated parts:
 
   - the first is the **direction**, or directions, of the relevant radii;
@@ -3746,7 +3747,7 @@ Radii shapes are constructed using the following properties:
     other shapes it will be a :ref:`compass direction <termsDirection>`.
   - the second is the **shape** to be drawn
   - the optional third part is the **fractional distance** along the line
-    at which the shape should be drawm; dy default this is ``1`` i.e. the
+    at which the shape should be drawn; by default this is ``1`` i.e. the
     length of the radial line |dash| if it is less than ``1`` the radii
     shape will be drawn inside of the parent shape; and if it is more than
     ``1`` the radii shape will be drawn outside of, or away from, the parent
@@ -3840,8 +3841,8 @@ Example 1. Radii Shapes
         )
 
       All of these examples use a common settings in ``ccom`` to draw
-      the vertex shape |dash| a circle; but the *label* property set as
-      a visual indicator
+      the vertex shape |dash| a circle; but the *label* property is set
+      as a visual indicator.
 
       Note that in some cases, setting the *fractional_distance* (the
       third value in the set) causes the radii shape to be moved
@@ -3856,7 +3857,8 @@ Example 1. Radii Shapes
           Although not shown above, multiple entries can be made for a given
           direction; for example, to draw a circle and a dot along the ``ne``
           radius for a rectangle |dash| in the case below the ``Dot()`` will
-          be drawn halfway along:
+          be drawn halfway between the rectangle's centre and it's north-east
+          corner:
 
           .. code:: python
 
@@ -3872,6 +3874,145 @@ Example 1. Radii Shapes
 
 ===== ======
 
+.. _corePerbiiShapes:
+
+Perbii Shapes
+~~~~~~~~~~~~~
+`^ <shapes-common-properties_>`_
+
+A number of shapes, that are formed by drawing lines between a set of
+vertices ("corner points"), can be styled by placing other shapes which
+can be located relative to the centre point of lines joining those
+vertices.
+
+Perbii shapes are constructed using the following properties:
+
+- *perbii_shapes* - this a list (values in ``[...]``) of value sets that
+  determine the "where and what" should be drawn along the line of
+  specific perbis.  Each set, enclosed in brackets ``(...)`` can consist
+  of three comma-separated parts:
+
+  - the first is the **direction**, or directions, of the relevant perbii;
+    this can be a string e.g. ``"n e"`` or a list e.g. ``["n", "e"]``.
+    Note that this will be a :ref:`compass direction <termsDirection>`.
+  - the second is the **shape** to be drawn
+  - the optional third part is the **fractional distance** along the line
+    at which the shape should be drawn; by default this is ``1`` i.e. the
+    length of the perbis line |dash| if it is less than ``1`` the perbii
+    shape will be drawn inside of the parent shape; and if it is more than
+    ``1`` the perbii shape will be drawn outside of, or away from, the parent
+    shape
+- *perbii_shapes_rotated* - an optional property which, if ``True``, will
+  rotate the vertex shapes such they "point" away from the centre of the
+  parent shape
+
+Perbii shapes can be constructed for:
+
+- :ref:`EquilateralTriangle <equilateraltriangle-command>`
+- :ref:`Hexagon <hexagon-command>`
+- :ref:`Rectangle <rectangle-command>`
+- :ref:`Rhombus <rhombus-command>`
+
+Example 1. Perbii Shapes
+++++++++++++++++++++++++
+
+.. |vr2| image:: images/customised/perbii_shapes.png
+   :width: 330
+
+===== ======
+|vr2| This example shows perbii shapes constructed as follows:
+
+      .. code:: python
+
+        ccom = Common(radius=0.15, fill="gold", label_size=6)
+
+        Hexagon(
+            cx=1, cy=1,
+            radius=0.8,
+            orientation="pointy",
+            perbii_shapes=[
+                ('ne', circle(common=ccom, label="ne")),
+                ('se', circle(common=ccom, label="se"), 1.25),
+                ('w', circle(common=ccom, label="w"), 0.5 ),
+            ],
+            perbii_shapes_rotated=True,
+        )
+        Hexagon(
+            cx=3, cy=1,
+            radius=0.8,
+            perbii_shapes=[
+               ('n', circle(common=ccom, label="n")),
+               ('se', circle(common=ccom, label="se"), 1.25),
+               ('sw', circle(common=ccom, label="sw"), 0.5),
+            ],
+            perbii_shapes_rotated=True,
+        )
+        Rectangle(
+            cx=1, cy=3,
+            height=1, width=1.5,
+            perbii_shapes=[
+                ('n', circle(common=ccom, label="n")),
+                ('s', circle(common=ccom, label="s.")),
+                ('w', circle(common=ccom, label="w")),
+                ('e', circle(common=ccom, label="e")),
+            ],
+            perbii_shapes_rotated=True,
+        )
+        Rhombus(
+            cx=3, cy=3,
+            width=1, height=1.5,
+            perbii="ne se nw sw",
+            perbii_shapes=[
+                ('ne', circle(common=ccom, label="ne")),
+                ('se', circle(common=ccom, label="se")),
+                ('nw', circle(common=ccom, label="nw")),
+                ('sw', circle(common=ccom, label="sw")),
+            ],
+            perbii_shapes_rotated=True,
+        )
+        EquilateralTriangle(
+            cx=1, cy=5,
+            side=1.25,
+            perbii_shapes=[
+                ('ne', circle(common=ccom, label="ne")),
+                ('s', circle(common=ccom, label="s.")),
+                ('nw', circle(common=ccom, label="nw")),
+            ],
+            perbii_shapes_rotated=True,
+        )
+
+      All of these examples use a common settings in ``ccom`` to draw
+      the vertex shape |dash| a circle; and the *label* property is set
+      as a visual indicator.
+
+      Note that in some cases, setting the *fractional_distance* (the
+      third value in the set) causes the perbii shape to be moved
+      closer to, or further away from, the centre.
+
+      The use of ``perbii_shapes_rotated=True`` will means all of these
+      examples have the perbii shapes rotated to face "away" from the
+      parent shape's centre.
+
+      .. HINT::
+
+          Although not shown above, multiple entries can be made for a given
+          direction; for example, to draw a circle and a dot along the ``n``
+          perbis for a rectangle |dash| in the case below the ``Dot()`` will
+          be drawn halfway between the rectangle's centre and it's north edge:
+
+          .. code:: python
+
+            Rectangle(
+                cx=1, cy=3,
+                height=1, width=1.5,
+                perbii_shapes=[
+                    ('n', circle(common=ccom, label="n")),
+                    ('n', dot(), 0.5),
+                ],
+                perbii_shapes_rotated=True,
+            )
+
+===== ======
 
 .. _coreShapeText:
 

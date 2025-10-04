@@ -82,7 +82,7 @@ class HexShape(BaseShape):
             )
         return orientation
 
-    def get_direction(self, lines="radii") -> DirectionGroup:
+    def get_direction(self, lines: str = "radii") -> DirectionGroup:
         """Return DirectionGroup for the Hexagon.
 
         Args:
@@ -1273,6 +1273,7 @@ class HexShape(BaseShape):
             "paths",
             "radii",
             "radii_shapes",
+            "perbii_shapes",
             "centre_shape",
             "centre_shapes",
             "vertex_shapes",
@@ -1412,6 +1413,18 @@ class HexShape(BaseShape):
                         Point(self.x_d, self.y_d),
                         direction_group,
                         self.radii_shapes_rotated,
+                    )
+            if item == "perbii_shapes":
+                # ---- * draw perbii_shapes
+                if self.perbii_shapes:
+                    direction_group = self.get_direction(lines="perbii")
+                    self.draw_perbii_shapes(
+                        cnv,
+                        self.perbii_shapes,
+                        self.vertices,
+                        Point(self.x_d, self.y_d),
+                        direction_group,
+                        self.perbii_shapes_rotated,
                     )
             if item == "centre_shape" or item == "center_shape":
                 # ---- * centred shape (with offset)

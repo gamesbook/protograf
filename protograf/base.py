@@ -3060,7 +3060,7 @@ class BaseShape:
                 as_int=False,
                 as_float=True,
                 sep=" ",
-                msg="ABC",
+                msg="",
             )
             vertexes = []
             radius = self._u.radius
@@ -3112,6 +3112,102 @@ class BaseShape:
                 else:
                     _rotation = 0
                 # ---- draw radii shape
+                _shape.draw(
+                    _abs_cx=shape_centre.x,
+                    _abs_cy=shape_centre.y,
+                    rotation=_rotation,
+                )
+
+    def draw_perbii_shapes(
+        self,
+        cnv,
+        perbii_shapes: list,
+        vertexes: list,
+        centre: Point,
+        direction_group: DirectionGroup = None,
+        rotated: bool = False,
+    ):
+        """Draw shape(s) along the perbii lines of a Shape.
+
+        Args:
+            perbii_shapes (list):
+                list of tuples of (dir, shape, offset) where:
+                * dir is a direction name
+                * shape is an instance of a Shape
+                * offset is optional float - the fractional distance along the
+                  line from the centre to the edge at which the shape is drawn;
+                  default is 1 i.e. at the edge
+            vertexes (list):
+                list of points for the vertices
+            centre (Point):
+                the centre of the Shape
+            direction_group (DirectionGroup):
+                used to define list of permissible directions for the Shape
+            rotated (bool):
+                if True, rotate perbii_shapes relative to centre
+        """
+
+        @functools.cache
+        def get_circle_vertexes(directions, centre) -> list:
+            """Get a list of vertexes where perbii intersect the circumference"""
+            angles = tools.sequence_split(
+                directions,
+                unique=False,
+                as_int=False,
+                as_float=True,
+                sep=" ",
+                msg="",
+            )
+            vertexes = []
+            radius = self._u.radius
+            for angle in angles:
+                vtx = geoms.point_on_circle(centre, radius, angle)
+                vertexes.append(vtx)
+            return vertexes
+
+        err = "The perbii_shapes must contain direction(s) and shape"
+        if direction_group != DirectionGroup.CIRCULAR:  # see below for calc.
+            perbii_dict = self.calculate_perbii(cnv, centre, vertexes)
+        for item in perbii_shapes:
+            if isinstance(item, tuple):
+                _shape_fraction = 1.0
+                if len(item) < 2:
+                    feedback(f"{err} - not {item}")
+                if direction_group == DirectionGroup.CIRCULAR:
+                    vertexes = get_circle_vertexes(item[0], centre)
+                    perbii_dict = self.calculate_perbii(cnv, centre, vertexes)
+                    _dirs = perbii_dict.keys()
+                else:
+                    _dirs = tools.validated_directions(
+                        item[0], direction_group, "direction"
+                    )
+                _shape = item[1]
+                if len(item) >= 3:
+                    _shape_fraction = tools.as_float(item[2], "fraction")
+            else:
+                feedback(f"{err} - not {item}")
+            self.can_draw_centred_shape(_shape, True)  # could stop here
+            for _dir in _dirs:
+                # ---- calculate shape centre
+                _perbii = perbii_dict[_dir]
+                if _shape_fraction <= 1:
+                    shape_centre = geoms.fraction_along_line(
+                        centre, _perbii.point, _shape_fraction
+                    )  # inside Shape boundaries
+                else:
+                    shape_centre = geoms.point_in_direction(
+                        centre, _perbii.point, _shape_fraction - 1
+                    )  # outside Shape boundaries
+                # print(f"*** {direction_group} {_perbii=} {shape_centre=}")
+                # ---- calculate shape rotation
+                if rotated:
+                    # compass, rotation = geoms.angles_from_points(centre, shape_centre)
+                    compass, _rotation = _perbii.compass, _perbii.angle
+                    # print(f"*** {self.__class__.__name__} {_dir} {compass=} {_rotation=}")
+                    _rotation = compass - 180.0
+                else:
+                    _rotation = 0
+                # ---- draw perbii shape
                 _shape.draw(
                     _abs_cx=shape_centre.x,
                     _abs_cy=shape_centre.y,

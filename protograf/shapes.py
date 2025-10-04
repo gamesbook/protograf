@@ -922,8 +922,18 @@ class EquilateralTriangleShape(BaseShape):
                 self.radii_shapes,
                 self.vertexes,
                 self.centroid,
-                DirectionGroup.TRIANGULAR,
+                DirectionGroup.TRIANGULAR,  # for the points!
                 self.radii_shapes_rotated,
+            )
+        # ---- * draw perbii_shapes
+        if self.perbii_shapes:
+            self.draw_perbii_shapes(
+                cnv,
+                self.perbii_shapes,
+                self.vertexes,
+                self.centroid,
+                DirectionGroup.TRIANGULAR_EDGES,  # for the sides!
+                self.perbii_shapes_rotated,
             )
         # ---- centred shape (with offset)
         if self.centre_shape:
@@ -1731,6 +1741,45 @@ class RhombusShape(BaseShape):
         vertices.append(Point(x_s + self._u.width / 2.0, y_s - self._u.height / 2.0))
         return vertices
 
+    def calculate_perbii(self, cnv, centre: Point, vertices: list, **kwargs) -> dict:
+        """Calculate centre points for each edge and angles from centre.
+
+        Args:
+            centre (Point):
+                the centre Point of the Rhombus
+            vertices (list):
+                list of Rhombus'es nodes as Points
+
+        Returns:
+            dict of Perbis objects keyed on direction
+        """
+        directions = ["sw", "se", "ne", "nw"]
+        perbii_dict = {}
+        vcount = len(vertices) - 1
+        _perbii_pts = []
+        # print(f"*** RHOMBUS perbii {centre=} {vertices=}")
+        for key, vertex in enumerate(vertices):
+            if key == 3:
+                p1 = Point(vertex.x, vertex.y)
+                p2 = Point(vertices[0].x, vertices[0].y)
+            else:
+                p1 = Point(vertex.x, vertex.y)
+                p2 = Point(vertices[key + 1].x, vertices[key + 1].y)
+            pc = geoms.fraction_along_line(p1, p2, 0.5)  # centre pt of edge
+            _perbii_pts.append(pc)  # debug use
+            compass, angle = geoms.angles_from_points(centre, pc)
+            # f"*** RHOMBUS *** perbii {key=} {directions[key]=} {pc=} {compass=} {angle=}"
+            _perbii = Perbis(
+                point=pc,
+                direction=directions[key],
+                v1=p1,
+                v2=p2,
+                compass=compass,
+                angle=angle,
+            )
+            perbii_dict[directions[key]] = _perbii
+        return perbii_dict
+
     def calculate_radii(
         self, cnv, centre: Point, vertices: list, debug: bool = False
     ) -> dict:
@@ -1822,6 +1871,72 @@ class RhombusShape(BaseShape):
             dotted=self.hatches_dots,
             rotation=rotation,
             rotation_point=muPoint(x_c, y_c),
+        )
+
+    def draw_perbii(
+        self, cnv, ID, centre: Point, vertices: list, rotation: float = None
+    ):
+        """Draw lines connecting the Rhombus centre to the centre of each edge.
+
+        Args:
+            ID: unique ID
+            vertices: list of Rhombus's nodes as Points
+            centre: the centre Point of the Rhombus
+            rotation: degrees anti-clockwise from horizontal "east"
+
+        Notes:
+            A perpendicular bisector ("perbis") of a chord is:
+                A line passing through the center of circle such that it divides
+                the chord into two equal parts and meets the chord at a right angle;
+                for a polygon, each edge is effectively a chord.
+        """
+        if self.perbii:
+            perbii_dirs = tools.validated_directions(
+                self.perbii,
+                DirectionGroup.ORDINAL,
+                "rhombus perbii",
+            )
+        perbii_dict = self.calculate_perbii(cnv=cnv, centre=centre, vertices=vertices)
+        pb_offset = self.unit(self.perbii_offset, label="perbii offset") or 0
+        pb_length = (
+            self.unit(self.perbii_length, label="perbii length")
+            if self.perbii_length
+            else self.radius
+        )
+        # ---- set perbii styles
+        lkwargs = {}
+        lkwargs["wave_style"] = self.kwargs.get("perbii_wave_style", None)
+        lkwargs["wave_height"] = self.kwargs.get("perbii_wave_height", 0)
+        for key, a_perbii in perbii_dict.items():
+            if self.perbii and key not in perbii_dirs:
+                continue
+            # points based on length of line, offset and the angle in degrees
+            edge_pt = a_perbii.point
+            if pb_offset is not None and pb_offset != 0:
+                offset_pt = geoms.point_on_circle(centre, pb_offset, a_perbii.angle)
+                end_pt = geoms.point_on_line(offset_pt, edge_pt, pb_length)
+                # print(f'*** RHOMBUS {pb_angle=} {offset_pt=} {x_c=}, {y_c=}')
+                start_point = offset_pt.x, offset_pt.y
+                end_point = end_pt.x, end_pt.y
+            else:
+                start_point = centre.x, centre.y
+                end_point = edge_pt.x, edge_pt.y
+            # ---- draw a perbii line
+            draw_line(
+                cnv,
+                start_point,
+                end_point,
+                shape=self,
+                **lkwargs,
+            )
+
+        self.set_canvas_props(
+            index=ID,
+            stroke=self.perbii_stroke,
+            stroke_width=self.perbii_stroke_width,
+            stroke_ends=self.perbii_ends,
+            dashed=self.perbii_dashed,
+            dotted=self.perbii_dotted,
         )
 
     def draw_radii(self, cnv, ID, centre: Point, vertices: list):
@@ -2006,7 +2121,6 @@ class RhombusShape(BaseShape):
             self.draw_hatches(
                 cnv, ID, cx, cy, self.side, self.vertexes, self.hatches_count, rotation
             )
-
         # ---- borders (override)
         if self.borders:
             if isinstance(self.borders, tuple):
@@ -2017,11 +2131,14 @@ class RhombusShape(BaseShape):
                 feedback('The "borders" property must be a list of sets or a set')
             for border in self.borders:
                 self.draw_border(cnv, border, ID)  # BaseShape
-
+        # ---- draw perbii
+        if self.perbii:
+            self.draw_perbii(
+                cnv, ID, Point(cx, cy), self.vertexes, rotation=kwargs.get("rotation")
+            )
         # ---- draw radii
         if self.radii:
             self.draw_radii(cnv, ID, Point(cx, cy), self.vertexes)
-
         # ---- draw radii_shapes
         if self.radii_shapes:
             self.draw_radii_shapes(
@@ -2032,7 +2149,16 @@ class RhombusShape(BaseShape):
                 DirectionGroup.CARDINAL,
                 self.radii_shapes_rotated,
             )
-
+        # ---- draw perbii_shapes
+        if self.perbii_shapes:
+            self.draw_perbii_shapes(
+                cnv,
+                self.perbii_shapes,
+                self.vertexes,
+                Point(cx, cy),
+                DirectionGroup.ORDINAL,  # for the sides!
+                self.perbii_shapes_rotated,
+            )
         # ---- centred shape (with offset)
         if self.centre_shape:
             if self.can_draw_centred_shape(self.centre_shape):
