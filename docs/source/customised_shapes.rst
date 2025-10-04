@@ -1734,9 +1734,13 @@ Hexagon
 =======
 `↑ <table-of-contents-custom_>`_
 
-A key property for a hexagon is its *orientation*; this can either be *flat*,
-which is the default, or *pointy*. The examples below show how each can be
-customised in a similar way.
+A Hexaggo
+
+A key property for a Hexagon is its *orientation*; this can either be *flat*,
+which is the default, or *pointy*.
+
+The examples below show how each orientation of a Hexagon can be customised
+in a similar way.
 
 - `Borders <hexBorders_>`_
 - `Centre <hexCentre_>`_

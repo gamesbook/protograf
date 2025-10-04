@@ -996,6 +996,8 @@ Example 1. Default EquilateralTriangle
       - side - ``1`` cm i.e. all sides are equal
 ===== ======
 
+.. _equtriHatches:
+
 Example 2. Customised EquilateralTriangle
 +++++++++++++++++++++++++++++++++++++++++
 
@@ -1024,7 +1026,6 @@ Example 2. Customised EquilateralTriangle
       - starting position - *cx* is``2`` cm
       - default side of ``2`` cm; all sides are equal
 
-
 ===== ======
 
 .. _equtriSlices:
@@ -1032,10 +1033,22 @@ Example 2. Customised EquilateralTriangle
 Example 3. EquilateralTriangle: Lines and Slices
 ++++++++++++++++++++++++++++++++++++++++++++++++
 
-*Slices* are a set of colors that are drawn as triangles inside a
-an EquilateralTriangle in a clockwise direction starting from the
-"North East". If there are fewer colors than the thre possible triangles,
-then the colors are repeated, starting from the first one.
+*Radii* are the lines drawn from the centroid of a triangle towards its
+vertices.
+
+"Perbis" is a shortcut name for "perpendicular bisector"; and *perbii* is the
+the plural. These lines are drawn from the centroid of a triangle towards the
+mid-points of its edges.
+
+*Slices* are a set of colors that are drawn as triangles inside an
+EquilateralTriangle in a clockwise direction starting from the "North East".
+If there are fewer colors than the three possible triangles, then the colors
+are repeated, starting from the first one.
+
+An EquilateralTriangle is considered to have three vertices located using the
+following compass directions; ``n`` (north), ``sw`` (south-west), and ``se``
+(south-east).  Similarly, the three sides are located at ``ne`` (north-east),
+``nw`` (north-west), and ``s`` (south).
 
 .. |eq3| image:: images/customised/equtri_perbii_slice.png
    :width: 330
@@ -1063,6 +1076,15 @@ then the colors are repeated, starting from the first one.
             side=1.5,
             title="slices",
             slices=["tomato", "gold", "lime"])
+
+      The top example, shows how all three *radii* for an EquilateralTriangle
+      can be constructed.
+
+      The middle example, shows how all three *perbii* for an
+      EquilateralTriangle can be constructed.
+
+      The lower example, shows how all three *slices* for an
+      EquilateralTriangle can be supplied with different colors.
 
 ===== ======
 
