@@ -6,13 +6,14 @@ Commands List
 
 This list provides an alphabetic summary of all the
 :ref:`commands <command-concept>` specific to **protograf**.
-It is not intended to be used for learning, but is just a handy
-cross-reference to the detailed information for that command.
+
+This list is not intended to be used for learning, but just provides
+a handy cross-reference to the detailed information for that command.
 
 .. HINT::
 
   :doc:`protograf <index>` is a small, specialised tool; but its part of a much
-  greater Python language "ecosystem", and commands and tools from the
+  greater Python language "ecosystem", and so commands and tools from the
   :doc:`Python language <python_commands>` |dash| or other
   `Python packages <https://pypi.org>`_  |dash| can be used to further enhance
   your own script.
@@ -36,6 +37,7 @@ cross-reference to the detailed information for that command.
    countersheet, containing one or more counters
 -  :ref:`Create <create-command>` - start of a script; define the
    paper size, output filename, margins, units, fill color etc.
+-  :ref:`Cross <cross-command>` * - a geometric shape that can be drawn on a page
 -  :ref:`Cube <cube-object>` * - create isometric and shaded view of a cube
 -  :ref:`Data <the-data-command>` - provides a set of information for
    a :ref:`deck <the-deck-command>` of :ref:`cards <the-card-command>`

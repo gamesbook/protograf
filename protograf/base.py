@@ -168,6 +168,7 @@ class BaseCanvas:
         self.side = self.defaults.get("side", 1)  # equal length sides
         self.height = self.defaults.get("height", self.side)
         self.width = self.defaults.get("width", self.side)
+        self.thickness = self.defaults.get("thickness", None)  # cross
         self.top = self.defaults.get("width", self.width * 0.5)
         self.depth = self.defaults.get("depth", self.side)  # diamond
         self.x = self.defaults.get("x", self.defaults.get("left", 1))
@@ -632,6 +633,8 @@ class BaseCanvas:
         self.pip_fill = self.defaults.get("pip_fill", self.stroke)  # see draw_piphead()
         self.pip_shape = self.defaults.get("pip_shape", "circle")
         self.pip_fraction = self.defaults.get("pip_fraction", 0.2)
+        # ---- cross
+        self.arm_fraction = self.defaults.get("arm_fraction", 0.5)
         # ---- mesh
         self.mesh = self.defaults.get("mesh", None)
         self.mesh_ends = self.defaults.get("mesh_ends", self.line_ends)
@@ -738,6 +741,7 @@ class BaseShape:
         self.side = self.kw_float(kwargs.get("side", base.side))  # equal length sides
         self.height = self.kw_float(kwargs.get("height", self.side))
         self.width = self.kw_float(kwargs.get("width", self.side))
+        self.thickness = kwargs.get("thickness", base.thickness)  # cross
         self.top = self.kw_float(kwargs.get("top", base.top))
         self.depth = self.kw_float(kwargs.get("depth", self.side))  # diamond
         self.x = self.kw_float(kwargs.get("x", kwargs.get("left", base.x)))
@@ -1253,6 +1257,10 @@ class BaseShape:
         self.pip_shape = kwargs.get("pip_shape", base.pip_shape)
         self.pip_fraction = self.kw_float(
             kwargs.get("pip_fraction", base.pip_fraction), "pip_fraction"
+        )
+        # ---- cross
+        self.arm_fraction = self.kw_float(
+            kwargs.get("arm_fraction", base.arm_fraction), "arm_fraction"
         )
         # ---- mesh
         self.mesh = kwargs.get("mesh", base.mesh)

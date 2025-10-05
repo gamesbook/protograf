@@ -424,6 +424,111 @@ class ChordShape(BaseShape):
         )
 
 
+class CrossShape(BaseShape):
+    """
+    Cross on a given canvas.
+    """
+
+    def __init__(self, _object=None, canvas=None, **kwargs):
+        super(CrossShape, self).__init__(_object=_object, canvas=canvas, **kwargs)
+        self.kwargs = kwargs
+        # ---- unit calcs
+        if self.arm_fraction > 1 or self.arm_fraction < 0:
+            feedback(
+                "The arm_fraction must be greater than 0 and less than 1"
+                f' (not "{self.arm_fraction}"',
+                True,
+            )
+        if not self.thickness:
+            self.u_thickness = self._u.width * 0.2
+        else:
+            self.u_thickness = self.unit(self.thickness)
+        if self.u_thickness >= self._u.width:
+            feedback("The cross thickness must be less than overall width", True)
+        if self.u_thickness <= 0:
+            feedback("The cross thickness must be more than zero", True)
+
+    def get_vertexes(self, x, y, **kwargs):
+        """Calculate vertices of cross.
+
+        Vertex locations:
+
+               0__11
+               |  |
+           2._1|  |10.9
+            |___  ___|
+           3  4|  |7  8
+               |  |
+               |__|
+              5   6
+        """
+        # ---- component sizes
+        thick = self.u_thickness
+        arm = self._u.width / 2.0 - 0.5 * thick
+        body = self._u.height * self.arm_fraction - thick / 2.0
+        head = self._u.height - body - thick
+        # feedback(f"*** CROSS {self._u.height=} {thick=} {arm=} {body=} {head=}")
+        # ---- top-left and anti-clockwise
+        vertices = []
+        vertices.append(Point(x + arm, y))  # 0
+        vertices.append(Point(x + arm, y + head))  # 1
+        vertices.append(Point(x, y + head))  # 2
+        vertices.append(Point(x, y + head + thick))  # 3
+        vertices.append(Point(x + arm, y + head + thick))  # 4
+        vertices.append(Point(x + arm, y + self._u.height))  # 5
+        vertices.append(Point(x + arm + thick, y + self._u.height))  # 6
+        vertices.append(Point(x + arm + thick, y + head + thick))  # 7
+        vertices.append(Point(x + self._u.width, y + head + thick))  # 8
+        vertices.append(Point(x + self._u.width, y + head))  # 9
+        vertices.append(Point(x + arm + thick, y + head))  # 10
+        vertices.append(Point(x + arm + thick, y))  # 11
+        return vertices
+
+    def draw(self, cnv=None, off_x=0, off_y=0, ID=None, **kwargs):
+        """Draw a cross on a given canvas."""
+        kwargs = self.kwargs | kwargs
+        cnv = cnv if cnv else globals.canvas  # a new Page/Shape may now exist
+        super().draw(cnv, off_x, off_y, ID, **kwargs)  # unit-based props
+        if self.cx is not None and self.cy is not None:
+            x = self._u.cx - self._u.width / 2.0 + self._o.delta_x
+            y = self._u.cy - self._u.height / 2.0 + self._o.delta_y
+        else:
+            x = self._u.x + self._o.delta_x
+            y = self._u.y + self._o.delta_y
+            self.cx = self.x + self.width / 2.0
+            self.cy = self.y + self.height / 2.0
+        # ---- overrides to centre the shape
+        if kwargs.get("cx") and kwargs.get("cy"):
+            x = kwargs.get("cx") * self.units - self._u.width / 2.0 + self._o.delta_x
+            y = kwargs.get("cy") * self.units - self._u.height / 2.0 + self._o.delta_y
+            self.cx = kwargs.get("cx")
+            self.cy = kwargs.get("cy")
+        cx = self.unit(self.cx) + self._o.delta_x
+        cy = self.unit(self.cy) + self._o.delta_y
+        cy_arm = cy + (0.5 - self.arm_fraction) * self._u.height  # arm crosses body
+        # feedback(f"*** CROSS {cx=} {cy=} {x=} {y=}")
+        # ---- handle rotation
+        rotation = kwargs.get("rotation", self.rotation)
+        if rotation:
+            self.centroid = muPoint(cx, cy_arm)
+            kwargs["rotation"] = rotation
+            kwargs["rotation_point"] = self.centroid
+        # ---- draw cross
+        self.vertexes = self.get_vertexes(x=x, y=y)
+        # feedback(f'*** CROSS {self.vertexes=}')
+        cnv.draw_polyline(self.vertexes)
+        kwargs["closed"] = True
+        self.set_canvas_props(cnv=cnv, index=ID, **kwargs)
+        # ---- dot
+        self.draw_dot(cnv, cx, cy_arm)
+        # ---- cross
+        self.draw_cross(cnv, cx, cy_arm, rotation=kwargs.get("rotation"))
+        # ---- text
+        self.draw_label(cnv, ID, cx, cy_arm, **kwargs)
+        self.draw_heading(cnv, ID, cx, cy - 0.5 * self._u.height, **kwargs)
+        self.draw_title(cnv, ID, cx, cy + 0.5 * self._u.height, **kwargs)
+
+
 class DotShape(BaseShape):
     """
     Dot of fixed radius on a given canvas.

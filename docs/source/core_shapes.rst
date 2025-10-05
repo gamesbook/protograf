@@ -38,6 +38,7 @@ Shape Index
 -  `Bezier`_
 -  `Circle`_
 -  `Chord`_
+-  `Cross`_
 -  `Dot`_
 -  `DotGrid`_
 -  `Ellipse`_
@@ -288,6 +289,106 @@ Example 1. Customised Chord
         at 135 |deg| with the circle's circumference
       - the end of chord is at the intersection of the radius of the circle
         at 45 |deg| with the circle's circumference
+
+===== ======
+
+.. _cross-command:
+
+Cross
+~~~~~
+`↑ <shape-index_>`_
+
+A Cross shape is two thick bars that cross each other at 90 |deg|.  The
+vertical bar is termed the "body" and the horizontal bar is the "arm".
+
+In addition to the normal, common properties, the Cross also has:
+
+- *thickness*: this is the width of the bars. The default value for this is
+  one-fifth of the overall width.
+- *arm_fraction*: this is the fraction **up** the length of the body at which
+  the arm crosses it. The default value for this is ``0.5`` (half-way up).
+
+
+Example 1. Default Cross
+++++++++++++++++++++++++
+
+.. |cr1| image:: images/defaults/cross.png
+   :width: 330
+
+===== ======
+|cr1| This example shows the shape constructed using the command with only
+      defaults:
+
+      .. code:: python
+
+          Cross()
+
+      It has the following properties based on the defaults:
+
+      - top-left is at x-position ``1`` cm and at y-position ``1`` cm
+      - default height and width of ``1`` cm
+      - default bar thickness is one-fifth of the width
+
+===== ======
+
+Example 2. Customised Cross
++++++++++++++++++++++++++++
+
+.. |cr2| image:: images/customised/cross.png
+   :width: 330
+
+===== ======
+|cr2| This example shows the shape constructed using the command with these
+      properties:
+
+      .. code:: python
+
+        crs = Common(
+            height=1.8, width=1.2,
+            arm_fraction=0.70)
+        Cross(
+            stroke_width=1,
+            stroke="red",
+            fill="gold")
+        Cross(
+            cx=3, cy=1,
+            thickness=0.33,
+            fill_stroke="red")
+        Cross(
+            common=crs,
+            cx=1, cy=3)
+        Cross(
+            common=crs,
+            cx=3, cy=3,
+            title="Title",
+            label="Label",
+            heading="Heading")
+        Cross(
+            common=crs,
+            cx=3, cy=5,
+            dot=0.1, cross=0.5)
+        Cross(
+            common=crs,
+            cx=1, cy=5, height=1.8,
+            rotation=45)
+
+      The top-left example shows a default-sized cross with different
+      *fill* and *stroke* colors, as well a thicker *stroke_width*.
+
+      The top-right example shows a cross with matching *fill* and
+      *stroke* colors.  It also changes the default size of the bar
+      for the arm and body to have a *thickness* of ``0.33`` cm. The
+      default is one-fifth of the overall width.
+
+      The lower four examples all share a common height and width. They
+      also use the *arm_fraction* property.  This is the fraction up the
+      length of the body at which the arm crosses it; by default this is
+      ``0.5`` (half-way up).  All these examples "centre" the cross; in
+      this case the centre corresponds to the middle point of the height
+      (for the y-direction) and width (for the x-direction) of the cross.
+
+      The *label* and *rotation* properties recalculate the centre to
+      match the point at which the arm crosses the body.
 
 ===== ======
 

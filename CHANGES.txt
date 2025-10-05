@@ -10,6 +10,7 @@ protograf Changes
 - Add `perbii_shapes` to EquilateralTriangle, Hexagon, Rhombus,
   and Rectangle
 - Update docs with suitable examples
+- Add Cross shape
 
 2025-10-01 (0.3.1)
 -------------------

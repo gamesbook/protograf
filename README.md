@@ -101,7 +101,7 @@ These features are **not** guaranteed to be implemented; they just represent
 current / potential areas of work or ideas.
 
 * [ ] New Shapes:
-    * [ ] Cross shape
+    * [x] Cross shape
     * [ ] Pod shape
 * [ ] Common objects:
     * [x] Cube

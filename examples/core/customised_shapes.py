@@ -216,6 +216,20 @@ Text(common=txt, text="Chord: 135 to 45 degrees")
 Chord(shape=Circle(radius=1, fill=None), angle=135, angle1=45, label="chord")
 PageBreak()
 
+# ---- cross - custom
+Blueprint()
+Text(common=txt, text="Cross: customised")
+crs = Common(height=1.8, width=1.2, arm_fraction=0.70)
+Cross(stroke_width=1, stroke="red", fill="gold")
+Cross(cx=3, cy=1, thickness=0.33, fill_stroke="red")
+Cross(cx=1, cy=3, common=crs,)
+Cross(cx=3, cy=3, common=crs,
+      title="Title", label="Label", heading="Heading")
+Cross(cx=3, cy=5, common=crs,
+      dot=0.1, cross=0.5)
+Cross(cx=1, cy=5, common=crs, rotation=45)
+PageBreak()
+
 # ---- polygon radii
 Blueprint()
 Text(common=txt, text="Polygon: radii (default & custom)")
@@ -1240,7 +1254,7 @@ Save(
         "right_angled_triangle_flip",
         "sectors", "grid_gray",
         "dotgrid_moleskine", "dotgrid_rowscols", "arc",
-        "stadium_edges", "trapezoid_flip", "chord",
+        "stadium_edges", "trapezoid_flip", "chord", "cross",
         "polygon_radii", "polygon_perbii", "polygon_slices",
         "dates_formats",
         "images_normal_rotation", "rhombus_red_rotation",
