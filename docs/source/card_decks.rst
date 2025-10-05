@@ -45,6 +45,9 @@ and that you've created some basic scripts of your own using the
 
   - `group function`_
   - `T(emplate) command`_
+
+      - `Template String Changes`_
+      - `Template Functions`_
   - `S(election) command`_
   - `L(ookup) command`_
   - `Card functions`_
@@ -850,8 +853,104 @@ The full code for this example is available as
 
         FEEDBACK:: Unable to process data with this template ('Ag' is undefined)
 
-Template functions
+Template String Changes
++++++++++++++++++++++++
+:ref:`^ <the-template-command>`
+
+While, in general, **protograf** operates under the assumption that the data
+provided to it can be used "as is", it might be the case that sometimes you
+want to alter the text provided to the ``T()`` command in some way.
+
+There are a number of built-in functions available that can help with this:
+
+- *capitalize()* - Converts the first character to upper case
+- *lower()* - Converts a string into lower case
+- *strip()* - Removes spaces at the beginning and at the end of the string
+- *title()* - Converts the first character of each word to upper case
+- *upper()* - Converts a string into upper case
+- *replace()* - Replaces a string with another string
+- *zfill()* - Fills the string with a specified number of 0 values at
+  the beginning of the string, if it is shorter in length than the number
+- *lstrip()* - Removes any leading characters; a space is the default leading
+  character to remove, but the *lstrip()* can use any characters provided
+- *rstrip()* - Removes any trailing characters; a space is the default leading
+  character to remove, but the *lrstrip()* can use any characters provided
+
+Template String Change Example
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+:ref:`^ <the-template-command>`
+
+.. |tsc| image:: images/decks/cards_text_functions.png
+   :width: 330
+
+===== ======
+|tsc| This example shows the definition of a deck for some small cards,
+      and illustrates using built-in functions to alter the orovided
+      text for a card.
+
+      .. code:: python
+
+        Create(filename='cards_lotr.pdf',
+               paper="A6",
+               margin=0.75, margin_top=1)
+
+        # deck data
+        lotr = [
+          ['ID', 'Name', 'Age', 'Race', 'Copies'],
+          [1, "gandalf grey", None, "Maia", 1],
+          [2, "LEGOLAS", 656, "Elf", 1],
+          [3, "gimli", 140, "Dwarf", 1],
+          [4, "aragorn", 88, "Human", 1],
+          [5, "frodo  ", 51, "Hobbit", 1],
+          [6, "pippin", 29, "Hobbit", 1],
+          [7, "merry", 37, "Hobbit", 1],
+          [8, "samwise", 39, "Hobbit", 1],
+          [9, "boromir", 41, "Human", 1],
+        ]
+        Data(data_list=lotr)
+        # design deck
+        Deck(cards=1, height=4, width=3)
+        # character name
+        name_box = rectangle(
+            x=0.25, y=0.25,
+            width=2.5, height=1,
+            rounded=0.1)
+        chn = Common(x=1.5, y=0.75, font_size=12)
+        Card("*", name_box)
+        Card("1",
+          text(text=T("{{ Name.title() }}"),
+          common=chn))
+        Card("2",
+          text(text=T("{{ Name.lower() }}"),
+          common=chn))
+        Card("3",
+          text(text=T("{{ Name.upper() }}"),
+          common=chn))
+        Card("4",
+          text(text=T("{{ Name.capitalize() }}"),
+          common=chn))
+        Card("5",
+          text(text=T("{{ Name.strip() }}"),
+          common=chn))
+        Card("6",
+          text(text=T("{{ Name.replace('p', 'm') }}"),
+          common=chn))
+        Card("7",
+          text(text=T("{{ Name.zfill(7) }}"),
+          common=chn))
+        Card("8",
+          text(text=T("{{ Name.lstrip('sam') }}"),
+          common=chn))
+        Card("9",
+          text(text=T("{{ Name.rstrip('mir') }}"),
+          common=chn))
+
+===== ======
+
+
+Template Functions
 ++++++++++++++++++
+:ref:`^ <the-template-command>`
 
 It could that you need to perform a more complex operation, or validation,
 on the data returned by the template from the :ref:`Data() <the-data-command>`.
@@ -874,7 +973,8 @@ The name of the function is then passed to the ``T()`` command by that
 command's *function* property.
 
 Template Function Example 1.
-++++++++++++++++++++++++++++
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+:ref:`^ <the-template-command>`
 
 In this example, the function is called ``greet``, and is assigned and used
 by the ``T()`` command as follows:
@@ -899,7 +999,8 @@ The Text() shape is then assigned, via ``greetings`` to one more cards in
 the usual way.
 
 Template Function Example 2.
-++++++++++++++++++++++++++++
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+:ref:`^ <the-template-command>`
 
 Here is a more complex example involving deeper knowledge of
 :doc:`Python Commands <python_commands>`; please skip it if the terminology

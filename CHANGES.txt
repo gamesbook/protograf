@@ -11,6 +11,7 @@ protograf Changes
   and Rectangle
 - Update docs with suitable examples
 - Add Cross shape
+- Add section on how to use text transforms in T() command
 
 2025-10-01 (0.3.1)
 -------------------
