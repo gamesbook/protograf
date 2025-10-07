@@ -41,7 +41,7 @@ from pymupdf import (
 )
 
 # local
-from protograf.utils import colrs, geoms, tools, support
+from protograf.utils import colrs, geoms, imaging, tools, support
 from protograf.utils.tools import _lower
 from protograf.utils.constants import (
     CACHE_DIRECTORY,
@@ -333,6 +333,7 @@ class BaseCanvas:
         self.cache_directory = None  # should be a pathlib.Path object
         self.sliced = ""
         self.image_location = None
+        self.operation = None  # operation on image
         # ---- line / ellipse / bezier / sector
         self.length = self.defaults.get("length", self.default_length)
         self.angle = self.defaults.get("angle", 0)
@@ -892,7 +893,8 @@ class BaseShape:
         # ---- image / file
         self.source = kwargs.get("source", base.source)  # file or http://
         self.sliced = ""
-        self.image_location = None
+        self.image_location = kwargs.get("image_location", base.image_location)
+        self.operation = kwargs.get("operation", base.operation)  # operation on image
         # ---- line / ellipse / bezier / arc / polygon
         self.length = self.kw_float(kwargs.get("length", base.length))
         self.angle = self.kw_float(
@@ -1589,6 +1591,27 @@ class BaseShape:
             ]:
                 issue.append(f'"{self.petals_style}" is an invalid petals style!')
                 correct = False
+        # ---- image operations
+        if self.operation:
+            if not isinstance(self.operation, (list, tuple)):
+                issue.append(f'"{self.operation}" must be a list or set!')
+                correct = False
+            if len(self.operation) != 2:
+                issue.append(f'"{self.operation}" must contain type and value!')
+                correct = False
+            if _lower(self.operation[0]) not in [
+                "circle",
+                "c",
+                "ellipse",
+                "e",
+                "polygon",
+                "p",
+                "rounded",
+                "rounding",
+                "r",
+            ]:
+                issue.append(f'"{self.operation[0]}" is not a valid operation type!')
+                correct = False
         # ---- line / arrow
         if self.rotation_point:
             if _lower(self.rotation_point) not in [
@@ -1969,25 +1992,28 @@ class BaseShape:
                 if tools.is_url_valid(image_location):
                     image_local = save_image_from_url(image_location)
 
-            # ---- round image
-            if self.rounding:
-                image_in = Image.open(image_local)
-                mask = Image.new("L", image_in.size, 0)
-                draw = ImageDraw.Draw(mask)
-                # draw.ellipse((0, 0, image_in.size[0], image_in.size[1]), fill=255)
-                draw.rounded_rectangle(
-                    ((0, 0), (image_in.size[0], image_in.size[1])),
-                    self.rounding,
-                    fill=255,
-                )
-                rounded_image = Image.composite(
-                    image_in, Image.new("RGBA", image_in.size, (0, 0, 0, 0)), mask
-                )
-
-                membuf = io.BytesIO()
-                rounded_image.save(membuf, format="png")
-                png_data = membuf.getvalue()
-                imgdoc = pymupdf.open(stream=png_data)  # in-memory image document
+            # ---- alter image
+            if self.operation:
+                if not isinstance(self.operation, list):
+                    feedback('The Image operation must be a list, '
+                             f'not a {type(self.operation).__name__}',
+                             True)
+                if len(self.operation) < 2:
+                    quit()
+                match _lower(self.operation[0]):
+                    case "circle" | "c":
+                        imgdoc = imaging.circle(image_local, self.operation[1])
+                    case "ellipse" | "e":
+                        imgdoc = imaging.ellipse(image_local, self.operation[1])
+                    case "polygon" | "p":
+                        imgdoc = imaging.polygon(image_local, self.operation[1])
+                    case "rounding" | "rounded" | "r":
+                        imgdoc = imaging.rounding(image_local, self.operation[1])
+                    case _:
+                        feedback(
+                            f'The Image operation "{self.operation[0]}" is not a valid one',
+                            True
+                        )
             else:
                 imgdoc = pymupdf.open(image_local)  # open file image as document
 
