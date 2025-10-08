@@ -12,6 +12,7 @@ protograf Changes
 - Update docs with suitable examples
 - Add Cross shape
 - Add section on how to use text transforms in T() command
+- Add Image operations (for cut-outs and blur)
 
 2025-10-01 (0.3.1)
 -------------------

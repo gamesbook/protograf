@@ -1596,10 +1596,13 @@ class BaseShape:
             if not isinstance(self.operation, (list, tuple)):
                 issue.append(f'"{self.operation}" must be a list or set!')
                 correct = False
-            if len(self.operation) != 2:
-                issue.append(f'"{self.operation}" must contain type and value!')
+            if len(self.operation) < 2:
+                issue.append(f'"{self.operation}" must contain at least type and value!')
                 correct = False
             if _lower(self.operation[0]) not in [
+                "blur",
+                "blurring",
+                "b",
                 "circle",
                 "c",
                 "ellipse",
@@ -1995,24 +1998,36 @@ class BaseShape:
             # ---- alter image
             if self.operation:
                 if not isinstance(self.operation, list):
-                    feedback('The Image operation must be a list, '
-                             f'not a {type(self.operation).__name__}',
-                             True)
+                    feedback(
+                        "The Image operation must be a list, "
+                        f"not a {type(self.operation).__name__}",
+                        True,
+                    )
                 if len(self.operation) < 2:
                     quit()
+
+                param1, param2, param3 = None, None, None
+                if len(self.operation) == 3:
+                    param1 = self.operation[2]
+                if len(self.operation) == 4:
+                    param1 = self.operation[3]
+                if len(self.operation) == 5:
+                    param1 = self.operation[4]
                 match _lower(self.operation[0]):
                     case "circle" | "c":
-                        imgdoc = imaging.circle(image_local, self.operation[1])
+                        imgdoc = imaging.circle(image_local, self.operation[1], param1, param2)
                     case "ellipse" | "e":
-                        imgdoc = imaging.ellipse(image_local, self.operation[1])
+                        imgdoc = imaging.ellipse(image_local, self.operation[1], param1, param2)
                     case "polygon" | "p":
-                        imgdoc = imaging.polygon(image_local, self.operation[1])
+                        imgdoc = imaging.polygon(image_local, self.operation[1], param1, param2, param3)
                     case "rounding" | "rounded" | "r":
                         imgdoc = imaging.rounding(image_local, self.operation[1])
+                    case "blurring" | "blur" | "b":
+                        imgdoc = imaging.blur(image_local, self.operation[1])
                     case _:
                         feedback(
                             f'The Image operation "{self.operation[0]}" is not a valid one',
-                            True
+                            True,
                         )
             else:
                 imgdoc = pymupdf.open(image_local)  # open file image as document

@@ -2964,34 +2964,38 @@ Image
 Pedantically speaking, an image is not like the other shapes in the sense that
 it does not consist of lines and areas drawn by **protograf** itself.
 
-An "image" refers to an external file which is simply inserted into the page.
+An "image" refers to an external file which is simply inserted into the page
+at sthe location.
 
-The Image shape shares a number of common aspects with other shapes - such as
-an x & y position, a width and a height, the ability to be rotated, and the
-setting of labl, heading or title text.
-
-An image can have its corners rounded by setting a value for ``rounding``.
-Be aware this is a pixel-based value and does not correspond to the units
-used elsewhere in **protograf**.
-
-An image can also be "drawn over" by other shapes appearing later on in the
-script.
+The Image shape shares a number of common aspects with other shapes |dash| such
+as its x & y ("top left") position, a width and a height, the ability to be
+rotated, and the adding of text in form of a label, heading or title.
 
 If an image has a transparent area, this will be respected and shapes
 appearing earlier on in the script may then be visible "below" it (see
-example below).
+examples below). An image can also be "drawn over" by other shapes
+appearing later on in the script.
+
+The following examples show how an image can be added to, or altered:
+
+- `Example 1. Default Image`_
+- `Example 2. Rotation & Scaling`_
+- `Example 3. Captions and Markings`_
+- `Example 4. Sliced Images`_ (extract image "thirds")
+- `Example 5: Operations`_ ("cutout" shapes, rounding, and blurred edges)
 
 .. _image-default:
 
 Example 1. Default Image
 ++++++++++++++++++++++++
+`^ <image-command_>`_
 
 .. |im1| image:: images/customised/image_default.png
    :width: 330
 
 ===== ======
-|im1| If the shape was constructed using only default properties, there will be
-      nothing to see and an error will be displayed:
+|im1| If the Image was constructed using only default properties, there will
+      be nothing to see and an error will be displayed:
 
       .. code:: python
 
@@ -3010,15 +3014,17 @@ Example 1. Default Image
       This first, unnamed property is the filename of the image.
 
       If no directory is supplied for the image, it is assumed to be
-      in the same as that of the script.
+      in the same directory as that of the script.
 
       The image has the following other properties based on the defaults:
 
       - upper-left corner - x-position ``1`` cm and y-position ``1`` cm
       - *width* and *height* - default to ``1`` cm each
 
-      The size set for the image may distort it if the ratios do not match
-      those of the image itself.
+      .. HINT::
+
+          The size set for the image may distort it if the ratios do not
+          match those of the image itself.
 
 ===== ======
 
@@ -3026,12 +3032,13 @@ Example 1. Default Image
 
 Example 2. Rotation & Scaling
 +++++++++++++++++++++++++++++
+`^ <image-command_>`_
 
 .. |im2| image:: images/customised/images_normal_rotation.png
    :width: 330
 
 ===== ======
-|im2| This example shows the shape constructed using the command with the
+|im2| This example shows the Image constructed using the command with the
       following properties:
 
       .. code:: python
@@ -3075,12 +3082,13 @@ Example 2. Rotation & Scaling
 
 Example 3. Captions and Markings
 ++++++++++++++++++++++++++++++++
+`^ <image-command_>`_
 
 .. |im3| image:: images/customised/image_label.png
    :width: 330
 
 ===== ======
-|im3| This example shows the shape constructed using the command with the
+|im3| This example shows shapes constructed using their command with the
       following properties:
 
       .. code:: python
@@ -3117,14 +3125,15 @@ Example 3. Captions and Markings
 
 .. _image-sliced:
 
-Example 4. Sliced
-+++++++++++++++++
+Example 4. Sliced Images
+++++++++++++++++++++++++
+`^ <image-command_>`_
 
 .. |im4| image:: images/customised/image_sliced.png
    :width: 330
 
 ===== ======
-|im4| This example shows the shape constructed using the command with the
+|im4| This example shows the Image constructed using the command with the
       following properties:
 
       .. code:: python
@@ -3157,6 +3166,94 @@ Example 4. Sliced
       - *b* - the botttom fraction, matching the image's height:width ratio
 
 ===== ======
+
+.. _image-operations:
+
+Example 5: Operations
++++++++++++++++++++++
+`^ <image-command_>`_
+
+It is possible change the way an Image appears by either creating a "cut-out"
+from it, or by blurring the edges.  These changes are termed *operations*.
+
+Each operation is specified by its name, followed by one or more settings,
+in list format (i.e. inside ``[...]`` brackets). Be aware that values used
+for these operations are pixel-based values and do not correspond to the
+units used elsewhere in **protograf**.
+
+The cut-out operations are:
+
+- *circle* (or ``c``): cut-out a circle; this must be followed by the radius,
+  in pixels, of the circle
+- *ellipse* (or ``e``): cut-out an ellipse; this must be followed by the width
+  and height |dash| inside ``(...)`` brackets |dash| in pixels, of the ellipse
+- *polygon* (or ``p``): cut-out a regular polygon; this must be followed by
+  the radius, in pixels, of the polygon; and an optional number for the number
+  of sides of the polygon |dash| the default is 6 (a hexagon)
+- *rounding* (or ``r``): cut-out a rounded portion of each corner of the image;
+  this must be followed by the radius, in pixels, of the cutout size
+
+By default, the cutout center matches the center of the image; but it is
+possible to shift the center by adding two values for the x- and y-shift,
+in pixels, respectively.  This shift does **not** apply to *rounding*.
+
+The blur operation is:
+
+- *blur* (or ``b``): blur the edges; this must be followed by the radius,
+  in pixels, of the size of the blur
+
+
+.. |im5| image:: images/customised/image_operations.png
+   :width: 330
+
+===== ======
+|im5| This example shows the Image constructed using the command with the
+      following properties:
+
+      .. code:: python
+
+        Image("fantasy-forest-with-old-bridges.png",
+              width=2, height=2,
+              x=0, y=0)
+        Image("fantasy-forest-with-old-bridges.png",
+              width=1.5, height=1.5,
+              x=2, y=0,
+              operation=['circle', 100, 75, -75]
+        )
+        Image("fantasy-forest-with-old-bridges.png",
+              width=1.5, height=1.5,
+              x=2.5, y=0.5,
+              operation=['circle', 100, -75, 75]
+        )
+        Image("fantasy-forest-with-old-bridges.png",
+              width=2, height=2,
+              x=0, y=2,
+              operation=['rounding', 50]
+        )
+        Image("fantasy-forest-with-old-bridges.png",
+              width=2, height=2,
+              x=2, y=2,
+              operation=['ellipse', (160, 240)]
+        )
+        Image("fantasy-forest-with-old-bridges.png",
+              width=2, height=2,
+              x=0, y=4,
+              operation=['polygon', 140, 5]
+        )
+        Image("fantasy-forest-with-old-bridges.png",
+              width=2, height=2,
+              x=2, y=4,
+              operation=['blur', 20]
+        )
+
+      The top-left image is the original, while the others show the result
+      of an operation.
+
+      Note that the two *circle* operations use offset values to move the
+      centre of where the cutout happens.
+
+===== ======
+
 
 .. _hexagons-command:
 

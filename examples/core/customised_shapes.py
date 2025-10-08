@@ -255,7 +255,7 @@ PageBreak()
 Blueprint()
 Text(common=txt, text="Polygon: slices")
 Polygon(
-    cx=2, cy=1, sides=8, radius=1,
+    cx=2, cy=3, sides=8, radius=1,
     slices=['red', 'orange', 'yellow', 'green',
             'aqua', 'pink', 'violet', 'purple'])
 PageBreak()
@@ -804,7 +804,7 @@ Square(x=2.5, y=0.5, height=1, centre_shape=small_star)
 Rectangle(x=0.25, y=2.5, height=1, width=1.5, centre_shape=small_star)
 Circle(cx=3, cy=3, radius=0.5, centre_shape=small_star)
 Polygon(cx=1, cy=5, radius=0.5, sides=8, centre_shape=small_star)
-EquilateralTriangle(x=2.35, y=5.5, side=1.25, centre_shape=small_star)
+EquilateralTriangle(cx=3, cy=5, side=1.25, centre_shape=small_star)
 PageBreak()
 
 # ---- centre shape - move
@@ -885,7 +885,7 @@ Rhombus(x=2.4, y=0.3, height=1.5,  width=1.25, centre_shapes=[(small_dot), (big_
 Rectangle(x=0.5, y=2.5, height=1, width=1.25, centre_shapes=[(small_dot), (big_dot, 0.2, 0.2)])
 Circle(cx=3, cy=3, radius=0.5, centre_shapes=[(small_dot), (big_dot, 0.2, 0.2)])
 Polygon(cx=1, cy=5, radius=0.5, sides=8, centre_shapes=[(small_dot), (big_dot, 0.2, 0.2)])
-EquilateralTriangle(x=2.35, y=5.5, side=1.25, centre_shapes=[(small_dot), (big_dot, 0.2, 0.2)])
+EquilateralTriangle(cx=3, cy=5, side=1.25, centre_shapes=[(small_dot), (big_dot, 0.2, 0.2)])
 PageBreak()
 
 
@@ -937,6 +937,44 @@ Image("sholes_typewriter.png",
       heading="Heading",
       title="Title",
       dot=0.1, dot_stroke='red')
+PageBreak()
+
+# ---- image - operations
+Blueprint()
+Text(common=txt, text="Image: operations")
+Image("fantasy-forest-with-old-bridges.png",
+      width=2, height=2,
+      x=0, y=0)
+Image("fantasy-forest-with-old-bridges.png",
+      width=1.5, height=1.5,
+      x=2, y=0,
+      operation=['c', 100, 75, -75]
+)
+Image("fantasy-forest-with-old-bridges.png",
+      width=1.5, height=1.5,
+      x=2.5, y=0.5,
+      operation=['c', 100, -75, 75]
+)
+Image("fantasy-forest-with-old-bridges.png",
+      width=2, height=2,
+      x=0, y=2,
+      operation=['r', 50]
+)
+Image("fantasy-forest-with-old-bridges.png",
+      width=2, height=2,
+      x=2, y=2,
+      operation=['e', (160, 240)]
+)
+Image("fantasy-forest-with-old-bridges.png",
+      width=2, height=2,
+      x=0, y=4,
+      operation=['p', 140, 5]
+)
+Image("fantasy-forest-with-old-bridges.png",
+      width=2, height=2,
+      x=2, y=4,
+      operation=['b', 20]
+)
 PageBreak()
 
 # ---- shape rotation
@@ -1277,7 +1315,7 @@ Save(
         "shape_centred", "shape_centred_move", "shape_centred_custom",
         "shapes_centred",
         "qr_code",
-        "image_sliced", "image_label",
+        "image_sliced", "image_label", "image_operations",
         "shape_rotation", "shape_hatches_and_rotation",
         "table_defaults", "table_custom",
         "perbii_styled",
