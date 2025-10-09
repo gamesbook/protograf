@@ -114,6 +114,8 @@ Follow this process:
 - |check| Finalise release date and notes in ``CHANGES.txt``
 - |check| Ensure all the examples can be run by using shell script(s)
 - |check| Update the ``examples.zip`` file with latest example code
+  (remove all PDF in examples/ except ``colorset`` and ``colorset_svg``;
+  and also delete the ``temp`` directory)
 - |check| Update the ``release`` in ``docs/source/conf.py``
 - |check| Update the ``__version_info__`` in ``_version.py``
 - |check| Update the version using poetry e.g. ``poetry version patch``

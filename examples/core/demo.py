@@ -57,8 +57,8 @@ Text(common=header, text="Filled shapes")
 Rectangle(cx=3, cy=23, width=5, height=3,
           title="rectangle:3-23", title_stroke="black", fill_stroke="tomato")
 EquilateralTriangle(
-    x=7, y=24, side=4,
-    title="triangle:9-24", title_stroke="black", fill_stroke="tomato")
+    cx=9, cy=23, side=4,
+    title="triangle:9-23", title_stroke="black", fill_stroke="tomato")
 Stadium(x=13.5, y=22, width=3, height=2,
         title="stadium:15-23", title_stroke="black", fill_stroke="tomato")
 Hexagon(cx=3, cy=17, side=2, orientation="flat",
@@ -108,7 +108,7 @@ Text(common=header, text="Centred shapes with centre point and x-y label")
 dot = Common(dot=0.2, dot_stroke="yellow")
 
 Rectangle(cx=3, cy=23, width=5, height=3, label="rectangle:3-23", common=dot)
-EquilateralTriangle(x=7, y=24, side=4, label="triangle:9-24", common=dot)
+EquilateralTriangle(cx=9, cy=23, side=4, label="triangle:9-23", common=dot)
 Stadium(cx=15, cy=23, width=3, height=2, label="stadium:15-23", common=dot)
 
 Hexagon(cx=3, cy=17, side=2, label="hexagon:3-17", orientation="flat", common=dot)
@@ -158,7 +158,7 @@ Text(common=header, text="Centred shapes with centre point and x-y title")
 dot = Common(dot=0.2, dot_stroke="green")
 
 Rectangle(cx=3, cy=23, width=5, height=3, title="rectangle:3-23", common=dot)
-EquilateralTriangle(x=7, y=24, side=4, title="triangle:9-24", common=dot)
+EquilateralTriangle(cx=9, cy=23, side=4, title="triangle:9-23", common=dot)
 Stadium(cx=15, cy=23, width=3, height=2, title="stadium:15-23", common=dot)
 
 Hexagon(cx=3, cy=17, side=2, title="hexagon:3-17", orientation="flat", common=dot)

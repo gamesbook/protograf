@@ -119,6 +119,19 @@ def boolean_join(items):
     return result
 
 
+def _vprint(points: list, decimals: int = 2) -> str:
+    """Return a user-units, truncated number, version of a list of points."""
+    upoints = [Point(pt.x / globals.units, pt.y / globals.units) for pt in points]
+    rpoints = [
+        Point("%.2f" % round(pt.x, decimals), "%.1f" % round(pt.y, decimals))
+        for pt in upoints
+    ]
+    result = ""
+    for key, pt in enumerate(rpoints):
+        result += f"{key}:({pt.x},{pt.y}), "
+    return result.strip(", ")
+
+
 def _lower(value) -> str | None:
     """Convert value into a lowercase string without any space around it
 

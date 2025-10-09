@@ -4109,7 +4109,15 @@ Perbii shapes can be constructed for:
 - :ref:`EquilateralTriangle <equilateraltriangle-command>`
 - :ref:`Hexagon <hexagon-command>`
 - :ref:`Rectangle <rectangle-command>`
-- :ref:`Rhombus <rhombus-command>`
+- :ref:`Rhombus <rhombus-command>`;
+
+.. NOTE::
+
+    Actually, because a rhombus can have an "elongated" shape, it is not
+    really possible to have true perbis lines for this shape.  What is drawn
+    are lines from the midpoints of each side to the centre. This in turn
+    means that rotated shapes have an "awkward" angle |dash| use with care.
+
 
 Example 1. Perbii Shapes
 ++++++++++++++++++++++++

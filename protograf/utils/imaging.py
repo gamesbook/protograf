@@ -130,7 +130,9 @@ def circle(the_image: str, radius: int, offset_x: int = 0, offset_y: int = 0):
     return in_memory(new_img)
 
 
-def polygon(the_image: str, radius: int, sides: int = 6, offset_x: int = 0, offset_y: int = 0):
+def polygon(
+    the_image: str, radius: int, sides: int = 6, offset_x: int = 0, offset_y: int = 0
+):
     """Extract image as polygon from original.
 
     Args:
@@ -158,13 +160,15 @@ def polygon(the_image: str, radius: int, sides: int = 6, offset_x: int = 0, offs
     offset_x = offset_x or 0
     offset_y = offset_y or 0
     sides = sides or 6
-    background = Image.new("RGBA", img.size, (0,0,0,0))
+    background = Image.new("RGBA", img.size, (0, 0, 0, 0))
     mask = Image.new("RGBA", img.size, 0)
     draw = ImageDraw.Draw(mask)
     # create square box around (offset) centre of image
     width, height = img.size
     cx, cy = int(width / 2) + offset_x, int(height / 2) + offset_y
-    draw.regular_polygon((cx, cy, radius), sides, rotation=360, fill='green', outline=None)
+    draw.regular_polygon(
+        (cx, cy, radius), sides, rotation=360, fill="green", outline=None
+    )
     new_img = Image.composite(img, background, mask)
     width, height = img.size
     base_img = Image.new("RGBA", (width, height))

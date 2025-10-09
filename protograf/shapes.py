@@ -30,7 +30,7 @@ from protograf.base_extended import (
 from protograf.shapes_circle import CircleShape
 from protograf.shapes_rectangle import RectangleShape
 from protograf.utils import colrs, geoms, support, tools, fonts
-from protograf.utils.tools import _lower
+from protograf.utils.tools import _lower, _vprint
 from protograf.utils.constants import (
     BGG_IMAGES,
 )
@@ -1862,7 +1862,7 @@ class RhombusShape(BaseShape):
         perbii_dict = {}
         vcount = len(vertices) - 1
         _perbii_pts = []
-        # print(f"*** RHOMBUS perbii {centre=} {vertices=}")
+        # print(f"*** RHOMBUS perbii {centre=} {_vprint(vertices)=}")
         for key, vertex in enumerate(vertices):
             if key == 3:
                 p1 = Point(vertex.x, vertex.y)
@@ -3276,7 +3276,7 @@ class TrapezoidShape(BaseShape):
             self.draw_vertex_shapes(
                 self.vertex_shapes,
                 self.vertexes,
-                Point(x, y),
+                Point(x_d, y_d),
                 self.vertex_shapes_rotated,
             )
         # ---- dot

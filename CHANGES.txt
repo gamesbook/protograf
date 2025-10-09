@@ -1,7 +1,7 @@
 protograf Changes
 =================
 
-2025-00-00 (0.3.2)
+2025-10-09 (0.3.2)
 -------------------
 - Start of new `base_extended` module
 - Add `snail` property to Polyline and Polyshape

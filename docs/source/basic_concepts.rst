@@ -27,8 +27,8 @@ detailed definitions of some of the terms in the section covering
 - `The "default" concept`_
 
 
-How you’ll use protograf
-========================
+How you’ll use **protograf**
+============================
 `↑ <table-of-contents-basic_>`_
 
 You will be using **protograf** to write what is termed a **script**
@@ -161,6 +161,8 @@ Examples of some of the available geometric **shapes** include:
 -  Rhombus
 -  Square
 -  Stadium
+-  Star
+-  Triangle
 
 Descriptions of all of these kinds of shapes, and how to create and use them,
 are provided in the section on :doc:`core shapes <core_shapes>`.
@@ -302,20 +304,21 @@ Some examples of defaults are:
    or 1/4" (one quarter of one inch); the main reason for this choice is to
    ensure that a 3x3 grid of Poker-sized cards fits onto one page!
 -  the default *paper* size for pages in the output PDF is ``A4`` |dash| similar
-   to the US Letter size i.e. A4 is 21 x 29.7 cm (8.268 x 11.693 inch) and
-   Letter is 8.5 x 11 inch (21.59 x 27.94 cm)
+   to the US ``Letter`` size i.e. A4 paper is 21 cm x 29.7 cm (8.268 inch x
+   11.693 inch) and Letter paper is 8.5 inch x 11 inch (21.59 cm x 27.94 cm)
 -  the default *units* are centimetres (*cm*)
 -  the default *x* and *y* positions are each ``1`` (one) |dash| with default
-   units that equates to *1cm*
--  the default line *length* is ``1`` (one) - with default units that is 1cm
--  the default line *stroke width* is ``1`` point - that corresponds to
+   units that equates to *1 cm*
+-  the default line *length* is ``1`` (one)  |dash| with default units that
+   corresponds to *1 cm*
+-  the default line *stroke width* is ``1`` point |dash| that corresponds to
    1/72 inches (or 0.353 mm)
--  the default line *stroke* color is ``black`` - which has a hexadecimal
+-  the default line *stroke* color is ``black`` |dash| a hexadecimal
    value of ``#000000``
--  the default area *fill* color is ``white`` - which has a hexadecimal
+-  the default area *fill* color is ``white`` |dash| a hexadecimal
    value of ``#FFFFFF``
--  the default *font* is ``Helvetica``, with a size (height) of ``12`` points
-   and a stroke color of ``black``
+-  the default *font* is ``Helvetica``, with a *size* (height) of ``12`` points
+   and a *stroke* color of ``black``
 
 .. HINT::
 
