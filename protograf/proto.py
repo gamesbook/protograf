@@ -35,6 +35,7 @@ from .shapes import (
     BezierShape,
     ChordShape,
     CommonShape,
+    CrossShape,
     DotShape,
     EllipseShape,
     EquilateralTriangleShape,
@@ -3083,8 +3084,33 @@ def dot(row=None, col=None, **kwargs):
     return DotShape(canvas=globals.canvas, **kwargs)
 
 
+@docstring_base
+def Cross(row=None, col=None, **kwargs):
+    """Draw a Cross shape on the canvas.
+
+    Args:
+
+    - row (int): row in which the shape is drawn.
+    - col (int): column in which shape is drawn.
+
+    Kwargs:
+
+    <base>
+
+    """
+    kwargs = margins(**kwargs)
+    crs = cross(**kwargs)
+    crs.draw()
+    return crs
+
+
+def cross(row=None, col=None, **kwargs):
+    kwargs = margins(**kwargs)
+    return CrossShape(canvas=globals.canvas, **kwargs)
+
+
 @docstring_center
-def Ellipse(**kwargs):
+def Ellipse(row=None, col=None, **kwargs):
     """Draw a Ellipse shape on the canvas.
 
     Args:
@@ -3098,6 +3124,8 @@ def Ellipse(**kwargs):
 
     """
     kwargs = margins(**kwargs)
+    kwargs["row"] = row
+    kwargs["col"] = col
     ellipse = EllipseShape(canvas=globals.canvas, **kwargs)
     ellipse.draw()
     return ellipse

@@ -101,27 +101,23 @@ These features are **not** guaranteed to be implemented; they just represent
 current / potential areas of work or ideas.
 
 * [ ] New Shapes:
-    * [ ] Diamond shape
-    * [ ] Parallelogram shape
-    * [ ] Cross shape
+    * [x] Cross shape
     * [ ] Pod shape
 * [ ] Common objects:
-    * [ ] CompassRose (replace Compass Shape)
     * [x] Cube
     * [ ] Domino
     * [x] Die
-    * [ ] Meeple (Polyshape with Arcs)
+    * [ ] Meeple (Polyshape with curves)
     * [x] Pentomino
-    * [ ] Picture Frame (Trapezoid composite)
 * [ ] Hexagons: 18xx tile example
-* [ ] HexHex Grid: better hexhex creation with notations
+* [ ] HexHex Grid: better hexhex boards via notation
 * [ ] Polyline: define arcs along the path
 * [x] Paths (arcs) inside a Hexagon
-* [ ] Shortcut notation for styling of a Shape
-* [ ] Stripes: interior "areas" for a Rectangle
+* [x] Stripes: interior "areas" for a Rectangle
 * [ ] Cards:
     * [x] support card-back designs
     * [ ] grid lines for hexagonal cards
+    * [ ] corner crosses as grid marks
     * [x] access to Google Sheets
     * [x] extract rectangular cards as PNG files
     * [x] page annotations
@@ -163,8 +159,8 @@ feedback and suggestions!
 * `cairoSVG` https://pypi.org/project/cairosvg/ - support for drawing SVG images
 * `bgg-api` https://pypi.org/project/bgg-api/ - support for access to the
   [BoardGameGeek](https://boardgamegeek.com) API
-* `xlrd` https://pypi.org/project/xlrd/ - support for access to Excel `.xls` files
-* `openpyxl` https://pypi.org/project/openpyxl/ - support for access to Excel files
+* `xlrd` https://pypi.org/project/xlrd/ - access to Excel `.xls` files
+* `openpyxl` https://pypi.org/project/openpyxl/ - access to Excel `.xlsx` files
 * `imageio` https://pypi.org/project/imageio/- support for compiling PNGs into a GIF
 * `jinja` https://jinja.palletsprojects.com - template logic with variables
 * `pillow` https://github.com/python-pillow/Pillow - support for image processing

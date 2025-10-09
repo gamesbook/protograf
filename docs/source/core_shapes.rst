@@ -38,6 +38,7 @@ Shape Index
 -  `Bezier`_
 -  `Circle`_
 -  `Chord`_
+-  `Cross`_
 -  `Dot`_
 -  `DotGrid`_
 -  `Ellipse`_
@@ -291,6 +292,106 @@ Example 1. Customised Chord
 
 ===== ======
 
+.. _cross-command:
+
+Cross
+~~~~~
+`↑ <shape-index_>`_
+
+A Cross shape is two thick bars that cross each other at 90 |deg|.  The
+vertical bar is termed the "body" and the horizontal bar is the "arm".
+
+In addition to the normal, common properties, the Cross also has:
+
+- *thickness*: this is the width of the bars. The default value for this is
+  one-fifth of the overall width.
+- *arm_fraction*: this is the fraction **up** the length of the body at which
+  the arm crosses it. The default value for this is ``0.5`` (half-way up).
+
+
+Example 1. Default Cross
+++++++++++++++++++++++++
+
+.. |cr1| image:: images/defaults/cross.png
+   :width: 330
+
+===== ======
+|cr1| This example shows the shape constructed using the command with only
+      defaults:
+
+      .. code:: python
+
+          Cross()
+
+      It has the following properties based on the defaults:
+
+      - top-left is at x-position ``1`` cm and at y-position ``1`` cm
+      - default height and width of ``1`` cm
+      - default bar thickness is one-fifth of the width
+
+===== ======
+
+Example 2. Customised Cross
++++++++++++++++++++++++++++
+
+.. |cr2| image:: images/customised/cross.png
+   :width: 330
+
+===== ======
+|cr2| This example shows the shape constructed using the command with these
+      properties:
+
+      .. code:: python
+
+        crs = Common(
+            height=1.8, width=1.2,
+            arm_fraction=0.70)
+        Cross(
+            stroke_width=1,
+            stroke="red",
+            fill="gold")
+        Cross(
+            cx=3, cy=1,
+            thickness=0.33,
+            fill_stroke="red")
+        Cross(
+            common=crs,
+            cx=1, cy=3)
+        Cross(
+            common=crs,
+            cx=3, cy=3,
+            title="Title",
+            label="Label",
+            heading="Heading")
+        Cross(
+            common=crs,
+            cx=3, cy=5,
+            dot=0.1, cross=0.5)
+        Cross(
+            common=crs,
+            cx=1, cy=5, height=1.8,
+            rotation=45)
+
+      The top-left example shows a default-sized cross with different
+      *fill* and *stroke* colors, as well a thicker *stroke_width*.
+
+      The top-right example shows a cross with matching *fill* and
+      *stroke* colors.  It also changes the default size of the bar
+      for the arm and body to have a *thickness* of ``0.33`` cm. The
+      default is one-fifth of the overall width.
+
+      The lower four examples all share a common height and width. They
+      also use the *arm_fraction* property.  This is the fraction up the
+      length of the body at which the arm crosses it; by default this is
+      ``0.5`` (half-way up).  All these examples "centre" the cross; in
+      this case the centre corresponds to the middle point of the height
+      (for the y-direction) and width (for the x-direction) of the cross.
+
+      The *label* and *rotation* properties recalculate the centre to
+      match the point at which the arm crosses the body.
+
+===== ======
+
 .. _dot-command:
 
 Dot
@@ -375,9 +476,17 @@ In addition to setting points directly, the Polyline can also be constructed
 using the *steps* property.  This define a series of values that represent
 the **relative** distance from the last point drawn.
 
+The following examples illustrate these properties:
+
+- `Example 1. Basic Polyline`_
+- `Example 2. Customised Polyline`_
+- `Example 3. Polyline with Arrow`_
+- `Example 4. Polyline with Snail`_
+
 
 Example 1. Basic Polyline
 +++++++++++++++++++++++++
+`^ <polyline-command_>`_
 
 .. |py1| image:: images/defaults/polyline.png
    :width: 330
@@ -418,6 +527,7 @@ Example 1. Basic Polyline
 
 Example 2. Customised Polyline
 ++++++++++++++++++++++++++++++
+`^ <polyline-command_>`_
 
 .. |py2| image:: images/customised/polyline_basic.png
    :width: 330
@@ -455,6 +565,7 @@ Example 2. Customised Polyline
 
 Example 3. Polyline with Arrow
 ++++++++++++++++++++++++++++++
+`^ <polyline-command_>`_
 
 .. |py3| image:: images/customised/polyline_arrow.png
    :width: 330
@@ -484,6 +595,124 @@ Example 3. Polyline with Arrow
 
 ===== ======
 
+
+Example 4. Polyline with Snail
+++++++++++++++++++++++++++++++
+`^ <polyline-command_>`_
+
+The *snail* property is loosely based on the Turtle graphics drawing module
+available for Python (see: https://docs.python.org/3/library/turtle.html).
+
+Instead of using points, the idea of the *snail* is to create a polyline
+based on a series of lines of given length, where the line direction |dash|
+or orientation |dash| will already have been set.   Each line is then drawn
+from the end point of the previous line.
+
+A *snail* property consists of a series of terms, each separated by a space.
+Each term either relates to a direction change or to drawing a line of a
+certain length.
+
+Directions can be set as follows:
+
+- a *compass direction*: one of n, e, w, s, ne, se, sw, or nw
+- an **absolute** *angle*: an ``a`` followed by a value in degrees, from
+  0 to 360, measured counter-clockwise from the east direction
+- a **relative** angle:
+
+  - a ``r`` or ``-`` sign (followed by a value in degrees): will *decrease*
+    the current angle i.e. alter it in a clockwise direction
+  - a ``l`` or ``+`` sign (followed by a value in degrees): will *increase*
+    the current angle i.e. alter it in an anti-clockwise direction
+
+Creating a line is done as follows:
+
+- a normal value |dash| whole or fractional |dash| will draw a line that
+  distance, in the last direction that was set
+- using a ``**`` will draw a line from the current point back to the start
+
+Moving - **without** creating a line - is done as follows:
+
+- a **relative** amount: a ``j`` followed by a value which is the distance,
+  at which the new point will be set |dash| according to the last direction
+  that was set; no line will be dreawn between the points.
+- a **fixed point** move: a ``*`` will set the next, new point to match the
+  one at the start; no line will be dreawn between the points.
+
+.. NOTE::
+
+    The *snail* line always starts at the x- and y-point defined for the
+    Polyline; and the starting direction is "e" or 0 |deg|.  The first term
+    in the *snail* property can either be a direction or a distance.
+
+
+.. raw:: html
+
+   <small>Apologies for using "jump" as the term to cause a move to
+   happen without drawing a line; the idea of a snail jumping was just
+   too absurd not to use!</small>
+
+
+.. |py4| image:: images/customised/polyline_snail.png
+   :width: 330
+
+===== ======
+|py4| The Polyline shape is constructed with these properties:
+
+      .. code:: python
+
+        snail_line = "n 3 e 2 -45 2 w 1 sw 3 **"
+        Polyline(
+            y=0.5,
+            snail="2 s 1 w 2 n 1",
+            stroke_width=2,
+            stroke="red")
+        Polyline(
+            x=0, y=5,
+            snail=snail_line,
+            stroke_width=1)
+        Polyline(
+            x=0, y=5,
+            snail=snail_line,
+            stroke_width=1,
+            scaling=0.5)
+        Polyline(
+            x=3.5, y=1,
+            snail="s 0.4 j0.1 "*8,
+            stroke_width=1,
+            stroke="green")
+        Polyline(
+            y=3, x=2,
+            snail="e 1 s 1 w 1 n 1 s j1 "*3,
+            stroke_width=2,
+            stroke="blue")
+
+      The top example is a simple red line going in a square.  It starts by
+      going east |dash| the default direction |dash| for ``2cm`` then south
+      for ``1cm``, west for ``2cm`` and finally north for ``1cm``.
+
+      The two examples with the black lines share the same *snail* line,
+      assigned to ``snail_line``.  This example shows the use of the ``-``
+      to represent turning right, in this case by 45 |deg|.  It also shows
+      how the ``**`` term constructs a line back to the start.  The "smaller"
+      example is constructed using the *scaling* fraction |dash| in this case
+      set to ``0.5`` to make it half the size. Note that both lines have the
+      same starting point.
+
+      The example with the green line shows how a dotted line can be
+      constructed using the "jump" (``j``) term to create a space in the same
+      direction as the drawn line.  The ``*8`` then repeats the snail line
+      eight times |dash| actually, the full string get constructed by joining
+      eight copies of this same string, so that is why a space is needed at
+      the end.
+
+      The example with the blue line shows how a shape |dash| in this case a
+      square |dash| is constructed multiple times using the `*3`` to
+      repeat the outline three times. Again, the "jump" (``j``) term is used
+      to move to a different location before the next shape is drawn. Note
+      that start direction is set explicitly, rather than using a default!
+
+
+===== ======
 
 .. _text-command:
 
@@ -868,6 +1097,8 @@ Example 1. Default EquilateralTriangle
       - side - ``1`` cm i.e. all sides are equal
 ===== ======
 
+.. _equtriHatches:
+
 Example 2. Customised EquilateralTriangle
 +++++++++++++++++++++++++++++++++++++++++
 
@@ -878,69 +1109,83 @@ Example 2. Customised EquilateralTriangle
 |eq2| This example shows the shape constructed using the command with the
       various properties.
 
-      In the top section:
-
       .. code:: python
 
         EquilateralTriangle(
-            x=2, y=1,
-            flip="north", hand="west",
-            label="NW",
-            fill="red")
+            cx=2, cy=2, side=2,
+            hatches_count=5,
+            hatches_stroke="red",
+            title='Title', heading='Head')
         EquilateralTriangle(
-            x=2, y=1,
-            flip="north", hand="east",
-            label="NE",
-            fill="gold")
-        EquilateralTriangle(
-            x=2, y=1,
-            flip="south", hand="west",
-            label="SW",
-            fill="blue")
-        EquilateralTriangle(
-            x=2, y=1,
-            flip="south", hand="east",
-            label="SE",
-            fill="chartreuse")
-
-      These shapes have the following properties:
-
-      - starting position - *x* is``2`` cm and *y* is ``1`` cm
-      - default side of ``1`` cm; all sides are equal
-      - *flip* - can be ``north`` or ``south`` |dash| the triangle
-        to either point up or down relative to the starting position
-      - *hand*  - can be ``west`` or ``east`` |dash| the triangle
-        to be drawn to the left or the right relative to the starting position
-
-      The middle section shows:
-
-      .. code:: python
-
-        EquilateralTriangle(
-            x=1, y=4, side=1.5,
-            hatches_count=5, hatches_stroke="red",
-            title="Title", heading="Head")
-
-      - starting position - *x* is ``1`` cm and *y* is ``4`` cm
-      - *side* of ``1.5`` cm; all sides are equal
-      - *hatches_count* of ``5`` - this means there will be 5 equally spaced lines drawn
-        between opposing sides and running parallel to the third side
-      - *hatches_stroke* - customise the hatches to show them as ``red``
-
-      The top section shows:
-
-      .. code:: python
-
-        EquilateralTriangle(
-            x=1, y=5.5, side=1.5,
+            cx=2, cy=5, side=2,
             stroke_width=1,
             rotation=45,
             dot=.05)
 
-      - starting position -  *x* is ``1`` cm and *y* is ``5.5`` cm
-      - *dot* - in the centre
-      - *rotation* - of 45 |deg| anti-clockwise about
-        the centre
+      These shapes have the following properties:
+
+      - starting position - *cx* is``2`` cm
+      - default side of ``2`` cm; all sides are equal
+
+===== ======
+
+.. _equtriSlices:
+
+Example 3. EquilateralTriangle: Lines and Slices
+++++++++++++++++++++++++++++++++++++++++++++++++
+
+*Radii* are the lines drawn from the centroid of a triangle towards its
+vertices.
+
+"Perbis" is a shortcut name for "perpendicular bisector"; and *perbii* is the
+the plural. These lines are drawn from the centroid of a triangle towards the
+mid-points of its edges.
+
+*Slices* are a set of colors that are drawn as triangles inside an
+EquilateralTriangle in a clockwise direction starting from the "North East".
+If there are fewer colors than the three possible triangles, then the colors
+are repeated, starting from the first one.
+
+An EquilateralTriangle is considered to have three vertices located using the
+following compass directions; ``n`` (north), ``sw`` (south-west), and ``se``
+(south-east).  Similarly, the three sides are located at ``ne`` (north-east),
+``nw`` (north-west), and ``s`` (south).
+
+.. |eq3| image:: images/customised/equtri_perbii_slice.png
+   :width: 330
+
+===== ======
+|eq3| This example shows EquilateralTriangles constructed using these
+      commands:
+
+      .. code:: python
+
+        EquilateralTriangle(
+            cx=1, cy=1,
+            side=1.5,
+            radii="n se sw",
+            title="radii",
+            fill="tomato")
+        EquilateralTriangle(
+            cx=2, cy=3,
+            side=1.5,
+            perbii="s ne nw",
+            title="perbii",
+            fill="gold")
+        EquilateralTriangle(
+            cx=3, cy=5,
+            side=1.5,
+            title="slices",
+            slices=["tomato", "gold", "lime"])
+
+      The top example, shows how all three *radii* for an EquilateralTriangle
+      can be constructed.
+
+      The middle example, shows how all three *perbii* for an
+      EquilateralTriangle can be constructed.
+
+      The lower example, shows how all three *slices* for an
+      EquilateralTriangle can be supplied with different colors.
 
 ===== ======
 
@@ -1288,8 +1533,21 @@ Polyshape
 
 A Polyshape is an irregular `polygon`_, constructed using a series of points.
 
+It's basic setup and construction  shares much in common with the
+`Polyline <polyline-command_>`_ but with  some differences, such as its
+*fill* and centre properties.
+
+The following examples illustrate these properties:
+
+- `Example 1. Default Polyshape`_
+- `Example 2. Polyshape: Centre and Steps`_
+- `Example 3. Polyshape Offset`_
+- `Example 4. Polyshape with Snail`_
+
+
 Example 1. Default Polyshape
 ++++++++++++++++++++++++++++
+`^ <polyshape-command_>`_
 
 .. |shp| image:: images/customised/polyshape_default.png
    :width: 330
@@ -1343,6 +1601,7 @@ Example 1. Default Polyshape
 
 Example 2. Polyshape: Centre and Steps
 ++++++++++++++++++++++++++++++++++++++
+`^ <polyshape-command_>`_
 
 While the Polyshape does not have the ability to be constructed using a
 *cx* and *cy* pair to set its centre location |dash| like the symmetric
@@ -1414,6 +1673,7 @@ the **relative** distance from the last point drawn.
 
 Example 3. Polyshape Offset
 +++++++++++++++++++++++++++
+`^ <polyshape-command_>`_
 
 There are two other options available.
 
@@ -1428,7 +1688,7 @@ pairs of values; so instead of ``[(0,0), (1,1)]`` just use ``"0,0 1,1"``.
    :width: 330
 
 ===== ======
-|sh3| The shapes are constructed using the command with these properties:
+|sh3| The Polyshapes are constructed using the command with these properties:
 
         .. code:: python
 
@@ -1459,6 +1719,106 @@ pairs of values; so instead of ``[(0,0), (1,1)]`` just use ``"0,0 1,1"``.
       So, even though the points used to define the ``gold`` Polyshape are
       the same as those used for ``green`` one, these values cause the whole
       shape to be moved down and to the right.
+
+===== ======
+
+
+Example 4. Polyshape with Snail
++++++++++++++++++++++++++++++++
+`^ <polyshape-command_>`_
+
+The *snail* property is loosely based on the Turtle graphics drawing module
+available for Python (see: https://docs.python.org/3/library/turtle.html).
+
+Instead of using points, the idea of the *snail* is to create a Polyshape
+based on a series of lines of given length, where the line direction |dash|
+or orientation |dash| will already have been set.   Each line is then drawn
+from the end point of the previous line.
+
+A *snail* property consists of a series of terms, each separated by a space.
+Each term either relates to a direction change or to drawing a line of a
+certain length.
+
+Directions can be set as follows:
+
+- a *compass direction*: one of n, e, w, s, ne, se, sw, or nw
+- an **absolute** *angle*: an ``a`` followed by a value in degrees, from
+  0 to 360, measured counter-clockwise from the east direction
+- a **relative** angle:
+
+  - a ``r`` or ``-`` sign (followed by a value in degrees): will *decrease*
+    the current angle i.e. alter it in a clockwise direction
+  - a ``l`` or ``+`` sign (followed by a value in degrees): will *increase*
+    the current angle i.e. alter it in an anti-clockwise direction
+
+Creating a line is done as follows:
+
+- a normal value |dash| whole or fractional |dash| will draw a line that
+  distance, in the last direction that was set
+- using a ``**`` will draw a line from the current point back to the start
+
+.. NOTE::
+
+    The *snail* line always starts at the x- and y-point defined for the
+    Polyshape; and the starting direction is "e" or 0 |deg|.  The first term
+    in the *snail* property can either be a direction or a distance.
+
+    Unlike the Polyline *snail*, no "jump" type movement is allowed; there
+    must be a continuous line.
+
+.. |sh4| image:: images/customised/polyshape_snail.png
+   :width: 330
+
+===== ======
+|sh4| The Polyshapes are constructed using the command with these properties:
+
+      .. code:: python
+
+        Polyshape(
+            x=0.5, y=1.5,
+            snail="ne 1 r65 1 ne 1.5 r125 1.44 **",
+            stroke_width=1,
+            #scaling=0.25,
+            stroke="red",
+            fill="tan")
+        Polyshape(
+            x=1, y=2.5,
+            snail="2 r160 "*9,
+            stroke_width=0.5,
+            #scaling=0.25,
+            stroke="red",
+            fill="yellow")
+        Polyshape(
+            x=1.5, y=4,
+            snail='w .5 s .5 e 2.5 n .5 w .5 s 1.5 w 1.5 n .5',
+            stroke="sandybrown",
+            stroke_width=3,
+            fill="seagreen")
+        Polyshape(
+            x=2, y=4.75,
+            snail='w .5 s .5 e 2.5 n .5 w .5 s 1.5 w 1.5 n .5',
+            scaling=0.25,
+            stroke="sandybrown",
+            stroke_width=1,
+            fill="seagreen")
+
+
+      The top example ilustrates the use of the ``r`` term to change the angle
+      of the line to the "right" of the direction it was aimed at before (north
+      east, in the first case). It also shows how the ``**`` term constructs a
+      line back to the start.
+
+      The middle example |dash| based on the one shown for the Turtle |dash|
+      shows how a simple move-and-turn can be repeated multiple times (using
+      the ``*`` multiplier to make copies) to construct a more complex shape.
+
+      The lower example is a repeat of the one shown for
+      `Example 2. Polyshape: Centre and Steps`_ but constructed with simple
+      compass directions.  It may not be that much shorter, but it could be
+      clearer.  In addition it can easily be scaled, as can be seen from the
+      small "inset" shape - the same *snail* but shrunk in size using
+      ``scaling=0.25``.
+
 ===== ======
 
 
@@ -2604,34 +2964,38 @@ Image
 Pedantically speaking, an image is not like the other shapes in the sense that
 it does not consist of lines and areas drawn by **protograf** itself.
 
-An "image" refers to an external file which is simply inserted into the page.
+An "image" refers to an external file which is simply inserted into the page
+at sthe location.
 
-The Image shape shares a number of common aspects with other shapes - such as
-an x & y position, a width and a height, the ability to be rotated, and the
-setting of labl, heading or title text.
-
-An image can have its corners rounded by setting a value for ``rounding``.
-Be aware this is a pixel-based value and does not correspond to the units
-used elsewhere in **protograf**.
-
-An image can also be "drawn over" by other shapes appearing later on in the
-script.
+The Image shape shares a number of common aspects with other shapes |dash| such
+as its x & y ("top left") position, a width and a height, the ability to be
+rotated, and the adding of text in form of a label, heading or title.
 
 If an image has a transparent area, this will be respected and shapes
 appearing earlier on in the script may then be visible "below" it (see
-example below).
+examples below). An image can also be "drawn over" by other shapes
+appearing later on in the script.
+
+The following examples show how an image can be added to, or altered:
+
+- `Example 1. Default Image`_
+- `Example 2. Rotation & Scaling`_
+- `Example 3. Captions and Markings`_
+- `Example 4. Sliced Images`_ (extract image "thirds")
+- `Example 5: Operations`_ ("cutout" shapes, rounding, and blurred edges)
 
 .. _image-default:
 
 Example 1. Default Image
 ++++++++++++++++++++++++
+`^ <image-command_>`_
 
 .. |im1| image:: images/customised/image_default.png
    :width: 330
 
 ===== ======
-|im1| If the shape was constructed using only default properties, there will be
-      nothing to see and an error will be displayed:
+|im1| If the Image was constructed using only default properties, there will
+      be nothing to see and an error will be displayed:
 
       .. code:: python
 
@@ -2650,15 +3014,17 @@ Example 1. Default Image
       This first, unnamed property is the filename of the image.
 
       If no directory is supplied for the image, it is assumed to be
-      in the same as that of the script.
+      in the same directory as that of the script.
 
       The image has the following other properties based on the defaults:
 
       - upper-left corner - x-position ``1`` cm and y-position ``1`` cm
       - *width* and *height* - default to ``1`` cm each
 
-      The size set for the image may distort it if the ratios do not match
-      those of the image itself.
+      .. HINT::
+
+          The size set for the image may distort it if the ratios do not
+          match those of the image itself.
 
 ===== ======
 
@@ -2666,12 +3032,13 @@ Example 1. Default Image
 
 Example 2. Rotation & Scaling
 +++++++++++++++++++++++++++++
+`^ <image-command_>`_
 
 .. |im2| image:: images/customised/images_normal_rotation.png
    :width: 330
 
 ===== ======
-|im2| This example shows the shape constructed using the command with the
+|im2| This example shows the Image constructed using the command with the
       following properties:
 
       .. code:: python
@@ -2715,12 +3082,13 @@ Example 2. Rotation & Scaling
 
 Example 3. Captions and Markings
 ++++++++++++++++++++++++++++++++
+`^ <image-command_>`_
 
 .. |im3| image:: images/customised/image_label.png
    :width: 330
 
 ===== ======
-|im3| This example shows the shape constructed using the command with the
+|im3| This example shows shapes constructed using their command with the
       following properties:
 
       .. code:: python
@@ -2757,14 +3125,15 @@ Example 3. Captions and Markings
 
 .. _image-sliced:
 
-Example 4. Sliced
-+++++++++++++++++
+Example 4. Sliced Images
+++++++++++++++++++++++++
+`^ <image-command_>`_
 
 .. |im4| image:: images/customised/image_sliced.png
    :width: 330
 
 ===== ======
-|im4| This example shows the shape constructed using the command with the
+|im4| This example shows the Image constructed using the command with the
       following properties:
 
       .. code:: python
@@ -2797,6 +3166,94 @@ Example 4. Sliced
       - *b* - the botttom fraction, matching the image's height:width ratio
 
 ===== ======
+
+.. _image-operations:
+
+Example 5: Operations
++++++++++++++++++++++
+`^ <image-command_>`_
+
+It is possible change the way an Image appears by either creating a "cut-out"
+from it, or by blurring the edges.  These changes are termed *operations*.
+
+Each operation is specified by its name, followed by one or more settings,
+in list format (i.e. inside ``[...]`` brackets). Be aware that values used
+for these operations are pixel-based values and do not correspond to the
+units used elsewhere in **protograf**.
+
+The cut-out operations are:
+
+- *circle* (or ``c``): cut-out a circle; this must be followed by the radius,
+  in pixels, of the circle
+- *ellipse* (or ``e``): cut-out an ellipse; this must be followed by the width
+  and height |dash| inside ``(...)`` brackets |dash| in pixels, of the ellipse
+- *polygon* (or ``p``): cut-out a regular polygon; this must be followed by
+  the radius, in pixels, of the polygon; and an optional number for the number
+  of sides of the polygon |dash| the default is 6 (a hexagon)
+- *rounding* (or ``r``): cut-out a rounded portion of each corner of the image;
+  this must be followed by the radius, in pixels, of the cutout size
+
+By default, the cutout center matches the center of the image; but it is
+possible to shift the center by adding two values for the x- and y-shift,
+in pixels, respectively.  This shift does **not** apply to *rounding*.
+
+The blur operation is:
+
+- *blur* (or ``b``): blur the edges; this must be followed by the radius,
+  in pixels, of the size of the blur
+
+
+.. |im5| image:: images/customised/image_operations.png
+   :width: 330
+
+===== ======
+|im5| This example shows the Image constructed using the command with the
+      following properties:
+
+      .. code:: python
+
+        Image("fantasy-forest-with-old-bridges.png",
+              width=2, height=2,
+              x=0, y=0)
+        Image("fantasy-forest-with-old-bridges.png",
+              width=1.5, height=1.5,
+              x=2, y=0,
+              operation=['circle', 100, 75, -75]
+        )
+        Image("fantasy-forest-with-old-bridges.png",
+              width=1.5, height=1.5,
+              x=2.5, y=0.5,
+              operation=['circle', 100, -75, 75]
+        )
+        Image("fantasy-forest-with-old-bridges.png",
+              width=2, height=2,
+              x=0, y=2,
+              operation=['rounding', 50]
+        )
+        Image("fantasy-forest-with-old-bridges.png",
+              width=2, height=2,
+              x=2, y=2,
+              operation=['ellipse', (160, 240)]
+        )
+        Image("fantasy-forest-with-old-bridges.png",
+              width=2, height=2,
+              x=0, y=4,
+              operation=['polygon', 140, 5]
+        )
+        Image("fantasy-forest-with-old-bridges.png",
+              width=2, height=2,
+              x=2, y=4,
+              operation=['blur', 20]
+        )
+
+      The top-left image is the original, while the others show the result
+      of an operation.
+
+      Note that the two *circle* operations use offset values to move the
+      centre of where the cutout happens.
+
+===== ======
+
 
 .. _hexagons-command:
 
@@ -3084,6 +3541,7 @@ the desired output:
 - `Fill and Stroke`_
 - `Rotation`_
 - `Radii Shapes`_
+- `Perbii Shapes`_
 - `Text Descriptions`_
 - `Transparency`_
 - `Vertex Shapes`_
@@ -3457,13 +3915,13 @@ Example 4. Rotation with Hatches
            cx=3, cy=5, height=2, width=1.5,
         )
 
-      The shapes share common properties for the number and style of hatches,
-      with a rotation of 30 |deg| each.
+      The shapes share common properties for the number, direction and style
+      of hatches, with a rotation of 30 |deg| each.
 
 ===== ======
 
 
-. _coreRadiiShapes:
+.. _coreRadiiShapes:
 
 Radii Shapes
 ~~~~~~~~~~~~
@@ -3471,13 +3929,13 @@ Radii Shapes
 
 A number of shapes, that are formed by drawing lines between a set of
 vertices ("corner points"), can be styled by placing other shapes which
-can be located those lines.
+can be located relative to those vertices.
 
 Radii shapes are constructed using the following properties:
 
 - *radii_shapes* - this a list (values in ``[...]``) of value sets that
   determine the "where and what" should be drawn along the line of
-  specific radius.  Each set, enclosed in brackets``(...)`` can consist
+  specific radius.  Each set, enclosed in brackets ``(...)`` can consist
   of three comma-separated parts:
 
   - the first is the **direction**, or directions, of the relevant radii;
@@ -3487,7 +3945,7 @@ Radii shapes are constructed using the following properties:
     other shapes it will be a :ref:`compass direction <termsDirection>`.
   - the second is the **shape** to be drawn
   - the optional third part is the **fractional distance** along the line
-    at which the shape should be drawm; dy default this is ``1`` i.e. the
+    at which the shape should be drawn; by default this is ``1`` i.e. the
     length of the radial line |dash| if it is less than ``1`` the radii
     shape will be drawn inside of the parent shape; and if it is more than
     ``1`` the radii shape will be drawn outside of, or away from, the parent
@@ -3581,8 +4039,8 @@ Example 1. Radii Shapes
         )
 
       All of these examples use a common settings in ``ccom`` to draw
-      the vertex shape |dash| a circle; but the *label* property set as
-      a visual indicator
+      the vertex shape |dash| a circle; but the *label* property is set
+      as a visual indicator.
 
       Note that in some cases, setting the *fractional_distance* (the
       third value in the set) causes the radii shape to be moved
@@ -3597,7 +4055,8 @@ Example 1. Radii Shapes
           Although not shown above, multiple entries can be made for a given
           direction; for example, to draw a circle and a dot along the ``ne``
           radius for a rectangle |dash| in the case below the ``Dot()`` will
-          be drawn halfway along:
+          be drawn halfway between the rectangle's centre and it's north-east
+          corner:
 
           .. code:: python
 
@@ -3613,6 +4072,153 @@ Example 1. Radii Shapes
 
 ===== ======
 
+.. _corePerbiiShapes:
+
+Perbii Shapes
+~~~~~~~~~~~~~
+`^ <shapes-common-properties_>`_
+
+A number of shapes, that are formed by drawing lines between a set of
+vertices ("corner points"), can be styled by placing other shapes which
+can be located relative to the centre point of lines joining those
+vertices.
+
+Perbii shapes are constructed using the following properties:
+
+- *perbii_shapes* - this a list (values in ``[...]``) of value sets that
+  determine the "where and what" should be drawn along the line of
+  specific perbis.  Each set, enclosed in brackets ``(...)`` can consist
+  of three comma-separated parts:
+
+  - the first is the **direction**, or directions, of the relevant perbii;
+    this can be a string e.g. ``"n e"`` or a list e.g. ``["n", "e"]``.
+    Note that this will be a :ref:`compass direction <termsDirection>`.
+  - the second is the **shape** to be drawn
+  - the optional third part is the **fractional distance** along the line
+    at which the shape should be drawn; by default this is ``1`` i.e. the
+    length of the perbis line |dash| if it is less than ``1`` the perbii
+    shape will be drawn inside of the parent shape; and if it is more than
+    ``1`` the perbii shape will be drawn outside of, or away from, the parent
+    shape
+- *perbii_shapes_rotated* - an optional property which, if ``True``, will
+  rotate the vertex shapes such they "point" away from the centre of the
+  parent shape
+
+Perbii shapes can be constructed for:
+
+- :ref:`EquilateralTriangle <equilateraltriangle-command>`
+- :ref:`Hexagon <hexagon-command>`
+- :ref:`Rectangle <rectangle-command>`
+- :ref:`Rhombus <rhombus-command>`;
+
+.. NOTE::
+
+    Actually, because a rhombus can have an "elongated" shape, it is not
+    really possible to have true perbis lines for this shape.  What is drawn
+    are lines from the midpoints of each side to the centre. This in turn
+    means that rotated shapes have an "awkward" angle |dash| use with care.
+
+
+Example 1. Perbii Shapes
+++++++++++++++++++++++++
+
+.. |vr2| image:: images/customised/perbii_shapes.png
+   :width: 330
+
+===== ======
+|vr2| This example shows perbii shapes constructed as follows:
+
+      .. code:: python
+
+        ccom = Common(radius=0.15, fill="gold", label_size=6)
+
+        Hexagon(
+            cx=1, cy=1,
+            radius=0.8,
+            orientation="pointy",
+            perbii_shapes=[
+                ('ne', circle(common=ccom, label="ne")),
+                ('se', circle(common=ccom, label="se"), 1.25),
+                ('w', circle(common=ccom, label="w"), 0.5 ),
+            ],
+            perbii_shapes_rotated=True,
+        )
+        Hexagon(
+            cx=3, cy=1,
+            radius=0.8,
+            perbii_shapes=[
+               ('n', circle(common=ccom, label="n")),
+               ('se', circle(common=ccom, label="se"), 1.25),
+               ('sw', circle(common=ccom, label="sw"), 0.5),
+            ],
+            perbii_shapes_rotated=True,
+        )
+        Rectangle(
+            cx=1, cy=3,
+            height=1, width=1.5,
+            perbii_shapes=[
+                ('n', circle(common=ccom, label="n")),
+                ('s', circle(common=ccom, label="s.")),
+                ('w', circle(common=ccom, label="w")),
+                ('e', circle(common=ccom, label="e")),
+            ],
+            perbii_shapes_rotated=True,
+        )
+        Rhombus(
+            cx=3, cy=3,
+            width=1, height=1.5,
+            perbii="ne se nw sw",
+            perbii_shapes=[
+                ('ne', circle(common=ccom, label="ne")),
+                ('se', circle(common=ccom, label="se")),
+                ('nw', circle(common=ccom, label="nw")),
+                ('sw', circle(common=ccom, label="sw")),
+            ],
+            perbii_shapes_rotated=True,
+        )
+        EquilateralTriangle(
+            cx=1, cy=5,
+            side=1.25,
+            perbii_shapes=[
+                ('ne', circle(common=ccom, label="ne")),
+                ('s', circle(common=ccom, label="s.")),
+                ('nw', circle(common=ccom, label="nw")),
+            ],
+            perbii_shapes_rotated=True,
+        )
+
+      All of these examples use a common settings in ``ccom`` to draw
+      the vertex shape |dash| a circle; and the *label* property is set
+      as a visual indicator.
+
+      Note that in some cases, setting the *fractional_distance* (the
+      third value in the set) causes the perbii shape to be moved
+      closer to, or further away from, the centre.
+
+      The use of ``perbii_shapes_rotated=True`` will means all of these
+      examples have the perbii shapes rotated to face "away" from the
+      parent shape's centre.
+
+      .. HINT::
+
+          Although not shown above, multiple entries can be made for a given
+          direction; for example, to draw a circle and a dot along the ``n``
+          perbis for a rectangle |dash| in the case below the ``Dot()`` will
+          be drawn halfway between the rectangle's centre and it's north edge:
+
+          .. code:: python
+
+            Rectangle(
+                cx=1, cy=3,
+                height=1, width=1.5,
+                perbii_shapes=[
+                    ('n', circle(common=ccom, label="n")),
+                    ('n', dot(), 0.5),
+                ],
+                perbii_shapes_rotated=True,
+            )
+
+===== ======
 
 .. _coreShapeText:
 

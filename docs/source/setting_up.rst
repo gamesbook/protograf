@@ -93,17 +93,17 @@ through such an install.
 .. NOTE::
 
     These are minimal guidelines; in case of any doubt or confusion, please
-    refer to the documentation of the tools that are referenced here!
+    refer to the full documentation of the tools that are referenced here!
 
 
 Linux users
 -----------
 
 You likely already have a version of Python installed, but it is
- **strongly recommended** that you set up a new version in a "virtual
- environment" to work with **protograf**
+**strongly recommended** that you set up a new version in a "virtual
+environment" to work with **protograf**.
 
-Todo this, you can use a modern tool such as ``uv``; see
+To do this, you can use a modern tool such as ``uv``; see
 https://ubuntushell.com/install-uv-python-package-manager/
 
 You can then use ``uv`` to install an updated version of Python into a
@@ -246,7 +246,7 @@ already have a tool for editing Python scripts.
 
 
 Installing **protograf**
-==========================
+========================
 `↑ <table-of-contents-setup_>`_
 
 .. IMPORTANT::
@@ -278,8 +278,8 @@ If you are using ``uv``::
         uv pip install -U pymupdf
 
 
-Checking that protograf works
-=============================
+Checking that **protograf** works
+=================================
 `↑ <table-of-contents-setup_>`_
 
 To now check that **protograf** works, you should create a small test

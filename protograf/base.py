@@ -41,7 +41,7 @@ from pymupdf import (
 )
 
 # local
-from protograf.utils import colrs, geoms, tools, support
+from protograf.utils import colrs, geoms, imaging, tools, support
 from protograf.utils.tools import _lower
 from protograf.utils.constants import (
     CACHE_DIRECTORY,
@@ -168,13 +168,14 @@ class BaseCanvas:
         self.side = self.defaults.get("side", 1)  # equal length sides
         self.height = self.defaults.get("height", self.side)
         self.width = self.defaults.get("width", self.side)
+        self.thickness = self.defaults.get("thickness", None)  # cross
         self.top = self.defaults.get("width", self.width * 0.5)
         self.depth = self.defaults.get("depth", self.side)  # diamond
         self.x = self.defaults.get("x", self.defaults.get("left", 1))
         self.y = self.defaults.get("y", self.defaults.get("bottom", 1))
         self.cx = self.defaults.get("cx", None)  # NB! not 0; needed for internal check
         self.cy = self.defaults.get("cy", None)  # NB! not 0; needed for internal check
-        self.scaling = self.defaults.get("scaling", None)
+        self.scaling = self.defaults.get("scaling", None)  # SVG; snail
         self.dot_width = self.defaults.get("dot_width", 3.0)  # points
         # ---- to be calculated ...
         self.area = None
@@ -190,7 +191,7 @@ class BaseCanvas:
         self.rotation_point = self.defaults.get("rotation_point", "centre")
         self.direction = self.defaults.get("direction", "north")
         self.position = self.defaults.get("position", None)
-        self.flip = self.defaults.get("flip", "north")  # north/south
+        self.flip = self.defaults.get("flip", None)  # north/south
         self.elevation = self.defaults.get("elevation", "horizontal")
         self.facing = self.defaults.get("facing", "out")  # out/in
         # ---- fill color
@@ -332,6 +333,7 @@ class BaseCanvas:
         self.cache_directory = None  # should be a pathlib.Path object
         self.sliced = ""
         self.image_location = None
+        self.operation = None  # operation on image
         # ---- line / ellipse / bezier / sector
         self.length = self.defaults.get("length", self.default_length)
         self.angle = self.defaults.get("angle", 0)
@@ -358,6 +360,8 @@ class BaseCanvas:
             "arrow_stroke", None
         )  # see draw_arrowhead()
         self.arrow_fill = self.defaults.get("arrow_fill", None)  # see draw_arrowhead()
+        # ---- polyline / polyshape
+        self.snail = self.defaults.get("snail", None)
         # ---- line
         self.connections = self.defaults.get("connections", None)
         self.connections_style = self.defaults.get("connections_style", None)
@@ -630,6 +634,8 @@ class BaseCanvas:
         self.pip_fill = self.defaults.get("pip_fill", self.stroke)  # see draw_piphead()
         self.pip_shape = self.defaults.get("pip_shape", "circle")
         self.pip_fraction = self.defaults.get("pip_fraction", 0.2)
+        # ---- cross
+        self.arm_fraction = self.defaults.get("arm_fraction", 0.5)
         # ---- mesh
         self.mesh = self.defaults.get("mesh", None)
         self.mesh_ends = self.defaults.get("mesh_ends", self.line_ends)
@@ -736,13 +742,14 @@ class BaseShape:
         self.side = self.kw_float(kwargs.get("side", base.side))  # equal length sides
         self.height = self.kw_float(kwargs.get("height", self.side))
         self.width = self.kw_float(kwargs.get("width", self.side))
+        self.thickness = kwargs.get("thickness", base.thickness)  # cross
         self.top = self.kw_float(kwargs.get("top", base.top))
         self.depth = self.kw_float(kwargs.get("depth", self.side))  # diamond
         self.x = self.kw_float(kwargs.get("x", kwargs.get("left", base.x)))
         self.y = self.kw_float(kwargs.get("y", kwargs.get("top", base.y)))
         self.cx = self.kw_float(kwargs.get("cx", base.cx))  # centre (for some shapes)
         self.cy = self.kw_float(kwargs.get("cy", base.cy))  # centre (for some shapes)
-        self.scaling = self.kw_float(kwargs.get("scaling", None))  # SVG images
+        self.scaling = self.kw_float(kwargs.get("scaling", None))  # SVG; snail
         self.dot_width = self.kw_float(
             kwargs.get("dot_width", base.dot_width)
         )  # points
@@ -886,7 +893,8 @@ class BaseShape:
         # ---- image / file
         self.source = kwargs.get("source", base.source)  # file or http://
         self.sliced = ""
-        self.image_location = None
+        self.image_location = kwargs.get("image_location", base.image_location)
+        self.operation = kwargs.get("operation", base.operation)  # operation on image
         # ---- line / ellipse / bezier / arc / polygon
         self.length = self.kw_float(kwargs.get("length", base.length))
         self.angle = self.kw_float(
@@ -925,6 +933,8 @@ class BaseShape:
         self.arrow_height = kwargs.get("arrow_height", base.arrow_height)
         self.arrow_stroke = kwargs.get("arrow_stroke", base.arrow_stroke)
         self.arrow_fill = kwargs.get("arrow_fill", base.arrow_fill)
+        # ---- polyline / polyshape
+        self.snail = kwargs.get("snail", base.snail)
         # ---- line
         self.connections = kwargs.get("connections", base.connections)
         self.connections_style = kwargs.get("connections_style", base.connections_style)
@@ -1249,6 +1259,10 @@ class BaseShape:
         self.pip_shape = kwargs.get("pip_shape", base.pip_shape)
         self.pip_fraction = self.kw_float(
             kwargs.get("pip_fraction", base.pip_fraction), "pip_fraction"
+        )
+        # ---- cross
+        self.arm_fraction = self.kw_float(
+            kwargs.get("arm_fraction", base.arm_fraction), "arm_fraction"
         )
         # ---- mesh
         self.mesh = kwargs.get("mesh", base.mesh)
@@ -1576,6 +1590,32 @@ class BaseShape:
                 "w",
             ]:
                 issue.append(f'"{self.petals_style}" is an invalid petals style!')
+                correct = False
+        # ---- image operations
+        if self.operation:
+            if not isinstance(self.operation, (list, tuple)):
+                issue.append(f'"{self.operation}" must be a list or set!')
+                correct = False
+            if len(self.operation) < 2:
+                issue.append(
+                    f'"{self.operation}" must contain at least type and value!'
+                )
+                correct = False
+            if _lower(self.operation[0]) not in [
+                "blur",
+                "blurring",
+                "b",
+                "circle",
+                "c",
+                "ellipse",
+                "e",
+                "polygon",
+                "p",
+                "rounded",
+                "rounding",
+                "r",
+            ]:
+                issue.append(f'"{self.operation[0]}" is not a valid operation type!')
                 correct = False
         # ---- line / arrow
         if self.rotation_point:
@@ -1957,25 +1997,46 @@ class BaseShape:
                 if tools.is_url_valid(image_location):
                     image_local = save_image_from_url(image_location)
 
-            # ---- round image
-            if self.rounding:
-                image_in = Image.open(image_local)
-                mask = Image.new("L", image_in.size, 0)
-                draw = ImageDraw.Draw(mask)
-                # draw.ellipse((0, 0, image_in.size[0], image_in.size[1]), fill=255)
-                draw.rounded_rectangle(
-                    ((0, 0), (image_in.size[0], image_in.size[1])),
-                    self.rounding,
-                    fill=255,
-                )
-                rounded_image = Image.composite(
-                    image_in, Image.new("RGBA", image_in.size, (0, 0, 0, 0)), mask
-                )
+            # ---- alter image
+            if self.operation:
+                if not isinstance(self.operation, list):
+                    feedback(
+                        "The Image operation must be a list, "
+                        f"not a {type(self.operation).__name__}",
+                        True,
+                    )
+                if len(self.operation) < 2:
+                    quit()
 
-                membuf = io.BytesIO()
-                rounded_image.save(membuf, format="png")
-                png_data = membuf.getvalue()
-                imgdoc = pymupdf.open(stream=png_data)  # in-memory image document
+                param1, param2, param3 = None, None, None
+                if len(self.operation) == 3:
+                    param1 = self.operation[2]
+                if len(self.operation) == 4:
+                    param1 = self.operation[3]
+                if len(self.operation) == 5:
+                    param1 = self.operation[4]
+                match _lower(self.operation[0]):
+                    case "circle" | "c":
+                        imgdoc = imaging.circle(
+                            image_local, self.operation[1], param1, param2
+                        )
+                    case "ellipse" | "e":
+                        imgdoc = imaging.ellipse(
+                            image_local, self.operation[1], param1, param2
+                        )
+                    case "polygon" | "p":
+                        imgdoc = imaging.polygon(
+                            image_local, self.operation[1], param1, param2, param3
+                        )
+                    case "rounding" | "rounded" | "r":
+                        imgdoc = imaging.rounding(image_local, self.operation[1])
+                    case "blurring" | "blur" | "b":
+                        imgdoc = imaging.blur(image_local, self.operation[1])
+                    case _:
+                        feedback(
+                            f'The Image operation "{self.operation[0]}" is not a valid one',
+                            True,
+                        )
             else:
                 imgdoc = pymupdf.open(image_local)  # open file image as document
 
@@ -3056,7 +3117,7 @@ class BaseShape:
                 as_int=False,
                 as_float=True,
                 sep=" ",
-                msg="ABC",
+                msg="",
             )
             vertexes = []
             radius = self._u.radius
@@ -3108,6 +3169,102 @@ class BaseShape:
                 else:
                     _rotation = 0
                 # ---- draw radii shape
+                _shape.draw(
+                    _abs_cx=shape_centre.x,
+                    _abs_cy=shape_centre.y,
+                    rotation=_rotation,
+                )
+
+    def draw_perbii_shapes(
+        self,
+        cnv,
+        perbii_shapes: list,
+        vertexes: list,
+        centre: Point,
+        direction_group: DirectionGroup = None,
+        rotated: bool = False,
+    ):
+        """Draw shape(s) along the perbii lines of a Shape.
+
+        Args:
+            perbii_shapes (list):
+                list of tuples of (dir, shape, offset) where:
+                * dir is a direction name
+                * shape is an instance of a Shape
+                * offset is optional float - the fractional distance along the
+                  line from the centre to the edge at which the shape is drawn;
+                  default is 1 i.e. at the edge
+            vertexes (list):
+                list of points for the vertices
+            centre (Point):
+                the centre of the Shape
+            direction_group (DirectionGroup):
+                used to define list of permissible directions for the Shape
+            rotated (bool):
+                if True, rotate perbii_shapes relative to centre
+        """
+
+        @functools.cache
+        def get_circle_vertexes(directions, centre) -> list:
+            """Get a list of vertexes where perbii intersect the circumference"""
+            angles = tools.sequence_split(
+                directions,
+                unique=False,
+                as_int=False,
+                as_float=True,
+                sep=" ",
+                msg="",
+            )
+            vertexes = []
+            radius = self._u.radius
+            for angle in angles:
+                vtx = geoms.point_on_circle(centre, radius, angle)
+                vertexes.append(vtx)
+            return vertexes
+
+        err = "The perbii_shapes must contain direction(s) and shape"
+        if direction_group != DirectionGroup.CIRCULAR:  # see below for calc.
+            perbii_dict = self.calculate_perbii(cnv, centre, vertexes)
+        for item in perbii_shapes:
+            if isinstance(item, tuple):
+                _shape_fraction = 1.0
+                if len(item) < 2:
+                    feedback(f"{err} - not {item}")
+                if direction_group == DirectionGroup.CIRCULAR:
+                    vertexes = get_circle_vertexes(item[0], centre)
+                    perbii_dict = self.calculate_perbii(cnv, centre, vertexes)
+                    _dirs = perbii_dict.keys()
+                else:
+                    _dirs = tools.validated_directions(
+                        item[0], direction_group, "direction"
+                    )
+                _shape = item[1]
+                if len(item) >= 3:
+                    _shape_fraction = tools.as_float(item[2], "fraction")
+            else:
+                feedback(f"{err} - not {item}")
+            self.can_draw_centred_shape(_shape, True)  # could stop here
+            for _dir in _dirs:
+                # ---- calculate shape centre
+                _perbii = perbii_dict[_dir]
+                if _shape_fraction <= 1:
+                    shape_centre = geoms.fraction_along_line(
+                        centre, _perbii.point, _shape_fraction
+                    )  # inside Shape boundaries
+                else:
+                    shape_centre = geoms.point_in_direction(
+                        centre, _perbii.point, _shape_fraction - 1
+                    )  # outside Shape boundaries
+                # print(f"*** {direction_group} {_perbii=} {shape_centre=}")
+                # ---- calculate shape rotation
+                if rotated:
+                    # compass, rotation = geoms.angles_from_points(centre, shape_centre)
+                    compass, _rotation = _perbii.compass, _perbii.angle
+                    # print(f"*** {self.__class__.__name__} {_dir} {compass=} {_rotation=}")
+                    _rotation = compass - 180.0
+                else:
+                    _rotation = 0
+                # ---- draw perbii shape
                 _shape.draw(
                     _abs_cx=shape_centre.x,
                     _abs_cy=shape_centre.y,

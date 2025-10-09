@@ -105,24 +105,41 @@ StarField(
     seeding=42.3)
 PageBreak()
 
-# ---- equilateral triangle: hatch
+# ---- equilateral triangle - hatch
 Blueprint()
-Text(common=txt, text="Equilateral Triangle; flip; hatch")
+Text(common=txt, text="Equilateral Triangle: hatch; rotation")
 EquilateralTriangle(
-    x=2, y=1, flip="north", hand="east", label="NE", fill="gold")
-EquilateralTriangle(
-    x=2, y=1, flip="south", hand="east", label="SE", fill="chartreuse")
-EquilateralTriangle(
-    x=2, y=1, flip="north", hand="west", label="NW", fill="red")
-EquilateralTriangle(
-    x=2, y=1, flip="south", hand="west", label="SW", fill="blue")
-EquilateralTriangle(
-    x=1, y=4, side=1.5,
-    hatches_count=5, hatches_stroke="red",
+    cx=2, cy=2, side=2,
+    hatches_count=5,
+    hatches_stroke="red",
     title='Title', heading='Head')
 EquilateralTriangle(
-    x=1, y=5.5, side=1.5, stroke_width=1,
-    rotation=45, dot=.05)
+    cx=2, cy=5, side=2,
+    stroke_width=1,
+    rotation=45,
+    dot=.05)
+PageBreak()
+
+# ---- equilateral triangle - perbis slice
+Blueprint()
+Text(common=txt, text="Equi. Tri.; radii; perbii; slice ")
+EquilateralTriangle(
+    cx=1, cy=1,
+    side=1.5,
+    radii="n se sw",
+    title="radii",
+    fill="tomato")
+EquilateralTriangle(
+    cx=2, cy=3,
+    side=1.5,
+    perbii="s ne nw",
+    title="perbii",
+    fill="gold")
+EquilateralTriangle(
+    cx=3, cy=5,
+    side=1.5,
+    title="slices",
+    slices=["tomato", "gold", "lime"])
 PageBreak()
 
 # ---- RA Triangle
@@ -199,6 +216,20 @@ Text(common=txt, text="Chord: 135 to 45 degrees")
 Chord(shape=Circle(radius=1, fill=None), angle=135, angle1=45, label="chord")
 PageBreak()
 
+# ---- cross - custom
+Blueprint()
+Text(common=txt, text="Cross: customised")
+crs = Common(height=1.8, width=1.2, arm_fraction=0.70)
+Cross(stroke_width=1, stroke="red", fill="gold")
+Cross(cx=3, cy=1, thickness=0.33, fill_stroke="red")
+Cross(cx=1, cy=3, common=crs,)
+Cross(cx=3, cy=3, common=crs,
+      title="Title", label="Label", heading="Heading")
+Cross(cx=3, cy=5, common=crs,
+      dot=0.1, cross=0.5)
+Cross(cx=1, cy=5, common=crs, rotation=45)
+PageBreak()
+
 # ---- polygon radii
 Blueprint()
 Text(common=txt, text="Polygon: radii (default & custom)")
@@ -224,7 +255,7 @@ PageBreak()
 Blueprint()
 Text(common=txt, text="Polygon: slices")
 Polygon(
-    cx=2, cy=1, sides=8, radius=1,
+    cx=2, cy=3, sides=8, radius=1,
     slices=['red', 'orange', 'yellow', 'green',
             'aqua', 'pink', 'violet', 'purple'])
 PageBreak()
@@ -240,7 +271,7 @@ Text(common=dtext, y=4, text="4.  "+Today(details="datetime", style="usa"))
 Text(common=dtext, y=5, text="5.  "+Today(details="datetime", style="eur"))
 PageBreak()
 
-# ---- rotation: image
+# ---- rotation - image
 Blueprint()
 Text(common=txt, text="Images: normal & rotation")
 Image("sholes_typewriter.png",
@@ -257,7 +288,7 @@ Image("noun-typewriter-3933515.svg",
       x=2, y=3, title="45\u00B0", rotation=45)
 PageBreak()
 
-# ---- rotation: rhombus
+# ---- rotation - rhombus
 Blueprint()
 Text(common=txt, text="Rhombus: red => rotation 60\u00B0")
 Rhombus(cx=2, cy=3, width=1.5, height=2*equilateral_height(1.5), dot=0.06,
@@ -266,7 +297,7 @@ Rhombus(cx=2, cy=3, width=1.5, height=2*equilateral_height(1.5), dot=0.03,
         fill=None, stroke="red", rotation=60)
 PageBreak()
 
-# ---- rotation: stadium
+# ---- rotation - stadium
 Blueprint()
 Text(common=txt, text="Stadium: red => rotation 60\u00B0")
 Stadium(cx=2, cy=3, width=1.25, height=2, dot=0.06)
@@ -274,7 +305,7 @@ Stadium(cx=2, cy=3, width=1.25, height=2,
         stroke="red", stroke_width=.3, rotation=60, dot=0.04)
 PageBreak()
 
-# ---- slices: rhombus
+# ---- slices - rhombus
 Blueprint()
 Text(common=txt, text="Rhombus: slices")
 Rhombus(cx=2, cy=3, height=3, width=2,
@@ -294,7 +325,7 @@ Rhombus(cx=1, cy=5, height=2, width=1,
 )
 PageBreak()
 
-# ---- rotation: polygon
+# ---- rotation - polygon
 Blueprint()
 Text(common=txt, text="Polygon: rotation")
 poly6 = Common(fill=None, sides=6, diameter=1, stroke_width=1)
@@ -359,7 +390,7 @@ Line(cx=1, cy=5, angle=135, length=2, stroke_width=1.5)
 Line(cx=3, cy=5, angle=315, length=2, stroke="red")
 PageBreak()
 
-# ---- line: connections -
+# ---- line: connections
 Blueprint(stroke_width=0.5)
 Text(common=txt, text="Line: connections")
 cc = Circle(cx=2, cy=3, radius=0.5)
@@ -551,6 +582,38 @@ Polyshape(
     x=1, y=2)
 PageBreak()
 
+# ---- polyshape - snail
+Blueprint(stroke_width=0.5)
+Text(common=txt, text="Polyshape: snail")
+Polyshape(
+    x=0.5, y=1.5,
+    snail="ne 1 r65 1 ne 1.5 r125 1.44 **",
+    stroke_width=1,
+    #scaling=0.25,
+    stroke="red",
+    fill="tan")
+Polyshape(
+    x=1, y=2.5,
+    snail="2 r160 "*9,
+    stroke_width=0.5,
+    #scaling=0.25,
+    stroke="red",
+    fill="yellow")
+Polyshape(
+    x=1.5, y=4,
+    snail='w .5 s .5 e 2.5 n .5 w .5 s 1.5 w 1.5 n .5',
+    stroke="sandybrown",
+    stroke_width=3,
+    fill="seagreen")
+Polyshape(
+    x=2, y=4.75,
+    snail='w .5 s .5 e 2.5 n .5 w .5 s 1.5 w 1.5 n .5',
+    scaling=0.25,
+    stroke="sandybrown",
+    stroke_width=1,
+    fill="seagreen")
+PageBreak()
+
 # ---- rectangles - basic
 Blueprint(stroke_width=0.5)
 Text(common=txt, text="Rectangles: rows & cols")
@@ -674,7 +737,7 @@ Line(x=3, y=6, x1=4, y1=5,
      arrow_position=[0.1, 0.15, 0.2])
 PageBreak()
 
-# ---- polyline custom
+# ---- polyline - custom
 Blueprint(stroke_width=0.5)
 Text(common=txt, text="Polyline: custom")
 Polyline(points=[(1, 2), (1, 1), (2, 0), (3, 1), (3, 2)],
@@ -683,7 +746,7 @@ Polyline(x=1, y=3, stroke_width=1,
          steps='0.5,0 0,1.5 1.5,0 0,-1.5 0.5,0 0,0.5 -2.5,0')
 PageBreak()
 
-# ---- polyline arrows
+# ---- polyline - arrows
 Blueprint(stroke_width=0.5)
 Text(common=txt, text="Polyline: arrow")
 Polyline(
@@ -700,6 +763,38 @@ Polyline(
 )
 PageBreak()
 
+# ---- polyline - snail
+Blueprint(stroke_width=0.5)
+Text(common=txt, text="Polyline: snail")
+snail_line = "n 3 e 2 -45 2 w 1 sw 3 **"
+Polyline(
+    y=0.5,
+    snail="2 s 1 w 2 n 1",
+    stroke_width=2,
+    stroke="red")
+Polyline(
+    x=0, y=5,
+    snail=snail_line,
+    stroke_width=1,
+)
+Polyline(
+    x=0, y=5,
+    snail=snail_line,
+    stroke_width=1,
+    scaling=0.5
+)
+Polyline(
+    y=3, x=2,
+    snail="e 1 s 1 w 1 n 1 s j1 "*3,
+    stroke_width=2,
+    stroke="blue")
+Polyline(
+    x=3.5, y=1,
+    snail="s 0.4 j0.1 "*8,
+    stroke_width=1,
+    stroke="green")
+PageBreak()
+
 # ---- centred shapes
 Blueprint()
 Text(common=txt, text="Centred Shape")
@@ -709,7 +804,7 @@ Square(x=2.5, y=0.5, height=1, centre_shape=small_star)
 Rectangle(x=0.25, y=2.5, height=1, width=1.5, centre_shape=small_star)
 Circle(cx=3, cy=3, radius=0.5, centre_shape=small_star)
 Polygon(cx=1, cy=5, radius=0.5, sides=8, centre_shape=small_star)
-EquilateralTriangle(x=2.35, y=5.5, side=1.25, centre_shape=small_star)
+EquilateralTriangle(cx=3, cy=5, side=1.25, centre_shape=small_star)
 PageBreak()
 
 # ---- centre shape - move
@@ -790,7 +885,7 @@ Rhombus(x=2.4, y=0.3, height=1.5,  width=1.25, centre_shapes=[(small_dot), (big_
 Rectangle(x=0.5, y=2.5, height=1, width=1.25, centre_shapes=[(small_dot), (big_dot, 0.2, 0.2)])
 Circle(cx=3, cy=3, radius=0.5, centre_shapes=[(small_dot), (big_dot, 0.2, 0.2)])
 Polygon(cx=1, cy=5, radius=0.5, sides=8, centre_shapes=[(small_dot), (big_dot, 0.2, 0.2)])
-EquilateralTriangle(x=2.35, y=5.5, side=1.25, centre_shapes=[(small_dot), (big_dot, 0.2, 0.2)])
+EquilateralTriangle(cx=3, cy=5, side=1.25, centre_shapes=[(small_dot), (big_dot, 0.2, 0.2)])
 PageBreak()
 
 
@@ -842,6 +937,44 @@ Image("sholes_typewriter.png",
       heading="Heading",
       title="Title",
       dot=0.1, dot_stroke='red')
+PageBreak()
+
+# ---- image - operations
+Blueprint()
+Text(common=txt, text="Image: operations")
+Image("fantasy-forest-with-old-bridges.png",
+      width=2, height=2,
+      x=0, y=0)
+Image("fantasy-forest-with-old-bridges.png",
+      width=1.5, height=1.5,
+      x=2, y=0,
+      operation=['c', 100, 75, -75]
+)
+Image("fantasy-forest-with-old-bridges.png",
+      width=1.5, height=1.5,
+      x=2.5, y=0.5,
+      operation=['c', 100, -75, 75]
+)
+Image("fantasy-forest-with-old-bridges.png",
+      width=2, height=2,
+      x=0, y=2,
+      operation=['r', 50]
+)
+Image("fantasy-forest-with-old-bridges.png",
+      width=2, height=2,
+      x=2, y=2,
+      operation=['e', (160, 240)]
+)
+Image("fantasy-forest-with-old-bridges.png",
+      width=2, height=2,
+      x=0, y=4,
+      operation=['p', 140, 5]
+)
+Image("fantasy-forest-with-old-bridges.png",
+      width=2, height=2,
+      x=2, y=4,
+      operation=['b', 20]
+)
 PageBreak()
 
 # ---- shape rotation
@@ -1082,20 +1215,84 @@ Circle(
 )
 PageBreak()
 
+# ---- perbii shapes
+Blueprint()
+Text(common=txt, text="Perbii shapes")
+ccom = Common(radius=0.15, fill="gold", label_size=6)
+Hexagon(
+    cx=1, cy=1,
+    radius=0.8,
+    orientation="pointy",
+    perbii_shapes=[
+        ('ne', circle(common=ccom, label="ne")),
+        ('se', circle(common=ccom, label="se"), 1.25),
+        ('w', circle(common=ccom, label="w"), 0.5 ),
+    ],
+    perbii_shapes_rotated=True,
+)
+Hexagon(
+    cx=3, cy=1,
+    radius=0.8,
+    perbii_shapes=[
+       ('n', circle(common=ccom, label="n")),
+       ('se', circle(common=ccom, label="se"), 1.25),
+       ('sw', circle(common=ccom, label="sw"), 0.5),
+    ],
+    perbii_shapes_rotated=True,
+)
+Rectangle(
+    cx=1, cy=3,
+    height=1, width=1.5,
+    perbii_shapes=[
+        ('n', circle(common=ccom, label="n")),
+        ('s', circle(common=ccom, label="s.")),
+        ('w', circle(common=ccom, label="w")),
+        ('e', circle(common=ccom, label="e")),
+    ],
+    perbii_shapes_rotated=True,
+)
+Rhombus(
+    cx=3, cy=3,
+    width=1, height=1.5,
+    perbii="ne se nw sw",
+    perbii_shapes=[
+        ('ne', circle(common=ccom, label="ne")),
+        ('se', circle(common=ccom, label="se")),
+        ('nw', circle(common=ccom, label="nw")),
+        ('sw', circle(common=ccom, label="sw")),
+    ],
+    perbii_shapes_rotated=True,
+)
+EquilateralTriangle(
+    cx=1, cy=5,
+    side=1.25,
+    perbii_shapes=[
+        ('ne', circle(common=ccom, label="ne")),
+        ('s', circle(common=ccom, label="s.")),
+        ('nw', circle(common=ccom, label="nw")),
+    ],
+    perbii_shapes_rotated=True,
+)
+PageBreak()
+
 # ---- END
 Text(common=txt, text="Shapes END...")
 
+#Save()
 Save(
      output='png',
      dpi=300,
      directory="../docs/source/images/customised",
      names=[
         None,
-        "blueprint_subdiv", "dots_crosses", "centred", "right_angled_triangle",
-        "lines", "starfield_rectangle", "starfield_circle",
-        "starfield_poly", "equilateral_triangle", "right_angled_triangle_flip",
-        "sectors", "grid_gray", "dotgrid_moleskine", "dotgrid_rowscols", "arc",
-        "stadium_edges", "trapezoid_flip", "chord",
+        "blueprint_subdiv", "dots_crosses", "centred",
+        "right_angled_triangle", "lines",
+        "starfield_rectangle", "starfield_circle", "starfield_poly",
+        "equilateral_triangle", "equtri_perbii_slice",
+        "right_angled_triangle_flip",
+        "sectors", "grid_gray",
+        "dotgrid_moleskine", "dotgrid_rowscols", "arc",
+        "stadium_edges", "trapezoid_flip", "chord", "cross",
         "polygon_radii", "polygon_perbii", "polygon_slices",
         "dates_formats",
         "images_normal_rotation", "rhombus_red_rotation",
@@ -1110,18 +1307,20 @@ Save(
         "descriptions", "label_offset",
         "star_custom", "star_slices",
         "polyshape_default", "polyshape_custom", "polyshape_offset",
+        "polyshape_snail",
         "rectangles_rowcol", "rectangles_custom", "rhombus_custom",
         "rhombus_borders", "trapezoid_borders",
         "arrow_sizes", "arrow_rotate", "arrowheads",
-        "polyline_basic", "polyline_arrow",
+        "polyline_basic", "polyline_arrow", "polyline_snail",
         "shape_centred", "shape_centred_move", "shape_centred_custom",
         "shapes_centred",
         "qr_code",
-        "image_sliced", "image_label",
+        "image_sliced", "image_label", "image_operations",
         "shape_rotation", "shape_hatches_and_rotation",
         "table_defaults", "table_custom",
         "perbii_styled",
         "poly_waves",
         "vertex_shapes",
         "radii_shapes",
+        "perbii_shapes",
         None])

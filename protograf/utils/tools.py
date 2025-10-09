@@ -119,6 +119,19 @@ def boolean_join(items):
     return result
 
 
+def _vprint(points: list, decimals: int = 2) -> str:
+    """Return a user-units, truncated number, version of a list of points."""
+    upoints = [Point(pt.x / globals.units, pt.y / globals.units) for pt in points]
+    rpoints = [
+        Point("%.2f" % round(pt.x, decimals), "%.1f" % round(pt.y, decimals))
+        for pt in upoints
+    ]
+    result = ""
+    for key, pt in enumerate(rpoints):
+        result += f"{key}:({pt.x},{pt.y}), "
+    return result.strip(", ")
+
+
 def _lower(value) -> str | None:
     """Convert value into a lowercase string without any space around it
 
@@ -292,6 +305,38 @@ def as_point(value) -> list | Point:
         return items
     else:
         raise ValueError(f"Cannot convert {value} into a Point!")
+
+
+def compass_to_rotation(value: str) -> float:
+    """Convert a compass direction to a rotation number.
+
+    Doc Test:
+
+    >>> compass_to_rotation('n')
+    90
+    >>> compass_to_rotation('s')
+    270
+    """
+    _value = _lower(value)
+    match _value:
+        case "n":
+            return 90
+        case "e":
+            return 0
+        case "w":
+            return 180
+        case "s":
+            return 270
+        case "ne":
+            return 45
+        case "nw":
+            return 135
+        case "sw":
+            return 225
+        case "se":
+            return 315
+        case _:
+            feedback(f'Compass direction "{value}" is not valid!', True)
 
 
 def tuple_split(
@@ -1157,8 +1202,10 @@ def validated_directions(
             valid = {"e", "se", "sw", "w", "ne", "nw"}
         case DirectionGroup.CIRCULAR:
             valid = {"n", "e", "w", "s", "ne", "se", "sw", "nw", "o", "d"}
-        case DirectionGroup.TRIANGULAR:  # equilateral
+        case DirectionGroup.TRIANGULAR:  # equilateral triangle
             valid = {"se", "sw", "n"}
+        case DirectionGroup.TRIANGULAR_EDGES:  # equilateral triangle
+            valid = {"ne", "nw", "s"}
         case _:
             raise NotImplementedError(f"Cannot handle {direction_group} type!")
     if "all" in values or "*" in values:

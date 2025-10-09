@@ -1,6 +1,19 @@
 protograf Changes
 =================
 
+2025-10-09 (0.3.2)
+-------------------
+- Start of new `base_extended` module
+- Add `snail` property to Polyline and Polyshape
+- Add `slices` and `perbii` properties to EquilateralTriangle
+- Add `slices` and `perbii` properties to Rhombus
+- Add `perbii_shapes` to EquilateralTriangle, Hexagon, Rhombus,
+  and Rectangle
+- Update docs with suitable examples
+- Add Cross shape
+- Add section on how to use text transforms in T() command
+- Add Image operations (for cut-outs and blur)
+
 2025-10-01 (0.3.1)
 -------------------
 - Add `sun` to Circle's petal style
@@ -9,7 +22,8 @@ protograf Changes
 - Patch Chord shape
 - Add `arrow` property to Chord shape
 - Add `vertex_shapes` property to key shapes
-- Add `radii_shapes` property to key shapes
+- Add `radii_shapes` property to EquilateralTriangle, Hexagon,
+  Rhombus, Circle and Rectangle
 - Removed Compass shape
 - Patch pointy Hexagon (centre error)
 - Patch issue with speed of GIF creation; add looping

@@ -126,6 +126,7 @@ Rectangle(
     heading="head-N",
     )
 Rectangle(
+    common=styles,
     x=0, y=2,
     chevron='S',
     chevron_height=0.5,
@@ -134,7 +135,8 @@ Rectangle(
     heading="head-S",
     )
 Rectangle(
-    x=1, y=4.5,
+    common=styles,
+    x=2, y=3.5,
     chevron='W',
     chevron_height=0.5,
     label="chevron:W:0.5",
@@ -142,6 +144,7 @@ Rectangle(
     heading="head-W",
     )
 Rectangle(
+    common=styles,
     x=1, y=0.5,
     chevron='E',
     chevron_height=0.5,

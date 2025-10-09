@@ -100,7 +100,7 @@ class RectangleShape(BaseShape):
             vertices (list):
                 list of Rect nodes as Points
             centre (Point):
-                the centre Point of the Hex
+                the centre Point of the Rect
 
         Returns:
             dict of Perbis objects keyed on direction
@@ -219,7 +219,7 @@ class RectangleShape(BaseShape):
         return angles
 
     def get_vertexes(self, **kwargs):
-        """Get vertices for rectangle without notches."""
+        """Get vertices for Rectangle without notches."""
         x, y = self.calculate_xy(**kwargs)
         # ---- overrides for grid layout
         if self.use_abs_c:
@@ -1667,6 +1667,7 @@ class RectangleShape(BaseShape):
             "radii",
             "corners",
             "radii_shapes",
+            "perbii_shapes",
             "centre_shape",
             "centre_shapes",
             "vertex_shapes",
@@ -1788,8 +1789,19 @@ class RectangleShape(BaseShape):
                         self.radii_shapes,
                         self.vertexes,
                         Point(x_d, y_d),
-                        DirectionGroup.ORDINAL,  # CARDINAL for perbii !
+                        DirectionGroup.ORDINAL,  # for radii !
                         self.radii_shapes_rotated,
+                    )
+            if item == "perbii_shapes":
+                # ---- * draw perbii_shapes
+                if self.perbii_shapes:
+                    self.draw_perbii_shapes(
+                        cnv,
+                        self.perbii_shapes,
+                        self.vertexes,
+                        Point(x_d, y_d),
+                        DirectionGroup.CARDINAL,  # for perbii !
+                        self.perbii_shapes_rotated,
                     )
             if item == "centre_shape" or item == "center_shape":
                 # ---- * centre shape (with offset)
