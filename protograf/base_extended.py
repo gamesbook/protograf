@@ -2,6 +2,9 @@
 """
 Base shape - extended classes for protograf
 """
+# base
+import re
+# local
 from protograf.base import BaseShape
 from protograf.shapes_utils import draw_line
 from protograf.utils.structures import Point
@@ -52,6 +55,34 @@ class BasePolyShape(BaseShape):
             except (ValueError, Exception):
                 return False
 
+        def draw_a_curve(curve: str, current_point: Point, current_dir: float) -> Point:
+            """Draw a curve from a Point."""
+            new_point, inflection_point, distance = None, None, None
+            try:
+                _distance_1, angle, _distance_2 = curve.strip('(').strip(')').split(" ")
+            except ValueError:
+                feedback('A curve must have 3 values: inflection distance & angle,'
+                         f' and total distance - not "{curve}"', True)
+            inf_distance = self.unit(_distance_1) * self.scaling  # convert to units
+            off_distance = self.unit(_distance_2) * self.scaling  # convert to units
+            inf_angle = tools.as_float(angle, 'inflection angle')
+            # ---- new point based on current_dir, off_distance
+            new_point = geoms.point_from_angle(
+                current_point, off_distance, 360 - current_dir
+            )
+            inflection_point = geoms.point_from_angle(
+                current_point, inf_distance, 360 - inf_angle
+            )
+            # ---- draw line from current_point to new_point
+            if new_point:
+                cnv.draw_curve(
+                    current_point,
+                    inflection_point,
+                    new_point,
+                )
+            # ---- save new_point as current_point
+            return new_point
+
         def draw_or_jump(current_point: Point, distance: float, jump: bool) -> Point:
             """Draw a line or move to a new Point."""
             u_distance = self.unit(distance) * self.scaling  # convert distance to units
@@ -75,8 +106,17 @@ class BasePolyShape(BaseShape):
         polytype = self.get_name()
         if not isinstance(self.snail, str):
             feedback("The {polytype} snail must be a space-separated string!", True)
-        items = self.snail.split(" ")
-        # print(f'*** snail {items=}')
+        # ---- extract curves into their own list
+        pattern = r"\((.*?)\)"
+        curves = re.findall(pattern, self.snail)
+        curve_counter = 0
+        if curves:
+            _snail = re.sub(pattern, "~", self.snail)
+        else:
+            _snail = self.snail
+
+        items = _snail.split(" ")
+        print(f'*** snail {self.snail=} {_snail=} {items=}')
         current_dir = 0  # face E by default
         start_point = Point(self._u.x + self._o.delta_x, self._u.y + self._o.delta_y)
         current_point = start_point
@@ -95,6 +135,11 @@ class BasePolyShape(BaseShape):
                         True,
                     )
                 current_point = start_point
+            elif _item == "~" and curve_counter <= len(curves) - 1:
+                # ---- curve
+                the_curve = curves[curve_counter]
+                current_point = draw_a_curve(the_curve, current_point, current_dir)
+                curve_counter += 1
             elif _item == "**":
                 draw_line(
                     cnv,

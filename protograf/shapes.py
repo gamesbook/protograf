@@ -1688,7 +1688,7 @@ class PolylineShape(BasePolyShape):
         lkwargs["wave_height"] = self.kwargs.get("wave_height", 0)
         # ---- set vertices
         self.vertexes = self.get_vertexes()
-        # ---- draw polyline
+        # ---- draw polyline by vertices
         # feedback(f'***PolyLineShp{x=} {y=} {self.vertexes=}')
         if self.vertexes:
             for key, vertex in enumerate(self.vertexes):
@@ -1699,12 +1699,13 @@ class PolylineShape(BasePolyShape):
             kwargs["closed"] = False
             kwargs["fill"] = None
             self.set_canvas_props(cnv=cnv, index=ID, **kwargs)
+        # ---- draw polyline by snail
         if self.snail:
             self.draw_snail(cnv=cnv, off_x=off_x, off_y=off_y, ID=ID, **kwargs)
             kwargs["closed"] = False
             kwargs["fill"] = None
             self.set_canvas_props(cnv=cnv, index=ID, **kwargs)
-        # ---- arrowhead
+        # ---- arrowhead for vertices
         if (
             self.arrow
             or self.arrow_style
@@ -2451,7 +2452,7 @@ class ShapeShape(BasePolyShape):
         lkwargs = {}
         lkwargs["wave_style"] = self.kwargs.get("wave_style", None)
         lkwargs["wave_height"] = self.kwargs.get("wave_height", 0)
-        # ---- draw polyshape
+        # ---- draw polyshape by vertices
         # feedback(f'***PolyShape{x=} {y=} {self.vertexes=}')
         if self.vertexes:
             for key, vertex in enumerate(self.vertexes):
@@ -2466,6 +2467,7 @@ class ShapeShape(BasePolyShape):
             if kwargs.get("rounded"):
                 kwargs["lineJoin"] = 1
             self.set_canvas_props(cnv=cnv, index=ID, **kwargs)
+        # ---- draw polyshape by snail
         if self.snail:
             self.draw_snail(cnv=cnv, off_x=off_x, off_y=off_y, ID=ID, **kwargs)
             kwargs["closed"] = True
