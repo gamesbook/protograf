@@ -9,8 +9,8 @@ or demonstrate how different functions or features can be used. They do
 **not** attempt to be comprehensive and cover all features, but they
 **do** give some ideas as to what can be done |dash| and how.
 
-In most cases, you will need to look at the script itself to understand how the
-output has been created.
+In most cases, you will need to look at the example script itself to
+understand how the output has been created.
 
 1. There is a somewhat random tour of various elements in **protograf**
    available as a `PDF file <https://github.com/gamesbook/protograf/blob/master/docs/source/examples/demo.pdf>`_ - it is based on the
@@ -25,7 +25,7 @@ output has been created.
    accessed from the BoardGameGeek API
 6. :doc:`Assorted <various>` - examples of various "real world" things;
    usually constructed using multiple different elements of **protograf**
-   to give ideas of what might be used in a game design
+   to give ideas of how these can be used together in a game design
 
 .. HINT::
 
