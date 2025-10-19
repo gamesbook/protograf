@@ -206,6 +206,8 @@ class BasePolyShape(BaseShape):
                     )
                 else:
                     current_dir = float(a_item)
+                    if current_dir < 0:
+                        current_dir = 360 + current_dir
                     if current_dir < 0 or current_dir > 360:
                         tools.feedback(
                             f'The {polytype} snail angle "{a_item}" must be in the range 0 to 360.',
