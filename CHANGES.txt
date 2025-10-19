@@ -4,6 +4,7 @@ protograf Changes
 2025-00-00 (0.3.3)
 -------------------
 - Add curve creation into `snail` property
+- Add cross grid marks for rectangular cards
 
 2025-10-09 (0.3.2)
 -------------------

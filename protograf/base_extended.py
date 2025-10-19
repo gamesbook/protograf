@@ -4,6 +4,7 @@ Base shape - extended classes for protograf
 """
 # base
 import re
+
 # local
 from protograf.base import BaseShape
 from protograf.shapes_utils import draw_line
@@ -44,9 +45,6 @@ class BasePolyShape(BaseShape):
         if not steps or len(steps) == 0:
             return None
         return steps
-
-
-
 
     def draw_snail(self, cnv=None, off_x=0, off_y=0, ID=None, **kwargs):
         """Draw a Poly-shape line (multi-part line) on a given canvas via snail."""
@@ -102,10 +100,13 @@ class BasePolyShape(BaseShape):
             """Draw a curve from a Point."""
             new_point, inflection_point = None, None
             try:
-                _distance_1, angle, _distance_2 = curve.strip('(').strip(')').split(" ")
+                _distance_1, angle, _distance_2 = curve.strip("(").strip(")").split(" ")
             except ValueError:
-                feedback('A curve must have 3 values: inflection distance & angle,'
-                         f' and total distance - not "{curve}"', True)
+                feedback(
+                    "A curve must have 3 values: inflection distance & angle,"
+                    f' and total distance - not "{curve}"',
+                    True,
+                )
             inf_distance = self.unit(_distance_1) * self.scaling  # convert to units
             off_distance = self.unit(_distance_2) * self.scaling  # convert to units
             try:
@@ -211,7 +212,7 @@ class BasePolyShape(BaseShape):
                             True,
                             True,
                         )
-            elif _item[0] in ['r', 'l', '-', '+']:
+            elif _item[0] in ["r", "l", "-", "+"]:
                 current_dir = relative_angle(_item, current_dir)
             # elif _item[0] == "+" or _item[0] == "l":  # anti-clockwise
             #     a_item = _item.strip("+").strip("l")

@@ -1847,18 +1847,43 @@ class RectangleShape(BaseShape):
         # ---- grid marks
         if self.grid_marks:  # and not kwargs.get("card_back", False):
             deltag = self.unit(self.grid_marks_length)
-            gx, gy = 0, y  # left-side
-            cnv.draw_line((gx, gy), (deltag, gy))
-            cnv.draw_line((0, gy + self._u.height), (deltag, gy + self._u.height))
-            gx, gy = x, globals.page[1]  # top-side
-            cnv.draw_line((gx, gy), (gx, gy - deltag))
-            cnv.draw_line((gx + self._u.width, gy), (gx + self._u.width, gy - deltag))
-            gx, gy = globals.page[0], y  # right-side
-            cnv.draw_line((gx, gy), (gx - deltag, gy))
-            cnv.draw_line((gx, gy + self._u.height), (gx - deltag, gy + self._u.height))
-            gx, gy = x, 0  # bottom-side
-            cnv.draw_line((gx, gy), (gx, gy + deltag))
-            cnv.draw_line((gx + self._u.width, gy), (gx + self._u.width, gy + deltag))
+            if _lower(self.grid_marks_style) in ["edge", "both", "e", "b"]:
+                gx, gy = 0, y  # left-side
+                cnv.draw_line((gx, gy), (deltag, gy))
+                cnv.draw_line((0, gy + self._u.height), (deltag, gy + self._u.height))
+                gx, gy = x, globals.page[1]  # top-side
+                cnv.draw_line((gx, gy), (gx, gy - deltag))
+                cnv.draw_line(
+                    (gx + self._u.width, gy), (gx + self._u.width, gy - deltag)
+                )
+                gx, gy = globals.page[0], y  # right-side
+                cnv.draw_line((gx, gy), (gx - deltag, gy))
+                cnv.draw_line(
+                    (gx, gy + self._u.height), (gx - deltag, gy + self._u.height)
+                )
+                gx, gy = x, 0  # bottom-side
+                cnv.draw_line((gx, gy), (gx, gy + deltag))
+                cnv.draw_line(
+                    (gx + self._u.width, gy), (gx + self._u.width, gy + deltag)
+                )
+            elif _lower(self.grid_marks_style) in ["cross", "both", "c", "b"]:
+                halfg = deltag / 2.0
+                gx, gy = x, y  # top-left
+                cnv.draw_line((gx - halfg, gy), (gx + halfg, gy))
+                cnv.draw_line((gx, gy - halfg), (gx, gy + halfg))
+                gx, gy = x + self._u.width, y  # top-right
+                cnv.draw_line((gx - halfg, gy), (gx + halfg, gy))
+                cnv.draw_line((gx, gy - halfg), (gx, gy + halfg))
+                gx, gy = x, y + self._u.height  # bottom-left
+                cnv.draw_line((gx - halfg, gy), (gx + halfg, gy))
+                cnv.draw_line((gx, gy - halfg), (gx, gy + halfg))
+                gx, gy = x + self._u.width, y + self._u.height  # bottom-right
+                cnv.draw_line((gx - halfg, gy), (gx + halfg, gy))
+                cnv.draw_line((gx, gy - halfg), (gx, gy + halfg))
+            else:
+                feedback(
+                    f'"{self.grid_marks_style}" is an invalid grid_marks_style!', True
+                )
             # done
             gargs = {}
             gargs["stroke"] = self.grid_marks_stroke

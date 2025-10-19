@@ -255,6 +255,7 @@ class BaseCanvas:
         )  # 1/3 inch
         self.grid_marks_offset = self.defaults.get("grid_marks_offset", 0)
         self.grid_marks_dotted = self.defaults.get("grid_marks_dotted", False)
+        self.grid_marks_style = self.defaults.get("grid_marks_style", "edge")
         # ---- line style
         self.line_stroke = self.defaults.get("line_stroke", WIDTH)
         self.line_width = self.defaults.get("line_width", self.stroke_width)
@@ -736,6 +737,7 @@ class BaseShape:
         self.grid_marks_dotted = self.kw_bool(
             kwargs.get("grid_marks_dotted", base.grid_marks_dotted)
         )
+        self.grid_marks_style = kwargs.get("grid_marks_style", base.grid_marks_style)
         # ---- sizes and positions
         self.row = kwargs.get("row", base.row)
         self.col = self.kw_int(kwargs.get("col", kwargs.get("column", base.col)), "col")
@@ -1632,7 +1634,21 @@ class BaseShape:
         # ---- hexagons
         if self.coord_style:
             if _lower(self.coord_style) not in ["linear", "diagonal", "l", "d"]:
-                issue.append(f'"{self.coord_style}" is an invalid coord style!')
+                issue.append(f'"{self.coord_style}" is an invalid coord_style!')
+                correct = False
+        # ---- grid_marks_style
+        if self.grid_marks_style:
+            if _lower(self.grid_marks_style) not in [
+                "edge",
+                "cross",
+                "both",
+                "e",
+                "c",
+                "b",
+            ]:
+                issue.append(
+                    f'"{self.grid_marks_style}" is an invalid grid_marks_style!'
+                )
                 correct = False
         # ---- arrowhead style
         if self.arrow_style:

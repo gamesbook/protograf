@@ -360,6 +360,48 @@ Example 5. Grid Marks
 ===== ======
 
 
+.. |d0A| image:: images/decks/cards_deck_05B.png
+   :width: 330
+
+===== ======
+|d0A| This example shows the definition of a deck for a set of small
+      cards.
+
+      The card size means that there will be 4 rectangular cards
+      on each A8 page:
+
+      .. code:: python
+
+        Deck(
+            cards=4,
+            height=3.2,
+            width=2.1,
+            stroke="red",
+            bleed_fill="silver",
+            offset=0.25,
+            grid_marks=True,
+            grid_marks_style="cross",
+            grid_marks_length=0.2,
+            grid_marks_stroke="black",
+            grid_marks_stroke_width=1)
+
+      This example is exactly the same as the one above, except for one change.
+
+      The *grid_marks_style* is changed from the default value of ``"edge"`` to
+      that of ``"cross"`` so that small cross-shapes, of length equal to ``0.2``
+      cm, are drawn at the corners of each card's frame.
+
+      .. HINT::
+
+          This style is perhaps suited to the case where cards are expected
+          to be rounded, otherwise the marks might show up on the cards.
+
+      The *grid_marks_style* can also be set to ``"both"`` if both edge marks
+      **and** crosses are required.
+
+===== ======
+
+
 Example 6. Card Spacing
 -----------------------
 `^ <property-examples_>`_
