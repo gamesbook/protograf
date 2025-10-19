@@ -45,6 +45,9 @@ class BasePolyShape(BaseShape):
             return None
         return steps
 
+
+
+
     def draw_snail(self, cnv=None, off_x=0, off_y=0, ID=None, **kwargs):
         """Draw a Poly-shape line (multi-part line) on a given canvas via snail."""
 
@@ -55,9 +58,49 @@ class BasePolyShape(BaseShape):
             except (ValueError, Exception):
                 return False
 
+        def relative_angle(item: str, current_dir: float) -> float:
+            """Use relative angle change to calculate new direction."""
+            if item[0] == "+" or item[0] == "l":  # anti-clockwise
+                a_item = item.strip("+").strip("l")
+                if not is_float(a_item):
+                    tools.feedback(
+                        f'The {polytype} snail angle "{item}" is not valid.',
+                        True,
+                        True,
+                    )
+                else:
+                    current_dir = current_dir + float(a_item)
+                    if current_dir > 360:
+                        current_dir = 360 - current_dir
+                    if current_dir < 0 or current_dir > 360:
+                        tools.feedback(
+                            f'The {polytype} snail angle change "{item}" must result in 0 to 360.',
+                            True,
+                            True,
+                        )
+            elif item[0] == "-" or item[0] == "r":  # clockwise
+                a_item = item.strip("-").strip("r")
+                if not is_float(a_item):
+                    tools.feedback(
+                        f'The {polytype} snail angle "{item}" is not valid.',
+                        True,
+                        True,
+                    )
+                else:
+                    current_dir = current_dir - float(a_item)
+                    if current_dir < 0:
+                        current_dir = 360 + current_dir
+                    if current_dir < 0 or current_dir > 360:
+                        tools.feedback(
+                            f'The {polytype} snail angle change "{item}" must result in 0 to 360.',
+                            True,
+                            True,
+                        )
+            return current_dir
+
         def draw_a_curve(curve: str, current_point: Point, current_dir: float) -> Point:
             """Draw a curve from a Point."""
-            new_point, inflection_point, distance = None, None, None
+            new_point, inflection_point = None, None
             try:
                 _distance_1, angle, _distance_2 = curve.strip('(').strip(')').split(" ")
             except ValueError:
@@ -65,7 +108,10 @@ class BasePolyShape(BaseShape):
                          f' and total distance - not "{curve}"', True)
             inf_distance = self.unit(_distance_1) * self.scaling  # convert to units
             off_distance = self.unit(_distance_2) * self.scaling  # convert to units
-            inf_angle = tools.as_float(angle, 'inflection angle')
+            try:
+                inf_angle = float(angle)
+            except ValueError:
+                inf_angle = relative_angle(angle, current_dir)
             # ---- new point based on current_dir, off_distance
             new_point = geoms.point_from_angle(
                 current_point, off_distance, 360 - current_dir
@@ -116,7 +162,7 @@ class BasePolyShape(BaseShape):
             _snail = self.snail
 
         items = _snail.split(" ")
-        print(f'*** snail {self.snail=} {_snail=} {items=}')
+        # print(f'*** snail {self.snail=} {_snail=} {items=}')
         current_dir = 0  # face E by default
         start_point = Point(self._u.x + self._o.delta_x, self._u.y + self._o.delta_y)
         current_point = start_point
@@ -165,42 +211,44 @@ class BasePolyShape(BaseShape):
                             True,
                             True,
                         )
-            elif _item[0] == "+" or _item[0] == "l":  # anti-clockwise
-                a_item = _item.strip("+").strip("l")
-                if not is_float(a_item):
-                    tools.feedback(
-                        f'The {polytype} snail angle "{_item}" is not valid.',
-                        True,
-                        True,
-                    )
-                else:
-                    current_dir = current_dir + float(a_item)
-                    if current_dir > 360:
-                        current_dir = 360 - current_dir
-                    if current_dir < 0 or current_dir > 360:
-                        tools.feedback(
-                            f'The {polytype} snail angle change "{_item}" must result in 0 to 360.',
-                            True,
-                            True,
-                        )
-            elif _item[0] == "-" or _item[0] == "r":  # clockwise
-                a_item = _item.strip("-").strip("r")
-                if not is_float(a_item):
-                    tools.feedback(
-                        f'The {polytype} snail angle "{_item}" is not valid.',
-                        True,
-                        True,
-                    )
-                else:
-                    current_dir = current_dir - float(a_item)
-                    if current_dir < 0:
-                        current_dir = 360 + current_dir
-                    if current_dir < 0 or current_dir > 360:
-                        tools.feedback(
-                            f'The {polytype} snail angle change "{_item}" must result in 0 to 360.',
-                            True,
-                            True,
-                        )
+            elif _item[0] in ['r', 'l', '-', '+']:
+                current_dir = relative_angle(_item, current_dir)
+            # elif _item[0] == "+" or _item[0] == "l":  # anti-clockwise
+            #     a_item = _item.strip("+").strip("l")
+            #     if not is_float(a_item):
+            #         tools.feedback(
+            #             f'The {polytype} snail angle "{_item}" is not valid.',
+            #             True,
+            #             True,
+            #         )
+            #     else:
+            #         current_dir = current_dir + float(a_item)
+            #         if current_dir > 360:
+            #             current_dir = 360 - current_dir
+            #         if current_dir < 0 or current_dir > 360:
+            #             tools.feedback(
+            #                 f'The {polytype} snail angle change "{_item}" must result in 0 to 360.',
+            #                 True,
+            #                 True,
+            #             )
+            # elif _item[0] == "-" or _item[0] == "r":  # clockwise
+            #     a_item = _item.strip("-").strip("r")
+            #     if not is_float(a_item):
+            #         tools.feedback(
+            #             f'The {polytype} snail angle "{_item}" is not valid.',
+            #             True,
+            #             True,
+            #         )
+            #     else:
+            #         current_dir = current_dir - float(a_item)
+            #         if current_dir < 0:
+            #             current_dir = 360 + current_dir
+            #         if current_dir < 0 or current_dir > 360:
+            #             tools.feedback(
+            #                 f'The {polytype} snail angle change "{_item}" must result in 0 to 360.',
+            #                 True,
+            #                 True,
+            #             )
             elif _item[0] == "j":
                 if self.__class__.__name__ == "ShapeShape":
                     tools.feedback(

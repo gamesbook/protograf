@@ -472,9 +472,13 @@ Polyline
 
 A Polyline is a series of one or more lines joining two or more points.
 
-In addition to setting points directly, the Polyline can also be constructed
+In addition to setting points directly, the Polyline can be constructed
 using the *steps* property.  This define a series of values that represent
-the **relative** distance from the last point drawn.
+the x- and y-values **relative** to the last point drawn.
+
+A Polyline can also be constructed using the *snail* property. This defines
+a series of relative distances, plus optional rotational and/or facing
+directions, that allow a sequence of lines and curves to be drawn.
 
 The following examples illustrate these properties:
 
@@ -482,6 +486,7 @@ The following examples illustrate these properties:
 - `Example 2. Customised Polyline`_
 - `Example 3. Polyline with Arrow`_
 - `Example 4. Polyline with Snail`_
+- `Example 5. Polyline with Snail Curves`_
 
 
 Example 1. Basic Polyline
@@ -644,12 +649,11 @@ Moving - **without** creating a line - is done as follows:
     Polyline; and the starting direction is "e" or 0 |deg|.  The first term
     in the *snail* property can either be a direction or a distance.
 
-
 .. raw:: html
 
    <small>Apologies for using "jump" as the term to cause a move to
    happen without drawing a line; the idea of a snail jumping was just
-   too absurd not to use!</small>
+   too absurd **not** to use!</small>
 
 
 .. |py4| image:: images/customised/polyline_snail.png
@@ -711,8 +715,74 @@ Moving - **without** creating a line - is done as follows:
       to move to a different location before the next shape is drawn. Note
       that start direction is set explicitly, rather than using a default!
 
+===== ======
+
+Example 5. Polyline with Snail Curves
++++++++++++++++++++++++++++++++++++++
+`^ <polyline-command_>`_
+
+In addition to all the options for *snail* as described in
+`Example 4. Polyline with Snail`_, there is also the option to draw
+**curves** as part of the line.
+
+A curve is specified by a series of three values, enclosed in round brackets;
+for example ``(1.118 60 1)``. These values are as follows:
+
+- the first value is the distance to the curve's *inflection point*;
+- the second value is the angle to the curve's *inflection point*;
+- the third value is the distance to the curve's end-point.
+
+So, the curve is drawn from the current point on the line, to a second
+point whose location is determined by a combination of the distance |dash|
+specified by the third value |dash| and the "current" direction, determined
+at the time just before the curve is drawn.  The curve will then bend, based
+on the location of the *inflection point* |dash| note that the curve does
+**not** go to that inflection point, but is rather "pulled" towards it to
+form the bend.
+
+
+.. |py5| image:: images/customised/polyline_snail_curve.png
+   :width: 330
 
 ===== ======
+|py5| The Polyline shape is constructed with these properties:
+
+      .. code:: python
+
+        Polyline(
+            y=1, x=0,
+            snail="(1.118 60 1) (1.118 -60 1) "*2,
+            stroke_width=1,
+            stroke="red")
+        Polyline(
+            y=2, x=0,
+            snail="(1.118 60 1) (1.118 -60 1) "*8,
+            scaling=0.25,
+            stroke_width=1,
+            stroke="red")
+        Polyline(
+            y=4, x=0,
+            snail="a45 (0.6 60 0.707) e 0.5 "*3,
+            stroke_width=1,
+            stroke="red")
+        Polyline(
+            y=5, x=2,
+            snail="r60 (1.118 r60 1) * "*6,
+            stroke_width=1,
+            stroke="red")
+
+      All these examples show repetion in effect; the same basic set of
+      lines repeated multiple times. Again, note that a space is needed at
+      the end of the snail's text string in order to support this repeat.
+
+      The first three examples use absolute angles for the curve |dash|
+      whether positive or negative |dash| but the last example uses a relative
+      angle, so that the curve, starting each time from the home location,
+      changes its orientation because the "current direction" is constantly
+      increasing.
+
+===== ======
+
 
 .. _text-command:
 

@@ -795,6 +795,33 @@ Polyline(
     stroke="green")
 PageBreak()
 
+# ---- polyline - snail - curve
+Blueprint(stroke_width=0.5)
+Text(common=txt, text="Polyline: snail; curves")
+Polyline(
+    y=1, x=0,
+    snail="(1.118 60 1) (1.118 -60 1) "*2,
+    stroke_width=1,
+    stroke="red")
+Polyline(
+    y=2, x=0,
+    snail="(1.118 60 1) (1.118 -60 1) "*8,
+    scaling=0.25,
+    stroke_width=1,
+    stroke="red")
+Polyline(
+    y=4, x=0,
+    snail="a45 (0.6 60 0.707) e 0.5 "*3,
+    stroke_width=1,
+    stroke="red")
+Polyline(
+    y=5, x=2,
+    snail="r60 (1.118 r60 1) * "*6,
+    stroke_width=1,
+    stroke="red")
+
+PageBreak()
+
 # ---- centred shapes
 Blueprint()
 Text(common=txt, text="Centred Shape")
@@ -1311,7 +1338,7 @@ Save(
         "rectangles_rowcol", "rectangles_custom", "rhombus_custom",
         "rhombus_borders", "trapezoid_borders",
         "arrow_sizes", "arrow_rotate", "arrowheads",
-        "polyline_basic", "polyline_arrow", "polyline_snail",
+        "polyline_basic", "polyline_arrow", "polyline_snail", "polyline_snail_curve",
         "shape_centred", "shape_centred_move", "shape_centred_custom",
         "shapes_centred",
         "qr_code",
