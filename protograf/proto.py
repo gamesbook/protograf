@@ -55,6 +55,7 @@ from .shapes import (
     StarLineShape,
     TextShape,
     TrapezoidShape,
+    TriangleShape,
 )
 from .shapes_circle import CircleShape
 from .shapes_hexagon import HexShape
@@ -3775,6 +3776,33 @@ def trapezoid(row=None, col=None, **kwargs):
     kwargs["row"] = row
     kwargs["col"] = col
     return TrapezoidShape(canvas=globals.canvas, **kwargs)
+
+
+@docstring_center
+def Triangle(row=None, col=None, **kwargs):
+    """Draw a Triangle shape on the canvas.
+
+    Args:
+
+    - row (int): row in which the shape is drawn.
+    - col (int): column in which shape is drawn.
+
+    Kwargs:
+
+    <center>
+
+    """
+    kwargs = margins(**kwargs)
+    kwargs["row"] = row
+    kwargs["col"] = col
+    eqt = TriangleShape(canvas=globals.canvas, **kwargs)
+    eqt.draw()
+    return eqt
+
+
+def equilateraltriangle(row=None, col=None, **kwargs):
+    kwargs = margins(**kwargs)
+    return TriangleShape(canvas=globals.canvas, **kwargs)
 
 
 # ---- grids ====

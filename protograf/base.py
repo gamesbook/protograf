@@ -510,6 +510,7 @@ class BaseCanvas:
         self.perimeter = self.defaults.get("perimeter", "circle")
         self.directions = self.defaults.get("directions", None)
         # ---- triangle
+        self.triangle_type = self.defaults.get("triangle_type", None)
         self.rotation_point = self.defaults.get("rotation_point", "centre")
         self.side2 = self.defaults.get("side2", None)
         self.side3 = self.defaults.get("side3", None)
@@ -746,11 +747,11 @@ class BaseShape:
         self.row = kwargs.get("row", base.row)
         self.col = self.kw_int(kwargs.get("col", kwargs.get("column", base.col)), "col")
         self.side = self.kw_float(kwargs.get("side", base.side))  # equal length sides
-        self.height = self.kw_float(kwargs.get("height", self.side))
-        self.width = self.kw_float(kwargs.get("width", self.side))
+        self.height = self.kw_float(kwargs.get("height", 0))  # was self.side
+        self.width = self.kw_float(kwargs.get("width", 0))  # was self.side
         self.thickness = kwargs.get("thickness", base.thickness)  # cross
         self.top = self.kw_float(kwargs.get("top", base.top))
-        self.depth = self.kw_float(kwargs.get("depth", self.side))  # diamond
+        self.depth = self.kw_float(kwargs.get("depth", 0))  # was self.side > diamond?
         self.x = self.kw_float(kwargs.get("x", kwargs.get("left", base.x)))
         self.y = self.kw_float(kwargs.get("y", kwargs.get("top", base.y)))
         self.cx = self.kw_float(kwargs.get("cx", base.cx))  # centre (for some shapes)
@@ -1366,10 +1367,6 @@ class BaseShape:
             self.diameter = 2.0 * self.radius
         if self.diameter and not self.width:
             self.width = self.diameter
-        if self.side and not self.width:
-            self.width = self.side  # square
-        if self.side and not self.height:
-            self.height = self.side  # square
         if self.diameter and not self.radius:
             self.radius = self.diameter / 2.0
         if self.width and not self.top:

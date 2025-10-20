@@ -2493,11 +2493,14 @@ class SquareShape(RectangleShape):
     def __init__(self, _object=None, canvas=None, **kwargs):
         super(SquareShape, self).__init__(_object=_object, canvas=canvas, **kwargs)
         # overrides to make a "square rectangle"
+        if self.side and not self.width:
+            self.width = self.side  # square
+        if self.side and not self.height:
+            self.height = self.side  # square
         if self.width and not self.side:
             self.side = self.width
         if self.height and not self.side:
             self.side = self.height
-        self.height, self.width = self.side, self.side
         self.set_unit_properties()
         self.kwargs = kwargs
 
@@ -2983,6 +2986,7 @@ class TextShape(BaseShape):
         if self.use_abs:
             x_t = self._abs_x
             y_t = self._abs_y
+        height, width = 0, 0
         if self.height:
             height = self._u.height
         if self.width:
@@ -3300,6 +3304,483 @@ class TrapezoidShape(BaseShape):
             )
         else:
             raise ValueError("Invalid Trapezoid sign")
+
+
+class TriangleShape(BaseShape):
+    """
+    Triangle on a given canvas.
+    """
+
+    def __init__(self, _object=None, canvas=None, **kwargs):
+        super(TriangleShape, self).__init__(_object=_object, canvas=canvas, **kwargs)
+        self.triangle_type = None
+        if self.side:
+            self.triangle_type = TriangleType.EQUILATERAL
+        if self.side and self.height:
+            self.triangle_type = TriangleType.ISOSCELES
+        if self.side and self.side2 and self.side3:
+            self.triangle_type = TriangleType.IRREGULAR
+        if self.side and self.side2 and self.angle:
+            self.triangle_type = TriangleType.IRREGULAR
+        if not self.triangle_type:
+            feedback(f"Insufficient settings to construct a Triangle!")
+
+    def calculate_sides(self, units: bool = True) -> tuple:
+        if self.triangle_type == TriangleType.EQUILATERAL:
+            self.side2 = self.side
+            self.side3 = self.side
+        elif self.triangle_type == TriangleType.ISOSCELES:
+            self.side2 = math.sqrt((self.side / 2.0) ** 2 + self.height**2)
+            self.side3 = self.side2
+        elif self.triangle_type == TriangleType.IRREGULAR:
+            if self.side and self.side2 and self.side3:
+                pass
+            elif self.side and self.side2 and self.angle:
+                self.side3 = math.sqrt(
+                    self.side**2
+                    + self.side2**2
+                    - 2 * self.side * self.side2 * math.cos(self.angle_theta)
+                )
+        if units:
+            return (
+                self.points_to_value(self.side),
+                self.points_to_value(self.side2),
+                self.points_to_value(self.side3),
+            )
+        else:
+            return (self.side1, self.side2, self.side3)
+
+    def calculate_area(self) -> float:
+        """
+        Area of a triangle (A) with sides a, b, and c is:
+            A = √[s(s-a)(s-b)(s-c)]
+        where 's' is the semi-perimeter i.e. s = (a + b + c)/2
+        """
+        _s1, _s2, _s3 = self.calculate_sides()
+        s = (_s1 + _s2 + _s3) / 2.0
+        return math.sqrt(s * (s - _s1) * (s - _s2) * (s - _s3))
+
+    def calculate_perimeter(self, units: bool = False) -> float:
+        """Total length of bounding line in user units."""
+        _s1, _s2, _s3 = self.calculate_sides(units=units)
+        length = _s1 + _s2 + _s3
+        if units:
+            return self.points_to_value(length)
+        else:
+            return length
+
+    def calculate_perbii(
+        self, cnv, centre: Point, rotation: float = None, **kwargs
+    ) -> dict:
+        """Calculate centre points for each edge and angles from centre.
+
+        Args:
+            vertices (list):
+                list of Triangle's nodes as Points
+            centre (Point):
+                the centre Point of the Triangle
+
+        Returns:
+            dict of Perbis objects keyed on direction
+        """
+        directions = ["nw", "s", "ne"]
+        perbii_dict = {}
+        vertices = self.get_vertexes(rotation=rotation, **kwargs)
+        vcount = len(vertices) - 1
+        _perbii_pts = []
+        # print(f"*** TRIANGLE perbii {centre=} {vertices=}")
+        for key, vertex in enumerate(vertices):
+            if key == 2:
+                p1 = Point(vertex.x, vertex.y)
+                p2 = Point(vertices[0].x, vertices[0].y)
+            else:
+                p1 = Point(vertex.x, vertex.y)
+                p2 = Point(vertices[key + 1].x, vertices[key + 1].y)
+            pc = geoms.fraction_along_line(p1, p2, 0.5)  # centre pt of edge
+            _perbii_pts.append(pc)  # debug use
+            compass, angle = geoms.angles_from_points(centre, pc)
+            # f"*** TRIANGLE *** perbii {key=} {directions[key]=} {pc=} {compass=} {angle=}"
+            _perbii = Perbis(
+                point=pc,
+                direction=directions[key],
+                v1=p1,
+                v2=p2,
+                compass=compass,
+                angle=angle,
+            )
+            perbii_dict[directions[key]] = _perbii
+        return perbii_dict
+
+    def calculate_radii(
+        self, cnv, centre: Point, vertices: list, debug: bool = False
+    ) -> dict:
+        """Calculate radii for each Triangle vertex and angles from centre.
+
+        Args:
+            vertices: list of Triangle's nodes as Points
+            centre: the centre Point of the Triangle
+
+        Returns:
+            dict of Radius objects keyed on direction
+        """
+        directions = ["sw", "se", "n"]
+        radii_dict = {}
+        # print(f*** TRIANGLE radii {centre=} {vertices=}")
+        for key, vertex in enumerate(vertices):
+            compass, angle = geoms.angles_from_points(centre, vertex)
+            # print(f"*** TRIANGLE *** radii {key=} {directions[key]=} {compass=} {angle=}")
+            _radii = Radius(
+                point=vertex,
+                direction=directions[key],
+                compass=compass,
+                angle=360 - angle,  # inverse flip (y is reversed)
+            )
+            # print(f*** TRIANGLE radii {_radii}")
+            radii_dict[directions[key]] = _radii
+        return radii_dict
+
+    def get_vertexes(self, rotation: float = 0, **kwargs) -> list:
+        """Get vertices for a Triangle
+
+             0;n
+              /\
+             /  \
+        1;sw/____\ 2;se
+        """
+        vertices = []
+        if self.triangle_type == TriangleType.EQUILATERAL:
+            height = 0.5 * math.sqrt(3) * self.side  # ½√3(a)
+            # N
+            ptN = Point(self.centroid.x, self.centroid.y - self.height * (2.0 / 3.0))
+            # SW
+            y2 = self.centroid.y + self.height * (1.0 / 3.0)
+            x2 = self.centroid.x - self.side / 2.0
+            ptSW = Point(x2, y2)
+            # SE
+            y3 = self.centroid.y + self.height * (1.0 / 3.0)
+            x3 = self.centroid.x + self.side / 2.0
+            ptSE = Point(x3, y3)
+        elif self.triangle_type == TriangleType.ISOSCELES:
+            x = self._u.x + self._o.delta_x
+            y = self._u.y + self._o.delta_y
+            ptSW = Point(x, y)
+            ptSE = Point(x + self._u.side, y)
+            ptN = Point(x + self._u.side / 2.0, y - self._u.height)
+        elif self.triangle_type == TriangleType.IRREGULAR:
+            x = self._u.x + self._o.delta_x
+            y = self._u.y + self._o.delta_y
+            ptSW = Point(x, y)
+            ptSE = Point(x + self._u.side, y)
+            if self.angle:
+                ptN = geoms.point_from_angle(
+                    ptSE, self.unit(self.side2), 180 + math.degrees(self.angle)
+                )
+            elif self.side3:
+                b, a, c = self._u.side, self.unit(self.side2), self.unit(self.side3)
+                x = (a**2 + b**2 - c**2) / (2.0 * a * b)
+                angle_a = math.acos(x)
+                # print(f"{math.degrees(angle_a)}")
+                ptN = geoms.point_from_angle(ptSE, a, 180 + math.degrees(angle_a))
+
+        vertices = [ptN, ptSW, ptSE]
+        return vertices
+
+    def get_centroid(self, vertices: list) -> Point:
+        """Get centroid Point for a Triangle from its vertices."""
+        x_c = (vertices[0].x + vertices[1].x + vertices[2].x) / 3.0
+        y_c = (vertices[0].y + vertices[1].y + vertices[2].y) / 3.0
+        return Point(x_c, y_c)
+
+    def draw_hatches(
+        self, cnv, ID, side: float, vertices: list, num: int, rotation: float = 0.0
+    ):
+        _dirs = tools.validated_directions(
+            self.hatches, DirectionGroup.HEX_POINTY_EDGE, "triangle hatch"
+        )
+        lines = tools.as_int(num, "hatches_count")
+        if lines >= 1:
+            # v_tl, v_tr, v_bl, v_br
+            if "ne" in _dirs or "sw" in _dirs:  # slope UP to the right
+                self.draw_lines_between_sides(
+                    cnv, side, lines, vertices, (0, 1), (2, 1), True
+                )
+            if "se" in _dirs or "nw" in _dirs:  # slope DOWN to the right
+                self.draw_lines_between_sides(
+                    cnv, side, lines, vertices, (0, 2), (0, 1), True
+                )
+            if "e" in _dirs or "w" in _dirs:  # horizontal
+                self.draw_lines_between_sides(
+                    cnv, side, lines, vertices, (0, 2), (1, 2), True
+                )
+        # ---- set canvas
+        centre = self.get_centroid(vertices)
+        self.set_canvas_props(
+            index=ID,
+            stroke=self.hatches_stroke,
+            stroke_width=self.hatches_stroke_width,
+            stroke_ends=self.hatches_ends,
+            dashed=self.hatches_dashed,
+            dotted=self.hatches_dots,
+            rotation=rotation,
+            rotation_point=centre,
+        )
+
+    def draw_perbii(
+        self, cnv, ID, centre: Point, vertices: list, rotation: float = None
+    ):
+        """Draw lines connecting the Triangle centre to the centre of each edge.
+
+        Args:
+            ID: unique ID
+            vertices: list of Triangle's nodes as Points
+            centre: the centre Point of the Triangle
+            rotation: degrees anti-clockwise from horizontal "east"
+
+        Notes:
+            A perpendicular bisector ("perbis") of a chord is:
+                A line passing through the center of circle such that it divides
+                the chord into two equal parts and meets the chord at a right angle;
+                for a polygon, each edge is effectively a chord.
+        """
+        if self.perbii:
+            perbii_dirs = tools.validated_directions(
+                self.perbii,
+                DirectionGroup.TRIANGULAR_EDGES,
+                "triangle perbii",
+            )
+        perbii_dict = self.calculate_perbii(cnv=cnv, centre=centre, vertices=vertices)
+        pb_offset = self.unit(self.perbii_offset, label="perbii offset") or 0
+        pb_length = (
+            self.unit(self.perbii_length, label="perbii length")
+            if self.perbii_length
+            else self.radius
+        )
+        # ---- set perbii styles
+        lkwargs = {}
+        lkwargs["wave_style"] = self.kwargs.get("perbii_wave_style", None)
+        lkwargs["wave_height"] = self.kwargs.get("perbii_wave_height", 0)
+        for key, a_perbii in perbii_dict.items():
+            if self.perbii and key not in perbii_dirs:
+                continue
+            # points based on length of line, offset and the angle in degrees
+            edge_pt = a_perbii.point
+            if pb_offset is not None and pb_offset != 0:
+                offset_pt = geoms.point_on_circle(centre, pb_offset, a_perbii.angle)
+                end_pt = geoms.point_on_line(offset_pt, edge_pt, pb_length)
+                # print(f'*** TRIANGLE {pb_angle=} {offset_pt=} {x_c=}, {y_c=}')
+                start_point = offset_pt.x, offset_pt.y
+                end_point = end_pt.x, end_pt.y
+            else:
+                start_point = centre.x, centre.y
+                end_point = edge_pt.x, edge_pt.y
+            # ---- draw a perbii line
+            draw_line(
+                cnv,
+                start_point,
+                end_point,
+                shape=self,
+                **lkwargs,
+            )
+
+        self.set_canvas_props(
+            index=ID,
+            stroke=self.perbii_stroke,
+            stroke_width=self.perbii_stroke_width,
+            stroke_ends=self.perbii_ends,
+            dashed=self.perbii_dashed,
+            dotted=self.perbii_dotted,
+        )
+
+    def draw_radii(self, cnv, ID, centre: Point, vertices: list):
+        """Draw line(s) connecting the Triangle centre to a vertex.
+
+        Args:
+            ID: unique ID
+            vertices: list of Triangle nodes as Points
+            centre: the centre Triangle of the Rhombus
+
+        Note:
+            * vertices start at N and are ordered anti-clockwise
+              [ "n", "sw", "se"]
+        """
+        _dirs = tools.validated_directions(
+            self.radii, DirectionGroup.TRIANGULAR, "triangle radii"
+        )
+        if "n" in _dirs:  # slope UP
+            cnv.draw_line(centre, vertices[0])
+        if "sw" in _dirs:  # slope DOWN to the left
+            cnv.draw_line(centre, vertices[1])
+        if "se" in _dirs:  # slope DOWN to the right
+            cnv.draw_line(centre, vertices[2])
+        # color, thickness etc.
+        self.set_canvas_props(
+            index=ID,
+            stroke=self.radii_stroke or self.stroke,
+            stroke_width=self.radii_stroke_width or self.stroke_width,
+            stroke_ends=self.radii_ends,
+        )
+
+    def draw_slices(self, cnv, ID, centre: Point, vertexes: list, rotation=0):
+        """Draw triangles inside the Triangle
+
+        Args:
+            ID: unique ID
+            vertexes: list of Triangle's nodes as Points
+            centre: the centre Point of the Triangle
+            rotation: degrees anti-clockwise from horizontal "east"
+        """
+        # ---- get slices color list from string
+        if isinstance(self.slices, str):
+            _slices = tools.split(self.slices.strip())
+        else:
+            _slices = self.slices
+        # ---- validate slices color settings
+        slices_colors = [
+            colrs.get_color(slcolor)
+            for slcolor in _slices
+            if not isinstance(slcolor, bool)
+        ]
+        # ---- draw triangle per slice; repeat as needed!
+        sid = 0
+        nodes = [0, 2, 1]
+        for vid in nodes:
+            if sid > len(slices_colors) - 1:
+                sid = 0
+            vnext = vid - 1 if vid > 0 else 2
+            vertexes_slice = [vertexes[vid], centre, vertexes[vnext]]
+            cnv.draw_polyline(vertexes_slice)
+            self.set_canvas_props(
+                index=ID,
+                stroke=self.slices_stroke or slices_colors[sid],
+                stroke_ends=self.slices_ends,
+                fill=slices_colors[sid],
+                transparency=self.slices_transparency,
+                closed=True,
+                rotation=rotation,
+                rotation_point=muPoint(centre[0], centre[1]),
+            )
+            sid += 1
+            vid += 1
+
+    def draw(self, cnv=None, off_x=0, off_y=0, ID=None, **kwargs):
+        """Draw a Triangle on a given canvas."""
+        # print(f'*** TRIANGLE {kwargs=}')
+        kwargs = self.kwargs | kwargs
+        cnv = cnv if cnv else globals.canvas  # a new Page/Shape may now exist
+        super().draw(cnv, off_x, off_y, ID, **kwargs)  # unit-based props
+        # ---- calculate key values
+        self.side = self._u.side if self._u.side else self._u.width
+        centroid_to_vertex = self.side / math.sqrt(3)
+        self.height = 0.5 * math.sqrt(3) * self.side  # ½√3(a)
+        self.radius = (2.0 / 3.0) * self.height
+        # ---- calculate centroid
+        if self.triangle_type == TriangleType.EQUILATERAL:
+            x = self._u.x + self._o.delta_x
+            y = self._u.y + self._o.delta_y
+            self.centroid = Point(x + self.side / 2.0, y + self.height / 2.0)
+        elif self.triangle_type == TriangleType.ISOSCELES:
+            self.vertexes = self.get_vertexes(**kwargs)
+            self.centroid = self.get_centroid(self.vertexes)
+        elif self.triangle_type == TriangleType.IRREGULAR:
+            self.vertexes = self.get_vertexes(**kwargs)
+            self.centroid = self.get_centroid(self.vertexes)
+        # ---- overrides to (re)centre the shape
+        if self.cx is not None and self.cy is not None:
+            cx = self._u.cx + self._o.delta_x
+            cy = self._u.cy + self._o.delta_y
+            self.centroid = Point(cx, cy)
+        if self.use_abs_c:
+            cx = self._abs_cx
+            cy = self._abs_cy
+            self.centroid = Point(cx, cy)
+        # print(f'*** TRIANGLE {self.side=} {self.centroid=} {self.height=}')
+        # ---- draw using vertices
+        self.vertexes = self.get_vertexes(**kwargs)
+        # print(f'*** TRIANGLE {self.vertexes=} {kwargs=}')
+        cnv.draw_polyline(self.vertexes)
+        kwargs["closed"] = True
+        # ---- handle rotation
+        rotation = kwargs.get("rotation", self.rotation)
+        if rotation:
+            kwargs["rotation"] = rotation
+            kwargs["rotation_point"] = self.centroid
+        self.set_canvas_props(cnv=cnv, index=ID, **kwargs)
+        # ---- debug
+        self._debug(cnv, vertices=self.vertexes)
+        # ---- slices
+        if self.slices:
+            self.draw_slices(
+                cnv,
+                ID,
+                self.centroid,
+                self.vertexes,
+                rotation=kwargs.get("rotation"),
+            )
+        # ---- draw hatches
+        if self.hatches_count:
+            self.draw_hatches(
+                cnv, ID, self.side, self.vertexes, self.hatches_count, rotation
+            )
+        # ---- draw radii
+        if self.radii:
+            self.draw_radii(cnv, ID, self.centroid, self.vertexes)
+        # ---- draw perbii
+        if self.perbii:
+            self.draw_perbii(cnv, ID, self.centroid, self.vertexes)
+        # ---- draw radii_shapes
+        if self.radii_shapes:
+            self.draw_radii_shapes(
+                cnv,
+                self.radii_shapes,
+                self.vertexes,
+                self.centroid,
+                DirectionGroup.TRIANGULAR,  # for the points!
+                self.radii_shapes_rotated,
+            )
+        # ---- * draw perbii_shapes
+        if self.perbii_shapes:
+            self.draw_perbii_shapes(
+                cnv,
+                self.perbii_shapes,
+                self.vertexes,
+                self.centroid,
+                DirectionGroup.TRIANGULAR_EDGES,  # for the sides!
+                self.perbii_shapes_rotated,
+            )
+        # ---- centred shape (with offset)
+        if self.centre_shape:
+            if self.can_draw_centred_shape(self.centre_shape):
+                self.centre_shape.draw(
+                    _abs_cx=self.centroid.x + self.unit(self.centre_shape_mx),
+                    _abs_cy=self.centroid.y + self.unit(self.centre_shape_my),
+                )
+        # ---- centred shapes (with offsets)
+        if self.centre_shapes:
+            self.draw_centred_shapes(
+                self.centre_shapes, self.centroid.x, self.centroid.y
+            )
+        # ---- draw vertex shapes
+        if self.vertex_shapes:
+            self.draw_vertex_shapes(
+                self.vertex_shapes,
+                self.vertexes,
+                Point(self.centroid.x, self.centroid.y),
+                self.vertex_shapes_rotated,
+            )
+        # ---- dot
+        self.draw_dot(cnv, self.centroid.x, self.centroid.y)
+        # ---- text
+        self.draw_heading(
+            cnv,
+            ID,
+            self.centroid.x,
+            self.centroid.y - self.height * 2.0 / 3.0,
+            **kwargs,
+        )
+        self.draw_label(cnv, ID, self.centroid.x, self.centroid.y, **kwargs)
+        self.draw_title(
+            cnv, ID, self.centroid.x, self.centroid.y + self.height / 3.0, **kwargs
+        )
 
 
 # ---- Other

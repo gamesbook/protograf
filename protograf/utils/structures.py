@@ -67,6 +67,7 @@ class TriangleType(Enum):
     ISOSCELES = 2
     IRREGULAR = 3
 
+
 # ---- NAMEDTUPLE
 
 Bounds = namedtuple(
