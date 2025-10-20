@@ -337,7 +337,7 @@ class BaseCanvas:
         self.operation = None  # operation on image
         # ---- line / ellipse / bezier / sector
         self.length = self.defaults.get("length", self.default_length)
-        self.angle = self.defaults.get("angle", 0)
+        self.angle = self.defaults.get("angle", 0)  # also triangle
         self.angle_width = self.defaults.get("angle_width", 90)
         self.angle_start = self.defaults.get("angle_start", 0)
         # ---- chord
@@ -509,6 +509,10 @@ class BaseCanvas:
         # ---- compass
         self.perimeter = self.defaults.get("perimeter", "circle")
         self.directions = self.defaults.get("directions", None)
+        # ---- triangle
+        self.rotation_point = self.defaults.get("rotation_point", "centre")
+        self.side2 = self.defaults.get("side2", None)
+        self.side3 = self.defaults.get("side3", None)
         # ---- triangle / trapezoid / polyomino
         self.flip = self.defaults.get("flip", None)
         # ---- triangle / polyomino
@@ -1110,6 +1114,11 @@ class BaseShape:
         # ---- compass
         self.perimeter = kwargs.get("perimeter", "circle")  # circle|rectangle|hexagon
         self.directions = kwargs.get("directions", None)
+        # ---- triangle
+        self.triangle_type = None
+        self.rotation_point = kwargs.get("rotation_point", base.rotation_point)
+        self.side2 = kwargs.get("side2", base.side2)
+        self.side3 = kwargs.get("side3", base.side3)
         # ---- triangle / trapezoid / polyomino
         self.flip = kwargs.get("flip", base.flip)
         # ---- triangle / polyomino

@@ -42,6 +42,7 @@ from protograf.utils.structures import (
     Point,
     PolyGeometry,
     Radius,
+    TriangleType,
 )  # named tuples
 from protograf.utils.support import CACHE_DIRECTORY
 

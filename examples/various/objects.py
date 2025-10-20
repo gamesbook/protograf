@@ -269,7 +269,7 @@ Polygon(
 )
 
 Text(common=header_font, x=8, y=17,
-     text="Olde Map: Polyshape: snail ")
+     text="Olde Parchment: Polyshape: snail ")
 Polyshape(
     x=1, y=18,
     snail="1 a-45 0.2 a45 0.4 a-45 0.4 a45 0.2 e 1 a45 0.3 a-45 0.3 e 1.2 "
