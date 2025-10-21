@@ -3325,7 +3325,25 @@ class TriangleShape(BaseShape):
         if not self.triangle_type:
             feedback(f"Insufficient settings to construct a Triangle!")
 
-    def calculate_sides(self, units: bool = True) -> tuple:
+    def calculate_sides(
+        self, vertices, rotation: float = 0, units: bool = True
+    ) -> tuple:
+        """Determine length of sides for a Triangle
+
+             0;n
+              /\
+        side3/  \side2
+            /    \
+       1;sw/______\ 2;se
+             side
+        """
+        if not vertices:
+            vertices = self.get_vertexes(rotation)
+        self.side = geoms.length_of_line(vertices[1], vertices[2])
+        self.side2 = geoms.length_of_line(vertices[2], vertices[0])
+        self.side3 = geoms.length_of_line(vertices[0], vertices[1])
+
+        """
         if self.triangle_type == TriangleType.EQUILATERAL:
             self.side2 = self.side
             self.side3 = self.side
@@ -3341,6 +3359,7 @@ class TriangleShape(BaseShape):
                     + self.side2**2
                     - 2 * self.side * self.side2 * math.cos(self.angle_theta)
                 )
+        """
         if units:
             return (
                 self.points_to_value(self.side),
@@ -3348,15 +3367,20 @@ class TriangleShape(BaseShape):
                 self.points_to_value(self.side3),
             )
         else:
-            return (self.side1, self.side2, self.side3)
+            return (self.side, self.side2, self.side3)
 
-    def calculate_area(self) -> float:
+    def calculate_area(
+        self, vertices, rotation: float = 0, units: bool = False
+    ) -> float:
         """
         Area of a triangle (A) with sides a, b, and c is:
             A = √[s(s-a)(s-b)(s-c)]
-        where 's' is the semi-perimeter i.e. s = (a + b + c)/2
+        where s is the semi-perimeter i.e. s = (a + b + c)/2
         """
-        _s1, _s2, _s3 = self.calculate_sides()
+        if not vertices:
+            vertices = self.get_vertexes(rotation)
+        _s1, _s2, _s3 = self.calculate_sides(vertices, rotation, units)
+        # print(f"TRIANGLE SIDES {_s1=} {_s2=} {_s2=}")
         s = (_s1 + _s2 + _s3) / 2.0
         return math.sqrt(s * (s - _s1) * (s - _s2) * (s - _s3))
 
@@ -3385,7 +3409,7 @@ class TriangleShape(BaseShape):
         """
         directions = ["nw", "s", "ne"]
         perbii_dict = {}
-        vertices = self.get_vertexes(rotation=rotation, **kwargs)
+        vertices = self.get_vertexes(rotation=rotation)
         vcount = len(vertices) - 1
         _perbii_pts = []
         # print(f"*** TRIANGLE perbii {centre=} {vertices=}")
@@ -3439,7 +3463,7 @@ class TriangleShape(BaseShape):
             radii_dict[directions[key]] = _radii
         return radii_dict
 
-    def get_vertexes(self, rotation: float = 0, **kwargs) -> list:
+    def get_vertexes(self, rotation: float = 0) -> list:
         """Get vertices for a Triangle
 
              0;n
@@ -3673,61 +3697,72 @@ class TriangleShape(BaseShape):
         centroid_to_vertex = self.side / math.sqrt(3)
         self.height = 0.5 * math.sqrt(3) * self.side  # ½√3(a)
         self.radius = (2.0 / 3.0) * self.height
-        # ---- calculate centroid
-        if self.triangle_type == TriangleType.EQUILATERAL:
-            x = self._u.x + self._o.delta_x
-            y = self._u.y + self._o.delta_y
-            self.centroid = Point(x + self.side / 2.0, y + self.height / 2.0)
-        elif self.triangle_type == TriangleType.ISOSCELES:
-            self.vertexes = self.get_vertexes(**kwargs)
-            self.centroid = self.get_centroid(self.vertexes)
-        elif self.triangle_type == TriangleType.IRREGULAR:
-            self.vertexes = self.get_vertexes(**kwargs)
-            self.centroid = self.get_centroid(self.vertexes)
-        # ---- overrides to (re)centre the shape
-        if self.cx is not None and self.cy is not None:
-            cx = self._u.cx + self._o.delta_x
-            cy = self._u.cy + self._o.delta_y
-            self.centroid = Point(cx, cy)
-        if self.use_abs_c:
-            cx = self._abs_cx
-            cy = self._abs_cy
-            self.centroid = Point(cx, cy)
-        # print(f'*** TRIANGLE {self.side=} {self.centroid=} {self.height=}')
-        # ---- draw using vertices
-        self.vertexes = self.get_vertexes(**kwargs)
-        # print(f'*** TRIANGLE {self.vertexes=} {kwargs=}')
-        cnv.draw_polyline(self.vertexes)
-        kwargs["closed"] = True
         # ---- handle rotation
         rotation = kwargs.get("rotation", self.rotation)
         if rotation:
             kwargs["rotation"] = rotation
+        # ---- calculate centroid (I)
+        if self.triangle_type == TriangleType.EQUILATERAL:
+            x = self._u.x + self._o.delta_x
+            y = self._u.y + self._o.delta_y
+            self.centroid = Point(x + self.side / 2.0, y + self.height / 2.0)
+        # ---- overrides to (re)centre the shape
+        if self.cx is not None and self.cy is not None:
+            if self.triangle_type == TriangleType.EQUILATERAL:
+                cx = self._u.cx + self._o.delta_x
+                cy = self._u.cy + self._o.delta_y
+                self.centroid = Point(cx, cy)
+            else:
+                feedback(
+                    "Cannot draw Triangle via its centre unless it is EQUILATERAL", True
+                )
+        if self.use_abs_c:
+            if self.triangle_type == TriangleType.EQUILATERAL:
+                cx = self._abs_cx
+                cy = self._abs_cy
+                self.centroid = Point(cx, cy)
+            else:
+                feedback(
+                    "Cannot draw Triangle via its centre unless it is EQUILATERAL", True
+                )
+        # ---- calculate vertexes
+        self.vertexes = self.get_vertexes(rotation)
+        # print(f'*** TRIANGLE {self.vertexes=} {kwargs=}')
+        # ---- calculate centroid (II)
+        if self.triangle_type == TriangleType.ISOSCELES:
+            self.centroid = self.get_centroid(self.vertexes)
+        elif self.triangle_type == TriangleType.IRREGULAR:
+            self.centroid = self.get_centroid(self.vertexes)
+            # print(f'*** TRIANGLE {self.side=} {self.centroid=} {self.height=}')
+        # ---- draw using vertices
+        cnv.draw_polyline(self.vertexes)
+        kwargs["closed"] = True
+        if rotation:
             kwargs["rotation_point"] = self.centroid
         self.set_canvas_props(cnv=cnv, index=ID, **kwargs)
         # ---- debug
         self._debug(cnv, vertices=self.vertexes)
-        # ---- slices
+        # ---- * draw slices
         if self.slices:
             self.draw_slices(
                 cnv,
                 ID,
                 self.centroid,
                 self.vertexes,
-                rotation=kwargs.get("rotation"),
+                rotation=rotation,
             )
-        # ---- draw hatches
+        # ---- * draw hatches
         if self.hatches_count:
             self.draw_hatches(
                 cnv, ID, self.side, self.vertexes, self.hatches_count, rotation
             )
-        # ---- draw radii
+        # ---- * draw radii
         if self.radii:
             self.draw_radii(cnv, ID, self.centroid, self.vertexes)
-        # ---- draw perbii
+        # ---- * draw perbii
         if self.perbii:
             self.draw_perbii(cnv, ID, self.centroid, self.vertexes)
-        # ---- draw radii_shapes
+        # ---- * draw radii_shapes
         if self.radii_shapes:
             self.draw_radii_shapes(
                 cnv,
@@ -3770,17 +3805,21 @@ class TriangleShape(BaseShape):
         # ---- dot
         self.draw_dot(cnv, self.centroid.x, self.centroid.y)
         # ---- text
-        self.draw_heading(
-            cnv,
-            ID,
-            self.centroid.x,
-            self.centroid.y - self.height * 2.0 / 3.0,
-            **kwargs,
-        )
+        if self.triangle_type == TriangleType.EQUILATERAL:
+            heading_y = self.centroid.y - self.height * 2.0 / 3.0
+            title_y = self.centroid.y + self.height / 3.0
+        elif self.triangle_type == TriangleType.ISOSCELES:
+            heading_y = self._u.y + self._o.delta_y - self._u.height
+            title_y = self._u.y + self._o.delta_y
+        elif self.triangle_type == TriangleType.IRREGULAR:
+            area = self.calculate_area(self.vertexes, rotation)
+            ht = 2 * area / self._u.side
+            # print(f'IRR {area=} {ht=} {self._u.y=}')
+            heading_y = self._u.y + self._o.delta_y - ht
+            title_y = self._u.y + self._o.delta_y
+        self.draw_heading(cnv, ID, self.centroid.x, heading_y, **kwargs)
         self.draw_label(cnv, ID, self.centroid.x, self.centroid.y, **kwargs)
-        self.draw_title(
-            cnv, ID, self.centroid.x, self.centroid.y + self.height / 3.0, **kwargs
-        )
+        self.draw_title(cnv, ID, self.centroid.x, title_y, **kwargs)
 
 
 # ---- Other

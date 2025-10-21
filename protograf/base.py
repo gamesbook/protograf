@@ -3049,7 +3049,7 @@ class BaseShape:
         """Test if a given Shape can be drawn at centre of another."""
         if fail_on_invalid and not isinstance(centre_shape, BaseShape):
             _type = type(centre_shape)
-            feedback(f"A shape is required not a {_type} ({centre_shape})!", True)
+            feedback(f"A shape is required - not a {_type} ({centre_shape})!", True)
         cshape_name = centre_shape.__class__.__name__
         if cshape_name in GRID_SHAPES_WITH_CENTRE:
             return True
