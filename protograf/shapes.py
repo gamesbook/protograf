@@ -3314,16 +3314,19 @@ class TriangleShape(BaseShape):
     def __init__(self, _object=None, canvas=None, **kwargs):
         super(TriangleShape, self).__init__(_object=_object, canvas=canvas, **kwargs)
         self.triangle_type = None
-        if self.side:
+        if kwargs.get("side"):
             self.triangle_type = TriangleType.EQUILATERAL
-        if self.side and self.height:
+        if kwargs.get("side") and self.kwargs.get("height"):
             self.triangle_type = TriangleType.ISOSCELES
-        if self.side and self.side2 and self.side3:
+        if self.kwargs.get("side") and kwargs.get("side2") and kwargs.get("side3"):
             self.triangle_type = TriangleType.IRREGULAR
-        if self.side and self.side2 and self.angle:
+        if self.kwargs.get("side") and kwargs.get("side2") and kwargs.get("angle"):
             self.triangle_type = TriangleType.IRREGULAR
         if not self.triangle_type:
-            feedback(f"Insufficient settings to construct a Triangle!")
+            if self.side:
+                self.triangle_type = TriangleType.EQUILATERAL
+            else:
+                feedback(f"Insufficient settings to construct a Triangle!", True)
 
     def calculate_sides(
         self, vertices, rotation: float = 0, units: bool = True

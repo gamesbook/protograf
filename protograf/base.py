@@ -165,14 +165,14 @@ class BaseCanvas:
         # ---- sizes and positions
         self.row = self.defaults.get("row", None)
         self.col = self.defaults.get("col", self.defaults.get("column", None))
-        self.side = self.defaults.get("side", 1)  # equal length sides
-        self.height = self.defaults.get("height", self.side)
-        self.width = self.defaults.get("width", self.side)
+        self.side = self.defaults.get("side", 1.0)  # equal length sides
+        self.height = self.defaults.get("height", 1.0)
+        self.width = self.defaults.get("width", 1.0)
         self.thickness = self.defaults.get("thickness", None)  # cross
         self.top = self.defaults.get("width", self.width * 0.5)
         self.depth = self.defaults.get("depth", self.side)  # diamond
-        self.x = self.defaults.get("x", self.defaults.get("left", 1))
-        self.y = self.defaults.get("y", self.defaults.get("bottom", 1))
+        self.x = self.defaults.get("x", self.defaults.get("left", 1.0))
+        self.y = self.defaults.get("y", self.defaults.get("bottom", 1.0))
         self.cx = self.defaults.get("cx", None)  # NB! not 0; needed for internal check
         self.cy = self.defaults.get("cy", None)  # NB! not 0; needed for internal check
         self.scaling = self.defaults.get("scaling", None)  # SVG; snail
@@ -187,7 +187,7 @@ class BaseCanvas:
         self.interval_x = self.defaults.get("interval_x", self.interval)
         self.interval_y = self.defaults.get("interval_y", self.interval)
         # ---- rotation / position /elevation
-        self.rotation = self.defaults.get("rotation", 0)  # degrees
+        self.rotation = self.defaults.get("rotation", 0.0)  # degrees
         self.rotation_point = self.defaults.get("rotation_point", "centre")
         self.direction = self.defaults.get("direction", "north")
         self.position = self.defaults.get("position", None)
@@ -230,7 +230,7 @@ class BaseCanvas:
         # ---- font
         self.font_name = self.defaults.get("font_name", DEFAULT_FONT)
         self.font_file = self.defaults.get("font_file", None)
-        self.font_size = self.defaults.get("font_size", 12)
+        self.font_size = self.defaults.get("font_size", 12.0)
         self.font_style = self.defaults.get("font_style", None)
         self.font_directory = self.defaults.get("font_directory", None)
         self.style = self.defaults.get("style", None)  # HTML/CSS style
@@ -253,7 +253,7 @@ class BaseCanvas:
         self.grid_marks_length = self.defaults.get(
             "grid_marks_length", 0.85
         )  # 1/3 inch
-        self.grid_marks_offset = self.defaults.get("grid_marks_offset", 0)
+        self.grid_marks_offset = self.defaults.get("grid_marks_offset", 0.0)
         self.grid_marks_dotted = self.defaults.get("grid_marks_dotted", False)
         self.grid_marks_style = self.defaults.get("grid_marks_style", "edge")
         # ---- line style
@@ -282,9 +282,9 @@ class BaseCanvas:
         self.label_stroke_width = self.defaults.get(
             "label_stroke_width", self.stroke_width
         )
-        self.label_mx = self.defaults.get("label_mx", 0)
-        self.label_my = self.defaults.get("label_my", 0)
-        self.label_rotation = self.defaults.get("label_rotation", 0)
+        self.label_mx = self.defaults.get("label_mx", 0.0)
+        self.label_my = self.defaults.get("label_my", 0.0)
+        self.label_rotation = self.defaults.get("label_rotation", 0.0)
         # ---- text: title
         self.title = self.defaults.get("title", "")
         self.title_size = self.defaults.get("title_size", self.font_size)
@@ -294,9 +294,9 @@ class BaseCanvas:
         self.title_stroke_width = self.defaults.get(
             "title_stroke_width", self.stroke_width
         )
-        self.title_mx = self.defaults.get("title_mx", 0)
-        self.title_my = self.defaults.get("title_my", 0)
-        self.title_rotation = self.defaults.get("title_rotation", 0)
+        self.title_mx = self.defaults.get("title_mx", 0.0)
+        self.title_my = self.defaults.get("title_my", 0.0)
+        self.title_rotation = self.defaults.get("title_rotation", 0.0)
         # ---- text: heading
         self.heading = self.defaults.get("heading", "")
         self.heading_size = self.defaults.get("heading_size", self.font_size)
@@ -306,9 +306,9 @@ class BaseCanvas:
         self.heading_stroke_width = self.defaults.get(
             "heading_stroke_width", self.stroke_width
         )
-        self.heading_mx = self.defaults.get("heading_mx", 0)
-        self.heading_my = self.defaults.get("heading_my", 0)
-        self.heading_rotation = self.defaults.get("heading_rotation", 0)
+        self.heading_mx = self.defaults.get("heading_mx", 0.0)
+        self.heading_my = self.defaults.get("heading_my", 0.0)
+        self.heading_rotation = self.defaults.get("heading_rotation", 0.0)
         # ---- text box (wrap/HTML)
         self.leading = self.defaults.get("leading", self.font_size)
         self.transform = self.defaults.get("transform", None)
@@ -316,7 +316,7 @@ class BaseCanvas:
         self.css = self.defaults.get("css", None)
         # ---- polyomino / text outline
         self.outline_stroke = self.defaults.get("outline_stroke", None)
-        self.outline_width = self.defaults.get("outline_width", 0)
+        self.outline_width = self.defaults.get("outline_width", 0.0)
         self.outline_dashed = self.defaults.get("outline_dashed", None)
         self.outline_dotted = self.defaults.get("outline_dotted", None)
         # if self.outlined:
@@ -325,7 +325,7 @@ class BaseCanvas:
         # ---- text box rectangle
         self.box_fill = self.defaults.get("box_fill", None)
         self.box_stroke = self.defaults.get("box_stroke", None)
-        self.box_stroke_width = self.defaults.get("box_stroke_width", 0)
+        self.box_stroke_width = self.defaults.get("box_stroke_width", 0.0)
         self.box_dashed = self.defaults.get("box_dashed", None)
         self.box_dotted = self.defaults.get("box_dotted", None)
         self.box_transparency = self.defaults.get("box_transparency", None)
@@ -337,19 +337,19 @@ class BaseCanvas:
         self.operation = None  # operation on image
         # ---- line / ellipse / bezier / sector
         self.length = self.defaults.get("length", self.default_length)
-        self.angle = self.defaults.get("angle", 0)  # also triangle
-        self.angle_width = self.defaults.get("angle_width", 90)
-        self.angle_start = self.defaults.get("angle_start", 0)
+        self.angle = self.defaults.get("angle", 0.0)  # also triangle
+        self.angle_width = self.defaults.get("angle_width", 90.0)
+        self.angle_start = self.defaults.get("angle_start", 0.0)
         # ---- chord
-        self.angle_1 = self.defaults.get("angle1", 0)
+        self.angle_1 = self.defaults.get("angle1", 0.0)
         # ---- arc / sector
         self.filled = self.defaults.get("filled", False)
         # ---- arrow shape: head and tail
-        self.points_offset = self.defaults.get("points_offset", 0)
+        self.points_offset = self.defaults.get("points_offset", 0.0)
         self.head_height = self.defaults.get("head_height", self.height)
-        self.head_width = self.defaults.get("head_width", 2 * self.width)
-        self.tail_width = self.defaults.get("tail_width", 0)  # adjusted in ArrowShape
-        self.tail_notch = self.defaults.get("tail_notch", 0)
+        self.head_width = self.defaults.get("head_width", 2.0 * self.width)
+        self.tail_width = self.defaults.get("tail_width", 0.0)  # adjusted in ArrowShape
+        self.tail_notch = self.defaults.get("tail_notch", 0.0)
         # ---- arrowhead (on-a-line)
         self.arrow = self.defaults.get("arrow", False)
         self.arrow_double = self.defaults.get("arrow_double", False)
@@ -367,27 +367,27 @@ class BaseCanvas:
         self.connections = self.defaults.get("connections", None)
         self.connections_style = self.defaults.get("connections_style", None)
         # ---- line / bezier
-        self.x_1 = self.defaults.get("x1", 0)
-        self.y_1 = self.defaults.get("y1", 0)
+        self.x_1 = self.defaults.get("x1", 0.0)
+        self.y_1 = self.defaults.get("y1", 0.0)
         # ---- bezier
-        self.x_2 = self.defaults.get("x2", 1)
-        self.y_2 = self.defaults.get("y2", 1)
-        self.x_3 = self.defaults.get("x3", 1)
-        self.y_3 = self.defaults.get("y3", 1)
+        self.x_2 = self.defaults.get("x2", 1.0)
+        self.y_2 = self.defaults.get("y2", 1.0)
+        self.x_3 = self.defaults.get("x3", 1.0)
+        self.y_3 = self.defaults.get("y3", 1.0)
         # ---- rectangle / card
-        self.rounding = self.defaults.get("rounding", 0)
+        self.rounding = self.defaults.get("rounding", 0.0)
         self.rounded = self.defaults.get("rounded", False)  # also line end
-        self.notch = self.defaults.get("notch", 0)
+        self.notch = self.defaults.get("notch", 0.0)
         self.notch_directions = self.defaults.get("notch_directions", "sw nw ne se")
-        self.notch_x = self.defaults.get("notch_x", 0)
-        self.notch_y = self.defaults.get("notch_y", 0)
+        self.notch_x = self.defaults.get("notch_x", 0.0)
+        self.notch_y = self.defaults.get("notch_y", 0.0)
         self.notch_style = self.defaults.get("notch_style", "snip")
         self.chevron = self.defaults.get("chevron", "")
-        self.chevron_height = kwargs.get("chevron_height", 0)
-        self.corners = self.defaults.get("corners", 0)
+        self.chevron_height = kwargs.get("chevron_height", 0.0)
+        self.corners = self.defaults.get("corners", 0.0)
         self.corners_directions = self.defaults.get("corners_directions", "sw nw ne se")
-        self.corners_x = self.defaults.get("corners_x", 0)
-        self.corners_y = self.defaults.get("corners_y", 0)
+        self.corners_x = self.defaults.get("corners_x", 0.0)
+        self.corners_y = self.defaults.get("corners_y", 0.0)
         self.corners_style = self.defaults.get("corners_style", "line")
         self.corners_stroke = self.defaults.get("corners_stroke", self.stroke)
         self.corners_fill = self.defaults.get("corners_fill", self.fill)
@@ -410,9 +410,9 @@ class BaseCanvas:
         self.slices = self.defaults.get("slices", [])
         self.slices_fractions = self.defaults.get("slices_fractions", [])
         self.slices_angles = self.defaults.get("slices_angles", [])
-        self.slices_line = self.defaults.get("slices_line", 0)
-        self.slices_line_mx = self.defaults.get("slices_line_mx", 0)
-        self.slices_line_my = self.defaults.get("slices_line_my", 0)
+        self.slices_line = self.defaults.get("slices_line", 0.0)
+        self.slices_line_mx = self.defaults.get("slices_line_mx", 0.0)
+        self.slices_line_my = self.defaults.get("slices_line_my", 0.0)
         self.slices_stroke = self.defaults.get("slices_stroke", None)
         self.slices_transparency = self.defaults.get(
             "slices_transparency", 1
@@ -427,10 +427,10 @@ class BaseCanvas:
         self.rows = self.defaults.get("rows", 0)
         self.cols = self.defaults.get("cols", self.defaults.get("columns", 0))
         self.frame = self.defaults.get("frame", "rectangle")
-        self.offset = self.defaults.get("offset", 0)  # from margin
+        self.offset = self.defaults.get("offset", 0.0)  # from margin
         self.offset_x = self.defaults.get("offset_x", self.offset)
         self.offset_y = self.defaults.get("offset_y", self.offset)
-        self.spacing = self.defaults.get("spacing", 0)  # between cards
+        self.spacing = self.defaults.get("spacing", 0.0)  # between cards
         self.spacing_x = self.defaults.get("spacing_x", self.spacing)
         self.spacing_y = self.defaults.get("spacing_y", self.spacing)
         self.grouping = self.defaults.get("grouping", 1)  # no. of cards in a set
@@ -444,8 +444,8 @@ class BaseCanvas:
         self.sides = self.defaults.get("sides", 6)
         self.points = self.defaults.get("points", [])
         self.steps = self.defaults.get("steps", [])
-        self.x_c = self.defaults.get("xc", 0)
-        self.y_c = self.defaults.get("yc", 0)
+        self.x_c = self.defaults.get("xc", 0.0)
+        self.y_c = self.defaults.get("yc", 0.0)
         # ---- star
         self.rays = self.defaults.get("rays", 5)
         self.inner_fraction = self.defaults.get("inner_fraction", 0.5)
@@ -459,7 +459,7 @@ class BaseCanvas:
         self.radii_length = self.defaults.get(
             "radii_length", None
         )  # default: circle radius
-        self.radii_offset = self.defaults.get("radii_offset", 0)
+        self.radii_offset = self.defaults.get("radii_offset", 0.0)
         self.radii_labels = self.defaults.get("radii_labels", "")
         self.radii_labels_size = self.defaults.get("radii_labels_size", self.font_size)
         self.radii_labels_font = self.defaults.get("radii_labels_font", self.font_name)
@@ -468,14 +468,14 @@ class BaseCanvas:
         self.radii_labels_stroke_width = self.defaults.get(
             "radii_labels_stroke_width", self.stroke_width
         )
-        self.radii_labels_rotation = self.defaults.get("radii_labels_rotation", 0)
-        self.radii_labels_my = self.defaults.get("radii_labels_my", 0)
-        self.radii_labels_mx = self.defaults.get("radii_labels_mx", 0)
+        self.radii_labels_rotation = self.defaults.get("radii_labels_rotation", 0.0)
+        self.radii_labels_my = self.defaults.get("radii_labels_my", 0.0)
+        self.radii_labels_mx = self.defaults.get("radii_labels_mx", 0.0)
         self.radii_ends = self.defaults.get("radii_ends", None)
         self.radii_dotted = self.defaults.get("radii_dotted", self.dotted)
         self.radii_dashed = self.defaults.get("radii_dashed", self.dashed)
         self.radii_wave_style = self.defaults.get("radii_wave_style", None)
-        self.radii_wave_height = self.defaults.get("radii_wave_height", 0)
+        self.radii_wave_height = self.defaults.get("radii_wave_height", 0.0)
         # ---- stripes (circle, hex, rect)
         self.stripes = self.defaults.get("stripes", 0)
         self.stripes_directions = self.defaults.get("stripes_directions", "n")
@@ -496,8 +496,8 @@ class BaseCanvas:
         self.nested = self.defaults.get("nested", None)
         self.petals = self.defaults.get("petals", 0)
         self.petals_style = self.defaults.get("petals_style", "triangle")
-        self.petals_height = self.defaults.get("petals_height", 1)
-        self.petals_offset = self.defaults.get("petals_offset", 0)
+        self.petals_height = self.defaults.get("petals_height", 1.0)
+        self.petals_offset = self.defaults.get("petals_offset", 0.0)
         self.petals_stroke = self.defaults.get("petals_stroke", self.stroke)
         self.petals_ends = self.defaults.get("petals_ends", self.stroke_ends)
         self.petals_stroke_width = self.defaults.get(
@@ -526,14 +526,14 @@ class BaseCanvas:
         # ---- shapes with centre (hex, circle, rect, rhombus, poly, ellipse, star)
         self.centre_shapes = self.defaults.get("centre_shapes", [])
         self.centre_shape = self.defaults.get("centre_shape", "")
-        self.centre_shape_mx = self.defaults.get("centre_shape_mx", 0)
-        self.centre_shape_my = self.defaults.get("centre_shape_my", 0)
-        self.dot = self.defaults.get("dot", 0)
+        self.centre_shape_mx = self.defaults.get("centre_shape_mx", 0.0)
+        self.centre_shape_my = self.defaults.get("centre_shape_my", 0.0)
+        self.dot = self.defaults.get("dot", 0.0)
         dot_stroke = self.defaults.get("dot_stroke", self.stroke)
         self.dot_stroke = colrs.get_color(dot_stroke)
         self.dot_stroke_width = self.defaults.get("dot_stroke_width", self.stroke_width)
         self.dot_fill = self.defaults.get("dot_fill", self.dot_stroke)  # colors match
-        self.cross = self.defaults.get("cross", 0)
+        self.cross = self.defaults.get("cross", 0.0)
         cross_stroke = self.defaults.get("cross_stroke", self.stroke)
         self.cross_ends = self.defaults.get("cross_ends", self.stroke_ends)
         self.cross_stroke = colrs.get_color(cross_stroke)
@@ -548,7 +548,7 @@ class BaseCanvas:
             "perbii_stroke_width", self.stroke_width
         )
         self.perbii_length = self.defaults.get("perbii_length", None)
-        self.perbii_offset = self.defaults.get("perbii_offset", 0)
+        self.perbii_offset = self.defaults.get("perbii_offset", 0.0)
         self.perbii_offset_x = self.defaults.get(
             "perbii_offset_x", self.perbii_offset
         )  # Rectangle
@@ -559,7 +559,7 @@ class BaseCanvas:
         self.perbii_dotted = self.defaults.get("perbii_dotted", self.dotted)
         self.perbii_dashed = self.defaults.get("perbii_dashed", self.dashed)
         self.perbii_wave_style = self.defaults.get("paths_wave_style", None)
-        self.perbii_wave_height = self.defaults.get("paths_wave_height", 0)
+        self.perbii_wave_height = self.defaults.get("paths_wave_height", 0.0)
         # ---- hexagon
         self.caltrops = self.defaults.get("caltrops", None)
         self.caltrops_invert = self.defaults.get("caltrops_invert", False)
@@ -582,7 +582,7 @@ class BaseCanvas:
         self.paths_dotted = self.defaults.get("paths_dotted", self.dotted)
         self.paths_dashed = self.defaults.get("paths_dashed", self.dashed)
         self.paths_wave_style = self.defaults.get("paths_wave_style", None)
-        self.paths_wave_height = self.defaults.get("paths_wave_height", 0)
+        self.paths_wave_height = self.defaults.get("paths_wave_height", 0.0)
         self.perbii_shapes = self.defaults.get("perbii_shapes", [])
         self.perbii_shapes_rotated = self.defaults.get(
             "self.perbii_shapes_rotated", False
@@ -599,12 +599,12 @@ class BaseCanvas:
         self.hex_layout = self.defaults.get("hex_layout", "rectangle")  # rectangle
         self.coord_type_x = self.defaults.get("coord_type_x", "number")  # number|letter
         self.coord_type_y = self.defaults.get("coord_type_y", "number")  # number|letter
-        self.coord_start_x = self.defaults.get("coord_start_x", 0)
-        self.coord_start_y = self.defaults.get("coord_start_y", 0)
+        self.coord_start_x = self.defaults.get("coord_start_x", 0.0)
+        self.coord_start_y = self.defaults.get("coord_start_y", 0.0)
         self.coord_elevation = self.defaults.get(
             "coord_elevation", None
         )  # top|middle|bottom
-        self.coord_offset = self.defaults.get("coord_offset", 0)
+        self.coord_offset = self.defaults.get("coord_offset", 0.0)
         self.coord_font_name = self.defaults.get("coord_font_name", DEFAULT_FONT)
         self.coord_font_size = self.defaults.get(
             "coord_font_size", int(self.font_size * 0.5)
@@ -618,8 +618,8 @@ class BaseCanvas:
         self.coord_style = self.defaults.get("coord_style", "")
         self.hidden = self.defaults.get("hidden", [])
         self.spikes = self.defaults.get("spikes", [])
-        self.spikes_height = self.defaults.get("spikes_height", 0)
-        self.spikes_width = self.defaults.get("spikes_width", 0)
+        self.spikes_height = self.defaults.get("spikes_height", 0.0)
+        self.spikes_width = self.defaults.get("spikes_width", 0.0)
         self.spikes_fill = self.defaults.get("spikes_fill", self.fill)
         self.spikes_stroke = self.defaults.get("spikes_stroke", "black")
         self.spikes_stroke_width = self.defaults.get(
@@ -747,11 +747,13 @@ class BaseShape:
         self.row = kwargs.get("row", base.row)
         self.col = self.kw_int(kwargs.get("col", kwargs.get("column", base.col)), "col")
         self.side = self.kw_float(kwargs.get("side", base.side))  # equal length sides
-        self.height = self.kw_float(kwargs.get("height", 0))  # was self.side
-        self.width = self.kw_float(kwargs.get("width", 0))  # was self.side
+        self.height = self.kw_float(kwargs.get("height", base.height))  # was self.side
+        self.width = self.kw_float(kwargs.get("width", base.width))  # was self.side
         self.thickness = kwargs.get("thickness", base.thickness)  # cross
         self.top = self.kw_float(kwargs.get("top", base.top))
-        self.depth = self.kw_float(kwargs.get("depth", 0))  # was self.side > diamond?
+        self.depth = self.kw_float(
+            kwargs.get("depth", base.depth)
+        )  # was self.side > diamond?
         self.x = self.kw_float(kwargs.get("x", kwargs.get("left", base.x)))
         self.y = self.kw_float(kwargs.get("y", kwargs.get("top", base.y)))
         self.cx = self.kw_float(kwargs.get("cx", base.cx))  # centre (for some shapes)
@@ -846,9 +848,9 @@ class BaseShape:
         self.label_stroke_width = self.kw_float(
             kwargs.get("label_stroke_width", self.stroke_width)
         )
-        self.label_mx = self.kw_float(kwargs.get("label_mx", 0))
-        self.label_my = self.kw_float(kwargs.get("label_my", 0))
-        self.label_rotation = self.kw_float(kwargs.get("label_rotation", 0))
+        self.label_mx = self.kw_float(kwargs.get("label_mx", 0.0))
+        self.label_my = self.kw_float(kwargs.get("label_my", 0.0))
+        self.label_rotation = self.kw_float(kwargs.get("label_rotation", 0.0))
         # ---- text: title
         self.title = kwargs.get("title", base.title)
         self.title_size = self.kw_float(kwargs.get("title_size", self.font_size))
@@ -857,9 +859,9 @@ class BaseShape:
         self.title_stroke_width = self.kw_float(
             kwargs.get("title_stroke_width", self.stroke_width)
         )
-        self.title_mx = self.kw_float(kwargs.get("title_mx", 0))
-        self.title_my = self.kw_float(kwargs.get("title_my", 0))
-        self.title_rotation = self.kw_float(kwargs.get("title_rotation", 0))
+        self.title_mx = self.kw_float(kwargs.get("title_mx", 0.0))
+        self.title_my = self.kw_float(kwargs.get("title_my", 0.0))
+        self.title_rotation = self.kw_float(kwargs.get("title_rotation", 0.0))
         # ---- text: heading
         self.heading = kwargs.get("heading", base.heading)
         self.heading_size = self.kw_float(kwargs.get("heading_size", self.font_size))
@@ -868,9 +870,9 @@ class BaseShape:
         self.heading_stroke_width = self.kw_float(
             kwargs.get("heading_stroke_width", self.stroke_width)
         )
-        self.heading_mx = self.kw_float(kwargs.get("heading_mx", 0))
-        self.heading_my = self.kw_float(kwargs.get("heading_my", 0))
-        self.heading_rotation = self.kw_float(kwargs.get("heading_rotation", 0))
+        self.heading_mx = self.kw_float(kwargs.get("heading_mx", 0.0))
+        self.heading_my = self.kw_float(kwargs.get("heading_my", 0.0))
+        self.heading_rotation = self.kw_float(kwargs.get("heading_rotation", 0.0))
         # ---- text block
         self.transform = kwargs.get("transform", base.transform)
         self.html = self.kw_bool(kwargs.get("html", base.html))
@@ -1068,12 +1070,12 @@ class BaseShape:
             kwargs.get("radii_labels_stroke_width", self.stroke_width)
         )
         self.radii_labels_rotation = self.kw_float(
-            kwargs.get("radii_labels_rotation", 0)
+            kwargs.get("radii_labels_rotation", 0.0)
         )
         self.radii_wave_style = kwargs.get("radii_wave_style", base.radii_wave_style)
         self.radii_wave_height = kwargs.get("radii_wave_height", base.radii_wave_height)
-        self.radii_labels_my = self.kw_float(kwargs.get("radii_labels_my", 0))
-        self.radii_labels_mx = self.kw_float(kwargs.get("radii_labels_mx", 0))
+        self.radii_labels_my = self.kw_float(kwargs.get("radii_labels_my", 0.0))
+        self.radii_labels_mx = self.kw_float(kwargs.get("radii_labels_mx", 0.0))
         # ---- stripes (circle, hex, rect)
         self.stripes = self.kw_int(kwargs.get("stripes", base.stripes))
         self.stripes_directions = kwargs.get(
@@ -2832,17 +2834,26 @@ class BaseShape:
             * Vertices normally go clockwise from bottom/lower left
             * Directions of vertex indices in left- and right-sides must be the same
         """
-        delta = side / (line_count + 1)
-        # feedback(f'### {side=} {line_count=} {delta=} {skip_ends=}')
+        # delta = side / (line_count + 1)
+        # lines and line intervals
+        left_length = geoms.length_of_line(
+            vertices[left_nodes[0]], vertices[left_nodes[1]]
+        )
+        delta_left = left_length / (line_count + 1)
+        right_length = geoms.length_of_line(
+            vertices[right_nodes[0]], vertices[right_nodes[1]]
+        )
+        delta_right = right_length / (line_count + 1)
+        # feedback(f'### lineJoin {line_count=} {delta_left=} {delta_right=}')
         for number in range(0, line_count + 2):
             if skip_ends:
                 if number == line_count + 1 or number == 0:
                     continue
             left_pt = geoms.point_on_line(
-                vertices[left_nodes[0]], vertices[left_nodes[1]], delta * number
+                vertices[left_nodes[0]], vertices[left_nodes[1]], delta_left * number
             )
             right_pt = geoms.point_on_line(
-                vertices[right_nodes[0]], vertices[right_nodes[1]], delta * number
+                vertices[right_nodes[0]], vertices[right_nodes[1]], delta_right * number
             )
             cnv.draw_line(left_pt, right_pt)
 

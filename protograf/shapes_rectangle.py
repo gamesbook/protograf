@@ -79,6 +79,10 @@ class RectangleShape(BaseShape):
             self.unit(self.slices_line_mx) if self.slices_line_my else 0
         )
         self.kwargs = kwargs
+        # check height
+        if self.width and not self.height:
+            self.height = self.width
+            self.set_unit_properties()  # need to recalculate!
 
     def calculate_area(self) -> float:
         return self._u.width * self._u.height
