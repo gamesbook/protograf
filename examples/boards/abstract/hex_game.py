@@ -3,6 +3,7 @@
 
 Written by: Derek Hohls
 Created on: 8 March 2024
+Revised on: 23 October 2025
 Notes:
 """
 
@@ -10,22 +11,12 @@ from protograf import *
 
 Create(filename="hex_game_board.pdf", margin=0.5, paper="A4-l")
 
-# Background Player Areas
-locale = Common(y=9.25, height=9, width=15.35)
-RightAngledTriangle(
-    common=locale, x=-1.1,  fill="white", flip="north", hand="east"
+# "Hex" Game Board
+Rhombus(
+    height=18, width=30.7, cx=14.25, cy=9.25,
+    stroke="black", fill="white", stroke_width=1,
+    slices=[None, "black", None, "black"]
 )
-RightAngledTriangle(
-    common=locale, x=-1.1, fill="black", flip="south", hand="east"
-)
-RightAngledTriangle(
-    common=locale, x=29.55, fill="black", flip="north", hand="west"
-)
-RightAngledTriangle(
-    common=locale, x=29.55, fill="white", flip="south", hand="west"
-)
-
-# Hex Game Board
 Hexagons(
     cols=21,
     rows=11,

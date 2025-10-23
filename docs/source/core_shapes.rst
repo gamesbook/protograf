@@ -42,7 +42,6 @@ Shape Index
 -  `Dot`_
 -  `DotGrid`_
 -  `Ellipse`_
--  `EquilateralTriangle`_
 -  `Grid`_
 -  `Hexagon`_
 -  `Hexagons`_
@@ -64,6 +63,7 @@ Shape Index
 -  `Table`_
 -  `Text`_
 -  `Trapezoid`_
+-  `Triangle`_
 
 Overview
 ---------
@@ -1136,19 +1136,34 @@ Example 2. Customised Ellipse
 ===== ======
 
 
-.. _equilateraltriangle-command:
+.. _triangle-command:
 
-EquilateralTriangle
-~~~~~~~~~~~~~~~~~~~
+Triangle
+~~~~~~~~
 `↑ <shape-index_>`_
 
-.. HINT::
+A Triangle is a three-sided polygon.  It can have uniform sides, in which case
+it is an *equilateral* triangle; two matching sides, in which case it is an
+*isosceles* triangle; or all sides unequal, in which case it is an
+*irregular* triangle.
 
-    For convenience, an `EquilateralTriangle()` can also be referenced as
-    an `EquTri()`.
+A triangle is considered to have three *vertices* located using the
+following compass directions; ``n`` (north), ``sw`` (south-west), and ``se``
+(south-east).  Similarly, the three sides are located at ``ne`` (north-east),
+``nw`` (north-west), and ``s`` (south).
 
-Example 1. Default EquilateralTriangle
-++++++++++++++++++++++++++++++++++++++
+A triangle has a *centroid*, or "center of mass", which is the point where
+the three lines from the vertices to the midpoints of the opposite sides
+intersect. It is used for the point around which the triangle is rotated.
+
+The starting point for drawing a triangle is the ``sw`` vertice.  The ``s``
+line is then drawn, followed by the ``ne``, and finally the ``ne``.  The
+*pivot* is the angle used to draw the ``s`` line; by default this is ``0``
+i.e. the line is drawn in the eastwards direction.
+
+
+Example 1. Default Triangle
++++++++++++++++++++++++++++
 
 .. |eqi| image:: images/defaults/equiangle.png
    :width: 330
@@ -1159,18 +1174,19 @@ Example 1. Default EquilateralTriangle
 
       .. code:: python
 
-          EquilateralTriangle()
+          Triangle()
 
       It has the following properties based on the defaults:
 
       - lower-left "corner" at x-position ``1`` cm and y-position ``1`` cm
       - side - ``1`` cm i.e. all sides are equal
+
 ===== ======
 
 .. _equtriHatches:
 
-Example 2. Customised EquilateralTriangle
-+++++++++++++++++++++++++++++++++++++++++
+Example 2. Customised Triangle: Equilateral
++++++++++++++++++++++++++++++++++++++++++++
 
 .. |eq2| image:: images/customised/equilateral_triangle.png
    :width: 330
@@ -1181,16 +1197,16 @@ Example 2. Customised EquilateralTriangle
 
       .. code:: python
 
-        EquilateralTriangle(
+        Triangle(
             cx=2, cy=2, side=2,
             hatches_count=5,
-            hatches_stroke="red",
-            title='Title', heading='Head')
-        EquilateralTriangle(
-            cx=2, cy=5, side=2,
+            hatches_stroke="red")
+        Triangle(
+            cx=2, cy=4.5, side=2,
             stroke_width=1,
             rotation=45,
-            dot=.05)
+            dot=.05,
+            title='Title', heading='Head')
 
       These shapes have the following properties:
 
@@ -1201,8 +1217,8 @@ Example 2. Customised EquilateralTriangle
 
 .. _equtriSlices:
 
-Example 3. EquilateralTriangle: Lines and Slices
-++++++++++++++++++++++++++++++++++++++++++++++++
+Example 3. Equilateral Triangle: Lines and Slices
+++++++++++++++++++++++++++++++++++++++++++++++++*
 
 *Radii* are the lines drawn from the centroid of a triangle towards its
 vertices.
@@ -1212,50 +1228,53 @@ the plural. These lines are drawn from the centroid of a triangle towards the
 mid-points of its edges.
 
 *Slices* are a set of colors that are drawn as triangles inside an
-EquilateralTriangle in a clockwise direction starting from the "North East".
+triangle in a clockwise direction starting from the "North East".
 If there are fewer colors than the three possible triangles, then the colors
 are repeated, starting from the first one.
 
-An EquilateralTriangle is considered to have three vertices located using the
-following compass directions; ``n`` (north), ``sw`` (south-west), and ``se``
-(south-east).  Similarly, the three sides are located at ``ne`` (north-east),
-``nw`` (north-west), and ``s`` (south).
 
 .. |eq3| image:: images/customised/equtri_perbii_slice.png
    :width: 330
 
 ===== ======
-|eq3| This example shows EquilateralTriangles constructed using these
+|eq3| This example shows equilateral triangles constructed using these
       commands:
 
       .. code:: python
 
-        EquilateralTriangle(
+        small_dot = dot(dot_width=4, fill="white")
+        Triangle(
             cx=1, cy=1,
             side=1.5,
             radii="n se sw",
+            centre_shapes=[(small_dot)],
             title="radii",
             fill="tomato")
-        EquilateralTriangle(
+        Triangle(
             cx=2, cy=3,
             side=1.5,
             perbii="s ne nw",
+            centre_shapes=[(small_dot)],
             title="perbii",
             fill="gold")
-        EquilateralTriangle(
+        Triangle(
             cx=3, cy=5,
             side=1.5,
+            centre_shapes=[(small_dot)],
             title="slices",
             slices=["tomato", "gold", "lime"])
 
-      The top example, shows how all three *radii* for an EquilateralTriangle
+      All examples share a common small circle, or ``Dot`` drawn at their
+      centroid.
+
+      The top example, shows how all three *radii* for an equilateral triangle
       can be constructed.
 
       The middle example, shows how all three *perbii* for an
-      EquilateralTriangle can be constructed.
+      equilateral triangle can be constructed.
 
       The lower example, shows how all three *slices* for an
-      EquilateralTriangle can be supplied with different colors.
+      equilateral triangle can be supplied with different colors.
 
 ===== ======
 
@@ -3968,7 +3987,7 @@ Example 4. Rotation with Hatches
             common=htch,
             cx=2, cy=1, height=1.5,
         )
-        EquilateralTriangle(
+        Triangle(
             common=htch,
             cx=1, cy=3, side=1.5,
         )
@@ -4026,11 +4045,11 @@ Radii shapes are constructed using the following properties:
 
 Radii shapes can be constructed for:
 
-- :ref:`EquilateralTriangle <equilateraltriangle-command>`
+- :ref:`Circle <circle-command>`
 - :ref:`Hexagon <hexagon-command>`
 - :ref:`Rectangle <rectangle-command>`
 - :ref:`Rhombus <rhombus-command>`
-- :ref:`Circle <circle-command>`
+- :ref:`Triangle <triangle-command>`
 
 Example 1. Radii Shapes
 ++++++++++++++++++++++++
@@ -4088,7 +4107,7 @@ Example 1. Radii Shapes
             ],
             radii_shapes_rotated=True,
         )
-        EquilateralTriangle(
+        Triangle(
             cx=1, cy=5,
             side=1.25,
             radii_shapes=[
@@ -4176,10 +4195,10 @@ Perbii shapes are constructed using the following properties:
 
 Perbii shapes can be constructed for:
 
-- :ref:`EquilateralTriangle <equilateraltriangle-command>`
 - :ref:`Hexagon <hexagon-command>`
 - :ref:`Rectangle <rectangle-command>`
-- :ref:`Rhombus <rhombus-command>`;
+- :ref:`Rhombus <rhombus-command>`
+- :ref:`Triangle <triangle-command>`
 
 .. NOTE::
 
@@ -4246,7 +4265,7 @@ Example 1. Perbii Shapes
             ],
             perbii_shapes_rotated=True,
         )
-        EquilateralTriangle(
+        Triangle(
             cx=1, cy=5,
             side=1.25,
             perbii_shapes=[
@@ -4487,7 +4506,7 @@ Example 1. Default Centre Shape
         Polygon(
             cx=1, cy=5, radius=0.5, sides=8,
             centre_shape=small_star)
-        EquilateralTriangle(
+        Triangle(
             x=2.35, y=5.5, side=1.25,
             centre_shape=small_star)
         Rectangle(
@@ -4698,7 +4717,7 @@ the change in ``x`` and ``y`` values as part of the set.
             radius=0.5, sides=8,
             centre_shapes=[
                 (small_dot), (big_dot, 0.2, 0.2)])
-        EquilateralTriangle(
+        Triangle(
             x=2.35, y=5.5, side=1.25,
             centre_shapes=[
                 (small_dot), (big_dot, 0.2, 0.2)])
@@ -4740,12 +4759,12 @@ Vertex shapes are constructed using the following properties:
 
 Vertex shapes can be constructed for:
 
-- :ref:`EquilateralTriangle <equilateraltriangle-command>`
 - :ref:`Hexagon <hexagon-command>`
 - :ref:`Polygon <polygon-command>`
 - :ref:`Rectangle <rectangle-command>`
 - :ref:`Rhombus <rhombus-command>`
 - :ref:`Star <star-command>`
+- :ref:`Triangle <triangle-command>`
 
 Example 1. Vertex Shapes
 ++++++++++++++++++++++++
@@ -4784,7 +4803,7 @@ Example 1. Vertex Shapes
             vertex_shapes=[
                 circle(radius=0.15, label="T")] * 5,
             vertex_shapes_rotated=True)
-        EquilateralTriangle(
+        Triangle(
             cx=1, cy=5,
             side=1.5,
             vertex_shapes=[

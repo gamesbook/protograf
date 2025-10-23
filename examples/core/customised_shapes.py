@@ -55,15 +55,6 @@ Ellipse(common=shp_font, cx=3, cy=3, width=2, height=1, heading="Ellipse cx=3;cy
 Polygon(common=shp_font, cx=2, cy=1, radius=0.8, sides=7, heading="Polygon-7 cx2=;cy=1")
 PageBreak()
 
-# ---- RA triangles
-Blueprint()
-Text(common=txt, text="Right Angled Triangle")
-RightAngledTriangle(x=1, y=1, flip="north", hand="east", label="NE", fill="yellow")
-RightAngledTriangle(x=2, y=2, flip="south", hand="east", label="SE", fill="green")
-RightAngledTriangle(x=2, y=3, flip="north", hand="west", label="NW", fill="red")
-RightAngledTriangle(x=3, y=4, flip="south", hand="west", label="SW", fill="blue")
-PageBreak()
-
 # ---- lines (multiple) labels
 Blueprint()
 Text(common=txt, text="Lines")
@@ -105,51 +96,128 @@ StarField(
     seeding=42.3)
 PageBreak()
 
-# ---- equilateral triangle - hatch
+# ---- triangle - equilateral - hatch, rotation
 Blueprint()
-Text(common=txt, text="Equilateral Triangle: hatch; rotation")
-EquilateralTriangle(
+Text(common=txt, text="Equi. Triangle: hatch; rotation")
+Triangle(
     cx=2, cy=2, side=2,
     hatches_count=5,
-    hatches_stroke="red",
-    title='Title', heading='Head')
-EquilateralTriangle(
-    cx=2, cy=5, side=2,
+    hatches_stroke="red")
+Triangle(
+    cx=2, cy=4.5, side=2,
     stroke_width=1,
     rotation=45,
-    dot=.05)
+    dot=.05,
+    title='Title', heading='Head')
 PageBreak()
 
-# ---- equilateral triangle - perbis slice
+# ---- triangle - equilateral - perbii, slice
 Blueprint()
-Text(common=txt, text="Equi. Tri.; radii; perbii; slice ")
-EquilateralTriangle(
+Text(common=txt, text="Equi. Tri.: radii; perbii; slice")
+small_dot = dot(dot_width=4, fill="white")
+Triangle(
     cx=1, cy=1,
     side=1.5,
     radii="n se sw",
+    centre_shapes=[(small_dot)],
     title="radii",
     fill="tomato")
-EquilateralTriangle(
+Triangle(
     cx=2, cy=3,
     side=1.5,
     perbii="s ne nw",
+    centre_shapes=[(small_dot)],
     title="perbii",
     fill="gold")
-EquilateralTriangle(
+Triangle(
     cx=3, cy=5,
     side=1.5,
+    centre_shapes=[(small_dot)],
     title="slices",
     slices=["tomato", "gold", "lime"])
 PageBreak()
 
-# ---- RA Triangle
+# ---- triangle - isosceles - hatch, rotation
 Blueprint()
-Text(common=txt, text="Right Angled Triangle: flip/hand")
-eqt = Common(x=2, y=2, side=2)
-RightAngledTriangle(common=eqt, flip="north", hand="east", label="NE", fill="yellow")
-RightAngledTriangle(common=eqt, flip="south", hand="east", label="SE", fill="green")
-RightAngledTriangle(common=eqt, flip="north", hand="west", label="NW", fill="red")
-RightAngledTriangle(common=eqt, flip="south", hand="west", label="SW", fill="blue")
+Text(common=txt, text="Iso. Triangle: hatch; rotation")
+Triangle(
+    x=1, y=2.5, side=2, height=1.5,
+    hatches_count=5,
+    hatches_stroke="red")
+Triangle(
+    x=1, y=5, side=2, height=1.5,
+    stroke_width=1,
+    rotation=45,
+    dot=.05,
+    title='Title', heading='Head')
+PageBreak()
+
+# ---- triangle - isosceles - perbii, slice
+Blueprint()
+Text(common=txt, text="Iso. Tri.: radii; perbii; slice")
+small_dot = dot(dot_width=4, fill="white")
+Triangle(
+    x=1, y=1.5,
+    side=2, height=1,
+    radii="n se sw",
+    centre_shapes=[(small_dot)],
+    title="radii",
+    fill="tomato")
+Triangle(
+    x=1, y=3.5,
+    side=2, height=1,
+    perbii="s ne nw",
+    centre_shapes=[(small_dot)],
+    title="perbii",
+    fill="gold")
+Triangle(
+    x=1, y=5.5,
+    side=2, height=1,
+    centre_shapes=[(small_dot)],
+    title="slices",
+    slices=["tomato", "gold", "lime"]
+    )
+PageBreak()
+
+# ---- triangle - irregular - hatch, rotation
+Blueprint()
+Text(common=txt, text="Irr. Triangle: hatch; rotation")
+Triangle(
+    x=1.5, y=2.5, side=2, side2=3.5, side3=2.25,
+    hatches_count=5,
+    hatches_stroke="red")
+Triangle(
+    x=1.5, y=5, side=2, side2=3.5, side3=2.25,
+    stroke_width=1,
+    rotation=45,
+    dot=.05,
+    title='Title', heading='Head')
+PageBreak()
+
+# ---- triangle - irregular - perbii, slice
+Blueprint()
+Text(common=txt, text="Irr. Tri.: radii; perbii; slice")
+small_dot = dot(dot_width=4, fill="white")
+Triangle(
+    x=1, y=1.5,
+    side=2, side2=1, side3=1.5,
+    radii="n se sw",
+    centre_shapes=[(small_dot)],
+    title="radii",
+    fill="tomato")
+Triangle(
+    x=1, y=3.5,
+    side=2, side2=1, side3=1.5,
+    perbii="s ne nw",
+    centre_shapes=[(small_dot)],
+    title="perbii",
+    fill="gold")
+Triangle(
+    x=1, y=5.5,
+    side=2, side2=1, angle=45,
+    centre_shapes=[(small_dot)],
+    title="slices",
+    slices=["tomato", "gold", "lime"])
 PageBreak()
 
 # ---- sectors
@@ -831,7 +899,7 @@ Square(x=2.5, y=0.5, height=1, centre_shape=small_star)
 Rectangle(x=0.25, y=2.5, height=1, width=1.5, centre_shape=small_star)
 Circle(cx=3, cy=3, radius=0.5, centre_shape=small_star)
 Polygon(cx=1, cy=5, radius=0.5, sides=8, centre_shape=small_star)
-EquilateralTriangle(cx=3, cy=5, side=1.25, centre_shape=small_star)
+Triangle(cx=3, cy=5, side=1.25, centre_shape=small_star)
 PageBreak()
 
 # ---- centre shape - move
@@ -912,7 +980,7 @@ Rhombus(x=2.4, y=0.3, height=1.5,  width=1.25, centre_shapes=[(small_dot), (big_
 Rectangle(x=0.5, y=2.5, height=1, width=1.25, centre_shapes=[(small_dot), (big_dot, 0.2, 0.2)])
 Circle(cx=3, cy=3, radius=0.5, centre_shapes=[(small_dot), (big_dot, 0.2, 0.2)])
 Polygon(cx=1, cy=5, radius=0.5, sides=8, centre_shapes=[(small_dot), (big_dot, 0.2, 0.2)])
-EquilateralTriangle(cx=3, cy=5, side=1.25, centre_shapes=[(small_dot), (big_dot, 0.2, 0.2)])
+Triangle(cx=3, cy=5, side=1.25, centre_shapes=[(small_dot), (big_dot, 0.2, 0.2)])
 PageBreak()
 
 
@@ -1034,7 +1102,7 @@ Hexagon(
     cx=2, cy=1, height=1.5,
     rotation=30,
     )
-EquilateralTriangle(
+Triangle(
     common=htch,
     cx=1, cy=3, side=1.5,
     rotation=30,
@@ -1162,7 +1230,7 @@ Trapezoid(
     width=1.5, top=1, height=1.25,
     vertex_shapes=[circle(radius=0.15, label="T")]*5,
     vertex_shapes_rotated=True)
-EquilateralTriangle(
+Triangle(
     cx=1, cy=5,
     side=1.5,
     vertex_shapes=[circle(radius=0.15, label="E")]*3,
@@ -1222,7 +1290,7 @@ Rhombus(
     ],
     radii_shapes_rotated=True,
 )
-EquilateralTriangle(
+Triangle(
     cx=1, cy=5,
     side=1.25,
     radii_shapes=[
@@ -1290,7 +1358,7 @@ Rhombus(
     ],
     perbii_shapes_rotated=True,
 )
-EquilateralTriangle(
+Triangle(
     cx=1, cy=5,
     side=1.25,
     perbii_shapes=[
@@ -1313,10 +1381,11 @@ Save(
      names=[
         None,
         "blueprint_subdiv", "dots_crosses", "centred",
-        "right_angled_triangle", "lines",
+        "lines",
         "starfield_rectangle", "starfield_circle", "starfield_poly",
         "equilateral_triangle", "equtri_perbii_slice",
-        "right_angled_triangle_flip",
+        "isosceles_triangle", "isotri_perbii_slice",
+        "irregular_triangle", "irrtri_perbii_slice",
         "sectors", "grid_gray",
         "dotgrid_moleskine", "dotgrid_rowscols", "arc",
         "stadium_edges", "trapezoid_flip", "chord", "cross",

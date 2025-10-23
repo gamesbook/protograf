@@ -241,7 +241,7 @@ Direction-orientated Terms
 ==========================
 
 In general, there are two primary ways of determining direction of
-something; either by a **compass direction** or by an **angle**.
+something; either by a **compass** direction or by an **angle**.
 Other, more descriptive directions are also used.
 
 The *angle* is the amount of rotation, in degrees, starting from a value
@@ -252,7 +252,7 @@ angle of a line parallel to the vertical sides of the page, and so on.
 The maximum allowed rotation is 360 degrees i.e. a full sweep around a
 circle.
 
-A *compass direction* is one of the following:
+A *compass* direction is one of the following:
 
 Primary compass directions |dash| with full names shown in brackets:
 
@@ -264,9 +264,9 @@ Primary compass directions |dash| with full names shown in brackets:
 Secondary compass directions |dash| with full names shown in brackets:
 
 -  ne (north-east) - normally corresponds to an angle of 45 degrees
--  se (south-east) - normally corresponds to an angle of 315 degrees
 -  nw (north-west) - normally corresponds to an angle of 135 degrees
 -  sw (south-west) - normally corresponds to an angle of 225 degrees
+-  se (south-east) - normally corresponds to an angle of 315 degrees
 
 .. NOTE::
 
@@ -274,8 +274,10 @@ Secondary compass directions |dash| with full names shown in brackets:
    then the angle is "reinterpreted" to match its context
    e.g. the *NE* angle for a ‘pointy’ hexagon is 60, not 45, degrees.
 
-Properties that use direction include:
+Properties that use directional terms include:
 
+-  **angle** - the interior angle between first and second sides of a
+   ``Triangle``
 -  **clockwise** - a ``True`` or ``False`` setting used to determine
    direction of travel around a circle
 -  **direction** - can be any primary compass direction; used to show
@@ -287,12 +289,12 @@ Properties that use direction include:
    be parallel to the bottom edge of the paper
 -  **facing** - can be any primary compass direction; used to show
    orientation of some types of layouts e.g. ``DiamondLayout``
--  **flip** - the relative vertical direction in which a triangle or rhombus
+-  **flip** - the relative vertical direction in which a rhombus
    must be drawn; can be either: *north* or *south*
--  **hand** - the relative horizontal direction in which a triangle must
-   be drawn; can be either: *east* or *west*
 -  **orientation** - used for drawing hexagons; can be either: *flat* or
    *pointy*
+-  **pivot** - the angle by which a ``Triangle`` is rotated around its start
+   point
 -  **pointy** - the *orientation* of a ``Hexagon``, meaning the top of it will
    make a "peak" relative to the bottom edge of the paper, and the flat edge
    will be parallel to the left side of the paper.

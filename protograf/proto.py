@@ -38,7 +38,6 @@ from .shapes import (
     CrossShape,
     DotShape,
     EllipseShape,
-    EquilateralTriangleShape,
     FooterShape,
     ImageShape,
     LineShape,
@@ -46,7 +45,6 @@ from .shapes import (
     PolygonShape,
     PolylineShape,
     RhombusShape,
-    RightAngledTriangleShape,
     SectorShape,
     ShapeShape,
     SquareShape,
@@ -3137,57 +3135,31 @@ def ellipse(**kwargs):
     return EllipseShape(canvas=globals.canvas, **kwargs)
 
 
-@docstring_center
-def EquilateralTriangle(row=None, col=None, **kwargs):
-    """Draw a EquilateralTriangle shape on the canvas.
+# @docstring_center
+# def XquilateralTriangle(row=None, col=None, **kwargs):
+#     """Draw a XquilateralTriangle shape on the canvas.
 
-    Args:
+#     Args:
 
-    - row (int): row in which the shape is drawn.
-    - col (int): column in which shape is drawn.
+#     - row (int): row in which the shape is drawn.
+#     - col (int): column in which shape is drawn.
 
-    Kwargs:
+#     Kwargs:
 
-    <center>
+#     <center>
 
-    """
-    kwargs = margins(**kwargs)
-    kwargs["row"] = row
-    kwargs["col"] = col
-    eqt = EquilateralTriangleShape(canvas=globals.canvas, **kwargs)
-    eqt.draw()
-    return eqt
-
-
-def equilateraltriangle(row=None, col=None, **kwargs):
-    kwargs = margins(**kwargs)
-    return EquilateralTriangleShape(canvas=globals.canvas, **kwargs)
+#     """
+#     kwargs = margins(**kwargs)
+#     kwargs["row"] = row
+#     kwargs["col"] = col
+#     eqt = XquilateralTriangleShape(canvas=globals.canvas, **kwargs)
+#     eqt.draw()
+#     return eqt
 
 
-def EquiTri(row=None, col=None, **kwargs):
-    """Draw a EquilateralTriangle shape on the canvas.
-
-    Args:
-
-    - row (int): row in which the shape is drawn.
-    - col (int): column in which shape is drawn.
-
-    Kwargs:
-
-    <center>
-
-    """
-    kwargs = margins(**kwargs)
-    kwargs["row"] = row
-    kwargs["col"] = col
-    eqt = EquilateralTriangleShape(canvas=globals.canvas, **kwargs)
-    eqt.draw()
-    return eqt
-
-
-def equitri(row=None, col=None, **kwargs):
-    kwargs = margins(**kwargs)
-    return EquilateralTriangleShape(canvas=globals.canvas, **kwargs)
+# def xquilateraltriangle(row=None, col=None, **kwargs):
+#     kwargs = margins(**kwargs)
+#     return XquilateralTriangleShape(canvas=globals.canvas, **kwargs)
 
 
 @docstring_center
@@ -3372,33 +3344,6 @@ def polyline(row=None, col=None, **kwargs):
     kwargs["row"] = row
     kwargs["col"] = col
     return PolylineShape(canvas=globals.canvas, **kwargs)
-
-
-@docstring_base
-def RightAngledTriangle(row=None, col=None, **kwargs):
-    """Draw a RightAngledTriangle shape on the canvas.
-
-    Args:
-
-    - row (int): row in which the shape is drawn.
-    - col (int): column in which the shape is drawn.
-
-    Kwargs:
-
-    <base>
-
-    """
-    kwargs = margins(**kwargs)
-    kwargs["row"] = row
-    kwargs["col"] = col
-    rat = RightAngledTriangleShape(canvas=globals.canvas, **kwargs)
-    rat.draw()
-    return rat
-
-
-def rightangledtriangle(row=None, col=None, **kwargs):
-    kwargs = margins(**kwargs)
-    return RightAngledTriangleShape(canvas=globals.canvas, **kwargs)
 
 
 @docstring_center
@@ -3800,7 +3745,7 @@ def Triangle(row=None, col=None, **kwargs):
     return eqt
 
 
-def equilateraltriangle(row=None, col=None, **kwargs):
+def triangle(row=None, col=None, **kwargs):
     kwargs = margins(**kwargs)
     return TriangleShape(canvas=globals.canvas, **kwargs)
 
@@ -5251,7 +5196,6 @@ chord.__doc__ = Chord.__doc__
 circle.__doc__ = Circle.__doc__
 dot.__doc__ = Dot.__doc__
 ellipse.__doc__ = Ellipse.__doc__
-equilateraltriangle.__doc__ = EquilateralTriangle.__doc__
 hexagon.__doc__ = Hexagon.__doc__
 image.__doc__ = Image.__doc__
 line.__doc__ = Line.__doc__
@@ -5262,8 +5206,8 @@ polyomino.__doc__ = Polyomino.__doc__
 polyshape.__doc__ = Polyshape.__doc__
 rectangle.__doc__ = Rectangle.__doc__
 rhombus.__doc__ = Rhombus.__doc__
-rightangledtriangle.__doc__ = RightAngledTriangle.__doc__
 star.__doc__ = Star.__doc__
 starfield.__doc__ = StarField.__doc__
 tetromino.__doc__ = Tetromino.__doc__
+triangle.__doc__ = Triangle.__doc__
 # .__doc__ = .__doc__

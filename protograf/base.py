@@ -512,6 +512,7 @@ class BaseCanvas:
         # ---- triangle
         self.triangle_type = self.defaults.get("triangle_type", None)
         self.rotation_point = self.defaults.get("rotation_point", "centre")
+        self.pivot = self.defaults.get("pivot", 0.0)
         self.side2 = self.defaults.get("side2", None)
         self.side3 = self.defaults.get("side3", None)
         # ---- triangle / trapezoid / polyomino
@@ -1120,6 +1121,7 @@ class BaseShape:
         # ---- triangle
         self.triangle_type = None
         self.rotation_point = kwargs.get("rotation_point", base.rotation_point)
+        self.pivot = kwargs.get("pivot", base.pivot)
         self.side2 = kwargs.get("side2", base.side2)
         self.side3 = kwargs.get("side3", base.side3)
         # ---- triangle / trapezoid / polyomino

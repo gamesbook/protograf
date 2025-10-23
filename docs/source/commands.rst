@@ -49,8 +49,6 @@ a handy cross-reference to the detailed information for that command.
 -  :ref:`Dot <dot-command>` * - a geometric shape that can be drawn on a page
 -  :ref:`DotGrid <dotgrid-command>` - a set, or group, of dots that can be drawn on a page
 -  :ref:`Ellipse <ellipse-command>` * - a geometric shape that can be drawn on a page
--  :ref:`EquilateralTriangle <equilateraltriangle-command>` * - a geometric shape that
-   can be drawn on a page (also referenced by `EquTri`)
 -  :ref:`Extract <the-extract-command>` - allows portions of pages to be extracted as PNG images
 -  :ref:`Font <the-font-command>` - set the font properties for any
    :ref:`Text <text-command>` drawn on a page
@@ -111,6 +109,8 @@ a handy cross-reference to the detailed information for that command.
 -  :ref:`Today <the-today-command>` - display - as text - the current date and time
 -  :doc:`Track <layouts_track>` - draw any number of shapes at the vertices of another shape
 -  :ref:`Trapezoid <trapezoid-command>` * - a geometric shape that can be drawn on a page
+-  :ref:`Triangle <triangle-command>` * - a geometric shape that
+   can be drawn on a page
 -  :doc:`TriangularLocations <layouts_triangular>`- defines an ordered series of
    row and column locations that create a triangular grid of shapes - the grid itself
    is not displayed; it is used in a :ref:`Layout <layoutIndex>` command

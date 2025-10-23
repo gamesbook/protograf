@@ -373,7 +373,7 @@ Function Example 1. Drawing Shapes
                 x=a, y=b, height=1, width=2, fill_stroke=c,
                 notch_y=0.1, notch_x=0.5,
                 notch_directions="nw ne",)
-            EquilateralTriangle(
+            Triangle(
                 cx=a+1, cy=b+1.5, side=0.25, fill_stroke=c)
 
         Create(paper="A8", margin=0.25)
@@ -386,8 +386,8 @@ Function Example 1. Drawing Shapes
 
       The function named ``capitol`` has three properties that
       can be set: *a*, *b* and *c*. These are used to control
-      some of the properties of the 3 shapes that are drawn by
-      the function.
+      some of the properties of the thre shapes that are drawn by
+      this function.
 
       The values have defaults - ``0``, ``0`` and ``red``
       - respectively, which are used if no values are provided;

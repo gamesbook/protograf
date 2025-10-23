@@ -117,7 +117,7 @@ Rectangle(common=money, label="2", x=23.5, y=27.5)
 Rectangle(common=card_icon_small, x=20, y=27.5)
 Rectangle(common=card_icon_small, x=22.25, y=27.25)
 Rectangle(common=card_icon_small, x=22.5, y=27.5)
-EquilateralTriangle(x=21, y=28.3, side=0.7, rotation=30)
+Triangle(x=21, y=28.3, side=0.7, rotation=30)
 
 # Scoring Track
 score_common = Common(
