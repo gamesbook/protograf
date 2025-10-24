@@ -23,11 +23,12 @@ which are described here.
 .. _table-of-contents-custom:
 
 - `Overview`_
+- `Blueprint`_
+- `Circle`_
+- `Hexagon`_
 - `Line`_
 - `Rectangle`_
-- `Hexagon`_
-- `Circle`_
-- `Blueprint`_
+- `Triangle`_
 
 
 Overview
@@ -70,8 +71,8 @@ Basic Properties
 A Line has the following properties, in addition to the basic ones of
 *x* and *y* for the starting point, and its *label* properties.
 
-- *angle* - the number of degrees clockwise from the baseline; used in
-  conjunction with *length*
+- *angle* - the number of degrees clockwise that the line is rotated from
+  the baseline about its start point; used in conjunction with *length*
 - *cx* and *cy* - if set, will replace the use of *x* and *y* for the
   starting point, and work in conjunction with *angle* and *length* to
   create the line around a centre point
@@ -817,8 +818,10 @@ Hatches
 -------
 `^ <rectangleIndex_>`_
 
-Hatches are a set of parallel lines that are drawn, in a specified direction, across
-the length or width of the Rectangle in a vertical, horizontal or diagonal direction.
+Hatches are a set of parallel lines that are drawn, in a specified direction,
+across the length or width of the Rectangle in a vertical, horizontal or
+diagonal direction.  Hatches are equally spaced across the height or width
+of the Rectangle.
 
 .. |rht| image:: images/custom/rectangle/hatches.png
    :width: 330
@@ -1838,9 +1841,9 @@ Hatches: Flat
 -------------
 `^ <hexagon_>`_
 
-Hatches are a set of parallel lines that are drawn across
-a Hexagon from one opposing side to another in a vertical, horizontal or
-diagonal direction.
+Hatches are a set of parallel lines that are drawn across a Hexagon from
+one opposing side to another in a vertical, horizontal or diagonal
+direction. Hatches are equally spaced across the diameter of the Hexagon.
 
 .. |hhf| image:: images/custom/hexagon/hatches_flat.png
    :width: 330
@@ -1896,7 +1899,8 @@ Hatches: Pointy
 
 Hatches are a set of parallel lines that are drawn, in a specified direction,
 across the Hexagon from one opposing side to another in a vertical, horizontal
-or diagonal direction.
+or diagonal direction. Hatches are equally spaced across the diameter of the
+Hexagon.
 
 .. |hhp| image:: images/custom/hexagon/hatches_pointy.png
    :width: 330
@@ -2730,7 +2734,8 @@ Hatches
 
 Hatches are a set of parallel lines that are drawn, in a specified direction,
 across the Circle from one opposing side to another in a vertical, horizontal
-or diagonal direction.
+or diagonal direction. Hatches are equally spaced across the diameter of the
+Circle.
 
 .. |chf| image:: images/custom/circle/hatches.png
    :width: 330
@@ -3566,5 +3571,406 @@ Edges Numbering at x and y
       This is not very useful for a tiny grid, but for a very large page size
       it can be helpful to set (or reset) such grid numbering while working
       on a complex design.
+
+===== ======
+
+
+.. _triIndex:
+
+Triangle
+========
+`↑ <table-of-contents-custom_>`_
+
+- `Triangle overview`_
+- `Triangle construction`_
+- `Triangle customisation`_
+
+Triangle overview
+-----------------
+
+A Triangle is a three-sided polygon.  It can have uniform sides, in which case
+it is an *equilateral* triangle |dash| the default; two sides of matching
+length, in which case it is an *isosceles* triangle; or all sides of unequal
+length, in which case it is an *irregular* triangle.
+
+A triangle is considered to have three *vertices* located using the
+following compass directions; ``n`` (north), ``sw`` (south-west), and ``se``
+(south-east).  Similarly, the three sides are located at ``ne`` (north-east),
+``nw`` (north-west), and ``s`` (south).
+
+A triangle has a *centroid*, or "center of mass", which is the point where
+the three lines from the vertices to the midpoints of the opposite sides
+intersect. It is used as the point around which the triangle is *rotated*.
+
+.. _triConstruction:
+
+Triangle construction
+---------------------
+`^ <triIndex_>`_
+
+The starting point for drawing a triangle is the ``sw`` vertice.  The ``s``
+line is then drawn, usually in the ``e`` direction, followed by the ``ne``
+line, and finally the ``ne``.
+
+All triangles require the starting point to be set, if different from the
+default of ``1`` for both the *x* and *y* positions.
+
+Equilateral triangles
++++++++++++++++++++++
+
+Equilateral triangles are the simplest to construct. Apart from the starting
+point, all that is required is the length of the *side* to be set. All sides
+share the same length.
+
+Isosceles triangles
++++++++++++++++++++
+
+Isosceles triangles require both the length of the bottom edge to be set
+|dash| via the *side* property |dash| as well as the *height*.  The other
+two sides will be equal in length and calculated from the *side* and
+*height* properties.
+
+Irregular triangles
++++++++++++++++++++
+
+Irregular triangles are the most complex to construct. There are a number
+of options to do so.
+
+**TODO**
+
+The *pivot* is the angle used to draw the ``s`` line; by default this is ``0``
+i.e. the line is drawn in the eastwards direction.
+
+The following shows examples of these constructions.
+
+- `Example 1. Default Triangle`_
+- `Example 2. Custom Equilateral`_
+- `Example 3. Custom Isosceles`_
+- `Example 4. Custom Irregular`_
+
+Example 1. Default Triangle
++++++++++++++++++++++++++++
+`^ <triConstruction_>`_
+
+.. |tc1| image:: images/defaults/equiangle.png
+   :width: 330
+
+===== ======
+|tc1| This example shows the Triangle constructed using the command with only
+      defaults:
+
+      .. code:: python
+
+          Triangle()
+
+      It has the following properties based on the defaults:
+
+      - lower-left "corner" at x-position ``1`` cm and y-position ``1`` cm
+      - side - ``1`` cm i.e. all sides are equal
+
+===== ======
+
+Example 2. Custom Equilateral
++++++++++++++++++++++++++++++
+`^ <triConstruction_>`_
+
+.. |tc2| image:: images/defaults/equiangle.png
+   :width: 330
+
+===== ======
+|tc2| This example shows the Triangle constructed using the command as follows:
+
+      .. code:: python
+
+          Triangle()
+
+      It has the following properties:
+
+      - side - ``2`` cm i.e. all sides are equal
+
+===== ======
+
+Example 3. Custom Isosceles
++++++++++++++++++++++++++++
+`^ <triConstruction_>`_
+
+.. |tc3| image:: images/defaults/equiangle.png
+   :width: 330
+
+===== ======
+|tc3| This example shows the Triangle constructed using the command as follows:
+
+      .. code:: python
+
+          Triangle()
+
+      It has the following properties:
+
+      - side - ``2`` cm i.e. all sides are equal
+
+===== ======
+
+Example 4. Custom Irregular
++++++++++++++++++++++++++++
+`^ <triConstruction_>`_
+
+.. |tc4| image:: images/defaults/equiangle.png
+   :width: 330
+
+===== ======
+|tc4| This example shows the Triangle constructed using the command as follows:
+
+      .. code:: python
+
+          Triangle()
+
+      It has the following properties:
+
+      - side - ``2`` cm i.e. all sides are equal
+
+===== ======
+
+
+.. _triCustomisation:
+
+Triangle customisation
+----------------------
+`^ <triIndex_>`_
+
+There are a number of ways that a Triangle can be customised.
+
+- `Cross and Dot <triCross_>`_
+- `Hatches <triHatches_>`_
+- `Perbii <triPerbii_>`_
+- `Radii <triRadii_>`_
+- `Rotation <triRotation_>`_
+- `Slices <triSlices_>`_
+
+
+.. _triCross:
+
+Cross and Dot
+-------------
+`^ <triCustomisation_>`_
+
+A cross or a dot are symbols that mark the centre of the Triangle.
+They are usually the last elements that are drawn.
+
+.. |td1| image:: images/custom/rectangle/dot_cross.png
+   :width: 330
+
+===== ======
+|td1| This example shows Triangles constructed using the commands:
+
+      .. code:: python
+
+        Triangle(cross=0.75, dot=0.15)
+
+      It has the following properties that differ from the defaults:
+
+      - *cross* - the length of each of the two lines that cross at the centre
+        is set to ``0.75`` cm (7.5mm)
+      - *dot* - a circle with a diameter of ``0.15`` cm (1.5mm); the fill color
+        for the dot is the same as its stroke
+
+===== ======
+
+
+.. _triHatches:
+
+Hatches
+-------
+`^ <triCustomisation_>`_
+
+Hatches are a set of parallel lines that are drawn, in a specified direction,
+across the Triangle from one opposing side to another. Hatch starting points
+are equally spaced across each of the sides of the Triangle.
+
+Example x. Triangle: Hatches
+++++++++++++++++++++++++++++
+
+.. |th1| image:: images/customised/equilateral_triangle.png
+   :width: 330
+
+===== ======
+|th1| This example shows the shape constructed using the command with the
+      various properties.
+
+      .. code:: python
+
+        Triangle(
+            cx=2, cy=2, side=2,
+            hatches_count=5,
+            hatches_stroke="red")
+        Triangle(
+            cx=2, cy=4.5, side=2,
+            stroke_width=1,
+            rotation=45,
+            dot=.05,
+            title='Title', heading='Head')
+
+      These shapes have the following properties:
+
+      - starting position - *cx* is``2`` cm
+      - default side of ``2`` cm; all sides are equal
+
+===== ======
+
+
+.. _triPerbii:
+
+Example x. Triangle: Perbii
++++++++++++++++++++++++++++
+`^ <triCustomisation_>`_
+
+"Perbis" is a shortcut name for "perpendicular bisector"; and *perbii* is the
+the plural. These lines are drawn from the *centroid* of a Triangle towards
+the mid-points of its edges.
+
+
+.. |tp1| image:: images/customised/equtri_perbii_slice.png
+   :width: 330
+
+===== ======
+|tp1| This example shows triangles constructed using these
+      commands:
+
+      .. code:: python
+
+        small_dot = dot(dot_width=4, fill="white")
+        Triangle(
+            cx=2, cy=3,
+            side=1.5,
+            perbii="s ne nw",
+            centre_shapes=[(small_dot)],
+            title="perbii",
+            fill="gold")
+
+      All examples share a common small circle, or ``Dot`` drawn at their
+      centroid.
+
+      The middle example, shows how all three *perbii* for an
+      equilateral triangle can be constructed.
+
+===== ======
+
+
+.. _triRotation:
+
+Rotation
+--------
+`^ <triCustomisation_>`_
+
+Rotation takes place in anti-clockwise direction, from the horizontal, around
+the *centroid* of the Triangle.
+
+Example x. Triangle: Rotation
++++++++++++++++++++++++++++++
+
+.. |to1| image:: images/custom/rectangle/rotation.png
+   :width: 330
+
+===== ======
+|to1| This example shows Triangles constructed using these commands:
+
+      .. code:: python
+
+        small_dot = dot(dot_width=4, fill="white")
+        Triangle(
+            cx=1, cy=1,
+            side=1.5,
+            radii="n se sw",
+            centre_shapes=[(small_dot)],
+            title="radii",
+            fill="tomato")
+
+      All examples share a common small circle, or ``Dot`` drawn at their
+      centroid.
+
+      The top example, shows how all three *radii* for an equilateral triangle
+      can be constructed.
+
+===== ======
+
+
+.. _triRadii:
+
+Radii
+-----
+`^ <triCustomisation_>`_
+
+*Radii* are the lines drawn from the *centroid* of a Triangle towards its
+vertices.
+
+Example x. Triangle: Radii
+++++++++++++++++++++++++++
+
+.. |ti1| image:: images/customised/equtri_perbii_slice.png
+   :width: 330
+
+===== ======
+|ti1| This example shows Triangles constructed using these
+      commands:
+
+      .. code:: python
+
+        small_dot = dot(dot_width=4, fill="white")
+        Triangle(
+            cx=1, cy=1,
+            side=1.5,
+            radii="n se sw",
+            centre_shapes=[(small_dot)],
+            title="radii",
+            fill="tomato")
+
+      All examples share a common small circle, or ``Dot`` drawn at their
+      centroid.
+
+      The top example, shows how all three *radii* for an equilateral triangle
+      can be constructed.
+
+===== ======
+
+
+.. _triSlices:
+
+Slices
+------
+`^ <triCustomisation_>`_
+
+*Slices* are a set of colors that are drawn as triangles inside an
+Triangle in a clockwise direction starting from the "North East" vertex.
+
+If there are fewer colors than the three possible triangles, then the colors
+are repeated, starting from the first one.
+
+The term ``None`` can be used to skip drawing of a slice i.e. the normal
+fill color of the Triangle will appear in that area.
+
+Example x. Triangle: Slices
++++++++++++++++++++++++++++
+
+.. |ts1| image:: images/customised/equtri_perbii_slice.png
+   :width: 330
+
+===== ======
+|ts1| This example shows triangles constructed using these
+      commands:
+
+      .. code:: python
+
+        small_dot = dot(dot_width=4, fill="white")
+        Triangle(
+            cx=3, cy=5,
+            side=1.5,
+            centre_shapes=[(small_dot)],
+            title="slices",
+            slices=["tomato", "gold", "lime"])
+
+      All examples share a common small circle, or ``Dot`` drawn at their
+      centroid.
+
+      The lower example, shows how all three *slices* for an
+      triangle can be supplied with different colors.
 
 ===== ======

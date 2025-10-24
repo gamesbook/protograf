@@ -44,9 +44,9 @@ The following are key properties that will often need to be set for a
 - **cards** - the number of cards appearing in the deck; it defaults
   to 9; note that other commands such as ``Data()`` and ``Matrix()`` can alter
   this value
-- **height** - the card height for a rectangular card;
+- **height** - the card height for a rectangular card
   it defaults to 8.89 cm, or 3.5", i.e. the height of a Poker playing card
-- **width** - the card width for a rectangular card;
+- **width** - the card width for a rectangular card
   it defaults to 6.35 cm, or 2.5", i.e. the width of a Poker playing card
 
 
@@ -76,12 +76,19 @@ The following are other properties that can also be set for a ``Deck``:
 - **fill** - sets the color of the card's area; defaults to ``white``
 - **frame** - the default card frame is a *rectangle* (or square, if the
   height and width match); but can be set to *hexagon* or *circle*
-- **grid_marks** - if set to ``True``, will cause small marks to be drawn at
-  the border of the page that align with the edges of the card frames
-- **grid_marks_length** - the length of the grid mark; defaults to ``0.85`` cm
+- **grid_marks** - if set to ``True``, will cause small marks to be drawn
+  so that they align with the edges of the card frames
+- **grid_marks_length** - the length of the grid marks; defaults to ``0.85`` cm
   (about one-third of an inch)
-- **grid_marks_stroke** - the color of the grid mark; defaults to ``gray``
-- **grid_marks_stroke_width** - the line width of the grid mark; defaults to 0.1
+- **grid_marks_stroke** - the color of the grid marks; defaults to ``gray``
+- **grid_marks_stroke_width** - the line width of the grid marks; defaults to
+  ``0.1``
+- **grid_marks_style** - set the location of where the grid marks are drawn;
+  the default of ``"edge"`` means they are drawn touching the border of the
+  page, whereas ``"cross"`` means they are drawn at the corner of each card's
+  frame; it can be set to ``"both"`` if edge marks **and** crosses are needed.
+  This property is only relevant for rectangular frame cards; other types
+  default to `"edge"`` only.
 - **grouping** - sets the number of cards to be drawn adjacent to each other
   before a blank space is added by the **spacing** property |dash| use
   **grouping_col** and/or **grouping_row** to set spacing specifically for the
@@ -134,7 +141,8 @@ Deck Property Examples
 - `Example 2. Card Bleed`_
 - `Example 3. Full Bleed`_
 - `Example 4. Offset`_
-- `Example 5. Grid Marks`_
+- `Example 5a. Grid Marks: Edge`_
+- `Example 5b. Grid Marks: Cross`_
 - `Example 6. Card Spacing`_
 - `Example 7. Clean Layout`_
 - `Example 8. Column Limit`_
@@ -154,10 +162,10 @@ In most cases |dash| except where otherwise shown |dash| a basic
 ``Rectangle``, with a thick rounded border, is used as the shape that is
 drawn on each card.  This purely for illustration purposes; your cards
 would have their own set of one or more shapes that you would want to
-draw on  them.
+draw on them.
 
 The ``Rectangle`` also has its *label* set to show the Card's *sequence*
-number i.e. the order in  which it is drawn (usually top-to-bottom and
+number i.e. the order in which it is drawn (usually top-to-bottom and
 left-to-right), sometimes followed by its *column* and *row* number.
 
 The part of the script for doing this is:
@@ -173,7 +181,7 @@ The part of the script for doing this is:
             label='{{sequence}}\n{{id}}')
     )
 
-In your script, the ``Deck()`` command should appear first before
+In your script, the ``Deck()`` command should appear first **before**
 any of the ``Card()`` commands.
 
 .. HINT::
@@ -312,8 +320,8 @@ Example 4. Offset
 ===== ======
 
 
-Example 5. Grid Marks
----------------------
+Example 5a. Grid Marks: Edge
+----------------------------
 `^ <property-examples_>`_
 
 .. |d05| image:: images/decks/cards_deck_05.png
@@ -360,7 +368,11 @@ Example 5. Grid Marks
 ===== ======
 
 
-.. |d0A| image:: images/decks/cards_deck_05B.png
+Example 5b. Grid Marks: Cross
+-----------------------------
+`^ <property-examples_>`_
+
+.. |d0A| image:: images/decks/cards_deck_05A.png
    :width: 330
 
 ===== ======
@@ -616,6 +628,7 @@ Example 11. Card Grouping
 
       .. code:: python
 
+        # design deck
         Deck(
             cards=60,
             width=0.65,
@@ -630,6 +643,7 @@ Example 11. Card Grouping
             grouping_rows=5,
             stroke=None,
             )
+        # design card
         Card(
             '*',
             rectangle(
@@ -668,6 +682,7 @@ Example 12. CardBack and Gutter
 
       .. code:: python
 
+        # design deck
         Deck(
             cards=4,
             height=2.1,
@@ -821,7 +836,7 @@ Example 14. Card Grid
       of lines inside of every Card's frame.  The value assigned to this
       property sets the spacing between the lines.
 
-      In this example, fill of the Rectangle is disabled by setting
+      In this example, the *fill* of the Rectangle is disabled by setting
       ``fill=None`` and so the grid is visible "through" it.
 
 ===== ======

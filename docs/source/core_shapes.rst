@@ -66,7 +66,7 @@ Shape Index
 -  `Triangle`_
 
 Overview
----------
+--------
 `↑ <table-of-contents-core_>`_
 
 Where possible, the basic examples first show how a shape would appear
@@ -1142,28 +1142,19 @@ Triangle
 ~~~~~~~~
 `↑ <shape-index_>`_
 
+.. NOTE::
+
+   There is more detail about the various properties that can be defined for
+   a Triangle in the :ref:`customised shapes' Triangle <triIndex>` section.
+
 A Triangle is a three-sided polygon.  It can have uniform sides, in which case
-it is an *equilateral* triangle; two matching sides, in which case it is an
-*isosceles* triangle; or all sides unequal, in which case it is an
-*irregular* triangle.
-
-A triangle is considered to have three *vertices* located using the
-following compass directions; ``n`` (north), ``sw`` (south-west), and ``se``
-(south-east).  Similarly, the three sides are located at ``ne`` (north-east),
-``nw`` (north-west), and ``s`` (south).
-
-A triangle has a *centroid*, or "center of mass", which is the point where
-the three lines from the vertices to the midpoints of the opposite sides
-intersect. It is used for the point around which the triangle is rotated.
-
-The starting point for drawing a triangle is the ``sw`` vertice.  The ``s``
-line is then drawn, followed by the ``ne``, and finally the ``ne``.  The
-*pivot* is the angle used to draw the ``s`` line; by default this is ``0``
-i.e. the line is drawn in the eastwards direction.
-
+it is an *equilateral* triangle |dash| the default; two matching sides, in
+which case it is an *isosceles* triangle; or all sides unequal, in which case
+it is an *irregular* triangle.
 
 Example 1. Default Triangle
 +++++++++++++++++++++++++++
+`^ <triangle-command_>`_
 
 .. |eqi| image:: images/defaults/equiangle.png
    :width: 330
@@ -1180,101 +1171,6 @@ Example 1. Default Triangle
 
       - lower-left "corner" at x-position ``1`` cm and y-position ``1`` cm
       - side - ``1`` cm i.e. all sides are equal
-
-===== ======
-
-.. _equtriHatches:
-
-Example 2. Customised Triangle: Equilateral
-+++++++++++++++++++++++++++++++++++++++++++
-
-.. |eq2| image:: images/customised/equilateral_triangle.png
-   :width: 330
-
-===== ======
-|eq2| This example shows the shape constructed using the command with the
-      various properties.
-
-      .. code:: python
-
-        Triangle(
-            cx=2, cy=2, side=2,
-            hatches_count=5,
-            hatches_stroke="red")
-        Triangle(
-            cx=2, cy=4.5, side=2,
-            stroke_width=1,
-            rotation=45,
-            dot=.05,
-            title='Title', heading='Head')
-
-      These shapes have the following properties:
-
-      - starting position - *cx* is``2`` cm
-      - default side of ``2`` cm; all sides are equal
-
-===== ======
-
-.. _equtriSlices:
-
-Example 3. Equilateral Triangle: Lines and Slices
-++++++++++++++++++++++++++++++++++++++++++++++++*
-
-*Radii* are the lines drawn from the centroid of a triangle towards its
-vertices.
-
-"Perbis" is a shortcut name for "perpendicular bisector"; and *perbii* is the
-the plural. These lines are drawn from the centroid of a triangle towards the
-mid-points of its edges.
-
-*Slices* are a set of colors that are drawn as triangles inside an
-triangle in a clockwise direction starting from the "North East".
-If there are fewer colors than the three possible triangles, then the colors
-are repeated, starting from the first one.
-
-
-.. |eq3| image:: images/customised/equtri_perbii_slice.png
-   :width: 330
-
-===== ======
-|eq3| This example shows equilateral triangles constructed using these
-      commands:
-
-      .. code:: python
-
-        small_dot = dot(dot_width=4, fill="white")
-        Triangle(
-            cx=1, cy=1,
-            side=1.5,
-            radii="n se sw",
-            centre_shapes=[(small_dot)],
-            title="radii",
-            fill="tomato")
-        Triangle(
-            cx=2, cy=3,
-            side=1.5,
-            perbii="s ne nw",
-            centre_shapes=[(small_dot)],
-            title="perbii",
-            fill="gold")
-        Triangle(
-            cx=3, cy=5,
-            side=1.5,
-            centre_shapes=[(small_dot)],
-            title="slices",
-            slices=["tomato", "gold", "lime"])
-
-      All examples share a common small circle, or ``Dot`` drawn at their
-      centroid.
-
-      The top example, shows how all three *radii* for an equilateral triangle
-      can be constructed.
-
-      The middle example, shows how all three *perbii* for an
-      equilateral triangle can be constructed.
-
-      The lower example, shows how all three *slices* for an
-      equilateral triangle can be supplied with different colors.
 
 ===== ======
 
