@@ -95,7 +95,7 @@ PageBreak()
 
 Blueprint(stroke_width=blue_width)
 Text(common=header, text="Triangle")
-lTriangle()
+Triangle()
 PageBreak()
 
 Blueprint(stroke_width=blue_width)

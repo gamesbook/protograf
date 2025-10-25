@@ -276,7 +276,7 @@ Example 3. Full Bleed
       the Card's bleed, so it's clear what its coverage is, but usually
       these colors would match.
 
-      See also `Example 5. Grid Marks`_ below.
+      See also `Example 5a. Grid Marks: Edge`_ below.
 
 ===== ======
 
