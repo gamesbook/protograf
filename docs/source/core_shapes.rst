@@ -1142,15 +1142,15 @@ Triangle
 ~~~~~~~~
 `↑ <shape-index_>`_
 
-.. NOTE::
-
-   There is more detail about the various properties that can be defined for
-   a Triangle in the :ref:`customised shapes' Triangle <triIndex>` section.
-
 A Triangle is a three-sided polygon.  It can have uniform sides, in which case
 it is an *equilateral* triangle |dash| the default; two matching sides, in
 which case it is an *isosceles* triangle; or all sides unequal, in which case
 it is an *irregular* triangle.
+
+.. NOTE::
+
+   There is more detail about the various properties that can be defined for
+   a Triangle in the :ref:`customised shapes' Triangle <triIndex>` section.
 
 Example 1. Default Triangle
 +++++++++++++++++++++++++++
@@ -1170,7 +1170,7 @@ Example 1. Default Triangle
       It has the following properties based on the defaults:
 
       - lower-left "corner" at x-position ``1`` cm and y-position ``1`` cm
-      - side - ``1`` cm i.e. all sides are equal
+      - side - ``1`` cm i.e. all sides are equal (*equilateral* triangle)
 
 ===== ======
 

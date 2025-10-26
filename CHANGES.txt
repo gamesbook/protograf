@@ -8,6 +8,7 @@ protograf Changes
 - Convert EquilateralTriangle to Triangle
 - Remove RightAngleTriangle
 - Add support for other types of Triangles
+- Extended Triangle properties
 
 2025-10-09 (0.3.2)
 -------------------

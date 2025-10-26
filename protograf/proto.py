@@ -3790,15 +3790,16 @@ def Blueprint(**kwargs):
       within each square; these are evenly spaces; use *subdivisions_dashed*
       to enhance these lines
     - style (str): set to one of: *blue*, *green* or *grey*
-    - decimals (float): set to to an integer number for the decimal points which
-      are used for the grid numbers (default is ``0``)
+    - decimals (float): set to to an integer number for the decimal points
+      which are used for the grid numbers (default is ``0``)
     - edges (str): can be set to any combination of *n*, *s*, *e*, or *w* in a
       single comma-delimited string; grid numbers will then be drawn on
       any of the edges specified
-    - edges_y (float): the number set for this determines where a horizontal line
-      of grid numbers will be drawn
-    - edges_x (float): the number set for this determines where a vertical line
-      of grid numbers will be drawn
+    - edges_y (float): the number set for this determines where a horizontal
+      line of grid numbers will be drawn
+    - edges_x (float): the number set for this determines where a vertical
+      line of grid numbers will be drawn
+    - numbering (bool): if True (default), will draw grid numbers on edges
 
     """
 

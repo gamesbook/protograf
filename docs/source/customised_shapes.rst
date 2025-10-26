@@ -3602,7 +3602,8 @@ following compass directions; ``n`` (north), ``sw`` (south-west), and ``se``
 
 A triangle has a *centroid*, or "center of mass", which is the point where
 the three lines from the vertices to the midpoints of the opposite sides
-intersect. It is used as the point around which the triangle can be *rotated*.
+intersect. It is used as the point around which all elements of triangle
+can be *rotated*.
 
 .. _triConstruction:
 
@@ -3623,6 +3624,11 @@ line, and finally the ``ne``.
 All triangles require the starting point to be set, if different from the
 default of ``1`` for both the *x* and *y* positions.
 
+A triangle's drawing can be affected by its *pivot* which is an angle used to
+alter the direction of the bottom edge |dash| the ``s`` line. By default this
+line is drawn in the eastwards direction, i.e a pivot of ``0`` |deg|, but if
+set will cause that line to be rotated anti-clockwise around the ``sw`` vertex.
+
 Equilateral triangles
 +++++++++++++++++++++
 
@@ -3631,11 +3637,12 @@ point, all that is required is the length of the *side* to be set. All sides
 share the same length.
 
 Because :doc:`protograf <index>` uses a default value of ``1`` for the *side*
-property, the Equilateral triangle is the default one that will be constructed
+property, an equilateral triangle is the default one that will be constructed
 unless more properties are set. See `Example 1. Default Triangle`_.
 
 Equilateral triangles can also be constructed using their centroid position,
-instead of the usual  *x* and *y* positions. See `Example 2. Custom Equilateral`_
+instead of the usual  *x* and *y* positions. See
+`Example 2. Custom Equilateral`_
 
 Isosceles triangles
 +++++++++++++++++++
@@ -3651,14 +3658,15 @@ Irregular triangles
 Irregular triangles are the most complex to construct. There are a number
 of options to do so.
 
-**TODO**
-
-The *pivot* is the angle used to draw the bottom edge |dash| set via the
-``side`` property  |dash| by default this is ``0`` i.e. the line is drawn
-in the eastwards direction.
+1. Set the values for *side2* and *side3*.  Their total must exceed the value
+   set for *side*.
+2. Set the values for *side2* and *angle*.  This will draw the second line,
+   of length *side2*, at the given angle relative to *side*.
+3. Set the value for *side2*. This will set the *angle* to 90 |deg| and cause
+   a *right-angled triangle* to be drawn.
 
 For illustrations of these construction options, see
-`Example 4. Custom Irregular`_.
+`Example 4a. Custom Irregular I`_ and `Example 4b. Custom Irregular II`_.
 
 
 Triangle construction examples
@@ -3701,7 +3709,8 @@ Example 2. Custom Equilateral
       .. code:: python
 
         Triangle(
-            cx=2, cy=3, side=3,
+            cx=2, cy=3,
+            side=3,
             stroke_width=1,
             fill="gold",
             title="Equilateral")
@@ -3710,6 +3719,7 @@ Example 2. Custom Equilateral
 
       - *cx* and *cy* - set the centroid position
       - *side* - ``3`` cm i.e. all sides are equal
+      - *stroke_width* - set the thickness of the Triangle's border line
       - *fill* - set the area color
       - *title* - set the text below the Triangle; note that the x-position
         is centred below the centroid
@@ -3729,7 +3739,8 @@ Example 3. Custom Isosceles
       .. code:: python
 
         Triangle(
-            x=0.5, y=5, side=3, height=4,
+            x=0.5, y=5,
+            side=3, height=4,
             stroke_width=1,
             fill="lime",
             title="Isosceles")
@@ -3739,14 +3750,15 @@ Example 3. Custom Isosceles
       - *x* and *y* - set the lower-left, or ``sw`` vertex
       - *side* - ``3`` cm for the base, or lower edge
       - *height* - set to ``4`` cm; used to calculate length of other sides
+      - *stroke_width* - set the thickness of the Triangle's border line
       - *fill* - set the area color
       - *title* - set the text below the Triangle; note that the x-position
         is centred below the centroid
 
 ===== ======
 
-Example 4. Custom Irregular
-+++++++++++++++++++++++++++
+Example 4a. Custom Irregular I
+++++++++++++++++++++++++++++++
 `^ <triConstruction_>`_
 
 .. |tc4| image:: images/custom/triangle/triangle_irregular.png
@@ -3758,7 +3770,8 @@ Example 4. Custom Irregular
       .. code:: python
 
         Triangle(
-            x=1, y=4, side=3, side2=4.5, side3=2.5,
+            x=1, y=4,
+            side=3, side2=4.5, side3=2.5,
             stroke_width=1,
             fill="tomato",
             title="Irregular")
@@ -3771,12 +3784,80 @@ Example 4. Custom Irregular
         (``ne``)
       - *side3* - ``2.5`` cm for the final edge in anti-clockwise direction
         (``nw``)
+      - *stroke_width* - set the thickness of the Triangle's border line
       - *fill* - set the area color
       - *title* - set the text below the Triangle; note that the x-position
         is centred below the centroid
 
 ===== ======
 
+Example 4b. Custom Irregular II
++++++++++++++++++++++++++++++++
+`^ <triConstruction_>`_
+
+.. |tc5| image:: images/custom/triangle/triangle_irregular_options.png
+   :width: 330
+
+===== ======
+|tc5| This example shows the Triangle constructed using the command as follows:
+
+      .. code:: python
+
+        Triangle(
+            x=0, y=2,
+            side=1.5, side2=1.75, side3=2.55,
+            stroke_width=0.5,
+            dot=0.06,
+            title="3xsides",
+            title_size=7)
+        Triangle(
+            x=2, y=2,
+            side=1.5, side2=1.75, side3=2.55,
+            pivot=30,
+            stroke_width=0.5,
+            dot=0.06,
+            title="pivot:30",
+            title_size=7)
+
+        Triangle(
+            x=0, y=4,
+            side=1.5, side2=1.75, angle=115,
+            stroke_width=0.5,
+            dot=0.06,
+            title="2xsides; 115",
+            title_size=7)
+        Triangle(
+            x=2, y=4,
+            side=2, side2=1.5,
+            stroke_width=0.5,
+            dot=0.06,
+            title="2xsides; rightangle",
+            title_size=7)
+
+        Triangle(
+            x=0, y=6,
+            side=1.5, side2=1.5, side3=1.5,
+            pivot=30,
+            stroke_width=0.5,
+            dot=0.06,
+            title="equi; pivot:45",
+            title_size=7)
+        Triangle(
+            x=3.5, y=6,
+            side=1.25, side2=1.75, side3=1.75,
+            pivot=90,
+            stroke_width=0.5,
+            dot=0.06,
+            title="iso; pivot:90",
+            title_size=7)
+
+      These examples illustrate the various construction techniques.
+
+      The lower two examples show how the other types of triangles can
+      also be constructed via setting the appropriate properties of an
+      irregular triangle.
+
+===== ======
 
 .. _triCustomisation:
 
@@ -3792,6 +3873,7 @@ There are a number of ways that a Triangle can be customised.
 - `Radii <triRadii_>`_
 - `Rotation <triRotation_>`_
 - `Slices <triSlices_>`_
+- `Pivot <triPivot_>`_
 
 
 .. _triCross:
@@ -3839,13 +3921,13 @@ Example 5. Triangle: Cross & Dot
             title="Irregular")
 
       The top example shows a dot, superimposed with a red cross, at the
-      centroid position of a equilateral Triangle.
+      centroid position of an equilateral Triangle.
 
       The middle example shows a dot, superimposed with a red cross, at the
-      centroid position of a isosceles Triangle.
+      centroid position of an isosceles Triangle.
 
       The lower example shows a dot, superimposed with a red cross, at the
-      centroid position of a irregular Triangle.
+      centroid position of an irregular Triangle.
 
 ===== ======
 
@@ -3924,25 +4006,25 @@ Example 7. Triangle: Perbii
 
       .. code:: python
 
-        small_dot = dot(dot_width=4, fill="white")
+        a_dot = dot(dot_width=4, fill="white")
         Triangle(
             cx=2, cy=3,
             side=1.5,
             perbii="s ne nw",
-            centre_shapes=[(small_dot)],
+            centre_shapes=[(a_dot)],
             title="perbii",
             fill="gold")
 
       All examples share a common small circle, or ``Dot`` drawn at their
       centroid via the *centre_shapes* property.
 
-      The top example shows perbii constructed in all directions for a
+      The top example shows perbii constructed in all directions for an
       equilateral Triangle.
 
-      The middle example shows perbii constructed in all directions for a
+      The middle example shows perbii constructed in all directions for an
       isosceles Triangle.
 
-      The lower example shows perbii constructed in all directions for a
+      The lower example shows perbii constructed in all directions for an
       irregular Triangle.
 
 ===== ======
@@ -3989,13 +4071,13 @@ Example 8. Triangle: Rotation
             dot=.05,
             title="Irregular")
 
-      The top example shows rotation of 45 |deg| anti-clockwise for a
+      The top example shows rotation of 45 |deg| anti-clockwise for an
       equilateral Triangle.
 
-      The middle example shows rotation of 45 |deg| anti-clockwise for a
+      The middle example shows rotation of 45 |deg| anti-clockwise for an
       isosceles Triangle.
 
-      The lower example shows rotation of 45 |deg| anti-clockwise for a
+      The lower example shows rotation of 45 |deg| anti-clockwise for an
       irregular Triangle.
 
 ===== ======
@@ -4022,38 +4104,38 @@ Example 9. Triangle: Radii
 
       .. code:: python
 
-        small_dot = dot(dot_width=4, fill="white")
+        a_dot = dot(dot_width=4, fill="white")
         Triangle(
             x=1, y=2, side=2,
             stroke_width=1,
             radii="n se sw",
-            centre_shapes=[(small_dot)],
+            centre_shapes=[(a_dot)],
             title="Equilateral")
         Triangle(
             x=1, y=4,
             side=2, height=1.25,
             stroke_width=1,
             radii="n se sw",
-            centre_shapes=[(small_dot)],
+            centre_shapes=[(a_dot)],
             title="Isosceles")
         Triangle(
             x=1.25, y=5.5,
             side=2, side2=2.5, side3=1.25,
             stroke_width=1,
             radii="n se sw",
-            centre_shapes=[(small_dot)],
+            centre_shapes=[(a_dot)],
             title="Irregular")
 
       All examples share a common small circle, or ``Dot`` drawn at their
       centroid via the *centre_shapes* property.
 
-      The top example shows radii constructed in all directions for a
+      The top example shows radii constructed in all directions for an
       equilateral Triangle.
 
-      The middle example shows radii constructed in all directions for a
+      The middle example shows radii constructed in all directions for an
       isosceles Triangle.
 
-      The lower example shows radii constructed in all directions for a
+      The lower example shows radii constructed in all directions for an
       irregular Triangle.
 
 ===== ======
@@ -4087,41 +4169,106 @@ Example 10. Triangle: Slices
 
       .. code:: python
 
-        small_dot = dot(dot_width=4, fill="white")
+        a_dot = dot(dot_width=4, fill="white")
         Triangle(
             x=1, y=2, side=2,
             stroke_width=1,
             slices=["tomato", "gold", "lime"],
-            centre_shapes=[(small_dot)],
+            centre_shapes=[(a_dot)],
             title="Equilateral")
         Triangle(
             x=1, y=4,
             side=2, height=1.25,
             stroke_width=1,
             slices=["tomato", "gold", "lime"],
-            centre_shapes=[(small_dot)],
+            centre_shapes=[(a_dot)],
             title="Isosceles")
         Triangle(
             x=1.25, y=5.5,
             side=2, side2=2.5, side3=1.25,
             stroke_width=1,
             slices=["tomato", "gold", "lime"],
-            centre_shapes=[(small_dot)],
+            centre_shapes=[(a_dot)],
             title="Irregular")
 
       All examples share a common small circle, or ``Dot`` drawn at their
       centroid via the *centre_shapes* property.
 
-      The top example shows slices constructed in three different colors for a
-      equilateral Triangle.
+      The top example shows slices constructed in three different colors for
+      an equilateral Triangle.
 
       The middle example shows slices constructed in three different colors
-      for a isosceles Triangle.
+      for an isosceles Triangle.
 
       The lower example shows slices constructed in three different colors for
-      a irregular Triangle.
+      an irregular Triangle.
 
 ===== ======
+
+
+.. _triPivot:
+
+Pivot
+------
+`^ <triCustomisation_>`_
+
+A *pivot*  is the number of degrees, in an anti-clockwise direction from
+the east, by which a Triangle is rotated around its "south-west" (``sw``)
+vertex.
+
+.. NOTE::
+
+    This type of rotation does **not** affect the drawing of the text or
+    cross for the Triangle; for this to change direction, the Triangle must
+    be rotated.
+
+Example 11. Triangle: Pivot
+++++++++++++++++++++++++++++
+
+.. |tv1| image:: images/custom/triangle/triangle_pivot.png
+   :width: 330
+
+===== ======
+|tv1| This example shows triangles constructed using these
+      commands:
+
+      .. code:: python
+
+        Triangle(
+            x=1, y=2, side=2,
+            stroke_width=1,
+            pivot=30,
+            dot=.05,
+            title="Equilateral")
+        Triangle(
+            x=1, y=4,
+            side=2, height=1.25,
+            stroke_width=1,
+            pivot=30,
+            dot=.05,
+            title="Isosceles")
+        Triangle(
+            x=1.25, y=5.5,
+            side=2, side2=2.5, side3=1.25,
+            stroke_width=1,
+            pivot=30,
+            dot=.05,
+            title="Irregular")
+
+      All examples share a common small circle, drawn at their
+      centroid via the *dot* property.
+
+      The top example shows a pivot of 30 |deg| around the south-west vertex
+      for an equilateral Triangle.
+
+      The middle example shows a pivot of 30 |deg| around the south-west vertex
+      for an isosceles Triangle.
+
+      The lower example shows a pivot of 30 |deg| around the south-west vertex
+      for an irregular Triangle.
+
+===== ======
+
 
 .. _triOrder:
 

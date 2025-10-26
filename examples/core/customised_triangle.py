@@ -20,7 +20,7 @@ Create(filename="customised_triangle.pdf",
 Footer(draw=False)
 
 txt = Common(x=0, y=0, font_size=8, align="left")
-small_dot = dot(dot_width=4, fill="white")
+a_dot = dot(dot_width=4, fill="white")
 
 Text(common=txt, text="Triangle START...")
 PageBreak()
@@ -113,6 +113,7 @@ Triangle(
     stroke_width=1,
     rotation=45,
     dot=.05,
+    heading="Up",
     title="Equilateral")
 Triangle(
     x=1, y=4,
@@ -120,6 +121,7 @@ Triangle(
     stroke_width=1,
     rotation=45,
     dot=.05,
+    heading="Up",
     title="Isosceles")
 Triangle(
     x=1.25, y=5.5,
@@ -127,6 +129,7 @@ Triangle(
     stroke_width=1,
     rotation=45,
     dot=.05,
+    heading="Up",
     title="Irregular")
 PageBreak()
 
@@ -137,21 +140,21 @@ Triangle(
     x=1, y=2, side=2,
     stroke_width=1,
     radii="n se sw",
-    centre_shapes=[(small_dot)],
+    centre_shapes=[(a_dot)],
     title="Equilateral")
 Triangle(
     x=1, y=4,
     side=2, height=1.25,
     stroke_width=1,
     radii="n se sw",
-    centre_shapes=[(small_dot)],
+    centre_shapes=[(a_dot)],
     title="Isosceles")
 Triangle(
     x=1.25, y=5.5,
     side=2, side2=2.5, side3=1.25,
     stroke_width=1,
     radii="n se sw",
-    centre_shapes=[(small_dot)],
+    centre_shapes=[(a_dot)],
     title="Irregular")
 PageBreak()
 
@@ -162,21 +165,21 @@ Triangle(
     x=1, y=2, side=2,
     stroke_width=1,
     perbii="s ne nw",
-    centre_shapes=[(small_dot)],
+    centre_shapes=[(a_dot)],
     title="Equilateral")
 Triangle(
     x=1, y=4,
     side=2, height=1.25,
     stroke_width=1,
     perbii="s ne nw",
-    centre_shapes=[(small_dot)],
+    centre_shapes=[(a_dot)],
     title="Isosceles")
 Triangle(
     x=1.25, y=5.5,
     side=2, side2=2.5, side3=1.25,
     stroke_width=1,
     perbii="s ne nw",
-    centre_shapes=[(small_dot)],
+    centre_shapes=[(a_dot)],
     title="Irregular")
 PageBreak()
 
@@ -187,62 +190,99 @@ Triangle(
     x=1, y=2, side=2,
     stroke_width=1,
     slices=["tomato", "gold", "lime"],
-    centre_shapes=[(small_dot)],
+    centre_shapes=[(a_dot)],
     title="Equilateral")
 Triangle(
     x=1, y=4,
     side=2, height=1.25,
     stroke_width=1,
     slices=["tomato", "gold", "lime"],
-    centre_shapes=[(small_dot)],
+    centre_shapes=[(a_dot)],
     title="Isosceles")
 Triangle(
     x=1.25, y=5.5,
     side=2, side2=2.5, side3=1.25,
     stroke_width=1,
     slices=["tomato", "gold", "lime"],
-    centre_shapes=[(small_dot)],
+    centre_shapes=[(a_dot)],
+    title="Irregular")
+PageBreak()
+
+# ---- triangle - pivot
+Blueprint()
+Text(common=txt, text="Triangle: pivot")
+Triangle(
+    x=1, y=2, side=2,
+    stroke_width=1,
+    pivot=30,
+    dot=.05,
+    title="Equilateral")
+Triangle(
+    x=1, y=4,
+    side=2, height=1.25,
+    stroke_width=1,
+    pivot=30,
+    dot=.05,
+    title="Isosceles")
+Triangle(
+    x=1.25, y=5.5,
+    side=2, side2=2.5, side3=1.25,
+    stroke_width=1,
+    pivot=30,
+    dot=.05,
     title="Irregular")
 PageBreak()
 
 # ---- triangle - irregular - options
-Blueprint()
+Blueprint(numbering=False)
 Text(common=txt, text="Triangle: irregular")
 
 Triangle(
-    x=0, y=2, side=1.5, side2=1.75, side3=2.55,
+    x=0, y=2,
+    side=1.5, side2=1.75, side3=2.55,
     stroke_width=0.5,
+    dot=0.06,
     title="3xsides",
     title_size=7)
 Triangle(
-    x=2, y=2, side=1.5, side2=1.75, side3=2.55,
+    x=2, y=2,
+    side=1.5, side2=1.75, side3=2.55,
     pivot=30,
     stroke_width=0.5,
+    dot=0.06,
     title="pivot:30",
     title_size=7)
 
 Triangle(
-    x=0, y=4, side=1.5, side2=1.75, angle=115,
+    x=0, y=4,
+    side=1.5, side2=1.75, angle=115,
     stroke_width=0.5,
-    title="2xsides; angle",
+    dot=0.06,
+    title="2xsides; 115",
     title_size=7)
 Triangle(
-    x=2, y=4, side=2, side2=1.5, angle=90,
+    x=2, y=4,
+    side=2, side2=1.5,  # angle will be 90!
     stroke_width=0.5,
+    dot=0.06,
     title="2xsides; rightangle",
     title_size=7)
 
 Triangle(
-    x=0, y=6, side=1.5, side2=1.5, side3=1.5,
-    pivot=45,
+    x=0, y=6,
+    side=1.5, side2=1.5, side3=1.5,
+    pivot=30,
     stroke_width=0.5,
-    title="equi;pivot:45",
+    dot=0.06,
+    title="equi; pivot:45",
     title_size=7)
 Triangle(
-    x=2, y=6, side=1.5, side2=2, angle=30,
-    pivot=45,
+    x=3.5, y=6,
+    side=1.25, side2=1.75, side3=1.75,
+    pivot=90,
     stroke_width=0.5,
-    title="iso;pivot:45",
+    dot=0.06,
+    title="iso; pivot:90",
     title_size=7)
 
 PageBreak()
@@ -266,6 +306,7 @@ Save(
         "triangle_radii",
         "triangle_perbii",
         "triangle_slices",
+        "triangle_pivot",
         "triangle_irregular_options",
         None,
         ])

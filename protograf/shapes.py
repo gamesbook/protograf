@@ -2833,8 +2833,12 @@ class TriangleShape(BaseShape):
             self.triangle_type = TriangleType.ISOSCELES
         if self.kwargs.get("side") and kwargs.get("side2") and kwargs.get("side3"):
             self.triangle_type = TriangleType.IRREGULAR
-        if self.kwargs.get("side") and kwargs.get("side2") and kwargs.get("angle"):
+            if self.side2 + self.side3 < self.side:
+                feedback(f"The total length of the second and third sides must exceed the first!", True)
+        if self.kwargs.get("side") and kwargs.get("side2"):
             self.triangle_type = TriangleType.IRREGULAR
+            if not kwargs.get("side3"):
+                self.angle = kwargs.get("angle", 90)  # default is RA triangle
         if not self.triangle_type:
             if self.side:
                 self.triangle_type = TriangleType.EQUILATERAL
@@ -2923,7 +2927,7 @@ class TriangleShape(BaseShape):
         Returns:
             dict of Perbis objects keyed on direction
         """
-        directions = ["nw", "s", "ne"]
+        directions = ["nw", "s", "ne"]  # edge directions
         perbii_dict = {}
         vertices = self.get_vertexes(rotation=rotation)
         vcount = len(vertices) - 1
@@ -2963,7 +2967,7 @@ class TriangleShape(BaseShape):
         Returns:
             dict of Radius objects keyed on direction
         """
-        directions = ["sw", "se", "n"]
+        directions = ["n", "sw", "se"]
         radii_dict = {}
         # print(f*** TRIANGLE radii {centre=} {vertices=}")
         for key, vertex in enumerate(vertices):
@@ -3012,7 +3016,7 @@ class TriangleShape(BaseShape):
             ptSE = Point(x + self._u.side, y)
             if self.angle:
                 ptN = geoms.point_from_angle(
-                    ptSE, self.unit(self.side2), 180 + math.degrees(self.angle)
+                    ptSE, self.unit(self.side2), 180 + self.angle
                 )
             elif self.side3:
                 b, a, c = self._u.side, self.unit(self.side2), self.unit(self.side3)
@@ -3020,6 +3024,10 @@ class TriangleShape(BaseShape):
                 angle_a = math.acos(x)
                 # print(f"{math.degrees(angle_a)}")
                 ptN = geoms.point_from_angle(ptSE, a, 180 + math.degrees(angle_a))
+
+        if self.pivot:
+            ptSE = geoms.rotate_point_around_point(ptSE, ptSW, self.pivot)
+            ptN = geoms.rotate_point_around_point(ptN, ptSW, self.pivot)
 
         vertices = [ptN, ptSW, ptSE]
         return vertices
@@ -3366,16 +3374,17 @@ class TriangleShape(BaseShape):
             if item == "text":
                 # ---- * text
                 if self.triangle_type == TriangleType.EQUILATERAL:
-                    heading_y = self.centroid.y - self.height * 2.0 / 3.0
-                    title_y = self.centroid.y + self.height / 3.0
+                    heading_y = self.vertexes[0].y  # self.centroid.y - self.height * 2.0 / 3.0
+                    # title_y = self.centroid.y + self.height / 3.0  # fails for pivot
+                    title_y = self._u.y + self._o.delta_y
                 elif self.triangle_type == TriangleType.ISOSCELES:
-                    heading_y = self._u.y + self._o.delta_y - self._u.height
+                    heading_y = self.vertexes[0].y  # self._u.y + self._o.delta_y - self._u.height
                     title_y = self._u.y + self._o.delta_y
                 elif self.triangle_type == TriangleType.IRREGULAR:
                     area = self.calculate_area(self.vertexes, rotation)
                     ht = 2 * area / self._u.side
                     # print(f'IRR {area=} {ht=} {self._u.y=}')
-                    heading_y = self._u.y + self._o.delta_y - ht
+                    heading_y = self.vertexes[0].y  # self._u.y + self._o.delta_y - ht
                     title_y = self._u.y + self._o.delta_y
                 self.draw_heading(cnv, ID, self.centroid.x, heading_y, **kwargs)
                 self.draw_label(cnv, ID, self.centroid.x, self.centroid.y, **kwargs)
