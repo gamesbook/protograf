@@ -499,17 +499,19 @@ PageBreak()
 Blueprint(stroke_width=0.5)
 Text(common=txt, text="Polyshape: custom")
 Polyshape(
-      points=[(1, 2), (1, 1), (2, 0), (3, 1), (3, 2)],
-      cx=2, cy=1,
-      label='A House',
-      label_stroke="seagreen",
-      cross=0.5,
-      fill="sandybrown",
-      stroke="peru",
+    x=0, y=1,
+    points=[(1, 2), (1, 1), (2, 0), (3, 1), (3, 2)],
+    cx=2, cy=1,
+    label='A House',
+    label_stroke="seagreen",
+    cross=0.5,
+    fill="sandybrown",
+    stroke="peru",
 )
-Polyshape(x=1, y=3,
-         steps='0.5,0 0,1.5 1.5,0 0,-1.5 0.5,0 0,0.5 -2.5,0 0,-0.5',
-         stroke="sandybrown", stroke_width=3, fill="seagreen")
+Polyshape(
+    x=1, y=4,
+    steps='0.5,0 0,1.5 1.5,0 0,-1.5 0.5,0 0,0.5 -2.5,0 0,-0.5',
+    stroke="sandybrown", stroke_width=3, fill="seagreen")
 PageBreak()
 
 # ---- shapeshape - offset + string

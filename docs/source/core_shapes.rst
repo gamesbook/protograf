@@ -1615,6 +1615,7 @@ the **relative** distance from the last point drawn.
       .. code:: python
 
         Polyshape(
+            x=0, y=1,
             points=[(1, 2), (1, 1), (2, 0), (3, 1), (3, 2)],
             cx=2, cy=1,
             label='A House',
@@ -1625,9 +1626,14 @@ the **relative** distance from the last point drawn.
         )
 
       As in Example 1, the *points* are used to construct the outline of the
-      "house" shape. Other properties:
+      "house" shape.
 
-      - the centre is *defined* to be at x-position ``2`` cm and y-position
+      Other properties include:
+
+      - *x* and *y* are used to provide offsets for the start; in this case
+        ``1`` is added to the start of the y-position, and for each value
+        thereafter
+0      - the centre is *defined* to be at x-position ``2`` cm and y-position
         ``1`` cm
       - *cross* - sets the length of each of the two lines that cross at the
         centre to be ``0.5`` cm
@@ -1645,7 +1651,7 @@ the **relative** distance from the last point drawn.
       .. code:: python
 
         Polyshape(
-          x=1, y=3,
+          x=1, y=4,
           steps='0.5,0 0,1.5 1.5,0 0,-1.5 0.5,0 0,0.5 -2.5,0 0,-0.5',
           stroke="sandybrown",
           stroke_width=3,

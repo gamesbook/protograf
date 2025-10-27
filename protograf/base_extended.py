@@ -265,16 +265,16 @@ class BasePolyShape(BaseShape):
             # start here...
             vertices.append(
                 Point(
-                    self.unit(self.x) + self.unit(offset_x) + self._o.delta_x,
-                    self.unit(self.y) + self.unit(offset_y) + self._o.delta_y,
+                    self.unit(self.x) + self._o.delta_x,
+                    self.unit(self.y) + self._o.delta_y,
                 )
             )
             if len(steps) > 0:
                 for index, stp in enumerate(steps):
                     vertices.append(
                         Point(
-                            vertices[index].x + self.unit(stp[0]),
-                            vertices[index].y + self.unit(stp[1]),
+                            vertices[index].x  + self.unit(stp[0]),
+                            vertices[index].y  + self.unit(stp[1]),
                         )
                     )
                 return vertices
