@@ -2056,10 +2056,12 @@ Hexagon
 =======
 `↑ <table-of-contents-custom_>`_
 
-A Hexaggo
+A Hexagon is a regular, six-sided, polygon whose sides are all equal.
 
 A key property for a Hexagon is its *orientation*; this can either be *flat*,
-which is the default, or *pointy*.
+which is the default, with two opposing sides parallel to the top and bottom
+edges of the page or card, or *pointy* with two opposing sides parallel to
+the left and right edges of the page or card.
 
 The examples below show how each orientation of a Hexagon can be customised
 in a similar way.

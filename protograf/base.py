@@ -128,6 +128,7 @@ class BaseCanvas:
         # ---- general
         self.shape = None
         self.shape_id = None
+        self.common = None
         self.sequence = self.defaults.get("sequence", [])
         self.dataset = []
         self.members = []  # card IDs, of which current card is a member
@@ -165,7 +166,7 @@ class BaseCanvas:
         # ---- sizes and positions
         self.row = self.defaults.get("row", None)
         self.col = self.defaults.get("col", self.defaults.get("column", None))
-        self.side = self.defaults.get("side", 1.0)  # equal length sides
+        self.side = self.defaults.get("side", 1.0)  # square,rhombus,tri
         self.height = self.defaults.get("height", 1.0)
         self.width = self.defaults.get("width", 1.0)
         self.thickness = self.defaults.get("thickness", None)  # cross
@@ -633,7 +634,7 @@ class BaseCanvas:
         self.enclosure = None
         self.colors = ["white"]
         self.sizes = [self.defaults.get("stroke_width", WIDTH)]
-        self.density = self.defaults.get("density", 10)
+        self.density = self.defaults.get("density", 10.0)
         self.star_pattern = "random"
         self.seeding = self.defaults.get("seeding", None)
         # ---- dice / domino
@@ -678,6 +679,12 @@ class BaseShape:
 
     def __init__(self, _object: muShape = None, canvas: BaseCanvas = None, **kwargs):
         self.kwargs = kwargs
+        # inject and overwrite Shape's own kwargs with those set by CommonShape
+        try:
+            if kwargs.get("common"):
+                self.kwargs = kwargs | kwargs["common"]._common_kwargs
+        except AttributeError:
+            pass  # ignore, for example, CommonShape
         # feedback(f'### BaseShape {_object=} {canvas=} {kwargs=}')
         # ---- constants
         self.default_length = 1
@@ -747,7 +754,7 @@ class BaseShape:
         # ---- sizes and positions
         self.row = kwargs.get("row", base.row)
         self.col = self.kw_int(kwargs.get("col", kwargs.get("column", base.col)), "col")
-        self.side = self.kw_float(kwargs.get("side", base.side))  # equal length sides
+        self.side = self.kw_float(kwargs.get("side", base.side))
         self.height = self.kw_float(kwargs.get("height", base.height))  # was self.side
         self.width = self.kw_float(kwargs.get("width", base.width))  # was self.side
         self.thickness = kwargs.get("thickness", base.thickness)  # cross
@@ -777,7 +784,7 @@ class BaseShape:
             kwargs.get("rotation", kwargs.get("rotation", base.rotation))
         )  # degrees anti-clockwise for text
         self.rotation_point = kwargs.get("rotation_point", None)
-        self._rotation_theta = math.radians(self.rotation or 0)  # radians
+        self._rotation_theta = math.radians(self.rotation or 0.0)  # radians
         self.direction = kwargs.get("direction", base.direction)
         self.position = kwargs.get("position", base.position)
         self.elevation = kwargs.get("elevation", base.elevation)
@@ -1400,7 +1407,7 @@ class BaseShape:
             self.unit(self.offset_y) if self.offset_y is not None else None,
         )
 
-    def set_offset_props(self, off_x=0, off_y=0):
+    def set_offset_props(self, off_x=0.0, off_y=0.0):
         """OffsetProperties in point units for a Shape."""
         margin_left = (
             self.unit(self.margin_left) if self.margin_left is not None else self.margin

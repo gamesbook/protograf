@@ -144,7 +144,6 @@ class ArcShape(BaseShape):
 
     def __init__(self, _object=None, canvas=None, **kwargs):
         super(ArcShape, self).__init__(_object=_object, canvas=canvas, **kwargs)
-        self.kwargs = kwargs
         # ---- perform overrides
         self.radius = self.radius or self.diameter / 2.0
         if self.cx is None and self.x is None:
@@ -246,7 +245,6 @@ class ArrowShape(BaseShape):
 
     def __init__(self, _object=None, canvas=None, **kwargs):
         super(ArrowShape, self).__init__(_object=_object, canvas=canvas, **kwargs)
-        self.kwargs = kwargs
         # ---- unit calcs
         self.points_offset_u = (
             self.unit(self.points_offset) if self.points_offset else 0
@@ -432,7 +430,6 @@ class CrossShape(BaseShape):
 
     def __init__(self, _object=None, canvas=None, **kwargs):
         super(CrossShape, self).__init__(_object=_object, canvas=canvas, **kwargs)
-        self.kwargs = kwargs
         # ---- unit calcs
         if self.arm_fraction > 1 or self.arm_fraction < 0:
             feedback(
@@ -537,7 +534,6 @@ class DotShape(BaseShape):
 
     def __init__(self, _object=None, canvas=None, **kwargs):
         super(DotShape, self).__init__(_object=_object, canvas=canvas, **kwargs)
-        self.kwargs = kwargs
         # ---- perform overrides
         self.point_size = self.dot_width / 2.0  # diameter is 3 points ~ 1mm or 1/32"
         self.radius = self.points_to_value(self.point_size, globals.units)
@@ -1419,6 +1415,25 @@ class RhombusShape(BaseShape):
     Rhombus on a given canvas.
     """
 
+    def __init__(self, _object=None, canvas=None, **kwargs):
+        super(RhombusShape, self).__init__(_object=_object, canvas=canvas, **kwargs)
+        # feedback(f'*** RHMBS {self.kwargs=}')
+        if self.kwargs.get("side") and (
+            self.kwargs.get("height") or self.kwargs.get("width")
+        ):
+            feedback("Set either side OR height and width for a Rhombus")
+        if (
+            self.kwargs.get("side")
+            and not self.kwargs.get("height")
+            and not self.kwargs.get("width")
+        ):
+            radii = math.sqrt(self.side**2 / 2.0)
+            self.height, self.width = 2.0 * radii, 2.0 * radii
+        elif self.kwargs.get("height") and self.kwargs.get("width"):
+            self.side = math.sqrt((self.height / 2.0) ** 2 + (self.width / 2.0) ** 2)
+        # ---- RESET UNIT PROPS (last!)
+        self.set_unit_properties()
+
     def get_vertexes(self, **kwargs):
         """Calculate vertices of rhombus."""
         x, y = kwargs.get("x"), kwargs.get("y")
@@ -1894,7 +1909,6 @@ class SectorShape(BaseShape):
 
     def __init__(self, _object=None, canvas=None, **kwargs):
         super(SectorShape, self).__init__(_object=_object, canvas=canvas, **kwargs)
-        self.kwargs = kwargs
         # ---- perform overrides
         self.radius = self.radius or self.diameter / 2.0
         if self.cx is None and self.x is None:
@@ -1906,7 +1920,7 @@ class SectorShape(BaseShape):
             self.y = self.cy - self.radius
         # feedback(f'***Sector {self.cx=} {self.cy=} {self.x=} {self.y=}')
         # ---- calculate centre
-        radius = self._u.radius
+        radius = self.unit(self.radius)  # changed above?
         if self.row is not None and self.col is not None:
             self.x_c = self.col * 2.0 * radius + radius
             self.y_c = self.row * 2.0 * radius + radius
@@ -1921,7 +1935,6 @@ class SectorShape(BaseShape):
 
     def draw(self, cnv=None, off_x=0, off_y=0, ID=None, **kwargs):
         """Draw sector on a given canvas."""
-        kwargs = self.kwargs | kwargs
         cnv = cnv if cnv else globals.canvas  # a new Page/Shape may now exist
         super().draw(cnv, off_x, off_y, ID, **kwargs)  # unit-based props
         if self.use_abs_c:
@@ -1930,7 +1943,7 @@ class SectorShape(BaseShape):
         # ---- centre point in units
         p_C = Point(self.x_c + self._o.delta_x, self.y_c + self._o.delta_y)
         # ---- circumference point in units
-        p_P = geoms.point_on_circle(p_C, self._u.radius, self.angle_start)
+        p_P = geoms.point_on_circle(p_C, self.unit(self.radius), self.angle_start)
         # ---- draw sector
         # feedback(
         #     f'***Sector: {p_P=} {p_C=} {self.angle_start=} {self.angle_width=}')
@@ -1949,8 +1962,8 @@ class ShapeShape(BasePolyShape):
     def __init__(self, _object=None, canvas=None, **kwargs):
         super(ShapeShape, self).__init__(_object=_object, canvas=canvas, **kwargs)
         # overrides
-        self.x = kwargs.get("x", kwargs.get("left", 0))
-        self.y = kwargs.get("y", kwargs.get("bottom", 0))
+        self.x = kwargs.get("x", kwargs.get("left", 0.0))
+        self.y = kwargs.get("y", kwargs.get("bottom", 0.0))
         self.scaling = tools.as_float(kwargs.get("scaling", 1.0), "scaling")
 
     def draw(self, cnv=None, off_x=0, off_y=0, ID=None, **kwargs):
@@ -1959,13 +1972,13 @@ class ShapeShape(BasePolyShape):
         cnv = cnv if cnv else globals.canvas  # a new Page/Shape may now exist
         # ---- set canvas
         self.set_canvas_props(index=ID)
-        x_offset, y_offset = self.unit(self.x or 0), self.unit(self.y or 0)
-        # ---- set vertices
-        self.vertexes = self.get_vertexes()
+        x_offset, y_offset = self.unit(self.x or 0.0), self.unit(self.y or 0.0)
+        # ---- set vertices for point-based draw
+        self.vertexes = self.get_vertexes(self.x or 0.0, self.y or 0.0)
         # ---- set line style
         lkwargs = {}
         lkwargs["wave_style"] = self.kwargs.get("wave_style", None)
-        lkwargs["wave_height"] = self.kwargs.get("wave_height", 0)
+        lkwargs["wave_height"] = self.kwargs.get("wave_height", 0.0)
         # ---- draw polyshape by vertices
         # feedback(f'***PolyShape{x=} {y=} {self.vertexes=}')
         if self.vertexes:
@@ -1976,7 +1989,6 @@ class ShapeShape(BasePolyShape):
                     )
                 else:
                     draw_line(cnv, vertex, self.vertexes[0], shape=self, **lkwargs)
-            # cnv.draw_polyline(self.vertexes)
             kwargs["closed"] = True
             if kwargs.get("rounded"):
                 kwargs["lineJoin"] = 1
@@ -2006,16 +2018,17 @@ class SquareShape(RectangleShape):
     def __init__(self, _object=None, canvas=None, **kwargs):
         super(SquareShape, self).__init__(_object=_object, canvas=canvas, **kwargs)
         # overrides to make a "square rectangle"
-        if kwargs.get("side") and not kwargs.get("width"):
+        # feedback(f'*** SQUARE {self.kwargs=}')
+        if self.kwargs.get("side") and not self.kwargs.get("width"):
             self.width = self.side  # square
-        if kwargs.get("side") and not kwargs.get("height"):
+        if self.kwargs.get("side") and not self.kwargs.get("height"):
             self.height = self.side  # square
-        if kwargs.get("width") and not kwargs.get("side"):
+        if self.kwargs.get("width") and not self.kwargs.get("side"):
             self.side = self.width
-        if kwargs.get("height") and not kwargs.get("side"):
+        if self.kwargs.get("height") and not self.kwargs.get("side"):
             self.side = self.height
+        # ---- RESET UNIT PROPS (last!)
         self.set_unit_properties()
-        self.kwargs = kwargs
 
     def calculate_area(self) -> float:
         return self._u.width * self._u.height
@@ -2041,13 +2054,27 @@ class StadiumShape(BaseShape):
 
     def __init__(self, _object=None, canvas=None, **kwargs):
         super(StadiumShape, self).__init__(_object=_object, canvas=canvas, **kwargs)
-        self.kwargs = kwargs
+        # check dimensions
+        if self.kwargs.get("side") and (
+            self.kwargs.get("height") or self.kwargs.get("width")
+        ):
+            feedback("Set either side OR height and width for a Stadium")
+        if (
+            self.kwargs.get("side")
+            and not self.kwargs.get("height")
+            and not self.kwargs.get("width")
+        ):
+            radii = math.sqrt(self.side**2 / 2.0)
+            self.height, self.width = 2.0 * radii, 2.0 * radii
+        elif self.kwargs.get("height") and self.kwargs.get("width"):
+            self.side = math.sqrt((self.height / 2.0) ** 2 + (self.width / 2.0) ** 2)
         # overrides to centre shape
         if self.cx is not None and self.cy is not None:
             self.x = self.cx - self.width / 2.0
             self.y = self.cy - self.height / 2.0
             # feedback(f"*** STADIUM OldX:{x} OldY:{y} NewX:{self.x} NewY:{self.y}")
-        self.kwargs = kwargs
+        # ---- RESET UNIT PROPS (last!)
+        self.set_unit_properties()
 
     def draw(self, cnv=None, off_x=0, off_y=0, ID=None, **kwargs):
         """Draw a stadium on a given canvas."""
@@ -2476,7 +2503,6 @@ class TextShape(BaseShape):
 
     def __init__(self, _object=None, canvas=None, **kwargs):
         super(TextShape, self).__init__(_object=_object, canvas=canvas, **kwargs)
-        self.kwargs = kwargs
 
     def __call__(self, *args, **kwargs):
         """do something when I'm called"""
@@ -2679,7 +2705,6 @@ class TrapezoidShape(BaseShape):
     def __init__(self, _object=None, canvas=None, **kwargs):
         """."""
         super(TrapezoidShape, self).__init__(_object=_object, canvas=canvas, **kwargs)
-        self.kwargs = kwargs
         if self.top >= self.width:
             feedback("The top cannot be longer than the width!", True)
         self.delta_width = self._u.width - self._u.top
@@ -2687,7 +2712,6 @@ class TrapezoidShape(BaseShape):
         if self.cx is not None and self.cy is not None:
             self.x = self.cx - self.width / 2.0
             self.y = self.cy - self.height / 2.0
-        self.kwargs = kwargs
 
     def calculate_area(self):
         """Calculate area of trapezoid."""
@@ -2827,17 +2851,24 @@ class TriangleShape(BaseShape):
     def __init__(self, _object=None, canvas=None, **kwargs):
         super(TriangleShape, self).__init__(_object=_object, canvas=canvas, **kwargs)
         self.triangle_type = None
-        if kwargs.get("side"):
+        if self.kwargs.get("side"):
             self.triangle_type = TriangleType.EQUILATERAL
-        if kwargs.get("side") and self.kwargs.get("height"):
+        if self.kwargs.get("side") and self.kwargs.get("height"):
             self.triangle_type = TriangleType.ISOSCELES
-        if self.kwargs.get("side") and kwargs.get("side2") and kwargs.get("side3"):
+        if (
+            self.kwargs.get("side")
+            and self.kwargs.get("side2")
+            and self.kwargs.get("side3")
+        ):
             self.triangle_type = TriangleType.IRREGULAR
             if self.side2 + self.side3 < self.side:
-                feedback(f"The total length of the second and third sides must exceed the first!", True)
-        if self.kwargs.get("side") and kwargs.get("side2"):
+                feedback(
+                    f"The total length of the second and third sides must exceed the first!",
+                    True,
+                )
+        if self.kwargs.get("side") and self.kwargs.get("side2"):
             self.triangle_type = TriangleType.IRREGULAR
-            if not kwargs.get("side3"):
+            if not self.kwargs.get("side3"):
                 self.angle = kwargs.get("angle", 90)  # default is RA triangle
         if not self.triangle_type:
             if self.side:
@@ -3367,18 +3398,27 @@ class TriangleShape(BaseShape):
                     )
             if item == "cross":
                 # ---- * cross
-                self.draw_cross(cnv, self.centroid.x, self.centroid.y, rotation=kwargs.get("rotation"))
+                self.draw_cross(
+                    cnv,
+                    self.centroid.x,
+                    self.centroid.y,
+                    rotation=kwargs.get("rotation"),
+                )
             if item == "dot":
                 # ---- * dot
                 self.draw_dot(cnv, self.centroid.x, self.centroid.y)
             if item == "text":
                 # ---- * text
                 if self.triangle_type == TriangleType.EQUILATERAL:
-                    heading_y = self.vertexes[0].y  # self.centroid.y - self.height * 2.0 / 3.0
+                    heading_y = self.vertexes[
+                        0
+                    ].y  # self.centroid.y - self.height * 2.0 / 3.0
                     # title_y = self.centroid.y + self.height / 3.0  # fails for pivot
                     title_y = self._u.y + self._o.delta_y
                 elif self.triangle_type == TriangleType.ISOSCELES:
-                    heading_y = self.vertexes[0].y  # self._u.y + self._o.delta_y - self._u.height
+                    heading_y = self.vertexes[
+                        0
+                    ].y  # self._u.y + self._o.delta_y - self._u.height
                     title_y = self._u.y + self._o.delta_y
                 elif self.triangle_type == TriangleType.IRREGULAR:
                     area = self.calculate_area(self.vertexes, rotation)
@@ -3393,6 +3433,7 @@ class TriangleShape(BaseShape):
         # ---- debug
         self._debug(cnv, vertices=self.vertexes)
 
+
 # ---- Other
 
 
@@ -3401,8 +3442,9 @@ class CommonShape(BaseShape):
     Attributes common to, or used by, multiple shapes
     """
 
-    def __init__(self, _object=None, canvas=None, **kwargs):
+    def __init__(self, _object=None, canvas=None, common_kwargs=None, **kwargs):
         super(CommonShape, self).__init__(_object=_object, canvas=canvas, **kwargs)
+        self._common_kwargs = common_kwargs
         self._kwargs = kwargs
 
     def draw(self, cnv=None, off_x=0, off_y=0, ID=None, **kwargs):
@@ -3417,7 +3459,6 @@ class FooterShape(BaseShape):
 
     def __init__(self, _object=None, canvas=None, **kwargs):
         super(FooterShape, self).__init__(_object=_object, canvas=canvas, **kwargs)
-        self.kwargs = kwargs
         # self.page_width = kwargs.get('paper', (canvas.width, canvas.height))[0]
 
     def draw(self, cnv=None, off_x=0, off_y=0, ID=None, **kwargs):

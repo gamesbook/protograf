@@ -27,7 +27,7 @@ log = logging.getLogger(__name__)
 DEBUG = False
 
 
-# ---- grids
+# ---- BaseShape-derived
 
 
 class GridShape(BaseShape):
@@ -37,7 +37,6 @@ class GridShape(BaseShape):
 
     def __init__(self, _object=None, canvas=None, **kwargs):
         super(GridShape, self).__init__(_object=_object, canvas=canvas, **kwargs)
-        self.kwargs = kwargs
         self.use_side = False
         if "side" in kwargs:
             self.use_side = True
@@ -111,7 +110,6 @@ class DotGridShape(BaseShape):
 
     def __init__(self, _object=None, canvas=None, **kwargs):
         super(DotGridShape, self).__init__(_object=_object, canvas=canvas, **kwargs)
-        self.kwargs = kwargs
 
     def draw(self, cnv=None, off_x=0, off_y=0, ID=None, **kwargs):
         """Draw a dot grid on a given canvas."""
@@ -133,7 +131,9 @@ class DotGridShape(BaseShape):
             "height" in self.kwargs or "width" in self.kwargs
         ):
             feedback(
-                "Set either height&width OR side (not both) for a DotGrid", False, True
+                "Set either height & width OR side, but not both, for a DotGrid",
+                False,
+                True,
             )
         # ---- number of blocks in grid
         if self.rows == 0:
@@ -158,13 +158,12 @@ class TableShape(BaseShape):
 
     def __init__(self, _object=None, canvas=None, **kwargs):
         super(TableShape, self).__init__(_object=_object, canvas=canvas, **kwargs)
-        self.kwargs = kwargs
-        # print(f'\n+++ {self.cols=} {self.rows=}')
+        # print(f'\n+++ TABLE {self.cols=} {self.rows=} {self.kwargs=}')
         self.locales = []
         self.use_side = False
-        if "side" in kwargs:
+        if "side" in self.kwargs:
             self.use_side = True
-            if "width" in kwargs or "height" in kwargs:
+            if "width" in self.kwargs or "height" in self.kwargs:
                 self.use_side = False
         self.col_count, self.row_count = 0, 0
         # validate settings
@@ -240,9 +239,6 @@ class TableShape(BaseShape):
         return self.locales
 
 
-# ---- sequence
-
-
 class SequenceShape(BaseShape):
     """
     Set of Shapes drawn at points
@@ -254,7 +250,6 @@ class SequenceShape(BaseShape):
     def __init__(self, _object=None, canvas=None, **kwargs):
         # feedback(f'+++ SequenceShape {_object=} {canvas=} {kwargs=}')
         super(SequenceShape, self).__init__(_object=_object, canvas=canvas, **kwargs)
-        self.kwargs = kwargs
         self._objects = kwargs.get(
             "shapes", TextShape(_object=None, canvas=canvas, **kwargs)
         )
@@ -414,9 +409,6 @@ class SequenceShape(BaseShape):
             off_y = off_y + self.interval_y[key]
 
 
-# ---- repeats
-
-
 class RepeatShape(BaseShape):
     """
     Shape is drawn multiple times.
@@ -427,7 +419,6 @@ class RepeatShape(BaseShape):
 
     def __init__(self, _object=None, canvas=None, **kwargs):
         super(RepeatShape, self).__init__(_object=_object, canvas=canvas, **kwargs)
-        self.kwargs = kwargs
         self._objects = kwargs.get("shapes", [])  # incoming Shape object(s)
         # UPDATE SELF WITH COMMON
         if self.common:
@@ -439,7 +430,7 @@ class RepeatShape(BaseShape):
                     if common_attr != base_attr:
                         setattr(self, attr, common_attr)
 
-        # repeat
+        # ---- repeat
         self.rows = kwargs.get("rows", 1)
         self.cols = kwargs.get("cols", kwargs.get("columns", 1))
         self.repeat = kwargs.get("repeat", None)
@@ -1142,7 +1133,6 @@ class ConnectShape(BaseShape):
 
     def __init__(self, _object=None, canvas=None, **kwargs):
         super(ConnectShape, self).__init__(_object=_object, canvas=canvas, **kwargs)
-        self.kwargs = kwargs
         # overrides
         self.shape_from = kwargs.get("shape_from", None)  # could be a GridShape
         self.shape_to = kwargs.get("shape_to", None)  # could be a GridShape

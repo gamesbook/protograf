@@ -66,7 +66,7 @@ class RectangleShape(BaseShape):
 
     def __init__(self, _object=None, canvas=None, **kwargs):
         super(RectangleShape, self).__init__(_object=_object, canvas=canvas, **kwargs)
-        # overrides to centre shape
+        # ---- overrides to centre shape
         if self.cx is not None and self.cy is not None:
             self.x = self.cx - self.width / 2.0
             self.y = self.cy - self.height / 2.0
@@ -78,11 +78,11 @@ class RectangleShape(BaseShape):
         self._u_slices_line_my = (
             self.unit(self.slices_line_mx) if self.slices_line_my else 0
         )
-        self.kwargs = kwargs
-        # check height
+        # ---- check height
         if self.width and not self.height:
             self.height = self.width
-            self.set_unit_properties()  # need to recalculate!
+        # ---- RESET UNIT PROPS (last!)
+        self.set_unit_properties()  # need to recalculate!
 
     def calculate_area(self) -> float:
         return self._u.width * self._u.height

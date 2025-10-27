@@ -51,7 +51,7 @@ PageBreak()
 # ---- rotations + corners - layout_rect_outer_rotation
 
 circ = circle(
-    label="{{sequence - 1}}", label_size=5, radius=0.26, fill="rosybrown")
+    label="{{sequence - 1}}", label_size=5, radius=0.24, fill="rosybrown")
 rct2 = rectangle(
     common=rct_common, label="{{sequence - 1}}", fill="tan")
 rct3 = rectangle(

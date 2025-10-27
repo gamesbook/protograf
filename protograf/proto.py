@@ -2836,18 +2836,21 @@ def Common(source=None, **kwargs):
 
     Notes:
 
-    Any kwargs can be used; they are stored for further use by other Shapes
+        * Any kwargs can be used; they are stored for further use by other Shapes
+        * `common_kwargs` will overwrite normal **kwargs supplied to a Shape
     """
+    base_kwargs = kwargs
     kwargs = margins(**kwargs)
     kwargs["source"] = source
-    cshape = CommonShape(canvas=globals.canvas, **kwargs)
+    cshape = CommonShape(canvas=globals.canvas, common_kwargs=base_kwargs, **kwargs)
     return cshape
 
 
 def common(source=None, **kwargs):
+    base_kwargs = kwargs
     kwargs = margins(**kwargs)
     kwargs["source"] = source
-    cshape = CommonShape(canvas=globals.canvas, **kwargs)
+    cshape = CommonShape(canvas=globals.canvas, common_kwargs=base_kwargs, **kwargs)
     return cshape
 
 

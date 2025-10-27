@@ -56,16 +56,20 @@ class HexShape(BaseShape):
 
     def __init__(self, _object=None, canvas=None, **kwargs):
         super(HexShape, self).__init__(_object=_object, canvas=canvas, **kwargs)
-        self.kwargs = kwargs
+        # ---- check construction type
         self.use_diameter = True if self.is_kwarg("diameter") else False
         self.use_height = True if self.is_kwarg("height") else False
         self.use_radius = True if self.is_kwarg("radius") else False
         self.use_side = False
-        if "side" in kwargs:
+        if "side" in self.kwargs:
             self.use_side = True
-            if "radius" in kwargs or "height" in kwargs or "diameter" in kwargs:
+            if (
+                "radius" in self.kwargs
+                or "height" in self.kwargs
+                or "diameter" in self.kwargs
+            ):
                 self.use_side = False
-        # fallback / default
+        # ---- fallback / default
         if not self.use_diameter and not self.use_radius and not self.use_side:
             self.use_height = True
             if not self.height:

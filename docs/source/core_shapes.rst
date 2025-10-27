@@ -605,17 +605,18 @@ Example 4. Polyline with Snail
 ++++++++++++++++++++++++++++++
 `^ <polyline-command_>`_
 
-The *snail* property is loosely based on the Turtle graphics drawing module
-available for Python (see: https://docs.python.org/3/library/turtle.html).
+The *snail* property is loosely based on the concept and approach of the
+Turtle graphics drawing module available for Python (see:
+https://docs.python.org/3/library/turtle.html).
 
-Instead of using points, the idea of the *snail* is to create a polyline
+Instead of using points, the idea of the *snail* is to create a Polyline
 based on a series of lines of given length, where the line direction |dash|
-or orientation |dash| will already have been set.   Each line is then drawn
-from the end point of the previous line.
+or orientation |dash| will already have been set.  Each line is then drawn
+starting from the end point of the previous line.
 
 A *snail* property consists of a series of terms, each separated by a space.
-Each term either relates to a direction change or to drawing a line of a
-certain length.
+Each term either relates to a **direction** change or to drawing a line of a
+certain **length**
 
 Directions can be set as follows:
 
@@ -633,15 +634,17 @@ Creating a line is done as follows:
 
 - a normal value |dash| whole or fractional |dash| will draw a line that
   distance, in the last direction that was set
-- using a ``**`` will draw a line from the current point back to the start
+- using a pair of asterixes (``**``) ` will draw a line from the current
+  point back to the start
 
 Moving - **without** creating a line - is done as follows:
 
-- a **relative** amount: a ``j`` followed by a value which is the distance,
+- a **relative** move: a ``j`` followed by a value which is the distance,
   at which the new point will be set |dash| according to the last direction
-  that was set; no line will be dreawn between the points.
-- a **fixed point** move: a ``*`` will set the next, new point to match the
-  one at the start; no line will be dreawn between the points.
+  that was set; no line will be drawn between the points
+- a **fixed point** move: a single asterix (``*``) will set the next, new
+  point to match the one at the start; no line will be drawn between the
+  points
 
 .. NOTE::
 
@@ -651,8 +654,8 @@ Moving - **without** creating a line - is done as follows:
 
 .. raw:: html
 
-   <small>Apologies for using "jump" as the term to cause a move to
-   happen without drawing a line; the idea of a snail jumping was just
+   <small>Apologies to users for using "jump" as the term to cause a move
+   to happen without drawing a line; the idea of a snail jumping was just
    too absurd **not** to use!</small>
 
 
@@ -713,7 +716,8 @@ Moving - **without** creating a line - is done as follows:
       square |dash| is constructed multiple times using the `*3`` to
       repeat the outline three times. Again, the "jump" (``j``) term is used
       to move to a different location before the next shape is drawn. Note
-      that start direction is set explicitly, rather than using a default!
+      that in this case the start direction is set explicitly, rather than
+      just using the default!
 
 ===== ======
 
@@ -1519,7 +1523,7 @@ Polyshape
 A Polyshape is an irregular `polygon`_, constructed using a series of points.
 
 It's basic setup and construction  shares much in common with the
-`Polyline <polyline-command_>`_ but with  some differences, such as its
+`Polyline <polyline-command_>`_ but with some differences, such as its
 *fill* and centre properties.
 
 The following examples illustrate these properties:
@@ -1667,43 +1671,46 @@ these values will be used to offset ("move") the Polyshape from the position it
 would normally occupy.
 
 It is also possible to provide the *points* as a string of space-separated
-pairs of values; so instead of ``[(0,0), (1,1)]`` just use ``"0,0 1,1"``.
+pairs of comma-separated values; so instead of ``[(0,0), (1,1)]`` just use
+``"0,0 1,1"``.
 
 .. |sh3| image:: images/customised/polyshape_offset.png
    :width: 330
 
 ===== ======
-|sh3| The Polyshapes are constructed using the command with these properties:
+|sh3| The following Polyshapes are constructed using the command with these
+      properties:
 
-        .. code:: python
+      .. code:: python
 
-            Polyshape(
-                points="0,0 0,1 2,0 2,1 0,0",
-                cx=1, cy=0.5,
-                fill="chartreuse",
-                label="Left ....... Right")
-            Polyshape(
-                points="0,0 0,1 2,0 2,1 0,0",
-                cx=1, cy=0.5,
-                fill="gold",
-                label="Left ....... Right",
-                x=1, y=2)
+        Polyshape(
+            points="0,0 0,1 2,0 2,1 0,0",
+            cx=1, cy=0.5,
+            fill="gold",
+            label="Left ....... Right")
+        Polyshape(
+            x=1, y=2,
+            points="0,0 0,1 2,0 2,1 0,0",
+            fill="chartreuse",
+            label="Left ....... Right")
 
-      As in Example 2, the *points* are used to construct the outline of the
-      shape. In this case, they are a string of space-separated pairs of values.
+      As in Example 2, the *points* property is used to construct the outline
+      of the Polyshape. In this case, the points are set by a string of
+      space-separated pairs of values.
 
-      Other properties:
+      The *fill* color defines the color of the interior of the shapes.
 
-      - the centre is defined to be at x-position ``1`` cm and y-position
-        ``0.5`` cm; this **only** affects drawing of the label
-        but does **not** affect drawing the shape itself
-      - *label* - sets the text appearing at the defined centre position
-      - *fill* color defines the color of the interior of the shape
+      For the ``gold`` color Polyshape, the *cx* and *cy* values have been set.
+      These values **only** affect the drawing of the *label*, and **not** the
+      shape itself!
 
-      In the ``gold``-filled Polyshape, the *x* and *y* values have been set.
-      So, even though the points used to define the ``gold`` Polyshape are
-      the same as those used for ``green`` one, these values cause the whole
-      shape to be moved down and to the right.
+      The points used to define the ``green`` Polyshape are the same as those
+      used for ``gold`` one, but because the  *x* and *y* values have also
+      been set, this causes the whole shape to be be drawn down and to the
+      right.
+
+      The ``green`` Polyshape has no *cx* and *cy* values set; therefore the
+      label cannot be drawn!
 
 ===== ======
 
@@ -1712,17 +1719,18 @@ Example 4. Polyshape with Snail
 +++++++++++++++++++++++++++++++
 `^ <polyshape-command_>`_
 
-The *snail* property is loosely based on the Turtle graphics drawing module
-available for Python (see: https://docs.python.org/3/library/turtle.html).
+The *snail* property is loosely based on the concept and approach of the
+Turtle graphics drawing module available for Python (see:
+https://docs.python.org/3/library/turtle.html).
 
 Instead of using points, the idea of the *snail* is to create a Polyshape
 based on a series of lines of given length, where the line direction |dash|
 or orientation |dash| will already have been set.   Each line is then drawn
-from the end point of the previous line.
+starting from the end point of the previous line.
 
 A *snail* property consists of a series of terms, each separated by a space.
-Each term either relates to a direction change or to drawing a line of a
-certain length.
+Each term either relates to a **direction** change or to drawing a line of a
+certain **length**.
 
 Directions can be set as follows:
 
@@ -1740,7 +1748,8 @@ Creating a line is done as follows:
 
 - a normal value |dash| whole or fractional |dash| will draw a line that
   distance, in the last direction that was set
-- using a ``**`` will draw a line from the current point back to the start
+- using a pair of asterixes (``**``) will draw a line from the current point
+  back to the start
 
 .. NOTE::
 
@@ -3674,11 +3683,11 @@ below.
       .. code:: python
 
         Stadium(
-            cx=1, cy=1, side=1,
+            cx=1, cy=1, side=0.66,
             stroke="blue",
             dot=0.1)
         Stadium(
-            cx=3, cy=1, side=1,
+            cx=3, cy=1, side=0.66,
             stroke="blue",
             cross=0.25,
             cross_stroke_width=1)
@@ -3695,11 +3704,11 @@ below.
             cross_stroke_width=1)
 
         Rhombus(
-            cx=1, cy=5, side=2,
+            cx=1, cy=5, side=1.25,
             dot=0.1,
             dot_stroke="red")
         Rhombus(
-            cx=3, cy=5, side=2,
+            cx=3, cy=5, side=1.25,
             cross=0.25,
             cross_stroke="red",
             cross_stroke_width=1)
@@ -3844,13 +3853,13 @@ Example 3. Shapes Rotation
             cx=1, cy=3, sides=6, side=0.75,
             common=props, label="polygon")
         Stadium(
-            cx=3, cy=3, side=1,
+            cx=3, cy=3, side=0.6,
             common=props, label="stadium")
         Rectangle(
             cx=1, cy=5, height=1, width=1.5,
             common=props, label="rectangle")
         Rhombus(
-            cx=3, cy=5, side=2,
+            cx=3, cy=5, side=1.25,
             common=props, label="rhombus")
 
       The shapes share common properties for the cross at the centre,

@@ -36,12 +36,12 @@ PageBreak()
 # ---- dot & cross
 Blueprint()
 Text(common=txt, text="Dots & Crosses")
-Rhombus(cx=1, cy=5, side=2, dot=0.1, dot_stroke="red")
-Rhombus(cx=3, cy=5, side=2, cross=0.25, cross_stroke="red", cross_stroke_width=1)
+Rhombus(cx=1, cy=5, side=1.25, dot=0.1, dot_stroke="red")
+Rhombus(cx=3, cy=5, side=1.25, cross=0.25, cross_stroke="red", cross_stroke_width=1)
 Polygon(cx=1, cy=3, sides=8, radius=1, dot=0.1, dot_stroke="orange")
 Polygon(cx=3, cy=3, sides=8, diameter=2, cross=0.25, cross_stroke="orange", cross_stroke_width=1)
-Stadium(cx=1, cy=1, side=1, stroke="blue", dot=0.1)
-Stadium(cx=3, cy=1, side=1, stroke="blue", cross=0.25, cross_stroke_width=1)
+Stadium(cx=1, cy=1, side=0.66, stroke="blue", dot=0.1)
+Stadium(cx=3, cy=1, side=0.66, stroke="blue", cross=0.25, cross_stroke_width=1)
 PageBreak()
 
 # ---- centre placement
@@ -518,12 +518,13 @@ Text(common=txt, text="Polyshape: offset")
 Polyshape(
     points="0,0 0,1 2,0 2,1 0,0",
     cx=1, cy=0.5,
-    fill="chartreuse", label="Left ....... Right")
+    fill="gold",
+    label="Left ....... Right")
 Polyshape(
+    x=1, y=2,
     points="0,0 0,1 2,0 2,1 0,0",
-    cx=1, cy=0.5,
-    fill="gold", label="Left ....... Right",
-    x=1, y=2)
+    fill="chartreuse",
+    label="Left ....... Right")
 PageBreak()
 
 # ---- polyshape - snail
@@ -816,7 +817,7 @@ Rectangle(x=2, y=1, side=1,
               borders=[("sw n se", 2)]))
 Rectangle(x=3, y=2, side=1,
           centre_shape=stadium(
-              side=0.4,
+              side=0.3,
               stroke="orange"))
 Rectangle(x=0, y=3, side=1,
           centre_shape=ellipse(
@@ -833,7 +834,7 @@ Rectangle(x=1, y=4, side=1,
               borders=[("n s", 2, "black")]))
 Rectangle(x=2, y=3, side=1,
           centre_shape=rhombus(
-              side=0.8,
+              side=0.6,
               stroke="gray",
               fill=None,
               borders=[("ne sw", 2, "black")]))
@@ -956,9 +957,9 @@ props = Common(
     cross=0.5, cross_stroke="red", cross_stroke_width=1,
     rotation=45, label_size=6)
 Rectangle(cx=1, cy=5, height=1, width=1.5, common=props, label="rectangle")
-Rhombus(cx=3, cy=5, side=2, common=props, label="rhombus")
+Rhombus(cx=3, cy=5, side=1.25, common=props, label="rhombus")
 Polygon(cx=1, cy=3, sides=6, side=0.75, common=props, label="polygon")
-Stadium(cx=3, cy=3, side=1, common=props, label="stadium")
+Stadium(cx=3, cy=3, side=0.6, common=props, label="stadium")
 Star(x=1, y=1, vertices=5, radius=0.75, common=props, label="star")
 Ellipse(cx=3, cy=1, height=1, width=1.5, common=props, label="ellipse")
 PageBreak()
