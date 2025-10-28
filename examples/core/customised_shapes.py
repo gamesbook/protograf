@@ -951,9 +951,9 @@ Image("fantasy-forest-with-old-bridges.png",
 )
 PageBreak()
 
-# ---- shape rotation
+# ---- shape rotation I
 Blueprint()
-Text(common=txt, text="Rotation (cross & label)")
+Text(common=txt, text="Rotation I (cross & label)")
 props = Common(
     stroke="black",
     cross=0.5, cross_stroke="red", cross_stroke_width=1,
@@ -964,6 +964,21 @@ Polygon(cx=1, cy=3, sides=6, side=0.75, common=props, label="polygon")
 Stadium(cx=3, cy=3, side=0.6, common=props, label="stadium")
 Star(x=1, y=1, vertices=5, radius=0.75, common=props, label="star")
 Ellipse(cx=3, cy=1, height=1, width=1.5, common=props, label="ellipse")
+PageBreak()
+
+# ---- shape rotation II
+Blueprint()
+Text(common=txt, text="Rotation II (cross & label)")
+props = Common(
+    stroke="black",
+    cross=0.5, cross_stroke="red", cross_stroke_width=1,
+    rotation=45, label_size=6)
+Square(cx=1, cy=1, side=1.25, common=props, label="square")
+Trapezoid(cx=3, cy=1, width=1.25, top=0.75, height=1, common=props, label="trapezoid")
+Hexagon(cx=1, cy=3, side=0.75, common=props, label="hex:flat")
+Hexagon(cx=3, cy=3, side=0.75, orientation="pointy", common=props, label="hex:pointy")
+Triangle(cx=1, cy=5, side=1.5, common=props, label="tri:equi")
+Triangle(x=2.5, y=5.5, side=1, height=1.5, common=props, label="tri:isos")
 PageBreak()
 
 # ---- shape hatches-and-rotation
@@ -1288,7 +1303,9 @@ Save(
         "shapes_centred",
         "qr_code",
         "image_sliced", "image_label", "image_operations",
-        "shape_rotation", "shape_hatches_and_rotation",
+        "shape_rotation",
+        "shape_rotation_two",
+        "shape_hatches_and_rotation",
         "table_defaults", "table_custom",
         "perbii_styled",
         "poly_waves",

@@ -513,6 +513,7 @@ class BaseCanvas:
         # ---- triangle
         self.triangle_type = self.defaults.get("triangle_type", None)
         self.rotation_point = self.defaults.get("rotation_point", "centre")
+        self.centroid = None
         self.pivot = self.defaults.get("pivot", 0.0)
         self.side2 = self.defaults.get("side2", None)
         self.side3 = self.defaults.get("side3", None)
@@ -1126,6 +1127,7 @@ class BaseShape:
         self.perimeter = kwargs.get("perimeter", "circle")  # circle|rectangle|hexagon
         self.directions = kwargs.get("directions", None)
         # ---- triangle
+        self.centroid = None
         self.triangle_type = None
         self.rotation_point = kwargs.get("rotation_point", base.rotation_point)
         self.pivot = kwargs.get("pivot", base.pivot)
@@ -1140,7 +1142,7 @@ class BaseShape:
         self.vertex_shapes_rotated = self.kw_bool(
             kwargs.get("vertex_shapes_rotated", False)
         )
-        # ---- shapes with centre (hex, circle, rect, rhombus, poly, ellipse, star)
+        # ---- shapes with centre hex, circle, rect, rhombus, poly, ellips, star, equtri
         self.centre_shapes = kwargs.get("centre_shapes", [])
         self.centre_shape = kwargs.get("centre_shape", "")
         self.centre_shape_mx = self.kw_float(

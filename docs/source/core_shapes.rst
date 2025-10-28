@@ -1633,7 +1633,7 @@ the **relative** distance from the last point drawn.
       - *x* and *y* are used to provide offsets for the start; in this case
         ``1`` is added to the start of the y-position, and for each value
         thereafter
-0      - the centre is *defined* to be at x-position ``2`` cm and y-position
+      - the centre is *defined* to be at x-position ``2`` cm and y-position
         ``1`` cm
       - *cross* - sets the length of each of the two lines that cross at the
         centre to be ``0.5`` cm
