@@ -61,6 +61,8 @@ class HexShape(BaseShape):
         self.use_height = True if self.is_kwarg("height") else False
         self.use_radius = True if self.is_kwarg("radius") else False
         self.use_side = False
+        if "rotation" in self.kwargs:
+            feedback("Rotation does not apply to Hexagons!", alert=True)
         if "side" in self.kwargs:
             self.use_side = True
             if (

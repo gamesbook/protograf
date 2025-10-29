@@ -872,7 +872,7 @@ class PolygonShape(BaseShape):
 
     def draw_mesh(self, cnv, ID, vertices: list):
         """Lines connecting each vertex to mid-points of opposing sides."""
-        feedback("Mesh for Polygon is not yet implemented.", True)
+        feedback("Mesh for Polygon is not yet implemented.", alert=True)
         """ TODO - autodraw (without dirs)
         self.set_canvas_props(
             index=ID,
@@ -883,7 +883,7 @@ class PolygonShape(BaseShape):
         """
 
     def get_centre(self) -> Point:
-        """Calculate the centre as a Point (in units)"""
+        """Calculate the centre of a polygon as a Point (in units)"""
         if self.cx is not None and self.cy is not None:
             x = self._u.cx + self._o.delta_x
             y = self._u.cy + self._o.delta_y
@@ -897,15 +897,16 @@ class PolygonShape(BaseShape):
                 y = self._abs_cy
         return Point(x, y)
 
-    def get_angles(self, rotation: float = 0, is_rotated: bool = False) -> list:
-        """Angles of lines connecting the Polygon centre to each of the vertices."""
-        centre = self.get_centre()
-        vertices = self.get_vertexes(rotation, is_rotated)
-        angles = []
-        for vertex in vertices:
-            _, angle = geoms.angles_from_points(centre, vertex)
-            angles.append(angle)
-        return angles
+    # def get_angles(self, rotation: float = 0, is_rotated: bool = False) -> list:
+    #     """Angles of lines connecting the Polygon centre to each of the vertices."""
+    #     centre = self.get_centre()
+    #     vertices = self.get_vertexes(rotation, is_rotated)
+    #     for p in vertices: print(f'*P-A-V* {p.x / 28.3465}, {p.y / 28.3465}')
+    #     angles = []
+    #     for vertex in vertices:
+    #         _, angle = geoms.angles_from_points(centre, vertex)
+    #         angles.append(angle)
+    #     return angles
 
     def draw_perbii(
         self,
@@ -950,7 +951,7 @@ class PolygonShape(BaseShape):
             else self.get_radius()
         )
 
-        # ---- set perbii styles
+        # ---- set perbii waves
         lkwargs = {}
         lkwargs["wave_style"] = self.kwargs.get("perbii_wave_style", None)
         lkwargs["wave_height"] = self.kwargs.get("perbii_wave_height", 0)
@@ -978,6 +979,9 @@ class PolygonShape(BaseShape):
                 **lkwargs,
             )
 
+        # ---- style all perbii
+        rotation_point = centre if rotation else None
+        print(f"*** POLY {rotation_point=} {rotation=}")
         self.set_canvas_props(
             index=ID,
             stroke=self.perbii_stroke,
@@ -985,6 +989,8 @@ class PolygonShape(BaseShape):
             stroke_ends=self.perbii_ends,
             dashed=self.perbii_dashed,
             dotted=self.perbii_dotted,
+            rotation=rotation,
+            rotation_point=rotation_point,
         )
 
     def draw_radii(
@@ -1107,22 +1113,16 @@ class PolygonShape(BaseShape):
         # radius
         radius = self.get_radius()
         # calculate vertices - assumes x,y marks the centre point
-        vertices = geoms.polygon_vertices(self.sides, radius, Point(x, y), None)
-        # for p in vertices: print(f'*G* {p.x / 28.3465}, {p.y / 28.3465}')
+        vertices = geoms.polygon_vertices(self.sides, radius, Point(x, y), rotation)
+        # for p in vertices: print(f'*G-V* {p.x / 28.3465}, {p.y / 28.3465}')
         return PolyGeometry(x, y, radius, side, half_flat, vertices)
 
-    def get_vertexes(self, rotation: float = None, is_rotated: bool = False):
+    def get_vertexes(self, centre: Point, rotation: float = None):
         """Calculate vertices of polygon."""
-        # convert to using units
-        if is_rotated:
-            x, y = 0.0, 0.0  # centre for now-rotated canvas
-        else:
-            x = self._u.x + self._o.delta_x
-            y = self._u.y + self._o.delta_y
         radius = self.get_radius()
         # calculate vertices - assumes x,y marks the centre point
-        vertices = geoms.polygon_vertices(self.sides, radius, Point(x, y), None)
-        # for p in vertices: print(f'*V* {p.x / 28.3465}, {p.y / 28.3465}')
+        vertices = geoms.polygon_vertices(self.sides, radius, centre, rotation)
+        # for p in vertices: print(f'*P-V* {p.x / 28.3465}, {p.y / 28.3465}')
         return vertices
 
     def draw(self, cnv=None, off_x=0, off_y=0, ID=None, **kwargs):
@@ -1183,14 +1183,12 @@ class PolygonShape(BaseShape):
             )
         # ---- handle rotation
         is_rotated = False
-        rotation = kwargs.get("rotation", self.rotation)
+        rotation = self.kwargs.get("rotation", self.rotation)
         if rotation:
             self.centroid = muPoint(x, y)
             kwargs["rotation"] = rotation
             kwargs["rotation_point"] = self.centroid
             is_rotated = True
-        # ---- updated geom
-        # self.vertices = geoms.polygon_vertices(self.sides, radius, Point(x, y), None)
         # ---- invalid polygon?
         if not self.vertices or len(self.vertices) == 0:
             return
@@ -1206,17 +1204,32 @@ class PolygonShape(BaseShape):
                 ID,
                 Point(x, y),
                 self.vertices,
-                rotation=kwargs.get("rotation"),
+                rotation=rotation,
             )
+        # ---- calculate vertices with rotation
+        self.vertices = self.get_vertexes(centre, rotation)
+        # self.vertices = geoms.polygon_vertices(self.sides, radius, Point(x, y), rotation)
         # ---- draw radii
         if self.radii:
-            self.draw_radii(cnv, ID, Point(x, y), self.vertices)
+            self.draw_radii(cnv, ID, Point(x, y), self.vertices, rotation=rotation)
         # ---- draw perbii
         if self.perbii:
-            self.draw_perbii(cnv, ID, Point(x, y), self.vertices)
+            self.draw_perbii(cnv, ID, Point(x, y), self.vertices, rotation=rotation)
         # ---- draw mesh
         if self.mesh:
             self.draw_mesh(cnv, ID, self.vertices)
+        # ---- draw radii_shapes
+        if self.radii_shapes:
+            feedback(
+                'The "radii_shapes" property is not implemented for a Polygon.',
+                alert=True,
+            )
+        # ---- draw perbii_shapes
+        if self.perbii_shapes:
+            feedback(
+                'The "perbii_shapes" property is not implemented for a Polygon.',
+                alert=True,
+            )
         # ---- centred shape (with offset)
         if self.centre_shape:
             if self.can_draw_centred_shape(self.centre_shape):
@@ -1611,7 +1624,7 @@ class RhombusShape(BaseShape):
             if self.perbii_length
             else self.radius
         )
-        # ---- set perbii styles
+        # ---- set perbii waves
         lkwargs = {}
         lkwargs["wave_style"] = self.kwargs.get("perbii_wave_style", None)
         lkwargs["wave_height"] = self.kwargs.get("perbii_wave_height", 0)
@@ -1638,6 +1651,8 @@ class RhombusShape(BaseShape):
                 **lkwargs,
             )
 
+        # ---- style all perbii
+        rotation_point = centre if rotation else None
         self.set_canvas_props(
             index=ID,
             stroke=self.perbii_stroke,
@@ -1645,6 +1660,8 @@ class RhombusShape(BaseShape):
             stroke_ends=self.perbii_ends,
             dashed=self.perbii_dashed,
             dotted=self.perbii_dotted,
+            rotation=rotation,
+            rotation_point=rotation_point,
         )
 
     def draw_radii(self, cnv, ID, centre: Point, vertices: list):
@@ -2826,7 +2843,9 @@ class TrapezoidShape(BaseShape):
         # ---- dot
         self.draw_dot(cnv, self.centroid.x, self.centroid.y)
         # ---- cross
-        self.draw_cross(cnv, self.centroid.x, self.centroid.y, rotation=kwargs.get("rotation"))
+        self.draw_cross(
+            cnv, self.centroid.x, self.centroid.y, rotation=kwargs.get("rotation")
+        )
         # ---- text
         self.draw_label(cnv, ID, self.centroid.x, self.centroid.y, **kwargs)
         if sign == 1:
@@ -3145,7 +3164,8 @@ class TriangleShape(BaseShape):
                 shape=self,
                 **lkwargs,
             )
-
+        rotation_point = centre if rotation else None
+        # ---- style all perbii
         self.set_canvas_props(
             index=ID,
             stroke=self.perbii_stroke,
@@ -3153,9 +3173,13 @@ class TriangleShape(BaseShape):
             stroke_ends=self.perbii_ends,
             dashed=self.perbii_dashed,
             dotted=self.perbii_dotted,
+            rotation=rotation,
+            rotation_point=rotation_point,
         )
 
-    def draw_radii(self, cnv, ID, centre: Point, vertices: list):
+    def draw_radii(
+        self, cnv, ID, centre: Point, vertices: list, rotation: float = None
+    ):
         """Draw line(s) connecting the Triangle centre to a vertex.
 
         Args:
@@ -3176,12 +3200,16 @@ class TriangleShape(BaseShape):
             cnv.draw_line(centre, vertices[1])
         if "se" in _dirs:  # slope DOWN to the right
             cnv.draw_line(centre, vertices[2])
-        # color, thickness etc.
+        # ---- style all radii
+        rotation_point = centre if rotation else None
+        print(f"*** TRIANGLE perbii {rotation_point=} {rotation=}")
         self.set_canvas_props(
             index=ID,
             stroke=self.radii_stroke or self.stroke,
             stroke_width=self.radii_stroke_width or self.stroke_width,
             stroke_ends=self.radii_ends,
+            rotation=rotation,
+            rotation_point=rotation_point,
         )
 
     def draw_slices(self, cnv, ID, centre: Point, vertexes: list, rotation=0):
@@ -3332,11 +3360,11 @@ class TriangleShape(BaseShape):
             if item == "radii":
                 # ---- * draw radii
                 if self.radii:
-                    self.draw_radii(cnv, ID, self.centroid, self.vertexes)
+                    self.draw_radii(cnv, ID, self.centroid, self.vertexes, rotation)
             if item == "perbii":
                 # ---- * draw perbii
                 if self.perbii:
-                    self.draw_perbii(cnv, ID, self.centroid, self.vertexes)
+                    self.draw_perbii(cnv, ID, self.centroid, self.vertexes, rotation)
             if item == "radii_shapes":
                 # ---- * draw radii_shapes
                 if self.radii_shapes:

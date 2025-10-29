@@ -917,6 +917,8 @@ class RectangleShape(BaseShape):
                 **lkwargs,
             )
 
+        # ---- style all perbii
+        rotation_point = centre if rotation else None
         self.set_canvas_props(
             index=ID,
             stroke=self.perbii_stroke,
@@ -924,9 +926,13 @@ class RectangleShape(BaseShape):
             stroke_ends=self.perbii_ends,
             dashed=self.perbii_dashed,
             dotted=self.perbii_dotted,
+            rotation=rotation,
+            rotation_point=rotation_point,
         )
 
-    def draw_radii(self, cnv, ID, centre: Point, vertices: list):
+    def draw_radii(
+        self, cnv, ID, centre: Point, vertices: list, rotation: float = None, **kwargs
+    ):
         """Draw line(s) connecting the Rectangle centre to a vertex.
 
         Args:
@@ -940,6 +946,7 @@ class RectangleShape(BaseShape):
         _dirs = tools.validated_directions(
             self.radii, DirectionGroup.ORDINAL, "rectangle radii"
         )
+        # ----- draw radii lines
         if "nw" in _dirs:  # slope UP to the left
             cnv.draw_line(centre, vertices[0])
         if "sw" in _dirs:  # slope DOWN to the left
@@ -948,12 +955,17 @@ class RectangleShape(BaseShape):
             cnv.draw_line(centre, vertices[2])
         if "ne" in _dirs:  # slope UP to the right
             cnv.draw_line(centre, vertices[3])
-        # color, thickness etc.
+        # ---- style all radii
+        rotation_point = centre if rotation else None
         self.set_canvas_props(
             index=ID,
             stroke=self.radii_stroke or self.stroke,
             stroke_width=self.radii_stroke_width or self.stroke_width,
             stroke_ends=self.radii_ends,
+            dashed=self.radii_dashed,
+            dotted=self.radii_dotted,
+            rotation=rotation,
+            rotation_point=rotation_point,
         )
 
     def draw_slices(self, cnv, ID, vertexes, rotation=0):
@@ -1777,11 +1789,13 @@ class RectangleShape(BaseShape):
             if item == "perbii":
                 # ---- * draw perbii
                 if self.perbii:
-                    self.draw_perbii(cnv, ID, Point(x_d, y_d), **kwargs)
+                    self.draw_perbii(cnv, ID, Point(x_d, y_d), rotation=rotation)
             if item == "radii":
                 # ---- * draw radii
                 if self.radii:
-                    self.draw_radii(cnv, ID, Point(x_d, y_d), self.vertexes)
+                    self.draw_radii(
+                        cnv, ID, Point(x_d, y_d), self.vertexes, rotation=rotation
+                    )
             if item == "corners":
                 # ---- * draw corners
                 self.draw_corners(cnv, ID, x, y)

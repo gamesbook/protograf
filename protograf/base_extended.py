@@ -273,8 +273,8 @@ class BasePolyShape(BaseShape):
                 for index, stp in enumerate(steps):
                     vertices.append(
                         Point(
-                            vertices[index].x  + self.unit(stp[0]),
-                            vertices[index].y  + self.unit(stp[1]),
+                            vertices[index].x + self.unit(stp[0]),
+                            vertices[index].y + self.unit(stp[1]),
                         )
                     )
                 return vertices
