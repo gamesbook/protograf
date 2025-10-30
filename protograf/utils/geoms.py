@@ -59,7 +59,7 @@ def polygon_vertices(
     except ValueError:
         feedback("Polygon's start angle must be an decimal or integer number.")
         return []
-    # print(f'\n+++ poly {sides=} {interior_angle=} {starting_angle=} {_starting_angle=} +++')
+    # print(f'\n+++ poly_vert {sides=} {interior_angle=} {starting_angle=} {_starting_angle=} +++')
     # angles go around a full circle, anti-clockwise, starting from the "top"
     _step = 360.0 / sides
     data_generator = numbers(_starting_angle, 360.0 + _starting_angle, _step)

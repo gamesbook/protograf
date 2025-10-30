@@ -2885,7 +2885,7 @@ class BaseShape:
                         canvas,
                         vert.x,
                         vert.y,
-                        f"{key}:{vert.x:.1f},{vert.y:.1f}",
+                        f"{key}/{vert.x:.1f}/{vert.y:.1f}",
                         **kwargs,
                     )
                     canvas.draw_circle((vert.x, vert.y), 1)
@@ -2900,7 +2900,7 @@ class BaseShape:
                 x = self.points_to_value(point.x)
                 y = self.points_to_value(point.y)
                 self.draw_multi_string(
-                    canvas, point.x, point.y, f"{label}:{point.x:.1f},{point.y:.1f}"
+                    canvas, point.x, point.y, f"{label}/{point.x:.1f}/{point.y:.1f}"
                 )
                 canvas.draw_circle((point.x, point.y), 1)
             self.set_canvas_props(cnv=canvas, index=None, **kwargs)

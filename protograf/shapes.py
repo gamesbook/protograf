@@ -897,23 +897,27 @@ class PolygonShape(BaseShape):
                 y = self._abs_cy
         return Point(x, y)
 
-    # def get_angles(self, rotation: float = 0, is_rotated: bool = False) -> list:
-    #     """Angles of lines connecting the Polygon centre to each of the vertices."""
-    #     centre = self.get_centre()
-    #     vertices = self.get_vertexes(rotation, is_rotated)
-    #     for p in vertices: print(f'*P-A-V* {p.x / 28.3465}, {p.y / 28.3465}')
-    #     angles = []
-    #     for vertex in vertices:
-    #         _, angle = geoms.angles_from_points(centre, vertex)
-    #         angles.append(angle)
-    #     return angles
+    def get_angles(self, rotation: float = 0) -> list:
+        """Angles of lines connecting the Polygon centre to each of the vertices.
+
+        NOTE:
+            Used by other Shapes e.g, Track
+        """
+        centre = self.get_centre()
+        vertices = self.get_vertexes(centre, rotation)
+        # for p in vertices: print(f'*P-A-V* {p.x / 28.3465}, {p.y / 28.3465}')
+        angles = []
+        for vertex in vertices:
+            _, angle = geoms.angles_from_points(centre, vertex)
+            angles.append(angle)
+        return angles
 
     def draw_perbii(
         self,
         cnv,
         ID,
-        centre: Point = None,
-        vertices: list = None,
+        centre: Point,
+        vertices: list,
         rotation: float = None,
     ):
         """Draw lines connecting the Polygon centre to the centre of each edge.
@@ -924,10 +928,6 @@ class PolygonShape(BaseShape):
             chord into two equal parts and meets the chord at a right angle;
             for a polygon, each edge is effectively a chord.
         """
-        if not centre:
-            centre = self.get_center()
-        if not vertices:
-            vertices = self.get_vertexes(rotation=rotation)
         _perbii = []  # store angles to centre of edges (the "chords")
         _perbii_pts = []  # store centre Point of edges
         vcount = len(vertices) - 1
@@ -981,7 +981,7 @@ class PolygonShape(BaseShape):
 
         # ---- style all perbii
         rotation_point = centre if rotation else None
-        print(f"*** POLY {rotation_point=} {rotation=}")
+        # print(f"*** POLY perbii {rotation_point=} {rotation=}")
         self.set_canvas_props(
             index=ID,
             stroke=self.perbii_stroke,
@@ -997,18 +997,14 @@ class PolygonShape(BaseShape):
         self,
         cnv,
         ID,
-        centre: Point = None,
-        vertices: list = None,
+        centre: Point,
+        vertices: list,
         rotation: float = None,
     ):
         """Draw lines connecting the Polygon centre to each of the vertices."""
-        if not centre:
-            centre = self.get_center()
-        if not vertices:
-            vertices = self.get_vertexes(rotation=rotation)
         _radii = []
         for vertex in vertices:
-            _, angle = geoms.angles_from_points(centre, vertex)
+            _, angle = geoms.angles_from_points(vertex, centre)
             _radii.append(angle)
         rad_offset = self.unit(self.radii_offset, label="radii offset") or 0
         rad_length = (
@@ -1041,6 +1037,9 @@ class PolygonShape(BaseShape):
                 **lkwargs,
             )
 
+        # ---- style all radii
+        rotation_point = centre if rotation else None
+        # print(f"*** POLY radii {rotation_point=} {rotation=}")
         self.set_canvas_props(
             cnv=cnv,
             index=ID,
@@ -1048,6 +1047,8 @@ class PolygonShape(BaseShape):
             stroke_width=self.radii_stroke_width,
             dashed=self.radii_dashed,
             dotted=self.radii_dotted,
+            rotation=rotation,
+            rotation_point=rotation_point,
         )
 
     def draw_slices(self, cnv, ID, centre: Point, vertexes: list, rotation=0):
@@ -1092,14 +1093,10 @@ class PolygonShape(BaseShape):
             if cid > len(slices_colors) - 1:
                 cid = 0
 
-    def get_geometry(self, rotation: float = None, is_rotated: bool = False):
+    def get_geometry(self, rotation: float = None):
         """Calculate centre, radius, side and vertices of Polygon."""
-        # convert to using units
-        if is_rotated:
-            x, y = 0.0, 0.0  # centre for now-rotated canvas
-        else:
-            centre = self.get_centre()
-            x, y = centre.x, centre.y
+        centre = self.get_centre()
+        x, y = centre.x, centre.y
         # calculate side
         if self.height:
             side = self._u.height / math.sqrt(3)
@@ -1117,10 +1114,11 @@ class PolygonShape(BaseShape):
         # for p in vertices: print(f'*G-V* {p.x / 28.3465}, {p.y / 28.3465}')
         return PolyGeometry(x, y, radius, side, half_flat, vertices)
 
-    def get_vertexes(self, centre: Point, rotation: float = None):
+    def get_vertexes(self, centre: Point = None, rotation: float = None):
         """Calculate vertices of polygon."""
+        if not centre:
+            centre = self.get_centre()
         radius = self.get_radius()
-        # calculate vertices - assumes x,y marks the centre point
         vertices = geoms.polygon_vertices(self.sides, radius, centre, rotation)
         # for p in vertices: print(f'*P-V* {p.x / 28.3465}, {p.y / 28.3465}')
         return vertices
@@ -1133,6 +1131,12 @@ class PolygonShape(BaseShape):
         # ---- calc centre (in units)
         centre = self.get_centre()
         x, y = centre.x, centre.y
+        # ---- handle rotation
+        rotation = self.kwargs.get("rotation", self.rotation)
+        if rotation:
+            self.centroid = muPoint(x, y)
+            kwargs["rotation"] = rotation
+            kwargs["rotation_point"] = self.centroid
         # ---- calculate vertices
         pre_geom = self.get_geometry()
         x, y, radius, self.vertices = (
@@ -1141,6 +1145,7 @@ class PolygonShape(BaseShape):
             pre_geom.radius,
             pre_geom.vertices,
         )
+        self._debug(cnv, vertices=self.vertices)
         # ---- new x/y per col/row
         is_cards = kwargs.get("is_cards", False)
         if self.row is not None and self.col is not None and is_cards:
@@ -1181,19 +1186,11 @@ class PolygonShape(BaseShape):
                 bl=Point(self.x_c - self._u.radius, self.y_c + self._u.radius),
                 tr=Point(self.x_c + self._u.radius, self.y_c - self._u.radius),
             )
-        # ---- handle rotation
-        is_rotated = False
-        rotation = self.kwargs.get("rotation", self.rotation)
-        if rotation:
-            self.centroid = muPoint(x, y)
-            kwargs["rotation"] = rotation
-            kwargs["rotation_point"] = self.centroid
-            is_rotated = True
         # ---- invalid polygon?
         if not self.vertices or len(self.vertices) == 0:
             return
         # ---- draw polygon
-        # feedback(f"***Polygon {self.col=} {self.row=} {x=} {y=} {self.vertices=}")
+        # feedback(f"***Polygon {self.col=} {self.row=} {x=} {y=} \n{self.vertices=}")
         cnv.draw_polyline(self.vertices)
         kwargs["closed"] = True
         self.set_canvas_props(cnv=cnv, index=ID, **kwargs)
@@ -1206,9 +1203,6 @@ class PolygonShape(BaseShape):
                 self.vertices,
                 rotation=rotation,
             )
-        # ---- calculate vertices with rotation
-        self.vertices = self.get_vertexes(centre, rotation)
-        # self.vertices = geoms.polygon_vertices(self.sides, radius, Point(x, y), rotation)
         # ---- draw radii
         if self.radii:
             self.draw_radii(cnv, ID, Point(x, y), self.vertices, rotation=rotation)
@@ -1249,7 +1243,7 @@ class PolygonShape(BaseShape):
                 self.vertex_shapes_rotated,
             )
         # ---- debug
-        self._debug(cnv, vertices=self.vertices)  # needs: self.run_debug = True
+        # self._debug(cnv, vertices=self.vertices)  # needs: self.run_debug = True
         # ---- dot
         self.draw_dot(cnv, x, y)
         # ---- cross
@@ -1283,7 +1277,7 @@ class PolylineShape(BasePolyShape):
         lkwargs["wave_style"] = self.kwargs.get("wave_style", None)
         lkwargs["wave_height"] = self.kwargs.get("wave_height", 0)
         # ---- set vertices
-        self.vertexes = self.get_vertexes()
+        self.vertexes = self.get_vertexes()  # BasePoly
         # ---- draw polyline by vertices
         # feedback(f'***PolyLineShp{x=} {y=} {self.vertexes=}')
         if self.vertexes:
