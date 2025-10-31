@@ -3130,6 +3130,7 @@ class BaseShape:
         vertexes: list,
         centre: Point,
         direction_group: DirectionGroup = None,
+        rotation: float = 0.0,
         rotated: bool = False,
     ):
         """Draw shape(s) along the radii lines of a Shape.
@@ -3137,17 +3138,20 @@ class BaseShape:
         Args:
             radii_shapes (list):
                 list of tuples of (dir, shape, offset) where:
-                * dir is a direction name
-                * shape is an instance of a Shape
-                * offset is optional float - the fractional distance along the
-                  line from the centre to the edge at which the shape is drawn;
-                  default is 1 i.e. at the edge
+
+                  * dir is a direction name
+                  * shape is an instance of a Shape
+                  * offset is optional float - the fractional distance along the
+                    line from the centre to the edge at which the shape is drawn;
+                    default is 1 i.e. at the edge
             vertexes (list):
                 list of points for the vertices
             centre (Point):
                 the centre of the Shape
             direction_group (DirectionGroup):
                 used to define list of permissible directions for the Shape
+            rotation (float):
+                degrees counter-clockwise of primary shape rotation
             rotated (bool):
                 if True, rotate radii_shapes relative to centre
         """
@@ -3204,14 +3208,19 @@ class BaseShape:
                         centre, _radii.point, _shape_fraction - 1
                     )  # outside Shape boundaries
                 # print(f"*** {direction_group} {_radii=} {shape_centre=}")
+                # ---- shift radii shape centre
+                if rotation:
+                    shape_centre = geoms.rotate_point_around_point(
+                        shape_centre, centre, rotation
+                    )
                 # ---- calculate shape rotation
                 if rotated:
                     # compass, rotation = geoms.angles_from_points(centre, shape_centre)
                     compass, _rotation = _radii.compass, _radii.angle
                     # print(f"*** {self.__class__.__name__} {_dir} {compass=} {_rotation=}")
-                    _rotation = compass - 180.0
+                    _rotation = compass - 180.0 + rotation
                 else:
-                    _rotation = 0
+                    _rotation = rotation
                 # ---- draw radii shape
                 _shape.draw(
                     _abs_cx=shape_centre.x,
@@ -3226,6 +3235,7 @@ class BaseShape:
         vertexes: list,
         centre: Point,
         direction_group: DirectionGroup = None,
+        rotation: float = 0.0,
         rotated: bool = False,
     ):
         """Draw shape(s) along the perbii lines of a Shape.
@@ -3233,17 +3243,20 @@ class BaseShape:
         Args:
             perbii_shapes (list):
                 list of tuples of (dir, shape, offset) where:
-                * dir is a direction name
-                * shape is an instance of a Shape
-                * offset is optional float - the fractional distance along the
-                  line from the centre to the edge at which the shape is drawn;
-                  default is 1 i.e. at the edge
+
+                  * dir is a direction name
+                  * shape is an instance of a Shape
+                  * offset is optional float - the fractional distance along the
+                    line from the centre to the edge at which the shape is drawn;
+                    default is 1 i.e. at the edge
             vertexes (list):
                 list of points for the vertices
             centre (Point):
                 the centre of the Shape
             direction_group (DirectionGroup):
                 used to define list of permissible directions for the Shape
+            rotation (float):
+                degrees counter-clockwise of primary shape rotation
             rotated (bool):
                 if True, rotate perbii_shapes relative to centre
         """
@@ -3289,7 +3302,7 @@ class BaseShape:
                 feedback(f"{err} - not {item}")
             self.can_draw_centred_shape(_shape, True)  # could stop here
             for _dir in _dirs:
-                # ---- calculate shape centre
+                # ---- calculate base shape centre
                 _perbii = perbii_dict[_dir]
                 if _shape_fraction <= 1:
                     shape_centre = geoms.fraction_along_line(
@@ -3300,14 +3313,19 @@ class BaseShape:
                         centre, _perbii.point, _shape_fraction - 1
                     )  # outside Shape boundaries
                 # print(f"*** {direction_group} {_perbii=} {shape_centre=}")
+                # ---- shift perbii shape centre
+                if rotation:
+                    shape_centre = geoms.rotate_point_around_point(
+                        shape_centre, centre, rotation
+                    )
                 # ---- calculate shape rotation
                 if rotated:
                     # compass, rotation = geoms.angles_from_points(centre, shape_centre)
                     compass, _rotation = _perbii.compass, _perbii.angle
                     # print(f"*** {self.__class__.__name__} {_dir} {compass=} {_rotation=}")
-                    _rotation = compass - 180.0
+                    _rotation = compass - 180.0 + rotation
                 else:
-                    _rotation = 0
+                    _rotation = rotation
                 # ---- draw perbii shape
                 _shape.draw(
                     _abs_cx=shape_centre.x,

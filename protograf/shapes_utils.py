@@ -54,10 +54,14 @@ def draw_line(
 
     Args:
 
-    - cnv (PyMuPDF Page object): where the line is drawn
-    - start (Point): start of the line
-    - end (Point): end of the line
-    - shape (BaseShape): shape for which line is being drawn
+        cnv (PyMuPDF Page object):
+            where the line is drawn
+        start (Point):
+            start of the line
+        end (Point):
+            end of the line
+        shape (BaseShape): shape
+            for which line is being drawn
 
     Returns:
         kwargs (modified for styled lines)

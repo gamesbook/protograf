@@ -1501,8 +1501,10 @@ class RhombusShape(BaseShape):
         """Calculate radii for each Rhombus vertex and angles from centre.
 
         Args:
-            vertices: list of Rhombus's nodes as Points
-            centre: the centre Point of the Rhombus
+            vertices (list):
+                the Rhombus nodes as Points
+            centre (Point):
+                the centre of the Rhombus
 
         Returns:
             dict of Radius objects keyed on direction
@@ -1589,15 +1591,19 @@ class RhombusShape(BaseShape):
         )
 
     def draw_perbii(
-        self, cnv, ID, centre: Point, vertices: list, rotation: float = None
+        self, cnv, ID, centre: Point, vertices: list, rotation: float = 0.0
     ):
         """Draw lines connecting the Rhombus centre to the centre of each edge.
 
         Args:
-            ID: unique ID
-            vertices: list of Rhombus's nodes as Points
-            centre: the centre Point of the Rhombus
-            rotation: degrees anti-clockwise from horizontal "east"
+            ID (str):
+                unique ID for the shape
+            vertices (list):
+                the Rhombus nodes as Points
+            centre (Point):
+                the centre of the Rhombus
+            rotation (float):
+                degrees anti-clockwise from horizontal "east"
 
         Notes:
             A perpendicular bisector ("perbis") of a chord is:
@@ -1605,6 +1611,7 @@ class RhombusShape(BaseShape):
                 the chord into two equal parts and meets the chord at a right angle;
                 for a polygon, each edge is effectively a chord.
         """
+        # ---- set perbii props
         if self.perbii:
             perbii_dirs = tools.validated_directions(
                 self.perbii,
@@ -1622,6 +1629,7 @@ class RhombusShape(BaseShape):
         lkwargs = {}
         lkwargs["wave_style"] = self.kwargs.get("perbii_wave_style", None)
         lkwargs["wave_height"] = self.kwargs.get("perbii_wave_height", 0)
+        # ---- draw perbii lines
         for key, a_perbii in perbii_dict.items():
             if self.perbii and key not in perbii_dirs:
                 continue
@@ -1644,7 +1652,6 @@ class RhombusShape(BaseShape):
                 shape=self,
                 **lkwargs,
             )
-
         # ---- style all perbii
         rotation_point = centre if rotation else None
         self.set_canvas_props(
@@ -1658,34 +1665,50 @@ class RhombusShape(BaseShape):
             rotation_point=rotation_point,
         )
 
-    def draw_radii(self, cnv, ID, centre: Point, vertices: list):
+    def draw_radii(self, cnv, ID, centre: Point, vertices: list, rotation: float = 0.0):
         """Draw line(s) connecting the Rhombus centre to a vertex.
 
         Args:
-            ID: unique ID
-            vertices: list of Rhombus nodes as Points
-            centre: the centre Point of the Rhombus
+            ID (str):
+                unique ID for the shape
+            vertices (list):
+                the Rhombus nodes as Points
+            centre (Point):
+                the centre of the Rhombus
+            rotation (float):
+                degrees anti-clockwise from horizontal "east"
 
         Note:
             * vertices start on left and are ordered anti-clockwise
         """
+        # ---- set radii props
         _dirs = tools.validated_directions(
             self.radii, DirectionGroup.CARDINAL, "rhombus radii"
         )
+        # ---- set radii waves
+        lkwargs = {}
+        lkwargs["wave_style"] = self.kwargs.get("radii_wave_style", None)
+        lkwargs["wave_height"] = self.kwargs.get("radii_wave_height", 0)
+        # ---- draw radii lines
         if "w" in _dirs:  # slope to the left
-            cnv.draw_line(centre, vertices[0])
+            draw_line(cnv, centre, vertices[0], shape=self, **lkwargs)
         if "s" in _dirs:  # slope DOWN
-            cnv.draw_line(centre, vertices[1])
+            draw_line(cnv, centre, vertices[1], shape=self, **lkwargs)
         if "e" in _dirs:  # slope to the right
-            cnv.draw_line(centre, vertices[2])
+            draw_line(cnv, centre, vertices[2], shape=self, **lkwargs)
         if "n" in _dirs:  # slope UP
-            cnv.draw_line(centre, vertices[3])
-        # color, thickness etc.
+            draw_line(cnv, centre, vertices[3], shape=self, **lkwargs)
+        # ---- style all radiii
+        rotation_point = centre if rotation else None
         self.set_canvas_props(
             index=ID,
             stroke=self.radii_stroke or self.stroke,
             stroke_width=self.radii_stroke_width or self.stroke_width,
             stroke_ends=self.radii_ends,
+            dashed=self.radii_dashed,
+            dotted=self.radii_dotted,
+            rotation=rotation,
+            rotation_point=rotation_point,
         )
 
     def draw_slices(self, cnv, ID, vertexes, centre: tuple, rotation=0):
@@ -1829,10 +1852,10 @@ class RhombusShape(BaseShape):
         cnv.draw_polyline(self.vertexes)
         kwargs["closed"] = True
         self.set_canvas_props(cnv=cnv, index=ID, **kwargs)
-        # ---- draw slices after base
+        # ---- * draw slices
         if self.slices:
             self.draw_slices(cnv, ID, self.vertexes, centre, rotation)
-        # ---- draw hatches
+        # ---- * draw hatches
         if self.hatches_count:
             self.side = math.sqrt(
                 (self._u.width / 2.0) ** 2 + (self._u.height / 2.0) ** 2
@@ -1840,7 +1863,7 @@ class RhombusShape(BaseShape):
             self.draw_hatches(
                 cnv, ID, cx, cy, self.side, self.vertexes, self.hatches_count, rotation
             )
-        # ---- borders (override)
+        # ---- * borders (override)
         if self.borders:
             if isinstance(self.borders, tuple):
                 self.borders = [
@@ -1850,15 +1873,13 @@ class RhombusShape(BaseShape):
                 feedback('The "borders" property must be a list of sets or a set')
             for border in self.borders:
                 self.draw_border(cnv, border, ID)  # BaseShape
-        # ---- draw perbii
+        # ---- * draw perbii
         if self.perbii:
-            self.draw_perbii(
-                cnv, ID, Point(cx, cy), self.vertexes, rotation=kwargs.get("rotation")
-            )
-        # ---- draw radii
+            self.draw_perbii(cnv, ID, Point(cx, cy), self.vertexes, rotation=rotation)
+        # ---- * draw radii
         if self.radii:
-            self.draw_radii(cnv, ID, Point(cx, cy), self.vertexes)
-        # ---- draw radii_shapes
+            self.draw_radii(cnv, ID, Point(cx, cy), self.vertexes, rotation=rotation)
+        # ---- * draw radii_shapes
         if self.radii_shapes:
             self.draw_radii_shapes(
                 cnv,
@@ -1866,9 +1887,10 @@ class RhombusShape(BaseShape):
                 self.vertexes,
                 Point(cx, cy),
                 DirectionGroup.CARDINAL,
+                rotation,
                 self.radii_shapes_rotated,
             )
-        # ---- draw perbii_shapes
+        # ---- * draw perbii_shapes
         if self.perbii_shapes:
             self.draw_perbii_shapes(
                 cnv,
@@ -1876,28 +1898,29 @@ class RhombusShape(BaseShape):
                 self.vertexes,
                 Point(cx, cy),
                 DirectionGroup.ORDINAL,  # for the sides!
+                rotation,
                 self.perbii_shapes_rotated,
             )
-        # ---- centred shape (with offset)
+        # ---- * centred shape (with offset)
         if self.centre_shape:
             if self.can_draw_centred_shape(self.centre_shape):
                 self.centre_shape.draw(
                     _abs_cx=cx + self.unit(self.centre_shape_mx),
                     _abs_cy=cy + self.unit(self.centre_shape_my),
                 )
-        # ---- centred shapes (with offsets)
+        # ---- * centred shapes (with offsets)
         if self.centre_shapes:
             self.draw_centred_shapes(self.centre_shapes, cx, cy)
-        # ---- dot
+        # ---- * draw dot
         self.draw_dot(cnv, cx, y + self._u.height / 2.0)
-        # ---- cross
+        # ---- * draw cross
         self.draw_cross(
             cnv,
             cx,
             y + self._u.height / 2.0,
             rotation=kwargs.get("rotation"),
         )
-        # ---- text
+        # ---- * draw text
         y_off = self._u.height / 2.0
         self.draw_heading(cnv, ID, cx, cy - y_off, **kwargs)
         self.draw_label(cnv, ID, cx, cy, **kwargs)
@@ -2988,8 +3011,10 @@ class TriangleShape(BaseShape):
         """Calculate radii for each Triangle vertex and angles from centre.
 
         Args:
-            vertices: list of Triangle's nodes as Points
-            centre: the centre Point of the Triangle
+            vertices (list):
+                list of Triangle's nodes as Points
+            centre (Point):
+                the centre Point of the Triangle
 
         Returns:
             dict of Radius objects keyed on direction
@@ -3108,10 +3133,14 @@ class TriangleShape(BaseShape):
         """Draw lines connecting the Triangle centre to the centre of each edge.
 
         Args:
-            ID: unique ID
-            vertices: list of Triangle's nodes as Points
-            centre: the centre Point of the Triangle
-            rotation: degrees anti-clockwise from horizontal "east"
+            ID (str):
+                unique ID for the shape
+            vertices (list):
+                the Triangle nodes as Points
+            centre (Point):
+                the centre of the Triangle
+            rotation (float):
+                degrees anti-clockwise from horizontal "east"
 
         Notes:
             A perpendicular bisector ("perbis") of a chord is:
@@ -3119,6 +3148,7 @@ class TriangleShape(BaseShape):
                 the chord into two equal parts and meets the chord at a right angle;
                 for a polygon, each edge is effectively a chord.
         """
+        # ---- set perbii props
         if self.perbii:
             perbii_dirs = tools.validated_directions(
                 self.perbii,
@@ -3177,31 +3207,44 @@ class TriangleShape(BaseShape):
         """Draw line(s) connecting the Triangle centre to a vertex.
 
         Args:
-            ID: unique ID
-            vertices: list of Triangle nodes as Points
-            centre: the centre Triangle of the Rhombus
+            ID (str):
+                unique ID for the shape
+            vertices (list):
+                the Triangle nodes as Points
+            centre (Point):
+                the centre of the Triangle
+            rotation (float):
+                degrees anti-clockwise from horizontal "east"
 
         Note:
             * vertices start at N and are ordered anti-clockwise
               [ "n", "sw", "se"]
         """
+        # ---- set radii props
         _dirs = tools.validated_directions(
             self.radii, DirectionGroup.TRIANGULAR, "triangle radii"
         )
+        # ---- set radii waves
+        lkwargs = {}
+        lkwargs["wave_style"] = self.kwargs.get("radii_wave_style", None)
+        lkwargs["wave_height"] = self.kwargs.get("radii_wave_height", 0)
+        # ---- draw radii lines
         if "n" in _dirs:  # slope UP
-            cnv.draw_line(centre, vertices[0])
+            draw_line(cnv, centre, vertices[0], shape=self, **lkwargs)
         if "sw" in _dirs:  # slope DOWN to the left
-            cnv.draw_line(centre, vertices[1])
+            draw_line(cnv, centre, vertices[1], shape=self, **lkwargs)
         if "se" in _dirs:  # slope DOWN to the right
-            cnv.draw_line(centre, vertices[2])
+            draw_line(cnv, centre, vertices[2], shape=self, **lkwargs)
         # ---- style all radii
         rotation_point = centre if rotation else None
-        print(f"*** TRIANGLE perbii {rotation_point=} {rotation=}")
+        # print(f"*** TRIANGLE perbii {rotation_point=} {rotation=}")
         self.set_canvas_props(
             index=ID,
             stroke=self.radii_stroke or self.stroke,
             stroke_width=self.radii_stroke_width or self.stroke_width,
             stroke_ends=self.radii_ends,
+            dashed=self.radii_dashed,
+            dotted=self.radii_dotted,
             rotation=rotation,
             rotation_point=rotation_point,
         )
@@ -3368,6 +3411,7 @@ class TriangleShape(BaseShape):
                         self.vertexes,
                         self.centroid,
                         DirectionGroup.TRIANGULAR,  # for the points!
+                        rotation,
                         self.radii_shapes_rotated,
                     )
             if item == "perbii_shapes":
@@ -3379,6 +3423,7 @@ class TriangleShape(BaseShape):
                         self.vertexes,
                         self.centroid,
                         DirectionGroup.TRIANGULAR_EDGES,  # for the sides!
+                        rotation,
                         self.perbii_shapes_rotated,
                     )
             if item == "centre_shape" or item == "center_shape":
@@ -3418,15 +3463,15 @@ class TriangleShape(BaseShape):
             if item == "text":
                 # ---- * text
                 if self.triangle_type == TriangleType.EQUILATERAL:
-                    heading_y = self.vertexes[
-                        0
-                    ].y  # self.centroid.y - self.height * 2.0 / 3.0
-                    # title_y = self.centroid.y + self.height / 3.0  # fails for pivot
-                    title_y = self._u.y + self._o.delta_y
+                    heading_y = self.vertexes[0].y
+                    # self.centroid.y - self.height * 2.0 / 3.0
+                    # title_y = self.centroid.y + self._u.height / 3.0  # fails for pivot
+                    # title_y = self._u.y + self._o.delta_y
+                    # title_y = self._u.y + 3./2. * self._o.delta_y
+                    title_y = self.vertexes[1].y
                 elif self.triangle_type == TriangleType.ISOSCELES:
-                    heading_y = self.vertexes[
-                        0
-                    ].y  # self._u.y + self._o.delta_y - self._u.height
+                    heading_y = self.vertexes[0].y
+                    # self._u.y + self._o.delta_y - self._u.height
                     title_y = self._u.y + self._o.delta_y
                 elif self.triangle_type == TriangleType.IRREGULAR:
                     area = self.calculate_area(self.vertexes, rotation)

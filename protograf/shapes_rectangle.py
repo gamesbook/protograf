@@ -1808,6 +1808,7 @@ class RectangleShape(BaseShape):
                         self.vertexes,
                         Point(x_d, y_d),
                         DirectionGroup.ORDINAL,  # for radii !
+                        rotation,
                         self.radii_shapes_rotated,
                     )
             if item == "perbii_shapes":
@@ -1819,6 +1820,7 @@ class RectangleShape(BaseShape):
                         self.vertexes,
                         Point(x_d, y_d),
                         DirectionGroup.CARDINAL,  # for perbii !
+                        rotation,
                         self.perbii_shapes_rotated,
                     )
             if item == "centre_shape" or item == "center_shape":
