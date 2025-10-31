@@ -148,7 +148,7 @@ to process your script:
 
 .. code::
 
-    python --fonts myscript.py
+    python myscript.py --fonts
 
 In either case, you should get feedback from the script about this process:
 
