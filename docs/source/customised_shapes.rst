@@ -3592,7 +3592,7 @@ Triangle
 Triangle overview
 -----------------
 
-A Triangle is a three-sided polygon.  It can have uniform sides, in which case
+A triangle is a three-sided polygon.  It can have uniform sides, in which case
 it is an *equilateral* triangle |dash| the default; two sides of matching
 length, in which case it is an *isosceles* triangle; or all sides of unequal
 length, in which case it is an *irregular* triangle.
@@ -3628,7 +3628,7 @@ default of ``1`` for both the *x* and *y* positions.
 
 A triangle's drawing can be affected by its *pivot* which is an angle used to
 alter the direction of the bottom edge |dash| the ``s`` line. By default this
-line is drawn in the eastwards direction, i.e a pivot of ``0`` |deg|, but if
+line is drawn in the eastwards direction, i.e. a pivot of ``0`` |deg|, but if
 set will cause that line to be rotated anti-clockwise around the ``sw`` vertex.
 
 Equilateral triangles
@@ -3645,6 +3645,12 @@ unless more properties are set. See `Example 1. Default Triangle`_.
 Equilateral triangles can also be constructed using their centroid position,
 instead of the usual  *x* and *y* positions. See
 `Example 2. Custom Equilateral`_
+
+.. NOTE::
+
+  An Equilateral triangle constructed via its centroid position cannot also
+  have a value set for *pivot*.  This is because this setting would effectively
+  be acting in the same way as the *rotation*.
 
 Isosceles triangles
 +++++++++++++++++++

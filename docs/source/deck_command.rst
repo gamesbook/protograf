@@ -60,8 +60,8 @@ The following are other properties that can also be set for a ``Deck``:
 
 - **bleed_fill** - set a background color for the page (up to the margins);
   if no separate **fill** property is set, then this color will be used instead
-- **card_name**  - the name of a column in the dataset defined by
-  :ref:`the Data Command <the-data-command>` that specifies
+- **card_name**  - the name of a column in the dataset defined by the
+  :ref:`Data Command <the-data-command>` that specifies
   what file name will be given to the card when it is exported as an image
   (if not supplied, will default to using the page number and card number)
 - **card_size** - a pre-existing card size used to set *width* and *height*
@@ -70,8 +70,8 @@ The following are other properties that can also be set for a ``Deck``:
   ``"skat"``, ``"tarot"`` or ``"business"``
 - **cols** - the maximum number of card columns that should appear on a
   page
-- **copy** - the name of a column in the dataset defined by
-  :ref:`the Data Command <the-data-command>` that specifies
+- **copy** - the name of a column in the dataset defined by the
+  :ref:`Data Command <the-data-command>` that specifies
   how many copies of a card are needed
 - **fill** - sets the color of the card's area; defaults to ``white``
 - **frame** - the default card frame is a *rectangle* (or square, if the

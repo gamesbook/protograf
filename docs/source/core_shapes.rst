@@ -2965,14 +2965,14 @@ Pedantically speaking, an image is not like the other shapes in the sense that
 it does not consist of lines and areas drawn by **protograf** itself.
 
 An "image" refers to an external file which is simply inserted into the page
-at sthe location.
+at the location.
 
 The Image shape shares a number of common aspects with other shapes |dash| such
 as its x & y ("top left") position, a width and a height, the ability to be
-rotated, and the adding of text in form of a label, heading or title.
+rotated, and the addition of text in form of a label, heading or title.
 
 If an image has a transparent area, this will be respected and shapes
-appearing earlier on in the script may then be visible "below" it (see
+drawn previously by the script may then be visible "below" it (see
 examples below). An image can also be "drawn over" by other shapes
 appearing later on in the script.
 
@@ -3034,6 +3034,16 @@ Example 2. Rotation & Scaling
 +++++++++++++++++++++++++++++
 `^ <image-command_>`_
 
+.. NOTE::
+
+   :doc:`protograf <index>` does not currently do image scaling in the
+   sense of altering the image dimensions of the actual image file.
+   Instead, by setting its ``height`` and ``width`` properties, the image
+   can appear in the output at the size required.
+
+   Bear in mind that larger images will increase the size of the output
+   PDF file accordingly, regardless of how small they appear on a page.
+
 .. |im2| image:: images/customised/images_normal_rotation.png
    :width: 330
 
@@ -3045,20 +3055,24 @@ Example 2. Rotation & Scaling
 
         Image(
           "sholes_typewriter.png",
-          x=0, y=1, width=1.5, height=1.5,
+          x=0, y=1,
+          width=2.0, height=2.0,
           title="PNG")
         Image(
           "sholes_typewriter.png",
-          x=2, y=1, width=1.5, height=1.5,
+          x=2, y=1,
+          width=1.5, height=1.5,
           title="60\u00B0",
           rotation=60)
         Image(
           "noun-typewriter-3933515.svg",
-          x=0, y=4, width=1.5, height=1.5,
+          x=0, y=4,
+          width=2.0, height=2.0,
           title="SVG")
         Image(
           "noun-typewriter-3933515.svg",
-          x=2, y=4, width=1.5, height=1.5,
+          x=2, y=4,
+          width=1.5, height=1.5,
           title="45\u00B0",
           rotation=45)
 
@@ -3066,11 +3080,20 @@ Example 2. Rotation & Scaling
 
       - name of the image file; this must be the first property set
       - *x* and *y* - these values set the upper-left corner
+
+      Each set of images has different sizes to simulate image scaling.
+
+      The two left-hand images have:
+
+      - *height* - set to ``2.0`` cm; this value may cause some distortion
+      - *width* - set to ``2.0`` cm; this value may cause some distortion
+
+      The two right-hand images have:
+
       - *height* - set to ``1.5`` cm; this value may cause some distortion
       - *width* - set to ``1.5`` cm; this value may cause some distortion
 
-      Two of the images |dash| the ones on the right |dash| are rotated about
-      a centre point:
+      The two right-hand images are rotated about a centre point:
 
       - *rotation* - degrees, anti-clockwise, about the centre
 
@@ -4113,10 +4136,11 @@ Perbii shapes can be constructed for:
 
 .. NOTE::
 
-    Actually, because a rhombus can have an "elongated" shape, it is not
+    Actually, because a Rhombus can have an "elongated" shape, it is not
     really possible to have true perbis lines for this shape.  What is drawn
     are lines from the midpoints of each side to the centre. This in turn
-    means that rotated shapes have an "awkward" angle |dash| use with care.
+    means that rotated shapes can seem to have an "awkward" angle |dash| use
+    with care. The same is true for any non-equilateral Triangle.
 
 
 Example 1. Perbii Shapes
@@ -4198,6 +4222,10 @@ Example 1. Perbii Shapes
       The use of ``perbii_shapes_rotated=True`` will means all of these
       examples have the perbii shapes rotated to face "away" from the
       parent shape's centre.
+
+      As per the note above, the *perbii_shapes* for the Rhombus are
+      aligned in the direction of the *perbii* lines and **not** with
+      the shape's edges.
 
       .. HINT::
 

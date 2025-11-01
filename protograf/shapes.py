@@ -87,16 +87,41 @@ class ImageShape(BaseShape):
             if width and height:
                 x = self._u.cx - width / 2.0 + self._o.delta_x
                 y = self._u.cy - height / 2.0 + self._o.delta_y
+                x_c = x + width / 2.0
+                y_c = y + height / 2.0
             else:
                 feedback(
                     "Must supply width and height for use with cx and cy.", stop=True
                 )
         else:
+            # ---- calculate x,y from alignment
             x = self._u.x + self._o.delta_x
             y = self._u.y + self._o.delta_y
-        if self.use_abs_c:
-            x = self._abs_cx - width / 2.0
-            y = self._abs_cy - height / 2.0
+            match _lower(self.align_horizontal):
+                case 'l' | 'left':
+                    x_c = x + width / 2.0
+                case 'c' | 'centre' | 'center':
+                    x = x - width / 2.0
+                    x_c = x + width / 2.0
+                case 'r' | 'right':
+                    x = x - width
+                    x_c = x + width / 2.0
+                case _:
+                    x_c = x + width / 2.0
+            match _lower(self.align_vertical):
+                case 't' | 'top':
+                    y_c = y + height / 2.0
+                case 'm' | 'mid' | 'middle':
+                    y = y - height / 2.0
+                    y_c = y + height / 2.0
+                case 'b' | 'bottom':
+                    y = y - height
+                    y_c = y + height / 2.0
+                case _:
+                    y_c = y + height / 2.0
+            if self.use_abs_c:
+                x = self._abs_cx - width / 2.0
+                y = self._abs_cy - height / 2.0
         rotation = kwargs.get("rotation", self.rotation)
         # ---- load image
         # feedback(f'*** IMAGE {ID=} {_source=} {x=} {y=} {self.rotation=}')
@@ -124,9 +149,6 @@ class ImageShape(BaseShape):
         if self.use_abs_c:
             x_c = self._abs_cx
             y_c = self._abs_cy
-        else:
-            x_c = x + width / 2.0
-            y_c = y + height / 2.0
         # ---- cross
         self.draw_cross(cnv, x_c, y_c, rotation=kwargs.get("rotation"))
         # ---- dot
@@ -2912,6 +2934,16 @@ class TriangleShape(BaseShape):
                 self.triangle_type = TriangleType.EQUILATERAL
             else:
                 feedback(f"Insufficient settings to construct a Triangle!", True)
+        # ---- validate
+        if self.triangle_type == TriangleType.EQUILATERAL:
+            if self.kwargs.get("pivot") and (
+                self.kwargs.get("cx") or self.kwargs.get("cy")
+            ):
+                feedback(
+                    f"An equilateral Triangle, with a defined centre,"
+                    " cannot also have a pivot set!",
+                    True,
+                )
 
     def calculate_sides(
         self, vertices, rotation: float = 0, units: bool = True
@@ -2964,7 +2996,7 @@ class TriangleShape(BaseShape):
             return length
 
     def calculate_perbii(
-        self, cnv, centre: Point, rotation: float = None, **kwargs
+        self, cnv, centre: Point, vertices: list, rotation: float = None, **kwargs
     ) -> dict:
         """Calculate centre points for each edge and angles from centre.
 
@@ -2979,11 +3011,11 @@ class TriangleShape(BaseShape):
         """
         directions = ["nw", "s", "ne"]  # edge directions
         perbii_dict = {}
-        vertices = self.get_vertexes(rotation=rotation)
         vcount = len(vertices) - 1
         _perbii_pts = []
         # print(f"*** TRIANGLE perbii {centre=} {vertices=}")
         for key, vertex in enumerate(vertices):
+            # print(f'*** TRIANGLE vertex {key=} {vertex.x:.1f}/{vertex.y:.1f}')
             if key == 2:
                 p1 = Point(vertex.x, vertex.y)
                 p2 = Point(vertices[0].x, vertices[0].y)
@@ -3325,9 +3357,6 @@ class TriangleShape(BaseShape):
                 feedback(
                     "Cannot draw Triangle via its centre unless it is EQUILATERAL", True
                 )
-        # ---- recalculate x,y
-        if self.centroid and self.triangle_type == TriangleType.EQUILATERAL:
-            has_centroid = True
         # ---- calculate vertexes
         # print(f'*** TRIANGLE {self.triangle_type=}'}
         self.vertexes = self.get_vertexes(rotation, has_centroid)
@@ -3339,7 +3368,7 @@ class TriangleShape(BaseShape):
             self.centroid = self.get_centroid(self.vertexes)
         elif self.triangle_type == TriangleType.IRREGULAR:
             self.centroid = self.get_centroid(self.vertexes)
-        # print(f'*** TRIANGLE {self.side=} {self.centroid=} {self.height=}')
+        # print(f'*** TRIANGLE {self.centroid.x:.1f} {self.centroid.y:.1f}')
 
         # ---- determine ordering
         base_ordering = [
@@ -3464,10 +3493,8 @@ class TriangleShape(BaseShape):
                 # ---- * text
                 if self.triangle_type == TriangleType.EQUILATERAL:
                     heading_y = self.vertexes[0].y
-                    # self.centroid.y - self.height * 2.0 / 3.0
                     # title_y = self.centroid.y + self._u.height / 3.0  # fails for pivot
                     # title_y = self._u.y + self._o.delta_y
-                    # title_y = self._u.y + 3./2. * self._o.delta_y
                     title_y = self.vertexes[1].y
                 elif self.triangle_type == TriangleType.ISOSCELES:
                     heading_y = self.vertexes[0].y
@@ -3476,8 +3503,7 @@ class TriangleShape(BaseShape):
                 elif self.triangle_type == TriangleType.IRREGULAR:
                     area = self.calculate_area(self.vertexes, rotation)
                     ht = 2 * area / self._u.side
-                    # print(f'IRR {area=} {ht=} {self._u.y=}')
-                    heading_y = self.vertexes[0].y  # self._u.y + self._o.delta_y - ht
+                    heading_y = self.vertexes[0].y
                     title_y = self._u.y + self._o.delta_y
                 self.draw_heading(cnv, ID, self.centroid.x, heading_y, **kwargs)
                 self.draw_label(cnv, ID, self.centroid.x, self.centroid.y, **kwargs)

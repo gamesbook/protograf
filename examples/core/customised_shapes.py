@@ -204,7 +204,7 @@ Polygon(
             'aqua', 'pink', 'violet', 'purple'])
 PageBreak()
 
-# ---- dates
+# ---- date formats
 Blueprint()
 Text(common=txt, text="Dates: format and styles")
 dtext = Common(x=0.25, align="left", font_size=8)
@@ -217,15 +217,15 @@ PageBreak()
 
 # ---- rotation - image
 Blueprint()
-Text(common=txt, text="Images: normal & rotation")
+Text(common=txt, text="Images: scaling + rotation")
 Image("sholes_typewriter.png",
-      width=1.5, height=1.5,
+      width=2, height=2,
       x=0, y=0, title="PNG")
 Image("sholes_typewriter.png",
       width=1.5, height=1.5,
       x=2, y=0, title="60\u00B0", rotation=60)
 Image("noun-typewriter-3933515.svg",
-      width=1.5, height=1.5,
+      width=2, height=2,
       x=0, y=3, title="SVG")
 Image("noun-typewriter-3933515.svg",
       width=1.5, height=1.5,
@@ -951,6 +951,49 @@ Image("fantasy-forest-with-old-bridges.png",
 )
 PageBreak()
 
+# ---- image - align
+Blueprint()
+Text(common=txt, text="Image: align")
+
+Image("fantasy-forest-with-old-bridges.png",
+      width=1, height=1,
+      x=0.5, y=0.5,
+      title="no align")
+Image("fantasy-forest-with-old-bridges.png",
+      width=1, height=1,
+      cx=3, cy=1,
+      title="centre x,y")
+Image("fantasy-forest-with-old-bridges.png",
+      width=1, height=1,
+      x=2, y=4,
+      align_horizontal="right",
+      align_vertical="bottom",
+      title="bottom-right")
+Circle(fill_stroke="red", radius=0.05, cx=2, cy=4)
+Image("fantasy-forest-with-old-bridges.png",
+      width=1, height=1,
+      x=2, y=2,
+      align_horizontal="left",
+      align_vertical="top",
+      title="top-left")
+Circle(fill_stroke="red", radius=0.05, cx=2, cy=2)
+Image("fantasy-forest-with-old-bridges.png",
+      width=1, height=1,
+      x=0, y=5,
+      align_horizontal="left",
+      align_vertical="mid",
+      title="mid-left")
+Circle(fill_stroke="red", radius=0.05, cx=0, cy=5)
+Image("fantasy-forest-with-old-bridges.png",
+      width=1, height=1,
+      x=3, y=5,
+      align_horizontal="centre",
+      align_vertical="mid",
+      title="mid-centre")
+Circle(fill_stroke="red", radius=0.05, cx=3, cy=5)
+
+PageBreak()
+
 # ---- shape rotation I
 Blueprint()
 Text(common=txt, text="Rotation I (cross & label)")
@@ -1302,7 +1345,8 @@ Save(
         "shape_centred", "shape_centred_move", "shape_centred_custom",
         "shapes_centred",
         "qr_code",
-        "image_sliced", "image_label", "image_operations",
+        "image_sliced", "image_label",
+        "image_operations", "image_align",
         "shape_rotation",
         "shape_rotation_two",
         "shape_hatches_and_rotation",

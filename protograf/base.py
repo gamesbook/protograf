@@ -334,6 +334,8 @@ class BaseCanvas:
         self.source = self.defaults.get("source", None)  # file or http://
         self.cache_directory = None  # should be a pathlib.Path object
         self.sliced = ""
+        self.align_vertical = self.defaults.get("align_vertical", None)
+        self.align_horizontal = self.defaults.get("align_horizontal", None)
         self.image_location = None
         self.operation = None  # operation on image
         # ---- line / ellipse / bezier / sector
@@ -912,6 +914,8 @@ class BaseShape:
         self.source = kwargs.get("source", base.source)  # file or http://
         self.sliced = ""
         self.image_location = kwargs.get("image_location", base.image_location)
+        self.align_vertical = kwargs.get("align_vertical", base.align_vertical)
+        self.align_horizontal = kwargs.get("align_horizontal", base.align_horizontal)
         self.operation = kwargs.get("operation", base.operation)  # operation on image
         # ---- line / ellipse / bezier / arc / polygon
         self.length = self.kw_float(kwargs.get("length", base.length))
@@ -1505,12 +1509,36 @@ class BaseShape:
                 "right",
                 "justify",
                 "centre",
+                "center",
                 "l",
                 "r",
                 "j",
                 "c",
             ]:
                 issue.append(f'"{self.align}" is an invalid align!')
+                correct = False
+        if self.align_horizontal:
+            if _lower(self.align_horizontal) not in [
+                "left",
+                "right",
+                "centre",
+                "center",
+                "l",
+                "r",
+                "c",
+            ]:
+                issue.append(f'"{self.align_horizontal}" is an invalid align_horizontal!')
+                correct = False
+        if self.align_vertical:
+            if _lower(self.align_vertical) not in [
+                "top",
+                "middle",
+                "bottom",
+                "t",
+                "m",
+                "b",
+            ]:
+                issue.append(f'"{self.align_vertical}" is an invalid align_vertical!')
                 correct = False
         if self.edges:
             if not isinstance(self.edges, list):
