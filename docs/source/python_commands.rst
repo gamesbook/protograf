@@ -55,7 +55,7 @@ However, most programming languages have the concept of **loops** and
 **if** statements. These commands are used to change the default
 behaviour of the program in some way.  Similarly, **functions** are
 used in many languages to create a set of items that must all carried out
-together, and which need to be used/activated a number of times.
+together, and which need to be used/activated multiple times.
 
 Any statement or functionality that is part of the Python programming language
 can be used in a script if you want to. The ones below are just to give
@@ -211,13 +211,13 @@ If Statements
 =============
 `↑ <table-of-contents-pyc_>`_
 
-An ``if`` statement is a way to allow the computer to make decisions
+An ``if`` statement is a way to allow the computer to make choices
 based on the information available to it.
 
-All us of make similar decisions. When we are driving a vehicle along a
+All of us have to make choices. When we are driving a vehicle along a
 road and we approach a traffic light, we evaluate the color of the
-traffic light and make a decision; if the light is green we carry on
-driving, but if the light is red we come to a stop.
+traffic light and make a decision; *if* the light is green we carry on
+driving, but *if* the light is red we come to a stop.
 
 In a similar way we can set up a statement to allow the script to behave
 differently according to information that it has.
@@ -290,10 +290,10 @@ This example is shown below.
         PageBreak()
 
       The value of ``number`` is used to locate the lower
-      corner position of the shape that is being drawn.
+      corner positions of the shapes that are being drawn.
 
-      The value of ``number`` can easily be seen as it is used to
-      create the text for the shape's label.
+      The value of ``number`` can easily be seen as it is also used
+      to create the text for the shapes' labels.
 
 ===== ======
 
@@ -357,6 +357,7 @@ was activated.
 
 Function Example 1. Drawing Shapes
 ----------------------------------
+`^ <python-function_>`_
 
 .. |fn1| image:: images/custom/commands/function.png
    :width: 330
@@ -373,7 +374,7 @@ Function Example 1. Drawing Shapes
                 x=a, y=b, height=1, width=2, fill_stroke=c,
                 notch_y=0.1, notch_x=0.5,
                 notch_directions="nw ne",)
-            EquilateralTriangle(
+            Triangle(
                 cx=a+1, cy=b+1.5, side=0.25, fill_stroke=c)
 
         Create(paper="A8", margin=0.25)
@@ -386,8 +387,8 @@ Function Example 1. Drawing Shapes
 
       The function named ``capitol`` has three properties that
       can be set: *a*, *b* and *c*. These are used to control
-      some of the properties of the 3 shapes that are drawn by
-      the function.
+      some of the properties of the thre shapes that are drawn by
+      this function.
 
       The values have defaults - ``0``, ``0`` and ``red``
       - respectively, which are used if no values are provided;
@@ -418,14 +419,17 @@ Function Example 1. Drawing Shapes
 
 Function Example 2. Modifying Data
 ----------------------------------
+`^ <python-function_>`_
 
-A *function* can also be used for a "non-drawing" operation.
+A *function* can also be used for a "non-drawing" operation, such as a
+calculation.
 
-You can create one that modifies the value of a property used by a shape.
+You can, for example, create one that generates or modifies the value of
+a property used by a shape.
 
-The use of ``return`` is key for most functions; any time that it used,
-the function will stop operations and the script will resume from the point
-where the function has just been activated.
+The use of ``return`` is a key step for most functions; any time that it used,
+the function will stop operating and "go back" to the main part of script. The
+script will resume from the point where the function has just been activated.
 
 .. code:: python
 
@@ -436,7 +440,7 @@ where the function has just been activated.
     Circle(cx=3, cy=3, diameter=shift(1))
     Circle(cx=3, cy=3, diameter=shift(2))
 
-Here the different circles each are assigned a slighly larger value
+Here the different circles each are assigned a slightly larger value
 by the function simply adding ``1`` to them.
 
 This is a trivial example, but it serves to show how functions can be

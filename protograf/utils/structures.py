@@ -62,6 +62,12 @@ class HexOrientation(Enum):
     POINTY = 2
 
 
+class TriangleType(Enum):
+    EQUILATERAL = 1
+    ISOSCELES = 2
+    IRREGULAR = 3
+
+
 # ---- NAMEDTUPLE
 
 Bounds = namedtuple(

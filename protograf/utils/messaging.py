@@ -9,7 +9,7 @@ from rich.console import Console
 from protograf import globals
 
 
-def feedback(item, stop=False, warn=False):
+def feedback(item, stop=False, warn=False, alert=False):
     """Placeholder for more complete feedback."""
     console = Console()
     if hasattr(globals, "pargs"):
@@ -18,6 +18,8 @@ def feedback(item, stop=False, warn=False):
         no_warning = False
     if warn and not no_warning:
         console.print("[bold magenta]WARNING::[/bold magenta] %s" % item)
+    elif alert:
+        console.print("[bold yellow]FEEDBACK::[/bold yellow] %s" % item)
     elif not warn:
         console.print("[bold green]FEEDBACK::[/bold green] %s" % item)
     if stop:

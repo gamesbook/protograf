@@ -23,11 +23,12 @@ which are described here.
 .. _table-of-contents-custom:
 
 - `Overview`_
+- `Blueprint`_
+- `Circle`_
+- `Hexagon`_
 - `Line`_
 - `Rectangle`_
-- `Hexagon`_
-- `Circle`_
-- `Blueprint`_
+- `Triangle`_
 
 
 Overview
@@ -35,16 +36,335 @@ Overview
 `↑ <table-of-contents-custom_>`_
 
 To make it easier to see where and how a shape has been drawn, most of these
-examples have been created with a background grid (which **protograf**
-refers to as a `Blueprint`_ shape) added to the page |dash| a small A8
-"business card" size |dash| for cross-reference. In addition, the default
-Blueprint line width (aka *stroke_width*) has been made thicker for easier
-viewing of the small PNG images that were generated from the original PDF
-output.
+examples have been created with a background grid (which
+:doc:`protograf <index>` refers to as a `Blueprint`_ shape) added to the page
+|dash| a small A8 "business card" size |dash| for cross-reference. In addition,
+the default Blueprint line width (aka *stroke_width*) has been made thicker
+for easier viewing of the small PNG images that were generated from the
+original PDF output.
 
 A number of examples also use the :ref:`Common command <the-common-command>`
 |dash| this allows shared properties to be defined once and then used by any
 number of shapes.
+
+
+.. _blueprintIndex:
+
+Blueprint
+=========
+`↑ <table-of-contents-custom_>`_
+
+This shape is primarily intended to support drawing while it is "in progress".
+
+It can take on the appearance of typical "cutting board", so it provides a quick
+and convenient way to orientate and place other shapes that *are* required for
+the final product.
+
+Typically one would just comment out the Blueprint command when its purpose has
+been served.
+
+Properties
+----------
+
+In addition to the basic line styling properties, a Blueprint can also be
+customised with the following properties:
+
+- *subdivisions* - a number indicating how many lines should be drawn
+  within each square; these are evenly spaces; use *subdivisions_dashed*
+  to enhance these lines
+- *style* - set to one of: *blue*, *green* or *grey*
+- *decimals* - set to to an integer number for the decimal points which
+  are used for the grid numbers (default is ``0``)
+- *edges* - can be set to any combination of *n*, *s*, *e*, or *w* in a
+  single comma-delimited string; grid numbers will then be drawn on
+  any of the edges specified
+- *edges_y* - the number set for this determines where a horizontal line
+  of grid numbers will be drawn
+- *edges_x* - the number set for this determines where a vertical line
+  of grid numbers will be drawn
+
+Examples showing how the Blueprint can be styled are described below.
+
+- `Subdivisions <blueSub_>`_
+- `Subdivisions - dashed <blueSubDash_>`_
+- `Style: Blue <blueStyleBlue_>`_
+- `Style: Green <blueStyleGreen_>`_
+- `Style: Gray <blueStyleGray_>`_
+- `Stroke <blueStroke_>`_
+- `Fill <blueFill_>`_
+- `Decimals <blueDec_>`_
+- `Edge Numbering <blueEdge_>`_
+- `Edge Numbering at x and y <blueEdgeXY_>`_
+
+
+.. _blueSub:
+
+Subdivisions
+------------
+`↑ <blueprint_>`_
+
+.. |bl0| image:: images/custom/blueprint/subdivisions.png
+   :width: 330
+
+===== ======
+|bl0| This example shows the Blueprint constructed using the command with these
+      properties:
+
+        .. code:: python
+
+          Blueprint(subdivisions=5, stroke_width=0.5)
+
+      It has the following properties set:
+
+      - *subdivisions* - ``5`` thinner lines between each pair of primary lines
+      - *stroke_width* - set to ``0.5`` |dash| thicker and more visible
+
+      .. NOTE::
+
+          *subdivisions* are **not** numbered and are automatically
+          drawn with a thinner line in a *dotted* style.
+
+===== ======
+
+
+.. _blueSubDash:
+
+Subdivisions - Dashed
+---------------------
+`↑ <blueprint_>`_
+
+.. |bl1| image:: images/custom/blueprint/subdivisions_dashed.png
+   :width: 330
+
+===== ======
+|bl1| This example shows the Blueprint constructed using the command with these
+      properties:
+
+        .. code:: python
+
+          Blueprint(
+              stroke_width=0.5,
+              subdivisions=5,
+              subdivisions_dashed=[0.2, 0.1])
+
+      It has the following properties set:
+
+      - *stroke_width* - set to ``0.5`` |dash| thicker and more visible
+      - *subdivisions* - ``5`` thinner lines between each pair of primary lines
+      - *subdivisions_dashed* - a list with the length of the dash followed by
+        the length of the space between two dashes - ``2`` and ``1`` mm.
+
+      .. NOTE::
+
+          *subdivisions* are **not** numbered and are automatically
+          drawn with a thinner line using the dash settings.
+
+===== ======
+
+.. _blueStyleBlue:
+
+Style - Blue
+------------
+`↑ <blueprint_>`_
+
+.. |bl2| image:: images/custom/blueprint/style_blue.png
+   :width: 330
+
+===== ======
+|bl2| This example shows the Blueprint constructed using the command with these
+      properties:
+
+        .. code:: python
+
+          Blueprint(style='blue')
+
+      It has the following properties set:
+
+      - *style* - set to ``blue``; this affects both the line and the
+        background colors
+
+===== ======
+
+.. _blueStyleGreen:
+
+Style - Green
+-------------
+`↑ <blueprint_>`_
+
+.. |bl3| image:: images/custom/blueprint/style_green.png
+   :width: 330
+
+===== ======
+|bl3| This example shows the Blueprint constructed using the command with these
+      properties:
+
+        .. code:: python
+
+          Blueprint(style='green')
+
+      It has the following properties set:
+
+      - *style* - set to `green`; this affects both the line and the background
+        colors
+
+===== ======
+
+.. _blueStyleGray:
+
+Style - Gray
+------------
+`↑ <blueprint_>`_
+
+.. |bl4| image:: images/custom/blueprint/style_grey.png
+   :width: 330
+
+===== ======
+|bl4| This example shows the Blueprint constructed using the command with these
+      properties:
+
+        .. code:: python
+
+          Blueprint(style='gray')
+
+      It has the following properties set:
+
+      - *style* - set to ``gray``; this affects both the line and the background
+        colors
+
+===== ======
+
+.. _blueStroke:
+
+Stroke
+------
+`↑ <blueprint_>`_
+
+.. |bl5| image:: images/custom/blueprint/stroke_width_red.png
+   :width: 330
+
+===== ======
+|bl5| This example shows the Blueprint constructed using the command with these
+      properties:
+
+        .. code:: python
+
+          Blueprint(stroke_width=1, stroke="red")
+
+      It has the following properties set:
+
+      - *stroke* - set to ``red`` for the grid line color
+      - *stroke_width* - set to ``1`` |dash| thicker and more visible
+
+===== ======
+
+.. _blueFill:
+
+Fill
+----
+`↑ <blueprint_>`_
+
+.. |bl6| image:: images/custom/blueprint/style_stroke.png
+   :width: 330
+
+===== ======
+|bl6| This example shows the Blueprint constructed using the command with these
+      properties:
+
+        .. code:: python
+
+          Blueprint(style="gray", stroke="purple")
+
+      It has the following properties set:
+
+      - *style* - see `Style: Gray <blueStyleGray_>`_ above
+      - *stroke* - set to ``purple`` to changes the grid line color
+
+      **Note**: changes to line stroke, and line and fill color, will
+      override the defaults for a chosen style.
+
+===== ======
+
+.. _blueDec:
+
+Decimals
+--------
+`↑ <blueprint_>`_
+
+.. |bl7| image:: images/custom/blueprint/decimals.png
+   :width: 330
+
+===== ======
+|bl7| This example shows the Blueprint constructed using the command with these
+      properties:
+
+        .. code:: python
+
+          Blueprint(decimals=1)
+
+      It has the following properties set:
+
+      - *decimals* - set to ``1``; number of decimal points used for the grid
+        numbers
+
+===== ======
+
+.. _blueEdge:
+
+Edge Numbering
+--------------
+`↑ <blueprint_>`_
+
+.. |bl8| image:: images/custom/blueprint/edges.png
+   :width: 330
+
+===== ======
+|bl8| This example shows the Blueprint constructed using the command with these
+      properties:
+
+        .. code:: python
+
+          Blueprint(edges='n,s,e,w')
+
+      It has the following properties set:
+
+      - *edges* - set to ``'n,s,e,w'``; grid numbers will be drawn on
+        all of the four edges
+
+      Choose which edges should be numbered by using them in the list;
+      e.g. ``'e,w'`` will only number left and right edges.
+
+===== ======
+
+.. _blueEdgeXY:
+
+Edges Numbering at x and y
+--------------------------
+`↑ <blueprint_>`_
+
+.. |bl9| image:: images/custom/blueprint/edges_x_y.png
+   :width: 330
+
+===== ======
+|bl9| This example shows the Blueprint constructed using the command with these
+      properties:
+
+        .. code:: python
+
+          Blueprint(
+              edges_y=3, edges_x=2)
+
+      It has the following properties set:
+
+      - *edges_y* - set to ``3``; a horizontal line of grid numbers will be
+        drawn where ``y`` is equal to 3
+      - *edges_x* - set to ``2``; a vertical line of grid numbers will be
+        drawn where ``x`` is equal to 2
+
+      This is not very useful for a tiny grid, but for a very large page size
+      it can be helpful to set (or reset) such grid numbering while working
+      on a complex design.
+
+===== ======
 
 
 .. _lineIndex:
@@ -70,8 +390,8 @@ Basic Properties
 A Line has the following properties, in addition to the basic ones of
 *x* and *y* for the starting point, and its *label* properties.
 
-- *angle* - the number of degrees clockwise from the baseline; used in
-  conjunction with *length*
+- *angle* - the number of degrees clockwise that the line is rotated from
+  the baseline about its start point; used in conjunction with *length*
 - *cx* and *cy* - if set, will replace the use of *x* and *y* for the
   starting point, and work in conjunction with *angle* and *length* to
   create the line around a centre point
@@ -817,8 +1137,10 @@ Hatches
 -------
 `^ <rectangleIndex_>`_
 
-Hatches are a set of parallel lines that are drawn, in a specified direction, across
-the length or width of the Rectangle in a vertical, horizontal or diagonal direction.
+Hatches are a set of parallel lines that are drawn, in a specified direction,
+across the length or width of the Rectangle in a vertical, horizontal or
+diagonal direction.  Hatches are equally spaced across the height or width
+of the Rectangle.
 
 .. |rht| image:: images/custom/rectangle/hatches.png
    :width: 330
@@ -1734,10 +2056,12 @@ Hexagon
 =======
 `↑ <table-of-contents-custom_>`_
 
-A Hexaggo
+A Hexagon is a regular, six-sided, polygon whose sides are all equal.
 
 A key property for a Hexagon is its *orientation*; this can either be *flat*,
-which is the default, or *pointy*.
+which is the default, with two opposing sides parallel to the top and bottom
+edges of the page or card, or *pointy* with two opposing sides parallel to
+the left and right edges of the page or card.
 
 The examples below show how each orientation of a Hexagon can be customised
 in a similar way.
@@ -1838,9 +2162,9 @@ Hatches: Flat
 -------------
 `^ <hexagon_>`_
 
-Hatches are a set of parallel lines that are drawn across
-a Hexagon from one opposing side to another in a vertical, horizontal or
-diagonal direction.
+Hatches are a set of parallel lines that are drawn across a Hexagon from
+one opposing side to another in a vertical, horizontal or diagonal
+direction. Hatches are equally spaced across the diameter of the Hexagon.
 
 .. |hhf| image:: images/custom/hexagon/hatches_flat.png
    :width: 330
@@ -1896,7 +2220,8 @@ Hatches: Pointy
 
 Hatches are a set of parallel lines that are drawn, in a specified direction,
 across the Hexagon from one opposing side to another in a vertical, horizontal
-or diagonal direction.
+or diagonal direction. Hatches are equally spaced across the diameter of the
+Hexagon.
 
 .. |hhp| image:: images/custom/hexagon/hatches_pointy.png
    :width: 330
@@ -2730,7 +3055,8 @@ Hatches
 
 Hatches are a set of parallel lines that are drawn, in a specified direction,
 across the Circle from one opposing side to another in a vertical, horizontal
-or diagonal direction.
+or diagonal direction. Hatches are equally spaced across the diameter of the
+Circle.
 
 .. |chf| image:: images/custom/circle/hatches.png
    :width: 330
@@ -3251,320 +3577,733 @@ The available property names, shown in their default order, are:
 #. text
 
 
-.. _blueprintIndex:
+.. _triIndex:
 
-Blueprint
-=========
+Triangle
+========
 `↑ <table-of-contents-custom_>`_
 
-This shape is primarily intended to support drawing while it is "in progress".
+- `Triangle overview`_
+- `Triangle construction`_
+- `Triangle construction examples`_
+- `Triangle customisation`_
+- `Triangle ordering of properties`_
 
-It can take on the appearance of typical "cutting board", so it provides a quick
-and convenient way to orientate and place other shapes that *are* required for
-the final product.
+Triangle overview
+-----------------
 
-Typically one would just comment out the Blueprint command when its purpose has
-been served.
+A triangle is a three-sided polygon.  It can have uniform sides, in which case
+it is an *equilateral* triangle |dash| the default; two sides of matching
+length, in which case it is an *isosceles* triangle; or all sides of unequal
+length, in which case it is an *irregular* triangle.
 
-Properties
-----------
+A triangle is considered to have three *vertices* located using the
+following compass directions; ``n`` (north), ``sw`` (south-west), and ``se``
+(south-east).  Similarly, the three sides are located at ``ne`` (north-east),
+``nw`` (north-west), and ``s`` (south).
 
-In addition to the basic line styling properties, a Blueprint can also be
-customised with the following properties:
+A triangle has a *centroid*, or "center of mass", which is the point where
+the three lines from the vertices to the midpoints of the opposite sides
+intersect. It is used as the point around which all elements of triangle
+can be *rotated*.
 
-- *subdivisions* - a number indicating how many lines should be drawn
-  within each square; these are evenly spaces; use *subdivisions_dashed*
-  to enhance these lines
-- *style* - set to one of: *blue*, *green* or *grey*
-- *decimals* - set to to an integer number for the decimal points which
-  are used for the grid numbers (default is ``0``)
-- *edges* - can be set to any combination of *n*, *s*, *e*, or *w* in a
-  single comma-delimited string; grid numbers will then be drawn on
-  any of the edges specified
-- *edges_y* - the number set for this determines where a horizontal line
-  of grid numbers will be drawn
-- *edges_x* - the number set for this determines where a vertical line
-  of grid numbers will be drawn
+.. _triConstruction:
 
-Examples showing how the Blueprint can be styled are described below.
-
-- `Subdivisions <blueSub_>`_
-- `Subdivisions - dashed <blueSubDash_>`_
-- `Style: Blue <blueStyleBlue_>`_
-- `Style: Green <blueStyleGreen_>`_
-- `Style: Gray <blueStyleGray_>`_
-- `Stroke <blueStroke_>`_
-- `Fill <blueFill_>`_
-- `Decimals <blueDec_>`_
-- `Edge Numbering <blueEdge_>`_
-- `Edge Numbering at x and y <blueEdgeXY_>`_
-
-
-.. _blueSub:
-
-Subdivisions
-------------
-`↑ <blueprint_>`_
-
-.. |bl0| image:: images/custom/blueprint/subdivisions.png
-   :width: 330
-
-===== ======
-|bl0| This example shows the Blueprint constructed using the command with these
-      properties:
-
-        .. code:: python
-
-          Blueprint(subdivisions=5, stroke_width=0.5)
-
-      It has the following properties set:
-
-      - *subdivisions* - ``5`` thinner lines between each pair of primary lines
-      - *stroke_width* - set to ``0.5`` |dash| thicker and more visible
-
-      .. NOTE::
-
-          *subdivisions* are **not** numbered and are automatically
-          drawn with a thinner line in a *dotted* style.
-
-===== ======
-
-
-.. _blueSubDash:
-
-Subdivisions - Dashed
+Triangle construction
 ---------------------
-`↑ <blueprint_>`_
+`^ <triIndex_>`_
 
-.. |bl1| image:: images/custom/blueprint/subdivisions_dashed.png
+The starting point for drawing a triangle is the ``sw`` vertice.  The ``s``
+line is then drawn, usually in the ``e`` direction, followed by the ``ne``
+line, and finally the ``ne``.
+
+.. NOTE::
+
+    Unlike most other shapes, the Triangle's *x* and *y* positions are
+    **NOT** at the top-left "corner".  This breaks with convention, but
+    the concept of such a corner just does not seem to work in this case.
+
+All triangles require the starting point to be set, if different from the
+default of ``1`` for both the *x* and *y* positions.
+
+A triangle's drawing can be affected by its *pivot* which is an angle used to
+alter the direction of the bottom edge |dash| the ``s`` line. By default this
+line is drawn in the eastwards direction, i.e. a pivot of ``0`` |deg|, but if
+set will cause that line to be rotated anti-clockwise around the ``sw`` vertex.
+
+Equilateral triangles
++++++++++++++++++++++
+
+Equilateral triangles are the simplest to construct. Apart from the starting
+point, all that is required is the length of the *side* to be set. All sides
+share the same length.
+
+Because :doc:`protograf <index>` uses a default value of ``1`` for the *side*
+property, an equilateral triangle is the default one that will be constructed
+unless more properties are set. See `Example 1. Default Triangle`_.
+
+Equilateral triangles can also be constructed using their centroid position,
+instead of the usual  *x* and *y* positions. See
+`Example 2. Custom Equilateral`_
+
+.. NOTE::
+
+  An Equilateral triangle constructed via its centroid position cannot also
+  have a value set for *pivot*.  This is because this setting would effectively
+  be acting in the same way as the *rotation*.
+
+Isosceles triangles
++++++++++++++++++++
+
+Isosceles triangles require both the length of the bottom edge to be set
+|dash| via the *side* property |dash| as well as the *height*.  The other
+two sides will be equal in length and calculated from the *side* and
+*height* properties.  See `Example 3. Custom Isosceles`_.
+
+Irregular triangles
++++++++++++++++++++
+
+Irregular triangles are the most complex to construct. There are a number
+of options to do so.
+
+1. Set the values for *side2* and *side3*.  Their total must exceed the value
+   set for *side*.
+2. Set the values for *side2* and *angle*.  This will draw the second line,
+   of length *side2*, at the given angle relative to *side*.
+3. Set the value for *side2*. This will set the *angle* to 90 |deg| and cause
+   a *right-angled triangle* to be drawn.
+
+For illustrations of these construction options, see
+`Example 4a. Custom Irregular I`_ and `Example 4b. Custom Irregular II`_.
+
+
+Triangle construction examples
+------------------------------
+`^ <triIndex_>`_
+
+Example 1. Default Triangle
++++++++++++++++++++++++++++
+`^ <triConstruction_>`_
+
+.. |tc1| image:: images/defaults/equiangle.png
    :width: 330
 
 ===== ======
-|bl1| This example shows the Blueprint constructed using the command with these
-      properties:
+|tc1| This example shows the Triangle constructed using the command with only
+      defaults:
 
-        .. code:: python
+      .. code:: python
 
-          Blueprint(
-              stroke_width=0.5,
-              subdivisions=5,
-              subdivisions_dashed=[0.2, 0.1])
+          Triangle()
 
-      It has the following properties set:
+      It has the following properties based on the defaults:
 
-      - *stroke_width* - set to ``0.5`` |dash| thicker and more visible
-      - *subdivisions* - ``5`` thinner lines between each pair of primary lines
-      - *subdivisions_dashed* - a list with the length of the dash followed by
-        the length of the space between two dashes - ``2`` and ``1`` mm.
-
-      .. NOTE::
-
-          *subdivisions* are **not** numbered and are automatically
-          drawn with a thinner line using the dash settings.
+      - lower-left, or south-west (``sw``) vertex at x-position ``1`` cm
+        and y-position ``1`` cm
+      - side - ``1`` cm i.e. all sides are equal
 
 ===== ======
 
-.. _blueStyleBlue:
+Example 2. Custom Equilateral
++++++++++++++++++++++++++++++
+`^ <triConstruction_>`_
 
-Style - Blue
-------------
-`↑ <blueprint_>`_
-
-.. |bl2| image:: images/custom/blueprint/style_blue.png
+.. |tc2| image:: images/custom/triangle/triangle_equilateral.png
    :width: 330
 
 ===== ======
-|bl2| This example shows the Blueprint constructed using the command with these
-      properties:
+|tc2| This example shows the Triangle constructed using the command as follows:
 
-        .. code:: python
+      .. code:: python
 
-          Blueprint(style='blue')
+        Triangle(
+            cx=2, cy=3,
+            side=3,
+            stroke_width=1,
+            fill="gold",
+            title="Equilateral")
 
-      It has the following properties set:
+      It has the following properties:
 
-      - *style* - set to ``blue``; this affects both the line and the
-        background colors
+      - *cx* and *cy* - set the centroid position
+      - *side* - ``3`` cm i.e. all sides are equal
+      - *stroke_width* - set the thickness of the Triangle's border line
+      - *fill* - set the area color
+      - *title* - set the text below the Triangle; note that the x-position
+        is centred below the centroid
 
 ===== ======
 
-.. _blueStyleGreen:
+Example 3. Custom Isosceles
++++++++++++++++++++++++++++
+`^ <triConstruction_>`_
 
-Style - Green
+.. |tc3| image:: images/custom/triangle/triangle_isosceles.png
+   :width: 330
+
+===== ======
+|tc3| This example shows the Triangle constructed using the command as follows:
+
+      .. code:: python
+
+        Triangle(
+            x=0.5, y=5,
+            side=3, height=4,
+            stroke_width=1,
+            fill="lime",
+            title="Isosceles")
+
+      It has the following properties:
+
+      - *x* and *y* - set the lower-left, or ``sw`` vertex
+      - *side* - ``3`` cm for the base, or lower edge
+      - *height* - set to ``4`` cm; used to calculate length of other sides
+      - *stroke_width* - set the thickness of the Triangle's border line
+      - *fill* - set the area color
+      - *title* - set the text below the Triangle; note that the x-position
+        is centred below the centroid
+
+===== ======
+
+Example 4a. Custom Irregular I
+++++++++++++++++++++++++++++++
+`^ <triConstruction_>`_
+
+.. |tc4| image:: images/custom/triangle/triangle_irregular.png
+   :width: 330
+
+===== ======
+|tc4| This example shows the Triangle constructed using the command as follows:
+
+      .. code:: python
+
+        Triangle(
+            x=1, y=4,
+            side=3, side2=4.5, side3=2.5,
+            stroke_width=1,
+            fill="tomato",
+            title="Irregular")
+
+      It has the following properties:
+
+      - *x* and *y* - set the lower-left, or ``sw`` vertex
+      - *side* - ``3`` cm for the base, or lower edge (``s``)
+      - *side2* - ``4.5`` cm for the next edge in anti-clockwise direction
+        (``ne``)
+      - *side3* - ``2.5`` cm for the final edge in anti-clockwise direction
+        (``nw``)
+      - *stroke_width* - set the thickness of the Triangle's border line
+      - *fill* - set the area color
+      - *title* - set the text below the Triangle; note that the x-position
+        is centred below the centroid
+
+===== ======
+
+Example 4b. Custom Irregular II
++++++++++++++++++++++++++++++++
+`^ <triConstruction_>`_
+
+.. |tc5| image:: images/custom/triangle/triangle_irregular_options.png
+   :width: 330
+
+===== ======
+|tc5| This example shows the Triangle constructed using the command as follows:
+
+      .. code:: python
+
+        Triangle(
+            x=0, y=2,
+            side=1.5, side2=1.75, side3=2.55,
+            stroke_width=0.5,
+            dot=0.06,
+            title="3xsides",
+            title_size=7)
+        Triangle(
+            x=2, y=2,
+            side=1.5, side2=1.75, side3=2.55,
+            pivot=30,
+            stroke_width=0.5,
+            dot=0.06,
+            title="pivot:30",
+            title_size=7)
+
+        Triangle(
+            x=0, y=4,
+            side=1.5, side2=1.75, angle=115,
+            stroke_width=0.5,
+            dot=0.06,
+            title="2xsides; 115",
+            title_size=7)
+        Triangle(
+            x=2, y=4,
+            side=2, side2=1.5,
+            stroke_width=0.5,
+            dot=0.06,
+            title="2xsides; rightangle",
+            title_size=7)
+
+        Triangle(
+            x=0, y=6,
+            side=1.5, side2=1.5, side3=1.5,
+            pivot=30,
+            stroke_width=0.5,
+            dot=0.06,
+            title="equi; pivot:45",
+            title_size=7)
+        Triangle(
+            x=3.5, y=6,
+            side=1.25, side2=1.75, side3=1.75,
+            pivot=90,
+            stroke_width=0.5,
+            dot=0.06,
+            title="iso; pivot:90",
+            title_size=7)
+
+      These examples illustrate the various construction techniques.
+
+      The lower two examples show how the other types of triangles can
+      also be constructed via setting the appropriate properties of an
+      irregular triangle.
+
+===== ======
+
+.. _triCustomisation:
+
+Triangle customisation
+----------------------
+`^ <triIndex_>`_
+
+There are a number of ways that a Triangle can be customised.
+
+- `Cross and Dot <triCross_>`_
+- `Hatches <triHatches_>`_
+- `Perbii <triPerbii_>`_
+- `Radii <triRadii_>`_
+- `Rotation <triRotation_>`_
+- `Slices <triSlices_>`_
+- `Pivot <triPivot_>`_
+
+
+.. _triCross:
+
+Cross and Dot
 -------------
-`↑ <blueprint_>`_
+`^ <triCustomisation_>`_
 
-.. |bl3| image:: images/custom/blueprint/style_green.png
+A cross or a dot are symbols that are used to mark the centroid of the
+Triangle. They are usually the last elements that are drawn.
+
+Example 5. Triangle: Cross & Dot
+++++++++++++++++++++++++++++++++
+
+.. |td1| image:: images/custom/triangle/triangle_dot_cross.png
    :width: 330
 
 ===== ======
-|bl3| This example shows the Blueprint constructed using the command with these
-      properties:
+|td1| This example shows Triangles constructed using the commands:
 
-        .. code:: python
+      .. code:: python
 
-          Blueprint(style='green')
+        Triangle(
+            x=1, y=2, side=2,
+            stroke_width=1,
+            dot=.05,
+            cross=0.33, cross_stroke="red",
+            cross_stroke_width=1,
+            title="Equilateral")
+        Triangle(
+            x=1, y=4,
+            side=2, height=1.25,
+            stroke_width=1,
+            dot=.05,
+            cross=0.33, cross_stroke="red",
+            cross_stroke_width=1,
+            title="Isosceles")
+        Triangle(
+            x=1.25, y=5.5,
+            side=2, side2=2.5, side3=1.25,
+            stroke_width=1,
+            dot=.05,
+            cross=0.33, cross_stroke="red",
+            cross_stroke_width=1,
+            title="Irregular")
 
-      It has the following properties set:
+      The top example shows a dot, superimposed with a red cross, at the
+      centroid position of an equilateral Triangle.
 
-      - *style* - set to `green`; this affects both the line and the background
-        colors
+      The middle example shows a dot, superimposed with a red cross, at the
+      centroid position of an isosceles Triangle.
+
+      The lower example shows a dot, superimposed with a red cross, at the
+      centroid position of an irregular Triangle.
 
 ===== ======
 
-.. _blueStyleGray:
 
-Style - Gray
-------------
-`↑ <blueprint_>`_
+.. _triHatches:
 
-.. |bl4| image:: images/custom/blueprint/style_grey.png
+Hatches
+-------
+`^ <triCustomisation_>`_
+
+Hatches are a set of parallel lines that are drawn, in a specified direction,
+across the Triangle from one opposing side to another. Hatch starting points
+are equally spaced across each of the sides of the Triangle.
+
+Example 6. Triangle: Hatches
+++++++++++++++++++++++++++++
+
+.. |th1| image:: images/custom/triangle/triangle_hatch.png
    :width: 330
 
 ===== ======
-|bl4| This example shows the Blueprint constructed using the command with these
-      properties:
+|th1| This example shows the shape constructed using the command with the
+      various properties.
 
-        .. code:: python
+      .. code:: python
 
-          Blueprint(style='gray')
+        Triangle(
+            x=1, y=2, side=2,
+            hatches_count=5,
+            hatches_stroke="red",
+            title="Equilateral")
+        Triangle(
+            x=1, y=4,
+            side=2, height=1.25,
+            hatches_count=5,
+            hatches_stroke="red",
+            title="Isosceles")
+        Triangle(
+            x=1.25, y=5.5,
+            side=2, side2=2.5, side3=1.25,
+            hatches_count=5,
+            hatches_stroke="red",
+            title="Irregular")
 
-      It has the following properties set:
+      The top example shows hatches constructed in all directions for a
+      equilateral Triangle.
 
-      - *style* - set to ``gray``; this affects both the line and the background
-        colors
+      The middle example shows hatches constructed in all directions for a
+      isosceles Triangle.
+
+      The lower example shows hatches constructed in all directions for a
+      irregular Triangle.
 
 ===== ======
 
-.. _blueStroke:
 
-Stroke
+.. _triPerbii:
+
+Perbii
 ------
-`↑ <blueprint_>`_
+`^ <triCustomisation_>`_
 
-.. |bl5| image:: images/custom/blueprint/stroke_width_red.png
+"Perbis" is a shortcut name for "perpendicular bisector"; and *perbii* is the
+the plural. These lines are drawn from the *centroid* of a Triangle towards
+the mid-points of its edges.
+
+Example 7. Triangle: Perbii
++++++++++++++++++++++++++++
+
+.. |tp1| image:: images/custom/triangle/triangle_perbii.png
    :width: 330
 
 ===== ======
-|bl5| This example shows the Blueprint constructed using the command with these
-      properties:
+|tp1| This example shows triangles constructed using these
+      commands:
 
-        .. code:: python
+      .. code:: python
 
-          Blueprint(stroke_width=1, stroke="red")
+        a_dot = dot(dot_width=4, fill="white")
+        Triangle(
+            cx=2, cy=3,
+            side=1.5,
+            perbii="s ne nw",
+            centre_shapes=[(a_dot)],
+            title="perbii",
+            fill="gold")
 
-      It has the following properties set:
+      All examples share a common small circle, or ``Dot`` drawn at their
+      centroid via the *centre_shapes* property.
 
-      - *stroke* - set to ``red`` for the grid line color
-      - *stroke_width* - set to ``1`` |dash| thicker and more visible
+      The top example shows perbii constructed in all directions for an
+      equilateral Triangle.
 
-===== ======
+      The middle example shows perbii constructed in all directions for an
+      isosceles Triangle.
 
-.. _blueFill:
-
-Fill
-----
-`↑ <blueprint_>`_
-
-.. |bl6| image:: images/custom/blueprint/style_stroke.png
-   :width: 330
-
-===== ======
-|bl6| This example shows the Blueprint constructed using the command with these
-      properties:
-
-        .. code:: python
-
-          Blueprint(style="gray", stroke="purple")
-
-      It has the following properties set:
-
-      - *style* - see `Style: Gray <blueStyleGray_>`_ above
-      - *stroke* - set to ``purple`` to changes the grid line color
-
-      **Note**: changes to line stroke, and line and fill color, will
-      override the defaults for a chosen style.
+      The lower example shows perbii constructed in all directions for an
+      irregular Triangle.
 
 ===== ======
 
-.. _blueDec:
 
-Decimals
+.. _triRotation:
+
+Rotation
 --------
-`↑ <blueprint_>`_
+`^ <triCustomisation_>`_
 
-.. |bl7| image:: images/custom/blueprint/decimals.png
+Rotation takes place in anti-clockwise direction, from the horizontal, around
+the *centroid* of the Triangle.
+
+Example 8. Triangle: Rotation
++++++++++++++++++++++++++++++
+
+.. |to1| image:: images/custom/triangle/triangle_rotation.png
    :width: 330
 
 ===== ======
-|bl7| This example shows the Blueprint constructed using the command with these
-      properties:
+|to1| This example shows Triangles constructed using these commands:
 
-        .. code:: python
+      .. code:: python
 
-          Blueprint(decimals=1)
+        Triangle(
+            x=1, y=2, side=2,
+            stroke_width=1,
+            rotation=45,
+            dot=.05,
+            title="Equilateral")
+        Triangle(
+            x=1, y=4,
+            side=2, height=1.25,
+            stroke_width=1,
+            rotation=45,
+            dot=.05,
+            title="Isosceles")
+        Triangle(
+            x=1.25, y=5.5,
+            side=2, side2=2.5, side3=1.25,
+            stroke_width=1,
+            rotation=45,
+            dot=.05,
+            title="Irregular")
 
-      It has the following properties set:
+      The top example shows rotation of 45 |deg| anti-clockwise for an
+      equilateral Triangle.
 
-      - *decimals* - set to ``1``; number of decimal points used for the grid
-        numbers
+      The middle example shows rotation of 45 |deg| anti-clockwise for an
+      isosceles Triangle.
+
+      The lower example shows rotation of 45 |deg| anti-clockwise for an
+      irregular Triangle.
 
 ===== ======
 
-.. _blueEdge:
 
-Edge Numbering
---------------
-`↑ <blueprint_>`_
+.. _triRadii:
 
-.. |bl8| image:: images/custom/blueprint/edges.png
+Radii
+-----
+`^ <triCustomisation_>`_
+
+*Radii* are the lines drawn from the *centroid* of a Triangle towards its
+vertices.
+
+Example 9. Triangle: Radii
+++++++++++++++++++++++++++
+
+.. |ti1| image:: images/custom/triangle/triangle_radii.png
    :width: 330
 
 ===== ======
-|bl8| This example shows the Blueprint constructed using the command with these
-      properties:
+|ti1| This example shows Triangles constructed using these
+      commands:
 
-        .. code:: python
+      .. code:: python
 
-          Blueprint(edges='n,s,e,w')
+        a_dot = dot(dot_width=4, fill="white")
+        Triangle(
+            x=1, y=2, side=2,
+            stroke_width=1,
+            radii="n se sw",
+            centre_shapes=[(a_dot)],
+            title="Equilateral")
+        Triangle(
+            x=1, y=4,
+            side=2, height=1.25,
+            stroke_width=1,
+            radii="n se sw",
+            centre_shapes=[(a_dot)],
+            title="Isosceles")
+        Triangle(
+            x=1.25, y=5.5,
+            side=2, side2=2.5, side3=1.25,
+            stroke_width=1,
+            radii="n se sw",
+            centre_shapes=[(a_dot)],
+            title="Irregular")
 
-      It has the following properties set:
+      All examples share a common small circle, or ``Dot`` drawn at their
+      centroid via the *centre_shapes* property.
 
-      - *edges* - set to ``'n,s,e,w'``; grid numbers will be drawn on
-        all of the four edges
+      The top example shows radii constructed in all directions for an
+      equilateral Triangle.
 
-      Choose which edges should be numbered by using them in the list;
-      e.g. ``'e,w'`` will only number left and right edges.
+      The middle example shows radii constructed in all directions for an
+      isosceles Triangle.
+
+      The lower example shows radii constructed in all directions for an
+      irregular Triangle.
 
 ===== ======
 
-.. _blueEdgeXY:
 
-Edges Numbering at x and y
---------------------------
-`↑ <blueprint_>`_
+.. _triSlices:
 
-.. |bl9| image:: images/custom/blueprint/edges_x_y.png
+Slices
+------
+`^ <triCustomisation_>`_
+
+*Slices* are a set of colors that are drawn as triangles inside an
+Triangle in a clockwise direction starting from the "north-east" (``ne``)
+vertex.
+
+If there are fewer colors than the three possible triangles, then the colors
+are repeated, starting from the first one.
+
+The term ``None`` can be used to skip drawing of a slice i.e. the normal
+fill color of the Triangle will appear in that area.
+
+Example 10. Triangle: Slices
+++++++++++++++++++++++++++++
+
+.. |ts1| image:: images/custom/triangle/triangle_slices.png
    :width: 330
 
 ===== ======
-|bl9| This example shows the Blueprint constructed using the command with these
-      properties:
+|ts1| This example shows triangles constructed using these
+      commands:
 
-        .. code:: python
+      .. code:: python
 
-          Blueprint(
-              edges_y=3, edges_x=2)
+        a_dot = dot(dot_width=4, fill="white")
+        Triangle(
+            x=1, y=2, side=2,
+            stroke_width=1,
+            slices=["tomato", "gold", "lime"],
+            centre_shapes=[(a_dot)],
+            title="Equilateral")
+        Triangle(
+            x=1, y=4,
+            side=2, height=1.25,
+            stroke_width=1,
+            slices=["tomato", "gold", "lime"],
+            centre_shapes=[(a_dot)],
+            title="Isosceles")
+        Triangle(
+            x=1.25, y=5.5,
+            side=2, side2=2.5, side3=1.25,
+            stroke_width=1,
+            slices=["tomato", "gold", "lime"],
+            centre_shapes=[(a_dot)],
+            title="Irregular")
 
-      It has the following properties set:
+      All examples share a common small circle, or ``Dot`` drawn at their
+      centroid via the *centre_shapes* property.
 
-      - *edges_y* - set to ``3``; a horizontal line of grid numbers will be
-        drawn where ``y`` is equal to 3
-      - *edges_x* - set to ``2``; a vertical line of grid numbers will be
-        drawn where ``x`` is equal to 2
+      The top example shows slices constructed in three different colors for
+      an equilateral Triangle.
 
-      This is not very useful for a tiny grid, but for a very large page size
-      it can be helpful to set (or reset) such grid numbering while working
-      on a complex design.
+      The middle example shows slices constructed in three different colors
+      for an isosceles Triangle.
+
+      The lower example shows slices constructed in three different colors for
+      an irregular Triangle.
 
 ===== ======
+
+
+.. _triPivot:
+
+Pivot
+------
+`^ <triCustomisation_>`_
+
+A *pivot*  is the number of degrees, in an anti-clockwise direction from
+the east, by which a Triangle is rotated around its "south-west" (``sw``)
+vertex.
+
+.. NOTE::
+
+    This type of rotation does **not** affect the drawing of the text or
+    cross for the Triangle; for this to change direction, the Triangle must
+    be rotated.
+
+Example 11. Triangle: Pivot
+++++++++++++++++++++++++++++
+
+.. |tv1| image:: images/custom/triangle/triangle_pivot.png
+   :width: 330
+
+===== ======
+|tv1| This example shows triangles constructed using these
+      commands:
+
+      .. code:: python
+
+        Triangle(
+            x=1, y=2, side=2,
+            stroke_width=1,
+            pivot=30,
+            dot=.05,
+            title="Equilateral")
+        Triangle(
+            x=1, y=4,
+            side=2, height=1.25,
+            stroke_width=1,
+            pivot=30,
+            dot=.05,
+            title="Isosceles")
+        Triangle(
+            x=1.25, y=5.5,
+            side=2, side2=2.5, side3=1.25,
+            stroke_width=1,
+            pivot=30,
+            dot=.05,
+            title="Irregular")
+
+      All examples share a common small circle, drawn at their
+      centroid via the *dot* property.
+
+      The top example shows a pivot of 30 |deg| around the south-west vertex
+      for an equilateral Triangle.
+
+      The middle example shows a pivot of 30 |deg| around the south-west vertex
+      for an isosceles Triangle.
+
+      The lower example shows a pivot of 30 |deg| around the south-west vertex
+      for an irregular Triangle.
+
+===== ======
+
+
+.. _triOrder:
+
+Triangle ordering of properties
+-------------------------------
+`^ <triIndex_>`_
+
+There is a default order in which the various properties of a Triangle are
+drawn. There are three ways to change this drawing order:
+
+- *order_first* - a list of properties that will be drawn, in the order given
+  in the list, **before** any others
+- *order_last* - a list of properties that will be drawn, in the order given
+  in the list, **after** any others
+- *order_all* - a list of the **only** properties that will be drawn, in the
+  order given in the list
+
+The available property names, shown in their default order, are:
+
+#. base - this represents the Triangle itself
+#. slices
+#. hatches
+#. perbii
+#. radii
+#. centre_shape
+#. centre_shapes
+#. vertex_shapes
+#. cross
+#. dot
+#. text

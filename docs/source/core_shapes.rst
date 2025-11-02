@@ -42,7 +42,6 @@ Shape Index
 -  `Dot`_
 -  `DotGrid`_
 -  `Ellipse`_
--  `EquilateralTriangle`_
 -  `Grid`_
 -  `Hexagon`_
 -  `Hexagons`_
@@ -64,9 +63,10 @@ Shape Index
 -  `Table`_
 -  `Text`_
 -  `Trapezoid`_
+-  `Triangle`_
 
 Overview
----------
+--------
 `↑ <table-of-contents-core_>`_
 
 Where possible, the basic examples first show how a shape would appear
@@ -472,9 +472,13 @@ Polyline
 
 A Polyline is a series of one or more lines joining two or more points.
 
-In addition to setting points directly, the Polyline can also be constructed
+In addition to setting points directly, the Polyline can be constructed
 using the *steps* property.  This define a series of values that represent
-the **relative** distance from the last point drawn.
+the x- and y-values **relative** to the last point drawn.
+
+A Polyline can also be constructed using the *snail* property. This defines
+a series of relative distances, plus optional rotational and/or facing
+directions, that allow a sequence of lines and curves to be drawn.
 
 The following examples illustrate these properties:
 
@@ -482,6 +486,7 @@ The following examples illustrate these properties:
 - `Example 2. Customised Polyline`_
 - `Example 3. Polyline with Arrow`_
 - `Example 4. Polyline with Snail`_
+- `Example 5. Polyline with Snail Curves`_
 
 
 Example 1. Basic Polyline
@@ -600,17 +605,18 @@ Example 4. Polyline with Snail
 ++++++++++++++++++++++++++++++
 `^ <polyline-command_>`_
 
-The *snail* property is loosely based on the Turtle graphics drawing module
-available for Python (see: https://docs.python.org/3/library/turtle.html).
+The *snail* property is loosely based on the concept and approach of the
+Turtle graphics drawing module available for Python (see:
+https://docs.python.org/3/library/turtle.html).
 
-Instead of using points, the idea of the *snail* is to create a polyline
+Instead of using points, the idea of the *snail* is to create a Polyline
 based on a series of lines of given length, where the line direction |dash|
-or orientation |dash| will already have been set.   Each line is then drawn
-from the end point of the previous line.
+or orientation |dash| will already have been set.  Each line is then drawn
+starting from the end point of the previous line.
 
 A *snail* property consists of a series of terms, each separated by a space.
-Each term either relates to a direction change or to drawing a line of a
-certain length.
+Each term either relates to a **direction** change or to drawing a line of a
+certain **length**
 
 Directions can be set as follows:
 
@@ -628,15 +634,17 @@ Creating a line is done as follows:
 
 - a normal value |dash| whole or fractional |dash| will draw a line that
   distance, in the last direction that was set
-- using a ``**`` will draw a line from the current point back to the start
+- using a pair of asterixes (``**``) ` will draw a line from the current
+  point back to the start
 
 Moving - **without** creating a line - is done as follows:
 
-- a **relative** amount: a ``j`` followed by a value which is the distance,
+- a **relative** move: a ``j`` followed by a value which is the distance,
   at which the new point will be set |dash| according to the last direction
-  that was set; no line will be dreawn between the points.
-- a **fixed point** move: a ``*`` will set the next, new point to match the
-  one at the start; no line will be dreawn between the points.
+  that was set; no line will be drawn between the points
+- a **fixed point** move: a single asterix (``*``) will set the next, new
+  point to match the one at the start; no line will be drawn between the
+  points
 
 .. NOTE::
 
@@ -644,12 +652,11 @@ Moving - **without** creating a line - is done as follows:
     Polyline; and the starting direction is "e" or 0 |deg|.  The first term
     in the *snail* property can either be a direction or a distance.
 
-
 .. raw:: html
 
-   <small>Apologies for using "jump" as the term to cause a move to
-   happen without drawing a line; the idea of a snail jumping was just
-   too absurd not to use!</small>
+   <small>Apologies to users for using "jump" as the term to cause a move
+   to happen without drawing a line; the idea of a snail jumping was just
+   too absurd **not** to use!</small>
 
 
 .. |py4| image:: images/customised/polyline_snail.png
@@ -709,10 +716,77 @@ Moving - **without** creating a line - is done as follows:
       square |dash| is constructed multiple times using the `*3`` to
       repeat the outline three times. Again, the "jump" (``j``) term is used
       to move to a different location before the next shape is drawn. Note
-      that start direction is set explicitly, rather than using a default!
-
+      that in this case the start direction is set explicitly, rather than
+      just using the default!
 
 ===== ======
+
+Example 5. Polyline with Snail Curves
++++++++++++++++++++++++++++++++++++++
+`^ <polyline-command_>`_
+
+In addition to all the options for *snail* as described in
+`Example 4. Polyline with Snail`_, there is also the option to draw
+**curves** as part of the line.
+
+A curve is specified by a series of three values, enclosed in round brackets;
+for example ``(1.118 60 1)``. These values are as follows:
+
+- the first value is the distance to the curve's *inflection point*;
+- the second value is the angle to the curve's *inflection point*;
+- the third value is the distance to the curve's end-point.
+
+So, the curve is drawn from the current point on the line, to a second
+point whose location is determined by a combination of the distance |dash|
+specified by the third value |dash| and the "current" direction, determined
+at the time just before the curve is drawn.  The curve will then bend, based
+on the location of the *inflection point* |dash| note that the curve does
+**not** go to that inflection point, but is rather "pulled" towards it to
+form the bend.
+
+
+.. |py5| image:: images/customised/polyline_snail_curve.png
+   :width: 330
+
+===== ======
+|py5| The Polyline shape is constructed with these properties:
+
+      .. code:: python
+
+        Polyline(
+            y=1, x=0,
+            snail="(1.118 60 1) (1.118 -60 1) "*2,
+            stroke_width=1,
+            stroke="red")
+        Polyline(
+            y=2, x=0,
+            snail="(1.118 60 1) (1.118 -60 1) "*8,
+            scaling=0.25,
+            stroke_width=1,
+            stroke="red")
+        Polyline(
+            y=4, x=0,
+            snail="a45 (0.6 60 0.707) e 0.5 "*3,
+            stroke_width=1,
+            stroke="red")
+        Polyline(
+            y=5, x=2,
+            snail="r60 (1.118 r60 1) * "*6,
+            stroke_width=1,
+            stroke="red")
+
+      All these examples show repetion in effect; the same basic set of
+      lines repeated multiple times. Again, note that a space is needed at
+      the end of the snail's text string in order to support this repeat.
+
+      The first three examples use absolute angles for the curve |dash|
+      whether positive or negative |dash| but the last example uses a relative
+      angle, so that the curve, starting each time from the home location,
+      changes its orientation because the "current direction" is constantly
+      increasing.
+
+===== ======
+
 
 .. _text-command:
 
@@ -1066,19 +1140,25 @@ Example 2. Customised Ellipse
 ===== ======
 
 
-.. _equilateraltriangle-command:
+.. _triangle-command:
 
-EquilateralTriangle
-~~~~~~~~~~~~~~~~~~~
+Triangle
+~~~~~~~~
 `↑ <shape-index_>`_
 
-.. HINT::
+A Triangle is a three-sided polygon.  It can have uniform sides, in which case
+it is an *equilateral* triangle |dash| the default; two matching sides, in
+which case it is an *isosceles* triangle; or all sides unequal, in which case
+it is an *irregular* triangle.
 
-    For convenience, an `EquilateralTriangle()` can also be referenced as
-    an `EquTri()`.
+.. NOTE::
 
-Example 1. Default EquilateralTriangle
-++++++++++++++++++++++++++++++++++++++
+   There is more detail about the various properties that can be defined for
+   a Triangle in the :ref:`customised shapes' Triangle <triIndex>` section.
+
+Example 1. Default Triangle
++++++++++++++++++++++++++++
+`^ <triangle-command_>`_
 
 .. |eqi| image:: images/defaults/equiangle.png
    :width: 330
@@ -1089,103 +1169,12 @@ Example 1. Default EquilateralTriangle
 
       .. code:: python
 
-          EquilateralTriangle()
+          Triangle()
 
       It has the following properties based on the defaults:
 
       - lower-left "corner" at x-position ``1`` cm and y-position ``1`` cm
-      - side - ``1`` cm i.e. all sides are equal
-===== ======
-
-.. _equtriHatches:
-
-Example 2. Customised EquilateralTriangle
-+++++++++++++++++++++++++++++++++++++++++
-
-.. |eq2| image:: images/customised/equilateral_triangle.png
-   :width: 330
-
-===== ======
-|eq2| This example shows the shape constructed using the command with the
-      various properties.
-
-      .. code:: python
-
-        EquilateralTriangle(
-            cx=2, cy=2, side=2,
-            hatches_count=5,
-            hatches_stroke="red",
-            title='Title', heading='Head')
-        EquilateralTriangle(
-            cx=2, cy=5, side=2,
-            stroke_width=1,
-            rotation=45,
-            dot=.05)
-
-      These shapes have the following properties:
-
-      - starting position - *cx* is``2`` cm
-      - default side of ``2`` cm; all sides are equal
-
-===== ======
-
-.. _equtriSlices:
-
-Example 3. EquilateralTriangle: Lines and Slices
-++++++++++++++++++++++++++++++++++++++++++++++++
-
-*Radii* are the lines drawn from the centroid of a triangle towards its
-vertices.
-
-"Perbis" is a shortcut name for "perpendicular bisector"; and *perbii* is the
-the plural. These lines are drawn from the centroid of a triangle towards the
-mid-points of its edges.
-
-*Slices* are a set of colors that are drawn as triangles inside an
-EquilateralTriangle in a clockwise direction starting from the "North East".
-If there are fewer colors than the three possible triangles, then the colors
-are repeated, starting from the first one.
-
-An EquilateralTriangle is considered to have three vertices located using the
-following compass directions; ``n`` (north), ``sw`` (south-west), and ``se``
-(south-east).  Similarly, the three sides are located at ``ne`` (north-east),
-``nw`` (north-west), and ``s`` (south).
-
-.. |eq3| image:: images/customised/equtri_perbii_slice.png
-   :width: 330
-
-===== ======
-|eq3| This example shows EquilateralTriangles constructed using these
-      commands:
-
-      .. code:: python
-
-        EquilateralTriangle(
-            cx=1, cy=1,
-            side=1.5,
-            radii="n se sw",
-            title="radii",
-            fill="tomato")
-        EquilateralTriangle(
-            cx=2, cy=3,
-            side=1.5,
-            perbii="s ne nw",
-            title="perbii",
-            fill="gold")
-        EquilateralTriangle(
-            cx=3, cy=5,
-            side=1.5,
-            title="slices",
-            slices=["tomato", "gold", "lime"])
-
-      The top example, shows how all three *radii* for an EquilateralTriangle
-      can be constructed.
-
-      The middle example, shows how all three *perbii* for an
-      EquilateralTriangle can be constructed.
-
-      The lower example, shows how all three *slices* for an
-      EquilateralTriangle can be supplied with different colors.
+      - side - ``1`` cm i.e. all sides are equal (*equilateral* triangle)
 
 ===== ======
 
@@ -1534,7 +1523,7 @@ Polyshape
 A Polyshape is an irregular `polygon`_, constructed using a series of points.
 
 It's basic setup and construction  shares much in common with the
-`Polyline <polyline-command_>`_ but with  some differences, such as its
+`Polyline <polyline-command_>`_ but with some differences, such as its
 *fill* and centre properties.
 
 The following examples illustrate these properties:
@@ -1626,6 +1615,7 @@ the **relative** distance from the last point drawn.
       .. code:: python
 
         Polyshape(
+            x=0, y=1,
             points=[(1, 2), (1, 1), (2, 0), (3, 1), (3, 2)],
             cx=2, cy=1,
             label='A House',
@@ -1636,8 +1626,13 @@ the **relative** distance from the last point drawn.
         )
 
       As in Example 1, the *points* are used to construct the outline of the
-      "house" shape. Other properties:
+      "house" shape.
 
+      Other properties include:
+
+      - *x* and *y* are used to provide offsets for the start; in this case
+        ``1`` is added to the start of the y-position, and for each value
+        thereafter
       - the centre is *defined* to be at x-position ``2`` cm and y-position
         ``1`` cm
       - *cross* - sets the length of each of the two lines that cross at the
@@ -1656,7 +1651,7 @@ the **relative** distance from the last point drawn.
       .. code:: python
 
         Polyshape(
-          x=1, y=3,
+          x=1, y=4,
           steps='0.5,0 0,1.5 1.5,0 0,-1.5 0.5,0 0,0.5 -2.5,0 0,-0.5',
           stroke="sandybrown",
           stroke_width=3,
@@ -1682,43 +1677,46 @@ these values will be used to offset ("move") the Polyshape from the position it
 would normally occupy.
 
 It is also possible to provide the *points* as a string of space-separated
-pairs of values; so instead of ``[(0,0), (1,1)]`` just use ``"0,0 1,1"``.
+pairs of comma-separated values; so instead of ``[(0,0), (1,1)]`` just use
+``"0,0 1,1"``.
 
 .. |sh3| image:: images/customised/polyshape_offset.png
    :width: 330
 
 ===== ======
-|sh3| The Polyshapes are constructed using the command with these properties:
+|sh3| The following Polyshapes are constructed using the command with these
+      properties:
 
-        .. code:: python
+      .. code:: python
 
-            Polyshape(
-                points="0,0 0,1 2,0 2,1 0,0",
-                cx=1, cy=0.5,
-                fill="chartreuse",
-                label="Left ....... Right")
-            Polyshape(
-                points="0,0 0,1 2,0 2,1 0,0",
-                cx=1, cy=0.5,
-                fill="gold",
-                label="Left ....... Right",
-                x=1, y=2)
+        Polyshape(
+            points="0,0 0,1 2,0 2,1 0,0",
+            cx=1, cy=0.5,
+            fill="gold",
+            label="Left ....... Right")
+        Polyshape(
+            x=1, y=2,
+            points="0,0 0,1 2,0 2,1 0,0",
+            fill="chartreuse",
+            label="Left ....... Right")
 
-      As in Example 2, the *points* are used to construct the outline of the
-      shape. In this case, they are a string of space-separated pairs of values.
+      As in Example 2, the *points* property is used to construct the outline
+      of the Polyshape. In this case, the points are set by a string of
+      space-separated pairs of values.
 
-      Other properties:
+      The *fill* color defines the color of the interior of the shapes.
 
-      - the centre is defined to be at x-position ``1`` cm and y-position
-        ``0.5`` cm; this **only** affects drawing of the label
-        but does **not** affect drawing the shape itself
-      - *label* - sets the text appearing at the defined centre position
-      - *fill* color defines the color of the interior of the shape
+      For the ``gold`` color Polyshape, the *cx* and *cy* values have been set.
+      These values **only** affect the drawing of the *label*, and **not** the
+      shape itself!
 
-      In the ``gold``-filled Polyshape, the *x* and *y* values have been set.
-      So, even though the points used to define the ``gold`` Polyshape are
-      the same as those used for ``green`` one, these values cause the whole
-      shape to be moved down and to the right.
+      The points used to define the ``green`` Polyshape are the same as those
+      used for ``gold`` one, but because the  *x* and *y* values have also
+      been set, this causes the whole shape to be be drawn down and to the
+      right.
+
+      The ``green`` Polyshape has no *cx* and *cy* values set; therefore the
+      label cannot be drawn!
 
 ===== ======
 
@@ -1727,17 +1725,18 @@ Example 4. Polyshape with Snail
 +++++++++++++++++++++++++++++++
 `^ <polyshape-command_>`_
 
-The *snail* property is loosely based on the Turtle graphics drawing module
-available for Python (see: https://docs.python.org/3/library/turtle.html).
+The *snail* property is loosely based on the concept and approach of the
+Turtle graphics drawing module available for Python (see:
+https://docs.python.org/3/library/turtle.html).
 
 Instead of using points, the idea of the *snail* is to create a Polyshape
 based on a series of lines of given length, where the line direction |dash|
 or orientation |dash| will already have been set.   Each line is then drawn
-from the end point of the previous line.
+starting from the end point of the previous line.
 
 A *snail* property consists of a series of terms, each separated by a space.
-Each term either relates to a direction change or to drawing a line of a
-certain length.
+Each term either relates to a **direction** change or to drawing a line of a
+certain **length**.
 
 Directions can be set as follows:
 
@@ -1755,7 +1754,8 @@ Creating a line is done as follows:
 
 - a normal value |dash| whole or fractional |dash| will draw a line that
   distance, in the last direction that was set
-- using a ``**`` will draw a line from the current point back to the start
+- using a pair of asterixes (``**``) will draw a line from the current point
+  back to the start
 
 .. NOTE::
 
@@ -2965,14 +2965,14 @@ Pedantically speaking, an image is not like the other shapes in the sense that
 it does not consist of lines and areas drawn by **protograf** itself.
 
 An "image" refers to an external file which is simply inserted into the page
-at sthe location.
+at the location.
 
 The Image shape shares a number of common aspects with other shapes |dash| such
 as its x & y ("top left") position, a width and a height, the ability to be
-rotated, and the adding of text in form of a label, heading or title.
+rotated, and the addition of text in form of a label, heading or title.
 
 If an image has a transparent area, this will be respected and shapes
-appearing earlier on in the script may then be visible "below" it (see
+drawn previously by the script may then be visible "below" it (see
 examples below). An image can also be "drawn over" by other shapes
 appearing later on in the script.
 
@@ -2980,9 +2980,10 @@ The following examples show how an image can be added to, or altered:
 
 - `Example 1. Default Image`_
 - `Example 2. Rotation & Scaling`_
-- `Example 3. Captions and Markings`_
-- `Example 4. Sliced Images`_ (extract image "thirds")
-- `Example 5: Operations`_ ("cutout" shapes, rounding, and blurred edges)
+- `Example 3. Alignment`_
+- `Example 4. Captions and Markings`_
+- `Example 5. Sliced Images`_ (extract image "thirds")
+- `Example 6: Operations`_ ("cutout" shapes, rounding, and blurred edges)
 
 .. _image-default:
 
@@ -3034,6 +3035,16 @@ Example 2. Rotation & Scaling
 +++++++++++++++++++++++++++++
 `^ <image-command_>`_
 
+.. NOTE::
+
+   :doc:`protograf <index>` does not currently do image scaling in the
+   sense of altering the image dimensions of the actual image file.
+   Instead, by setting its ``height`` and ``width`` properties, the image
+   can appear in the output at the size required.
+
+   Bear in mind that larger images will increase the size of the output
+   PDF file accordingly, regardless of how small they appear on a page.
+
 .. |im2| image:: images/customised/images_normal_rotation.png
    :width: 330
 
@@ -3045,20 +3056,24 @@ Example 2. Rotation & Scaling
 
         Image(
           "sholes_typewriter.png",
-          x=0, y=1, width=1.5, height=1.5,
+          x=0, y=1,
+          width=2.0, height=2.0,
           title="PNG")
         Image(
           "sholes_typewriter.png",
-          x=2, y=1, width=1.5, height=1.5,
+          x=2, y=1,
+          width=1.5, height=1.5,
           title="60\u00B0",
           rotation=60)
         Image(
           "noun-typewriter-3933515.svg",
-          x=0, y=4, width=1.5, height=1.5,
+          x=0, y=4,
+          width=2.0, height=2.0,
           title="SVG")
         Image(
           "noun-typewriter-3933515.svg",
-          x=2, y=4, width=1.5, height=1.5,
+          x=2, y=4,
+          width=1.5, height=1.5,
           title="45\u00B0",
           rotation=45)
 
@@ -3066,11 +3081,20 @@ Example 2. Rotation & Scaling
 
       - name of the image file; this must be the first property set
       - *x* and *y* - these values set the upper-left corner
+
+      Each set of images has different sizes to simulate image scaling.
+
+      The two left-hand images have:
+
+      - *height* - set to ``2.0`` cm; this value may cause some distortion
+      - *width* - set to ``2.0`` cm; this value may cause some distortion
+
+      The two right-hand images have:
+
       - *height* - set to ``1.5`` cm; this value may cause some distortion
       - *width* - set to ``1.5`` cm; this value may cause some distortion
 
-      Two of the images |dash| the ones on the right |dash| are rotated about
-      a centre point:
+      The two right-hand images are rotated about a centre point:
 
       - *rotation* - degrees, anti-clockwise, about the centre
 
@@ -3078,9 +3102,85 @@ Example 2. Rotation & Scaling
 
 ===== ======
 
+.. _image-align:
+
+Example 3. Alignment
+++++++++++++++++++++
+`^ <image-command_>`_
+
+Image alignment is somewhat similar to alignment of Text.
+
+Instead of the shape's ``x`` and ``y`` values defining the top-left position,
+the use of either, or both, *align_horizontal* or *align_vertical* can cause
+the shape to be located in a different relative position.
+
+The *align_horizontal* property can take on values of ``"left"``, ``"centre"``
+or ``"right"``; the *align_vertical* property can take on values of ``"top"``,
+``"middle"`` or ``"bottom"``. These are illustrated in the exampe below.
+
+.. |ia1| image:: images/customised/image_align.png
+   :width: 330
+
+===== ======
+|ia1| This example shows the Image constructed using the command with the
+      following properties:
+
+      .. code:: python
+
+        rdot = Common(fill_stroke="red", radius=0.05)
+        image_file = "fantasy-forest-with-old-bridges.png"
+        Image(image_file,
+              width=1, height=1,
+              x=0.5, y=0.5,
+              title="no align")
+        Circle(common=rdot, cx=0.5, cy=0.5)
+        Image(image_file,
+              width=1, height=1,
+              cx=3, cy=1,
+              title="centre x,y")
+        Image(image_file,
+              width=1, height=1,
+              x=2, y=4,
+              align_horizontal="right",
+              align_vertical="bottom",
+              title="bottom-right")
+        Circle(common=rdot, cx=2, cy=4)
+        Image(image_file,
+              width=1, height=1,
+              x=2, y=2,
+              align_horizontal="left",
+              align_vertical="top",
+              title="top-left")
+        Circle(common=rdot, cx=2, cy=2)
+        Image(image_file,
+              width=1, height=1,
+              x=0, y=5,
+              align_horizontal="left",
+              align_vertical="mid",
+              title="mid-left")
+        Circle(common=rdot, cx=0, cy=5)
+        Image(image_file,
+              width=1, height=1,
+              x=3, y=5,
+              align_horizontal="centre",
+              align_vertical="mid",
+              title="mid-centre")
+        Circle(common=rdot, cx=3, cy=5)
+
+      The top-left image is set using defaults i.e. no alignment.
+
+      The top right-hand image position is set using a centre point; for such
+      a setting, no alignment can be used.
+
+      The other images have a small red dot superimposed on them, set to the
+      same value as the *x* and *y* used to position the shape; this helps
+      show how the image is drawn relative to that position.
+
+===== ======
+
 .. _image-caption:
 
-Example 3. Captions and Markings
+Example 4. Captions and Markings
 ++++++++++++++++++++++++++++++++
 `^ <image-command_>`_
 
@@ -3125,7 +3225,7 @@ Example 3. Captions and Markings
 
 .. _image-sliced:
 
-Example 4. Sliced Images
+Example 5. Sliced Images
 ++++++++++++++++++++++++
 `^ <image-command_>`_
 
@@ -3169,7 +3269,7 @@ Example 4. Sliced Images
 
 .. _image-operations:
 
-Example 5: Operations
+Example 6: Operations
 +++++++++++++++++++++
 `^ <image-command_>`_
 
@@ -3689,11 +3789,11 @@ below.
       .. code:: python
 
         Stadium(
-            cx=1, cy=1, side=1,
+            cx=1, cy=1, side=0.66,
             stroke="blue",
             dot=0.1)
         Stadium(
-            cx=3, cy=1, side=1,
+            cx=3, cy=1, side=0.66,
             stroke="blue",
             cross=0.25,
             cross_stroke_width=1)
@@ -3710,11 +3810,11 @@ below.
             cross_stroke_width=1)
 
         Rhombus(
-            cx=1, cy=5, side=2,
+            cx=1, cy=5, side=1.25,
             dot=0.1,
             dot_stroke="red")
         Rhombus(
-            cx=3, cy=5, side=2,
+            cx=3, cy=5, side=1.25,
             cross=0.25,
             cross_stroke="red",
             cross_stroke_width=1)
@@ -3859,13 +3959,13 @@ Example 3. Shapes Rotation
             cx=1, cy=3, sides=6, side=0.75,
             common=props, label="polygon")
         Stadium(
-            cx=3, cy=3, side=1,
+            cx=3, cy=3, side=0.6,
             common=props, label="stadium")
         Rectangle(
             cx=1, cy=5, height=1, width=1.5,
             common=props, label="rectangle")
         Rhombus(
-            cx=3, cy=5, side=2,
+            cx=3, cy=5, side=1.25,
             common=props, label="rhombus")
 
       The shapes share common properties for the cross at the centre,
@@ -3898,7 +3998,7 @@ Example 4. Rotation with Hatches
             common=htch,
             cx=2, cy=1, height=1.5,
         )
-        EquilateralTriangle(
+        Triangle(
             common=htch,
             cx=1, cy=3, side=1.5,
         )
@@ -3956,11 +4056,11 @@ Radii shapes are constructed using the following properties:
 
 Radii shapes can be constructed for:
 
-- :ref:`EquilateralTriangle <equilateraltriangle-command>`
+- :ref:`Circle <circle-command>`
 - :ref:`Hexagon <hexagon-command>`
 - :ref:`Rectangle <rectangle-command>`
 - :ref:`Rhombus <rhombus-command>`
-- :ref:`Circle <circle-command>`
+- :ref:`Triangle <triangle-command>`
 
 Example 1. Radii Shapes
 ++++++++++++++++++++++++
@@ -4018,7 +4118,7 @@ Example 1. Radii Shapes
             ],
             radii_shapes_rotated=True,
         )
-        EquilateralTriangle(
+        Triangle(
             cx=1, cy=5,
             side=1.25,
             radii_shapes=[
@@ -4106,17 +4206,18 @@ Perbii shapes are constructed using the following properties:
 
 Perbii shapes can be constructed for:
 
-- :ref:`EquilateralTriangle <equilateraltriangle-command>`
 - :ref:`Hexagon <hexagon-command>`
 - :ref:`Rectangle <rectangle-command>`
-- :ref:`Rhombus <rhombus-command>`;
+- :ref:`Rhombus <rhombus-command>`
+- :ref:`Triangle <triangle-command>`
 
 .. NOTE::
 
-    Actually, because a rhombus can have an "elongated" shape, it is not
+    Actually, because a Rhombus can have an "elongated" shape, it is not
     really possible to have true perbis lines for this shape.  What is drawn
     are lines from the midpoints of each side to the centre. This in turn
-    means that rotated shapes have an "awkward" angle |dash| use with care.
+    means that rotated shapes can seem to have an "awkward" angle |dash| use
+    with care. The same is true for any non-equilateral Triangle.
 
 
 Example 1. Perbii Shapes
@@ -4176,7 +4277,7 @@ Example 1. Perbii Shapes
             ],
             perbii_shapes_rotated=True,
         )
-        EquilateralTriangle(
+        Triangle(
             cx=1, cy=5,
             side=1.25,
             perbii_shapes=[
@@ -4198,6 +4299,10 @@ Example 1. Perbii Shapes
       The use of ``perbii_shapes_rotated=True`` will means all of these
       examples have the perbii shapes rotated to face "away" from the
       parent shape's centre.
+
+      As per the note above, the *perbii_shapes* for the Rhombus are
+      aligned in the direction of the *perbii* lines and **not** with
+      the shape's edges.
 
       .. HINT::
 
@@ -4417,7 +4522,7 @@ Example 1. Default Centre Shape
         Polygon(
             cx=1, cy=5, radius=0.5, sides=8,
             centre_shape=small_star)
-        EquilateralTriangle(
+        Triangle(
             x=2.35, y=5.5, side=1.25,
             centre_shape=small_star)
         Rectangle(
@@ -4628,7 +4733,7 @@ the change in ``x`` and ``y`` values as part of the set.
             radius=0.5, sides=8,
             centre_shapes=[
                 (small_dot), (big_dot, 0.2, 0.2)])
-        EquilateralTriangle(
+        Triangle(
             x=2.35, y=5.5, side=1.25,
             centre_shapes=[
                 (small_dot), (big_dot, 0.2, 0.2)])
@@ -4670,12 +4775,12 @@ Vertex shapes are constructed using the following properties:
 
 Vertex shapes can be constructed for:
 
-- :ref:`EquilateralTriangle <equilateraltriangle-command>`
 - :ref:`Hexagon <hexagon-command>`
 - :ref:`Polygon <polygon-command>`
 - :ref:`Rectangle <rectangle-command>`
 - :ref:`Rhombus <rhombus-command>`
 - :ref:`Star <star-command>`
+- :ref:`Triangle <triangle-command>`
 
 Example 1. Vertex Shapes
 ++++++++++++++++++++++++
@@ -4714,7 +4819,7 @@ Example 1. Vertex Shapes
             vertex_shapes=[
                 circle(radius=0.15, label="T")] * 5,
             vertex_shapes_rotated=True)
-        EquilateralTriangle(
+        Triangle(
             cx=1, cy=5,
             side=1.5,
             vertex_shapes=[

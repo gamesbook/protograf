@@ -27,8 +27,10 @@ Who might want to use **protograf** ?
 
 **protograf** is useful for anyone that needs to work on a design in
 an incremental fashion, tweaking and changing as they go along. Doing
-this with a regular graphics package can sometimes be tedious;
-especially when common changes need to be made across many elements.
+this with a regular graphics package can sometimes be tedious |dash|
+especially when common changes need to be made across many elements
+|dash| and doing this with regular office software can limiting in
+other ways.
 
 Simple designs that make use of regular-shaped objects or fonts,
 including fonts that themselves contain symbols or icons, are
@@ -37,7 +39,7 @@ pictures or background images should be made, as usual, in a regular
 graphics design package and then added into your script by a link
 to the image file.
 
-**protograf** also supports access of data in comma-delimited text files
+**protograf** also supports access of data in comma-separated text files
 |dash| often called "CSV" files |dash| and Excel documents; this can help
 separate out the design and layout from the content - the text and the
 numbers - that appears in the design.
@@ -47,7 +49,7 @@ Why not use a professional graphics package?
 ============================================
 
 Obviously, if you're a designer who uses a graphics package as an everyday
-tool, that will suit your needs perfectly.
+tool, then that will likely suit your needs perfectly.
 
 However, there might be a reason to use something simpler. Daniel, of
 https://daniel.games/ has this to say about making a game prototype which
@@ -87,8 +89,9 @@ your computer, and then use Python to create your output |dash| a PDF or
 PNG file |dash| containing the results of those instructions; hopefully
 the design that you intended to make!
 
-As your design changes and evolves, you can add or change instructions and
-recreate the output.
+As your design changes and evolves, you can add or change instructions,
+or add new information for your cards, and then quickly recreate the new
+output.
 
 
 How does **protograf** work?
@@ -124,4 +127,6 @@ and tested.
 
 Now read through the :doc:`basic concepts <basic_concepts>`
 before trying out a :doc:`worked example <worked_example>`. After that,
-browse through the sections listed in the :doc:`Guide <guide>`.
+browse through the sections listed in the :doc:`Guide <guide>`, according
+to what you have in mind, or look at the various
+:doc:`Examples <examples/index>` for inspiration.

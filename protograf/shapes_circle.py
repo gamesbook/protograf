@@ -54,7 +54,6 @@ class CircleShape(BaseShape):
 
     def __init__(self, _object=None, canvas=None, **kwargs):
         super(CircleShape, self).__init__(_object=_object, canvas=canvas, **kwargs)
-        self.kwargs = kwargs
         # ---- perform overrides
         self.radius = self.radius or self.diameter / 2.0
         if self.cx is not None and self.cy is not None:

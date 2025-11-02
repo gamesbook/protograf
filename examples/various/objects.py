@@ -256,4 +256,28 @@ Rectangle(
     stripes=1, stripes_directions="ne",
     stripes_fill="black", stripes_breadth=1.04)
 
+Text(common=header_font, x=8, y=13,
+     text="Jewel: Polygon with radii & nested polygon")
+Polygon(
+    cx=4, cy=13, sides=8, radius=1.5,
+    fill_stroke="#388D44",
+    radii=True, radii_stroke="azure", radii_stroke_width=3,
+    centre_shape=polygon(
+        sides=8, radius=1,
+        fill="#45A94A", stroke="azure", stroke_width=3
+    )
+)
+
+Text(common=header_font, x=8, y=17,
+     text="Olde Parchment: Polyshape: snail ")
+Polyshape(
+    x=1, y=18,
+    snail="1 a-45 0.2 a45 0.4 a-45 0.4 a45 0.2 e 1 a45 0.3 a-45 0.3 e 1.2 "
+    "a-45 0.2 a45 0.2 a-45 0.2 a45 0.5 a-45 0.3 e 0.8 a45 0.1 a-45 0.1 e 1.25 "
+    "n 3 w 1.7 a225 0.6 a135 0.4 a225 0.2 a135 0.2 a225 0.1 a125 0.25 w 1.2 "
+    "a225 0.2 a135 0.2 w 1.5 a225 0.23 a135 0.25 w 1.45 **",
+    stroke="sienna", stroke_width=2, fill="khaki",
+    scaling=0.8
+)
+
 Save()

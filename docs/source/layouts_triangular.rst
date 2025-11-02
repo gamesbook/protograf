@@ -26,7 +26,7 @@ of row and column locations that create a triangular pattern.
 
 The x- and y-values of these rows and columns are then used to
 set the centres of the elements that can be placed there using the
-``Layout()`` command.
+:ref:`Layout() <layoutIndex>` command.
 
 Apart from the ``TriangularLocations()`` command described here,
 there are also these other commands which allow you to layout
@@ -54,7 +54,7 @@ The ``TriangularLocations()`` command accepts the following properties:
   from where the grid is initially drawn; values can be *ne*, *nw*, *se*, and
   *sw* (the default i.e. the lower-left corner)
 
-The ``Layout()`` command accepts the following properties:
+The :ref:`Layout() <layoutIndex>` command accepts the following properties:
 
 - **grid** - this *must* be the first property used for the command; it will
   refer to

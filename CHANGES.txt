@@ -1,6 +1,18 @@
 protograf Changes
 =================
 
+2025-11-02 (0.3.3)
+-------------------
+- Add curve creation into `snail` property
+- Add cross grid marks for rectangular cards
+- Convert EquilateralTriangle to Triangle
+- Remove RightAngleTriangle
+- Add construction for other types of Triangles
+- All extended Triangle properties
+- Add horizontal_ and vertical_align to Image
+- Patch Image labelling when rotated
+- Patch track layout with in- and out-facing
+
 2025-10-09 (0.3.2)
 -------------------
 - Start of new `base_extended` module

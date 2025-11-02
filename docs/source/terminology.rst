@@ -11,8 +11,9 @@ which they are used.
 However, in order to help with clarity, below is a reasonably comprehensive
 list of terms used in different places, grouped by what aspects they affect.
 
-Note that some shapes, such as the :ref:`Hexagon <hexIndex>`, or
-:ref:`Circle <circleIndex>`, have extensive customisation properties
+Note that some shapes, such as the :ref:`Hexagon <hexIndex>`,
+:ref:`Circle <circleIndex>`, :ref:`Line <lineIndex>`, or
+:ref:`Rectangle <rectangleIndex>`,  have extensive customisation properties
 available; its better to refer to their specific descriptions to understand
 exactly how these can used.
 
@@ -131,27 +132,33 @@ from the left- and top-edge of a page or a card.
 and **y** positions; it could be a row and/or column identifier; it
 could be a sequence identifier; or just a indicator of where something
 is relative to something else, for example, a coordinate being drawn
-at the *top* of a Hexagon.
+at the *top* of a ``Hexagon``.
 
--  **align** - used to move text horizontally, relative to its starting
+-  **align** - used to move ``Text`` horizontally, relative to its starting
    location; can be one of: *justify*, *left*, *right*, or *centre*
--  **cx** - the centre position of a shape, going in the horizontal
+-  **align_horizontal** - used to move an ``Image`` horizontally, relative to
+   its starting location; can be one of:  *left*, *centre*, or *right*
+-  **align_vertical** - used to move an ``Image`` vertically, relative to
+   its starting location; can be one of:  *top*, *middle*, or *bottom*
+-  **cx** - the centre position of a shape, measured in the horizontal
    direction; its usually the case that the distance is not absolute, but
    relative to some other value e.g. distance from a margin; or the edge
-   of a ``Card``
--  **cy** - the centre position of a shape, going in the vertical
+   of a :ref:`Card <the-card-command>`
+-  **cy** - the centre position of a shape, measured in the vertical
    direction; its usually the case that the distance is not absolute, but
    relative to some other value e.g. distance from a margin; or the edge
-   of a ``Card``
+   of a :ref:`Card <the-card-command>`
 -  **elevation** - a relative vertical location within a shape; can be one
    of: *top*, *middle*, or *bottom*
 -  **x** - the position of a point in the horizontal direction; its
    usually the case that the distance is not absolute, but relative to
    some other value e.g. distance from a margin; or the edge of a
-   ``Card``; or the away from the centre of a Hexagon in a grid
+   :ref:`Card <the-card-command>`; or the away from the centre of a ``Hexagon``
+   in a grid
 -  **y** - the position of a point in the vertical direction; its usually
    the case that the distance is not absolute, but relative to some
-   other value e.g. distance from a margin; or the top edge of a ``Card``
+   other value e.g. distance from a margin; or the top edge of a
+   :ref:`Card <the-card-command>`
 
 
 .. _termsSize:
@@ -202,13 +209,18 @@ to set.
    **NOTE:** to switch to landscape orientation, append an ``l`` to the name;
    so ``"A5-1"`` set the page to use A5 landscape paper
 -  **radius** - the radius of a ``Circle``
--  **scaling** - the amount by which an SVG image should be shrunk or
-   expanded e.g. 0.5 makes it half-size and 2.0 doubles its size; but
-   because SVG is a vector-format, there will be no loss of resolution
-   through scaling
+-  **scaling** - the amount by which a ``Polyline``, drawn with a *snail*,
+   should be expanded or shrunk; e.g. 0.5 makes it half-size and 2.0 doubles
+   its size; **note** that images do not have scaling as such |dash| simply
+   set the *height* and *width* of the ``Image`` and the image will be
+   auto-sized to fit (SVG images use a vector-format, so there will be no loss
+   of resolution through rescaling)
 -  **side** - the length of a side of some shapes (e.g. ``Square``,
    ``Polygon``, ``Grid``) as well as the distance between each adjacent
    point in a ``TriangularLayout``
+-  **snail** - a means to draw a ``Polyline`` or ``Polyshape`` by setting
+   a series of values to represent relative increments of distance, or
+   changes in angle, of the line used to do the drawing
 -  **stroke_width** - the thickness of a line in **points**; many
    specific widths are set by prefixing this term with the name of the
    item in question; examples: **cross_stroke_width**;
@@ -241,7 +253,7 @@ Direction-orientated Terms
 ==========================
 
 In general, there are two primary ways of determining direction of
-something; either by a **compass direction** or by an **angle**.
+something; either by a **compass** direction or by an **angle**.
 Other, more descriptive directions are also used.
 
 The *angle* is the amount of rotation, in degrees, starting from a value
@@ -252,7 +264,7 @@ angle of a line parallel to the vertical sides of the page, and so on.
 The maximum allowed rotation is 360 degrees i.e. a full sweep around a
 circle.
 
-A *compass direction* is one of the following:
+A *compass* direction is one of the following:
 
 Primary compass directions |dash| with full names shown in brackets:
 
@@ -264,9 +276,9 @@ Primary compass directions |dash| with full names shown in brackets:
 Secondary compass directions |dash| with full names shown in brackets:
 
 -  ne (north-east) - normally corresponds to an angle of 45 degrees
--  se (south-east) - normally corresponds to an angle of 315 degrees
 -  nw (north-west) - normally corresponds to an angle of 135 degrees
 -  sw (south-west) - normally corresponds to an angle of 225 degrees
+-  se (south-east) - normally corresponds to an angle of 315 degrees
 
 .. NOTE::
 
@@ -274,8 +286,10 @@ Secondary compass directions |dash| with full names shown in brackets:
    then the angle is "reinterpreted" to match its context
    e.g. the *NE* angle for a ‘pointy’ hexagon is 60, not 45, degrees.
 
-Properties that use direction include:
+Properties that use directional terms include:
 
+-  **angle** - the interior angle between first and second sides of a
+   ``Triangle``
 -  **clockwise** - a ``True`` or ``False`` setting used to determine
    direction of travel around a circle
 -  **direction** - can be any primary compass direction; used to show
@@ -287,12 +301,12 @@ Properties that use direction include:
    be parallel to the bottom edge of the paper
 -  **facing** - can be any primary compass direction; used to show
    orientation of some types of layouts e.g. ``DiamondLayout``
--  **flip** - the relative vertical direction in which a triangle or rhombus
+-  **flip** - the relative vertical direction in which a rhombus
    must be drawn; can be either: *north* or *south*
--  **hand** - the relative horizontal direction in which a triangle must
-   be drawn; can be either: *east* or *west*
 -  **orientation** - used for drawing hexagons; can be either: *flat* or
    *pointy*
+-  **pivot** - the angle by which a ``Triangle`` is rotated around its start
+   point
 -  **pointy** - the *orientation* of a ``Hexagon``, meaning the top of it will
    make a "peak" relative to the bottom edge of the paper, and the flat edge
    will be parallel to the left side of the paper.
@@ -316,20 +330,21 @@ Styling-orientated Terms
 -  **dashed** - allows a line to be broken into a series of short lines,
    separated by spaces defined in a list; the first number is the length of
    the dash; the second is the length of the space between two dashes |dash|
-   note that sizes will be rounded to the nearest whole point value; so ``2cm``
-   which is equivalent to ``56.693`` points will be changed to ``57`` points
+   note that sizes will be rounded to the nearest whole point value;
+   so ``2cm``, which is equivalent to ``56.693`` points, will be changed to
+   ``57`` points
 -  **_ends** - this is part of a line property e.g. *stroke_ends* that changes
    the style of the line ends; it can be ``rounded`` which causes the ends of
    a line to be extended with a semi-circle; or ``squared`` which causes the
-   ends of a line to be extened with an extra half-square. (In graphics terms,
+   ends of a line to be extended with an extra half-square. (In graphics terms,
    this can also be termed an *end cap*.)
 -  **transform** - will change text in a ``Text`` command to *uppercase*,
    *lowercase*, or *capitalise* it
 -  **transparency** - a percentage value from 1 to 100 that determines how
-   "see through" a shape, or line, or area is; where ``1`` means it is nearly
-   not transparent and `100` means it is completely transparent. It is also
+   "see through" a shape, or line, or area is; where ``1`` means it is not at
+   all transparent and `100` means it is completely transparent.  It is also
    possible to use a fractional number e.g. ``0.5`` equates to 50%. Some
-   programs use the term *opacity*; but note that that is the inverse of
+   programs use the term *opacity*; but note that this is the **inverse** of
    transparency.
 
 

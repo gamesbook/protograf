@@ -94,13 +94,8 @@ Cross()
 PageBreak()
 
 Blueprint(stroke_width=blue_width)
-Text(common=header, text="RightAngledTriangle")
-RightAngledTriangle()
-PageBreak()
-
-Blueprint(stroke_width=blue_width)
-Text(common=header, text="EquilateralTriangle")
-EquilateralTriangle()
+Text(common=header, text="Triangle")
+Triangle()
 PageBreak()
 
 Blueprint(stroke_width=blue_width)
@@ -220,7 +215,7 @@ Save(output='png',
         'blueprint', 'blueprint-sub', 'text', 'line', 'rectangle',
         'circle', 'hexagon-flat', 'hexagon-pointy', 'rhombus',
         'trapezoid', 'star', 'ellipse', 'polygon',  'arrow',
-        'cross', 'rightangle',  'equiangle',  'hexagons-2x2',
+        'cross',  'equiangle',  'hexagons-2x2',
         'grid', 'arc', 'bezier', 'polyline',
         'shape', 'sector', 'sequence', 'square',
         'stadium', 'starfield', 'dot', 'dotgrid', 'fill-stroke',

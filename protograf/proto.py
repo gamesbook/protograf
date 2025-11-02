@@ -38,7 +38,6 @@ from .shapes import (
     CrossShape,
     DotShape,
     EllipseShape,
-    EquilateralTriangleShape,
     FooterShape,
     ImageShape,
     LineShape,
@@ -46,7 +45,6 @@ from .shapes import (
     PolygonShape,
     PolylineShape,
     RhombusShape,
-    RightAngledTriangleShape,
     SectorShape,
     ShapeShape,
     SquareShape,
@@ -55,6 +53,7 @@ from .shapes import (
     StarLineShape,
     TextShape,
     TrapezoidShape,
+    TriangleShape,
 )
 from .shapes_circle import CircleShape
 from .shapes_hexagon import HexShape
@@ -2837,18 +2836,21 @@ def Common(source=None, **kwargs):
 
     Notes:
 
-    Any kwargs can be used; they are stored for further use by other Shapes
+        * Any kwargs can be used; they are stored for further use by other Shapes
+        * `common_kwargs` will overwrite normal **kwargs supplied to a Shape
     """
+    base_kwargs = kwargs
     kwargs = margins(**kwargs)
     kwargs["source"] = source
-    cshape = CommonShape(canvas=globals.canvas, **kwargs)
+    cshape = CommonShape(canvas=globals.canvas, common_kwargs=base_kwargs, **kwargs)
     return cshape
 
 
 def common(source=None, **kwargs):
+    base_kwargs = kwargs
     kwargs = margins(**kwargs)
     kwargs["source"] = source
-    cshape = CommonShape(canvas=globals.canvas, **kwargs)
+    cshape = CommonShape(canvas=globals.canvas, common_kwargs=base_kwargs, **kwargs)
     return cshape
 
 
@@ -2863,14 +2865,26 @@ def Image(source=None, **kwargs):
 
     Kwargs:
     <base>
+
     -  *sliced* (str) - a letter used to indicate which portion of the
        image to extract:
+
        - *l* - the left fraction, matching the image's width:height ratio
        - *c* - the centre fraction, matching the image's width:height ratio
        - *r* - the right fraction, matching the image's width:height ratio
        - *t* - the top fraction, matching the image's height:width ratio
        - *m* - the middle fraction, matching the image's height:width ratio
        - *b* - the botttom fraction, matching the image's height:width ratio
+    - *align_horizontal* (str) - position of the image relative to its (x,y):
+
+      - *left* - left edge of image aligned to the x-position (default)
+      - *centre* - centre of image aligned to the x-position
+      - *right* - right edge of image aligned to the x-position
+    - *align_vertical* (str) - position of the image relative to its (x,y):
+
+      - *top* - top edge of image aligned to the y-position (default)
+      - *middle* - middle/centre of image aligned to the y-position
+      - *bottom* - bottom edge of image aligned to the y-position
 
     """
     kwargs = margins(**kwargs)
@@ -3136,57 +3150,31 @@ def ellipse(**kwargs):
     return EllipseShape(canvas=globals.canvas, **kwargs)
 
 
-@docstring_center
-def EquilateralTriangle(row=None, col=None, **kwargs):
-    """Draw a EquilateralTriangle shape on the canvas.
+# @docstring_center
+# def XquilateralTriangle(row=None, col=None, **kwargs):
+#     """Draw a XquilateralTriangle shape on the canvas.
 
-    Args:
+#     Args:
 
-    - row (int): row in which the shape is drawn.
-    - col (int): column in which shape is drawn.
+#     - row (int): row in which the shape is drawn.
+#     - col (int): column in which shape is drawn.
 
-    Kwargs:
+#     Kwargs:
 
-    <center>
+#     <center>
 
-    """
-    kwargs = margins(**kwargs)
-    kwargs["row"] = row
-    kwargs["col"] = col
-    eqt = EquilateralTriangleShape(canvas=globals.canvas, **kwargs)
-    eqt.draw()
-    return eqt
-
-
-def equilateraltriangle(row=None, col=None, **kwargs):
-    kwargs = margins(**kwargs)
-    return EquilateralTriangleShape(canvas=globals.canvas, **kwargs)
+#     """
+#     kwargs = margins(**kwargs)
+#     kwargs["row"] = row
+#     kwargs["col"] = col
+#     eqt = XquilateralTriangleShape(canvas=globals.canvas, **kwargs)
+#     eqt.draw()
+#     return eqt
 
 
-def EquiTri(row=None, col=None, **kwargs):
-    """Draw a EquilateralTriangle shape on the canvas.
-
-    Args:
-
-    - row (int): row in which the shape is drawn.
-    - col (int): column in which shape is drawn.
-
-    Kwargs:
-
-    <center>
-
-    """
-    kwargs = margins(**kwargs)
-    kwargs["row"] = row
-    kwargs["col"] = col
-    eqt = EquilateralTriangleShape(canvas=globals.canvas, **kwargs)
-    eqt.draw()
-    return eqt
-
-
-def equitri(row=None, col=None, **kwargs):
-    kwargs = margins(**kwargs)
-    return EquilateralTriangleShape(canvas=globals.canvas, **kwargs)
+# def xquilateraltriangle(row=None, col=None, **kwargs):
+#     kwargs = margins(**kwargs)
+#     return XquilateralTriangleShape(canvas=globals.canvas, **kwargs)
 
 
 @docstring_center
@@ -3371,33 +3359,6 @@ def polyline(row=None, col=None, **kwargs):
     kwargs["row"] = row
     kwargs["col"] = col
     return PolylineShape(canvas=globals.canvas, **kwargs)
-
-
-@docstring_base
-def RightAngledTriangle(row=None, col=None, **kwargs):
-    """Draw a RightAngledTriangle shape on the canvas.
-
-    Args:
-
-    - row (int): row in which the shape is drawn.
-    - col (int): column in which the shape is drawn.
-
-    Kwargs:
-
-    <base>
-
-    """
-    kwargs = margins(**kwargs)
-    kwargs["row"] = row
-    kwargs["col"] = col
-    rat = RightAngledTriangleShape(canvas=globals.canvas, **kwargs)
-    rat.draw()
-    return rat
-
-
-def rightangledtriangle(row=None, col=None, **kwargs):
-    kwargs = margins(**kwargs)
-    return RightAngledTriangleShape(canvas=globals.canvas, **kwargs)
 
 
 @docstring_center
@@ -3777,6 +3738,33 @@ def trapezoid(row=None, col=None, **kwargs):
     return TrapezoidShape(canvas=globals.canvas, **kwargs)
 
 
+@docstring_center
+def Triangle(row=None, col=None, **kwargs):
+    """Draw a Triangle shape on the canvas.
+
+    Args:
+
+    - row (int): row in which the shape is drawn.
+    - col (int): column in which shape is drawn.
+
+    Kwargs:
+
+    <center>
+
+    """
+    kwargs = margins(**kwargs)
+    kwargs["row"] = row
+    kwargs["col"] = col
+    eqt = TriangleShape(canvas=globals.canvas, **kwargs)
+    eqt.draw()
+    return eqt
+
+
+def triangle(row=None, col=None, **kwargs):
+    kwargs = margins(**kwargs)
+    return TriangleShape(canvas=globals.canvas, **kwargs)
+
+
 # ---- grids ====
 
 
@@ -3817,15 +3805,16 @@ def Blueprint(**kwargs):
       within each square; these are evenly spaces; use *subdivisions_dashed*
       to enhance these lines
     - style (str): set to one of: *blue*, *green* or *grey*
-    - decimals (float): set to to an integer number for the decimal points which
-      are used for the grid numbers (default is ``0``)
+    - decimals (float): set to to an integer number for the decimal points
+      which are used for the grid numbers (default is ``0``)
     - edges (str): can be set to any combination of *n*, *s*, *e*, or *w* in a
       single comma-delimited string; grid numbers will then be drawn on
       any of the edges specified
-    - edges_y (float): the number set for this determines where a horizontal line
-      of grid numbers will be drawn
-    - edges_x (float): the number set for this determines where a vertical line
-      of grid numbers will be drawn
+    - edges_y (float): the number set for this determines where a horizontal
+      line of grid numbers will be drawn
+    - edges_x (float): the number set for this determines where a vertical
+      line of grid numbers will be drawn
+    - numbering (bool): if True (default), will draw grid numbers on edges
 
     """
 
@@ -4833,19 +4822,25 @@ def Track(track=None, **kwargs):
         # TODO - can choose line centre, not vertex, as the cx,cy position
         shape.cx = shape.points_to_value(track_point.x - track._o.delta_x)
         shape.cy = shape.points_to_value(track_point.y - track._o.delta_y)
-        # feedback(f'*Track* {shape.cx=}, {shape.cy=}')
+        # feedback(f'\n*Track* {track_name=} {shape.cx=}, {shape.cy=}')
         if _rotation_style:
             match _rotation_style:
                 case "i" | "inwards":
                     if track_name == "CircleShape":
                         shape_rotation = 90 + track_point.angle
+                    elif track_name == "PolygonShape":
+                        shape_rotation = 90 - track_point.angle
                     else:
                         shape_rotation = 90 - track_point.angle
                 case "o" | "outwards":
                     if track_name == "CircleShape":
                         shape_rotation = 270 + track_point.angle
-                    else:
+                    elif track_name in ["SquareShape", "RectangleShape"]:
                         shape_rotation = 270 - track_point.angle
+                    elif track_name == "PolygonShape":
+                        shape_rotation = 270 - track_point.angle
+                    else:
+                        shape_rotation = 90 - track_point.angle
                 case _:
                     raise NotImplementedError(
                         f"The rotation_style '{_rotation_style}' is not valid"
@@ -5223,7 +5218,6 @@ chord.__doc__ = Chord.__doc__
 circle.__doc__ = Circle.__doc__
 dot.__doc__ = Dot.__doc__
 ellipse.__doc__ = Ellipse.__doc__
-equilateraltriangle.__doc__ = EquilateralTriangle.__doc__
 hexagon.__doc__ = Hexagon.__doc__
 image.__doc__ = Image.__doc__
 line.__doc__ = Line.__doc__
@@ -5234,8 +5228,8 @@ polyomino.__doc__ = Polyomino.__doc__
 polyshape.__doc__ = Polyshape.__doc__
 rectangle.__doc__ = Rectangle.__doc__
 rhombus.__doc__ = Rhombus.__doc__
-rightangledtriangle.__doc__ = RightAngledTriangle.__doc__
 star.__doc__ = Star.__doc__
 starfield.__doc__ = StarField.__doc__
 tetromino.__doc__ = Tetromino.__doc__
+triangle.__doc__ = Triangle.__doc__
 # .__doc__ = .__doc__

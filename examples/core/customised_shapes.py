@@ -36,12 +36,12 @@ PageBreak()
 # ---- dot & cross
 Blueprint()
 Text(common=txt, text="Dots & Crosses")
-Rhombus(cx=1, cy=5, side=2, dot=0.1, dot_stroke="red")
-Rhombus(cx=3, cy=5, side=2, cross=0.25, cross_stroke="red", cross_stroke_width=1)
+Rhombus(cx=1, cy=5, side=1.25, dot=0.1, dot_stroke="red")
+Rhombus(cx=3, cy=5, side=1.25, cross=0.25, cross_stroke="red", cross_stroke_width=1)
 Polygon(cx=1, cy=3, sides=8, radius=1, dot=0.1, dot_stroke="orange")
 Polygon(cx=3, cy=3, sides=8, diameter=2, cross=0.25, cross_stroke="orange", cross_stroke_width=1)
-Stadium(cx=1, cy=1, side=1, stroke="blue", dot=0.1)
-Stadium(cx=3, cy=1, side=1, stroke="blue", cross=0.25, cross_stroke_width=1)
+Stadium(cx=1, cy=1, side=0.66, stroke="blue", dot=0.1)
+Stadium(cx=3, cy=1, side=0.66, stroke="blue", cross=0.25, cross_stroke_width=1)
 PageBreak()
 
 # ---- centre placement
@@ -53,15 +53,6 @@ Rhombus(common=shp_font, cx=3, cy=5, heading="Rhombus cx=3;cy=5")
 Star(common=shp_font, cx=1, cy=3, heading="Star cx=1;cy=3")
 Ellipse(common=shp_font, cx=3, cy=3, width=2, height=1, heading="Ellipse cx=3;cy=3")
 Polygon(common=shp_font, cx=2, cy=1, radius=0.8, sides=7, heading="Polygon-7 cx2=;cy=1")
-PageBreak()
-
-# ---- RA triangles
-Blueprint()
-Text(common=txt, text="Right Angled Triangle")
-RightAngledTriangle(x=1, y=1, flip="north", hand="east", label="NE", fill="yellow")
-RightAngledTriangle(x=2, y=2, flip="south", hand="east", label="SE", fill="green")
-RightAngledTriangle(x=2, y=3, flip="north", hand="west", label="NW", fill="red")
-RightAngledTriangle(x=3, y=4, flip="south", hand="west", label="SW", fill="blue")
 PageBreak()
 
 # ---- lines (multiple) labels
@@ -103,53 +94,6 @@ StarField(
     colors=["white", "white", "white", "red", "green", "blue", ],
     sizes=[0.15, 0.15, 0.15, 0.15, 0.3, 0.3, 0.45],
     seeding=42.3)
-PageBreak()
-
-# ---- equilateral triangle - hatch
-Blueprint()
-Text(common=txt, text="Equilateral Triangle: hatch; rotation")
-EquilateralTriangle(
-    cx=2, cy=2, side=2,
-    hatches_count=5,
-    hatches_stroke="red",
-    title='Title', heading='Head')
-EquilateralTriangle(
-    cx=2, cy=5, side=2,
-    stroke_width=1,
-    rotation=45,
-    dot=.05)
-PageBreak()
-
-# ---- equilateral triangle - perbis slice
-Blueprint()
-Text(common=txt, text="Equi. Tri.; radii; perbii; slice ")
-EquilateralTriangle(
-    cx=1, cy=1,
-    side=1.5,
-    radii="n se sw",
-    title="radii",
-    fill="tomato")
-EquilateralTriangle(
-    cx=2, cy=3,
-    side=1.5,
-    perbii="s ne nw",
-    title="perbii",
-    fill="gold")
-EquilateralTriangle(
-    cx=3, cy=5,
-    side=1.5,
-    title="slices",
-    slices=["tomato", "gold", "lime"])
-PageBreak()
-
-# ---- RA Triangle
-Blueprint()
-Text(common=txt, text="Right Angled Triangle: flip/hand")
-eqt = Common(x=2, y=2, side=2)
-RightAngledTriangle(common=eqt, flip="north", hand="east", label="NE", fill="yellow")
-RightAngledTriangle(common=eqt, flip="south", hand="east", label="SE", fill="green")
-RightAngledTriangle(common=eqt, flip="north", hand="west", label="NW", fill="red")
-RightAngledTriangle(common=eqt, flip="south", hand="west", label="SW", fill="blue")
 PageBreak()
 
 # ---- sectors
@@ -260,9 +204,9 @@ Polygon(
             'aqua', 'pink', 'violet', 'purple'])
 PageBreak()
 
-# ---- dates
+# ---- date formats
 Blueprint()
-Text(common=txt, text="Dates: format and styles")
+Text(common=txt, text="Today: format and styles")
 dtext = Common(x=0.25, align="left", font_size=8)
 Text(common=dtext, y=1, text="1.  "+Today())
 Text(common=dtext, y=2, text="2.  "+Today(details="date", style="usa"))
@@ -273,15 +217,15 @@ PageBreak()
 
 # ---- rotation - image
 Blueprint()
-Text(common=txt, text="Images: normal & rotation")
+Text(common=txt, text="Image: scaling + rotation")
 Image("sholes_typewriter.png",
-      width=1.5, height=1.5,
+      width=2, height=2,
       x=0, y=0, title="PNG")
 Image("sholes_typewriter.png",
       width=1.5, height=1.5,
       x=2, y=0, title="60\u00B0", rotation=60)
 Image("noun-typewriter-3933515.svg",
-      width=1.5, height=1.5,
+      width=2, height=2,
       x=0, y=3, title="SVG")
 Image("noun-typewriter-3933515.svg",
       width=1.5, height=1.5,
@@ -555,17 +499,19 @@ PageBreak()
 Blueprint(stroke_width=0.5)
 Text(common=txt, text="Polyshape: custom")
 Polyshape(
-      points=[(1, 2), (1, 1), (2, 0), (3, 1), (3, 2)],
-      cx=2, cy=1,
-      label='A House',
-      label_stroke="seagreen",
-      cross=0.5,
-      fill="sandybrown",
-      stroke="peru",
+    x=0, y=1,
+    points=[(1, 2), (1, 1), (2, 0), (3, 1), (3, 2)],
+    cx=2, cy=1,
+    label='A House',
+    label_stroke="seagreen",
+    cross=0.5,
+    fill="sandybrown",
+    stroke="peru",
 )
-Polyshape(x=1, y=3,
-         steps='0.5,0 0,1.5 1.5,0 0,-1.5 0.5,0 0,0.5 -2.5,0 0,-0.5',
-         stroke="sandybrown", stroke_width=3, fill="seagreen")
+Polyshape(
+    x=1, y=4,
+    steps='0.5,0 0,1.5 1.5,0 0,-1.5 0.5,0 0,0.5 -2.5,0 0,-0.5',
+    stroke="sandybrown", stroke_width=3, fill="seagreen")
 PageBreak()
 
 # ---- shapeshape - offset + string
@@ -574,12 +520,13 @@ Text(common=txt, text="Polyshape: offset")
 Polyshape(
     points="0,0 0,1 2,0 2,1 0,0",
     cx=1, cy=0.5,
-    fill="chartreuse", label="Left ....... Right")
+    fill="gold",
+    label="Left ....... Right")
 Polyshape(
+    x=1, y=2,
     points="0,0 0,1 2,0 2,1 0,0",
-    cx=1, cy=0.5,
-    fill="gold", label="Left ....... Right",
-    x=1, y=2)
+    fill="chartreuse",
+    label="Left ....... Right")
 PageBreak()
 
 # ---- polyshape - snail
@@ -795,6 +742,33 @@ Polyline(
     stroke="green")
 PageBreak()
 
+# ---- polyline - snail - curve
+Blueprint(stroke_width=0.5)
+Text(common=txt, text="Polyline: snail; curves")
+Polyline(
+    y=1, x=0,
+    snail="(1.118 60 1) (1.118 -60 1) "*2,
+    stroke_width=1,
+    stroke="red")
+Polyline(
+    y=2, x=0,
+    snail="(1.118 60 1) (1.118 -60 1) "*8,
+    scaling=0.25,
+    stroke_width=1,
+    stroke="red")
+Polyline(
+    y=4, x=0,
+    snail="a45 (0.6 60 0.707) e 0.5 "*3,
+    stroke_width=1,
+    stroke="red")
+Polyline(
+    y=5, x=2,
+    snail="r60 (1.118 r60 1) * "*6,
+    stroke_width=1,
+    stroke="red")
+
+PageBreak()
+
 # ---- centred shapes
 Blueprint()
 Text(common=txt, text="Centred Shape")
@@ -804,7 +778,7 @@ Square(x=2.5, y=0.5, height=1, centre_shape=small_star)
 Rectangle(x=0.25, y=2.5, height=1, width=1.5, centre_shape=small_star)
 Circle(cx=3, cy=3, radius=0.5, centre_shape=small_star)
 Polygon(cx=1, cy=5, radius=0.5, sides=8, centre_shape=small_star)
-EquilateralTriangle(cx=3, cy=5, side=1.25, centre_shape=small_star)
+Triangle(cx=3, cy=5, side=1.25, centre_shape=small_star)
 PageBreak()
 
 # ---- centre shape - move
@@ -845,7 +819,7 @@ Rectangle(x=2, y=1, side=1,
               borders=[("sw n se", 2)]))
 Rectangle(x=3, y=2, side=1,
           centre_shape=stadium(
-              side=0.4,
+              side=0.3,
               stroke="orange"))
 Rectangle(x=0, y=3, side=1,
           centre_shape=ellipse(
@@ -862,7 +836,7 @@ Rectangle(x=1, y=4, side=1,
               borders=[("n s", 2, "black")]))
 Rectangle(x=2, y=3, side=1,
           centre_shape=rhombus(
-              side=0.8,
+              side=0.6,
               stroke="gray",
               fill=None,
               borders=[("ne sw", 2, "black")]))
@@ -885,7 +859,7 @@ Rhombus(x=2.4, y=0.3, height=1.5,  width=1.25, centre_shapes=[(small_dot), (big_
 Rectangle(x=0.5, y=2.5, height=1, width=1.25, centre_shapes=[(small_dot), (big_dot, 0.2, 0.2)])
 Circle(cx=3, cy=3, radius=0.5, centre_shapes=[(small_dot), (big_dot, 0.2, 0.2)])
 Polygon(cx=1, cy=5, radius=0.5, sides=8, centre_shapes=[(small_dot), (big_dot, 0.2, 0.2)])
-EquilateralTriangle(cx=3, cy=5, side=1.25, centre_shapes=[(small_dot), (big_dot, 0.2, 0.2)])
+Triangle(cx=3, cy=5, side=1.25, centre_shapes=[(small_dot), (big_dot, 0.2, 0.2)])
 PageBreak()
 
 
@@ -942,54 +916,114 @@ PageBreak()
 # ---- image - operations
 Blueprint()
 Text(common=txt, text="Image: operations")
-Image("fantasy-forest-with-old-bridges.png",
+image_file = "fantasy-forest-with-old-bridges.png"
+Image(image_file,
       width=2, height=2,
       x=0, y=0)
-Image("fantasy-forest-with-old-bridges.png",
+Image(image_file,
       width=1.5, height=1.5,
       x=2, y=0,
       operation=['c', 100, 75, -75]
 )
-Image("fantasy-forest-with-old-bridges.png",
+Image(image_file,
       width=1.5, height=1.5,
       x=2.5, y=0.5,
       operation=['c', 100, -75, 75]
 )
-Image("fantasy-forest-with-old-bridges.png",
+Image(image_file,
       width=2, height=2,
       x=0, y=2,
       operation=['r', 50]
 )
-Image("fantasy-forest-with-old-bridges.png",
+Image(image_file,
       width=2, height=2,
       x=2, y=2,
       operation=['e', (160, 240)]
 )
-Image("fantasy-forest-with-old-bridges.png",
+Image(image_file,
       width=2, height=2,
       x=0, y=4,
       operation=['p', 140, 5]
 )
-Image("fantasy-forest-with-old-bridges.png",
+Image(image_file,
       width=2, height=2,
       x=2, y=4,
       operation=['b', 20]
 )
 PageBreak()
 
-# ---- shape rotation
+# ---- image - align
 Blueprint()
-Text(common=txt, text="Rotation (cross & label)")
+Text(common=txt, text="Image: align")
+rdot = Common(fill_stroke="red", radius=0.05)
+image_file = "fantasy-forest-with-old-bridges.png"
+Image(image_file,
+      width=1, height=1,
+      x=0.5, y=0.5,
+      title="no align")
+Circle(common=rdot, cx=0.5, cy=0.5)
+Image(image_file,
+      width=1, height=1,
+      cx=3, cy=1,
+      title="centre x,y")
+Image(image_file,
+      width=1, height=1,
+      x=2, y=4,
+      align_horizontal="right",
+      align_vertical="bottom",
+      title="bottom-right")
+Circle(common=rdot, cx=2, cy=4)
+Image(image_file,
+      width=1, height=1,
+      x=2, y=2,
+      align_horizontal="left",
+      align_vertical="top",
+      title="top-left")
+Circle(common=rdot, cx=2, cy=2)
+Image(image_file,
+      width=1, height=1,
+      x=0, y=5,
+      align_horizontal="left",
+      align_vertical="mid",
+      title="mid-left")
+Circle(common=rdot, cx=0, cy=5)
+Image(image_file,
+      width=1, height=1,
+      x=3, y=5,
+      align_horizontal="centre",
+      align_vertical="mid",
+      title="mid-centre")
+Circle(common=rdot, cx=3, cy=5)
+PageBreak()
+
+# ---- shape rotation I
+Blueprint()
+Text(common=txt, text="Rotation I (cross & label)")
 props = Common(
     stroke="black",
     cross=0.5, cross_stroke="red", cross_stroke_width=1,
     rotation=45, label_size=6)
 Rectangle(cx=1, cy=5, height=1, width=1.5, common=props, label="rectangle")
-Rhombus(cx=3, cy=5, side=2, common=props, label="rhombus")
+Rhombus(cx=3, cy=5, side=1.25, common=props, label="rhombus")
 Polygon(cx=1, cy=3, sides=6, side=0.75, common=props, label="polygon")
-Stadium(cx=3, cy=3, side=1, common=props, label="stadium")
+Stadium(cx=3, cy=3, side=0.6, common=props, label="stadium")
 Star(x=1, y=1, vertices=5, radius=0.75, common=props, label="star")
 Ellipse(cx=3, cy=1, height=1, width=1.5, common=props, label="ellipse")
+PageBreak()
+
+# ---- shape rotation II
+Blueprint()
+Text(common=txt, text="Rotation II (cross & label)")
+props = Common(
+    stroke="black",
+    cross=0.5, cross_stroke="red", cross_stroke_width=1,
+    rotation=45, label_size=6)
+Square(cx=1, cy=1, side=1.25, common=props, label="square")
+Trapezoid(cx=3, cy=1, width=1.25, top=0.75, height=1, common=props, label="trapezoid")
+Hexagon(cx=1, cy=3, side=0.75, common=props, label="hex:flat")
+Hexagon(cx=3, cy=3, side=0.75, orientation="pointy", common=props, label="hex:pointy")
+Triangle(cx=1, cy=5, side=1.5, common=props, label="tri:equi")
+Triangle(x=2.5, y=5.5, side=1, height=1.5, common=props, label="tri:isos")
 PageBreak()
 
 # ---- shape hatches-and-rotation
@@ -1007,7 +1041,7 @@ Hexagon(
     cx=2, cy=1, height=1.5,
     rotation=30,
     )
-EquilateralTriangle(
+Triangle(
     common=htch,
     cx=1, cy=3, side=1.5,
     rotation=30,
@@ -1135,7 +1169,7 @@ Trapezoid(
     width=1.5, top=1, height=1.25,
     vertex_shapes=[circle(radius=0.15, label="T")]*5,
     vertex_shapes_rotated=True)
-EquilateralTriangle(
+Triangle(
     cx=1, cy=5,
     side=1.5,
     vertex_shapes=[circle(radius=0.15, label="E")]*3,
@@ -1195,7 +1229,7 @@ Rhombus(
     ],
     radii_shapes_rotated=True,
 )
-EquilateralTriangle(
+Triangle(
     cx=1, cy=5,
     side=1.25,
     radii_shapes=[
@@ -1263,7 +1297,7 @@ Rhombus(
     ],
     perbii_shapes_rotated=True,
 )
-EquilateralTriangle(
+Triangle(
     cx=1, cy=5,
     side=1.25,
     perbii_shapes=[
@@ -1286,10 +1320,8 @@ Save(
      names=[
         None,
         "blueprint_subdiv", "dots_crosses", "centred",
-        "right_angled_triangle", "lines",
+        "lines",
         "starfield_rectangle", "starfield_circle", "starfield_poly",
-        "equilateral_triangle", "equtri_perbii_slice",
-        "right_angled_triangle_flip",
         "sectors", "grid_gray",
         "dotgrid_moleskine", "dotgrid_rowscols", "arc",
         "stadium_edges", "trapezoid_flip", "chord", "cross",
@@ -1311,12 +1343,15 @@ Save(
         "rectangles_rowcol", "rectangles_custom", "rhombus_custom",
         "rhombus_borders", "trapezoid_borders",
         "arrow_sizes", "arrow_rotate", "arrowheads",
-        "polyline_basic", "polyline_arrow", "polyline_snail",
+        "polyline_basic", "polyline_arrow", "polyline_snail", "polyline_snail_curve",
         "shape_centred", "shape_centred_move", "shape_centred_custom",
         "shapes_centred",
         "qr_code",
-        "image_sliced", "image_label", "image_operations",
-        "shape_rotation", "shape_hatches_and_rotation",
+        "image_sliced", "image_label",
+        "image_operations", "image_align",
+        "shape_rotation",
+        "shape_rotation_two",
+        "shape_hatches_and_rotation",
         "table_defaults", "table_custom",
         "perbii_styled",
         "poly_waves",

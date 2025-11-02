@@ -35,6 +35,7 @@ GRID_SHAPES_WITH_CENTRE = [
     "StadiumShape",
     "StarShape",
     "TrapezoidShape",
+    "TriangleShape",
 ]
 GRID_SHAPES_NO_CENTRE = [
     "TextShape",

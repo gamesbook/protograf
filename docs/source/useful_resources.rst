@@ -25,6 +25,8 @@ Icons, Art and Images
 -  https://thenounproject.com/ (some free, provided they are attributed)
 -  https://developers.google.com/fonts/docs/material_icons - downloadable set
    of free-to-use small icons in PNG/SVG format
+-  https://www.the-blueprints.com/blueprints/ - outlines and drawings of
+   military and other equipment and objects... plus a skull or two
 
 There is a collated list of sites with free *artwork* at
 https://www.fairway3games.com/where-do-i-get-art-for-free-an-ongoing-list/

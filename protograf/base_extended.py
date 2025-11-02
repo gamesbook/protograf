@@ -2,6 +2,10 @@
 """
 Base shape - extended classes for protograf
 """
+# base
+import re
+
+# local
 from protograf.base import BaseShape
 from protograf.shapes_utils import draw_line
 from protograf.utils.structures import Point
@@ -52,6 +56,80 @@ class BasePolyShape(BaseShape):
             except (ValueError, Exception):
                 return False
 
+        def relative_angle(item: str, current_dir: float) -> float:
+            """Use relative angle change to calculate new direction."""
+            if item[0] == "+" or item[0] == "l":  # anti-clockwise
+                a_item = item.strip("+").strip("l")
+                if not is_float(a_item):
+                    tools.feedback(
+                        f'The {polytype} snail angle "{item}" is not valid.',
+                        True,
+                        True,
+                    )
+                else:
+                    current_dir = current_dir + float(a_item)
+                    if current_dir > 360:
+                        current_dir = 360 - current_dir
+                    if current_dir < 0 or current_dir > 360:
+                        tools.feedback(
+                            f'The {polytype} snail angle change "{item}" must result in 0 to 360.',
+                            True,
+                            True,
+                        )
+            elif item[0] == "-" or item[0] == "r":  # clockwise
+                a_item = item.strip("-").strip("r")
+                if not is_float(a_item):
+                    tools.feedback(
+                        f'The {polytype} snail angle "{item}" is not valid.',
+                        True,
+                        True,
+                    )
+                else:
+                    current_dir = current_dir - float(a_item)
+                    if current_dir < 0:
+                        current_dir = 360 + current_dir
+                    if current_dir < 0 or current_dir > 360:
+                        tools.feedback(
+                            f'The {polytype} snail angle change "{item}" must result in 0 to 360.',
+                            True,
+                            True,
+                        )
+            return current_dir
+
+        def draw_a_curve(curve: str, current_point: Point, current_dir: float) -> Point:
+            """Draw a curve from a Point."""
+            new_point, inflection_point = None, None
+            try:
+                _distance_1, angle, _distance_2 = curve.strip("(").strip(")").split(" ")
+            except ValueError:
+                feedback(
+                    "A curve must have 3 values: inflection distance & angle,"
+                    f' and total distance - not "{curve}"',
+                    True,
+                )
+            inf_distance = self.unit(_distance_1) * self.scaling  # convert to units
+            off_distance = self.unit(_distance_2) * self.scaling  # convert to units
+            try:
+                inf_angle = float(angle)
+            except ValueError:
+                inf_angle = relative_angle(angle, current_dir)
+            # ---- new point based on current_dir, off_distance
+            new_point = geoms.point_from_angle(
+                current_point, off_distance, 360 - current_dir
+            )
+            inflection_point = geoms.point_from_angle(
+                current_point, inf_distance, 360 - inf_angle
+            )
+            # ---- draw line from current_point to new_point
+            if new_point:
+                cnv.draw_curve(
+                    current_point,
+                    inflection_point,
+                    new_point,
+                )
+            # ---- save new_point as current_point
+            return new_point
+
         def draw_or_jump(current_point: Point, distance: float, jump: bool) -> Point:
             """Draw a line or move to a new Point."""
             u_distance = self.unit(distance) * self.scaling  # convert distance to units
@@ -75,8 +153,17 @@ class BasePolyShape(BaseShape):
         polytype = self.get_name()
         if not isinstance(self.snail, str):
             feedback("The {polytype} snail must be a space-separated string!", True)
-        items = self.snail.split(" ")
-        # print(f'*** snail {items=}')
+        # ---- extract curves into their own list
+        pattern = r"\((.*?)\)"
+        curves = re.findall(pattern, self.snail)
+        curve_counter = 0
+        if curves:
+            _snail = re.sub(pattern, "~", self.snail)
+        else:
+            _snail = self.snail
+
+        items = _snail.split(" ")
+        # print(f'*** snail {self.snail=} {_snail=} {items=}')
         current_dir = 0  # face E by default
         start_point = Point(self._u.x + self._o.delta_x, self._u.y + self._o.delta_y)
         current_point = start_point
@@ -95,6 +182,11 @@ class BasePolyShape(BaseShape):
                         True,
                     )
                 current_point = start_point
+            elif _item == "~" and curve_counter <= len(curves) - 1:
+                # ---- curve
+                the_curve = curves[curve_counter]
+                current_point = draw_a_curve(the_curve, current_point, current_dir)
+                curve_counter += 1
             elif _item == "**":
                 draw_line(
                     cnv,
@@ -114,48 +206,16 @@ class BasePolyShape(BaseShape):
                     )
                 else:
                     current_dir = float(a_item)
+                    if current_dir < 0:
+                        current_dir = 360 + current_dir
                     if current_dir < 0 or current_dir > 360:
                         tools.feedback(
                             f'The {polytype} snail angle "{a_item}" must be in the range 0 to 360.',
                             True,
                             True,
                         )
-            elif _item[0] == "+" or _item[0] == "l":  # anti-clockwise
-                a_item = _item.strip("+").strip("l")
-                if not is_float(a_item):
-                    tools.feedback(
-                        f'The {polytype} snail angle "{_item}" is not valid.',
-                        True,
-                        True,
-                    )
-                else:
-                    current_dir = current_dir + float(a_item)
-                    if current_dir > 360:
-                        current_dir = 360 - current_dir
-                    if current_dir < 0 or current_dir > 360:
-                        tools.feedback(
-                            f'The {polytype} snail angle change "{_item}" must result in 0 to 360.',
-                            True,
-                            True,
-                        )
-            elif _item[0] == "-" or _item[0] == "r":  # clockwise
-                a_item = _item.strip("-").strip("r")
-                if not is_float(a_item):
-                    tools.feedback(
-                        f'The {polytype} snail angle "{_item}" is not valid.',
-                        True,
-                        True,
-                    )
-                else:
-                    current_dir = current_dir - float(a_item)
-                    if current_dir < 0:
-                        current_dir = 360 + current_dir
-                    if current_dir < 0 or current_dir > 360:
-                        tools.feedback(
-                            f'The {polytype} snail angle change "{_item}" must result in 0 to 360.',
-                            True,
-                            True,
-                        )
+            elif _item[0] in ["r", "l", "-", "+"]:
+                current_dir = relative_angle(_item, current_dir)
             elif _item[0] == "j":
                 if self.__class__.__name__ == "ShapeShape":
                     tools.feedback(
@@ -177,7 +237,7 @@ class BasePolyShape(BaseShape):
                     f'The {polytype} snail cannot contain "{_item}".', True, True
                 )
 
-    def get_vertexes(self):
+    def get_vertexes(self, offset_x=0.0, offset_y=0.0):
         """Return Poly-shape line vertices in canvas units"""
         polytype = self.get_name()
         points = self.get_points()
@@ -199,15 +259,6 @@ class BasePolyShape(BaseShape):
             feedback(
                 f"Point values will supercede steps to draw the {polytype}", False, True
             )
-        if points:
-            vertices = [
-                Point(
-                    self.unit(pt[0]) + self._o.delta_x,
-                    self.unit(pt[1]) + self._o.delta_y,
-                )
-                for pt in points
-            ]
-            return vertices
         # print('***', f'{steps=}')
         if steps:
             vertices = []
@@ -227,6 +278,16 @@ class BasePolyShape(BaseShape):
                         )
                     )
                 return vertices
+        if points:
+            vertices = [
+                Point(
+                    self.unit(pt[0]) + self.unit(offset_x) + self._o.delta_x,
+                    self.unit(pt[1]) + self.unit(offset_y) + self._o.delta_y,
+                )
+                for pt in points
+            ]
+            return vertices
+
         if not self.snail:
             feedback(
                 f"There are no points or steps or snail to draw the {polytype}.",

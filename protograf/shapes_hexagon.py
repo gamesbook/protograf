@@ -56,18 +56,38 @@ class HexShape(BaseShape):
 
     def __init__(self, _object=None, canvas=None, **kwargs):
         super(HexShape, self).__init__(_object=_object, canvas=canvas, **kwargs)
-        self.kwargs = kwargs
+        # ---- check construction type
         self.use_diameter = True if self.is_kwarg("diameter") else False
         self.use_height = True if self.is_kwarg("height") else False
         self.use_radius = True if self.is_kwarg("radius") else False
         self.use_side = False
-        if "side" in kwargs:
+        if "rotation" in self.kwargs:
+            feedback("Rotation does not apply to Hexagons!", alert=True)
+        if "side" in self.kwargs:
             self.use_side = True
-            if "radius" in kwargs or "height" in kwargs or "diameter" in kwargs:
+            if (
+                "radius" in self.kwargs
+                or "height" in self.kwargs
+                or "diameter" in self.kwargs
+            ):
                 self.use_side = False
-        # fallback / default
+        # ---- fallback / default
         if not self.use_diameter and not self.use_radius and not self.use_side:
             self.use_height = True
+            if not self.height:
+                if self.radius:
+                    base = self.radius
+                elif self.diameter:
+                    base = self.diameter / 2.0
+                elif self.side:
+                    base = self.side
+                else:
+                    feedback(
+                        "No dimensions (greater than zero) set to draw the Hexagon",
+                        True,
+                    )
+                self.height = base * math.sqrt(3)
+                self.set_unit_properties()  # need to recalculate!
         self.ORIENTATION = self.get_orientation()
 
     def get_orientation(self) -> HexOrientation:
@@ -113,7 +133,44 @@ class HexShape(BaseShape):
             raise ValueError("get_direction `lines` must be one of: {LINES}")
         return direction
 
-    def hex_height_width(self) -> tuple:
+    def get_geometry(self):
+        """Calculate geometric settings of a Hexagon."""
+        # feedback(f"*** hex geo {self.radius=} {self.height=} {self.diameter=} {self.side=} ")
+        # feedback(f"hexi {self.use_radius=} {self.use_height=} {self.use_diameter=} {self.use_side=} ")
+        # ---- calculate half_flat & half_side
+        if self.height and self.use_height:
+            side = self._u.height / math.sqrt(3)
+            half_flat = self._u.height / 2.0
+        elif self.diameter and self.use_diameter:
+            side = self._u.diameter / 2.0
+            half_flat = side * math.sqrt(3) / 2.0
+        elif self.radius and self.use_radius:
+            side = self._u.radius
+            half_flat = side * math.sqrt(3) / 2.0
+        else:
+            pass
+        if self.side and self.use_side:
+            side = self._u.side
+            half_flat = side * math.sqrt(3) / 2.0
+        if not self.radius and not self.height and not self.diameter and not self.side:
+            feedback(
+                "No value for side or height or diameter or radius"
+                " supplied for hexagon.",
+                True,
+            )
+        half_side = side / 2.0
+        height_flat = 2 * half_flat
+        diameter = 2.0 * side
+        radius = side
+        z_fraction = (diameter - side) / 2.0
+        self.ORIENTATION = self.get_orientation()
+        hex_geometry = HexGeometry(
+            radius, diameter, side, half_side, half_flat, height_flat, z_fraction
+        )
+        # feedback(f"*** hex geo {hex_geometry=}")
+        return hex_geometry
+
+    def get_hex_height_width(self) -> tuple:
         """Calculate vertical and horizontal point dimensions of a hexagon
 
         Returns:
@@ -1006,39 +1063,6 @@ class HexShape(BaseShape):
             dotted=self.spikes_dotted,
         )
 
-    def get_geometry(self):
-        """Calculate geometric settings of a Hexagon."""
-        # ---- calculate half_flat & half_side
-        if self.height and self.use_height:
-            side = self._u.height / math.sqrt(3)
-            half_flat = self._u.height / 2.0
-        elif self.diameter and self.use_diameter:
-            side = self._u.diameter / 2.0
-            half_flat = side * math.sqrt(3) / 2.0
-        elif self.radius and self.use_radius:
-            side = self._u.radius
-            half_flat = side * math.sqrt(3) / 2.0
-        else:
-            pass
-        if self.side and self.use_side:
-            side = self._u.side
-            half_flat = side * math.sqrt(3) / 2.0
-        if not self.radius and not self.height and not self.diameter and not self.side:
-            feedback(
-                "No value for side or height or diameter or radius"
-                " supplied for hexagon.",
-                True,
-            )
-        half_side = side / 2.0
-        height_flat = 2 * half_flat
-        diameter = 2.0 * side
-        radius = side
-        z_fraction = (diameter - side) / 2.0
-        self.ORIENTATION = self.get_orientation()
-        return HexGeometry(
-            radius, diameter, side, half_side, half_flat, height_flat, z_fraction
-        )
-
     def get_vertexes(self, is_cards=False) -> list:
         """Calculate vertices of the Hexagon.
 
@@ -1140,7 +1164,7 @@ class HexShape(BaseShape):
             # x and y are at the bottom-left corner of the box around the hex
             x = self._u.x + self._o.delta_x
             y = self._u.y + self._o.delta_y
-            # feedback(f""*** P~: {x=} {y=} {self.row=} {self.col=} {geo=} ")
+            # feedback(f"*** P~: {x=} {y=} {self.row=} {self.col=} {geo=} ")
             # ---- ~ draw flat by row/col
             if self.row is not None and self.col is not None and is_cards:
                 # x = self.col * 2.0 * geo.side + self._o.delta_x

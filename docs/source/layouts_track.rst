@@ -239,10 +239,11 @@ Example 5. Polygon Track
       .. code:: python
 
         shp = hexagon(
-          cx=1, cy=1, height=0.5, label='{{sequence}}')
+          cx=1, cy=1, height=0.5,
+          label='{{sequence}}')
         Track(
-           polygon(cx=2, cy=3, radius=1.5, sides=8),
-           shapes=[shp])
+          polygon(cx=2, cy=3, radius=1.5, sides=8),
+          shapes=[shp])
 
       Because the vertices of a regular polygon lie on the diameter of a
       circle, a ``Polygon`` track is a fairly easy way to create a
@@ -272,7 +273,8 @@ Example 6. Polygon Track with start and stop
       .. code:: python
 
         shp = hexagon(
-          cx=1, cy=1, height=0.5, label='{{sequence}}')
+          cx=1, cy=1, height=0.5,
+          label='{{sequence}}')
         Track(
           polygon(cx=2, cy=3, radius=1.5, sides=8),
           shapes=[shp],
@@ -305,7 +307,8 @@ Example 7. Polyline Track
       .. code:: python
 
         shp = circle(
-          cx=1, cy=1, radius=0.25, label='{{sequence}}')
+          cx=1, cy=1, radius=0.25,
+          label='{{sequence}}')
         Track(
           Polyline(points=[
             (0, 0), (1, 2), (2, 1), (3, 3), (1, 5)]),
@@ -315,7 +318,7 @@ Example 7. Polyline Track
       at irregular locations on the page.
 
       In this example, because ``Polyline`` is used for the *track*,
-      and not ``polyline``, the track itself is drawn.
+      and not ``polyline``, the track itself is also drawn.
 
 ===== ======
 
@@ -334,18 +337,19 @@ Example 8. Circle Track - clockwise
       .. code:: python
 
         shp = hexagon(
-          cx=1, cy=1, height=0.5, label='{{sequence}}')
+          cx=1, cy=1, height=0.5,
+          label='{{sequence}}')
         Track(
-           Circle(cx=2, cy=3, radius=1.5),
-           angles=[30,120,210,300],
-           shapes=[shp],
-           clockwise=True)
+          Circle(cx=2, cy=3, radius=1.5),
+          angles=[30,120,210,300],
+          shapes=[shp],
+          clockwise=True)
 
       In order to draw shapes on a ``Circle``, the *angles* property must
       be set.
 
       Again, in this example, because ``Circle`` is used for the *track*,
-      and not ``circle``, the track itself is drawn.
+      and not ``circle``, the track itself is also drawn.
 
 ===== ======
 
@@ -364,10 +368,14 @@ Example 9. Polygon Track - custom shape
       .. code:: python
 
         shp = rectangle(
-          cx=1, cy=1, width=0.5, height=0.5,
-          label='{{sequence}}', peaks=[("n", 0.25)])
+          cx=1, cy=1,
+          width=0.5, height=0.5,
+          label='{{sequence}}',
+          peaks=[("n", 0.25)])
         Track(
-          polygon(cx=2, cy=3, sides=6, radius=1.5),
+          polygon(
+            cx=2, cy=3, sides=6,
+            radius=1.5),
           shapes=[shp])
 
       This is very similar to the third example; the only differences being
@@ -391,10 +399,14 @@ Example 10. Polygon Track - clockwise
       .. code:: python
 
         shp = rectangle(
-            cx=1, cy=1, width=0.5, height=0.5, peaks=[("n", 0.25)],
+            cx=1, cy=1,
+            width=0.5, height=0.5,
+            peaks=[("n", 0.25)],
             label='{{sequence}}')
         Track(
-            polygon(cx=2, cy=3, sides=6, radius=1.5),
+            polygon(
+              cx=2, cy=3, sides=6,
+              radius=1.5),
             shapes=[shp],
             clockwise=True)
 
@@ -418,10 +430,14 @@ Example 11. Polygon Track - inwards
       .. code:: python
 
         shp = rectangle(
-          cx=1, cy=1, width=0.5, height=0.5, peaks=[("n", 0.25)],
+          cx=1, cy=1,
+          width=0.5, height=0.5,
+          peaks=[("n", 0.25)],
           label='{{sequence}}')
         Track(
-          polygon(cx=2, cy=3, sides=6, radius=1.5),
+          polygon
+            cx=2, cy=3, sides=6,
+            radius=1.5),
           shapes=[shp],
           rotation_style='i')
 
@@ -446,10 +462,14 @@ Example 12. Polygon Track - outwards
       .. code:: python
 
         shp = rectangle(
-          cx=1, cy=1, width=0.5, height=0.5, peaks=[("n", 0.25)],
+          cx=1, cy=1,
+          width=0.5, height=0.5,
+          peaks=[("n", 0.25)],
           label='{{sequence}}')
         Track(
-          polygon(cx=2, cy=3, sides=6, radius=1.5),
+          polygon(
+            cx=2, cy=3, sides=6,
+            radius=1.5),
           shapes=[shp],
           rotation_style='o')
 
@@ -460,7 +480,7 @@ Example 12. Polygon Track - outwards
 ===== ======
 
 
-Example 13. Circular Track - outwards
+Example 13. Circular Track - inwards
 -------------------------------------
 `^ <key-properties-track_>`_
 
@@ -474,13 +494,15 @@ Example 13. Circular Track - outwards
       .. code:: python
 
         shp = rectangle(
-          cx=1, cy=1, width=0.5, height=0.5, peaks=[("n", 0.25)],
+          cx=1, cy=1,
+          width=0.5, height=0.5,
+          peaks=[("n", 0.25)],
           label='{{sequence}}')
         Track(
           Circle(cx=2, cy=3, radius=1.5),
           angles=[30,120,210,300],
           shapes=[shp],
-          rotation_style='o')
+          rotation_style='i')
 
       This is very similar to the twelfth example; the only difference being
       that a circular track, with locations specified by *angles* is used.
@@ -503,10 +525,14 @@ Example 14. Rectangular Track - inwards
       .. code:: python
 
         shp = rectangle(
-          cx=1, cy=1, width=0.5, height=0.5, peaks=[("n", 0.25)],
+          cx=1, cy=1,
+          width=0.5, height=0.5,
+          peaks=[("n", 0.25)],
           label='{{sequence}}')
         Track(
-          Rectangle(cx=2, cy=3, height=2, width=2),
+          Rectangle(
+            cx=2, cy=3,
+            height=2, width=2),
           shapes=[shp],
           rotation_style='i')
 
@@ -530,10 +556,14 @@ Example 15. Rectangular Track - outwards
       .. code:: python
 
         shp = rectangle(
-          cx=1, cy=1, width=0.5, height=0.5, peaks=[("n", 0.25)],
+          cx=1, cy=1,
+          width=0.5, height=0.5,
+          peaks=[("n", 0.25)],
           label='{{sequence}}')
         Track(
-          Rectangle(cx=2, cy=3, height=2, width=2),
+          Rectangle(
+            cx=2, cy=3,
+            height=2, width=2),
           shapes=[shp],
           rotation_style='o')
 
@@ -557,10 +587,14 @@ Example 16. Polygon Track - sequences
       .. code:: python
 
         shp = rectangle(
-          cx=1, cy=1, width=0.5, height=0.5, peaks=[("n", 0.25)],
+          cx=1, cy=1,
+          width=0.5, height=0.5,
+          peaks=[("n", 0.25)],
           label='{{sequence}}')
         Track(
-            polygon(cx=2, cy=3, sides=12, radius=1.5),
+            polygon(
+              cx=2, cy=3, sides=12,
+              radius=1.5),
             shapes=[shp],
             rotation_style='o',
             sequences=[1,3,5,7,9,11])
@@ -588,14 +622,18 @@ Example 17. Multiple Tracks - starts
 
       .. code:: python
 
-        shp = circle(cx=0, cy=0, radius=0.25, label='{{sequence}}')
+        shp = circle(
+          cx=0, cy=0, radius=0.25,
+          label='{{sequence}}')
 
         # polygon
         Track(
-          Polygon(cx=1, cy=5, radius=0.5, sides=4, stroke="red"),
+          Polygon(cx=1, cy=5, radius=0.5,
+                  sides=4, stroke="red"),
           shapes=[shp])
         Track(
-          Polygon(cx=3, cy=5, radius=0.5, sides=4, stroke="red"),
+          Polygon(cx=3, cy=5, radius=0.5,
+                  sides=4, stroke="red"),
           shapes=[shp],
           clockwise=True)
         # circle
@@ -646,7 +684,8 @@ Example 18. Circular Track - clock
       .. code:: python
 
         Circle(
-          cx=2, cy=3, radius=1.8, stroke_width=2, dot=0.1)
+          cx=2, cy=3, radius=1.8,
+          stroke_width=2, dot=0.1)
 
         times = circle(
           cx=1, cy=1, radius=0.25, stroke="white",
@@ -687,39 +726,40 @@ Example 19. Polygon Track - scoring
         score = Common(
             cx=1, cy=1, radius=0.18, stroke="navy",
             label='{{sequence}}', label_size=6)
-        # white circles
+        # white circles - track one
         shp = circle(common=score, fill="white")
         Track(
             trk,
             shapes=[shp],
             rotation_style='o',
             clockwise=True,
-            start=24
+            start=1
         )
-        # blue circles
+        # blue circles - track two
         shp5 = circle(common=score, fill="aqua")
         Track(
             trk,
             shapes=[shp5],
             rotation_style='o',
             clockwise=True,
-            start=24,
+            start=1,
             sequences=[5,10,15,20,25,30,35]
         )
 
       This example shows how a track could be used to construct a
-      familiar shape - a scoring track for a game.
+      familiar shape |dash| a scoring track for a game.
 
       In this case, a 30-sided polygon is used as the basis for the track.
 
       Two tracks are constructed:
 
-      - first one has the white circles;
-      - second one is constructed "above" it with blue circles.
+      - the first track makes use of the white circles;
+      - the second track is constructed "above" it with blue circles.
 
-      The blue circles are only drawn at every *fifth* location in the sequence.
-
-      The track's circles share the same *common* property, as the only
+      The tracks' *shapes* share a *common* property, as the only
       difference between them is their *fill* color.
+
+      The blue circles are only drawn at every *fifth* location, as
+      set in the *sequences* property of the second track.
 
 ===== ======

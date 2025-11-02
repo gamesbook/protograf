@@ -56,9 +56,9 @@ Blueprint()
 Text(common=header, text="Filled shapes")
 Rectangle(cx=3, cy=23, width=5, height=3,
           title="rectangle:3-23", title_stroke="black", fill_stroke="tomato")
-EquilateralTriangle(
+Triangle(
     cx=9, cy=23, side=4,
-    title="triangle:9-23", title_stroke="black", fill_stroke="tomato")
+    title="Triangle:9-23", title_stroke="black", fill_stroke="tomato")
 Stadium(x=13.5, y=22, width=3, height=2,
         title="stadium:15-23", title_stroke="black", fill_stroke="tomato")
 Hexagon(cx=3, cy=17, side=2, orientation="flat",
@@ -108,7 +108,7 @@ Text(common=header, text="Centred shapes with centre point and x-y label")
 dot = Common(dot=0.2, dot_stroke="yellow")
 
 Rectangle(cx=3, cy=23, width=5, height=3, label="rectangle:3-23", common=dot)
-EquilateralTriangle(cx=9, cy=23, side=4, label="triangle:9-23", common=dot)
+Triangle(cx=9, cy=23, side=4, label="Triangle:9-23", common=dot)
 Stadium(cx=15, cy=23, width=3, height=2, label="stadium:15-23", common=dot)
 
 Hexagon(cx=3, cy=17, side=2, label="hexagon:3-17", orientation="flat", common=dot)
@@ -145,7 +145,7 @@ Ellipse(cx=9, cy=17, width=5, height=3, heading="ellipse:9-17", common=dot)
 Trapezoid(cx=16, cy=17, width=4, top=2, height=3, heading="trapezoid:16-17", common=dot)
 
 Rectangle(cx=3, cy=23, width=5, height=3, heading="rectangle:3-23", common=dot)
-EquilateralTriangle(cx=9, cy=23, side=4, heading="triangle:9-23", common=dot)
+Triangle(cx=9, cy=23, side=4, heading="Triangle:9-23", common=dot)
 Stadium(cx=15, cy=23, width=3, height=2, heading="stadium:15-23", common=dot)
 
 Dot(x=9, y=1, dot_width=6, heading="dot:1-9")
@@ -158,7 +158,7 @@ Text(common=header, text="Centred shapes with centre point and x-y title")
 dot = Common(dot=0.2, dot_stroke="green")
 
 Rectangle(cx=3, cy=23, width=5, height=3, title="rectangle:3-23", common=dot)
-EquilateralTriangle(cx=9, cy=23, side=4, title="triangle:9-23", common=dot)
+Triangle(cx=9, cy=23, side=4, title="triangle:9-23", common=dot)
 Stadium(cx=15, cy=23, width=3, height=2, title="stadium:15-23", common=dot)
 
 Hexagon(cx=3, cy=17, side=2, title="hexagon:3-17", orientation="flat", common=dot)
@@ -187,7 +187,7 @@ Polygon(x=15, y=24.5, radius=2, sides=5, rotation=45, stroke_width=2, label="pol
 Rectangle(x=2, y=18.5, width=4, height=3, rotation=45, stroke_width=2, label="rectangle")
 Trapezoid(x=14, y=13, width=4, top=2, height=3, rotation=45, stroke_width=2, label="trapezoid")
 Stadium(x=14.5, y=19, width=3, height=2, rotation=45, stroke_width=2, label="stadium")
-EquilateralTriangle(cx=10, cy=20, side=4, rotation=45, stroke_width=2, label="equ.triangle")
+Triangle(cx=10, cy=20, side=4, rotation=45, stroke_width=2, label="Triangle")
 Hexagon(cx=4, cy=15, side=2, rotation=45, stroke_width=2, label="hexagon")
 Hexagon(cx=10, cy=15, side=2, orientation="pointy", rotation=45, stroke_width=2, label="hexagon")
 Star(x=10, y=9, vertices=5, radius=2, rotation=45, stroke_width=2, label="star")

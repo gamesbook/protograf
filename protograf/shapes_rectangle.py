@@ -66,7 +66,7 @@ class RectangleShape(BaseShape):
 
     def __init__(self, _object=None, canvas=None, **kwargs):
         super(RectangleShape, self).__init__(_object=_object, canvas=canvas, **kwargs)
-        # overrides to centre shape
+        # ---- overrides to centre shape
         if self.cx is not None and self.cy is not None:
             self.x = self.cx - self.width / 2.0
             self.y = self.cy - self.height / 2.0
@@ -78,7 +78,11 @@ class RectangleShape(BaseShape):
         self._u_slices_line_my = (
             self.unit(self.slices_line_mx) if self.slices_line_my else 0
         )
-        self.kwargs = kwargs
+        # ---- check height
+        if self.width and not self.height:
+            self.height = self.width
+        # ---- RESET UNIT PROPS (last!)
+        self.set_unit_properties()  # need to recalculate!
 
     def calculate_area(self) -> float:
         return self._u.width * self._u.height
@@ -913,6 +917,8 @@ class RectangleShape(BaseShape):
                 **lkwargs,
             )
 
+        # ---- style all perbii
+        rotation_point = centre if rotation else None
         self.set_canvas_props(
             index=ID,
             stroke=self.perbii_stroke,
@@ -920,9 +926,13 @@ class RectangleShape(BaseShape):
             stroke_ends=self.perbii_ends,
             dashed=self.perbii_dashed,
             dotted=self.perbii_dotted,
+            rotation=rotation,
+            rotation_point=rotation_point,
         )
 
-    def draw_radii(self, cnv, ID, centre: Point, vertices: list):
+    def draw_radii(
+        self, cnv, ID, centre: Point, vertices: list, rotation: float = None, **kwargs
+    ):
         """Draw line(s) connecting the Rectangle centre to a vertex.
 
         Args:
@@ -936,6 +946,7 @@ class RectangleShape(BaseShape):
         _dirs = tools.validated_directions(
             self.radii, DirectionGroup.ORDINAL, "rectangle radii"
         )
+        # ----- draw radii lines
         if "nw" in _dirs:  # slope UP to the left
             cnv.draw_line(centre, vertices[0])
         if "sw" in _dirs:  # slope DOWN to the left
@@ -944,12 +955,17 @@ class RectangleShape(BaseShape):
             cnv.draw_line(centre, vertices[2])
         if "ne" in _dirs:  # slope UP to the right
             cnv.draw_line(centre, vertices[3])
-        # color, thickness etc.
+        # ---- style all radii
+        rotation_point = centre if rotation else None
         self.set_canvas_props(
             index=ID,
             stroke=self.radii_stroke or self.stroke,
             stroke_width=self.radii_stroke_width or self.stroke_width,
             stroke_ends=self.radii_ends,
+            dashed=self.radii_dashed,
+            dotted=self.radii_dotted,
+            rotation=rotation,
+            rotation_point=rotation_point,
         )
 
     def draw_slices(self, cnv, ID, vertexes, rotation=0):
@@ -1773,11 +1789,13 @@ class RectangleShape(BaseShape):
             if item == "perbii":
                 # ---- * draw perbii
                 if self.perbii:
-                    self.draw_perbii(cnv, ID, Point(x_d, y_d), **kwargs)
+                    self.draw_perbii(cnv, ID, Point(x_d, y_d), rotation=rotation)
             if item == "radii":
                 # ---- * draw radii
                 if self.radii:
-                    self.draw_radii(cnv, ID, Point(x_d, y_d), self.vertexes)
+                    self.draw_radii(
+                        cnv, ID, Point(x_d, y_d), self.vertexes, rotation=rotation
+                    )
             if item == "corners":
                 # ---- * draw corners
                 self.draw_corners(cnv, ID, x, y)
@@ -1790,6 +1808,7 @@ class RectangleShape(BaseShape):
                         self.vertexes,
                         Point(x_d, y_d),
                         DirectionGroup.ORDINAL,  # for radii !
+                        rotation,
                         self.radii_shapes_rotated,
                     )
             if item == "perbii_shapes":
@@ -1801,6 +1820,7 @@ class RectangleShape(BaseShape):
                         self.vertexes,
                         Point(x_d, y_d),
                         DirectionGroup.CARDINAL,  # for perbii !
+                        rotation,
                         self.perbii_shapes_rotated,
                     )
             if item == "centre_shape" or item == "center_shape":
@@ -1847,18 +1867,43 @@ class RectangleShape(BaseShape):
         # ---- grid marks
         if self.grid_marks:  # and not kwargs.get("card_back", False):
             deltag = self.unit(self.grid_marks_length)
-            gx, gy = 0, y  # left-side
-            cnv.draw_line((gx, gy), (deltag, gy))
-            cnv.draw_line((0, gy + self._u.height), (deltag, gy + self._u.height))
-            gx, gy = x, globals.page[1]  # top-side
-            cnv.draw_line((gx, gy), (gx, gy - deltag))
-            cnv.draw_line((gx + self._u.width, gy), (gx + self._u.width, gy - deltag))
-            gx, gy = globals.page[0], y  # right-side
-            cnv.draw_line((gx, gy), (gx - deltag, gy))
-            cnv.draw_line((gx, gy + self._u.height), (gx - deltag, gy + self._u.height))
-            gx, gy = x, 0  # bottom-side
-            cnv.draw_line((gx, gy), (gx, gy + deltag))
-            cnv.draw_line((gx + self._u.width, gy), (gx + self._u.width, gy + deltag))
+            if _lower(self.grid_marks_style) in ["edge", "both", "e", "b"]:
+                gx, gy = 0, y  # left-side
+                cnv.draw_line((gx, gy), (deltag, gy))
+                cnv.draw_line((0, gy + self._u.height), (deltag, gy + self._u.height))
+                gx, gy = x, globals.page[1]  # top-side
+                cnv.draw_line((gx, gy), (gx, gy - deltag))
+                cnv.draw_line(
+                    (gx + self._u.width, gy), (gx + self._u.width, gy - deltag)
+                )
+                gx, gy = globals.page[0], y  # right-side
+                cnv.draw_line((gx, gy), (gx - deltag, gy))
+                cnv.draw_line(
+                    (gx, gy + self._u.height), (gx - deltag, gy + self._u.height)
+                )
+                gx, gy = x, 0  # bottom-side
+                cnv.draw_line((gx, gy), (gx, gy + deltag))
+                cnv.draw_line(
+                    (gx + self._u.width, gy), (gx + self._u.width, gy + deltag)
+                )
+            elif _lower(self.grid_marks_style) in ["cross", "both", "c", "b"]:
+                halfg = deltag / 2.0
+                gx, gy = x, y  # top-left
+                cnv.draw_line((gx - halfg, gy), (gx + halfg, gy))
+                cnv.draw_line((gx, gy - halfg), (gx, gy + halfg))
+                gx, gy = x + self._u.width, y  # top-right
+                cnv.draw_line((gx - halfg, gy), (gx + halfg, gy))
+                cnv.draw_line((gx, gy - halfg), (gx, gy + halfg))
+                gx, gy = x, y + self._u.height  # bottom-left
+                cnv.draw_line((gx - halfg, gy), (gx + halfg, gy))
+                cnv.draw_line((gx, gy - halfg), (gx, gy + halfg))
+                gx, gy = x + self._u.width, y + self._u.height  # bottom-right
+                cnv.draw_line((gx - halfg, gy), (gx + halfg, gy))
+                cnv.draw_line((gx, gy - halfg), (gx, gy + halfg))
+            else:
+                feedback(
+                    f'"{self.grid_marks_style}" is an invalid grid_marks_style!', True
+                )
             # done
             gargs = {}
             gargs["stroke"] = self.grid_marks_stroke

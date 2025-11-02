@@ -115,14 +115,20 @@ Hex
 ===
 `↑ <table-of-contents-exabs_>`_
 
-"Hex" is the title of a game invented by Piet Hein.
+"Hex" is the title of a game invented by Piet Hein; see:
+https://en.wikipedia.org/wiki/Hex_(board_game)
 
 =========== ==================================================================
 Title       *Hex Board*
 ----------- ------------------------------------------------------------------
 Script      `hex_game.py <https://github.com/gamesbook/protograf/blob/master/examples/boards/abstract/hex_game.py>`_
 ----------- ------------------------------------------------------------------
-Discussion  This example shows how to construct a Hex game board.
+Discussion  This example shows how to construct a *Hex* game board.
+
+            The primary board is drawn using the ``Hexagons`` command, which
+            specifies rows, columns and the hex layout pattern |dash| in this
+            case a *diamond*.   The background edges are drawn as *slices*
+            within a ``Rhombus`` shape.
 
 ----------- ------------------------------------------------------------------
 Screenshot  .. image:: images/boards/abstract/hex_game.png

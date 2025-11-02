@@ -21,7 +21,7 @@ This is part of the set of commands use for :doc:`Layouts <layouts>`.
 - `Usage`_
 
   - `RectangularLocations`_
-  - `Layout`_
+  - `Layout Command`_
 - `Key Properties`_
 
 
@@ -34,8 +34,8 @@ of row and column locations that create a rectangular grid.  The x- and
 y-values of these rows and columns are then used to set the centres of
 the elements that can be placed there using the ``Layout()`` command.
 
-The rows and columns themselves are not drawn - if needed you can use the
-*debug* property to display them (see `Example 10. Debug`_  below).
+The rows and columns themselves are not drawn |dash| if needed you can use
+the *debug* property to display them (see `Example 10. Debug`_  below).
 
 Apart from the ``RectangularLocations()`` command described here,
 there are also these other commands which allow you to layout
@@ -85,8 +85,8 @@ column in the lower-right corner.
 
 .. _layoutIndex:
 
-Layout
-------
+Layout Command
+--------------
 
 The ``Layout()`` command - designed to be used in conjuction with a
 location-based grid - specifies the shapes that are to be drawn at locations.
