@@ -108,8 +108,6 @@ run as normal |dash| then a new version can be released.
 
 Follow this process:
 
-- |check| If working in a branch, merge changes into master
-- |check| Ensure you are on the ``master`` branch
 - |check| Format primary code with black (``black protograf``)
 - |check| Finalise release date and notes in ``CHANGES.txt``
 - |check| Ensure all the examples can be run by using shell script(s)
@@ -118,6 +116,8 @@ Follow this process:
   and also delete the ``temp`` directory)
 - |check| Update the ``release`` in ``docs/source/conf.py``
 - |check| Update the ``__version_info__`` in ``_version.py``
+- |check| If working in a branch, now merge changes into master
+- |check| Ensure you are on the ``master`` branch and pull changes
 - |check| Update the version using poetry e.g. ``poetry version patch``
 - |check| Git commit and push all these changes to GitHub
 - |check| Add a tag that matches the poetry version e.g. ``git tag 0.1.2``
