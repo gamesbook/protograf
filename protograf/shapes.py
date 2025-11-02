@@ -57,10 +57,18 @@ class ImageShape(BaseShape):
 
     def __init__(self, _object=None, canvas=None, **kwargs):
         super(ImageShape, self).__init__(_object=_object, canvas=canvas, **kwargs)
-        # overrides / extra args
+        # ---- overrides / extra args
         self.sliced = kwargs.get("sliced", None)
         self.cache_directory = get_cache(**kwargs)
         self.image_location = None
+        # ---- validation
+        if (self.kwargs.get("cx") or self.kwargs.get("cy")) and (
+            self.kwargs.get("align_horizontal") or self.kwargs.get("align_vertical")
+        ):
+            feedback(
+                "Image cannot have both align and cx or cy properties set at the same time.",
+                True,
+            )
 
     def draw(self, cnv=None, off_x=0, off_y=0, ID=None, **kwargs):
         """Show an image on a given canvas."""
@@ -98,23 +106,23 @@ class ImageShape(BaseShape):
             x = self._u.x + self._o.delta_x
             y = self._u.y + self._o.delta_y
             match _lower(self.align_horizontal):
-                case 'l' | 'left':
+                case "l" | "left":
                     x_c = x + width / 2.0
-                case 'c' | 'centre' | 'center':
+                case "c" | "centre" | "center":
                     x = x - width / 2.0
                     x_c = x + width / 2.0
-                case 'r' | 'right':
+                case "r" | "right":
                     x = x - width
                     x_c = x + width / 2.0
                 case _:
                     x_c = x + width / 2.0
             match _lower(self.align_vertical):
-                case 't' | 'top':
+                case "t" | "top":
                     y_c = y + height / 2.0
-                case 'm' | 'mid' | 'middle':
+                case "m" | "mid" | "middle":
                     y = y - height / 2.0
                     y_c = y + height / 2.0
-                case 'b' | 'bottom':
+                case "b" | "bottom":
                     y = y - height
                     y_c = y + height / 2.0
                 case _:
@@ -149,8 +157,12 @@ class ImageShape(BaseShape):
         if self.use_abs_c:
             x_c = self._abs_cx
             y_c = self._abs_cy
+        x_u, y_u = self._p2v(x_c), self._p2v(y_c)
+        # print(f"*** IMAGE {ID=} {self.title=} {x_u=} {y_u=} {rotation=}")
+        if rotation:
+            kwargs["rotation_point"] = Point(x_c, y_c)
         # ---- cross
-        self.draw_cross(cnv, x_c, y_c, rotation=kwargs.get("rotation"))
+        self.draw_cross(cnv, x_c, y_c, **kwargs)
         # ---- dot
         self.draw_dot(cnv, x_c, y_c)
         # ---- text
@@ -923,14 +935,18 @@ class PolygonShape(BaseShape):
         """Angles of lines connecting the Polygon centre to each of the vertices.
 
         NOTE:
-            Used by other Shapes e.g, Track
+            Used by other Shapes e.g. Track
         """
-        centre = self.get_centre()
-        vertices = self.get_vertexes(centre, rotation)
-        # for p in vertices: print(f'*P-A-V* {p.x / 28.3465}, {p.y / 28.3465}')
+        pre_geom = self.get_geometry()
+        x, y, vertices = (
+            pre_geom.x,
+            pre_geom.y,
+            pre_geom.vertices,
+        )
+        # for p in vertices: print(f'*Poly G-V* x={self._p2v(p.x)} y={self._p2v(p.y)}')
         angles = []
         for vertex in vertices:
-            _, angle = geoms.angles_from_points(centre, vertex)
+            _, angle = geoms.angles_from_points(Point(x, y), vertex)
             angles.append(angle)
         return angles
 

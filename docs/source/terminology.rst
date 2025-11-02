@@ -11,8 +11,9 @@ which they are used.
 However, in order to help with clarity, below is a reasonably comprehensive
 list of terms used in different places, grouped by what aspects they affect.
 
-Note that some shapes, such as the :ref:`Hexagon <hexIndex>`, or
-:ref:`Circle <circleIndex>`, have extensive customisation properties
+Note that some shapes, such as the :ref:`Hexagon <hexIndex>`,
+:ref:`Circle <circleIndex>`, :ref:`Line <lineIndex>`, or
+:ref:`Rectangle <rectangleIndex>`,  have extensive customisation properties
 available; its better to refer to their specific descriptions to understand
 exactly how these can used.
 
@@ -131,27 +132,33 @@ from the left- and top-edge of a page or a card.
 and **y** positions; it could be a row and/or column identifier; it
 could be a sequence identifier; or just a indicator of where something
 is relative to something else, for example, a coordinate being drawn
-at the *top* of a Hexagon.
+at the *top* of a ``Hexagon``.
 
--  **align** - used to move text horizontally, relative to its starting
+-  **align** - used to move ``Text`` horizontally, relative to its starting
    location; can be one of: *justify*, *left*, *right*, or *centre*
--  **cx** - the centre position of a shape, going in the horizontal
+-  **align_horizontal** - used to move an ``Image`` horizontally, relative to
+   its starting location; can be one of:  *left*, *centre*, or *right*
+-  **align_vertical** - used to move an ``Image`` vertically, relative to
+   its starting location; can be one of:  *top*, *middle*, or *bottom*
+-  **cx** - the centre position of a shape, measured in the horizontal
    direction; its usually the case that the distance is not absolute, but
    relative to some other value e.g. distance from a margin; or the edge
-   of a ``Card``
--  **cy** - the centre position of a shape, going in the vertical
+   of a :ref:`Card <the-card-command>`
+-  **cy** - the centre position of a shape, measured in the vertical
    direction; its usually the case that the distance is not absolute, but
    relative to some other value e.g. distance from a margin; or the edge
-   of a ``Card``
+   of a :ref:`Card <the-card-command>`
 -  **elevation** - a relative vertical location within a shape; can be one
    of: *top*, *middle*, or *bottom*
 -  **x** - the position of a point in the horizontal direction; its
    usually the case that the distance is not absolute, but relative to
    some other value e.g. distance from a margin; or the edge of a
-   ``Card``; or the away from the centre of a Hexagon in a grid
+   :ref:`Card <the-card-command>`; or the away from the centre of a ``Hexagon``
+   in a grid
 -  **y** - the position of a point in the vertical direction; its usually
    the case that the distance is not absolute, but relative to some
-   other value e.g. distance from a margin; or the top edge of a ``Card``
+   other value e.g. distance from a margin; or the top edge of a
+   :ref:`Card <the-card-command>`
 
 
 .. _termsSize:
@@ -202,13 +209,18 @@ to set.
    **NOTE:** to switch to landscape orientation, append an ``l`` to the name;
    so ``"A5-1"`` set the page to use A5 landscape paper
 -  **radius** - the radius of a ``Circle``
--  **scaling** - the amount by which an SVG image should be shrunk or
-   expanded e.g. 0.5 makes it half-size and 2.0 doubles its size; but
-   because SVG is a vector-format, there will be no loss of resolution
-   through scaling
+-  **scaling** - the amount by which a ``Polyline``, drawn with a *snail*,
+   should be expanded or shrunk; e.g. 0.5 makes it half-size and 2.0 doubles
+   its size; **note** that images do not have scaling as such |dash| simply
+   set the *height* and *width* of the ``Image`` and the image will be
+   auto-sized to fit (SVG images use a vector-format, so there will be no loss
+   of resolution through rescaling)
 -  **side** - the length of a side of some shapes (e.g. ``Square``,
    ``Polygon``, ``Grid``) as well as the distance between each adjacent
    point in a ``TriangularLayout``
+-  **snail** - a means to draw a ``Polyline`` or ``Polyshape`` by setting
+   a series of values to represent relative increments of distance, or
+   changes in angle, of the line used to do the drawing
 -  **stroke_width** - the thickness of a line in **points**; many
    specific widths are set by prefixing this term with the name of the
    item in question; examples: **cross_stroke_width**;
@@ -318,20 +330,21 @@ Styling-orientated Terms
 -  **dashed** - allows a line to be broken into a series of short lines,
    separated by spaces defined in a list; the first number is the length of
    the dash; the second is the length of the space between two dashes |dash|
-   note that sizes will be rounded to the nearest whole point value; so ``2cm``
-   which is equivalent to ``56.693`` points will be changed to ``57`` points
+   note that sizes will be rounded to the nearest whole point value;
+   so ``2cm``, which is equivalent to ``56.693`` points, will be changed to
+   ``57`` points
 -  **_ends** - this is part of a line property e.g. *stroke_ends* that changes
    the style of the line ends; it can be ``rounded`` which causes the ends of
    a line to be extended with a semi-circle; or ``squared`` which causes the
-   ends of a line to be extened with an extra half-square. (In graphics terms,
+   ends of a line to be extended with an extra half-square. (In graphics terms,
    this can also be termed an *end cap*.)
 -  **transform** - will change text in a ``Text`` command to *uppercase*,
    *lowercase*, or *capitalise* it
 -  **transparency** - a percentage value from 1 to 100 that determines how
-   "see through" a shape, or line, or area is; where ``1`` means it is nearly
-   not transparent and `100` means it is completely transparent. It is also
+   "see through" a shape, or line, or area is; where ``1`` means it is not at
+   all transparent and `100` means it is completely transparent.  It is also
    possible to use a fractional number e.g. ``0.5`` equates to 50%. Some
-   programs use the term *opacity*; but note that that is the inverse of
+   programs use the term *opacity*; but note that this is the **inverse** of
    transparency.
 
 

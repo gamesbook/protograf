@@ -7,8 +7,10 @@ protograf Changes
 - Add cross grid marks for rectangular cards
 - Convert EquilateralTriangle to Triangle
 - Remove RightAngleTriangle
-- Add support for other types of Triangles
-- Extended Triangle properties
+- Add construction for other types of Triangles
+- All extended Triangle properties
+- Add horizontal_ and vertical_align to Image
+- Patch Image labelling when rotated
 
 2025-10-09 (0.3.2)
 -------------------

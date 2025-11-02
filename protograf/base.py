@@ -1137,9 +1137,9 @@ class BaseShape:
         self.pivot = kwargs.get("pivot", base.pivot)
         self.side2 = kwargs.get("side2", base.side2)
         self.side3 = kwargs.get("side3", base.side3)
-        # ---- triangle / trapezoid / polyomino
+        # ---- trapezoid / polyomino
         self.flip = kwargs.get("flip", base.flip)
-        # ---- triangle / polyomino
+        # ---- polyomino
         self.hand = kwargs.get("hand", base.hand)
         # ---- shapes with vertices (hex, circle, rect, rhombus, poly, ellipse, star)
         self.vertex_shapes = kwargs.get("vertex_shapes", [])
@@ -1317,7 +1317,7 @@ class BaseShape:
         # ---- CHECK ALL
         correct, issue = self.check_settings()
         if not correct:
-            feedback("Problem with settings: %s." % "; ".join(issue))
+            feedback("Problem with settings: %s" % "; ".join(issue), alert=True)
         # ---- UPDATE SELF WITH COMMON
         if self.common:
             try:
@@ -1517,6 +1517,7 @@ class BaseShape:
             ]:
                 issue.append(f'"{self.align}" is an invalid align!')
                 correct = False
+        # ---- image align
         if self.align_horizontal:
             if _lower(self.align_horizontal) not in [
                 "left",
@@ -1527,12 +1528,15 @@ class BaseShape:
                 "r",
                 "c",
             ]:
-                issue.append(f'"{self.align_horizontal}" is an invalid align_horizontal!')
+                issue.append(
+                    f'"{self.align_horizontal}" is an invalid align_horizontal!'
+                )
                 correct = False
         if self.align_vertical:
             if _lower(self.align_vertical) not in [
                 "top",
                 "middle",
+                "mid",
                 "bottom",
                 "t",
                 "m",
@@ -2253,25 +2257,34 @@ class BaseShape:
         except TypeError:
             return _text
 
-    def points_to_value(self, value: float, units_name=None) -> float:
+    def points_to_value(
+        self, value: float, units_name: str = None, decimals: int = None
+    ) -> float:
         """Convert a point value to a units-based value."""
         try:
             match units_name:
                 case "cm" | "centimetres":
-                    return float(value) / unit.cm
+                    val = float(value) / unit.cm
                 case "mm" | "millimetres":
-                    return float(value) / unit.mm
+                    val = float(value) / unit.mm
                 case "inch" | "in" | "inches":
-                    return float(value) / unit.inch
+                    val = float(value) / unit.inch
                 case "points" | "pts":
-                    return float(value) / unit.pt
+                    val = float(value) / unit.pt
                 case _:
-                    return float(value) / self.units
+                    val = float(value) / self.units
+            if decimals:
+                return round(val, decimals)
+            return val
         except Exception as err:
             log.exception(err)
             feedback(
                 f'Unable to do unit conversion from "{value}" using {self.units}!', True
             )
+
+    def _p2v(self, value: float):
+        """Internal wrapper around points_to_value()"""
+        return self.points_to_value(value, decimals=1)
 
     def values_to_points(self, items: list, units_name=None) -> list:
         """Convert a list of values to point units."""

@@ -2980,9 +2980,10 @@ The following examples show how an image can be added to, or altered:
 
 - `Example 1. Default Image`_
 - `Example 2. Rotation & Scaling`_
-- `Example 3. Captions and Markings`_
-- `Example 4. Sliced Images`_ (extract image "thirds")
-- `Example 5: Operations`_ ("cutout" shapes, rounding, and blurred edges)
+- `Example 3. Alignment`_
+- `Example 4. Captions and Markings`_
+- `Example 5. Sliced Images`_ (extract image "thirds")
+- `Example 6: Operations`_ ("cutout" shapes, rounding, and blurred edges)
 
 .. _image-default:
 
@@ -3101,9 +3102,85 @@ Example 2. Rotation & Scaling
 
 ===== ======
 
+.. _image-align:
+
+Example 3. Alignment
+++++++++++++++++++++
+`^ <image-command_>`_
+
+Image alignment is somewhat similar to alignment of Text.
+
+Instead of the shape's ``x`` and ``y`` values defining the top-left position,
+the use of either, or both, *align_horizontal* or *align_vertical* can cause
+the shape to be located in a different relative position.
+
+The *align_horizontal* property can take on values of ``"left"``, ``"centre"``
+or ``"right"``; the *align_vertical* property can take on values of ``"top"``,
+``"middle"`` or ``"bottom"``. These are illustrated in the exampe below.
+
+.. |ia1| image:: images/customised/image_align.png
+   :width: 330
+
+===== ======
+|ia1| This example shows the Image constructed using the command with the
+      following properties:
+
+      .. code:: python
+
+        rdot = Common(fill_stroke="red", radius=0.05)
+        image_file = "fantasy-forest-with-old-bridges.png"
+        Image(image_file,
+              width=1, height=1,
+              x=0.5, y=0.5,
+              title="no align")
+        Circle(common=rdot, cx=0.5, cy=0.5)
+        Image(image_file,
+              width=1, height=1,
+              cx=3, cy=1,
+              title="centre x,y")
+        Image(image_file,
+              width=1, height=1,
+              x=2, y=4,
+              align_horizontal="right",
+              align_vertical="bottom",
+              title="bottom-right")
+        Circle(common=rdot, cx=2, cy=4)
+        Image(image_file,
+              width=1, height=1,
+              x=2, y=2,
+              align_horizontal="left",
+              align_vertical="top",
+              title="top-left")
+        Circle(common=rdot, cx=2, cy=2)
+        Image(image_file,
+              width=1, height=1,
+              x=0, y=5,
+              align_horizontal="left",
+              align_vertical="mid",
+              title="mid-left")
+        Circle(common=rdot, cx=0, cy=5)
+        Image(image_file,
+              width=1, height=1,
+              x=3, y=5,
+              align_horizontal="centre",
+              align_vertical="mid",
+              title="mid-centre")
+        Circle(common=rdot, cx=3, cy=5)
+
+      The top-left image is set using defaults i.e. no alignment.
+
+      The top right-hand image position is set using a centre point; for such
+      a setting, no alignment can be used.
+
+      The other images have a small red dot superimposed on them, set to the
+      same value as the *x* and *y* used to position the shape; this helps
+      show how the image is drawn relative to that position.
+
+===== ======
+
 .. _image-caption:
 
-Example 3. Captions and Markings
+Example 4. Captions and Markings
 ++++++++++++++++++++++++++++++++
 `^ <image-command_>`_
 
@@ -3148,7 +3225,7 @@ Example 3. Captions and Markings
 
 .. _image-sliced:
 
-Example 4. Sliced Images
+Example 5. Sliced Images
 ++++++++++++++++++++++++
 `^ <image-command_>`_
 
@@ -3192,7 +3269,7 @@ Example 4. Sliced Images
 
 .. _image-operations:
 
-Example 5: Operations
+Example 6: Operations
 +++++++++++++++++++++
 `^ <image-command_>`_
 

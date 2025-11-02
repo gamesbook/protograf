@@ -15,7 +15,7 @@ Overview
 ========
 
 **protograf** allows you to directly define where elements, that make up
-your design, should be placed within a page, or over a series of pages
+your design, should be placed within a page, or over a series of Cards
 within a :doc:`Deck <card_decks>`, but it also includes commands that let
 you place, or "layout", elements in a more repetitive or regular way
 within a page.
@@ -26,23 +26,29 @@ Sequences
 The most basic repetition is that of a simple **sequence**, with elements
 placed at regular x- and y-positions in a linear direction.
 
+See the :doc:`Sequence <layouts_sequence>` section for details.
+
 Repeats
 -------
 
 The other fairly basic repetition is that of a **repeat**, with elements
 placed at grid locations within a page.
 
+See the :doc:`Repeat <layouts_repeat>` section for details.
+
 Tracks
 ------
 
 Elements can also be placed repetitively along a **track**.
 
-A track can be defined as the border of a rectangle or polygon shape;
-or at specific angles along the circumference of a circle.
+A track can be defined as the border of a ``Rectangle`` or ``Polygon``
+shape; or at specific angles along the circumference of a ``Circle``.
 
 The properties needed to construct this kind of repetition differ
 slightly from that of a simple linear one but the principle is the
 same. The track can be visible, or not.
+
+See the :doc:`Track <layouts_track>` section for details.
 
 Locations and Layouts
 ---------------------
@@ -50,10 +56,10 @@ Locations and Layouts
 The other way that elements can be laid out repetitively on a page
 is through grid **locations**.
 
-In **protograf**, such a grid can be derived from various built-in shapes -
-for example, ``Hexagons`` - or it can be constructed using a supplied set
-of properties. Because these grids do not themselves appear on the page,
-they are termed *"virtual grids"*.
+In **protograf**, such a grid can be derived from various built-in shapes
+|dash| for example, ``Hexagons`` |dash| or it can be constructed using a
+supplied set of properties. Because these grids do not themselves appear
+on the page, they are termed *"virtual grids"*.
 
 A virtual grid is **not** specifically drawn on the page; rather it creates
 a set of point locations at which other elements can be drawn. This set of
@@ -101,8 +107,8 @@ Grid-based layouts, where elements appear in two-dimensional space:
    differing x- and y-points in a triangular pattern; these x- and y-values
    will set the centre of any element being placed on the grid
 
-These location-types are paired with a **Layout()** command, which
-links them with the shapes that need to be drawn at their locations.
+These location-types are paired with a :ref:`Layout() <layoutIndex>` command,
+which links them with the shapes that need to be drawn at their locations.
 
 .. HINT::
 

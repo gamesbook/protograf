@@ -127,7 +127,7 @@ PageBreak()
 
 # ---- circle track + rotation shape
 Blueprint()
-Text(common=txt, text="Track: circle; rotate 'o'")
+Text(common=txt, text="Track: circle; rotate 'i'")
 shp = rectangle(cx=1, cy=1, width=0.5, height=0.5,
                 label='{{sequence}}', peaks=[("n", 0.25)])
 Track(
@@ -221,7 +221,7 @@ PageBreak()
 
 # ---- scoring track
 Blueprint()
-Text(common=txt, text="Track: polygon; 'scoring'")
+Text(common=txt, text="Track: polygon [30]; 'scoring'")
 trk = polygon(cx=2, cy=3, sides=30, radius=1.75)
 score = Common(
     cx=1, cy=1, radius=0.18, stroke="navy",
@@ -233,7 +233,7 @@ Track(
     shapes=[shp],
     rotation_style='o',
     clockwise=True,
-    start=24
+    start=1
 )
 shp5 = circle(common=score, fill="cyan")
 Track(
@@ -241,7 +241,7 @@ Track(
     shapes=[shp5],
     rotation_style='o',
     clockwise=True,
-    start=24,
+    start=1,
     sequences=[5,10,15,20,25,30,35]
 )
 PageBreak()

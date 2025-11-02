@@ -206,7 +206,7 @@ PageBreak()
 
 # ---- date formats
 Blueprint()
-Text(common=txt, text="Dates: format and styles")
+Text(common=txt, text="Today: format and styles")
 dtext = Common(x=0.25, align="left", font_size=8)
 Text(common=dtext, y=1, text="1.  "+Today())
 Text(common=dtext, y=2, text="2.  "+Today(details="date", style="usa"))
@@ -217,7 +217,7 @@ PageBreak()
 
 # ---- rotation - image
 Blueprint()
-Text(common=txt, text="Images: scaling + rotation")
+Text(common=txt, text="Image: scaling + rotation")
 Image("sholes_typewriter.png",
       width=2, height=2,
       x=0, y=0, title="PNG")
@@ -916,35 +916,36 @@ PageBreak()
 # ---- image - operations
 Blueprint()
 Text(common=txt, text="Image: operations")
-Image("fantasy-forest-with-old-bridges.png",
+image_file = "fantasy-forest-with-old-bridges.png"
+Image(image_file,
       width=2, height=2,
       x=0, y=0)
-Image("fantasy-forest-with-old-bridges.png",
+Image(image_file,
       width=1.5, height=1.5,
       x=2, y=0,
       operation=['c', 100, 75, -75]
 )
-Image("fantasy-forest-with-old-bridges.png",
+Image(image_file,
       width=1.5, height=1.5,
       x=2.5, y=0.5,
       operation=['c', 100, -75, 75]
 )
-Image("fantasy-forest-with-old-bridges.png",
+Image(image_file,
       width=2, height=2,
       x=0, y=2,
       operation=['r', 50]
 )
-Image("fantasy-forest-with-old-bridges.png",
+Image(image_file,
       width=2, height=2,
       x=2, y=2,
       operation=['e', (160, 240)]
 )
-Image("fantasy-forest-with-old-bridges.png",
+Image(image_file,
       width=2, height=2,
       x=0, y=4,
       operation=['p', 140, 5]
 )
-Image("fantasy-forest-with-old-bridges.png",
+Image(image_file,
       width=2, height=2,
       x=2, y=4,
       operation=['b', 20]
@@ -954,44 +955,45 @@ PageBreak()
 # ---- image - align
 Blueprint()
 Text(common=txt, text="Image: align")
-
-Image("fantasy-forest-with-old-bridges.png",
+rdot = Common(fill_stroke="red", radius=0.05)
+image_file = "fantasy-forest-with-old-bridges.png"
+Image(image_file,
       width=1, height=1,
       x=0.5, y=0.5,
       title="no align")
-Image("fantasy-forest-with-old-bridges.png",
+Circle(common=rdot, cx=0.5, cy=0.5)
+Image(image_file,
       width=1, height=1,
       cx=3, cy=1,
       title="centre x,y")
-Image("fantasy-forest-with-old-bridges.png",
+Image(image_file,
       width=1, height=1,
       x=2, y=4,
       align_horizontal="right",
       align_vertical="bottom",
       title="bottom-right")
-Circle(fill_stroke="red", radius=0.05, cx=2, cy=4)
-Image("fantasy-forest-with-old-bridges.png",
+Circle(common=rdot, cx=2, cy=4)
+Image(image_file,
       width=1, height=1,
       x=2, y=2,
       align_horizontal="left",
       align_vertical="top",
       title="top-left")
-Circle(fill_stroke="red", radius=0.05, cx=2, cy=2)
-Image("fantasy-forest-with-old-bridges.png",
+Circle(common=rdot, cx=2, cy=2)
+Image(image_file,
       width=1, height=1,
       x=0, y=5,
       align_horizontal="left",
       align_vertical="mid",
       title="mid-left")
-Circle(fill_stroke="red", radius=0.05, cx=0, cy=5)
-Image("fantasy-forest-with-old-bridges.png",
+Circle(common=rdot, cx=0, cy=5)
+Image(image_file,
       width=1, height=1,
       x=3, y=5,
       align_horizontal="centre",
       align_vertical="mid",
       title="mid-centre")
-Circle(fill_stroke="red", radius=0.05, cx=3, cy=5)
-
+Circle(common=rdot, cx=3, cy=5)
 PageBreak()
 
 # ---- shape rotation I

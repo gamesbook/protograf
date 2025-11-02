@@ -2865,14 +2865,26 @@ def Image(source=None, **kwargs):
 
     Kwargs:
     <base>
+
     -  *sliced* (str) - a letter used to indicate which portion of the
        image to extract:
+
        - *l* - the left fraction, matching the image's width:height ratio
        - *c* - the centre fraction, matching the image's width:height ratio
        - *r* - the right fraction, matching the image's width:height ratio
        - *t* - the top fraction, matching the image's height:width ratio
        - *m* - the middle fraction, matching the image's height:width ratio
        - *b* - the botttom fraction, matching the image's height:width ratio
+    - *align_horizontal* (str) - position of the image relative to its (x,y):
+
+      - *left* - left edge of image aligned to the x-position (default)
+      - *centre* - centre of image aligned to the x-position
+      - *right* - right edge of image aligned to the x-position
+    - *align_vertical* (str) - position of the image relative to its (x,y):
+
+      - *top* - top edge of image aligned to the y-position (default)
+      - *middle* - middle/centre of image aligned to the y-position
+      - *bottom* - bottom edge of image aligned to the y-position
 
     """
     kwargs = margins(**kwargs)
@@ -4810,19 +4822,25 @@ def Track(track=None, **kwargs):
         # TODO - can choose line centre, not vertex, as the cx,cy position
         shape.cx = shape.points_to_value(track_point.x - track._o.delta_x)
         shape.cy = shape.points_to_value(track_point.y - track._o.delta_y)
-        # feedback(f'*Track* {shape.cx=}, {shape.cy=}')
+        # feedback(f'\n*Track* {track_name=} {shape.cx=}, {shape.cy=}')
         if _rotation_style:
             match _rotation_style:
                 case "i" | "inwards":
                     if track_name == "CircleShape":
                         shape_rotation = 90 + track_point.angle
+                    elif track_name == "PolygonShape":
+                        shape_rotation = 90 - track_point.angle
                     else:
                         shape_rotation = 90 - track_point.angle
                 case "o" | "outwards":
                     if track_name == "CircleShape":
                         shape_rotation = 270 + track_point.angle
-                    else:
+                    elif track_name in ["SquareShape", "RectangleShape"]:
                         shape_rotation = 270 - track_point.angle
+                    elif track_name == "PolygonShape":
+                        shape_rotation = 270 - track_point.angle
+                    else:
+                        shape_rotation = 90 - track_point.angle
                 case _:
                     raise NotImplementedError(
                         f"The rotation_style '{_rotation_style}' is not valid"
