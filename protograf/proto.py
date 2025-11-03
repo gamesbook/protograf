@@ -42,6 +42,7 @@ from .shapes import (
     ImageShape,
     LineShape,
     QRCodeShape,
+    PodShape,
     PolygonShape,
     PolylineShape,
     RhombusShape,
@@ -3308,6 +3309,33 @@ def line(row=None, col=None, **kwargs):
 
 
 @docstring_center
+def Pod(row=None, col=None, **kwargs):
+    """Draw a Pod shape on the canvas.
+
+    Args:
+
+    - row (int): row in which the shape is drawn.
+    - col (int): column in which shape is drawn.
+
+    Kwargs:
+
+    <center>
+
+    """
+    kwargs = margins(**kwargs)
+    kwargs["row"] = row
+    kwargs["col"] = col
+    pod = PodShape(canvas=globals.canvas, **kwargs)
+    pod.draw()
+    return pod
+
+
+def pod(**kwargs):
+    kwargs = margins(**kwargs)
+    return PodShape(canvas=globals.canvas, **kwargs)
+
+
+@docstring_center
 def Polygon(row=None, col=None, **kwargs):
     """Draw a Polygon shape on the canvas.
 
@@ -5222,6 +5250,7 @@ hexagon.__doc__ = Hexagon.__doc__
 image.__doc__ = Image.__doc__
 line.__doc__ = Line.__doc__
 pentomino.__doc__ = Pentomino.__doc__
+pod.__doc__ = Pod.__doc__
 polygon.__doc__ = Polygon.__doc__
 polyline.__doc__ = Polyline.__doc__
 polyomino.__doc__ = Polyomino.__doc__

@@ -338,7 +338,7 @@ class BaseCanvas:
         self.align_horizontal = self.defaults.get("align_horizontal", None)
         self.image_location = None
         self.operation = None  # operation on image
-        # ---- line / ellipse / bezier / sector
+        # ---- line / ellipse / bezier / sector / polygon / pod
         self.length = self.defaults.get("length", self.default_length)
         self.angle = self.defaults.get("angle", 0.0)  # also triangle
         self.angle_width = self.defaults.get("angle_width", 90.0)
@@ -377,6 +377,11 @@ class BaseCanvas:
         self.y_2 = self.defaults.get("y2", 1.0)
         self.x_3 = self.defaults.get("x3", 1.0)
         self.y_3 = self.defaults.get("y3", 1.0)
+        # ---- pod
+        self.dx_1 = self.defaults.get("dx1", None)
+        self.dy_1 = self.defaults.get("dy1", None)
+        self.dx_2 = self.defaults.get("dx2", None)
+        self.dy_2 = self.defaults.get("dy2", None)
         # ---- rectangle / card
         self.rounding = self.defaults.get("rounding", 0.0)
         self.rounded = self.defaults.get("rounded", False)  # also line end
@@ -917,7 +922,7 @@ class BaseShape:
         self.align_vertical = kwargs.get("align_vertical", base.align_vertical)
         self.align_horizontal = kwargs.get("align_horizontal", base.align_horizontal)
         self.operation = kwargs.get("operation", base.operation)  # operation on image
-        # ---- line / ellipse / bezier / arc / polygon
+        # ---- line / ellipse / bezier / arc / polygon / pod
         self.length = self.kw_float(kwargs.get("length", base.length))
         self.angle = self.kw_float(
             kwargs.get("angle", base.angle)
@@ -968,6 +973,11 @@ class BaseShape:
         self.y_2 = self.kw_float(kwargs.get("y2", base.y_2))
         self.x_3 = self.kw_float(kwargs.get("x3", base.x_3))
         self.y_3 = self.kw_float(kwargs.get("y3", base.y_3))
+        # ---- pod
+        self.dx_1 = kwargs.get("dx1", base.dx_1)
+        self.dy_1 = kwargs.get("dy1", base.dy_1)
+        self.dx_2 = kwargs.get("dx2", base.dx_2)
+        self.dy_2 = kwargs.get("dy2", base.dy_2)
         # ---- rectangle / card
         self.rounding = self.kw_float(kwargs.get("rounding", base.rounding))
         self.rounded = kwargs.get("rounded", base.rounded)  # also line end

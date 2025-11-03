@@ -856,6 +856,106 @@ class LineShape(BaseShape):
         )
 
 
+class PodShape(BaseShape):
+    """
+    Symmetrical curved shape on a given canvas.
+    """
+
+    def __init__(self, _object=None, canvas=None, **kwargs):
+        super(PodShape, self).__init__(_object=_object, canvas=canvas, **kwargs)
+        if not self.length:
+            self.length = 1.0
+        if not self.dx_1:
+            self.dx_1 = self.length / 2.0
+        if not self.dy_1:
+            self.dy_1 = 0.5
+        # ---- RESET UNIT PROPS (last!)
+        self.set_unit_properties()
+
+    def calculate_xy(self, **kwargs):
+        # ---- adjust start
+        if self.row is not None and self.col is not None:
+            x = self.col * self._u.width + self._o.delta_x
+            y = self.row * self._u.height + self._o.delta_y
+        elif self.cx is not None and self.cy is not None:
+            x = self._u.cx - self._u.width / 2.0 + self._o.delta_x
+            y = self._u.cy - self._u.height / 2.0 + self._o.delta_y
+        else:
+            x = self._u.x + self._o.delta_x
+            y = self._u.y + self._o.delta_y
+        # ---- overrides to centre the shape
+        if kwargs.get("cx") and kwargs.get("cy"):
+            x = kwargs.get("cx")
+            y = kwargs.get("cy") - self._u.height / 2.0
+        return x, y
+
+    def draw(self, cnv=None, off_x=0, off_y=0, ID=None, **kwargs):
+        """Draw pod on a given canvas."""
+        kwargs = self.kwargs | kwargs
+        cnv = cnv if cnv else globals.canvas  # a new Page/Shape may now exist
+        super().draw(cnv, off_x, off_y, ID, **kwargs)  # unit-based props
+        # ---- calculate properties
+        x, y = self.calculate_xy()
+        # ---- overrides for grid layout
+        if self.use_abs_c:
+            x = self._abs_cx - self._u.width / 2.0
+            y = self._abs_cy - self._u.height / 2.0
+        x_d = x + self._u.length / 2.0  # centre
+        y_d = y  # centre
+        # ---- handle rotation
+        rotation = kwargs.get("rotation", self.rotation)
+        if rotation:
+            self.centroid = muPoint(x_d, y_d)
+            kwargs["rotation"] = rotation
+            kwargs["rotation_point"] = self.centroid
+        # ---- set canvas
+        self.set_canvas_props(index=ID)
+        # ---- draw pod
+        start_point = Point(x, y)
+        end_point = Point(x + self._u.length, y)
+        dx_1 = self.unit(self.dx_1)
+        dy_1 = self.unit(self.dy_1)
+        if not self.dx_2 or not self.dy_2:
+            dx_2, dy_2 = 0.0, 0.0
+            # ---- * single curve
+            curve_point1 = Point(x + dx_1, y + dy_1)
+            curve_point2 = Point(x + dx_1, y - dy_1)
+            cnv.draw_curve(start_point, curve_point1, end_point)
+            cnv.draw_curve(start_point, curve_point2, end_point)
+            kwargs["closed"] = True
+        else:
+            dx_2 = self.unit(self.dx_2)
+            dy_2 = self.unit(self.dy_2)
+            # ---- * bezier curve
+            curve_point1A = Point(x + dx_1, y + dy_1)
+            curve_point1B = Point(x + dx_2, y + dy_2)
+            curve_point2A = Point(x + dx_1, y - dy_1)
+            curve_point2B = Point(x + dx_2, y - dy_2)
+            cnv.draw_curve(start_point, curve_point1A, curve_point1B, end_point)
+            cnv.draw_curve(start_point, curve_point2A, curve_point2B, end_point)
+        # cnv.draw_oval((x, y, x + self._u.width, y + self._u.height))
+        self.set_canvas_props(cnv=cnv, index=ID, **kwargs)  # shape.finish()
+        # ---- centred shape (with offset)
+        if self.centre_shape:
+            if self.can_draw_centred_shape(self.centre_shape):
+                self.centre_shape.draw(
+                    _abs_cx=x + self.unit(self.centre_shape_mx),
+                    _abs_cy=y + self.unit(self.centre_shape_my),
+                )
+        # ---- centred shapes (with offsets)
+        if self.centre_shapes:
+            self.draw_centred_shapes(self.centre_shapes, x, y)
+        # ---- cross
+        self.draw_cross(cnv, x_d, y_d, rotation=kwargs.get("rotation"))
+        # ---- dot
+        self.draw_dot(cnv, x_d, y_d)
+        # ---- text
+        delta_y = max(abs(dy_1), abs(dy_2))
+        self.draw_heading(cnv, ID, x_d, y_d - delta_y, **kwargs)
+        self.draw_label(cnv, ID, x_d, y_d, **kwargs)
+        self.draw_title(cnv, ID, x_d, y_d + delta_y, **kwargs)
+
+
 class PolygonShape(BaseShape):
     """
     Regular polygon on a given canvas.
