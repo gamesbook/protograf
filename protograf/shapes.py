@@ -2731,7 +2731,7 @@ class TextShape(BaseShape):
                             _stroke = self.stroke
                         css_style.append(f"color: {_stroke};")
                     if self.align:
-                        if _lower(self.align) == "centre":
+                        if _lower(self.align) in ["centre", "center", "c"]:
                             self.align = "center"
                         css_style.append(f"text-align: {self.align};")
                     styling = " ".join(css_style)

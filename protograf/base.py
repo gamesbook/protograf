@@ -1147,13 +1147,19 @@ class BaseShape:
             kwargs.get("vertex_shapes_rotated", False)
         )
         # ---- shapes with centre hex, circle, rect, rhombus, poly, ellips, star, equtri
-        self.centre_shapes = kwargs.get("centre_shapes", [])
-        self.centre_shape = kwargs.get("centre_shape", "")
+        self.centre_shapes = kwargs.get(
+            "centre_shapes", kwargs.get("center_shapes", [])
+        )
+        self.centre_shape = kwargs.get("centre_shape", kwargs.get("center_shapes", ""))
         self.centre_shape_mx = self.kw_float(
-            kwargs.get("centre_shape_mx", base.centre_shape_mx)
+            kwargs.get(
+                "centre_shape_mx", kwargs.get("center_shape_mx", base.centre_shape_mx)
+            )
         )
         self.centre_shape_my = self.kw_float(
-            kwargs.get("centre_shape_my", base.centre_shape_my)
+            kwargs.get(
+                "centre_shape_my", kwargs.get("center_shape_my", base.centre_shape_my)
+            )
         )
         self.dot_stroke = kwargs.get("dot_stroke", self.stroke)
         self.dot_stroke_width = self.kw_float(
@@ -1670,11 +1676,12 @@ class BaseShape:
             ]:
                 issue.append(f'"{self.operation[0]}" is not a valid operation type!')
                 correct = False
-        # ---- line / arrow
+        # ---- line
         if self.rotation_point:
             if _lower(self.rotation_point) not in [
                 "start",
                 "centre",
+                "center",
                 "end",
                 "s",
                 "c",
@@ -2509,9 +2516,9 @@ class BaseShape:
             # compute length of written text under font and fontsize:
             tl = font.text_length(text, fontsize=fontsize)
             # insertion point ("origin"):
-            if align == "centre":
+            if align in ["centre", "center", "c"]:
                 origin = muPoint(point.x - tl / 2.0, point.y)
-            elif align == "right":
+            elif align in ["right", "r"]:
                 origin = muPoint(point.x - tl, point.y)
             else:
                 origin = point
