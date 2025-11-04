@@ -875,18 +875,18 @@ class PodShape(BaseShape):
     def calculate_xy(self, **kwargs):
         # ---- adjust start
         if self.row is not None and self.col is not None:
-            x = self.col * self._u.width + self._o.delta_x
-            y = self.row * self._u.height + self._o.delta_y
+            x = self.col * self._u.length + self._o.delta_x
+            y = self.row + self._o.delta_y
         elif self.cx is not None and self.cy is not None:
-            x = self._u.cx - self._u.width / 2.0 + self._o.delta_x
-            y = self._u.cy - self._u.height / 2.0 + self._o.delta_y
+            x = self._u.cx - self._u.length / 2.0 + self._o.delta_x
+            y = self._u.cy + self._o.delta_y
         else:
             x = self._u.x + self._o.delta_x
             y = self._u.y + self._o.delta_y
-        # ---- overrides to centre the shape
+        # ---- overrides to recentre the shape
         if kwargs.get("cx") and kwargs.get("cy"):
-            x = kwargs.get("cx")
-            y = kwargs.get("cy") - self._u.height / 2.0
+            x = kwargs.get("cx") - self._u.length / 2.0
+            y = kwargs.get("cy")
         return x, y
 
     def draw(self, cnv=None, off_x=0, off_y=0, ID=None, **kwargs):
@@ -899,7 +899,7 @@ class PodShape(BaseShape):
         # ---- overrides for grid layout
         if self.use_abs_c:
             x = self._abs_cx - self._u.width / 2.0
-            y = self._abs_cy - self._u.height / 2.0
+            y = self._abs_cy
         x_d = x + self._u.length / 2.0  # centre
         y_d = y  # centre
         # ---- handle rotation
@@ -920,9 +920,9 @@ class PodShape(BaseShape):
             # ---- * single curve
             curve_point1 = Point(x + dx_1, y + dy_1)
             curve_point2 = Point(x + dx_1, y - dy_1)
+            # print('*** POD', self._p2v(curve_point1.y), self._p2v(curve_point2.y),)
             cnv.draw_curve(start_point, curve_point1, end_point)
             cnv.draw_curve(start_point, curve_point2, end_point)
-            kwargs["closed"] = True
         else:
             dx_2 = self.unit(self.dx_2)
             dy_2 = self.unit(self.dy_2)
@@ -931,9 +931,11 @@ class PodShape(BaseShape):
             curve_point1B = Point(x + dx_2, y + dy_2)
             curve_point2A = Point(x + dx_1, y - dy_1)
             curve_point2B = Point(x + dx_2, y - dy_2)
-            cnv.draw_curve(start_point, curve_point1A, curve_point1B, end_point)
-            cnv.draw_curve(start_point, curve_point2A, curve_point2B, end_point)
-        # cnv.draw_oval((x, y, x + self._u.width, y + self._u.height))
+            cnv.draw_bezier(start_point, curve_point1A, curve_point1B, end_point)
+            cnv.draw_bezier(start_point, curve_point2A, curve_point2B, end_point)
+
+        if self.centre_line:
+            kwargs["closed"] = True
         self.set_canvas_props(cnv=cnv, index=ID, **kwargs)  # shape.finish()
         # ---- centred shape (with offset)
         if self.centre_shape:
@@ -944,13 +946,13 @@ class PodShape(BaseShape):
                 )
         # ---- centred shapes (with offsets)
         if self.centre_shapes:
-            self.draw_centred_shapes(self.centre_shapes, x, y)
+            self.draw_centred_shapes(self.centre_shapes, x_d, y_d)
         # ---- cross
         self.draw_cross(cnv, x_d, y_d, rotation=kwargs.get("rotation"))
         # ---- dot
         self.draw_dot(cnv, x_d, y_d)
         # ---- text
-        delta_y = max(abs(dy_1), abs(dy_2))
+        delta_y = max(abs(dy_1), abs(dy_2)) / 2.0
         self.draw_heading(cnv, ID, x_d, y_d - delta_y, **kwargs)
         self.draw_label(cnv, ID, x_d, y_d, **kwargs)
         self.draw_title(cnv, ID, x_d, y_d + delta_y, **kwargs)

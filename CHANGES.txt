@@ -3,7 +3,7 @@ protograf Changes
 
 2025-00-00 (0.3.4)
 ------------------
-- Add "center" alias for centre
+- Add "center" alias for "centre"
 - Add Pod shape
 
 2025-11-02 (0.3.3)

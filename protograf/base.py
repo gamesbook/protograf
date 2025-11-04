@@ -382,6 +382,7 @@ class BaseCanvas:
         self.dy_1 = self.defaults.get("dy1", None)
         self.dx_2 = self.defaults.get("dx2", None)
         self.dy_2 = self.defaults.get("dy2", None)
+        self.centre_line = self.defaults.get("centre_line", False)
         # ---- rectangle / card
         self.rounding = self.defaults.get("rounding", 0.0)
         self.rounded = self.defaults.get("rounded", False)  # also line end
@@ -978,6 +979,9 @@ class BaseShape:
         self.dy_1 = kwargs.get("dy1", base.dy_1)
         self.dx_2 = kwargs.get("dx2", base.dx_2)
         self.dy_2 = kwargs.get("dy2", base.dy_2)
+        self.centre_line = kwargs.get(
+            "centre_line", kwargs.get("center_line", base.centre_line)
+        )
         # ---- rectangle / card
         self.rounding = self.kw_float(kwargs.get("rounding", base.rounding))
         self.rounded = kwargs.get("rounded", base.rounded)  # also line end
