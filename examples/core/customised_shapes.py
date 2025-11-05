@@ -1309,6 +1309,40 @@ Triangle(
 )
 PageBreak()
 
+
+Blueprint()
+Text(common=txt, text="Pod: customised")
+Pod()
+Pod(x=2.5, y=1, rotation=30)
+Pod(cx=3, cy=3,
+    fill="lime",
+    center_line=True)
+Pod(cx=1, cy=2,
+    heading="Head",
+    title="Title",
+    label="Label")
+Pod(cx=3, cy=2,
+    rotation=90)
+Pod(cx=1, cy=3,
+    length=2,
+    fill="gold")
+Pod(cx=1, cy=4,
+    dy1=1,
+    fill="tan")
+Pod(cx=3, cy=4,
+    dy1=1, dx1=0.1,
+    fill="aqua")
+Pod(cx=1, cy=5,
+    dy1=0.1,
+    dy2=0.5, dx2=-1.2,
+    fill="silver")
+Pod(cx=3, cy=5.5,
+    dx1=-0.6, dy1=-0.5,
+    dx2=0.15, dy2=-1,
+    fill="tomato",
+    rotation=-90)
+PageBreak()
+
 # ---- END
 Text(common=txt, text="Shapes END...")
 
@@ -1358,4 +1392,5 @@ Save(
         "vertex_shapes",
         "radii_shapes",
         "perbii_shapes",
+        "pod_custom",
         None])

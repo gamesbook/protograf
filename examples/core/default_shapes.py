@@ -119,6 +119,12 @@ Bezier()
 PageBreak()
 
 Blueprint(stroke_width=blue_width)
+Text(common=header, text="Pod")
+Pod()
+PageBreak()
+
+
+Blueprint(stroke_width=blue_width)
 Text(common=header, text="Polyline")
 # Polyline()  # will only get FEEDBACK
 Polyline(points=[(0, 0), (1, 1), (2, 0)])
@@ -216,7 +222,7 @@ Save(output='png',
         'circle', 'hexagon-flat', 'hexagon-pointy', 'rhombus',
         'trapezoid', 'star', 'ellipse', 'polygon',  'arrow',
         'cross',  'equiangle',  'hexagons-2x2',
-        'grid', 'arc', 'bezier', 'polyline',
+        'grid', 'arc', 'bezier', 'pod', 'polyline',
         'shape', 'sector', 'sequence', 'square',
         'stadium', 'starfield', 'dot', 'dotgrid', 'fill-stroke',
         'transparency', 'track-rectangle', 'chord',

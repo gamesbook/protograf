@@ -48,6 +48,7 @@ Shape Index
 -  `Image`_
 -  `Line`_
 -  `Lines`_
+-  `Pod`_
 -  `Polygon`_
 -  `Polyline`_
 -  `Polyshape`_
@@ -1233,6 +1234,85 @@ Example 2. Pointy Hexagon
 ===== ======
 
 
+.. _pod-command:
+
+Pod
+~~~
+`↑ <shape-index_>`_
+
+A pod is a symmetrical shape constructed of two curved lines.
+
+The following examples show how a Pod can be constructed.
+
+
+Example 1. Default Pod
+++++++++++++++++++++++
+`^ <pod-command_>`_
+
+.. |pd1| image:: images/defaults/pod.png
+   :width: 330
+
+===== ======
+|pd1| This example shows the shape constructed using the command with only
+      defaults:
+
+      .. code:: python
+
+          Pod()
+
+      It has the following properties based on the defaults:
+
+      - left point is at x-position ``1`` cm and at y-position ``1`` cm
+      - a *length* of ``1`` cm
+
+===== ======
+
+Example 2. Customised Pod
++++++++++++++++++++++++++
+`^ <pod-command_>`_
+
+.. |pd2| image:: images/customised/pod_custom.png
+   :width: 330
+
+===== ======
+|pd2| This example shows pod shapes constructed using the command with the
+      following properties:
+
+      .. code:: python
+
+        Pod()
+        Pod(x=2.5, y=1, rotation=30)
+        Pod(cx=3, cy=3,
+            fill="lime",
+            center_line=True)
+        Pod(cx=1, cy=2,
+            heading="Head",
+            title="Title",
+            label="Label")
+        Pod(cx=3, cy=2,
+            rotation=90)
+        Pod(cx=1, cy=3,
+            length=2,
+            fill="gold")
+        Pod(cx=1, cy=4,
+            dy1=1,
+            fill="tan")
+        Pod(cx=3, cy=4,
+            dy1=1, dx1=0.1,
+            fill="aqua")
+        Pod(cx=1, cy=5,
+            dy1=0.1,
+            dy2=0.5, dx2=-1.2,
+            fill="silver")
+        Pod(cx=3, cy=5.5,
+            dx1=-0.6, dy1=-0.5,
+            dx2=0.15, dy2=-1,
+            fill="tomato",
+            rotation=-90)
+
+===== ======
+
+
 .. _polygon-command:
 
 Polygon
@@ -1246,7 +1326,7 @@ is a polygon with 8 sides.
 
     **HINT** Unlike the `Hexagon`_ shape, a Polygon can be rotated!
 
-The following examples
+The following examples show how a Polygon can be constructed.
 
 
 Example 1. Default Polygon

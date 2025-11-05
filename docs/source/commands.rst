@@ -77,6 +77,7 @@ a handy cross-reference to the detailed information for that command.
 -  :ref:`PageBreak <pagebreak-command>` - set the start of a new page in
    the document; not required for a :ref:`Deck <the-deck-command>`
 -  :ref:`Pentomino <pentominoesOver>` * - a compound shape made up of five squares
+-  :ref:`Pod <pod-command>` * - a geometric shape that can be drawn on a page
 -  :ref:`Polygon <polygon-command>` * - a geometric shape that can be drawn on a page
 -  :ref:`Polyline <polyline-command>` * - a geometric shape that can be drawn on a page
 -  :ref:`Polyomino <polyominoesOver>` * - a compound shape made up of one or more squares
