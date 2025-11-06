@@ -868,7 +868,7 @@ class PodShape(BaseShape):
         if not self.dx_1:
             self.dx_1 = self.length / 2.0
         if not self.dy_1:
-            self.dy_1 = 0.5
+            self.dy_1 = self.length / 2.0
         # ---- RESET UNIT PROPS (last!)
         self.set_unit_properties()
 
