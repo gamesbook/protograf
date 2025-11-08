@@ -498,7 +498,13 @@ class CardShape(BaseShape):
                         card_values_tuple = namedtuple("Data", card_values.keys())(
                             **card_values
                         )
-                        _one_or_more_eles = new_ele(card_values_tuple) or []
+                        try:
+                            _one_or_more_eles = new_ele(card_values_tuple) or []
+                        except Exception as err:
+                            feedback(
+                                f"Unable to create card #{cid + 1}. (Error: {err})",
+                                True,
+                            )
                         if isinstance(_one_or_more_eles, list):
                             new_eles = _one_or_more_eles
                         else:
@@ -1436,6 +1442,13 @@ def Create(**kwargs):
     parser.add_argument(
         "-p", "--pages", help="Specify which pages to process", default=""
     )
+    parser.add_argument(
+        "-t",
+        "--trace",
+        help="Print a program trace for an error (default is False)",
+        default=False,
+        action=argparse.BooleanOptionalAction,
+    )
     globals.pargs = parser.parse_args()
     # NB - pages does not work - see notes in PageBreak()
     if globals.pargs.pages:
@@ -1567,6 +1580,13 @@ def Load(**kwargs):
     )
     parser.add_argument(
         "-p", "--pages", help="Specify which pages to process", default=""
+    )
+    parser.add_argument(
+        "-t",
+        "--trace",
+        help="Print a program trace for an error (default is False)",
+        default=False,
+        action=argparse.BooleanOptionalAction,
     )
     globals.pargs = parser.parse_args()
     # NB - pages does not work - see notes in PageBreak()
@@ -3151,33 +3171,6 @@ def ellipse(**kwargs):
     return EllipseShape(canvas=globals.canvas, **kwargs)
 
 
-# @docstring_center
-# def XquilateralTriangle(row=None, col=None, **kwargs):
-#     """Draw a XquilateralTriangle shape on the canvas.
-
-#     Args:
-
-#     - row (int): row in which the shape is drawn.
-#     - col (int): column in which shape is drawn.
-
-#     Kwargs:
-
-#     <center>
-
-#     """
-#     kwargs = margins(**kwargs)
-#     kwargs["row"] = row
-#     kwargs["col"] = col
-#     eqt = XquilateralTriangleShape(canvas=globals.canvas, **kwargs)
-#     eqt.draw()
-#     return eqt
-
-
-# def xquilateraltriangle(row=None, col=None, **kwargs):
-#     kwargs = margins(**kwargs)
-#     return XquilateralTriangleShape(canvas=globals.canvas, **kwargs)
-
-
 @docstring_center
 def Hexagon(row=None, col=None, **kwargs):
     """Draw a Hexagon shape on the canvas.
@@ -3714,7 +3707,7 @@ def starline(row=None, col=None, **kwargs):
 
 
 @docstring_base
-def Text(row=None, col=None, **kwargs):
+def Text(text: str = None, row=None, col=None, **kwargs):
     """Draw a Text shape on the canvas.
 
     Args:
@@ -3728,15 +3721,22 @@ def Text(row=None, col=None, **kwargs):
 
     """
     kwargs = margins(**kwargs)
+    kwargs["row"] = row
+    kwargs["col"] = col
+    if text and not kwargs.get("text"):
+        kwargs["text"] = text
     text = TextShape(canvas=globals.canvas, **kwargs)
     text.draw()
     return text
 
 
-def text(*args, **kwargs):
+def text(text: str = None, row=None, col=None, **kwargs):
     kwargs = margins(**kwargs)
-    _obj = args[0] if args else None
-    return TextShape(_object=_obj, canvas=globals.canvas, **kwargs)
+    kwargs["row"] = row
+    kwargs["col"] = col
+    if text and not kwargs.get("text"):
+        kwargs["text"] = text
+    return TextShape(canvas=globals.canvas, **kwargs)
 
 
 @docstring_center

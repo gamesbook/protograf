@@ -1052,6 +1052,50 @@ class PolygonShape(BaseShape):
             angles.append(angle)
         return angles
 
+    def calculate_perbii(
+        self, cnv, centre: Point, vertices: list, debug: bool = False
+    ) -> dict:
+        """Calculate centre points for each Polygon edge and angles from centre.
+
+        Args:
+            vertices (list):
+                list of Polygon's nodes as Points
+            centre (Point):
+                the centre Point of the Polygon
+
+        Returns:
+            dict of Perbis objects keyed on direction number
+        """
+        perbii_dict = {}
+        vcount = len(vertices) - 1
+        _perbii_pts = []
+        vertices.reverse()
+        for key, vertex in enumerate(vertices):
+            if key == 0:
+                p1 = Point(vertex.x, vertex.y)
+                p2 = Point(vertices[vcount].x, vertices[vcount].y)
+            else:
+                p1 = Point(vertex.x, vertex.y)
+                p2 = Point(vertices[key - 1].x, vertices[key - 1].y)
+            pc = geoms.fraction_along_line(p1, p2, 0.5)  # centre pt of edge
+            _perbii_pts.append(pc)
+            compass, angle = geoms.angles_from_points(centre, pc)
+            angle = 360.0 - angle if angle > 0.0 else angle
+            # print(f"*** POLYGON *** perbii {key=} {pc=} {compass=} {angle=}")
+            _perbii = Perbis(
+                point=pc,
+                direction=key,
+                v1=p1,
+                v2=p2,
+                compass=compass,
+                angle=angle,
+            )
+            perbii_dict[key] = _perbii
+        # if debug:
+        #     self.run_debug = True
+        #     self._debug(cnv, vertices=_perbii_pts)
+        return perbii_dict
+
     def draw_perbii(
         self,
         cnv,
@@ -1360,9 +1404,14 @@ class PolygonShape(BaseShape):
             )
         # ---- draw perbii_shapes
         if self.perbii_shapes:
-            feedback(
-                'The "perbii_shapes" property is not implemented for a Polygon.',
-                alert=True,
+            # ---- * draw perbii_shapes
+            self.draw_perbii_shapes(
+                cnv,
+                self.perbii_shapes,
+                self.vertices,
+                Point(x, y),
+                DirectionGroup.POLYGONAL,
+                self.perbii_shapes_rotated,
             )
         # ---- centred shape (with offset)
         if self.centre_shape:
@@ -2710,6 +2759,9 @@ class TextShape(BaseShape):
         self.set_canvas_props(index=ID)
         # ---- overrides for self.text / text value
         _locale = kwargs.get("locale", None)
+        if self.text is None or self.text == "":
+            feedback("No text supplied for the Text shape!", False, True)
+            return
         if _locale:
             self.text = tools.eval_template(self.text, _locale)
         _text = self.textify(ID)

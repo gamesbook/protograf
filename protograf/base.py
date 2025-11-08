@@ -3353,6 +3353,8 @@ class BaseShape:
                     vertexes = get_circle_vertexes(item[0], centre)
                     perbii_dict = self.calculate_perbii(cnv, centre, vertexes)
                     _dirs = perbii_dict.keys()
+                elif direction_group == DirectionGroup.POLYGONAL:
+                    _dirs = perbii_dict.keys()
                 else:
                     _dirs = tools.validated_directions(
                         item[0], direction_group, "direction"

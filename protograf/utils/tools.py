@@ -1206,6 +1206,8 @@ def validated_directions(
             valid = {"se", "sw", "n"}
         case DirectionGroup.TRIANGULAR_EDGES:  # equilateral triangle
             valid = {"ne", "nw", "s"}
+        case DirectionGroup.POLYGONAL:  # equilateral triangle
+            valid = {}
         case _:
             raise NotImplementedError(f"Cannot handle {direction_group} type!")
     if "all" in values or "*" in values:
