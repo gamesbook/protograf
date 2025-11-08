@@ -75,7 +75,8 @@ of  icons and images, stored in a CSV file or spreadsheet; while in your script
 the ``Card()`` command is used, multiple times, to provide the "glue" needed to
 position the elements containing these "things".
 
-A complete script with all commands, is what some software terms a "template".
+A complete script with all commands, is what some software terms a "template"
+for your cards.
 
 
 Key Concepts and Commands
@@ -89,6 +90,10 @@ based on the cards' size and the size of the paper chosen.
 In your script, for one or more cards, you will set out the elements exactly
 as you want them to appear |dash| in effect, the card becomes a "mini page".
 
+This is important |dash| defining something often means it is **not** needed
+right away but **only** when the card, or cards, that use it are drawn. See
+the related detail in the `Card Command`_ section below.
+
 There are two core commands needed; the ``Deck()`` and the ``Card()``; with
 supporting commands including the ``Data()`` and ``Matrix()`` commands.
 
@@ -100,8 +105,8 @@ needed for creating one or more cards.
 
 Using its properties, you can specify aspects such type, size and the expected
 number of cards, as well as any spacing and color swathes between them, that
-will be used to create "frames", or placeholders, for each of the cards in the
-deck.
+will be used to create the "frames", or placeholders, that are used for each and
+all of the cards in the deck.
 
 All of these properties have defaults; for example, the default card size is
 that of a Poker card, and the default number of cards is 9 |dash| the number
@@ -119,6 +124,14 @@ part of the design for a card, or a range of cards, in a deck.
 A card design typically makes use of various shapes and text elements |dash|
 some of which may have already been defined elsewhere in the script |dash| to
 both position and style the card's data.
+
+.. HINT::
+
+   In many cases when defining what appears on a card |dash| shapes, images
+   or text |dash| you should generally employ commands with a **lowercase
+   initial** as this means the command will be **not** carried out
+   straightaway, but deferred for activation later on in the script when the
+   cards themselves are drawn.
 
 Elements can be used (or re-used) for single or multiple cards.
 

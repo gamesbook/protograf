@@ -92,7 +92,7 @@ Key Properties
 - `Example 10. Polygon Track - clockwise`_
 - `Example 11. Polygon Track - inwards`_
 - `Example 12. Polygon Track - outwards`_
-- `Example 13. Circular Track - outwards`_
+- `Example 13. Circular Track - inwards`_
 - `Example 14. Rectangular Track - inwards`_
 - `Example 15. Rectangular Track - outwards`_
 - `Example 16. Polygon Track - sequences`_

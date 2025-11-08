@@ -83,6 +83,13 @@ A "stand-alone" image is **not** part of a text string and can be displayed
 directly on any part of a card; this is fully described in the
 :ref:`Image Command <image-command>`.
 
+.. HINT::
+
+   Remember that when defining an image to appear on a card, you should
+   usually use the command with a **lowercase initial** i.e. ``image()``
+   rather than ``Image()``, as this will defer it being drawn to when the
+   card itself is drawn.
+
 
 Inline / Embedded Images and Symbols
 ====================================
@@ -332,7 +339,7 @@ embedded in :ref:`HTML Text <textHTML>` used in cards.
       Because the ``IconFont()`` has been set to *game-icons-net-20200315a*:
 
       - a shamrock |shm| is shown when using the symbol
-        markers ``|! ... !|`` and referencing  Unicode *EB73*, and
+        markers ``|! ... !|`` and referencing Unicode *EB73*; and
       - a diamond is shown when using the symbol markers ``|! ... !|``
         and referencing Unicode *2666* |dash| the color is set differently for
         two different card characters.

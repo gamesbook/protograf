@@ -7,6 +7,9 @@ Commands List
 This list provides an alphabetic summary of all the
 :ref:`commands <command-concept>` specific to **protograf**.
 
+    Remember that using certain commands with a **lowercase initial**
+    defers their activation to later in the script!
+
 This list is not intended to be used for learning, but just provides
 a handy cross-reference to the detailed information for that command.
 

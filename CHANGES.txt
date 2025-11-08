@@ -5,6 +5,9 @@ protograf Changes
 ------------------
 - Add "center" alias for "centre"
 - Add Pod shape
+- Patch card error when using Text() command
+- Add `--trace` command-line option
+- Update docs for more references to lower-case commands
 
 2025-11-02 (0.3.3)
 ------------------
@@ -26,8 +29,8 @@ protograf Changes
 - Add `slices` and `perbii` properties to Rhombus
 - Add `perbii_shapes` to EquilateralTriangle, Hexagon, Rhombus,
   and Rectangle
-- Update docs with suitable examples
 - Add Cross shape
+- Update docs with suitable examples for the above
 - Add section on how to use text transforms in T() command
 - Add Image operations (for cut-outs and blur)
 
