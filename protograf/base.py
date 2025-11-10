@@ -687,14 +687,27 @@ class BaseShape:
     """Base class for objects drawn on a given canvas aka a pymupdf_utils_Shape"""
 
     def __init__(self, _object: muShape = None, canvas: BaseCanvas = None, **kwargs):
-        self.kwargs = kwargs
+        # feedback(f'### BaseShape 1 {type(self).__name__} {kwargs=}')
+        # inject and then override kwargs supplied by DefaultShape
+        if kwargs.get("default"):
+            try:
+                if kwargs.get("default"):
+                    self.kwargs = kwargs["default"]._default_kwargs | kwargs
+            except Exception:
+                self.kwargs = kwargs
+        else:
+            self.kwargs = kwargs
+        self.kwargs.pop("default", None)
+        # feedback(f'### BaseShape 2 {type(self).__name__} {self.kwargs=}')
         # inject and overwrite Shape's own kwargs with those set by CommonShape
         try:
             if kwargs.get("common"):
                 self.kwargs = kwargs | kwargs["common"]._common_kwargs
         except AttributeError:
             pass  # ignore, for example, CommonShape
-        # feedback(f'### BaseShape {_object=} {canvas=} {kwargs=}')
+        # ---- reset kwargs for processing
+        kwargs = self.kwargs
+        # feedback(f'### BaseShape 3 {type(self).__name__} {canvas=} {kwargs=}')
         # ---- constants
         self.default_length = 1
         self.show_id = False  # True
@@ -703,8 +716,8 @@ class BaseShape:
         self.page_number = globals.page_count + 1
         self.canvas = canvas or globals.canvas  # pymupdf Shape
         base = _object or globals.base  # protograf BaseCanvas
-        # print(f"### {type(self.canvas)=} {type(cnv)=} {type(base=)}")
-        # print(f"### {self.canvas=} {cnv=} {base=}")
+        # print(f"### TYPES  {type(self.canvas)=} {type(cnv)=} {type(base=)}")
+        # print(f"### ACTUAL {self.canvas=} {cnv=} {base=}")
         self.shape_id = None
         self.sequence = kwargs.get("sequence", [])  # e.g. card numbers
         self.dataset = []  # list of dict data (loaded from file)

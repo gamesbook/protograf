@@ -36,6 +36,7 @@ from .shapes import (
     ChordShape,
     CommonShape,
     CrossShape,
+    DefaultShape,
     DotShape,
     EllipseShape,
     FooterShape,
@@ -2857,8 +2858,8 @@ def Common(source=None, **kwargs):
 
     Notes:
 
-        * Any kwargs can be used; they are stored for further use by other Shapes
-        * `common_kwargs` will overwrite normal **kwargs supplied to a Shape
+    * Any kwargs can be used; they are stored for further use by other Shapes
+    * `common_kwargs` will overwrite normal **kwargs supplied to a Shape
     """
     base_kwargs = kwargs
     kwargs = margins(**kwargs)
@@ -2873,6 +2874,33 @@ def common(source=None, **kwargs):
     kwargs["source"] = source
     cshape = CommonShape(canvas=globals.canvas, common_kwargs=base_kwargs, **kwargs)
     return cshape
+
+
+def Default(source=None, **kwargs):
+    """Store properties that can be used, or overridden by one or more other Shapes.
+
+    Args:
+
+    - source (object): any object can be the source
+
+    Notes:
+
+    * Any kwargs can be used; they are stored for possible further use by other Shapes
+    * `default_kwargs` will be overwritten by equivalent **kwargs supplied to a Shape
+    """
+    base_kwargs = kwargs
+    kwargs = margins(**kwargs)
+    kwargs["source"] = source
+    dshape = DefaultShape(canvas=globals.canvas, default_kwargs=base_kwargs, **kwargs)
+    return dshape
+
+
+def default(source=None, **kwargs):
+    base_kwargs = kwargs
+    kwargs = margins(**kwargs)
+    kwargs["source"] = source
+    dshape = DefaultShape(canvas=globals.canvas, default_kwargs=base_kwargs, **kwargs)
+    return dshape
 
 
 @docstring_base

@@ -3688,7 +3688,7 @@ class TriangleShape(BaseShape):
 
 class CommonShape(BaseShape):
     """
-    Attributes common to, or used by, multiple shapes
+    Attributes common to, or used by, multiple shapes BUT not overridden
     """
 
     def __init__(self, _object=None, canvas=None, common_kwargs=None, **kwargs):
@@ -3699,6 +3699,21 @@ class CommonShape(BaseShape):
     def draw(self, cnv=None, off_x=0, off_y=0, ID=None, **kwargs):
         """Not applicable."""
         feedback("The Common shape cannot be drawn.", True)
+
+
+class DefaultShape(BaseShape):
+    """
+    Attributes common to, or used by, multiple shapes that CAN be overridden
+    """
+
+    def __init__(self, _object=None, canvas=None, default_kwargs=None, **kwargs):
+        super(DefaultShape, self).__init__(_object=_object, canvas=canvas, **kwargs)
+        self._default_kwargs = default_kwargs
+        self._kwargs = kwargs
+
+    def draw(self, cnv=None, off_x=0, off_y=0, ID=None, **kwargs):
+        """Not applicable."""
+        feedback("The Default shape cannot be drawn.", True)
 
 
 class FooterShape(BaseShape):
