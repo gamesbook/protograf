@@ -8,6 +8,7 @@ protograf Changes
 - Patch card error when using Text() command
 - Add `--trace` command-line option
 - Update docs for more references to lower-case commands
+- Add Default command
 
 2025-11-02 (0.3.3)
 ------------------
