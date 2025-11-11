@@ -260,13 +260,17 @@ class CardShape(BaseShape):
         """Draw a list of elements created via a Template or Card function call."""
         for the_new_ele in new_eles:
             try:
-                the_new_ele.draw(cnv=cnv, off_x=off_x, off_y=off_y, ID=ID, **kwargs)
-                cnv.commit()
-            except AttributeError as err:
+                if isinstance(the_new_ele, GroupBase):
+                    for new_group_ele in the_new_ele:
+                        new_group_ele.draw(cnv=cnv, off_x=off_x, off_y=off_y, ID=ID, **kwargs)
+                        cnv.commit()
+                else:
+                    the_new_ele.draw(cnv=cnv, off_x=off_x, off_y=off_y, ID=ID, **kwargs)
+                    cnv.commit()
+            except AttributeError:
                 feedback(
-                    f"Unable to draw card #{cid + 1}.  Check that the"
-                    f" elements created by '{the_function.__name__}'"
-                    " are all shapes.",
+                    f"Unable to draw card #{cid + 1}. Check that the elements"
+                    f" created by '{the_function.__name__}' are all shapes.",
                     True,
                 )
 
@@ -2337,9 +2341,6 @@ def Card(sequence: object = None, *elements, **kwargs):
                 if isinstance(element, TemplatingType):
                     add_members_to_card(element)
                 else:
-                    # element.members = _cards  # track all related cards
-                    # card.members = _cards
-                    # card.elements.append(element)  # may be Group or Shape or Query
                     add_members_to_card(element)
         else:
             feedback(f'Cannot find card#{_card}. (Check "cards" setting in Deck)')
@@ -2420,9 +2421,6 @@ def CardBack(sequence: object = None, *elements, **kwargs):
                 if isinstance(element, TemplatingType):
                     add_members_to_back(element)
                 else:
-                    # element.members = _cardbacks  # track all related cards
-                    # cardback.members = _cardbacks
-                    # cardback.elements.append(element)  # may be Group or Shape or Query
                     add_members_to_back(element)
         else:
             feedback(f'Cannot find cardback#{_back}. (Check "cards" setting in Deck)')

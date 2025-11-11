@@ -9,6 +9,7 @@ protograf Changes
 - Add `--trace` command-line option
 - Update docs for more references to lower-case commands
 - Add Default command
+- Support `group` property for card elements in a function
 
 2025-11-02 (0.3.3)
 ------------------
