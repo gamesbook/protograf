@@ -33,7 +33,8 @@ a handy cross-reference to the detailed information for that command.
 -  :ref:`Circle <circle-command>` * - a geometric shape that can be drawn on a page
    (see also further :ref:`customisation options <circleIndex>`)
 -  :ref:`Chord <chord-command>` * - a geometric shape that can be drawn on a page
--  :ref:`Common <the-common-command>` - set the properties for any shape that can be drawn on a page
+-  :ref:`Common <the-common-command>` - set the properties that will be the same for
+   any shape using them
 -  :ref:`Counter <the-countersheet-command>`  - details for a counter that is part
    of a :ref:`countersheet <the-countersheet-command>`
 -  :ref:`countersheet <the-countersheet-command>`  - details for a
@@ -49,6 +50,8 @@ a handy cross-reference to the detailed information for that command.
 -  :ref:`D6 <d6-object>` * - create top-down view of a six-sided die
 -  :ref:`Deck <the-deck-command>`  - details for a deck, containing one or
    more :ref:`cards <the-card-command>`
+-  :ref:`Default <the-default-command>` - set the properties that can be used by
+   any shape
 -  :ref:`Dot <dot-command>` * - a geometric shape that can be drawn on a page
 -  :ref:`DotGrid <dotgrid-command>` - a set, or group, of dots that can be drawn on a page
 -  :ref:`Ellipse <ellipse-command>` * - a geometric shape that can be drawn on a page

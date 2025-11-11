@@ -14,6 +14,7 @@ basic scripts of your own using the :doc:`Core Shapes <core_shapes>`.
 .. _table-of-contents-addcmd:
 
 -  `Common Command`_
+-  `Default Command`_
 -  `Font Command`_
 -  `Extract Command`_
 -  `Random Command`_
@@ -27,7 +28,8 @@ Common Command
 ==============
 `↑ <table-of-contents-addcmd_>`_
 
-The ``Common()`` command allows different shapes to share the same properties.
+The ``Common()`` command allows different shapes to use exactly the same
+properties.
 
 These properties are listed in much the same way as they would for an actual
 shape, but the ``Common()`` command does not actually draw anything itself.
@@ -40,13 +42,42 @@ For example:
   Circle(common=colors, cx=1, cy=2)
   Square(common=colors, cx=2, cy=2)
 
-Here the circle and the square will both use the Common properties assigned to
-the ``colors`` name.
+Here the circle and the square will both use the ``common`` properties that
+have been assigned to the ``colors`` name.
 
 .. NOTE::
 
   The common properties **cannot** be overwritten by a shape; if set, they
   will be used and cannot be changed on a case-by-case basis!
+
+
+.. _the-default-command:
+
+Default Command
+===============
+`↑ <table-of-contents-addcmd_>`_
+
+The ``Default()`` command allows different shapes to potentially all use the
+same properties.
+
+These properties are listed in much the same way as they would for an actual
+shape, but the ``Default()`` command does not actually draw anything itself.
+
+For example:
+
+.. code:: python
+
+  colors = Default(stroke="tomato", fill="gold")
+  Circle(default=colors, cx=1, cy=2)
+  Square(default=colors, cx=2, cy=2)
+
+Here the circle and the square will both use the ``default`` properties that
+have been assigned to the ``colors`` name.
+
+.. NOTE::
+
+  Unlike the ``Common()`` command, the common properties set here **will**
+  be overwritten by any of the same ones which are set by the shape itself!
 
 
 .. _the-font-command:
