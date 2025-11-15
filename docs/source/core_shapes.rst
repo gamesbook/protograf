@@ -1481,15 +1481,15 @@ Example 3. Polygon Radii
 
           Polygon(
               cx=2, cy=4, sides=8, radius=1,
-              radii=True)
+              radii="1,3,7")
 
       It has the following properties:
 
       - *centre* at x-position ``2`` cm and at y-position ``4`` cm, with a *radius*
         size of ``1`` cm
       - *sides* - ``8`` sides
-      - *radii* - set to ``True`` to force lines to be drawn from the centre
-        of the polygon to each of its vertices
+      - *radii* - set to ``1, 3, 7`` to enable lines to be drawn from the centre
+        of the polygon to three of its vertices  (starting from the top)
 
       The **top** example:
 
@@ -1497,7 +1497,7 @@ Example 3. Polygon Radii
 
           Polygon(
               cx=2, cy=1, sides=10, radius=1,
-              radii=True,
+              radii="*",
               radii_offset=0.75,
               radii_length=0.25,
               radii_stroke_width=1,
@@ -1509,8 +1509,8 @@ Example 3. Polygon Radii
       - *centre* at x-position ``2`` cm and at y-position ``1`` cm, with a *radius*
         size of ``1`` cm
       - *sides* - ``10``
-      - *radii* - set to ``True`` to force lines to be drawn from the centre of
-        the polygon to each of its vertices; the radii properties are then set:
+      - *radii* - set to ``*`` to enable lines to be drawn from the centre
+        of the polygon to all of its vertices; the radii properties are then set:
 
         - *radii_offset* - set to ``0.75`` cm; distance away from the centre
           that the radii will start

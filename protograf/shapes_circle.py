@@ -693,8 +693,8 @@ class CircleShape(BaseShape):
             "radii_shapes",
             "centre_shape",
             "centre_shapes",
-            "cross",
             "dot",
+            "cross",
             "text",
         ]
         ordering = base_ordering

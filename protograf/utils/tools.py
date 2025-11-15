@@ -1158,7 +1158,10 @@ def eval_template(string: str, data: dict = None, label: str = ""):
 
 
 def validated_directions(
-    value: list | str, direction_group: DirectionGroup, label: str = ""
+    value: list | str,
+    direction_group: DirectionGroup,
+    label: str = "",
+    vertex_count: int = 0,
 ) -> list:
     """Check and return a list of lowercase, direction abbreviations.
 
@@ -1206,13 +1209,27 @@ def validated_directions(
             valid = {"se", "sw", "n"}
         case DirectionGroup.TRIANGULAR_EDGES:  # equilateral triangle
             valid = {"ne", "nw", "s"}
-        case DirectionGroup.POLYGONAL:  # equilateral triangle
-            valid = {}
+        case DirectionGroup.POLYGONAL:  # polygon
+            valid = set(range(1, vertex_count + 1))
+            # print('^^^ ', vertex_count, values_set)
         case _:
             raise NotImplementedError(f"Cannot handle {direction_group} type!")
     if "all" in values or "*" in values:
         values = list(valid)
+        if direction_group == DirectionGroup.POLYGONAL:
+            values = range(1, vertex_count + 1)
         values_set = set(values)
+    else:
+        if direction_group == DirectionGroup.POLYGONAL:
+            try:
+                values = [int(val) for val in values]
+            except:
+                feedback(f'Unable to use "{value}" as directions for a Polygon.', False)
+                feedback(
+                    f"The Polygon directions must be numbers from 1 to {vertex_count}.",
+                    True,
+                )
+            values_set = set(values)
     if values_set.issubset(valid):
         return values
     _label = f"the {label} value" if label else f'"{value}"'

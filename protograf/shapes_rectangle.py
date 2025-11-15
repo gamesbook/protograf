@@ -1687,8 +1687,8 @@ class RectangleShape(BaseShape):
             "centre_shape",
             "centre_shapes",
             "vertex_shapes",
-            "cross",
             "dot",
+            "cross",
             "text",
             "numbering",
         ]

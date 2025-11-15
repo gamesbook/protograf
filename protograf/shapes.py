@@ -1069,7 +1069,7 @@ class PolygonShape(BaseShape):
         perbii_dict = {}
         vcount = len(vertices) - 1
         _perbii_pts = []
-        vertices.reverse()
+        # vertices.reverse()
         for key, vertex in enumerate(vertices):
             if key == 0:
                 p1 = Point(vertex.x, vertex.y)
@@ -1096,7 +1096,104 @@ class PolygonShape(BaseShape):
         #     self._debug(cnv, vertices=_perbii_pts)
         return perbii_dict
 
+    def calculate_radii(
+        self, cnv, centre: Point, vertices: list, debug: bool = False
+    ) -> dict:
+        """Calculate radii for each Polygon vertex and angles from centre.
+
+        Args:
+            vertices: list of Polygon's nodes as Points
+            centre: the centre Point of the Polygon
+
+        Returns:
+            dict of Radius objects keyed on direction
+        """
+        radii_dict = {}
+        vertices.reverse()
+        # print(f"*** POLYGON radii {centre=} {vertices=}")
+        for key, vertex in enumerate(vertices):
+            compass, angle = geoms.angles_from_points(centre, vertex)
+            # print(f"*** POLYGON radii {key=} {directions[key]=} {compass=} {angle=}")
+            _radii = Radius(
+                point=vertex,
+                direction=key,
+                compass=compass,
+                angle=360 - angle,  # inverse flip (y is reveresed)
+            )
+            # print(f"*** POLYGON radii {_radii}")
+            radii_dict[key] = _radii
+        return radii_dict
+
     def draw_perbii(
+        self,
+        cnv,
+        ID,
+        centre: Point,
+        vertices: list,
+        rotation: float = None,
+    ):
+        """Draw lines connecting the Polygon centre to the centre of each edge.
+
+        Def:
+            A perpendicular bisector ("perbii") of a chord is:
+            A line passing through the center of circle such that it divides the
+            chord into two equal parts and meets the chord at a right angle;
+            for a polygon, each edge is effectively a chord.
+        """
+        pb_offset = self.unit(self.perbii_offset, label="perbii offset") or 0
+        pb_length = (
+            self.unit(self.perbii_length, label="perbii length")
+            if self.perbii_length
+            else self.get_radius()
+        )
+        perbii_dict = self.calculate_perbii(cnv, centre, vertices)
+        # ---- set perbii waves
+        lkwargs = {}
+        lkwargs["wave_style"] = self.kwargs.get("perbii_wave_style", None)
+        lkwargs["wave_height"] = self.kwargs.get("perbii_wave_height", 0)
+        for key in self.perbii:
+            # print(f'*** {key=} {perbii_dict}')
+            # points based on length of line, offset and the angle in degrees
+            the_perbii = perbii_dict.get(int(key) - 1, None)
+            if the_perbii is None:
+                feedback(f"{key} is not a valid perbii direction!", True)
+            edge_pt = geoms.fraction_along_line(
+                the_perbii.v1, the_perbii.v2, 0.5
+            )  # centre pt of edge
+            # print(f'*** {pb_angle=} {edge_pt=} {centre=}')
+            if pb_offset is not None and pb_offset != 0:
+                offset_pt = geoms.point_on_circle(centre, pb_offset, the_perbii.angle)
+                end_pt = geoms.point_on_line(offset_pt, edge_pt, pb_length)
+                # print(f'*** {end_pt=} {offset_pt=}')
+                start_point = offset_pt.x, offset_pt.y
+                end_point = end_pt.x, end_pt.y
+            else:
+                start_point = centre.x, centre.y
+                end_point = edge_pt.x, edge_pt.y
+            # ---- draw a perbii line
+            draw_line(
+                cnv,
+                start_point,
+                end_point,
+                shape=self,
+                **lkwargs,
+            )
+
+        # ---- style all perbii
+        rotation_point = centre if rotation else None
+        # print(f"*** POLY perbii {rotation_point=} {rotation=}")
+        self.set_canvas_props(
+            index=ID,
+            stroke=self.perbii_stroke,
+            stroke_width=self.perbii_stroke_width,
+            stroke_ends=self.perbii_ends,
+            dashed=self.perbii_dashed,
+            dotted=self.perbii_dotted,
+            rotation=rotation,
+            rotation_point=rotation_point,
+        )
+
+    def draw_perbii_OLD(
         self,
         cnv,
         ID,
@@ -1134,6 +1231,7 @@ class PolygonShape(BaseShape):
             if self.perbii_length
             else self.get_radius()
         )
+        perbii_dict = self.calculate_perbii(cnv, centre, vertices)
 
         # ---- set perbii waves
         lkwargs = {}
@@ -1187,9 +1285,14 @@ class PolygonShape(BaseShape):
     ):
         """Draw lines connecting the Polygon centre to each of the vertices."""
         _radii = []
-        for vertex in vertices:
-            _, angle = geoms.angles_from_points(vertex, centre)
-            _radii.append(angle)
+        vertices.reverse()
+        _dirs = tools.validated_directions(
+            self.radii, DirectionGroup.POLYGONAL, "polygon radii", len(vertices)
+        )
+        for key, vertex in enumerate(vertices):
+            if key + 1 in _dirs:
+                _, angle = geoms.angles_from_points(vertex, centre)
+                _radii.append(angle)
         rad_offset = self.unit(self.radii_offset, label="radii offset") or 0
         rad_length = (
             self.unit(self.radii_length, label="radii length")
@@ -1373,74 +1476,134 @@ class PolygonShape(BaseShape):
         # ---- invalid polygon?
         if not self.vertices or len(self.vertices) == 0:
             return
-        # ---- draw polygon
-        # feedback(f"***Polygon {self.col=} {self.row=} {x=} {y=} \n{self.vertices=}")
-        cnv.draw_polyline(self.vertices)
-        kwargs["closed"] = True
-        self.set_canvas_props(cnv=cnv, index=ID, **kwargs)
-        # ---- draw slices
-        if self.slices:
-            self.draw_slices(
-                cnv,
-                ID,
-                Point(x, y),
-                self.vertices,
-                rotation=rotation,
-            )
-        # ---- draw radii
-        if self.radii:
-            self.draw_radii(cnv, ID, Point(x, y), self.vertices, rotation=rotation)
-        # ---- draw perbii
-        if self.perbii:
-            self.draw_perbii(cnv, ID, Point(x, y), self.vertices, rotation=rotation)
-        # ---- draw mesh
-        if self.mesh:
-            self.draw_mesh(cnv, ID, self.vertices)
-        # ---- draw radii_shapes
-        if self.radii_shapes:
-            feedback(
-                'The "radii_shapes" property is not implemented for a Polygon.',
-                alert=True,
-            )
-        # ---- draw perbii_shapes
-        if self.perbii_shapes:
-            # ---- * draw perbii_shapes
-            self.draw_perbii_shapes(
-                cnv,
-                self.perbii_shapes,
-                self.vertices,
-                Point(x, y),
-                DirectionGroup.POLYGONAL,
-                self.perbii_shapes_rotated,
-            )
-        # ---- centred shape (with offset)
-        if self.centre_shape:
-            if self.can_draw_centred_shape(self.centre_shape):
-                self.centre_shape.draw(
-                    _abs_cx=x + self.unit(self.centre_shape_mx),
-                    _abs_cy=y + self.unit(self.centre_shape_my),
+
+        # ---- determine ordering
+        base_ordering = [
+            "base",
+            # "borders",
+            "slices",
+            "mesh",
+            "radii",
+            "perbii",
+            "radii_shapes",
+            "perbii_shapes",
+            "centre_shape",
+            "centre_shapes",
+            "vertex_shapes",
+            "dot",
+            "cross",
+            "text",
+        ]
+        ordering = base_ordering
+        if self.order_all:
+            ordering = tools.list_ordering(base_ordering, self.order_all, only=True)
+        else:
+            if self.order_first:
+                ordering = tools.list_ordering(
+                    base_ordering, self.order_first, start=True
                 )
-        # ---- centred shapes (with offsets)
-        if self.centre_shapes:
-            self.draw_centred_shapes(self.centre_shapes, x, y)
-        # ---- draw vertex shapes
-        if self.vertex_shapes:
-            self.draw_vertex_shapes(
-                self.vertex_shapes,
-                self.vertices,
-                Point(x, y),
-                self.vertex_shapes_rotated,
-            )
-        # ---- debug
-        # self._debug(cnv, vertices=self.vertices)  # needs: self.run_debug = True
-        # ---- dot
-        self.draw_dot(cnv, x, y)
-        # ---- cross
-        self.draw_cross(cnv, x, y, rotation=kwargs.get("rotation"))
-        # ---- text
-        self.draw_heading(cnv, ID, x, y, radius, **kwargs)
-        self.draw_label(cnv, ID, x, y, **kwargs)
-        self.draw_title(cnv, ID, x, y, radius + 0.5 * self.title_size, **kwargs)
+            if self.order_last:
+                ordering = tools.list_ordering(base_ordering, self.order_last, end=True)
+        # feedback(f'*** POLYGON: {ordering=}')
+
+        # ---- draw in ORDER
+        for item in ordering:
+            if item == "base":
+                # ---- * draw polygon
+                # feedback(f"***Polygon {self.col=} {self.row=} {x=} {y=} \n{self.vertices=}")
+                cnv.draw_polyline(self.vertices)
+                kwargs["closed"] = True
+                self.set_canvas_props(cnv=cnv, index=ID, **kwargs)
+            if item == "borders":
+                # ---- * draw slices
+                feedback("Polygon borders are not implemented yet!", True)
+            if item == "slices":
+                # ---- * draw slices
+                if self.slices:
+                    self.draw_slices(
+                        cnv,
+                        ID,
+                        Point(x, y),
+                        self.vertices,
+                        rotation=rotation,
+                    )
+            if item == "radii":
+                # ---- * draw radii
+                if self.radii:
+                    self.draw_radii(
+                        cnv, ID, Point(x, y), self.vertices, rotation=rotation
+                    )
+            if item == "perbii":
+                # ---- * draw perbii
+                if self.perbii:
+                    self.draw_perbii(
+                        cnv, ID, Point(x, y), self.vertices, rotation=rotation
+                    )
+            if item == "mesh":
+                # ---- * draw mesh
+                if self.mesh:
+                    self.draw_mesh(cnv, ID, self.vertices)
+            if item == "radii_shapes":
+                # ---- * draw radii_shapes
+                if self.radii_shapes:
+                    self.draw_radii_shapes(
+                        cnv,
+                        radii_shapes=self.radii_shapes,
+                        vertexes=self.vertices,
+                        centre=Point(x, y),
+                        direction_group=DirectionGroup.POLYGONAL,
+                        rotation=rotation,
+                        rotated=self.radii_shapes_rotated,
+                    )
+            if item == "perbii_shapes":
+                # ---- * draw perbii_shapes
+                if self.perbii_shapes:
+                    self.draw_perbii_shapes(
+                        cnv,
+                        perbii_shapes=self.perbii_shapes,
+                        vertexes=self.vertices,
+                        centre=Point(x, y),
+                        direction_group=DirectionGroup.POLYGONAL,
+                        rotation=rotation,
+                        rotated=self.perbii_shapes_rotated,
+                    )
+            if item == "centre_shape":
+                # ---- * draw centred shape (with offset)
+                if self.centre_shape:
+                    if self.can_draw_centred_shape(self.centre_shape):
+                        self.centre_shape.draw(
+                            _abs_cx=x + self.unit(self.centre_shape_mx),
+                            _abs_cy=y + self.unit(self.centre_shape_my),
+                        )
+            if item == "centre_shapes":
+                # ---- * draw centre_shapes (with offsets)
+                if self.centre_shapes:
+                    self.draw_centred_shapes(self.centre_shapes, x, y)
+            if item == "vertex_shapes":
+                # ---- * draw vertex shapes
+                if self.vertex_shapes:
+                    self.draw_vertex_shapes(
+                        self.vertex_shapes,
+                        self.vertices,
+                        Point(x, y),
+                        self.vertex_shapes_rotated,
+                    )
+            if item == "debug":
+                # ---- * draw debug
+                # self._debug(cnv, vertices=self.vertices)  # needs: self.run_debug = True
+                pass
+            if item == "dot":
+                # ---- * draw dot
+                self.draw_dot(cnv, x, y)
+            if item == "cross":
+                # ---- * draw cross
+                self.draw_cross(cnv, x, y, rotation=kwargs.get("rotation"))
+            if item == "text":
+                # ---- * draw text
+                self.draw_heading(cnv, ID, x, y, radius, **kwargs)
+                self.draw_label(cnv, ID, x, y, **kwargs)
+                self.draw_title(cnv, ID, x, y, radius + 0.5 * self.title_size, **kwargs)
+
         # ---- set calculated top-left in user units
         self.calculated_left = (x - self._u.radius) / self.units
         self.calculated_top = (x - self._u.radius) / self.units

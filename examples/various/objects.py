@@ -261,7 +261,7 @@ Text(common=header_font, x=8, y=13,
 Polygon(
     cx=4, cy=13, sides=8, radius=1.5,
     fill_stroke="#388D44",
-    radii=True, radii_stroke="azure", radii_stroke_width=3,
+    radii="*", radii_stroke="azure", radii_stroke_width=3,
     centre_shape=polygon(
         sides=8, radius=1,
         fill="#45A94A", stroke="azure", stroke_width=3

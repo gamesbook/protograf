@@ -177,9 +177,9 @@ PageBreak()
 # ---- polygon radii
 Blueprint()
 Text(common=txt, text="Polygon: radii (default & custom)")
-Polygon(cx=2, cy=4, sides=8, radius=1, radii=True)
+Polygon(cx=2, cy=4, sides=8, radius=1, radii="1,3,7")
 Polygon(
-    cx=2, cy=1, sides=10, radius=1, radii=True,
+    cx=2, cy=1, sides=10, radius=1, radii="*",
     radii_offset=0.75, radii_length=0.25, radii_stroke_width=1,
     dot=0.1, dot_stroke="red")
 PageBreak()
@@ -450,7 +450,7 @@ Star(cx=1, cy=1, radius=1,
 )
 Star(cx=2, cy=3, radius=1,
      rays=6,
-     show_radii=True,
+     show_radii="*",
      rotation=30,
 )
 Star(cx=3, cy=5, radius=1,

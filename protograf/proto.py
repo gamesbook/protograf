@@ -262,7 +262,9 @@ class CardShape(BaseShape):
             try:
                 if isinstance(the_new_ele, GroupBase):
                     for new_group_ele in the_new_ele:
-                        new_group_ele.draw(cnv=cnv, off_x=off_x, off_y=off_y, ID=ID, **kwargs)
+                        new_group_ele.draw(
+                            cnv=cnv, off_x=off_x, off_y=off_y, ID=ID, **kwargs
+                        )
                         cnv.commit()
                 else:
                     the_new_ele.draw(cnv=cnv, off_x=off_x, off_y=off_y, ID=ID, **kwargs)

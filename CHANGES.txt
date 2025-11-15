@@ -10,6 +10,8 @@ protograf Changes
 - Update docs for more references to lower-case commands
 - Add Default command
 - Support `group` property for card elements in a function
+- Add perbii shapes for Polygon
+- Add radii shapes for Polygon
 
 2025-11-02 (0.3.3)
 ------------------

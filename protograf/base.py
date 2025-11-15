@@ -3256,6 +3256,7 @@ class BaseShape:
             radii_dict = self.calculate_radii(cnv, centre, vertexes)
         for item in radii_shapes:
             if isinstance(item, tuple):
+                # ---- determine dirs for shape
                 _shape_fraction = 1.0
                 if len(item) < 2:
                     feedback(f"{err} - not {item}")
@@ -3263,6 +3264,8 @@ class BaseShape:
                     vertexes = get_circle_vertexes(item[0], centre)
                     radii_dict = self.calculate_radii(cnv, centre, vertexes)
                     _dirs = radii_dict.keys()
+                elif direction_group == DirectionGroup.POLYGONAL:
+                    _dirs = [int(item[0]) - 1]
                 else:
                     _dirs = tools.validated_directions(
                         item[0], direction_group, "direction"
@@ -3294,7 +3297,7 @@ class BaseShape:
                 if rotated:
                     # compass, rotation = geoms.angles_from_points(centre, shape_centre)
                     compass, _rotation = _radii.compass, _radii.angle
-                    # print(f"*** {self.__class__.__name__} {_dir} {compass=} {_rotation=}")
+                    # print(f"*** {self.__class__.__name__} {rotated=} {_dir} {compass=} {_rotation=}")
                     _rotation = compass - 180.0 + rotation
                 else:
                     _rotation = rotation
@@ -3359,8 +3362,10 @@ class BaseShape:
         err = "The perbii_shapes must contain direction(s) and shape"
         if direction_group != DirectionGroup.CIRCULAR:  # see below for calc.
             perbii_dict = self.calculate_perbii(cnv, centre, vertexes)
+
         for item in perbii_shapes:
             if isinstance(item, tuple):
+                # ---- determine dirs for shape
                 _shape_fraction = 1.0
                 if len(item) < 2:
                     feedback(f"{err} - not {item}")
@@ -3369,7 +3374,7 @@ class BaseShape:
                     perbii_dict = self.calculate_perbii(cnv, centre, vertexes)
                     _dirs = perbii_dict.keys()
                 elif direction_group == DirectionGroup.POLYGONAL:
-                    _dirs = perbii_dict.keys()
+                    _dirs = [int(item[0]) - 1]
                 else:
                     _dirs = tools.validated_directions(
                         item[0], direction_group, "direction"
@@ -3401,8 +3406,8 @@ class BaseShape:
                 if rotated:
                     # compass, rotation = geoms.angles_from_points(centre, shape_centre)
                     compass, _rotation = _perbii.compass, _perbii.angle
-                    # print(f"*** {self.__class__.__name__} {_dir} {compass=} {_rotation=}")
                     _rotation = compass - 180.0 + rotation
+                    # print(f"*** {self.__class__.__name__} {_dir} {compass=} {_rotation=}")
                 else:
                     _rotation = rotation
                 # ---- draw perbii shape
