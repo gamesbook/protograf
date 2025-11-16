@@ -280,4 +280,32 @@ Polyshape(
     scaling=0.8
 )
 
+Text(common=header_font, x=8, y=21,
+     text="D10: Polygon with radii & perbii shapes")
+d10 = Common(font_name="Times-Roman", font_size=20, stroke="red")
+ccom = Common(radius=0.15, fill="gold", label_size=6)
+Text(text="ABC", common=d10, cx=8, cy=23)
+Polygon(
+    cx=2, cy=21, sides=5, radius=1.75,
+    fill="linen",
+    stroke="black",
+    # perbii_shapes=[
+    #     (1, circle(common=ccom, label="1"), 0.66),
+    #     (2, circle(common=ccom, label="2"), 0.66),
+    #     (4, circle(common=ccom, label="4"), 0.66),
+    # ],
+    perbii_shapes=[
+        (1, text(text="d0", common=d10), 0.66),
+        (1, circle(common=ccom, label="1"), 0.66),
+        # (2, text(text="d2", common=d10), 0.5),
+        # (3, text(text="d3", common=d10), 0.5),
+        # (4, text(text="d4", common=d10), 0.5),
+        # (5, text(text="d5", common=d10), 0.5 ),
+    ],
+    perbii_shapes_rotated=True,
+    radii="*",
+    radii_stroke="silver", radii_stroke_width=1
+)
+
+
 Save()

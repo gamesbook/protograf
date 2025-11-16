@@ -1532,7 +1532,11 @@ class BaseShape:
     def draw(self, cnv=None, off_x=0, off_y=0, ID=None, **kwargs):
         """Draw an element on a given canvas."""
         self.set_abs_and_offset(cnv=cnv, off_x=off_x, off_y=off_y, ID=ID, **kwargs)
-        # feedback(f'### draw baseshape: {self._abs_x=} {self._abs_y=} {self._abs_cx=} {self._abs_cy=}')
+        if self.use_abs_c:
+            feedback(
+                f"### BaseShape draw: {self.__class__.__name__} {self._abs_cx=} {self._abs_cy=} {self.use_abs_c=}"
+            )
+        # feedback(f'### BaseShape draw: {self.__class__.__name__} {self._abs_x=} {self._abs_y=}')
 
     def check_settings(self) -> tuple:
         """Validate that the user-supplied parameters for choices are correct"""

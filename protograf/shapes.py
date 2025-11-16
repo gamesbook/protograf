@@ -1053,12 +1053,12 @@ class PolygonShape(BaseShape):
         return angles
 
     def calculate_perbii(
-        self, cnv, centre: Point, vertices: list, debug: bool = False
+        self, cnv, centre: Point, poly_vertices: list, debug: bool = False
     ) -> dict:
         """Calculate centre points for each Polygon edge and angles from centre.
 
         Args:
-            vertices (list):
+            poly_vertices (list):
                 list of Polygon's nodes as Points
             centre (Point):
                 the centre Point of the Polygon
@@ -1067,9 +1067,9 @@ class PolygonShape(BaseShape):
             dict of Perbis objects keyed on direction number
         """
         perbii_dict = {}
-        vcount = len(vertices) - 1
+        vcount = len(poly_vertices) - 1
         _perbii_pts = []
-        # vertices.reverse()
+        vertices = poly_vertices  # [::-1] # reversed
         for key, vertex in enumerate(vertices):
             if key == 0:
                 p1 = Point(vertex.x, vertex.y)
@@ -1097,19 +1097,19 @@ class PolygonShape(BaseShape):
         return perbii_dict
 
     def calculate_radii(
-        self, cnv, centre: Point, vertices: list, debug: bool = False
+        self, cnv, centre: Point, poly_vertices: list, debug: bool = False
     ) -> dict:
         """Calculate radii for each Polygon vertex and angles from centre.
 
         Args:
-            vertices: list of Polygon's nodes as Points
+            poly_vertices: list of Polygon's nodes as Points
             centre: the centre Point of the Polygon
 
         Returns:
             dict of Radius objects keyed on direction
         """
         radii_dict = {}
-        vertices.reverse()
+        vertices = poly_vertices  # [::-1] # reversed
         # print(f"*** POLYGON radii {centre=} {vertices=}")
         for key, vertex in enumerate(vertices):
             compass, angle = geoms.angles_from_points(centre, vertex)
@@ -1193,99 +1193,17 @@ class PolygonShape(BaseShape):
             rotation_point=rotation_point,
         )
 
-    def draw_perbii_OLD(
-        self,
-        cnv,
-        ID,
-        centre: Point,
-        vertices: list,
-        rotation: float = None,
-    ):
-        """Draw lines connecting the Polygon centre to the centre of each edge.
-
-        Def:
-            A perpendicular bisector ("perbii") of a chord is:
-            A line passing through the center of circle such that it divides the
-            chord into two equal parts and meets the chord at a right angle;
-            for a polygon, each edge is effectively a chord.
-        """
-        _perbii = []  # store angles to centre of edges (the "chords")
-        _perbii_pts = []  # store centre Point of edges
-        vcount = len(vertices) - 1
-        vertices.reverse()
-        for key, vertex in enumerate(vertices):
-            if key == 0:
-                p1 = Point(vertex.x, vertex.y)
-                p2 = Point(vertices[vcount].x, vertices[vcount].y)
-            else:
-                p1 = Point(vertex.x, vertex.y)
-                p2 = Point(vertices[key - 1].x, vertices[key - 1].y)
-            pc = geoms.fraction_along_line(p1, p2, 0.5)  # centre pt of edge
-            _perbii_pts.append(pc)
-            _, angle = geoms.angles_from_points(centre, pc)
-            angle = 360.0 - angle if angle > 0.0 else angle
-            _perbii.append(angle)
-        pb_offset = self.unit(self.perbii_offset, label="perbii offset") or 0
-        pb_length = (
-            self.unit(self.perbii_length, label="perbii length")
-            if self.perbii_length
-            else self.get_radius()
-        )
-        perbii_dict = self.calculate_perbii(cnv, centre, vertices)
-
-        # ---- set perbii waves
-        lkwargs = {}
-        lkwargs["wave_style"] = self.kwargs.get("perbii_wave_style", None)
-        lkwargs["wave_height"] = self.kwargs.get("perbii_wave_height", 0)
-        for key, pb_angle in enumerate(_perbii):
-            if self.perbii and key + 1 not in self.perbii:
-                continue
-            # points based on length of line, offset and the angle in degrees
-            edge_pt = _perbii_pts[key]
-            # print(f'*** {pb_angle=} {edge_pt=} {centre=}')
-            if pb_offset is not None and pb_offset != 0:
-                offset_pt = geoms.point_on_circle(centre, pb_offset, pb_angle)
-                end_pt = geoms.point_on_line(offset_pt, edge_pt, pb_length)
-                # print(f'*** {end_pt=} {offset_pt=}')
-                start_point = offset_pt.x, offset_pt.y
-                end_point = end_pt.x, end_pt.y
-            else:
-                start_point = centre.x, centre.y
-                end_point = edge_pt.x, edge_pt.y
-            # ---- draw a perbii line
-            draw_line(
-                cnv,
-                start_point,
-                end_point,
-                shape=self,
-                **lkwargs,
-            )
-
-        # ---- style all perbii
-        rotation_point = centre if rotation else None
-        # print(f"*** POLY perbii {rotation_point=} {rotation=}")
-        self.set_canvas_props(
-            index=ID,
-            stroke=self.perbii_stroke,
-            stroke_width=self.perbii_stroke_width,
-            stroke_ends=self.perbii_ends,
-            dashed=self.perbii_dashed,
-            dotted=self.perbii_dotted,
-            rotation=rotation,
-            rotation_point=rotation_point,
-        )
-
     def draw_radii(
         self,
         cnv,
         ID,
         centre: Point,
-        vertices: list,
+        poly_vertices: list,
         rotation: float = None,
     ):
         """Draw lines connecting the Polygon centre to each of the vertices."""
         _radii = []
-        vertices.reverse()
+        vertices = poly_vertices[::-1]  # reversed
         _dirs = tools.validated_directions(
             self.radii, DirectionGroup.POLYGONAL, "polygon radii", len(vertices)
         )
@@ -2889,6 +2807,11 @@ class TextShape(BaseShape):
 
     def __init__(self, _object=None, canvas=None, **kwargs):
         super(TextShape, self).__init__(_object=_object, canvas=canvas, **kwargs)
+        if self.kwargs.get("cx") and self.kwargs.get("cy"):
+            self.x = self.kwargs.get("cx")
+            self.y = self.kwargs.get("cy") - self.points_to_value(self.font_size)
+        # ---- RESET UNIT PROPS (last!)
+        self.set_unit_properties()
 
     def __call__(self, *args, **kwargs):
         """do something when I'm called"""
@@ -2907,10 +2830,10 @@ class TextShape(BaseShape):
         # ---- convert to using units
         x_t = self._u.x + self._o.delta_x
         y_t = self._u.y + self._o.delta_y
-        # ---- position the shape
-        if self.use_abs:
-            x_t = self._abs_x
-            y_t = self._abs_y
+        # ---- overrides if shape centred
+        if self.use_abs_c:
+            x_t = self._abs_cx
+            y_t = self._abs_cy + self.font_size / 2.0
         height, width = 0, 0
         if self.height:
             height = self._u.height
@@ -2986,12 +2909,11 @@ class TextShape(BaseShape):
             #     render_mode=0, miter_limit=1, border_width=1, expandtabs=8,
             #     align=TEXT_ALIGN_LEFT, rotate=0, lineheight=None, morph=None,
             #     stroke_opacity=1, fill_opacity=1, oc=0)
-            # ---- rotation
             if self.rotation is None or self.rotation == 0:
                 text_rotation = 0
             else:
                 text_rotation = self.rotation // 90 * 90  # multiple of 90 for HTML/Box
-            # ---- text styles - htmlbox & textbox
+            # text styles
             # https://pymupdf.readthedocs.io/en/latest/page.html#Page.insert_htmlbox
             # https://pymupdf.readthedocs.io/en/latest/shape.html#Shape.insert_textbox
             try:
@@ -3078,11 +3000,12 @@ class TextShape(BaseShape):
                 current_page.insert_htmlbox(rect, _text, **keys)
             except ValueError as err:
                 feedback(f"Cannot create Text - {err}", True)
-        # ---- text string
+        # ---- PLAIN Text string
         else:
             keys = {}
             keys["rotation"] = self.rotation
-            # feedback(f"*** Text PLAIN {x_t=} {y_t=} {_text=} {keys=}")
+            if self.use_abs_c:
+                feedback(f"*** Text PLAIN {x_t=} {y_t=} {_text=} {keys=}")
             self.draw_multi_string(cnv, x_t, y_t, _text, **keys)  # use morph to rotate
 
 
