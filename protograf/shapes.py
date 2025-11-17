@@ -2839,8 +2839,8 @@ class TextShape(BaseShape):
             height = self._u.height
         if self.width:
             width = self._u.width
-        # TODO => text rotation
-        # rotation = kwargs.get("rotation", self.rotation)
+        # ---- text rotation set by draw()
+        self.rotation = kwargs.get("rotation", self.rotation)
         # ---- set canvas
         self.set_canvas_props(index=ID)
         # ---- overrides for self.text / text value

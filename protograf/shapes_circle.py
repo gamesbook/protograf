@@ -71,7 +71,6 @@ class CircleShape(BaseShape):
     def calculate_centre(self) -> Point:
         """Calculate centre of Circle."""
         if self.use_abs_c:
-            print(f"centred circle {self.fill=}")
             self.x_c = self._abs_cx
             self.y_c = self._abs_cy
         else:

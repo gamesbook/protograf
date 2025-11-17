@@ -289,11 +289,6 @@ Polygon(
     cx=2, cy=21, sides=5, radius=1.75,
     fill="linen",
     stroke="black",
-    # perbii_shapes=[
-    #     (1, circle(common=ccom, label="1"), 0.66),
-    #     (2, circle(common=ccom, label="2"), 0.66),
-    #     (4, circle(common=ccom, label="4"), 0.66),
-    # ],
     perbii_shapes=[
         (1, text(text="d0", common=d10), 0.66),
         (1, circle(common=ccom, label="1"), 0.66),
@@ -306,6 +301,5 @@ Polygon(
     radii="*",
     radii_stroke="silver", radii_stroke_width=1
 )
-
 
 Save()
