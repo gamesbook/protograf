@@ -2807,6 +2807,7 @@ class TextShape(BaseShape):
 
     def __init__(self, _object=None, canvas=None, **kwargs):
         super(TextShape, self).__init__(_object=_object, canvas=canvas, **kwargs)
+        self.valign = None
         if self.kwargs.get("cx") and self.kwargs.get("cy"):
             self.x = self.kwargs.get("cx")
             self.y = self.kwargs.get("cy") - self.points_to_value(self.font_size)
@@ -2833,7 +2834,9 @@ class TextShape(BaseShape):
         # ---- overrides if shape centred
         if self.use_abs_c:
             x_t = self._abs_cx
-            y_t = self._abs_cy + self.font_size / 2.0
+            y_t = self._abs_cy #+ self.font_size / 2.0
+            self.align = 'centre'  # NB otherwise base.draw_multi_string() will shift x
+            self.valign = 'centre'
         height, width = 0, 0
         if self.height:
             height = self._u.height
@@ -3004,8 +3007,8 @@ class TextShape(BaseShape):
         else:
             keys = {}
             keys["rotation"] = self.rotation
-            if self.use_abs_c:
-                feedback(f"*** Text PLAIN {x_t=} {y_t=} {_text=} {keys=}")
+            # if self.use_abs_c:
+            #     feedback(f"*** Text PLAIN {x_t=} {y_t=} {_text=} {keys=}")
             self.draw_multi_string(cnv, x_t, y_t, _text, **keys)  # use morph to rotate
 
 

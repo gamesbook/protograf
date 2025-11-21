@@ -826,3 +826,4 @@ class CircleShape(BaseShape):
         # ---- set calculated top-left in user units
         self.calculated_left = (self.x_c - self._u.radius) / self.units
         self.calculated_top = (self.y_c - self._u.radius) / self.units
+        # print(f'*** CIRCLE {self.x_c=} {self.y_c=}')

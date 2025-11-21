@@ -2542,14 +2542,17 @@ class BaseShape:
             Drawing using HTML CSS-styling is handled in the Text shape
         """
 
-        def move_string_start(text, point, font, fontsize, align):
+        def move_string_start(text, point, font, fontsize, align, valign):
             # compute length of written text under font and fontsize:
             tl = font.text_length(text, fontsize=fontsize)
+            py = point.y
+            if valign in ["centre", "center", "c"]:
+                py = point.y + fontsize / 2.0
             # insertion point ("origin"):
             if align in ["centre", "center", "c"]:
-                origin = muPoint(point.x - tl / 2.0, point.y)
+                origin = muPoint(point.x - tl / 2.0, py)
             elif align in ["right", "r"]:
-                origin = muPoint(point.x - tl, point.y)
+                origin = muPoint(point.x - tl, py)
             else:
                 origin = point
             return origin
@@ -2580,7 +2583,7 @@ class BaseShape:
         # ---- draw
         point = muPoint(xm, ym)
         if self.align:
-            point = move_string_start(string, point, font, keys["fontsize"], self.align)
+            point = move_string_start(string, point, font, keys["fontsize"], self.align, self.valign)
         if rotation:
             dx = pymupdf.get_text_length(string, fontsize=keys["fontsize"]) / 2
             midpt = muPoint(point.x + dx, point.y)

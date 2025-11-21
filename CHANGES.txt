@@ -12,6 +12,8 @@ protograf Changes
 - Support `group` property for card elements in a function
 - Add perbii shapes for Polygon
 - Add radii shapes for Polygon
+- Add sizes for flash cards
+- Enable use of Text for centred, perbii and radii shapes
 
 2025-11-02 (0.3.3)
 ------------------
