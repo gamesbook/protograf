@@ -10,15 +10,15 @@ Why do this?
 
 I realize that there are many software programs out there that are used for
 creating graphics and layouts for games, some of which are very sophisticated
-indeed; for example, Photoshop, Inkscape as well as various ones designed for
-the Mac which obviously excels in this field.
+indeed; for example, Photoshop, CorelDraw, Inkscape as well as various ones
+designed for the Mac which obviously excels in this field.
 
 However for someone like myself, who is not a graphics designer and doesn't
 want to spend time learning all the ins-and-outs of these programs, I wanted
 a tool that was fairly flexible but still in line with my own capabilities
 and ambitions.
 
-To be clear: *protograf* is not a tool that in any way competes with
+To be clear: *protograf* is **not** a tool that in any way competes with
 full-scale graphics or art programs, and if you already know and use such
 programs, you may just want to skip this one...
 
@@ -52,8 +52,9 @@ shapes such as circles, rectangles, stars etc. - as well as lines and text.
 Each of these can be customized in terms of their color, size, shape etc.
 From these primitive graphics, more complex ones can be built up.
 
-*protograf* provides acommands to allow to layout shapes onto various
-"virtual" grids.
+*protograf* also provides commands to allow to layout shapes onto various
+"virtual" grids, which in turn can be used to supprt visible grids, such
+as various hexagonal layouts.
 
 *protograf* can also generate cards, using data from Excel or CSV files,
 or other sources such Google Sheets or the BGG API. There is a strong emphasis

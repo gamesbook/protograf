@@ -734,7 +734,7 @@ class HexShape(BaseShape):
             pc = geoms.fraction_along_line(p1, p2, 0.5)  # centre pt of edge
             _perbii_pts.append(pc)  # debug use
             compass, angle = geoms.angles_from_points(centre, pc)
-            # print(f"*** HEX *** perbii {key=} {pc=} {compass=} {angle=}")
+            # print(f"*** HEX *** perbii {directions[key]=} {pc=} {compass=} {angle=}")
             _perbii = Perbis(
                 point=pc,
                 direction=directions[key],
@@ -1436,6 +1436,7 @@ class HexShape(BaseShape):
                         self.vertices,
                         Point(self.x_d, self.y_d),
                         direction_group,
+                        0,  # "rotation" - but HexShape cannot be rotated
                         self.radii_shapes_rotated,
                     )
             if item == "perbii_shapes":
@@ -1448,6 +1449,7 @@ class HexShape(BaseShape):
                         self.vertices,
                         Point(self.x_d, self.y_d),
                         direction_group,
+                        0,  # "rotation" - but HexShape cannot be rotated
                         self.perbii_shapes_rotated,
                     )
             if item == "centre_shape" or item == "center_shape":

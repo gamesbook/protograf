@@ -225,7 +225,24 @@ Most modern web browsers should also be able to open and display PDF files.
     at https://www.sumatrapdfreader.org/download-free-pdf-viewer |dash|
     is a useful one for Windows users, as it supports "live reloading"
     i.e. each time you make changes to your **protograf** script the PDF
-    will automatically refresh if the Sumatra PDF viewer is running.
+    will automatically refresh if the script output is already loaded into
+    a running instance of the Sumatra PDF viewer.
+
+Text Editor
+-----------
+
+When you create and edit your scripts, you must **not** use a word processor
+such as "Word", "Pages" or "LibreOffice" |dash| but a text file editor.
+
+For Windows users, it is suggested that you install
+`NotePad++ <https://notepad-plus-plus.org/>`_ which is the recommended
+Windows editor for creating **protograf** scripts |dash| if you do not
+already have a tool for editing Python scripts.
+
+On OS X, you could use *TextEdit* or `CotEditor <https://coteditor.com/>`_.
+
+A useful editor should be able to color-code your file to make it easier
+to work with.
 
 Core Fonts (optional)
 ---------------------
@@ -235,14 +252,6 @@ Fonts - see http://mscorefonts2.sourceforge.net/ |dash| Ubuntu users
 can install these via::
 
    sudo apt-get install ttf-mscorefonts-installer
-
-Text Editor
------------
-
-For Windows users, it is suggested that you install
-`NotePad++ <https://notepad-plus-plus.org/>`_ which is the recommended
-Windows editor for creating **protograf** scripts |dash| if you do not
-already have a tool for editing Python scripts.
 
 
 Installing **protograf**

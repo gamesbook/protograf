@@ -49,17 +49,19 @@ circ1 = circle(cx=1.4, cy=1.4, radius=0.15, stroke="black", stroke_width=1, fill
 
 # text labels
 ratings = Common(font_name="Helvetica", font_size=18, x=1.4, y=2.4)
-value = text(ratings, text=T('{{VALUE}}'))
+value = text(text=T('{{VALUE}}'), common=ratings)
 
 classify = Common(font_name="Helvetica", font_size=12, x=1.4, y=0.8)
-size = text(common=classify, text=T('{{SIZE}}'))
+size = text(text=T('{{SIZE}}'), common=classify)
 
 ident = text(
     text=T('{{ID}}'),
     font_name="Helvetica", font_size=12,
     x=0.25, y=0.7,
     width=0.8, height=1.4,
-    wrap=True, align='centre',rotation=90)
+    wrap=True,
+    align='centre',
+    rotation=90)
 
 # unit symbols - types
 inf = group(out, lu, ld)

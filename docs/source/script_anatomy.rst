@@ -5,7 +5,7 @@ Script Anatomy
 .. |dash| unicode:: U+2014 .. EM DASH SIGN
 
 A "script" is the short-cut name for a file containing a list of instructions
-that will be read and processed by Python.  The script filename is usually given
+that will be read and processed by Python. The script filename is usually given
 an extension of ``.py``
 
 .. HINT::
@@ -42,7 +42,6 @@ A script will normally start with a `Create command`_, then contain a series
 of `other commands`_ with the instructions for your particular needs (each
 command can run over multiple lines).
 
-
 .. HINT::
 
     If your needs are more complex, you have the options of embedding "pure"
@@ -50,11 +49,11 @@ command can run over multiple lines).
 
 If the design you are working on requires multiple pages, then a
 `PageBreak command`_ can be inserted, followed again by the specific commands
-you need.
+you need.  A ``PageBreak`` is **not** needed when working with `Card Decks`_.
 
 The final command in the script will be the `Save command`_, which triggers the
-creation of the output; by default a PDF file |dash| optional PNG or GIF output
-is available as well.
+creation of the output; by default a PDF file |dash| optional PNG, SVG or
+animated GIF output is available as well.
 
 .. _key-commands:
 
@@ -73,9 +72,9 @@ Create Command
 `^ <key-commands_>`_
 
 The ``Create()`` command is the essential command that **must** appear first
-in every script.
+in every script (unless you choose the `Load Command`_ instead).
 
-``Create()`` to support all of the
+``Create()`` sets up the document so that it can support, or use, all of the
 elements that will appear after it.
 
 .. HINT::
@@ -210,6 +209,9 @@ To customise the command, set its properties as follows:
   extension
 - **framerate** - the delay in seconds between each "page" of a GIF image; by
   default this is ``1`` second
+- **stop** - when set to ``True`` will cause the script to stop at that point,
+  after saving the file |dash| this can be useful when you have a long script
+  and want to verify output with adding or displaying all the elements
 
 
 Example 1. Save PNG
@@ -225,9 +227,10 @@ Here is an example of a customised ``Save`` command:
         names=['pageOne', None, 'pageThree']
     )
 
-In this example, **no** PNG file will be created from the second page, while
-``.png`` files named ``pageOne.png`` and ``pageThree.png`` will be created
-from the first and third pages of the PDF file.
+In this example, assuming that three pages are created by the script, **no**
+PNG file will be created from the second page, while ``.png`` files named
+``pageOne.png`` and ``pageThree.png`` will be created from the first and
+third pages of the PDF file.
 
 Example 2. Save GIF
 ~~~~~~~~~~~~~~~~~~~
@@ -317,8 +320,8 @@ The ``Load()`` command is useful in conjunction with the
 :ref:`Extract <the-extract-command>` command.
 
 
-Shape, Grid,  Card and Deck Commands
-------------------------------------
+Shape, Grid, Deck & Card Commands
+---------------------------------
 
 There are numerous other commands which are either used to draw shapes, or
 sets of shapes, or to control how and where sets of shapes appear on a page.
@@ -326,7 +329,7 @@ See:
 
 - :doc:`Core Shapes <core_shapes>`
 - :doc:`Object commands (specialised shapes) <objects>`
-- :doc:`Card and Deck commands <card_decks>`
+- :doc:`Deck and Card commands <card_decks>`
 - :doc:`Further script commands <additional_commands>`
 - :doc:`Layout <layouts>` commands
 - :doc:`Hexagonal Grid <hexagonal_grids>` commands
@@ -366,7 +369,8 @@ Use a pair of triple-quotes to surround all the lines of comments:
     """
     Circle(stroke_width=5)
 
-Make sure the quotes appear at the **start** of the lines they are used in.
+Make sure the triple quotes appear at the **start** of the lines in which
+they are used.
 
 
 Drawing vs Assigning
@@ -493,7 +497,7 @@ Making Mistakes
 `↑ <table-of-contents-anat_>`_
 
 It is, unfortunately, all too easy to make mistakes while writing scripts.
-Some common kinds of mistakes are listed below - these are in no way
+Some common types of mistakes are listed below |dash| these are in no way
 meant to be comprehensive!
 
 Supplying the script an **incorrect value**, for example, giving the
@@ -514,8 +518,8 @@ because those two letters are located right next to each other on a
 keyboard and the letters are a little similar. In this case, the script will
 "fail silently" because properties that don’t exist are simply ignored.
 This kind of mistake is much harder to spot; often because the default value
-will then be used instead and it will seem as though the script is drawing
-something incorrectly.
+will then be used instead and it will seem as though the script is just
+drawing something incorrectly.
 
 Supplying the script with a **duplicate property**, for example:
 

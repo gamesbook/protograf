@@ -1950,6 +1950,7 @@ def Save(**kwargs):
       exported as PNG files;  the names of the files are either derived using the
       PDF filename, with a dash (-) followed by the page number OR set by the user
       with ``card_name`` property in the Deck()
+    - stop (bool): if set to ``True`` will cause all the script to stop at this point
 
     Notes:
 
@@ -1967,6 +1968,7 @@ def Save(**kwargs):
     cards = kwargs.get("cards", False)  # export individual cards as PNG
     output = kwargs.get("output", None)  # export document into this format e.g. SVG
     local_filename = kwargs.get("filename", None)  # override Create()
+    stop_here = kwargs.get("stop", False)  # stop script
 
     # ---- directory
     if globals.pargs.directory:
@@ -2072,6 +2074,9 @@ def Save(**kwargs):
     globals.page_count = 0
     globals.extracts = {}
     page_setup()
+    # ---- possibly stop?
+    if stop_here:
+        sys.exit(0)
 
 
 def save(**kwargs):

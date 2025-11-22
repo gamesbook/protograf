@@ -238,6 +238,7 @@ class BaseCanvas:
         self.style = self.defaults.get("style", None)  # HTML/CSS style
         self.wrap = self.defaults.get("wrap", False)
         self.align = self.defaults.get("align", "centre")  # centre,left,right,justify
+        self.valign = self.defaults.get("Valign", None)  # centre,top,bottom
         self._alignment = TEXT_ALIGN_LEFT  # see to_alignment()
         # ---- icon font
         self.icon_font_name = self.defaults.get("font_name", DEFAULT_FONT)
@@ -852,6 +853,7 @@ class BaseShape:
         self.style = kwargs.get("style", base.style)  # HTML/CSS style
         self.wrap = kwargs.get("wrap", base.wrap)
         self.align = kwargs.get("align", base.align)  # centre,left,right,justify
+        self.valign = kwargs.get("valign", base.valign)  # centre,top,bottom
         self._alignment = TEXT_ALIGN_LEFT  # see to_alignment()
         # ---- icon font
         self.icon_font_name = kwargs.get("icon_font_name", base.icon_font_name)
@@ -2537,28 +2539,49 @@ class BaseShape:
             * outlined (bool): draw outline without fill
             * invisible (bool): do not draw text at all
             * stroke_width (float): thickness of text outline
+            * absolute (bool): the xm and ym value represent absolute centre
 
         Notes:
             Drawing using HTML CSS-styling is handled in the Text shape
         """
 
-        def move_string_start(text, point, font, fontsize, align, valign):
+        def move_string_start(
+            text, point, font, fontsize, rotation, align, valign, absolute
+        ):
             # compute length of written text under font and fontsize:
             tl = font.text_length(text, fontsize=fontsize)
             py = point.y
-            if valign in ["centre", "center", "c"]:
-                py = point.y + fontsize / 2.0
-            # insertion point ("origin"):
-            if align in ["centre", "center", "c"]:
-                origin = muPoint(point.x - tl / 2.0, py)
-            elif align in ["right", "r"]:
-                origin = muPoint(point.x - tl, py)
+            px = point.x
+            # self.dot = 0.01; self.draw_dot(canvas, px, py, fill_dot="dimgrey")
+            if absolute:
+                # calc rotation point
+                if rotation < 0:
+                    ante_rotation = 90 - rotation
+                else:
+                    ante_rotation = 90 - rotation
+                rp = geoms.point_from_angle(point, fontsize / 3.0, ante_rotation)
+                # get origin (lower-left for text string)
+                py = rp.y
+                px = rp.x - tl / 2.0
+                # flip
+                if abs(round(rotation, 6)) == 180.0:
+                    py = point.y - fontsize / 3.0
+                    px = point.x - tl / 2.0
+                origin = muPoint(px, py)
+                # feedback(f"### move abs {tl=} {point=} {origin=}")
+                # self.dot = 0.03; self.draw_dot(canvas, origin.x, origin.y, fill_dot="green", stroke_dot="green")
             else:
-                origin = point
-            return origin
+                if valign in ["centre", "center", "c"]:
+                    py = point.y + fontsize / 2.0
+                if align in ["centre", "center", "c"]:
+                    origin = muPoint(px - tl / 2.0, py)
+                elif align in ["right", "r"]:
+                    origin = muPoint(px - tl, py)
+                else:
+                    origin = point
+                # feedback(f"### move relative {align=} {valign=} {point=} {origin=}")
+            return origin  # lower-left for text string
 
-        # feedback(f"### {string=} {kwargs=} {rotation=}")
-        # if string == '{{sequence}}':  break point()
         if not string:
             return
         # ---- deprecated
@@ -2574,26 +2597,49 @@ class BaseShape:
         mvy = copy.copy(ym)
         # ---- text properties
         keys = self.text_properties(**kwargs)
+        # feedback(f"\n### {string=} {kwargs=} {rotation=} {kwargs.get('absolute')=}")
         keys.pop("align")
-        # TODO - recalculate xm, ym based on align and text width
-        # keys["align"] = align or self.align
         font, _, _, _ = tools.get_font_by_name(keys["fontname"])
         keys["fontname"] = keys["mu_font"]
         keys.pop("mu_font")
-        # ---- draw
-        point = muPoint(xm, ym)
-        if self.align:
-            point = move_string_start(string, point, font, keys["fontsize"], self.align, self.valign)
+        # ---- calculate start
+        if kwargs.get("absolute"):
+            point = move_string_start(
+                string,
+                muPoint(xm, ym),
+                font,
+                keys["fontsize"],
+                rotation,
+                None,
+                None,
+                True,
+            )
+        elif self.align:
+            point = move_string_start(
+                string,
+                muPoint(xm, ym),
+                font,
+                keys["fontsize"],
+                rotation,
+                self.align,
+                self.valign,
+                False,
+            )
+        else:
+            point = muPoint(xm, ym)
+        # ---- rotation transform
         if rotation:
-            dx = pymupdf.get_text_length(string, fontsize=keys["fontsize"]) / 2
+            dx = font.text_length(string, fontsize=keys["fontsize"]) / 2
             midpt = muPoint(point.x + dx, point.y)
+            # feedback(f"### multistring {rotation} {string=} {midpt=} ")
             # self.dot = 0.05; self.draw_dot(canvas, midpt.x, midpt.y)
             morph = (midpt, Matrix(rotation))
         else:
             morph = None
 
+        # ---- draw text
         try:
-            # insert_text(
+            # insert_text(  # pymupdf function
             #     point, text, *, fontsize=11, fontname='helv', fontfile=None,
             #     set_simple=False, encoding=TEXT_ENCODING_LATIN, color=None,
             #     lineheight=None, fill=None, render_mode=0, miter_limit=1,
@@ -2784,14 +2830,13 @@ class BaseShape:
             if isinstance(canvas, muShape):
                 canvas.commit()
 
-    def draw_dot(self, canvas, x, y):
+    def draw_dot(self, canvas, x, y, **kwargs):
         """Draw a small dot on a shape (normally the centre)."""
         if self.dot:
-            # print(f'*** draw_dot {x=} {y=}' )
+            # print(f'*** draw_dot {x=} {y=} {kwargs=}' )
             dot_size = self.unit(self.dot)
-            kwargs = {}
-            kwargs["fill"] = self.dot_stroke
-            kwargs["stroke"] = self.dot_stroke
+            kwargs["fill"] = kwargs.get("fill_dot", self.dot_stroke)
+            kwargs["stroke"] = kwargs.get("stroke_dot", self.dot_stroke)
             canvas.draw_circle((x, y), dot_size)
             self.set_canvas_props(cnv=canvas, index=None, **kwargs)
 

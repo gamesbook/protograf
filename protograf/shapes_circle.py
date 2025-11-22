@@ -757,6 +757,7 @@ class CircleShape(BaseShape):
                         self.vertexes,
                         Point(self.x_c, self.y_c),
                         DirectionGroup.CIRCULAR,
+                        kwargs["rotation"],
                         self.radii_shapes_rotated,
                     )
             if item == "centre_shape" or item == "center_shape":
