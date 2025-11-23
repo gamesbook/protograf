@@ -15,8 +15,8 @@ or two basic scripts on your own, along the lines described in the
 
 -  `Names and Naming`_
 -  `Value Types: Text, Numbers and Booleans`_
--  `Assigned Names`_
 -  `Case-sensitivity`_
+-  `Assigned Names`_
 -  `Calculations`_
 -  `Changeable Values`_
 -  `Quote Marks in Text`_
@@ -94,38 +94,6 @@ There are not many constants in **protograf** but two that are useful are:
 Any constants that are available will be written in capital letters, following
 the convention established for Python.
 
-
-.. _value-types-concept:
-
-Value Types: Text, Numbers and Booleans
-=======================================
-`↑ <table-of-contents-addcon_>`_
-
-An important concept in **protograf** is understanding the different types
-of values and how they are used.
-
-Values are typically associated with a property, and affect how a shape
-appears, as discussed in :doc:`Basic Concepts <basic_concepts>`.
-
-Text - whether individual letters or words - is often called a *string*, and
-is wrapped in quotes - ``"`` - at the start and end of the string.
-The string can contain numbers as well - ``"ABC 123"``. Strings are usually
-**not** used for calculations, although some can be converted into numbers.
-Also see below on `using quotes in text <Quotes in Text>`_.
-
-Numbers are either *integers* |dash| "whole" or "counting" numbers, such as
-``21`` or ``100`` |dash| or *floats* which are numbers with fractions, such as
-``3.141``. In most cases,  **protograf** will handle these differences for you.
-
-Booleans are commonly referred to a "true" or "false" values. In Python, the
-reserved names ``True`` and ``False`` can be used whenever such values are
-required.  Some of the properties for some commands require a ``True`` value
-to be set before they are activated.
-
-Text and numbers are often grouped into `Lists`_ and this is an important
-concept to understand.
-
-
 .. _assigned-names-concept:
 
 Assigned Names
@@ -159,7 +127,9 @@ Case-sensitivity
 
 **protograf**, like Python, is case-sensitive |dash| unlike some computer
 languages or, for example, the file names that are used in Windows; so a
-lowercase name is **NOT** the same as an uppercase version of it.
+lowercase name is **NOT** the same as an uppercase or titlecase version
+of it  i.e. ``CASE``, ``Case`` and ``case`` are all considered "different"
+in **protograf**, even though we might think this is the same word!
 
 For example:
 
@@ -176,6 +146,46 @@ will create and draw a ``Rectangle`` shape on the page; but:
 will create a ``Rectangle`` shape, and assign a reference to it in the
 property named ``area`` |dash| for use later on in the script |dash| but
 will **not** draw the Rectangle on the page at this point in the script.
+
+.. HINT::
+
+    Lowercase use versions of :ref:`command <command-concept>` names is
+    common when :doc:`working with cards <card_deck_introduction>` |dash|
+    you would use ``rectangle()`` rather than ``Rectangle()`` when defining
+    such a shape to appear on one or more cards; the reason being is that
+    the rectangle should not be drawn at that point in the script, but
+    rather only when the card itself is drawn.
+
+
+.. _value-types-concept:
+
+Value Types: Text, Numbers and Booleans
+=======================================
+`↑ <table-of-contents-addcon_>`_
+
+An important concept in **protograf** is understanding the different types
+of values and how they are used.
+
+Values are typically associated with a property, and affect how a shape
+appears, as discussed in :doc:`Basic Concepts <basic_concepts>`.
+
+Text - whether individual letters or words - is often called a *string*, and
+is wrapped in quotes - ``"`` - at the start and end of the string.
+The string can contain numbers as well - ``"ABC 123"``. Strings are usually
+**not** used for calculations, although some can be converted into numbers.
+Also see below on `using quotes in text <Quotes in Text>`_.
+
+Numbers are either *integers* |dash| "whole" or "counting" numbers, such as
+``21`` or ``100`` |dash| or *floats* which are numbers with fractions, such as
+``3.141``. In most cases,  **protograf** will handle these differences for you.
+
+Booleans are commonly referred to a "true" or "false" values. In Python, the
+reserved names ``True`` and ``False`` can be used whenever such values are
+required.  Some of the properties for some commands require a ``True`` value
+to be set before they are activated.
+
+Text and numbers are often grouped into `Lists`_ and this is an important
+concept to understand.
 
 
 .. _calculation-concept:

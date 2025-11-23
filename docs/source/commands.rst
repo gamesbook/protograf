@@ -7,6 +7,9 @@ Commands List
 This list provides an alphabetic summary of all the
 :ref:`commands <command-concept>` specific to **protograf**.
 
+    Remember that using certain commands with a **lowercase initial**
+    defers their activation to later in the script!
+
 This list is not intended to be used for learning, but just provides
 a handy cross-reference to the detailed information for that command.
 
@@ -30,7 +33,8 @@ a handy cross-reference to the detailed information for that command.
 -  :ref:`Circle <circle-command>` * - a geometric shape that can be drawn on a page
    (see also further :ref:`customisation options <circleIndex>`)
 -  :ref:`Chord <chord-command>` * - a geometric shape that can be drawn on a page
--  :ref:`Common <the-common-command>` - set the properties for any shape that can be drawn on a page
+-  :ref:`Common <the-common-command>` - set the properties that will be the same for
+   any shape using them
 -  :ref:`Counter <the-countersheet-command>`  - details for a counter that is part
    of a :ref:`countersheet <the-countersheet-command>`
 -  :ref:`countersheet <the-countersheet-command>`  - details for a
@@ -46,6 +50,8 @@ a handy cross-reference to the detailed information for that command.
 -  :ref:`D6 <d6-object>` * - create top-down view of a six-sided die
 -  :ref:`Deck <the-deck-command>`  - details for a deck, containing one or
    more :ref:`cards <the-card-command>`
+-  :ref:`Default <the-default-command>` - set the properties that can be used by
+   any shape
 -  :ref:`Dot <dot-command>` * - a geometric shape that can be drawn on a page
 -  :ref:`DotGrid <dotgrid-command>` - a set, or group, of dots that can be drawn on a page
 -  :ref:`Ellipse <ellipse-command>` * - a geometric shape that can be drawn on a page
@@ -77,6 +83,7 @@ a handy cross-reference to the detailed information for that command.
 -  :ref:`PageBreak <pagebreak-command>` - set the start of a new page in
    the document; not required for a :ref:`Deck <the-deck-command>`
 -  :ref:`Pentomino <pentominoesOver>` * - a compound shape made up of five squares
+-  :ref:`Pod <pod-command>` * - a geometric shape that can be drawn on a page
 -  :ref:`Polygon <polygon-command>` * - a geometric shape that can be drawn on a page
 -  :ref:`Polyline <polyline-command>` * - a geometric shape that can be drawn on a page
 -  :ref:`Polyomino <polyominoesOver>` * - a compound shape made up of one or more squares

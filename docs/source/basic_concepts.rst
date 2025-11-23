@@ -116,24 +116,26 @@ The "command" concept
 
 Instructions in **protograf** are termed *commands*.
 
-Commands are usually written with an initial capital letter. They are
-effectively "imperative" in nature, causing something to happen;
+Commands are usually written with an initial **capital** letter. They are
+effectively "imperative" in nature, causing something to happen right away;
 for example:
 
 - ``Save()`` - instructs the program to save the output to file
-- ``Circle()`` - instructs the program to draw a circle
+- ``Circle()`` - instructs the program to draw a circle at this point in the
+  script
 
 The :doc:`summary list of all commands <commands>` is a useful reference
 for checking what is available.
 
-.. HINT::
+.. IMPORTANT::
 
-   In some cases you will use the same command but with a lowercase initial
-   |dash| often when defining :doc:`shapes <core_shapes>` for cards when
-   constructing decks (see :doc:`Card Decks <card_decks>`).
+   In some cases you will use the same command but with a **lowercase initial**
+   |dash| often when defining :doc:`shapes <core_shapes>` (including images and
+   text) for cards when constructing decks
+   (see :doc:`Working with Cards <card_deck_introduction>`).
 
-   When used in this way, the command is not carried out straightaway, but
-   deferred for activation for later on in the script.
+   When used in this way, the command is **not** carried out straightaway, but
+   deferred for activation later on in the script.
 
 
 .. _element-concept:
@@ -168,7 +170,7 @@ Descriptions of all of these kinds of shapes, and how to create and use them,
 are provided in the section on :doc:`core shapes <core_shapes>`.
 
 Other *elements* include things like :doc:`hexagonal grids <hexagonal_grids>`,
-regular :doc:`layouts <layouts>` and :doc:`decks of cards <card_decks>`.
+regular :doc:`layouts <layouts>` and :doc:`cards <card_deck_introduction>`.
 
 .. _element-properties:
 

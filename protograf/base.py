@@ -15,6 +15,7 @@ import math
 import os
 from pathlib import Path, PosixPath
 from sys import platform
+import traceback
 from urllib.parse import urlparse
 
 # third party
@@ -237,6 +238,7 @@ class BaseCanvas:
         self.style = self.defaults.get("style", None)  # HTML/CSS style
         self.wrap = self.defaults.get("wrap", False)
         self.align = self.defaults.get("align", "centre")  # centre,left,right,justify
+        self.valign = self.defaults.get("Valign", None)  # centre,top,bottom
         self._alignment = TEXT_ALIGN_LEFT  # see to_alignment()
         # ---- icon font
         self.icon_font_name = self.defaults.get("font_name", DEFAULT_FONT)
@@ -338,7 +340,7 @@ class BaseCanvas:
         self.align_horizontal = self.defaults.get("align_horizontal", None)
         self.image_location = None
         self.operation = None  # operation on image
-        # ---- line / ellipse / bezier / sector
+        # ---- line / ellipse / bezier / sector / polygon / pod
         self.length = self.defaults.get("length", self.default_length)
         self.angle = self.defaults.get("angle", 0.0)  # also triangle
         self.angle_width = self.defaults.get("angle_width", 90.0)
@@ -377,6 +379,12 @@ class BaseCanvas:
         self.y_2 = self.defaults.get("y2", 1.0)
         self.x_3 = self.defaults.get("x3", 1.0)
         self.y_3 = self.defaults.get("y3", 1.0)
+        # ---- pod
+        self.dx_1 = self.defaults.get("dx1", None)
+        self.dy_1 = self.defaults.get("dy1", None)
+        self.dx_2 = self.defaults.get("dx2", None)
+        self.dy_2 = self.defaults.get("dy2", None)
+        self.centre_line = self.defaults.get("centre_line", False)
         # ---- rectangle / card
         self.rounding = self.defaults.get("rounding", 0.0)
         self.rounded = self.defaults.get("rounded", False)  # also line end
@@ -681,14 +689,28 @@ class BaseShape:
     """Base class for objects drawn on a given canvas aka a pymupdf_utils_Shape"""
 
     def __init__(self, _object: muShape = None, canvas: BaseCanvas = None, **kwargs):
-        self.kwargs = kwargs
+        # print(''.join(traceback.format_stack()))
+        # feedback(f'### BaseShape 1 {type(self).__name__} {kwargs=}')
+        # inject and then override kwargs supplied by DefaultShape
+        if kwargs.get("default"):
+            try:
+                if kwargs.get("default"):
+                    self.kwargs = kwargs["default"]._default_kwargs | kwargs
+            except Exception:
+                self.kwargs = kwargs
+        else:
+            self.kwargs = kwargs
+        self.kwargs.pop("default", None)
+        # feedback(f'### BaseShape 2 {type(self).__name__} {self.kwargs=}')
         # inject and overwrite Shape's own kwargs with those set by CommonShape
         try:
             if kwargs.get("common"):
                 self.kwargs = kwargs | kwargs["common"]._common_kwargs
         except AttributeError:
             pass  # ignore, for example, CommonShape
-        # feedback(f'### BaseShape {_object=} {canvas=} {kwargs=}')
+        # ---- reset kwargs for processing
+        kwargs = self.kwargs
+        # feedback(f'### BaseShape 3 {type(self).__name__} {canvas=} {kwargs=}')
         # ---- constants
         self.default_length = 1
         self.show_id = False  # True
@@ -697,8 +719,8 @@ class BaseShape:
         self.page_number = globals.page_count + 1
         self.canvas = canvas or globals.canvas  # pymupdf Shape
         base = _object or globals.base  # protograf BaseCanvas
-        # print(f"### {type(self.canvas)=} {type(cnv)=} {type(base=)}")
-        # print(f"### {self.canvas=} {cnv=} {base=}")
+        # print(f"### TYPES  {type(self.canvas)=} {type(cnv)=} {type(base=)}")
+        # print(f"### ACTUAL {self.canvas=} {cnv=} {base=}")
         self.shape_id = None
         self.sequence = kwargs.get("sequence", [])  # e.g. card numbers
         self.dataset = []  # list of dict data (loaded from file)
@@ -831,6 +853,7 @@ class BaseShape:
         self.style = kwargs.get("style", base.style)  # HTML/CSS style
         self.wrap = kwargs.get("wrap", base.wrap)
         self.align = kwargs.get("align", base.align)  # centre,left,right,justify
+        self.valign = kwargs.get("valign", base.valign)  # centre,top,bottom
         self._alignment = TEXT_ALIGN_LEFT  # see to_alignment()
         # ---- icon font
         self.icon_font_name = kwargs.get("icon_font_name", base.icon_font_name)
@@ -917,7 +940,7 @@ class BaseShape:
         self.align_vertical = kwargs.get("align_vertical", base.align_vertical)
         self.align_horizontal = kwargs.get("align_horizontal", base.align_horizontal)
         self.operation = kwargs.get("operation", base.operation)  # operation on image
-        # ---- line / ellipse / bezier / arc / polygon
+        # ---- line / ellipse / bezier / arc / polygon / pod
         self.length = self.kw_float(kwargs.get("length", base.length))
         self.angle = self.kw_float(
             kwargs.get("angle", base.angle)
@@ -968,6 +991,14 @@ class BaseShape:
         self.y_2 = self.kw_float(kwargs.get("y2", base.y_2))
         self.x_3 = self.kw_float(kwargs.get("x3", base.x_3))
         self.y_3 = self.kw_float(kwargs.get("y3", base.y_3))
+        # ---- pod
+        self.dx_1 = kwargs.get("dx1", base.dx_1)
+        self.dy_1 = kwargs.get("dy1", base.dy_1)
+        self.dx_2 = kwargs.get("dx2", base.dx_2)
+        self.dy_2 = kwargs.get("dy2", base.dy_2)
+        self.centre_line = kwargs.get(
+            "centre_line", kwargs.get("center_line", base.centre_line)
+        )
         # ---- rectangle / card
         self.rounding = self.kw_float(kwargs.get("rounding", base.rounding))
         self.rounded = kwargs.get("rounded", base.rounded)  # also line end
@@ -1147,13 +1178,19 @@ class BaseShape:
             kwargs.get("vertex_shapes_rotated", False)
         )
         # ---- shapes with centre hex, circle, rect, rhombus, poly, ellips, star, equtri
-        self.centre_shapes = kwargs.get("centre_shapes", [])
-        self.centre_shape = kwargs.get("centre_shape", "")
+        self.centre_shapes = kwargs.get(
+            "centre_shapes", kwargs.get("center_shapes", [])
+        )
+        self.centre_shape = kwargs.get("centre_shape", kwargs.get("center_shapes", ""))
         self.centre_shape_mx = self.kw_float(
-            kwargs.get("centre_shape_mx", base.centre_shape_mx)
+            kwargs.get(
+                "centre_shape_mx", kwargs.get("center_shape_mx", base.centre_shape_mx)
+            )
         )
         self.centre_shape_my = self.kw_float(
-            kwargs.get("centre_shape_my", base.centre_shape_my)
+            kwargs.get(
+                "centre_shape_my", kwargs.get("center_shape_my", base.centre_shape_my)
+            )
         )
         self.dot_stroke = kwargs.get("dot_stroke", self.stroke)
         self.dot_stroke_width = self.kw_float(
@@ -1497,7 +1534,8 @@ class BaseShape:
     def draw(self, cnv=None, off_x=0, off_y=0, ID=None, **kwargs):
         """Draw an element on a given canvas."""
         self.set_abs_and_offset(cnv=cnv, off_x=off_x, off_y=off_y, ID=ID, **kwargs)
-        # feedback(f'### draw baseshape: {self._abs_x=} {self._abs_y=} {self._abs_cx=} {self._abs_cy=}')
+        # f"### BaseShape draw: {self.__class__.__name__} {self._abs_cx=} {self._abs_cy=} {self.use_abs_c=}"
+        # feedback(f'### BaseShape draw: {self.__class__.__name__} {self._abs_x=} {self._abs_y=}')
 
     def check_settings(self) -> tuple:
         """Validate that the user-supplied parameters for choices are correct"""
@@ -1670,11 +1708,12 @@ class BaseShape:
             ]:
                 issue.append(f'"{self.operation[0]}" is not a valid operation type!')
                 correct = False
-        # ---- line / arrow
+        # ---- line
         if self.rotation_point:
             if _lower(self.rotation_point) not in [
                 "start",
                 "centre",
+                "center",
                 "end",
                 "s",
                 "c",
@@ -2500,25 +2539,49 @@ class BaseShape:
             * outlined (bool): draw outline without fill
             * invisible (bool): do not draw text at all
             * stroke_width (float): thickness of text outline
+            * absolute (bool): the xm and ym value represent absolute centre
 
         Notes:
             Drawing using HTML CSS-styling is handled in the Text shape
         """
 
-        def move_string_start(text, point, font, fontsize, align):
+        def move_string_start(
+            text, point, font, fontsize, rotation, align, valign, absolute
+        ):
             # compute length of written text under font and fontsize:
             tl = font.text_length(text, fontsize=fontsize)
-            # insertion point ("origin"):
-            if align == "centre":
-                origin = muPoint(point.x - tl / 2.0, point.y)
-            elif align == "right":
-                origin = muPoint(point.x - tl, point.y)
+            py = point.y
+            px = point.x
+            # self.dot = 0.01; self.draw_dot(canvas, px, py, fill_dot="dimgrey")
+            if absolute:
+                # calc rotation point
+                if rotation < 0:
+                    ante_rotation = 90 - rotation
+                else:
+                    ante_rotation = 90 - rotation
+                rp = geoms.point_from_angle(point, fontsize / 3.0, ante_rotation)
+                # get origin (lower-left for text string)
+                py = rp.y
+                px = rp.x - tl / 2.0
+                # flip
+                if abs(round(rotation, 6)) == 180.0:
+                    py = point.y - fontsize / 3.0
+                    px = point.x - tl / 2.0
+                origin = muPoint(px, py)
+                # feedback(f"### move abs {tl=} {point=} {origin=}")
+                # self.dot = 0.03; self.draw_dot(canvas, origin.x, origin.y, fill_dot="green", stroke_dot="green")
             else:
-                origin = point
-            return origin
+                if valign in ["centre", "center", "c"]:
+                    py = point.y + fontsize / 2.0
+                if align in ["centre", "center", "c"]:
+                    origin = muPoint(px - tl / 2.0, py)
+                elif align in ["right", "r"]:
+                    origin = muPoint(px - tl, py)
+                else:
+                    origin = point
+                # feedback(f"### move relative {align=} {valign=} {point=} {origin=}")
+            return origin  # lower-left for text string
 
-        # feedback(f"### {string=} {kwargs=} {rotation=}")
-        # if string == '{{sequence}}':  break point()
         if not string:
             return
         # ---- deprecated
@@ -2534,26 +2597,49 @@ class BaseShape:
         mvy = copy.copy(ym)
         # ---- text properties
         keys = self.text_properties(**kwargs)
+        # feedback(f"\n### {string=} {kwargs=} {rotation=} {kwargs.get('absolute')=}")
         keys.pop("align")
-        # TODO - recalculate xm, ym based on align and text width
-        # keys["align"] = align or self.align
         font, _, _, _ = tools.get_font_by_name(keys["fontname"])
         keys["fontname"] = keys["mu_font"]
         keys.pop("mu_font")
-        # ---- draw
-        point = muPoint(xm, ym)
-        if self.align:
-            point = move_string_start(string, point, font, keys["fontsize"], self.align)
+        # ---- calculate start
+        if kwargs.get("absolute"):
+            point = move_string_start(
+                string,
+                muPoint(xm, ym),
+                font,
+                keys["fontsize"],
+                rotation,
+                None,
+                None,
+                True,
+            )
+        elif self.align:
+            point = move_string_start(
+                string,
+                muPoint(xm, ym),
+                font,
+                keys["fontsize"],
+                rotation,
+                self.align,
+                self.valign,
+                False,
+            )
+        else:
+            point = muPoint(xm, ym)
+        # ---- rotation transform
         if rotation:
-            dx = pymupdf.get_text_length(string, fontsize=keys["fontsize"]) / 2
+            dx = font.text_length(string, fontsize=keys["fontsize"]) / 2
             midpt = muPoint(point.x + dx, point.y)
+            # feedback(f"### multistring {rotation} {string=} {midpt=} ")
             # self.dot = 0.05; self.draw_dot(canvas, midpt.x, midpt.y)
             morph = (midpt, Matrix(rotation))
         else:
             morph = None
 
+        # ---- draw text
         try:
-            # insert_text(
+            # insert_text(  # pymupdf function
             #     point, text, *, fontsize=11, fontname='helv', fontfile=None,
             #     set_simple=False, encoding=TEXT_ENCODING_LATIN, color=None,
             #     lineheight=None, fill=None, render_mode=0, miter_limit=1,
@@ -2744,14 +2830,13 @@ class BaseShape:
             if isinstance(canvas, muShape):
                 canvas.commit()
 
-    def draw_dot(self, canvas, x, y):
+    def draw_dot(self, canvas, x, y, **kwargs):
         """Draw a small dot on a shape (normally the centre)."""
         if self.dot:
-            # print(f'*** draw_dot {x=} {y=}' )
+            # print(f'*** draw_dot {x=} {y=} {kwargs=}' )
             dot_size = self.unit(self.dot)
-            kwargs = {}
-            kwargs["fill"] = self.dot_stroke
-            kwargs["stroke"] = self.dot_stroke
+            kwargs["fill"] = kwargs.get("fill_dot", self.dot_stroke)
+            kwargs["stroke"] = kwargs.get("stroke_dot", self.dot_stroke)
             canvas.draw_circle((x, y), dot_size)
             self.set_canvas_props(cnv=canvas, index=None, **kwargs)
 
@@ -3220,6 +3305,7 @@ class BaseShape:
             radii_dict = self.calculate_radii(cnv, centre, vertexes)
         for item in radii_shapes:
             if isinstance(item, tuple):
+                # ---- determine dirs for shape
                 _shape_fraction = 1.0
                 if len(item) < 2:
                     feedback(f"{err} - not {item}")
@@ -3227,6 +3313,8 @@ class BaseShape:
                     vertexes = get_circle_vertexes(item[0], centre)
                     radii_dict = self.calculate_radii(cnv, centre, vertexes)
                     _dirs = radii_dict.keys()
+                elif direction_group == DirectionGroup.POLYGONAL:
+                    _dirs = [int(item[0]) - 1]
                 else:
                     _dirs = tools.validated_directions(
                         item[0], direction_group, "direction"
@@ -3258,7 +3346,7 @@ class BaseShape:
                 if rotated:
                     # compass, rotation = geoms.angles_from_points(centre, shape_centre)
                     compass, _rotation = _radii.compass, _radii.angle
-                    # print(f"*** {self.__class__.__name__} {_dir} {compass=} {_rotation=}")
+                    # print(f"*** {self.__class__.__name__} {rotated=} {_dir} {compass=} {_rotation=}")
                     _rotation = compass - 180.0 + rotation
                 else:
                     _rotation = rotation
@@ -3323,8 +3411,10 @@ class BaseShape:
         err = "The perbii_shapes must contain direction(s) and shape"
         if direction_group != DirectionGroup.CIRCULAR:  # see below for calc.
             perbii_dict = self.calculate_perbii(cnv, centre, vertexes)
+
         for item in perbii_shapes:
             if isinstance(item, tuple):
+                # ---- determine dirs for shape
                 _shape_fraction = 1.0
                 if len(item) < 2:
                     feedback(f"{err} - not {item}")
@@ -3332,6 +3422,8 @@ class BaseShape:
                     vertexes = get_circle_vertexes(item[0], centre)
                     perbii_dict = self.calculate_perbii(cnv, centre, vertexes)
                     _dirs = perbii_dict.keys()
+                elif direction_group == DirectionGroup.POLYGONAL:
+                    _dirs = [int(item[0]) - 1]
                 else:
                     _dirs = tools.validated_directions(
                         item[0], direction_group, "direction"
@@ -3363,8 +3455,8 @@ class BaseShape:
                 if rotated:
                     # compass, rotation = geoms.angles_from_points(centre, shape_centre)
                     compass, _rotation = _perbii.compass, _perbii.angle
-                    # print(f"*** {self.__class__.__name__} {_dir} {compass=} {_rotation=}")
                     _rotation = compass - 180.0 + rotation
+                    # print(f"*** {self.__class__.__name__} {_dir} {compass=} {_rotation=}")
                 else:
                     _rotation = rotation
                 # ---- draw perbii shape

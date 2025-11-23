@@ -130,6 +130,8 @@ props = Common(font_size=7,  fill="black", stroke="black", font_name="Helvetica"
 # line
 Text(common=props, x=1, y=1, text="Line text 1,1 - rotate 30", rotation=30)
 Text(common=props, x=3, y=1, text="Line text 3,1 - rotate 30\nline break", rotation=30)
+# d10 = Common(font_name="Times-Roman", font_size=30, stroke="red")
+# Text( x=1, y=2, text="d0", common=d10, rotation=30)
 
 Text(common=props, x=0, y=3, width=1, height=3, wrap=True,
      text="Wrap text - 1-by-3 - rotate 90", rotation=90)

@@ -625,9 +625,8 @@ def rotate_point_around_point(
     return Point(round(final_x, 8), round(final_y, 8))
 
 
-def rectangles_overlap(rect1, rect2) -> bool:
+def rectangles_overlap(rect1: tuple, rect2: tuple) -> bool:
     """Check if rectangles overlap, given top-left and bottom-right coordinates
-    Y-coordinates increase downwards.
 
     Args:
         rect1 (tuple): (x1, y1, x2, y2) for the first rectangle.

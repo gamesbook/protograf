@@ -36,12 +36,14 @@ from .shapes import (
     ChordShape,
     CommonShape,
     CrossShape,
+    DefaultShape,
     DotShape,
     EllipseShape,
     FooterShape,
     ImageShape,
     LineShape,
     QRCodeShape,
+    PodShape,
     PolygonShape,
     PolylineShape,
     RhombusShape,
@@ -258,13 +260,19 @@ class CardShape(BaseShape):
         """Draw a list of elements created via a Template or Card function call."""
         for the_new_ele in new_eles:
             try:
-                the_new_ele.draw(cnv=cnv, off_x=off_x, off_y=off_y, ID=ID, **kwargs)
-                cnv.commit()
-            except AttributeError as err:
+                if isinstance(the_new_ele, GroupBase):
+                    for new_group_ele in the_new_ele:
+                        new_group_ele.draw(
+                            cnv=cnv, off_x=off_x, off_y=off_y, ID=ID, **kwargs
+                        )
+                        cnv.commit()
+                else:
+                    the_new_ele.draw(cnv=cnv, off_x=off_x, off_y=off_y, ID=ID, **kwargs)
+                    cnv.commit()
+            except AttributeError:
                 feedback(
-                    f"Unable to draw card #{cid + 1}.  Check that the"
-                    f" elements created by '{the_function.__name__}'"
-                    " are all shapes.",
+                    f"Unable to draw card #{cid + 1}. Check that the elements"
+                    f" created by '{the_function.__name__}' are all shapes.",
                     True,
                 )
 
@@ -497,7 +505,13 @@ class CardShape(BaseShape):
                         card_values_tuple = namedtuple("Data", card_values.keys())(
                             **card_values
                         )
-                        _one_or_more_eles = new_ele(card_values_tuple) or []
+                        try:
+                            _one_or_more_eles = new_ele(card_values_tuple) or []
+                        except Exception as err:
+                            feedback(
+                                f"Unable to create card #{cid + 1}. (Error: {err})",
+                                True,
+                            )
                         if isinstance(_one_or_more_eles, list):
                             new_eles = _one_or_more_eles
                         else:
@@ -1435,6 +1449,13 @@ def Create(**kwargs):
     parser.add_argument(
         "-p", "--pages", help="Specify which pages to process", default=""
     )
+    parser.add_argument(
+        "-t",
+        "--trace",
+        help="Print a program trace for an error (default is False)",
+        default=False,
+        action=argparse.BooleanOptionalAction,
+    )
     globals.pargs = parser.parse_args()
     # NB - pages does not work - see notes in PageBreak()
     if globals.pargs.pages:
@@ -1566,6 +1587,13 @@ def Load(**kwargs):
     )
     parser.add_argument(
         "-p", "--pages", help="Specify which pages to process", default=""
+    )
+    parser.add_argument(
+        "-t",
+        "--trace",
+        help="Print a program trace for an error (default is False)",
+        default=False,
+        action=argparse.BooleanOptionalAction,
     )
     globals.pargs = parser.parse_args()
     # NB - pages does not work - see notes in PageBreak()
@@ -1922,6 +1950,7 @@ def Save(**kwargs):
       exported as PNG files;  the names of the files are either derived using the
       PDF filename, with a dash (-) followed by the page number OR set by the user
       with ``card_name`` property in the Deck()
+    - stop (bool): if set to ``True`` will cause all the script to stop at this point
 
     Notes:
 
@@ -1939,6 +1968,7 @@ def Save(**kwargs):
     cards = kwargs.get("cards", False)  # export individual cards as PNG
     output = kwargs.get("output", None)  # export document into this format e.g. SVG
     local_filename = kwargs.get("filename", None)  # override Create()
+    stop_here = kwargs.get("stop", False)  # stop script
 
     # ---- directory
     if globals.pargs.directory:
@@ -2044,6 +2074,9 @@ def Save(**kwargs):
     globals.page_count = 0
     globals.extracts = {}
     page_setup()
+    # ---- possibly stop?
+    if stop_here:
+        sys.exit(0)
 
 
 def save(**kwargs):
@@ -2315,9 +2348,6 @@ def Card(sequence: object = None, *elements, **kwargs):
                 if isinstance(element, TemplatingType):
                     add_members_to_card(element)
                 else:
-                    # element.members = _cards  # track all related cards
-                    # card.members = _cards
-                    # card.elements.append(element)  # may be Group or Shape or Query
                     add_members_to_card(element)
         else:
             feedback(f'Cannot find card#{_card}. (Check "cards" setting in Deck)')
@@ -2398,9 +2428,6 @@ def CardBack(sequence: object = None, *elements, **kwargs):
                 if isinstance(element, TemplatingType):
                     add_members_to_back(element)
                 else:
-                    # element.members = _cardbacks  # track all related cards
-                    # cardback.members = _cardbacks
-                    # cardback.elements.append(element)  # may be Group or Shape or Query
                     add_members_to_back(element)
         else:
             feedback(f'Cannot find cardback#{_back}. (Check "cards" setting in Deck)')
@@ -2836,8 +2863,8 @@ def Common(source=None, **kwargs):
 
     Notes:
 
-        * Any kwargs can be used; they are stored for further use by other Shapes
-        * `common_kwargs` will overwrite normal **kwargs supplied to a Shape
+    * Any kwargs can be used; they are stored for further use by other Shapes
+    * `common_kwargs` will overwrite normal **kwargs supplied to a Shape
     """
     base_kwargs = kwargs
     kwargs = margins(**kwargs)
@@ -2852,6 +2879,33 @@ def common(source=None, **kwargs):
     kwargs["source"] = source
     cshape = CommonShape(canvas=globals.canvas, common_kwargs=base_kwargs, **kwargs)
     return cshape
+
+
+def Default(source=None, **kwargs):
+    """Store properties that can be used, or overridden by one or more other Shapes.
+
+    Args:
+
+    - source (object): any object can be the source
+
+    Notes:
+
+    * Any kwargs can be used; they are stored for possible further use by other Shapes
+    * `default_kwargs` will be overwritten by equivalent **kwargs supplied to a Shape
+    """
+    base_kwargs = kwargs
+    kwargs = margins(**kwargs)
+    kwargs["source"] = source
+    dshape = DefaultShape(canvas=globals.canvas, default_kwargs=base_kwargs, **kwargs)
+    return dshape
+
+
+def default(source=None, **kwargs):
+    base_kwargs = kwargs
+    kwargs = margins(**kwargs)
+    kwargs["source"] = source
+    dshape = DefaultShape(canvas=globals.canvas, default_kwargs=base_kwargs, **kwargs)
+    return dshape
 
 
 @docstring_base
@@ -3150,33 +3204,6 @@ def ellipse(**kwargs):
     return EllipseShape(canvas=globals.canvas, **kwargs)
 
 
-# @docstring_center
-# def XquilateralTriangle(row=None, col=None, **kwargs):
-#     """Draw a XquilateralTriangle shape on the canvas.
-
-#     Args:
-
-#     - row (int): row in which the shape is drawn.
-#     - col (int): column in which shape is drawn.
-
-#     Kwargs:
-
-#     <center>
-
-#     """
-#     kwargs = margins(**kwargs)
-#     kwargs["row"] = row
-#     kwargs["col"] = col
-#     eqt = XquilateralTriangleShape(canvas=globals.canvas, **kwargs)
-#     eqt.draw()
-#     return eqt
-
-
-# def xquilateraltriangle(row=None, col=None, **kwargs):
-#     kwargs = margins(**kwargs)
-#     return XquilateralTriangleShape(canvas=globals.canvas, **kwargs)
-
-
 @docstring_center
 def Hexagon(row=None, col=None, **kwargs):
     """Draw a Hexagon shape on the canvas.
@@ -3305,6 +3332,33 @@ def line(row=None, col=None, **kwargs):
     kwargs["row"] = row
     kwargs["col"] = col
     return LineShape(canvas=globals.canvas, **kwargs)
+
+
+@docstring_center
+def Pod(row=None, col=None, **kwargs):
+    """Draw a Pod shape on the canvas.
+
+    Args:
+
+    - row (int): row in which the shape is drawn.
+    - col (int): column in which shape is drawn.
+
+    Kwargs:
+
+    <center>
+
+    """
+    kwargs = margins(**kwargs)
+    kwargs["row"] = row
+    kwargs["col"] = col
+    pod = PodShape(canvas=globals.canvas, **kwargs)
+    pod.draw()
+    return pod
+
+
+def pod(**kwargs):
+    kwargs = margins(**kwargs)
+    return PodShape(canvas=globals.canvas, **kwargs)
 
 
 @docstring_center
@@ -3686,7 +3740,7 @@ def starline(row=None, col=None, **kwargs):
 
 
 @docstring_base
-def Text(row=None, col=None, **kwargs):
+def Text(text: str = None, row=None, col=None, **kwargs):
     """Draw a Text shape on the canvas.
 
     Args:
@@ -3700,15 +3754,22 @@ def Text(row=None, col=None, **kwargs):
 
     """
     kwargs = margins(**kwargs)
+    kwargs["row"] = row
+    kwargs["col"] = col
+    if text and not kwargs.get("text"):
+        kwargs["text"] = text
     text = TextShape(canvas=globals.canvas, **kwargs)
     text.draw()
     return text
 
 
-def text(*args, **kwargs):
+def text(text: str = None, row=None, col=None, **kwargs):
     kwargs = margins(**kwargs)
-    _obj = args[0] if args else None
-    return TextShape(_object=_obj, canvas=globals.canvas, **kwargs)
+    kwargs["row"] = row
+    kwargs["col"] = col
+    if text and not kwargs.get("text"):
+        kwargs["text"] = text
+    return TextShape(canvas=globals.canvas, **kwargs)
 
 
 @docstring_center
@@ -5222,6 +5283,7 @@ hexagon.__doc__ = Hexagon.__doc__
 image.__doc__ = Image.__doc__
 line.__doc__ = Line.__doc__
 pentomino.__doc__ = Pentomino.__doc__
+pod.__doc__ = Pod.__doc__
 polygon.__doc__ = Polygon.__doc__
 polyline.__doc__ = Polyline.__doc__
 polyomino.__doc__ = Polyomino.__doc__

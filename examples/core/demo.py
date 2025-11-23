@@ -98,7 +98,7 @@ Star(x=11, y=9, vertices=5, radius=2, label="star")
 Circle(cx=16, cy=9, radius=2, label="circle")
 Ellipse(x=2, y=7, width=5, height=3, label="ellipse")
 Rhombus(x=8.5, y=1, width=3, height=5, label="rhombus")
-Polygon(cx=4, cy=3, radius=2, sides=8, title="polygon")
+Pod(cx=4, cy=3, dy=2, length=5, label="pod")
 Square(x=14, y=1, side=4, label="square")
 PageBreak()
 

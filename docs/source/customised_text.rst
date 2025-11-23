@@ -182,6 +182,14 @@ An HTML text box is most useful when fine-grained control of text is required.
 An HTML text box is also required if you need to insert Unicode-referenced
 characters as part of the text, using the ``\u0041`` notation.
 
+.. HINT::
+
+    While it is possible to insert images into HTML text by use of the
+    ``<image>`` tag, be aware that this can cause the file size to
+    "balloon" quite dramatically |dash| unless otherwise required rather
+    insert large, background images via the ``Image()`` command and restrict
+    the use of this tag to small icons and PNG files.
+
 Knowledge of CSS, as used to style HTML web pages, is required if you to
 achieve specific effects. This can be done in two ways (neither is exclusive
 of the other):

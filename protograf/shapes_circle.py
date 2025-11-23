@@ -693,8 +693,8 @@ class CircleShape(BaseShape):
             "radii_shapes",
             "centre_shape",
             "centre_shapes",
-            "cross",
             "dot",
+            "cross",
             "text",
         ]
         ordering = base_ordering
@@ -757,6 +757,7 @@ class CircleShape(BaseShape):
                         self.vertexes,
                         Point(self.x_c, self.y_c),
                         DirectionGroup.CIRCULAR,
+                        kwargs["rotation"],
                         self.radii_shapes_rotated,
                     )
             if item == "centre_shape" or item == "center_shape":
@@ -826,3 +827,4 @@ class CircleShape(BaseShape):
         # ---- set calculated top-left in user units
         self.calculated_left = (self.x_c - self._u.radius) / self.units
         self.calculated_top = (self.y_c - self._u.radius) / self.units
+        # print(f'*** CIRCLE {self.x_c=} {self.y_c=}')

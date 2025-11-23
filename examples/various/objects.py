@@ -261,7 +261,7 @@ Text(common=header_font, x=8, y=13,
 Polygon(
     cx=4, cy=13, sides=8, radius=1.5,
     fill_stroke="#388D44",
-    radii=True, radii_stroke="azure", radii_stroke_width=3,
+    radii="*", radii_stroke="azure", radii_stroke_width=3,
     centre_shape=polygon(
         sides=8, radius=1,
         fill="#45A94A", stroke="azure", stroke_width=3
@@ -278,6 +278,26 @@ Polyshape(
     "a225 0.2 a135 0.2 w 1.5 a225 0.23 a135 0.25 w 1.45 **",
     stroke="sienna", stroke_width=2, fill="khaki",
     scaling=0.8
+)
+
+Text(common=header_font, x=8, y=21,
+     text="D10: Polygon with radii & perbii shapes")
+d10 = Common(font_name="Times-Bold", font_size=20, stroke="red", rotation=180)
+ccom = Common(radius=0.15, fill="gold", label_size=6)
+Polygon(
+    cx=4, cy=21, sides=5, radius=1.75,
+    fill="mistyrose",
+    stroke="black",
+    perbii_shapes=[
+        (1, text(text="1", common=d10), 0.66),
+        (2, text(text="9", common=d10), 0.66),
+        (3, text(text="5", common=d10), 0.66),
+        (4, text(text="3", common=d10), 0.66),
+        (5, text(text="7", common=d10), 0.66),
+    ],
+    perbii_shapes_rotated=True,
+    radii="*",
+    radii_stroke="silver", radii_stroke_width=1
 )
 
 Save()

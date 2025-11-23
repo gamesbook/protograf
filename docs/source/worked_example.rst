@@ -22,8 +22,7 @@ the full documentation such as the one on
    word processor such as "Word", "Pages" or "LibreOffice" - but a text
    file editor instead e.g. on Windows, use *NotePad* or
    `NotePad++ <https://notepad-plus-plus.org/>`_; and on OS X, use
-   *TextEdit* or `CotEditor <https://coteditor.com/>`_.  A useful editor
-   should be able to color-code your file to make it easier to work with.
+   *TextEdit* or `CotEditor <https://coteditor.com/>`_.
 
 A simple card deck example: Take 1
 ----------------------------------

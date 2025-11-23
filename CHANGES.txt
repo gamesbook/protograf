@@ -1,8 +1,22 @@
 protograf Changes
 =================
 
+2025-11-23 (0.3.4)
+------------------
+- Add "center" alias for "centre"
+- Add Pod shape
+- Patch card error when using Text() command
+- Add `--trace` command-line option
+- Update docs for more references to lower-case commands
+- Add Default command
+- Support `group` property for card elements in a function
+- Add perbii shapes for Polygon
+- Add radii shapes for Polygon
+- Add sizes for flash cards
+- Enable use of plain Text for centred, perbii and radii shapes
+
 2025-11-02 (0.3.3)
--------------------
+------------------
 - Add curve creation into `snail` property
 - Add cross grid marks for rectangular cards
 - Convert EquilateralTriangle to Triangle
@@ -14,20 +28,20 @@ protograf Changes
 - Patch track layout with in- and out-facing
 
 2025-10-09 (0.3.2)
--------------------
+------------------
 - Start of new `base_extended` module
 - Add `snail` property to Polyline and Polyshape
 - Add `slices` and `perbii` properties to EquilateralTriangle
 - Add `slices` and `perbii` properties to Rhombus
 - Add `perbii_shapes` to EquilateralTriangle, Hexagon, Rhombus,
   and Rectangle
-- Update docs with suitable examples
 - Add Cross shape
+- Update docs with suitable examples for the above
 - Add section on how to use text transforms in T() command
 - Add Image operations (for cut-outs and blur)
 
 2025-10-01 (0.3.1)
--------------------
+------------------
 - Add `sun` to Circle's petal style
 - Recreate Star shape with revised properties
 - Add `slices` property to Star shape (Compass Rose example)
@@ -47,7 +61,7 @@ protograf Changes
 - Add docs for `Cards: Images, Symbols and Fonts`
 
 2025-09-16 (0.3.0)
--------------------
+------------------
 - Refactor large complex shapes into own modules
 - Rename property: `corner` to `corners`
 - Rename property: `hatch` to `hatches`

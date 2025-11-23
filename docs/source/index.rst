@@ -34,12 +34,12 @@ useful information but do build on each other.
 
    overview
    guide
-   basic_concepts
 
 .. toctree::
    :maxdepth: 2
    :caption: Concepts:
 
+   basic_concepts
    script_anatomy
    additional_concepts
    terminology

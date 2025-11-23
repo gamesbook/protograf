@@ -7,6 +7,7 @@ from rich.console import Console
 
 # local
 from protograf import globals
+import traceback
 
 
 def feedback(item, stop=False, warn=False, alert=False):
@@ -26,4 +27,6 @@ def feedback(item, stop=False, warn=False, alert=False):
         console.print(
             "[bold red]FEEDBACK::[/bold red] Could not continue with script.\n"
         )
+        if globals.pargs.trace:
+            traceback.print_stack()
         quit()

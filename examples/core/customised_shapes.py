@@ -177,9 +177,9 @@ PageBreak()
 # ---- polygon radii
 Blueprint()
 Text(common=txt, text="Polygon: radii (default & custom)")
-Polygon(cx=2, cy=4, sides=8, radius=1, radii=True)
+Polygon(cx=2, cy=4, sides=8, radius=1, radii="1,3,7")
 Polygon(
-    cx=2, cy=1, sides=10, radius=1, radii=True,
+    cx=2, cy=1, sides=10, radius=1, radii="*",
     radii_offset=0.75, radii_length=0.25, radii_stroke_width=1,
     dot=0.1, dot_stroke="red")
 PageBreak()
@@ -450,7 +450,7 @@ Star(cx=1, cy=1, radius=1,
 )
 Star(cx=2, cy=3, radius=1,
      rays=6,
-     show_radii=True,
+     show_radii="*",
      rotation=30,
 )
 Star(cx=3, cy=5, radius=1,
@@ -1309,6 +1309,48 @@ Triangle(
 )
 PageBreak()
 
+# ---- pod: custom 1
+Blueprint()
+Text(common=txt, text="Pod: customised #1")
+Pod()
+Pod(cx=3, cy=1,
+    center_line=True)
+Pod(x=1, y=2, rotation=30)
+Pod(cx=3, cy=2, rotation=90)
+Pod(cx=2, cy=3,
+    length=2)
+Pod(cx=2, cy=5,
+    heading="Head",
+    title="Title",
+    label="Label")
+PageBreak()
+
+# ---- pod: custom 2
+Blueprint()
+Text(common=txt, text="Pod: customised #2")
+Pod(cx=2, cy=1,
+    length=2,
+    center_line=True,
+    fill="gold",
+    stroke="red",
+    stroke_width=1)
+Pod(cx=1, cy=3,
+    dy1=1,
+    fill="tan")
+Pod(cx=3, cy=3,
+    dy1=1, dx1=0.1,
+    fill="aqua")
+Pod(cx=1, cy=4.5,
+    dy1=0.1,
+    dy2=0.5, dx2=-1.2,
+    fill="silver")
+Pod(cx=3, cy=4.5,
+    dx1=-0.6, dy1=-0.5,
+    dx2=0.15, dy2=-1,
+    fill_stroke="tomato",
+    rotation=-90)
+PageBreak()
+
 # ---- END
 Text(common=txt, text="Shapes END...")
 
@@ -1358,4 +1400,6 @@ Save(
         "vertex_shapes",
         "radii_shapes",
         "perbii_shapes",
+        "pod_custom",
+        "pod_customised",
         None])

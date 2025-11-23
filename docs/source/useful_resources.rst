@@ -86,4 +86,5 @@ BoardGameGeek
 =============
 
 The `Board Game Geek <https://boardgamegeek.com>`_ website has many communities
-and lists of resources to help support aspiring game designers!
+and lists of resources to help support aspiring game designers; one place to
+start is https://boardgamegeek.com/forum/974616/bgg/board-game-creation

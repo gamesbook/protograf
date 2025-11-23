@@ -22,7 +22,8 @@ other.
     example of setting up and running a script to generate a *deck of cards*
 5.  :doc:`Script Anatomy <script_anatomy>` - how a script is constructed
 6.  :doc:`Additional Concepts <additional_concepts>` - additional
-    aspects of **protograf** that can also help with script creation
+    aspects of **protograf** that will extend your ability to create scripts
+    and understand issues that might arise
 7.  :doc:`Core Shapes <core_shapes>` - a tour of the core geometries
     available and how to construct and customise them
 8.  :doc:`Working with Cards <card_deck_introduction>` - introduces key

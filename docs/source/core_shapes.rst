@@ -48,6 +48,7 @@ Shape Index
 -  `Image`_
 -  `Line`_
 -  `Lines`_
+-  `Pod`_
 -  `Polygon`_
 -  `Polyline`_
 -  `Polyshape`_
@@ -73,9 +74,10 @@ Where possible, the basic examples first show how a shape would appear
 on a page when **only** the default properties are used. This means that,
 for most cases, that *lines* are drawn in **black** and shapes that have an
 enclosed area are *filled* with a **white** color. The default length, width
-or height in most cases is **1cm**. The only change from default, for these
+or height in most cases is **1 cm**. The main change from default, for these
 examples, has been to make the default line width (*stroke_width*) thicker
-for easier viewing of the small PNG images.
+for easier viewing of the small PNG images that have been generated from the
+original PDF output.
 
 Most shapes can be styled by setting one or more of the
 `Shapes Common Properties`_. Other shapes have additional properties
@@ -83,10 +85,8 @@ available that allow even further styling.
 
 To make it easier to see where and how a shape has been drawn, most of these
 examples have been created with a background grid, which **protograf**
-refers to as a `Blueprint`_ shape, added to the page  - a small A8
-"business card" size - for cross-reference. In addition, the default line width
-(aka *stroke_width*) has been made thicker for easier viewing of the small
-PNG images that were generated from the original PDF output.
+refers to as a `Blueprint`_ shape, added to the page |dash| a small A8
+"business card" size |dash| for cross-reference.
 
 .. NOTE::
 
@@ -1233,6 +1233,166 @@ Example 2. Pointy Hexagon
 ===== ======
 
 
+.. _pod-command:
+
+Pod
+~~~
+`↑ <shape-index_>`_
+
+A pod is a symmetrical shape constructed from two matching curved lines,
+each drawn on either side of a straight centre line.
+
+The shape of each curve is controlled by setting *d* prefixed values for two
+pairs of *control points*.  If only the first control point is set, then a
+simple curve is created; but if both control points are set, then a *Bezier*
+line is constructed.
+
+.. HINT::
+
+    It is not always obvious how exactly to construct a *Bezier* curve,
+    so some experimentation may be needed to get the desired result!
+
+Pod Properties
+++++++++++++++
+
+Apart from the common drawing properties shared with other shapes, a ``Pod``
+has these available:
+
+- *length* - the length of the centre line; by default this is ``1``
+- *centre_line* - if set to ``True`` then the centre line will be displayed
+- *dx1* and *dy1* - respectively the horizontal and vertical distance away
+  from the start of the centre line for the first control point i.e. these
+  are **relative** distances and not **absolute** points. By default, they
+  are set to be equal to half the length of the centre line.
+- *dx2* and *dy2* - respectively the horizontal and vertical distance away
+  from the start of the centre line for the second control point i.e. these
+  are **relative** distances and not **absolute** point values. By default,
+  they are not set to any value.
+
+
+The following examples shows different ways how a Pod can be constructed.
+
+
+Example 1. Default Pod
+++++++++++++++++++++++
+`^ <pod-command_>`_
+
+.. |pd1| image:: images/defaults/pod.png
+   :width: 330
+
+===== ======
+|pd1| This example shows the shape constructed using the command with only
+      defaults:
+
+      .. code:: python
+
+          Pod()
+
+      It has the following properties based on the defaults:
+
+      - the left point of the line running through the centre of the pod
+        is at x-position ``1`` cm and at y-position ``1`` cm
+      - the *length* of the pod defaults to ``1`` cm
+
+===== ======
+
+Example 2. Customised Pod
++++++++++++++++++++++++++
+`^ <pod-command_>`_
+
+.. |pd2| image:: images/customised/pod_custom.png
+   :width: 330
+
+===== ======
+|pd2| This example shows pod shapes constructed using the command with the
+      following properties:
+
+      .. code:: python
+
+        Pod()
+        Pod(cx=3, cy=1,
+            center_line=True)
+        Pod(x=1, y=2, rotation=30)
+        Pod(cx=3, cy=2, rotation=90)
+        Pod(cx=2, cy=3,
+            length=2)
+        Pod(cx=2, cy=5,
+            heading="Head",
+            title="Title",
+            label="Label")
+
+      The top-left shape is the default.  The top-right shows how using the
+      *centre_line* property enables a line to be drawn from one end of the
+      Pod to the other.
+
+      The smaller middle-left and middle-right shapes show how the Pod can
+      be *rotated* counter-clockwise around its centre |dash| note that centre
+      is calculated the same way regardless of whether the Pod is drawn using
+      *x* and *y* or *cx* and *cy*.
+
+      The large middle shape shows setting the shape's *length*, and how the
+      default size of the curved lines is increased proportionally to it.
+
+      The lower shape shows how the  *heading*, *label* and *title* are set
+      |dash| see `Text Descriptions`_ for more details.
+
+===== ======
+
+
+Example 3. Customised Pods
+++++++++++++++++++++++++++
+`^ <pod-command_>`_
+
+.. |pd3| image:: images/customised/pod_customised.png
+   :width: 330
+
+===== ======
+|pd3| This example shows pod shapes constructed using the command with the
+      following properties:
+
+      .. code:: python
+
+        Pod(cx=2, cy=1,
+            length=2,
+            center_line=True,
+            fill="gold",
+            stroke="red",
+            stroke_width=1)
+        Pod(cx=1, cy=3,
+            dy1=1,
+            fill="tan")
+        Pod(cx=3, cy=3,
+            dy1=1, dx1=0.1,
+            fill="aqua")
+        Pod(cx=1, cy=4.5,
+            dy1=0.1,
+            dy2=0.5, dx2=-1.2,
+            fill="silver")
+        Pod(cx=3, cy=4.5,
+            dx1=-0.6, dy1=-0.5,
+            dx2=0.15, dy2=-1,
+            fill_stroke="tomato",
+            rotation=-90)
+
+      The top example shows setting of colors and line length for a
+      longer, thicker pod.
+
+      The middle-left example, drawn with a brown fill color, shows how the
+      Pod curve size can be changed by setting the *dy1* property.
+
+      The middle-right example, drawn with a blue fill color, shows how the
+      Pod curve size can be changed by setting the *dy1* and *dx1* properties.
+
+      The lower-left example, drawn with a grey fill color, shows how the
+      Pod's Bezier curves can be set using the  *dy2* and *dx2* properties.
+
+      The lower-right example shows how the Pod Bezier curve can be set
+      using the  *dy2* and *dx2* properties as well as  *dy1* and *dx1*
+      properties in order to create a more recognisable "heart" shape.
+
+===== ======
+
+
 .. _polygon-command:
 
 Polygon
@@ -1246,7 +1406,7 @@ is a polygon with 8 sides.
 
     **HINT** Unlike the `Hexagon`_ shape, a Polygon can be rotated!
 
-The following examples
+The following examples show how a Polygon can be constructed.
 
 
 Example 1. Default Polygon
@@ -1321,15 +1481,15 @@ Example 3. Polygon Radii
 
           Polygon(
               cx=2, cy=4, sides=8, radius=1,
-              radii=True)
+              radii="1,3,7")
 
       It has the following properties:
 
       - *centre* at x-position ``2`` cm and at y-position ``4`` cm, with a *radius*
         size of ``1`` cm
       - *sides* - ``8`` sides
-      - *radii* - set to ``True`` to force lines to be drawn from the centre
-        of the polygon to each of its vertices
+      - *radii* - set to ``1, 3, 7`` to enable lines to be drawn from the centre
+        of the polygon to three of its vertices  (starting from the top)
 
       The **top** example:
 
@@ -1337,7 +1497,7 @@ Example 3. Polygon Radii
 
           Polygon(
               cx=2, cy=1, sides=10, radius=1,
-              radii=True,
+              radii="*",
               radii_offset=0.75,
               radii_length=0.25,
               radii_stroke_width=1,
@@ -1349,8 +1509,8 @@ Example 3. Polygon Radii
       - *centre* at x-position ``2`` cm and at y-position ``1`` cm, with a *radius*
         size of ``1`` cm
       - *sides* - ``10``
-      - *radii* - set to ``True`` to force lines to be drawn from the centre of
-        the polygon to each of its vertices; the radii properties are then set:
+      - *radii* - set to ``*`` to enable lines to be drawn from the centre
+        of the polygon to all of its vertices; the radii properties are then set:
 
         - *radii_offset* - set to ``0.75`` cm; distance away from the centre
           that the radii will start
@@ -2947,7 +3107,7 @@ Example 3. Fixed Size
       - *stroke_width* - set to ``1`` point; the thicker line makes
         the grid clearly visible
       - *stroke* - set to ``gray`` i.e. a lighter color than the default black
-      - *heading*, *label* and *title* - see `Text Descriptions`_
+      - *heading*, *label* and *title* - see `Text Descriptions`_ for details
 
       The grid now has a fixed "rows by columns" size, rather than being
       automatically calculated to fill up the page.
