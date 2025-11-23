@@ -112,8 +112,8 @@ to write code from scratch.
 of these is *PyMuPDF* which supports the creation of vector graphics in
 a PDF document.
 
-**protograf** is designed in such a way that you *don’t* need to know how
-to program in Python in order to use it; but if you *are* a Python
+**protograf** is designed in such a way that you **don’t** need to know
+how to program in Python in order to use it; but if you *are* a Python
 programmer then you can certainly treat this as you would any other
 package and add in your own additional Python code or logic to your
 scripts as needed.
@@ -125,8 +125,9 @@ How do I get started?
 Its suggested that you **first** get everything :doc:`set-up <setting_up>`
 and tested.
 
-Now read through the :doc:`basic concepts <basic_concepts>`
-before trying out a :doc:`worked example <worked_example>`. After that,
+Now read through the :doc:`basic concepts <basic_concepts>` and
+:doc:`script anatomy <script_anatomy>` before trying out a
+:doc:`worked example <worked_example>`. After that,
 browse through the sections listed in the :doc:`Guide <guide>`, according
 to what you have in mind, or look at the various
 :doc:`Examples <examples/index>` for inspiration.

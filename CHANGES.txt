@@ -1,7 +1,7 @@
 protograf Changes
 =================
 
-2025-00-00 (0.3.4)
+2025-11-23 (0.3.4)
 ------------------
 - Add "center" alias for "centre"
 - Add Pod shape
@@ -13,7 +13,7 @@ protograf Changes
 - Add perbii shapes for Polygon
 - Add radii shapes for Polygon
 - Add sizes for flash cards
-- Enable use of Text for centred, perbii and radii shapes
+- Enable use of plain Text for centred, perbii and radii shapes
 
 2025-11-02 (0.3.3)
 ------------------

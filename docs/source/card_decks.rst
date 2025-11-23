@@ -14,8 +14,8 @@ and that you've created some basic scripts of your own using the
 .. NOTE::
 
     This section provides all the details, along with supporting examples,
-    of commands used in card creation. A high-level overview can be found in
-    the section on :doc:`Working with Cards <card_deck_introduction>`.
+    of the commands used in card creation. A high-level overview can be found
+    in the section on :doc:`Working with Cards <card_deck_introduction>`.
 
 .. _table-of-contents-crddk:
 

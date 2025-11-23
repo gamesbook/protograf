@@ -4,8 +4,8 @@ Working with Cards
 
 .. |dash| unicode:: U+2014 .. EM DASH SIGN
 
-This section assumes you are very familiar with the concepts, terms and
-ideas for :doc:`protograf <index>` as presented in the
+This section assumes you are very familiar with the basic concepts, terms
+and ideas for :doc:`protograf <index>` as presented in the
 :doc:`Basic Concepts <basic_concepts>` , that you understand all of the
 :doc:`Additional Concepts <additional_concepts>`
 and that you've created some basic scripts of your own using the
@@ -93,6 +93,12 @@ as you want them to appear |dash| in effect, the card becomes a "mini page".
 This is important |dash| defining something often means it is **not** needed
 right away but **only** when the card, or cards, that use it are drawn. See
 the related detail in the `Card Command`_ section below.
+
+.. HINT::
+
+    Be aware that when defining elements, such as shapes, that are not needed
+    immediately, you will use the **lowercase** version of the command name;
+    refer to the section on  :ref:`case sensitivity <case-sensitivity-concept>`
 
 There are two core commands needed; the ``Deck()`` and the ``Card()``; with
 supporting commands including the ``Data()`` and ``Matrix()`` commands.
