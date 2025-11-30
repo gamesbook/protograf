@@ -2248,6 +2248,8 @@ class SectorShape(BaseShape):
         p_C = Point(self.x_c + self._o.delta_x, self.y_c + self._o.delta_y)
         # ---- circumference point in units
         p_P = geoms.point_on_circle(p_C, self.unit(self.radius), self.angle_start)
+        # ---- mid point in units
+        p_M = geoms.point_on_circle(p_C, self.unit(self.radius) / 2., self.angle_start)
         # ---- draw sector
         # feedback(
         #     f'***Sector: {p_P=} {p_C=} {self.angle_start=} {self.angle_width=}')
@@ -2256,7 +2258,11 @@ class SectorShape(BaseShape):
         )
         kwargs["closed"] = False
         self.set_canvas_props(cnv=cnv, index=ID, **kwargs)
-
+        # ---- * draw text
+        y_off = self._u.height / 2.0
+        self.draw_heading(cnv, ID, p_P.x, p_P.y, **kwargs)
+        self.draw_label(cnv, ID, p_M.x, p_M.y, **kwargs)
+        self.draw_title(cnv, ID, p_C.x, p_C.y, **kwargs)
 
 class ShapeShape(BasePolyShape):
     """

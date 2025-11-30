@@ -1387,6 +1387,18 @@ class BaseShape:
         except:
             return f"{self.__class__.__name__}"
 
+    def simple_name(self, shape_object: None) -> str:
+        """Return user-friendly name for a shape."""
+        try:
+            if shape_object:
+                cshape_name = shape_object.__class__.__name__
+                return cshape_name.replace("Shape", "")
+            else:
+                cshape_name = self.__class__.__name__
+                return cshape_name.replace("Shape", "")
+        except:
+            return "Shape"
+
     def kw_float(self, value, label: str = ""):
         return tools.as_float(value, label) if value is not None else value
 
@@ -3300,15 +3312,16 @@ class BaseShape:
                 vertexes.append(vtx)
             return vertexes
 
-        err = "The radii_shapes must contain direction(s) and shape"
+        err = "The radii_shapes must contain direction(s) and shape(s)"
         if direction_group != DirectionGroup.CIRCULAR:  # see below for calc.
             radii_dict = self.calculate_radii(cnv, centre, vertexes)
         for item in radii_shapes:
+            _shape, _dirs = None, []
             if isinstance(item, tuple):
                 # ---- determine dirs for shape
                 _shape_fraction = 1.0
                 if len(item) < 2:
-                    feedback(f"{err} - not {item}")
+                    feedback(f"{err} - not {item}", True)
                 if direction_group == DirectionGroup.CIRCULAR:
                     vertexes = get_circle_vertexes(item[0], centre)
                     radii_dict = self.calculate_radii(cnv, centre, vertexes)
@@ -3323,7 +3336,8 @@ class BaseShape:
                 if len(item) >= 3:
                     _shape_fraction = tools.as_float(item[2], "fraction")
             else:
-                feedback(f"{err} - not {item}")
+                feedback(f"{err} - not {item}.", True)
+            # print(f"*** radii_shapes {item=} {type(item)=}")
             self.can_draw_centred_shape(_shape, True)  # could stop here
             for _dir in _dirs:
                 # ---- calculate shape centre
