@@ -16,12 +16,31 @@ txt = Default(x=5, font_size=19, align="left")
 
 # ---- title
 Image("protograf_slogan.png", x=3.5, y=8, height=3.6, width=12)
-Text('A Brief Tour...', font_size=48, x=9.5, y=15)
+Text('A Brief Tour...', font_size=48, stroke="#3286AD", x=9.5, y=15)
+PageBreak()
+
+# ---- simple
+Rectangle()
+Text('... a rectangle!', default=txt)
 PageBreak()
 
 # ---- base
 Rectangle()
-Text('Rectangle()', default=txt)
+Text('What does the script look like?', default=txt, y=6, x=1)
+Text("""from protograf import *
+
+Create(
+ filename='overview.pdf',
+ margin=1, page_grid=2)
+Rectangle()
+Save()""",
+  box=True,
+  font_name="Courier",
+  font_size=24,
+  align="left",
+  x=1, y=8,
+  height=15,
+  width=15)
 PageBreak()
 
 # ---- styled
