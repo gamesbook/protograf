@@ -2508,12 +2508,13 @@ class StadiumShape(BaseShape):
         # ---- dot
         self.draw_dot(cnv, cx, cy)
         # ---- text
-        delta = radius_tb if "n" in _edges or "north" in _edges else 0.0
+        delta_top = radius_tb if "n" in _edges or "north" in _edges else 0.0
+        delta_btm = radius_tb if "s" in _edges or "south" in _edges else 0.0
         self.draw_heading(
             cnv,
             ID,
             cx,
-            cy - delta,
+            cy - 0.5 * self._u.height - delta_top,
             **kwargs,
         )
         self.draw_label(cnv, ID, cx, cy, **kwargs)
@@ -2521,7 +2522,7 @@ class StadiumShape(BaseShape):
             cnv,
             ID,
             cx,
-            cy + delta,
+            cy + 0.5 * self._u.height + delta_btm,
             **kwargs,
         )
 

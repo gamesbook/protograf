@@ -12,7 +12,8 @@ from protograf import *
 Create(
    filename="overview.pdf", margin=1, page_grid=2)
 
-txt = Default(x=5, font_size=19, align="left")
+lbl = Default(x=5, font_size=19, align="left")
+txt = Default(x=5, font_size=19, align="left", font_name="Courier")
 
 # ---- title
 Image("protograf_slogan.png", x=3.5, y=8, height=3.6, width=12)
@@ -21,12 +22,12 @@ PageBreak()
 
 # ---- simple
 Rectangle()
-Text('... a rectangle!', default=txt)
+Text('... a rectangle!', default=lbl)
 PageBreak()
 
 # ---- base
 Rectangle()
-Text('What does the script look like?', default=txt, y=6, x=1)
+Text('What does the script look like?', default=lbl, y=6, x=1)
 Text("""from protograf import *
 
 Create(
@@ -52,11 +53,11 @@ Rectangle(y=11, width=3, height=4, label="Hi!")
 Text('Rectangle(\n y=11, \n width=3, height=4,\n label="Hi!")', default=txt, y=11)
 Rectangle(y=16, width=3, height=4, hatches_count=5)
 Text('Rectangle(\n y=16, \n width=3, height=4,\n hatches_count=5)', default=txt, y=16)
-Rectangle(y=21, width=3, height=4, notch_style='bite', notch=0.5,
-          # radii_shapes=[('*', dot())]
-          radii_shapes=[('*', dot())],
-          )
-Text('Rectangle(\n y=21, \n width=3, height=4,\n notch=0.5, notch_style="bite",\n radii_shapes=[("*", dot())]', default=txt, y=21)
+Rectangle(
+    y=21, width=3, height=4,
+    notch_style='bite', notch=0.5,
+    radii_shapes=[('*', dot())])
+Text('Rectangle(\n y=21, \n width=3, height=4,\n notch_style="bite",\n notch=0.5, \n radii_shapes=[("*", dot())]', default=txt, y=21)
 PageBreak()
 
 # ---- filled shapes
@@ -107,14 +108,14 @@ DotGrid(
     dot_width=8
 )
 Text("""Grid(
-    cols=18, rows=18,
-    stroke_width=1
-)""", default=txt, x=2, y=20)
+  cols=18, rows=18,
+  stroke_width=1
+)""", default=txt, x=1, y=20)
 Text("""DotGrid(
-    cols=3, rows=3,
-    offset_x=4, offset_y=4,
-    side=6,
-    dot_width=8
+  cols=3, rows=3,
+  offset_x=4, offset_y=4,
+  side=6,
+  dot_width=8
 )""", default=txt, x=10, y=20)
 PageBreak()
 
