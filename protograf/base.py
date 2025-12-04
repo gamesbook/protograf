@@ -3,11 +3,9 @@
 Base shape class for protograf
 """
 # lib
-from collections import namedtuple
 import copy
 from enum import Enum
 import functools
-import inspect
 import json
 import io
 import logging
@@ -23,7 +21,7 @@ import cairosvg
 import jinja2
 from jinja2.environment import Template
 import requests
-from PIL import Image, ImageDraw, UnidentifiedImageError
+from PIL import Image, UnidentifiedImageError
 import pymupdf
 from pymupdf import (
     Document as muDocument,
@@ -676,10 +674,6 @@ class BaseCanvas:
         # ---- deck
         self.deck_data = []
 
-    def get_canvas(self):
-        """Return canvas (page) object"""
-        return self.canvas
-
     def get_page(self, name="A4"):
         """Get a paper format by name from a pre-defined dictionary."""
         return pymupdf.paper_size(name)
@@ -798,6 +792,12 @@ class BaseShape:
         # ---- to be calculated ...
         self.area = base.area
         self.vertexes = base.vertexes  # list of shape's "points"
+        self._abs_x = None
+        self._abs_y = None
+        self._abs_x1 = None
+        self._abs_y1 = None
+        self._abs_cx = None
+        self._abs_cy = None
         # ---- repeats
         self.fill_pattern = kwargs.get("fill_pattern", base.fill_pattern)
         self.repeat = kwargs.get("repeat", base.repeat)
@@ -1257,6 +1257,7 @@ class BaseShape:
         self.perbii_shapes_rotated = self.kw_bool(
             kwargs.get("perbii_shapes_rotated", False)
         )
+        self.radii_label = None
         self.radii_shapes = kwargs.get("radii_shapes", [])
         self.radii_shapes_rotated = self.kw_bool(
             kwargs.get("radii_shapes_rotated", False)
@@ -1354,7 +1355,8 @@ class BaseShape:
         # ---- CHECK ALL
         correct, issue = self.check_settings()
         if not correct:
-            feedback("Problem with settings: %s" % "; ".join(issue), alert=True)
+            _issues = "; ".join(issue)
+            feedback(f"Problem with settings: {_issues}", alert=True)
         # ---- UPDATE SELF WITH COMMON
         if self.common:
             try:
@@ -1466,11 +1468,6 @@ class BaseShape:
         """OffsetProperties in point units for a Shape."""
         margin_left = (
             self.unit(self.margin_left) if self.margin_left is not None else self.margin
-        )
-        margin_bottom = (
-            self.unit(self.margin_bottom)
-            if self.margin_bottom is not None
-            else self.margin
         )
         margin_top = (
             self.unit(self.margin_top) if self.margin_top is not None else self.margin
@@ -1791,7 +1788,7 @@ class BaseShape:
         # ---- starfield
         if self.star_pattern:
             if _lower(self.star_pattern) not in ["random", "cluster", "r", "c"]:
-                issue.append(f'"{self.pattern}" is an invalid starfield pattern!')
+                issue.append(f'"{self.star_pattern}" is an invalid starfield pattern!')
                 correct = False
         # ---- dice pip shape
         if self.pip_shape:
@@ -1980,22 +1977,23 @@ class BaseShape:
                 return None
             try:
                 _slice = _lower(slice_portion)
-                if _slice[0] not in ["t", "m", "b", "l", "c", "r"]:
-                    feedback(f'The sliced value "{slice_portion}" is not valid!', True)
                 img = Image.open(img_path)
                 iwidth = img.size[0]
                 iheight = img.size[1]
                 icentre = (int(iwidth / 2), int(iheight / 2))
+                slice_width, slice_height = 0.0, 0.0
                 # calculate height of horizontal slice
                 if _slice[0] in ["t", "m", "b"]:
                     slice_height = int(
                         min(iwidth * (width_height[1] / width_height[0]), iheight)
                     )
                 # calculate width of vertical slice
-                if _slice[0] in ["l", "c", "r"]:
+                elif _slice[0] in ["l", "c", "r"]:
                     slice_width = int(
                         min(iheight * (width_height[0] / width_height[1]), iwidth)
                     )
+                else:
+                    feedback(f'The sliced value "{slice_portion}" is not valid!', True)
                 # crop - needs a "box" which accepts a tuple with four values for
                 #        the rectangle: left, upper, right, and lower
                 match _slice[0]:
@@ -2111,6 +2109,7 @@ class BaseShape:
         def image_render(image_location) -> object:
             """Load, first from local cache then network, and draw."""
             image_local = image_location
+            image_doc = None
             if cache_directory:
                 if tools.is_url_valid(image_location):
                     image_local = save_image_from_url(image_location)
@@ -2135,31 +2134,31 @@ class BaseShape:
                     param1 = self.operation[4]
                 match _lower(self.operation[0]):
                     case "circle" | "c":
-                        imgdoc = imaging.circle(
+                        image_doc = imaging.circle(
                             image_local, self.operation[1], param1, param2
                         )
                     case "ellipse" | "e":
-                        imgdoc = imaging.ellipse(
+                        image_doc = imaging.ellipse(
                             image_local, self.operation[1], param1, param2
                         )
                     case "polygon" | "p":
-                        imgdoc = imaging.polygon(
+                        image_doc = imaging.polygon(
                             image_local, self.operation[1], param1, param2, param3
                         )
                     case "rounding" | "rounded" | "r":
-                        imgdoc = imaging.rounding(image_local, self.operation[1])
+                        image_doc = imaging.rounding(image_local, self.operation[1])
                     case "blurring" | "blur" | "b":
-                        imgdoc = imaging.blur(image_local, self.operation[1])
+                        image_doc = imaging.blur(image_local, self.operation[1])
                     case _:
                         feedback(
                             f'The Image operation "{self.operation[0]}" is not a valid one',
                             True,
                         )
             else:
-                imgdoc = pymupdf.open(image_local)  # open file image as document
+                image_doc = pymupdf.open(image_local)  # open file image as document
 
             # ---- draw image
-            pdfbytes = imgdoc.convert_to_pdf()  # make a 1-page PDF of it
+            pdfbytes = image_doc.convert_to_pdf()  # make a 1-page PDF of it
             imgpdf = pymupdf.open("pdf", pdfbytes)
             rct = muRect(scaffold)
             pdf_page.show_pdf_page(
@@ -2606,7 +2605,6 @@ class BaseShape:
             string = tools.eval_template(string, _locale)
         # ---- align and font
         align = align or self.align
-        mvy = copy.copy(ym)
         # ---- text properties
         keys = self.text_properties(**kwargs)
         # feedback(f"\n### {string=} {kwargs=} {rotation=} {kwargs.get('absolute')=}")
@@ -2923,7 +2921,7 @@ class BaseShape:
             kwargs["stroke"] = self.arrow_stroke or self.stroke
             kwargs["fill"] = self.arrow_fill or self.stroke
             kwargs["closed"] = True
-            deg, angle = geoms.angles_from_points(point_start, point_end)
+            deg, _ = geoms.angles_from_points(point_start, point_end)
             # print(f'{deg=} {angle=} ')
             if point_start.x != point_end.x:
                 kwargs["rotation"] = 180 + deg
@@ -3016,8 +3014,8 @@ class BaseShape:
                 kwargs["font_name"] = self.font_name
                 kwargs["font_size"] = 4
                 for key, vert in enumerate(kwargs.get("vertices")):
-                    x = self.points_to_value(vert.x)
-                    y = self.points_to_value(vert.y)
+                    # x = self.points_to_value(vert.x)
+                    # y = self.points_to_value(vert.y)
                     self.draw_multi_string(
                         # canvas, vert.x, vert.y, f"{key}:{x:.2f},{y:.2f}", **kwargs
                         canvas,
@@ -3035,8 +3033,8 @@ class BaseShape:
                 kwargs["stroke"] = kwargs.get("color", self.debug_color)
                 kwargs["stroke_width"] = 0.1
                 kwargs["font_size"] = 4
-                x = self.points_to_value(point.x)
-                y = self.points_to_value(point.y)
+                # x = self.points_to_value(point.x)
+                # y = self.points_to_value(point.y)
                 self.draw_multi_string(
                     canvas, point.x, point.y, f"{label}/{point.x:.1f}/{point.y:.1f}"
                 )
@@ -3219,7 +3217,7 @@ class BaseShape:
         return False
 
     def draw_centred_shapes(self, centre_shapes: list, cx: float, cy: float):
-        """Draw one or more shapes with thei centre at a Point.
+        """Draw one or more shapes with their centre at a Point.
 
         Args:
 
@@ -3254,7 +3252,7 @@ class BaseShape:
                     compass, rotation = geoms.angles_from_points(centre, vertices[idx])
                     # print(f"{idx} {compass=} {rotation=}")
                 else:
-                    rotation = 0
+                    compass = 180.0
                 vshape.draw(
                     _abs_cx=cx,  # + self.unit(vshape.mx),  # NO default move
                     _abs_cy=cy,  # + self.unit(vshape.my),  # NO default move
@@ -3313,6 +3311,7 @@ class BaseShape:
             return vertexes
 
         err = "The radii_shapes must contain direction(s) and shape(s)"
+        _shape_fraction = 1.0
         if direction_group != DirectionGroup.CIRCULAR:  # see below for calc.
             radii_dict = self.calculate_radii(cnv, centre, vertexes)
         for item in radii_shapes:
@@ -3342,13 +3341,13 @@ class BaseShape:
             for _dir in _dirs:
                 # ---- calculate shape centre
                 _radii = radii_dict[_dir]
-                if _shape_fraction <= 1:
+                if _shape_fraction <= 1.0:
                     shape_centre = geoms.fraction_along_line(
                         centre, _radii.point, _shape_fraction
                     )  # inside Shape boundaries
                 else:
                     shape_centre = geoms.point_in_direction(
-                        centre, _radii.point, _shape_fraction - 1
+                        centre, _radii.point, _shape_fraction - 1.0
                     )  # outside Shape boundaries
                 # print(f"*** {direction_group} {_radii=} {shape_centre=}")
                 # ---- shift radii shape centre
@@ -3423,6 +3422,7 @@ class BaseShape:
             return vertexes
 
         err = "The perbii_shapes must contain direction(s) and shape"
+        _dirs, _shape, _shape_fraction = [], None, 1.0
         if direction_group != DirectionGroup.CIRCULAR:  # see below for calc.
             perbii_dict = self.calculate_perbii(cnv, centre, vertexes)
 
@@ -3446,18 +3446,18 @@ class BaseShape:
                 if len(item) >= 3:
                     _shape_fraction = tools.as_float(item[2], "fraction")
             else:
-                feedback(f"{err} - not {item}")
+                feedback(f"{err} - not {item}", True)
             self.can_draw_centred_shape(_shape, True)  # could stop here
             for _dir in _dirs:
                 # ---- calculate base shape centre
                 _perbii = perbii_dict[_dir]
-                if _shape_fraction <= 1:
+                if _shape_fraction <= 1.0:
                     shape_centre = geoms.fraction_along_line(
                         centre, _perbii.point, _shape_fraction
                     )  # inside Shape boundaries
                 else:
                     shape_centre = geoms.point_in_direction(
-                        centre, _perbii.point, _shape_fraction - 1
+                        centre, _perbii.point, _shape_fraction - 1.0
                     )  # outside Shape boundaries
                 # print(f"*** {direction_group} {_perbii=} {shape_centre=}")
                 # ---- shift perbii shape centre
