@@ -5,7 +5,7 @@ protograf Changes
 ------------------
 - Patch drawing radii shapes for Rectangle
 - Patch docs for Sector
-- Add new demo script
+- Add new overview script
 - Patch text for Stadium
 
 2025-11-23 (0.3.4)

@@ -6,15 +6,19 @@ mkdir -p /tmp/demo
 echo -e "Creating core..."
 python demo/overview.py --no-png -d /tmp/demo
 # ---- examples:games
-echo -e "Creating examples..."
+echo -e "Creating basic examples..."
 python objects/pentominoes.py --no-png -d /tmp/demo
 python boards/abstract/octagons.py --no-png -d /tmp/demo
+echo -e "Creating commercial boards..."
 python boards/commercial/underwater_cities.py --no-png -d /tmp/demo
 python boards/commercial/tm_player_board.py --no-png -d /tmp/demo
 python boards/commercial/warpwar.py --no-png -d /tmp/demo
+echo -e "Creating counters and money..."
 python counters/counters_doagc.py --no-png -d /tmp/demo
-python cards/cards_standard.py --no-png -d /tmp/demo
 python play_money/supreme.py --no-png -d /tmp/demo
+echo -e "Creating playing cards..."
+python cards/cards_standard.py --no-png -d /tmp/demo
+echo -e "Creating BGG game cards..."
 python bgg/cards_bgg_thumb.py --no-png -d /tmp/demo
 # ---- extract pages
 echo -e "Extracting subsets..."
@@ -32,3 +36,5 @@ pdftk overview.pdf \
   cs_eg.pdf su_eg.pdf doagc_eg.pdf cards_bgg_thumb.pdf \
   cat output pg_overview.pdf
 echo -e "\nDone!"
+# ---- show PDF
+xreader pg_overview.pdf

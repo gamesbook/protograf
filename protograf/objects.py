@@ -505,11 +505,14 @@ class StarFieldObject(BaseShape):
     def __init__(self, _object=None, canvas=None, **kwargs):
         super(StarFieldObject, self).__init__(_object=_object, canvas=canvas, **kwargs)
         self.kwargs = kwargs
-        # override to set the randomisation sequenc
+        # override to set the randomisation sequence
         if self.seeding:
             self.seed = tools.as_float(self.seeding, "seeding")
         else:
             self.seed = None
+        # validation
+        for size in self.sizes:
+            tools.as_float(size, 'the Starfield "size"', minimum=0.000000001)
 
     def draw_star(self, cnv, position: Point):
         """Draw a single star at a Point (x,y)."""

@@ -469,6 +469,7 @@ class BaseCanvas:
             "radii_length", None
         )  # default: circle radius
         self.radii_offset = self.defaults.get("radii_offset", 0.0)
+        self.radii_label = self.defaults.get("radii_label", None)
         self.radii_labels = self.defaults.get("radii_labels", "")
         self.radii_labels_size = self.defaults.get("radii_labels_size", self.font_size)
         self.radii_labels_font = self.defaults.get("radii_labels_font", self.font_name)
