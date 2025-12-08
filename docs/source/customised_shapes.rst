@@ -2041,11 +2041,14 @@ The available property names, shown in their default order, are:
 #. stripes
 #. hatches
 #. radii
+#. corners
+#. radii_shapes
+#. perbii_shapes
 #. centre_shape
 #. centre_shapes
 #. vertex_shapes
-#. cross
 #. dot
+#. cross
 #. text
 #. numbering
 
@@ -2926,13 +2929,13 @@ The available property names, shown in their default order, are:
 #. links
 #. perbii
 #. paths
-#. radii
-#. sector_shapes
+#. radii_shapes
+#. perbii_shapes
 #. centre_shape
 #. centre_shapes
 #. vertex_shapes
-#. cross
 #. dot
+#. cross
 #. text
 #. numbering
 
@@ -3570,10 +3573,11 @@ The available property names, shown in their default order, are:
 #. slices
 #. hatches
 #. radii
+#. radii_shapes
 #. centre_shape
 #. centre_shapes
-#. cross
 #. dot
+#. cross
 #. text
 
 

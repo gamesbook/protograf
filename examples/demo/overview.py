@@ -249,7 +249,48 @@ Text("radii_shapes", y=10, default=ctxt)
 Text("slices", y=14, default=ctxt)
 PageBreak()
 
-# ---- assorted shapes
+# ---- Shapes with properties
+big = Default(stroke="black", font_size=32, x=9, align="left")
+Text('"Gold Coin"', default=big, y=4)
+Circle(
+    cx=5, cy=22, radius=2,
+    fill="#63B1BB", stroke="#63B1BB",
+    radii=[135,225],
+    radii_offset=1, radii_length=2,
+    radii_stroke="white", radii_stroke_width=30,
+    centre_shape=circle(radius=1.5, fill="#63B1BB", stroke="#63B1BB"),
+    radii_shapes=[(45, dot(stroke="white", dot_width=10), 0.75)],
+    order_last=["radii_shapes"]
+)
+Text('"Red Pawn"', default=big, y=10)
+Circle(
+    cx=5, cy=4, radius=2,
+    fill="gold", stroke_width=2, 
+    radii=steps(0,360,15),
+    centre_shape=circle(
+        radius=1.5,
+        fill="gold", label="5", font_size=48)
+)
+Text('"German Cross"', default=big, y=16)
+Triangle(
+    cx=5, cy=11, side=4,
+    fill_stroke="red",
+    radii_shapes=[('n', circle(fill_stroke="red", radius=1))],
+)
+Text('"XOK Fish"', default=big, y=22)
+Rectangle(
+    height=4.2, width=4.2, x=3, y=14,
+    fill="white", stroke="black", stroke_width=3,
+    hatches_stroke_width=33, hatches_stroke="black",
+    hatches='o', hatches_count=1,
+    notch=1, notch_style='step',
+    centre_shape=rectangle(
+        height=4.2, width=4.2, 
+        fill=None, stroke="white", stroke_width=4.5)
+)
+PageBreak()
+
+# ---- assorted objects
 ctxt = Default(stroke="black", font_size=20, x=5, align="left")
 Text("StarField (with Polyon)", default=ctxt, y=1)
 Polygon(x=2.5, y=1.4, sides=10, radius=1.5, fill="black")
@@ -359,14 +400,15 @@ DotGrid(
 Text("""Grid(
   cols=18, rows=18,
   stroke_width=1
-)""", default=txt, x=1, y=20)
+)""", default=txt, x=0, y=20)
 Text("""DotGrid(
   cols=3, rows=3,
   offset_x=4, offset_y=4,
   side=6,
   dot_width=8
-)""", default=txt, x=10, y=20)
-# PageBreak()
+)""", default=txt, x=9, y=20)
+PageBreak()
 
 
+    
 Save()

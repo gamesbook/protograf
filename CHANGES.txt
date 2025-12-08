@@ -7,6 +7,7 @@ protograf Changes
 - Patch docs for Sector
 - Add new overview script
 - Patch text for Stadium
+- Patch drawing order items
 
 2025-11-23 (0.3.4)
 ------------------
