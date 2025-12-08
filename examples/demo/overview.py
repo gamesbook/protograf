@@ -290,6 +290,154 @@ Rectangle(
 )
 PageBreak()
 
+
+# ----- lines
+Text(common=txt, text='Line: locations; styles')
+Line(x=0, y=0.5, stroke_width=0.2, dotted=True, label="0.2", font_size=6)
+Line(x=1, y=0.5, stroke_width=0.4, dotted=True, label="0.4", font_size=6)
+Line(x=2, y=0.5, stroke_width=0.8, dotted=True, label="0.8", font_size=6)
+Line(x=3, y=0.5, stroke_width=1.6, dotted=True, label="1.6", font_size=6)
+
+Line(x=1, y=1, length=2, stroke="chartreuse", stroke_width=10)
+Line(x=1, y=1.5, length=2, stroke="aqua", stroke_width=10, stroke_ends="rounded")
+Line(x=1, y=2, length=2, stroke="gold", stroke_width=10, stroke_ends="squared")
+
+Line(x=0, y=2.5, length=4, stroke="pink", stroke_width=2)
+Line(x=0, y=3.6, length=4.1, angle=15, stroke="red", label="15", font_size=6)
+Line(x=0, y=5, x1=4, y1=5.9, stroke="blue", stroke_width=1,
+     dashed=[0.2, 0.1], label="dashed:[0.2,0.1]", font_size=6)
+
+Line(x=0, y=4, x1=4, y1=4, stroke="purple", stroke_width=1,
+     wave_style='wave', wave_height=1.9)
+Line(x=0, y=4, x1=4, y1=4, stroke="firebrick", stroke_width=1,
+     wave_style='sawtooth', wave_height=0.1)
+PageBreak()
+
+# ---- center line from angle
+Text(common=txt, text="Line: angle")
+
+Line(cx=1, cy=1, angle=45, length=2, stroke="red")
+Line(cx=3, cy=1, angle=225, length=2, stroke_width=1.5)
+
+Circle(cx=2, cy=3, radius=1)
+Line(cx=2, cy=3, angle=45, length=2, stroke="red", arrow_width=0.2)
+Line(cx=2, cy=3, angle=135, length=2, stroke_width=1.5, arrow_width=0.2)
+
+Line(cx=1, cy=5, angle=135, length=2, stroke_width=1.5)
+Line(cx=3, cy=5, angle=315, length=2, stroke="red")
+PageBreak()
+
+
+# ---- arrowhead
+Text(common=txt, text="Line: arrow styles")
+arr1 = Default(arrow_width=0.2, arrow_height=0.3, stroke_width=0.8, x=0, x1=3)
+Line(y=1, y1=1, arrow=True, default=arr1)
+Line(y=1.5, y1=1.5, arrow_style='notch', default=arr1)
+Line(y=2, y1=2, arrow_style='angle', default=arr1)
+Line(y=2.5, y1=2.5, arrow_style='spear', default=arr1)
+
+Line(y=3, y1=3,
+     dotted=True,
+     arrow_position=0.6,
+     arrow_double=True,
+     default=arr1)
+Line(y=3.5, y1=3.5, 
+     arrow_position=[0.25, 0.5, 0.75], 
+     default=arr1)
+Line(y=4, y1=4, 
+     arrow_position=[1.0, 0.93], 
+     default=arr1)
+Line(y=4.5, y1=4.5,
+     arrow_style='spear',
+     arrow_height=0.15, 
+     default=arr1)
+Line(y=4.5, y1=4.5,
+     arrow_style='angle',
+     arrow_width=0.15,
+     arrow_position=[0.1, 0.15, 0.2], 
+     default=arr1)
+# ---- lines and polyshapes & polylines
+Polyline(
+    points='0,5 1,6 2,5 3,6',
+    stroke="red", stroke_width=2,
+    wave_style="sawtooth", 
+    wave_height=0.03,)
+Polyline(
+    points='0,6 1,7 2,6 3,7',
+    stroke="purple", stroke_width=2,
+    wave_style="wave", 
+    wave_height=0.05,)
+Polyline(
+    points='0,7 1,8 2,7 3,8',
+    stroke_width=3,
+    dotted=True,
+    arrow_style='notch',
+    arrow_double=True
+)
+# ---- line: connections
+Text(common=txt, text="Line: connections")
+cc = Circle(cx=2, cy=12, radius=0.5)
+cy = Circle(cx=1, cy=10, radius=0.5, fill_stroke="gold")
+Line(connections=[cc, cy])
+ca = Circle(cx=1, cy=14, radius=0.5, fill_stroke="aqua")
+Line(connections=[cc, ca])
+cr = Circle(cx=3, cy=10, radius=0.5, fill_stroke="tomato")
+Line(connections=[cc, cr])
+co = Circle(cx=3, cy=14, radius=0.5, fill_stroke="orange")
+Line(connections=[cc, co])
+# orthogonal
+Line(connections=[cy, cr, co, ca, cy], stroke_width=2)
+# ---- line: connections - arrow
+Text(common=txt, text="Line: connections; arrow")
+cc = Circle(cx=8.5, cy=12.5, radius=0.5)
+cy = Circle(cx=8, cy=10, radius=0.5, fill_stroke="gold")
+co = Circle(cx=10, cy=14, radius=0.5, fill_stroke="orange")
+Line(connections=[cy, cc, co],
+     stroke="red",
+     stroke_width=1,
+     arrow=True,
+     default=arr1
+     )
+# ---- line: connections - dot&spoke
+Text(common=txt, text="Line: connections; dot&spoke")
+cc = Dot(cx=14.5, cy=12.5, dot_width=2)
+cr = Circle(cx=16, cy=10, radius=0.5, fill_stroke="red")
+co = Circle(cx=16, cy=14, radius=0.5, fill_stroke="orange")
+ca = Circle(cx=14, cy=14, radius=0.5, fill_stroke="aqua")
+Line(connections=[cc, cr, co, ca],
+     connections_style='spoke',
+     stroke="green",
+     stroke_width=1,
+     arrow=True,
+     default=arr1
+     )
+# ---- polyline - snail
+Polyline(
+    x=2, y=18,
+    snail="s 0.4 j0.1 "*12,
+    stroke_width=4,
+    stroke="orange")
+Polyline(
+    x=6, y=18,
+    snail="e 2 s 2 w 2 n 2 s j2 "*3,
+    stroke_width=2,
+    stroke="blue")
+
+snail_line = "n 6 e 4 -45 4 w 2 sw 6 **"
+Polyline(
+    x=12, y=23,
+    snail=snail_line,
+    stroke_width=2,
+)
+Polyline(
+    x=12, y=23,
+    snail=snail_line,
+    stroke_width=2,
+    scaling=0.5
+)
+PageBreak()
+
+
 # ---- assorted objects
 ctxt = Default(stroke="black", font_size=20, x=5, align="left")
 Text("StarField (with Polyon)", default=ctxt, y=1)
