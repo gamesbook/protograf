@@ -4,8 +4,6 @@ An overview of protograf capabilities
 
 Written by: Derek Hohls
 Created on: 29 November 2025
-Notes:
-    Chess font from: http://www.enpassant.dk/chess/fontimg/alpha.htm
 """
 from protograf import *
 
@@ -13,9 +11,9 @@ Create(
    filename="overview.pdf", margin=1, page_grid=2)
 
 # ---- default & common
-lbl = Default(x=5, font_size=19, align="left")
-txt = Default(x=5, font_size=19, align="left", font_name="Courier")
-header = Common(x=0, y=28, font_size=24, align="left")
+txt = Default(x=5, font_size=20, align="left", font_name="Courier")
+ctxt = Default(x=5, font_size=20, align="left")
+header = Common(x=10, y=0, font_size=24, font_name="Helvetica", align="centre")
 
 # ---- title
 Image("protograf_slogan.png", x=3.5, y=8, height=3.6, width=12)
@@ -24,17 +22,20 @@ PageBreak()
 
 # ---- simple
 Rectangle()
-Text('... a rectangle!', default=lbl)
+Text('... a rectangle!', default=ctxt)
 PageBreak()
+
 
 # ---- base
 Rectangle()
-Text('What does the script look like?', default=lbl, y=6, x=1)
+Text('What does the script look like?', default=ctxt, y=6, x=1)
 Text("""from protograf import *
 
 Create(
- filename='overview.pdf',
- margin=1, page_grid=2)
+  filename='overview.pdf',
+  margin=1, 
+  page_grid=2
+)
 Rectangle()
 Save()""",
   box=True,
@@ -44,7 +45,9 @@ Save()""",
   x=1, y=8,
   height=15,
   width=15)
+Text("A protograf script", common=header)
 PageBreak()
+
 
 # ---- styled
 Rectangle(width=3, height=4)
@@ -60,9 +63,12 @@ Rectangle(
     notch_style='bite', notch=0.5,
     radii_shapes=[('*', dot())])
 Text('Rectangle(\n y=21, \n width=3, height=4,\n notch_style="bite",\n notch=0.5, \n radii_shapes=[("*", dot())]', default=txt, y=21)
+Text("Styling a Rectangle", common=header)
 PageBreak()
 
+
 # ---- filled shapes
+Text("Shapes", common=header)
 shp = Default(title_stroke="black", title_size=18)
 Arrow(x=3, y=27,  height=2, width=1,
       title="Arrow", default=shp, fill_stroke="plum")
@@ -95,11 +101,11 @@ Rhombus(cx=16, cy=3, width=3, height=5,
         title="Rhombus", default=shp, fill_stroke="cyan")
 Square(cx=9, cy=3, side=3,
        title="Square", default=shp, fill_stroke="cyan")
-Dot(cx=9, cy=0, dot_width=12, title="Dot", default=shp, fill_stroke="red")
+Dot(cx=3, cy=0, dot_width=12, title="Dot", default=shp, fill_stroke="red")
 PageBreak()
 
+
 # ---- shape properties
-# Blueprint()
 cmm = circle(radius=0.25, fill_stroke="cyan")
 # ---- * circle hatches
 Circle(
@@ -242,12 +248,14 @@ Hexagon(
     paths_dotted=True,
     title="paths", default=shp)
 # ---- TEXT for customised shapes
-ctxt = Default(stroke="black", font_size=18, x=15, align="left")
-Text("hatches", y=2, default=ctxt)
-Text("radii", y=6, default=ctxt)
-Text("radii_shapes", y=10, default=ctxt)
-Text("slices", y=14, default=ctxt)
+cstxt = Default(stroke="black", font_size=18, x=15, align="left")
+Text("hatches", y=2, default=cstxt)
+Text("radii", y=6, default=cstxt)
+Text("radii_shapes", y=10, default=cstxt)
+Text("slices", y=14, default=cstxt)
+Text("Shapes with properties", common=header)
 PageBreak()
+
 
 # ---- Shapes with properties
 big = Default(stroke="black", font_size=32, x=9, align="left")
@@ -288,6 +296,7 @@ Rectangle(
         height=4.2, width=4.2, 
         fill=None, stroke="white", stroke_width=4.5)
 )
+Text('Shapes => "Things"', common=header)
 PageBreak()
 
 
@@ -311,31 +320,19 @@ Line(x=0, y=4, x1=4, y1=4, stroke="purple", stroke_width=1,
      wave_style='wave', wave_height=1.9)
 Line(x=0, y=4, x1=4, y1=4, stroke="firebrick", stroke_width=1,
      wave_style='sawtooth', wave_height=0.1)
-PageBreak()
-
-# ---- center line from angle
-Text(common=txt, text="Line: angle")
-
-Line(cx=1, cy=1, angle=45, length=2, stroke="red")
-Line(cx=3, cy=1, angle=225, length=2, stroke_width=1.5)
-
-Circle(cx=2, cy=3, radius=1)
-Line(cx=2, cy=3, angle=45, length=2, stroke="red", arrow_width=0.2)
-Line(cx=2, cy=3, angle=135, length=2, stroke_width=1.5, arrow_width=0.2)
-
-Line(cx=1, cy=5, angle=135, length=2, stroke_width=1.5)
-Line(cx=3, cy=5, angle=315, length=2, stroke="red")
+Text("Lines with properties", common=header)
 PageBreak()
 
 
 # ---- arrowhead
-Text(common=txt, text="Line: arrow styles")
+ctxt = Default(x=5, font_size=20, align="left")
+Text(text="Line: arrow styles", default=ctxt, y=2)
 arr1 = Default(arrow_width=0.2, arrow_height=0.3, stroke_width=0.8, x=0, x1=3)
 Line(y=1, y1=1, arrow=True, default=arr1)
 Line(y=1.5, y1=1.5, arrow_style='notch', default=arr1)
 Line(y=2, y1=2, arrow_style='angle', default=arr1)
 Line(y=2.5, y1=2.5, arrow_style='spear', default=arr1)
-
+Text(text="Line: arrow positions", default=ctxt, y=4)
 Line(y=3, y1=3,
      dotted=True,
      arrow_position=0.6,
@@ -357,16 +354,19 @@ Line(y=4.5, y1=4.5,
      arrow_position=[0.1, 0.15, 0.2], 
      default=arr1)
 # ---- lines and polyshapes & polylines
+Text(text="Polylines: sawtooth style", default=ctxt, y=6)
 Polyline(
     points='0,5 1,6 2,5 3,6',
     stroke="red", stroke_width=2,
     wave_style="sawtooth", 
     wave_height=0.03,)
+Text(text="Polylines: wave style", default=ctxt, y=7)
 Polyline(
     points='0,6 1,7 2,6 3,7',
     stroke="purple", stroke_width=2,
     wave_style="wave", 
     wave_height=0.05,)
+Text(text="Polylines: dotted + arrows", default=ctxt, y=8)
 Polyline(
     points='0,7 1,8 2,7 3,8',
     stroke_width=3,
@@ -375,7 +375,7 @@ Polyline(
     arrow_double=True
 )
 # ---- line: connections
-Text(common=txt, text="Line: connections")
+Text("Line: connections", default=ctxt, y=16, x=0)
 cc = Circle(cx=2, cy=12, radius=0.5)
 cy = Circle(cx=1, cy=10, radius=0.5, fill_stroke="gold")
 Line(connections=[cc, cy])
@@ -385,10 +385,9 @@ cr = Circle(cx=3, cy=10, radius=0.5, fill_stroke="tomato")
 Line(connections=[cc, cr])
 co = Circle(cx=3, cy=14, radius=0.5, fill_stroke="orange")
 Line(connections=[cc, co])
-# orthogonal
 Line(connections=[cy, cr, co, ca, cy], stroke_width=2)
 # ---- line: connections - arrow
-Text(common=txt, text="Line: connections; arrow")
+Text("...connections: arrow", default=ctxt, y=16, x=6)
 cc = Circle(cx=8.5, cy=12.5, radius=0.5)
 cy = Circle(cx=8, cy=10, radius=0.5, fill_stroke="gold")
 co = Circle(cx=10, cy=14, radius=0.5, fill_stroke="orange")
@@ -399,11 +398,11 @@ Line(connections=[cy, cc, co],
      default=arr1
      )
 # ---- line: connections - dot&spoke
-Text(common=txt, text="Line: connections; dot&spoke")
-cc = Dot(cx=14.5, cy=12.5, dot_width=2)
+Text("... dot&spoke", default=ctxt, y=16, x=14)
+cc = Dot(cx=14.5, cy=12.5, dot_width=10, stroke="aqua")
 cr = Circle(cx=16, cy=10, radius=0.5, fill_stroke="red")
 co = Circle(cx=16, cy=14, radius=0.5, fill_stroke="orange")
-ca = Circle(cx=14, cy=14, radius=0.5, fill_stroke="aqua")
+ca = Circle(cx=14, cy=14, radius=0.5, fill_stroke="gold")
 Line(connections=[cc, cr, co, ca],
      connections_style='spoke',
      stroke="green",
@@ -412,6 +411,7 @@ Line(connections=[cc, cr, co, ca],
      default=arr1
      )
 # ---- polyline - snail
+Text("Polyline: snail", default=ctxt, y=26, x=2)
 Polyline(
     x=2, y=18,
     snail="s 0.4 j0.1 "*12,
@@ -429,17 +429,51 @@ Polyline(
     snail=snail_line,
     stroke_width=2,
 )
+Text("Polyline: snail + scaled", default=ctxt, y=26, x=11)
 Polyline(
     x=12, y=23,
     snail=snail_line,
     stroke_width=2,
     scaling=0.5
 )
+Text("Lines and Polylines", common=header)
+PageBreak()
+
+
+# ---- polyshapes
+Text(text="Polyshape- wave style line", default=ctxt, y=3)
+Polyshape(
+    points=[(0, 5), (0, 2), (2, 1), (4, 2), (4, 5)],
+    wave_style="wave", wave_height=0.06,
+    stroke_width=1,
+    fill="gold")
+Text(text="Polyshape - snail (rotation)", default=ctxt, y=8)
+Polyshape(
+    x=0, y=8,
+    snail="4 r160 "*9,
+    stroke_width=1,
+    #scaling=0.25,
+    stroke="red",
+    fill="yellow")
+Text(text="Polyshapes - snail (scaling)", default=ctxt, y=13)
+psh = Default(
+    snail='w 1 s 1 e 5 n 1 w 1 s 3 w 3 n 1',
+    stroke="sandybrown",
+    fill="seagreen",)
+Polyshape(
+    x=0, y=12,
+    default=psh,
+    stroke_width=4)
+Polyshape(
+    x=1.25, y=13.5,
+    default=psh,
+    scaling=0.25,
+    stroke_width=3)
+Text("Polyshapes", common=header)
 PageBreak()
 
 
 # ---- assorted objects
-ctxt = Default(stroke="black", font_size=20, x=5, align="left")
 Text("StarField (with Polyon)", default=ctxt, y=1)
 Polygon(x=2.5, y=1.4, sides=10, radius=1.5, fill="black")
 StarField(
@@ -448,28 +482,38 @@ StarField(
     colors=["white", "white", "white", "red", "green", "blue", ],
     sizes=[0.3, 0.3, 0.3, 0.35, 0.5, 0.6, 0.65],
     seeding=42.3)
-Text("Cube / shades", default=ctxt, y=6)
+Text("Cube / shades", default=ctxt, y=5)
 Cube(
-    x=1, y=4.5, height=3,
+    x=1, y=3.5, height=3,
     shades=["#FFDC17", "#957F0A", "#CCB412"],
     radii_stroke="dimgray",
     radii_stroke_width=1)
-Text("D6 [die] / shades", default=ctxt, y=11)
+Text("D6 [die] / shades", default=ctxt, y=9)
 D6(
-    x=1, y=9, side=2, 
+    x=1, y=7.5, side=2, 
     roll=5, 
     pip_fill="gold", 
     pip_stroke="orange",
     fill="red", 
     rounding=0.2)
 D6(
-    x=3, y=11, side=1.75, 
+    x=3, y=9.5, side=1.75, 
     roll=4, 
     pip_fill="white",
     pip_shape="diamond",
     pip_stroke="aqua",
     fill="blue", 
     pip_fraction=0.15)
+Text("QR Code", default=ctxt, y=13)
+QRCode(
+    'qrcode2.png',
+    text="https://protograf.readthedocs.io/en/latest/",
+    x=1, y=12,
+    height=2.5, width=2.5,
+    fill="gray",
+    stroke="red",
+    scaling=5,
+)
 Text("Tetronimo", default=ctxt, y=16)
 Tetromino(
     x=0, y=15, side=1.5, 
@@ -490,30 +534,16 @@ Pentomino(
     fill="gold",
     outline_stroke="black", 
     outline_width=1)
+Text("Specialised Shapes", common=header)
 PageBreak()
 
-# ---- lines and polyshapes & polylines
-Text(common=header, text="Polyshapes, Polylines and lines")
-Line(x=0, y=2, x1=19, y1=2, stroke="black", stroke_width=2)
-Polyline(
-    points='1,3 1,4 2,4 4,3',
-    stroke="red", stroke_width=2,
-    wave_style="sawtooth", wave_height=0.03,)
-Polyline(
-    points='1,5 1,6 2,6 4,5',
-    stroke="purple", stroke_width=2,
-    wave_style="wave", wave_height=0.05,)
-Polyline(
-    points=[(0, 13), (2, 15), (4, 13), (6, 15), (8, 13), (10, 15), (12, 13)],
-    stroke="gray")
-Line(x=1, y=20, length=25.5, angle=45, stroke="tomato", stroke_width=3)  # thick diagonal
-PageBreak()
 
 # ---- grid: graph paper
-Text(common=header, text='"Graph Paper" -> Grid (95x135) and Grid (19x27)')
 Grid(cols=95, rows=135, size=0.2, stroke="mediumseagreen", stroke_width=0.9)
 Grid(cols=19, rows=27, size=1.0, stroke="mediumseagreen", stroke_width=1.5)
+Text(common=header, text='"Graph Paper" -> Grid (95x135) + Grid (19x27)')
 PageBreak()
+
 
 # ---- hexagons ~2cm grid - numbered "wargame" style
 Hexagons(
@@ -531,8 +561,9 @@ Hexagons(
     stroke="darkslategray",
     caltrops=0.5,
 )
-Text(common=header, text="Hexagons (dot; coords; caltrops)")
+Text("Hexagons (dot; coords; caltrops)", common=header)
 PageBreak()
+
 
 # ---- Go board
 Grid(
@@ -555,6 +586,7 @@ Text("""DotGrid(
   side=6,
   dot_width=8
 )""", default=txt, x=9, y=20)
+Text("Go board", common=header)
 PageBreak()
 
 

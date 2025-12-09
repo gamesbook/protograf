@@ -69,12 +69,21 @@ Rectangle(
 
 
 Text(common=header_font, x=5, y=21,
-     text="Start Player Token: circles + radii at angles")
-Polygon(cx=3, cy=21, height=3, sides=8, fill="black")
-Circle(cx=3, cy=21, fill="black", radius=1.25,
-       radii=steps(0, 315, 45),
-       radii_stroke="gold", radii_stroke_width=2)
-Circle(cx=3, cy=21, stroke="black", fill="gold", radius=0.5, stroke_width=5)
+     text="Start Player Token: circles + radii via steps")
+Polygon(
+    cx=3, cy=21, height=3, 
+    sides=8, fill="black",
+    centre_shapes=[
+        circle(
+            fill="black", radius=1.25,
+            radii=steps(0, 315, 45),
+            radii_stroke="gold", 
+            radii_stroke_width=2),
+        circle(
+            stroke="black", fill="gold", 
+            radius=0.5, stroke_width=5)
+        ]
+)
 
 
 Text(common=header_font, x=5, y=26,
