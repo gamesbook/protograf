@@ -15,7 +15,7 @@ Create(filename="hex_game_board.pdf", margin=0.5, paper="A4-l")
 Rhombus(
     height=18, width=30.7, cx=14.25, cy=9.25,
     stroke="black", fill="white", stroke_width=1,
-    slices=[None, "black", None, "black"]
+    slices=["red", "black", "red", "black"]
 )
 Hexagons(
     cols=21,

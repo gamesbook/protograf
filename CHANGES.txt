@@ -8,6 +8,7 @@ protograf Changes
 - Add new overview script
 - Patch text for Stadium
 - Patch drawing order items
+- Add Dejarik board example
 
 2025-11-23 (0.3.4)
 ------------------

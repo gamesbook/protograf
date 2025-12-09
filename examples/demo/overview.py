@@ -589,6 +589,29 @@ Text("""DotGrid(
 Text("Go board", common=header)
 PageBreak()
 
-
+# ---- Dejarik board
+Circle(
+    cx=10.5, cy=9,
+    radius=8,
+    stroke_width=16,
+    slices=["black", "silver"]*6,
+    centre_shapes=[
+        circle(radius=5.2, stroke_width=12, slices=["#E0DFDD", "black"]*6, rotation=15),
+        circle(radius=1.8, stroke_width=8, fill="silver") 
+    ],
+    rotation=15
+)
+Text("""Circle(
+  cx=10.5, cy=14, 
+  radius=10, stroke_width=20,
+  slices=["black", "silver"]*6,
+  centre_shapes=[
+    circle(radius=6.5, stroke_width=15, 
+           slices=["#E0DFDD", "black"]*6, 
+           rotation=15),
+    circle(radius=2.5, stroke_width=10, 
+           fill="silver")],
+  rotation=15)""", default=txt, x=0, y=18)
+Text("Dejarik board", common=header)
     
 Save()

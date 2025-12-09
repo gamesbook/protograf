@@ -36,6 +36,7 @@ python objects/dice_d6.py
 # ---- boards: abstract
 echo -e "\nCreating abstract boards..."
 python boards/abstract/chessboard.py
+python boards/abstract/dejarik.py
 python boards/abstract/chessboard_brown.py
 python boards/abstract/go.py
 python boards/abstract/hex_game.py
