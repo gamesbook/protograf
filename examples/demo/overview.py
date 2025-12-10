@@ -4,6 +4,11 @@ An overview of protograf capabilities
 
 Written by: Derek Hohls
 Created on: 29 November 2025
+
+Font sources:
+    * https://fonts.google.com/specimen/Eagle+Lake
+    * https://fonts.google.com/specimen/Quintessential
+    * https://github.com/toddfast/game-icons-net-font (Icons)
 """
 from protograf import *
 
@@ -11,7 +16,7 @@ Create(
    filename="overview.pdf", margin=1, page_grid=2)
 
 # ---- default & common
-txt = Default(x=5, font_size=20, align="left", font_name="Courier")
+txt = Default(x=5, font_size=20, align="left", font_name="Courier-Bold")
 ctxt = Default(x=5, font_size=20, align="left")
 header = Common(x=10, y=0, font_size=24, font_name="Helvetica", align="centre")
 
@@ -39,7 +44,7 @@ Create(
 Rectangle()
 Save()""",
   box=True,
-  font_name="Courier",
+  font_name="Courier-Bold",
   font_size=24,
   align="left",
   x=1, y=8,
@@ -51,18 +56,18 @@ PageBreak()
 
 # ---- styled
 Rectangle(width=3, height=4)
-Text('Rectangle(\n width=3, height=4)', default=txt, y=1)
-Rectangle(y=6, width=3, height=4, fill="yellow", stroke="red", stroke_width=4)
-Text('Rectangle(\n y=6, \n width=3, height=4,\n fill="yellow", stroke="red",\n stroke_width=4)', default=txt, y=6)
-Rectangle(y=11, width=3, height=4, label="Hi!", label_size=18)
-Text('Rectangle(\n y=11, \n width=3, height=4,\n label="Hi!,\n label_size=18")', default=txt, y=11)
-Rectangle(y=16, width=3, height=4, hatches_count=5)
-Text('Rectangle(\n y=16, \n width=3, height=4,\n hatches_count=5)', default=txt, y=16)
+Text('Rectangle(\n width=3, height=4)', default=txt, y=1.5)
+Rectangle(y=6.5, width=3, height=4, fill="yellow", stroke="red", stroke_width=4)
+Text('Rectangle(\n width=3, height=4, y=6,\n fill="yellow", stroke="red",\n stroke_width=4)', default=txt, y=7)
+Rectangle(y=12, width=3, height=4, label="Hi!", label_size=18)
+Text('Rectangle(\n width=3, height=4, y=11,\n label="Hi!,\n label_size=18")', default=txt, y=12.5)
+Rectangle(y=17.5, width=3, height=4, hatches_count=5)
+Text('Rectangle(\n width=3, height=4, y=16,\n hatches_count=5)', default=txt, y=18)
 Rectangle(
-    y=21, width=3, height=4,
+    y=23, width=3, height=4,
     notch_style='bite', notch=0.5,
     radii_shapes=[('*', dot())])
-Text('Rectangle(\n y=21, \n width=3, height=4,\n notch_style="bite",\n notch=0.5, \n radii_shapes=[("*", dot())]', default=txt, y=21)
+Text('Rectangle(\n width=3, height=4, y=21,\n notch_style="bite",\n notch=0.5, \n radii_shapes=[("*", dot())])', default=txt, y=23.5)
 Text("Styling a Rectangle", common=header)
 PageBreak()
 
@@ -300,31 +305,7 @@ Text('Shapes => "Things"', common=header)
 PageBreak()
 
 
-# ----- lines
-Text(common=txt, text='Line: locations; styles')
-Line(x=0, y=0.5, stroke_width=0.2, dotted=True, label="0.2", font_size=6)
-Line(x=1, y=0.5, stroke_width=0.4, dotted=True, label="0.4", font_size=6)
-Line(x=2, y=0.5, stroke_width=0.8, dotted=True, label="0.8", font_size=6)
-Line(x=3, y=0.5, stroke_width=1.6, dotted=True, label="1.6", font_size=6)
-
-Line(x=1, y=1, length=2, stroke="chartreuse", stroke_width=10)
-Line(x=1, y=1.5, length=2, stroke="aqua", stroke_width=10, stroke_ends="rounded")
-Line(x=1, y=2, length=2, stroke="gold", stroke_width=10, stroke_ends="squared")
-
-Line(x=0, y=2.5, length=4, stroke="pink", stroke_width=2)
-Line(x=0, y=3.6, length=4.1, angle=15, stroke="red", label="15", font_size=6)
-Line(x=0, y=5, x1=4, y1=5.9, stroke="blue", stroke_width=1,
-     dashed=[0.2, 0.1], label="dashed:[0.2,0.1]", font_size=6)
-
-Line(x=0, y=4, x1=4, y1=4, stroke="purple", stroke_width=1,
-     wave_style='wave', wave_height=1.9)
-Line(x=0, y=4, x1=4, y1=4, stroke="firebrick", stroke_width=1,
-     wave_style='sawtooth', wave_height=0.1)
-Text("Lines with properties", common=header)
-PageBreak()
-
-
-# ---- arrowhead
+# ---- Lines & arrowheads
 ctxt = Default(x=5, font_size=20, align="left")
 Text(text="Line: arrow styles", default=ctxt, y=2)
 arr1 = Default(arrow_width=0.2, arrow_height=0.3, stroke_width=0.8, x=0, x1=3)
@@ -353,7 +334,7 @@ Line(y=4.5, y1=4.5,
      arrow_width=0.15,
      arrow_position=[0.1, 0.15, 0.2], 
      default=arr1)
-# ---- lines and polyshapes & polylines
+# ---- polylines
 Text(text="Polylines: sawtooth style", default=ctxt, y=6)
 Polyline(
     points='0,5 1,6 2,5 3,6',
@@ -378,13 +359,13 @@ Polyline(
 Text("Line: connections", default=ctxt, y=16, x=0)
 cc = Circle(cx=2, cy=12, radius=0.5)
 cy = Circle(cx=1, cy=10, radius=0.5, fill_stroke="gold")
-Line(connections=[cc, cy])
+Line(connections=[cc, cy], stroke_width=4, stroke="lime")
 ca = Circle(cx=1, cy=14, radius=0.5, fill_stroke="aqua")
-Line(connections=[cc, ca])
+Line(connections=[cc, ca], stroke_width=6, dashed=[0.2, 0.1])
 cr = Circle(cx=3, cy=10, radius=0.5, fill_stroke="tomato")
-Line(connections=[cc, cr])
+Line(connections=[cc, cr], stroke_width=2, wave_style='sawtooth', wave_height=0.06)
 co = Circle(cx=3, cy=14, radius=0.5, fill_stroke="orange")
-Line(connections=[cc, co])
+Line(connections=[cc, co], stroke_width=4, stroke="lime")
 Line(connections=[cy, cr, co, ca, cy], stroke_width=2)
 # ---- line: connections - arrow
 Text("...connections: arrow", default=ctxt, y=16, x=6)
@@ -393,7 +374,7 @@ cy = Circle(cx=8, cy=10, radius=0.5, fill_stroke="gold")
 co = Circle(cx=10, cy=14, radius=0.5, fill_stroke="orange")
 Line(connections=[cy, cc, co],
      stroke="red",
-     stroke_width=1,
+     stroke_width=1.5,
      arrow=True,
      default=arr1
      )
@@ -406,8 +387,9 @@ ca = Circle(cx=14, cy=14, radius=0.5, fill_stroke="gold")
 Line(connections=[cc, cr, co, ca],
      connections_style='spoke',
      stroke="green",
-     stroke_width=1,
-     arrow=True,
+     stroke_width=1.5,
+     # arrow=True,
+     arrow_double=True,
      default=arr1
      )
 # ---- polyline - snail
@@ -537,6 +519,96 @@ Pentomino(
 Text("Specialised Shapes", common=header)
 PageBreak()
 
+# ---- text
+Blueprint()
+Text("Plain, default, text")
+Text("Default Text()", default=ctxt, y=1)
+basic = Common(
+    wrap=True,
+    x=0,
+    width=5, height=2.5,
+    font_size=14,
+    align="left")
+Text(common=basic,
+     y=1.5,
+     fill="white",
+     outlined=True,
+     text="Outlined; white fill")
+Text(common=basic,
+     y=2.5,
+     fill=None,
+     outlined=True,
+     text_stroke_width=0.1,
+     text="Outlined; no fill; text_stroke_width=.1")
+Text(common=basic,
+     y=4,
+     fill="yellow",
+     outlined=True,
+     text_stroke_width=0.02,
+     text="Outlined; yellow fill; text_stroke_width=.02")
+Text("Outlined Text()", default=ctxt, y=3)
+
+Text(x=2.5, y=6.5, text="Line text 1,1 - rotate 20", font_size=14, rotation=20)
+Text("Rotated Text()", default=ctxt, y=6.5)
+Text(font_size=14, x=0, y=8, width=5, height=2, wrap=True,
+     text="Wrap textbox - 5-by-2 - rotate 90", rotation=90)
+Text("Rotated textbox", default=ctxt, y=9)
+
+Text(wrap=True,
+     x=0, y=11, width=4.8, height=3,
+     font_size=16,  fill="black", stroke="black",
+     font_name="Times-Roman", align="right",
+     transform='title',
+     text="Times-Roman 16pt in title case to the right")
+Text("Wrap textbox: transformed & aligned text", default=ctxt, y=12)
+
+Text(x=0, y=14, width=4.8, height=2.5,
+     box_stroke="red", box_fill="yellow",
+     box_dotted=True, box_transparency=50,
+     style="font-family: Courier; font-size: 16pt; color: blue;",
+     text='HTML/CSS; Courier 16pt; blue<br/>')
+Text("HTML textbox with its box styled", default=ctxt, y=15)
+
+Text(x=0, y=17, width=4.8, height=1.5, wrap=True,
+     align="right", stroke="lime", font_size=18,
+     font_name="Eagle Lake", box_fill="lightcyan",
+     text="Eagle Lake")
+Text("Wrap textbox with custom font", default=ctxt, y=18)
+
+IconFont("Arial")
+Text(x=0.5, y=20, width=4, height=2,
+     html=True,
+     # box_fill="white",
+     box_fill="silver",
+     text="""
+     <div style="
+         font-family: Quintessential;
+         font-size:16.0px;
+         color:blue;
+         text-align:center;">
+     Return 2 |:openmoji--fish 14:| and get 3 |!\u2666!|
+     </div>"""
+ )
+Text("HTML textbox; custom font; inline icons", default=ctxt, y=21)
+
+IconFont("game-icons-net-20200315a")
+Text(x=0.5, y=22.5, width=4, height=2,
+     html=True,
+     box_fill="silver",
+     text="""
+     <div style="
+         font-family: Quintessential;
+         font-size:16.0px;
+         color:blue;
+         text-align:center;">
+     Recyle 2 |;openmoji--fish 16;| and get 4 |!\uEB73 16 green!|
+     </div>"""
+ )
+Text("HTML textbox; custom font; inline icons", default=ctxt, y=23)
+Text("(icons via SVG & built-font symbols)", default=ctxt, y=24)
+
+Text(common=header, text='Text: Font & Styling')
+PageBreak()
 
 # ---- grid: graph paper
 Grid(cols=95, rows=135, size=0.2, stroke="mediumseagreen", stroke_width=0.9)

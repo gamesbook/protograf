@@ -9,6 +9,7 @@ Font sources:
     * https://fonts.google.com/specimen/Eagle+Lake
     * https://fontmeme.com/fonts/freemono-font/
     * https://fonts.google.com/specimen/Tektur
+    * https://github.com/toddfast/game-icons-net-font (Icons)
 """
 
 from protograf import *
