@@ -5,7 +5,9 @@ An overview of protograf capabilities
 Written by: Derek Hohls
 Created on: 29 November 2025
 
-Font sources:
+Sources and Credit:
+    * SVG from https://thenounproject.com/icon/typewriter-3933515/
+    * Forest PNG extracted from https://picjumbo.com/mysterious-fantasy-forest-with-old-bridges/
     * https://fonts.google.com/specimen/Eagle+Lake
     * https://fonts.google.com/specimen/Quintessential
     * https://github.com/toddfast/game-icons-net-font (Icons)
@@ -520,7 +522,6 @@ Text("Specialised Shapes", common=header)
 PageBreak()
 
 # ---- text
-Blueprint()
 Text("Plain, default, text")
 Text("Default Text()", default=ctxt, y=1)
 basic = Common(
@@ -609,6 +610,53 @@ Text("(icons via SVG & built-font symbols)", default=ctxt, y=24)
 
 Text(common=header, text='Text: Font & Styling')
 PageBreak()
+
+
+# ---- images
+Image("sholes_typewriter.png",
+      width=3, height=3,
+      x=1, y=1)
+Text("PNG Image", default=ctxt, y=2)
+Image("noun-typewriter-3933515.svg",
+      width=3, height=3,
+      x=1, y=4, 
+      rotation=45)
+Text("SVG Image; rotated 45\u00B0", default=ctxt, y=5)
+
+Image("sholes_typewriter.png", sliced='t',
+      width=3, height=1, x=0.0, y=7)
+Image("sholes_typewriter.png", sliced='m',
+      width=3, height=1, x=0.5, y=8.5)
+Image("sholes_typewriter.png", sliced='b',
+      width=3, height=1, x=1.25, y=10)
+Text("Sliced image (multiple portions)", default=ctxt, y=9)
+
+image_file = "fantasy-forest-with-old-bridges.png"
+Image(image_file,
+      width=3, height=3,
+      x=1, y=12,
+      operation=['r', 50]
+)
+Text("Image with rounded corners", default=ctxt, y=13)
+Image(image_file,
+      width=3, height=3,
+      x=0.5, y=15,
+      operation=['c', 100, -75, 75])
+Text("Image portion extracted as a circle", default=ctxt, y=16.5)
+Image(image_file,
+      width=3, height=3,
+      x=1, y=17.5,
+      operation=['e', (160, 240)])
+Text("Image portion extracted as an ellipse", default=ctxt, y=19)
+Image(image_file,
+      width=3, height=3,
+      x=1, y=20,
+      operation=['p', 140, 5])
+Text("Image portion extracted as a polygon (5-sided)", default=ctxt, y=21.5)
+
+Text(common=header, text='Image Manipulation')
+PageBreak()
+
 
 # ---- grid: graph paper
 Grid(cols=95, rows=135, size=0.2, stroke="mediumseagreen", stroke_width=0.9)

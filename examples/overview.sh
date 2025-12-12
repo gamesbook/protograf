@@ -7,8 +7,8 @@ echo -e "Creating core..."
 python demo/overview.py --no-png -d /tmp/demo
 # ---- examples:games
 echo -e "Creating basic examples..."
-python objects/pentominoes.py --no-png -d /tmp/demo
 python boards/abstract/octagons.py --no-png -d /tmp/demo
+python objects/pentominoes.py --no-png -d /tmp/demo
 echo -e "Creating commercial boards..."
 python boards/commercial/underwater_cities.py --no-png -d /tmp/demo
 python boards/commercial/tm_player_board.py --no-png -d /tmp/demo
