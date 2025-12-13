@@ -25,7 +25,50 @@ header = Common(x=10, y=0, font_size=24, font_name="Helvetica", align="centre")
 # ---- title
 Image("protograf_slogan.png", x=3.5, y=8, height=3.6, width=12)
 Text('A Brief Tour...', font_size=48, stroke="#3286AD", x=9.5, y=15)
+Text('December 2025', font_size=36, stroke="#3286AD", x=9.5, y=17)
 PageBreak()
+
+# --- TOC
+
+Text(x=0.75, y=1, 
+     width=18, height=25,
+     html=True,
+     text="""
+     <div style="
+         font-family: Helvetica;
+         font-size:32.0px;
+         color:blue;
+         text-align:left;">
+     <ul>
+       <li>Basic script grammar</li>
+       <li>Basic styling</li>
+       <li>Shapes Available</li>
+       <li>Shapes Properties </li>
+       <li>Creating "things"</li>
+       <li>Lines & Polylines</li>
+       <li>Polyshapes</li>
+       <li>Specialised Shapes</li>
+       <li>Font & Styling</li>
+       <li>Image Manipulation</li>
+       <li>Grid :: Graph Paper</li>
+       <li>Hexagons Grid & Track Layout</li>
+       <li><i>Go</i> board</li>
+       <li><i>Dejarik</i> board</li>
+       <li>Pentominoes Puzzle</li>
+       <li><i>Underwater Cities</i> board</li>
+       <li><i>Warp War</i> board</li>
+       <li>Poker Cards</li>
+       <li>Paper Money</li>
+       <li>Wargame Counters</li>
+       <li>BoardGameGeek Game Cards</li>
+       <li></li>
+     </ul>
+     </div>"""
+)
+Text('What will be covered', common=header)
+PageBreak()
+
+
 
 # ---- simple
 Rectangle()
@@ -59,8 +102,8 @@ PageBreak()
 # ---- styled
 Rectangle(width=3, height=4)
 Text('Rectangle(\n width=3, height=4)', default=txt, y=1.5)
-Rectangle(y=6.5, width=3, height=4, fill="yellow", stroke="red", stroke_width=4)
-Text('Rectangle(\n width=3, height=4, y=6,\n fill="yellow", stroke="red",\n stroke_width=4)', default=txt, y=7)
+Rectangle(y=6.5, width=3, height=4, fill="yellow", stroke="red", transparency=50, stroke_width=4)
+Text('Rectangle(\n width=3, height=4, y=6,\n fill="yellow", stroke="red",\n transparency=50,\n stroke_width=4)', default=txt, y=7)
 Rectangle(y=12, width=3, height=4, label="Hi!", label_size=18)
 Text('Rectangle(\n width=3, height=4, y=11,\n label="Hi!,\n label_size=18")', default=txt, y=12.5)
 Rectangle(y=17.5, width=3, height=4, hatches_count=5)
@@ -667,11 +710,11 @@ PageBreak()
 
 # ---- hexagons ~2cm grid - numbered "wargame" style
 Hexagons(
-    rows=11,
-    cols=9,
-    side=1.69,
-    margin_left=-1.8,
-    margin_top=-1.529,
+    rows=10,
+    cols=8,
+    height=2.5,
+    margin_left=0.2,
+    margin_top=1.4,
     dot=0.05,
     dot_stroke="black",
     coord_elevation="top",
@@ -681,7 +724,40 @@ Hexagons(
     stroke="darkslategray",
     caltrops=0.5,
 )
-Text("Hexagons (dot; coords; caltrops)", common=header)
+# ---- rotations + corners - layout_rect_outer_rotation
+circ = circle(
+    label="{{sequence - 1}}", label_size=14, 
+    stroke_width=1,
+    radius=0.65, 
+    stroke="maroon",
+    fill="peachpuff")
+rct_common = Common(label_size=14, points=[('s', 0.1)], height=1.25, width=1.25)
+rct2 = rectangle(
+    common=rct_common, label="{{sequence - 1}}", 
+    fill="mistyrose",
+    stroke_width=1)
+rct3 = rectangle(
+    common=rct_common, label="{{sequence - 1}}",
+    fill="maroon", stroke="rosybrown",
+    stroke_width=1)
+rrect = RectangularLocations(
+    x=0.5, y=0.75, 
+    cols=15, rows=22, 
+    interval=1.25,
+    start="SW", direction="north", pattern="outer")
+Layout(
+    rrect,
+    shapes=[rct3] + [rct2]*4,
+    rotations=[
+        ("1", 135), 
+        ("2-21", 90),
+        ("22", 45),
+        ("36", -45), 
+        ("37-56", 270),
+        ("57", 225), 
+        ("58-70", 180),],
+    corners=[('*', circ)])
+Text("Hexagons Grid & Track Layout", common=header)
 PageBreak()
 
 

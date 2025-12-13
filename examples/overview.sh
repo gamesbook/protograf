@@ -7,11 +7,9 @@ echo -e "Creating core..."
 python demo/overview.py --no-png -d /tmp/demo
 # ---- examples:games
 echo -e "Creating basic examples..."
-python boards/abstract/octagons.py --no-png -d /tmp/demo
 python objects/pentominoes.py --no-png -d /tmp/demo
 echo -e "Creating commercial boards..."
 python boards/commercial/underwater_cities.py --no-png -d /tmp/demo
-python boards/commercial/tm_player_board.py --no-png -d /tmp/demo
 python boards/commercial/warpwar.py --no-png -d /tmp/demo
 echo -e "Creating counters and money..."
 python counters/counters_doagc.py --no-png -d /tmp/demo
@@ -31,8 +29,8 @@ pdftk doagc.pdf cat 1left output doagc_eg.pdf
 # ---- assemble pages
 echo -e "Assembling pages..."
 pdftk overview.pdf \
-  octagons.pdf pent_eg.pdf \
-  uw_eg.pdf tm_player_board.pdf warpwar.pdf \
+  pent_eg.pdf \
+  uw_eg.pdf warpwar.pdf \
   cs_eg.pdf su_eg.pdf doagc_eg.pdf cards_bgg_thumb.pdf \
   cat output pg_overview.pdf
 echo -e "\nDone!"
