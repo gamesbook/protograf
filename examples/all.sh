@@ -113,6 +113,9 @@ python various/objects.py --no-png -d /tmp/demo
 python various/rolling.py --no-png -d /tmp/demo
 python various/unicode.py --no-png -d /tmp/demo
 python various/world_clocks.py --no-png -d /tmp/demo
+# -- demo
+echo -e "\nCreating demo..."
+python demo/overview.py --no-png -d /tmp/demo
 # -- Board Game Geek
 echo -e "\nCreating BGG game cards..."
 python bgg/cards_bgg_basic.py --no-png -d /tmp/demo

@@ -309,9 +309,18 @@ PageBreak()
 
 # ---- Shapes with properties
 big = Default(stroke="black", font_size=32, x=9, align="left")
-Text('"Gold Coin"', default=big, y=4)
+Text('"Gold Coin"', default=big, y=3)
 Circle(
-    cx=5, cy=22, radius=2,
+    cx=5, cy=3, radius=2,
+    fill="gold", stroke_width=2, 
+    radii=steps(0,360,15),
+    centre_shape=circle(
+        radius=1.5,
+        fill="gold", label="5", font_size=48)
+)
+Text('"XOK Fish"', default=big, y=19)
+Circle(
+    cx=5, cy=19.5, radius=2,
     fill="#63B1BB", stroke="#63B1BB",
     radii=[135,225],
     radii_offset=1, radii_length=2,
@@ -320,24 +329,15 @@ Circle(
     radii_shapes=[(45, dot(stroke="white", dot_width=10), 0.75)],
     order_last=["radii_shapes"]
 )
-Text('"Red Pawn"', default=big, y=10)
-Circle(
-    cx=5, cy=4, radius=2,
-    fill="gold", stroke_width=2, 
-    radii=steps(0,360,15),
-    centre_shape=circle(
-        radius=1.5,
-        fill="gold", label="5", font_size=48)
-)
-Text('"German Cross"', default=big, y=16)
+Text('"Red Pawn"', default=big, y=8)
 Triangle(
-    cx=5, cy=11, side=4,
+    cx=5, cy=9.5, side=4,
     fill_stroke="red",
     radii_shapes=[('n', circle(fill_stroke="red", radius=1))],
 )
-Text('"XOK Fish"', default=big, y=22)
+Text('"German Cross"', default=big, y=14)
 Rectangle(
-    height=4.2, width=4.2, x=3, y=14,
+    height=4.2, width=4.2, x=3, y=12,
     fill="white", stroke="black", stroke_width=3,
     hatches_stroke_width=33, hatches_stroke="black",
     hatches='o', hatches_count=1,
@@ -346,6 +346,41 @@ Rectangle(
         height=4.2, width=4.2, 
         fill=None, stroke="white", stroke_width=4.5)
 )
+Text('"Compass Rose"', default=big, y=25)
+eye = Common(cx=5, cy=25)
+Circle(
+    common=eye,
+    radius=2,
+    stroke_width=1,
+    fill=None,
+    radii=steps(0, 360, 5),
+    radii_offset=1.85,
+    radii_length=0.1,
+    radii_stroke_width=1,
+    heading="N")
+Circle(
+    common=eye,
+    radius=1.2,
+    stroke_width=1,
+    fill=None)
+Star(
+     common=eye,
+     radius=1.4,
+     rays=4,
+     show_radii=True,
+     rotation=45,
+     stroke_width=1,
+     slices=["black", "white"],
+     radii_stroke_width=1,
+     inner_fraction=0.25,
+)
+Star(common=eye,
+     radius=2.2,
+     rays=4,
+     inner_fraction=0.25,
+     stroke_width=1,
+     slices=["black", "white"],
+ )
 Text('Shapes => "Things"', common=header)
 PageBreak()
 

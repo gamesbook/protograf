@@ -2,10 +2,10 @@ echo -e "\nCreating and assembling a PDF for the overview"
 echo " (NOTE: this script requires pdftk to be installed)"
 echo -e "\nAll output will be saved to /tmp/demo"
 mkdir -p /tmp/demo
-# ---- examples: core
-echo -e "Creating core..."
+# ---- examples: demo
+echo -e "Creating demo core..."
 python demo/overview.py --no-png -d /tmp/demo
-# ---- examples:games
+# ---- examples: games
 echo -e "Creating basic examples..."
 python objects/pentominoes.py --no-png -d /tmp/demo
 echo -e "Creating commercial boards..."

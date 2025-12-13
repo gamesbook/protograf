@@ -22,12 +22,10 @@ Create(filename="logo.pdf",
 sanserif = Font("Courier", size=24, stroke="#3085AC")
 Text(x=0, y=1, text='proto', width=3, height=2,
      wrap=True, align="left", stroke="#3085AC")
-
-Text(x=2.58, y=1.1, width=3, height=2,
+Text(x=1.72, y=1.1, width=3, height=2,
      text="""<span style="font-family: Helvetica; font-size: 20pt; color: #3085AC">
      <b>graf</b></span>""",
      html=True)
-
 Hexagon(
     cx=1.27, cy=1.61,
     stroke="#3085AC",
@@ -44,9 +42,11 @@ Polygon(
     radii_stroke_width=0.5,
     sides=8
 )
-Text(x=-0.05, y=2, width=8, height=2,
-     text="""<span style="font-family: Helvetica; font-size: 7pt; color: #3085AC;">
-     <b>making prototypes &#8212;made simple</b></span>""",
+Text(x=-2.1, y=2, 
+     width=8, height=2,
+     text="""
+     <span style="font-family:Helvetica; font-size:6.8pt; color:#3085AC; text-align:left">
+     <b>making prototypes&#8212;made simple</b></span>""",
      html=True)
 
 Save(
