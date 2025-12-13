@@ -1026,6 +1026,8 @@ class DeckOfCards:
         self.export_cards = kwargs.get("export_cards", False)
         self.dpi = kwargs.get("dpi", 300)
         prime_globals = None
+        width = globals.page[0]
+        height = globals.page[1]
 
         # ---- gutter-based settings (new doc)
         if self.gutter > 0:
@@ -2028,6 +2030,7 @@ def Save(**kwargs):
         )
 
     # ---- save to PNG image(s) or SVG file(s)
+    fformat = None
     if output:
         match _lower(output):
             case "png":

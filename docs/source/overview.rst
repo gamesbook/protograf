@@ -53,7 +53,7 @@ tool, then that will likely suit your needs perfectly.
 
 However, there might be a reason to use something simpler. Daniel, of
 https://daniel.games/ has this to say about making a game prototype which
-is ready to show to a wider audience:
+should be ready to show to a wider audience:
 
     The game should be neat. This means it's simple, clear, and not ugly.
 
@@ -75,6 +75,17 @@ is ready to show to a wider audience:
 So, **protograf** aims to help you achieve the above |dash| the
 "second-best design"!
 
+As an example of this approach, here is a quote from a game designer:
+
+    "In May 2023, I talked with Albin, who runs Game Prototyper, a local Swedish
+    shop for creating prototypes and small print-run games. Albin found a good
+    illustrator, Marco Aurélio from Brazil, who created nice art, taking my rough
+    prototypes into something really beautiful. Albin himself did most of the
+    graphics design putting it all together."
+
+    Magnus Karlsson, from his *"Designer Diary: The Plank"*, at
+    https://boardgamegeek.com/blog/1/blogpost/176994/designer-diary-the-plank
+
 To see how a professional graphic designer develops production-ready design
 of game components, watch this interview with Brigette Indelicato at
 https://www.youtube.com/watch?v=_PfOjSAEFUY
@@ -91,7 +102,8 @@ the design that you intended to make!
 
 As your design changes and evolves, you can add or change instructions,
 or add new information for your cards, and then quickly recreate the new
-output.
+output. Because **protograf** scripts are very small, its easy to save
+versions as you go along.
 
 
 How does **protograf** work?

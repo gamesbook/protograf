@@ -16,6 +16,7 @@ will demonstrate full scalability.
 
 - `Chess`_
 - `Backgammon`_
+- `Dejarik`_
 - `Go`_
 - `Hex`_
 - `HexHex Games`_
@@ -87,6 +88,29 @@ Screenshot  .. image:: images/boards/abstract/backgammon.png
 =========== ==================================================================
 
 
+Dejarik
+=======
+`↑ <table-of-contents-exabs_>`_
+
+`Dejarik <https://en.wikipedia.org/wiki/Dejarik>`__ is a holographic, 
+Chess-like game depicted in the "Star Wars" movies.
+
+=========== ==================================================================
+Title       *Dejarik Board*
+----------- ------------------------------------------------------------------
+Script      `dejarik.py <https://github.com/gamesbook/protograf/blob/master/examples/boards/abstract/dejarik.py>`_
+----------- ------------------------------------------------------------------
+Discussion  The code uses a basic ``Circle()``, with the *slices*
+            property being used to construct the internal sectors that creates
+            the "dartboard-like" effect of radiating spaces. The
+            *centre_shapes* property adds more overlapping circles.
+
+----------- ------------------------------------------------------------------
+Screenshot  .. image:: images/boards/abstract/dejarik.png
+               :width: 90%
+=========== ==================================================================
+
+
 Go
 ==
 `↑ <table-of-contents-exabs_>`_
@@ -115,8 +139,8 @@ Hex
 ===
 `↑ <table-of-contents-exabs_>`_
 
-"Hex" is the title of a game invented by Piet Hein; see:
-https://en.wikipedia.org/wiki/Hex_(board_game)
+`Hex <https://en.wikipedia.org/wiki/Hex_(board_game)>`__ is the title of a game 
+invented by Piet Hein.
 
 =========== ==================================================================
 Title       *Hex Board*

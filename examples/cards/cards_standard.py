@@ -37,7 +37,7 @@ value_top = Common(x=1.0, y=1.4, font_size=40)
 value_black = text(common=value_top, stroke="black", text=T('{{VALUE}}'))
 value_red = text(common=value_top, stroke=gred, text=T('{{VALUE}}'))
 
-value_low = Common(x=5.85, y=7.4, font_size=40, rotation=180)
+value_low = Common(x=5.4, y=7.4, font_size=40, rotation=180)
 value_low_black = text(common=value_low, stroke="black", text=T('{{VALUE}}'))
 value_low_red = text(common=value_low, stroke=gred, text=T('{{VALUE}}'))
 

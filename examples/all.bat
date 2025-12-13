@@ -48,6 +48,7 @@ REM ---- boards: abstract
 ECHO "Creating abstract boards..."
 python boards\abstract\chessboard.py --no-png -d %location%
 python boards\abstract\chessboard_brown.py --no-png -d %location%
+python boards\abstract\dejarik.py --no-png -d %location%
 python boards\abstract\go.py --no-png -d %location%
 python boards\abstract\hex_game.py --no-png -d %location%
 python boards\abstract\hexhex.py --no-png -d %location%

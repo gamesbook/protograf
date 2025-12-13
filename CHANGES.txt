@@ -1,6 +1,15 @@
 protograf Changes
 =================
 
+2025-12-13 (0.3.5)
+------------------
+- Patch drawing radii shapes for Rectangle
+- Patch docs for Sector
+- Add new overview script
+- Patch text for Stadium
+- Patch drawing order items
+- Add Dejarik board example
+
 2025-11-23 (0.3.4)
 ------------------
 - Add "center" alias for "centre"

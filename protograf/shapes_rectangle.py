@@ -1805,7 +1805,7 @@ class RectangleShape(BaseShape):
                     self.draw_radii_shapes(
                         cnv,
                         self.radii_shapes,
-                        self.vertexes,
+                        self.get_vertexes(**kwargs),
                         Point(x_d, y_d),
                         DirectionGroup.ORDINAL,  # for radii !
                         rotation,
@@ -1817,7 +1817,7 @@ class RectangleShape(BaseShape):
                     self.draw_perbii_shapes(
                         cnv,
                         self.perbii_shapes,
-                        self.vertexes,
+                        self.get_vertexes(**kwargs),
                         Point(x_d, y_d),
                         DirectionGroup.CARDINAL,  # for perbii !
                         rotation,

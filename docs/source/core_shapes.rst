@@ -2270,11 +2270,11 @@ Example 2. Customised Sector
             cx=2, cy=3, radius=2,
             fill="black", angle_width=43)
 
-        Sector(common=sctm, angle=40)
-        Sector(common=sctm, angle=160)
-        Sector(common=sctm, angle=280)
+        Sector(common=sctm, angle_start=40)
+        Sector(common=sctm, angle_start=160)
+        Sector(common=sctm, angle_start=280)
 
-      These all have the following Common properties:
+      These all have the following ``Common()`` properties:
 
       - centred at x-position ``2`` cm and at y-position ``3`` cm
       - *radius* of ``2`` cm for the enclosing "virtual" circle
@@ -2282,7 +2282,7 @@ Example 2. Customised Sector
       - *angle_width* - determines the coverage i.e. the "width" of the
         Sector; in all these cases it is 43 |deg|
 
-      Each sector in this example is drawn at a different *angle*.
+      Each Sector in this example is drawn at a different *angle_start*.
       This represents a "virtual" centre-line extending through the sector,
       outwards from the centre of the enclosing "virtual" circle.
 ===== ======

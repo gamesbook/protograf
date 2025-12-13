@@ -91,8 +91,8 @@ useful information but do build on each other.
    :caption: References:
 
    commands
-   development
    rationale
+   development
    useful_resources
 
 

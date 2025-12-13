@@ -91,7 +91,7 @@ class PolyominoObject(RectangleShape):
         # tetris
         self.letter = kwargs.get("letter", None)
         self.tetris = kwargs.get("tetris", False)
-        self.is_tetronimo = kwargs.get("is_tetromino", False)
+        self.is_tetronimo = False  # see draw()
 
     def numeric_pattern(self):
         """Generate numeric-equivalent of pattern matrix."""
@@ -305,6 +305,7 @@ class PolyominoObject(RectangleShape):
             self.int_pattern = tools.transpose_lists(
                 self.int_pattern, direction=self.flip, invert=self.invert
             )
+        self.is_tetronimo = kwargs.get("is_tetromino", False)
         # print(f"~~~ {self.int_pattern=}")
         base_x, base_y = off_x, off_y
         # ---- squares
@@ -331,11 +332,12 @@ class PolyominoObject(RectangleShape):
                     except:
                         self.label = self._label
                     # ---- Tetris: overide colors and shape centre
+                    # print(f"~~~ Polyomino {self.tetris=}  {self.is_tetronimo=}")
                     if self.tetris and self.is_tetronimo:
                         color_top, color_btm = self.set_tetris_style(**kwargs)
                         if color_top and color_btm:
                             self.slices = [color_top, color_btm]
-                            # print(f"{self.letter=} {self.slices=}")
+                            # print(f"~~~ Polyomino {self.letter=} {self.slices=}")
 
                     kwargs["row"] = row
                     kwargs["col"] = col
@@ -505,11 +507,14 @@ class StarFieldObject(BaseShape):
     def __init__(self, _object=None, canvas=None, **kwargs):
         super(StarFieldObject, self).__init__(_object=_object, canvas=canvas, **kwargs)
         self.kwargs = kwargs
-        # override to set the randomisation sequenc
+        # override to set the randomisation sequence
         if self.seeding:
             self.seed = tools.as_float(self.seeding, "seeding")
         else:
             self.seed = None
+        # validation
+        for size in self.sizes:
+            tools.as_float(size, 'the Starfield "size"', minimum=0.000000001)
 
     def draw_star(self, cnv, position: Point):
         """Draw a single star at a Point (x,y)."""

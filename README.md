@@ -80,7 +80,7 @@ and is designed to produce a single, blank, A4-sized page in a PDF file.
 It should create an output file called `example1.pdf`, which will appear in the
 same directory as the script. You should be able to open and view this file using
 any PDF-capable program or application. (If you run the script in a Python shell,
-the output file will be called `test.pdf`.)
+the output file will be called `test.pdf`)
 
 If this works, then download and try out other scripts from any of the `examples`
 sub-directories (**note** some examples may require additional files such as
@@ -100,9 +100,9 @@ Please see the [list of contributors](CONTRIBUTORS.txt).
 These features are **not** guaranteed to be implemented; they just represent
 current / potential areas of work or ideas.
 
-* [ ] New Shapes:
+* [x] New Shapes:
     * [x] Cross shape
-    * [ ] Pod shape
+    * [x] Pod shape
 * [ ] Common objects:
     * [x] Cube
     * [ ] Domino
@@ -110,14 +110,14 @@ current / potential areas of work or ideas.
     * [ ] Meeple (Polyshape with curves)
     * [x] Pentomino
 * [ ] Hexagons: 18xx tile example
-* [ ] HexHex Grid: better hexhex boards via notation
-* [ ] Polyline: define arcs along the path
+* [ ] HexHex Grid: hexhex boards using notation
+* [x] Polyline: define arcs along the path
 * [x] Paths (arcs) inside a Hexagon
 * [x] Stripes: interior "areas" for a Rectangle
 * [ ] Cards:
     * [x] support card-back designs
     * [ ] grid lines for hexagonal cards
-    * [ ] corner crosses as grid marks
+    * [x] corner crosses as grid marks
     * [x] access to Google Sheets
     * [x] extract rectangular cards as PNG files
     * [x] page annotations
@@ -128,7 +128,7 @@ current / potential areas of work or ideas.
 
 These are possible examples to show board creation based on existing games:
 
-* [ ] Extra abstract game boards: Ludo, Wari, Mu Torere
+* [ ] Extra abstract game boards: Mancala, Mu Torere
 * [ ] Wargame board: Squad Leader with full terrain features (vector and bitmap)
 * [ ] Traveller board: show a fully-styled Star System
 * [x] WarpWar board: show a fully-styled example
@@ -145,13 +145,13 @@ In this case, the [pyMuPDF](https://pymupdf.io/) library provides all of the
 core infrastructure used to do the underlying graphics processing, PDF file
 creation and images exports; __protograf__ is effectively a highly customised
 wrapper to simplify common uses around its existing and extensive capabilities.
+Internal terminology, such as `shapes`, was developed before the adoption of
+*pyMuPDF* and it is coincidental that these are similar!
 
-Earlier versions of  __protograf__  used the *ReportLab PDF Toolkit*, which is
-also a very powerful library for supporting this type of application. Internal
-terminology, such as `shapes`, was developed before the adoption of *pyMuPDF*
-and it is coincidental that these are similar!
+Earlier versions of __protograf__ used the *ReportLab PDF Toolkit*, which is
+also a powerful and useful library for supporting this type of application.
 
-Users on  [BoardGameGeek](https://boardgamegeek.com) have provided invaluable
+Users on [BoardGameGeek](https://boardgamegeek.com) have provided invaluable
 feedback and suggestions!
 
 ### :books: Additional Libraries

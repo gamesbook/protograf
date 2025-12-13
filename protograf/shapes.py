@@ -91,6 +91,7 @@ class ImageShape(BaseShape):
         # ---- convert to using units
         height = self._u.height
         width = self._u.width
+        x_c, y_c = 0.0, 0.0
         if self.cx is not None and self.cy is not None:
             if width and height:
                 x = self._u.cx - width / 2.0 + self._o.delta_x
@@ -157,7 +158,7 @@ class ImageShape(BaseShape):
         if self.use_abs_c:
             x_c = self._abs_cx
             y_c = self._abs_cy
-        x_u, y_u = self._p2v(x_c), self._p2v(y_c)
+        # x_u, y_u = self._p2v(x_c), self._p2v(y_c)
         # print(f"*** IMAGE {ID=} {self.title=} {x_u=} {y_u=} {rotation=}")
         if rotation:
             kwargs["rotation_point"] = Point(x_c, y_c)
@@ -1302,7 +1303,8 @@ class PolygonShape(BaseShape):
         """Calculate centre, radius, side and vertices of Polygon."""
         centre = self.get_centre()
         x, y = centre.x, centre.y
-        # calculate side
+        side, half_flat = 0.0, 0.0
+        # ---- calculate side and half_flat
         if self.height:
             side = self._u.height / math.sqrt(3)
             half_flat = self._u.height / 2.0
@@ -1311,10 +1313,15 @@ class PolygonShape(BaseShape):
             self._u.side = side
             half_flat = self._u.side * math.sqrt(3) / 2.0
         elif self.radius:
-            side = self.u_radius
-        # radius
+            side = self.get_radius()
+            half_flat = side * math.sqrt(3) / 2.0
+        else:
+            feedback(
+                "Polygon needs either a valid height, or diameter, or radius", True
+            )
+        # ---- calculate radius
         radius = self.get_radius()
-        # calculate vertices - assumes x,y marks the centre point
+        # ---- calculate vertices - assumes x,y marks the centre point
         vertices = geoms.polygon_vertices(self.sides, radius, Point(x, y), rotation)
         # for p in vertices: print(f'*G-V* {p.x / 28.3465}, {p.y / 28.3465}')
         return PolyGeometry(x, y, radius, side, half_flat, vertices)
@@ -1388,8 +1395,8 @@ class PolygonShape(BaseShape):
                 )
             self.x_c, self.y_c = x, y
             self.bbox = BBox(
-                bl=Point(self.x_c - self._u.radius, self.y_c + self._u.radius),
-                tr=Point(self.x_c + self._u.radius, self.y_c - self._u.radius),
+                tl=Point(self.x_c - self._u.radius, self.y_c - self._u.radius),
+                br=Point(self.x_c + self._u.radius, self.y_c + self._u.radius),
             )
         # ---- invalid polygon?
         if not self.vertices or len(self.vertices) == 0:
@@ -1888,6 +1895,8 @@ class RhombusShape(BaseShape):
                 DirectionGroup.ORDINAL,
                 "rhombus perbii",
             )
+        else:
+            perbii_dirs = []
         perbii_dict = self.calculate_perbii(cnv=cnv, centre=centre, vertices=vertices)
         pb_offset = self.unit(self.perbii_offset, label="perbii offset") or 0
         pb_length = (
@@ -2248,6 +2257,8 @@ class SectorShape(BaseShape):
         p_C = Point(self.x_c + self._o.delta_x, self.y_c + self._o.delta_y)
         # ---- circumference point in units
         p_P = geoms.point_on_circle(p_C, self.unit(self.radius), self.angle_start)
+        # ---- mid point in units
+        p_M = geoms.point_on_circle(p_C, self.unit(self.radius) / 2.0, self.angle_start)
         # ---- draw sector
         # feedback(
         #     f'***Sector: {p_P=} {p_C=} {self.angle_start=} {self.angle_width=}')
@@ -2256,6 +2267,11 @@ class SectorShape(BaseShape):
         )
         kwargs["closed"] = False
         self.set_canvas_props(cnv=cnv, index=ID, **kwargs)
+        # ---- * draw text
+        y_off = self._u.height / 2.0
+        self.draw_heading(cnv, ID, p_P.x, p_P.y, **kwargs)
+        self.draw_label(cnv, ID, p_M.x, p_M.y, **kwargs)
+        self.draw_title(cnv, ID, p_C.x, p_C.y, **kwargs)
 
 
 class ShapeShape(BasePolyShape):
@@ -2341,7 +2357,7 @@ class SquareShape(RectangleShape):
         """Total length of bounding line."""
         length = 2.0 * (self._u.width + self._u.height)
         if units:
-            return self.peaks_to_value(length)
+            return self.points_to_value(length)
         else:
             return length
 
@@ -2501,12 +2517,13 @@ class StadiumShape(BaseShape):
         # ---- dot
         self.draw_dot(cnv, cx, cy)
         # ---- text
-        delta = radius_tb if "n" in _edges or "north" in _edges else 0.0
+        delta_top = radius_tb if "n" in _edges or "north" in _edges else 0.0
+        delta_btm = radius_tb if "s" in _edges or "south" in _edges else 0.0
         self.draw_heading(
             cnv,
             ID,
             cx,
-            cy - delta,
+            cy - 0.5 * self._u.height - delta_top,
             **kwargs,
         )
         self.draw_label(cnv, ID, cx, cy, **kwargs)
@@ -2514,7 +2531,7 @@ class StadiumShape(BaseShape):
             cnv,
             ID,
             cx,
-            cy + delta,
+            cy + 0.5 * self._u.height + delta_btm,
             **kwargs,
         )
 
@@ -3247,7 +3264,8 @@ class TriangleShape(BaseShape):
 
     def calculate_perimeter(self, units: bool = False) -> float:
         """Total length of bounding line in user units."""
-        _s1, _s2, _s3 = self.calculate_sides(units=units)
+        vertices = self.get_vertexes(rotation=0)
+        _s1, _s2, _s3 = self.calculate_sides(vertices, rotation=0, units=units)
         length = _s1 + _s2 + _s3
         if units:
             return self.points_to_value(length)
@@ -3370,6 +3388,10 @@ class TriangleShape(BaseShape):
                 angle_a = math.acos(x)
                 # print(f"{math.degrees(angle_a)}")
                 ptN = geoms.point_from_angle(ptSE, a, 180 + math.degrees(angle_a))
+        else:
+            raise NotImplementedError(
+                f"Cannot handle triangle type {self.triangle_type}"
+            )
 
         if self.pivot:
             ptSE = geoms.rotate_point_around_point(ptSE, ptSW, self.pivot)
@@ -3446,6 +3468,8 @@ class TriangleShape(BaseShape):
                 DirectionGroup.TRIANGULAR_EDGES,
                 "triangle perbii",
             )
+        else:
+            perbii_dirs = []
         perbii_dict = self.calculate_perbii(cnv=cnv, centre=centre, vertices=vertices)
         pb_offset = self.unit(self.perbii_offset, label="perbii offset") or 0
         pb_length = (
@@ -3627,6 +3651,10 @@ class TriangleShape(BaseShape):
             self.centroid = self.get_centroid(self.vertexes)
         elif self.triangle_type == TriangleType.IRREGULAR:
             self.centroid = self.get_centroid(self.vertexes)
+        else:
+            raise NotImplementedError(
+                f"Cannot handle triangle type {self.triangle_type}"
+            )
         # print(f'*** TRIANGLE {self.centroid.x:.1f} {self.centroid.y:.1f}')
 
         # ---- determine ordering
@@ -3765,6 +3793,10 @@ class TriangleShape(BaseShape):
                     ht = 2 * area / self._u.side
                     heading_y = self.vertexes[0].y
                     title_y = self._u.y + self._o.delta_y
+                else:
+                    raise NotImplementedError(
+                        f"Cannot handle triangle type {self.triangle_type}"
+                    )
                 self.draw_heading(cnv, ID, self.centroid.x, heading_y, **kwargs)
                 self.draw_label(cnv, ID, self.centroid.x, self.centroid.y, **kwargs)
                 self.draw_title(cnv, ID, self.centroid.x, title_y, **kwargs)

@@ -25,14 +25,15 @@ Text(common=header, text="Miscellaneous Things #1")
 
 
 Text(common=header_font, x=6, y=4,
-     text="Coin: circle with steps-created radii + inner circle")
-# circles with 24 radii - i.e. one every 15 degrees
+     text="Coin: circle with steps-created radii & centre circle")
 Circle(
    cx=3, cy=4, radius=2,
-   fill="skyblue", stroke_width=2, radii=steps(0,360,15))
-Circle(
-   cx=3, cy=4, radius=1.5,
-   fill="skyblue", label="5", font_size=48)
+   fill="gold", stroke_width=2, 
+   radii=steps(0,360,15), # one every 15 degrees i.e. 24 total
+   centre_shape=circle(
+       radius=1.5,
+       fill="gold", label="5", font_size=48)
+)
 
 
 Text(align="left", x=9, y=8, wrap=True, width=10, height=4, font_size=16,
@@ -68,12 +69,21 @@ Rectangle(
 
 
 Text(common=header_font, x=5, y=21,
-     text="Start Player Token: circles + radii at angles")
-Polygon(cx=3, cy=21, height=3, sides=8, fill="black")
-Circle(cx=3, cy=21, fill="black", radius=1.25,
-       radii=steps(0, 315, 45),
-       radii_stroke="gold", radii_stroke_width=2)
-Circle(cx=3, cy=21, stroke="black", fill="gold", radius=0.5, stroke_width=5)
+     text="Start Player Token: circles + radii via steps")
+Polygon(
+    cx=3, cy=21, height=3, 
+    sides=8, fill="black",
+    centre_shapes=[
+        circle(
+            fill="black", radius=1.25,
+            radii=steps(0, 315, 45),
+            radii_stroke="gold", 
+            radii_stroke_width=2),
+        circle(
+            stroke="black", fill="gold", 
+            radius=0.5, stroke_width=5)
+        ]
+)
 
 
 Text(common=header_font, x=5, y=26,
@@ -148,10 +158,11 @@ Rectangle(
     fill="white", stroke="black", stroke_width=2,
     hatches_stroke_width=22, hatches_stroke="black",
     hatches='o', hatches_count=1,
-    notch=0.7, notch_style='step')
-Rectangle(
-    height=2.8, width=2.8, x=0.5, y=11,
-    fill=None, stroke="white", stroke_width=3)
+    notch=0.7, notch_style='step',
+    centre_shape=rectangle(
+        height=2.8, width=2.8, 
+        fill=None, stroke="white", stroke_width=3)
+)
 
 
 Text(common=header_font, x=5, y=16,
@@ -173,14 +184,18 @@ Circle(cx=2, cy=19, radius=0.15, fill_stroke="dimgray")
 
 
 Text(common=header_font, x=5, y=22,
-     text="XOK Fish: two circles with 2 thick, offset, radii")
-Circle(cx=2, cy=22, radius=1,
-       fill="#63B1BB", stroke="#63B1BB",
-       radii=[135,225],
-       radii_offset=0.5, radii_length=1,
-       radii_stroke="white", radii_stroke_width=15)
-Circle(cx=2, cy=22, radius=0.75, fill="#63B1BB", stroke="#63B1BB")
-Dot(x=2.5, y=21.5, stroke="white", dot_width=5)
+     text="XOK Fish: circles with thick, offset, radii and shapes")
+Circle(
+    cx=2, cy=22, radius=1,
+    fill="#63B1BB", stroke="#63B1BB",
+    radii=[135,225],
+    radii_offset=0.5, radii_length=1,
+    radii_stroke="white", radii_stroke_width=15,
+    centre_shape=circle(
+        radius=0.75, fill="#63B1BB", stroke="#63B1BB"),
+    radii_shapes=[(45, dot(stroke="white", dot_width=5), 0.75)],
+    order_last=["radii_shapes"]
+)
 
 
 Text(common=header_font, x=5, y=25,
