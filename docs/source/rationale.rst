@@ -19,49 +19,94 @@ want to spend time learning all the complexities of these programs, I wanted
 a tool that was simple but flexible, aligned with my own capabilities
 and ambitions.
 
-To be clear: *protograf* is **not** a tool that in any way competes with
+To be clear: **protograf** is *not* a tool that in any way competes with
 full-scale graphics or art programs, and if you already know and use such
 programs, you may just want to skip this one...
 
-How does this work?
+Why use this?
+=============
+
+**protograf** is not going to change your life forever and make you wonder how
+you  ever managed without it. It's not the best tool for every project nor is
+it better than everything else. However, it is possible that for some cases
+for some people it might a helpful tool for part of the process of board game
+creation.
+
+Most people who start off a game's design process are going to be drawing by
+hand on large sheets of paper, or scribbling on small card-sized ones. 
+
+When things are in a state of flux, you don't want to be committed to anything
+fancy that takes lots of time or effort to change.  However, at some point,
+you'd like to share your creation with a wider group of people; friends, family
+or even fellow game designers and game testers.  This means converting it into
+a digital format which gives you legible text and clear graphics.
+
+At this point you're not trying to create a fancy polished project that is ready
+for production and sale.  You just need a prototype.  If you are not a graphic
+designer, then you have a choice. Do you now try and learn a graphic design
+program, or do you rather just make use of any existing tools that you have
+|dash| for example, a word-processor or spreadsheet |dash| which are not really
+specifically designed to meet the typical requirements for a game layout and
+could be awkward to work with?
+
+At this point you may want to consider looking at **protograf** to meet your
+needs.
+
+Who would use this?
 ===================
 
-As a programmer, I'm used to the idea of writing scripts to generate an output
-and so, given my familiarity with Python, a language which has access to
-numerous libraries covering a wide range of domains, it made sense for me to
-pick this tool to undertake the task.
+The approach taken by **protograf** is one that might appeal to those who are
+less visual thinkers and more logic / word thinkers. 
 
-The code is publicly available on `GitHub <https://github.com/gamesbook/protograf>`_ 
-and so can be used (or reused) by anyone with Internet access.
+The primary way that you express yourself is through logically constructed
+discussions and arguments where the details matter.  With **protograf**, you
+start off simple and gradually add more layers of detail as you go on.
+Its very easy to turn things on and off, and everything that you've done so
+far is directly visible to you, and not hidden away in layers of menus.  
 
-If something happens to me such that I cannot work on it any more, anyone
-else is welcome to continue with it.
+Getting to a final product might seem intimidating if you are looking at a
+100-line long "final script", but because it's a *process* that you are in
+control of from start to finish, your involvement in that process means that
+all the steps of it will make sense to you.  
 
-What does it do?
-================
+In addition, when you come back to that script in 3 months, 6 months, or even
+a years time, it should remain just as readable as it was when you created it.
 
-*protograf* is essentially a Python package that allows you to write a script
-that can generate components of a game's graphical components, layer by layer.
+How is this designed?
+=====================
 
-*protograf* is built on top of the PyMuPDF Python library which provides the
-underlying routines that allows a Python program to draw vector graphics and
-generate a PDF output |dash| or export to PNG/SVG/GIF images.
+The three principles of **protograf** |dash| as much as any piece of software
+can have "principles" |dash| are clarity, consistency, and comprehensiveness.
 
-*protograf* provides a set of commands that will draw graphics - these are
-shapes such as circles, rectangles, stars, and many more - as well as lines 
-and text. Each of these can be customized in terms of their color, size, 
-shape etc. From these primitive graphics, more complex ones can be built up.
+By *clarity* I mean that the terminology and approach to constructing elements
+of a game design should be reasonably obvious.  I do appreciate that nothing
+is fully intuitive and inherently obvious, and every new thing we do relies to
+some degree on our previous knowledge. So **protograf** tries to avoid jargon,
+and also to use "long hand", rather than abbreviations which may not be that
+memorable.  
 
-*protograf* also provides commands to allow to layout shapes onto various
-"virtual" grids, which in turn can be used to support visible grids. There 
-is a strong emphasis on hexagons and hexagonal grids, as I really just enjoy
-working with this particular shape.
+As an example, to draw a rectangle on a page you would use a command like:
+``Rectangle(x=3, y=5, height=6, width=7)``.  If you understand the basic
+notation that ``x`` is used to measure distance of the Rectangle's top corner
+from the left-hand edge of the page and ``y`` is used to measure its distance
+from the top edge of the page, then it's reasonably clear where this rectangle
+would be drawn and what it would look like.
 
-*protograf* can also generate cards, using data from Excel or CSV files,
-or other sources such Google Sheets or the 
-`BoardGameGeek API <https://boardgamegeek.com/wiki/page/BGG_XML_API#_>`_
+The language used for **protograf** tries to match everyday usage of terms.
 
-*protograf* is not aimed at a "professional software level" for creating
-production-ready graphics and does *NOT* handle "special effects" such kerning,
-skewing, image tiling, gradient colors, fancy text-effects (e.g. drop shadows; 
-3D), etc. etc.
+*Consistency* is about doing similar things in the same way.  An ellipse shape
+is similar to a rectangle except that - obviously! - it's drawn with curves 
+rather than straight lines.  The instruction for **protograf** to do this would
+look something like ``Ellipse(x=4, y=6, height=7, width=8)``. Hopefully it's 
+obvious that there is consistency in the way you draw these two kinds of shapes.
+
+*Comprehensiveness* is much more of a challenge.  By it's very nature graphics
+is an open-ended domain and almost anything that one can imagine can be 
+depicted in some way, shape or form.  It's therefore unlikely that any single
+software program can hope to emulate that degree of creativity; the best you
+can ever achieve is some reasonable subset of that.  That's where the evolving
+nature of programs such as **protograf** comes in. 
+
+Hopefully, there is a reasonable enough range of features available to make 
+**protograf** useful now |dash| but as more people use it, more ideas for new 
+or different kinds of things will be incorporated. 
