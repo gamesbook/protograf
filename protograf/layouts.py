@@ -10,7 +10,7 @@ import math
 # third party
 # local
 from protograf.utils.messaging import feedback
-from protograf.utils.structures import Point, Locale
+from protograf.utils.structures import Point, HexGeometry, VirtualHex, Locale
 from protograf.utils import tools, support
 from protograf.utils.tools import _lower
 from protograf.base import BaseShape, BaseCanvas
@@ -533,6 +533,156 @@ class VirtualShape:
         except Exception:
             _label = f" for {label}" if label else ""
             feedback(f'"{value}"{_label} is not a valid floating number!', True)
+
+
+# ---- virtual HexHex grid
+
+
+class HexHexLocations(VirtualShape):
+    """
+    HexHex Locations are not drawn on the canvas; they provide the
+    locations/points where user-defined shapes will be drawn.
+    """
+
+    def __init__(self, rows, cols, **kwargs):
+        self.kwargs = kwargs
+        self.cx = tools.as_float(kwargs.get("cx", 1.0), "x")  # hexhex centre
+        self.cy = tools.as_float(kwargs.get("cy", 1.0), "y")  # hexhex centre
+        self.rings = tools.as_int(kwargs.get("rings", 1), "rings")
+        self.radius = kwargs.get("radius", None)
+        self.diameter = kwargs.get("diameter", None)
+        self.height = kwargs.get("heighr", 1.0)
+        self.side = kwargs.get("side", None)
+        # ---- check construction type
+        self.use_diameter = True if self.is_kwarg("diameter") else False
+        self.use_height = True if self.is_kwarg("height") else False
+        self.use_radius = True if self.is_kwarg("radius") else False
+        self.use_side = False
+        if "side" in self.kwargs:
+            self.use_side = True
+            if (
+                "radius" in self.kwargs
+                or "height" in self.kwargs
+                or "diameter" in self.kwargs
+            ):
+                self.use_side = False
+        # ---- fallback / default
+        if not self.use_diameter and not self.use_radius and not self.use_side:
+            self.use_height = True
+            if not self.height:
+                if self.radius:
+                    base = tools.as_float(self.radius, "hexagon radius")
+                elif self.diameter:
+                    base = tools.as_float(self.diameter, "hexagon diameter") / 2.0
+                elif self.side:
+                    base = tools.as_float(self.side, "hexagon side")
+                else:
+                    feedback(
+                        "No dimensions (greater than zero) set to draw the Hexagon",
+                        True,
+                    )
+                self.height = base * math.sqrt(3)
+        self.ORIENTATION = self.get_orientation()
+        # ---- get grid
+        self.grid = self.construct_grid()
+
+    def is_kwarg(self, value) -> bool:
+        """Validate if value is in direct kwargs OR in Common _kwargs."""
+        if value in self.kwargs:
+            return True
+        return False
+
+    def get_orientation(self) -> HexOrientation:
+        """Return HexOrientation for the Hexagon."""
+        if _lower(self.orientation) in ["p", "pointy"]:
+            orientation = HexOrientation.POINTY
+        elif _lower(self.orientation) in ["f", "flat"]:
+            orientation = HexOrientation.FLAT
+        else:
+            feedback(
+                'Invalid orientation "{self.orientation}" supplied for hexagon.', True
+            )
+        return orientation
+
+    def get_geometry(self):
+        """Calculate geometric settings of a single hexagon."""
+        # feedback(f"*** hexhex geo {self.radius=} {self.height=} {self.diameter=} {self.side=} ")
+        # feedback(f"hexhex {self.use_radius=} {self.use_height=} {self.use_diameter=} {self.use_side=} ")
+        # ---- calculate half_flat & half_side
+        if self.height and self.use_height:
+            side = self._u.height / math.sqrt(3)
+            half_flat = self._u.height / 2.0
+        elif self.diameter and self.use_diameter:
+            side = self._u.diameter / 2.0
+            half_flat = side * math.sqrt(3) / 2.0
+        elif self.radius and self.use_radius:
+            side = self._u.radius
+            half_flat = side * math.sqrt(3) / 2.0
+        else:
+            pass
+        if self.side and self.use_side:
+            side = self._u.side
+            half_flat = side * math.sqrt(3) / 2.0
+        if not self.radius and not self.height and not self.diameter and not self.side:
+            feedback(
+                "No value for side or height or diameter or radius"
+                " supplied to construct hexagon for HexHexLocations.",
+                True,
+            )
+        half_side = side / 2.0
+        height_flat = 2 * half_flat
+        diameter = 2.0 * side
+        radius = side
+        z_fraction = (diameter - side) / 2.0
+        self.ORIENTATION = self.get_orientation()
+        hex_geometry = HexGeometry(
+            radius, diameter, side, half_side, half_flat, height_flat, z_fraction
+        )
+        # feedback(f"*** hex geo {hex_geometry=}")
+        return hex_geometry
+
+    def construct_grid(self):
+        """Create a virtual hexhex grid, with identified locations."""
+        ghex = self.get_geometry()
+        n = self.rings + 1
+        hex_count = 3 * n * (n - 1) + 1
+        hexes = []
+        # ---- centre hex
+        hex0 = VirtualHex(
+            centre=Point(cx, cy),
+            ring=0,
+            spine=False,
+            zone=0,
+            orientation=self.ORIENTATION,
+        )
+        hexes.append(hex0)
+        # ---- iterate over all hexes
+        ring = 1
+        ring_counter = 1
+        vertex_interval = 0
+        for location in range(1, hex_count + 1):
+            chx = cx
+            chx = cx
+            if ring_counter % 6 * ring == 0:
+                is_spine = True
+            else:
+                is_spine = False
+            _hex = VirtualHex(
+                centre=Point(chx, chy),
+                ring=ring,
+                spine=is_spine,
+                zone=0,
+                orientation=self.ORIENTATION,
+            )
+            _hexes.append(_hex)
+            ring_counter += 1
+            # increment ring?
+            if location % 6 * ring == 0:
+                ring += 1
+                vertex_interval += 1
+                ring_counter = 1
+        # ---- done
+        return hexes
 
 
 # ---- virtual Locations

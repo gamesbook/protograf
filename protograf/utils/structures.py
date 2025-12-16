@@ -274,3 +274,15 @@ class TemplatingType:
     template: Template
     function: object
     members: List
+
+
+@dataclass
+class VirtualHex:
+    """VirtualHex is an identified Hex in a HexHexLocations array"""
+
+    centre: Point
+    sequence: int
+    spine: bool
+    ring: int
+    zone: str
+    orientation: HexOrientation
