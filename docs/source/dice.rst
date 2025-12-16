@@ -25,8 +25,8 @@ a graphic layout can be useful.
 D6 Properties
 =============
 
-The six-sided die object ``D6`` shares some of basic properties of many
-other :doc:`shapes <core_shapes>`, with additional properties of *roll* and
+The six-sided die object ``D6`` shares some of the basic properties of many
+other :doc:`shapes <core_shapes>`, with additional properties of *pips* and
 *random*, as well as the various *pip_* properties.
 
 d6 Examples
@@ -42,26 +42,26 @@ D6 Styling
    :width: 330
 
 ===== ======
-|d61| This example shows D6 objects constructed using commands like:
+|d61| This example shows D6 objects constructed using these commands:
 
       .. code:: python
 
         D6(x=0, y=0)
-        D6(x=1, y=0, roll=2)
-        D6(x=0, y=1, roll=3)
-        D6(x=1, y=1, roll=4)
-        D6(x=0, y=2, roll=5)
-        D6(x=1, y=2, roll=6)
+        D6(x=1, y=0, pips=2)
+        D6(x=0, y=1, pips=3)
+        D6(x=1, y=1, pips=4)
+        D6(x=0, y=2, pips=5)
+        D6(x=1, y=2, pips=6)
 
         red_yello = Common(
             pip_fill="gold", pip_stroke="orange",
             fill="red", rounding=0.175)
         D6(x=2, y=0, common=red_yello)
-        D6(x=3, y=0, roll=2, common=red_yello)
-        D6(x=2, y=1, roll=3, common=red_yello)
-        D6(x=3, y=1, roll=4, common=red_yello)
-        D6(x=2, y=2, roll=5, common=red_yello)
-        D6(x=3, y=2, roll=6, common=red_yello)
+        D6(x=3, y=0, pips=2, common=red_yello)
+        D6(x=2, y=1, pips=3, common=red_yello)
+        D6(x=3, y=1, pips=4, common=red_yello)
+        D6(x=2, y=2, pips=5, common=red_yello)
+        D6(x=3, y=2, pips=6, common=red_yello)
 
         blu_wite = Common(
             pip_fill="white",
@@ -69,21 +69,21 @@ D6 Styling
             pip_shape="diamond",
             fill="blue", pip_fraction=0.15)
         D6(x=0, y=3, common=blu_wite)
-        D6(x=1, y=3, roll=2, common=blu_wite)
-        D6(x=0, y=4, roll=3, common=blu_wite)
-        D6(x=1, y=4, roll=4, common=blu_wite)
-        D6(x=0, y=5, roll=5, common=blu_wite)
-        D6(x=1, y=5, roll=6, common=blu_wite)
+        D6(x=1, y=3, pips=2, common=blu_wite)
+        D6(x=0, y=4, pips=3, common=blu_wite)
+        D6(x=1, y=4, pips=4, common=blu_wite)
+        D6(x=0, y=5, pips=5, common=blu_wite)
+        D6(x=1, y=5, pips=6, common=blu_wite)
 
         D6(
             x=2.6, y=3.6, side=0.8,
-            roll=4,
+            pips=4,
             title="Title",
             heading="D6",
             label="4")
         D6(
             cx=3.5, cy=5.5, side=0.5,
-            roll=5,
+            pips=5,
             stroke_width=0.5,
             rotation=30)
 

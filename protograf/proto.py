@@ -63,6 +63,7 @@ from .shapes_rectangle import RectangleShape
 from .objects import (
     CubeObject,
     D6Object,
+    DominoObject,
     PolyominoObject,
     PentominoObject,
     TetrominoObject,
@@ -5053,6 +5054,37 @@ def d6(*args, **kwargs):
     kwargs = margins(**kwargs)
     _obj = args[0] if args else None
     return D6Object(_object=_obj, canvas=globals.canvas, **kwargs)
+
+
+@docstring_base
+def Domino(row=None, col=None, **kwargs):
+    """Draw a Domino shape with "pips" on the canvas.
+
+    Args:
+
+    - row (int): row in which the shape is drawn.
+    - col (int): column in which the shape is drawn.
+
+    Kwargs:
+
+    - random (bool):
+    - rolls (tuple): a pair of number (each 1 to 6) representing the number of pips
+    - pip_stroke (str):
+    - pip_fill (str):
+    - pip_fraction (float):
+    <base>
+
+    """
+    kwargs = margins(**kwargs)
+    domino = DominoObject(canvas=globals.canvas, **kwargs)
+    domino.draw()
+    return domino
+
+
+def domino(*args, **kwargs):
+    kwargs = margins(**kwargs)
+    _obj = args[0] if args else None
+    return DominoObject(_object=_obj, canvas=globals.canvas, **kwargs)
 
 
 @docstring_base

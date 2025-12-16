@@ -7,11 +7,11 @@ Overview
 .. _table-of-contents-overview:
 
 - `Introduction`_
-- `Who might want to use **protograf**?`_
+- `Who might want to use protograf?`_
 - `Why not use a professional graphics package?`_
-- `How do I use **protograf**?`_
-- `How does **protograf** work?`_
-- `What does **protograf** do?`_
+- `How do I use protograf?`_
+- `How does protograf work?`_
+- `What does protograf do?`_
 - `How do I get started?`_
 
 
@@ -33,8 +33,8 @@ the tiles, the cards and so on.
    attempt in **any** way to replicate their extensive functionality!
 
 
-Who might want to use **protograf**?
-====================================
+Who might want to use protograf?
+================================
 
 **protograf** is useful for anyone that needs to work on a design in
 an incremental fashion, tweaking and changing as they go along. Doing
@@ -102,8 +102,8 @@ of game components, watch this interview with Brigette Indelicato at
 https://www.youtube.com/watch?v=_PfOjSAEFUY
 
 
-How do I use **protograf**?
-===========================
+How do I use protograf?
+=======================
 
 In general, what you do is type a set of instructions |dash| which
 **protograf** terms a *script* |dash| into a file. You save that file on
@@ -117,8 +117,8 @@ output. Because **protograf** scripts are very small, its easy to save
 versions as you go along.
 
 
-How does **protograf** work?
-============================
+How does protograf work?
+========================
 
 **protograf** is written in Python; the reason being that this is a
 relatively easy-to-use programming language that is often used for
@@ -142,8 +142,8 @@ package and add in your own additional Python code or logic to your
 scripts as needed.
 
 
-What does **protograf** do?
-===========================
+What does protograf do?
+=======================
 
 *protograf* is built on top of the PyMuPDF Python library which provides the
 underlying routines that allows a Python program to draw vector graphics and

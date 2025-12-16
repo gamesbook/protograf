@@ -33,6 +33,7 @@ python objects/polyominoes.py
 python objects/ominoes_basic.py
 python objects/pentominoes.py
 python objects/dice_d6.py
+python objects/dominos.py
 # ---- boards: abstract
 echo -e "\nCreating abstract boards..."
 python boards/abstract/chessboard.py

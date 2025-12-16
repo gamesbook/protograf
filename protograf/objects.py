@@ -18,6 +18,7 @@ from pymupdf import Point as muPoint, Rect as muRect
 
 # local
 from protograf import globals
+from protograf.shapes_utils import draw_line
 from protograf.utils import colrs, geoms, tools, support
 from protograf.utils.tools import _lower
 from protograf.utils.constants import (
@@ -50,6 +51,23 @@ from protograf.shapes_hexagon import HexShape
 
 log = logging.getLogger(__name__)
 DEBUG = False
+
+
+class CubeObject(HexShape):
+    """
+    A pseudo-3D view of a cube as an isometric drawing.
+    """
+
+    def __init__(self, _object=None, canvas=None, **kwargs):
+        super(CubeObject, self).__init__(_object=_object, canvas=canvas, **kwargs)
+        # overrides
+        self.orientation = "pointy"
+        if not self.shades or self.radii_stroke != colrs.get_color("black"):
+            self.radii = "s ne nw"
+
+    def draw(self, cnv=None, off_x=0, off_y=0, ID=None, **kwargs):
+        """Draw a cube on a given canvas."""
+        return super().draw(cnv, off_x, off_y, ID, **kwargs)
 
 
 class PolyominoObject(RectangleShape):
@@ -588,7 +606,101 @@ class StarFieldObject(BaseShape):
             self.cluster_stars(cnv)
 
 
-class D6Object(BaseShape):
+class DiceObject(BaseShape):
+    """
+    Parent class to handle common routines for all Shapes with a D6 'face'.
+    """
+
+    def __init__(self, _object=None, canvas=None, **kwargs):
+        super(DiceObject, self).__init__(_object=_object, canvas=canvas, **kwargs)
+
+    def draw_diamond(self, cnv, middle: float, radius: float):
+        """Draw a Diamond shape based on a centre and radius."""
+        centre = Point(middle[0], middle[1])
+        pt1 = Point(centre.x, centre.y - radius)
+        pt2 = Point(centre.x + radius, centre.y)
+        pt3 = Point(centre.x, centre.y + radius)
+        pt4 = Point(centre.x - radius, centre.y)
+        cnv.draw_polyline((pt1, pt2, pt3, pt4, pt1))
+
+    def draw_pips(
+        self,
+        cnv,
+        number: int,
+        offset: float,
+        px: float,
+        py: float,
+        pip_shape: str,
+        pip_radius: float,
+        shape_name: str = "shape",
+    ):
+        """Draw pips based on a number (the 'pips') and the pip style."""
+
+        if _lower(pip_shape) in ["circle", "c"]:
+            match number:
+                case 1:
+                    cnv.draw_circle((px, py), pip_radius)
+                case 2:
+                    cnv.draw_circle((px - offset, py - offset), pip_radius)
+                    cnv.draw_circle((px + offset, py + offset), pip_radius)
+                case 3:
+                    cnv.draw_circle((px - offset, py - offset), pip_radius)
+                    cnv.draw_circle((px, py), pip_radius)
+                    cnv.draw_circle((px + offset, py + offset), pip_radius)
+                case 4:
+                    cnv.draw_circle((px - offset, py + offset), pip_radius)
+                    cnv.draw_circle((px + offset, py - offset), pip_radius)
+                    cnv.draw_circle((px - offset, py - offset), pip_radius)
+                    cnv.draw_circle((px + offset, py + offset), pip_radius)
+                case 5:
+                    cnv.draw_circle((px - offset, py + offset), pip_radius)
+                    cnv.draw_circle((px + offset, py - offset), pip_radius)
+                    cnv.draw_circle((px - offset, py - offset), pip_radius)
+                    cnv.draw_circle((px, py), pip_radius)
+                    cnv.draw_circle((px + offset, py + offset), pip_radius)
+                case 6:
+                    cnv.draw_circle((px - offset, py + offset), pip_radius)
+                    cnv.draw_circle((px + offset, py - offset), pip_radius)
+                    cnv.draw_circle((px - offset, py - offset), pip_radius)
+                    cnv.draw_circle((px + offset, py + offset), pip_radius)
+                    cnv.draw_circle((px - offset, py), pip_radius)
+                    cnv.draw_circle((px + offset, py), pip_radius)
+                case _:
+                    feedback(f"The {shape_name} must use a number from 1 to 6", True)
+        if _lower(pip_shape) in ["diamond", "d"]:
+            match number:
+                case 1:
+                    self.draw_diamond(cnv, (px, py), pip_radius)
+                case 2:
+                    self.draw_diamond(cnv, (px - offset, py - offset), pip_radius)
+                    self.draw_diamond(cnv, (px + offset, py + offset), pip_radius)
+                case 3:
+                    self.draw_diamond(cnv, (px - offset, py - offset), pip_radius)
+                    self.draw_diamond(cnv, (px, py), pip_radius)
+                    self.draw_diamond(cnv, (px + offset, py + offset), pip_radius)
+                case 4:
+                    self.draw_diamond(cnv, (px - offset, py + offset), pip_radius)
+                    self.draw_diamond(cnv, (px + offset, py - offset), pip_radius)
+                    self.draw_diamond(cnv, (px - offset, py - offset), pip_radius)
+                    self.draw_diamond(cnv, (px + offset, py + offset), pip_radius)
+                case 5:
+                    self.draw_diamond(cnv, (px - offset, py + offset), pip_radius)
+                    self.draw_diamond(cnv, (px + offset, py - offset), pip_radius)
+                    self.draw_diamond(cnv, (px - offset, py - offset), pip_radius)
+                    self.draw_diamond(cnv, (px, py), pip_radius)
+                    self.draw_diamond(cnv, (px + offset, py + offset), pip_radius)
+                case 6:
+                    self.draw_diamond(cnv, (px - offset, py + offset), pip_radius)
+                    self.draw_diamond(cnv, (px + offset, py - offset), pip_radius)
+                    self.draw_diamond(cnv, (px - offset, py - offset), pip_radius)
+                    self.draw_diamond(cnv, (px + offset, py + offset), pip_radius)
+                    self.draw_diamond(cnv, (px - offset, py), pip_radius)
+                    self.draw_diamond(cnv, (px + offset, py), pip_radius)
+                case _:
+                    feedback(f"The {shape_name} must use a number from 1 to 6", True)
+
+
+class D6Object(DiceObject):
     """
     A top-down view of a six-sided (cubic) die
     """
@@ -610,7 +722,7 @@ class D6Object(BaseShape):
         self.kwargs = kwargs
         self._label = self.label
         # custom/unique properties
-        self.roll = tools.as_int(kwargs.get("roll", 1), "roll")
+        self.pips = tools.as_int(kwargs.get("pips", 1), "pips")
         self.random = tools.as_bool(kwargs.get("random", False), "random")
         # defaults
         self._fill, self._stroke = (
@@ -627,11 +739,11 @@ class D6Object(BaseShape):
     def validate_properties(self):
         correct = True
         issue = []
-        if self.random and self.roll is not None:
-            issue.append("Both random and roll cannot be set at the same time!")
+        if self.random and self.pips is not None:
+            issue.append("Both random and pips cannot be set at the same time!")
             correct = False
-        if not self.random and self.roll not in [1, 2, 3, 4, 5, 6]:
-            issue.append("The roll must be a number from 1 to 6")
+        if not self.random and self.pips not in [1, 2, 3, 4, 5, 6]:
+            issue.append("The value for pips must be a number from 1 to 6")
             correct = False
         if self.pip_fraction > 0.33 or self.pip_fraction < 0.1:
             issue.append("The pip_fraction must be between 0.1 and 0.33")
@@ -640,16 +752,6 @@ class D6Object(BaseShape):
 
     def draw(self, cnv=None, off_x=0, off_y=0, ID=None, **kwargs):
         """Draw the D6 on a given canvas."""
-
-        def draw_diamond(middle, radius):
-            """Draw a Diamond shape based on a centre and radius."""
-            centre = Point(middle[0], middle[1])
-            pt1 = Point(centre.x, centre.y - radius)
-            pt2 = Point(centre.x + radius, centre.y)
-            pt3 = Point(centre.x, centre.y + radius)
-            pt4 = Point(centre.x - radius, centre.y)
-            cnv.draw_polyline((pt1, pt2, pt3, pt4, pt1))
-
         kwargs = self.kwargs | kwargs
         cnv = cnv if cnv else globals.canvas  # a new Page/Shape may now exist
         super().draw(cnv, off_x, off_y, ID, **kwargs)  # unit-based props
@@ -699,74 +801,12 @@ class D6Object(BaseShape):
         if self.random:
             number = random.randint(1, 6)
         else:
-            number = self.roll
+            number = self.pips
         pip_radius = self.pip_fraction * self._u.width / 2.0
         px = x + self._u.width / 2.0
         py = y + self._u.height / 2.0
         offset = 3 * (0.2 * self._u.width / 2.0)  # fixed regardless of pip size
-        if _lower(self.pip_shape) in ["circle", "c"]:
-            match number:
-                case 1:
-                    cnv.draw_circle((px, py), pip_radius)
-                case 2:
-                    cnv.draw_circle((px - offset, py - offset), pip_radius)
-                    cnv.draw_circle((px + offset, py + offset), pip_radius)
-                case 3:
-                    cnv.draw_circle((px - offset, py - offset), pip_radius)
-                    cnv.draw_circle((px, py), pip_radius)
-                    cnv.draw_circle((px + offset, py + offset), pip_radius)
-                case 4:
-                    cnv.draw_circle((px - offset, py + offset), pip_radius)
-                    cnv.draw_circle((px + offset, py - offset), pip_radius)
-                    cnv.draw_circle((px - offset, py - offset), pip_radius)
-                    cnv.draw_circle((px + offset, py + offset), pip_radius)
-                case 5:
-                    cnv.draw_circle((px - offset, py + offset), pip_radius)
-                    cnv.draw_circle((px + offset, py - offset), pip_radius)
-                    cnv.draw_circle((px - offset, py - offset), pip_radius)
-                    cnv.draw_circle((px, py), pip_radius)
-                    cnv.draw_circle((px + offset, py + offset), pip_radius)
-                case 6:
-                    cnv.draw_circle((px - offset, py + offset), pip_radius)
-                    cnv.draw_circle((px + offset, py - offset), pip_radius)
-                    cnv.draw_circle((px - offset, py - offset), pip_radius)
-                    cnv.draw_circle((px + offset, py + offset), pip_radius)
-                    cnv.draw_circle((px - offset, py), pip_radius)
-                    cnv.draw_circle((px + offset, py), pip_radius)
-                case _:
-                    feedback("D6 must use a number from 1 to 6", True)
-        if _lower(self.pip_shape) in ["diamond", "d"]:
-            match number:
-                case 1:
-                    draw_diamond((px, py), pip_radius)
-                case 2:
-                    draw_diamond((px - offset, py - offset), pip_radius)
-                    draw_diamond((px + offset, py + offset), pip_radius)
-                case 3:
-                    draw_diamond((px - offset, py - offset), pip_radius)
-                    draw_diamond((px, py), pip_radius)
-                    draw_diamond((px + offset, py + offset), pip_radius)
-                case 4:
-                    draw_diamond((px - offset, py + offset), pip_radius)
-                    draw_diamond((px + offset, py - offset), pip_radius)
-                    draw_diamond((px - offset, py - offset), pip_radius)
-                    draw_diamond((px + offset, py + offset), pip_radius)
-                case 5:
-                    draw_diamond((px - offset, py + offset), pip_radius)
-                    draw_diamond((px + offset, py - offset), pip_radius)
-                    draw_diamond((px - offset, py - offset), pip_radius)
-                    draw_diamond((px, py), pip_radius)
-                    draw_diamond((px + offset, py + offset), pip_radius)
-                case 6:
-                    draw_diamond((px - offset, py + offset), pip_radius)
-                    draw_diamond((px + offset, py - offset), pip_radius)
-                    draw_diamond((px - offset, py - offset), pip_radius)
-                    draw_diamond((px + offset, py + offset), pip_radius)
-                    draw_diamond((px - offset, py), pip_radius)
-                    draw_diamond((px + offset, py), pip_radius)
-                case _:
-                    feedback("D6 must use a number from 1 to 6", True)
-
+        self.draw_pips(cnv, number, offset, px, py, self.pip_shape, pip_radius, "D6")
         # add style
         pargs = {}
         pargs["stroke"] = self.pip_stroke
@@ -785,18 +825,165 @@ class D6Object(BaseShape):
         self.draw_title(cnv, ID, cx, cy + 0.5 * self._u.height, **kwargs)
 
 
-class CubeObject(HexShape):
+class DominoObject(DiceObject):
     """
-    A pseudo-3D view of a cube as an isometric drawing.
+    A top-down view of a domino playing piece
     """
 
     def __init__(self, _object=None, canvas=None, **kwargs):
-        super(CubeObject, self).__init__(_object=_object, canvas=canvas, **kwargs)
-        # overrides
-        self.orientation = "pointy"
-        if not self.shades or self.radii_stroke != colrs.get_color("black"):
-            self.radii = "s ne nw"
+        super(DominoObject, self).__init__(_object=_object, canvas=canvas, **kwargs)
+        # overrides to centre shape
+        if self.cx is not None and self.cy is not None:
+            self.x = self.cx - self.width / 2.0
+            self.y = self.cy - self.height / 2.0
+            # feedback(f"*** Domino OldX:{x} OldY:{y} NewX:{self.x} NewY:{self.y}")
+        # overrides to make a "double square rectangle"
+        if self.width and not self.side:
+            self.side = 0.5 * self.width
+        if self.height and not self.side:
+            self.side = self.height
+        self.height, self.width = self.side, 2.0 * self.side
+        self.set_unit_properties()
+        self.kwargs = kwargs
+        self._label = self.label
+        # custom/unique properties
+        self.pips = kwargs.get("pips", (1, 1))
+        self.random = tools.as_bool(kwargs.get("random", False), "random")
+        # defaults
+        self._fill, self._stroke = (
+            self.fill,
+            self.stroke,
+        )
+        if "rounded" not in kwargs and "rounding" not in kwargs:
+            self.rounded = True
+        # validate
+        correct, issue = self.validate_properties()
+        if not correct:
+            feedback("Problem with Domino settings: %s." % "; ".join(issue), True)
+
+    def validate_properties(self):
+        correct = True
+        issue = []
+        if self.random and self.pips is not None:
+            issue.append("Both random and pips cannot be set at the same time!")
+            correct = False
+        if not self.random:
+            if self.pips:
+                if not isinstance(self.pips, (list, tuple)):
+                    issue.append(
+                        "The pips setting must be a pair of numbers; each from 1 to 6"
+                    )
+                    correct = False
+                else:
+                    allowed = [1, 2, 3, 4, 5, 6]
+                    if self.pips[0] not in allowed or self.pips[1] not in allowed:
+                        issue.append("Each pips value must be a number from 1 to 6")
+                        correct = False
+        if self.pip_fraction > 0.33 or self.pip_fraction < 0.1:
+            issue.append("The pip_fraction must be between 0.1 and 0.33")
+            correct = False
+        return correct, issue
 
     def draw(self, cnv=None, off_x=0, off_y=0, ID=None, **kwargs):
-        """Draw a cube on a given canvas."""
-        return super().draw(cnv, off_x, off_y, ID, **kwargs)
+        """Draw the Domino on a given canvas."""
+        kwargs = self.kwargs | kwargs
+        cnv = cnv if cnv else globals.canvas  # a new Page/Shape may now exist
+        super().draw(cnv, off_x, off_y, ID, **kwargs)  # unit-based props
+        # ---- adjust start
+        if self.row is not None and self.col is not None:
+            x = self.col * self._u.width + self._o.delta_x
+            y = self.row * self._u.height + self._o.delta_y
+        elif self.cx is not None and self.cy is not None:
+            x = self._u.cx - self._u.width / 2.0 + self._o.delta_x
+            y = self._u.cy - self._u.height / 2.0 + self._o.delta_y
+        else:
+            x = self._u.x + self._o.delta_x
+            y = self._u.y + self._o.delta_y
+        # ---- calculate centre of the shape
+        cx = x + self._u.width / 2.0
+        cy = y + self._u.height / 2.0
+        # ---- overrides for grid layout
+        if self._abs_cx is not None and self._abs_cy is not None:
+            cx = self._abs_cx
+            cy = self._abs_cy
+            x = cx - self._u.width / 2.0
+            y = cy - self._u.height / 2.0
+        # ---- handle rotation
+        rotation = kwargs.get("rotation", self.rotation)
+        if rotation:
+            self.centroid = muPoint(cx, cy)
+            kwargs["rotation"] = rotation
+            kwargs["rotation_point"] = self.centroid
+        else:
+            self.centroid = None
+        # ---- calculate rounding
+        # Specifies the radius of the curvature as percentage of rectangle side length
+        # where 0.5 corresponds to 50% of the respective side.
+        radius = None
+        if self.rounded:
+            radius = self.rounded_radius  # hard-coded OR from defaults
+        if self.rounding:
+            rounding = self.unit(self.rounding)
+            radius = rounding / min(self._u.width, self._u.height)
+        if radius and radius > 0.5:
+            feedback("The rounding radius cannot exceed 50% of the Domino side.", True)
+        # ---- draw the outline
+        # feedback(f'*** Domino normal {radius=} {kwargs=} {self.pips=} {self.random=}')
+        cnv.draw_rect((x, y, x + self._u.width, y + self._u.height), radius=radius)
+        self.set_canvas_props(cnv=cnv, index=ID, **kwargs)
+        # ---- draw centre line
+        if self.centre_line:
+            ctop = (cx, cy - 0.5 * self.unit(self.centre_line_length))
+            cbtm = (cx, cy + 0.5 * self.unit(self.centre_line_length))
+            lkwargs = {}
+            lkwargs["wave_style"] = self.kwargs.get("centre_line_wave_style", None)
+            lkwargs["wave_height"] = self.kwargs.get("centre_line_wave_height", 0)
+            draw_line(cnv, ctop, cbtm, shape=self, **lkwargs)
+            self.set_canvas_props(
+                index=ID,
+                stroke=self.centre_line_stroke or self.stroke,
+                stroke_width=self.centre_line_stroke_width or self.stroke_width,
+                stroke_ends=self.centre_line_ends,
+                dashed=self.centre_line_dashed,
+                dotted=self.centre_line_dotted,
+                rotation=rotation,
+                rotation_point=muPoint(cx, cy),
+            )
+        # ---- draw centre_shape
+        if self.centre_shape:
+            if self.can_draw_centred_shape(self.centre_shape):
+                self.centre_shape.draw(
+                    _abs_cx=cx + self.unit(self.centre_shape_mx),
+                    _abs_cy=cy + self.unit(self.centre_shape_my),
+                )
+        # ---- draw the pips
+        for face in [0, 1]:
+            if self.random:
+                number = random.randint(1, 6)
+            else:
+                number = self.pips[face]
+                # feedback(f'*** Domino normal {face=} {number=}')
+            pip_radius = self.pip_fraction * self._u.height / 2.0
+            px = x + self._u.height / 2.0 + face * self._u.height
+            py = y + self._u.height / 2.0
+            offset = 3 * (0.2 * self._u.height / 2.0)  # fixed regardless of pip size
+            self.draw_pips(
+                cnv, number, offset, px, py, self.pip_shape, pip_radius, "Domino"
+            )
+            # self.set_canvas_props(cnv=None, index=ID, **kwargs)
+        # ---- set style
+        pargs = {}
+        pargs["stroke"] = self.pip_stroke
+        pargs["fill"] = self.pip_fill
+        if rotation:
+            pargs["rotation"] = rotation
+            pargs["rotation_point"] = self.centroid
+        self.set_canvas_props(cnv=None, index=ID, **pargs)
+        # ---- cross
+        self.draw_cross(cnv, cx, cy, rotation=kwargs.get("rotation"))
+        # ---- dot
+        self.draw_dot(cnv, cx, cy)
+        # ---- text
+        self.draw_heading(cnv, ID, cx, cy - 0.5 * self._u.height, **kwargs)
+        self.draw_label(cnv, ID, cx, cy, **kwargs)
+        self.draw_title(cnv, ID, cx, cy + 0.5 * self._u.height, **kwargs)

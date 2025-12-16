@@ -382,7 +382,16 @@ class BaseCanvas:
         self.dy_1 = self.defaults.get("dy1", None)
         self.dx_2 = self.defaults.get("dx2", None)
         self.dy_2 = self.defaults.get("dy2", None)
+        # ---- pod / domino
         self.centre_line = self.defaults.get("centre_line", False)
+        self.centre_line_stroke = self.defaults.get("centre_line_stroke", self.stroke)
+        self.centre_line_stroke_width = self.defaults.get(
+            "centre_line_stroke_width", self.stroke_width
+        )
+        self.centre_line_length = self.defaults.get("centre_line_length", 0.5)
+        self.centre_line_dotted = self.defaults.get("centre_line_dotted", self.dotted)
+        self.centre_line_dashed = self.defaults.get("centre_line_dashed", self.dashed)
+        self.centre_line_ends = self.defaults.get("centre_line_ends", self.line_ends)
         # ---- rectangle / card
         self.rounding = self.defaults.get("rounding", 0.0)
         self.rounded = self.defaults.get("rounded", False)  # also line end
@@ -535,7 +544,7 @@ class BaseCanvas:
         self.vertex_shapes_rotated = self.defaults.get(
             "self.vertex_shapes_rotated", False
         )
-        # ---- shapes with centre (hex, circle, rect, rhombus, poly, ellipse, star)
+        # ---- shapes with centre (hex, circle, rect, rhombus, poly, ellipse, star, domino)
         self.centre_shapes = self.defaults.get("centre_shapes", [])
         self.centre_shape = self.defaults.get("centre_shape", "")
         self.centre_shape_mx = self.defaults.get("centre_shape_mx", 0.0)
@@ -997,9 +1006,20 @@ class BaseShape:
         self.dy_1 = kwargs.get("dy1", base.dy_1)
         self.dx_2 = kwargs.get("dx2", base.dx_2)
         self.dy_2 = kwargs.get("dy2", base.dy_2)
+        # ---- pod / domino
         self.centre_line = kwargs.get(
             "centre_line", kwargs.get("center_line", base.centre_line)
         )
+        self.centre_line_stroke = kwargs.get("centre_line_stroke", self.stroke)
+        self.centre_line_stroke_width = self.kw_float(
+            kwargs.get("centre_line_stroke_width", base.centre_line_stroke_width)
+        )
+        self.centre_line_length = self.kw_float(
+            kwargs.get("centre_line_length", base.centre_line_length)
+        )
+        self.centre_line_ends = kwargs.get("centre_line_ends", base.centre_line_ends)
+        self.centre_line_dotted = kwargs.get("centre_line_dotted", base.dotted)
+        self.centre_line_dashed = kwargs.get("centre_line_dashed", self.dashed)
         # ---- rectangle / card
         self.rounding = self.kw_float(kwargs.get("rounding", base.rounding))
         self.rounded = kwargs.get("rounded", base.rounded)  # also line end
@@ -3438,7 +3458,7 @@ class BaseShape:
                     perbii_dict = self.calculate_perbii(cnv, centre, vertexes)
                     _dirs = perbii_dict.keys()
                 elif direction_group == DirectionGroup.POLYGONAL:
-                    _dirs = [int(item[0]) - 1]
+                    _dirs = [tools.as_int(item[0], "perbii_shapes direction") - 1]
                 else:
                     _dirs = tools.validated_directions(
                         item[0], direction_group, "direction"
