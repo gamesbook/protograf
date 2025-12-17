@@ -3873,6 +3873,7 @@ def HexHex(**kwargs):
     """
     kwargs = margins(**kwargs)
     hhgrid = HexHexShape(canvas=globals.canvas, **kwargs)
+    # feedback(f' \\\ HexHex {kwargs=}')
     hhgrid.draw()
     return hhgrid
 

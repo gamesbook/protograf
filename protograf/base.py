@@ -2756,6 +2756,9 @@ class BaseShape:
 
         Requires native units (i.e. points)!
         """
+        # feedback(f' @@@ base.draw_label {kwargs=}')
+        if kwargs.get("sequence", False):
+            self.label = f"#{ID}"
         ttext = self.textify(index=ID, text=self.label, default=False)
         _rotation = rotation or self.label_rotation
         if ttext is not None or ttext != "":

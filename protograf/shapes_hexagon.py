@@ -1484,6 +1484,7 @@ class HexShape(BaseShape):
             if item == "text":
                 # ---- * text
                 self.draw_heading(cnv, ID, self.x_d, self.y_d - offset, **kwargs)
+                # feedback(f' @@@ Hexg.label {kwargs=}')
                 self.draw_label(cnv, ID, self.x_d, self.y_d, **kwargs)
                 self.draw_title(cnv, ID, self.x_d, self.y_d + offset, **kwargs)
             if item == "numbering":

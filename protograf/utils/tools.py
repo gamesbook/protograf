@@ -1407,6 +1407,24 @@ def unit(item, units: str = None, skip_none: bool = False, label: str = ""):
         )
 
 
+def points(item, units: str = None, skip_none: bool = False, label: str = ""):
+    """Convert an item from points into the appropriate unit system."""
+    log.debug("units %s :: label: %s", units, label)
+    if item is None and skip_none:
+        return None
+    units = to_units(units) if units is not None else globals.units
+    try:
+        _item = as_float(item, label)
+        return _item / units
+    except (TypeError, ValueError):
+        _label = f" {label}" if label else ""
+        feedback(
+            f"Unable to set points value for{_label}: {item}."
+            " Please check that this is a valid value.",
+            stop=True,
+        )
+
+
 def get_pymupdf_props(
     defaults=None,
     index=None,  # extract from list of potential values (usually Card options)

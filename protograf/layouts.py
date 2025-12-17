@@ -165,17 +165,23 @@ class HexHexShape(BaseShape):
 
     def __init__(self, _object=None, canvas=None, **kwargs):
         super(HexHexShape, self).__init__(_object=_object, canvas=canvas, **kwargs)
+        feedback(f" \\\ HexHexShape init {self.kwargs=}")
+        self.rings = kwargs.get("rings", 1)
 
     def draw(self, cnv=None, off_x=0, off_y=0, ID=None, **kwargs):
         """Draw a hexhex layout on a given canvas."""
         kwargs = self.kwargs | kwargs
+        feedback(f" \\\ HexHexShape draw {kwargs=}")
+        print(
+            f"{self.cx=} {self.x=} {self.cy=} {self.y=} {self.radius=} {self.diameter=} {self.height=} {self.side=} {self.rings=}"
+        )
         cnv = cnv if cnv else self.canvas
         super().draw(cnv, off_x, off_y, ID, **kwargs)  # unit-based props
         # ---- switch to use of units
         x = 0 + self._u.offset_x
         y = 0 + self._u.offset_y
         # ---- create virtual grid
-        hexhhex_locations = HexHexLocations(
+        hexhex_locations = HexHexLocations(
             cx=self.cx or self.x,  # no default value for cx
             cy=self.cy or self.y,  # no default value for cy
             radius=self.radius,
@@ -184,7 +190,8 @@ class HexHexShape(BaseShape):
             side=self.side,
             rings=self.rings,
         )
-        locations = hexhhex_locations.grid
+        locations = hexhex_locations.grid
+        # feedback(f'+++ loc  {len(locations)=} \n {locations=}')
         # ---- set shape to draw
         if not self.shape:
             self.shape = HexShape(
@@ -196,8 +203,14 @@ class HexHexShape(BaseShape):
         # ---- draw shapes on grid
         for location in locations:
             # TODO => add filtering for conditional drawing of shape(s)
+            feedback(
+                f"+++ HH {location.centre.x=}, {location.centre.y=} {location.sequence=}"
+            )
             self.shape.draw(
-                off_x=location.centre.x, off_y=location.centre.x, ID=location.sequence
+                off_x=tools.points(location.centre.x),  # offset must be in user units
+                off_y=tools.points(location.centre.y),  # offset must be in user units
+                ID=location.sequence,
+                sequence=True,
             )
         self.set_canvas_props(cnv=cnv, index=ID, **kwargs)
         cnv.commit()  # if not, then Page objects e.g. Image not layered
@@ -703,13 +716,15 @@ class HexHexLocations(VirtualShape):
     def construct_grid(self):
         """Create a virtual hexhex grid, with identified locations."""
         ghex = self.get_geometry()
+        cxu, cyu = tools.unit(self.cx), tools.unit(self.cy)
         n = self.rings + 1
         hex_count = 3 * n * (n - 1) + 1
+        print(f"*** {self.rings=}, {hex_count=}")
         hexes = []
-        vertex_angles = [-30.0, -90.0, -150.0, 150.0, 90.0, 30.0]
+        vertex_angles = [30.0, 90.0, 150.0, -150.0, -90.0, 30.0]
         # ---- centre hex
         hex0 = VirtualHex(
-            centre=Point(self.cx, self.cy),
+            centre=Point(cxu, cyu),
             sequence=0,
             ring=0,
             spine=False,
@@ -718,21 +733,23 @@ class HexHexLocations(VirtualShape):
         )
         hexes.append(hex0)
         # ---- iterate over all hexes
-        start = Point(self.cx, self.cy)
-        chex = Point(self.cx, self.cy)
+        start = Point(cxu, cyu)
+        chex = Point(cxu, cyu)
         ring = 1
         ring_counter = 1
-        vertex_interval = 0
+        ring_interval = 1  # distance between "spine" hexes in a given ring
+        spine_location = 1
         direction = 90.0
         is_spine = True
         spine = 0
-        for location in range(1, hex_count + 1):
+        for location in range(1, hex_count):
             if is_spine and spine == 0:  # first spine hex
-                chex = Point(self.cx, self.cy - ghex.diameter * ring)
+                chex = Point(cxu, cyu - ghex.height_flat * ring)
             # if is_spine:
             #    chx = cx
             #    chy = cy - ghex * ring, 90.)
             else:
+                print(f" {location=}  {spine=} { vertex_angles[spine]=}")
                 chex = geoms.point_from_angle(
                     chex, ghex.height_flat, vertex_angles[spine]
                 )
@@ -747,15 +764,18 @@ class HexHexLocations(VirtualShape):
             hexes.append(_hex)
             # next hex
             ring_counter += 1
-            if ring_counter % 6 * ring == 0:
+            if location - spine_location == ring_interval:
                 is_spine = True
                 spine += 1
+                spine_location = location
+                if spine > 5:
+                    spine = 0
             else:
                 is_spine = False
             # increment ring?
-            if location % 6 * ring == 0:
+            if location % (6 * ring) == 0:
                 ring += 1
-                vertex_interval += 1
+                ring_interval += 1
                 ring_counter = 1
                 spine = 0
         # ---- done
