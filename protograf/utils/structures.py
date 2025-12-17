@@ -282,7 +282,7 @@ class VirtualHex:
 
     centre: Point
     sequence: int
-    spine: bool
     ring: int
+    spine: bool
     zone: str
     orientation: HexOrientation

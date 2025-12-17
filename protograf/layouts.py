@@ -10,8 +10,14 @@ import math
 # third party
 # local
 from protograf.utils.messaging import feedback
-from protograf.utils.structures import Point, HexGeometry, VirtualHex, Locale
-from protograf.utils import tools, support
+from protograf.utils.structures import (
+    Point,
+    HexGeometry,
+    HexOrientation,
+    VirtualHex,
+    Locale,
+)
+from protograf.utils import geoms, tools, support
 from protograf.utils.tools import _lower
 from protograf.base import BaseShape, BaseCanvas
 from protograf.shapes import (
@@ -22,6 +28,7 @@ from protograf.shapes import (
     # RectangleShape,
     TextShape,
 )
+from protograf.shapes_hexagon import HexShape
 
 log = logging.getLogger(__name__)
 DEBUG = False
@@ -147,6 +154,51 @@ class DotGridShape(BaseShape):
         for y_col in range(0, self.rows):
             for x_col in range(0, self.cols):
                 cnv.draw_circle((x + x_col * width, y + y_col * height), size)
+        self.set_canvas_props(cnv=cnv, index=ID, **kwargs)
+        cnv.commit()  # if not, then Page objects e.g. Image not layered
+
+
+class HexHexShape(BaseShape):
+    """
+    HexHex Grid on a given canvas.
+    """
+
+    def __init__(self, _object=None, canvas=None, **kwargs):
+        super(HexHexShape, self).__init__(_object=_object, canvas=canvas, **kwargs)
+
+    def draw(self, cnv=None, off_x=0, off_y=0, ID=None, **kwargs):
+        """Draw a hexhex layout on a given canvas."""
+        kwargs = self.kwargs | kwargs
+        cnv = cnv if cnv else self.canvas
+        super().draw(cnv, off_x, off_y, ID, **kwargs)  # unit-based props
+        # ---- switch to use of units
+        x = 0 + self._u.offset_x
+        y = 0 + self._u.offset_y
+        # ---- create virtual grid
+        hexhhex_locations = HexHexLocations(
+            cx=self.cx or self.x,  # no default value for cx
+            cy=self.cy or self.y,  # no default value for cy
+            radius=self.radius,
+            diameter=self.diameter,
+            height=self.height,
+            side=self.side,
+            rings=self.rings,
+        )
+        locations = hexhhex_locations.grid
+        # ---- set shape to draw
+        if not self.shape:
+            self.shape = HexShape(
+                radius=self.radius,
+                diameter=self.diameter,
+                height=self.height,
+                side=self.side,
+            )
+        # ---- draw shapes on grid
+        for location in locations:
+            # TODO => add filtering for conditional drawing of shape(s)
+            self.shape.draw(
+                off_x=location.centre.x, off_y=location.centre.x, ID=location.sequence
+            )
         self.set_canvas_props(cnv=cnv, index=ID, **kwargs)
         cnv.commit()  # if not, then Page objects e.g. Image not layered
 
@@ -544,7 +596,7 @@ class HexHexLocations(VirtualShape):
     locations/points where user-defined shapes will be drawn.
     """
 
-    def __init__(self, rows, cols, **kwargs):
+    def __init__(self, **kwargs):
         self.kwargs = kwargs
         self.cx = tools.as_float(kwargs.get("cx", 1.0), "x")  # hexhex centre
         self.cy = tools.as_float(kwargs.get("cy", 1.0), "y")  # hexhex centre
@@ -553,6 +605,7 @@ class HexHexLocations(VirtualShape):
         self.diameter = kwargs.get("diameter", None)
         self.height = kwargs.get("heighr", 1.0)
         self.side = kwargs.get("side", None)
+        self.orientation = kwargs.get("orientation", "flat")
         # ---- check construction type
         self.use_diameter = True if self.is_kwarg("diameter") else False
         self.use_height = True if self.is_kwarg("height") else False
@@ -610,18 +663,18 @@ class HexHexLocations(VirtualShape):
         # feedback(f"hexhex {self.use_radius=} {self.use_height=} {self.use_diameter=} {self.use_side=} ")
         # ---- calculate half_flat & half_side
         if self.height and self.use_height:
-            side = self._u.height / math.sqrt(3)
-            half_flat = self._u.height / 2.0
+            side = self.height / math.sqrt(3)
+            half_flat = self.height / 2.0
         elif self.diameter and self.use_diameter:
-            side = self._u.diameter / 2.0
+            side = self.diameter / 2.0
             half_flat = side * math.sqrt(3) / 2.0
         elif self.radius and self.use_radius:
-            side = self._u.radius
+            side = self.radius
             half_flat = side * math.sqrt(3) / 2.0
         else:
             pass
         if self.side and self.use_side:
-            side = self._u.side
+            side = self.side
             half_flat = side * math.sqrt(3) / 2.0
         if not self.radius and not self.height and not self.diameter and not self.side:
             feedback(
@@ -635,8 +688,14 @@ class HexHexLocations(VirtualShape):
         radius = side
         z_fraction = (diameter - side) / 2.0
         self.ORIENTATION = self.get_orientation()
-        hex_geometry = HexGeometry(
-            radius, diameter, side, half_side, half_flat, height_flat, z_fraction
+        hex_geometry = HexGeometry(  # in point units
+            tools.unit(radius),
+            tools.unit(diameter),
+            tools.unit(side),
+            tools.unit(half_side),
+            tools.unit(half_flat),
+            tools.unit(height_flat),
+            z_fraction,
         )
         # feedback(f"*** hex geo {hex_geometry=}")
         return hex_geometry
@@ -647,9 +706,11 @@ class HexHexLocations(VirtualShape):
         n = self.rings + 1
         hex_count = 3 * n * (n - 1) + 1
         hexes = []
+        vertex_angles = [-30.0, -90.0, -150.0, 150.0, 90.0, 30.0]
         # ---- centre hex
         hex0 = VirtualHex(
-            centre=Point(cx, cy),
+            centre=Point(self.cx, self.cy),
+            sequence=0,
             ring=0,
             spine=False,
             zone=0,
@@ -657,30 +718,46 @@ class HexHexLocations(VirtualShape):
         )
         hexes.append(hex0)
         # ---- iterate over all hexes
+        start = Point(self.cx, self.cy)
+        chex = Point(self.cx, self.cy)
         ring = 1
         ring_counter = 1
         vertex_interval = 0
+        direction = 90.0
+        is_spine = True
+        spine = 0
         for location in range(1, hex_count + 1):
-            chx = cx
-            chx = cx
-            if ring_counter % 6 * ring == 0:
-                is_spine = True
+            if is_spine and spine == 0:  # first spine hex
+                chex = Point(self.cx, self.cy - ghex.diameter * ring)
+            # if is_spine:
+            #    chx = cx
+            #    chy = cy - ghex * ring, 90.)
             else:
-                is_spine = False
+                chex = geoms.point_from_angle(
+                    chex, ghex.height_flat, vertex_angles[spine]
+                )
             _hex = VirtualHex(
-                centre=Point(chx, chy),
+                centre=chex,
+                sequence=location,
                 ring=ring,
                 spine=is_spine,
                 zone=0,
                 orientation=self.ORIENTATION,
             )
-            _hexes.append(_hex)
+            hexes.append(_hex)
+            # next hex
             ring_counter += 1
+            if ring_counter % 6 * ring == 0:
+                is_spine = True
+                spine += 1
+            else:
+                is_spine = False
             # increment ring?
             if location % 6 * ring == 0:
                 ring += 1
                 vertex_interval += 1
                 ring_counter = 1
+                spine = 0
         # ---- done
         return hexes
 

@@ -72,6 +72,7 @@ from .objects import (
 from .layouts import (
     GridShape,
     DotGridShape,
+    HexHexShape,
     RectangularLocations,
     TriangularLocations,
     VirtualLocations,
@@ -3859,6 +3860,21 @@ def Grid(**kwargs):
     grid = GridShape(canvas=globals.canvas, **kwargs)
     grid.draw()
     return grid
+
+
+@docstring_loc
+def HexHex(**kwargs):
+    """Draw a hexhex-based layout on the canvas.
+
+    Kwargs:
+
+    <base>
+
+    """
+    kwargs = margins(**kwargs)
+    hhgrid = HexHexShape(canvas=globals.canvas, **kwargs)
+    hhgrid.draw()
+    return hhgrid
 
 
 def Blueprint(**kwargs):

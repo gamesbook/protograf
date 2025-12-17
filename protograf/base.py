@@ -455,6 +455,7 @@ class BaseCanvas:
         self.grouping_rows = self.defaults.get("grouping_rows", self.grouping)
         self.grouping_cols = self.defaults.get("grouping_cols", self.grouping)
         self.lines = self.defaults.get("lines", "all")  # which direction to draw
+        self.rings = self.defaults.get("rings", 1)  # for HexHex grid
         # ---- circle / star / polygon
         self.diameter = self.defaults.get("diameter", 1)
         self.radius = self.defaults.get("radius", self.diameter / 2.0)
@@ -1101,6 +1102,7 @@ class BaseShape:
             kwargs.get("grouping_cols", self.grouping), "grouping_cols"
         )
         self.lines = kwargs.get("lines", base.lines)
+        self.rings = kwargs.get("lines", base.rings)
         # ---- circle / star / polygon
         self.diameter = self.kw_float(kwargs.get("diameter", base.diameter))
         self.radius = self.kw_float(kwargs.get("radius", base.radius))
