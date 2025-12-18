@@ -281,8 +281,9 @@ class VirtualHex:
     """VirtualHex is an identified Hex in a HexHexLocations array"""
 
     centre: Point
-    sequence: int
+    id: int
     ring: int
-    spine: bool
+    counter: int
+    spine: int
     zone: str
     orientation: HexOrientation
