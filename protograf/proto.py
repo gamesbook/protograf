@@ -1087,6 +1087,7 @@ class DeckOfCards:
                 top=prime_globals.margins.top - gutter / 2.0,
                 bottom=prime_globals.margins.bottom,
                 debug=prime_globals.margins.debug,
+                units=globals.units,
             )
             cnv = globals.doc_page.new_shape()  # pymupdf Shape
             globals.canvas = cnv
@@ -1395,6 +1396,7 @@ def Create(**kwargs):
         bottom=kwargs.get("margin_bottom", the_margin),
         right=kwargs.get("margin_right", the_margin),
         debug=kwargs.get("margin_debug", False),
+        units=globals.units,
     )
     # ---- cards
     _cards = kwargs.get("cards", 0)
@@ -1552,6 +1554,7 @@ def Load(**kwargs):
         bottom=kwargs.get("margin_bottom", the_margin),
         right=kwargs.get("margin_right", the_margin),
         debug=kwargs.get("margin_debug", False),
+        units=globals.units,
     )
     # ---- defaults
     defaults = kwargs.get("defaults", None)

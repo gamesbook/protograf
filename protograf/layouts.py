@@ -9,6 +9,7 @@ import math
 
 # third party
 # local
+from protograf import globals
 from protograf.utils.messaging import feedback
 from protograf.utils.structures import (
     Point,
@@ -166,6 +167,9 @@ class HexHexShape(BaseShape):
     def __init__(self, _object=None, canvas=None, **kwargs):
         super(HexHexShape, self).__init__(_object=_object, canvas=canvas, **kwargs)
         self.rings = kwargs.get("rings", 1)
+        self.show_sequence = kwargs.get("show_sequence", False)
+        self.locations = kwargs.get("locations", None)
+        self.ranges = kwargs.get("ranges", None)
 
     def draw(self, cnv=None, off_x=0, off_y=0, ID=None, **kwargs):
         """Draw a hexhex layout on a given canvas."""
@@ -187,6 +191,7 @@ class HexHexShape(BaseShape):
             rings=self.rings,
         )
         locations = hexhex_locations.grid
+        hex_count = hexhex_locations.hex_count
         # feedback(f'/// HHS {len(locations)=} \n {locations=}')
         # ---- set shape to draw
         if not self.shape:
@@ -197,16 +202,48 @@ class HexHexShape(BaseShape):
                 side=self.side,
                 fill=self.fill,
             )
-        # ---- draw shapes on grid
-        for location in locations:
-            # TODO => add filtering for conditional drawing of shape(s)
-            # feedback(f"/// HH {location.centre=}, {location.sequence=}")
-            self.shape.draw(
-                off_x=tools.points(location.centre.x),  # offset must be in user units
-                off_y=tools.points(location.centre.y),  # offset must be in user units
-                ID=location.id,
-                sequence=True,
+        # ---- set the range of required locations
+        id_locations = range(0, hex_count + 1)
+        # TODO => add filtering for conditional drawing of shape(s)
+        spines, rings = [], []
+        if self.locations:
+            id_locations = tools.sequence_split(
+                self.locations, as_int=True, unique=True
             )
+        if self.ranges:
+            _ranges = tools.sequence_split(self.ranges, as_int=False, clean=True)
+            for rng in _ranges:
+                if rng != "":
+                    values = rng[1:]
+                    match _lower(rng[0]):
+                        case "s":
+                            spines += tools.sequence_split(
+                                values, as_int=True, unique=True
+                            )
+                        case "r":
+                            rings += tools.sequence_split(
+                                values, as_int=True, unique=True
+                            )
+        # ---- draw shapes on grid
+        # print('***', id_locations, spines, rings)
+        for location in locations:
+            # print('***', location)
+            draw = False
+            if location.id in id_locations:
+                draw = True
+            if location.spine in spines:
+                draw = True
+            if location.ring in rings:
+                draw = True
+            if draw:
+                cx = location.centre.x + globals.margins.left_u
+                cy = location.centre.y + globals.margins.top_u
+                self.shape.draw(
+                    _abs_cx=cx,
+                    _abs_cy=cy,
+                    ID=location.id,
+                    label_sequence=self.show_sequence,
+                )
         self.set_canvas_props(cnv=cnv, index=ID, **kwargs)
         cnv.commit()  # if not, then Page objects e.g. Image not layered
 
@@ -606,6 +643,22 @@ class HexHexLocations(VirtualShape):
 
     def __init__(self, **kwargs):
         self.kwargs = kwargs
+        # inject and then override kwargs supplied by DefaultShape
+        if kwargs.get("default"):
+            try:
+                if kwargs.get("default"):
+                    self.kwargs = kwargs["default"]._default_kwargs | kwargs
+            except Exception:
+                self.kwargs = kwargs
+        else:
+            self.kwargs = kwargs
+        self.kwargs.pop("default", None)
+        # inject and overwrite kwargs with those set by CommonShape
+        try:
+            if kwargs.get("common"):
+                self.kwargs = kwargs | kwargs["common"]._common_kwargs
+        except AttributeError:
+            pass  # ignore, for example, CommonShape
         self.cx = tools.as_float(kwargs.get("cx", 1.0), "x")  # hexhex centre
         self.cy = tools.as_float(kwargs.get("cy", 1.0), "y")  # hexhex centre
         self.rings = tools.as_int(kwargs.get("rings", 1), "rings")
@@ -614,6 +667,27 @@ class HexHexLocations(VirtualShape):
         self.height = kwargs.get("heighr", 1.0)
         self.side = kwargs.get("side", None)
         self.orientation = kwargs.get("orientation", "flat")
+        self.common = kwargs.get("common", None)
+        # ---- UPDATE SELF WITH COMMON
+        if self.common:
+            try:
+                attrs = vars(self.common)
+            except TypeError:
+                feedback(
+                    f'Cannot process the Common property "{self.common}"'
+                    " - please check!",
+                    True,
+                )
+            for attr in attrs.keys():
+                if (
+                    attr not in ["canvas", "common", "stylesheet", "kwargs"]
+                    and attr[0] != "_"
+                ):
+                    # print(f'/// HHL Common {attr=} {base=} {type(base)=}')
+                    common_attr = getattr(self.common, attr)
+                    base_attr = getattr(base, attr)
+                    if common_attr != base_attr:
+                        setattr(self, attr, common_attr)
         # ---- check construction type
         self.use_diameter = True if self.is_kwarg("diameter") else False
         self.use_height = True if self.is_kwarg("height") else False
@@ -645,6 +719,7 @@ class HexHexLocations(VirtualShape):
                 self.height = base * math.sqrt(3)
         self.ORIENTATION = self.get_orientation()
         # ---- get grid
+        self.hex_count = 0  # useful to check grid size
         self.grid = self.construct_grid()
 
     def is_kwarg(self, value) -> bool:
@@ -713,7 +788,7 @@ class HexHexLocations(VirtualShape):
         ghex = self.get_geometry()
         cxu, cyu = tools.unit(self.cx), tools.unit(self.cy)
         n = self.rings + 1
-        hex_count = 3 * n * (n - 1) + 1
+        self.hex_count = 3 * n * (n - 1) + 1
         hexes = []
         if self.ORIENTATION == HexOrientation.FLAT:
             vertex_angles = [0.0, 30.0, 90.0, 150.0, -150.0, -90.0, -30.0]
@@ -725,7 +800,7 @@ class HexHexLocations(VirtualShape):
             id=0,
             ring=0,
             counter=0,
-            spine=False,
+            spine=0,
             zone=0,
             orientation=self.ORIENTATION,
         )
@@ -740,7 +815,7 @@ class HexHexLocations(VirtualShape):
         direction = 90.0
         is_spine = True
         spine = 1
-        for location in range(1, hex_count):
+        for location in range(1, self.hex_count):
             # print(f"/// HHS {location=} ")
             # print(f"/// HHS {spine=} {spine_location=} {is_spine=}")
             if is_spine and spine == 1:  # first spine hex

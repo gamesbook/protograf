@@ -151,9 +151,9 @@ OffsetProperties = namedtuple(
     ],
 )
 
-# margins are in user units
-PageMargins = namedtuple(
-    "PageMargins",
+# base margins are in user units
+PageMarginsBase = namedtuple(
+    "PageMarginsBase",
     [
         "margin",  # default
         "left",
@@ -161,8 +161,33 @@ PageMargins = namedtuple(
         "bottom",
         "top",
         "debug",  # show the margin?
+        "units",  # point equivalent of single user unit
     ],
 )
+
+
+class PageMargins(PageMarginsBase):
+
+    @property
+    def left_u(self):
+        """Calculates the margin in point units."""
+        return self.units * self.left
+
+    @property
+    def right_u(self):
+        """Calculates the margin in point units."""
+        return self.units * self.right
+
+    @property
+    def top_u(self):
+        """Calculates the margin in point units."""
+        return self.units * self.top
+
+    @property
+    def bottom_u(self):
+        """Calculates the margin in point units."""
+        return self.units * self.bottom
+
 
 Place = namedtuple("Place", ["shape", "rotation"])
 
