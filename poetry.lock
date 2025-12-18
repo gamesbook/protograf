@@ -49,14 +49,14 @@ dev = ["backports.zoneinfo", "freezegun (>=1.0,<2.0)", "jinja2 (>=3.0)", "pytest
 
 [[package]]
 name = "bgg-api"
-version = "1.1.10"
+version = "1.1.14"
 description = "A Python API for boardgamegeek.com"
 optional = false
-python-versions = "*"
+python-versions = ">=3.8"
 groups = ["main"]
 files = [
-    {file = "bgg_api-1.1.10-py2.py3-none-any.whl", hash = "sha256:0ecce2e7eb14939cca91419d01d3249bb9ad1bd47f33dd2f36f3a49f25b8acab"},
-    {file = "bgg_api-1.1.10.tar.gz", hash = "sha256:5c872fe40e56513d30af6704956b7c05e1cee567c22007361bac5ae7cd2d9b8b"},
+    {file = "bgg_api-1.1.14-py3-none-any.whl", hash = "sha256:f1e79adfedb91f42e15738ad191ffb4eff6055a1329af7f7707cc5c9cf5f5618"},
+    {file = "bgg_api-1.1.14.tar.gz", hash = "sha256:92dae1cec9a49bd6cc0826398eecc686ddf935f073e4a67d63ac4d971dbeb9fb"},
 ]
 
 [package.dependencies]
@@ -1488,4 +1488,4 @@ type = ["pytest-mypy"]
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.9,<4"
-content-hash = "df09d56cbc6b71ce2e4ad4b76cd06276fdf23d198a4a03330c8c4b7148d6dfd9"
+content-hash = "a57e33d57d17779ca0632ff7147614112e655a3d1b0da8d53b63401e0b7c9e75"

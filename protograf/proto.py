@@ -4948,7 +4948,14 @@ def Track(track=None, **kwargs):
 # ---- bgg API ====
 
 
-def BGG(user: str = None, ids: list = None, progress=False, short=500, **kwargs):
+def BGG(
+    token: str = None,
+    user: str = None,
+    ids: list = None,
+    progress=False,
+    short=500,
+    **kwargs,
+):
     """Access BGG API for game data"""
     ckwargs = {}
     # ---- self filters
@@ -4978,13 +4985,17 @@ def BGG(user: str = None, ids: list = None, progress=False, short=500, **kwargs)
         ckwargs["has_parts"] = tools.as_bool(kwargs.get("has_parts"))
     if kwargs.get("want_parts") is not None:
         ckwargs["want_parts"] = tools.as_bool(kwargs.get("want_parts"))
-    gamelist = BGGGameList(user, **ckwargs)
+    if kwargs.get("requests") is not None:
+        ckwargs["requests"] = tools.as_int(kwargs.get("requests", 60), "requests")
+    gamelist = BGGGameList(token, user, **ckwargs)
     if user:
         ids = []
         if gamelist.collection:
             for item in gamelist.collection.items:
                 ids.append(item.id)
-                _game = BGGGame(game_id=item.id, user_game=item, user=user, short=short)
+                _game = BGGGame(
+                    token=token, game_id=item.id, user_game=item, user=user, short=short
+                )
                 gamelist.set_values(_game)
         if not ids:
             feedback(
@@ -4998,7 +5009,7 @@ def BGG(user: str = None, ids: list = None, progress=False, short=500, **kwargs)
         for game_id in ids:
             if progress:
                 feedback(f"Retrieving game '{game_id}' from BoardGameGeek...")
-            _game = BGGGame(game_id=game_id, short=short)
+            _game = BGGGame(token=token, game_id=game_id, short=short)
             gamelist.set_values(_game)
     else:
         feedback(

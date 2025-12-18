@@ -13,7 +13,7 @@ readme = "README.md"
 requires-python = ">=3.9,<4"
 dependencies = [
     "xlrd (>=0.9.4)",
-    "bgg-api (>=1.1.6)",
+    "bgg-api (>=1.1.14,<2.0.0)",
     "cairosvg (>=2.7.1)",
     "imageio (>=2.36.1)",
     "pymupdf (>=1.25.4)",

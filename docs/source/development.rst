@@ -61,7 +61,7 @@ New package dependencies should be added via::
 
     poetry add MyNewPackage
 
-Or perhaps with finer control over versions::
+Or added with a specific version via::
 
     poetry add MyNewPackage^3.1.4
 
@@ -71,7 +71,11 @@ Check existing dependencies via::
 
 Upgrade a dependency via::
 
-    poetry update MyExistingPackage
+    poetry add MyExistingPackage
+    
+Upgrade a dependency to a specific version via::
+
+    poetry add MyExistingPackage^3.1.5
 
 Update a patch / feature version (the most common case) via::
 
