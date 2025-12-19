@@ -166,10 +166,7 @@ class HexHexShape(BaseShape):
 
     def __init__(self, _object=None, canvas=None, **kwargs):
         super(HexHexShape, self).__init__(_object=_object, canvas=canvas, **kwargs)
-        self.rings = kwargs.get("rings", 1)
         self.show_sequence = kwargs.get("show_sequence", False)
-        self.locations = kwargs.get("locations", None)
-        self.ranges = kwargs.get("ranges", None)
 
     def draw(self, cnv=None, off_x=0, off_y=0, ID=None, **kwargs):
         """Draw a hexhex layout on a given canvas."""
@@ -204,36 +201,63 @@ class HexHexShape(BaseShape):
             )
         # ---- set the range of required locations
         id_locations = range(0, hex_count + 1)
-        # TODO => add filtering for conditional drawing of shape(s)
-        spines, rings = [], []
+        # ---- process filters for conditional drawing of shape(s)
+        spine_set, rings_set, counters_set = [], [], []
+        if self.ranges:
+            try:
+                id_locations = []
+                _ranges = tools.separate(self.ranges, separator=" ", clean=True)
+                for rng in _ranges:
+                    if rng != "":
+                        if ":" in rng:
+                            _ring, _hex = rng.split(":")
+                            # print(f'\\\ COUNT {rng=} {_ring=} {_hex=}')
+                            _ring_set = tools.sequence_split(
+                                _ring, as_int=True, unique=True, star=True
+                            )
+                            _hex_set = tools.sequence_split(
+                                _hex, as_int=True, unique=True, star=False
+                            )
+                            if "*" in _ring_set:
+                                _ring_set += range(1, self.rings + 1)
+                            for rval in _ring_set:
+                                for hval in _hex_set:
+                                    counters_set.append((rval, hval))
+                        else:
+                            values = rng[1:] if len(rng) > 1 else "*"
+                            match _lower(rng[0]):
+                                case "s":
+                                    spine_set += tools.sequence_split(
+                                        values, as_int=True, unique=True, star=True
+                                    )
+                                case "r":
+                                    rings_set += tools.sequence_split(
+                                        values, as_int=True, unique=True, star=True
+                                    )
+                if "*" in spine_set:
+                    spine_set += [1, 2, 3, 4, 5, 6]
+                if "*" in rings_set:
+                    rings_set += range(1, self.rings + 1)
+            except ValueError as err:
+                feedback(
+                    f'Unable to process HexHex ranges "{self.ranges}".'
+                    " Please check and correct this property."
+                )
         if self.locations:
             id_locations = tools.sequence_split(
                 self.locations, as_int=True, unique=True
             )
-        if self.ranges:
-            _ranges = tools.sequence_split(self.ranges, as_int=False, clean=True)
-            for rng in _ranges:
-                if rng != "":
-                    values = rng[1:]
-                    match _lower(rng[0]):
-                        case "s":
-                            spines += tools.sequence_split(
-                                values, as_int=True, unique=True
-                            )
-                        case "r":
-                            rings += tools.sequence_split(
-                                values, as_int=True, unique=True
-                            )
         # ---- draw shapes on grid
-        # print('***', id_locations, spines, rings)
+        # print(f'/// {self.fill=} {id_locations=} {rings_set=} {spine_set=} {counters_set=}')
         for location in locations:
-            # print('***', location)
             draw = False
             if location.id in id_locations:
                 draw = True
-            if location.spine in spines:
+            if location.spine in spine_set:
                 draw = True
-            if location.ring in rings:
+            if location.ring in rings_set:
+                draw = True
+            if (location.ring, location.counter) in counters_set:
                 draw = True
             if draw:
                 cx = location.centre.x + globals.margins.left_u

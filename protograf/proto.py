@@ -110,7 +110,7 @@ from protograf.utils.docstrings import (
     docstring_onimo,
 )
 from protograf.utils.colrs import lighten, darken  # used in scripts
-from protograf.utils.fonts import builtin_font, FontInterface
+from protograf.utils.fonts import FontInterface
 from protograf.utils.geoms import equilateral_height  # used in scripts
 from protograf.utils.messaging import feedback
 from protograf.utils.support import (  # used in scripts
@@ -134,14 +134,14 @@ from protograf.utils.structures import (
     Ray,
     TemplatingType,
 )
-from protograf.utils.tools import (
+from protograf.utils.tools import (  # used in scripts
     base_fonts,
     _lower,
     split,
     save_globals,
     restore_globals,
     uniques,
-)  # used in scripts
+)
 from protograf import globals
 
 log = logging.getLogger(__name__)

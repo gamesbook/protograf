@@ -7,7 +7,7 @@ from collections import namedtuple
 from dataclasses import dataclass
 from enum import Enum
 import logging
-from typing import Any, List, Tuple
+from typing import List
 
 # third-party
 from jinja2 import Template

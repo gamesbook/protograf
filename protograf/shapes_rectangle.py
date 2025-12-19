@@ -3,44 +3,27 @@
 Create custom shapes for protograf
 """
 # lib
-import codecs
-import copy
 import logging
 import math
-import os
-from pathlib import Path
-from urllib.parse import urlparse
 
 # third party
-import pymupdf
-from pymupdf import Point as muPoint, Rect as muRect
-import segno  # QRCode
+from pymupdf import Point as muPoint
 
 # local
 from protograf import globals
-from protograf.shapes_utils import set_cached_dir, draw_line
-from protograf.utils import colrs, geoms, tools, support, fonts
+from protograf.shapes_utils import draw_line
+from protograf.utils import colrs, geoms, tools
 from protograf.utils.tools import _lower
-from protograf.utils.constants import (
-    BGG_IMAGES,
-)
 from protograf.utils.messaging import feedback
 from protograf.utils.structures import (
-    BBox,
     DirectionGroup,
-    HexGeometry,
-    HexOrientation,
-    Link,
     Perbis,
     Point,
-    PolyGeometry,
     Radius,
 )  # named tuples
-from protograf.utils.support import CACHE_DIRECTORY
 from protograf.base import (
     BaseShape,
     GridShape,
-    get_cache,
 )
 
 log = logging.getLogger(__name__)

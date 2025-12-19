@@ -3,47 +3,24 @@
 Create custom objects for protograf
 """
 # lib
-import codecs
-import copy
 import logging
 import math
-import os
-from pathlib import Path
 import random
-from urllib.parse import urlparse
 
 # third party
-import pymupdf
-from pymupdf import Point as muPoint, Rect as muRect
+from pymupdf import Point as muPoint
 
 # local
 from protograf import globals
 from protograf.shapes_utils import draw_line
-from protograf.utils import colrs, geoms, tools, support
+from protograf.utils import colrs, geoms, tools
 from protograf.utils.tools import _lower
-from protograf.utils.constants import (
-    GRID_SHAPES_WITH_CENTRE,
-    COLOR_NAMES,
-    DEBUG_COLOR,
-    BGG_IMAGES,
-)
 from protograf.utils.messaging import feedback
 from protograf.utils.structures import (
-    BBox,
-    DirectionGroup,
-    HexGeometry,
-    Link,
-    Locale,
     Point,
-    PolyGeometry,
     Tetris3D,
 )  # named tuples
-from protograf.utils.support import CACHE_DIRECTORY
-from protograf.base import (
-    BaseShape,
-    BaseCanvas,
-    GridShape,
-)
+from protograf.base import BaseShape
 from protograf.shapes import PolygonShape
 from protograf.shapes_circle import CircleShape
 from protograf.shapes_rectangle import RectangleShape
