@@ -16,6 +16,7 @@ python core/customised_commands.py
 python core/customised_hexagon.py
 python core/customised_hexagonal_grid.py
 python core/customised_hexagonal_grid_locations.py
+python core/customised_hexhex.py
 python core/customised_rectangle.py
 python core/customised_shapes.py
 python core/customised_text.py

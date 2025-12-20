@@ -304,23 +304,32 @@ class HexHexShape(BaseShape):
                 shapes = shapes_dict.get(ring)
                 if not shapes:
                     continue  # might not be shapes defined for a given ring
+                # check no. of shapes vs size of ring
+                if ring == 0 and len(shapes) != 1:
+                    feedback("There must only be one HexHex shape for ring#0", True)
+                if ring != 0 and len(shapes) != ring * 6:
+                    feedback(
+                        "There is a mismatch between the number of HexHex shapes"
+                        f" and the ring locations ({ring * 6}) for ring#{ring}",
+                        True,
+                    )
                 for key, the_shape in enumerate(shapes):
-                    if key > ring * 6:
-                        feedback(f"Too many HexHex shapes set ring#{ring}", True)
-                    loc = location_dict[(ring, key)]
-                    cx = location.centre.x + globals.margins.left_u
-                    cy = location.centre.y + globals.margins.top_u
+                    loc = location_dict.get((ring, key + 1))
+                    # print(f'/// {ring=} {key+1=} {loc.id=} {the_shape=}')
+                    cx = loc.centre.x + globals.margins.left_u
+                    cy = loc.centre.y + globals.margins.top_u
                     hex_id = key
                     if self.show_counter:
                         hex_id = loc.counter
                     if self.show_sequence:
                         hex_id = loc.id
-                    the_shape.draw(
-                        _abs_cx=cx,
-                        _abs_cy=cy,
-                        ID=hex_id,
-                        label_sequence=self.show_sequence or self.show_counter,
-                    )
+                    if the_shape:  # TODO - test for centre-able?
+                        the_shape.draw(
+                            _abs_cx=cx,
+                            _abs_cy=cy,
+                            ID=hex_id,
+                            label_sequence=self.show_sequence or self.show_counter,
+                        )
         elif self.shape:
             for key, location in enumerate(locations):
                 # print(f'/// {key=} {location.counter=} {location.id=}')
@@ -917,7 +926,7 @@ class HexHexLocations(VirtualShape):
             centre=Point(cxu, cyu),
             id=0,
             ring=0,
-            counter=0,
+            counter=1,
             spine=0,
             zone=0,
             orientation=self.ORIENTATION,
@@ -1395,7 +1404,7 @@ class RectangularLocations(VirtualLocations):
 
 class TriangularLocations(VirtualLocations):
     """
-    Common properties and methods to define  virtual triangular locations.
+    Common properties and methods to define virtual triangular locations.
     """
 
     def __init__(self, rows=2, cols=2, **kwargs):
