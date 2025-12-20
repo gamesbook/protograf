@@ -1,11 +1,12 @@
 protograf Changes
 =================
 
-2026-00-00 (0.3.6)
+2020-00-00 (0.3.6)
 ------------------
 - Add Domino object
 - Renamed `rolls` to `pips` for D6 (die)
 - Upgrade BGG API library; access to API now via a token
+- Add HexHex board shape
 
 2025-12-13 (0.3.5)
 ------------------

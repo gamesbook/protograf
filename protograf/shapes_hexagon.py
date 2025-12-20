@@ -1136,10 +1136,13 @@ class HexShape(BaseShape):
                 # cx,cy are centre; create x_d, y_d as the unit-formatted hex centre
                 self.x_d = self._u.cx + self._o.delta_x
                 self.y_d = self._u.cy + self._o.delta_y
+                # feedback(f"*** draw P^Hex {self.cx=} {self.cy=} {self.x_d=} {self._y_d=}")
                 # recalculate start x,y
                 x = self.x_d - geo.half_flat
                 y = self.y_d - geo.half_side - geo.side / 2.0
-            # feedback(f"*** P^: {x=} {y=}{self.x_d=} {self.y_d=} {geo=} ")
+            else:
+                pass
+                # feedback(f"*** draw P^Hex: {x=} {y=}{self.x_d=} {self.y_d=} {geo=}")
 
         # ---- FLAT~
         elif self.ORIENTATION == HexOrientation.FLAT:
@@ -1208,10 +1211,13 @@ class HexShape(BaseShape):
                 # cx,cy are centre; create x_d, y_d as the unit-formatted hex centre
                 self.x_d = self._u.cx + self._o.delta_x
                 self.y_d = self._u.cy + self._o.delta_y
+                # feedback(f"*** draw F~Hex {self.cx=} {self.cy=} {self.x_d=} {self.y_d=}")
                 # recalculate start x,y
                 x = self.x_d - geo.half_side - geo.side / 2.0
                 y = self.y_d - geo.half_flat
-            # feedback(f"*** F~: {x=} {y=} {self.x_d=} {self.y_d=} {geo=}")
+            else:
+                pass
+                # feedback(f"*** draw F~Hex: {x=} {y=} {self.x_d=} {self.y_d=} {geo=}")
 
         # ---- VERTICES:
         # ---- ^ pointy hexagon vertices (clockwise)
