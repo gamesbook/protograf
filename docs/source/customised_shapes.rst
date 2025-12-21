@@ -2155,7 +2155,7 @@ Dot & Cross
       - *cross* - sets the length of each of the two lines that cross at the centre
       - *cross_stroke*  - sets the color of the cross lines
       - *cross_stroke_width* - sets the thickness of the cross lines
-      - *orientation* - if set to `pointy`, there will be a "peak" at the top
+      - *orientation* - if set to ``pointy``, there will be a "peak" at the top
 
 ===== ======
 

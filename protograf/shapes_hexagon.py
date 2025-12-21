@@ -84,7 +84,7 @@ class HexShape(BaseShape):
             orientation = HexOrientation.FLAT
         else:
             feedback(
-                'Invalid orientation "{self.orientation}" supplied for hexagon.', True
+                f'Invalid orientation "{self.orientation}" supplied for hexagon.', True
             )
         return orientation
 
@@ -101,7 +101,7 @@ class HexShape(BaseShape):
                 direction = DirectionGroup.HEX_FLAT
             else:
                 feedback(
-                    'Invalid orientation "{self.orientation}" supplied for hexagon radii.',
+                    f'Invalid orientation "{self.orientation}" supplied for hexagon radii.',
                     True,
                 )
         elif lines == "perbii":
@@ -111,7 +111,7 @@ class HexShape(BaseShape):
                 direction = DirectionGroup.HEX_FLAT_EDGE
             else:
                 feedback(
-                    'Invalid orientation "{self.orientation}" supplied for hexagon perbii.',
+                    f'Invalid orientation "{self.orientation}" supplied for hexagon perbii.',
                     True,
                 )
         else:

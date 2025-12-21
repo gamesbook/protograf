@@ -460,15 +460,15 @@ class BaseCanvas:
         self.locations = self.defaults.get("locations", None)
         self.ranges = self.defaults.get("ranges", None)
         self.shapes = None
-        self.grid_lines = self.defaults.get("grid_lines_lines", False)
-        self.grid_lines_stroke = self.defaults.get("grid_lines_stroke", self.stroke)
-        self.grid_lines_fill = self.defaults.get("grid_lines_fill", None)
-        self.grid_lines_ends = self.defaults.get("grid_lines_ends", None)
-        self.grid_lines_stroke_width = self.defaults.get(
-            "grid_lines_stroke_width", self.stroke_width
+        self.gridlines = self.defaults.get("gridlines", False)
+        self.gridlines_stroke = self.defaults.get("gridlines_stroke", self.stroke)
+        self.gridlines_fill = self.defaults.get("gridlines_fill", None)
+        self.gridlines_ends = self.defaults.get("gridlines_ends", None)
+        self.gridlines_stroke_width = self.defaults.get(
+            "gridlines_stroke_width", self.stroke_width
         )
-        self.grid_lines_dotted = self.defaults.get("grid_lines_dotted", False)
-        self.grid_lines_dashed = self.defaults.get("grid_lines_dashed", None)
+        self.gridlines_dotted = self.defaults.get("gridlines_dotted", False)
+        self.gridlines_dashed = self.defaults.get("gridlines_dashed", None)
         # ---- circle / star / polygon
         self.diameter = self.defaults.get("diameter", 1)
         self.radius = self.defaults.get("radius", self.diameter / 2.0)
@@ -1120,18 +1120,18 @@ class BaseShape:
         self.locations = kwargs.get("locations", base.locations)
         self.ranges = kwargs.get("ranges", base.ranges)
         self.shapes = kwargs.get("shapes", base.shapes)
-        self.grid_lines = self.kw_bool(kwargs.get("grid_lines", base.grid_lines))
-        self.grid_lines_fill = kwargs.get("grid_lines_fill", None)
-        self.grid_lines_stroke = kwargs.get("grid_lines_stroke", base.grid_lines_stroke)
-        self.grid_lines_stroke_width = self.kw_float(
-            kwargs.get("grid_lines_stroke_width", base.grid_lines_stroke_width)
+        self.gridlines = self.kw_bool(kwargs.get("gridlines", base.gridlines))
+        self.gridlines_fill = kwargs.get("gridlines_fill", None)
+        self.gridlines_stroke = kwargs.get("gridlines_stroke", base.gridlines_stroke)
+        self.gridlines_stroke_width = self.kw_float(
+            kwargs.get("gridlines_stroke_width", base.gridlines_stroke_width)
         )
-        self.grid_lines_ends = kwargs.get("grid_lines_ends", base.grid_lines_ends)
-        self.grid_lines_dotted = self.kw_bool(
-            kwargs.get("grid_lines_dotted", base.grid_lines_dotted)
+        self.gridlines_ends = kwargs.get("gridlines_ends", base.gridlines_ends)
+        self.gridlines_dotted = self.kw_bool(
+            kwargs.get("gridlines_dotted", base.gridlines_dotted)
         )
-        self.grid_lines_dashed = self.kw_bool(
-            kwargs.get("grid_lines_dashed", base.grid_lines_dashed)
+        self.gridlines_dashed = self.kw_bool(
+            kwargs.get("gridlines_dashed", base.gridlines_dashed)
         )
         # ---- circle / star / polygon
         self.diameter = self.kw_float(kwargs.get("diameter", base.diameter))
