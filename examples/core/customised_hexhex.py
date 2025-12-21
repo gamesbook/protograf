@@ -45,12 +45,12 @@ HexHex(
     cx=2, cy=3,
     height=0.5,
     rings=3,
-    show_sequence=True) #,shape=dot() fill=None)
+    show_sequence=True)
 HexHex(
     cx=4, cy=6,
     height=0.5,
     rings=3,
-    show_counter=True) #,shape=dot() fill=None)
+    show_counter=True)
 PageBreak()
 
 

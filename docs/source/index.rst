@@ -68,6 +68,7 @@ useful information but do build on each other.
 
    layouts
    hexagonal_grids
+   hexhex_grids
    additional_commands
    objects
    functions

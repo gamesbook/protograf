@@ -37,8 +37,8 @@ other.
     appearance of text
 11. :doc:`Repetitive Elements <layouts>` - how to work with repeats, sequences,
     tracks and grid layouts
-12. :doc:`Hexagonal Grids <hexagonal_grids>` - how to create different types
-    of hexagonal grids and customise or add to them
+12. :doc:`Hexagonal <hexagonal_grids>` and :doc:`HexHex <hexhex_grids>`
+    grids - how to create and customise them
 13. :doc:`Additional Commands <additional_commands>` - special commands not part
     of the core shapes; fonts, dates and access to BoardGameGeek data
 14. :doc:`Compound Objects <objects>` - special composite shapes not part
