@@ -33,7 +33,7 @@ python objects\polyominoes.py --no-png -d %location%
 python objects\pentominoes.py --no-png -d %location%
 python objects\ominoes_basic.py --no-png -d %location%
 python objects\dice_d6.py --no-png -d %location%
-python objects\dominoes.py --no-png -d %location%
+python objects\domino.py --no-png -d %location%
 python objects\cubes.py --no-png -d %location%
 
 REM ---- examples: simple: layouts

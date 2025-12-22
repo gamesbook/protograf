@@ -131,6 +131,7 @@ from boardgamegeek.objects.games import BoardGame
 from protograf.utils.messaging import feedback
 from protograf.utils.support import CACHE_DIRECTORY
 from protograf.utils import tools
+from protograf import globals
 
 
 class BGGGame:
@@ -159,6 +160,10 @@ class BGGGame:
         self.user_game = user_game
         self.user = user or ""
         self.short = int(short) or 500
+        if not token:
+            # check command-line
+            if globals.pargs.bggapi:
+                token = globals.pargs.bggapi
         if not token:
             feedback(f"Access to BGG requires a token!", True)
         self.bgg = BGGClient(token)

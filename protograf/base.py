@@ -267,6 +267,11 @@ class BaseCanvas:
         self.order_all = self.defaults.get("order_all", None)
         self.order_first = self.defaults.get("order_first", None)
         self.order_last = self.defaults.get("order_last", None)
+        # ---- attrs  (hex, circle, rect)
+        self.calculated_left = self.defaults.get("calculated_left", None )
+        self.calculated_top = self.defaults.get("calculated_top", None)
+        self.grid = self.defaults.get("grid", None)
+        self.coord_text = self.defaults.get("coord_text", None)
         # ---- text: base
         self.text = self.defaults.get("text", "")
         self.text_size = self.defaults.get("text_size", self.font_size)
@@ -892,6 +897,11 @@ class BaseShape:
         self.order_all = kwargs.get("order_all", base.order_all)
         self.order_first = kwargs.get("order_first", base.order_first)
         self.order_last = kwargs.get("order_last", base.order_last)
+        # ---- attrs  (hex, circle, rect)
+        self.calculated_left = kwargs.get("calculated_left", None )
+        self.calculated_top = kwargs.get("calculated_top", None)
+        self.grid = kwargs.get("grid", None)
+        self.coord_text = kwargs.get("coord_text", None)
         # ---- text: base
         self.text = kwargs.get("text", base.text)
         self.text_size = self.kw_float(kwargs.get("text_size", base.text_size))

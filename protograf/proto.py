@@ -1427,14 +1427,10 @@ def Create(**kwargs):
     # ---- command-line arguments
     parser = argparse.ArgumentParser()
     parser.add_argument(
-        "-d", "--directory", help="Specify output directory", default=""
+        "-b", "--bggapi", help="Specify token for access to BGG API", default=""
     )
-    # use: --no-png to skip PNG output during Save()
     parser.add_argument(
-        "--png",
-        help="Whether to create PNG during Save (default is True)",
-        default=True,
-        action=argparse.BooleanOptionalAction,
+        "-d", "--directory", help="Specify output directory", default=""
     )
     # use: --fonts to force Fonts recreation during Create()
     parser.add_argument(
@@ -1446,14 +1442,22 @@ def Create(**kwargs):
     )
     # use: --no-warning to ignore WARNING:: messages
     parser.add_argument(
-        "-nw",
+        "-w",
         "--nowarning",
         help="Do NOT show any WARNING:: messages (default is False)",
         default=False,
         action=argparse.BooleanOptionalAction,
     )
+    # use: --no-png to skip PNG output during Save()
     parser.add_argument(
-        "-p", "--pages", help="Specify which pages to process", default=""
+        "-p",
+        "--png",
+        help="Whether to create PNG during Save (default is True)",
+        default=True,
+        action=argparse.BooleanOptionalAction,
+    )
+    parser.add_argument(
+        "-g", "--pages", help="Specify which pages to process", default=""
     )
     parser.add_argument(
         "-t",

@@ -6,7 +6,8 @@ Created on: 22 January 2025
 
 Notes:
     * BGG() uses the `bgg-api` Python library (https://github.com/SukiCZ/boardgamegeek)
-    * Inspired by https://www.myboardgamecollection.com/ (cover page)
+    * As of late-2025, the BGG API requires token-based access
+    * Script inspired by https://www.myboardgamecollection.com/ (cover page)
 """
 from protograf import *
 
