@@ -1,7 +1,7 @@
 protograf Changes
 =================
 
-2020-00-00 (0.3.6)
+2025-12-22 (0.3.6)
 ------------------
 - Add Domino object
 - Renamed `rolls` to `pips` for D6 (die)

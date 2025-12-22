@@ -34,7 +34,11 @@ class CircleShape(BaseShape):
     """
 
     def __init__(self, _object=None, canvas=None, **kwargs):
-        super(CircleShape, self).__init__(_object=_object, canvas=canvas, **kwargs)
+        super().__init__(_object=_object, canvas=canvas, **kwargs)
+        # ---- class vars
+        self.calculated_left, self.calculated_top = None, None
+        self.grid = None
+        self.coord_text = None
         # ---- perform overrides
         self.radius = self.radius or self.diameter / 2.0
         if self.cx is not None and self.cy is not None:
@@ -68,8 +72,7 @@ class CircleShape(BaseShape):
         length = math.pi * 2.0 * self._u.radius
         if units:
             return self.points_to_value(length)
-        else:
-            return length
+        return length
 
     def calculate_radii(
         self, cnv, centre: Point, vertices: list, debug: bool = False
@@ -741,7 +744,7 @@ class CircleShape(BaseShape):
                         kwargs["rotation"],
                         self.radii_shapes_rotated,
                     )
-            if item == "centre_shape" or item == "center_shape":
+            if item in ["centre_shape", "center_shape"]:
                 # ---- * centre shape (with offset)
                 if self.centre_shape:
                     if self.can_draw_centred_shape(self.centre_shape):
@@ -749,7 +752,7 @@ class CircleShape(BaseShape):
                             _abs_cx=x + self.unit(self.centre_shape_mx),
                             _abs_cy=y + self.unit(self.centre_shape_my),
                         )
-            if item == "centre_shapes" or item == "center_shapes":
+            if item in ["centre_shapes", "center_shapes"]:
                 # ---- * centre shapes (with offsets)
                 if self.centre_shapes:
                     self.draw_centred_shapes(self.centre_shapes, x, y)

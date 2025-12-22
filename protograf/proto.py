@@ -168,7 +168,7 @@ class CardOutline(BaseShape):
     """
 
     def __init__(self, _object=None, canvas=None, **kwargs):
-        super(CardOutline, self).__init__(_object=_object, canvas=canvas, **kwargs)
+        super().__init__(_object=_object, canvas=canvas, **kwargs)
         self.kwargs = kwargs
         # feedback(f'\n$$$ CardShape KW=> {self.kwargs}')
         self.elements = []  # container for objects which get added to the card
@@ -241,7 +241,7 @@ class CardShape(BaseShape):
     """
 
     def __init__(self, _object=None, canvas=None, **kwargs):
-        super(CardShape, self).__init__(_object=_object, canvas=canvas, **kwargs)
+        super().__init__(_object=_object, canvas=canvas, **kwargs)
         self.kwargs = kwargs
         # feedback(f'\n$$$ CardShape KW=> {self.kwargs}')
         self.elements = []  # container for objects which get added to the card

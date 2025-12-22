@@ -366,6 +366,8 @@ class BaseCanvas:
         self.arrow_fill = self.defaults.get("arrow_fill", None)  # see draw_arrowhead()
         # ---- polyline / polyshape
         self.snail = self.defaults.get("snail", None)
+        self.x_c = self.defaults.get("x_c", None)
+        self.y_c = self.defaults.get("y_c", None)
         # ---- line
         self.connections = self.defaults.get("connections", None)
         self.connections_style = self.defaults.get("connections_style", None)
@@ -1004,6 +1006,8 @@ class BaseShape:
         self.arrow_fill = kwargs.get("arrow_fill", base.arrow_fill)
         # ---- polyline / polyshape
         self.snail = kwargs.get("snail", base.snail)
+        self.x_c = kwargs.get("x_c", base.x_c)
+        self.y_c = kwargs.get("y_c", base.y_c)
         # ---- line
         self.connections = kwargs.get("connections", base.connections)
         self.connections_style = kwargs.get("connections_style", base.connections_style)
