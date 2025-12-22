@@ -21,7 +21,9 @@ its highly recommended to read the sections in the order presented in the
 [Guide](https://protograf.readthedocs.io/en/latest/guide.html).
 
 If you're not familiar with any kind of programming or scripting, you should
-at least read some of the introductory sections, and especially the
+at least read some of the
+[introductory sections](https://protograf.readthedocs.io/en/latest/basic_concepts.html),
+and especially the
 [installation](https://protograf.readthedocs.io/en/latest/setting_up.html)
 before proceeding...
 
@@ -105,14 +107,15 @@ current / potential areas of work or ideas.
     * [x] Pod shape
 * [ ] Common objects:
     * [x] Cube
-    * [ ] Domino
+    * [x] Domino
     * [x] Die
     * [ ] Meeple (Polyshape with curves)
     * [x] Pentomino
 * [ ] Hexagons: 18xx tile example
-* [ ] HexHex Grid: hexhex boards using notation
+* [x] HexHex Grid: hexhex boards
 * [x] Polyline: define arcs along the path
 * [x] Paths (arcs) inside a Hexagon
+* [ ] Pathways: (arcs and line) in a Hexagonal grid
 * [x] Stripes: interior "areas" for a Rectangle
 * [ ] Cards:
     * [x] support card-back designs

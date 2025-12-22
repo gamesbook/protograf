@@ -3,44 +3,27 @@
 Create custom shapes for protograf
 """
 # lib
-import codecs
-import copy
 import logging
 import math
-import os
-from pathlib import Path
-from urllib.parse import urlparse
 
 # third party
-import pymupdf
-from pymupdf import Point as muPoint, Rect as muRect
-import segno  # QRCode
+from pymupdf import Point as muPoint
 
 # local
 from protograf import globals
-from protograf.shapes_utils import set_cached_dir, draw_line
-from protograf.utils import colrs, geoms, tools, support, fonts
+from protograf.shapes_utils import draw_line
+from protograf.utils import colrs, geoms, tools
 from protograf.utils.tools import _lower
-from protograf.utils.constants import (
-    BGG_IMAGES,
-)
 from protograf.utils.messaging import feedback
 from protograf.utils.structures import (
-    BBox,
     DirectionGroup,
-    HexGeometry,
-    HexOrientation,
-    Link,
     Perbis,
     Point,
-    PolyGeometry,
     Radius,
 )  # named tuples
-from protograf.utils.support import CACHE_DIRECTORY
 from protograf.base import (
     BaseShape,
     GridShape,
-    get_cache,
 )
 
 log = logging.getLogger(__name__)
@@ -65,7 +48,11 @@ class RectangleShape(BaseShape):
     """
 
     def __init__(self, _object=None, canvas=None, **kwargs):
-        super(RectangleShape, self).__init__(_object=_object, canvas=canvas, **kwargs)
+        super().__init__(_object=_object, canvas=canvas, **kwargs)
+        # ---- class vars
+        self.calculated_left, self.calculated_top = None, None
+        self.grid = None
+        self.coord_text = None
         # ---- overrides to centre shape
         if self.cx is not None and self.cy is not None:
             self.x = self.cx - self.width / 2.0
@@ -85,15 +72,15 @@ class RectangleShape(BaseShape):
         self.set_unit_properties()  # need to recalculate!
 
     def calculate_area(self) -> float:
+        """Calculate rectangle area."""
         return self._u.width * self._u.height
 
     def calculate_perimeter(self, units: bool = False) -> float:
-        """Total length of bounding perimeter."""
+        """Total length of rectangle bounding perimeter."""
         length = 2.0 * (self._u.width + self._u.height)
         if units:
             return self.points_to_value(length)
-        else:
-            return length
+        return length
 
     def calculate_perbii(
         self, cnv, centre: Point, rotation: float = None, **kwargs
@@ -166,7 +153,8 @@ class RectangleShape(BaseShape):
             radii_dict[directions[key]] = _radii
         return radii_dict
 
-    def calculate_xy(self, **kwargs):
+    def calculate_xy(self, **kwargs) -> tuple:
+        """Calculate top-left point of rectangle."""
         # ---- adjust start
         # feedback(f'***Rect{self.col=}{self.row=} {self._u.offset_x=}{self._o.off_x=}')
         if self.row is not None and self.col is not None:
@@ -307,6 +295,8 @@ class RectangleShape(BaseShape):
         if self.notch_directions:
             _ntches = self.notch_directions.split()
             _notches = [str(ntc).upper() for ntc in _ntches]
+        else:
+            _notches = []
         # feedback(f'*** Rect {self.notch_x=} {self.notch_y=} {_notches=} ')
         n_x = self.unit(self.notch_x) if self.notch_x else self.unit(self.notch)
         n_y = self.unit(self.notch_y) if self.notch_y else self.unit(self.notch)
@@ -441,6 +431,8 @@ class RectangleShape(BaseShape):
         if self.corners_directions:
             _crnrs = self.corners_directions.split()
             _corners = [str(crn).upper() for crn in _crnrs]
+        else:
+            _corners = []
         # feedback(f'*** Rect corners {_corners=} ')
         o_x = self.unit(self.corners_x) if self.corners_x else self.unit(self.corners)
         o_y = self.unit(self.corners_y) if self.corners_y else self.unit(self.corners)
@@ -454,7 +446,7 @@ class RectangleShape(BaseShape):
                     cnv.draw_line(Point(x, y), Point(x + o_x, y))
                 case "triangle" | "t":
                     cnv.draw_line(Point(x, y), Point(x, y + o_y))
-                    cnv.draw_line(Point(x, y + o_y), Point(x + o_x, y)),
+                    cnv.draw_line(Point(x, y + o_y), Point(x + o_x, y))
                     cnv.draw_line(Point(x + o_x, y), Point(x, y))
                 case "curve" | "c":
                     cnv.draw_line(Point(x, y), Point(x, y + o_y))
@@ -466,12 +458,12 @@ class RectangleShape(BaseShape):
                     cnv.draw_line(Point(x + o_x, y), Point(x, y))
                 case "photo" | "p":
                     cnv.draw_line(Point(x, y), Point(x, y + o_y))
-                    cnv.draw_line(Point(x, y + o_y), Point(x + ox3, y + o_y - oy3)),
+                    cnv.draw_line(Point(x, y + o_y), Point(x + ox3, y + o_y - oy3))
                     cnv.draw_line(
                         Point(x + ox3, y + o_y - oy3), Point(x + ox3, y + oy3)
-                    ),
-                    cnv.draw_line(Point(x + ox3, y + oy3), Point(x + 2 * ox3, y + oy3)),
-                    cnv.draw_line(Point(x + 2 * ox3, y + oy3), Point(x + o_x, y)),
+                    )
+                    cnv.draw_line(Point(x + ox3, y + oy3), Point(x + 2 * ox3, y + oy3))
+                    cnv.draw_line(Point(x + 2 * ox3, y + oy3), Point(x + o_x, y))
                     cnv.draw_line(Point(x + o_x, y), Point(x, y))
         if "SE" in _corners:
             match _corners_style:
@@ -681,6 +673,8 @@ class RectangleShape(BaseShape):
         if self.notch_directions:
             _ntches = self.notch_directions.split()
             _notches = [str(ntc).upper() for ntc in _ntches]
+        else:
+            _notches = []
         # feedback(f'*** Rect bite {self.notch_x=} {self.notch_y=} {_notches=} ')
         n_x = self.unit(self.notch_x) if self.notch_x else self.unit(self.notch)
         n_y = self.unit(self.notch_y) if self.notch_y else self.unit(self.notch)
@@ -756,11 +750,12 @@ class RectangleShape(BaseShape):
         # ---- check spaces
         if self.rounding or self.rounded:
             spaces = max(self._u.width / (lines + 1), self._u.height / (lines + 1))
+            _rounding = 0.0
             if self.rounding:
                 _rounding = self.unit(self.rounding)
             elif self.rounded:
                 _rounding = self._u.width * 0.08
-            if spaces < _rounding:
+            if _rounding and spaces < _rounding:
                 feedback(
                     "No hatches permissible with this size of rounding in a rectangle",
                     True,
@@ -872,6 +867,8 @@ class RectangleShape(BaseShape):
             perbii_dirs = tools.validated_directions(
                 self.perbii, DirectionGroup.CARDINAL, "rectangle perbii"
             )
+        else:
+            perbii_dirs = []
 
         # ---- set perbii styles
         lkwargs = {}
@@ -1080,6 +1077,11 @@ class RectangleShape(BaseShape):
                 closed=True,
             )
 
+        # ---- set defaults
+        prime_x, prime_y = 0.0, 0.0
+        stripe_x, stripe_y = 0.0, 0.0
+        off_x, off_y = 0.0, 0.0
+        diagonals_per_side = 0
         # ---- set canvas
         cx = vertices[0].x + 0.5 * self._u.width
         cy = vertices[0].y + 0.5 * self._u.height
@@ -1143,7 +1145,6 @@ class RectangleShape(BaseShape):
             else:
                 gaps = lines + 1
         # ---- calculate and check gap size for preset breadth
-        over_allocated = False
         allocations = []
         if "n" in _dirs or "s" in _dirs or "o" in _dirs or is_all:
             space_horz = self._u.width
@@ -1176,13 +1177,17 @@ class RectangleShape(BaseShape):
                     " together exceeds the available space!",
                     True,
                 )
+        else:
+            gap_size_min = 0.0
         # ---- check space available vs round corners
         if self.rounding or self.rounded:
             if self.rounding:
                 _rounding = self.unit(self.rounding)
             elif self.rounded:
                 _rounding = self._u.width * 0.08
-            if gap_size_min < _rounding:
+            else:
+                _rounding = 0
+            if _rounding and gap_size_min and gap_size_min < _rounding:
                 feedback(
                     "No stripes permissible with this size of rounding in a Rectangle",
                     True,
@@ -1442,7 +1447,7 @@ class RectangleShape(BaseShape):
 
             self.lines = []
             # print(f'*** {self.prows_dict=}')
-            if "w" in self.prows_dict.keys():
+            if "w" in self.prows_dict:
                 prow = self.prows_dict["w"]
                 # top curve
                 self.lines.append(
@@ -1468,7 +1473,7 @@ class RectangleShape(BaseShape):
                 )
             else:
                 self.lines.append([Point(x, y), Point(x, y + self._u.height)])
-            if "s" in self.prows_dict.keys():
+            if "s" in self.prows_dict:
                 prow = self.prows_dict["s"]
                 # left-hand curve
                 self.lines.append(
@@ -1503,7 +1508,7 @@ class RectangleShape(BaseShape):
                         Point(x + self._u.width, y + self._u.height),
                     ]
                 )
-            if "e" in self.prows_dict.keys():
+            if "e" in self.prows_dict:
                 prow = self.prows_dict["e"]
                 # bottom curve
                 self.lines.append(
@@ -1538,7 +1543,7 @@ class RectangleShape(BaseShape):
                         Point(x + self._u.width, y),
                     ]
                 )
-            if "n" in self.prows_dict.keys():
+            if "n" in self.prows_dict:
                 prow = self.prows_dict["n"]
                 # right-hand curve
                 self.lines.append(
@@ -1749,26 +1754,26 @@ class RectangleShape(BaseShape):
                 if self.fill_pattern:
                     raise NotImplementedError("Fill pattern is not yet supported!")
                     # TODO - convert to PyMuPDF
-                    img, is_svg, is_dir = self.load_image(self.fill_pattern)
-                    if img:
-                        log.debug("IMG %s s%s %s", type(img._image), img._image.size)
-                        iwidth = img._image.size[0]
-                        iheight = img._image.size[1]
-                        # repeat?
-                        if self.repeat:
-                            cnv.drawImage(
-                                img, x=x, y=y, width=iwidth, height=iheight, mask="auto"
-                            )
-                        else:
-                            # stretch
-                            cnv.drawImage(
-                                img,
-                                x=x,
-                                y=y,
-                                width=self._u.width,
-                                height=self._u.height,
-                                mask="auto",
-                            )
+                    # img, is_dir = self.load_image(self.fill_pattern)
+                    # if img:
+                    #     log.debug("IMG type:%s size:%s", type(img._image), img._image.size)
+                    #     iwidth = img._image.size[0]
+                    #     iheight = img._image.size[1]
+                    #     # repeat?
+                    #     if self.repeat:
+                    #         cnv.drawImage(
+                    #             img, x=x, y=y, width=iwidth, height=iheight, mask="auto"
+                    #         )
+                    #     else:
+                    #         # stretch
+                    #         cnv.drawImage(
+                    #             img,
+                    #             x=x,
+                    #             y=y,
+                    #             width=self._u.width,
+                    #             height=self._u.height,
+                    #             mask="auto",
+                    #         )
             if item == "slices":
                 # ---- * draw slices
                 if self.slices:
@@ -1823,7 +1828,7 @@ class RectangleShape(BaseShape):
                         rotation,
                         self.perbii_shapes_rotated,
                     )
-            if item == "centre_shape" or item == "center_shape":
+            if item in ["centre_shape", "center_shape"]:
                 # ---- * centre shape (with offset)
                 if self.centre_shape:
                     if self.can_draw_centred_shape(self.centre_shape):
@@ -1831,7 +1836,7 @@ class RectangleShape(BaseShape):
                             _abs_cx=x_d + self.unit(self.centre_shape_mx),
                             _abs_cy=y_d + self.unit(self.centre_shape_my),
                         )
-            if item == "centre_shapes" or item == "center_shapes":
+            if item in ["centre_shapes", "center_shapes"]:
                 # * ---- centre shapes (with offsets)
                 if self.centre_shapes:
                     self.draw_centred_shapes(self.centre_shapes, x_d, y_d)

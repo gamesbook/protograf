@@ -9,9 +9,16 @@ import math
 
 # third party
 # local
+from protograf import globals
 from protograf.utils.messaging import feedback
-from protograf.utils.structures import Point, Locale
-from protograf.utils import tools, support
+from protograf.utils.structures import (
+    Point,
+    HexGeometry,
+    HexOrientation,
+    VirtualHex,
+    Locale,
+)
+from protograf.utils import geoms, tools, support
 from protograf.utils.tools import _lower
 from protograf.base import BaseShape, BaseCanvas
 from protograf.shapes import (
@@ -22,6 +29,7 @@ from protograf.shapes import (
     # RectangleShape,
     TextShape,
 )
+from protograf.shapes_hexagon import HexShape
 
 log = logging.getLogger(__name__)
 DEBUG = False
@@ -36,7 +44,7 @@ class GridShape(BaseShape):
     """
 
     def __init__(self, _object=None, canvas=None, **kwargs):
-        super(GridShape, self).__init__(_object=_object, canvas=canvas, **kwargs)
+        super().__init__(_object=_object, canvas=canvas, **kwargs)
         self.use_side = False
         if "side" in kwargs:
             self.use_side = True
@@ -67,7 +75,6 @@ class GridShape(BaseShape):
                 (self.page_width - self.margin_left - self.margin_right)
                 / self.points_to_value(width)
             )
-        # feedback(f'+++ {self.rows=} {self.cols=}')
         y_cols, x_cols = [], []
         for y_col in range(0, self.rows + 1):
             y_cols.append(y + y_col * height)
@@ -109,7 +116,7 @@ class DotGridShape(BaseShape):
     """
 
     def __init__(self, _object=None, canvas=None, **kwargs):
-        super(DotGridShape, self).__init__(_object=_object, canvas=canvas, **kwargs)
+        super().__init__(_object=_object, canvas=canvas, **kwargs)
 
     def draw(self, cnv=None, off_x=0, off_y=0, ID=None, **kwargs):
         """Draw a dot grid on a given canvas."""
@@ -151,14 +158,213 @@ class DotGridShape(BaseShape):
         cnv.commit()  # if not, then Page objects e.g. Image not layered
 
 
+class HexHexShape(BaseShape):
+    """
+    HexHex Grid on a given canvas.
+    """
+
+    def __init__(self, _object=None, canvas=None, **kwargs):
+        super().__init__(_object=_object, canvas=canvas, **kwargs)
+        self.show_sequence = kwargs.get("show_sequence", False)
+        self.show_counter = kwargs.get("show_counter", False)
+        # ---- create virtual grid
+        self.hexhex_locations = HexHexLocations(
+            cx=self.cx or self.x,  # no default value for cx
+            cy=self.cy or self.y,  # no default value for cy
+            radius=self.radius,
+            diameter=self.diameter,
+            height=self.height,
+            side=self.side,
+            rings=self.rings,
+            orientation=self.orientation,
+        )
+
+    def draw(self, cnv=None, off_x=0, off_y=0, ID=None, **kwargs):
+        """Draw a hexhex layout on a given canvas."""
+        kwargs = self.kwargs | kwargs
+        cnv = cnv if cnv else self.canvas
+        super().draw(cnv, off_x, off_y, ID, **kwargs)  # unit-based props
+        locations = self.hexhex_locations.grid
+        hex_count = self.hexhex_locations.hex_count
+        hex_geometry = self.hexhex_locations.get_geometry()
+        hex_orientation = self.hexhex_locations.get_orientation()
+        # ---- set shape to draw
+        if not self.shape and not self.is_kwarg("shape"):
+            self.shape = HexShape(
+                radius=self.radius,
+                diameter=self.diameter,
+                height=self.height,
+                side=self.side,
+                fill=self.fill,
+                orientation=hex_orientation.name,
+            )
+        # ---- actual grid lines
+        if self.gridlines:
+            # radius = tools.points(hex_geometry.radius)
+            height = tools.points(hex_geometry.height_flat)
+            orientation = (
+                "flat"
+                if self.hexhex_locations.ORIENTATION == HexOrientation.POINTY
+                else "pointy"
+            )
+            grid_hex = HexShape(
+                cx=self.cx,
+                cy=self.cy,
+                radius=self.rings * height,
+                hatches_count=2 * self.rings - 1,
+                orientation=orientation,
+                fill=self.gridlines_fill,
+                stroke=self.gridlines_stroke,
+                stroke_width=self.gridlines_stroke_width,
+                stroke_ends=self.gridlines_ends,
+                dotted=self.gridlines_dotted,
+                dashed=self.gridlines_dashed,
+                hatches_stroke=self.gridlines_stroke,
+                hatches_stroke_width=self.gridlines_stroke_width,
+                hatches_stroke_ends=self.gridlines_ends,
+                hatches_dotted=self.gridlines_dotted,
+                hatches_dashed=self.gridlines_dashed,
+            )
+            cxu = tools.unit(self.cx) + globals.margins.left_u
+            cyu = tools.unit(self.cy) + globals.margins.top_u
+            grid_hex.draw(_abs_cx=cxu, _abs_cy=cyu)
+        # ---- set the range of required locations
+        id_locations = range(0, hex_count + 1)
+        # ---- process filters for conditional drawing of shape(s)
+        spine_set, rings_set, counters_set = [], [], []
+        if self.ranges:
+            try:
+                id_locations = []
+                _ranges = tools.separate(self.ranges, separator=" ", clean=True)
+                for rng in _ranges:
+                    if rng != "":
+                        if ":" in rng:
+                            _ring, _hex = rng.split(":")
+                            _ring_set = tools.sequence_split(
+                                _ring, as_int=True, unique=True, star=True
+                            )
+                            _hex_set = tools.sequence_split(
+                                _hex, as_int=True, unique=True, star=False
+                            )
+                            if "*" in _ring_set:
+                                _ring_set += range(1, self.rings + 1)
+                            for rval in _ring_set:
+                                for hval in _hex_set:
+                                    counters_set.append((rval, hval))
+                        else:
+                            values = rng[1:] if len(rng) > 1 else "*"
+                            match _lower(rng[0]):
+                                case "s":
+                                    spine_set += tools.sequence_split(
+                                        values, as_int=True, unique=True, star=True
+                                    )
+                                case "r":
+                                    rings_set += tools.sequence_split(
+                                        values, as_int=True, unique=True, star=True
+                                    )
+                if "*" in spine_set:
+                    spine_set += [1, 2, 3, 4, 5, 6]
+                if "*" in rings_set:
+                    rings_set += range(1, self.rings + 1)
+            except ValueError:
+                feedback(
+                    f'Unable to process HexHex ranges "{self.ranges}".'
+                    " Please check and correct this property."
+                )
+        if self.locations:
+            id_locations = tools.sequence_split(
+                self.locations, as_int=True, unique=True
+            )
+        # ---- draw shapes on grid
+        if self.shapes:
+            # create shapes dist
+            shapes_dict = {}
+            if not isinstance(self.shapes, list):
+                feedback("HexHex shapes must be a list of sets!", True)
+            for key, item in enumerate(self.shapes):
+                if not isinstance(item, tuple):
+                    feedback("HexHex shapes must be a list of sets!", True)
+                _key = tools.as_int(item[0], f"ring #{key}")
+                if not isinstance(item[1], list):
+                    feedback(
+                        f"HexHex shapes ring #{key} must contain a list of shapes!",
+                        True,
+                    )
+                _items = list(tools.flatten(item[1]))
+                shapes_dict[_key] = _items
+            # create dict for location retrieval
+            location_dict = {}
+            for location in locations:
+                location_dict[(location.ring, location.counter)] = location
+            # work through shapes; arranged in counter order for each ring
+            for ring in range(0, self.rings + 1):
+                shapes = shapes_dict.get(ring)
+                if not shapes:
+                    continue  # might not be shapes defined for a given ring
+                # check no. of shapes vs size of ring
+                if ring == 0 and len(shapes) != 1:
+                    feedback("There must only be one HexHex shape for ring#0", True)
+                if ring != 0 and len(shapes) != ring * 6:
+                    feedback(
+                        "There is a mismatch between the number of HexHex shapes"
+                        f" and the ring locations ({ring * 6}) for ring#{ring}",
+                        True,
+                    )
+                for key, the_shape in enumerate(shapes):
+                    loc = location_dict.get((ring, key + 1))
+                    cx = loc.centre.x + globals.margins.left_u
+                    cy = loc.centre.y + globals.margins.top_u
+                    hex_id = key
+                    if self.show_counter:
+                        hex_id = loc.counter
+                    if self.show_sequence:
+                        hex_id = loc.id
+                    if the_shape:  # TODO - test for centre-able?
+                        the_shape.draw(
+                            _abs_cx=cx,
+                            _abs_cy=cy,
+                            ID=hex_id,
+                            label_sequence=self.show_sequence or self.show_counter,
+                        )
+        elif self.shape:
+            for key, location in enumerate(locations):
+                draw = False
+                if location.id in id_locations:
+                    draw = True
+                if location.spine in spine_set:
+                    draw = True
+                if location.ring in rings_set:
+                    draw = True
+                if (location.ring, location.counter) in counters_set:
+                    draw = True
+                if draw:
+                    cx = location.centre.x + globals.margins.left_u
+                    cy = location.centre.y + globals.margins.top_u
+                    hex_id = key
+                    if self.show_counter:
+                        hex_id = location.counter
+                    if self.show_sequence:
+                        hex_id = location.id
+                    self.shape.draw(
+                        _abs_cx=cx,
+                        _abs_cy=cy,
+                        ID=hex_id,
+                        label_sequence=self.show_sequence or self.show_counter,
+                    )
+                self.set_canvas_props(cnv=cnv, index=ID, **kwargs)
+        else:
+            if not self.gridlines:
+                feedback("No grid lines, shape or shapes set for HexHex!", False, True)
+        cnv.commit()  # if not, then Page objects e.g. Image not layered
+
+
 class TableShape(BaseShape):
     """
     Table on a given canvas.
     """
 
     def __init__(self, _object=None, canvas=None, **kwargs):
-        super(TableShape, self).__init__(_object=_object, canvas=canvas, **kwargs)
-        # print(f'\n+++ TABLE {self.cols=} {self.rows=} {self.kwargs=}')
+        super().__init__(_object=_object, canvas=canvas, **kwargs)
         self.locales = []
         self.use_side = False
         if "side" in self.kwargs:
@@ -249,7 +455,7 @@ class SequenceShape(BaseShape):
 
     def __init__(self, _object=None, canvas=None, **kwargs):
         # feedback(f'+++ SequenceShape {_object=} {canvas=} {kwargs=}')
-        super(SequenceShape, self).__init__(_object=_object, canvas=canvas, **kwargs)
+        super().__init__(_object=_object, canvas=canvas, **kwargs)
         self._objects = kwargs.get(
             "shapes", TextShape(_object=None, canvas=canvas, **kwargs)
         )
@@ -290,6 +496,7 @@ class SequenceShape(BaseShape):
                 feedback('Values for "interval_x" must be numeric!', True)
 
     def calculate_setting_list(self):
+        """Create settings for sequence."""
         if not isinstance(self.setting, tuple):
             feedback(f"Sequence setting '{self.setting}' must be a set!", True)
         if len(self.setting) < 2:
@@ -370,13 +577,12 @@ class SequenceShape(BaseShape):
         kwargs = self.kwargs | kwargs
         cnv = cnv if cnv else self.canvas
         super().draw(cnv, off_x, off_y, ID, **kwargs)  # unit-based props
-        _off_x, _off_y = off_x, off_y
+        # _off_x, _off_y = off_x, off_y
 
         for key, item in enumerate(self.setting_list):
             _ID = ID if ID is not None else self.shape_id
             _locale = Locale(sequence=item)
             kwargs["locale"] = _locale._asdict()
-            # feedback(f'+++ @Seqnc@ {self.interval_x=}, {self.interval_y=}')
             # feedback(f'+++ @Seqnc@ {kwargs["locale"]}')
             flat_elements = tools.flatten(self._objects)
             log.debug("flat_eles:%s", flat_elements)
@@ -418,7 +624,7 @@ class RepeatShape(BaseShape):
     """
 
     def __init__(self, _object=None, canvas=None, **kwargs):
-        super(RepeatShape, self).__init__(_object=_object, canvas=canvas, **kwargs)
+        super().__init__(_object=_object, canvas=canvas, **kwargs)
         self._objects = kwargs.get("shapes", [])  # incoming Shape object(s)
         # UPDATE SELF WITH COMMON
         if self.common:
@@ -465,7 +671,6 @@ class RepeatShape(BaseShape):
         cnv = cnv if cnv else self.canvas
         super().draw(cnv, off_x, off_y, ID, **kwargs)  # unit-based props
         _off_x, _off_y = off_x or self.offset_x or 0, off_y or self.offset_y or 0
-        # print(f'+++ {_off_x=}, {_off_y=}')
 
         for col in range(self.cols):
             for row in range(self.rows):
@@ -535,6 +740,262 @@ class VirtualShape:
             feedback(f'"{value}"{_label} is not a valid floating number!', True)
 
 
+# ---- virtual HexHex grid
+
+
+class HexHexLocations(VirtualShape):
+    """
+    HexHex Locations are not drawn on the canvas; they provide the
+    locations/points where user-defined shapes will be drawn.
+    """
+
+    def __init__(self, **kwargs):
+        base = globals.base  # protograf BaseCanvas
+        self.kwargs = kwargs
+        # inject and then override kwargs supplied by DefaultShape
+        if kwargs.get("default"):
+            try:
+                if kwargs.get("default"):
+                    self.kwargs = kwargs["default"]._default_kwargs | kwargs
+            except Exception:
+                self.kwargs = kwargs
+        else:
+            self.kwargs = kwargs
+        self.kwargs.pop("default", None)
+        # inject and overwrite kwargs with those set by CommonShape
+        try:
+            if kwargs.get("common"):
+                self.kwargs = kwargs | kwargs["common"]._common_kwargs
+        except AttributeError:
+            pass  # ignore, for example, CommonShape
+        self.cx = tools.as_float(kwargs.get("cx", 1.0), "x")  # hexhex centre
+        self.cy = tools.as_float(kwargs.get("cy", 1.0), "y")  # hexhex centre
+        self.rings = tools.as_int(kwargs.get("rings", 1), "rings")
+        self.radius = kwargs.get("radius", None)
+        self.diameter = kwargs.get("diameter", None)
+        self.height = kwargs.get("height", 1.0)
+        self.side = kwargs.get("side", None)
+        self.orientation = kwargs.get("orientation", "flat")
+        self.common = kwargs.get("common", None)
+        self.hexes = []
+        # ---- UPDATE SELF WITH COMMON
+        if self.common:
+            try:
+                attrs = vars(self.common)
+            except TypeError:
+                feedback(
+                    f'Cannot process the Common property "{self.common}"'
+                    " - please check!",
+                    True,
+                )
+            for attr in attrs.keys():
+                if (
+                    attr not in ["canvas", "common", "stylesheet", "kwargs"]
+                    and attr[0] != "_"
+                ):
+                    common_attr = getattr(self.common, attr)
+                    base_attr = getattr(base, attr)
+                    if common_attr != base_attr:
+                        setattr(self, attr, common_attr)
+        # ---- check construction type
+        self.use_diameter = self.is_kwarg("diameter")
+        self.use_height = self.is_kwarg("height")
+        self.use_radius = self.is_kwarg("radius")
+        self.use_side = False
+        if "side" in self.kwargs:
+            self.use_side = True
+            if (
+                "radius" in self.kwargs
+                or "height" in self.kwargs
+                or "diameter" in self.kwargs
+            ):
+                self.use_side = False
+        # ---- fallback / default
+        if not self.use_diameter and not self.use_radius and not self.use_side:
+            hex_base = None
+            self.use_height = True
+            if not self.height:
+                if self.radius:
+                    hex_base = tools.as_float(self.radius, "hexagon radius")
+                elif self.diameter:
+                    hex_base = tools.as_float(self.diameter, "hexagon diameter") / 2.0
+                elif self.side:
+                    hex_base = tools.as_float(self.side, "hexagon side")
+                else:
+                    feedback(
+                        "No dimensions (greater than zero) set to draw the Hexagon",
+                        True,
+                    )
+                self.height = hex_base * math.sqrt(3)
+        self.ORIENTATION = self.get_orientation()
+        # ---- get grid
+        self.hex_count = 0  # useful to check grid size
+        self.grid = self.construct_grid()
+
+    def is_kwarg(self, value) -> bool:
+        """Validate if value is in direct kwargs OR in Common _kwargs."""
+        if value in self.kwargs:
+            return True
+        return False
+
+    def get_orientation(self) -> HexOrientation:
+        """Return HexOrientation for the Hexagon."""
+        orientation = None
+        if _lower(self.orientation) in ["p", "pointy"]:
+            orientation = HexOrientation.POINTY
+        elif _lower(self.orientation) in ["f", "flat"]:
+            orientation = HexOrientation.FLAT
+        else:
+            feedback(
+                'Invalid orientation "{self.orientation}" supplied for hexagon.', True
+            )
+        return orientation
+
+    def get_geometry(self):
+        """Calculate geometric settings of a single hexagon."""
+        half_flat = 0
+        # ---- calculate half_flat & half_side
+        if self.height and self.use_height:
+            side = self.height / math.sqrt(3)
+            half_flat = self.height / 2.0
+        elif self.diameter and self.use_diameter:
+            side = self.diameter / 2.0
+            half_flat = side * math.sqrt(3) / 2.0
+        elif self.radius and self.use_radius:
+            side = self.radius
+            half_flat = side * math.sqrt(3) / 2.0
+        else:
+            pass
+        if self.side and self.use_side:
+            side = self.side
+            half_flat = side * math.sqrt(3) / 2.0
+        if not self.radius and not self.height and not self.diameter and not self.side:
+            feedback(
+                "No value for side or height or diameter or radius"
+                " supplied to construct hexagon for HexHexLocations.",
+                True,
+            )
+        half_side = side / 2.0
+        height_flat = 2 * half_flat
+        diameter = 2.0 * side
+        radius = side
+        z_fraction = (diameter - side) / 2.0
+        self.ORIENTATION = self.get_orientation()
+        hex_geometry = HexGeometry(  # in point units
+            tools.unit(radius),
+            tools.unit(diameter),
+            tools.unit(side),
+            tools.unit(half_side),
+            tools.unit(half_flat),
+            tools.unit(height_flat),
+            z_fraction,
+        )
+        return hex_geometry
+
+    def construct_grid(self):
+        """Create a virtual hexhex grid, with identified locations."""
+        ghex = self.get_geometry()
+        cxu, cyu = tools.unit(self.cx), tools.unit(self.cy)
+        n = self.rings + 1
+        self.hex_count = 3 * n * (n - 1) + 1
+        self.hexes = []
+        # ---- angles
+        vertex_angles = []
+        if self.ORIENTATION == HexOrientation.FLAT:
+            vertex_angles = [0.0, 30.0, 90.0, 150.0, -150.0, -90.0, -30.0]
+        elif self.ORIENTATION == HexOrientation.POINTY:
+            vertex_angles = [
+                0.0,
+                60.0,
+                120.0,
+                180.0,
+                -120.0,
+                -60.0,
+                0.0,
+                60.0,
+            ]  # TODO - set
+        else:
+            feedback(
+                'Invalid orientation "{self.ORIENTATION}" supplied for hexagon.', True
+            )
+        # ---- centre hex
+        hex0 = VirtualHex(
+            centre=Point(cxu, cyu),
+            id=0,
+            ring=0,
+            counter=1,
+            spine=0,
+            zone=0,
+            orientation=self.ORIENTATION,
+        )
+        self.hexes.append(hex0)
+        # ---- iterate over all ring hexes
+        chex = Point(cxu, cyu)
+        hex_zero = Point(cxu, cyu)
+        ring = 1
+        ring_counter = 1  # space number "around" a given ring
+        spine_interval = 1  # distance between "spine" hexes in a given ring
+        spine_location = 1
+        is_spine = True
+        spine = 1
+        for location in range(1, self.hex_count):
+            if self.ORIENTATION == HexOrientation.POINTY:
+                if is_spine and spine == 1:  # first spine hex
+                    chex = geoms.point_from_angle(
+                        hex_zero, ghex.height_flat * ring, 300.0
+                    )
+                elif is_spine and ring > 1:
+                    chex = geoms.point_from_angle(
+                        chex, ghex.height_flat, vertex_angles[spine - 2]
+                    )
+                else:
+                    sid = spine - 1
+                    chex = geoms.point_from_angle(
+                        chex, ghex.height_flat, vertex_angles[spine - 1]
+                    )
+            elif self.ORIENTATION == HexOrientation.FLAT:
+                if is_spine and spine == 1:  # first spine hex
+                    chex = Point(cxu, cyu - ghex.height_flat * ring)
+                elif is_spine and ring > 1:
+                    chex = geoms.point_from_angle(
+                        chex, ghex.height_flat, vertex_angles[spine - 2]
+                    )
+                else:
+                    chex = geoms.point_from_angle(
+                        chex, ghex.height_flat, vertex_angles[spine - 1]
+                    )
+            _hex = VirtualHex(
+                centre=chex,
+                id=location,
+                ring=ring,
+                counter=ring_counter,
+                spine=spine if is_spine else 0,
+                zone=0,
+                orientation=self.ORIENTATION,
+            )
+            self.hexes.append(_hex)
+            # next hex
+            ring_counter += 1
+            if (location + 1) - spine_location == spine_interval:
+                # set values related to NEXT (upcoming hex)
+                is_spine = True
+                spine += 1
+                spine_location = location + 1
+            else:
+                is_spine = False
+            # increment ring? reset spine value & ring_counter
+            if ring_counter - 1 == 6 * ring:
+                ring += 1
+                ring_counter = 1
+                spine_interval += 1
+                is_spine = True
+                spine = 1
+                if ring == 2:
+                    del vertex_angles[0]
+        # ---- done
+        return self.hexes
+
+
 # ---- virtual Locations
 
 
@@ -547,7 +1008,6 @@ class VirtualLocations(VirtualShape):
     """
 
     def __init__(self, rows, cols, **kwargs):
-        kwargs = kwargs
         self.x = self.to_float(kwargs.get("x", 1.0), "x")  # left(upper) corner
         self.y = self.to_float(kwargs.get("y", 1.0), "y")  # top(uppper) corner
         self.rows = self.to_int(rows, "rows")
@@ -644,9 +1104,10 @@ class VirtualLocations(VirtualShape):
     def set_id(self, col: int, row: int) -> str:
         """Create an ID from row and col values."""
         if self.label_style and _lower(self.label_style) == "excel":
-            return "%s%s" % (tools.sheet_column(col), row)
+            _col = tools.sheet_column(col)
+            return f"{_col}{row}"
         else:
-            return "%s,%s" % (col, row)
+            return f"{col},{row}"
 
     def set_compass(self, compass: str) -> str:
         """Return full lower-case value of primary compass direction."""
@@ -669,7 +1130,6 @@ class VirtualLocations(VirtualShape):
 
     def next_locale(self) -> Locale:
         """Yield next Locale for each call."""
-        pass
 
 
 class RectangularLocations(VirtualLocations):
@@ -678,7 +1138,7 @@ class RectangularLocations(VirtualLocations):
     """
 
     def __init__(self, rows=2, cols=2, **kwargs):
-        super(RectangularLocations, self).__init__(rows, cols, **kwargs)
+        super().__init__(rows, cols, **kwargs)
         self.kwargs = kwargs
         _interval = kwargs.get("interval", 1)
         self.interval = tools.as_float(_interval, "interval")
@@ -716,19 +1176,19 @@ class RectangularLocations(VirtualLocations):
             case "sw":
                 row_start = self.rows
                 col_start = 1
-                clockwise = True if _dir in ["north", "n"] else False
+                clockwise = _dir in ["north", "n"]
             case "se":
                 row_start = self.rows
                 col_start = self.cols
-                clockwise = True if _dir in ["west", "w"] else False
+                clockwise = _dir in ["west", "w"]
             case "nw":
                 row_start = 1
                 col_start = 1
-                clockwise = True if _dir in ["east", "e"] else False
+                clockwise = _dir in ["east", "e"]
             case "ne":
                 row_start = 1
                 col_start = self.cols
-                clockwise = True if _dir in ["south", "s"] else False
+                clockwise = _dir in ["south", "s"]
             case _:
                 raise ValueError(
                     f'"{self.direction}" is an invalid secondary compass direction!'
@@ -736,7 +1196,6 @@ class RectangularLocations(VirtualLocations):
         col, row, count = col_start, row_start, 0
         max_outer = 2 * self.rows + (self.cols - 2) * 2
         corner = None
-        # print(f'\n+++ {self.start=} {self.layout_size=} {max_outer=} {self.stop=} {clockwise=}')
         # ---- triangular layout
         if self.side:
             self.interval_x = self.side
@@ -768,7 +1227,6 @@ class RectangularLocations(VirtualLocations):
                     x = x + self.row_odd
                 if self.row_even and not row & 1:
                     x = x + self.row_even
-            # print(f'+++ {count=} {row=},{col=} // {x=},{y=}')
             # ---- set next grid location
             match _lower(self.pattern):
                 # ---- * snake
@@ -836,9 +1294,8 @@ class RectangularLocations(VirtualLocations):
                     if row == 1 and col == self.cols:
                         corner = "ne"
                     yield Locale(col, row, x, y, self.set_id(col, row), count, corner)
-                    # next grid location
-                    # print(f'+++ {count=} {current_dir=} {row=},{col=} // {row_start=},{col_start=}')
 
+                    # next grid location
                     if row == 1 and col == 1:
                         corner = "nw"
                         if clockwise:
@@ -945,16 +1402,15 @@ class RectangularLocations(VirtualLocations):
 
                     x = self.x + (col - 1) * self.interval_x
                     y = self.y + (row - 1) * self.interval_y
-                    # feedback(f"+++ {x=}, {y=}, {col=}, {row=}")
 
 
 class TriangularLocations(VirtualLocations):
     """
-    Common properties and methods to define  virtual triangular locations.
+    Common properties and methods to define virtual triangular locations.
     """
 
     def __init__(self, rows=2, cols=2, **kwargs):
-        super(TriangularLocations, self).__init__(rows, cols, **kwargs)
+        super().__init__(rows, cols, **kwargs)
         self.kwargs = kwargs
         self.start = kwargs.get("start", "north")
         self.facing = kwargs.get("facing", "north")
@@ -981,9 +1437,8 @@ class TriangularLocations(VirtualLocations):
     def next_locale(self) -> Locale:
         """Yield next Location for each call."""
         _start = self.set_compass(_lower(self.start))
-        _dir = self.set_compass(_lower(self.direction))
+        # _dir = self.set_compass(_lower(self.direction))
         _facing = self.set_compass(_lower(self.facing))
-        current_dir = _dir
 
         # TODO - create logic
         if _lower(self.pattern) in ["snake", "snaking", "s"]:
@@ -994,17 +1449,16 @@ class TriangularLocations(VirtualLocations):
         match _facing:
             case "north" | "south":
                 for length in range(1, self.cols + 1):
-                    _cols = [col for col in range(1, length + 1)]
+                    _cols = list(range(1, length + 1))
                     if _cols:
                         array.append(_cols)
             case "east" | "west":
                 for length in range(1, self.rows + 1):
-                    _rows = [row for row in range(1, length + 1)]
+                    _rows = list(range(1, length + 1))
                     if _rows:
                         array.append(_rows)
             case _:
                 feedback(f"The facing value {self.facing} is not valid!", True)
-        # print(f'+++ {_facing}', f'{self.cols=}',  f'{self.rows=}',array)
 
         # ---- calculate initial conditions
         col_start, row_start = 1, 1
@@ -1012,20 +1466,19 @@ class TriangularLocations(VirtualLocations):
             case ("north", "north"):
                 row_start = 1
                 col_start = 1
-                clockwise = True if _dir == "north" else False
+                # clockwise = True if _dir == "north" else False
             case ("north", "west"):
                 row_start = 1
                 col_start = self.cols
-                clockwise = True if _dir == "west" else False
+                # clockwise = True if _dir == "west" else False
             case ("north", "east"):
                 row_start = self.rows
                 col_start = 1
-                clockwise = True if _dir == "east" else False
+                # clockwise = True if _dir == "east" else False
 
         col, row, count = col_start, row_start, 0
-        max_outer = 2 * self.rows + (self.cols - 2) * 2
+        # max_outer = 2 * self.rows + (self.cols - 2) * 2
         corner = None
-        # print(f'\n+++ {self.start=} {self.layout_size=} {max_outer=} {self.stop=} {clockwise=}')
         # ---- set row and col interval
         match _facing:
             case "north" | "south":  # layout is row-oriented
@@ -1035,7 +1488,7 @@ class TriangularLocations(VirtualLocations):
                 self.interval_x = math.sqrt(3) / 2.0 * self.side
                 self.interval_y = self.side
         # ---- iterate the rows and cols
-        hlf_side = self.side / 2.0
+        # hlf_side = self.side / 2.0
         for key, entry in enumerate(array):
             match _facing:
                 case "south":  # layout is row-oriented
@@ -1102,7 +1555,7 @@ class DiamondLocations(VirtualLocations):
     """
 
     def __init__(self, rows=1, cols=2, **kwargs):
-        super(DiamondLocations, self).__init__(rows, cols, **kwargs)
+        super().__init__(rows, cols, **kwargs)
         self.kwargs = kwargs
         if (self.cols < 2 and self.rows < 1) or (self.cols < 1 and self.rows < 2):
             feedback(
@@ -1132,7 +1585,7 @@ class ConnectShape(BaseShape):
     """
 
     def __init__(self, _object=None, canvas=None, **kwargs):
-        super(ConnectShape, self).__init__(_object=_object, canvas=canvas, **kwargs)
+        super().__init__(_object=_object, canvas=canvas, **kwargs)
         # overrides
         self.shape_from = kwargs.get("shape_from", None)  # could be a GridShape
         self.shape_to = kwargs.get("shape_to", None)  # could be a GridShape
@@ -1144,7 +1597,7 @@ class ConnectShape(BaseShape):
         cnv = cnv if cnv else self.canvas
         super().draw(cnv, off_x, off_y, ID, **kwargs)  # unit-based props
         # ---- style
-        style = "direct"  # TODO: self.connect or "direct"
+        style = "direct"
         # ---- shapes and positions
         try:
             shp_from, shape_from_position = self.shape_from  # tuple form
@@ -1291,5 +1744,4 @@ class ConnectShape(BaseShape):
         }
         if location:
             return _positions.get(location, ())
-        else:
-            return _positions
+        return _positions

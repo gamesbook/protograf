@@ -30,10 +30,7 @@ from protograf.base_extended import (
 from protograf.shapes_circle import CircleShape
 from protograf.shapes_rectangle import RectangleShape
 from protograf.utils import colrs, geoms, support, tools, fonts
-from protograf.utils.tools import _lower, _vprint
-from protograf.utils.constants import (
-    BGG_IMAGES,
-)
+from protograf.utils.tools import _lower  # , _vprint
 from protograf.utils.messaging import feedback
 from protograf.utils.structures import (
     BBox,
@@ -44,7 +41,6 @@ from protograf.utils.structures import (
     Radius,
     TriangleType,
 )  # named tuples
-from protograf.utils.support import CACHE_DIRECTORY
 
 log = logging.getLogger(__name__)
 DEBUG = False
@@ -56,7 +52,7 @@ class ImageShape(BaseShape):
     """
 
     def __init__(self, _object=None, canvas=None, **kwargs):
-        super(ImageShape, self).__init__(_object=_object, canvas=canvas, **kwargs)
+        super().__init__(_object=_object, canvas=canvas, **kwargs)
         # ---- overrides / extra args
         self.sliced = kwargs.get("sliced", None)
         self.cache_directory = get_cache(**kwargs)
@@ -178,7 +174,7 @@ class ArcShape(BaseShape):
     """
 
     def __init__(self, _object=None, canvas=None, **kwargs):
-        super(ArcShape, self).__init__(_object=_object, canvas=canvas, **kwargs)
+        super().__init__(_object=_object, canvas=canvas, **kwargs)
         # ---- perform overrides
         self.radius = self.radius or self.diameter / 2.0
         if self.cx is None and self.x is None:
@@ -230,16 +226,16 @@ class ArcShape(BaseShape):
                 intervals.sort(reverse=True)
                 # print(f'*** nested {intervals=}')
                 for inter in intervals:
-                    # ---- circumference point in units
-                    p_P = geoms.point_on_circle(
+                    # ---- circumference/perimeter point in units
+                    pt_p = geoms.point_on_circle(
                         centre, self._u.radius * inter, self.angle_start
                     )
                     # ---- draw sector
                     # feedback(
                     #     f'***Arc: {centre=} {self.angle_start=} {self.angle_width=}')
-                    cnv.draw_sector(  # anti-clockwise from p_P; 90° default
+                    cnv.draw_sector(  # anti-clockwise from pt_p; 90° default
                         (centre.x, centre.y),
-                        (p_P.x, p_P.y),
+                        (pt_p.x, pt_p.y),
                         self.angle_width,
                         fullSector=False,
                     )
@@ -256,21 +252,21 @@ class ArcShape(BaseShape):
             self.x_c = self._abs_cx
             self.y_c = self._abs_cy
         # ---- centre point in units
-        p_C = Point(self.x_c + self._o.delta_x, self.y_c + self._o.delta_y)
-        # ---- circumference point in units
-        p_P = geoms.point_on_circle(p_C, self._u.radius, self.angle_start)
+        pt_c = Point(self.x_c + self._o.delta_x, self.y_c + self._o.delta_y)
+        # ---- circumference/perimeter point in units
+        pt_p = geoms.point_on_circle(pt_c, self._u.radius, self.angle_start)
         # ---- draw sector
         # feedback(
-        #     f'***Arc: {p_P=} {p_C=} {self.angle_start=} {self.angle_width=}')
-        cnv.draw_sector(  # anti-clockwise from p_P; 90° default
-            (p_C.x, p_C.y), (p_P.x, p_P.y), self.angle_width, fullSector=False
+        #     f'***Arc: {pt_p=} {pt_c=} {self.angle_start=} {self.angle_width=}')
+        cnv.draw_sector(  # anti-clockwise from pt_p; 90° default
+            (pt_c.x, pt_c.y), (pt_p.x, pt_p.y), self.angle_width, fullSector=False
         )
         kwargs["closed"] = False
         kwargs["fill"] = None
         self.set_canvas_props(cnv=cnv, index=ID, **kwargs)
         # ---- draw nested
         if self.nested:
-            self.draw_nested(cnv, ID, p_C, **kwargs)
+            self.draw_nested(cnv, ID, pt_c, **kwargs)
 
 
 class ArrowShape(BaseShape):
@@ -279,7 +275,7 @@ class ArrowShape(BaseShape):
     """
 
     def __init__(self, _object=None, canvas=None, **kwargs):
-        super(ArrowShape, self).__init__(_object=_object, canvas=canvas, **kwargs)
+        super().__init__(_object=_object, canvas=canvas, **kwargs)
         # ---- unit calcs
         self.points_offset_u = (
             self.unit(self.points_offset) if self.points_offset else 0
@@ -372,6 +368,9 @@ class BezierShape(BaseShape):
     from (x1,y1) to (x2,y2) and a line segment from (x3,y3) to (x4,y4)
     """
 
+    def __init__(self, _object=None, canvas=None, **kwargs):
+        super().__init__(_object=_object, canvas=canvas, **kwargs)
+
     def draw(self, cnv=None, off_x=0, off_y=0, ID=None, **kwargs):
         """Draw Bezier curve on a given canvas."""
         kwargs = self.kwargs | kwargs
@@ -383,7 +382,7 @@ class BezierShape(BaseShape):
         if not self.x_1:
             self.x_1 = self.x + self.default_length
         if not self.y_1:
-            self.y1 = self.y + self.default_length
+            self.y_1 = self.y + self.default_length
         x_2 = self.unit(self.x_1) + self._o.delta_x
         y_2 = self.unit(self.y_1) + self._o.delta_y
         x_3 = self.unit(self.x_2) + self._o.delta_x
@@ -439,8 +438,8 @@ class ChordShape(BaseShape):
         kwargs["rotation_point"] = mid_point
         self.set_canvas_props(cnv=cnv, index=ID, **kwargs)  # shape.finish()
         # ---- calculate line rotation
-        compass, rotation = geoms.angles_from_points(Point(x, y), Point(x_1, y_1))
-        # feedback(f"*** Chord {compass=} {rotation=}")
+        _, rotation = geoms.angles_from_points(Point(x, y), Point(x_1, y_1))
+        # feedback(f"*** Chord {rotation=}")
         # ---- dot
         self.draw_dot(cnv, (x_1 + x) / 2.0, (y_1 + y) / 2.0)
         # ---- arrowhead
@@ -464,7 +463,7 @@ class CrossShape(BaseShape):
     """
 
     def __init__(self, _object=None, canvas=None, **kwargs):
-        super(CrossShape, self).__init__(_object=_object, canvas=canvas, **kwargs)
+        super().__init__(_object=_object, canvas=canvas, **kwargs)
         # ---- unit calcs
         if self.arm_fraction > 1 or self.arm_fraction < 0:
             feedback(
@@ -568,7 +567,7 @@ class DotShape(BaseShape):
     """
 
     def __init__(self, _object=None, canvas=None, **kwargs):
-        super(DotShape, self).__init__(_object=_object, canvas=canvas, **kwargs)
+        super().__init__(_object=_object, canvas=canvas, **kwargs)
         # ---- perform overrides
         self.point_size = self.dot_width / 2.0  # diameter is 3 points ~ 1mm or 1/32"
         self.radius = self.points_to_value(self.point_size, globals.units)
@@ -729,7 +728,7 @@ class LineShape(BaseShape):
             if isinstance(shape_a, (CircleShape, DotShape)) and isinstance(
                 shape_b, (CircleShape, DotShape)
             ):
-                compass, rotation = geoms.angles_from_points(centre_a, centre_b)
+                _, rotation = geoms.angles_from_points(centre_a, centre_b)
                 if centre_b.x < centre_a.x and centre_b.y < centre_a.y:
                     rotation_a = 360.0 - rotation
                     rotation_b = 180 + rotation_a
@@ -863,7 +862,7 @@ class PodShape(BaseShape):
     """
 
     def __init__(self, _object=None, canvas=None, **kwargs):
-        super(PodShape, self).__init__(_object=_object, canvas=canvas, **kwargs)
+        super().__init__(_object=_object, canvas=canvas, **kwargs)
         if not self.length:
             self.length = 1.0
         if not self.dx_1:
@@ -928,12 +927,12 @@ class PodShape(BaseShape):
             dx_2 = self.unit(self.dx_2)
             dy_2 = self.unit(self.dy_2)
             # ---- * bezier curve
-            curve_point1A = Point(x + dx_1, y + dy_1)
-            curve_point1B = Point(x + dx_2, y + dy_2)
-            curve_point2A = Point(x + dx_1, y - dy_1)
-            curve_point2B = Point(x + dx_2, y - dy_2)
-            cnv.draw_bezier(start_point, curve_point1A, curve_point1B, end_point)
-            cnv.draw_bezier(start_point, curve_point2A, curve_point2B, end_point)
+            curve_point1a = Point(x + dx_1, y + dy_1)
+            curve_point1b = Point(x + dx_2, y + dy_2)
+            curve_point2a = Point(x + dx_1, y - dy_1)
+            curve_point2b = Point(x + dx_2, y - dy_2)
+            cnv.draw_bezier(start_point, curve_point1a, curve_point1b, end_point)
+            cnv.draw_bezier(start_point, curve_point2a, curve_point2b, end_point)
 
         if self.centre_line:
             kwargs["closed"] = True
@@ -965,11 +964,13 @@ class PolygonShape(BaseShape):
     """
 
     def __init__(self, _object=None, canvas=None, **kwargs):
-        super(PolygonShape, self).__init__(_object=_object, canvas=canvas, **kwargs)
-        self.use_diameter = True if self.is_kwarg("diameter") else False
-        self.use_height = True if self.is_kwarg("height") else False
-        self.use_width = True if self.is_kwarg("width") else False
-        self.use_radius = True if self.is_kwarg("radius") else False
+        super().__init__(_object=_object, canvas=canvas, **kwargs)
+        self.use_diameter = self.is_kwarg("diameter")
+        self.use_height = self.is_kwarg("height")
+        self.use_width = self.is_kwarg("width")
+        self.use_radius = self.is_kwarg("radius")
+        self.calculated_left = None
+        self.calculated_top = None
         # ---- perform overrides
         if self.perbii:
             if isinstance(self.perbii, str):
@@ -1010,14 +1011,8 @@ class PolygonShape(BaseShape):
     def draw_mesh(self, cnv, ID, vertices: list):
         """Lines connecting each vertex to mid-points of opposing sides."""
         feedback("Mesh for Polygon is not yet implemented.", alert=True)
-        """ TODO - autodraw (without dirs)
-        self.set_canvas_props(
-            index=ID,
-            stroke=self.mesh_stroke or self.stroke,
-            stroke_width=self.mesh_stroke_width or self.stroke_width,
-            stroke_ends=self.mesh_ends,
-        )
-        """
+        log.debug("%s %s %s", cnv, ID, vertices)
+        # TODO - autodraw (without dirs)
 
     def get_centre(self) -> Point:
         """Calculate the centre of a polygon as a Point (in units)"""
@@ -1034,7 +1029,7 @@ class PolygonShape(BaseShape):
                 y = self._abs_cy
         return Point(x, y)
 
-    def get_angles(self, rotation: float = 0) -> list:
+    def get_angles(self) -> list:
         """Angles of lines connecting the Polygon centre to each of the vertices.
 
         NOTE:
@@ -1092,9 +1087,10 @@ class PolygonShape(BaseShape):
                 angle=angle,
             )
             perbii_dict[key] = _perbii
-        # if debug:
-        #     self.run_debug = True
-        #     self._debug(cnv, vertices=_perbii_pts)
+        if debug:
+            pass
+            # self.run_debug = True
+            # self._debug(cnv, vertices=_perbii_pts)
         return perbii_dict
 
     def calculate_radii(
@@ -1540,7 +1536,7 @@ class PolylineShape(BasePolyShape):
     """
 
     def __init__(self, _object=None, canvas=None, **kwargs):
-        super(PolylineShape, self).__init__(_object=_object, canvas=canvas, **kwargs)
+        super().__init__(_object=_object, canvas=canvas, **kwargs)
         # overrides / extra args
         self.scaling = tools.as_float(kwargs.get("scaling", 1.0), "scaling")
 
@@ -1595,7 +1591,7 @@ class QRCodeShape(BaseShape):
     """
 
     def __init__(self, _object=None, canvas=None, **kwargs):
-        super(QRCodeShape, self).__init__(_object=_object, canvas=canvas, **kwargs)
+        super().__init__(_object=_object, canvas=canvas, **kwargs)
         # overrides / extra args
         _cache_directory = get_cache(**kwargs)
         self.cache_directory = Path(_cache_directory, "qrcodes")
@@ -1700,7 +1696,7 @@ class RhombusShape(BaseShape):
     """
 
     def __init__(self, _object=None, canvas=None, **kwargs):
-        super(RhombusShape, self).__init__(_object=_object, canvas=canvas, **kwargs)
+        super().__init__(_object=_object, canvas=canvas, **kwargs)
         # feedback(f'*** RHMBS {self.kwargs=}')
         if self.kwargs.get("side") and (
             self.kwargs.get("height") or self.kwargs.get("width")
@@ -2221,7 +2217,7 @@ class SectorShape(BaseShape):
     """
 
     def __init__(self, _object=None, canvas=None, **kwargs):
-        super(SectorShape, self).__init__(_object=_object, canvas=canvas, **kwargs)
+        super().__init__(_object=_object, canvas=canvas, **kwargs)
         # ---- perform overrides
         self.radius = self.radius or self.diameter / 2.0
         if self.cx is None and self.x is None:
@@ -2254,24 +2250,25 @@ class SectorShape(BaseShape):
             self.x_c = self._abs_cx
             self.y_c = self._abs_cy
         # ---- centre point in units
-        p_C = Point(self.x_c + self._o.delta_x, self.y_c + self._o.delta_y)
-        # ---- circumference point in units
-        p_P = geoms.point_on_circle(p_C, self.unit(self.radius), self.angle_start)
+        pt_c = Point(self.x_c + self._o.delta_x, self.y_c + self._o.delta_y)
+        # ---- circumference/perimeter point in units
+        pt_p = geoms.point_on_circle(pt_c, self.unit(self.radius), self.angle_start)
         # ---- mid point in units
-        p_M = geoms.point_on_circle(p_C, self.unit(self.radius) / 2.0, self.angle_start)
+        pt_mid = geoms.point_on_circle(
+            pt_c, self.unit(self.radius) / 2.0, self.angle_start
+        )
         # ---- draw sector
         # feedback(
-        #     f'***Sector: {p_P=} {p_C=} {self.angle_start=} {self.angle_width=}')
-        cnv.draw_sector(  # anti-clockwise from p_P; 90° default
-            (p_C.x, p_C.y), (p_P.x, p_P.y), self.angle_width, fullSector=True
+        #     f'***Sector: {pt_p=} {pt_c=} {self.angle_start=} {self.angle_width=}')
+        cnv.draw_sector(  # anti-clockwise from pt_p; 90° default
+            (pt_c.x, pt_c.y), (pt_p.x, pt_p.y), self.angle_width, fullSector=True
         )
         kwargs["closed"] = False
         self.set_canvas_props(cnv=cnv, index=ID, **kwargs)
         # ---- * draw text
-        y_off = self._u.height / 2.0
-        self.draw_heading(cnv, ID, p_P.x, p_P.y, **kwargs)
-        self.draw_label(cnv, ID, p_M.x, p_M.y, **kwargs)
-        self.draw_title(cnv, ID, p_C.x, p_C.y, **kwargs)
+        self.draw_heading(cnv, ID, pt_p.x, pt_p.y, **kwargs)
+        self.draw_label(cnv, ID, pt_mid.x, pt_mid.y, **kwargs)
+        self.draw_title(cnv, ID, pt_c.x, pt_c.y, **kwargs)
 
 
 class ShapeShape(BasePolyShape):
@@ -2280,7 +2277,7 @@ class ShapeShape(BasePolyShape):
     """
 
     def __init__(self, _object=None, canvas=None, **kwargs):
-        super(ShapeShape, self).__init__(_object=_object, canvas=canvas, **kwargs)
+        super().__init__(_object=_object, canvas=canvas, **kwargs)
         # overrides
         self.x = kwargs.get("x", kwargs.get("left", 0.0))
         self.y = kwargs.get("y", kwargs.get("bottom", 0.0))
@@ -2336,7 +2333,7 @@ class SquareShape(RectangleShape):
     """
 
     def __init__(self, _object=None, canvas=None, **kwargs):
-        super(SquareShape, self).__init__(_object=_object, canvas=canvas, **kwargs)
+        super().__init__(_object=_object, canvas=canvas, **kwargs)
         # overrides to make a "square rectangle"
         # feedback(f'*** SQUARE {self.kwargs=}')
         if self.kwargs.get("side") and not self.kwargs.get("width"):
@@ -2358,8 +2355,7 @@ class SquareShape(RectangleShape):
         length = 2.0 * (self._u.width + self._u.height)
         if units:
             return self.points_to_value(length)
-        else:
-            return length
+        return length
 
     def draw(self, cnv=None, off_x=0, off_y=0, ID=None, **kwargs):
         """Draw a square on a given canvas."""
@@ -2373,7 +2369,7 @@ class StadiumShape(BaseShape):
     """
 
     def __init__(self, _object=None, canvas=None, **kwargs):
-        super(StadiumShape, self).__init__(_object=_object, canvas=canvas, **kwargs)
+        super().__init__(_object=_object, canvas=canvas, **kwargs)
         # check dimensions
         if self.kwargs.get("side") and (
             self.kwargs.get("height") or self.kwargs.get("width")
@@ -2541,6 +2537,10 @@ class StarShape(BaseShape):
     Star on a given canvas.
     """
 
+    def __init__(self, _object=None, canvas=None, **kwargs):
+        super().__init__(_object=_object, canvas=canvas, **kwargs)
+        self.vertexes_list = []
+
     def get_vertexes(self, x, y, **kwargs) -> tuple:
         """Calculate vertices of star
 
@@ -2682,7 +2682,7 @@ class StarShape(BaseShape):
         cnv = cnv if cnv else globals.canvas  # a new Page/Shape may now exist
         # ---- validate
         if self.rays < 3:
-            feedback(f"Cannot draw a Star with less than 3 rays!", True)
+            feedback("Cannot draw a Star with less than 3 rays!", True)
         # convert to using units
         x = self._u.x + self._o.delta_x
         y = self._u.y + self._o.delta_y
@@ -2762,6 +2762,10 @@ class StarLineShape(BaseShape):
     Star made of line on a given canvas.
     """
 
+    def __init__(self, _object=None, canvas=None, **kwargs):
+        super().__init__(_object=_object, canvas=canvas, **kwargs)
+        self.vertexes_list = []
+
     def get_vertexes(self, x, y, **kwargs):
         """Calculate vertices of StarLine"""
         vertices = []
@@ -2823,7 +2827,7 @@ class TextShape(BaseShape):
     """
 
     def __init__(self, _object=None, canvas=None, **kwargs):
-        super(TextShape, self).__init__(_object=_object, canvas=canvas, **kwargs)
+        super().__init__(_object=_object, canvas=canvas, **kwargs)
         if self.kwargs.get("cx") and self.kwargs.get("cy"):
             self.x = self.kwargs.get("cx")
             self.y = self.kwargs.get("cy") - self.points_to_value(self.font_size)
@@ -2952,7 +2956,11 @@ class TextShape(BaseShape):
                 _err = str(err)
                 cause, thefile = "", ""
                 if "caused exception" in _err:
-                    cause = _err.split("caused exception")[0].strip("\n").strip(" ")
+                    cause = (
+                        _err.split("caused exception", maxsplit=1)[0]
+                        .strip("\n")
+                        .strip(" ")
+                    )
                     cause = f" in {cause}"
                 if "Cannot open resource" in _err:
                     thefile = _err.split("Cannot open resource")[1].strip("\n")
@@ -2968,10 +2976,7 @@ class TextShape(BaseShape):
                 keys["opacity"] = colrs.get_opacity(self.transparency)
                 _font_name = self.font_name.replace(" ", "-")
                 if not fonts.builtin_font(self.font_name):  # local check
-                    _, _path, font_file = tools.get_font_file(self.font_name)
-                    # if font_file:
-                    #   keys["css"] = '@font-face {font-family: %s; src: url(%s);}' % (
-                    #     _font_name, font_file)
+                    _, _path, _ = tools.get_font_file(self.font_name)
                 keys["css"] = globals.css
                 if self.style:
                     _text = f'<div style="{self.style}">{_text}</div>'
@@ -3013,7 +3018,7 @@ class TextShape(BaseShape):
                 try:
                     icon_font = globals.base.icon_font_name
                     icon_size = globals.base.icon_font_size
-                except:
+                except Exception:
                     icon_font = "Helvetica"
                 _text = tools.html_glyph(_text, icon_font, icon_size)
                 current_page.insert_htmlbox(rect, _text, **keys)
@@ -3036,7 +3041,7 @@ class TrapezoidShape(BaseShape):
 
     def __init__(self, _object=None, canvas=None, **kwargs):
         """."""
-        super(TrapezoidShape, self).__init__(_object=_object, canvas=canvas, **kwargs)
+        super().__init__(_object=_object, canvas=canvas, **kwargs)
         if self.top >= self.width:
             feedback("The top cannot be longer than the width!", True)
         self.delta_width = self._u.width - self._u.top
@@ -3058,8 +3063,7 @@ class TrapezoidShape(BaseShape):
         )
         if units:
             return self.points_to_value(length)
-        else:
-            return length
+        return length
 
     def calculate_xy(self):
         # ---- adjust start
@@ -3087,8 +3091,7 @@ class TrapezoidShape(BaseShape):
                 cy = y - self._u.height / 2.0
         if self.cx is not None and self.cy is not None:
             return self._u.cx, self._u.cy, x, y
-        else:
-            return cx, cy, x, y
+        return cx, cy, x, y
 
     def get_vertexes(self, **kwargs):
         """Calculate vertices of trapezoid."""
@@ -3183,7 +3186,7 @@ class TriangleShape(BaseShape):
     """
 
     def __init__(self, _object=None, canvas=None, **kwargs):
-        super(TriangleShape, self).__init__(_oject=_object, canvas=canvas, **kwargs)
+        super().__init__(_oject=_object, canvas=canvas, **kwargs)
         self.triangle_type = None
         if self.kwargs.get("side"):
             self.triangle_type = TriangleType.EQUILATERAL
@@ -3197,7 +3200,7 @@ class TriangleShape(BaseShape):
             self.triangle_type = TriangleType.IRREGULAR
             if self.side2 + self.side3 < self.side:
                 feedback(
-                    f"The total length of the second and third sides must exceed the first!",
+                    "The total length of the second and third sides must exceed the first!",
                     True,
                 )
         if self.kwargs.get("side") and self.kwargs.get("side2"):
@@ -3209,14 +3212,14 @@ class TriangleShape(BaseShape):
             if self.side:
                 self.triangle_type = TriangleType.EQUILATERAL
             else:
-                feedback(f"Insufficient settings to construct a Triangle!", True)
+                feedback("Insufficient settings to construct a Triangle!", True)
         # ---- validate
         if self.triangle_type == TriangleType.EQUILATERAL:
             if self.kwargs.get("pivot") and (
                 self.kwargs.get("cx") or self.kwargs.get("cy")
             ):
                 feedback(
-                    f"An equilateral Triangle, with a defined centre,"
+                    "An equilateral Triangle, with a defined centre,"
                     " cannot also have a pivot set!",
                     True,
                 )
@@ -3244,8 +3247,7 @@ class TriangleShape(BaseShape):
                 self.points_to_value(self.side2),
                 self.points_to_value(self.side3),
             )
-        else:
-            return (self.side, self.side2, self.side3)
+        return (self.side, self.side2, self.side3)
 
     def calculate_area(
         self, vertices, rotation: float = 0, units: bool = False
@@ -3269,8 +3271,7 @@ class TriangleShape(BaseShape):
         length = _s1 + _s2 + _s3
         if units:
             return self.points_to_value(length)
-        else:
-            return length
+        return length
 
     def calculate_perbii(
         self, cnv, centre: Point, vertices: list, rotation: float = None, **kwargs
@@ -3288,7 +3289,6 @@ class TriangleShape(BaseShape):
         """
         directions = ["nw", "s", "ne"]  # edge directions
         perbii_dict = {}
-        vcount = len(vertices) - 1
         _perbii_pts = []
         # print(f"*** TRIANGLE perbii {centre=} {vertices=}")
         for key, vertex in enumerate(vertices):
@@ -3362,42 +3362,42 @@ class TriangleShape(BaseShape):
             else:
                 x = self._u.x + self._o.delta_x
                 y = self._u.y + self._o.delta_y
-            ptSW = Point(x, y)
-            ptSE = Point(x + self._u.side, y)
-            ptN = Point(x + self._u.side / 2.0, y - height)
+            pt_sw = Point(x, y)
+            pt_se = Point(x + self._u.side, y)
+            pt_north = Point(x + self._u.side / 2.0, y - height)
         elif self.triangle_type == TriangleType.ISOSCELES:
             # print(f'*** calculate TriangleType.ISOSCELES: {self.centroid=}')
             x = self._u.x + self._o.delta_x
             y = self._u.y + self._o.delta_y
-            ptSW = Point(x, y)
-            ptSE = Point(x + self._u.side, y)
-            ptN = Point(x + self._u.side / 2.0, y - self._u.height)
+            pt_sw = Point(x, y)
+            pt_se = Point(x + self._u.side, y)
+            pt_north = Point(x + self._u.side / 2.0, y - self._u.height)
         elif self.triangle_type == TriangleType.IRREGULAR:
             # print(f'*** calculate TriangleType.IRREGULAR: {self.centroid=}')
             x = self._u.x + self._o.delta_x
             y = self._u.y + self._o.delta_y
-            ptSW = Point(x, y)
-            ptSE = Point(x + self._u.side, y)
+            pt_sw = Point(x, y)
+            pt_se = Point(x + self._u.side, y)
             if self.angle:
-                ptN = geoms.point_from_angle(
-                    ptSE, self.unit(self.side2), 180 + self.angle
+                pt_north = geoms.point_from_angle(
+                    pt_se, self.unit(self.side2), 180 + self.angle
                 )
             elif self.side3:
                 b, a, c = self._u.side, self.unit(self.side2), self.unit(self.side3)
                 x = (a**2 + b**2 - c**2) / (2.0 * a * b)
                 angle_a = math.acos(x)
                 # print(f"{math.degrees(angle_a)}")
-                ptN = geoms.point_from_angle(ptSE, a, 180 + math.degrees(angle_a))
+                pt_north = geoms.point_from_angle(pt_se, a, 180 + math.degrees(angle_a))
         else:
             raise NotImplementedError(
                 f"Cannot handle triangle type {self.triangle_type}"
             )
 
         if self.pivot:
-            ptSE = geoms.rotate_point_around_point(ptSE, ptSW, self.pivot)
-            ptN = geoms.rotate_point_around_point(ptN, ptSW, self.pivot)
+            pt_se = geoms.rotate_point_around_point(pt_se, pt_sw, self.pivot)
+            pt_north = geoms.rotate_point_around_point(pt_north, pt_sw, self.pivot)
 
-        vertices = [ptN, ptSW, ptSE]
+        vertices = [pt_north, pt_sw, pt_se]
         return vertices
 
     def get_centroid(self, vertices: list) -> Point:
@@ -3743,7 +3743,7 @@ class TriangleShape(BaseShape):
                         rotation,
                         self.perbii_shapes_rotated,
                     )
-            if item == "centre_shape" or item == "center_shape":
+            if item in ["centre_shape", "center_shape"]:
                 # ---- * centred shape (with offset)
                 if self.centre_shape:
                     if self.can_draw_centred_shape(self.centre_shape):
@@ -3751,7 +3751,7 @@ class TriangleShape(BaseShape):
                             _abs_cx=self.centroid.x + self.unit(self.centre_shape_mx),
                             _abs_cy=self.centroid.y + self.unit(self.centre_shape_my),
                         )
-            if item == "centre_shapes" or item == "center_shapes":
+            if item in ["centre_shapes", "center_shapes"]:
                 # ---- * centred shapes (with offsets)
                 if self.centre_shapes:
                     self.draw_centred_shapes(
@@ -3781,16 +3781,11 @@ class TriangleShape(BaseShape):
                 # ---- * text
                 if self.triangle_type == TriangleType.EQUILATERAL:
                     heading_y = self.vertexes[0].y
-                    # title_y = self.centroid.y + self._u.height / 3.0  # fails for pivot
-                    # title_y = self._u.y + self._o.delta_y
                     title_y = self.vertexes[1].y
                 elif self.triangle_type == TriangleType.ISOSCELES:
                     heading_y = self.vertexes[0].y
-                    # self._u.y + self._o.delta_y - self._u.height
                     title_y = self._u.y + self._o.delta_y
                 elif self.triangle_type == TriangleType.IRREGULAR:
-                    area = self.calculate_area(self.vertexes, rotation)
-                    ht = 2 * area / self._u.side
                     heading_y = self.vertexes[0].y
                     title_y = self._u.y + self._o.delta_y
                 else:
@@ -3814,7 +3809,7 @@ class CommonShape(BaseShape):
     """
 
     def __init__(self, _object=None, canvas=None, common_kwargs=None, **kwargs):
-        super(CommonShape, self).__init__(_object=_object, canvas=canvas, **kwargs)
+        super().__init__(_object=_object, canvas=canvas, **kwargs)
         self._common_kwargs = common_kwargs
         self._kwargs = kwargs
 
@@ -3829,7 +3824,7 @@ class DefaultShape(BaseShape):
     """
 
     def __init__(self, _object=None, canvas=None, default_kwargs=None, **kwargs):
-        super(DefaultShape, self).__init__(_object=_object, canvas=canvas, **kwargs)
+        super().__init__(_object=_object, canvas=canvas, **kwargs)
         self._default_kwargs = default_kwargs
         self._kwargs = kwargs
 
@@ -3844,7 +3839,7 @@ class FooterShape(BaseShape):
     """
 
     def __init__(self, _object=None, canvas=None, **kwargs):
-        super(FooterShape, self).__init__(_object=_object, canvas=canvas, **kwargs)
+        super().__init__(_object=_object, canvas=canvas, **kwargs)
         # self.page_width = kwargs.get('paper', (canvas.width, canvas.height))[0]
 
     def draw(self, cnv=None, off_x=0, off_y=0, ID=None, **kwargs):
@@ -3856,7 +3851,7 @@ class FooterShape(BaseShape):
         # ---- set location and text
         x = self.kwargs.get("x", self._u.page_width / 2.0)  # centre across page
         y = self.unit(self.margin_bottom) / 2.0  # centre in margin
-        text = kwargs.get("text") or "Page %s" % ID
+        text = kwargs.get("text") or f"Page {ID}"
         # feedback(f'*** FooterShape {ID=} {text=} {x=} {y=} {font_size=}')
         # ---- draw footer
         self.draw_multi_string(cnv, x, y, text, align="centre", font_size=font_size)

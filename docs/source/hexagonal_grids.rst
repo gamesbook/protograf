@@ -45,7 +45,7 @@ are created using defaults.
 You should also have seen how a single hexagon can be further enhanced
 as a :ref:`Customised Hexagon Shape <hexIndex>`.
 
-.. _rectIndex:
+.. _rectHGIndex:
 
 Rectangular Hexagonal Grid
 ==========================
@@ -65,7 +65,7 @@ customised in a number of ways.
 
 Rows and Columns
 ----------------
-`^ <rectIndex_>`_
+`^ <rectHGIndex_>`_
 
 .. |rr1| image:: images/custom/hexagonal_grid/rect_basic_flat.png
    :width: 330
@@ -121,7 +121,7 @@ Rows and Columns
 
 Coordinates
 -----------
-`^ <rectIndex_>`_
+`^ <rectHGIndex_>`_
 
 Every location in a grid has a row and column number |dash| these are not, by
 default, displayed on the grid; but they are needed in some cases; for example,
@@ -251,7 +251,7 @@ Most coordinate property names are prefixed with ``coord_``.
 
 Caltrops
 --------
-`^ <rectIndex_>`_
+`^ <rectHGIndex_>`_
 
 Caltrops is a term when the point at which three hexagons meet is drawn by
 a set of three small lines; these replace the normal edge of the hexagon.
@@ -323,7 +323,7 @@ a set of three small lines; these replace the normal edge of the hexagon.
 
 Hidden
 ------
-`^ <rectIndex_>`_
+`^ <rectHGIndex_>`_
 
 As every location in a grid has a row and column number, these values can be
 used to hide or mask certain hexagons from being displayed.  This can be useful
@@ -385,7 +385,7 @@ when a grid is designed for a scenario where not all hexagons are needed.
 
 Offset
 ------
-`^ <rectIndex_>`_
+`^ <rectHGIndex_>`_
 
 .. |rof| image:: images/custom/hexagonal_grid/rect_offset.png
    :width: 330
@@ -436,7 +436,7 @@ Offset
 
 Radii
 -----
-`^ <rectIndex_>`_
+`^ <rectHGIndex_>`_
 
 .. |rdi| image:: images/custom/hexagonal_grid/rect_radii.png
    :width: 330
@@ -1131,7 +1131,8 @@ are listed below:
    extension for creating hex grids in *Inkscape* that can also be used
    to make brick patterns of staggered rectangles.
 -  *hexboard* (https://www.ctan.org/pkg/hexboard) - a package for LATEX
-   that provides functionality for drawing Hex boards and games.
+   that provides functionality for drawing boards and game pieces for the
+   abstract game "Hex"
 -  *draw_game_board* (https://github.com/jpneto/draw_game_boards/tree/main) -
    a Python tool to translate boards from ASCII format into SVG.
 -  *map18xx* (https://github.com/XeryusTC/map18xx) - a 18XX hex map and

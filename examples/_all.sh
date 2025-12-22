@@ -16,6 +16,7 @@ python core/customised_commands.py
 python core/customised_hexagon.py
 python core/customised_hexagonal_grid.py
 python core/customised_hexagonal_grid_locations.py
+python core/customised_hexhex.py
 python core/customised_rectangle.py
 python core/customised_shapes.py
 python core/customised_text.py
@@ -33,6 +34,7 @@ python objects/polyominoes.py
 python objects/ominoes_basic.py
 python objects/pentominoes.py
 python objects/dice_d6.py
+python objects/domino.py
 # ---- boards: abstract
 echo -e "\nCreating abstract boards..."
 python boards/abstract/chessboard.py

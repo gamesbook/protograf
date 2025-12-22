@@ -267,6 +267,11 @@ class BaseCanvas:
         self.order_all = self.defaults.get("order_all", None)
         self.order_first = self.defaults.get("order_first", None)
         self.order_last = self.defaults.get("order_last", None)
+        # ---- attrs  (hex, circle, rect)
+        self.calculated_left = self.defaults.get("calculated_left", None )
+        self.calculated_top = self.defaults.get("calculated_top", None)
+        self.grid = self.defaults.get("grid", None)
+        self.coord_text = self.defaults.get("coord_text", None)
         # ---- text: base
         self.text = self.defaults.get("text", "")
         self.text_size = self.defaults.get("text_size", self.font_size)
@@ -366,6 +371,8 @@ class BaseCanvas:
         self.arrow_fill = self.defaults.get("arrow_fill", None)  # see draw_arrowhead()
         # ---- polyline / polyshape
         self.snail = self.defaults.get("snail", None)
+        self.x_c = self.defaults.get("x_c", None)
+        self.y_c = self.defaults.get("y_c", None)
         # ---- line
         self.connections = self.defaults.get("connections", None)
         self.connections_style = self.defaults.get("connections_style", None)
@@ -382,7 +389,16 @@ class BaseCanvas:
         self.dy_1 = self.defaults.get("dy1", None)
         self.dx_2 = self.defaults.get("dx2", None)
         self.dy_2 = self.defaults.get("dy2", None)
+        # ---- pod / domino
         self.centre_line = self.defaults.get("centre_line", False)
+        self.centre_line_stroke = self.defaults.get("centre_line_stroke", self.stroke)
+        self.centre_line_stroke_width = self.defaults.get(
+            "centre_line_stroke_width", self.stroke_width
+        )
+        self.centre_line_length = self.defaults.get("centre_line_length", 0.5)
+        self.centre_line_dotted = self.defaults.get("centre_line_dotted", self.dotted)
+        self.centre_line_dashed = self.defaults.get("centre_line_dashed", self.dashed)
+        self.centre_line_ends = self.defaults.get("centre_line_ends", self.line_ends)
         # ---- rectangle / card
         self.rounding = self.defaults.get("rounding", 0.0)
         self.rounded = self.defaults.get("rounded", False)  # also line end
@@ -446,6 +462,20 @@ class BaseCanvas:
         self.grouping_rows = self.defaults.get("grouping_rows", self.grouping)
         self.grouping_cols = self.defaults.get("grouping_cols", self.grouping)
         self.lines = self.defaults.get("lines", "all")  # which direction to draw
+        # ---- HexHex grid
+        self.rings = self.defaults.get("rings", 1)
+        self.locations = self.defaults.get("locations", None)
+        self.ranges = self.defaults.get("ranges", None)
+        self.shapes = None
+        self.gridlines = self.defaults.get("gridlines", False)
+        self.gridlines_stroke = self.defaults.get("gridlines_stroke", self.stroke)
+        self.gridlines_fill = self.defaults.get("gridlines_fill", None)
+        self.gridlines_ends = self.defaults.get("gridlines_ends", None)
+        self.gridlines_stroke_width = self.defaults.get(
+            "gridlines_stroke_width", self.stroke_width
+        )
+        self.gridlines_dotted = self.defaults.get("gridlines_dotted", False)
+        self.gridlines_dashed = self.defaults.get("gridlines_dashed", None)
         # ---- circle / star / polygon
         self.diameter = self.defaults.get("diameter", 1)
         self.radius = self.defaults.get("radius", self.diameter / 2.0)
@@ -535,7 +565,7 @@ class BaseCanvas:
         self.vertex_shapes_rotated = self.defaults.get(
             "self.vertex_shapes_rotated", False
         )
-        # ---- shapes with centre (hex, circle, rect, rhombus, poly, ellipse, star)
+        # ---- shapes with centre (hex, circle, rect, rhombus, poly, ellipse, star, domino)
         self.centre_shapes = self.defaults.get("centre_shapes", [])
         self.centre_shape = self.defaults.get("centre_shape", "")
         self.centre_shape_mx = self.defaults.get("centre_shape_mx", 0.0)
@@ -755,7 +785,7 @@ class BaseShape:
         self.margin_left = self.kw_float(kwargs.get("margin_left", self.margin))
         self.margin_right = self.kw_float(kwargs.get("margin_right", self.margin))
         # ---- grid marks
-        self.grid_marks = self.kw_float(kwargs.get("grid_marks", base.grid_marks))
+        self.grid_marks = self.kw_bool(kwargs.get("grid_marks", base.grid_marks))
         self.grid_marks_stroke = kwargs.get("grid_marks_stroke", base.grid_marks_stroke)
         self.grid_marks_ends = kwargs.get("grid_marks_ends", base.grid_marks_ends)
         self.grid_marks_stroke_width = self.kw_float(
@@ -867,6 +897,11 @@ class BaseShape:
         self.order_all = kwargs.get("order_all", base.order_all)
         self.order_first = kwargs.get("order_first", base.order_first)
         self.order_last = kwargs.get("order_last", base.order_last)
+        # ---- attrs  (hex, circle, rect)
+        self.calculated_left = kwargs.get("calculated_left", None )
+        self.calculated_top = kwargs.get("calculated_top", None)
+        self.grid = kwargs.get("grid", None)
+        self.coord_text = kwargs.get("coord_text", None)
         # ---- text: base
         self.text = kwargs.get("text", base.text)
         self.text_size = self.kw_float(kwargs.get("text_size", base.text_size))
@@ -981,6 +1016,8 @@ class BaseShape:
         self.arrow_fill = kwargs.get("arrow_fill", base.arrow_fill)
         # ---- polyline / polyshape
         self.snail = kwargs.get("snail", base.snail)
+        self.x_c = kwargs.get("x_c", base.x_c)
+        self.y_c = kwargs.get("y_c", base.y_c)
         # ---- line
         self.connections = kwargs.get("connections", base.connections)
         self.connections_style = kwargs.get("connections_style", base.connections_style)
@@ -997,9 +1034,20 @@ class BaseShape:
         self.dy_1 = kwargs.get("dy1", base.dy_1)
         self.dx_2 = kwargs.get("dx2", base.dx_2)
         self.dy_2 = kwargs.get("dy2", base.dy_2)
+        # ---- pod / domino
         self.centre_line = kwargs.get(
             "centre_line", kwargs.get("center_line", base.centre_line)
         )
+        self.centre_line_stroke = kwargs.get("centre_line_stroke", self.stroke)
+        self.centre_line_stroke_width = self.kw_float(
+            kwargs.get("centre_line_stroke_width", base.centre_line_stroke_width)
+        )
+        self.centre_line_length = self.kw_float(
+            kwargs.get("centre_line_length", base.centre_line_length)
+        )
+        self.centre_line_ends = kwargs.get("centre_line_ends", base.centre_line_ends)
+        self.centre_line_dotted = kwargs.get("centre_line_dotted", base.dotted)
+        self.centre_line_dashed = kwargs.get("centre_line_dashed", self.dashed)
         # ---- rectangle / card
         self.rounding = self.kw_float(kwargs.get("rounding", base.rounding))
         self.rounded = kwargs.get("rounded", base.rounded)  # also line end
@@ -1081,6 +1129,24 @@ class BaseShape:
             kwargs.get("grouping_cols", self.grouping), "grouping_cols"
         )
         self.lines = kwargs.get("lines", base.lines)
+        # ---- HexHex grid
+        self.rings = kwargs.get("rings", base.rings)
+        self.locations = kwargs.get("locations", base.locations)
+        self.ranges = kwargs.get("ranges", base.ranges)
+        self.shapes = kwargs.get("shapes", base.shapes)
+        self.gridlines = self.kw_bool(kwargs.get("gridlines", base.gridlines))
+        self.gridlines_fill = kwargs.get("gridlines_fill", None)
+        self.gridlines_stroke = kwargs.get("gridlines_stroke", base.gridlines_stroke)
+        self.gridlines_stroke_width = self.kw_float(
+            kwargs.get("gridlines_stroke_width", base.gridlines_stroke_width)
+        )
+        self.gridlines_ends = kwargs.get("gridlines_ends", base.gridlines_ends)
+        self.gridlines_dotted = self.kw_bool(
+            kwargs.get("gridlines_dotted", base.gridlines_dotted)
+        )
+        self.gridlines_dashed = self.kw_bool(
+            kwargs.get("gridlines_dashed", base.gridlines_dashed)
+        )
         # ---- circle / star / polygon
         self.diameter = self.kw_float(kwargs.get("diameter", base.diameter))
         self.radius = self.kw_float(kwargs.get("radius", base.radius))
@@ -2734,6 +2800,9 @@ class BaseShape:
 
         Requires native units (i.e. points)!
         """
+        # feedback(f' @@@ base.draw_label {kwargs=}')
+        if kwargs.get("label_sequence", False):
+            self.label = f"{ID}"
         ttext = self.textify(index=ID, text=self.label, default=False)
         _rotation = rotation or self.label_rotation
         if ttext is not None or ttext != "":
@@ -3438,7 +3507,7 @@ class BaseShape:
                     perbii_dict = self.calculate_perbii(cnv, centre, vertexes)
                     _dirs = perbii_dict.keys()
                 elif direction_group == DirectionGroup.POLYGONAL:
-                    _dirs = [int(item[0]) - 1]
+                    _dirs = [tools.as_int(item[0], "perbii_shapes direction") - 1]
                 else:
                     _dirs = tools.validated_directions(
                         item[0], direction_group, "direction"

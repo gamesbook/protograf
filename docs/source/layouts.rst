@@ -113,4 +113,5 @@ which links them with the shapes that need to be drawn at their locations.
 .. HINT::
 
     :doc:`Hexagonal Grids <hexagonal_grids>` are a special kind of repetition
-    that can be more specifically customised.
+    that can be more specifically customised;
+    as are :doc:`HexHex Grids <hexhex_grids>`

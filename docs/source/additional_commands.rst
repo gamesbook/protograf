@@ -375,11 +375,16 @@ Examples of using BGG API data for card creation can be found at
 
    1. Note that access to the BGG API can only be used in terms of its
       license: https://boardgamegeek.com/wiki/page/XML_API_Terms_of_Use
-   2. Furthermore, there is an upper limit to how many games can be retrieved
-      at a time - best available knowledge suggests this is about 15,000.
-   3. Copies are kept of data downloaded from BGG - and this data will *not*
-      be re-retrieved from BGG unless you delete those copies; see `Caching`_
-      below.
+   2. Access to the BGG API requires that you apply to the site and request
+      permission; when granted, this will allow you to generate a *token*
+      |dash| a long, unique, set of characters and numbers that look something
+      like ``48398139-7fb1-4809-b7af-0be28d35dcec`` |dash| for details see 
+      https://boardgamegeek.com/application/
+   3. Furthermore, there is an upper limit to how many games can be retrieved
+      at a time |dash| best available knowledge suggests this is about 15,000.
+   4. Copies are kept of data downloaded from BGG |dash| and this data will 
+      *not* be re-retrieved from BGG unless you delete those copies; 
+      see `Caching`_ below.
 
 Usage
 -----
@@ -390,19 +395,23 @@ The ``BGG`` command allows game data to be retrieved either by providing:
   game IDs
 - the ID of a BoardGameGeek user; by default all games in that user's collection
   will be retrieved, unless filters are used
+  
+In both cases, you will also need to supply your **BGG API token**.
 
-The ID of a game appears in its URL; so, for example, the game "Monopoly"
-can be found at https://boardgamegeek.com/boardgame/1406
+The ID of a game appears in its URL; so, for example, the ID for the boardgame 
+"Monopoly" is ``1406`` and is found at https://boardgamegeek.com/boardgame/1406
 
 
 Example 1. Games by ID
 ~~~~~~~~~~~~~~~~~~~~~~
 
-To retrieve games which have the ID's 1, 2 and 3:
+To retrieve games which have known IDs, create a list of those numbers,
+using square brackets; for example, for ID's 1, 2 and 3:
+:
 
 .. code:: python
 
-    BGG(ids=[1, 2, 3])
+    BGG(token="ABC123", ids=[1, 2, 3])
 
 When the command runs, you will get the following feedback::
 
@@ -414,7 +423,7 @@ as it runs, showing that each game is being processed i.e.
 
 .. code:: python
 
-    BGG(ids=[1, 2, 3], progress=True)
+    BGG(token="ABC123",  ids=[1, 2, 3], progress=True)
 
 shows::
 
@@ -430,7 +439,7 @@ To retrieve games for an (imaginary) user with the username ``BenKenobi1976``:
 
 .. code:: python
 
-    BGG(user='BenKenobi1976')
+    BGG(token="ABC123", user='BenKenobi1976')
 
 A collection can be very large; you may want to filter it to create a
 `Subset of Games`_.
@@ -450,10 +459,10 @@ stored under your user directory on your local machine (or where ever you are
 running :doc:`protograf <index>`).
 
 The caching directory is called ``.protograf`` and this will have a ``bgg``
-subdirectory where game data |dash| such as ``.pck`` files |dash| and
-``images`` and ``thumbs`` are stored.  If you delete these folders and files,
-they will be recreated the next time your script runs i.e. all of their data
-will need to be downloaded again.
+subdirectory where game data |dash| in the form of ``.pck`` files and
+``images`` and ``thumbs`` |dash| are stored.  If you delete these folders and 
+files, they will be recreated the next time your script runs 
+i.e. all of their data will need to be downloaded again.
 
 
 Output Fields
@@ -533,14 +542,15 @@ These are added as extra properties to the ``BGG()`` command. For example:
 .. code:: python
 
     bgames = BGG(
-        user='BenKenobi1976',
+        token="ABC123",
+        user="BenKenobi1976",
         want_to_play=True,
         own=True,
     )
 
 In this example, games must be marked both as "want to play" items **and**
-items that are "own"ed in the collection of the (imaginary) user
-``BenKenobi1976``.
+items that are "own"ed in the collection of the (totally imaginary) user
+called ``BenKenobi1976``.
 
 .. HINT::
 

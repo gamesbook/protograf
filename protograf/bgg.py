@@ -2,11 +2,12 @@
 Purpose: BoardGameGeek.com API wrapper for protograf
 Written by: Derek Hohls
 Created on: 21 May 2016
-Updated on: 16 January 2024
+Updated on: 18 December 2025
 
 Notes:
 
 * BGG() uses the `bgg-api` Python library (https://github.com/SukiCZ/boardgamegeek)
+* Access to BoardGameGeek API requires a token; https://boardgamegeek.com/application/
 * Code is based off of the BGGGame object, for example::
 
     {'_comments': [],
@@ -130,6 +131,7 @@ from boardgamegeek.objects.games import BoardGame
 from protograf.utils.messaging import feedback
 from protograf.utils.support import CACHE_DIRECTORY
 from protograf.utils import tools
+from protograf import globals
 
 
 class BGGGame:
@@ -137,6 +139,7 @@ class BGGGame:
 
     def __init__(
         self,
+        token: str = None,
         game_id: int = None,
         user: str = None,
         user_game: CollectionBoardGame = None,
@@ -144,18 +147,26 @@ class BGGGame:
     ):
         """
         Args:
-            user_game: obj
+            token (str)
+                a boardgamegeek API access token
+            user_game (obj)
                 a boardgamegeek.game.CollectionBoardGame object
-            game_id: int
+            game_id (int)
                 Unique BGG number for a boardgame
-            short: int
+            short (int)
                 number of characters to use for short description
         """
         self._game = None
         self.user_game = user_game
         self.user = user or ""
         self.short = int(short) or 500
-        self.bgg = BGGClient()
+        if not token:
+            # check command-line
+            if globals.pargs.bggapi:
+                token = globals.pargs.bggapi
+        if not token:
+            feedback(f"Access to BGG requires a token!", True)
+        self.bgg = BGGClient(token)
         self.cache_directory = Path(Path.home() / CACHE_DIRECTORY / "bgg")
         self.cache_directory.mkdir(parents=True, exist_ok=True)
         # load and cache game
@@ -366,9 +377,11 @@ class BGGGame:
 class BGGGameList:
     """Lists which are groups of multiple games' string-based properties."""
 
-    def __init__(self, user=None, **kwargs):
+    def __init__(self, token=None, user=None, **kwargs):
         """create empty lists to hold values"""
-        self.bgg = BGGClient(requests_per_minute=120)
+        requests = kwargs.get("requests", 240)
+        _requests = tools.as_int(requests, "requests")
+        self.bgg = BGGClient(token, requests_per_minute=_requests)
         self.user = user
         self.collection = None  # boardgamegeek.collection.Collection
         if self.user:

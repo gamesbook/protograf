@@ -4,6 +4,35 @@ Basic Concepts
 
 .. |dash| unicode:: U+2014 .. EM DASH SIGN
 
+.. raw:: html
+
+    <style>
+    .blue {color:#0000FF; font-weight:bold}
+    .cyan {color:#00FFFF; font-weight:bold}
+    .dark-blue {color:#293BC7; font-weight:bold}
+    .natural {color:#F3B54A; font-weight:bold}
+    .forest-green {color:#007700; font-weight:bold}
+    .malachite {color:#32CD32; font-weight:bold}
+    .cinnamon {color:#D2691E; font-weight:bold}
+    .pink {color:#E6506E; font-weight:bold}
+    .black {color:#000000; font-weight:bold}
+    .picton-blue {color:#00BFFF; font-weight:bold}
+    .magenta {color:#BF00BF; font-weight:bold}
+    .orange {color:#FFA500; font-weight:bold}
+    .white {color:#FFFFFF; font-weight:bold}
+    .purple {color:#EE82EE; font-weight:bold}
+    .red {color:#FF0000; font-weight:bold}
+    .silver {color:#C0C0C0; font-weight:bold}
+    .dark-brown {color:#4C271B; font-weight:bold}
+    .yellow {color:#FFFF00; font-weight:bold}
+    </style>
+
+.. role:: red
+.. role:: yellow
+.. role:: blue
+.. role:: dark-brown
+
+
 Like many other specialised tools, :doc:`protograf <index>` has its
 own set of terms and concepts that act as "short-cuts" to define
 its functions and behaviour. Some of these are likely to be common to
@@ -206,9 +235,10 @@ Everything we see has color.
 
 Color in **protograf**, is defined in the same way as it is in pages
 that appear on the web i.e. in RGB |dash| red-green-blue |dash| *hexadecimal*
-format; for example, ``#A0522D`` represents a shade of the color that we
-would likely term "brown", while "basic" colors have their own values;
-"yellow" is ``#FFFF00``, "red" is ``#FF0000``, and "blue" is ``#0000FF``.
+format; for example, ``#4C271B`` represents a dark shade of the color that we
+would likely term :dark-brown:`"brown"`, while "basic" colors have their own
+values; :yellow:`"yellow"` is ``#FFFF00``, :red:`"red"` is ``#FF0000``, and
+:blue:`"blue"` is ``#0000FF``.
 
 Colors in **protograf** can also make use of names from a pre-defined
 list - for example ``#A0522D`` is defined as the color *sienna*. The

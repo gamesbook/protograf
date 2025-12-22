@@ -48,6 +48,7 @@ a handy cross-reference to the detailed information for that command.
    :ref:`countersheet <the-countersheet-command>` - typically sourced from a CSV or
    Excel file, or a Google Sheet
 -  :ref:`D6 <d6-object>` * - create top-down view of a six-sided die
+-  :ref:`Domino <domino-object>` * - create top-down view of a domino
 -  :ref:`Deck <the-deck-command>`  - details for a deck, containing one or
    more :ref:`cards <the-card-command>`
 -  :ref:`Default <the-default-command>` - set the properties that can be used by

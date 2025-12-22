@@ -582,6 +582,51 @@ def split(
     return sequence_split(string, as_int=False, unique=False, sep=sep, clean=clean)
 
 
+def separate(
+    string: str, tuple_to_list: bool = False, separator: str = None, clean: bool = False
+):
+    """
+    Split a string into a list of individual items
+
+    Doc Test:
+
+    >>> separate('A,1,B')
+    ['A', '1', 'B']
+    >>> separate('A 1 B')
+    ['A', '1', 'B']
+    >>> separate((1, 2, 3), True)
+    [(1, 2, 3)]
+    >>> separate("1;2;3", separator=';')
+    ['1', '2', '3']
+    >>> separate("1; 2; 3", separator=';', clean=True)
+    ['1', '2', '3']
+    >>> separate("A,b B, C")
+    ['A', 'b B', ' C']
+    >>> separate("A,b B, C", clean=True)
+    ['A', 'b B', 'C']
+    >>> separate("A,1-3, C, 1:1-3", separator=',', clean=True)
+    ['A', '1-3', 'C', '1:1-3']
+    >>> separate("A b C d:1,6", separator=' ', clean=True)
+    ['A', 'b', 'C', 'd:1,6']
+
+    """
+    if isinstance(string, list):
+        return string
+    if isinstance(string, tuple):
+        if tuple_to_list:
+            return [string]
+        return string
+    if separator:
+        sep = separator
+    else:
+        sep = " " if (string and "," not in string) else ","
+    result = string.split(sep)
+    if clean:
+        outcome = [item.strip() for item in result if item.strip() != ""]
+        return outcome
+    return result
+
+
 def integer_pairs(pairs, label: str = "list") -> list:
     """Convert a list or string into a list of tuples; each with a pair of integers.
 
@@ -1407,6 +1452,24 @@ def unit(item, units: str = None, skip_none: bool = False, label: str = ""):
         )
 
 
+def points(item, units: str = None, skip_none: bool = False, label: str = ""):
+    """Convert an item from points into the appropriate unit system."""
+    log.debug("units %s :: label: %s", units, label)
+    if item is None and skip_none:
+        return None
+    units = to_units(units) if units is not None else globals.units
+    try:
+        _item = as_float(item, label)
+        return _item / units
+    except (TypeError, ValueError):
+        _label = f" {label}" if label else ""
+        feedback(
+            f"Unable to set points value for{_label}: {item}."
+            " Please check that this is a valid value.",
+            stop=True,
+        )
+
+
 def get_pymupdf_props(
     defaults=None,
     index=None,  # extract from list of potential values (usually Card options)
@@ -1768,9 +1831,9 @@ def html_glyph(text: str, font_name: str, font_size: str = "") -> str:
     >>> html_glyph('E001!|', "Helvetica")
     'E001!|'
     >>> html_glyph('an |! E001 12 !| or', "Helvetica")
-    'an <span style="font-family: Helvetica"; font-size: 12px;>E001</span> or'
+    'an <span style="font-family: Helvetica; font-size: 12px;">E001</span> or'
     >>> html_glyph('an |! E001 12 #000 !| or', "Helvetica")
-    'an <span style="font-family: Helvetica"; font-size: 12px; color: #000;>E001</span> or'
+    'an <span style="font-family: Helvetica; font-size: 12px; color: #000;">E001</span> or'
 
     """
     glyphs = re.findall("\|\!(.*?)\!\|", text)

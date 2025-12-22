@@ -63,6 +63,7 @@ from .shapes_rectangle import RectangleShape
 from .objects import (
     CubeObject,
     D6Object,
+    DominoObject,
     PolyominoObject,
     PentominoObject,
     TetrominoObject,
@@ -71,6 +72,7 @@ from .objects import (
 from .layouts import (
     GridShape,
     DotGridShape,
+    HexHexShape,
     RectangularLocations,
     TriangularLocations,
     VirtualLocations,
@@ -108,7 +110,7 @@ from protograf.utils.docstrings import (
     docstring_onimo,
 )
 from protograf.utils.colrs import lighten, darken  # used in scripts
-from protograf.utils.fonts import builtin_font, FontInterface
+from protograf.utils.fonts import FontInterface
 from protograf.utils.geoms import equilateral_height  # used in scripts
 from protograf.utils.messaging import feedback
 from protograf.utils.support import (  # used in scripts
@@ -132,14 +134,14 @@ from protograf.utils.structures import (
     Ray,
     TemplatingType,
 )
-from protograf.utils.tools import (
+from protograf.utils.tools import (  # used in scripts
     base_fonts,
     _lower,
     split,
     save_globals,
     restore_globals,
     uniques,
-)  # used in scripts
+)
 from protograf import globals
 
 log = logging.getLogger(__name__)
@@ -166,7 +168,7 @@ class CardOutline(BaseShape):
     """
 
     def __init__(self, _object=None, canvas=None, **kwargs):
-        super(CardOutline, self).__init__(_object=_object, canvas=canvas, **kwargs)
+        super().__init__(_object=_object, canvas=canvas, **kwargs)
         self.kwargs = kwargs
         # feedback(f'\n$$$ CardShape KW=> {self.kwargs}')
         self.elements = []  # container for objects which get added to the card
@@ -239,7 +241,7 @@ class CardShape(BaseShape):
     """
 
     def __init__(self, _object=None, canvas=None, **kwargs):
-        super(CardShape, self).__init__(_object=_object, canvas=canvas, **kwargs)
+        super().__init__(_object=_object, canvas=canvas, **kwargs)
         self.kwargs = kwargs
         # feedback(f'\n$$$ CardShape KW=> {self.kwargs}')
         self.elements = []  # container for objects which get added to the card
@@ -1085,6 +1087,7 @@ class DeckOfCards:
                 top=prime_globals.margins.top - gutter / 2.0,
                 bottom=prime_globals.margins.bottom,
                 debug=prime_globals.margins.debug,
+                units=globals.units,
             )
             cnv = globals.doc_page.new_shape()  # pymupdf Shape
             globals.canvas = cnv
@@ -1393,6 +1396,7 @@ def Create(**kwargs):
         bottom=kwargs.get("margin_bottom", the_margin),
         right=kwargs.get("margin_right", the_margin),
         debug=kwargs.get("margin_debug", False),
+        units=globals.units,
     )
     # ---- cards
     _cards = kwargs.get("cards", 0)
@@ -1423,14 +1427,10 @@ def Create(**kwargs):
     # ---- command-line arguments
     parser = argparse.ArgumentParser()
     parser.add_argument(
-        "-d", "--directory", help="Specify output directory", default=""
+        "-b", "--bggapi", help="Specify token for access to BGG API", default=""
     )
-    # use: --no-png to skip PNG output during Save()
     parser.add_argument(
-        "--png",
-        help="Whether to create PNG during Save (default is True)",
-        default=True,
-        action=argparse.BooleanOptionalAction,
+        "-d", "--directory", help="Specify output directory", default=""
     )
     # use: --fonts to force Fonts recreation during Create()
     parser.add_argument(
@@ -1442,14 +1442,22 @@ def Create(**kwargs):
     )
     # use: --no-warning to ignore WARNING:: messages
     parser.add_argument(
-        "-nw",
+        "-w",
         "--nowarning",
         help="Do NOT show any WARNING:: messages (default is False)",
         default=False,
         action=argparse.BooleanOptionalAction,
     )
+    # use: --no-png to skip PNG output during Save()
     parser.add_argument(
-        "-p", "--pages", help="Specify which pages to process", default=""
+        "-p",
+        "--png",
+        help="Whether to create PNG during Save (default is True)",
+        default=True,
+        action=argparse.BooleanOptionalAction,
+    )
+    parser.add_argument(
+        "-g", "--pages", help="Specify which pages to process", default=""
     )
     parser.add_argument(
         "-t",
@@ -1550,6 +1558,7 @@ def Load(**kwargs):
         bottom=kwargs.get("margin_bottom", the_margin),
         right=kwargs.get("margin_right", the_margin),
         debug=kwargs.get("margin_debug", False),
+        units=globals.units,
     )
     # ---- defaults
     defaults = kwargs.get("defaults", None)
@@ -3860,6 +3869,22 @@ def Grid(**kwargs):
     return grid
 
 
+@docstring_loc
+def HexHex(**kwargs):
+    """Draw a hexhex-based layout on the canvas.
+
+    Kwargs:
+
+    <base>
+
+    """
+    kwargs = margins(**kwargs)
+    hhgrid = HexHexShape(canvas=globals.canvas, **kwargs)
+    # feedback(f' \\\ HexHex {kwargs=}')
+    hhgrid.draw()
+    return hhgrid
+
+
 def Blueprint(**kwargs):
     """Draw a grid extending between page margins.
 
@@ -4930,7 +4955,14 @@ def Track(track=None, **kwargs):
 # ---- bgg API ====
 
 
-def BGG(user: str = None, ids: list = None, progress=False, short=500, **kwargs):
+def BGG(
+    token: str = None,
+    user: str = None,
+    ids: list = None,
+    progress=False,
+    short=500,
+    **kwargs,
+):
     """Access BGG API for game data"""
     ckwargs = {}
     # ---- self filters
@@ -4960,13 +4992,17 @@ def BGG(user: str = None, ids: list = None, progress=False, short=500, **kwargs)
         ckwargs["has_parts"] = tools.as_bool(kwargs.get("has_parts"))
     if kwargs.get("want_parts") is not None:
         ckwargs["want_parts"] = tools.as_bool(kwargs.get("want_parts"))
-    gamelist = BGGGameList(user, **ckwargs)
+    if kwargs.get("requests") is not None:
+        ckwargs["requests"] = tools.as_int(kwargs.get("requests", 60), "requests")
+    gamelist = BGGGameList(token, user, **ckwargs)
     if user:
         ids = []
         if gamelist.collection:
             for item in gamelist.collection.items:
                 ids.append(item.id)
-                _game = BGGGame(game_id=item.id, user_game=item, user=user, short=short)
+                _game = BGGGame(
+                    token=token, game_id=item.id, user_game=item, user=user, short=short
+                )
                 gamelist.set_values(_game)
         if not ids:
             feedback(
@@ -4980,7 +5016,7 @@ def BGG(user: str = None, ids: list = None, progress=False, short=500, **kwargs)
         for game_id in ids:
             if progress:
                 feedback(f"Retrieving game '{game_id}' from BoardGameGeek...")
-            _game = BGGGame(game_id=game_id, short=short)
+            _game = BGGGame(token=token, game_id=game_id, short=short)
             gamelist.set_values(_game)
     else:
         feedback(
@@ -5053,6 +5089,37 @@ def d6(*args, **kwargs):
     kwargs = margins(**kwargs)
     _obj = args[0] if args else None
     return D6Object(_object=_obj, canvas=globals.canvas, **kwargs)
+
+
+@docstring_base
+def Domino(row=None, col=None, **kwargs):
+    """Draw a Domino shape with "pips" on the canvas.
+
+    Args:
+
+    - row (int): row in which the shape is drawn.
+    - col (int): column in which the shape is drawn.
+
+    Kwargs:
+
+    - random (bool):
+    - rolls (tuple): a pair of number (each 1 to 6) representing the number of pips
+    - pip_stroke (str):
+    - pip_fill (str):
+    - pip_fraction (float):
+    <base>
+
+    """
+    kwargs = margins(**kwargs)
+    domino = DominoObject(canvas=globals.canvas, **kwargs)
+    domino.draw()
+    return domino
+
+
+def domino(*args, **kwargs):
+    kwargs = margins(**kwargs)
+    _obj = args[0] if args else None
+    return DominoObject(_object=_obj, canvas=globals.canvas, **kwargs)
 
 
 @docstring_base

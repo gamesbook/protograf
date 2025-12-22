@@ -44,6 +44,15 @@ depiction of them can be useful.
 For more details, see the section on :doc:`Dice <dice>`.
 
 
+Dominoes
+========
+
+Dominoes, like cards, are used in a number of games, and being able to 
+readily create a basic depiction of them can be useful.
+
+For more details, see the section on :doc:`Dominoes <dominos>`.
+
+
 Polyominoes
 ===========
 

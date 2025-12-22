@@ -3,44 +3,30 @@
 Create custom shapes for protograf
 """
 # lib
-import codecs
-import copy
 import logging
 import math
-import os
-from pathlib import Path
-from urllib.parse import urlparse
 
 # third party
-import pymupdf
-from pymupdf import Point as muPoint, Rect as muRect
-import segno  # QRCode
+from pymupdf import Point as muPoint
 
 # local
 from protograf import globals
-from protograf.shapes_utils import set_cached_dir, draw_line
-from protograf.utils import colrs, geoms, tools, support, fonts
+from protograf.shapes_utils import draw_line
+from protograf.utils import colrs, geoms, tools
 from protograf.utils.tools import _lower
-from protograf.utils.constants import (
-    BGG_IMAGES,
-)
 from protograf.utils.messaging import feedback
 from protograf.utils.structures import (
-    BBox,
     DirectionGroup,
     HexGeometry,
     HexOrientation,
     Link,
     Perbis,
     Point,
-    PolyGeometry,
     Radius,
 )  # named tuples
-from protograf.utils.support import CACHE_DIRECTORY
 from protograf.base import (
     BaseShape,
     GridShape,
-    get_cache,
 )
 
 log = logging.getLogger(__name__)
@@ -55,11 +41,18 @@ class HexShape(BaseShape):
     """
 
     def __init__(self, _object=None, canvas=None, **kwargs):
-        super(HexShape, self).__init__(_object=_object, canvas=canvas, **kwargs)
+        super().__init__(_object=_object, canvas=canvas, **kwargs)
+        # ---- class vars
+        self.x_d = None
+        self.y_d = None
+        self.calculated_left = None
+        self.calculated_top = None
+        self.coord_text = None
+        self.grid = None
         # ---- check construction type
-        self.use_diameter = True if self.is_kwarg("diameter") else False
-        self.use_height = True if self.is_kwarg("height") else False
-        self.use_radius = True if self.is_kwarg("radius") else False
+        self.use_diameter = self.is_kwarg("diameter")
+        self.use_height = self.is_kwarg("height")
+        self.use_radius = self.is_kwarg("radius")
         self.use_side = False
         if "rotation" in self.kwargs:
             feedback("Rotation does not apply to Hexagons!", alert=True)
@@ -74,6 +67,7 @@ class HexShape(BaseShape):
         # ---- fallback / default
         if not self.use_diameter and not self.use_radius and not self.use_side:
             self.use_height = True
+            base = None
             if not self.height:
                 if self.radius:
                     base = self.radius
@@ -92,13 +86,14 @@ class HexShape(BaseShape):
 
     def get_orientation(self) -> HexOrientation:
         """Return HexOrientation for the Hexagon."""
+        orientation = None
         if _lower(self.orientation) in ["p", "pointy"]:
             orientation = HexOrientation.POINTY
         elif _lower(self.orientation) in ["f", "flat"]:
             orientation = HexOrientation.FLAT
         else:
             feedback(
-                'Invalid orientation "{self.orientation}" supplied for hexagon.', True
+                f'Invalid orientation "{self.orientation}" supplied for hexagon.', True
             )
         return orientation
 
@@ -108,6 +103,7 @@ class HexShape(BaseShape):
         Args:
             lines (str): either radii (default) or perbii
         """
+        direction = None
         if lines == "radii":
             if _lower(self.orientation) in ["p", "pointy"]:
                 direction = DirectionGroup.HEX_POINTY
@@ -115,7 +111,7 @@ class HexShape(BaseShape):
                 direction = DirectionGroup.HEX_FLAT
             else:
                 feedback(
-                    'Invalid orientation "{self.orientation}" supplied for hexagon radii.',
+                    f'Invalid orientation "{self.orientation}" supplied for hexagon radii.',
                     True,
                 )
         elif lines == "perbii":
@@ -125,19 +121,21 @@ class HexShape(BaseShape):
                 direction = DirectionGroup.HEX_FLAT_EDGE
             else:
                 feedback(
-                    'Invalid orientation "{self.orientation}" supplied for hexagon perbii.',
+                    f'Invalid orientation "{self.orientation}" supplied for hexagon perbii.',
                     True,
                 )
         else:
-            LINES = ["radii", "perbii"]
+            # LINES = ["radii", "perbii"]
             raise ValueError("get_direction `lines` must be one of: {LINES}")
         return direction
 
     def get_geometry(self):
         """Calculate geometric settings of a Hexagon."""
-        # feedback(f"*** hex geo {self.radius=} {self.height=} {self.diameter=} {self.side=} ")
-        # feedback(f"hexi {self.use_radius=} {self.use_height=} {self.use_diameter=} {self.use_side=} ")
+        # feedback(f"*** hex geom {self.radius=} {self.height=} {self.diameter=} {self.side=}")
+        # feedback(f"*** hex geom {self.use_radius=} {self.use_height=}")
+        # feedback(f"*** hex geom {self.use_diameter=} {self.use_side=} ")
         # ---- calculate half_flat & half_side
+        half_flat, side = None, None
         if self.height and self.use_height:
             side = self._u.height / math.sqrt(3)
             half_flat = self._u.height / 2.0
@@ -181,6 +179,7 @@ class HexShape(BaseShape):
             * Units are in points!
         """
         # ---- half_flat, side & half_side
+        half_flat, side = None, None
         if self.height and self.use_height:
             side = self._u.height / math.sqrt(3)
             half_flat = self._u.height / 2.0
@@ -211,6 +210,10 @@ class HexShape(BaseShape):
         elif self.ORIENTATION == HexOrientation.FLAT:
             self.height = 2 * half_flat / self.units
             self.width = 2 * radius / self.units
+        else:
+            feedback(
+                'Invalid orientation "{self.ORIENTATION}" supplied for hexagon.', True
+            )
         return radius, diameter, side, half_flat
 
     def calculate_caltrop_lines(
@@ -243,8 +246,8 @@ class HexShape(BaseShape):
             p1a = geoms.fraction_along_line(p1, p0, fraction)
             if not invert:
                 return ((p0, p0a), (p1, p1a))
-            else:
-                return (p0a, p1a)
+            return (p0a, p1a)
+        return None
 
     def set_coord(self, cnv, x_d, y_d, half_flat):
         """Set and draw the coords of the hexagon."""
@@ -322,10 +325,14 @@ class HexShape(BaseShape):
                 feedback(f'Cannot handle a coord_elevation of "{self.coord_elevation}"')
 
     def calculate_area(self):
+        """Calculate Hexagon area."""
+        side = None
         if self.side:
             side = self._u.side
         elif self.height:
             side = self._u.height / math.sqrt(3)
+        else:
+            raise ValueError("No side or height avaiable to calculate hexagon area!")
         return (3.0 * math.sqrt(3.0) * side * side) / 2.0
 
     def draw_hatches(
@@ -357,13 +364,18 @@ class HexShape(BaseShape):
                     self.make_path_vertices(cnv, vertices, 0, 3)
                 if "n" in _dirs or "s" in _dirs:  # vertical
                     self.make_path_vertices(cnv, vertices, 2, 5)
-            if self.orientation in ["f", "flat"]:
+            elif self.orientation in ["f", "flat"]:
                 if "ne" in _dirs or "sw" in _dirs:  # slope UP to the right
                     self.make_path_vertices(cnv, vertices, 1, 4)
                 if "se" in _dirs or "nw" in _dirs:  # slope down to the right
                     self.make_path_vertices(cnv, vertices, 2, 5)
                 if "e" in _dirs or "w" in _dirs:  # horizontal
                     self.make_path_vertices(cnv, vertices, 0, 3)
+            else:
+                feedback(
+                    'Invalid orientation "{self.orientation}" supplied for hexagon.',
+                    True,
+                )
         if num >= 3:
             _lines = lines - 1
             self.ORIENTATION = self.get_orientation()
@@ -411,6 +423,11 @@ class HexShape(BaseShape):
                     self.draw_lines_between_sides(
                         cnv, side, _lines, vertices, (0, 5), (3, 4)
                     )
+            else:
+                feedback(
+                    'Invalid orientation "{self.ORIENTATION}" supplied for hexagon.',
+                    True,
+                )
         # ---- set canvas
         self.set_canvas_props(
             index=ID,
@@ -432,8 +449,7 @@ class HexShape(BaseShape):
         self.set_canvas_props(
             index=ID,
             stroke=self.link_stroke,
-            stroke_width=self.link_width,
-            stroke_ends=self.link_ends,
+            stroke_width=self.link_stroke_width,
         )
         _links = links.split(",")
         for _link in _links:
@@ -545,6 +561,7 @@ class HexShape(BaseShape):
         hex_geom = self.get_geometry()
         side_plus = hex_geom.side * 1.5
         h_flat = hex_geom.half_flat
+        pt_a, pt_b, pt_c, pt_d, pt_e, pt_f = None, None, None, None, None, None
         self.ORIENTATION = self.get_orientation()
         if self.ORIENTATION == HexOrientation.POINTY:
             #          .
@@ -552,23 +569,27 @@ class HexShape(BaseShape):
             #   E|  |B
             #   D\ /C
             #
-            ptA = Point(centre.x + h_flat, centre.y - side_plus)
-            ptB = Point(centre.x + 2 * h_flat, centre.y)
-            ptC = Point(centre.x + h_flat, centre.y + side_plus)
-            ptD = Point(centre.x - h_flat, centre.y + side_plus)
-            ptE = Point(centre.x - 2 * h_flat, centre.y)
-            ptF = Point(centre.x - h_flat, centre.y - side_plus)
+            pt_a = Point(centre.x + h_flat, centre.y - side_plus)
+            pt_b = Point(centre.x + 2 * h_flat, centre.y)
+            pt_c = Point(centre.x + h_flat, centre.y + side_plus)
+            pt_d = Point(centre.x - h_flat, centre.y + side_plus)
+            pt_e = Point(centre.x - 2 * h_flat, centre.y)
+            pt_f = Point(centre.x - h_flat, centre.y - side_plus)
         elif self.ORIENTATION == HexOrientation.FLAT:
             #     _A_
             #  .F/  \B
             #   E\__/C
             #     D
-            ptA = Point(centre.x, centre.y - hex_geom.height_flat)
-            ptB = Point(centre.x + side_plus, centre.y - h_flat)
-            ptC = Point(centre.x + side_plus, centre.y + h_flat)
-            ptD = Point(centre.x, centre.y + hex_geom.height_flat)
-            ptE = Point(centre.x - side_plus, centre.y + h_flat)
-            ptF = Point(centre.x - side_plus, centre.y - h_flat)
+            pt_a = Point(centre.x, centre.y - hex_geom.height_flat)
+            pt_b = Point(centre.x + side_plus, centre.y - h_flat)
+            pt_c = Point(centre.x + side_plus, centre.y + h_flat)
+            pt_d = Point(centre.x, centre.y + hex_geom.height_flat)
+            pt_e = Point(centre.x - side_plus, centre.y + h_flat)
+            pt_f = Point(centre.x - side_plus, centre.y - h_flat)
+        else:
+            feedback(
+                'Invalid orientation "{self.ORIENTATION}" supplied for hexagon.', True
+            )
 
         # ---- calculate centres of sides
         perbii_dict = self.calculate_perbii(cnv=cnv, centre=centre, vertices=vertices)
@@ -577,7 +598,7 @@ class HexShape(BaseShape):
             dir_pair = tools.validated_directions(item, dir_group, "hexagon paths")
             if len(dir_pair) != 2:
                 feedback(
-                    f"A Hexagon's paths must be in the form of a list of direction pairs!",
+                    "A Hexagon's paths must be in the form of a list of direction pairs!",
                     True,
                 )
             # ---- set line styles
@@ -602,17 +623,17 @@ class HexShape(BaseShape):
                         arc(vertices[5], perbii_dict["nw"].point, 120.0)  # p5
                     # 60 degrees / long arc
                     case ["n", "se"] | ["se", "n"]:
-                        arc(ptB, perbii_dict["n"].point, 60.0)  # p5
+                        arc(pt_b, perbii_dict["n"].point, 60.0)  # p5
                     case ["ne", "s"] | ["s", "ne"]:
-                        arc(ptC, perbii_dict["ne"].point, 60.0)  # p4
+                        arc(pt_c, perbii_dict["ne"].point, 60.0)  # p4
                     case ["se", "sw"] | ["sw", "se"]:
-                        arc(ptD, perbii_dict["se"].point, 60.0)  # p3
+                        arc(pt_d, perbii_dict["se"].point, 60.0)  # p3
                     case ["s", "nw"] | ["nw", "s"]:
-                        arc(ptE, perbii_dict["s"].point, 60.0)  # p2
+                        arc(pt_e, perbii_dict["s"].point, 60.0)  # p2
                     case ["sw", "n"] | ["n", "sw"]:
-                        arc(ptF, perbii_dict["sw"].point, 60.0)  # p1
+                        arc(pt_f, perbii_dict["sw"].point, 60.0)  # p1
                     case ["nw", "ne"] | ["ne", "nw"]:
-                        arc(ptA, perbii_dict["nw"].point, 60.0)  # p0
+                        arc(pt_a, perbii_dict["nw"].point, 60.0)  # p0
                     # 90 degrees
                     case ["nw", "se"] | ["se", "nw"]:
                         klargs = draw_line(
@@ -638,7 +659,7 @@ class HexShape(BaseShape):
                             shape=self,
                             **lkwargs,
                         )
-            if self.ORIENTATION == HexOrientation.POINTY:
+            elif self.ORIENTATION == HexOrientation.POINTY:
                 match dir_pair:
                     # 120 degrees / short arc
                     case ["e", "ne"] | ["ne", "e"]:
@@ -655,17 +676,17 @@ class HexShape(BaseShape):
                         arc(vertices[5], perbii_dict["nw"].point, 120.0)  # p0
                     # 60 degrees / long arc
                     case ["ne", "se"] | ["se", "ne"]:
-                        arc(ptB, perbii_dict["ne"].point, 60.0)  # p5
+                        arc(pt_b, perbii_dict["ne"].point, 60.0)  # p5
                     case ["e", "sw"] | ["sw", "e"]:
-                        arc(ptC, perbii_dict["e"].point, 60.0)  # p4
+                        arc(pt_c, perbii_dict["e"].point, 60.0)  # p4
                     case ["w", "se"] | ["se", "w"]:
-                        arc(ptD, perbii_dict["se"].point, 60.0)  # p3
+                        arc(pt_d, perbii_dict["se"].point, 60.0)  # p3
                     case ["nw", "sw"] | ["sw", "nw"]:
-                        arc(ptE, perbii_dict["sw"].point, 60.0)  # p2
+                        arc(pt_e, perbii_dict["sw"].point, 60.0)  # p2
                     case ["ne", "w"] | ["w", "ne"]:
-                        arc(ptF, perbii_dict["w"].point, 60.0)  # p1
+                        arc(pt_f, perbii_dict["w"].point, 60.0)  # p1
                     case ["e", "nw"] | ["nw", "e"]:
-                        arc(ptA, perbii_dict["nw"].point, 60.0)  # p0
+                        arc(pt_a, perbii_dict["nw"].point, 60.0)  # p0
                     # 90 degrees
                     case ["ne", "sw"] | ["sw", "ne"]:
                         klargs = draw_line(
@@ -691,6 +712,12 @@ class HexShape(BaseShape):
                             shape=self,
                             **lkwargs,
                         )
+
+            else:
+                feedback(
+                    'Invalid orientation "{self.ORIENTATION}" supplied for hexagon.',
+                    True,
+                )
         # ---- set color, thickness etc.
         self.set_canvas_props(
             index=ID,
@@ -716,10 +743,15 @@ class HexShape(BaseShape):
         Returns:
             dict of Perbis objects keyed on direction
         """
+        directions = []
         if self.ORIENTATION == HexOrientation.POINTY:
             directions = ["nw", "w", "sw", "se", "e", "ne"]
-        if self.ORIENTATION == HexOrientation.FLAT:
+        elif self.ORIENTATION == HexOrientation.FLAT:
             directions = ["nw", "sw", "s", "se", "ne", "n"]
+        else:
+            feedback(
+                'Invalid orientation "{self.ORIENTATION}" supplied for hexagon.', True
+            )
         perbii_dict = {}
         vcount = len(vertices) - 1
         _perbii_pts = []
@@ -761,10 +793,15 @@ class HexShape(BaseShape):
         Returns:
             dict of Radius objects keyed on direction
         """
+        directions = []
         if self.ORIENTATION == HexOrientation.POINTY:
             directions = ["nw", "sw", "s", "se", "ne", "n"]
-        if self.ORIENTATION == HexOrientation.FLAT:
+        elif self.ORIENTATION == HexOrientation.FLAT:
             directions = ["w", "sw", "se", "e", "ne", "nw"]
+        else:
+            feedback(
+                'Invalid orientation "{self.ORIENTATION}" supplied for hexagon.', True
+            )
         radii_dict = {}
         # print(f"*** HEX radii {self.ORIENTATION=} {centre=} {vertices=}")
         for key, vertex in enumerate(vertices):
@@ -799,6 +836,7 @@ class HexShape(BaseShape):
         """
         perbii_dict = self.calculate_perbii(cnv=cnv, centre=centre, vertices=vertices)
         pb_offset = self.unit(self.perbii_offset, label="perbii offset") or 0
+        perbii_dirs = []
         pb_length = (
             self.unit(self.perbii_length, label="perbii length")
             if self.perbii_length
@@ -1150,10 +1188,13 @@ class HexShape(BaseShape):
                 # cx,cy are centre; create x_d, y_d as the unit-formatted hex centre
                 self.x_d = self._u.cx + self._o.delta_x
                 self.y_d = self._u.cy + self._o.delta_y
+                # feedback(f"*** draw P^Hex {self.cx=} {self.cy=} {self.x_d=} {self._y_d=}")
                 # recalculate start x,y
                 x = self.x_d - geo.half_flat
                 y = self.y_d - geo.half_side - geo.side / 2.0
-            # feedback(f"*** P^: {x=} {y=}{self.x_d=} {self.y_d=} {geo=} ")
+            else:
+                pass
+                # feedback(f"*** draw P^Hex: {x=} {y=}{self.x_d=} {self.y_d=} {geo=}")
 
         # ---- FLAT~
         elif self.ORIENTATION == HexOrientation.FLAT:
@@ -1222,10 +1263,18 @@ class HexShape(BaseShape):
                 # cx,cy are centre; create x_d, y_d as the unit-formatted hex centre
                 self.x_d = self._u.cx + self._o.delta_x
                 self.y_d = self._u.cy + self._o.delta_y
+                # feedback(f"*** draw F~Hex {self.cx=} {self.cy=} {self.x_d=} {self.y_d=}")
                 # recalculate start x,y
                 x = self.x_d - geo.half_side - geo.side / 2.0
                 y = self.y_d - geo.half_flat
-            # feedback(f"*** F~: {x=} {y=} {self.x_d=} {self.y_d=} {geo=}")
+            else:
+                pass
+                # feedback(f"*** draw F~Hex: {x=} {y=} {self.x_d=} {self.y_d=} {geo=}")
+
+        else:
+            feedback(
+                'Invalid orientation "{self.ORIENTATION}" supplied for hexagon.', True
+            )
 
         # ---- VERTICES:
         # ---- ^ pointy hexagon vertices (clockwise)
@@ -1257,6 +1306,10 @@ class HexShape(BaseShape):
                 muPoint(x + geo.z_fraction + geo.side, y),
                 muPoint(x + geo.z_fraction, y),
             ]
+        else:
+            feedback(
+                'Invalid orientation "{self.ORIENTATION}" supplied for hexagon.', True
+            )
         return self.vertexes
 
     def draw(self, cnv=None, off_x=0, off_y=0, ID=None, **kwargs):
@@ -1452,7 +1505,7 @@ class HexShape(BaseShape):
                         0,  # "rotation" - but HexShape cannot be rotated
                         self.perbii_shapes_rotated,
                     )
-            if item == "centre_shape" or item == "center_shape":
+            if item in ["centre_shape", "center_shape"]:
                 # ---- * centred shape (with offset)
                 if self.centre_shape:
                     if self.can_draw_centred_shape(self.centre_shape):
@@ -1460,7 +1513,7 @@ class HexShape(BaseShape):
                             _abs_cx=self.x_d + self.unit(self.centre_shape_mx),
                             _abs_cy=self.y_d + self.unit(self.centre_shape_my),
                         )
-            if item == "centre_shapes" or item == "center_shapes":
+            if item == ["centre_shapes", "center_shapes"]:
                 # ---- * centred shapes (with offsets)
                 if self.centre_shapes:
                     self.draw_centred_shapes(self.centre_shapes, self.x_d, self.y_d)
@@ -1484,6 +1537,7 @@ class HexShape(BaseShape):
             if item == "text":
                 # ---- * text
                 self.draw_heading(cnv, ID, self.x_d, self.y_d - offset, **kwargs)
+                # feedback(f' @@@ Hexg.label {kwargs=}')
                 self.draw_label(cnv, ID, self.x_d, self.y_d, **kwargs)
                 self.draw_title(cnv, ID, self.x_d, self.y_d + offset, **kwargs)
             if item == "numbering":
