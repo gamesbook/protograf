@@ -1,9 +1,10 @@
 protograf Changes
 =================
 
-2026-00-00 (0.3.6)
+2026-00-00 (0.4.0)
 ------------------
 - Add shortcut letters for key colors
+- Increase Python requirement to 3.11
 
 2025-12-22 (0.3.6)
 ------------------
