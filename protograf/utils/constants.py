@@ -22,6 +22,29 @@ DEFAULT_DPI = 300
 DEFAULT_FONT = "Helvetica"
 DEFAULT_MARGIN_SIZE = 18  # pt (1/4")
 
+COLOR_SINGLES = {
+    "b": "#0000FF",
+    "c": "#00FFFF",
+    "d": "#293BC7",
+    "e": "#F3B54A",
+    "f": "#007700",
+    "g": "#32CD32",
+    "h": "#D2691E",
+    "i": "#E6506E",
+    "k": "#000000",
+    "l": "#00BFFF",
+    "m": "#BF00BF",
+    "n": "#FFA500",
+    "o": "#FFFFFF",
+    "p": "#EE82EE",
+    "r": "#FF0000",
+    "s": "#C0C0C0",
+    "u": "#4C271B",
+    "w": "#FFFFFF",
+    "y": "#FFFF00",
+    "x": "#000000",
+}
+
 GRID_SHAPES_WITH_CENTRE = [
     "CircleShape",
     "CompassShape",

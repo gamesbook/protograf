@@ -9,12 +9,12 @@ from colorsys import rgb_to_hls, hls_to_rgb
 from pymupdf.utils import getColor
 
 # local
-from protograf.utils.constants import COLOR_NAMES
+from protograf.utils.constants import COLOR_SINGLES, COLOR_NAMES
 from protograf.utils.messaging import feedback
 
 
-def get_color(name: str = None, is_rgb: bool = True) -> tuple:
-    """Get a color tuple; by name from a pre-defined dictionary or as a RGB tuple."""
+def get_color(name: str = None) -> tuple:
+    """Get a color tuple; by name/char from pre-defined dictionary or as RGB tuple."""
     if name is None:
         return None  # it IS valid to say that NO color has been set
     if isinstance(name, tuple) and len(name) == 3:  # RGB color tuple
@@ -24,8 +24,15 @@ def get_color(name: str = None, is_rgb: bool = True) -> tuple:
             and (name[2] >= 0 and name[0] <= 255)
         ):
             return name
+        feedback(f'The color tuple "{name}" is invalid!')
+    elif isinstance(name, str) and len(name) == 1:  # predefined hexadecimal
+        _hdcolor = COLOR_SINGLES.get(name, None)
+        if not _hdcolor:
+            feedback(f'The color abbreviation "{name}" does not exist!', True)
         else:
-            feedback(f'The color tuple "{name}" is invalid!')
+            _rgb = tuple(int(_hdcolor[i : i + 2], 16) for i in (1, 3, 5))
+            rgb = tuple(i / 255 for i in _rgb)
+            return rgb
     elif isinstance(name, str) and len(name) == 7 and name[0] == "#":  # hexadecimal
         _rgb = tuple(int(name[i : i + 2], 16) for i in (1, 3, 5))
         rgb = tuple(i / 255 for i in _rgb)
@@ -39,18 +46,22 @@ def get_color(name: str = None, is_rgb: bool = True) -> tuple:
         return color
     except (AttributeError, ValueError):
         feedback(f'The color name "{name}" cannot be converted to RGB!', True)
+    return None
 
 
 def get_opacity(transparency: float = 0) -> float:
     """Convert from '100% is fully transparent' to '0 is not opaque'."""
+    opacity = 1.0
     if transparency is None:
-        return 1.0
+        return opacity
     try:
-        return float(1.0 - transparency / 100.0)
+        opacity = float(1.0 - transparency / 100.0)
+        return opacity
     except (ValueError, TypeError):
         feedback(
             f'The transparency of "{transparency}" is not valid (use 0 to 100)', True
         )
+    return opacity
 
 
 def color_to_hex(name):
@@ -94,8 +105,7 @@ def adjust_color_brightness(red, grn, blu, factor, as_hex=True):
     _r, _g, _b = int(red * 255), int(grn * 255), int(blu * 255)
     if as_hex:
         return "#%02x%02x%02x" % (_r, _g, _b)
-    else:
-        return _r, _g, _b
+    return _r, _g, _b
 
 
 def lighten_color(red, grn, blu, factor=0.1, as_hex=True):
@@ -175,17 +185,20 @@ def lighten(hex_color, factor=0.2, as_hex=True):
 
         Factor set to 0.2 for use in Cube shades
     """
+    lightened = None
     if not hex_color:
-        return None
+        return lightened
     if hex_color[0] != "#":
         feedback(f'"{hex_color}" is not a valid hexadecimal color', True)
     try:
         red, grn, blu = tuple(int(hex_color[i : i + 2], 16) for i in (1, 3, 5))
-        return lighten_color(red, grn, blu, factor, as_hex)
+        lightened = lighten_color(red, grn, blu, factor, as_hex)
+        return lightened
     except (ValueError, TypeError):
         feedback(
             f'Unable to lighten "{hex_color}"; please check it is a valid color', True
         )
+    return lightened
 
 
 def darken(hex_color, factor=0.2, as_hex=True):
@@ -201,17 +214,20 @@ def darken(hex_color, factor=0.2, as_hex=True):
 
         Factor set to 0.2 for use in Cube shades
     """
+    darker = None
     if not hex_color:
-        return None
+        return darker
     if hex_color[0] != "#":
         feedback(f'"{hex_color}" is not a valid hexadecimal color', True)
     try:
         red, grn, blu = tuple(int(hex_color[i : i + 2], 16) for i in (1, 3, 5))
-        return darken_color(red, grn, blu, factor, as_hex)
+        darker = darken_color(red, grn, blu, factor, as_hex)
+        return darker
     except (ValueError, TypeError):
         feedback(
             f'Unable to darken "{hex_color}"; please check it is a valid color', True
         )
+    return darker
 
 
 if __name__ == "__main__":

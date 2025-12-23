@@ -262,6 +262,36 @@ The :ref:`default <default-concept>` **colors** in **protograf**  are
    section https://www.w3.org/TR/css-color-3/#svg-color (this list can
    also be found at https://en.wikipedia.org/wiki/X11_color_names)
 
+Quick Colors
+------------
+`↑ <table-of-contents-basic_>`_
+
+A list of "one-letter" colors is also available (based off of a popular
+Python library called *matplotlib*); their hexadecimal codes are also
+shown here for reference:
+
+- ``b`` is blue ("#0000FF")
+- ``c`` is cyan ("#00FFFF")
+- ``d`` is dark blue ("#293BC7")
+- ``e`` is earth/natural ("#F3B54A")
+- ``f`` is forest green ("#007700")
+- ``g`` is green/malachite ("#32CD32")
+- ``h`` is brown/cinnamon ("#D2691E")
+- ``i`` is pink ("#E6506E")
+- ``k`` is black ("#000000")
+- ``l`` is picton blue ("#00BFFF")
+- ``m`` is magenta/violet ("#BF00BF")
+- ``n`` is orange ("#FFA500")
+- ``o`` is white ("#FFFFFF")
+- ``p`` is purple/lavender ("#EE82EE")
+- ``r`` is red ("#FF0000")
+- ``s`` is silver/gray ("#C0C0C0")
+- ``u`` is dark/derby brown ("#4C271B")
+- ``w`` is white ("#FFFFFF")
+- ``y`` is yellow ("#FFFF00")
+- ``x`` is black ("#000000")
+
+
 .. _basic-units:
 
 Working with units
