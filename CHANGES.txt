@@ -3,7 +3,7 @@ protograf Changes
 
 2026-00-00 (0.3.6)
 ------------------
--
+- Add shortcut letters for key colors
 
 2025-12-22 (0.3.6)
 ------------------

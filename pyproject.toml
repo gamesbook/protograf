@@ -10,7 +10,7 @@ maintainers = [
 ]
 license = "GPL-3.0-or-later"
 readme = "README.md"
-requires-python = ">=3.9,<4"
+requires-python = ">=3.11,<4"
 dependencies = [
     "xlrd (>=0.9.4)",
     "bgg-api (>=1.1.14,<2.0.0)",
@@ -21,7 +21,7 @@ dependencies = [
     "segno (>=1.6.1)",
     "sphinx-copybutton (>=0.5.2,<0.6.0)",
     "black (>=25.1.0,<26.0.0)",
-    "fonttools (>=4.58.4,<5.0.0)",
+    "fonttools (>=4.61.1,<5.0.0)",
     "findsystemfontsfilename (>=0.3.2,<0.4.0)",
     "rich (>=14.0.0,<15.0.0)",
     "openpyxl (>=3.1.5,<4.0.0)",
