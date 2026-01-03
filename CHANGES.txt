@@ -5,6 +5,7 @@ protograf Changes
 ------------------
 - Add shortcut letters for key colors
 - Increase Python requirement to 3.11
+- Add `wand` library (for image processing)
 
 2025-12-22 (0.3.6)
 ------------------
