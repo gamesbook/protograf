@@ -128,10 +128,17 @@ def extract_section(
 
 def process_image(config=None):
     """Process an image according to configuration settings."""
-    fname = config.file["name"]
+    try:
+        fname = config.file["name"]
+        base_dir = config.file["output"]
+    except (AttributeError, KeyError) as err:
+        failure(
+            'Unable to create the configuration file.'
+            f" - please check its sections and try again (Error: {err})."
+        )
     if not os.path.exists(fname):
         failure(f"Cannot locate image file: {fname}")
-    base_dir = config.file["output"]
+
     if not os.path.exists(base_dir):
         try:
             os.makedirs(base_dir)
@@ -222,6 +229,10 @@ def load_config(filename: str = "config.ini"):
         "alias": "1",
     }
     config = configparser.ConfigParser(defaults=default_settings)
+    if not os.path.exists(filename):
+        failure(
+            f'Unable to find configuation file "{filename}"'
+        )
     config.read(filename)
     allconfig = namedtuple("allconfig", config.keys())
     all_items = dict(config.items())
@@ -230,10 +241,20 @@ def load_config(filename: str = "config.ini"):
     return all_config
 
 
+def validate_config(config) -> bool:
+    """Check main sections of config."""
+    for section in ['file', 'counter', 'group']:
+        if not hasattr(config, section):
+            failure(
+                f'Please add a "[{section}]" section to the configuration file.'
+            )
+
+
 def main():
     """Script Entry - primary loop."""
-    config = load_config("sample.ini")
-    process_image(config)
+    config = load_config()
+    if  validate_config(config):
+        process_image(config)
 
 
 if __name__ == "__main__":

@@ -89,6 +89,12 @@ useful information but do build on each other.
 
 .. toctree::
    :maxdepth: 2
+   :caption: Scripts:
+
+   scripts/overview
+
+.. toctree::
+   :maxdepth: 2
    :caption: References:
 
    commands
