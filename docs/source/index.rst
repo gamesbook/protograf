@@ -92,6 +92,7 @@ useful information but do build on each other.
    :caption: Scripts:
 
    scripts/overview
+   scripts/counter_extraction
 
 .. toctree::
    :maxdepth: 2

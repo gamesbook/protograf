@@ -1,10 +1,9 @@
 # -*- coding: utf-8 -*-
 """
-protograf script: extract rectangular counters as invididual images
+protograf script: extract rectangular counters as individual images
 """
 # lib
 import configparser
-from collections import namedtuple
 import os
 import sys
 
@@ -13,30 +12,35 @@ from wand.image import Image
 from wand.drawing import Drawing
 from wand.color import Color
 
+# local
+from .utils import failure, as_int, DynamicConfigIni
 
-def failure(message: str):
-    """End the program with a message."""
-    print(message)
-    sys.exit(0)  # Exit with status code 0 (success)
+DEFAULT_CONFIG = """
+[file]
+name=counters.jpg
+output=/tmp/
 
+[counter]
+width=100
+height=100
+top=10
+left=10
+gap_x=0
+gap_y=0
+prefix=counter
 
-def as_int(value, label: str = None) -> int:
-    """Convert a value to an int
+[group]
+sets=1x1
+cols=8
+rows=1
+gap_col=0
+gap_row=0
 
-    Args:
-
-    - value (Any): the value to be converted to a float
-    - label (str): assigned as part of the error message to ID the type of value
-    """
-    _label = f"{label} value " if label else "value "
-    if value is None:
-        failure(f'The {_label}"{value}" is not a valid integer!')
-    try:
-        the_value = int(value)
-        return the_value
-    except (ValueError, Exception):
-        failure(f'The {_label}"{value}" is not a valid integer!')
-    return None
+[frame]
+thickness=2
+color=black
+alias=1
+"""
 
 
 def draw_outline(config, filename: str, rounded: bool = True, aliased: bool = True):
@@ -49,11 +53,12 @@ def draw_outline(config, filename: str, rounded: bool = True, aliased: bool = Tr
     - rounded (bool): if True, outline is rounded
     - aliased (bool): if True, outline is antialiased
     """
-    width = as_int(config.counter["width"], "counter width")
-    height = as_int(config.counter["height"], "counter height")
-    border = as_int(config.frame["thickness"], "frame thickness")
+    # print(f'draw_outline: {filename=} {rounded=} {aliased=}')
+    width = as_int(config.counter.width, "counter width")
+    height = as_int(config.counter.height, "counter height")
+    border = as_int(config.frame.thickness, "frame thickness")
     # https://imagemagick.org/script/color.php#color_names
-    border_color = config.frame["color"]  # 'black'
+    border_color = config.frame.color  # 'black'
     new_width = width + border * 2
     new_height = height + border * 2
 
@@ -112,8 +117,8 @@ def extract_section(
     - aliased (bool): if True, outline is antialiased
     """
     # ---- region to extract : top-left corner at (top, left) with width & height
-    width = as_int(config.counter["width"], "counter width")
-    height = as_int(config.counter["height"], "counter height")
+    width = as_int(config.counter.width, "counter width")
+    height = as_int(config.counter.height, "counter height")
     # ---- clone() and crop() create the extracted image
     btm = top + height
     # print(f"size: {img.size} extract: {top=} {btm=}")
@@ -123,17 +128,17 @@ def extract_section(
             extracted_region.save(filename=extract_filename)
             # print(f'Extracted region size: {extracted_region.size}')
             if outlined:
-                draw_outline(config, extract_filename, aliased)
+                draw_outline(config, filename=extract_filename, aliased=aliased)
 
 
 def process_image(config=None):
     """Process an image according to configuration settings."""
     try:
-        fname = config.file["name"]
-        base_dir = config.file["output"]
+        fname = config.file.name
+        base_dir = config.file.output
     except (AttributeError, KeyError) as err:
         failure(
-            'Unable to create the configuration file.'
+            "Unable to create the configuration file."
             f" - please check its sections and try again (Error: {err})."
         )
     if not os.path.exists(fname):
@@ -149,28 +154,28 @@ def process_image(config=None):
             )
 
     # ---- counter settings
-    prefix = config.counter["prefix"].strip('"')
-    top = as_int(config.counter["top"], "top-most y position")
-    left = as_int(config.counter["left"], "left-most x position")
-    gap_x = as_int(config.counter["gap_x"], "gap_x")
-    gap_y = as_int(config.counter["gap_y"], "gap_y")
-    height = as_int(config.counter["height"], "height")
-    width = as_int(config.counter["width"], "width")
+    prefix = config.counter.prefix.strip('"')
+    top = as_int(config.counter.top, "top-most y position")
+    left = as_int(config.counter.left, "left-most x position")
+    gap_x = as_int(config.counter.gap_x, "gap_x")
+    gap_y = as_int(config.counter.gap_y, "gap_y")
+    height = as_int(config.counter.height, "height")
+    width = as_int(config.counter.width, "width")
     # ---- group settings
-    rows = as_int(config.group["rows"], "rows")
-    cols = as_int(config.group["cols"], "cols")
-    gap_row = as_int(config.group["gap_row"], "gap_row")
-    gap_col = as_int(config.group["gap_col"], "gap_col")
-    _sets = config.group["sets"]
+    rows = as_int(config.group.rows, "rows")
+    cols = as_int(config.group.cols, "cols")
+    gap_row = as_int(config.group.gap_row, "gap_row")
+    gap_col = as_int(config.group.gap_col, "gap_col")
+    _sets = config.group.sets
     # ---- frame settings
-    border = as_int(config.frame["thickness"], "frame thickness")
+    border = as_int(config.frame.thickness, "frame thickness")
     if border % 2 != 0:
         failure(
             f"Frame thickness must be an even number e.g. 2, 4 or 6 - not {border}."
         )
-    outlined = True if border else False
-    alias = as_int(config.group["alias"], "alias")
-    aliased = True if alias else False
+    outlined = bool(border > 0)
+    alias = as_int(config.frame.alias, "alias")
+    aliased = bool(alias > 0)
 
     if "x" not in _sets:
         failure('Set must contain a "NxM" setting - please check and try again.')
@@ -209,52 +214,31 @@ def process_image(config=None):
 
 def load_config(filename: str = "config.ini"):
     """Load configuration settings from an .ini file"""
-    # ---- default values in a dictionary
-    default_settings = {
-        "name": "counters.png",
-        "prefix": "counter",
-        "width": "100",
-        "height": "100",
-        "top": "0",
-        "left": "0",
-        "gap_x": "0",
-        "gap_y": "0",
-        "cols": "1",
-        "rows": "1",
-        "gap_col": "0",
-        "gap_row": "0",
-        "sets": "1x1",
-        "thickness": "0",
-        "color": "black",
-        "alias": "1",
-    }
-    config = configparser.ConfigParser(defaults=default_settings)
-    if not os.path.exists(filename):
-        failure(
-            f'Unable to find configuation file "{filename}"'
-        )
-    config.read(filename)
-    allconfig = namedtuple("allconfig", config.keys())
-    all_items = dict(config.items())
-    all_config = allconfig(**all_items)
-    # print(f"{all_config}")
+    defaults = configparser.ConfigParser()
+    defaults.read_string(DEFAULT_CONFIG)
+    parser = configparser.ConfigParser()
+    try:
+        with open(filename, "r") as _file:
+            parser.read_file(_file)
+    except FileNotFoundError:
+        failure(f'Cannot find or load configuration file "{filename}"')
+    except configparser.MissingSectionHeaderError as err:
+        failure(f'Cannot process configuration file "{filename}" ({err}')
+    all_config = DynamicConfigIni(parser, defaults)
     return all_config
-
-
-def validate_config(config) -> bool:
-    """Check main sections of config."""
-    for section in ['file', 'counter', 'group']:
-        if not hasattr(config, section):
-            failure(
-                f'Please add a "[{section}]" section to the configuration file.'
-            )
 
 
 def main():
     """Script Entry - primary loop."""
-    config = load_config()
-    if  validate_config(config):
-        process_image(config)
+    if len(sys.argv) > 1:  # at least one argument provided
+        filename = sys.argv[1]
+    else:
+        filename = "config.ini"
+        print(f'No configuration (.ini) filename provided; using: "{filename}')
+    if not os.path.exists(filename):
+        failure(f'Unable to find configuration file "{filename}"')
+    config = load_config(filename)
+    process_image(config)
 
 
 if __name__ == "__main__":
