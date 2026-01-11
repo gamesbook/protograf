@@ -1,6 +1,10 @@
 protograf Changes
 =================
 
+2026-00-00 (0.4.1)
+------------------
+-
+
 2026-01-11 (0.4.0)
 ------------------
 - Add shortcut letters for key colors
