@@ -89,6 +89,13 @@ useful information but do build on each other.
 
 .. toctree::
    :maxdepth: 2
+   :caption: Scripts:
+
+   scripts/overview
+   scripts/counter_extraction
+
+.. toctree::
+   :maxdepth: 2
    :caption: References:
 
    commands

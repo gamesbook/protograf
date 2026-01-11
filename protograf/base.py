@@ -30,8 +30,8 @@ from pymupdf import (
     Point as muPoint,
     Page as muPage,
     Rect as muRect,
+    Shape as muShape,
 )
-from pymupdf.utils import Shape as muShape
 from pymupdf import (
     TEXT_ALIGN_CENTER,
     TEXT_ALIGN_RIGHT,

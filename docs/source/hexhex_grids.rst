@@ -76,7 +76,7 @@ A HexHex grid has the following key properties:
 
 Grid points |dash| or intersections |dash| are defined as the centre points
 of "virtual" hexagons; these can be defined in the same way as a normal
- :ref:`Hexagon <hexIndex>` i.e. by:
+:ref:`Hexagon <hexIndex>` i.e. by:
 
 - *height* - sets the distance from flat-edge to flat-edge
 - *radius* - sets the distance from centre to a vertex

@@ -1,6 +1,15 @@
 protograf Changes
 =================
 
+2026-01-11 (0.4.0)
+------------------
+- Add shortcut letters for key colors
+- Increase Python requirement to 3.11
+- Update pyMuPDF to 1.26.7 (import changes!)
+- Update various library dependencies
+- Add `wand` library (for image processing)
+- Add script to process counters
+
 2025-12-22 (0.3.6)
 ------------------
 - Add Domino object

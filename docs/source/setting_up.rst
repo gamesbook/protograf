@@ -254,8 +254,8 @@ can install these via::
    sudo apt-get install ttf-mscorefonts-installer
 
 
-Installing **protograf**
-========================
+Installing protograf
+====================
 `↑ <table-of-contents-setup_>`_
 
 .. IMPORTANT::
@@ -287,9 +287,12 @@ If you are using ``uv``::
         uv pip install -U pymupdf
 
 
-Checking that **protograf** works
-=================================
+Checking that protograf works
+=============================
 `↑ <table-of-contents-setup_>`_
+
+1. Create a test file
+---------------------
 
 To now check that **protograf** works, you should create a small test
 file.
@@ -311,11 +314,16 @@ making sure you do not have any spaces at the start of any line!::
 Save the file; call it *test.py*. The ``.py`` extension indicates that this
 is a Python file |dash| this is useful but not absolutely essential!
 
-Now use Python to "run" this file i.e. after `opening a Terminal`_, and
-activating the virtual environment, you will need to change to the
+.. _runWithPython:
+
+2. Run file with Python
+-----------------------
+
+Now use Python to "run" this test file i.e. after `opening a Terminal`_,
+and activating the virtual environment, you will need to change to the
 directory in which the test file was created.
 
-For example. on Windows, you may have saved the file in ``Documents``, so::
+For example, on Windows, you may have saved the file in ``Documents``, so::
 
    (Sam) C:\Users\Sam>cd Documents
 
@@ -325,8 +333,11 @@ Now type::
 
 and press the *Enter* key.
 
-After the program runs, there should now be a new file called ``test.pdf``
-that has been created in the same directory.
+3. View test results
+--------------------
+
+After the test file has been "run", there should now be a new file created
+called ``test.pdf`` that has been created in the same directory.
 
 You should be able to open and view this PDF file via your `PDF viewer`_.
 It should be a mostly blank, A4-sized page with the phrase *Hello World*
