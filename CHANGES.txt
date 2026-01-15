@@ -3,7 +3,7 @@ protograf Changes
 
 2026-00-00 (0.4.1)
 ------------------
--
+- Enable Line connections for other shapes
 
 2026-01-11 (0.4.0)
 ------------------

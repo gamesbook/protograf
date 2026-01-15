@@ -379,7 +379,8 @@ that it can be customised.
 - `Dotted, Dashed, Angled and Wavy <lineDotDash_>`_
 - `Centred <lineCentred_>`_
 - `Arrowheads <line-with-arrow_>`_
-- `Connections <lineConnections_>`_
+- `Connections: Circles <lineConnectionsCircle_>`_
+- `Connections: Shapes <lineConnectionsShapes_>`_
 - `Connections with Arrows <lineConnectionsArrow_>`_
 - `Connections as Spokes <lineConnectionsSpoke_>`_
 
@@ -395,8 +396,9 @@ A Line has the following properties, in addition to the basic ones of
 - *cx* and *cy* - if set, will replace the use of *x* and *y* for the
   starting point, and work in conjunction with *angle* and *length* to
   create the line around a centre point
-- *connections* - a list of circular shapes (Circle or Dot) that will be
-  connected by the line
+- *connections* - a list of one or more shapes that will be
+  connected by the line; this property overrides any others that may have
+  been set to determine **where** the line is drawn
 - *connections_style* - if set to ``spoke``, will draw lines from the first
   shape to each of the other shapes in the *connections* list
 - *dotted* - if ``True``, create a series of small lines i.e. the
@@ -774,13 +776,32 @@ The following properties can be set:
 
 ===== ======
 
-.. _lineConnections:
+.. _lineConnectionsCircle:
 
-Example 4. Connections
-------------------------------------------
+Example 4. Connections: Circle
+------------------------------
 `^ <lineIndex_>`_
 
-.. |ln7| image:: images/customised/line_connections.png
+To connect two or more shapes, supply a list of them, together with a
+*connection point*, for the *connections* property of the line.
+
+The *connection point* for circular shapes |dash| ``Circle`` and ``Dot`` |dash|
+is not required, as the connecting line is always drawn to/from the centre
+of such a shape.
+
+For non-circular shapes |dash| for example, ``Rectangle`` or ``Hexagon`` |dash|
+such a shape must have either/or vertex points, or perbis points, that can be
+specified as the *connection point* to which the line will connect. This point
+must be set along with the shape, in the  *connections* property setting.
+
+.. NOTE::
+
+  Use of the *connections* property overrides any other properties that may
+  have been set to specify **where** the line will be drawn.  The other
+  properties that specify **how** the line will be appear will still be used.
+
+
+.. |ln7| image:: images/customised/line_connections_circle.png
    :width: 330
 
 ===== ======
@@ -831,9 +852,46 @@ Example 4. Connections
 
 ===== ======
 
+.. _lineConnectionsShapes:
+
+Example 5. Connections: Shapes
+------------------------------
+`^ <lineIndex_>`_
+
+To connect two or more shapes, supply a list of them, together with a
+*connection point*, for the *connections* property of the line.
+
+For non-circular shapes |dash| for example, ``Rectangle`` or ``Hexagon`` |dash|
+such a shape must have either/or vertex points, or perbis points, that can be
+specified as the *connection point* to which the line will connect. This point
+must be set along with the shape, in the  *connections* property setting.
+
+.. NOTE::
+
+  Use of the *connections* property overrides any other properties that may
+  have been set to specify **where** the line will be drawn.  The other
+  properties that specify **how** the line will be appear will still be used.
+
+
+.. |ln8| image:: images/customised/line_connections_shapes.png
+   :width: 330
+
+===== ======
+|ln8| This example shows a Line constructed using commands with the
+      following properties:
+
+      .. code:: python
+
+        ca = Circle(cx=2, cy=3, radius=0.5)
+        cb = Circle(cx=3, cy=2, radius=0.5)
+        Line(connections=[ca, cb])
+
+===== ======
+
+
 .. _lineConnectionsArrow:
 
-Example 5. Connections - Arrow
+Example 6. Connections - Arrow
 ------------------------------
 `^ <lineIndex_>`_
 
@@ -857,8 +915,8 @@ Example 5. Connections - Arrow
              arrow=True,
              )
 
-      Similarly to `Example 4 <lineConnections_>`_, the line is drawn
-      between a series of shapes.
+      Similarly to `Example 4 <lineConnectionsCircle_>`_, the line is drawn
+      between a series of ``Circle`` shapes.
 
       In this case, the line has been styled with color and thickness, and
       the *arrow* has been "switched on".  The arrow points in the direction
@@ -868,7 +926,7 @@ Example 5. Connections - Arrow
 
 .. _lineConnectionsSpoke:
 
-Example 6. Connections - Spoke
+Example 7. Connections - Spoke
 ------------------------------
 `^ <lineIndex_>`_
 
@@ -895,7 +953,7 @@ Example 6. Connections - Spoke
              arrow=True,
              )
 
-      Similarly to `Example 5 <lineConnectionsArrow_>`_, the line is drawn
+      Similarly to `Example 6 <lineConnectionsArrow_>`_, the line is drawn
       as an arrow between the shapes.
 
       However, the use of the ``connections_style='spoke'`` property means

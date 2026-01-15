@@ -711,8 +711,6 @@ class LineShape(BaseShape):
             return False
         connections = []
         for idx, cshape in enumerate(shapes):
-            if not isinstance(cshape, (CircleShape, DotShape)):
-                feedback("Can only connect Circles or Dots!", True)
             if idx == len(shapes) - 1:
                 continue
             if self.connections_style and _lower(self.connections_style) in [
@@ -722,12 +720,12 @@ class LineShape(BaseShape):
                 shape_a, shape_b = shapes[0], shapes[idx + 1]
             else:
                 shape_a, shape_b = cshape, shapes[idx + 1]
-            centre_a = shape_a.calculate_centre()
-            centre_b = shape_b.calculate_centre()
-            # print(f"{centre_a=}, {centre_b=}")
             if isinstance(shape_a, (CircleShape, DotShape)) and isinstance(
                 shape_b, (CircleShape, DotShape)
             ):
+                centre_a = shape_a.calculate_centre()
+                centre_b = shape_b.calculate_centre()
+                # print(f"*** connections {centre_a=}, {centre_b=}")
                 _, rotation = geoms.angles_from_points(centre_a, centre_b)
                 if centre_b.x < centre_a.x and centre_b.y < centre_a.y:
                     rotation_a = 360.0 - rotation
@@ -750,10 +748,23 @@ class LineShape(BaseShape):
                 else:
                     rotation_a = rotation - 90
                     rotation_b = rotation + 90
-                # print(f"{rotation_a=}, {rotation_b=}")
+                # print(f"*** connections {rotation_a=}, {rotation_b=}")
                 pt_a = geoms.point_on_circle(centre_a, shape_a._u.radius, rotation_a)
                 pt_b = geoms.point_on_circle(centre_b, shape_b._u.radius, rotation_b)
                 connections.append((pt_a, pt_b))
+            if isinstance(shape_a, (CircleShape, DotShape)) and not isinstance(
+                shape_b, (CircleShape, DotShape)
+            ):
+                feedback("TO BE DONE: circle-to-non_circle connection", False, True)
+            if not isinstance(shape_a, (CircleShape, DotShape)) and isinstance(
+                shape_b, (CircleShape, DotShape)
+            ):
+                feedback("TO BE DONE: non_circle-to-circle connection", False, True)
+            if not isinstance(shape_a, (CircleShape, DotShape)) and not isinstance(
+                shape_b, (CircleShape, DotShape)
+            ):
+                feedback("TO BE DONE: non_circle-to-non_circle connection", False, True)
+
         for conn in connections:
             klargs = draw_line(cnv, conn[0], conn[1], shape=self, **kwargs)
             self.set_canvas_props(cnv=cnv, index=ID, **klargs)  # shape.finish()

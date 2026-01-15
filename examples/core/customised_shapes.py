@@ -334,9 +334,9 @@ Line(cx=1, cy=5, angle=135, length=2, stroke_width=1.5)
 Line(cx=3, cy=5, angle=315, length=2, stroke="red")
 PageBreak()
 
-# ---- line: connections
+# ---- line: connections: circle
 Blueprint(stroke_width=0.5)
-Text(common=txt, text="Line: connections")
+Text(common=txt, text="Line: connections; circles")
 cc = Circle(cx=2, cy=3, radius=0.5)
 cy = Circle(cx=1, cy=1, radius=0.5, fill_stroke="yellow")
 Line(connections=[cc, cy])
@@ -348,6 +348,17 @@ co = Circle(cx=3, cy=5, radius=0.5, fill_stroke="orange")
 Line(connections=[cc, co])
 # orthogonal
 Line(connections=[cy, cr, co, ca, cy], stroke_width=2)
+PageBreak()
+
+# ---- line: connections: shapes
+Blueprint(stroke_width=0.5)
+Text(common=txt, text="Line: connections; shapes")
+r1 = Square(cx=2, cy=3, side=0.5)
+r2 = Square(cx=3, cy=2, side=0.5)
+Line(
+    connections=[(r1, 'ne'), (r1, 'n', 'p')],
+    stroke="red",
+    stroke_width=2)
 PageBreak()
 
 # ---- line: connections - arrow
@@ -1354,6 +1365,7 @@ PageBreak()
 # ---- END
 Text(common=txt, text="Shapes END...")
 
+# ---- SAVE
 #Save()
 Save(
      output='png',
@@ -1375,7 +1387,8 @@ Save(
         "polygon_rotation_flat",
         "polygon_sizes", "grid_3x4",
         "line_custom", "line_centred",
-        "line_connections", "line_connections_arrow", "line_connections_spoke",
+        "line_connections_circle", "line_connections_shapes",
+        "line_connections_arrow", "line_connections_spoke",
         "bezier_custom", "ellipse_custom", "rectangle_custom",
         "square_custom", "trapezoid_custom", "image_default",
         "descriptions", "label_offset",

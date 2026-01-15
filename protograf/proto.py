@@ -2352,7 +2352,14 @@ def Card(sequence: object = None, *elements, **kwargs):
             feedback(
                 f'Unable to convert "{sequence}" into a card or range of cards {globals.deck}.'
             )
+    max_cards = len(globals.deck.fronts)
     for index, _card in enumerate(_cards):
+        if _card > max_cards:
+            feedback(
+                f"There are {max_cards} cards in the deck;"
+                f" a reference to card #{_card} is not valid.",
+                True,
+            )
         card = globals.deck.fronts[_card - 1]  # cards internally number from ZERO
         if card:
             for element in elements:
@@ -2430,9 +2437,14 @@ def CardBack(sequence: object = None, *elements, **kwargs):
             feedback(
                 f'Unable to convert "{sequence}" into a cardback or range of cardbacks {globals.deck}.'
             )
+    max_backs = len(globals.deck.backs)
     for index, _back in enumerate(_cardbacks):
-        if _back - 1 >= len(globals.deck.backs):
-            feedback("Number of CardBacks cannot exceed number of Cards!", True)
+        if _back > max_backs:
+            feedback(
+                f"There are {max_backs} card backs in the deck;"
+                f" a reference to card #{_back} is not valid.",
+                True,
+            )
         cardback = globals.deck.backs[_back - 1]  # cards internally number from ZERO
         if cardback:
             for element in elements:
