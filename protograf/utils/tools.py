@@ -1222,6 +1222,10 @@ def validated_directions(
     ['w', 'e', 'n', 's', 'ne']
     >>> validated_directions(' w e n s ne ', DirectionGroup.COMPASS)  # spaces at ends
     ['w', 'e', 'n', 's', 'ne']
+    >>> validated_directions('  1 4 7 ', DirectionGroup.STAR, vertex_count=8)  # spaces at ends
+    [1, 4, 7]
+    >>> validated_directions('1 9 17 ', DirectionGroup.POLYGONAL, vertex_count=20)
+    [1, 9, 17]
     """
     if not value:
         return []
@@ -1257,25 +1261,31 @@ def validated_directions(
         case DirectionGroup.POLYGONAL:  # polygon
             valid = set(range(1, vertex_count + 1))
             # print('^^^ ', vertex_count, values_set)
+        case DirectionGroup.STAR:  # star
+            valid = set(range(1, vertex_count + 1))
+            # print('^^^ ', vertex_count, values_set)
         case _:
             raise NotImplementedError(f"Cannot handle {direction_group} type!")
     if "all" in values or "*" in values:
         values = list(valid)
-        if direction_group == DirectionGroup.POLYGONAL:
+        if direction_group in [DirectionGroup.POLYGONAL, DirectionGroup.STAR]:
             values = range(1, vertex_count + 1)
         values_set = set(values)
     else:
-        if direction_group == DirectionGroup.POLYGONAL:
+        if direction_group in [DirectionGroup.POLYGONAL, DirectionGroup.STAR]:
+            shname = 'Star' if direction_group == DirectionGroup.STAR else 'Polygon'
             try:
                 values = [int(val) for val in values]
             except:
-                feedback(f'Unable to use "{value}" as directions for a Polygon.', False)
+                feedback(f'Unable to use "{value}" as direction(s) for a {shname}.', False)
+                vrange = f'to {vertex_count}' if vertex_count else 'onwards'
                 feedback(
-                    f"The Polygon directions must be numbers from 1 to {vertex_count}.",
+                    f"The {shname} directions must be whole numbers from 1 {vrange}.",
                     True,
                 )
             values_set = set(values)
-    if values_set.issubset(valid):
+    if values_set.issubset(valid) or not vertex_count:
+        # NOTE in some cases, we need to ignore `vertex_count` because not yet known...
         return values
     _label = f"the {label} value" if label else f'"{value}"'
     feedback(

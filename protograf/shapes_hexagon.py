@@ -23,6 +23,7 @@ from protograf.utils.structures import (
     Perbis,
     Point,
     Radius,
+    Vertex,
 )  # named tuples
 from protograf.base import (
     BaseShape,
@@ -592,7 +593,7 @@ class HexShape(BaseShape):
             )
 
         # ---- calculate centres of sides
-        perbii_dict = self.calculate_perbii(cnv=cnv, centre=centre, vertices=vertices)
+        perbii_dict = self.calculate_perbii(cnv=cnv, centre=centre)
 
         for item in self.paths:
             dir_pair = tools.validated_directions(item, dir_group, "hexagon paths")
@@ -730,7 +731,7 @@ class HexShape(BaseShape):
         )
 
     def calculate_perbii(
-        self, cnv, centre: Point, vertices: list, debug: bool = False
+        self, cnv, centre: Point, debug: bool = False
     ) -> dict:
         """Calculate centre points for each Hex edge and angles from centre.
 
@@ -743,6 +744,7 @@ class HexShape(BaseShape):
         Returns:
             dict of Perbis objects keyed on direction
         """
+        vertices = self.get_vertexes()
         directions = []
         if self.ORIENTATION == HexOrientation.POINTY:
             directions = ["nw", "w", "sw", "se", "e", "ne"]
@@ -834,7 +836,7 @@ class HexShape(BaseShape):
                 the chord into two equal parts and meets the chord at a right angle;
                 for a polygon, each edge is effectively a chord.
         """
-        perbii_dict = self.calculate_perbii(cnv=cnv, centre=centre, vertices=vertices)
+        perbii_dict = self.calculate_perbii(cnv=cnv, centre=centre)
         pb_offset = self.unit(self.perbii_offset, label="perbii offset") or 0
         perbii_dirs = []
         pb_length = (
@@ -1054,9 +1056,7 @@ class HexShape(BaseShape):
 
         spikes_fill = colrs.get_color(self.spikes_fill)
         geo = self.get_geometry()
-        perbii_dict = self.calculate_perbii(
-            cnv=cnv, centre=centre, vertices=vertices, debug=True
-        )
+        perbii_dict = self.calculate_perbii(cnv=cnv, centre=centre)
         spk_length = (
             self.unit(self.spikes_height, label="spikes height")
             if self.spikes_height
@@ -1311,6 +1311,27 @@ class HexShape(BaseShape):
                 'Invalid orientation "{self.ORIENTATION}" supplied for hexagon.', True
             )
         return self.vertexes
+
+    def get_vertexes_named(self, **kwargs):
+        """Get named vertices for Hexagon."""
+        vertices = self.get_vertexes(**kwargs)
+        # anti-clockwise from top-left; relative to centre
+        if self.ORIENTATION == HexOrientation.POINTY:
+            directions = ['sw', 's', 'se', 'ne', 'n', 'nw']
+        elif self.ORIENTATION == HexOrientation.FLAT:
+            directions = ['w', 'sw', 'se', 'e', 'ne', 'nw']
+        else:
+            feedback(
+                'Invalid orientation "{self.ORIENTATION}" supplied for hexagon.', True
+            )
+        vertex_dict = {}
+        for key, vertex in enumerate(vertices):
+            _vertex = Vertex(
+                point=vertex,
+                direction=directions[key],
+            )
+            vertex_dict[directions[key]] = _vertex
+        return vertex_dict
 
     def draw(self, cnv=None, off_x=0, off_y=0, ID=None, **kwargs):
         """Draw a hexagon on a given canvas."""

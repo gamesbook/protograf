@@ -1456,7 +1456,7 @@ class BaseShape:
         except:
             return f"{self.__class__.__name__}"
 
-    def simple_name(self, shape_object: None) -> str:
+    def simple_name(self, shape_object: object = None) -> str:
         """Return user-friendly name for a shape."""
         try:
             if shape_object:
@@ -2329,13 +2329,13 @@ class BaseShape:
         # if _dict.get('x'):
         #    self.x = _dict.get('x', 1)
 
-    def get_center(self) -> tuple:
-        """Attempt to get centre (x,y) tuple for a shape."""
+    def get_center(self) -> Point:
+        """Attempt to get centre for a shape."""
         if self.cx and self.cy:
-            return (self.cx, self.cy)
+            return Point(self.cx, self.cy)
         if self.x and self.y and self.width and self.height:
-            return (self.x + self.width / 2.0, self.y + self.height / 2.0)
-        return ()
+            return Point(self.x + self.width / 2.0, self.y + self.height / 2.0)
+        return None
 
     def get_bounds(self) -> Bounds:
         """Attempt to get bounds of Rectangle (or any Shape with height and width)."""
@@ -3494,8 +3494,7 @@ class BaseShape:
         err = "The perbii_shapes must contain direction(s) and shape"
         _dirs, _shape, _shape_fraction = [], None, 1.0
         if direction_group != DirectionGroup.CIRCULAR:  # see below for calc.
-            perbii_dict = self.calculate_perbii(cnv, centre, vertexes)
-
+            perbii_dict = self.calculate_perbii(cnv)
         for item in perbii_shapes:
             if isinstance(item, tuple):
                 # ---- determine dirs for shape

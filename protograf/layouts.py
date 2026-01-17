@@ -1614,8 +1614,10 @@ class ConnectShape(BaseShape):
         edge_to = shape_to.get_bounds()
         x_f, y_f = self.key_positions(shape_from, shape_from_position)
         x_t, y_t = self.key_positions(shape_to, shape_to_position)
-        xc_f, yc_f = shape_from.get_center()
-        xc_t, yc_t = shape_to.get_center()
+        c_f = shape_from.get_center()
+        xc_f, yc_f = c_f.x, c_f.y
+        c_t = shape_to.get_center()
+        xc_t, yc_t = c_t.x, c_t.y
         # x,y: use fixed/supplied; or by "name"; or by default; or by "smart"
         if style == "path":
             # ---- path points

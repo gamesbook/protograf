@@ -20,6 +20,7 @@ from protograf.utils.structures import (
     Perbis,
     Point,
     Radius,
+    Vertex,
 )  # named tuples
 from protograf.base import (
     BaseShape,
@@ -72,11 +73,11 @@ class RectangleShape(BaseShape):
         self.set_unit_properties()  # need to recalculate!
 
     def calculate_area(self) -> float:
-        """Calculate rectangle area."""
+        """Calculate Rectangle area."""
         return self._u.width * self._u.height
 
     def calculate_perimeter(self, units: bool = False) -> float:
-        """Total length of rectangle bounding perimeter."""
+        """Total length of Rectangle bounding perimeter."""
         length = 2.0 * (self._u.width + self._u.height)
         if units:
             return self.points_to_value(length)
@@ -88,8 +89,6 @@ class RectangleShape(BaseShape):
         """Calculate centre points for each edge and angles from centre.
 
         Args:
-            vertices (list):
-                list of Rect nodes as Points
             centre (Point):
                 the centre Point of the Rect
 
@@ -154,7 +153,7 @@ class RectangleShape(BaseShape):
         return radii_dict
 
     def calculate_xy(self, **kwargs) -> tuple:
-        """Calculate top-left point of rectangle."""
+        """Calculate top-left point of Rectangle."""
         # ---- adjust start
         # feedback(f'***Rect{self.col=}{self.row=} {self._u.offset_x=}{self._o.off_x=}')
         if self.row is not None and self.col is not None:
@@ -200,7 +199,7 @@ class RectangleShape(BaseShape):
         return x, y
 
     def get_angles(self, rotation=0, **kwargs):
-        """Get angles from centre to vertices for rectangle without notches."""
+        """Get angles from centre to vertices for Rectangle without notches."""
         x, y = self.calculate_xy(**kwargs)
         vertices = self.get_vertexes(rotation=rotation, **kwargs)
         centre = Point(x + self._u.height / 2.0, y + self._u.height / 2.0)
@@ -210,7 +209,17 @@ class RectangleShape(BaseShape):
             angles.append(angle)
         return angles
 
-    def get_vertexes(self, **kwargs):
+    def get_center(self) -> Point:
+        """Get centre point of the Rectangle."""
+        x, y = self.calculate_xy()
+        if self.use_abs_c:
+            x = self._abs_cx - self._u.width / 2.0
+            y = self._abs_cy - self._u.height / 2.0
+        x_d = x + self._u.width / 2.0
+        y_d = y + self._u.height / 2.0
+        return Point(x=x_d, y=y_d)
+
+    def get_vertexes(self, **kwargs) -> list:
         """Get vertices for Rectangle without notches."""
         x, y = self.calculate_xy(**kwargs)
         # ---- overrides for grid layout
@@ -232,8 +241,22 @@ class RectangleShape(BaseShape):
         # )
         return vertices
 
+    def get_vertexes_named(self, **kwargs):
+        """Get named vertices for Rectangle without notches."""
+        vertices = self.get_vertexes(**kwargs)
+        # anti-clockwise from top-left; relative to centre
+        directions = ['nw', 'sw', 'se', 'ne']
+        vertex_dict = {}
+        for key, vertex in enumerate(vertices):
+            _vertex = Vertex(
+                point=vertex,
+                direction=directions[key],
+            )
+            vertex_dict[directions[key]] = _vertex
+        return vertex_dict
+
     def set_coord(self, cnv, x_d, y_d):
-        """Set (optionally draw) the coords of the rectangle."""
+        """Set (optionally draw) the coords of the Rectangle."""
         the_row = self.row or 0
         the_col = self.col or 0
         # _row = self.rows - the_row + self.coord_start_y
@@ -1353,7 +1376,7 @@ class RectangleShape(BaseShape):
                 apply_props(cx, cy)
 
     def draw(self, cnv=None, off_x=0, off_y=0, ID=None, **kwargs):
-        """Draw a rectangle on a given canvas."""
+        """Draw a Rectangle on a given canvas."""
         kwargs = self.kwargs | kwargs
         # feedback(f'\n@@@ Rect.draw {kwargs=}')
         cnv = cnv if cnv else globals.canvas  # a new Page/Shape may now exist
