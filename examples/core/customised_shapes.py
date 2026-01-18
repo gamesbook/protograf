@@ -167,7 +167,7 @@ crs = Common(height=1.8, width=1.2, arm_fraction=0.70)
 Cross(stroke_width=1, stroke="red", fill="gold")
 Cross(cx=3, cy=1, thickness=0.33, fill_stroke="red")
 Cross(cx=1, cy=3, common=crs,)
-Cross(cx=3, cy=3, common=crs,
+Cross(cx=3, cy=2.5, common=crs,
       title="Title", label="Label", heading="Heading")
 Cross(cx=3, cy=5, common=crs,
       dot=0.1, cross=0.5)

@@ -86,11 +86,13 @@ class RectangleShape(BaseShape):
     def calculate_perbii(
         self, cnv, centre: Point, rotation: float = None, **kwargs
     ) -> dict:
-        """Calculate centre points for each edge and angles from centre.
+        """Calculate centre points for each Rectangle edge and angles from centre.
 
         Args:
             centre (Point):
                 the centre Point of the Rect
+            rotation (float):
+                degrees of rotation anti-clockwise around the centre
 
         Returns:
             dict of Perbis objects keyed on direction
@@ -245,7 +247,7 @@ class RectangleShape(BaseShape):
         """Get named vertices for Rectangle without notches."""
         vertices = self.get_vertexes(**kwargs)
         # anti-clockwise from top-left; relative to centre
-        directions = ['nw', 'sw', 'se', 'ne']
+        directions = ["nw", "sw", "se", "ne"]
         vertex_dict = {}
         for key, vertex in enumerate(vertices):
             _vertex = Vertex(

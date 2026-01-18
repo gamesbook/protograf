@@ -305,8 +305,15 @@ In addition to the normal, common properties, the Cross also has:
 
 - *thickness*: this is the width of the bars. The default value for this is
   one-fifth of the overall width.
-- *arm_fraction*: this is the fraction **up** the length of the body at which
-  the arm crosses it. The default value for this is ``0.5`` (half-way up).
+- *arm_fraction*: this is the fraction **along** (up or down) the length of
+  the body at which the arm crosses it. The default value for this is ``0.5``
+  i.e. half-way along.
+
+.. NOTE::
+
+    Unlike most other shapes with a centre, the Cross uses as its centre
+    the middle point of the arm of the cross |dash| rather a centre based on
+    the overall height and width.
 
 
 Example 1. Default Cross
@@ -359,7 +366,7 @@ Example 2. Customised Cross
             cx=1, cy=3)
         Cross(
             common=crs,
-            cx=3, cy=3,
+            cx=3, cy=2.5,
             title="Title",
             label="Label",
             heading="Heading")
@@ -383,12 +390,12 @@ Example 2. Customised Cross
       The lower four examples all share a common height and width. They
       also use the *arm_fraction* property.  This is the fraction up the
       length of the body at which the arm crosses it; by default this is
-      ``0.5`` (half-way up).  All these examples "centre" the cross; in
-      this case the centre corresponds to the middle point of the height
-      (for the y-direction) and width (for the x-direction) of the cross.
+      ``0.5`` (half-way up).  All these examples, as well as the top-right
+      example "centre" the cross; in this case the centre corresponds to
+      the middle point of the arm of the cross.
 
-      The *label* and *rotation* properties recalculate the centre to
-      match the point at which the arm crosses the body.
+      The *label* and *rotation* properties are also based on the
+      middle point of the arm of the cross.
 
 ===== ======
 

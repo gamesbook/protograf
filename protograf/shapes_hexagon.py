@@ -731,18 +731,21 @@ class HexShape(BaseShape):
         )
 
     def calculate_perbii(
-        self, cnv, centre: Point, debug: bool = False
+        self, cnv, centre: Point, rotation: float = None, **kwargs
     ) -> dict:
         """Calculate centre points for each Hex edge and angles from centre.
 
         Args:
-            vertices (list):
-                list of Hex'es nodes as Points
             centre (Point):
                 the centre Point of the Hex
+            rotation (float):
+                degrees of rotation anti-clockwise around the centre
 
         Returns:
             dict of Perbis objects keyed on direction
+
+        NOTE:
+            * rotation is NOT used for a Hex; set for consistency of method call
         """
         vertices = self.get_vertexes()
         directions = []
@@ -778,9 +781,10 @@ class HexShape(BaseShape):
                 angle=angle,
             )
             perbii_dict[directions[key]] = _perbii
-        # if debug:
-        #     self.run_debug = True
-        #     self._debug(cnv, vertices=_perbii_pts)
+        if kwargs.get("debug"):
+            pass
+            # self.run_debug = True
+            # self._debug(cnv, vertices=_perbii_pts)
         return perbii_dict
 
     def calculate_radii(
@@ -1101,7 +1105,7 @@ class HexShape(BaseShape):
             dotted=self.spikes_dotted,
         )
 
-    def get_vertexes(self, is_cards=False) -> list:
+    def get_vertexes(self, is_cards: bool = False) -> list:
         """Calculate vertices of the Hexagon.
 
         Returns:
@@ -1317,9 +1321,9 @@ class HexShape(BaseShape):
         vertices = self.get_vertexes(**kwargs)
         # anti-clockwise from top-left; relative to centre
         if self.ORIENTATION == HexOrientation.POINTY:
-            directions = ['sw', 's', 'se', 'ne', 'n', 'nw']
+            directions = ["sw", "s", "se", "ne", "n", "nw"]
         elif self.ORIENTATION == HexOrientation.FLAT:
-            directions = ['w', 'sw', 'se', 'e', 'ne', 'nw']
+            directions = ["w", "sw", "se", "e", "ne", "nw"]
         else:
             feedback(
                 'Invalid orientation "{self.ORIENTATION}" supplied for hexagon.', True

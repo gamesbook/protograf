@@ -82,6 +82,11 @@ Bounds = namedtuple(
     ],
 )
 
+CrossParts = namedtuple(
+    "CrossParts",
+    ["thickness", "half_thick", "arm", "body", "head"],
+)
+
 # track progress of a Deck print (front or back)
 DeckPrintState = namedtuple(
     "DeckPrintState",
@@ -198,7 +203,9 @@ PolyGeometry = namedtuple(
     "PolyGeometry", ["x", "y", "radius", "side", "half_flat", "vertices"]
 )
 
-Ray = namedtuple("Ray", ["x", "y", "angle"])  # maths term specifing position & direction
+Ray = namedtuple(
+    "Ray", ["x", "y", "angle"]
+)  # maths term specifing position & direction
 
 ShapeProperties = namedtuple(
     "ShapeProperties",

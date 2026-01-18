@@ -1273,12 +1273,14 @@ def validated_directions(
         values_set = set(values)
     else:
         if direction_group in [DirectionGroup.POLYGONAL, DirectionGroup.STAR]:
-            shname = 'Star' if direction_group == DirectionGroup.STAR else 'Polygon'
+            shname = "Star" if direction_group == DirectionGroup.STAR else "Polygon"
             try:
                 values = [int(val) for val in values]
             except:
-                feedback(f'Unable to use "{value}" as direction(s) for a {shname}.', False)
-                vrange = f'to {vertex_count}' if vertex_count else 'onwards'
+                feedback(
+                    f'Unable to use "{value}" as direction(s) for a {shname}.', False
+                )
+                vrange = f"to {vertex_count}" if vertex_count else "onwards"
                 feedback(
                     f"The {shname} directions must be whole numbers from 1 {vrange}.",
                     True,
@@ -1784,7 +1786,7 @@ def html_img(text: str) -> str:
     'an <img src="A.png" height=20> or'
     """
     # ---- PNG
-    images = re.findall("\|\:(.*?)\:\|", text)
+    images = re.findall(r"\|\:(.*?)\:\|", text)
     txt = text
     for img in images:
         _img = img.strip(" ")
@@ -1800,7 +1802,7 @@ def html_img(text: str) -> str:
     if images:
         txt = txt.replace("|:", "").replace(":|", "")
     # ---- SVG
-    svg_images = re.findall("\|\;(.*?)\;\|", txt)
+    svg_images = re.findall(r"\|\;(.*?)\;\|", txt)
     for img in svg_images:
         _img = img.strip(" ")
         items = _img.split(" ")
@@ -1846,7 +1848,7 @@ def html_glyph(text: str, font_name: str, font_size: str = "") -> str:
     'an <span style="font-family: Helvetica; font-size: 12px; color: #000;">E001</span> or'
 
     """
-    glyphs = re.findall("\|\!(.*?)\!\|", text)
+    glyphs = re.findall(r"\|\!(.*?)\!\|", text)
     txt = text
     for glp in glyphs:
         _glp = glp.strip(" ")

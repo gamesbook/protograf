@@ -35,6 +35,7 @@ from protograf.utils.tools import _lower  # , _vprint
 from protograf.utils.messaging import feedback
 from protograf.utils.structures import (
     BBox,
+    CrossParts,
     DirectionGroup,
     Perbis,
     Point,
@@ -483,10 +484,37 @@ class CrossShape(BaseShape):
         if self.u_thickness <= 0:
             feedback("The cross thickness must be more than zero", True)
 
-    def get_vertexes(self, x, y, **kwargs):
+    def get_center(self, **kwargs) -> Point:
+        """Get the centre Point of a Cross."""
+        if self.use_abs_c:
+            self.x_c = self._abs_cx
+            self.y_c = self._abs_cy
+        else:
+            if self.cx and self.cy:
+                self.x_c = self._u.cx + self._o.delta_x
+                self.y_c = self._u.cy + self._o.delta_y
+            else:
+                # calc centre based on top-left
+                parts = self.get_cross_parts()
+                self.x_c = self._u.x + self._o.delta_x + parts.half_thick + parts.arm
+                self.y_c = self._u.y + self._o.delta_y + parts.half_thick + parts.head
+        return Point(self.x_c, self.y_c)
+
+    def get_cross_parts(self) -> CrossParts:
+        """Calculate sizes of parts of Cross."""
+        thick = self.u_thickness
+        arm = self._u.width / 2.0 - 0.5 * thick
+        body = self._u.height * self.arm_fraction - thick / 2.0
+        half_thick = thick / 2.0
+        parts = CrossParts(
+            thickness=thick, half_thick=half_thick, arm=arm, body=body, head=self._u.height - body - thick
+        )
+        return parts
+
+    def get_vertexes(self, **kwargs):
         """Calculate vertices of Cross.
 
-        Vertex locations:
+        Vertex point locations:
 
                0__11
                |  |
@@ -497,71 +525,90 @@ class CrossShape(BaseShape):
                |__|
               5   6
         """
+        # ----- x,y
+
         # ---- component sizes
-        thick = self.u_thickness
-        arm = self._u.width / 2.0 - 0.5 * thick
-        body = self._u.height * self.arm_fraction - thick / 2.0
-        head = self._u.height - body - thick
-        # feedback(f"*** CROSS {self._u.height=} {thick=} {arm=} {body=} {head=}")
+        parts = self.get_cross_parts()  # CrossParts tuple
+        centre = self.get_center(**kwargs)
+        # feedback(f"*** CROSS {self._u.height=} {thick=}")
+        # x,y are top-left
+        y = centre.y - parts.head - parts.half_thick
+        x = centre.x - parts.arm - parts.half_thick
         # ---- top-left and anti-clockwise
         vertices = []
-        vertices.append(Point(x + arm, y))  # 0
-        vertices.append(Point(x + arm, y + head))  # 1
-        vertices.append(Point(x, y + head))  # 2
-        vertices.append(Point(x, y + head + thick))  # 3
-        vertices.append(Point(x + arm, y + head + thick))  # 4
-        vertices.append(Point(x + arm, y + self._u.height))  # 5
-        vertices.append(Point(x + arm + thick, y + self._u.height))  # 6
-        vertices.append(Point(x + arm + thick, y + head + thick))  # 7
-        vertices.append(Point(x + self._u.width, y + head + thick))  # 8
-        vertices.append(Point(x + self._u.width, y + head))  # 9
-        vertices.append(Point(x + arm + thick, y + head))  # 10
-        vertices.append(Point(x + arm + thick, y))  # 11
+        vertices.append(Point(x + parts.arm, y))  # 0
+        vertices.append(Point(x + parts.arm, y + parts.head))  # 1
+        vertices.append(Point(x, y + parts.head))  # 2
+        vertices.append(Point(x, y + parts.head + parts.thickness))  # 3
+        vertices.append(Point(x + parts.arm, y + parts.head + parts.thickness))  # 4
+        vertices.append(Point(x + parts.arm, y + self._u.height))  # 5
+        vertices.append(Point(x + parts.arm + parts.thickness, y + self._u.height))  # 6
+        vertices.append(
+            Point(
+                x + parts.arm + parts.thickness,
+                y + parts.head + parts.thickness,
+            )
+        )  # 7
+        vertices.append(Point(x + self._u.width, y + parts.head + parts.thickness))  # 8
+        vertices.append(Point(x + self._u.width, y + parts.head))  # 9
+        vertices.append(Point(x + parts.arm + parts.thickness, y + parts.head))  # 10
+        vertices.append(Point(x + parts.arm + parts.thickness, y))  # 11
         return vertices
+
+    def get_vertexes_named(self, **kwargs):
+        """Get named (by number) vertices for Cross."""
+        vertices = self.get_vertexes(**kwargs)
+        vertex_dict = {}
+        for key, vertex in enumerate(vertices):
+            _vertex = Vertex(
+                point=vertex,
+                direction=key + 1,
+            )
+            vertex_dict[key + 1] = _vertex
+        return vertex_dict
 
     def draw(self, cnv=None, off_x=0, off_y=0, ID=None, **kwargs):
         """Draw a Cross on a given canvas."""
         kwargs = self.kwargs | kwargs
         cnv = cnv if cnv else globals.canvas  # a new Page/Shape may now exist
         super().draw(cnv, off_x, off_y, ID, **kwargs)  # unit-based props
-        if self.cx is not None and self.cy is not None:
-            x = self._u.cx - self._u.width / 2.0 + self._o.delta_x
-            y = self._u.cy - self._u.height / 2.0 + self._o.delta_y
-        else:
-            x = self._u.x + self._o.delta_x
-            y = self._u.y + self._o.delta_y
-            self.cx = self.x + self.width / 2.0
-            self.cy = self.y + self.height / 2.0
-        # ---- overrides to centre the shape
-        if kwargs.get("cx") and kwargs.get("cy"):
-            x = kwargs.get("cx") * self.units - self._u.width / 2.0 + self._o.delta_x
-            y = kwargs.get("cy") * self.units - self._u.height / 2.0 + self._o.delta_y
-            self.cx = kwargs.get("cx")
-            self.cy = kwargs.get("cy")
-        cx = self.unit(self.cx) + self._o.delta_x
-        cy = self.unit(self.cy) + self._o.delta_y
-        cy_arm = cy + (0.5 - self.arm_fraction) * self._u.height  # arm crosses body
-        # feedback(f"*** CROSS {cx=} {cy=} {x=} {y=}")
+        self.centre = self.get_center(**kwargs)
+        parts = self.get_cross_parts()  # CrossParts tuple
+        # feedback(f"*** CROSS {self.centre=} {cross_parts=}")
         # ---- handle rotation
         rotation = kwargs.get("rotation", self.rotation)
         if rotation:
-            self.centroid = muPoint(cx, cy_arm)
+            self.centroid = muPoint(self.centre.x, self.centre.y)
             kwargs["rotation"] = rotation
             kwargs["rotation_point"] = self.centroid
         # ---- draw cross
-        self.vertexes = self.get_vertexes(x=x, y=y)
+        self.vertexes = self.get_vertexes(**kwargs)
         # feedback(f'*** CROSS {self.vertexes=}')
         cnv.draw_polyline(self.vertexes)
         kwargs["closed"] = True
         self.set_canvas_props(cnv=cnv, index=ID, **kwargs)
         # ---- dot
-        self.draw_dot(cnv, cx, cy_arm)
+        self.draw_dot(cnv, self.centre.x, self.centre.y)
         # ---- cross
-        self.draw_cross(cnv, cx, cy_arm, rotation=kwargs.get("rotation"))
+        self.draw_cross(
+            cnv, self.centre.x, self.centre.y, rotation=kwargs.get("rotation")
+        )
         # ---- text
-        self.draw_label(cnv, ID, cx, cy_arm, **kwargs)
-        self.draw_heading(cnv, ID, cx, cy - 0.5 * self._u.height, **kwargs)
-        self.draw_title(cnv, ID, cx, cy + 0.5 * self._u.height, **kwargs)
+        self.draw_label(cnv, ID, self.centre.x, self.centre.y, **kwargs)
+        self.draw_heading(
+            cnv,
+            ID,
+            self.centre.x,
+            self.centre.y - parts.head - parts.half_thick,
+            **kwargs,
+        )
+        self.draw_title(
+            cnv,
+            ID,
+            self.centre.x,
+            self.centre.y + parts.body + parts.half_thick,
+            **kwargs,
+        )
 
 
 class DotShape(BaseShape):
@@ -713,78 +760,83 @@ class LineShape(BaseShape):
                 feedback(
                     "A non-circular connection must contain a shape, a point type,"
                     f' and a point location - not "{conn}"',
-                    True
+                    True,
                 )
             if not isinstance(conn[0], BaseShape):
                 feedback(
                     "A non-circular connection's first entry must be a shape"
                     f' - not "{conn[0]}"',
-                    True
+                    True,
                 )
             shape_type = conn[0].simple_name()
-            if _lower(conn[1]) not in ['v', 'vertex', 'p', 'perbis']:
+            if _lower(conn[1]) not in ["v", "vertex", "p", "perbis"]:
                 feedback(
                     f"A {shape_type} connection's second entry must be"
                     f' one of v, vertex, p or point - not "{conn[1]}"',
-                    True
+                    True,
                 )
             if isinstance(conn[0], PolygonShape):
                 dirs = tools.validated_directions(
                     value=_lower(conn[2]),
                     direction_group=DirectionGroup.POLYGONAL,
-                    label=f"{shape_type} connection's third (direction)")
+                    label=f"{shape_type} connection's third (direction)",
+                )
             elif isinstance(conn[0], StarShape):
                 dirs = tools.validated_directions(
                     value=_lower(conn[2]),
                     direction_group=DirectionGroup.STAR,
-                    label=f"{shape_type} connection's third (direction)")
+                    label=f"{shape_type} connection's third (direction)",
+                )
             else:
                 dirs = tools.validated_directions(
                     value=_lower(conn[2]),
                     direction_group=DirectionGroup.COMPASS,
-                    label=f"{shape_type} connection's third (direction)")
+                    label=f"{shape_type} connection's third (direction)",
+                )
             return dirs, shape_type
 
-        def get_connection_point(cnv, the_shape: BaseShape, conn_type: str, direction: str) -> Point:
+        def get_connection_point(
+            cnv, the_shape: BaseShape, conn_type: str, direction: str
+        ) -> Point:
             """Get Point at which connection is to be made."""
             shape_name = the_shape.simple_name()
             if isinstance(the_shape, HexShape):
-                shape_name = f'{the_shape.ORIENTATION.name.lower()} {shape_name}'
+                shape_name = f"{the_shape.ORIENTATION.name.lower()} {shape_name}"
             if isinstance(the_shape, (PolygonShape, StarShape)):
-                direction = tools.as_int(direction, 'direction')
+                direction = tools.as_int(direction, "direction")
             match _lower(conn_type):
-                case 'v' | 'vertex':
+                case "v" | "vertex":
                     try:
                         vertexes = the_shape.get_vertexes_named()
                     except AttributeError:
                         feedback(
-                            f'A {shape_name} has no vertices available for a connection.',
-                            True
+                            f"A {shape_name} has no vertices available for a connection.",
+                            True,
                         )
                     vtx = vertexes.get(direction)
                     if not vtx:
-                        print(f'*** Line:connections {vertexes}')
+                        print(f"*** Line:connections {vertexes}")
                         breakpoint()
                         feedback(
                             f'A {shape_name} cannot use a vertex in the "{direction}" direction.',
-                            True
+                            True,
                         )
                     else:
                         the_point = vtx.point
-                case 'p' | 'perbis':
+                case "p" | "perbis":
                     the_centre = the_shape.get_center()
                     try:
                         perbises = the_shape.calculate_perbii(cnv, the_centre)
                     except AttributeError:
                         feedback(
-                            f'A {shape_name} has no perbii available for a connection.',
-                            True
+                            f"A {shape_name} has no perbii available for a connection.",
+                            True,
                         )
                     pbs = perbises.get(direction)
                     if not pbs:
                         feedback(
                             f'A {shape_name} cannot use a perbis in the "{direction}" direction.',
-                            True
+                            True,
                         )
                     else:
                         the_point = pbs.point
@@ -816,7 +868,6 @@ class LineShape(BaseShape):
                 rotation_a = rotation - 90
                 rotation_b = rotation + 90
             return rotation_a, rotation_b
-
 
         if not isinstance(shapes, (list, tuple)) or len(shapes) < 2:
             feedback(
@@ -854,7 +905,7 @@ class LineShape(BaseShape):
                 pt_b = get_connection_point(cnv, shape_b[0], shape_b[1], shape_b[2])
 
                 centre_a = shape_a.calculate_centre()
-                centre_b = shape_b.get_centre()
+                centre_b = shape_b.get_center()
                 rotation_a, rotation_b = get_rotation(centre_a, centre_b)
                 # print(f"*** connections {rotation_a=}, {rotation_b=}")
                 pt_a = geoms.point_on_circle(centre_a, shape_a._u.radius, rotation_a)
@@ -1141,7 +1192,7 @@ class PolygonShape(BaseShape):
         log.debug("%s %s %s", cnv, ID, vertices)
         # TODO - autodraw (without dirs)
 
-    def get_centre(self) -> Point:
+    def get_center(self) -> Point:
         """Calculate the centre of a polygon as a Point (in units)"""
         if self.cx is not None and self.cy is not None:
             x = self._u.cx + self._o.delta_x
@@ -1176,16 +1227,21 @@ class PolygonShape(BaseShape):
         return angles
 
     def calculate_perbii(
-        self, cnv, debug: bool = False
+        self, cnv, centre: Point, rotation: float = None, **kwargs
     ) -> dict:
         """Calculate centre points for each Polygon edge and angles from centre.
+
+        Args:
+            centre (Point):
+                the centre Point of the Polygon
+            rotation (float):
+                degrees of rotation anti-clockwise around the centre
 
         Returns:
             dict of Perbis objects keyed on direction number
         """
         perbii_dict = {}
-        centre = self.get_center()
-        poly_vertices = self.get_vertexes()
+        poly_vertices = self.get_vertexes(**kwargs)
         vcount = len(poly_vertices) - 1
         _perbii_pts = []
         vertices = poly_vertices  # [::-1] # reversed
@@ -1210,7 +1266,7 @@ class PolygonShape(BaseShape):
                 angle=angle,
             )
             perbii_dict[key] = _perbii
-        if debug:
+        if kwargs.get("debug"):
             pass
             # self.run_debug = True
             # self._debug(cnv, vertices=_perbii_pts)
@@ -1260,13 +1316,15 @@ class PolygonShape(BaseShape):
             chord into two equal parts and meets the chord at a right angle;
             for a polygon, each edge is effectively a chord.
         """
+        # print(f'*** M-POLY perbii {len(vertices)=} \n {vertices=} \n')
         pb_offset = self.unit(self.perbii_offset, label="perbii offset") or 0
         pb_length = (
             self.unit(self.perbii_length, label="perbii length")
             if self.perbii_length
             else self.get_radius()
         )
-        perbii_dict = self.calculate_perbii(cnv)
+        perbii_dict = self.calculate_perbii(cnv, centre, rotation)
+        centre = self.get_center()
         # ---- set perbii waves
         lkwargs = {}
         lkwargs["wave_style"] = self.kwargs.get("perbii_wave_style", None)
@@ -1301,7 +1359,7 @@ class PolygonShape(BaseShape):
 
         # ---- style all perbii
         rotation_point = centre if rotation else None
-        # print(f"*** POLY perbii {rotation_point=} {rotation=}")
+        # print(f"*** POLY perbii {len(vertices)=} {rotation_point=} {rotation=}")
         self.set_canvas_props(
             index=ID,
             stroke=self.perbii_stroke,
@@ -1420,7 +1478,7 @@ class PolygonShape(BaseShape):
 
     def get_geometry(self, rotation: float = None):
         """Calculate centre, radius, side and vertices of Polygon."""
-        centre = self.get_centre()
+        centre = self.get_center()
         x, y = centre.x, centre.y
         side, half_flat = 0.0, 0.0
         # ---- calculate side and half_flat
@@ -1445,14 +1503,17 @@ class PolygonShape(BaseShape):
         # for p in vertices: print(f'*G-V* {p.x / 28.3465}, {p.y / 28.3465}')
         return PolyGeometry(x, y, radius, side, half_flat, vertices)
 
-    def get_vertexes(self, centre: Point = None, rotation: float = None):
-        """Calculate vertices of polygon."""
-        if not centre:
-            centre = self.get_centre()
+    def get_vertexes(self, **kwargs):
+        """Calculate vertices of Polygon."""
+        rotation = kwargs.get('rotation', 0)
+        centre = self.get_center()
         radius = self.get_radius()
         vertices = geoms.polygon_vertices(self.sides, radius, centre, rotation)
+        # move back so the vertices start at "top right"
+        # vertices_shift = vertices[1:] + vertices[:1]
+        vertices_shift = vertices[-1:] + vertices[:-1]
         # for p in vertices: print(f'*P-V* {p.x / 28.3465}, {p.y / 28.3465}')
-        return vertices
+        return vertices_shift
 
     def get_vertexes_named(self, **kwargs):
         """Get named (by number) vertices for Polygon."""
@@ -1461,9 +1522,9 @@ class PolygonShape(BaseShape):
         for key, vertex in enumerate(vertices):
             _vertex = Vertex(
                 point=vertex,
-                direction=key,
+                direction=key + 1,
             )
-            vertex_dict[key] = _vertex
+            vertex_dict[key + 1] = _vertex
         return vertex_dict
 
     def draw(self, cnv=None, off_x=0, off_y=0, ID=None, **kwargs):
@@ -1472,7 +1533,7 @@ class PolygonShape(BaseShape):
         cnv = cnv if cnv else globals.canvas  # a new Page/Shape may now exist
         super().draw(cnv, off_x, off_y, ID, **kwargs)  # unit-based props
         # ---- calc centre (in units)
-        centre = self.get_centre()
+        centre = self.get_center()
         x, y = centre.x, centre.y
         # ---- handle rotation
         rotation = self.kwargs.get("rotation", self.rotation)
@@ -1685,7 +1746,7 @@ class PolylineShape(BasePolyShape):
         lkwargs["wave_style"] = self.kwargs.get("wave_style", None)
         lkwargs["wave_height"] = self.kwargs.get("wave_height", 0)
         # ---- set vertices
-        self.vertexes = self.get_vertexes()  # BasePoly
+        self.vertexes = self.get_vertexes(**kwargs)  # BasePoly
         # ---- draw polyline by vertices
         # feedback(f'***PolyLineShp{x=} {y=} {self.vertexes=}')
         if self.vertexes:
@@ -1871,7 +1932,7 @@ class RhombusShape(BaseShape):
     def get_vertexes(self, **kwargs):
         """Calculate vertices of Rhombus."""
         centre = self.get_center()
-        x_s, y_s = centre.x - self._u.width / 2.0, centre.y- self._u.height / 2.0
+        x_s, y_s = centre.x - self._u.width / 2.0, centre.y - self._u.height / 2.0
         vertices = []
         vertices.append(Point(x_s, y_s))
         vertices.append(Point(x_s + self._u.width / 2.0, y_s + self._u.height / 2.0))
@@ -1883,7 +1944,7 @@ class RhombusShape(BaseShape):
         """Get named vertices for Rhombus."""
         vertices = self.get_vertexes(**kwargs)
         # anti-clockwise from top-left; relative to centre
-        directions = ['w', 's', 'e', 'n']
+        directions = ["w", "s", "e", "n"]
         vertex_dict = {}
         for key, vertex in enumerate(vertices):
             _vertex = Vertex(
@@ -1893,12 +1954,16 @@ class RhombusShape(BaseShape):
             vertex_dict[directions[key]] = _vertex
         return vertex_dict
 
-    def calculate_perbii(self, cnv, centre: Point, **kwargs) -> dict:
-        """Calculate centre points for each edge and angles from centre.
+    def calculate_perbii(
+        self, cnv, centre: Point, rotation: float = None, **kwargs
+    ) -> dict:
+        """Calculate centre points for each Rhombus edge and angles from centre.
 
         Args:
             centre (Point):
                 the centre Point of the Rhombus
+            rotation (float):
+                degrees of rotation anti-clockwise around the centre
 
         Returns:
             dict of Perbis objects keyed on direction
@@ -1964,8 +2029,7 @@ class RhombusShape(BaseShape):
         self,
         cnv,
         ID,
-        x_c: float,
-        y_c: float,
+        centre: Point,
         side: float,
         vertices: list,
         num: int,
@@ -1975,7 +2039,7 @@ class RhombusShape(BaseShape):
 
         Args:
             ID: unique ID
-            x_c, yc: centre of rhombus
+            centre: centre of rhombus
             side: length of rhombus edge
             vertices: the rhombus's nodes
             num: number of lines
@@ -1984,6 +2048,7 @@ class RhombusShape(BaseShape):
         _dirs = tools.validated_directions(
             self.hatches, DirectionGroup.CIRCULAR, "rhombus hatches"
         )
+        x_c, yc = centre.x, centre.y
         _num = tools.as_int(num, "hatches_count")
         lines = int((_num - 1) / 2 + 1)
         # feedback(f'*** RHOMB {num=} {lines=} {vertices=} {_dirs=} {side=}')
@@ -2270,21 +2335,21 @@ class RhombusShape(BaseShape):
         else:
             self.centroid = None
         # ---- draw rhombus
-        self.vertexes = self.get_vertexes()
+        self.vertexes = self.get_vertexes(**kwargs)
         # feedback(f'***Rhombus {x=} {y=} {self.vertexes=}')
         cnv.draw_polyline(self.vertexes)
         kwargs["closed"] = True
         self.set_canvas_props(cnv=cnv, index=ID, **kwargs)
         # ---- * draw slices
         if self.slices:
-            self.draw_slices(cnv, ID, self.vertexes, centre, rotation)
+            self.draw_slices(cnv, ID, self.vertexes, self.centre, rotation)
         # ---- * draw hatches
         if self.hatches_count:
             self.side = math.sqrt(
                 (self._u.width / 2.0) ** 2 + (self._u.height / 2.0) ** 2
             )
             self.draw_hatches(
-                cnv, ID, cx, cy, self.side, self.vertexes, self.hatches_count, rotation
+                cnv, ID, self.centre, self.side, self.vertexes, self.hatches_count, rotation
             )
         # ---- * borders (override)
         if self.borders:
@@ -2743,9 +2808,7 @@ class StarShape(BaseShape):
             vertex_dict[key] = _vertex
         return vertex_dict
 
-    def draw_radii(
-        self, cnv, ID, rotation: float, all_vertexes: list
-    ):
+    def draw_radii(self, cnv, ID, rotation: float, all_vertexes: list):
         """Draw radius lines from the centre to the inner and outer vertices.
 
         Args:
@@ -2861,7 +2924,7 @@ class StarShape(BaseShape):
                 f' (not "{self.inner_fraction}"',
                 True,
             )
-        self.vertexes_list, self.vertices = self.get_vertexes()
+        self.vertexes_list, self.vertices = self.get_vertexes(**kwargs)
         # feedback(f'***Star {self.vertexes_list=}')
         cnv.draw_polyline(self.vertexes_list)
         kwargs["closed"] = True
@@ -2899,7 +2962,9 @@ class StarShape(BaseShape):
         # ---- dot
         self.draw_dot(cnv, self.centre.x, self.centre.y)
         # ---- cross
-        self.draw_cross(cnv, self.centre.x, self.centre.y, rotation=kwargs.get("rotation"))
+        self.draw_cross(
+            cnv, self.centre.x, self.centre.y, rotation=kwargs.get("rotation")
+        )
         # ---- text
         self.draw_heading(cnv, ID, self.centre.x, self.centre.y - radius, **kwargs)
         self.draw_label(cnv, ID, self.centre.x, self.centre.y, **kwargs)
@@ -2915,9 +2980,25 @@ class StarLineShape(BaseShape):
         super().__init__(_object=_object, canvas=canvas, **kwargs)
         self.vertexes_list = []
 
-    def get_vertexes(self, x, y, **kwargs):
+    def get_center(self) -> Point:
+        """Calculate centre Point of StarLine"""
+        # convert to using units
+        x = self._u.x + self._o.delta_x
+        y = self._u.y + self._o.delta_y
+        # ---- overrides to centre the shape
+        if self.use_abs_c:
+            x = self._abs_cx
+            y = self._abs_cy
+        elif self.cx is not None and self.cy is not None:
+            x = self._u.cx + self._o.delta_x
+            y = self._u.cy + self._o.delta_y
+        return Point(x=x, y=y)
+
+    def get_vertexes(self, **kwargs):
         """Calculate vertices of StarLine"""
         vertices = []
+        centre = self.get_center()
+        x, y = centre.x, centre.y
         radius = self._u.radius
         vertices.append(muPoint(x, y + radius))
         angle = (2 * math.pi) * 2.0 / 5.0
@@ -2934,16 +3015,7 @@ class StarLineShape(BaseShape):
         """Draw a StarLine on a given canvas."""
         super().draw(cnv, off_x, off_y, ID, **kwargs)  # unit-based props
         cnv = cnv if cnv else globals.canvas  # a new Page/Shape may now exist
-        # convert to using units
-        x = self._u.x + self._o.delta_x
-        y = self._u.y + self._o.delta_y
-        # ---- overrides to centre the shape
-        if self.use_abs_c:
-            x = self._abs_cx
-            y = self._abs_cy
-        elif self.cx is not None and self.cy is not None:
-            x = self._u.cx + self._o.delta_x
-            y = self._u.cy + self._o.delta_y
+        self.centre = self.get_center()
         # calc - assumes x and y are the centre!
         radius = self._u.radius
         # ---- set canvas
@@ -2951,23 +3023,25 @@ class StarLineShape(BaseShape):
         # ---- handle rotation
         rotation = kwargs.get("rotation", self.rotation)
         if rotation:
-            self.centroid = muPoint(x, y)
+            self.centroid = muPoint(self.centre.x, self.centre.y)
             kwargs["rotation"] = rotation
             kwargs["rotation_point"] = self.centroid
         # ---- draw starline
         # feedback(f'***StarLine {x=} {y=} {self.vertexes_list=}')
-        self.vertexes_list = self.get_vertexes(x, y)
+        self.vertexes_list = self.get_vertexes(**kwargs)
         cnv.draw_polyline(self.vertexes_list)
         kwargs["closed"] = True
         self.set_canvas_props(cnv=cnv, index=ID, **kwargs)
         # ---- dot
-        self.draw_dot(cnv, x, y)
+        self.draw_dot(cnv, self.centre.x, self.centre.y)
         # ---- cross
-        self.draw_cross(cnv, x, y, rotation=kwargs.get("rotation"))
+        self.draw_cross(
+            cnv, self.centre.x, self.centre.y, rotation=kwargs.get("rotation")
+        )
         # ---- text
-        self.draw_heading(cnv, ID, x, y - radius, **kwargs)
-        self.draw_label(cnv, ID, x, y, **kwargs)
-        self.draw_title(cnv, ID, x, y + radius, **kwargs)
+        self.draw_heading(cnv, ID, self.centre.x, self.centre.y - radius, **kwargs)
+        self.draw_label(cnv, ID, self.centre.x, self.centre.y, **kwargs)
+        self.draw_title(cnv, ID, self.centre.x, self.centre.y + radius, **kwargs)
 
 
 class TextShape(BaseShape):
@@ -3217,18 +3291,20 @@ class TrapezoidShape(BaseShape):
     def calculate_perbii(
         self, cnv, centre: Point, rotation: float = None, **kwargs
     ) -> dict:
-        """Calculate centre points for each edge and angles from centre.
+        """Calculate centre points for each Trapezoid edge and angles from centre.
 
         Args:
             centre (Point):
                 the centre Point of the Trapezoid
+            rotation (float):
+                degrees of rotation anti-clockwise around the centre
 
         Returns:
             dict of Perbis objects keyed on direction
         """
         directions = ["n", "w", "s", "e"]
         perbii_dict = {}
-        vertices = self.get_vertexes(rotation=rotation, **kwargs)
+        vertices = self.get_vertexes(**kwargs)
         vcount = len(vertices) - 1
         _perbii_pts = []
         # print(f"*** RECT perbii {centre=} {vertices=}")
@@ -3282,8 +3358,13 @@ class TrapezoidShape(BaseShape):
             return self._u.cx, self._u.cy, x, y
         return cx, cy, x, y
 
+    def get_center(self) -> Point:
+        """Calculate centre of Trapezoid."""
+        cx, cy, x, y = self.calculate_xy()
+        return Point(cx, cy)
+
     def get_vertexes(self, **kwargs):
-        """Calculate vertices of trapezoid."""
+        """Calculate vertices of Trapezoid."""
         # set start
         _cx, _cy, _x, _y = self.calculate_xy()  # for direct call without draw()
         # cx = kwargs.get("cx", _cx)
@@ -3308,7 +3389,7 @@ class TrapezoidShape(BaseShape):
         """Get named vertices for Trapezoid."""
         vertices = self.get_vertexes(**kwargs)
         # anti-clockwise from top-left; relative to centre
-        directions = ['nw', 'sw', 'se', 'ne']
+        directions = ["nw", "sw", "se", "ne"]
         vertex_dict = {}
         for key, vertex in enumerate(vertices):
             _vertex = Vertex(
@@ -3338,8 +3419,8 @@ class TrapezoidShape(BaseShape):
             kwargs["rotation"] = rotation
             kwargs["rotation_point"] = muPoint(x_d, y_d)
         # ---- draw trapezoid
-        self.vertexes = self.get_vertexes(cx=cx, cy=cy, x=x, y=y)
-        # feedback(f'***Trap {x=} {y=} {self.vertexes=}')
+        self.vertexes = self.get_vertexes(**kwargs)
+        # feedback(f'*** Trapezid {x=} {y=} {cx=} {cy=} {self.vertexes=}')
         cnv.draw_polyline(self.vertexes)
         kwargs["closed"] = True
         self.set_canvas_props(cnv=cnv, index=ID, **kwargs)
@@ -3433,11 +3514,12 @@ class TriangleShape(BaseShape):
         """Determine length of sides for a Triangle
 
                   0;n
-                   /\
-            side3 /  \ side2
-                 /    \
-           1;sw /______\ 2;se
-                  side
+                   //\\
+            side3 //  \\ side2
+                 //    \\
+           1;sw //______\\ 2;se
+                ----------
+                   side
         """
         if not vertices:
             vertices = self.get_vertexes(rotation)
@@ -3479,11 +3561,13 @@ class TriangleShape(BaseShape):
     def calculate_perbii(
         self, cnv, centre: Point, rotation: float = None, **kwargs
     ) -> dict:
-        """Calculate centre points for each edge and angles from centre.
+        """Calculate centre points for each Triangle edge and angles from centre.
 
         Args:
             centre (Point):
                 the centre Point of the Triangle
+            rotation (float):
+                degrees of rotation anti-clockwise around the centre
 
         Returns:
             dict of Perbis objects keyed on direction
@@ -3546,13 +3630,14 @@ class TriangleShape(BaseShape):
             radii_dict[directions[key]] = _radii
         return radii_dict
 
-    def get_vertexes(self, rotation: float = 0, has_centroid: bool = False) -> list:
+    def get_vertexes(self, **kwargs) -> list:
         """Get vertices for a Triangle
 
                   0;n
-                   /\
-                  /  \
-            1;sw /____\ 2;se
+                   //\\
+                  //  \\
+            1;sw //____\\ 2;se
+                 --------
         """
         vertices = []
         if self.triangle_type == TriangleType.EQUILATERAL:
@@ -3606,7 +3691,7 @@ class TriangleShape(BaseShape):
         """Get named vertices for Triangle."""
         vertices = self.get_vertexes(**kwargs)
         # anti-clockwise from top; relative to centre
-        directions = ['n', 'se', 'sw']
+        directions = ["n", "se", "sw"]
         vertex_dict = {}
         for key, vertex in enumerate(vertices):
             _vertex = Vertex(
@@ -3832,7 +3917,7 @@ class TriangleShape(BaseShape):
         self.side = self._u.side if self._u.side else self._u.width
         self.height = 0.5 * math.sqrt(3) * self.side  # ½√3(a)
         self.radius = (2.0 / 3.0) * self.height
-        has_centroid = False
+        self.centroid = None
         # ---- handle rotation
         rotation = kwargs.get("rotation", self.rotation)
         if rotation:
@@ -3858,10 +3943,10 @@ class TriangleShape(BaseShape):
                 )
         # ---- calculate vertexes
         # print(f'*** TRIANGLE {self.triangle_type=}'}
-        self.vertexes = self.get_vertexes(rotation, has_centroid)
+        self.vertexes = self.get_vertexes(**kwargs)
         # print(f'*** TRIANGLE {self.vertexes=} {kwargs=}')
         # ---- calculate centroid (II)
-        if self.triangle_type == TriangleType.EQUILATERAL and not has_centroid:
+        if self.triangle_type == TriangleType.EQUILATERAL and not self.centroid:
             self.centroid = self.get_centroid(self.vertexes)
         elif self.triangle_type == TriangleType.ISOSCELES:
             self.centroid = self.get_centroid(self.vertexes)
