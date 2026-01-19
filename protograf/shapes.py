@@ -5,10 +5,12 @@ Create custom shapes for protograf
 # lib
 import codecs
 import copy
+from functools import cached_property
 import logging
 import math
 import os
 from pathlib import Path
+from pprint import pprint
 import sys
 from urllib.parse import urlparse
 
@@ -507,7 +509,11 @@ class CrossShape(BaseShape):
         body = self._u.height * self.arm_fraction - thick / 2.0
         half_thick = thick / 2.0
         parts = CrossParts(
-            thickness=thick, half_thick=half_thick, arm=arm, body=body, head=self._u.height - body - thick
+            thickness=thick,
+            half_thick=half_thick,
+            arm=arm,
+            body=body,
+            head=self._u.height - body - thick,
         )
         return parts
 
@@ -815,7 +821,7 @@ class LineShape(BaseShape):
                         )
                     vtx = vertexes.get(direction)
                     if not vtx:
-                        print(f"*** Line:connections {vertexes}")
+                        # print(f"*** Line:connections {vertexes}")
                         breakpoint()
                         feedback(
                             f'A {shape_name} cannot use a vertex in the "{direction}" direction.',
@@ -1241,11 +1247,12 @@ class PolygonShape(BaseShape):
             dict of Perbis objects keyed on direction number
         """
         perbii_dict = {}
-        poly_vertices = self.get_vertexes(**kwargs)
+        poly_vertices = self.get_vertexes()
         vcount = len(poly_vertices) - 1
         _perbii_pts = []
         vertices = poly_vertices  # [::-1] # reversed
         for key, vertex in enumerate(vertices):
+            # print(f"*** POLYGOM *** vertex {key=} {vertex=}")
             if key == 0:
                 p1 = Point(vertex.x, vertex.y)
                 p2 = Point(vertices[vcount].x, vertices[vcount].y)
@@ -1259,13 +1266,14 @@ class PolygonShape(BaseShape):
             # print(f"*** POLYGON *** perbii {key=} {pc=} {compass=} {angle=}")
             _perbii = Perbis(
                 point=pc,
-                direction=key,
+                direction=key + 1,
                 v1=p1,
                 v2=p2,
                 compass=compass,
                 angle=angle,
             )
-            perbii_dict[key] = _perbii
+            # print(f"*** POLYGON *** perbii {key=} {_perbii=}")
+            perbii_dict[key + 1] = _perbii
         if kwargs.get("debug"):
             pass
             # self.run_debug = True
@@ -1316,7 +1324,6 @@ class PolygonShape(BaseShape):
             chord into two equal parts and meets the chord at a right angle;
             for a polygon, each edge is effectively a chord.
         """
-        # print(f'*** M-POLY perbii {len(vertices)=} \n {vertices=} \n')
         pb_offset = self.unit(self.perbii_offset, label="perbii offset") or 0
         pb_length = (
             self.unit(self.perbii_length, label="perbii length")
@@ -1330,19 +1337,18 @@ class PolygonShape(BaseShape):
         lkwargs["wave_style"] = self.kwargs.get("perbii_wave_style", None)
         lkwargs["wave_height"] = self.kwargs.get("perbii_wave_height", 0)
         for key in self.perbii:
-            # print(f'*** {key=} {perbii_dict}')
             # points based on length of line, offset and the angle in degrees
-            the_perbii = perbii_dict.get(int(key) - 1, None)
+            the_perbii = perbii_dict.get(int(key), None)
+            # print(f'*** POLY {key=} {the_perbii.v1=} {the_perbii.v2=}')
             if the_perbii is None:
                 feedback(f"{key} is not a valid perbii direction!", True)
             edge_pt = geoms.fraction_along_line(
                 the_perbii.v1, the_perbii.v2, 0.5
             )  # centre pt of edge
-            # print(f'*** {pb_angle=} {edge_pt=} {centre=}')
+            # print(f'*** POLY {pb_angle=} {edge_pt=} {centre=}')
             if pb_offset is not None and pb_offset != 0:
                 offset_pt = geoms.point_on_circle(centre, pb_offset, the_perbii.angle)
                 end_pt = geoms.point_on_line(offset_pt, edge_pt, pb_length)
-                # print(f'*** {end_pt=} {offset_pt=}')
                 start_point = offset_pt.x, offset_pt.y
                 end_point = end_pt.x, end_pt.y
             else:
@@ -1359,7 +1365,7 @@ class PolygonShape(BaseShape):
 
         # ---- style all perbii
         rotation_point = centre if rotation else None
-        # print(f"*** POLY perbii {len(vertices)=} {rotation_point=} {rotation=}")
+        # print(f"*** B-POLY perbii {len(vertices)=} {rotation_point=} {rotation=}")
         self.set_canvas_props(
             index=ID,
             stroke=self.perbii_stroke,
@@ -1503,21 +1509,20 @@ class PolygonShape(BaseShape):
         # for p in vertices: print(f'*G-V* {p.x / 28.3465}, {p.y / 28.3465}')
         return PolyGeometry(x, y, radius, side, half_flat, vertices)
 
-    def get_vertexes(self, **kwargs):
+    def get_vertexes(self):
         """Calculate vertices of Polygon."""
-        rotation = kwargs.get('rotation', 0)
-        centre = self.get_center()
-        radius = self.get_radius()
-        vertices = geoms.polygon_vertices(self.sides, radius, centre, rotation)
+        # ---- calculate vertices
+        the_geom = self.get_geometry()
+        vertices = the_geom.vertices
         # move back so the vertices start at "top right"
-        # vertices_shift = vertices[1:] + vertices[:1]
-        vertices_shift = vertices[-1:] + vertices[:-1]
-        # for p in vertices: print(f'*P-V* {p.x / 28.3465}, {p.y / 28.3465}')
+        # vertices_shift = vertices[-1:] + vertices[:-1]
+        vertices_shift = vertices[1:] + vertices[0:1]
+        # for p in vertices: print(f'*POLY* P-V* {p.x / 28.3465}, {p.y / 28.3465}')
         return vertices_shift
 
-    def get_vertexes_named(self, **kwargs):
-        """Get named (by number) vertices for Polygon."""
-        vertices = self.get_vertexes(**kwargs)
+    def get_vertexes_named(self):
+        """Get named (by number) vertices of Polygon."""
+        vertices = self.get_vertexes()
         vertex_dict = {}
         for key, vertex in enumerate(vertices):
             _vertex = Vertex(
@@ -1543,12 +1548,12 @@ class PolygonShape(BaseShape):
             kwargs["rotation_point"] = self.centroid
         # ---- calculate vertices
         pre_geom = self.get_geometry()
-        x, y, radius, self.vertices = (
+        x, y, radius = (
             pre_geom.x,
             pre_geom.y,
             pre_geom.radius,
-            pre_geom.vertices,
         )
+        self.vertices = self.get_vertexes()
         self._debug(cnv, vertices=self.vertices)
         # ---- new x/y per col/row
         is_cards = kwargs.get("is_cards", False)
@@ -2349,7 +2354,13 @@ class RhombusShape(BaseShape):
                 (self._u.width / 2.0) ** 2 + (self._u.height / 2.0) ** 2
             )
             self.draw_hatches(
-                cnv, ID, self.centre, self.side, self.vertexes, self.hatches_count, rotation
+                cnv,
+                ID,
+                self.centre,
+                self.side,
+                self.vertexes,
+                self.hatches_count,
+                rotation,
             )
         # ---- * borders (override)
         if self.borders:
@@ -3522,7 +3533,7 @@ class TriangleShape(BaseShape):
                    side
         """
         if not vertices:
-            vertices = self.get_vertexes(rotation)
+            vertices = self.get_vertexes()
         self.side = geoms.length_of_line(vertices[1], vertices[2])
         self.side2 = geoms.length_of_line(vertices[2], vertices[0])
         self.side3 = geoms.length_of_line(vertices[0], vertices[1])
@@ -3543,7 +3554,7 @@ class TriangleShape(BaseShape):
         where s is the semi-perimeter i.e. s = (a + b + c)/2
         """
         if not vertices:
-            vertices = self.get_vertexes(rotation)
+            vertices = self.get_vertexes()
         _s1, _s2, _s3 = self.calculate_sides(vertices, rotation, units)
         # print(f"*** TRIANGLE SIDES {_s1=} {_s2=} {_s2=}")
         s = (_s1 + _s2 + _s3) / 2.0
@@ -3551,7 +3562,7 @@ class TriangleShape(BaseShape):
 
     def calculate_perimeter(self, units: bool = False) -> float:
         """Total length of bounding line in user units."""
-        vertices = self.get_vertexes(rotation=0)
+        vertices = self.get_vertexes()
         _s1, _s2, _s3 = self.calculate_sides(vertices, rotation=0, units=units)
         length = _s1 + _s2 + _s3
         if units:
@@ -3573,7 +3584,7 @@ class TriangleShape(BaseShape):
             dict of Perbis objects keyed on direction
         """
         directions = ["nw", "s", "ne"]  # edge directions
-        vertices = self.get_vertexes(rotation)
+        vertices = self.get_vertexes()
         perbii_dict = {}
         _perbii_pts = []
         # print(f"*** TRIANGLE perbii {centre=} {vertices=}")
@@ -3630,7 +3641,7 @@ class TriangleShape(BaseShape):
             radii_dict[directions[key]] = _radii
         return radii_dict
 
-    def get_vertexes(self, **kwargs) -> list:
+    def get_vertexes(self) -> list:
         """Get vertices for a Triangle
 
                   0;n
@@ -3689,7 +3700,7 @@ class TriangleShape(BaseShape):
 
     def get_vertexes_named(self, **kwargs):
         """Get named vertices for Triangle."""
-        vertices = self.get_vertexes(**kwargs)
+        vertices = self.get_vertexes()
         # anti-clockwise from top; relative to centre
         directions = ["n", "se", "sw"]
         vertex_dict = {}
@@ -3943,7 +3954,7 @@ class TriangleShape(BaseShape):
                 )
         # ---- calculate vertexes
         # print(f'*** TRIANGLE {self.triangle_type=}'}
-        self.vertexes = self.get_vertexes(**kwargs)
+        self.vertexes = self.get_vertexes()
         # print(f'*** TRIANGLE {self.vertexes=} {kwargs=}')
         # ---- calculate centroid (II)
         if self.triangle_type == TriangleType.EQUILATERAL and not self.centroid:
@@ -3953,6 +3964,8 @@ class TriangleShape(BaseShape):
         elif self.triangle_type == TriangleType.IRREGULAR:
             self.centroid = self.get_centroid(self.vertexes)
         else:
+            pass
+        if not self.centroid:
             raise NotImplementedError(
                 f"Cannot handle triangle type {self.triangle_type}"
             )
