@@ -909,10 +909,8 @@ class LineShape(BaseShape):
             ):
                 dirs_b, name_b = validate_connection_params(shape_b)
                 pt_b = get_connection_point(cnv, shape_b[0], shape_b[1], shape_b[2])
-
                 centre_a = shape_a.calculate_centre()
-                centre_b = shape_b.get_center()
-                rotation_a, rotation_b = get_rotation(centre_a, centre_b)
+                rotation_a, rotation_b = get_rotation(centre_a, pt_b)
                 # print(f"*** connections {rotation_a=}, {rotation_b=}")
                 pt_a = geoms.point_on_circle(centre_a, shape_a._u.radius, rotation_a)
                 connections.append((pt_a, pt_b))
@@ -922,9 +920,8 @@ class LineShape(BaseShape):
             ):
                 dirs_a, name_a = validate_connection_params(shape_a)
                 pt_a = get_connection_point(cnv, shape_a[0], shape_a[1], shape_a[2])
-
-                centre_b = shape_b.calculate_centre()
-                rotation_a, rotation_b = get_rotation(centre_a, centre_b)
+                centre_b = shape_b.calculate_centre()  # circle
+                rotation_a, rotation_b = get_rotation(pt_a, centre_b)
                 # print(f"*** connections {rotation_a=}, {rotation_b=}")
                 pt_b = geoms.point_on_circle(centre_b, shape_b._u.radius, rotation_b)
                 connections.append((pt_a, pt_b))
@@ -1247,10 +1244,9 @@ class PolygonShape(BaseShape):
             dict of Perbis objects keyed on direction number
         """
         perbii_dict = {}
-        poly_vertices = self.get_vertexes()
-        vcount = len(poly_vertices) - 1
         _perbii_pts = []
-        vertices = poly_vertices  # [::-1] # reversed
+        vertices = self.get_vertexes()
+        vcount = len(vertices) - 1
         for key, vertex in enumerate(vertices):
             # print(f"*** POLYGOM *** vertex {key=} {vertex=}")
             if key == 0:
@@ -1300,12 +1296,12 @@ class PolygonShape(BaseShape):
             # print(f"*** POLYGON radii {key=} {directions[key]=} {compass=} {angle=}")
             _radii = Radius(
                 point=vertex,
-                direction=key,
+                direction=key + 1,
                 compass=compass,
                 angle=360 - angle,  # inverse flip (y is reveresed)
             )
-            # print(f"*** POLYGON radii {_radii}")
-            radii_dict[key] = _radii
+            print(f"*** POLYGON radii {_radii=} {self.fill=}")
+            radii_dict[key + 1] = _radii
         return radii_dict
 
     def draw_perbii(
@@ -1387,14 +1383,17 @@ class PolygonShape(BaseShape):
     ):
         """Draw lines connecting the Polygon centre to each of the vertices."""
         _radii = []
-        vertices = poly_vertices[::-1]  # reversed
+        vertices = self.get_vertexes()
         _dirs = tools.validated_directions(
             self.radii, DirectionGroup.POLYGONAL, "polygon radii", len(vertices)
         )
         for key, vertex in enumerate(vertices):
             if key + 1 in _dirs:
                 _, angle = geoms.angles_from_points(vertex, centre)
-                _radii.append(angle)
+                # compass, angle = geoms.angles_from_points(vertex, centre)
+                mirror_angle = 180 - angle
+                # print(f'{key+1=} {vertex=} {compass=} {angle=} {mirror_angle=}')
+                _radii.append(mirror_angle)
         rad_offset = self.unit(self.radii_offset, label="radii offset") or 0
         rad_length = (
             self.unit(self.radii_length, label="radii length")
@@ -2805,7 +2804,7 @@ class StarShape(BaseShape):
             all_vertices.append(
                 geoms.point_on_circle(center, inner_radius, angle + gap / 2.0)
             )
-        return all_vertices, outer_vertices
+        return list(reversed(all_vertices)), list(reversed(outer_vertices))
 
     def get_vertexes_named(self, **kwargs):
         """Get named (by number) vertices for Star."""
@@ -2814,9 +2813,9 @@ class StarShape(BaseShape):
         for key, vertex in enumerate(vertices):
             _vertex = Vertex(
                 point=vertex,
-                direction=key,
+                direction=key + 1,
             )
-            vertex_dict[key] = _vertex
+            vertex_dict[key + 1] = _vertex
         return vertex_dict
 
     def draw_radii(self, cnv, ID, rotation: float, all_vertexes: list):

@@ -3944,8 +3944,6 @@ def Blueprint(**kwargs):
         feedback('The "common" property cannot be used with a Blueprint.', True)
     kwargs["units"] = kwargs.get("units", globals.units)
     side = 1.0
-    if kwargs["units"] == unit.inch:
-        side = 0.5
     decimals = tools.as_int(kwargs.get("decimals", 0), "Blueprint decimals")
     # override defaults ... otherwise grid not "next" to margins
     numbering = kwargs.get("numbering", True)
