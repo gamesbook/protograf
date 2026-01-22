@@ -4,6 +4,8 @@ protograf Changes
 2026-00-00 (0.4.1)
 ------------------
 - Enable Line connections for other shapes
+- Add Kensington board example
+- Refactor code to start using class properties
 
 2026-01-11 (0.4.0)
 ------------------

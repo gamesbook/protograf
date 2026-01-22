@@ -3396,7 +3396,9 @@ class BaseShape:
                     radii_dict = self.calculate_radii(cnv, centre, vertexes)
                     _dirs = radii_dict.keys()
                 elif direction_group == DirectionGroup.POLYGONAL:
-                    _dirs = [int(item[0]) - 1]
+                    _dirs = tools.validated_directions(
+                        item[0], direction_group, "direction"
+                    )
                 else:
                     _dirs = tools.validated_directions(
                         item[0], direction_group, "direction"
@@ -3408,9 +3410,14 @@ class BaseShape:
                 feedback(f"{err} - not {item}.", True)
             # print(f"*** radii_shapes {item=} {type(item)=}")
             self.can_draw_centred_shape(_shape, True)  # could stop here
+            # print(f"*** radii_shapes :::\n {radii_dict=} {_dirs=}")
             for _dir in _dirs:
                 # ---- calculate shape centre
-                _radii = radii_dict[_dir]
+                _radii = radii_dict.get(_dir)
+                if not _radii:
+                    feedback(
+                        f'There is no radius corresponding to direction "{_dir}"', True
+                    )
                 if _shape_fraction <= 1.0:
                     shape_centre = geoms.fraction_along_line(
                         centre, _radii.point, _shape_fraction
@@ -3494,7 +3501,7 @@ class BaseShape:
         err = "The perbii_shapes must contain direction(s) and shape"
         _dirs, _shape, _shape_fraction = [], None, 1.0
         if direction_group != DirectionGroup.CIRCULAR:  # see below for calc.
-            perbii_dict = self.calculate_perbii(cnv)
+            perbii_dict = self.calculate_perbii(cnv, centre)
         for item in perbii_shapes:
             if isinstance(item, tuple):
                 # ---- determine dirs for shape
@@ -3503,10 +3510,12 @@ class BaseShape:
                     feedback(f"{err} - not {item}")
                 if direction_group == DirectionGroup.CIRCULAR:
                     vertexes = get_circle_vertexes(item[0], centre)
-                    perbii_dict = self.calculate_perbii(cnv, centre, vertexes)
+                    perbii_dict = self.calculate_perbii(cnv, centre)
                     _dirs = perbii_dict.keys()
                 elif direction_group == DirectionGroup.POLYGONAL:
-                    _dirs = [tools.as_int(item[0], "perbii_shapes direction") - 1]
+                    _dirs = tools.validated_directions(
+                        item[0], direction_group, "direction"
+                    )
                 else:
                     _dirs = tools.validated_directions(
                         item[0], direction_group, "direction"

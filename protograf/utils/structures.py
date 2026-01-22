@@ -200,7 +200,7 @@ Place = namedtuple("Place", ["shape", "rotation"])
 Point = namedtuple("Point", ["x", "y"])
 
 PolyGeometry = namedtuple(
-    "PolyGeometry", ["x", "y", "radius", "side", "half_flat", "vertices"]
+    "PolyGeometry", ["x", "y", "radius", "side", "half_flat", "vertices", "sides"]
 )
 
 Ray = namedtuple(

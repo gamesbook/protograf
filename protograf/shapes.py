@@ -297,10 +297,25 @@ class ArrowShape(BaseShape):
         )
         self.tail_notch_u = self.unit(self.tail_notch) if self.tail_notch else 0
 
-    def get_vertexes(self, **kwargs):
-        """Calculate vertices of arrow."""
-        x_c = kwargs.get("x")
-        x_s, y_s = x_c - self.tail_width_u / 2.0, kwargs.get("y")
+    @cached_property
+    def shape_centre(self) -> Point:
+        """Centre of Arrow."""
+        if self.use_abs:
+            x = self._abs_x
+            y = self._abs_y
+        else:
+            x = self._u.x + self._o.delta_x
+            y = self._u.y + self._o.delta_y
+        cx = x
+        cy = y - self._u.height
+        return Point(cx, cy)
+
+    def get_vertexes(self) -> list:
+        """Calculate vertices of Arrow."""
+        centre = self.shape_centre
+        x_c, y_c = centre.x, centre.y
+        y = y_c + self._u.height
+        x_s, y_s = x_c - self.tail_width_u / 2.0, y
         tail_height = self._u.height
         total_height = self._u.height + self.head_height_u
         if tail_height <= 0:
@@ -327,18 +342,11 @@ class ArrowShape(BaseShape):
         return vertices
 
     def draw(self, cnv=None, off_x=0, off_y=0, ID=None, **kwargs):
-        """Draw an arrow on a given canvas."""
+        """Draw an Arrow on a given canvas."""
         kwargs = self.kwargs | kwargs
         cnv = cnv if cnv else globals.canvas  # a new Page/Shape may now exist
         super().draw(cnv, off_x, off_y, ID, **kwargs)  # unit-based props
-        if self.use_abs:
-            x = self._abs_x
-            y = self._abs_y
-        else:
-            x = self._u.x + self._o.delta_x
-            y = self._u.y + self._o.delta_y
-        cx = x
-        cy = y - self._u.height
+        cx, cy = self.shape_centre.x, self.shape_centre.y
         # ---- set canvas
         self.set_canvas_props(index=ID)
         # ---- handle rotation
@@ -348,7 +356,7 @@ class ArrowShape(BaseShape):
             kwargs["rotation"] = rotation
             kwargs["rotation_point"] = self.centroid
         # ---- draw arrow
-        self.vertexes = self.get_vertexes(cx=cx, cy=cy, x=x, y=y)
+        self.vertexes = self.get_vertexes()
         # feedback(f'***Arrow {x=} {y=} {self.vertexes=}')
         cnv.draw_polyline(self.vertexes)
         kwargs["closed"] = True
@@ -359,8 +367,8 @@ class ArrowShape(BaseShape):
         self.draw_cross(cnv, cx, cy, rotation=kwargs.get("rotation"))
         # ---- text
         self.draw_label(cnv, ID, cx, cy, **kwargs)
-        self.draw_heading(cnv, ID, x, y - self._u.height - self.head_height_u, **kwargs)
-        self.draw_title(cnv, ID, x, y, **kwargs)
+        self.draw_heading(cnv, ID, cx, cy - self.head_height_u, **kwargs)
+        self.draw_title(cnv, ID, cx, cy + self._u.height, **kwargs)
 
 
 class BezierShape(BaseShape):
@@ -486,8 +494,8 @@ class CrossShape(BaseShape):
         if self.u_thickness <= 0:
             feedback("The cross thickness must be more than zero", True)
 
-    def get_center(self, **kwargs) -> Point:
-        """Get the centre Point of a Cross."""
+    def get_center(self) -> Point:
+        """Centre Point of a Cross."""
         if self.use_abs_c:
             self.x_c = self._abs_cx
             self.y_c = self._abs_cy
@@ -535,7 +543,7 @@ class CrossShape(BaseShape):
 
         # ---- component sizes
         parts = self.get_cross_parts()  # CrossParts tuple
-        centre = self.get_center(**kwargs)
+        centre = self.get_center()
         # feedback(f"*** CROSS {self._u.height=} {thick=}")
         # x,y are top-left
         y = centre.y - parts.head - parts.half_thick
@@ -636,8 +644,9 @@ class DotShape(BaseShape):
         # ---- RESET UNIT PROPS (last!)
         self.set_unit_properties()
 
-    def calculate_centre(self) -> Point:
-        """Calculate centre of Dot."""
+    @cached_property
+    def shape_centre(self) -> Point:
+        """Centre of Dot."""
         if self.use_abs_c:
             self.x_c = self._abs_cx
             self.y_c = self._abs_cy
@@ -832,7 +841,9 @@ class LineShape(BaseShape):
                 case "p" | "perbis":
                     the_centre = the_shape.get_center()
                     try:
-                        perbises = the_shape.calculate_perbii(cnv, the_centre)
+                        perbises = the_shape.calculate_perbii(
+                            cnv=cnv, centre=the_centre
+                        )
                     except AttributeError:
                         feedback(
                             f"A {shape_name} has no perbii available for a connection.",
@@ -1141,7 +1152,7 @@ class PodShape(BaseShape):
 
 class PolygonShape(BaseShape):
     """
-    Regular polygon on a given canvas.
+    Regular Polygon on a given canvas.
     """
 
     def __init__(self, _object=None, canvas=None, **kwargs):
@@ -1156,7 +1167,7 @@ class PolygonShape(BaseShape):
         if self.perbii:
             if isinstance(self.perbii, str):
                 if _lower(self.perbii) in ["all", "*"]:
-                    sides = tools.as_int(self.sides, "sides")
+                    sides = tools.as_int(self.sides, label="sides", minimum=1)
                     self.perbii = list(range(1, sides + 1))
                 else:
                     self.perbii = tools.sequence_split(self.perbii)
@@ -1167,7 +1178,21 @@ class PolygonShape(BaseShape):
         # ---- RESET UNIT PROPS (last!)
         self.set_unit_properties()
 
-    def get_radius(self) -> float:
+    @cached_property
+    def shape_centre(self) -> Point:
+        """Centre of Polygon"""
+
+    @cached_property
+    def shape_area(self) -> float:
+        """Area of Polygon"""
+        sides = tools.as_int(self.sides, label="sides", minimum=1)
+        radius = self.shape_radius
+        area = (sides * radius * radius / 2.0) * math.sin(2.0 * math.pi / sides)
+        return area
+
+    @cached_property
+    def shape_radius(self) -> float:
+        """Radius of Polygon"""
         if self.radius and self.use_radius:
             radius = self._u.radius
         elif self.diameter and self.use_diameter:
@@ -1182,12 +1207,6 @@ class PolygonShape(BaseShape):
             # 180 degrees is math.pi radians
             radius = side / (2.0 * math.sin(math.pi / sides))
         return radius
-
-    def calculate_area(self) -> float:
-        sides = tools.as_int(self.sides, "sides")
-        radius = self.get_radius()
-        area = (sides * radius * radius / 2.0) * math.sin(2.0 * math.pi / sides)
-        return area
 
     def draw_mesh(self, cnv, ID, vertices: list):
         """Lines connecting each vertex to mid-points of opposing sides."""
@@ -1222,7 +1241,7 @@ class PolygonShape(BaseShape):
             pre_geom.y,
             pre_geom.vertices,
         )
-        # for p in vertices: print(f'*Poly G-V* x={self._p2v(p.x)} y={self._p2v(p.y)}')
+        # for p in vertices: print(f'*POLYG vert x={self._p2v(p.x)} y={self._p2v(p.y)}')
         angles = []
         for vertex in vertices:
             _, angle = geoms.angles_from_points(Point(x, y), vertex)
@@ -1245,16 +1264,23 @@ class PolygonShape(BaseShape):
         """
         perbii_dict = {}
         _perbii_pts = []
-        vertices = self.get_vertexes()
-        vcount = len(vertices) - 1
-        for key, vertex in enumerate(vertices):
-            # print(f"*** POLYGOM *** vertex {key=} {vertex=}")
+        _vertices = self.get_vertexes()
+        the_geom = self.get_geometry()
+        if the_geom.sides & 1 == 1:  # odd no.of sides
+            vertices = _vertices
+        else:  # even no.of sides
+            vertices = _vertices[2:] + _vertices[0:2]
+        # print(f"*** POLYGON *** \n{_vertices=}\n{vertices=}")
+        vcount = len(_vertices) - 1
+        for key, vertex in enumerate(_vertices):
+            # print(f"*** POLYGON *** vertex {key=} {vertex=}")
             if key == 0:
                 p1 = Point(vertex.x, vertex.y)
                 p2 = Point(vertices[vcount].x, vertices[vcount].y)
             else:
                 p1 = Point(vertex.x, vertex.y)
                 p2 = Point(vertices[key - 1].x, vertices[key - 1].y)
+            # print(f"*** POLYGON *** perbii {key=} {p1=} {p2=}")
             pc = geoms.fraction_along_line(p1, p2, 0.5)  # centre pt of edge
             _perbii_pts.append(pc)
             compass, angle = geoms.angles_from_points(centre, pc)
@@ -1300,7 +1326,7 @@ class PolygonShape(BaseShape):
                 compass=compass,
                 angle=360 - angle,  # inverse flip (y is reveresed)
             )
-            print(f"*** POLYGON radii {_radii=} {self.fill=}")
+            # print(f"*** POLYGON radii {_radii=} {self.fill=}")
             radii_dict[key + 1] = _radii
         return radii_dict
 
@@ -1324,7 +1350,7 @@ class PolygonShape(BaseShape):
         pb_length = (
             self.unit(self.perbii_length, label="perbii length")
             if self.perbii_length
-            else self.get_radius()
+            else self.shape_radius
         )
         perbii_dict = self.calculate_perbii(cnv, centre, rotation)
         centre = self.get_center()
@@ -1335,13 +1361,13 @@ class PolygonShape(BaseShape):
         for key in self.perbii:
             # points based on length of line, offset and the angle in degrees
             the_perbii = perbii_dict.get(int(key), None)
-            # print(f'*** POLY {key=} {the_perbii.v1=} {the_perbii.v2=}')
+            # print(f'*** POLYGON {key=} {the_perbii.v1=} {the_perbii.v2=}')
             if the_perbii is None:
                 feedback(f"{key} is not a valid perbii direction!", True)
             edge_pt = geoms.fraction_along_line(
                 the_perbii.v1, the_perbii.v2, 0.5
             )  # centre pt of edge
-            # print(f'*** POLY {pb_angle=} {edge_pt=} {centre=}')
+            # print(f'*** POLYGON {pb_angle=} {edge_pt=} {centre=}')
             if pb_offset is not None and pb_offset != 0:
                 offset_pt = geoms.point_on_circle(centre, pb_offset, the_perbii.angle)
                 end_pt = geoms.point_on_line(offset_pt, edge_pt, pb_length)
@@ -1361,7 +1387,7 @@ class PolygonShape(BaseShape):
 
         # ---- style all perbii
         rotation_point = centre if rotation else None
-        # print(f"*** B-POLY perbii {len(vertices)=} {rotation_point=} {rotation=}")
+        # print(f"*** POLYGON perbii {len(vertices)=} {rotation_point=} {rotation=}")
         self.set_canvas_props(
             index=ID,
             stroke=self.perbii_stroke,
@@ -1392,13 +1418,13 @@ class PolygonShape(BaseShape):
                 _, angle = geoms.angles_from_points(vertex, centre)
                 # compass, angle = geoms.angles_from_points(vertex, centre)
                 mirror_angle = 180 - angle
-                # print(f'{key+1=} {vertex=} {compass=} {angle=} {mirror_angle=}')
+                # print(f'*** POLYGON {key+1=} {vertex=} {compass=} {mirror_angle=}')
                 _radii.append(mirror_angle)
         rad_offset = self.unit(self.radii_offset, label="radii offset") or 0
         rad_length = (
             self.unit(self.radii_length, label="radii length")
             if self.radii_length
-            else self.get_radius()
+            else self.shape_radius
         )
         # ---- set radii styles
         lkwargs = {}
@@ -1410,7 +1436,7 @@ class PolygonShape(BaseShape):
             if rad_offset is not None and rad_offset != 0:
                 offset_pt = geoms.point_on_circle(centre, rad_offset, rad_angle)
                 end_pt = geoms.point_on_line(offset_pt, diam_pt, rad_length)
-                # print('***', rad_angle, offset_pt, f'{x_c=}, {y_c=}')
+                # print('*** POLYGON', rad_angle, offset_pt, f'{x_c=}, {y_c=}')
                 start_point = offset_pt.x, offset_pt.y
                 end_point = end_pt.x, end_pt.y
             else:
@@ -1427,7 +1453,7 @@ class PolygonShape(BaseShape):
 
         # ---- style all radii
         rotation_point = centre if rotation else None
-        # print(f"*** POLY radii {rotation_point=} {rotation=}")
+        # print(f"*** POLYGON radii {rotation_point=} {rotation=}")
         self.set_canvas_props(
             cnv=cnv,
             index=ID,
@@ -1460,7 +1486,7 @@ class PolygonShape(BaseShape):
             if not isinstance(slcolor, bool)
         ]
         # ---- draw triangle per slice; iterate through colors as needed!
-        # print(f'*** PS {slices_colors=} {vertexes=}')
+        # print(f'*** POLYGON {slices_colors=} {vertexes=}')
         cid = 0
         for vid in range(0, len(vertexes)):
             scolor = slices_colors[cid]
@@ -1482,7 +1508,7 @@ class PolygonShape(BaseShape):
                 cid = 0
 
     def get_geometry(self, rotation: float = None):
-        """Calculate centre, radius, side and vertices of Polygon."""
+        """Calculate centre, radius, side, vertices and sides of Polygon."""
         centre = self.get_center()
         x, y = centre.x, centre.y
         side, half_flat = 0.0, 0.0
@@ -1495,29 +1521,30 @@ class PolygonShape(BaseShape):
             self._u.side = side
             half_flat = self._u.side * math.sqrt(3) / 2.0
         elif self.radius:
-            side = self.get_radius()
+            side = self.shape_radius
             half_flat = side * math.sqrt(3) / 2.0
         else:
             feedback(
                 "Polygon needs either a valid height, or diameter, or radius", True
             )
+        sides = tools.as_int(self.sides, label="sides", minimum=1)
         # ---- calculate radius
-        radius = self.get_radius()
+        radius = self.shape_radius
         # ---- calculate vertices - assumes x,y marks the centre point
-        vertices = geoms.polygon_vertices(self.sides, radius, Point(x, y), rotation)
-        # for p in vertices: print(f'*G-V* {p.x / 28.3465}, {p.y / 28.3465}')
-        return PolyGeometry(x, y, radius, side, half_flat, vertices)
+        vertices = geoms.polygon_vertices(sides, radius, Point(x, y), rotation)
+        # for p in vertices: print(f'*PG-V* {p.x / 28.3465}, {p.y / 28.3465}')
+        return PolyGeometry(x, y, radius, side, half_flat, vertices, sides)
 
     def get_vertexes(self):
         """Calculate vertices of Polygon."""
-        # ---- calculate vertices
         the_geom = self.get_geometry()
         vertices = the_geom.vertices
-        # move back so the vertices start at "top right"
-        # vertices_shift = vertices[-1:] + vertices[:-1]
-        vertices_shift = vertices[1:] + vertices[0:1]
-        # for p in vertices: print(f'*POLY* P-V* {p.x / 28.3465}, {p.y / 28.3465}')
-        return vertices_shift
+        # for p in vertices: print(f'*POLYGON* vtx: {p.x / 28.3465}, {p.y / 28.3465}')
+        if the_geom.sides & 1 == 1:  # odd no.of sides
+            # move back so the vertices start at "top right"
+            vertices_shift = vertices[1:] + vertices[0:1]
+            return vertices_shift
+        return vertices
 
     def get_vertexes_named(self):
         """Get named (by number) vertices of Polygon."""
@@ -1616,6 +1643,7 @@ class PolygonShape(BaseShape):
             "text",
         ]
         ordering = base_ordering
+        # feedback(f'*** POLYGON: {ordering=}')
         if self.order_all:
             ordering = tools.list_ordering(base_ordering, self.order_all, only=True)
         else:
@@ -1625,13 +1653,12 @@ class PolygonShape(BaseShape):
                 )
             if self.order_last:
                 ordering = tools.list_ordering(base_ordering, self.order_last, end=True)
-        # feedback(f'*** POLYGON: {ordering=}')
 
         # ---- draw in ORDER
         for item in ordering:
             if item == "base":
                 # ---- * draw polygon
-                # feedback(f"***Polygon {self.col=} {self.row=} {x=} {y=} \n{self.vertices=}")
+                # feedback(f"*** POLYGON {self.col=} {self.row=} {x=} {y=} \n{self.vertices=}")
                 cnv.draw_polyline(self.vertices)
                 kwargs["closed"] = True
                 self.set_canvas_props(cnv=cnv, index=ID, **kwargs)
@@ -1710,8 +1737,7 @@ class PolygonShape(BaseShape):
                         self.vertex_shapes_rotated,
                     )
             if item == "debug":
-                # ---- * draw debug
-                # self._debug(cnv, vertices=self.vertices)  # needs: self.run_debug = True
+                # ---- * draw debug; needs: self.run_debug = True
                 pass
             if item == "dot":
                 # ---- * draw dot
@@ -1752,7 +1778,7 @@ class PolylineShape(BasePolyShape):
         # ---- set vertices
         self.vertexes = self.get_vertexes(**kwargs)  # BasePoly
         # ---- draw polyline by vertices
-        # feedback(f'***PolyLineShp{x=} {y=} {self.vertexes=}')
+        # feedback(f'***POLYLINE {x=} {y=} {self.vertexes=}')
         if self.vertexes:
             for key, vertex in enumerate(self.vertexes):
                 if key < len(self.vertexes) - 1:
@@ -2124,7 +2150,7 @@ class RhombusShape(BaseShape):
             )
         else:
             perbii_dirs = []
-        perbii_dict = self.calculate_perbii(cnv=cnv, centre=centre, vertices=vertices)
+        perbii_dict = self.calculate_perbii(cnv=cnv, centre=centre)
         pb_offset = self.unit(self.perbii_offset, label="perbii offset") or 0
         pb_length = (
             self.unit(self.perbii_length, label="perbii length")
@@ -3781,7 +3807,7 @@ class TriangleShape(BaseShape):
             )
         else:
             perbii_dirs = []
-        perbii_dict = self.calculate_perbii(cnv=cnv, centre=centre, vertices=vertices)
+        perbii_dict = self.calculate_perbii(cnv=cnv, centre=centre)
         pb_offset = self.unit(self.perbii_offset, label="perbii offset") or 0
         pb_length = (
             self.unit(self.perbii_length, label="perbii length")

@@ -195,12 +195,12 @@ def as_int(
         the_value = int(value)
         if minimum and the_value < minimum:
             feedback(
-                f'The {_label}"{value}" integer is less than the minimum of {minimum}!',
+                f'The {_label}"{value}" is less than the integer minimum of {minimum}!',
                 True,
             )
         if maximum and the_value > maximum:
             feedback(
-                f'The {_label}"{value}" integer is more than the maximum of {maximum}!',
+                f'The {_label}"{value}" is more than the integer maximum of {maximum}!',
                 True,
             )
         return the_value

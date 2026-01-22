@@ -882,7 +882,7 @@ class RectangleShape(BaseShape):
                 for a polygon, each edge is effectively a chord.
         """
         vertices = self.get_vertexes(rotation=rotation, **kwargs)
-        perbii_dict = self.calculate_perbii(cnv=cnv, centre=centre, vertices=vertices)
+        perbii_dict = self.calculate_perbii(cnv=cnv, centre=centre)
         pb_length = (
             self.unit(self.perbii_length, label="perbii length")
             if self.perbii_length
