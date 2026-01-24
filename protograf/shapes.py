@@ -43,6 +43,7 @@ from protograf.utils.structures import (
     Point,
     PolyGeometry,
     Radius,
+    ShapeGeometry,
     TriangleType,
     Vertex,
 )  # named tuples
@@ -70,6 +71,31 @@ class ImageShape(BaseShape):
                 "Image cannot have both align and cx or cy properties set at the same time.",
                 True,
             )
+
+    @cached_property
+    def shape_area(self) -> float:
+        """Area of Image."""
+        return None
+
+    @cached_property
+    def shape_centre(self) -> Point:
+        """Centre of Image."""
+        return None
+
+    @cached_property
+    def shape_vertices(self) -> dict:
+        """Vertices of Image."""
+        return {}
+
+    @cached_property
+    def shape_perbii(self) -> dict:
+        """Perbii of Image."""
+        return {}
+
+    @cached_property
+    def shape_geom(self) -> ShapeGeometry:
+        """Geometry of Image."""
+        return ShapeGeometry()
 
     def draw(self, cnv=None, off_x=0, off_y=0, ID=None, **kwargs):
         """Show an image on a given canvas."""
@@ -204,6 +230,31 @@ class ArcShape(BaseShape):
             self.y_c = self._u.y + radius
         # feedback(f'***Arc {self.x_c=} {self.y_c=} {self.radius=}')
 
+    @cached_property
+    def shape_area(self) -> float:
+        """Area of Arc."""
+        return None
+
+    @cached_property
+    def shape_centre(self) -> Point:
+        """Centre of Arc."""
+        return None
+
+    @cached_property
+    def shape_vertices(self) -> dict:
+        """Vertices of Arc."""
+        return {}
+
+    @cached_property
+    def shape_perbii(self) -> dict:
+        """Perbii of Arc."""
+        return {}
+
+    @cached_property
+    def shape_geom(self) -> ShapeGeometry:
+        """Geometry of Arc."""
+        return ShapeGeometry()
+
     def draw_nested(self, cnv, ID, centre: Point, **kwargs):
         """Draw concentric Arcs from the outer Arc inwards."""
         if self.nested:
@@ -298,8 +349,33 @@ class ArrowShape(BaseShape):
         self.tail_notch_u = self.unit(self.tail_notch) if self.tail_notch else 0
 
     @cached_property
+    def shape_area(self) -> float:
+        """Area of Arrow."""
+        return None
+
+    @cached_property
     def shape_centre(self) -> Point:
         """Centre of Arrow."""
+        return None
+
+    @cached_property
+    def shape_vertices(self) -> dict:
+        """Vertices of Arrow."""
+        return {}
+
+    @cached_property
+    def shape_perbii(self) -> dict:
+        """Perbii of Arrow."""
+        return {}
+
+    @cached_property
+    def shape_geom(self) -> ShapeGeometry:
+        """Geometry of Arrow."""
+        return ShapeGeometry()
+
+    @cached_property
+    def _shape_centre(self) -> Point:
+        """Centre of Arrow in points."""
         if self.use_abs:
             x = self._abs_x
             y = self._abs_y
@@ -312,7 +388,7 @@ class ArrowShape(BaseShape):
 
     def get_vertexes(self) -> list:
         """Calculate vertices of Arrow."""
-        centre = self.shape_centre
+        centre = self._shape_centre
         x_c, y_c = centre.x, centre.y
         y = y_c + self._u.height
         x_s, y_s = x_c - self.tail_width_u / 2.0, y
@@ -346,7 +422,7 @@ class ArrowShape(BaseShape):
         kwargs = self.kwargs | kwargs
         cnv = cnv if cnv else globals.canvas  # a new Page/Shape may now exist
         super().draw(cnv, off_x, off_y, ID, **kwargs)  # unit-based props
-        cx, cy = self.shape_centre.x, self.shape_centre.y
+        cx, cy = self._shape_centre.x, self._shape_centre.y
         # ---- set canvas
         self.set_canvas_props(index=ID)
         # ---- handle rotation
@@ -384,6 +460,31 @@ class BezierShape(BaseShape):
     def __init__(self, _object=None, canvas=None, **kwargs):
         super().__init__(_object=_object, canvas=canvas, **kwargs)
 
+    @cached_property
+    def shape_area(self) -> float:
+        """Area of Bezier."""
+        return None
+
+    @cached_property
+    def shape_centre(self) -> Point:
+        """Centre of Bezier."""
+        return None
+
+    @cached_property
+    def shape_vertices(self) -> dict:
+        """Vertices of Bezier."""
+        return {}
+
+    @cached_property
+    def shape_perbii(self) -> dict:
+        """Perbii of Bezier."""
+        return {}
+
+    @cached_property
+    def shape_geom(self) -> ShapeGeometry:
+        """Geometry of Bezier."""
+        return ShapeGeometry()
+
     def draw(self, cnv=None, off_x=0, off_y=0, ID=None, **kwargs):
         """Draw Bezier curve on a given canvas."""
         kwargs = self.kwargs | kwargs
@@ -414,6 +515,31 @@ class ChordShape(BaseShape):
     Chord line on a Circle on a given canvas.
     """
 
+    @cached_property
+    def shape_area(self) -> float:
+        """Area of Chord."""
+        return None
+
+    @cached_property
+    def shape_centre(self) -> Point:
+        """Centre of Chord."""
+        return None
+
+    @cached_property
+    def shape_vertices(self) -> dict:
+        """Vertices of Chord."""
+        return {}
+
+    @cached_property
+    def shape_perbii(self) -> dict:
+        """Perbii of Chord."""
+        return {}
+
+    @cached_property
+    def shape_geom(self) -> ShapeGeometry:
+        """Geometry of Chord."""
+        return ShapeGeometry()
+
     def draw_arrow(self, cnv, point_a, point_b, **kwargs):
         """Draw a styled Arrow for Chord."""
         if (
@@ -436,9 +562,10 @@ class ChordShape(BaseShape):
         if not isinstance(self.shape, CircleShape):
             feedback("Shape must be a circle!", True)
         circle = self.shape
-        centre = circle.calculate_centre()  # pt units!
-        pt0 = geoms.point_on_circle(centre, circle._u.radius, self.angle)
-        pt1 = geoms.point_on_circle(centre, circle._u.radius, self.angle_1)
+        pt0 = geoms.point_on_circle(circle._shape_centre, circle._u.radius, self.angle)
+        pt1 = geoms.point_on_circle(
+            circle._shape_centre, circle._u.radius, self.angle_1
+        )
         # feedback(f"*** {circle._u.radius=} {pt0=} {pt1=}")
         x = pt0.x  # + self._o.delta_x
         y = pt0.y  # + self._o.delta_y
@@ -494,8 +621,34 @@ class CrossShape(BaseShape):
         if self.u_thickness <= 0:
             feedback("The cross thickness must be more than zero", True)
 
-    def get_center(self) -> Point:
-        """Centre Point of a Cross."""
+    @cached_property
+    def shape_area(self) -> float:
+        """Area of Cross."""
+        return None
+
+    @cached_property
+    def shape_centre(self) -> Point:
+        """Centre of Cross."""
+        return None
+
+    @cached_property
+    def shape_vertices(self) -> dict:
+        """Vertices of Cross."""
+        return {}
+
+    @cached_property
+    def shape_perbii(self) -> dict:
+        """Perbii of Cross."""
+        return {}
+
+    @cached_property
+    def shape_geom(self) -> ShapeGeometry:
+        """Geometry of Cross."""
+        return ShapeGeometry()
+
+    @cached_property
+    def _shape_centre(self) -> Point:
+        """Centre of Cross in points."""
         if self.use_abs_c:
             self.x_c = self._abs_cx
             self.y_c = self._abs_cy
@@ -543,11 +696,10 @@ class CrossShape(BaseShape):
 
         # ---- component sizes
         parts = self.get_cross_parts()  # CrossParts tuple
-        centre = self.get_center()
         # feedback(f"*** CROSS {self._u.height=} {thick=}")
         # x,y are top-left
-        y = centre.y - parts.head - parts.half_thick
-        x = centre.x - parts.arm - parts.half_thick
+        y = self._shape_centre.y - parts.head - parts.half_thick
+        x = self._shape_centre.x - parts.arm - parts.half_thick
         # ---- top-left and anti-clockwise
         vertices = []
         vertices.append(Point(x + parts.arm, y))  # 0
@@ -586,13 +738,13 @@ class CrossShape(BaseShape):
         kwargs = self.kwargs | kwargs
         cnv = cnv if cnv else globals.canvas  # a new Page/Shape may now exist
         super().draw(cnv, off_x, off_y, ID, **kwargs)  # unit-based props
-        self.centre = self.get_center(**kwargs)
         parts = self.get_cross_parts()  # CrossParts tuple
-        # feedback(f"*** CROSS {self.centre=} {cross_parts=}")
+        centre = self._shape_centre  # shortcut!
+        # feedback(f"*** CROSS {self._shape_centre=} {cross_parts=}")
         # ---- handle rotation
         rotation = kwargs.get("rotation", self.rotation)
         if rotation:
-            self.centroid = muPoint(self.centre.x, self.centre.y)
+            self.centroid = muPoint(centre.x, centre.y)
             kwargs["rotation"] = rotation
             kwargs["rotation_point"] = self.centroid
         # ---- draw cross
@@ -602,25 +754,23 @@ class CrossShape(BaseShape):
         kwargs["closed"] = True
         self.set_canvas_props(cnv=cnv, index=ID, **kwargs)
         # ---- dot
-        self.draw_dot(cnv, self.centre.x, self.centre.y)
+        self.draw_dot(cnv, centre.x, centre.y)
         # ---- cross
-        self.draw_cross(
-            cnv, self.centre.x, self.centre.y, rotation=kwargs.get("rotation")
-        )
+        self.draw_cross(cnv, centre.x, centre.y, rotation=kwargs.get("rotation"))
         # ---- text
-        self.draw_label(cnv, ID, self.centre.x, self.centre.y, **kwargs)
+        self.draw_label(cnv, ID, centre.x, centre.y, **kwargs)
         self.draw_heading(
             cnv,
             ID,
-            self.centre.x,
-            self.centre.y - parts.head - parts.half_thick,
+            centre.x,
+            centre.y - parts.head - parts.half_thick,
             **kwargs,
         )
         self.draw_title(
             cnv,
             ID,
-            self.centre.x,
-            self.centre.y + parts.body + parts.half_thick,
+            centre.x,
+            centre.y + parts.body + parts.half_thick,
             **kwargs,
         )
 
@@ -645,8 +795,33 @@ class DotShape(BaseShape):
         self.set_unit_properties()
 
     @cached_property
+    def shape_area(self) -> float:
+        """Area of Dot."""
+        return None
+
+    @cached_property
     def shape_centre(self) -> Point:
         """Centre of Dot."""
+        return None
+
+    @cached_property
+    def shape_vertices(self) -> dict:
+        """Vertices of Dot."""
+        return {}
+
+    @cached_property
+    def shape_perbii(self) -> dict:
+        """Perbii of Dot."""
+        return {}
+
+    @cached_property
+    def shape_geom(self) -> ShapeGeometry:
+        """Geometry of Dot."""
+        return ShapeGeometry()
+
+    @cached_property
+    def _shape_centre(self) -> Point:
+        """Centre of Dot in points."""
         if self.use_abs_c:
             self.x_c = self._abs_cx
             self.y_c = self._abs_cy
@@ -662,7 +837,7 @@ class DotShape(BaseShape):
         super().draw(cnv, off_x, off_y, ID, **kwargs)  # unit-based props
         # feedback(f"*** Dot {self._o.delta_x=} {self._o.delta_y=}")
         # ---- set centre
-        ccentre = self.calculate_centre()  # self.x_c, self.y_c
+        ccentre = self._shape_centre
         x, y = ccentre.x, ccentre.y
         self.fill = self.stroke
         center = muPoint(x, y)
@@ -682,6 +857,31 @@ class EllipseShape(BaseShape):
     """
     Ellipse on a given canvas.
     """
+
+    @cached_property
+    def shape_area(self) -> float:
+        """Area of Ellipse."""
+        return None
+
+    @cached_property
+    def shape_centre(self) -> Point:
+        """Centre of Ellipse."""
+        return None
+
+    @cached_property
+    def shape_vertices(self) -> dict:
+        """Vertices of Ellipse."""
+        return {}
+
+    @cached_property
+    def shape_perbii(self) -> dict:
+        """Perbii of Ellipse."""
+        return {}
+
+    @cached_property
+    def shape_geom(self) -> ShapeGeometry:
+        """Geometry of Ellipse."""
+        return ShapeGeometry()
 
     def calculate_area(self):
         return math.pi * self._u.height * self._u.width
@@ -762,6 +962,31 @@ class LineShape(BaseShape):
     """
     Line on a given canvas.
     """
+
+    @cached_property
+    def shape_area(self) -> float:
+        """Area of Line."""
+        return None
+
+    @cached_property
+    def shape_centre(self) -> Point:
+        """Centre of Line."""
+        return None
+
+    @cached_property
+    def shape_vertices(self) -> dict:
+        """Vertices of Line."""
+        return {}
+
+    @cached_property
+    def shape_perbii(self) -> dict:
+        """Perbii of Line."""
+        return {}
+
+    @cached_property
+    def shape_geom(self) -> ShapeGeometry:
+        """Geometry of Line."""
+        return ShapeGeometry()
 
     def draw_connections(
         self, cnv=None, off_x=0, off_y=0, ID=None, shapes: list = None, **kwargs
@@ -907,8 +1132,8 @@ class LineShape(BaseShape):
             if isinstance(shape_a, (CircleShape, DotShape)) and isinstance(
                 shape_b, (CircleShape, DotShape)
             ):
-                centre_a = shape_a.calculate_centre()
-                centre_b = shape_b.calculate_centre()
+                centre_a = shape_a._shape_centre  # circle/dot
+                centre_b = shape_b._shape_centre  # circle/dot
                 rotation_a, rotation_b = get_rotation(centre_a, centre_b)
                 # print(f"*** connections {rotation_a=}, {rotation_b=}")
                 pt_a = geoms.point_on_circle(centre_a, shape_a._u.radius, rotation_a)
@@ -920,7 +1145,7 @@ class LineShape(BaseShape):
             ):
                 dirs_b, name_b = validate_connection_params(shape_b)
                 pt_b = get_connection_point(cnv, shape_b[0], shape_b[1], shape_b[2])
-                centre_a = shape_a.calculate_centre()
+                centre_a = shape_a._shape_centre  # circle/dot
                 rotation_a, rotation_b = get_rotation(centre_a, pt_b)
                 # print(f"*** connections {rotation_a=}, {rotation_b=}")
                 pt_a = geoms.point_on_circle(centre_a, shape_a._u.radius, rotation_a)
@@ -931,7 +1156,7 @@ class LineShape(BaseShape):
             ):
                 dirs_a, name_a = validate_connection_params(shape_a)
                 pt_a = get_connection_point(cnv, shape_a[0], shape_a[1], shape_a[2])
-                centre_b = shape_b.calculate_centre()  # circle
+                centre_b = shape_b._shape_centre  # circle/dot
                 rotation_a, rotation_b = get_rotation(pt_a, centre_b)
                 # print(f"*** connections {rotation_a=}, {rotation_b=}")
                 pt_b = geoms.point_on_circle(centre_b, shape_b._u.radius, rotation_b)
@@ -1064,6 +1289,31 @@ class PodShape(BaseShape):
         # ---- RESET UNIT PROPS (last!)
         self.set_unit_properties()
 
+    @cached_property
+    def shape_area(self) -> float:
+        """Area of Pod."""
+        return None
+
+    @cached_property
+    def shape_centre(self) -> Point:
+        """Centre of Pod."""
+        return None
+
+    @cached_property
+    def shape_vertices(self) -> dict:
+        """Vertices of Pod."""
+        return {}
+
+    @cached_property
+    def shape_perbii(self) -> dict:
+        """Perbii of Pod."""
+        return {}
+
+    @cached_property
+    def shape_geom(self) -> ShapeGeometry:
+        """Geometry of Pod."""
+        return ShapeGeometry()
+
     def calculate_xy(self, **kwargs):
         # ---- adjust start
         if self.row is not None and self.col is not None:
@@ -1179,20 +1429,60 @@ class PolygonShape(BaseShape):
         self.set_unit_properties()
 
     @cached_property
-    def shape_centre(self) -> Point:
-        """Centre of Polygon"""
+    def shape_area(self) -> float:
+        """Area of Polygon."""
+        return self._p2v(self._shape_area)
 
     @cached_property
-    def shape_area(self) -> float:
-        """Area of Polygon"""
+    def shape_centre(self) -> Point:
+        """Centre of Polygon"""
+        return Point(
+            self._p2v(self._shape_centre.x, 3), self._p2v(self._shape_centre.y, 3)
+        )
+
+    '''
+    @cached_property
+    def shape_vertices(self) -> dict:
+        """Vertices of Polygon."""
+        return {}
+
+    @cached_property
+    def shape_perbii(self) -> dict:
+        """Perbii of Polygon."""
+        return {}
+
+    @cached_property
+    def shape_geom(self) -> ShapeGeometry:
+        """Geometry of Polygon."""
+        return ShapeGeometry()
+    '''
+
+    @cached_property
+    def _shape_area(self) -> float:
+        """Area of Polygon in points."""
         sides = tools.as_int(self.sides, label="sides", minimum=1)
-        radius = self.shape_radius
-        area = (sides * radius * radius / 2.0) * math.sin(2.0 * math.pi / sides)
+        area = (sides * self._shape_radius**2 / 2.0) * math.sin(2.0 * math.pi / sides)
         return area
 
     @cached_property
-    def shape_radius(self) -> float:
-        """Radius of Polygon"""
+    def _shape_centre(self) -> Point:
+        """Centre of Polygon in points"""
+        if self.cx is not None and self.cy is not None:
+            x = self._u.cx + self._o.delta_x
+            y = self._u.cy + self._o.delta_y
+        else:
+            x = self._u.x + self._o.delta_x
+            y = self._u.y + self._o.delta_y
+        # recalculate centre if preset
+        if self.use_abs_c:
+            if self._abs_cx is not None and self._abs_cy is not None:
+                x = self._abs_cx
+                y = self._abs_cy
+        return Point(x, y)
+
+    @cached_property
+    def _shape_radius(self) -> float:
+        """Radius of Polygon in points."""
         if self.radius and self.use_radius:
             radius = self._u.radius
         elif self.diameter and self.use_diameter:
@@ -1213,21 +1503,6 @@ class PolygonShape(BaseShape):
         feedback("Mesh for Polygon is not yet implemented.", alert=True)
         log.debug("%s %s %s", cnv, ID, vertices)
         # TODO - autodraw (without dirs)
-
-    def get_center(self) -> Point:
-        """Calculate the centre of a polygon as a Point (in units)"""
-        if self.cx is not None and self.cy is not None:
-            x = self._u.cx + self._o.delta_x
-            y = self._u.cy + self._o.delta_y
-        else:
-            x = self._u.x + self._o.delta_x
-            y = self._u.y + self._o.delta_y
-        # ---- recalculate centre if preset
-        if self.use_abs_c:
-            if self._abs_cx is not None and self._abs_cy is not None:
-                x = self._abs_cx
-                y = self._abs_cy
-        return Point(x, y)
 
     def get_angles(self) -> list:
         """Angles of lines connecting the Polygon centre to each of the vertices.
@@ -1350,10 +1625,10 @@ class PolygonShape(BaseShape):
         pb_length = (
             self.unit(self.perbii_length, label="perbii length")
             if self.perbii_length
-            else self.shape_radius
+            else self._shape_radius
         )
+        centre = centre or self._shape_centre
         perbii_dict = self.calculate_perbii(cnv, centre, rotation)
-        centre = self.get_center()
         # ---- set perbii waves
         lkwargs = {}
         lkwargs["wave_style"] = self.kwargs.get("perbii_wave_style", None)
@@ -1424,7 +1699,7 @@ class PolygonShape(BaseShape):
         rad_length = (
             self.unit(self.radii_length, label="radii length")
             if self.radii_length
-            else self.shape_radius
+            else self._shape_radius
         )
         # ---- set radii styles
         lkwargs = {}
@@ -1509,7 +1784,7 @@ class PolygonShape(BaseShape):
 
     def get_geometry(self, rotation: float = None):
         """Calculate centre, radius, side, vertices and sides of Polygon."""
-        centre = self.get_center()
+        centre = self._shape_centre
         x, y = centre.x, centre.y
         side, half_flat = 0.0, 0.0
         # ---- calculate side and half_flat
@@ -1528,12 +1803,12 @@ class PolygonShape(BaseShape):
                 "Polygon needs either a valid height, or diameter, or radius", True
             )
         sides = tools.as_int(self.sides, label="sides", minimum=1)
-        # ---- calculate radius
-        radius = self.shape_radius
         # ---- calculate vertices - assumes x,y marks the centre point
-        vertices = geoms.polygon_vertices(sides, radius, Point(x, y), rotation)
+        vertices = geoms.polygon_vertices(
+            sides, self._shape_radius, Point(x, y), rotation
+        )
         # for p in vertices: print(f'*PG-V* {p.x / 28.3465}, {p.y / 28.3465}')
-        return PolyGeometry(x, y, radius, side, half_flat, vertices, sides)
+        return PolyGeometry(x, y, self._shape_radius, side, half_flat, vertices, sides)
 
     def get_vertexes(self):
         """Calculate vertices of Polygon."""
@@ -1564,7 +1839,7 @@ class PolygonShape(BaseShape):
         cnv = cnv if cnv else globals.canvas  # a new Page/Shape may now exist
         super().draw(cnv, off_x, off_y, ID, **kwargs)  # unit-based props
         # ---- calc centre (in units)
-        centre = self.get_center()
+        centre = self._shape_centre
         x, y = centre.x, centre.y
         # ---- handle rotation
         rotation = self.kwargs.get("rotation", self.rotation)
@@ -1621,7 +1896,7 @@ class PolygonShape(BaseShape):
                 tl=Point(self.x_c - self._u.radius, self.y_c - self._u.radius),
                 br=Point(self.x_c + self._u.radius, self.y_c + self._u.radius),
             )
-        # ---- invalid polygon?
+        # ---- invalid polygonArrow
         if not self.vertices or len(self.vertices) == 0:
             return
 
@@ -1671,7 +1946,7 @@ class PolygonShape(BaseShape):
                     self.draw_slices(
                         cnv,
                         ID,
-                        Point(x, y),
+                        self._shape_centre,
                         self.vertices,
                         rotation=rotation,
                     )
@@ -1679,13 +1954,13 @@ class PolygonShape(BaseShape):
                 # ---- * draw radii
                 if self.radii:
                     self.draw_radii(
-                        cnv, ID, Point(x, y), self.vertices, rotation=rotation
+                        cnv, ID, self._shape_centre, self.vertices, rotation=rotation
                     )
             if item == "perbii":
                 # ---- * draw perbii
                 if self.perbii:
                     self.draw_perbii(
-                        cnv, ID, Point(x, y), self.vertices, rotation=rotation
+                        cnv, ID, self._shape_centre, self.vertices, rotation=rotation
                     )
             if item == "mesh":
                 # ---- * draw mesh
@@ -1698,7 +1973,7 @@ class PolygonShape(BaseShape):
                         cnv,
                         radii_shapes=self.radii_shapes,
                         vertexes=self.vertices,
-                        centre=Point(x, y),
+                        centre=self._shape_centre,
                         direction_group=DirectionGroup.POLYGONAL,
                         rotation=rotation,
                         rotated=self.radii_shapes_rotated,
@@ -1710,7 +1985,7 @@ class PolygonShape(BaseShape):
                         cnv,
                         perbii_shapes=self.perbii_shapes,
                         vertexes=self.vertices,
-                        centre=Point(x, y),
+                        centre=self._shape_centre,
                         direction_group=DirectionGroup.POLYGONAL,
                         rotation=rotation,
                         rotated=self.perbii_shapes_rotated,
@@ -1720,20 +1995,24 @@ class PolygonShape(BaseShape):
                 if self.centre_shape:
                     if self.can_draw_centred_shape(self.centre_shape):
                         self.centre_shape.draw(
-                            _abs_cx=x + self.unit(self.centre_shape_mx),
-                            _abs_cy=y + self.unit(self.centre_shape_my),
+                            _abs_cx=self._shape_centre.x
+                            + self.unit(self.centre_shape_mx),
+                            _abs_cy=self._shape_centre.y
+                            + self.unit(self.centre_shape_my),
                         )
             if item == "centre_shapes":
                 # ---- * draw centre_shapes (with offsets)
                 if self.centre_shapes:
-                    self.draw_centred_shapes(self.centre_shapes, x, y)
+                    self.draw_centred_shapes(
+                        self.centre_shapes, self._shape_centre.x, self._shape_centre.y
+                    )
             if item == "vertex_shapes":
                 # ---- * draw vertex shapes
                 if self.vertex_shapes:
                     self.draw_vertex_shapes(
                         self.vertex_shapes,
                         self.vertices,
-                        Point(x, y),
+                        self._shape_centre,
                         self.vertex_shapes_rotated,
                     )
             if item == "debug":
@@ -1741,15 +2020,36 @@ class PolygonShape(BaseShape):
                 pass
             if item == "dot":
                 # ---- * draw dot
-                self.draw_dot(cnv, x, y)
+                self.draw_dot(cnv, self._shape_centre.x, self._shape_centre.y)
             if item == "cross":
                 # ---- * draw cross
-                self.draw_cross(cnv, x, y, rotation=kwargs.get("rotation"))
+                self.draw_cross(
+                    cnv,
+                    self._shape_centre.x,
+                    self._shape_centre.y,
+                    rotation=kwargs.get("rotation"),
+                )
             if item == "text":
                 # ---- * draw text
-                self.draw_heading(cnv, ID, x, y, radius, **kwargs)
-                self.draw_label(cnv, ID, x, y, **kwargs)
-                self.draw_title(cnv, ID, x, y, radius + 0.5 * self.title_size, **kwargs)
+                self.draw_heading(
+                    cnv,
+                    ID,
+                    self._shape_centre.x,
+                    self._shape_centre.y,
+                    radius,
+                    **kwargs,
+                )
+                self.draw_label(
+                    cnv, ID, self._shape_centre.x, self._shape_centre.y, **kwargs
+                )
+                self.draw_title(
+                    cnv,
+                    ID,
+                    self._shape_centre.x,
+                    self._shape_centre.y,
+                    radius + 0.5 * self.title_size,
+                    **kwargs,
+                )
 
         # ---- set calculated top-left in user units
         self.calculated_left = (x - self._u.radius) / self.units
@@ -1766,6 +2066,31 @@ class PolylineShape(BasePolyShape):
         # overrides / extra args
         self.scaling = tools.as_float(kwargs.get("scaling", 1.0), "scaling")
 
+    @cached_property
+    def shape_area(self) -> float:
+        """Area of Polyline."""
+        return None
+
+    @cached_property
+    def shape_centre(self) -> Point:
+        """Centre of Polyline."""
+        return None
+
+    @cached_property
+    def shape_vertices(self) -> dict:
+        """Vertices of Polyline."""
+        return {}
+
+    @cached_property
+    def shape_perbii(self) -> dict:
+        """Perbii of Polyline."""
+        return {}
+
+    @cached_property
+    def shape_geom(self) -> ShapeGeometry:
+        """Geometry of Polyline."""
+        return ShapeGeometry()
+
     def draw(self, cnv=None, off_x=0, off_y=0, ID=None, **kwargs):
         """Draw a Polyline (multi-part line) on a given canvas."""
         kwargs = self.kwargs | kwargs
@@ -1776,7 +2101,7 @@ class PolylineShape(BasePolyShape):
         lkwargs["wave_style"] = self.kwargs.get("wave_style", None)
         lkwargs["wave_height"] = self.kwargs.get("wave_height", 0)
         # ---- set vertices
-        self.vertexes = self.get_vertexes(**kwargs)  # BasePoly
+        self.vertexes = self.get_vertexes()  # BasePoly
         # ---- draw polyline by vertices
         # feedback(f'***POLYLINE {x=} {y=} {self.vertexes=}')
         if self.vertexes:
@@ -1940,8 +2265,41 @@ class RhombusShape(BaseShape):
         # ---- RESET UNIT PROPS (last!)
         self.set_unit_properties()
 
-    def get_center(self) -> Point:
-        """Get centre point of Rhombus."""
+    @cached_property
+    def shape_area(self) -> float:
+        """Area of Rhombus."""
+        return None
+
+    @cached_property
+    def shape_centre(self) -> Point:
+        """Centre of Rhombus."""
+        return Point(
+            self._p2v(self._shape_centre.x, 3), self._p2v(self._shape_centre.y, 3)
+        )
+
+    @cached_property
+    def shape_vertices(self) -> dict:
+        """Vertices of Rhombus."""
+        vtc = self.get_vertexes_named()
+        shape_vtc = {
+            key: Point(self._p2v(value.point.x, 3), self._p2v(value.point.y, 3))
+            for key, value in vtc.items()
+        }
+        return shape_vtc
+
+    @cached_property
+    def shape_perbii(self) -> dict:
+        """Perbii of Rhombus."""
+        return {}
+
+    @cached_property
+    def shape_geom(self) -> ShapeGeometry:
+        """Geometry of Rhombus."""
+        return ShapeGeometry()
+
+    @cached_property
+    def _shape_centre(self) -> Point:
+        """Centre of Rhombus in points."""
         # ---- overrides for grid layout
         if self.use_abs_c:
             x = self._abs_cx
@@ -1959,20 +2317,21 @@ class RhombusShape(BaseShape):
         cy = y + self._u.height / 2.0
         return Point(x=cx, y=cy)
 
-    def get_vertexes(self, **kwargs):
-        """Calculate vertices of Rhombus."""
-        centre = self.get_center()
-        x_s, y_s = centre.x - self._u.width / 2.0, centre.y - self._u.height / 2.0
+    @cached_property
+    def _shape_vertexes(self):
+        """Vertices of Rhombus in points."""
+        centre = self._shape_centre
+        cx, cy = centre.x, centre.y  # shortcuts
         vertices = []
-        vertices.append(Point(x_s, y_s))
-        vertices.append(Point(x_s + self._u.width / 2.0, y_s + self._u.height / 2.0))
-        vertices.append(Point(x_s + self._u.width, y_s))
-        vertices.append(Point(x_s + self._u.width / 2.0, y_s - self._u.height / 2.0))
+        vertices.append(Point(cx - self._u.width / 2.0, cy))  # w
+        vertices.append(Point(cx, cy + self._u.height / 2.0))  # s
+        vertices.append(Point(cx + self._u.width / 2.0, cy))  # e
+        vertices.append(Point(cx, cy - self._u.height / 2.0))  # n
         return vertices
 
     def get_vertexes_named(self, **kwargs):
         """Get named vertices for Rhombus."""
-        vertices = self.get_vertexes(**kwargs)
+        vertices = self._shape_vertexes
         # anti-clockwise from top-left; relative to centre
         directions = ["w", "s", "e", "n"]
         vertex_dict = {}
@@ -1984,9 +2343,7 @@ class RhombusShape(BaseShape):
             vertex_dict[directions[key]] = _vertex
         return vertex_dict
 
-    def calculate_perbii(
-        self, cnv, centre: Point, rotation: float = None, **kwargs
-    ) -> dict:
+    def calculate_perbii(self, cnv, centre: Point) -> dict:
         """Calculate centre points for each Rhombus edge and angles from centre.
 
         Args:
@@ -1999,7 +2356,7 @@ class RhombusShape(BaseShape):
             dict of Perbis objects keyed on direction
         """
         directions = ["sw", "se", "ne", "nw"]
-        vertices = self.get_vertexes(**kwargs)
+        vertices = self._shape_vertexes
         perbii_dict = {}
         _perbii_pts = []
         # print(f"*** RHOMBUS perbii {centre=} {_vprint(vertices)=}")
@@ -2025,21 +2382,21 @@ class RhombusShape(BaseShape):
             perbii_dict[directions[key]] = _perbii
         return perbii_dict
 
-    def calculate_radii(
-        self, cnv, centre: Point, vertices: list, debug: bool = False
-    ) -> dict:
+    def calculate_radii(self, cnv, centre: Point, vertices: list = None) -> dict:
         """Calculate radii for each Rhombus vertex and angles from centre.
 
         Args:
-            vertices (list):
-                the Rhombus nodes as Points
             centre (Point):
                 the centre of the Rhombus
+            vertices (list):
+                the Rhombus nodes as Points
 
         Returns:
             dict of Radius objects keyed on direction
         """
         directions = ["w", "s", "e", "n"]
+        if not vertices:
+            vertices = self._shape_vertexes
         radii_dict = {}
         # print(f"*** RHMB radii {centre=} {vertices=}")
         for key, vertex in enumerate(vertices):
@@ -2078,7 +2435,8 @@ class RhombusShape(BaseShape):
         _dirs = tools.validated_directions(
             self.hatches, DirectionGroup.CIRCULAR, "rhombus hatches"
         )
-        x_c, yc = centre.x, centre.y
+        # centre = self._shape_centre  # shortcut
+        x_c, y_c = centre.x, centre.y
         _num = tools.as_int(num, "hatches_count")
         lines = int((_num - 1) / 2 + 1)
         # feedback(f'*** RHOMB {num=} {lines=} {vertices=} {_dirs=} {side=}')
@@ -2353,26 +2711,26 @@ class RhombusShape(BaseShape):
         kwargs = self.kwargs | kwargs
         cnv = cnv if cnv else globals.canvas  # a new Page/Shape may now exist
         super().draw(cnv, off_x, off_y, ID, **kwargs)  # unit-based props
-        self.centre = self.get_center()
+        centre = self._shape_centre  # shortcut
         # ---- calculated properties
         self.area = (self._u.width * self._u.height) / 2.0
         # ---- handle rotation
         rotation = kwargs.get("rotation", self.rotation)
         if rotation:
-            self.centroid = muPoint(self.centre.x, self.centre.y)
+            self.centroid = muPoint(centre.x, centre.y)
             kwargs["rotation"] = rotation
             kwargs["rotation_point"] = self.centroid
         else:
             self.centroid = None
         # ---- draw rhombus
-        self.vertexes = self.get_vertexes(**kwargs)
-        # feedback(f'***Rhombus {x=} {y=} {self.vertexes=}')
-        cnv.draw_polyline(self.vertexes)
+        self.vertexes = self._shape_vertexes  # used in base for draw_border
+        # feedback(f'***Rhombus {x=} {y=} {self._shape_vertexes=}')
+        cnv.draw_polyline(self._shape_vertexes)
         kwargs["closed"] = True
         self.set_canvas_props(cnv=cnv, index=ID, **kwargs)
         # ---- * draw slices
         if self.slices:
-            self.draw_slices(cnv, ID, self.vertexes, self.centre, rotation)
+            self.draw_slices(cnv, ID, self._shape_vertexes, centre, rotation)
         # ---- * draw hatches
         if self.hatches_count:
             self.side = math.sqrt(
@@ -2381,9 +2739,9 @@ class RhombusShape(BaseShape):
             self.draw_hatches(
                 cnv,
                 ID,
-                self.centre,
+                centre,
                 self.side,
-                self.vertexes,
+                self._shape_vertexes,
                 self.hatches_count,
                 rotation,
             )
@@ -2399,17 +2757,17 @@ class RhombusShape(BaseShape):
                 self.draw_border(cnv, border, ID)  # BaseShape
         # ---- * draw perbii
         if self.perbii:
-            self.draw_perbii(cnv, ID, self.centre, self.vertexes, rotation=rotation)
+            self.draw_perbii(cnv, ID, centre, self._shape_vertexes, rotation=rotation)
         # ---- * draw radii
         if self.radii:
-            self.draw_radii(cnv, ID, self.centre, self.vertexes, rotation=rotation)
+            self.draw_radii(cnv, ID, centre, self._shape_vertexes, rotation=rotation)
         # ---- * draw radii_shapes
         if self.radii_shapes:
             self.draw_radii_shapes(
                 cnv,
                 self.radii_shapes,
-                self.vertexes,
-                self.centre,
+                self._shape_vertexes,
+                centre,
                 DirectionGroup.CARDINAL,
                 rotation,
                 self.radii_shapes_rotated,
@@ -2419,8 +2777,8 @@ class RhombusShape(BaseShape):
             self.draw_perbii_shapes(
                 cnv,
                 self.perbii_shapes,
-                self.vertexes,
-                self.centre,
+                self._shape_vertexes,
+                centre,
                 DirectionGroup.ORDINAL,  # for the sides!
                 rotation,
                 self.perbii_shapes_rotated,
@@ -2429,26 +2787,26 @@ class RhombusShape(BaseShape):
         if self.centre_shape:
             if self.can_draw_centred_shape(self.centre_shape):
                 self.centre_shape.draw(
-                    _abs_cx=self.centre.x + self.unit(self.centre_shape_mx),
-                    _abs_cy=self.centre.y + self.unit(self.centre_shape_my),
+                    _abs_cx=centre.x + self.unit(self.centre_shape_mx),
+                    _abs_cy=centre.y + self.unit(self.centre_shape_my),
                 )
         # ---- * centred shapes (with offsets)
         if self.centre_shapes:
-            self.draw_centred_shapes(self.centre_shapes, self.centre.x, self.centre.y)
+            self.draw_centred_shapes(self.centre_shapes, centre.x, centre.y)
         # ---- * draw dot
-        self.draw_dot(cnv, self.centre.x, self.centre.y)
+        self.draw_dot(cnv, centre.x, centre.y)
         # ---- * draw cross
         self.draw_cross(
             cnv,
-            self.centre.x,
-            self.centre.y,
+            centre.x,
+            centre.y,
             rotation=kwargs.get("rotation"),
         )
         # ---- * draw text
         y_off = self._u.height / 2.0
-        self.draw_heading(cnv, ID, self.centre.x, self.centre.y - y_off, **kwargs)
-        self.draw_label(cnv, ID, self.centre.x, self.centre.y, **kwargs)
-        self.draw_title(cnv, ID, self.centre.x, self.centre.y + y_off, **kwargs)
+        self.draw_heading(cnv, ID, centre.x, centre.y - y_off, **kwargs)
+        self.draw_label(cnv, ID, centre.x, centre.y, **kwargs)
+        self.draw_title(cnv, ID, centre.x, centre.y + y_off, **kwargs)
 
 
 class SectorShape(BaseShape):
@@ -2478,7 +2836,7 @@ class SectorShape(BaseShape):
             self.y = self.cy - self.radius
         # feedback(f'***Sector {self.cx=} {self.cy=} {self.x=} {self.y=}')
         # ---- calculate centre
-        radius = self.unit(self.radius)  # changed above?
+        radius = self.unit(self.radius)  # changed aboveCross
         if self.row is not None and self.col is not None:
             self.x_c = self.col * 2.0 * radius + radius
             self.y_c = self.row * 2.0 * radius + radius
@@ -2490,6 +2848,31 @@ class SectorShape(BaseShape):
             self.x_c = self._u.x + radius
             self.y_c = self._u.y + radius
         # feedback(f'***Sector {self.x_c=} {self.y_c=} {self.radius=}')
+
+    @cached_property
+    def shape_area(self) -> float:
+        """Area of Sector."""
+        return None
+
+    @cached_property
+    def shape_centre(self) -> Point:
+        """Centre of Sector."""
+        return None
+
+    @cached_property
+    def shape_vertices(self) -> dict:
+        """Vertices of Sector."""
+        return {}
+
+    @cached_property
+    def shape_perbii(self) -> dict:
+        """Perbii of Sector."""
+        return {}
+
+    @cached_property
+    def shape_geom(self) -> ShapeGeometry:
+        """Geometry of Sector."""
+        return ShapeGeometry()
 
     def draw(self, cnv=None, off_x=0, off_y=0, ID=None, **kwargs):
         """Draw sector on a given canvas."""
@@ -2531,6 +2914,31 @@ class ShapeShape(BasePolyShape):
         self.x = kwargs.get("x", kwargs.get("left", 0.0))
         self.y = kwargs.get("y", kwargs.get("bottom", 0.0))
         self.scaling = tools.as_float(kwargs.get("scaling", 1.0), "scaling")
+
+    @cached_property
+    def shape_area(self) -> float:
+        """Area of PolyShape."""
+        return None
+
+    @cached_property
+    def shape_centre(self) -> Point:
+        """Centre of PolyShape."""
+        return None
+
+    @cached_property
+    def shape_vertices(self) -> dict:
+        """Vertices of PolyShape."""
+        return {}
+
+    @cached_property
+    def shape_perbii(self) -> dict:
+        """Perbii of PolyShape."""
+        return {}
+
+    @cached_property
+    def shape_geom(self) -> ShapeGeometry:
+        """Geometry of PolyShape."""
+        return ShapeGeometry()
 
     def draw(self, cnv=None, off_x=0, off_y=0, ID=None, **kwargs):
         """Draw an irregular polygon on a given canvas."""
@@ -2596,6 +3004,31 @@ class SquareShape(RectangleShape):
         # ---- RESET UNIT PROPS (last!)
         self.set_unit_properties()
 
+    @cached_property
+    def shape_area(self) -> float:
+        """Area of Square."""
+        return None
+
+    @cached_property
+    def shape_centre(self) -> Point:
+        """Centre of Square."""
+        return None
+
+    @cached_property
+    def shape_vertices(self) -> dict:
+        """Vertices of Square."""
+        return {}
+
+    @cached_property
+    def shape_perbii(self) -> dict:
+        """Perbii of Square."""
+        return {}
+
+    @cached_property
+    def shape_geom(self) -> ShapeGeometry:
+        """Geometry of Square."""
+        return ShapeGeometry()
+
     def calculate_area(self) -> float:
         return self._u.width * self._u.height
 
@@ -2640,6 +3073,31 @@ class StadiumShape(BaseShape):
             # feedback(f"*** STADIUM OldX:{x} OldY:{y} NewX:{self.x} NewY:{self.y}")
         # ---- RESET UNIT PROPS (last!)
         self.set_unit_properties()
+
+    @cached_property
+    def shape_area(self) -> float:
+        """Area of Stadium."""
+        return None
+
+    @cached_property
+    def shape_centre(self) -> Point:
+        """Centre of Stadium."""
+        return None
+
+    @cached_property
+    def shape_vertices(self) -> dict:
+        """Vertices of Stadium."""
+        return {}
+
+    @cached_property
+    def shape_perbii(self) -> dict:
+        """Perbii of Stadium."""
+        return {}
+
+    @cached_property
+    def shape_geom(self) -> ShapeGeometry:
+        """Geometry of Stadium."""
+        return ShapeGeometry()
 
     def draw(self, cnv=None, off_x=0, off_y=0, ID=None, **kwargs):
         """Draw a Stadium on a given canvas."""
@@ -2789,6 +3247,31 @@ class StarShape(BaseShape):
     def __init__(self, _object=None, canvas=None, **kwargs):
         super().__init__(_object=_object, canvas=canvas, **kwargs)
         self.vertexes_list = []
+
+    @cached_property
+    def shape_area(self) -> float:
+        """Area of Star."""
+        return None
+
+    @cached_property
+    def shape_centre(self) -> Point:
+        """Centre of Star."""
+        return None
+
+    @cached_property
+    def shape_vertices(self) -> dict:
+        """Vertices of Star."""
+        return {}
+
+    @cached_property
+    def shape_perbii(self) -> dict:
+        """Perbii of Star."""
+        return {}
+
+    @cached_property
+    def shape_geom(self) -> ShapeGeometry:
+        """Geometry of Star."""
+        return ShapeGeometry()
 
     def get_center(self, **kwargs) -> Point:
         # convert to using units
@@ -3309,6 +3792,31 @@ class TrapezoidShape(BaseShape):
             self.x = self.cx - self.width / 2.0
             self.y = self.cy - self.height / 2.0
 
+    @cached_property
+    def shape_area(self) -> float:
+        """Area of Trapezoid."""
+        return None
+
+    @cached_property
+    def shape_centre(self) -> Point:
+        """Centre of Trapezoid."""
+        return None
+
+    @cached_property
+    def shape_vertices(self) -> dict:
+        """Vertices of Trapezoid."""
+        return {}
+
+    @cached_property
+    def shape_perbii(self) -> dict:
+        """Perbii of Trapezoid."""
+        return {}
+
+    @cached_property
+    def shape_geom(self) -> ShapeGeometry:
+        """Geometry of Trapezoid."""
+        return ShapeGeometry()
+
     def calculate_area(self):
         """Calculate area of trapezoid."""
         return self._u.top * self._u.height + 2.0 * self.delta_width * self._u.height
@@ -3543,6 +4051,31 @@ class TriangleShape(BaseShape):
                     " cannot also have a pivot set!",
                     True,
                 )
+
+    @cached_property
+    def shape_area(self) -> float:
+        """Area of Triangle."""
+        return None
+
+    @cached_property
+    def shape_centre(self) -> Point:
+        """Centre of Triangle."""
+        return None
+
+    @cached_property
+    def shape_vertices(self) -> dict:
+        """Vertices of Triangle."""
+        return {}
+
+    @cached_property
+    def shape_perbii(self) -> dict:
+        """Perbii of Triangle."""
+        return {}
+
+    @cached_property
+    def shape_geom(self) -> ShapeGeometry:
+        """Geometry of Triangle."""
+        return ShapeGeometry()
 
     def calculate_sides(
         self, vertices, rotation: float = 0, units: bool = True

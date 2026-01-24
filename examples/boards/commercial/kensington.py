@@ -15,21 +15,23 @@ blue = "#5D80EA"
 Create(filename="kensington.pdf", margin=0.25, paper="A4", fill=page_fill)
 # Blueprint(stroke_width=0.5, fill="black")
 
+SIDE = 1
+
 def grouping(x=0, y=0, filled=None):
     # draw outer 12-sided polygon
     outer = Polygon(
         cx=x, cy=y,
-        side=1, sides=12, fill=None, stroke=outline)
+        side=SIDE, sides=12, fill=None, stroke=outline)
     # draw inner 6-sided polygon
     if filled:
         inner = Polygon(
             cx=x, cy=y,
-            side=1, sides=6,
+            side=SIDE, sides=6,
             fill=filled, stroke=outline)
     else:
         inner = Polygon(
             cx=x, cy=y,
-            side=1, sides=6,
+            side=SIDE, sides=6,
             fill=None, stroke=outline)
         Polygon(
             cx=x, cy=y,
@@ -38,12 +40,15 @@ def grouping(x=0, y=0, filled=None):
     # connect vertices of outer polygon to those of inner polygon
     for point in range(1, 7):
         Line(connections=[
-                (outer, 'v', point * 2 - 1), (inner, 'v', point), (outer, 'v', point * 2)
+                (outer, 'v', point * 2 - 1),
+                (inner, 'v', point),
+                (outer, 'v', point * 2)
             ],
             stroke=outline)
 
 # draw the 6 sets of shapes
 grouping(x=2, y=4, filled=red)
+# TODO => draw centre set first, then calculate distance to others based on SIDE
 grouping(x=4.365, y=2.635)
 
 Save()

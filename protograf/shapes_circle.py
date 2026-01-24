@@ -3,6 +3,7 @@
 Create custom shapes for protograf
 """
 # lib
+from functools import cached_property
 import logging
 import math
 
@@ -20,6 +21,7 @@ from protograf.utils.structures import (
     DirectionGroup,
     Point,
     Radius,
+    ShapeGeometry,
 )  # named tuples
 from protograf.base import BaseShape
 
@@ -53,8 +55,40 @@ class CircleShape(BaseShape):
         # ---- RESET UNIT PROPS (last!)
         self.set_unit_properties()
 
-    def calculate_centre(self) -> Point:
-        """Calculate centre of Circle."""
+    @cached_property
+    def shape_area(self) -> float:
+        """Area of Circle."""
+        return None
+
+    @cached_property
+    def shape_centre(self) -> Point:
+        """Centre of Circle."""
+        return None
+
+    @cached_property
+    def shape_vertices(self) -> dict:
+        """Vertices of Circle."""
+        return {}
+
+    @cached_property
+    def shape_perbii(self) -> dict:
+        """Perbii of Circle."""
+        return {}
+
+    @cached_property
+    def shape_geom(self) -> ShapeGeometry:
+        """Geometry of Circle."""
+        return ShapeGeometry()
+
+    @cached_property
+    def shape_perimeter(self) -> float:
+        """Circle circumference length"""
+        length = math.pi * 2.0 * self._u.radius
+        return self.points_to_value(length)
+
+    @cached_property
+    def _shape_centre(self) -> Point:
+        """Circle centre in points."""
         if self.use_abs_c:
             self.x_c = self._abs_cx
             self.y_c = self._abs_cy
@@ -63,15 +97,15 @@ class CircleShape(BaseShape):
             self.y_c = self._u.cy + self._o.delta_y
         return Point(self.x_c, self.y_c)
 
-    def calculate_area(self) -> float:
-        """Calculate area of Circle."""
+    @cached_property
+    def _shape_area(self) -> float:
+        """Circle area in points."""
         return math.pi * self._u.radius * self._u.radius
 
-    def calculate_perimeter(self, units: bool = False) -> float:
-        """Calculate length of circumference of Circle"""
+    @cached_property
+    def _shape_perimeter(self) -> float:
+        """Circle circumference length in points."""
         length = math.pi * 2.0 * self._u.radius
-        if units:
-            return self.points_to_value(length)
         return length
 
     def calculate_radii(
@@ -615,9 +649,8 @@ class CircleShape(BaseShape):
         super().draw(cnv, off_x, off_y, ID, **kwargs)  # unit-based props
         is_cards = kwargs.get("is_cards", False)
         # ---- set centre & area
-        ccentre = self.calculate_centre()  # self.x_c, self.y_c
+        ccentre = self._shape_centre  # self.x_c, self.y_c
         x, y = ccentre.x, ccentre.y
-        self.area = self.calculate_area()
         # ---- draw by row/col
         if self.row is not None and self.col is not None and is_cards:
             if self.kwargs.get("grouping_cols", 1) == 1:

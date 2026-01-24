@@ -171,6 +171,20 @@ PageMarginsBase = namedtuple(
     ],
 )
 
+shape_fields = (
+    "radius",
+    "diameter",
+    "side",
+    "length",
+    "width",
+    "height",
+    "head",
+    "tail",
+)
+ShapeGeometry = namedtuple(
+    "ShapeGeometry", shape_fields, defaults=(None,) * len(shape_fields)
+)
+
 
 class PageMargins(PageMarginsBase):
 

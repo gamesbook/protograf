@@ -49,9 +49,9 @@ Blueprint()
 Text(common=txt, text="Centred")
 shp_font = Common(font_size=6, stroke="red")
 Trapezoid(common=shp_font, cx=1, cy=5, heading="Trapezoid cx=1;cy=5")
-Rhombus(common=shp_font, cx=3, cy=5, heading="Rhombus cx=3;cy=5")
+Rhombus(common=shp_font, cx=3, cy=5, title="Rhombus cx=3;cy=5")
 Star(common=shp_font, cx=1, cy=3, heading="Star cx=1;cy=3")
-Ellipse(common=shp_font, cx=3, cy=3, width=2, height=1, heading="Ellipse cx=3;cy=3")
+Ellipse(common=shp_font, cx=3, cy=3, width=2, height=1, title="Ellipse cx=3;cy=3")
 Polygon(common=shp_font, cx=2, cy=1, radius=0.8, sides=7, heading="Polygon-7 cx2=;cy=1")
 PageBreak()
 
@@ -356,7 +356,7 @@ Text(common=txt, text="Line: connections; shapes")
 r1 = Square(cx=2, cy=3, side=0.5)
 r2 = Square(cx=3, cy=2, side=0.5)
 Line(
-    connections=[(r1, 'ne'), (r1, 'n', 'p')],
+    connections=[(r1, 'v', 'ne'), (r1, 'p', 'n')],
     stroke="red",
     stroke_width=2)
 PageBreak()

@@ -3,6 +3,7 @@
 Create custom shapes for protograf
 """
 # lib
+from functools import cached_property
 import logging
 import math
 
@@ -20,6 +21,7 @@ from protograf.utils.structures import (
     Perbis,
     Point,
     Radius,
+    ShapeGeometry,
     Vertex,
 )  # named tuples
 from protograf.base import (
@@ -72,15 +74,46 @@ class RectangleShape(BaseShape):
         # ---- RESET UNIT PROPS (last!)
         self.set_unit_properties()  # need to recalculate!
 
-    def calculate_area(self) -> float:
-        """Calculate Rectangle area."""
+    @cached_property
+    def shape_area(self) -> float:
+        """Area of Rectangle."""
+        return None
+
+    @cached_property
+    def shape_centre(self) -> Point:
+        """Centre of Rectangle."""
+        return None
+
+    @cached_property
+    def shape_vertices(self) -> dict:
+        """Vertices of Rectangle."""
+        return {}
+
+    @cached_property
+    def shape_perbii(self) -> dict:
+        """Perbii of Rectangle."""
+        return {}
+
+    @cached_property
+    def shape_geom(self) -> ShapeGeometry:
+        """Geometry of Rectangle."""
+        return ShapeGeometry()
+
+    @cached_property
+    def shape_perimeter(self) -> float:
+        """Rectangle bounding perimeter."""
+        length = 2.0 * (self._u.width + self._u.height)
+        return self.points_to_value(length)
+
+    @cached_property
+    def _shape_area(self) -> float:
+        """Area of Rectangle in points."""
         return self._u.width * self._u.height
 
-    def calculate_perimeter(self, units: bool = False) -> float:
-        """Total length of Rectangle bounding perimeter."""
+    @cached_property
+    def _shape_perimeter(self) -> float:
+        """Rectangle bounding perimeter in points."""
         length = 2.0 * (self._u.width + self._u.height)
-        if units:
-            return self.points_to_value(length)
         return length
 
     def calculate_perbii(
@@ -1438,7 +1471,6 @@ class RectangleShape(BaseShape):
         # ---- calculate centre
         x_d = x + self._u.width / 2.0
         y_d = y + self._u.height / 2.0
-        self.area = self.calculate_area()
         delta_m_up, delta_m_down = 0.0, 0.0  # potential text offset from chevron
         # ---- handle rotation
         rotation = kwargs.get("rotation", self.rotation)

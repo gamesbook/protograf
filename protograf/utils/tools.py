@@ -1226,15 +1226,21 @@ def validated_directions(
     [1, 4, 7]
     >>> validated_directions('1 9 17 ', DirectionGroup.POLYGONAL, vertex_count=20)
     [1, 9, 17]
+    >>> validated_directions(1, DirectionGroup.POLYGONAL, vertex_count=20)
+    [1]
     """
     if not value:
         return []
+    if isinstance(value, int):
+        value = str(value)
     if isinstance(value, str):
         value = value.strip()
         values = split(value.lower())
     else:
         if not isinstance(value, list):
-            feedback(f"Cannot handle {label}value - must be a string or a list!", True)
+            feedback(
+                f"Cannot handle {label}{value} - must be a string or a list!", True
+            )
         values = [str(val).lower().strip() for val in value]
     values_set = set(values)
     match direction_group:

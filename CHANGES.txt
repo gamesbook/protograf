@@ -4,8 +4,11 @@ protograf Changes
 2026-00-00 (0.4.1)
 ------------------
 - Enable Line connections for other shapes
+- Enable PolyLine connections for shapes
 - Add Kensington board example
+- Add process flow diagram example
 - Refactor code to start using class properties
+- Bump development status to Beta
 
 2026-01-11 (0.4.0)
 ------------------
@@ -301,7 +304,7 @@ protograf Changes
 
 2024-02-04 (0.1.0a2)
 --------------------
-- Upgrade to Python 3.13
+- Upgrade to Python 3.10
 - Patch code for changes related to Python and library upgrades
 - Switch to using bgg-api library
 

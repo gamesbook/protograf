@@ -527,7 +527,7 @@ class StarFieldObject(BaseShape):
     def random_stars(self, cnv):
         # feedback(f'*** StarFld {self.enclosure=}')
         if isinstance(self.enclosure, CircleShape):
-            ccentre = self.enclosure.calculate_centre()
+            ccentre = self.enclosure._shape_centre
             x_c, y_c = ccentre.x, ccentre.y
         if isinstance(self.enclosure, PolygonShape):
             _geom = self.enclosure.get_geometry()
@@ -570,7 +570,7 @@ class StarFieldObject(BaseShape):
             self.enclosure = RectangleShape()
         # ---- calculations
         random.seed()
-        area = math.sqrt(self.enclosure.calculate_area())
+        area = math.sqrt(self.enclosure._shape_area)
         self.star_count = round(self.density * self.points_to_value(area))
         # feedback(f'*** StarFld {self.star_pattern =} {self.enclosure}')
         # feedback(f'*** StarFld {area=} {self.density=} {self.star_count=}')

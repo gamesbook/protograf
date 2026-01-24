@@ -2399,9 +2399,15 @@ class BaseShape:
                 f'Unable to do unit conversion from "{value}" using {self.units}!', True
             )
 
-    def _p2v(self, value: float):
-        """Internal wrapper around points_to_value()"""
-        return self.points_to_value(value, decimals=1)
+    def _p2v(self, value: float, decimals: int = 1):
+        """Convert to rounded value using current units."""
+        try:
+            return round(float(value) / self.units, decimals)
+        except Exception as err:
+            log.exception(err)
+            feedback(
+                f'Unable to do unit conversion from "{value}" using {self.units}!', True
+            )
 
     def values_to_points(self, items: list, units_name=None) -> list:
         """Convert a list of values to point units."""

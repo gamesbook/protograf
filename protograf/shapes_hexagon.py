@@ -3,6 +3,7 @@
 Create custom shapes for protograf
 """
 # lib
+from functools import cached_property
 import logging
 import math
 
@@ -23,6 +24,7 @@ from protograf.utils.structures import (
     Perbis,
     Point,
     Radius,
+    ShapeGeometry,
     Vertex,
 )  # named tuples
 from protograf.base import (
@@ -84,6 +86,31 @@ class HexShape(BaseShape):
                 self.height = base * math.sqrt(3)
                 self.set_unit_properties()  # need to recalculate!
         self.ORIENTATION = self.get_orientation()
+
+    @cached_property
+    def shape_area(self) -> float:
+        """Area of Hexagon."""
+        return None
+
+    @cached_property
+    def shape_centre(self) -> Point:
+        """Centre of Hexagon."""
+        return None
+
+    @cached_property
+    def shape_vertices(self) -> dict:
+        """Vertices of Hexagon."""
+        return {}
+
+    @cached_property
+    def shape_perbii(self) -> dict:
+        """Perbii of Hexagon."""
+        return {}
+
+    @cached_property
+    def shape_geom(self) -> ShapeGeometry:
+        """Geometry of Hexagon."""
+        return ShapeGeometry()
 
     def get_orientation(self) -> HexOrientation:
         """Return HexOrientation for the Hexagon."""
