@@ -2396,17 +2396,19 @@ class BaseShape:
         except Exception as err:
             log.exception(err)
             feedback(
-                f'Unable to do unit conversion from "{value}" using {self.units}!', True
+                f'Unable to do units conversion from "{value}" using {self.units}!',
+                True,
             )
 
-    def _p2v(self, value: float, decimals: int = 1):
-        """Convert to rounded value using current units."""
+    def _p2v(self, value: float, decimals: int = 3):
+        """Convert point value to a rounded, units-based value using current units."""
         try:
             return round(float(value) / self.units, decimals)
         except Exception as err:
             log.exception(err)
             feedback(
-                f'Unable to do unit conversion from "{value}" using {self.units}!', True
+                f'Unable to do units conversion from "{value}" using {self.units}!',
+                True,
             )
 
     def values_to_points(self, items: list, units_name=None) -> list:
@@ -3292,6 +3294,23 @@ class BaseShape:
             feedback(f"Cannot draw a centered {_name}!", True)
         return False
 
+    @functools.cache
+    def get_circle_vertexes(self, directions, centre, radius) -> list:
+        """Get a list of vertexes where radii intersect the circumference"""
+        angles = tools.sequence_split(
+            directions,
+            unique=False,
+            as_int=False,
+            as_float=True,
+            sep=" ",
+            msg="",
+        )
+        vertexes = []
+        for angle in angles:
+            vtx = geoms.point_on_circle(centre, radius, angle)
+            vertexes.append(vtx)
+        return vertexes
+
     def draw_centred_shapes(self, centre_shapes: list, cx: float, cy: float):
         """Draw one or more shapes with their centre at a Point.
 
@@ -3341,6 +3360,7 @@ class BaseShape:
         radii_shapes: list,
         vertexes: list,
         centre: Point,
+        radius: float = None,
         direction_group: DirectionGroup = None,
         rotation: float = 0.0,
         rotated: bool = False,
@@ -3368,28 +3388,10 @@ class BaseShape:
                 if True, rotate radii_shapes relative to centre
         """
 
-        @functools.cache
-        def get_circle_vertexes(directions, centre) -> list:
-            """Get a list of vertexes where radii intersect the circumference"""
-            angles = tools.sequence_split(
-                directions,
-                unique=False,
-                as_int=False,
-                as_float=True,
-                sep=" ",
-                msg="",
-            )
-            vertexes = []
-            radius = self._u.radius
-            for angle in angles:
-                vtx = geoms.point_on_circle(centre, radius, angle)
-                vertexes.append(vtx)
-            return vertexes
-
         err = "The radii_shapes must contain direction(s) and shape(s)"
         _shape_fraction = 1.0
         if direction_group != DirectionGroup.CIRCULAR:  # see below for calc.
-            radii_dict = self.calculate_radii(cnv, centre, vertexes)
+            radii_dict = self.calculate_radii(cnv, centre)
         for item in radii_shapes:
             _shape, _dirs = None, []
             if isinstance(item, tuple):
@@ -3398,7 +3400,7 @@ class BaseShape:
                 if len(item) < 2:
                     feedback(f"{err} - not {item}", True)
                 if direction_group == DirectionGroup.CIRCULAR:
-                    vertexes = get_circle_vertexes(item[0], centre)
+                    vertexes = self.get_circle_vertexes(item[0], centre, radius)
                     radii_dict = self.calculate_radii(cnv, centre, vertexes)
                     _dirs = radii_dict.keys()
                 elif direction_group == DirectionGroup.POLYGONAL:
@@ -3459,6 +3461,7 @@ class BaseShape:
         perbii_shapes: list,
         vertexes: list,
         centre: Point,
+        radius: float = None,
         direction_group: DirectionGroup = None,
         rotation: float = 0.0,
         rotated: bool = False,
@@ -3486,24 +3489,6 @@ class BaseShape:
                 if True, rotate perbii_shapes relative to centre
         """
 
-        @functools.cache
-        def get_circle_vertexes(directions, centre) -> list:
-            """Get a list of vertexes where perbii intersect the circumference"""
-            angles = tools.sequence_split(
-                directions,
-                unique=False,
-                as_int=False,
-                as_float=True,
-                sep=" ",
-                msg="",
-            )
-            vertexes = []
-            radius = self._u.radius
-            for angle in angles:
-                vtx = geoms.point_on_circle(centre, radius, angle)
-                vertexes.append(vtx)
-            return vertexes
-
         err = "The perbii_shapes must contain direction(s) and shape"
         _dirs, _shape, _shape_fraction = [], None, 1.0
         if direction_group != DirectionGroup.CIRCULAR:  # see below for calc.
@@ -3515,7 +3500,7 @@ class BaseShape:
                 if len(item) < 2:
                     feedback(f"{err} - not {item}")
                 if direction_group == DirectionGroup.CIRCULAR:
-                    vertexes = get_circle_vertexes(item[0], centre)
+                    # vertexes = self.get_circle_vertexes(item[0], centre, radius)
                     perbii_dict = self.calculate_perbii(cnv, centre)
                     _dirs = perbii_dict.keys()
                 elif direction_group == DirectionGroup.POLYGONAL:

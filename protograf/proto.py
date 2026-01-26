@@ -44,7 +44,6 @@ from .shapes import (
     LineShape,
     QRCodeShape,
     PodShape,
-    PolygonShape,
     PolylineShape,
     RhombusShape,
     SectorShape,
@@ -59,6 +58,7 @@ from .shapes import (
 )
 from .shapes_circle import CircleShape
 from .shapes_hexagon import HexShape
+from .shapes_polygon import PolygonShape
 from .shapes_rectangle import RectangleShape
 from .objects import (
     CubeObject,
@@ -73,15 +73,13 @@ from .layouts import (
     GridShape,
     DotGridShape,
     HexHexShape,
-    RectangularLocations,
-    TriangularLocations,
     VirtualLocations,
     ConnectShape,
     RepeatShape,
     SequenceShape,
     TableShape,
 )
-from .globals import unit
+from .globals import unit  # used in scripts
 from .groups import Switch, Lookup  # used in scripts
 from ._version import __version__
 

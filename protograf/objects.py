@@ -21,7 +21,7 @@ from protograf.utils.structures import (
     Tetris3D,
 )  # named tuples
 from protograf.base import BaseShape
-from protograf.shapes import PolygonShape
+from protograf.shapes_polygon import PolygonShape
 from protograf.shapes_circle import CircleShape
 from protograf.shapes_rectangle import RectangleShape
 from protograf.shapes_hexagon import HexShape

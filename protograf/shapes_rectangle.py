@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Create custom shapes for protograf
+Create Rectangle shape for protograf
 """
 # lib
 from functools import cached_property
@@ -97,7 +97,38 @@ class RectangleShape(BaseShape):
     @cached_property
     def shape_geom(self) -> ShapeGeometry:
         """Geometry of Rectangle."""
-        return ShapeGeometry()
+        return ShapeGeometry(
+            width=self.width,
+            height=self.height,
+        )
+
+    @cached_property
+    def _shape_vertexes(self) -> list:
+        """Get vertices for Rectangle without notches."""
+        x, y = self.calculate_xy()
+        # ---- overrides for grid layout
+        if self.use_abs_c:
+            x = self._abs_cx - self._u.width / 2.0
+            y = self._abs_cy - self._u.height / 2.0
+        vertices = [  # anti-clockwise from top-left; relative to centre
+            Point(x, y),  # e
+            Point(x, y + self._u.height),  # s
+            Point(x + self._u.width, y + self._u.height),  # w
+            Point(x + self._u.width, y),  # n
+        ]
+        # feedback(
+        #     '*** RECT VERTS '
+        #     f' /0: {vertices[0][0]:.2f};{vertices[0][1]:.2f}'
+        #     f' /1: {vertices[1][0]:.2f};{vertices[1][1]:.2f}'
+        #     f' /2: {vertices[2][0]:.2f};{vertices[2][1]:.2f}'
+        #     f' /3: {vertices[3][0]:.2f};{vertices[3][1]:.2f}'
+        # )
+        return vertices
+
+    @cached_property
+    def geom(self) -> ShapeGeometry:
+        """Geometry of Rectangle - alias for shape_geom."""
+        return self.shape_geom
 
     @cached_property
     def shape_perimeter(self) -> float:
@@ -132,7 +163,7 @@ class RectangleShape(BaseShape):
         """
         directions = ["n", "w", "s", "e"]
         perbii_dict = {}
-        vertices = self.get_vertexes(rotation=rotation, **kwargs)
+        vertices = self._shape_vertexes
         vcount = len(vertices) - 1
         _perbii_pts = []
         # print(f"*** RECT perbii {centre=} {vertices=}")
@@ -158,9 +189,7 @@ class RectangleShape(BaseShape):
             perbii_dict[directions[key]] = _perbii
         return perbii_dict
 
-    def calculate_radii(
-        self, cnv, centre: Point, vertices: list, debug: bool = False
-    ) -> dict:
+    def calculate_radii(self, cnv, centre: Point, debug: bool = False) -> dict:
         """Calculate radii for each Rectangle vertex and angles from centre.
 
         Args:
@@ -170,6 +199,7 @@ class RectangleShape(BaseShape):
         Returns:
             dict of Radius objects keyed on direction
         """
+        vertices = self._shape_vertexes
         # directions = ["sw", "se", "ne", "nw"]
         directions = ["nw", "sw", "se", "ne"]
         radii_dict = {}
@@ -236,7 +266,7 @@ class RectangleShape(BaseShape):
     def get_angles(self, rotation=0, **kwargs):
         """Get angles from centre to vertices for Rectangle without notches."""
         x, y = self.calculate_xy(**kwargs)
-        vertices = self.get_vertexes(rotation=rotation, **kwargs)
+        vertices = self._shape_vertexes
         centre = Point(x + self._u.height / 2.0, y + self._u.height / 2.0)
         angles = []
         for vtx in vertices:
@@ -254,31 +284,9 @@ class RectangleShape(BaseShape):
         y_d = y + self._u.height / 2.0
         return Point(x=x_d, y=y_d)
 
-    def get_vertexes(self, **kwargs) -> list:
-        """Get vertices for Rectangle without notches."""
-        x, y = self.calculate_xy(**kwargs)
-        # ---- overrides for grid layout
-        if self.use_abs_c:
-            x = self._abs_cx - self._u.width / 2.0
-            y = self._abs_cy - self._u.height / 2.0
-        vertices = [  # anti-clockwise from top-left; relative to centre
-            Point(x, y),  # e
-            Point(x, y + self._u.height),  # s
-            Point(x + self._u.width, y + self._u.height),  # w
-            Point(x + self._u.width, y),  # n
-        ]
-        # feedback(
-        #     '*** RECT VERTS '
-        #     f' /0: {vertices[0][0]:.2f};{vertices[0][1]:.2f}'
-        #     f' /1: {vertices[1][0]:.2f};{vertices[1][1]:.2f}'
-        #     f' /2: {vertices[2][0]:.2f};{vertices[2][1]:.2f}'
-        #     f' /3: {vertices[3][0]:.2f};{vertices[3][1]:.2f}'
-        # )
-        return vertices
-
     def get_vertexes_named(self, **kwargs):
         """Get named vertices for Rectangle without notches."""
-        vertices = self.get_vertexes(**kwargs)
+        vertices = self._shape_vertexes
         # anti-clockwise from top-left; relative to centre
         directions = ["nw", "sw", "se", "ne"]
         vertex_dict = {}
@@ -914,7 +922,7 @@ class RectangleShape(BaseShape):
                 the chord into two equal parts and meets the chord at a right angle;
                 for a polygon, each edge is effectively a chord.
         """
-        vertices = self.get_vertexes(rotation=rotation, **kwargs)
+        # vertices = self._shape_vertexes
         perbii_dict = self.calculate_perbii(cnv=cnv, centre=centre)
         pb_length = (
             self.unit(self.perbii_length, label="perbii length")
@@ -985,9 +993,7 @@ class RectangleShape(BaseShape):
             rotation_point=rotation_point,
         )
 
-    def draw_radii(
-        self, cnv, ID, centre: Point, vertices: list, rotation: float = None, **kwargs
-    ):
+    def draw_radii(self, cnv, ID, centre: Point, rotation: float = None, **kwargs):
         """Draw line(s) connecting the Rectangle centre to a vertex.
 
         Args:
@@ -1001,6 +1007,7 @@ class RectangleShape(BaseShape):
         _dirs = tools.validated_directions(
             self.radii, DirectionGroup.ORDINAL, "rectangle radii"
         )
+        vertices = self._shape_vertexes
         # ----- draw radii lines
         if "nw" in _dirs:  # slope UP to the left
             cnv.draw_line(centre, vertices[0])
@@ -1023,12 +1030,11 @@ class RectangleShape(BaseShape):
             rotation_point=rotation_point,
         )
 
-    def draw_slices(self, cnv, ID, vertexes, rotation=0):
+    def draw_slices(self, cnv, ID, rotation=0):
         """Draw triangles and trapezoids inside the Rectangle
 
         Args:
             ID: unique ID
-            vertexes: the rectangle's nodes
             rotation: degrees anti-clockwise from horizontal "east"
         """
         # ---- get slices color list from string
@@ -1044,6 +1050,7 @@ class RectangleShape(BaseShape):
             if len(_slices) not in [2, 4]:
                 feedback(err, True)
         slices_colors = [colrs.get_color(slcolor) for slcolor in _slices]
+        vertexes = self._shape_vertexes
         # ---- draw 2 triangles
         if len(slices_colors) == 2:
             # top-left
@@ -1715,9 +1722,9 @@ class RectangleShape(BaseShape):
                 )
                 self.vertexes.append(Point(x + self._u.width, y))
             else:
-                self.vertexes = self.get_vertexes(**kwargs)
+                self.vertexes = self._shape_vertexes
         else:
-            self.vertexes = self.get_vertexes(**kwargs)
+            self.vertexes = self._shape_vertexes
         # feedback(f'*** Rect {len(self.vertexes)=}')
 
         # ---- calculate rounding
@@ -1844,10 +1851,7 @@ class RectangleShape(BaseShape):
                 if self.hatches_count:
                     # if 'rotation' in kwargs.keys():
                     #     kwargs.pop('rotation')
-                    vertices = self.get_vertexes(**kwargs)
-                    self.draw_hatches(
-                        cnv, ID, vertices, self.hatches_count, rotation=rotation
-                    )
+                    self.draw_hatches(cnv, ID, self.hatches_count, rotation=rotation)
             if item == "perbii":
                 # ---- * draw perbii
                 if self.perbii:
@@ -1867,11 +1871,11 @@ class RectangleShape(BaseShape):
                     self.draw_radii_shapes(
                         cnv,
                         self.radii_shapes,
-                        self.get_vertexes(**kwargs),
+                        self._shape_vertexes,
                         Point(x_d, y_d),
-                        DirectionGroup.ORDINAL,  # for radii !
-                        rotation,
-                        self.radii_shapes_rotated,
+                        direction_group=DirectionGroup.ORDINAL,  # for radii !
+                        rotation=rotation,
+                        rotated=self.radii_shapes_rotated,
                     )
             if item == "perbii_shapes":
                 # ---- * draw perbii_shapes
@@ -1879,7 +1883,6 @@ class RectangleShape(BaseShape):
                     self.draw_perbii_shapes(
                         cnv,
                         self.perbii_shapes,
-                        self.get_vertexes(**kwargs),
                         Point(x_d, y_d),
                         DirectionGroup.CARDINAL,  # for perbii !
                         rotation,
@@ -1900,10 +1903,8 @@ class RectangleShape(BaseShape):
             if item == "vertex_shapes":
                 # ---- * draw vertex shapes
                 if self.vertex_shapes:
-                    base_vertexes = self.get_vertexes(**kwargs)
                     self.draw_vertex_shapes(
                         self.vertex_shapes,
-                        base_vertexes,
                         Point(x_d, y_d),
                         self.vertex_shapes_rotated,
                     )

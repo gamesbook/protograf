@@ -172,6 +172,7 @@ PageMarginsBase = namedtuple(
 )
 
 shape_fields = (
+    "name",
     "radius",
     "diameter",
     "side",
@@ -184,6 +185,18 @@ shape_fields = (
 ShapeGeometry = namedtuple(
     "ShapeGeometry", shape_fields, defaults=(None,) * len(shape_fields)
 )
+# template for use in Shape construction
+# return ShapeGeometry(
+#     name=self.simple_name(),
+#     radius=self.,
+#     diameter=self.,
+#     side=self.,
+#     length=self.,
+#     width=self.,
+#     height=self.,
+#     head=self.,
+#     tail=self.,
+# )
 
 
 class PageMargins(PageMarginsBase):

@@ -48,10 +48,12 @@ class HexShape(BaseShape):
         # ---- class vars
         self.x_d = None
         self.y_d = None
+        self.centre = None  # calculated by vertices
         self.calculated_left = None
         self.calculated_top = None
         self.coord_text = None
         self.grid = None
+        self.is_cards = False
         # ---- check construction type
         self.use_diameter = self.is_kwarg("diameter")
         self.use_height = self.is_kwarg("height")
@@ -95,7 +97,8 @@ class HexShape(BaseShape):
     @cached_property
     def shape_centre(self) -> Point:
         """Centre of Hexagon."""
-        return None
+        self.vertices = self._shape_vertexes  # also sets self.centre
+        return Point(self._p2v(self.centre.x), self._p2v(self.centre.y))
 
     @cached_property
     def shape_vertices(self) -> dict:
@@ -110,7 +113,250 @@ class HexShape(BaseShape):
     @cached_property
     def shape_geom(self) -> ShapeGeometry:
         """Geometry of Hexagon."""
-        return ShapeGeometry()
+        hex_geom = self.get_geometry()
+        return ShapeGeometry(
+            name=self.simple_name(),
+            radius=self._p2v(hex_geom.radius),
+            diameter=self._p2v(hex_geom.diameter),
+            side=self._p2v(hex_geom.radius),
+            height=self._p2v(hex_geom.height_flat),
+        )
+
+    @cached_property
+    def geom(self) -> ShapeGeometry:
+        """Geometry of Hexagon - alias for shape_geom."""
+        return self.shape_geom
+
+    @cached_property
+    def _shape_vertexes(self):
+        """Vertices of Hexagon in points."""
+        geo = self.get_geometry()
+        # ---- POINTY^
+        self.ORIENTATION = self.get_orientation()
+        if self.ORIENTATION == HexOrientation.POINTY:
+            #          .
+            #         / \`
+            # x,y .. |  |
+            #        \ /
+            #         .
+            # x and y are at the bottom-left corner of the box around the hex
+            x = self._u.x + self._o.delta_x
+            y = self._u.y + self._o.delta_y
+            # ---- ^ draw pointy by row/col
+            if self.row is not None and self.col is not None and self.is_cards:
+                x = (
+                    self.col * (geo.height_flat + self._u.spacing_x)
+                    + self._o.delta_x
+                    + self._u.offset_x
+                )
+                y = (
+                    self.row * (geo.diameter + self._u.spacing_y)
+                    + self._o.delta_y
+                    + self._u.offset_y
+                )  # do NOT add half_flat
+            elif self.row is not None and self.col is not None:
+                if self.hex_offset in ["o", "O", "odd"]:
+                    # TODO => calculate!
+                    # downshift applies from first odd row - NOT the very first one!
+                    downshift = geo.diameter - geo.z_fraction if self.row >= 1 else 0
+                    downshift = downshift * self.row if self.row >= 2 else downshift
+                    y = (
+                        self.row * (geo.diameter + geo.side)
+                        - downshift
+                        + self._u.y
+                        + self._o.delta_y
+                    )
+                    if (self.row + 1) & 1:  # is odd row; row are 0-base numbered!
+                        x = (
+                            self.col * geo.height_flat
+                            + geo.half_flat
+                            + self._u.x
+                            + self._o.delta_x
+                        )
+                    else:  # even row
+                        x = self.col * geo.height_flat + self._u.x + self._o.delta_x
+                elif self.hex_offset in ["e", "E", "even"]:  #
+                    # downshift applies from first even row - NOT the very first one!
+                    downshift = geo.diameter - geo.z_fraction if self.row >= 1 else 0
+                    downshift = downshift * self.row if self.row >= 2 else downshift
+                    y = (
+                        self.row * (geo.diameter + geo.side)
+                        - downshift
+                        + self._u.y
+                        + self._o.delta_y
+                    )
+                    if (self.row + 1) & 1:  # is odd row; row are 0-base numbered!
+                        x = self.col * geo.height_flat + self._u.x + self._o.delta_x
+                    else:  # even row
+                        x = (
+                            self.col * geo.height_flat
+                            + geo.half_flat
+                            + self._u.x
+                            + self._o.delta_x
+                        )
+                else:
+                    feedback(f"Unknown hex_offset value {self.hex_offset}", True)
+            # ----  ^ set hex centre relative to x,y
+            self.x_d = x + geo.half_flat
+            self.y_d = y + geo.side
+            # ---- ^ recalculate hex centre
+            if self.use_abs_c:
+                # create x_d, y_d as the unit-formatted hex centre
+                self.x_d = self._abs_cx
+                self.y_d = self._abs_cy
+                # recalculate start x,y
+                x = self.x_d - geo.half_flat
+                y = self.y_d - geo.half_side - geo.side / 2.0
+            elif self.cx is not None and self.cy is not None:
+                # cx,cy are centre; create x_d, y_d as the unit-formatted hex centre
+                self.x_d = self._u.cx + self._o.delta_x
+                self.y_d = self._u.cy + self._o.delta_y
+                # feedback(f"*** draw P^Hex {self.cx=} {self.cy=} {self.x_d=} {self._y_d=}")
+                # recalculate start x,y
+                x = self.x_d - geo.half_flat
+                y = self.y_d - geo.half_side - geo.side / 2.0
+            else:
+                pass
+                # feedback(f"*** draw P^Hex: {x=} {y=}{self.x_d=} {self.y_d=} {geo=}")
+
+        # ---- FLAT~
+        elif self.ORIENTATION == HexOrientation.FLAT:
+            #         __
+            # x,y .. /  \
+            #        \__/
+            #
+            # x and y are at the bottom-left corner of the box around the hex
+            x = self._u.x + self._o.delta_x
+            y = self._u.y + self._o.delta_y
+            # feedback(f"*** P~: {x=} {y=} {self.row=} {self.col=} {geo=} ")
+            # ---- ~ draw flat by row/col
+            if self.row is not None and self.col is not None and self.is_cards:
+                # x = self.col * 2.0 * geo.side + self._o.delta_x
+                # if self.row & 1:
+                #     x = x + geo.side
+                # y = self.row * 2.0 * geo.half_flat + self._o.delta_y  # NO half_flat
+                x = (
+                    self.col * 2.0 * (geo.side + self._u.spacing_x)
+                    + self._o.delta_x
+                    + self._u.offset_x
+                )
+                if self.row & 1:
+                    x = x + geo.side + self._u.spacing_x
+                y = (
+                    self.row * 2.0 * (geo.half_flat + self._u.spacing_y)
+                    + self._o.delta_y
+                    + self._u.offset_y
+                )  # do NOT add half_flat
+            elif self.row is not None and self.col is not None:
+                if self.hex_offset in ["o", "O", "odd"]:
+                    x = (
+                        self.col * (geo.half_side + geo.side)
+                        + self._u.x
+                        + self._o.delta_x
+                    )
+                    y = self.row * geo.half_flat * 2.0 + self._u.y + self._o.delta_y
+                    if (self.col + 1) & 1:  # is odd
+                        y = y + geo.half_flat
+                elif self.hex_offset in ["e", "E", "even"]:
+                    x = (
+                        self.col * (geo.half_side + geo.side)
+                        + self._u.x
+                        + self._o.delta_x
+                    )
+                    y = self.row * geo.half_flat * 2.0 + self._u.y + self._o.delta_y
+                    if (self.col + 1) & 1:  # is odd
+                        pass
+                    else:
+                        y = y + geo.half_flat
+                else:
+                    feedback(f"Unknown hex_offset value {self.hex_offset}", True)
+
+            # ----  ~ set hex centre relative to x,y
+            self.x_d = x + geo.side
+            self.y_d = y + geo.half_flat
+            # ----  ~ recalculate centre if preset
+            if self.use_abs_c:
+                # create x_d, y_d as the unit-formatted hex centre
+                self.x_d = self._abs_cx
+                self.y_d = self._abs_cy
+                # recalculate start x,y
+                x = self.x_d - geo.half_side - geo.side / 2.0
+                y = self.y_d - geo.half_flat
+            elif self.cx is not None and self.cy is not None:
+                # cx,cy are centre; create x_d, y_d as the unit-formatted hex centre
+                self.x_d = self._u.cx + self._o.delta_x
+                self.y_d = self._u.cy + self._o.delta_y
+                # feedback(f"*** draw F~Hex {self.cx=} {self.cy=} {self.x_d=} {self.y_d=}")
+                # recalculate start x,y
+                x = self.x_d - geo.half_side - geo.side / 2.0
+                y = self.y_d - geo.half_flat
+            else:
+                pass
+                # feedback(f"*** draw F~Hex: {x=} {y=} {self.x_d=} {self.y_d=} {geo=}")
+
+        else:
+            feedback(
+                'Invalid orientation "{self.ORIENTATION}" supplied for hexagon.', True
+            )
+
+        # ---- VERTICES:
+        # ---- ^ pointy hexagon vertices (clockwise)
+        if self.ORIENTATION == HexOrientation.POINTY:
+            #     4
+            #  5 / \3
+            #  0|  |2
+            #   \ /
+            #    1
+            self.vertexes = [  # clockwise from bottom-left; relative to centre
+                muPoint(x, y + geo.z_fraction),
+                muPoint(x, y + geo.z_fraction + geo.side),
+                muPoint(x + geo.half_flat, y + geo.diameter),
+                muPoint(x + geo.height_flat, y + geo.z_fraction + geo.side),
+                muPoint(x + geo.height_flat, y + geo.z_fraction),
+                muPoint(x + geo.half_flat, y),
+            ]
+        # ---- ~ flat hexagon vertices (clockwise)
+        elif self.ORIENTATION == HexOrientation.FLAT:
+            #   5__4
+            # 0 /  \3
+            #   \__/
+            #  1    2
+            self.vertexes = [  # clockwise from left; relative to centre
+                muPoint(x, y + geo.half_flat),
+                muPoint(x + geo.z_fraction, y + geo.height_flat),
+                muPoint(x + geo.z_fraction + geo.side, y + geo.height_flat),
+                muPoint(x + geo.diameter, y + geo.half_flat),
+                muPoint(x + geo.z_fraction + geo.side, y),
+                muPoint(x + geo.z_fraction, y),
+            ]
+        else:
+            feedback(
+                'Invalid orientation "{self.ORIENTATION}" supplied for hexagon.', True
+            )
+        self.centre = Point(self.x_d, self.y_d)
+        return self.vertexes
+
+    @cached_property
+    def _shape_vertexes_named(self):
+        """Named vertices for Hexagon."""
+        vertices = self._shape_vertexes
+        # anti-clockwise from top-left; relative to centre
+        if self.ORIENTATION == HexOrientation.POINTY:
+            directions = ["sw", "s", "se", "ne", "n", "nw"]
+        elif self.ORIENTATION == HexOrientation.FLAT:
+            directions = ["w", "sw", "se", "e", "ne", "nw"]
+        else:
+            feedback(
+                'Invalid orientation "{self.ORIENTATION}" supplied for hexagon.', True
+            )
+        vertex_dict = {}
+        for key, vertex in enumerate(vertices):
+            _vertex = Vertex(
+                point=vertex,
+                direction=directions[key],
+            )
+            vertex_dict[directions[key]] = _vertex
+        return vertex_dict
 
     def get_orientation(self) -> HexOrientation:
         """Return HexOrientation for the Hexagon."""
@@ -774,7 +1020,7 @@ class HexShape(BaseShape):
         NOTE:
             * rotation is NOT used for a Hex; set for consistency of method call
         """
-        vertices = self.get_vertexes()
+        vertices = self._shape_vertexes
         directions = []
         if self.ORIENTATION == HexOrientation.POINTY:
             directions = ["nw", "w", "sw", "se", "e", "ne"]
@@ -814,18 +1060,16 @@ class HexShape(BaseShape):
             # self._debug(cnv, vertices=_perbii_pts)
         return perbii_dict
 
-    def calculate_radii(
-        self, cnv, centre: Point, vertices: list, debug: bool = False
-    ) -> dict:
+    def calculate_radii(self, cnv, centre: Point, debug: bool = False) -> dict:
         """Calculate radii for each Hex vertex and angles from centre.
 
         Args:
-            vertices: list of Hex'es nodes as Points
             centre: the centre Point of the Hex
 
         Returns:
             dict of Radius objects keyed on direction
         """
+        vertices = self._shape_vertexes
         directions = []
         if self.ORIENTATION == HexOrientation.POINTY:
             directions = ["nw", "sw", "s", "se", "ne", "n"]
@@ -1132,238 +1376,6 @@ class HexShape(BaseShape):
             dotted=self.spikes_dotted,
         )
 
-    def get_vertexes(self, is_cards: bool = False) -> list:
-        """Calculate vertices of the Hexagon.
-
-        Returns:
-            list of Hex'es nodes as Points
-        """
-        geo = self.get_geometry()
-        # ---- POINTY^
-        self.ORIENTATION = self.get_orientation()
-        if self.ORIENTATION == HexOrientation.POINTY:
-            #          .
-            #         / \`
-            # x,y .. |  |
-            #        \ /
-            #         .
-            # x and y are at the bottom-left corner of the box around the hex
-            x = self._u.x + self._o.delta_x
-            y = self._u.y + self._o.delta_y
-            # ---- ^ draw pointy by row/col
-            if self.row is not None and self.col is not None and is_cards:
-                x = (
-                    self.col * (geo.height_flat + self._u.spacing_x)
-                    + self._o.delta_x
-                    + self._u.offset_x
-                )
-                y = (
-                    self.row * (geo.diameter + self._u.spacing_y)
-                    + self._o.delta_y
-                    + self._u.offset_y
-                )  # do NOT add half_flat
-            elif self.row is not None and self.col is not None:
-                if self.hex_offset in ["o", "O", "odd"]:
-                    # TODO => calculate!
-                    # downshift applies from first odd row - NOT the very first one!
-                    downshift = geo.diameter - geo.z_fraction if self.row >= 1 else 0
-                    downshift = downshift * self.row if self.row >= 2 else downshift
-                    y = (
-                        self.row * (geo.diameter + geo.side)
-                        - downshift
-                        + self._u.y
-                        + self._o.delta_y
-                    )
-                    if (self.row + 1) & 1:  # is odd row; row are 0-base numbered!
-                        x = (
-                            self.col * geo.height_flat
-                            + geo.half_flat
-                            + self._u.x
-                            + self._o.delta_x
-                        )
-                    else:  # even row
-                        x = self.col * geo.height_flat + self._u.x + self._o.delta_x
-                elif self.hex_offset in ["e", "E", "even"]:  #
-                    # downshift applies from first even row - NOT the very first one!
-                    downshift = geo.diameter - geo.z_fraction if self.row >= 1 else 0
-                    downshift = downshift * self.row if self.row >= 2 else downshift
-                    y = (
-                        self.row * (geo.diameter + geo.side)
-                        - downshift
-                        + self._u.y
-                        + self._o.delta_y
-                    )
-                    if (self.row + 1) & 1:  # is odd row; row are 0-base numbered!
-                        x = self.col * geo.height_flat + self._u.x + self._o.delta_x
-                    else:  # even row
-                        x = (
-                            self.col * geo.height_flat
-                            + geo.half_flat
-                            + self._u.x
-                            + self._o.delta_x
-                        )
-                else:
-                    feedback(f"Unknown hex_offset value {self.hex_offset}", True)
-            # ----  ^ set hex centre relative to x,y
-            self.x_d = x + geo.half_flat
-            self.y_d = y + geo.side
-            # ---- ^ recalculate hex centre
-            if self.use_abs_c:
-                # create x_d, y_d as the unit-formatted hex centre
-                self.x_d = self._abs_cx
-                self.y_d = self._abs_cy
-                # recalculate start x,y
-                x = self.x_d - geo.half_flat
-                y = self.y_d - geo.half_side - geo.side / 2.0
-            elif self.cx is not None and self.cy is not None:
-                # cx,cy are centre; create x_d, y_d as the unit-formatted hex centre
-                self.x_d = self._u.cx + self._o.delta_x
-                self.y_d = self._u.cy + self._o.delta_y
-                # feedback(f"*** draw P^Hex {self.cx=} {self.cy=} {self.x_d=} {self._y_d=}")
-                # recalculate start x,y
-                x = self.x_d - geo.half_flat
-                y = self.y_d - geo.half_side - geo.side / 2.0
-            else:
-                pass
-                # feedback(f"*** draw P^Hex: {x=} {y=}{self.x_d=} {self.y_d=} {geo=}")
-
-        # ---- FLAT~
-        elif self.ORIENTATION == HexOrientation.FLAT:
-            #         __
-            # x,y .. /  \
-            #        \__/
-            #
-            # x and y are at the bottom-left corner of the box around the hex
-            x = self._u.x + self._o.delta_x
-            y = self._u.y + self._o.delta_y
-            # feedback(f"*** P~: {x=} {y=} {self.row=} {self.col=} {geo=} ")
-            # ---- ~ draw flat by row/col
-            if self.row is not None and self.col is not None and is_cards:
-                # x = self.col * 2.0 * geo.side + self._o.delta_x
-                # if self.row & 1:
-                #     x = x + geo.side
-                # y = self.row * 2.0 * geo.half_flat + self._o.delta_y  # NO half_flat
-                x = (
-                    self.col * 2.0 * (geo.side + self._u.spacing_x)
-                    + self._o.delta_x
-                    + self._u.offset_x
-                )
-                if self.row & 1:
-                    x = x + geo.side + self._u.spacing_x
-                y = (
-                    self.row * 2.0 * (geo.half_flat + self._u.spacing_y)
-                    + self._o.delta_y
-                    + self._u.offset_y
-                )  # do NOT add half_flat
-            elif self.row is not None and self.col is not None:
-                if self.hex_offset in ["o", "O", "odd"]:
-                    x = (
-                        self.col * (geo.half_side + geo.side)
-                        + self._u.x
-                        + self._o.delta_x
-                    )
-                    y = self.row * geo.half_flat * 2.0 + self._u.y + self._o.delta_y
-                    if (self.col + 1) & 1:  # is odd
-                        y = y + geo.half_flat
-                elif self.hex_offset in ["e", "E", "even"]:
-                    x = (
-                        self.col * (geo.half_side + geo.side)
-                        + self._u.x
-                        + self._o.delta_x
-                    )
-                    y = self.row * geo.half_flat * 2.0 + self._u.y + self._o.delta_y
-                    if (self.col + 1) & 1:  # is odd
-                        pass
-                    else:
-                        y = y + geo.half_flat
-                else:
-                    feedback(f"Unknown hex_offset value {self.hex_offset}", True)
-
-            # ----  ~ set hex centre relative to x,y
-            self.x_d = x + geo.side
-            self.y_d = y + geo.half_flat
-            # ----  ~ recalculate centre if preset
-            if self.use_abs_c:
-                # create x_d, y_d as the unit-formatted hex centre
-                self.x_d = self._abs_cx
-                self.y_d = self._abs_cy
-                # recalculate start x,y
-                x = self.x_d - geo.half_side - geo.side / 2.0
-                y = self.y_d - geo.half_flat
-            elif self.cx is not None and self.cy is not None:
-                # cx,cy are centre; create x_d, y_d as the unit-formatted hex centre
-                self.x_d = self._u.cx + self._o.delta_x
-                self.y_d = self._u.cy + self._o.delta_y
-                # feedback(f"*** draw F~Hex {self.cx=} {self.cy=} {self.x_d=} {self.y_d=}")
-                # recalculate start x,y
-                x = self.x_d - geo.half_side - geo.side / 2.0
-                y = self.y_d - geo.half_flat
-            else:
-                pass
-                # feedback(f"*** draw F~Hex: {x=} {y=} {self.x_d=} {self.y_d=} {geo=}")
-
-        else:
-            feedback(
-                'Invalid orientation "{self.ORIENTATION}" supplied for hexagon.', True
-            )
-
-        # ---- VERTICES:
-        # ---- ^ pointy hexagon vertices (clockwise)
-        if self.ORIENTATION == HexOrientation.POINTY:
-            #     4
-            #  5 / \3
-            #  0|  |2
-            #   \ /
-            #    1
-            self.vertexes = [  # clockwise from bottom-left; relative to centre
-                muPoint(x, y + geo.z_fraction),
-                muPoint(x, y + geo.z_fraction + geo.side),
-                muPoint(x + geo.half_flat, y + geo.diameter),
-                muPoint(x + geo.height_flat, y + geo.z_fraction + geo.side),
-                muPoint(x + geo.height_flat, y + geo.z_fraction),
-                muPoint(x + geo.half_flat, y),
-            ]
-        # ---- ~ flat hexagon vertices (clockwise)
-        elif self.ORIENTATION == HexOrientation.FLAT:
-            #   5__4
-            # 0 /  \3
-            #   \__/
-            #  1    2
-            self.vertexes = [  # clockwise from left; relative to centre
-                muPoint(x, y + geo.half_flat),
-                muPoint(x + geo.z_fraction, y + geo.height_flat),
-                muPoint(x + geo.z_fraction + geo.side, y + geo.height_flat),
-                muPoint(x + geo.diameter, y + geo.half_flat),
-                muPoint(x + geo.z_fraction + geo.side, y),
-                muPoint(x + geo.z_fraction, y),
-            ]
-        else:
-            feedback(
-                'Invalid orientation "{self.ORIENTATION}" supplied for hexagon.', True
-            )
-        return self.vertexes
-
-    def get_vertexes_named(self, **kwargs):
-        """Get named vertices for Hexagon."""
-        vertices = self.get_vertexes(**kwargs)
-        # anti-clockwise from top-left; relative to centre
-        if self.ORIENTATION == HexOrientation.POINTY:
-            directions = ["sw", "s", "se", "ne", "n", "nw"]
-        elif self.ORIENTATION == HexOrientation.FLAT:
-            directions = ["w", "sw", "se", "e", "ne", "nw"]
-        else:
-            feedback(
-                'Invalid orientation "{self.ORIENTATION}" supplied for hexagon.', True
-            )
-        vertex_dict = {}
-        for key, vertex in enumerate(vertices):
-            _vertex = Vertex(
-                point=vertex,
-                direction=directions[key],
-            )
-            vertex_dict[directions[key]] = _vertex
-        return vertex_dict
-
     def draw(self, cnv=None, off_x=0, off_y=0, ID=None, **kwargs):
         """Draw a hexagon on a given canvas."""
         kwargs = self.kwargs | kwargs
@@ -1375,8 +1387,8 @@ class HexShape(BaseShape):
         super().draw(cnv, off_x, off_y, ID, **kwargs)  # unit-based props
         # ---- calculate vertexes
         geo = self.get_geometry()
-        is_cards = kwargs.get("is_cards", False)
-        self.vertices = self.get_vertexes(is_cards)
+        self.is_cards = kwargs.get("is_cards", False)
+        self.vertices = self._shape_vertexes  # also sets self.centre
         # ---- calculate area
         self.area = self.calculate_area()
         # ---- remove rotation
@@ -1540,9 +1552,9 @@ class HexShape(BaseShape):
                         self.radii_shapes,
                         self.vertices,
                         Point(self.x_d, self.y_d),
-                        direction_group,
-                        0,  # "rotation" - but HexShape cannot be rotated
-                        self.radii_shapes_rotated,
+                        direction_group=direction_group,
+                        rotation=0,  # "rotation" - but HexShape cannot be rotated
+                        rotated=self.radii_shapes_rotated,
                     )
             if item == "perbii_shapes":
                 # ---- * draw perbii_shapes

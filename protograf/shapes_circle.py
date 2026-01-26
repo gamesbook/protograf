@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Create custom shapes for protograf
+Create Circle shape for protograf
 """
 # lib
 from functools import cached_property
@@ -79,6 +79,11 @@ class CircleShape(BaseShape):
     def shape_geom(self) -> ShapeGeometry:
         """Geometry of Circle."""
         return ShapeGeometry()
+
+    @cached_property
+    def geom(self) -> ShapeGeometry:
+        """Geometry of Circle - alias for shape_geom."""
+        return self.shape_geom
 
     @cached_property
     def shape_perimeter(self) -> float:
@@ -773,9 +778,10 @@ class CircleShape(BaseShape):
                         self.radii_shapes,
                         self.vertexes,
                         Point(self.x_c, self.y_c),
-                        DirectionGroup.CIRCULAR,
-                        kwargs["rotation"],
-                        self.radii_shapes_rotated,
+                        radius=self._u.radius,
+                        direction_group=DirectionGroup.CIRCULAR,
+                        rotation=kwargs["rotation"],
+                        rotated=self.radii_shapes_rotated,
                     )
             if item in ["centre_shape", "center_shape"]:
                 # ---- * centre shape (with offset)
