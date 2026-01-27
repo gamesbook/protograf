@@ -91,7 +91,7 @@ class CircleShape(BaseShape):
         length = math.pi * 2.0 * self._u.radius
         return self.points_to_value(length)
 
-    @cached_property
+    @property  # do NOT cache because centre needs to be changed!
     def _shape_centre(self) -> Point:
         """Circle centre in points."""
         if self.use_abs_c:
@@ -123,21 +123,21 @@ class CircleShape(BaseShape):
             centre: the centre Point of the Circle
 
         Returns:
-            dict of Radius objects keyed on angle
+            dict of Radius objects keyed on order of vertices
         """
         radii_dict = {}
         # print(f"*** CIRC radii {centre=} {vertices=}")
         for key, vertex in enumerate(vertices):
             compass, angle = geoms.angles_from_points(centre, vertex)
-            # print(f"*** CIRC *** radii {key=} {directions[key]=} {compass=} {angle=}")
+            mirror_angle = 360 - angle  # inverse flip (y is reversed)
             _radii = Radius(
                 point=vertex,
-                direction=angle,
+                direction=mirror_angle,
                 compass=compass,
-                angle=360 - angle,  # inverse flip (y is reveresed)
+                angle=mirror_angle,
             )
-            # print(f"*** CIRC radii {_radii}")
-            radii_dict[angle] = _radii
+            print(f"*** CIRC radii {_radii}")
+            radii_dict[key + 1] = _radii
         return radii_dict
 
     def draw_hatches(

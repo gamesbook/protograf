@@ -387,7 +387,7 @@ class ArrowShape(BaseShape):
         """Geometry of Arrow - alias for shape_geom."""
         return self.shape_geom
 
-    @cached_property
+    @property  # do NOT cache because centre needs to be changed!
     def _shape_centre(self) -> Point:
         """Centre of Arrow in points."""
         if self.use_abs:
@@ -400,7 +400,8 @@ class ArrowShape(BaseShape):
         cy = y - self._u.height
         return Point(cx, cy)
 
-    def get_vertexes(self) -> list:
+    @property  # must be able to change e.g. for layout
+    def _shape_vertexes(self) -> list:
         """Calculate vertices of Arrow."""
         centre = self._shape_centre
         x_c, y_c = centre.x, centre.y
@@ -446,7 +447,7 @@ class ArrowShape(BaseShape):
             kwargs["rotation"] = rotation
             kwargs["rotation_point"] = self.centroid
         # ---- draw arrow
-        self.vertexes = self.get_vertexes()
+        self.vertexes = self._shape_vertexes
         # feedback(f'***Arrow {x=} {y=} {self.vertexes=}')
         cnv.draw_polyline(self.vertexes)
         kwargs["closed"] = True
@@ -675,7 +676,7 @@ class CrossShape(BaseShape):
         """Geometry of Cross - alias for shape_geom."""
         return self.shape_geom
 
-    @cached_property
+    @property  # do NOT cache because centre needs to be changed!
     def _shape_centre(self) -> Point:
         """Centre of Cross in points."""
         if self.use_abs_c:
@@ -853,7 +854,7 @@ class DotShape(BaseShape):
         """Geometry of Dot - alias for shape_geom."""
         return self.shape_geom
 
-    @cached_property
+    @property  # do NOT cache because centre needs to be changed!
     def _shape_centre(self) -> Point:
         """Centre of Dot in points."""
         if self.use_abs_c:
@@ -1700,7 +1701,7 @@ class RhombusShape(BaseShape):
         """Geometry of Rhombus - alias for shape_geom."""
         return self.shape_geom
 
-    @cached_property
+    @property  # do NOT cache because centre needs to be changed!
     def _shape_centre(self) -> Point:
         """Centre of Rhombus in points."""
         # ---- overrides for grid layout
@@ -1720,7 +1721,7 @@ class RhombusShape(BaseShape):
         cy = y + self._u.height / 2.0
         return Point(x=cx, y=cy)
 
-    @cached_property
+    @property  # must be able to change e.g. for layout
     def _shape_vertexes(self):
         """Vertices of Rhombus in points."""
         centre = self._shape_centre
@@ -1785,21 +1786,18 @@ class RhombusShape(BaseShape):
             perbii_dict[directions[key]] = _perbii
         return perbii_dict
 
-    def calculate_radii(self, cnv, centre: Point, vertices: list = None) -> dict:
+    def calculate_radii(self, cnv, centre: Point, debug: bool = False) -> dict:
         """Calculate radii for each Rhombus vertex and angles from centre.
 
         Args:
             centre (Point):
                 the centre of the Rhombus
-            vertices (list):
-                the Rhombus nodes as Points
 
         Returns:
             dict of Radius objects keyed on direction
         """
         directions = ["w", "s", "e", "n"]
-        if not vertices:
-            vertices = self._shape_vertexes
+        vertices = self._shape_vertexes
         radii_dict = {}
         # print(f"*** RHMB radii {centre=} {vertices=}")
         for key, vertex in enumerate(vertices):
@@ -3573,7 +3571,7 @@ class TriangleShape(BaseShape):
         """Geometry of Triangle - alias for shape_geom."""
         return self.shape_geom
 
-    @cached_property
+    @property  # must be able to change e.g. for layout
     def _shape_vertexes(self) -> list:
         """Get vertices for a Triangle
 

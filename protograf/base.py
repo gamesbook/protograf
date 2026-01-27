@@ -3401,6 +3401,8 @@ class BaseShape:
                     feedback(f"{err} - not {item}", True)
                 if direction_group == DirectionGroup.CIRCULAR:
                     vertexes = self.get_circle_vertexes(item[0], centre, radius)
+                    for v in vertexes:
+                        print(self._p2v(v.x) - 0.5, self._p2v(v.y) - 0.5)
                     radii_dict = self.calculate_radii(cnv, centre, vertexes)
                     _dirs = radii_dict.keys()
                 elif direction_group == DirectionGroup.POLYGONAL:
@@ -3418,7 +3420,8 @@ class BaseShape:
                 feedback(f"{err} - not {item}.", True)
             # print(f"*** radii_shapes {item=} {type(item)=}")
             self.can_draw_centred_shape(_shape, True)  # could stop here
-            # print(f"*** radii_shapes :::\n {radii_dict=} {_dirs=}")
+            print(f"*** radii_shapes :::\n {radii_dict=} {_dirs=}")
+            breakpoint()
             for _dir in _dirs:
                 # ---- calculate shape centre
                 _radii = radii_dict.get(_dir)
@@ -3449,6 +3452,9 @@ class BaseShape:
                 else:
                     _rotation = rotation
                 # ---- draw radii shape
+                print(
+                    f"*** draw shape {shape_centre.x=} {shape_centre.y=} {_rotation=}"
+                )
                 _shape.draw(
                     _abs_cx=shape_centre.x,
                     _abs_cy=shape_centre.y,

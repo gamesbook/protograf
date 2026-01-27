@@ -147,6 +147,17 @@ class RectangleShape(BaseShape):
         length = 2.0 * (self._u.width + self._u.height)
         return length
 
+    @property  # do NOT cache because centre needs to be changed!
+    def _shape_centre(self) -> Point:
+        """Get centre point of the Rectangle."""
+        x, y = self.calculate_xy()
+        if self.use_abs_c:
+            x = self._abs_cx - self._u.width / 2.0
+            y = self._abs_cy - self._u.height / 2.0
+        x_d = x + self._u.width / 2.0
+        y_d = y + self._u.height / 2.0
+        return Point(x=x_d, y=y_d)
+
     def calculate_perbii(
         self, cnv, centre: Point, rotation: float = None, **kwargs
     ) -> dict:
@@ -273,16 +284,6 @@ class RectangleShape(BaseShape):
             _, angle = geoms.angles_from_points(centre, vtx)
             angles.append(angle)
         return angles
-
-    def get_center(self) -> Point:
-        """Get centre point of the Rectangle."""
-        x, y = self.calculate_xy()
-        if self.use_abs_c:
-            x = self._abs_cx - self._u.width / 2.0
-            y = self._abs_cy - self._u.height / 2.0
-        x_d = x + self._u.width / 2.0
-        y_d = y + self._u.height / 2.0
-        return Point(x=x_d, y=y_d)
 
     def get_vertexes_named(self, **kwargs):
         """Get named vertices for Rectangle without notches."""
@@ -1469,7 +1470,7 @@ class RectangleShape(BaseShape):
                 True,
             )
         # ---- calculate properties
-        x, y = self.calculate_xy()
+        x, y = self.calculate_xy(**kwargs)
         # feedback(f'*** RECT      {self.col=} {self.row=} {x=} {y=}')
         # ---- overrides for grid layout
         if self.use_abs_c:

@@ -65,7 +65,7 @@ class PolygonShape(BaseShape):
         """Area of Polygon."""
         return self._p2v(self._shape_area)
 
-    @cached_property
+    @property
     def shape_centre(self) -> Point:
         """Centre of Polygon"""
         return Point(
@@ -104,7 +104,7 @@ class PolygonShape(BaseShape):
         area = (sides * self._shape_radius**2 / 2.0) * math.sin(2.0 * math.pi / sides)
         return area
 
-    @cached_property
+    @property  # do NOT cache because centre needs to be changed!
     def _shape_centre(self) -> Point:
         """Centre of Polygon in points"""
         if self.cx is not None and self.cy is not None:
@@ -138,7 +138,7 @@ class PolygonShape(BaseShape):
             radius = side / (2.0 * math.sin(math.pi / sides))
         return radius
 
-    @cached_property
+    @property
     def _shape_vertexes(self):
         """Vertices of Polygon in points."""
         the_geom = self.get_geometry()
@@ -239,22 +239,17 @@ class PolygonShape(BaseShape):
             # self._debug(cnv, vertices=_perbii_pts)
         return perbii_dict
 
-    def calculate_radii(
-        self,
-        centre: Point,
-        poly_vertices: list,
-    ) -> dict:
+    def calculate_radii(self, centre: Point, debug: bool = False) -> dict:
         """Calculate radii for each Polygon vertex and angles from centre.
 
         Args:
-            poly_vertices: list of Polygon's nodes as Points
             centre: the centre Point of the Polygon
 
         Returns:
             dict of Radius objects keyed on direction
         """
         radii_dict = {}
-        vertices = poly_vertices  # [::-1] # reversed
+        vertices = self._shape_vertexes
         # print(f"*** POLYGON radii {centre=} {vertices=}")
         for key, vertex in enumerate(vertices):
             compass, angle = geoms.angles_from_points(centre, vertex)

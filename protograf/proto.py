@@ -328,7 +328,7 @@ class CardShape(BaseShape):
         # ---- track frame outlines for possible image extraction
         match kwargs["frame_type"]:
             case CardFrame.RECTANGLE:
-                _vertices = outline.get_vertexes()  # clockwise from bottom-left
+                _vertices = outline._shape_vertexes  # clockwise from bottom-left
                 base_frame_bbox = BBox(tl=_vertices[0], br=_vertices[2])
             case CardFrame.CIRCLE:
                 base_frame_bbox = outline.bbox
@@ -2294,9 +2294,18 @@ def Card(sequence: object = None, *elements, **kwargs):
             card.members = _cards
             card.elements.append(element)  # may be Group or Shape or Query
         except AttributeError:
+            breakpoint()
             if isinstance(element, str):
                 feedback(
                     f'Cannot use the string "{element}" for a Card or CardBack.', True
+                )
+            elif isinstance(element, BaseShape):
+                name = element.simple_name()
+                feedback(f'Cannot use a "{name}" shape for a Card or CardBack.', True)
+            elif isinstance(element, list):
+                feedback(
+                    "Cannot use a list for a Card or CardBack; try the group command.",
+                    True,
                 )
             else:
                 feedback(f'Cannot use "{element}" for a Card or CardBack.', True)

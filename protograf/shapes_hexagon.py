@@ -127,8 +127,8 @@ class HexShape(BaseShape):
         """Geometry of Hexagon - alias for shape_geom."""
         return self.shape_geom
 
-    @cached_property
-    def _shape_vertexes(self):
+    @property  # must be able to change e.g. for layout
+    def _shape_vertexes(self) -> list:
         """Vertices of Hexagon in points."""
         geo = self.get_geometry()
         # ---- POINTY^
