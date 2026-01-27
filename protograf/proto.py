@@ -333,8 +333,10 @@ class CardShape(BaseShape):
             case CardFrame.CIRCLE:
                 base_frame_bbox = outline.bbox
             case CardFrame.HEXAGON:
-                _vertices = outline.get_vertexes()  # anti-clockwise from mid-left
+                _vertices = outline._shape_vertexes  # anti-clockwise from mid-left
                 # print(f"$$$ HEXAGON {_vertices=}")
+                # _vvs = self._l2v(_vertices)
+                # for i,v in enumerate(_vvs): print(f'$$$ HEX-V {i=} {v=}')
                 #   5__4
                 #   /  \
                 # 0/    \3
@@ -4878,7 +4880,7 @@ def Track(track=None, **kwargs):
             )
     else:
         # ---- get normal vertices and angles
-        vertices = track.get_vertexes()
+        vertices = track._shape_vertexes
         angles = [0] * len(vertices) if not angles else angles  # Polyline-> has none!
         for key, vertex in enumerate(vertices):
             track_points.append(Ray(vertex.x, vertex.y, angles[key]))

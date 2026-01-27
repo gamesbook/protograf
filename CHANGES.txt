@@ -9,6 +9,7 @@ protograf Changes
 - Add process flow diagram example
 - Refactor code to start using class properties
 - Bump development status to Beta
+- Added further error trapping
 
 2026-01-11 (0.4.0)
 ------------------

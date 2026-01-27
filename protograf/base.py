@@ -2411,6 +2411,24 @@ class BaseShape:
                 True,
             )
 
+    def _l2v(self, values: list, decimals: int = 3):
+        """Convert Points to a rounded, units-based values using current units."""
+        try:
+            _values = [
+                Point(
+                    round(float(value.x) / self.units, decimals),
+                    round(float(value.y) / self.units, decimals),
+                )
+                for value in values
+            ]
+            return _values
+        except Exception as err:
+            log.exception(err)
+            feedback(
+                f'Unable to do units conversion from "{values}" using {self.units}!',
+                True,
+            )
+
     def values_to_points(self, items: list, units_name=None) -> list:
         """Convert a list of values to point units."""
         try:
@@ -3401,8 +3419,6 @@ class BaseShape:
                     feedback(f"{err} - not {item}", True)
                 if direction_group == DirectionGroup.CIRCULAR:
                     vertexes = self.get_circle_vertexes(item[0], centre, radius)
-                    for v in vertexes:
-                        print(self._p2v(v.x) - 0.5, self._p2v(v.y) - 0.5)
                     radii_dict = self.calculate_radii(cnv, centre, vertexes)
                     _dirs = radii_dict.keys()
                 elif direction_group == DirectionGroup.POLYGONAL:
@@ -3420,8 +3436,7 @@ class BaseShape:
                 feedback(f"{err} - not {item}.", True)
             # print(f"*** radii_shapes {item=} {type(item)=}")
             self.can_draw_centred_shape(_shape, True)  # could stop here
-            print(f"*** radii_shapes :::\n {radii_dict=} {_dirs=}")
-            breakpoint()
+            # print(f"*** radii_shapes :::\n {radii_dict=} {_dirs=}")
             for _dir in _dirs:
                 # ---- calculate shape centre
                 _radii = radii_dict.get(_dir)
@@ -3452,9 +3467,7 @@ class BaseShape:
                 else:
                     _rotation = rotation
                 # ---- draw radii shape
-                print(
-                    f"*** draw shape {shape_centre.x=} {shape_centre.y=} {_rotation=}"
-                )
+                # print(f"*** draw shape {shape_centre.x=} {shape_centre.y=} {_rotation=}")
                 _shape.draw(
                     _abs_cx=shape_centre.x,
                     _abs_cy=shape_centre.y,
@@ -3498,7 +3511,7 @@ class BaseShape:
         err = "The perbii_shapes must contain direction(s) and shape"
         _dirs, _shape, _shape_fraction = [], None, 1.0
         if direction_group != DirectionGroup.CIRCULAR:  # see below for calc.
-            perbii_dict = self.calculate_perbii(cnv, centre)
+            perbii_dict = self.calculate_perbii(centre)
         for item in perbii_shapes:
             if isinstance(item, tuple):
                 # ---- determine dirs for shape
@@ -3507,7 +3520,7 @@ class BaseShape:
                     feedback(f"{err} - not {item}")
                 if direction_group == DirectionGroup.CIRCULAR:
                     # vertexes = self.get_circle_vertexes(item[0], centre, radius)
-                    perbii_dict = self.calculate_perbii(cnv, centre)
+                    perbii_dict = self.calculate_perbii(centre)
                     _dirs = perbii_dict.keys()
                 elif direction_group == DirectionGroup.POLYGONAL:
                     _dirs = tools.validated_directions(

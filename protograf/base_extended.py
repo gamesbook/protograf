@@ -237,12 +237,15 @@ class BasePolyShape(BaseShape):
                     f'The {polytype} snail cannot contain "{_item}".', True, True
                 )
 
-    def get_vertexes(self, offset_x=0.0, offset_y=0.0):
+    @property  # must be able to change e.g. for layout
+    def _shape_vertexes(self):
         """Return Poly-shape line vertices in canvas units"""
         polytype = self.get_name()
         points = self.get_points()
         steps = self.get_steps()
         _snail = self.snail
+        offset_x = self.offset_x or 0.0
+        offset_y = self.offset_y or 0.0
         if points and _snail:
             feedback(
                 f"Snail values will supercede points to draw the {polytype}",

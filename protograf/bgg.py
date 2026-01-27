@@ -123,7 +123,7 @@ from pathlib import Path
 # third party
 from boardgamegeek import BGGClient
 from boardgamegeek.objects.things import Thing
-from boardgamegeek.exceptions import BGGApiError
+from boardgamegeek.exceptions import BGGApiError, BGGApiUnauthorizedError
 from boardgamegeek.objects.games import CollectionBoardGame
 from boardgamegeek.objects.games import BoardGame
 
@@ -165,7 +165,7 @@ class BGGGame:
             if globals.pargs.bggapi:
                 token = globals.pargs.bggapi
         if not token:
-            feedback(f"Access to BGG requires a token!", True)
+            feedback("Access to BGG requires a token!", True)
         self.bgg = BGGClient(token)
         self.cache_directory = Path(Path.home() / CACHE_DIRECTORY / "bgg")
         self.cache_directory.mkdir(parents=True, exist_ok=True)
@@ -205,7 +205,7 @@ class BGGGame:
                     msg = "Test if your internet connection reaches boardgamegeek.com"
                 else:
                     msg = err
-                feedback(f"Unable to access boardgamegeek API ({msg})", True)
+                feedback(f"Unable to access BoardGameGeek API ({msg})", True)
             except Exception as err:
                 feedback(f"Unable to create game: {game_id} ({err})", True)
         return the_game, None
@@ -383,9 +383,6 @@ class BGGGameList:
         _requests = tools.as_int(requests, "requests")
         self.bgg = BGGClient(token, requests_per_minute=_requests)
         self.user = user
-        self.collection = None  # boardgamegeek.collection.Collection
-        if self.user:
-            self.collection = self.bgg.collection(user_name=user, **kwargs)
         self.game_data = []  # list of games; each as a list of values
         self.games = []  # list of BGGGame objects
         self.alternative_names = []
@@ -426,6 +423,13 @@ class BGGGameList:
         self.players = []
         self.description_short = []
         self.age = []
+        # collection
+        self.collection = None  # boardgamegeek.collection.Collection
+        if self.user:
+            try:
+                self.collection = self.bgg.collection(user_name=user, **kwargs)
+            except BGGApiUnauthorizedError as err:
+                feedback(f"Unable to access BoardGameGeek API: {err}", True)
 
     def set_values(self, game):
         """Append a game's property to a matching list."""

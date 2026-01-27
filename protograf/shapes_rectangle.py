@@ -102,7 +102,7 @@ class RectangleShape(BaseShape):
             height=self.height,
         )
 
-    @cached_property
+    @property
     def _shape_vertexes(self) -> list:
         """Get vertices for Rectangle without notches."""
         x, y = self.calculate_xy()
@@ -158,9 +158,7 @@ class RectangleShape(BaseShape):
         y_d = y + self._u.height / 2.0
         return Point(x=x_d, y=y_d)
 
-    def calculate_perbii(
-        self, cnv, centre: Point, rotation: float = None, **kwargs
-    ) -> dict:
+    def calculate_perbii(self, centre: Point, rotation: float = None, **kwargs) -> dict:
         """Calculate centre points for each Rectangle edge and angles from centre.
 
         Args:
@@ -788,7 +786,7 @@ class RectangleShape(BaseShape):
         else:
             cnv.draw_line(p7, p1)
 
-    def draw_hatches(self, cnv, ID, vertices: list, num: int, rotation: float = 0.0):
+    def draw_hatches(self, cnv, ID, num: int, rotation: float = 0.0):
         """Draw line(s) from one side of Rectangle to the parallel opposite.
 
         Args:
@@ -801,6 +799,7 @@ class RectangleShape(BaseShape):
             self.hatches, DirectionGroup.CIRCULAR, "hatches"
         )
         lines = tools.as_int(num, "hatches_count")
+        vertices = self._shape_vertexes
         # ---- check dirs
         if self.rounding or self.rounded:
             if (
@@ -924,7 +923,7 @@ class RectangleShape(BaseShape):
                 for a polygon, each edge is effectively a chord.
         """
         # vertices = self._shape_vertexes
-        perbii_dict = self.calculate_perbii(cnv=cnv, centre=centre)
+        perbii_dict = self.calculate_perbii(centre=centre)
         pb_length = (
             self.unit(self.perbii_length, label="perbii length")
             if self.perbii_length
@@ -994,12 +993,11 @@ class RectangleShape(BaseShape):
             rotation_point=rotation_point,
         )
 
-    def draw_radii(self, cnv, ID, centre: Point, rotation: float = None, **kwargs):
+    def draw_radii(self, cnv, ID, centre: Point, rotation: float = None):
         """Draw line(s) connecting the Rectangle centre to a vertex.
 
         Args:
             ID: unique ID
-            vertices: list of Rectangle nodes as Points
             centre: the centre Point of the Rectangle
 
         Note:
@@ -1119,13 +1117,12 @@ class RectangleShape(BaseShape):
                     rotation_point=self.centroid,
                 )
 
-    def draw_stripes(self, cnv, ID, vertices: list, rotation: float = 0.0):
+    def draw_stripes(self, cnv, ID, rotation: float = 0.0):
         """Draw tetragons between two sides of a Rectangle.
 
         Args:
             cnv: PyMuPDF Page object
             ID (int): unique ID
-            vertices (list): the Rectangle's nodes
             rotation (float): degrees anti-clockwise from horizontal "east"
         """
 
@@ -1149,6 +1146,7 @@ class RectangleShape(BaseShape):
         off_x, off_y = 0.0, 0.0
         diagonals_per_side = 0
         # ---- set canvas
+        vertices = self._shape_vertexes
         cx = vertices[0].x + 0.5 * self._u.width
         cy = vertices[0].y + 0.5 * self._u.height
         # ---- basic checks
@@ -1842,17 +1840,19 @@ class RectangleShape(BaseShape):
             if item == "slices":
                 # ---- * draw slices
                 if self.slices:
-                    self.draw_slices(cnv, ID, self.vertexes, rotation)
+                    self.draw_slices(cnv, ID, rotation)
             if item == "stripes":
                 # ---- * draw slices
                 if self.stripes:
-                    self.draw_stripes(cnv, ID, self.vertexes, rotation)
+                    self.draw_stripes(cnv, ID, rotation)
             if item == "hatches":
                 # ---- * draw hatches
                 if self.hatches_count:
                     # if 'rotation' in kwargs.keys():
                     #     kwargs.pop('rotation')
-                    self.draw_hatches(cnv, ID, self.hatches_count, rotation=rotation)
+                    self.draw_hatches(
+                        cnv, ID, num=self.hatches_count, rotation=rotation
+                    )
             if item == "perbii":
                 # ---- * draw perbii
                 if self.perbii:
@@ -1860,9 +1860,7 @@ class RectangleShape(BaseShape):
             if item == "radii":
                 # ---- * draw radii
                 if self.radii:
-                    self.draw_radii(
-                        cnv, ID, Point(x_d, y_d), self.vertexes, rotation=rotation
-                    )
+                    self.draw_radii(cnv, ID, Point(x_d, y_d), rotation=rotation)
             if item == "corners":
                 # ---- * draw corners
                 self.draw_corners(cnv, ID, x, y)
@@ -1883,11 +1881,12 @@ class RectangleShape(BaseShape):
                 if self.perbii_shapes:
                     self.draw_perbii_shapes(
                         cnv,
-                        self.perbii_shapes,
-                        Point(x_d, y_d),
-                        DirectionGroup.CARDINAL,  # for perbii !
-                        rotation,
-                        self.perbii_shapes_rotated,
+                        perbii_shapes=self.perbii_shapes,
+                        vertexes=self._shape_vertexes,
+                        centre=Point(x_d, y_d),
+                        direction_group=DirectionGroup.CARDINAL,  # for perbii !
+                        rotation=rotation,
+                        rotated=self.perbii_shapes_rotated,
                     )
             if item in ["centre_shape", "center_shape"]:
                 # ---- * centre shape (with offset)
@@ -1905,9 +1904,10 @@ class RectangleShape(BaseShape):
                 # ---- * draw vertex shapes
                 if self.vertex_shapes:
                     self.draw_vertex_shapes(
-                        self.vertex_shapes,
-                        Point(x_d, y_d),
-                        self.vertex_shapes_rotated,
+                        vertex_shapes=self.vertex_shapes,
+                        vertices=self._shape_vertexes,
+                        centre=Point(x_d, y_d),
+                        rotated=self.vertex_shapes_rotated,
                     )
             if item == "cross":
                 # ---- * cross

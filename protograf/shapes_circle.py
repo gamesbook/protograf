@@ -136,7 +136,7 @@ class CircleShape(BaseShape):
                 compass=compass,
                 angle=mirror_angle,
             )
-            print(f"*** CIRC radii {_radii}")
+            # print(f"*** CIRC radii {_radii}")
             radii_dict[key + 1] = _radii
         return radii_dict
 

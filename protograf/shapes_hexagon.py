@@ -866,7 +866,7 @@ class HexShape(BaseShape):
             )
 
         # ---- calculate centres of sides
-        perbii_dict = self.calculate_perbii(cnv=cnv, centre=centre)
+        perbii_dict = self.calculate_perbii(centre=centre)
 
         for item in self.paths:
             dir_pair = tools.validated_directions(item, dir_group, "hexagon paths")
@@ -1003,9 +1003,7 @@ class HexShape(BaseShape):
             dotted=self.paths_dotted,
         )
 
-    def calculate_perbii(
-        self, cnv, centre: Point, rotation: float = None, **kwargs
-    ) -> dict:
+    def calculate_perbii(self, centre: Point, rotation: float = None, **kwargs) -> dict:
         """Calculate centre points for each Hex edge and angles from centre.
 
         Args:
@@ -1111,7 +1109,7 @@ class HexShape(BaseShape):
                 the chord into two equal parts and meets the chord at a right angle;
                 for a polygon, each edge is effectively a chord.
         """
-        perbii_dict = self.calculate_perbii(cnv=cnv, centre=centre)
+        perbii_dict = self.calculate_perbii(centre=centre)
         pb_offset = self.unit(self.perbii_offset, label="perbii offset") or 0
         perbii_dirs = []
         pb_length = (
@@ -1331,7 +1329,7 @@ class HexShape(BaseShape):
 
         spikes_fill = colrs.get_color(self.spikes_fill)
         geo = self.get_geometry()
-        perbii_dict = self.calculate_perbii(cnv=cnv, centre=centre)
+        perbii_dict = self.calculate_perbii(centre=centre)
         spk_length = (
             self.unit(self.spikes_height, label="spikes height")
             if self.spikes_height
@@ -1565,9 +1563,9 @@ class HexShape(BaseShape):
                         self.perbii_shapes,
                         self.vertices,
                         Point(self.x_d, self.y_d),
-                        direction_group,
-                        0,  # "rotation" - but HexShape cannot be rotated
-                        self.perbii_shapes_rotated,
+                        direction_group=direction_group,
+                        rotation=0,  # "rotation" - but HexShape cannot be rotated
+                        rotated=self.perbii_shapes_rotated,
                     )
             if item in ["centre_shape", "center_shape"]:
                 # ---- * centred shape (with offset)
