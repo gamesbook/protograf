@@ -154,7 +154,7 @@ class PolyominoObject(RectangleShape):
             return length
 
     def get_perimeter_lines(self, cnv=None, ID=None, **kwargs) -> list:
-        """Calculate set of lines that form perimeter of polyonimo"""
+        """Calculate set of lines that form perimeter of Polyonimo"""
         perimeter_lines = []
         max_row = len(self.int_pattern)
         max_col = len(self.int_pattern[0])
@@ -167,7 +167,7 @@ class PolyominoObject(RectangleShape):
                 super().set_abs_and_offset(
                     cnv=cnv, off_x=off_x, off_y=off_y, ID=ID, **kwargs
                 )
-                vtx = super()._shape_vertexes()  # anti-clockwise from top-left
+                vtx = super()._shape_vertexes  # anti-clockwise from top-left
                 # handle edges
                 if col == 0:  # left edge
                     perimeter_lines.append((vtx[1], vtx[0]))
