@@ -1515,7 +1515,7 @@ class PolylineShape(BasePolyShape):
         if self.snail:
             self.draw_snail(cnv=cnv, off_x=off_x, off_y=off_y, ID=ID, **kwargs)
             kwargs["closed"] = False
-            kwargs["fill"] = None
+            kwargs["fill"] = None  # line ONLY
             self.set_canvas_props(cnv=cnv, index=ID, **kwargs)
         # ---- arrowhead for vertices
         if (
@@ -3023,6 +3023,7 @@ class TextShape(BaseShape):
             Any text in a Template should already have been rendered by
             base.handle_custom_values()
         """
+        # feedback(f'*** Text {ID=} {self.text=}')
         kwargs = self.kwargs | kwargs
         cnv = cnv if cnv else globals.canvas  # a new Page/Shape may now exist
         super().draw(cnv, off_x, off_y, ID, **kwargs)  # unit-based props

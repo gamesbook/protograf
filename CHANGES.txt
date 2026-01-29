@@ -3,13 +3,13 @@ protograf Changes
 
 2026-00-00 (0.4.1)
 ------------------
-- Enable Line connections for other shapes
-- Enable PolyLine connections for shapes
+- Enable Line connections between non-Circle shapes
 - Add Kensington board example
 - Add process flow diagram example
 - Refactor code to start using class properties
 - Bump development status to Beta
 - Added further error trapping
+- Remove Connect shape (replaced with Line connections)
 
 2026-01-11 (0.4.0)
 ------------------

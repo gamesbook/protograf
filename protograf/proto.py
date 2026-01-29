@@ -76,7 +76,6 @@ from .layouts import (
     RectangularLocations,  # used in user scripts
     TriangularLocations,  # used in user scripts
     VirtualLocations,
-    ConnectShape,
     RepeatShape,
     SequenceShape,
     TableShape,
@@ -260,6 +259,7 @@ class CardShape(BaseShape):
         self, the_function, new_eles, cnv, off_x, off_y, ID, cid, **kwargs
     ):
         """Draw a list of elements created via a Template or Card function call."""
+        feedback(f"$$$ CardShape elements  {new_eles}")
         for the_new_ele in new_eles:
             try:
                 if isinstance(the_new_ele, GroupBase):
@@ -471,10 +471,11 @@ class CardShape(BaseShape):
                 # ---- * normal element
                 iid = members.index(cid + 1)
                 new_ele = self.handle_custom_values(flat_ele, cid)  # calculated values
-                # feedback(f'$$$ CS draw_card ele $$$ {new_ele=}')
-                # breakpoint()
+                # feedback(f'$$$ CS draw_card ele $$$ {type(new_ele)=}')
                 if isinstance(new_ele, (SequenceShape, RepeatShape)):
                     new_ele.deck_data = self.deck_data
+                    new_ele.draw(cnv=cnv, off_x=_dx, off_y=_dy, ID=iid, **kwargs)
+                    cnv.commit()
                 elif isinstance(new_ele, TemplatingType):
                     # convert Template into a string via render
                     card_value = self.deck_data[iid]
@@ -2298,7 +2299,6 @@ def Card(sequence: object = None, *elements, **kwargs):
             card.members = _cards
             card.elements.append(element)  # may be Group or Shape or Query
         except AttributeError:
-            breakpoint()
             if isinstance(element, str):
                 feedback(
                     f'Cannot use the string "{element}" for a Card or CardBack.', True
@@ -3874,6 +3874,10 @@ def DotGrid(**kwargs):
     return dgrd
 
 
+def dotgrid(row=None, col=None, **kwargs):
+    return DotGridShape(**kwargs)
+
+
 @docstring_loc
 def Grid(**kwargs):
     """Draw a lined grid on the canvas.
@@ -3892,6 +3896,10 @@ def Grid(**kwargs):
     return grid
 
 
+def grid(row=None, col=None, **kwargs):
+    return GridShape(**kwargs)
+
+
 @docstring_loc
 def HexHex(**kwargs):
     """Draw a hexhex-based layout on the canvas.
@@ -3906,6 +3914,10 @@ def HexHex(**kwargs):
     # feedback(f' \\\ HexHex {kwargs=}')
     hhgrid.draw()
     return hhgrid
+
+
+def hexhex(row=None, col=None, **kwargs):
+    return HexHex(canvas=globals.canvas, **kwargs)
 
 
 def Blueprint(**kwargs):
@@ -4094,37 +4106,6 @@ def Blueprint(**kwargs):
     )  # don't add canvas as arg here!
     grid.draw(cnv=globals.canvas)
     return grid
-
-
-# ---- connect ====
-
-
-def Connect(shape_from, shape_to, **kwargs):
-    """Connect two shapes on the canvas.
-
-    Args:
-
-    - row (int): row in which the shape is drawn.
-    - col (int): column in which the shape is drawn.
-
-    Kwargs:
-
-    <base>
-
-    """
-    kwargs = margins(**kwargs)
-    kwargs["shape_from"] = shape_from
-    kwargs["shape_to"] = shape_to
-    connect = ConnectShape(canvas=globals.canvas, **kwargs)
-    connect.draw(cnv=globals.canvas)
-    return connect
-
-
-def connect(shape_from, shape_to, **kwargs):
-    kwargs = margins(**kwargs)
-    kwargs["shape_from"] = shape_from
-    kwargs["shape_to"] = shape_to
-    return ConnectShape(canvas=globals.canvas, **kwargs)
 
 
 # ---- layouts ====

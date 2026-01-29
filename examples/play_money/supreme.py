@@ -31,6 +31,7 @@ Deck(cards=20,
      width=9.5,
      fill=None,
      grid_marks=True,
+     grid_marks_length=0.5,
      copy='COPIES')
 
 # card elements

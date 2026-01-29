@@ -21,14 +21,7 @@ from protograf.utils.structures import (
 from protograf.utils import geoms, tools, support
 from protograf.utils.tools import _lower
 from protograf.base import BaseShape, BaseCanvas
-from protograf.shapes import (
-    # CircleShape,
-    LineShape,
-    # PolygonShape,
-    PolylineShape,
-    # RectangleShape,
-    TextShape,
-)
+from protograf.shapes import TextShape
 from protograf.shapes_hexagon import HexShape
 
 log = logging.getLogger(__name__)
@@ -124,8 +117,12 @@ class DotGridShape(BaseShape):
         cnv = cnv if cnv else self.canvas
         super().draw(cnv, off_x, off_y, ID, **kwargs)  # unit-based props
         # ---- switch to use of units
-        x = 0 + self._u.offset_x
-        y = 0 + self._u.offset_y
+        if ID is None:  # being used on a page - absolute offset
+            x = 0 + self._u.offset_x
+            y = 0 + self._u.offset_y
+        else:  # being used on a card - relative offset
+            x = self._u.x + self._o.delta_x
+            y = self._u.y + self._o.delta_y
         height = self._u.height  # of each grid item
         width = self._u.width  # of each grid item
         if "side" in self.kwargs and not (
@@ -626,6 +623,7 @@ class RepeatShape(BaseShape):
     def __init__(self, _object=None, canvas=None, **kwargs):
         super().__init__(_object=_object, canvas=canvas, **kwargs)
         self._objects = kwargs.get("shapes", [])  # incoming Shape object(s)
+        # feedback(f'*** REPEAT {self._objects=} {kwargs=}')
         # UPDATE SELF WITH COMMON
         if self.common:
             attrs = vars(self.common)
@@ -671,6 +669,7 @@ class RepeatShape(BaseShape):
         cnv = cnv if cnv else self.canvas
         super().draw(cnv, off_x, off_y, ID, **kwargs)  # unit-based props
         _off_x, _off_y = off_x or self.offset_x or 0, off_y or self.offset_y or 0
+        # feedback(f'*** REPEAT {self._objects=} {ID=} {self.cols=} {self.rows=}')
 
         for col in range(self.cols):
             for row in range(self.rows):
@@ -949,7 +948,6 @@ class HexHexLocations(VirtualShape):
                         chex, ghex.height_flat, vertex_angles[spine - 2]
                     )
                 else:
-                    sid = spine - 1
                     chex = geoms.point_from_angle(
                         chex, ghex.height_flat, vertex_angles[spine - 1]
                     )
@@ -1476,7 +1474,7 @@ class TriangularLocations(VirtualLocations):
                 col_start = 1
                 # clockwise = True if _dir == "east" else False
 
-        col, row, count = col_start, row_start, 0
+        _, _, count = col_start, row_start, 0
         # max_outer = 2 * self.rows + (self.cols - 2) * 2
         corner = None
         # ---- set row and col interval
@@ -1570,180 +1568,3 @@ class DiamondLocations(VirtualLocations):
 # ---- tracks
 
 # See proto.py
-
-# ---- other layouts
-
-
-class ConnectShape(BaseShape):
-    """
-    Connect two shapes (Rectangle), based on a position, on a given canvas.
-
-       Q4 | Q1
-       -------
-       Q3 | Q2
-
-    """
-
-    def __init__(self, _object=None, canvas=None, **kwargs):
-        super().__init__(_object=_object, canvas=canvas, **kwargs)
-        # overrides
-        self.shape_from = kwargs.get("shape_from", None)  # could be a GridShape
-        self.shape_to = kwargs.get("shape_to", None)  # could be a GridShape
-
-    def draw(self, cnv=None, off_x=0, off_y=0, ID=None, **kwargs):
-        """Draw a connection (line) between two shapes on given canvas."""
-        kwargs = self.kwargs | kwargs
-        base_canvas = cnv
-        cnv = cnv if cnv else self.canvas
-        super().draw(cnv, off_x, off_y, ID, **kwargs)  # unit-based props
-        # ---- style
-        style = "direct"
-        # ---- shapes and positions
-        try:
-            shp_from, shape_from_position = self.shape_from  # tuple form
-        except Exception:
-            shp_from, shape_from_position = self.shape_from, "S"
-        try:
-            shp_to, shape_to_position = self.shape_to  # tuple form
-        except Exception:
-            shp_to, shape_to_position = self.shape_to, "N"
-        # ---- shape props
-        shape_from = self.get_shape_in_grid(shp_from)
-        shape_to = self.get_shape_in_grid(shp_to)
-        edge_from = shape_from.get_bounds()
-        edge_to = shape_to.get_bounds()
-        x_f, y_f = self.key_positions(shape_from, shape_from_position)
-        x_t, y_t = self.key_positions(shape_to, shape_to_position)
-        c_f = shape_from.get_center()
-        xc_f, yc_f = c_f.x, c_f.y
-        c_t = shape_to.get_center()
-        xc_t, yc_t = c_t.x, c_t.y
-        # x,y: use fixed/supplied; or by "name"; or by default; or by "smart"
-        if style == "path":
-            # ---- path points
-            points = []
-
-            if xc_f == xc_t and yc_f > yc_t:  # above
-                points = [
-                    self.key_positions(shape_from, "S"),
-                    self.key_positions(shape_to, "N"),
-                ]
-            if xc_f == xc_t and yc_f < yc_t:  # below
-                points = [
-                    self.key_positions(shape_from, "N"),
-                    self.key_positions(shape_to, "S"),
-                ]
-            if xc_f > xc_t and yc_f == yc_t:  # left
-                points = [
-                    self.key_positions(shape_from, "W"),
-                    self.key_positions(shape_to, "E"),
-                ]
-            if xc_f < xc_t and yc_f == yc_t:  # right
-                points = [
-                    self.key_positions(shape_from, "E"),
-                    self.key_positions(shape_to, "W"),
-                ]
-
-            if xc_f < xc_t and yc_f < yc_t:  # Q1
-                if edge_from.right < edge_to.left:
-                    if edge_from.top < edge_to.bottom:
-                        log.debug("A t:%s b:%s", edge_from.top, edge_to.bottom)
-                        delta = (edge_to.bottom - edge_from.top) / 2.0
-                        points = [
-                            self.key_positions(shape_from, "N"),
-                            (xc_f, edge_from.top + delta),
-                            (xc_t, edge_from.top + delta),
-                            self.key_positions(shape_to, "S"),
-                        ]
-                    elif edge_from.top > edge_to.bottom:
-                        log.debug("B t:%s b:%s", edge_from.top, edge_to.bottom)
-                        points = [
-                            self.key_positions(shape_from, "N"),
-                            (xc_f, yc_t),
-                            self.key_positions(shape_to, "W"),
-                        ]
-                    else:
-                        pass
-                else:
-                    log.debug("C t:%s b:%s", edge_from.top, edge_to.bottom)
-                    points = [
-                        self.key_positions(shape_from, "N"),
-                        (xc_f, yc_t),
-                        self.key_positions(shape_to, "W"),
-                    ]
-            if xc_f < xc_t and yc_f > yc_t:  # Q2
-                log.debug("Q2")
-
-            if xc_f > xc_t and yc_f > yc_t:  # Q3
-                log.debug("Q3")
-
-            if xc_f > xc_t and yc_f < yc_t:  # Q4
-                log.debug("Q4")
-                if edge_from.left < edge_to.right:
-                    if edge_from.top < edge_to.bottom:
-                        log.debug(" A t:%s b:%s", edge_from.top, edge_to.bottom)
-                        delta = (edge_to.bottom - edge_from.top) / 2.0
-                        points = [
-                            self.key_positions(shape_from, "N"),
-                            (xc_f, edge_from.top + delta),
-                            (xc_t, edge_from.top + delta),
-                            self.key_positions(shape_to, "S"),
-                        ]
-                    elif edge_from.top > edge_to.bottom:
-                        log.debug(" B t:%s b:%s", edge_from.top, edge_to.bottom)
-                        points = [
-                            self.key_positions(shape_from, "N"),
-                            (xc_f, yc_t),
-                            self.key_positions(shape_to, "E"),
-                        ]
-                    else:
-                        pass
-                else:
-                    log.debug(" C t:%s b:%s", edge_from.top, edge_to.bottom)
-                    points = [
-                        self.key_positions(shape_from, "N"),
-                        (xc_f, yc_t),
-                        self.key_positions(shape_to, "E"),
-                    ]
-
-            if xc_f == xc_t and yc_f == yc_t:  # same!
-                return
-            self.kwargs["points"] = points
-            plin = PolylineShape(None, base_canvas, **self.kwargs)
-            plin.draw(ID=ID)
-        elif style == "direct":  # straight line
-            # ---- direct points
-            self.kwargs["x"] = x_f
-            self.kwargs["y"] = y_f
-            self.kwargs["x1"] = x_t
-            self.kwargs["y1"] = y_t
-            lin = LineShape(None, base_canvas, **self.kwargs)
-            lin.draw(ID=ID)
-        else:
-            feedback('Style "{style}" is unknown.')
-
-    def key_positions(self, _shape, location=None):
-        """Calculate a dictionary of key positions around a Rectangle.
-
-        N,S,E,W = North, South, East, West
-        """
-        top = _shape.y
-        btm = _shape.y + _shape.height
-        mid_horizontal = _shape.x + _shape.width / 2.0
-        mid_vertical = _shape.y + _shape.height / 2.0
-        left = _shape.x
-        right = _shape.x + _shape.width
-        _positions = {
-            "NW": (left, top),
-            "N": (mid_horizontal, top),
-            "NE": (right, top),
-            "SW": (left, btm),
-            "S": (mid_horizontal, btm),
-            "SE": (right, btm),
-            "W": (left, mid_vertical),
-            "E": (right, mid_vertical),
-            # '': (),
-        }
-        if location:
-            return _positions.get(location, ())
-        return _positions

@@ -6,7 +6,6 @@ echo -e "\nAll examples outputs are saved to directories specified in the script
 echo -e "\nCreating basic examples..."
 python core/blank.py
 python core/demo.py
-python core/diagram.py
 python core/default_shapes.py
 # ----  examples: customised
 echo -e "\nCreating customised examples..."
