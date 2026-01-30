@@ -49,23 +49,41 @@ class GridShape(BaseShape):
         kwargs = self.kwargs | kwargs
         cnv = cnv if cnv else self.canvas
         super().draw(cnv, off_x, off_y, ID, **kwargs)  # unit-based props
-        # ---- convert to using units
-        x = self._u.x + self._o.delta_x
-        y = self._u.y + self._o.delta_y
+        # ---- switch to use of units
+        # print(f'\n~~~ Grid {ID=} {off_x=} {self._u.x=}  {self._o.delta_x=} ')
+        # print(f'~~~ Grid {ID=} {off_y=} {self._u.y=}  {self._o.delta_y=} ')
+        space_top = 0
+        space_left = 0
+        space_bottom = 0
+        space_right = 0
+        if ID is None:  # being used on a page - absolute offset
+            x = self._u.x + self._o.delta_x
+            y = self._u.y + self._o.delta_y
+            if self.margin_fit:
+                space_top = self.margin_top
+                space_left = self.margin_left
+                space_bottom = self.margin_bottom
+                space_right = self.margin_right
+            else:
+                x = self._u.x
+                y = self._u.y
+        else:  # being used on a card - relative offset
+            pass
+
         height = self._u.height  # of each grid item
         width = self._u.width  # of each grid item
         if self.side and self.use_side:  # square grid
             side = self.unit(self.side)
             height, width = side, side
-        # ---- number of blocks in grid:
+        # ---- number of blocks in grid
         if self.rows == 0:
             self.rows = int(
-                (self.page_height - self.margin_bottom - self.margin_top)
+                (self.page_height - space_bottom - space_top)
                 / self.points_to_value(height)
             )
         if self.cols == 0:
             self.cols = int(
-                (self.page_width - self.margin_left - self.margin_right)
+                (self.page_width - space_left - space_right)
                 / self.points_to_value(width)
             )
         y_cols, x_cols = [], []
@@ -121,8 +139,16 @@ class DotGridShape(BaseShape):
             x = 0 + self._u.offset_x
             y = 0 + self._u.offset_y
         else:  # being used on a card - relative offset
+            print(
+                f"~~~ DGrid {ID=} {off_x=} {self._u.offset_x=} {self._u.x=}  {self._o.delta_x=} "
+            )
+            print(
+                f"~~~ DGrid {ID=} {off_y=} {self._u.offset_y=} {self._u.y=}  {self._o.delta_y=} "
+            )
             x = self._u.x + self._o.delta_x
+            x = self._o.delta_x
             y = self._u.y + self._o.delta_y
+            y = self._o.delta_y
         height = self._u.height  # of each grid item
         width = self._u.width  # of each grid item
         if "side" in self.kwargs and not (
@@ -144,7 +170,7 @@ class DotGridShape(BaseShape):
             self.rows = int((self.page_height) / height) + 1
         if self.cols == 0:
             self.cols = int((self.page_width) / width) + 1
-        # ---- set canvas
+        # ---- set properties
         size = self.dot_width / 2.0  # diameter is 3 points ~ 1mm or 1/32"
         self.fill = self.stroke
         # ---- draw dot grid

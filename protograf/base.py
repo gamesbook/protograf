@@ -462,6 +462,7 @@ class BaseCanvas:
         self.grouping_rows = self.defaults.get("grouping_rows", self.grouping)
         self.grouping_cols = self.defaults.get("grouping_cols", self.grouping)
         self.lines = self.defaults.get("lines", "all")  # which direction to draw
+        self.margin_fit = self.defaults.get("margin_fit", True)  # respect margin?
         # ---- HexHex grid
         self.rings = self.defaults.get("rings", 1)
         self.locations = self.defaults.get("locations", None)
@@ -1129,6 +1130,9 @@ class BaseShape:
             kwargs.get("grouping_cols", self.grouping), "grouping_cols"
         )
         self.lines = kwargs.get("lines", base.lines)
+        self.margin_fit = self.kw_bool(
+            kwargs.get("margin_fit", base.margin_fit)
+        )  # respect margin?
         # ---- HexHex grid
         self.rings = kwargs.get("rings", base.rings)
         self.locations = kwargs.get("locations", base.locations)
