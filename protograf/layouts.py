@@ -86,7 +86,9 @@ class GridBase(BaseShape):
         # ---- number of blocks in grid
         bonus = 1 if isinstance(self, DotGridShape) else 0
         if self.rows == 0:
-            self.rows = int((max_height - space_bottom - offset_y) / self.height) + bonus
+            self.rows = (
+                int((max_height - space_bottom - offset_y) / self.height) + bonus
+            )
         if self.cols == 0:
             self.cols = int((max_width - space_right - offset_x) / self.width) + bonus
         # print(f'~~~ GridBase {self.rows=} {self.cols=} {self.width=} {self.height=}')
