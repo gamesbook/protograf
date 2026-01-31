@@ -31,9 +31,9 @@ DEBUG = False
 # ---- BaseShape-derived
 
 
-class GridShape(BaseShape):
+class GridBase(BaseShape):
     """
-    Grid on a given canvas.
+    Base functionality for a drawing grid-like shapes on a given canvas.
     """
 
     def __init__(self, _object=None, canvas=None, **kwargs):
@@ -43,6 +43,8 @@ class GridShape(BaseShape):
             self.use_side = True
             if "width" in kwargs or "height" in kwargs:
                 self.use_side = False
+        self.y_cols, self.x_cols = [], []
+        self.start_x, self.start_y = 0.0, 0.0  # top-left corner of grid
 
     def draw(self, cnv=None, off_x=0, off_y=0, ID=None, **kwargs):
         """Draw a grid on a given canvas."""
@@ -50,53 +52,60 @@ class GridShape(BaseShape):
         cnv = cnv if cnv else self.canvas
         super().draw(cnv, off_x, off_y, ID, **kwargs)  # unit-based props
         # ---- set x,y and calculate space available
-        # print(f'\n~~~ Grid {ID=} {off_x=} {self._u.x=}  {self._o.delta_x=} ')
-        # print(f'~~~ Grid {ID=} {off_y=} {self._u.y=}  {self._o.delta_y=} ')
+        # print(f'\n~~~ GridBase {ID=} {off_x=} {self._u.x=}  {self._o.delta_x=} ')
+        # print(f'~~~ GridBase {ID=} {off_y=} {self._u.y=}  {self._o.delta_y=} ')
         space_bottom = 0
         space_right = 0
         if ID is None:  # being used on a page - absolute offset
-            x = self._u.x + self._o.delta_x
-            y = self._u.y + self._o.delta_y
+            self.start_x = self._u.x + self._o.delta_x
+            self.start_y = self._u.y + self._o.delta_y
             max_width = self.page_width
             max_height = self.page_height
             if self.margin_fit:
                 space_bottom = self._u.margin_bottom
                 space_right = self._u.margin_right
             else:
-                x = self._u.x
-                y = self._u.y
-            offset_x, offset_y = x, y
+                self.start_x = self._u.x
+                self.start_y = self._u.y
+            offset_x, offset_y = self.start_x, self.start_y
         else:  # being used on a card - x,y are relative offset - no margins
             # see proto/draw_element() function for these kwargs settings
-            x = kwargs.get("card_x", 0) + self._u.x
-            y = kwargs.get("card_y", 0) + self._u.y
+            self.start_kwargs.get("card_x", 0) + self._u.x
+            self.start_y = kwargs.get("card_y", 0) + self._u.y
             max_width = self.unit(kwargs.get("card_width", 0))
             max_height = self.unit(kwargs.get("card_height", 0))
             offset_x, offset_y = 0, 0
-            # print(f'\n~~~ Grid-card {ID=} {x=} {y=} {max_width=} {max_height=}')
+            # print(f'\n~~~ GridBase-card {ID=} {self.start_x=} {self.start_y=}')
+            # print(f'\n~~~ GridBase-card {ID=} {max_width=} {max_height=}')
 
-        height = self._u.height  # of each grid item
-        width = self._u.width  # of each grid item
+        self.height = self._u.height  # of each grid item
+        self.width = self._u.width  # of each grid item
         if self.side and self.use_side:  # square grid
             side = self.unit(self.side)
-            height, width = side, side
+            self.height, self.width = side, side
         # ---- number of blocks in grid
+        bonus = 1 if isinstance(self, DotGridShape) else 0
         if self.rows == 0:
-            self.rows = int(
-                (max_height - space_bottom - offset_y)
-                / height  # y is offset from page-top!
-            )
+            self.rows = int((max_height - space_bottom - offset_y) / self.height) + bonus
         if self.cols == 0:
-            self.cols = int(
-                (max_width - space_right - offset_x)
-                / width  # y is offset from page-left!
-            )
-        # print(f'~~~ Grid {self.rows=} {self.cols=} {width=} {height=}')
-        y_cols, x_cols = [], []
+            self.cols = int((max_width - space_right - offset_x) / self.width) + bonus
+        # print(f'~~~ GridBase {self.rows=} {self.cols=} {self.width=} {self.height=}')
         for y_col in range(0, self.rows + 1):
-            y_cols.append(y + y_col * height)
+            self.y_cols.append(self.start_y + y_col * self.height)
         for x_col in range(0, self.cols + 1):
-            x_cols.append(x + x_col * width)
+            self.x_cols.append(self.start_x + x_col * self.width)
+
+
+class GridShape(GridBase):
+    """
+    Grid on a given canvas.
+    """
+
+    def draw(self, cnv=None, off_x=0, off_y=0, ID=None, **kwargs):
+        """Draw a grid on a given canvas."""
+        kwargs = self.kwargs | kwargs
+        cnv = cnv if cnv else self.canvas
+        super().draw(cnv, off_x, off_y, ID, **kwargs)  # unit-based props
         # ---- draw grid
         match kwargs.get("lines"):
             case "horizontal" | "horiz" | "h":
@@ -106,11 +115,11 @@ class GridShape(BaseShape):
             case _:
                 horizontal, vertical = True, True
         if vertical:
-            for x in x_cols:
-                cnv.draw_line(Point(x, y_cols[0]), Point(x, y_cols[-1]))
+            for x in self.x_cols:
+                cnv.draw_line(Point(x, self.y_cols[0]), Point(x, self.y_cols[-1]))
         if horizontal:
-            for y in y_cols:
-                cnv.draw_line(Point(x_cols[0], y), Point(x_cols[-1], y))
+            for y in self.y_cols:
+                cnv.draw_line(Point(self.x_cols[0], y), Point(self.x_cols[-1], y))
         self.set_canvas_props(  # shape.finish()
             cnv=cnv,
             index=ID,
@@ -118,73 +127,48 @@ class GridShape(BaseShape):
         )
         cnv.commit()  # if not, then Page objects e.g. Image not layered
         # ---- text
-        x = self._u.x + self._o.delta_x
-        y = self._u.y + self._o.delta_y
-        x_d = x + (self.cols * width) / 2.0
-        y_d = y + (self.rows * height) / 2.0
-        self.draw_heading(cnv, ID, x_d, y, **kwargs)
+        x_d = self.start_x + (self.cols * self.width) / 2.0
+        y_d = self.start_y + (self.rows * self.height) / 2.0
+        self.draw_heading(cnv, ID, x_d, self.start_y, **kwargs)
         self.draw_label(cnv, ID, x_d, y_d, **kwargs)
-        self.draw_title(cnv, ID, x_d, y + (self.rows * height), **kwargs)
+        self.draw_title(
+            cnv, ID, x_d, self.start_y + (self.rows * self.height), **kwargs
+        )
 
 
-class DotGridShape(BaseShape):
+class DotGridShape(GridBase):
     """
     Dot Grid on a given canvas.
     """
-
-    def __init__(self, _object=None, canvas=None, **kwargs):
-        super().__init__(_object=_object, canvas=canvas, **kwargs)
 
     def draw(self, cnv=None, off_x=0, off_y=0, ID=None, **kwargs):
         """Draw a dot grid on a given canvas."""
         kwargs = self.kwargs | kwargs
         cnv = cnv if cnv else self.canvas
         super().draw(cnv, off_x, off_y, ID, **kwargs)  # unit-based props
-        # ---- switch to use of units
-        if ID is None:  # being used on a page - absolute offset
-            x = 0 + self._u.offset_x
-            y = 0 + self._u.offset_y
-        else:  # being used on a card - relative offset
-            print(
-                f"~~~ DGrid {ID=} {off_x=} {self._u.offset_x=} {self._u.x=}  {self._o.delta_x=} "
-            )
-            print(
-                f"~~~ DGrid {ID=} {off_y=} {self._u.offset_y=} {self._u.y=}  {self._o.delta_y=} "
-            )
-            x = self._u.x + self._o.delta_x
-            x = self._o.delta_x
-            y = self._u.y + self._o.delta_y
-            y = self._o.delta_y
-        height = self._u.height  # of each grid item
-        width = self._u.width  # of each grid item
-        if "side" in self.kwargs and not (
-            "height" in self.kwargs or "width" in self.kwargs
-        ):
-            # square grid
-            side = self.unit(self.side)
-            height, width = side, side
-        if "side" in self.kwargs and (
-            "height" in self.kwargs or "width" in self.kwargs
-        ):
-            feedback(
-                "Set either height & width OR side, but not both, for a DotGrid",
-                False,
-                True,
-            )
-        # ---- number of blocks in grid
-        if self.rows == 0:
-            self.rows = int((self.page_height) / height) + 1
-        if self.cols == 0:
-            self.cols = int((self.page_width) / width) + 1
         # ---- set properties
         size = self.dot_width / 2.0  # diameter is 3 points ~ 1mm or 1/32"
         self.fill = self.stroke
         # ---- draw dot grid
         for y_col in range(0, self.rows):
             for x_col in range(0, self.cols):
-                cnv.draw_circle((x + x_col * width, y + y_col * height), size)
+                cnv.draw_circle(
+                    (
+                        self.start_x + x_col * self.width,
+                        self.start_y + y_col * self.height,
+                    ),
+                    size,
+                )
         self.set_canvas_props(cnv=cnv, index=ID, **kwargs)
         cnv.commit()  # if not, then Page objects e.g. Image not layered
+        # ---- text
+        x_d = self.start_x + (self.cols * self.width) / 2.0
+        y_d = self.start_y + (self.rows * self.height) / 2.0
+        self.draw_heading(cnv, ID, x_d, self.start_y, **kwargs)
+        self.draw_label(cnv, ID, x_d, y_d, **kwargs)
+        self.draw_title(
+            cnv, ID, x_d, self.start_y + (self.rows * self.height), **kwargs
+        )
 
 
 class HexHexShape(BaseShape):

@@ -2981,10 +2981,8 @@ Example 1. Defaults
 
       It has the following properties based on the defaults:
 
-      - the upper-left of the grid is drawn at the absolute page x-position
-        of ``0`` cm and y-position ``0`` cm i.e. the margins are ignored
-      - a set of dots, spaced ``1`` cm apart, are created extending to the
-        right- and top- edges
+      - the upper-left of the grid is drawn at the default x-position
+        of ``1`` cm and y-position ``1`` cm relative to the margins
       - default dot size of ``3`` points
       - default color of ``black``
 
@@ -3004,18 +3002,22 @@ Example 2. Moleskine Grid
 
         DotGrid(
             stroke="darkgray",
+            x=0, y=0,
             width=0.5, height=0.5,
             dot_width=1,
-            offset_y=-0.25)
+            margin_fit=False)
 
       To simulate the dot grid found in Moleskine notebooks, it
       has the following properties set:
 
+      - *x* and *y* - start the grid at the top-left of the page
       - *width* and *height* - intervals between the centre of the dots
         in the x- and y-directions respectively
       - *dot_width* - set to be smaller than the default of ``3``
-      - *stroke*  - set to ``darkgrey`` i.e. lighter than the default black
-      - *offset_y* - moves the start of the grid slightly downwards by 1/4 cm
+      - *stroke* - set to ``darkgrey`` i.e. lighter than the default ``black``
+      - *margin_fit* - set to ``False`` to ignore any page margins when
+        calculating the *x* and *y* positions, and also when calculating the
+        width and height of the grid
 
       .. HINT::
 
@@ -3026,7 +3028,7 @@ Example 2. Moleskine Grid
          command.
 
          A color like ``"cornsilk"`` might provide a suitable backdrop
-         for the light grey of the grid.
+         for the grey color of the dot grid.
 ===== ======
 
 
@@ -3037,8 +3039,16 @@ Grid
 `↑ <shape-index_>`_
 
 A Grid is a series of crossed lines |dash| both in the vertical and
-horizontal directions. The Grid will, by default, fill the page as far
+horizontal directions. The Grid will, by default |dash| i.e. if the exact
+number of rows and columns is not specified |dash| fill the page as far
 as possible between its margins.
+
+.. NOTE::
+
+    The behaviour for a grid on a Card is little different, as a
+    :ref:`Card <the-card-command>` has no margins; so all *x* and *y*
+    settings, such as those used by a grid are relative to the card
+    edges.
 
 Example 1. Defaults
 +++++++++++++++++++
@@ -3056,8 +3066,10 @@ Example 1. Defaults
 
       It has the following properties based on the defaults:
 
-      - starts at upper-left corner of page defined by the margin
+      - starts at upper-left corner of the page, as defined by the top- and
+        left-margins
       - has a default grid interval of ``1`` cm in both the x- and y-direction
+
 ===== ======
 
 Example 2. Side & Stroke
@@ -3072,7 +3084,10 @@ Example 2. Side & Stroke
 
       .. code:: python
 
-          Grid(side=0.85, stroke="gray", stroke_width=1)
+          Grid(
+            side=0.85,
+            stroke="gray",
+            stroke_width=1)
 
       It has the following properties based on the defaults:
 
@@ -3097,11 +3112,14 @@ Example 3. Fixed Size
       .. code:: python
 
           Grid(
-              x=0.5, y=0.5,
-              height=1.25, width=1,
-              cols=3, rows=4,
-              stroke="gray", stroke_width=1,
-              heading="Heading", label="Label", title="Title"
+            x=0.5, y=0.5,
+            height=1.25, width=1,
+            cols=3, rows=4,
+            stroke="gray",
+            stroke_width=1,
+            heading="Heading",
+            label="Label",
+            title="Title"
           )
 
       It has the following properties set for it:
@@ -3118,6 +3136,47 @@ Example 3. Fixed Size
 
       The grid now has a fixed "rows by columns" size, rather than being
       automatically calculated to fill up the page.
+
+===== ======
+
+
+Example 4. Ignore Margins
++++++++++++++++++++++++++
+
+.. |gr4| image:: images/customised/grid_ignore_margins.png
+   :width: 330
+
+===== ======
+|gr4| This example shows the shape constructed using the command with the
+      following properties:
+
+      .. code:: python
+
+          Grid(
+            x=0, y=0,
+            height=1.2, width=1,
+            stroke="gray",
+            stroke_width=1,
+            margin_fit=False,
+            label="Grid Label")
+          )
+
+      It has the following properties set for it:
+
+      - *x* and *y* - each set to ``0`` cm; grid's upper-left
+        corner starts at the page edges (because of *margin_fit*)
+      - *height* - value of ``0.9`` cm set for the row height
+      - *width* - value of ``1`` cm set for the column width
+      - *stroke_width* - set to ``1`` point; the thicker line makes
+        the grid clearly visible
+      - *stroke* - set to ``gray`` i.e. a lighter color than the default black
+      - *label* - see `Text Descriptions`_ for details
+
+      The grid size has being automatically calculated to fill up the page.
+
+      Note the use of *margin_fit* set to ``False``, thereby causing the
+      page margins to be ignored when calculating the top left of the
+      grid, as well as its height and width.
 
 ===== ======
 

@@ -112,7 +112,10 @@ PageBreak()
 
 # ---- dotgrid - Moleskin
 Text(common=txt, text='DotGrid: "Moleskine" setting')
-DotGrid(stroke="darkgray", width=0.5, height=0.5, dot_width=1, offset_y=0.25)
+DotGrid(stroke="darkgray",
+        x=0, y=0,
+        width=0.5, height=0.5, dot_width=1,
+        margin_fit=False) #, offset_y=0.25)
 PageBreak()
 
 # ---- dotgrid - rows & cols
@@ -294,6 +297,16 @@ Text(common=txt, text='Grid: gray; 3x4; thick')
 Grid(x=0.5, y=0.5, cols=3, rows=4, height=1.25, width=1,
      stroke="gray", stroke_width=1,
      heading="Heading", label="Label", title="Title")
+PageBreak()
+
+# ---- grid ignore_margins
+Blueprint()
+Text(common=txt, text='Grid: ignore margins')
+Grid(x=0, y=0,
+     height=0.9, width=1,
+     stroke="gray", stroke_width=1,
+     margin_fit=False,
+     label="Grid Label")
 PageBreak()
 
 # ---- line - custom
@@ -1385,7 +1398,8 @@ Save(
         "stadium_red_rotation",
         "slices_rhombus",
         "polygon_rotation_flat",
-        "polygon_sizes", "grid_3x4",
+        "polygon_sizes",
+        "grid_3x4", "grid_ignore_margins",
         "line_custom", "line_centred",
         "line_connections_circle", "line_connections_shapes",
         "line_connections_arrow", "line_connections_spoke",
