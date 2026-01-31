@@ -49,26 +49,31 @@ class GridShape(BaseShape):
         kwargs = self.kwargs | kwargs
         cnv = cnv if cnv else self.canvas
         super().draw(cnv, off_x, off_y, ID, **kwargs)  # unit-based props
-        # ---- switch to use of units
+        # ---- set x,y and calculate space available
         # print(f'\n~~~ Grid {ID=} {off_x=} {self._u.x=}  {self._o.delta_x=} ')
         # print(f'~~~ Grid {ID=} {off_y=} {self._u.y=}  {self._o.delta_y=} ')
-        space_top = 0
-        space_left = 0
         space_bottom = 0
         space_right = 0
         if ID is None:  # being used on a page - absolute offset
             x = self._u.x + self._o.delta_x
             y = self._u.y + self._o.delta_y
+            max_width = self.page_width
+            max_height = self.page_height
             if self.margin_fit:
-                space_top = self.margin_top
-                space_left = self.margin_left
-                space_bottom = self.margin_bottom
-                space_right = self.margin_right
+                space_bottom = self._u.margin_bottom
+                space_right = self._u.margin_right
             else:
                 x = self._u.x
                 y = self._u.y
-        else:  # being used on a card - relative offset
-            pass
+            offset_x, offset_y = x, y
+        else:  # being used on a card - x,y are relative offset - no margins
+            # see proto/draw_element() function for these kwargs settings
+            x = kwargs.get("card_x", 0) + self._u.x
+            y = kwargs.get("card_y", 0) + self._u.y
+            max_width = self.unit(kwargs.get("card_width", 0))
+            max_height = self.unit(kwargs.get("card_height", 0))
+            offset_x, offset_y = 0, 0
+            # print(f'\n~~~ Grid-card {ID=} {x=} {y=} {max_width=} {max_height=}')
 
         height = self._u.height  # of each grid item
         width = self._u.width  # of each grid item
@@ -78,14 +83,15 @@ class GridShape(BaseShape):
         # ---- number of blocks in grid
         if self.rows == 0:
             self.rows = int(
-                (self.page_height - space_bottom - space_top)
-                / self.points_to_value(height)
+                (max_height - space_bottom - offset_y)
+                / height  # y is offset from page-top!
             )
         if self.cols == 0:
             self.cols = int(
-                (self.page_width - space_left - space_right)
-                / self.points_to_value(width)
+                (max_width - space_right - offset_x)
+                / width  # y is offset from page-left!
             )
+        # print(f'~~~ Grid {self.rows=} {self.cols=} {width=} {height=}')
         y_cols, x_cols = [], []
         for y_col in range(0, self.rows + 1):
             y_cols.append(y + y_col * height)

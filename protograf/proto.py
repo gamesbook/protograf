@@ -259,7 +259,7 @@ class CardShape(BaseShape):
         self, the_function, new_eles, cnv, off_x, off_y, ID, cid, **kwargs
     ):
         """Draw a list of elements created via a Template or Card function call."""
-        feedback(f"$$$ CardShape elements  {new_eles}")
+        # feedback(f"$$$ CardShape elements  {new_eles}")
         for the_new_ele in new_eles:
             try:
                 if isinstance(the_new_ele, GroupBase):
@@ -283,6 +283,21 @@ class CardShape(BaseShape):
 
         Pass on `deck_data` to other commands, as needed, for them to draw Shapes
         """
+
+        def draw_element(new_ele, cnv, off_x, off_y, ID, **kwargs):
+            """Allow customisation of kwargs before call to Shape's draw()."""
+            # print(f'$$$ draw_element {ID=} {type(new_ele)=}')
+            if isinstance(
+                new_ele, (SequenceShape, RepeatShape, GridShape, DotGridShape)
+            ):
+                new_ele.deck_data = self.deck_data
+                kwargs["card_width"] = self.width
+                kwargs["card_height"] = self.height
+                kwargs["card_x"] = base_frame_bbox.tl.x
+                kwargs["card_y"] = base_frame_bbox.tl.y
+
+            new_ele.draw(cnv, off_x, off_y, ID, **kwargs)
+
         # feedback(f'\n$$$ draw_card  {cid=} {row=} {col=} {self.elements=}')
         # feedback(f'$$$ draw_card  {cid=} KW=> {kwargs}')
         is_card_back = kwargs.get("card_back", False)
@@ -298,10 +313,10 @@ class CardShape(BaseShape):
             shape_kwargs["fill"] = kwargs.get("fill", kwargs.get("bleed_fill", None))
         shape_kwargs.pop("image_list", None)  # do NOT draw linked image
         shape_kwargs.pop("image", None)  # do NOT draw get_outline(linked image
-        # feedback(f'$$$ draw_card)() {cid=} {row=} {col=} \nKW=> {shape_kwargs}')
         outline = self.outline_shape.get_outline(
             cnv=cnv, row=row, col=col, cid=cid, label=label, **shape_kwargs
         )
+        # feedback(f'$$$ draw_card {cid=} {row=} {col=} {outline._o=}') # KW=> {shape_kwargs}
 
         # ---- custom geometry
         if kwargs["frame_type"] == CardFrame.HEXAGON:
@@ -472,9 +487,17 @@ class CardShape(BaseShape):
                 iid = members.index(cid + 1)
                 new_ele = self.handle_custom_values(flat_ele, cid)  # calculated values
                 # feedback(f'$$$ CS draw_card ele $$$ {type(new_ele)=}')
-                if isinstance(new_ele, (SequenceShape, RepeatShape)):
+                if isinstance(
+                    new_ele, (SequenceShape, RepeatShape, GridShape, DotGridShape)
+                ):
                     new_ele.deck_data = self.deck_data
-                    new_ele.draw(cnv=cnv, off_x=_dx, off_y=_dy, ID=iid, **kwargs)
+                    kwargs["card_width"] = self.width
+                    kwargs["card_height"] = self.height
+                    kwargs["card_x"] = base_frame_bbox.tl.x
+                    kwargs["card_y"] = base_frame_bbox.tl.y
+                    draw_element(
+                        new_ele=new_ele, cnv=cnv, off_x=_dx, off_y=_dy, ID=iid, **kwargs
+                    )
                     cnv.commit()
                 elif isinstance(new_ele, TemplatingType):
                     # convert Template into a string via render
@@ -539,7 +562,14 @@ class CardShape(BaseShape):
                             **kwargs,
                         )
                     else:
-                        new_ele.draw(cnv=cnv, off_x=_dx, off_y=_dy, ID=iid, **kwargs)
+                        draw_element(
+                            new_ele=new_ele,
+                            cnv=cnv,
+                            off_x=_dx,
+                            off_y=_dy,
+                            ID=iid,
+                            **kwargs,
+                        )
                         cnv.commit()
             except AttributeError:
                 # ---- * switch ... get a new element ... or not!?
@@ -560,8 +590,13 @@ class CardShape(BaseShape):
                             if isinstance(custom_new_ele, (SequenceShape, RepeatShape)):
                                 custom_new_ele.deck_data = self.deck_data
                             # feedback(f'$$$ draw_card $$$ {self.shape_id=} {custom_new_ele=}')
-                            custom_new_ele.draw(
-                                cnv=cnv, off_x=_dx, off_y=_dy, ID=iid, **kwargs
+                            draw_element(
+                                new_ele=custom_new_ele,
+                                cnv=cnv,
+                                off_x=_dx,
+                                off_y=_dy,
+                                ID=iid,
+                                **kwargs,
                             )
                             cnv.commit()
                 except Exception as err:
