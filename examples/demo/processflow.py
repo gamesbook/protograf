@@ -41,12 +41,20 @@ b4 = draw_box(
     title="Trigger Workflow",
     detail="<li>Send an email</li><li>Message sysadmin</li><li>Notify external API</li>")
 
-Line(connections=[(b1, "p", "e"), (b2, "p", "w")],
+Line(connections=[
+        (b1, "p", "e"),
+        (b2, "p", "w")],
      stroke_width=1, arrow=True)
-Line(connections=[(b2, "p", "e"), (b3, "p", "w")],
+Line(connections=[
+        (b2, "p", "e"),
+        (b3, "p", "w")],
      stroke_width=1, arrow=True)
 # TODO - use polyline + snail!
-Line(connections=[(b3, "p", "s"), (b4, "p", "n")],
+Polyline(
+    snail="s 1 w 6",
+    connections=[
+        (b3, "p", "s"),
+        (b4, "p", "n")],
      stroke_width=1, arrow=True)
 
 Save()

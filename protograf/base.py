@@ -568,6 +568,7 @@ class BaseCanvas:
         )
         # ---- shapes with centre (hex, circle, rect, rhombus, poly, ellipse, star, domino)
         self.centre_shapes = self.defaults.get("centre_shapes", [])
+        self.centre_shapes_rotated = self.defaults.get("centre_shapes_rotated", False)
         self.centre_shape = self.defaults.get("centre_shape", "")
         self.centre_shape_mx = self.defaults.get("centre_shape_mx", 0.0)
         self.centre_shape_my = self.defaults.get("centre_shape_my", 0.0)
@@ -1251,6 +1252,10 @@ class BaseShape:
         # ---- shapes with centre hex, circle, rect, rhombus, poly, ellips, star, equtri
         self.centre_shapes = kwargs.get(
             "centre_shapes", kwargs.get("center_shapes", [])
+        )
+
+        self.centre_shapes_rotated = self.kw_bool(
+            kwargs.get("centre_shapes_rotated", base.centre_shapes_rotated)
         )
         self.centre_shape = kwargs.get("centre_shape", kwargs.get("center_shapes", ""))
         self.centre_shape_mx = self.kw_float(
@@ -3333,7 +3338,9 @@ class BaseShape:
             vertexes.append(vtx)
         return vertexes
 
-    def draw_centred_shapes(self, centre_shapes: list, cx: float, cy: float):
+    def draw_centred_shapes(
+        self, centre_shapes: list, cx: float, cy: float, rotation: float = 0
+    ):
         """Draw one or more shapes with their centre at a Point.
 
         Args:
@@ -3350,9 +3357,11 @@ class BaseShape:
             else:
                 _shape = item
             if self.can_draw_centred_shape(_shape):
+                _rotation = rotation if self.centre_shapes_rotated is True else 0.0
                 _shape.draw(
                     _abs_cx=cx + self.unit(_shape_mx),
                     _abs_cy=cy + self.unit(_shape_my),
+                    rotation=_rotation,
                 )
 
     def draw_vertex_shapes(

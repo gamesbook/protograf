@@ -292,6 +292,7 @@ Properties that use directional terms include:
    ``Triangle``
 -  **clockwise** - a ``True`` or ``False`` setting used to determine
    direction of travel around a circle
+-  **connections** - for a line, when referencing a vertex or perbis point
 -  **direction** - can be any primary compass direction; used to show
    the travel route when moving through various types of layouts
    e.g. ``RectangularLayout``

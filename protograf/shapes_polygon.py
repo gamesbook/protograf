@@ -83,11 +83,6 @@ class PolygonShape(BaseShape):
         return shape_vtc
 
     @cached_property
-    def shape_perbii(self) -> dict:
-        """Perbii of Polygon."""
-        return {}
-
-    @cached_property
     def shape_geom(self) -> ShapeGeometry:
         """Geometry of Polygon."""
         return ShapeGeometry()

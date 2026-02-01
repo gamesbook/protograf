@@ -4,18 +4,21 @@ protograf Changes
 2026-00-00 (0.4.1)
 ------------------
 - Enable Line connections between non-Circle shapes
-- Add Kensington board example
+- Enable Polyline connections between shapes
+- Add Kensington board example using connections
+- Updated Morabaa board example to use connections
 - Add process flow diagram example
 - Refactor code to start using class properties
 - Bump development status to Beta
 - Added further error trapping
 - Remove Connect shape (replaced with Line connections)
+- Support arrows for snail-based Polylines
 
 2026-01-11 (0.4.0)
 ------------------
 - Add shortcut letters for key colors
 - Increase Python requirement to 3.11
-- Update pyMuPDF to 1.26.7 (import changes!)
+- Update pyMuPDF to 1.26.7 (update import changes!)
 - Update various library dependencies
 - Add `wand` library (for image processing)
 - Add script to process counters

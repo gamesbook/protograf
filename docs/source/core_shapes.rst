@@ -678,8 +678,9 @@ Moving - **without** creating a line - is done as follows:
         Polyline(
             y=0.5,
             snail="2 s 1 w 2 n 1",
-            stroke_width=2,
-            stroke="red")
+            stroke_width=1,
+            stroke="red",
+            arrow=True)
         Polyline(
             x=0, y=5,
             snail=snail_line,
@@ -702,7 +703,9 @@ Moving - **without** creating a line - is done as follows:
 
       The top example is a simple red line going in a square.  It starts by
       going east |dash| the default direction |dash| for ``2cm`` then south
-      for ``1cm``, west for ``2cm`` and finally north for ``1cm``.
+      for ``1cm``, west for ``2cm`` and finally north for ``0.5cm``.  The
+      *arrow* property is set to ``True`` so a default size arrowhead is
+      drawn at the end of the line.
 
       The two examples with the black lines share the same *snail* line,
       assigned to ``snail_line``.  This example shows the use of the ``-``
@@ -4980,7 +4983,7 @@ the change in ``x`` and ``y`` values as part of the set.
 ===== ======
 
 
-. _coreVertexShapes:
+.. _coreVertexShapes:
 
 Vertex Shapes
 ~~~~~~~~~~~~~

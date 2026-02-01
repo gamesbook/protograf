@@ -106,11 +106,6 @@ class HexShape(BaseShape):
         return {}
 
     @cached_property
-    def shape_perbii(self) -> dict:
-        """Perbii of Hexagon."""
-        return {}
-
-    @cached_property
     def shape_geom(self) -> ShapeGeometry:
         """Geometry of Hexagon."""
         hex_geom = self.get_geometry()

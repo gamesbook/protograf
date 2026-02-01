@@ -33,6 +33,7 @@ from protograf.shapes_circle import CircleShape
 from protograf.shapes_hexagon import HexShape
 from protograf.shapes_polygon import PolygonShape
 from protograf.shapes_rectangle import RectangleShape
+from protograf.utils.connections import get_connections
 from protograf.utils import colrs, geoms, support, tools, fonts
 from protograf.utils.tools import _lower  # , _vprint
 from protograf.utils.messaging import feedback
@@ -84,11 +85,6 @@ class ImageShape(BaseShape):
     @cached_property
     def shape_vertices(self) -> dict:
         """Vertices of Image."""
-        return {}
-
-    @cached_property
-    def shape_perbii(self) -> dict:
-        """Perbii of Image."""
         return {}
 
     @cached_property
@@ -250,11 +246,6 @@ class ArcShape(BaseShape):
         return {}
 
     @cached_property
-    def shape_perbii(self) -> dict:
-        """Perbii of Arc."""
-        return {}
-
-    @cached_property
     def shape_geom(self) -> ShapeGeometry:
         """Geometry of Arc."""
         return ShapeGeometry()
@@ -373,11 +364,6 @@ class ArrowShape(BaseShape):
         return {}
 
     @cached_property
-    def shape_perbii(self) -> dict:
-        """Perbii of Arrow."""
-        return {}
-
-    @cached_property
     def shape_geom(self) -> ShapeGeometry:
         """Geometry of Arrow."""
         return ShapeGeometry()
@@ -491,11 +477,6 @@ class BezierShape(BaseShape):
         return {}
 
     @cached_property
-    def shape_perbii(self) -> dict:
-        """Perbii of Bezier."""
-        return {}
-
-    @cached_property
     def shape_geom(self) -> ShapeGeometry:
         """Geometry of Bezier."""
         return ShapeGeometry()
@@ -548,11 +529,6 @@ class ChordShape(BaseShape):
     @cached_property
     def shape_vertices(self) -> dict:
         """Vertices of Chord."""
-        return {}
-
-    @cached_property
-    def shape_perbii(self) -> dict:
-        """Perbii of Chord."""
         return {}
 
     @cached_property
@@ -659,11 +635,6 @@ class CrossShape(BaseShape):
     @cached_property
     def shape_vertices(self) -> dict:
         """Vertices of Cross."""
-        return {}
-
-    @cached_property
-    def shape_perbii(self) -> dict:
-        """Perbii of Cross."""
         return {}
 
     @cached_property
@@ -841,11 +812,6 @@ class DotShape(BaseShape):
         return {}
 
     @cached_property
-    def shape_perbii(self) -> dict:
-        """Perbii of Dot."""
-        return {}
-
-    @cached_property
     def shape_geom(self) -> ShapeGeometry:
         """Geometry of Dot."""
         return ShapeGeometry()
@@ -907,11 +873,6 @@ class EllipseShape(BaseShape):
     @cached_property
     def shape_vertices(self) -> dict:
         """Vertices of Ellipse."""
-        return {}
-
-    @cached_property
-    def shape_perbii(self) -> dict:
-        """Perbii of Ellipse."""
         return {}
 
     @cached_property
@@ -1020,11 +981,6 @@ class LineShape(BaseShape):
         return {}
 
     @cached_property
-    def shape_perbii(self) -> dict:
-        """Perbii of Line."""
-        return {}
-
-    @cached_property
     def shape_geom(self) -> ShapeGeometry:
         """Geometry of Line."""
         return ShapeGeometry()
@@ -1036,125 +992,8 @@ class LineShape(BaseShape):
 
     def draw_connections(
         self, cnv=None, off_x=0, off_y=0, ID=None, shapes: list = None, **kwargs
-    ):
+    ) -> bool:
         """Draw a Line between two or more shapes."""
-
-        def validate_connection_params(conn: tuple) -> list:
-            """Check that a connection tuple contains all required values."""
-            dirs = None
-            if not isinstance(conn, tuple) or len(conn) < 3:
-                feedback(
-                    "A non-circular connection must contain a shape, a point type,"
-                    f' and a point location - not "{conn}"',
-                    True,
-                )
-            if not isinstance(conn[0], BaseShape):
-                feedback(
-                    "A non-circular connection's first entry must be a shape"
-                    f' - not "{conn[0]}"',
-                    True,
-                )
-            shape_type = conn[0].simple_name()
-            if _lower(conn[1]) not in ["v", "vertex", "p", "perbis"]:
-                feedback(
-                    f"A {shape_type} connection's second entry must be"
-                    f' one of v, vertex, p or point - not "{conn[1]}"',
-                    True,
-                )
-            if isinstance(conn[0], PolygonShape):
-                dirs = tools.validated_directions(
-                    value=_lower(conn[2]),
-                    direction_group=DirectionGroup.POLYGONAL,
-                    label=f"{shape_type} connection's third (direction)",
-                )
-            elif isinstance(conn[0], StarShape):
-                dirs = tools.validated_directions(
-                    value=_lower(conn[2]),
-                    direction_group=DirectionGroup.STAR,
-                    label=f"{shape_type} connection's third (direction)",
-                )
-            else:
-                dirs = tools.validated_directions(
-                    value=_lower(conn[2]),
-                    direction_group=DirectionGroup.COMPASS,
-                    label=f"{shape_type} connection's third (direction)",
-                )
-            return dirs, shape_type
-
-        def get_connection_point(
-            cnv, the_shape: BaseShape, conn_type: str, direction: str
-        ) -> Point:
-            """Get Point at which connection is to be made."""
-            shape_name = the_shape.simple_name()
-            if isinstance(the_shape, HexShape):
-                shape_name = f"{the_shape.ORIENTATION.name.lower()} {shape_name}"
-            if isinstance(the_shape, (PolygonShape, StarShape)):
-                direction = tools.as_int(direction, "direction")
-            match _lower(conn_type):
-                case "v" | "vertex":
-                    try:
-                        vertexes = the_shape.get_vertexes_named()
-                    except AttributeError:
-                        feedback(
-                            f"A {shape_name} has no vertices available for a connection.",
-                            True,
-                        )
-                    vtx = vertexes.get(direction)
-                    if not vtx:
-                        # print(f"*** Line:connections {vertexes}")
-                        breakpoint()
-                        feedback(
-                            f'A {shape_name} cannot use a vertex in the "{direction}" direction.',
-                            True,
-                        )
-                    else:
-                        the_point = vtx.point
-                case "p" | "perbis":
-                    the_centre = the_shape.get_center()
-                    try:
-                        perbises = the_shape.calculate_perbii(centre=the_centre)
-                    except AttributeError:
-                        feedback(
-                            f"A {shape_name} has no perbii available for a connection.",
-                            True,
-                        )
-                    pbs = perbises.get(direction)
-                    if not pbs:
-                        feedback(
-                            f'A {shape_name} cannot use a perbis in the "{direction}" direction.',
-                            True,
-                        )
-                    else:
-                        the_point = pbs.point
-            return the_point
-
-        def get_rotation(centre_a: Point, centre_b: Point) -> tuple:
-            """Get relative rotation between points."""
-            # print(f"*** connections {centre_a=}, {centre_b=}")
-            _, rotation = geoms.angles_from_points(centre_a, centre_b)
-            if centre_b.x < centre_a.x and centre_b.y < centre_a.y:
-                rotation_a = 360.0 - rotation
-                rotation_b = 180 + rotation_a
-            elif centre_b.x < centre_a.x and centre_b.y > centre_a.y:
-                rotation_b = 180 - rotation
-                rotation_a = 180 + rotation_b
-            elif centre_b.x > centre_a.x and centre_b.y < centre_a.y:
-                rotation_a = 360 - rotation
-                rotation_b = 180 + rotation_a
-            elif centre_b.x > centre_a.x and centre_b.y > centre_a.y:
-                rotation_b = 180 - rotation
-                rotation_a = 180 + rotation_b
-            elif centre_b.y == centre_a.y:
-                rotation_a = rotation
-                rotation_b = 180 - rotation
-            elif centre_b.x == centre_a.x:
-                rotation_a = 360 - rotation
-                rotation_b = rotation
-            else:
-                rotation_a = rotation - 90
-                rotation_b = rotation + 90
-            return rotation_a, rotation_b
-
         if not isinstance(shapes, (list, tuple)) or len(shapes) < 2:
             feedback(
                 "Connections can only be made using a list of two or more shapes!",
@@ -1162,59 +1001,7 @@ class LineShape(BaseShape):
                 True,
             )
             return False
-        connections = []
-        for idx, cshape in enumerate(shapes):
-            if idx == len(shapes) - 1:
-                continue
-            if self.connections_style and _lower(self.connections_style) in [
-                "s",
-                "spoke",
-            ]:
-                shape_a, shape_b = shapes[0], shapes[idx + 1]
-            else:
-                shape_a, shape_b = cshape, shapes[idx + 1]
-            if isinstance(shape_a, (CircleShape, DotShape)) and isinstance(
-                shape_b, (CircleShape, DotShape)
-            ):
-                centre_a = shape_a._shape_centre  # circle/dot
-                centre_b = shape_b._shape_centre  # circle/dot
-                rotation_a, rotation_b = get_rotation(centre_a, centre_b)
-                # print(f"*** connections {rotation_a=}, {rotation_b=}")
-                pt_a = geoms.point_on_circle(centre_a, shape_a._u.radius, rotation_a)
-                pt_b = geoms.point_on_circle(centre_b, shape_b._u.radius, rotation_b)
-                connections.append((pt_a, pt_b))
-
-            if isinstance(shape_a, (CircleShape, DotShape)) and not isinstance(
-                shape_b, (CircleShape, DotShape)
-            ):
-                dirs_b, name_b = validate_connection_params(shape_b)
-                pt_b = get_connection_point(cnv, shape_b[0], shape_b[1], shape_b[2])
-                centre_a = shape_a._shape_centre  # circle/dot
-                rotation_a, rotation_b = get_rotation(centre_a, pt_b)
-                # print(f"*** connections {rotation_a=}, {rotation_b=}")
-                pt_a = geoms.point_on_circle(centre_a, shape_a._u.radius, rotation_a)
-                connections.append((pt_a, pt_b))
-
-            if not isinstance(shape_a, (CircleShape, DotShape)) and isinstance(
-                shape_b, (CircleShape, DotShape)
-            ):
-                dirs_a, name_a = validate_connection_params(shape_a)
-                pt_a = get_connection_point(cnv, shape_a[0], shape_a[1], shape_a[2])
-                centre_b = shape_b._shape_centre  # circle/dot
-                rotation_a, rotation_b = get_rotation(pt_a, centre_b)
-                # print(f"*** connections {rotation_a=}, {rotation_b=}")
-                pt_b = geoms.point_on_circle(centre_b, shape_b._u.radius, rotation_b)
-                connections.append((pt_a, pt_b))
-
-            if not isinstance(shape_a, (CircleShape, DotShape)) and not isinstance(
-                shape_b, (CircleShape, DotShape)
-            ):
-                dirs_a, name_a = validate_connection_params(shape_a)
-                dirs_b, name_b = validate_connection_params(shape_b)
-                pt_a = get_connection_point(cnv, shape_a[0], shape_a[1], shape_a[2])
-                pt_b = get_connection_point(cnv, shape_b[0], shape_b[1], shape_b[2])
-                connections.append((pt_a, pt_b))
-
+        connections = get_connections(shapes, self.connections_style)
         for conn in connections:
             klargs = draw_line(cnv, conn[0], conn[1], shape=self, **kwargs)
             self.set_canvas_props(cnv=cnv, index=ID, **klargs)  # shape.finish()
@@ -1239,70 +1026,79 @@ class LineShape(BaseShape):
         kwargs = self.kwargs | kwargs
         cnv = cnv if cnv else globals.canvas  # a new Page/Shape may now exist
         super().draw(cnv, off_x, off_y, ID, **kwargs)  # unit-based props
-        # ---- connections draw
+        # ---- EITHER connections draw
         if self.connections:
-            if self.draw_connections(cnv, off_x, off_y, ID, self.connections, **kwargs):
-                return
-        # "normal" draw
-        if self.use_abs:
-            x = self._abs_x
-            y = self._abs_y
+            self.draw_connections(cnv, off_x, off_y, ID, self.connections, **kwargs)
+        # ----- OR "normal" draw
         else:
-            x = self._u.x + self._o.delta_x
-            y = self._u.y + self._o.delta_y
-        if self.use_abs_1:
-            x_1 = self._abs_x1
-            y_1 = self._abs_y1
-        elif self.x_1 or self.y_1:
-            x_1 = self.unit(self.x_1) + self._o.delta_x
-            y_1 = self.unit(self.y_1) + self._o.delta_y
-        elif self.angle != 0 and self.cx and self.cy and self.length:
-            # calc points for line "sticking out" both sides of a centre points
-            _len = self.unit(self.length) / 2.0
-            _cx = self.unit(self.cx) + self._o.delta_x
-            _cy = self.unit(self.cy) + self._o.delta_y
-            angle1 = max(self.angle + 180.0, self.angle - 180.0)
-            delta_pt_2 = geoms.point_from_angle(Point(0, 0), _len, self.angle)
-            delta_pt_1 = geoms.point_from_angle(Point(0, 0), _len, angle1)
-            # use delta point as offset because function works in Euclidian space
-            x, y = _cx + delta_pt_1.x, _cy - delta_pt_1.y
-            x_1, y_1 = _cx + delta_pt_2.x, _cy - delta_pt_2.y
-        else:
-            if self.angle != 0:
-                angle = math.radians(self.angle)
-                x_1 = x + (self._u.length * math.cos(angle))
-                y_1 = y - (self._u.length * math.sin(angle))
+            if self.use_abs:
+                x = self._abs_x
+                y = self._abs_y
             else:
-                x_1 = x + self._u.length
-                y_1 = y
+                x = self._u.x + self._o.delta_x
+                y = self._u.y + self._o.delta_y
+            if self.use_abs_1:
+                x_1 = self._abs_x1
+                y_1 = self._abs_y1
+            elif self.x_1 or self.y_1:
+                x_1 = self.unit(self.x_1) + self._o.delta_x
+                y_1 = self.unit(self.y_1) + self._o.delta_y
+            elif self.angle != 0 and self.cx and self.cy and self.length:
+                # calc points for line "sticking out" both sides of a centre points
+                _len = self.unit(self.length) / 2.0
+                _cx = self.unit(self.cx) + self._o.delta_x
+                _cy = self.unit(self.cy) + self._o.delta_y
+                angle1 = max(self.angle + 180.0, self.angle - 180.0)
+                delta_pt_2 = geoms.point_from_angle(Point(0, 0), _len, self.angle)
+                delta_pt_1 = geoms.point_from_angle(Point(0, 0), _len, angle1)
+                # use delta point as offset because function works in Euclidian space
+                x, y = _cx + delta_pt_1.x, _cy - delta_pt_1.y
+                x_1, y_1 = _cx + delta_pt_2.x, _cy - delta_pt_2.y
+            else:
+                if self.angle != 0:
+                    angle = math.radians(self.angle)
+                    x_1 = x + (self._u.length * math.cos(angle))
+                    y_1 = y - (self._u.length * math.sin(angle))
+                else:
+                    x_1 = x + self._u.length
+                    y_1 = y
 
-        if self.row is not None and self.row >= 0:
-            y = y + self.row * self._u.height
-            y_1 = y_1 + self.row * self._u.height  # - self._u.margin_bottom
-        if self.col is not None and self.col >= 0:
-            x = x + self.col * self._u.width
-            x_1 = x_1 + self.col * self._u.width  # - self._u.margin_left
-        # feedback(f"*** Line {x=} {x_1=} {y=} {y_1=}")
-        # ---- calculate line rotation
-        match self.rotation_point:
-            case "centre" | "center" | "c" | None:  # default
-                mid_point = geoms.fraction_along_line(Point(x, y), Point(x_1, y_1), 0.5)
-                the_point = muPoint(mid_point[0], mid_point[1])
-            case "start" | "s":
-                the_point = muPoint(x, y)
-            case "end" | "e":
-                the_point = muPoint(x_1, y_1)
-            case _:
-                raise ValueError(
-                    f'Cannot calculate rotation point "{self.rotation_point}"', True
-                )
-        # ---- draw line
-        klargs = draw_line(cnv, Point(x, y), Point(x_1, y_1), shape=self, **kwargs)
-        self.set_canvas_props(cnv=cnv, index=ID, **klargs)  # shape.finish()
-        # ---- dot
-        self.draw_dot(cnv, (x_1 + x) / 2.0, (y_1 + y) / 2.0)
-        # ---- arrowhead
-        self.draw_arrow(cnv, Point(x, y), Point(x_1, y_1), **kwargs)
+            if self.row is not None and self.row >= 0:
+                y = y + self.row * self._u.height
+                y_1 = y_1 + self.row * self._u.height  # - self._u.margin_bottom
+            if self.col is not None and self.col >= 0:
+                x = x + self.col * self._u.width
+                x_1 = x_1 + self.col * self._u.width  # - self._u.margin_left
+            # feedback(f"*** Line {x=} {x_1=} {y=} {y_1=}")
+            # ---- calculate line rotation
+            match self.rotation_point:
+                case "centre" | "center" | "c" | None:  # default
+                    mid_point = geoms.fraction_along_line(
+                        Point(x, y), Point(x_1, y_1), 0.5
+                    )
+                    the_point = muPoint(mid_point[0], mid_point[1])
+                case "start" | "s":
+                    the_point = muPoint(x, y)
+                case "end" | "e":
+                    the_point = muPoint(x_1, y_1)
+                case _:
+                    raise ValueError(
+                        f'Cannot calculate rotation point "{self.rotation_point}"', True
+                    )
+            # ---- draw line
+            klargs = draw_line(cnv, Point(x, y), Point(x_1, y_1), shape=self, **kwargs)
+            self.set_canvas_props(cnv=cnv, index=ID, **klargs)  # shape.finish()
+            # ---- dot
+            cx, cy = (x_1 + x) / 2.0, (y_1 + y) / 2.0
+            self.draw_dot(cnv, cx, cy)
+            # ---- arrowhead
+            self.draw_arrow(cnv, Point(x, y), Point(x_1, y_1), **kwargs)
+        # ----- centre
+        cx, cy = (x_1 + x) / 2.0, (y_1 + y) / 2.0
+        # ---- centre shapes (with offsets)
+        if self.centre_shapes:
+            _, _angle = geoms.angles_from_points(Point(x_1, y_1), Point(x, y))
+            self.draw_centred_shapes(self.centre_shapes, cx, cy, rotation=180 - _angle)
         # ---- text
         _, _rotation = geoms.angles_from_points(Point(x, y), Point(x_1, y_1))
         kwargs["rotation"] = -1 * _rotation
@@ -1310,8 +1106,8 @@ class LineShape(BaseShape):
         self.draw_label(
             cnv,
             ID,
-            (x_1 + x) / 2.0,
-            (y_1 + y) / 2.0 + self.font_size / 4.0,
+            cx,
+            cy + self.font_size / 4.0,
             centred=False,
             **kwargs,
         )
@@ -1346,11 +1142,6 @@ class PodShape(BaseShape):
     @cached_property
     def shape_vertices(self) -> dict:
         """Vertices of Pod."""
-        return {}
-
-    @cached_property
-    def shape_perbii(self) -> dict:
-        """Perbii of Pod."""
         return {}
 
     @cached_property
@@ -1475,11 +1266,6 @@ class PolylineShape(BasePolyShape):
         return {}
 
     @cached_property
-    def shape_perbii(self) -> dict:
-        """Perbii of Polyline."""
-        return {}
-
-    @cached_property
     def shape_geom(self) -> ShapeGeometry:
         """Geometry of Polyline."""
         return ShapeGeometry()
@@ -1488,6 +1274,18 @@ class PolylineShape(BasePolyShape):
     def geom(self) -> ShapeGeometry:
         """Geometry of Polyline - alias for shape_geom."""
         return self.shape_geom
+
+    def polyline_connections(self) -> list:
+        """Get vertex Points to connect sets of two shapes."""
+        if not isinstance(self.connections, (list, tuple)) or len(self.connections) < 2:
+            feedback(
+                "Connections can only be made using a list of two or more shapes!",
+                False,
+                True,
+            )
+            return None
+        connections = get_connections(self.connections, self.connections_style)
+        return connections
 
     def draw(self, cnv=None, off_x=0, off_y=0, ID=None, **kwargs):
         """Draw a Polyline (multi-part line) on a given canvas."""
@@ -1502,6 +1300,8 @@ class PolylineShape(BasePolyShape):
         self.vertexes = self._shape_vertexes  # BasePoly method
         # ---- draw polyline by vertices
         # feedback(f'***POLYLINE {x=} {y=} {self.vertexes=}')
+        if self.vertexes and self.connections:
+            feedback("Connections can only be used with a snail!", True)
         if self.vertexes:
             for key, vertex in enumerate(self._shape_vertexes):
                 if key < len(self.vertexes) - 1:
@@ -1513,7 +1313,16 @@ class PolylineShape(BasePolyShape):
             self.set_canvas_props(cnv=cnv, index=ID, **kwargs)
         # ---- draw polyline by snail
         if self.snail:
-            self.draw_snail(cnv=cnv, off_x=off_x, off_y=off_y, ID=ID, **kwargs)
+            # ---- EITHER connections draw (possible multiple lines)
+            if self.connections:
+                connections = self.polyline_connections()
+                for connection in connections:
+                    kwargs["start_point"] = connection[0]
+                    kwargs["end_point"] = connection[1]
+                    self.draw_snail(cnv=cnv, off_x=off_x, off_y=off_y, ID=ID, **kwargs)
+            # ----- OR "normal" draw
+            else:
+                self.draw_snail(cnv=cnv, off_x=off_x, off_y=off_y, ID=ID, **kwargs)
             kwargs["closed"] = False
             kwargs["fill"] = None  # line ONLY
             self.set_canvas_props(cnv=cnv, index=ID, **kwargs)
@@ -1686,11 +1495,6 @@ class RhombusShape(BaseShape):
         return shape_vtc
 
     @cached_property
-    def shape_perbii(self) -> dict:
-        """Perbii of Rhombus."""
-        return {}
-
-    @cached_property
     def shape_geom(self) -> ShapeGeometry:
         """Geometry of Rhombus."""
         return ShapeGeometry()
@@ -1703,10 +1507,11 @@ class RhombusShape(BaseShape):
     @property  # do NOT cache because centre needs to be changed!
     def _shape_centre(self) -> Point:
         """Centre of Rhombus in points."""
-        # ---- overrides for grid layout
+        cx, cy = None, None
         if self.use_abs_c:
-            x = self._abs_cx
-            y = self._abs_cy
+            # ---- overrides for grid layout or centred shape
+            cx = self._abs_cx
+            cy = self._abs_cy
         elif self.cx is not None and self.cy is not None:
             x = self._u.cx - self._u.width / 2.0 + self._o.delta_x
             y = self._u.cy - self._u.height / 2.0 + self._o.delta_y
@@ -1716,8 +1521,11 @@ class RhombusShape(BaseShape):
         else:
             x = self._u.x + self._o.delta_x
             y = self._u.y + self._o.delta_y
-        cx = x + self._u.width / 2.0
-        cy = y + self._u.height / 2.0
+        if cx is None and cy is None:
+            cx = x + self._u.width / 2.0
+            cy = y + self._u.height / 2.0
+        # _cx, _cy = self._p2v(cx), self._p2v(cy)
+        # print(f"*** RHOMBUS perbii centre {_cx=} {_cy=} {self.fill=}")
         return Point(x=cx, y=cy)
 
     @property  # must be able to change e.g. for layout
@@ -2265,11 +2073,6 @@ class SectorShape(BaseShape):
         return {}
 
     @cached_property
-    def shape_perbii(self) -> dict:
-        """Perbii of Sector."""
-        return {}
-
-    @cached_property
     def shape_geom(self) -> ShapeGeometry:
         """Geometry of Sector."""
         return ShapeGeometry()
@@ -2325,19 +2128,18 @@ class ShapeShape(BasePolyShape):
         """Area of PolyShape."""
         return None
 
-    @cached_property
+    @property
     def shape_centre(self) -> Point:
         """Centre of PolyShape."""
+        if self.cx and self.cy:
+            return Point(self.cx, self.cy)
+            x = self._u.cx + self._o.delta_x
+            y = self._u.cy + self._o.delta_y
         return None
 
-    @cached_property
+    @property
     def shape_vertices(self) -> dict:
         """Vertices of PolyShape."""
-        return {}
-
-    @cached_property
-    def shape_perbii(self) -> dict:
-        """Perbii of PolyShape."""
         return {}
 
     @cached_property
@@ -2349,6 +2151,15 @@ class ShapeShape(BasePolyShape):
     def geom(self) -> ShapeGeometry:
         """Geometry of PolyShape - alias for shape_geom."""
         return self.shape_geom
+
+    @property
+    def _shape_centre(self) -> Point:
+        """Centre of PolyShape in points."""
+        if self.cx and self.cy:
+            x = self._u.cx + self._o.delta_x
+            y = self._u.cy + self._o.delta_y
+            return Point(x, y)
+        return None
 
     def draw(self, cnv=None, off_x=0, off_y=0, ID=None, **kwargs):
         """Draw an irregular polygon on a given canvas."""
@@ -2384,8 +2195,8 @@ class ShapeShape(BasePolyShape):
             self.set_canvas_props(cnv=cnv, index=ID, **kwargs)
         # ---- is there a centre?
         if self.cx and self.cy:
-            x = self._u.cx + self._o.delta_x + x_offset
-            y = self._u.cy + self._o.delta_y + y_offset
+            x = self._u.cx + self._o.delta_x
+            y = self._u.cy + self._o.delta_y
             # ---- * dot
             self.draw_dot(cnv, x, y)
             # ---- * cross
@@ -2427,11 +2238,6 @@ class SquareShape(RectangleShape):
     @cached_property
     def shape_vertices(self) -> dict:
         """Vertices of Square."""
-        return {}
-
-    @cached_property
-    def shape_perbii(self) -> dict:
-        """Perbii of Square."""
         return {}
 
     @cached_property
@@ -2502,11 +2308,6 @@ class StadiumShape(BaseShape):
     @cached_property
     def shape_vertices(self) -> dict:
         """Vertices of Stadium."""
-        return {}
-
-    @cached_property
-    def shape_perbii(self) -> dict:
-        """Perbii of Stadium."""
         return {}
 
     @cached_property
@@ -2681,11 +2482,6 @@ class StarShape(BaseShape):
     @cached_property
     def shape_vertices(self) -> dict:
         """Vertices of Star."""
-        return {}
-
-    @cached_property
-    def shape_perbii(self) -> dict:
-        """Perbii of Star."""
         return {}
 
     @cached_property
@@ -3245,11 +3041,6 @@ class TrapezoidShape(BaseShape):
         return {}
 
     @cached_property
-    def shape_perbii(self) -> dict:
-        """Perbii of Trapezoid."""
-        return {}
-
-    @cached_property
     def shape_geom(self) -> ShapeGeometry:
         """Geometry of Trapezoid."""
         return ShapeGeometry()
@@ -3506,11 +3297,6 @@ class TriangleShape(BaseShape):
     @cached_property
     def shape_vertices(self) -> dict:
         """Vertices of Triangle."""
-        return {}
-
-    @cached_property
-    def shape_perbii(self) -> dict:
-        """Perbii of Triangle."""
         return {}
 
     @cached_property

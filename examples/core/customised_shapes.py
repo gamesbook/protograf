@@ -366,10 +366,10 @@ PageBreak()
 # ---- line: connections: shapes
 Blueprint(stroke_width=0.5)
 Text(common=txt, text="Line: connections; shapes")
-r1 = Square(cx=2, cy=3, side=0.5)
-r2 = Square(cx=3, cy=2, side=0.5)
+s1 = Square(cx=1, cy=4, side=1, fill="yellow")
+s2 = Square(cx=3, cy=2, side=1)
 Line(
-    connections=[(r1, 'v', 'ne'), (r1, 'p', 'n')],
+    connections=[(s1, 'v', 'ne'), (s2, 'p', 'w')],
     stroke="red",
     stroke_width=2)
 PageBreak()
@@ -740,9 +740,10 @@ Text(common=txt, text="Polyline: snail")
 snail_line = "n 3 e 2 -45 2 w 1 sw 3 **"
 Polyline(
     y=0.5,
-    snail="2 s 1 w 2 n 1",
-    stroke_width=2,
-    stroke="red")
+    snail="2 s 1 w 2 n 0.5",
+    stroke_width=1,
+    stroke="red",
+    arrow=True)
 Polyline(
     x=0, y=5,
     snail=snail_line,

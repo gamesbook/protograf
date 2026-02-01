@@ -90,11 +90,6 @@ class RectangleShape(BaseShape):
         return {}
 
     @cached_property
-    def shape_perbii(self) -> dict:
-        """Perbii of Rectangle."""
-        return {}
-
-    @cached_property
     def shape_geom(self) -> ShapeGeometry:
         """Geometry of Rectangle."""
         return ShapeGeometry(

@@ -837,7 +837,7 @@ must be set along with the shape, in the  *connections* property setting.
       can be assigned to a name e.g. ``cc`` for the white Circle, and then
       connected by a Line via the *connections* property.
 
-      The *connections* property requires two or more circular shapes in a
+      The *connections* property requires two or more shapes in a
       list so that the Line can be drawn between them.
 
       Using the *connections* property means that the normal point locations,
@@ -858,13 +858,16 @@ Example 5. Connections: Shapes
 ------------------------------
 `^ <lineIndex_>`_
 
-To connect two or more shapes, supply a list of them, together with a
-*connection point*, for the *connections* property of the line.
+To connect two or more non-circular shapes |dash| for example, ``Rectangle``
+or ``Hexagon`` |dash| supply a list of these, along with the settings for
+each of their *connection points*, as the *connections* property of the line.
 
-For non-circular shapes |dash| for example, ``Rectangle`` or ``Hexagon`` |dash|
-such a shape must have either/or vertex points, or perbis points, that can be
-specified as the *connection point* to which the line will connect. This point
-must be set along with the shape, in the  *connections* property setting.
+The *connection point* setting for non-circular shapes must specify:
+
+- the shape name;
+- the connection type |dash| either a vertex point (``v``) or a perbis
+  point (``p``);
+- the connection location, as a :ref:`compass direction <termsDirection>`.
 
 .. NOTE::
 
@@ -882,9 +885,32 @@ must be set along with the shape, in the  *connections* property setting.
 
       .. code:: python
 
-        ca = Circle(cx=2, cy=3, radius=0.5)
-        cb = Circle(cx=3, cy=2, radius=0.5)
-        Line(connections=[ca, cb])
+        s1 = Square(
+          xx=1, cy=4, side=1,
+          fill="yellow")
+        s2 = Square(
+          cx=3, cy=2, side=1)
+        Line(
+          connections=[
+            (s1, 'v', 'ne'),
+            (s2, 'p', 'w')
+          ],
+          stroke="red",
+          stroke_width=2)
+
+      This example shows how Squares that are defined and drawn as normal
+      can be assigned to a name e.g. ``r1`` for the yellow Square, and then
+      connected by a Line via the *connections* property.
+
+      The *connections* property requires two or more shapes, together with
+      their connection points, in a  list so that the Line can be drawn between
+      them.
+
+      Using the *connections* property means that the normal point locations,
+      or line angle, are **not** used but are superceded by the calculated
+      values for the start and end of the line.  In this case, for example,
+      the start of the line is at the north-east vertex of the yellow square,
+      and the end of the line is at the west perbis point of the white square.
 
 ===== ======
 
