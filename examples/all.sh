@@ -54,6 +54,7 @@ python boards/abstract/tictactoe.py --no-png -d /tmp/demo
 # ---- boards: commercial
 echo -e "\nCreating commercial boards..."
 python boards/commercial/ack_map.py --no-png -d /tmp/demo
+python boards/commercial/kensington.py --no-png -d /tmp/demo
 python boards/commercial/orion_game_board.py --no-png -d /tmp/demo
 python boards/commercial/squadleader.py --no-png -d /tmp/demo
 python boards/commercial/traveller_draft.py --no-png -d /tmp/demo

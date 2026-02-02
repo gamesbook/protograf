@@ -11,7 +11,7 @@ protograf Changes
 - Enable Line connections between non-Circle shapes
 - Enable Polyline connections between shapes
 - Add Kensington board example using connections
-- Updated Morabaa board example to use connections
+- Updated Morabaraba board example to use connections
 - Add process flow diagram example
 - Refactor code to start using class properties
 - Bump development status to Beta

@@ -72,7 +72,7 @@ def get_connection_point(the_shape: BaseShape, conn_type: str, direction: str) -
     match _lower(conn_type):
         case "v" | "vertex":
             try:
-                vertexes = the_shape.get_vertexes_named()
+                vertexes = the_shape._shape_vertexes_named
             except AttributeError:
                 feedback(
                     f"A {shape_name} has no vertices available for a connection.",

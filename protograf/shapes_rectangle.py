@@ -278,7 +278,8 @@ class RectangleShape(BaseShape):
             angles.append(angle)
         return angles
 
-    def get_vertexes_named(self, **kwargs):
+    @property
+    def _shape_vertexes_named(self):
         """Get named vertices for Rectangle without notches."""
         vertices = self._shape_vertexes
         # anti-clockwise from top-left; relative to centre

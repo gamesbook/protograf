@@ -65,6 +65,7 @@ python boards\abstract\tictactoe.py --no-png -d %location%
 REM ---- boards: commercial
 ECHO "Creating commercial boards..."
 python boards\commercial\ack_map.py --no-png -d %location%
+python boards\commercial\kensington.py --no-png -d %location%
 python boards\commercial\orion_game_board.py --no-png -d %location%
 python boards\commercial\squadleader.py --no-png -d %location%
 python boards\commercial\traveller_draft.py --no-png -d %location%

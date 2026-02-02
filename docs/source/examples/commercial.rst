@@ -22,6 +22,7 @@ will demonstrate full scalability.
 
 - `Squad Leader`_
 - `Orion`_
+- `Kensington`_
 - `Adventurer Conqueror King`_
 - `Traveller: Draft`_
 - `Traveller: Black`_
@@ -72,6 +73,35 @@ Discussion  This example shows how to construct a board for the commercial
             they are listed as *masked*.
 ----------- ------------------------------------------------------------------
 Screenshot  .. image:: images/boards/commercial/orion_game_board.png
+               :width: 80%
+=========== ==================================================================
+
+
+Kensington
+==========
+`↑ <table-of-contents-excomm_>`_
+
+=========== ==================================================================
+Title       *Kensington Game Board*
+----------- ------------------------------------------------------------------
+Script      `kensington.py <https://github.com/gamesbook/protograf/blob/master/examples/boards/commercial/kensington.py>`_
+----------- ------------------------------------------------------------------
+Discussion  This example shows how to construct a board for the commercial
+            board game "Kensington".
+
+            This is a more complex example that makes use of a Python
+            **function** to draw each of the seven sets of the
+            hexagon/dodecagon pairs.
+
+            Each shape in the pair is connected using the *connections*
+            property of a joining Line.
+
+            The key attributes of each pair |dash| color and angle relative to
+            the centre one |dash| are stored in a list, and then a Python
+            **loop** is used to process each in turn.
+
+----------- ------------------------------------------------------------------
+Screenshot  .. image:: images/boards/commercial/kensington.png
                :width: 80%
 =========== ==================================================================
 
@@ -279,10 +309,10 @@ Discussion  This example shows a map with the locations of stars described in th
               used to show the star.
             - The names of stars allow their point locations to be "looked up"
               in the list, and the stars' locations form the start and end points
-              of lines for the connecting wormholes (green lines).
+              of lines for the connecting wormholes (red lines).
             - The script has a boolean "toggle" (called ``DARK_MODE``) which can
               be set to change the background color of the map to black and
-              the stars to white.
+              the stars to white, as can be seen in the "zoomed" example.
 
 ----------- ------------------------------------------------------------------
 Screenshot  .. image:: images/boards/maps/honorverse.png

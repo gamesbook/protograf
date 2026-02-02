@@ -723,7 +723,8 @@ class CrossShape(BaseShape):
         vertices.append(Point(x + parts.arm + parts.thickness, y))  # 11
         return vertices
 
-    def get_vertexes_named(self, **kwargs):
+    @property
+    def _shape_vertexes_named(self):
         """Get named (by number) vertices for Cross."""
         vertices = self._shape_vertexes
         vertex_dict = {}
@@ -1494,10 +1495,10 @@ class RhombusShape(BaseShape):
             self._p2v(self._shape_centre.x, 3), self._p2v(self._shape_centre.y, 3)
         )
 
-    @cached_property
+    @property
     def shape_vertices(self) -> dict:
         """Vertices of Rhombus."""
-        vtc = self.get_vertexes_named()
+        vtc = self._shape_vertexes_named
         shape_vtc = {
             key: Point(self._p2v(value.point.x, 3), self._p2v(value.point.y, 3))
             for key, value in vtc.items()
@@ -1550,7 +1551,8 @@ class RhombusShape(BaseShape):
         vertices.append(Point(cx, cy - self._u.height / 2.0))  # n
         return vertices
 
-    def get_vertexes_named(self, **kwargs):
+    @property
+    def _shape_vertexes_named(self):
         """Get named vertices for Rhombus."""
         vertices = self._shape_vertexes
         # anti-clockwise from top-left; relative to centre
@@ -2556,7 +2558,8 @@ class StarShape(BaseShape):
             )
         return list(reversed(all_vertices)), list(reversed(outer_vertices))
 
-    def get_vertexes_named(self, **kwargs):
+    @property
+    def _shape_vertexes_named(self):
         """Get named (by number) vertices for Star."""
         _, vertices = self._shape_vertexes  # only need outer vertices!
         vertex_dict = {}
@@ -3171,7 +3174,8 @@ class TrapezoidShape(BaseShape):
         vertices.append(Point(x + self._u.width, y))
         return vertices
 
-    def get_vertexes_named(self, **kwargs):
+    @property
+    def _shape_vertexes_named(self):
         """Get named vertices for Trapezoid."""
         vertices = self._shape_vertexes
         # anti-clockwise from top-left; relative to centre
@@ -3493,7 +3497,8 @@ class TriangleShape(BaseShape):
             radii_dict[directions[key]] = _radii
         return radii_dict
 
-    def get_vertexes_named(self, **kwargs):
+    @property
+    def _shape_vertexes_named(self):
         """Get named vertices for Triangle."""
         vertices = self._shape_vertexes
         # anti-clockwise from top; relative to centre
