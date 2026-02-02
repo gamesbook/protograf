@@ -992,7 +992,7 @@ class LineShape(BaseShape):
 
     def draw_connections(
         self, cnv=None, off_x=0, off_y=0, ID=None, shapes: list = None, **kwargs
-    ) -> bool:
+    ) -> list:
         """Draw a Line between two or more shapes."""
         if not isinstance(shapes, (list, tuple)) or len(shapes) < 2:
             feedback(
@@ -1000,13 +1000,13 @@ class LineShape(BaseShape):
                 False,
                 True,
             )
-            return False
+            return []
         connections = get_connections(shapes, self.connections_style)
         for conn in connections:
             klargs = draw_line(cnv, conn[0], conn[1], shape=self, **kwargs)
             self.set_canvas_props(cnv=cnv, index=ID, **klargs)  # shape.finish()
             self.draw_arrow(cnv, conn[0], conn[1], **kwargs)
-        return True
+        return connections
 
     def draw_arrow(self, cnv, point_a, point_b, **kwargs):
         if (
@@ -1026,10 +1026,13 @@ class LineShape(BaseShape):
         kwargs = self.kwargs | kwargs
         cnv = cnv if cnv else globals.canvas  # a new Page/Shape may now exist
         super().draw(cnv, off_x, off_y, ID, **kwargs)  # unit-based props
+        x, y, x_1, y_1 = None, None, None, None
         # ---- EITHER connections draw
         if self.connections:
-            self.draw_connections(cnv, off_x, off_y, ID, self.connections, **kwargs)
-        # ----- OR "normal" draw
+            conns = self.draw_connections(
+                cnv, off_x, off_y, ID, self.connections, **kwargs
+            )
+        # ---- OR "normal" draw
         else:
             if self.use_abs:
                 x = self._abs_x
@@ -1088,29 +1091,36 @@ class LineShape(BaseShape):
             # ---- draw line
             klargs = draw_line(cnv, Point(x, y), Point(x_1, y_1), shape=self, **kwargs)
             self.set_canvas_props(cnv=cnv, index=ID, **klargs)  # shape.finish()
-            # ---- dot
-            cx, cy = (x_1 + x) / 2.0, (y_1 + y) / 2.0
-            self.draw_dot(cnv, cx, cy)
             # ---- arrowhead
             self.draw_arrow(cnv, Point(x, y), Point(x_1, y_1), **kwargs)
-        # ----- centre
-        cx, cy = (x_1 + x) / 2.0, (y_1 + y) / 2.0
-        # ---- centre shapes (with offsets)
-        if self.centre_shapes:
-            _, _angle = geoms.angles_from_points(Point(x_1, y_1), Point(x, y))
-            self.draw_centred_shapes(self.centre_shapes, cx, cy, rotation=180 - _angle)
-        # ---- text
-        _, _rotation = geoms.angles_from_points(Point(x, y), Point(x_1, y_1))
-        kwargs["rotation"] = -1 * _rotation
-        kwargs["rotation_point"] = the_point
-        self.draw_label(
-            cnv,
-            ID,
-            cx,
-            cy + self.font_size / 4.0,
-            centred=False,
-            **kwargs,
-        )
+            # store line points to match connections (for more drawing)
+            conns = [(Point(x, y), Point(x_1, y_1))]
+        # ---- other line properties
+        if conns and len(conns) == 1:
+            conn = conns[0]
+            x, y = conn[0].x, conn[0].y
+            x_1, y_1 = conn[1].x, conn[1].y
+            cx, cy = (x_1 + x) / 2.0, (y_1 + y) / 2.0
+            # ---- * centre shapes (with offsets)
+            if self.centre_shapes:
+                _, _angle = geoms.angles_from_points(Point(x_1, y_1), Point(x, y))
+                self.draw_centred_shapes(
+                    self.centre_shapes, cx, cy, rotation=180 - _angle
+                )
+            # ---- * dot
+            self.draw_dot(cnv, cx, cy)
+            # ---- * text
+            _, _rotation = geoms.angles_from_points(Point(x, y), Point(x_1, y_1))
+            kwargs["rotation"] = -1 * _rotation
+            # kwargs["rotation_point"] = the_point
+            self.draw_label(
+                cnv,
+                ID,
+                cx,
+                cy + self.font_size / 4.0,
+                centred=False,
+                **kwargs,
+            )
 
 
 class PodShape(BaseShape):

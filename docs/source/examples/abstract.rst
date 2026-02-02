@@ -92,7 +92,7 @@ Dejarik
 =======
 `↑ <table-of-contents-exabs_>`_
 
-`Dejarik <https://en.wikipedia.org/wiki/Dejarik>`__ is a holographic, 
+`Dejarik <https://en.wikipedia.org/wiki/Dejarik>`__ is a holographic,
 Chess-like game depicted in the "Star Wars" movies.
 
 =========== ==================================================================
@@ -139,7 +139,7 @@ Hex
 ===
 `↑ <table-of-contents-exabs_>`_
 
-`Hex <https://en.wikipedia.org/wiki/Hex_(board_game)>`__ is the title of a game 
+`Hex <https://en.wikipedia.org/wiki/Hex_(board_game)>`__ is the title of a game
 invented by Piet Hein.
 
 =========== ==================================================================
@@ -227,8 +227,9 @@ Script      `morabaraba.py <https://github.com/gamesbook/protograf/blob/master/e
 ----------- ------------------------------------------------------------------
 Discussion  This example shows how to construct a Morabaraba board.
 
-            There is just a simple set of Rectangles, with corners connected by
-            Lines.
+            There is just a simple set of Rectangles, with corners vertices and
+            line centres ("perbis" points), connected by :ref:`Lines <line-command>`
+            using each line's *connection* property.
 
 ----------- ------------------------------------------------------------------
 Screenshot  .. image:: images/boards/abstract/morabaraba.png

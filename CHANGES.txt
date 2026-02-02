@@ -1,6 +1,11 @@
 protograf Changes
 =================
 
+2026-00-00 (0.4.2)
+------------------
+- [PLANNED] Enable Line connections to Ellipse shapes
+- [PLANNED] Enable text labels for snail lines
+
 2026-00-00 (0.4.1)
 ------------------
 - Enable Line connections between non-Circle shapes
