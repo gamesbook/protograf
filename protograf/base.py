@@ -1483,8 +1483,8 @@ class BaseShape:
     def kw_int(self, value, label: str = ""):
         return tools.as_int(value, label) if value is not None else value
 
-    def kw_bool(self, value, label: str = ""):
-        return tools.as_bool(value, label) if value is not None else value
+    def kw_bool(self, value):
+        return tools.as_bool(value) if value is not None else value
 
     def unit(self, item, units: str = None, skip_none: bool = False, label: str = ""):
         """Convert an item into the appropriate unit system."""

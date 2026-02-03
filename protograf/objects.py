@@ -700,7 +700,7 @@ class D6Object(DiceObject):
         self._label = self.label
         # custom/unique properties
         self.pips = tools.as_int(kwargs.get("pips", 1), "pips")
-        self.random = tools.as_bool(kwargs.get("random", False), "random")
+        self.random = tools.as_bool(kwargs.get("random", False))
         # defaults
         self._fill, self._stroke = (
             self.fill,
@@ -825,7 +825,7 @@ class DominoObject(DiceObject):
         self._label = self.label
         # custom/unique properties
         self.pips = kwargs.get("pips", (1, 1))
-        self.random = tools.as_bool(kwargs.get("random", False), "random")
+        self.random = tools.as_bool(kwargs.get("random", False))
         # defaults
         self._fill, self._stroke = (
             self.fill,

@@ -963,7 +963,7 @@ class DeckOfCards:
                     _check = tools.eval_template(
                         self.mask, self.dataset[card_num], label="mask"
                     )
-                    mask = tools.as_bool(_check, label="mask", allow_none=False)
+                    mask = tools.as_bool(_check, allow_none=False)
                     if not isinstance(mask, bool):
                         feedback(
                             'The "mask" test must result in True or False value!', True
@@ -1805,7 +1805,7 @@ def Extract(pages: object, **kwargs):
     tl_y = tools.as_float(kwargs.get("y", 1), "y")
     gap_x = tools.as_float(kwargs.get("x_gap", 0), "x_gap")
     gap_y = tools.as_float(kwargs.get("y_gap", 0), "y_gap")
-    repeat = tools.as_bool(kwargs.get("repeat", False), "repeat")
+    repeat = tools.as_bool(kwargs.get("repeat", False))
     cards = True if (height and width) else False
     if (cols_rows and areas and cards) or (not areas and not cols_rows and not cards):
         feedback(
@@ -5004,7 +5004,7 @@ def BGG(
     ckwargs = {}
     # ---- self filters
     if kwargs.get("own") is not None:
-        ckwargs["own"] = tools.as_bool(kwargs.get("pwn"))
+        ckwargs["own"] = tools.as_bool(kwargs.get("own"))
     if kwargs.get("rated") is not None:
         ckwargs["rated"] = tools.as_bool(kwargs.get("rate"))
     if kwargs.get("played") is not None:

@@ -45,6 +45,15 @@ class GridBase(BaseShape):
                 self.use_side = False
         self.y_cols, self.x_cols = [], []
         self.start_x, self.start_y = 0.0, 0.0  # top-left corner of grid
+        # edge settings
+        omit_a = tools.as_bool(kwargs.get("omit_all", False))
+        omit_b = tools.as_bool(kwargs.get("omit_outer", False))
+        omit_c = tools.as_bool(kwargs.get("omit_edges", False))
+        self.omit_all = True if (omit_a or omit_b or omit_c) else False
+        self.omit_top = tools.as_bool(kwargs.get("omit_top", False))
+        self.omit_bottom = tools.as_bool(kwargs.get("omit_bottom", False))
+        self.omit_left = tools.as_bool(kwargs.get("omit_left", False))
+        self.omit_right = tools.as_bool(kwargs.get("omit_right", False))
 
     def draw(self, cnv=None, off_x=0, off_y=0, ID=None, **kwargs):
         """Draw a grid on a given canvas."""
@@ -117,11 +126,27 @@ class GridShape(GridBase):
             case _:
                 horizontal, vertical = True, True
         if vertical:
-            for x in self.x_cols:
-                cnv.draw_line(Point(x, self.y_cols[0]), Point(x, self.y_cols[-1]))
+            for col_no, x in enumerate(self.x_cols):
+                skip = False
+                if col_no == 0 and (self.omit_all or self.omit_left):
+                    skip = True
+                if col_no == len(self.x_cols) - 1 and (
+                    self.omit_all or self.omit_right
+                ):
+                    skip = True
+                if not skip:
+                    cnv.draw_line(Point(x, self.y_cols[0]), Point(x, self.y_cols[-1]))
         if horizontal:
-            for y in self.y_cols:
-                cnv.draw_line(Point(self.x_cols[0], y), Point(self.x_cols[-1], y))
+            for row_no, y in enumerate(self.y_cols):
+                skip = False
+                if row_no == 0 and (self.omit_all or self.omit_top):
+                    skip = True
+                if row_no == len(self.y_cols) - 1 and (
+                    self.omit_all or self.omit_bottom
+                ):
+                    skip = True
+                if not skip:
+                    cnv.draw_line(Point(self.x_cols[0], y), Point(self.x_cols[-1], y))
         self.set_canvas_props(  # shape.finish()
             cnv=cnv,
             index=ID,

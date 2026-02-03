@@ -36,7 +36,7 @@ HAVEN = "#FF80FF"
 MANTICORE = "#C0C0C0"
 MONICA =  "#BDB76B" # "#A0522D"
 
-DARK_MODE = True  # True to use Black background
+DARK_MODE = False  # True to use Black background
 if DARK_MODE:
     WORMHOLE = "red"
     STAR = "white"
