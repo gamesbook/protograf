@@ -215,6 +215,7 @@ Screenshot  .. image:: images/boards/abstract/hexhex_hexagons.png
                :width: 66%
 =========== ==================================================================
 
+.. _abstractGameMorabaraba:
 
 Morabaraba
 ==========
@@ -227,7 +228,7 @@ Script      `morabaraba.py <https://github.com/gamesbook/protograf/blob/master/e
 ----------- ------------------------------------------------------------------
 Discussion  This example shows how to construct a Morabaraba board.
 
-            There is just a simple set of Rectangles, with corners vertices and
+            There is just a simple set of Squares, with the corner vertices and
             line centres ("perbis" points), connected by :ref:`Lines <line-command>`
             using each line's *connection* property.
 

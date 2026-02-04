@@ -345,8 +345,11 @@ Example 2. Customised Cross
    :width: 330
 
 ===== ======
-|cr2| This example shows the shape constructed using the command with these
-      properties:
+|cr2| This example shows the Cross constructed using the command with thes
+      properties shown.
+
+      Note the use of the :ref:`Common command <the-common-command>`
+      to allow multiple Crosses to share the same properties.
 
       .. code:: python
 
@@ -1611,7 +1614,10 @@ Example 5. Polygon Rotation
 
 ===== ======
 |pl4| This example shows five Polygons constructed using the command with
-      additional properties:
+      additional properties.
+
+      Note the use of the :ref:`Common command <the-common-command>`
+      to allow multiple Polygons to share the same properties.
 
       .. code:: python
 
@@ -3048,13 +3054,25 @@ as possible between its margins.
 
 .. NOTE::
 
-    The behaviour for a grid on a Card is little different, as a
-    :ref:`Card <the-card-command>` has no margins; so all *x* and *y*
-    settings, such as those used by a grid are relative to the card
-    edges.
+   The behaviour for a grid on a Card is little different, as a
+   :ref:`Card <the-card-command>` has no margins; so all *x* and *y*
+   settings, such as those used by a grid are relative to the card
+   edges.
+
+Examples showing how the Grid can be styled are described below.
+
+- `Example 1. Defaults <gridDefaults_>`_
+- `Example 2. Side & Stroke <gridSide_>`_
+- `Example 3. Fixed Size <gridFixed_>`_
+- `Example 4. Ignore Margins <gridMargins_>`_
+- `Example 5. Omit Edges <gridEdges_>`_
+
+
+.. _gridDefaults:
 
 Example 1. Defaults
 +++++++++++++++++++
+`↑ <grid-command_>`_
 
 .. |grd| image:: images/defaults/grid.png
    :width: 330
@@ -3075,8 +3093,11 @@ Example 1. Defaults
 
 ===== ======
 
+.. _gridSide:
+
 Example 2. Side & Stroke
 ++++++++++++++++++++++++
+`↑ <grid-command_>`_
 
 .. |gr2| image:: images/customised/grid_gray.png
    :width: 330
@@ -3102,8 +3123,11 @@ Example 2. Side & Stroke
 
 ===== ======
 
+.. _gridFixed:
+
 Example 3. Fixed Size
 +++++++++++++++++++++
+`↑ <grid-command_>`_
 
 .. |gr3| image:: images/customised/grid_3x4.png
    :width: 330
@@ -3142,9 +3166,11 @@ Example 3. Fixed Size
 
 ===== ======
 
+.. _gridMargins:
 
 Example 4. Ignore Margins
 +++++++++++++++++++++++++
+`↑ <grid-command_>`_
 
 .. |gr4| image:: images/customised/grid_ignore_margins.png
    :width: 330
@@ -3180,6 +3206,62 @@ Example 4. Ignore Margins
       Note the use of *margin_fit* set to ``False``, thereby causing the
       page margins to be ignored when calculating the top left of the
       grid, as well as its height and width.
+
+===== ======
+
+.. _gridEdges:
+
+Example 5. Omit Edges
++++++++++++++++++++++
+`↑ <grid-command_>`_
+
+.. |gr5| image:: images/customised/grid_omit_edges.png
+   :width: 330
+
+===== ======
+|gr5| This example shows the Grid constructed using the command with the
+      following properties:
+
+      .. code:: python
+
+        Grid(
+          x=0.5, y=0.5,
+          rows=3, cols=3,
+          side=0.5, stroke_width=0.5,
+          omit_left=True)
+        Grid(
+          x=2.5, y=0.5,
+          rows=3, cols=3,
+          side=0.5, stroke_width=0.5,
+          omit_bottom=True)
+        Grid(
+          x=1.5, y=2.5,
+          rows=3, cols=3,
+          side=0.5, stroke_width=0.5,
+          omit_outer=True)
+        Grid(
+          x=0.5, y=4.5,
+          rows=3, cols=3,
+          side=0.5, stroke_width=0.5,
+          omit_top=True)
+        Grid(
+          x=2.5, y=4.5,
+          rows=3, cols=3,
+          side=0.5, stroke_width=0.5,
+          omit_right=True)
+
+      Each of the grids have the following properties set:
+
+      - *x* and *y* - set the grid's upper-left corner
+      - *rows* and *cols* - set the number of "spaces" to drawn in the
+        vertical and horizontal directions
+      - *side* - value of ``0.5`` cm sets the row height **and** column width
+      - *stroke_width* - set to ``0.5`` points; the thicker line makes
+        the grid more visible
+
+      In addition, each grid has an *outer_...* property set to ``True``.
+      This means that the line on that edge of the grid is not drawn. Setting
+      *omit_outer* to ``True`` means **all** edge lines are not drawn.
 
 ===== ======
 
@@ -3352,7 +3434,10 @@ or ``"right"``; the *align_vertical* property can take on values of ``"top"``,
 
 ===== ======
 |ia1| This example shows the Image constructed using the command with the
-      following properties:
+      properties shown.
+
+      Note the use of the :ref:`Common command <the-common-command>`
+      to allow multiple Images to share the same properties.
 
       .. code:: python
 
@@ -3875,6 +3960,15 @@ the desired output:
 - `Transparency`_
 - `Vertex Shapes`_
 - `Wave Styles`_
+
+.. NOTE::
+
+  The term "common" in this section is referring to the concept that many
+  shapes are properrties with the same names and similar behaviour.  This
+  makes it a bit easier to use and remember them.  In **protograf** the
+  :ref:`Common command <the-common-command>` has the specific meaning of
+  setting the same property value(s) to be used in multiple shapes in the
+  same script |dash| as seen in various of the examples here.
 
 .. _coreShapeXY:
 

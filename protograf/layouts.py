@@ -281,10 +281,10 @@ class HexHexShape(BaseShape):
                         if ":" in rng:
                             _ring, _hex = rng.split(":")
                             _ring_set = tools.sequence_split(
-                                _ring, as_int=True, unique=True, star=True
+                                _ring, to_int=True, unique=True, star=True
                             )
                             _hex_set = tools.sequence_split(
-                                _hex, as_int=True, unique=True, star=False
+                                _hex, to_int=True, unique=True, star=False
                             )
                             if "*" in _ring_set:
                                 _ring_set += range(1, self.rings + 1)
@@ -296,11 +296,11 @@ class HexHexShape(BaseShape):
                             match _lower(rng[0]):
                                 case "s":
                                     spine_set += tools.sequence_split(
-                                        values, as_int=True, unique=True, star=True
+                                        values, to_int=True, unique=True, star=True
                                     )
                                 case "r":
                                     rings_set += tools.sequence_split(
-                                        values, as_int=True, unique=True, star=True
+                                        values, to_int=True, unique=True, star=True
                                     )
                 if "*" in spine_set:
                     spine_set += [1, 2, 3, 4, 5, 6]
@@ -313,7 +313,7 @@ class HexHexShape(BaseShape):
                 )
         if self.locations:
             id_locations = tools.sequence_split(
-                self.locations, as_int=True, unique=True
+                self.locations, to_int=True, unique=True
             )
         # ---- draw shapes on grid
         if self.shapes:

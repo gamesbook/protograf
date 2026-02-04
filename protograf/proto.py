@@ -2668,7 +2668,7 @@ def Data(**kwargs):
     data_list = kwargs.get("data_list", None)  # list-of-lists
     images = kwargs.get("images", None)  # directory
     images_filter = kwargs.get("images_filter", "")  # e.g. .png
-    image_filter_list = tools.sequence_split(images_filter, False, True)
+    image_filter_list = tools.sequence_split(images_filter, to_int=False, unique=True)
     source = kwargs.get("source", None)  # dict
     google_sheet = kwargs.get("google_sheet", None)  # Google Sheet
     debug = kwargs.get("debug", False)
@@ -4528,7 +4528,7 @@ def LinkLine(grid: list, locations: Union[list, str], **kwargs):
     """Enable a line link between one or more locations in a grid."""
     kwargs = kwargs
     if isinstance(locations, str):  # should be a comma-delimited string
-        locations = tools.sequence_split(locations, False, False)
+        locations = tools.sequence_split(locations, to_int=False, unique=False)
     if not isinstance(locations, list):
         feedback(f"'{locations} is not a list - please check!", True)
     if len(locations) < 2:

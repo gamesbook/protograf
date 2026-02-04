@@ -2994,8 +2994,8 @@ class BaseShape:
             steps = tools.sequence_split(
                 self.arrow_position,
                 unique=False,
-                as_int=False,
-                as_float=True,
+                to_int=False,
+                to_float=True,
                 msg=" for arrow_position",
             )
             for step in steps:
@@ -3327,8 +3327,8 @@ class BaseShape:
         angles = tools.sequence_split(
             directions,
             unique=False,
-            as_int=False,
-            as_float=True,
+            to_int=False,
+            to_float=True,
             sep=" ",
             msg="",
         )

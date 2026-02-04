@@ -18,6 +18,7 @@ protograf Changes
 - Added further error trapping
 - Remove Connect shape (replaced with Line connections)
 - Support arrows for snail-based Polylines
+- Allow Grid edges to be omitted
 
 2026-01-11 (0.4.0)
 ------------------

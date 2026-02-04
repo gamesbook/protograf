@@ -291,7 +291,7 @@ Polygon(cx=2, cy=3, sides=6, radius=1, label="Six")
 Polygon(cx=3, cy=1, sides=5, radius=1, label="Five")
 PageBreak()
 
-# ---- grid cols and rows
+# ---- grid - cols and rows
 Blueprint()
 Text(common=txt, text='Grid: gray; 3x4; thick')
 Grid(x=0.5, y=0.5, cols=3, rows=4, height=1.25, width=1,
@@ -299,7 +299,7 @@ Grid(x=0.5, y=0.5, cols=3, rows=4, height=1.25, width=1,
      heading="Heading", label="Label", title="Title")
 PageBreak()
 
-# ---- grid ignore_margins
+# ---- grid - ignore_margins
 Blueprint()
 Text(common=txt, text='Grid: ignore margins')
 Grid(x=0, y=0,
@@ -307,6 +307,27 @@ Grid(x=0, y=0,
      stroke="gray", stroke_width=1,
      margin_fit=False,
      label="Grid Label")
+PageBreak()
+
+# ---- grid - omit edges
+Blueprint()
+Text(common=txt, text='Grid: omit edges')
+Grid(x=0.5, y=0.5, rows=3, cols=3,
+     side=0.5, stroke_width=0.5,
+     omit_left=True)
+Grid(x=2.5, y=0.5, rows=3, cols=3,
+     side=0.5, stroke_width=0.5,
+     omit_bottom=True)
+Grid(x=1.5, y=2.5, rows=3, cols=3,
+     side=0.5, stroke_width=0.5,
+     omit_outer=True)
+Grid(x=0.5, y=4.5, rows=3, cols=3,
+     side=0.5, stroke_width=0.5,
+     omit_top=True)
+Grid(x=2.5, y=4.5, rows=3, cols=3,
+     side=0.5, stroke_width=0.5,
+     omit_right=True)
+
 PageBreak()
 
 # ---- line - custom
@@ -347,7 +368,7 @@ Line(cx=1, cy=5, angle=135, length=2, stroke_width=1.5)
 Line(cx=3, cy=5, angle=315, length=2, stroke="red")
 PageBreak()
 
-# ---- line: connections: circle
+# ---- line - connections: circle
 Blueprint(stroke_width=0.5)
 Text(common=txt, text="Line: connections; circles")
 cc = Circle(cx=2, cy=3, radius=0.5)
@@ -363,7 +384,7 @@ Line(connections=[cc, co])
 Line(connections=[cy, cr, co, ca, cy], stroke_width=2)
 PageBreak()
 
-# ---- line: connections: shapes
+# ---- line - connections: shapes
 Blueprint(stroke_width=0.5)
 Text(common=txt, text="Line: connections; shapes")
 s1 = Square(cx=1, cy=4, side=1, fill="yellow")
@@ -374,7 +395,7 @@ Line(
     stroke_width=2)
 PageBreak()
 
-# ---- line: connections - arrow
+# ---- line - connections - arrow
 Blueprint(stroke_width=0.5)
 Text(common=txt, text="Line: connections; arrow")
 cc = Circle(cx=1.5, cy=3.5, radius=0.5)
@@ -387,7 +408,7 @@ Line(connections=[cy, cc, co],
      )
 PageBreak()
 
-# ---- line: connections - dot&spoke
+# ---- line - connections - dot&spoke
 Blueprint(stroke_width=0.5)
 Text(common=txt, text="Line: connections; dot&spoke")
 cc = Dot(cx=1.5, cy=3.5, dot_width=2)
@@ -1400,7 +1421,7 @@ Save(
         "slices_rhombus",
         "polygon_rotation_flat",
         "polygon_sizes",
-        "grid_3x4", "grid_ignore_margins",
+        "grid_3x4", "grid_ignore_margins", "grid_omit_edges",
         "line_custom", "line_centred",
         "line_connections_circle", "line_connections_shapes",
         "line_connections_arrow", "line_connections_spoke",

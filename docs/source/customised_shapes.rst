@@ -875,6 +875,10 @@ The *connection point* setting for non-circular shapes must specify:
   have been set to specify **where** the line will be drawn.  The other
   properties that specify **how** the line will be appear will still be used.
 
+More concrete examples of the use of connections can be found in the
+examples of constructing boards |dash| :ref:`Morabaraba <abstractGameMorabaraba>`
+and :ref:`Kensington <abstractGameKensington>`.
+
 
 .. |ln8| image:: images/customised/line_connections_shapes.png
    :width: 330

@@ -77,6 +77,8 @@ Screenshot  .. image:: images/boards/commercial/orion_game_board.png
 =========== ==================================================================
 
 
+.. _abstractGameKensington:
+
 Kensington
 ==========
 `↑ <table-of-contents-excomm_>`_
