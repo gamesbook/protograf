@@ -829,10 +829,12 @@ Example 4. Centre Shapes
              angle=30,
              centre_shapes=[crs],
              centre_shapes_rotated=True)
-        Line(x=2, y=5, length=2, angle=30,
+        Line(x=2, y=5, length=2,
+             angle=30,
              centre_shapes=[ply],
              centre_shapes_rotated=True)
-        Line(x=0, y=6, length=2, angle=30,
+        Line(x=0, y=6, length=2,
+             angle=30,
              centre_shapes=[ell],
              centre_shapes_rotated=True)
         Line(x=2, y=6, length=2,
@@ -840,7 +842,16 @@ Example 4. Centre Shapes
              centre_shapes=[rho],
              centre_shapes_rotated=True)
 
-      This example ...
+      This example shows how shapes can placed on a line, such that the
+      centre of the shapes are automatically at the line's centre point.
+
+      The *centre_shapes* property is set to a list (``[`` to ``]``) of one
+      or more shapes; typically these will have been predefined and assigned
+      to a name |dash| as is the case here.
+
+      If the shape should be rotated in the same direction as the line, then
+      the *centre_shapes_rotated* property should be set to ``True``. This is
+      shown in the lower set of examples.
 
 ===== ======
 

@@ -6,6 +6,7 @@ protograf Changes
 - [PLANNED] Enable Line connections to Ellipse shapes
 - [PLANNED] Enable text labels for snail lines
 - [PLANNED] Add code for DiamondLocations
+- [PLANNED] Add code to connect *Locations
 - [PLANNED] Examples: script for New Classic Board Games
 - [PLANNED] Docs: list all props for Hex, Circle, Rectangle, Line
 
@@ -22,6 +23,7 @@ protograf Changes
 - Remove Connect shape (replaced with Line connections)
 - Support arrows for snail-based Polylines
 - Allow Grid edges to be omitted
+- Fix Polygon rotation on vertex points
 
 2026-01-11 (0.4.0)
 ------------------

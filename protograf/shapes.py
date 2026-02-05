@@ -1188,13 +1188,16 @@ class PodShape(BaseShape):
         cnv = cnv if cnv else globals.canvas  # a new Page/Shape may now exist
         super().draw(cnv, off_x, off_y, ID, **kwargs)  # unit-based props
         # ---- calculate properties
-        x, y = self.calculate_xy()
         # ---- overrides for grid layout
         if self.use_abs_c:
-            x = self._abs_cx - self._u.width / 2.0
+            x = self._abs_cx - self._u.length / 2.0
             y = self._abs_cy
-        x_d = x + self._u.length / 2.0  # centre
-        y_d = y  # centre
+            x_d = self._abs_cx - self._u.margin_left # centre
+            y_d = y  # centre
+        else:
+            x, y = self.calculate_xy()
+            x_d = x + self._u.length / 2.0  # centre
+            y_d = y  # centre
         # ---- handle rotation
         rotation = kwargs.get("rotation", self.rotation)
         if rotation:
@@ -2561,7 +2564,7 @@ class StarShape(BaseShape):
     @property
     def _shape_vertexes_named(self):
         """Get named (by number) vertices for Star."""
-        _, vertices = self._shape_vertexes  # only need outer vertices!
+        vertices = self._shape_vertexes  # this proo is only outer vertices!
         vertex_dict = {}
         for key, vertex in enumerate(vertices):
             _vertex = Vertex(
