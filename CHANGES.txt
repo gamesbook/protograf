@@ -5,6 +5,9 @@ protograf Changes
 ------------------
 - [PLANNED] Enable Line connections to Ellipse shapes
 - [PLANNED] Enable text labels for snail lines
+- [PLANNED] Add code for DiamondLocations
+- [PLANNED] Examples: script for New Classic Board Games
+- [PLANNED] Docs: list all props for Hex, Circle, Rectangle, Line
 
 2026-00-00 (0.4.1)
 ------------------

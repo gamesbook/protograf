@@ -472,11 +472,14 @@ class PolygonShape(BaseShape):
         centre = self._shape_centre
         x, y = centre.x, centre.y
         # ---- handle rotation
-        rotation = self.kwargs.get("rotation", self.rotation)
+        rotation = kwargs.get("rotation", self.rotation)
         if rotation:
             self.centroid = muPoint(x, y)
             kwargs["rotation"] = rotation
             kwargs["rotation_point"] = self.centroid
+            kwargs["rotated"] = True  # used by draw_vertex_shapes()
+        else:
+            kwargs["rotated"] = False
         # ---- calculate vertices
         pre_geom = self.get_geometry()
         x, y, radius = (
@@ -563,6 +566,7 @@ class PolygonShape(BaseShape):
             if item == "base":
                 # ---- * draw polygon
                 # feedback(f"*** POLYGON {self.col=} {self.row=} {x=} {y=} \n{elf._shape_vertexes=}")
+                # feedback(f"*** POLYGON {x=} {y=} \n{self._shape_vertexes=}")
                 cnv.draw_polyline(self._shape_vertexes)
                 kwargs["closed"] = True
                 self.set_canvas_props(cnv=cnv, index=ID, **kwargs)
