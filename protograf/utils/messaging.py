@@ -2,12 +2,15 @@
 """
 Messaging utilities for protograf
 """
+# lib
+import sys
+import traceback
+
 # third party
 from rich.console import Console
 
 # local
 from protograf import globals
-import traceback
 
 
 def feedback(item, stop=False, warn=False, alert=False):
@@ -18,15 +21,15 @@ def feedback(item, stop=False, warn=False, alert=False):
     else:
         no_warning = False
     if warn and not no_warning:
-        console.print("[bold magenta]WARNING::[/bold magenta] %s" % item)
+        console.print(f"[bold magenta]WARNING::[/bold magenta] {item}")
     elif alert:
-        console.print("[bold yellow]FEEDBACK::[/bold yellow] %s" % item)
+        console.print(f"[bold yellow]FEEDBACK::[/bold yellow] {item}")
     elif not warn:
-        console.print("[bold green]FEEDBACK::[/bold green] %s" % item)
+        console.print(f"[bold green]FEEDBACK::[/bold green] {item}")
     if stop:
         console.print(
             "[bold red]FEEDBACK::[/bold red] Could not continue with script.\n"
         )
         if globals.pargs.trace:
             traceback.print_stack()
-        quit()
+        sys.exit()

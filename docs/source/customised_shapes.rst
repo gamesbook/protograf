@@ -63,8 +63,8 @@ the final product.
 Typically one would just comment out the Blueprint command when its purpose has
 been served.
 
-Properties
-----------
+Blueprint Properties
+--------------------
 
 In addition to the basic line styling properties, a Blueprint can also be
 customised with the following properties:
@@ -377,15 +377,16 @@ A Line is a very common shape in many designs; there are a number of ways
 that it can be customised.
 
 - `Dotted, Dashed, Angled and Wavy <lineDotDash_>`_
-- `Centred <lineCentred_>`_
+- `Centred Line <lineCentred_>`_
 - `Arrowheads <line-with-arrow_>`_
+- `Centre Shapes <lineCentreShapes_>`_
 - `Connections: Circles <lineConnectionsCircle_>`_
 - `Connections: Shapes <lineConnectionsShapes_>`_
 - `Connections with Arrows <lineConnectionsArrow_>`_
 - `Connections as Spokes <lineConnectionsSpoke_>`_
 
-Basic Properties
-----------------
+Line Properties
+---------------
 `^ <lineIndex_>`_
 
 A Line has the following properties, in addition to the basic ones of
@@ -396,6 +397,10 @@ A Line has the following properties, in addition to the basic ones of
 - *cx* and *cy* - if set, will replace the use of *x* and *y* for the
   starting point, and work in conjunction with *angle* and *length* to
   create the line around a centre point
+- *centre_shapes* - a list of one or more shapes that will be
+  drawn at the centre of the line
+- *centre_shapes_rotated* - if set to ``True``,  the shapes that will be
+  drawn at the centre of the line are rotated to align with it
 - *connections* - a list of one or more shapes that will be
   connected by the line; this property overrides any others that may have
   been set to determine **where** the line is drawn
@@ -776,9 +781,73 @@ The following properties can be set:
 
 ===== ======
 
+
+.. _lineCentreShapes:
+
+Example 4. Centre Shapes
+------------------------
+`^ <lineIndex_>`_
+
+.. |ln9| image:: images/customised/line_centre_shapes.png
+   :width: 330
+
+===== ======
+|ln9| This example shows Lines constructed using commands with the
+      following properties:
+
+      .. code:: python
+
+        crc = circle(radius=0.15)
+        ttt = text("Aa", font_size=10)
+        crs = cross(height=0.6, width=0.6)
+        ell = ellipse(height=0.4, width=0.6)
+        ply = polygon(side=0.2, sides=5)
+        rho = rhombus(side=0.3)
+
+        Line(x=0, y=0.5, length=1.5,
+             centre_shapes=[crc])
+        Line(x=2, y=0.5, length=1.5,
+             centre_shapes=[ttt])
+        Line(x=0, y=1.5, length=1.5,
+             centre_shapes=[crs])
+        Line(x=2, y=1.5, length=1.5,
+             centre_shapes=[ply])
+        Line(x=0, y=2.5, length=1.5,
+             centre_shapes=[ell])
+        Line(x=2, y=2.5, length=1.5,
+             centre_shapes=[rho])
+
+        Line(x=0, y=4, length=2,
+             angle=30,
+             centre_shapes=[crc],
+             centre_shapes_rotated=True)
+        Line(x=2, y=4, length=2,
+             angle=30,
+             centre_shapes=[ttt],
+             centre_shapes_rotated=True)
+        Line(x=0, y=5, length=2,
+             angle=30,
+             centre_shapes=[crs],
+             centre_shapes_rotated=True)
+        Line(x=2, y=5, length=2, angle=30,
+             centre_shapes=[ply],
+             centre_shapes_rotated=True)
+        Line(x=0, y=6, length=2, angle=30,
+             centre_shapes=[ell],
+             centre_shapes_rotated=True)
+        Line(x=2, y=6, length=2,
+             angle=30,
+             centre_shapes=[rho],
+             centre_shapes_rotated=True)
+
+      This example ...
+
+===== ======
+
+
 .. _lineConnectionsCircle:
 
-Example 4. Connections: Circle
+Example 5. Connections: Circle
 ------------------------------
 `^ <lineIndex_>`_
 
@@ -852,9 +921,10 @@ must be set along with the shape, in the  *connections* property setting.
 
 ===== ======
 
+
 .. _lineConnectionsShapes:
 
-Example 5. Connections: Shapes
+Example 6. Connections: Shapes
 ------------------------------
 `^ <lineIndex_>`_
 
@@ -921,7 +991,7 @@ and :ref:`Kensington <abstractGameKensington>`.
 
 .. _lineConnectionsArrow:
 
-Example 6. Connections - Arrow
+Example 7. Connections - Arrow
 ------------------------------
 `^ <lineIndex_>`_
 
@@ -954,9 +1024,10 @@ Example 6. Connections - Arrow
 
 ===== ======
 
+
 .. _lineConnectionsSpoke:
 
-Example 7. Connections - Spoke
+Example 8. Connections - Spoke
 ------------------------------
 `^ <lineIndex_>`_
 

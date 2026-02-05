@@ -14,7 +14,7 @@ and that you've created some basic scripts of your own using the
 
 - `Overview`_
 - `Usage`_
-- `Key Properties`_
+- `TriangularLocations Properties`_
 
 
 Overview
@@ -48,24 +48,23 @@ The ``TriangularLocations()`` command accepts the following properties:
   defaults to *2*
 - **rows** - this is the number of locations in the vertical direction; this
   defaults to *2*
-- **direction** - this is the compass direction of the line of travel when
-  creating the row and column layout; the default is e(ast).
+- **facing** - this is the compass point of the line of travel used to define
+  which direction the layout "points" at; the default is e(ast).
 - **start** - this is the initial corner, defined a secondary compass direction,
-  from where the grid is initially drawn; values can be *ne*, *nw*, *se*, and
+  from where the grid is initially drawn; values can be *n*, *se*, and
   *sw* (the default i.e. the lower-left corner)
 
 The :ref:`Layout() <layoutIndex>` command accepts the following properties:
 
-- **grid** - this *must* be the first property used for the command; it will
-  refer to
+- **grid** - this *must* be the first property used for the command
 - **shapes** - this is a list of one or more of the core shapes available,
   for example, a circle or rectangle
 
 
-.. _key-properties:
+.. _trilay-properties:
 
-Key Properties
-==============
+TriangularLocations Properties
+==============================
 `↑ <table-of-contents-trilay_>`_
 
 - `Example 1. Rows and Columns`_
@@ -78,7 +77,7 @@ Key Properties
 - `Example 8. Mixed Styles`_
 
 
-Many examples below make use of some common ```Circle`` shapes which
+Many examples below make use of some common ``Circle`` shapes which
 are defined as:
 
   .. code:: python
@@ -97,7 +96,7 @@ by the sequence number (order) in which that Circle is drawn.
 
 Example 1. Rows and Columns
 ---------------------------
-`^ <key-properties_>`_
+`^ <trilay-properties_>`_
 
 .. |tl0| image:: images/layouts/layout_tri_default.png
    :width: 330
@@ -120,7 +119,7 @@ Example 1. Rows and Columns
 
 Example 2. East - 2 Rows
 ------------------------
-`^ <key-properties_>`_
+`^ <trilay-properties_>`_
 
 .. |tl1| image:: images/layouts/layout_tri_east_row2.png
    :width: 330
@@ -147,7 +146,7 @@ Example 2. East - 2 Rows
 
 Example 3. East - 6 Rows
 ------------------------
-`^ <key-properties_>`_
+`^ <trilay-properties_>`_
 
 .. |tl2| image:: images/layouts/layout_tri_east_row6.png
    :width: 330
@@ -174,7 +173,7 @@ Example 3. East - 6 Rows
 
 Example 4. North - 2 Columns
 ----------------------------
-`^ <key-properties_>`_
+`^ <trilay-properties_>`_
 
 .. |tl3| image:: images/layouts/layout_tri_north_col2.png
    :width: 330
@@ -201,7 +200,7 @@ Example 4. North - 2 Columns
 
 Example 5. North - 6 Columns
 ----------------------------
-`^ <key-properties_>`_
+`^ <trilay-properties_>`_
 
 .. |tl4| image:: images/layouts/layout_tri_north_col6.png
    :width: 330
@@ -228,7 +227,7 @@ Example 5. North - 6 Columns
 
 Example 6. West - 3 Rows
 ------------------------
-`^ <key-properties_>`_
+`^ <trilay-properties_>`_
 
 .. |tl5| image:: images/layouts/layout_tri_west_row3.png
    :width: 330
@@ -255,7 +254,7 @@ Example 6. West - 3 Rows
 
 Example 7. South - 3 Columns
 ----------------------------
-`^ <key-properties_>`_
+`^ <trilay-properties_>`_
 
 .. |tl6| image:: images/layouts/layout_tri_south_col3.png
    :width: 330
@@ -282,7 +281,7 @@ Example 7. South - 3 Columns
 
 Example 8. Mixed Styles
 -----------------------
-`^ <key-properties_>`_
+`^ <trilay-properties_>`_
 
 .. |tl7| image:: images/layouts/layout_tri_all.png
    :width: 330

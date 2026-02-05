@@ -820,7 +820,7 @@ class DeckOfCards:
                 dpi=self.dpi,
                 directory=directory or self.directory,
                 frames=globals.card_frames,
-                page_height=globals.page[1],
+                # page_height=globals.page[1],
             )
 
     def draw(self, cnv=None, off_x=0, off_y=0, ID=None, **kwargs):
@@ -2107,7 +2107,7 @@ def Save(**kwargs):
         dpi=300,  # ??? FIXME
         directory=directory or globals.directory,
         frames=globals.extracts,
-        page_height=globals.page[1],
+        # page_height=globals.page[1],
     )
 
     # ---- reset key globals to allow for new Deck()

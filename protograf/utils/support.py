@@ -15,7 +15,7 @@ from pymupdf import Rect as muRect, Identity
 from pymupdf.utils import getColorInfoList
 
 # local
-from protograf import globals
+# from protograf import globals
 from protograf.globals import unit
 from protograf.utils.constants import (
     BUILT_IN_FONTS,
@@ -34,28 +34,34 @@ def numbers(*args):
 
     Doc Test:
 
-    >>> dg = numbers(5.0, 10.0, 0.5)
+    >>> dg = numbers(5.0, 7.0, 0.5)
     >>> assert next(dg) == 5.0
     >>> assert next(dg) == 5.5
+    >>> assert next(dg) == 6.0
+    >>> assert next(dg) == 6.5
+    >>> assert next(dg) == 7.0
+    Traceback (most recent call last):
+      ...
+    StopIteration
     """
     start = 0.0
     step = 1.0
-    l = len(args)
-    if l == 1:
+    nargs = len(args)
+    if nargs == 1:
         end = args[0]
-    elif l == 2:
+    elif nargs == 2:
         start, end = args
-    elif l == 3:
+    elif nargs == 3:
         start, end, step = args
         if step == 0.0:
             raise ValueError("frange step must not be zero")
     else:
-        raise TypeError("frange expects 1-3 arguments, got %d" % l)
+        raise TypeError(f"frange expects 1-3 arguments, got {nargs}")
 
     v = start
     while True:
         if (step > 0 and v >= end) or (step < 0 and v <= end):
-            raise StopIteration
+            return
         yield v
         v += step
 
@@ -87,14 +93,14 @@ def letters(start: str = "a", stop: str = "z", step: int = 1):
     return list(gen())
 
 
-def roman(value: int, REAL=True) -> str:
+def roman(value: int, is_real=True) -> str:
     """Convert an integer to a Roman number
 
     Args:
 
     - value
         integer to be converted
-    - REAL
+    - is_real
         only used for doctest, to bypass sys.exist() problem
 
     Source:
@@ -119,10 +125,10 @@ def roman(value: int, REAL=True) -> str:
     try:
         num = abs(int(value))
     except Exception:
-        feedback(f'The value "{value}" is not a valid integer', REAL)
-        return
+        feedback(f'The value "{value}" is not a valid integer', is_real)
+        return None
     if num > 3999:
-        feedback("Cannot convert a number above 3999 to Roman", REAL)
+        feedback("Cannot convert a number above 3999 to Roman", is_real)
         return None
 
     # Store Roman values of digits from 0-9 at different places
@@ -140,7 +146,7 @@ def roman(value: int, REAL=True) -> str:
     return ans
 
 
-def steps(start, end, step=1, REAL=True):
+def steps(start, end, step=1, is_real=True) -> list:
     """Return a list of numbers from start to end, at step intervals.
 
     Args:
@@ -151,60 +157,61 @@ def steps(start, end, step=1, REAL=True):
         last number
     - step
         increment between numbers
-    - REAL
+    - is_real
         only used for doctest, to bypass sys.exist() problem
 
     Doc Test:
 
-    >>> steps('a', 'b', REAL=False)
+    >>> steps('a', 'b', is_real=False)
     FEEDBACK:: A start value of "a" is not a valid number
-    >>> steps(1, 'b', REAL=False)
+    >>> steps(1, 'b', is_real=False)
     FEEDBACK:: An end value of "b" is not a valid number
-    >>> steps(1, 2, 'c', REAL=False)
+    >>> steps(1, 2, 'c', is_real=False)
     FEEDBACK:: A step value of "c" is not a valid number
-    >>> steps(2, 1, REAL=False)
+    >>> steps(2, 1, is_real=False)
     FEEDBACK:: End value of "1" must be greater than start value of "2"
-    >>> steps(1, 2, -1, REAL=False)
+    >>> steps(1, 2, -1, is_real=False)
     FEEDBACK:: End value of "2" must be less than start value of "1"
-    >>> steps(2, 1, 0, REAL=False)
+    >>> steps(2, 1, 0, is_real=False)
     FEEDBACK:: An step value of "0" is not valid
-    >>> steps(1, 3, REAL=False)
+    >>> steps(1, 3, is_real=False)
     [1, 2, 3]
-    >>> steps(1, 3, 2, REAL=False)
+    >>> steps(1, 3, 2, is_real=False)
     [1, 3]
-    >>> steps(3, 1, -2, REAL=False)
+    >>> steps(3, 1, -2, is_real=False)
     [3, 1]
-    >>> steps(1, 5, 1.5, REAL=False)
+    >>> steps(1, 5, 1.5, is_real=False)
     [1, 2.5, 4.0]
     """
     try:
         _ = float(start)
     except Exception:
-        feedback(f'A start value of "{start}" is not a valid number', REAL)
-        return
+        feedback(f'A start value of "{start}" is not a valid number', is_real)
+        return None
     try:
         _ = float(end)
     except Exception:
-        feedback(f'An end value of "{end}" is not a valid number', REAL)
-        return
+        feedback(f'An end value of "{end}" is not a valid number', is_real)
+        return None
     try:
         _ = float(step)
     except Exception:
-        feedback(f'A step value of "{step}" is not a valid number', REAL)
-        return
+        feedback(f'A step value of "{step}" is not a valid number', is_real)
+        return None
     if step == 0:
-        feedback(f'An step value of "{step}" is not valid', REAL)
-        return
+        feedback(f'An step value of "{step}" is not valid', is_real)
+        return None
     if end < start and step > 0:
         feedback(
-            f'End value of "{end}" must be greater than start value of "{start}"', REAL
+            f'End value of "{end}" must be greater than start value of "{start}"',
+            is_real,
         )
-        return
+        return None
     if start < end and step < 0:
         feedback(
-            f'End value of "{end}" must be less than start value of "{start}"', REAL
+            f'End value of "{end}" must be less than start value of "{start}"', is_real
         )
-        return
+        return None
 
     result, current = [], start
     while True:
@@ -266,8 +273,6 @@ def combinations(_object, size=2, repeat=1, delimiter=","):
     except AttributeError:
         items = _object
     try:
-        for item in items:
-            pass
         items = items * repeat
         combo = itertools.combinations(items, size)
         full_list = []
@@ -317,6 +322,7 @@ def to_int(value: Any, name: str = "", fail: bool = True) -> int:
             )
         else:
             feedback(f'Unable to convert "{value}" into a whole number!', fail)
+        return None
 
 
 def to_float(value: Any, name: str = "", fail: bool = True) -> float:
@@ -350,6 +356,7 @@ def to_float(value: Any, name: str = "", fail: bool = True) -> float:
             )
         else:
             feedback(f'Unable to convert "{value}" into a floating point number!', fail)
+        return None
 
 
 def to_units(value):
@@ -365,6 +372,7 @@ def to_units(value):
             case "mm" | "millimetre" | "mms" | "millimetres":
                 numeric_units = unit.mm
             case _:
+                numeric_units = None
                 feedback(
                     f'Cannot recognise "{value}" as valid units -'
                     " use mm, cm, inch or pt",
@@ -400,7 +408,7 @@ def excel_column(value: int = 1):
     return converter(num)
 
 
-def excels(start: int, end: int, step: int = 1, REAL: bool = True):
+def excels(start: int, end: int, step: int = 1, is_real: bool = True):
     """Return a list of Excel col numbers from start to end, at step intervals.
 
     Args:
@@ -411,7 +419,7 @@ def excels(start: int, end: int, step: int = 1, REAL: bool = True):
         last column number
     - step
         increment between numbers
-    - REAL
+    - is_real
         only used for doctest, to bypass sys.exist() problem
 
     Doc Test:
@@ -423,7 +431,7 @@ def excels(start: int, end: int, step: int = 1, REAL: bool = True):
     >>> excels(27, 29)
     ['AA', 'AB', 'AC']
     """
-    nums = steps(start, end, step=step, REAL=REAL)
+    nums = steps(start, end, step=step, is_real=is_real)
     result = [excel_column(num) for num in nums]
     return result
 
@@ -481,7 +489,7 @@ def pdf_export(
                 f'The names setting "{names}" must be a list of names.', False, True
             )
             names = None
-        _names = [name in names if name is not None else name]
+        _names = [name for name in names if name is not None]
         if len(_names) != len(list(set(_names))):
             feedback(
                 f'The names setting "{names}" does not contain a unique list of names.',
@@ -511,7 +519,7 @@ def pdf_export(
                     with open(fname, "w") as _file:
                         _file.write(svg)  # store image as a SVG
 
-        if fformat == ExportFormat.GIF or fformat == ExportFormat.PNG:
+        if fformat in [ExportFormat.GIF, ExportFormat.PNG]:
             # ---- save pages as .png files
             all_pngs = []  # track full and final name of each saved .png
             for pg_number, page in enumerate(doc):
@@ -538,8 +546,8 @@ def pdf_export(
             )
             images = []
             gif_name = os.path.join(dirname, f"{basename}.gif")
-            for filename in all_pngs:
-                images.append(imageio.imread(filename))
+            for _filename in all_pngs:
+                images.append(imageio.imread(_filename))
             imageio.mimsave(
                 gif_name,
                 images,
@@ -547,9 +555,9 @@ def pdf_export(
                 optimize=True,
                 loop=0,  # keep looping
             )  # ms -> sec
-            for filename in all_pngs:
-                if os.path.isfile(filename):
-                    os.remove(filename)
+            for _filename in all_pngs:
+                if os.path.isfile(_filename):
+                    os.remove(_filename)
     except Exception as err:
         feedback(f"Unable to extract images for {filename} - {err}!")
 
@@ -561,7 +569,6 @@ def pdf_frames_to_png(
     dpi: int = 300,
     directory: str = None,
     frames: dict = None,
-    page_height: float = 0,
 ):
     """Extract framed areas from PDF as PNG image(s).
 
@@ -582,8 +589,6 @@ def pdf_frames_to_png(
 
         - Bounding Box (top-left and bottom-right x,y coordinates)
         - optional name (which is user-defined)
-    - page_height:
-        size of page
 
     Uses:
 
@@ -591,7 +596,7 @@ def pdf_frames_to_png(
     - https://pypi.org/project/imageio/
     """
     if frames:
-        feedback(f"Saving frames(s) as image file(s)...", False)
+        feedback("Saving frames(s) as image file(s)...", False)
     _source = os.path.basename(source_file)
     _output = output or source_file  # default to same as input name
     _filename = os.path.basename(_output)
@@ -654,7 +659,7 @@ def color_set(svg_only: bool = False) -> list:
         _string = "#%02x%02x%02x" % rgb_tuple
         hex_string = _string.upper()
         name = _color[0].lower()
-        is_svg = True if name in svg_color_names else False
+        is_svg = name in svg_color_names
         if svg_only and not is_svg:
             continue
         colors.append(
@@ -669,6 +674,7 @@ def uni(code: str):
         return chr(int(code.lstrip("U+").zfill(8), 16))
     except Exception as err:
         feedback(f"Unable to process Unicode character {code} - {err}!")
+        return None
 
 
 def uc(code: str):

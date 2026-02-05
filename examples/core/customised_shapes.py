@@ -423,6 +423,53 @@ Line(connections=[cc, cr, co, ca],
      )
 PageBreak()
 
+# ---- line - centred shapes
+Blueprint(stroke_width=0.5)
+Text(common=txt, text='Line: centred shapes')
+crc = circle(radius=0.15)
+ttt = text("Aa", font_size=10)
+crs = cross(height=0.6, width=0.6)
+ell = ellipse(height=0.4, width=0.6)
+ply = polygon(side=0.2, sides=5)
+rho = rhombus(side=0.3)
+
+Line(x=0, y=0.5, length=1.5,
+     centre_shapes=[crc])
+Line(x=2, y=0.5, length=1.5,
+     centre_shapes=[ttt])
+Line(x=0, y=1.5, length=1.5,
+     centre_shapes=[crs])
+Line(x=2, y=1.5, length=1.5,
+     centre_shapes=[ply])
+Line(x=0, y=2.5, length=1.5,
+     centre_shapes=[ell])
+Line(x=2, y=2.5, length=1.5,
+     centre_shapes=[rho])
+
+Line(x=0, y=4, length=2,
+     angle=30,
+     centre_shapes=[crc],
+     centre_shapes_rotated =True)
+Line(x=2, y=4, length=2,
+     angle=30,
+     centre_shapes=[ttt],
+     centre_shapes_rotated =True)
+Line(x=0, y=5, length=2,
+     angle=30,
+     centre_shapes=[crs],
+     centre_shapes_rotated =True)
+Line(x=2, y=5, length=2, angle=30,
+     centre_shapes=[ply],
+     centre_shapes_rotated =True)
+Line(x=0, y=6, length=2, angle=30,
+     centre_shapes=[ell],
+     centre_shapes_rotated =True)
+Line(x=2, y=6, length=2,
+     angle=30,
+     centre_shapes=[rho],
+     centre_shapes_rotated =True)
+PageBreak()
+
 # ---- bezier - custom
 Blueprint()
 Text(common=txt, text="Bezier line")
@@ -1425,6 +1472,7 @@ Save(
         "line_custom", "line_centred",
         "line_connections_circle", "line_connections_shapes",
         "line_connections_arrow", "line_connections_spoke",
+        "line_centre_shapes",
         "bezier_custom", "ellipse_custom", "rectangle_custom",
         "square_custom", "trapezoid_custom", "image_default",
         "descriptions", "label_offset",
