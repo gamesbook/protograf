@@ -16,7 +16,7 @@ from protograf.utils.structures import (
 
 def validate_connection_params(conn: tuple) -> list:
     """Check that a connection tuple contains all required values."""
-    from protograf.shapes import StarShape
+    from protograf.shapes import StarShape  # avoid circular imports
 
     dirs = None
     if not isinstance(conn, tuple) or len(conn) < 3:
@@ -61,7 +61,7 @@ def validate_connection_params(conn: tuple) -> list:
 
 def get_connection_point(the_shape: BaseShape, conn_type: str, direction: str) -> Point:
     """Get Point at which connection is to be made."""
-    from protograf.shapes import StarShape
+    from protograf.shapes import StarShape  # avoid circular imports
 
     the_point = None
     shape_name = the_shape.simple_name()
@@ -69,6 +69,7 @@ def get_connection_point(the_shape: BaseShape, conn_type: str, direction: str) -
         shape_name = f"{the_shape.ORIENTATION.name.lower()} {shape_name}"
     if isinstance(the_shape, (PolygonShape, StarShape)):
         direction = tools.as_int(direction, "direction")
+    # print(f"*** connections {shape_name=}")
     match _lower(conn_type):
         case "v" | "vertex":
             try:
@@ -104,6 +105,13 @@ def get_connection_point(the_shape: BaseShape, conn_type: str, direction: str) -
                 )
             else:
                 the_point = pbs.point
+    if the_shape.rotation:
+        center_point = the_shape._shape_centre
+        the_point = geoms.rotate_point_around_point(
+            (the_point.x, the_point.y),
+            (center_point.x, center_point.y),
+            the_shape.rotation,
+        )
     return the_point
 
 
@@ -136,9 +144,8 @@ def get_rotation(centre_a: Point, centre_b: Point) -> tuple:
 
 
 def get_connections(shapes: list, connections_style) -> list:
-    """Get connection vertices"""
-
-    from protograf.shapes import CircleShape, DotShape
+    """Get connection vertices."""
+    from protograf.shapes import CircleShape, DotShape  # avoid circular imports
 
     connections = []
     for idx, cshape in enumerate(shapes):

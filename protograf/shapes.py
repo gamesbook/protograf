@@ -886,6 +886,18 @@ class EllipseShape(BaseShape):
         """Geometry of Ellipse - alias for shape_geom."""
         return self.shape_geom
 
+    @property  # do NOT cache because centre needs to be changed!
+    def _shape_centre(self) -> Point:
+        """Centre of Ellipse in points."""
+        x, y = self.calculate_xy()
+        # ---- overrides for grid layout
+        if self.use_abs_c:
+            x = self._abs_cx - self._u.width / 2.0
+            y = self._abs_cy - self._u.height / 2.0
+        x_d = x + self._u.width / 2.0  # centre
+        y_d = y + self._u.height / 2.0  # centre
+        return Point(x_d, y_d)
+
     def calculate_area(self):
         return math.pi * self._u.height * self._u.width
 
@@ -922,8 +934,8 @@ class EllipseShape(BaseShape):
         if self.use_abs_c:
             x = self._abs_cx - self._u.width / 2.0
             y = self._abs_cy - self._u.height / 2.0
-        x_d = x + self._u.width / 2.0  # centre
-        y_d = y + self._u.height / 2.0  # centre
+        self.centroid = self._shape_centre
+        x_d, y_d = self._shape_centre.x, self._shape_centre.y
         self.area = self.calculate_area()
         delta_m_up, delta_m_down = 0.0, 0.0  # potential text offset from chevron
         # ---- handle rotation
@@ -1165,6 +1177,10 @@ class PodShape(BaseShape):
         """Geometry of Pod - alias for shape_geom."""
         return self.shape_geom
 
+    @property  # do NOT cache because centre needs to be changed!
+    def _shape_centre(self) -> Point:
+        """Centre of Pod in points."""
+
     def calculate_xy(self, **kwargs):
         # ---- adjust start
         if self.row is not None and self.col is not None:
@@ -1192,7 +1208,7 @@ class PodShape(BaseShape):
         if self.use_abs_c:
             x = self._abs_cx - self._u.length / 2.0
             y = self._abs_cy
-            x_d = self._abs_cx - self._u.margin_left # centre
+            x_d = self._abs_cx - self._u.margin_left  # centre
             y_d = y  # centre
         else:
             x, y = self.calculate_xy()
@@ -2167,7 +2183,7 @@ class ShapeShape(BasePolyShape):
         """Geometry of PolyShape - alias for shape_geom."""
         return self.shape_geom
 
-    @property
+    @property  # do NOT cache because centre needs to be changed!
     def _shape_centre(self) -> Point:
         """Centre of PolyShape in points."""
         if self.cx and self.cy:
@@ -2243,17 +2259,17 @@ class SquareShape(RectangleShape):
     @cached_property
     def shape_area(self) -> float:
         """Area of Square."""
-        return None
+        return self._p2v(self._u.width) * self._p2v(self._u.height)
 
     @cached_property
     def shape_centre(self) -> Point:
         """Centre of Square."""
-        return None
+        return super().shape_centre  # via Rectangle
 
     @cached_property
     def shape_vertices(self) -> dict:
         """Vertices of Square."""
-        return {}
+        return super().shape_vertices  # via Rectangle
 
     @cached_property
     def shape_geom(self) -> ShapeGeometry:
@@ -2264,6 +2280,11 @@ class SquareShape(RectangleShape):
     def geom(self) -> ShapeGeometry:
         """Geometry of Square - alias for shape_geom."""
         return self.shape_geom
+
+    @property  # do NOT cache because centre needs to be changed!
+    def _shape_centre(self) -> Point:
+        """Centre of Square in points."""
+        return super()._shape_centre  # via Rectangle
 
     def calculate_area(self) -> float:
         return self._u.width * self._u.height
@@ -2509,7 +2530,8 @@ class StarShape(BaseShape):
         """Geometry of Star - alias for shape_geom."""
         return self.shape_geom
 
-    def get_center(self, **kwargs) -> Point:
+    @property  # do NOT cache because centre needs to be changed!
+    def _shape_centre(self) -> Point:
         # convert to using units
         x = self._u.x + self._o.delta_x
         y = self._u.y + self._o.delta_y
@@ -2539,9 +2561,8 @@ class StarShape(BaseShape):
             tuple:
                 list of all vertices; list of 'ray' (outer) vertices
         """
-        center = self.get_center()
-        outer_vertices = []
-        all_vertices = []
+        center = self._shape_centre
+        outer_vertices, all_vertices = [], []
         inner = self.inner_fraction or 0.5
         inner_radius = self._u.radius * inner
         gap = 360.0 / self.rays
@@ -2564,7 +2585,7 @@ class StarShape(BaseShape):
     @property
     def _shape_vertexes_named(self):
         """Get named (by number) vertices for Star."""
-        vertices = self._shape_vertexes  # this proo is only outer vertices!
+        vertices = self._shape_vertexes  # these are only outer vertices!
         vertex_dict = {}
         for key, vertex in enumerate(vertices):
             _vertex = Vertex(
@@ -2583,7 +2604,7 @@ class StarShape(BaseShape):
             all_vertexes (list):
                 outer- and inner- Points used to draw Star
         """
-        _center = self.get_center()
+        _center = self._shape_centre
         centre = muPoint(_center.x, _center.y)
         # ---- set radii styles
         lkwargs = {}
@@ -2672,7 +2693,7 @@ class StarShape(BaseShape):
         # ---- validate
         if self.rays < 3:
             feedback("Cannot draw a Star with less than 3 rays!", True)
-        self.centre = self.get_center()
+        self.centre = self._shape_centre
         # calc - assumes x and y are the centre!
         radius = self._u.radius
         # ---- set canvas
@@ -2746,7 +2767,8 @@ class StarLineShape(BaseShape):
         super().__init__(_object=_object, canvas=canvas, **kwargs)
         self.vertexes_list = []
 
-    def get_center(self) -> Point:
+    @property  # do NOT cache because centre needs to be changed!
+    def _shape_centre(self) -> Point:
         """Calculate centre Point of StarLine"""
         # convert to using units
         x = self._u.x + self._o.delta_x
@@ -2764,7 +2786,7 @@ class StarLineShape(BaseShape):
     def _shape_vertexes(self):
         """Calculate vertices of StarLine"""
         vertices = []
-        centre = self.get_center()
+        centre = self._shape_centre
         x, y = centre.x, centre.y
         radius = self._u.radius
         vertices.append(muPoint(x, y + radius))
@@ -2782,7 +2804,7 @@ class StarLineShape(BaseShape):
         """Draw a StarLine on a given canvas."""
         super().draw(cnv, off_x, off_y, ID, **kwargs)  # unit-based props
         cnv = cnv if cnv else globals.canvas  # a new Page/Shape may now exist
-        self.centre = self.get_center()
+        self.centre = self._shape_centre
         # calc - assumes x and y are the centre!
         radius = self._u.radius
         # ---- set canvas
@@ -3063,8 +3085,16 @@ class TrapezoidShape(BaseShape):
 
     @cached_property
     def geom(self) -> ShapeGeometry:
-        """Geometry of Trapezpoid - alias for shape_geom."""
+        """Geometry of Trapezoid - alias for shape_geom."""
         return self.shape_geom
+
+    @property  # do NOT cache because centre needs to be changed!
+    def _shape_centre(self) -> Point:
+        """Centre of Trapezoid in points."""
+        cx, cy, x, y = self.calculate_xy()
+        sign = -1 if self.flip and _lower(self.flip) in ["s", "south"] else 1
+        x_d, y_d = x + self._u.width / 2.0, y + sign * self._u.height / 2.0
+        return Point(x_d, y_d)
 
     def calculate_area(self):
         """Calculate area of trapezoid."""
@@ -3149,11 +3179,6 @@ class TrapezoidShape(BaseShape):
             return self._u.cx, self._u.cy, x, y
         return cx, cy, x, y
 
-    def get_center(self) -> Point:
-        """Calculate centre of Trapezoid."""
-        cx, cy, x, y = self.calculate_xy()
-        return Point(cx, cy)
-
     @property  # must be able to change e.g. for layout
     def _shape_vertexes(self):
         """Calculate vertices of Trapezoid."""
@@ -3204,13 +3229,12 @@ class TrapezoidShape(BaseShape):
         sign = 1
         if self.flip and _lower(self.flip) in ["s", "south"]:
             sign = -1
-        x_d, y_d = x + self._u.width / 2.0, y + sign * self._u.height / 2.0
-        self.centroid = Point(x_d, y_d)
+        self.centroid = self._shape_centre
         # ---- handle rotation
         rotation = kwargs.get("rotation", self.rotation)
         if rotation:
             kwargs["rotation"] = rotation
-            kwargs["rotation_point"] = muPoint(x_d, y_d)
+            kwargs["rotation_point"] = muPoint(self.centroid.x, self.centroid.y)
         # ---- draw trapezoid
         self.vertexes = self._shape_vertexes
         # feedback(f'*** Trapezid {x=} {y=} {cx=} {cy=} {self.vertexes=}')
@@ -3232,7 +3256,7 @@ class TrapezoidShape(BaseShape):
             self.draw_vertex_shapes(
                 self.vertex_shapes,
                 self.vertexes,
-                Point(x_d, y_d),
+                self.centroid,
                 self.vertex_shapes_rotated,
             )
         # ---- dot
@@ -3325,6 +3349,15 @@ class TriangleShape(BaseShape):
     def geom(self) -> ShapeGeometry:
         """Geometry of Triangle - alias for shape_geom."""
         return self.shape_geom
+
+    @property  # do NOT cache because centre needs to be changed!
+    def _shape_centre(self) -> Point:
+        """Calculate centre of Triangle in points."""
+        vertices = self._shape_vertexes
+        sum_x = vertices[0].x + vertices[1].x + vertices[2].x
+        sum_y = vertices[0].y + vertices[1].y + vertices[2].y
+        centre = Point(sum_x / 3.0, sum_y / 3.0)
+        return centre
 
     @property  # must be able to change e.g. for layout
     def _shape_vertexes(self) -> list:

@@ -24,6 +24,7 @@ protograf Changes
 - Support arrows for snail-based Polylines
 - Allow Grid edges to be omitted
 - Fix Polygon rotation on vertex points
+- Fix connections between rotated shapes
 
 2026-01-11 (0.4.0)
 ------------------
