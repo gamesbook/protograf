@@ -117,6 +117,26 @@ class GridShape(GridBase):
         kwargs = self.kwargs | kwargs
         cnv = cnv if cnv else self.canvas
         super().draw(cnv, off_x, off_y, ID, **kwargs)  # unit-based props
+        # ---- fill
+        if kwargs.get("fill"):
+            gwargs = copy.copy(kwargs)
+            gwargs["stroke"] = None
+            gwidth = self.width * (len(self.x_cols) - 1)
+            gheight = self.height * (len(self.y_cols) - 1)
+            cnv.draw_rect(
+                (
+                    self.start_x,
+                    self.start_y,
+                    self.start_x + gwidth,
+                    self.start_y + gheight,
+                )
+            )
+            self.set_canvas_props(  # shape.finish()
+                cnv=cnv,
+                index=ID,
+                **gwargs,
+            )
+            cnv.commit()
         # ---- draw grid
         match kwargs.get("lines"):
             case "horizontal" | "horiz" | "h":
@@ -147,6 +167,7 @@ class GridShape(GridBase):
                     skip = True
                 if not skip:
                     cnv.draw_line(Point(self.x_cols[0], y), Point(self.x_cols[-1], y))
+        kwargs["stroke_ends"] = "squared"
         self.set_canvas_props(  # shape.finish()
             cnv=cnv,
             index=ID,

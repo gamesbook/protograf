@@ -338,6 +338,14 @@ class PolyominoObject(RectangleShape):
                     kwargs["col"] = col
                     # print(f"~~~ Polyomino {row=} {col=} {number=} {self.label=}")
                     super().draw(cnv, off_x=off_x, off_y=off_y, ID=ID, **kwargs)
+                else:
+                    if self.blank_fill:
+                        kwargs["fill"] = self.blank_fill
+                        kwargs["stroke"] = self.blank_stroke or self.stroke
+                        kwargs["row"] = row
+                        kwargs["col"] = col
+                        super().draw(cnv, off_x=off_x, off_y=off_y, ID=ID, **kwargs)
+
         # ---- optional perimeter
         if self.outline_stroke or self.outline_width:
             cnv = cnv if cnv else globals.canvas  # a new Page/Shape may now exist
