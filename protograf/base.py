@@ -328,6 +328,8 @@ class BaseCanvas:
         # if self.outlined:
         #     self.stroke = self.outline_stroke
         #     self.fill = None
+        self.blank_fill = self.defaults.get("blank_fill", None)
+        self.blank_stroke = self.defaults.get("blank_stroke", None)
         # ---- text box rectangle
         self.box_fill = self.defaults.get("box_fill", None)
         self.box_stroke = self.defaults.get("box_stroke", None)
@@ -960,6 +962,8 @@ class BaseShape:
         # if self.outlined:
         #     self.stroke = self.outline_stroke
         #     self.fill = None
+        self.blank_fill = kwargs.get("blank_fill", base.blank_fill)
+        self.blank_stroke = kwargs.get("blank_stroke", base.blank_stroke)
         # ---- text block
         self.box_stroke = kwargs.get("box_stroke", base.box_stroke)
         self.box_fill = kwargs.get("box_fill", base.box_fill)
