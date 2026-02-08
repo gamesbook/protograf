@@ -1953,7 +1953,7 @@ colored triangular or quadilateral shapes.
       a list of **four** colors (``[ ]`` with comma-separated color strings).
       This causes **four** triangles to be drawn |dash| the rectangle is thus
       subdivided into four triangular spaces.  Colors are allocated from the
-      top-most triangle, going clock-wise.
+      top-most triangle, going clockwise.
 
       The lower-most example shows what happens when the *slices* property is
       given a list of **four** colors, plus a *slices_line* and a
@@ -3672,8 +3672,10 @@ length to the  *slice* list.
       in this case they do not occupy the full circumference because the total
       angles amount is less than 360 |deg|.
 
-      **NOTE** All slice lines are drawn with the  *slices_stroke* color,
-      which defaults to the slice color itself.
+      .. NOTE::
+
+          All slice lines are drawn with the  *slices_stroke* color,
+          which defaults to the slice color itself.
 
 ===== ======
 
@@ -3710,11 +3712,18 @@ concentric circles.
       The *nested* property can either be a single whole number or a list of
       fractional numbers.
 
-      **NOTE** All nested Circles are drawn with the same line and fill
-      properties as the Circle shape to which they are part of.  For more
-      control over such features, rather use the *centre_shape* property
-      instead, as this will permit construction of such a circle with any/all
-      properties being set.
+      Each fractional number in the list indicates a Circle to be drawn at
+      a distance corresponding to the fraction of the circle's radius.
+      For example, if circle's radius is ``8`` cm, then a fractional value
+      of ``0.75`` corresponds to a nested circle with a radius of ``6`` cm.
+
+      .. NOTE::
+
+          All nested Circles are drawn with the same line and fill
+          properties as the Circle shape to which they are part of.  For more
+          control over such features, rather use the *centre_shape* property
+          instead, as this will permit construction of a circle with
+          any/all properties being set.
 
 ===== ======
 

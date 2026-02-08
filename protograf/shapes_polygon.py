@@ -138,7 +138,7 @@ class PolygonShape(BaseShape):
         """Vertices of Polygon in points."""
         the_geom = self.get_geometry()
         vertices = the_geom.vertices
-        # for p in vertices: print(f'*POLYGON* vtx: {p.x / 28.3465}, {p.y / 28.3465}')
+        # print(f'*** POLYGON vertices {self._l2v(vertices)=}')
         if the_geom.sides & 1 == 1:  # odd no.of sides
             # move back so the vertices start at "top right"
             vertices_shift = vertices[1:] + vertices[0:1]
@@ -172,16 +172,14 @@ class PolygonShape(BaseShape):
             Used by other Shapes e.g. Track
         """
         pre_geom = self.get_geometry()
-        x, y, vertices = (
-            pre_geom.x,
-            pre_geom.y,
-            pre_geom.vertices,
-        )
-        # for p in vertices: print(f'*POLYG vert x={self._p2v(p.x)} y={self._p2v(p.y)}')
+        x, y = pre_geom.x, pre_geom.y
+        vertices = self._shape_vertexes
         angles = []
         for vertex in vertices:
+            # print(f'{self._p2v(vertex.x)}, {self._p2v(vertex.y)} :: {self._p2v(x)}, {self._p2v(y)}')
             _, angle = geoms.angles_from_points(Point(x, y), vertex)
-            angles.append(angle)
+            angles.append(360 - angle)
+        # print(f'*** POLYGON angles {angles=}')
         return angles
 
     def calculate_perbii(self, centre: Point, **kwargs) -> dict:
@@ -202,22 +200,22 @@ class PolygonShape(BaseShape):
             vertices = _vertices
         else:  # even no.of sides
             vertices = _vertices[2:] + _vertices[0:2]
-        # print(f"*** POLYGON *** \n{_vertices=}\n{vertices=}")
+        # print(f"*** POLYGON \n{_vertices=}\n{vertices=}")
         vcount = len(_vertices) - 1
         for key, vertex in enumerate(_vertices):
-            # print(f"*** POLYGON *** vertex {key=} {vertex=}")
+            # print(f"*** POLYGON vertex {key=} {vertex=}")
             if key == 0:
                 p1 = Point(vertex.x, vertex.y)
                 p2 = Point(vertices[vcount].x, vertices[vcount].y)
             else:
                 p1 = Point(vertex.x, vertex.y)
                 p2 = Point(vertices[key - 1].x, vertices[key - 1].y)
-            # print(f"*** POLYGON *** perbii {key=} {p1=} {p2=}")
+            # print(f"*** POLYGON perbii {key=} {p1=} {p2=}")
             pc = geoms.fraction_along_line(p1, p2, 0.5)  # centre pt of edge
             _perbii_pts.append(pc)
             compass, angle = geoms.angles_from_points(centre, pc)
             angle = 360.0 - angle if angle > 0.0 else angle
-            # print(f"*** POLYGON *** perbii {key=} {pc=} {compass=} {angle=}")
+            # print(f"*** POLYGON perbii {key=} {pc=} {compass=} {angle=}")
             _perbii = Perbis(
                 point=pc,
                 direction=key + 1,
@@ -226,7 +224,7 @@ class PolygonShape(BaseShape):
                 compass=compass,
                 angle=angle,
             )
-            # print(f"*** POLYGON *** perbii {key=} {_perbii=}")
+            # print(f"*** POLYGON perbii {key=} {_perbii=}")
             perbii_dict[key + 1] = _perbii
         if kwargs.get("debug"):
             pass
@@ -460,7 +458,7 @@ class PolygonShape(BaseShape):
         vertices = geoms.polygon_vertices(
             sides, self._shape_radius, Point(x, y), rotation
         )
-        # for p in vertices: print(f'*PG-V* {p.x / 28.3465}, {p.y / 28.3465}')
+        # print(f'*** POLYGON vertices {self._l2v(vertices)=}')
         return PolyGeometry(x, y, self._shape_radius, side, half_flat, vertices, sides)
 
     def draw(self, cnv=None, off_x=0, off_y=0, ID=None, **kwargs):

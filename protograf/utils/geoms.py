@@ -399,6 +399,8 @@ def angles_from_points(first: Point, second: Point) -> tuple:
     (270.0, 180.0)
     >>> angles_from_points(Point(0, 0), Point(-4, 4))
     (315.0, 135.0)
+    >>> angles_from_points(Point(2.5, 3.5), Point(3.25, 2.2))
+    (150.01836063115067, 299.9816393688493)
     """
     compass = 0
     a, b = second.x - first.x, second.y - first.y

@@ -1993,7 +1993,7 @@ class RhombusShape(BaseShape):
             if not isinstance(self.borders, list):
                 feedback('The "borders" property must be a list of sets or a set')
             for border in self.borders:
-                self.draw_border(cnv, border, ID)  # BaseShape
+                self.draw_border(cnv, border, ID, **kwargs)
         # ---- * draw perbii
         if self.perbii:
             self.draw_perbii(cnv, ID, centre, self._shape_vertexes, rotation=rotation)
@@ -3237,7 +3237,7 @@ class TrapezoidShape(BaseShape):
             kwargs["rotation_point"] = muPoint(self.centroid.x, self.centroid.y)
         # ---- draw trapezoid
         self.vertexes = self._shape_vertexes
-        # feedback(f'*** Trapezid {x=} {y=} {cx=} {cy=} {self.vertexes=}')
+        # feedback(f'*** Trapezoid {x=} {y=} {cx=} {cy=} {self.vertexes=}')
         cnv.draw_polyline(self.vertexes)
         kwargs["closed"] = True
         self.set_canvas_props(cnv=cnv, index=ID, **kwargs)
@@ -3250,7 +3250,7 @@ class TrapezoidShape(BaseShape):
             if not isinstance(self.borders, list):
                 feedback('The "borders" property must be a list of sets or a set')
             for border in self.borders:
-                self.draw_border(cnv, border, ID)  # BaseShape
+                self.draw_border(cnv, border, ID, **kwargs)
         # ---- draw vertex shapes
         if self.vertex_shapes:
             self.draw_vertex_shapes(

@@ -79,7 +79,7 @@ class GridBase(BaseShape):
             offset_x, offset_y = self.start_x, self.start_y
         else:  # being used on a card - x,y are relative offset - no margins
             # see proto/draw_element() function for these kwargs settings
-            self.start_kwargs.get("card_x", 0) + self._u.x
+            self.start_x = kwargs.get("card_x", 0) + self._u.x
             self.start_y = kwargs.get("card_y", 0) + self._u.y
             max_width = self.unit(kwargs.get("card_width", 0))
             max_height = self.unit(kwargs.get("card_height", 0))

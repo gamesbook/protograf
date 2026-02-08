@@ -1496,7 +1496,7 @@ def get_pymupdf_props(
     index=None,  # extract from list of potential values (usually Card options)
     **kwargs,
 ):
-    """Get pymupdf properties for fill, font, line, line style and colors
+    """Get pymupdf properties for fill, font, line, line style, colors and rotation
 
     Notes:
         If letting default a color parameter to None, then no resp. color selection
@@ -1591,10 +1591,10 @@ def get_pymupdf_props(
         dashes = f"[{dlength} {dspaced}] {doffset}"
     else:
         dashes = None
-    # print(f"### SCP{_dotted =} {_dashed=} {dashes=}")
+    # print(f"^^^ SCP{_dotted =} {_dashed=} {dashes=}")
     # ---- check rotation
     morph = None
-    # print(f'^^^ SCP {_rotation_point=} {_rotation}')
+    # print(f'^^^ SCP {_rotation_point=} {_rotation=}')
     if _rotation_point and not isinstance(_rotation_point, (Point, muPoint)):
         feedback(f'Rotation point "{_rotation_point}" is invalid', True)
     if _rotation is not None and not isinstance(_rotation, (float, int)):

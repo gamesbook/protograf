@@ -14,13 +14,15 @@ Notes:
 from protograf import *
 
 Create(filename="new_classic_boards.pdf", margin=0.5, paper="A4-l", page_grid=1)
-# common usage
+
+# ---- common usage
 source = '"New Book of Classic Board Games", Brian E. Svoboda, 2026.'
 title = Common(x=1, y=1, font_name="Times-Roman", align="left", font_size=13)
-credit = Common(x=0.5, y=19.75, font_name="Times-Italic", align="left", font_size=10)
+credit = Common(x=19.5, y=19.75, font_name="Times-Italic", align="left", font_size=10)
 
 # ---- .Ataxx
 Text("Attaxx", common=title)
+Text(source, common=credit)
 ATAXX_BLUE = "#21BDE6"
 atx = Common(
     fill="#929292", stroke="#7C7C7C",
@@ -104,7 +106,7 @@ PageBreak()
 # ---- .Cairo Corridor
 # ---- .Checkers
 # ---- .Chinese Checkers
-# ---- .Connect6
+# ---- .Connect6 (pen-and-paper)
 
 # ---- .Go
 Text("Go", common=title)
@@ -156,9 +158,42 @@ Sequence(
     )
 PageBreak()
 
-# ---- .Joust
+# ---- .Joust (chess board)
 # ---- .King's Valley
+
 # ---- .Mills
+Text("Mills", common=title)
+Text(source, common=credit)
+SIZE = 5
+dotty = dot(dot_width=20)
+# frame
+rect = Rectangle(
+    cx=14.3, cy=10,
+    width=SIZE*3 + 2.5, height=SIZE*3 + 2.5,
+    stroke_width=3, fill_stroke="#D9D9D9",
+    rounding=1)
+# board
+rect = Common(
+    cx=14.3, cy=10,
+    stroke_width=4,
+    vertex_shapes=[dotty]*4,
+    perbii_shapes=[('*', dotty)]*4)
+r1 = Rectangle(
+    common=rect,
+    width=SIZE*3, height=SIZE*3, fill="#8DD9FF")
+r2 = Rectangle(
+    common=rect,
+    width=SIZE*2, height=SIZE*2, fill="#8DB3FF")
+r3 = Rectangle(
+    common=rect,
+    width=SIZE, height=SIZE, fill="#D08DFF")
+lns = Common(stroke_width=4)
+# connections (orthogonal)
+Line(common=lns, connections=[(r3, 'p', 'n'), (r1, 'p', 'n')])
+Line(common=lns, connections=[(r3, 'p', 's'), (r1, 'p', 's')])
+Line(common=lns, connections=[(r3, 'p', 'e'), (r1, 'p', 'e')])
+Line(common=lns, connections=[(r3, 'p', 'w'), (r1, 'p', 'w')])
+PageBreak()
 
 # ---- .Odd
 Text("Odd", common=title)
@@ -181,11 +216,127 @@ HexHex(
 PageBreak()
 
 # ---- .Sea Battle Tafl
-# ---- .Sprouts
+Text("Sea Battle Tafl", common=title)
+Text(source, common=credit)
+Grid(
+    x=5.5, y=1,
+    cols=9, rows=9,
+    stroke_width=2,
+    side=2,
+    fill="#63B0EB", stroke="#003F73"
+)
+# TODO => use layout for location for start
+PageBreak()
+
+# ---- .Sprouts (pen-and-paper)
+
 # ---- .Squava
+Text("Squava", common=title)
+Text(source, common=credit)
+Grid(
+    x=10, y=4,
+    cols=5, rows=5,
+    stroke_width=1,
+    side=2,
+    omit_outer=True,
+)
+PageBreak()
+
 # ---- .Strands
-# ---- .Turkish Checkers
+Text("Strands", common=title)
+Text(source, common=credit)
+hxc = Common(
+    orientation="pointy",
+    height=2,
+    stroke="black",
+    stroke_width=2,
+    label_size=42,
+    label_font="Helvetica-Bold"
+)
+hx1 = hexagon(
+    common=hxc,
+    label="1",
+    fill="#EEC3C3",
+    label_stroke="#C63A39")
+hx2 = hexagon(
+    common=hxc,
+    label="2",
+    fill="#F9DCB9",
+    label_stroke="#EB8814")
+hx3 = hexagon(
+    common=hxc,
+    label="3",
+    fill="#C5EED7",
+    label_stroke="#39C676")
+hx4 = hexagon(
+    common=hxc,
+    label="4",
+    fill="#B9D7F8",
+    label_stroke="#3978C6")
+hx6 = hexagon(
+    common=hxc,
+    label="6",
+    fill="#CEC4EF",
+    label_stroke="#5839C6")
+HexHex(
+    cx=14.3, cy=10,
+    height=2,
+    rings=4,
+    orientation="pointy",
+    shapes=[
+        (0, [hx1]),
+        (1, [hx2]*6),
+        (2, [hx2]*12),
+        (3, [hx3, hx2, hx3, hx3, hx3, hx2, hx3, hx3, hx3]*2),
+        (4, [hx6, hx4, hx4, hx4]*6),
+   ]
+)
+PageBreak()
+
+# ---- .Turkish Checkers (checker board)
 # ---- .Ultimate Tic-Tac-Toe
+
 # ---- .Volo
+Text("Volo", common=title)
+Text(source, common=credit)
+HexHex(
+    cx=14.3, cy=10,
+    height=2,
+    rings=5,
+    orientation="pointy",
+    shape=None,
+    gridlines=True,
+    gridlines_fill="#99EBFF",
+    gridlines_stroke_width=2)
+Hexagon(
+    cx=14.3, cy=10,
+    height=17.2, stroke_width=4, fill=None,
+    centre_shape=hexagon(
+        height=3.5, stroke_width=4, fill="white"),
+    radii_shapes=[
+        ('*',
+         rhombus(
+             width=3.5, height=1.95, stroke_ends="squared",
+             stroke_width=4, fill="white"),
+         0.9)
+    ],
+    radii_shapes_rotated=True,
+)
+place = Common(fill=None, stroke="grey", stroke_width=2, dotted=True)
+Hexagon(
+    cx=14.3, cy=10,
+    height=17.2, stroke_width=6,
+    caltrops=0.185, stroke_ends="squared",
+    stroke="white", fill=None,
+    radii_shapes=[
+        ('ne', square(common=place), 0.8),
+        ('se', square(common=place), 0.8),
+        ('w', square(common=place), 0.8),
+        ('e', circle(common=place), 0.8),
+        ('ne', circle(common=place), 0.8),
+        ('nw', circle(common=place), 0.8),
+    ]
+)
+PageBreak()
 
 Save()

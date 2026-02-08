@@ -105,11 +105,11 @@ class RectangleShape(BaseShape):
         if self.use_abs_c:
             x = self._abs_cx - self._u.width / 2.0
             y = self._abs_cy - self._u.height / 2.0
-        vertices = [  # anti-clockwise from top-left; relative to centre
-            Point(x, y),  # e
-            Point(x, y + self._u.height),  # s
-            Point(x + self._u.width, y + self._u.height),  # w
-            Point(x + self._u.width, y),  # n
+        vertices = [  # clockwise from right; relative to centre
+            Point(x + self._u.width, y),  # ne
+            Point(x + self._u.width, y + self._u.height),  # se
+            Point(x, y + self._u.height),  # sw
+            Point(x, y),  # nw
         ]
         # feedback(
         #     '*** RECT VERTS '
@@ -223,6 +223,11 @@ class RectangleShape(BaseShape):
 
     def calculate_xy(self, **kwargs) -> tuple:
         """Calculate top-left point of Rectangle."""
+        # ---- check for locale (used by Track; see proto.py)
+        lx, ly = None, None
+        if kwargs.get("locale"):
+            lx = kwargs.get("locale").get("x")
+            ly = kwargs.get("locale").get("y")
         # ---- adjust start
         # feedback(f'***Rect{self.col=}{self.row=} {self._u.offset_x=}{self._o.off_x=}')
         if self.row is not None and self.col is not None:
@@ -254,6 +259,9 @@ class RectangleShape(BaseShape):
                     + self._o.delta_y
                     + self._u.offset_y
                 )
+        elif lx and ly:
+            x = lx - self._u.width / 2.0
+            y = ly - self._u.height / 2.0
         elif self.cx is not None and self.cy is not None:
             x = self._u.cx - self._u.width / 2.0 + self._o.delta_x
             y = self._u.cy - self._u.height / 2.0 + self._o.delta_y
@@ -261,7 +269,7 @@ class RectangleShape(BaseShape):
             x = self._u.x + self._o.delta_x
             y = self._u.y + self._o.delta_y
         # ---- overrides to centre the shape
-        if kwargs.get("cx") and kwargs.get("cy"):
+        if (kwargs.get("cx") and kwargs.get("cy")) and not (lx or ly):
             x = kwargs.get("cx") * self.units - self._u.width / 2.0 + self._o.delta_x
             y = kwargs.get("cy") * self.units - self._u.height / 2.0 + self._o.delta_y
             # breakpoint()
@@ -282,8 +290,8 @@ class RectangleShape(BaseShape):
     def _shape_vertexes_named(self):
         """Get named vertices for Rectangle without notches."""
         vertices = self._shape_vertexes
-        # anti-clockwise from top-left; relative to centre
-        directions = ["nw", "sw", "se", "ne"]
+        # clockwise from top-right; relative to centre
+        directions = ["ne", "se", "sw", "nw"]
         vertex_dict = {}
         for key, vertex in enumerate(vertices):
             _vertex = Vertex(
@@ -1089,17 +1097,17 @@ class RectangleShape(BaseShape):
                     midpt.x + _line + self._u_slices_line_mx,
                     midpt.y + self._u_slices_line_my,
                 )
-                vert_t = [vertexes[0], midleft, midrite, vertexes[3]]
-                vert_r = [vertexes[3], midrite, vertexes[2]]
-                vert_b = [vertexes[1], midleft, midrite, vertexes[2]]
-                vert_l = [vertexes[0], midleft, vertexes[1]]
+                vert_t = [vertexes[3], midleft, midrite, vertexes[0]]
+                vert_r = [vertexes[0], midrite, vertexes[1]]
+                vert_b = [vertexes[1], midrite, midleft, vertexes[2]]
+                vert_l = [vertexes[2], midleft, vertexes[3]]
             else:
-                vert_t = [vertexes[0], midpt, vertexes[3]]
-                vert_r = [vertexes[3], midpt, vertexes[2]]
+                vert_t = [vertexes[3], midpt, vertexes[0]]
+                vert_r = [vertexes[0], midpt, vertexes[1]]
                 vert_b = [vertexes[1], midpt, vertexes[2]]
-                vert_l = [vertexes[0], midpt, vertexes[1]]
+                vert_l = [vertexes[2], midpt, vertexes[3]]
 
-            sections = [vert_l, vert_r, vert_t, vert_b]  # order is important!
+            sections = [vert_t, vert_r, vert_b, vert_l]  # order is important!
             for key, section in enumerate(sections):
                 cnv.draw_polyline(section)
                 self.set_canvas_props(
@@ -1807,7 +1815,7 @@ class RectangleShape(BaseShape):
                                 'The "borders" property must be a list of sets or a set'
                             )
                         for border in self.borders:
-                            self.draw_border(cnv, border, ID)  # BaseShape
+                            self.draw_border(cnv, border, ID, **kwargs)
             if item == "pattern":
                 # ---- * fill pattern?
                 if self.fill_pattern:

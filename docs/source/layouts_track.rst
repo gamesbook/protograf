@@ -185,8 +185,8 @@ Example 3. Track with sequence
       In this case, the *label* value is replaced by the
       actual number.
 
-      The ``Rectangle`` vertices are numbered in an
-      anti-clockwise direction starting with the lower-left corner.
+      The ``Rectangle`` vertices are numbered in a clockwise
+      direction starting with the top-right corner.
 
       For this, and further examples, the shape to be drawn
       is defined before the track; this makes the script less
@@ -216,7 +216,9 @@ Example 4. Square Track with Star
           square(side=1.5),
           shapes=[shp])
 
-      This is very similar to the third example; the differences being:
+      This is very similar to the third example |dash| a track laid
+      out in the clockwise direction starting with the top-right corner
+      |dash| the differences being:
 
       - a different shape (the ``Star``) is being drawn on a larger
         ``Square`` track
@@ -253,8 +255,9 @@ Example 5. Polygon Track
       - one drawn at each of the vertices of an octagon (an eight-sided
       polygon).
 
-      The polygon numbering starts on the mid-right (or just above) of
-      the figure and continues in an anti-clockwise direction.
+      The polygon numbering starts on the top-right / north-east
+      (or close to that location) of the figure and continues in a
+      clockwise direction.
 
 ===== ======
 
@@ -628,44 +631,51 @@ Example 17. Multiple Tracks - starts
 
         # polygon
         Track(
-          Polygon(cx=1, cy=5, radius=0.5,
-                  sides=4, stroke="red"),
+          Polygon(
+            cx=1, cy=5, radius=0.5,
+            sides=4, stroke="red", fill="gold"),
           shapes=[shp])
         Track(
-          Polygon(cx=3, cy=5, radius=0.5,
-                  sides=4, stroke="red"),
+          Polygon(
+            cx=3, cy=5, radius=0.5,
+            sides=4, stroke="red", fill="gold"),
           shapes=[shp],
-          clockwise=True)
+          clockwise=False)
         # circle
         Track(
-          Circle(cx=1, cy=3, radius=0.5, stroke="red"),
+          Circle(
+            cx=1, cy=3, radius=0.5,
+            stroke="red", fill="aqua"),
           shapes=[shp],
-          angles=[45,135,225,315])
+          angles=[45,315,225,135])
         Track(
-          Circle(cx=3, cy=3, radius=0.5, stroke="red"),
+          Circle(
+            cx=3, cy=3, radius=0.5,
+            stroke="red", fill="aqua"),
           shapes=[shp],
-          angles=[45,135,225,315],
-          clockwise=True)
+          angles=[45,315,225,135],
+          clockwise=False)
         # square
         Track(
-          Square(x=0.75, y=0.75, side=0.75, stroke="red"),
+          Square(
+            x=0.75, y=0.75, side=0.75,
+            stroke="red", fill="orange"),
           shapes=[shp])
         Track(
-          Square(x=2.75, y=0.75, side=0.75, stroke="red"),
+          Square(
+            x=2.75, y=0.75, side=0.75,
+            stroke="red", fill="orange"),
           shapes=[shp],
-          clockwise=True)
+          clockwise=False)
 
       The purpose of this example to show that the start location varies
       per type of track used; from top to bottom these are:
 
-      - ``Polygon``
-      - ``Circle``
-      - ``Square``
+      - ``Polygon`` (``gold`` color)
+      - ``Circle`` (``aqua/blue`` color)
+      - ``Square``  (``orange`` color)
 
       In each case, the track itself is being shown in red.
-
-      The examples on the left are with default direction; the ones on the
-      right show how ``clockwise=True`` switches that.
 
 ===== ======
 
@@ -694,9 +704,7 @@ Example 18. Circular Track - clock
         Track(
           circle(cx=2, cy=3, radius=1.5),
           angles=[60,90,120,150,180,210,240,270,300,330,0,30],
-          shapes=[times],
-          rotation_style='o',
-          clockwise=True)
+          shapes=[times])
 
       This example is to show how a track could be used to construct a
       familiar shape - an analog clock face.
@@ -732,7 +740,6 @@ Example 19. Polygon Track - scoring
             trk,
             shapes=[shp],
             rotation_style='o',
-            clockwise=True,
             start=1
         )
         # blue circles - track two
@@ -741,7 +748,6 @@ Example 19. Polygon Track - scoring
             trk,
             shapes=[shp5],
             rotation_style='o',
-            clockwise=True,
             start=1,
             sequences=[5,10,15,20,25,30,35]
         )

@@ -405,7 +405,7 @@ class CardShape(BaseShape):
                 if row & 1:  # odd row
                     if is_card_back:
                         _dx = _dx + side - outline.spacing_x
-                        # print('HEX ODD BACK {_dx=}')
+                        # print('$$$ HEX ODD BACK {_dx=}')
                     else:
                         _dx = _dx + side + outline.spacing_x
             case _:
@@ -537,7 +537,7 @@ class CardShape(BaseShape):
                             _one_or_more_eles = new_ele(card_values_tuple) or []
                         except Exception as err:
                             feedback(
-                                f"Unable to create card #{cid + 1}. (Error: {err})",
+                                f"Unable to create card #{cid + 1}. (Error:- {err})",
                                 True,
                             )
                         if isinstance(_one_or_more_eles, list):
@@ -4251,10 +4251,10 @@ def Hexagons(rows=1, cols=1, sides=None, **kwargs):
         for ccol in the_cols:
             top_row = top_row + 1 if ccol & 1 != 0 else top_row  # odd col
             end_row = end_row - 1 if ccol & 1 == 0 else end_row  # even col
-            # print('ccol, top_row, end_row', ccol, top_row, end_row)
+            # print('$$$ ccol, top_row, end_row', ccol, top_row, end_row)
             for row in range(top_row - 1, end_row + 1):
                 _row = row + 1
-                # feedback(f'{ccol=}, {_row=}')
+                # feedback(f'$$$ Hexagons {ccol=}, {_row=}')
                 if hidden and (_row, ccol) in hidden:
                     pass
                 else:
@@ -4860,7 +4860,7 @@ def Track(track=None, **kwargs):
     if track_name == "CircleShape":
         if not angles or not isinstance(angles, list) or len(angles) < 2:
             feedback(
-                f"A list of 2 or more angles is needed for a Circle-based Track!", True
+                "A list of 2 or more angles is needed for a Circle-based Track!", True
             )
     elif track_name in ["SquareShape", "RectangleShape"]:
         angles = track.get_angles()
@@ -4942,20 +4942,20 @@ def Track(track=None, **kwargs):
             "theta": track_point.angle,
             "count": index + 1,
         }
-        # feedback(f'*Track* {index=} {data=}')
+        # feedback(f'$$$ Track {index=} {data=}')
         # format_label(shape, data)
         # ---- supply data to change shape's location
         # TODO - can choose line centre, not vertex, as the cx,cy position
         shape.cx = shape.points_to_value(track_point.x - track._o.delta_x)
         shape.cy = shape.points_to_value(track_point.y - track._o.delta_y)
-        # feedback(f'\n*Track* {track_name=} {shape.cx=}, {shape.cy=}')
+        # feedback(f'\n $$$ Track {track_name=} {shape.cx=}, {shape.cy=}')
         if _rotation_style:
             match _rotation_style:
                 case "i" | "inwards":
                     if track_name == "CircleShape":
                         shape_rotation = 90 + track_point.angle
                     elif track_name == "PolygonShape":
-                        shape_rotation = 90 - track_point.angle
+                        shape_rotation = 90 + track_point.angle
                     else:
                         shape_rotation = 90 - track_point.angle
                 case "o" | "outwards":
@@ -4964,7 +4964,14 @@ def Track(track=None, **kwargs):
                     elif track_name in ["SquareShape", "RectangleShape"]:
                         shape_rotation = 270 - track_point.angle
                     elif track_name == "PolygonShape":
-                        shape_rotation = 270 - track_point.angle
+                        shape_rotation = 270 + track_point.angle
+                    else:
+                        shape_rotation = 90 - track_point.angle
+                case "f" | "flow" | "follow":
+                    if track_name == "CircleShape":
+                        shape_rotation = 90 + track_point.angle
+                    elif track_name == "PolygonShape":
+                        shape_rotation = track_point.angle
                     else:
                         shape_rotation = 90 - track_point.angle
                 case _:
@@ -4983,6 +4990,8 @@ def Track(track=None, **kwargs):
             page=globals.page_count + 1,
         )
         _locale = locale._asdict()
+        # print(f'$$$ Track {type(shape)=} {shape_rotation=}')
+        # print(f'$$$ Track x,y={track._p2v(locale.x)},{track._p2v(locale.y)})')
         shape.draw(cnv=globals.canvas, rotation=shape_rotation, locale=_locale)
         shape_id += 1
         if shape_id > len(shapes) - 1:

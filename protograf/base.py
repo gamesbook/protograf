@@ -1455,6 +1455,8 @@ class BaseShape:
                     # print(f'### Common {attr=} {base=} {type(base)=}')
                     common_attr = getattr(self.common, attr)
                     base_attr = getattr(base, attr)
+                    # if 'stroke' in attr in attr:
+                    #     print(f'### Common {attr=} {base_attr=} {common_attr=}')
                     if common_attr != base_attr:
                         setattr(self, attr, common_attr)
 
@@ -2800,7 +2802,7 @@ class BaseShape:
             y = yh + self.unit(self.heading_my)
             x = xh + self.unit(self.heading_mx)
             kwargs["font_name"] = self.heading_font or self.font_name
-            kwargs["stroke"] = self.heading_stroke
+            kwargs["stroke"] = kwargs.get("heading_stroke", self.heading_stroke)
             kwargs["font_size"] = self.heading_size
             center_point = kwargs.get("rotation_point", None)
             if center_point and _rotation:
@@ -2850,7 +2852,7 @@ class BaseShape:
             y = yl + self.unit(self.label_my)
             x = xl + self.unit(self.label_mx)
             kwargs["font_name"] = self.label_font or self.font_name
-            kwargs["stroke"] = self.label_stroke
+            kwargs["stroke"] = kwargs.get("label_stroke", self.label_stroke)
             kwargs["font_size"] = self.label_size
             center_point = kwargs.get("rotation_point", None)
             if center_point and _rotation:
@@ -2891,7 +2893,7 @@ class BaseShape:
             y = yt + self.unit(self.title_my)
             x = xt + self.unit(self.title_mx)
             kwargs["font_name"] = self.title_font or self.font_name
-            kwargs["stroke"] = self.title_stroke
+            kwargs["stroke"] = kwargs.get("title_stroke", self.title_stroke)
             kwargs["font_size"] = self.title_size
             center_point = kwargs.get("rotation_point", None)
             if center_point and _rotation:
@@ -3150,7 +3152,7 @@ class BaseShape:
                 canvas.draw_circle((point.x, point.y), 1)
             self.set_canvas_props(cnv=canvas, index=None, **kwargs)
 
-    def draw_border(self, cnv, border: tuple, ID: int = None):
+    def draw_border(self, cnv, border: tuple, ID: int = None, **kwargs):
         """Draw a border line based its settings."""
         # feedback(f'### border {self.__class__.__name__} {border=} {ID=}')
         if not isinstance(border, tuple):
@@ -3300,6 +3302,13 @@ class BaseShape:
                             feedback(f"Cannot draw borders for a {shape_name}")
 
             # ---- draw line
+            # if rotation:
+            #     p1 = Point(x, y)
+            #     p2 = Point(x_1, y_1)
+            #     p_1 = geoms.rotate_point_around_point(p1, centre, rotation)
+            #     p_2 = geoms.rotate_point_around_point(p2, centre, rotation)
+            #     x, y = p_1.x, p_2.y
+            #     x_1, y_1 = p_2.x, p_2.y
             cnv.draw_line((x, y), (x_1, y_1))
             self.set_canvas_props(
                 index=ID,
@@ -3308,6 +3317,8 @@ class BaseShape:
                 # stroke_ends=bends, # TODO - allow this setting
                 dotted=dotted,
                 dashed=dashed,
+                rotation=kwargs.get("rotation", 0.0),
+                rotation_point=kwargs.get("rotation_point", None),
             )
 
     def can_draw_centred_shape(
@@ -3433,6 +3444,10 @@ class BaseShape:
                 # ---- determine dirs for shape
                 _shape_fraction = 1.0
                 if len(item) < 2:
+                    if isinstance(item, BaseShape):
+                        _item = self.simple_name(item)
+                    else:
+                        _item = item
                     feedback(f"{err} - not {item}", True)
                 if direction_group == DirectionGroup.CIRCULAR:
                     vertexes = self.get_circle_vertexes(item[0], centre, radius)
@@ -3450,7 +3465,11 @@ class BaseShape:
                 if len(item) >= 3:
                     _shape_fraction = tools.as_float(item[2], "fraction")
             else:
-                feedback(f"{err} - not {item}.", True)
+                if isinstance(item, BaseShape):
+                    _item = self.simple_name(item)
+                else:
+                    _item = item
+                feedback(f"{err} - not {_item}.", True)
             # print(f"*** radii_shapes {item=} {type(item)=}")
             self.can_draw_centred_shape(_shape, True)  # could stop here
             # print(f"*** radii_shapes :::\n {radii_dict=} {_dirs=}")

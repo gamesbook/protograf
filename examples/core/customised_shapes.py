@@ -106,8 +106,8 @@ Sector(common=sctm, angle_start=280)
 PageBreak()
 
 # ---- grid
+Grid(side=0.85, stroke="gray", fill="lightgray", stroke_width=1)
 Text(common=txt, text='Grid: gray; 1/3"; thick')
-Grid(side=0.85, stroke="gray", stroke_width=1)
 PageBreak()
 
 # ---- dotgrid - Moleskin

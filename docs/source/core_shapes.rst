@@ -1412,7 +1412,8 @@ Polygon
 ~~~~~~~
 `↑ <shape-index_>`_
 
-A polygon is a shape constructed of any number of sides of equal length.
+A polygon is a regular shape constructed of three or more sides of
+equal length, and whose interior angles are all equal.
 
 For example, a hexagon is simply a polygon with 6 sides and an octagon
 is a polygon with 8 sides.
@@ -1420,6 +1421,13 @@ is a polygon with 8 sides.
     **HINT** Unlike the `Hexagon`_ shape, a Polygon can be rotated!
 
 The following examples show how a Polygon can be constructed.
+
+- `Example 1. Default Polygon`_
+- `Example 2. Polygon with Sides`_
+- `Example 3. Polygon with Radii`_
+- `Example 4. Polygon with Perbii`_
+- `Example 5. Polygon Rotation`_
+- `Example 6. Polygon Slices`_
 
 
 Example 1. Default Polygon
@@ -1477,8 +1485,8 @@ Example 2. Polygon with Sides
       asymmetrical; this can be adjusted through `rotation`_.
 ===== ======
 
-Example 3. Polygon Radii
-++++++++++++++++++++++++
+Example 3. Polygon with Radii
++++++++++++++++++++++++++++++
 `^ <polygon-command_>`_
 
 .. |pl2| image:: images/customised/polygon_radii.png
@@ -1664,7 +1672,9 @@ Example 6. Polygon Slices
 `^ <polygon-command_>`_
 
 Slices are a set of colors that are drawn as triangles inside a
-a Polygon in a clockwise direction starting from the "South East".
+a Polygon in a clockwise direction starting from the one that is at,
+or approximates, "North East".
+
 If there are fewer colors than all the possible triangles, then the
 colors are repeated, starting from the first one.
 
@@ -1689,6 +1699,7 @@ colors are repeated, starting from the first one.
       - *slices* - list of named colors that will be drawn
         seqentially
 ===== ======
+
 
 .. _polyshape-command:
 
@@ -3062,7 +3073,7 @@ as possible between its margins.
 Examples showing how the Grid can be styled are described below.
 
 - `Example 1. Defaults <gridDefaults_>`_
-- `Example 2. Side & Stroke <gridSide_>`_
+- `Example 2. Side, Stroke & Fill <gridSide_>`_
 - `Example 3. Fixed Size <gridFixed_>`_
 - `Example 4. Ignore Margins <gridMargins_>`_
 - `Example 5. Omit Edges <gridEdges_>`_
@@ -3095,8 +3106,8 @@ Example 1. Defaults
 
 .. _gridSide:
 
-Example 2. Side & Stroke
-++++++++++++++++++++++++
+Example 2. Side, Stroke & Fill
+++++++++++++++++++++++++++++++
 `↑ <grid-command_>`_
 
 .. |gr2| image:: images/customised/grid_gray.png
@@ -3110,6 +3121,7 @@ Example 2. Side & Stroke
 
           Grid(
             side=0.85,
+            fill="lightgray",
             stroke="gray",
             stroke_width=1)
 
@@ -3117,6 +3129,7 @@ Example 2. Side & Stroke
 
       - *side* - set to ``0.85`` cm (about 1/3 of an inch)
         which sets the size of both the x- and y-direction
+      - *fill* - set to ``lightgray`` for the grid's background color
       - *stroke_width* - set to ``1`` point; the thicker line makes the grid
         more visible
       - *stroke* - set to ``gray`` i.e. a lighter color than the default black
