@@ -43,6 +43,7 @@ class DirectionGroup(Enum):
     TRIANGULAR = 8
     TRIANGULAR_EDGES = 9
     POLYGONAL = 10
+    STAR = 11
 
 
 class ExportFormat(Enum):
@@ -79,6 +80,11 @@ Bounds = namedtuple(
         "bottom",
         "top",
     ],
+)
+
+CrossParts = namedtuple(
+    "CrossParts",
+    ["thickness", "half_thick", "arm", "body", "head"],
 )
 
 # track progress of a Deck print (front or back)
@@ -165,6 +171,33 @@ PageMarginsBase = namedtuple(
     ],
 )
 
+shape_fields = (
+    "name",
+    "radius",
+    "diameter",
+    "side",
+    "length",
+    "width",
+    "height",
+    "head",
+    "tail",
+)
+ShapeGeometry = namedtuple(
+    "ShapeGeometry", shape_fields, defaults=(None,) * len(shape_fields)
+)
+# template for use in Shape construction
+# return ShapeGeometry(
+#     name=self.simple_name(),
+#     radius=self.,
+#     diameter=self.,
+#     side=self.,
+#     length=self.,
+#     width=self.,
+#     height=self.,
+#     head=self.,
+#     tail=self.,
+# )
+
 
 class PageMargins(PageMarginsBase):
 
@@ -191,13 +224,15 @@ class PageMargins(PageMarginsBase):
 
 Place = namedtuple("Place", ["shape", "rotation"])
 
-Point = namedtuple("Point", ["x", "y"])  # maths term specifing position & direction
+Point = namedtuple("Point", ["x", "y"])
 
 PolyGeometry = namedtuple(
-    "PolyGeometry", ["x", "y", "radius", "side", "half_flat", "vertices"]
+    "PolyGeometry", ["x", "y", "radius", "side", "half_flat", "vertices", "sides"]
 )
 
-Ray = namedtuple("Ray", ["x", "y", "angle"])
+Ray = namedtuple(
+    "Ray", ["x", "y", "angle"]
+)  # maths term specifing position & direction
 
 ShapeProperties = namedtuple(
     "ShapeProperties",
@@ -283,7 +318,7 @@ class Perbis:
 
 @dataclass
 class Radius:
-    """Radius is the line from centre to circumference around a Shape"""
+    """Radius is the line from centre to circumference enclosing a Shape"""
 
     point: Point
     direction: str
@@ -299,6 +334,14 @@ class TemplatingType:
     template: Template
     function: object
     members: List
+
+
+@dataclass
+class Vertex:
+    """Vertext is a named point corresponding a vertex on a Shape"""
+
+    point: Point
+    direction: str
 
 
 @dataclass

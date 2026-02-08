@@ -49,9 +49,9 @@ Blueprint()
 Text(common=txt, text="Centred")
 shp_font = Common(font_size=6, stroke="red")
 Trapezoid(common=shp_font, cx=1, cy=5, heading="Trapezoid cx=1;cy=5")
-Rhombus(common=shp_font, cx=3, cy=5, heading="Rhombus cx=3;cy=5")
+Rhombus(common=shp_font, cx=3, cy=5, title="Rhombus cx=3;cy=5")
 Star(common=shp_font, cx=1, cy=3, heading="Star cx=1;cy=3")
-Ellipse(common=shp_font, cx=3, cy=3, width=2, height=1, heading="Ellipse cx=3;cy=3")
+Ellipse(common=shp_font, cx=3, cy=3, width=2, height=1, title="Ellipse cx=3;cy=3")
 Polygon(common=shp_font, cx=2, cy=1, radius=0.8, sides=7, heading="Polygon-7 cx2=;cy=1")
 PageBreak()
 
@@ -106,13 +106,16 @@ Sector(common=sctm, angle_start=280)
 PageBreak()
 
 # ---- grid
+Grid(side=0.85, stroke="gray", fill="lightgray", stroke_width=1)
 Text(common=txt, text='Grid: gray; 1/3"; thick')
-Grid(side=0.85, stroke="gray", stroke_width=1)
 PageBreak()
 
 # ---- dotgrid - Moleskin
 Text(common=txt, text='DotGrid: "Moleskine" setting')
-DotGrid(stroke="darkgray", width=0.5, height=0.5, dot_width=1, offset_y=0.25)
+DotGrid(stroke="darkgray",
+        x=0, y=0,
+        width=0.5, height=0.5, dot_width=1,
+        margin_fit=False) #, offset_y=0.25)
 PageBreak()
 
 # ---- dotgrid - rows & cols
@@ -167,7 +170,7 @@ crs = Common(height=1.8, width=1.2, arm_fraction=0.70)
 Cross(stroke_width=1, stroke="red", fill="gold")
 Cross(cx=3, cy=1, thickness=0.33, fill_stroke="red")
 Cross(cx=1, cy=3, common=crs,)
-Cross(cx=3, cy=3, common=crs,
+Cross(cx=3, cy=2.5, common=crs,
       title="Title", label="Label", heading="Heading")
 Cross(cx=3, cy=5, common=crs,
       dot=0.1, cross=0.5)
@@ -288,12 +291,43 @@ Polygon(cx=2, cy=3, sides=6, radius=1, label="Six")
 Polygon(cx=3, cy=1, sides=5, radius=1, label="Five")
 PageBreak()
 
-# ---- grid cols and rows
+# ---- grid - cols and rows
 Blueprint()
 Text(common=txt, text='Grid: gray; 3x4; thick')
 Grid(x=0.5, y=0.5, cols=3, rows=4, height=1.25, width=1,
      stroke="gray", stroke_width=1,
      heading="Heading", label="Label", title="Title")
+PageBreak()
+
+# ---- grid - ignore_margins
+Blueprint()
+Text(common=txt, text='Grid: ignore margins')
+Grid(x=0, y=0,
+     height=0.9, width=1,
+     stroke="gray", stroke_width=1,
+     margin_fit=False,
+     label="Grid Label")
+PageBreak()
+
+# ---- grid - omit edges
+Blueprint()
+Text(common=txt, text='Grid: omit edges')
+Grid(x=0.5, y=0.5, rows=3, cols=3,
+     side=0.5, stroke_width=0.5,
+     omit_left=True)
+Grid(x=2.5, y=0.5, rows=3, cols=3,
+     side=0.5, stroke_width=0.5,
+     omit_bottom=True)
+Grid(x=1.5, y=2.5, rows=3, cols=3,
+     side=0.5, stroke_width=0.5,
+     omit_outer=True)
+Grid(x=0.5, y=4.5, rows=3, cols=3,
+     side=0.5, stroke_width=0.5,
+     omit_top=True)
+Grid(x=2.5, y=4.5, rows=3, cols=3,
+     side=0.5, stroke_width=0.5,
+     omit_right=True)
+
 PageBreak()
 
 # ---- line - custom
@@ -334,9 +368,9 @@ Line(cx=1, cy=5, angle=135, length=2, stroke_width=1.5)
 Line(cx=3, cy=5, angle=315, length=2, stroke="red")
 PageBreak()
 
-# ---- line: connections
+# ---- line - connections: circle
 Blueprint(stroke_width=0.5)
-Text(common=txt, text="Line: connections")
+Text(common=txt, text="Line: connections; circles")
 cc = Circle(cx=2, cy=3, radius=0.5)
 cy = Circle(cx=1, cy=1, radius=0.5, fill_stroke="yellow")
 Line(connections=[cc, cy])
@@ -350,7 +384,18 @@ Line(connections=[cc, co])
 Line(connections=[cy, cr, co, ca, cy], stroke_width=2)
 PageBreak()
 
-# ---- line: connections - arrow
+# ---- line - connections: shapes
+Blueprint(stroke_width=0.5)
+Text(common=txt, text="Line: connections; shapes")
+s1 = Square(cx=1, cy=4, side=1, fill="yellow")
+s2 = Square(cx=3, cy=2, side=1)
+Line(
+    connections=[(s1, 'v', 'ne'), (s2, 'p', 'w')],
+    stroke="red",
+    stroke_width=2)
+PageBreak()
+
+# ---- line - connections - arrow
 Blueprint(stroke_width=0.5)
 Text(common=txt, text="Line: connections; arrow")
 cc = Circle(cx=1.5, cy=3.5, radius=0.5)
@@ -363,7 +408,7 @@ Line(connections=[cy, cc, co],
      )
 PageBreak()
 
-# ---- line: connections - dot&spoke
+# ---- line - connections - dot&spoke
 Blueprint(stroke_width=0.5)
 Text(common=txt, text="Line: connections; dot&spoke")
 cc = Dot(cx=1.5, cy=3.5, dot_width=2)
@@ -376,6 +421,53 @@ Line(connections=[cc, cr, co, ca],
      stroke_width=1,
      arrow=True,
      )
+PageBreak()
+
+# ---- line - centred shapes
+Blueprint(stroke_width=0.5)
+Text(common=txt, text='Line: centred shapes')
+crc = circle(radius=0.15)
+ttt = text("Aa", font_size=10)
+crs = cross(height=0.6, width=0.6)
+ell = ellipse(height=0.4, width=0.6)
+ply = polygon(side=0.2, sides=5)
+rho = rhombus(side=0.3)
+
+Line(x=0, y=0.5, length=1.5,
+     centre_shapes=[crc])
+Line(x=2, y=0.5, length=1.5,
+     centre_shapes=[ttt])
+Line(x=0, y=1.5, length=1.5,
+     centre_shapes=[crs])
+Line(x=2, y=1.5, length=1.5,
+     centre_shapes=[ply])
+Line(x=0, y=2.5, length=1.5,
+     centre_shapes=[ell])
+Line(x=2, y=2.5, length=1.5,
+     centre_shapes=[rho])
+
+Line(x=0, y=4, length=2,
+     angle=30,
+     centre_shapes=[crc],
+     centre_shapes_rotated =True)
+Line(x=2, y=4, length=2,
+     angle=30,
+     centre_shapes=[ttt],
+     centre_shapes_rotated =True)
+Line(x=0, y=5, length=2,
+     angle=30,
+     centre_shapes=[crs],
+     centre_shapes_rotated =True)
+Line(x=2, y=5, length=2, angle=30,
+     centre_shapes=[ply],
+     centre_shapes_rotated =True)
+Line(x=0, y=6, length=2, angle=30,
+     centre_shapes=[ell],
+     centre_shapes_rotated =True)
+Line(x=2, y=6, length=2,
+     angle=30,
+     centre_shapes=[rho],
+     centre_shapes_rotated =True)
 PageBreak()
 
 # ---- bezier - custom
@@ -716,9 +808,10 @@ Text(common=txt, text="Polyline: snail")
 snail_line = "n 3 e 2 -45 2 w 1 sw 3 **"
 Polyline(
     y=0.5,
-    snail="2 s 1 w 2 n 1",
-    stroke_width=2,
-    stroke="red")
+    snail="2 s 1 w 2 n 0.5",
+    stroke_width=1,
+    stroke="red",
+    arrow=True)
 Polyline(
     x=0, y=5,
     snail=snail_line,
@@ -1354,6 +1447,7 @@ PageBreak()
 # ---- END
 Text(common=txt, text="Shapes END...")
 
+# ---- SAVE
 #Save()
 Save(
      output='png',
@@ -1373,9 +1467,12 @@ Save(
         "stadium_red_rotation",
         "slices_rhombus",
         "polygon_rotation_flat",
-        "polygon_sizes", "grid_3x4",
+        "polygon_sizes",
+        "grid_3x4", "grid_ignore_margins", "grid_omit_edges",
         "line_custom", "line_centred",
-        "line_connections", "line_connections_arrow", "line_connections_spoke",
+        "line_connections_circle", "line_connections_shapes",
+        "line_connections_arrow", "line_connections_spoke",
+        "line_centre_shapes",
         "bezier_custom", "ellipse_custom", "rectangle_custom",
         "square_custom", "trapezoid_custom", "image_default",
         "descriptions", "label_offset",

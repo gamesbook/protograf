@@ -18,11 +18,7 @@ def get_color(name: str = None) -> tuple:
     if name is None:
         return None  # it IS valid to say that NO color has been set
     if isinstance(name, tuple) and len(name) == 3:  # RGB color tuple
-        if (
-            (name[0] >= 0 and name[0] <= 255)
-            and (name[1] >= 0 and name[0] <= 255)
-            and (name[2] >= 0 and name[0] <= 255)
-        ):
+        if all(0 <= x <= 255 for x in name):
             return name
         feedback(f'The color tuple "{name}" is invalid!')
     elif isinstance(name, str) and len(name) == 1:  # predefined hexadecimal

@@ -1,11 +1,38 @@
 protograf Changes
 =================
 
+2026-00-00 (0.4.2)
+------------------
+- [PLANNED] Enable Line connections to Ellipse shapes
+- [PLANNED] Enable text labels for snail lines
+- [PLANNED] Add code for DiamondLocations
+- [PLANNED] Add code to connect *Locations
+- [PLANNED] Examples: finalise script for New Classic Board Games
+- [PLANNED] Docs: list all props for Hex, Circle, Rectangle, Line
+
+2026-02-08 (0.4.1)
+------------------
+- Enable Line connections between non-Circle shapes
+- Enable Polyline connections between shapes
+- Add Kensington board example using connections
+- Updated Morabaraba board example to use connections
+- Add process flow diagram example
+- Refactor code to start using class properties
+- Bump development status to Beta
+- Added further error trapping
+- Remove Connect shape (replaced with Line connections)
+- Support arrows for snail-based Polylines
+- Allow Grid edges to be omitted
+- Allow Grid to have a fill
+- Fix Polygon rotation on vertex points
+- Fix connections between rotated shapes
+- Fix rotations with borders for affected shapes
+
 2026-01-11 (0.4.0)
 ------------------
 - Add shortcut letters for key colors
 - Increase Python requirement to 3.11
-- Update pyMuPDF to 1.26.7 (import changes!)
+- Update pyMuPDF to 1.26.7 (update import changes!)
 - Update various library dependencies
 - Add `wand` library (for image processing)
 - Add script to process counters
@@ -295,7 +322,7 @@ protograf Changes
 
 2024-02-04 (0.1.0a2)
 --------------------
-- Upgrade to Python 3.13
+- Upgrade to Python 3.10
 - Patch code for changes related to Python and library upgrades
 - Switch to using bgg-api library
 

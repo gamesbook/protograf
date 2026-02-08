@@ -15,7 +15,7 @@ Grid(
 )
 # handicap points
 DotGrid(
-    offset_x=4.5, offset_y=4.5,
+    x=3, y=3,
     side=6,
     cols=3, rows=3,
     dot_width=8

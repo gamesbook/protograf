@@ -328,6 +328,8 @@ class BaseCanvas:
         # if self.outlined:
         #     self.stroke = self.outline_stroke
         #     self.fill = None
+        self.blank_fill = self.defaults.get("blank_fill", None)
+        self.blank_stroke = self.defaults.get("blank_stroke", None)
         # ---- text box rectangle
         self.box_fill = self.defaults.get("box_fill", None)
         self.box_stroke = self.defaults.get("box_stroke", None)
@@ -462,6 +464,7 @@ class BaseCanvas:
         self.grouping_rows = self.defaults.get("grouping_rows", self.grouping)
         self.grouping_cols = self.defaults.get("grouping_cols", self.grouping)
         self.lines = self.defaults.get("lines", "all")  # which direction to draw
+        self.margin_fit = self.defaults.get("margin_fit", True)  # respect margin?
         # ---- HexHex grid
         self.rings = self.defaults.get("rings", 1)
         self.locations = self.defaults.get("locations", None)
@@ -567,6 +570,7 @@ class BaseCanvas:
         )
         # ---- shapes with centre (hex, circle, rect, rhombus, poly, ellipse, star, domino)
         self.centre_shapes = self.defaults.get("centre_shapes", [])
+        self.centre_shapes_rotated = self.defaults.get("centre_shapes_rotated", False)
         self.centre_shape = self.defaults.get("centre_shape", "")
         self.centre_shape_mx = self.defaults.get("centre_shape_mx", 0.0)
         self.centre_shape_my = self.defaults.get("centre_shape_my", 0.0)
@@ -958,6 +962,8 @@ class BaseShape:
         # if self.outlined:
         #     self.stroke = self.outline_stroke
         #     self.fill = None
+        self.blank_fill = kwargs.get("blank_fill", base.blank_fill)
+        self.blank_stroke = kwargs.get("blank_stroke", base.blank_stroke)
         # ---- text block
         self.box_stroke = kwargs.get("box_stroke", base.box_stroke)
         self.box_fill = kwargs.get("box_fill", base.box_fill)
@@ -1129,6 +1135,9 @@ class BaseShape:
             kwargs.get("grouping_cols", self.grouping), "grouping_cols"
         )
         self.lines = kwargs.get("lines", base.lines)
+        self.margin_fit = self.kw_bool(
+            kwargs.get("margin_fit", base.margin_fit)
+        )  # respect margin?
         # ---- HexHex grid
         self.rings = kwargs.get("rings", base.rings)
         self.locations = kwargs.get("locations", base.locations)
@@ -1247,6 +1256,10 @@ class BaseShape:
         # ---- shapes with centre hex, circle, rect, rhombus, poly, ellips, star, equtri
         self.centre_shapes = kwargs.get(
             "centre_shapes", kwargs.get("center_shapes", [])
+        )
+
+        self.centre_shapes_rotated = self.kw_bool(
+            kwargs.get("centre_shapes_rotated", base.centre_shapes_rotated)
         )
         self.centre_shape = kwargs.get("centre_shape", kwargs.get("center_shapes", ""))
         self.centre_shape_mx = self.kw_float(
@@ -1442,6 +1455,8 @@ class BaseShape:
                     # print(f'### Common {attr=} {base=} {type(base)=}')
                     common_attr = getattr(self.common, attr)
                     base_attr = getattr(base, attr)
+                    # if 'stroke' in attr in attr:
+                    #     print(f'### Common {attr=} {base_attr=} {common_attr=}')
                     if common_attr != base_attr:
                         setattr(self, attr, common_attr)
 
@@ -1456,7 +1471,7 @@ class BaseShape:
         except:
             return f"{self.__class__.__name__}"
 
-    def simple_name(self, shape_object: None) -> str:
+    def simple_name(self, shape_object: object = None) -> str:
         """Return user-friendly name for a shape."""
         try:
             if shape_object:
@@ -1474,8 +1489,8 @@ class BaseShape:
     def kw_int(self, value, label: str = ""):
         return tools.as_int(value, label) if value is not None else value
 
-    def kw_bool(self, value, label: str = ""):
-        return tools.as_bool(value, label) if value is not None else value
+    def kw_bool(self, value):
+        return tools.as_bool(value) if value is not None else value
 
     def unit(self, item, units: str = None, skip_none: bool = False, label: str = ""):
         """Convert an item into the appropriate unit system."""
@@ -2329,13 +2344,13 @@ class BaseShape:
         # if _dict.get('x'):
         #    self.x = _dict.get('x', 1)
 
-    def get_center(self) -> tuple:
-        """Attempt to get centre (x,y) tuple for a shape."""
+    def get_center(self) -> Point:
+        """Attempt to get centre for a shape."""
         if self.cx and self.cy:
-            return (self.cx, self.cy)
+            return Point(self.cx, self.cy)
         if self.x and self.y and self.width and self.height:
-            return (self.x + self.width / 2.0, self.y + self.height / 2.0)
-        return ()
+            return Point(self.x + self.width / 2.0, self.y + self.height / 2.0)
+        return None
 
     def get_bounds(self) -> Bounds:
         """Attempt to get bounds of Rectangle (or any Shape with height and width)."""
@@ -2396,12 +2411,38 @@ class BaseShape:
         except Exception as err:
             log.exception(err)
             feedback(
-                f'Unable to do unit conversion from "{value}" using {self.units}!', True
+                f'Unable to do units conversion from "{value}" using {self.units}!',
+                True,
             )
 
-    def _p2v(self, value: float):
-        """Internal wrapper around points_to_value()"""
-        return self.points_to_value(value, decimals=1)
+    def _p2v(self, value: float, decimals: int = 3):
+        """Convert point value to a rounded, units-based value using current units."""
+        try:
+            return round(float(value) / self.units, decimals)
+        except Exception as err:
+            log.exception(err)
+            feedback(
+                f'Unable to do units conversion from "{value}" using {self.units}!',
+                True,
+            )
+
+    def _l2v(self, values: list, decimals: int = 3):
+        """Convert Points to a rounded, units-based values using current units."""
+        try:
+            _values = [
+                Point(
+                    round(float(value.x) / self.units, decimals),
+                    round(float(value.y) / self.units, decimals),
+                )
+                for value in values
+            ]
+            return _values
+        except Exception as err:
+            log.exception(err)
+            feedback(
+                f'Unable to do units conversion from "{values}" using {self.units}!',
+                True,
+            )
 
     def values_to_points(self, items: list, units_name=None) -> list:
         """Convert a list of values to point units."""
@@ -2761,7 +2802,7 @@ class BaseShape:
             y = yh + self.unit(self.heading_my)
             x = xh + self.unit(self.heading_mx)
             kwargs["font_name"] = self.heading_font or self.font_name
-            kwargs["stroke"] = self.heading_stroke
+            kwargs["stroke"] = kwargs.get("heading_stroke", self.heading_stroke)
             kwargs["font_size"] = self.heading_size
             center_point = kwargs.get("rotation_point", None)
             if center_point and _rotation:
@@ -2811,7 +2852,7 @@ class BaseShape:
             y = yl + self.unit(self.label_my)
             x = xl + self.unit(self.label_mx)
             kwargs["font_name"] = self.label_font or self.font_name
-            kwargs["stroke"] = self.label_stroke
+            kwargs["stroke"] = kwargs.get("label_stroke", self.label_stroke)
             kwargs["font_size"] = self.label_size
             center_point = kwargs.get("rotation_point", None)
             if center_point and _rotation:
@@ -2852,7 +2893,7 @@ class BaseShape:
             y = yt + self.unit(self.title_my)
             x = xt + self.unit(self.title_mx)
             kwargs["font_name"] = self.title_font or self.font_name
-            kwargs["stroke"] = self.title_stroke
+            kwargs["stroke"] = kwargs.get("title_stroke", self.title_stroke)
             kwargs["font_size"] = self.title_size
             center_point = kwargs.get("rotation_point", None)
             if center_point and _rotation:
@@ -2959,8 +3000,8 @@ class BaseShape:
             steps = tools.sequence_split(
                 self.arrow_position,
                 unique=False,
-                as_int=False,
-                as_float=True,
+                to_int=False,
+                to_float=True,
                 msg=" for arrow_position",
             )
             for step in steps:
@@ -3111,7 +3152,7 @@ class BaseShape:
                 canvas.draw_circle((point.x, point.y), 1)
             self.set_canvas_props(cnv=canvas, index=None, **kwargs)
 
-    def draw_border(self, cnv, border: tuple, ID: int = None):
+    def draw_border(self, cnv, border: tuple, ID: int = None, **kwargs):
         """Draw a border line based its settings."""
         # feedback(f'### border {self.__class__.__name__} {border=} {ID=}')
         if not isinstance(border, tuple):
@@ -3261,6 +3302,13 @@ class BaseShape:
                             feedback(f"Cannot draw borders for a {shape_name}")
 
             # ---- draw line
+            # if rotation:
+            #     p1 = Point(x, y)
+            #     p2 = Point(x_1, y_1)
+            #     p_1 = geoms.rotate_point_around_point(p1, centre, rotation)
+            #     p_2 = geoms.rotate_point_around_point(p2, centre, rotation)
+            #     x, y = p_1.x, p_2.y
+            #     x_1, y_1 = p_2.x, p_2.y
             cnv.draw_line((x, y), (x_1, y_1))
             self.set_canvas_props(
                 index=ID,
@@ -3269,6 +3317,8 @@ class BaseShape:
                 # stroke_ends=bends, # TODO - allow this setting
                 dotted=dotted,
                 dashed=dashed,
+                rotation=kwargs.get("rotation", 0.0),
+                rotation_point=kwargs.get("rotation_point", None),
             )
 
     def can_draw_centred_shape(
@@ -3286,7 +3336,26 @@ class BaseShape:
             feedback(f"Cannot draw a centered {_name}!", True)
         return False
 
-    def draw_centred_shapes(self, centre_shapes: list, cx: float, cy: float):
+    @functools.cache
+    def get_circle_vertexes(self, directions, centre, radius) -> list:
+        """Get a list of vertexes where radii intersect the circumference"""
+        angles = tools.sequence_split(
+            directions,
+            unique=False,
+            to_int=False,
+            to_float=True,
+            sep=" ",
+            msg="",
+        )
+        vertexes = []
+        for angle in angles:
+            vtx = geoms.point_on_circle(centre, radius, angle)
+            vertexes.append(vtx)
+        return vertexes
+
+    def draw_centred_shapes(
+        self, centre_shapes: list, cx: float, cy: float, rotation: float = 0
+    ):
         """Draw one or more shapes with their centre at a Point.
 
         Args:
@@ -3303,9 +3372,11 @@ class BaseShape:
             else:
                 _shape = item
             if self.can_draw_centred_shape(_shape):
+                _rotation = rotation if self.centre_shapes_rotated is True else 0.0
                 _shape.draw(
                     _abs_cx=cx + self.unit(_shape_mx),
                     _abs_cy=cy + self.unit(_shape_my),
+                    rotation=_rotation,
                 )
 
     def draw_vertex_shapes(
@@ -3335,6 +3406,7 @@ class BaseShape:
         radii_shapes: list,
         vertexes: list,
         centre: Point,
+        radius: float = None,
         direction_group: DirectionGroup = None,
         rotation: float = 0.0,
         rotated: bool = False,
@@ -3362,41 +3434,29 @@ class BaseShape:
                 if True, rotate radii_shapes relative to centre
         """
 
-        @functools.cache
-        def get_circle_vertexes(directions, centre) -> list:
-            """Get a list of vertexes where radii intersect the circumference"""
-            angles = tools.sequence_split(
-                directions,
-                unique=False,
-                as_int=False,
-                as_float=True,
-                sep=" ",
-                msg="",
-            )
-            vertexes = []
-            radius = self._u.radius
-            for angle in angles:
-                vtx = geoms.point_on_circle(centre, radius, angle)
-                vertexes.append(vtx)
-            return vertexes
-
         err = "The radii_shapes must contain direction(s) and shape(s)"
         _shape_fraction = 1.0
         if direction_group != DirectionGroup.CIRCULAR:  # see below for calc.
-            radii_dict = self.calculate_radii(cnv, centre, vertexes)
+            radii_dict = self.calculate_radii(cnv, centre)
         for item in radii_shapes:
             _shape, _dirs = None, []
             if isinstance(item, tuple):
                 # ---- determine dirs for shape
                 _shape_fraction = 1.0
                 if len(item) < 2:
+                    if isinstance(item, BaseShape):
+                        _item = self.simple_name(item)
+                    else:
+                        _item = item
                     feedback(f"{err} - not {item}", True)
                 if direction_group == DirectionGroup.CIRCULAR:
-                    vertexes = get_circle_vertexes(item[0], centre)
+                    vertexes = self.get_circle_vertexes(item[0], centre, radius)
                     radii_dict = self.calculate_radii(cnv, centre, vertexes)
                     _dirs = radii_dict.keys()
                 elif direction_group == DirectionGroup.POLYGONAL:
-                    _dirs = [int(item[0]) - 1]
+                    _dirs = tools.validated_directions(
+                        item[0], direction_group, "direction"
+                    )
                 else:
                     _dirs = tools.validated_directions(
                         item[0], direction_group, "direction"
@@ -3405,12 +3465,21 @@ class BaseShape:
                 if len(item) >= 3:
                     _shape_fraction = tools.as_float(item[2], "fraction")
             else:
-                feedback(f"{err} - not {item}.", True)
+                if isinstance(item, BaseShape):
+                    _item = self.simple_name(item)
+                else:
+                    _item = item
+                feedback(f"{err} - not {_item}.", True)
             # print(f"*** radii_shapes {item=} {type(item)=}")
             self.can_draw_centred_shape(_shape, True)  # could stop here
+            # print(f"*** radii_shapes :::\n {radii_dict=} {_dirs=}")
             for _dir in _dirs:
                 # ---- calculate shape centre
-                _radii = radii_dict[_dir]
+                _radii = radii_dict.get(_dir)
+                if not _radii:
+                    feedback(
+                        f'There is no radius corresponding to direction "{_dir}"', True
+                    )
                 if _shape_fraction <= 1.0:
                     shape_centre = geoms.fraction_along_line(
                         centre, _radii.point, _shape_fraction
@@ -3434,6 +3503,7 @@ class BaseShape:
                 else:
                     _rotation = rotation
                 # ---- draw radii shape
+                # print(f"*** draw shape {shape_centre.x=} {shape_centre.y=} {_rotation=}")
                 _shape.draw(
                     _abs_cx=shape_centre.x,
                     _abs_cy=shape_centre.y,
@@ -3446,6 +3516,7 @@ class BaseShape:
         perbii_shapes: list,
         vertexes: list,
         centre: Point,
+        radius: float = None,
         direction_group: DirectionGroup = None,
         rotation: float = 0.0,
         rotated: bool = False,
@@ -3473,29 +3544,10 @@ class BaseShape:
                 if True, rotate perbii_shapes relative to centre
         """
 
-        @functools.cache
-        def get_circle_vertexes(directions, centre) -> list:
-            """Get a list of vertexes where perbii intersect the circumference"""
-            angles = tools.sequence_split(
-                directions,
-                unique=False,
-                as_int=False,
-                as_float=True,
-                sep=" ",
-                msg="",
-            )
-            vertexes = []
-            radius = self._u.radius
-            for angle in angles:
-                vtx = geoms.point_on_circle(centre, radius, angle)
-                vertexes.append(vtx)
-            return vertexes
-
         err = "The perbii_shapes must contain direction(s) and shape"
         _dirs, _shape, _shape_fraction = [], None, 1.0
         if direction_group != DirectionGroup.CIRCULAR:  # see below for calc.
-            perbii_dict = self.calculate_perbii(cnv, centre, vertexes)
-
+            perbii_dict = self.calculate_perbii(centre)
         for item in perbii_shapes:
             if isinstance(item, tuple):
                 # ---- determine dirs for shape
@@ -3503,11 +3555,13 @@ class BaseShape:
                 if len(item) < 2:
                     feedback(f"{err} - not {item}")
                 if direction_group == DirectionGroup.CIRCULAR:
-                    vertexes = get_circle_vertexes(item[0], centre)
-                    perbii_dict = self.calculate_perbii(cnv, centre, vertexes)
+                    # vertexes = self.get_circle_vertexes(item[0], centre, radius)
+                    perbii_dict = self.calculate_perbii(centre)
                     _dirs = perbii_dict.keys()
                 elif direction_group == DirectionGroup.POLYGONAL:
-                    _dirs = [tools.as_int(item[0], "perbii_shapes direction") - 1]
+                    _dirs = tools.validated_directions(
+                        item[0], direction_group, "direction"
+                    )
                 else:
                     _dirs = tools.validated_directions(
                         item[0], direction_group, "direction"

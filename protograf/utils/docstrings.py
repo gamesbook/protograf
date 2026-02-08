@@ -26,6 +26,7 @@ Example Usage:
 
 
 def docstring_base(func):
+    """Docstring decoration for base shapes."""
     func.__doc__ = func.__doc__.replace(
         "<base>",
         """- x (float): the left-most edge of the shape; defaults to 1
@@ -45,6 +46,7 @@ def docstring_base(func):
 
 
 def docstring_loc(func):
+    """Docstring decoration for location shapes."""
     func.__doc__ = func.__doc__.replace(
         "<loc>",
         """- x (float): the left-most edge of the shape; defaults to 1
@@ -54,6 +56,7 @@ def docstring_loc(func):
 
 
 def docstring_card(func):
+    """Docstring decoration for card shapes."""
     func.__doc__ = func.__doc__.replace(
         "<card>",
         """- The first argument must be an expression that can be evaulated to
@@ -69,6 +72,7 @@ def docstring_card(func):
 
 
 def docstring_area(func):
+    """Docstring decoration for area-shapes."""
     func.__doc__ = func.__doc__.replace(
         "<area>",
         """- fill (str): the named or hexadecimal color of shape's area;
@@ -80,6 +84,7 @@ def docstring_area(func):
 
 
 def docstring_center(func):
+    """Docstring decoration for shapes."""
     func.__doc__ = func.__doc__.replace(
         "<center>",
         """- x (float): the left-most edge of the shape; defaults to 1
@@ -120,6 +125,7 @@ def docstring_center(func):
 
 
 def docstring_onimo(func):
+    """Docstring decoration for -omino shapes."""
     func.__doc__ = func.__doc__.replace(
         "<onimo>",
         """- invert (str): can either be ``leftright`` (``lr``) or ``topbottom``

@@ -44,7 +44,6 @@ from .shapes import (
     LineShape,
     QRCodeShape,
     PodShape,
-    PolygonShape,
     PolylineShape,
     RhombusShape,
     SectorShape,
@@ -59,6 +58,7 @@ from .shapes import (
 )
 from .shapes_circle import CircleShape
 from .shapes_hexagon import HexShape
+from .shapes_polygon import PolygonShape
 from .shapes_rectangle import RectangleShape
 from .objects import (
     CubeObject,
@@ -73,15 +73,14 @@ from .layouts import (
     GridShape,
     DotGridShape,
     HexHexShape,
-    RectangularLocations,
-    TriangularLocations,
+    RectangularLocations,  # used in user scripts
+    TriangularLocations,  # used in user scripts
     VirtualLocations,
-    ConnectShape,
     RepeatShape,
     SequenceShape,
     TableShape,
 )
-from .globals import unit
+from .globals import unit  # used in scripts
 from .groups import Switch, Lookup  # used in scripts
 from ._version import __version__
 
@@ -260,6 +259,7 @@ class CardShape(BaseShape):
         self, the_function, new_eles, cnv, off_x, off_y, ID, cid, **kwargs
     ):
         """Draw a list of elements created via a Template or Card function call."""
+        # feedback(f"$$$ CardShape elements  {new_eles}")
         for the_new_ele in new_eles:
             try:
                 if isinstance(the_new_ele, GroupBase):
@@ -283,6 +283,21 @@ class CardShape(BaseShape):
 
         Pass on `deck_data` to other commands, as needed, for them to draw Shapes
         """
+
+        def draw_element(new_ele, cnv, off_x, off_y, ID, **kwargs):
+            """Allow customisation of kwargs before call to Shape's draw()."""
+            # print(f'$$$ draw_element {ID=} {type(new_ele)=}')
+            if isinstance(
+                new_ele, (SequenceShape, RepeatShape, GridShape, DotGridShape)
+            ):
+                new_ele.deck_data = self.deck_data
+                kwargs["card_width"] = self.width
+                kwargs["card_height"] = self.height
+                kwargs["card_x"] = base_frame_bbox.tl.x
+                kwargs["card_y"] = base_frame_bbox.tl.y
+
+            new_ele.draw(cnv, off_x, off_y, ID, **kwargs)
+
         # feedback(f'\n$$$ draw_card  {cid=} {row=} {col=} {self.elements=}')
         # feedback(f'$$$ draw_card  {cid=} KW=> {kwargs}')
         is_card_back = kwargs.get("card_back", False)
@@ -298,10 +313,10 @@ class CardShape(BaseShape):
             shape_kwargs["fill"] = kwargs.get("fill", kwargs.get("bleed_fill", None))
         shape_kwargs.pop("image_list", None)  # do NOT draw linked image
         shape_kwargs.pop("image", None)  # do NOT draw get_outline(linked image
-        # feedback(f'$$$ draw_card)() {cid=} {row=} {col=} \nKW=> {shape_kwargs}')
         outline = self.outline_shape.get_outline(
             cnv=cnv, row=row, col=col, cid=cid, label=label, **shape_kwargs
         )
+        # feedback(f'$$$ draw_card {cid=} {row=} {col=} {outline._o=}') # KW=> {shape_kwargs}
 
         # ---- custom geometry
         if kwargs["frame_type"] == CardFrame.HEXAGON:
@@ -330,13 +345,15 @@ class CardShape(BaseShape):
         # ---- track frame outlines for possible image extraction
         match kwargs["frame_type"]:
             case CardFrame.RECTANGLE:
-                _vertices = outline.get_vertexes()  # clockwise from bottom-left
+                _vertices = outline._shape_vertexes  # clockwise from bottom-left
                 base_frame_bbox = BBox(tl=_vertices[0], br=_vertices[2])
             case CardFrame.CIRCLE:
                 base_frame_bbox = outline.bbox
             case CardFrame.HEXAGON:
-                _vertices = outline.get_vertexes()  # anti-clockwise from mid-left
+                _vertices = outline._shape_vertexes  # anti-clockwise from mid-left
                 # print(f"$$$ HEXAGON {_vertices=}")
+                # _vvs = self._l2v(_vertices)
+                # for i,v in enumerate(_vvs): print(f'$$$ HEX-V {i=} {v=}')
                 #   5__4
                 #   /  \
                 # 0/    \3
@@ -388,7 +405,7 @@ class CardShape(BaseShape):
                 if row & 1:  # odd row
                     if is_card_back:
                         _dx = _dx + side - outline.spacing_x
-                        # print('HEX ODD BACK {_dx=}')
+                        # print('$$$ HEX ODD BACK {_dx=}')
                     else:
                         _dx = _dx + side + outline.spacing_x
             case _:
@@ -469,10 +486,19 @@ class CardShape(BaseShape):
                 # ---- * normal element
                 iid = members.index(cid + 1)
                 new_ele = self.handle_custom_values(flat_ele, cid)  # calculated values
-                # feedback(f'$$$ CS draw_card ele $$$ {new_ele=}')
-                # breakpoint()
-                if isinstance(new_ele, (SequenceShape, RepeatShape)):
+                # feedback(f'$$$ CS draw_card ele $$$ {type(new_ele)=}')
+                if isinstance(
+                    new_ele, (SequenceShape, RepeatShape, GridShape, DotGridShape)
+                ):
                     new_ele.deck_data = self.deck_data
+                    kwargs["card_width"] = self.width
+                    kwargs["card_height"] = self.height
+                    kwargs["card_x"] = base_frame_bbox.tl.x
+                    kwargs["card_y"] = base_frame_bbox.tl.y
+                    draw_element(
+                        new_ele=new_ele, cnv=cnv, off_x=_dx, off_y=_dy, ID=iid, **kwargs
+                    )
+                    cnv.commit()
                 elif isinstance(new_ele, TemplatingType):
                     # convert Template into a string via render
                     card_value = self.deck_data[iid]
@@ -511,7 +537,7 @@ class CardShape(BaseShape):
                             _one_or_more_eles = new_ele(card_values_tuple) or []
                         except Exception as err:
                             feedback(
-                                f"Unable to create card #{cid + 1}. (Error: {err})",
+                                f"Unable to create card #{cid + 1}. (Error:- {err})",
                                 True,
                             )
                         if isinstance(_one_or_more_eles, list):
@@ -536,7 +562,14 @@ class CardShape(BaseShape):
                             **kwargs,
                         )
                     else:
-                        new_ele.draw(cnv=cnv, off_x=_dx, off_y=_dy, ID=iid, **kwargs)
+                        draw_element(
+                            new_ele=new_ele,
+                            cnv=cnv,
+                            off_x=_dx,
+                            off_y=_dy,
+                            ID=iid,
+                            **kwargs,
+                        )
                         cnv.commit()
             except AttributeError:
                 # ---- * switch ... get a new element ... or not!?
@@ -557,8 +590,13 @@ class CardShape(BaseShape):
                             if isinstance(custom_new_ele, (SequenceShape, RepeatShape)):
                                 custom_new_ele.deck_data = self.deck_data
                             # feedback(f'$$$ draw_card $$$ {self.shape_id=} {custom_new_ele=}')
-                            custom_new_ele.draw(
-                                cnv=cnv, off_x=_dx, off_y=_dy, ID=iid, **kwargs
+                            draw_element(
+                                new_ele=custom_new_ele,
+                                cnv=cnv,
+                                off_x=_dx,
+                                off_y=_dy,
+                                ID=iid,
+                                **kwargs,
                             )
                             cnv.commit()
                 except Exception as err:
@@ -782,7 +820,7 @@ class DeckOfCards:
                 dpi=self.dpi,
                 directory=directory or self.directory,
                 frames=globals.card_frames,
-                page_height=globals.page[1],
+                # page_height=globals.page[1],
             )
 
     def draw(self, cnv=None, off_x=0, off_y=0, ID=None, **kwargs):
@@ -925,7 +963,7 @@ class DeckOfCards:
                     _check = tools.eval_template(
                         self.mask, self.dataset[card_num], label="mask"
                     )
-                    mask = tools.as_bool(_check, label="mask", allow_none=False)
+                    mask = tools.as_bool(_check, allow_none=False)
                     if not isinstance(mask, bool):
                         feedback(
                             'The "mask" test must result in True or False value!', True
@@ -1767,7 +1805,7 @@ def Extract(pages: object, **kwargs):
     tl_y = tools.as_float(kwargs.get("y", 1), "y")
     gap_x = tools.as_float(kwargs.get("x_gap", 0), "x_gap")
     gap_y = tools.as_float(kwargs.get("y_gap", 0), "y_gap")
-    repeat = tools.as_bool(kwargs.get("repeat", False), "repeat")
+    repeat = tools.as_bool(kwargs.get("repeat", False))
     cards = True if (height and width) else False
     if (cols_rows and areas and cards) or (not areas and not cols_rows and not cards):
         feedback(
@@ -2069,7 +2107,7 @@ def Save(**kwargs):
         dpi=300,  # ??? FIXME
         directory=directory or globals.directory,
         frames=globals.extracts,
-        page_height=globals.page[1],
+        # page_height=globals.page[1],
     )
 
     # ---- reset key globals to allow for new Deck()
@@ -2300,6 +2338,14 @@ def Card(sequence: object = None, *elements, **kwargs):
                 feedback(
                     f'Cannot use the string "{element}" for a Card or CardBack.', True
                 )
+            elif isinstance(element, BaseShape):
+                name = element.simple_name()
+                feedback(f'Cannot use a "{name}" shape for a Card or CardBack.', True)
+            elif isinstance(element, list):
+                feedback(
+                    "Cannot use a list for a Card or CardBack; try the group command.",
+                    True,
+                )
             else:
                 feedback(f'Cannot use "{element}" for a Card or CardBack.', True)
 
@@ -2352,7 +2398,14 @@ def Card(sequence: object = None, *elements, **kwargs):
             feedback(
                 f'Unable to convert "{sequence}" into a card or range of cards {globals.deck}.'
             )
+    max_cards = len(globals.deck.fronts)
     for index, _card in enumerate(_cards):
+        if _card > max_cards:
+            feedback(
+                f"There are {max_cards} cards in the deck;"
+                f" a reference to card #{_card} is not valid.",
+                True,
+            )
         card = globals.deck.fronts[_card - 1]  # cards internally number from ZERO
         if card:
             for element in elements:
@@ -2430,9 +2483,14 @@ def CardBack(sequence: object = None, *elements, **kwargs):
             feedback(
                 f'Unable to convert "{sequence}" into a cardback or range of cardbacks {globals.deck}.'
             )
+    max_backs = len(globals.deck.backs)
     for index, _back in enumerate(_cardbacks):
-        if _back - 1 >= len(globals.deck.backs):
-            feedback("Number of CardBacks cannot exceed number of Cards!", True)
+        if _back > max_backs:
+            feedback(
+                f"There are {max_backs} card backs in the deck;"
+                f" a reference to card #{_back} is not valid.",
+                True,
+            )
         cardback = globals.deck.backs[_back - 1]  # cards internally number from ZERO
         if cardback:
             for element in elements:
@@ -2610,7 +2668,7 @@ def Data(**kwargs):
     data_list = kwargs.get("data_list", None)  # list-of-lists
     images = kwargs.get("images", None)  # directory
     images_filter = kwargs.get("images_filter", "")  # e.g. .png
-    image_filter_list = tools.sequence_split(images_filter, False, True)
+    image_filter_list = tools.sequence_split(images_filter, to_int=False, unique=True)
     source = kwargs.get("source", None)  # dict
     google_sheet = kwargs.get("google_sheet", None)  # Google Sheet
     debug = kwargs.get("debug", False)
@@ -3851,6 +3909,10 @@ def DotGrid(**kwargs):
     return dgrd
 
 
+def dotgrid(row=None, col=None, **kwargs):
+    return DotGridShape(**kwargs)
+
+
 @docstring_loc
 def Grid(**kwargs):
     """Draw a lined grid on the canvas.
@@ -3869,6 +3931,10 @@ def Grid(**kwargs):
     return grid
 
 
+def grid(row=None, col=None, **kwargs):
+    return GridShape(**kwargs)
+
+
 @docstring_loc
 def HexHex(**kwargs):
     """Draw a hexhex-based layout on the canvas.
@@ -3883,6 +3949,10 @@ def HexHex(**kwargs):
     # feedback(f' \\\ HexHex {kwargs=}')
     hhgrid.draw()
     return hhgrid
+
+
+def hexhex(row=None, col=None, **kwargs):
+    return HexHex(canvas=globals.canvas, **kwargs)
 
 
 def Blueprint(**kwargs):
@@ -3932,8 +4002,6 @@ def Blueprint(**kwargs):
         feedback('The "common" property cannot be used with a Blueprint.', True)
     kwargs["units"] = kwargs.get("units", globals.units)
     side = 1.0
-    if kwargs["units"] == unit.inch:
-        side = 0.5
     decimals = tools.as_int(kwargs.get("decimals", 0), "Blueprint decimals")
     # override defaults ... otherwise grid not "next" to margins
     numbering = kwargs.get("numbering", True)
@@ -4075,37 +4143,6 @@ def Blueprint(**kwargs):
     return grid
 
 
-# ---- connect ====
-
-
-def Connect(shape_from, shape_to, **kwargs):
-    """Connect two shapes on the canvas.
-
-    Args:
-
-    - row (int): row in which the shape is drawn.
-    - col (int): column in which the shape is drawn.
-
-    Kwargs:
-
-    <base>
-
-    """
-    kwargs = margins(**kwargs)
-    kwargs["shape_from"] = shape_from
-    kwargs["shape_to"] = shape_to
-    connect = ConnectShape(canvas=globals.canvas, **kwargs)
-    connect.draw(cnv=globals.canvas)
-    return connect
-
-
-def connect(shape_from, shape_to, **kwargs):
-    kwargs = margins(**kwargs)
-    kwargs["shape_from"] = shape_from
-    kwargs["shape_to"] = shape_to
-    return ConnectShape(canvas=globals.canvas, **kwargs)
-
-
 # ---- layouts ====
 
 
@@ -4214,10 +4251,10 @@ def Hexagons(rows=1, cols=1, sides=None, **kwargs):
         for ccol in the_cols:
             top_row = top_row + 1 if ccol & 1 != 0 else top_row  # odd col
             end_row = end_row - 1 if ccol & 1 == 0 else end_row  # even col
-            # print('ccol, top_row, end_row', ccol, top_row, end_row)
+            # print('$$$ ccol, top_row, end_row', ccol, top_row, end_row)
             for row in range(top_row - 1, end_row + 1):
                 _row = row + 1
-                # feedback(f'{ccol=}, {_row=}')
+                # feedback(f'$$$ Hexagons {ccol=}, {_row=}')
                 if hidden and (_row, ccol) in hidden:
                     pass
                 else:
@@ -4491,7 +4528,7 @@ def LinkLine(grid: list, locations: Union[list, str], **kwargs):
     """Enable a line link between one or more locations in a grid."""
     kwargs = kwargs
     if isinstance(locations, str):  # should be a comma-delimited string
-        locations = tools.sequence_split(locations, False, False)
+        locations = tools.sequence_split(locations, to_int=False, unique=False)
     if not isinstance(locations, list):
         feedback(f"'{locations} is not a list - please check!", True)
     if len(locations) < 2:
@@ -4823,7 +4860,7 @@ def Track(track=None, **kwargs):
     if track_name == "CircleShape":
         if not angles or not isinstance(angles, list) or len(angles) < 2:
             feedback(
-                f"A list of 2 or more angles is needed for a Circle-based Track!", True
+                "A list of 2 or more angles is needed for a Circle-based Track!", True
             )
     elif track_name in ["SquareShape", "RectangleShape"]:
         angles = track.get_angles()
@@ -4861,7 +4898,7 @@ def Track(track=None, **kwargs):
             )
     else:
         # ---- get normal vertices and angles
-        vertices = track.get_vertexes()
+        vertices = track._shape_vertexes
         angles = [0] * len(vertices) if not angles else angles  # Polyline-> has none!
         for key, vertex in enumerate(vertices):
             track_points.append(Ray(vertex.x, vertex.y, angles[key]))
@@ -4905,20 +4942,20 @@ def Track(track=None, **kwargs):
             "theta": track_point.angle,
             "count": index + 1,
         }
-        # feedback(f'*Track* {index=} {data=}')
+        # feedback(f'$$$ Track {index=} {data=}')
         # format_label(shape, data)
         # ---- supply data to change shape's location
         # TODO - can choose line centre, not vertex, as the cx,cy position
         shape.cx = shape.points_to_value(track_point.x - track._o.delta_x)
         shape.cy = shape.points_to_value(track_point.y - track._o.delta_y)
-        # feedback(f'\n*Track* {track_name=} {shape.cx=}, {shape.cy=}')
+        # feedback(f'\n $$$ Track {track_name=} {shape.cx=}, {shape.cy=}')
         if _rotation_style:
             match _rotation_style:
                 case "i" | "inwards":
                     if track_name == "CircleShape":
                         shape_rotation = 90 + track_point.angle
                     elif track_name == "PolygonShape":
-                        shape_rotation = 90 - track_point.angle
+                        shape_rotation = 90 + track_point.angle
                     else:
                         shape_rotation = 90 - track_point.angle
                 case "o" | "outwards":
@@ -4927,7 +4964,14 @@ def Track(track=None, **kwargs):
                     elif track_name in ["SquareShape", "RectangleShape"]:
                         shape_rotation = 270 - track_point.angle
                     elif track_name == "PolygonShape":
-                        shape_rotation = 270 - track_point.angle
+                        shape_rotation = 270 + track_point.angle
+                    else:
+                        shape_rotation = 90 - track_point.angle
+                case "f" | "flow" | "follow":
+                    if track_name == "CircleShape":
+                        shape_rotation = 90 + track_point.angle
+                    elif track_name == "PolygonShape":
+                        shape_rotation = track_point.angle
                     else:
                         shape_rotation = 90 - track_point.angle
                 case _:
@@ -4946,6 +4990,8 @@ def Track(track=None, **kwargs):
             page=globals.page_count + 1,
         )
         _locale = locale._asdict()
+        # print(f'$$$ Track {type(shape)=} {shape_rotation=}')
+        # print(f'$$$ Track x,y={track._p2v(locale.x)},{track._p2v(locale.y)})')
         shape.draw(cnv=globals.canvas, rotation=shape_rotation, locale=_locale)
         shape_id += 1
         if shape_id > len(shapes) - 1:
@@ -4967,7 +5013,7 @@ def BGG(
     ckwargs = {}
     # ---- self filters
     if kwargs.get("own") is not None:
-        ckwargs["own"] = tools.as_bool(kwargs.get("pwn"))
+        ckwargs["own"] = tools.as_bool(kwargs.get("own"))
     if kwargs.get("rated") is not None:
         ckwargs["rated"] = tools.as_bool(kwargs.get("rate"))
     if kwargs.get("played") is not None:

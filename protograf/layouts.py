@@ -21,14 +21,7 @@ from protograf.utils.structures import (
 from protograf.utils import geoms, tools, support
 from protograf.utils.tools import _lower
 from protograf.base import BaseShape, BaseCanvas
-from protograf.shapes import (
-    # CircleShape,
-    LineShape,
-    # PolygonShape,
-    PolylineShape,
-    # RectangleShape,
-    TextShape,
-)
+from protograf.shapes import TextShape
 from protograf.shapes_hexagon import HexShape
 
 log = logging.getLogger(__name__)
@@ -38,9 +31,9 @@ DEBUG = False
 # ---- BaseShape-derived
 
 
-class GridShape(BaseShape):
+class GridBase(BaseShape):
     """
-    Grid on a given canvas.
+    Base functionality for a drawing grid-like shapes on a given canvas.
     """
 
     def __init__(self, _object=None, canvas=None, **kwargs):
@@ -50,36 +43,100 @@ class GridShape(BaseShape):
             self.use_side = True
             if "width" in kwargs or "height" in kwargs:
                 self.use_side = False
+        self.y_cols, self.x_cols = [], []
+        self.start_x, self.start_y = 0.0, 0.0  # top-left corner of grid
+        # edge settings
+        omit_a = tools.as_bool(kwargs.get("omit_all", False))
+        omit_b = tools.as_bool(kwargs.get("omit_outer", False))
+        omit_c = tools.as_bool(kwargs.get("omit_edges", False))
+        self.omit_all = True if (omit_a or omit_b or omit_c) else False
+        self.omit_top = tools.as_bool(kwargs.get("omit_top", False))
+        self.omit_bottom = tools.as_bool(kwargs.get("omit_bottom", False))
+        self.omit_left = tools.as_bool(kwargs.get("omit_left", False))
+        self.omit_right = tools.as_bool(kwargs.get("omit_right", False))
 
     def draw(self, cnv=None, off_x=0, off_y=0, ID=None, **kwargs):
         """Draw a grid on a given canvas."""
         kwargs = self.kwargs | kwargs
         cnv = cnv if cnv else self.canvas
         super().draw(cnv, off_x, off_y, ID, **kwargs)  # unit-based props
-        # ---- convert to using units
-        x = self._u.x + self._o.delta_x
-        y = self._u.y + self._o.delta_y
-        height = self._u.height  # of each grid item
-        width = self._u.width  # of each grid item
+        # ---- set x,y and calculate space available
+        # print(f'\n~~~ GridBase {ID=} {off_x=} {self._u.x=}  {self._o.delta_x=} ')
+        # print(f'~~~ GridBase {ID=} {off_y=} {self._u.y=}  {self._o.delta_y=} ')
+        space_bottom = 0
+        space_right = 0
+        if ID is None:  # being used on a page - absolute offset
+            self.start_x = self._u.x + self._o.delta_x
+            self.start_y = self._u.y + self._o.delta_y
+            max_width = self.page_width
+            max_height = self.page_height
+            if self.margin_fit:
+                space_bottom = self._u.margin_bottom
+                space_right = self._u.margin_right
+            else:
+                self.start_x = self._u.x
+                self.start_y = self._u.y
+            offset_x, offset_y = self.start_x, self.start_y
+        else:  # being used on a card - x,y are relative offset - no margins
+            # see proto/draw_element() function for these kwargs settings
+            self.start_x = kwargs.get("card_x", 0) + self._u.x
+            self.start_y = kwargs.get("card_y", 0) + self._u.y
+            max_width = self.unit(kwargs.get("card_width", 0))
+            max_height = self.unit(kwargs.get("card_height", 0))
+            offset_x, offset_y = 0, 0
+            # print(f'\n~~~ GridBase-card {ID=} {self.start_x=} {self.start_y=}')
+            # print(f'\n~~~ GridBase-card {ID=} {max_width=} {max_height=}')
+
+        self.height = self._u.height  # of each grid item
+        self.width = self._u.width  # of each grid item
         if self.side and self.use_side:  # square grid
             side = self.unit(self.side)
-            height, width = side, side
-        # ---- number of blocks in grid:
+            self.height, self.width = side, side
+        # ---- number of blocks in grid
+        bonus = 1 if isinstance(self, DotGridShape) else 0
         if self.rows == 0:
-            self.rows = int(
-                (self.page_height - self.margin_bottom - self.margin_top)
-                / self.points_to_value(height)
+            self.rows = (
+                int((max_height - space_bottom - offset_y) / self.height) + bonus
             )
         if self.cols == 0:
-            self.cols = int(
-                (self.page_width - self.margin_left - self.margin_right)
-                / self.points_to_value(width)
-            )
-        y_cols, x_cols = [], []
+            self.cols = int((max_width - space_right - offset_x) / self.width) + bonus
+        # print(f'~~~ GridBase {self.rows=} {self.cols=} {self.width=} {self.height=}')
         for y_col in range(0, self.rows + 1):
-            y_cols.append(y + y_col * height)
+            self.y_cols.append(self.start_y + y_col * self.height)
         for x_col in range(0, self.cols + 1):
-            x_cols.append(x + x_col * width)
+            self.x_cols.append(self.start_x + x_col * self.width)
+
+
+class GridShape(GridBase):
+    """
+    Grid on a given canvas.
+    """
+
+    def draw(self, cnv=None, off_x=0, off_y=0, ID=None, **kwargs):
+        """Draw a grid on a given canvas."""
+        kwargs = self.kwargs | kwargs
+        cnv = cnv if cnv else self.canvas
+        super().draw(cnv, off_x, off_y, ID, **kwargs)  # unit-based props
+        # ---- fill
+        if kwargs.get("fill"):
+            gwargs = copy.copy(kwargs)
+            gwargs["stroke"] = None
+            gwidth = self.width * (len(self.x_cols) - 1)
+            gheight = self.height * (len(self.y_cols) - 1)
+            cnv.draw_rect(
+                (
+                    self.start_x,
+                    self.start_y,
+                    self.start_x + gwidth,
+                    self.start_y + gheight,
+                )
+            )
+            self.set_canvas_props(  # shape.finish()
+                cnv=cnv,
+                index=ID,
+                **gwargs,
+            )
+            cnv.commit()
         # ---- draw grid
         match kwargs.get("lines"):
             case "horizontal" | "horiz" | "h":
@@ -89,11 +146,28 @@ class GridShape(BaseShape):
             case _:
                 horizontal, vertical = True, True
         if vertical:
-            for x in x_cols:
-                cnv.draw_line(Point(x, y_cols[0]), Point(x, y_cols[-1]))
+            for col_no, x in enumerate(self.x_cols):
+                skip = False
+                if col_no == 0 and (self.omit_all or self.omit_left):
+                    skip = True
+                if col_no == len(self.x_cols) - 1 and (
+                    self.omit_all or self.omit_right
+                ):
+                    skip = True
+                if not skip:
+                    cnv.draw_line(Point(x, self.y_cols[0]), Point(x, self.y_cols[-1]))
         if horizontal:
-            for y in y_cols:
-                cnv.draw_line(Point(x_cols[0], y), Point(x_cols[-1], y))
+            for row_no, y in enumerate(self.y_cols):
+                skip = False
+                if row_no == 0 and (self.omit_all or self.omit_top):
+                    skip = True
+                if row_no == len(self.y_cols) - 1 and (
+                    self.omit_all or self.omit_bottom
+                ):
+                    skip = True
+                if not skip:
+                    cnv.draw_line(Point(self.x_cols[0], y), Point(self.x_cols[-1], y))
+        kwargs["stroke_ends"] = "squared"
         self.set_canvas_props(  # shape.finish()
             cnv=cnv,
             index=ID,
@@ -101,61 +175,48 @@ class GridShape(BaseShape):
         )
         cnv.commit()  # if not, then Page objects e.g. Image not layered
         # ---- text
-        x = self._u.x + self._o.delta_x
-        y = self._u.y + self._o.delta_y
-        x_d = x + (self.cols * width) / 2.0
-        y_d = y + (self.rows * height) / 2.0
-        self.draw_heading(cnv, ID, x_d, y, **kwargs)
+        x_d = self.start_x + (self.cols * self.width) / 2.0
+        y_d = self.start_y + (self.rows * self.height) / 2.0
+        self.draw_heading(cnv, ID, x_d, self.start_y, **kwargs)
         self.draw_label(cnv, ID, x_d, y_d, **kwargs)
-        self.draw_title(cnv, ID, x_d, y + (self.rows * height), **kwargs)
+        self.draw_title(
+            cnv, ID, x_d, self.start_y + (self.rows * self.height), **kwargs
+        )
 
 
-class DotGridShape(BaseShape):
+class DotGridShape(GridBase):
     """
     Dot Grid on a given canvas.
     """
-
-    def __init__(self, _object=None, canvas=None, **kwargs):
-        super().__init__(_object=_object, canvas=canvas, **kwargs)
 
     def draw(self, cnv=None, off_x=0, off_y=0, ID=None, **kwargs):
         """Draw a dot grid on a given canvas."""
         kwargs = self.kwargs | kwargs
         cnv = cnv if cnv else self.canvas
         super().draw(cnv, off_x, off_y, ID, **kwargs)  # unit-based props
-        # ---- switch to use of units
-        x = 0 + self._u.offset_x
-        y = 0 + self._u.offset_y
-        height = self._u.height  # of each grid item
-        width = self._u.width  # of each grid item
-        if "side" in self.kwargs and not (
-            "height" in self.kwargs or "width" in self.kwargs
-        ):
-            # square grid
-            side = self.unit(self.side)
-            height, width = side, side
-        if "side" in self.kwargs and (
-            "height" in self.kwargs or "width" in self.kwargs
-        ):
-            feedback(
-                "Set either height & width OR side, but not both, for a DotGrid",
-                False,
-                True,
-            )
-        # ---- number of blocks in grid
-        if self.rows == 0:
-            self.rows = int((self.page_height) / height) + 1
-        if self.cols == 0:
-            self.cols = int((self.page_width) / width) + 1
-        # ---- set canvas
+        # ---- set properties
         size = self.dot_width / 2.0  # diameter is 3 points ~ 1mm or 1/32"
         self.fill = self.stroke
         # ---- draw dot grid
         for y_col in range(0, self.rows):
             for x_col in range(0, self.cols):
-                cnv.draw_circle((x + x_col * width, y + y_col * height), size)
+                cnv.draw_circle(
+                    (
+                        self.start_x + x_col * self.width,
+                        self.start_y + y_col * self.height,
+                    ),
+                    size,
+                )
         self.set_canvas_props(cnv=cnv, index=ID, **kwargs)
         cnv.commit()  # if not, then Page objects e.g. Image not layered
+        # ---- text
+        x_d = self.start_x + (self.cols * self.width) / 2.0
+        y_d = self.start_y + (self.rows * self.height) / 2.0
+        self.draw_heading(cnv, ID, x_d, self.start_y, **kwargs)
+        self.draw_label(cnv, ID, x_d, y_d, **kwargs)
+        self.draw_title(
+            cnv, ID, x_d, self.start_y + (self.rows * self.height), **kwargs
+        )
 
 
 class HexHexShape(BaseShape):
@@ -241,10 +302,10 @@ class HexHexShape(BaseShape):
                         if ":" in rng:
                             _ring, _hex = rng.split(":")
                             _ring_set = tools.sequence_split(
-                                _ring, as_int=True, unique=True, star=True
+                                _ring, to_int=True, unique=True, star=True
                             )
                             _hex_set = tools.sequence_split(
-                                _hex, as_int=True, unique=True, star=False
+                                _hex, to_int=True, unique=True, star=False
                             )
                             if "*" in _ring_set:
                                 _ring_set += range(1, self.rings + 1)
@@ -256,11 +317,11 @@ class HexHexShape(BaseShape):
                             match _lower(rng[0]):
                                 case "s":
                                     spine_set += tools.sequence_split(
-                                        values, as_int=True, unique=True, star=True
+                                        values, to_int=True, unique=True, star=True
                                     )
                                 case "r":
                                     rings_set += tools.sequence_split(
-                                        values, as_int=True, unique=True, star=True
+                                        values, to_int=True, unique=True, star=True
                                     )
                 if "*" in spine_set:
                     spine_set += [1, 2, 3, 4, 5, 6]
@@ -273,7 +334,7 @@ class HexHexShape(BaseShape):
                 )
         if self.locations:
             id_locations = tools.sequence_split(
-                self.locations, as_int=True, unique=True
+                self.locations, to_int=True, unique=True
             )
         # ---- draw shapes on grid
         if self.shapes:
@@ -626,6 +687,7 @@ class RepeatShape(BaseShape):
     def __init__(self, _object=None, canvas=None, **kwargs):
         super().__init__(_object=_object, canvas=canvas, **kwargs)
         self._objects = kwargs.get("shapes", [])  # incoming Shape object(s)
+        # feedback(f'*** REPEAT {self._objects=} {kwargs=}')
         # UPDATE SELF WITH COMMON
         if self.common:
             attrs = vars(self.common)
@@ -671,6 +733,7 @@ class RepeatShape(BaseShape):
         cnv = cnv if cnv else self.canvas
         super().draw(cnv, off_x, off_y, ID, **kwargs)  # unit-based props
         _off_x, _off_y = off_x or self.offset_x or 0, off_y or self.offset_y or 0
+        # feedback(f'*** REPEAT {self._objects=} {ID=} {self.cols=} {self.rows=}')
 
         for col in range(self.cols):
             for row in range(self.rows):
@@ -949,7 +1012,6 @@ class HexHexLocations(VirtualShape):
                         chex, ghex.height_flat, vertex_angles[spine - 2]
                     )
                 else:
-                    sid = spine - 1
                     chex = geoms.point_from_angle(
                         chex, ghex.height_flat, vertex_angles[spine - 1]
                     )
@@ -1476,7 +1538,7 @@ class TriangularLocations(VirtualLocations):
                 col_start = 1
                 # clockwise = True if _dir == "east" else False
 
-        col, row, count = col_start, row_start, 0
+        _, _, count = col_start, row_start, 0
         # max_outer = 2 * self.rows + (self.cols - 2) * 2
         corner = None
         # ---- set row and col interval
@@ -1570,178 +1632,3 @@ class DiamondLocations(VirtualLocations):
 # ---- tracks
 
 # See proto.py
-
-# ---- other layouts
-
-
-class ConnectShape(BaseShape):
-    """
-    Connect two shapes (Rectangle), based on a position, on a given canvas.
-
-       Q4 | Q1
-       -------
-       Q3 | Q2
-
-    """
-
-    def __init__(self, _object=None, canvas=None, **kwargs):
-        super().__init__(_object=_object, canvas=canvas, **kwargs)
-        # overrides
-        self.shape_from = kwargs.get("shape_from", None)  # could be a GridShape
-        self.shape_to = kwargs.get("shape_to", None)  # could be a GridShape
-
-    def draw(self, cnv=None, off_x=0, off_y=0, ID=None, **kwargs):
-        """Draw a connection (line) between two shapes on given canvas."""
-        kwargs = self.kwargs | kwargs
-        base_canvas = cnv
-        cnv = cnv if cnv else self.canvas
-        super().draw(cnv, off_x, off_y, ID, **kwargs)  # unit-based props
-        # ---- style
-        style = "direct"
-        # ---- shapes and positions
-        try:
-            shp_from, shape_from_position = self.shape_from  # tuple form
-        except Exception:
-            shp_from, shape_from_position = self.shape_from, "S"
-        try:
-            shp_to, shape_to_position = self.shape_to  # tuple form
-        except Exception:
-            shp_to, shape_to_position = self.shape_to, "N"
-        # ---- shape props
-        shape_from = self.get_shape_in_grid(shp_from)
-        shape_to = self.get_shape_in_grid(shp_to)
-        edge_from = shape_from.get_bounds()
-        edge_to = shape_to.get_bounds()
-        x_f, y_f = self.key_positions(shape_from, shape_from_position)
-        x_t, y_t = self.key_positions(shape_to, shape_to_position)
-        xc_f, yc_f = shape_from.get_center()
-        xc_t, yc_t = shape_to.get_center()
-        # x,y: use fixed/supplied; or by "name"; or by default; or by "smart"
-        if style == "path":
-            # ---- path points
-            points = []
-
-            if xc_f == xc_t and yc_f > yc_t:  # above
-                points = [
-                    self.key_positions(shape_from, "S"),
-                    self.key_positions(shape_to, "N"),
-                ]
-            if xc_f == xc_t and yc_f < yc_t:  # below
-                points = [
-                    self.key_positions(shape_from, "N"),
-                    self.key_positions(shape_to, "S"),
-                ]
-            if xc_f > xc_t and yc_f == yc_t:  # left
-                points = [
-                    self.key_positions(shape_from, "W"),
-                    self.key_positions(shape_to, "E"),
-                ]
-            if xc_f < xc_t and yc_f == yc_t:  # right
-                points = [
-                    self.key_positions(shape_from, "E"),
-                    self.key_positions(shape_to, "W"),
-                ]
-
-            if xc_f < xc_t and yc_f < yc_t:  # Q1
-                if edge_from.right < edge_to.left:
-                    if edge_from.top < edge_to.bottom:
-                        log.debug("A t:%s b:%s", edge_from.top, edge_to.bottom)
-                        delta = (edge_to.bottom - edge_from.top) / 2.0
-                        points = [
-                            self.key_positions(shape_from, "N"),
-                            (xc_f, edge_from.top + delta),
-                            (xc_t, edge_from.top + delta),
-                            self.key_positions(shape_to, "S"),
-                        ]
-                    elif edge_from.top > edge_to.bottom:
-                        log.debug("B t:%s b:%s", edge_from.top, edge_to.bottom)
-                        points = [
-                            self.key_positions(shape_from, "N"),
-                            (xc_f, yc_t),
-                            self.key_positions(shape_to, "W"),
-                        ]
-                    else:
-                        pass
-                else:
-                    log.debug("C t:%s b:%s", edge_from.top, edge_to.bottom)
-                    points = [
-                        self.key_positions(shape_from, "N"),
-                        (xc_f, yc_t),
-                        self.key_positions(shape_to, "W"),
-                    ]
-            if xc_f < xc_t and yc_f > yc_t:  # Q2
-                log.debug("Q2")
-
-            if xc_f > xc_t and yc_f > yc_t:  # Q3
-                log.debug("Q3")
-
-            if xc_f > xc_t and yc_f < yc_t:  # Q4
-                log.debug("Q4")
-                if edge_from.left < edge_to.right:
-                    if edge_from.top < edge_to.bottom:
-                        log.debug(" A t:%s b:%s", edge_from.top, edge_to.bottom)
-                        delta = (edge_to.bottom - edge_from.top) / 2.0
-                        points = [
-                            self.key_positions(shape_from, "N"),
-                            (xc_f, edge_from.top + delta),
-                            (xc_t, edge_from.top + delta),
-                            self.key_positions(shape_to, "S"),
-                        ]
-                    elif edge_from.top > edge_to.bottom:
-                        log.debug(" B t:%s b:%s", edge_from.top, edge_to.bottom)
-                        points = [
-                            self.key_positions(shape_from, "N"),
-                            (xc_f, yc_t),
-                            self.key_positions(shape_to, "E"),
-                        ]
-                    else:
-                        pass
-                else:
-                    log.debug(" C t:%s b:%s", edge_from.top, edge_to.bottom)
-                    points = [
-                        self.key_positions(shape_from, "N"),
-                        (xc_f, yc_t),
-                        self.key_positions(shape_to, "E"),
-                    ]
-
-            if xc_f == xc_t and yc_f == yc_t:  # same!
-                return
-            self.kwargs["points"] = points
-            plin = PolylineShape(None, base_canvas, **self.kwargs)
-            plin.draw(ID=ID)
-        elif style == "direct":  # straight line
-            # ---- direct points
-            self.kwargs["x"] = x_f
-            self.kwargs["y"] = y_f
-            self.kwargs["x1"] = x_t
-            self.kwargs["y1"] = y_t
-            lin = LineShape(None, base_canvas, **self.kwargs)
-            lin.draw(ID=ID)
-        else:
-            feedback('Style "{style}" is unknown.')
-
-    def key_positions(self, _shape, location=None):
-        """Calculate a dictionary of key positions around a Rectangle.
-
-        N,S,E,W = North, South, East, West
-        """
-        top = _shape.y
-        btm = _shape.y + _shape.height
-        mid_horizontal = _shape.x + _shape.width / 2.0
-        mid_vertical = _shape.y + _shape.height / 2.0
-        left = _shape.x
-        right = _shape.x + _shape.width
-        _positions = {
-            "NW": (left, top),
-            "N": (mid_horizontal, top),
-            "NE": (right, top),
-            "SW": (left, btm),
-            "S": (mid_horizontal, btm),
-            "SE": (right, btm),
-            "W": (left, mid_vertical),
-            "E": (right, mid_vertical),
-            # '': (),
-        }
-        if location:
-            return _positions.get(location, ())
-        return _positions

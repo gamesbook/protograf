@@ -40,9 +40,7 @@ def polygon_vertices(
     Point(x=1.4999999999999996, y=1.1339745962155616)]
     """
     try:
-        sides = int(sides)
-        if sides < 3:
-            sides = 3
+        sides = max(int(sides), 3)
     except ValueError:
         feedback("Polygon's sides must be an integer of 3 or more.")
         return []
@@ -68,7 +66,7 @@ def polygon_vertices(
         while True:
             points.append(degrees_to_xy(_rotate, radius, centre))
             _rotate = next(data_generator)
-    except RuntimeError:
+    except (StopIteration, RuntimeError):
         pass  # ignore StopIteration
     finally:
         del data_generator
@@ -265,10 +263,10 @@ def point_on_circle(point_centre: Point, radius: float, angle: float) -> Point:
         theta = float(angle) * math.pi / 180.0
         x = math.cos(theta) * radius + point_centre.x
         y = point_centre.y - math.sin(theta) * radius  # + point_centre.y
-    except Exception:
+    except Exception as exc:
         raise ValueError(
             f"Cannot calculate point on circle for: {point_centre}, {radius} and {angle}"
-        )
+        ) from exc
     return Point(x, y)
 
 
@@ -401,7 +399,10 @@ def angles_from_points(first: Point, second: Point) -> tuple:
     (270.0, 180.0)
     >>> angles_from_points(Point(0, 0), Point(-4, 4))
     (315.0, 135.0)
+    >>> angles_from_points(Point(2.5, 3.5), Point(3.25, 2.2))
+    (150.01836063115067, 299.9816393688493)
     """
+    compass = 0
     a, b = second.x - first.x, second.y - first.y
     if second.x != first.x:
         gradient = (second.y - first.y) / (second.x - first.x)
@@ -473,14 +474,14 @@ def separation_between_hexsides(side_a: int, side_b: int) -> int:
     return dist
 
 
-def lines_intersect(A: Point, B: Point, C: Point, D: Point) -> bool:
+def lines_intersect(a_start: Point, a_end: Point, c_start: Point, c_end: Point) -> bool:
     """Return True if line segments AB and CD intersect
 
     Args:
-        A: (x, y) coodinate of start point of line AB
-        B: (x, y) coodinate of end point of line AB
-        C: (x, y) coodinate of start point of line CD
-        D: (x, y) coodinate of end point of line CD
+        a_start: (x, y) coodinate of start point of line AB
+        a_end: (x, y) coodinate of end point of line AB
+        c_start: (x, y) coodinate of start point of line CD
+        c_end: (x, y) coodinate of end point of line CD
 
     Ref:
         https://stackoverflow.com/questions/3838329
@@ -493,10 +494,14 @@ def lines_intersect(A: Point, B: Point, C: Point, D: Point) -> bool:
     True
     """
 
-    def ccw(A: Point, B: Point, C: Point):
-        return (C.y - A.y) * (B.x - A.x) > (B.y - A.y) * (C.x - A.x)
+    def ccw(a_start: Point, a_end: Point, c_start: Point):
+        return (c_start.y - a_start.y) * (a_end.x - a_start.x) > (
+            a_end.y - a_start.y
+        ) * (c_start.x - a_start.x)
 
-    return ccw(A, C, D) != ccw(B, C, D) and ccw(A, B, C) != ccw(A, B, D)
+    return ccw(a_start, c_start, c_end) != ccw(a_end, c_start, c_end) and ccw(
+        a_start, a_end, c_start
+    ) != ccw(a_start, a_end, c_end)
 
 
 def bezier_arc_segment(
@@ -604,8 +609,6 @@ def rotate_point_around_point(
     >>> rotate_point_around_point((10,0), (0,0), 90)
     Point(x=0.0, y=-10.0)
     """
-    import math
-
     x, y = point_to_rotate
     cx, cy = center_point
     angle_radians = math.radians(-angle)

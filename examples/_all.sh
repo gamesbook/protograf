@@ -6,7 +6,6 @@ echo -e "\nAll examples outputs are saved to directories specified in the script
 echo -e "\nCreating basic examples..."
 python core/blank.py
 python core/demo.py
-python core/diagram.py
 python core/default_shapes.py
 # ----  examples: customised
 echo -e "\nCreating customised examples..."
@@ -54,6 +53,7 @@ python boards/abstract/tictactoe.py
 # ---- boards: commercial
 echo -e "\nCreating commercial boards..."
 python boards/commercial/ack_map.py
+python boards/commercial/kensington.py
 python boards/commercial/orion_game_board.py
 python boards/commercial/squadleader.py
 python boards/commercial/traveller_draft.py

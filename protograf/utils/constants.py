@@ -46,11 +46,13 @@ COLOR_SINGLES = {
 }
 
 GRID_SHAPES_WITH_CENTRE = [
+    "ArrowShape",
     "CircleShape",
-    "CompassShape",
+    "CrossShape",
     "DotShape",
     "EllipseShape",
     "HexShape",
+    "PodShape",
     "PolygonShape",
     "RectangleShape",
     "RhombusShape",

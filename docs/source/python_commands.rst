@@ -339,10 +339,10 @@ are part of them.
 
 A function is simply created/defined by using a ``def`` command, followed by
 the name you want to give the function |dash| using a word with **no** spaces
-in it |dash| followed by the set of property names and their default values.
-These properties are only available as part of the function, and represent
-aspects of that function that you need to be able to change every time the
-function is activated.
+in it |dash| followed by the set of property names and their default values
+|dash| if any. These properties are only available as part of the function,
+and represent aspects of that function that you need to be able to change
+every time the function is activated.
 
 The ``def`` line is followed by one or more lines that are all indented and
 all aligned; these represent the actions that are to be carried out in that
@@ -367,7 +367,7 @@ Function Example 1. Drawing Shapes
 
       .. code:: python
 
-        def capitol(a=0, b=0, c=red):
+        def capitol(a=0, b=0, c="red"):
             Circle(
                 cx=a+1, cy=b+1, radius=0.5, fill_stroke=c)
             Rectangle(
@@ -385,12 +385,12 @@ Function Example 1. Drawing Shapes
         PageBreak()
         Save()
 
-      The function named ``capitol`` has three properties that
-      can be set: *a*, *b* and *c*. These are used to control
-      some of the properties of the thre shapes that are drawn by
-      this function.
+      The function named ``capitol`` has three **properties** that
+      can be set, called: *a*, *b* and *c*. These, in turn, are used to
+      help control or determine some of the properties of the three
+      shapes that are drawn by this function.
 
-      The values have defaults - ``0``, ``0`` and ``red``
+      The values have defaults - ``0``, ``0`` and ``"red"``
       - respectively, which are used if no values are provided;
       this can be seen in the first example on the upper left.
 
@@ -409,7 +409,7 @@ Function Example 1. Drawing Shapes
 
         capitol()
 
-      or, when setting values for the function's properties:
+      or, if setting custom values for the function's properties:
 
       .. code:: python
 

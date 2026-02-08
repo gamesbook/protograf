@@ -21,6 +21,7 @@ will demonstrate full scalability.
 - `Miscellaneous Things 1`_
 - `Miscellaneous Things 2`_
 - `Miscellaneous Things 3`_
+- `Process Flow Diagram`_
 - `World Clocks`_
 
 A Clock
@@ -274,6 +275,66 @@ Discussion  This example shows how to construct a simple effect by using
 ----------- ------------------------------------------------------------------
 Screenshot  .. image:: images/various/rondel.png
                :width: 50%
+=========== ==================================================================
+
+
+
+Process Flow Diagram
+====================
+`↑ <table-of-contents-exvar_>`_
+
+=========== ==================================================================
+Title       *Process Flow Diagram*
+----------- ------------------------------------------------------------------
+Script      `processflow.py <https://github.com/gamesbook/protograf/blob/master/examples/demo/processflow.py>`_
+----------- ------------------------------------------------------------------
+Discussion  This example shows how to construct a diagram by drawing a series
+            of :ref:`Rectangles <rectangle-command>` with :ref:`Text <text-command>`
+            as part of a Python function.  These Rectangles are then connected by
+            :ref:`Lines <line-command>` via the *connection* property of each line.
+
+            Part of the function looks like:
+
+              .. code:: python
+
+                def draw_step(x, y, title, detail):
+                    box = Rectangle(
+                        x=x, y=y,
+                        width=5, height=4,
+                        stroke_width=1, rounded=True)
+
+            It can be seen that the location of the Rectangle will depend on
+            the *x* and *y* values supplied to the function when it is used.
+
+            The function is used as follows:
+
+              .. code:: python
+
+                step1 = draw_step(
+                    x=1, y=5,
+                    title="User Details",
+                    detail="<li>Fill out form</li><li>Submit form</li>")
+
+            Also see :ref:`Python function <python-function>` for more details
+            on how to construct a function.
+
+            The connecting lines are drawn as follows:
+
+              .. code:: python
+
+                Line(connections=[
+                        (step1, "p", "e"),
+                        (step2, "p", "w")],
+                     stroke_width=1,
+                     dot=0.1,
+                     arrow=True)
+
+            For more detail about connections, see the
+            :ref:`customised Line <lineIndex>` section.
+
+----------- ------------------------------------------------------------------
+Screenshot  .. image:: images/demo/process_flow_diagram.png
+               :width: 80%
 =========== ==================================================================
 
 

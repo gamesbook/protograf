@@ -47,7 +47,11 @@ class BasePolyShape(BaseShape):
         return steps
 
     def draw_snail(self, cnv=None, off_x=0, off_y=0, ID=None, **kwargs):
-        """Draw a Poly-shape line (multi-part line) on a given canvas via snail."""
+        """Draw a Poly-shape line (multi-part line) on a given canvas via snail.
+
+        Notes:
+            * Set self.vertices (for potential use in arrows)
+        """
 
         def is_float(value: str) -> bool:
             try:
@@ -165,8 +169,16 @@ class BasePolyShape(BaseShape):
         items = _snail.split(" ")
         # print(f'*** snail {self.snail=} {_snail=} {items=}')
         current_dir = 0  # face E by default
-        start_point = Point(self._u.x + self._o.delta_x, self._u.y + self._o.delta_y)
+        if kwargs.get("start_point", None) is not None:
+            start_point = kwargs.get("start_point")
+        else:
+            start_point = Point(
+                self._u.x + self._o.delta_x, self._u.y + self._o.delta_y
+            )
         current_point = start_point
+        self.vertexes = [
+            start_point,
+        ]
         # ---- iterate over all snail items
         for item in items:
             if not item:
@@ -236,13 +248,27 @@ class BasePolyShape(BaseShape):
                 tools.feedback(
                     f'The {polytype} snail cannot contain "{_item}".', True, True
                 )
+            self.vertexes.append(current_point)
+        if kwargs.get("end_point", None) is not None:
+            new_point = kwargs.get("end_point")
+            self.vertexes.append(new_point)
+            draw_line(
+                cnv,
+                current_point,
+                new_point,
+                shape=self,
+                **kwargs,
+            )
 
-    def get_vertexes(self, offset_x=0.0, offset_y=0.0):
+    @property  # must be able to change e.g. for layout
+    def _shape_vertexes(self):
         """Return Poly-shape line vertices in canvas units"""
         polytype = self.get_name()
         points = self.get_points()
         steps = self.get_steps()
         _snail = self.snail
+        offset_x = self.offset_x or 0.0
+        offset_y = self.offset_y or 0.0
         if points and _snail:
             feedback(
                 f"Snail values will supercede points to draw the {polytype}",

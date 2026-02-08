@@ -71,12 +71,13 @@ PageBreak()
 
 # # ---- circle track + shape
 Blueprint()
+
 Text(common=txt, text="Track: circle")
 #shp = rhombus(cx=1, cy=1, width=0.25, height=0.5, label='{{sequence}}')
 shp = hexagon(cx=1, cy=1, height=0.5, label='{{sequence}}')
 Track(
      Circle(cx=2, cy=3, radius=1.5),
-     angles=[30,120,210,300],
+     angles=[30,300,210,120],
      shapes=[shp],
      clockwise=True
 )
@@ -94,12 +95,12 @@ PageBreak()
 
 # ---- polygon track + clockwise
 Blueprint()
-Text(common=txt, text="Track: polygon; clockwise")
+Text(common=txt, text="Track: polygon; anti-clockwise")
 shp = rectangle(cx=1, cy=1, width=0.5, height=0.5, label='{{sequence}}', peaks=[("n", 0.25)])
 Track(
     polygon(cx=2, cy=3, sides=6, radius=1.5),
     shapes=[shp],
-    clockwise=True,
+    clockwise=False,
 )
 PageBreak()
 
@@ -124,7 +125,9 @@ Track(
     rotation_style='o',
 )
 PageBreak()
+'''
 
+'''
 # ---- circle track + rotation shape
 Blueprint()
 Text(common=txt, text="Track: circle; rotate 'i'")
@@ -178,30 +181,30 @@ Text(common=txt, text="Track: multiple types; starting")
 shp = circle(cx=0, cy=0, radius=0.25, label='{{sequence}}')
 # square
 Track(
-  Square(x=0.75, y=0.75, side=0.75, stroke="red"),
+  Square(x=0.75, y=0.75, side=0.75, stroke="red", fill="orange"),
+  shapes=[shp])
+Track(
+  Square(x=2.75, y=0.75, side=0.75, stroke="red", fill="orange"),
   shapes=[shp],
   clockwise=False)
-Track(
-  Square(x=2.75, y=0.75, side=0.75, stroke="red"),
-  shapes=[shp])
 # circle
 Track(
-  Circle(cx=1, cy=3, radius=0.5, stroke="red"),
+  Circle(cx=1, cy=3, radius=0.5, stroke="red", fill="aqua"),
   shapes=[shp],
   angles=[45,135,225,315])
 Track(
-  Circle(cx=3, cy=3, radius=0.5, stroke="red"),
+  Circle(cx=3, cy=3, radius=0.5, stroke="red", fill="aqua"),
   shapes=[shp],
   angles=[45,135,225,315],
-  clockwise=True)
+  clockwise=False)
 # poly
 Track(
-  Polygon(cx=1, cy=5, radius=0.5, sides=4, stroke="red"),
+  Polygon(cx=1, cy=5, radius=0.5, sides=4, stroke="red", fill="gold"),
   shapes=[shp])
 Track(
-  Polygon(cx=3, cy=5, radius=0.5, sides=4, stroke="red"),
+  Polygon(cx=3, cy=5, radius=0.5, sides=4, stroke="red", fill="gold"),
   shapes=[shp],
-  clockwise=True)
+  clockwise=False)
 PageBreak()
 
 # ---- clock shape

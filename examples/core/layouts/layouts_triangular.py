@@ -81,10 +81,10 @@ Blueprint(stroke_width=0.5)
 Text(common=header, text="Tri.Locations:all directions")
 
 tri = TriangularLocations(facing='south', y=5, x=1, side=0.8, cols=3)
-Layout(tri, shapes=[circle(common=small_circle, label="N"),])
+Layout(tri, shapes=[circle(common=small_circle, label="S"),])
 
 tri = TriangularLocations(facing='north', y=4, x=3, side=0.8, cols=3)
-Layout(tri, shapes=[circle(common=small_circle, label="S"),])
+Layout(tri, shapes=[circle(common=small_circle, label="N"),])
 
 tri = TriangularLocations(facing='east', y=1.5, x=1.5, side=0.8, rows=3)
 Layout(tri, shapes=[circle(common=small_circle, label="E"),])

@@ -27,13 +27,13 @@ from pathlib import Path
 import pickle
 import re
 import tempfile
-from typing import List, Union
+from typing import Union
 import unicodedata
 
 # third party
 from find_system_fonts_filename import (
     get_system_fonts_filename,
-    FindSystemFontsFilenameException,
+    # FindSystemFontsFilenameException,
 )
 from fontTools.ttLib import TTFont, TTLibFileIsCollectionError
 from tqdm import tqdm
@@ -58,6 +58,7 @@ def builtin_font(name: str) -> Union[str, None]:
 
 
 class FontInterface:
+    """Enable access to local fonts."""
 
     def __init__(self, cache_directory):
         self.name_table = {}
@@ -109,23 +110,25 @@ class FontInterface:
                         self.font_families[family] = []
                     self.font_families[family].append(
                         {
-                            "file": fdt["fileName"],
-                            "name": fdt["fullName"],
-                            "italic": fdt["isItalic"],
-                            "class": fdt["fontSubfamily"],
+                            "file": fdt.get("fileName"),
+                            "name": fdt.get("fullName"),
+                            "italic": fdt.get("isItalic"),
+                            "class": fdt.get("fontSubfamily"),
                         }
                     )
                     # register font under alternate (display?) name
-                    if fdt["altName"] and fdt["altName"] != fdt["fontFamily"]:
-                        family = fdt["altName"]
+                    if fdt.get("altName") and fdt.get("altName") != fdt.get(
+                        "fontFamily"
+                    ):
+                        family = fdt.get("altName")
                         if family not in list(self.font_families.keys()):
                             self.font_families[family] = []
                         self.font_families[family].append(
                             {
-                                "file": fdt["fileName"],
-                                "name": fdt["fullName"],
-                                "italic": fdt["isItalic"],
-                                "class": fdt["fontSubfamily"],
+                                "file": fdt.get("fileName"),
+                                "name": fdt.get("fullName"),
+                                "italic": fdt.get("isItalic"),
+                                "class": fdt.get("fontSubfamily"),
                             }
                         )
         if self.font_families:
@@ -204,17 +207,15 @@ class FontInterface:
                 if _filename:
                     if fullpath:
                         return _filename
-                    else:
-                        _fileonly = Path(_filename).name
-                        return _fileonly
+                    _fileonly = Path(_filename).name
+                    return _fileonly
 
         # is fallback available?
         if _filename_regular:
             if fullpath:
                 return _filename_regular
-            else:
-                _fileonly = Path(_filename_regular).name
-                return _fileonly
+            _fileonly = Path(_filename_regular).name
+            return _fileonly
         else:
             return None
 

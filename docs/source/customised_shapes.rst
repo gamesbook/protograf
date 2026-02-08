@@ -63,8 +63,8 @@ the final product.
 Typically one would just comment out the Blueprint command when its purpose has
 been served.
 
-Properties
-----------
+Blueprint Properties
+--------------------
 
 In addition to the basic line styling properties, a Blueprint can also be
 customised with the following properties:
@@ -377,14 +377,16 @@ A Line is a very common shape in many designs; there are a number of ways
 that it can be customised.
 
 - `Dotted, Dashed, Angled and Wavy <lineDotDash_>`_
-- `Centred <lineCentred_>`_
+- `Centred Line <lineCentred_>`_
 - `Arrowheads <line-with-arrow_>`_
-- `Connections <lineConnections_>`_
+- `Centre Shapes <lineCentreShapes_>`_
+- `Connections: Circles <lineConnectionsCircle_>`_
+- `Connections: Shapes <lineConnectionsShapes_>`_
 - `Connections with Arrows <lineConnectionsArrow_>`_
 - `Connections as Spokes <lineConnectionsSpoke_>`_
 
-Basic Properties
-----------------
+Line Properties
+---------------
 `^ <lineIndex_>`_
 
 A Line has the following properties, in addition to the basic ones of
@@ -395,8 +397,13 @@ A Line has the following properties, in addition to the basic ones of
 - *cx* and *cy* - if set, will replace the use of *x* and *y* for the
   starting point, and work in conjunction with *angle* and *length* to
   create the line around a centre point
-- *connections* - a list of circular shapes (Circle or Dot) that will be
-  connected by the line
+- *centre_shapes* - a list of one or more shapes that will be
+  drawn at the centre of the line
+- *centre_shapes_rotated* - if set to ``True``,  the shapes that will be
+  drawn at the centre of the line are rotated to align with it
+- *connections* - a list of one or more shapes that will be
+  connected by the line; this property overrides any others that may have
+  been set to determine **where** the line is drawn
 - *connections_style* - if set to ``spoke``, will draw lines from the first
   shape to each of the other shapes in the *connections* list
 - *dotted* - if ``True``, create a series of small lines i.e. the
@@ -774,13 +781,107 @@ The following properties can be set:
 
 ===== ======
 
-.. _lineConnections:
 
-Example 4. Connections
-------------------------------------------
+.. _lineCentreShapes:
+
+Example 4. Centre Shapes
+------------------------
 `^ <lineIndex_>`_
 
-.. |ln7| image:: images/customised/line_connections.png
+.. |ln9| image:: images/customised/line_centre_shapes.png
+   :width: 330
+
+===== ======
+|ln9| This example shows Lines constructed using commands with the
+      following properties:
+
+      .. code:: python
+
+        crc = circle(radius=0.15)
+        ttt = text("Aa", font_size=10)
+        crs = cross(height=0.6, width=0.6)
+        ell = ellipse(height=0.4, width=0.6)
+        ply = polygon(side=0.2, sides=5)
+        rho = rhombus(side=0.3)
+
+        Line(x=0, y=0.5, length=1.5,
+             centre_shapes=[crc])
+        Line(x=2, y=0.5, length=1.5,
+             centre_shapes=[ttt])
+        Line(x=0, y=1.5, length=1.5,
+             centre_shapes=[crs])
+        Line(x=2, y=1.5, length=1.5,
+             centre_shapes=[ply])
+        Line(x=0, y=2.5, length=1.5,
+             centre_shapes=[ell])
+        Line(x=2, y=2.5, length=1.5,
+             centre_shapes=[rho])
+
+        Line(x=0, y=4, length=2,
+             angle=30,
+             centre_shapes=[crc],
+             centre_shapes_rotated=True)
+        Line(x=2, y=4, length=2,
+             angle=30,
+             centre_shapes=[ttt],
+             centre_shapes_rotated=True)
+        Line(x=0, y=5, length=2,
+             angle=30,
+             centre_shapes=[crs],
+             centre_shapes_rotated=True)
+        Line(x=2, y=5, length=2,
+             angle=30,
+             centre_shapes=[ply],
+             centre_shapes_rotated=True)
+        Line(x=0, y=6, length=2,
+             angle=30,
+             centre_shapes=[ell],
+             centre_shapes_rotated=True)
+        Line(x=2, y=6, length=2,
+             angle=30,
+             centre_shapes=[rho],
+             centre_shapes_rotated=True)
+
+      This example shows how shapes can placed on a line, such that the
+      centre of the shapes are automatically at the line's centre point.
+
+      The *centre_shapes* property is set to a list (``[`` to ``]``) of one
+      or more shapes; typically these will have been predefined and assigned
+      to a name |dash| as is the case here.
+
+      If the shape should be rotated in the same direction as the line, then
+      the *centre_shapes_rotated* property should be set to ``True``. This is
+      shown in the lower set of examples.
+
+===== ======
+
+
+.. _lineConnectionsCircle:
+
+Example 5. Connections: Circle
+------------------------------
+`^ <lineIndex_>`_
+
+To connect two or more shapes, supply a list of them, together with a
+*connection point*, for the *connections* property of the line.
+
+The *connection point* for circular shapes |dash| ``Circle`` and ``Dot`` |dash|
+is not required, as the connecting line is always drawn to/from the centre
+of such a shape.
+
+For non-circular shapes |dash| for example, ``Rectangle`` or ``Hexagon`` |dash|
+such a shape must have either/or vertex points, or perbis points, that can be
+specified as the *connection point* to which the line will connect. This point
+must be set along with the shape, in the  *connections* property setting.
+
+.. NOTE::
+
+  Use of the *connections* property overrides any other properties that may
+  have been set to specify **where** the line will be drawn.  The other
+  properties that specify **how** the line will be appear will still be used.
+
+
+.. |ln7| image:: images/customised/line_connections_circle.png
    :width: 330
 
 ===== ======
@@ -816,7 +917,7 @@ Example 4. Connections
       can be assigned to a name e.g. ``cc`` for the white Circle, and then
       connected by a Line via the *connections* property.
 
-      The *connections* property requires two or more circular shapes in a
+      The *connections* property requires two or more shapes in a
       list so that the Line can be drawn between them.
 
       Using the *connections* property means that the normal point locations,
@@ -831,9 +932,77 @@ Example 4. Connections
 
 ===== ======
 
+
+.. _lineConnectionsShapes:
+
+Example 6. Connections: Shapes
+------------------------------
+`^ <lineIndex_>`_
+
+To connect two or more non-circular shapes |dash| for example, ``Rectangle``
+or ``Hexagon`` |dash| supply a list of these, along with the settings for
+each of their *connection points*, as the *connections* property of the line.
+
+The *connection point* setting for non-circular shapes must specify:
+
+- the shape name;
+- the connection type |dash| either a vertex point (``v``) or a perbis
+  point (``p``);
+- the connection location, as a :ref:`compass direction <termsDirection>`.
+
+.. NOTE::
+
+  Use of the *connections* property overrides any other properties that may
+  have been set to specify **where** the line will be drawn.  The other
+  properties that specify **how** the line will be appear will still be used.
+
+More concrete examples of the use of connections can be found in the
+examples of constructing boards |dash| :ref:`Morabaraba <abstractGameMorabaraba>`
+and :ref:`Kensington <abstractGameKensington>`.
+
+
+.. |ln8| image:: images/customised/line_connections_shapes.png
+   :width: 330
+
+===== ======
+|ln8| This example shows a Line constructed using commands with the
+      following properties:
+
+      .. code:: python
+
+        s1 = Square(
+          xx=1, cy=4, side=1,
+          fill="yellow")
+        s2 = Square(
+          cx=3, cy=2, side=1)
+        Line(
+          connections=[
+            (s1, 'v', 'ne'),
+            (s2, 'p', 'w')
+          ],
+          stroke="red",
+          stroke_width=2)
+
+      This example shows how Squares that are defined and drawn as normal
+      can be assigned to a name e.g. ``r1`` for the yellow Square, and then
+      connected by a Line via the *connections* property.
+
+      The *connections* property requires two or more shapes, together with
+      their connection points, in a  list so that the Line can be drawn between
+      them.
+
+      Using the *connections* property means that the normal point locations,
+      or line angle, are **not** used but are superceded by the calculated
+      values for the start and end of the line.  In this case, for example,
+      the start of the line is at the north-east vertex of the yellow square,
+      and the end of the line is at the west perbis point of the white square.
+
+===== ======
+
+
 .. _lineConnectionsArrow:
 
-Example 5. Connections - Arrow
+Example 7. Connections - Arrow
 ------------------------------
 `^ <lineIndex_>`_
 
@@ -857,8 +1026,8 @@ Example 5. Connections - Arrow
              arrow=True,
              )
 
-      Similarly to `Example 4 <lineConnections_>`_, the line is drawn
-      between a series of shapes.
+      Similarly to `Example 4 <lineConnectionsCircle_>`_, the line is drawn
+      between a series of ``Circle`` shapes.
 
       In this case, the line has been styled with color and thickness, and
       the *arrow* has been "switched on".  The arrow points in the direction
@@ -866,9 +1035,10 @@ Example 5. Connections - Arrow
 
 ===== ======
 
+
 .. _lineConnectionsSpoke:
 
-Example 6. Connections - Spoke
+Example 8. Connections - Spoke
 ------------------------------
 `^ <lineIndex_>`_
 
@@ -895,7 +1065,7 @@ Example 6. Connections - Spoke
              arrow=True,
              )
 
-      Similarly to `Example 5 <lineConnectionsArrow_>`_, the line is drawn
+      Similarly to `Example 6 <lineConnectionsArrow_>`_, the line is drawn
       as an arrow between the shapes.
 
       However, the use of the ``connections_style='spoke'`` property means
@@ -1783,7 +1953,7 @@ colored triangular or quadilateral shapes.
       a list of **four** colors (``[ ]`` with comma-separated color strings).
       This causes **four** triangles to be drawn |dash| the rectangle is thus
       subdivided into four triangular spaces.  Colors are allocated from the
-      top-most triangle, going clock-wise.
+      top-most triangle, going clockwise.
 
       The lower-most example shows what happens when the *slices* property is
       given a list of **four** colors, plus a *slices_line* and a
@@ -3502,8 +3672,10 @@ length to the  *slice* list.
       in this case they do not occupy the full circumference because the total
       angles amount is less than 360 |deg|.
 
-      **NOTE** All slice lines are drawn with the  *slices_stroke* color,
-      which defaults to the slice color itself.
+      .. NOTE::
+
+          All slice lines are drawn with the  *slices_stroke* color,
+          which defaults to the slice color itself.
 
 ===== ======
 
@@ -3540,11 +3712,18 @@ concentric circles.
       The *nested* property can either be a single whole number or a list of
       fractional numbers.
 
-      **NOTE** All nested Circles are drawn with the same line and fill
-      properties as the Circle shape to which they are part of.  For more
-      control over such features, rather use the *centre_shape* property
-      instead, as this will permit construction of such a circle with any/all
-      properties being set.
+      Each fractional number in the list indicates a Circle to be drawn at
+      a distance corresponding to the fraction of the circle's radius.
+      For example, if circle's radius is ``8`` cm, then a fractional value
+      of ``0.75`` corresponds to a nested circle with a radius of ``6`` cm.
+
+      .. NOTE::
+
+          All nested Circles are drawn with the same line and fill
+          properties as the Circle shape to which they are part of.  For more
+          control over such features, rather use the *centre_shape* property
+          instead, as this will permit construction of a circle with
+          any/all properties being set.
 
 ===== ======
 

@@ -6,7 +6,6 @@ echo -e "\nAll examples output is saved to /tmp/demo"
 echo -e "\nCreating basic examples..."
 python core/demo.py --no-png -d /tmp/demo
 python core/blank.py --no-png -d /tmp/demo
-python core/diagram.py --no-png -d /tmp/demo
 python core/default_shapes.py --no-png -d /tmp/demo
 # ----  examples: customised
 echo -e "\nCreating customised examples..."
@@ -55,6 +54,7 @@ python boards/abstract/tictactoe.py --no-png -d /tmp/demo
 # ---- boards: commercial
 echo -e "\nCreating commercial boards..."
 python boards/commercial/ack_map.py --no-png -d /tmp/demo
+python boards/commercial/kensington.py --no-png -d /tmp/demo
 python boards/commercial/orion_game_board.py --no-png -d /tmp/demo
 python boards/commercial/squadleader.py --no-png -d /tmp/demo
 python boards/commercial/traveller_draft.py --no-png -d /tmp/demo

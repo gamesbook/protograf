@@ -21,7 +21,7 @@ from protograf.utils.structures import (
     Tetris3D,
 )  # named tuples
 from protograf.base import BaseShape
-from protograf.shapes import PolygonShape
+from protograf.shapes_polygon import PolygonShape
 from protograf.shapes_circle import CircleShape
 from protograf.shapes_rectangle import RectangleShape
 from protograf.shapes_hexagon import HexShape
@@ -154,7 +154,7 @@ class PolyominoObject(RectangleShape):
             return length
 
     def get_perimeter_lines(self, cnv=None, ID=None, **kwargs) -> list:
-        """Calculate set of lines that form perimeter of polyonimo"""
+        """Calculate set of lines that form perimeter of Polyonimo"""
         perimeter_lines = []
         max_row = len(self.int_pattern)
         max_col = len(self.int_pattern[0])
@@ -167,7 +167,7 @@ class PolyominoObject(RectangleShape):
                 super().set_abs_and_offset(
                     cnv=cnv, off_x=off_x, off_y=off_y, ID=ID, **kwargs
                 )
-                vtx = super().get_vertexes()  # anti-clockwise from top-left
+                vtx = super()._shape_vertexes  # anti-clockwise from top-left
                 # handle edges
                 if col == 0:  # left edge
                     perimeter_lines.append((vtx[1], vtx[0]))
@@ -338,6 +338,14 @@ class PolyominoObject(RectangleShape):
                     kwargs["col"] = col
                     # print(f"~~~ Polyomino {row=} {col=} {number=} {self.label=}")
                     super().draw(cnv, off_x=off_x, off_y=off_y, ID=ID, **kwargs)
+                else:
+                    if self.blank_fill:
+                        kwargs["fill"] = self.blank_fill
+                        kwargs["stroke"] = self.blank_stroke or self.stroke
+                        kwargs["row"] = row
+                        kwargs["col"] = col
+                        super().draw(cnv, off_x=off_x, off_y=off_y, ID=ID, **kwargs)
+
         # ---- optional perimeter
         if self.outline_stroke or self.outline_width:
             cnv = cnv if cnv else globals.canvas  # a new Page/Shape may now exist
@@ -527,7 +535,7 @@ class StarFieldObject(BaseShape):
     def random_stars(self, cnv):
         # feedback(f'*** StarFld {self.enclosure=}')
         if isinstance(self.enclosure, CircleShape):
-            ccentre = self.enclosure.calculate_centre()
+            ccentre = self.enclosure._shape_centre
             x_c, y_c = ccentre.x, ccentre.y
         if isinstance(self.enclosure, PolygonShape):
             _geom = self.enclosure.get_geometry()
@@ -570,7 +578,7 @@ class StarFieldObject(BaseShape):
             self.enclosure = RectangleShape()
         # ---- calculations
         random.seed()
-        area = math.sqrt(self.enclosure.calculate_area())
+        area = math.sqrt(self.enclosure._shape_area)
         self.star_count = round(self.density * self.points_to_value(area))
         # feedback(f'*** StarFld {self.star_pattern =} {self.enclosure}')
         # feedback(f'*** StarFld {area=} {self.density=} {self.star_count=}')
@@ -700,7 +708,7 @@ class D6Object(DiceObject):
         self._label = self.label
         # custom/unique properties
         self.pips = tools.as_int(kwargs.get("pips", 1), "pips")
-        self.random = tools.as_bool(kwargs.get("random", False), "random")
+        self.random = tools.as_bool(kwargs.get("random", False))
         # defaults
         self._fill, self._stroke = (
             self.fill,
@@ -825,7 +833,7 @@ class DominoObject(DiceObject):
         self._label = self.label
         # custom/unique properties
         self.pips = kwargs.get("pips", (1, 1))
-        self.random = tools.as_bool(kwargs.get("random", False), "random")
+        self.random = tools.as_bool(kwargs.get("random", False))
         # defaults
         self._fill, self._stroke = (
             self.fill,

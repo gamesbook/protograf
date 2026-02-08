@@ -30,7 +30,7 @@ PageBreak()
 
 # --- TOC
 
-Text(x=0.75, y=1, 
+Text(x=0.75, y=1,
      width=18, height=25,
      html=True,
      text="""
@@ -83,7 +83,7 @@ Text("""from protograf import *
 
 Create(
   filename='overview.pdf',
-  margin=1, 
+  margin=1,
   page_grid=2
 )
 Rectangle()
@@ -175,7 +175,7 @@ Circle(
 Circle(
     cx=2, cy=10, radius=1.5,
     radii_shapes=[
-        ('30 90 150 210 270 330', 
+        ('30 90 150 210 270 330',
          circle(radius=0.25, fill_stroke="cyan", label="S")),
     ],
     radii_shapes_rotated=True)
@@ -199,9 +199,9 @@ Circle(
     title="petals", default=shp)
 # ---- * circle nested
 Circle(
-   cx=2, cy=24, radius=1.5, 
+   cx=2, cy=24, radius=1.5,
    nested=4,
-   dotted=True, 
+   dotted=True,
    stroke="red", fill="yellow",
    title="nested", default=shp)
 # ---- RECTANGLE
@@ -210,7 +210,7 @@ Rectangle(
    x=6, y=1,
    height=3, width=2.5,
    hatches_count=5,
-   hatches_stroke_width=2, 
+   hatches_stroke_width=2,
    hatches_stroke="red",
    hatches='ne')
 # ---- * rect radii
@@ -257,18 +257,18 @@ Rectangle(
 # ---- HEXAGON
 # ---- * hex hatches
 Hexagon(
-    cx=12, cy=2, height=3, 
+    cx=12, cy=2, height=3,
     hatches_count=5,
-    hatches_stroke_width=2, 
+    hatches_stroke_width=2,
     hatches_stroke="red",
     hatches='ne')
 # ---- * hex radii
 Hexagon(
-    cx=12, cy=6, height=3, 
+    cx=12, cy=6, height=3,
     radii="*")
 # ---- * hex radii shapes
 Hexagon(
-    cx=12, cy=10, height=3, 
+    cx=12, cy=10, height=3,
     radii_shapes=[
         ('ne', circle(common=cmm, label="ne")),
         ('se', circle(common=cmm, label="se")),
@@ -278,12 +278,12 @@ Hexagon(
     radii_shapes_rotated=True)
 # ---- * hex slices
 Hexagon(
-    cx=12, cy=14, height=3, 
+    cx=12, cy=14, height=3,
     slices=['tomato', 'aqua', 'gold', 'chartreuse'],
     fill=None)
 # ---- * hex spikes
 Hexagon(
-    cx=12, cy=18, height=3, 
+    cx=12, cy=18, height=3,
     spikes=["sw", "nw", "ne", "se"],
     spikes_height=1,
     spikes_width=0.5,
@@ -294,7 +294,7 @@ Hexagon(
 Hexagon(
     cx=12, cy=24, height=3,
     paths=["s nw", "n ne", "n nw", "ne s"],
-    paths_stroke_width=2, 
+    paths_stroke_width=2,
     paths_dotted=True,
     title="paths", default=shp)
 # ---- TEXT for customised shapes
@@ -312,7 +312,7 @@ big = Default(stroke="black", font_size=32, x=9, align="left")
 Text('"Gold Coin"', default=big, y=3)
 Circle(
     cx=5, cy=3, radius=2,
-    fill="gold", stroke_width=2, 
+    fill="gold", stroke_width=2,
     radii=steps(0,360,15),
     centre_shape=circle(
         radius=1.5,
@@ -343,7 +343,7 @@ Rectangle(
     hatches='o', hatches_count=1,
     notch=1, notch_style='step',
     centre_shape=rectangle(
-        height=4.2, width=4.2, 
+        height=4.2, width=4.2,
         fill=None, stroke="white", stroke_width=4.5)
 )
 Text('"Compass Rose"', default=big, y=25)
@@ -399,33 +399,33 @@ Line(y=3, y1=3,
      arrow_position=0.6,
      arrow_double=True,
      default=arr1)
-Line(y=3.5, y1=3.5, 
-     arrow_position=[0.25, 0.5, 0.75], 
+Line(y=3.5, y1=3.5,
+     arrow_position=[0.25, 0.5, 0.75],
      default=arr1)
-Line(y=4, y1=4, 
-     arrow_position=[1.0, 0.93], 
+Line(y=4, y1=4,
+     arrow_position=[1.0, 0.93],
      default=arr1)
 Line(y=4.5, y1=4.5,
      arrow_style='spear',
-     arrow_height=0.15, 
+     arrow_height=0.15,
      default=arr1)
 Line(y=4.5, y1=4.5,
      arrow_style='angle',
      arrow_width=0.15,
-     arrow_position=[0.1, 0.15, 0.2], 
+     arrow_position=[0.1, 0.15, 0.2],
      default=arr1)
 # ---- polylines
 Text(text="Polylines: sawtooth style", default=ctxt, y=6)
 Polyline(
     points='0,5 1,6 2,5 3,6',
     stroke="red", stroke_width=2,
-    wave_style="sawtooth", 
+    wave_style="sawtooth",
     wave_height=0.03,)
 Text(text="Polylines: wave style", default=ctxt, y=7)
 Polyline(
     points='0,6 1,7 2,6 3,7',
     stroke="purple", stroke_width=2,
-    wave_style="wave", 
+    wave_style="wave",
     wave_height=0.05,)
 Text(text="Polylines: dotted + arrows", default=ctxt, y=8)
 Polyline(
@@ -552,19 +552,19 @@ Cube(
     radii_stroke_width=1)
 Text("D6 [die] / shades", default=ctxt, y=9)
 D6(
-    x=1, y=7.5, side=2, 
-    roll=5, 
-    pip_fill="gold", 
+    x=1, y=7.5, side=2,
+    roll=5,
+    pip_fill="gold",
     pip_stroke="orange",
-    fill="red", 
+    fill="red",
     rounding=0.2)
 D6(
-    x=3, y=9.5, side=1.75, 
-    roll=4, 
+    x=3, y=9.5, side=1.75,
+    roll=4,
     pip_fill="white",
     pip_shape="diamond",
     pip_stroke="aqua",
-    fill="blue", 
+    fill="blue",
     pip_fraction=0.15)
 Text("QR Code", default=ctxt, y=13)
 QRCode(
@@ -578,8 +578,8 @@ QRCode(
 )
 Text("Tetronimo", default=ctxt, y=16)
 Tetromino(
-    x=0, y=15, side=1.5, 
-    letter="T", 
+    x=0, y=15, side=1.5,
+    letter="T",
     outline_width=1)
 Text("Polyonimo", default=ctxt, y=20)
 Polyomino(
@@ -590,11 +590,11 @@ Polyomino(
 Text("Pentonimo", default=ctxt, y=25)
 Pentomino(
     x=0, y=23, side=1.5,
-    letter="F", 
-    flip="south", 
+    letter="F",
+    flip="south",
     stroke=None,
     fill="gold",
-    outline_stroke="black", 
+    outline_stroke="black",
     outline_width=1)
 Text("Specialised Shapes", common=header)
 PageBreak()
@@ -697,7 +697,7 @@ Image("sholes_typewriter.png",
 Text("PNG Image", default=ctxt, y=2)
 Image("noun-typewriter-3933515.svg",
       width=3, height=3,
-      x=1, y=4, 
+      x=1, y=4,
       rotation=45)
 Text("SVG Image; rotated 45\u00B0", default=ctxt, y=5)
 
@@ -761,14 +761,14 @@ Hexagons(
 )
 # ---- rotations + corners - layout_rect_outer_rotation
 circ = circle(
-    label="{{sequence - 1}}", label_size=14, 
+    label="{{sequence - 1}}", label_size=14,
     stroke_width=1,
-    radius=0.65, 
+    radius=0.65,
     stroke="maroon",
     fill="peachpuff")
 rct_common = Common(label_size=14, points=[('s', 0.1)], height=1.25, width=1.25)
 rct2 = rectangle(
-    common=rct_common, label="{{sequence - 1}}", 
+    common=rct_common, label="{{sequence - 1}}",
     fill="mistyrose",
     stroke_width=1)
 rct3 = rectangle(
@@ -776,20 +776,20 @@ rct3 = rectangle(
     fill="maroon", stroke="rosybrown",
     stroke_width=1)
 rrect = RectangularLocations(
-    x=0.5, y=0.75, 
-    cols=15, rows=22, 
+    x=0.5, y=0.75,
+    cols=15, rows=22,
     interval=1.25,
     start="SW", direction="north", pattern="outer")
 Layout(
     rrect,
     shapes=[rct3] + [rct2]*4,
     rotations=[
-        ("1", 135), 
+        ("1", 135),
         ("2-21", 90),
         ("22", 45),
-        ("36", -45), 
+        ("36", -45),
         ("37-56", 270),
-        ("57", 225), 
+        ("57", 225),
         ("58-70", 180),],
     corners=[('*', circ)])
 Text("Hexagons Grid & Track Layout", common=header)
@@ -802,7 +802,7 @@ Grid(
     stroke_width=1
 )
 DotGrid(
-    offset_x=4, offset_y=4,
+    x=3, y=3,
     side=6,
     cols=3, rows=3,
     dot_width=8
@@ -813,7 +813,7 @@ Text("""Grid(
 )""", default=txt, x=0, y=20)
 Text("""DotGrid(
   cols=3, rows=3,
-  offset_x=4, offset_y=4,
+  x=3, offset_y=3,
   side=6,
   dot_width=8
 )""", default=txt, x=9, y=20)
@@ -828,21 +828,21 @@ Circle(
     slices=["black", "silver"]*6,
     centre_shapes=[
         circle(radius=5.2, stroke_width=12, slices=["#E0DFDD", "black"]*6, rotation=15),
-        circle(radius=1.8, stroke_width=8, fill="silver") 
+        circle(radius=1.8, stroke_width=8, fill="silver")
     ],
     rotation=15
 )
 Text("""Circle(
-  cx=10.5, cy=14, 
+  cx=10.5, cy=14,
   radius=10, stroke_width=20,
   slices=["black", "silver"]*6,
   centre_shapes=[
-    circle(radius=6.5, stroke_width=15, 
-           slices=["#E0DFDD", "black"]*6, 
+    circle(radius=6.5, stroke_width=15,
+           slices=["#E0DFDD", "black"]*6,
            rotation=15),
-    circle(radius=2.5, stroke_width=10, 
+    circle(radius=2.5, stroke_width=10,
            fill="silver")],
   rotation=15)""", default=txt, x=0, y=18)
 Text("Dejarik board", common=header)
-    
+
 Save()

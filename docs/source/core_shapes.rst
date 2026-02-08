@@ -305,8 +305,15 @@ In addition to the normal, common properties, the Cross also has:
 
 - *thickness*: this is the width of the bars. The default value for this is
   one-fifth of the overall width.
-- *arm_fraction*: this is the fraction **up** the length of the body at which
-  the arm crosses it. The default value for this is ``0.5`` (half-way up).
+- *arm_fraction*: this is the fraction **along** (up or down) the length of
+  the body at which the arm crosses it. The default value for this is ``0.5``
+  i.e. half-way along.
+
+.. NOTE::
+
+    Unlike most other shapes with a centre, the Cross uses as its centre
+    the middle point of the arm of the cross |dash| rather a centre based on
+    the overall height and width.
 
 
 Example 1. Default Cross
@@ -338,8 +345,11 @@ Example 2. Customised Cross
    :width: 330
 
 ===== ======
-|cr2| This example shows the shape constructed using the command with these
-      properties:
+|cr2| This example shows the Cross constructed using the command with thes
+      properties shown.
+
+      Note the use of the :ref:`Common command <the-common-command>`
+      to allow multiple Crosses to share the same properties.
 
       .. code:: python
 
@@ -359,7 +369,7 @@ Example 2. Customised Cross
             cx=1, cy=3)
         Cross(
             common=crs,
-            cx=3, cy=3,
+            cx=3, cy=2.5,
             title="Title",
             label="Label",
             heading="Heading")
@@ -383,12 +393,12 @@ Example 2. Customised Cross
       The lower four examples all share a common height and width. They
       also use the *arm_fraction* property.  This is the fraction up the
       length of the body at which the arm crosses it; by default this is
-      ``0.5`` (half-way up).  All these examples "centre" the cross; in
-      this case the centre corresponds to the middle point of the height
-      (for the y-direction) and width (for the x-direction) of the cross.
+      ``0.5`` (half-way up).  All these examples, as well as the top-right
+      example "centre" the cross; in this case the centre corresponds to
+      the middle point of the arm of the cross.
 
-      The *label* and *rotation* properties recalculate the centre to
-      match the point at which the arm crosses the body.
+      The *label* and *rotation* properties are also based on the
+      middle point of the arm of the cross.
 
 ===== ======
 
@@ -671,8 +681,9 @@ Moving - **without** creating a line - is done as follows:
         Polyline(
             y=0.5,
             snail="2 s 1 w 2 n 1",
-            stroke_width=2,
-            stroke="red")
+            stroke_width=1,
+            stroke="red",
+            arrow=True)
         Polyline(
             x=0, y=5,
             snail=snail_line,
@@ -695,7 +706,9 @@ Moving - **without** creating a line - is done as follows:
 
       The top example is a simple red line going in a square.  It starts by
       going east |dash| the default direction |dash| for ``2cm`` then south
-      for ``1cm``, west for ``2cm`` and finally north for ``1cm``.
+      for ``1cm``, west for ``2cm`` and finally north for ``0.5cm``.  The
+      *arrow* property is set to ``True`` so a default size arrowhead is
+      drawn at the end of the line.
 
       The two examples with the black lines share the same *snail* line,
       assigned to ``snail_line``.  This example shows the use of the ``-``
@@ -1399,7 +1412,8 @@ Polygon
 ~~~~~~~
 `↑ <shape-index_>`_
 
-A polygon is a shape constructed of any number of sides of equal length.
+A polygon is a regular shape constructed of three or more sides of
+equal length, and whose interior angles are all equal.
 
 For example, a hexagon is simply a polygon with 6 sides and an octagon
 is a polygon with 8 sides.
@@ -1407,6 +1421,13 @@ is a polygon with 8 sides.
     **HINT** Unlike the `Hexagon`_ shape, a Polygon can be rotated!
 
 The following examples show how a Polygon can be constructed.
+
+- `Example 1. Default Polygon`_
+- `Example 2. Polygon with Sides`_
+- `Example 3. Polygon with Radii`_
+- `Example 4. Polygon with Perbii`_
+- `Example 5. Polygon Rotation`_
+- `Example 6. Polygon Slices`_
 
 
 Example 1. Default Polygon
@@ -1464,8 +1485,8 @@ Example 2. Polygon with Sides
       asymmetrical; this can be adjusted through `rotation`_.
 ===== ======
 
-Example 3. Polygon Radii
-++++++++++++++++++++++++
+Example 3. Polygon with Radii
++++++++++++++++++++++++++++++
 `^ <polygon-command_>`_
 
 .. |pl2| image:: images/customised/polygon_radii.png
@@ -1601,7 +1622,10 @@ Example 5. Polygon Rotation
 
 ===== ======
 |pl4| This example shows five Polygons constructed using the command with
-      additional properties:
+      additional properties.
+
+      Note the use of the :ref:`Common command <the-common-command>`
+      to allow multiple Polygons to share the same properties.
 
       .. code:: python
 
@@ -1648,7 +1672,9 @@ Example 6. Polygon Slices
 `^ <polygon-command_>`_
 
 Slices are a set of colors that are drawn as triangles inside a
-a Polygon in a clockwise direction starting from the "South East".
+a Polygon in a clockwise direction starting from the one that is at,
+or approximates, "North East".
+
 If there are fewer colors than all the possible triangles, then the
 colors are repeated, starting from the first one.
 
@@ -1673,6 +1699,7 @@ colors are repeated, starting from the first one.
       - *slices* - list of named colors that will be drawn
         seqentially
 ===== ======
+
 
 .. _polyshape-command:
 
@@ -2974,10 +3001,8 @@ Example 1. Defaults
 
       It has the following properties based on the defaults:
 
-      - the upper-left of the grid is drawn at the absolute page x-position
-        of ``0`` cm and y-position ``0`` cm i.e. the margins are ignored
-      - a set of dots, spaced ``1`` cm apart, are created extending to the
-        right- and top- edges
+      - the upper-left of the grid is drawn at the default x-position
+        of ``1`` cm and y-position ``1`` cm relative to the margins
       - default dot size of ``3`` points
       - default color of ``black``
 
@@ -2997,18 +3022,22 @@ Example 2. Moleskine Grid
 
         DotGrid(
             stroke="darkgray",
+            x=0, y=0,
             width=0.5, height=0.5,
             dot_width=1,
-            offset_y=-0.25)
+            margin_fit=False)
 
       To simulate the dot grid found in Moleskine notebooks, it
       has the following properties set:
 
+      - *x* and *y* - start the grid at the top-left of the page
       - *width* and *height* - intervals between the centre of the dots
         in the x- and y-directions respectively
       - *dot_width* - set to be smaller than the default of ``3``
-      - *stroke*  - set to ``darkgrey`` i.e. lighter than the default black
-      - *offset_y* - moves the start of the grid slightly downwards by 1/4 cm
+      - *stroke* - set to ``darkgrey`` i.e. lighter than the default ``black``
+      - *margin_fit* - set to ``False`` to ignore any page margins when
+        calculating the *x* and *y* positions, and also when calculating the
+        width and height of the grid
 
       .. HINT::
 
@@ -3019,7 +3048,7 @@ Example 2. Moleskine Grid
          command.
 
          A color like ``"cornsilk"`` might provide a suitable backdrop
-         for the light grey of the grid.
+         for the grey color of the dot grid.
 ===== ======
 
 
@@ -3030,11 +3059,31 @@ Grid
 `↑ <shape-index_>`_
 
 A Grid is a series of crossed lines |dash| both in the vertical and
-horizontal directions. The Grid will, by default, fill the page as far
+horizontal directions. The Grid will, by default |dash| i.e. if the exact
+number of rows and columns is not specified |dash| fill the page as far
 as possible between its margins.
+
+.. NOTE::
+
+   The behaviour for a grid on a Card is little different, as a
+   :ref:`Card <the-card-command>` has no margins; so all *x* and *y*
+   settings, such as those used by a grid are relative to the card
+   edges.
+
+Examples showing how the Grid can be styled are described below.
+
+- `Example 1. Defaults <gridDefaults_>`_
+- `Example 2. Side, Stroke & Fill <gridSide_>`_
+- `Example 3. Fixed Size <gridFixed_>`_
+- `Example 4. Ignore Margins <gridMargins_>`_
+- `Example 5. Omit Edges <gridEdges_>`_
+
+
+.. _gridDefaults:
 
 Example 1. Defaults
 +++++++++++++++++++
+`↑ <grid-command_>`_
 
 .. |grd| image:: images/defaults/grid.png
    :width: 330
@@ -3049,12 +3098,17 @@ Example 1. Defaults
 
       It has the following properties based on the defaults:
 
-      - starts at upper-left corner of page defined by the margin
+      - starts at upper-left corner of the page, as defined by the top- and
+        left-margins
       - has a default grid interval of ``1`` cm in both the x- and y-direction
+
 ===== ======
 
-Example 2. Side & Stroke
-++++++++++++++++++++++++
+.. _gridSide:
+
+Example 2. Side, Stroke & Fill
+++++++++++++++++++++++++++++++
+`↑ <grid-command_>`_
 
 .. |gr2| image:: images/customised/grid_gray.png
    :width: 330
@@ -3065,20 +3119,28 @@ Example 2. Side & Stroke
 
       .. code:: python
 
-          Grid(side=0.85, stroke="gray", stroke_width=1)
+          Grid(
+            side=0.85,
+            fill="lightgray",
+            stroke="gray",
+            stroke_width=1)
 
       It has the following properties based on the defaults:
 
       - *side* - set to ``0.85`` cm (about 1/3 of an inch)
         which sets the size of both the x- and y-direction
+      - *fill* - set to ``lightgray`` for the grid's background color
       - *stroke_width* - set to ``1`` point; the thicker line makes the grid
         more visible
       - *stroke* - set to ``gray`` i.e. a lighter color than the default black
 
 ===== ======
 
+.. _gridFixed:
+
 Example 3. Fixed Size
 +++++++++++++++++++++
+`↑ <grid-command_>`_
 
 .. |gr3| image:: images/customised/grid_3x4.png
    :width: 330
@@ -3090,11 +3152,14 @@ Example 3. Fixed Size
       .. code:: python
 
           Grid(
-              x=0.5, y=0.5,
-              height=1.25, width=1,
-              cols=3, rows=4,
-              stroke="gray", stroke_width=1,
-              heading="Heading", label="Label", title="Title"
+            x=0.5, y=0.5,
+            height=1.25, width=1,
+            cols=3, rows=4,
+            stroke="gray",
+            stroke_width=1,
+            heading="Heading",
+            label="Label",
+            title="Title"
           )
 
       It has the following properties set for it:
@@ -3111,6 +3176,105 @@ Example 3. Fixed Size
 
       The grid now has a fixed "rows by columns" size, rather than being
       automatically calculated to fill up the page.
+
+===== ======
+
+.. _gridMargins:
+
+Example 4. Ignore Margins
++++++++++++++++++++++++++
+`↑ <grid-command_>`_
+
+.. |gr4| image:: images/customised/grid_ignore_margins.png
+   :width: 330
+
+===== ======
+|gr4| This example shows the shape constructed using the command with the
+      following properties:
+
+      .. code:: python
+
+          Grid(
+            x=0, y=0,
+            height=1.2, width=1,
+            stroke="gray",
+            stroke_width=1,
+            margin_fit=False,
+            label="Grid Label")
+          )
+
+      It has the following properties set for it:
+
+      - *x* and *y* - each set to ``0`` cm; grid's upper-left
+        corner starts at the page edges (because of *margin_fit*)
+      - *height* - value of ``0.9`` cm set for the row height
+      - *width* - value of ``1`` cm set for the column width
+      - *stroke_width* - set to ``1`` point; the thicker line makes
+        the grid clearly visible
+      - *stroke* - set to ``gray`` i.e. a lighter color than the default black
+      - *label* - see `Text Descriptions`_ for details
+
+      The grid size has being automatically calculated to fill up the page.
+
+      Note the use of *margin_fit* set to ``False``, thereby causing the
+      page margins to be ignored when calculating the top left of the
+      grid, as well as its height and width.
+
+===== ======
+
+.. _gridEdges:
+
+Example 5. Omit Edges
++++++++++++++++++++++
+`↑ <grid-command_>`_
+
+.. |gr5| image:: images/customised/grid_omit_edges.png
+   :width: 330
+
+===== ======
+|gr5| This example shows the Grid constructed using the command with the
+      following properties:
+
+      .. code:: python
+
+        Grid(
+          x=0.5, y=0.5,
+          rows=3, cols=3,
+          side=0.5, stroke_width=0.5,
+          omit_left=True)
+        Grid(
+          x=2.5, y=0.5,
+          rows=3, cols=3,
+          side=0.5, stroke_width=0.5,
+          omit_bottom=True)
+        Grid(
+          x=1.5, y=2.5,
+          rows=3, cols=3,
+          side=0.5, stroke_width=0.5,
+          omit_outer=True)
+        Grid(
+          x=0.5, y=4.5,
+          rows=3, cols=3,
+          side=0.5, stroke_width=0.5,
+          omit_top=True)
+        Grid(
+          x=2.5, y=4.5,
+          rows=3, cols=3,
+          side=0.5, stroke_width=0.5,
+          omit_right=True)
+
+      Each of the grids have the following properties set:
+
+      - *x* and *y* - set the grid's upper-left corner
+      - *rows* and *cols* - set the number of "spaces" to drawn in the
+        vertical and horizontal directions
+      - *side* - value of ``0.5`` cm sets the row height **and** column width
+      - *stroke_width* - set to ``0.5`` points; the thicker line makes
+        the grid more visible
+
+      In addition, each grid has an *outer_...* property set to ``True``.
+      This means that the line on that edge of the grid is not drawn. Setting
+      *omit_outer* to ``True`` means **all** edge lines are not drawn.
 
 ===== ======
 
@@ -3283,7 +3447,10 @@ or ``"right"``; the *align_vertical* property can take on values of ``"top"``,
 
 ===== ======
 |ia1| This example shows the Image constructed using the command with the
-      following properties:
+      properties shown.
+
+      Note the use of the :ref:`Common command <the-common-command>`
+      to allow multiple Images to share the same properties.
 
       .. code:: python
 
@@ -3806,6 +3973,15 @@ the desired output:
 - `Transparency`_
 - `Vertex Shapes`_
 - `Wave Styles`_
+
+.. NOTE::
+
+  The term "common" in this section is referring to the concept that many
+  shapes are properrties with the same names and similar behaviour.  This
+  makes it a bit easier to use and remember them.  In **protograf** the
+  :ref:`Common command <the-common-command>` has the specific meaning of
+  setting the same property value(s) to be used in multiple shapes in the
+  same script |dash| as seen in various of the examples here.
 
 .. _coreShapeXY:
 
@@ -4914,7 +5090,7 @@ the change in ``x`` and ``y`` values as part of the set.
 ===== ======
 
 
-. _coreVertexShapes:
+.. _coreVertexShapes:
 
 Vertex Shapes
 ~~~~~~~~~~~~~

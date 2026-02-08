@@ -7,7 +7,6 @@ import collections
 import copy
 from functools import lru_cache
 from itertools import zip_longest
-import jinja2
 import logging
 import os
 import pathlib
@@ -19,6 +18,7 @@ import sys
 from urllib.parse import urlparse
 
 # third-party
+import jinja2
 from pymupdf import Point as muPoint, Matrix, Font as muFont
 
 # local
@@ -119,9 +119,9 @@ def boolean_join(items):
     return result
 
 
-def _vprint(points: list, decimals: int = 2) -> str:
+def _vprint(poynts: list, decimals: int = 2) -> str:
     """Return a user-units, truncated number, version of a list of points."""
-    upoints = [Point(pt.x / globals.units, pt.y / globals.units) for pt in points]
+    upoints = [Point(pt.x / globals.units, pt.y / globals.units) for pt in poynts]
     rpoints = [
         Point("%.2f" % round(pt.x, decimals), "%.1f" % round(pt.y, decimals))
         for pt in upoints
@@ -195,12 +195,12 @@ def as_int(
         the_value = int(value)
         if minimum and the_value < minimum:
             feedback(
-                f'The {_label}"{value}" integer is less than the minimum of {minimum}!',
+                f'The {_label}"{value}" is less than the integer minimum of {minimum}!',
                 True,
             )
         if maximum and the_value > maximum:
             feedback(
-                f'The {_label}"{value}" integer is more than the maximum of {maximum}!',
+                f'The {_label}"{value}" is more than the integer maximum of {maximum}!',
                 True,
             )
         return the_value
@@ -208,27 +208,32 @@ def as_int(
         feedback(f'The {_label}"{value}" is not a valid integer!!', True)
 
 
-def as_bool(value, label: str = None, allow_none: bool = True) -> bool:
+def as_bool(value, allow_none: bool = True) -> bool:
     """Convert a value to a Boolean
 
     Args:
 
     - value (Any): the value to be converted to a float
-    - label (str): assigned as part of the error message to ID the type of value
     - allow_none (bool): if True, return None if value is None
 
     Doc Test:
 
-    >>> as_bool(value='3', label='N')
+    >>> as_bool(value='3')
     False
-    >>> as_bool(value='Y', label='Y')
+    >>> as_bool(value=None)
+    >>> as_bool(value=None, allow_none=True)
+    >>> as_bool(value=None, allow_none=False)
+    False
+    >>> as_bool(value='1')
+    True
+    >>> as_bool(value='Y')
     True
     """
-    TRUES = ["yes", "ja", "oui", "si", "y", "ya", "yep", "yeah", "true", "t", "1"]
+    trues = ["yes", "y", "ya", "yep", "yeah", "ja", "oui", "si", "true", "t", "1"]
     if value is None and allow_none:
         return value
-    _label = f" for {label}" if label else " of"
-    result = str(value).lower() in TRUES
+    # _label = f" for {label}" if label else " of"
+    result = str(value).lower() in trues
     return result
 
 
@@ -293,9 +298,9 @@ def as_point(value) -> list | Point:
     """
     if value is None:
         return None
-    elif isinstance(value, tuple):
+    if isinstance(value, tuple):
         return Point(value[0], value[1])
-    elif isinstance(value, list):
+    if isinstance(value, list):
         items = []
         for item in value:
             if isinstance(item, tuple):
@@ -303,8 +308,7 @@ def as_point(value) -> list | Point:
             else:
                 raise ValueError(f"Cannot convert {item} into a Point!")
         return items
-    else:
-        raise ValueError(f"Cannot convert {value} into a Point!")
+    raise ValueError(f"Cannot convert {value} into a Point!")
 
 
 def compass_to_rotation(value: str) -> float:
@@ -340,7 +344,7 @@ def compass_to_rotation(value: str) -> float:
 
 
 def tuple_split(
-    string: str, label: str = "list", pairs_list: bool = False, all_ints: bool = False
+    strng: str, label: str = "list", pairs_list: bool = False, all_ints: bool = False
 ) -> list:
     """Split a string into a list of tuple numbers
 
@@ -366,9 +370,9 @@ def tuple_split(
     # Values of list must be pairs of integers!
     """
     values = []
-    if string:
+    if strng:
         try:
-            _string_list = string.strip(" ").replace(";", ",").split(" ")
+            _string_list = strng.strip(" ").replace(";", ",").split(" ")
             # print(f'^^^ {_string_list=}')
             for _str in _string_list:
                 items = _str.split(",")
@@ -387,7 +391,7 @@ def tuple_split(
                     if len(value) != 2:
                         feedback(
                             f"Values of {label} must be pairs of integers!",
-                            f' Check if all values in "{string}" are integer pairs.',
+                            f' Check if all values in "{strng}" are integer pairs.',
                             True,
                         )
             return values
@@ -395,7 +399,7 @@ def tuple_split(
             if all_ints:
                 feedback(
                     f"Cannot convert {label} into a list of integer sets!"
-                    f' Check if all values in "{string}" are integers.',
+                    f' Check if all values in "{strng}" are integers.',
                     True,
                 )
             else:
@@ -411,11 +415,11 @@ def tuple_split(
 
 
 def sequence_split(
-    string: str,
-    as_int: bool = True,
+    strng: str,
+    to_int: bool = True,
     unique: bool = True,
     sep: str = ",",
-    as_float: bool = False,
+    to_float: bool = False,
     msg: str = "",
     clean: bool = False,
     star: bool = False,
@@ -425,11 +429,11 @@ def sequence_split(
 
     Args:
 
-    - string: the item to be split
-    - as_int (bool): if True, convert values to integers
+    - strng: the item to be split
+    - to_int (bool): if True, convert values to integers
     - unique (bool): if True, create a list of unique
     - sep (str): expected delimiter between values - defaults to ","
-    - as_float (bool): if True, convert values to floats
+    - to_float (bool): if True, convert values to floats
     - msg (str): return as part of the error
     - clean (bool): if True, strip any surrounding spaces
     - star (bool): if True, allow for "all" or "*" as the only list value
@@ -445,21 +449,21 @@ def sequence_split(
     []
     >>> sequence_split('3')
     [3]
-    >>> sequence_split('3', as_int=False)
+    >>> sequence_split('3', to_int=False)
     ['3']
     >>> sequence_split('3,4,5')
     [3, 4, 5]
-    >>> sequence_split('3,4,5', as_int=False, unique=False)
+    >>> sequence_split('3,4,5', to_int=False, unique=False)
     ['3', '4', '5']
-    >>> x = sequence_split('3,4,5', as_int=False)
+    >>> x = sequence_split('3,4,5', to_int=False)
     >>> assert '5' in x
     >>> sequence_split('3-5,6,1-4')
     [1, 2, 3, 4, 5, 6]
-    >>> sequence_split('A,1,B', as_int=False, unique=False)
+    >>> sequence_split('A,1,B', to_int=False, unique=False)
     ['A', '1', 'B']
-    >>> sequence_split('3.1,4.2,5.3', unique=False, as_int=False, as_float=True)
+    >>> sequence_split('3.1,4.2,5.3', unique=False, to_int=False, to_float=True)
     [3.1, 4.2, 5.3]
-    >>> sequence_split([3.1,4.2,5.3], unique=False, as_int=False, as_float=True)
+    >>> sequence_split([3.1,4.2,5.3], unique=False, to_int=False, to_float=True)
     [3.1, 4.2, 5.3]
     >>> sequence_split(3)
     [3]
@@ -467,16 +471,16 @@ def sequence_split(
     [3.1]
     """
     values = []
-    if isinstance(string, (dict, list)):
-        return string
-    if isinstance(string, (int, float)):
-        return [string]
-    if string:
+    if isinstance(strng, (dict, list)):
+        return strng
+    if isinstance(strng, (int, float)):
+        return [strng]
+    if strng:
         try:
             if sep == ",":
-                _string = string.replace('"', "").replace("'", "").strip()
+                _string = strng.replace('"', "").replace("'", "").strip()
             else:
-                _string = string
+                _string = strng
                 if clean or star:
                     _string = _string.strip()
         except Exception:
@@ -486,7 +490,7 @@ def sequence_split(
 
     # simple single value
     try:
-        if as_int:
+        if to_int:
             values.append(int(_string))
             return values
     except Exception:
@@ -495,15 +499,15 @@ def sequence_split(
     # multi-values
     try:
         _strings = _string.split(sep)
-    except AttributeError as err:
+    except AttributeError:
         feedback(
             f'Unable to split "{_string}" - please check that its a valid candidate!',
             False,
         )
         if isinstance(_string, TemplatingType):
-            feedback(f"The script may not be using T() correctly", True)
+            feedback("The script may not be using T() correctly", True)
         else:
-            feedback(f"", True)
+            feedback("", True)
 
     # star test
     if star and len(_strings) == 1:
@@ -515,24 +519,24 @@ def sequence_split(
         if "-" in item:
             _strs = item.split("-")
             seq_range = [str(val) for val in _strs]
-            if as_int:
+            if to_int:
                 seq_range = list(range(int(_strs[0]), int(_strs[1]) + 1))
             values = values + seq_range
-            if as_float:
+            if to_float:
                 feedback(f'Cannot set a range of decimal numbers ("{item}"){msg}', True)
         else:
-            if as_int:
+            if to_int:
                 try:
                     values.append(int(item))
-                except ValueError as err:
+                except ValueError:
                     feedback(
                         f'Unable to use "{item}"; check for whole numbers (with a {sep} between each)',
                         True,
                     )
-            elif as_float:
+            elif to_float:
                 try:
                     values.append(float(item))
-                except ValueError as err:
+                except ValueError:
                     feedback(
                         f'Unable to use "{item}"; check for numbers (with a {sep} between each)',
                         True,
@@ -547,7 +551,7 @@ def sequence_split(
 
 
 def split(
-    string: str, tuple_to_list: bool = False, separator: str = None, clean: bool = False
+    strng: str, tuple_to_list: bool = False, separator: str = None, clean: bool = False
 ):
     """
     Split a string into a list of individual characters
@@ -569,21 +573,21 @@ def split(
     >>> split("A,b B, C", clean=True)
     ['A', 'b B', 'C']
     """
-    if isinstance(string, list):
-        return string
-    if isinstance(string, tuple):
+    if isinstance(strng, list):
+        return strng
+    if isinstance(strng, tuple):
         if tuple_to_list:
-            return [string]
-        return string
+            return [strng]
+        return strng
     if separator:
         sep = separator
     else:
-        sep = " " if string and "," not in string else ","
-    return sequence_split(string, as_int=False, unique=False, sep=sep, clean=clean)
+        sep = " " if strng and "," not in strng else ","
+    return sequence_split(strng, to_int=False, unique=False, sep=sep, clean=clean)
 
 
 def separate(
-    string: str, tuple_to_list: bool = False, separator: str = None, clean: bool = False
+    strng: str, tuple_to_list: bool = False, separator: str = None, clean: bool = False
 ):
     """
     Split a string into a list of individual items
@@ -610,17 +614,17 @@ def separate(
     ['A', 'b', 'C', 'd:1,6']
 
     """
-    if isinstance(string, list):
-        return string
-    if isinstance(string, tuple):
+    if isinstance(strng, list):
+        return strng
+    if isinstance(strng, tuple):
         if tuple_to_list:
-            return [string]
-        return string
+            return [strng]
+        return strng
     if separator:
         sep = separator
     else:
-        sep = " " if (string and "," not in string) else ","
-    result = string.split(sep)
+        sep = " " if (strng and "," not in strng) else ","
+    result = strng.split(sep)
     if clean:
         outcome = [item.strip() for item in result if item.strip() != ""]
         return outcome
@@ -688,8 +692,8 @@ def splitq(seq, sep=None, pairs=("()", "[]", "{}"), quote="\"'"):
         pairs = dict(pairs)
         start = index = 0
         while 0 <= index < len(seq):
-            c = seq[index]
-            if (sep and seq[index:].startswith(sep)) or (sep is None and c.isspace()):
+            sdx = seq[index]
+            if (sep and seq[index:].startswith(sep)) or (sep is None and sdx.isspace()):
                 yield seq[start:index]
                 # pass multiple separators as single one
                 if sep is None:
@@ -698,23 +702,23 @@ def splitq(seq, sep=None, pairs=("()", "[]", "{}"), quote="\"'"):
                     while sep and seq[index:].startswith(sep):
                         index = index + lsep
                 start = index
-            elif c in quote:
+            elif sdx in quote:
                 index += 1
-                p, index = index, seq.find(c, index) + 1
+                p, index = index, seq.find(sdx, index) + 1
                 if not index:
-                    raise IndexError("Unmatched quote %r\n%i:%s" % (c, p, seq[:p]))
-            elif c in lpair:
+                    raise IndexError("Unmatched quote %r\n%i:%s" % (sdx, p, seq[:p]))
+            elif sdx in lpair:
                 nesting = 1
                 while True:
                     index += 1
-                    p, index = index, seq.find(pairs[c], index)
+                    p, index = index, seq.find(pairs[sdx], index)
                     if index < 0:
                         raise IndexError(
                             "Did not find end of pair for %r: %r\n%i:%s"
-                            % (c, pairs[c], p, seq[:p])
+                            % (sdx, pairs[sdx], p, seq[:p])
                         )
                     nesting += "{lpair}({inner})".format(
-                        lpair=c, inner=splitq(seq[p:index].count(c) - 2)
+                        lpair=sdx, inner=splitq(seq[p:index].count(sdx) - 2)
                     )
                     if not nesting:
                         break
@@ -743,7 +747,7 @@ def flatten(lst: list):
         yield lst
 
 
-def flatten_keys(d: dict):
+def flatten_keys(dictionary: dict):
     """Flatten nested dicts into a single dict.
 
     NOTE:
@@ -756,24 +760,23 @@ def flatten_keys(d: dict):
     {'height': 8, 'cards': 9, 'image': 'FOO'}
     """
     result = {}
-    for k, v in d.items():
-        if isinstance(v, dict):
-            flat_v = flatten_keys(v)
+    for key, val in dictionary.items():
+        if isinstance(val, dict):
+            flat_v = flatten_keys(val)
             for flat_k, flat_v in flat_v.items():
-                # result[k + '.' + flat_k] = flat_v
+                # result[key + '.' + flat_k] = flat_v
                 result[flat_k] = flat_v
-        elif isinstance(v, list):
-            for i, item in enumerate(v):
+        elif isinstance(val, list):
+            for item in val:
                 try:
                     flat_item = flatten_keys(item)
                 except AttributeError:
                     flat_item = item
                 if isinstance(flat_item, dict):
                     for flat_k, flat_v in flat_item.items():
-                        # result[f"{k}.{i}.{flat_k}"] = flat_v
                         result[f"{flat_k}"] = flat_v
         else:
-            result[k] = v
+            result[key] = val
     return result
 
 
@@ -889,13 +892,13 @@ def comparer(val: str, operator: str, target: str | list) -> bool:
             pass
         return val, target
 
-    if target == "T" or target == "True":
+    if target in ["T", "True"]:
         target = True
-    if target == "F" or target == "False":
+    if target in ["F", "False"]:
         target = False
-    if val == "T" or val == "True":
+    if val in ["T", "True"]:
         val = True
-    if val == "F" or val == "False":
+    if val in ["F", "False"]:
         val = False
 
     if not operator:
@@ -914,7 +917,7 @@ def comparer(val: str, operator: str, target: str | list) -> bool:
     if operator == "=":
         if val == target:
             return True
-    elif operator == "~" or operator == "in":
+    elif operator in ["~", "in"]:
         try:
             if val in target:
                 return True
@@ -936,11 +939,11 @@ def comparer(val: str, operator: str, target: str | list) -> bool:
         if val <= target:
             return True
     else:
-        feedback("Unknown operator: %s (%s and %s)" % (operator, val, target))
+        feedback(f"Unknown operator: {operator} ({val} and {target})")
     return False
 
 
-def alpha_column(num: int, lower: bool = False) -> string:
+def alpha_column(num: int, lower: bool = False) -> str:
     """Convert a number to a letter-based notation
 
     Notes:
@@ -962,10 +965,9 @@ def alpha_column(num: int, lower: bool = False) -> string:
         return string.ascii_lowercase[divmod(num - 1, 26)[1] % 26] * (
             divmod(num - 1, 26)[0] + 1
         )
-    else:
-        return string.ascii_uppercase[divmod(num - 1, 26)[1] % 26] * (
-            divmod(num - 1, 26)[0] + 1
-        )
+    return string.ascii_uppercase[divmod(num - 1, 26)[1] % 26] * (
+        divmod(num - 1, 26)[0] + 1
+    )
 
 
 @lru_cache(maxsize=None)
@@ -1015,19 +1017,21 @@ def coordinate_to_tuple(coordinate: str, zeroed: bool = False) -> tuple:
     (0, 0)
     >>> coordinate_to_tuple('AB31', True)
     (27, 30)
+    >>> coordinate_to_tuple('')
     """
+    idx = None
     for idx, c in enumerate(coordinate):
         if c in digits:
             break
-    col = coordinate[:idx]
-    row = coordinate[idx:]
-    if zeroed:
-        return column_from_string(col) - 1, int(row) - 1
-    else:
+    if idx:
+        col = coordinate[:idx]
+        row = coordinate[idx:]
+        if zeroed:
+            return column_from_string(col) - 1, int(row) - 1
         return column_from_string(col), int(row)
 
 
-def sheet_column(num: int, lower: bool = False) -> string:
+def sheet_column(num: int, lower: bool = False) -> str:
     """Convert a spreadsheet number to a column letter
 
     Ref:
@@ -1049,13 +1053,12 @@ def sheet_column(num: int, lower: bool = False) -> string:
                 else converter((num - 1) // 26, lower)
                 + string.ascii_lowercase[(num - 1) % 26]
             )
-        else:
-            return (
-                ""
-                if num == 0
-                else converter((num - 1) // 26, lower)
-                + string.ascii_uppercase[(num - 1) % 26]
-            )
+        return (
+            ""
+            if num == 0
+            else converter((num - 1) // 26, lower)
+            + string.ascii_uppercase[(num - 1) % 26]
+        )
 
     return converter(num, lower)
 
@@ -1109,11 +1112,6 @@ def get_font_by_name(font_name: str) -> tuple:
     return font, font_file, font_name, mu_font_name
 
 
-def register_font(name: str, filename: str = None):
-    """Register a font."""
-    pass
-
-
 def base_fonts():
     """Register MS Core Fonts
 
@@ -1122,6 +1120,11 @@ def base_fonts():
         * The Windows filenames are 'truncated' versions, hence the use
           of an alternate
     """
+
+    def register_font(name: str, filename: str = None):
+        """Register a font."""
+        log.debug("register_font: %s %s", name, filename)
+
     fonts = [
         {
             "name": "Arial",
@@ -1169,7 +1172,7 @@ def base_fonts():
         feedback(f"Unable to register the MS font(s): {names}", False, True)
 
 
-def eval_template(string: str, data: dict = None, label: str = ""):
+def eval_template(strng: str, data: dict = None, label: str = ""):
     """Process data dict via jinja2 template in source.
 
     Doc Test:
@@ -1180,7 +1183,7 @@ def eval_template(string: str, data: dict = None, label: str = ""):
     '2+'
     """
     if data is None or not data:
-        return string
+        return strng
     if isinstance(data, tuple):
         try:
             data = data._asdict()
@@ -1190,16 +1193,16 @@ def eval_template(string: str, data: dict = None, label: str = ""):
         feedback("The data must be in the form of a dictionary", True)
     try:
         environment = jinja2.Environment()
-        template = environment.from_string(str(string))
+        template = environment.from_string(str(strng))
         custom_value = template.render(data)
         return custom_value
     except jinja2.exceptions.TemplateSyntaxError:
         feedback(
-            f'Unable to create the text or value - check the grammar for "{string}"',
+            f'Unable to create the text or value - check the grammar for "{strng}"',
             True,
         )
     except (ValueError, jinja2.exceptions.UndefinedError):
-        feedback(f'Unable to process "{string}" data with this template', True)
+        feedback(f'Unable to process "{strng}" data with this template', True)
 
 
 def validated_directions(
@@ -1222,15 +1225,25 @@ def validated_directions(
     ['w', 'e', 'n', 's', 'ne']
     >>> validated_directions(' w e n s ne ', DirectionGroup.COMPASS)  # spaces at ends
     ['w', 'e', 'n', 's', 'ne']
+    >>> validated_directions('  1 4 7 ', DirectionGroup.STAR, vertex_count=8)  # spaces at ends
+    [1, 4, 7]
+    >>> validated_directions('1 9 17 ', DirectionGroup.POLYGONAL, vertex_count=20)
+    [1, 9, 17]
+    >>> validated_directions(1, DirectionGroup.POLYGONAL, vertex_count=20)
+    [1]
     """
     if not value:
         return []
+    if isinstance(value, int):
+        value = str(value)
     if isinstance(value, str):
         value = value.strip()
         values = split(value.lower())
     else:
         if not isinstance(value, list):
-            feedback(f"Cannot handle {label}value - must be a string or a list!", True)
+            feedback(
+                f"Cannot handle {label}{value} - must be a string or a list!", True
+            )
         values = [str(val).lower().strip() for val in value]
     values_set = set(values)
     match direction_group:
@@ -1257,25 +1270,33 @@ def validated_directions(
         case DirectionGroup.POLYGONAL:  # polygon
             valid = set(range(1, vertex_count + 1))
             # print('^^^ ', vertex_count, values_set)
+        case DirectionGroup.STAR:  # star
+            valid = set(range(1, vertex_count + 1))
+            # print('^^^ ', vertex_count, values_set)
         case _:
             raise NotImplementedError(f"Cannot handle {direction_group} type!")
     if "all" in values or "*" in values:
         values = list(valid)
-        if direction_group == DirectionGroup.POLYGONAL:
+        if direction_group in [DirectionGroup.POLYGONAL, DirectionGroup.STAR]:
             values = range(1, vertex_count + 1)
         values_set = set(values)
     else:
-        if direction_group == DirectionGroup.POLYGONAL:
+        if direction_group in [DirectionGroup.POLYGONAL, DirectionGroup.STAR]:
+            shname = "Star" if direction_group == DirectionGroup.STAR else "Polygon"
             try:
                 values = [int(val) for val in values]
-            except:
-                feedback(f'Unable to use "{value}" as directions for a Polygon.', False)
+            except (NameError, TypeError, ValueError):
                 feedback(
-                    f"The Polygon directions must be numbers from 1 to {vertex_count}.",
+                    f'Unable to use "{value}" as direction(s) for a {shname}.', False
+                )
+                vrange = f"to {vertex_count}" if vertex_count else "onwards"
+                feedback(
+                    f"The {shname} directions must be whole numbers from 1 {vrange}.",
                     True,
                 )
             values_set = set(values)
-    if values_set.issubset(valid):
+    if values_set.issubset(valid) or not vertex_count:
+        # NOTE in some cases, we need to ignore `vertex_count` because not yet known...
         return values
     _label = f"the {label} value" if label else f'"{value}"'
     feedback(
@@ -1475,7 +1496,7 @@ def get_pymupdf_props(
     index=None,  # extract from list of potential values (usually Card options)
     **kwargs,
 ):
-    """Get pymupdf properties for fill, font, line, line style and colors
+    """Get pymupdf properties for fill, font, line, line style, colors and rotation
 
     Notes:
         If letting default a color parameter to None, then no resp. color selection
@@ -1505,11 +1526,11 @@ def get_pymupdf_props(
 
     defaults = defaults if defaults else {}
     # print(f'^^^ pymuProps: {kwargs.keys()} \n {kwargs.get("closed", "?")=}')
-    if "fill" in kwargs.keys():
+    if "fill" in kwargs:
         fill = kwargs.get("fill", None)  # reserve None for 'no fill at all'
     else:
         fill = defaults.get("fill")
-    if "stroke" in kwargs.keys():
+    if "stroke" in kwargs:
         stroke = kwargs.get("stroke", None)  # reserve None for 'no stroke at all'
     else:
         stroke = defaults.get("stroke", None)
@@ -1562,7 +1583,7 @@ def get_pymupdf_props(
         _dlist = (
             _dashed
             if isinstance(_dashed, (list, tuple))
-            else sequence_split(_dashed, as_int=False)
+            else sequence_split(_dashed, to_int=False)
         )
         doffset = round(unit(_dlist[2])) if len(_dlist) >= 3 else 0
         dspaced = round(unit(_dlist[1])) if len(_dlist) >= 2 else ""
@@ -1570,10 +1591,10 @@ def get_pymupdf_props(
         dashes = f"[{dlength} {dspaced}] {doffset}"
     else:
         dashes = None
-    # print(f"### SCP{_dotted =} {_dashed=} {dashes=}")
+    # print(f"^^^ SCP{_dotted =} {_dashed=} {dashes=}")
     # ---- check rotation
     morph = None
-    # print(f'^^^ SCP {_rotation_point=} {_rotation}')
+    # print(f'^^^ SCP {_rotation_point=} {_rotation=}')
     if _rotation_point and not isinstance(_rotation_point, (Point, muPoint)):
         feedback(f'Rotation point "{_rotation_point}" is invalid', True)
     if _rotation is not None and not isinstance(_rotation, (float, int)):
@@ -1632,7 +1653,6 @@ def set_canvas_props(
             closePath=pymu_props.closePath,
         )
     cnv.commit()
-    return None
 
 
 def get_font_file(font_name: str) -> tuple:
@@ -1666,7 +1686,7 @@ def get_font_file(font_name: str) -> tuple:
     return _name, font_path, _file
 
 
-def card_size(card_size: str = None, units: str = "pt") -> tuple:
+def card_size(card_size: str, units: str = "pt") -> tuple:
     """Return card width and height in requested units for a named size.
 
     Doc Test:
@@ -1686,12 +1706,16 @@ def card_size(card_size: str = None, units: str = "pt") -> tuple:
             size = STANDARD_CARD_SIZES["bridge"][units]
         case "business" | "u":
             size = STANDARD_CARD_SIZES["business"][units]
+        case "flash" | "f":
+            size = STANDARD_CARD_SIZES["flash"][units]
         case "mini" | "m":
             size = STANDARD_CARD_SIZES["mini"][units]
         case "miniamerican" | "ma":
             size = STANDARD_CARD_SIZES["miniamerican"][units]
         case "minieuropean" | "me":
             size = STANDARD_CARD_SIZES["minieuropean"][units]
+        case "mtg" | "magic":
+            size = STANDARD_CARD_SIZES["mtg"][units]
         case "poker" | "p" | "mtg":
             size = STANDARD_CARD_SIZES["poker"][units]
         case "skat" | "s":
@@ -1705,7 +1729,7 @@ def card_size(card_size: str = None, units: str = "pt") -> tuple:
     return size
 
 
-def paper_size(paper_size: str = None, units: str = "pt") -> tuple:
+def paper_size(paper_size: str, units: str = "pt") -> tuple:
     """Return paper width and height in requested units for a named size.
 
     Doc Test:
@@ -1774,13 +1798,13 @@ def html_img(text: str) -> str:
     'an <img src="A.png" height=20> or'
     """
     # ---- PNG
-    images = re.findall("\|\:(.*?)\:\|", text)
+    images = re.findall(r"\|\:(.*?)\:\|", text)
     txt = text
     for img in images:
         _img = img.strip(" ")
         items = _img.split(" ")
         image_name = items[0]
-        base, ext = os.path.splitext(image_name)
+        _, ext = os.path.splitext(image_name)
         if not ext:
             image_name = image_name + ".png"
         if len(items) > 1:
@@ -1790,18 +1814,17 @@ def html_img(text: str) -> str:
     if images:
         txt = txt.replace("|:", "").replace(":|", "")
     # ---- SVG
-    svg_images = re.findall("\|\;(.*?)\;\|", txt)
+    svg_images = re.findall(r"\|\;(.*?)\;\|", txt)
     for img in svg_images:
         _img = img.strip(" ")
         items = _img.split(" ")
         image_name = items[0]
-        base, ext = os.path.splitext(image_name)
+        _, ext = os.path.splitext(image_name)
         if not ext:
             image_name = image_name + ".svg"
         if len(items) > 1 and len(items) < 3:
             txt = txt.replace(img, f'<img src="{image_name}" height={items[1]}>')
         elif len(items) >= 3:
-            transform = True
             txt = txt.replace(img, f'<img src="{image_name}" height={items[1]}>')
         else:
             txt = txt.replace(img, f'<img src="{image_name}">')
@@ -1836,7 +1859,7 @@ def html_glyph(text: str, font_name: str, font_size: str = "") -> str:
     'an <span style="font-family: Helvetica; font-size: 12px; color: #000;">E001</span> or'
 
     """
-    glyphs = re.findall("\|\!(.*?)\!\|", text)
+    glyphs = re.findall(r"\|\!(.*?)\!\|", text)
     txt = text
     for glp in glyphs:
         _glp = glp.strip(" ")
@@ -1854,9 +1877,15 @@ def html_glyph(text: str, font_name: str, font_size: str = "") -> str:
                 f'<span style="font-family: {font_name}; font-size: {items[1]}px;">{glyph_name}</span>',
             )
         else:
-            txt = txt.replace(
-                glp, f'<span style="font-family: {font_name}">{glyph_name}</span'
-            )
+            if font_size:
+                txt = txt.replace(
+                    glp,
+                    f'<span style="font-family: {font_name}; ; font-size:{font_size}">{glyph_name}</span',
+                )
+            else:
+                txt = txt.replace(
+                    glp, f'<span style="font-family: {font_name}">{glyph_name}</span'
+                )
     if glyphs:
         txt = txt.replace("|!", "").replace("!|", "")
     # print(f"glyph text: {txt=}")
