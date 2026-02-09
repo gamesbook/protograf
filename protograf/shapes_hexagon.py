@@ -341,16 +341,18 @@ class HexShape(BaseShape):
         elif self.ORIENTATION == HexOrientation.FLAT:
             directions = ["w", "sw", "se", "e", "ne", "nw"]
         else:
+            directions = []
             feedback(
                 'Invalid orientation "{self.ORIENTATION}" supplied for hexagon.', True
             )
         vertex_dict = {}
-        for key, vertex in enumerate(vertices):
-            _vertex = Vertex(
-                point=vertex,
-                direction=directions[key],
-            )
-            vertex_dict[directions[key]] = _vertex
+        if directions:
+            for key, vertex in enumerate(vertices):
+                _vertex = Vertex(
+                    point=vertex,
+                    direction=directions[key],
+                )
+                vertex_dict[directions[key]] = _vertex
         return vertex_dict
 
     def get_orientation(self) -> HexOrientation:
@@ -1375,7 +1377,8 @@ class HexShape(BaseShape):
         # feedback(f'*** draw hex: {off_x=} {off_y=} {ID=}')
         # feedback(f'*** draw hex: {self.x=} {self.y=} {self.cx=} {self.cy=}')
         # feedback(f'*** draw hex: {self.row=} {self.col=}')
-        # feedback(f' @@@ Hexg.draw {kwargs=}')
+        # feedback(f'@@@ Hexg.draw {kwargs=}')
+        # feedback(f'@@@ Hexg.draw  {ID=} {kwargs["dataset"]=}')
         cnv = cnv if cnv else globals.canvas  # a new Page/Shape may now exist
         super().draw(cnv, off_x, off_y, ID, **kwargs)  # unit-based props
         # ---- calculate vertexes
@@ -1608,7 +1611,7 @@ class HexShape(BaseShape):
 
         # ---- grid marks
         if self.grid_marks:  # and not kwargs.get("card_back", False):
-            deltag = self.unit(self.grid_marks_length)
+            delta_grid = self.unit(self.grid_marks_length)
             pg_tl = Point(0, 0)
             pg_tr = Point(globals.page[0], 0)
             pg_bl = Point(0, globals.page[1])
@@ -1622,22 +1625,93 @@ class HexShape(BaseShape):
                 self.vertices[5],
             )
             # print('!!!' , v0, v1, v2, v3, v5, v5)
+            # feedback(f'@@@ Hexg.grid_marks {pg_tl=} {pg_tr=} {pg_bl=} {pg_br=}')
             if _lower(self.grid_marks_style) in ["edge", "both", "e", "b"]:
                 if self.ORIENTATION == HexOrientation.FLAT:
                     # north edge of hex
-                    pin = geoms.line_intersection_point(pg_tl, pg_bl, v4, v5)
+                    pin = geoms.line_intersection_point(pg_tl, pg_bl, v4, v5)  # left
                     if pin:
-                        pol = geoms.point_on_line(pin, v5, deltag)
-                        cnv.draw_line(pol, v5)
-                    pin = geoms.line_intersection_point(pg_tr, pg_br, v5, v4)
+                        pol = geoms.point_on_line(pin, v5, delta_grid)
+                        cnv.draw_line(pol, pin)
+                    pin = geoms.line_intersection_point(pg_tr, pg_br, v5, v4)  # right
                     if pin:
-                        pol = geoms.point_on_line(pin, v4, deltag)
-                        cnv.draw_line(pol, v4)
-                    # north-east edge of hex
+                        pol = geoms.point_on_line(pin, v4, delta_grid)
+                        cnv.draw_line(pol, pin)
+
+                    # north-east edge of hex: UP
+                    pin = geoms.line_intersection_point(
+                        pg_tl, pg_tr, v3, v4, True
+                    )  # top
+                    if not pin:
+                        pin = geoms.line_intersection_point(
+                            pg_tl, pg_bl, v3, v4, True
+                        )  # left
+                    if not pin:
+                        pin = geoms.line_intersection_point(
+                            pg_tr, pg_br, v3, v4, True
+                        )  # right
+                    if pin:
+                        pol = geoms.point_on_line(pin, v4, delta_grid)
+                        cnv.draw_line(pol, pin)
+                    # north-east edge of hex: DOWN
+                    pin = geoms.line_intersection_point(
+                        pg_bl, pg_br, v4, v3, True
+                    )  # btm
+                    if not pin:
+                        pin = geoms.line_intersection_point(
+                            pg_tl, pg_bl, v4, v3, True
+                        )  # left
+                    if not pin:
+                        pin = geoms.line_intersection_point(
+                            pg_tr, pg_br, v4, v3, True
+                        )  # right
+                    if pin:
+                        pol = geoms.point_on_line(pin, v3, delta_grid)
+                        cnv.draw_line(pol, pin)
+
                     # north-west edge of hex
+
                     # south edge of hex
+                    pin = geoms.line_intersection_point(pg_tl, pg_bl, v2, v1)
+                    if pin:
+                        pol = geoms.point_on_line(pin, v1, delta_grid)
+                        cnv.draw_line(pol, pin)
+                    pin = geoms.line_intersection_point(pg_tr, pg_br, v1, v2)
+                    if pin:
+                        pol = geoms.point_on_line(pin, v2, delta_grid)
+                        cnv.draw_line(pol, pin)
                     # south-east edge of hex
-                    # south-west edge of hex
+
+                    # south-west edge of hex: UP
+                    pin = geoms.line_intersection_point(
+                        pg_tl, pg_tr, v1, v0, True
+                    )  # top
+                    if not pin:
+                        pin = geoms.line_intersection_point(
+                            pg_tl, pg_bl, v1, v0, True
+                        )  # left
+                    if not pin:
+                        pin = geoms.line_intersection_point(
+                            pg_tr, pg_br, v1, v0, True
+                        )  # right
+                    if pin:
+                        pol = geoms.point_on_line(pin, v0, delta_grid)
+                        cnv.draw_line(pol, pin)
+                    # south-west edge of hex: DOWN
+                    pin = geoms.line_intersection_point(
+                        pg_bl, pg_br, v0, v1, True
+                    )  # btm
+                    if not pin:
+                        pin = geoms.line_intersection_point(
+                            pg_tl, pg_bl, v0, v1, True
+                        )  # left
+                    if not pin:
+                        pin = geoms.line_intersection_point(
+                            pg_tr, pg_br, v0, v1, True
+                        )  # right
+                    if pin:
+                        pol = geoms.point_on_line(pin, v1, delta_grid)
+                        cnv.draw_line(pol, pin)
 
             elif _lower(self.grid_marks_style) in ["cross", "c"]:
                 feedback(
