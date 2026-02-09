@@ -1381,6 +1381,7 @@ class HexShape(BaseShape):
         # ---- calculate vertexes
         geo = self.get_geometry()
         self.is_cards = kwargs.get("is_cards", False)
+        self.grid_marks = kwargs.get("grid_marks", self.grid_marks)
         self.vertices = self._shape_vertexes  # also sets self.centre
         # ---- calculate area
         self.area = self.calculate_area()
@@ -1604,6 +1605,56 @@ class HexShape(BaseShape):
                 self.grid = GridShape(
                     label=self.coord_text, x=self.x_d, y=self.y_d, shape=self
                 )
+
+        # ---- grid marks
+        if self.grid_marks:  # and not kwargs.get("card_back", False):
+            deltag = self.unit(self.grid_marks_length)
+            pg_tl = Point(0, 0)
+            pg_tr = Point(globals.page[0], 0)
+            pg_bl = Point(0, globals.page[1])
+            pg_br = Point(globals.page[0], globals.page[1])
+            v0, v1, v2, v3, v4, v5 = (  # anti-clockwise from west-point
+                self.vertices[0],
+                self.vertices[1],
+                self.vertices[2],
+                self.vertices[3],
+                self.vertices[4],
+                self.vertices[5],
+            )
+            # print('!!!' , v0, v1, v2, v3, v5, v5)
+            if _lower(self.grid_marks_style) in ["edge", "both", "e", "b"]:
+                if self.ORIENTATION == HexOrientation.FLAT:
+                    # north edge of hex
+                    pin = geoms.line_intersection_point(pg_tl, pg_bl, v4, v5)
+                    if pin:
+                        pol = geoms.point_on_line(pin, v5, deltag)
+                        cnv.draw_line(pol, v5)
+                    pin = geoms.line_intersection_point(pg_tr, pg_br, v5, v4)
+                    if pin:
+                        pol = geoms.point_on_line(pin, v4, deltag)
+                        cnv.draw_line(pol, v4)
+                    # north-east edge of hex
+                    # north-west edge of hex
+                    # south edge of hex
+                    # south-east edge of hex
+                    # south-west edge of hex
+
+            elif _lower(self.grid_marks_style) in ["cross", "c"]:
+                feedback(
+                    f'"{self.grid_marks_style}" is an invalid grid_marks_style for Hexagons!',
+                    True,
+                )
+            else:
+                feedback(
+                    f'"{self.grid_marks_style}" is an invalid grid_marks_style!', True
+                )
+            # done
+            gargs = {}
+            gargs["stroke"] = self.grid_marks_stroke
+            gargs["stroke_width"] = self.grid_marks_stroke_width
+            gargs["stroke_ends"] = self.grid_marks_ends
+            gargs["dotted"] = self.grid_marks_dotted
+            self.set_canvas_props(cnv=None, index=ID, **gargs)
 
         # ---- debug
         # self._debug(cnv, Point(x, y), 'start')

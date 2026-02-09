@@ -504,6 +504,31 @@ def lines_intersect(a_start: Point, a_end: Point, c_start: Point, c_end: Point) 
     ) != ccw(a_start, a_end, c_end)
 
 
+def line_intersection_point(p1: Point, p2: Point, p3: Point, p4: Point) -> Point:
+    """Calculate intersection of two extended lines (p1-p2) and (p3-p4).
+
+    Doc Test:
+
+    >>> line_intersection_point(Point(0, 0), Point(10, 10), Point(0, 10), Point(10, 0))
+    Point(x=5.0, y=5.0)
+    >>> line_intersection_point(Point(0, 0), Point(10, 10), Point(0, 10), Point(2.5, 7.5))
+    Point(x=5.0, y=5.0)
+    >>> line_intersection_point(Point(0, 10), Point(0, 0), Point(10, 10), Point(10, 0))
+    """
+    x1, y1 = p1.x, p1.y
+    x2, y2 = p2.x, p2.y
+    x3, y3 = p3.x, p3.y
+    x4, y4 = p4.x, p4.y
+    denom = (y4 - y3) * (x2 - x1) - (x4 - x3) * (y2 - y1)
+    if denom == 0:
+        return None  # parallel or coincident
+    ua = ((x4 - x3) * (y1 - y3) - (y4 - y3) * (x1 - x3)) / denom
+    # intersection point
+    x = x1 + ua * (x2 - x1)
+    y = y1 + ua * (y2 - y1)
+    return Point(x, y)
+
+
 def bezier_arc_segment(
     cx: float, cy: float, rx: float, ry: float, theta0: float, theta1: float
 ):

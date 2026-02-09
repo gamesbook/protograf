@@ -340,6 +340,7 @@ class CardShape(BaseShape):
         else:
             move_x = 0
         # feedback(f'$$$ {right_gap=} {self.offset_x=} {move_x=}')
+        # feedback(f'$$$ {shape_kwargs["frame_type"]=} {shape_kwargs["grid_marks"]=}')
         outline.draw(off_x=move_x, off_y=0, **shape_kwargs)  # inc. grid_marks
 
         # ---- track frame outlines for possible image extraction
