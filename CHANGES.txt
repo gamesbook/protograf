@@ -3,6 +3,7 @@ protograf Changes
 
 2026-00-00 (0.4.5)
 ------------------
+- Enable grid marks for Hexagonal cards
 - [PLANNED] Enable Line connections to Ellipse shapes
 - [PLANNED] Enable text labels for snail lines
 - [PLANNED] Add code for DiamondLocations

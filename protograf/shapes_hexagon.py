@@ -1637,15 +1637,10 @@ class HexShape(BaseShape):
                     if pin:
                         pol = geoms.point_on_line(pin, v4, delta_grid)
                         cnv.draw_line(pol, pin)
-
                     # north-east edge of hex: UP
                     pin = geoms.line_intersection_point(
                         pg_tl, pg_tr, v3, v4, True
                     )  # top
-                    if not pin:
-                        pin = geoms.line_intersection_point(
-                            pg_tl, pg_bl, v3, v4, True
-                        )  # left
                     if not pin:
                         pin = geoms.line_intersection_point(
                             pg_tr, pg_br, v3, v4, True
@@ -1659,18 +1654,33 @@ class HexShape(BaseShape):
                     )  # btm
                     if not pin:
                         pin = geoms.line_intersection_point(
-                            pg_tl, pg_bl, v4, v3, True
-                        )  # left
-                    if not pin:
-                        pin = geoms.line_intersection_point(
                             pg_tr, pg_br, v4, v3, True
                         )  # right
                     if pin:
                         pol = geoms.point_on_line(pin, v3, delta_grid)
                         cnv.draw_line(pol, pin)
-
-                    # north-west edge of hex
-
+                    # north-west edge of hex: UP
+                    pin = geoms.line_intersection_point(
+                        pg_tl, pg_tr, v0, v5, True
+                    )  # top
+                    if not pin:
+                        pin = geoms.line_intersection_point(
+                            pg_tr, pg_br, v0, v5, True
+                        )  # right
+                    if pin:
+                        pol = geoms.point_on_line(pin, v5, delta_grid)
+                        cnv.draw_line(pol, pin)
+                    # north-west edge of hex: DOWN
+                    pin = geoms.line_intersection_point(
+                        pg_bl, pg_br, v5, v0, True
+                    )  # btm
+                    if not pin:
+                        pin = geoms.line_intersection_point(
+                            pg_tl, pg_bl, v5, v0, True
+                        )  # left
+                    if pin:
+                        pol = geoms.point_on_line(pin, v5, delta_grid)
+                        cnv.draw_line(pol, pin)
                     # south edge of hex
                     pin = geoms.line_intersection_point(pg_tl, pg_bl, v2, v1)
                     if pin:
@@ -1680,8 +1690,28 @@ class HexShape(BaseShape):
                     if pin:
                         pol = geoms.point_on_line(pin, v2, delta_grid)
                         cnv.draw_line(pol, pin)
-                    # south-east edge of hex
-
+                    # south-east edge of hex: UP
+                    pin = geoms.line_intersection_point(
+                        pg_tl, pg_tr, v2, v3, True
+                    )  # top
+                    if not pin:
+                        pin = geoms.line_intersection_point(
+                            pg_tr, pg_br, v2, v3, True
+                        )  # right
+                    if pin:
+                        pol = geoms.point_on_line(pin, v3, delta_grid)
+                        cnv.draw_line(pol, pin)
+                    # south-east edge of hex: DOWN
+                    pin = geoms.line_intersection_point(
+                        pg_bl, pg_br, v3, v2, True
+                    )  # btm
+                    if not pin:
+                        pin = geoms.line_intersection_point(
+                            pg_tl, pg_bl, v3, v2, True
+                        )  # left
+                    if pin:
+                        pol = geoms.point_on_line(pin, v2, delta_grid)
+                        cnv.draw_line(pol, pin)
                     # south-west edge of hex: UP
                     pin = geoms.line_intersection_point(
                         pg_tl, pg_tr, v1, v0, True
@@ -1690,10 +1720,6 @@ class HexShape(BaseShape):
                         pin = geoms.line_intersection_point(
                             pg_tl, pg_bl, v1, v0, True
                         )  # left
-                    if not pin:
-                        pin = geoms.line_intersection_point(
-                            pg_tr, pg_br, v1, v0, True
-                        )  # right
                     if pin:
                         pol = geoms.point_on_line(pin, v0, delta_grid)
                         cnv.draw_line(pol, pin)
@@ -1701,10 +1727,6 @@ class HexShape(BaseShape):
                     pin = geoms.line_intersection_point(
                         pg_bl, pg_br, v0, v1, True
                     )  # btm
-                    if not pin:
-                        pin = geoms.line_intersection_point(
-                            pg_tl, pg_bl, v0, v1, True
-                        )  # left
                     if not pin:
                         pin = geoms.line_intersection_point(
                             pg_tr, pg_br, v0, v1, True
