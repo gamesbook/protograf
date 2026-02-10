@@ -73,6 +73,7 @@ from .layouts import (
     GridShape,
     DotGridShape,
     HexHexShape,
+    DiamondLocations,  # used in user scripts
     RectangularLocations,  # used in user scripts
     TriangularLocations,  # used in user scripts
     VirtualLocations,

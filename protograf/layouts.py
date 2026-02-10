@@ -802,6 +802,23 @@ class VirtualShape:
             _label = f" for {label}" if label else ""
             feedback(f'"{value}"{_label} is not a valid floating number!', True)
 
+    def unit(self, item, units: str = None, skip_none: bool = False, label: str = ""):
+        """Convert an item into the appropriate unit system."""
+        log.debug("units %s %s :: label: %s", units, globals.units, label)
+        if item is None and skip_none:
+            return None
+        units = support.to_units(units) if units is not None else globals.units
+        try:
+            _item = tools.as_float(item, label)
+            return _item * units
+        except (TypeError, ValueError):
+            _label = f" {label}" if label else ""
+            feedback(
+                f"Unable to set unit value for{_label}: {item}."
+                " Please check that this is a valid value.",
+                stop=True,
+            )
+
 
 # ---- virtual HexHex grid
 
@@ -1149,7 +1166,11 @@ class VirtualLocations(VirtualShape):
             or "e" in _lower(self.start)[0]
             and "e" in _lower(self.direction)[0]
         ):
-            feedback(f"Cannot use {self.start} with {self.direction}!", True)
+            if not isinstance(self, DiamondLocations):  # diamond does not use facing
+                feedback(
+                    f"Cannot use start '{self.start}' with facing '{self.direction}'!",
+                    True,
+                )
         if _lower(self.direction) in ["north", "n", "south", "s"]:
             self.flow = "vert"
         elif _lower(self.direction) in ["west", "w", "east", "e"]:
@@ -1215,7 +1236,7 @@ class RectangularLocations(VirtualLocations):
         self.start = kwargs.get("start", "sw")
         if self.cols < 2 or self.rows < 2:
             feedback(
-                f"Minimum layout size is 2x2 (cannot use {self.cols }x{self.rows})!",
+                f"Minimum rectangular layout size is 2x2 (cannot use {self.cols }x{self.rows})!",
                 True,
             )
         if _lower(self.start) not in ["sw", "se", "nw", "ne"]:
@@ -1478,7 +1499,7 @@ class TriangularLocations(VirtualLocations):
         self.facing = kwargs.get("facing", "north")
         if (self.cols < 2 and self.rows < 1) or (self.cols < 1 and self.rows < 2):
             feedback(
-                f"Minimum layout size is 2x1 or 1x2 (cannot use {self.cols }x{self.rows})!",
+                f"Minimum triangular layout size is 2x1 or 1x2 (cannot use {self.cols }x{self.rows})!",
                 True,
             )
         if _lower(self.start) not in [
@@ -1616,17 +1637,207 @@ class DiamondLocations(VirtualLocations):
     Common properties and methods to define virtual diamond locations.
     """
 
-    def __init__(self, rows=1, cols=2, **kwargs):
+    def __init__(self, rows=3, cols=3, **kwargs):
         super().__init__(rows, cols, **kwargs)
         self.kwargs = kwargs
-        if (self.cols < 2 and self.rows < 1) or (self.cols < 1 and self.rows < 2):
+        self.start = kwargs.get("start", "north")
+        if self.cols and not kwargs.get("rows"):
+            self.rows = self.cols
+        if self.rows and not kwargs.get("cols"):
+            self.cols = self.rows
+        self.diamond_validate()
+        # calculated settings
+        self._side = self.unit(self.side)
+        self.col_gap = math.sqrt(2) * self._side
+        self.row_gap = self._side
+        self.total_height = self.row_gap * self.rows // 2
+        self.total_width = self.col_gap * (self.cols - 1) // 2
+        # feedback(f"~~~ Dia {self.total_height=} {self.total_width=}", False)
+
+    def diamond_validate(self):
+        if self.cols < 3 or self.rows < 3:
             feedback(
-                f"Minimum layout size is 2x1 or 1x2 (cannot use {self.cols }x{self.rows})!",
+                f"Minimum diamond layout size is 3x3 (cannot use {self.cols }x{self.rows})!",
+                True,
+            )
+        if self.cols != self.rows:
+            feedback(
+                f"Diamond layout requires equal rows and cols (cannot use {self.cols }x{self.rows})!",
+                True,
+            )
+        if not (self.cols & 1 == 1):
+            feedback(
+                f"Diamond layout requires odd rows and cols (cannot use {self.cols }x{self.rows})!",
+                True,
+            )
+        if _lower(self.start) not in [
+            "north",
+            "south",
+            "east",
+            "west",
+            "n",
+            "e",
+            "w",
+            "s",
+        ]:
+            feedback(
+                f"'{self.start}' is not a valid start - use: 'n', 's', 'e', or 'w'",
                 True,
             )
 
     def next_locale(self) -> Locale:
         """Yield next Location for each call."""
+        _start = self.set_compass(_lower(self.start))
+
+        # ---- store col/row as list of lists
+        array = []
+        match _start:
+            case "north":
+                start_col = self.cols // 2 + 1
+                mid_row = self.rows // 2 + 1
+                items = 1
+                for row in range(1, self.rows + 1):
+                    for arr in range(0, items):
+                        array.append([start_col + arr * 2, row])
+                    if row < mid_row:
+                        items += 1
+                        start_col -= 1
+                    else:
+                        items -= 1
+                        start_col += 1
+            case "south":
+                start_col = self.cols // 2 + 1
+                mid_row = self.rows // 2 + 1
+                items = 1
+                for row in range(self.rows, 0, -1):
+                    for arr in range(0, items):
+                        array.append([start_col + arr * 2, row])
+                    if row > mid_row:
+                        items += 1
+                        start_col -= 1
+                    else:
+                        items -= 1
+                        start_col += 1
+            case "east":
+                start_row = self.rows // 2 + 1
+                mid_col = self.cols // 2 + 1
+                items = 1
+                for col in range(self.cols, 0, -1):
+                    for arr in range(0, items):
+                        array.append([col, start_row + arr * 2])
+                    if col > mid_col:
+                        items += 1
+                        start_row -= 1
+                    else:
+                        items -= 1
+                        start_row += 1
+            case "west":
+                start_row = self.rows // 2 + 1
+                mid_col = self.cols // 2 + 1
+                items = 1
+                for col in range(1, self.cols + 1):
+                    for arr in range(0, items):
+                        array.append([col, start_row + arr * 2])
+                    if col < mid_col:
+                        items += 1
+                        start_row -= 1
+                    else:
+                        items -= 1
+                        start_row += 1
+            case _:
+                feedback(
+                    f"'{self.start}' is not a valid start - use: 'n', 's', 'e', or 'w'",
+                    True,
+                )
+        # feedback(f"~~~ Dia {_start=} {array=}", False)
+
+        # ---- calculate initial conditions
+        col_start, row_start = 1, 1
+        match _start:
+            case "north":
+                row_start = 1
+                col_start = 1
+                # clockwise = True if _dir == "north" else False
+            case "west":
+                row_start = 1
+                col_start = self.cols
+                # clockwise = True if _dir == "west" else False
+            case "east":
+                row_start = self.rows
+                col_start = 1
+                # clockwise = True if _dir == "east" else False
+
+        _, _, count = col_start, row_start, 0
+        # max_outer = 2 * self.rows + (self.cols - 2) * 2
+        corner = None
+        # ---- set row and col interval
+        match _start:
+            case "north" | "south":  # layout is row-oriented
+                self.interval_x = self.side
+                self.interval_y = math.sqrt(3) / 2.0 * self.side
+            case "east" | "west":  # layout is col-oriented
+                self.interval_x = math.sqrt(3) / 2.0 * self.side
+                self.interval_y = self.side
+        # ---- iterate the rows and cols
+        # hlf_side = self.side / 2.0
+        for key, entry in enumerate(array):
+            match _start:
+                case "south":  # layout is row-oriented
+                    y = (
+                        self.y
+                        + (self.rows - 1) * self.interval_y
+                        - (key + 1) * self.interval_y
+                    )
+                    dx = (
+                        0.5 * (self.cols - len(entry)) * self.interval_x
+                        - (self.cols - 1) * 0.5 * self.interval_x
+                    )
+                    for val, loc in enumerate(entry):
+                        count += 1
+                        x = self.x + dx + val * self.interval_x
+                        yield Locale(
+                            loc, key + 1, x, y, self.set_id(loc, key + 1), count, corner
+                        )
+                case "north":  # layout is row-oriented
+                    y = self.y + key * self.interval_y
+                    dx = (
+                        0.5 * (self.cols - len(entry)) * self.interval_x
+                        - (self.cols - 1) * 0.5 * self.interval_x
+                    )
+                    for val, loc in enumerate(entry):
+                        count += 1
+                        x = self.x + dx + val * self.interval_x
+                        yield Locale(
+                            loc, key + 1, x, y, self.set_id(loc, key + 1), count, corner
+                        )
+                case "east":  # layout is col-oriented
+                    x = (
+                        self.x
+                        + self.cols * self.interval_x
+                        - (key + 2) * self.interval_x
+                    )
+                    dy = (
+                        0.5 * (self.rows - len(entry)) * self.interval_y
+                        - (self.rows - 1) * 0.5 * self.interval_y
+                    )
+                    for val, loc in enumerate(entry):
+                        count += 1
+                        y = self.y + dy + val * self.interval_y
+                        yield Locale(
+                            key + 1, loc, x, y, self.set_id(key + 1, loc), count, corner
+                        )
+                case "west":  # layout is col-oriented
+                    x = self.x + key * self.interval_x
+                    dy = (
+                        0.5 * (self.rows - len(entry)) * self.interval_y
+                        - (self.rows - 1) * 0.5 * self.interval_y
+                    )
+                    for val, loc in enumerate(entry):
+                        count += 1
+                        y = self.y + dy + val * self.interval_y
+                        yield Locale(
+                            key + 1, loc, x, y, self.set_id(key + 1, loc), count, corner
+                        )
 
 
 # ---- tracks
