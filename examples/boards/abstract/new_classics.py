@@ -294,7 +294,27 @@ HexHex(
 PageBreak()
 
 # ---- .Turkish Checkers (checker board)
+
 # ---- .Ultimate Tic-Tac-Toe
+Text("Ultimate Tic-Tac-Toe", common=title)
+Text(source, common=credit)
+Grid(
+    x=4, y=1,
+    cols=3, rows=3,
+    stroke_width=3,
+    side=6,
+    omit_outer=True,
+)
+for x in range(0, 18, 6):
+    for y in range(0, 18, 6):
+        Grid(
+            x=x + 4.45, y=y + 1.45,
+            cols=3, rows=3,
+            stroke_width=1.5,
+            side=1.7,
+            dotted=True,
+            omit_outer=True)
+PageBreak()
 
 # ---- .Volo
 Text("Volo", common=title)
