@@ -1647,14 +1647,16 @@ class DiamondLocations(VirtualLocations):
             self.cols = self.rows
         self.diamond_validate()
         # calculated settings
-        self._side = self.unit(self.side)
-        self.col_gap = math.sqrt(2) * self._side
-        self.row_gap = self._side
-        self.total_height = self.row_gap * self.rows // 2
-        self.total_width = self.col_gap * (self.cols - 1) // 2
-        # feedback(f"~~~ Dia {self.total_height=} {self.total_width=}", False)
+        self._side = self.side  # self.unit(self.side) KEEP USER UNITS
+        self.gap_col = math.sqrt(1.5 * self._side)
+        self.gap_row = self._side * 0.5
+        self.total_height = 2 * self.gap_row * (self.rows // 2)
+        self.total_width = self.gap_col * (self.cols - 1)
+        self.array = self.diamond_array()
+        # feedback(f"~~~ Dia {self.gap_col=} {self.total_height=} {self.total_width=}", False)
 
     def diamond_validate(self):
+        """Check that settings for DiamondLayout are correct."""
         if self.cols < 3 or self.rows < 3:
             feedback(
                 f"Minimum diamond layout size is 3x3 (cannot use {self.cols }x{self.rows})!",
@@ -1685,10 +1687,9 @@ class DiamondLocations(VirtualLocations):
                 True,
             )
 
-    def next_locale(self) -> Locale:
-        """Yield next Location for each call."""
+    def diamond_array(self) -> list:
+        """Calculate sequenced rows and columns for DiamondLayout."""
         _start = self.set_compass(_lower(self.start))
-
         # ---- store col/row as list of lists
         array = []
         match _start:
@@ -1750,94 +1751,26 @@ class DiamondLocations(VirtualLocations):
                     True,
                 )
         # feedback(f"~~~ Dia {_start=} {array=}", False)
+        return array
 
-        # ---- calculate initial conditions
-        col_start, row_start = 1, 1
-        match _start:
-            case "north":
-                row_start = 1
-                col_start = 1
-                # clockwise = True if _dir == "north" else False
-            case "west":
-                row_start = 1
-                col_start = self.cols
-                # clockwise = True if _dir == "west" else False
-            case "east":
-                row_start = self.rows
-                col_start = 1
-                # clockwise = True if _dir == "east" else False
-
-        _, _, count = col_start, row_start, 0
-        # max_outer = 2 * self.rows + (self.cols - 2) * 2
+    def next_locale(self) -> Locale:
+        """Yield next Location for each call."""
         corner = None
-        # ---- set row and col interval
-        match _start:
-            case "north" | "south":  # layout is row-oriented
-                self.interval_x = self.side
-                self.interval_y = math.sqrt(3) / 2.0 * self.side
-            case "east" | "west":  # layout is col-oriented
-                self.interval_x = math.sqrt(3) / 2.0 * self.side
-                self.interval_y = self.side
-        # ---- iterate the rows and cols
-        # hlf_side = self.side / 2.0
-        for key, entry in enumerate(array):
-            match _start:
-                case "south":  # layout is row-oriented
-                    y = (
-                        self.y
-                        + (self.rows - 1) * self.interval_y
-                        - (key + 1) * self.interval_y
-                    )
-                    dx = (
-                        0.5 * (self.cols - len(entry)) * self.interval_x
-                        - (self.cols - 1) * 0.5 * self.interval_x
-                    )
-                    for val, loc in enumerate(entry):
-                        count += 1
-                        x = self.x + dx + val * self.interval_x
-                        yield Locale(
-                            loc, key + 1, x, y, self.set_id(loc, key + 1), count, corner
-                        )
-                case "north":  # layout is row-oriented
-                    y = self.y + key * self.interval_y
-                    dx = (
-                        0.5 * (self.cols - len(entry)) * self.interval_x
-                        - (self.cols - 1) * 0.5 * self.interval_x
-                    )
-                    for val, loc in enumerate(entry):
-                        count += 1
-                        x = self.x + dx + val * self.interval_x
-                        yield Locale(
-                            loc, key + 1, x, y, self.set_id(loc, key + 1), count, corner
-                        )
-                case "east":  # layout is col-oriented
-                    x = (
-                        self.x
-                        + self.cols * self.interval_x
-                        - (key + 2) * self.interval_x
-                    )
-                    dy = (
-                        0.5 * (self.rows - len(entry)) * self.interval_y
-                        - (self.rows - 1) * 0.5 * self.interval_y
-                    )
-                    for val, loc in enumerate(entry):
-                        count += 1
-                        y = self.y + dy + val * self.interval_y
-                        yield Locale(
-                            key + 1, loc, x, y, self.set_id(key + 1, loc), count, corner
-                        )
-                case "west":  # layout is col-oriented
-                    x = self.x + key * self.interval_x
-                    dy = (
-                        0.5 * (self.rows - len(entry)) * self.interval_y
-                        - (self.rows - 1) * 0.5 * self.interval_y
-                    )
-                    for val, loc in enumerate(entry):
-                        count += 1
-                        y = self.y + dy + val * self.interval_y
-                        yield Locale(
-                            key + 1, loc, x, y, self.set_id(key + 1, loc), count, corner
-                        )
+        # ---- iterate the array
+        for key, entry in enumerate(self.array):
+            dx, dy = entry[0], entry[1]  # col & row numbers
+            x = self.x + (dx - 1) * self.gap_col
+            y = self.y + (dy - 1) * self.gap_row
+            # ("col", "row", "x", "y", "id", "sequence", "corner", "label", "page")
+            yield Locale(
+                entry[0],
+                entry[1],
+                x,
+                y,
+                self.set_id(entry[0], entry[1]),
+                key + 1,
+                corner,
+            )
 
 
 # ---- tracks

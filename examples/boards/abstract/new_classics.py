@@ -105,7 +105,18 @@ PageBreak()
 
 # ---- .Cairo Corridor
 # ---- .Checkers
+
 # ---- .Chinese Checkers
+CC_LINE = "#E4B700"
+CC_FILL = "#FFFDB2"
+CC_PLAY = "#E7B900"
+CC_MID = "#FFD42A"
+Text("Go", common=title)
+Text(source, common=credit)
+
+Dot(cx=14, cy=10, dot_width=10)
+PageBreak()
+
 # ---- .Connect6 (pen-and-paper)
 
 # ---- .Go

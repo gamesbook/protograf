@@ -4751,6 +4751,7 @@ def Layout(grid, **kwargs):
             shape = copy(_shape)
 
             # ---- * execute shape.draw()
+            # breakpoint()
             cx = loc.x * shape.units + shape._o.delta_x
             cy = loc.y * shape.units + shape._o.delta_y
             locale = Locale(
@@ -4793,7 +4794,7 @@ def Layout(grid, **kwargs):
                     Dot(
                         x=loc.x,
                         y=loc.y,
-                        label=f"{loc.x},{loc.y}",
+                        label=f"{round(loc.x, 2)},{round(loc.y, 2)}",
                         stroke=DEBUG_COLOR,
                         fill=DEBUG_COLOR,
                     )
