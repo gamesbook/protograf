@@ -113,7 +113,7 @@ rect = RectangularLocations(
 Layout(
   rect,
   shapes=[a_circle, rectangle(label="{{sequence}}//{{col}}-{{row}}", label_size=6)],
-  locations=[(1,2), (2,3), (3,1), (1,1), (3,4)])
+  locations=[ (1,1), (1,2), (2,3), (3,1), (3,4)])
 
 # Save()
 Save(

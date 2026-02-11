@@ -4610,6 +4610,8 @@ def Layout(grid, **kwargs):
     kwargs = kwargs
     shapes = kwargs.get("shapes", [])  # shapes or Places
     locations = kwargs.get("locations", [])
+    location_rows = kwargs.get("rows", [])
+    location_cols = kwargs.get("cols", [])
     corners = kwargs.get("corners", [])  # shapes or Places for corners only!
     rotations = kwargs.get("rotations", [])  # rotations for an edge
     if kwargs.get("masked") and isinstance(kwargs.get("masked"), str):
@@ -4655,13 +4657,21 @@ def Layout(grid, **kwargs):
 
     # ---- setup locations; automatically or via user-specification
     shape_id = 0
-    default_locations = enumerate(grid.next_locale())
-    if not locations:
+    _default_locations = enumerate(grid.next_locale())
+    default_locations = [*_default_locations]
+    if not locations and not location_rows and not location_cols:
         _locations = default_locations
     else:
         _locations = []
         user_locations = tools.integer_pairs(locations, label="locations")
-        # restructure and pick locations according to user input
+        user_location_rows = tools.sequence_split(
+            location_rows, to_int=True, unique=True, msg="rows"
+        )
+        user_location_cols = tools.sequence_split(
+            location_cols, to_int=True, unique=True, msg="col"
+        )
+
+        # ---- pick locations according to user input
         for key, user_loc in enumerate(user_locations):
             for loc in default_locations:
                 if user_loc[0] == loc[1].col and user_loc[1] == loc[1].row:
@@ -4680,6 +4690,52 @@ def Layout(grid, **kwargs):
                     )
                     _locations.append(new_loc)
             default_locations = enumerate(grid.next_locale())  # regenerate !
+
+        # ---- pick locations by row according to user input
+        for key, user_loc in enumerate(user_location_rows):
+            for loc in default_locations:
+                if user_loc == loc[1].row:
+                    new_loc = (
+                        key,
+                        Locale(
+                            col=loc[1].col,
+                            row=loc[1].row,
+                            x=loc[1].x,
+                            y=loc[1].y,
+                            id=f"{loc[1].col}:{loc[1].row}",  # ,loc[1].id,
+                            sequence=key,
+                            corner=loc[1].corner,
+                            page=globals.page_count + 1,
+                        ),
+                    )
+                    if new_loc not in _locations:
+                        _locations.append(new_loc)
+            default_locations = enumerate(grid.next_locale())  # regenerate !
+
+        # ---- pick locations by col according to user input
+        for key, user_loc in enumerate(user_location_cols):
+            for loc in default_locations:
+                if user_loc == loc[1].col:
+                    new_loc = (
+                        key,
+                        Locale(
+                            col=loc[1].col,
+                            row=loc[1].row,
+                            x=loc[1].x,
+                            y=loc[1].y,
+                            id=f"{loc[1].col}:{loc[1].row}",  # ,loc[1].id,
+                            sequence=key,
+                            corner=loc[1].corner,
+                            page=globals.page_count + 1,
+                        ),
+                    )
+                    if new_loc not in _locations:
+                        _locations.append(new_loc)
+            default_locations = enumerate(grid.next_locale())  # regenerate !
+
+    # print('pre-draw locs')
+    # for l in _locations: print(l)
+    # breakpoint()
 
     # ---- generate rotations - keyed per sequence number
     rotation_sequence = {}
@@ -4707,13 +4763,14 @@ def Layout(grid, **kwargs):
 
     # ---- iterate through locations & draw shape(s)
     for count, loc in _locations:
+        # print("time to draw locs:", count, loc)
         if masked and count + 1 in masked:  # ignore if IN masked
             continue
         if visible and count + 1 not in visible:  # ignore if NOT in visible
             continue
         if grid.stop and count + 1 >= grid.stop:
             break
-        if grid.pattern in ["o", "outer"]:
+        if grid.pattern in ["o", "outer"]:  # Rectangle only?
             if count + 1 > grid.rows * 2 + (grid.cols - 2) * 2:
                 break
         if shapes:

@@ -1648,7 +1648,7 @@ class DiamondLocations(VirtualLocations):
         self.diamond_validate()
         # calculated settings
         self._side = self.side  # self.unit(self.side) KEEP USER UNITS
-        self.gap_col = math.sqrt(1.5 * self._side)
+        self.gap_col = math.sqrt(0.5) * self._side
         self.gap_row = self._side * 0.5
         self.total_height = 2 * self.gap_row * (self.rows // 2)
         self.total_width = self.gap_col * (self.cols - 1)
@@ -1756,13 +1756,39 @@ class DiamondLocations(VirtualLocations):
     def next_locale(self) -> Locale:
         """Yield next Location for each call."""
         corner = None
+        # ---- get offset
+        _start = self.set_compass(_lower(self.start))
+        # ---- calculate start point relative to facing
+        match _start:
+            case "north":
+                self.start_x = self.x - 0.5 * self.total_width
+                self.start_y = self.y
+            case "south":
+                self.start_x = self.x - 0.5 * self.total_width
+                self.start_y = self.y - self.total_height
+            case "east":
+                self.start_x = self.x - self.total_width
+                self.start_y = self.y - 0.5 * self.total_height
+            case "west":
+                self.start_x = self.x
+                self.start_y = self.y - 0.5 * self.total_height
         # ---- iterate the array
         for key, entry in enumerate(self.array):
+            if entry[0] == self.cols // 2 + 1 and (
+                entry[1] == 1 or entry[1] == self.rows
+            ):
+                corner = True
+            elif entry[1] == self.rows // 2 + 1 and (
+                entry[0] == 1 or entry[0] == self.cols
+            ):
+                corner = True
+            else:
+                corner = None
             dx, dy = entry[0], entry[1]  # col & row numbers
-            x = self.x + (dx - 1) * self.gap_col
-            y = self.y + (dy - 1) * self.gap_row
+            x = self.start_x + (dx - 1) * self.gap_col
+            y = self.start_y + (dy - 1) * self.gap_row
             # ("col", "row", "x", "y", "id", "sequence", "corner", "label", "page")
-            yield Locale(
+            _locale = Locale(
                 entry[0],
                 entry[1],
                 x,
@@ -1771,6 +1797,8 @@ class DiamondLocations(VirtualLocations):
                 key + 1,
                 corner,
             )
+            # print(_locale.col, _locale.row, _locale.corner)
+            yield _locale
 
 
 # ---- tracks

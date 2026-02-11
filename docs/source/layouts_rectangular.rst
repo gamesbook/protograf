@@ -597,7 +597,8 @@ Example 9. Locations Setting
 
       The shapes are allocated to the list of *locations* provided.
 
-      Each location is identified by its ``(row, column)`` numbers.
+      Each location is identified by its pair of ``(column, row)``
+      numbers.
 
       The shape allocation cycles through the list of *shapes* provided;
       in this case the Circle and Rectangle.

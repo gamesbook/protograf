@@ -19,7 +19,7 @@ Create(filename="new_classic_boards.pdf", margin=0.5, paper="A4-l", page_grid=1)
 source = '"New Book of Classic Board Games", Brian E. Svoboda, 2026.'
 title = Common(x=1, y=1, font_name="Times-Roman", align="left", font_size=13)
 credit = Common(x=19.5, y=19.75, font_name="Times-Italic", align="left", font_size=10)
-
+'''
 # ---- .Ataxx
 Text("Attaxx", common=title)
 Text(source, common=credit)
@@ -102,19 +102,21 @@ Grid(
 )
 Text(source, common=credit)
 PageBreak()
-
+'''
 # ---- .Cairo Corridor
 # ---- .Checkers
 
 # ---- .Chinese Checkers
 CC_LINE = "#E4B700"
 CC_FILL = "#FFFDB2"
-CC_PLAY = "#E7B900"
-CC_MID = "#FFD42A"
-Text("Go", common=title)
+player_space = circle(radius=0.75, stroke="#B59200", fill="#E7B900", stroke_width=2)
+board_space = circle(radius=0.75, stroke=CC_LINE, fill="#FFD42A", stroke_width=2, dot=0.05)
+Text("Chinese Checkers", common=title)
 Text(source, common=credit)
-
-Dot(cx=14, cy=10, dot_width=10)
+dmds = DiamondLocations(y=10, x=3, cols=17, start="west", side=2)
+Layout(dmds, shapes=[board_space])
+Layout(dmds, cols="1-5,13-17", shapes=[player_space])
+Dot(cx=14.33, cy=10, dot_width=5)
 PageBreak()
 
 # ---- .Connect6 (pen-and-paper)
