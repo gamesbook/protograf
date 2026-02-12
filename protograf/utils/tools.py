@@ -1263,10 +1263,12 @@ def validated_directions(
             valid = {"e", "se", "sw", "w", "ne", "nw"}
         case DirectionGroup.CIRCULAR:
             valid = {"n", "e", "w", "s", "ne", "se", "sw", "nw", "o", "d"}
-        case DirectionGroup.TRIANGULAR:  # equilateral triangle
+        case DirectionGroup.TRIANGULAR:  # equilateral triangle VERTICES
             valid = {"se", "sw", "n"}
         case DirectionGroup.TRIANGULAR_EDGES:  # equilateral triangle
             valid = {"ne", "nw", "s"}
+        case DirectionGroup.TRIANGULAR_HATCHES:  # equilateral triangle
+            valid = {"ne", "nw", "e"}
         case DirectionGroup.POLYGONAL:  # polygon
             valid = set(range(1, vertex_count + 1))
             # print('^^^ ', vertex_count, values_set)

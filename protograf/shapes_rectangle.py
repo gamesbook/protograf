@@ -804,6 +804,8 @@ class RectangleShape(BaseShape):
         )
         lines = tools.as_int(num, "hatches_count")
         vertices = self._shape_vertexes
+        pt_ne, pt_se, pt_sw, pt_nw = vertices[0], vertices[1], vertices[2], vertices[3]
+        # print('rect verts", self._l2v(vertices))
         # ---- check dirs
         if self.rounding or self.rounded:
             if (
@@ -844,27 +846,23 @@ class RectangleShape(BaseShape):
                 )
         # ---- draw items
         if lines >= 1:
-            if "se" in _dirs or "nw" in _dirs or "d" in _dirs:  # UP to the right
-                cnv.draw_line(
-                    (vertices[0].x, vertices[0].y), (vertices[2].x, vertices[2].y)
-                )
-            if "sw" in _dirs or "ne" in _dirs or "d" in _dirs:  # DOWN to the right
-                cnv.draw_line(
-                    (vertices[1].x, vertices[1].y), (vertices[3].x, vertices[3].y)
-                )
+            if "se" in _dirs or "nw" in _dirs or "d" in _dirs:  # DOWN to the right
+                cnv.draw_line((pt_nw.x, pt_nw.y), (pt_se.x, pt_se.y))
+            if "sw" in _dirs or "ne" in _dirs or "d" in _dirs:  # UP to the right
+                cnv.draw_line((pt_sw.x, pt_sw.y), (pt_ne.x, pt_ne.y))
             if "n" in _dirs or "s" in _dirs or "o" in _dirs:  # vertical
                 x_dist = self._u.width / (lines + 1)
                 for i in range(1, lines + 1):
                     cnv.draw_line(
-                        (vertices[0].x + i * x_dist, vertices[1].y),
-                        (vertices[0].x + i * x_dist, vertices[0].y),
+                        (pt_ne.x - i * x_dist, pt_ne.y),
+                        (pt_ne.x - i * x_dist, pt_se.y),
                     )
             if "e" in _dirs or "w" in _dirs or "o" in _dirs:  # horizontal
                 y_dist = self._u.height / (lines + 1)
                 for i in range(1, lines + 1):
                     cnv.draw_line(
-                        (vertices[0].x, vertices[0].y + i * y_dist),
-                        (vertices[0].x + self._u.width, vertices[0].y + i * y_dist),
+                        (pt_ne.x, pt_ne.y + i * y_dist),
+                        (pt_ne.x - self._u.width, pt_ne.y + i * y_dist),
                     )
 
         if lines >= 1:
@@ -873,34 +871,26 @@ class RectangleShape(BaseShape):
             y_dist = self._u.height / diag_num
             top_pt, btm_pt, left_pt, rite_pt = [], [], [], []
             for number in range(0, diag_num + 1):
-                left_pt.append(
-                    geoms.point_on_line(vertices[0], vertices[1], y_dist * number)
-                )
-                top_pt.append(
-                    geoms.point_on_line(vertices[1], vertices[2], x_dist * number)
-                )
-                rite_pt.append(
-                    geoms.point_on_line(vertices[3], vertices[2], y_dist * number)
-                )
-                btm_pt.append(
-                    geoms.point_on_line(vertices[0], vertices[3], x_dist * number)
-                )
+                left_pt.append(geoms.point_on_line(pt_sw, pt_nw, y_dist * number))
+                top_pt.append(geoms.point_on_line(pt_nw, pt_ne, x_dist * number))
+                rite_pt.append(geoms.point_on_line(pt_se, pt_ne, y_dist * number))
+                btm_pt.append(geoms.point_on_line(pt_sw, pt_se, x_dist * number))
 
-        if "se" in _dirs or "nw" in _dirs or "d" in _dirs:  # slope UP to the right
+        if "sw" in _dirs or "ne" in _dirs or "d" in _dirs:  # slope UP to the right
             for i in range(1, diag_num):  # top-left side
                 j = diag_num - i
                 cnv.draw_line((left_pt[i].x, left_pt[i].y), (top_pt[j].x, top_pt[j].y))
             for i in range(1, diag_num):  # bottom-right side
                 j = diag_num - i
                 cnv.draw_line((btm_pt[i].x, btm_pt[i].y), (rite_pt[j].x, rite_pt[j].y))
-        if "ne" in _dirs or "sw" in _dirs or "d" in _dirs:  # slope down to the right
+        if "nw" in _dirs or "se" in _dirs or "d" in _dirs:  # slop DOWN to the right
             for i in range(1, diag_num):  # bottom-left side
                 cnv.draw_line((left_pt[i].x, left_pt[i].y), (btm_pt[i].x, btm_pt[i].y))
             for i in range(1, diag_num):  # top-right side
                 cnv.draw_line((top_pt[i].x, top_pt[i].y), (rite_pt[i].x, rite_pt[i].y))
         # ---- set canvas
-        cx = vertices[0].x + 0.5 * self._u.width
-        cy = vertices[0].y + 0.5 * self._u.height
+        cx = pt_ne.x + 0.5 * self._u.width
+        cy = pt_ne.y + 0.5 * self._u.height
         self.set_canvas_props(
             index=ID,
             stroke=self.hatches_stroke,

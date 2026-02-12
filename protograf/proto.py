@@ -4604,7 +4604,7 @@ def LinkLine(grid: list, locations: Union[list, str], **kwargs):
 
 
 def Layout(grid, **kwargs):
-    """Determine locations for cols&rows in a virtual layout and draw shape(s)"""
+    """Determine locations and styles for cols&rows in a virtual layout and draw shape(s)"""
     validate_globals()
 
     kwargs = kwargs
@@ -4622,6 +4622,16 @@ def Layout(grid, **kwargs):
         visible = tools.integer_pairs(kwargs.get("visible"), "visible")
     else:
         visible = kwargs.get("visible", [])
+    # ---- grid
+    layout_grid = kwargs.get("gridlines", False)
+    _grid_stroke = kwargs.get("gridlines_stroke", "black")
+    layout_grid_ends = kwargs.get("gridlines_ends", None)
+    layout_grid_fill = kwargs.get("gridlines_fill", None)
+    layout_grid_stroke = colrs.get_color(_grid_stroke)
+    layout_grid_stroke_width = kwargs.get("gridlines_stroke_width", WIDTH)
+    layout_grid_dotted = kwargs.get("gridlines_dotted", False)
+    layout_grid_dashed = kwargs.get("gridlines_dashed", None)
+    layout_grid_transparency = kwargs.get("gridlines_transparency", None)
 
     # ---- validate inputs
     if not shapes:
@@ -4654,6 +4664,34 @@ def Layout(grid, **kwargs):
                     corners_dict[value] = shape
             except Exception:
                 feedback(f'The corners setting "{corner}" is not a valid list', True)
+
+    # ---- draw grid (using a Shape)
+    if layout_grid:
+        layout_grid_centroid = grid.grid_centroid  # calculated in layouts
+        match type(grid):
+            case DiamondLocations:
+                layout_grid_hatches = grid.cols // 2 - 1  # for Diamond, rows == cols
+                Rhombus(
+                    cx=layout_grid_centroid.x,
+                    cy=layout_grid_centroid.y,
+                    height=grid.total_height,
+                    width=grid.total_width,
+                    stroke=layout_grid_stroke,
+                    stroke_width=layout_grid_stroke_width,
+                    stroke_ends=layout_grid_ends,
+                    dotted=layout_grid_dotted,
+                    dashed=layout_grid_dashed,
+                    fill=layout_grid_fill,
+                    transparency=layout_grid_transparency,
+                    hatches_count=layout_grid_hatches,
+                    hatches=layout_grid,  # eg. '*', 'd', 'ne' etc.
+                    hatches_stroke=layout_grid_stroke,
+                    hatches_stroke_width=layout_grid_stroke_width,
+                    hatches_dots=layout_grid_dotted,
+                    hatches_ends=layout_grid_ends,
+                    hatches_dashed=layout_grid_dashed,
+                    # rotation=0,
+                )
 
     # ---- setup locations; automatically or via user-specification
     shape_id = 0
