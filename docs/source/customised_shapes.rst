@@ -1092,6 +1092,7 @@ that it can be customised.
 - `Cross and Dot <rectCross_>`_
 - `Chevron <rectChevron_>`_
 - `Hatches <rectHatches_>`_
+- `Hatches: Variable <rectHatchesVariable_>`_
 - `Notch <rectNotch_>`_
 - `Peak <rectPeak_>`_
 - `Perbii <rectPerbii_>`_
@@ -1376,6 +1377,48 @@ of the Rectangle.
 
 ===== ======
 
+.. _rectHatchesVariable:
+
+Hatches: Variable
+-----------------
+`^ <rectangleIndex_>`_
+
+As described in section on `Hatches <rectHatches_>`_, these are normally
+spaced equally across the height or width of the Rectangle.
+
+However it is possible to vary the number of hatch lines for any direction,
+or set of directions, by changing the setting for the *hatches* property.
+
+This is illustrated in the example below.
+
+.. |rhv| image:: images/custom/rectangle/hatches_variable.png
+   :width: 330
+
+===== ======
+|rhv| This example shows a Rectangle constructed using these commands:
+
+      .. code:: python
+
+        Rectangle(
+            x=0.5, y=1,
+            height=4, width=3,
+            hatches=[('e', 2), ('d', 5)],
+            hatches_stroke_width=0.5,
+            hatches_stroke="red")
+
+      While other settings are similar to the previous example, in this
+      case the *hatches* property is in a list form, as shown by the square
+      brackets from ``[`` to ``]``, with each item in the list being a set
+      of two values.  These values are:
+
+      - firstly, the named direction, or directions,
+      - secondly, the number of lines to be drawn in that direction(s).
+
+      In this case, there are 2 lines in the ``east`` (horizontal) direction,
+      and 5 ``diagonal`` lines i.e. north-east and south-east.
+
+===== ======
+
 .. _rectNotch:
 
 Notch
@@ -1406,7 +1449,8 @@ Example 1. Size & Location
         )
         Rectangle(
             x=1, y=4, height=1, width=2,
-            label="notch:.25/.5 loc: NW, SE", label_size=5,
+            label="notch:.25/.5 loc: NW, SE",
+            label_size=5,
             notch_x=0.5, notch_y=0.25,
             notch_directions="NW SE",
         )

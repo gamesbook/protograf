@@ -1243,7 +1243,7 @@ class RectangularLocations(VirtualLocations):
         else:
             self.interval_y = self.interval
         self.start = kwargs.get("start", "sw")
-        self.rectangle_validate(kwargs)
+        self.rectangle_validate(**kwargs)
         # ---- calculated values
         self.total_height = self.interval_x * (self.rows - 1)
         self.total_width = self.interval_y * (self.cols - 1)

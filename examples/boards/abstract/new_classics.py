@@ -103,8 +103,21 @@ Grid(
 Text(source, common=credit)
 PageBreak()
 '''
+
 # ---- .Cairo Corridor
+
 # ---- .Checkers
+Text("Checkers", common=title)
+Text(source, common=credit)
+place = Common(height=3, width=3, fill="#FFFA4F", stroke_width=2)
+tch = RectangularLocations(x=10.5, y=5, cols=4, rows=3, interval=3)
+Layout(tch, shapes=[rhombus(common=place)])
+tch = RectangularLocations(x=12, y=6.5, cols=4, rows=3, interval=3)
+Layout(tch, shapes=[rhombus(common=place)])
+edge = Common(height=3, width=3, fill="#FFC433", stroke_width=2)
+Repeat(rhombus(x=10.5, y=2, common=edge), interval=3, cols=4, rows=1)
+Repeat(rhombus(x=9, y=12.5, common=edge), interval=3, cols=4, rows=1)
+PageBreak()
 
 # ---- .Chinese Checkers
 CC_LINE = "#E4B700"
@@ -180,7 +193,22 @@ Sequence(
 PageBreak()
 
 # ---- .Joust (chess board)
+
 # ---- .King's Valley
+Text("King's Valley", common=title)
+Text(source, common=credit)
+brd = Common(cx=14.4, cy=10.4, radius=8, stroke_width=8)
+Circle(
+    common=brd,
+    fill="#FFDC85",
+    stroke="#CAB36E",
+    radii=steps(22, 355, 45),
+    radii_stroke="black",
+    radii_stroke_width=4,
+    rotation=15,
+)
+Circle(common=brd, stroke="#CAB36E", fill=None)
+PageBreak()
 
 # ---- .Mills
 Text("Mills", common=title)
@@ -246,7 +274,26 @@ Grid(
     side=2,
     fill="#63B0EB", stroke="#003F73"
 )
-# TODO => use layout for location for start
+rct = RectangularLocations(x=6.5, y=2, cols=9, rows=9, interval=2)
+place = Common(fill=None, stroke="white", stroke_width=3, dotted=True)
+Layout(
+    rct,
+    shapes=[square(common=place)],
+    locations=[
+        (5,1), (2,2), (5,2), (8,2), (3,3), (7,3),
+        (1,5), (2,5), (8,5), (9,5),
+        (5,9), (2,8), (5,8), (8,8), (3,7), (7,7),
+    ],
+)
+Layout(
+   rct,
+   shapes=[circle(common=place)],
+   locations=[
+       (4,4), (5,4), (6,4),
+       (4,5), (5,5), (6,5),
+       (4,6), (5,6), (6,6),
+   ]
+)
 PageBreak()
 
 # ---- .Sprouts (pen-and-paper)
