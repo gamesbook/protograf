@@ -799,98 +799,141 @@ class RectangleShape(BaseShape):
             num: number of lines
             rotation: degrees anti-clockwise from horizontal "east"
         """
-        _dirs = tools.validated_directions(
-            self.hatches, DirectionGroup.CIRCULAR, "hatches"
-        )
-        lines = tools.as_int(num, "hatches_count")
+
+        def draw_lines(vertices, _dirs, lines):
+            """Draw lines for a given direction."""
+            # print("rect vertices", self._l2v(vertices))
+            pt_ne, pt_se, pt_sw, pt_nw = (
+                vertices[0],
+                vertices[1],
+                vertices[2],
+                vertices[3],
+            )
+            # ---- draw items
+            if lines >= 1:
+                if "se" in _dirs or "nw" in _dirs or "d" in _dirs:  # DOWN to the right
+                    cnv.draw_line((pt_nw.x, pt_nw.y), (pt_se.x, pt_se.y))
+                if "sw" in _dirs or "ne" in _dirs or "d" in _dirs:  # UP to the right
+                    cnv.draw_line((pt_sw.x, pt_sw.y), (pt_ne.x, pt_ne.y))
+                if "n" in _dirs or "s" in _dirs or "o" in _dirs:  # vertical
+                    x_dist = self._u.width / (lines + 1)
+                    for i in range(1, lines + 1):
+                        cnv.draw_line(
+                            (pt_ne.x - i * x_dist, pt_ne.y),
+                            (pt_ne.x - i * x_dist, pt_se.y),
+                        )
+                if "e" in _dirs or "w" in _dirs or "o" in _dirs:  # horizontal
+                    y_dist = self._u.height / (lines + 1)
+                    for i in range(1, lines + 1):
+                        cnv.draw_line(
+                            (pt_ne.x, pt_ne.y + i * y_dist),
+                            (pt_ne.x - self._u.width, pt_ne.y + i * y_dist),
+                        )
+
+            if lines >= 1:
+                diag_num = int((lines - 1) / 2 + 1)
+                x_dist = self._u.width / diag_num
+                y_dist = self._u.height / diag_num
+                top_pt, btm_pt, left_pt, rite_pt = [], [], [], []
+                for number in range(0, diag_num + 1):
+                    left_pt.append(geoms.point_on_line(pt_sw, pt_nw, y_dist * number))
+                    top_pt.append(geoms.point_on_line(pt_nw, pt_ne, x_dist * number))
+                    rite_pt.append(geoms.point_on_line(pt_se, pt_ne, y_dist * number))
+                    btm_pt.append(geoms.point_on_line(pt_sw, pt_se, x_dist * number))
+
+            if "sw" in _dirs or "ne" in _dirs or "d" in _dirs:  # slope UP to the right
+                for i in range(1, diag_num):  # top-left side
+                    j = diag_num - i
+                    cnv.draw_line(
+                        (left_pt[i].x, left_pt[i].y), (top_pt[j].x, top_pt[j].y)
+                    )
+                for i in range(1, diag_num):  # bottom-right side
+                    j = diag_num - i
+                    cnv.draw_line(
+                        (btm_pt[i].x, btm_pt[i].y), (rite_pt[j].x, rite_pt[j].y)
+                    )
+            if "nw" in _dirs or "se" in _dirs or "d" in _dirs:  # slop DOWN to the right
+                for i in range(1, diag_num):  # bottom-left side
+                    cnv.draw_line(
+                        (left_pt[i].x, left_pt[i].y), (btm_pt[i].x, btm_pt[i].y)
+                    )
+                for i in range(1, diag_num):  # top-right side
+                    cnv.draw_line(
+                        (top_pt[i].x, top_pt[i].y), (rite_pt[i].x, rite_pt[i].y)
+                    )
+
+        def check_other_settings(_dirs, lines):
+            """Check hatch lines count and direction vs other Rectangle settings."""
+            # ---- check dirs
+            if self.rounding or self.rounded:
+                if (
+                    "ne" in _dirs
+                    or "sw" in _dirs
+                    or "se" in _dirs
+                    or "nw" in _dirs
+                    or "d" in _dirs
+                ):
+                    feedback(
+                        "No diagonal hatches permissible with rounding in the rectangle",
+                        True,
+                    )
+            # ---- check spaces
+            if self.rounding or self.rounded:
+                spaces = max(self._u.width / (lines + 1), self._u.height / (lines + 1))
+                _rounding = 0.0
+                if self.rounding:
+                    _rounding = self.unit(self.rounding)
+                elif self.rounded:
+                    _rounding = self._u.width * 0.08
+                if _rounding and spaces < _rounding:
+                    feedback(
+                        "No hatches permissible with this size of rounding in a rectangle",
+                        True,
+                    )
+            if self.notch and self.hatches_count > 1 or self.notch_x or self.notch_y:
+                if (
+                    "ne" in _dirs
+                    or "sw" in _dirs
+                    or "se" in _dirs
+                    or "nw" in _dirs
+                    or "d" in _dirs
+                ):
+                    feedback(
+                        "Multi-diagonal hatches not permissible in a notched Rectangle",
+                        True,
+                    )
+            # ---- etc,
+            if lines and self.chevron:
+                feedback("Cannot use hatches with chevron.", True)
+            if lines and self.peaks:
+                feedback("Cannot use hatches and peaks together.", True)
+
         vertices = self._shape_vertexes
-        pt_ne, pt_se, pt_sw, pt_nw = vertices[0], vertices[1], vertices[2], vertices[3]
-        # print('rect verts", self._l2v(vertices))
-        # ---- check dirs
-        if self.rounding or self.rounded:
-            if (
-                "ne" in _dirs
-                or "sw" in _dirs
-                or "se" in _dirs
-                or "nw" in _dirs
-                or "d" in _dirs
-            ):
-                feedback(
-                    "No diagonal hatches permissible with rounding in the rectangle",
-                    True,
-                )
-        # ---- check spaces
-        if self.rounding or self.rounded:
-            spaces = max(self._u.width / (lines + 1), self._u.height / (lines + 1))
-            _rounding = 0.0
-            if self.rounding:
-                _rounding = self.unit(self.rounding)
-            elif self.rounded:
-                _rounding = self._u.width * 0.08
-            if _rounding and spaces < _rounding:
-                feedback(
-                    "No hatches permissible with this size of rounding in a rectangle",
-                    True,
-                )
-        if self.notch and self.hatches_count > 1 or self.notch_x or self.notch_y:
-            if (
-                "ne" in _dirs
-                or "sw" in _dirs
-                or "se" in _dirs
-                or "nw" in _dirs
-                or "d" in _dirs
-            ):
-                feedback(
-                    "Multi-diagonal hatches not permissible in a notched Rectangle",
-                    True,
-                )
-        # ---- draw items
-        if lines >= 1:
-            if "se" in _dirs or "nw" in _dirs or "d" in _dirs:  # DOWN to the right
-                cnv.draw_line((pt_nw.x, pt_nw.y), (pt_se.x, pt_se.y))
-            if "sw" in _dirs or "ne" in _dirs or "d" in _dirs:  # UP to the right
-                cnv.draw_line((pt_sw.x, pt_sw.y), (pt_ne.x, pt_ne.y))
-            if "n" in _dirs or "s" in _dirs or "o" in _dirs:  # vertical
-                x_dist = self._u.width / (lines + 1)
-                for i in range(1, lines + 1):
-                    cnv.draw_line(
-                        (pt_ne.x - i * x_dist, pt_ne.y),
-                        (pt_ne.x - i * x_dist, pt_se.y),
+        # ---- draw lines
+        if isinstance(self.hatches, list):
+            for item in self.hatches:
+                if not isinstance(item, tuple) and len(item) < 2:
+                    feedback(
+                        "Rectangle hatches list must consist of (direction, count) values",
+                        True,
                     )
-            if "e" in _dirs or "w" in _dirs or "o" in _dirs:  # horizontal
-                y_dist = self._u.height / (lines + 1)
-                for i in range(1, lines + 1):
-                    cnv.draw_line(
-                        (pt_ne.x, pt_ne.y + i * y_dist),
-                        (pt_ne.x - self._u.width, pt_ne.y + i * y_dist),
-                    )
+                _dirs = tools.validated_directions(
+                    item[0], DirectionGroup.CIRCULAR, "rectangle hatches"
+                )
+                lines = tools.as_int(item[1], label="hatch count", minimum=1)
+                check_other_settings(_dirs, lines)
+                draw_lines(vertices, _dirs, lines)
+        else:
+            lines = tools.as_int(num, "hatches_count")
+            _dirs = tools.validated_directions(
+                self.hatches, DirectionGroup.CIRCULAR, "rectangle hatches"
+            )
+            check_other_settings(_dirs, lines)
+            draw_lines(vertices, _dirs, lines)
 
-        if lines >= 1:
-            diag_num = int((lines - 1) / 2 + 1)
-            x_dist = self._u.width / diag_num
-            y_dist = self._u.height / diag_num
-            top_pt, btm_pt, left_pt, rite_pt = [], [], [], []
-            for number in range(0, diag_num + 1):
-                left_pt.append(geoms.point_on_line(pt_sw, pt_nw, y_dist * number))
-                top_pt.append(geoms.point_on_line(pt_nw, pt_ne, x_dist * number))
-                rite_pt.append(geoms.point_on_line(pt_se, pt_ne, y_dist * number))
-                btm_pt.append(geoms.point_on_line(pt_sw, pt_se, x_dist * number))
-
-        if "sw" in _dirs or "ne" in _dirs or "d" in _dirs:  # slope UP to the right
-            for i in range(1, diag_num):  # top-left side
-                j = diag_num - i
-                cnv.draw_line((left_pt[i].x, left_pt[i].y), (top_pt[j].x, top_pt[j].y))
-            for i in range(1, diag_num):  # bottom-right side
-                j = diag_num - i
-                cnv.draw_line((btm_pt[i].x, btm_pt[i].y), (rite_pt[j].x, rite_pt[j].y))
-        if "nw" in _dirs or "se" in _dirs or "d" in _dirs:  # slop DOWN to the right
-            for i in range(1, diag_num):  # bottom-left side
-                cnv.draw_line((left_pt[i].x, left_pt[i].y), (btm_pt[i].x, btm_pt[i].y))
-            for i in range(1, diag_num):  # top-right side
-                cnv.draw_line((top_pt[i].x, top_pt[i].y), (rite_pt[i].x, rite_pt[i].y))
         # ---- set canvas
-        cx = pt_ne.x + 0.5 * self._u.width
-        cy = pt_ne.y + 0.5 * self._u.height
+        cx = vertices[3].x + 0.5 * self._u.width
+        cy = vertices[3].y + 0.5 * self._u.height
         self.set_canvas_props(
             index=ID,
             stroke=self.hatches_stroke,
@@ -1441,7 +1484,7 @@ class RectangleShape(BaseShape):
         if self.hatches_count and is_notched and self.hatches_count > 1:
             feedback("Cannot use multiple hatches with notch.", True)
         if self.hatches_count and is_chevron:
-            feedback("Cannot use hatches_count with chevron.", True)
+            feedback("Cannot use hatches with chevron.", True)
         if is_notched and is_chevron:
             feedback("Cannot use notch and chevron together.", True)
         if is_notched and is_peaks:
@@ -1449,7 +1492,7 @@ class RectangleShape(BaseShape):
         if is_chevron and is_peaks:
             feedback("Cannot use chevron and peaks together.", True)
         if self.hatches_count and is_peaks:
-            feedback("Cannot use hatches_count and peaks together.", True)
+            feedback("Cannot use hatches and peaks together.", True)
         if is_notched and is_prows:
             feedback("Cannot use notch and prows together.", True)
         if is_chevron and is_prows:
@@ -1841,7 +1884,7 @@ class RectangleShape(BaseShape):
                     self.draw_stripes(cnv, ID, rotation)
             if item == "hatches":
                 # ---- * draw hatches
-                if self.hatches_count:
+                if self.hatches_count or isinstance(self.hatches, list):
                     # if 'rotation' in kwargs.keys():
                     #     kwargs.pop('rotation')
                     self.draw_hatches(

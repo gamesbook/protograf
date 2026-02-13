@@ -1516,7 +1516,7 @@ class HexShape(BaseShape):
                     )
             if item == "hatches":
                 # ---- * draw hatches
-                if self.hatches_count:
+                if self.hatches_count or isinstance(self.hatches, list):
                     if not self.hatches_count & 1:
                         feedback(
                             "hatches count must be an odd number for a Hexagon", True

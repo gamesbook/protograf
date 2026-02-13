@@ -4684,7 +4684,7 @@ def Layout(grid, **kwargs):
                     fill=layout_grid_fill,
                     transparency=layout_grid_transparency,
                     hatches_count=layout_grid_hatches,
-                    hatches=layout_grid,  # eg. '*', 'd', 'ne' etc.
+                    hatches=layout_grid,  # eg. '*', 'd', 'ne' etc. or [('d', 10)]
                     hatches_stroke=layout_grid_stroke,
                     hatches_stroke_width=layout_grid_stroke_width,
                     hatches_dots=layout_grid_dotted,

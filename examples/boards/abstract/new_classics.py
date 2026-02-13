@@ -108,17 +108,21 @@ PageBreak()
 
 # ---- .Chinese Checkers
 CC_LINE = "#E4B700"
-player_space = circle(radius=0.75, stroke="#B59200", fill="#E7B900", stroke_width=2)
-board_space = circle(radius=0.75, stroke=CC_LINE, fill="#FFD42A", stroke_width=2)
+player_space = circle(
+    radius=0.75, stroke="#B59200", fill="#E7B900", stroke_width=2)
+board_space = circle(
+    radius=0.75, stroke=CC_LINE, fill="#FFD42A", stroke_width=2)
 Text("Chinese Checkers", common=title)
 Text(source, common=credit)
-dmds = DiamondLocations(y=10, x=0.5, cols=17, facing="west", side=2)
-Layout(dmds,
-       shapes=[board_space],
-       gridlines='d n',
-       gridlines_stroke=CC_LINE,
-       gridlines_stroke_width=4,
-       gridlines_fill="#FFFDB2")
+dmds = DiamondLocations(
+    y=10, x=0.5, cols=17, facing="west", side=2)
+Layout(
+    dmds,
+    shapes=[board_space],
+    gridlines=[('d', 7), ('n', 8)],
+    gridlines_stroke=CC_LINE,
+    gridlines_stroke_width=4,
+    gridlines_fill="#FFFDB2")
 Layout(dmds, cols="1-5,13-17", shapes=[player_space])
 Layout(dmds, locations=[(9,9)], shapes=[Dot(dot_width=5)])
 PageBreak()
@@ -370,7 +374,7 @@ Hexagon(
         ('se', square(common=place), 0.8),
         ('w', square(common=place), 0.8),
         ('e', circle(common=place), 0.8),
-        ('ne', circle(common=place), 0.8),
+        ('sw', circle(common=place), 0.8),
         ('nw', circle(common=place), 0.8),
     ]
 )

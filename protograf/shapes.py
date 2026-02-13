@@ -1672,7 +1672,7 @@ class RhombusShape(BaseShape):
             rotation: degrees anti-clockwise from horizontal "east"
         """
 
-        def draw_lines(_dirs, _num, lines):
+        def draw_lines(num, _dirs, _num, lines):
             if num >= 1:
                 if any(item in _dirs for item in ["e", "w", "o"]):
                     cnv.draw_line(vertices[0], vertices[2])
@@ -1708,6 +1708,7 @@ class RhombusShape(BaseShape):
             return
         # print("rhomb verts", self._l2v(vertices))
         x_c, y_c = centre.x, centre.y
+        # ---- draw lines
         if isinstance(self.hatches, list):
             for item in self.hatches:
                 if not isinstance(item, tuple) and len(item) < 2:
@@ -1720,8 +1721,7 @@ class RhombusShape(BaseShape):
                 )
                 _num = tools.as_int(item[1], label="hatch count", minimum=1)
                 lines = _num
-                # print('*** RHOMB []', _dirs, _num, lines)
-                draw_lines(_dirs, _num, lines)
+                draw_lines(_num, _dirs, _num, lines)
         else:
             _num = tools.as_int(num, "hatches_count")
             lines = int((_num - 1) / 2 + 1)
@@ -1729,8 +1729,7 @@ class RhombusShape(BaseShape):
                 self.hatches, DirectionGroup.CARDINAL, "rhombus hatch"
             )
             if lines >= 0:
-                # print('*** RHOMB -', _dirs, _num, lines)
-                draw_lines(_dirs, _num, lines)
+                draw_lines(num, _dirs, _num, lines)
 
         # ---- set canvas
         self.set_canvas_props(
@@ -3904,7 +3903,7 @@ class TriangleShape(BaseShape):
                     )
             if item == "hatches":
                 # ---- * draw hatches
-                if self.hatches_count:
+                if self.hatches_count or isinstance(self.hatches, list):
                     self.draw_hatches(
                         cnv,
                         ID,

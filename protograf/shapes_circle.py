@@ -757,7 +757,7 @@ class CircleShape(BaseShape):
                     )
             if item == "hatches":
                 # ---- * draw hatches
-                if self.hatches_count:
+                if self.hatches_count or isinstance(self.hatches, list):
                     self.draw_hatches(
                         cnv,
                         ID,
