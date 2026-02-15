@@ -74,7 +74,7 @@ Rectangle(common=htch, x=3, y=4, hatches='d', label="D")
 
 PageBreak()
 
-# ---- hatches
+# ---- hatches - variable
 Blueprint()
 Text(common=txt, text="Rectangle: hatches; variable")
 Rectangle(

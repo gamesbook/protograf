@@ -3219,6 +3219,7 @@ ways that it can be customised.
 
 - `Dot and Cross <circleCross_>`_
 - `Hatches <circleHatches_>`_
+- `Hatches: Variable <circleHatchesVariable_>`_
 - `Radii <circleRadii_>`_
 - `Radii Labels <circleRadiiLabels_>`_
 - `Petals: petal <circlePetalsPetal_>`_
@@ -3335,6 +3336,49 @@ Circle.
         - ``d`` (diagonal) draws diagonal lines (``ne`` and ``nw``)
 
 ===== ======
+
+
+.. _circleHatchesVariable:
+
+Hatches: Variable
+-----------------
+`^ <circle_>`_
+
+As described in section on `Hatches <circleHatches_>`_, these are normally
+spaced equally across the height or width of the Circle.
+
+However it is possible to vary the number of hatch lines for any direction,
+or set of directions, by changing the setting for the *hatches* property.
+
+This is illustrated in the example below.
+
+.. |chv| image:: images/custom/circle/hatches_variable.png
+   :width: 330
+
+===== ======
+|chv| This example shows a Circle constructed using these commands:
+
+      .. code:: python
+
+        Circle(
+           common=htc,
+           hatches=[('e', 3), ('d', 5)],
+           hatches_stroke_width=0.5,
+           hatches_stroke="red")
+
+      While other settings are similar to the previous example, in this
+      case the *hatches* property is in a list form, as shown by the square
+      brackets from ``[`` to ``]``, with each item in the list being a set
+      of two values.  These values are:
+
+      - firstly, the named direction, or directions,
+      - secondly, the number of lines to be drawn in that direction(s).
+
+      In this case, there are 3 lines in the ``east`` (horizontal) direction,
+      and 5 ``diagonal`` lines i.e. north-east and south-east.
+
+===== ======
+
 
 .. _circleRadii:
 

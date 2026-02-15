@@ -25,7 +25,7 @@ PageBreak()
 # ---- circle hatches
 Blueprint()
 Text(common=txt, text="Circle: hatches")
-htc = Common(radius=0.7, hatches_count=5, hatches_stroke="red")
+htc = Common(radius=0.7, hatches_count=5, hatches_stroke="red", hatches_stroke_width=0.5)
 Circle(common=htc, cx=2, cy=5.2, label='5')  # all directions
 Circle(common=htc, cx=1, cy=3.7, hatches='o', label='o')
 Circle(common=htc, cx=3, cy=3.7, hatches='d', label='d')
@@ -33,6 +33,16 @@ Circle(common=htc, cx=1, cy=2.2, hatches='e', label='e')
 Circle(common=htc, cx=3, cy=2.2, hatches='n', label='n')
 Circle(common=htc, cx=1, cy=0.7, hatches='ne', label='ne')
 Circle(common=htc, cx=3, cy=0.7, hatches='nw', label='nw')
+PageBreak()
+
+# ---- circle hatches - variable
+Blueprint()
+Text(common=txt, text="Circle: hatches; variable")
+Circle(
+    radius=1,
+    hatches=[('e', 3), ('d', 5)],
+    hatches_stroke_width=0.5,
+    hatches_stroke="red")
 PageBreak()
 
 # ---- circle dot_cross
@@ -202,6 +212,7 @@ Save(
      names=[
         None,
         "hatches",
+        "hatches_variable",
         "dot_cross",
         "radii",
         "petals_triangle",

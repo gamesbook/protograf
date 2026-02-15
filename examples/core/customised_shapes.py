@@ -684,6 +684,20 @@ Rhombus(cx=2, cy=3, width=2, height=3, stroke_width=1.9,
 )
 PageBreak()
 
+# ---- rhombus - hatches
+Blueprint()
+Text(common=txt, text="Rhombus: hatches")
+Rhombus(cx=2, cy=2, width=1.5, height=2, stroke_width=2,
+    hatches="ne sw",
+    hatches_count=3,
+    hatches_stroke="red"
+)
+Rhombus(cx=2, cy=5, width=1.5, height=2, stroke_width=2,
+    hatches=[("nw", 4), ("ne", 3)],
+    hatches_stroke="red"
+)
+PageBreak()
+
 # ---- trapezoid - borders
 Blueprint()
 Text(common=txt, text="Trapezoid: borders")
@@ -1480,7 +1494,8 @@ Save(
         "polyshape_default", "polyshape_custom", "polyshape_offset",
         "polyshape_snail",
         "rectangles_rowcol", "rectangles_custom", "rhombus_custom",
-        "rhombus_borders", "trapezoid_borders",
+        "rhombus_borders", "rhombus_hatches",
+        "trapezoid_borders",
         "arrow_sizes", "arrow_rotate", "arrowheads",
         "polyline_basic", "polyline_arrow", "polyline_snail", "polyline_snail_curve",
         "shape_centred", "shape_centred_move", "shape_centred_custom",

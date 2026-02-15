@@ -302,6 +302,11 @@ All positions, heights, widths, distances, line thicknesses and other
 kinds of lengths or sizes all need to be measured in a particular set of
 **units**.
 
+Units are important, and **protograf** requires that the same set of units
+applies throughout a specific script (see this
+`cautionary story <https://www.simscale.com/blog/nasa-mars-climate-orbiter-metric/>`_
+on why not to mix units!)
+
 In the USA, people tend to use the so-called Imperial System. In
 **protograf** this means that distances might be measured in units of
 *inches*. Inches are often shown with a double-quotes symbol (``"``)

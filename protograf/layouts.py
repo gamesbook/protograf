@@ -751,6 +751,8 @@ class RepeatShape(BaseShape):
                                 new_ele = flat_ele
                             new_ele.draw(off_x=off_x, off_y=off_y, ID=_ID, **kwargs)
                         except AttributeError:
+                            if not flat_ele:
+                                feedback("No shape to repeat!", True)
                             new_ele = flat_ele(cid=self.shape_id)
                             log.debug("%s %s", new_ele, type(new_ele))
                             if new_ele:

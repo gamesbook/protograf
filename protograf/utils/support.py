@@ -5,6 +5,7 @@ Support utilities for protograf
 # lib
 import itertools
 import os
+from pathlib import Path
 import string
 from typing import Any
 
@@ -434,6 +435,14 @@ def excels(start: int, end: int, step: int = 1, is_real: bool = True):
     nums = steps(start, end, step=step, is_real=is_real)
     result = [excel_column(num) for num in nums]
     return result
+
+
+def file_exists(filename: str) -> bool:
+    """Check if a file exists at the given path."""
+    file_path = Path(filename)
+    if file_path.exists():
+        return True
+    return False
 
 
 def pdf_export(

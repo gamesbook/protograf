@@ -2243,6 +2243,55 @@ Example 3. Rhombus Border Styles
         Mutiple, spaced values can be used to draw lines e.g. ``ne se``.
 ===== ======
 
+Example 4. Rhombus Hatches
+++++++++++++++++++++++++++
+
+.. |rh3| image:: images/customised/rhombus_hatches.png
+   :width: 330
+
+===== ======
+|rh3| This example shows the shape constructed using the command with these
+      properties:
+
+      .. code:: python
+
+        Rhombus(
+          cx=2, cy=2,
+          width=1.5, height=2,
+          stroke_width=2,
+          hatches="ne sw",
+          hatches_count=3,
+          hatches_stroke="red"
+        )
+        Rhombus(
+          cx=2, cy=5,
+          width=1.5, height=2,
+          stroke_width=2,
+          hatches=[("nw", 4), ("ne", 3)],
+          hatches_stroke="red"
+        )
+
+      Both examples have the following properties set:
+
+      - *width* of ``1.5`` cm
+      - *height* of ``2`` cm
+      - *stroke_width* of ``2``
+      - *hatches_stroke* of ``red``; sets the color of the lines criss-crossing
+        the Rhombus
+
+      The top example shows:
+
+      - *hatches_count* of ``3``; sets the number of criss-cross lines for
+        **all** directions
+      - *hatches* of ``ne sw``; sets the direction, or directions, in which
+        the criss-cross lines will run
+
+      The lower example shows:
+
+      - *hatches* of ``[("nw", 4), ("ne", 3)]``; this sets the number of
+        criss-cross lines separately for each of the directions specified
+
+===== ======
 
 .. _sector-command:
 

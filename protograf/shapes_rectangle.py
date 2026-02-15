@@ -909,7 +909,7 @@ class RectangleShape(BaseShape):
                 feedback("Cannot use hatches and peaks together.", True)
 
         vertices = self._shape_vertexes
-        # ---- draw lines
+        # ---- variable hatches
         if isinstance(self.hatches, list):
             for item in self.hatches:
                 if not isinstance(item, tuple) and len(item) < 2:
@@ -923,6 +923,7 @@ class RectangleShape(BaseShape):
                 lines = tools.as_int(item[1], label="hatch count", minimum=1)
                 check_other_settings(_dirs, lines)
                 draw_lines(vertices, _dirs, lines)
+        # ---- common hatches
         else:
             lines = tools.as_int(num, "hatches_count")
             _dirs = tools.validated_directions(

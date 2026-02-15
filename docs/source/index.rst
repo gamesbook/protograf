@@ -18,9 +18,9 @@ counters, tiles and boards for board games, including hexagonal grids, but can
 also be used for creating any simple design that has regular or repetitive
 elements; typically a mix of graphics and text.
 
-If it's your first time here, please consult the `guide <guide.html>`_
+If it's your first time here, *please consult the* `guide <guide.html>`_
 which presents the sections designed to be read in order; they all contain
-useful information but do build on each other.
+useful information designed to build on each other.
 
 .. toctree::
    :maxdepth: 2
