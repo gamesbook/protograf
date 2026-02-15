@@ -61,6 +61,14 @@ Hexagon(common=hxgn, y=2, hatches='ne', label="ne/sw")
 Hexagon(common=hxgn, y=4, hatches='nw', label="nw/se")
 PageBreak()
 
+# ---- hatches - variable
+Blueprint()
+Text(common=txt, text="Hexagon: hatches; variable")
+hhxgn = Common(cx=2, height=1.5, hatches_stroke="red")
+Hexagon(common=hhxgn, cy=2, orientation='pointy', hatches=[('s', 3), ('ne', 5)])
+Hexagon(common=hhxgn, cy=5, orientation='flat', hatches=[('w', 3), ('ne', 5)])
+PageBreak()
+
 # ---- text_flat
 Blueprint()
 Text(common=txt, text="Hexagon: flat; text")
@@ -280,7 +288,7 @@ Save(
         None,
         "centre",
         "dot_cross",
-        "hatches_flat", "hatches_pointy",
+        "hatches_flat", "hatches_pointy", "hatches_variable",
         "hatches_text_flat", "hatches_text_pointy",
         "radii_flat", "radii_pointy",
         "borders_flat", "borders_pointy",

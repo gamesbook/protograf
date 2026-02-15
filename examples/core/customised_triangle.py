@@ -105,6 +105,16 @@ Triangle(
     title="Irregular")
 PageBreak()
 
+# ---- triangle hatches - variable
+Blueprint()
+Text(common=txt, text="Triangle: hatches; variable")
+Triangle(
+    x=1, y=3, side=2,
+    hatches=[('e', 3), ('se', 6)],
+    hatches_stroke_width=0.5,
+    hatches_stroke="red")
+PageBreak()
+
 # ---- triangle - rotation
 Blueprint()
 Text(common=txt, text="Triangle: rotation")
@@ -302,6 +312,7 @@ Save(
         "triangle_irregular",
         "triangle_dot_cross",
         "triangle_hatch",
+        "triangle_hatch_variable",
         "triangle_rotation",
         "triangle_radii",
         "triangle_perbii",

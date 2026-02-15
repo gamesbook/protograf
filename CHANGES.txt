@@ -1,15 +1,24 @@
 protograf Changes
 =================
 
+2026-00-00 (0.4.6)
+------------------
+- [PLANNED] Enable Line connections to Ellipse shapes
+- [PLANNED] Enable text labels for snail lines
+- [PLANNED] Add code to connect *Locations
+- [PLANNED] Docs: list all props for Hex, Circle, Rectangle, Line
+- [PLANNED] Support compass directions for Circle radii
+
 2026-00-00 (0.4.5)
 ------------------
 - Enable grid marks for Hexagonal cards
-- [PLANNED] Enable Line connections to Ellipse shapes
-- [PLANNED] Enable text labels for snail lines
-- [PLANNED] Add code for DiamondLocations
-- [PLANNED] Add code to connect *Locations
-- [PLANNED] Examples: finalise script for New Classic Board Games
-- [PLANNED] Docs: list all props for Hex, Circle, Rectangle, Line
+- Add DiamondLocations for Layout
+- Enable grid lines and grid fill for:
+  DiamondLocations, RectangularLocations and TriangularLocations
+- Add variable hatch line settings for:
+  Rectangle, Rhomubus Circle, Hexagon and Triangle
+- Add abstract board examples: New Classic Board Games
+- Start of work on test suite for shapes
 
 2026-02-08 (0.4.4)
 ------------------

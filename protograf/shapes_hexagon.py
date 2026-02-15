@@ -164,7 +164,7 @@ class HexShape(BaseShape):
                     if (self.row + 1) & 1:  # is odd row; row are 0-base numbered!
                         x = (
                             self.col * geo.height_flat
-                            + geo.half_flat
+                            + geo.half
                             + self._u.x
                             + self._o.delta_x
                         )
@@ -618,87 +618,117 @@ class HexShape(BaseShape):
             num: number of lines
             rotation: degrees anti-clockwise from horizontal "east"
         """
+
+        def draw_lines(hatch_count, _dirs):
+            lines = int((hatch_count - 1) / 2 + 1)
+            # feedback(f'*** HEX hatch {dir_group.name=} {hatch_count=} {lines=} {_dirs=}')
+            if hatch_count >= 1:
+                if self.orientation in ["p", "pointy"]:
+                    if "ne" in _dirs or "sw" in _dirs:  # slope UP to the right
+                        self.make_path_vertices(cnv, vertices, 1, 4)
+                    if "se" in _dirs or "nw" in _dirs:  # slope down to the right
+                        self.make_path_vertices(cnv, vertices, 0, 3)
+                    if "n" in _dirs or "s" in _dirs:  # vertical
+                        self.make_path_vertices(cnv, vertices, 2, 5)
+                elif self.orientation in ["f", "flat"]:
+                    if "ne" in _dirs or "sw" in _dirs:  # slope UP to the right
+                        self.make_path_vertices(cnv, vertices, 1, 4)
+                    if "se" in _dirs or "nw" in _dirs:  # slope down to the right
+                        self.make_path_vertices(cnv, vertices, 2, 5)
+                    if "e" in _dirs or "w" in _dirs:  # horizontal
+                        self.make_path_vertices(cnv, vertices, 0, 3)
+                else:
+                    feedback(
+                        'Invalid orientation "{self.orientation}" supplied for hexagon.',
+                        True,
+                    )
+            if hatch_count >= 3:
+                _lines = lines - 1
+                self.ORIENTATION = self.get_orientation()
+                if self.ORIENTATION == HexOrientation.POINTY:
+                    if "ne" in _dirs or "sw" in _dirs:  # slope UP to the right
+                        self.draw_lines_between_sides(
+                            cnv, side, _lines, vertices, (4, 5), (1, 0)
+                        )
+                        self.draw_lines_between_sides(
+                            cnv, side, _lines, vertices, (4, 3), (1, 2)
+                        )
+                    if "se" in _dirs or "nw" in _dirs:  # slope down to the right
+                        self.draw_lines_between_sides(
+                            cnv, side, _lines, vertices, (0, 5), (3, 4)
+                        )
+                        self.draw_lines_between_sides(
+                            cnv, side, _lines, vertices, (3, 2), (0, 1)
+                        )
+                    if "n" in _dirs or "s" in _dirs:  # vertical
+                        self.draw_lines_between_sides(
+                            cnv, side, _lines, vertices, (1, 2), (0, 5)
+                        )
+                        self.draw_lines_between_sides(
+                            cnv, side, _lines, vertices, (2, 3), (5, 4)
+                        )
+                elif self.ORIENTATION == HexOrientation.FLAT:
+                    if "ne" in _dirs or "sw" in _dirs:  # slope UP to the right
+                        self.draw_lines_between_sides(
+                            cnv, side, _lines, vertices, (0, 1), (5, 4)
+                        )
+                        self.draw_lines_between_sides(
+                            cnv, side, _lines, vertices, (3, 4), (2, 1)
+                        )
+                    if "se" in _dirs or "nw" in _dirs:  # slope down to the right
+                        self.draw_lines_between_sides(
+                            cnv, side, _lines, vertices, (4, 5), (3, 2)
+                        )
+                        self.draw_lines_between_sides(
+                            cnv, side, _lines, vertices, (2, 1), (5, 0)
+                        )
+                    if "e" in _dirs or "w" in _dirs:  # horizontal
+                        self.draw_lines_between_sides(
+                            cnv, side, _lines, vertices, (0, 1), (3, 2)
+                        )
+                        self.draw_lines_between_sides(
+                            cnv, side, _lines, vertices, (0, 5), (3, 4)
+                        )
+                else:
+                    feedback(
+                        'Invalid orientation "{self.ORIENTATION}" supplied for hexagon.',
+                        True,
+                    )
+
         dir_group = (
             DirectionGroup.HEX_POINTY
             if self.orientation == "pointy"
             else DirectionGroup.HEX_FLAT
         )
-        _dirs = tools.validated_directions(self.hatches, dir_group, "hexagon hatches")
-        _num = tools.as_int(num, "hatches_count")
-        lines = int((_num - 1) / 2 + 1)
-        # feedback(f'*** HEX {num=} {lines=} {vertices=} {_dirs=}')
-        if num >= 1:
-            if self.orientation in ["p", "pointy"]:
-                if "ne" in _dirs or "sw" in _dirs:  # slope UP to the right
-                    self.make_path_vertices(cnv, vertices, 1, 4)
-                if "se" in _dirs or "nw" in _dirs:  # slope down to the right
-                    self.make_path_vertices(cnv, vertices, 0, 3)
-                if "n" in _dirs or "s" in _dirs:  # vertical
-                    self.make_path_vertices(cnv, vertices, 2, 5)
-            elif self.orientation in ["f", "flat"]:
-                if "ne" in _dirs or "sw" in _dirs:  # slope UP to the right
-                    self.make_path_vertices(cnv, vertices, 1, 4)
-                if "se" in _dirs or "nw" in _dirs:  # slope down to the right
-                    self.make_path_vertices(cnv, vertices, 2, 5)
-                if "e" in _dirs or "w" in _dirs:  # horizontal
-                    self.make_path_vertices(cnv, vertices, 0, 3)
-            else:
-                feedback(
-                    'Invalid orientation "{self.orientation}" supplied for hexagon.',
-                    True,
+        # ---- variable hatches
+        if isinstance(self.hatches, list):
+            for item in self.hatches:
+                if not isinstance(item, tuple) and len(item) < 2:
+                    feedback(
+                        "Hexagon hatches list must consist of (direction, count) values",
+                        True,
+                    )
+                _dirs = tools.validated_directions(
+                    item[0], dir_group, "hexagon hatches"
                 )
-        if num >= 3:
-            _lines = lines - 1
-            self.ORIENTATION = self.get_orientation()
-            if self.ORIENTATION == HexOrientation.POINTY:
-                if "ne" in _dirs or "sw" in _dirs:  # slope UP to the right
-                    self.draw_lines_between_sides(
-                        cnv, side, _lines, vertices, (4, 5), (1, 0)
-                    )
-                    self.draw_lines_between_sides(
-                        cnv, side, _lines, vertices, (4, 3), (1, 2)
-                    )
-                if "se" in _dirs or "nw" in _dirs:  # slope down to the right
-                    self.draw_lines_between_sides(
-                        cnv, side, _lines, vertices, (0, 5), (3, 4)
-                    )
-                    self.draw_lines_between_sides(
-                        cnv, side, _lines, vertices, (3, 2), (0, 1)
-                    )
-                if "n" in _dirs or "s" in _dirs:  # vertical
-                    self.draw_lines_between_sides(
-                        cnv, side, _lines, vertices, (1, 2), (0, 5)
-                    )
-                    self.draw_lines_between_sides(
-                        cnv, side, _lines, vertices, (2, 3), (5, 4)
-                    )
-            elif self.ORIENTATION == HexOrientation.FLAT:
-                if "ne" in _dirs or "sw" in _dirs:  # slope UP to the right
-                    self.draw_lines_between_sides(
-                        cnv, side, _lines, vertices, (0, 1), (5, 4)
-                    )
-                    self.draw_lines_between_sides(
-                        cnv, side, _lines, vertices, (3, 4), (2, 1)
-                    )
-                if "se" in _dirs or "nw" in _dirs:  # slope down to the right
-                    self.draw_lines_between_sides(
-                        cnv, side, _lines, vertices, (4, 5), (3, 2)
-                    )
-                    self.draw_lines_between_sides(
-                        cnv, side, _lines, vertices, (2, 1), (5, 0)
-                    )
-                if "e" in _dirs or "w" in _dirs:  # horizontal
-                    self.draw_lines_between_sides(
-                        cnv, side, _lines, vertices, (0, 1), (3, 2)
-                    )
-                    self.draw_lines_between_sides(
-                        cnv, side, _lines, vertices, (0, 5), (3, 4)
-                    )
-            else:
-                feedback(
-                    'Invalid orientation "{self.ORIENTATION}" supplied for hexagon.',
-                    True,
-                )
+                hatches_count = tools.as_int(item[1], label="hatch count", minimum=1)
+                if not hatches_count & 1:
+                   feedback(
+                       "Hatches count must be an odd number for a Hexagon", True
+                   )
+                draw_lines(hatches_count, _dirs)
+        # ---- common hatches
+        else:
+            _dirs = tools.validated_directions(
+                self.hatches, dir_group, "hexagon hatches"
+            )
+            hatches_count = tools.as_int(num, "hatches_count", minimum=1)
+            if not hatches_count & 1:
+               feedback(
+                   "Hatches count must be an odd number for a Hexagon", True
+               )
+            draw_lines(hatches_count, _dirs)
+
         # ---- set canvas
         self.set_canvas_props(
             index=ID,
@@ -1517,9 +1547,9 @@ class HexShape(BaseShape):
             if item == "hatches":
                 # ---- * draw hatches
                 if self.hatches_count or isinstance(self.hatches, list):
-                    if not self.hatches_count & 1:
+                    if self.hatches_count and not self.hatches_count & 1:
                         feedback(
-                            "hatches count must be an odd number for a Hexagon", True
+                            "Hatches count must be an odd number for a Hexagon", True
                         )
                     self.draw_hatches(
                         cnv, ID, geo.side, self.vertexes, self.hatches_count

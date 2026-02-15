@@ -2273,7 +2273,8 @@ Hexagon
 =======
 `↑ <table-of-contents-custom_>`_
 
-A Hexagon is a regular, six-sided, polygon whose sides are all equal.
+A Hexagon is a regular, six-sided, polygon whose sides and interior angles
+are all equal.
 
 A key property for a Hexagon is its *orientation*; this can either be *flat*,
 which is the default, with two opposing sides parallel to the top and bottom
@@ -2288,6 +2289,7 @@ in a similar way.
 - `Dot and Cross <hexCross_>`_
 - `Hatches: Flat <hexHatchesFlat_>`_
 - `Hatches: Pointy <hexHatchesPointy_>`_
+- `Hatches: Variable <hexHatchesVariable_>`_
 - `Radii: Flat <hexRadiiFlat_>`_
 - `Radii: Pointy <hexRadiiPointy_>`_
 - `Perbii: Flat <hexPerbiiFlat_>`_
@@ -2381,7 +2383,8 @@ Hatches: Flat
 
 Hatches are a set of parallel lines that are drawn across a Hexagon from
 one opposing side to another in a vertical, horizontal or diagonal
-direction. Hatches are equally spaced across the diameter of the Hexagon.
+direction. By default, hatches are equally spaced across the diameter
+of the Hexagon.
 
 .. |hhf| image:: images/custom/hexagon/hatches_flat.png
    :width: 330
@@ -2437,8 +2440,8 @@ Hatches: Pointy
 
 Hatches are a set of parallel lines that are drawn, in a specified direction,
 across the Hexagon from one opposing side to another in a vertical, horizontal
-or diagonal direction. Hatches are equally spaced across the diameter of the
-Hexagon.
+or diagonal direction. By default, hatches are equally spaced across the
+diameter of the Hexagon.
 
 .. |hhp| image:: images/custom/hexagon/hatches_pointy.png
    :width: 330
@@ -2487,6 +2490,58 @@ Hexagon.
           top-left to bottom-right
 
 ===== ======
+
+.. _hexHatchesVariable:
+
+Hatches: Variable
+-----------------
+`^ <hexagon_>`_
+
+As described in above, hatches are normally spaced equally across the sides
+of the Hexagon.
+
+However it is possible to vary the number of hatch lines for any direction,
+or set of directions, by changing the setting for the *hatches* property.
+
+.. |hhv| image:: images/custom/hexagon/hatches_variable.png
+   :width: 330
+
+===== ======
+|hhv| This example shows the shape constructed using the command with the
+      various properties.
+
+      .. code:: python
+
+        hhxgn = Common(
+          cx=2, height=1.5,
+          hatches_stroke="red")
+        Hexagon(
+          common=hhxgn, cy=2,
+          orientation='pointy',
+          hatches=[('s', 3), ('ne', 5)])
+        Hexagon(
+          common=hhxgn, cy=5,
+          orientation='flat',
+          hatches=[('w', 3), ('ne', 5)])
+
+      While other settings are similar to the previous example, in this
+      case the *hatches* property is in a list form, as shown by the square
+      brackets from ``[`` to ``]``, with each item in the list being a set
+      of two values.  These values are:
+
+      - firstly, the named direction, or directions,
+      - secondly, the number of lines to be drawn in that direction(s).
+
+      In the top example ("pointy" hex), there are 3 lines in the ``north``
+      (vertical) direction, and 5 ``diagonal`` lines i.e. running
+      north-east to south-west.
+
+      In the top example ("flat" hex), there are 3 lines in the ``west``
+      (horizontal) direction, and 5 ``diagonal`` lines i.e. running
+      north-east to south-west.
+
+===== ======
+
 
 .. _hexRadiiFlat:
 
@@ -4218,11 +4273,13 @@ Hatches
 `^ <triCustomisation_>`_
 
 Hatches are a set of parallel lines that are drawn, in a specified direction,
-across the Triangle from one opposing side to another. Hatch starting points
-are equally spaced across each of the sides of the Triangle.
+across the Triangle from one opposing side to another.
 
-Example 6. Triangle: Hatches
-++++++++++++++++++++++++++++
+Example 6a. Triangle: Hatches
++++++++++++++++++++++++++++++
+
+These examples show hatch starting points that are equally spaced across
+each of the sides of the Triangle.
 
 .. |th1| image:: images/custom/triangle/triangle_hatch.png
    :width: 330
@@ -4259,6 +4316,44 @@ Example 6. Triangle: Hatches
 
       The lower example shows hatches constructed in all directions for a
       irregular Triangle.
+
+===== ======
+
+
+Example 6b. Triangle: Hatches - Variable
+++++++++++++++++++++++++++++++++++++++++
+
+As described in Example 6a above, hatches are normally spaced equally
+across the sides of the Triangle.
+
+However it is possible to vary the number of hatch lines for any direction,
+or set of directions, by changing the setting for the *hatches* property.
+
+.. |th2| image:: images/custom/triangle/triangle_hatch_variable.png
+   :width: 330
+
+===== ======
+|th2| This example shows the shape constructed using the command with the
+      various properties.
+
+      .. code:: python
+
+        Triangle(
+            x=1, y=3, side=2,
+            hatches=[('e', 3), ('se', 6)],
+            hatches_stroke_width=0.5,
+            hatches_stroke="red")
+
+      While other settings are similar to the previous example, in this
+      case the *hatches* property is in a list form, as shown by the square
+      brackets from ``[`` to ``]``, with each item in the list being a set
+      of two values.  These values are:
+
+      - firstly, the named direction, or directions,
+      - secondly, the number of lines to be drawn in that direction(s).
+
+      In this case, there are 3 lines in the ``east`` (horizontal) direction,
+      and 6 ``diagonal`` lines i.e. running north-west to south-east.
 
 ===== ======
 
