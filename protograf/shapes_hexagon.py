@@ -713,9 +713,7 @@ class HexShape(BaseShape):
                 )
                 hatches_count = tools.as_int(item[1], label="hatch count", minimum=1)
                 if not hatches_count & 1:
-                   feedback(
-                       "Hatches count must be an odd number for a Hexagon", True
-                   )
+                    feedback("Hatches count must be an odd number for a Hexagon", True)
                 draw_lines(hatches_count, _dirs)
         # ---- common hatches
         else:
@@ -724,9 +722,7 @@ class HexShape(BaseShape):
             )
             hatches_count = tools.as_int(num, "hatches_count", minimum=1)
             if not hatches_count & 1:
-               feedback(
-                   "Hatches count must be an odd number for a Hexagon", True
-               )
+                feedback("Hatches count must be an odd number for a Hexagon", True)
             draw_lines(hatches_count, _dirs)
 
         # ---- set canvas

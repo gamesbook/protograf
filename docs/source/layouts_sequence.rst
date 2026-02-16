@@ -13,8 +13,16 @@ and that you've created some basic scripts of your own using the
 
 This is part of the set of commands use for :doc:`Layouts <layouts>`.
 
+.. _table-of-contents-seq:
+
+- `Overview`_
+- `Usage`_
+- `Properties`_
+
+
 Overview
 ========
+`↑ <table-of-contents-seq_>`_
 
 The `Sequence()` command is designed to lay out a number of values - letters or
 numbers, or shapes - in a straight line.
@@ -27,11 +35,13 @@ regular way within a page:
 - :doc:`Track <layouts_track>`
 - :doc:`RectangularLocations <layouts_rectangular>`
 - :doc:`TriangularLocations <layouts_triangular>`
+- :doc:`DiamondLocations <layouts_diamond>`
 
 .. _the-sequence-command:
 
 Usage
 =====
+`↑ <table-of-contents-seq_>`_
 
 The ``Sequence()`` command accepts the following properties:
 
@@ -60,10 +70,27 @@ The ``Sequence()`` command accepts the following properties:
   from the location of the first as the reference point; negative numbers means
   the distances are to the left and up (rather than to the right and down)
 
+.. _table-of-contents-props:
 
-Example 1. Sequence Values #1
------------------------------
-`↑ <the-sequence-command_>`_
+Properties
+==========
+`↑ <table-of-contents-seq_>`_
+
+- `Example 1. Sequence Numbers`_
+- `Example 2. Sequence Lowercase`_
+- `Example 3. Sequence Uppercase`_
+- `Example 4. Sequence Roman`_
+- `Example 5. Sequence Excel`_
+- `Example 6. Sequence Shapes - Label`_
+- `Example 7. Sequence Shapes - Multiple`_
+- `Example 8. Sequence Shapes - Setting #1`_
+- `Example 9. Sequence Shapes - Setting #2`_
+- `Example 10. Sequence Shapes - Intervals`_
+
+
+Example 1. Sequence Numbers
+---------------------------
+`↑ <table-of-contents-props_>`_
 
 .. |sv1| image:: images/layouts/sequence_values1.png
    :width: 330
@@ -97,9 +124,9 @@ Example 1. Sequence Values #1
 
 ===== ======
 
-Example 2. Sequence Values #2
+Example 2. Sequence Lowercase
 -----------------------------
-`↑ <the-sequence-command_>`_
+`↑ <table-of-contents-props_>`_
 
 .. |sv2| image:: images/layouts/sequence_values2.png
    :width: 330
@@ -136,9 +163,9 @@ Example 2. Sequence Values #2
 
 ===== ======
 
-Example 3. Sequence Values #3
+Example 3. Sequence Uppercase
 -----------------------------
-`↑ <the-sequence-command_>`_
+`↑ <table-of-contents-props_>`_
 
 .. |sv3| image:: images/layouts/sequence_values3.png
    :width: 330
@@ -168,9 +195,9 @@ Example 3. Sequence Values #3
 
 ===== ======
 
-Example 4. Sequence Values #4
------------------------------
-`↑ <the-sequence-command_>`_
+Example 4. Sequence Roman
+-------------------------
+`↑ <table-of-contents-props_>`_
 
 .. |sv4| image:: images/layouts/sequence_values4.png
    :width: 330
@@ -197,9 +224,9 @@ Example 4. Sequence Values #4
 
 ===== ======
 
-Example 5. Sequence Values #5
------------------------------
-`↑ <the-sequence-command_>`_
+Example 5. Sequence Excel
+-------------------------
+`↑ <table-of-contents-props_>`_
 
 .. |sv5| image:: images/layouts/sequence_values5.png
    :width: 330
@@ -233,9 +260,9 @@ Example 5. Sequence Values #5
 
 ===== ======
 
-Example 6. Sequence Shapes #1
------------------------------
-`↑ <the-sequence-command_>`_
+Example 6. Sequence Shapes - Label
+----------------------------------
+`↑ <table-of-contents-props_>`_
 
 .. |sq1| image:: images/layouts/sequence_shape2.png
    :width: 330
@@ -254,7 +281,8 @@ Example 6. Sequence Shapes #1
           Sequence(
               rectangle(
                   x=0.25, y=0.25, height=0.75, width=1,
-                  label_size=8, label="${{sequence}}"),
+                  label_size=8,
+                  label="${{sequence}}"),
               setting=(1, 3, 1, 'number'),
               interval_x=1.2,
           )
@@ -267,9 +295,9 @@ Example 6. Sequence Shapes #1
 
 ===== ======
 
-Example 7. Sequence Shapes #2
------------------------------
-`↑ <the-sequence-command_>`_
+Example 7. Sequence Shapes - Multiple
+-------------------------------------
+`↑ <table-of-contents-props_>`_
 
 .. |sq2| image:: images/layouts/sequence_shape3.png
    :width: 330
@@ -318,9 +346,9 @@ Example 7. Sequence Shapes #2
 
 ===== ======
 
-Example 8. Sequence Shapes #3
------------------------------
-`↑ <the-sequence-command_>`_
+Example 8. Sequence Shapes - Setting #1
+---------------------------------------
+`↑ <table-of-contents-props_>`_
 
 .. |sq3| image:: images/layouts/sequence_shape1.png
    :width: 330
@@ -361,9 +389,9 @@ Example 8. Sequence Shapes #3
 
 ===== ======
 
-Example 9. Sequence Shapes #4
------------------------------
-`↑ <the-sequence-command_>`_
+Example 9. Sequence Shapes - Setting #2
+---------------------------------------
+`↑ <table-of-contents-props_>`_
 
 .. |sq4| image:: images/layouts/sequence_shape4.png
    :width: 330
@@ -383,7 +411,8 @@ Example 9. Sequence Shapes #4
             [square(
                 x=1.5, y=1, side=0.5,
                 rounded=True,
-                label_size=8, label ="{{sequence}}")],
+                label_size=8,
+                label ="{{sequence}}")],
             setting=list('DIANA'),
             interval_y=0.6,
             interval_x=0.0,
@@ -396,9 +425,9 @@ Example 9. Sequence Shapes #4
 
 ===== ======
 
-Example 10. Sequence Shapes #5
-------------------------------
-`↑ <the-sequence-command_>`_
+Example 10. Sequence Shapes - Intervals
+---------------------------------------
+`↑ <table-of-contents-props_>`_
 
 .. |sq5| image:: images/layouts/sequence_shape5.png
    :width: 330
@@ -424,16 +453,15 @@ Example 10. Sequence Shapes #5
                 "red", "orange", "yellow",
                 "green", "blue"],
             interval_y=[1.25, 1.5, 1, 1.25, 0.75],
-            interval_x=0.0,
+            interval_x=[-0.5, 0.0, 0.4, 1.0, 2.0],
         )
 
       Here the **setting** is a list of words; these are assigned to the
       ``{{sequence}}`` to use for the Polygon's label.
 
-      The *interval_y* property is a list of incremental values; these can be
-      used to position the shape at any y-position on a page.  This can be
-      combined, if needed, with a list of any incremental *interval_x* values.
-      The result is to allow complete flexibility over where items in the
-      sequence can be placed.
+      The *interval_y* and *interval_x* properties are set as a list of
+      incremental values; these are used to position the shape at defined
+      x- and y-positions on a page. The result is to allow more flexibility
+      over where items in the sequence will be placed.
 
 ===== ======

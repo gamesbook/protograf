@@ -1,6 +1,8 @@
-===========================
-TriangularLocations Command
-===========================
+========================
+DiamondLocations Command
+========================
+
+.. |dash| unicode:: U+2014 .. EM DASH SIGN
 
 This section assumes you are very familiar with the concepts, terms and
 ideas for :doc:`protograf <index>` as presented in the
@@ -11,8 +13,7 @@ and that you've created some basic scripts of your own using the
 
 This is part of the set of commands used for :doc:`Layouts <layouts>`.
 
-
-.. _table-of-contents-trilay:
+.. _table-of-contents-dialay:
 
 - `Overview`_
 - `Usage`_
@@ -21,16 +22,18 @@ This is part of the set of commands used for :doc:`Layouts <layouts>`.
 
 Overview
 ========
-`↑ <table-of-contents-trilay_>`_
+`↑ <table-of-contents-dialay_>`_
 
-The ``TriangularLocations()`` command defines an ordered series
-of row and column locations that create a triangular pattern.
+The ``DiamondLocations()`` command defines an ordered series
+of row and column locations that create a diamond pattern i.e
+two equilateral triangles placed edge-to-edge. This pattern is
+termed a **grid**.
 
 The x- and y-values of these rows and columns are then used to
 set the centres of the elements that can be placed there using the
 :ref:`Layout() <layout-command>` command.
 
-Apart from the ``TriangularLocations()`` command described here,
+Apart from the ``DiamondLocations()`` command described here,
 there are also these other commands which allow you to layout
 elements in a more repetitive or regular way within a page:
 
@@ -38,38 +41,39 @@ elements in a more repetitive or regular way within a page:
 - :doc:`Sequence <layouts_sequence>`
 - :doc:`Tracks <layouts_track>`
 - :doc:`RectangularLocations <layouts_rectangular>`
-- :doc:`DiamondLocations <layouts_diamond>`
+- :doc:`TriangularLocations <layouts_triangular>`
 
 
 Usage
 =====
-`↑ <table-of-contents-trilay_>`_
+`↑ <table-of-contents-dialay_>`_
 
-The ``TriangularLocations()`` command accepts the following properties:
+The ``DiamondLocations()`` command accepts the following properties:
 
+- **x** - the horizontal position of the starting point of the grid; this
+  defaults to ``1``
+- **y** - the vertical position of the starting point of the grid; this
+  defaults to ``1``
 - **cols** - this is the number of locations in the horizontal direction; this
-  defaults to *2*
+  defaults to ``3`` (the minimum)
 - **rows** - this is the number of locations in the vertical direction; this
-  defaults to *2*
-- **facing** - this is the compass point of the line of travel used to define
-  which direction the layout "points" at; the default is e(ast).
-- **start** - this is the initial corner, defined a secondary compass direction,
-  from where the grid is initially drawn; values can be *n*, *se*, and
-  *sw* (the default i.e. the lower-left corner)
-
+  defaults to ``3`` (the minimum)
+- **facing** - this is the compass point from where the grid is initially
+  drawn; values can be *north*, *south*, *east* and
+  *west* |dash| this is the default i.e. the left "corner" point
 
 .. NOTE::
 
-    Bear in mind that the ``TriangularLocations()`` command is designed
+    Bear in mind that the ``DiamondLocations()`` command is designed
     to work in conjunction with a :ref:`Layout() command <layout-command>`
     which accepts, as its first property, the name assigned to the **grid**.
 
 
-.. _trilay-properties:
+.. _dialay-properties:
 
 Properties
 ==========
-`↑ <table-of-contents-trilay_>`_
+`↑ <table-of-contents-dialay_>`_
 
 - `Example 1. Rows and Columns`_
 - `Example 2. East - 2 Rows`_
@@ -100,7 +104,7 @@ by the sequence number (order) in which that Circle is drawn.
 
 Example 1. Rows and Columns
 ---------------------------
-`^ <trilay-properties_>`_
+`^ <dialay-properties_>`_
 
 .. |tl0| image:: images/layouts/layout_tri_default.png
    :width: 330
@@ -111,8 +115,8 @@ Example 1. Rows and Columns
 
       .. code:: python
 
-          tri = TriangularLocations()
-          Layout(tri, shapes=[d_circle,], debug='cr')
+          dia = DiamondLocations()
+          Layout(dia, shapes=[d_circle,], debug='cr')
 
       Here, because there is only the default ``2`` *rows* and *cols*,
       located at x-position ``1`` cm and y-position ``1`` cm,
@@ -123,7 +127,7 @@ Example 1. Rows and Columns
 
 Example 2. East - 2 Rows
 ------------------------
-`^ <trilay-properties_>`_
+`^ <dialay-properties_>`_
 
 .. |tl1| image:: images/layouts/layout_tri_east_row2.png
    :width: 330
@@ -134,10 +138,10 @@ Example 2. East - 2 Rows
 
       .. code:: python
 
-          tri = TriangularLocations(
+          dia = DiamondLocations(
               facing='east', rows=2,
               x=4, y=3, side=0.66)
-          Layout(tri, shapes=[d_circle,], debug='cr')
+          Layout(dia, shapes=[d_circle,], debug='cr')
 
       Here, the layout starts on the mid-right side - because the facing
       is ``east`` the triangle extends leftwards into the interior of
@@ -150,7 +154,7 @@ Example 2. East - 2 Rows
 
 Example 3. East - 6 Rows
 ------------------------
-`^ <trilay-properties_>`_
+`^ <dialay-properties_>`_
 
 .. |tl2| image:: images/layouts/layout_tri_east_row6.png
    :width: 330
@@ -161,10 +165,10 @@ Example 3. East - 6 Rows
 
       .. code:: python
 
-          tri = TriangularLocations(
+          dia = DiamondLocations(
               facing='east', rows=6,
               x=4, y=3, side=0.66)
-          Layout(tri, shapes=[d_circle,], debug='cr')
+          Layout(dia, shapes=[d_circle,], debug='cr')
 
       Here, the layout starts on the mid-right side - because the facing
       is ``east`` the triangle extends leftwards into the interior of
@@ -177,7 +181,7 @@ Example 3. East - 6 Rows
 
 Example 4. North - 2 Columns
 ----------------------------
-`^ <trilay-properties_>`_
+`^ <dialay-properties_>`_
 
 .. |tl3| image:: images/layouts/layout_tri_north_col2.png
    :width: 330
@@ -188,10 +192,10 @@ Example 4. North - 2 Columns
 
       .. code:: python
 
-          tri = TriangularLocations(
+          dia = DiamondLocations(
               facing='north', cols=2,
               y=1, x=2, side=0.66)
-          Layout(tri, shapes=[d_circle,], debug='cr')
+          Layout(dia, shapes=[d_circle,], debug='cr')
 
       Here, the layout starts on the top-centre side - because the facing
       is ``north`` the triangle extends downwards into the interior of
@@ -204,7 +208,7 @@ Example 4. North - 2 Columns
 
 Example 5. North - 6 Columns
 ----------------------------
-`^ <trilay-properties_>`_
+`^ <dialay-properties_>`_
 
 .. |tl4| image:: images/layouts/layout_tri_north_col6.png
    :width: 330
@@ -215,10 +219,10 @@ Example 5. North - 6 Columns
 
       .. code:: python
 
-          tri = TriangularLocations(
+          dia = DiamondLocations(
               facing='north', cols=6,
               y=1, x=2, side=0.66)
-          Layout(tri, shapes=[d_circle,], debug='cr')
+          Layout(dia, shapes=[d_circle,], debug='cr')
 
       Here, the layout starts on the top-centre side - because the facing
       is ``north`` the triangle extends downwards into the interior of
@@ -231,7 +235,7 @@ Example 5. North - 6 Columns
 
 Example 6. West - 3 Rows
 ------------------------
-`^ <trilay-properties_>`_
+`^ <dialay-properties_>`_
 
 .. |tl5| image:: images/layouts/layout_tri_west_row3.png
    :width: 330
@@ -242,10 +246,10 @@ Example 6. West - 3 Rows
 
       .. code:: python
 
-          tri = TriangularLocations(
+          dia = DiamondLocations(
               facing="west", rows=3,
               x=1, y=3, side=1.0)
-          Layout(tri, shapes=[a_circle,])
+          Layout(dia, shapes=[a_circle,])
 
       Here, the layout starts on the left-centre side - because the facing
       is ``west`` the triangle extends rightwards into the interior of
@@ -258,7 +262,7 @@ Example 6. West - 3 Rows
 
 Example 7. South - 3 Columns
 ----------------------------
-`^ <trilay-properties_>`_
+`^ <dialay-properties_>`_
 
 .. |tl6| image:: images/layouts/layout_tri_south_col3.png
    :width: 330
@@ -269,10 +273,10 @@ Example 7. South - 3 Columns
 
       .. code:: python
 
-          tri = TriangularLocations(
+          dia = DiamondLocations(
               cols=3, facing="south",
               x=2, y=4, side=1.0)
-          Layout(tri, shapes=[a_circle,])
+          Layout(dia, shapes=[a_circle,])
 
       Here, the layout starts in the mid-centre side - because the facing
       is ``south`` the triangle extends upwards into the interior of
@@ -285,7 +289,7 @@ Example 7. South - 3 Columns
 
 Example 8. Mixed Styles
 -----------------------
-`^ <trilay-properties_>`_
+`^ <dialay-properties_>`_
 
 .. |tl7| image:: images/layouts/layout_tri_all.png
    :width: 330
@@ -296,32 +300,32 @@ Example 8. Mixed Styles
 
       .. code:: python
 
-        tri = TriangularLocations(
+        dia = DiamondLocations(
             facing='east', rows=3,
             y=1.5, x=1.5, side=0.8)
         Layout(
-            tri, shapes=[circle(
+            dia, shapes=[circle(
                 common=small_circle, label="E"),])
 
-        tri = TriangularLocations(
+        dia = DiamondLocations(
             facing='west', rows=3,
             y=1.5, x=2.5, side=0.8)
         Layout(
-            tri, shapes=[circle(
+            dia, shapes=[circle(
                 common=small_circle, label="W"),])
 
-        tri = TriangularLocations(
+        dia = DiamondLocations(
             facing='south', cols=3,
             y=5, x=1, side=0.8)
         Layout(
-            tri, shapes=[circle(
+            dia, shapes=[circle(
                 common=small_circle, label="N"),])
 
-        tri = TriangularLocations(
+        dia = DiamondLocations(
             facing='north', cols=3,
             y=4, x=3, side=0.8)
         Layout(
-            tri, shapes=[circle(
+            dia, shapes=[circle(
                 common=small_circle, label="S"),])
 
       These layouts are similar to other examples.
