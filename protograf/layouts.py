@@ -1200,7 +1200,7 @@ class VirtualLocations(VirtualShape):
         else:
             return f"{col},{row}"
 
-    def set_compass(self, compass: str) -> str:
+    def set_compass_primary(self, compass: str) -> str:
         """Return full lower-case value of primary compass direction."""
         if not compass:
             return None
@@ -1219,8 +1219,29 @@ class VirtualLocations(VirtualShape):
                     f'"{compass}" is an invalid primary compass direction!'
                 )
 
+    def set_compass_secondary(self, compass: str) -> str:
+        """Return full lower-case value of secondary compass direction."""
+        if not compass:
+            return None
+        _compass = _lower(compass)
+        match _compass:
+            case "nw" | "northwest":
+                return "northwest"
+            case "sw" | "southwest":
+                return "southwest"
+            case "se" | "southeast":
+                return "southeast"
+            case "ne" | "northeast":
+                return "northeast"
+            case _:
+                raise ValueError(
+                    f'"{compass}" is an invalid secondary compass direction!'
+                )
+
+    @property
     def grid_centroid(self) -> Point:
         """Centre point of Grid in user units."""
+        return None
 
     def next_locale(self) -> Locale:
         """Yield next Locale for each call."""
@@ -1271,7 +1292,26 @@ class RectangularLocations(VirtualLocations):
     @property
     def grid_centroid(self) -> Point:
         """Centre point of Grid in user units."""
-        return None
+        self.centre_x = self.x + 0.5 * self.total_width
+        self.centre_y = self.y + 0.5 * self.total_height
+        """
+        _start = self.set_compass_secondary(_lower(self.start))
+        # ---- calculate centre points relative to facing
+        match _start:
+            case "northwest":
+                self.centre_x = self.x + 0.5 * self.total_width
+                self.centre_y = self.y + 0.5 * self.total_height
+            case "northeast":
+                self.centre_x = self.x - 0.5 * self.total_width
+                self.centre_y = self.y + 0.5 * self.total_height
+            case "southwest":
+                self.centre_x = self.x + 0.5 * self.total_width
+                self.centre_y = self.y + 0.5 * self.total_height
+            case "southeast":
+                self.centre_x = self.x - 0.5 * self.total_width
+                self.centre_y = self.y - 0.5 * self.total_height
+        """
+        return Point(self.centre_x, self.centre_y)
 
     def next_locale(self) -> Locale:
         """Yield next Location for each call."""
@@ -1522,7 +1562,7 @@ class TriangularLocations(VirtualLocations):
         self.facing = kwargs.get("facing", "north")
         self.triangle_validate(kwargs)
         # ---- calculated values
-        _facing = self.set_compass(_lower(self.facing))
+        _facing = self.set_compass_primary(_lower(self.facing))
         match _facing:
             case "north" | "south":  # layout is row-oriented
                 self.interval_x = self.side
@@ -1562,9 +1602,9 @@ class TriangularLocations(VirtualLocations):
 
     def next_locale(self) -> Locale:
         """Yield next Location for each call."""
-        _start = self.set_compass(_lower(self.start))
-        # _dir = self.set_compass(_lower(self.direction))
-        _facing = self.set_compass(_lower(self.facing))
+        _start = self.set_compass_primary(_lower(self.start))
+        # _dir = self.set_compass_primary(_lower(self.direction))
+        _facing = self.set_compass_primary(_lower(self.facing))
 
         # TODO - create logic
         if _lower(self.pattern) in ["snake", "snaking", "s"]:
@@ -1731,7 +1771,7 @@ class DiamondLocations(VirtualLocations):
 
     def diamond_array(self) -> list:
         """Calculate sequenced rows and columns for DiamondLayout."""
-        _facing = self.set_compass(_lower(self.facing))
+        _facing = self.set_compass_primary(_lower(self.facing))
         # ---- store col/row as list of lists
         array = []
         match _facing:
@@ -1798,7 +1838,7 @@ class DiamondLocations(VirtualLocations):
     @property
     def grid_centroid(self) -> Point:
         """Centre point of Grid in user units."""
-        _facing = self.set_compass(_lower(self.facing))
+        _facing = self.set_compass_primary(_lower(self.facing))
         # ---- calculate centre points relative to facing
         match _facing:
             case "north":
@@ -1819,7 +1859,7 @@ class DiamondLocations(VirtualLocations):
         """Yield next Location for each call."""
         corner = None
         # ---- get offset
-        _facing = self.set_compass(_lower(self.facing))
+        _facing = self.set_compass_primary(_lower(self.facing))
         # ---- calculate initial location relative to facing
         match _facing:
             case "north":

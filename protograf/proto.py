@@ -4607,6 +4607,7 @@ def Layout(grid, **kwargs):
     """Determine locations and styles for cols&rows in a virtual layout and draw shape(s)"""
     validate_globals()
 
+    grid_classname = grid.__class__.__name__ if grid else ""
     kwargs = kwargs
     shapes = kwargs.get("shapes", [])  # shapes or Places
     locations = kwargs.get("locations", [])
@@ -4623,7 +4624,7 @@ def Layout(grid, **kwargs):
     else:
         visible = kwargs.get("visible", [])
     # ---- grid
-    layout_grid = kwargs.get("gridlines", False)
+    layout_grid = kwargs.get("gridlines", None)  # directions ...
     _grid_stroke = kwargs.get("gridlines_stroke", "black")
     layout_grid_ends = kwargs.get("gridlines_ends", None)
     layout_grid_fill = kwargs.get("gridlines_fill", None)
@@ -4635,26 +4636,32 @@ def Layout(grid, **kwargs):
 
     # ---- validate inputs
     if not shapes:
-        feedback("There is no list of shapes to draw!", False, True)
+        feedback(f"There is no list of {grid_classname} shapes to draw!", False, True)
     if shapes and not isinstance(shapes, list):
-        feedback("The values for 'shapes' must be in a list!", True)
+        feedback(f"The values for {grid_classname} 'shapes' must be in a list!", True)
     if not isinstance(grid, VirtualLocations):
-        feedback(f"The grid value '{grid}' is not valid!", True)
+        feedback(f"The grid type '{grid_classname} ' is not valid!", True)
     corners_dict = {}
     if corners:
         if not isinstance(corners, list):
-            feedback(f"The corners value '{corners}' is not a valid list!", True)
+            feedback(
+                f"The {grid_classname} corners value '{corners}' is not a valid list!",
+                True,
+            )
         for corner in corners:
             try:
                 value = corner[0]
                 shape = corner[1]
                 if _lower(value) not in ["nw", "ne", "sw", "se", "*"]:
                     feedback(
-                        f'The corner must be one of nw, ne, sw, se (not "{value}")!',
+                        f'The {grid_classname} corner must be one of nw, ne, sw, se (not "{value}")!',
                         True,
                     )
                 if not isinstance(shape, BaseShape):
-                    feedback(f'The corner item must be a shape (not "{shape}") !', True)
+                    feedback(
+                        f'The {grid_classname} corner item must be a shape (not "{shape}") !',
+                        True,
+                    )
                 if value == "*":
                     corners_dict["nw"] = shape
                     corners_dict["ne"] = shape
@@ -4663,13 +4670,16 @@ def Layout(grid, **kwargs):
                 else:
                     corners_dict[value] = shape
             except Exception:
-                feedback(f'The corners setting "{corner}" is not a valid list', True)
+                feedback(
+                    f'The {grid_classname} corners setting "{corner}" is not a valid list',
+                    True,
+                )
 
     # ---- draw grid (using a Shape)
     if layout_grid:
         layout_grid_centroid = grid.grid_centroid  # calculated in layouts
-        match type(grid):
-            case DiamondLocations:
+        match grid_classname:
+            case "DiamondLocations":
                 layout_grid_hatches = grid.cols // 2 - 1  # for Diamond, rows == cols
                 Rhombus(
                     cx=layout_grid_centroid.x,
@@ -4691,6 +4701,34 @@ def Layout(grid, **kwargs):
                     hatches_ends=layout_grid_ends,
                     hatches_dashed=layout_grid_dashed,
                     # rotation=0,
+                )
+            case "RectangularLocations":
+                layout_grid_hatches = grid.cols // 2  # for Diamond, rows == cols
+                Rectangle(
+                    cx=layout_grid_centroid.x,
+                    cy=layout_grid_centroid.y,
+                    height=grid.total_height,
+                    width=grid.total_width,
+                    stroke=layout_grid_stroke,
+                    stroke_width=layout_grid_stroke_width,
+                    stroke_ends=layout_grid_ends,
+                    dotted=layout_grid_dotted,
+                    dashed=layout_grid_dashed,
+                    fill=layout_grid_fill,
+                    transparency=layout_grid_transparency,
+                    hatches_count=layout_grid_hatches,
+                    hatches=layout_grid,  # eg. '*', 'd', 'ne' etc. or [('d', 10)]
+                    hatches_stroke=layout_grid_stroke,
+                    hatches_stroke_width=layout_grid_stroke_width,
+                    hatches_dots=layout_grid_dotted,
+                    hatches_ends=layout_grid_ends,
+                    hatches_dashed=layout_grid_dashed,
+                    # rotation=0,
+                )
+            case _:
+                feedback(
+                    f"The grid type '{grid_classname}' does not support gridlines!",
+                    True,
                 )
 
     # ---- setup locations; automatically or via user-specification
@@ -4906,6 +4944,22 @@ def Layout(grid, **kwargs):
                         x=loc.x,
                         y=loc.y,
                         label=f"{loc.col},{loc.row}",
+                        stroke=DEBUG_COLOR,
+                        fill=DEBUG_COLOR,
+                    )
+                case "col" | "c":
+                    Dot(
+                        x=loc.x,
+                        y=loc.y,
+                        label=f"{loc.col}",
+                        stroke=DEBUG_COLOR,
+                        fill=DEBUG_COLOR,
+                    )
+                case "row" | "r":
+                    Dot(
+                        x=loc.x,
+                        y=loc.y,
+                        label=f"{loc.row}",
                         stroke=DEBUG_COLOR,
                         fill=DEBUG_COLOR,
                     )
