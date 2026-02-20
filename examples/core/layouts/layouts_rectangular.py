@@ -168,6 +168,44 @@ Blueprint(stroke_width=0.5)
 Text(common=header, text="Rect.Locations: SW->north: Outer")
 rect = RectangularLocations(cols=3, rows=4, start="SW", direction="north", pattern="outer")
 Layout(rect, shapes=[a_circle,])
+PageBreak()
+
+# ---- grid and fill
+
+Blueprint(stroke_width=0.5)
+Text(common=header, text="Rect.Locations: gridlines; fill")
+rct = RectangularLocations(cols=3, rows=5, start="NE", direction="west")
+Layout(
+   rct,
+   gridlines='n',
+   gridlines_fill="aqua",
+   gridlines_stroke="gold",
+   gridlines_stroke_width=2,
+   shapes=[small_circle])
+PageBreak()
+
+Blueprint(stroke_width=0.5)
+Text(common=header, text='Rect.Locations: gridlines "o"')
+rct = RectangularLocations(cols=3, rows=5, start="NE", direction="west")
+Layout(
+   rct,
+   gridlines='o',
+   gridlines_stroke="gold",
+   gridlines_stroke_width=2,
+   shapes=[small_circle])
+PageBreak()
+
+
+Blueprint(stroke_width=0.5)
+Text(common=header, text="Rect.Locations: gridlines: square")
+rct = RectangularLocations(cols=4, rows=4, start="NE", direction="west")
+Layout(
+   rct,
+   gridlines='d',
+   gridlines_stroke="gold",
+   gridlines_stroke_width=2,
+   shapes=[small_circle])
+PageBreak()
 
 Save(
     output='png',
@@ -188,5 +226,9 @@ Save(
         "rect_locs_outer_ne_W", "rect_locs_outer_ne_S",
         "rect_locs_outer_se_N", "rect_locs_outer_se_W",
         "rect_locs_outer_sw_E", "rect_locs_outer_sw_N",
+
+        "rect_locs_grid_fill",
+        "rect_locs_grid_orth",
+        "rect_locs_grid_diag",
     ]
 )

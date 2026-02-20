@@ -58,7 +58,6 @@ Layout(dia, shapes=[d_circle,], debug='cr')
 PageBreak()
 
 # ---- layout with filled shape
-
 red_circle = circle(radius=0.33, fill="tomato")
 gold_circle = circle(radius=0.33, fill="gold")
 
@@ -83,10 +82,8 @@ Layout(dia, shapes=[gold_circle])
 Layout(dia, rows=[1,2,6,7], shapes=[red_circle], debug='r')
 PageBreak()
 
-
 # ---- layout with grid line & fill
-
-small_circle = circle(radius=0.2, fill="tomato")
+small_circle = circle(radius=0.15, fill="tomato")
 
 Blueprint(stroke_width=0.5)
 Text(common=header, text="Dia.Locations: gridlines; NE")
@@ -99,25 +96,11 @@ Layout(
    shapes=[small_circle])
 PageBreak()
 
-
 Blueprint(stroke_width=0.5)
 Text(common=header, text="Dia.Locations: gridlines; fill")
 dia = DiamondLocations(facing='north', y=2, x=2, side=.66, cols=7)
 Layout(
    dia,
-   gridlines='*',
-   gridlines_fill="aqua",
-   gridlines_stroke="gold",
-   gridlines_stroke_width=2,
-   shapes=[small_circle])
-PageBreak()
-
-
-Blueprint(stroke_width=0.5)
-Text(common=header, text="Rect.Locations: gridlines")
-rct = RectangularLocations(cols=3, rows=5, start="NE", direction="west")
-Layout(
-   rct,
    gridlines='*',
    gridlines_fill="aqua",
    gridlines_stroke="gold",
@@ -140,6 +123,5 @@ Save(
        "layout_dia_shape_rows",
        "layout_dia_gridlines_ne",
        "layout_dia_gridlines_fill",
-       "layout_TEST"
     ]
 )

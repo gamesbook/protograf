@@ -4604,7 +4604,7 @@ def LinkLine(grid: list, locations: Union[list, str], **kwargs):
 
 
 def Layout(grid, **kwargs):
-    """Determine locations and styles for cols&rows in a virtual layout and draw shape(s)"""
+    """Draw shape(s) in locations, cols, & rows in a virtual layout"""
     validate_globals()
 
     grid_classname = grid.__class__.__name__ if grid else ""
@@ -4680,7 +4680,26 @@ def Layout(grid, **kwargs):
         layout_grid_centroid = grid.grid_centroid  # calculated in layouts
         match grid_classname:
             case "DiamondLocations":
+                # ---- get gridlines params
+                layout_grid_dirs = tools.validated_gridlines(
+                    layout_grid, DirectionGroup.COMPASS, "gridlines"
+                )
                 layout_grid_hatches = grid.cols // 2 - 1  # for Diamond, rows == cols
+                # ---- setup gridlines configuration # eg.  [('d', 10), ('ne', 10)]
+                gridlines_count = {
+                    "n": grid.cols // 2,
+                    "s": grid.cols // 2,
+                    "e": grid.rows // 2,
+                    "w": grid.rows // 2,
+                    "ne": grid.cols // 2 - 1,
+                    "nw": grid.cols // 2 - 1,
+                    "se": grid.rows // 2 - 1,
+                    "sw": grid.rows // 2 - 1,
+                }
+                gridlines_config = [
+                    (_dir, gridlines_count[_dir]) for _dir in layout_grid_dirs
+                ]
+                # ---- draw lines
                 Rhombus(
                     cx=layout_grid_centroid.x,
                     cy=layout_grid_centroid.y,
@@ -4694,7 +4713,7 @@ def Layout(grid, **kwargs):
                     fill=layout_grid_fill,
                     transparency=layout_grid_transparency,
                     hatches_count=layout_grid_hatches,
-                    hatches=layout_grid,  # eg. '*', 'd', 'ne' etc. or [('d', 10)]
+                    hatches=gridlines_config,
                     hatches_stroke=layout_grid_stroke,
                     hatches_stroke_width=layout_grid_stroke_width,
                     hatches_dots=layout_grid_dotted,
@@ -4703,7 +4722,16 @@ def Layout(grid, **kwargs):
                     # rotation=0,
                 )
             case "RectangularLocations":
-                layout_grid_hatches = grid.cols // 2  # for Diamond, rows == cols
+                # ---- get gridlines params
+                layout_grid_dirs = tools.validated_gridlines(
+                    layout_grid, DirectionGroup.COMPASS, "gridlines"
+                )
+                layout_grid_hatches = grid.cols
+                # ---- setup gridlines configuration
+                gridlines_config = layout_grid  # eg. '*', 'd', 'ne' etc. or [('d', 10)]
+                # TODO - set []
+
+                # ---- draw lines
                 Rectangle(
                     cx=layout_grid_centroid.x,
                     cy=layout_grid_centroid.y,
@@ -4717,7 +4745,39 @@ def Layout(grid, **kwargs):
                     fill=layout_grid_fill,
                     transparency=layout_grid_transparency,
                     hatches_count=layout_grid_hatches,
-                    hatches=layout_grid,  # eg. '*', 'd', 'ne' etc. or [('d', 10)]
+                    hatches=gridlines_config,
+                    hatches_stroke=layout_grid_stroke,
+                    hatches_stroke_width=layout_grid_stroke_width,
+                    hatches_dots=layout_grid_dotted,
+                    hatches_ends=layout_grid_ends,
+                    hatches_dashed=layout_grid_dashed,
+                    # rotation=0,
+                )
+            case "TriangularLocations":
+                # ---- get gridlines params
+                layout_grid_hatches = grid.cols
+                layout_grid_dirs = tools.validated_gridlines(
+                    layout_grid, DirectionGroup.TRIANGULAR, "gridlines"
+                )
+                # ---- setup gridlines configuration
+                gridlines_config = layout_grid  # eg. '*', 'd', 'ne' etc. or [('d', 10)]
+                # TODO - set []
+
+                # ---- draw lines
+                Triangle(
+                    cx=layout_grid_centroid.x,
+                    cy=layout_grid_centroid.y,
+                    # height=grid.total_height,
+                    side=grid.total_width,
+                    stroke=layout_grid_stroke,
+                    stroke_width=layout_grid_stroke_width,
+                    stroke_ends=layout_grid_ends,
+                    dotted=layout_grid_dotted,
+                    dashed=layout_grid_dashed,
+                    fill=layout_grid_fill,
+                    transparency=layout_grid_transparency,
+                    hatches_count=layout_grid_hatches,
+                    hatches=gridlines_config,
                     hatches_stroke=layout_grid_stroke,
                     hatches_stroke_width=layout_grid_stroke_width,
                     hatches_dots=layout_grid_dotted,
