@@ -8,6 +8,7 @@ Note:
 # lib
 import argparse
 from collections import namedtuple
+from contextlib import suppress
 from copy import copy
 from datetime import datetime
 import itertools
@@ -4726,11 +4727,29 @@ def Layout(grid, **kwargs):
                 layout_grid_dirs = tools.validated_gridlines(
                     layout_grid, DirectionGroup.COMPASS, "gridlines"
                 )
+                # ---- NO diags for unequal rows & cols:
+                if grid.cols != grid.rows:
+                    with suppress(ValueError): layout_grid_dirs.remove('ne')
+                    with suppress(ValueError): layout_grid_dirs.remove('nw')
+                    with suppress(ValueError): layout_grid_dirs.remove('se')
+                    with suppress(ValueError): layout_grid_dirs.remove('sw')
+                    with suppress(ValueError): layout_grid_dirs.remove('d')
                 layout_grid_hatches = grid.cols
                 # ---- setup gridlines configuration
                 gridlines_config = layout_grid  # eg. '*', 'd', 'ne' etc. or [('d', 10)]
-                # TODO - set []
-
+                gridlines_count = {
+                    "n": grid.cols // 2,
+                    "s": grid.cols // 2,
+                    "e": grid.rows // 2 + 1,
+                    "w": grid.rows // 2 + 1,
+                    "ne": grid.cols + 1,
+                    "nw": grid.cols + 1,
+                    "se": grid.rows + 1,
+                    "sw": grid.rows + 1,
+                }
+                gridlines_config = [
+                    (_dir, gridlines_count[_dir]) for _dir in layout_grid_dirs
+                ]
                 # ---- draw lines
                 Rectangle(
                     cx=layout_grid_centroid.x,
@@ -4751,18 +4770,33 @@ def Layout(grid, **kwargs):
                     hatches_dots=layout_grid_dotted,
                     hatches_ends=layout_grid_ends,
                     hatches_dashed=layout_grid_dashed,
-                    # rotation=0,
+                    # rotation=rotation,
                 )
             case "TriangularLocations":
                 # ---- get gridlines params
-                layout_grid_hatches = grid.cols
                 layout_grid_dirs = tools.validated_gridlines(
-                    layout_grid, DirectionGroup.TRIANGULAR, "gridlines"
+                    layout_grid, DirectionGroup.TRIANGULAR_HATCH, "gridlines"
                 )
-                # ---- setup gridlines configuration
-                gridlines_config = layout_grid  # eg. '*', 'd', 'ne' etc. or [('d', 10)]
-                # TODO - set []
-
+                layout_grid_hatches = grid.cols // 2 - 1  # for Diamond, rows == cols
+                # ---- setup gridlines configuration # eg.  [('d', 10), ('ne', 10)]
+                gridlines_count = {
+                    "e": grid.rows * 2,
+                    "w": grid.rows * 2,
+                    "ne": grid.cols // 2 + 1,
+                    "nw": grid.cols // 2 + 1,
+                    "se": grid.cols // 2 + 1,
+                    "sw": grid.cols // 2 + 1,
+                }
+                gridlines_config = [
+                    (_dir, gridlines_count[_dir]) for _dir in layout_grid_dirs
+                ]
+                match grid.facing:
+                    case 'south':
+                        rotation = 180
+                    case 'east':
+                        rotation = 30
+                    case _:
+                        rotation = 0
                 # ---- draw lines
                 Triangle(
                     cx=layout_grid_centroid.x,
@@ -4783,7 +4817,7 @@ def Layout(grid, **kwargs):
                     hatches_dots=layout_grid_dotted,
                     hatches_ends=layout_grid_ends,
                     hatches_dashed=layout_grid_dashed,
-                    # rotation=0,
+                    rotation=rotation
                 )
             case _:
                 feedback(

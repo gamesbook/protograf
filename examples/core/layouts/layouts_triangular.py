@@ -91,6 +91,55 @@ Layout(tri, shapes=[circle(common=small_circle, label="E"),])
 
 tri = TriangularLocations(facing='west', y=1.5, x=2.5, side=0.8, rows=3)
 Layout(tri, shapes=[circle(common=small_circle, label="W"),])
+PageBreak()
+
+# ---- layout with grid line & fill
+small_circle = circle(radius=0.15, fill="tomato")
+
+Blueprint(stroke_width=0.5, subdivisions=5)
+Text(common=header, text="Tri.Locations: gridlines; NE & N")
+tri = TriangularLocations(facing='north', y=1, x=2, side=.66, cols=6)
+Layout(
+   tri,
+   gridlines='ne e',
+   gridlines_stroke="gold",
+   gridlines_stroke_width=2,
+   shapes=[small_circle])
+PageBreak()
+
+Blueprint(stroke_width=0.5)
+Text(common=header, text="Tri.Locations: gridlines; fill")
+tri = TriangularLocations(facing='north', y=1, x=2, side=.66, cols=6)
+Layout(
+   tri,
+   gridlines='*',
+   gridlines_fill="aqua",
+   gridlines_stroke="gold",
+   gridlines_stroke_width=2,
+   shapes=[small_circle])
+PageBreak()
+
+Blueprint(stroke_width=0.5, subdivisions=5)
+Text(common=header, text="Tri.Locations: gridlines; NE & N")
+tri = TriangularLocations(facing='south', y=4, x=2, side=.66, cols=6)
+Layout(
+   tri,
+   gridlines='ne e',
+   gridlines_stroke="gold",
+   gridlines_stroke_width=2,
+   shapes=[small_circle])
+PageBreak()
+
+Blueprint(stroke_width=0.5, subdivisions=5)
+Text(common=header, text="Tri.Locations: gridlines; east")
+tri = TriangularLocations(facing='east', y=3, x=4, side=.66, rows=6)
+Layout(
+   tri,
+   gridlines='ne e',
+   gridlines_stroke="gold",
+   gridlines_stroke_width=2,
+   shapes=[small_circle])
+PageBreak()
 
 Save(
      output='png',

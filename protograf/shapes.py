@@ -1678,6 +1678,14 @@ class RhombusShape(BaseShape):
                     cnv.draw_line(vertices[0], vertices[2])
                 if any(item in _dirs for item in ["n", "s", "o"]):  # vertical
                     cnv.draw_line(vertices[1], vertices[3])
+                if any(item in _dirs for item in ["ne", "sw", "d"]):
+                    self.draw_lines_between_sides(
+                        cnv, side, _num, vertices, (1, 0), (2, 3)
+                    )
+                if any(item in _dirs for item in ["se", "nw", "d"]):
+                    self.draw_lines_between_sides(
+                        cnv, side, _num, vertices, (0, 3), (1, 2)
+                    )
             if num >= 3:
                 _lines = lines - 1
                 if any(item in _dirs for item in ["ne", "sw", "d"]):
@@ -3602,7 +3610,6 @@ class TriangleShape(BaseShape):
 
         if not self.hatches:
             return
-        # print("tri verts", self._l2v(vertices))
         if isinstance(self.hatches, list):
             for item in self.hatches:
                 if not isinstance(item, tuple) and len(item) < 2:
@@ -3611,14 +3618,15 @@ class TriangleShape(BaseShape):
                         True,
                     )
                 _dirs = tools.validated_directions(
-                    item[0], DirectionGroup.TRIANGULAR_HATCHES, "triangle hatch"
+                    item[0], DirectionGroup.TRIANGULAR_HATCH, "triangle hatch"
                 )
-                lines = tools.as_int(item[1], label="hatch count", minimum=1)
+                # print(f"tri hatches {item[0]=} {item[1]=}")
+                lines = tools.as_int(item[1], label="hatch count", minimum=0)
                 draw_lines(_dirs, lines)
         else:
             lines = tools.as_int(num, "hatches_count")
             _dirs = tools.validated_directions(
-                self.hatches, DirectionGroup.TRIANGULAR_HATCHES, "triangle hatch"
+                self.hatches, DirectionGroup.TRIANGULAR_HATCH, "triangle hatch"
             )
             if lines >= 0:
                 draw_lines(_dirs, lines)
@@ -3661,7 +3669,7 @@ class TriangleShape(BaseShape):
         if self.perbii:
             perbii_dirs = tools.validated_directions(
                 self.perbii,
-                DirectionGroup.TRIANGULAR_EDGES,
+                DirectionGroup.TRIANGULAR_EDGE,
                 "triangle perbii",
             )
         else:
@@ -3932,7 +3940,7 @@ class TriangleShape(BaseShape):
                         self.radii_shapes,
                         self._shape_vertexes,
                         self.centroid,
-                        direction_group=DirectionGroup.TRIANGULAR,  # for the points!
+                        direction_group=DirectionGroup.TRIANGULAR,  # => the points!
                         rotation=rotation,
                         rotated=self.radii_shapes_rotated,
                     )
@@ -3944,7 +3952,7 @@ class TriangleShape(BaseShape):
                         perbii_shapes=self.perbii_shapes,
                         vertexes=self._shape_vertexes,
                         centre=self.centroid,
-                        direction_group=DirectionGroup.TRIANGULAR_EDGES,  # for the sides!
+                        direction_group=DirectionGroup.TRIANGULAR_EDGE,  # => the sides!
                         rotation=rotation,
                         rotated=self.perbii_shapes_rotated,
                     )

@@ -1560,18 +1560,19 @@ class TriangularLocations(VirtualLocations):
         self.kwargs = kwargs
         self.start = kwargs.get("start", "north")
         self.facing = kwargs.get("facing", "north")
-        self.triangle_validate(kwargs)
+        self.triangle_validate(**kwargs)
         # ---- calculated values
         _facing = self.set_compass_primary(_lower(self.facing))
         match _facing:
             case "north" | "south":  # layout is row-oriented
                 self.interval_x = self.side
                 self.interval_y = math.sqrt(3) / 2.0 * self.side
+                self.total_width = self.side * (self.cols - 1)
             case "east" | "west":  # layout is col-oriented
                 self.interval_x = math.sqrt(3) / 2.0 * self.side
                 self.interval_y = self.side
-        self.total_height = self.interval_x * (self.rows - 1)
-        self.total_width = self.interval_y * (self.cols - 1)
+                self.total_width = self.side * self.rows
+        self.total_height = math.sqrt(self.total_width**2 * 0.5)
 
     def triangle_validate(self, **kwargs):
         """Check that settings for TriangularLocations are correct."""
@@ -1598,7 +1599,22 @@ class TriangularLocations(VirtualLocations):
     @property
     def grid_centroid(self) -> Point:
         """Centre point of Grid in user units."""
-        return None
+        _facing = self.set_compass_primary(_lower(self.facing))
+        match _facing:
+            case 'north':
+                self.centre_x = self.x
+                self.centre_y = self.y + self.total_width / math.sqrt(3)
+            case 'south':
+                self.centre_x = self.x
+                self.centre_y = self.y - self.total_width * math.sqrt(3) / 6
+                # but need to shift back up because tri rotated around centre
+                self.centre_y = self.centre_y - math.sqrt(0.75 * (self.total_width / 3.)**2)
+            case 'east':
+                self.centre_y = self.y
+                self.centre_x = self.x - self.total_width / math.sqrt(3)
+            case _:
+                raise NotImplementedError(f'Cannot yet calculate centre for {_facing}')
+        return Point(self.centre_x, self.centre_y)
 
     def next_locale(self) -> Locale:
         """Yield next Location for each call."""
@@ -1720,13 +1736,16 @@ class DiamondLocations(VirtualLocations):
     Common properties and methods to define virtual diamond locations.
     """
 
-    def __init__(self, rows=3, cols=3, **kwargs):
+    def __init__(self, rows=0, cols=0, **kwargs):
         super().__init__(rows, cols, **kwargs)
         self.kwargs = kwargs
-        if self.cols and not kwargs.get("rows"):
+        if self.cols and not self.rows:
             self.rows = self.cols
-        if self.rows and not kwargs.get("cols"):
+        if self.rows and not self.cols:
             self.cols = self.rows
+        if not self.rows and not self.cols:
+            self.cols = 3
+            self.rows = 3
         self.diamond_validate()
         # ---- calculated settings
         self._side = self.side  # self.unit(self.side) KEEP USER UNITS

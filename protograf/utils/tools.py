@@ -1230,10 +1230,10 @@ def valid_directions(
             valid = {"n", "e", "w", "s", "ne", "se", "sw", "nw", "o", "d"}
         case DirectionGroup.TRIANGULAR:  # equilateral triangle VERTICES
             valid = {"se", "sw", "n"}
-        case DirectionGroup.TRIANGULAR_EDGES:  # equilateral triangle
+        case DirectionGroup.TRIANGULAR_EDGE:  # equilateral triangle
             valid = {"ne", "nw", "s"}
-        case DirectionGroup.TRIANGULAR_HATCHES:  # equilateral triangle
-            valid = {"ne", "nw", "e"}
+        case DirectionGroup.TRIANGULAR_HATCH:  # equilateral triangle HATCH
+            valid = {"ne", "sw", "e", "w", "nw", "se"}
         case DirectionGroup.POLYGONAL:  # polygon
             valid = set(range(1, vertex_count + 1))
             # print('^^^ ', vertex_count, values_set)
@@ -1269,6 +1269,7 @@ def validated_gridlines(
     >>> validated_gridlines('o', DirectionGroup.HEX_FLAT_EDGE)
     ['n', 's']
     """
+    # print(f'^^^ {value=} {direction_group=}')
     _value = value
     # ---- pre-flight checks
     if not value:
@@ -1293,16 +1294,16 @@ def validated_gridlines(
                     clean_values += ["n", "s", "ne", "sw"]
                 elif direction_group == DirectionGroup.HEX_POINTY_EDGE:
                     clean_values += ["e", "w", "ne", "sw"]
-                elif direction_group == DirectionGroup.TRIANGULAR:
+                elif direction_group == DirectionGroup.TRIANGULAR_HATCH:
                     clean_values += ["e", "ne", "sw"]
                 else:
-                    clean_values += ["n", "s", "e", "w", "ne", "sw", "se", "sw"]
+                    clean_values += ["n", "s", "e", "w", "ne", "nw", "se", "sw"]
             case "d" | "diag" | "diagonal":
                 if direction_group == DirectionGroup.HEX_FLAT_EDGE:
                     clean_values += ["ne", "sw"]
                 elif direction_group == DirectionGroup.HEX_POINTY_EDGE:
                     clean_values += ["ne", "sw"]
-                elif direction_group == DirectionGroup.TRIANGULAR:
+                elif direction_group == DirectionGroup.TRIANGULAR_HATCH:
                     clean_values += ["ne", "sw"]
                 else:
                     clean_values += ["ne", "sw"]
@@ -1311,16 +1312,16 @@ def validated_gridlines(
                     clean_values += ["n", "s"]
                 elif direction_group == DirectionGroup.HEX_POINTY_EDGE:
                     clean_values += ["e", "w"]
-                elif direction_group == DirectionGroup.TRIANGULAR:
+                elif direction_group == DirectionGroup.TRIANGULAR_HATCH:
                     clean_values += ["e", "w"]
                 else:
                     clean_values += ["n", "s", "e", "w"]
             case "n" | "s" | "e" | "w" | "ne" | "sw" | "se" | "sw":
                 clean_values += [val]
             case _:
-                _label = f"the {label} {val}" if label else f'"{val}"'
+                _label = f'the {label} "{val}"' if label else f'"{val}"'
                 feedback(
-                    f"Cannot use {_label} - it must correspond with "
+                    f"Cannot use {_label} - this must correspond with "
                     "one of the valid directions!",
                     True,
                 )
@@ -1332,9 +1333,9 @@ def validated_gridlines(
     if values_set.issubset(valid):
         # NOTE in some cases, we need to ignore `vertex_count` because not yet known...
         return clean_values
-    _label = f"the {label} {_value}" if label else f'"{_value}"'
+    _label = f'{label} "{_value}"' if label else f'"{_value}"'
     feedback(
-        f"Cannot use {_label} - it must correspond with "
+        f"Cannot use {_label} - this must correspond with "
         f"one of the valid directions {valid}!",
         True,
     )

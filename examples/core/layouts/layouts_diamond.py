@@ -86,11 +86,11 @@ PageBreak()
 small_circle = circle(radius=0.15, fill="tomato")
 
 Blueprint(stroke_width=0.5)
-Text(common=header, text="Dia.Locations: gridlines; NE")
+Text(common=header, text="Dia.Locations: gridlines; NE & N")
 dia = DiamondLocations(facing='north', y=2, x=2, side=.66, cols=7)
 Layout(
    dia,
-   gridlines='ne',
+   gridlines='ne n',
    gridlines_stroke="gold",
    gridlines_stroke_width=2,
    shapes=[small_circle])

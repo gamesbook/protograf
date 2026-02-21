@@ -76,23 +76,25 @@ Properties
 `↑ <table-of-contents-dialay_>`_
 
 - `Example 1. Rows and Columns`_
-- `Example 2. East - 2 Rows`_
-- `Example 3. East - 6 Rows`_
-- `Example 4. North - 2 Columns`_
-- `Example 5. North - 6 Columns`_
-- `Example 6. West - 3 Rows`_
-- `Example 7. South - 3 Columns`_
-- `Example 8. Mixed Styles`_
+- `Example 2. East - 3 Columns`_
+- `Example 3. West - 5 Rows`_
+- `Example 4. North - 3 Columns`_
+- `Example 5. South - 5 Rows`_
+- `Example 6. Shapes - by Rows`_
+- `Example 7. Shapes - by Columns`_
+- `Example 8. Shapes - by Locations`_
+- `Example 9. Gridlines - Direction`_
+- `Example 10. Gridlines - Fill`_
 
-
-Many examples below make use of some common ``Circle`` shapes which
+Many examples below make use of some named ``Circle`` shapes which
 are defined as:
 
   .. code:: python
 
     circles = Common(
-        x=0, y=0, diameter=1.0,
-        label="{{sequence}}//{{col}}-{{row}}", label_size=6)
+        diameter=1.0,
+        label="{{sequence}}//{{col}}-{{row}}",
+        label_size=6)
     a_circle = circle(common=circles)
     d_circle = circle(x=0, y=0, radius=0.33)
 
@@ -106,7 +108,7 @@ Example 1. Rows and Columns
 ---------------------------
 `^ <dialay-properties_>`_
 
-.. |tl0| image:: images/layouts/layout_tri_default.png
+.. |tl0| image:: images/layouts/layout_dia_default.png
    :width: 330
 
 ===== ======
@@ -116,20 +118,21 @@ Example 1. Rows and Columns
       .. code:: python
 
           dia = DiamondLocations()
-          Layout(dia, shapes=[d_circle,], debug='cr')
+          Layout(
+            dia, shapes=[d_circle,], debug='cr')
 
-      Here, because there is only the default ``2`` *rows* and *cols*,
+      Here, because there is only the default ``3`` *rows* and *cols*,
       located at x-position ``1`` cm and y-position ``1`` cm,
-      the *four* Circle shapes that are drawn are all super-imposed.
+      all the Circle shapes that are drawn are super-imposed.
 
 ===== ======
 
 
-Example 2. East - 2 Rows
-------------------------
+Example 2. East - 3 Columns
+---------------------------
 `^ <dialay-properties_>`_
 
-.. |tl1| image:: images/layouts/layout_tri_east_row2.png
+.. |tl1| image:: images/layouts/layout_dia_east_col3.png
    :width: 330
 
 ===== ======
@@ -139,9 +142,10 @@ Example 2. East - 2 Rows
       .. code:: python
 
           dia = DiamondLocations(
-              facing='east', rows=2,
-              x=4, y=3, side=0.66)
-          Layout(dia, shapes=[d_circle,], debug='cr')
+              facing='east', cols=3,
+              x=3, y=3, side=0.66)
+          Layout(
+            dia, shapes=[d_circle,], debug='cr')
 
       Here, the layout starts on the mid-right side - because the facing
       is ``east`` the triangle extends leftwards into the interior of
@@ -152,11 +156,11 @@ Example 2. East - 2 Rows
 ===== ======
 
 
-Example 3. East - 6 Rows
+Example 3. West - 5 Rows
 ------------------------
 `^ <dialay-properties_>`_
 
-.. |tl2| image:: images/layouts/layout_tri_east_row6.png
+.. |tl2| image:: images/layouts/layout_dia_west_row5.png
    :width: 330
 
 ===== ======
@@ -166,12 +170,13 @@ Example 3. East - 6 Rows
       .. code:: python
 
           dia = DiamondLocations(
-              facing='east', rows=6,
-              x=4, y=3, side=0.66)
-          Layout(dia, shapes=[d_circle,], debug='cr')
+              facing='west', rows=5,
+              x=1, y=3, side=0.66)
+          Layout(
+            dia, shapes=[d_circle,], debug='cr')
 
-      Here, the layout starts on the mid-right side - because the facing
-      is ``east`` the triangle extends leftwards into the interior of
+      Here, the layout starts on the mid-left side - because the facing
+      is ``west`` the triangle extends rightwards into the interior of
       the drawing.
 
       The *debug* value shows the column and row values (in that order).
@@ -179,11 +184,11 @@ Example 3. East - 6 Rows
 ===== ======
 
 
-Example 4. North - 2 Columns
+Example 4. North - 3 Columns
 ----------------------------
 `^ <dialay-properties_>`_
 
-.. |tl3| image:: images/layouts/layout_tri_north_col2.png
+.. |tl3| image:: images/layouts/layout_dia_north_col3.png
    :width: 330
 
 ===== ======
@@ -194,11 +199,12 @@ Example 4. North - 2 Columns
 
           dia = DiamondLocations(
               facing='north', cols=2,
-              y=1, x=2, side=0.66)
-          Layout(dia, shapes=[d_circle,], debug='cr')
+              y=2, x=2, side=0.66)
+          Layout(
+            dia, shapes=[d_circle,], debug='cr')
 
       Here, the layout starts on the top-centre side - because the facing
-      is ``north`` the triangle extends downwards into the interior of
+      is ``north`` the grid extends downwards into the interior of
       the drawing.
 
       The *debug* value shows the column and row values (in that order).
@@ -206,11 +212,11 @@ Example 4. North - 2 Columns
 ===== ======
 
 
-Example 5. North - 6 Columns
-----------------------------
+Example 5. South - 5 Rows
+-------------------------
 `^ <dialay-properties_>`_
 
-.. |tl4| image:: images/layouts/layout_tri_north_col6.png
+.. |tl4| image:: images/layouts/layout_dia_south_row5.png
    :width: 330
 
 ===== ======
@@ -220,12 +226,13 @@ Example 5. North - 6 Columns
       .. code:: python
 
           dia = DiamondLocations(
-              facing='north', cols=6,
-              y=1, x=2, side=0.66)
-          Layout(dia, shapes=[d_circle,], debug='cr')
+              facing='south', rows=5,
+              y=4, x=2, side=0.66)
+          Layout(
+            dia, shapes=[d_circle,], debug='cr')
 
-      Here, the layout starts on the top-centre side - because the facing
-      is ``north`` the triangle extends downwards into the interior of
+      Here, the layout starts on the lower-centre side - because the facing
+      is ``south`` the grid extends upwards into the interior of
       the drawing.
 
       The *debug* value shows the column and row values (in that order).
@@ -233,11 +240,11 @@ Example 5. North - 6 Columns
 ===== ======
 
 
-Example 6. West - 3 Rows
-------------------------
+Example 6. Shapes - by Rows
+---------------------------
 `^ <dialay-properties_>`_
 
-.. |tl5| image:: images/layouts/layout_tri_west_row3.png
+.. |tl5| image:: images/layouts/layout_dia_shape_rows.png
    :width: 330
 
 ===== ======
@@ -246,25 +253,38 @@ Example 6. West - 3 Rows
 
       .. code:: python
 
-          dia = DiamondLocations(
-              facing="west", rows=3,
-              x=1, y=3, side=1.0)
-          Layout(dia, shapes=[a_circle,])
+        dia = DiamondLocations(
+          facing='north',
+          y=2, x=2,
+          side=.66, cols=7)
+        Layout(
+          dia,
+          shapes=[gold_circle])
+        Layout(
+          dia,
+          shapes=[red_circle],
+          rows=[1,2,6,7],
+          debug='r')
 
-      Here, the layout starts on the left-centre side - because the facing
-      is ``west`` the triangle extends rightwards into the interior of
-      the drawing.
+      Here, two sets of circles are drawn onto the diamond grid.
 
-      The *debug* value shows the column and row values (in that order).
+      The first set |dash| the ``gold`` circles |dash| are drawn at every
+      location.
+
+      The second set |dash| the ``red`` circles |dash| are drawn on specific
+      rows; in this case, the top two and the bottom two, via the list of
+      numbers assigned to the *rows* property.
+
+      The *debug* value in the red circles shows the row number (in order).
 
 ===== ======
 
 
-Example 7. South - 3 Columns
-----------------------------
+Example 7. Shapes - by Columns
+------------------------------
 `^ <dialay-properties_>`_
 
-.. |tl6| image:: images/layouts/layout_tri_south_col3.png
+.. |tl6| image:: images/layouts/layout_dia_shape_cols.png
    :width: 330
 
 ===== ======
@@ -273,25 +293,38 @@ Example 7. South - 3 Columns
 
       .. code:: python
 
-          dia = DiamondLocations(
-              cols=3, facing="south",
-              x=2, y=4, side=1.0)
-          Layout(dia, shapes=[a_circle,])
+        dia = DiamondLocations(
+          facing='north',
+          y=2, x=2,
+          side=.66, cols=7)
+        Layout(
+          dia,
+          shapes=[gold_circle])
+        Layout(
+          dia,
+          shapes=[red_circle],
+          cols=[1,2,6,7],
+          debug='c')
 
-      Here, the layout starts in the mid-centre side - because the facing
-      is ``south`` the triangle extends upwards into the interior of
-      the drawing.
+      Here, two sets of circles are drawn onto the diamond grid.
 
-      The *debug* value shows the column and row values (in that order).
+      The first set |dash| the ``gold`` circles |dash| are drawn at every
+      location.
+
+      The second set |dash| the ``red`` circles |dash| are drawn on specific
+      columns; in this case, the leftmost two and the rightmost two, via the
+      list of numbers assigned to the *cols* property.
+
+      The *debug* value in the red circles shows the column number (in order).
 
 ===== ======
 
 
-Example 8. Mixed Styles
------------------------
+Example 8. Shapes - by Locations
+--------------------------------
 `^ <dialay-properties_>`_
 
-.. |tl7| image:: images/layouts/layout_tri_all.png
+.. |tl7| image:: images/layouts/layout_dia_shape_locs.png
    :width: 330
 
 ===== ======
@@ -301,35 +334,116 @@ Example 8. Mixed Styles
       .. code:: python
 
         dia = DiamondLocations(
-            facing='east', rows=3,
-            y=1.5, x=1.5, side=0.8)
+          facing='north',
+          y=2, x=2,
+          side=.66, cols=7)
         Layout(
-            dia, shapes=[circle(
-                common=small_circle, label="E"),])
+          dia,
+          shapes=[gold_circle])
+        Layout(
+          dia,
+          shapes=[red_circle],
+          locations=[
+           (3,2), (5,2), (3,6), (5,6)],
+          debug='c')
 
+      Here, two sets of circles are drawn onto the diamond grid.
+
+      The first set |dash| the ``gold`` circles |dash| are drawn at every
+      location.
+
+      The second set |dash| the ``red`` circles |dash| are drawn at specific
+      locations; using a pair of ``(col, row)`` numbers in the list of
+      values assigned to the *locations* property.
+
+      The *debug* value shows the column and row values (in that order).
+
+===== ======
+
+
+Example 9. Gridlines - Direction
+--------------------------------
+`^ <dialay-properties_>`_
+
+.. |tl8| image:: images/layouts/layout_dia_gridlines_ne.png
+   :width: 330
+
+===== ======
+|tl8| This example shows the shape constructed using differing values for
+      its properties.
+
+      .. code:: python
+
+        small_circle = circle(
+          radius=0.15,
+          fill="tomato")
         dia = DiamondLocations(
-            facing='west', rows=3,
-            y=1.5, x=2.5, side=0.8)
+          facing='north',
+          y=2, x=2,
+          side=.66, cols=7)
         Layout(
-            dia, shapes=[circle(
-                common=small_circle, label="W"),])
+          dia,
+          gridlines='ne n',
+          gridlines_stroke="gold",
+          gridlines_stroke_width=2,
+          shapes=[small_circle])
 
+      Here, the grid itself is displayed |dash| it is always drawn first
+      before any shapes.
+
+      The outline of the grid is always drawn.
+
+      The key prefix is *gridlines* and the value assigned to it will
+      determine in which direction, or directions, the gridlines are drawn;
+      in this case, north and north-east.
+
+      The usual customisation settings are possible for the gridlines;
+      color, thickness, etc.
+
+===== ======
+
+
+Example 10. Gridlines - Fill
+----------------------------
+`^ <dialay-properties_>`_
+
+.. |tl9| image:: images/layouts/layout_dia_gridlines_fill.png
+   :width: 330
+
+===== ======
+|tl9| This example shows the shape constructed using differing values for
+      its properties.
+
+      .. code:: python
+
+        small_circle = circle(
+          radius=0.15,
+          fill="tomato")
         dia = DiamondLocations(
-            facing='south', cols=3,
-            y=5, x=1, side=0.8)
+          facing='north',
+          y=2, x=2,
+          side=.66, cols=7)
         Layout(
-            dia, shapes=[circle(
-                common=small_circle, label="N"),])
+          dia,
+          gridlines='*',
+          gridlines_fill="aqua",
+          gridlines_stroke="gold",
+          gridlines_stroke_width=2,
+          shapes=[small_circle])
 
-        dia = DiamondLocations(
-            facing='north', cols=3,
-            y=4, x=3, side=0.8)
-        Layout(
-            dia, shapes=[circle(
-                common=small_circle, label="S"),])
+      Here, the grid itself is displayed |dash| it is always drawn first
+      before any shapes.
 
-      These layouts are similar to other examples.
+      The outline of the grid is always drawn.  If the *gridlines_fill*
+      property is assigned a color, then the grid will be filled with that
+      color before any gridlines are drawn.
 
-      The circles, in each case, now show fixed text.
+      The key prefix is *gridlines* and the value assigned to it will
+      determine in which direction, or directions, the gridlines are drawn;
+      in this case, because of the ``*`` value, they are drawn in all
+      possible directions.
+
+      The usual customisation settings are possible for the gridlines;
+      color, thickness, etc.
 
 ===== ======

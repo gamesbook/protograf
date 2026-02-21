@@ -110,6 +110,11 @@ Properties
 - `Example 8. Visible`_
 - `Example 9. Locations Setting`_
 - `Example 10. Debug`_
+- `Example 11. Gridlines - Orthogonal`_
+- `Example 12. Gridlines - Diagonal`_
+- `Example 13. Gridlines - Fill`_
+- `Example 14. Shapes - by Rows`_
+- `Example 15. Shapes - by Columns`_
 
 All examples below make use of a common ``Circle`` shape (assigned to
 the name *a_circle*) defined as:
@@ -639,5 +644,223 @@ Example 10. Debug
       This is useful to visualise the **identity** of each location; for
       example, if you needed to make any of these locations *visible* or
       *masked*.
+
+===== ======
+
+
+Example 11. Gridlines - Orthogonal
+----------------------------------
+`^ <key-properties-rect_>`_
+
+.. |11g| image:: images/layouts/rect_locs_grid_orth.png
+   :width: 330
+
+===== ======
+|11g| This example shows the design constructed using the following values
+      for the shapes' properties.
+
+      .. code:: python
+
+        small_circle = circle(
+          radius=0.15,
+          fill="tomato")
+        rct = RectangularLocations(
+           cols=3, rows=5,
+           start="NE",
+           direction="west")
+        Layout(
+           rct,
+           gridlines='o',
+           gridlines_stroke="gold",
+           gridlines_stroke_width=2,
+           shapes=[small_circle])
+
+      Here, the grid itself is displayed |dash| it is always drawn first
+      before any shapes.
+
+      The outline of the grid is always drawn.
+
+      The key prefix is *gridlines* and the value assigned to it will
+      determine in which direction, or directions, the gridlines are drawn;
+      in this case, all ``orthogonal`` lines.
+
+      The usual customisation settings are possible for the gridlines;
+      color, thickness, etc.
+
+===== ======
+
+
+Example 12. Gridlines - Diagonal
+--------------------------------
+`^ <key-properties-rect_>`_
+
+.. |12g| image:: images/layouts/rect_locs_grid_diag.png
+   :width: 330
+
+===== ======
+|12g| This example shows the design constructed using the following values
+      for the shapes' properties.
+
+      .. code:: python
+
+        small_circle = circle(
+          radius=0.15,
+          fill="tomato")
+        rct = RectangularLocations(
+           cols=4, rows=4,
+           start="NE",
+           direction="west")
+        Layout(
+           rct,
+           gridlines='d n',
+           gridlines_stroke="gold",
+           gridlines_stroke_width=2,
+           shapes=[small_circle])
+
+      Here, the grid itself is displayed |dash| it is always drawn first
+      before any shapes.
+
+      The outline of the grid is always drawn.
+
+      The key prefix is *gridlines* and the value assigned to it will
+      determine in which direction, or directions, the gridlines are drawn;
+      in this case, all ``north`` and ``diagonal`` lines.
+
+      The usual customisation settings are possible for the gridlines;
+      color, thickness, etc.
+
+===== ======
+
+
+Example 13. Gridlines - Fill
+----------------------------
+`^ <key-properties-rect_>`_
+
+.. |13g| image:: images/layouts/rect_locs_grid_fill.png
+   :width: 330
+
+===== ======
+|13g| This example shows the design constructed using the following values
+      for the shapes' properties.
+
+      .. code:: python
+
+        small_circle = circle(
+          radius=0.15,
+          fill="tomato")
+        rct = RectangularLocations(
+           cols=3, rows=5,
+           start="NE",
+           direction="west")
+        Layout(
+           rct,
+           gridlines='*',
+           gridlines_fill="aqua",
+           gridlines_stroke="gold",
+           gridlines_stroke_width=2,
+           shapes=[small_circle])
+
+      Here, the grid itself is displayed |dash| it is always drawn first
+      before any shapes.
+
+      The outline of the grid is always drawn.  If the *gridlines_fill*
+      property is assigned a color, then the grid will be filled with that
+      color before any gridlines are drawn.
+
+      The key prefix is *gridlines* and the value assigned to it will
+      determine in which direction, or directions, the gridlines are drawn;
+      in this case, because of the ``*`` value, they are drawn in all
+      possible directions.
+
+      The usual customisation settings are possible for the gridlines;
+      color, thickness, etc.
+
+      .. NOTE::
+
+        Although gridlines *could* be drawn in all directions, in this case
+        they will not be because the grid is rectangular |dash| only square
+        shaped grids will have diagonal lines drawn for them.
+
+===== ======
+
+
+Example 14. Shapes - by Rows
+----------------------------
+`^ <key-properties-rect_>`_
+
+.. |14g| image:: images/layouts/rect_locs_shape_rows.png
+   :width: 330
+
+===== ======
+|14g| This example shows the shape constructed using differing values for
+      its properties.
+
+      .. code:: python
+
+        rct = RectangularLocations(
+          facing='north',
+          y=1, x=1,
+          side=.66,
+          cols=4, rows=6)
+        Layout(
+          rct,
+          shapes=[gold_circle])
+        Layout(
+          rct,
+          rows=[1, 3, 5],
+          shapes=[red_circle],
+          debug='c')
+
+      Here, two sets of circles are drawn onto the diamond grid.
+
+      The first set |dash| the ``gold`` circles |dash| are drawn at every
+      location.
+
+      The second set |dash| the ``red`` circles |dash| are drawn on specific
+      rows; in this case, every odd numbered row, via the list of
+      numbers assigned to the *rows* property.
+
+      The *debug* value in the red circles shows the row number (in order).
+
+===== ======
+
+
+Example 15. Shapes - by Columns
+-------------------------------
+`^ <key-properties-rect_>`_
+
+.. |15g| image:: images/layouts/rect_locs_shape_cols.png
+   :width: 330
+
+===== ======
+|15g| This example shows the shape constructed using differing values for
+      its properties.
+
+      .. code:: python
+
+        rct = RectangularLocations(
+          facing='north',
+          y=1, x=1,
+          side=.66,
+          cols=4, rows=6)
+        Layout(
+          rct,
+          shapes=[gold_circle])
+        Layout(
+          rct,
+          cols=[1, 4],
+          shapes=[red_circle],
+          debug='c')
+
+      Here, two sets of circles are drawn onto the diamond grid.
+
+      The first set |dash| the ``gold`` circles |dash| are drawn at every
+      location.
+
+      The second set |dash| the ``red`` circles |dash| are drawn on specific
+      columns; in this case, the leftmost and the rightmost, via the
+      list of numbers assigned to the *cols* property.
+
+      The *debug* value in the red circles shows the column number (in order).
 
 ===== ======
