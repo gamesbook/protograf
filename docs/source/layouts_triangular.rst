@@ -2,6 +2,8 @@
 TriangularLocations Command
 ===========================
 
+.. |dash| unicode:: U+2014 .. EM DASH SIGN
+
 This section assumes you are very familiar with the concepts, terms and
 ideas for :doc:`protograf <index>` as presented in the
 :doc:`Basic Concepts <basic_concepts>` , that you understand all of the
@@ -9,7 +11,8 @@ ideas for :doc:`protograf <index>` as presented in the
 and that you've created some basic scripts of your own using the
 :doc:`Core Shapes <core_shapes>`.
 
-This is part of the set of commands used for :doc:`Layouts <layouts>`.
+This is part of the set of commands used for :doc:`Layouts <layouts>`,
+that are used in conjunction with the :doc:`Layout command <layout_command>`.
 
 
 .. _table-of-contents-trilay:
@@ -79,6 +82,8 @@ Properties
 - `Example 6. West - 3 Rows`_
 - `Example 7. South - 3 Columns`_
 - `Example 8. Mixed Styles`_
+- `Example 9. Gridlines - Direction`_
+- `Example 10. Gridlines - Fill`_
 
 
 Many examples below make use of some common ``Circle`` shapes which
@@ -327,5 +332,92 @@ Example 8. Mixed Styles
       These layouts are similar to other examples.
 
       The circles, in each case, now show fixed text.
+
+===== ======
+
+
+Example 9. Gridlines - Direction
+--------------------------------
+`^ <trilay-properties_>`_
+
+.. |tl8| image:: images/layouts/layout_tri_gridlines_ne.png
+   :width: 330
+
+===== ======
+|tl8| This example shows the shape constructed using differing values for
+      its properties.
+
+      .. code:: python
+
+        small_circle = circle(
+          radius=0.15,
+          fill="tomato")
+        tri = TriangularLocations(
+          facing='north',
+          y=1, x=2,
+          side=.66, cols=6)
+        Layout(
+          tri,
+          gridlines='ne e',
+          gridlines_stroke="gold",
+          gridlines_stroke_width=2,
+          shapes=[small_circle])
+
+      Here, the grid itself is displayed |dash| it is always drawn first
+      before any shapes.
+
+      The outline of the grid is always drawn.
+
+      The key prefix is *gridlines* and the value assigned to it will
+      determine in which direction, or directions, the gridlines are drawn;
+      in this case, east and north-east.
+
+      The usual customisation settings are possible for the gridlines;
+      color, thickness, etc.
+
+===== ======
+
+
+Example 10. Gridlines - Fill
+----------------------------
+`^ <trilay-properties_>`_
+
+.. |tl9| image:: images/layouts/layout_tri_gridlines_fill.png
+   :width: 330
+
+===== ======
+|tl9| This example shows the shape constructed using differing values for
+      its properties.
+
+      .. code:: python
+
+        small_circle = circle(
+          radius=0.15,
+          fill="tomato")
+        tri = TriangularLocations(
+          facing='north',
+          y=1, x=2,
+          side=.66, cols=6)
+        Layout(
+          tri,
+          gridlines='ne e',
+          gridlines_fill="aqua",
+          gridlines_stroke="gold",
+          gridlines_stroke_width=2,
+          shapes=[small_circle])
+
+      Here, the grid itself is displayed |dash| it is always drawn first
+      before any shapes.
+
+      The outline of the grid is always drawn.  If the *gridlines_fill*
+      property is assigned a color, then the grid will be filled with that
+      color before any gridlines are drawn.
+
+      The key prefix is *gridlines* and the value assigned to it will
+      determine in which direction, or directions, the gridlines are drawn;
+      in this case, east and north-east.
+
+      The usual customisation settings are possible for the gridlines;
+      color, thickness, etc.
 
 ===== ======

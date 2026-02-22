@@ -1571,7 +1571,7 @@ class TriangularLocations(VirtualLocations):
             case "east" | "west":  # layout is col-oriented
                 self.interval_x = math.sqrt(3) / 2.0 * self.side
                 self.interval_y = self.side
-                self.total_width = self.side * self.rows
+                self.total_width = self.side * (self.rows - 1)
         self.total_height = math.sqrt(self.total_width**2 * 0.5)
 
     def triangle_validate(self, **kwargs):
@@ -1601,30 +1601,33 @@ class TriangularLocations(VirtualLocations):
         """Centre point of Grid in user units."""
         _facing = self.set_compass_primary(_lower(self.facing))
         match _facing:
-            case 'north':
+            case "north":
                 self.centre_x = self.x
                 self.centre_y = self.y + self.total_width / math.sqrt(3)
-            case 'south':
+            case "south":
                 self.centre_x = self.x
                 self.centre_y = self.y - self.total_width * math.sqrt(3) / 6
                 # but need to shift back up because tri rotated around centre
-                self.centre_y = self.centre_y - math.sqrt(0.75 * (self.total_width / 3.)**2)
-            case 'east':
+                self.centre_y = self.centre_y - math.sqrt(
+                    0.75 * (self.total_width / 3.0) ** 2
+                )
+            case "east":
                 self.centre_y = self.y
                 self.centre_x = self.x - self.total_width / math.sqrt(3)
+            case "west":
+                self.centre_y = self.y
+                self.centre_x = self.x + self.total_width / math.sqrt(3)
             case _:
-                raise NotImplementedError(f'Cannot yet calculate centre for {_facing}')
+                raise NotImplementedError(f"Cannot yet calculate centre for {_facing}")
         return Point(self.centre_x, self.centre_y)
 
     def next_locale(self) -> Locale:
         """Yield next Location for each call."""
         _start = self.set_compass_primary(_lower(self.start))
-        # _dir = self.set_compass_primary(_lower(self.direction))
         _facing = self.set_compass_primary(_lower(self.facing))
-
         # TODO - create logic
         if _lower(self.pattern) in ["snake", "snaking", "s"]:
-            feedback("Snake pattern NOT YET IMPLEMENTED", True)
+            feedback("Snake pattern NOT YET IMPLEMENTED for TriangleLocations", True)
 
         # ---- store row/col as list of lists
         array = []

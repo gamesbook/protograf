@@ -4729,11 +4729,16 @@ def Layout(grid, **kwargs):
                 )
                 # ---- NO diags for unequal rows & cols:
                 if grid.cols != grid.rows:
-                    with suppress(ValueError): layout_grid_dirs.remove('ne')
-                    with suppress(ValueError): layout_grid_dirs.remove('nw')
-                    with suppress(ValueError): layout_grid_dirs.remove('se')
-                    with suppress(ValueError): layout_grid_dirs.remove('sw')
-                    with suppress(ValueError): layout_grid_dirs.remove('d')
+                    with suppress(ValueError):
+                        layout_grid_dirs.remove("ne")
+                    with suppress(ValueError):
+                        layout_grid_dirs.remove("nw")
+                    with suppress(ValueError):
+                        layout_grid_dirs.remove("se")
+                    with suppress(ValueError):
+                        layout_grid_dirs.remove("sw")
+                    with suppress(ValueError):
+                        layout_grid_dirs.remove("d")
                 layout_grid_hatches = grid.cols
                 # ---- setup gridlines configuration
                 gridlines_config = layout_grid  # eg. '*', 'd', 'ne' etc. or [('d', 10)]
@@ -4779,22 +4784,35 @@ def Layout(grid, **kwargs):
                 )
                 layout_grid_hatches = grid.cols // 2 - 1  # for Diamond, rows == cols
                 # ---- setup gridlines configuration # eg.  [('d', 10), ('ne', 10)]
-                gridlines_count = {
-                    "e": grid.rows * 2,
-                    "w": grid.rows * 2,
-                    "ne": grid.cols // 2 + 1,
-                    "nw": grid.cols // 2 + 1,
-                    "se": grid.cols // 2 + 1,
-                    "sw": grid.cols // 2 + 1,
-                }
+                match grid.facing:
+                    case "north" | "south":
+                        gridlines_count = {
+                            "e": grid.rows * 2,
+                            "w": grid.rows * 2,
+                            "ne": grid.cols // 2 + 1,
+                            "nw": grid.cols // 2 + 1,
+                            "se": grid.cols // 2 + 1,
+                            "sw": grid.cols // 2 + 1,
+                        }
+                    case "east" | "west":
+                        gridlines_count = {
+                            "e": grid.cols * 2,
+                            "w": grid.cols * 2,
+                            "ne": grid.rows // 2 + 1,
+                            "nw": grid.rows // 2 + 1,
+                            "se": grid.rows // 2 + 1,
+                            "sw": grid.rows // 2 + 1,
+                        }
                 gridlines_config = [
                     (_dir, gridlines_count[_dir]) for _dir in layout_grid_dirs
                 ]
                 match grid.facing:
-                    case 'south':
+                    case "south":
                         rotation = 180
-                    case 'east':
+                    case "east":
                         rotation = 30
+                    case "west":
+                        rotation = -30
                     case _:
                         rotation = 0
                 # ---- draw lines
@@ -4817,7 +4835,7 @@ def Layout(grid, **kwargs):
                     hatches_dots=layout_grid_dotted,
                     hatches_ends=layout_grid_ends,
                     hatches_dashed=layout_grid_dashed,
-                    rotation=rotation
+                    rotation=rotation,
                 )
             case _:
                 feedback(

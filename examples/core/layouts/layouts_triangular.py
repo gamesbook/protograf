@@ -96,8 +96,8 @@ PageBreak()
 # ---- layout with grid line & fill
 small_circle = circle(radius=0.15, fill="tomato")
 
-Blueprint(stroke_width=0.5, subdivisions=5)
-Text(common=header, text="Tri.Locations: gridlines; NE & N")
+Blueprint(stroke_width=0.5)
+Text(common=header, text="Tri.Locations: gridlines NE & E")
 tri = TriangularLocations(facing='north', y=1, x=2, side=.66, cols=6)
 Layout(
    tri,
@@ -108,7 +108,7 @@ Layout(
 PageBreak()
 
 Blueprint(stroke_width=0.5)
-Text(common=header, text="Tri.Locations: gridlines; fill")
+Text(common=header, text="Tri.Locations: gridlines NE & E; fill")
 tri = TriangularLocations(facing='north', y=1, x=2, side=.66, cols=6)
 Layout(
    tri,
@@ -119,8 +119,21 @@ Layout(
    shapes=[small_circle])
 PageBreak()
 
-Blueprint(stroke_width=0.5, subdivisions=5)
-Text(common=header, text="Tri.Locations: gridlines; NE & N")
+# ---- layout with grid line & fill - facing
+
+Blueprint(stroke_width=0.5)
+Text(common=header, text="Tri.Locations: gridlines NE & E; north")
+tri = TriangularLocations(facing='north', y=1, x=2, side=.66, cols=6)
+Layout(
+   tri,
+   gridlines='ne e',
+   gridlines_stroke="gold",
+   gridlines_stroke_width=2,
+   shapes=[small_circle])
+PageBreak()
+
+Blueprint(stroke_width=0.5)
+Text(common=header, text="Tri.Locations: gridlines NE & E; south")
 tri = TriangularLocations(facing='south', y=4, x=2, side=.66, cols=6)
 Layout(
    tri,
@@ -130,8 +143,8 @@ Layout(
    shapes=[small_circle])
 PageBreak()
 
-Blueprint(stroke_width=0.5, subdivisions=5)
-Text(common=header, text="Tri.Locations: gridlines; east")
+Blueprint(stroke_width=0.5)
+Text(common=header, text="Tri.Locations: gridlines NE & E; east")
 tri = TriangularLocations(facing='east', y=3, x=4, side=.66, rows=6)
 Layout(
    tri,
@@ -141,15 +154,37 @@ Layout(
    shapes=[small_circle])
 PageBreak()
 
+Blueprint(stroke_width=0.5)
+Text(common=header, text="Tri.Locations: gridlines NE & E; west")
+tri = TriangularLocations(facing='west', y=3, x=0, side=.66, rows=6)
+Layout(
+   tri,
+   gridlines='ne e',
+   gridlines_stroke="gold",
+   gridlines_stroke_width=2,
+   shapes=[small_circle])
+
+
 Save(
      output='png',
      dpi=300,
      directory="../docs/source/images/layouts",
      names=[
         "layout_tri_default",
-        "layout_tri_east_row2", "layout_tri_east_row6",
-        "layout_tri_north_col2", "layout_tri_north_col6",
-        "layout_tri_west_row3", "layout_tri_south_col3",
-        "layout_tri_all"
+        "layout_tri_east_row2",
+        "layout_tri_east_row6",
+        "layout_tri_north_col2",
+        "layout_tri_north_col6",
+        "layout_tri_west_row3",
+        "layout_tri_south_col3",
+        "layout_tri_all",
+
+        "layout_tri_gridlines_ne",
+        "layout_tri_gridlines_fill",
+
+        "layout_tri_gridlines_north",
+        "layout_tri_gridlines_south",
+        "layout_tri_gridlines_east",
+        "layout_tri_gridlines_west",
      ]
 )

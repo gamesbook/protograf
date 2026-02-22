@@ -13,7 +13,8 @@ ideas for :doc:`protograf <index>` as presented in the
 and that you've created some basic scripts of your own using the
 :doc:`Core Shapes <core_shapes>`.
 
-This is part of the set of commands used for :doc:`Layouts <layouts>`.
+This is part of the set of commands used for :doc:`Layouts <layouts>`,
+that are used in conjunction with the :doc:`Layout command <layout_command>`.
 
 .. _table-of-contents-rect:
 
