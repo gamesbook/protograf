@@ -104,6 +104,36 @@ Text(source, common=credit)
 PageBreak()
 
 # ---- .Cairo Corridor
+Text("Cairo Corridor", common=title)
+Text(source, common=credit)
+START_X = 4.5
+START_Y = 2.4
+INTERVAL = 3.
+litec = Common(stroke_width=1, stroke='grey', fill='tan')
+darkc = Common(stroke_width=1, stroke='black', fill='brown')
+
+offset = 0
+for y in steps(START_Y, 20., INTERVAL):
+    for x in steps(START_X, 24., INTERVAL * 2):
+        Polyshape(
+            x=x + offset, y=y, common=litec,
+            snail=cairo_pentagon_snail(INTERVAL, "west"))
+        Polyshape(
+            x=x + offset, y=y, common=litec,
+            snail=cairo_pentagon_snail(INTERVAL, "east"))
+    offset = INTERVAL - offset
+
+offset = 0
+for y in steps(START_Y, 20., INTERVAL):
+    for x in steps(START_X + INTERVAL, 24., INTERVAL * 2):
+        Polyshape(
+            x=x + offset, y=y, common=darkc,
+            snail=cairo_pentagon_snail(INTERVAL, "north"))
+        Polyshape(
+            x=x + offset, y=y, common=darkc,
+            snail=cairo_pentagon_snail(INTERVAL, "south"))
+    offset = INTERVAL - offset
+PageBreak()
 
 # ---- .Checkers
 Text("Checkers", common=title)

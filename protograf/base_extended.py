@@ -73,10 +73,10 @@ class BasePolyShape(BaseShape):
                 else:
                     current_dir = current_dir + float(a_item)
                     if current_dir > 360:
-                        current_dir = 360 - current_dir
+                        current_dir = current_dir - 360
                     if current_dir < 0 or current_dir > 360:
                         tools.feedback(
-                            f'The {polytype} snail angle change "{item}" must result in 0 to 360.',
+                            f'The {polytype} snail anti-clockwise angle change "{item}" must result in 0 to 360.',
                             True,
                             True,
                         )
@@ -94,7 +94,7 @@ class BasePolyShape(BaseShape):
                         current_dir = 360 + current_dir
                     if current_dir < 0 or current_dir > 360:
                         tools.feedback(
-                            f'The {polytype} snail angle change "{item}" must result in 0 to 360.',
+                            f'The {polytype} snail angle clockwise change "{item}" must result in 0 to 360.',
                             True,
                             True,
                         )
