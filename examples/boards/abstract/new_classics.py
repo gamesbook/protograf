@@ -13,7 +13,7 @@ Notes:
 
 from protograf import *
 
-Create(filename="new_classic_boards.pdf", margin=0.5, paper="A4-l", page_grid=1)
+Create(filename="new_classic_boards.pdf", margin=0.5, paper="A4-l")
 
 # ---- common usage
 source = '"New Book of Classic Board Games", Brian E. Svoboda, 2026.'
@@ -106,31 +106,39 @@ PageBreak()
 # ---- .Cairo Corridor
 Text("Cairo Corridor", common=title)
 Text(source, common=credit)
-START_X = 4.5
+START_X = 7
 START_Y = 2.4
 INTERVAL = 3.
-litec = Common(stroke_width=1, stroke='grey', fill='tan')
-darkc = Common(stroke_width=1, stroke='black', fill='brown')
-
+litec = Common(stroke_width=1.5, stroke='black', fill='#F0E370')
+darkc = Common(stroke_width=1.5, stroke='black', fill='#CEBB53')
+# ---- light colors
 offset = 0
-for y in steps(START_Y, 20., INTERVAL):
-    for x in steps(START_X, 24., INTERVAL * 2):
+for row in steps(0, 5, 1):
+    for col in steps(0, 2, 1):
         Polyshape(
-            x=x + offset, y=y, common=litec,
+            x=START_X + INTERVAL*col*2 + offset,
+            y=START_Y + INTERVAL*row,
+            common=litec,
             snail=cairo_pentagon_snail(INTERVAL, "west"))
         Polyshape(
-            x=x + offset, y=y, common=litec,
+            x=START_X + INTERVAL*col*2 + offset,
+            y=START_Y + INTERVAL*row,
+            common=litec,
             snail=cairo_pentagon_snail(INTERVAL, "east"))
     offset = INTERVAL - offset
-
-offset = 0
-for y in steps(START_Y, 20., INTERVAL):
-    for x in steps(START_X + INTERVAL, 24., INTERVAL * 2):
+# ---- dark colors
+offset = INTERVAL
+for row in steps(0, 5, 1):
+    for col in steps(0, 2, 1):
         Polyshape(
-            x=x + offset, y=y, common=darkc,
+            x=START_X + INTERVAL*col*2 + offset,
+            y=START_Y + INTERVAL*row,
+            common=darkc,
             snail=cairo_pentagon_snail(INTERVAL, "north"))
         Polyshape(
-            x=x + offset, y=y, common=darkc,
+            x=START_X + INTERVAL*col*2 + offset,
+            y=START_Y + INTERVAL*row,
+            common=darkc,
             snail=cairo_pentagon_snail(INTERVAL, "south"))
     offset = INTERVAL - offset
 PageBreak()
@@ -149,24 +157,24 @@ Repeat(rhombus(x=9, y=12.5, common=edge), interval=3, cols=4, rows=1)
 PageBreak()
 
 # ---- .Chinese Checkers
+Text("Chinese Checkers", common=title)
+Text(source, common=credit)
 CC_LINE = "#E4B700"
 player_space = circle(
     radius=0.75, stroke="#B59200", fill="#E7B900", stroke_width=2)
 board_space = circle(
     radius=0.75, stroke=CC_LINE, fill="#FFD42A", stroke_width=2)
-Text("Chinese Checkers", common=title)
-Text(source, common=credit)
 dmds = DiamondLocations(
     y=10, x=0.5, cols=17, facing="west", side=2)
 Layout(
     dmds,
     shapes=[board_space],
-    gridlines=[('d', 7), ('n', 8)],
+    gridlines='d n',
     gridlines_stroke=CC_LINE,
     gridlines_stroke_width=4,
     gridlines_fill="#FFFDB2")
 Layout(dmds, cols="1-5,13-17", shapes=[player_space])
-Layout(dmds, locations=[(9,9)], shapes=[Dot(dot_width=5)])
+Layout(dmds, locations=[(9,9)], shapes=[dot(dot_width=5)])
 PageBreak()
 
 # ---- .Connect6 (pen-and-paper)
@@ -217,7 +225,7 @@ Sequence(
     interval_y=-0.763, interval_x=1.3)
 PageBreak()
 
-# ---- .Joust (chess board)
+# ---- .Joust
 Text("Joust", common=title)
 Text(source, common=credit)
 sqr_locations = RectangularLocations(
@@ -395,7 +403,7 @@ HexHex(
    ])
 PageBreak()
 
-# ---- .Turkish Checkers (checker board)
+# ---- .Turkish Checkers (checker/chess board)
 
 # ---- .Ultimate Tic-Tac-Toe
 Text("Ultimate Tic-Tac-Toe", common=title)

@@ -1300,13 +1300,13 @@ def validated_gridlines(
                     clean_values += ["n", "s", "e", "w", "ne", "nw", "se", "sw"]
             case "d" | "diag" | "diagonal":
                 if direction_group == DirectionGroup.HEX_FLAT_EDGE:
-                    clean_values += ["ne", "sw"]
+                    clean_values += ["ne", "nw"]
                 elif direction_group == DirectionGroup.HEX_POINTY_EDGE:
-                    clean_values += ["ne", "sw"]
+                    clean_values += ["ne", "nw"]
                 elif direction_group == DirectionGroup.TRIANGULAR_HATCH:
-                    clean_values += ["ne", "sw"]
+                    clean_values += ["ne", "nw"]
                 else:
-                    clean_values += ["ne", "sw"]
+                    clean_values += ["ne", "nw"]
             case "o" | "ortho" | "orthogonal":
                 if direction_group == DirectionGroup.HEX_FLAT_EDGE:
                     clean_values += ["n", "s"]
@@ -1316,7 +1316,7 @@ def validated_gridlines(
                     clean_values += ["e", "w"]
                 else:
                     clean_values += ["n", "s", "e", "w"]
-            case "n" | "s" | "e" | "w" | "ne" | "sw" | "se" | "sw":
+            case "n" | "s" | "e" | "w" | "ne" | "nw" | "se" | "sw":
                 clean_values += [val]
             case _:
                 _label = f'the {label} "{val}"' if label else f'"{val}"'
@@ -1325,7 +1325,6 @@ def validated_gridlines(
                     "one of the valid directions!",
                     True,
                 )
-
     # print(f'{clean_values=}')
     # ---- validate all directions
     values_set = set(clean_values)
