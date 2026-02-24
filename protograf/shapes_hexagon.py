@@ -1600,7 +1600,7 @@ class HexShape(BaseShape):
                             _abs_cx=self.x_d + self.unit(self.centre_shape_mx),
                             _abs_cy=self.y_d + self.unit(self.centre_shape_my),
                         )
-            if item == ["centre_shapes", "center_shapes"]:
+            if item in ["centre_shapes", "center_shapes"]:
                 # ---- * centred shapes (with offsets)
                 if self.centre_shapes:
                     self.draw_centred_shapes(self.centre_shapes, self.x_d, self.y_d)

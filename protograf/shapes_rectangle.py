@@ -165,7 +165,7 @@ class RectangleShape(BaseShape):
         Returns:
             dict of Perbis objects keyed on direction
         """
-        directions = ["n", "w", "s", "e"]
+        directions = ["n", "e", "s", "w"]
         perbii_dict = {}
         vertices = self._shape_vertexes
         vcount = len(vertices) - 1
