@@ -4,6 +4,7 @@ protograf Changes
 2026-00-00 (0.4.6)
 ------------------
 - [PLANNED] Enable Line connections to Ellipse shapes
+- [PLANNED] Enable Line connections to Stadium shapes
 - [PLANNED] Enable text labels for snail lines
 - [PLANNED] Add code to connect *Locations
 - [PLANNED] Docs: list all props for Hex, Circle, Rectangle, Line

@@ -279,11 +279,17 @@ Discussion  This example shows how to construct a deck of cards/tiles using
                     cards=6,
                     shape='hexagon',
                     height=6.3,
-                    copy='Copies')
+                    copy='Copies',
+                    stroke='darkgray',
+                    grid_marks=True)
 
             It can be seen that each alternate row is offset from the ones on
             either side of it; this is to make cutting such cards/tiles much
             easier.
+
+            In addition, the use of the *grid_marks* property will cause short
+            lines to be drawn along each edge of the page in order to support
+            easier cutting of such cards/tiles.
 
 ----------- ------------------------------------------------------------------
 Screenshot  .. image:: images/cards/cards_hexagonal.png

@@ -1,5 +1,5 @@
 """
-Deck design Example 19 for protograf
+Deck design Example 15 for protograf
 
 Written by: Derek Hohls
 Created on: 31 July 2025
@@ -12,13 +12,14 @@ Create(filename='cards_deck_15.pdf', margin=0.25, paper="A8")
 Deck(
     cards=4,
     height=3.2,
-    width=2.1,
-    card_grid=0.25)
+    width=2.1)
 # design card
 Card(
     '*',
     rectangle(
-        x=0.2, y=0.2, width=1.7, height=2.8, stroke_width=1, rounding=0.2,
+        x=0.2, y=0.2,
+        width=1.7, height=2.8,
+        stroke_width=1, rounding=0.2,
         fill=None,
         label='{{sequence}}\n{{id}}')
 )

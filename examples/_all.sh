@@ -92,6 +92,7 @@ python cards/cards_deck_02.py
 python cards/cards_deck_03.py
 python cards/cards_deck_04.py
 python cards/cards_deck_05.py
+python cards/cards_deck_05A.py
 python cards/cards_deck_06.py
 python cards/cards_deck_07.py
 python cards/cards_deck_08.py

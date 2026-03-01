@@ -25,6 +25,7 @@ will demonstrate full scalability.
 - `Snex`_
 - `TicTacToe`_
 - `Meridians`_
+- `New Classic Games`_
 
 Chess
 =====
@@ -401,5 +402,51 @@ Discussion  The code uses a basic ``Hexagon()``, with the *hatches_count*
 
 ----------- ------------------------------------------------------------------
 Screenshot  .. image:: images/boards/abstract/meridians.png
+               :width: 90%
+=========== ==================================================================
+
+
+New Classic Games
+=================
+`↑ <table-of-contents-exabs_>`_
+
+In February 2026, Brian E. Svoboda release a small booklet, in PDF format,
+containing boards and rules for a number of abstract games, titled
+*"A NEW BOOK OF CLASSIC BOARD GAMES"*.  This booklet was discussed at
+Board Game Geek in this forum: https://boardgamegeek.com/thread/3357842
+
+The script linked here is an attempt to reproduce the boards from that booklet.
+
+.. NOTE::
+
+    The script does not currently reproduce the "King's Valley" board;
+    this is still a work-in-progress.
+
+=========== ==================================================================
+Title       *New Classic Games*
+----------- ------------------------------------------------------------------
+Script      `new_classics.py <https://github.com/gamesbook/protograf/blob/master/examples/boards/abstract/new_classics.py>`_
+----------- ------------------------------------------------------------------
+Discussion  The script uses different techniques and commands for each board;
+            some are simple, but some are quite long and/or complex.
+
+            Only the screenshots for a few of the boards are shown here:
+
+            - Cairo Corridor
+            - Chinese Checkers
+            - Strands
+            - Volo
+
+----------- ------------------------------------------------------------------
+Screenshot  .. image:: images/boards/abstract/cairo_corridor.png
+               :width: 90%
+----------- ------------------------------------------------------------------
+Screenshot  .. image:: images/boards/abstract/chinese_checkers.png
+               :width: 90%
+----------- ------------------------------------------------------------------
+Screenshot  .. image:: images/boards/abstract/strands.png
+               :width: 90%
+----------- ------------------------------------------------------------------
+Screenshot  .. image:: images/boards/abstract/volo.png
                :width: 90%
 =========== ==================================================================

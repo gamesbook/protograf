@@ -1184,7 +1184,7 @@ class RectangleShape(BaseShape):
         off_x, off_y = 0.0, 0.0
         diagonals_per_side = 0
         # ---- set canvas
-        vertices = self._shape_vertexes
+        vertices = self._shape_vertexes  # clockwise from right; 0:ne, 1:se, 2:sw, 3:nw
         cx = vertices[0].x + 0.5 * self._u.width
         cy = vertices[0].y + 0.5 * self._u.height
         # ---- basic checks
@@ -1307,13 +1307,14 @@ class RectangleShape(BaseShape):
             ):
                 # interior angles
                 _, alpha = geoms.angles_from_points(  # diag. angle; interior; upwards
-                    Point(vertices[0].x, vertices[0].y),
-                    Point(vertices[2].x, vertices[2].y),
+                    Point(vertices[3].x, vertices[3].y),  # nw
+                    Point(vertices[1].x, vertices[1].y),  # se
                 )
                 kappa = 180 - alpha  # diag. angle measured from zero east
                 zeta = 90 - alpha  # diag. angle; interior; downwards
                 beta = kappa - alpha
                 # print(f'*** NW angles {kappa=} {alpha=} {zeta=} {beta=}')
+
                 # line spacing
                 if not _breadth:
                     _breadth = space_diag / (lines + gaps)  # divide equally
@@ -1338,76 +1339,69 @@ class RectangleShape(BaseShape):
                 prime_x = (_breadth / 2.0) / _sin(90 - zeta)
                 # secondary diagonals (sometimes)
                 diagonals_per_side = int((self.stripes - 1) / 2)
-                # print(f'*** NW primary {diagonals_per_side=}')
+                # print(f'*** NW primary {prime_x=} {prime_y=} {diagonals_per_side=}')
 
             # ---- * diagonal UP
             if "sw" in _dirs or "ne" in _dirs or "d" in _dirs or is_all:
                 # primary diagonal (always)
                 # print(f'*** NW primary {prime_x=} {prime_y=}')
-                p1 = Point(vertices[3].x, vertices[3].y)
-                pb2 = Point(vertices[3].x, vertices[3].y + prime_y)
-                pb3 = Point(vertices[1].x + prime_x, vertices[1].y)
-                p4 = Point(vertices[1].x, vertices[1].y)
-                pu3 = Point(vertices[1].x, vertices[1].y - prime_y)
-                pu4 = Point(vertices[3].x - prime_x, vertices[3].y)
+                p1 = Point(vertices[0].x, vertices[0].y)
+                pb2 = Point(vertices[0].x, vertices[0].y + prime_y)
+                pb3 = Point(vertices[2].x + prime_x, vertices[2].y)
+                p4 = Point(vertices[2].x, vertices[2].y)
+                pu3 = Point(vertices[2].x, vertices[2].y - prime_y)
+                pu4 = Point(vertices[0].x - prime_x, vertices[0].y)
                 vertexes = [p1, pb2, pb3, p4, pu3, pu4, p1]
                 cnv.draw_polyline(vertexes)
-                apply_props(cx, cy)
-                # self._debug(cnv, vertices=vertexes)
-
                 # secondary diagonals (sometimes)
+                # note that pu3/pb3 & pu3/pu4 are changed each loop iteration!
                 for each_stripe in range(0, diagonals_per_side):
                     # offset line: below
-                    p1 = Point(vertices[3].x, pb2.y + off_y)
-                    pb2 = Point(vertices[3].x, pb2.y + off_y + stripe_y)
-                    p4 = Point(pb3.x + off_x, vertices[1].y)
-                    pb3 = Point(pb3.x + off_x + stripe_x, vertices[1].y)
+                    p1 = Point(vertices[0].x, pb2.y + off_y)
+                    pb2 = Point(vertices[0].x, pb2.y + off_y + stripe_y)
+                    p4 = Point(pb3.x + off_x, vertices[2].y)
+                    pb3 = Point(pb3.x + off_x + stripe_x, vertices[2].y)
                     vertexes = [p1, pb2, pb3, p4, p1]
                     cnv.draw_polyline(vertexes)
-                    # print(f'NE offset below: {vertexes=}')
                     # offset line: above
-                    p1 = Point(pu4.x - off_x, vertices[3].y)
-                    p2 = Point(vertices[1].x, pu3.y - off_y)
-                    pu3 = Point(vertices[1].x, pu3.y - off_y - stripe_y)
-                    pu4 = Point(pu4.x - off_x - stripe_x, vertices[3].y)
+                    p1 = Point(pu4.x - off_x, vertices[0].y)
+                    p2 = Point(vertices[2].x, pu3.y - off_y)
+                    pu3 = Point(vertices[2].x, pu3.y - off_y - stripe_y)
+                    pu4 = Point(pu4.x - off_x - stripe_x, vertices[0].y)
                     vertexes = [p1, p2, pu3, pu4, p1]
                     cnv.draw_polyline(vertexes)
-                    # print(f'NW offset above: {vertexes=}')
                 apply_props(cx, cy)
 
             # ---- * diagonal DOWN
             if "nw" in _dirs or "se" in _dirs or "d" in _dirs or is_all:
                 # primary diagonal (always)
-                # print(f'*** NW primary {prime_x=} {prime_y=}')
-                p1 = Point(vertices[0].x, vertices[0].y)
-                pb2 = Point(vertices[0].x, vertices[0].y + prime_y)
-                pb3 = Point(vertices[2].x - prime_x, vertices[2].y)
-                p4 = Point(vertices[2].x, vertices[2].y)
-                pu3 = Point(vertices[2].x, vertices[2].y - prime_y)
-                pu4 = Point(vertices[0].x + prime_x, vertices[0].y)
+                p1 = Point(vertices[3].x, vertices[3].y)
+                pb2 = Point(vertices[3].x, vertices[3].y + prime_y)
+                pb3 = Point(vertices[1].x - prime_x, vertices[1].y)
+                p4 = Point(vertices[1].x, vertices[1].y)
+                pu3 = Point(vertices[1].x, vertices[1].y - prime_y)
+                pu4 = Point(vertices[3].x + prime_x, vertices[3].y)
                 vertexes = [p1, pb2, pb3, p4, pu3, pu4, p1]
                 cnv.draw_polyline(vertexes)
                 apply_props(cx, cy)
-
                 # secondary diagonals (sometimes)
+                # note that pb2/pb3 & pu3/pu4 are changed each loop iteration!
                 for each_stripe in range(0, diagonals_per_side):
                     # offset line: below
-                    p1 = Point(vertices[0].x, pb2.y + off_y)
-                    pb2 = Point(vertices[0].x, pb2.y + off_y + stripe_y)
-                    p4 = Point(pb3.x - off_x, vertices[2].y)
+                    p1 = Point(vertices[3].x, pb2.y + off_y)
+                    pb2 = Point(vertices[3].x, pb2.y + off_y + stripe_y)
+                    p4 = Point(pb3.x - off_x, vertices[1].y)
                     pb3 = Point(pb3.x - off_x - stripe_x, vertices[2].y)
                     vertexes = [p1, pb2, pb3, p4, p1]
                     cnv.draw_polyline(vertexes)
                     apply_props(cx, cy)
-                    # print(f'NW offset below: {vertexes=}')
                     # offset line: above
-                    p1 = Point(pu4.x + off_x, vertices[0].y)
-                    p2 = Point(vertices[2].x, pu3.y - off_y)
-                    pu3 = Point(vertices[2].x, pu3.y - off_y - stripe_y)
-                    pu4 = Point(pu4.x + off_x + stripe_x, vertices[0].y)
+                    p1 = Point(pu4.x + off_x, vertices[3].y)
+                    p2 = Point(vertices[1].x, pu3.y - off_y)
+                    pu3 = Point(vertices[1].x, pu3.y - off_y - stripe_y)
+                    pu4 = Point(pu4.x + off_x + stripe_x, vertices[3].y)
                     vertexes = [p1, p2, pu3, pu4, p1]
                     cnv.draw_polyline(vertexes)
-                    # print(f'NW offset above: {vertexes=}')
                 apply_props(cx, cy)
 
             # ---- * vertical
@@ -1424,9 +1418,9 @@ class RectangleShape(BaseShape):
                 for i in range(0, lines):
                     cnv.draw_rect(
                         (
-                            vertices[0].x + i * delta_x + x_offset,
-                            vertices[0].y,
-                            vertices[0].x + i * delta_x + x_offset + _breadth,
+                            vertices[3].x + i * delta_x + x_offset,
+                            vertices[3].y,
+                            vertices[3].x + i * delta_x + x_offset + _breadth,
                             vertices[1].y,
                         ),
                     )
@@ -1446,10 +1440,10 @@ class RectangleShape(BaseShape):
                 for i in range(0, lines):
                     cnv.draw_rect(
                         (
-                            vertices[0].x,
-                            vertices[0].y + i * delta_y + y_offset,
-                            vertices[2].x,
-                            vertices[0].y + i * delta_y + y_offset + _breadth,
+                            vertices[3].x,
+                            vertices[3].y + i * delta_y + y_offset,
+                            vertices[1].x,
+                            vertices[3].y + i * delta_y + y_offset + _breadth,
                         ),
                     )
                 apply_props(cx, cy)
