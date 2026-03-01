@@ -1477,9 +1477,8 @@ class BaseShape:
             if shape_object:
                 cshape_name = shape_object.__class__.__name__
                 return cshape_name.replace("Shape", "")
-            else:
-                cshape_name = self.__class__.__name__
-                return cshape_name.replace("Shape", "")
+            cshape_name = self.__class__.__name__
+            return cshape_name.replace("Shape", "")
         except:
             return "Shape"
 
@@ -2364,10 +2363,10 @@ class BaseShape:
         # if inspect.isclass(the_shape) and the_shape.__class__.__name__ == 'GridShape':
         if isinstance(the_shape, GridShape):
             return the_shape.shape
-        else:
-            return the_shape
+        return the_shape
 
     def get_font_height(self) -> float:
+        """Get height of a font in points."""
         # see Span Dictionary for ascender and descender of the font (float).
         # face = pdfmetrics.getFont(self.font_name).face
         # height = (face.ascent - face.descent) / 1000 * self.font_size
@@ -2614,7 +2613,7 @@ class BaseShape:
                     value, (str, int, float, list, tuple, range, Enum)
                 ):
                     continue
-                elif isinstance(value, dict):
+                if isinstance(value, dict):
                     updated = False
                     for dkey, val in value.items():
                         if val is None or isinstance(
@@ -3331,9 +3330,8 @@ class BaseShape:
         cshape_name = centre_shape.__class__.__name__
         if cshape_name in GRID_SHAPES_WITH_CENTRE:
             return True
-        else:
-            _name = cshape_name.replace("Shape", "")
-            feedback(f"Cannot draw a centered {_name}!", True)
+        _name = cshape_name.replace("Shape", "")
+        feedback(f"Cannot draw a centered {_name}!", True)
         return False
 
     @functools.cache
@@ -3359,6 +3357,14 @@ class BaseShape:
         """Draw one or more shapes with their centre at a Point.
 
         Args:
+            centre_shapes (list):
+                one or more Shape objects
+            cx (float):
+                x-position for drawing the Shapes
+            cy (float):
+                y-position for drawing the Shapes
+            rotation (float):
+                degrees by which to rotate the Shapes
 
         """
         for item in centre_shapes:
@@ -3382,6 +3388,17 @@ class BaseShape:
     def draw_vertex_shapes(
         self, vertex_shapes: list, vertices: list, centre: Point, rotated: bool = False
     ):
+        """Draw shape(s) at vertex(ices) of a Shape.
+
+        Args:
+            vertex_shapes (list):
+                one or more Shape objects
+            vertices (list):
+                list oif the Points at which to draw the Shapes
+            centre (tuple):
+                x- and y-position of the parent Shape's centre
+            rotated (bool):
+                whether or not to rotate the Shapes"""
         for idx, vshape in enumerate(vertex_shapes):
             if vshape is None or vshape == "":
                 continue

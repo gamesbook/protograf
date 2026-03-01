@@ -18,9 +18,9 @@ from protograf.utils.structures import (
     VirtualHex,
     Locale,
 )
-from protograf.utils import colrs, geoms, tools, support
+from protograf.utils import geoms, tools, support
 from protograf.utils.tools import _lower
-from protograf.base import BaseShape, BaseCanvas, WIDTH
+from protograf.base import BaseShape, BaseCanvas
 from protograf.shapes import TextShape
 from protograf.shapes_hexagon import HexShape
 
@@ -778,6 +778,13 @@ class VirtualShape:
     """
     Common properties and methods for all virtual shapes (layout and track)
     """
+
+    def __init__(self, **kwargs):
+        """Common properties"""
+        self.centre_x = None
+        self.centre_y = None
+        self.start_x = None
+        self.start_y = None
 
     def to_int(self, value, label="", maximum=None, minimum=None) -> int:
         """Set a value to an int; or stop if an invalid value."""
@@ -1574,7 +1581,7 @@ class TriangularLocations(VirtualLocations):
                 self.total_width = self.side * (self.rows - 1)
         self.total_height = math.sqrt(self.total_width**2 * 0.5)
 
-    def triangle_validate(self, **kwargs):
+    def triangle_validate(self):
         """Check that settings for TriangularLocations are correct."""
         if (self.cols < 2 and self.rows < 1) or (self.cols < 1 and self.rows < 2):
             feedback(
@@ -1771,7 +1778,7 @@ class DiamondLocations(VirtualLocations):
                 f"Diamond layout requires equal rows and cols (cannot use {self.cols }x{self.rows})!",
                 True,
             )
-        if not (self.cols & 1 == 1):
+        if not self.cols & 1 == 1:
             feedback(
                 f"Diamond layout requires odd rows and cols (cannot use {self.cols }x{self.rows})!",
                 True,
