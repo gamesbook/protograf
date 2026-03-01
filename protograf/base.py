@@ -691,7 +691,7 @@ class BaseCanvas:
         # ---- mesh
         self.mesh = self.defaults.get("mesh", None)
         self.mesh_ends = self.defaults.get("mesh_ends", self.line_ends)
-        # ---- hatches (hex, circle, rect)
+        # ---- hatches (hex, circle, rect, rhombus)
         self.hatches_count = self.defaults.get("hatches_count", 0)
         self.hatches = self.defaults.get("hatches", "*")
         self.hatches_stroke = self.defaults.get("hatches_stroke", self.stroke)

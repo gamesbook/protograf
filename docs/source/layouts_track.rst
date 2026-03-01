@@ -19,7 +19,7 @@ This is part of the set of commands use for :doc:`Layouts <layouts>`.
 
 - `Overview`_
 - `Usage`_
-- `Key Properties`_
+- `Properties`_
 
 
 Overview
@@ -44,6 +44,7 @@ elements in a more repetitive or regular way within a page:
 - :doc:`Sequence <layouts_sequence>`
 - :doc:`RectangularLocations <layouts_rectangular>`
 - :doc:`TriangularLocations <layouts_triangular>`
+- :doc:`DiamondLocations <layouts_diamond>`
 
 
 Usage
@@ -76,8 +77,8 @@ The ``Track()`` command accepts the following properties:
 
 .. _key-properties-track:
 
-Key Properties
-==============
+Properties
+==========
 `↑ <table-of-contents-laytrk_>`_
 
 - `Example 1. Default`_

@@ -1671,39 +1671,73 @@ class RhombusShape(BaseShape):
             num: number of lines
             rotation: degrees anti-clockwise from horizontal "east"
         """
-        _dirs = tools.validated_directions(
-            self.hatches, DirectionGroup.CIRCULAR, "rhombus hatches"
-        )
-        # centre = self._shape_centre  # shortcut
+
+        def draw_lines(num, _dirs, _num, lines):
+            if num >= 1:
+                if any(item in _dirs for item in ["e", "w", "o"]):
+                    cnv.draw_line(vertices[0], vertices[2])
+                if any(item in _dirs for item in ["n", "s", "o"]):  # vertical
+                    cnv.draw_line(vertices[1], vertices[3])
+                if any(item in _dirs for item in ["ne", "sw", "d"]):
+                    self.draw_lines_between_sides(
+                        cnv, side, _num, vertices, (1, 0), (2, 3)
+                    )
+                if any(item in _dirs for item in ["se", "nw", "d"]):
+                    self.draw_lines_between_sides(
+                        cnv, side, _num, vertices, (0, 3), (1, 2)
+                    )
+            if num >= 3:
+                _lines = lines - 1
+                if any(item in _dirs for item in ["ne", "sw", "d"]):
+                    self.draw_lines_between_sides(
+                        cnv, side, _num, vertices, (1, 0), (2, 3)
+                    )
+                if any(item in _dirs for item in ["se", "nw", "d"]):
+                    self.draw_lines_between_sides(
+                        cnv, side, _num, vertices, (0, 3), (1, 2)
+                    )
+                if any(item in _dirs for item in ["s", "n", "o"]):
+                    self.draw_lines_between_sides(
+                        cnv, side, _lines, vertices, (0, 3), (0, 1)
+                    )
+                    self.draw_lines_between_sides(
+                        cnv, side, _lines, vertices, (3, 2), (1, 2)
+                    )
+                if any(item in _dirs for item in ["e", "w", "o"]):
+                    self.draw_lines_between_sides(
+                        cnv, side, _lines, vertices, (0, 3), (2, 3)
+                    )
+                    self.draw_lines_between_sides(
+                        cnv, side, _lines, vertices, (1, 0), (1, 2)
+                    )
+
+        # feedback(f'*** RHOMB {num=} {vertices=} {side=}', False)
+        if not self.hatches:
+            return
+        # print("rhomb verts", self._l2v(vertices))
         x_c, y_c = centre.x, centre.y
-        _num = tools.as_int(num, "hatches_count")
-        lines = int((_num - 1) / 2 + 1)
-        # feedback(f'*** RHOMB {num=} {lines=} {vertices=} {_dirs=} {side=}')
-        if num >= 1:
-            if any(item in _dirs for item in ["e", "w", "o"]):
-                cnv.draw_line(vertices[0], vertices[2])
-            if any(item in _dirs for item in ["n", "s", "o"]):  # vertical
-                cnv.draw_line(vertices[1], vertices[3])
-        if num >= 3:
-            _lines = lines - 1
-            if any(item in _dirs for item in ["ne", "sw", "d"]):
-                self.draw_lines_between_sides(cnv, side, _num, vertices, (1, 0), (2, 3))
-            if any(item in _dirs for item in ["se", "nw", "d"]):
-                self.draw_lines_between_sides(cnv, side, _num, vertices, (0, 3), (1, 2))
-            if any(item in _dirs for item in ["s", "n", "o"]):
-                self.draw_lines_between_sides(
-                    cnv, side, _lines, vertices, (0, 3), (0, 1)
+        # ---- draw lines
+        if isinstance(self.hatches, list):
+            for item in self.hatches:
+                if not isinstance(item, tuple) and len(item) < 2:
+                    feedback(
+                        "Rhombus hatches list must consist of (direction, count) values",
+                        True,
+                    )
+                _dirs = tools.validated_directions(
+                    item[0], DirectionGroup.CARDINAL, "rhombus hatch"
                 )
-                self.draw_lines_between_sides(
-                    cnv, side, _lines, vertices, (3, 2), (1, 2)
-                )
-            if any(item in _dirs for item in ["e", "w", "o"]):
-                self.draw_lines_between_sides(
-                    cnv, side, _lines, vertices, (0, 3), (2, 3)
-                )
-                self.draw_lines_between_sides(
-                    cnv, side, _lines, vertices, (1, 0), (1, 2)
-                )
+                _num = tools.as_int(item[1], label="hatch count", minimum=1)
+                lines = _num
+                draw_lines(_num, _dirs, _num, lines)
+        else:
+            _num = tools.as_int(num, "hatches_count")
+            lines = int((_num - 1) / 2 + 1)
+            _dirs = tools.validated_directions(
+                self.hatches, DirectionGroup.CARDINAL, "rhombus hatch"
+            )
+            if lines >= 0:
+                draw_lines(num, _dirs, _num, lines)
 
         # ---- set canvas
         self.set_canvas_props(
@@ -1971,7 +2005,7 @@ class RhombusShape(BaseShape):
         if self.slices:
             self.draw_slices(cnv, ID, self._shape_vertexes, centre, rotation)
         # ---- * draw hatches
-        if self.hatches_count:
+        if self.hatches_count or isinstance(self.hatches, list):
             self.side = math.sqrt(
                 (self._u.width / 2.0) ** 2 + (self._u.height / 2.0) ** 2
             )
@@ -3557,24 +3591,46 @@ class TriangleShape(BaseShape):
     def draw_hatches(
         self, cnv, ID, side: float, vertices: list, num: int, rotation: float = 0.0
     ):
-        _dirs = tools.validated_directions(
-            self.hatches, DirectionGroup.HEX_POINTY_EDGE, "triangle hatch"
-        )
-        lines = tools.as_int(num, "hatches_count")
-        if lines >= 1:
+
+        def draw_lines(_dirs: str, lines: int):
+            """Draw hatch lines across a Triangle."""
             # v_tl, v_tr, v_bl, v_br
             if "ne" in _dirs or "sw" in _dirs:  # slope UP to the right
                 self.draw_lines_between_sides(
-                    cnv, side, lines, vertices, (0, 1), (2, 1), True
+                    cnv, side, lines, vertices, (1, 2), (0, 2), True
                 )
             if "se" in _dirs or "nw" in _dirs:  # slope DOWN to the right
                 self.draw_lines_between_sides(
-                    cnv, side, lines, vertices, (0, 2), (0, 1), True
+                    cnv, side, lines, vertices, (2, 1), (0, 1), True
                 )
             if "e" in _dirs or "w" in _dirs:  # horizontal
                 self.draw_lines_between_sides(
-                    cnv, side, lines, vertices, (0, 2), (1, 2), True
+                    cnv, side, lines, vertices, (0, 2), (0, 1), True
                 )
+
+        if not self.hatches:
+            return
+        if isinstance(self.hatches, list):
+            for item in self.hatches:
+                if not isinstance(item, tuple) and len(item) < 2:
+                    feedback(
+                        "Triangle hatches list must consist of (direction, count) values",
+                        True,
+                    )
+                _dirs = tools.validated_directions(
+                    item[0], DirectionGroup.TRIANGULAR_HATCH, "triangle hatch"
+                )
+                # print(f"tri hatches {item[0]=} {item[1]=}")
+                lines = tools.as_int(item[1], label="hatch count", minimum=0)
+                draw_lines(_dirs, lines)
+        else:
+            lines = tools.as_int(num, "hatches_count")
+            _dirs = tools.validated_directions(
+                self.hatches, DirectionGroup.TRIANGULAR_HATCH, "triangle hatch"
+            )
+            if lines >= 0:
+                draw_lines(_dirs, lines)
+
         # ---- set canvas
         centre = self.get_centroid(vertices)
         self.set_canvas_props(
@@ -3613,7 +3669,7 @@ class TriangleShape(BaseShape):
         if self.perbii:
             perbii_dirs = tools.validated_directions(
                 self.perbii,
-                DirectionGroup.TRIANGULAR_EDGES,
+                DirectionGroup.TRIANGULAR_EDGE,
                 "triangle perbii",
             )
         else:
@@ -3855,7 +3911,7 @@ class TriangleShape(BaseShape):
                     )
             if item == "hatches":
                 # ---- * draw hatches
-                if self.hatches_count:
+                if self.hatches_count or isinstance(self.hatches, list):
                     self.draw_hatches(
                         cnv,
                         ID,
@@ -3884,7 +3940,7 @@ class TriangleShape(BaseShape):
                         self.radii_shapes,
                         self._shape_vertexes,
                         self.centroid,
-                        direction_group=DirectionGroup.TRIANGULAR,  # for the points!
+                        direction_group=DirectionGroup.TRIANGULAR,  # => the points!
                         rotation=rotation,
                         rotated=self.radii_shapes_rotated,
                     )
@@ -3896,7 +3952,7 @@ class TriangleShape(BaseShape):
                         perbii_shapes=self.perbii_shapes,
                         vertexes=self._shape_vertexes,
                         centre=self.centroid,
-                        direction_group=DirectionGroup.TRIANGULAR_EDGES,  # for the sides!
+                        direction_group=DirectionGroup.TRIANGULAR_EDGE,  # => the sides!
                         rotation=rotation,
                         rotated=self.perbii_shapes_rotated,
                     )

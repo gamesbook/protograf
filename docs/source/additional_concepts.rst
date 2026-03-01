@@ -49,7 +49,16 @@ so-called "reserved" names that are built-in to Python.
 Reserved Names
 --------------
 
-Basic built-in *keywords* include:
+Basic built-in *terms* used by **protograf**, apart from the ones
+discussed elsewhere |dash| see, for example, the
+:doc:`Commands list <commands>` |dash| include:
+
+- *file_exists*
+- *point_from_angle*
+- *Point*
+- *split*
+
+Basic built-in *keywords* used by Python include:
 
 False, None, True, and, as, assert, async, await, break, class,
 continue, def, del, elif, else, except, finally, for, from, global,

@@ -30,6 +30,7 @@ def feedback(item, stop=False, warn=False, alert=False):
         console.print(
             "[bold red]FEEDBACK::[/bold red] Could not continue with script.\n"
         )
-        if globals.pargs.trace:
-            traceback.print_stack()
+        if hasattr(globals, "pargs"):
+            if globals.pargs.trace:
+                traceback.print_stack()
         sys.exit()

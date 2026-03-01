@@ -127,6 +127,57 @@ def point_in_polygon(point: Point, vertices: List[Point], valid_border=False) ->
     return is_inside_polygon(_point, _vertices, valid_border)
 
 
+def is_point_on_line(
+    point_a: Point, point_b: Point, point_c: Point, tolerance: float = 1e-6
+):
+    """Check if point C is on the finite line defined by points A and B.
+
+    Doc Test:
+    >>> point_a = Point(1, 2)
+    >>> point_b = Point(4, 8)
+    >>> point_c = Point(2, 4)
+    >>> point_d = Point(2, 5)
+    >>> is_point_on_line(point_a, point_b, point_c)
+    True
+    >>> is_point_on_line(point_a, point_b, point_d)
+    False
+    >>> point_a = Point(0, 0)
+    >>> point_b = Point(10, 10)
+    >>> point_P1 = Point(5, 5)     # On the segment
+    >>> point_P2 = Point(15, 15)   # Collinear, but outside the segment's end
+    >>> is_point_on_line(point_a, point_b, point_P1)
+    True
+    >>> is_point_on_line(point_a, point_b, point_P2)
+    False
+    """
+    # Vector AB: (b.x - a.x, b.y - a.y)
+    ab_x = point_b.x - point_a.x
+    ab_y = point_b.y - point_a.y
+    # Vector AC: (c.x - a.x, c.y - a.y)
+    ac_x = point_c.x - point_a.x
+    ac_y = point_c.y - point_a.y
+    # Cross product (magnitude for 2D vectors): AB_x * AC_y - AB_y * AC_x
+    cross_product = ab_x * ac_y - ab_y * ac_x
+    # 1. Check if the cross product is close to zero (using math.isclose for floats)
+    if not math.isclose(cross_product, 0.0, abs_tol=tolerance):
+        return False  # point is NOT collinear
+    # 2. Bound Check (point is between endpoints)
+    # Check if C's coordinates are within the range of A and B's coordinates
+    # use max and min to handle segments defined in any order
+    if (
+        min(point_a.x, point_b.x) - tolerance
+        <= point_c.x
+        <= max(point_a.x, point_b.x) + tolerance
+        and min(point_a.y, point_b.y) - tolerance
+        <= point_c.y
+        <= max(point_a.y, point_b.y) + tolerance
+    ):
+        # point is collinear AND within the bounds
+        return True
+    # point is collinear BUT outside the segment endpoints
+    return False
+
+
 def is_inside_polygon(point: tuple, vertices: list, valid_border=False) -> bool:
     """Check if point inside a polygon defined by set of vertices.
 
@@ -478,10 +529,10 @@ def lines_intersect(a_start: Point, a_end: Point, c_start: Point, c_end: Point) 
     """Return True if line segments AB and CD intersect
 
     Args:
-        a_start: (x, y) coodinate of start point of line AB
-        a_end: (x, y) coodinate of end point of line AB
-        c_start: (x, y) coodinate of start point of line CD
-        c_end: (x, y) coodinate of end point of line CD
+        a_start: (x, y) coordinates of start point of line AB
+        a_end: (x, y) coordinates of end point of line AB
+        c_start: (x, y) coordinates of start point of line CD
+        c_end: (x, y) coordinates of end point of line CD
 
     Ref:
         https://stackoverflow.com/questions/3838329
@@ -502,6 +553,43 @@ def lines_intersect(a_start: Point, a_end: Point, c_start: Point, c_end: Point) 
     return ccw(a_start, c_start, c_end) != ccw(a_end, c_start, c_end) and ccw(
         a_start, a_end, c_start
     ) != ccw(a_start, a_end, c_end)
+
+
+def line_intersection_point(
+    p1: Point, p2: Point, p3: Point, p4: Point, intersects_primary: bool = False
+) -> Point:
+    """Calculate intersection of two extended lines (p1-p2) and (p3-p4).
+
+    Args:
+        p1 (Point): start of primary line
+        p2 (Point): end of primary line
+        p3 (Point): start of secondary line
+        p4 (Point): end of secondary line
+        intersects_primary (bool): only return point if it is on primary line
+
+    Doc Test:
+
+    >>> line_intersection_point(Point(0, 0), Point(10, 10), Point(0, 10), Point(10, 0))
+    Point(x=5.0, y=5.0)
+    >>> line_intersection_point(Point(0, 0), Point(10, 10), Point(0, 10), Point(2.5, 7.5))
+    Point(x=5.0, y=5.0)
+    >>> line_intersection_point(Point(0, 10), Point(0, 0), Point(10, 10), Point(10, 0))
+    """
+    x1, y1 = p1.x, p1.y
+    x2, y2 = p2.x, p2.y
+    x3, y3 = p3.x, p3.y
+    x4, y4 = p4.x, p4.y
+    denom = (y4 - y3) * (x2 - x1) - (x4 - x3) * (y2 - y1)
+    if denom == 0:
+        return None  # parallel or coincident
+    ua = ((x4 - x3) * (y1 - y3) - (y4 - y3) * (x1 - x3)) / denom
+    # intersection point
+    x = x1 + ua * (x2 - x1)
+    y = y1 + ua * (y2 - y1)
+    if intersects_primary:
+        if not is_point_on_line(p1, p2, Point(x, y)):
+            return None
+    return Point(x, y)
 
 
 def bezier_arc_segment(

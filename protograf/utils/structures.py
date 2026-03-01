@@ -41,9 +41,10 @@ class DirectionGroup(Enum):
     CIRCULAR = 6
     ORDINAL = 7
     TRIANGULAR = 8
-    TRIANGULAR_EDGES = 9
+    TRIANGULAR_EDGE = 9
     POLYGONAL = 10
     STAR = 11
+    TRIANGULAR_HATCH = 12
 
 
 class ExportFormat(Enum):

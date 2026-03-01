@@ -8,6 +8,7 @@ Note:
 # lib
 import argparse
 from collections import namedtuple
+from contextlib import suppress
 from copy import copy
 from datetime import datetime
 import itertools
@@ -73,6 +74,7 @@ from .layouts import (
     GridShape,
     DotGridShape,
     HexHexShape,
+    DiamondLocations,  # used in user scripts
     RectangularLocations,  # used in user scripts
     TriangularLocations,  # used in user scripts
     VirtualLocations,
@@ -340,6 +342,7 @@ class CardShape(BaseShape):
         else:
             move_x = 0
         # feedback(f'$$$ {right_gap=} {self.offset_x=} {move_x=}')
+        # feedback(f'$$$ {shape_kwargs["frame_type"]=} {shape_kwargs["grid_marks"]=}')
         outline.draw(off_x=move_x, off_y=0, **shape_kwargs)  # inc. grid_marks
 
         # ---- track frame outlines for possible image extraction
@@ -4602,12 +4605,15 @@ def LinkLine(grid: list, locations: Union[list, str], **kwargs):
 
 
 def Layout(grid, **kwargs):
-    """Determine locations for cols&rows in a virtual layout and draw shape(s)"""
+    """Draw shape(s) in locations, cols, & rows in a virtual layout"""
     validate_globals()
 
+    grid_classname = grid.__class__.__name__ if grid else ""
     kwargs = kwargs
     shapes = kwargs.get("shapes", [])  # shapes or Places
     locations = kwargs.get("locations", [])
+    location_rows = kwargs.get("rows", [])
+    location_cols = kwargs.get("cols", [])
     corners = kwargs.get("corners", [])  # shapes or Places for corners only!
     rotations = kwargs.get("rotations", [])  # rotations for an edge
     if kwargs.get("masked") and isinstance(kwargs.get("masked"), str):
@@ -4618,29 +4624,45 @@ def Layout(grid, **kwargs):
         visible = tools.integer_pairs(kwargs.get("visible"), "visible")
     else:
         visible = kwargs.get("visible", [])
+    # ---- grid
+    layout_grid = kwargs.get("gridlines", None)  # directions ...
+    _grid_stroke = kwargs.get("gridlines_stroke", "black")
+    layout_grid_ends = kwargs.get("gridlines_ends", None)
+    layout_grid_fill = kwargs.get("gridlines_fill", None)
+    layout_grid_stroke = colrs.get_color(_grid_stroke)
+    layout_grid_stroke_width = kwargs.get("gridlines_stroke_width", WIDTH)
+    layout_grid_dotted = kwargs.get("gridlines_dotted", False)
+    layout_grid_dashed = kwargs.get("gridlines_dashed", None)
+    layout_grid_transparency = kwargs.get("gridlines_transparency", None)
 
     # ---- validate inputs
     if not shapes:
-        feedback("There is no list of shapes to draw!", False, True)
+        feedback(f"There is no list of {grid_classname} shapes to draw!", False, True)
     if shapes and not isinstance(shapes, list):
-        feedback("The values for 'shapes' must be in a list!", True)
+        feedback(f"The values for {grid_classname} 'shapes' must be in a list!", True)
     if not isinstance(grid, VirtualLocations):
-        feedback(f"The grid value '{grid}' is not valid!", True)
+        feedback(f"The grid type '{grid_classname} ' is not valid!", True)
     corners_dict = {}
     if corners:
         if not isinstance(corners, list):
-            feedback(f"The corners value '{corners}' is not a valid list!", True)
+            feedback(
+                f"The {grid_classname} corners value '{corners}' is not a valid list!",
+                True,
+            )
         for corner in corners:
             try:
                 value = corner[0]
                 shape = corner[1]
                 if _lower(value) not in ["nw", "ne", "sw", "se", "*"]:
                     feedback(
-                        f'The corner must be one of nw, ne, sw, se (not "{value}")!',
+                        f'The {grid_classname} corner must be one of nw, ne, sw, se (not "{value}")!',
                         True,
                     )
                 if not isinstance(shape, BaseShape):
-                    feedback(f'The corner item must be a shape (not "{shape}") !', True)
+                    feedback(
+                        f'The {grid_classname} corner item must be a shape (not "{shape}") !',
+                        True,
+                    )
                 if value == "*":
                     corners_dict["nw"] = shape
                     corners_dict["ne"] = shape
@@ -4649,17 +4671,195 @@ def Layout(grid, **kwargs):
                 else:
                     corners_dict[value] = shape
             except Exception:
-                feedback(f'The corners setting "{corner}" is not a valid list', True)
+                feedback(
+                    f'The {grid_classname} corners setting "{corner}" is not a valid list',
+                    True,
+                )
+
+    # ---- draw grid (using a Shape)
+    if layout_grid:
+        layout_grid_centroid = grid.grid_centroid  # calculated in layouts
+        match grid_classname:
+            case "DiamondLocations":
+                # ---- get gridlines params
+                layout_grid_dirs = tools.validated_gridlines(
+                    layout_grid, DirectionGroup.COMPASS, "gridlines"
+                )
+                layout_grid_hatches = grid.cols // 2 - 1  # for Diamond, rows == cols
+                # ---- setup gridlines configuration # eg.  [('d', 10), ('ne', 10)]
+                gridlines_count = {
+                    "n": grid.cols // 2,
+                    "s": grid.cols // 2,
+                    "e": grid.rows // 2,
+                    "w": grid.rows // 2,
+                    "ne": grid.cols // 2 - 1,
+                    "nw": grid.cols // 2 - 1,
+                    "se": grid.rows // 2 - 1,
+                    "sw": grid.rows // 2 - 1,
+                }
+                gridlines_config = [
+                    (_dir, gridlines_count[_dir]) for _dir in layout_grid_dirs
+                ]
+                # ---- draw lines
+                Rhombus(
+                    cx=layout_grid_centroid.x,
+                    cy=layout_grid_centroid.y,
+                    height=grid.total_height,
+                    width=grid.total_width,
+                    stroke=layout_grid_stroke,
+                    stroke_width=layout_grid_stroke_width,
+                    stroke_ends=layout_grid_ends,
+                    dotted=layout_grid_dotted,
+                    dashed=layout_grid_dashed,
+                    fill=layout_grid_fill,
+                    transparency=layout_grid_transparency,
+                    hatches_count=layout_grid_hatches,
+                    hatches=gridlines_config,
+                    hatches_stroke=layout_grid_stroke,
+                    hatches_stroke_width=layout_grid_stroke_width,
+                    hatches_dots=layout_grid_dotted,
+                    hatches_ends=layout_grid_ends,
+                    hatches_dashed=layout_grid_dashed,
+                    # rotation=0,
+                )
+            case "RectangularLocations":
+                # ---- get gridlines params
+                layout_grid_dirs = tools.validated_gridlines(
+                    layout_grid, DirectionGroup.COMPASS, "gridlines"
+                )
+                # ---- NO diags for unequal rows & cols:
+                if grid.cols != grid.rows:
+                    with suppress(ValueError):
+                        layout_grid_dirs.remove("ne")
+                    with suppress(ValueError):
+                        layout_grid_dirs.remove("nw")
+                    with suppress(ValueError):
+                        layout_grid_dirs.remove("se")
+                    with suppress(ValueError):
+                        layout_grid_dirs.remove("sw")
+                    with suppress(ValueError):
+                        layout_grid_dirs.remove("d")
+                layout_grid_hatches = grid.cols
+                # ---- setup gridlines configuration
+                gridlines_config = layout_grid  # eg. '*', 'd', 'ne' etc. or [('d', 10)]
+                gridlines_count = {
+                    "n": grid.cols // 2,
+                    "s": grid.cols // 2,
+                    "e": grid.rows // 2 + 1,
+                    "w": grid.rows // 2 + 1,
+                    "ne": grid.cols + 1,
+                    "nw": grid.cols + 1,
+                    "se": grid.rows + 1,
+                    "sw": grid.rows + 1,
+                }
+                gridlines_config = [
+                    (_dir, gridlines_count[_dir]) for _dir in layout_grid_dirs
+                ]
+                # ---- draw lines
+                Rectangle(
+                    cx=layout_grid_centroid.x,
+                    cy=layout_grid_centroid.y,
+                    height=grid.total_height,
+                    width=grid.total_width,
+                    stroke=layout_grid_stroke,
+                    stroke_width=layout_grid_stroke_width,
+                    stroke_ends=layout_grid_ends,
+                    dotted=layout_grid_dotted,
+                    dashed=layout_grid_dashed,
+                    fill=layout_grid_fill,
+                    transparency=layout_grid_transparency,
+                    hatches_count=layout_grid_hatches,
+                    hatches=gridlines_config,
+                    hatches_stroke=layout_grid_stroke,
+                    hatches_stroke_width=layout_grid_stroke_width,
+                    hatches_dots=layout_grid_dotted,
+                    hatches_ends=layout_grid_ends,
+                    hatches_dashed=layout_grid_dashed,
+                    # rotation=rotation,
+                )
+            case "TriangularLocations":
+                # ---- get gridlines params
+                layout_grid_dirs = tools.validated_gridlines(
+                    layout_grid, DirectionGroup.TRIANGULAR_HATCH, "gridlines"
+                )
+                layout_grid_hatches = grid.cols // 2 - 1  # for Diamond, rows == cols
+                # ---- setup gridlines configuration # eg.  [('d', 10), ('ne', 10)]
+                match grid.facing:
+                    case "north" | "south":
+                        gridlines_count = {
+                            "e": grid.rows * 2,
+                            "w": grid.rows * 2,
+                            "ne": grid.cols // 2 + 1,
+                            "nw": grid.cols // 2 + 1,
+                            "se": grid.cols // 2 + 1,
+                            "sw": grid.cols // 2 + 1,
+                        }
+                    case "east" | "west":
+                        gridlines_count = {
+                            "e": grid.cols * 2,
+                            "w": grid.cols * 2,
+                            "ne": grid.rows // 2 + 1,
+                            "nw": grid.rows // 2 + 1,
+                            "se": grid.rows // 2 + 1,
+                            "sw": grid.rows // 2 + 1,
+                        }
+                gridlines_config = [
+                    (_dir, gridlines_count[_dir]) for _dir in layout_grid_dirs
+                ]
+                match grid.facing:
+                    case "south":
+                        rotation = 180
+                    case "east":
+                        rotation = 30
+                    case "west":
+                        rotation = -30
+                    case _:
+                        rotation = 0
+                # ---- draw lines
+                Triangle(
+                    cx=layout_grid_centroid.x,
+                    cy=layout_grid_centroid.y,
+                    # height=grid.total_height,
+                    side=grid.total_width,
+                    stroke=layout_grid_stroke,
+                    stroke_width=layout_grid_stroke_width,
+                    stroke_ends=layout_grid_ends,
+                    dotted=layout_grid_dotted,
+                    dashed=layout_grid_dashed,
+                    fill=layout_grid_fill,
+                    transparency=layout_grid_transparency,
+                    hatches_count=layout_grid_hatches,
+                    hatches=gridlines_config,
+                    hatches_stroke=layout_grid_stroke,
+                    hatches_stroke_width=layout_grid_stroke_width,
+                    hatches_dots=layout_grid_dotted,
+                    hatches_ends=layout_grid_ends,
+                    hatches_dashed=layout_grid_dashed,
+                    rotation=rotation,
+                )
+            case _:
+                feedback(
+                    f"The grid type '{grid_classname}' does not support gridlines!",
+                    True,
+                )
 
     # ---- setup locations; automatically or via user-specification
     shape_id = 0
-    default_locations = enumerate(grid.next_locale())
-    if not locations:
+    _default_locations = enumerate(grid.next_locale())
+    default_locations = [*_default_locations]
+    if not locations and not location_rows and not location_cols:
         _locations = default_locations
     else:
         _locations = []
         user_locations = tools.integer_pairs(locations, label="locations")
-        # restructure and pick locations according to user input
+        user_location_rows = tools.sequence_split(
+            location_rows, to_int=True, unique=True, msg="rows"
+        )
+        user_location_cols = tools.sequence_split(
+            location_cols, to_int=True, unique=True, msg="col"
+        )
+
+        # ---- pick locations according to user input
         for key, user_loc in enumerate(user_locations):
             for loc in default_locations:
                 if user_loc[0] == loc[1].col and user_loc[1] == loc[1].row:
@@ -4678,6 +4878,52 @@ def Layout(grid, **kwargs):
                     )
                     _locations.append(new_loc)
             default_locations = enumerate(grid.next_locale())  # regenerate !
+
+        # ---- pick locations by row according to user input
+        for key, user_loc in enumerate(user_location_rows):
+            for loc in default_locations:
+                if user_loc == loc[1].row:
+                    new_loc = (
+                        key,
+                        Locale(
+                            col=loc[1].col,
+                            row=loc[1].row,
+                            x=loc[1].x,
+                            y=loc[1].y,
+                            id=f"{loc[1].col}:{loc[1].row}",  # ,loc[1].id,
+                            sequence=key,
+                            corner=loc[1].corner,
+                            page=globals.page_count + 1,
+                        ),
+                    )
+                    if new_loc not in _locations:
+                        _locations.append(new_loc)
+            default_locations = enumerate(grid.next_locale())  # regenerate !
+
+        # ---- pick locations by col according to user input
+        for key, user_loc in enumerate(user_location_cols):
+            for loc in default_locations:
+                if user_loc == loc[1].col:
+                    new_loc = (
+                        key,
+                        Locale(
+                            col=loc[1].col,
+                            row=loc[1].row,
+                            x=loc[1].x,
+                            y=loc[1].y,
+                            id=f"{loc[1].col}:{loc[1].row}",  # ,loc[1].id,
+                            sequence=key,
+                            corner=loc[1].corner,
+                            page=globals.page_count + 1,
+                        ),
+                    )
+                    if new_loc not in _locations:
+                        _locations.append(new_loc)
+            default_locations = enumerate(grid.next_locale())  # regenerate !
+
+    # print('pre-draw locs')
+    # for l in _locations: print(l)
+    # breakpoint()
 
     # ---- generate rotations - keyed per sequence number
     rotation_sequence = {}
@@ -4705,13 +4951,14 @@ def Layout(grid, **kwargs):
 
     # ---- iterate through locations & draw shape(s)
     for count, loc in _locations:
+        # print("time to draw locs:", count, loc)
         if masked and count + 1 in masked:  # ignore if IN masked
             continue
         if visible and count + 1 not in visible:  # ignore if NOT in visible
             continue
         if grid.stop and count + 1 >= grid.stop:
             break
-        if grid.pattern in ["o", "outer"]:
+        if grid.pattern in ["o", "outer"]:  # Rectangle only?
             if count + 1 > grid.rows * 2 + (grid.cols - 2) * 2:
                 break
         if shapes:
@@ -4749,6 +4996,7 @@ def Layout(grid, **kwargs):
             shape = copy(_shape)
 
             # ---- * execute shape.draw()
+            # breakpoint()
             cx = loc.x * shape.units + shape._o.delta_x
             cy = loc.y * shape.units + shape._o.delta_y
             locale = Locale(
@@ -4791,7 +5039,7 @@ def Layout(grid, **kwargs):
                     Dot(
                         x=loc.x,
                         y=loc.y,
-                        label=f"{loc.x},{loc.y}",
+                        label=f"{round(loc.x, 2)},{round(loc.y, 2)}",
                         stroke=DEBUG_COLOR,
                         fill=DEBUG_COLOR,
                     )
@@ -4808,6 +5056,22 @@ def Layout(grid, **kwargs):
                         x=loc.x,
                         y=loc.y,
                         label=f"{loc.col},{loc.row}",
+                        stroke=DEBUG_COLOR,
+                        fill=DEBUG_COLOR,
+                    )
+                case "col" | "c":
+                    Dot(
+                        x=loc.x,
+                        y=loc.y,
+                        label=f"{loc.col}",
+                        stroke=DEBUG_COLOR,
+                        fill=DEBUG_COLOR,
+                    )
+                case "row" | "r":
+                    Dot(
+                        x=loc.x,
+                        y=loc.y,
+                        label=f"{loc.row}",
                         stroke=DEBUG_COLOR,
                         fill=DEBUG_COLOR,
                     )

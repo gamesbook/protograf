@@ -74,6 +74,17 @@ Rectangle(common=htch, x=3, y=4, hatches='d', label="D")
 
 PageBreak()
 
+# ---- hatches - variable
+Blueprint()
+Text(common=txt, text="Rectangle: hatches; variable")
+Rectangle(
+    x=0.5, y=1,
+    height=4, width=3,
+    hatches=[('e', 2), ('d', 5)],
+    hatches_stroke_width=0.5,
+    hatches_stroke="red")
+PageBreak()
+
 # ---- perbii
 Blueprint()
 Text(common=txt, text="Rectangle: perbii + directions")
@@ -375,7 +386,7 @@ Save(
      names=[
         None,
         "centre", "notch", "dot_cross",
-        "hatches",
+        "hatches", "hatches_variable",
         "perbii",
         "radii",
         "rounding", "chevron",

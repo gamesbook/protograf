@@ -119,10 +119,14 @@ PageBreak()
 Blueprint()
 Text(common=txt, text="Sequence: Shapes #5")
 Sequence(
-    [polygon(cx=2, cy=0.5, sides=7, radius=0.5, label_size=7, label="{{sequence}}")],
+    [polygon(
+        cx=2, cy=0.5,
+        sides=7, radius=0.5,
+        # fill="{{sequence}}",
+        label_size=7, label="{{sequence}}")],
     setting=["red", "orange", "yellow", "green", "blue"],
     interval_y=[1.25, 1.5, 1, 1.25, 0.75],
-    interval_x=0.0,
+    interval_x=[-0.5, 0.0, 0.4, 1.0, 2.0],
     )
 
 Save(

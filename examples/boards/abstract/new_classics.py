@@ -13,7 +13,7 @@ Notes:
 
 from protograf import *
 
-Create(filename="new_classic_boards.pdf", margin=0.5, paper="A4-l", page_grid=1)
+Create(filename="new_classic_boards.pdf", margin=0.5, paper="A4-l")
 
 # ---- common usage
 source = '"New Book of Classic Board Games", Brian E. Svoboda, 2026.'
@@ -104,8 +104,79 @@ Text(source, common=credit)
 PageBreak()
 
 # ---- .Cairo Corridor
+Text("Cairo Corridor", common=title)
+Text(source, common=credit)
+START_X = 7
+START_Y = 2.4
+INTERVAL = 3.
+litec = Common(stroke_width=1.5, stroke='black', fill='#F0E370')
+darkc = Common(stroke_width=1.5, stroke='black', fill='#CEBB53')
+# ---- light colors
+offset = 0
+for row in steps(0, 5, 1):
+    for col in steps(0, 2, 1):
+        Polyshape(
+            x=START_X + INTERVAL*col*2 + offset,
+            y=START_Y + INTERVAL*row,
+            common=litec,
+            snail=cairo_pentagon_snail(INTERVAL, "west"))
+        Polyshape(
+            x=START_X + INTERVAL*col*2 + offset,
+            y=START_Y + INTERVAL*row,
+            common=litec,
+            snail=cairo_pentagon_snail(INTERVAL, "east"))
+    offset = INTERVAL - offset
+# ---- dark colors
+offset = INTERVAL
+for row in steps(0, 5, 1):
+    for col in steps(0, 2, 1):
+        Polyshape(
+            x=START_X + INTERVAL*col*2 + offset,
+            y=START_Y + INTERVAL*row,
+            common=darkc,
+            snail=cairo_pentagon_snail(INTERVAL, "north"))
+        Polyshape(
+            x=START_X + INTERVAL*col*2 + offset,
+            y=START_Y + INTERVAL*row,
+            common=darkc,
+            snail=cairo_pentagon_snail(INTERVAL, "south"))
+    offset = INTERVAL - offset
+PageBreak()
+
 # ---- .Checkers
+Text("Checkers", common=title)
+Text(source, common=credit)
+place = Common(height=3, width=3, fill="#FFFA4F", stroke_width=2)
+tch = RectangularLocations(x=10.5, y=5, cols=4, rows=3, interval=3)
+Layout(tch, shapes=[rhombus(common=place)])
+tch = RectangularLocations(x=12, y=6.5, cols=4, rows=3, interval=3)
+Layout(tch, shapes=[rhombus(common=place)])
+edge = Common(height=3, width=3, fill="#FFC433", stroke_width=2)
+Repeat(rhombus(x=10.5, y=2, common=edge), interval=3, cols=4, rows=1)
+Repeat(rhombus(x=9, y=12.5, common=edge), interval=3, cols=4, rows=1)
+PageBreak()
+
 # ---- .Chinese Checkers
+Text("Chinese Checkers", common=title)
+Text(source, common=credit)
+CC_LINE = "#E4B700"
+player_space = circle(
+    radius=0.75, stroke="#B59200", fill="#E7B900", stroke_width=2)
+board_space = circle(
+    radius=0.75, stroke=CC_LINE, fill="#FFD42A", stroke_width=2)
+dmds = DiamondLocations(
+    y=10, x=0.5, cols=17, facing="west", side=2)
+Layout(
+    dmds,
+    shapes=[board_space],
+    gridlines='d n',
+    gridlines_stroke=CC_LINE,
+    gridlines_stroke_width=4,
+    gridlines_fill="#FFFDB2")
+Layout(dmds, cols="1-5,13-17", shapes=[player_space])
+Layout(dmds, locations=[(9,9)], shapes=[dot(dot_width=5)])
+PageBreak()
+
 # ---- .Connect6 (pen-and-paper)
 
 # ---- .Go
@@ -119,8 +190,7 @@ Grid(
     x=6, y=2,
     cols=8, rows=8,
     stroke_width=1,
-    side=2
-)
+    side=2)
 Dot(cx=14, cy=10, dot_width=10)
 PageBreak()
 
@@ -131,8 +201,7 @@ HEX_LABELS = Common(align="left", font_size=20, stroke="#B58863")
 Rhombus(
     height=17, width=29.2, cx=14.25, cy=9.25,
     stroke="black", fill="white", stroke_width=1,
-    slices=["white", "black", "white", "black"]
-)
+    slices=["white", "black", "white", "black"])
 Hexagons(
     cols=21, rows=11,
     hex_layout="diamond",
@@ -147,19 +216,51 @@ Sequence(
          x=0.8, y=9.8,
          common=HEX_LABELS),
     setting=(1, 11),
-    interval_y=0.763, interval_x=1.3,
-    )
+    interval_y=0.763, interval_x=1.3)
 Sequence(
     text(text="{{sequence}}",
          x=0.8, y=9.1,
          common=HEX_LABELS),
     setting=('a', 'k', 1, 'letter'),
-    interval_y=-0.763, interval_x=1.3,
-    )
+    interval_y=-0.763, interval_x=1.3)
 PageBreak()
 
-# ---- .Joust (chess board)
+# ---- .Joust
+Text("Joust", common=title)
+Text(source, common=credit)
+sqr_locations = RectangularLocations(
+    cols=8, rows=8,
+    x=6.75, y=2,
+    interval=2.25,
+    start="NW", direction="east",
+    pattern="snake")
+Layout(
+   sqr_locations,
+   shapes=[
+       square(side=2.25, stroke=None, fill="#FFFDB2"),
+       square(side=2.25, stroke=None, fill="gray")])
+Rectangle(
+    x=5.57, y=0.85,
+    width=18, height=18,
+    stroke="#B59200",
+    stroke_width=3,
+    fill=None)
+PageBreak()
+
 # ---- .King's Valley
+Text("King's Valley", common=title)
+Text(source, common=credit)
+brd = Common(cx=14.4, cy=10.4, radius=8, stroke_width=8)
+Circle(
+    common=brd,
+    fill="#FFDC85",
+    stroke="#CAB36E",
+    radii=steps(22, 355, 45),
+    radii_stroke="black",
+    radii_stroke_width=4,
+    rotation=15)
+Circle(common=brd, stroke="#CAB36E", fill=None)
+PageBreak()
 
 # ---- .Mills
 Text("Mills", common=title)
@@ -198,10 +299,7 @@ PageBreak()
 # ---- .Odd
 Text("Odd", common=title)
 Text(source, common=credit)
-ODD_FRAME = "#FDDCDC"
-ODD_BORDER = "#8A1F20"
-ODD_FILL = "#ED3436"
-Hexagon(cx=14.8, cy=10.5, height=17, fill_stroke=ODD_FRAME)
+Hexagon(cx=14.8, cy=10.5, height=17, fill_stroke="#FDDCDC")
 HexHex(
     cx=14.8, cy=10.5,
     height=1.8,
@@ -209,10 +307,9 @@ HexHex(
     orientation="pointy",
     shape=hexagon(
         height=1.65, orientation="pointy",
-        fill=ODD_FILL,
-        stroke=ODD_BORDER,
-        stroke_width=1)
-)
+        fill="#ED3436",
+        stroke="#8A1F20",
+        stroke_width=1))
 PageBreak()
 
 # ---- .Sea Battle Tafl
@@ -223,9 +320,25 @@ Grid(
     cols=9, rows=9,
     stroke_width=2,
     side=2,
-    fill="#63B0EB", stroke="#003F73"
-)
-# TODO => use layout for location for start
+    fill="#63B0EB", stroke="#003F73")
+rct = RectangularLocations(x=6.5, y=2, cols=9, rows=9, interval=2)
+place = Common(fill=None, stroke="white", stroke_width=3, dotted=True)
+Layout(
+    rct,
+    shapes=[square(common=place)],
+    locations=[
+        (5,1), (2,2), (5,2), (8,2), (3,3), (7,3),
+        (1,5), (2,5), (8,5), (9,5),
+        (5,9), (2,8), (5,8), (8,8), (3,7), (7,7),
+    ])
+Layout(
+   rct,
+   shapes=[circle(common=place)],
+   locations=[
+       (4,4), (5,4), (6,4),
+       (4,5), (5,5), (6,5),
+       (4,6), (5,6), (6,6),
+   ])
 PageBreak()
 
 # ---- .Sprouts (pen-and-paper)
@@ -238,8 +351,7 @@ Grid(
     cols=5, rows=5,
     stroke_width=1,
     side=2,
-    omit_outer=True,
-)
+    omit_outer=True)
 PageBreak()
 
 # ---- .Strands
@@ -251,8 +363,7 @@ hxc = Common(
     stroke="black",
     stroke_width=2,
     label_size=42,
-    label_font="Helvetica-Bold"
-)
+    label_font="Helvetica-Bold")
 hx1 = hexagon(
     common=hxc,
     label="1",
@@ -289,12 +400,30 @@ HexHex(
         (2, [hx2]*12),
         (3, [hx3, hx2, hx3, hx3, hx3, hx2, hx3, hx3, hx3]*2),
         (4, [hx6, hx4, hx4, hx4]*6),
-   ]
-)
+   ])
 PageBreak()
 
-# ---- .Turkish Checkers (checker board)
+# ---- .Turkish Checkers (checker/chess board)
+
 # ---- .Ultimate Tic-Tac-Toe
+Text("Ultimate Tic-Tac-Toe", common=title)
+Text(source, common=credit)
+Grid(
+    x=4, y=1,
+    cols=3, rows=3,
+    stroke_width=3,
+    side=6,
+    omit_outer=True)
+for x in range(0, 18, 6):
+    for y in range(0, 18, 6):
+        Grid(
+            x=x + 4.45, y=y + 1.45,
+            cols=3, rows=3,
+            stroke_width=1.5,
+            side=1.7,
+            dotted=True,
+            omit_outer=True)
+PageBreak()
 
 # ---- .Volo
 Text("Volo", common=title)
@@ -320,8 +449,7 @@ Hexagon(
              stroke_width=4, fill="white"),
          0.9)
     ],
-    radii_shapes_rotated=True,
-)
+    radii_shapes_rotated=True)
 place = Common(fill=None, stroke="grey", stroke_width=2, dotted=True)
 Hexagon(
     cx=14.3, cy=10,
@@ -333,10 +461,8 @@ Hexagon(
         ('se', square(common=place), 0.8),
         ('w', square(common=place), 0.8),
         ('e', circle(common=place), 0.8),
-        ('ne', circle(common=place), 0.8),
+        ('sw', circle(common=place), 0.8),
         ('nw', circle(common=place), 0.8),
-    ]
-)
-PageBreak()
+    ])
 
 Save()

@@ -125,9 +125,7 @@ Track(
     rotation_style='o',
 )
 PageBreak()
-'''
 
-'''
 # ---- circle track + rotation shape
 Blueprint()
 Text(common=txt, text="Track: circle; rotate 'i'")

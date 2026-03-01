@@ -164,7 +164,7 @@ class HexShape(BaseShape):
                     if (self.row + 1) & 1:  # is odd row; row are 0-base numbered!
                         x = (
                             self.col * geo.height_flat
-                            + geo.half_flat
+                            + geo.half
                             + self._u.x
                             + self._o.delta_x
                         )
@@ -341,16 +341,18 @@ class HexShape(BaseShape):
         elif self.ORIENTATION == HexOrientation.FLAT:
             directions = ["w", "sw", "se", "e", "ne", "nw"]
         else:
+            directions = []
             feedback(
                 'Invalid orientation "{self.ORIENTATION}" supplied for hexagon.', True
             )
         vertex_dict = {}
-        for key, vertex in enumerate(vertices):
-            _vertex = Vertex(
-                point=vertex,
-                direction=directions[key],
-            )
-            vertex_dict[directions[key]] = _vertex
+        if directions:
+            for key, vertex in enumerate(vertices):
+                _vertex = Vertex(
+                    point=vertex,
+                    direction=directions[key],
+                )
+                vertex_dict[directions[key]] = _vertex
         return vertex_dict
 
     def get_orientation(self) -> HexOrientation:
@@ -616,87 +618,113 @@ class HexShape(BaseShape):
             num: number of lines
             rotation: degrees anti-clockwise from horizontal "east"
         """
+
+        def draw_lines(hatch_count, _dirs):
+            lines = int((hatch_count - 1) / 2 + 1)
+            # feedback(f'*** HEX hatch {dir_group.name=} {hatch_count=} {lines=} {_dirs=}')
+            if hatch_count >= 1:
+                if self.orientation in ["p", "pointy"]:
+                    if "ne" in _dirs or "sw" in _dirs:  # slope UP to the right
+                        self.make_path_vertices(cnv, vertices, 1, 4)
+                    if "se" in _dirs or "nw" in _dirs:  # slope down to the right
+                        self.make_path_vertices(cnv, vertices, 0, 3)
+                    if "n" in _dirs or "s" in _dirs:  # vertical
+                        self.make_path_vertices(cnv, vertices, 2, 5)
+                elif self.orientation in ["f", "flat"]:
+                    if "ne" in _dirs or "sw" in _dirs:  # slope UP to the right
+                        self.make_path_vertices(cnv, vertices, 1, 4)
+                    if "se" in _dirs or "nw" in _dirs:  # slope down to the right
+                        self.make_path_vertices(cnv, vertices, 2, 5)
+                    if "e" in _dirs or "w" in _dirs:  # horizontal
+                        self.make_path_vertices(cnv, vertices, 0, 3)
+                else:
+                    feedback(
+                        'Invalid orientation "{self.orientation}" supplied for hexagon.',
+                        True,
+                    )
+            if hatch_count >= 3:
+                _lines = lines - 1
+                self.ORIENTATION = self.get_orientation()
+                if self.ORIENTATION == HexOrientation.POINTY:
+                    if "ne" in _dirs or "sw" in _dirs:  # slope UP to the right
+                        self.draw_lines_between_sides(
+                            cnv, side, _lines, vertices, (4, 5), (1, 0)
+                        )
+                        self.draw_lines_between_sides(
+                            cnv, side, _lines, vertices, (4, 3), (1, 2)
+                        )
+                    if "se" in _dirs or "nw" in _dirs:  # slope down to the right
+                        self.draw_lines_between_sides(
+                            cnv, side, _lines, vertices, (0, 5), (3, 4)
+                        )
+                        self.draw_lines_between_sides(
+                            cnv, side, _lines, vertices, (3, 2), (0, 1)
+                        )
+                    if "n" in _dirs or "s" in _dirs:  # vertical
+                        self.draw_lines_between_sides(
+                            cnv, side, _lines, vertices, (1, 2), (0, 5)
+                        )
+                        self.draw_lines_between_sides(
+                            cnv, side, _lines, vertices, (2, 3), (5, 4)
+                        )
+                elif self.ORIENTATION == HexOrientation.FLAT:
+                    if "ne" in _dirs or "sw" in _dirs:  # slope UP to the right
+                        self.draw_lines_between_sides(
+                            cnv, side, _lines, vertices, (0, 1), (5, 4)
+                        )
+                        self.draw_lines_between_sides(
+                            cnv, side, _lines, vertices, (3, 4), (2, 1)
+                        )
+                    if "se" in _dirs or "nw" in _dirs:  # slope down to the right
+                        self.draw_lines_between_sides(
+                            cnv, side, _lines, vertices, (4, 5), (3, 2)
+                        )
+                        self.draw_lines_between_sides(
+                            cnv, side, _lines, vertices, (2, 1), (5, 0)
+                        )
+                    if "e" in _dirs or "w" in _dirs:  # horizontal
+                        self.draw_lines_between_sides(
+                            cnv, side, _lines, vertices, (0, 1), (3, 2)
+                        )
+                        self.draw_lines_between_sides(
+                            cnv, side, _lines, vertices, (0, 5), (3, 4)
+                        )
+                else:
+                    feedback(
+                        'Invalid orientation "{self.ORIENTATION}" supplied for hexagon.',
+                        True,
+                    )
+
         dir_group = (
             DirectionGroup.HEX_POINTY
             if self.orientation == "pointy"
             else DirectionGroup.HEX_FLAT
         )
-        _dirs = tools.validated_directions(self.hatches, dir_group, "hexagon hatches")
-        _num = tools.as_int(num, "hatches_count")
-        lines = int((_num - 1) / 2 + 1)
-        # feedback(f'*** HEX {num=} {lines=} {vertices=} {_dirs=}')
-        if num >= 1:
-            if self.orientation in ["p", "pointy"]:
-                if "ne" in _dirs or "sw" in _dirs:  # slope UP to the right
-                    self.make_path_vertices(cnv, vertices, 1, 4)
-                if "se" in _dirs or "nw" in _dirs:  # slope down to the right
-                    self.make_path_vertices(cnv, vertices, 0, 3)
-                if "n" in _dirs or "s" in _dirs:  # vertical
-                    self.make_path_vertices(cnv, vertices, 2, 5)
-            elif self.orientation in ["f", "flat"]:
-                if "ne" in _dirs or "sw" in _dirs:  # slope UP to the right
-                    self.make_path_vertices(cnv, vertices, 1, 4)
-                if "se" in _dirs or "nw" in _dirs:  # slope down to the right
-                    self.make_path_vertices(cnv, vertices, 2, 5)
-                if "e" in _dirs or "w" in _dirs:  # horizontal
-                    self.make_path_vertices(cnv, vertices, 0, 3)
-            else:
-                feedback(
-                    'Invalid orientation "{self.orientation}" supplied for hexagon.',
-                    True,
+        # ---- variable hatches
+        if isinstance(self.hatches, list):
+            for item in self.hatches:
+                if not isinstance(item, tuple) and len(item) < 2:
+                    feedback(
+                        "Hexagon hatches list must consist of (direction, count) values",
+                        True,
+                    )
+                _dirs = tools.validated_directions(
+                    item[0], dir_group, "hexagon hatches"
                 )
-        if num >= 3:
-            _lines = lines - 1
-            self.ORIENTATION = self.get_orientation()
-            if self.ORIENTATION == HexOrientation.POINTY:
-                if "ne" in _dirs or "sw" in _dirs:  # slope UP to the right
-                    self.draw_lines_between_sides(
-                        cnv, side, _lines, vertices, (4, 5), (1, 0)
-                    )
-                    self.draw_lines_between_sides(
-                        cnv, side, _lines, vertices, (4, 3), (1, 2)
-                    )
-                if "se" in _dirs or "nw" in _dirs:  # slope down to the right
-                    self.draw_lines_between_sides(
-                        cnv, side, _lines, vertices, (0, 5), (3, 4)
-                    )
-                    self.draw_lines_between_sides(
-                        cnv, side, _lines, vertices, (3, 2), (0, 1)
-                    )
-                if "n" in _dirs or "s" in _dirs:  # vertical
-                    self.draw_lines_between_sides(
-                        cnv, side, _lines, vertices, (1, 2), (0, 5)
-                    )
-                    self.draw_lines_between_sides(
-                        cnv, side, _lines, vertices, (2, 3), (5, 4)
-                    )
-            elif self.ORIENTATION == HexOrientation.FLAT:
-                if "ne" in _dirs or "sw" in _dirs:  # slope UP to the right
-                    self.draw_lines_between_sides(
-                        cnv, side, _lines, vertices, (0, 1), (5, 4)
-                    )
-                    self.draw_lines_between_sides(
-                        cnv, side, _lines, vertices, (3, 4), (2, 1)
-                    )
-                if "se" in _dirs or "nw" in _dirs:  # slope down to the right
-                    self.draw_lines_between_sides(
-                        cnv, side, _lines, vertices, (4, 5), (3, 2)
-                    )
-                    self.draw_lines_between_sides(
-                        cnv, side, _lines, vertices, (2, 1), (5, 0)
-                    )
-                if "e" in _dirs or "w" in _dirs:  # horizontal
-                    self.draw_lines_between_sides(
-                        cnv, side, _lines, vertices, (0, 1), (3, 2)
-                    )
-                    self.draw_lines_between_sides(
-                        cnv, side, _lines, vertices, (0, 5), (3, 4)
-                    )
-            else:
-                feedback(
-                    'Invalid orientation "{self.ORIENTATION}" supplied for hexagon.',
-                    True,
-                )
+                hatches_count = tools.as_int(item[1], label="hatch count", minimum=1)
+                if not hatches_count & 1:
+                    feedback("Hatches count must be an odd number for a Hexagon", True)
+                draw_lines(hatches_count, _dirs)
+        # ---- common hatches
+        else:
+            _dirs = tools.validated_directions(
+                self.hatches, dir_group, "hexagon hatches"
+            )
+            hatches_count = tools.as_int(num, "hatches_count", minimum=1)
+            if not hatches_count & 1:
+                feedback("Hatches count must be an odd number for a Hexagon", True)
+            draw_lines(hatches_count, _dirs)
+
         # ---- set canvas
         self.set_canvas_props(
             index=ID,
@@ -1375,12 +1403,14 @@ class HexShape(BaseShape):
         # feedback(f'*** draw hex: {off_x=} {off_y=} {ID=}')
         # feedback(f'*** draw hex: {self.x=} {self.y=} {self.cx=} {self.cy=}')
         # feedback(f'*** draw hex: {self.row=} {self.col=}')
-        # feedback(f' @@@ Hexg.draw {kwargs=}')
+        # feedback(f'@@@ Hexg.draw {kwargs=}')
+        # feedback(f'@@@ Hexg.draw  {ID=} {kwargs["dataset"]=}')
         cnv = cnv if cnv else globals.canvas  # a new Page/Shape may now exist
         super().draw(cnv, off_x, off_y, ID, **kwargs)  # unit-based props
         # ---- calculate vertexes
         geo = self.get_geometry()
         self.is_cards = kwargs.get("is_cards", False)
+        self.grid_marks = kwargs.get("grid_marks", self.grid_marks)
         self.vertices = self._shape_vertexes  # also sets self.centre
         # ---- calculate area
         self.area = self.calculate_area()
@@ -1512,10 +1542,10 @@ class HexShape(BaseShape):
                     )
             if item == "hatches":
                 # ---- * draw hatches
-                if self.hatches_count:
-                    if not self.hatches_count & 1:
+                if self.hatches_count or isinstance(self.hatches, list):
+                    if self.hatches_count and not self.hatches_count & 1:
                         feedback(
-                            "hatches count must be an odd number for a Hexagon", True
+                            "Hatches count must be an odd number for a Hexagon", True
                         )
                     self.draw_hatches(
                         cnv, ID, geo.side, self.vertexes, self.hatches_count
@@ -1570,7 +1600,7 @@ class HexShape(BaseShape):
                             _abs_cx=self.x_d + self.unit(self.centre_shape_mx),
                             _abs_cy=self.y_d + self.unit(self.centre_shape_my),
                         )
-            if item == ["centre_shapes", "center_shapes"]:
+            if item in ["centre_shapes", "center_shapes"]:
                 # ---- * centred shapes (with offsets)
                 if self.centre_shapes:
                     self.draw_centred_shapes(self.centre_shapes, self.x_d, self.y_d)
@@ -1604,6 +1634,149 @@ class HexShape(BaseShape):
                 self.grid = GridShape(
                     label=self.coord_text, x=self.x_d, y=self.y_d, shape=self
                 )
+
+        # ---- grid marks
+        if self.grid_marks:  # and not kwargs.get("card_back", False):
+            delta_grid = self.unit(self.grid_marks_length)
+            pg_tl = Point(0, 0)
+            pg_tr = Point(globals.page[0], 0)
+            pg_bl = Point(0, globals.page[1])
+            pg_br = Point(globals.page[0], globals.page[1])
+            v0, v1, v2, v3, v4, v5 = (  # anti-clockwise from west-point
+                self.vertices[0],
+                self.vertices[1],
+                self.vertices[2],
+                self.vertices[3],
+                self.vertices[4],
+                self.vertices[5],
+            )
+            # print('!!!' , v0, v1, v2, v3, v5, v5)
+            # feedback(f'@@@ Hexg.grid_marks {pg_tl=} {pg_tr=} {pg_bl=} {pg_br=}')
+            if _lower(self.grid_marks_style) in ["edge", "both", "e", "b"]:
+                if self.ORIENTATION == HexOrientation.FLAT:
+                    # north edge of hex
+                    pin = geoms.line_intersection_point(pg_tl, pg_bl, v4, v5)  # left
+                    if pin:
+                        pol = geoms.point_on_line(pin, v5, delta_grid)
+                        cnv.draw_line(pol, pin)
+                    pin = geoms.line_intersection_point(pg_tr, pg_br, v5, v4)  # right
+                    if pin:
+                        pol = geoms.point_on_line(pin, v4, delta_grid)
+                        cnv.draw_line(pol, pin)
+                    # north-east edge of hex: UP
+                    pin = geoms.line_intersection_point(
+                        pg_tl, pg_tr, v3, v4, True
+                    )  # top
+                    if not pin:
+                        pin = geoms.line_intersection_point(
+                            pg_tr, pg_br, v3, v4, True
+                        )  # right
+                    if pin:
+                        pol = geoms.point_on_line(pin, v4, delta_grid)
+                        cnv.draw_line(pol, pin)
+                    # north-east edge of hex: DOWN
+                    pin = geoms.line_intersection_point(
+                        pg_bl, pg_br, v4, v3, True
+                    )  # btm
+                    if not pin:
+                        pin = geoms.line_intersection_point(
+                            pg_tr, pg_br, v4, v3, True
+                        )  # right
+                    if pin:
+                        pol = geoms.point_on_line(pin, v3, delta_grid)
+                        cnv.draw_line(pol, pin)
+                    # north-west edge of hex: UP
+                    pin = geoms.line_intersection_point(
+                        pg_tl, pg_tr, v0, v5, True
+                    )  # top
+                    if not pin:
+                        pin = geoms.line_intersection_point(
+                            pg_tr, pg_br, v0, v5, True
+                        )  # right
+                    if pin:
+                        pol = geoms.point_on_line(pin, v5, delta_grid)
+                        cnv.draw_line(pol, pin)
+                    # north-west edge of hex: DOWN
+                    pin = geoms.line_intersection_point(
+                        pg_bl, pg_br, v5, v0, True
+                    )  # btm
+                    if not pin:
+                        pin = geoms.line_intersection_point(
+                            pg_tl, pg_bl, v5, v0, True
+                        )  # left
+                    if pin:
+                        pol = geoms.point_on_line(pin, v5, delta_grid)
+                        cnv.draw_line(pol, pin)
+                    # south edge of hex
+                    pin = geoms.line_intersection_point(pg_tl, pg_bl, v2, v1)
+                    if pin:
+                        pol = geoms.point_on_line(pin, v1, delta_grid)
+                        cnv.draw_line(pol, pin)
+                    pin = geoms.line_intersection_point(pg_tr, pg_br, v1, v2)
+                    if pin:
+                        pol = geoms.point_on_line(pin, v2, delta_grid)
+                        cnv.draw_line(pol, pin)
+                    # south-east edge of hex: UP
+                    pin = geoms.line_intersection_point(
+                        pg_tl, pg_tr, v2, v3, True
+                    )  # top
+                    if not pin:
+                        pin = geoms.line_intersection_point(
+                            pg_tr, pg_br, v2, v3, True
+                        )  # right
+                    if pin:
+                        pol = geoms.point_on_line(pin, v3, delta_grid)
+                        cnv.draw_line(pol, pin)
+                    # south-east edge of hex: DOWN
+                    pin = geoms.line_intersection_point(
+                        pg_bl, pg_br, v3, v2, True
+                    )  # btm
+                    if not pin:
+                        pin = geoms.line_intersection_point(
+                            pg_tl, pg_bl, v3, v2, True
+                        )  # left
+                    if pin:
+                        pol = geoms.point_on_line(pin, v2, delta_grid)
+                        cnv.draw_line(pol, pin)
+                    # south-west edge of hex: UP
+                    pin = geoms.line_intersection_point(
+                        pg_tl, pg_tr, v1, v0, True
+                    )  # top
+                    if not pin:
+                        pin = geoms.line_intersection_point(
+                            pg_tl, pg_bl, v1, v0, True
+                        )  # left
+                    if pin:
+                        pol = geoms.point_on_line(pin, v0, delta_grid)
+                        cnv.draw_line(pol, pin)
+                    # south-west edge of hex: DOWN
+                    pin = geoms.line_intersection_point(
+                        pg_bl, pg_br, v0, v1, True
+                    )  # btm
+                    if not pin:
+                        pin = geoms.line_intersection_point(
+                            pg_tr, pg_br, v0, v1, True
+                        )  # right
+                    if pin:
+                        pol = geoms.point_on_line(pin, v1, delta_grid)
+                        cnv.draw_line(pol, pin)
+
+            elif _lower(self.grid_marks_style) in ["cross", "c"]:
+                feedback(
+                    f'"{self.grid_marks_style}" is an invalid grid_marks_style for Hexagons!',
+                    True,
+                )
+            else:
+                feedback(
+                    f'"{self.grid_marks_style}" is an invalid grid_marks_style!', True
+                )
+            # done
+            gargs = {}
+            gargs["stroke"] = self.grid_marks_stroke
+            gargs["stroke_width"] = self.grid_marks_stroke_width
+            gargs["stroke_ends"] = self.grid_marks_ends
+            gargs["dotted"] = self.grid_marks_dotted
+            self.set_canvas_props(cnv=None, index=ID, **gargs)
 
         # ---- debug
         # self._debug(cnv, Point(x, y), 'start')

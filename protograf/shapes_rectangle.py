@@ -165,7 +165,7 @@ class RectangleShape(BaseShape):
         Returns:
             dict of Perbis objects keyed on direction
         """
-        directions = ["n", "w", "s", "e"]
+        directions = ["n", "e", "s", "w"]
         perbii_dict = {}
         vertices = self._shape_vertexes
         vcount = len(vertices) - 1
@@ -799,108 +799,142 @@ class RectangleShape(BaseShape):
             num: number of lines
             rotation: degrees anti-clockwise from horizontal "east"
         """
-        _dirs = tools.validated_directions(
-            self.hatches, DirectionGroup.CIRCULAR, "hatches"
-        )
-        lines = tools.as_int(num, "hatches_count")
+
+        def draw_lines(vertices, _dirs, lines):
+            """Draw lines for a given direction."""
+            # print("rect vertices", self._l2v(vertices))
+            pt_ne, pt_se, pt_sw, pt_nw = (
+                vertices[0],
+                vertices[1],
+                vertices[2],
+                vertices[3],
+            )
+            # ---- draw items
+            if lines >= 1:
+                if "se" in _dirs or "nw" in _dirs or "d" in _dirs:  # DOWN to the right
+                    cnv.draw_line((pt_nw.x, pt_nw.y), (pt_se.x, pt_se.y))
+                if "sw" in _dirs or "ne" in _dirs or "d" in _dirs:  # UP to the right
+                    cnv.draw_line((pt_sw.x, pt_sw.y), (pt_ne.x, pt_ne.y))
+                if "n" in _dirs or "s" in _dirs or "o" in _dirs:  # vertical
+                    x_dist = self._u.width / (lines + 1)
+                    for i in range(1, lines + 1):
+                        cnv.draw_line(
+                            (pt_ne.x - i * x_dist, pt_ne.y),
+                            (pt_ne.x - i * x_dist, pt_se.y),
+                        )
+                if "e" in _dirs or "w" in _dirs or "o" in _dirs:  # horizontal
+                    y_dist = self._u.height / (lines + 1)
+                    for i in range(1, lines + 1):
+                        cnv.draw_line(
+                            (pt_ne.x, pt_ne.y + i * y_dist),
+                            (pt_ne.x - self._u.width, pt_ne.y + i * y_dist),
+                        )
+
+            if lines >= 1:
+                diag_num = int((lines - 1) / 2 + 1)
+                x_dist = self._u.width / diag_num
+                y_dist = self._u.height / diag_num
+                top_pt, btm_pt, left_pt, rite_pt = [], [], [], []
+                for number in range(0, diag_num + 1):
+                    left_pt.append(geoms.point_on_line(pt_sw, pt_nw, y_dist * number))
+                    top_pt.append(geoms.point_on_line(pt_nw, pt_ne, x_dist * number))
+                    rite_pt.append(geoms.point_on_line(pt_se, pt_ne, y_dist * number))
+                    btm_pt.append(geoms.point_on_line(pt_sw, pt_se, x_dist * number))
+
+            if "sw" in _dirs or "ne" in _dirs or "d" in _dirs:  # slope UP to the right
+                for i in range(1, diag_num):  # top-left side
+                    j = diag_num - i
+                    cnv.draw_line(
+                        (left_pt[i].x, left_pt[i].y), (top_pt[j].x, top_pt[j].y)
+                    )
+                for i in range(1, diag_num):  # bottom-right side
+                    j = diag_num - i
+                    cnv.draw_line(
+                        (btm_pt[i].x, btm_pt[i].y), (rite_pt[j].x, rite_pt[j].y)
+                    )
+            if "nw" in _dirs or "se" in _dirs or "d" in _dirs:  # slop DOWN to the right
+                for i in range(1, diag_num):  # bottom-left side
+                    cnv.draw_line(
+                        (left_pt[i].x, left_pt[i].y), (btm_pt[i].x, btm_pt[i].y)
+                    )
+                for i in range(1, diag_num):  # top-right side
+                    cnv.draw_line(
+                        (top_pt[i].x, top_pt[i].y), (rite_pt[i].x, rite_pt[i].y)
+                    )
+
+        def check_other_settings(_dirs, lines):
+            """Check hatch lines count and direction vs other Rectangle settings."""
+            # ---- check dirs
+            if self.rounding or self.rounded:
+                if (
+                    "ne" in _dirs
+                    or "sw" in _dirs
+                    or "se" in _dirs
+                    or "nw" in _dirs
+                    or "d" in _dirs
+                ):
+                    feedback(
+                        "No diagonal hatches permissible with rounding in the rectangle",
+                        True,
+                    )
+            # ---- check spaces
+            if self.rounding or self.rounded:
+                spaces = max(self._u.width / (lines + 1), self._u.height / (lines + 1))
+                _rounding = 0.0
+                if self.rounding:
+                    _rounding = self.unit(self.rounding)
+                elif self.rounded:
+                    _rounding = self._u.width * 0.08
+                if _rounding and spaces < _rounding:
+                    feedback(
+                        "No hatches permissible with this size of rounding in a rectangle",
+                        True,
+                    )
+            if self.notch and self.hatches_count > 1 or self.notch_x or self.notch_y:
+                if (
+                    "ne" in _dirs
+                    or "sw" in _dirs
+                    or "se" in _dirs
+                    or "nw" in _dirs
+                    or "d" in _dirs
+                ):
+                    feedback(
+                        "Multi-diagonal hatches not permissible in a notched Rectangle",
+                        True,
+                    )
+            # ---- etc,
+            if lines and self.chevron:
+                feedback("Cannot use hatches with chevron.", True)
+            if lines and self.peaks:
+                feedback("Cannot use hatches and peaks together.", True)
+
         vertices = self._shape_vertexes
-        # ---- check dirs
-        if self.rounding or self.rounded:
-            if (
-                "ne" in _dirs
-                or "sw" in _dirs
-                or "se" in _dirs
-                or "nw" in _dirs
-                or "d" in _dirs
-            ):
-                feedback(
-                    "No diagonal hatches permissible with rounding in the rectangle",
-                    True,
-                )
-        # ---- check spaces
-        if self.rounding or self.rounded:
-            spaces = max(self._u.width / (lines + 1), self._u.height / (lines + 1))
-            _rounding = 0.0
-            if self.rounding:
-                _rounding = self.unit(self.rounding)
-            elif self.rounded:
-                _rounding = self._u.width * 0.08
-            if _rounding and spaces < _rounding:
-                feedback(
-                    "No hatches permissible with this size of rounding in a rectangle",
-                    True,
-                )
-        if self.notch and self.hatches_count > 1 or self.notch_x or self.notch_y:
-            if (
-                "ne" in _dirs
-                or "sw" in _dirs
-                or "se" in _dirs
-                or "nw" in _dirs
-                or "d" in _dirs
-            ):
-                feedback(
-                    "Multi-diagonal hatches not permissible in a notched Rectangle",
-                    True,
-                )
-        # ---- draw items
-        if lines >= 1:
-            if "se" in _dirs or "nw" in _dirs or "d" in _dirs:  # UP to the right
-                cnv.draw_line(
-                    (vertices[0].x, vertices[0].y), (vertices[2].x, vertices[2].y)
-                )
-            if "sw" in _dirs or "ne" in _dirs or "d" in _dirs:  # DOWN to the right
-                cnv.draw_line(
-                    (vertices[1].x, vertices[1].y), (vertices[3].x, vertices[3].y)
-                )
-            if "n" in _dirs or "s" in _dirs or "o" in _dirs:  # vertical
-                x_dist = self._u.width / (lines + 1)
-                for i in range(1, lines + 1):
-                    cnv.draw_line(
-                        (vertices[0].x + i * x_dist, vertices[1].y),
-                        (vertices[0].x + i * x_dist, vertices[0].y),
+        # ---- variable hatches
+        if isinstance(self.hatches, list):
+            for item in self.hatches:
+                if not isinstance(item, tuple) and len(item) < 2:
+                    feedback(
+                        "Rectangle hatches list must consist of (direction, count) values",
+                        True,
                     )
-            if "e" in _dirs or "w" in _dirs or "o" in _dirs:  # horizontal
-                y_dist = self._u.height / (lines + 1)
-                for i in range(1, lines + 1):
-                    cnv.draw_line(
-                        (vertices[0].x, vertices[0].y + i * y_dist),
-                        (vertices[0].x + self._u.width, vertices[0].y + i * y_dist),
-                    )
+                _dirs = tools.validated_directions(
+                    item[0], DirectionGroup.CIRCULAR, "rectangle hatches"
+                )
+                lines = tools.as_int(item[1], label="hatch count", minimum=1)
+                check_other_settings(_dirs, lines)
+                draw_lines(vertices, _dirs, lines)
+        # ---- common hatches
+        else:
+            lines = tools.as_int(num, "hatches_count")
+            _dirs = tools.validated_directions(
+                self.hatches, DirectionGroup.CIRCULAR, "rectangle hatches"
+            )
+            check_other_settings(_dirs, lines)
+            draw_lines(vertices, _dirs, lines)
 
-        if lines >= 1:
-            diag_num = int((lines - 1) / 2 + 1)
-            x_dist = self._u.width / diag_num
-            y_dist = self._u.height / diag_num
-            top_pt, btm_pt, left_pt, rite_pt = [], [], [], []
-            for number in range(0, diag_num + 1):
-                left_pt.append(
-                    geoms.point_on_line(vertices[0], vertices[1], y_dist * number)
-                )
-                top_pt.append(
-                    geoms.point_on_line(vertices[1], vertices[2], x_dist * number)
-                )
-                rite_pt.append(
-                    geoms.point_on_line(vertices[3], vertices[2], y_dist * number)
-                )
-                btm_pt.append(
-                    geoms.point_on_line(vertices[0], vertices[3], x_dist * number)
-                )
-
-        if "se" in _dirs or "nw" in _dirs or "d" in _dirs:  # slope UP to the right
-            for i in range(1, diag_num):  # top-left side
-                j = diag_num - i
-                cnv.draw_line((left_pt[i].x, left_pt[i].y), (top_pt[j].x, top_pt[j].y))
-            for i in range(1, diag_num):  # bottom-right side
-                j = diag_num - i
-                cnv.draw_line((btm_pt[i].x, btm_pt[i].y), (rite_pt[j].x, rite_pt[j].y))
-        if "ne" in _dirs or "sw" in _dirs or "d" in _dirs:  # slope down to the right
-            for i in range(1, diag_num):  # bottom-left side
-                cnv.draw_line((left_pt[i].x, left_pt[i].y), (btm_pt[i].x, btm_pt[i].y))
-            for i in range(1, diag_num):  # top-right side
-                cnv.draw_line((top_pt[i].x, top_pt[i].y), (rite_pt[i].x, rite_pt[i].y))
         # ---- set canvas
-        cx = vertices[0].x + 0.5 * self._u.width
-        cy = vertices[0].y + 0.5 * self._u.height
+        cx = vertices[3].x + 0.5 * self._u.width
+        cy = vertices[3].y + 0.5 * self._u.height
         self.set_canvas_props(
             index=ID,
             stroke=self.hatches_stroke,
@@ -1150,7 +1184,7 @@ class RectangleShape(BaseShape):
         off_x, off_y = 0.0, 0.0
         diagonals_per_side = 0
         # ---- set canvas
-        vertices = self._shape_vertexes
+        vertices = self._shape_vertexes  # clockwise from right; 0:ne, 1:se, 2:sw, 3:nw
         cx = vertices[0].x + 0.5 * self._u.width
         cy = vertices[0].y + 0.5 * self._u.height
         # ---- basic checks
@@ -1273,13 +1307,14 @@ class RectangleShape(BaseShape):
             ):
                 # interior angles
                 _, alpha = geoms.angles_from_points(  # diag. angle; interior; upwards
-                    Point(vertices[0].x, vertices[0].y),
-                    Point(vertices[2].x, vertices[2].y),
+                    Point(vertices[3].x, vertices[3].y),  # nw
+                    Point(vertices[1].x, vertices[1].y),  # se
                 )
                 kappa = 180 - alpha  # diag. angle measured from zero east
                 zeta = 90 - alpha  # diag. angle; interior; downwards
                 beta = kappa - alpha
                 # print(f'*** NW angles {kappa=} {alpha=} {zeta=} {beta=}')
+
                 # line spacing
                 if not _breadth:
                     _breadth = space_diag / (lines + gaps)  # divide equally
@@ -1304,76 +1339,69 @@ class RectangleShape(BaseShape):
                 prime_x = (_breadth / 2.0) / _sin(90 - zeta)
                 # secondary diagonals (sometimes)
                 diagonals_per_side = int((self.stripes - 1) / 2)
-                # print(f'*** NW primary {diagonals_per_side=}')
+                # print(f'*** NW primary {prime_x=} {prime_y=} {diagonals_per_side=}')
 
             # ---- * diagonal UP
             if "sw" in _dirs or "ne" in _dirs or "d" in _dirs or is_all:
                 # primary diagonal (always)
                 # print(f'*** NW primary {prime_x=} {prime_y=}')
-                p1 = Point(vertices[3].x, vertices[3].y)
-                pb2 = Point(vertices[3].x, vertices[3].y + prime_y)
-                pb3 = Point(vertices[1].x + prime_x, vertices[1].y)
-                p4 = Point(vertices[1].x, vertices[1].y)
-                pu3 = Point(vertices[1].x, vertices[1].y - prime_y)
-                pu4 = Point(vertices[3].x - prime_x, vertices[3].y)
+                p1 = Point(vertices[0].x, vertices[0].y)
+                pb2 = Point(vertices[0].x, vertices[0].y + prime_y)
+                pb3 = Point(vertices[2].x + prime_x, vertices[2].y)
+                p4 = Point(vertices[2].x, vertices[2].y)
+                pu3 = Point(vertices[2].x, vertices[2].y - prime_y)
+                pu4 = Point(vertices[0].x - prime_x, vertices[0].y)
                 vertexes = [p1, pb2, pb3, p4, pu3, pu4, p1]
                 cnv.draw_polyline(vertexes)
-                apply_props(cx, cy)
-                # self._debug(cnv, vertices=vertexes)
-
                 # secondary diagonals (sometimes)
+                # note that pu3/pb3 & pu3/pu4 are changed each loop iteration!
                 for each_stripe in range(0, diagonals_per_side):
                     # offset line: below
-                    p1 = Point(vertices[3].x, pb2.y + off_y)
-                    pb2 = Point(vertices[3].x, pb2.y + off_y + stripe_y)
-                    p4 = Point(pb3.x + off_x, vertices[1].y)
-                    pb3 = Point(pb3.x + off_x + stripe_x, vertices[1].y)
+                    p1 = Point(vertices[0].x, pb2.y + off_y)
+                    pb2 = Point(vertices[0].x, pb2.y + off_y + stripe_y)
+                    p4 = Point(pb3.x + off_x, vertices[2].y)
+                    pb3 = Point(pb3.x + off_x + stripe_x, vertices[2].y)
                     vertexes = [p1, pb2, pb3, p4, p1]
                     cnv.draw_polyline(vertexes)
-                    # print(f'NE offset below: {vertexes=}')
                     # offset line: above
-                    p1 = Point(pu4.x - off_x, vertices[3].y)
-                    p2 = Point(vertices[1].x, pu3.y - off_y)
-                    pu3 = Point(vertices[1].x, pu3.y - off_y - stripe_y)
-                    pu4 = Point(pu4.x - off_x - stripe_x, vertices[3].y)
+                    p1 = Point(pu4.x - off_x, vertices[0].y)
+                    p2 = Point(vertices[2].x, pu3.y - off_y)
+                    pu3 = Point(vertices[2].x, pu3.y - off_y - stripe_y)
+                    pu4 = Point(pu4.x - off_x - stripe_x, vertices[0].y)
                     vertexes = [p1, p2, pu3, pu4, p1]
                     cnv.draw_polyline(vertexes)
-                    # print(f'NW offset above: {vertexes=}')
                 apply_props(cx, cy)
 
             # ---- * diagonal DOWN
             if "nw" in _dirs or "se" in _dirs or "d" in _dirs or is_all:
                 # primary diagonal (always)
-                # print(f'*** NW primary {prime_x=} {prime_y=}')
-                p1 = Point(vertices[0].x, vertices[0].y)
-                pb2 = Point(vertices[0].x, vertices[0].y + prime_y)
-                pb3 = Point(vertices[2].x - prime_x, vertices[2].y)
-                p4 = Point(vertices[2].x, vertices[2].y)
-                pu3 = Point(vertices[2].x, vertices[2].y - prime_y)
-                pu4 = Point(vertices[0].x + prime_x, vertices[0].y)
+                p1 = Point(vertices[3].x, vertices[3].y)
+                pb2 = Point(vertices[3].x, vertices[3].y + prime_y)
+                pb3 = Point(vertices[1].x - prime_x, vertices[1].y)
+                p4 = Point(vertices[1].x, vertices[1].y)
+                pu3 = Point(vertices[1].x, vertices[1].y - prime_y)
+                pu4 = Point(vertices[3].x + prime_x, vertices[3].y)
                 vertexes = [p1, pb2, pb3, p4, pu3, pu4, p1]
                 cnv.draw_polyline(vertexes)
                 apply_props(cx, cy)
-
                 # secondary diagonals (sometimes)
+                # note that pb2/pb3 & pu3/pu4 are changed each loop iteration!
                 for each_stripe in range(0, diagonals_per_side):
                     # offset line: below
-                    p1 = Point(vertices[0].x, pb2.y + off_y)
-                    pb2 = Point(vertices[0].x, pb2.y + off_y + stripe_y)
-                    p4 = Point(pb3.x - off_x, vertices[2].y)
+                    p1 = Point(vertices[3].x, pb2.y + off_y)
+                    pb2 = Point(vertices[3].x, pb2.y + off_y + stripe_y)
+                    p4 = Point(pb3.x - off_x, vertices[1].y)
                     pb3 = Point(pb3.x - off_x - stripe_x, vertices[2].y)
                     vertexes = [p1, pb2, pb3, p4, p1]
                     cnv.draw_polyline(vertexes)
                     apply_props(cx, cy)
-                    # print(f'NW offset below: {vertexes=}')
                     # offset line: above
-                    p1 = Point(pu4.x + off_x, vertices[0].y)
-                    p2 = Point(vertices[2].x, pu3.y - off_y)
-                    pu3 = Point(vertices[2].x, pu3.y - off_y - stripe_y)
-                    pu4 = Point(pu4.x + off_x + stripe_x, vertices[0].y)
+                    p1 = Point(pu4.x + off_x, vertices[3].y)
+                    p2 = Point(vertices[1].x, pu3.y - off_y)
+                    pu3 = Point(vertices[1].x, pu3.y - off_y - stripe_y)
+                    pu4 = Point(pu4.x + off_x + stripe_x, vertices[3].y)
                     vertexes = [p1, p2, pu3, pu4, p1]
                     cnv.draw_polyline(vertexes)
-                    # print(f'NW offset above: {vertexes=}')
                 apply_props(cx, cy)
 
             # ---- * vertical
@@ -1390,9 +1418,9 @@ class RectangleShape(BaseShape):
                 for i in range(0, lines):
                     cnv.draw_rect(
                         (
-                            vertices[0].x + i * delta_x + x_offset,
-                            vertices[0].y,
-                            vertices[0].x + i * delta_x + x_offset + _breadth,
+                            vertices[3].x + i * delta_x + x_offset,
+                            vertices[3].y,
+                            vertices[3].x + i * delta_x + x_offset + _breadth,
                             vertices[1].y,
                         ),
                     )
@@ -1412,10 +1440,10 @@ class RectangleShape(BaseShape):
                 for i in range(0, lines):
                     cnv.draw_rect(
                         (
-                            vertices[0].x,
-                            vertices[0].y + i * delta_y + y_offset,
-                            vertices[2].x,
-                            vertices[0].y + i * delta_y + y_offset + _breadth,
+                            vertices[3].x,
+                            vertices[3].y + i * delta_y + y_offset,
+                            vertices[1].x,
+                            vertices[3].y + i * delta_y + y_offset + _breadth,
                         ),
                     )
                 apply_props(cx, cy)
@@ -1451,7 +1479,7 @@ class RectangleShape(BaseShape):
         if self.hatches_count and is_notched and self.hatches_count > 1:
             feedback("Cannot use multiple hatches with notch.", True)
         if self.hatches_count and is_chevron:
-            feedback("Cannot use hatches_count with chevron.", True)
+            feedback("Cannot use hatches with chevron.", True)
         if is_notched and is_chevron:
             feedback("Cannot use notch and chevron together.", True)
         if is_notched and is_peaks:
@@ -1459,7 +1487,7 @@ class RectangleShape(BaseShape):
         if is_chevron and is_peaks:
             feedback("Cannot use chevron and peaks together.", True)
         if self.hatches_count and is_peaks:
-            feedback("Cannot use hatches_count and peaks together.", True)
+            feedback("Cannot use hatches and peaks together.", True)
         if is_notched and is_prows:
             feedback("Cannot use notch and prows together.", True)
         if is_chevron and is_prows:
@@ -1851,7 +1879,7 @@ class RectangleShape(BaseShape):
                     self.draw_stripes(cnv, ID, rotation)
             if item == "hatches":
                 # ---- * draw hatches
-                if self.hatches_count:
+                if self.hatches_count or isinstance(self.hatches, list):
                     # if 'rotation' in kwargs.keys():
                     #     kwargs.pop('rotation')
                     self.draw_hatches(

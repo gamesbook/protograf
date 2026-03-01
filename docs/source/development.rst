@@ -72,7 +72,7 @@ Check existing dependencies via::
 Upgrade a dependency via::
 
     poetry add MyExistingPackage
-    
+
 Upgrade a dependency to a specific version via::
 
     poetry add MyExistingPackage^3.1.5
@@ -92,13 +92,13 @@ Update a major version via::
 
 Examples:
 
-======= ======= =======
-type 	before 	after
-======= ======= =======
-patch 	4.1.6 	4.1.7
-minor 	2.1.4 	2.2.0
-major 	1.3.2 	2.0.0
-======= ======= =======
+===================== ====== ======
+command               before after
+===================== ====== ======
+poetry version patch   4.1.6  4.1.7
+poetry version minor   2.1.4  2.2.0
+poetry version major   1.3.2  2.0.0
+===================== ====== ======
 
 Releases to pypi
 ----------------

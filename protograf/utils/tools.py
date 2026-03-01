@@ -1205,6 +1205,141 @@ def eval_template(strng: str, data: dict = None, label: str = ""):
         feedback(f'Unable to process "{strng}" data with this template', True)
 
 
+def valid_directions(
+    direction_group: DirectionGroup,
+    label: str = "",
+    vertex_count: int = 0,
+) -> list:
+    """."""
+    match direction_group:
+        case DirectionGroup.CARDINAL:
+            valid = {"n", "e", "w", "s"}
+        case DirectionGroup.ORDINAL:
+            valid = {"ne", "se", "sw", "nw"}
+        case DirectionGroup.COMPASS:
+            valid = {"n", "e", "w", "s", "ne", "se", "sw", "nw"}
+        case DirectionGroup.HEX_FLAT:  # radii
+            valid = {"e", "se", "sw", "w", "ne", "nw"}
+        case DirectionGroup.HEX_POINTY:  # radii
+            valid = {"s", "se", "sw", "n", "ne", "nw"}
+        case DirectionGroup.HEX_FLAT_EDGE:  # perbii
+            valid = {"s", "se", "sw", "n", "ne", "nw"}
+        case DirectionGroup.HEX_POINTY_EDGE:  # perbii
+            valid = {"e", "se", "sw", "w", "ne", "nw"}
+        case DirectionGroup.CIRCULAR:
+            valid = {"n", "e", "w", "s", "ne", "se", "sw", "nw", "o", "d"}
+        case DirectionGroup.TRIANGULAR:  # equilateral triangle VERTICES
+            valid = {"se", "sw", "n"}
+        case DirectionGroup.TRIANGULAR_EDGE:  # equilateral triangle
+            valid = {"ne", "nw", "s"}
+        case DirectionGroup.TRIANGULAR_HATCH:  # equilateral triangle HATCH
+            valid = {"ne", "sw", "e", "w", "nw", "se"}
+        case DirectionGroup.POLYGONAL:  # polygon
+            valid = set(range(1, vertex_count + 1))
+            # print('^^^ ', vertex_count, values_set)
+        case DirectionGroup.STAR:  # star
+            valid = set(range(1, vertex_count + 1))
+            # print('^^^ ', vertex_count, values_set)
+        case _:
+            raise NotImplementedError(f"Cannot handle {direction_group} type!")
+    return valid
+
+
+def validated_gridlines(
+    value: list | str,
+    direction_group: DirectionGroup = DirectionGroup.COMPASS,
+    label: str = "",
+) -> list:
+    """Check and return a list of lowercase, direction abbreviations for a grid.
+
+    Doc Test:
+
+    >>> validated_gridlines('n s')
+    ['n', 's']
+    >>> validated_gridlines('ne se')
+    ['ne', 'se']
+    >>> validated_gridlines('d se')
+    ['ne', 'sw', 'se']
+    >>> validated_gridlines('e w', DirectionGroup.HEX_POINTY_EDGE)
+    ['e', 'w']
+    >>> validated_gridlines('o', DirectionGroup.HEX_POINTY_EDGE)
+    ['e', 'w']
+    >>> validated_gridlines('n s', DirectionGroup.HEX_FLAT_EDGE)
+    ['n', 's']
+    >>> validated_gridlines('o', DirectionGroup.HEX_FLAT_EDGE)
+    ['n', 's']
+    """
+    # print(f'^^^ {value=} {direction_group=}')
+    _value = value
+    # ---- pre-flight checks
+    if not value:
+        return []
+    if isinstance(value, int):
+        value = str(value)
+    if isinstance(value, str):
+        value = value.strip().split(" ")
+    else:
+        if not isinstance(value, list):
+            feedback(
+                f"Cannot handle {label}{_value} - must be a string or a list!", True
+            )
+    values = [str(val).lower().strip() for val in value]
+    # print(f'{values=}')
+    # ---- replace generic directions
+    clean_values = []
+    for val in values:
+        match val:
+            case "all" | "*":
+                if direction_group == DirectionGroup.HEX_FLAT_EDGE:
+                    clean_values += ["n", "s", "ne", "sw"]
+                elif direction_group == DirectionGroup.HEX_POINTY_EDGE:
+                    clean_values += ["e", "w", "ne", "sw"]
+                elif direction_group == DirectionGroup.TRIANGULAR_HATCH:
+                    clean_values += ["e", "ne", "sw"]
+                else:
+                    clean_values += ["n", "s", "e", "w", "ne", "nw", "se", "sw"]
+            case "d" | "diag" | "diagonal":
+                if direction_group == DirectionGroup.HEX_FLAT_EDGE:
+                    clean_values += ["ne", "nw"]
+                elif direction_group == DirectionGroup.HEX_POINTY_EDGE:
+                    clean_values += ["ne", "nw"]
+                elif direction_group == DirectionGroup.TRIANGULAR_HATCH:
+                    clean_values += ["ne", "nw"]
+                else:
+                    clean_values += ["ne", "nw"]
+            case "o" | "ortho" | "orthogonal":
+                if direction_group == DirectionGroup.HEX_FLAT_EDGE:
+                    clean_values += ["n", "s"]
+                elif direction_group == DirectionGroup.HEX_POINTY_EDGE:
+                    clean_values += ["e", "w"]
+                elif direction_group == DirectionGroup.TRIANGULAR_HATCH:
+                    clean_values += ["e", "w"]
+                else:
+                    clean_values += ["n", "s", "e", "w"]
+            case "n" | "s" | "e" | "w" | "ne" | "nw" | "se" | "sw":
+                clean_values += [val]
+            case _:
+                _label = f'the {label} "{val}"' if label else f'"{val}"'
+                feedback(
+                    f"Cannot use {_label} - this must correspond with "
+                    "one of the valid directions!",
+                    True,
+                )
+    # print(f'{clean_values=}')
+    # ---- validate all directions
+    values_set = set(clean_values)
+    valid = valid_directions(direction_group, label, 0)
+    if values_set.issubset(valid):
+        # NOTE in some cases, we need to ignore `vertex_count` because not yet known...
+        return clean_values
+    _label = f'{label} "{_value}"' if label else f'"{_value}"'
+    feedback(
+        f"Cannot use {_label} - this must correspond with "
+        f"one of the valid directions {valid}!",
+        True,
+    )
+
+
 def validated_directions(
     value: list | str,
     direction_group: DirectionGroup,
@@ -1246,35 +1381,7 @@ def validated_directions(
             )
         values = [str(val).lower().strip() for val in value]
     values_set = set(values)
-    match direction_group:
-        case DirectionGroup.CARDINAL:
-            valid = {"n", "e", "w", "s"}
-        case DirectionGroup.ORDINAL:
-            valid = {"ne", "se", "sw", "nw"}
-        case DirectionGroup.COMPASS:
-            valid = {"n", "e", "w", "s", "ne", "se", "sw", "nw"}
-        case DirectionGroup.HEX_FLAT:  # radii
-            valid = {"e", "se", "sw", "w", "ne", "nw"}
-        case DirectionGroup.HEX_POINTY:  # radii
-            valid = {"s", "se", "sw", "n", "ne", "nw"}
-        case DirectionGroup.HEX_FLAT_EDGE:  # perbii
-            valid = {"s", "se", "sw", "n", "ne", "nw"}
-        case DirectionGroup.HEX_POINTY_EDGE:  # perbii
-            valid = {"e", "se", "sw", "w", "ne", "nw"}
-        case DirectionGroup.CIRCULAR:
-            valid = {"n", "e", "w", "s", "ne", "se", "sw", "nw", "o", "d"}
-        case DirectionGroup.TRIANGULAR:  # equilateral triangle
-            valid = {"se", "sw", "n"}
-        case DirectionGroup.TRIANGULAR_EDGES:  # equilateral triangle
-            valid = {"ne", "nw", "s"}
-        case DirectionGroup.POLYGONAL:  # polygon
-            valid = set(range(1, vertex_count + 1))
-            # print('^^^ ', vertex_count, values_set)
-        case DirectionGroup.STAR:  # star
-            valid = set(range(1, vertex_count + 1))
-            # print('^^^ ', vertex_count, values_set)
-        case _:
-            raise NotImplementedError(f"Cannot handle {direction_group} type!")
+    valid = valid_directions(direction_group, label, vertex_count)
     if "all" in values or "*" in values:
         values = list(valid)
         if direction_group in [DirectionGroup.POLYGONAL, DirectionGroup.STAR]:

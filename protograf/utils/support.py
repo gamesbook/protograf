@@ -4,7 +4,9 @@ Support utilities for protograf
 """
 # lib
 import itertools
+import math
 import os
+from pathlib import Path
 import string
 from typing import Any
 
@@ -24,6 +26,101 @@ from protograf.utils.constants import (
 )
 from protograf.utils.structures import ExportFormat
 from protograf.utils.messaging import feedback
+
+
+def cairo_pentagon_snail(interval: float, facing: str) -> str:
+    """Calculate a polyshape snail for a pentagon making up a Cairo board.
+
+    Args:
+        interval (float): distance between start points of pentagon pairs
+        facing (str): primary compass direction showing facing of "point"
+
+    Notes:
+        Angle calculations - interior of pentagon
+            side = interval / (0.5 + math.sqrt(7 / 4))
+            height = interval - 0.5 * side
+            z = math.sqrt(2) * side
+            arcsin_rad = math.asin(height/z)
+            degA = math.degrees(arcsin_rad) + 45
+            degB = 180 - 2 * math.degrees(arcsin_rad)
+            degC = 90 + degB
+    """
+    degA, degC = 114.2952, 131.4096
+    side = interval / (0.5 + math.sqrt(7 / 4))
+    half = side / 2.0
+    if not facing or not isinstance(facing, str):
+        feedback("The cairo_pentagon_snail() facing must a valid string!", True)
+    match facing.lower():
+        case "n" | "north":
+            start = "w"
+        case "e" | "east":
+            start = "n"
+        case "s" | "south":
+            start = "e"
+        case "w" | "west":
+            start = "s"
+        case _:
+            feedback(
+                f'The cairo_pentagon_snail() facing must be a compass direction, not "{facing}"',
+                True,
+            )
+    ang1 = 180.0 - degA  # turning angle derived from pentagon's interior angle
+    ang2 = 180.0 - degC  # turning angle derived from pentagon's interior angle
+    snail = f"{start} {half} r{ang1} {side} r90 {side} r{ang2} {side} r90 {side} r{ang1} {half}"
+    return snail
+
+
+def combinations(_object, size=2, repeat=1, delimiter=","):
+    """Create a list of combinations.
+
+    Args:
+
+    - _object: list OR delimited string
+        source data for combos
+    - size: int
+        how many items to take from list to create a combo
+    - repeat: int
+        how many times to repeat item in original list
+
+    Doc Test:
+
+    >>> combinations([1,2,3])
+    ['12', '13', '23']
+    >>> combinations('1,2,3')
+    ['12', '13', '23']
+
+    """
+    try:
+        size = int(size)
+    except (TypeError, AttributeError):
+        feedback(f'Unable to use a size of "{size}"', False, True)
+        return []
+    try:
+        repeat = int(repeat)
+    except (TypeError, AttributeError):
+        feedback(f'Unable to use a repeat of "{repeat}"', False, True)
+        return []
+    try:
+        items = _object.split(delimiter)
+    except AttributeError:
+        items = _object
+    try:
+        items = items * repeat
+        combo = itertools.combinations(items, size)
+        full_list = []
+        while True:
+            try:
+                comb = next(combo)
+                sub = [str(cmb) for cmb in comb]
+                full_list.append("".join(sub))
+            except StopIteration:
+                break
+        new_list = list(set(full_list))
+        new_list.sort()
+        return new_list
+    except (TypeError, AttributeError):
+        feedback(f'Unable to create combinations from "{_object}"', False, True)
+        return []
 
 
 def numbers(*args):
@@ -238,59 +335,6 @@ def steps(start, end, step=1, is_real=True) -> list:
 #     return string.split(delim)
 
 
-def combinations(_object, size=2, repeat=1, delimiter=","):
-    """Create a list of combinations.
-
-    Args:
-
-    - _object: list OR delimited string
-        source data for combos
-    - size: int
-        how many items to take from list to create a combo
-    - repeat: int
-        how many times to repeat item in original list
-
-    Doc Test:
-
-    >>> combinations([1,2,3])
-    ['12', '13', '23']
-    >>> combinations('1,2,3')
-    ['12', '13', '23']
-
-    """
-    try:
-        size = int(size)
-    except (TypeError, AttributeError):
-        feedback(f'Unable to use a size of "{size}"', False, True)
-        return []
-    try:
-        repeat = int(repeat)
-    except (TypeError, AttributeError):
-        feedback(f'Unable to use a repeat of "{repeat}"', False, True)
-        return []
-    try:
-        items = _object.split(delimiter)
-    except AttributeError:
-        items = _object
-    try:
-        items = items * repeat
-        combo = itertools.combinations(items, size)
-        full_list = []
-        while True:
-            try:
-                comb = next(combo)
-                sub = [str(cmb) for cmb in comb]
-                full_list.append("".join(sub))
-            except StopIteration:
-                break
-        new_list = list(set(full_list))
-        new_list.sort()
-        return new_list
-    except (TypeError, AttributeError):
-        feedback(f'Unable to create combinations from "{_object}"', False, True)
-        return []
-
-
 def to_int(value: Any, name: str = "", fail: bool = True) -> int:
     """Convert value to an integer.
 
@@ -434,6 +478,14 @@ def excels(start: int, end: int, step: int = 1, is_real: bool = True):
     nums = steps(start, end, step=step, is_real=is_real)
     result = [excel_column(num) for num in nums]
     return result
+
+
+def file_exists(filename: str) -> bool:
+    """Check if a file exists at the given path."""
+    file_path = Path(filename)
+    if file_path.exists():
+        return True
+    return False
 
 
 def pdf_export(

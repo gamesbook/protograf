@@ -48,11 +48,14 @@ a handy cross-reference to the detailed information for that command.
    :ref:`countersheet <the-countersheet-command>` - typically sourced from a CSV or
    Excel file, or a Google Sheet
 -  :ref:`D6 <d6-object>` * - create top-down view of a six-sided die
--  :ref:`Domino <domino-object>` * - create top-down view of a domino
 -  :ref:`Deck <the-deck-command>`  - details for a deck, containing one or
    more :ref:`cards <the-card-command>`
 -  :ref:`Default <the-default-command>` - set the properties that can be used by
    any shape
+-  :doc:`DiamondLocations <layouts_diamond>`- defines an ordered series of
+   row and column locations that create a diamond grid of shapes - the grid itself
+   is not displayed; it is used in a :ref:`Layout <layout-command>` command
+-  :ref:`Domino <domino-object>` * - create top-down view of a domino
 -  :ref:`Dot <dot-command>` * - a geometric shape that can be drawn on a page
 -  :ref:`DotGrid <dotgrid-command>` - a set, or group, of dots that can be drawn on a page
 -  :ref:`Ellipse <ellipse-command>` * - a geometric shape that can be drawn on a page
@@ -71,8 +74,8 @@ a handy cross-reference to the detailed information for that command.
 -  :ref:`Image <image-command>` - an external image to be shown on a page or card
 -  :ref:`L <the-lookup-command>` - short for *Lookup*; a way to access data in a set
    from another :ref:`card <the-card-command>` in a :ref:`deck <the-deck-command>`
--  :ref:`Layout <layoutIndex>` -  used in conjuction with a location-based
-   grid and specifies the shapes that are to be drawn at the grid locations
+-  :ref:`Layout <layout-command>` -  used in conjuction with a location-based
+   grid and specifies the shapes that are to be drawn at that grid's locations
 -  :ref:`Line <line-command>` * - a geometric shape that can be drawn on a page
 -  :ref:`Lines <lines-command>` - a set, or group, of lines that can be drawn on a page
 -  :ref:`LinkLine <linkline-command>` - a line joining one or more hexagons inside a
@@ -96,7 +99,7 @@ a handy cross-reference to the detailed information for that command.
 -  :ref:`Rectangles <rectangles-command>` - a set, or group, of rectangles that can be drawn on a page
 -  :doc:`RectangularLocations <layouts_rectangular>` - defines an ordered series of
    row and column locations that create a rectangular grid of shapes - the grid itself
-   is not displayed; it is used in a :ref:`Layout <layoutIndex>` command.
+   is not displayed; it is used in a :ref:`Layout <layout-command>` command.
 -  :ref:`Rhombus <rhombus-command>` * - a geometric shape that can be drawn on a page
 -  :ref:`S <the-selection-command>` - short for *Selection*; the way to draw a
    shape on a :ref:`card <the-card-command>` depending on a condition
@@ -121,7 +124,7 @@ a handy cross-reference to the detailed information for that command.
    can be drawn on a page
 -  :doc:`TriangularLocations <layouts_triangular>`- defines an ordered series of
    row and column locations that create a triangular grid of shapes - the grid itself
-   is not displayed; it is used in a :ref:`Layout <layoutIndex>` command
+   is not displayed; it is used in a :ref:`Layout <layout-command>` command
 
 .. IMPORTANT::
 

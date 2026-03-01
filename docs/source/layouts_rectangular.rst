@@ -13,16 +13,14 @@ ideas for :doc:`protograf <index>` as presented in the
 and that you've created some basic scripts of your own using the
 :doc:`Core Shapes <core_shapes>`.
 
-This is part of the set of commands use for :doc:`Layouts <layouts>`.
+This is part of the set of commands used for :doc:`Layouts <layouts>`,
+that are used in conjunction with the :doc:`Layout command <layout_command>`.
 
 .. _table-of-contents-rect:
 
 - `Overview`_
 - `Usage`_
-
-  - `RectangularLocations`_
-  - `Layout Command`_
-- `Key Properties`_
+- `Properties`_
 
 
 Overview
@@ -30,12 +28,15 @@ Overview
 `↑ <table-of-contents-rect_>`_
 
 The ``RectangularLocations()`` command defines an ordered series
-of row and column locations that create a rectangular grid.  The x- and
-y-values of these rows and columns are then used to set the centres of
-the elements that can be placed there using the ``Layout()`` command.
+of row and column locations that create a rectangular **grid**.
 
-The rows and columns themselves are not drawn |dash| if needed you can use
-the *debug* property to display them (see `Example 10. Debug`_  below).
+The x- and y-values of these rows and columns are then used to set
+the centres of the shapes that can be placed there using the
+:ref:`Layout() <layout-command>` command.
+
+The centres of the rows and columns themselves are not drawn |dash|
+if needed you can use the *debug* property to display them
+(see `Example 10. Debug`_  below).
 
 Apart from the ``RectangularLocations()`` command described here,
 there are also these other commands which allow you to layout
@@ -45,16 +46,18 @@ elements in a more repetitive or regular way within a page:
 - :doc:`Sequence <layouts_sequence>`
 - :doc:`Tracks <layouts_track>`
 - :doc:`TriangularLocations <layouts_triangular>`
+- :doc:`DiamondLocations <layouts_diamond>`
 
 
 Usage
 =====
 `↑ <table-of-contents-rect_>`_
 
-RectangularLocations
---------------------
+``RectangularLocations()`` creates a "virtual" grid that always has the
+first row and first column in the upper-left corner and the last row and last
+column in the lower-right corner.
 
-The ``RectangularLocations()`` command accepts the following properties:
+The command accepts the following properties:
 
 - **cols** - this is the number of locations in the horizontal direction; this
   defaults to *2*
@@ -79,54 +82,18 @@ The ``RectangularLocations()`` command accepts the following properties:
   - *outer* - which means only the locations in the outer-most edge of the grid
     are created
 
-The ``RectangularLocations()`` creates a "virtual" grid that always has the
-first row and first column in the upper-left corner and the last row and last
-column in the lower-right corner.
 
-.. _layoutIndex:
+.. NOTE::
 
-Layout Command
---------------
+    Bear in mind that the ``RectangularLocations()`` command is designed
+    to work in conjunction with a :ref:`Layout() command <layout-command>`
+    which accepts, as its first property, the name assigned to the **grid**.
 
-The ``Layout()`` command - designed to be used in conjuction with a
-location-based grid - specifies the shapes that are to be drawn at locations.
-
-It accepts the following properties:
-
-- **grid** - this *must* be the first property used for the command; it will
-  refer to, in this case, a row & column grid created by ``RectangularLocations()``
-- **locations** - a list of sets of ``(col, row)`` pairs; these are locations
-  that will be used for drawing, in the order that they appear
-- **shapes** - this is a list of one or more of the core shapes available,
-  for example, a circle or rectangle; if no shapes are provided, the program
-  will issue a ``WARNING`` message
-- **masked** - a list of sequence numbers for the locations in which shapes
-  should **not** be displayed
-- **visible** - a list of sequence numbers for the **only** locations in
-  which shapes should be displayed
-
-Debug
-~~~~~
-
-A property that is not usually used for a final layout, but can be helpful
-during the design stage is  **debug**.
-
-**debug** will display the centre points of the grid, along with any
-extra information specified.  Allowed values for debug include:
-
-  - *none* - only the locations are shown as small dots; matching the color
-    of the :ref:`Blueprint <blueprintIndex>`
-  - *count* - shows the sequence number i.e. the order of drawing
-  - *xy* - shows x- and y-values
-  - *yx* - shows y- and x-values
-  - *rowcol* - shows row and column numbers
-  - *colrow* - shows column and row numbers
-  - *id* - shows the internal ID number assigned to the location
 
 .. _key-properties-rect:
 
-Key Properties
-==============
+Properties
+==========
 `↑ <table-of-contents-rect_>`_
 
 - `Example 1. Rows and Columns`_
@@ -144,6 +111,11 @@ Key Properties
 - `Example 8. Visible`_
 - `Example 9. Locations Setting`_
 - `Example 10. Debug`_
+- `Example 11. Gridlines - Orthogonal`_
+- `Example 12. Gridlines - Diagonal`_
+- `Example 13. Gridlines - Fill`_
+- `Example 14. Shapes - by Rows`_
+- `Example 15. Shapes - by Columns`_
 
 All examples below make use of a common ``Circle`` shape (assigned to
 the name *a_circle*) defined as:
@@ -597,7 +569,8 @@ Example 9. Locations Setting
 
       The shapes are allocated to the list of *locations* provided.
 
-      Each location is identified by its ``(row, column)`` numbers.
+      Each location is identified by its pair of ``(column, row)``
+      numbers.
 
       The shape allocation cycles through the list of *shapes* provided;
       in this case the Circle and Rectangle.
@@ -672,5 +645,223 @@ Example 10. Debug
       This is useful to visualise the **identity** of each location; for
       example, if you needed to make any of these locations *visible* or
       *masked*.
+
+===== ======
+
+
+Example 11. Gridlines - Orthogonal
+----------------------------------
+`^ <key-properties-rect_>`_
+
+.. |11g| image:: images/layouts/rect_locs_grid_orth.png
+   :width: 330
+
+===== ======
+|11g| This example shows the design constructed using the following values
+      for the shapes' properties.
+
+      .. code:: python
+
+        small_circle = circle(
+          radius=0.15,
+          fill="tomato")
+        rct = RectangularLocations(
+           cols=3, rows=5,
+           start="NE",
+           direction="west")
+        Layout(
+           rct,
+           gridlines='o',
+           gridlines_stroke="gold",
+           gridlines_stroke_width=2,
+           shapes=[small_circle])
+
+      Here, the grid itself is displayed |dash| it is always drawn first
+      before any shapes.
+
+      The outline of the grid is always drawn.
+
+      The key prefix is *gridlines* and the value assigned to it will
+      determine in which direction, or directions, the gridlines are drawn;
+      in this case, all ``orthogonal`` lines.
+
+      The usual customisation settings are possible for the gridlines;
+      color, thickness, etc.
+
+===== ======
+
+
+Example 12. Gridlines - Diagonal
+--------------------------------
+`^ <key-properties-rect_>`_
+
+.. |12g| image:: images/layouts/rect_locs_grid_diag.png
+   :width: 330
+
+===== ======
+|12g| This example shows the design constructed using the following values
+      for the shapes' properties.
+
+      .. code:: python
+
+        small_circle = circle(
+          radius=0.15,
+          fill="tomato")
+        rct = RectangularLocations(
+           cols=4, rows=4,
+           start="NE",
+           direction="west")
+        Layout(
+           rct,
+           gridlines='d n',
+           gridlines_stroke="gold",
+           gridlines_stroke_width=2,
+           shapes=[small_circle])
+
+      Here, the grid itself is displayed |dash| it is always drawn first
+      before any shapes.
+
+      The outline of the grid is always drawn.
+
+      The key prefix is *gridlines* and the value assigned to it will
+      determine in which direction, or directions, the gridlines are drawn;
+      in this case, all ``north`` and ``diagonal`` lines.
+
+      The usual customisation settings are possible for the gridlines;
+      color, thickness, etc.
+
+===== ======
+
+
+Example 13. Gridlines - Fill
+----------------------------
+`^ <key-properties-rect_>`_
+
+.. |13g| image:: images/layouts/rect_locs_grid_fill.png
+   :width: 330
+
+===== ======
+|13g| This example shows the design constructed using the following values
+      for the shapes' properties.
+
+      .. code:: python
+
+        small_circle = circle(
+          radius=0.15,
+          fill="tomato")
+        rct = RectangularLocations(
+           cols=3, rows=5,
+           start="NE",
+           direction="west")
+        Layout(
+           rct,
+           gridlines='*',
+           gridlines_fill="aqua",
+           gridlines_stroke="gold",
+           gridlines_stroke_width=2,
+           shapes=[small_circle])
+
+      Here, the grid itself is displayed |dash| it is always drawn first
+      before any shapes.
+
+      The outline of the grid is always drawn.  If the *gridlines_fill*
+      property is assigned a color, then the grid will be filled with that
+      color before any gridlines are drawn.
+
+      The key prefix is *gridlines* and the value assigned to it will
+      determine in which direction, or directions, the gridlines are drawn;
+      in this case, because of the ``*`` value, they are drawn in all
+      possible directions.
+
+      The usual customisation settings are possible for the gridlines;
+      color, thickness, etc.
+
+      .. NOTE::
+
+        Although gridlines *could* be drawn in all directions, in this case
+        they will not be because the grid is rectangular |dash| only square
+        shaped grids will have diagonal lines drawn for them.
+
+===== ======
+
+
+Example 14. Shapes - by Rows
+----------------------------
+`^ <key-properties-rect_>`_
+
+.. |14g| image:: images/layouts/rect_locs_shape_rows.png
+   :width: 330
+
+===== ======
+|14g| This example shows the shape constructed using differing values for
+      its properties.
+
+      .. code:: python
+
+        rct = RectangularLocations(
+          facing='north',
+          y=1, x=1,
+          side=.66,
+          cols=4, rows=6)
+        Layout(
+          rct,
+          shapes=[gold_circle])
+        Layout(
+          rct,
+          rows=[1, 3, 5],
+          shapes=[red_circle],
+          debug='c')
+
+      Here, two sets of circles are drawn onto the diamond grid.
+
+      The first set |dash| the ``gold`` circles |dash| are drawn at every
+      location.
+
+      The second set |dash| the ``red`` circles |dash| are drawn on specific
+      rows; in this case, every odd numbered row, via the list of
+      numbers assigned to the *rows* property.
+
+      The *debug* value in the red circles shows the row number (in order).
+
+===== ======
+
+
+Example 15. Shapes - by Columns
+-------------------------------
+`^ <key-properties-rect_>`_
+
+.. |15g| image:: images/layouts/rect_locs_shape_cols.png
+   :width: 330
+
+===== ======
+|15g| This example shows the shape constructed using differing values for
+      its properties.
+
+      .. code:: python
+
+        rct = RectangularLocations(
+          facing='north',
+          y=1, x=1,
+          side=.66,
+          cols=4, rows=6)
+        Layout(
+          rct,
+          shapes=[gold_circle])
+        Layout(
+          rct,
+          cols=[1, 4],
+          shapes=[red_circle],
+          debug='c')
+
+      Here, two sets of circles are drawn onto the diamond grid.
+
+      The first set |dash| the ``gold`` circles |dash| are drawn at every
+      location.
+
+      The second set |dash| the ``red`` circles |dash| are drawn on specific
+      columns; in this case, the leftmost and the rightmost, via the
+      list of numbers assigned to the *cols* property.
+
+      The *debug* value in the red circles shows the column number (in order).
 
 ===== ======

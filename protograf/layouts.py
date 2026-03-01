@@ -18,9 +18,9 @@ from protograf.utils.structures import (
     VirtualHex,
     Locale,
 )
-from protograf.utils import geoms, tools, support
+from protograf.utils import colrs, geoms, tools, support
 from protograf.utils.tools import _lower
-from protograf.base import BaseShape, BaseCanvas
+from protograf.base import BaseShape, BaseCanvas, WIDTH
 from protograf.shapes import TextShape
 from protograf.shapes_hexagon import HexShape
 
@@ -751,6 +751,8 @@ class RepeatShape(BaseShape):
                                 new_ele = flat_ele
                             new_ele.draw(off_x=off_x, off_y=off_y, ID=_ID, **kwargs)
                         except AttributeError:
+                            if not flat_ele:
+                                feedback("No shape to repeat!", True)
                             new_ele = flat_ele(cid=self.shape_id)
                             log.debug("%s %s", new_ele, type(new_ele))
                             if new_ele:
@@ -801,6 +803,23 @@ class VirtualShape:
         except Exception:
             _label = f" for {label}" if label else ""
             feedback(f'"{value}"{_label} is not a valid floating number!', True)
+
+    def unit(self, item, units: str = None, skip_none: bool = False, label: str = ""):
+        """Convert an item into the appropriate unit system."""
+        log.debug("units %s %s :: label: %s", units, globals.units, label)
+        if item is None and skip_none:
+            return None
+        units = support.to_units(units) if units is not None else globals.units
+        try:
+            _item = tools.as_float(item, label)
+            return _item * units
+        except (TypeError, ValueError):
+            _label = f" {label}" if label else ""
+            feedback(
+                f"Unable to set unit value for{_label}: {item}."
+                " Please check that this is a valid value.",
+                stop=True,
+            )
 
 
 # ---- virtual HexHex grid
@@ -955,6 +974,11 @@ class HexHexLocations(VirtualShape):
         )
         return hex_geometry
 
+    @property
+    def grid_centroid(self) -> Point:
+        """Centre point of Grid in user units."""
+        return None
+
     def construct_grid(self):
         """Create a virtual hexhex grid, with identified locations."""
         ghex = self.get_geometry()
@@ -1079,20 +1103,21 @@ class VirtualLocations(VirtualShape):
         self.interval = kwargs.get("interval", 1)
         self.interval_y = kwargs.get("interval_y", self.interval)
         self.interval_x = kwargs.get("interval_x", self.interval)
-        # offset
+        # ---- offset
         self.col_even = kwargs.get("col_even", 0)
         self.col_odd = kwargs.get("col_odd", 0)
         self.row_even = kwargs.get("row_even", 0)
         self.row_odd = kwargs.get("row_odd", 0)
-        # layout
+        # ---- layout
         self.pattern = kwargs.get("pattern", "default")
-        self.direction = kwargs.get("direction", "east")
-        self.facing = kwargs.get("facing", "east")  # for diamond, triangle
+        self.direction = kwargs.get("direction", "east")  # for diamond, triangle
+        self.facing = kwargs.get("facing", "east")
         self.flow = None  # used for snake; see validate() for setting
-        # start / end
+        # ---- start / end
         self.start = kwargs.get("start", None)
         self.stop = kwargs.get("stop", 0)
         self.label_style = kwargs.get("label_style", None)
+        # ----  check!
         self.validate()
 
     def validate(self):
@@ -1149,7 +1174,11 @@ class VirtualLocations(VirtualShape):
             or "e" in _lower(self.start)[0]
             and "e" in _lower(self.direction)[0]
         ):
-            feedback(f"Cannot use {self.start} with {self.direction}!", True)
+            if not isinstance(self, DiamondLocations):  # diamond does not use facing
+                feedback(
+                    f"Cannot use start '{self.start}' with facing '{self.direction}'!",
+                    True,
+                )
         if _lower(self.direction) in ["north", "n", "south", "s"]:
             self.flow = "vert"
         elif _lower(self.direction) in ["west", "w", "east", "e"]:
@@ -1171,7 +1200,7 @@ class VirtualLocations(VirtualShape):
         else:
             return f"{col},{row}"
 
-    def set_compass(self, compass: str) -> str:
+    def set_compass_primary(self, compass: str) -> str:
         """Return full lower-case value of primary compass direction."""
         if not compass:
             return None
@@ -1189,6 +1218,30 @@ class VirtualLocations(VirtualShape):
                 raise ValueError(
                     f'"{compass}" is an invalid primary compass direction!'
                 )
+
+    def set_compass_secondary(self, compass: str) -> str:
+        """Return full lower-case value of secondary compass direction."""
+        if not compass:
+            return None
+        _compass = _lower(compass)
+        match _compass:
+            case "nw" | "northwest":
+                return "northwest"
+            case "sw" | "southwest":
+                return "southwest"
+            case "se" | "southeast":
+                return "southeast"
+            case "ne" | "northeast":
+                return "northeast"
+            case _:
+                raise ValueError(
+                    f'"{compass}" is an invalid secondary compass direction!'
+                )
+
+    @property
+    def grid_centroid(self) -> Point:
+        """Centre point of Grid in user units."""
+        return None
 
     def next_locale(self) -> Locale:
         """Yield next Locale for each call."""
@@ -1213,9 +1266,16 @@ class RectangularLocations(VirtualLocations):
         else:
             self.interval_y = self.interval
         self.start = kwargs.get("start", "sw")
+        self.rectangle_validate(**kwargs)
+        # ---- calculated values
+        self.total_height = self.interval_x * (self.rows - 1)
+        self.total_width = self.interval_y * (self.cols - 1)
+
+    def rectangle_validate(self, **kwargs):
+        """Check that settings for RectangularLocations are correct."""
         if self.cols < 2 or self.rows < 2:
             feedback(
-                f"Minimum layout size is 2x2 (cannot use {self.cols }x{self.rows})!",
+                f"Minimum rectangular layout size is 2x2 (cannot use {self.cols }x{self.rows})!",
                 True,
             )
         if _lower(self.start) not in ["sw", "se", "nw", "ne"]:
@@ -1228,6 +1288,30 @@ class RectangularLocations(VirtualLocations):
             feedback("Using side will override interval_x and offset values!", False)
         if self.side and kwargs.get("interval_y"):
             feedback("Using side will override interval_y and offset values!", False)
+
+    @property
+    def grid_centroid(self) -> Point:
+        """Centre point of Grid in user units."""
+        self.centre_x = self.x + 0.5 * self.total_width
+        self.centre_y = self.y + 0.5 * self.total_height
+        """
+        _start = self.set_compass_secondary(_lower(self.start))
+        # ---- calculate centre points relative to facing
+        match _start:
+            case "northwest":
+                self.centre_x = self.x + 0.5 * self.total_width
+                self.centre_y = self.y + 0.5 * self.total_height
+            case "northeast":
+                self.centre_x = self.x - 0.5 * self.total_width
+                self.centre_y = self.y + 0.5 * self.total_height
+            case "southwest":
+                self.centre_x = self.x + 0.5 * self.total_width
+                self.centre_y = self.y + 0.5 * self.total_height
+            case "southeast":
+                self.centre_x = self.x - 0.5 * self.total_width
+                self.centre_y = self.y - 0.5 * self.total_height
+        """
+        return Point(self.centre_x, self.centre_y)
 
     def next_locale(self) -> Locale:
         """Yield next Location for each call."""
@@ -1476,9 +1560,25 @@ class TriangularLocations(VirtualLocations):
         self.kwargs = kwargs
         self.start = kwargs.get("start", "north")
         self.facing = kwargs.get("facing", "north")
+        self.triangle_validate(**kwargs)
+        # ---- calculated values
+        _facing = self.set_compass_primary(_lower(self.facing))
+        match _facing:
+            case "north" | "south":  # layout is row-oriented
+                self.interval_x = self.side
+                self.interval_y = math.sqrt(3) / 2.0 * self.side
+                self.total_width = self.side * (self.cols - 1)
+            case "east" | "west":  # layout is col-oriented
+                self.interval_x = math.sqrt(3) / 2.0 * self.side
+                self.interval_y = self.side
+                self.total_width = self.side * (self.rows - 1)
+        self.total_height = math.sqrt(self.total_width**2 * 0.5)
+
+    def triangle_validate(self, **kwargs):
+        """Check that settings for TriangularLocations are correct."""
         if (self.cols < 2 and self.rows < 1) or (self.cols < 1 and self.rows < 2):
             feedback(
-                f"Minimum layout size is 2x1 or 1x2 (cannot use {self.cols }x{self.rows})!",
+                f"Minimum triangular layout size is 2x1 or 1x2 (cannot use {self.cols }x{self.rows})!",
                 True,
             )
         if _lower(self.start) not in [
@@ -1496,15 +1596,38 @@ class TriangularLocations(VirtualLocations):
                 True,
             )
 
+    @property
+    def grid_centroid(self) -> Point:
+        """Centre point of Grid in user units."""
+        _facing = self.set_compass_primary(_lower(self.facing))
+        match _facing:
+            case "north":
+                self.centre_x = self.x
+                self.centre_y = self.y + self.total_width / math.sqrt(3)
+            case "south":
+                self.centre_x = self.x
+                self.centre_y = self.y - self.total_width * math.sqrt(3) / 6
+                # but need to shift back up because tri rotated around centre
+                self.centre_y = self.centre_y - math.sqrt(
+                    0.75 * (self.total_width / 3.0) ** 2
+                )
+            case "east":
+                self.centre_y = self.y
+                self.centre_x = self.x - self.total_width / math.sqrt(3)
+            case "west":
+                self.centre_y = self.y
+                self.centre_x = self.x + self.total_width / math.sqrt(3)
+            case _:
+                raise NotImplementedError(f"Cannot yet calculate centre for {_facing}")
+        return Point(self.centre_x, self.centre_y)
+
     def next_locale(self) -> Locale:
         """Yield next Location for each call."""
-        _start = self.set_compass(_lower(self.start))
-        # _dir = self.set_compass(_lower(self.direction))
-        _facing = self.set_compass(_lower(self.facing))
-
+        _start = self.set_compass_primary(_lower(self.start))
+        _facing = self.set_compass_primary(_lower(self.facing))
         # TODO - create logic
         if _lower(self.pattern) in ["snake", "snaking", "s"]:
-            feedback("Snake pattern NOT YET IMPLEMENTED", True)
+            feedback("Snake pattern NOT YET IMPLEMENTED for TriangleLocations", True)
 
         # ---- store row/col as list of lists
         array = []
@@ -1616,17 +1739,190 @@ class DiamondLocations(VirtualLocations):
     Common properties and methods to define virtual diamond locations.
     """
 
-    def __init__(self, rows=1, cols=2, **kwargs):
+    def __init__(self, rows=0, cols=0, **kwargs):
         super().__init__(rows, cols, **kwargs)
         self.kwargs = kwargs
-        if (self.cols < 2 and self.rows < 1) or (self.cols < 1 and self.rows < 2):
+        if self.cols and not self.rows:
+            self.rows = self.cols
+        if self.rows and not self.cols:
+            self.cols = self.rows
+        if not self.rows and not self.cols:
+            self.cols = 3
+            self.rows = 3
+        self.diamond_validate()
+        # ---- calculated settings
+        self._side = self.side  # self.unit(self.side) KEEP USER UNITS
+        self.gap_col = math.sqrt(self._side**2 - (0.5 * self._side) ** 2)
+        self.gap_row = self._side * 0.5
+        self.total_height = 2 * self.gap_row * (self.rows // 2)
+        self.total_width = self.gap_col * (self.cols - 1)
+        self.array = self.diamond_array()
+        # feedback(f"~~~ Dia {self.gap_col=} {self.total_height=} {self.total_width=}", False)
+
+    def diamond_validate(self):
+        """Check that settings for DiamondLayout are correct."""
+        if self.cols < 3 or self.rows < 3:
             feedback(
-                f"Minimum layout size is 2x1 or 1x2 (cannot use {self.cols }x{self.rows})!",
+                f"Minimum diamond layout size is 3x3 (cannot use {self.cols }x{self.rows})!",
+                True,
+            )
+        if self.cols != self.rows:
+            feedback(
+                f"Diamond layout requires equal rows and cols (cannot use {self.cols }x{self.rows})!",
+                True,
+            )
+        if not (self.cols & 1 == 1):
+            feedback(
+                f"Diamond layout requires odd rows and cols (cannot use {self.cols }x{self.rows})!",
+                True,
+            )
+        if _lower(self.facing) not in [
+            "north",
+            "south",
+            "east",
+            "west",
+            "n",
+            "e",
+            "w",
+            "s",
+        ]:
+            feedback(
+                f"'{self.facing}' is not a valid facing - use: 'n', 's', 'e', or 'w'",
                 True,
             )
 
+    def diamond_array(self) -> list:
+        """Calculate sequenced rows and columns for DiamondLayout."""
+        _facing = self.set_compass_primary(_lower(self.facing))
+        # ---- store col/row as list of lists
+        array = []
+        match _facing:
+            case "north":
+                start_col = self.cols // 2 + 1
+                mid_row = self.rows // 2 + 1
+                items = 1
+                for row in range(1, self.rows + 1):
+                    for arr in range(0, items):
+                        array.append([start_col + arr * 2, row])
+                    if row < mid_row:
+                        items += 1
+                        start_col -= 1
+                    else:
+                        items -= 1
+                        start_col += 1
+            case "south":
+                start_col = self.cols // 2 + 1
+                mid_row = self.rows // 2 + 1
+                items = 1
+                for row in range(self.rows, 0, -1):
+                    for arr in range(0, items):
+                        array.append([start_col + arr * 2, row])
+                    if row > mid_row:
+                        items += 1
+                        start_col -= 1
+                    else:
+                        items -= 1
+                        start_col += 1
+            case "east":
+                start_row = self.rows // 2 + 1
+                mid_col = self.cols // 2 + 1
+                items = 1
+                for col in range(self.cols, 0, -1):
+                    for arr in range(0, items):
+                        array.append([col, start_row + arr * 2])
+                    if col > mid_col:
+                        items += 1
+                        start_row -= 1
+                    else:
+                        items -= 1
+                        start_row += 1
+            case "west":
+                start_row = self.rows // 2 + 1
+                mid_col = self.cols // 2 + 1
+                items = 1
+                for col in range(1, self.cols + 1):
+                    for arr in range(0, items):
+                        array.append([col, start_row + arr * 2])
+                    if col < mid_col:
+                        items += 1
+                        start_row -= 1
+                    else:
+                        items -= 1
+                        start_row += 1
+            case _:
+                feedback(
+                    f"'{self.start}' is not a valid start - use: 'n', 's', 'e', or 'w'",
+                    True,
+                )
+        # feedback(f"~~~ Dia {_facing=} {array=}", False)
+        return array
+
+    @property
+    def grid_centroid(self) -> Point:
+        """Centre point of Grid in user units."""
+        _facing = self.set_compass_primary(_lower(self.facing))
+        # ---- calculate centre points relative to facing
+        match _facing:
+            case "north":
+                self.centre_x = self.x
+                self.centre_y = self.y + 0.5 * self.total_height
+            case "south":
+                self.centre_x = self.x
+                self.centre_y = self.y - 0.5 * self.total_height
+            case "east":
+                self.centre_x = self.x - 0.5 * self.total_width
+                self.centre_y = self.y
+            case "west":
+                self.centre_x = self.x + 0.5 * self.total_width
+                self.centre_y = self.y
+        return Point(self.centre_x, self.centre_y)
+
     def next_locale(self) -> Locale:
         """Yield next Location for each call."""
+        corner = None
+        # ---- get offset
+        _facing = self.set_compass_primary(_lower(self.facing))
+        # ---- calculate initial location relative to facing
+        match _facing:
+            case "north":
+                self.start_x = self.x - 0.5 * self.total_width
+                self.start_y = self.y
+            case "south":
+                self.start_x = self.x - 0.5 * self.total_width
+                self.start_y = self.y - self.total_height
+            case "east":
+                self.start_x = self.x - self.total_width
+                self.start_y = self.y - 0.5 * self.total_height
+            case "west":
+                self.start_x = self.x
+                self.start_y = self.y - 0.5 * self.total_height
+        # ---- iterate the array
+        for key, entry in enumerate(self.array):
+            if entry[0] == self.cols // 2 + 1 and (
+                entry[1] == 1 or entry[1] == self.rows
+            ):
+                corner = True
+            elif entry[1] == self.rows // 2 + 1 and (
+                entry[0] == 1 or entry[0] == self.cols
+            ):
+                corner = True
+            else:
+                corner = None
+            dx, dy = entry[0], entry[1]  # col & row numbers
+            x = self.start_x + (dx - 1) * self.gap_col
+            y = self.start_y + (dy - 1) * self.gap_row
+            # ("col", "row", "x", "y", "id", "sequence", "corner", "label", "page")
+            _locale = Locale(
+                entry[0],
+                entry[1],
+                x,
+                y,
+                self.set_id(entry[0], entry[1]),
+                key + 1,
+                corner,
+            )
+            # print(_locale.col, _locale.row, _locale.corner)
+            yield _locale
 
 
 # ---- tracks

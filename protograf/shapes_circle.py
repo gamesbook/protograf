@@ -151,111 +151,137 @@ class CircleShape(BaseShape):
             y_c: y-centre of circle
             rotation: degrees anti-clockwise from horizontal "east"
         """
-        _dirs = tools.validated_directions(
-            self.hatches, DirectionGroup.CIRCULAR, "circle hatches"
-        )
-        lines = tools.as_int(num, "hatches_count")
-        if lines < 0:
-            feedback("Cannot draw negative number of lines!", True)
-        dist = (self._u.radius * 2.0) / (lines + 1)
-        partial = lines // 2
 
-        # calculate relative distances for each line - (x, y) tuples
-        vertical_distances, horizontal_distances = [], []
-        for line_no in range(1, partial + 1):
-            if lines & 1:
-                dist_h = dist * line_no
-            else:
-                dist_h = dist * 0.5 if line_no == 1 else dist * line_no - dist * 0.5
-            dist_v = math.sqrt(self._u.radius * self._u.radius - dist_h * dist_h)
-            vertical_distances.append((dist_h, dist_v))
-            horizontal_distances.append((dist_v, dist_h))
+        def draw_lines(_dirs, lines):
+            """Draw lines for a given direction."""
+            partial = lines // 2
+            dist = (self._u.radius * 2.0) / (lines + 1)
+            num = lines
+            # calculate relative distances for each line - (x, y) tuples
+            vertical_distances, horizontal_distances = [], []
+            for line_no in range(1, partial + 1):
+                if lines & 1:
+                    dist_h = dist * line_no
+                else:
+                    dist_h = dist * 0.5 if line_no == 1 else dist * line_no - dist * 0.5
+                dist_v = math.sqrt(self._u.radius * self._u.radius - dist_h * dist_h)
+                vertical_distances.append((dist_h, dist_v))
+                horizontal_distances.append((dist_v, dist_h))
 
-        if num >= 1 and lines & 1:  # is odd - draw centre lines
+            if num >= 1 and lines & 1:  # is odd - draw centre lines
+                if "e" in _dirs or "w" in _dirs or "o" in _dirs:  # horizontal
+                    cnv.draw_line(
+                        Point(x_c + self._u.radius, y_c),
+                        Point(x_c - self._u.radius, y_c),
+                    )
+                if "n" in _dirs or "s" in _dirs or "o" in _dirs:  # vertical
+                    cnv.draw_line(
+                        Point(x_c, y_c + self._u.radius),
+                        Point(x_c, y_c - self._u.radius),
+                    )
+                if "se" in _dirs or "nw" in _dirs or "d" in _dirs:  # diagonal  "down"
+                    poc_top_d = geoms.point_on_circle(
+                        Point(x_c, y_c), self._u.radius, 135
+                    )
+                    poc_btm_d = geoms.point_on_circle(
+                        Point(x_c, y_c), self._u.radius, 315
+                    )
+                    cnv.draw_line(poc_top_d, poc_btm_d)
+                if "ne" in _dirs or "sw" in _dirs or "d" in _dirs:  # diagonal  "up"
+                    poc_top_u = geoms.point_on_circle(
+                        Point(x_c, y_c), self._u.radius, 45
+                    )
+                    poc_btm_u = geoms.point_on_circle(
+                        Point(x_c, y_c), self._u.radius, 225
+                    )
+                    cnv.draw_line(poc_top_u, poc_btm_u)
+
+            if num <= 1:
+                return
+
             if "e" in _dirs or "w" in _dirs or "o" in _dirs:  # horizontal
-                cnv.draw_line(
-                    Point(x_c + self._u.radius, y_c),
-                    Point(x_c - self._u.radius, y_c),
-                )
+                for dist in horizontal_distances:
+                    cnv.draw_line(  # "above" diameter
+                        Point(x_c - dist[0], y_c + dist[1]),
+                        Point(x_c + dist[0], y_c + dist[1]),
+                    )
+                    cnv.draw_line(  # "below" diameter
+                        Point(x_c - dist[0], y_c - dist[1]),
+                        Point(x_c + dist[0], y_c - dist[1]),
+                    )
+
             if "n" in _dirs or "s" in _dirs or "o" in _dirs:  # vertical
-                cnv.draw_line(
-                    Point(x_c, y_c + self._u.radius),
-                    Point(x_c, y_c - self._u.radius),
-                )
+                for dist in vertical_distances:
+                    cnv.draw_line(  # "right" of diameter
+                        Point(x_c + dist[0], y_c + dist[1]),
+                        Point(x_c + dist[0], y_c - dist[1]),
+                    )
+                    cnv.draw_line(  # "left" of diameter
+                        Point(x_c - dist[0], y_c + dist[1]),
+                        Point(x_c - dist[0], y_c - dist[1]),
+                    )
+
             if "se" in _dirs or "nw" in _dirs or "d" in _dirs:  # diagonal  "down"
-                poc_top_d = geoms.point_on_circle(Point(x_c, y_c), self._u.radius, 135)
-                poc_btm_d = geoms.point_on_circle(Point(x_c, y_c), self._u.radius, 315)
-                cnv.draw_line(poc_top_d, poc_btm_d)
+                for dist in horizontal_distances:
+                    _angle = math.degrees(math.asin(dist[0] / self._u.radius))
+                    # "above right" of diameter
+                    dal = geoms.point_on_circle(
+                        Point(x_c, y_c), self._u.radius, 45.0 + _angle
+                    )
+                    dar = geoms.point_on_circle(
+                        Point(x_c, y_c), self._u.radius, 45.0 - _angle
+                    )  # + 45.)
+                    cnv.draw_line(dar, dal)
+                    # "below left" of diameter
+                    dbl = geoms.point_on_circle(
+                        Point(x_c, y_c), self._u.radius, 225.0 - _angle
+                    )
+                    dbr = geoms.point_on_circle(
+                        Point(x_c, y_c), self._u.radius, 225.0 + _angle
+                    )
+                    cnv.draw_line(dbr, dbl)
+                    # TEST cnv.circle(dal.x, dal.y, 2, stroke=1, fill=1 if self.fill else 0)
+
             if "ne" in _dirs or "sw" in _dirs or "d" in _dirs:  # diagonal  "up"
-                poc_top_u = geoms.point_on_circle(Point(x_c, y_c), self._u.radius, 45)
-                poc_btm_u = geoms.point_on_circle(Point(x_c, y_c), self._u.radius, 225)
-                cnv.draw_line(poc_top_u, poc_btm_u)
+                for dist in vertical_distances:
+                    _angle = math.degrees(math.asin(dist[0] / self._u.radius))
+                    # "above left" of diameter
+                    poc_top = geoms.point_on_circle(
+                        Point(x_c, y_c), self._u.radius, _angle + 45.0
+                    )
+                    poc_btm = geoms.point_on_circle(
+                        Point(x_c, y_c), self._u.radius, 180.0 - _angle + 45.0
+                    )
+                    cnv.draw_line(poc_top, poc_btm)
+                    # "below right" of diameter
+                    poc_top = geoms.point_on_circle(
+                        Point(x_c, y_c), self._u.radius, 45 - _angle
+                    )
+                    poc_btm = geoms.point_on_circle(
+                        Point(x_c, y_c), self._u.radius, 180.0 + _angle + 45.0
+                    )
+                    cnv.draw_line(poc_top, poc_btm)
 
-        if num <= 1:
-            return
-
-        if "e" in _dirs or "w" in _dirs or "o" in _dirs:  # horizontal
-            for dist in horizontal_distances:
-                cnv.draw_line(  # "above" diameter
-                    Point(x_c - dist[0], y_c + dist[1]),
-                    Point(x_c + dist[0], y_c + dist[1]),
+        # ---- variable hatches
+        if isinstance(self.hatches, list):
+            for item in self.hatches:
+                if not isinstance(item, tuple) and len(item) < 2:
+                    feedback(
+                        "Circle hatches list must consist of (direction, count) values",
+                        True,
+                    )
+                _dirs = tools.validated_directions(
+                    item[0], DirectionGroup.CIRCULAR, "circle hatches"
                 )
-                cnv.draw_line(  # "below" diameter
-                    Point(x_c - dist[0], y_c - dist[1]),
-                    Point(x_c + dist[0], y_c - dist[1]),
-                )
-
-        if "n" in _dirs or "s" in _dirs or "o" in _dirs:  # vertical
-            for dist in vertical_distances:
-                cnv.draw_line(  # "right" of diameter
-                    Point(x_c + dist[0], y_c + dist[1]),
-                    Point(x_c + dist[0], y_c - dist[1]),
-                )
-                cnv.draw_line(  # "left" of diameter
-                    Point(x_c - dist[0], y_c + dist[1]),
-                    Point(x_c - dist[0], y_c - dist[1]),
-                )
-
-        if "se" in _dirs or "nw" in _dirs or "d" in _dirs:  # diagonal  "down"
-            for dist in horizontal_distances:
-                _angle = math.degrees(math.asin(dist[0] / self._u.radius))
-                # "above right" of diameter
-                dal = geoms.point_on_circle(
-                    Point(x_c, y_c), self._u.radius, 45.0 + _angle
-                )
-                dar = geoms.point_on_circle(
-                    Point(x_c, y_c), self._u.radius, 45.0 - _angle
-                )  # + 45.)
-                cnv.draw_line(dar, dal)
-                # "below left" of diameter
-                dbl = geoms.point_on_circle(
-                    Point(x_c, y_c), self._u.radius, 225.0 - _angle
-                )
-                dbr = geoms.point_on_circle(
-                    Point(x_c, y_c), self._u.radius, 225.0 + _angle
-                )
-                cnv.draw_line(dbr, dbl)
-                # TEST cnv.circle(dal.x, dal.y, 2, stroke=1, fill=1 if self.fill else 0)
-
-        if "ne" in _dirs or "sw" in _dirs or "d" in _dirs:  # diagonal  "up"
-            for dist in vertical_distances:
-                _angle = math.degrees(math.asin(dist[0] / self._u.radius))
-                # "above left" of diameter
-                poc_top = geoms.point_on_circle(
-                    Point(x_c, y_c), self._u.radius, _angle + 45.0
-                )
-                poc_btm = geoms.point_on_circle(
-                    Point(x_c, y_c), self._u.radius, 180.0 - _angle + 45.0
-                )
-                cnv.draw_line(poc_top, poc_btm)
-                # "below right" of diameter
-                poc_top = geoms.point_on_circle(
-                    Point(x_c, y_c), self._u.radius, 45 - _angle
-                )
-                poc_btm = geoms.point_on_circle(
-                    Point(x_c, y_c), self._u.radius, 180.0 + _angle + 45.0
-                )
-                cnv.draw_line(poc_top, poc_btm)
+                lines = tools.as_int(item[1], label="hatch count", minimum=1)
+                draw_lines(_dirs, lines)
+        # ---- common hatches
+        else:
+            _dirs = tools.validated_directions(
+                self.hatches, DirectionGroup.CIRCULAR, "circle hatches"
+            )
+            lines = tools.as_int(num, "hatches_count", minimum=1)
+            draw_lines(_dirs, lines)
 
         # ---- set canvas
         self.set_canvas_props(
@@ -757,7 +783,7 @@ class CircleShape(BaseShape):
                     )
             if item == "hatches":
                 # ---- * draw hatches
-                if self.hatches_count:
+                if self.hatches_count or isinstance(self.hatches, list):
                     self.draw_hatches(
                         cnv,
                         ID,

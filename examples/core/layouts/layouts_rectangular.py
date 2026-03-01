@@ -16,7 +16,7 @@ Create(filename="layouts_basic_rectangular.pdf",
        font_size=8,
        stroke_width=0.5)
 
-header = Common(x=0, y=0, font_size=6, align="left")
+header = Common(x=0, y=0, font_size=8, align="left")
 a_circle = circle(
     x=0, y=0, radius=0.5, label="{{sequence}}//{{col}}-{{row}}", label_size=6)
 
@@ -168,6 +168,62 @@ Blueprint(stroke_width=0.5)
 Text(common=header, text="Rect.Locations: SW->north: Outer")
 rect = RectangularLocations(cols=3, rows=4, start="SW", direction="north", pattern="outer")
 Layout(rect, shapes=[a_circle,])
+PageBreak()
+
+# ---- grid and fill
+small_circle = circle(radius=0.15, fill="tomato")
+
+Blueprint(stroke_width=0.5)
+Text(common=header, text="Rect.Locations: gridlines; fill")
+rct = RectangularLocations(cols=3, rows=5, start="NE", direction="west")
+Layout(
+   rct,
+   gridlines='*',
+   gridlines_fill="aqua",
+   gridlines_stroke="gold",
+   gridlines_stroke_width=2,
+   shapes=[small_circle])
+PageBreak()
+
+Blueprint(stroke_width=0.5)
+Text(common=header, text='Rect.Locations: gridlines "o"')
+rct = RectangularLocations(cols=3, rows=5, start="NE", direction="west")
+Layout(
+   rct,
+   gridlines='o',
+   gridlines_stroke="gold",
+   gridlines_stroke_width=2,
+   shapes=[small_circle])
+PageBreak()
+
+Blueprint(stroke_width=0.5)
+Text(common=header, text="Rect.Locations: gridlines: square")
+rct = RectangularLocations(cols=4, rows=4, start="NE", direction="west")
+Layout(
+   rct,
+   gridlines='d n',
+   gridlines_stroke="gold",
+   gridlines_stroke_width=2,
+   shapes=[small_circle])
+PageBreak()
+
+# ---- layout with filled shape
+red_circle = circle(radius=0.33, fill="tomato")
+gold_circle = circle(radius=0.33, fill="gold")
+
+Blueprint(stroke_width=0.5)
+Text(common=header, text="Rect.Locations: col shapes")
+rct = RectangularLocations(facing='north', y=1, x=1, side=.66, cols=4, rows=6)
+Layout(rct, shapes=[gold_circle])
+Layout(rct, cols=[1,4], shapes=[red_circle], debug='c')
+PageBreak()
+
+Blueprint(stroke_width=0.5)
+Text(common=header, text="Rect.Locations: row shapes")
+rct = RectangularLocations(facing='north', y=1, x=1, side=.66, cols=4, rows=6)
+Layout(rct, shapes=[gold_circle])
+Layout(rct, rows=[1,3,5], shapes=[red_circle], debug='r')
+# PageBreak()
 
 Save(
     output='png',
@@ -188,5 +244,12 @@ Save(
         "rect_locs_outer_ne_W", "rect_locs_outer_ne_S",
         "rect_locs_outer_se_N", "rect_locs_outer_se_W",
         "rect_locs_outer_sw_E", "rect_locs_outer_sw_N",
+
+        "rect_locs_grid_fill",
+        "rect_locs_grid_orth",
+        "rect_locs_grid_diag",
+
+        "rect_locs_shape_cols",
+        "rect_locs_shape_rows",
     ]
 )
