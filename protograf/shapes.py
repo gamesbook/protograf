@@ -990,7 +990,9 @@ class EllipseShape(BaseShape):
                 if radius_offset is not None and radius_offset != 0:
                     offset_pt = geoms.point_on_line(cntr_pt, diam_pt, radius_offset)
                     extra_fraction = radius_offset / radii_length
-                    end_pt = geoms.point_on_line(cntr_pt, diam_pt, (1. + extra_fraction))
+                    end_pt = geoms.point_on_line(
+                        cntr_pt, diam_pt, (1.0 + extra_fraction)
+                    )
                     x_start, y_start = offset_pt.x, offset_pt.y
                     x_end, y_end = end_pt.x, end_pt.y
                     # print(f'*** {rad_angle=} {radius_offset=} {cntr_pt=} {offset_pt=} {end_pt=}')
