@@ -294,7 +294,7 @@ def point_on_circle(point_centre: Point, radius: float, angle: float) -> Point:
 
     Args:
         point_center: the (x, y) coordinates of the circle centre
-        angle: the rotation angle in degrees (anti-clockwise)
+        angle: the rotation angle in degrees (anti-clockwise from x-axis baseline)
         radius: length of circle radius
 
     Doc Test:
@@ -317,6 +317,48 @@ def point_on_circle(point_centre: Point, radius: float, angle: float) -> Point:
     except Exception as exc:
         raise ValueError(
             f"Cannot calculate point on circle for: {point_centre}, {radius} and {angle}"
+        ) from exc
+    return Point(x, y)
+
+
+def point_on_ellipse(
+    point_centre: Point, angle: float, height: float, width: float
+) -> Point:
+    """Calculate Point on circumference of an ellipse at a specific angle in degrees
+
+    Args:
+        point_center: the (x, y) coordinates of the ellipse centre
+        angle: the rotation angle in degrees (anti-clockwise from x-axis baseline)
+        height: length of ellipse vertical axis
+        width: length of ellipse horizontal axis
+
+    Doc Test:
+
+    >>> P = Point(3, 4)
+    >>> R = None
+    >>> T = 30.0
+    >>> H = 4.0
+    >>> W = 10.0
+    >>> R = point_on_ellipse(P, R, T, H, W)
+    >>> round(R.x, 4)
+    5.8475
+    >>> round(R.y, 4)
+    5.644
+    """
+    try:
+        h2 = float(height / 2.0)
+        w2 = float(width / 2.0)
+    except ValueError:
+        feedback("Ellipse's height and width must be decimal or integer numbers.")
+        return point_centre
+    try:
+        theta = float(angle) * math.pi / 180.0
+        divisor = math.sqrt((h2 * math.cos(theta)) ** 2 + (w2 * math.sin(theta)) ** 2)
+        x = point_centre.x + (h2 * w2 * math.cos(theta)) / divisor
+        y = point_centre.y + (h2 * w2 * math.sin(theta)) / divisor
+    except Exception as exc:
+        raise ValueError(
+            f"Cannot calculate point on ellipse for: {point_centre} and angle: {angle}"
         ) from exc
     return Point(x, y)
 
