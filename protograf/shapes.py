@@ -938,13 +938,27 @@ class EllipseShape(BaseShape):
         """
         if self.radii:
             try:
+                if isinstance(self.radii, str):
+                    radii_list = tools.sequence_split(
+                        self.radii, to_int=False, clean=True
+                    )
+                else:
+                    radii_list = self.radii
+                all_radii = [
+                    (
+                        geoms.compass_to_angle(angle)[1]
+                        if isinstance(angle, str)
+                        else angle
+                    )
+                    for angle in radii_list
+                ]
                 _radii = [
-                    float(angle) for angle in self.radii if angle >= 0 and angle <= 360
+                    float(angle) for angle in all_radii if angle >= 0 and angle <= 360
                 ]
             except Exception:
                 feedback(
-                    f"The radii {self.radii} are not valid - must be a list of numbers"
-                    " from 0 to 360",
+                    f'The ellipse radii "{self.radii}" are not valid - '
+                    " must be a list of numbers from 0 to 360, or compass directions",
                     True,
                 )
             if self.radii_length and self.radii_offset:
@@ -954,7 +968,6 @@ class EllipseShape(BaseShape):
             else:
                 outer_radius = self.radius
             radius_offset = self.unit(self.radii_offset) or None
-            radius_length = self.unit(outer_radius, label="radius length")
             # print(f"*** {x_c=} {y_c=} :: {self.radii=}")
             # print(f'*** {radius_length=} :: {radius_offset=} :: {outer_radius=}')
             _radii_labels = [self.radii_labels]
@@ -972,27 +985,31 @@ class EllipseShape(BaseShape):
             # print(f'*** {_radii_labels=} {_radii_strokes=}')
             label_key, stroke_key = 0, 0
             label_points = []
-
             # ---- set radii styles
             lkwargs = {}
             lkwargs["wave_style"] = self.kwargs.get("radii_wave_style", None)
             lkwargs["wave_height"] = self.kwargs.get("radii_wave_height", 0)
+            # ---- calculate radii points
             cntr_pt = Point(x_c, y_c)
             for key, rad_angle in enumerate(_radii):
                 # points based on length of line, offset and the angle in degrees
+                mirror_angle = 360 - rad_angle  # inverse flip (y is reversed)
                 diam_pt = geoms.point_on_ellipse(
                     point_centre=Point(x_c, y_c),
-                    angle=rad_angle,
+                    angle=mirror_angle,
                     height=self._u.height,
                     width=self._u.width,
                 )
-                radii_length = geoms.length_of_line(cntr_pt, diam_pt)
-                if radius_offset is not None and radius_offset != 0:
+                natural_radii_length = geoms.length_of_line(cntr_pt, diam_pt)
+                if self.radii_length:
+                    radii_length = self.unit(outer_radius, label="radius length")
+                else:
+                    radii_length = natural_radii_length
+                # print(f'*** {rad_angle=} {radii_length=}')
+                if radius_offset is not None and radius_offset > 0:
                     offset_pt = geoms.point_on_line(cntr_pt, diam_pt, radius_offset)
-                    extra_fraction = radius_offset / radii_length
-                    end_pt = geoms.point_on_line(
-                        cntr_pt, diam_pt, (1.0 + extra_fraction)
-                    )
+                    extra_fraction = radius_offset / natural_radii_length
+                    end_pt = geoms.point_in_direction(cntr_pt, diam_pt, extra_fraction)
                     x_start, y_start = offset_pt.x, offset_pt.y
                     x_end, y_end = end_pt.x, end_pt.y
                     # print(f'*** {rad_angle=} {radius_offset=} {cntr_pt=} {offset_pt=} {end_pt=}')

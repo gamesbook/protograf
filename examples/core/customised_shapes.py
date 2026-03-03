@@ -482,6 +482,65 @@ Text(common=txt, text="Ellipse: centre; tall")
 Ellipse(cx=2, cy=3, width=3, height=4, dot=0.1)
 PageBreak()
 
+
+# ---- ellipse - radii
+Blueprint()
+Text(common=txt, text="Ellipse: radii (styled & offset)")
+Ellipse(
+    x=1, y=1,
+    width=2, height=1.5,
+    fill=None,
+    radii="n, s, e, w",
+    radii_stroke_width=3,
+    radii_stroke="red")
+Ellipse(
+    x=1, y=1,
+    width=2, height=1.5,
+    fill=None,
+    radii=[45,135,225,315],
+    radii_stroke_width=1,
+    radii_dotted=True,
+    radii_offset=0.5,
+    radii_length=1)
+Ellipse(
+    cx=2, cy=4,
+    width=2, height=1.5,
+    fill="green",
+    stroke="orange",
+    stroke_width=1,
+    radii=[0,90,180,270,45,135,225,315],
+    radii_stroke_width=4,
+    radii_stroke="orange")
+PageBreak()
+
+# ---- ellipse - radii_labels
+Blueprint()
+Text(common=txt, text="Ellipse: radii labels")
+Ellipse(
+    cx=1, cy=5,
+    width=2, height=1.5,
+    radii=[30, 150, 270],
+    radii_labels="ABC",
+    dot=0.05)
+Ellipse(
+    cx=3, cy=3,
+    width=2, height=1.5,
+    radii=[30, 150, 270],
+    radii_labels="A,B,C",
+    radii_labels_rotation=90,
+    dot=0.05)
+Ellipse(
+    cx=1, cy=1,
+    width=2, height=1.5,
+    radii=[30, 150, 270],
+    radii_stroke="white",
+    radii_labels=["A", "B", "C"],
+    radii_labels_rotation=270,
+    radii_labels_stroke="red",
+    radii_labels_font="Courier",
+    dot=0.05)
+PageBreak()
+
 # ---- rectangle - custom
 Blueprint()
 Text(common=txt, text="Rectangle: centre; tall")
@@ -1487,7 +1546,9 @@ Save(
         "line_connections_circle", "line_connections_shapes",
         "line_connections_arrow", "line_connections_spoke",
         "line_centre_shapes",
-        "bezier_custom", "ellipse_custom", "rectangle_custom",
+        "bezier_custom",
+        "ellipse_custom", "ellipse_radii",  "ellipse_radii_labels",
+        "rectangle_custom",
         "square_custom", "trapezoid_custom", "image_default",
         "descriptions", "label_offset",
         "star_custom", "star_slices",

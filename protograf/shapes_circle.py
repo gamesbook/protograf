@@ -338,13 +338,27 @@ class CircleShape(BaseShape):
         """
         if self.radii:
             try:
+                if isinstance(self.radii, str):
+                    radii_list = tools.sequence_split(
+                        self.radii, to_int=False, clean=True
+                    )
+                else:
+                    radii_list = self.radii
+                all_radii = [
+                    (
+                        geoms.compass_to_angle(angle)[1]
+                        if isinstance(angle, str)
+                        else angle
+                    )
+                    for angle in radii_list
+                ]
                 _radii = [
-                    float(angle) for angle in self.radii if angle >= 0 and angle <= 360
+                    float(angle) for angle in all_radii if angle >= 0 and angle <= 360
                 ]
             except Exception:
                 feedback(
-                    f"The radii {self.radii} are not valid - must be a list of numbers"
-                    " from 0 to 360",
+                    f'The circle radii "{self.radii}" are not valid - '
+                    " must be a list of numbers from 0 to 360, or compass directions",
                     True,
                 )
             if self.radii_length and self.radii_offset:
