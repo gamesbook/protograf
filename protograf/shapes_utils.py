@@ -68,6 +68,8 @@ def draw_line(
     """
     result = False
     if start and end and cnv:
+        if kwargs.get("wave_height") and kwargs.get("curve"):
+            feedback("A line cannot use a wave_style and curve together", True)
         if kwargs.get("wave_height"):
             _height = tools.as_float(kwargs.get("wave_height", 0.5), "wave_height")
             try:

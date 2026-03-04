@@ -1237,6 +1237,7 @@ class LineShape(BaseShape):
                         f'Cannot calculate rotation point "{self.rotation_point}"', True
                     )
             # ---- draw line
+            # breakpoint()
             klargs = draw_line(cnv, Point(x, y), Point(x_1, y_1), shape=self, **kwargs)
             self.set_canvas_props(cnv=cnv, index=ID, **klargs)  # shape.finish()
             # ---- arrowhead
@@ -1462,6 +1463,8 @@ class PolylineShape(BasePolyShape):
         lkwargs = {}
         lkwargs["wave_style"] = self.kwargs.get("wave_style", None)
         lkwargs["wave_height"] = self.kwargs.get("wave_height", 0)
+        if lkwargs["wave_style"] and self.curve:
+            feedback("A polyline cannot use a wave_style and curve together", True)
         # ---- set vertices
         self.vertexes = self._shape_vertexes  # BasePoly method
         # ---- draw polyline by vertices

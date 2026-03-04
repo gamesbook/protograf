@@ -292,7 +292,8 @@ Properties that use directional terms include:
    ``Triangle``
 -  **clockwise** - a ``True`` or ``False`` setting used to determine
    direction of travel around a circle
--  **connections** - for a line, when referencing a vertex or perbis point
+-  **connections** - for a line, when referencing a vertex or perbis point,
+   are used to join one or more shapes with a line
 -  **direction** - can be any primary compass direction; used to show
    the travel route when moving through various types of layouts
    e.g. ``RectangularLayout``
@@ -324,6 +325,8 @@ Styling-orientated Terms
 ========================
 `↑ <table-of-contents-terms_>`_
 
+-  **curve** - sets the amount of "bend" for a line; cannot be used when some
+   other styles such as a *wave* are used
 -  **dotted** - allows a line to be broken into a series of "dots" |dash| very
    short lines |dash| of length equal to the width of the line being drawn,
    with spacing in-between each dot of that same length; to make a line dotted,
@@ -347,6 +350,9 @@ Styling-orientated Terms
    possible to use a fractional number e.g. ``0.5`` equates to 50%. Some
    programs use the term *opacity*; but note that this is the **inverse** of
    transparency.
+-  **wave_style** - this can be 'sawtooth' or 'wave' and causes the line to
+   be drawn in that pattern, rather than as a straight line; the height of
+   the wave is set by the **wave_height**
 
 
 .. _termsDisplay:
