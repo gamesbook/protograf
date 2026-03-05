@@ -62,15 +62,33 @@ Built-In Fonts
 `↑ <table-of-contents-fonts_>`_
 
 Because :doc:`protograf <index>` uses *PyMuPDF* to generate the PDF output,
-it has access to these "built-in" fonts.
+it has access to a number of "built-in" fonts that should exist in any PDF viewer.
 
-These are:
+These fonts are:
 
+- *Helvetica* - a basic sanserif font (the default for :doc:`protograf <index>`)
 - *Times-Roman* - a basic serif font
-- *Helvetica* - a basic sanserif font
 - *Courier* - a basic fixed-width font
 - *Symbol* - a variety of custom lettering
 - *ZapfDingbats* - a variety of "dingbats" (mini-images)
+
+The names to use in the ``Font`` command are - especially if you want to
+display bold or italic styles are:
+
+- Courier
+- Courier-Oblique
+- Courier-Bold
+- Courier-BoldOblique
+- Helvetica
+- Helvetica-Oblique
+- Helvetica-Bold
+- Helvetica-BoldOblique
+- Times-Roman
+- Times-Italic
+- Times-Bold
+- Times-BoldItalic
+- Symbol
+- ZapfDingbats
 
 As far as possible, all examples supplied with :doc:`protograf <index>` make
 use of these fonts, so that they can be run and used anywhere.
