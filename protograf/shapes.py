@@ -1259,8 +1259,11 @@ class LineShape(BaseShape):
             # ---- * dot
             self.draw_dot(cnv, cx, cy)
             # ---- * text
-            _, _rotation = geoms.angles_from_points(Point(x, y), Point(x_1, y_1))
-            kwargs["rotation"] = -1 * _rotation
+            if self.label_rotation is None:
+                _, _rotation = geoms.angles_from_points(Point(x, y), Point(x_1, y_1))
+                kwargs["rotation"] = -1 * _rotation
+            else:
+                kwargs["rotation"] = self.label_rotation
             # kwargs["rotation_point"] = the_point
             self.draw_label(
                 cnv,

@@ -2347,9 +2347,9 @@ class BaseShape:
 
     def get_center(self) -> Point:
         """Attempt to get centre for a shape."""
-        if self.cx and self.cy:
+        if self.cx is not None and self.cy is not None:
             return Point(self.cx, self.cy)
-        if self.x and self.y and self.width and self.height:
+        if self.x is not None and self.y is not None and self.width and self.height:
             return Point(self.x + self.width / 2.0, self.y + self.height / 2.0)
         return None
 
