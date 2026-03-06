@@ -65,7 +65,7 @@ def get_connection_point(the_shape: BaseShape, conn_type: str, direction: str) -
 
     the_point = None
     shape_name = the_shape.simple_name()
-    _name = f'{shape_name} ({the_shape.label})' if the_shape.label else shape_name
+    _name = f"{shape_name} ({the_shape.label})" if the_shape.label else shape_name
     if isinstance(the_shape, HexShape):
         shape_name = f"{the_shape.ORIENTATION.name.lower()} {shape_name}"
     if isinstance(the_shape, (PolygonShape, StarShape)):
@@ -99,7 +99,6 @@ def get_connection_point(the_shape: BaseShape, conn_type: str, direction: str) -
             try:
                 perbises = the_shape.calculate_perbii(centre=the_centre)
             except AttributeError:
-                _name = f'{shape_name} ({the_shape.label})' if the_shape.label else shape_name
                 feedback(
                     f"{_name} has no perbii available for a connection.",
                     True,
@@ -155,9 +154,11 @@ def get_connections(shapes: list, connections_style) -> list:
     from protograf.shapes import CircleShape, DotShape  # avoid circular imports
 
     connections = []
-    for idx, cshape in enumerate(shapes):
-        if idx == len(shapes) - 1:
-            continue
+    # for idx, cshape in enumerate(shapes):
+    #     if idx == len(shapes) - 1:
+    #         continue
+    for idx in range(0, len(shapes) - 1):
+        cshape = shapes[idx]
         if connections_style and _lower(connections_style) in [
             "s",
             "spoke",
