@@ -39,7 +39,7 @@ class CubeObject(HexShape):
         super(CubeObject, self).__init__(_object=_object, canvas=canvas, **kwargs)
         # overrides
         self.orientation = "pointy"
-        if not self.shades or self.radii_stroke != colrs.get_color("black"):
+        if not self.shades or self.radii_stroke != colrs.get_color(globals.black):
             self.radii = "s ne nw"
 
     def draw(self, cnv=None, off_x=0, off_y=0, ID=None, **kwargs):

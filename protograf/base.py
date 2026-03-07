@@ -44,7 +44,8 @@ from protograf.utils import colrs, geoms, imaging, tools, support
 from protograf.utils.tools import _lower
 from protograf.utils.constants import (
     CACHE_DIRECTORY,
-    DEBUG_COLOR,
+    CMYK_DEBUG_COLOR,
+    RGB_DEBUG_COLOR,
     DEFAULT_FONT,
     DEFAULT_MARGIN_SIZE,
     GRID_SHAPES_WITH_CENTRE,
@@ -195,7 +196,9 @@ class BaseCanvas:
         self.elevation = self.defaults.get("elevation", "horizontal")
         self.facing = self.defaults.get("facing", "out")  # out/in
         # ---- fill color
-        fill = self.defaults.get("fill", self.defaults.get("fill_color")) or "white"
+        fill = (
+            self.defaults.get("fill", self.defaults.get("fill_color")) or globals.white
+        )
         self.fill_transparency = self.defaults.get(
             "fill_transparency", 1
         )  # NOT transparent
@@ -204,7 +207,8 @@ class BaseCanvas:
         self.stroke_fill = self.defaults.get("stroke_fill", None)  # alias
         # ---- stroke
         stroke = (
-            self.defaults.get("stroke", self.defaults.get("stroke_color")) or "black"
+            self.defaults.get("stroke", self.defaults.get("stroke_color"))
+            or globals.black
         )
         self.stroke = colrs.get_color(stroke)
         self.stroke_width = self.defaults.get("stroke_width", WIDTH)
@@ -224,6 +228,9 @@ class BaseCanvas:
             self.stroke = self.fill_stroke
             self.fill = self.fill_stroke
         # ---- debug color & transparency
+        DEBUG_COLOR = (
+            CMYK_DEBUG_COLOR if globals.color_model == "CMYK" else RGB_DEBUG_COLOR
+        )
         debug_color = self.defaults.get("debug_color", DEBUG_COLOR)
         self.debug_color = colrs.get_color(debug_color)
         self.transparency = self.defaults.get("transparency", 1)  # NOT transparent
@@ -590,7 +597,7 @@ class BaseCanvas:
         # ---- perbii (hex, rect, polygon)
         self.orientation = self.defaults.get("orientation", "flat")  # flat|pointy
         self.perbii = self.defaults.get("perbii", None)  # directions
-        self.perbii_stroke = self.defaults.get("perbii_stroke", "black")
+        self.perbii_stroke = self.defaults.get("perbii_stroke", self.stroke)
         self.perbii_stroke_width = self.defaults.get(
             "perbii_stroke_width", self.stroke_width
         )
@@ -656,7 +663,7 @@ class BaseCanvas:
         self.coord_font_size = self.defaults.get(
             "coord_font_size", int(self.font_size * 0.5)
         )
-        coord_stroke = self.defaults.get("coord_stroke", "black")
+        coord_stroke = self.defaults.get("coord_stroke", globals.black)
         self.coord_stroke = colrs.get_color(coord_stroke)
         self.coord_padding = self.defaults.get("coord_padding", 2)
         self.coord_separator = self.defaults.get("coord_separator", "")
@@ -668,7 +675,7 @@ class BaseCanvas:
         self.spikes_height = self.defaults.get("spikes_height", 0.0)
         self.spikes_width = self.defaults.get("spikes_width", 0.0)
         self.spikes_fill = self.defaults.get("spikes_fill", self.fill)
-        self.spikes_stroke = self.defaults.get("spikes_stroke", "black")
+        self.spikes_stroke = self.defaults.get("spikes_stroke", globals.black)
         self.spikes_stroke_width = self.defaults.get(
             "spikes_stroke_width", self.stroke_width
         )
@@ -677,7 +684,7 @@ class BaseCanvas:
         self.spikes_dashed = self.defaults.get("spikes_dashed", self.dashed)
         # ---- starfield
         self.enclosure = None
-        self.colors = ["white"]
+        self.colors = [globals.white]
         self.sizes = [self.defaults.get("stroke_width", WIDTH)]
         self.density = self.defaults.get("density", 10.0)
         self.star_pattern = "random"
@@ -3166,7 +3173,7 @@ class BaseShape:
         bdirections, bwidth, bcolor, bstyle, dotted, dashed = (
             None,
             None,
-            "black",
+            globals.black,
             None,
             False,
             None,

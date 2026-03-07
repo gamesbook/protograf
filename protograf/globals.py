@@ -8,6 +8,9 @@ from collections import namedtuple
 # third-party
 from pymupdf import paper_size
 
+# local
+from protograf.utils.constants import RGB_DEBUG_COLOR
+
 UnitPoints = namedtuple(
     "UnitPoints",
     [
@@ -32,18 +35,22 @@ def initialize():
     global document
     global base
     global back
+    global black
     global deck
     global deck_settings
+    global debug_color
     global card_frames  # card boundaries - use for image extraction
+    global color_model
     global dataset
     global dataset_type
-    global image_list
+    global directory
     global extracts
     global filename
-    global directory
-    global margins
+    global font_size
     global footer
     global footer_draw
+    global image_list
+    global margins
     global pargs
     global paper
     global page  #  (width, height) in points
@@ -52,8 +59,8 @@ def initialize():
     global page_fill
     global page_count
     global page_grid
-    global font_size
     global units
+    global white
 
     archive = None  # will become a pymupdf Archive
     css = None  # will become a string containing CSS font location
@@ -64,6 +71,7 @@ def initialize():
     deck = None  # will become a proto.DeckOfCards object
     # store kwargs for DeckOfCards; #cards, copy, card_name, extra, grid_marks, zones
     deck_settings = {}
+    debug_color = RGB_DEBUG_COLOR
     card_frames = {}  # list of proto.BBox card frames; keyed on page number
     filename = None
     directory = None  # set by Save() command
@@ -77,10 +85,13 @@ def initialize():
     page_count = 0
     pargs = None
     units = unit.cm
+    color_model = "RGB"
+    black = "black"  # stroke color for RGB
+    white = "white"  # fill color for RGB
     paper = "A4"
     page = paper_size(paper)  # (width, height) in points
     page_width = page[0] / units  # width in user units
     page_height = page[1] / units  # height in user units
-    page_fill = "white"  # page color
+    page_fill = "white"  # page color for RGB
     page_grid = None  # grid interval in user units
     font_size = 12

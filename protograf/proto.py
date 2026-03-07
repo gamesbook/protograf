@@ -89,7 +89,8 @@ from ._version import __version__
 from protograf.utils import colrs, geoms, loadr, tools, support
 from protograf.utils.constants import (
     DEFAULT_FONT,
-    DEBUG_COLOR,
+    RGB_DEBUG_COLOR,
+    CMYK_DEBUG_COLOR,
     DEFAULT_CARD_WIDTH,  # cm
     DEFAULT_CARD_HEIGHT,  # cm
     DEFAULT_CARD_COUNT,
@@ -143,14 +144,20 @@ from protograf.utils.tools import (  # used in scripts
     restore_globals,
     uniques,
 )
+from protograf.utils.constants import (
+    RGB_BLACK,
+    RGB_WHITE,
+    CMYK_BLACK,
+    CMYK_WHITE,
+    YES,
+    NO,
+)
 from protograf import globals
 
 log = logging.getLogger(__name__)
 globals_set = False
 
-# user constants
-YES = True
-NO = False
+GRAYS = ("0,0,0,25.5", "#BEBEBE")
 
 
 def validate_globals():
@@ -441,7 +448,7 @@ class CardShape(BaseShape):
             _card_grid = tools.as_float(card_grid, "card_grid")
             mx = self.unit(_dx or 0) + self._o.delta_x
             my = self.unit(_dy or 0) + self._o.delta_y
-            stroke = colrs.get_color(DEBUG_COLOR)
+            stroke = colrs.get_color(globals.debug_color)
             grid_size = _card_grid * globals.units
             cols = int(frame_width // grid_size)
             rows = int(frame_height // grid_size)
@@ -1311,7 +1318,8 @@ class DeckOfCards:
                         pt2 = (globals.page[0] / 2.0, globals.page[1])
                     globals.canvas.draw_line(pt1, pt2)
                     gwargs = {}  # kwargs
-                    gwargs["stroke"] = self.gutter_stroke or colrs.get_color("gray")
+                    GRAY = GRAYS[0] if globals.color_model == "CMYK" else GRAYS[1]
+                    gwargs["stroke"] = self.gutter_stroke or colrs.get_color(GRAY)
                     gwargs["stroke_width"] = self.gutter_stroke_width
                     gwargs["dotted"] = self.gutter_dotted
                     tools.set_canvas_props(cnv=globals.canvas, index=None, **gwargs)
@@ -1344,14 +1352,14 @@ def page_setup():
     """Set the page color and (optionally) show a dotted margin line and grid."""
     # ---- paper color
     _fill = colrs.get_color(globals.page_fill)
-    if _fill != colrs.get_color("white"):
+    if _fill != colrs.get_color(globals.white):
         globals.doc_page.draw_rect(
             (0, 0, globals.page[0], globals.page[1]), fill=_fill, color=None
         )
     # ---- debug margins
     if globals.margins.debug:
         # print(f'$$$ {globals.margins.left=} {globals.margins.right=}')
-        stroke = colrs.get_color(DEBUG_COLOR)
+        stroke = colrs.get_color(globals.debug_color)
         globals.doc_page.draw_rect(
             (
                 globals.margins.left * globals.units,
@@ -1364,7 +1372,7 @@ def page_setup():
         )
     # ---- page grid
     if globals.page_grid:
-        stroke = colrs.get_color(DEBUG_COLOR)
+        stroke = colrs.get_color(globals.debug_color)
         grid_size = globals.page_grid * globals.units
         cols = int(globals.page[0] // grid_size)
         rows = int(globals.page[1] // grid_size)
@@ -1395,9 +1403,10 @@ def Create(**kwargs):
     - paper_width (float): set specific paper width using the defined *units*
     - paper_height (float): set specific paper height using the defined *units*
       For example, ``"A3-l"`` is a landscape A3 paper size; default is ``A4``
+    - color_model (str): either ``RBG`` (default) or ``CMYK``
     - filename (str): name of the output PDF file; by default this is the prefix
       name of the script, with a ``.pdf`` extension
-    - fill (str): the page color; default is ``white``
+    - fill (str): the page color; default is ``white`` (CMYK equivalent)
     - units (str): can be ``cm`` (centimetres), ``in`` (inches), ``mm``
       (millimetres), or ``points``; default is ``cm``
     - margin (float): set the value for *all* margins using the defined *units*;
@@ -1441,10 +1450,18 @@ def Create(**kwargs):
     )
     # ---- cards
     _cards = kwargs.get("cards", 0)
-    landscape = kwargs.get("landscape", False)
+    # landscape = kwargs.get("landscape", False)  # deprecated
     kwargs = margins(**kwargs)
     defaults = kwargs.get("defaults", None)
-    # ---- paper, page, page sizes, page color
+    # ---- color_model, paper, page, page sizes, page color
+    globals.color_model = kwargs.get("color_model", "RGB")
+    if globals.color_model not in ["RGB", "CMYK"]:
+        feedback('The color_model must be set to "RGB" or "CMYK"', True)
+    globals.black = CMYK_BLACK if globals.color_model == "CMYK" else RGB_BLACK
+    globals.white = CMYK_WHITE if globals.color_model == "CMYK" else RGB_WHITE
+    globals.debug_color = (
+        CMYK_DEBUG_COLOR if globals.color_model == "CMYK" else RGB_DEBUG_COLOR
+    )
     globals.paper = kwargs.get("paper", globals.paper)
     globals.page = pymupdf.paper_size(globals.paper)  # (width, height) in points
     # user overrides
@@ -1460,7 +1477,7 @@ def Create(**kwargs):
         globals.page = (_page_width_pt, _page_height_pt)
     globals.page_width = globals.page[0] / globals.units  # width in user units
     globals.page_height = globals.page[1] / globals.units  # height in user units
-    globals.page_fill = colrs.get_color(kwargs.get("fill", "white"))
+    globals.page_fill = colrs.get_color(kwargs.get("fill", globals.white))
     globals.page_grid = tools.as_float(kwargs.get("page_grid", 0), "page_grid")
     # ---- fonts
     base_fonts()
@@ -1534,9 +1551,13 @@ def Create(**kwargs):
         width=globals.page[0], height=globals.page[1]
     )  # pymupdf Page
     globals.canvas = globals.doc_page.new_shape()  # pymupdf Shape
-    # ---- BaseCanvas
+    # ---- BaseCanvas (base.py)
     globals.base = BaseCanvas(
-        globals.document, paper=globals.paper, defaults=defaults, kwargs=kwargs
+        globals.document,
+        paper=globals.paper,
+        color_model=globals.color_model,
+        defaults=defaults,
+        kwargs=kwargs,
     )
     page_setup()
     # ---- cards
@@ -1603,7 +1624,12 @@ def Load(**kwargs):
     )
     # ---- defaults
     defaults = kwargs.get("defaults", None)
-    # ---- paper, page, page sizes
+    # ---- color_model, paper, page, page sizes
+    globals.color_model = kwargs.get("color_model", "RGB")
+    if globals.color_model not in ["RGB", "CMYK"]:
+        feedback('The color_model must be set to "RGB" or "CMYK"', True)
+    globals.black = CMYK_BLACK if globals.color_model == "CMYK" else RGB_BLACK
+    globals.white = CMYK_WHITE if globals.color_model == "CMYK" else RGB_WHITE
     globals.paper = kwargs.get("paper", globals.paper)
     globals.page = pymupdf.paper_size(globals.paper)  # (width, height) in points
     # ---- fonts
@@ -1685,10 +1711,10 @@ def Load(**kwargs):
     globals.page = (_page_width_pt, _page_height_pt)
     globals.page_width = globals.page[0] / globals.units  # width in user units
     globals.page_height = globals.page[1] / globals.units  # height in user units
-    globals.page_fill = colrs.get_color(kwargs.get("fill", "white"))
+    globals.page_fill = colrs.get_color(kwargs.get("fill", globals.white))
     globals.page_grid = tools.as_float(kwargs.get("page_grid", 0), "page_grid")
     globals.canvas = globals.doc_page.new_shape()  # pymupdf Shape
-    # ---- BaseCanvas
+    # ---- BaseCanvas (base.py)
     globals.base = BaseCanvas(
         globals.document, paper=globals.paper, defaults=defaults, kwargs=kwargs
     )
@@ -2167,9 +2193,10 @@ def Font(name=None, **kwargs):
 
     Kwargs:
 
-    - size (float): the point size of the Font; default is 12
-    - stroke (str): the named or hexadecimal color of the Font; default is "black"
-    - style (str): the style, if available, for the Font e.g. "bold", "italic"
+    - size (float): point size of the Font; default is 12
+    - stroke (str): named or hexadecimal color of the Font;
+      default is "black" for RGB color_model
+    - style (str): style, if available, for the Font e.g. "bold", "italic"
 
     """
     validate_globals()
@@ -2178,7 +2205,7 @@ def Font(name=None, **kwargs):
     globals.base.font_file = _file
     globals.base.font_size = kwargs.get("size", 12)
     globals.base.font_style = kwargs.get("style", None)
-    globals.base.stroke = kwargs.get("stroke", "black")
+    globals.base.stroke = kwargs.get("stroke", globals.black)
 
 
 def IconFont(name=None, **kwargs):
@@ -2191,7 +2218,8 @@ def IconFont(name=None, **kwargs):
     Kwargs:
 
     - size (float): the point size of the Font; default is 12
-    - stroke (str): the named or hexadecimal color of the Font; default is "black"
+    - stroke (str): the named or hexadecimal color of the Font;
+      default is "black" for RGB color_model
     - style (str): the style, if available, for the Font e.g. "bold", "italic"
 
     """
@@ -2201,7 +2229,7 @@ def IconFont(name=None, **kwargs):
     globals.base.icon_font_file = _file
     globals.base.icon_font_size = kwargs.get("size", 12)
     globals.base.icon_font_style = kwargs.get("style", None)
-    globals.base.icon_stroke = kwargs.get("stroke", "black")
+    globals.base.icon_stroke = kwargs.get("stroke", globals.black)
 
 
 # ---- various ====
@@ -2546,7 +2574,7 @@ def Deck(**kwargs):
     - cols (int): maximum number of card columns that should appear on a page
     - copy (str): the name of a column in the dataset defined by Data() that
       specifies how many copies of a card are needed
-    - fill (str): color of the card's area; defaults to ``white``
+    - fill (str): color of the card's area; defaults to ``white`` (for RGB color_model)
     - frame (str): the default card frame is a *rectangle* (or square, if the
       height and width match); but can be set to *hexagon* or *circle*
     - grid_marks (bool): if set to ``True``, will cause small marks to be drawn at
@@ -2567,7 +2595,7 @@ def Deck(**kwargs):
       page; its value is divided in half, and added to the top margin value, and
       each set of cards is drawn that distance away from the centre line of the page
     - gutter_stroke (str): if set, will cause a line of that color to be used
-      for the *gutter* line; this defaults to ``gray`` (to match grid marks)
+      for the *gutter* line; this defaults to ``gray``, for RGB, (to match grid marks)
     - gutter_stroke_width (float): if set to a value, will cause a line of that
       thickness to be used for the *gutter* line
     - gutter_dotted (bool): sets the style of the *gutter* line
@@ -2588,7 +2616,7 @@ def Deck(**kwargs):
       horizontal direction
     - spacing_y (float): size of blank space between each card or grouping in a
       vertical direction
-    - stroke (str): color of the card's border; defaults to ``black``
+    - stroke (str): color of the card's border; defaults to ``black`` (for RGB color_model)
     - width (float): card width for a *rectangular* card; defaults to ``6.35`` cm
     - zones (list): list of tuples; each with page number(s) and a shape
 
@@ -3554,9 +3582,9 @@ def Rectangle(row=None, col=None, **kwargs):
       corners of the rectangle
     - corners_stroke_width (float): corners line thickness; defaults to 0.1 points
     - corners_stroke (str): the named or hexadecimal color of the corners line;
-      defaults to ``black`
+      defaults to ``black` (for RGB color_model)
     - corners_fill (str): the named or hexadecimal color of the corners area;
-      defaults to ``white`
+      defaults to ```white`` (for RGB color_model)
     - corners_x (float): the length of the corners in the x-direction
     - corners_y (float): the length of the corners in the y-direction
     - corners_directions (str): the specific corners of the rectangle where the
@@ -3981,16 +4009,32 @@ def Blueprint(**kwargs):
     """
 
     def set_style(style_name):
-        """Set Blueprint color and fill."""
+        """Set Blueprint color and fill.
+
+        Note:
+            RGB to CMYK was done via https://colordesigner.io/convert/hextocmyk
+        """
         match style_name:
             case "green":
-                color, fill = "#CECE2C", "#35705E"
+                if globals.color_model == "CMYK":
+                    color, fill = "0,0,78.6,19.2", "52.7,0,16.1,56.1"
+                else:
+                    color, fill = "#CECE2C", "#35705E"
             case "grey" | "gray":
-                color, fill = "white", "#A1969C"
+                if globals.color_model == "CMYK":
+                    color, fill = CMYK_WHITE, "0,6.8,3.1.38.9"
+                else:
+                    color, fill = RGB_WHITE, "#A1969C"
             case "blue" | "invert" | "inverted":
-                color, fill = "honeydew", "#3085AC"
+                if globals.color_model == "CMYK":
+                    color, fill = "5.9,0,5.9,0", "72.1,22.7,0.32.6"
+                else:
+                    color, fill = "#F0FFF0", "#3085AC"
             case _:
-                color, fill = "#3085AC", None
+                if globals.color_model == "CMYK":
+                    color, fill = "72.1,22.7,0.32.6", None
+                else:
+                    color, fill = "#3085AC", None
                 if style_name is not None:
                     feedback(
                         f'The Blueprint style "{style_name}" is unknown', False, True
@@ -4029,7 +4073,7 @@ def Blueprint(**kwargs):
     kwargs["fill"] = kwargs.get("fill", page_fill)
     # ---- page color (optional)
     if kwargs["fill"] is not None:
-        fill = colrs.get_color(kwargs.get("fill", "white"))
+        fill = colrs.get_color(kwargs.get("fill", RGB_WHITE))
         globals.canvas.draw_rect((0, 0, globals.page[0], globals.page[1]))
         globals.canvas.finish(fill=fill)
     kwargs["fill"] = kwargs.get("fill", line_stroke)  # revert back for font
@@ -4626,7 +4670,7 @@ def Layout(grid, **kwargs):
         visible = kwargs.get("visible", [])
     # ---- grid
     layout_grid = kwargs.get("gridlines", None)  # directions ...
-    _grid_stroke = kwargs.get("gridlines_stroke", "black")
+    _grid_stroke = kwargs.get("gridlines_stroke", globals.black)
     layout_grid_ends = kwargs.get("gridlines_ends", None)
     layout_grid_fill = kwargs.get("gridlines_fill", None)
     layout_grid_stroke = colrs.get_color(_grid_stroke)
@@ -5018,70 +5062,75 @@ def Layout(grid, **kwargs):
         if do_debug:
             match _lower(do_debug):
                 case "normal" | "none" | "null" | "n":
-                    Dot(x=loc.x, y=loc.y, stroke=DEBUG_COLOR, fill=DEBUG_COLOR)
+                    Dot(
+                        x=loc.x,
+                        y=loc.y,
+                        stroke=globals.debug_color,
+                        fill=globals.debug_color,
+                    )
                 case "id" | "i":
                     Dot(
                         x=loc.x,
                         y=loc.y,
                         label=loc.id,
-                        stroke=DEBUG_COLOR,
-                        fill=DEBUG_COLOR,
+                        stroke=globals.debug_color,
+                        fill=globals.debug_color,
                     )
                 case "sequence" | "s":
                     Dot(
                         x=loc.x,
                         y=loc.y,
                         label=f"{loc.sequence}",
-                        stroke=DEBUG_COLOR,
-                        fill=DEBUG_COLOR,
+                        stroke=globals.debug_color,
+                        fill=globals.debug_color,
                     )
                 case "xy" | "xy":
                     Dot(
                         x=loc.x,
                         y=loc.y,
                         label=f"{round(loc.x, 2)},{round(loc.y, 2)}",
-                        stroke=DEBUG_COLOR,
-                        fill=DEBUG_COLOR,
+                        stroke=globals.debug_color,
+                        fill=globals.debug_color,
                     )
                 case "yx" | "yx":
                     Dot(
                         x=loc.x,
                         y=loc.y,
                         label=f"{loc.y},{loc.x}",
-                        stroke=DEBUG_COLOR,
-                        fill=DEBUG_COLOR,
+                        stroke=globals.debug_color,
+                        fill=globals.debug_color,
                     )
                 case "colrow" | "cr":
                     Dot(
                         x=loc.x,
                         y=loc.y,
                         label=f"{loc.col},{loc.row}",
-                        stroke=DEBUG_COLOR,
-                        fill=DEBUG_COLOR,
+                        stroke=globals.debug_color,
+                        fill=globals.debug_color,
                     )
                 case "col" | "c":
                     Dot(
                         x=loc.x,
                         y=loc.y,
                         label=f"{loc.col}",
-                        stroke=DEBUG_COLOR,
-                        fill=DEBUG_COLOR,
+                        stroke=globals.debug_color,
+                        fill=globals.debug_color,
                     )
                 case "row" | "r":
                     Dot(
                         x=loc.x,
                         y=loc.y,
                         label=f"{loc.row}",
-                        stroke=DEBUG_COLOR,
-                        fill=DEBUG_COLOR,
+                        stroke=globals.debug_color,
+                        fill=globals.debug_color,
                     )
                 case "rowcol" | "rc":
                     Dot(
                         x=loc.x,
                         y=loc.y,
                         label=f"{loc.row},{loc.col}",
-                        stroke=DEBUG_COLOR,
-                        fill=DEBUG_COLOR,
+                        stroke=globals.debug_color,
+                        fill=globals.debug_color,
                     )
                 case _:
                     feedback(f'Unknown debug style "{do_debug}"', True)
@@ -5539,7 +5588,7 @@ def StarField(**kwargs):
 
     <base>
     - density (int): average number of stars per square unit; default is 10
-    - colors (list): the individual star colors; default is ["white"]
+    - colors (list): individual star colors; default is ["white"] for RGB color_model
     - enclosure (str): the name of the regular shape inside which the
       StarFieldObject is drawn; default is a `rectangle`
     - sizes (list): the individual star sizes; default is [0.1]

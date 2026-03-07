@@ -3482,8 +3482,8 @@ of a Circle towards its circumference.
 
       - *x* and *y* to set the upper-left position; or *cx* and *cy* to set the
         centre
-      - *radii* - a list of angles (in N|deg|) sets the directions at which the
-        radii lines are drawn
+      - *radii* - a list of angles (in N|deg|), or compass points, sets the
+        directions at which the radii lines are drawn
       - *radii_stroke_width* - if set, will determine the thickness of the radii
       - *radii_dotted* - if set to True, will make the radii lines dotted
       - *radii_stroke* - determines the color of the radii

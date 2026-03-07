@@ -5,6 +5,10 @@ protograf Changes
 ------------------
 - Enable radii for Ellipse shapes
 - Support compass directions for Circle radii
+- Patch error with label rotation for Line
+- Add diagram example for New Classic Board Games
+- Add CMYK support for colors
+- [PLANNED] Enable curve for a Line
 - [PLANNED] Enable Line connections to Ellipse shapes
 - [PLANNED] Enable Line connections to Stadium shapes
 - [PLANNED] Enable text labels for snail lines
