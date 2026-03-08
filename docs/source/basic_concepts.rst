@@ -233,20 +233,17 @@ Working with color
 
 Everything we see has color.
 
-Color in **protograf**, is defined in the same way as it is in pages
+Color in **protograf**, can be defined in the same way as it is in pages
 that appear on the web i.e. in RGB |dash| red-green-blue |dash| *hexadecimal*
-format; for example, ``#4C271B`` represents a dark shade of the color that we
+format; for example, ``#A0522D`` represents a darker shade of the color that we
 would likely term :dark-brown:`"brown"`, while "basic" colors have their own
 values; :yellow:`"yellow"` is ``#FFFF00``, :red:`"red"` is ``#FF0000``, and
-:blue:`"blue"` is ``#0000FF``.
+:blue:`"blue"` is ``#0000FF``.  RGB colors in **protograf** can also make use
+of names from a pre-defined list - for example ``#A0522D`` is defined as the
+color *sienna*.
 
-Colors in **protograf** can also make use of names from a pre-defined
-list - for example ``#A0522D`` is defined as the color *sienna*. The
-`colorset.pdf <https://github.com/gamesbook/protograf/blob/master/examples/colorset.pdf>`_
-file shows all the names of colors that are available, along with their
-*hexadecimal* value.  The
-`colorset_svg.pdf <https://github.com/gamesbook/protograf/blob/master/examples/colorset_svg.pdf>`_
-shows the subset of names and colors available for SVG documents.
+Color can also be defined using CMYK color values; for example the *sienna*
+color can also be set via these 4 values: ``"0, 48.75, 71.87, 37.2"``.
 
 Color properties in **protograf** are typically set either with a *"fill"*,
 which defines the color of a whole area, or a *"stroke"* which determines
@@ -257,39 +254,8 @@ The :ref:`default <default-concept>` **colors** in **protograf**  are
 
 .. HINT::
 
-   For more details on hexadecimal colors, refer to
-   http://www.w3.org/TR/css3-color; the color names are listed in the
-   section https://www.w3.org/TR/css-color-3/#svg-color (this list can
-   also be found at https://en.wikipedia.org/wiki/X11_color_names)
-
-Quick Colors
-------------
-`↑ <table-of-contents-basic_>`_
-
-A list of "one-letter" colors is also available (based off of a popular
-Python library called *matplotlib*); their hexadecimal codes are also
-shown here for reference:
-
-- ``b`` is blue ("#0000FF")
-- ``c`` is cyan ("#00FFFF")
-- ``d`` is dark blue ("#293BC7")
-- ``e`` is earth/natural ("#F3B54A")
-- ``f`` is forest green ("#007700")
-- ``g`` is green/malachite ("#32CD32")
-- ``h`` is brown/cinnamon ("#D2691E")
-- ``i`` is pink ("#E6506E")
-- ``k`` is black ("#000000")
-- ``l`` is picton blue ("#00BFFF")
-- ``m`` is magenta/violet ("#BF00BF")
-- ``n`` is orange ("#FFA500")
-- ``o`` is white ("#FFFFFF")
-- ``p`` is purple/lavender ("#EE82EE")
-- ``r`` is red ("#FF0000")
-- ``s`` is silver/gray ("#C0C0C0")
-- ``u`` is dark/derby brown ("#4C271B")
-- ``w`` is white ("#FFFFFF")
-- ``y`` is yellow ("#FFFF00")
-- ``x`` is black ("#000000")
+   For more details on colors, and color models, refer to the section on
+   :ref:`Color-orientated Terms <termsColor>`.
 
 
 .. _basic-units:

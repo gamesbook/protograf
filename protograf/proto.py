@@ -4027,12 +4027,12 @@ def Blueprint(**kwargs):
                     color, fill = RGB_WHITE, "#A1969C"
             case "blue" | "invert" | "inverted":
                 if globals.color_model == "CMYK":
-                    color, fill = "5.9,0,5.9,0", "72.1,22.7,0.32.6"
+                    color, fill = "5.9,0,5.9,0", "72.1,22.7,0,32.6"
                 else:
                     color, fill = "#F0FFF0", "#3085AC"
             case _:
                 if globals.color_model == "CMYK":
-                    color, fill = "72.1,22.7,0.32.6", None
+                    color, fill = "72.1,22.7,0,32.6", None
                 else:
                     color, fill = "#3085AC", None
                 if style_name is not None:

@@ -91,17 +91,17 @@ but with a ``.pdf`` extension.
 
 To customise the command, set its properties as follows:
 
+- **filename** - name of the output PDF file; by default this is the prefix
+  name of the script, with a ``.pdf`` extension
+- **fill** - set the color for the page; the default page color is ``white``
+- **color_model** - sets the model used to create any default, or built-in
+  colors; this can be ``"RGB"`` (the default) or ``"CMYK"``
 - **paper** - use a paper size from either of the ISO series - A0 down to A8;
   or B6 down to B0 - or a USA type - letter, legal or elevenSeventeen; to change
   the page orientation to **landscape** simply append ``-l`` to the name |dash|
   for example, ``"A3-l"`` is a landscape A3 paper size
 - **paper_width** - set a specific paper width using the defined *units*
 - **paper_height** - set a specific paper height using the defined *units*
-- **filename** - name of the output PDF file; by default this is the prefix
-  name of the script, with a ``.pdf`` extension
-- **fill** - set the color for the page; the default page color is ``white``
-- **units** - these can be ``cm`` (centimetres), ``in`` (inches), ``mm``
-  (millimetres), or ``points``; the default is ``cm``
 - **margin** - set the value for *all* margins using the defined *units*
 - **margin_top** - set the top margin
 - **margin_bottom** - set the bottom margin
@@ -111,6 +111,8 @@ To customise the command, set its properties as follows:
 - **page_grid** - if set to a number, will display a squared grid of thin
   horizontal and vertical lines, set a distance "unit" apart |dash| where the distance depends on the
   current *units*
+- **units** - these can be ``cm`` (centimetres), ``in`` (inches), ``mm``
+  (millimetres), or ``points``; the default is ``cm``
 
 
 Example 1. Create Options
