@@ -33,7 +33,7 @@ __protograf__ requires Python (version of 3.13 or higher) to be installed
 and running on your machine.
 
 If this is **not** your current Python version, or Python is not installed on
-your machine, may want to [install uv](https://docs.astral.sh/uv/getting-started/installation/)
+your machine, you may want to [install uv](https://docs.astral.sh/uv/getting-started/installation/)
 which is a cross-platform tool able to [install Python](https://docs.astral.sh/uv/guides/install-python).
 
 If using [uv](https://docs.astral.sh/uv/), it is recommended to also create and use a
@@ -119,19 +119,19 @@ current / potential areas of work or ideas.
 * [x] Stripes: interior "areas" for a Rectangle
 * [ ] Cards:
     * [x] support card-back designs
-    * [ ] grid lines for hexagonal cards
+    * [x] grid lines for hexagonal cards
     * [x] corner crosses as grid marks
     * [x] access to Google Sheets
     * [x] extract rectangular cards as PNG files
     * [x] page annotations
-* [ ] Color:
-    * [ ] add support for CYMK
+    * [ ] bleed areas
+* [x] Color:
+    * [x] add support for CYMK
 
 ## :jigsaw: Potential Examples
 
 These are possible examples to show board creation based on existing games:
 
-* [ ] Extra abstract game boards: Mancala, Mu Torere
 * [ ] Wargame board: Squad Leader with full terrain features (vector and bitmap)
 * [ ] Traveller board: show a fully-styled Star System
 * [x] WarpWar board: show a fully-styled example

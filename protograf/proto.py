@@ -123,6 +123,7 @@ from protograf.utils.support import (  # used in scripts
 )
 from protograf.utils.structures import (
     BBox,
+    CardBleed,
     CardFrame,
     DatasetType,
     DeckPrintState,
@@ -254,6 +255,7 @@ class CardShape(BaseShape):
         # feedback(f'\n$$$ CardShape KW=> {self.kwargs}')
         self.elements = []  # container for objects which get added to the card
         self.members = None
+        self.card_bleed = None  # possible CardBleed namedtuple
         self.outline_shape = CardOutline(_object=_object, canvas=canvas, **kwargs)
         self.outline = self.outline_shape.get_outline(
             cnv=canvas, row=None, col=None, cid=None, label=None, **kwargs
@@ -288,7 +290,7 @@ class CardShape(BaseShape):
                 )
 
     def draw_card(self, cnv, row, col, cid, **kwargs):
-        """Draw a card on a given canvas.
+        """Draw a Card on a given canvas.
 
         Pass on `deck_data` to other commands, as needed, for them to draw Shapes
         """
@@ -348,8 +350,13 @@ class CardShape(BaseShape):
             move_x = right_gap - self.offset_x - globals.margins.left
         else:
             move_x = 0
-        # feedback(f'$$$ {right_gap=} {self.offset_x=} {move_x=}')
-        # feedback(f'$$$ {shape_kwargs["frame_type"]=} {shape_kwargs["grid_marks"]=}')
+        # feedback(f'$$$ 351 {right_gap=} {self.offset_x=} {move_x=}')
+        # feedback(f'$$$ 352 {shape_kwargs["frame_type"]=} {shape_kwargs["grid_marks"]=}')
+        feedback(f"$$$ 353 {outline=} {shape_kwargs=}")
+
+        # HOOK for card bleed
+        if hasattr(self, "card_bleed"):
+            print(f"$$$ 360 {cid=} {self.elements=} {self.card_bleed=}")
         outline.draw(off_x=move_x, off_y=0, **shape_kwargs)  # inc. grid_marks
 
         # ---- track frame outlines for possible image extraction
@@ -2350,11 +2357,21 @@ def Matrix(labels: list = None, data: list = None) -> list:
 
 
 @docstring_card
-def Card(sequence: object = None, *elements, **kwargs):
+def Card(
+    sequence: object = None,
+    *elements,
+    **kwargs,
+):
     """Add one or more elements to a card or cards.
 
     Args:
     <card>
+
+    Kwargs:
+    - bleed_fill (str): the color with which to create the bleed area
+    - bleed (float): the distance away from the card frame to which the bleed extends
+    - bleed_x (float): the x-distance away from the card frame to which the bleed extends
+    - bleed_y (float): the y-distance away from the card frame to which the bleed extends
 
     NOTE: A Card receives its `draw()` command via Save()!
     """
@@ -2381,6 +2398,7 @@ def Card(sequence: object = None, *elements, **kwargs):
                 feedback(f'Cannot use "{element}" for a Card or CardBack.', True)
 
     kwargs = margins(**kwargs)
+    # print(f'*** Card: {kwargs}')
     if not globals.deck:
         feedback("The Deck() has not been defined or is incorrect.", True)
     if not sequence:
@@ -2438,13 +2456,28 @@ def Card(sequence: object = None, *elements, **kwargs):
                 True,
             )
         card = globals.deck.fronts[_card - 1]  # cards internally number from ZERO
+
         if card:
+            # ---- add elements to card
             for element in elements:
                 # print(f'$$$  Card() {element=} {type(element)=}')
                 if isinstance(element, TemplatingType):
                     add_members_to_card(element)
                 else:
                     add_members_to_card(element)
+            # ---- set card bleed
+            if kwargs.get("bleed_fill") and (
+                kwargs.get("bleed") or kwargs.get("bleed_y") or kwargs.get("bleed_x")
+            ):
+                card.card_bleed = CardBleed(
+                    fill=kwargs.get("bleed_fill"),
+                    offset_x=kwargs.get("bleed_x", kwargs.get("bleed", 0.0)),
+                    offset_y=kwargs.get("bleed_y", kwargs.get("bleed", 0.0)),
+                )
+            if hasattr(card, "card_bleed"):
+                print(
+                    f"**** 2478 {type(card)} ID:{index+1} {card.elements=} {card.card_bleed=}"
+                )
         else:
             feedback(f'Cannot find card#{_card}. (Check "cards" setting in Deck)')
 
