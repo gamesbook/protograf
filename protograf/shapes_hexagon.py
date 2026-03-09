@@ -140,10 +140,11 @@ class HexShape(BaseShape):
             # ---- ^ draw pointy by row/col
             if self.row is not None and self.col is not None and self.is_cards:
                 x = (
-                    self.col * (geo.height_flat + self._u.spacing_x)
+                    self.col
+                    * (geo.height_flat + self._u.spacing_x - 2 * self.bleed_radius)
                     + self._o.delta_x
                     + self._u.offset_x
-                )
+                ) - self.bleed_radius
                 y = (
                     self.row * (geo.diameter + self._u.spacing_y)
                     + self._o.delta_y
@@ -231,10 +232,12 @@ class HexShape(BaseShape):
                 #     x = x + geo.side
                 # y = self.row * 2.0 * geo.half_flat + self._o.delta_y  # NO half_flat
                 x = (
-                    self.col * 2.0 * (geo.side + self._u.spacing_x)
+                    self.col
+                    * 2.0
+                    * (geo.side + self._u.spacing_x - 2 * self.bleed_radius)
                     + self._o.delta_x
                     + self._u.offset_x
-                )
+                ) - self.bleed_radius
                 if self.row & 1:
                     x = x + geo.side + self._u.spacing_x
                 y = (
@@ -1411,6 +1414,7 @@ class HexShape(BaseShape):
         geo = self.get_geometry()
         self.is_cards = kwargs.get("is_cards", False)
         self.grid_marks = kwargs.get("grid_marks", self.grid_marks)
+        self.bleed_radius = kwargs.get("bleed_radius", 0.0)
         self.vertices = self._shape_vertexes  # also sets self.centre
         # ---- calculate area
         self.area = self.calculate_area()

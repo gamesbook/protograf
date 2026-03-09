@@ -236,12 +236,12 @@ class RectangleShape(BaseShape):
         # feedback(f'***Rect{self.col=} {self.row=} {bleed_x=} {bleed_y=}')
         if self.row is not None and self.col is not None:
             if self.kwargs.get("grouping_cols", 1) == 1:
+                # feedback(f"***Rect {self.col=} {self.row=} {bleed_x=} {bleed_y=}")
                 x = (
-                    self.col * (self._u.width + self._u.spacing_x)
+                    self.col * (self._u.width + self._u.spacing_x - 2 * bleed_x)
                     + self._o.delta_x
                     + self._u.offset_x
-                    - bleed_x
-                )
+                ) - bleed_x
             else:
                 group_no = self.col // self.kwargs["grouping_cols"]
                 x = (
@@ -249,15 +249,14 @@ class RectangleShape(BaseShape):
                     + self._u.spacing_x * group_no
                     + self._o.delta_x
                     + self._u.offset_x
-                    - bleed_x
+                    - 2 * bleed_x
                 )
             if self.kwargs.get("grouping_rows", 1) == 1:
                 y = (
-                    self.row * (self._u.height + self._u.spacing_y)
+                    self.row * (self._u.height + self._u.spacing_y - 2 * bleed_y)
                     + self._o.delta_y
                     + self._u.offset_y
-                    - bleed_y
-                )
+                ) - bleed_y
             else:
                 group_no = self.row // self.kwargs["grouping_rows"]
                 y = (

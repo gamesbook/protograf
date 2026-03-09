@@ -174,6 +174,9 @@ def validate_globals():
 class CardOutline(BaseShape):
     """
     Card outline on a given canvas.
+
+    Note:
+        Also use to calculate an area for card bleed.
     """
 
     def __init__(self, _object=None, canvas=None, **kwargs):
@@ -196,7 +199,9 @@ class CardOutline(BaseShape):
         self.bleed_y = kwargs.get("bleed_y", 0.0)
         self.bleed_radius = kwargs.get("bleed_radius", 0.0)
         self.width = kwargs.get("width", default_width) + 2 * self.bleed_x
-        self.height = kwargs.get("height", default_height) + 2 * self.bleed_y
+        self.height = kwargs.get("height", default_height) + 2 * (
+            self.bleed_y or self.bleed_radius
+        )
         self.radius = kwargs.get("radius", default_radius) + self.bleed_radius
         self.frame_type = kwargs["frame_type"]
         self.outline = self.get_outline(
@@ -372,7 +377,7 @@ class CardShape(BaseShape):
             bleed_outline = bleed_shape.get_outline(
                 cnv=cnv, row=row, col=col, cid=cid, label=label, **bleed_kwargs
             )
-            # feedback(f"$$$ 376 {cid=} {bleed_kwargs=}")
+            # feedback(f"$$$ 376 {cid=} {type(bleed_outline=} {bleed_kwargs=}")
             bleed_outline.draw(off_x=move_x, off_y=0, **bleed_kwargs)  # NO grid_marks!
 
         outline.draw(off_x=move_x, off_y=0, **shape_kwargs)  # inc. grid_marks
@@ -2485,7 +2490,10 @@ def Card(
                     add_members_to_card(element)
             # ---- set card bleed
             if kwargs.get("bleed_fill") and (
-                kwargs.get("bleed") or kwargs.get("bleed_y") or kwargs.get("bleed_x")
+                kwargs.get("bleed")
+                or kwargs.get("bleed_y")
+                or kwargs.get("bleed_x")
+                or kwargs.get("bleed_radius")
             ):
                 fill = kwargs.get("bleed_fill")
                 offset_x = kwargs.get("bleed_x", kwargs.get("bleed", 0.0))

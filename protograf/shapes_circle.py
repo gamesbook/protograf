@@ -689,22 +689,25 @@ class CircleShape(BaseShape):
         """Draw circle on a given canvas."""
         kwargs = self.kwargs | kwargs
         _ = kwargs.pop("ID", None)
-        # feedback(f' @@@ Circ.draw {kwargs=}')
+        # feedback(f'@@@ Circ. draw() {kwargs=}')
         cnv = cnv if cnv else globals.canvas  # a new Page/Shape may now exist
         super().draw(cnv, off_x, off_y, ID, **kwargs)  # unit-based props
         is_cards = kwargs.get("is_cards", False)
         # ---- set centre & area
         ccentre = self._shape_centre  # self.x_c, self.y_c
         x, y = ccentre.x, ccentre.y
+        # ---- bleed adjust
+        bleed_radius = self.unit(kwargs.get("bleed_radius", 0.0))
         # ---- draw by row/col
         if self.row is not None and self.col is not None and is_cards:
             if self.kwargs.get("grouping_cols", 1) == 1:
                 x = (
-                    self.col * (self._u.radius * 2.0 + self._u.spacing_x)
+                    self.col
+                    * (self._u.radius * 2.0 + self._u.spacing_x - 2 * bleed_radius)
                     + self._o.delta_x
                     + self._u.radius
                     + self._u.offset_x
-                )
+                ) - bleed_radius
             else:
                 group_no = self.col // self.kwargs["grouping_cols"]
                 x = (
@@ -716,11 +719,12 @@ class CircleShape(BaseShape):
                 )
             if self.kwargs.get("grouping_rows", 1) == 1:
                 y = (
-                    self.row * (self._u.radius * 2.0 + self._u.spacing_y)
+                    self.row
+                    * (self._u.radius * 2.0 + self._u.spacing_y - 2 * bleed_radius)
                     + self._o.delta_y
                     + self._u.radius
                     + self._u.offset_y
-                )
+                ) - bleed_radius
             else:
                 group_no = self.row // self.kwargs["grouping_rows"]
                 y = (
