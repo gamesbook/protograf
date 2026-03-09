@@ -83,7 +83,7 @@ Bounds = namedtuple(
     ],
 )
 
-cb_fields = ("fill", "offset_x", "offset_y")
+cb_fields = ("fill", "offset_x", "offset_y", "offset_radius")
 CardBleed = namedtuple("CardBleed", cb_fields, defaults=(None,) * len(cb_fields))
 
 CrossParts = namedtuple(

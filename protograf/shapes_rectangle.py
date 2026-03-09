@@ -228,14 +228,19 @@ class RectangleShape(BaseShape):
         if kwargs.get("locale"):
             lx = kwargs.get("locale").get("x")
             ly = kwargs.get("locale").get("y")
+        # ---- bleed adjust
+        bleed_x = self.unit(kwargs.get("bleed_x", 0.0))
+        bleed_y = self.unit(kwargs.get("bleed_y", 0.0))
         # ---- adjust start
         # feedback(f'***Rect{self.col=}{self.row=} {self._u.offset_x=}{self._o.off_x=}')
+        # feedback(f'***Rect{self.col=} {self.row=} {bleed_x=} {bleed_y=}')
         if self.row is not None and self.col is not None:
             if self.kwargs.get("grouping_cols", 1) == 1:
                 x = (
                     self.col * (self._u.width + self._u.spacing_x)
                     + self._o.delta_x
                     + self._u.offset_x
+                    - bleed_x
                 )
             else:
                 group_no = self.col // self.kwargs["grouping_cols"]
@@ -244,12 +249,14 @@ class RectangleShape(BaseShape):
                     + self._u.spacing_x * group_no
                     + self._o.delta_x
                     + self._u.offset_x
+                    - bleed_x
                 )
             if self.kwargs.get("grouping_rows", 1) == 1:
                 y = (
                     self.row * (self._u.height + self._u.spacing_y)
                     + self._o.delta_y
                     + self._u.offset_y
+                    - bleed_y
                 )
             else:
                 group_no = self.row // self.kwargs["grouping_rows"]
@@ -258,6 +265,7 @@ class RectangleShape(BaseShape):
                     + self._u.spacing_y * group_no
                     + self._o.delta_y
                     + self._u.offset_y
+                    - bleed_y
                 )
         elif lx and ly:
             x = lx - self._u.width / 2.0

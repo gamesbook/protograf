@@ -192,9 +192,12 @@ class CardOutline(BaseShape):
             default_radius = DEFAULT_CARD_RADIUS / globals.units
 
         # print(f'$$$ {default_width=} {default_height=} {default_radius=} {globals.units=}')
-        self.height = kwargs.get("height", default_height)
-        self.width = kwargs.get("width", default_width)
-        self.radius = kwargs.get("radius", default_radius)
+        self.bleed_x = kwargs.get("bleed_x", 0.0)
+        self.bleed_y = kwargs.get("bleed_y", 0.0)
+        self.bleed_radius = kwargs.get("bleed_radius", 0.0)
+        self.width = kwargs.get("width", default_width) + 2 * self.bleed_x
+        self.height = kwargs.get("height", default_height) + 2 * self.bleed_y
+        self.radius = kwargs.get("radius", default_radius) + self.bleed_radius
         self.frame_type = kwargs["frame_type"]
         self.outline = self.get_outline(
             cnv=canvas, row=None, col=None, cid=None, label=None, **kwargs
@@ -350,20 +353,35 @@ class CardShape(BaseShape):
             move_x = right_gap - self.offset_x - globals.margins.left
         else:
             move_x = 0
-        # feedback(f'$$$ 351 {right_gap=} {self.offset_x=} {move_x=}')
-        # feedback(f'$$$ 352 {shape_kwargs["frame_type"]=} {shape_kwargs["grid_marks"]=}')
-        feedback(f"$$$ 353 {outline=} {shape_kwargs=}")
+        # feedback(f'$$$ 356 {right_gap=} {self.offset_x=} {move_x=}')
+        # feedback(f'$$$ 357 {shape_kwargs["frame_type"]=} {shape_kwargs["grid_marks"]=}')
+        # feedback(f"$$$ 358 {outline=} {shape_kwargs=}")
 
-        # HOOK for card bleed
-        if hasattr(self, "card_bleed"):
-            print(f"$$$ 360 {cid=} {self.elements=} {self.card_bleed=}")
+        # ---- draw card bleed
+        if self.card_bleed:
+            # print(f"$$$ 362 {cid=} {self.elements=} {self.card_bleed=}")
+            bleed_kwargs = copy(shape_kwargs)
+            bleed_kwargs["fill"] = self.card_bleed.fill
+            bleed_kwargs["stroke"] = self.card_bleed.fill
+            bleed_kwargs["bleed_x"] = self.card_bleed.offset_x
+            bleed_kwargs["bleed_y"] = self.card_bleed.offset_y
+            bleed_kwargs["bleed_radius"] = self.card_bleed.offset_radius
+            bleed_kwargs["grid_marks"] = None
+            # calculate size for bleed
+            bleed_shape = CardOutline(_object=None, canvas=cnv, **bleed_kwargs)
+            bleed_outline = bleed_shape.get_outline(
+                cnv=cnv, row=row, col=col, cid=cid, label=label, **bleed_kwargs
+            )
+            # feedback(f"$$$ 376 {cid=} {bleed_kwargs=}")
+            bleed_outline.draw(off_x=move_x, off_y=0, **bleed_kwargs)  # NO grid_marks!
+
         outline.draw(off_x=move_x, off_y=0, **shape_kwargs)  # inc. grid_marks
 
         # ---- track frame outlines for possible image extraction
         match kwargs["frame_type"]:
             case CardFrame.RECTANGLE:
-                _vertices = outline._shape_vertexes  # clockwise from bottom-left
-                base_frame_bbox = BBox(tl=_vertices[0], br=_vertices[2])
+                _vertices = outline._shape_vertexes  # clockwise from top-right
+                base_frame_bbox = BBox(tl=_vertices[3], br=_vertices[1])
             case CardFrame.CIRCLE:
                 base_frame_bbox = outline.bbox
             case CardFrame.HEXAGON:
@@ -382,7 +400,7 @@ class CardShape(BaseShape):
                 )
             case _:
                 raise NotImplementedError(
-                    f'Cannot handle card frame type: {kwargs["frame_type"]}'
+                    f'Outline cannot handle card frame type: {kwargs["frame_type"]}'
                 )
         frame_width = base_frame_bbox.br.x - base_frame_bbox.tl.x
         frame_height = base_frame_bbox.br.y - base_frame_bbox.tl.y
@@ -2469,14 +2487,15 @@ def Card(
             if kwargs.get("bleed_fill") and (
                 kwargs.get("bleed") or kwargs.get("bleed_y") or kwargs.get("bleed_x")
             ):
+                fill = kwargs.get("bleed_fill")
+                offset_x = kwargs.get("bleed_x", kwargs.get("bleed", 0.0))
+                offset_y = kwargs.get("bleed_y", kwargs.get("bleed", 0.0))
+                offset_radius = kwargs.get("bleed_radius", 0.0)
                 card.card_bleed = CardBleed(
-                    fill=kwargs.get("bleed_fill"),
-                    offset_x=kwargs.get("bleed_x", kwargs.get("bleed", 0.0)),
-                    offset_y=kwargs.get("bleed_y", kwargs.get("bleed", 0.0)),
-                )
-            if hasattr(card, "card_bleed"):
-                print(
-                    f"**** 2478 {type(card)} ID:{index+1} {card.elements=} {card.card_bleed=}"
+                    fill=colrs.get_color(fill),
+                    offset_x=tools.as_float(offset_x, "bleed_x"),
+                    offset_y=tools.as_float(offset_y, "bleed_y"),
+                    offset_radius=tools.as_float(offset_radius, "bleed_radius"),
                 )
         else:
             feedback(f'Cannot find card#{_card}. (Check "cards" setting in Deck)')
