@@ -34,6 +34,7 @@ from protograf.base import (
 
 log = logging.getLogger(__name__)
 DEBUG = False
+ROOT2 = math.sqrt(2.0)
 
 
 class HexShape(BaseShape):
@@ -126,6 +127,10 @@ class HexShape(BaseShape):
     def _shape_vertexes(self) -> list:
         """Vertices of Hexagon in points."""
         geo = self.get_geometry()
+        # calculate shift in "pointy" direction
+        bleed_shift = (
+            self.bleed_radius / math.sin(math.radians(60)) if self.bleed_radius else 0.0
+        )
         # ---- POINTY^
         self.ORIENTATION = self.get_orientation()
         if self.ORIENTATION == HexOrientation.POINTY:
@@ -140,16 +145,19 @@ class HexShape(BaseShape):
             # ---- ^ draw pointy by row/col
             if self.row is not None and self.col is not None and self.is_cards:
                 x = (
-                    self.col
-                    * (geo.height_flat + self._u.spacing_x - 2 * self.bleed_radius)
+                    2.0
+                    * self.col
+                    * (geo.half_flat + self._u.spacing_x - self.bleed_radius)
                     + self._o.delta_x
                     + self._u.offset_x
                 ) - self.bleed_radius
+                if self.row & 1:
+                    x = x + geo.half_flat + self._u.spacing_x - self.bleed_radius
                 y = (
-                    self.row * (geo.diameter + self._u.spacing_y)
+                    2.0 * self.row * (geo.diameter + self._u.spacing_y - bleed_shift)
                     + self._o.delta_y
                     + self._u.offset_y
-                )  # do NOT add half_flat
+                ) - bleed_shift  # do NOT add half_flat
             elif self.row is not None and self.col is not None:
                 if self.hex_offset in ["o", "O", "odd"]:
                     # TODO => calculate!
@@ -227,24 +235,22 @@ class HexShape(BaseShape):
             # feedback(f"*** P~: {x=} {y=} {self.row=} {self.col=} {geo=} ")
             # ---- ~ draw flat by row/col
             if self.row is not None and self.col is not None and self.is_cards:
-                # x = self.col * 2.0 * geo.side + self._o.delta_x
-                # if self.row & 1:
-                #     x = x + geo.side
-                # y = self.row * 2.0 * geo.half_flat + self._o.delta_y  # NO half_flat
                 x = (
-                    self.col
-                    * 2.0
-                    * (geo.side + self._u.spacing_x - 2 * self.bleed_radius)
+                    self.col * 2.0 * (geo.side + self._u.spacing_x - bleed_shift)
+                    # - 2.0 * self.col * bleed_shift
                     + self._o.delta_x
                     + self._u.offset_x
-                ) - self.bleed_radius
+                ) - bleed_shift
                 if self.row & 1:
-                    x = x + geo.side + self._u.spacing_x
+                    x = x + geo.side + self._u.spacing_x - bleed_shift
                 y = (
-                    self.row * 2.0 * (geo.half_flat + self._u.spacing_y)
+                    self.row
+                    * 2.0
+                    * (geo.half_flat + self._u.spacing_y - self.bleed_radius)
                     + self._o.delta_y
                     + self._u.offset_y
-                )  # do NOT add half_flat
+                ) - self.bleed_radius  # do NOT add half_flat
+                # feedback(f"*** ~C {self.row=} {self.col=} {self.bleed_radius=} {bleed_shift}")
             elif self.row is not None and self.col is not None:
                 if self.hex_offset in ["o", "O", "odd"]:
                     x = (
@@ -1411,11 +1417,13 @@ class HexShape(BaseShape):
         cnv = cnv if cnv else globals.canvas  # a new Page/Shape may now exist
         super().draw(cnv, off_x, off_y, ID, **kwargs)  # unit-based props
         # ---- calculate vertexes
-        geo = self.get_geometry()
         self.is_cards = kwargs.get("is_cards", False)
         self.grid_marks = kwargs.get("grid_marks", self.grid_marks)
-        self.bleed_radius = kwargs.get("bleed_radius", 0.0)
+        self.bleed_radius = self.unit(
+            kwargs.get("bleed_radius", 0.0), label="bleed_radius"
+        )
         self.vertices = self._shape_vertexes  # also sets self.centre
+        geo = self.get_geometry()
         # ---- calculate area
         self.area = self.calculate_area()
         # ---- remove rotation
