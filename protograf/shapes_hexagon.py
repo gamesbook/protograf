@@ -146,7 +146,7 @@ class HexShape(BaseShape):
             if self.row is not None and self.col is not None and self.is_cards:
                 x = (
                     2.0
-                    * self.col
+                    * float(self.col)
                     * (geo.half_flat + self._u.spacing_x - self.bleed_radius)
                     + self._o.delta_x
                     + self._u.offset_x
@@ -154,7 +154,9 @@ class HexShape(BaseShape):
                 if self.row & 1:
                     x = x + geo.half_flat + self._u.spacing_x - self.bleed_radius
                 y = (
-                    2.0 * self.row * (geo.diameter + self._u.spacing_y - bleed_shift)
+                    2.0
+                    * float(self.row)
+                    * (geo.diameter + self._u.spacing_y - bleed_shift)
                     + self._o.delta_y
                     + self._u.offset_y
                 ) - bleed_shift  # do NOT add half_flat
@@ -232,25 +234,24 @@ class HexShape(BaseShape):
             # x and y are at the bottom-left corner of the box around the hex
             x = self._u.x + self._o.delta_x
             y = self._u.y + self._o.delta_y
-            # feedback(f"*** P~: {x=} {y=} {self.row=} {self.col=} {geo=} ")
+            # feedback(f"*** P~: {geo=} {self._u.spacing_x=}")
             # ---- ~ draw flat by row/col
             if self.row is not None and self.col is not None and self.is_cards:
                 x = (
-                    self.col * 2.0 * (geo.side + self._u.spacing_x - bleed_shift)
-                    # - 2.0 * self.col * bleed_shift
+                    float(self.col) * 2.0 * (geo.side + self._u.spacing_x - bleed_shift)
                     + self._o.delta_x
                     + self._u.offset_x
                 ) - bleed_shift
                 if self.row & 1:
                     x = x + geo.side + self._u.spacing_x - bleed_shift
                 y = (
-                    self.row
+                    float(self.row)
                     * 2.0
                     * (geo.half_flat + self._u.spacing_y - self.bleed_radius)
                     + self._o.delta_y
                     + self._u.offset_y
                 ) - self.bleed_radius  # do NOT add half_flat
-                # feedback(f"*** ~C {self.row=} {self.col=} {self.bleed_radius=} {bleed_shift}")
+                # feedback(f"*** ~C {self.row=} {self.col=} {self.bleed_radius=} {bleed_shift=}")
             elif self.row is not None and self.col is not None:
                 if self.hex_offset in ["o", "O", "odd"]:
                     x = (
@@ -1412,8 +1413,8 @@ class HexShape(BaseShape):
         # feedback(f'*** draw hex: {off_x=} {off_y=} {ID=}')
         # feedback(f'*** draw hex: {self.x=} {self.y=} {self.cx=} {self.cy=}')
         # feedback(f'*** draw hex: {self.row=} {self.col=}')
-        # feedback(f'@@@ Hexg.draw {kwargs=}')
-        # feedback(f'@@@ Hexg.draw  {ID=} {kwargs["dataset"]=}')
+        # feedback(f'*** Hexg.draw {kwargs=}')
+        # feedback(f'*** Hexg.draw  {ID=} {kwargs["dataset"]=}')
         cnv = cnv if cnv else globals.canvas  # a new Page/Shape may now exist
         super().draw(cnv, off_x, off_y, ID, **kwargs)  # unit-based props
         # ---- calculate vertexes
@@ -1636,7 +1637,7 @@ class HexShape(BaseShape):
             if item == "text":
                 # ---- * text
                 self.draw_heading(cnv, ID, self.x_d, self.y_d - offset, **kwargs)
-                # feedback(f' @@@ Hexg.label {kwargs=}')
+                # feedback(f' *** Hexg.label {kwargs=}')
                 self.draw_label(cnv, ID, self.x_d, self.y_d, **kwargs)
                 self.draw_title(cnv, ID, self.x_d, self.y_d + offset, **kwargs)
             if item == "numbering":
@@ -1662,8 +1663,8 @@ class HexShape(BaseShape):
                 self.vertices[4],
                 self.vertices[5],
             )
-            # print('!!!' , v0, v1, v2, v3, v5, v5)
-            # feedback(f'@@@ Hexg.grid_marks {pg_tl=} {pg_tr=} {pg_bl=} {pg_br=}')
+            # feedback(f'*** Hex {self._l2v(self.vertices)}')
+            # feedback(f'*** Hexg.grid_marks {pg_tl=} {pg_tr=} {pg_bl=} {pg_br=}')
             if _lower(self.grid_marks_style) in ["edge", "both", "e", "b"]:
                 if self.ORIENTATION == HexOrientation.FLAT:
                     # north edge of hex

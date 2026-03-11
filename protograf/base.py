@@ -2423,7 +2423,7 @@ class BaseShape:
                 True,
             )
 
-    def _p2v(self, value: float, decimals: int = 3):
+    def _p2v(self, value: float, decimals: int = 4):
         """Convert point value to a rounded, units-based value using current units."""
         try:
             return round(float(value) / self.units, decimals)
@@ -2434,7 +2434,7 @@ class BaseShape:
                 True,
             )
 
-    def _l2v(self, values: list, decimals: int = 3):
+    def _l2v(self, values: list, decimals: int = 4):
         """Convert Points to a rounded, units-based values using current units."""
         try:
             _values = [

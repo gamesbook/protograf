@@ -8,11 +8,11 @@ protograf Changes
 - Patch error with label rotation for Line
 - Add diagram example for New Classic Board Games
 - Add CMYK support for colors
+- Add bleed area for a Card
 
-- [PLANNED-1] Add bleed area for a Card
 - [PLANNED-1] Enable curve for a Line
 
-- [PLANNED-2] Enable Line connections to Ellipse shapes
+- [PLANNED-2] Enable non-curve Line connections to Ellipse shapes
 - [PLANNED-2] Enable Line connections to Stadium shapes
 - [PLANNED-2] Enable Line connections to Text shapes
 - [PLANNED-2] Add Circle/Dot end for an arrowhead
