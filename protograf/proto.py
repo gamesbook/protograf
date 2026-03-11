@@ -654,6 +654,9 @@ class DeckOfCards:
         self.cnv = canvas  # initial pymupdf Shape object (need one per Page)
         self.kwargs = kwargs
         # feedback(f'$$$ DeckShape KW=> {self.kwargs}')
+        # ---- INVALID KWARGS
+        if kwargs.get("bleed_x") is not None or kwargs.get("bleed_y") is not None:
+            feedback('Cannot set "bleed_x" for "bleed_y" for a Deck!', True)
         # ---- cards
         self.fronts = []  # container for CardShape objects for front of cards
         self.backs = []  # container for CardShape objects for back of cards
@@ -681,6 +684,14 @@ class DeckOfCards:
         self.kwargs["width"] = self.width  # used for create_cardshapes()
         self.kwargs["height"] = self.height  # used for create_cardshapes()
         self.radius = kwargs.get("radius", default_radius)  # OVERWRITE
+        # ---- spacing
+        self.spacing = tools.as_float(kwargs.get("spacing", 0), "spacing")
+        self.spacing_x = tools.as_float(
+            kwargs.get("spacing_x", self.spacing), "spacing_x"
+        )
+        self.spacing_y = tools.as_float(
+            kwargs.get("spacing_y", self.spacing), "spacing_y"
+        )
         # ----- set card frame type
         self.frame = kwargs.get("frame", "rectangle")
         match self.frame:
@@ -714,6 +725,16 @@ class DeckOfCards:
                     globals.page_width - globals.margins.left - globals.margins.right
                 ):
                     feedback("Card diameter cannot exceed available page width.", True)
+                if (
+                    self.spacing_x
+                    and self.spacing_y
+                    and self.spacing_x == self.spacing_y
+                ):
+                    feedback(
+                        "Equal card spacing implies hexagon diagonal edges are not aligned.",
+                        False,
+                        True,
+                    )
             case _:
                 hint = " Try rectangle, hexagon, or circle."
                 feedback(f"Unable to draw a {self.frame}-shaped card. {hint}", True)
@@ -761,17 +782,10 @@ class DeckOfCards:
         self.grouping_cols = tools.as_int(
             kwargs.get("grouping_cols", self.grouping), "grouping_cols"
         )
-        # ---- spacing and offset
+        # ---- offset
         self.offset = tools.as_float(kwargs.get("offset", 0), "offset")
         self.offset_x = tools.as_float(kwargs.get("offset_x", self.offset), "offset_x")
         self.offset_y = tools.as_float(kwargs.get("offset_y", self.offset), "offset_y")
-        self.spacing = tools.as_float(kwargs.get("spacing", 0), "spacing")
-        self.spacing_x = tools.as_float(
-            kwargs.get("spacing_x", self.spacing), "spacing_x"
-        )
-        self.spacing_y = tools.as_float(
-            kwargs.get("spacing_y", self.spacing), "spacing_y"
-        )
         # ---- gutter (put backs of Cards on same page)
         self.gutter = tools.as_float(kwargs.get("gutter", 0), "gutter")  # none if zero
         self.gutter_stroke = kwargs.get("gutter_stroke", None)

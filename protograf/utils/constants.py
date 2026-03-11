@@ -6,10 +6,14 @@ Notes:
     * https://www.a2-size.com/american-paper-sizes/
     * https://en.wikipedia.org/wiki/Paper_size#Overview_of_ISO_paper_sizes
 """
+import math
 from pymupdf.utils import getColorList
 
 YES = True
 NO = False
+SIN_60 = math.sin(math.radians(60))
+COS_60 = math.cos(math.radians(60))
+TAN_60 = math.tan(math.radians(60))
 
 BGG_IMAGES = "cf.geekdo-images.com"
 COLOR_NAMES = getColorList()
