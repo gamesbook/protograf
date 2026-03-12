@@ -3017,6 +3017,7 @@ class TextShape(BaseShape):
 
     def __init__(self, _object=None, canvas=None, **kwargs):
         super().__init__(_object=_object, canvas=canvas, **kwargs)
+        self.height_used = None
         if self.kwargs.get("cx") and self.kwargs.get("cy"):
             self.x = self.kwargs.get("cx")
             self.y = self.kwargs.get("cy") - self.points_to_value(self.font_size)
@@ -3030,9 +3031,17 @@ class TextShape(BaseShape):
     def draw(self, cnv=None, off_x=0, off_y=0, ID=None, **kwargs):
         """Draw text on a given canvas.
 
+        Args:
+            cnv: PyMuPDF page canvas
+            off_x: offset from left
+            off_y: offset from top
+            ID: identifier
+
         Note:
-            Any text in a Template should already have been rendered by
-            base.handle_custom_values()
+            * Any text in a Template should already have been rendered by
+              base.handle_custom_values()
+            * Wrap and HTML text boxes set `height_used` in user units
+            * If offpage=True in kwargs, then draw text waaay off the page!
         """
         # feedback(f'*** Text {ID=} {self.text=}')
         kwargs = self.kwargs | kwargs
@@ -3047,6 +3056,11 @@ class TextShape(BaseShape):
             y_t = self._abs_cy  # + self.font_size / 2.0
             self.align = "centre"  # NB otherwise base.draw_multi_string() will shift x
             self.valign = "centre"
+        # ---- override if offpage (used for e.g. cards to calculate height_used)
+        if kwargs.get("offpage"):
+            x_t = 1e6
+            y_t = 1e6
+        # ---- calculate height & width
         height, width = 0, 0
         if self.height:
             height = self._u.height
@@ -3139,7 +3153,11 @@ class TextShape(BaseShape):
                     )
                 keys["fontname"] = keys["mu_font"]
                 keys.pop("mu_font")
-                current_page.insert_textbox(rect, _text, **keys)
+                _height_left = current_page.insert_textbox(rect, _text, **keys)  # pts
+                self.height_used = self.height - self.points_to_value(_height_left)
+                # feedback(f"\n*** Text WRAP {_height_left=}  {self.height_used=}")
+                if _height_left < 0:
+                    feedback(f'Text "{_text}" overflowed the available space!', True)
             except ValueError as err:
                 feedback(f"Cannot create Text! - {err}", True)
             except IOError as err:
@@ -3211,7 +3229,9 @@ class TextShape(BaseShape):
                 except Exception:
                     icon_font = "Helvetica"
                 _text = tools.html_glyph(_text, icon_font, icon_size)
-                current_page.insert_htmlbox(rect, _text, **keys)
+                _height_left = current_page.insert_htmlbox(rect, _text, **keys)
+                self.height_used = self.height - self.points_to_value(_height_left)
+                # feedback(f"\n*** Text HTML {_height_left=}  {self.height_used=}")
             except ValueError as err:
                 feedback(f"Cannot create Text - {err}", True)
         # ---- PLAIN Text string
@@ -3222,6 +3242,7 @@ class TextShape(BaseShape):
                 keys["absolute"] = True
                 # feedback(f"\n*** Text PLAIN {_text=} {x_t=} {y_t=} {keys=}")
             self.draw_multi_string(cnv, x_t, y_t, _text, **keys)  # use morph to rotate
+            # TODO - calculate self.height_used
 
 
 class TrapezoidShape(BaseShape):

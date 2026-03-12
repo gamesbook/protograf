@@ -2710,7 +2710,7 @@ class BaseShape:
             return origin  # lower-left for text string
 
         if not string:
-            return
+            return None
         # ---- deprecated
         if kwargs.get("text_sequence", None):
             raise NotImplementedError("No text_sequence please!")

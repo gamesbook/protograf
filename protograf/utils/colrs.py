@@ -61,7 +61,10 @@ def get_color(name: str = None, color_model: str = "RGB") -> tuple:
         pass  # unknown format
     try:
         if name.upper() not in COLOR_NAMES:
-            feedback(f'The color name "{name}" is not pre-defined!', True)
+            if name.upper() == "NONE":
+                return None
+            else:
+                feedback(f'The color name "{name}" is not pre-defined!', True)
         color = getColor(name)
         return color
     except (AttributeError, ValueError):
