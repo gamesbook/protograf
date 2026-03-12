@@ -3128,7 +3128,48 @@ class TextShape(BaseShape):
                 fill_opacity=pymu_props.fill_opacity,
             )
             # self.set_canvas_props(cnv=cnv, index=ID, **rkwargs)
-        # ---- BOX text
+
+        # ---- BOX-like text (with vertical write)
+        if self.box:
+            # TextWriter
+            #     __init__(self, rect, opacity=1, color=None)
+            # Parameters:
+            #     rect (rect-like) – rectangle internally used for text positioning
+            #     opacity (float) – set transparency for the text to store here
+            #     color (float,sequ) – color of the text.
+            # Methods:
+            #     append(pos, text, font=None, fontsize=11, small_caps=0)
+            #         pos (point_like) – start position, bottom left point of first character.
+            #         Returns: text_rect and last_point.
+            #     appendv(pos, text, font=None, fontsize=11, small_caps=0)  # top-to-bottom
+            #         pos (point_like) – start position,  bottom left point of  first character.
+            #         Returns: text_rect and last_point.
+            #     write_text(page, opacity=None, color=None, morph=None, overlay=True, render_mode=0)
+            #         page – write to this Page.
+            #         opacity (float) – override init value TextWriter
+            #         color (sequ) – override the init value of the TextWriter
+            #         morph (sequ) – modify the text appearance by applying a matrix to it
+            #         overlay (bool) – put in foreground (default) or background.
+            #         render_mode (int) – Values: 0 (default), 1, 2, 3 (invisible).
+            #     fill_textbox(rect, text, *, pos=None, font=None, fontsize=11, align=0, warn=None, small_caps=0)
+            #         rect (rect_like) – the area to fill. No part of the text will appear outside of this.
+            #         warn (bool) – on text overflow do nothing (None), warn (True)
+            #         align (int) – text alignment. Use one of
+            #             TEXT_ALIGN_LEFT, TEXT_ALIGN_CENTER, TEXT_ALIGN_RIGHT or TEXT_ALIGN_JUSTIFY.
+            #         Returns:
+            #             list – List of lines that did not fit in the rectangle.
+            # Props:
+            #     text_rect - area currently occupied (Rect)
+            text_writer = TextWriter()
+            keys = self.text_properties(string=_text, **kwargs)
+            if text_rotation:
+                current_page.write_text()
+            elif kwargs.get("vertical"):
+                text_writer.appendv(_text)
+            else:
+                text_writer.appendv(_text)
+
+        # ---- WRAP text
         if self.wrap:
             # insert_textbox(
             #     rect, buffer, *, fontsize=11, fontname='helv', fontfile=None,
@@ -3175,6 +3216,7 @@ class TextShape(BaseShape):
                     thefile = f" - unable to open or find {thefile}"
                 msg = f"Cannot create Text{thefile}{cause}"
                 feedback(msg, True, True)
+
         # ---- HTML text
         elif self.html or self.style:
             # insert_htmlbox(rect, text, *, css=None, scale_low=0,
@@ -3213,7 +3255,6 @@ class TextShape(BaseShape):
                 # {'_subarchives': [{'fmt': 'dir', 'entries': ['foo.png', ...
                 globals.archive.add(script_dir)  # append "current" to use img in HTML
                 globals.archive.add(".")  # append "current" to use img in HTML
-
                 keys["archive"] = globals.archive
                 # feedback(f'*** Text HTML {keys=} {rect=} {_text=} {keys=}')
                 if self.run_debug:
@@ -3234,6 +3275,7 @@ class TextShape(BaseShape):
                 # feedback(f"\n*** Text HTML {_height_left=}  {self.height_used=}")
             except ValueError as err:
                 feedback(f"Cannot create Text - {err}", True)
+
         # ---- PLAIN Text string
         else:
             keys = {}
