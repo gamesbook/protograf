@@ -3136,6 +3136,24 @@ class TextShape(BaseShape):
             #     render_mode=0, miter_limit=1, border_width=1, expandtabs=8,
             #     align=TEXT_ALIGN_LEFT, rotate=0, lineheight=None, morph=None,
             #     stroke_opacity=1, fill_opacity=1, oc=0)
+            def _measure_unused_height():
+                temp_pdf = pymupdf.open()
+                temp_page = temp_pdf.new_page(width=rect.width, height=rect.height)
+                temp_page.insert_textbox(temp_page.rect, _text, **keys)
+                blocks = temp_page.get_text("blocks")
+                if len(blocks) == 0:
+                    return rect.height
+                last_y = blocks[-1][3]
+                unused_height = temp_page.rect.y1 - last_y
+                return unused_height
+
+            if self.valign:
+                if _lower(self.valign) in ["top", "t"]:
+                    self.valign = "top"
+                elif _lower(self.valign) in ["centre", "center", "c", "middle", "m"]:
+                    self.valign = "centre"
+                elif _lower(self.valign) in ["bottom", "b"]:
+                    self.valign = "bottom"
             if self.rotation is None or self.rotation == 0:
                 text_rotation = 0
             else:
@@ -3153,7 +3171,12 @@ class TextShape(BaseShape):
                     )
                 keys["fontname"] = keys["mu_font"]
                 keys.pop("mu_font")
-                _height_left = current_page.insert_textbox(rect, _text, **keys)  # pts
+                _height_left = _measure_unused_height()
+                if self.valign == "centre" or self.valign == "bottom":
+                    _offset = _height_left if self.valign == "bottom" else _height_left / 2
+                    rect.y0 += _offset
+                    rect.y1 += _offset
+                current_page.insert_textbox(rect, _text, **keys)  # pts
                 self.height_used = self.height - self.points_to_value(_height_left)
                 # feedback(f"\n*** Text WRAP {_height_left=}  {self.height_used=}")
                 if _height_left < 0:
