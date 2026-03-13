@@ -3130,44 +3130,44 @@ class TextShape(BaseShape):
             # self.set_canvas_props(cnv=cnv, index=ID, **rkwargs)
 
         # ---- BOX-like text (with vertical write)
-        if self.box:
-            # TextWriter
-            #     __init__(self, rect, opacity=1, color=None)
-            # Parameters:
-            #     rect (rect-like) – rectangle internally used for text positioning
-            #     opacity (float) – set transparency for the text to store here
-            #     color (float,sequ) – color of the text.
-            # Methods:
-            #     append(pos, text, font=None, fontsize=11, small_caps=0)
-            #         pos (point_like) – start position, bottom left point of first character.
-            #         Returns: text_rect and last_point.
-            #     appendv(pos, text, font=None, fontsize=11, small_caps=0)  # top-to-bottom
-            #         pos (point_like) – start position,  bottom left point of  first character.
-            #         Returns: text_rect and last_point.
-            #     write_text(page, opacity=None, color=None, morph=None, overlay=True, render_mode=0)
-            #         page – write to this Page.
-            #         opacity (float) – override init value TextWriter
-            #         color (sequ) – override the init value of the TextWriter
-            #         morph (sequ) – modify the text appearance by applying a matrix to it
-            #         overlay (bool) – put in foreground (default) or background.
-            #         render_mode (int) – Values: 0 (default), 1, 2, 3 (invisible).
-            #     fill_textbox(rect, text, *, pos=None, font=None, fontsize=11, align=0, warn=None, small_caps=0)
-            #         rect (rect_like) – the area to fill. No part of the text will appear outside of this.
-            #         warn (bool) – on text overflow do nothing (None), warn (True)
-            #         align (int) – text alignment. Use one of
-            #             TEXT_ALIGN_LEFT, TEXT_ALIGN_CENTER, TEXT_ALIGN_RIGHT or TEXT_ALIGN_JUSTIFY.
-            #         Returns:
-            #             list – List of lines that did not fit in the rectangle.
-            # Props:
-            #     text_rect - area currently occupied (Rect)
-            text_writer = TextWriter()
-            keys = self.text_properties(string=_text, **kwargs)
-            if text_rotation:
-                current_page.write_text()
-            elif kwargs.get("vertical"):
-                text_writer.appendv(_text)
-            else:
-                text_writer.appendv(_text)
+        # if self.box:
+        # TextWriter
+        #     __init__(self, rect, opacity=1, color=None)
+        # Parameters:
+        #     rect (rect-like) – rectangle internally used for text positioning
+        #     opacity (float) – set transparency for the text to store here
+        #     color (float,sequ) – color of the text.
+        # Methods:
+        #     append(pos, text, font=None, fontsize=11, small_caps=0)
+        #         pos (point_like) – start position, bottom left point of first character.
+        #         Returns: text_rect and last_point.
+        #     appendv(pos, text, font=None, fontsize=11, small_caps=0)  # top-to-bottom
+        #         pos (point_like) – start position,  bottom left point of  first character.
+        #         Returns: text_rect and last_point.
+        #     write_text(page, opacity=None, color=None, morph=None, overlay=True, render_mode=0)
+        #         page – write to this Page.
+        #         opacity (float) – override init value TextWriter
+        #         color (sequ) – override the init value of the TextWriter
+        #         morph (sequ) – modify the text appearance by applying a matrix to it
+        #         overlay (bool) – put in foreground (default) or background.
+        #         render_mode (int) – Values: 0 (default), 1, 2, 3 (invisible).
+        #     fill_textbox(rect, text, *, pos=None, font=None, fontsize=11, align=0, warn=None, small_caps=0)
+        #         rect (rect_like) – the area to fill. No part of the text will appear outside of this.
+        #         warn (bool) – on text overflow do nothing (None), warn (True)
+        #         align (int) – text alignment. Use one of
+        #             TEXT_ALIGN_LEFT, TEXT_ALIGN_CENTER, TEXT_ALIGN_RIGHT or TEXT_ALIGN_JUSTIFY.
+        #         Returns:
+        #             list – List of lines that did not fit in the rectangle.
+        # Props:
+        #     text_rect - area currently occupied (Rect)
+        # text_writer = TextWriter()
+        # keys = self.text_properties(string=_text, **kwargs)
+        # if text_rotation:
+        #     current_page.write_text()
+        # elif kwargs.get("vertical"):
+        #     text_writer.appendv(_text)
+        # else:
+        #     text_writer.appendv(_text)
 
         # ---- WRAP text
         if self.wrap:
@@ -3214,7 +3214,9 @@ class TextShape(BaseShape):
                 keys.pop("mu_font")
                 _height_left = _measure_unused_height()
                 if self.valign == "centre" or self.valign == "bottom":
-                    _offset = _height_left if self.valign == "bottom" else _height_left / 2
+                    _offset = (
+                        _height_left if self.valign == "bottom" else _height_left / 2
+                    )
                     rect.y0 += _offset
                     rect.y1 += _offset
                 current_page.insert_textbox(rect, _text, **keys)  # pts
@@ -3293,7 +3295,9 @@ class TextShape(BaseShape):
                 except Exception:
                     icon_font = "Helvetica"
                 _text = tools.html_glyph(_text, icon_font, icon_size)
-                _height_left = current_page.insert_htmlbox(rect, _text, **keys)
+                _height_left, _success = current_page.insert_htmlbox(
+                    rect, _text, **keys
+                )
                 self.height_used = self.height - self.points_to_value(_height_left)
                 # feedback(f"\n*** Text HTML {_height_left=}  {self.height_used=}")
             except ValueError as err:

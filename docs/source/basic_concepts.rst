@@ -363,3 +363,9 @@ Some examples of defaults are:
 
   Use the :ref:`Create <create-command>` command to set your own output
   *filename*.
+
+Finally |dash| and perhaps confusingly |dash| :doc:`protograf <index>` also
+allows you to create your own "defaults" which represent properties that you
+want to share among a number of geometric **shapes**, or text, that make up
+your design; for more on this, see the :ref:`Default <the-default-command>`
+command.

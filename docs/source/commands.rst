@@ -51,7 +51,7 @@ a handy cross-reference to the detailed information for that command.
 -  :ref:`Deck <the-deck-command>`  - details for a deck, containing one or
    more :ref:`cards <the-card-command>`
 -  :ref:`Default <the-default-command>` - set the properties that can be used by
-   any shape
+   any number of shapes
 -  :doc:`DiamondLocations <layouts_diamond>`- defines an ordered series of
    row and column locations that create a diamond grid of shapes - the grid itself
    is not displayed; it is used in a :ref:`Layout <layout-command>` command

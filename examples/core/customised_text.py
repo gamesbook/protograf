@@ -31,6 +31,7 @@ Text(common=txt, text="Text START...")
 Text(x=0, y=6, font_size=8, align="left", text=Today())
 PageBreak()
 
+
 # ---- text styling
 Blueprint()
 Text(common=txt, text="Text - styling")
@@ -236,6 +237,37 @@ Text(x=0.5, y=3.5, width=3, height=2,
  )
 PageBreak()
 
+# ---- text valign
+Blueprint(stroke_width=0.5)
+Text(common=txt, text="Text - horizontal & vertical align")
+Font("Times-Roman")
+tprops = Common(
+    wrap=True,
+    height=1.6, width=1.6,
+    font_size=8,
+    stroke="blue",
+    align="centre",
+    box_stroke="black"
+)
+Text("Top", common=tprops,
+     x=0.2, y=0.2,
+     valign="top")
+Text("Top\nTop", common=tprops,
+     x=2.2, y=0.2,
+     valign="top")
+Text("Middle", common=tprops,
+     x=0.2, y=2.2,
+     valign="middle")
+Text("Middle\nMiddle", common=tprops,
+     x=2.2, y=2.2,
+     valign="middle")
+Text("Bottom", common=tprops,
+     x=0.2, y=4.2,
+     valign="bottom")
+Text("Bottom\nBottom", common=tprops,
+     x=2.2, y=4.2,
+     valign="bottom")
+PageBreak()
 
 # ---- END
 Text(common=txt, text="Text END...")
@@ -250,4 +282,5 @@ Save(
         "text_outlined", "text_rotate",
         "text_fonts",
         "text_images",
+        "text_valign",
         None])
