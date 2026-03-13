@@ -16,11 +16,11 @@ many of these will only become clear once you have read other parts of
 the full documentation such as the one on
 :doc:`Working with Cards <card_deck_introduction>`.
 
-.. HINT::
+.. NOTE::
 
    **Remember** when you create and edit your files, do **not** use a
-   word processor such as "Word", "Pages" or "LibreOffice" - but a text
-   file editor instead e.g. on Windows, use *NotePad* or
+   word processor such as "Word", "Pages" or "LibreOffice" |dash| but a
+   text file editor instead e.g. on Windows, use *NotePad* or
    `NotePad++ <https://notepad-plus-plus.org/>`_; and on OS X, use
    *TextEdit* or `CotEditor <https://coteditor.com/>`_.
 
@@ -273,6 +273,10 @@ section on :doc:`Card Decks <card_decks>` will be helpful for you.
 Please bear in mind that that section assumes you are familiar with **all**
 the :doc:`basic concepts <basic_concepts>` and program usage described in
 earlier sections.
+
+There is a card creation script to help set up a basic template for your
+cards, based on a series of choices you make |dash| find this in the
+:doc:`Available Scripts <scripts/overview>` section.
 
 There are also card-related examples in the
 :doc:`Available Examples <examples/index>` section.

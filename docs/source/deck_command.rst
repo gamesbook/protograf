@@ -355,10 +355,17 @@ Example 5a. Grid Marks: Edge
       then the fill color within the card frame will be set to match that of
       the *bleed_fill*.
 
-      The edge of the page has small marks that are designed to help with
-      card cutting; ``grid_marks=True`` enables these marks, and the optional
-      *grid_marks_length* allows the length of these lines to be set; the default
-      length is ``0.85`` cm.
+      The edge of the page has small marks along it that are designed to help
+      with card cutting; ``grid_marks=True`` enables these marks |dash| also
+      referred to as trim or crop marks |dash| and the optional
+      *grid_marks_length* allows the length of these lines to be set;
+      the default length is ``0.85`` cm (one-third of an inch).
+
+      .. HINT::
+
+          Be aware that the grid marks used to assist with cutting are being
+          drawn at the page edge; depending on their length and your printer
+          settings, this may result in them not being printed!
 
       In this example, the ``grid_marks_stroke`` has been changed from the
       default color of ``"gray"`` to ``"black"`` and the
@@ -401,12 +408,13 @@ Example 5b. Grid Marks: Cross
 
       The *grid_marks_style* is changed from the default value of ``"edge"`` to
       that of ``"cross"`` so that small cross-shapes, of length equal to ``0.2``
-      cm, are drawn at the corners of each card's frame.
+      cm, are drawn at the corners of each card's frame, to help the cards to be
+      cut or trimmed more easily.
 
       .. HINT::
 
           This style is perhaps suited to the case where cards are expected
-          to be rounded, otherwise the marks might show up on the cards.
+          to be rounded, otherwise the marks might be drawn on the cards.
 
       The *grid_marks_style* can also be set to ``"both"`` if both edge marks
       **and** crosses are required.

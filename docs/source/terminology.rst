@@ -427,12 +427,16 @@ Display-orientated Terms
 -  **corners** - if assigned a number will cause short lines of that length
    to be drawn from each corner of a ``Rectangle`` |dash| these lines can be
    further styled e.g. to show as small, triangular photograph holders
--  **hidden** - a list of locations, indicated by their *row and
-   column* identifier, which should **not** be used for display - the rest
-   are displayed as normal
+-  **grid** - a series of lines that are drawn in a pattern;  **protograf**
+   uses this term in many contexts |dash| grids that cover the whole page;
+   grids used for drawing game boards; and even small grid marks that are
+   used for trmming, cutting or cropping cards
 -  **hatches** - when used in combination with **hatches_count** will draw a
    series of parallel lines between two opposing sides of a regular shape in
    the specified direction(s)
+-  **hidden** - a list of locations, indicated by their *row and
+   column* identifier, which should **not** be used for display - the rest
+   are displayed as normal
 -  **masked** - a list of locations, indicated by their *sequence
    number* |dash| i.e. their position in the drawing order |dash| which
    should **not** be used for display |dash| the rest are displayed as normal
@@ -493,9 +497,12 @@ Miscellaneous Terms
    for a layout will show small dots where each point in that layout exists
 -  **GIF** - Graphics Interchange Format. A file format in which an image
    can be stored; its useful because it supports multiple layers and can be
-   animated
+   animated.
+-  **PDF** - Portable Document Format. A widely used format to create documents
+   such that they display the same way on all devices; its Useful because it
+   supports the vector-format of **protograf** shapes.
 -  **PNG** - Portable Network Graphic. A file format in which an image can
-   be stored; its useful because it supports transparent backgrounds
+   be stored; its useful because it supports transparent backgrounds.
 -  **SVG** - Scaleable Vector Graphics. A file format in which an image can
    be stored; its a vector-format unlike the bitmap- or raster-format of PNG
-   and JPEG files, so its size can be changed without loss of quality
+   and JPEG files, so its size can be changed without loss of quality.

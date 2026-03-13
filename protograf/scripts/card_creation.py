@@ -4,8 +4,25 @@
 protograf script: generate a basic template for a set of cards
 """
 # lib
+from dataclasses import dataclass
 from datetime import datetime
+
+# third party
 from rich.console import Console
+
+
+@dataclass
+class Options:
+    script: str = ""
+    paper_size: str = "A4"
+    units: str = "cm"
+    margins: float = 0.5
+    gap: float = 0
+    cards: int = 9
+    grid_marks: bool = True
+    card_size: str = "Poker"
+    excel: str = ""
+
 
 paper_size = {
     "1": "A4 - portrait",
@@ -37,10 +54,13 @@ ms = "[bold magenta]"
 me = "[/bold magenta]"
 qs = "[bold blue]"
 qe = "[/bold blue]"
+
 now = datetime.now()
+dstring = f"{now:%Y%m%d%H%M%S}"
 created = f"{now:%Y-%m-%d %H:%M:%S}"
 created_usa = f"{now:%m-%d-%Y %H:%M:%S}"
 _input = 0.0
+x_size = 1
 
 console = Console()
 console.print(f"{qs}Welcome to the Card Creation assistant!{qe}\n")
@@ -50,39 +70,31 @@ console.print(f"{qs}a starting point for your card prototype.{qe}\n")
 console.print(f"{qs}* Pressing Enter will accept the default option or value.{qe}")
 console.print(f"{qs}* Pressing ? will take you back to the previous prompt.{qe}")
 # console.print(f"{qs}{qe}")
+
 prompt = f"{gs}Enter the number of your choice:{ge} "
 invalid = f"{ms}Invalid selection. Please choose a number from those shown.{me}"
 invalid_number = f"{ms}The value {_input} is not a valid number. Please try again.{me}"
 
-
+opts = Options()
 step = 0
-params = {}
-params["script"] = "cards_" + f"{now:%Y%m%d%H%M%S}"
-params["paper_size"] = "A4"
-params["units"] = "cm"
-params["margins"] = 0.5
-params["gap"] = 0
-params["cards"] = 9
-params["grid_marks"] = True
-params["card_size"] = "Poker"
-uunits = params["units"]
-
 # ---- data gather process
-while step < 8:
+while step < 9:
 
     if step == 0:
         name_input = console.input(
-            f"\n{ms}Enter your own script name (no spaces):{me} "
+            f"\n{gs}Enter your own script name (no spaces or extension):{ge} "
         )
         if name_input:
-            _name = str(name_input).replace(" ", "_")
+            _name = str(name_input).strip().replace(" ", "_")
             if len(_name) > 0:
-                params["script"] = _name
+                opts.script = _name
+        if not opts.script:
+            opts.script = f"cards_{dstring}"
         step += 1
 
     elif step == 1:
         options = paper_size
-        console.print(f"\n{ms}Select your paper size:{me}")
+        console.print(f"\n{ms}What is your paper size?{me}")
         for key, value in options.items():
             print(f"{key}. {value}")
         choice = console.input(prompt)
@@ -92,7 +104,15 @@ while step < 8:
         else:
             if choice:
                 if choice in options:
-                    params["paper_size"] = options[choice]
+                    match options[choice]:
+                        case 1:
+                            opts.paper_size = "A4"
+                        case 2:
+                            opts.paper_size = "A4-l"
+                        case 3:
+                            opts.paper_size = "Letter"
+                        case 4:
+                            opts.paper_size = "Letter-l"
                     step += 1
                 else:
                     console.print(invalid)
@@ -101,7 +121,7 @@ while step < 8:
 
     elif step == 2:
         options = units
-        console.print(f"\n{ms}Select your units:{me}")
+        console.print(f"\n{ms}What are your units?{me}")
         for key, value in options.items():
             print(f"{key}. {value}")
         choice = console.input(prompt)
@@ -111,16 +131,22 @@ while step < 8:
         else:
             if choice:
                 if choice in options:
-                    params["units"] = options[choice]
+                    opts.units = options[choice]
+                    match opts.units:
+                        case "cm":
+                            x_size = 1
+                        case "mm":
+                            x_size = 10
+                        case "in":
+                            x_size = 0.5
                     step += 1
                 else:
                     console.print(invalid)
             else:
                 step += 1
-            uunits = params["units"]
 
     elif step == 3:
-        _input = console.input(f"\n{gs}Enter the page margin [{uunits}]:{ge} ")
+        _input = console.input(f"\n{gs}Enter the page margin ({opts.units}):{ge} ")
         if _input == "?":
             step -= 1
         else:
@@ -130,16 +156,20 @@ while step < 8:
                     if _val < 0:
                         console.print(invalid_number)
                     else:
-                        params["margins"] = _val
+                        opts.margins = _val
                         step += 1
                 except:
                     console.print(invalid_number)
             else:
+                if opts.units == "in":
+                    opts.margins = 0.33
+                if opts.units == "mm":
+                    opts.margins = 10
                 step += 1
 
     elif step == 4:
         options = card_size
-        console.print(f"\n{ms}Select your card size:{me}")
+        console.print(f"\n{ms}What is your card size?{me}")
         for key, value in options.items():
             print(f"{key}. {value}")
         choice = console.input(prompt)
@@ -149,7 +179,7 @@ while step < 8:
         else:
             if choice:
                 if choice in options:
-                    params["card_size"] = options[choice]
+                    opts.card_size = options[choice]
                     step += 1
                 else:
                     console.print(invalid)
@@ -158,7 +188,7 @@ while step < 8:
 
     elif step == 5:
         _input = console.input(
-            f'\n{gs}Enter the number of {params["card_size"]} cards:{ge} '
+            f"\n{gs}Enter the number of {opts.card_size} cards:{ge} "
         )
         if _input == "?":
             step -= 1
@@ -169,7 +199,7 @@ while step < 8:
                     if _val <= 0:
                         console.print(invalid_number)
                     else:
-                        params["cards"] = _val
+                        opts.cards = _val
                         step += 1
                 except:
                     console.print(invalid_number)
@@ -178,7 +208,7 @@ while step < 8:
 
     elif step == 6:
         options = t_f
-        _input = console.print(f"\n{gs}Do you want grid marks displayed?{ge} ")
+        _input = console.print(f"\n{ms}Do you want grid marks displayed?{me} ")
         for key, value in options.items():
             print(f"{key}. {value}")
         choice = console.input(prompt)
@@ -188,7 +218,7 @@ while step < 8:
         else:
             if choice:
                 if choice in options:
-                    params["grid_marks"] = True if choice == "1" else False
+                    opts.grid_marks = True if choice == "1" else False
                     step += 1
                 else:
                     console.print(invalid)
@@ -197,7 +227,7 @@ while step < 8:
 
     elif step == 7:
         _input = console.input(
-            f"\n{gs}Enter the spacing size between cards [{uunits}]:{ge} "
+            f"\n{gs}Enter the spacing size between cards ({opts.units}):{ge} "
         )
         if _input == "?":
             step -= 1
@@ -208,40 +238,58 @@ while step < 8:
                     if _val < 0:
                         console.print(invalid_number)
                     else:
-                        params["gap"] = _val
+                        opts.gap = _val
                         step += 1
                 except:
                     console.print(invalid_number)
             else:
                 step += 1
 
+    elif step == 8:
+        name_input = console.input(
+            f"\n{gs}Enter the name of an Excel file (if any) containing card data:{ge} "
+        )
+        if name_input == "?":
+            step -= 1
+        else:
+            if name_input:
+                _name = str(name_input).strip()
+                if len(_name) > 0:
+                    opts.excel = _name
+            step += 1
+
+
 # ---- data write process
-# print(params)
-fname = params["script"] + ".py" if ".py" not in params["script"] else params["script"]
-cdate = created if "A4" in params["paper_size"] else created_usa
+# print(opts)
+fname = opts.script + ".py" if ".py" not in opts.script else opts.script
+cdate = created if "A4" in opts.paper_size else created_usa
+
 with open(f"{fname}", "w") as foo:
-    foo.write(f"'''\nprotograf script\nCreated on: {cdate}\n'''\n")
-    foo.write("from protograf import *\n")
+    foo.write(f"'''\nprotograf script\nCreated on: {cdate}\n'''")
+    foo.write("\nfrom protograf import *")
     foo.write(
-        f"Create(\n    filename=\"{params['script']}.pdf\","
-        f"\n    margin={params['margins']},"
-        f"\n    paper=\"{params['paper_size']}\""
-        ")"
+        f'\nCreate(\n    filename="{opts.script}.pdf",'
+        f'\n    paper="{opts.paper_size}",'
+        f'\n    units="{opts.units}",'
+        f"\n    margin={opts.margins},"
+        "\n)"
     )
+    if opts.excel:
+        foo.write(f'\nData(filename="{opts.excel}")')
     foo.write("\nDeck(")
-    foo.write(f"\n    cards={params['cards']},")
-    foo.write(f"\n    card_size=\"{params['card_size']}\",")
-    if params["grid_marks"]:
-        gml = params["margins"] / 2.0
+    foo.write(f"\n    cards={opts.cards},")
+    foo.write(f'\n    card_size="{opts.card_size}",')
+    if opts.grid_marks:
+        gml = opts.margins / 2.0
         foo.write("\n    grid_marks=True,")
         foo.write(f"\n    grid_marks_length={gml},")
         foo.write('\n    grid_marks_stroke="black",')
         foo.write("\n    grid_marks_stroke_width=0.1,")
-    if params["gap"]:
-        foo.write(f"\n    spacing_x={params['gap']},")
-        foo.write(f"\n    spacing_y={params['gap']},")
+    if opts.gap:
+        foo.write(f"\n    spacing_x={opts.gap},")
+        foo.write(f"\n    spacing_y={opts.gap},")
     foo.write("\n)")
-    foo.write("\nCard('*', circle(label=\"{{sequence}}\"))")
+    foo.write(f'\nCard("*", circle(x={x_size}, y={x_size}, label="{{{{sequence}}}}"))')
     foo.write("\nSave()")
 
 console.print(f'\n{qs}Your choices have been used to create "{fname}" {qe}')
