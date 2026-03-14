@@ -18,6 +18,7 @@ from protograf.utils.tools import _lower
 from protograf.utils.messaging import feedback
 from protograf.utils.structures import (
     DirectionGroup,
+    Locale,
     Perbis,
     Point,
     Radius,
@@ -223,11 +224,20 @@ class RectangleShape(BaseShape):
 
     def calculate_xy(self, **kwargs) -> tuple:
         """Calculate top-left point of Rectangle."""
-        # ---- check for locale (used by Track; see proto.py)
+        # ---- check for locale (used by Track and Grid; see proto.py)
         lx, ly = None, None
-        if kwargs.get("locale"):
-            lx = kwargs.get("locale").get("x")
-            ly = kwargs.get("locale").get("y")
+        _locale = kwargs.get("locale")
+        if _locale:
+            if isinstance(_locale, dict):
+                lx = _locale.get("x", 0.0)
+                ly = _locale.get("y", 0.0)
+            elif isinstance(_locale, (GridShape, Locale)):
+                lx = _locale.x
+                ly = _locale.y
+            else:
+                raise NotImplementedError(
+                    f"Unable to process locale type {type(_locale)} for RectangleShape"
+                )
         # ---- bleed adjust
         bleed_x = self.unit(kwargs.get("bleed_x", 0.0))
         bleed_y = self.unit(kwargs.get("bleed_y", 0.0))

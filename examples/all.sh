@@ -51,7 +51,8 @@ python boards/abstract/morabaraba.py --no-png -d /tmp/demo
 python boards/abstract/octagons.py --no-png -d /tmp/demo
 python boards/abstract/snex.py --no-png -d /tmp/demo
 python boards/abstract/tictactoe.py --no-png -d /tmp/demo
-python boards/abstract/classic_games.py --no-png -d /tmp/demo
+echo -e "\nCreating New Classic boards..."
+#python boards/abstract/new_classics.py --no-png -d /tmp/demo
 # ---- boards: commercial
 echo -e "\nCreating commercial boards..."
 python boards/commercial/ack_map.py --no-png -d /tmp/demo
@@ -93,7 +94,6 @@ python cards/cards_deck_01.py --no-png -d /tmp/demo
 python cards/cards_deck_02.py --no-png -d /tmp/demo
 python cards/cards_deck_03.py --no-png -d /tmp/demo
 python cards/cards_deck_04.py --no-png -d /tmp/demo
-python cards/cards_deck_04A.py --no-png -d /tmp/demo
 python cards/cards_deck_05.py --no-png -d /tmp/demo
 python cards/cards_deck_05A.py --no-png -d /tmp/demo
 python cards/cards_deck_06.py --no-png -d /tmp/demo

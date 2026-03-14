@@ -685,7 +685,7 @@ class DeckOfCards:
         self.width = kwargs.get("width", the_width)  # OVERWRITE
         self.cx = self.width / 2.0
         self.cy = self.height / 2.0
-        print(f"$$$ Deck {size=} {self.width=} {self.height} {self.cx=} {self.cy=}")
+        # print(f"$$$ Deck {size=} {self.width=} {self.height} {self.cx=} {self.cy=}")
         self.kwargs["width"] = self.width  # used for create_cardshapes()
         self.kwargs["height"] = self.height  # used for create_cardshapes()
         self.radius = kwargs.get("radius", default_radius)  # OVERWRITE
@@ -4645,7 +4645,7 @@ def Location(grid: list, label: str, shapes: list, **kwargs):
             kwargs["locale"] = locale
             # feedback(f"$$$ {shape=} :: {loc.x=}, {loc.y=} // {dx=}, {dy=}")
             # feedback(f"$$$ {kwargs=}")
-            # feedback(f"$$$ {label} :: {shape_name=}")
+            # feedback(f"$$$ Loc {label} :: {shape_name=}")
             if shape_name in GRID_SHAPES_WITH_CENTRE:
                 shape.draw(_abs_cx=x, _abs_cy=y, **kwargs)
             elif shape_name in GRID_SHAPES_NO_CENTRE:
@@ -4714,7 +4714,7 @@ def Locations(grid: list, labels: Union[str, list], shapes: list, **kwargs):
         feedback("Shapes must contain a list of shapes!", True)
 
     for label in _labels:
-        # feedback(f'{label=} :: {shapes=}')
+        # feedback(f'### Locations {label=} :: {shapes=}')
         Location(grid, label, shapes)
 
 

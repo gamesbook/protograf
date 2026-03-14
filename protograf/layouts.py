@@ -1567,7 +1567,7 @@ class TriangularLocations(VirtualLocations):
         self.kwargs = kwargs
         self.start = kwargs.get("start", "north")
         self.facing = kwargs.get("facing", "north")
-        self.triangle_validate(**kwargs)
+        self.triangle_validate()
         # ---- calculated values
         _facing = self.set_compass_primary(_lower(self.facing))
         match _facing:

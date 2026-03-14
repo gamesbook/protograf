@@ -58,6 +58,7 @@ python boards\abstract\hexhex_dots.py --no-png -d %location%
 python boards\abstract\hexhex_hexagons.py --no-png -d %location%
 python boards\abstract\hexhex_rectangles.py --no-png -d %location%
 python boards\abstract\morabaraba.py --no-png -d %location%
+python boards\abstract\new_classics.py --no-png -d %location%
 python boards\abstract\octagons.py --no-png -d %location%
 python boards\abstract\snex.py --no-png -d %location%
 python boards\abstract\tictactoe.py --no-png -d %location%
