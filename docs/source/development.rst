@@ -120,7 +120,7 @@ Follow this process:
   and also delete the ``temp`` directory)
 - |check| Update the ``release`` in ``docs/source/conf.py``
 - |check| Update the ``__version_info__`` in ``_version.py``
-- |check| If working in a branch, now merge changes into master
+- |check| If working in a branch, now merge changes into master on GitHub
 - |check| Ensure you are on the ``master`` branch and pull changes
 - |check| Update the version using poetry e.g. ``poetry version patch``
 - |check| Git commit and push all these changes to GitHub
