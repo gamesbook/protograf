@@ -727,12 +727,20 @@ class BaseShape:
 
     def __init__(self, _object: muShape = None, canvas: BaseCanvas = None, **kwargs):
         # print(''.join(traceback.format_stack()))
+
         # feedback(f'### BaseShape 1 {type(self).__name__} {kwargs=}')
-        # inject and then override kwargs supplied by DefaultShape
+        # inject and then override kwargs supplied by DefaultShape aka user defaults
         if kwargs.get("default"):
             try:
-                if kwargs.get("default"):
-                    self.kwargs = kwargs["default"]._default_kwargs | kwargs
+                shape_default = kwargs.get("default")
+                if shape_default:
+                    if isinstance(shape_default, list):
+                        all_kwargs = {}
+                        for item in shape_default:
+                            all_kwargs = all_kwargs | item._default_kwargs
+                        self.kwargs = all_kwargs | kwargs
+                    else:
+                        self.kwargs = shape_default._default_kwargs | kwargs
             except Exception:
                 self.kwargs = kwargs
         else:

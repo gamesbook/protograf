@@ -18,10 +18,12 @@ import os
 from pathlib import Path
 import random
 import sys
+import types
 from typing import Union, Any
 
 # third party
 import jinja2
+from PIL import Image as PIL_Image
 import pymupdf
 from pymupdf import Rect as muRect, Archive
 
@@ -260,10 +262,11 @@ class CardShape(BaseShape):
     def __init__(self, _object=None, canvas=None, **kwargs):
         super().__init__(_object=_object, canvas=canvas, **kwargs)
         self.kwargs = kwargs
-        # feedback(f'\n$$$ CardShape KW=> {self.kwargs}')
+        # feedback(f"\n$$$ CardShape KW=> {self.kwargs}")
         self.elements = []  # container for objects which get added to the card
         self.members = None
         self.card_bleed = None  # possible CardBleed namedtuple
+        self.card_name = kwargs.get("card_name", None)  # prefix for card PNG images
         self.outline_shape = CardOutline(_object=_object, canvas=canvas, **kwargs)
         self.outline = self.outline_shape.get_outline(
             cnv=canvas, row=None, col=None, cid=None, label=None, **kwargs
@@ -466,7 +469,7 @@ class CardShape(BaseShape):
                 tl=Point(mx, my), br=Point(mx + frame_width, my + frame_height)
             )
             page = kwargs.get("page_number", 0)
-            _cframe = (frame_bbox, kwargs.get("cardname", None))
+            _cframe = (frame_bbox, self.card_name)
             # store for use by pdf_cards_to_png()
             if page not in globals.card_frames:
                 globals.card_frames[page] = [_cframe]
@@ -680,7 +683,9 @@ class DeckOfCards:
             the_height, the_width = size[1] / globals.units, size[0] / globals.units
         self.height = kwargs.get("height", the_height)  # OVERWRITE
         self.width = kwargs.get("width", the_width)  # OVERWRITE
-        # print(f'$$$ {size=}, {self.width=}, {self.height}')
+        self.cx = self.width / 2.0
+        self.cy = self.height / 2.0
+        print(f"$$$ Deck {size=} {self.width=} {self.height} {self.cx=} {self.cy=}")
         self.kwargs["width"] = self.width  # used for create_cardshapes()
         self.kwargs["height"] = self.height  # used for create_cardshapes()
         self.radius = kwargs.get("radius", default_radius)  # OVERWRITE
@@ -864,10 +869,11 @@ class DeckOfCards:
         directory: str,
         output: str = None,
         fformat: str = "png",
-    ):
+    ) -> list:
         """Save individual cards as PNG images using their frames."""
+        card_names = []
         if self.export_cards and globals.pargs.png:  # pargs.png should default to True
-            support.pdf_frames_to_png(
+            card_names = support.pdf_frames_to_png(
                 source_file=filename,
                 output=output or filename,
                 fformat=fformat,
@@ -876,6 +882,44 @@ class DeckOfCards:
                 frames=globals.card_frames,
                 # page_height=globals.page[1],
             )
+        return card_names
+
+    def export_cards_as_single_image(
+        self,
+        card_names: list,
+        filename: str,
+        output: str = None,
+        directory: str = "/tmp/demo",
+        fformat: str = "png",
+    ):
+        """Combine individual card PNG images into a single large one.
+
+        Notes:
+            * This kind of image is used by TTS (Table Top Simulator)
+        """
+        # new, transparent canvas
+        output_name = "deck_image.png"  # set via user?
+        MAX_X, MAX_Y = 500, 800  # set by user or default to 4096, 4096
+        new_image = PIL_Image.new("RGBA", (MAX_X, MAX_Y), color=(0, 0, 0, 0))
+        # source images
+        card_names = card_names or ["image", "image-1-2", "image-1-3", "image-1-4"]
+        # TODO - load first image to get its dimensions
+        x, y = 0, 0  # top-left
+        # add source images to new canvas
+        for key, image in enumerate(card_names):
+            if x > MAX_X:
+                x = 0
+                y = y + 400  # image height
+                if y > MAX_Y:
+                    # maybe start a new image ???
+                    feedback(f"Too many card images to fit into {output_name}!", True)
+            _file = Path(directory, f"{image}.{fformat}")
+            card_image = PIL_Image.open(_file).convert("RGBA")
+            new_image.paste(card_image, (x, y), mask=card_image)
+            x = x + 250  # image width
+        # save final result
+        file_out = Path(directory, output_name)
+        new_image.save(file_out, "PNG")
 
     def draw(self, cnv=None, off_x=0, off_y=0, ID=None, **kwargs):
         """Draw all cards for a DeckOfCards.
@@ -1316,19 +1360,27 @@ class DeckOfCards:
 
         # ---- reset to prime and load-in gutter pages
         if self.gutter > 0:
-            # save gutter document
+            # ---- * save gutter document
             gutterfile = os.path.join(globals.directory, globals.filename)
             globals.document.save(gutterfile)
-            # export cards
-            self.export_cards_as_images(
+            # ---- * export individual cards
+            card_names = self.export_cards_as_images(
                 filename=globals.filename,
                 directory=globals.directory,
                 output=prime_globals.filename,
             )  # default to PNG format
-            # reset globals to current doc
+            # ---- * export cards as single image
+            if False:  # TODO - set and read self.deck_image
+                self.export_cards_as_single_image(
+                    card_names=card_names,
+                    filename=globals.filename,
+                    directory=globals.directory,
+                    output=prime_globals.filename,
+                )  # default to PNG format
+            # ---- * reset globals to current doc
             restore_globals(prime_globals)
             cnv = globals.canvas
-            # open gutter document
+            # ---- * open gutter document
             src = pymupdf.open(gutterfile)
             if is_landscape:
                 # upper half page (r1: backs)
@@ -1344,7 +1396,7 @@ class DeckOfCards:
                 # right half page (r1: backs)
                 r1 = muRect(cnv.width / 2, 0, cnv.width, cnv.height)
                 r1_rotate = 90
-            # insert pages from gutter.pdf
+            # ---- * insert pages from gutter.pdf
             for page_number in range(0, src.page_count, 2):
                 globals.doc_page.show_pdf_page(
                     r2, src, page_number, rotate=r2_rotate
@@ -1369,7 +1421,7 @@ class DeckOfCards:
                     tools.set_canvas_props(cnv=globals.canvas, index=None, **gwargs)
                 # if page_number < src.page_count / 2 - 1:
                 PageBreak()
-            # ---- delete extra blank page at the end
+            # ---- * delete extra blank page at the end
             globals.document.delete_page(globals.page_count)
             # ---- delete gutter PDF document
             if os.path.exists(gutter_filename):
@@ -2145,9 +2197,16 @@ def Save(**kwargs):
 
     # ---- export individual Cards (where only Card fronts exist)
     if globals.deck and len(globals.deck.fronts) >= 1:
-        globals.deck.export_cards_as_images(
+        card_names = globals.deck.export_cards_as_images(
             filename=the_filename, directory=globals.directory
         )
+        # ---- * export cards as single image
+        if False:  # TODO - set and read self.deck_image
+            globals.deck.export_cards_as_single_image(
+                card_names=card_names,
+                filename=the_filename,
+                directory=globals.directory,
+            )  # default to PNG format
 
     # ---- save to PNG image(s) or SVG file(s)
     fformat = None
@@ -2406,7 +2465,6 @@ def Card(
 
     Kwargs:
     - bleed_fill (str): the color with which to create the bleed area
-    - bleed (float): the distance away from the card frame to which the bleed extends
     - bleed_x (float): the x-distance away from the card frame to which the bleed extends
     - bleed_y (float): the y-distance away from the card frame to which the bleed extends
 
@@ -2439,7 +2497,10 @@ def Card(
     if not globals.deck:
         feedback("The Deck() has not been defined or is incorrect.", True)
     if not sequence:
-        feedback("The Card() needs to have a valid sequence defined.", True)
+        feedback(
+            f"A Card() does not have a valid sequence and will be skipped.", False, True
+        )
+        return
     _cards = []
     # int - single card
     try:
@@ -2463,6 +2524,8 @@ def Card(
                     )
                 )
             )
+            if isinstance(sequence, types.FunctionType):
+                sequence = sequence()
             if isinstance(sequence, list) and not isinstance(sequence, str):
                 _cards = sequence
             elif _lower(sequence) == "all" or _lower(sequence) == "*":
@@ -2482,8 +2545,16 @@ def Card(
                 err,
             )
             feedback(
-                f'Unable to convert "{sequence}" into a card or range of cards {globals.deck}.'
+                f'Unable to convert Card "{sequence}" into a range of cards.',
+                False,
+                True,
             )
+            return
+    if not _cards:
+        feedback(
+            f"A Card() does not have a valid sequence and will be skipped.", False, True
+        )
+        return
     max_cards = len(globals.deck.fronts)
     for index, _card in enumerate(_cards):
         if _card > max_cards:
@@ -2567,6 +2638,8 @@ def CardBack(sequence: object = None, *elements, **kwargs):
                     )
                 )
             )
+            if isinstance(sequence, types.FunctionType):
+                sequence = sequence()
             if isinstance(sequence, list) and not isinstance(sequence, str):
                 _cardbacks = sequence
             elif _lower(sequence) == "all" or _lower(sequence) == "*":

@@ -471,7 +471,7 @@ def sequence_split(
     [3.1]
     """
     values = []
-    if isinstance(strng, (dict, list)):
+    if isinstance(strng, list):
         return strng
     if isinstance(strng, (int, float)):
         return [strng]
