@@ -18,10 +18,12 @@ import os
 from pathlib import Path
 import random
 import sys
+import types
 from typing import Union, Any
 
 # third party
 import jinja2
+from PIL import Image as PIL_Image
 import pymupdf
 from pymupdf import Rect as muRect, Archive
 
@@ -89,7 +91,8 @@ from ._version import __version__
 from protograf.utils import colrs, geoms, loadr, tools, support
 from protograf.utils.constants import (
     DEFAULT_FONT,
-    DEBUG_COLOR,
+    RGB_DEBUG_COLOR,
+    CMYK_DEBUG_COLOR,
     DEFAULT_CARD_WIDTH,  # cm
     DEFAULT_CARD_HEIGHT,  # cm
     DEFAULT_CARD_COUNT,
@@ -122,6 +125,7 @@ from protograf.utils.support import (  # used in scripts
 )
 from protograf.utils.structures import (
     BBox,
+    CardBleed,
     CardFrame,
     DatasetType,
     DeckPrintState,
@@ -143,14 +147,20 @@ from protograf.utils.tools import (  # used in scripts
     restore_globals,
     uniques,
 )
+from protograf.utils.constants import (
+    RGB_BLACK,
+    RGB_WHITE,
+    CMYK_BLACK,
+    CMYK_WHITE,
+    YES,
+    NO,
+)
 from protograf import globals
 
 log = logging.getLogger(__name__)
 globals_set = False
 
-# user constants
-YES = True
-NO = False
+GRAYS = ("0,0,0,25.5", "#BEBEBE")
 
 
 def validate_globals():
@@ -166,6 +176,9 @@ def validate_globals():
 class CardOutline(BaseShape):
     """
     Card outline on a given canvas.
+
+    Note:
+        Also use to calculate an area for card bleed.
     """
 
     def __init__(self, _object=None, canvas=None, **kwargs):
@@ -184,9 +197,14 @@ class CardOutline(BaseShape):
             default_radius = DEFAULT_CARD_RADIUS / globals.units
 
         # print(f'$$$ {default_width=} {default_height=} {default_radius=} {globals.units=}')
-        self.height = kwargs.get("height", default_height)
-        self.width = kwargs.get("width", default_width)
-        self.radius = kwargs.get("radius", default_radius)
+        self.bleed_x = kwargs.get("bleed_x", 0.0)
+        self.bleed_y = kwargs.get("bleed_y", 0.0)
+        self.bleed_radius = kwargs.get("bleed_radius", 0.0)
+        self.width = kwargs.get("width", default_width) + 2 * self.bleed_x
+        self.height = kwargs.get("height", default_height) + 2 * (
+            self.bleed_y or self.bleed_radius
+        )
+        self.radius = kwargs.get("radius", default_radius) + self.bleed_radius
         self.frame_type = kwargs["frame_type"]
         self.outline = self.get_outline(
             cnv=canvas, row=None, col=None, cid=None, label=None, **kwargs
@@ -244,9 +262,11 @@ class CardShape(BaseShape):
     def __init__(self, _object=None, canvas=None, **kwargs):
         super().__init__(_object=_object, canvas=canvas, **kwargs)
         self.kwargs = kwargs
-        # feedback(f'\n$$$ CardShape KW=> {self.kwargs}')
+        # feedback(f"\n$$$ CardShape KW=> {self.kwargs}")
         self.elements = []  # container for objects which get added to the card
         self.members = None
+        self.card_bleed = None  # possible CardBleed namedtuple
+        self.card_name = kwargs.get("card_name", None)  # prefix for card PNG images
         self.outline_shape = CardOutline(_object=_object, canvas=canvas, **kwargs)
         self.outline = self.outline_shape.get_outline(
             cnv=canvas, row=None, col=None, cid=None, label=None, **kwargs
@@ -281,7 +301,7 @@ class CardShape(BaseShape):
                 )
 
     def draw_card(self, cnv, row, col, cid, **kwargs):
-        """Draw a card on a given canvas.
+        """Draw a Card on a given canvas.
 
         Pass on `deck_data` to other commands, as needed, for them to draw Shapes
         """
@@ -341,15 +361,35 @@ class CardShape(BaseShape):
             move_x = right_gap - self.offset_x - globals.margins.left
         else:
             move_x = 0
-        # feedback(f'$$$ {right_gap=} {self.offset_x=} {move_x=}')
-        # feedback(f'$$$ {shape_kwargs["frame_type"]=} {shape_kwargs["grid_marks"]=}')
+        # feedback(f'$$$ 356 {right_gap=} {self.offset_x=} {move_x=}')
+        # feedback(f'$$$ 357 {shape_kwargs["frame_type"]=} {shape_kwargs["grid_marks"]=}')
+        # feedback(f"$$$ 358 {outline=} {shape_kwargs=}")
+
+        # ---- draw card bleed
+        if self.card_bleed:
+            # print(f"$$$ 362 {cid=} {self.elements=} {self.card_bleed=}")
+            bleed_kwargs = copy(shape_kwargs)
+            bleed_kwargs["fill"] = self.card_bleed.fill
+            bleed_kwargs["stroke"] = self.card_bleed.fill
+            bleed_kwargs["bleed_x"] = self.card_bleed.offset_x
+            bleed_kwargs["bleed_y"] = self.card_bleed.offset_y
+            bleed_kwargs["bleed_radius"] = self.card_bleed.offset_radius
+            bleed_kwargs["grid_marks"] = None
+            # calculate size for bleed
+            bleed_shape = CardOutline(_object=None, canvas=cnv, **bleed_kwargs)
+            bleed_outline = bleed_shape.get_outline(
+                cnv=cnv, row=row, col=col, cid=cid, label=label, **bleed_kwargs
+            )
+            # feedback(f"$$$ 376 {cid=} {type(bleed_outline=} {bleed_kwargs=}")
+            bleed_outline.draw(off_x=move_x, off_y=0, **bleed_kwargs)  # NO grid_marks!
+
         outline.draw(off_x=move_x, off_y=0, **shape_kwargs)  # inc. grid_marks
 
         # ---- track frame outlines for possible image extraction
         match kwargs["frame_type"]:
             case CardFrame.RECTANGLE:
-                _vertices = outline._shape_vertexes  # clockwise from bottom-left
-                base_frame_bbox = BBox(tl=_vertices[0], br=_vertices[2])
+                _vertices = outline._shape_vertexes  # clockwise from top-right
+                base_frame_bbox = BBox(tl=_vertices[3], br=_vertices[1])
             case CardFrame.CIRCLE:
                 base_frame_bbox = outline.bbox
             case CardFrame.HEXAGON:
@@ -368,7 +408,7 @@ class CardShape(BaseShape):
                 )
             case _:
                 raise NotImplementedError(
-                    f'Cannot handle card frame type: {kwargs["frame_type"]}'
+                    f'Outline cannot handle card frame type: {kwargs["frame_type"]}'
                 )
         frame_width = base_frame_bbox.br.x - base_frame_bbox.tl.x
         frame_height = base_frame_bbox.br.y - base_frame_bbox.tl.y
@@ -429,7 +469,7 @@ class CardShape(BaseShape):
                 tl=Point(mx, my), br=Point(mx + frame_width, my + frame_height)
             )
             page = kwargs.get("page_number", 0)
-            _cframe = (frame_bbox, kwargs.get("cardname", None))
+            _cframe = (frame_bbox, self.card_name)
             # store for use by pdf_cards_to_png()
             if page not in globals.card_frames:
                 globals.card_frames[page] = [_cframe]
@@ -441,7 +481,7 @@ class CardShape(BaseShape):
             _card_grid = tools.as_float(card_grid, "card_grid")
             mx = self.unit(_dx or 0) + self._o.delta_x
             my = self.unit(_dy or 0) + self._o.delta_y
-            stroke = colrs.get_color(DEBUG_COLOR)
+            stroke = colrs.get_color(globals.debug_color)
             grid_size = _card_grid * globals.units
             cols = int(frame_width // grid_size)
             rows = int(frame_height // grid_size)
@@ -617,6 +657,9 @@ class DeckOfCards:
         self.cnv = canvas  # initial pymupdf Shape object (need one per Page)
         self.kwargs = kwargs
         # feedback(f'$$$ DeckShape KW=> {self.kwargs}')
+        # ---- INVALID KWARGS
+        if kwargs.get("bleed_x") is not None or kwargs.get("bleed_y") is not None:
+            feedback('Cannot set "bleed_x" for "bleed_y" for a Deck!', True)
         # ---- cards
         self.fronts = []  # container for CardShape objects for front of cards
         self.backs = []  # container for CardShape objects for back of cards
@@ -640,10 +683,20 @@ class DeckOfCards:
             the_height, the_width = size[1] / globals.units, size[0] / globals.units
         self.height = kwargs.get("height", the_height)  # OVERWRITE
         self.width = kwargs.get("width", the_width)  # OVERWRITE
-        # print(f'$$$ {size=}, {self.width=}, {self.height}')
+        self.cx = self.width / 2.0
+        self.cy = self.height / 2.0
+        # print(f"$$$ Deck {size=} {self.width=} {self.height} {self.cx=} {self.cy=}")
         self.kwargs["width"] = self.width  # used for create_cardshapes()
         self.kwargs["height"] = self.height  # used for create_cardshapes()
         self.radius = kwargs.get("radius", default_radius)  # OVERWRITE
+        # ---- spacing
+        self.spacing = tools.as_float(kwargs.get("spacing", 0), "spacing")
+        self.spacing_x = tools.as_float(
+            kwargs.get("spacing_x", self.spacing), "spacing_x"
+        )
+        self.spacing_y = tools.as_float(
+            kwargs.get("spacing_y", self.spacing), "spacing_y"
+        )
         # ----- set card frame type
         self.frame = kwargs.get("frame", "rectangle")
         match self.frame:
@@ -677,6 +730,16 @@ class DeckOfCards:
                     globals.page_width - globals.margins.left - globals.margins.right
                 ):
                     feedback("Card diameter cannot exceed available page width.", True)
+                if (
+                    self.spacing_x
+                    and self.spacing_y
+                    and self.spacing_x == self.spacing_y
+                ):
+                    feedback(
+                        "Equal card spacing implies hexagon diagonal edges are not aligned.",
+                        False,
+                        True,
+                    )
             case _:
                 hint = " Try rectangle, hexagon, or circle."
                 feedback(f"Unable to draw a {self.frame}-shaped card. {hint}", True)
@@ -724,17 +787,10 @@ class DeckOfCards:
         self.grouping_cols = tools.as_int(
             kwargs.get("grouping_cols", self.grouping), "grouping_cols"
         )
-        # ---- spacing and offset
+        # ---- offset
         self.offset = tools.as_float(kwargs.get("offset", 0), "offset")
         self.offset_x = tools.as_float(kwargs.get("offset_x", self.offset), "offset_x")
         self.offset_y = tools.as_float(kwargs.get("offset_y", self.offset), "offset_y")
-        self.spacing = tools.as_float(kwargs.get("spacing", 0), "spacing")
-        self.spacing_x = tools.as_float(
-            kwargs.get("spacing_x", self.spacing), "spacing_x"
-        )
-        self.spacing_y = tools.as_float(
-            kwargs.get("spacing_y", self.spacing), "spacing_y"
-        )
         # ---- gutter (put backs of Cards on same page)
         self.gutter = tools.as_float(kwargs.get("gutter", 0), "gutter")  # none if zero
         self.gutter_stroke = kwargs.get("gutter_stroke", None)
@@ -813,10 +869,11 @@ class DeckOfCards:
         directory: str,
         output: str = None,
         fformat: str = "png",
-    ):
+    ) -> list:
         """Save individual cards as PNG images using their frames."""
+        card_names = []
         if self.export_cards and globals.pargs.png:  # pargs.png should default to True
-            support.pdf_frames_to_png(
+            card_names = support.pdf_frames_to_png(
                 source_file=filename,
                 output=output or filename,
                 fformat=fformat,
@@ -825,6 +882,44 @@ class DeckOfCards:
                 frames=globals.card_frames,
                 # page_height=globals.page[1],
             )
+        return card_names
+
+    def export_cards_as_single_image(
+        self,
+        card_names: list,
+        filename: str,
+        output: str = None,
+        directory: str = "/tmp/demo",
+        fformat: str = "png",
+    ):
+        """Combine individual card PNG images into a single large one.
+
+        Notes:
+            * This kind of image is used by TTS (Table Top Simulator)
+        """
+        # new, transparent canvas
+        output_name = "deck_image.png"  # set via user?
+        MAX_X, MAX_Y = 500, 800  # set by user or default to 4096, 4096
+        new_image = PIL_Image.new("RGBA", (MAX_X, MAX_Y), color=(0, 0, 0, 0))
+        # source images
+        card_names = card_names or ["image", "image-1-2", "image-1-3", "image-1-4"]
+        # TODO - load first image to get its dimensions
+        x, y = 0, 0  # top-left
+        # add source images to new canvas
+        for key, image in enumerate(card_names):
+            if x > MAX_X:
+                x = 0
+                y = y + 400  # image height
+                if y > MAX_Y:
+                    # maybe start a new image ???
+                    feedback(f"Too many card images to fit into {output_name}!", True)
+            _file = Path(directory, f"{image}.{fformat}")
+            card_image = PIL_Image.open(_file).convert("RGBA")
+            new_image.paste(card_image, (x, y), mask=card_image)
+            x = x + 250  # image width
+        # save final result
+        file_out = Path(directory, output_name)
+        new_image.save(file_out, "PNG")
 
     def draw(self, cnv=None, off_x=0, off_y=0, ID=None, **kwargs):
         """Draw all cards for a DeckOfCards.
@@ -1265,19 +1360,27 @@ class DeckOfCards:
 
         # ---- reset to prime and load-in gutter pages
         if self.gutter > 0:
-            # save gutter document
+            # ---- * save gutter document
             gutterfile = os.path.join(globals.directory, globals.filename)
             globals.document.save(gutterfile)
-            # export cards
-            self.export_cards_as_images(
+            # ---- * export individual cards
+            card_names = self.export_cards_as_images(
                 filename=globals.filename,
                 directory=globals.directory,
                 output=prime_globals.filename,
             )  # default to PNG format
-            # reset globals to current doc
+            # ---- * export cards as single image
+            if False:  # TODO - set and read self.deck_image
+                self.export_cards_as_single_image(
+                    card_names=card_names,
+                    filename=globals.filename,
+                    directory=globals.directory,
+                    output=prime_globals.filename,
+                )  # default to PNG format
+            # ---- * reset globals to current doc
             restore_globals(prime_globals)
             cnv = globals.canvas
-            # open gutter document
+            # ---- * open gutter document
             src = pymupdf.open(gutterfile)
             if is_landscape:
                 # upper half page (r1: backs)
@@ -1293,7 +1396,7 @@ class DeckOfCards:
                 # right half page (r1: backs)
                 r1 = muRect(cnv.width / 2, 0, cnv.width, cnv.height)
                 r1_rotate = 90
-            # insert pages from gutter.pdf
+            # ---- * insert pages from gutter.pdf
             for page_number in range(0, src.page_count, 2):
                 globals.doc_page.show_pdf_page(
                     r2, src, page_number, rotate=r2_rotate
@@ -1311,13 +1414,14 @@ class DeckOfCards:
                         pt2 = (globals.page[0] / 2.0, globals.page[1])
                     globals.canvas.draw_line(pt1, pt2)
                     gwargs = {}  # kwargs
-                    gwargs["stroke"] = self.gutter_stroke or colrs.get_color("gray")
+                    GRAY = GRAYS[0] if globals.color_model == "CMYK" else GRAYS[1]
+                    gwargs["stroke"] = self.gutter_stroke or colrs.get_color(GRAY)
                     gwargs["stroke_width"] = self.gutter_stroke_width
                     gwargs["dotted"] = self.gutter_dotted
                     tools.set_canvas_props(cnv=globals.canvas, index=None, **gwargs)
                 # if page_number < src.page_count / 2 - 1:
                 PageBreak()
-            # ---- delete extra blank page at the end
+            # ---- * delete extra blank page at the end
             globals.document.delete_page(globals.page_count)
             # ---- delete gutter PDF document
             if os.path.exists(gutter_filename):
@@ -1344,14 +1448,14 @@ def page_setup():
     """Set the page color and (optionally) show a dotted margin line and grid."""
     # ---- paper color
     _fill = colrs.get_color(globals.page_fill)
-    if _fill != colrs.get_color("white"):
+    if _fill != colrs.get_color(globals.white):
         globals.doc_page.draw_rect(
             (0, 0, globals.page[0], globals.page[1]), fill=_fill, color=None
         )
     # ---- debug margins
     if globals.margins.debug:
         # print(f'$$$ {globals.margins.left=} {globals.margins.right=}')
-        stroke = colrs.get_color(DEBUG_COLOR)
+        stroke = colrs.get_color(globals.debug_color)
         globals.doc_page.draw_rect(
             (
                 globals.margins.left * globals.units,
@@ -1364,7 +1468,7 @@ def page_setup():
         )
     # ---- page grid
     if globals.page_grid:
-        stroke = colrs.get_color(DEBUG_COLOR)
+        stroke = colrs.get_color(globals.debug_color)
         grid_size = globals.page_grid * globals.units
         cols = int(globals.page[0] // grid_size)
         rows = int(globals.page[1] // grid_size)
@@ -1395,9 +1499,10 @@ def Create(**kwargs):
     - paper_width (float): set specific paper width using the defined *units*
     - paper_height (float): set specific paper height using the defined *units*
       For example, ``"A3-l"`` is a landscape A3 paper size; default is ``A4``
+    - color_model (str): either ``RBG`` (default) or ``CMYK``
     - filename (str): name of the output PDF file; by default this is the prefix
       name of the script, with a ``.pdf`` extension
-    - fill (str): the page color; default is ``white``
+    - fill (str): the page color; default is ``white`` (CMYK equivalent)
     - units (str): can be ``cm`` (centimetres), ``in`` (inches), ``mm``
       (millimetres), or ``points``; default is ``cm``
     - margin (float): set the value for *all* margins using the defined *units*;
@@ -1441,10 +1546,18 @@ def Create(**kwargs):
     )
     # ---- cards
     _cards = kwargs.get("cards", 0)
-    landscape = kwargs.get("landscape", False)
+    # landscape = kwargs.get("landscape", False)  # deprecated
     kwargs = margins(**kwargs)
     defaults = kwargs.get("defaults", None)
-    # ---- paper, page, page sizes, page color
+    # ---- color_model, paper, page, page sizes, page color
+    globals.color_model = kwargs.get("color_model", "RGB")
+    if globals.color_model not in ["RGB", "CMYK"]:
+        feedback('The color_model must be set to "RGB" or "CMYK"', True)
+    globals.black = CMYK_BLACK if globals.color_model == "CMYK" else RGB_BLACK
+    globals.white = CMYK_WHITE if globals.color_model == "CMYK" else RGB_WHITE
+    globals.debug_color = (
+        CMYK_DEBUG_COLOR if globals.color_model == "CMYK" else RGB_DEBUG_COLOR
+    )
     globals.paper = kwargs.get("paper", globals.paper)
     globals.page = pymupdf.paper_size(globals.paper)  # (width, height) in points
     # user overrides
@@ -1460,7 +1573,7 @@ def Create(**kwargs):
         globals.page = (_page_width_pt, _page_height_pt)
     globals.page_width = globals.page[0] / globals.units  # width in user units
     globals.page_height = globals.page[1] / globals.units  # height in user units
-    globals.page_fill = colrs.get_color(kwargs.get("fill", "white"))
+    globals.page_fill = colrs.get_color(kwargs.get("fill", globals.white))
     globals.page_grid = tools.as_float(kwargs.get("page_grid", 0), "page_grid")
     # ---- fonts
     base_fonts()
@@ -1534,9 +1647,13 @@ def Create(**kwargs):
         width=globals.page[0], height=globals.page[1]
     )  # pymupdf Page
     globals.canvas = globals.doc_page.new_shape()  # pymupdf Shape
-    # ---- BaseCanvas
+    # ---- BaseCanvas (base.py)
     globals.base = BaseCanvas(
-        globals.document, paper=globals.paper, defaults=defaults, kwargs=kwargs
+        globals.document,
+        paper=globals.paper,
+        color_model=globals.color_model,
+        defaults=defaults,
+        kwargs=kwargs,
     )
     page_setup()
     # ---- cards
@@ -1603,7 +1720,12 @@ def Load(**kwargs):
     )
     # ---- defaults
     defaults = kwargs.get("defaults", None)
-    # ---- paper, page, page sizes
+    # ---- color_model, paper, page, page sizes
+    globals.color_model = kwargs.get("color_model", "RGB")
+    if globals.color_model not in ["RGB", "CMYK"]:
+        feedback('The color_model must be set to "RGB" or "CMYK"', True)
+    globals.black = CMYK_BLACK if globals.color_model == "CMYK" else RGB_BLACK
+    globals.white = CMYK_WHITE if globals.color_model == "CMYK" else RGB_WHITE
     globals.paper = kwargs.get("paper", globals.paper)
     globals.page = pymupdf.paper_size(globals.paper)  # (width, height) in points
     # ---- fonts
@@ -1685,10 +1807,10 @@ def Load(**kwargs):
     globals.page = (_page_width_pt, _page_height_pt)
     globals.page_width = globals.page[0] / globals.units  # width in user units
     globals.page_height = globals.page[1] / globals.units  # height in user units
-    globals.page_fill = colrs.get_color(kwargs.get("fill", "white"))
+    globals.page_fill = colrs.get_color(kwargs.get("fill", globals.white))
     globals.page_grid = tools.as_float(kwargs.get("page_grid", 0), "page_grid")
     globals.canvas = globals.doc_page.new_shape()  # pymupdf Shape
-    # ---- BaseCanvas
+    # ---- BaseCanvas (base.py)
     globals.base = BaseCanvas(
         globals.document, paper=globals.paper, defaults=defaults, kwargs=kwargs
     )
@@ -2075,9 +2197,16 @@ def Save(**kwargs):
 
     # ---- export individual Cards (where only Card fronts exist)
     if globals.deck and len(globals.deck.fronts) >= 1:
-        globals.deck.export_cards_as_images(
+        card_names = globals.deck.export_cards_as_images(
             filename=the_filename, directory=globals.directory
         )
+        # ---- * export cards as single image
+        if False:  # TODO - set and read self.deck_image
+            globals.deck.export_cards_as_single_image(
+                card_names=card_names,
+                filename=the_filename,
+                directory=globals.directory,
+            )  # default to PNG format
 
     # ---- save to PNG image(s) or SVG file(s)
     fformat = None
@@ -2167,9 +2296,10 @@ def Font(name=None, **kwargs):
 
     Kwargs:
 
-    - size (float): the point size of the Font; default is 12
-    - stroke (str): the named or hexadecimal color of the Font; default is "black"
-    - style (str): the style, if available, for the Font e.g. "bold", "italic"
+    - size (float): point size of the Font; default is 12
+    - stroke (str): named or hexadecimal color of the Font;
+      default is "black" for RGB color_model
+    - style (str): style, if available, for the Font e.g. "bold", "italic"
 
     """
     validate_globals()
@@ -2178,7 +2308,7 @@ def Font(name=None, **kwargs):
     globals.base.font_file = _file
     globals.base.font_size = kwargs.get("size", 12)
     globals.base.font_style = kwargs.get("style", None)
-    globals.base.stroke = kwargs.get("stroke", "black")
+    globals.base.stroke = kwargs.get("stroke", globals.black)
 
 
 def IconFont(name=None, **kwargs):
@@ -2191,7 +2321,8 @@ def IconFont(name=None, **kwargs):
     Kwargs:
 
     - size (float): the point size of the Font; default is 12
-    - stroke (str): the named or hexadecimal color of the Font; default is "black"
+    - stroke (str): the named or hexadecimal color of the Font;
+      default is "black" for RGB color_model
     - style (str): the style, if available, for the Font e.g. "bold", "italic"
 
     """
@@ -2201,7 +2332,7 @@ def IconFont(name=None, **kwargs):
     globals.base.icon_font_file = _file
     globals.base.icon_font_size = kwargs.get("size", 12)
     globals.base.icon_font_style = kwargs.get("style", None)
-    globals.base.icon_stroke = kwargs.get("stroke", "black")
+    globals.base.icon_stroke = kwargs.get("stroke", globals.black)
 
 
 # ---- various ====
@@ -2322,11 +2453,20 @@ def Matrix(labels: list = None, data: list = None) -> list:
 
 
 @docstring_card
-def Card(sequence: object = None, *elements, **kwargs):
+def Card(
+    sequence: object = None,
+    *elements,
+    **kwargs,
+):
     """Add one or more elements to a card or cards.
 
     Args:
     <card>
+
+    Kwargs:
+    - bleed_fill (str): the color with which to create the bleed area
+    - bleed_x (float): the x-distance away from the card frame to which the bleed extends
+    - bleed_y (float): the y-distance away from the card frame to which the bleed extends
 
     NOTE: A Card receives its `draw()` command via Save()!
     """
@@ -2353,10 +2493,14 @@ def Card(sequence: object = None, *elements, **kwargs):
                 feedback(f'Cannot use "{element}" for a Card or CardBack.', True)
 
     kwargs = margins(**kwargs)
+    # print(f'*** Card: {kwargs}')
     if not globals.deck:
         feedback("The Deck() has not been defined or is incorrect.", True)
     if not sequence:
-        feedback("The Card() needs to have a valid sequence defined.", True)
+        feedback(
+            f"A Card() does not have a valid sequence and will be skipped.", False, True
+        )
+        return
     _cards = []
     # int - single card
     try:
@@ -2380,6 +2524,8 @@ def Card(sequence: object = None, *elements, **kwargs):
                     )
                 )
             )
+            if isinstance(sequence, types.FunctionType):
+                sequence = sequence()
             if isinstance(sequence, list) and not isinstance(sequence, str):
                 _cards = sequence
             elif _lower(sequence) == "all" or _lower(sequence) == "*":
@@ -2399,8 +2545,16 @@ def Card(sequence: object = None, *elements, **kwargs):
                 err,
             )
             feedback(
-                f'Unable to convert "{sequence}" into a card or range of cards {globals.deck}.'
+                f'Unable to convert Card "{sequence}" into a range of cards.',
+                False,
+                True,
             )
+            return
+    if not _cards:
+        feedback(
+            f"A Card() does not have a valid sequence and will be skipped.", False, True
+        )
+        return
     max_cards = len(globals.deck.fronts)
     for index, _card in enumerate(_cards):
         if _card > max_cards:
@@ -2410,13 +2564,32 @@ def Card(sequence: object = None, *elements, **kwargs):
                 True,
             )
         card = globals.deck.fronts[_card - 1]  # cards internally number from ZERO
+
         if card:
+            # ---- add elements to card
             for element in elements:
                 # print(f'$$$  Card() {element=} {type(element)=}')
                 if isinstance(element, TemplatingType):
                     add_members_to_card(element)
                 else:
                     add_members_to_card(element)
+            # ---- set card bleed
+            if kwargs.get("bleed_fill") and (
+                kwargs.get("bleed")
+                or kwargs.get("bleed_y")
+                or kwargs.get("bleed_x")
+                or kwargs.get("bleed_radius")
+            ):
+                fill = kwargs.get("bleed_fill")
+                offset_x = kwargs.get("bleed_x", kwargs.get("bleed", 0.0))
+                offset_y = kwargs.get("bleed_y", kwargs.get("bleed", 0.0))
+                offset_radius = kwargs.get("bleed_radius", 0.0)
+                card.card_bleed = CardBleed(
+                    fill=colrs.get_color(fill),
+                    offset_x=tools.as_float(offset_x, "bleed_x"),
+                    offset_y=tools.as_float(offset_y, "bleed_y"),
+                    offset_radius=tools.as_float(offset_radius, "bleed_radius"),
+                )
         else:
             feedback(f'Cannot find card#{_card}. (Check "cards" setting in Deck)')
 
@@ -2465,6 +2638,8 @@ def CardBack(sequence: object = None, *elements, **kwargs):
                     )
                 )
             )
+            if isinstance(sequence, types.FunctionType):
+                sequence = sequence()
             if isinstance(sequence, list) and not isinstance(sequence, str):
                 _cardbacks = sequence
             elif _lower(sequence) == "all" or _lower(sequence) == "*":
@@ -2546,7 +2721,7 @@ def Deck(**kwargs):
     - cols (int): maximum number of card columns that should appear on a page
     - copy (str): the name of a column in the dataset defined by Data() that
       specifies how many copies of a card are needed
-    - fill (str): color of the card's area; defaults to ``white``
+    - fill (str): color of the card's area; defaults to ``white`` (for RGB color_model)
     - frame (str): the default card frame is a *rectangle* (or square, if the
       height and width match); but can be set to *hexagon* or *circle*
     - grid_marks (bool): if set to ``True``, will cause small marks to be drawn at
@@ -2567,7 +2742,7 @@ def Deck(**kwargs):
       page; its value is divided in half, and added to the top margin value, and
       each set of cards is drawn that distance away from the centre line of the page
     - gutter_stroke (str): if set, will cause a line of that color to be used
-      for the *gutter* line; this defaults to ``gray`` (to match grid marks)
+      for the *gutter* line; this defaults to ``gray``, for RGB, (to match grid marks)
     - gutter_stroke_width (float): if set to a value, will cause a line of that
       thickness to be used for the *gutter* line
     - gutter_dotted (bool): sets the style of the *gutter* line
@@ -2588,7 +2763,7 @@ def Deck(**kwargs):
       horizontal direction
     - spacing_y (float): size of blank space between each card or grouping in a
       vertical direction
-    - stroke (str): color of the card's border; defaults to ``black``
+    - stroke (str): color of the card's border; defaults to ``black`` (for RGB color_model)
     - width (float): card width for a *rectangular* card; defaults to ``6.35`` cm
     - zones (list): list of tuples; each with page number(s) and a shape
 
@@ -3554,9 +3729,9 @@ def Rectangle(row=None, col=None, **kwargs):
       corners of the rectangle
     - corners_stroke_width (float): corners line thickness; defaults to 0.1 points
     - corners_stroke (str): the named or hexadecimal color of the corners line;
-      defaults to ``black`
+      defaults to ``black` (for RGB color_model)
     - corners_fill (str): the named or hexadecimal color of the corners area;
-      defaults to ``white`
+      defaults to ```white`` (for RGB color_model)
     - corners_x (float): the length of the corners in the x-direction
     - corners_y (float): the length of the corners in the y-direction
     - corners_directions (str): the specific corners of the rectangle where the
@@ -3981,16 +4156,32 @@ def Blueprint(**kwargs):
     """
 
     def set_style(style_name):
-        """Set Blueprint color and fill."""
+        """Set Blueprint color and fill.
+
+        Note:
+            RGB to CMYK was done via https://colordesigner.io/convert/hextocmyk
+        """
         match style_name:
             case "green":
-                color, fill = "#CECE2C", "#35705E"
+                if globals.color_model == "CMYK":
+                    color, fill = "0,0,78.6,19.2", "52.7,0,16.1,56.1"
+                else:
+                    color, fill = "#CECE2C", "#35705E"
             case "grey" | "gray":
-                color, fill = "white", "#A1969C"
+                if globals.color_model == "CMYK":
+                    color, fill = CMYK_WHITE, "0,6.8,3.1.38.9"
+                else:
+                    color, fill = RGB_WHITE, "#A1969C"
             case "blue" | "invert" | "inverted":
-                color, fill = "honeydew", "#3085AC"
+                if globals.color_model == "CMYK":
+                    color, fill = "5.9,0,5.9,0", "72.1,22.7,0,32.6"
+                else:
+                    color, fill = "#F0FFF0", "#3085AC"
             case _:
-                color, fill = "#3085AC", None
+                if globals.color_model == "CMYK":
+                    color, fill = "72.1,22.7,0,32.6", None
+                else:
+                    color, fill = "#3085AC", None
                 if style_name is not None:
                     feedback(
                         f'The Blueprint style "{style_name}" is unknown', False, True
@@ -4029,7 +4220,7 @@ def Blueprint(**kwargs):
     kwargs["fill"] = kwargs.get("fill", page_fill)
     # ---- page color (optional)
     if kwargs["fill"] is not None:
-        fill = colrs.get_color(kwargs.get("fill", "white"))
+        fill = colrs.get_color(kwargs.get("fill", RGB_WHITE))
         globals.canvas.draw_rect((0, 0, globals.page[0], globals.page[1]))
         globals.canvas.finish(fill=fill)
     kwargs["fill"] = kwargs.get("fill", line_stroke)  # revert back for font
@@ -4454,7 +4645,7 @@ def Location(grid: list, label: str, shapes: list, **kwargs):
             kwargs["locale"] = locale
             # feedback(f"$$$ {shape=} :: {loc.x=}, {loc.y=} // {dx=}, {dy=}")
             # feedback(f"$$$ {kwargs=}")
-            # feedback(f"$$$ {label} :: {shape_name=}")
+            # feedback(f"$$$ Loc {label} :: {shape_name=}")
             if shape_name in GRID_SHAPES_WITH_CENTRE:
                 shape.draw(_abs_cx=x, _abs_cy=y, **kwargs)
             elif shape_name in GRID_SHAPES_NO_CENTRE:
@@ -4523,7 +4714,7 @@ def Locations(grid: list, labels: Union[str, list], shapes: list, **kwargs):
         feedback("Shapes must contain a list of shapes!", True)
 
     for label in _labels:
-        # feedback(f'{label=} :: {shapes=}')
+        # feedback(f'### Locations {label=} :: {shapes=}')
         Location(grid, label, shapes)
 
 
@@ -4626,7 +4817,7 @@ def Layout(grid, **kwargs):
         visible = kwargs.get("visible", [])
     # ---- grid
     layout_grid = kwargs.get("gridlines", None)  # directions ...
-    _grid_stroke = kwargs.get("gridlines_stroke", "black")
+    _grid_stroke = kwargs.get("gridlines_stroke", globals.black)
     layout_grid_ends = kwargs.get("gridlines_ends", None)
     layout_grid_fill = kwargs.get("gridlines_fill", None)
     layout_grid_stroke = colrs.get_color(_grid_stroke)
@@ -5018,70 +5209,75 @@ def Layout(grid, **kwargs):
         if do_debug:
             match _lower(do_debug):
                 case "normal" | "none" | "null" | "n":
-                    Dot(x=loc.x, y=loc.y, stroke=DEBUG_COLOR, fill=DEBUG_COLOR)
+                    Dot(
+                        x=loc.x,
+                        y=loc.y,
+                        stroke=globals.debug_color,
+                        fill=globals.debug_color,
+                    )
                 case "id" | "i":
                     Dot(
                         x=loc.x,
                         y=loc.y,
                         label=loc.id,
-                        stroke=DEBUG_COLOR,
-                        fill=DEBUG_COLOR,
+                        stroke=globals.debug_color,
+                        fill=globals.debug_color,
                     )
                 case "sequence" | "s":
                     Dot(
                         x=loc.x,
                         y=loc.y,
                         label=f"{loc.sequence}",
-                        stroke=DEBUG_COLOR,
-                        fill=DEBUG_COLOR,
+                        stroke=globals.debug_color,
+                        fill=globals.debug_color,
                     )
                 case "xy" | "xy":
                     Dot(
                         x=loc.x,
                         y=loc.y,
                         label=f"{round(loc.x, 2)},{round(loc.y, 2)}",
-                        stroke=DEBUG_COLOR,
-                        fill=DEBUG_COLOR,
+                        stroke=globals.debug_color,
+                        fill=globals.debug_color,
                     )
                 case "yx" | "yx":
                     Dot(
                         x=loc.x,
                         y=loc.y,
                         label=f"{loc.y},{loc.x}",
-                        stroke=DEBUG_COLOR,
-                        fill=DEBUG_COLOR,
+                        stroke=globals.debug_color,
+                        fill=globals.debug_color,
                     )
                 case "colrow" | "cr":
                     Dot(
                         x=loc.x,
                         y=loc.y,
                         label=f"{loc.col},{loc.row}",
-                        stroke=DEBUG_COLOR,
-                        fill=DEBUG_COLOR,
+                        stroke=globals.debug_color,
+                        fill=globals.debug_color,
                     )
                 case "col" | "c":
                     Dot(
                         x=loc.x,
                         y=loc.y,
                         label=f"{loc.col}",
-                        stroke=DEBUG_COLOR,
-                        fill=DEBUG_COLOR,
+                        stroke=globals.debug_color,
+                        fill=globals.debug_color,
                     )
                 case "row" | "r":
                     Dot(
                         x=loc.x,
                         y=loc.y,
                         label=f"{loc.row}",
-                        stroke=DEBUG_COLOR,
-                        fill=DEBUG_COLOR,
+                        stroke=globals.debug_color,
+                        fill=globals.debug_color,
                     )
                 case "rowcol" | "rc":
                     Dot(
                         x=loc.x,
                         y=loc.y,
                         label=f"{loc.row},{loc.col}",
-                        stroke=DEBUG_COLOR,
-                        fill=DEBUG_COLOR,
+                        stroke=globals.debug_color,
+                        fill=globals.debug_color,
                     )
                 case _:
                     feedback(f'Unknown debug style "{do_debug}"', True)
@@ -5539,7 +5735,7 @@ def StarField(**kwargs):
 
     <base>
     - density (int): average number of stars per square unit; default is 10
-    - colors (list): the individual star colors; default is ["white"]
+    - colors (list): individual star colors; default is ["white"] for RGB color_model
     - enclosure (str): the name of the regular shape inside which the
       StarFieldObject is drawn; default is a `rectangle`
     - sizes (list): the individual star sizes; default is [0.1]

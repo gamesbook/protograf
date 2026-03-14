@@ -14,14 +14,14 @@ and that you've created some basic scripts of your own using the
 .. NOTE::
 
     This section provides all the details, along with supporting examples,
-    of the commands used in card creation. A high-level overview can be found
-    in the section on :doc:`Working with Cards <card_deck_introduction>`.
+    of the commands used in card creation. A high-level overview can be
+    found in :doc:`Working with Cards <card_deck_introduction>`.
 
 .. _table-of-contents-crddk:
 
 - `The Deck Command`_
 
-  - `Deck Example 1. Defaults`_
+  - `Deck Example 1. Default Card Size`_
   - `Deck Example 2. Copy & Mask`_
 - `The Card Command`_
 - `The CardBack Command`_
@@ -78,8 +78,8 @@ The following are key properties that will usually need to be set for a
   properties, in `The Deck Command <deck_command.html>`_ section.
 
 
-Deck Example 1. Defaults
-------------------------
+Deck Example 1. Default Card Size
+---------------------------------
 `↑ <table-of-contents-crddk_>`_
 
 This example shows the definition of a simple deck for cards that are a
@@ -305,7 +305,7 @@ reason to supply a data source in this way.
 
 The Data Source Property
 ------------------------
-`↑ <table-of-contents-crddk_>`_
+`↑ <the-data-command_>`_
 
 There are six possible types of data sources to create a dataset, and
 **protograf** uses a different property name, or set of names, for each:
@@ -370,7 +370,7 @@ in some way, for a card:
 
 Other Data Properties
 ---------------------
-`↑ <table-of-contents-crddk_>`_
+`↑ <the-data-command_>`_
 
 The other properties that can be used for the ``Data`` command are:
 
@@ -386,14 +386,26 @@ The other properties that can be used for the ``Data`` command are:
   must be filtered - see `Data Example 8. Filters`_
 
 
+.. _toc-crddk-data:
+
 Data Examples
 -------------
+`↑ <the-data-command_>`_
+
+- `Data Example 1. CSV`_
+- `Data Example 2. Excel`_
+- `Data Example 3. Matrix`_
+- `Data Example 4. Images`_
+- `Data Example 5. Lists`_
+- `Data Example 6. Google Sheets`_
+- `Data Example 7. BoardGameGeek API`_
+- `Data Example 8. Filters`_
+
 
 .. _deck-data-csv:
 
 Data Example 1. CSV
 +++++++++++++++++++
-`↑ <table-of-contents-crddk_>`_
 
 This example shows how data is sourced from a CSV file:
 
@@ -405,7 +417,7 @@ This example shows how data is sourced from a CSV file:
 
 Data Example 2. Excel
 +++++++++++++++++++++
-`↑ <table-of-contents-crddk_>`_
+`↑ <toc-crddk-data_>`_
 
 This example shows how data is sourced from an Excel file:
 
@@ -432,7 +444,7 @@ For example:
 
 Data Example 3. Matrix
 ++++++++++++++++++++++
-`↑ <table-of-contents-crddk_>`_
+`↑ <toc-crddk-data_>`_
 
 This example shows how data is sourced from a Matrix; in this case the data
 represents possible combinations for a standard deck of playing cards:
@@ -458,7 +470,7 @@ For more detail on these properties see `The Matrix Command`_.
 
 Data Example 4. Images
 ++++++++++++++++++++++
-`↑ <table-of-contents-crddk_>`_
+`↑ <toc-crddk-data_>`_
 
 This example shows how data is sourced from an image directory:
 
@@ -474,7 +486,7 @@ located in the ``pictures`` subdirectory.
 
 Data Example 5. Lists
 +++++++++++++++++++++
-`↑ <table-of-contents-crddk_>`_
+`↑ <toc-crddk-data_>`_
 
 This example shows how data is sourced from a "list of lists":
 
@@ -520,7 +532,7 @@ See below under the `T(emplate) command`_ and also under the
 
 Data Example 6. Google Sheets
 +++++++++++++++++++++++++++++
-`↑ <table-of-contents-crddk_>`_
+`↑ <toc-crddk-data_>`_
 
 There are three properties needed to gain access to data from a Google Sheet:
 
@@ -534,39 +546,6 @@ There are three properties needed to gain access to data from a Google Sheet:
     Access to a Google Sheet is done in such a way that it is possible for
     empty cells to **not** be included in the downloaded data.  In this case
     **protograf** will "fill-in" blank values.
-
-
-.. _deck-data-bgg:
-
-Data Example 7. BoardGameGeek API
-+++++++++++++++++++++++++++++++++
-`↑ <table-of-contents-crddk_>`_
-
-This example shows how data is loaded for boardgame details obtained from the
-:ref:`BoardGameGeek API <the-bgg-command>`.
-
-.. code:: python
-
-    boardgames = BGG(ids=[1, 2, 3], progress=True)
-    Data(data_list=boardgames.data_list)
-
-If access to the BoardGameGeek API works, then it returns the game data
-|dash| in this case games with ID's ``1``, ``2``, and ``3`` |dash|
-and these data are assigned to the name ``boardgames``.
-
-The ``data_list`` required for Data can be obtained from the stored set of
-games  |dash| in this case ``boardgames`` |dash| by appending the term
-``.data_list`` to it.
-
-The game information can then be used as it would for other data sources.
-
-A collection of games, linked to a BoardGameGeek user, can also be retrieved
-by supplying their username, for example:
-
-.. code:: python
-
-    boardgames = BGG(user='BenKenobi1976', progress=True)
-    Data(data_list=boardgames.data_list)
 
 The API Key
 ~~~~~~~~~~~
@@ -625,12 +604,47 @@ and its developers!
     There are limits to how many requests you can make to Google; please
     be aware of what your usage rights and limits are!
 
+.. _deck-data-bgg:
+
+Data Example 7. BoardGameGeek API
++++++++++++++++++++++++++++++++++
+`↑ <toc-crddk-data_>`_
+
+This example shows how data is loaded for boardgame details obtained from the
+:ref:`BoardGameGeek API <the-bgg-command>`.
+
+.. code:: python
+
+    boardgames = BGG(token="ABC123", ids=[1, 2, 3], progress=True)
+    Data(data_list=boardgames.data_list)
+
+If your token-based access to the BoardGameGeek API works, then it returns the
+game data |dash| in this case games with ID's ``1``, ``2``, and ``3`` |dash|
+and these data are assigned to the name ``boardgames``.
+
+The ``data_list`` required for Data can be obtained from the stored set of
+games  |dash| in this case ``boardgames`` |dash| by appending the term
+``.data_list`` to it.
+
+The game information can then be used as it would for other data sources.
+
+A collection of games, linked to a BoardGameGeek user, can also be retrieved
+by supplying their username, for example:
+
+.. code:: python
+
+    boardgames = BGG(
+        token="ABC123",
+        user='BenKenobi1977',
+        progress=True)
+    Data(data_list=boardgames.data_list)
+
 
 .. _deck-data-filters:
 
 Data Example 8. Filters
 +++++++++++++++++++++++
-`↑ <table-of-contents-crddk_>`_
+`↑ <toc-crddk-data_>`_
 
 This example shows how data, in this case sourced from a "list of lists"
 |dash| note that filters can be applied to *any* data source |dash|
@@ -1104,6 +1118,7 @@ The full code for this example is available as
 
 L(ookup) command
 ----------------
+`↑ <table-of-contents-crddk_>`_
 
 The ``L()``  command enables the current Card to retrieve data from a named
 column corresponding to another Card based on the value of a named column
@@ -1140,15 +1155,17 @@ a Card whose **NAME** column contains a matching value |dash| in this case,
 the card with **ID** of ``1``; and then returns the value from that card's
 **IMAGE** column |dash| in this case, the value **wire.png**.
 
+.. _card-functions:
 
 Card functions
 --------------
+`↑ <table-of-contents-crddk_>`_
 
 It could be that you need to perform a more complex operation, or validation,
 on any or all of the data assigned to a Card or Cards.
 
-In this case, you can write a :ref:`Python function <python-function>` which
-can be used to generate one or more shapes to be drawn on the card.
+In this case, you can write your own :ref:`Python function <python-function>`
+which can be used to generate one or more shapes to be drawn on the card.
 
 The function should accept one incoming value; this will hold the data
 associated with  a card |dash| for example, the row of data in a

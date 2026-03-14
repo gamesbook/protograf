@@ -13,7 +13,7 @@ and that you've created some basic scripts of your own using the
 
 .. _table-of-contents-wwc:
 
-- `Introduction`_
+- `Background`_
 - `The Development Process`_
 - `Key Concepts and Commands`_
 - `Images, Symbols and Fonts`_
@@ -31,8 +31,8 @@ and that you've created some basic scripts of your own using the
     :doc:`Cards: Images, Icons and Font <card_images>` section.
 
 
-Introduction
-============
+Background
+==========
 `↑ <table-of-contents-wwc_>`_
 
 Cards are a common and widely used method of storing and displaying
@@ -47,11 +47,11 @@ data. In gaming, playing cards have been popular both in China and
 Europe, coming into more widespread use somewhere in the 9th and 14th
 centuries respectively.
 
-The massive rise in popularity of a game like
+The massive rise in popularity of a card game like
 `Magic the Gathering <https://en.wikipedia.org/wiki/Magic:_The_Gathering>`_,
 from the early 1990s onwards, has inspired the much greater use of cards in
 all aspects of the modern board gaming experience, with cards or tiles
-taking the predominant role in many of them.
+taking a predominant role in many of them.
 
 
 The Development Process
@@ -71,12 +71,21 @@ You probably will iterate |dash| repeat |dash| those steps a number of times,
 adding and adjusting until you are happy with the result.
 
 In brief; the "things" for your cards are typically text, along with the names
-of  icons and images, stored in a CSV file or spreadsheet; while in your script
+of icons and images, stored in a CSV file or spreadsheet; while in your script
 the ``Card()`` command is used, multiple times, to provide the "glue" needed to
-position the elements containing these "things".
+position the elements |dash| shapes, text and images |dash| containing or
+referring to those "things".
 
-A complete script with all commands, is what some software terms a "template"
+A complete script with all commands, is what some software calls a "template"
 for your cards.
+
+.. HINT::
+
+    There is a card creation script to help set up a basic template for your
+    cards, based on a series of choices you make |dash| refer to the
+    :doc:`Available Scripts <scripts/overview>` section.  It includes some
+    of the commands and ideas described further below and which are also
+    illustrated in "`A Simple Deck, Card & Data Example`_".
 
 
 Key Concepts and Commands
@@ -147,6 +156,12 @@ Elements can be used (or re-used) for single or multiple cards.
     they are really just "shapes containing other shapes". See
     `Countersheet and Counter Commands`_.
 
+The ``Card()`` command also supports using a reference to a
+:ref:`Python function <python-function>` which you have created, that can be
+used to generate one or more shapes to be drawn on the card, based on value(s)
+from that card's data record.  This is useful when you require more complex
+logic to draw shapes; refer to :ref:`Card functions <card-functions>`.
+
 For full details on how to work with a ``Card``, see the section on the
 :ref:`Card Command <the-card-command>`.
 
@@ -206,10 +221,6 @@ reduced repetition when designing a deck of cards.
 -  The ``T()`` (*Template*) command allows a reference to some data |dash|
    for example, the cell in the named column of a spreadsheet |dash| to
    be substituted by its actual value when the card gets created.
--  The ``T()`` command also supports using a reference to a
-   :ref:`Python function <python-function>` which you have created, that
-   can be used to generate one or more shapes to be drawn on the card,
-   based on value(s) from that card's data record.
 -  The ``S()`` (*Selection*) command causes a shape to be added to a card,
    or set of cards, for a matching condition.
 -  The ``L()`` (*Lookup*)  command enables the current Card to retrieve data
@@ -219,6 +230,7 @@ reduced repetition when designing a deck of cards.
 
 A Simple Deck, Card & Data Example
 ==================================
+`↑ <table-of-contents-wwc_>`_
 
 This script shows a simple script that displays a few cards using some
 of the commands discussed briefly above. A "real" script will obviously
@@ -240,24 +252,29 @@ brackets with a comma at the end: ``[...],``
     from protograf import *
     Create()
     card_data = [
-        ['ID', 'Name', 'Age'],
-        [1, "Gimli", 140],
-        [2, "Legolas", 656],
-        [3, "Aragorn", 88],
-        [4, "Frodo", 51],
-        [5, "Pippin", 29],
-        [6, "Merry", 37],
-        [7, "Samwise", 39],
-        [8, "Boromir", 41],
-        [9, "RingWraith", 4300],
+        ['ID', 'Name', 'Age', 'Color'],
+        [1, "Gimli", 140, "tan"],
+        [2, "Legolas", 656, "green"],
+        [3, "Aragorn", 88, "pink"],
+        [4, "Frodo", 51, "orange"],
+        [5, "Pippin", 29, "orange"],
+        [6, "Merry", 37, "orange"],
+        [7, "Samwise", 39, "orange"],
+        [8, "Boromir", 41, "pink"],
+        [9, "RingWraith", 4300, "gray"],
     ]
     Data(data_list=card_data)
     Deck()
     Card("all",
-         circle(x=0.5, y=0.5, radius=0.5, label=T("{{ Age }}")))
+         circle(x=4.5, y=7, radius=0.55, label=T("{{ Age }}")))
     Card("all",
-         text(text=T("{{ Name }}"), x=3.3, y=7, font_size=18))
+         text(text=T("{{ Name }}"), x=3.3, y=1, font_size=18))
     Save()
+
+The output looks like:
+
+.. image:: images/decks/lotr.png
+   :width: 400
 
 
 Countersheet and Counter Commands
@@ -294,18 +311,19 @@ open-source ones are listed below.
 Note that inclusion of these links does **not** constitute a recommendation of
 them or their use!
 
-================== ======= ========== =========================================================
-Title              O/S     Language   Link
-================== ======= ========== =========================================================
-Batch Card Maker   Multi   Python     https://github.com/p-dimi/Batch-Card-Maker
-Card Creatr Studio Multi   Electron   https://cardcreatr.sffc.xyz/
-Card Editor        Windows Java       https://bitbucket.org/mattsinger/card-editor/src/release/
-CardFoldr          Multi   JavaScript https://foosel.github.io/cardfoldr/
-CardMaker          Multi   C#         https://github.com/nhmkdev/cardmaker
-DeCard64           Windows Delphi     https://github.com/Dimon-II/DeCard64
-Forge of Cards     Online  JavaScript https://forgeofcards.com/#/
-NanDeck            Windows ?          https://www.nandeck.com/
-Paperize           Online  JavaScript https://beta.editor.paperize.io/#/
-Strange Eons       Multi   Java       https://strangeeons.cgjennings.ca/index.html
-Squib              Multi   Ruby       https://github.com/andymeneely/squib
-================== ======= ========== =========================================================
+======================== ======= ========== =========================================================
+Title                    O/S     Language   Link
+======================== ======= ========== =========================================================
+Batch Card Maker         Multi   Python     https://github.com/p-dimi/Batch-Card-Maker
+Card Creatr Studio       Multi   Electron   https://cardcreatr.sffc.xyz/
+Card Editor              Windows Java       https://bitbucket.org/mattsinger/card-editor/src/release/
+CardFoldr                Multi   JavaScript https://foosel.github.io/cardfoldr/
+CardMaker                Multi   C#         https://github.com/nhmkdev/cardmaker
+DeCard64                 Windows Delphi     https://github.com/Dimon-II/DeCard64
+Forge of Cards           Online  JavaScript https://forgeofcards.com/#/
+Martin's Card Prototyper Online  JavaScript https://prototyper.gonzhome.us/
+NanDeck                  Windows ?          https://www.nandeck.com/
+Paperize                 Online  JavaScript https://beta.editor.paperize.io/#/
+Strange Eons             Multi   Java       https://strangeeons.cgjennings.ca/index.html
+Squib                    Multi   Ruby       https://github.com/andymeneely/squib
+======================== ======= ========== =========================================================

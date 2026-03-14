@@ -7,8 +7,8 @@ graphical designs in PDF (or PNG/GIF/SVG) format via a script.
 
 __protograf__  has been primarily created to handle the prototyping of cards,
 counters, tiles and boards for board games, including hexagonal grids, but can
-also be used for creating any simple design that has regular or repetitive
-elements; typically a mix of graphics and text.
+also be used for creating any relatively simple design that has regular or
+repetitive elements; typically a mix of graphics and text.
 
 > You do not need to know the Python language to be able to use __protograf__
 > but you do need Python installed on your machine!
@@ -33,7 +33,7 @@ __protograf__ requires Python (version of 3.13 or higher) to be installed
 and running on your machine.
 
 If this is **not** your current Python version, or Python is not installed on
-your machine, may want to [install uv](https://docs.astral.sh/uv/getting-started/installation/)
+your machine, you may want to [install uv](https://docs.astral.sh/uv/getting-started/installation/)
 which is a cross-platform tool able to [install Python](https://docs.astral.sh/uv/guides/install-python).
 
 If using [uv](https://docs.astral.sh/uv/), it is recommended to also create and use a
@@ -99,8 +99,8 @@ Please see the [list of contributors](CONTRIBUTORS.txt).
 
 ## :game_die: Potential Features
 
-These features are **not** guaranteed to be implemented; they just represent
-current / potential areas of work or ideas.
+Features not yet checked off are **not** guaranteed to be implemented;
+they just represent current / potential areas of work or ideas.
 
 * [x] New Shapes:
     * [x] Cross shape
@@ -119,19 +119,20 @@ current / potential areas of work or ideas.
 * [x] Stripes: interior "areas" for a Rectangle
 * [ ] Cards:
     * [x] support card-back designs
-    * [ ] grid lines for hexagonal cards
+    * [x] grid lines for hexagonal cards
     * [x] corner crosses as grid marks
     * [x] access to Google Sheets
     * [x] extract rectangular cards as PNG files
     * [x] page annotations
-* [ ] Color:
-    * [ ] add support for CYMK
+    * [x] bleed areas
+    * [ ] extraction as TableTopSimulator deck
+* [x] Color:
+    * [x] add support for CYMK
 
 ## :jigsaw: Potential Examples
 
 These are possible examples to show board creation based on existing games:
 
-* [ ] Extra abstract game boards: Mancala, Mu Torere
 * [ ] Wargame board: Squad Leader with full terrain features (vector and bitmap)
 * [ ] Traveller board: show a fully-styled Star System
 * [x] WarpWar board: show a fully-styled example
@@ -143,7 +144,7 @@ These are possible examples to show board creation based on existing games:
 > skimming off a tiny bit of it.*
 > "[Snow Crash](https://en.wikipedia.org/wiki/Snow_Crash)", Neal Stephenson, 1992.
 
-As always, with Python, you are building "on the shoulders of giants".
+As usual, with Python, you are building "on the shoulders of giants".
 In this case, the [pyMuPDF](https://pymupdf.io/) library provides all of the
 core infrastructure used to do the underlying graphics processing, PDF file
 creation and images exports; __protograf__ is effectively a highly customised
@@ -156,6 +157,8 @@ also a powerful and useful library for supporting this type of application.
 
 Users on [BoardGameGeek](https://boardgamegeek.com) have provided invaluable
 feedback and suggestions!
+
+Those who have directly contributed to the project are listed in CONTRIBUTORS.
 
 ### :books: Additional Libraries
 

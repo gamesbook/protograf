@@ -1,3 +1,4 @@
 Derek Richard Hohls <gamesbook@gmail.com> - primary designer and author
-Kate Walsh https://kathleenmaywalsh.wixsite.com/copywriter - docs proof-reader and editor
+R. Martinho Fernandes - https://github.com/rmartinho - contributor
+Kate Walsh - https://kathleenmaywalsh.wixsite.com/copywriter - proof-reader and editor
 Rory Meyer - https://github.com/RoryMMMM - maintainer

@@ -621,7 +621,7 @@ def pdf_frames_to_png(
     dpi: int = 300,
     directory: str = None,
     frames: dict = None,
-):
+) -> list:
     """Extract framed areas from PDF as PNG image(s).
 
     Args:
@@ -642,11 +642,15 @@ def pdf_frames_to_png(
         - Bounding Box (top-left and bottom-right x,y coordinates)
         - optional name (which is user-defined)
 
+    Returns:
+    - list: names of PNG files
+
     Uses:
 
     - https://pymupdf.io/
     - https://pypi.org/project/imageio/
     """
+    inames = []  # list of image filenames
     if frames:
         feedback("Saving frames(s) as image file(s)...", False)
     _source = os.path.basename(source_file)
@@ -675,7 +679,6 @@ def pdf_frames_to_png(
                 outlines = frames.get("*", [])
             if outlines == []:
                 outlines = frames.get("all", [])
-            inames = []
             for key, item in enumerate(outlines):
                 outline = item[0]  # Rect
                 cname = item[1]  # user-specified name
@@ -697,8 +700,10 @@ def pdf_frames_to_png(
                 pix = page.get_pixmap(clip=rect, dpi=dpi)  # page fragment as an image
                 pix.save(iname)  # store image as a PNG
             page_num += 1
+        return inames
     except Exception as err:
-        feedback(f"Unable to extract images for {source_file} - {err}!")
+        feedback(f"Unable to extract images for {source_file} - {err}!", True)
+        return []
 
 
 def color_set(svg_only: bool = False) -> list:

@@ -13,8 +13,20 @@ Deck(
     cards=4,
     height=3.2,
     width=2.1,
-    fill="lightsteelblue",
-    bleed_fill="gray")
+    spacing_x=0.15,
+    spacing_y=0.2,
+    card_name="image",
+)
+# card bleed
+Card(
+    '1,4',
+    bleed_x=0.075, bleed_y=0.1,
+    bleed_fill="yellow")
+Card(
+    '2,3',
+    bleed_x=0.075,
+    bleed_y=0.1,
+    bleed_fill="red")
 # design card
 Card(
     '*',
@@ -23,9 +35,14 @@ Card(
         label='{{sequence}}\n{{id}}')
 )
 # create output
+# Save(
+#      output='png',
+#      dpi=300,
+#      directory="../docs/source/images/decks",
+#      names=['cards_deck_03']
+# )
 Save(
      output='png',
      dpi=300,
-     directory="../docs/source/images/decks",
-     names=['cards_deck_03']
+     cards=True,
 )

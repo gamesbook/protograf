@@ -9,26 +9,50 @@ from colorsys import rgb_to_hls, hls_to_rgb
 from pymupdf.utils import getColor
 
 # local
-from protograf.utils.constants import COLOR_SINGLES, COLOR_NAMES
+from protograf.utils.constants import RGB_COLOR_SINGLES, CMYK_COLOR_SINGLES, COLOR_NAMES
 from protograf.utils.messaging import feedback
 
 
-def get_color(name: str = None) -> tuple:
-    """Get a color tuple; by name/char from pre-defined dictionary or as RGB tuple."""
+def get_color(name: str = None, color_model: str = "RGB") -> tuple:
+    """Get a color tuple; by name/char from dictionary, or as RGB/CMYK tuple."""
     if name is None:
         return None  # it IS valid to say that NO color has been set
     if isinstance(name, tuple) and len(name) == 3:  # RGB color tuple
-        if all(0 <= x <= 255 for x in name):
-            return name
-        feedback(f'The color tuple "{name}" is invalid!')
-    elif isinstance(name, str) and len(name) == 1:  # predefined hexadecimal
-        _hdcolor = COLOR_SINGLES.get(name, None)
-        if not _hdcolor:
-            feedback(f'The color abbreviation "{name}" does not exist!', True)
-        else:
+        if all(isinstance(x, (float, int)) for x in name):
+            if all(0 <= x <= 255 for x in name):
+                return name
+        feedback(f'The RGB color tuple "{name}" is invalid!')
+    elif isinstance(name, tuple) and len(name) == 4:  # CMYK color tuple
+        if all(isinstance(x, (float, int)) for x in name):
+            if all(x <= 1 for x in name):
+                return name
+        feedback(f'The CMYK color tuple "{name}" is invalid!')
+    elif isinstance(name, str) and len(name) == 1:  # predefined hexadecimal or CMYK
+        if color_model == "RGB":
+            _hdcolor = RGB_COLOR_SINGLES.get(name, None)
+            if not _hdcolor:
+                feedback(f'The color abbreviation "{name}" does not exist!', True)
             _rgb = tuple(int(_hdcolor[i : i + 2], 16) for i in (1, 3, 5))
             rgb = tuple(i / 255 for i in _rgb)
             return rgb
+        elif color_model == "CMYK":
+            _hdcolor = CMYK_COLOR_SINGLES.get(name, None)
+            if not _hdcolor:
+                feedback(f'The color abbreviation "{name}" does not exist!', True)
+            _cmyk = _hdcolor.split(",")
+            cmyk = tuple(float(i) / 100.0 for i in _cmyk)
+            return cmyk
+        else:
+            raise NotImplementedError(
+                f'The color_model "{color_model}" does not exist!'
+            )
+    elif isinstance(name, str) and "," in name:  # CMYK
+        items = name.split(",")
+        try:
+            cmyk = tuple(float(i) / 100.0 for i in items)
+            return cmyk
+        except Exception:
+            feedback(f'The CMYK color tuple "{name}" is invalid!')
     elif isinstance(name, str) and len(name) == 7 and name[0] == "#":  # hexadecimal
         _rgb = tuple(int(name[i : i + 2], 16) for i in (1, 3, 5))
         rgb = tuple(i / 255 for i in _rgb)
@@ -37,7 +61,10 @@ def get_color(name: str = None) -> tuple:
         pass  # unknown format
     try:
         if name.upper() not in COLOR_NAMES:
-            feedback(f'The color name "{name}" is not pre-defined!', True)
+            if name.upper() == "NONE":
+                return None
+            else:
+                feedback(f'The color name "{name}" is not pre-defined!', True)
         color = getColor(name)
         return color
     except (AttributeError, ValueError):

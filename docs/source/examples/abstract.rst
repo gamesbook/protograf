@@ -437,6 +437,10 @@ Discussion  The script uses different techniques and commands for each board;
             - Strands
             - Volo
 
+            Another related script, linked here for interest is an example of
+            drawing a diagram that would be used in a rules document - see
+            `new_classics_diagrams.py <https://github.com/gamesbook/protograf/blob/master/examples/boards/abstract/new_classics_diagrams.py>`_
+
 ----------- ------------------------------------------------------------------
 Screenshot  .. image:: images/boards/abstract/cairo_corridor.png
                :width: 90%

@@ -44,7 +44,8 @@ from protograf.utils import colrs, geoms, imaging, tools, support
 from protograf.utils.tools import _lower
 from protograf.utils.constants import (
     CACHE_DIRECTORY,
-    DEBUG_COLOR,
+    CMYK_DEBUG_COLOR,
+    RGB_DEBUG_COLOR,
     DEFAULT_FONT,
     DEFAULT_MARGIN_SIZE,
     GRID_SHAPES_WITH_CENTRE,
@@ -195,7 +196,9 @@ class BaseCanvas:
         self.elevation = self.defaults.get("elevation", "horizontal")
         self.facing = self.defaults.get("facing", "out")  # out/in
         # ---- fill color
-        fill = self.defaults.get("fill", self.defaults.get("fill_color")) or "white"
+        fill = (
+            self.defaults.get("fill", self.defaults.get("fill_color")) or globals.white
+        )
         self.fill_transparency = self.defaults.get(
             "fill_transparency", 1
         )  # NOT transparent
@@ -204,7 +207,8 @@ class BaseCanvas:
         self.stroke_fill = self.defaults.get("stroke_fill", None)  # alias
         # ---- stroke
         stroke = (
-            self.defaults.get("stroke", self.defaults.get("stroke_color")) or "black"
+            self.defaults.get("stroke", self.defaults.get("stroke_color"))
+            or globals.black
         )
         self.stroke = colrs.get_color(stroke)
         self.stroke_width = self.defaults.get("stroke_width", WIDTH)
@@ -224,6 +228,9 @@ class BaseCanvas:
             self.stroke = self.fill_stroke
             self.fill = self.fill_stroke
         # ---- debug color & transparency
+        DEBUG_COLOR = (
+            CMYK_DEBUG_COLOR if globals.color_model == "CMYK" else RGB_DEBUG_COLOR
+        )
         debug_color = self.defaults.get("debug_color", DEBUG_COLOR)
         self.debug_color = colrs.get_color(debug_color)
         self.transparency = self.defaults.get("transparency", 1)  # NOT transparent
@@ -378,6 +385,7 @@ class BaseCanvas:
         # ---- line
         self.connections = self.defaults.get("connections", None)
         self.connections_style = self.defaults.get("connections_style", None)
+        self.curve = self.defaults.get("curve", None)
         # ---- line / bezier
         self.x_1 = self.defaults.get("x1", 0.0)
         self.y_1 = self.defaults.get("y1", 0.0)
@@ -589,7 +597,7 @@ class BaseCanvas:
         # ---- perbii (hex, rect, polygon)
         self.orientation = self.defaults.get("orientation", "flat")  # flat|pointy
         self.perbii = self.defaults.get("perbii", None)  # directions
-        self.perbii_stroke = self.defaults.get("perbii_stroke", "black")
+        self.perbii_stroke = self.defaults.get("perbii_stroke", self.stroke)
         self.perbii_stroke_width = self.defaults.get(
             "perbii_stroke_width", self.stroke_width
         )
@@ -655,7 +663,7 @@ class BaseCanvas:
         self.coord_font_size = self.defaults.get(
             "coord_font_size", int(self.font_size * 0.5)
         )
-        coord_stroke = self.defaults.get("coord_stroke", "black")
+        coord_stroke = self.defaults.get("coord_stroke", globals.black)
         self.coord_stroke = colrs.get_color(coord_stroke)
         self.coord_padding = self.defaults.get("coord_padding", 2)
         self.coord_separator = self.defaults.get("coord_separator", "")
@@ -667,7 +675,7 @@ class BaseCanvas:
         self.spikes_height = self.defaults.get("spikes_height", 0.0)
         self.spikes_width = self.defaults.get("spikes_width", 0.0)
         self.spikes_fill = self.defaults.get("spikes_fill", self.fill)
-        self.spikes_stroke = self.defaults.get("spikes_stroke", "black")
+        self.spikes_stroke = self.defaults.get("spikes_stroke", globals.black)
         self.spikes_stroke_width = self.defaults.get(
             "spikes_stroke_width", self.stroke_width
         )
@@ -676,7 +684,7 @@ class BaseCanvas:
         self.spikes_dashed = self.defaults.get("spikes_dashed", self.dashed)
         # ---- starfield
         self.enclosure = None
-        self.colors = ["white"]
+        self.colors = [globals.white]
         self.sizes = [self.defaults.get("stroke_width", WIDTH)]
         self.density = self.defaults.get("density", 10.0)
         self.star_pattern = "random"
@@ -719,12 +727,20 @@ class BaseShape:
 
     def __init__(self, _object: muShape = None, canvas: BaseCanvas = None, **kwargs):
         # print(''.join(traceback.format_stack()))
+
         # feedback(f'### BaseShape 1 {type(self).__name__} {kwargs=}')
-        # inject and then override kwargs supplied by DefaultShape
+        # inject and then override kwargs supplied by DefaultShape aka user defaults
         if kwargs.get("default"):
             try:
-                if kwargs.get("default"):
-                    self.kwargs = kwargs["default"]._default_kwargs | kwargs
+                shape_default = kwargs.get("default")
+                if shape_default:
+                    if isinstance(shape_default, list):
+                        all_kwargs = {}
+                        for item in shape_default:
+                            all_kwargs = all_kwargs | item._default_kwargs
+                        self.kwargs = all_kwargs | kwargs
+                    else:
+                        self.kwargs = shape_default._default_kwargs | kwargs
             except Exception:
                 self.kwargs = kwargs
         else:
@@ -1027,6 +1043,7 @@ class BaseShape:
         # ---- line
         self.connections = kwargs.get("connections", base.connections)
         self.connections_style = kwargs.get("connections_style", base.connections_style)
+        self.curve = kwargs.get("curve", base.curve)
         # ---- line / bezier / sector
         self.x_1 = self.kw_float(kwargs.get("x1", base.x_1))
         self.y_1 = self.kw_float(kwargs.get("y1", base.y_1))
@@ -1477,9 +1494,8 @@ class BaseShape:
             if shape_object:
                 cshape_name = shape_object.__class__.__name__
                 return cshape_name.replace("Shape", "")
-            else:
-                cshape_name = self.__class__.__name__
-                return cshape_name.replace("Shape", "")
+            cshape_name = self.__class__.__name__
+            return cshape_name.replace("Shape", "")
         except:
             return "Shape"
 
@@ -2346,9 +2362,9 @@ class BaseShape:
 
     def get_center(self) -> Point:
         """Attempt to get centre for a shape."""
-        if self.cx and self.cy:
+        if self.cx is not None and self.cy is not None:
             return Point(self.cx, self.cy)
-        if self.x and self.y and self.width and self.height:
+        if self.x is not None and self.y is not None and self.width and self.height:
             return Point(self.x + self.width / 2.0, self.y + self.height / 2.0)
         return None
 
@@ -2364,10 +2380,10 @@ class BaseShape:
         # if inspect.isclass(the_shape) and the_shape.__class__.__name__ == 'GridShape':
         if isinstance(the_shape, GridShape):
             return the_shape.shape
-        else:
-            return the_shape
+        return the_shape
 
     def get_font_height(self) -> float:
+        """Get height of a font in points."""
         # see Span Dictionary for ascender and descender of the font (float).
         # face = pdfmetrics.getFont(self.font_name).face
         # height = (face.ascent - face.descent) / 1000 * self.font_size
@@ -2415,7 +2431,7 @@ class BaseShape:
                 True,
             )
 
-    def _p2v(self, value: float, decimals: int = 3):
+    def _p2v(self, value: float, decimals: int = 4):
         """Convert point value to a rounded, units-based value using current units."""
         try:
             return round(float(value) / self.units, decimals)
@@ -2426,7 +2442,7 @@ class BaseShape:
                 True,
             )
 
-    def _l2v(self, values: list, decimals: int = 3):
+    def _l2v(self, values: list, decimals: int = 4):
         """Convert Points to a rounded, units-based values using current units."""
         try:
             _values = [
@@ -2614,7 +2630,7 @@ class BaseShape:
                     value, (str, int, float, list, tuple, range, Enum)
                 ):
                     continue
-                elif isinstance(value, dict):
+                if isinstance(value, dict):
                     updated = False
                     for dkey, val in value.items():
                         if val is None or isinstance(
@@ -2702,7 +2718,7 @@ class BaseShape:
             return origin  # lower-left for text string
 
         if not string:
-            return
+            return None
         # ---- deprecated
         if kwargs.get("text_sequence", None):
             raise NotImplementedError("No text_sequence please!")
@@ -3165,7 +3181,7 @@ class BaseShape:
         bdirections, bwidth, bcolor, bstyle, dotted, dashed = (
             None,
             None,
-            "black",
+            globals.black,
             None,
             False,
             None,
@@ -3331,9 +3347,8 @@ class BaseShape:
         cshape_name = centre_shape.__class__.__name__
         if cshape_name in GRID_SHAPES_WITH_CENTRE:
             return True
-        else:
-            _name = cshape_name.replace("Shape", "")
-            feedback(f"Cannot draw a centered {_name}!", True)
+        _name = cshape_name.replace("Shape", "")
+        feedback(f"Cannot draw a centered {_name}!", True)
         return False
 
     @functools.cache
@@ -3359,6 +3374,14 @@ class BaseShape:
         """Draw one or more shapes with their centre at a Point.
 
         Args:
+            centre_shapes (list):
+                one or more Shape objects
+            cx (float):
+                x-position for drawing the Shapes
+            cy (float):
+                y-position for drawing the Shapes
+            rotation (float):
+                degrees by which to rotate the Shapes
 
         """
         for item in centre_shapes:
@@ -3382,6 +3405,17 @@ class BaseShape:
     def draw_vertex_shapes(
         self, vertex_shapes: list, vertices: list, centre: Point, rotated: bool = False
     ):
+        """Draw shape(s) at vertex(ices) of a Shape.
+
+        Args:
+            vertex_shapes (list):
+                one or more Shape objects
+            vertices (list):
+                list oif the Points at which to draw the Shapes
+            centre (tuple):
+                x- and y-position of the parent Shape's centre
+            rotated (bool):
+                whether or not to rotate the Shapes"""
         for idx, vshape in enumerate(vertex_shapes):
             if vshape is None or vshape == "":
                 continue

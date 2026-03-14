@@ -47,6 +47,7 @@ python boards/abstract/hexhex_dots.py
 python boards/abstract/hexhex_hexagons.py
 python boards/abstract/hexhex_rectangles.py
 python boards/abstract/morabaraba.py
+python boards/abstract/new_classics.py
 python boards/abstract/octagons.py
 python boards/abstract/snex.py
 python boards/abstract/tictactoe.py

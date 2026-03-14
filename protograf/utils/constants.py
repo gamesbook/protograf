@@ -6,12 +6,27 @@ Notes:
     * https://www.a2-size.com/american-paper-sizes/
     * https://en.wikipedia.org/wiki/Paper_size#Overview_of_ISO_paper_sizes
 """
+import math
 from pymupdf.utils import getColorList
+
+YES = True
+NO = False
+SIN_60 = math.sin(math.radians(60))
+COS_60 = math.cos(math.radians(60))
+TAN_60 = math.tan(math.radians(60))
 
 BGG_IMAGES = "cf.geekdo-images.com"
 COLOR_NAMES = getColorList()
 CACHE_DIRECTORY = ".protograf"  # append to the user's home directory
-DEBUG_COLOR = "#B0C4DE"
+
+RGB_DEBUG_COLOR = "#B0C4DE"
+RGB_BLACK = "black"
+RGB_WHITE = "white"
+
+CMYK_DEBUG_COLOR = "21,12,0,13"
+CMYK_BLACK = "0,0,0,100"
+CMYK_WHITE = "0,0,0,0"
+
 DEFAULT_CARD_WIDTH = 180  # pt (2.5")
 DEFAULT_CARD_HEIGHT = 252  # pt (3.5")
 DEFAULT_CARD_RADIUS = 72  # pt (1")
@@ -22,7 +37,7 @@ DEFAULT_DPI = 300
 DEFAULT_FONT = "Helvetica"
 DEFAULT_MARGIN_SIZE = 18  # pt (1/4")
 
-COLOR_SINGLES = {
+RGB_COLOR_SINGLES = {
     "b": "#0000FF",
     "c": "#00FFFF",
     "d": "#293BC7",
@@ -43,6 +58,29 @@ COLOR_SINGLES = {
     "w": "#FFFFFF",
     "y": "#FFFF00",
     "x": "#000000",
+}
+# converted from RGB via https://colordesigner.io/convert/hextocmyk
+CMYK_COLOR_SINGLES = {
+    "b": "100, 100, 0, 0",
+    "c": "100, 0, 0, 0",
+    "d": "79.4, 70.35, 0, 21.96",
+    "e": "0, 25.51, 69.55, 4.71",
+    "f": "100, 0, 100, 53.33",
+    "g": "75.61, 0, 75.61, 19.61",
+    "h": "0, 50, 85.71, 17.65",
+    "i": "0, 65.22, 52.17, 9.8",
+    "k": "0, 0, 0, 100",
+    "l": "100, 25, 0, 0",
+    "m": "0, 100, 0, 25",
+    "n": "0, 35.3, 100, 0",
+    "o": "0, 0, 0, 0",
+    "p": "0, 45.38, 0, 6.67",
+    "r": "0, 100, 100, 0",
+    "s": "0, 0, 0, 25",
+    "u": "0, 48.68, 64.47, 70.2",
+    "w": "0, 0, 0, 0",
+    "y": "0, 0, 100, 0",
+    "x": "0, 0, 0, 100",
 }
 
 GRID_SHAPES_WITH_CENTRE = [

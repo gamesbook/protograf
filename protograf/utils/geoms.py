@@ -6,6 +6,7 @@ Mathematical utility functions for protograf
 import cmath
 import logging
 import math
+import sys
 from typing import Any, List
 
 # local
@@ -106,6 +107,51 @@ def degrees_to_xy(degrees: float, radius: float, origin: Point) -> Point:
     y_o = math.sin(radians) * radius + origin.y
     # print('+++ +++', Point(x_o, y_o))
     return Point(x_o, y_o)
+
+
+def compass_to_angle(direction: str) -> tuple:
+    """Convert a 16-point compass bearing abbreviation to angles
+
+    Args:
+        direction (str): name of compass bearing
+
+    Returns:
+        compass (float): degrees clockwise from North
+        rotation (float): degrees anti-clockwise from East
+
+    Doc Test:
+
+    >>> compass_to_angle('ene')
+    (67.5, 22.5)
+    >>> compass_to_angle('W')
+    (270.0, 180.0)
+    """
+    data = {
+        "N": 0.0,
+        "NNE": 22.5,
+        "NE": 45.0,
+        "ENE": 67.5,
+        "E": 90.0,
+        "ESE": 112.5,
+        "SE": 135.0,
+        "SSE": 157.5,
+        "S": 180.0,
+        "SSW": 202.5,
+        "SW": 225.0,
+        "WSW": 247.5,
+        "W": 270.0,
+        "WNW": 292.5,
+        "NW": 315.0,
+        "NNW": 337.5,
+    }
+    if not isinstance(direction, str):
+        feedback(f'The compass bearing "{direction}" must be a string!', True)
+    compass = data.get(direction.upper(), None)
+    if compass is None:
+        feedback(f'The compass bearing "{direction}" is not valid!', True)
+    rotation = (450 - compass) % 360.0
+    # print(f'compass-angle fn: {compass=}, {rotation=}')
+    return round_tiny_float(compass), round_tiny_float(rotation)
 
 
 def point_in_polygon(point: Point, vertices: List[Point], valid_border=False) -> bool:
@@ -294,7 +340,7 @@ def point_on_circle(point_centre: Point, radius: float, angle: float) -> Point:
 
     Args:
         point_center: the (x, y) coordinates of the circle centre
-        angle: the rotation angle in degrees (anti-clockwise)
+        angle: the rotation angle in degrees (anti-clockwise from x-axis baseline)
         radius: length of circle radius
 
     Doc Test:
@@ -317,6 +363,47 @@ def point_on_circle(point_centre: Point, radius: float, angle: float) -> Point:
     except Exception as exc:
         raise ValueError(
             f"Cannot calculate point on circle for: {point_centre}, {radius} and {angle}"
+        ) from exc
+    return Point(x, y)
+
+
+def point_on_ellipse(
+    point_centre: Point, angle: float, height: float, width: float
+) -> Point:
+    """Calculate Point on circumference of an ellipse at a specific angle in degrees
+
+        Args:
+            point_center: the (x, y) coordinates of the ellipse centre
+            angle: the rotation angle in degrees (anti-clockwise from x-axis baseline)
+            height: length of ellipse vertical axis
+            width: length of ellipse horizontal axis
+    R,
+        Doc Test:
+
+        >>> P = Point(3, 4)
+        >>> T = 30.0
+        >>> H = 4.0
+        >>> W = 10.0
+        >>> R = point_on_ellipse(P, T, H, W)
+        >>> round(R.x, 4)
+        5.8475
+        >>> round(R.y, 4)
+        5.644
+    """
+    try:
+        h2 = float(height / 2.0)
+        w2 = float(width / 2.0)
+    except ValueError:
+        feedback("Ellipse's height and width must be decimal or integer numbers.")
+        return point_centre
+    try:
+        theta = float(angle) * math.pi / 180.0
+        divisor = math.sqrt((h2 * math.cos(theta)) ** 2 + (w2 * math.sin(theta)) ** 2)
+        x = point_centre.x + (h2 * w2 * math.cos(theta)) / divisor
+        y = point_centre.y + (h2 * w2 * math.sin(theta)) / divisor
+    except Exception as exc:
+        raise ValueError(
+            f"Cannot calculate point on ellipse for: {point_centre} and angle: {angle}"
         ) from exc
     return Point(x, y)
 
@@ -475,6 +562,56 @@ def angles_from_points(first: Point, second: Point) -> tuple:
     rotation = (450 - compass) % 360.0
     # print(f'angle fn: {compass=}, {rotation=}')
     return round_tiny_float(compass), round_tiny_float(rotation)
+
+
+def centre_radius_from_points(pt_a: Point, pt_b: Point, pt_c: Point) -> tuple:
+    """Return (center, radius) of the circle passing through three Points.
+
+    Args:
+        pt_a (Point)
+        pt_b (Point)
+        pt_c (Point)
+
+    Returns:
+        tuple:
+            centre (Point), radius (float)
+
+    Notes:
+        If points are colinear, feedback "colinear error" and return empty tuple.
+
+    Source:
+        https://math.stackexchange.com/questions/213658/
+
+    Doc Test:
+
+    >>> centre_radius_from_points(Point(1, 1), Point(2, 4), Point(5, 3))
+    (Point(x=3.0, y=2.0), 2.23606797749979)
+    >>> R = centre_radius_from_points(Point(10, 10), Point(3, 7), Point(6, 10))
+    >>> round(R[0].x, 5)
+    8.0
+    >>> round(R[0].y, 5)
+    5.0
+    >>> round(R[1], 5)
+    5.38516
+    """
+    z_1 = complex(pt_a.x, pt_a.y)
+    z_2 = complex(pt_b.x, pt_b.y)
+    z_3 = complex(pt_c.x, pt_c.y)
+
+    if z_1 == z_2:
+        feedback("Points are colinear and no circle can be determined", True)
+        return (None, None)
+
+    w_3 = (z_3 - z_1) / (z_2 - z_1)
+    if abs(w_3.imag) < sys.float_info.epsilon:
+        feedback("Points are colinear and no circle can be determined", True)
+        return (None, None)
+
+    d_1 = (w_3 - w_3 * w_3.conjugate()) / (w_3 - w_3.conjugate())
+    c_1 = z_1 + (z_2 - z_1) * d_1
+    radius = abs(z_1 - c_1)
+    centre = Point(c_1.real, c_1.imag)
+    return (centre, radius)
 
 
 def separation_between_hexsides(side_a: int, side_b: int) -> int:

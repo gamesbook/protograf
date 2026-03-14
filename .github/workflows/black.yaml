@@ -7,8 +7,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: psf/black@stable
+      - name: Set up Python
+        uses: actions/setup-python@v5
         with:
-          options: "--check --verbose"
-          src: "./protograf"
-          use_pyproject: true
+          python-version: '3.11'
+      - name: Install specific Black version
+        run: |
+          pip install black==25.1.0  # desired version here
+      - name: Run Black check
+        run: |
+          black --check --verbose ./protograf

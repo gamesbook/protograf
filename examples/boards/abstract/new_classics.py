@@ -3,12 +3,27 @@
 
 Written by: Derek Hohls
 Created on: 6 February 2026
+Updated on: 2 March 2026
 
 Notes:
+
   * The boards in this collection are based on those presented in the
     booklet "A NEW BOOK OF CLASSIC BOARD GAMES (V1.0)"  by Brian E. Svoboda
     as discussed here https://boardgamegeek.com/thread/3357842 - but
     any faults, errors or omissions are mine and *not* the author's!
+
+  * The recommended font is Fira Mono - see
+    https://fonts.google.com/specimen/Fira+Mono to download and install
+    FiraMono-Regular.ttf and FiraMono-Bold.ttf
+
+License:
+
+The text and figures in the book "A NEW BOOK OF CLASSIC BOARD GAMES (V1.0)" are
+copyrighted by Brian Svoboda (2024) and released under the Creative Commons
+Attribution-NonCommercial-ShareAlike 4.0 International license.  See
+https://creativecommons.org/licenses/by-nc-sa/4.0/ for the full license.
+
+This script is released under that same license.
 """
 
 from protograf import *

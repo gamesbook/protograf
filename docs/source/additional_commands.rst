@@ -32,7 +32,7 @@ The ``Common()`` command allows different shapes to use exactly the same
 properties.
 
 These properties are listed in much the same way as they would for an actual
-shape, but the ``Common()`` command does not actually draw anything itself.
+shape, but the ``Common()`` command does *not* actually draw anything itself.
 
 For example:
 
@@ -57,27 +57,67 @@ Default Command
 ===============
 `↑ <table-of-contents-addcmd_>`_
 
-The ``Default()`` command allows different shapes to potentially all use the
-same properties.
+The ``Default()`` command allows different shapes to potentially all share
+the same properties.
 
 These properties are listed in much the same way as they would for an actual
-shape, but the ``Default()`` command does not actually draw anything itself.
-
-For example:
-
-.. code:: python
-
-  colors = Default(stroke="tomato", fill="gold")
-  Circle(default=colors, cx=1, cy=2)
-  Square(default=colors, cx=2, cy=2)
-
-Here the circle and the square will both use the ``default`` properties that
-have been assigned to the ``colors`` name.
+shape, but the ``Default()`` command does *not* actually draw anything itself.
 
 .. NOTE::
 
-  Unlike the ``Common()`` command, the common properties set here **will**
-  be overwritten by any of the same ones which are set by the shape itself!
+    Unlike the ``Common()`` command, the common properties set by the
+    ``Default()`` command **will**  be overwritten by any of the same
+    ones which are set by the shape itself!
+
+For a shape to make use of properties set by a ``Default()`` command, the shape
+must assign the name given to the ``Default()`` to its *default* property.
+
+For example:
+
+.. |dfc| image:: images/custom/commands/defaults.png
+   :width: 330
+
+===== ======
+|dfc| This example shows setting and using defaults for shapes.
+
+      .. code:: python
+
+        def1 = Default(
+            radius=0.75, fill="gold", stroke_width=4)
+        def2 = Default(
+            label="ne", label_size=24, stroke_width=2)
+
+        Circle(
+            default=def2,
+            cx=1, cy=1, label_size=12)
+        Circle(
+            default=def1,
+            cx=2, cy=2.5, fill="aqua")
+        Circle(
+            default=[def1, def2],
+            cx=3, cy=5, radius=1)
+
+      Here the various circles make use of the ``default`` properties that
+      have been assigned to the ``def1`` and ``def2`` names.
+
+      The top circle makes use of properties assigned to ``def2`` to set
+      the properties of *radius*, *fill* and *stroke_width*.
+
+      The middle circle makes use of properties assigned to ``def1``.
+      However, the *fill* color is set to ``aqua`` and not ``gold``
+      because the property value set in the shape itself overrides the
+      one supplied in ``def1``.
+
+      The bottom circle makes use of properties assigned to **both** of the
+      ``def1`` and ``def2`` names.  It does this by using them in a list
+      format, as shown by the square brackets from ``[`` to ``]``.
+
+      Note that the **order**, when using multiple Defaults, is important.
+      Its clear in the bottom circle that ``stroke_width=2`` from ``def2``
+      supercedes ``stroke_width=4`` from ``def1`` i.e. the values from
+      the second, and onwards, Defaults override those from earlier ones.
+
+===== ======
 
 
 .. _the-font-command:
@@ -378,12 +418,12 @@ Examples of using BGG API data for card creation can be found at
    2. Access to the BGG API requires that you apply to the site and request
       permission; when granted, this will allow you to generate a *token*
       |dash| a long, unique, set of characters and numbers that look something
-      like ``48398139-7fb1-4809-b7af-0be28d35dcec`` |dash| for details see 
+      like ``48398139-7fb1-4809-b7af-0be28d35dcec`` |dash| for details see
       https://boardgamegeek.com/application/
    3. Furthermore, there is an upper limit to how many games can be retrieved
       at a time |dash| best available knowledge suggests this is about 15,000.
-   4. Copies are kept of data downloaded from BGG |dash| and this data will 
-      *not* be re-retrieved from BGG unless you delete those copies; 
+   4. Copies are kept of data downloaded from BGG |dash| and this data will
+      *not* be re-retrieved from BGG unless you delete those copies;
       see `Caching`_ below.
 
 Usage
@@ -395,10 +435,10 @@ The ``BGG`` command allows game data to be retrieved either by providing:
   game IDs
 - the ID of a BoardGameGeek user; by default all games in that user's collection
   will be retrieved, unless filters are used
-  
+
 In both cases, you will also need to supply your **BGG API token**.
 
-The ID of a game appears in its URL; so, for example, the ID for the boardgame 
+The ID of a game appears in its URL; so, for example, the ID for the boardgame
 "Monopoly" is ``1406`` and is found at https://boardgamegeek.com/boardgame/1406
 
 
@@ -460,8 +500,8 @@ running :doc:`protograf <index>`).
 
 The caching directory is called ``.protograf`` and this will have a ``bgg``
 subdirectory where game data |dash| in the form of ``.pck`` files and
-``images`` and ``thumbs`` |dash| are stored.  If you delete these folders and 
-files, they will be recreated the next time your script runs 
+``images`` and ``thumbs`` |dash| are stored.  If you delete these folders and
+files, they will be recreated the next time your script runs
 i.e. all of their data will need to be downloaded again.
 
 

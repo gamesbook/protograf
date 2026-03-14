@@ -31,7 +31,7 @@ for count in range(1, 5):
         Rectangle(x=1, y=count, label=count)
 PageBreak()
 
-# ---- functions
+# ---- function
 def capitol(a=0, b=1, c="red"):
     Circle(cx=a+1, cy=b, radius=0.5, fill_stroke=c)
     Rectangle(x=a, y=b, height=1, width=2, fill_stroke=c,
@@ -45,6 +45,7 @@ capitol(a=1, b=3, c="gold")
 capitol(a=2, b=5, c="chartreuse")
 PageBreak()
 
+# ---- Font
 Blueprint()
 Text(common=txt, text="Font Command")
 Font("Helvetica", size=9, stroke="gold")
@@ -57,6 +58,16 @@ Font("Arial", size=12, stroke="black")
 Text(text="Arial 12pt black", x=0, y=4, align="left")
 PageBreak()
 
+# ---- defaults
+Blueprint()
+Text(common=txt, text="Defaults")
+def1 = Default(radius=0.75, fill="gold", stroke_width=4)
+def2 = Default(label="ne", label_size=24, stroke_width=2)
+Circle(default=def2, cx=1, cy=1, label_size=12)
+Circle(default=def1, cx=2, cy=2.5, fill="aqua")
+Circle(default=[def1, def2], cx=3, cy=5, radius=1)
+PageBreak()
+
 # ---- END
 Text(common=txt, text="Command END...")
 
@@ -66,5 +77,5 @@ Save(
      directory="../docs/source/images/custom/commands",
      names=[
         None,
-        "loop", "function", "fonts",
+        "loop", "function", "fonts", "defaults",
         None])

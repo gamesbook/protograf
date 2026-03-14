@@ -65,6 +65,7 @@ def get_connection_point(the_shape: BaseShape, conn_type: str, direction: str) -
 
     the_point = None
     shape_name = the_shape.simple_name()
+    _name = f"{shape_name} ({the_shape.label})" if the_shape.label else shape_name
     if isinstance(the_shape, HexShape):
         shape_name = f"{the_shape.ORIENTATION.name.lower()} {shape_name}"
     if isinstance(the_shape, (PolygonShape, StarShape)):
@@ -76,31 +77,36 @@ def get_connection_point(the_shape: BaseShape, conn_type: str, direction: str) -
                 vertexes = the_shape._shape_vertexes_named
             except AttributeError:
                 feedback(
-                    f"A {shape_name} has no vertices available for a connection.",
+                    f"{_name} has no vertices available for a connection.",
                     True,
                 )
             vtx = vertexes.get(direction)
             if not vtx:
                 # print(f"*** Line:connections {vertexes}")
                 feedback(
-                    f'A {shape_name} cannot use a vertex in the "{direction}" direction.',
+                    f'{_name} cannot use a vertex in the "{direction}" direction.',
                     True,
                 )
             else:
                 the_point = vtx.point
         case "p" | "perbis":
             the_centre = the_shape.get_center()
+            if the_centre is None:
+                feedback(
+                    f"{_name} centre cannot be calculated; please report this error!",
+                    True,
+                )
             try:
                 perbises = the_shape.calculate_perbii(centre=the_centre)
             except AttributeError:
                 feedback(
-                    f"A {shape_name} has no perbii available for a connection.",
+                    f"{_name} has no perbii available for a connection.",
                     True,
                 )
             pbs = perbises.get(direction)
             if not pbs:
                 feedback(
-                    f'A {shape_name} cannot use a perbis in the "{direction}" direction.',
+                    f'{_name} cannot use a perbis in the "{direction}" direction.',
                     True,
                 )
             else:
@@ -148,9 +154,11 @@ def get_connections(shapes: list, connections_style) -> list:
     from protograf.shapes import CircleShape, DotShape  # avoid circular imports
 
     connections = []
-    for idx, cshape in enumerate(shapes):
-        if idx == len(shapes) - 1:
-            continue
+    # for idx, cshape in enumerate(shapes):
+    #     if idx == len(shapes) - 1:
+    #         continue
+    for idx in range(0, len(shapes) - 1):
+        cshape = shapes[idx]
         if connections_style and _lower(connections_style) in [
             "s",
             "spoke",

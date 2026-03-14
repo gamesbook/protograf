@@ -1152,6 +1152,131 @@ Example 2. Customised Ellipse
       Because the *height* is greater than the *width* it has more of an egg-shape.
 ===== ======
 
+Example 3. Ellipse Radii
+++++++++++++++++++++++++
+
+Radii are like spokes of a bicycle wheel; they are drawn from the centre
+of an Ellipse towards its circumference.
+
+.. |el2| image:: images/customised/ellipse_radii.png
+   :width: 330
+
+===== ======
+|el2| This example shows the shape constructed using the command with these
+      properties:
+
+      .. code:: python
+
+        Ellipse(
+            x=1, y=1,
+            width=2, height=1.5,
+            fill=None,
+            radii="n, s, e, w",
+            radii_stroke_width=3,
+            radii_stroke="red")
+        Ellipse(
+            x=1, y=1,
+            width=2, height=1.5,
+            fill=None,
+            radii=[45,135,225,315],
+            radii_stroke_width=1,
+            radii_dotted=True,
+            radii_offset=0.5,
+            radii_length=1)
+        Ellipse(
+            cx=2, cy=4,
+            width=2, height=1.5,
+            fill="green",
+            stroke="orange",
+            stroke_width=1,
+            radii=[0,90,180,270,45,135,225,315],
+            radii_stroke_width=4,
+            radii_stroke="orange")
+
+
+      The top two Ellipses are drawn at the same location with the same
+      basic properties; with their *fill* set to ``None`` to make them
+      transparent.
+
+      These Ellipses also have some of the following properties, which
+      demonstrate how radii can be set and customised:
+
+      - *x* and *y* to set the upper-left position; or *cx* and *cy* to set the
+        centre
+      - *radii* - a list of angles (in N|deg|), or compass points, sets the
+        directions at which the radii lines are drawn
+      - *radii_stroke_width* - if set, will determine the thickness of the radii
+      - *radii_dotted* - if set to True, will make the radii lines dotted
+      - *radii_stroke* - determines the color of the radii
+      - *radii_length* - changes the length of the radii lines
+        (centre to circumference)
+      - *radii_offset* - moves the endpoint of the radii line
+        **away** from the centre
+
+===== ======
+
+Example 4. Ellipse Radii - Labels
++++++++++++++++++++++++++++++++++
+
+.. |el3| image:: images/customised/ellipse_radii_labels.png
+   :width: 330
+
+===== ======
+|el3| This example shows the shape constructed using the command with these
+      properties:
+
+      .. code:: python
+
+        Ellipse(
+            cx=1, cy=1,
+            width=2, height=1.5,
+            radii=[30, 150, 270],
+            radii_stroke="white",
+            radii_labels=["A", "B", "C"],
+            radii_labels_rotation=270,
+            radii_labels_stroke="red",
+            radii_labels_font="Courier",
+            dot=0.05)
+        Ellipse(
+            cx=3, cy=3,
+            width=2, height=1.5,
+            radii=[30, 150, 270],
+            radii_labels="A,B,C",
+            radii_labels_rotation=90,
+            dot=0.05)
+        Ellipse(
+            cx=1, cy=5,
+            width=2, height=1.5,
+            radii=[30, 150, 270],
+            radii_labels="ABC",
+            dot=0.05)
+
+      Apart from the radii lines themselves, the labels'
+      properties can be set:
+
+      - *radii_labels* - a string or list of strings used for text
+      - *radii_labels_font* - name of the font used for the labels
+      - *radii_labels_rotation* - rotation in degrees relative to radius angle
+      - *radii_labels_size* - point size of labels
+      - *radii_labels_stroke* - the color of the labels
+      - *radii_labels_stroke_width* - thickness of the labels
+
+      The top-most example shows how text strings are created with a list.
+
+      The middle example shows how the text string is split using commas;
+      this results in a list whose members are used to create the labels.
+
+      The lower-most example shows how the same text is repeated for all radii.
+
+      The top example also shows how text is rotated and styled. The radii
+      lines' stroke color is set to match the circle fill, thereby making it
+      "invisible".
+
+      The label rotation is relative to its upright position on the line;
+      so 90 |deg| turns the text to the left and onto its "side", as shown
+      in the middle example.
+
+===== ======
 
 .. _triangle-command:
 

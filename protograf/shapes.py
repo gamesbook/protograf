@@ -899,9 +899,11 @@ class EllipseShape(BaseShape):
         return Point(x_d, y_d)
 
     def calculate_area(self):
+        """Area of Ellipse in points."""
         return math.pi * self._u.height * self._u.width
 
     def calculate_xy(self, **kwargs):
+        """Start point of Ellipse in points."""
         # ---- adjust start
         if self.row is not None and self.col is not None:
             x = self.col * self._u.width + self._o.delta_x
@@ -922,6 +924,135 @@ class EllipseShape(BaseShape):
             x = -self._u.width / 2.0
             y = -self._u.height / 2.0
         return x, y
+
+    def draw_radii(self, cnv, ID, x_c: float, y_c: float):
+        """Draw radius lines from Ellipse centre outwards to the circumference.
+
+        The offset will start the line a certain distance away; and the length will
+        determine how long the radial line is.  By default it stretches from centre
+        to circumference.
+
+        Args:
+            x_c: x-centre of ellipse
+            y_c: y-centre of ellipse
+        """
+        if self.radii:
+            try:
+                if isinstance(self.radii, str):
+                    radii_list = tools.sequence_split(
+                        self.radii, to_int=False, clean=True
+                    )
+                else:
+                    radii_list = self.radii
+                all_radii = [
+                    (
+                        geoms.compass_to_angle(angle)[1]
+                        if isinstance(angle, str)
+                        else angle
+                    )
+                    for angle in radii_list
+                ]
+                _radii = [
+                    float(angle) for angle in all_radii if angle >= 0 and angle <= 360
+                ]
+            except Exception:
+                feedback(
+                    f'The ellipse radii "{self.radii}" are not valid - '
+                    " must be a list of numbers from 0 to 360, or compass directions",
+                    True,
+                )
+            if self.radii_length and self.radii_offset:
+                outer_radius = self.radii_length + self.radii_offset
+            elif self.radii_length:
+                outer_radius = self.radii_length
+            else:
+                outer_radius = self.radius
+            radius_offset = self.unit(self.radii_offset) or None
+            # print(f"*** {x_c=} {y_c=} :: {self.radii=}")
+            # print(f'*** {radius_length=} :: {radius_offset=} :: {outer_radius=}')
+            _radii_labels = [self.radii_labels]
+            if self.radii_labels:
+                if isinstance(self.radii_labels, list):
+                    _radii_labels = self.radii_labels
+                else:
+                    _radii_labels = tools.split(self.radii_labels)
+            _radii_strokes = [self.radii_stroke]  # could be color tuple (or str?)
+            if self.radii_stroke:
+                if isinstance(self.radii_stroke, list):
+                    _radii_strokes = self.radii_stroke
+                else:
+                    _radii_strokes = tools.split(self.radii_stroke, tuple_to_list=True)
+            # print(f'*** {_radii_labels=} {_radii_strokes=}')
+            label_key, stroke_key = 0, 0
+            label_points = []
+            # ---- set radii styles
+            lkwargs = {}
+            lkwargs["wave_style"] = self.kwargs.get("radii_wave_style", None)
+            lkwargs["wave_height"] = self.kwargs.get("radii_wave_height", 0)
+            # ---- calculate radii points
+            cntr_pt = Point(x_c, y_c)
+            for key, rad_angle in enumerate(_radii):
+                # points based on length of line, offset and the angle in degrees
+                mirror_angle = 360 - rad_angle  # inverse flip (y is reversed)
+                diam_pt = geoms.point_on_ellipse(
+                    point_centre=Point(x_c, y_c),
+                    angle=mirror_angle,
+                    height=self._u.height,
+                    width=self._u.width,
+                )
+                natural_radii_length = geoms.length_of_line(cntr_pt, diam_pt)
+                if self.radii_length:
+                    radii_length = self.unit(outer_radius, label="radius length")
+                else:
+                    radii_length = natural_radii_length
+                # print(f'*** {rad_angle=} {radii_length=}')
+                if radius_offset is not None and radius_offset > 0:
+                    offset_pt = geoms.point_on_line(cntr_pt, diam_pt, radius_offset)
+                    extra_fraction = radius_offset / natural_radii_length
+                    end_pt = geoms.point_in_direction(cntr_pt, diam_pt, extra_fraction)
+                    x_start, y_start = offset_pt.x, offset_pt.y
+                    x_end, y_end = end_pt.x, end_pt.y
+                    # print(f'*** {rad_angle=} {radius_offset=} {cntr_pt=} {offset_pt=} {end_pt=}')
+                else:
+                    x_start, y_start = cntr_pt.x, cntr_pt.y
+                    x_end, y_end = diam_pt.x, diam_pt.y
+                # ---- track label points
+                label_points.append(
+                    (Point((x_start + x_end) / 2.0, (y_start + y_end) / 2.0), rad_angle)
+                )
+                # ---- draw a radii line
+                draw_line(
+                    cnv, (x_start, y_start), (x_end, y_end), shape=self, **lkwargs
+                )
+                # ---- style radii line
+                _radii_stroke = _radii_strokes[stroke_key]
+                self.set_canvas_props(
+                    index=ID,
+                    stroke=_radii_stroke,
+                    stroke_width=self.radii_stroke_width,
+                    stroke_ends=self.radii_ends,
+                    dashed=self.radii_dashed,
+                    dotted=self.radii_dotted,
+                )
+                stroke_key += 1
+                if stroke_key > len(_radii_strokes) - 1:
+                    stroke_key = 0
+            # ---- draw radii text labels
+            if self.radii_labels:
+                for label_point in label_points:
+                    self.radii_label = _radii_labels[label_key]
+                    # print(f'*** {label_point[1]=}  {self.radii_labels_rotation=}')
+                    self.draw_radii_label(
+                        cnv,
+                        ID,
+                        label_point[0].x,
+                        label_point[0].y,
+                        rotation=label_point[1] + self.radii_labels_rotation,
+                        centred=False,
+                    )
+                    label_key += 1
+                    if label_key > len(_radii_labels) - 1:
+                        label_key = 0
 
     def draw(self, cnv=None, off_x=0, off_y=0, ID=None, **kwargs):
         """Draw ellipse on a given canvas."""
@@ -949,6 +1080,9 @@ class EllipseShape(BaseShape):
         # ---- draw ellipse
         cnv.draw_oval((x, y, x + self._u.width, y + self._u.height))
         self.set_canvas_props(cnv=cnv, index=ID, **kwargs)  # shape.finish()
+        # ---- draw radii
+        if self.radii:
+            self.draw_radii(cnv, ID, x_d, y_d)
         # ---- centred shape (with offset)
         if self.centre_shape:
             if self.can_draw_centred_shape(self.centre_shape):
@@ -1022,6 +1156,7 @@ class LineShape(BaseShape):
         return connections
 
     def draw_arrow(self, cnv, point_a, point_b, **kwargs):
+        """Draw arrow (head) on Line."""
         if (
             self.arrow
             or self.arrow_style
@@ -1102,6 +1237,7 @@ class LineShape(BaseShape):
                         f'Cannot calculate rotation point "{self.rotation_point}"', True
                     )
             # ---- draw line
+            # breakpoint()
             klargs = draw_line(cnv, Point(x, y), Point(x_1, y_1), shape=self, **kwargs)
             self.set_canvas_props(cnv=cnv, index=ID, **klargs)  # shape.finish()
             # ---- arrowhead
@@ -1123,8 +1259,11 @@ class LineShape(BaseShape):
             # ---- * dot
             self.draw_dot(cnv, cx, cy)
             # ---- * text
-            _, _rotation = geoms.angles_from_points(Point(x, y), Point(x_1, y_1))
-            kwargs["rotation"] = -1 * _rotation
+            if self.label_rotation is None:
+                _, _rotation = geoms.angles_from_points(Point(x, y), Point(x_1, y_1))
+                kwargs["rotation"] = -1 * _rotation
+            else:
+                kwargs["rotation"] = self.label_rotation
             # kwargs["rotation_point"] = the_point
             self.draw_label(
                 cnv,
@@ -1182,6 +1321,7 @@ class PodShape(BaseShape):
         """Centre of Pod in points."""
 
     def calculate_xy(self, **kwargs):
+        """Start of Pod in points."""
         # ---- adjust start
         if self.row is not None and self.col is not None:
             x = self.col * self._u.length + self._o.delta_x
@@ -1326,6 +1466,8 @@ class PolylineShape(BasePolyShape):
         lkwargs = {}
         lkwargs["wave_style"] = self.kwargs.get("wave_style", None)
         lkwargs["wave_height"] = self.kwargs.get("wave_height", 0)
+        if lkwargs["wave_style"] and self.curve:
+            feedback("A polyline cannot use a wave_style and curve together", True)
         # ---- set vertices
         self.vertexes = self._shape_vertexes  # BasePoly method
         # ---- draw polyline by vertices
@@ -1629,7 +1771,7 @@ class RhombusShape(BaseShape):
 
         Args:
             centre (Point):
-                the centre of the Rhombus
+                the centre Point of the Rhombus
 
         Returns:
             dict of Radius objects keyed on direction
@@ -1637,7 +1779,7 @@ class RhombusShape(BaseShape):
         directions = ["w", "s", "e", "n"]
         vertices = self._shape_vertexes
         radii_dict = {}
-        # print(f"*** RHMB radii {centre=} {vertices=}")
+        # print(f"*** RHOMBUS radii {centre=} {vertices=}")
         for key, vertex in enumerate(vertices):
             compass, angle = geoms.angles_from_points(centre, vertex)
             # print(f"*** RHMB *** radii {key=} {directions[key]=} {compass=} {angle=}")
@@ -2321,10 +2463,11 @@ class SquareShape(RectangleShape):
         return super()._shape_centre  # via Rectangle
 
     def calculate_area(self) -> float:
+        """Area of Square in points."""
         return self._u.width * self._u.height
 
     def calculate_perimeter(self, units: bool = False) -> float:
-        """Total length of bounding line."""
+        """Total length of Square bounding line."""
         length = 2.0 * (self._u.width + self._u.height)
         if units:
             return self.points_to_value(length)
@@ -2874,6 +3017,7 @@ class TextShape(BaseShape):
 
     def __init__(self, _object=None, canvas=None, **kwargs):
         super().__init__(_object=_object, canvas=canvas, **kwargs)
+        self.height_used = None
         if self.kwargs.get("cx") and self.kwargs.get("cy"):
             self.x = self.kwargs.get("cx")
             self.y = self.kwargs.get("cy") - self.points_to_value(self.font_size)
@@ -2887,9 +3031,17 @@ class TextShape(BaseShape):
     def draw(self, cnv=None, off_x=0, off_y=0, ID=None, **kwargs):
         """Draw text on a given canvas.
 
+        Args:
+            cnv: PyMuPDF page canvas
+            off_x: offset from left
+            off_y: offset from top
+            ID: identifier
+
         Note:
-            Any text in a Template should already have been rendered by
-            base.handle_custom_values()
+            * Any text in a Template should already have been rendered by
+              base.handle_custom_values()
+            * Wrap and HTML text boxes set `height_used` in user units
+            * If offpage=True in kwargs, then draw text waaay off the page!
         """
         # feedback(f'*** Text {ID=} {self.text=}')
         kwargs = self.kwargs | kwargs
@@ -2904,6 +3056,11 @@ class TextShape(BaseShape):
             y_t = self._abs_cy  # + self.font_size / 2.0
             self.align = "centre"  # NB otherwise base.draw_multi_string() will shift x
             self.valign = "centre"
+        # ---- override if offpage (used for e.g. cards to calculate height_used)
+        if kwargs.get("offpage"):
+            x_t = 1e6
+            y_t = 1e6
+        # ---- calculate height & width
         height, width = 0, 0
         if self.height:
             height = self._u.height
@@ -2971,7 +3128,48 @@ class TextShape(BaseShape):
                 fill_opacity=pymu_props.fill_opacity,
             )
             # self.set_canvas_props(cnv=cnv, index=ID, **rkwargs)
-        # ---- BOX text
+
+        # ---- BOX-like text (with vertical write)
+        # if self.box:
+        # TextWriter
+        #     __init__(self, rect, opacity=1, color=None)
+        # Parameters:
+        #     rect (rect-like) – rectangle internally used for text positioning
+        #     opacity (float) – set transparency for the text to store here
+        #     color (float,sequ) – color of the text.
+        # Methods:
+        #     append(pos, text, font=None, fontsize=11, small_caps=0)
+        #         pos (point_like) – start position, bottom left point of first character.
+        #         Returns: text_rect and last_point.
+        #     appendv(pos, text, font=None, fontsize=11, small_caps=0)  # top-to-bottom
+        #         pos (point_like) – start position,  bottom left point of  first character.
+        #         Returns: text_rect and last_point.
+        #     write_text(page, opacity=None, color=None, morph=None, overlay=True, render_mode=0)
+        #         page – write to this Page.
+        #         opacity (float) – override init value TextWriter
+        #         color (sequ) – override the init value of the TextWriter
+        #         morph (sequ) – modify the text appearance by applying a matrix to it
+        #         overlay (bool) – put in foreground (default) or background.
+        #         render_mode (int) – Values: 0 (default), 1, 2, 3 (invisible).
+        #     fill_textbox(rect, text, *, pos=None, font=None, fontsize=11, align=0, warn=None, small_caps=0)
+        #         rect (rect_like) – the area to fill. No part of the text will appear outside of this.
+        #         warn (bool) – on text overflow do nothing (None), warn (True)
+        #         align (int) – text alignment. Use one of
+        #             TEXT_ALIGN_LEFT, TEXT_ALIGN_CENTER, TEXT_ALIGN_RIGHT or TEXT_ALIGN_JUSTIFY.
+        #         Returns:
+        #             list – List of lines that did not fit in the rectangle.
+        # Props:
+        #     text_rect - area currently occupied (Rect)
+        # text_writer = TextWriter()
+        # keys = self.text_properties(string=_text, **kwargs)
+        # if text_rotation:
+        #     current_page.write_text()
+        # elif kwargs.get("vertical"):
+        #     text_writer.appendv(_text)
+        # else:
+        #     text_writer.appendv(_text)
+
+        # ---- WRAP text
         if self.wrap:
             # insert_textbox(
             #     rect, buffer, *, fontsize=11, fontname='helv', fontfile=None,
@@ -2979,6 +3177,24 @@ class TextShape(BaseShape):
             #     render_mode=0, miter_limit=1, border_width=1, expandtabs=8,
             #     align=TEXT_ALIGN_LEFT, rotate=0, lineheight=None, morph=None,
             #     stroke_opacity=1, fill_opacity=1, oc=0)
+            def _measure_unused_height():
+                temp_pdf = pymupdf.open()
+                temp_page = temp_pdf.new_page(width=rect.width, height=rect.height)
+                temp_page.insert_textbox(temp_page.rect, _text, **keys)
+                blocks = temp_page.get_text("blocks")
+                if len(blocks) == 0:
+                    return rect.height
+                last_y = blocks[-1][3]
+                unused_height = temp_page.rect.y1 - last_y
+                return unused_height
+
+            if self.valign:
+                if _lower(self.valign) in ["top", "t"]:
+                    self.valign = "top"
+                elif _lower(self.valign) in ["centre", "center", "c", "middle", "m"]:
+                    self.valign = "centre"
+                elif _lower(self.valign) in ["bottom", "b"]:
+                    self.valign = "bottom"
             if self.rotation is None or self.rotation == 0:
                 text_rotation = 0
             else:
@@ -2996,7 +3212,18 @@ class TextShape(BaseShape):
                     )
                 keys["fontname"] = keys["mu_font"]
                 keys.pop("mu_font")
-                current_page.insert_textbox(rect, _text, **keys)
+                _height_left = _measure_unused_height()
+                if self.valign == "centre" or self.valign == "bottom":
+                    _offset = (
+                        _height_left if self.valign == "bottom" else _height_left / 2
+                    )
+                    rect.y0 += _offset
+                    rect.y1 += _offset
+                current_page.insert_textbox(rect, _text, **keys)  # pts
+                self.height_used = self.height - self.points_to_value(_height_left)
+                # feedback(f"\n*** Text WRAP {_height_left=}  {self.height_used=}")
+                if _height_left < 0:
+                    feedback(f'Text "{_text}" overflowed the available space!', True)
             except ValueError as err:
                 feedback(f"Cannot create Text! - {err}", True)
             except IOError as err:
@@ -3014,6 +3241,7 @@ class TextShape(BaseShape):
                     thefile = f" - unable to open or find {thefile}"
                 msg = f"Cannot create Text{thefile}{cause}"
                 feedback(msg, True, True)
+
         # ---- HTML text
         elif self.html or self.style:
             # insert_htmlbox(rect, text, *, css=None, scale_low=0,
@@ -3052,7 +3280,6 @@ class TextShape(BaseShape):
                 # {'_subarchives': [{'fmt': 'dir', 'entries': ['foo.png', ...
                 globals.archive.add(script_dir)  # append "current" to use img in HTML
                 globals.archive.add(".")  # append "current" to use img in HTML
-
                 keys["archive"] = globals.archive
                 # feedback(f'*** Text HTML {keys=} {rect=} {_text=} {keys=}')
                 if self.run_debug:
@@ -3068,9 +3295,14 @@ class TextShape(BaseShape):
                 except Exception:
                     icon_font = "Helvetica"
                 _text = tools.html_glyph(_text, icon_font, icon_size)
-                current_page.insert_htmlbox(rect, _text, **keys)
+                _height_left, _success = current_page.insert_htmlbox(
+                    rect, _text, **keys
+                )
+                self.height_used = self.height - self.points_to_value(_height_left)
+                # feedback(f"\n*** Text HTML {_height_left=}  {self.height_used=}")
             except ValueError as err:
                 feedback(f"Cannot create Text - {err}", True)
+
         # ---- PLAIN Text string
         else:
             keys = {}
@@ -3079,6 +3311,7 @@ class TextShape(BaseShape):
                 keys["absolute"] = True
                 # feedback(f"\n*** Text PLAIN {_text=} {x_t=} {y_t=} {keys=}")
             self.draw_multi_string(cnv, x_t, y_t, _text, **keys)  # use morph to rotate
+            # TODO - calculate self.height_used
 
 
 class TrapezoidShape(BaseShape):
@@ -3131,11 +3364,11 @@ class TrapezoidShape(BaseShape):
         return Point(x_d, y_d)
 
     def calculate_area(self):
-        """Calculate area of trapezoid."""
+        """Calculate area of Trapezoid."""
         return self._u.top * self._u.height + 2.0 * self.delta_width * self._u.height
 
     def calculate_perimeter(self, units: bool = False) -> float:
-        """Total length of bounding perimeter."""
+        """Total length of Trapezoid bounding perimeter."""
         length = (
             2.0 * math.sqrt(self.delta_width + self._u.height)
             + self._u.top
@@ -3186,6 +3419,7 @@ class TrapezoidShape(BaseShape):
         return perbii_dict
 
     def calculate_xy(self):
+        """Calculate start point of Trapezoid."""
         # ---- adjust start
         if self.cx is not None and self.cy is not None:
             x = self._u.cx - self._u.width / 2.0 + self._o.delta_x
@@ -3551,9 +3785,9 @@ class TriangleShape(BaseShape):
             dict of Radius objects keyed on direction
         """
         directions = ["n", "sw", "se"]
-        radii_dict = {}
         vertices = self._shape_vertexes
-        # print(f*** TRIANGLE radii {centre=} {vertices=}")
+        radii_dict = {}
+        # print(f"*** TRIANGLE radii {centre=} {vertices=}")
         for key, vertex in enumerate(vertices):
             compass, angle = geoms.angles_from_points(centre, vertex)
             # print(f"*** TRIANGLE *** radii {key=} {directions[key]=} {compass=} {angle=}")
@@ -3591,9 +3825,10 @@ class TriangleShape(BaseShape):
     def draw_hatches(
         self, cnv, ID, side: float, vertices: list, num: int, rotation: float = 0.0
     ):
+        """Draw hatch lines for a Triangle."""
 
         def draw_lines(_dirs: str, lines: int):
-            """Draw hatch lines across a Triangle."""
+            """Draw the hatch lines"""
             # v_tl, v_tr, v_bl, v_br
             if "ne" in _dirs or "sw" in _dirs:  # slope UP to the right
                 self.draw_lines_between_sides(

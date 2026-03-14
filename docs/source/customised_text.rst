@@ -64,8 +64,8 @@ The basic properties that can be set for ``Text()`` are:
 - *font_size* - default is ``12`` points
 - *font_name* - the default is ``Helvetica``
 - *stroke* - the default text color is ``black``
-- *align* - the default alignment is ``centre``; it can be changed to be
-  ``left`` or ``right``
+- *align* - the default horizontal alignment is ``centre``; it can be
+  changed to be ``left`` or ``right``
 - *transform* - convert the text to ``upper`` (``u``) or ``lower`` (``l``)
   or ``title`` (``t``) case
 
@@ -84,6 +84,8 @@ The more advanced properties that can be set for "box" ``Text()`` are:
   *box_stoke_width*, *box_dotted*, *box_dashed*, and *box_transparency*
 - *style* - set HTML/CSS properties that will apply to all of the text; this
   will **automatically** also set the *html* property to ``True``
+- *valign* - the default vertical alignment for text whose property is set to
+  ``wrap`` is ``top``; it can be changed to be ``middle`` or ``bottom``
 
 
 .. _textLineOfText:
@@ -224,10 +226,11 @@ A number of examples also use the :ref:`Common command <the-common-command>`
 number of shapes.
 
 - `Example 1. Customised Text`_
-- `Example 2. Styled Text`_
+- `Example 2. HTML-Styled Text`_
 - `Example 3. Rotated Text`_
-- `Example 4. Styled Text`_
-- `Example 5. Custom Fonts`_
+- `Example 4. Wrap-Styled Text`_
+- `Example 5. Wrap-Aligned Text`_
+- `Example 6. Custom Fonts`_
 
 
 Example 1. Customised Text
@@ -289,8 +292,8 @@ Example 1. Customised Text
 ===== ======
 
 
-Example 2. Styled Text
-++++++++++++++++++++++
+Example 2. HTML-Styled Text
++++++++++++++++++++++++++++
 `^ <textIndex_>`_
 
 .. |t03| image:: images/customised/text_style.png
@@ -427,8 +430,8 @@ Example 3. Rotated Text
 ===== ======
 
 
-Example 4. Styled Text
-++++++++++++++++++++++
+Example 4. Wrap-styled Text
++++++++++++++++++++++++++++
 `^ <textIndex_>`_
 
 .. |t05| image:: images/customised/text_outlined.png
@@ -494,8 +497,64 @@ Example 4. Styled Text
 
 ===== ======
 
+Example 5. Wrap-Aligned Text
+++++++++++++++++++++++++++++
+`^ <textIndex_>`_
 
-Example 5. Custom Fonts
+.. |t06| image:: images/customised/text_valign.png
+   :width: 330
+
+===== ======
+|t06| This example shows the text constructed using various properties:
+
+      .. code:: python
+
+        Font("Times-Roman")
+        tprops = Common(
+            wrap=True,
+            height=1.6, width=1.6,
+            font_size=8,
+            stroke="blue",
+            align="centre",
+            box_stroke="black"
+        )
+        Text("Top", common=tprops,
+             x=0.2, y=0.2,
+             valign="top")
+        Text("Top\nTop", common=tprops,
+             x=2.2, y=0.2,
+             valign="top")
+        Text("Middle", common=tprops,
+             x=0.2, y=2.2,
+             valign="middle")
+        Text("Middle\nMiddle", common=tprops,
+             x=2.2, y=2.2,
+             valign="middle")
+        Text("Bottom", common=tprops,
+             x=0.2, y=4.2,
+             valign="bottom")
+        Text("Bottom\nBottom", common=tprops,
+             x=2.2, y=4.2,
+             valign="bottom"
+
+      This example shows how the text can be styled using the *valign*
+      property.
+
+      All examples have a horizontal alignment of ``centre``.
+
+      The top row examples show what the text looks like with a *valign*
+      of ``top``.
+
+      The middle row examples show what the text looks like with a *valign*
+      of ``middle``.
+
+      The top row examples show what the text looks like with a *valign*
+      of ``bottom``.
+
+===== ======
+
+
+Example 6. Custom Fonts
 +++++++++++++++++++++++
 `^ <textIndex_>`_
 
@@ -520,11 +579,11 @@ The best way to use custom fonts in a script is to "activate" them with the
   once after new font install, and then the property can be removed.
 
 
-.. |t06| image:: images/customised/text_fonts.png
+.. |t07| image:: images/customised/text_fonts.png
    :width: 330
 
 ===== ======
-|t06| This example shows the text constructed using various properties:
+|t07| This example shows the text constructed using various properties:
 
       .. code:: python
 

@@ -74,17 +74,22 @@ Color-orientated Terms
 ======================
 `↑ <table-of-contents-terms_>`_
 
-Color is defined in the same way as it is in pages that appear on the
-web i.e. in RGB (red-green-blue) *hexadecimal* format, for example,
+.. _termsColorRGB:
+
+RGB Colors
+----------
+
+An RGB color is defined in the same way as it is in pages that appear on the
+web i.e. in red-green-blue *hexadecimal* format, for example,
 ``#A0522D`` represents a shade of the color that we would likely term
 "brown".
 
-Colors can also be chosen from a pre-defined list of names, for example
+RGB colors can also be chosen from a pre-defined list of names, for example
 ``#A0522D`` is pre-defined in **protograf** as the color *sienna*.
 
 A PDF file
 `colorset.pdf <https://github.com/gamesbook/protograf/blob/master/examples/colorset.pdf>`_
-shows all the names and colors that are available.
+shows all the names and RGB colors that are available.
 
 .. HINT::
 
@@ -93,8 +98,66 @@ shows all the names and colors that are available.
    section https://www.w3.org/TR/css-color-3/#svg-color (this list can
    also be found at https://en.wikipedia.org/wiki/X11_color_names)
 
+.. _termsColorCMYK:
+
+CMYK Colors
+-----------
+
+A CMYK (cyan-magenta-yellow-black) color can be set using 4 numbers for these
+four colors.
+
+To set these as percentage values - between 0 and 100 - use a string value,
+for example, ``"0, 48.75, 71.87, 37.2"`` (which corresponds to the color
+*sienna* color described in the previous section).
+
+To set these as fractional values, use a set of numbers enclosed in ``(...)``
+brackets, for example: ``(0, 0.4875, 0.7187, 0.3725)``
+
+.. IMPORTANT::
+
+    If you need all colors in the output PDF document to be in this format,
+    then ensure you set the property ``color_model="CMYK"`` in the
+    :ref:`Create <create-command>` command.
+
+
+.. _termsColorQuick:
+
+Quick Colors
+------------
+
+A list of "one-letter" colors is also available (based off of a popular
+Python library called *matplotlib*); their RGB hexadecimal codes are also
+shown here for reference:
+
+- ``b`` is blue ("#0000FF")
+- ``c`` is cyan ("#00FFFF")
+- ``d`` is dark blue ("#293BC7")
+- ``e`` is earth/natural ("#F3B54A")
+- ``f`` is forest green ("#007700")
+- ``g`` is green/malachite ("#32CD32")
+- ``h`` is brown/cinnamon ("#D2691E")
+- ``i`` is pink ("#E6506E")
+- ``k`` is black ("#000000")
+- ``l`` is picton blue ("#00BFFF")
+- ``m`` is magenta/violet ("#BF00BF")
+- ``n`` is orange ("#FFA500")
+- ``o`` is white ("#FFFFFF")
+- ``p`` is purple/lavender ("#EE82EE")
+- ``r`` is red ("#FF0000")
+- ``s`` is silver/gray ("#C0C0C0")
+- ``u`` is dark/derby brown ("#4C271B")
+- ``w`` is white ("#FFFFFF")
+- ``y`` is yellow ("#FFFF00")
+- ``x`` is black ("#000000")
+
+.. _termsColorProperty:
+
+Setting Colors
+--------------
+
 In general, color can be set for the lines (**stroke**) and areas
-(**fill**) that are being drawn on a page.
+(**fill**) that are being drawn on a page by assigning values to
+the respective proprerties of a shape that is being drawn.
 
 -  **dot_fill** - the color in which a circle is to be drawn at the
    centre of a shape
@@ -292,7 +355,8 @@ Properties that use directional terms include:
    ``Triangle``
 -  **clockwise** - a ``True`` or ``False`` setting used to determine
    direction of travel around a circle
--  **connections** - for a line, when referencing a vertex or perbis point
+-  **connections** - for a line, when referencing a vertex or perbis point,
+   are used to join one or more shapes with a line
 -  **direction** - can be any primary compass direction; used to show
    the travel route when moving through various types of layouts
    e.g. ``RectangularLayout``
@@ -324,6 +388,8 @@ Styling-orientated Terms
 ========================
 `↑ <table-of-contents-terms_>`_
 
+-  **curve** - sets the amount of "bend" for a line; cannot be used when some
+   other styles such as a *wave* are used
 -  **dotted** - allows a line to be broken into a series of "dots" |dash| very
    short lines |dash| of length equal to the width of the line being drawn,
    with spacing in-between each dot of that same length; to make a line dotted,
@@ -347,6 +413,9 @@ Styling-orientated Terms
    possible to use a fractional number e.g. ``0.5`` equates to 50%. Some
    programs use the term *opacity*; but note that this is the **inverse** of
    transparency.
+-  **wave_style** - this can be 'sawtooth' or 'wave' and causes the line to
+   be drawn in that pattern, rather than as a straight line; the height of
+   the wave is set by the **wave_height**
 
 
 .. _termsDisplay:
@@ -358,12 +427,16 @@ Display-orientated Terms
 -  **corners** - if assigned a number will cause short lines of that length
    to be drawn from each corner of a ``Rectangle`` |dash| these lines can be
    further styled e.g. to show as small, triangular photograph holders
--  **hidden** - a list of locations, indicated by their *row and
-   column* identifier, which should **not** be used for display - the rest
-   are displayed as normal
+-  **grid** - a series of lines that are drawn in a pattern;  **protograf**
+   uses this term in many contexts |dash| grids that cover the whole page;
+   grids used for drawing game boards; and even small grid marks that are
+   used for trmming, cutting or cropping cards
 -  **hatches** - when used in combination with **hatches_count** will draw a
    series of parallel lines between two opposing sides of a regular shape in
    the specified direction(s)
+-  **hidden** - a list of locations, indicated by their *row and
+   column* identifier, which should **not** be used for display - the rest
+   are displayed as normal
 -  **masked** - a list of locations, indicated by their *sequence
    number* |dash| i.e. their position in the drawing order |dash| which
    should **not** be used for display |dash| the rest are displayed as normal
@@ -424,9 +497,12 @@ Miscellaneous Terms
    for a layout will show small dots where each point in that layout exists
 -  **GIF** - Graphics Interchange Format. A file format in which an image
    can be stored; its useful because it supports multiple layers and can be
-   animated
+   animated.
+-  **PDF** - Portable Document Format. A widely used format to create documents
+   such that they display the same way on all devices; its Useful because it
+   supports the vector-format of **protograf** shapes.
 -  **PNG** - Portable Network Graphic. A file format in which an image can
-   be stored; its useful because it supports transparent backgrounds
+   be stored; its useful because it supports transparent backgrounds.
 -  **SVG** - Scaleable Vector Graphics. A file format in which an image can
    be stored; its a vector-format unlike the bitmap- or raster-format of PNG
-   and JPEG files, so its size can be changed without loss of quality
+   and JPEG files, so its size can be changed without loss of quality.

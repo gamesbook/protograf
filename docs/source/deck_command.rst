@@ -19,6 +19,7 @@ It also assumes you have read through the section on
 - `Overview`_
 - `Primary Deck Properties`_
 - `Secondary Deck Properties`_
+- `Access to Deck Properties`_
 - `Deck Property Examples`_
 
 
@@ -130,6 +131,33 @@ The following are other properties that can also be set for a ``Deck``:
     option to export the cards as individual PNG images.  To this you need
     to add ``cards=True`` to the :ref:`Save() <save-command>` command.
 
+.. _deck-properties:
+
+Access to Deck Properties
+=========================
+
+If you assign the Deck to a name, you can use that name to access properties
+of the deck in the rest of your script.
+
+Properties are accessed by means of a "dot", as illustrated below.
+
+.. code:: python
+
+  dk = Deck(
+      cards=4,
+      height=3.2,
+      width=2.2)
+
+  Circle(cx=dk.cx, cy=dk.cy)
+  Rectangle(height=dk.height, width=dk.width)
+
+Here ``dk`` is the name assigned to the Deck; so properties are accessed by
+``dk``, followed by a dot, then the name of the property.
+
+In this code, the ``Circle`` will have its *centre* at x of ``1.1`` and y of
+``1.6``, while the ``Rectangle`` will have its *height* and *width* equal to
+the height and width of the deck's cards.
+
 
 .. _property-examples:
 
@@ -137,9 +165,9 @@ Deck Property Examples
 =======================
 `↑ <table-of-contents-deck_>`_
 
-- `Example 1. Defaults`_
-- `Example 2. Card Bleed`_
-- `Example 3. Full Bleed`_
+- `Example 1. Changing Defaults`_
+- `Example 2. Full Bleed`_
+- `Example 3. Card Bleed`_
 - `Example 4. Offset`_
 - `Example 5a. Grid Marks: Edge`_
 - `Example 5b. Grid Marks: Cross`_
@@ -163,6 +191,12 @@ In most cases |dash| except where otherwise shown |dash| a basic
 drawn on each card.  This purely for illustration purposes; your cards
 would have their own set of one or more shapes that you would want to
 draw on them.
+
+.. HINT::
+
+    When add elements to a Card, its always wise to leave a small gap
+    between them and the edge of the card, to allow for possible errors
+    when they are cut.
 
 The ``Rectangle`` also has its *label* set to show the Card's *sequence*
 number i.e. the order in which it is drawn (usually top-to-bottom and
@@ -190,8 +224,8 @@ any of the ``Card()`` commands.
   more shapes on one or more cards, can be used in a script!
 
 
-Example 1. Defaults
--------------------
+Example 1. Changing Defaults
+----------------------------
 `^ <property-examples_>`_
 
 .. |d01| image:: images/decks/cards_deck_01.png
@@ -211,14 +245,17 @@ Example 1. Defaults
             height=3.2,
             width=2.1)
 
-      The frame for the card is shown by default as a thin black line.
+      Here the default for number of cards (``9``) and their size (``Poker``)
+      are changed by setting properties for the Deck.
+
+      The frame for each card is shown by default as a thin black line.
       The shape, or shapes drawn on a card are located within that frame,
       relative to its boundaries.
 
 ===== ======
 
 
-Example 2. Card Bleed
+Example 2. Full Bleed
 ---------------------
 `^ <property-examples_>`_
 
@@ -236,17 +273,29 @@ Example 2. Card Bleed
             cards=4,
             height=3.2,
             width=2.1,
-            fill="silver")
+            fill="lightsteelblue",
+            bleed_fill="gray")
 
-      Every card can be assigned a background color via the *fill* property
-      of the Deck. This is also known as a "bleed" area, and is useful in case
+      The whole area occupised by the cards can be assigned a background color
+      via the *fill* property of the Deck.
+
+      This is sometimes known as a "bleed" area, and is useful in case where
       the cutting is misaligned; allowing the main area of the card to still
-      be visible.
+      be contain the required color.
+
+      The bleed area for the cards can also be extended to the whole page
+      (up to the margins) by using the *bleed_fill* color.
+
+      In this example, the *bleed_fill* is shown as a different color from
+      the *fill*, so it's clear what its coverage is, but usually
+      these colors would match.
+
+      See also `Example 5a. Grid Marks: Edge`_ below.
 
 ===== ======
 
 
-Example 3. Full Bleed
+Example 3. Card Bleed
 ---------------------
 `^ <property-examples_>`_
 
@@ -266,17 +315,36 @@ Example 3. Full Bleed
             cards=4,
             height=3.2,
             width=2.1,
-            fill="silver",
-            bleed_fill="gray")
+            spacing_x=0.15,
+            spacing_y=0.2)
+        Card(
+            '1,4',
+            bleed_x=0.075, bleed_y=0.1,
+            bleed_fill="yellow")
+        Card(
+            '2,3',
+            bleed_x=0.075,
+            bleed_y=0.1,
+            bleed_fill="red")
 
-      The bleed area for the card can also be extended to the whole page
-      (up to the margins) by using the *bleed_fill* color.
+      Unlike `Example 2. Full Bleed`_, there is no *fill* and *bleed_fill*
+      area set via the ``Deck()`` command; rather the bleed area is set for
+      specific cards.
 
-      In this example, the *bleed_fill* is shown as a different color from
-      the Card's bleed, so it's clear what its coverage is, but usually
-      these colors would match.
+      The ``Card()`` command properties used are as follows:
 
-      See also `Example 5a. Grid Marks: Edge`_ below.
+      - *bleed_fill* - set the fill color of the bleed area
+      - *bleed_x* - set the distance by which the bleed area extends beyond
+        the card frame in both horizontal directions
+      - *bleed_y* - set the distance by which the bleed area extends beyond
+        the card frame in both vertical directions
+
+      Note the use of *spacing_x* and *spacing_y* in the ``Deck()`` command
+      to create a gap between the cards and prevent the bleed areas being
+      overdrawn.  In general, that spacing should be at least twice the bleed
+      distance.
+
+      See also `Example 6. Card Spacing`_ below.
 
 ===== ======
 
@@ -351,14 +419,21 @@ Example 5a. Grid Marks: Edge
       In this example, there are two main changes from previous ones.
 
       There is now a consistent bleed color across both page background and
-      within in the cards themselves; if no separate *fill* property is used,
+      within the cards themselves; if no separate *fill* property is used,
       then the fill color within the card frame will be set to match that of
       the *bleed_fill*.
 
-      The edge of the page has small marks that are designed to help with
-      card cutting; ``grid_marks=True`` enables these marks, and the optional
-      *grid_marks_length* allows the length of these lines to be set; the default
-      length is ``0.85`` cm.
+      The edge of the page has small marks along it that are designed to help
+      with card cutting; ``grid_marks=True`` enables these marks |dash| also
+      referred to as trim or crop marks |dash| and the optional
+      *grid_marks_length* allows the length of these lines to be set;
+      the default length is ``0.85`` cm (one-third of an inch).
+
+      .. HINT::
+
+          Be aware that the grid marks used to assist with cutting are being
+          drawn at the page edge; depending on their length and your printer
+          settings, this may result in them not being printed!
 
       In this example, the ``grid_marks_stroke`` has been changed from the
       default color of ``"gray"`` to ``"black"`` and the
@@ -401,12 +476,13 @@ Example 5b. Grid Marks: Cross
 
       The *grid_marks_style* is changed from the default value of ``"edge"`` to
       that of ``"cross"`` so that small cross-shapes, of length equal to ``0.2``
-      cm, are drawn at the corners of each card's frame.
+      cm, are drawn at the corners of each card's frame, to help the cards to be
+      cut or trimmed more easily.
 
       .. HINT::
 
           This style is perhaps suited to the case where cards are expected
-          to be rounded, otherwise the marks might show up on the cards.
+          to be rounded, otherwise the marks might be drawn on the cards.
 
       The *grid_marks_style* can also be set to ``"both"`` if both edge marks
       **and** crosses are required.
