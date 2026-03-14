@@ -167,35 +167,35 @@ class PolyominoObject(RectangleShape):
                 super().set_abs_and_offset(
                     cnv=cnv, off_x=off_x, off_y=off_y, ID=ID, **kwargs
                 )
-                vtx = super()._shape_vertexes  # anti-clockwise from top-left
+                vtx = super()._shape_vertexes  # clockwise from top-right
                 # handle edges
                 if col == 0:  # left edge
-                    perimeter_lines.append((vtx[1], vtx[0]))
-                if row == 0:  # top edge
-                    perimeter_lines.append((vtx[0], vtx[3]))
-                if col == max_col - 1:  # right edge
                     perimeter_lines.append((vtx[2], vtx[3]))
+                if row == 0:  # top edge
+                    perimeter_lines.append((vtx[3], vtx[0]))
+                if col == max_col - 1:  # right edge
+                    perimeter_lines.append((vtx[0], vtx[1]))
                 if row == max_row - 1:  # bottom edge
                     perimeter_lines.append((vtx[1], vtx[2]))
                 # left
                 try:
                     number = self.int_pattern[row][col - 1]
                     if number == 0:
-                        perimeter_lines.append((vtx[0], vtx[1]))
+                        perimeter_lines.append((vtx[2], vtx[3]))
                 except:
                     pass
                 # right
                 try:
                     number = self.int_pattern[row][col + 1]
                     if number == 0:
-                        perimeter_lines.append((vtx[3], vtx[2]))
+                        perimeter_lines.append((vtx[0], vtx[1]))
                 except:
                     pass
                 # above
                 try:
                     number = self.int_pattern[row - 1][col]
                     if number == 0:
-                        perimeter_lines.append((vtx[0], vtx[3]))
+                        perimeter_lines.append((vtx[3], vtx[0]))
                 except:
                     pass
                 # below
