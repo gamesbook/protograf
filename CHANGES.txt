@@ -1,19 +1,18 @@
 protograf Changes
 =================
 
-2026-00-00 (0.4.7)
+2026-00-00 (0.4.8)
 ------------------
 - [PLANNED-1] Enable curve for a Line
 - [PLANNED-2] Enable non-curve Line connections to Ellipse shapes
+- [PLANNED-2] Add Circle/Dot end for an arrowhead
 - [PLANNED-2] Enable Line connections to Stadium shapes
 - [PLANNED-2] Enable Line connections to Rhombus shapes
 - [PLANNED-2] Enable Line connections to Text shapes
-- [PLANNED-2] Add Circle/Dot end for an arrowhead
-- [PLANNED-2] Enable centred multi-line shape label
 - [PLANNED-3] Add code to connect *Locations
 - [PLANNED-3] Docs: list all props for Hex, Circle, Rectangle, Line
 
-2026-03-014 (0.4.6)
+2026-03-014 (0.4.7)
 ------------------
 - Enable radii for Ellipse shapes
 - Support compass directions for Circle radii
