@@ -405,6 +405,7 @@ Screenshot  .. image:: images/boards/abstract/meridians.png
                :width: 90%
 =========== ==================================================================
 
+.. _new-classic-games:
 
 New Classic Games
 =================

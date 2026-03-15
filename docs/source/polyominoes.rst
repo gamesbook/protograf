@@ -50,6 +50,7 @@ a Polyomino can also be customised with the following properties:
 - **outline** - along with **outline_stroke** and **outline_stroke_width**
   is used to draw a line around the boundary of all connected squares in
   the pattern |dash| it cannot be used in conjunction with a non-zero *gap*
+- **blank_fill** - non-used squares can have a different fill color
 - **fills** - each square can be associated with a different fill color
 - **strokes** - each square can be associated with a different stroke color
 - **labels** - each square can be linked to a different label
@@ -367,14 +368,21 @@ Polyomino: Adhoc Design
 
          Polyomino(
              x=0, y=1,
-             fill="silver",
+             fill="seagreen",
+             blank_fill="tan",
              pattern=[
                  '1001', '0110', '0100', '1001'])
 
-      In this example, the pattern is constructed in such a way that the
-      squares comprising it are not all adjacent to another square.
+      In this example, the pattern |dash| made up of the green squares |dash|
+      is constructed in such a way that the squares comprising it are not
+      all adjacent to another square.
 
       Technically, this is **not** a Polyomino but can provide a useful way
       to construct a pattern made up of squares in an arbitrary layout.
+
+      This example shows how to color in "blank" areas that are **not**
+      filled in by the Polyomino i.e. those marked with ``0``. For an
+      example of their usage, see the "Attaxx" section of the script for
+      :ref:`New Classic Games <new-classic-games>`.
 
 ===== ======
