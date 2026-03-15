@@ -608,6 +608,44 @@ class DiceObject(BaseShape):
         pt4 = Point(centre.x - radius, centre.y)
         cnv.draw_polyline((pt1, pt2, pt3, pt4, pt1))
 
+    def draw_knot(
+        self,
+        cnv,
+        position: str,
+        offset: float,
+        px: float,
+        py: float,
+        knot_shape: str,
+        knot_radius: float,
+        shape_name: str = "shape",
+    ):
+        """Draw a knot on a vertex based on a position and the pip style.
+
+        Args:
+            position (str):
+                an x-y coordinate as a Excel cell ref string;
+                values for x runs from A to E, and y runs from 1 to 5
+            offset (float):
+                distance between each vertex
+
+        Note:
+            * A knot is a slightly smaller shape than a pip, drawn on one of
+              the vertices of an imaginary 5x5 grid overlaid onto the die face
+        """
+        try:
+            pos_y = int(position[1])
+            pos_x = tools.column_from_string(position[0])
+        except:
+            feedback(
+                "Invalid knot position - must be a string with values A1..E5", True
+            )
+        if _lower(knot_shape) in ["circle", "c"]:
+            offset_y = (pos_y - 3) * offset / 2  # negative for 1  & 2
+            offset_x = (pos_x - 3) * offset / 2  # negative for 1  & 2
+            cnv.draw_circle((px + offset_x, py + offset_y), knot_radius)
+        else:
+            raise NotImplementedError('No support for knot shape: "{knot_shape}"')
+
     def draw_pips(
         self,
         cnv,
@@ -652,7 +690,7 @@ class DiceObject(BaseShape):
                     cnv.draw_circle((px + offset, py), pip_radius)
                 case _:
                     feedback(f"The {shape_name} must use a number from 1 to 6", True)
-        if _lower(pip_shape) in ["diamond", "d"]:
+        elif _lower(pip_shape) in ["diamond", "d"]:
             match number:
                 case 1:
                     self.draw_diamond(cnv, (px, py), pip_radius)
@@ -683,6 +721,8 @@ class DiceObject(BaseShape):
                     self.draw_diamond(cnv, (px + offset, py), pip_radius)
                 case _:
                     feedback(f"The {shape_name} must use a number from 1 to 6", True)
+        else:
+            raise NotImplementedError('No support for pip shape: "{pip_shape}"')
 
 
 class D6Object(DiceObject):
@@ -800,6 +840,34 @@ class D6Object(DiceObject):
             pargs["rotation"] = rotation
             pargs["rotation_point"] = self.centroid
         self.set_canvas_props(cnv=None, index=ID, **pargs)
+        # ---- draw the knot
+        knot_position = kwargs.get("knot")
+        if knot_position:
+            knot_fill = kwargs.get("knot_fill", self.pip_fill)
+            knot_stroke = kwargs.get("knot_stroke", knot_fill)
+            knot_offset = 3 * (
+                0.2 * self._u.width / 2.0
+            )  # fixed regardless of pip size
+            # knot_offset = 0.2 * self._u.width  # fixed regardless of pip size
+            knot_radius = 0.66 * pip_radius
+            self.draw_knot(
+                cnv,
+                knot_position,
+                knot_offset,
+                px,
+                py,
+                self.pip_shape,
+                knot_radius,
+                "D6",
+            )
+            # add style
+            pargs = {}
+            pargs["stroke"] = knot_stroke
+            pargs["fill"] = knot_fill
+            if rotation:
+                pargs["rotation"] = rotation
+                pargs["rotation_point"] = self.centroid
+            self.set_canvas_props(cnv=None, index=ID, **pargs)
         # ---- cross
         self.draw_cross(cnv, cx, cy, rotation=kwargs.get("rotation"))
         # ---- dot
