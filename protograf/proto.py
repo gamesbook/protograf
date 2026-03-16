@@ -1025,6 +1025,7 @@ class DeckOfCards:
                 row, col = 0, max_cols - 1  # draw left-to-right for back
             card_number = start_card
 
+            rendered_one = False
             for card_num in range(start_card, card_count):
                 card_number = card_num
 
@@ -1080,6 +1081,7 @@ class DeckOfCards:
                         kwargs["cardname"] = cardname
 
                     for i in range(state.copies_done, copies):
+                        rendered_one = True
                         if not front:
                             kwargs["card_back"] = True  # de/activate grid marks & shift
                         else:
@@ -1143,10 +1145,12 @@ class DeckOfCards:
                     copies_done=0,
                     start_x=0,
                 )
-            # if card_num >= deck_length:
-            PageBreak(**kwargs)
-            cnv = globals.canvas  # new one from page break
-            self.draw_bleed(cnv, page_across, page_down)
+            if rendered_one:
+                # If we're here, the last call finished rendering without a full page
+                # We need to add a page break to match what happens when it finishes with a full page
+                PageBreak(**kwargs)
+                cnv = globals.canvas  # new one from page break
+                self.draw_bleed(cnv, page_across, page_down)
             # print(f"$$$ card_draw - RETURN FROM end  / {front=} : {card_number + 1}")
             return cnv, DeckPrintState(
                 card_count=state.card_count,
