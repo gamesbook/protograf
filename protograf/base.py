@@ -2485,10 +2485,11 @@ class BaseShape:
         keys = {}
         keys["fontsize"] = kwargs.get("font_size", self.font_size)
         keys["fontname"] = kwargs.get("font_name", self.font_name)
+        if isinstance(keys["fontname"], list):
+            keys["fontname"] = tuple(keys["fontname"])
         font, keys["fontfile"], keys["fontname"], keys["mu_font"] = (
             tools.get_font_by_name(keys["fontname"])
         )
-
         _outlined = kwargs.get("outlined", self.outlined)
         if _outlined:
             keys["render_mode"] = 2  # default render_mode=0

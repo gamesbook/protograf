@@ -1064,11 +1064,11 @@ def sheet_column(num: int, lower: bool = False) -> str:
 
 
 @lru_cache(maxsize=256)
-def get_font_by_name(font_name: str) -> tuple:
+def get_font_by_name(fonts_name: object) -> tuple:
     """Get font details by name - built-in OR system installed.
 
     Args:
-        font_name: expected name of font
+        fonts_name: expected name of font or fonts
 
     Returns:
 
@@ -1084,29 +1084,45 @@ def get_font_by_name(font_name: str) -> tuple:
     (Font('Helvetica'), None, 'Helvetica', 'Helvetica')
     >>> get_font_by_name('Helvetica')
     (Font('Helvetica'), None, 'Helvetica', 'Helvetica')
+    >>> get_font_by_name(['foo', 'Times-Roman]')
+    WARNING:: Cannot find or load the font named `foo`. Defaulting to "Times-Roman".
+    (Font('Times-Roman'), None, 'Times-Roman', 'Times-Roman')
 
     #get_font_by_name('Arial')
     #(Font('Arial Regular'), '/usr/share/fonts/truetype/msttcorefonts/Arial.ttf', 'Arial')
     """
 
     font, font_file = None, None
-    if not builtin_font(font_name):
-        cache_directory = pathlib.Path(pathlib.Path.home() / CACHE_DIRECTORY)
-        fi = FontInterface(cache_directory=cache_directory)
-        font_file = fi.get_font_file(name=font_name)
-        if not font_file:
-            feedback(
-                f"Cannot find or load the font named `{font_name}`."
-                f' Defaulting to "{DEFAULT_FONT}".',
-                False,
-                True,
-            )
-            font_name = DEFAULT_FONT
-            font = muFont(DEFAULT_FONT)  # built-in
-        else:
-            font = muFont(font_name, font_file)
+    if fonts_name is None:
+        font_name = DEFAULT_FONT
+    elif isinstance(fonts_name, str):
+        font_names = [fonts_name]
+    elif isinstance(fonts_name, (tuple, list)):
+        font_names = fonts_name
     else:
-        font = muFont(font_name)  # built-in
+        feedback("Font name must be a string or a list of strings!", True)
+
+    for font_name in font_names:
+        if not builtin_font(font_name):
+            cache_directory = pathlib.Path(pathlib.Path.home() / CACHE_DIRECTORY)
+            fi = FontInterface(cache_directory=cache_directory)
+            font_file = fi.get_font_file(name=font_name)
+            if font_file:
+                font = muFont(font_name, font_file)
+                break  # stop after first one found
+        else:
+            font = muFont(font_name)  # built-in
+            break
+
+    if not font:
+        feedback(
+            f"Cannot find or load the font(s) `{fonts_name}`."
+            f' Defaulting to "{DEFAULT_FONT}".',
+            False,
+            True,
+        )
+        font_name = DEFAULT_FONT
+        font = muFont(DEFAULT_FONT)  # built-in
 
     mu_font_name = font_name.replace(" ", "-")
     return font, font_file, font_name, mu_font_name
@@ -1762,34 +1778,42 @@ def set_canvas_props(
     cnv.commit()
 
 
-def get_font_file(font_name: str) -> tuple:
+def get_font_file(fonts_name: object) -> tuple:
     """Access and track a font and its file."""
     _name = None
     font_path = None
     _file = None
-    if not font_name:
+    if not fonts_name:
         return _name, font_path, _file
-    _font_name = str(font_name).strip()
-    if _font_name:
-        _name = builtin_font(_font_name)
-        if not _name:  # check for custom font
-            cache_directory = Path(Path.home() / CACHE_DIRECTORY)
-            fi = FontInterface(cache_directory=cache_directory)
-            _name = fi.get_font_family(font_name)
-            if not _name:
-                feedback(
-                    f'Cannot find or load a Font named "{font_name}".'
-                    f' Defaulting to "{DEFAULT_FONT}".',
-                    False,
-                    True,
-                )
-            else:
-                _file = fi.get_font_file(font_name, fullpath=False)
-                font_path, css = fi.font_file_css(_name)
-                if css not in globals.css:
-                    globals.css += css + "\n"
-                globals.archive.add(font_path)
-                # print(font_path, globals.archive, globals.css)
+    if isinstance(fonts_name, str):
+        font_names = [fonts_name]
+    elif isinstance(font_name, list):
+        font_names = fonts_name
+    else:
+        feedback("Font name must be a string or a list of strings!", True)
+    for name in font_names:
+        _font_name = str(name).strip()
+        if _font_name:
+            _name = builtin_font(_font_name)
+            if not _name:  # check for custom font
+                cache_directory = Path(Path.home() / CACHE_DIRECTORY)
+                fi = FontInterface(cache_directory=cache_directory)
+                _name = fi.get_font_family(font_name)
+                if not _name:
+                    feedback(
+                        f'Cannot find or load a Font named "{font_name}".',
+                        False,
+                        True,
+                    )
+                else:
+                    _file = fi.get_font_file(font_name, fullpath=False)
+                    font_path, css = fi.font_file_css(_name)
+                    if css not in globals.css:
+                        globals.css += css + "\n"
+                    globals.archive.add(font_path)
+                    # print(font_path, globals.archive, globals.css)
+                    return _name, font_path, _file
+    feedback(f'Defaulting to "{DEFAULT_FONT}".')
     return _name, font_path, _file
 
 

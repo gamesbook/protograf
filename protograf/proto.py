@@ -2292,7 +2292,7 @@ def Font(name=None, **kwargs):
 
     Args:
 
-    - name (str): the name of the Font
+    - name (str|list): the name of the Font(s)
 
     Kwargs:
 
