@@ -105,16 +105,29 @@ class ImageShape(BaseShape):
         img = None
         # ---- check for Card usage
         cache_directory = str(self.cache_directory)
-        _source = self.source
-        # feedback(f'*** IMAGE {ID=} {self.source=}')
+        # ---- process locale data (dict via Locale namedtuple) using jinja2
+        #      this may include the item's sequence number and current page
+        _locale = kwargs.get("locale", None)
+        _source = (
+            self.source if not _locale else tools.eval_template(self.source, _locale)
+        )
         if ID is not None and isinstance(self.source, list):
-            _source = self.source[ID]
+            _source = (
+                self.source[ID]
+                if not _locale
+                else tools.eval_template(self.source[ID], _locale)
+            )
             cache_directory = set_cached_dir(_source) or cache_directory
         elif ID is not None and isinstance(self.source, str):
-            _source = self.source
-            cache_directory = set_cached_dir(self.source) or cache_directory
+            _source = (
+                self.source
+                if not _locale
+                else tools.eval_template(self.source, _locale)
+            )
+            cache_directory = set_cached_dir(_source) or cache_directory
         else:
             pass
+        # feedback(f"*** IMAGE draw {_source=} {self.source=} {_locale=}")
         # ---- convert to using units
         height = self._u.height
         width = self._u.width

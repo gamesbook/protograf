@@ -333,5 +333,4 @@ Line(stroke="white", stroke_width=3, dotted=True, connections=[c1, c2])
 Line(stroke="white", stroke_width=3, dotted=True, connections=[c3, c4])
 cC = Circle(cx=3.25, cy=26.25, radius=0.6, fill="#ff004e", stroke="white", stroke_width=3, label_size=18, label="C")
 
-
 Save()

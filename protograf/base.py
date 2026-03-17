@@ -2727,6 +2727,7 @@ class BaseShape:
         #      this may include the item's sequence number and current page
         _locale = kwargs.get("locale", None)
         if _locale:
+            # feedback(f"\n### multistring {string=} {_locale=}")
             string = tools.eval_template(string, _locale)
         # ---- align and font
         align = align or self.align
@@ -2858,11 +2859,12 @@ class BaseShape:
 
         Requires native units (i.e. points)!
         """
-        # feedback(f' @@@ base.draw_label {kwargs=}')
+        # feedback(f' @@@ base.draw_label {ID=} {kwargs.keys()=}')
         if kwargs.get("label_sequence", False):
             self.label = f"{ID}"
         ttext = self.textify(index=ID, text=self.label, default=False)
         _rotation = rotation or self.label_rotation
+        # feedback(f' @@@ base.draw_label {ID=} {ttext=}')
         if ttext is not None or ttext != "":
             _ttext = str(ttext)
             yl = yl + (self.label_size / 3.0) if centred else yl
