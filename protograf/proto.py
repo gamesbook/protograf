@@ -1025,6 +1025,7 @@ class DeckOfCards:
                 row, col = 0, max_cols - 1  # draw left-to-right for back
             card_number = start_card
 
+            rendered_one = False
             for card_num in range(start_card, card_count):
                 card_number = card_num
 
@@ -1079,7 +1080,8 @@ class DeckOfCards:
                         cardname = card.deck_data[card_num].get(self.card_name, None)
                         kwargs["cardname"] = cardname
 
-                    for i in range(state.copies_to_do, copies):
+                    for i in range(state.copies_done, copies):
+                        rendered_one = True
                         if not front:
                             kwargs["card_back"] = True  # de/activate grid marks & shift
                         else:
@@ -1133,20 +1135,27 @@ class DeckOfCards:
                             # print(f"$$$ card_draw - RETURN FROM rows / {front=} : {card_number + 1}")
                             return cnv, DeckPrintState(
                                 card_count=state.card_count,
-                                card_number=card_number + 1,
-                                copies_to_do=copies - i - 1,
+                                card_number=card_number,
+                                copies_done=i + 1,
                                 start_x=0,
                             )
-
-            # if card_num >= deck_length:
-            PageBreak(**kwargs)
-            cnv = globals.canvas  # new one from page break
-            self.draw_bleed(cnv, page_across, page_down)
+                state = DeckPrintState(
+                    card_count=state.card_count,
+                    card_number=card_number,
+                    copies_done=0,
+                    start_x=0,
+                )
+            if rendered_one:
+                # If we're here, the last call finished rendering without a full page
+                # We need to add a page break to match what happens when it finishes with a full page
+                PageBreak(**kwargs)
+                cnv = globals.canvas  # new one from page break
+                self.draw_bleed(cnv, page_across, page_down)
             # print(f"$$$ card_draw - RETURN FROM end  / {front=} : {card_number + 1}")
             return cnv, DeckPrintState(
                 card_count=state.card_count,
                 card_number=card_number + 1,
-                copies_to_do=0,
+                copies_done=0,
                 start_x=0,
             )
 
@@ -1332,10 +1341,10 @@ class DeckOfCards:
         # ---- prep for card drawing
         page_number = -1
         state_front = DeckPrintState(
-            card_count=len(self.fronts), card_number=0, copies_to_do=0, start_x=0
+            card_count=len(self.fronts), card_number=0, copies_done=0, start_x=0
         )
         state_back = DeckPrintState(
-            card_count=len(self.backs), card_number=0, copies_to_do=0, start_x=0
+            card_count=len(self.backs), card_number=0, copies_done=0, start_x=0
         )
         for back in self.backs:
             if back.elements:
