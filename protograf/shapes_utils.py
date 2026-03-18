@@ -14,7 +14,7 @@ from urllib.parse import urlparse
 from protograf.base import (
     BaseShape,
 )
-from protograf.utils import tools
+from protograf.utils import geoms, tools
 from protograf.utils.tools import _lower
 from protograf.utils.constants import (
     BGG_IMAGES,
@@ -68,8 +68,6 @@ def draw_line(
     """
     result = False
     if start and end and cnv:
-        if kwargs.get("wave_height") and kwargs.get("curve"):
-            feedback("A line cannot use a wave_style and curve together", True)
         if kwargs.get("wave_height"):
             _height = tools.as_float(kwargs.get("wave_height", 0.5), "wave_height")
             try:
@@ -102,3 +100,50 @@ def draw_line(
         klargs["fill"] = None
         return klargs
     return kwargs
+
+
+def draw_line_curve(
+    cnv=None,
+    start: Point = None,
+    end: Point = None,
+    curve_height: float = None,
+    **kwargs,
+) -> dict:
+    """Draw a curved line on the canvas (Page) between two points for a Shape.
+
+    Args:
+
+        cnv (PyMuPDF Page object):
+            where the line is drawn
+        start (Point):
+            start of the line
+        end (Point):
+            end of the line
+        curve_height (float):
+            height of curve above centre point of line
+
+    Returns:
+        kwargs (modified for styled lines)
+    """
+    result = False
+    if start and end and curve_height:
+        curve_centre = geoms.fraction_along_line(start, end, 0.5)
+        _, rotation = geoms.angles_from_points(start, end)
+        adjust = 90 if curve_height < 0 else -90
+        u_curve_height = tools.unit(curve_height)
+        curve_point = geoms.point_from_angle(
+            curve_centre, abs(u_curve_height), rotation + adjust
+        )
+        ccentre, _ = geoms.centre_radius_from_points(start, curve_point, end)
+        angle_width = geoms.circle_angle_between_points(start, end, ccentre)
+        # feedback(f'***Line Curve: {start=} {end=} {u_curve_height=} {angle_width=}')
+        cnv.draw_sector(  # anti-clockwise from end pt; 90° default
+            (ccentre.x, ccentre.y), (end.x, end.y), angle_width, fullSector=False
+        )
+        result = True
+    if result:
+        klargs = copy.copy(kwargs)
+        klargs["closed"] = False
+        klargs["fill"] = None  # may want to allow this? curve_fill?
+        return klargs, curve_point.x, curve_point.y
+    return kwargs, None, None

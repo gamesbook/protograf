@@ -21,7 +21,7 @@ import segno  # QRCode
 
 # local
 from protograf import globals
-from protograf.shapes_utils import set_cached_dir, draw_line
+from protograf.shapes_utils import set_cached_dir, draw_line, draw_line_curve
 from protograf.base import (
     BaseShape,
     get_cache,
@@ -1187,7 +1187,7 @@ class LineShape(BaseShape):
         kwargs = self.kwargs | kwargs
         cnv = cnv if cnv else globals.canvas  # a new Page/Shape may now exist
         super().draw(cnv, off_x, off_y, ID, **kwargs)  # unit-based props
-        x, y, x_1, y_1 = None, None, None, None
+        x, y, x_1, y_1, ccx, ccy = None, None, None, None, None, None
         # ---- EITHER connections draw
         if self.connections:
             conns = self.draw_connections(
@@ -1249,9 +1249,18 @@ class LineShape(BaseShape):
                     raise ValueError(
                         f'Cannot calculate rotation point "{self.rotation_point}"', True
                     )
-            # ---- draw line
-            # breakpoint()
-            klargs = draw_line(cnv, Point(x, y), Point(x_1, y_1), shape=self, **kwargs)
+            # ---- draw straight line
+            if not self.curve:
+                klargs = draw_line(
+                    cnv, Point(x, y), Point(x_1, y_1), shape=self, **kwargs
+                )
+            else:
+                # ---- draw curve line
+                if kwargs.get("wave_height") or kwargs.get("wave_style"):
+                    feedback("A line cannot use a wave and curve together", True)
+                klargs, ccx, ccy = draw_line_curve(
+                    cnv, Point(x, y), Point(x_1, y_1), self.curve, **kwargs
+                )
             self.set_canvas_props(cnv=cnv, index=ID, **klargs)  # shape.finish()
             # ---- arrowhead
             self.draw_arrow(cnv, Point(x, y), Point(x_1, y_1), **kwargs)
@@ -1262,7 +1271,10 @@ class LineShape(BaseShape):
             conn = conns[0]
             x, y = conn[0].x, conn[0].y
             x_1, y_1 = conn[1].x, conn[1].y
-            cx, cy = (x_1 + x) / 2.0, (y_1 + y) / 2.0
+            if ccx and ccy:
+                cx, cy = ccx, ccy  # centre of point of curve line
+            else:
+                cx, cy = (x_1 + x) / 2.0, (y_1 + y) / 2.0
             # ---- * centre shapes (with offsets)
             if self.centre_shapes:
                 _, _angle = geoms.angles_from_points(Point(x_1, y_1), Point(x, y))

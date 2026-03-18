@@ -731,7 +731,7 @@ def line_intersection_point(
 
 def bezier_arc_segment(
     cx: float, cy: float, rx: float, ry: float, theta0: float, theta1: float
-):
+) -> tuple:
     """Compute the control points for a Bezier arc with angles theta1-theta0 <= 90.
 
     Points are computed for an arc with angle theta increasing in the
@@ -782,7 +782,7 @@ def bezier_arc_segment(
     return (x0, y0), (x1, y1, x2, y2, x3, y3)
 
 
-def circle_angles(radius: float, chord: float):
+def circle_angles(radius: float, chord: float) -> float:
     """Calculate interior angles of isosceles triangle formed inside a circle.
 
     Source:
@@ -799,7 +799,46 @@ def circle_angles(radius: float, chord: float):
     return math.degrees(top), base, base
 
 
-def equilateral_height(side: Any):
+def circle_angle_between_points(start: Point, end: Point, centre: Point) -> float:
+    """Calculate angles between two points lying on a circle of known centre.
+
+    Args:
+        start: coordinates of first point
+        end: coordinates of seconf point
+        centre: coordinates of circle's centre
+
+    Returns:
+        angle (degrees)
+
+    Source:
+        Google AI!
+
+    Doc Test:
+
+    >>> P1 = Point(15, 10)
+    >>> P2 = Point(10, 15)
+    >>> C0 = Point(10, 10)
+    >>> circle_angle_between_points(P1, P2, C0)
+    90.0
+    """
+
+    # # Center of the circle
+    # h, k = 10, 10
+
+    # # Two points on the circle
+    # x1, y1 = 15, 10
+    # x2, y2 = 10, 15
+
+    # Subtract the center from each point
+    angle1 = math.atan2(start.y - centre.y, start.x - centre.x)
+    angle2 = math.atan2(end.y - centre.y, end.x - centre.x)
+    # Calculate the difference and normalize
+    diff = math.degrees(angle2 - angle1)
+    angle_between = diff % 360
+    return angle_between
+
+
+def equilateral_height(side: Any) -> float:
     """Calculate height of equilateral triangle from a side.
 
     Doc Test:
