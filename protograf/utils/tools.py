@@ -156,6 +156,31 @@ def _lower(value) -> str | None:
         raise ValueError(f"Cannot convert {value} into a string!")
 
 
+def _p2v(value: Point, decimals: int = 4) -> tuple:
+    """Convert point values to a rounded, units-based values using current units.
+
+    Doc Test:
+
+    >>> _p2v(Point(28, 56))
+    (0.9878, 1.9756)
+    """
+    try:
+        _units = globals.units
+    except:
+        _units = 28.3465
+    try:
+        return (
+            round(float(value.x) / _units, decimals),
+            round(float(value.y) / _units, decimals),
+        )
+    except Exception as err:
+        log.exception(err)
+        feedback(
+            f'Unable to do units conversion from "{value}" using {globals.units}!',
+            True,
+        )
+
+
 def as_int(
     value,
     label: str = None,
@@ -373,7 +398,6 @@ def tuple_split(
     if strng:
         try:
             _string_list = strng.strip(" ").replace(";", ",").split(" ")
-            # print(f'^^^ {_string_list=}')
             for _str in _string_list:
                 items = _str.split(",")
                 _items = []
@@ -1080,12 +1104,11 @@ def get_font_by_name(fonts_name: object) -> tuple:
     Doc Test:
 
     >>> get_font_by_name('foo')
-    WARNING:: Cannot find or load the font named `foo`. Defaulting to "Helvetica".
+    WARNING:: Cannot find or load the font(s) `foo`. Defaulting to "Helvetica".
     (Font('Helvetica'), None, 'Helvetica', 'Helvetica')
     >>> get_font_by_name('Helvetica')
     (Font('Helvetica'), None, 'Helvetica', 'Helvetica')
-    >>> get_font_by_name(['foo', 'Times-Roman]')
-    WARNING:: Cannot find or load the font named `foo`. Defaulting to "Times-Roman".
+    >>> get_font_by_name(tuple(['foo', 'Times-Roman']))
     (Font('Times-Roman'), None, 'Times-Roman', 'Times-Roman')
 
     #get_font_by_name('Arial')
@@ -1252,10 +1275,8 @@ def valid_directions(
             valid = {"ne", "sw", "e", "w", "nw", "se"}
         case DirectionGroup.POLYGONAL:  # polygon
             valid = set(range(1, vertex_count + 1))
-            # print('^^^ ', vertex_count, values_set)
         case DirectionGroup.STAR:  # star
             valid = set(range(1, vertex_count + 1))
-            # print('^^^ ', vertex_count, values_set)
         case _:
             raise NotImplementedError(f"Cannot handle {direction_group} type!")
     return valid
@@ -1275,7 +1296,7 @@ def validated_gridlines(
     >>> validated_gridlines('ne se')
     ['ne', 'se']
     >>> validated_gridlines('d se')
-    ['ne', 'sw', 'se']
+    ['ne', 'nw', 'se']
     >>> validated_gridlines('e w', DirectionGroup.HEX_POINTY_EDGE)
     ['e', 'w']
     >>> validated_gridlines('o', DirectionGroup.HEX_POINTY_EDGE)
@@ -1285,7 +1306,6 @@ def validated_gridlines(
     >>> validated_gridlines('o', DirectionGroup.HEX_FLAT_EDGE)
     ['n', 's']
     """
-    # print(f'^^^ {value=} {direction_group=}')
     _value = value
     # ---- pre-flight checks
     if not value:
@@ -1300,7 +1320,6 @@ def validated_gridlines(
                 f"Cannot handle {label}{_value} - must be a string or a list!", True
             )
     values = [str(val).lower().strip() for val in value]
-    # print(f'{values=}')
     # ---- replace generic directions
     clean_values = []
     for val in values:
@@ -1341,7 +1360,6 @@ def validated_gridlines(
                     "one of the valid directions!",
                     True,
                 )
-    # print(f'{clean_values=}')
     # ---- validate all directions
     values_set = set(clean_values)
     valid = valid_directions(direction_group, label, 0)
@@ -1469,10 +1487,8 @@ def transpose_lists(
     def row_col_swop(matrix):
         num_cols = len(matrix[0])
         swopped_matrix = [[row[i] for row in matrix] for i in range(num_cols)]
-        # print(f'^^^ {swopped_matrix=}')
         return swopped_matrix
 
-    # print(f'^^^ transpose_lists {original_list=} {direction=} {invert=}')
     transpose_copy = copy.copy(original_list)
     match str(invert).lower():
         case "lr" | "leftright" | "rl" | "rightleft":
@@ -1482,7 +1498,6 @@ def transpose_lists(
             transpose_copy.reverse()
         case _:
             pass
-    # print('^^^ PF post-flip', transpose_copy)
 
     match str(direction).lower():
         case "s" | "south" | "-90" | "270":
@@ -1494,7 +1509,6 @@ def transpose_lists(
             transpose_copy.reverse()
         case _:
             pass
-    # print('^^^ PF post-rotate', transpose_copy)
     return transpose_copy
 
 
@@ -1648,7 +1662,6 @@ def get_pymupdf_props(
             return prop
 
     defaults = defaults if defaults else {}
-    # print(f'^^^ pymuProps: {kwargs.keys()} \n {kwargs.get("closed", "?")=}')
     if "fill" in kwargs:
         fill = kwargs.get("fill", None)  # reserve None for 'no fill at all'
     else:
@@ -1657,7 +1670,6 @@ def get_pymupdf_props(
         stroke = kwargs.get("stroke", None)  # reserve None for 'no stroke at all'
     else:
         stroke = defaults.get("stroke", None)
-    # print(f'^^^ SCP {kwargs.get("fill")=} {fill=} {kwargs.get("stroke")=} {stroke=}')
     # ---- transparency / opacity
     opacity = 1
     _transparency = kwargs.get("transparency", defaults.get("transparency"))
@@ -1670,7 +1682,6 @@ def get_pymupdf_props(
     # ---- set line end style
     stroke_cap = 0  # default is "sharp"
     line_join = kwargs.get("lineJoin", 0)  # default is "sharp"
-    # print(f"^^^ color: {stroke}", kwargs.get("stroke_ends", None))
     if kwargs.get("stroke_ends", None):  # shape centered at end-of-line
         ends = _lower(kwargs.get("stroke_ends"))
         if ends in ["rounded", "r", "round"]:
@@ -1714,10 +1725,8 @@ def get_pymupdf_props(
         dashes = f"[{dlength} {dspaced}] {doffset}"
     else:
         dashes = None
-    # print(f"^^^ SCP{_dotted =} {_dashed=} {dashes=}")
     # ---- check rotation
     morph = None
-    # print(f'^^^ SCP {_rotation_point=} {_rotation=}')
     if _rotation_point and not isinstance(_rotation_point, (Point, muPoint)):
         feedback(f'Rotation point "{_rotation_point}" is invalid', True)
     if _rotation is not None and not isinstance(_rotation, (float, int)):
@@ -1727,7 +1736,6 @@ def get_pymupdf_props(
         mtrx = Matrix(1, 1)
         mtrx.prerotate(_rotation)
         morph = (_rotation_point, mtrx)
-        # print(f'^^^ SCP {morph=}')
     # ---- get color tuples
     _color = colrs.get_color(stroke)
     _fill = colrs.get_color(fill)
@@ -1759,7 +1767,6 @@ def set_canvas_props(
     **kwargs,
 ):
     """Set pymupdf Shape properties for fill, font, line, line style and colors"""
-    # print(f'^^^ SetCnvProps: {kwargs.keys()} \n {kwargs.get("closed", "?")=}')
     cnv = cnv if cnv else globals.canvas
     defaults = defaults if defaults else {}
     pymu_props = get_pymupdf_props(defaults=defaults, index=index, **kwargs)
@@ -1787,7 +1794,7 @@ def get_font_file(fonts_name: object) -> tuple:
         return _name, font_path, _file
     if isinstance(fonts_name, str):
         font_names = [fonts_name]
-    elif isinstance(font_name, list):
+    elif isinstance(fonts_name, list):
         font_names = fonts_name
     else:
         feedback("Font name must be a string or a list of strings!", True)
@@ -1798,20 +1805,19 @@ def get_font_file(fonts_name: object) -> tuple:
             if not _name:  # check for custom font
                 cache_directory = Path(Path.home() / CACHE_DIRECTORY)
                 fi = FontInterface(cache_directory=cache_directory)
-                _name = fi.get_font_family(font_name)
+                _name = fi.get_font_family(fonts_name)
                 if not _name:
                     feedback(
-                        f'Cannot find or load a Font named "{font_name}".',
+                        f'Cannot find or load a Font named "{fonts_name}".',
                         False,
                         True,
                     )
                 else:
-                    _file = fi.get_font_file(font_name, fullpath=False)
+                    _file = fi.get_font_file(fonts_name, fullpath=False)
                     font_path, css = fi.font_file_css(_name)
                     if css not in globals.css:
                         globals.css += css + "\n"
                     globals.archive.add(font_path)
-                    # print(font_path, globals.archive, globals.css)
                     return _name, font_path, _file
     feedback(f'Defaulting to "{DEFAULT_FONT}".')
     return _name, font_path, _file
@@ -2019,7 +2025,6 @@ def html_glyph(text: str, font_name: str, font_size: str = "") -> str:
                 )
     if glyphs:
         txt = txt.replace("|!", "").replace("!|", "")
-    # print(f"glyph text: {txt=}")
     return txt
 
 

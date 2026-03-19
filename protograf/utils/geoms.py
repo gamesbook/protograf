@@ -804,7 +804,7 @@ def circle_angle_between_points(start: Point, end: Point, centre: Point) -> floa
 
     Args:
         start: coordinates of first point
-        end: coordinates of seconf point
+        end: coordinates of second point
         centre: coordinates of circle's centre
 
     Returns:
@@ -821,21 +821,54 @@ def circle_angle_between_points(start: Point, end: Point, centre: Point) -> floa
     >>> circle_angle_between_points(P1, P2, C0)
     90.0
     """
-
-    # # Center of the circle
-    # h, k = 10, 10
-
-    # # Two points on the circle
-    # x1, y1 = 15, 10
-    # x2, y2 = 10, 15
-
-    # Subtract the center from each point
+    # subtract center from each point
     angle1 = math.atan2(start.y - centre.y, start.x - centre.x)
     angle2 = math.atan2(end.y - centre.y, end.x - centre.x)
-    # Calculate the difference and normalize
+    # calculate difference and normalize
     diff = math.degrees(angle2 - angle1)
     angle_between = diff % 360
     return angle_between
+
+
+def circle_tangent_angle(centre: Point, point: Point) -> float:
+    """
+    Calculates the angle of the tangent line at a given point on a circle.
+
+    Args:
+        centre: coordinates of circle's centre
+        point: coordinates of point
+
+    Returns:
+        angle (float): tangent line in degrees (0 to 360).
+
+    Source:
+        Google AI!
+
+    Doc Test:
+
+    >>> P1 = Point(15, 10)
+    >>> C0 = Point(10, 10)
+    >>> circle_tangent_angle(C0, P1)
+    90.0
+    >>> C0 = Point(5, 5)
+    >>> P1 = Point(7.5, 7.5)
+    >>> circle_tangent_angle(C0, P1)
+    135.0
+    """
+    # change in coordinates (vector from centre to point)
+    dx = point.x - centre.x
+    dy = point.y - centre.y
+    # angle of the radius
+    radius_angle_rad = math.atan2(dy, dx)
+    # tangent is perpendicular, so add 90 degrees (pi/2 radians)
+    tangent_angle_rad = radius_angle_rad + math.pi / 2
+    tangent_angle_deg = math.degrees(tangent_angle_rad)
+    # convert angle to range [0, 360]
+    if tangent_angle_deg < 0:
+        tangent_angle_deg += 360
+    elif tangent_angle_deg >= 360:
+        tangent_angle_deg -= 360
+    return tangent_angle_deg
 
 
 def equilateral_height(side: Any) -> float:

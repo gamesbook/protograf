@@ -11,6 +11,7 @@ from urllib.parse import urlparse
 # third party
 
 # local
+from protograf import globals
 from protograf.base import (
     BaseShape,
 )
@@ -123,27 +124,43 @@ def draw_line_curve(
             height of curve above centre point of line
 
     Returns:
-        kwargs (modified for styled lines)
+        tuple:
+            kwargs (modified for styled lines)
+            curve_point (Point)
+            tangent_angle (float)
+
     """
     result = False
     if start and end and curve_height:
-        curve_centre = geoms.fraction_along_line(start, end, 0.5)
+        line_centre = geoms.fraction_along_line(start, end, 0.5)
+        # feedback(f'***Line start:{_p2v(start)} end:{_p2v(end)} c:{_p2v(line_centre)}')
         _, rotation = geoms.angles_from_points(start, end)
-        adjust = 90 if curve_height < 0 else -90
+        if curve_height < 0:
+            adjust = 90
+            begin = start
+        else:
+            adjust = -90
+            begin = end
         u_curve_height = tools.unit(curve_height)
         curve_point = geoms.point_from_angle(
-            curve_centre, abs(u_curve_height), rotation + adjust
+            line_centre, abs(u_curve_height), rotation + adjust
         )
+        # feedback(f'***Line Curve Pt: {_p2v(curve_point)}')
         ccentre, _ = geoms.centre_radius_from_points(start, curve_point, end)
-        angle_width = geoms.circle_angle_between_points(start, end, ccentre)
+        # feedback(f'***Line Curve Centre: {_p2v(ccentre)}')
+        if curve_height > 0:
+            angle_width = geoms.circle_angle_between_points(start, end, ccentre)
+        else:
+            angle_width = geoms.circle_angle_between_points(end, start, ccentre)
         # feedback(f'***Line Curve: {start=} {end=} {u_curve_height=} {angle_width=}')
-        cnv.draw_sector(  # anti-clockwise from end pt; 90° default
-            (ccentre.x, ccentre.y), (end.x, end.y), angle_width, fullSector=False
+        cnv.draw_sector(  # anti-clockwise from a pt; 90° default
+            (ccentre.x, ccentre.y), (begin.x, begin.y), angle_width, fullSector=False
         )
         result = True
     if result:
         klargs = copy.copy(kwargs)
         klargs["closed"] = False
         klargs["fill"] = None  # may want to allow this? curve_fill?
-        return klargs, curve_point.x, curve_point.y
+        tangent_angle = geoms.circle_tangent_angle(ccentre, end)
+        return klargs, curve_point, tangent_angle
     return kwargs, None, None

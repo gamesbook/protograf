@@ -52,7 +52,7 @@ As can be seen there are four lines in the file:
    Because there is no other information given, it will create the default
    number of cards |dash| *9* |dash| with each card having the same default
    size of 6.35 cm x 8.89 cm, or 2.5" x 3.5" |dash| the same as a normal
-   Poker card.
+   Poker (or *Magic: The Gathering*) card.
 -  *Line 4* - ``Save()`` gives the go-ahead to create the output file on
    disc. Usually, every script you write will have this as the last
    line.  If you don't have it, no file will be created.  The output file
@@ -78,7 +78,7 @@ laid out in a grid on an A4-sized page.
     The default paper size for **protograf** is *A4* which is a standard
     ISO paper size of about 21 x 30 centimetres (approximately 8.3 x 11.7
     inches), chosen because this is most common type of paper encountered
-    globally. Thie can be changed if needed; see below!
+    globally. This can be changed if needed; see below!
 
 
 A simple card deck example: Take 2
@@ -151,7 +151,8 @@ Create this text in a file called ``cards3.py``:
        cards=50,
        height=5,
        width=3.8,
-       fill="purple")
+       fill="purple",
+       grid_marks=True)
 
    # create the output card file, using the card 'deck'
    Save()
@@ -175,6 +176,9 @@ wide.
 
 The *fill* color is set to a predefined one called ``purple``. This
 corresponds to the  **hexadecimal** value ``800080``.
+
+The ``Deck`` will also now display small marks, used to help with cutting,
+along the page edges |dash| these are called "grid marks".
 
 In this script, the lines shown starting with a ``#`` are called
 **comments** |dash| these will be ignored by **protograf** but are included
@@ -216,7 +220,8 @@ Create this text in a file called ``cards4.py``:
         height=5,
         width=3.8,
         fill="skyblue",
-        stroke="white")
+        stroke="white",
+        grid_marks=True)
 
    # customize a single card (number 25) in the deck with text;
    # the text is 1.9cm from the card left & 3cm from its top;

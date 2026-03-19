@@ -1187,7 +1187,8 @@ class LineShape(BaseShape):
         kwargs = self.kwargs | kwargs
         cnv = cnv if cnv else globals.canvas  # a new Page/Shape may now exist
         super().draw(cnv, off_x, off_y, ID, **kwargs)  # unit-based props
-        x, y, x_1, y_1, ccx, ccy = None, None, None, None, None, None
+        x, y, x_1, y_1 = None, None, None, None
+        ccx, ccy, tangent_angle = None, None, None  # used for lince curve
         # ---- EITHER connections draw
         if self.connections:
             conns = self.draw_connections(
@@ -1258,11 +1259,14 @@ class LineShape(BaseShape):
                 # ---- draw curve line
                 if kwargs.get("wave_height") or kwargs.get("wave_style"):
                     feedback("A line cannot use a wave and curve together", True)
-                klargs, ccx, ccy = draw_line_curve(
+                klargs, ccentre, tangent_angle = draw_line_curve(
                     cnv, Point(x, y), Point(x_1, y_1), self.curve, **kwargs
                 )
+                # print(f'*** curve {tools._p2v(ccentre)} {tangent_angle=}')
+                ccx, ccy = ccentre.x, ccentre.y
+                kwargs["tangent"] = tangent_angle
             self.set_canvas_props(cnv=cnv, index=ID, **klargs)  # shape.finish()
-            # ---- arrowhead
+            # ---- draw arrowhead
             self.draw_arrow(cnv, Point(x, y), Point(x_1, y_1), **kwargs)
             # store line points to match connections (for more drawing)
             conns = [(Point(x, y), Point(x_1, y_1))]

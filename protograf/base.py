@@ -3051,7 +3051,10 @@ class BaseShape:
             kwargs["stroke"] = self.arrow_stroke or self.stroke
             kwargs["fill"] = self.arrow_fill or self.stroke
             kwargs["closed"] = True
-            deg, _ = geoms.angles_from_points(point_start, point_end)
+            if kwargs.get("tangent"):
+                deg = kwargs.get("tangent")
+            else:
+                deg, _ = geoms.angles_from_points(point_start, point_end)
             # print(f'{deg=} {angle=} ')
             if point_start.x != point_end.x:
                 kwargs["rotation"] = 180 + deg
