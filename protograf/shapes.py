@@ -1163,7 +1163,17 @@ class LineShape(BaseShape):
             return []
         connections = get_connections(shapes, self.connections_style)
         for conn in connections:
-            klargs = draw_line(cnv, conn[0], conn[1], shape=self, **kwargs)
+            # ---- draw straight line
+            if not self.curve:
+                klargs = draw_line(cnv, conn[0], conn[1], shape=self, **kwargs)
+            else:
+                # ---- draw curve line
+                if kwargs.get("wave_height") or kwargs.get("wave_style"):
+                    feedback("A connection cannot use a wave and curve together", True)
+                klargs, ccentre, tangent_angle = draw_line_curve(
+                    cnv, conn[0], conn[1], self.curve, **kwargs
+                )
+                kwargs["tangent"] = tangent_angle
             self.set_canvas_props(cnv=cnv, index=ID, **klargs)  # shape.finish()
             self.draw_arrow(cnv, conn[0], conn[1], **kwargs)
         return connections

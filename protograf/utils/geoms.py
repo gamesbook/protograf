@@ -871,6 +871,61 @@ def circle_tangent_angle(centre: Point, point: Point) -> float:
     return tangent_angle_deg
 
 
+def circle_intersections(
+    centre1: Point, radius1: float, centre2: Point, radius2: float
+) -> list:
+    """Calculate the intersection points of two circles.
+
+    Args:
+        centre1: coordinates of first circle's centre
+        radius1: radius of first circle
+        centre2: coordinates of second circle's centre
+        radius2: radius of second circle
+
+    Returns:
+        list: any intersection points (0, 1 or 2)
+
+    Source:
+        Google AI!
+
+    Doc Test:
+
+    >>> circle_intersections(Point(0, 0), 5, Point(6, 0), 4)
+    [Point(x=3.75, y=-3.307189138830738), Point(x=3.75, y=3.307189138830738)]
+    >>> circle_intersections(Point(0, 0),1, Point(5, 0), 1)  # separate
+    []
+    >>> circle_intersections(Point(0, 0),10, Point(0, 0), 5)  # 2 inside 1
+    []
+    >>> circle_intersections(Point(0, 0),5, Point(9, 0), 4) # tangent
+    [Point(x=5.0, y=0.0)]
+
+    """
+    # distance between centers
+    c2c = math.sqrt((centre2.x - centre1.x) ** 2 + (centre2.y - centre1.y) ** 2)
+    # non-intersecting cases?
+    if c2c > radius1 + radius2:
+        return []  # separate
+    if c2c < abs(radius1 - radius2):
+        return []  # circle is contained within the other
+    if c2c == 0 and radius1 == radius2:
+        return None  # coincident (infinite intersection points!)
+    # intermediate values
+    a = (radius1**2 - radius2**2 + c2c**2) / (2 * c2c)
+    h = math.sqrt(radius1**2 - a**2)
+    # point where common chord intersects line connecting centers
+    x2 = centre1.x + a * (centre2.x - centre1.x) / c2c
+    y2 = centre1.y + a * (centre2.y - centre1.y) / c2c
+    # calculate the intersection points
+    x3 = x2 + h * (centre2.y - centre1.y) / c2c
+    y3 = y2 - h * (centre2.x - centre1.x) / c2c
+    x4 = x2 - h * (centre2.y - centre1.y) / c2c
+    y4 = y2 + h * (centre2.x - centre1.x) / c2c
+    # return point(s)
+    if h == 0:
+        return [Point(x3, y3)]  # tangent circles (one point)
+    return [Point(x3, y3), Point(x4, y4)]
+
+
 def equilateral_height(side: Any) -> float:
     """Calculate height of equilateral triangle from a side.
 
@@ -879,8 +934,12 @@ def equilateral_height(side: Any) -> float:
     >>> equilateral_height(5)
     4.330127018922194
     """
-    _side = float(side)
-    return math.sqrt(_side**2 - (0.5 * _side) ** 2)
+    try:
+        _side = float(side)
+        return math.sqrt(_side**2 - (0.5 * _side) ** 2)
+    except ValueError:
+        feedback("Equilateral height must be an decimal or integer number.", True)
+        return None
 
 
 def rotate_point_around_point(
