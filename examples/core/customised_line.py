@@ -73,15 +73,17 @@ PageBreak()
 Blueprint(stroke_width=0.5)
 Text(common=txt, text="Line: angle")
 
-Line(cx=1, cy=1, angle=45, length=2, stroke="red")
-Line(cx=3, cy=1, angle=225, length=2, stroke_width=1.5)
+Line(cx=1, cy=1, angle=45, length=2, stroke="red", arrow_style="circle")
+Line(cx=3, cy=1, angle=225, length=2, stroke_width=1.5,
+     arrow_style="circle", arrow_width=0.2)
 
 Circle(cx=2, cy=3, radius=1)
 Line(cx=2, cy=3, angle=45, length=2, stroke="red", arrow_width=0.2)
 Line(cx=2, cy=3, angle=135, length=2, stroke_width=1.5, arrow_width=0.2)
 
-Line(cx=1, cy=5, angle=135, length=2, stroke_width=1.5)
-Line(cx=3, cy=5, angle=315, length=2, stroke="red")
+Line(cx=1, cy=5, angle=135, length=2, stroke_width=1.5,
+     arrow_style="circle", arrow_width=0.2)
+Line(cx=3, cy=5, angle=315, length=2, stroke="red", arrow_style="circle")
 PageBreak()
 
 # ---- line - connections: circle

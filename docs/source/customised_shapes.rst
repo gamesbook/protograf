@@ -578,9 +578,12 @@ A line can be drawn at a centre point by providing the following properties:
       .. code:: python
 
         Line(cx=1, cy=1, angle=45,
-             length=2, stroke="red")
+             length=2, stroke="red",
+             arrow_style="circle")
         Line(cx=3, cy=1, angle=225,
-             length=2, stroke_width=1.5)
+             length=2, stroke_width=1.5,
+             arrow_style="c",
+             arrow_width=0.2)
 
         Circle(cx=2, cy=3, radius=1)
         Line(cx=2, cy=3, angle=45, length=2,
@@ -589,20 +592,29 @@ A line can be drawn at a centre point by providing the following properties:
              stroke_width=1.5, arrow_width=0.2)
 
         Line(cx=1, cy=5, angle=135,
-             length=2, stroke_width=1.5)
+             length=2, stroke_width=1.5
+             arrow_style="circle",
+             arrow_width=0.2)
         Line(cx=3, cy=5, angle=315,
-             length=2, stroke="red")
+             length=2, stroke="red",
+             arrow_style="c")
 
       The top two lines are rotated at 45 |deg| (red) and 255 |deg|
-      (thick black).
+      (thick black). The direction of rotation is shown by the
+      circular "arrowhead" at the end of each line.
 
       The bottom two lines are rotated at 135 |deg| (thick black) and
-      315 |deg| (red).
+      315 |deg| (red).  The direction of rotation is shown by the
+      circular "arrowhead" at the end of each line.
 
-      While each pair appears to be "in the same direction", the use of the
-      arrow property will display the actual direction; so the 45 |deg| (red)
-      line in the circle points to 45 |deg|, while the 135 |deg|
-      (thick black) points to 135 |deg|.
+      While each of the red/black pairs appear to be "in the same
+      direction" |dash| or parallel |dash| the use of the arrow property
+      displays the actual direction.
+
+      Similarly, in the circle, 45 |deg| (red) line in the circle points
+      north-east, while the 135 |deg| (thick black) points to north-west.
+
+      For more on use of arrowheads, see `Example 3. Arrowheads on Line`_.
 
 ===== ======
 
@@ -618,19 +630,20 @@ In addition to styling a Line, it is also possible to specify an arrow
 signify direction.
 
 This is different from the standalone :ref:`Arrow <arrow-command>` which
-allows a much higher degree of customisation.
+allows a much higher degree of customisation and styling.
 
 The following properties can be set:
 
 - *arrow* - if set to ``True`` will cause a default arrow to be drawn
-- *arrow_style* - can be set to ``notch``, ``angle``, or ``spear`` to change
-  the default shape of the arrow
+- *arrow_style* - can be set to ``notch``, ``angle``, ``circle``, or
+  ``spear`` to change the default shape of the arrow
 - *arrow_fill* - set the color of the arrow, which otherwise defaults to the
   color of the line
 - *arrow_stroke* - set the color of the arrow with style ``angle``, which
   otherwise defaults to the color of the line
 - *arrow_width* - set the width of the arrow at its base,  which otherwise
-  defaults to a multiple of the line width
+  defaults to a multiple of the line width |dash| it also sets the radius of
+  the arrow if its shape is circular
 - *arrow_height* - set the height of the arrow, which otherwise
   defaults to a value proportional to the arrow *width* |dash| specifically,
   the height of the equilateral triangle used for the default arrow style
@@ -727,7 +740,6 @@ The following properties can be set:
              arrow_position=[0.25, 0.5, 0.75])
         Line(x=2.5, y=6, x1=2.5, y1=5,
              arrow_position=[1.0, 0.93])
-
         # two lines superimposed
         Line(x=3, y=6, x1=4, y1=5,
              arrow_style='spear',
@@ -769,7 +781,7 @@ The following properties can be set:
       of values means the arrow is drawn in multiple places along the line.
 
       The bottom left image shows how the default arrow expands in size
-      proportional to the thickness (*stroke_width*) of the Line. Again,
+      proportional to the thickness (*stroke_width*) of the line. Again,
       because ``arrow_double=True`` the same arrow is drawn twice; facing
       in each direction, but the ``arrow_position=0.66`` property means
       the arrows are each drawn about two-thirds of the way along the line,
@@ -778,6 +790,8 @@ The following properties can be set:
       The bottom right image is a "cheat" of sorts.  Two lines are drawn in
       the same location but with different styled arrows in different
       positions.
+
+      An example of a circle arrowhead is shown in `Example 2. Centred Line`_
 
 ===== ======
 

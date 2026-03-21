@@ -1860,8 +1860,8 @@ class BaseShape:
                 "s",
                 "triangle",  # default
                 "t",
-                # "circle",
-                # "c",
+                "circle",
+                "c",
             ]:
                 issue.append(f'"{self.arrow_style}" is an invalid arrow_style!')
                 correct = False
@@ -3071,7 +3071,7 @@ class BaseShape:
                 case "triangle" | "t":
                     pass
                 case "spear" | "s":
-                    pt4 = geoms.Point(the_tip.x, the_tip.y + 2 * head_height)
+                    pt4 = geoms.Point(the_tip.x, the_tip.y + 2.0 * head_height)
                     vertexes.append(pt4)
                 case "angle" | "angled" | "a":
                     kwargs["stroke_width"] = self.stroke_width
@@ -3080,10 +3080,18 @@ class BaseShape:
                 case "notch" | "notched" | "n":
                     pt4 = geoms.Point(the_tip.x, the_tip.y + 0.5 * head_height)
                     vertexes.append(pt4)
-            # set props
+                case "circle" | "c":
+                    pt4 = geoms.point_on_line(point_end, point_start, head_height / 2.0)
+            # ---- draw and set props
             # print(f'{vertexes=}' {kwargs=}')
             self._debug(cnv, vertices=vertexes)  # needs: self.debug=True
-            cnv.draw_polyline(vertexes)
+            match _lower(self.arrow_style):
+                case "circle" | "c":
+                    cnv.draw_circle(center=(pt4.x, pt4.y), radius=head_width / 2.0)
+                    kwargs["rotation"] = None
+                    kwargs["rotation_point"] = None
+                case _:
+                    cnv.draw_polyline(vertexes)
             self.set_canvas_props(cnv=cnv, index=None, **kwargs)
 
     def make_path_vertices(self, cnv, vertices: list, v1: int, v2: int):

@@ -858,7 +858,7 @@ class DotShape(BaseShape):
         self.fill = self.stroke
         center = muPoint(x, y)
         # ---- draw dot
-        # feedback(f'*** Dot {size=} {x=} {y=}')
+        # feedback(f'*** Dot {size=} {x=} {y=} {center=} {self._u.radius=}')
         cnv.draw_circle(center=center, radius=self._u.radius)
         kwargs["rotation"] = self.rotation
         kwargs["rotation_point"] = center
