@@ -63,7 +63,6 @@ Line(x=0, y=2.5, length=4, stroke="pink", stroke_width=2, curve=0.25)
 Line(x=0, y=3.6, length=4.1, angle=15, stroke="red", label="15", font_size=6, curve=0.5)
 Line(x=0, y=3.6, length=4.1, angle=-15, stroke="red", label="-15", font_size=6, curve=-0.5)
 
-
 Line(x=0, y=5, x1=4, y1=5.9, stroke="blue", stroke_width=1,
      dashed=[0.2, 0.1], label="dashed:[0.2,0.1]", font_size=6, curve=0.25)
 
@@ -159,7 +158,6 @@ Line(connections=[cc, cr, co, ca],
      connections_style='spoke',
      stroke="green",
      stroke_width=1,
-     arrow=True,
      curve=0.5,
      )
 PageBreak()
@@ -282,10 +280,10 @@ Line(common=tr, angle=300)
 Line(common=tr, angle=360)
 
 Line(x=0.5, y=4, length=1, curve=1.5)
-Line(x=2.5, y=2.5, length=1, curve=-1.5)
+Line(x=2.5, y=2.5, length=1, curve=-1.5, stroke="red")
 
 Line(x=2, y=5.5, length=1, angle=90, curve=1.5)
-Line(x=2.5, y=5.5, length=1, angle=90, curve=-1.5)
+Line(x=2.5, y=5.5, length=1, angle=90, curve=-1.5, stroke="red")
 
 PageBreak()
 
