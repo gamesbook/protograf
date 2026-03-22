@@ -5,9 +5,10 @@ protograf Changes
 ------------------
 - Add example for Grid and Line connections
 - Allow Card Images to use sequence value
-- Patch error when card copies run across pages
+- Patch error when Card copies run across pages
 - Add Circle arrow_style for an arrowhead on a Line
-- [PLANNED-1] Enable curve for a Line
+- Enable de-duplication of Images to reduce Cards file size
+- Enable curve for a Line
 - [PLANNED-2] Enable non-curve Line connections to Ellipse shapes
 - [PLANNED-2] Enable Line connections to Stadium shapes
 - [PLANNED-2] Enable Line connections to Text boxes
@@ -22,7 +23,7 @@ protograf Changes
 - Add diagram example for New Classic Board Games
 - Add CMYK support for colors
 - Add Card-specific bleed area
-- Enable vertical alignment of wrap Text
+- Enable vertical alignment of wrap Text [pending!]
 - Allow shapes to use multiple Default commands
 - Add a script to generate a basic Card template
 

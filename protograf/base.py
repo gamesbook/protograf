@@ -3007,11 +3007,16 @@ class BaseShape:
     def draw_arrowhead(
         self, cnv, point_start: geoms.Point, point_end: geoms.Point, **kwargs
     ):
-        """Draw arrowhead at the end of a straight line segment
+        """Draw arrowhead at the end of a line segment
 
         Args:
             point_start: start point of line
             point_end: end point of line
+
+        Notes:
+            * for curved lines, the kwargs should include circle_centre and
+              circle_radius - these are used to recalculate the point_start
+              based on a chord for the circle
         """
         self.arrow_style = self.arrow_style or "triangle"  # default
         if self.arrow_position:
@@ -3051,11 +3056,16 @@ class BaseShape:
             kwargs["stroke"] = self.arrow_stroke or self.stroke
             kwargs["fill"] = self.arrow_fill or self.stroke
             kwargs["closed"] = True
-            if kwargs.get("tangent"):
-                deg = kwargs.get("tangent")
-            else:
-                deg, _ = geoms.angles_from_points(point_start, point_end)
-            # print(f'{deg=} {angle=} ')
+            # curved line?
+            ccentre = kwargs.get("circle_centre", None)
+            cradius = kwargs.get("circle_radius", None)
+            if ccentre and cradius:
+                # recalc point_start using chord on the circle
+                end_pts = geoms.circle_chord_endpoints(
+                    ccentre, cradius, point_end, head_height
+                )
+                point_start = end_pts[1]  # or 0
+            deg, _ = geoms.angles_from_points(point_start, point_end)
             if point_start.x != point_end.x:
                 kwargs["rotation"] = 180 + deg
                 kwargs["rotation_point"] = the_tip
@@ -3083,7 +3093,7 @@ class BaseShape:
                 case "circle" | "c":
                     pt4 = geoms.point_on_line(point_end, point_start, head_height / 2.0)
             # ---- draw and set props
-            # print(f'{vertexes=}' {kwargs=}')
+            # print(f'*** {vertexes=} {kwargs=}')
             self._debug(cnv, vertices=vertexes)  # needs: self.debug=True
             match _lower(self.arrow_style):
                 case "circle" | "c":
@@ -3439,7 +3449,7 @@ class BaseShape:
                 cx, cy = vertices[idx][0], vertices[idx][1]
                 if rotated:
                     compass, rotation = geoms.angles_from_points(centre, vertices[idx])
-                    # print(f"{idx} {compass=} {rotation=}")
+                    # print(f"*** {idx=} {compass=} {rotation=}")
                 else:
                     compass = 180.0
                 vshape.draw(

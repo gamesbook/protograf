@@ -126,8 +126,12 @@ def draw_line_curve(
     Returns:
         tuple:
             kwargs (modified for styled lines)
-            curve_point (Point)
-            tangent_angle (float)
+            curve_point (Point): middle of the curve (on the circle)
+            centre (Point): centre of circle used to draw curve
+            radius (Point): radius of circle used to draw curve
+
+    Notes:
+        * If kwargs contains `draw=False` the line will NOT be drawn
 
     """
     result = False
@@ -146,21 +150,25 @@ def draw_line_curve(
             line_centre, abs(u_curve_height), rotation + adjust
         )
         # feedback(f'***Line Curve Pt: {_p2v(curve_point)}')
-        ccentre, _ = geoms.centre_radius_from_points(start, curve_point, end)
-        # feedback(f'***Line Curve Centre: {_p2v(ccentre)}')
+        ccentre, radius = geoms.centre_radius_from_points(start, curve_point, end)
+        # feedback(f'***Line Curve Centre: {_p2v(ccentre)} {radius=}')
         if curve_height > 0:
             angle_width = geoms.circle_angle_between_points(start, end, ccentre)
         else:
             angle_width = geoms.circle_angle_between_points(end, start, ccentre)
         # feedback(f'***Line Curve: {start=} {end=} {u_curve_height=} {angle_width=}')
-        cnv.draw_sector(  # anti-clockwise from a pt; 90° default
-            (ccentre.x, ccentre.y), (begin.x, begin.y), angle_width, fullSector=False
-        )
+        if cnv and kwargs.get("draw", True):
+            cnv.draw_sector(  # anti-clockwise from a pt; 90° default
+                (ccentre.x, ccentre.y),
+                (begin.x, begin.y),
+                angle_width,
+                fullSector=False,
+            )
         result = True
     if result:
         klargs = copy.copy(kwargs)
         klargs["closed"] = False
         klargs["fill"] = None  # may want to allow this? curve_fill?
-        tangent_angle = geoms.circle_tangent_angle(ccentre, end)
-        return klargs, curve_point, tangent_angle
-    return kwargs, None, None
+        # tangent_angle = geoms.circle_tangent_angle(ccentre, end)
+        return kwargs, curve_point, ccentre, radius
+    return kwargs, None, None, None

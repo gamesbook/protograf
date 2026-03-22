@@ -132,7 +132,7 @@ Line(connections=[cy, cc, co],
      )
 cr = Circle(cx=1, cy=5, radius=0.5, fill_stroke="tomato")
 cb = Circle(cx=3, cy=5, radius=0.5, fill_stroke="aqua")
-Line(connections=[cr, cc], stroke="grey", stroke_width=0.1)
+# Line(connections=[cr, cc], stroke="grey", stroke_width=0.1)
 Line(connections=[cr, cc, cb],
      stroke="black",
      stroke_width=1,

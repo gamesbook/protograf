@@ -91,6 +91,11 @@ class CircleShape(BaseShape):
         length = math.pi * 2.0 * self._u.radius
         return self.points_to_value(length)
 
+    @cached_property
+    def _shape_radius(self) -> float:
+        """Circle radius length"""
+        return self._u.radius
+
     @property  # do NOT cache because centre needs to be changed!
     def _shape_centre(self) -> Point:
         """Circle centre in points."""

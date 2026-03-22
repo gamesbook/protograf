@@ -2,9 +2,15 @@
 """
 Support functions for calculating connections for Lines/Polylines
 """
+# lib
+import math
+
+# local
+from protograf import globals
 from protograf.base import BaseShape
 from protograf.shapes_hexagon import HexShape
 from protograf.shapes_polygon import PolygonShape
+from protograf.shapes_utils import draw_line_curve
 from protograf.utils.messaging import feedback
 from protograf.utils.tools import _lower, validated_directions  # , _vprint
 from protograf.utils import geoms, tools
@@ -149,14 +155,28 @@ def get_rotation(centre_a: Point, centre_b: Point) -> tuple:
     return rotation_a, rotation_b
 
 
-def get_connections(shapes: list, connections_style) -> list:
-    """Get connection vertices."""
+def get_connections(shapes: list, connections_style: str, curve: float = None) -> tuple:
+    """Get connection vertices.
+
+    Returns:
+        tuple:
+            float: curve height
+            list: connection point tuples; start and end
+    """
     from protograf.shapes import CircleShape, DotShape  # avoid circular imports
 
+    def get_connection_curve(pt_x, centre_x, shape_x, rotation_x):
+        """recalculate curve height as `connection_curve`"""
+        straight_pt_x = geoms.point_on_circle(centre_x, shape_x._u.radius, rotation_x)
+        theta = geoms.circle_angle_between_points(pt_x, straight_pt_x, centre_x)
+        offset_height = shape_a._shape_radius * math.sin(math.radians(theta))
+        connection_curve = (globals.units * curve - abs(offset_height)) / globals.units
+        # print(f"{shape_x._shape_radius=} {theta=} {offset_height=} {connection_curve=}")
+        return connection_curve
+
     connections = []
-    # for idx, cshape in enumerate(shapes):
-    #     if idx == len(shapes) - 1:
-    #         continue
+    connection_curve = curve
+
     for idx in range(0, len(shapes) - 1):
         cshape = shapes[idx]
         if connections_style and _lower(connections_style) in [
@@ -173,8 +193,29 @@ def get_connections(shapes: list, connections_style) -> list:
             centre_b = shape_b._shape_centre  # circle/dot
             rotation_a, rotation_b = get_rotation(centre_a, centre_b)
             # print(f"*** connections {rotation_a=}, {rotation_b=}")
-            pt_a = geoms.point_on_circle(centre_a, shape_a._u.radius, rotation_a)
-            pt_b = geoms.point_on_circle(centre_b, shape_b._u.radius, rotation_b)
+            # print(f"*** connections {centre_a=} {shape_a._shape_radius=}")
+            # print(f"*** connections {centre_b=} {shape_b._shape_radius=}")
+            if curve:
+                # curve intersects
+                klargs, curve_centre, circle_centre, radius = draw_line_curve(
+                    None, centre_a, centre_b, curve, draw=False
+                )  # NOT drawn here
+                # print(f"*** connection curve {circle_centre=} {radius=} {centre_a=} {shape_a._shape_radius=}")
+                intersects_a = geoms.circle_intersections(
+                    circle_centre, radius, centre_a, shape_a._shape_radius
+                )
+                # print(f"*** connection curve {circle_centre=} {radius=} {centre_b=} {shape_b._shape_radius=}")
+                intersects_b = geoms.circle_intersections(
+                    circle_centre, radius, centre_b, shape_b._shape_radius
+                )
+                pt_a, pt_b = intersects_a[1], intersects_b[0]
+                # print(f"*** connection points {pt_a=}, {pt_b=}")
+                connection_curve = get_connection_curve(
+                    pt_a, centre_a, shape_a, rotation_a
+                )
+            else:
+                pt_a = geoms.point_on_circle(centre_a, shape_a._u.radius, rotation_a)
+                pt_b = geoms.point_on_circle(centre_b, shape_b._u.radius, rotation_b)
             connections.append((pt_a, pt_b))
 
         if isinstance(shape_a, (CircleShape, DotShape)) and not isinstance(
@@ -203,4 +244,5 @@ def get_connections(shapes: list, connections_style) -> list:
             pt_a = get_connection_point(shape_a[0], shape_a[1], shape_a[2])
             pt_b = get_connection_point(shape_b[0], shape_b[1], shape_b[2])
             connections.append((pt_a, pt_b))
-    return connections
+
+    return connection_curve, connections

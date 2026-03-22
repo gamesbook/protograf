@@ -846,6 +846,11 @@ class DotShape(BaseShape):
             self.y_c = self._u.cy + self._o.delta_y
         return Point(self.x_c, self.y_c)
 
+    @cached_property
+    def _shape_radius(self) -> Point:
+        """Radius of Dot in points."""
+        return self.point_size
+
     def draw(self, cnv=None, off_x=0, off_y=0, ID=None, **kwargs):
         """Draw a Dot on a given canvas."""
         kwargs = self.kwargs | kwargs
@@ -1161,7 +1166,7 @@ class LineShape(BaseShape):
                 True,
             )
             return []
-        connections = get_connections(shapes, self.connections_style)
+        curve, connections = get_connections(shapes, self.connections_style, self.curve)
         for conn in connections:
             # ---- draw straight line
             if not self.curve:
@@ -1170,10 +1175,12 @@ class LineShape(BaseShape):
                 # ---- draw curve line
                 if kwargs.get("wave_height") or kwargs.get("wave_style"):
                     feedback("A connection cannot use a wave and curve together", True)
-                klargs, ccentre, tangent_angle = draw_line_curve(
-                    cnv, conn[0], conn[1], self.curve, **kwargs
+                klargs, curve_centre, circle_centre, radius = draw_line_curve(
+                    cnv, conn[0], conn[1], curve, **kwargs
                 )
-                kwargs["tangent"] = tangent_angle
+                kwargs["circle_centre"] = circle_centre
+                kwargs["circle_radius"] = radius
+                klargs["fill"] = None
             self.set_canvas_props(cnv=cnv, index=ID, **klargs)  # shape.finish()
             self.draw_arrow(cnv, conn[0], conn[1], **kwargs)
         return connections
@@ -1269,12 +1276,14 @@ class LineShape(BaseShape):
                 # ---- draw curve line
                 if kwargs.get("wave_height") or kwargs.get("wave_style"):
                     feedback("A line cannot use a wave and curve together", True)
-                klargs, ccentre, tangent_angle = draw_line_curve(
+                klargs, curve_centre, circle_centre, radius = draw_line_curve(
                     cnv, Point(x, y), Point(x_1, y_1), self.curve, **kwargs
                 )
-                # print(f'*** curve {tools._p2v(ccentre)} {tangent_angle=}')
-                ccx, ccy = ccentre.x, ccentre.y
-                kwargs["tangent"] = tangent_angle
+                kwargs["circle_centre"] = circle_centre
+                kwargs["circle_radius"] = radius
+                klargs["fill"] = None
+                ccx, ccy = curve_centre.x, curve_centre.y
+                # print(f"*** Line {tools._p2v(curve_centre)} {circle_centre=} {radius=}")
             self.set_canvas_props(cnv=cnv, index=ID, **klargs)  # shape.finish()
             # ---- draw arrowhead
             self.draw_arrow(cnv, Point(x, y), Point(x_1, y_1), **kwargs)
@@ -1493,7 +1502,7 @@ class PolylineShape(BasePolyShape):
                 True,
             )
             return None
-        connections = get_connections(self.connections, self.connections_style)
+        curve, connections = get_connections(self.connections, self.connections_style)
         return connections
 
     def draw(self, cnv=None, off_x=0, off_y=0, ID=None, **kwargs):
