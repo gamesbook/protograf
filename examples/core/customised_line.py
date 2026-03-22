@@ -122,13 +122,22 @@ PageBreak()
 # ---- line - connections - arrow
 Blueprint(stroke_width=0.5)
 Text(common=txt, text="Line: connections; arrow")
-cc = Circle(cx=1.5, cy=3.5, radius=0.5)
+cc = Circle(cx=2, cy=3, radius=0.5)
 cy = Circle(cx=1, cy=1, radius=0.5, fill_stroke="yellow")
-co = Circle(cx=3, cy=5, radius=0.5, fill_stroke="orange")
+co = Circle(cx=3, cy=1, radius=0.5, fill_stroke="orange")
 Line(connections=[cy, cc, co],
      stroke="red",
      stroke_width=1,
      arrow=True,
+     )
+cr = Circle(cx=1, cy=5, radius=0.5, fill_stroke="tomato")
+cb = Circle(cx=3, cy=5, radius=0.5, fill_stroke="aqua")
+Line(connections=[cr, cc], stroke="grey", stroke_width=0.1)
+Line(connections=[cr, cc, cb],
+     stroke="black",
+     stroke_width=1,
+     arrow=True,
+     curve=0.25,
      )
 PageBreak()
 

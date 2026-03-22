@@ -785,6 +785,10 @@ def bezier_arc_segment(
 def circle_angles(radius: float, chord: float) -> float:
     """Calculate interior angles of isosceles triangle formed inside a circle.
 
+    Args:
+        radius (float): radius of circle
+        chord (float): length of line between two points on circle
+
     Source:
         https://www.quora.com/How-do-you-find-the-angles-of-an-isosceles-triangle-given-three-sides
 
@@ -924,6 +928,72 @@ def circle_intersections(
     if h == 0:
         return [Point(x3, y3)]  # tangent circles (one point)
     return [Point(x3, y3), Point(x4, y4)]
+
+
+def circle_chord_endpoints(
+    centre: Point, radius: float, start: Point, chord: float
+) -> tuple:
+    """Calculate the two possible endpoints of a chord.
+
+    Args:
+        centre (Point): coordinates of circle's centre
+        radius (float): radius of circle
+        chord (float): length of line between two points on circle
+        start (Point): coordinates of point on circle
+
+    Returns:
+        tuple (Point, Point):
+            coordinates of two possible endpoints
+
+    Source:
+        Google AI!
+
+    Doc Test:
+
+    >>> center = Point(0, 0)
+    >>> radius = 5
+    >>> start = Point(5, 0) # A point on the circle
+    >>> chord = 8
+    >>> circle_chord_endpoints(center, radius, start, chord)
+    (Point(x=-1.4000000000000008, y=4.8), Point(x=-1.4000000000000008, y=-4.8))
+    >>> chord = 80
+    >>> # circle_chord_endpoints(center, radius, start, chord)
+    >>> # "Chord length cannot be greater than the diameter."
+    >>> chord = 8
+    >>> start = Point(50, 50)
+    >>> # circle_chord_endpoints(center, radius, start, chord)
+    >>> # "Starting point is not on the circle."
+    """
+    # starting point is on the circle?
+    distance_to_center = math.sqrt(
+        (start.x - centre.x) ** 2 + (start.y - centre.y) ** 2
+    )
+    if not math.isclose(distance_to_center, radius):
+        feedback("Starting point is not on the circle.", stop=True, warn=True)
+    # chord length is valid?
+    if chord > 2 * radius:
+        feedback(
+            "Chord length cannot be greater than the diameter.", stop=True, warn=True
+        )
+    # angle subtended by the chord at the center using Law of Cosines
+    # L^2 = R^2 + R^2 - 2*R*R*cos(theta)
+    # cos(theta) = (2*R^2 - L^2) / (2*R^2)
+    # theta = acos(...)
+    cos_theta = (2 * radius**2 - chord**2) / (2 * radius**2)
+    # clamp the value to [-1, 1] to avoid math domain errors due to floating point inaccuracies
+    cos_theta = max(-1, min(1, cos_theta))
+    theta = math.acos(cos_theta)  # radians
+    # initial angle of starting point relative to center
+    alpha = math.atan2(start.y - centre.y, start.x - centre.x)
+    # two possible angles for second endpoint: alpha + theta & alpha - theta
+    angle1 = alpha + theta
+    angle2 = alpha - theta
+    # convert polar to Cartesian coordinates
+    end_x1 = centre.x + radius * math.cos(angle1)
+    end_y1 = centre.y + radius * math.sin(angle1)
+    end_x2 = centre.x + radius * math.cos(angle2)
+    end_y2 = centre.y + radius * math.sin(angle2)
+    return Point(end_x1, end_y1), Point(end_x2, end_y2)
 
 
 def equilateral_height(side: Any) -> float:
