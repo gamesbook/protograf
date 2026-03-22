@@ -2193,10 +2193,10 @@ def Save(**kwargs):
     # print(f'$$$ SAVE {output_filepath=}')
     try:
         globals.document.subset_fonts(verbose=True)  # subset fonts to reduce file size
-        globals.document.save(output_filepath)
+        globals.document.save(output_filepath, garbage=4)  # remove unused & duplicates
     # TODO - allow appending?
     except ValueError as err:
-        feedback(f'Unable to overwrite "{output_filepath}"', False, True)
+        feedback(f'Unable to overwrite "{output_filepath} - {err}"', False, True)
     except RuntimeError as err:
         feedback(f'Unable to save "{output_filepath}" - {err} - {msg}', True)
     except FileNotFoundError as err:
