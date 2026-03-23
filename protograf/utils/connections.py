@@ -169,7 +169,7 @@ def get_connections(shapes: list, connections_style: str, curve: float = None) -
         """recalculate curve height as `connection_curve`"""
         straight_pt_x = geoms.point_on_circle(centre_x, shape_x._u.radius, rotation_x)
         theta = geoms.circle_angle_between_points(pt_x, straight_pt_x, centre_x)
-        offset_height = shape_a._shape_radius * math.sin(math.radians(theta))
+        offset_height = shape_x._shape_radius * math.sin(math.radians(theta))
         connection_curve = (globals.units * curve - abs(offset_height)) / globals.units
         # print(f"{shape_x._shape_radius=} {theta=} {offset_height=} {connection_curve=}")
         return connection_curve
@@ -225,7 +225,22 @@ def get_connections(shapes: list, connections_style: str, curve: float = None) -
             centre_a = shape_a._shape_centre  # circle/dot
             rotation_a, rotation_b = get_rotation(centre_a, pt_b)
             # print(f"*** connections {rotation_a=}, {rotation_b=}")
-            pt_a = geoms.point_on_circle(centre_a, shape_a._u.radius, rotation_a)
+            if curve:
+                # curve intersects
+                klargs, curve_centre, circle_centre, radius = draw_line_curve(
+                    None, centre_a, pt_b, curve, draw=False
+                )  # NOT drawn here
+                # print(f"*** connection curve {circle_centre=} {radius=} {centre_a=} {shape_a._shape_radius=}")
+                intersects_a = geoms.circle_intersections(
+                    circle_centre, radius, centre_a, shape_a._shape_radius
+                )
+                pt_a = intersects_a[1]
+                # print(f"*** connection points {pt_a=}, {pt_b=}")
+                connection_curve = get_connection_curve(
+                    pt_a, centre_a, shape_a, rotation_a
+                )
+            else:
+                pt_a = geoms.point_on_circle(centre_a, shape_a._u.radius, rotation_a)
             connections.append((pt_a, pt_b))
 
         if not isinstance(shape_a, (CircleShape, DotShape)) and isinstance(
@@ -234,8 +249,23 @@ def get_connections(shapes: list, connections_style: str, curve: float = None) -
             pt_a = get_connection_point(shape_a[0], shape_a[1], shape_a[2])
             centre_b = shape_b._shape_centre  # circle/dot
             rotation_a, rotation_b = get_rotation(pt_a, centre_b)
-            # print(f"*** connections {rotation_a=}, {rotation_b=}")
-            pt_b = geoms.point_on_circle(centre_b, shape_b._u.radius, rotation_b)
+            print(f"*** connections {rotation_a=}, {rotation_b=}")
+            if curve:
+                # curve intersects
+                klargs, curve_centre, circle_centre, radius = draw_line_curve(
+                    None, centre_b, pt_a, curve, draw=False
+                )  # NOT drawn here
+                # print(f"*** Z-C connection curve {circle_centre=} {radius=} {centre_b=} {shape_b._shape_radius=}")
+                intersects_b = geoms.circle_intersections(
+                    circle_centre, radius, centre_b, shape_b._shape_radius
+                )
+                pt_b = intersects_b[1]
+                # print(f"*** connection points {pt_a=}, {pt_b=}")
+                connection_curve = get_connection_curve(
+                    pt_b, centre_b, shape_b, rotation_b
+                )
+            else:
+                pt_b = geoms.point_on_circle(centre_b, shape_b._u.radius, rotation_b)
             connections.append((pt_a, pt_b))
 
         if not isinstance(shape_a, (CircleShape, DotShape)) and not isinstance(
