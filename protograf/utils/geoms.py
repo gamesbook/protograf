@@ -996,6 +996,25 @@ def circle_chord_endpoints(
     return Point(end_x1, end_y1), Point(end_x2, end_y2)
 
 
+def circle_to_chord(radius: float, chord: float) -> float:
+    """Calculate the distance between centre of a chord and the diameter
+
+    Args:
+        radius (float): radius of circle
+        chord (float): length of line between two points on circle
+
+    Returns:
+        float:
+            distance between centre of a chord and the diameter
+
+
+    Doc Test:
+    >>> circle_to_chord(15.0, 24.0)
+    6.0
+    """
+    return radius - math.sqrt(radius**2 - (chord / 2) ** 2)
+
+
 def equilateral_height(side: Any) -> float:
     """Calculate height of equilateral triangle from a side.
 

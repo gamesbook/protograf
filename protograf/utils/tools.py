@@ -157,7 +157,7 @@ def _lower(value) -> str | None:
 
 
 def _p2v(value: Point, decimals: int = 4) -> tuple:
-    """Convert point values to a rounded, units-based values using current units.
+    """Convert Point values to a rounded, units-based values using current units.
 
     Doc Test:
 

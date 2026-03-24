@@ -134,10 +134,11 @@ def draw_line_curve(
         * If kwargs contains `draw=False` the line will NOT be drawn
 
     """
+    # from protograf.utils.tools import _p2v
     result = False
     if start and end and curve_height:
         line_centre = geoms.fraction_along_line(start, end, 0.5)
-        # feedback(f'***Line start:{_p2v(start)} end:{_p2v(end)} c:{_p2v(line_centre)}')
+        # feedback(f'***Line Curve Start:{_p2v(start)} End:{_p2v(end)} M:{_p2v(line_centre)}')
         _, rotation = geoms.angles_from_points(start, end)
         if curve_height < 0:
             adjust = 90
@@ -149,9 +150,9 @@ def draw_line_curve(
         curve_point = geoms.point_from_angle(
             line_centre, abs(u_curve_height), rotation + adjust
         )
-        # feedback(f'***Line Curve Pt: {_p2v(curve_point)}')
+        # feedback(f'***Line Curve Point: {_p2v(curve_point)}')
         ccentre, radius = geoms.centre_radius_from_points(start, curve_point, end)
-        # feedback(f'***Line Curve Centre: {_p2v(ccentre)} {radius=}')
+        # feedback(f'***Line Curve Cntre: {_p2v(ccentre)} {radius/globals.units=}')
         if curve_height > 0:
             angle_width = geoms.circle_angle_between_points(start, end, ccentre)
         else:

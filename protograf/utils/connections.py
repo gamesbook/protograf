@@ -226,19 +226,29 @@ def get_connections(shapes: list, connections_style: str, curve: float = None) -
             rotation_a, rotation_b = get_rotation(centre_a, pt_b)
             # print(f"*** connections {rotation_a=}, {rotation_b=}")
             if curve:
+                # print(f"*** connections ca:{tools._p2v(centre_a)} b:{tools._p2v(pt_b)}")
                 # curve intersects
                 klargs, curve_centre, circle_centre, radius = draw_line_curve(
                     None, centre_a, pt_b, curve, draw=False
                 )  # NOT drawn here
-                # print(f"*** connection curve {circle_centre=} {radius=} {centre_a=} {shape_a._shape_radius=}")
+                # print(f"*** b-a connection curve {tools._p2v(curve_centre)=}")
+                # print(f"*** b-a connection curve c:{tools._p2v(circle_centre)} r:{radius/globals.units}")
                 intersects_a = geoms.circle_intersections(
                     circle_centre, radius, centre_a, shape_a._shape_radius
                 )
-                pt_a = intersects_a[1]
-                # print(f"*** connection points {pt_a=}, {pt_b=}")
-                connection_curve = get_connection_curve(
-                    pt_a, centre_a, shape_a, rotation_a
+                ia = intersects_a
+                # feedback(f"***Intersects: {tools._p2v(ia[0])} {tools._p2v(ia[1])}")
+                if curve < 0:
+                    pt_a = intersects_a[0]
+                else:
+                    pt_a = intersects_a[1]
+                # print(f"*** connections a:{tools._p2v(pt_a)} b:{tools._p2v(pt_b)}")
+                chord = geoms.length_of_line(pt_a, pt_b)
+                connection_curve = geoms.circle_to_chord(radius, chord) / globals.units
+                connection_curve = (
+                    connection_curve * -1 if curve < 0 else connection_curve
                 )
+                # print(f"*** {connection_curve=}")
             else:
                 pt_a = geoms.point_on_circle(centre_a, shape_a._u.radius, rotation_a)
             connections.append((pt_a, pt_b))
@@ -249,21 +259,30 @@ def get_connections(shapes: list, connections_style: str, curve: float = None) -
             pt_a = get_connection_point(shape_a[0], shape_a[1], shape_a[2])
             centre_b = shape_b._shape_centre  # circle/dot
             rotation_a, rotation_b = get_rotation(pt_a, centre_b)
-            print(f"*** connections {rotation_a=}, {rotation_b=}")
             if curve:
+                # print(f"*** connections a:{tools._p2v(pt_a)} cb:{tools._p2v(centre_b)}")
                 # curve intersects
                 klargs, curve_centre, circle_centre, radius = draw_line_curve(
-                    None, centre_b, pt_a, curve, draw=False
+                    None, pt_a, centre_b, curve, draw=False
                 )  # NOT drawn here
-                # print(f"*** Z-C connection curve {circle_centre=} {radius=} {centre_b=} {shape_b._shape_radius=}")
+                # print(f"*** b-a connection curve {tools._p2v(curve_centre)=}")
+                # print(f"*** b-a connection curve c:{tools._p2v(circle_centre)} r:{radius/globals.units}")
                 intersects_b = geoms.circle_intersections(
                     circle_centre, radius, centre_b, shape_b._shape_radius
                 )
-                pt_b = intersects_b[1]
-                # print(f"*** connection points {pt_a=}, {pt_b=}")
-                connection_curve = get_connection_curve(
-                    pt_b, centre_b, shape_b, rotation_b
+                ib = intersects_b
+                feedback(f"***Intersects: {tools._p2v(ib[0])} {tools._p2v(ib[1])}")
+                if curve < 0:
+                    pt_b = intersects_b[1]
+                else:
+                    pt_b = intersects_b[0]
+                # print(f"*** connections a:{tools._p2v(pt_a)} b:{tools._p2v(pt_b)}")
+                chord = geoms.length_of_line(pt_a, pt_b)
+                connection_curve = geoms.circle_to_chord(radius, chord) / globals.units
+                connection_curve = (
+                    connection_curve * -1 if curve < 0 else connection_curve
                 )
+                # print(f"*** {connection_curve=}")
             else:
                 pt_b = geoms.point_on_circle(centre_b, shape_b._u.radius, rotation_b)
             connections.append((pt_a, pt_b))

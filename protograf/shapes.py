@@ -325,8 +325,6 @@ class ArcShape(BaseShape):
         # ---- circumference/perimeter point in units
         pt_p = geoms.point_on_circle(pt_c, self._u.radius, self.angle_start)
         # ---- draw sector
-        # feedback(
-        #     f'***Arc: {pt_p=} {pt_c=} {self.angle_start=} {self.angle_width=}')
         cnv.draw_sector(  # anti-clockwise from pt_p; 90° default
             (pt_c.x, pt_c.y), (pt_p.x, pt_p.y), self.angle_width, fullSector=False
         )
