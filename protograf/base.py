@@ -383,12 +383,13 @@ class BaseCanvas:
         self.x_c = self.defaults.get("x_c", None)
         self.y_c = self.defaults.get("y_c", None)
         # ---- line
-        self.connections = self.defaults.get("connections", None)
-        self.connections_style = self.defaults.get("connections_style", None)
         self.curve = self.defaults.get("curve", 0.0)
         # ---- line / bezier
         self.x_1 = self.defaults.get("x1", 0.0)
         self.y_1 = self.defaults.get("y1", 0.0)
+        # ---- line / hex
+        self.links = self.defaults.get("links", None)
+        self.links_style = self.defaults.get("links_style", None)
         # ---- bezier
         self.x_2 = self.defaults.get("x2", 1.0)
         self.y_2 = self.defaults.get("y2", 1.0)
@@ -1041,12 +1042,13 @@ class BaseShape:
         self.x_c = kwargs.get("x_c", base.x_c)
         self.y_c = kwargs.get("y_c", base.y_c)
         # ---- line
-        self.connections = kwargs.get("connections", base.connections)
-        self.connections_style = kwargs.get("connections_style", base.connections_style)
         self.curve = self.kw_float(kwargs.get("curve", base.curve))
         # ---- line / bezier / sector
         self.x_1 = self.kw_float(kwargs.get("x1", base.x_1))
         self.y_1 = self.kw_float(kwargs.get("y1", base.y_1))
+        # ---- line / hex
+        self.links = kwargs.get("links", base.links)
+        self.links_style = kwargs.get("links_style", base.links_style)
         # ---- bezier / sector
         self.x_2 = self.kw_float(kwargs.get("x2", base.x_2))
         self.y_2 = self.kw_float(kwargs.get("y2", base.y_2))
@@ -1328,7 +1330,6 @@ class BaseShape:
         self.caltrops_invert = self.kw_bool(
             kwargs.get("caltrops_invert", base.caltrops_invert)
         )
-        self.links = kwargs.get("links", base.links)
         self.link_stroke_width = self.kw_float(
             kwargs.get("link_stroke_width", base.link_stroke_width)
         )
@@ -3122,11 +3123,11 @@ class BaseShape:
 
         Args:
             side: length of a side
-            line_count: number of connections
+            line_count: number of connecting lines
             vertices: list of the Points making up the shape
             left_nodes: IDs of the two vertices on either end of one of the sides
             right_nodes: IDs of the two vertices on either end of the opposite side
-            skip_ends: if True, do not draw the first or last connection
+            skip_ends: if True, do not draw the first or last connecting line
 
         Note:
             * Vertices normally go clockwise from bottom/lower left

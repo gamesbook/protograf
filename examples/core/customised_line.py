@@ -85,55 +85,55 @@ Line(cx=1, cy=5, angle=135, length=2, stroke_width=1.5,
 Line(cx=3, cy=5, angle=315, length=2, stroke="red", arrow_style="circle")
 PageBreak()
 
-# ---- line - connections: circle
+# ---- line - links: circle
 Blueprint(stroke_width=0.5)
-Text(common=txt, text="Line: connections; circles")
+Text(common=txt, text="Line: links; circles")
 cc = Circle(cx=2, cy=3, radius=0.5)
 cy = Circle(cx=1, cy=1, radius=0.5, fill_stroke="yellow")
-Line(connections=[cc, cy])
+Line(links=[cc, cy])
 ca = Circle(cx=1, cy=5, radius=0.5, fill_stroke="aqua")
-Line(connections=[cc, ca])
+Line(links=[cc, ca])
 cr = Circle(cx=3, cy=1, radius=0.5, fill_stroke="red")
-Line(connections=[cc, cr])
+Line(links=[cc, cr])
 co = Circle(cx=3, cy=5, radius=0.5, fill_stroke="orange")
-Line(connections=[cc, co])
+Line(links=[cc, co])
 # orthogonal
-Line(connections=[cy, cr, co, ca, cy], stroke_width=2)
-Line(connections=[cy, cr, co, ca, cy],
+Line(links=[cy, cr, co, ca, cy], stroke_width=2)
+Line(links=[cy, cr, co, ca, cy],
      stroke_width=2, stroke="green", curve=0.5)
 PageBreak()
 
-# ---- line - connections: shapes
+# ---- line - links: shapes
 Blueprint(stroke_width=0.5)
-Text(common=txt, text="Line: connections; shapes")
+Text(common=txt, text="Line: links; shapes")
 s1 = Square(cx=1, cy=4, side=1, fill="yellow")
 s2 = Square(cx=3, cy=2, side=1)
 Line(
-    connections=[(s1, 'v', 'ne'), (s2, 'p', 'w')],
+    links=[(s1, 'v', 'ne'), (s2, 'p', 'w')],
     stroke="red",
     stroke_width=2)
 Line(
-    connections=[(s1, 'p', 'e'), (s2, 'v', 'se')],
+    links=[(s1, 'p', 'e'), (s2, 'v', 'se')],
     stroke="blue",
     stroke_width=2,
     curve=-0.5)
 PageBreak()
 
-# ---- line - connections - arrow
+# ---- line - links - arrow
 Blueprint(stroke_width=0.5)
-Text(common=txt, text="Line: connections; arrow")
+Text(common=txt, text="Line: links; arrow")
 cc = Circle(cx=2, cy=3, radius=0.5)
 cy = Circle(cx=1, cy=1, radius=0.5, fill_stroke="yellow")
 co = Circle(cx=3, cy=1, radius=0.5, fill_stroke="orange")
-Line(connections=[cy, cc, co],
+Line(links=[cy, cc, co],
      stroke="red",
      stroke_width=1,
      arrow=True,
      )
 cr = Circle(cx=1, cy=5, radius=0.5, fill_stroke="tomato")
 cb = Circle(cx=3, cy=5, radius=0.5, fill_stroke="aqua")
-# Line(connections=[cr, cc], stroke="grey", stroke_width=0.1)
-Line(connections=[cr, cc, cb],
+# Line(links=[cr, cc], stroke="grey", stroke_width=0.1)
+Line(links=[cr, cc, cb],
      stroke="black",
      stroke_width=1,
      arrow=True,
@@ -141,30 +141,30 @@ Line(connections=[cr, cc, cb],
      )
 PageBreak()
 
-# ---- line - connections - dot&spoke
+# ---- line - links - dot&spoke
 Blueprint(stroke_width=0.5)
-Text(common=txt, text="Line: connections; dot&spoke")
+Text(common=txt, text="Line: links; dot&spoke")
 cc = Dot(cx=1.5, cy=3.5, dot_width=2)
 cr = Circle(cx=3, cy=1, radius=0.5, fill_stroke="red")
 co = Circle(cx=3, cy=5, radius=0.5, fill_stroke="orange")
 ca = Circle(cx=1, cy=5, radius=0.5, fill_stroke="aqua")
-Line(connections=[cc, cr, co, ca],
-     connections_style='spoke',
+Line(links=[cc, cr, co, ca],
+     links_style='spoke',
      stroke="green",
      stroke_width=1,
      arrow=True,
      )
 PageBreak()
 
-# ---- line - connections - curved
+# ---- line - links - curved
 Blueprint(stroke_width=0.5)
-Text(common=txt, text="Line: connections; curve")
+Text(common=txt, text="Line: links; curve")
 cc = Dot(cx=1.5, cy=3.5, dot_width=2)
 cr = Circle(cx=3, cy=1, radius=0.5, fill_stroke="red")
 co = Circle(cx=3, cy=5, radius=0.5, fill_stroke="orange")
 ca = Circle(cx=1, cy=5, radius=0.5, fill_stroke="aqua")
-Line(connections=[cc, cr, co, ca],
-     connections_style='spoke',
+Line(links=[cc, cr, co, ca],
+     links_style='spoke',
      stroke="green",
      stroke_width=1,
      curve=0.5,
@@ -309,11 +309,11 @@ Save(
         "line_custom",
         "line_custom_curve",
         "line_centred",
-        "line_connections_circle",
-        "line_connections_shapes",
-        "line_connections_arrow",
-        "line_connections_spoke",
-        "line_connections_curve",
+        "line_links_circle",
+        "line_links_shapes",
+        "line_links_arrow",
+        "line_links_spoke",
+        "line_links_curve",
         "line_centre_shapes",
         "line_centre_shapes_curve",
         "line_curves",

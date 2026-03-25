@@ -231,7 +231,7 @@ Discussion  This example shows how to construct a Morabaraba board.
 
             There is just a simple set of Squares, with the corner vertices and
             line centres ("perbis" points), connected by :ref:`Lines <line-command>`
-            using each line's *connection* property.
+            using each line's *link* property.
 
 ----------- ------------------------------------------------------------------
 Screenshot  .. image:: images/boards/abstract/morabaraba.png
@@ -245,7 +245,7 @@ Octagons
 
 In Octagons, players alternate taking turns. On their turn, a player can
 either fill in one half of an octagon or two squares. The player who first
-forms an unbroken connection between the edges of their colour wins.
+forms an unbroken connecting line between the edges of their colour wins.
 
 =========== ==================================================================
 Title       *Octagons Board*

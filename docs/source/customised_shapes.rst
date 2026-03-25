@@ -383,10 +383,10 @@ that it can be customised.
 - `Arrowheads <line-with-arrow_>`_
 - `Centre Shapes <lineCentreShapes_>`_
 - `Centre Shapes - curved <lineCentreShapesCurve_>`_
-- `Connections: Circles <lineConnectionsCircle_>`_
-- `Connections: Shapes <lineConnectionsShapes_>`_
-- `Connections with Arrows <lineConnectionsArrow_>`_
-- `Connections as Spokes <lineConnectionsSpoke_>`_
+- `Links: Circles <lineLinksCircle_>`_
+- `Links: Shapes <lineLinksShapes_>`_
+- `Links with Arrows <lineLinksArrow_>`_
+- `Links as Spokes <lineLinksSpoke_>`_
 
 Line Properties
 ---------------
@@ -406,17 +406,17 @@ A Line has the following properties, in addition to the basic ones of
   drawn at the centre of the line
 - *centre_shapes_rotated* - if set to ``True``,  the shapes that will be
   drawn at the centre of the line are rotated to align with it
-- *connections* - a list of one or more shapes that will be
-  connected by the line; this property overrides any others that may have
-  been set to determine **where** the line is drawn
-- *connections_style* - if set to ``spoke``, will draw lines from the first
-  shape to each of the other shapes in the *connections* list
 - *dotted* - if ``True``, create a series of small lines i.e. the
   "dots", followed by gaps, of sizes equal to the line's *stroke_width*
 - *dashed* - a list of two numbers: the first is the length of the dash;
   the second is the length of the space between each dash
 - *length* - sets the specific size of the line; used in conjunction
   with *angle* (which defaults to 0 |deg|)
+- *links* - a list of one or more shapes that will be joined by the line;
+  this property overrides any others that may have been set to determine
+  **where** the line is drawn
+- *links_style* - if set to ``spoke``, will draw lines from the first
+  shape to each of the other shapes in the *links* list
 - *rounded* - if ``True``, draw small circles, centred at the ends of the line
 - *squared* - if ``True``, draw small squares, centred at the ends of the line
 - *stroke* - the color of the line
@@ -1105,32 +1105,32 @@ Example 5b. Centre Shapes - curve
 ===== ======
 
 
-.. _lineConnectionsCircle:
+.. _lineLinksCircle:
 
-Example 6. Connections: Circle
-------------------------------
+Example 6. Links: Circle
+------------------------
 `^ <lineIndex_>`_
 
 To connect two or more shapes, supply a list of them, together with a
-*connection point*, for the *connections* property of the line.
+*link point*, for the *links* property of the line.
 
-The *connection point* for circular shapes |dash| ``Circle`` and ``Dot`` |dash|
+The *link point* for circular shapes |dash| ``Circle`` and ``Dot`` |dash|
 is not required, as the connecting line is always drawn to/from the centre
 of such a shape.
 
 For non-circular shapes |dash| for example, ``Rectangle`` or ``Hexagon`` |dash|
 such a shape must have either/or vertex points, or perbis points, that can be
-specified as the *connection point* to which the line will connect. This point
-must be set along with the shape, in the  *connections* property setting.
+specified as the *link point* to which the line will connect. This point
+must be set along with the shape, in the  *links* property setting.
 
 .. NOTE::
 
-  Use of the *connections* property overrides any other properties that may
+  Use of the *links* property overrides any other properties that may
   have been set to specify **where** the line will be drawn.  The other
   properties that specify **how** the line will be appear will still be used.
 
 
-.. |ln7| image:: images/customised/line_connections_circle.png
+.. |ln7| image:: images/customised/line_links_circle.png
    :width: 330
 
 ===== ======
@@ -1143,33 +1143,33 @@ must be set along with the shape, in the  *connections* property setting.
 
         cy = Circle(cx=1, cy=1, radius=0.5,
                     fill_stroke="yellow")
-        Line(connections=[cc, cy])
+        Line(links=[cc, cy])
 
         ca = Circle(cx=1, cy=5, radius=0.5,
                     fill_stroke="aqua")
-        Line(connections=[cc, ca])
+        Line(links=[cc, ca])
 
         cr = Circle(cx=3, cy=1,
                     radius=0.5, fill_stroke="red")
-        Line(connections=[cc, cr])
+        Line(links=[cc, cr])
 
         co = Circle(cx=3, cy=5, radius=0.5,
                     fill_stroke="orange")
-        Line(connections=[cc, co])
+        Line(links=[cc, co])
 
         # orthogonal
         Line(
-            connections=[cy, cr, co, ca, cy],
+            links=[cy, cr, co, ca, cy],
             stroke_width=2)
 
       This example shows how Circles that are defined and drawn as normal
       can be assigned to a name e.g. ``cc`` for the white Circle, and then
-      connected by a Line via the *connections* property.
+      connected by a Line via the *links* property.
 
-      The *connections* property requires two or more shapes in a
+      The *links* property requires two or more shapes in a
       list so that the Line can be drawn between them.
 
-      Using the *connections* property means that the normal point locations,
+      Using the *links* property means that the normal point locations,
       or line angle, are **not** used but are superceded by calculated values.
       The "start" of the line is at the centre of the first circular shape
       and the "end" of the line is at the centre of the second circular shape.
@@ -1182,35 +1182,35 @@ must be set along with the shape, in the  *connections* property setting.
 ===== ======
 
 
-.. _lineConnectionsShapes:
+.. _lineLinksShapes:
 
-Example 7. Connections: Shapes
-------------------------------
+Example 7. Links: Shapes
+------------------------
 `^ <lineIndex_>`_
 
 To connect two or more non-circular shapes |dash| for example, ``Rectangle``
 or ``Hexagon`` |dash| supply a list of these, along with the settings for
-each of their *connection points*, as the *connections* property of the line.
+each of their *link points*, as the *links* property of the line.
 
-The *connection point* setting for non-circular shapes must specify:
+The *link point* setting for non-circular shapes must specify:
 
 - the shape name;
-- the connection type |dash| either a vertex point (``v``) or a perbis
+- the link type |dash| either a vertex point (``v``) or a perbis
   point (``p``);
-- the connection location, as a :ref:`compass direction <termsDirection>`.
+- the link location, as a :ref:`compass direction <termsDirection>`.
 
 .. NOTE::
 
-  Use of the *connections* property overrides any other properties that may
+  Use of the *links* property overrides any other properties that may
   have been set to specify **where** the line will be drawn.  The other
   properties that specify **how** the line will be appear will still be used.
 
-More concrete examples of the use of connections can be found in the
+More concrete examples of the use of links can be found in the
 examples of constructing boards |dash| :ref:`Morabaraba <abstractGameMorabaraba>`
 and :ref:`Kensington <abstractGameKensington>`.
 
 
-.. |ln8| image:: images/customised/line_connections_shapes.png
+.. |ln8| image:: images/customised/line_links_shapes.png
    :width: 330
 
 ===== ======
@@ -1226,14 +1226,14 @@ and :ref:`Kensington <abstractGameKensington>`.
           cx=3, cy=2, side=1)
 
         Line(
-          connections=[
+          links=[
             (s1, 'v', 'ne'),
             (s2, 'p', 'w')
           ],
           stroke="red",
           stroke_width=2)
         Line(
-          connections=[
+          links=[
             (s1, 'p', 'e'),
             (s2, 'v', 'se')],
           stroke="blue",
@@ -1242,13 +1242,13 @@ and :ref:`Kensington <abstractGameKensington>`.
 
       This example shows how Squares that are defined and drawn as normal
       can be assigned to a name e.g. ``r1`` for the yellow Square, and then
-      connected by Lines via the *connections* property.
+      connected by Lines via the *links* property.
 
-      The *connections* property requires two or more shapes, together with
-      their connection points, in a  list so that the Line can be drawn between
+      The *links* property requires two or more shapes, together with
+      their link points, in a  list so that the Line can be drawn between
       them.
 
-      Using the *connections* property means that the normal point locations,
+      Using the *links* property means that the normal point locations,
       or line angle, are **not** used but are superceded by the calculated
       values for the start and end of the line.
 
@@ -1263,13 +1263,13 @@ and :ref:`Kensington <abstractGameKensington>`.
 ===== ======
 
 
-.. _lineConnectionsArrow:
+.. _lineLinksArrow:
 
-Example 8. Connections - Arrow
-------------------------------
+Example 8. Links - Arrow
+------------------------
 `^ <lineIndex_>`_
 
-.. |ln5| image:: images/customised/line_connections_arrow.png
+.. |ln5| image:: images/customised/line_links_arrow.png
    :width: 330
 
 ===== ======
@@ -1283,29 +1283,29 @@ Example 8. Connections - Arrow
                     fill_stroke="yellow")
         co = Circle(cx=3, cy=5, radius=0.5,
                     fill_stroke="orange")
-        Line(connections=[cy, cc, co],
+        Line(links=[cy, cc, co],
              stroke="red",
              stroke_width=1,
              arrow=True,
              )
 
-      Similarly to `Example 4 <lineConnectionsCircle_>`_, the line is drawn
+      Similarly to `Example 4 <lineLinksCircle_>`_, the line is drawn
       between a series of ``Circle`` shapes.
 
       In this case, the line has been styled with color and thickness, and
       the *arrow* has been "switched on".  The arrow points in the direction
-      corresponding to the order of the shapes in the *connections* list.
+      corresponding to the order of the shapes in the *links* list.
 
 ===== ======
 
 
-.. _lineConnectionsSpoke:
+.. _lineLinksSpoke:
 
-Example 9. Connections - Spoke
-------------------------------
+Example 9. Links - Spoke
+------------------------
 `^ <lineIndex_>`_
 
-.. |ln6| image:: images/customised/line_connections_spoke.png
+.. |ln6| image:: images/customised/line_links_spoke.png
    :width: 330
 
 ===== ======
@@ -1321,32 +1321,32 @@ Example 9. Connections - Spoke
                     fill_stroke="orange")
         ca = Circle(cx=1, cy=5, radius=0.5,
                     fill_stroke="aqua")
-        Line(connections=[cc, cr, co, ca],
-             connections_style='spoke',
+        Line(links=[cc, cr, co, ca],
+             links_style='spoke',
              stroke="green",
              stroke_width=1,
              arrow=True,
              )
 
-      Similarly to `Example 6 <lineConnectionsArrow_>`_, the line is drawn
+      Similarly to `Example 6 <lineLinksArrow_>`_, the line is drawn
       as an arrow between the shapes.
 
-      However, the use of the ``connections_style='spoke'`` property means
+      However, the use of the ``links_style='spoke'`` property means
       each line is drawn from the first shape in the list to each of the
-      others, rather than as a series of connections.
+      others, rather than as a series of links.
 
       Note that ``Dot()`` shape is used here instead of a ``Circle()``.
 
 ===== ======
 
 
-.. _lineConnectionsCurve:
+.. _lineLinksCurve:
 
-Example 10. Connections - Curve
--------------------------------
+Example 10. Links - Curve
+-------------------------
 `^ <lineIndex_>`_
 
-.. |lc9| image:: images/customised/line_connections_curve.png
+.. |lc9| image:: images/customised/line_links_curve.png
    :width: 330
 
 ===== ======
@@ -1366,8 +1366,8 @@ Example 10. Connections - Curve
         ca = Circle(
           cx=1, cy=5,
           radius=0.5, fill_stroke="aqua")
-        Line(connections=[cc, cr, co, ca],
-             connections_style='spoke',
+        Line(links=[cc, cr, co, ca],
+             links_style='spoke',
              stroke="green",
              stroke_width=1,
              curve=0.5,
@@ -3107,13 +3107,13 @@ or straight lines depending on which edges they connnect.
       - *paths* - a list of one or more pairs of compass directions between
         which a line |dash| straight or an arc |dash| is drawn
 
-      The Hexagons with normal line styles have connections between opposing
+      The Hexagons with normal line styles have links between opposing
       edges.
 
-      The Hexagons with gold colored line have connections between adjacent
+      The Hexagons with gold colored line have links between adjacent
       edges.
 
-      The Hexagons with dotteed line styles have connections between edges
+      The Hexagons with dotteed line styles have links between edges
       that are not opposite or adjacent.
 
 ===== ======

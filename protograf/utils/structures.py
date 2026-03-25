@@ -145,7 +145,9 @@ HexGeometry = namedtuple(
         "z_fraction",
     ],
 )
+
 LookupType = namedtuple("LookupType", ["column", "lookups"])
+
 Link = namedtuple("Link", ["a", "b", "style"])
 
 fields = ("col", "row", "x", "y", "id", "sequence", "corner", "label", "page")
@@ -173,6 +175,27 @@ PageMarginsBase = namedtuple(
         "debug",  # show the margin?
         "units",  # point equivalent of single user unit
     ],
+)
+
+pointlocations_fields = (
+    "centre",
+    "center",
+    "c",
+    "n",
+    "s",
+    "e",
+    "w",
+    "ne",
+    "se",
+    "nw",
+    "sw",
+    "t",
+    "type",
+    "shapetype",
+    "name",
+)
+PointLocations = namedtuple(
+    "PointLocations", pointlocations_fields, defaults=(None,) * len(pointlocations_fields)
 )
 
 shape_fields = (

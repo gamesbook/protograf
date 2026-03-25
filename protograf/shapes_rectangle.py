@@ -21,6 +21,7 @@ from protograf.utils.structures import (
     Locale,
     Perbis,
     Point,
+    PointLocations,
     Radius,
     ShapeGeometry,
     Vertex,
@@ -85,10 +86,30 @@ class RectangleShape(BaseShape):
         """Centre of Rectangle."""
         return None
 
-    @cached_property
-    def shape_vertices(self) -> dict:
-        """Vertices of Rectangle."""
-        return {}
+    @property
+    def pts(self) -> dict:
+        """Vertices, Perbises and Centre of Rectangle (in user units)."""
+        mx = globals.margins[0]
+        my = globals.margins[1]
+        print(mx, my)
+        breakpoint()
+        _type = type(self)
+        cntr = self._shape_centre
+        cntr_user = Point(cntr.x / self.units - mx, cntr.y / self.units - my)
+        vtcs = self._shape_vertexes
+        return PointLocations(
+            centre=cntr_user,
+            center=cntr_user,
+            c=cntr_user,
+            ne=Point(vtcs[0].x / self.units - mx, vtcs[0].y / self.units - my),
+            se=Point(vtcs[1].x / self.units - mx, vtcs[1].y / self.units - my),
+            sw=Point(vtcs[2].x / self.units - mx, vtcs[2].y / self.units - my),
+            nw=Point(vtcs[3].x / self.units - mx, vtcs[3].y / self.units - my),
+            t=_type,
+            type=_type,
+            shapetype=_type,
+            name=self.simple_name(self),
+        )
 
     @cached_property
     def shape_geom(self) -> ShapeGeometry:
@@ -978,7 +999,7 @@ class RectangleShape(BaseShape):
                 for a polygon, each edge is effectively a chord.
         """
         # vertices = self._shape_vertexes
-        perbii_dict = self.calculate_perbii(centre=centre)
+        perbii_dict = self.calculate_perbii(centre=centre, rotation=rotation)
         pb_length = (
             self.unit(self.perbii_length, label="perbii length")
             if self.perbii_length

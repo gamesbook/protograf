@@ -166,7 +166,7 @@ Some helpful reStructuredText web resources:
 - https://github.com/DevDungeon/reStructuredText-Documentation-Reference - guide
 - https://docutils.sourceforge.io/docs/user/rst/quickstart.html - quick start
 - https://docutils.sourceforge.io/docs/user/rst/quickref.html - detailed summary
-- https://jwodder.github.io/kbits/posts/rst-hyperlinks/ - all about links
+- https://jwodder.github.io/kbits/posts/rst-hyperlinks/ - all about using URLs
 - https://docutils.sourceforge.io/docs/ref/rst/directives.html - directives
 
 Some useful tools:

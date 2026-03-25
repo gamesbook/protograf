@@ -33,7 +33,7 @@ from protograf.shapes_circle import CircleShape
 from protograf.shapes_hexagon import HexShape
 from protograf.shapes_polygon import PolygonShape
 from protograf.shapes_rectangle import RectangleShape
-from protograf.utils.connections import get_connections
+from protograf.utils.connections import get_links
 from protograf.utils import colrs, geoms, support, tools, fonts
 from protograf.utils.tools import _lower  # , _vprint
 from protograf.utils.messaging import feedback
@@ -1153,26 +1153,26 @@ class LineShape(BaseShape):
         """Geometry of Line - alias for shape_geom."""
         return self.shape_geom
 
-    def draw_connections(
+    def draw_links(
         self, cnv=None, off_x=0, off_y=0, ID=None, shapes: list = None, **kwargs
     ) -> list:
         """Draw a Line between two or more shapes."""
         if not isinstance(shapes, (list, tuple)) or len(shapes) < 2:
             feedback(
-                "Connections can only be made using a list of two or more shapes!",
+                "Links can only be made using a list of two or more shapes!",
                 False,
                 True,
             )
             return []
-        curve, connections = get_connections(shapes, self.connections_style, self.curve)
-        for conn in connections:
+        curve, links = get_links(shapes, self.links_style, self.curve)
+        for conn in links:
             # ---- draw straight line
             if not self.curve:
                 klargs = draw_line(cnv, conn[0], conn[1], shape=self, **kwargs)
             else:
                 # ---- draw curve line
                 if kwargs.get("wave_height") or kwargs.get("wave_style"):
-                    feedback("A connection cannot use a wave and curve together", True)
+                    feedback("A link cannot use a wave and curve together", True)
                 klargs, curve_centre, circle_centre, radius = draw_line_curve(
                     cnv, conn[0], conn[1], curve, **kwargs
                 )
@@ -1181,7 +1181,7 @@ class LineShape(BaseShape):
                 klargs["fill"] = None
             self.set_canvas_props(cnv=cnv, index=ID, **klargs)  # shape.finish()
             self.draw_arrow(cnv, conn[0], conn[1], **kwargs)
-        return connections
+        return links
 
     def draw_arrow(self, cnv, point_a, point_b, **kwargs):
         """Draw arrow (head) on Line."""
@@ -1204,10 +1204,10 @@ class LineShape(BaseShape):
         super().draw(cnv, off_x, off_y, ID, **kwargs)  # unit-based props
         x, y, x_1, y_1 = None, None, None, None
         ccx, ccy, tangent_angle = None, None, None  # used for lince curve
-        # ---- EITHER connections draw
-        if self.connections:
-            conns = self.draw_connections(
-                cnv, off_x, off_y, ID, self.connections, **kwargs
+        # ---- EITHER links draw
+        if self.links:
+            conns = self.draw_links(
+                cnv, off_x, off_y, ID, self.links, **kwargs
             )
         # ---- OR "normal" draw
         else:
@@ -1285,7 +1285,7 @@ class LineShape(BaseShape):
             self.set_canvas_props(cnv=cnv, index=ID, **klargs)  # shape.finish()
             # ---- draw arrowhead
             self.draw_arrow(cnv, Point(x, y), Point(x_1, y_1), **kwargs)
-            # store line points to match connections (for more drawing)
+            # store line points to match links (for more drawing)
             conns = [(Point(x, y), Point(x_1, y_1))]
         # ---- other line properties
         if conns and len(conns) == 1:
@@ -1491,17 +1491,17 @@ class PolylineShape(BasePolyShape):
         """Geometry of Polyline - alias for shape_geom."""
         return self.shape_geom
 
-    def polyline_connections(self) -> list:
-        """Get vertex Points to connect sets of two shapes."""
-        if not isinstance(self.connections, (list, tuple)) or len(self.connections) < 2:
+    def polyline_links(self) -> list:
+        """Get vertex Points to link sets of two shapes."""
+        if not isinstance(self.links, (list, tuple)) or len(self.links) < 2:
             feedback(
-                "Connections can only be made using a list of two or more shapes!",
+                "Links can only be made using a list of two or more shapes!",
                 False,
                 True,
             )
             return None
-        curve, connections = get_connections(self.connections, self.connections_style)
-        return connections
+        curve, links = get_links(self.links, self.links_style)
+        return links
 
     def draw(self, cnv=None, off_x=0, off_y=0, ID=None, **kwargs):
         """Draw a Polyline (multi-part line) on a given canvas."""
@@ -1518,8 +1518,8 @@ class PolylineShape(BasePolyShape):
         self.vertexes = self._shape_vertexes  # BasePoly method
         # ---- draw polyline by vertices
         # feedback(f'***POLYLINE {x=} {y=} {self.vertexes=}')
-        if self.vertexes and self.connections:
-            feedback("Connections can only be used with a snail!", True)
+        if self.vertexes and self.links:
+            feedback("Links can only be used with a snail!", True)
         if self.vertexes:
             for key, vertex in enumerate(self._shape_vertexes):
                 if key < len(self.vertexes) - 1:
@@ -1531,12 +1531,12 @@ class PolylineShape(BasePolyShape):
             self.set_canvas_props(cnv=cnv, index=ID, **kwargs)
         # ---- draw polyline by snail
         if self.snail:
-            # ---- EITHER connections draw (possible multiple lines)
-            if self.connections:
-                connections = self.polyline_connections()
-                for connection in connections:
-                    kwargs["start_point"] = connection[0]
-                    kwargs["end_point"] = connection[1]
+            # ---- EITHER links draw (possible multiple lines)
+            if self.links:
+                links = self.polyline_links()
+                for link in links:
+                    kwargs["start_point"] = link[0]
+                    kwargs["end_point"] = link[1]
                     self.draw_snail(cnv=cnv, off_x=off_x, off_y=off_y, ID=ID, **kwargs)
             # ----- OR "normal" draw
             else:

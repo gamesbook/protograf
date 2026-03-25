@@ -43,12 +43,12 @@ def grouping(x=0, y=0, filled=None):
             stroke="white", stroke_width=3)
     # connect vertices of outer polygon to those of inner polygon
     for point in range(1, 7):
-        Line(connections=[
+        Line(links=[
                 (outer, 'v', point * 2 - 1),
                 (inner, 'v', point),
                 (outer, 'v', point * 2)
-            ],
-            stroke=GREEN)
+             ],
+             stroke=GREEN)
 
 
 HEIGHT = SIDE * sqrt(3)  # edge-to-edge across hexagon

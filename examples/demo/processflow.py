@@ -27,7 +27,9 @@ def draw_step(x, y, title, detail):
     return box
 
 
-Create(filename="process_flow.pdf", margin=1, page_grid=2)
+Create(filename="process_flow.pdf", margin=1)
+
+Blueprint(edges="n,w")
 
 step1 = draw_step(
     x=1, y=5,
@@ -46,24 +48,22 @@ step4 = draw_step(
     title="Trigger Workflow",
     detail="<li>Send out emails</li><li>Message sysadmin</li><li>Notify the API</li>")
 
-Line(connections=[
+Line(links=[
         (step1, "p", "e"),
         (step2, "p", "w")],
      stroke_width=1,
-     dot=0.1,
      arrow=True)
-Line(connections=[
+Line(links=[
         (step2, "p", "e"),
         (step3, "p", "w")],
      stroke_width=1,
      arrow=True)
 Polyline(
-    snail="s 1 w 6",
-    connections=[
+    links=[
         (step3, "p", "s"),
         (step4, "p", "n")],
+     snail="s 1 w 6",
      stroke_width=1,
-     dot=0.1,
      arrow=True)
 
 Save()

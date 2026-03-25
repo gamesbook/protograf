@@ -95,7 +95,7 @@ Discussion  This example shows how to construct a board for the commercial
             **function** to draw each of the seven sets of the
             hexagon/dodecagon pairs.
 
-            Each shape in the pair is connected using the *connections*
+            Each shape in the pair is connected using the *links*
             property of a joining Line.
 
             The key attributes of each pair |dash| color and angle relative to

@@ -304,11 +304,11 @@ r3 = Rectangle(
     common=rect,
     width=SIZE, height=SIZE, fill="#D08DFF")
 lns = Common(stroke_width=4)
-# connections (orthogonal)
-Line(common=lns, connections=[(r3, 'p', 'n'), (r1, 'p', 'n')])
-Line(common=lns, connections=[(r3, 'p', 's'), (r1, 'p', 's')])
-Line(common=lns, connections=[(r3, 'p', 'e'), (r1, 'p', 'e')])
-Line(common=lns, connections=[(r3, 'p', 'w'), (r1, 'p', 'w')])
+# links (orthogonal)
+Line(common=lns, links=[(r3, 'p', 'n'), (r1, 'p', 'n')])
+Line(common=lns, links=[(r3, 'p', 's'), (r1, 'p', 's')])
+Line(common=lns, links=[(r3, 'p', 'e'), (r1, 'p', 'e')])
+Line(common=lns, links=[(r3, 'p', 'w'), (r1, 'p', 'w')])
 PageBreak()
 
 # ---- .Odd
