@@ -33,8 +33,7 @@ def validate_link_params(conn: tuple) -> list:
         )
     if not isinstance(conn[0], BaseShape):
         feedback(
-            "A non-circular link's first entry must be a shape"
-            f' - not "{conn[0]}"',
+            "A non-circular link's first entry must be a shape" f' - not "{conn[0]}"',
             True,
         )
     shape_type = conn[0].simple_name()
@@ -210,9 +209,7 @@ def get_links(shapes: list, links_style: str, curve: float = None) -> tuple:
                 )
                 pt_a, pt_b = intersects_a[1], intersects_b[0]
                 # print(f"*** link points {pt_a=}, {pt_b=}")
-                link_curve = get_link_curve(
-                    pt_a, centre_a, shape_a, rotation_a
-                )
+                link_curve = get_link_curve(pt_a, centre_a, shape_a, rotation_a)
             else:
                 pt_a = geoms.point_on_circle(centre_a, shape_a._u.radius, rotation_a)
                 pt_b = geoms.point_on_circle(centre_b, shape_b._u.radius, rotation_b)
@@ -245,9 +242,7 @@ def get_links(shapes: list, links_style: str, curve: float = None) -> tuple:
                 # print(f"*** links a:{tools._p2v(pt_a)} b:{tools._p2v(pt_b)}")
                 chord = geoms.length_of_line(pt_a, pt_b)
                 link_curve = geoms.circle_to_chord(radius, chord) / globals.units
-                link_curve = (
-                    link_curve * -1 if curve < 0 else link_curve
-                )
+                link_curve = link_curve * -1 if curve < 0 else link_curve
                 # print(f"*** {link_curve=}")
             else:
                 pt_a = geoms.point_on_circle(centre_a, shape_a._u.radius, rotation_a)
@@ -279,9 +274,7 @@ def get_links(shapes: list, links_style: str, curve: float = None) -> tuple:
                 # print(f"*** links a:{tools._p2v(pt_a)} b:{tools._p2v(pt_b)}")
                 chord = geoms.length_of_line(pt_a, pt_b)
                 link_curve = geoms.circle_to_chord(radius, chord) / globals.units
-                link_curve = (
-                    link_curve * -1 if curve < 0 else link_curve
-                )
+                link_curve = link_curve * -1 if curve < 0 else link_curve
                 # print(f"*** {link_curve=}")
             else:
                 pt_b = geoms.point_on_circle(centre_b, shape_b._u.radius, rotation_b)

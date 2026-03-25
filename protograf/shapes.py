@@ -1206,9 +1206,7 @@ class LineShape(BaseShape):
         ccx, ccy, tangent_angle = None, None, None  # used for lince curve
         # ---- EITHER links draw
         if self.links:
-            conns = self.draw_links(
-                cnv, off_x, off_y, ID, self.links, **kwargs
-            )
+            conns = self.draw_links(cnv, off_x, off_y, ID, self.links, **kwargs)
         # ---- OR "normal" draw
         else:
             if self.use_abs:

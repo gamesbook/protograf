@@ -195,7 +195,9 @@ pointlocations_fields = (
     "name",
 )
 PointLocations = namedtuple(
-    "PointLocations", pointlocations_fields, defaults=(None,) * len(pointlocations_fields)
+    "PointLocations",
+    pointlocations_fields,
+    defaults=(None,) * len(pointlocations_fields),
 )
 
 shape_fields = (

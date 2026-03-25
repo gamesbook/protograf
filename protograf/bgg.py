@@ -202,7 +202,9 @@ class BGGGame:
                 return the_game, False
             except BGGApiError as err:
                 if "Failed to resolve 'boardgamegeek.com'" in str(err):
-                    msg = "Test if your internet is able to connect to boardgamegeek.com"
+                    msg = (
+                        "Test if your internet is able to connect to boardgamegeek.com"
+                    )
                 else:
                     msg = err
                 feedback(f"Unable to access BoardGameGeek API ({msg})", True)
