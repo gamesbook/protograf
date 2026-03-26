@@ -2364,7 +2364,9 @@ class BaseShape:
         # ---- render image
         try:
             if sliced:
-                the_sliced_image, slice_filename = slice_image(image, sliced, width_height)
+                the_sliced_image, slice_filename = slice_image(
+                    image, sliced, width_height
+                )
                 img = image_render(the_sliced_image, image_filename=slice_filename)
             else:
                 img = image_render(image)
