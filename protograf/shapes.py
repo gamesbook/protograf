@@ -174,26 +174,21 @@ class ImageShape(BaseShape):
         rotation = kwargs.get("rotation", self.rotation)
         # ---- load image
         # feedback(f'*** IMAGE {ID=} {_source=} {x=} {y=} {self.rotation=}')
-        img, is_dir = self.load_image(  # via base.BaseShape
-            globals.doc_page,
-            _source,
-            origin=(x, y),
-            sliced=self.sliced,
-            width_height=(width, height),
-            cache_directory=cache_directory,
-            rotation=rotation,
-        )
-        if not img and not is_dir:
-            if _source:
-                feedback(
-                    f'Unable to load image "{_source}"; please check name and location',
-                    True,
-                )
-            else:
-                feedback(
-                    "Unable to load image - no name provided",
-                    True,
-                )
+        img = self.load_image(image_location=_source, cache_directory=cache_directory)
+        if not img:
+            feedback(
+                f'Unable to load image "{_source}!" - please check name and location',
+                True,
+            )
+        else:
+            self.insert_image(  # via base.BaseShape
+                globals.doc_page,
+                image=img,
+                origin=(x, y),
+                sliced=self.sliced,
+                width_height=(width, height),
+                rotation=rotation,
+            )
         # ---- centre
         if self.use_abs_c:
             x_c = self._abs_cx
@@ -1639,19 +1634,20 @@ class QRCodeShape(BaseShape):
         rotation = kwargs.get("rotation", self.rotation)
         # ---- load QR image
         # feedback(f'*** IMAGE {ID=} {_source=} {x=} {y=} {self.rotation=}')
-        img, is_dir = self.load_image(  # via base.BaseShape
-            globals.doc_page,
-            _source,
-            origin=(x, y),
-            sliced=self.sliced,
-            width_height=(width, height),
-            cache_directory=cache_directory,
-            rotation=rotation,
-        )
-        if not img and not is_dir:
+        img = self.load_image(image_location=_source, cache_directory=cache_directory)
+        if not img:
             feedback(
                 f'Unable to load image "{_source}!" - please check name and location',
                 True,
+            )
+        else:
+            self.insert_image(  # via base.BaseShape
+                globals.doc_page,
+                image=img,
+                origin=(x, y),
+                sliced=self.sliced,
+                width_height=(width, height),
+                rotation=rotation,
             )
         # ---- QR shape other text
         if kwargs and kwargs.get("text"):

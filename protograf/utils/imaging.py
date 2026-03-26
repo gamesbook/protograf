@@ -13,14 +13,23 @@ from PIL import (
     ImageFont,
 )  # , UnidentifiedImageError
 import pymupdf
+from pymupdf import Document
 
 # local
 from protograf.utils.messaging import feedback
 from protograf.utils import tools
 
 
-def in_memory(the_image):
-    """Return an in-memory instance of an image as a PNG."""
+def in_memory(the_image: Image) -> Document:
+    """Return an in-memory instance of an image as a PNG.
+
+    Args:
+        the_image (PIL Image)
+
+    Returns:
+        PyMuPDF Document
+
+    """
     membuf = io.BytesIO()
     the_image.save(membuf, format="png")
     png_data = membuf.getvalue()
@@ -28,7 +37,7 @@ def in_memory(the_image):
     return imgdoc
 
 
-def rounding(the_image: str, rounding_radius):
+def rounding(the_image: str, rounding_radius: int) -> Document:
     """Apply rounded corners to the image.
 
     Args:
@@ -36,6 +45,9 @@ def rounding(the_image: str, rounding_radius):
             name of the image file
         rounding_radius (int):
             corner radius in pixels
+
+    Returns:
+        PyMuPDF Document
     """
     _rad = tools.as_int(rounding_radius, "image operation rounding radius ", minimum=1)
 
@@ -55,7 +67,9 @@ def rounding(the_image: str, rounding_radius):
     return in_memory(rounded_image)
 
 
-def ellipse(the_image: str, bounds: tuple, offset_x: int = 0, offset_y: int = 0):
+def ellipse(
+    the_image: str, bounds: tuple, offset_x: int = 0, offset_y: int = 0
+) -> Document:
     """Extract image as ellipse from original.
 
     Args:
@@ -67,8 +81,11 @@ def ellipse(the_image: str, bounds: tuple, offset_x: int = 0, offset_y: int = 0)
             x-distance in pixels to shift the ellipse centre
         offset_y (int):
             y-distance in pixels to shift the ellipse centre
+
+    Returns:
+        PyMuPDF Document
     """
-    err = f"The (x,y) for extracting an ellipse from {the_image} is not valid"
+    err = f"The (x,y) values for extracting an ellipse from {the_image} is not valid"
     if not isinstance(bounds, tuple):
         feedback(err, True)
     else:
@@ -98,7 +115,9 @@ def ellipse(the_image: str, bounds: tuple, offset_x: int = 0, offset_y: int = 0)
     return in_memory(new_img)
 
 
-def circle(the_image: str, radius: int, offset_x: int = 0, offset_y: int = 0):
+def circle(
+    the_image: str, radius: int, offset_x: int = 0, offset_y: int = 0
+) -> Document:
     """Extract image as a circle from original.
 
     Args:
@@ -110,6 +129,9 @@ def circle(the_image: str, radius: int, offset_x: int = 0, offset_y: int = 0):
             x-distance in pixels to shift the ellipse centre
         offset_y (int):
             y-distance in pixels to shift the ellipse centre
+
+    Returns:
+        PyMuPDF Document
 
     """
     img = Image.open(the_image).convert("RGBA")
@@ -132,7 +154,7 @@ def circle(the_image: str, radius: int, offset_x: int = 0, offset_y: int = 0):
 
 def polygon(
     the_image: str, radius: int, sides: int = 6, offset_x: int = 0, offset_y: int = 0
-):
+) -> Document:
     """Extract image as polygon from original.
 
     Args:
@@ -146,6 +168,9 @@ def polygon(
             x-distance in pixels to shift the ellipse centre
         offset_y (int):
             y-distance in pixels to shift the ellipse centre
+
+    Returns:
+        PyMuPDF Document
 
     Notes:
         the regular_polygon method from ImageDraw module
@@ -178,7 +203,7 @@ def polygon(
     return in_memory(base_img)
 
 
-def blur(the_image: str, radius: int = 10):
+def blur(the_image: str, radius: int = 10) -> Document:
     """Blur the outline of an image.
 
     Args:
@@ -186,6 +211,9 @@ def blur(the_image: str, radius: int = 10):
             name of the image file
         radius (int):
             blur radius in pixels
+
+    Returns:
+        PyMuPDF Document
 
     """
     bradius = radius

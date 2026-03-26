@@ -1886,27 +1886,6 @@ class RectangleShape(BaseShape):
                 # ---- * fill pattern?
                 if self.fill_pattern:
                     raise NotImplementedError("Fill pattern is not yet supported!")
-                    # TODO - convert to PyMuPDF
-                    # img, is_dir = self.load_image(self.fill_pattern)
-                    # if img:
-                    #     log.debug("IMG type:%s size:%s", type(img._image), img._image.size)
-                    #     iwidth = img._image.size[0]
-                    #     iheight = img._image.size[1]
-                    #     # repeat?
-                    #     if self.repeat:
-                    #         cnv.drawImage(
-                    #             img, x=x, y=y, width=iwidth, height=iheight, mask="auto"
-                    #         )
-                    #     else:
-                    #         # stretch
-                    #         cnv.drawImage(
-                    #             img,
-                    #             x=x,
-                    #             y=y,
-                    #             width=self._u.width,
-                    #             height=self._u.height,
-                    #             mask="auto",
-                    #         )
             if item == "slices":
                 # ---- * draw slices
                 if self.slices:
