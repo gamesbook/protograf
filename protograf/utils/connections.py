@@ -218,6 +218,10 @@ def get_links(shapes: list, links_style: str, curve: float = None) -> tuple:
         if isinstance(shape_a, (CircleShape, DotShape)) and not isinstance(
             shape_b, (CircleShape, DotShape)
         ):
+            try:
+                assert len(shape_b) == 2
+            except Exception:
+                tools.feedback("Faulty link!", True)
             pt_b = get_link_point(shape_b[0], shape_b[1], shape_b[2])
             centre_a = shape_a._shape_centre  # circle/dot
             rotation_a, rotation_b = get_rotation(centre_a, pt_b)
