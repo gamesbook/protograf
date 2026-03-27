@@ -63,6 +63,8 @@ class ImageShape(BaseShape):
         self.sliced = kwargs.get("sliced", None)
         self.cache_directory = get_cache(**kwargs)
         self.image_location = None
+        self.height_set = True if kwargs.get("height") else False
+        self.width_set = True if kwargs.get("width") else False
         # ---- validation
         if (self.kwargs.get("cx") or self.kwargs.get("cy")) and (
             self.kwargs.get("align_horizontal") or self.kwargs.get("align_vertical")
@@ -181,6 +183,21 @@ class ImageShape(BaseShape):
                 True,
             )
         else:
+            # feedback(f'*** IMAGE {self.width=} {self.height=} {width=} {height=}')
+            if kwargs.get("auto_frame") and self.auto_frame:
+                # ---- set image area
+                if self.width_set and not self.height_set:
+                    height = img.height * width / img.width
+                    self.height = img.height * self.width / img.width
+                elif self.height_set and not self.width_set:
+                    width = img.width * height / img.height
+                    self.width = img.width * self.height / img.height
+                else:
+                    feedback(
+                        "Both width and height are set - auto_frame not used.",
+                        False,
+                        True,
+                    )
             self.insert_image(  # via base.BaseShape
                 globals.doc_page,
                 image=img,

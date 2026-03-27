@@ -352,6 +352,7 @@ class BaseCanvas:
         self.align_horizontal = self.defaults.get("align_horizontal", None)
         self.image_location = None
         self.operation = None  # operation on image
+        self.auto_frame = self.defaults.get("auto_frame", None)
         # ---- line / ellipse / bezier / sector / polygon / pod
         self.length = self.defaults.get("length", self.default_length)
         self.angle = self.defaults.get("angle", 0.0)  # also triangle
@@ -998,6 +999,7 @@ class BaseShape:
         self.image_location = kwargs.get("image_location", base.image_location)
         self.align_vertical = kwargs.get("align_vertical", base.align_vertical)
         self.align_horizontal = kwargs.get("align_horizontal", base.align_horizontal)
+        self.auto_frame = self.kw_bool(kwargs.get("auto_frame", base.auto_frame))
         self.operation = kwargs.get("operation", base.operation)  # operation on image
         # ---- line / ellipse / bezier / arc / polygon / pod
         self.length = self.kw_float(kwargs.get("length", base.length))
