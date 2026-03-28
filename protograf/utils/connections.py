@@ -185,6 +185,7 @@ def get_links(shapes: list, links_style: str, curve: float = None) -> tuple:
             shape_a, shape_b = shapes[0], shapes[idx + 1]
         else:
             shape_a, shape_b = cshape, shapes[idx + 1]
+
         if isinstance(shape_a, (CircleShape, DotShape)) and isinstance(
             shape_b, (CircleShape, DotShape)
         ):
@@ -215,13 +216,17 @@ def get_links(shapes: list, links_style: str, curve: float = None) -> tuple:
                 pt_b = geoms.point_on_circle(centre_b, shape_b._u.radius, rotation_b)
             links.append((pt_a, pt_b))
 
-        if isinstance(shape_a, (CircleShape, DotShape)) and not isinstance(
+        elif isinstance(shape_a, (CircleShape, DotShape)) and not isinstance(
             shape_b, (CircleShape, DotShape)
         ):
             try:
-                assert len(shape_b) == 2
+                assert isinstance(shape_b, (list, tuple))
+                assert len(shape_b) == 3
             except Exception:
-                tools.feedback("Faulty link!", True)
+                tools.feedback(
+                    "Faulty second item in link - use a Circle or a shape in a set!",
+                    True,
+                )
             pt_b = get_link_point(shape_b[0], shape_b[1], shape_b[2])
             centre_a = shape_a._shape_centre  # circle/dot
             rotation_a, rotation_b = get_rotation(centre_a, pt_b)
@@ -252,7 +257,7 @@ def get_links(shapes: list, links_style: str, curve: float = None) -> tuple:
                 pt_a = geoms.point_on_circle(centre_a, shape_a._u.radius, rotation_a)
             links.append((pt_a, pt_b))
 
-        if not isinstance(shape_a, (CircleShape, DotShape)) and isinstance(
+        elif not isinstance(shape_a, (CircleShape, DotShape)) and isinstance(
             shape_b, (CircleShape, DotShape)
         ):
             pt_a = get_link_point(shape_a[0], shape_a[1], shape_a[2])
@@ -283,6 +288,9 @@ def get_links(shapes: list, links_style: str, curve: float = None) -> tuple:
             else:
                 pt_b = geoms.point_on_circle(centre_b, shape_b._u.radius, rotation_b)
             links.append((pt_a, pt_b))
+
+        else:
+            feedback("The items in the links list cannot not be used!", True)
 
         if not isinstance(shape_a, (CircleShape, DotShape)) and not isinstance(
             shape_b, (CircleShape, DotShape)

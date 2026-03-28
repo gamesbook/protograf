@@ -625,6 +625,8 @@ class DiceObject(BaseShape):
             position (str):
                 an x-y coordinate as a Excel cell ref string;
                 values for x runs from A to E, and y runs from 1 to 5
+                or
+                a single value from A to D representing the 4 inner points
             offset (float):
                 distance between each vertex
 
@@ -632,13 +634,29 @@ class DiceObject(BaseShape):
             * A knot is a slightly smaller shape than a pip, drawn on one of
               the vertices of an imaginary 5x5 grid overlaid onto the die face
         """
-        try:
-            pos_y = int(position[1])
-            pos_x = tools.column_from_string(position[0])
-        except:
-            feedback(
-                "Invalid knot position - must be a string with values A1..E5", True
-            )
+        if len(position) == 1:
+            match position:
+                case "a" | "A":
+                    pos_y, pos_x = 2, 2
+                case "b" | "B":
+                    pos_y, pos_x = 2, 4
+                case "c" | "C":
+                    pos_y, pos_x = 4, 2
+                case "d" | "D":
+                    pos_y, pos_x = 4, 4
+                case _:
+                    feedback(
+                        "Invalid knot position - a single character must A, B, C or D",
+                        True,
+                    )
+        else:
+            try:
+                pos_y = int(position[1])
+                pos_x = tools.column_from_string(position[0])
+            except:
+                feedback(
+                    "Invalid knot position - must be a string with values A1..E5", True
+                )
         if _lower(knot_shape) in ["circle", "c"]:
             offset_y = (pos_y - 3) * offset / 2  # negative for 1  & 2
             offset_x = (pos_x - 3) * offset / 2  # negative for 1  & 2
@@ -688,8 +706,35 @@ class DiceObject(BaseShape):
                     cnv.draw_circle((px + offset, py + offset), pip_radius)
                     cnv.draw_circle((px - offset, py), pip_radius)
                     cnv.draw_circle((px + offset, py), pip_radius)
+                case 7:
+                    cnv.draw_circle((px - offset, py + offset), pip_radius)
+                    cnv.draw_circle((px + offset, py - offset), pip_radius)
+                    cnv.draw_circle((px - offset, py - offset), pip_radius)
+                    cnv.draw_circle((px + offset, py + offset), pip_radius)
+                    cnv.draw_circle((px - offset, py), pip_radius)
+                    cnv.draw_circle((px + offset, py), pip_radius)
+                    cnv.draw_circle((px, py), pip_radius)  # centre
+                case 8:
+                    cnv.draw_circle((px - offset, py + offset), pip_radius)
+                    cnv.draw_circle((px + offset, py - offset), pip_radius)
+                    cnv.draw_circle((px - offset, py - offset), pip_radius)
+                    cnv.draw_circle((px + offset, py + offset), pip_radius)
+                    cnv.draw_circle((px - offset, py), pip_radius)
+                    cnv.draw_circle((px + offset, py), pip_radius)
+                    cnv.draw_circle((px, py - offset), pip_radius)
+                    cnv.draw_circle((px, py + offset), pip_radius)
+                case 9:
+                    cnv.draw_circle((px - offset, py + offset), pip_radius)
+                    cnv.draw_circle((px + offset, py - offset), pip_radius)
+                    cnv.draw_circle((px - offset, py - offset), pip_radius)
+                    cnv.draw_circle((px + offset, py + offset), pip_radius)
+                    cnv.draw_circle((px - offset, py), pip_radius)
+                    cnv.draw_circle((px + offset, py), pip_radius)
+                    cnv.draw_circle((px, py - offset), pip_radius)
+                    cnv.draw_circle((px, py + offset), pip_radius)
+                    cnv.draw_circle((px, py), pip_radius)  # centre
                 case _:
-                    feedback(f"The {shape_name} must use a number from 1 to 6", True)
+                    feedback(f"The {shape_name} must use a number from 1 to 9", True)
         elif _lower(pip_shape) in ["diamond", "d"]:
             match number:
                 case 1:
@@ -767,8 +812,8 @@ class D6Object(DiceObject):
         if self.random and self.pips is not None:
             issue.append("Both random and pips cannot be set at the same time!")
             correct = False
-        if not self.random and self.pips not in [1, 2, 3, 4, 5, 6]:
-            issue.append("The value for pips must be a number from 1 to 6")
+        if not self.random and self.pips not in [1, 2, 3, 4, 5, 6, 7, 8, 9]:
+            issue.append("The value for pips must be a number from 1 to 9")
             correct = False
         if self.pip_fraction > 0.33 or self.pip_fraction < 0.1:
             issue.append("The pip_fraction must be between 0.1 and 0.33")

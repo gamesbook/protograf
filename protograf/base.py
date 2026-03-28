@@ -2082,12 +2082,15 @@ class BaseShape:
                     os.sep, "/"
                 )
             if not os.path.exists(image_local):
-                feedback(
-                    f'Unable to find or open image "{image_location}" (also tried in "{image_local}"',
-                    False,
-                    True,
-                )
-                return None
+                if os.path.exists(image_local + ".png"):
+                    image_local = image_local + ".png"
+                else:
+                    feedback(
+                        f'Unable to find or open image "{image_location}" (also tried in "{image_local}"',
+                        False,
+                        True,
+                    )
+                    return None
 
         try:
             img = Image.open(image_local)
@@ -2375,7 +2378,7 @@ class BaseShape:
             return img
         except IOError as err:
             feedback(
-                f'Unable to find or open image "{image.filename}"' f" ({err}).",
+                f'Unable to find or open the image "{image.filename}"' f" ({err}).",
                 False,
                 True,
             )

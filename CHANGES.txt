@@ -1,22 +1,27 @@
 protograf Changes
 =================
 
-2026-00-00 (0.5.0)
+2026-00-00 (0.5.1)
 ------------------
-- RENAMED "connections" to "links" [BREAKING CHANGE]
-- Add example for Grid and Line links
-- Allow Card Images to use sequence value
-- Patch error when Card copies run across pages
-- Add Circle `arrow_style` for an arrowhead on a Line
-- Enable de-duplication of Images to reduce Cards file size
-- Enable curve for a Line
-- Enable Line links to use curve
 - [PLANNED-2] Enable non-curves Line links to Ellipse shapes
 - [PLANNED-2] Enable Line links to Stadium shapes
 - [PLANNED-2] Enable Line links to Text boxes
 - [PLANNED-3] Add code to link *Locations
 - [PLANNED-3] Docs: list all props for Hex, Circle, Rectangle, Line
 - [PLANNED-3] Centre multi-line label text strings
+
+2026-00-00 (0.5.0)
+------------------
+- RENAME Line `connections` to `links` [BREAKING CHANGE]
+- Add example for Grid and Line links
+- Allow Card Images to use sequence value
+- Patch error when Card copies run across pages
+- Add a circle `arrow_style` for an arrowhead on a Line
+- Enable de-duplication of Images to reduce Cards file size
+- Enable curve for a Line
+- Enable Line links to use curve
+- Add auto_frame to support sizing of frame for Image
+- Add "knots" for D6; expand to 9 pips
 
 2026-03-14 (0.4.7)
 ------------------
