@@ -75,7 +75,6 @@ def get_link_point(the_shape: BaseShape, conn_type: str, direction: str) -> Poin
         shape_name = f"{the_shape.ORIENTATION.name.lower()} {shape_name}"
     if isinstance(the_shape, (PolygonShape, StarShape)):
         direction = tools.as_int(direction, "direction")
-    # print(f"*** links {shape_name=}")
     match _lower(conn_type):
         case "v" | "vertex":
             try:
@@ -87,7 +86,6 @@ def get_link_point(the_shape: BaseShape, conn_type: str, direction: str) -> Poin
                 )
             vtx = vertexes.get(direction)
             if not vtx:
-                # print(f"*** Line:links {vertexes}")
                 feedback(
                     f'{_name} cannot use a vertex in the "{direction}" direction.',
                     True,
@@ -128,7 +126,6 @@ def get_link_point(the_shape: BaseShape, conn_type: str, direction: str) -> Poin
 
 def get_rotation(centre_a: Point, centre_b: Point) -> tuple:
     """Get relative rotation between points."""
-    # print(f"*** links {centre_a=}, {centre_b=}")
     _, rotation = geoms.angles_from_points(centre_a, centre_b)
     if centre_b.x < centre_a.x and centre_b.y < centre_a.y:
         rotation_a = 360.0 - rotation
@@ -164,13 +161,15 @@ def get_links(shapes: list, links_style: str, curve: float = None) -> tuple:
     """
     from protograf.shapes import CircleShape, DotShape  # avoid circular imports
 
-    def get_link_curve(pt_x, centre_x, shape_x, rotation_x):
+    def get_link_curve(pt_x, centre_x, shape_x, rotation_x, positive: bool = True):
         """recalculate curve height as `link_curve`"""
         straight_pt_x = geoms.point_on_circle(centre_x, shape_x._u.radius, rotation_x)
         theta = geoms.circle_angle_between_points(pt_x, straight_pt_x, centre_x)
         offset_height = shape_x._shape_radius * math.sin(math.radians(theta))
-        link_curve = (globals.units * curve - abs(offset_height)) / globals.units
-        # print(f"{shape_x._shape_radius=} {theta=} {offset_height=} {link_curve=}")
+        if positive:
+            link_curve = (globals.units * curve - abs(offset_height)) / globals.units
+        else:
+            link_curve = (globals.units * curve + abs(offset_height)) / globals.units
         return link_curve
 
     links = []
@@ -192,25 +191,25 @@ def get_links(shapes: list, links_style: str, curve: float = None) -> tuple:
             centre_a = shape_a._shape_centre  # circle/dot
             centre_b = shape_b._shape_centre  # circle/dot
             rotation_a, rotation_b = get_rotation(centre_a, centre_b)
-            # print(f"*** links {rotation_a=}, {rotation_b=}")
-            # print(f"*** links {centre_a=} {shape_a._shape_radius=}")
-            # print(f"*** links {centre_b=} {shape_b._shape_radius=}")
             if curve:
                 # curve intersects
                 klargs, curve_centre, circle_centre, radius = draw_line_curve(
                     None, centre_a, centre_b, curve, draw=False
                 )  # NOT drawn here
-                # print(f"*** link curve {circle_centre=} {radius=} {centre_a=} {shape_a._shape_radius=}")
                 intersects_a = geoms.circle_intersections(
                     circle_centre, radius, centre_a, shape_a._shape_radius
                 )
-                # print(f"*** link curve {circle_centre=} {radius=} {centre_b=} {shape_b._shape_radius=}")
                 intersects_b = geoms.circle_intersections(
                     circle_centre, radius, centre_b, shape_b._shape_radius
                 )
-                pt_a, pt_b = intersects_a[1], intersects_b[0]
-                # print(f"*** link points {pt_a=}, {pt_b=}")
-                link_curve = get_link_curve(pt_a, centre_a, shape_a, rotation_a)
+                if curve >= 0:
+                    pt_a, pt_b = intersects_a[1], intersects_b[0]
+                    link_curve = get_link_curve(pt_a, centre_a, shape_a, rotation_a)
+                else:
+                    pt_a, pt_b = intersects_a[0], intersects_b[1]
+                    link_curve = get_link_curve(
+                        pt_a, centre_a, shape_a, rotation_a, False
+                    )
             else:
                 pt_a = geoms.point_on_circle(centre_a, shape_a._u.radius, rotation_a)
                 pt_b = geoms.point_on_circle(centre_b, shape_b._u.radius, rotation_b)
@@ -230,29 +229,21 @@ def get_links(shapes: list, links_style: str, curve: float = None) -> tuple:
             pt_b = get_link_point(shape_b[0], shape_b[1], shape_b[2])
             centre_a = shape_a._shape_centre  # circle/dot
             rotation_a, rotation_b = get_rotation(centre_a, pt_b)
-            # print(f"*** links {rotation_a=}, {rotation_b=}")
             if curve:
-                # print(f"*** links ca:{tools._p2v(centre_a)} b:{tools._p2v(pt_b)}")
                 # curve intersects
                 klargs, curve_centre, circle_centre, radius = draw_line_curve(
                     None, centre_a, pt_b, curve, draw=False
                 )  # NOT drawn here
-                # print(f"*** b-a link curve {tools._p2v(curve_centre)=}")
-                # print(f"*** b-a link curve c:{tools._p2v(circle_centre)} r:{radius/globals.units}")
                 intersects_a = geoms.circle_intersections(
                     circle_centre, radius, centre_a, shape_a._shape_radius
                 )
-                ia = intersects_a
-                # feedback(f"***Intersects: {tools._p2v(ia[0])} {tools._p2v(ia[1])}")
                 if curve < 0:
                     pt_a = intersects_a[0]
                 else:
                     pt_a = intersects_a[1]
-                # print(f"*** links a:{tools._p2v(pt_a)} b:{tools._p2v(pt_b)}")
                 chord = geoms.length_of_line(pt_a, pt_b)
                 link_curve = geoms.circle_to_chord(radius, chord) / globals.units
                 link_curve = link_curve * -1 if curve < 0 else link_curve
-                # print(f"*** {link_curve=}")
             else:
                 pt_a = geoms.point_on_circle(centre_a, shape_a._u.radius, rotation_a)
             links.append((pt_a, pt_b))
@@ -264,27 +255,20 @@ def get_links(shapes: list, links_style: str, curve: float = None) -> tuple:
             centre_b = shape_b._shape_centre  # circle/dot
             rotation_a, rotation_b = get_rotation(pt_a, centre_b)
             if curve:
-                # print(f"*** links a:{tools._p2v(pt_a)} cb:{tools._p2v(centre_b)}")
                 # curve intersects
                 klargs, curve_centre, circle_centre, radius = draw_line_curve(
                     None, pt_a, centre_b, curve, draw=False
                 )  # NOT drawn here
-                # print(f"*** b-a link curve {tools._p2v(curve_centre)=}")
-                # print(f"*** b-a link curve c:{tools._p2v(circle_centre)} r:{radius/globals.units}")
                 intersects_b = geoms.circle_intersections(
                     circle_centre, radius, centre_b, shape_b._shape_radius
                 )
-                # ib = intersects_b
-                # feedback(f"***Intersects: {tools._p2v(ib[0])} {tools._p2v(ib[1])}")
                 if curve < 0:
                     pt_b = intersects_b[1]
                 else:
                     pt_b = intersects_b[0]
-                # print(f"*** links a:{tools._p2v(pt_a)} b:{tools._p2v(pt_b)}")
                 chord = geoms.length_of_line(pt_a, pt_b)
                 link_curve = geoms.circle_to_chord(radius, chord) / globals.units
                 link_curve = link_curve * -1 if curve < 0 else link_curve
-                # print(f"*** {link_curve=}")
             else:
                 pt_b = geoms.point_on_circle(centre_b, shape_b._u.radius, rotation_b)
             links.append((pt_a, pt_b))

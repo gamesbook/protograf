@@ -3104,12 +3104,16 @@ class BaseShape:
             # curved line?
             ccentre = kwargs.get("circle_centre", None)
             cradius = kwargs.get("circle_radius", None)
+            curve = kwargs.get("curve", 0)
             if ccentre and cradius:
                 # recalc point_start using chord on the circle
                 end_pts = geoms.circle_chord_endpoints(
                     ccentre, cradius, point_end, head_height
                 )
-                point_start = end_pts[1]  # or 0
+                if curve >= 0:
+                    point_start = end_pts[1]
+                else:
+                    point_start = end_pts[0]  # reverse direction
             deg, _ = geoms.angles_from_points(point_start, point_end)
             if point_start.x != point_end.x:
                 kwargs["rotation"] = 180 + deg

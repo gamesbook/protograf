@@ -1191,6 +1191,8 @@ class LineShape(BaseShape):
                 kwargs["circle_centre"] = circle_centre
                 kwargs["circle_radius"] = radius
                 klargs["fill"] = None
+                klargs["fill"] = None
+                kwargs["curve"] = curve  # used in draw_arrow() & draw_arrowhead()
             self.set_canvas_props(cnv=cnv, index=ID, **klargs)  # shape.finish()
             self.draw_arrow(cnv, conn[0], conn[1], **kwargs)
         return links
@@ -1215,7 +1217,13 @@ class LineShape(BaseShape):
         cnv = cnv if cnv else globals.canvas  # a new Page/Shape may now exist
         super().draw(cnv, off_x, off_y, ID, **kwargs)  # unit-based props
         x, y, x_1, y_1 = None, None, None, None
-        ccx, ccy, tangent_angle = None, None, None  # used for lince curve
+        (
+            ccx,
+            ccy,
+        ) = (
+            None,
+            None,
+        )
         # ---- EITHER links draw
         if self.links:
             conns = self.draw_links(cnv, off_x, off_y, ID, self.links, **kwargs)
