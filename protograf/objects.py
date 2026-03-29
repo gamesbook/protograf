@@ -2,6 +2,7 @@
 """
 Create custom objects for protograf
 """
+
 # lib
 import logging
 import math

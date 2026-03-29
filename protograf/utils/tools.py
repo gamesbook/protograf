@@ -2,6 +2,7 @@
 """
 General purpose utility functions for protograf
 """
+
 # lib
 import collections
 import copy
@@ -1744,7 +1745,7 @@ def get_pymupdf_props(
     if _color is None and _fill is None:
         # feedback("Cannot have both fill and stroke set to None!", True)
         return None
-    # print(f'^^^ SCP {stroke=} {fill=} {_color=} {_fill=}')  # None OR fraction RGB
+    # print(f'^^^ SCP {stroke=} {fill=} {_color=} {_fill=} {line_join=}')  # None OR fraction RGB
     # ---- set/apply properties
     pymu_props = ShapeProperties(
         width=_width,
@@ -1770,18 +1771,23 @@ def set_canvas_props(
     cnv = cnv if cnv else globals.canvas
     defaults = defaults if defaults else {}
     pymu_props = get_pymupdf_props(defaults=defaults, index=index, **kwargs)
+    # print(f"--- tools {pymu_props=}")
     if pymu_props:
-        cnv.finish(
-            width=as_float(pymu_props.width, "width"),
-            color=pymu_props.color,
-            fill=pymu_props.fill,
-            lineCap=pymu_props.lineCap,
-            lineJoin=pymu_props.lineJoin,
-            dashes=pymu_props.dashes,
-            fill_opacity=pymu_props.fill_opacity,
-            morph=pymu_props.morph,
-            closePath=pymu_props.closePath,
-        )
+        try:
+            cnv.finish(
+                width=as_float(pymu_props.width, "width"),
+                color=pymu_props.color,
+                fill=pymu_props.fill,
+                lineCap=pymu_props.lineCap,
+                # FIXME : MuPDF error: syntax error: unknown keyword: 'lineJoin'?
+                # lineJoin=pymu_props.lineJoin,
+                dashes=pymu_props.dashes,
+                fill_opacity=pymu_props.fill_opacity,
+                morph=pymu_props.morph,
+                closePath=pymu_props.closePath,
+            )
+        except Exception as err:
+            feedback(f"Unexpected Error: {err}", True)
     cnv.commit()
 
 

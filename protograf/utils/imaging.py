@@ -2,6 +2,7 @@
 """
 Image utility functions for protograf
 """
+
 # lib
 import io
 

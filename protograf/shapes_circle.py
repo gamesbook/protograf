@@ -2,6 +2,7 @@
 """
 Create Circle shape for protograf
 """
+
 # lib
 from functools import cached_property
 import logging
@@ -24,7 +25,6 @@ from protograf.utils.structures import (
     ShapeGeometry,
 )  # named tuples
 from protograf.base import BaseShape
-
 
 log = logging.getLogger(__name__)
 DEBUG = False

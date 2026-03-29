@@ -2,6 +2,7 @@
 """
 Messaging utilities for protograf
 """
+
 # lib
 import sys
 import traceback

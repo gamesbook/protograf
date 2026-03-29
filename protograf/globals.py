@@ -2,6 +2,7 @@
 """
 Global variables for proto (import at top-level)
 """
+
 # lib
 from collections import namedtuple
 

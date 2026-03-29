@@ -2,6 +2,7 @@
 """
 Create custom shapes for protograf
 """
+
 # lib
 import codecs
 import copy
@@ -3188,7 +3189,6 @@ class TextShape(BaseShape):
                 color=pymu_props.color,
                 fill=pymu_props.fill,
                 lineCap=pymu_props.lineCap,
-                lineJoin=pymu_props.lineJoin,
                 dashes=pymu_props.dashes,
                 fill_opacity=pymu_props.fill_opacity,
             )

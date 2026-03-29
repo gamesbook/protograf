@@ -5,6 +5,7 @@ Primary interface for protograf (imported at top-level)
 Note:
     Some imports here are for sake of reuse by the top-level import
 """
+
 # lib
 import argparse
 from collections import namedtuple
@@ -4231,7 +4232,7 @@ def Blueprint(**kwargs):
     if kwargs["fill"] is not None:
         fill = colrs.get_color(kwargs.get("fill", RGB_WHITE))
         globals.canvas.draw_rect((0, 0, globals.page[0], globals.page[1]))
-        globals.canvas.finish(fill=fill)
+        globals.canvas.finish(fill=fill, lineJoin=0)
     kwargs["fill"] = kwargs.get("fill", line_stroke)  # revert back for font
     # ---- number edges
     if number_edges:

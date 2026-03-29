@@ -2,6 +2,7 @@
 """
 Create grids, repeats, sequences, and layouts for protograf
 """
+
 # lib
 import copy
 import logging

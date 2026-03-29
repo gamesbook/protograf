@@ -2,6 +2,7 @@
 """
 Support functions for calculating links for Lines/Polylines
 """
+
 # lib
 import math
 

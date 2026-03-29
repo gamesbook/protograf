@@ -2,6 +2,7 @@
 """
 Support functions for Shapes for protograf
 """
+
 # lib
 import copy
 import logging

@@ -2,6 +2,7 @@
 """
 Base shape class for protograf
 """
+
 # lib
 import copy
 from enum import Enum
@@ -3191,7 +3192,7 @@ class BaseShape:
             vertices[right_nodes[0]], vertices[right_nodes[1]]
         )
         delta_right = right_length / (line_count + 1)
-        # feedback(f'### lineJoin {line_count=} {delta_left=} {delta_right=}')
+        # feedback(f'### draw_lines_between {line_count=} {delta_left=} {delta_right=}')
         for number in range(0, line_count + 2):
             if skip_ends:
                 if number == line_count + 1 or number == 0:

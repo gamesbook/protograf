@@ -2,6 +2,7 @@
 """
 Create Rectangle shape for protograf
 """
+
 # lib
 from functools import cached_property
 import logging

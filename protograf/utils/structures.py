@@ -2,6 +2,7 @@
 """
 Data structures (enum, dataclasses, namedtuples) for protograf
 """
+
 # lib
 from collections import namedtuple
 from dataclasses import dataclass

@@ -6,6 +6,7 @@ Notes:
     * Dyanamic* classes derived from code at:
       https://alexandra-zaharia.github.io/posts/python-configuration-and-dataclasses/
 """
+
 # lib
 import configparser
 import sys

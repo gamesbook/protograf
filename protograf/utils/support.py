@@ -2,6 +2,7 @@
 """
 Support utilities for protograf
 """
+
 # lib
 import itertools
 import math

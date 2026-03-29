@@ -2,6 +2,7 @@
 """
 Mathematical utility functions for protograf
 """
+
 # lib
 import cmath
 import logging
