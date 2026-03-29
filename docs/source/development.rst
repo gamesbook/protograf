@@ -123,6 +123,7 @@ Follow this process:
 - |check| If working in a branch, now merge changes into master on GitHub
 - |check| Ensure you are on the ``master`` branch and pull changes
 - |check| Update the version using poetry e.g. ``poetry version patch``
+  and inspect ``pyproject.toml`` to ensure it has changed
 - |check| Git commit and push all these changes to GitHub
 - |check| Add a tag that matches the poetry version e.g. ``git tag 0.1.2``
 - |check| Push tag to GitHub i.e. ``git push origin --tags``
