@@ -411,7 +411,7 @@ New Classic Games
 =================
 `↑ <table-of-contents-exabs_>`_
 
-In February 2026, Brian E. Svoboda release a small booklet, in PDF format,
+In February 2026, Brian E. Svoboda released a small booklet, in PDF format,
 containing boards and rules for a number of abstract games, titled
 *"A NEW BOOK OF CLASSIC BOARD GAMES"*.  This booklet was discussed at
 Board Game Geek in this forum: https://boardgamegeek.com/thread/3357842
@@ -421,7 +421,7 @@ The script linked here is an attempt to reproduce the boards from that booklet.
 .. NOTE::
 
     The script does not currently reproduce the "King's Valley" board;
-    this is still a work-in-progress.
+    this is still a work-in-progress!
 
 =========== ==================================================================
 Title       *New Classic Games*
@@ -439,7 +439,7 @@ Discussion  The script uses different techniques and commands for each board;
             - Volo
 
             Another related script, linked here for interest is an example of
-            drawing a diagram that would be used in a rules document - see
+            drawing a diagram that could be used in a rules document - see
             `new_classics_diagrams.py <https://github.com/gamesbook/protograf/blob/master/examples/boards/abstract/new_classics_diagrams.py>`_
 
 ----------- ------------------------------------------------------------------

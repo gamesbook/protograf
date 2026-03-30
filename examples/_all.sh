@@ -55,6 +55,7 @@ python boards/abstract/tictactoe.py
 # ---- boards: commercial
 echo -e "\nCreating commercial boards..."
 python boards/commercial/ack_map.py
+python boards/commercial/catan.py
 python boards/commercial/kensington.py
 python boards/commercial/orion_game_board.py
 python boards/commercial/squadleader.py

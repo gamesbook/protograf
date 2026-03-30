@@ -22,6 +22,7 @@ will demonstrate full scalability.
 
 - `Squad Leader`_
 - `Orion`_
+- `Catan`_
 - `Kensington`_
 - `Adventurer Conqueror King`_
 - `Traveller: Draft`_
@@ -76,6 +77,35 @@ Screenshot  .. image:: images/boards/commercial/orion_game_board.png
                :width: 80%
 =========== ==================================================================
 
+.. _commercialGameCatan:
+
+Catan
+=====
+`↑ <table-of-contents-excomm_>`_
+
+=========== ==================================================================
+Title       *Catan Hexes Board*
+----------- ------------------------------------------------------------------
+Script      `catan.py <https://github.com/gamesbook/protograf/blob/master/examples/boards/commercial/catan.py>`_
+----------- ------------------------------------------------------------------
+Discussion  This example shows how to construct a board for the commercial
+            board game "Catan".  It uses the ``HexHex`` command to layout
+            the game's hexes (``Hexagon`` shape) and discs (``Circle``
+            shape).  A single large hexagon forms the surrounding sea.
+
+            All the pieces - hexes and discs - are predefined in the script
+            (without any ``x`` or ``y`` settings) and then laid out
+            using the ``shapes`` property of the ``HexHex`` grid, which puts
+            them in sequence into the "ring" |dash| centred at their correct
+            locations.
+
+            *An interesting exercise would be to write a script that generates
+            random board setups!*
+
+----------- ------------------------------------------------------------------
+Screenshot  .. image:: images/boards/commercial/catan.png
+               :width: 80%
+=========== ==================================================================
 
 .. _abstractGameKensington:
 
@@ -352,5 +382,5 @@ Discussion  This example shows a version of the player board from the
               on the lower edge
 ----------- ------------------------------------------------------------------
 Screenshot  .. image:: images/boards/commercial/tm_player_board.png
-               :width: 90%
+               :width: 80%
 =========== ==================================================================
