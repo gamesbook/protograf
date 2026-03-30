@@ -274,14 +274,14 @@ def get_links(shapes: list, links_style: str, curve: float = None) -> tuple:
                 pt_b = geoms.point_on_circle(centre_b, shape_b._u.radius, rotation_b)
             links.append((pt_a, pt_b))
 
-        else:
-            feedback("The items in the links list cannot not be used!", True)
-
-        if not isinstance(shape_a, (CircleShape, DotShape)) and not isinstance(
+        elif not isinstance(shape_a, (CircleShape, DotShape)) and not isinstance(
             shape_b, (CircleShape, DotShape)
         ):
             pt_a = get_link_point(shape_a[0], shape_a[1], shape_a[2])
             pt_b = get_link_point(shape_b[0], shape_b[1], shape_b[2])
             links.append((pt_a, pt_b))
+
+        else:
+            feedback("The items in the links list cannot not be used!", True)
 
     return link_curve, links

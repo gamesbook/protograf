@@ -177,7 +177,9 @@ class ImageShape(BaseShape):
         rotation = kwargs.get("rotation", self.rotation)
         # ---- load image
         # feedback(f'*** IMAGE {ID=} {_source=} {x=} {y=} {self.rotation=}')
-        img = self.load_image(image_location=_source, cache_directory=cache_directory)
+        img, filename = self.load_image(
+            image_location=_source, cache_directory=cache_directory
+        )
         if not img:
             feedback(
                 f'Unable to load image "{_source}!" - please check name and location',
@@ -202,6 +204,7 @@ class ImageShape(BaseShape):
             self.insert_image(  # via base.BaseShape
                 globals.doc_page,
                 image=img,
+                filename=filename,
                 origin=(x, y),
                 sliced=self.sliced,
                 width_height=(width, height),
@@ -1660,7 +1663,9 @@ class QRCodeShape(BaseShape):
         rotation = kwargs.get("rotation", self.rotation)
         # ---- load QR image
         # feedback(f'*** IMAGE {ID=} {_source=} {x=} {y=} {self.rotation=}')
-        img = self.load_image(image_location=_source, cache_directory=cache_directory)
+        img, filename = self.load_image(
+            image_location=_source, cache_directory=cache_directory
+        )
         if not img:
             feedback(
                 f'Unable to load image "{_source}!" - please check name and location',
@@ -1670,6 +1675,7 @@ class QRCodeShape(BaseShape):
             self.insert_image(  # via base.BaseShape
                 globals.doc_page,
                 image=img,
+                filename=filename,
                 origin=(x, y),
                 sliced=self.sliced,
                 width_height=(width, height),

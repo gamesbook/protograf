@@ -839,10 +839,10 @@ Rectangle(x=1, y=2, side=1,
               stroke="green"))
 Rectangle(x=2, y=1, side=1,
           centre_shape=hexagon(
-              radius=0.4,
-              stroke="purple",
-              fill=None,
-              borders=[("sw n se", 2)]))
+            radius=0.4,
+            stroke="purple",
+            fill=None,
+            borders=[("sw n se", 2)]))
 Rectangle(x=3, y=2, side=1,
           centre_shape=stadium(
               side=0.3,
@@ -1044,10 +1044,14 @@ props = Common(
     stroke="black",
     cross=0.5, cross_stroke="red", cross_stroke_width=1,
     rotation=45, label_size=6)
+props_no = Common(
+    stroke="black",
+    cross=0.5, cross_stroke="red", cross_stroke_width=1,
+    label_size=6)
 Square(cx=1, cy=1, side=1.25, common=props, label="square")
 Trapezoid(cx=3, cy=1, width=1.25, top=0.75, height=1, common=props, label="trapezoid")
-Hexagon(cx=1, cy=3, side=0.75, common=props, label="hex:flat")
-Hexagon(cx=3, cy=3, side=0.75, orientation="pointy", common=props, label="hex:pointy")
+Hexagon(cx=1, cy=3, side=0.75, common=props_no, label="hex:flat")
+Hexagon(cx=3, cy=3, side=0.75, common=props_no, label="hex:pointy", orientation="pointy")
 Triangle(cx=1, cy=5, side=1.5, common=props, label="tri:equi")
 Triangle(x=2.5, y=5.5, side=1, height=1.5, common=props, label="tri:isos")
 PageBreak()
@@ -1065,7 +1069,6 @@ htch = Common(
 Hexagon(
     common=htch,
     cx=2, cy=1, height=1.5,
-    rotation=30,
     )
 Triangle(
     common=htch,

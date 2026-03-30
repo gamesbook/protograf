@@ -2030,8 +2030,11 @@ class BaseShape:
                 where to store a local for copy for URL-sourced images
 
         Returns:
-            image (Image):
-                PIL Image object, if loaded, else None
+            tupe:
+                image (Image):
+                    PIL Image object, if loaded, else None
+                filename (str):
+                    actual image location
         """
 
         def save_image_from_url(url: str):
@@ -2052,7 +2055,7 @@ class BaseShape:
                 svg_code = f.read()
             png_bytes = cairosvg.svg2png(bytestring=svg_code.encode("utf-8"), dpi=300)
             image = Image.open(io.BytesIO(png_bytes))
-            return image
+            return image  # NO embedded filename!
 
         if not image_location:  # not the droids you're looking for... move along
             return None
@@ -2072,7 +2075,7 @@ class BaseShape:
                     f'The image "{image_location}" is a directory/folder, not a file',
                     True,
                 )
-                return None
+                return None, None
             # relative paths
             if not os.path.isabs(image_location):
                 filepath = tools.script_path()
@@ -2091,7 +2094,7 @@ class BaseShape:
                         False,
                         True,
                     )
-                    return None
+                    return None, None
 
         try:
             img = Image.open(image_local)
@@ -2102,14 +2105,15 @@ class BaseShape:
                 feedback(
                     f'Unable to open and process the image "{image_location}"', True
                 )
-                return None
+                return None, None
 
-        return img
+        return img, image_local
 
     def insert_image(
         self,
         pdf_page: muPage,
         image: Image,
+        filename: str = None,
         origin: tuple = None,
         sliced: str = None,
         width_height: tuple = None,
@@ -2120,6 +2124,8 @@ class BaseShape:
         Args:
             image (Image):
                 binary PIL Image
+            filename (str):
+                known path of Image
             origin (tuple):
                 x, y location of image on Page
             sliced (str):
@@ -2279,9 +2285,13 @@ class BaseShape:
         def image_render(img: Image, image_filename: str = None) -> object:
             """Draw a PIL Image."""
             try:
-                image_local = img.filename  # should exist for open() image
+                image_local = img.filename  # only exist for open() image from file
             except AttributeError:
-                image_local = image_filename  # will need for this for new save() image
+                image_local = (
+                    image_filename  # need for this for new save() or stream image
+                )
+            if not image_local:
+                image_local = image_filename
             if not image_local:
                 feedback(
                     "The Image's filename was not supplied or could not be determined.",
@@ -2375,11 +2385,11 @@ class BaseShape:
                 )
                 img = image_render(the_sliced_image, image_filename=slice_filename)
             else:
-                img = image_render(image)
+                img = image_render(image, filename)
             return img
         except IOError as err:
             feedback(
-                f'Unable to find or open the image "{image.filename}"' f" ({err}).",
+                f'Unable to find or open the image at "{filename}"' f" ({err}).",
                 False,
                 True,
             )

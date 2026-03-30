@@ -112,7 +112,8 @@ run as normal |dash| then a new version can be released.
 
 Follow this process:
 
-- |check| Format primary code with black (``black protograf``)
+- |check| Format primary code with black (``black --target-version py311 protograf``);
+  update the Python version as needed
 - |check| Finalise release date and notes in ``CHANGES.txt``
 - |check| Ensure all the examples can be run by using shell script(s)
 - |check| Update the ``examples.zip`` file with latest example code

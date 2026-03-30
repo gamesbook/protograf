@@ -2185,7 +2185,10 @@ def Save(**kwargs):
         )
 
     # ---- update current pymupdf Shape
-    globals.canvas.commit()  # add all drawings (to current pymupdf Shape)
+    try:
+        globals.canvas.commit()  # add all drawings (to current pymupdf Shape)
+    except AssertionError:
+        pass  # ignore `assert 0, f'page is None'` from pymupdf
 
     # ---- save all Pages to file
     msg = "Please check the folder exists and that you have access rights."

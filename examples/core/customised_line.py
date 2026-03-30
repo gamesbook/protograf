@@ -100,8 +100,9 @@ Line(links=[cc, co])
 # orthogonal
 Line(links=[cy, cr, co, ca, cy], stroke_width=2)
 Line(links=[cy, cr, co, ca, cy],
-     stroke_width=2, stroke="green", curve=0.5)
+      stroke_width=2, stroke="green", curve=0.5)
 PageBreak()
+
 
 # ---- line - links: shapes
 Blueprint(stroke_width=0.5)
@@ -118,6 +119,7 @@ Line(
     stroke_width=2,
     curve=-0.5)
 PageBreak()
+
 
 # ---- line - links - arrow
 Blueprint(stroke_width=0.5)
@@ -295,7 +297,6 @@ Line(x=2, y=5.5, length=1, angle=90, curve=1.5)
 Line(x=2.5, y=5.5, length=1, angle=90, curve=-1.5, stroke="red")
 
 PageBreak()
-
 
 # ---- END
 Text(common=txt, text="Line END...")
