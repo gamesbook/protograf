@@ -6,6 +6,7 @@ Created on: 29 March 2024
 
 Sources and Credit:
     * SVG from https://thenounproject.com/icon/typewriter-3933515/
+    * Images extracted from https://picjumbo.com/mysterious-fantasy-forest-with-old-bridges/
 """
 
 from protograf import *
@@ -1022,6 +1023,21 @@ Image(image_file,
 Circle(common=rdot, cx=3, cy=5)
 PageBreak()
 
+# ---- image - auto_frame
+Blueprint()
+Text(common=txt, text="Image: auto_frame")
+img_file = "fantasy-forest-with-old-bridges-crop.jpg"
+rred = Common(
+    width=2, height=3, stroke="tomato",
+    fill=None, stroke_width=2,
+    label_size=12)
+Image(img_file, x=0, y=0, width=1.5, auto_frame=True)
+Rectangle(x=0, y=0, label="W", common=rred)
+Image(img_file, x=2, y=3, height=2, auto_frame=True)
+Rectangle(x=2, y=3, label="H", common=rred)
+PageBreak()
+
+
 # ---- shape rotation I
 Blueprint()
 Text(common=txt, text="Rotation I (cross & label)")
@@ -1423,6 +1439,7 @@ Save(
         "qr_code",
         "image_sliced", "image_label",
         "image_operations", "image_align",
+        "image_auto_frame",
         "shape_rotation",
         "shape_rotation_two",
         "shape_hatches_and_rotation",

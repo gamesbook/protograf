@@ -541,6 +541,8 @@ class RectangleShape(BaseShape):
             _corners = [str(crn).upper() for crn in _crnrs]
         else:
             _corners = []
+        if not _corners:
+            return  # move along, move along...
         # feedback(f'*** Rect corners {_corners=} ')
         o_x = self.unit(self.corners_x) if self.corners_x else self.unit(self.corners)
         o_y = self.unit(self.corners_y) if self.corners_y else self.unit(self.corners)

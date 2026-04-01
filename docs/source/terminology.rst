@@ -245,12 +245,14 @@ because of convention.
 A few sizes are given descriptive names; this makes them a little easier
 to set.
 
+-  **auto_frame** - allows the height of an Image on the page to be
+   calculated if the **width** is set, or vice-versa
 -  **caltrops** - a descriptive term for the relative dimensions of a
    "caltrop" - the small three-pointed shape drawn at the vertex of a
    hexagon
--  **dot** - the diameter of a small ``Dot`` in **points**
 -  **cross** - the height and width of the intersecting lines drawn at
    the centre of a shape
+-  **dot** - the diameter of a small ``Dot`` in **points**
 -  **height** - the vertical dimension of a shape e.g. a ``Rectangle``
    or a bitmap ``Image``
 -  **leading** - the spacing, in points, between lines of wrapped ``Text``
@@ -286,7 +288,7 @@ to set.
    changes in angle, of the line used to do the drawing
 -  **stroke_width** - the thickness of a line in **points**; many
    specific widths are set by prefixing this term with the name of the
-   item in question; examples: **cross_stroke_width**;
+   item in question; examples include: **cross_stroke_width**;
    **grid_stroke_width**; **radii_stroke_width**; **perbsis_stroke_width**,
    etc.
 -  **width** - the horizontal dimension of a shape e.g. a ``Rectangle``

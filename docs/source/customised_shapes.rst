@@ -3767,7 +3767,7 @@ of a Circle towards its circumference.
 
         Circle(cx=3, cy=5, radius=1,
                fill="green",
-               sstroke="orange", stroke_width=1,
+               stroke="orange", stroke_width=1,
                radii=[0,90,180,270,45,135,225,315],
                radii_stroke_width=8,
                radii_stroke="orange",

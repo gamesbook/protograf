@@ -5140,7 +5140,7 @@ def Layout(grid, **kwargs):
             _key = rotation[0]
             if not isinstance(_key, str):
                 feedback(
-                    "The first value for rreach 'rotations' entry must be a string!",
+                    "The first value for each 'rotations' entry must be a string!",
                     True,
                 )
             rotate = tools.as_float(
