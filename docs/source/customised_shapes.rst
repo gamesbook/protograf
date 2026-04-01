@@ -1786,25 +1786,27 @@ Example 2. Styles
       .. code:: python
 
         styles = Common(
-          height=1, width=3.5, x=0.25,
-          notch=0.25, label_size=7, fill="lightsteelblue")
+          height=0.8, width=3.5, x=0.25,
+          notch=0.2, label_size=7, fill="lightsteelblue")
 
         Rectangle(
           common=styles, y=0,  notch_style='snip',
           label='Notch: snip (s)')
         Rectangle(
-          common=styles, y=1.25, notch_style='step',
+          common=styles, y=1, notch_style='step',
           label='Notch: step (t)')
         Rectangle(
-          common=styles, y=3.5, notch_style='fold',
+          common=styles, y=2, notch_style='fold',
           label='Notch: fold (o)')
         Rectangle(
-          common=styles, y=4.25, notch_style='flap',
+          common=styles, y=3, notch_style='flap',
           label='Notch: flap (l)')
         Rectangle(
-          common=styles,
-          y=5.0, notch_style='bite',
+          common=styles, y=4, notch_style='bite',
           label='Notch: bite (b)')
+        Rectangle(
+          common=styles, y=5, notch_style='arch',
+          label='Notch: arch (a)')
 
       These Rectangles all share the following Common properties that differ from the
       defaults:
@@ -1822,6 +1824,7 @@ Example 2. Styles
       - *flap* - makes it appear that the corner has a small, liftable flap
       - *bite* - a curved portion is "cut out"; this will be a quarter-circle
         if *notch_x* and *notch_y* are equal
+      - *arch* - a curved portion is cut out in the same way as a rounded edge
 
 ===== ======
 

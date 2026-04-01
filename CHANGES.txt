@@ -20,9 +20,10 @@ protograf Changes
 - Enable de-duplication of Images to reduce Cards file size
 - Enable curve for a Line
 - Enable Line links to use curve
-- Add auto_frame to support sizing of frame for Image
+- Add `auto_frame` to support sizing of frame for Image
 - Add "knots" for D6; expand to 9 pips
 - Add "Catan" example board
+- Add `arch` notch for a Rectangle
 
 2026-03-14 (0.4.7)
 ------------------

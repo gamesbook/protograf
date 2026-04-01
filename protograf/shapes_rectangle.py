@@ -778,6 +778,60 @@ class RectangleShape(BaseShape):
         gargs["dotted"] = self.corners_dots
         self.set_canvas_props(cnv=None, index=ID, **gargs)
 
+    def draw_arch_rectangle(self, cnv, x, y):
+        """Draw a Rectangle with outward curved corners."""
+        if self.notch_directions:
+            _ntches = self.notch_directions.split()
+            _notches = [str(ntc).upper() for ntc in _ntches]
+        else:
+            _notches = []
+        bend = 0.01
+        # feedback(f'*** Rect arch {self.notch_x=} {self.notch_y=} {_notches=} ')
+        n_x = self.unit(self.notch_x) if self.notch_x else self.unit(self.notch)
+        n_y = self.unit(self.notch_y) if self.notch_y else self.unit(self.notch)
+        # feedback(f'*** Rect bite {n_x=} {n_y=} ')
+        if "NW" in _notches:
+            p1 = Point(x, y + n_y)
+        else:
+            p1 = Point(x, y)
+        if "SW" in _notches:
+            p2 = Point(x, y + self._u.height - n_y)
+            p3 = Point(x + n_x, y + self._u.height)
+            pm = Point(x - bend * n_x, y + self._u.height + bend * n_y)
+            cnv.draw_line(p1, p2)
+            cnv.draw_curve(p2, pm, p3)
+        else:
+            p2 = Point(x, y + self._u.height)
+            p3 = p2
+            cnv.draw_line(p1, p3)
+        if "SE" in _notches:
+            p4 = Point(x + self._u.width - n_x, y + self._u.height)
+            p5 = Point(x + self._u.width, y + self._u.height - n_y)
+            pm = Point(x + self._u.width + bend * n_x, y + self._u.height + bend * n_y)
+            cnv.draw_line(p3, p4)
+            cnv.draw_curve(p4, pm, p5)
+        else:
+            p4 = Point(x + self._u.width, y + self._u.height)
+            p5 = p4
+            cnv.draw_line(p3, p5)
+        if "NE" in _notches:
+            p6 = Point(x + self._u.width, y + n_y)
+            p7 = Point(x + self._u.width - n_x, y)
+            pm = Point(x + self._u.width + bend * n_x, y - bend * n_y)
+            cnv.draw_line(p5, p6)
+            cnv.draw_curve(p6, pm, p7)
+        else:
+            p6 = Point(x + self._u.width, y)
+            p7 = p6
+            cnv.draw_line(p5, p7)
+        if "NW" in _notches:
+            p8 = Point(x + n_x, y)
+            pm = Point(x - bend * n_x, y - bend * n_y)
+            cnv.draw_line(p7, p8)
+            cnv.draw_curve(p8, pm, p1)
+        else:
+            cnv.draw_line(p7, p1)
+
     def draw_bite_rectangle(self, cnv, x, y):
         """Draw a Rectangle with inward curved corners."""
         if self.notch_directions:
@@ -1562,7 +1616,7 @@ class RectangleShape(BaseShape):
         self.vertexes = []
         # ---- * notch vertices
         if is_notched:
-            if _lower(self.notch_style) not in ["b", "bite"]:
+            if _lower(self.notch_style) not in ["b", "bite", "b", "arch", "arc"]:
                 self.set_notch_vertexes(x, y)
         # ---- * prows - line/arc endpoints
         elif is_prows:
@@ -1853,6 +1907,8 @@ class RectangleShape(BaseShape):
                     # feedback(f'*** RECT  vertices')
                     if _lower(self.notch_style) in ["b", "bite"]:
                         self.draw_bite_rectangle(cnv, x, y)
+                    elif _lower(self.notch_style) in ["a", "arch", "arc"]:
+                        self.draw_arch_rectangle(cnv, x, y)
                     else:
                         cnv.draw_polyline(self.vertexes)
                         kwargs["closed"] = True

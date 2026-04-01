@@ -1924,6 +1924,9 @@ class BaseShape:
                 "l",
                 "step",
                 "t",
+                "arch",
+                "arc",
+                "a",
             ]:
                 issue.append(f'"{self.notch_style}" is an invalid notch_style!')
                 correct = False
