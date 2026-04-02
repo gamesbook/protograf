@@ -182,9 +182,11 @@ class ImageShape(BaseShape):
         )
         if not img:
             feedback(
-                f'Unable to load image "{_source}!" - please check name and location',
+                f'Unable to load image "{_source}" - please check this is a valid filename',
+                False,
                 True,
             )
+            return
         else:
             # feedback(f'*** IMAGE {self.width=} {self.height=} {width=} {height=}')
             if kwargs.get("auto_frame") and self.auto_frame:

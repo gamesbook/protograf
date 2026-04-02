@@ -2033,11 +2033,11 @@ class BaseShape:
                 where to store a local for copy for URL-sourced images
 
         Returns:
-            tupe:
+            tuple:
                 image (Image):
                     PIL Image object, if loaded, else None
                 filename (str):
-                    actual image location
+                   actual image location
         """
 
         def save_image_from_url(url: str):
@@ -2109,6 +2109,9 @@ class BaseShape:
                     f'Unable to open and process the image "{image_location}"', True
                 )
                 return None, None
+        except IsADirectoryError:
+            feedback(f'The image "{image_location}" is a directory', False, True)
+            return None, None
 
         return img, image_local
 

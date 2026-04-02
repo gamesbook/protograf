@@ -316,7 +316,6 @@ PageBreak()
 # ---- images and various text descriptors
 Text(common=header, text="Rectangles and images (with transparency)")
 Rectangle(x=5.9, y=15.9, width=7.2, height=6.2, stroke="lightsteelblue", fill=None)
-'''
 Image(  # PNG with transparent background
     "sholes_typewriter.png",
     x=6,
@@ -331,7 +330,6 @@ Image(  # PNG with transparent background
     title="Fig 2. The Sholes Typewriter",
     title_stroke="chartreuse",
 )
-'''
 Rectangle(x=6, y=6, width=7, height=6.25, stroke="lightsteelblue", fill=None)
 Image( # "Typewriter_Vector.svg",
     "noun-typewriter-3933515.svg",
@@ -357,7 +355,7 @@ PageBreak()
 
 # ---- text alignment (default is centre);
 Text(common=header, text="Text: face, styling, wrap and align")
-Rectangle(x=0.75, y=23.5, width=7.5, height=3, stroke_width=1, stroke="gray") #, heading="Aligments")
+Rectangle(x=0.75, y=23.5, width=7.5, height=3.5, stroke_width=1, stroke="gray") #, heading="Aligments")
 Text(text="sholes\ntypewriter!", x=4.5, y=26)  #  add line break via \n
 Text(text="sholes * typewriter!", x=4.5, y=25, align="centre")
 Text(text="sholes typewriter! *", x=4.5, y=24.5, align="right")

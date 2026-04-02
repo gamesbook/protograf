@@ -22,7 +22,7 @@ copyright = '2025-2026, Derek R. Hohls'
 author = 'Derek R. Hohls'
 
 # The full version, including alpha/beta/rc tags
-release = '0.4.6'
+release = '0.5.0'
 
 
 # ---- General configuration

@@ -1787,7 +1787,8 @@ Example 2. Styles
 
         styles = Common(
           height=0.8, width=3.5, x=0.25,
-          notch=0.2, label_size=7, fill="lightsteelblue")
+          notch=0.2, label_size=7,
+          fill="lightsteelblue")
 
         Rectangle(
           common=styles, y=0,  notch_style='snip',
