@@ -116,13 +116,14 @@ Follow this process:
   update the Python version as needed
 - |check| Finalise release date and notes in ``CHANGES.txt``
 - |check| Ensure all the examples can be run by using shell script(s)
+  in the examples directory e.g. ``all.sh`` or ``_all.sh``
 - |check| Update the ``examples.zip`` file with latest example code
   (remove all PDF in examples/ except ``colorset`` and ``colorset_svg``;
   and also delete the ``temp`` directory)
 - |check| Update the ``release`` in ``docs/source/conf.py``
 - |check| Update the ``__version_info__`` in ``_version.py``
 - |check| If working in a branch, now merge changes into master on GitHub
-- |check| Ensure you are on the ``master`` branch and pull changes
+- |check| Ensure you are on the ``master`` branch and ``git pull`` changes
 - |check| Update the version using poetry e.g. ``poetry version patch``
   and inspect ``pyproject.toml`` to ensure it has changed
 - |check| Git commit and push all these changes to GitHub
