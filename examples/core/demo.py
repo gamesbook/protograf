@@ -188,8 +188,8 @@ Rectangle(x=2, y=18.5, width=4, height=3, rotation=45, stroke_width=2, label="re
 Trapezoid(x=14, y=13, width=4, top=2, height=3, rotation=45, stroke_width=2, label="trapezoid")
 Stadium(x=14.5, y=19, width=3, height=2, rotation=45, stroke_width=2, label="stadium")
 Triangle(cx=10, cy=20, side=4, rotation=45, stroke_width=2, label="Triangle")
-Hexagon(cx=4, cy=15, side=2, rotation=45, stroke_width=2, label="hexagon")
-Hexagon(cx=10, cy=15, side=2, orientation="pointy", rotation=45, stroke_width=2, label="hexagon")
+Hexagon(cx=4, cy=15, side=2, cstroke_width=2, label="hexagon")
+Hexagon(cx=10, cy=15, side=2, orientation="pointy", stroke_width=2, label="hexagon")
 Star(x=10, y=9, vertices=5, radius=2, rotation=45, stroke_width=2, label="star")
 Circle(cx=16, cy=9, radius=2, rotation=45, stroke_width=2, label="circle")
 Ellipse(cx=4, cy=9, width=5, height=3, rotation=45, stroke_width=2, label="ellipse")
@@ -316,8 +316,8 @@ PageBreak()
 # ---- images and various text descriptors
 Text(common=header, text="Rectangles and images (with transparency)")
 Rectangle(x=5.9, y=15.9, width=7.2, height=6.2, stroke="lightsteelblue", fill=None)
-Image(
-    "sholes_typewriter.png",  # has transparent background
+Image(  # PNG with transparent background
+    "sholes_typewriter.png",
     x=6,
     y=16,
     width=7,
@@ -330,10 +330,8 @@ Image(
     title="Fig 2. The Sholes Typewriter",
     title_stroke="chartreuse",
 )
-
 Rectangle(x=6, y=6, width=7, height=6.25, stroke="lightsteelblue", fill=None)
-Image(
-    # "Typewriter_Vector.svg",
+Image( # "Typewriter_Vector.svg",
     "noun-typewriter-3933515.svg",
     x=6,
     y=6,
@@ -348,6 +346,7 @@ Image(
     title_stroke="chartreuse",
     scaling=0.6,
 )
+
 PageBreak()
 
 # TEST = '''<span style="font-family: Helvetica; font-size: 14pt; color: blue">
@@ -356,7 +355,7 @@ PageBreak()
 
 # ---- text alignment (default is centre);
 Text(common=header, text="Text: face, styling, wrap and align")
-Rectangle(x=0.75, y=23.5, width=7.5, height=3, stroke_width=1, stroke="gray") #, heading="Aligments")
+Rectangle(x=0.75, y=23.5, width=7.5, height=3.5, stroke_width=1, stroke="gray") #, heading="Aligments")
 Text(text="sholes\ntypewriter!", x=4.5, y=26)  #  add line break via \n
 Text(text="sholes * typewriter!", x=4.5, y=25, align="centre")
 Text(text="sholes typewriter! *", x=4.5, y=24.5, align="right")

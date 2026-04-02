@@ -3466,8 +3466,9 @@ An "image" refers to an external file which is simply inserted into the page
 at the location.
 
 The Image shape shares a number of common aspects with other shapes |dash| such
-as its x & y ("top left") position, a width and a height, the ability to be
-rotated, and the addition of text in form of a label, heading or title.
+as its ``x`` & ``y`` ("top left") positions, a ``width`` and a ``height``, the
+ability to be rotated, and the addition of text in form of a ``label``,
+``heading`` or ``title``.
 
 If an image has a transparent area, this will be respected and shapes
 drawn previously by the script may then be visible "below" it (see
@@ -3478,10 +3479,11 @@ The following examples show how an image can be added to, or altered:
 
 - `Example 1. Default Image`_
 - `Example 2. Rotation & Scaling`_
-- `Example 3. Alignment`_
-- `Example 4. Captions and Markings`_
-- `Example 5. Sliced Images`_ (extract image "thirds")
-- `Example 6: Operations`_ ("cutout" shapes, rounding, and blurred edges)
+- `Example 3. Auto Frame`_ (calculate height from width or vice-versa)
+- `Example 4. Alignment`_ (set the image's "anchor" point)
+- `Example 5. Captions and Markings`_
+- `Example 6. Sliced Images`_ (extract image "thirds")
+- `Example 7: Operations`_ ("cutout" shapes, rounding, and blurred edges)
 
 .. _image-default:
 
@@ -3600,9 +3602,61 @@ Example 2. Rotation & Scaling
 
 ===== ======
 
+
+.. _image-autoframe:
+
+Example 3. Auto Frame
++++++++++++++++++++++
+`^ <image-command_>`_
+
+Normally the frame |dash| or size of the Image occupied on the page |dash| is
+done by setting **both** its ``height`` and ``width`` properties.
+
+However, it is possible to set **either** ``height`` and ``width``, and then
+set ``auto_frame=True`` to have the other dimension automatically calculated
+based on the relative dimensions of the image itself.
+
+If both ``height`` and ``width`` are set, then ``auto_frame`` will not be
+used.
+
+.. |im8| image:: images/customised/image_auto_frame.png
+   :width: 330
+
+===== ======
+|im8| This example shows the Image constructed using the command with the
+      following properties:
+
+      .. code:: python
+
+        img_file = "fantasy-forest-with-old-bridges-crop.jpg"
+        Image(
+          img_file,
+          x=0, y=0,
+          width=1.5, auto_frame=True)
+        Rectangle(x=0, y=0, label="W", common=rred)
+
+        Image(
+          img_file,
+          x=2, y=3,
+          height=2, auto_frame=True)
+        Rectangle(x=2, y=3, label="H", common=rred)
+
+      In the top-left example, the *width* has been set for the Image, and
+      then the height is automatically calculated; in this case because the
+      image is 900 pixels high by 600 pixels wide, the height is about
+      ``2.25`` cm.
+
+      In the lower-right example, the *height* has been set for the Image, and
+      then the width is automatically calculated; in this case because the
+      image is 900 pixels high by 600 pixels wide, the width is about
+      ``1.33`` cm.
+
+===== ======
+
+
 .. _image-align:
 
-Example 3. Alignment
+Example 4. Alignment
 ++++++++++++++++++++
 `^ <image-command_>`_
 
@@ -3681,7 +3735,7 @@ or ``"right"``; the *align_vertical* property can take on values of ``"top"``,
 
 .. _image-caption:
 
-Example 4. Captions and Markings
+Example 5. Captions and Markings
 ++++++++++++++++++++++++++++++++
 `^ <image-command_>`_
 
@@ -3726,7 +3780,7 @@ Example 4. Captions and Markings
 
 .. _image-sliced:
 
-Example 5. Sliced Images
+Example 6. Sliced Images
 ++++++++++++++++++++++++
 `^ <image-command_>`_
 
@@ -3770,7 +3824,7 @@ Example 5. Sliced Images
 
 .. _image-operations:
 
-Example 6: Operations
+Example 7: Operations
 +++++++++++++++++++++
 `^ <image-command_>`_
 

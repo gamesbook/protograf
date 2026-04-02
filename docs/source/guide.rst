@@ -60,5 +60,6 @@ doing more advanced scripts or needing further resources:
     *loops*, *if/then* statements and *functions* for more flexibility
 21. :doc:`Development Notes <development>` - notes for programmers wanting
     to develop further in or with  **protograf**
-22. :doc:`Useful Resources <useful_resources>` - links to
-    tools and websites related to boardgame prototyping
+22. :doc:`Useful Resources <useful_resources>` - various tools, graphic
+    collections andd other items, alonhg with their website addresses,
+    that could be useful for boardgame prototyping

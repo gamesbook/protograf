@@ -6,6 +6,7 @@ Notes:
     * https://www.a2-size.com/american-paper-sizes/
     * https://en.wikipedia.org/wiki/Paper_size#Overview_of_ISO_paper_sizes
 """
+
 import math
 from pymupdf.utils import getColorList
 

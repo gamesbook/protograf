@@ -28,7 +28,7 @@ Text(common=header_font, x=6, y=4,
      text="Coin: circle with steps-created radii & centre circle")
 Circle(
    cx=3, cy=4, radius=2,
-   fill="gold", stroke_width=2, 
+   fill="gold", stroke_width=2,
    radii=steps(0,360,15), # one every 15 degrees i.e. 24 total
    centre_shape=circle(
        radius=1.5,
@@ -71,16 +71,16 @@ Rectangle(
 Text(common=header_font, x=5, y=21,
      text="Start Player Token: circles + radii via steps")
 Polygon(
-    cx=3, cy=21, height=3, 
+    cx=3, cy=21, height=3,
     sides=8, fill="black",
     centre_shapes=[
         circle(
             fill="black", radius=1.25,
             radii=steps(0, 315, 45),
-            radii_stroke="gold", 
+            radii_stroke="gold",
             radii_stroke_width=2),
         circle(
-            stroke="black", fill="gold", 
+            stroke="black", fill="gold",
             radius=0.5, stroke_width=5)
         ]
 )
@@ -160,7 +160,7 @@ Rectangle(
     hatches='o', hatches_count=1,
     notch=0.7, notch_style='step',
     centre_shape=rectangle(
-        height=2.8, width=2.8, 
+        height=2.8, width=2.8,
         fill=None, stroke="white", stroke_width=3)
 )
 
@@ -314,5 +314,23 @@ Polygon(
     radii="*",
     radii_stroke="silver", radii_stroke_width=1
 )
+
+Text(common=header_font, x=8, y=26,
+     text="CH4: Filled grid with\n- Circle shapes and Line connectors")
+Grid(
+  x=1, y=24,
+  rows=9, cols=9,
+  side=0.5, stroke_width=0.5,
+  fill="#001027",
+  stroke="#445368",
+  omit_outer=True)
+cH = Common(radius=0.3, fill="#8142f8", stroke="white", stroke_width=2, label_size=10, label="H")
+c1 = Circle(cx=3.25, cy=24.5, common=cH)
+c2 = Circle(cx=3.25, cy=28, common=cH)
+c3 = Circle(cx=1.5, cy=26.25, common=cH, rotation=90)
+c4 = Circle(cx=5, cy=26.25, common=cH, rotation=90)
+Line(stroke="white", stroke_width=3, dotted=True, links=[c1, c2])
+Line(stroke="white", stroke_width=3, dotted=True, links=[c3, c4])
+cC = Circle(cx=3.25, cy=26.25, radius=0.6, fill="#ff004e", stroke="white", stroke_width=3, label_size=18, label="C")
 
 Save()

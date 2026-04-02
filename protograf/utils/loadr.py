@@ -2,6 +2,7 @@
 """
 Data-loading utility functions for protograf
 """
+
 # lib
 import csv
 import logging
@@ -15,7 +16,6 @@ import xlrd
 # local
 from protograf.utils.tools import _lower, script_path, coordinate_to_tuple
 from protograf.utils.messaging import feedback
-
 
 log = logging.getLogger(__name__)
 

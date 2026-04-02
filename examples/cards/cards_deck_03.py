@@ -35,14 +35,9 @@ Card(
         label='{{sequence}}\n{{id}}')
 )
 # create output
-# Save(
-#      output='png',
-#      dpi=300,
-#      directory="../docs/source/images/decks",
-#      names=['cards_deck_03']
-# )
 Save(
      output='png',
      dpi=300,
-     cards=True,
+     directory="../docs/source/images/decks",
+     names=['cards_deck_03']
 )

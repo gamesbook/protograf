@@ -210,13 +210,16 @@ Element properties
 *Elements*, including *shapes*, can have other settings apart from their
 :ref:`position <position-concept>`.
 
-For example, settings can include:
+Common examples of settings include:
 
-- the *height* |dash| size in the vertical direction and *width* |dash| the
-  size in the horizontal direction, of some shapes
-- the *stroke*, i.e. color, of the line used to draw a shape
-- the *radius* or *diameter* |dash| to set the size of a circle or polygon
-- the *paper* size, *margins*, and so forth for the document as a whole
+- *height* |dash| size in the vertical direction, of some shapes
+- *width* |dash| size in the horizontal direction, of some shapes
+- *stroke* is the color, of the line used to draw a shape; sometimes called
+  the "pen" in graphic applications
+- *fill* is the color used to "fill in" an area of a shape; sometimes called
+  the "brush" in graphic applications
+- *radius* or *diameter* |dash| to set the size of a circle or polygon
+- *paper* size, *margins*, and so forth for the document as a whole
 
 All of these types of settings are termed **properties**.
 

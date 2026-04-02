@@ -377,13 +377,16 @@ A Line is a very common shape in many designs; there are a number of ways
 that it can be customised.
 
 - `Dotted, Dashed, Angled and Wavy <lineDotDash_>`_
+- `Dotted, Dashed, and Angled - curved <lineDotDashCurve_>`_
+- `Curved Line <lineCurve_>`_
 - `Centred Line <lineCentred_>`_
 - `Arrowheads <line-with-arrow_>`_
 - `Centre Shapes <lineCentreShapes_>`_
-- `Connections: Circles <lineConnectionsCircle_>`_
-- `Connections: Shapes <lineConnectionsShapes_>`_
-- `Connections with Arrows <lineConnectionsArrow_>`_
-- `Connections as Spokes <lineConnectionsSpoke_>`_
+- `Centre Shapes - curved <lineCentreShapesCurve_>`_
+- `Links: Circles <lineLinksCircle_>`_
+- `Links: Shapes <lineLinksShapes_>`_
+- `Links with Arrows <lineLinksArrow_>`_
+- `Links as Spokes <lineLinksSpoke_>`_
 
 Line Properties
 ---------------
@@ -394,6 +397,8 @@ A Line has the following properties, in addition to the basic ones of
 
 - *angle* - the number of degrees clockwise that the line is rotated from
   the baseline about its start point; used in conjunction with *length*
+- *curve* - the distance from the centre point of the line through
+  which a curve, joining the start and end of the line, must pass
 - *cx* and *cy* - if set, will replace the use of *x* and *y* for the
   starting point, and work in conjunction with *angle* and *length* to
   create the line around a centre point
@@ -401,17 +406,17 @@ A Line has the following properties, in addition to the basic ones of
   drawn at the centre of the line
 - *centre_shapes_rotated* - if set to ``True``,  the shapes that will be
   drawn at the centre of the line are rotated to align with it
-- *connections* - a list of one or more shapes that will be
-  connected by the line; this property overrides any others that may have
-  been set to determine **where** the line is drawn
-- *connections_style* - if set to ``spoke``, will draw lines from the first
-  shape to each of the other shapes in the *connections* list
 - *dotted* - if ``True``, create a series of small lines i.e. the
   "dots", followed by gaps, of sizes equal to the line's *stroke_width*
 - *dashed* - a list of two numbers: the first is the length of the dash;
   the second is the length of the space between each dash
 - *length* - sets the specific size of the line; used in conjunction
   with *angle* (which defaults to 0 |deg|)
+- *links* - a list of one or more shapes that will be joined by the line;
+  this property overrides any others that may have been set to determine
+  **where** the line is drawn
+- *links_style* - if set to ``spoke``, will draw lines from the first
+  shape to each of the other shapes in the *links* list
 - *rounded* - if ``True``, draw small circles, centred at the ends of the line
 - *squared* - if ``True``, draw small squares, centred at the ends of the line
 - *stroke* - the color of the line
@@ -427,8 +432,8 @@ details in the `arrowheads example <line-with-arrow_>`_.
 
 .. _lineDotDash:
 
-Example 1. Dotted, Dashed, Angled and Wavy Lines
-------------------------------------------------
+Example 1a. Dotted, Dashed, Angled and Wavy Lines
+-------------------------------------------------
 `^ <lineIndex_>`_
 
 .. |ln2| image:: images/customised/line_custom.png
@@ -462,8 +467,7 @@ Example 1. Dotted, Dashed, Angled and Wavy Lines
         # thick colored lines
         Line(
             x=1, y=1, stroke_width=10,
-            length=2, stroke="chartreuse",
-            )
+            length=2, stroke="chartreuse")
         Line(
             x=1, y=1.5, stroke_width=10,
             length=2, stroke="aqua",
@@ -478,7 +482,8 @@ Example 1. Dotted, Dashed, Angled and Wavy Lines
             x=0, y=5, x1=4, y1=5.9,
             stroke="blue", stroke_width=1,
             dashed=[0.2, 0.1],
-            label="dashed:[0.2,0.1]", font_size=6)
+            label="dashed:[0.2,0.1]",
+            font_size=6)
         Line(
             x=0, y=3.6,
             length=4.1, angle=15,
@@ -488,16 +493,15 @@ Example 1. Dotted, Dashed, Angled and Wavy Lines
             x=0, y=2.5, length=4,
             stroke="pink", stroke_width=2)
 
+        # wavy lines
         Line(
             x=0, y=4, x1=4, y1=4,
             stroke="purple", stroke_width=1,
             wave_style='wave', wave_height=1.9)
-
         Line(
             x=0, y=4, x1=4, y1=4,
             stroke="firebrick", stroke_width=1,
             wave_style='sawtooth', wave_height=0.1)
-
 
       The various black lines have these properties:
 
@@ -556,9 +560,167 @@ Example 1. Dotted, Dashed, Angled and Wavy Lines
 ===== ======
 
 
+.. _lineDotDashCurve:
+
+Example 1b. Dotted, Dashed and Angled Lines - curved
+----------------------------------------------------
+`^ <lineIndex_>`_
+
+.. |l2B| image:: images/customised/line_custom_curve.png
+   :width: 330
+
+===== ======
+|l2B| This example shows a Line constructed using commands with the
+      following properties:
+
+      .. code:: python
+
+        # black lines
+        Line(
+            x=0, y=0.5,
+            stroke_width=0.2,
+            dotted=True,
+            label="0.2", font_size=6,
+            curve=0.25)
+        Line(
+            x=1, y=0.5,
+            stroke_width=0.4, dotted=True,
+            label="0.4", font_size=6,
+            curve=0.25)
+        Line(
+            x=2, y=0.5,
+            stroke_width=0.8, dotted=True,
+            label="0.8", font_size=6,
+            curve=0.25)
+        Line(
+            x=3, y=0.5,
+            stroke_width=1.6, dotted=True,
+            label="1.6", font_size=6,
+            curve=0.25)
+
+        # thick colored lines
+        Line(
+            x=1, y=1, stroke_width=10,
+            length=2, stroke="chartreuse",
+            curve=0.25)
+        Line(
+            x=1, y=1.5, stroke_width=10,
+            length=2, stroke="aqua",
+            stroke_ends="rounded",
+            curve=0.25)
+        Line(
+            x=1, y=2, stroke_width=10,
+            length=2, stroke="gold",
+            stroke_ends="squared",
+            curve=0.25)
+
+        # thin colored lines
+        Line(
+            x=0, y=5, x1=4, y1=5.9,
+            stroke="blue", stroke_width=1,
+            dashed=[0.2, 0.1],
+            label="dashed:[0.2,0.1]",
+            font_size=6,
+            curve=0.25)
+        Line(
+            x=0, y=3.6,
+            length=4.1, angle=15,
+            stroke="red",
+            label="15",
+            font_size=6,
+            curve=0.25)
+        Line(
+            x=0, y=2.5, length=4,
+            stroke="pink",
+            stroke_width=2,
+            curve=0.25)
+
+      This example is almost exactly the same as the one above
+      `Example 1a. Dotted, Dashed, Angled and Wavy Lines`_ but with two key
+      changes.
+
+      1. Each ``Line`` now has a *curve* property added to it.
+      2. There are no wavy lines in this example; it is not possible to have
+         both curve and wave together.
+
+      For more on curves, see `Example 2. Curved Line`_.
+
+===== ======
+
+
+.. _lineCurve:
+
+Example 2. Curved Line
+----------------------
+`^ <lineIndex_>`_
+
+A line can be drawn as a curve by providing a value for the *curve* property.
+
+The *curve* value represents the distance above, or below if the value is
+negative, the centre point of the line through which the curve must pass;
+the curve is calculated as the arc of a circle joining the start, the
+"elevated centre" and the end of the line.
+
+.. |lnc| image:: images/customised/line_curves.png
+   :width: 330
+
+===== ======
+|lnc| This example shows a Line constructed using commands with the
+      following properties:
+
+      .. code:: python
+
+        tl = Common(
+          x=1, y=1,
+          length=1, curve=0.5)
+        Line(common=tl, angle=60)
+        Line(common=tl, angle=120)
+        Line(common=tl, angle=180)
+        Line(common=tl, angle=240)
+        Line(common=tl, angle=300)
+        Line(common=tl, angle=360)
+
+        tr = Common(
+          x=3, y=1, length=1,
+          curve=-0.5, stroke="red")
+        Line(common=tr, angle=60)
+        Line(common=tr, angle=120)
+        Line(common=tr, angle=180)
+        Line(common=tr, angle=240)
+        Line(common=tr, angle=300)
+        Line(common=tr, angle=360)
+
+        Line(
+          x=0.5, y=4,
+          length=1, curve=1.5)
+        Line(
+          x=2.5, y=2.5,
+          stroke="red",
+          length=1, curve=-1.5)
+
+        Line(
+          x=2, y=5.5, angle=90,
+          length=1, curve=1.5)
+        Line(
+          x=2.5, y=5.5, angle=90,
+          stroke="red",
+          length=1, curve=-1.5)
+
+      Here, the lines in the top-third of the drawing represent curved lines
+      drawn at various angles; the black lines on left side show a positive
+      curve, with lines curving "up" and the red lines on right side show a
+      negative curve, with lines curving "down".
+
+      The lines in the lower section shows how the curve approaches the shape
+      of a circle as the curve value increases. Again, black lines represent a
+      "positive" curve and red lines represent a "negative" curve.
+
+===== ======
+
+
 .. _lineCentred:
 
-Example 2. Centred Line
+Example 3. Centred Line
 -----------------------
 `^ <lineIndex_>`_
 
@@ -578,9 +740,12 @@ A line can be drawn at a centre point by providing the following properties:
       .. code:: python
 
         Line(cx=1, cy=1, angle=45,
-             length=2, stroke="red")
+             length=2, stroke="red",
+             arrow_style="circle")
         Line(cx=3, cy=1, angle=225,
-             length=2, stroke_width=1.5)
+             length=2, stroke_width=1.5,
+             arrow_style="c",
+             arrow_width=0.2)
 
         Circle(cx=2, cy=3, radius=1)
         Line(cx=2, cy=3, angle=45, length=2,
@@ -589,27 +754,36 @@ A line can be drawn at a centre point by providing the following properties:
              stroke_width=1.5, arrow_width=0.2)
 
         Line(cx=1, cy=5, angle=135,
-             length=2, stroke_width=1.5)
+             length=2, stroke_width=1.5
+             arrow_style="circle",
+             arrow_width=0.2)
         Line(cx=3, cy=5, angle=315,
-             length=2, stroke="red")
+             length=2, stroke="red",
+             arrow_style="c")
 
       The top two lines are rotated at 45 |deg| (red) and 255 |deg|
-      (thick black).
+      (thick black). The direction of rotation is shown by the
+      circular "arrowhead" at the end of each line.
 
       The bottom two lines are rotated at 135 |deg| (thick black) and
-      315 |deg| (red).
+      315 |deg| (red).  The direction of rotation is shown by the
+      circular "arrowhead" at the end of each line.
 
-      While each pair appears to be "in the same direction", the use of the
-      arrow property will display the actual direction; so the 45 |deg| (red)
-      line in the circle points to 45 |deg|, while the 135 |deg|
-      (thick black) points to 135 |deg|.
+      While each of the red/black pairs appear to be "in the same
+      direction" |dash| or parallel |dash| the use of the arrow property
+      displays the actual direction.
+
+      Similarly, in the circle, 45 |deg| (red) line in the circle points
+      north-east, while the 135 |deg| (thick black) points to north-west.
+
+      For more on use of arrowheads, see `Example 4. Arrowheads on Line`_.
 
 ===== ======
 
 
 .. _line-with-arrow:
 
-Example 3. Arrowheads on Line
+Example 4. Arrowheads on Line
 -----------------------------
 `^ <lineIndex_>`_
 
@@ -618,19 +792,20 @@ In addition to styling a Line, it is also possible to specify an arrow
 signify direction.
 
 This is different from the standalone :ref:`Arrow <arrow-command>` which
-allows a much higher degree of customisation.
+allows a much higher degree of customisation and styling.
 
 The following properties can be set:
 
 - *arrow* - if set to ``True`` will cause a default arrow to be drawn
-- *arrow_style* - can be set to ``notch``, ``angle``, or ``spear`` to change
-  the default shape of the arrow
+- *arrow_style* - can be set to ``notch``, ``angle``, ``circle``, or
+  ``spear`` to change the default shape of the arrow
 - *arrow_fill* - set the color of the arrow, which otherwise defaults to the
   color of the line
 - *arrow_stroke* - set the color of the arrow with style ``angle``, which
   otherwise defaults to the color of the line
 - *arrow_width* - set the width of the arrow at its base,  which otherwise
-  defaults to a multiple of the line width
+  defaults to a multiple of the line width |dash| it also sets the radius of
+  the arrow if its shape is circular
 - *arrow_height* - set the height of the arrow, which otherwise
   defaults to a value proportional to the arrow *width* |dash| specifically,
   the height of the equilateral triangle used for the default arrow style
@@ -727,7 +902,6 @@ The following properties can be set:
              arrow_position=[0.25, 0.5, 0.75])
         Line(x=2.5, y=6, x1=2.5, y1=5,
              arrow_position=[1.0, 0.93])
-
         # two lines superimposed
         Line(x=3, y=6, x1=4, y1=5,
              arrow_style='spear',
@@ -769,7 +943,7 @@ The following properties can be set:
       of values means the arrow is drawn in multiple places along the line.
 
       The bottom left image shows how the default arrow expands in size
-      proportional to the thickness (*stroke_width*) of the Line. Again,
+      proportional to the thickness (*stroke_width*) of the line. Again,
       because ``arrow_double=True`` the same arrow is drawn twice; facing
       in each direction, but the ``arrow_position=0.66`` property means
       the arrows are each drawn about two-thirds of the way along the line,
@@ -779,13 +953,15 @@ The following properties can be set:
       the same location but with different styled arrows in different
       positions.
 
+      An example of a circle arrowhead is shown in `Example 3. Centred Line`_
+
 ===== ======
 
 
 .. _lineCentreShapes:
 
-Example 4. Centre Shapes
-------------------------
+Example 5a. Centre Shapes
+-------------------------
 `^ <lineIndex_>`_
 
 .. |ln9| image:: images/customised/line_centre_shapes.png
@@ -856,32 +1032,105 @@ Example 4. Centre Shapes
 ===== ======
 
 
-.. _lineConnectionsCircle:
+.. _lineCentreShapesCurve:
 
-Example 5. Connections: Circle
-------------------------------
+Example 5b. Centre Shapes - curve
+---------------------------------
+`^ <lineIndex_>`_
+
+.. |l9B| image:: images/customised/line_centre_shapes_curve.png
+   :width: 330
+
+===== ======
+|l9B| This example shows Lines constructed using commands with the
+      following properties:
+
+      .. code:: python
+
+        crc = circle(radius=0.15)
+        ttt = text("Aa", font_size=10)
+        crs = cross(height=0.6, width=0.6)
+        ell = ellipse(height=0.4, width=0.6)
+        ply = polygon(side=0.2, sides=5)
+        rho = rhombus(side=0.3)
+
+        shrt = Common(length=1.51, curve=0.25)
+        Line(x=0, y=0.5, common=shrt,
+             centre_shapes=[crc])
+        Line(x=2, y=0.5, common=shrt,
+             centre_shapes=[ttt])
+        Line(x=0, y=1.5, common=shrt,
+             centre_shapes=[crs])
+        Line(x=2, y=1.5, common=shrt,
+             centre_shapes=[ply])
+        Line(x=0, y=2.5, common=shrt,
+             centre_shapes=[ell])
+        Line(x=2, y=2.5, common=shrt,
+             centre_shapes=[rho])
+
+        lng = Common(length=2, curve=0.25)
+        Line(x=0, y=4, common=lng,
+             angle=30,
+             centre_shapes=[crc],
+             centre_shapes_rotated =True)
+        Line(x=2, y=4, common=lng,
+             angle=30,
+             centre_shapes=[ttt],
+             centre_shapes_rotated =True)
+        Line(x=0, y=5, common=lng,
+             angle=30,
+             centre_shapes=[crs],
+             centre_shapes_rotated =True)
+        Line(x=2, y=5, common=lng, angle=30,
+             centre_shapes=[ply],
+             centre_shapes_rotated =True)
+        Line(x=0, y=6, common=lng, angle=30,
+             centre_shapes=[ell],
+             centre_shapes_rotated =True)
+        Line(x=2, y=6, common=lng,
+             angle=30,
+             centre_shapes=[rho],
+             centre_shapes_rotated =True)
+
+      This example is almost exactly the same as the one above
+      `Example 5a. Centre Shapes`_ but with the addition of the *curve*
+      property to each line.
+
+      The value for the *curve* is set in each of the two ``Common``
+      statements.  The value set for it |dash| for example, ``0.25`` |dash|
+      represents the distance above the centre point of the line through
+      which the curve must pass; the curve is calculated as the arc of a
+      circle joining start, "elevated centre" and end of the lines.
+
+===== ======
+
+
+.. _lineLinksCircle:
+
+Example 6. Links: Circle
+------------------------
 `^ <lineIndex_>`_
 
 To connect two or more shapes, supply a list of them, together with a
-*connection point*, for the *connections* property of the line.
+*link point*, for the *links* property of the line.
 
-The *connection point* for circular shapes |dash| ``Circle`` and ``Dot`` |dash|
+The *link point* for circular shapes |dash| ``Circle`` and ``Dot`` |dash|
 is not required, as the connecting line is always drawn to/from the centre
 of such a shape.
 
 For non-circular shapes |dash| for example, ``Rectangle`` or ``Hexagon`` |dash|
 such a shape must have either/or vertex points, or perbis points, that can be
-specified as the *connection point* to which the line will connect. This point
-must be set along with the shape, in the  *connections* property setting.
+specified as the *link point* to which the line will connect. This point
+must be set along with the shape, in the  *links* property setting.
 
 .. NOTE::
 
-  Use of the *connections* property overrides any other properties that may
+  Use of the *links* property overrides any other properties that may
   have been set to specify **where** the line will be drawn.  The other
   properties that specify **how** the line will be appear will still be used.
 
 
-.. |ln7| image:: images/customised/line_connections_circle.png
+.. |ln7| image:: images/customised/line_links_circle.png
    :width: 330
 
 ===== ======
@@ -894,33 +1143,33 @@ must be set along with the shape, in the  *connections* property setting.
 
         cy = Circle(cx=1, cy=1, radius=0.5,
                     fill_stroke="yellow")
-        Line(connections=[cc, cy])
+        Line(links=[cc, cy])
 
         ca = Circle(cx=1, cy=5, radius=0.5,
                     fill_stroke="aqua")
-        Line(connections=[cc, ca])
+        Line(links=[cc, ca])
 
         cr = Circle(cx=3, cy=1,
                     radius=0.5, fill_stroke="red")
-        Line(connections=[cc, cr])
+        Line(links=[cc, cr])
 
         co = Circle(cx=3, cy=5, radius=0.5,
                     fill_stroke="orange")
-        Line(connections=[cc, co])
+        Line(links=[cc, co])
 
         # orthogonal
         Line(
-            connections=[cy, cr, co, ca, cy],
+            links=[cy, cr, co, ca, cy],
             stroke_width=2)
 
       This example shows how Circles that are defined and drawn as normal
       can be assigned to a name e.g. ``cc`` for the white Circle, and then
-      connected by a Line via the *connections* property.
+      connected by a Line via the *links* property.
 
-      The *connections* property requires two or more shapes in a
+      The *links* property requires two or more shapes in a
       list so that the Line can be drawn between them.
 
-      Using the *connections* property means that the normal point locations,
+      Using the *links* property means that the normal point locations,
       or line angle, are **not** used but are superceded by calculated values.
       The "start" of the line is at the centre of the first circular shape
       and the "end" of the line is at the centre of the second circular shape.
@@ -933,35 +1182,35 @@ must be set along with the shape, in the  *connections* property setting.
 ===== ======
 
 
-.. _lineConnectionsShapes:
+.. _lineLinksShapes:
 
-Example 6. Connections: Shapes
-------------------------------
+Example 7. Links: Shapes
+------------------------
 `^ <lineIndex_>`_
 
 To connect two or more non-circular shapes |dash| for example, ``Rectangle``
 or ``Hexagon`` |dash| supply a list of these, along with the settings for
-each of their *connection points*, as the *connections* property of the line.
+each of their *link points*, as the *links* property of the line.
 
-The *connection point* setting for non-circular shapes must specify:
+The *link point* setting for non-circular shapes must specify:
 
 - the shape name;
-- the connection type |dash| either a vertex point (``v``) or a perbis
+- the link type |dash| either a vertex point (``v``) or a perbis
   point (``p``);
-- the connection location, as a :ref:`compass direction <termsDirection>`.
+- the link location, as a :ref:`compass direction <termsDirection>`.
 
 .. NOTE::
 
-  Use of the *connections* property overrides any other properties that may
+  Use of the *links* property overrides any other properties that may
   have been set to specify **where** the line will be drawn.  The other
   properties that specify **how** the line will be appear will still be used.
 
-More concrete examples of the use of connections can be found in the
+More concrete examples of the use of links can be found in the
 examples of constructing boards |dash| :ref:`Morabaraba <abstractGameMorabaraba>`
 and :ref:`Kensington <abstractGameKensington>`.
 
 
-.. |ln8| image:: images/customised/line_connections_shapes.png
+.. |ln8| image:: images/customised/line_links_shapes.png
    :width: 330
 
 ===== ======
@@ -975,38 +1224,52 @@ and :ref:`Kensington <abstractGameKensington>`.
           fill="yellow")
         s2 = Square(
           cx=3, cy=2, side=1)
+
         Line(
-          connections=[
+          links=[
             (s1, 'v', 'ne'),
             (s2, 'p', 'w')
           ],
           stroke="red",
           stroke_width=2)
+        Line(
+          links=[
+            (s1, 'p', 'e'),
+            (s2, 'v', 'se')],
+          stroke="blue",
+          stroke_width=2,
+          curve=-0.5)
 
       This example shows how Squares that are defined and drawn as normal
       can be assigned to a name e.g. ``r1`` for the yellow Square, and then
-      connected by a Line via the *connections* property.
+      connected by Lines via the *links* property.
 
-      The *connections* property requires two or more shapes, together with
-      their connection points, in a  list so that the Line can be drawn between
+      The *links* property requires two or more shapes, together with
+      their link points, in a  list so that the Line can be drawn between
       them.
 
-      Using the *connections* property means that the normal point locations,
+      Using the *links* property means that the normal point locations,
       or line angle, are **not** used but are superceded by the calculated
-      values for the start and end of the line.  In this case, for example,
-      the start of the line is at the north-east vertex of the yellow square,
-      and the end of the line is at the west perbis point of the white square.
+      values for the start and end of the line.
+
+      In this case, for example, the start of the ``red`` line is at the
+      north-east vertex of the yellow square, and the end of the line is at
+      the west perbis point of the white square.
+
+      The ``red`` line is a normal straight line, but the ``blue`` line has
+      the *curve* property set; because it is a negative number, the curve
+      direction is "downwards".
 
 ===== ======
 
 
-.. _lineConnectionsArrow:
+.. _lineLinksArrow:
 
-Example 7. Connections - Arrow
-------------------------------
+Example 8. Links - Arrow
+------------------------
 `^ <lineIndex_>`_
 
-.. |ln5| image:: images/customised/line_connections_arrow.png
+.. |ln5| image:: images/customised/line_links_arrow.png
    :width: 330
 
 ===== ======
@@ -1020,29 +1283,29 @@ Example 7. Connections - Arrow
                     fill_stroke="yellow")
         co = Circle(cx=3, cy=5, radius=0.5,
                     fill_stroke="orange")
-        Line(connections=[cy, cc, co],
+        Line(links=[cy, cc, co],
              stroke="red",
              stroke_width=1,
              arrow=True,
              )
 
-      Similarly to `Example 4 <lineConnectionsCircle_>`_, the line is drawn
+      Similarly to `Example 4 <lineLinksCircle_>`_, the line is drawn
       between a series of ``Circle`` shapes.
 
       In this case, the line has been styled with color and thickness, and
       the *arrow* has been "switched on".  The arrow points in the direction
-      corresponding to the order of the shapes in the *connections* list.
+      corresponding to the order of the shapes in the *links* list.
 
 ===== ======
 
 
-.. _lineConnectionsSpoke:
+.. _lineLinksSpoke:
 
-Example 8. Connections - Spoke
-------------------------------
+Example 9. Links - Spoke
+------------------------
 `^ <lineIndex_>`_
 
-.. |ln6| image:: images/customised/line_connections_spoke.png
+.. |ln6| image:: images/customised/line_links_spoke.png
    :width: 330
 
 ===== ======
@@ -1058,21 +1321,58 @@ Example 8. Connections - Spoke
                     fill_stroke="orange")
         ca = Circle(cx=1, cy=5, radius=0.5,
                     fill_stroke="aqua")
-        Line(connections=[cc, cr, co, ca],
-             connections_style='spoke',
+        Line(links=[cc, cr, co, ca],
+             links_style='spoke',
              stroke="green",
              stroke_width=1,
              arrow=True,
              )
 
-      Similarly to `Example 6 <lineConnectionsArrow_>`_, the line is drawn
+      Similarly to `Example 6 <lineLinksArrow_>`_, the line is drawn
       as an arrow between the shapes.
 
-      However, the use of the ``connections_style='spoke'`` property means
+      However, the use of the ``links_style='spoke'`` property means
       each line is drawn from the first shape in the list to each of the
-      others, rather than as a series of connections.
+      others, rather than as a series of links.
 
       Note that ``Dot()`` shape is used here instead of a ``Circle()``.
+
+===== ======
+
+
+.. _lineLinksCurve:
+
+Example 10. Links - Curve
+-------------------------
+`^ <lineIndex_>`_
+
+.. |lc9| image:: images/customised/line_links_curve.png
+   :width: 330
+
+===== ======
+|lc9| This example shows a Line constructed using commands with the
+      following properties:
+
+      .. code:: python
+
+        cc = Dot(
+          cx=1.5, cy=3.5, dot_width=2)
+        cr = Circle(
+          cx=3, cy=1,
+          radius=0.5, fill_stroke="red")
+        co = Circle(
+          cx=3, cy=5,
+          radius=0.5, fill_stroke="orange")
+        ca = Circle(
+          cx=1, cy=5,
+          radius=0.5, fill_stroke="aqua")
+        Line(links=[cc, cr, co, ca],
+             links_style='spoke',
+             stroke="green",
+             stroke_width=1,
+             curve=0.5,
+         )
+
 
 ===== ======
 
@@ -1486,25 +1786,28 @@ Example 2. Styles
       .. code:: python
 
         styles = Common(
-          height=1, width=3.5, x=0.25,
-          notch=0.25, label_size=7, fill="lightsteelblue")
+          height=0.8, width=3.5, x=0.25,
+          notch=0.2, label_size=7,
+          fill="lightsteelblue")
 
         Rectangle(
           common=styles, y=0,  notch_style='snip',
           label='Notch: snip (s)')
         Rectangle(
-          common=styles, y=1.25, notch_style='step',
+          common=styles, y=1, notch_style='step',
           label='Notch: step (t)')
         Rectangle(
-          common=styles, y=3.5, notch_style='fold',
+          common=styles, y=2, notch_style='fold',
           label='Notch: fold (o)')
         Rectangle(
-          common=styles, y=4.25, notch_style='flap',
+          common=styles, y=3, notch_style='flap',
           label='Notch: flap (l)')
         Rectangle(
-          common=styles,
-          y=5.0, notch_style='bite',
+          common=styles, y=4, notch_style='bite',
           label='Notch: bite (b)')
+        Rectangle(
+          common=styles, y=5, notch_style='arch',
+          label='Notch: arch (a)')
 
       These Rectangles all share the following Common properties that differ from the
       defaults:
@@ -1522,6 +1825,7 @@ Example 2. Styles
       - *flap* - makes it appear that the corner has a small, liftable flap
       - *bite* - a curved portion is "cut out"; this will be a quarter-circle
         if *notch_x* and *notch_y* are equal
+      - *arch* - a curved portion is cut out in the same way as a rounded edge
 
 ===== ======
 
@@ -2807,13 +3111,13 @@ or straight lines depending on which edges they connnect.
       - *paths* - a list of one or more pairs of compass directions between
         which a line |dash| straight or an arc |dash| is drawn
 
-      The Hexagons with normal line styles have connections between opposing
+      The Hexagons with normal line styles have links between opposing
       edges.
 
-      The Hexagons with gold colored line have connections between adjacent
+      The Hexagons with gold colored line have links between adjacent
       edges.
 
-      The Hexagons with dotteed line styles have connections between edges
+      The Hexagons with dotteed line styles have links between edges
       that are not opposite or adjacent.
 
 ===== ======
@@ -3467,7 +3771,7 @@ of a Circle towards its circumference.
 
         Circle(cx=3, cy=5, radius=1,
                fill="green",
-               sstroke="orange", stroke_width=1,
+               stroke="orange", stroke_width=1,
                radii=[0,90,180,270,45,135,225,315],
                radii_stroke_width=8,
                radii_stroke="orange",

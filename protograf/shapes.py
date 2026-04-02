@@ -2,6 +2,7 @@
 """
 Create custom shapes for protograf
 """
+
 # lib
 import codecs
 import copy
@@ -21,7 +22,7 @@ import segno  # QRCode
 
 # local
 from protograf import globals
-from protograf.shapes_utils import set_cached_dir, draw_line
+from protograf.shapes_utils import set_cached_dir, draw_line, draw_line_curve
 from protograf.base import (
     BaseShape,
     get_cache,
@@ -33,7 +34,7 @@ from protograf.shapes_circle import CircleShape
 from protograf.shapes_hexagon import HexShape
 from protograf.shapes_polygon import PolygonShape
 from protograf.shapes_rectangle import RectangleShape
-from protograf.utils.connections import get_connections
+from protograf.utils.connections import get_links
 from protograf.utils import colrs, geoms, support, tools, fonts
 from protograf.utils.tools import _lower  # , _vprint
 from protograf.utils.messaging import feedback
@@ -63,6 +64,8 @@ class ImageShape(BaseShape):
         self.sliced = kwargs.get("sliced", None)
         self.cache_directory = get_cache(**kwargs)
         self.image_location = None
+        self.height_set = True if kwargs.get("height") else False
+        self.width_set = True if kwargs.get("width") else False
         # ---- validation
         if (self.kwargs.get("cx") or self.kwargs.get("cy")) and (
             self.kwargs.get("align_horizontal") or self.kwargs.get("align_vertical")
@@ -105,16 +108,29 @@ class ImageShape(BaseShape):
         img = None
         # ---- check for Card usage
         cache_directory = str(self.cache_directory)
-        _source = self.source
-        # feedback(f'*** IMAGE {ID=} {self.source=}')
+        # ---- process locale data (dict via Locale namedtuple) using jinja2
+        #      this may include the item's sequence number and current page
+        _locale = kwargs.get("locale", None)
+        _source = (
+            self.source if not _locale else tools.eval_template(self.source, _locale)
+        )
         if ID is not None and isinstance(self.source, list):
-            _source = self.source[ID]
+            _source = (
+                self.source[ID]
+                if not _locale
+                else tools.eval_template(self.source[ID], _locale)
+            )
             cache_directory = set_cached_dir(_source) or cache_directory
         elif ID is not None and isinstance(self.source, str):
-            _source = self.source
-            cache_directory = set_cached_dir(self.source) or cache_directory
+            _source = (
+                self.source
+                if not _locale
+                else tools.eval_template(self.source, _locale)
+            )
+            cache_directory = set_cached_dir(_source) or cache_directory
         else:
             pass
+        # feedback(f"*** IMAGE draw {_source=} {self.source=} {_locale=}")
         # ---- convert to using units
         height = self._u.height
         width = self._u.width
@@ -161,26 +177,41 @@ class ImageShape(BaseShape):
         rotation = kwargs.get("rotation", self.rotation)
         # ---- load image
         # feedback(f'*** IMAGE {ID=} {_source=} {x=} {y=} {self.rotation=}')
-        img, is_dir = self.load_image(  # via base.BaseShape
-            globals.doc_page,
-            _source,
-            origin=(x, y),
-            sliced=self.sliced,
-            width_height=(width, height),
-            cache_directory=cache_directory,
-            rotation=rotation,
+        img, filename = self.load_image(
+            image_location=_source, cache_directory=cache_directory
         )
-        if not img and not is_dir:
-            if _source:
-                feedback(
-                    f'Unable to load image "{_source}"; please check name and location',
-                    True,
-                )
-            else:
-                feedback(
-                    "Unable to load image - no name provided",
-                    True,
-                )
+        if not img:
+            feedback(
+                f'Unable to load image "{_source}" - please check this is a valid filename',
+                False,
+                True,
+            )
+            return
+        else:
+            # feedback(f'*** IMAGE {self.width=} {self.height=} {width=} {height=}')
+            if kwargs.get("auto_frame") and self.auto_frame:
+                # ---- set image area
+                if self.width_set and not self.height_set:
+                    height = img.height * width / img.width
+                    self.height = img.height * self.width / img.width
+                elif self.height_set and not self.width_set:
+                    width = img.width * height / img.height
+                    self.width = img.width * self.height / img.height
+                else:
+                    feedback(
+                        "Both width and height are set - auto_frame not used.",
+                        False,
+                        True,
+                    )
+            self.insert_image(  # via base.BaseShape
+                globals.doc_page,
+                image=img,
+                filename=filename,
+                origin=(x, y),
+                sliced=self.sliced,
+                width_height=(width, height),
+                rotation=rotation,
+            )
         # ---- centre
         if self.use_abs_c:
             x_c = self._abs_cx
@@ -312,8 +343,6 @@ class ArcShape(BaseShape):
         # ---- circumference/perimeter point in units
         pt_p = geoms.point_on_circle(pt_c, self._u.radius, self.angle_start)
         # ---- draw sector
-        # feedback(
-        #     f'***Arc: {pt_p=} {pt_c=} {self.angle_start=} {self.angle_width=}')
         cnv.draw_sector(  # anti-clockwise from pt_p; 90° default
             (pt_c.x, pt_c.y), (pt_p.x, pt_p.y), self.angle_width, fullSector=False
         )
@@ -833,6 +862,11 @@ class DotShape(BaseShape):
             self.y_c = self._u.cy + self._o.delta_y
         return Point(self.x_c, self.y_c)
 
+    @cached_property
+    def _shape_radius(self) -> Point:
+        """Radius of Dot in points."""
+        return self.point_size
+
     def draw(self, cnv=None, off_x=0, off_y=0, ID=None, **kwargs):
         """Draw a Dot on a given canvas."""
         kwargs = self.kwargs | kwargs
@@ -845,7 +879,7 @@ class DotShape(BaseShape):
         self.fill = self.stroke
         center = muPoint(x, y)
         # ---- draw dot
-        # feedback(f'*** Dot {size=} {x=} {y=}')
+        # feedback(f'*** Dot {size=} {x=} {y=} {center=} {self._u.radius=}')
         cnv.draw_circle(center=center, radius=self._u.radius)
         kwargs["rotation"] = self.rotation
         kwargs["rotation_point"] = center
@@ -1137,23 +1171,37 @@ class LineShape(BaseShape):
         """Geometry of Line - alias for shape_geom."""
         return self.shape_geom
 
-    def draw_connections(
+    def draw_links(
         self, cnv=None, off_x=0, off_y=0, ID=None, shapes: list = None, **kwargs
     ) -> list:
         """Draw a Line between two or more shapes."""
         if not isinstance(shapes, (list, tuple)) or len(shapes) < 2:
             feedback(
-                "Connections can only be made using a list of two or more shapes!",
+                "Links can only be made using a list of two or more shapes!",
                 False,
                 True,
             )
             return []
-        connections = get_connections(shapes, self.connections_style)
-        for conn in connections:
-            klargs = draw_line(cnv, conn[0], conn[1], shape=self, **kwargs)
+        curve, links = get_links(shapes, self.links_style, self.curve)
+        for conn in links:
+            # ---- draw straight line
+            if not self.curve:
+                klargs = draw_line(cnv, conn[0], conn[1], shape=self, **kwargs)
+            else:
+                # ---- draw curve line
+                if kwargs.get("wave_height") or kwargs.get("wave_style"):
+                    feedback("A link cannot use a wave and curve together", True)
+                klargs, curve_centre, circle_centre, radius = draw_line_curve(
+                    cnv, conn[0], conn[1], curve, **kwargs
+                )
+                kwargs["circle_centre"] = circle_centre
+                kwargs["circle_radius"] = radius
+                klargs["fill"] = None
+                klargs["fill"] = None
+                kwargs["curve"] = curve  # used in draw_arrow() & draw_arrowhead()
             self.set_canvas_props(cnv=cnv, index=ID, **klargs)  # shape.finish()
             self.draw_arrow(cnv, conn[0], conn[1], **kwargs)
-        return connections
+        return links
 
     def draw_arrow(self, cnv, point_a, point_b, **kwargs):
         """Draw arrow (head) on Line."""
@@ -1175,11 +1223,16 @@ class LineShape(BaseShape):
         cnv = cnv if cnv else globals.canvas  # a new Page/Shape may now exist
         super().draw(cnv, off_x, off_y, ID, **kwargs)  # unit-based props
         x, y, x_1, y_1 = None, None, None, None
-        # ---- EITHER connections draw
-        if self.connections:
-            conns = self.draw_connections(
-                cnv, off_x, off_y, ID, self.connections, **kwargs
-            )
+        (
+            ccx,
+            ccy,
+        ) = (
+            None,
+            None,
+        )
+        # ---- EITHER links draw
+        if self.links:
+            conns = self.draw_links(cnv, off_x, off_y, ID, self.links, **kwargs)
         # ---- OR "normal" draw
         else:
             if self.use_abs:
@@ -1236,20 +1289,37 @@ class LineShape(BaseShape):
                     raise ValueError(
                         f'Cannot calculate rotation point "{self.rotation_point}"', True
                     )
-            # ---- draw line
-            # breakpoint()
-            klargs = draw_line(cnv, Point(x, y), Point(x_1, y_1), shape=self, **kwargs)
+            # ---- draw straight line
+            if not self.curve:
+                klargs = draw_line(
+                    cnv, Point(x, y), Point(x_1, y_1), shape=self, **kwargs
+                )
+            else:
+                # ---- draw curve line
+                if kwargs.get("wave_height") or kwargs.get("wave_style"):
+                    feedback("A line cannot use a wave and curve together", True)
+                klargs, curve_centre, circle_centre, radius = draw_line_curve(
+                    cnv, Point(x, y), Point(x_1, y_1), self.curve, **kwargs
+                )
+                kwargs["circle_centre"] = circle_centre
+                kwargs["circle_radius"] = radius
+                klargs["fill"] = None
+                ccx, ccy = curve_centre.x, curve_centre.y
+                # print(f"*** Line {tools._p2v(curve_centre)} {circle_centre=} {radius=}")
             self.set_canvas_props(cnv=cnv, index=ID, **klargs)  # shape.finish()
-            # ---- arrowhead
+            # ---- draw arrowhead
             self.draw_arrow(cnv, Point(x, y), Point(x_1, y_1), **kwargs)
-            # store line points to match connections (for more drawing)
+            # store line points to match links (for more drawing)
             conns = [(Point(x, y), Point(x_1, y_1))]
         # ---- other line properties
         if conns and len(conns) == 1:
             conn = conns[0]
             x, y = conn[0].x, conn[0].y
             x_1, y_1 = conn[1].x, conn[1].y
-            cx, cy = (x_1 + x) / 2.0, (y_1 + y) / 2.0
+            if ccx and ccy:
+                cx, cy = ccx, ccy  # centre of point of curve line
+            else:
+                cx, cy = (x_1 + x) / 2.0, (y_1 + y) / 2.0
             # ---- * centre shapes (with offsets)
             if self.centre_shapes:
                 _, _angle = geoms.angles_from_points(Point(x_1, y_1), Point(x, y))
@@ -1445,17 +1515,17 @@ class PolylineShape(BasePolyShape):
         """Geometry of Polyline - alias for shape_geom."""
         return self.shape_geom
 
-    def polyline_connections(self) -> list:
-        """Get vertex Points to connect sets of two shapes."""
-        if not isinstance(self.connections, (list, tuple)) or len(self.connections) < 2:
+    def polyline_links(self) -> list:
+        """Get vertex Points to link sets of two shapes."""
+        if not isinstance(self.links, (list, tuple)) or len(self.links) < 2:
             feedback(
-                "Connections can only be made using a list of two or more shapes!",
+                "Links can only be made using a list of two or more shapes!",
                 False,
                 True,
             )
             return None
-        connections = get_connections(self.connections, self.connections_style)
-        return connections
+        curve, links = get_links(self.links, self.links_style)
+        return links
 
     def draw(self, cnv=None, off_x=0, off_y=0, ID=None, **kwargs):
         """Draw a Polyline (multi-part line) on a given canvas."""
@@ -1472,8 +1542,8 @@ class PolylineShape(BasePolyShape):
         self.vertexes = self._shape_vertexes  # BasePoly method
         # ---- draw polyline by vertices
         # feedback(f'***POLYLINE {x=} {y=} {self.vertexes=}')
-        if self.vertexes and self.connections:
-            feedback("Connections can only be used with a snail!", True)
+        if self.vertexes and self.links:
+            feedback("Links can only be used with a snail!", True)
         if self.vertexes:
             for key, vertex in enumerate(self._shape_vertexes):
                 if key < len(self.vertexes) - 1:
@@ -1485,12 +1555,12 @@ class PolylineShape(BasePolyShape):
             self.set_canvas_props(cnv=cnv, index=ID, **kwargs)
         # ---- draw polyline by snail
         if self.snail:
-            # ---- EITHER connections draw (possible multiple lines)
-            if self.connections:
-                connections = self.polyline_connections()
-                for connection in connections:
-                    kwargs["start_point"] = connection[0]
-                    kwargs["end_point"] = connection[1]
+            # ---- EITHER links draw (possible multiple lines)
+            if self.links:
+                links = self.polyline_links()
+                for link in links:
+                    kwargs["start_point"] = link[0]
+                    kwargs["end_point"] = link[1]
                     self.draw_snail(cnv=cnv, off_x=off_x, off_y=off_y, ID=ID, **kwargs)
             # ----- OR "normal" draw
             else:
@@ -1595,19 +1665,23 @@ class QRCodeShape(BaseShape):
         rotation = kwargs.get("rotation", self.rotation)
         # ---- load QR image
         # feedback(f'*** IMAGE {ID=} {_source=} {x=} {y=} {self.rotation=}')
-        img, is_dir = self.load_image(  # via base.BaseShape
-            globals.doc_page,
-            _source,
-            origin=(x, y),
-            sliced=self.sliced,
-            width_height=(width, height),
-            cache_directory=cache_directory,
-            rotation=rotation,
+        img, filename = self.load_image(
+            image_location=_source, cache_directory=cache_directory
         )
-        if not img and not is_dir:
+        if not img:
             feedback(
                 f'Unable to load image "{_source}!" - please check name and location',
                 True,
+            )
+        else:
+            self.insert_image(  # via base.BaseShape
+                globals.doc_page,
+                image=img,
+                filename=filename,
+                origin=(x, y),
+                sliced=self.sliced,
+                width_height=(width, height),
+                rotation=rotation,
             )
         # ---- QR shape other text
         if kwargs and kwargs.get("text"):
@@ -3123,7 +3197,6 @@ class TextShape(BaseShape):
                 color=pymu_props.color,
                 fill=pymu_props.fill,
                 lineCap=pymu_props.lineCap,
-                lineJoin=pymu_props.lineJoin,
                 dashes=pymu_props.dashes,
                 fill_opacity=pymu_props.fill_opacity,
             )

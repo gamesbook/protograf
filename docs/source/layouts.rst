@@ -46,8 +46,8 @@ Very briefly, the different kinds of layout commands are as follows.
    will set the centre of any element being placed on the grid
 
 These *grid-based locations* can be paired with a
-:ref:`Layout() <layout-command>` command, which links them with the shapes
-that need to be drawn at their locations.
+:ref:`Layout() <layout-command>` command, which associates them with the
+shapes that need to be drawn at their locations.
 
 .. HINT::
 

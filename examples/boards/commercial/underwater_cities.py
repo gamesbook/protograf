@@ -17,7 +17,7 @@ money = rectangle(
     fill_stroke="gold", height=1.2, width=0.8, rounding=0.1,
     hatches_count=5, hatches='w', hatches_stroke="dimgray",
     label_stroke="black", label_size=16)
-pipe = image("images/pipe.png", width=2, height=0.75)
+pipe = Common(width=2, height=0.75)
 card_icon = rectangle(fill="white", label_stroke="black", label_size=32)
 card_icon_small = rectangle(common=card_icon, height=1.2, width=0.8, rounding=0.1)
 card_icon_med = rectangle(common=card_icon, height=1.7, width=1.2, rounding=0.15, fill="white")
@@ -89,7 +89,7 @@ lock_grn = image('images/padlock-open-green.png', x=9, y=40, width=1.5, height=1
 Repeat(lock_grn, rows=1, cols=5, interval_x=7)
 
 Rectangle(common=card_icon_large, x=36, y=36.5, label="A")
-Image(common=pipe, x=28.5, y=37)
+Image("images/pipe.png", common=pipe, x=28.5, y=37)
 
 # Special Cards
 special_grn = "#4A8D86"

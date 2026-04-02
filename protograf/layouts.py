@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 """
-Create grids, repeats, sequences, layouts, and connections for protograf
+Create grids, repeats, sequences, and layouts for protograf
 """
+
 # lib
 import copy
 import logging

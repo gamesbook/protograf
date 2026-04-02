@@ -291,7 +291,7 @@ Script      `processflow.py <https://github.com/gamesbook/protograf/blob/master/
 Discussion  This example shows how to construct a diagram by drawing a series
             of :ref:`Rectangles <rectangle-command>` with :ref:`Text <text-command>`
             as part of a Python function.  These Rectangles are then connected by
-            :ref:`Lines <line-command>` via the *connection* property of each line.
+            :ref:`Lines <line-command>` via the *link* property of each line.
 
             Part of the function looks like:
 
@@ -322,14 +322,14 @@ Discussion  This example shows how to construct a diagram by drawing a series
 
               .. code:: python
 
-                Line(connections=[
+                Line(links=[
                         (step1, "p", "e"),
                         (step2, "p", "w")],
                      stroke_width=1,
                      dot=0.1,
                      arrow=True)
 
-            For more detail about connections, see the
+            For more detail about links, see the
             :ref:`customised Line <lineIndex>` section.
 
 ----------- ------------------------------------------------------------------

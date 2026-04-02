@@ -813,7 +813,7 @@ Example 13. Deck Zones
 
         # design deck
         page_header = text(
-            text="protograf-cards // page:{{page}}",
+            text="protograf-cards // Page:{{page}}",
             x=2.5, y=0.5, font_size=6, )
         silver = rectangle(
              x=0.5, y=0.75,
@@ -836,7 +836,7 @@ Example 13. Deck Zones
             grouping_rows=4,
             stroke=None,
             zones=[
-                ('*', page_header),
+                ('1', page_header),
                 ('1', silver),
                 ('1', gold)]
             )
@@ -865,15 +865,22 @@ Example 13. Deck Zones
       The ``zones`` property for ``Deck()`` defines a list of shapes that must
       be drawn on the specified pages.
 
+      ..NOTE::
+
+          Ensure that you do **not** set a page range for ``zones`` greater
+          than the actual number in your document; so a range of ``1-2``
+          will trigger an error here.
+
       Each item in the list is a set of two values: the first is the page
       number |dash| or range of page numbers |dash| and the second is the
       shape to be drawn on the page(s); this is defined as usual for such
       a shape i.e. the *x* and *y* values are relative to the page margins
       and not those of the card.
 
-      In this case, there is ``Text()`` that is drawn on every page |dash|
-      using the ``*`` value |dash| and colored rectangles that are drawn on
-      page one; ``silver`` colored at the top and ``gold`` colored lower down.
+      In this case, there is ``Text()`` that is drawn on every specified
+      page in the range, as well as colored rectangles that are drawn on the
+      specified pages; ``silver`` color at the top and ``gold`` color lower
+      down.
 
 ===== ======
 

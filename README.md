@@ -97,37 +97,37 @@ guide.
 
 Please see the [list of contributors](CONTRIBUTORS.txt).
 
+## :flower_playing_cards: Recent Features
+
+This section highlights a few of the more recent features added.
+The full feature list is available in the
+[documentation](https://protograf.readthedocs.io/).
+
+* [x] New shapes: Cross and Pod
+* [x] Common gaming objects: Cube, Domino, Die and Pentomino(es)
+* [x] HexHex boards
+* [x] Stripes: interior "areas" for a Rectangle
+* [x] Cards:
+    * [x] support for card-back designs
+    * [x] grid marks for hexagonal cards
+    * [x] corner crosses as grid marks
+    * [x] card-specific bleed areas
+* [x] Color support for CYMK
+
 ## :game_die: Potential Features
 
 Features not yet checked off are **not** guaranteed to be implemented;
 they just represent current / potential areas of work or ideas.
 
-* [x] New Shapes:
-    * [x] Cross shape
-    * [x] Pod shape
 * [ ] Common objects:
-    * [x] Cube
-    * [x] Domino
-    * [x] Die
     * [ ] Meeple (Polyshape with curves)
-    * [x] Pentomino
-* [ ] Hexagons: 18xx tile example
-* [x] HexHex Grid: hexhex boards
-* [x] Polyline: define arcs along the path
-* [x] Paths (arcs) inside a Hexagon
-* [ ] Pathways: (arcs and line) in a Hexagonal grid
-* [x] Stripes: interior "areas" for a Rectangle
+* [ ] Annular Sectors
+* [ ] Image alteration operations
+* [ ] Hexagon: 18xx tile example
+* [ ] Pathways: (arcs and lines) in a Hexagonal grid
 * [ ] Cards:
-    * [x] support card-back designs
-    * [x] grid lines for hexagonal cards
-    * [x] corner crosses as grid marks
-    * [x] access to Google Sheets
-    * [x] extract rectangular cards as PNG files
-    * [x] page annotations
-    * [x] bleed areas
     * [ ] extraction as TableTopSimulator deck
-* [x] Color:
-    * [x] add support for CYMK
+    * [ ] icon alignment
 
 ## :jigsaw: Potential Examples
 

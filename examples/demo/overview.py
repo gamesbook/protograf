@@ -435,37 +435,37 @@ Polyline(
     arrow_style='notch',
     arrow_double=True
 )
-# ---- line: connections
-Text("Line: connections", default=ctxt, y=16, x=0)
+# ---- line: links
+Text("Line: links", default=ctxt, y=16, x=0)
 cc = Circle(cx=2, cy=12, radius=0.5)
 cy = Circle(cx=1, cy=10, radius=0.5, fill_stroke="gold")
-Line(connections=[cc, cy], stroke_width=4, stroke="lime")
+Line(links=[cc, cy], stroke_width=4, stroke="lime")
 ca = Circle(cx=1, cy=14, radius=0.5, fill_stroke="aqua")
-Line(connections=[cc, ca], stroke_width=6, dashed=[0.2, 0.1])
+Line(links=[cc, ca], stroke_width=6, dashed=[0.2, 0.1])
 cr = Circle(cx=3, cy=10, radius=0.5, fill_stroke="tomato")
-Line(connections=[cc, cr], stroke_width=2, wave_style='sawtooth', wave_height=0.06)
+Line(links=[cc, cr], stroke_width=2, wave_style='sawtooth', wave_height=0.06)
 co = Circle(cx=3, cy=14, radius=0.5, fill_stroke="orange")
-Line(connections=[cc, co], stroke_width=4, stroke="lime")
-Line(connections=[cy, cr, co, ca, cy], stroke_width=2)
-# ---- line: connections - arrow
-Text("...connections: arrow", default=ctxt, y=16, x=6)
+Line(links=[cc, co], stroke_width=4, stroke="lime")
+Line(links=[cy, cr, co, ca, cy], stroke_width=2)
+# ---- line: links - arrow
+Text("...links: arrow", default=ctxt, y=16, x=6)
 cc = Circle(cx=8.5, cy=12.5, radius=0.5)
 cy = Circle(cx=8, cy=10, radius=0.5, fill_stroke="gold")
 co = Circle(cx=10, cy=14, radius=0.5, fill_stroke="orange")
-Line(connections=[cy, cc, co],
+Line(links=[cy, cc, co],
      stroke="red",
      stroke_width=1.5,
      arrow=True,
      default=arr1
      )
-# ---- line: connections - dot&spoke
+# ---- line: links - dot&spoke
 Text("... dot&spoke", default=ctxt, y=16, x=14)
 cc = Dot(cx=14.5, cy=12.5, dot_width=10, stroke="aqua")
 cr = Circle(cx=16, cy=10, radius=0.5, fill_stroke="red")
 co = Circle(cx=16, cy=14, radius=0.5, fill_stroke="orange")
 ca = Circle(cx=14, cy=14, radius=0.5, fill_stroke="gold")
-Line(connections=[cc, cr, co, ca],
-     connections_style='spoke',
+Line(links=[cc, cr, co, ca],
+     links_style='spoke',
      stroke="green",
      stroke_width=1.5,
      # arrow=True,

@@ -112,7 +112,8 @@ run as normal |dash| then a new version can be released.
 
 Follow this process:
 
-- |check| Format primary code with black (``black protograf``)
+- |check| Format primary code with black (``black --target-version py311 protograf``);
+  update the Python version as needed
 - |check| Finalise release date and notes in ``CHANGES.txt``
 - |check| Ensure all the examples can be run by using shell script(s)
 - |check| Update the ``examples.zip`` file with latest example code
@@ -123,6 +124,7 @@ Follow this process:
 - |check| If working in a branch, now merge changes into master on GitHub
 - |check| Ensure you are on the ``master`` branch and pull changes
 - |check| Update the version using poetry e.g. ``poetry version patch``
+  and inspect ``pyproject.toml`` to ensure it has changed
 - |check| Git commit and push all these changes to GitHub
 - |check| Add a tag that matches the poetry version e.g. ``git tag 0.1.2``
 - |check| Push tag to GitHub i.e. ``git push origin --tags``
@@ -166,7 +168,7 @@ Some helpful reStructuredText web resources:
 - https://github.com/DevDungeon/reStructuredText-Documentation-Reference - guide
 - https://docutils.sourceforge.io/docs/user/rst/quickstart.html - quick start
 - https://docutils.sourceforge.io/docs/user/rst/quickref.html - detailed summary
-- https://jwodder.github.io/kbits/posts/rst-hyperlinks/ - all about links
+- https://jwodder.github.io/kbits/posts/rst-hyperlinks/ - all about using URLs
 - https://docutils.sourceforge.io/docs/ref/rst/directives.html - directives
 
 Some useful tools:

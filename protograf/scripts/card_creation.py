@@ -3,6 +3,7 @@
 """
 protograf script: generate a basic template for a set of cards
 """
+
 # lib
 from dataclasses import dataclass
 from datetime import datetime

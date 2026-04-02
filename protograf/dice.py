@@ -4,6 +4,7 @@ Dice functions for protograf
 
 Note: for the D6 Shape - see objects.py
 """
+
 # lib
 import random
 

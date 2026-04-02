@@ -2,6 +2,7 @@
 """
 Base shape class for protograf
 """
+
 # lib
 import copy
 from enum import Enum
@@ -352,6 +353,7 @@ class BaseCanvas:
         self.align_horizontal = self.defaults.get("align_horizontal", None)
         self.image_location = None
         self.operation = None  # operation on image
+        self.auto_frame = self.defaults.get("auto_frame", None)
         # ---- line / ellipse / bezier / sector / polygon / pod
         self.length = self.defaults.get("length", self.default_length)
         self.angle = self.defaults.get("angle", 0.0)  # also triangle
@@ -383,12 +385,13 @@ class BaseCanvas:
         self.x_c = self.defaults.get("x_c", None)
         self.y_c = self.defaults.get("y_c", None)
         # ---- line
-        self.connections = self.defaults.get("connections", None)
-        self.connections_style = self.defaults.get("connections_style", None)
-        self.curve = self.defaults.get("curve", None)
+        self.curve = self.defaults.get("curve", 0.0)
         # ---- line / bezier
         self.x_1 = self.defaults.get("x1", 0.0)
         self.y_1 = self.defaults.get("y1", 0.0)
+        # ---- line / hex
+        self.links = self.defaults.get("links", None)
+        self.links_style = self.defaults.get("links_style", None)
         # ---- bezier
         self.x_2 = self.defaults.get("x2", 1.0)
         self.y_2 = self.defaults.get("y2", 1.0)
@@ -997,6 +1000,7 @@ class BaseShape:
         self.image_location = kwargs.get("image_location", base.image_location)
         self.align_vertical = kwargs.get("align_vertical", base.align_vertical)
         self.align_horizontal = kwargs.get("align_horizontal", base.align_horizontal)
+        self.auto_frame = self.kw_bool(kwargs.get("auto_frame", base.auto_frame))
         self.operation = kwargs.get("operation", base.operation)  # operation on image
         # ---- line / ellipse / bezier / arc / polygon / pod
         self.length = self.kw_float(kwargs.get("length", base.length))
@@ -1041,12 +1045,13 @@ class BaseShape:
         self.x_c = kwargs.get("x_c", base.x_c)
         self.y_c = kwargs.get("y_c", base.y_c)
         # ---- line
-        self.connections = kwargs.get("connections", base.connections)
-        self.connections_style = kwargs.get("connections_style", base.connections_style)
-        self.curve = kwargs.get("curve", base.curve)
+        self.curve = self.kw_float(kwargs.get("curve", base.curve))
         # ---- line / bezier / sector
         self.x_1 = self.kw_float(kwargs.get("x1", base.x_1))
         self.y_1 = self.kw_float(kwargs.get("y1", base.y_1))
+        # ---- line / hex
+        self.links = kwargs.get("links", base.links)
+        self.links_style = kwargs.get("links_style", base.links_style)
         # ---- bezier / sector
         self.x_2 = self.kw_float(kwargs.get("x2", base.x_2))
         self.y_2 = self.kw_float(kwargs.get("y2", base.y_2))
@@ -1328,7 +1333,6 @@ class BaseShape:
         self.caltrops_invert = self.kw_bool(
             kwargs.get("caltrops_invert", base.caltrops_invert)
         )
-        self.links = kwargs.get("links", base.links)
         self.link_stroke_width = self.kw_float(
             kwargs.get("link_stroke_width", base.link_stroke_width)
         )
@@ -1860,8 +1864,8 @@ class BaseShape:
                 "s",
                 "triangle",  # default
                 "t",
-                # "circle",
-                # "c",
+                "circle",
+                "c",
             ]:
                 issue.append(f'"{self.arrow_style}" is an invalid arrow_style!')
                 correct = False
@@ -1920,6 +1924,9 @@ class BaseShape:
                 "l",
                 "step",
                 "t",
+                "arch",
+                "arc",
+                "a",
             ]:
                 issue.append(f'"{self.notch_style}" is an invalid notch_style!')
                 correct = False
@@ -2009,24 +2016,122 @@ class BaseShape:
 
     def load_image(
         self,
-        pdf_page: muPage,
         image_location: str = None,
-        origin: tuple = None,
-        sliced: str = None,
-        width_height: tuple = None,
         cache_directory: str = None,
-        rotation: float = 0,
-    ) -> tuple:
+    ) -> Image:
         """Load an image from file or website.
 
         Attempt to use local cache directory to retrieve an image
         for web-based assets, if possible.
 
-        If image_location not found; try path in which script located.
+        If image_location not found; try path in which script located...
 
         Args:
             image_location (str):
                 full path or URL for image
+            cache_directory (str):
+                where to store a local for copy for URL-sourced images
+
+        Returns:
+            tuple:
+                image (Image):
+                    PIL Image object, if loaded, else None
+                filename (str):
+                   actual image location
+        """
+
+        def save_image_from_url(url: str):
+            """Download image from network and save locally if not present."""
+            # feedback(f"### image save: {url=} ")
+            loc = urlparse(url)
+            filename = loc.path.split("/")[-1]
+            image_local = os.path.join(cache_directory, filename)
+            if not os.path.exists(image_local):
+                image = requests.get(url)
+                with open(image_local, "wb") as f:
+                    f.write(image.content)
+            return image_local
+
+        def get_image_from_svg(image_location: str = None):
+            """Load SVG image and convert to PNG."""
+            with open(image_location) as f:
+                svg_code = f.read()
+            png_bytes = cairosvg.svg2png(bytestring=svg_code.encode("utf-8"), dpi=300)
+            image = Image.open(io.BytesIO(png_bytes))
+            return image  # NO embedded filename!
+
+        if not image_location:  # not the droids you're looking for... move along
+            return None
+
+        img = None
+        image_local = image_location
+
+        if cache_directory:
+            if tools.is_url_valid(image_location):
+                image_local = save_image_from_url(image_location)
+
+        # ---- check local files
+        if not tools.is_url_valid(image_location):
+            # not a filename
+            if os.path.isdir(image_local):
+                feedback(
+                    f'The image "{image_location}" is a directory/folder, not a file',
+                    True,
+                )
+                return None, None
+            # relative paths
+            if not os.path.isabs(image_location):
+                filepath = tools.script_path()
+                image_local = os.path.join(filepath, image_location)
+            # check image exists
+            if platform == "linux" or platform == "linux2":
+                image_local = os.path.normpath(image_local.replace("\\", "/")).replace(
+                    os.sep, "/"
+                )
+            if not os.path.exists(image_local):
+                if os.path.exists(image_local + ".png"):
+                    image_local = image_local + ".png"
+                else:
+                    feedback(
+                        f'Unable to find or open image "{image_location}" (also tried in "{image_local}"',
+                        False,
+                        True,
+                    )
+                    return None, None
+
+        try:
+            img = Image.open(image_local)
+        except UnidentifiedImageError:
+            try:
+                img = get_image_from_svg(image_local)
+            except Exception:
+                feedback(
+                    f'Unable to open and process the image "{image_location}"', True
+                )
+                return None, None
+        except IsADirectoryError:
+            feedback(f'The image "{image_location}" is a directory', False, True)
+            return None, None
+
+        return img, image_local
+
+    def insert_image(
+        self,
+        pdf_page: muPage,
+        image: Image,
+        filename: str = None,
+        origin: tuple = None,
+        sliced: str = None,
+        width_height: tuple = None,
+        rotation: float = 0,
+    ) -> Image:
+        """Insert a PIL Image already loaded from a file or website.
+
+        Args:
+            image (Image):
+                binary PIL Image
+            filename (str):
+                known path of Image
             origin (tuple):
                 x, y location of image on Page
             sliced (str):
@@ -2036,46 +2141,44 @@ class BaseShape:
                 the (width, height) of the output frame for the image;
                 will be used along with x,y to set size and position;
                 will be recalculated if image has a rotation
-            cache_directory (str):
-                where to store a local for copy for URL-sourced images
             rotation (float):
                 angle of image rotation (in degrees)
 
         Returns:
-            tuple:
-
-            - Image
-            - boolean (True if file is a directory)
+            Image
 
         Notes:
 
         """
 
         def slice_image(
-            img_path, slice_portion: str = None, width_height: tuple = (1, 1)
-        ) -> str:
-            """Slice off a portion of an image while maintaining its aspect ratio
+            img: Image, slice_portion: str = None, width_height: tuple = (1, 1)
+        ) -> tuple:
+            """Slice off a portion of an Image while maintaining its aspect ratio
 
             Args:
-                img_path (Pathlib):
-                    Pathlib file
+                img (Image):
+                    the binary PIL Image
                 slice_portion (str):
                     what portion of the image to return
                 width_height (tuple):
                     the (width, height) of the output frame for the image
 
             Returns:
-                filename (str): path to sliced image
+                tuple (Image, str):
+                    return the new binary PIL image and the filename
 
             Note:
-                Uses the CACHE_DIRECTORY to store these (temporary) images
+                * Uses the CACHE_DIRECTORY to store these (temporary) images
+                * An Image object has a filename attribute only if it was opened
+                  using Image.open(). An image created from scratch will NOT have
+                  this attribute; keep track of the file path using a variable
             """
-            # feedback(f"### {img_path=} {slice_portion=}")
+            # feedback(f"### slice! {img=} {slice_portion=} {width_height=}")
             if not slice_portion:
-                return None
+                return (None, None)
             try:
                 _slice = _lower(slice_portion)
-                img = Image.open(img_path)
                 iwidth = img.size[0]
                 iheight = img.size[1]
                 icentre = (int(iwidth / 2), int(iheight / 2))
@@ -2085,15 +2188,19 @@ class BaseShape:
                     slice_height = int(
                         min(iwidth * (width_height[1] / width_height[0]), iheight)
                     )
+                    slice_height = slice_height // 3
                 # calculate width of vertical slice
                 elif _slice[0] in ["l", "c", "r"]:
                     slice_width = int(
                         min(iheight * (width_height[0] / width_height[1]), iwidth)
                     )
+                    slice_width = slice_width // 3
                 else:
                     feedback(f'The sliced value "{slice_portion}" is not valid!', True)
                 # crop - needs a "box" which accepts a tuple with four values for
                 #        the rectangle: left, upper, right, and lower
+                img2 = None
+                # print(f"{slice_width=} {slice_height=}  {iwidth=} {iheight=}")
                 match _slice[0]:
                     case "t":  # top (horizontal slice)
                         img2 = img.crop((0, 0, iwidth, slice_height))
@@ -2111,45 +2218,29 @@ class BaseShape:
                         img2 = img.crop((iwidth - slice_width, 0, iwidth, iheight))
                     case _:
                         raise NotImplementedError(f"Cannot process {slice_portion}")
+
                 # create new file with sliced image
                 try:
                     cache_directory = get_cache()
-                    img2_filename = img_path.stem + "_" + _slice[0] + img_path.suffix
+                    f_p = Path(img.filename)
+                    img2_filename = f_p.stem + "_" + _slice[0] + f_p.suffix
                     sliced_filename = os.path.join(cache_directory, img2_filename)
                     img2.save(sliced_filename)
-                    return sliced_filename
+                    # see Notes above as to why to return the filename
+                    return (img2, sliced_filename)
                 except Exception as err:
                     feedback(
                         f'Unable to save image slice "{slice_portion}" - {err}', True
                     )
+                    return (None, None)
             except Exception as err:
                 feedback(
                     f'The sliced value "{slice_portion}" is not valid! ({err})', True
                 )
-            return None
+            return (None, None)
 
-        def get_image_from_svg(image_location: str = None):
-            """Load SVG image and convert to PNG."""
-            with open(image_location) as f:
-                svg_code = f.read()
-            png_bytes = cairosvg.svg2png(bytestring=svg_code.encode("utf-8"), dpi=300)
-            image = Image.open(io.BytesIO(png_bytes))
-            return image
-
-        def save_image_from_url(url: str):
-            """Download image from network and save locally if not present."""
-            # feedback(f"### image save: {url=} ")
-            loc = urlparse(url)
-            filename = loc.path.split("/")[-1]
-            image_local = os.path.join(cache_directory, filename)
-            if not os.path.exists(image_local):
-                image = requests.get(url)
-                with open(image_local, "wb") as f:
-                    f.write(image.content)
-            return image_local
-
-        def image_bbox_resize(bbox: muRect, img_path: str, rotation: float) -> muRect:
-            """Recompute bounding Rect for image with rotation to maintain image size.
+        def image_bbox_resize(bbox: muRect, img: Image, rotation: float) -> muRect:
+            """Recompute bounding Rect for Image with rotation to maintain image size.
 
             Args
                 bbox: pymupdf Rect; original bounding box for the image
@@ -2169,13 +2260,6 @@ class BaseShape:
             # Compute the rectangle hull of the Quad for new boundary box
             new_bbox = quad.rect
             # Check image dimensions and ratios
-            try:
-                img = Image.open(img_path)
-            except UnidentifiedImageError:
-                try:
-                    img = get_image_from_svg(img_path)
-                except Exception:
-                    feedback(f'Unable to open and process the image "{img_path}"', True)
             iwidth = img.size[0]
             iheight = img.size[1]
             iratio = iwidth / iheight
@@ -2204,14 +2288,22 @@ class BaseShape:
                 )
             return new_bbox
 
-        def image_render(image_location) -> object:
-            """Load, first from local cache then network, and draw."""
-            image_local = image_location
+        def image_render(img: Image, image_filename: str = None) -> object:
+            """Draw a PIL Image."""
+            try:
+                image_local = img.filename  # only exist for open() image from file
+            except AttributeError:
+                image_local = (
+                    image_filename  # need for this for new save() or stream image
+                )
+            if not image_local:
+                image_local = image_filename
+            if not image_local:
+                feedback(
+                    "The Image's filename was not supplied or could not be determined.",
+                    True,
+                )
             image_doc = None
-            if cache_directory:
-                if tools.is_url_valid(image_location):
-                    image_local = save_image_from_url(image_location)
-
             # ---- alter image
             if self.operation:
                 if not isinstance(self.operation, list):
@@ -2270,74 +2362,44 @@ class BaseShape:
                 overlay=True,  # put in foreground
             )
             if self.run_debug:
-                pdf_page.draw_rect(rct, color=colrs.get_color(DEBUG_COLOR))
+                DEBUG_COLOR = (
+                    CMYK_DEBUG_COLOR
+                    if globals.color_model == "CMYK"
+                    else RGB_DEBUG_COLOR
+                )
+                debug_color = self.defaults.get("debug_color", DEBUG_COLOR)
+                pdf_page.draw_rect(rct, color=colrs.get_color(debug_color))
             return image_local
-
-        img = False
-        is_directory = False
-
-        if not image_location:  # not the droids you're looking for... move along
-            return img, None
-        base_image_location = image_location
-
-        if cache_directory:
-            if tools.is_url_valid(image_location):
-                image_local = save_image_from_url(image_location)
-        # ---- check local files
-        if not tools.is_url_valid(image_location):
-            # relative paths
-            if not os.path.isabs(image_location):
-                filepath = tools.script_path()
-                image_local = os.path.join(filepath, image_location)
-            else:
-                image_local = image_location
-            # no filename
-            is_directory = os.path.isdir(image_local)
-            if is_directory:
-                return img, True
-            # check image exists
-            if platform == "linux" or platform == "linux2":
-                image_local = os.path.normpath(image_local.replace("\\", "/")).replace(
-                    os.sep, "/"
-                )
-            if not os.path.exists(image_local):
-                feedback(
-                    f'Unable to find or open image "{image_location}" (also tried in "{image_local}"',
-                    False,
-                    True,
-                )
-                return img, True
 
         # ---- calculate BBOX for image
         width, height = width_height[0], width_height[1]
         scaffold = (origin[0], origin[1], origin[0] + width, origin[1] + height)
         if rotation is not None:
             # need a larger rect!
-            new_origin = image_bbox_resize(muRect(scaffold), image_local, rotation)
+            new_origin = image_bbox_resize(muRect(scaffold), image, rotation)
             scaffold = (
                 new_origin[0],
                 new_origin[1],
                 new_origin[2],
                 new_origin[3],
             )
-
         # ---- render image
         try:
             if sliced:
-                sliced_filename = slice_image(Path(image_local), sliced, width_height)
-                if sliced_filename:
-                    img = image_render(sliced_filename)
+                the_sliced_image, slice_filename = slice_image(
+                    image, sliced, width_height
+                )
+                img = image_render(the_sliced_image, image_filename=slice_filename)
             else:
-                img = image_render(image_local)
-            return img, is_directory
+                img = image_render(image, filename)
+            return img
         except IOError as err:
             feedback(
-                f'Unable to find or open image "{base_image_location}"' f" ({err}).",
+                f'Unable to find or open the image at "{filename}"' f" ({err}).",
                 False,
                 True,
             )
-
-        return img, is_directory
+        return image
 
     def process_template(self, _dict):
         """Set values for properties based on those defined in a dictionary."""
@@ -2485,10 +2547,11 @@ class BaseShape:
         keys = {}
         keys["fontsize"] = kwargs.get("font_size", self.font_size)
         keys["fontname"] = kwargs.get("font_name", self.font_name)
+        if isinstance(keys["fontname"], list):
+            keys["fontname"] = tuple(keys["fontname"])
         font, keys["fontfile"], keys["fontname"], keys["mu_font"] = (
             tools.get_font_by_name(keys["fontname"])
         )
-
         _outlined = kwargs.get("outlined", self.outlined)
         if _outlined:
             keys["render_mode"] = 2  # default render_mode=0
@@ -2726,6 +2789,7 @@ class BaseShape:
         #      this may include the item's sequence number and current page
         _locale = kwargs.get("locale", None)
         if _locale:
+            # feedback(f"\n### multistring {string=} {_locale=}")
             string = tools.eval_template(string, _locale)
         # ---- align and font
         align = align or self.align
@@ -2857,11 +2921,12 @@ class BaseShape:
 
         Requires native units (i.e. points)!
         """
-        # feedback(f' @@@ base.draw_label {kwargs=}')
+        # feedback(f' @@@ base.draw_label {ID=} {kwargs.keys()=}')
         if kwargs.get("label_sequence", False):
             self.label = f"{ID}"
         ttext = self.textify(index=ID, text=self.label, default=False)
         _rotation = rotation or self.label_rotation
+        # feedback(f' @@@ base.draw_label {ID=} {ttext=}')
         if ttext is not None or ttext != "":
             _ttext = str(ttext)
             yl = yl + (self.label_size / 3.0) if centred else yl
@@ -3004,11 +3069,16 @@ class BaseShape:
     def draw_arrowhead(
         self, cnv, point_start: geoms.Point, point_end: geoms.Point, **kwargs
     ):
-        """Draw arrowhead at the end of a straight line segment
+        """Draw arrowhead at the end of a line segment
 
         Args:
             point_start: start point of line
             point_end: end point of line
+
+        Notes:
+            * for curved lines, the kwargs should include circle_centre and
+              circle_radius - these are used to recalculate the point_start
+              based on a chord for the circle
         """
         self.arrow_style = self.arrow_style or "triangle"  # default
         if self.arrow_position:
@@ -3048,8 +3118,20 @@ class BaseShape:
             kwargs["stroke"] = self.arrow_stroke or self.stroke
             kwargs["fill"] = self.arrow_fill or self.stroke
             kwargs["closed"] = True
+            # curved line?
+            ccentre = kwargs.get("circle_centre", None)
+            cradius = kwargs.get("circle_radius", None)
+            curve = kwargs.get("curve", 0)
+            if ccentre and cradius:
+                # recalc point_start using chord on the circle
+                end_pts = geoms.circle_chord_endpoints(
+                    ccentre, cradius, point_end, head_height
+                )
+                if curve >= 0:
+                    point_start = end_pts[1]
+                else:
+                    point_start = end_pts[0]  # reverse direction
             deg, _ = geoms.angles_from_points(point_start, point_end)
-            # print(f'{deg=} {angle=} ')
             if point_start.x != point_end.x:
                 kwargs["rotation"] = 180 + deg
                 kwargs["rotation_point"] = the_tip
@@ -3065,7 +3147,7 @@ class BaseShape:
                 case "triangle" | "t":
                     pass
                 case "spear" | "s":
-                    pt4 = geoms.Point(the_tip.x, the_tip.y + 2 * head_height)
+                    pt4 = geoms.Point(the_tip.x, the_tip.y + 2.0 * head_height)
                     vertexes.append(pt4)
                 case "angle" | "angled" | "a":
                     kwargs["stroke_width"] = self.stroke_width
@@ -3074,10 +3156,18 @@ class BaseShape:
                 case "notch" | "notched" | "n":
                     pt4 = geoms.Point(the_tip.x, the_tip.y + 0.5 * head_height)
                     vertexes.append(pt4)
-            # set props
-            # print(f'{vertexes=}' {kwargs=}')
+                case "circle" | "c":
+                    pt4 = geoms.point_on_line(point_end, point_start, head_height / 2.0)
+            # ---- draw and set props
+            # print(f'*** {vertexes=} {kwargs=}')
             self._debug(cnv, vertices=vertexes)  # needs: self.debug=True
-            cnv.draw_polyline(vertexes)
+            match _lower(self.arrow_style):
+                case "circle" | "c":
+                    cnv.draw_circle(center=(pt4.x, pt4.y), radius=head_width / 2.0)
+                    kwargs["rotation"] = None
+                    kwargs["rotation_point"] = None
+                case _:
+                    cnv.draw_polyline(vertexes)
             self.set_canvas_props(cnv=cnv, index=None, **kwargs)
 
     def make_path_vertices(self, cnv, vertices: list, v1: int, v2: int):
@@ -3098,11 +3188,11 @@ class BaseShape:
 
         Args:
             side: length of a side
-            line_count: number of connections
+            line_count: number of connecting lines
             vertices: list of the Points making up the shape
             left_nodes: IDs of the two vertices on either end of one of the sides
             right_nodes: IDs of the two vertices on either end of the opposite side
-            skip_ends: if True, do not draw the first or last connection
+            skip_ends: if True, do not draw the first or last connecting line
 
         Note:
             * Vertices normally go clockwise from bottom/lower left
@@ -3118,7 +3208,7 @@ class BaseShape:
             vertices[right_nodes[0]], vertices[right_nodes[1]]
         )
         delta_right = right_length / (line_count + 1)
-        # feedback(f'### lineJoin {line_count=} {delta_left=} {delta_right=}')
+        # feedback(f'### draw_lines_between {line_count=} {delta_left=} {delta_right=}')
         for number in range(0, line_count + 2):
             if skip_ends:
                 if number == line_count + 1 or number == 0:
@@ -3425,7 +3515,7 @@ class BaseShape:
                 cx, cy = vertices[idx][0], vertices[idx][1]
                 if rotated:
                     compass, rotation = geoms.angles_from_points(centre, vertices[idx])
-                    # print(f"{idx} {compass=} {rotation=}")
+                    # print(f"*** {idx=} {compass=} {rotation=}")
                 else:
                     compass = 180.0
                 vshape.draw(
