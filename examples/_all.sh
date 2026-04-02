@@ -16,6 +16,7 @@ python core/customised_hexagon.py
 python core/customised_hexagonal_grid.py
 python core/customised_hexagonal_grid_locations.py
 python core/customised_hexhex.py
+python core/customised_line.py
 python core/customised_rectangle.py
 python core/customised_shapes.py
 python core/customised_text.py
@@ -54,6 +55,7 @@ python boards/abstract/tictactoe.py
 # ---- boards: commercial
 echo -e "\nCreating commercial boards..."
 python boards/commercial/ack_map.py
+python boards/commercial/catan.py
 python boards/commercial/kensington.py
 python boards/commercial/orion_game_board.py
 python boards/commercial/squadleader.py

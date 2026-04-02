@@ -16,6 +16,7 @@ python core/customised_hexagon.py --no-png -d /tmp/demo
 python core/customised_hexagonal_grid.py --no-png -d /tmp/demo
 python core/customised_hexagonal_grid_locations.py --no-png -d /tmp/demo
 python core/customised_hexhex.py --no-png -d /tmp/demo
+python core/customised_line.py --no-png -d /tmp/demo
 python core/customised_rectangle.py --no-png -d /tmp/demo
 python core/customised_shapes.py --no-png -d /tmp/demo
 python core/customised_text.py --no-png -d /tmp/demo
@@ -56,6 +57,7 @@ echo -e "\nCreating New Classic boards..."
 # ---- boards: commercial
 echo -e "\nCreating commercial boards..."
 python boards/commercial/ack_map.py --no-png -d /tmp/demo
+python boards/commercial/catan.py --no-png -d /tmp/demo
 python boards/commercial/kensington.py --no-png -d /tmp/demo
 python boards/commercial/orion_game_board.py --no-png -d /tmp/demo
 python boards/commercial/squadleader.py --no-png -d /tmp/demo

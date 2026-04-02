@@ -2,6 +2,7 @@
 """
 Support functions for Shapes for protograf
 """
+
 # lib
 import copy
 import logging
@@ -11,10 +12,11 @@ from urllib.parse import urlparse
 # third party
 
 # local
+from protograf import globals
 from protograf.base import (
     BaseShape,
 )
-from protograf.utils import tools
+from protograf.utils import geoms, tools
 from protograf.utils.tools import _lower
 from protograf.utils.constants import (
     BGG_IMAGES,
@@ -68,8 +70,6 @@ def draw_line(
     """
     result = False
     if start and end and cnv:
-        if kwargs.get("wave_height") and kwargs.get("curve"):
-            feedback("A line cannot use a wave_style and curve together", True)
         if kwargs.get("wave_height"):
             _height = tools.as_float(kwargs.get("wave_height", 0.5), "wave_height")
             try:
@@ -102,3 +102,75 @@ def draw_line(
         klargs["fill"] = None
         return klargs
     return kwargs
+
+
+def draw_line_curve(
+    cnv=None,
+    start: Point = None,
+    end: Point = None,
+    curve_height: float = None,
+    **kwargs,
+) -> dict:
+    """Draw a curved line on the canvas (Page) between two points for a Shape.
+
+    Args:
+
+        cnv (PyMuPDF Page object):
+            where the line is drawn
+        start (Point):
+            start of the line
+        end (Point):
+            end of the line
+        curve_height (float):
+            height of curve above centre point of line
+
+    Returns:
+        tuple:
+            kwargs (modified for styled lines)
+            curve_point (Point): middle of the curve (on the circle)
+            centre (Point): centre of circle used to draw curve
+            radius (Point): radius of circle used to draw curve
+
+    Notes:
+        * If kwargs contains `draw=False` the line will NOT be drawn
+
+    """
+    # from protograf.utils.tools import _p2v
+    result = False
+    if start and end and curve_height:
+        line_centre = geoms.fraction_along_line(start, end, 0.5)
+        # feedback(f'***Line Curve Start:{_p2v(start)} End:{_p2v(end)} M:{_p2v(line_centre)}')
+        _, rotation = geoms.angles_from_points(start, end)
+        if curve_height < 0:
+            adjust = 90
+            begin = start
+        else:
+            adjust = -90
+            begin = end
+        u_curve_height = tools.unit(curve_height)
+        curve_point = geoms.point_from_angle(
+            line_centre, abs(u_curve_height), rotation + adjust
+        )
+        # feedback(f'***Line Curve Point: {_p2v(curve_point)}')
+        ccentre, radius = geoms.centre_radius_from_points(start, curve_point, end)
+        # feedback(f'***Line Curve Cntre: {_p2v(ccentre)} {radius/globals.units=}')
+        if curve_height > 0:
+            angle_width = geoms.circle_angle_between_points(start, end, ccentre)
+        else:
+            angle_width = geoms.circle_angle_between_points(end, start, ccentre)
+        # feedback(f'***Line Curve: {start=} {end=} {u_curve_height=} {angle_width=}')
+        if cnv and kwargs.get("draw", True):
+            cnv.draw_sector(  # anti-clockwise from a pt; 90° default
+                (ccentre.x, ccentre.y),
+                (begin.x, begin.y),
+                angle_width,
+                fullSector=False,
+            )
+        result = True
+    if result:
+        klargs = copy.copy(kwargs)
+        klargs["closed"] = False
+        klargs["fill"] = None  # may want to allow this? curve_fill?
+        # tangent_angle = geoms.circle_tangent_angle(ccentre, end)
+        return kwargs, curve_point, ccentre, radius
+    return kwargs, None, None, None

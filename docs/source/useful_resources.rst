@@ -7,8 +7,25 @@ game design when working with :doc:`protograf <index>`.
 
 .. NOTE::
 
-   Inclusion of these links does **not** constitute a recommendation!
-   As always, check the conditions of use and any terms and conditions.
+   Inclusion of these resources does **not** constitute a recommendation! As
+   always, check how they are allowed to be used and any terms and conditions.
+
+
+Prototyping Tools
+=================
+
+- https://www.ttgda.org/software-tools - lists a number of tools that
+  can be used for game design
+- https://github.com/christianbachmann/board-game-design-canvas - an outline
+  for a game development process that can help choose *what* you need to
+  prototype
+
+.. HINT::
+
+    Please also refer to the sections on
+    :ref:`hexagonal grid resources <other-hexagonal-resources>`
+    as well as  :ref:`playing cards resources <other-card-resources>`.
+
 
 Icons, Art and Images
 =====================
@@ -27,6 +44,8 @@ Icons, Art and Images
    of free-to-use small icons in PNG/SVG format
 -  https://www.the-blueprints.com/blueprints/ - outlines and drawings of
    military and other equipment and objects... plus a skull or two
+-  https://www.deviantart.com/sharandra/gallery/38764181/stock-textures - images
+   that can be used to fill in background areas (check license and attribution)
 
 There is a collated list of sites with free *artwork* at
 https://www.fairway3games.com/where-do-i-get-art-for-free-an-ongoing-list/
@@ -64,22 +83,6 @@ U+2BFF (Miscellaneous Symbols and Arrows) are likely to be of interest.
 .. NOTE::
 
     Not all Unicode characters can be displayed in all fonts!
-
-
-Other Tools
-===========
-
-- https://www.ttgda.org/software-tools - lists a number of tools that
-  can be used for game design
-- https://github.com/christianbachmann/board-game-design-canvas - an outline
-  for a game development process that can help choose *what* you need to
-  prototype
-
-.. HINT::
-
-    Please also refer to the sections on
-    :ref:`hexagonal grid resources <other-hexagonal-resources>`
-    as well as  :ref:`playing cards resources <other-card-resources>`.
 
 
 BoardGameGeek

@@ -230,7 +230,7 @@ number of shapes.
 - `Example 3. Rotated Text`_
 - `Example 4. Wrap-Styled Text`_
 - `Example 5. Wrap-Aligned Text`_
-- `Example 6. Custom Fonts`_
+- `Example 6. Custom Fonts and Fallbacks`_
 
 
 Example 1. Customised Text
@@ -554,8 +554,8 @@ Example 5. Wrap-Aligned Text
 ===== ======
 
 
-Example 6. Custom Fonts
-+++++++++++++++++++++++
+Example 6. Custom Fonts and Fallbacks
++++++++++++++++++++++++++++++++++++++
 `^ <textIndex_>`_
 
 Many fonts, such as the ones shown in this example, are typically **not**
@@ -576,7 +576,23 @@ The best way to use custom fonts in a script is to "activate" them with the
   would have been indexed.  If you later install new fonts you want to use,
   then you need to add in the ``cached_fonts=False`` property to the
   ``Create()`` command at the start of the script. You only need to do this
-  once after new font install, and then the property can be removed.
+  *once* after a new font is installed, and then the property can be removed.
+
+Fallbacks
+~~~~~~~~~
+
+If a custom font is **not** found when the script is run, then
+:doc:`protograf <index>` will "fallback" to using the default font of
+``Helvetica``, which is guaranteed to be available for any PDF document.
+
+However, you can provide your own alternatives for the fallback.  Use
+the syntax of a list of font names (inside a pair of ``[``..``]`` brackets).
+These will be used in the order given; for example, if the first font is
+not found, then the second is used, as so on:
+
+.. code:: python
+
+    font_name=["Superior Font", "Arial", "Helvetica"]
 
 
 .. |t07| image:: images/customised/text_fonts.png
@@ -593,7 +609,8 @@ The best way to use custom fonts in a script is to "activate" them with the
         Font("FreeMono")
 
         Text(x=0, y=0.5, width=4, height=1.5,
-             align="left", font_name="Tektur",
+             align="left",
+             font_name=["Tektur", "Arial"],
              text="AbcEJZ?0&")
 
         Text(x=0, y=1, width=4, height=1.25, wrap=True,

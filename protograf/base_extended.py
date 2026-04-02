@@ -2,6 +2,7 @@
 """
 Base shape - extended classes for protograf
 """
+
 # base
 import re
 

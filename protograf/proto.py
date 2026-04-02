@@ -5,6 +5,7 @@ Primary interface for protograf (imported at top-level)
 Note:
     Some imports here are for sake of reuse by the top-level import
 """
+
 # lib
 import argparse
 from collections import namedtuple
@@ -1025,6 +1026,7 @@ class DeckOfCards:
                 row, col = 0, max_cols - 1  # draw left-to-right for back
             card_number = start_card
 
+            rendered_one = False
             for card_num in range(start_card, card_count):
                 card_number = card_num
 
@@ -1079,7 +1081,8 @@ class DeckOfCards:
                         cardname = card.deck_data[card_num].get(self.card_name, None)
                         kwargs["cardname"] = cardname
 
-                    for i in range(state.copies_to_do, copies):
+                    for i in range(state.copies_done, copies):
+                        rendered_one = True
                         if not front:
                             kwargs["card_back"] = True  # de/activate grid marks & shift
                         else:
@@ -1133,20 +1136,27 @@ class DeckOfCards:
                             # print(f"$$$ card_draw - RETURN FROM rows / {front=} : {card_number + 1}")
                             return cnv, DeckPrintState(
                                 card_count=state.card_count,
-                                card_number=card_number + 1,
-                                copies_to_do=copies - i - 1,
+                                card_number=card_number,
+                                copies_done=i + 1,
                                 start_x=0,
                             )
-
-            # if card_num >= deck_length:
-            PageBreak(**kwargs)
-            cnv = globals.canvas  # new one from page break
-            self.draw_bleed(cnv, page_across, page_down)
+                state = DeckPrintState(
+                    card_count=state.card_count,
+                    card_number=card_number,
+                    copies_done=0,
+                    start_x=0,
+                )
+            if rendered_one:
+                # If we're here, the last call finished rendering without a full page
+                # We need to add a page break to match what happens when it finishes with a full page
+                PageBreak(**kwargs)
+                cnv = globals.canvas  # new one from page break
+                self.draw_bleed(cnv, page_across, page_down)
             # print(f"$$$ card_draw - RETURN FROM end  / {front=} : {card_number + 1}")
             return cnv, DeckPrintState(
                 card_count=state.card_count,
                 card_number=card_number + 1,
-                copies_to_do=0,
+                copies_done=0,
                 start_x=0,
             )
 
@@ -1332,10 +1342,10 @@ class DeckOfCards:
         # ---- prep for card drawing
         page_number = -1
         state_front = DeckPrintState(
-            card_count=len(self.fronts), card_number=0, copies_to_do=0, start_x=0
+            card_count=len(self.fronts), card_number=0, copies_done=0, start_x=0
         )
         state_back = DeckPrintState(
-            card_count=len(self.backs), card_number=0, copies_to_do=0, start_x=0
+            card_count=len(self.backs), card_number=0, copies_done=0, start_x=0
         )
         for back in self.backs:
             if back.elements:
@@ -2175,7 +2185,10 @@ def Save(**kwargs):
         )
 
     # ---- update current pymupdf Shape
-    globals.canvas.commit()  # add all drawings (to current pymupdf Shape)
+    try:
+        globals.canvas.commit()  # add all drawings (to current pymupdf Shape)
+    except AssertionError:
+        pass  # ignore `assert 0, f'page is None'` from pymupdf
 
     # ---- save all Pages to file
     msg = "Please check the folder exists and that you have access rights."
@@ -2184,10 +2197,10 @@ def Save(**kwargs):
     # print(f'$$$ SAVE {output_filepath=}')
     try:
         globals.document.subset_fonts(verbose=True)  # subset fonts to reduce file size
-        globals.document.save(output_filepath)
+        globals.document.save(output_filepath, garbage=4)  # remove unused & duplicates
     # TODO - allow appending?
     except ValueError as err:
-        feedback(f'Unable to overwrite "{output_filepath}"', False, True)
+        feedback(f'Unable to overwrite "{output_filepath} - {err}"', False, True)
     except RuntimeError as err:
         feedback(f'Unable to save "{output_filepath}" - {err} - {msg}', True)
     except FileNotFoundError as err:
@@ -2292,7 +2305,7 @@ def Font(name=None, **kwargs):
 
     Args:
 
-    - name (str): the name of the Font
+    - name (str|list): the name of the Font(s)
 
     Kwargs:
 
@@ -4222,7 +4235,7 @@ def Blueprint(**kwargs):
     if kwargs["fill"] is not None:
         fill = colrs.get_color(kwargs.get("fill", RGB_WHITE))
         globals.canvas.draw_rect((0, 0, globals.page[0], globals.page[1]))
-        globals.canvas.finish(fill=fill)
+        globals.canvas.finish(fill=fill, lineJoin=0)
     kwargs["fill"] = kwargs.get("fill", line_stroke)  # revert back for font
     # ---- number edges
     if number_edges:
@@ -5127,7 +5140,7 @@ def Layout(grid, **kwargs):
             _key = rotation[0]
             if not isinstance(_key, str):
                 feedback(
-                    "The first value for rreach 'rotations' entry must be a string!",
+                    "The first value for each 'rotations' entry must be a string!",
                     True,
                 )
             rotate = tools.as_float(

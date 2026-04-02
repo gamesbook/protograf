@@ -94,7 +94,9 @@ Text(common=header, text="AdHoc Design")
 Polyomino(
     x=0, y=1,
     pattern=['1001', '0110', '0100', '1001'],
-    fill="silver")
+    fill="seagreen",
+    blank_fill="tan",
+)
 
 Save(
     output='png',

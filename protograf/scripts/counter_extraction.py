@@ -2,6 +2,7 @@
 """
 protograf script: extract rectangular counters as individual images
 """
+
 # lib
 import configparser
 import os

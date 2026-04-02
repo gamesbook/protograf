@@ -2,6 +2,7 @@
 """
 Color-specific utility functions for protograf
 """
+
 # lib
 from colorsys import rgb_to_hls, hls_to_rgb
 

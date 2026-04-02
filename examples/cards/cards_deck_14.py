@@ -10,10 +10,10 @@ Create(filename='cards_deck_14.pdf', margin=0.25, paper="A8")
 
 # design deck
 page_header = text(
-    text="protograf-cards_deck#14 // page:{{page}}",
+    text="protograf-cards_deck#14 // Page:{{page}}",
     x=2.5, y=0.5, font_size=6, )
 silver = rectangle(
-     x=0.5, y=0.75, width=4, height=4,
+     x=0.5, y=0.75, width=4, height=3,
      fill_stroke="silver")
 gold = rectangle(
      x=0.5, y=3.75, width=4, height=3,
@@ -30,11 +30,8 @@ Deck(
     grouping_cols=2,
     grouping_rows=4,
     stroke=None,
-    zones=[
-        ('*', page_header),
-        ('1', silver),
-        ('1', gold)]
-    )
+    zones=[('1', silver),('1', gold),('*', page_header)]
+)
 # design card
 Card(
     '1-16',

@@ -2,6 +2,7 @@
 """
 Create Rectangle shape for protograf
 """
+
 # lib
 from functools import cached_property
 import logging
@@ -21,6 +22,7 @@ from protograf.utils.structures import (
     Locale,
     Perbis,
     Point,
+    PointLocations,
     Radius,
     ShapeGeometry,
     Vertex,
@@ -85,10 +87,30 @@ class RectangleShape(BaseShape):
         """Centre of Rectangle."""
         return None
 
-    @cached_property
-    def shape_vertices(self) -> dict:
-        """Vertices of Rectangle."""
-        return {}
+    @property
+    def pts(self) -> dict:
+        """Vertices, Perbises and Centre of Rectangle (in user units)."""
+        mx = globals.margins[0]
+        my = globals.margins[1]
+        print(mx, my)
+        breakpoint()
+        _type = type(self)
+        cntr = self._shape_centre
+        cntr_user = Point(cntr.x / self.units - mx, cntr.y / self.units - my)
+        vtcs = self._shape_vertexes
+        return PointLocations(
+            centre=cntr_user,
+            center=cntr_user,
+            c=cntr_user,
+            ne=Point(vtcs[0].x / self.units - mx, vtcs[0].y / self.units - my),
+            se=Point(vtcs[1].x / self.units - mx, vtcs[1].y / self.units - my),
+            sw=Point(vtcs[2].x / self.units - mx, vtcs[2].y / self.units - my),
+            nw=Point(vtcs[3].x / self.units - mx, vtcs[3].y / self.units - my),
+            t=_type,
+            type=_type,
+            shapetype=_type,
+            name=self.simple_name(self),
+        )
 
     @cached_property
     def shape_geom(self) -> ShapeGeometry:
@@ -519,6 +541,8 @@ class RectangleShape(BaseShape):
             _corners = [str(crn).upper() for crn in _crnrs]
         else:
             _corners = []
+        if not _corners:
+            return  # move along, move along...
         # feedback(f'*** Rect corners {_corners=} ')
         o_x = self.unit(self.corners_x) if self.corners_x else self.unit(self.corners)
         o_y = self.unit(self.corners_y) if self.corners_y else self.unit(self.corners)
@@ -754,6 +778,60 @@ class RectangleShape(BaseShape):
         gargs["dotted"] = self.corners_dots
         self.set_canvas_props(cnv=None, index=ID, **gargs)
 
+    def draw_arch_rectangle(self, cnv, x, y):
+        """Draw a Rectangle with outward curved corners."""
+        if self.notch_directions:
+            _ntches = self.notch_directions.split()
+            _notches = [str(ntc).upper() for ntc in _ntches]
+        else:
+            _notches = []
+        bend = 0.01
+        # feedback(f'*** Rect arch {self.notch_x=} {self.notch_y=} {_notches=} ')
+        n_x = self.unit(self.notch_x) if self.notch_x else self.unit(self.notch)
+        n_y = self.unit(self.notch_y) if self.notch_y else self.unit(self.notch)
+        # feedback(f'*** Rect bite {n_x=} {n_y=} ')
+        if "NW" in _notches:
+            p1 = Point(x, y + n_y)
+        else:
+            p1 = Point(x, y)
+        if "SW" in _notches:
+            p2 = Point(x, y + self._u.height - n_y)
+            p3 = Point(x + n_x, y + self._u.height)
+            pm = Point(x - bend * n_x, y + self._u.height + bend * n_y)
+            cnv.draw_line(p1, p2)
+            cnv.draw_curve(p2, pm, p3)
+        else:
+            p2 = Point(x, y + self._u.height)
+            p3 = p2
+            cnv.draw_line(p1, p3)
+        if "SE" in _notches:
+            p4 = Point(x + self._u.width - n_x, y + self._u.height)
+            p5 = Point(x + self._u.width, y + self._u.height - n_y)
+            pm = Point(x + self._u.width + bend * n_x, y + self._u.height + bend * n_y)
+            cnv.draw_line(p3, p4)
+            cnv.draw_curve(p4, pm, p5)
+        else:
+            p4 = Point(x + self._u.width, y + self._u.height)
+            p5 = p4
+            cnv.draw_line(p3, p5)
+        if "NE" in _notches:
+            p6 = Point(x + self._u.width, y + n_y)
+            p7 = Point(x + self._u.width - n_x, y)
+            pm = Point(x + self._u.width + bend * n_x, y - bend * n_y)
+            cnv.draw_line(p5, p6)
+            cnv.draw_curve(p6, pm, p7)
+        else:
+            p6 = Point(x + self._u.width, y)
+            p7 = p6
+            cnv.draw_line(p5, p7)
+        if "NW" in _notches:
+            p8 = Point(x + n_x, y)
+            pm = Point(x - bend * n_x, y - bend * n_y)
+            cnv.draw_line(p7, p8)
+            cnv.draw_curve(p8, pm, p1)
+        else:
+            cnv.draw_line(p7, p1)
+
     def draw_bite_rectangle(self, cnv, x, y):
         """Draw a Rectangle with inward curved corners."""
         if self.notch_directions:
@@ -978,7 +1056,7 @@ class RectangleShape(BaseShape):
                 for a polygon, each edge is effectively a chord.
         """
         # vertices = self._shape_vertexes
-        perbii_dict = self.calculate_perbii(centre=centre)
+        perbii_dict = self.calculate_perbii(centre=centre, rotation=rotation)
         pb_length = (
             self.unit(self.perbii_length, label="perbii length")
             if self.perbii_length
@@ -1538,7 +1616,7 @@ class RectangleShape(BaseShape):
         self.vertexes = []
         # ---- * notch vertices
         if is_notched:
-            if _lower(self.notch_style) not in ["b", "bite"]:
+            if _lower(self.notch_style) not in ["b", "bite", "b", "arch", "arc"]:
                 self.set_notch_vertexes(x, y)
         # ---- * prows - line/arc endpoints
         elif is_prows:
@@ -1829,6 +1907,8 @@ class RectangleShape(BaseShape):
                     # feedback(f'*** RECT  vertices')
                     if _lower(self.notch_style) in ["b", "bite"]:
                         self.draw_bite_rectangle(cnv, x, y)
+                    elif _lower(self.notch_style) in ["a", "arch", "arc"]:
+                        self.draw_arch_rectangle(cnv, x, y)
                     else:
                         cnv.draw_polyline(self.vertexes)
                         kwargs["closed"] = True
@@ -1865,27 +1945,6 @@ class RectangleShape(BaseShape):
                 # ---- * fill pattern?
                 if self.fill_pattern:
                     raise NotImplementedError("Fill pattern is not yet supported!")
-                    # TODO - convert to PyMuPDF
-                    # img, is_dir = self.load_image(self.fill_pattern)
-                    # if img:
-                    #     log.debug("IMG type:%s size:%s", type(img._image), img._image.size)
-                    #     iwidth = img._image.size[0]
-                    #     iheight = img._image.size[1]
-                    #     # repeat?
-                    #     if self.repeat:
-                    #         cnv.drawImage(
-                    #             img, x=x, y=y, width=iwidth, height=iheight, mask="auto"
-                    #         )
-                    #     else:
-                    #         # stretch
-                    #         cnv.drawImage(
-                    #             img,
-                    #             x=x,
-                    #             y=y,
-                    #             width=self._u.width,
-                    #             height=self._u.height,
-                    #             mask="auto",
-                    #         )
             if item == "slices":
                 # ---- * draw slices
                 if self.slices:

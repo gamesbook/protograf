@@ -187,13 +187,14 @@ PageBreak()
 # ---- notch_style
 Blueprint()
 Text(common=txt, text="Rectangle : Notch Styles")
-styles = Common(height=1.0, width=3.5, x=0.25,
-                notch=0.25, label_size=7, fill="lightsteelblue")
-Rectangle(common=styles, y=0.0, notch_style='snip', label='Notch: snip (s)')
-Rectangle(common=styles, y=1.25, notch_style='step', label='Notch: step (t)')
-Rectangle(common=styles, y=2.5, notch_style='fold', label='Notch: fold (d)')
-Rectangle(common=styles, y=3.75, notch_style='flap', label='Notch: flap (p)')
-Rectangle(common=styles, height=1, y=5.0, notch_style='bite', label='Notch: bite (b)')
+styles = Common(height=0.8, width=3.5, x=0.25, stroke_width=0.5,
+                notch=0.2, label_size=7, fill="lightsteelblue")
+Rectangle(common=styles, y=0, notch_style='snip', label='Notch: snip (s)')
+Rectangle(common=styles, y=1, notch_style='step', label='Notch: step (t)')
+Rectangle(common=styles, y=2, notch_style='fold', label='Notch: fold (d)')
+Rectangle(common=styles, y=3, notch_style='flap', label='Notch: flap (p)')
+Rectangle(common=styles, y=4, notch_style='bite', label='Notch: bite (b)')
+Rectangle(common=styles, y=5, notch_style='arch', label='Notch: arch (a)')
 PageBreak()
 
 # ---- borders

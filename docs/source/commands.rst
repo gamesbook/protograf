@@ -131,4 +131,5 @@ a handy cross-reference to the detailed information for that command.
    Commands marked with an asterisk (``*``) can be given with a uppercase or
    lowercase initial (``Commmand`` vs ``command``); the former meaning that
    the shape should be drawn directly at that point in the script; and the
-   latter that it should be "stored" to be drawn later.
+   latter that it should be "stored" to be drawn later. This is especially
+   relevant when specifying card designs.
