@@ -75,30 +75,15 @@ class ImageShape(BaseShape):
                 True,
             )
 
-    @cached_property
-    def shape_area(self) -> float:
-        """Area of Image."""
-        return None
-
-    @cached_property
-    def shape_centre(self) -> Point:
-        """Centre of Image."""
-        return None
-
-    @cached_property
-    def shape_vertices(self) -> dict:
-        """Vertices of Image."""
-        return {}
-
-    @cached_property
-    def shape_geom(self) -> ShapeGeometry:
-        """Geometry of Image."""
+    @property
+    def geo(self) -> ShapeGeometry:
+        """Geometry of Image in user units."""
         return ShapeGeometry()
 
-    @cached_property
-    def geom(self) -> ShapeGeometry:
-        """Geometry of Image - alias for shape_geom."""
-        return self.shape_geom
+    @property
+    def geometry(self) -> ShapeGeometry:
+        """Geometry of Image - alias for geo."""
+        return self.geo
 
     def draw(self, cnv=None, off_x=0, off_y=0, ID=None, **kwargs):
         """Show an image on a given canvas."""
@@ -261,30 +246,15 @@ class ArcShape(BaseShape):
             self.y_c = self._u.y + radius
         # feedback(f'***Arc {self.x_c=} {self.y_c=} {self.radius=}')
 
-    @cached_property
-    def shape_area(self) -> float:
-        """Area of Arc."""
-        return None
-
-    @cached_property
-    def shape_centre(self) -> Point:
-        """Centre of Arc."""
-        return None
-
-    @cached_property
-    def shape_vertices(self) -> dict:
-        """Vertices of Arc."""
-        return {}
-
-    @cached_property
-    def shape_geom(self) -> ShapeGeometry:
-        """Geometry of Arc."""
+    @property
+    def geo(self) -> ShapeGeometry:
+        """Geometry of Arc in user units."""
         return ShapeGeometry()
 
-    @cached_property
-    def geom(self) -> ShapeGeometry:
-        """Geometry of Arc - alias for shape_geom."""
-        return self.shape_geom
+    @property
+    def geometry(self) -> ShapeGeometry:
+        """Geometry of Arc - alias for geo."""
+        return self.geo
 
     def draw_nested(self, cnv, ID, centre: Point, **kwargs):
         """Draw concentric Arcs from the outer Arc inwards."""
@@ -377,30 +347,15 @@ class ArrowShape(BaseShape):
         )
         self.tail_notch_u = self.unit(self.tail_notch) if self.tail_notch else 0
 
-    @cached_property
-    def shape_area(self) -> float:
-        """Area of Arrow."""
-        return None
-
-    @cached_property
-    def shape_centre(self) -> Point:
-        """Centre of Arrow."""
-        return None
-
-    @cached_property
-    def shape_vertices(self) -> dict:
-        """Vertices of Arrow."""
-        return {}
-
-    @cached_property
-    def shape_geom(self) -> ShapeGeometry:
-        """Geometry of Arrow."""
+    @property
+    def geo(self) -> ShapeGeometry:
+        """Geometry of Arrow in user units."""
         return ShapeGeometry()
 
-    @cached_property
-    def geom(self) -> ShapeGeometry:
-        """Geometry of Arrow - alias for shape_geom."""
-        return self.shape_geom
+    @property
+    def geometry(self) -> ShapeGeometry:
+        """Geometry of Arrow - alias for geo."""
+        return self.geo
 
     @property  # do NOT cache because centre needs to be changed!
     def _shape_centre(self) -> Point:
@@ -490,30 +445,15 @@ class BezierShape(BaseShape):
     def __init__(self, _object=None, canvas=None, **kwargs):
         super().__init__(_object=_object, canvas=canvas, **kwargs)
 
-    @cached_property
-    def shape_area(self) -> float:
-        """Area of Bezier."""
-        return None
-
-    @cached_property
-    def shape_centre(self) -> Point:
-        """Centre of Bezier."""
-        return None
-
-    @cached_property
-    def shape_vertices(self) -> dict:
-        """Vertices of Bezier."""
-        return {}
-
-    @cached_property
-    def shape_geom(self) -> ShapeGeometry:
-        """Geometry of Bezier."""
+    @property
+    def geo(self) -> ShapeGeometry:
+        """Geometry of Bezier in user units."""
         return ShapeGeometry()
 
-    @cached_property
-    def geom(self) -> ShapeGeometry:
-        """Geometry of Bezier - alias for shape_geom."""
-        return self.shape_geom
+    @property
+    def geometry(self) -> ShapeGeometry:
+        """Geometry of Bezier - alias for geo."""
+        return self.geo
 
     def draw(self, cnv=None, off_x=0, off_y=0, ID=None, **kwargs):
         """Draw Bezier curve on a given canvas."""
@@ -546,29 +486,14 @@ class ChordShape(BaseShape):
     """
 
     @cached_property
-    def shape_area(self) -> float:
-        """Area of Chord."""
-        return None
-
-    @cached_property
-    def shape_centre(self) -> Point:
-        """Centre of Chord."""
-        return None
-
-    @cached_property
-    def shape_vertices(self) -> dict:
-        """Vertices of Chord."""
-        return {}
-
-    @cached_property
-    def shape_geom(self) -> ShapeGeometry:
-        """Geometry of Chord."""
+    def geo(self) -> ShapeGeometry:
+        """Geometry of Chord in user units."""
         return ShapeGeometry()
 
     @cached_property
-    def geom(self) -> ShapeGeometry:
-        """Geometry of Chord - alias for shape_geom."""
-        return self.shape_geom
+    def geometry(self) -> ShapeGeometry:
+        """Geometry of Chord - alias for geo."""
+        return self.geo
 
     def draw_arrow(self, cnv, point_a, point_b, **kwargs):
         """Draw a styled Arrow for Chord."""
@@ -590,7 +515,7 @@ class ChordShape(BaseShape):
         cnv = cnv if cnv else globals.canvas  # a new Page/Shape may now exist
         super().draw(cnv, off_x, off_y, ID, **kwargs)  # unit-based props
         if not isinstance(self.shape, CircleShape):
-            feedback("Shape must be a circle!", True)
+            feedback("Shape used by a chord must be a circle!", True)
         circle = self.shape
         pt0 = geoms.point_on_circle(circle._shape_centre, circle._u.radius, self.angle)
         pt1 = geoms.point_on_circle(
@@ -651,30 +576,69 @@ class CrossShape(BaseShape):
         if self.u_thickness <= 0:
             feedback("The cross thickness must be more than zero", True)
 
-    @cached_property
-    def shape_area(self) -> float:
-        """Area of Cross."""
-        return None
+    @property
+    def geo(self) -> ShapeGeometry:
+        """Geometry of Cross in user units."""
+        _type = type(self)
+        cntr = self._shape_centre
+        mx = globals.margins[0]
+        my = globals.margins[1]
+        cntr_user = self.as_point(
+            cntr.x, cntr.y, mx, my, self.units, cntr, self.rotation
+        )
+        vtcs = self._shape_vertexes  # see diagram for NSEW locations
+        n1 = self.as_point(
+            vtcs[0].x, vtcs[0].y, mx, my, self.units, cntr, self.rotation
+        )
+        n2 = self.as_point(
+            vtcs[11].x, vtcs[11].y, mx, my, self.units, cntr, self.rotation
+        )
+        s1 = self.as_point(
+            vtcs[5].x, vtcs[5].y, mx, my, self.units, cntr, self.rotation
+        )
+        s2 = self.as_point(
+            vtcs[6].x, vtcs[6].y, mx, my, self.units, cntr, self.rotation
+        )
+        e1 = self.as_point(
+            vtcs[9].x, vtcs[9].y, mx, my, self.units, cntr, self.rotation
+        )
+        e2 = self.as_point(
+            vtcs[8].x, vtcs[8].y, mx, my, self.units, cntr, self.rotation
+        )
+        w1 = self.as_point(
+            vtcs[2].x, vtcs[2].y, mx, my, self.units, cntr, self.rotation
+        )
+        w2 = self.as_point(
+            vtcs[3].x, vtcs[3].y, mx, my, self.units, cntr, self.rotation
+        )
+        perim = None  # TODO- calculate
+        area = None  # TODO- calculate
+        return ShapeGeometry(
+            # centre
+            centre=cntr_user,
+            center=cntr_user,
+            c=cntr_user,
+            # vertices
+            n=geoms.fraction_along_line(n1, n2, 0.5),
+            s=geoms.fraction_along_line(s1, s2, 0.5),
+            e=geoms.fraction_along_line(e1, e2, 0.5),
+            w=geoms.fraction_along_line(w1, w2, 0.5),
+            # perbii
+            # length
+            perimeter=perim,
+            # other
+            area=area,
+            # meta
+            t=_type,
+            type=_type,
+            shapetype=_type,
+            name=self.simple_name(self),
+        )
 
-    @cached_property
-    def shape_centre(self) -> Point:
-        """Centre of Cross."""
-        return None
-
-    @cached_property
-    def shape_vertices(self) -> dict:
-        """Vertices of Cross."""
-        return {}
-
-    @cached_property
-    def shape_geom(self) -> ShapeGeometry:
-        """Geometry of Cross."""
-        return ShapeGeometry()
-
-    @cached_property
-    def geom(self) -> ShapeGeometry:
-        """Geometry of Cross - alias for shape_geom."""
-        return self.shape_geom
+    @property
+    def geometry(self) -> ShapeGeometry:
+        """Geometry of Cross - alias for geo."""
+        return self.geo
 
     @property  # do NOT cache because centre needs to be changed!
     def _shape_centre(self) -> Point:
@@ -714,14 +678,16 @@ class CrossShape(BaseShape):
 
         Vertex point locations:
 
+                 N
                0__11
                |  |
            2._1|  |10.9
-            |___  ___|
+         W  |___  ___|  E
            3  4|  |7  8
                |  |
                |__|
               5   6
+                S
         """
         # ----- x,y
 
@@ -826,30 +792,15 @@ class DotShape(BaseShape):
         # ---- RESET UNIT PROPS (last!)
         self.set_unit_properties()
 
-    @cached_property
-    def shape_area(self) -> float:
-        """Area of Dot."""
-        return None
-
-    @cached_property
-    def shape_centre(self) -> Point:
-        """Centre of Dot."""
-        return None
-
-    @cached_property
-    def shape_vertices(self) -> dict:
-        """Vertices of Dot."""
-        return {}
-
-    @cached_property
-    def shape_geom(self) -> ShapeGeometry:
-        """Geometry of Dot."""
+    @property
+    def geo(self) -> ShapeGeometry:
+        """Geometry of Dot in user units."""
         return ShapeGeometry()
 
-    @cached_property
-    def geom(self) -> ShapeGeometry:
-        """Geometry of Dot - alias for shape_geom."""
-        return self.shape_geom
+    @property
+    def geometry(self) -> ShapeGeometry:
+        """Geometry of Dot - alias for geo."""
+        return self.geo
 
     @property  # do NOT cache because centre needs to be changed!
     def _shape_centre(self) -> Point:
@@ -895,30 +846,15 @@ class EllipseShape(BaseShape):
     Ellipse on a given canvas.
     """
 
-    @cached_property
-    def shape_area(self) -> float:
-        """Area of Ellipse."""
-        return None
-
-    @cached_property
-    def shape_centre(self) -> Point:
-        """Centre of Ellipse."""
-        return None
-
-    @cached_property
-    def shape_vertices(self) -> dict:
-        """Vertices of Ellipse."""
-        return {}
-
-    @cached_property
-    def shape_geom(self) -> ShapeGeometry:
-        """Geometry of Ellipse."""
+    @property
+    def geo(self) -> ShapeGeometry:
+        """Geometry of Ellipse in user units."""
         return ShapeGeometry()
 
-    @cached_property
-    def geom(self) -> ShapeGeometry:
-        """Geometry of Ellipse - alias for shape_geom."""
-        return self.shape_geom
+    @property
+    def geometry(self) -> ShapeGeometry:
+        """Geometry of Ellipse - alias for geo."""
+        return self.geo
 
     @property  # do NOT cache because centre needs to be changed!
     def _shape_centre(self) -> Point:
@@ -1146,30 +1082,15 @@ class LineShape(BaseShape):
     Line on a given canvas.
     """
 
-    @cached_property
-    def shape_area(self) -> float:
-        """Area of Line."""
-        return None
-
-    @cached_property
-    def shape_centre(self) -> Point:
-        """Centre of Line."""
-        return None
-
-    @cached_property
-    def shape_vertices(self) -> dict:
-        """Vertices of Line."""
-        return {}
-
-    @cached_property
-    def shape_geom(self) -> ShapeGeometry:
-        """Geometry of Line."""
+    @property
+    def geo(self) -> ShapeGeometry:
+        """Geometry of Line in user units."""
         return ShapeGeometry()
 
-    @cached_property
-    def geom(self) -> ShapeGeometry:
-        """Geometry of Line - alias for shape_geom."""
-        return self.shape_geom
+    @property
+    def geometry(self) -> ShapeGeometry:
+        """Geometry of Line - alias for geo."""
+        return self.geo
 
     def draw_links(
         self, cnv=None, off_x=0, off_y=0, ID=None, shapes: list = None, **kwargs
@@ -1361,30 +1282,15 @@ class PodShape(BaseShape):
         # ---- RESET UNIT PROPS (last!)
         self.set_unit_properties()
 
-    @cached_property
-    def shape_area(self) -> float:
-        """Area of Pod."""
-        return None
-
-    @cached_property
-    def shape_centre(self) -> Point:
-        """Centre of Pod."""
-        return None
-
-    @cached_property
-    def shape_vertices(self) -> dict:
-        """Vertices of Pod."""
-        return {}
-
-    @cached_property
-    def shape_geom(self) -> ShapeGeometry:
-        """Geometry of Pod."""
+    @property
+    def geo(self) -> ShapeGeometry:
+        """Geometry of Pod in user units."""
         return ShapeGeometry()
 
-    @cached_property
-    def geom(self) -> ShapeGeometry:
-        """Geometry of Pod - alias for shape_geom."""
-        return self.shape_geom
+    @property
+    def geometry(self) -> ShapeGeometry:
+        """Geometry of Pod - alias for geo."""
+        return self.geo
 
     @property  # do NOT cache because centre needs to be changed!
     def _shape_centre(self) -> Point:
@@ -1490,30 +1396,15 @@ class PolylineShape(BasePolyShape):
         # overrides / extra args
         self.scaling = tools.as_float(kwargs.get("scaling", 1.0), "scaling")
 
-    @cached_property
-    def shape_area(self) -> float:
-        """Area of Polyline."""
-        return None
-
-    @cached_property
-    def shape_centre(self) -> Point:
-        """Centre of Polyline."""
-        return None
-
-    @cached_property
-    def shape_vertices(self) -> dict:
-        """Vertices of Polyline."""
-        return {}
-
-    @cached_property
-    def shape_geom(self) -> ShapeGeometry:
-        """Geometry of Polyline."""
+    @property
+    def geo(self) -> ShapeGeometry:
+        """Geometry of Polyline in user units."""
         return ShapeGeometry()
 
-    @cached_property
-    def geom(self) -> ShapeGeometry:
-        """Geometry of Polyline - alias for shape_geom."""
-        return self.shape_geom
+    @property
+    def geometry(self) -> ShapeGeometry:
+        """Geometry of Polyline - alias for geo."""
+        return self.geo
 
     def polyline_links(self) -> list:
         """Get vertex Points to link sets of two shapes."""
@@ -1718,18 +1609,6 @@ class RhombusShape(BaseShape):
         # ---- RESET UNIT PROPS (last!)
         self.set_unit_properties()
 
-    @cached_property
-    def shape_area(self) -> float:
-        """Area of Rhombus."""
-        return None
-
-    @cached_property
-    def shape_centre(self) -> Point:
-        """Centre of Rhombus."""
-        return Point(
-            self._p2v(self._shape_centre.x, 3), self._p2v(self._shape_centre.y, 3)
-        )
-
     @property
     def shape_vertices(self) -> dict:
         """Vertices of Rhombus."""
@@ -1740,15 +1619,15 @@ class RhombusShape(BaseShape):
         }
         return shape_vtc
 
-    @cached_property
-    def shape_geom(self) -> ShapeGeometry:
-        """Geometry of Rhombus."""
+    @property
+    def geo(self) -> ShapeGeometry:
+        """Geometry of Rhombus in user units."""
         return ShapeGeometry()
 
-    @cached_property
-    def geom(self) -> ShapeGeometry:
-        """Geometry of Rhombus - alias for shape_geom."""
-        return self.shape_geom
+    @property
+    def geometry(self) -> ShapeGeometry:
+        """Geometry of Rhombus - alias for geo."""
+        return self.geo
 
     @property  # do NOT cache because centre needs to be changed!
     def _shape_centre(self) -> Point:
@@ -2339,29 +2218,14 @@ class SectorShape(BaseShape):
         # feedback(f'***Sector {self.x_c=} {self.y_c=} {self.radius=}')
 
     @cached_property
-    def shape_area(self) -> float:
-        """Area of Sector."""
-        return None
-
-    @cached_property
-    def shape_centre(self) -> Point:
-        """Centre of Sector."""
-        return None
-
-    @cached_property
-    def shape_vertices(self) -> dict:
-        """Vertices of Sector."""
-        return {}
-
-    @cached_property
-    def shape_geom(self) -> ShapeGeometry:
-        """Geometry of Sector."""
+    def geo(self) -> ShapeGeometry:
+        """Geometry of Sector in user units."""
         return ShapeGeometry()
 
     @cached_property
-    def geom(self) -> ShapeGeometry:
-        """Geometry of Sector - alias for shape_geom."""
-        return self.shape_geom
+    def geometry(self) -> ShapeGeometry:
+        """Geometry of Sector - alias for geo."""
+        return self.geo
 
     def draw(self, cnv=None, off_x=0, off_y=0, ID=None, **kwargs):
         """Draw sector on a given canvas."""
@@ -2404,11 +2268,6 @@ class ShapeShape(BasePolyShape):
         self.y = kwargs.get("y", kwargs.get("bottom", 0.0))
         self.scaling = tools.as_float(kwargs.get("scaling", 1.0), "scaling")
 
-    @cached_property
-    def shape_area(self) -> float:
-        """Area of PolyShape."""
-        return None
-
     @property
     def shape_centre(self) -> Point:
         """Centre of PolyShape."""
@@ -2419,19 +2278,14 @@ class ShapeShape(BasePolyShape):
         return None
 
     @property
-    def shape_vertices(self) -> dict:
-        """Vertices of PolyShape."""
-        return {}
-
-    @cached_property
-    def shape_geom(self) -> ShapeGeometry:
-        """Geometry of PolyShape."""
+    def geo(self) -> ShapeGeometry:
+        """Geometry of PolyShape in user units."""
         return ShapeGeometry()
 
-    @cached_property
-    def geom(self) -> ShapeGeometry:
-        """Geometry of PolyShape - alias for shape_geom."""
-        return self.shape_geom
+    @property
+    def geometry(self) -> ShapeGeometry:
+        """Geometry of PolyShape - alias for geo."""
+        return self.geo
 
     @property  # do NOT cache because centre needs to be changed!
     def _shape_centre(self) -> Point:
@@ -2506,46 +2360,20 @@ class SquareShape(RectangleShape):
         # ---- RESET UNIT PROPS (last!)
         self.set_unit_properties()
 
-    @cached_property
-    def shape_area(self) -> float:
-        """Area of Square."""
-        return self._p2v(self._u.width) * self._p2v(self._u.height)
+    @property
+    def geo(self) -> ShapeGeometry:
+        """Geometry of Square in user units."""
+        return super().geo  # via Rectangle
 
-    @cached_property
-    def shape_centre(self) -> Point:
-        """Centre of Square."""
-        return super().shape_centre  # via Rectangle
-
-    @cached_property
-    def shape_vertices(self) -> dict:
-        """Vertices of Square."""
-        return super().shape_vertices  # via Rectangle
-
-    @cached_property
-    def shape_geom(self) -> ShapeGeometry:
-        """Geometry of Square."""
-        return ShapeGeometry()
-
-    @cached_property
-    def geom(self) -> ShapeGeometry:
-        """Geometry of Square - alias for shape_geom."""
-        return self.shape_geom
+    @property
+    def geometry(self) -> ShapeGeometry:
+        """Geometry of Square - alias for geo."""
+        return super().geometry  # via Rectangle
 
     @property  # do NOT cache because centre needs to be changed!
     def _shape_centre(self) -> Point:
         """Centre of Square in points."""
         return super()._shape_centre  # via Rectangle
-
-    def calculate_area(self) -> float:
-        """Area of Square in points."""
-        return self._u.width * self._u.height
-
-    def calculate_perimeter(self, units: bool = False) -> float:
-        """Total length of Square bounding line."""
-        length = 2.0 * (self._u.width + self._u.height)
-        if units:
-            return self.points_to_value(length)
-        return length
 
     def draw(self, cnv=None, off_x=0, off_y=0, ID=None, **kwargs):
         """Draw a Square on a given canvas."""
@@ -2582,30 +2410,15 @@ class StadiumShape(BaseShape):
         # ---- RESET UNIT PROPS (last!)
         self.set_unit_properties()
 
-    @cached_property
-    def shape_area(self) -> float:
-        """Area of Stadium."""
-        return None
-
-    @cached_property
-    def shape_centre(self) -> Point:
-        """Centre of Stadium."""
-        return None
-
-    @cached_property
-    def shape_vertices(self) -> dict:
-        """Vertices of Stadium."""
-        return {}
-
-    @cached_property
-    def shape_geom(self) -> ShapeGeometry:
-        """Geometry of Stadium."""
+    @property
+    def geo(self) -> ShapeGeometry:
+        """Geometry of Stadium in user units."""
         return ShapeGeometry()
 
-    @cached_property
-    def geom(self) -> ShapeGeometry:
-        """Geometry of Stadium - alias for shape_geom."""
-        return self.shape_geom
+    @property
+    def geometry(self) -> ShapeGeometry:
+        """Geometry of Stadium - alias for geo."""
+        return self.geo
 
     def draw(self, cnv=None, off_x=0, off_y=0, ID=None, **kwargs):
         """Draw a Stadium on a given canvas."""
@@ -2756,30 +2569,15 @@ class StarShape(BaseShape):
         super().__init__(_object=_object, canvas=canvas, **kwargs)
         self.vertexes_list = []
 
-    @cached_property
-    def shape_area(self) -> float:
-        """Area of Star."""
-        return None
-
-    @cached_property
-    def shape_centre(self) -> Point:
-        """Centre of Star."""
-        return None
-
-    @cached_property
-    def shape_vertices(self) -> dict:
-        """Vertices of Star."""
-        return {}
-
-    @cached_property
-    def shape_geom(self) -> ShapeGeometry:
-        """Geometry of Star."""
+    @property
+    def geo(self) -> ShapeGeometry:
+        """Geometry of Star in user units."""
         return ShapeGeometry()
 
-    @cached_property
-    def geom(self) -> ShapeGeometry:
-        """Geometry of Star - alias for shape_geom."""
-        return self.shape_geom
+    @property
+    def geometry(self) -> ShapeGeometry:
+        """Geometry of Star - alias for geo."""
+        return self.geo
 
     @property  # do NOT cache because centre needs to be changed!
     def _shape_centre(self) -> Point:
@@ -3403,30 +3201,15 @@ class TrapezoidShape(BaseShape):
             self.x = self.cx - self.width / 2.0
             self.y = self.cy - self.height / 2.0
 
-    @cached_property
-    def shape_area(self) -> float:
-        """Area of Trapezoid."""
-        return None
-
-    @cached_property
-    def shape_centre(self) -> Point:
-        """Centre of Trapezoid."""
-        return None
-
-    @cached_property
-    def shape_vertices(self) -> dict:
-        """Vertices of Trapezoid."""
-        return {}
-
-    @cached_property
-    def shape_geom(self) -> ShapeGeometry:
-        """Geometry of Trapezoid."""
+    @property
+    def geo(self) -> ShapeGeometry:
+        """Geometry of Trapezoid in user units."""
         return ShapeGeometry()
 
-    @cached_property
-    def geom(self) -> ShapeGeometry:
-        """Geometry of Trapezoid - alias for shape_geom."""
-        return self.shape_geom
+    @property
+    def geometry(self) -> ShapeGeometry:
+        """Geometry of Trapezoid - alias for geo."""
+        return self.geo
 
     @property  # do NOT cache because centre needs to be changed!
     def _shape_centre(self) -> Point:
@@ -3666,30 +3449,15 @@ class TriangleShape(BaseShape):
                     True,
                 )
 
-    @cached_property
-    def shape_area(self) -> float:
-        """Area of Triangle."""
-        return None
-
-    @cached_property
-    def shape_centre(self) -> Point:
-        """Centre of Triangle."""
-        return None
-
-    @cached_property
-    def shape_vertices(self) -> dict:
-        """Vertices of Triangle."""
-        return {}
-
-    @cached_property
-    def shape_geom(self) -> ShapeGeometry:
-        """Geometry of Triangle."""
+    @property
+    def geo(self) -> ShapeGeometry:
+        """Geometry of Triangle in user units."""
         return ShapeGeometry()
 
-    @cached_property
-    def geom(self) -> ShapeGeometry:
-        """Geometry of Triangle - alias for shape_geom."""
-        return self.shape_geom
+    @property
+    def geometry(self) -> ShapeGeometry:
+        """Geometry of Triangle - alias for geo."""
+        return self.geo
 
     @property  # do NOT cache because centre needs to be changed!
     def _shape_centre(self) -> Point:

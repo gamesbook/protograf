@@ -62,36 +62,59 @@ class PolygonShape(BaseShape):
         self.set_unit_properties()
 
     @cached_property
-    def shape_area(self) -> float:
-        """Area of Polygon."""
-        return self._p2v(self._shape_area)
-
-    @property
-    def shape_centre(self) -> Point:
-        """Centre of Polygon"""
-        return Point(
-            self._p2v(self._shape_centre.x, 3), self._p2v(self._shape_centre.y, 3)
-        )
-
-    @cached_property
     def shape_vertices(self) -> dict:
         """Vertices of Polygon."""
         vtc = self._shape_vertexes_named
         shape_vtc = {
-            key: Point(self._p2v(value.point.x, 3), self._p2v(value.point.y, 3))
+            key: Point(self._p2v(value.point.x, 10), self._p2v(value.point.y, 10))
             for key, value in vtc.items()
         }
         return shape_vtc
 
-    @cached_property
-    def shape_geom(self) -> ShapeGeometry:
-        """Geometry of Polygon."""
-        return ShapeGeometry()
+    @property
+    def geo(self) -> ShapeGeometry:
+        """Geometry of Polygon in user units."""
+        _type = type(self)
+        cntr = self._shape_centre
+        mx = globals.margins[0]
+        my = globals.margins[1]
+        cntr_user = self.as_point(
+            cntr.x, cntr.y, mx, my, self.units, cntr, self.rotation
+        )
+        perim = None
+        radius = self._p2v(self._shape_radius)
+        area = self._p2v(self._shape_area)
+        vtc = self._shape_vertexes_named
+        vtcs_user = [
+            self.as_point(value.x, value.y, mx, my, self.units, cntr, self.rotation)
+            for key, value in vtc.items()
+        ]
+        return ShapeGeometry(
+            # centre
+            centre=cntr_user,
+            center=cntr_user,
+            c=cntr_user,
+            # vertices
+            v=vtcs_user,
+            vertices=vtcs_user,
+            # perbii
+            # length
+            perimeter=perim,
+            radius=radius,
+            diameter=2 * radius,
+            # other
+            area=area,
+            # meta
+            t=_type,
+            type=_type,
+            shapetype=_type,
+            name=self.simple_name(self),
+        )
 
-    @cached_property
-    def geom(self) -> ShapeGeometry:
-        """Geometry of Polygon - alias for shape_geom."""
-        return self.shape_geom
+    @property
+    def geometry(self) -> ShapeGeometry:
+        """Geometry of Polygon - alias for geo."""
+        return self.geo
 
     @cached_property
     def _shape_area(self) -> float:

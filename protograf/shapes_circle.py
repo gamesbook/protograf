@@ -55,41 +55,41 @@ class CircleShape(BaseShape):
         # ---- RESET UNIT PROPS (last!)
         self.set_unit_properties()
 
-    @cached_property
-    def shape_area(self) -> float:
-        """Area of Circle."""
-        return None
+    @property
+    def geo(self) -> ShapeGeometry:
+        """Geometry of Circle in user units."""
+        _type = type(self)
+        cntr = self._shape_centre
+        mx = globals.margins[0]
+        my = globals.margins[1]
+        cntr_user = self.as_point(
+            cntr.x, cntr.y, mx, my, self.units, cntr, self.rotation
+        )
+        perim = self.points_to_value(math.pi * 2.0 * self._u.radius)
+        radius = self.points_to_value(self._u.radius)
+        area = self.points_to_value(math.pi * self._u.radius**2)
+        return ShapeGeometry(
+            # centre
+            centre=cntr_user,
+            center=cntr_user,
+            c=cntr_user,
+            # length
+            perimeter=perim,
+            radius=radius,
+            diameter=2 * radius,
+            # other
+            area=area,
+            # meta
+            t=_type,
+            type=_type,
+            shapetype=_type,
+            name=self.simple_name(self),
+        )
 
-    @cached_property
-    def shape_centre(self) -> Point:
-        """Centre of Circle."""
-        return None
-
-    @cached_property
-    def shape_vertices(self) -> dict:
-        """Vertices of Circle."""
-        return {}
-
-    @cached_property
-    def shape_perbii(self) -> dict:
-        """Perbii of Circle."""
-        return {}
-
-    @cached_property
-    def shape_geom(self) -> ShapeGeometry:
-        """Geometry of Circle."""
-        return ShapeGeometry()
-
-    @cached_property
-    def geom(self) -> ShapeGeometry:
-        """Geometry of Circle - alias for shape_geom."""
-        return self.shape_geom
-
-    @cached_property
-    def shape_perimeter(self) -> float:
-        """Circle circumference length"""
-        length = math.pi * 2.0 * self._u.radius
-        return self.points_to_value(length)
+    @property
+    def geometry(self) -> ShapeGeometry:
+        """Geometry of Circle - alias for geo."""
+        return self.geo
 
     @cached_property
     def _shape_radius(self) -> float:

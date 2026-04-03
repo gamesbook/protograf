@@ -178,7 +178,8 @@ PageMarginsBase = namedtuple(
     ],
 )
 
-pointlocations_fields = (
+shapegeometry_fields = (
+    # points
     "centre",
     "center",
     "c",
@@ -190,43 +191,30 @@ pointlocations_fields = (
     "se",
     "nw",
     "sw",
-    "t",
-    "type",
-    "shapetype",
-    "name",
-)
-PointLocations = namedtuple(
-    "PointLocations",
-    pointlocations_fields,
-    defaults=(None,) * len(pointlocations_fields),
-)
-
-shape_fields = (
-    "name",
+    "v",
+    "vertices",
+    "b",
+    "perbii",
+    # lengths
     "radius",
     "diameter",
     "side",
     "length",
     "width",
     "height",
-    "head",
-    "tail",
+    "perimeter",
+    # other
+    "area",
+    # meta
+    "t",
+    "type",
+    "shapetype",
+    "name",
 )
+
 ShapeGeometry = namedtuple(
-    "ShapeGeometry", shape_fields, defaults=(None,) * len(shape_fields)
+    "ShapeGeometry", shapegeometry_fields, defaults=(None,) * len(shapegeometry_fields)
 )
-# template for use in Shape construction
-# return ShapeGeometry(
-#     name=self.simple_name(),
-#     radius=self.,
-#     diameter=self.,
-#     side=self.,
-#     length=self.,
-#     width=self.,
-#     height=self.,
-#     head=self.,
-#     tail=self.,
-# )
 
 
 class PageMargins(PageMarginsBase):

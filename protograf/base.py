@@ -174,9 +174,13 @@ class BaseCanvas:
         self.top = self.defaults.get("width", self.width * 0.5)
         self.depth = self.defaults.get("depth", self.side)  # diamond
         self.x = self.defaults.get("x", self.defaults.get("left", 1.0))
-        self.y = self.defaults.get("y", self.defaults.get("bottom", 1.0))
+        self.y = self.defaults.get("y", self.defaults.get("top", 1.0))
+        self.xy = self.defaults.get(
+            "xy", self.defaults.get("xy", Point(self.x, self.y))
+        )
         self.cx = self.defaults.get("cx", None)  # NB! not 0; needed for internal check
         self.cy = self.defaults.get("cy", None)  # NB! not 0; needed for internal check
+        self.cxy = self.defaults.get("cxy", None)
         self.scaling = self.defaults.get("scaling", None)  # SVG; snail
         self.dot_width = self.defaults.get("dot_width", 3.0)  # points
         # ---- to be calculated ...
@@ -837,8 +841,10 @@ class BaseShape:
         )  # was self.side > diamond?
         self.x = self.kw_float(kwargs.get("x", kwargs.get("left", base.x)))
         self.y = self.kw_float(kwargs.get("y", kwargs.get("top", base.y)))
+        self.xy = kwargs.get("xy", base.xy)
         self.cx = self.kw_float(kwargs.get("cx", base.cx))  # centre (for some shapes)
         self.cy = self.kw_float(kwargs.get("cy", base.cy))  # centre (for some shapes)
+        self.cxy = kwargs.get("xcy", base.cxy)
         self.scaling = self.kw_float(kwargs.get("scaling", None))  # SVG; snail
         self.dot_width = self.kw_float(
             kwargs.get("dot_width", base.dot_width)
@@ -2492,6 +2498,24 @@ class BaseShape:
                 f'Unable to do units conversion from "{value}" using {self.units}!',
                 True,
             )
+
+    def as_point(
+        self,
+        x: float,
+        y: float,
+        margin_left: float,
+        margin_top: float,
+        units: float,
+        center: Point,
+        rotation: float = None,
+    ) -> Point:
+        """Create a Point in user units offset from page margin."""
+        pxy = Point(x, y)
+        if rotation:
+            pxy = geoms.rotate_point_around_point(pxy, center, rotation)
+        xpt = round(pxy.x / units - margin_left, 10)
+        ypt = round(pxy.y / units - margin_top, 10)
+        return Point(xpt, ypt)
 
     def _p2v(self, value: float, decimals: int = 4):
         """Convert point value to a rounded, units-based value using current units."""
