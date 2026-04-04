@@ -3,6 +3,8 @@ protograf Changes
 
 2026-00-00 (0.5.1)
 ------------------
+- Add Shape geometry property
+- Add function to get point on Circle cicumference
 - [PLANNED-2] Enable non-curves Line links to Ellipse shapes
 - [PLANNED-2] Enable Line links to Stadium shapes
 - [PLANNED-2] Enable Line links to Text boxes

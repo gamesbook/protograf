@@ -95,12 +95,13 @@ class HexShape(BaseShape):
     def geo(self) -> ShapeGeometry:
         """Geometry of Hexagon in user units."""
         _type = type(self)
-        mx = globals.margins[0]
-        my = globals.margins[1]
-        cntr_user = self.as_point(self.x_d, self.y_d, mx, my, self.units, None, None)
+        cntr = Point(self.x_d, self.y_d)
+        cntr_user = self.as_point(cntr, self.units, None, None)
         vtcs = self._shape_vertexes
-        ne = self.as_point(vtcs[0].x, vtcs[0].y, mx, my, self.units, None, None)
-        nw = self.as_point(vtcs[5].x, vtcs[5].y, mx, my, self.units, None, None)
+        # vertices vary by ORIENTATION!
+        ne = self.as_point(vtcs[0], self.units, None, None)
+        se = self.as_point(vtcs[1], self.units, None, None)
+        nw = self.as_point(vtcs[5], self.units, None, None)
         hex_geom = self.get_geometry()
         radius = self._p2v(hex_geom.radius)
         diameter = self._p2v(hex_geom.diameter)
@@ -115,6 +116,7 @@ class HexShape(BaseShape):
             # vertices
             ne=ne,
             nw=nw,
+            se=se,
             # perbii
             n=geoms.fraction_along_line(nw, ne, 0.5),
             # length

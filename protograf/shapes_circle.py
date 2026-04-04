@@ -60,14 +60,10 @@ class CircleShape(BaseShape):
         """Geometry of Circle in user units."""
         _type = type(self)
         cntr = self._shape_centre
-        mx = globals.margins[0]
-        my = globals.margins[1]
-        cntr_user = self.as_point(
-            cntr.x, cntr.y, mx, my, self.units, cntr, self.rotation
-        )
+        cntr_user = self.as_point(cntr, self.units, cntr, self.rotation)
         perim = self.points_to_value(math.pi * 2.0 * self._u.radius)
         radius = self.points_to_value(self._u.radius)
-        area = self.points_to_value(math.pi * self._u.radius**2)
+        area = math.pi * self.points_to_value(self._u.radius) ** 2
         return ShapeGeometry(
             # centre
             centre=cntr_user,
@@ -90,6 +86,13 @@ class CircleShape(BaseShape):
     def geometry(self) -> ShapeGeometry:
         """Geometry of Circle - alias for geo."""
         return self.geo
+
+    def poc(self, angle: float) -> Point:
+        """Return Point on the Circle at a given angle - in user units."""
+        _pt = geoms.point_on_circle(self._shape_centre, self._u.radius, angle)
+        return self.as_point(
+            _pt.x, _pt.y, self.units, self._shape_centre, self.rotation
+        )
 
     @cached_property
     def _shape_radius(self) -> float:

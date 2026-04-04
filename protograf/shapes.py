@@ -250,9 +250,8 @@ class ArcShape(BaseShape):
     def geo(self) -> ShapeGeometry:
         """Geometry of Arc in user units."""
         _type = type(self)
-        mx = globals.margins[0]
-        my = globals.margins[1]
-        cntr_user = self.as_point(self.x_c, self.y_c, mx, my, self.units, None, None)
+        cntr = Point(self.x_c, self.y_c)
+        cntr_user = self.as_point(cntr, self.units, None, None)
         return ShapeGeometry(
             # centre
             centre=cntr_user,
@@ -523,13 +522,9 @@ class ChordShape(BaseShape):
     def geo(self) -> ShapeGeometry:
         """Geometry of Chord in user units."""
         _type = type(self)
-        mx = globals.margins[0]
-        my = globals.margins[1]
         cntr_user = None
         if self._centre:
-            cntr_user = self.as_point(
-                self._centre.x, self._centre.y, mx, my, self.units, None, None
-            )
+            cntr_user = self.as_point(self._centre, self.units, None, None)
         return ShapeGeometry(
             # centre
             centre=cntr_user,
@@ -638,36 +633,16 @@ class CrossShape(BaseShape):
         """Geometry of Cross in user units."""
         _type = type(self)
         cntr = self._shape_centre
-        mx = globals.margins[0]
-        my = globals.margins[1]
-        cntr_user = self.as_point(
-            cntr.x, cntr.y, mx, my, self.units, cntr, self.rotation
-        )
+        cntr_user = self.as_point(cntr, self.units, cntr, self.rotation)
         vtcs = self._shape_vertexes  # see diagram for NSEW locations
-        n1 = self.as_point(
-            vtcs[0].x, vtcs[0].y, mx, my, self.units, cntr, self.rotation
-        )
-        n2 = self.as_point(
-            vtcs[11].x, vtcs[11].y, mx, my, self.units, cntr, self.rotation
-        )
-        s1 = self.as_point(
-            vtcs[5].x, vtcs[5].y, mx, my, self.units, cntr, self.rotation
-        )
-        s2 = self.as_point(
-            vtcs[6].x, vtcs[6].y, mx, my, self.units, cntr, self.rotation
-        )
-        e1 = self.as_point(
-            vtcs[9].x, vtcs[9].y, mx, my, self.units, cntr, self.rotation
-        )
-        e2 = self.as_point(
-            vtcs[8].x, vtcs[8].y, mx, my, self.units, cntr, self.rotation
-        )
-        w1 = self.as_point(
-            vtcs[2].x, vtcs[2].y, mx, my, self.units, cntr, self.rotation
-        )
-        w2 = self.as_point(
-            vtcs[3].x, vtcs[3].y, mx, my, self.units, cntr, self.rotation
-        )
+        n1 = self.as_point(vtcs[0], self.units, cntr, self.rotation)
+        n2 = self.as_point(vtcs[11], self.units, cntr, self.rotation)
+        s1 = self.as_point(vtcs[5], self.units, cntr, self.rotation)
+        s2 = self.as_point(vtcs[6], self.units, cntr, self.rotation)
+        e1 = self.as_point(vtcs[9], self.units, cntr, self.rotation)
+        e2 = self.as_point(vtcs[8], self.units, cntr, self.rotation)
+        w1 = self.as_point(vtcs[2], self.units, cntr, self.rotation)
+        w2 = self.as_point(vtcs[3], self.units, cntr, self.rotation)
         perim = None  # TODO- calculate
         area = None  # TODO- calculate
         return ShapeGeometry(
@@ -854,9 +829,7 @@ class DotShape(BaseShape):
         """Geometry of Dot in user units."""
         _type = type(self)
         cntr = self._shape_centre
-        mx = globals.margins[0]
-        my = globals.margins[1]
-        cntr_user = self.as_point(cntr.x, cntr.y, mx, my, self.units, None, None)
+        cntr_user = self.as_point(cntr, self.units, None, None)
         return ShapeGeometry(
             # centre
             centre=cntr_user,
@@ -927,11 +900,7 @@ class EllipseShape(BaseShape):
         """Geometry of Ellipse in user units."""
         _type = type(self)
         cntr = self._shape_centre
-        mx = globals.margins[0]
-        my = globals.margins[1]
-        cntr_user = self.as_point(
-            cntr.x, cntr.y, mx, my, self.units, cntr, self.rotation
-        )
+        cntr_user = self.as_point(cntr, self.units, cntr, self.rotation)
         return ShapeGeometry(
             # centre
             centre=cntr_user,
@@ -1384,11 +1353,7 @@ class PodShape(BaseShape):
         """Geometry of Pod in user units."""
         _type = type(self)
         cntr = self._shape_centre
-        mx = globals.margins[0]
-        my = globals.margins[1]
-        cntr_user = self.as_point(
-            cntr.x, cntr.y, mx, my, self.units, cntr, self.rotation
-        )
+        cntr_user = self.as_point(cntr, self.units, cntr, self.rotation)
         return ShapeGeometry(
             # centre
             centre=cntr_user,
@@ -1771,20 +1736,33 @@ class RhombusShape(BaseShape):
         """Geometry of Rhombus in user units."""
         _type = type(self)
         cntr = self._shape_centre
-        mx = globals.margins[0]
-        my = globals.margins[1]
-        cntr_user = self.as_point(
-            cntr.x, cntr.y, mx, my, self.units, cntr, self.rotation
-        )
+        cntr_user = self.as_point(cntr, self.units, cntr, self.rotation)
+        vtcs = self._shape_vertexes
+        w = self.as_point(vtcs[0], self.units, cntr, self.rotation)
+        s = self.as_point(vtcs[1], self.units, cntr, self.rotation)
+        e = self.as_point(vtcs[2], self.units, cntr, self.rotation)
+        n = self.as_point(vtcs[3], self.units, cntr, self.rotation)
+        perim = (self.height + self.width) * 2
+        area = self.height * self.width
         return ShapeGeometry(
             # centre
             centre=cntr_user,
             center=cntr_user,
             c=cntr_user,
             # vertices
+            n=n,
+            s=s,
+            e=e,
+            w=w,
             # perbii
+            ne=geoms.fraction_along_line(n, e, 0.5),
+            se=geoms.fraction_along_line(s, e, 0.5),
+            sw=geoms.fraction_along_line(s, w, 0.5),
+            nw=geoms.fraction_along_line(n, w, 0.5),
             # length
+            perimeter=perim,
             # other
+            area=area,
             # meta
             t=_type,
             type=_type,
@@ -2390,11 +2368,7 @@ class SectorShape(BaseShape):
         """Geometry of Sector in user units."""
         _type = type(self)
         cntr = self._shape_centre
-        mx = globals.margins[0]
-        my = globals.margins[1]
-        cntr_user = self.as_point(
-            cntr.x, cntr.y, mx, my, self.units, cntr, self.rotation
-        )
+        cntr_user = self.as_point(cntr, self.units, cntr, self.rotation)
         return ShapeGeometry(
             # centre
             centre=cntr_user,
@@ -2618,20 +2592,33 @@ class StadiumShape(BaseShape):
         """Geometry of Stadium in user units."""
         _type = type(self)
         cntr = self._shape_centre
-        mx = globals.margins[0]
-        my = globals.margins[1]
-        cntr_user = self.as_point(
-            cntr.x, cntr.y, mx, my, self.units, cntr, self.rotation
-        )
+        cntr_user = self.as_point(cntr, self.units, cntr, self.rotation)
+        vtcs = self._shape_vertexes
+        nw = self.as_point(vtcs[0], self.units, cntr, self.rotation)
+        sw = self.as_point(vtcs[1], self.units, cntr, self.rotation)
+        se = self.as_point(vtcs[2], self.units, cntr, self.rotation)
+        ne = self.as_point(vtcs[3], self.units, cntr, self.rotation)
+        perim = (self.height + self.width) * 2
+        area = self.height * self.width
         return ShapeGeometry(
             # centre
             centre=cntr_user,
             center=cntr_user,
             c=cntr_user,
             # vertices
+            ne=ne,
+            nw=nw,
+            se=se,
+            sw=sw,
             # perbii
+            n=geoms.fraction_along_line(nw, ne, 0.5),
+            s=geoms.fraction_along_line(sw, se, 0.5),
+            e=geoms.fraction_along_line(ne, se, 0.5),
+            w=geoms.fraction_along_line(nw, sw, 0.5),
             # length
+            perimeter=perim,
             # other
+            area=area,
             # meta
             t=_type,
             type=_type,
@@ -2654,6 +2641,18 @@ class StadiumShape(BaseShape):
         x_d = x + self._u.width / 2.0
         y_d = y + self._u.height / 2.0
         return Point(x=x_d, y=y_d)
+
+    @property  # must be able to change e.g. for layout
+    def _shape_vertexes(self):
+        """Vertices of Stadium in points."""
+        x, y = self.calculate_xy()
+        vertexes = [  # clockwise from top-left; relative to centre
+            Point(x, y),
+            Point(x, y + self._u.height),
+            Point(x + self._u.width, y + self._u.height),
+            Point(x + self._u.width, y),
+        ]
+        return vertexes
 
     def calculate_xy(self, **kwargs) -> tuple:
         """Calculate top-left point of Stadium."""
@@ -2694,30 +2693,22 @@ class StadiumShape(BaseShape):
             kwargs["rotation"] = rotation
             kwargs["rotation_point"] = self.centroid
         # ---- vertices
-        self.vertexes = [  # clockwise from top-left; relative to centre
-            Point(x, y),
-            Point(x, y + self._u.height),
-            Point(x + self._u.width, y + self._u.height),
-            Point(x + self._u.width, y),
-        ]
+        self.vertexes = self._shape_vertexes
         # feedback(f'*** Stad{len(self.vertexes)=}')
         # ---- edges
         _edges = tools.validated_directions(
             self.edges, DirectionGroup.CARDINAL, "stadium edges"
         )  # need curves on these edges
         self.vertexes.append(self.vertexes[0])
-
         # ---- draw rect fill only
         # feedback(f'***Stadium:Rect {x=} {y=} {self.vertexes=}')
         keys = copy.copy(kwargs)
         keys["stroke"] = None
         cnv.draw_polyline(self.vertexes)
         self.set_canvas_props(cnv=cnv, index=ID, **keys)
-
         # ---- draw stadium - lines or curves
         # radius_lr = self._u.height / 2.0
         radius_tb = self._u.width / 2.0
-
         for key, vertex in enumerate(self.vertexes):
             if key + 1 == len(self.vertexes):
                 continue
@@ -2814,17 +2805,19 @@ class StarShape(BaseShape):
         """Geometry of Star in user units."""
         _type = type(self)
         cntr = self._shape_centre
-        mx = globals.margins[0]
-        my = globals.margins[1]
-        cntr_user = self.as_point(
-            cntr.x, cntr.y, mx, my, self.units, cntr, self.rotation
-        )
+        cntr_user = self.as_point(cntr, self.units, cntr, self.rotation)
+        vtcs = self._shape_vertexes
+        vtcs_user = [
+            self.as_point(value, self.units, cntr, self.rotation) for value in vtcs
+        ]
         return ShapeGeometry(
             # centre
             centre=cntr_user,
             center=cntr_user,
             c=cntr_user,
             # vertices
+            v=vtcs_user,
+            vertices=vtcs_user,
             # perbii
             # length
             # other
@@ -3465,7 +3458,41 @@ class TrapezoidShape(BaseShape):
     @property
     def geo(self) -> ShapeGeometry:
         """Geometry of Trapezoid in user units."""
-        return ShapeGeometry()
+        _type = type(self)
+        cntr = self._shape_centre
+        cntr_user = self.as_point(cntr, self.units, cntr, self.rotation)
+        vtcs = self._shape_vertexes
+        nw = self.as_point(vtcs[0], self.units, cntr, self.rotation)
+        sw = self.as_point(vtcs[1], self.units, cntr, self.rotation)
+        se = self.as_point(vtcs[2], self.units, cntr, self.rotation)
+        ne = self.as_point(vtcs[3], self.units, cntr, self.rotation)
+        perim = (self.height + self.width) * 2
+        area = self.height * self.width
+        return ShapeGeometry(
+            # centre
+            centre=cntr_user,
+            center=cntr_user,
+            c=cntr_user,
+            # vertices
+            ne=ne,
+            nw=nw,
+            se=se,
+            sw=sw,
+            # perbii
+            n=geoms.fraction_along_line(nw, ne, 0.5),
+            s=geoms.fraction_along_line(sw, se, 0.5),
+            e=geoms.fraction_along_line(ne, se, 0.5),
+            w=geoms.fraction_along_line(nw, sw, 0.5),
+            # length
+            perimeter=perim,
+            # other
+            area=area,
+            # meta
+            t=_type,
+            type=_type,
+            shapetype=_type,
+            name=self.simple_name(self),
+        )
 
     @property
     def geometry(self) -> ShapeGeometry:
@@ -3713,7 +3740,34 @@ class TriangleShape(BaseShape):
     @property
     def geo(self) -> ShapeGeometry:
         """Geometry of Triangle in user units."""
-        return ShapeGeometry()
+        _type = type(self)
+        cntr = self._shape_centre
+        cntr_user = self.as_point(cntr, self.units, cntr, self.rotation)
+        vtcs = self._shape_vertexes
+        n = self.as_point(vtcs[0], self.units, cntr, self.rotation)
+        sw = self.as_point(vtcs[1], self.units, cntr, self.rotation)
+        se = self.as_point(vtcs[2], self.units, cntr, self.rotation)
+        return ShapeGeometry(
+            # centre
+            centre=cntr_user,
+            center=cntr_user,
+            c=cntr_user,
+            # vertices
+            n=n,
+            se=se,
+            sw=sw,
+            # perbii
+            ne=geoms.fraction_along_line(n, se, 0.5),
+            s=geoms.fraction_along_line(sw, se, 0.5),
+            w=geoms.fraction_along_line(sw, n, 0.5),
+            # length
+            # other
+            # meta
+            t=_type,
+            type=_type,
+            shapetype=_type,
+            name=self.simple_name(self),
+        )
 
     @property
     def geometry(self) -> ShapeGeometry:

@@ -193,7 +193,7 @@ shapegeometry_fields = (
     "sw",
     "v",
     "vertices",
-    "b",
+    "p",
     "perbii",
     # lengths
     "radius",

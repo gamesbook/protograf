@@ -76,19 +76,22 @@ class PolygonShape(BaseShape):
         """Geometry of Polygon in user units."""
         _type = type(self)
         cntr = self._shape_centre
-        mx = globals.margins[0]
-        my = globals.margins[1]
-        cntr_user = self.as_point(
-            cntr.x, cntr.y, mx, my, self.units, cntr, self.rotation
-        )
+        cntr_user = self.as_point(cntr, self.units, cntr, self.rotation)
         perim = None
         radius = self._p2v(self._shape_radius)
         area = self._p2v(self._shape_area)
         vtcs = self._shape_vertexes
         vtcs_user = [
-            self.as_point(value.x, value.y, mx, my, self.units, cntr, self.rotation)
-            for value in vtcs
+            self.as_point(value, self.units, cntr, self.rotation) for value in vtcs
         ]
+        perbii_user = []
+        perbii_user.append(
+            geoms.fraction_along_line(vtcs_user[self.sides - 1], vtcs_user[0], 0.5)
+        )
+        for pb in range(0, self.sides - 1):
+            perbii_user.append(
+                geoms.fraction_along_line(vtcs_user[pb], vtcs_user[pb + 1], 0.5)
+            )
         return ShapeGeometry(
             # centre
             centre=cntr_user,
@@ -98,6 +101,8 @@ class PolygonShape(BaseShape):
             v=vtcs_user,
             vertices=vtcs_user,
             # perbii
+            p=perbii_user,
+            perbii=perbii_user,
             # length
             perimeter=perim,
             radius=radius,

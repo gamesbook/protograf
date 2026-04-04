@@ -81,24 +81,12 @@ class RectangleShape(BaseShape):
         """Geometry of Rectangle in user units."""
         _type = type(self)
         cntr = self._shape_centre
-        mx = globals.margins[0]
-        my = globals.margins[1]
-        cntr_user = self.as_point(
-            cntr.x, cntr.y, mx, my, self.units, cntr, self.rotation
-        )
+        cntr_user = self.as_point(cntr, self.units, cntr, self.rotation)
         vtcs = self._shape_vertexes
-        ne = self.as_point(
-            vtcs[0].x, vtcs[0].y, mx, my, self.units, cntr, self.rotation
-        )
-        se = self.as_point(
-            vtcs[1].x, vtcs[1].y, mx, my, self.units, cntr, self.rotation
-        )
-        sw = self.as_point(
-            vtcs[2].x, vtcs[2].y, mx, my, self.units, cntr, self.rotation
-        )
-        nw = self.as_point(
-            vtcs[3].x, vtcs[3].y, mx, my, self.units, cntr, self.rotation
-        )
+        ne = self.as_point(vtcs[0], self.units, cntr, self.rotation)
+        se = self.as_point(vtcs[1], self.units, cntr, self.rotation)
+        sw = self.as_point(vtcs[2], self.units, cntr, self.rotation)
+        nw = self.as_point(vtcs[3], self.units, cntr, self.rotation)
         perim = (self.height + self.width) * 2
         area = self.height * self.width
         return ShapeGeometry(
@@ -114,7 +102,7 @@ class RectangleShape(BaseShape):
             # perbii
             n=geoms.fraction_along_line(nw, ne, 0.5),
             s=geoms.fraction_along_line(sw, se, 0.5),
-            e=geoms.fraction_along_line(ne, ne, 0.5),
+            e=geoms.fraction_along_line(ne, se, 0.5),
             w=geoms.fraction_along_line(nw, sw, 0.5),
             # length
             perimeter=perim,

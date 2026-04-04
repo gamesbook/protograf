@@ -333,4 +333,26 @@ Line(stroke="white", stroke_width=3, dotted=True, links=[c1, c2])
 Line(stroke="white", stroke_width=3, dotted=True, links=[c3, c4])
 cC = Circle(cx=3.25, cy=26.25, radius=0.6, fill="#ff004e", stroke="white", stroke_width=3, label_size=18, label="C")
 
+PageBreak()
+
+# ---- PAGE 4 ===>
+
+Text(common=header, text="Miscellaneous Things #4")
+
+Text(common=header_font, x=8, y=3,
+     text="Orbit: Filled Grid with Circle\n- Dots & Line use named points")
+Grid(
+  x=1, y=2,
+  rows=9, cols=9,
+  side=0.5, stroke_width=0.5,
+  fill="#001027",
+  stroke="#445368",
+  omit_outer=True)
+ci = Circle(cx=3.25, cy=4.25, radius=1.5, stroke="white", stroke_width=1, fill=None)
+print(ci.geo.c)
+loc = ci.poc(45)
+Dot(cxy=loc, fill_stroke="aqua", dot_width=8)
+Dot(cxy=ci.geo.c, fill_stroke="tomato", dot_width=16)
+Line(xy=ci.geo.c, xy1=loc, stroke="white", dotted=True)
+
 Save()

@@ -164,7 +164,7 @@ class BaseCanvas:
         self.margin_bottom = self.defaults.get("margin_bottom", self.margin)
         self.margin_left = self.defaults.get("margin_left", self.margin)
         self.margin_right = self.defaults.get("margin_right", self.margin)
-        # ---- sizes and positions
+        # ---- sizes
         self.row = self.defaults.get("row", None)
         self.col = self.defaults.get("col", self.defaults.get("column", None))
         self.side = self.defaults.get("side", 1.0)  # square,rhombus,tri
@@ -173,6 +173,9 @@ class BaseCanvas:
         self.thickness = self.defaults.get("thickness", None)  # cross
         self.top = self.defaults.get("width", self.width * 0.5)
         self.depth = self.defaults.get("depth", self.side)  # diamond
+        self.scaling = self.defaults.get("scaling", None)  # SVG; snail
+        self.dot_width = self.defaults.get("dot_width", 3.0)  # points
+        # ---- positions
         self.x = self.defaults.get("x", self.defaults.get("left", 1.0))
         self.y = self.defaults.get("y", self.defaults.get("top", 1.0))
         self.xy = self.defaults.get(
@@ -181,8 +184,7 @@ class BaseCanvas:
         self.cx = self.defaults.get("cx", None)  # NB! not 0; needed for internal check
         self.cy = self.defaults.get("cy", None)  # NB! not 0; needed for internal check
         self.cxy = self.defaults.get("cxy", None)
-        self.scaling = self.defaults.get("scaling", None)  # SVG; snail
-        self.dot_width = self.defaults.get("dot_width", 3.0)  # points
+        self.xy1 = self.defaults.get("xy1", None)
         # ---- to be calculated ...
         self.area = None
         self.vertexes = []
@@ -828,7 +830,7 @@ class BaseShape:
             kwargs.get("grid_marks_dotted", base.grid_marks_dotted)
         )
         self.grid_marks_style = kwargs.get("grid_marks_style", base.grid_marks_style)
-        # ---- sizes and positions
+        # ---- sizes
         self.row = kwargs.get("row", base.row)
         self.col = self.kw_int(kwargs.get("col", kwargs.get("column", base.col)), "col")
         self.side = self.kw_float(kwargs.get("side", base.side))
@@ -839,16 +841,27 @@ class BaseShape:
         self.depth = self.kw_float(
             kwargs.get("depth", base.depth)
         )  # was self.side > diamond?
-        self.x = self.kw_float(kwargs.get("x", kwargs.get("left", base.x)))
-        self.y = self.kw_float(kwargs.get("y", kwargs.get("top", base.y)))
-        self.xy = kwargs.get("xy", base.xy)
-        self.cx = self.kw_float(kwargs.get("cx", base.cx))  # centre (for some shapes)
-        self.cy = self.kw_float(kwargs.get("cy", base.cy))  # centre (for some shapes)
-        self.cxy = kwargs.get("xcy", base.cxy)
-        self.scaling = self.kw_float(kwargs.get("scaling", None))  # SVG; snail
         self.dot_width = self.kw_float(
             kwargs.get("dot_width", base.dot_width)
-        )  # points
+        )  # units are points!
+        self.scaling = self.kw_float(kwargs.get("scaling", None))  # SVG; snail
+        # ---- positions
+        __x, __y, __cx, __cy = None, None, None, None
+        self.xy = kwargs.get("xy", base.xy)
+        if self.xy and isinstance(self.xy, Point):
+            __x, __y = self.xy.x, self.xy.y
+        self.x = self.kw_float(kwargs.get("x", __x or kwargs.get("left", base.x)))
+        self.y = self.kw_float(kwargs.get("y", __y or kwargs.get("top", base.y)))
+        self.cxy = kwargs.get("cxy", base.cxy)
+        if self.cxy and isinstance(self.cxy, Point):
+            __cx, __cy = self.cxy.x, self.cxy.y
+        self.cx = self.kw_float(
+            kwargs.get("cx", __cx or base.cx)
+        )  # centre (for some shapes)
+        self.cy = self.kw_float(
+            kwargs.get("cy", __cy or base.cy)
+        )  # centre (for some shapes)
+        # print(f"{self.xy=} {self.x=} {self.y=} {self.cx=} {self.cy=}")
         # ---- to be calculated ...
         self.area = base.area
         self.vertexes = base.vertexes  # list of shape's "points"
@@ -1053,8 +1066,12 @@ class BaseShape:
         # ---- line
         self.curve = self.kw_float(kwargs.get("curve", base.curve))
         # ---- line / bezier / sector
-        self.x_1 = self.kw_float(kwargs.get("x1", base.x_1))
-        self.y_1 = self.kw_float(kwargs.get("y1", base.y_1))
+        __x1, __y1 = None, None
+        self.xy1 = kwargs.get("xy1", base.xy1)
+        if self.xy1 and isinstance(self.xy1, Point):
+            __x1, __y1 = self.xy1.x, self.xy1.y
+        self.x_1 = self.kw_float(kwargs.get("x1", __x1 or base.x_1))
+        self.y_1 = self.kw_float(kwargs.get("y1", __y1 or base.y_1))
         # ---- line / hex
         self.links = kwargs.get("links", base.links)
         self.links_style = kwargs.get("links_style", base.links_style)
@@ -2501,20 +2518,19 @@ class BaseShape:
 
     def as_point(
         self,
-        x: float,
-        y: float,
-        margin_left: float,
-        margin_top: float,
+        xy: Point,
         units: float,
         center: Point,
         rotation: float = None,
     ) -> Point:
-        """Create a Point in user units offset from page margin."""
-        pxy = Point(x, y)
+        """Create a Point in user units already offset from page margins."""
+        margin_left = globals.margins.left
+        margin_top = globals.margins.top
+        # print(f'as_point() {margin_left=} {margin_top=} {x=} {y=}')
         if rotation:
-            pxy = geoms.rotate_point_around_point(pxy, center, rotation)
-        xpt = round(pxy.x / units - margin_left, 10)
-        ypt = round(pxy.y / units - margin_top, 10)
+            xy = geoms.rotate_point_around_point(xy, center, rotation)
+        xpt = round(xy.x / units - margin_left, 10)
+        ypt = round(xy.y / units - margin_top, 10)
         return Point(xpt, ypt)
 
     def _p2v(self, value: float, decimals: int = 4):
