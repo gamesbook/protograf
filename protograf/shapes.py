@@ -249,7 +249,25 @@ class ArcShape(BaseShape):
     @property
     def geo(self) -> ShapeGeometry:
         """Geometry of Arc in user units."""
-        return ShapeGeometry()
+        _type = type(self)
+        mx = globals.margins[0]
+        my = globals.margins[1]
+        cntr_user = self.as_point(self.x_c, self.y_c, mx, my, self.units, None, None)
+        return ShapeGeometry(
+            # centre
+            centre=cntr_user,
+            center=cntr_user,
+            c=cntr_user,
+            # vertices
+            # perbii
+            # length
+            # other
+            # meta
+            t=_type,
+            type=_type,
+            shapetype=_type,
+            name=self.simple_name(self),
+        )
 
     @property
     def geometry(self) -> ShapeGeometry:
@@ -448,7 +466,19 @@ class BezierShape(BaseShape):
     @property
     def geo(self) -> ShapeGeometry:
         """Geometry of Bezier in user units."""
-        return ShapeGeometry()
+        _type = type(self)
+        return ShapeGeometry(
+            # centre
+            # vertices
+            # perbii
+            # length
+            # other
+            # meta
+            t=_type,
+            type=_type,
+            shapetype=_type,
+            name=self.simple_name(self),
+        )
 
     @property
     def geometry(self) -> ShapeGeometry:
@@ -485,10 +515,36 @@ class ChordShape(BaseShape):
     Chord line on a Circle on a given canvas.
     """
 
+    def __init__(self, _object=None, canvas=None, **kwargs):
+        super().__init__(_object=_object, canvas=canvas, **kwargs)
+        self._centre = None
+
     @cached_property
     def geo(self) -> ShapeGeometry:
         """Geometry of Chord in user units."""
-        return ShapeGeometry()
+        _type = type(self)
+        mx = globals.margins[0]
+        my = globals.margins[1]
+        cntr_user = None
+        if self._centre:
+            cntr_user = self.as_point(
+                self._centre.x, self._centre.y, mx, my, self.units, None, None
+            )
+        return ShapeGeometry(
+            # centre
+            centre=cntr_user,
+            center=cntr_user,
+            c=cntr_user,
+            # vertices
+            # perbii
+            # length
+            # other
+            # meta
+            t=_type,
+            type=_type,
+            shapetype=_type,
+            name=self.simple_name(self),
+        )
 
     @cached_property
     def geometry(self) -> ShapeGeometry:
@@ -526,6 +582,7 @@ class ChordShape(BaseShape):
         y = pt0.y  # + self._o.delta_y
         x_1 = pt1.x  # + self._o.delta_x
         y_1 = pt1.y  # + self._o.delta_y
+        self._centre = geoms.fraction_along_line(pt0, pt1, 0.5)
         # ---- draw chord
         # feedback(f"*** Chord {x=} {y=}, {x_1=} {y_1=}")
         mid_point = geoms.fraction_along_line(Point(x, y), Point(x_1, y_1), 0.5)
@@ -795,7 +852,26 @@ class DotShape(BaseShape):
     @property
     def geo(self) -> ShapeGeometry:
         """Geometry of Dot in user units."""
-        return ShapeGeometry()
+        _type = type(self)
+        cntr = self._shape_centre
+        mx = globals.margins[0]
+        my = globals.margins[1]
+        cntr_user = self.as_point(cntr.x, cntr.y, mx, my, self.units, None, None)
+        return ShapeGeometry(
+            # centre
+            centre=cntr_user,
+            center=cntr_user,
+            c=cntr_user,
+            # vertices
+            # perbii
+            # length
+            # other
+            # meta
+            t=_type,
+            type=_type,
+            shapetype=_type,
+            name=self.simple_name(self),
+        )
 
     @property
     def geometry(self) -> ShapeGeometry:
@@ -849,7 +925,28 @@ class EllipseShape(BaseShape):
     @property
     def geo(self) -> ShapeGeometry:
         """Geometry of Ellipse in user units."""
-        return ShapeGeometry()
+        _type = type(self)
+        cntr = self._shape_centre
+        mx = globals.margins[0]
+        my = globals.margins[1]
+        cntr_user = self.as_point(
+            cntr.x, cntr.y, mx, my, self.units, cntr, self.rotation
+        )
+        return ShapeGeometry(
+            # centre
+            centre=cntr_user,
+            center=cntr_user,
+            c=cntr_user,
+            # vertices
+            # perbii
+            # length
+            # other
+            # meta
+            t=_type,
+            type=_type,
+            shapetype=_type,
+            name=self.simple_name(self),
+        )
 
     @property
     def geometry(self) -> ShapeGeometry:
@@ -1285,7 +1382,28 @@ class PodShape(BaseShape):
     @property
     def geo(self) -> ShapeGeometry:
         """Geometry of Pod in user units."""
-        return ShapeGeometry()
+        _type = type(self)
+        cntr = self._shape_centre
+        mx = globals.margins[0]
+        my = globals.margins[1]
+        cntr_user = self.as_point(
+            cntr.x, cntr.y, mx, my, self.units, cntr, self.rotation
+        )
+        return ShapeGeometry(
+            # centre
+            centre=cntr_user,
+            center=cntr_user,
+            c=cntr_user,
+            # vertices
+            # perbii
+            # length
+            # other
+            # meta
+            t=_type,
+            type=_type,
+            shapetype=_type,
+            name=self.simple_name(self),
+        )
 
     @property
     def geometry(self) -> ShapeGeometry:
@@ -1295,6 +1413,14 @@ class PodShape(BaseShape):
     @property  # do NOT cache because centre needs to be changed!
     def _shape_centre(self) -> Point:
         """Centre of Pod in points."""
+        if self.use_abs_c:
+            x_d = self._abs_cx - self._u.margin_left  # centre
+            y_d = self._abs_cy  # centre
+        else:
+            x, y = self.calculate_xy()
+            x_d = x + self._u.length / 2.0  # centre
+            y_d = y  # centre
+        return Point(x_d, y_d)
 
     def calculate_xy(self, **kwargs):
         """Start of Pod in points."""
@@ -1324,12 +1450,11 @@ class PodShape(BaseShape):
         if self.use_abs_c:
             x = self._abs_cx - self._u.length / 2.0
             y = self._abs_cy
-            x_d = self._abs_cx - self._u.margin_left  # centre
-            y_d = y  # centre
         else:
             x, y = self.calculate_xy()
-            x_d = x + self._u.length / 2.0  # centre
-            y_d = y  # centre
+        # ---- centre
+        self._centre = self._shape_centre
+        x_d, y_d = self._centre.x, self._centre.y
         # ---- handle rotation
         rotation = kwargs.get("rotation", self.rotation)
         if rotation:
@@ -1488,6 +1613,28 @@ class QRCodeShape(BaseShape):
         self.cache_directory = Path(_cache_directory, "qrcodes")
         self.cache_directory.mkdir(parents=True, exist_ok=True)
 
+    @property
+    def geo(self) -> ShapeGeometry:
+        """Geometry of QRCode in user units."""
+        _type = type(self)
+        return ShapeGeometry(
+            # centre
+            # vertices
+            # perbii
+            # length
+            # other
+            # meta
+            t=_type,
+            type=_type,
+            shapetype=_type,
+            name=self.simple_name(self),
+        )
+
+    @property
+    def geometry(self) -> ShapeGeometry:
+        """Geometry of QRCode - alias for geo."""
+        return self.geo
+
     def draw(self, cnv=None, off_x=0, off_y=0, ID=None, **kwargs):
         """Draw a QRCode on a given canvas."""
         kwargs = self.kwargs | kwargs
@@ -1622,7 +1769,28 @@ class RhombusShape(BaseShape):
     @property
     def geo(self) -> ShapeGeometry:
         """Geometry of Rhombus in user units."""
-        return ShapeGeometry()
+        _type = type(self)
+        cntr = self._shape_centre
+        mx = globals.margins[0]
+        my = globals.margins[1]
+        cntr_user = self.as_point(
+            cntr.x, cntr.y, mx, my, self.units, cntr, self.rotation
+        )
+        return ShapeGeometry(
+            # centre
+            centre=cntr_user,
+            center=cntr_user,
+            c=cntr_user,
+            # vertices
+            # perbii
+            # length
+            # other
+            # meta
+            t=_type,
+            type=_type,
+            shapetype=_type,
+            name=self.simple_name(self),
+        )
 
     @property
     def geometry(self) -> ShapeGeometry:
@@ -2220,12 +2388,46 @@ class SectorShape(BaseShape):
     @cached_property
     def geo(self) -> ShapeGeometry:
         """Geometry of Sector in user units."""
-        return ShapeGeometry()
+        _type = type(self)
+        cntr = self._shape_centre
+        mx = globals.margins[0]
+        my = globals.margins[1]
+        cntr_user = self.as_point(
+            cntr.x, cntr.y, mx, my, self.units, cntr, self.rotation
+        )
+        return ShapeGeometry(
+            # centre
+            centre=cntr_user,
+            center=cntr_user,
+            c=cntr_user,
+            # vertices
+            # perbii
+            # length
+            # other
+            # meta
+            t=_type,
+            type=_type,
+            shapetype=_type,
+            name=self.simple_name(self),
+        )
 
     @cached_property
     def geometry(self) -> ShapeGeometry:
         """Geometry of Sector - alias for geo."""
         return self.geo
+
+    @property  # do NOT cache because centre needs to be changed!
+    def _shape_centre(self) -> Point:
+        """Centre of Sector arc in points."""
+        if self.use_abs_c:
+            self.x_c = self._abs_cx
+            self.y_c = self._abs_cy
+        pt_c = Point(self.x_c + self._o.delta_x, self.y_c + self._o.delta_y)
+        # ---- mid point in units
+        pt_mid = geoms.point_on_circle(
+            pt_c, self.unit(self.radius) / 2.0, self.angle_start
+        )
+        return pt_mid
 
     def draw(self, cnv=None, off_x=0, off_y=0, ID=None, **kwargs):
         """Draw sector on a given canvas."""
@@ -2234,11 +2436,11 @@ class SectorShape(BaseShape):
         if self.use_abs_c:
             self.x_c = self._abs_cx
             self.y_c = self._abs_cy
-        # ---- centre point in units
+        # ---- centre point of circle in units
         pt_c = Point(self.x_c + self._o.delta_x, self.y_c + self._o.delta_y)
         # ---- circumference/perimeter point in units
         pt_p = geoms.point_on_circle(pt_c, self.unit(self.radius), self.angle_start)
-        # ---- mid point in units
+        # ---- centre point of arc in units
         pt_mid = geoms.point_on_circle(
             pt_c, self.unit(self.radius) / 2.0, self.angle_start
         )
@@ -2403,6 +2605,7 @@ class StadiumShape(BaseShape):
         elif self.kwargs.get("height") and self.kwargs.get("width"):
             self.side = math.sqrt((self.height / 2.0) ** 2 + (self.width / 2.0) ** 2)
         # overrides to centre shape
+        self._centre = None
         if self.cx is not None and self.cy is not None:
             self.x = self.cx - self.width / 2.0
             self.y = self.cy - self.height / 2.0
@@ -2413,21 +2616,47 @@ class StadiumShape(BaseShape):
     @property
     def geo(self) -> ShapeGeometry:
         """Geometry of Stadium in user units."""
-        return ShapeGeometry()
+        _type = type(self)
+        cntr = self._shape_centre
+        mx = globals.margins[0]
+        my = globals.margins[1]
+        cntr_user = self.as_point(
+            cntr.x, cntr.y, mx, my, self.units, cntr, self.rotation
+        )
+        return ShapeGeometry(
+            # centre
+            centre=cntr_user,
+            center=cntr_user,
+            c=cntr_user,
+            # vertices
+            # perbii
+            # length
+            # other
+            # meta
+            t=_type,
+            type=_type,
+            shapetype=_type,
+            name=self.simple_name(self),
+        )
 
     @property
     def geometry(self) -> ShapeGeometry:
         """Geometry of Stadium - alias for geo."""
         return self.geo
 
-    def draw(self, cnv=None, off_x=0, off_y=0, ID=None, **kwargs):
-        """Draw a Stadium on a given canvas."""
-        kwargs = self.kwargs | kwargs
-        cnv = cnv if cnv else globals.canvas  # a new Page/Shape may now exist
-        super().draw(cnv, off_x, off_y, ID, **kwargs)  # unit-based props
-        if "fill" in kwargs.keys():
-            if kwargs.get("fill") is None:
-                feedback("Cannot have no fill for a Stadium!", True)
+    @property  # do NOT cache because centre needs to be changed!
+    def _shape_centre(self) -> Point:
+        """Get centre point of the Rectangle."""
+        x, y = self.calculate_xy()
+        if self.use_abs_c:
+            x = self._abs_cx - self._u.width / 2.0
+            y = self._abs_cy - self._u.height / 2.0
+        x_d = x + self._u.width / 2.0
+        y_d = y + self._u.height / 2.0
+        return Point(x=x_d, y=y_d)
+
+    def calculate_xy(self, **kwargs) -> tuple:
+        """Calculate top-left point of Stadium."""
         # ---- adjust start
         if self.row is not None and self.col is not None:
             x = self.col * self._u.width + self._o.delta_x
@@ -2438,15 +2667,26 @@ class StadiumShape(BaseShape):
         else:
             x = self._u.x + self._o.delta_x
             y = self._u.y + self._o.delta_y
-        # ---- calculate centre of the shape
-        cx = x + self._u.width / 2.0
-        cy = y + self._u.height / 2.0
         # ---- overrides for grid layout
         if self._abs_cx is not None and self._abs_cy is not None:
             cx = self._abs_cx
             cy = self._abs_cy
             x = cx - self._u.width / 2.0
             y = cy - self._u.height / 2.0
+        return x, y
+
+    def draw(self, cnv=None, off_x=0, off_y=0, ID=None, **kwargs):
+        """Draw a Stadium on a given canvas."""
+        kwargs = self.kwargs | kwargs
+        cnv = cnv if cnv else globals.canvas  # a new Page/Shape may now exist
+        super().draw(cnv, off_x, off_y, ID, **kwargs)  # unit-based props
+        if "fill" in kwargs.keys():
+            if kwargs.get("fill") is None:
+                feedback("Cannot have no fill for a Stadium!", True)
+        # ---- calculate centre of the shape
+        x, y = self.calculate_xy(**kwargs)
+        self._centre = self._shape_centre
+        cx, cy = self._centre.x, self._centre.y
         # ---- handle rotation
         rotation = kwargs.get("rotation", self.rotation)
         if rotation:
@@ -2572,7 +2812,28 @@ class StarShape(BaseShape):
     @property
     def geo(self) -> ShapeGeometry:
         """Geometry of Star in user units."""
-        return ShapeGeometry()
+        _type = type(self)
+        cntr = self._shape_centre
+        mx = globals.margins[0]
+        my = globals.margins[1]
+        cntr_user = self.as_point(
+            cntr.x, cntr.y, mx, my, self.units, cntr, self.rotation
+        )
+        return ShapeGeometry(
+            # centre
+            centre=cntr_user,
+            center=cntr_user,
+            c=cntr_user,
+            # vertices
+            # perbii
+            # length
+            # other
+            # meta
+            t=_type,
+            type=_type,
+            shapetype=_type,
+            name=self.simple_name(self),
+        )
 
     @property
     def geometry(self) -> ShapeGeometry:

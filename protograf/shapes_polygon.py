@@ -84,10 +84,10 @@ class PolygonShape(BaseShape):
         perim = None
         radius = self._p2v(self._shape_radius)
         area = self._p2v(self._shape_area)
-        vtc = self._shape_vertexes_named
+        vtcs = self._shape_vertexes
         vtcs_user = [
             self.as_point(value.x, value.y, mx, my, self.units, cntr, self.rotation)
-            for key, value in vtc.items()
+            for value in vtcs
         ]
         return ShapeGeometry(
             # centre
