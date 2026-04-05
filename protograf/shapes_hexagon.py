@@ -98,10 +98,44 @@ class HexShape(BaseShape):
         cntr = Point(self.x_d, self.y_d)
         cntr_user = self.as_point(cntr, self.units, None, None)
         vtcs = self._shape_vertexes
-        # vertices vary by ORIENTATION!
-        ne = self.as_point(vtcs[0], self.units, None, None)
-        se = self.as_point(vtcs[1], self.units, None, None)
-        nw = self.as_point(vtcs[5], self.units, None, None)
+        # vertices and perbii vary by ORIENTATION!
+        n, ne, nw, e, se, s, sw, w = None, None, None, None, None, None, None, None
+        nnw, nne, sse, ssw = None, None, None, None  # pointy
+        wnw, ene, ese, wsw = None, None, None, None  # flat
+        if self.ORIENTATION == HexOrientation.POINTY:
+            # vertices
+            nw = self.as_point(vtcs[0], self.units, None, None)
+            sw = self.as_point(vtcs[1], self.units, None, None)
+            s = self.as_point(vtcs[2], self.units, None, None)
+            se = self.as_point(vtcs[3], self.units, None, None)
+            ne = self.as_point(vtcs[4], self.units, None, None)
+            n = self.as_point(vtcs[5], self.units, None, None)
+            # perbii
+            e = geoms.fraction_along_line(ne, se, 0.5)
+            w = geoms.fraction_along_line(nw, sw, 0.5)
+            nnw = geoms.fraction_along_line(n, nw, 0.5)
+            nne = geoms.fraction_along_line(n, ne, 0.5)
+            sse = geoms.fraction_along_line(s, se, 0.5)
+            ssw = geoms.fraction_along_line(s, sw, 0.5)
+        elif self.ORIENTATION == HexOrientation.FLAT:
+            # vertices
+            w = self.as_point(vtcs[0], self.units, None, None)
+            sw = self.as_point(vtcs[1], self.units, None, None)
+            se = self.as_point(vtcs[2], self.units, None, None)
+            e = self.as_point(vtcs[3], self.units, None, None)
+            ne = self.as_point(vtcs[4], self.units, None, None)
+            nw = self.as_point(vtcs[5], self.units, None, None)
+            # perbii
+            n = geoms.fraction_along_line(nw, ne, 0.5)
+            s = geoms.fraction_along_line(sw, se, 0.5)
+            wnw = geoms.fraction_along_line(w, nw, 0.5)
+            ene = geoms.fraction_along_line(e, ne, 0.5)
+            ese = geoms.fraction_along_line(e, se, 0.5)
+            wsw = geoms.fraction_along_line(w, sw, 0.5)
+        else:
+            feedback(
+                'Invalid orientation "{self.ORIENTATION}" supplied for hexagon.', True
+            )
         hex_geom = self.get_geometry()
         radius = self._p2v(hex_geom.radius)
         diameter = self._p2v(hex_geom.diameter)
@@ -113,12 +147,23 @@ class HexShape(BaseShape):
             centre=cntr_user,
             center=cntr_user,
             c=cntr_user,
-            # vertices
+            # vertices and perbii
+            n=n,
             ne=ne,
-            nw=nw,
+            e=e,
             se=se,
-            # perbii
-            n=geoms.fraction_along_line(nw, ne, 0.5),
+            s=s,
+            sw=sw,
+            w=w,
+            nw=nw,
+            nnw=nnw,
+            nne=nne,
+            sse=sse,
+            ssw=ssw,
+            wnw=wnw,
+            ene=ene,
+            ese=ese,
+            wsw=wsw,
             # length
             perimeter=perim,
             radius=radius,
