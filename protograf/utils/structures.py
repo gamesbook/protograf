@@ -213,6 +213,7 @@ shapegeometry_fields = (
     "perimeter",
     # other
     "area",
+    "sides",  # e.g. for a regular Polygon
     # meta
     "t",
     "type",

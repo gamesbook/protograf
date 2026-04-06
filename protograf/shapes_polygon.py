@@ -80,6 +80,7 @@ class PolygonShape(BaseShape):
         perim = None
         radius = self._p2v(self._shape_radius)
         area = self._p2v(self._shape_area)
+        # numbered vertices and perbii
         vtcs = self._shape_vertexes
         vtcs_user = [
             self.as_point(value, self.units, cntr, self.rotation) for value in vtcs
@@ -92,11 +93,39 @@ class PolygonShape(BaseShape):
             perbii_user.append(
                 geoms.fraction_along_line(vtcs_user[pb], vtcs_user[pb + 1], 0.5)
             )
+        # named vertices - for "regular" sides
+        n, ne, nw, e, se, s, sw, w = None, None, None, None, None, None, None, None
+        if self.sides == 3:  # triangle
+            se = vtcs_user[0]
+            sw = vtcs_user[1]
+            n = vtcs_user[2]
+        if self.sides == 4:  # square
+            ne = vtcs_user[0]
+            se = vtcs_user[1]
+            sw = vtcs_user[2]
+            nw = vtcs_user[3]
+        if self.sides == 6:  # hexagon
+            ne = vtcs_user[0]
+            e = vtcs_user[1]
+            se = vtcs_user[2]
+            sw = vtcs_user[3]
+            w = vtcs_user[4]
+            nw = vtcs_user[5]
+
         return ShapeGeometry(
             # centre
             centre=cntr_user,
             center=cntr_user,
             c=cntr_user,
+            # named vertices (for some polygons only)
+            n=n,
+            ne=ne,
+            e=e,
+            se=se,
+            s=s,
+            sw=sw,
+            w=w,
+            nw=nw,
             # vertices
             v=vtcs_user,
             vertices=vtcs_user,
@@ -109,6 +138,7 @@ class PolygonShape(BaseShape):
             diameter=2 * radius,
             # other
             area=area,
+            sides=self.sides,
             # meta
             t=_type,
             type=_type,

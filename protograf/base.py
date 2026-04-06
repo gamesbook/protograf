@@ -848,18 +848,22 @@ class BaseShape:
         # ---- positions
         __x, __y, __cx, __cy = None, None, None, None
         self.xy = kwargs.get("xy", base.xy)
-        if self.xy and isinstance(self.xy, Point):
+        if self.xy is not None and isinstance(self.xy, Point):
             __x, __y = self.xy.x, self.xy.y
-        self.x = self.kw_float(kwargs.get("x", __x or kwargs.get("left", base.x)))
-        self.y = self.kw_float(kwargs.get("y", __y or kwargs.get("top", base.y)))
+        self.x = self.kw_float(
+            kwargs.get("x", __x if __x is not None else kwargs.get("left", base.x))
+        )
+        self.y = self.kw_float(
+            kwargs.get("y", __y if __y is not None else kwargs.get("top", base.y))
+        )
         self.cxy = kwargs.get("cxy", base.cxy)
-        if self.cxy and isinstance(self.cxy, Point):
+        if self.cxy is not None and isinstance(self.cxy, Point):
             __cx, __cy = self.cxy.x, self.cxy.y
         self.cx = self.kw_float(
-            kwargs.get("cx", __cx or base.cx)
+            kwargs.get("cx", __cx if __cx is not None else base.cx)
         )  # centre (for some shapes)
         self.cy = self.kw_float(
-            kwargs.get("cy", __cy or base.cy)
+            kwargs.get("cy", __cy if __cy is not None else base.cy)
         )  # centre (for some shapes)
         # print(f"{self.xy=} {self.x=} {self.y=} {self.cx=} {self.cy=}")
         # ---- to be calculated ...

@@ -16,6 +16,67 @@ Create(
 
 txt = Common(x=0, y=0, font_size=8, align="left")
 
+# ---- polyshape/sector - geo points
+Text(common=txt, text='Reuse of "geo" points')
+Blueprint(stroke_width=0.5)
+hx = Hexagon(
+  x=0, y=0.85, height=2,
+  fill="yellow",
+  orientation="pointy")
+Polyshape(
+  points=[hx.geo.c, hx.geo.ne, hx.geo.se],
+  fill="tomato")
+cc = Circle(
+  x=2, y=3, radius=0.9,
+  fill="yellow")
+Sector(
+  cxy=cc.geo.c,
+  radius=cc.geo.radius,
+  angle_width=60,
+  angle_start=-30,
+  fill="tomato")
+PageBreak()
+
+# ---- polygon - numbered and named points
+Text(common=txt, text='Polygon: "geo" points')
+Blueprint(stroke_width=0.5)
+# triangle
+p1 = Polygon(x=1, y=1, sides=3, side=1.5)
+Dot(cxy=p1.geo.n, fill_stroke="red")
+Dot(cxy=p1.geo.se, fill_stroke="blue")
+Dot(cxy=p1.geo.sw, fill_stroke="green")
+p2 = Polygon(x=3, y=1, sides=3, side=1.5)
+Dot(cxy=p2.geo.v[2], fill_stroke="red")
+Dot(cxy=p2.geo.v[0], fill_stroke="blue")
+Dot(cxy=p2.geo.v[1], fill_stroke="green")
+# square
+p1 = Polygon(x=1, y=3, sides=4, side=1.5)
+Dot(cxy=p1.geo.ne, fill_stroke="red")
+Dot(cxy=p1.geo.se, fill_stroke="blue")
+Dot(cxy=p1.geo.sw, fill_stroke="green")
+Dot(cxy=p1.geo.nw, fill_stroke="yellow")
+p2 = Polygon(x=3, y=3, sides=4, side=1.5)
+Dot(cxy=p2.geo.v[0], fill_stroke="red")
+Dot(cxy=p2.geo.v[1], fill_stroke="blue")
+Dot(cxy=p2.geo.v[2], fill_stroke="green")
+Dot(cxy=p2.geo.v[3], fill_stroke="yellow")
+# hexagon
+p1 = Polygon(x=1, y=5, sides=6, side=0.8)
+Dot(cxy=p1.geo.ne, fill_stroke="red")
+Dot(cxy=p1.geo.e, fill_stroke="blue")
+Dot(cxy=p1.geo.se, fill_stroke="green")
+Dot(cxy=p1.geo.sw, fill_stroke="yellow")
+Dot(cxy=p1.geo.w, fill_stroke="pink")
+Dot(cxy=p1.geo.nw, fill_stroke="purple")
+p2 = Polygon(x=3, y=5, sides=6, side=0.8)
+Dot(cxy=p2.geo.v[0], fill_stroke="red")
+Dot(cxy=p2.geo.v[1], fill_stroke="blue")
+Dot(cxy=p2.geo.v[2], fill_stroke="green")
+Dot(cxy=p2.geo.v[3], fill_stroke="yellow")
+Dot(cxy=p2.geo.v[4], fill_stroke="pink")
+Dot(cxy=p2.geo.v[5], fill_stroke="purple")
+PageBreak()
+
 # ---- hexagon - vertices and perbii points
 Text(common=txt, text='Hexagon: "geo" points')
 Blueprint(stroke_width=0.5)
@@ -60,6 +121,8 @@ Save(
     dpi=300,
     directory="../docs/source/images/custom/geo",
     names=[
+        "polygon_named",
+        "geo_points_poly",
         "hex_vertices_perbii",
     ]
 )

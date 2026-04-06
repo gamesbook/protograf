@@ -88,6 +88,7 @@ a handy cross-reference to the detailed information for that command.
    the document; not required for a :ref:`Deck <the-deck-command>`
 -  :ref:`Pentomino <pentominoesOver>` * - a compound shape made up of five squares
 -  :ref:`Pod <pod-command>` * - a geometric shape that can be drawn on a page
+-  :ref:`Point <point-command>` - a command to set both x- and y- values for a position
 -  :ref:`Polygon <polygon-command>` * - a geometric shape that can be drawn on a page
 -  :ref:`Polyline <polyline-command>` * - a geometric shape that can be drawn on a page
 -  :ref:`Polyomino <polyominoesOver>` * - a compound shape made up of one or more squares

@@ -89,6 +89,9 @@ class RectangleShape(BaseShape):
         nw = self.as_point(vtcs[3], self.units, cntr, self.rotation)
         perim = (self.height + self.width) * 2
         area = self.height * self.width
+        radius = (
+            math.hypot(self.height, self.width) if self.height == self.width else None
+        )
         return ShapeGeometry(
             # centre
             centre=cntr_user,
@@ -106,6 +109,7 @@ class RectangleShape(BaseShape):
             w=geoms.fraction_along_line(nw, sw, 0.5),
             # length
             perimeter=perim,
+            radius=radius,
             # other
             area=area,
             # meta

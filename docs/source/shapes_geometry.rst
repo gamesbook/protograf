@@ -1,0 +1,384 @@
+===============
+Shapes Geometry
+===============
+
+.. |dash| unicode:: U+2014 .. EM DASH SIGN
+.. |copy| unicode:: U+000A9 .. COPYRIGHT SIGN
+   :trim:
+.. |deg|  unicode:: U+00B0 .. DEGREE SIGN
+   :ltrim:
+
+The descriptions here assume you are familiar with the concepts, terms
+and ideas for :doc:`protograf <index>` as presented in the
+:doc:`Basic Concepts <basic_concepts>` |dash| especially *units*,
+*properties* and *defaults*.
+
+You should have already seen how these shapes were created, with defaults,
+in :doc:`Core Shapes <core_shapes>`.  You will also need to understand how
+shapes can be :doc:`further customised <customised_shapes>`
+
+.. _table-of-contents-geometry:
+
+- `Overview`_
+- `Point-based Locations`_
+- `Geometry Properties`_
+- `Examples of using Named Geometry Properties`_
+
+Overview
+========
+`↑ <table-of-contents-geometry_>`_
+
+When reading this section, you should already know how shapes are created by
+using commands, and understand how their properties are set.
+
+This section describes the use of **point** locations to set where shapes are
+drawn. It also covers the availability and use of a shape's **geometry**
+properties that can be used to set *relative* locations e.g. given that a
+Rectangle has been drawn, use a relative reference to its north-east corner.
+
+
+.. _point-command:
+
+Point-based Locations
+=====================
+`↑ <table-of-contents-geometry_>`_
+
+For the majority of shapes, their location is typically set either by supplying
+their ``x`` and ``y`` values to define the top-left position of the shape
+|dash| with both values defaulting to ``1`` |dash| or through their ``cx`` and
+``cy`` values to define the centre position of the shape |dash| with both
+values defaulting to ``1``.
+
+It is also possible to use the ``xy`` property or ``cxy`` property to achieve
+the same result; the difference being that the script needs to provide values
+through a ``Point`` command rather than through a single number.
+
+For example, in all cases below the top-left of the Rectangle is at
+x-position ``2`` and y-position ``3``:
+
+.. code:: python
+
+    Rectangle(x=2, y=3)
+    Rectangle(xy=Point(x=2, y=3))
+    Rectangle(xy=Point(2, 3))
+
+In this example, in all cases below the centre of the Rectangle is at
+x-position ``1`` and y-position ``4``:
+
+.. code:: python
+
+    Rectangle(cx=1, cy=4)
+    Rectangle(cxy=Point(x=1, y=4))
+    Rectangle(cxy=Point(1, 4))
+
+It can be seen that the ``Point()`` command simply takes two values |dash| if
+not named then its assumed that these correspond to ``x`` and ``y`` in that
+order.
+
+Setting locations this way is more verbose and, perhaps less immediately clear
+than using single properties.  However, it might be of use in some cases |dash|
+and is certainly needed when referencing another shape's geometry (see below).
+
+
+.. _geometryProps:
+
+Geometry Properties
+===================
+`↑ <table-of-contents-geometry_>`_
+
+Much of :doc:`protograf <index>`'s documentation and focus is on *setting*
+of properties for shapes so that they appear the way you want them to.
+However, it can be useful to reuse those properties to allow for more
+flexibility and ease-of-change.
+
+Using a Property
+----------------
+
+Each shape, depending on its characteristics, has various geometry properties
+available.  These are referenced using a ``name.geo.XYZ`` syntax; where the
+``name`` is a name assigned in the script to the shape, and the ``XYZ`` is
+the property being referenced.  For example:
+
+.. code:: python
+
+    box = Rectangle(cx=1, cy=4, height=2, width=5)
+    Circle(cxy=box.geo.c, radius=1)
+
+Here the name ``box`` is assigned to the Rectangle, and the Circle's centre
+*point* is set by referencing the Rectangle's centre *point* via the
+``box.geo.c``, where the ``c`` refers to the **centre**.
+
+.. HINT::
+
+    You can also refer to a shape's geometry properties by using the term in
+    full |dash| for example, ``box.geometry.c``
+
+Available Properties
+--------------------
+
+These are the potentially available properties.  Obviously, their value may
+or may not be set depending on the shape involved; so circular-like shapes
+such as a Circle, Ellipse, Hexagon and Polygon have a radius, whereas shapes
+such as a Rhombus, Line or Cross will not.
+
+Named Location Properties
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Locations refer to key points for a shape.
+
+Key points include: the shape centre |dash| common to most shapes;
+the vertices which help define its "outer" lines; and, for specific shapes,
+the perbii i.e. the mid-points of the lines between two vertices at which
+the lines from the centre of the shape form right-angles to them.
+
+Locations are typically referenced via :ref:`compass directions <termsDirection>`
+which match the location, relative to the shape's centre, in an exact or
+*approximate* way. These include:
+
+* ``n`` - a point to the north
+* ``s`` - a point to the south
+* ``e`` - a point to the east
+* ``w`` - a point to the west
+* ``ne`` - a point to the north-east
+* ``se`` - a point to the south-east
+* ``nw`` - a point to the north-west
+* ``sw`` - a point to the south-west
+* ``nnw`` - a point to the north-north-west
+* ``nne`` - a point to the north-north-east
+* ``sse`` - a point to the south-south-east
+* ``ssw`` - a point to the south-south-west
+* ``wnw`` - a point to the west-north-west
+* ``ene`` - a point to the east-north-east
+* ``ese`` - a point to the east-south-east
+* ``wsw`` - a point to the west-south-west
+
+Unnamed Location Properties
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+It is not always possible to name locations.  For some shapes, they can only
+be referenced by a number.
+
+Unnamed locations include:
+
+* ``vertices`` (``v``) - a list of vertices of the shape, where each item is
+  referenced by number, starting from ``0``.
+* ``perbii`` (``p``) - a list of perbii of the shape, where each item is
+  referenced by number, starting from ``0``.
+
+As an example:
+
+.. code:: python
+
+    ply = Polygon(cx=1, cy=4, sides=7, side=1)
+    Line(xy=ply.geo.v[3], length=1)
+
+Here the line uses, as its starting point, the fourth vertex of the 7-sided
+polygon.
+
+Size Properties
+~~~~~~~~~~~~~~~
+
+* ``area`` - the area of the shape
+* ``perimeter`` - the length of the line around the shape
+* ``radius`` - the radius of the shape
+* ``diameter`` - the diameter of the shape
+* ``side`` - the length of a side of the shape (if all sides are equal)
+* ``length`` - the length of the shape (if it has a set length)
+* ``width`` - the width of the shape  (if it has a set width)
+* ``height`` - the height of the shape
+* ``sides`` - the number of side of the shape (if all sides are of equal length)
+
+.. NOTE::
+
+    Be aware that in some cases, the calculations may **not** yet be in place
+    for some of these calculated values |dash| use with caution!
+
+Non-Numeric Properties
+~~~~~~~~~~~~~~~~~~~~~~
+
+* ``type`` - the shape type (the internal **protograf** type)
+* ``name`` - the shape's name is usually the same as its command
+
+
+Examples of using Named Geometry Properties
+===========================================
+`↑ <table-of-contents-geometry_>`_
+
+
+Example 1. Use of Named Properties
+----------------------------------
+
+.. |go1| image:: images/custom/geo/polygon_named.png
+   :width: 330
+
+===== ======
+|go1| This example shows named points referenced using these
+      commands:
+
+      .. code:: python
+
+        hx = Hexagon(
+          x=0, y=0.85, height=2,
+          fill="yellow",
+          orientation="pointy")
+        Polyshape(
+          points=[hx.geo.c, hx.geo.ne, hx.geo.se],
+          fill="tomato")
+        cc = Circle(
+          x=2, y=3, radius=0.9,
+          fill="yellow")
+        Sector(
+          cxy=cc.geo.c,
+          radius=cc.geo.radius,
+          angle_width=60,
+          angle_start=-30,
+          fill="tomato")
+
+      The two "primary" shapes |dash| Hexagon and Circle |dash| are
+      assigned names (``hx`` and ``cc`` respectively).
+
+      These are then used to allow access to their geometric properties.
+
+      For example, the triangular Polyshape is drawn over the Hexagon by
+      referencing various of its available vertices for use in the *points*
+      property.
+
+      The Sector is drawn over the Circle by referencing both the *radius*
+      and the centre of the Circle (assigned to *cxy*).
+
+===== ======
+
+
+Example 2. Use of Named Vertices
+--------------------------------
+
+.. |go2| image:: images/custom/geo/geo_points_poly.png
+   :width: 330
+
+===== ======
+|go2| This example shows named points referenced using these
+      commands:
+
+      .. code:: python
+
+        p1 = Polygon(x=1, y=1, sides=3, side=1.5)
+        Dot(cxy=p1.geo.n, fill_stroke="red")
+        Dot(cxy=p1.geo.se, fill_stroke="blue")
+        Dot(cxy=p1.geo.sw, fill_stroke="green")
+        p2 = Polygon(x=3, y=1, sides=3, side=1.5)
+        Dot(cxy=p2.geo.v[2], fill_stroke="red")
+        Dot(cxy=p2.geo.v[0], fill_stroke="blue")
+        Dot(cxy=p2.geo.v[1], fill_stroke="green")
+
+        p1 = Polygon(x=1, y=3, sides=4, side=1.5)
+        Dot(cxy=p1.geo.ne, fill_stroke="red")
+        Dot(cxy=p1.geo.se, fill_stroke="blue")
+        Dot(cxy=p1.geo.sw, fill_stroke="green")
+        Dot(cxy=p1.geo.nw, fill_stroke="yellow")
+        p2 = Polygon(x=3, y=3, sides=4, side=1.5)
+        Dot(cxy=p2.geo.v[0], fill_stroke="red")
+        Dot(cxy=p2.geo.v[1], fill_stroke="blue")
+        Dot(cxy=p2.geo.v[2], fill_stroke="green")
+        Dot(cxy=p2.geo.v[3], fill_stroke="yellow")
+
+        p1 = Polygon(x=1, y=5, sides=6, side=0.8)
+        Dot(cxy=p1.geo.ne, fill_stroke="red")
+        Dot(cxy=p1.geo.e, fill_stroke="blue")
+        Dot(cxy=p1.geo.se, fill_stroke="green")
+        Dot(cxy=p1.geo.sw, fill_stroke="yellow")
+        Dot(cxy=p1.geo.w, fill_stroke="pink")
+        Dot(cxy=p1.geo.nw, fill_stroke="purple")
+        p2 = Polygon(x=3, y=5, sides=6, side=0.8)
+        Dot(cxy=p2.geo.v[0], fill_stroke="red")
+        Dot(cxy=p2.geo.v[1], fill_stroke="blue")
+        Dot(cxy=p2.geo.v[2], fill_stroke="green")
+        Dot(cxy=p2.geo.v[3], fill_stroke="yellow")
+        Dot(cxy=p2.geo.v[4], fill_stroke="pink")
+        Dot(cxy=p2.geo.v[5], fill_stroke="purple")
+
+      This example shows the "equivalence" between use of compass directions
+      versus numbered vertices (such as ``v[0]``).  The named directions can
+      only be used for these polygons because of their smaller number of sides.
+
+      Other sizes of polygons will not have any named locations available, and
+      to reference their vertices will require the use of numbers.
+
+===== ======
+
+
+Example 3. Hexagonal Vertices and Perbii
+----------------------------------------
+
+.. |go3| image:: images/custom/geo/hex_vertices_perbii.png
+   :width: 330
+
+===== ======
+|go3| This example shows the points that can be referenced using these
+      commands:
+
+      .. code:: python
+
+        Image(
+          "compass.png",
+          x=0, y=0.1, height=2, width=2)
+        hx = Hexagon(
+          x=-0.15, y=0.1, height=2,
+          fill=None, stroke_width=1)
+        Dot(cxy=hx.geo.ne, fill_stroke="red")
+        Dot(cxy=hx.geo.e, fill_stroke="blue")
+        Dot(cxy=hx.geo.se, fill_stroke="green")
+        Dot(cxy=hx.geo.sw, fill_stroke="yellow")
+        Dot(cxy=hx.geo.w, fill_stroke="pink")
+        Dot(cxy=hx.geo.nw, fill_stroke="purple")
+
+        Image(
+          "compass.png",
+          x=2, y=1.1, height=2, width=2)
+        hx = Hexagon(
+          x=1.85, y=1.1, height=2,
+          fill=None, stroke_width=1)
+        Dot(cxy=hx.geo.ene, fill_stroke="red")
+        Dot(cxy=hx.geo.ese, fill_stroke="blue")
+        Dot(cxy=hx.geo.s, fill_stroke="green")
+        Dot(cxy=hx.geo.wsw, fill_stroke="yellow")
+        Dot(cxy=hx.geo.wnw, fill_stroke="pink")
+        Dot(cxy=hx.geo.n, fill_stroke="purple")
+
+        Image(
+          "compass.png",
+          x=0, y=3, height=2, width=2)
+        hx = Hexagon(
+          x=0, y=2.85, height=2, fill=None,
+          stroke_width=1, orientation="pointy")
+        Dot(cxy=hx.geo.ne, fill_stroke="red")
+        Dot(cxy=hx.geo.se, fill_stroke="blue")
+        Dot(cxy=hx.geo.s, fill_stroke="green")
+        Dot(cxy=hx.geo.sw, fill_stroke="yellow")
+        Dot(cxy=hx.geo.nw, fill_stroke="pink")
+        Dot(cxy=hx.geo.n, fill_stroke="purple")
+
+        Image(
+          "compass.png",
+          x=2.1, y=3.8, height=2, width=2)
+        hx = Hexagon(
+          x=2.1, y=3.65, height=2, fill=None,
+          stroke_width=1, orientation="pointy")
+        Dot(cxy=hx.geo.nne, fill_stroke="red")
+        Dot(cxy=hx.geo.e, fill_stroke="blue")
+        Dot(cxy=hx.geo.sse, fill_stroke="green")
+        Dot(cxy=hx.geo.ssw, fill_stroke="yellow")
+        Dot(cxy=hx.geo.w, fill_stroke="pink")
+        Dot(cxy=hx.geo.nnw, fill_stroke="purple")
+
+      These four Hexagons each show a different aspect of using named
+      locations. In all cases, a series of colored Dots are drawn, in the
+      same sequence, in a clockwise direction.
+
+      While vertices can be easily identified with primary or secondary
+      compass directions, some of the perbii can only be identified by
+      tertiary directions.
+
+      The compass image provides some context to see how the named locations
+      are approximations to the actual directions.
+
+===== ======

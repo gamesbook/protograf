@@ -20,6 +20,7 @@ python core/customised_line.py --no-png -d /tmp/demo
 python core/customised_rectangle.py --no-png -d /tmp/demo
 python core/customised_shapes.py --no-png -d /tmp/demo
 python core/customised_text.py --no-png -d /tmp/demo
+python core/shapes_geo.py --no-png -d /tmp/demo
 # ---- examples: simple: layouts
 echo -e "\nCreating customised layouts..."
 python core/layouts/layouts_basic.py --no-png -d /tmp/demo

@@ -348,8 +348,8 @@ Secondary compass directions |dash| with full names shown in brackets:
 .. NOTE::
 
    If a compass direction is used in the context of a ``Hexagon``,
-   then the angle is "reinterpreted" to match its context
-   e.g. the *NE* angle for a ‘pointy’ hexagon is 60, not 45, degrees.
+   then the angle is "reinterpreted" to approximate its context
+   e.g. the *NE* angle for a "pointy" hexagon is 60, not 45, degrees.
 
 Properties that use directional terms include:
 
