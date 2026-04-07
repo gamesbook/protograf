@@ -2598,8 +2598,45 @@ class StadiumShape(BaseShape):
         sw = self.as_point(vtcs[1], self.units, cntr, self.rotation)
         se = self.as_point(vtcs[2], self.units, cntr, self.rotation)
         ne = self.as_point(vtcs[3], self.units, cntr, self.rotation)
+        # defaults
+        n = geoms.fraction_along_line(nw, ne, 0.5)
+        s = geoms.fraction_along_line(sw, se, 0.5)
+        e = geoms.fraction_along_line(ne, se, 0.5)
+        w = geoms.fraction_along_line(nw, sw, 0.5)
+        # override defaults for curves
+        area_n, area_s, area_e, area_w = 0.0, 0.0, 0.0, 0.0
+        perim_n, perim_s, perim_e, perim_w = 0.0, 0.0, 0.0, 0.0
+        _edges = tools.validated_directions(
+            self.edges, DirectionGroup.CARDINAL, "stadium edges"
+        )
+        if "w" in _edges:
+            w_o = geoms.fraction_along_line(vtcs[0], vtcs[1], 0.5)
+            w_m = Point(w_o.x - self._u.height / 2.0, w_o.y)
+            w = self.as_point(w_m, self.units, cntr, self.rotation)
+            area_w = 0.5 * math.pi * (self.height / 2.0) ** 2
+            perim_w = math.pi * self.height / 2.0 - self.height
+        if "e" in _edges:
+            e_o = geoms.fraction_along_line(vtcs[2], vtcs[3], 0.5)
+            e_m = Point(e_o.x + self._u.height / 2.0, e_o.y)
+            e = self.as_point(e_m, self.units, cntr, self.rotation)
+            area_e = 0.5 * math.pi * (self.height / 2.0) ** 2
+            perim_e = math.pi * self.height / 2.0 - self.height
+        if "n" in _edges:
+            n_o = geoms.fraction_along_line(vtcs[0], vtcs[3], 0.5)
+            n_m = Point(n_o.x, n_o.y - self._u.width / 2.0)
+            n = self.as_point(n_m, self.units, cntr, self.rotation)
+            area_n = 0.5 * math.pi * (self.width / 2.0) ** 2
+            perim_n = math.pi * self.width / 2.0 - self.width
+        if "s" in _edges:
+            s_o = geoms.fraction_along_line(vtcs[1], vtcs[2], 0.5)
+            s_m = Point(s_o.x, s_o.y + self._u.width / 2.0)
+            s = self.as_point(s_m, self.units, cntr, self.rotation)
+            area_s = 0.5 * math.pi * (self.width / 2.0) ** 2
+            perim_s = math.pi * self.width / 2.0 - self.width
+        # values with possible rounding
         perim = (self.height + self.width) * 2
-        area = self.height * self.width
+        perim += perim_n + perim_s + perim_e + perim_w
+        area = self.height * self.width + area_n + area_s + area_e + area_w
         return ShapeGeometry(
             # centre
             centre=cntr_user,
@@ -2611,10 +2648,10 @@ class StadiumShape(BaseShape):
             se=se,
             sw=sw,
             # perbii
-            n=geoms.fraction_along_line(nw, ne, 0.5),
-            s=geoms.fraction_along_line(sw, se, 0.5),
-            e=geoms.fraction_along_line(ne, se, 0.5),
-            w=geoms.fraction_along_line(nw, sw, 0.5),
+            n=n,
+            s=s,
+            e=e,
+            w=w,
             # length
             perimeter=perim,
             # other

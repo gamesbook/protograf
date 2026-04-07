@@ -119,7 +119,7 @@ Available Properties
 These are the potentially available properties.  Obviously, their value may
 or may not be set depending on the shape involved; so circular-like shapes
 such as a Circle, Ellipse, Hexagon and Polygon have a radius, whereas shapes
-such as a Rhombus, Line or Cross will not.
+such as a Rhombus, Line, Star or Cross will not.
 
 Named Location Properties
 ~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -188,10 +188,11 @@ Size Properties
 * ``height`` - the height of the shape
 * ``sides`` - the number of side of the shape (if all sides are of equal length)
 
-.. NOTE::
+.. WARNING::
 
     Be aware that in some cases, the calculations may **not** yet be in place
-    for some of these calculated values |dash| use with caution!
+    for some of these calculated values or the calculations themselves may
+    still only be approximations |dash| use with caution!
 
 Non-Numeric Properties
 ~~~~~~~~~~~~~~~~~~~~~~
@@ -205,8 +206,8 @@ Examples of using Named Geometry Properties
 `↑ <table-of-contents-geometry_>`_
 
 
-Example 1. Use of Named Properties
-----------------------------------
+Example 1. Named Properties
+---------------------------
 
 .. |go1| image:: images/custom/geo/polygon_named.png
    :width: 330
@@ -248,15 +249,79 @@ Example 1. Use of Named Properties
 
 ===== ======
 
+Example 2. Use of Named Points for Shapes
+-----------------------------------------
 
-Example 2. Use of Named Vertices
---------------------------------
-
-.. |go2| image:: images/custom/geo/geo_points_poly.png
+.. |go2| image:: images/custom/geo/shape_points_geo.png
    :width: 330
 
 ===== ======
 |go2| This example shows named points referenced using these
+      commands:
+
+      .. code:: python
+
+        sh = Rectangle(
+            cx=1, cy=1, height=1, width=1.5,
+            label="rectangle", label_size=6)
+        Dot(cxy=sh.geo.ne, fill_stroke="red")
+        Dot(cxy=sh.geo.se, fill_stroke="blue")
+        Dot(cxy=sh.geo.sw, fill_stroke="green")
+        Dot(cxy=sh.geo.nw, fill_stroke="yellow")
+        sh = Trapezoid(
+            cx=3, cy=1, height=1, width=1.5,
+            label="trapezoid", label_size=6)
+        Dot(cxy=sh.geo.ne, fill_stroke="red")
+        Dot(cxy=sh.geo.se, fill_stroke="blue")
+        Dot(cxy=sh.geo.sw, fill_stroke="green")
+        Dot(cxy=sh.geo.nw, fill_stroke="yellow")
+        sh = Rhombus(
+            cx=1, cy=2.5, height=1, width=1.5,
+            label="rhombus", label_size=6)
+        Dot(cxy=sh.geo.n, fill_stroke="red")
+        Dot(cxy=sh.geo.s, fill_stroke="blue")
+        Dot(cxy=sh.geo.e, fill_stroke="green")
+        Dot(cxy=sh.geo.w, fill_stroke="yellow")
+        sh = Cross(
+            cx=3, cy=2.5, height=1, width=1.5,
+            label="cross", label_size=6)
+        Dot(cxy=sh.geo.n, fill_stroke="red")
+        Dot(cxy=sh.geo.s, fill_stroke="blue")
+        Dot(cxy=sh.geo.e, fill_stroke="green")
+        Dot(cxy=sh.geo.w, fill_stroke="yellow")
+        sh = Stadium(
+            cx=1, cy=4, height=1, width=1,
+            label="stadium", label_size=6)
+        Dot(cxy=sh.geo.n, fill_stroke="red")
+        Dot(cxy=sh.geo.s, fill_stroke="blue")
+        Dot(cxy=sh.geo.e, fill_stroke="green")
+        Dot(cxy=sh.geo.w, fill_stroke="yellow")
+        sh = Star(
+            cx=3, cy=4, radius=0.8, rays=5,
+            label="star", label_size=6)
+        Dot(cxy=sh.geo.v[0], fill_stroke="red")
+        Dot(cxy=sh.geo.v[1], fill_stroke="blue")
+        Dot(cxy=sh.geo.v[2], fill_stroke="green")
+        Dot(cxy=sh.geo.v[3], fill_stroke="yellow")
+        Dot(cxy=sh.geo.v[4], fill_stroke="pink")
+
+      This example shows the "equivalence" between use of compass directions
+      for a number of different shapes.
+
+      Note that the Stadium points will lie on a curve if it has edges that
+      "bulge" in that direction;
+
+===== ======
+
+
+Example 3. Use of Named Vertices for Polygon
+--------------------------------------------
+
+.. |go3| image:: images/custom/geo/geo_points_poly.png
+   :width: 330
+
+===== ======
+|go3| This example shows named points referenced using these
       commands:
 
       .. code:: python
@@ -306,14 +371,14 @@ Example 2. Use of Named Vertices
 ===== ======
 
 
-Example 3. Hexagonal Vertices and Perbii
+Example 4. Hexagonal Vertices and Perbii
 ----------------------------------------
 
-.. |go3| image:: images/custom/geo/hex_vertices_perbii.png
+.. |go4| image:: images/custom/geo/hex_vertices_perbii.png
    :width: 330
 
 ===== ======
-|go3| This example shows the points that can be referenced using these
+|go4| This example shows the points that can be referenced using these
       commands:
 
       .. code:: python

@@ -50,7 +50,7 @@ Shape Index
 -  `Lines`_
 -  `Pod`_
 -  `Polygon`_
--  `Polyline`_
+-  `Polyline <polyline-command_>`_
 -  `Polyshape`_
 -  `QRCode`_
 -  `Rectangle`_
@@ -1864,7 +1864,7 @@ Example 1. Default Polyshape
 
         WARNING:: There are no points to draw the Polyshape
 
-      Like `polyline`_, the Polyshape requires a list of points to be constructed.
+      Like Polyline, the Polyshape requires a list of points to be constructed.
 
       This example shows how to do this using the command with these properties:
 

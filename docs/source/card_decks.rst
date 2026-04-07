@@ -19,7 +19,7 @@ and that you've created some basic scripts of your own using the
 
 .. _table-of-contents-crddk:
 
-- `The Deck Command`_
+- `The Deck Command <the-deck-command_>`_
 
   - `Deck Example 1. Default Card Size`_
   - `Deck Example 2. Copy & Mask`_

@@ -16,6 +16,54 @@ Create(
 
 txt = Common(x=0, y=0, font_size=8, align="left")
 
+# ---- shapes - compass points
+Text(common=txt, text='Named "geo" points')
+Blueprint(stroke_width=0.5)
+sh = Rectangle(
+    cx=1, cy=1, height=1, width=1.5,
+    label="rectangle", label_size=6)
+Dot(cxy=sh.geo.ne, fill_stroke="red")
+Dot(cxy=sh.geo.se, fill_stroke="blue")
+Dot(cxy=sh.geo.sw, fill_stroke="green")
+Dot(cxy=sh.geo.nw, fill_stroke="yellow")
+sh = Trapezoid(
+    cx=3, cy=1, height=1, width=1.5,
+    label="trapezoid", label_size=6)
+Dot(cxy=sh.geo.ne, fill_stroke="red")
+Dot(cxy=sh.geo.se, fill_stroke="blue")
+Dot(cxy=sh.geo.sw, fill_stroke="green")
+Dot(cxy=sh.geo.nw, fill_stroke="yellow")
+sh = Rhombus(
+    cx=1, cy=2.5, height=1, width=1.5,
+    label="rhombus", label_size=6)
+Dot(cxy=sh.geo.n, fill_stroke="red")
+Dot(cxy=sh.geo.s, fill_stroke="blue")
+Dot(cxy=sh.geo.e, fill_stroke="green")
+Dot(cxy=sh.geo.w, fill_stroke="yellow")
+sh = Cross(
+    cx=3, cy=2.5, height=1, width=1.5,
+    label="cross", label_size=6)
+Dot(cxy=sh.geo.n, fill_stroke="red")
+Dot(cxy=sh.geo.s, fill_stroke="blue")
+Dot(cxy=sh.geo.e, fill_stroke="green")
+Dot(cxy=sh.geo.w, fill_stroke="yellow")
+sh = Stadium(
+    cx=1, cy=4, height=1, width=1,
+    label="stadium", label_size=6)
+Dot(cxy=sh.geo.n, fill_stroke="red")
+Dot(cxy=sh.geo.s, fill_stroke="blue")
+Dot(cxy=sh.geo.e, fill_stroke="green")
+Dot(cxy=sh.geo.w, fill_stroke="yellow")
+sh = Star(
+    cx=3, cy=4, radius=0.8, rays=5,
+    label="star", label_size=6)
+Dot(cxy=sh.geo.v[0], fill_stroke="red")
+Dot(cxy=sh.geo.v[1], fill_stroke="blue")
+Dot(cxy=sh.geo.v[2], fill_stroke="green")
+Dot(cxy=sh.geo.v[3], fill_stroke="yellow")
+Dot(cxy=sh.geo.v[4], fill_stroke="pink")
+PageBreak()
+
 # ---- polyshape/sector - geo points
 Text(common=txt, text='Reuse of "geo" points')
 Blueprint(stroke_width=0.5)
@@ -121,6 +169,7 @@ Save(
     dpi=300,
     directory="../docs/source/images/custom/geo",
     names=[
+        "shape_points_geo",
         "polygon_named",
         "geo_points_poly",
         "hex_vertices_perbii",
