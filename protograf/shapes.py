@@ -1169,7 +1169,7 @@ class LineShape(BaseShape):
                 True,
             )
             return []
-        curve, links = get_links(shapes, self.links_style, self.curve)
+        curve, links = get_links(shapes, self.links_style, self.curve)  # connections
         for conn in links:
             # ---- draw straight line
             if not self.curve:
@@ -1505,7 +1505,7 @@ class PolylineShape(BasePolyShape):
                 True,
             )
             return None
-        curve, links = get_links(self.links, self.links_style)
+        curve, links = get_links(self.links, self.links_style)  # connections
         return links
 
     def draw(self, cnv=None, off_x=0, off_y=0, ID=None, **kwargs):

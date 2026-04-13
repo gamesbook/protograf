@@ -178,6 +178,28 @@ PageMarginsBase = namedtuple(
     ],
 )
 
+clockgeometry_fields = (
+    "h1",
+    "h2",
+    "h3",
+    "h4",
+    "h5",
+    "h6",
+    "h7",
+    "h8",
+    "h9",
+    "h10",
+    "h11",
+    "h12",
+)
+
+ClockGeometry = namedtuple(
+    "ClockGeometry", clockgeometry_fields, defaults=(None,) * len(clockgeometry_fields)
+)
+
+# N = 90, W = 180, S = 270, E = 0
+# NE = 45, NW = 135, SW = 225, SE = 315
+# NNW =
 shapegeometry_fields = (
     # points
     "centre",
