@@ -45,13 +45,17 @@ Point-based Locations
 
 For the majority of shapes, their location is typically set either by supplying
 their ``x`` and ``y`` values to define the top-left position of the shape
-|dash| with both values defaulting to ``1`` |dash| or through their ``cx`` and
-``cy`` values to define the centre position of the shape |dash| with both
+|dash| with both values defaulting to ``1`` |dash| or through using their ``cx``
+and ``cy`` values to define the centre position of the shape |dash| with both
 values defaulting to ``1``.
 
 It is also possible to use the ``xy`` property or ``cxy`` property to achieve
 the same result; the difference being that the script needs to provide values
-through a ``Point`` command rather than through a single number.
+for these properties using a ``Point`` command rather than a single number.
+
+The ``Point()`` command simply uses two values |dash| if not names are used,
+then it us s assumed that these correspond to the ``x`` and ``y`` properties;
+in that order.
 
 For example, in all cases below the top-left of the Rectangle is at
 x-position ``2`` and y-position ``3``:
@@ -71,11 +75,7 @@ x-position ``1`` and y-position ``4``:
     Rectangle(cxy=Point(x=1, y=4))
     Rectangle(cxy=Point(1, 4))
 
-It can be seen that the ``Point()`` command simply takes two values |dash| if
-not named then its assumed that these correspond to ``x`` and ``y`` in that
-order.
-
-Setting locations this way is more verbose and, perhaps less immediately clear
+Setting locations this way is more verbose and perhaps less immediately clear
 than using single properties.  However, it might be of use in some cases |dash|
 and is certainly needed when referencing another shape's geometry (see below).
 
@@ -89,7 +89,7 @@ Geometry Properties
 Much of :doc:`protograf <index>`'s documentation and focus is on *setting*
 of properties for shapes so that they appear the way you want them to.
 However, it can be useful to reuse those properties to allow for more
-flexibility and ease-of-change.
+flexibility and ease-of-change in a script.
 
 Using a Property
 ----------------
@@ -116,10 +116,10 @@ Here the name ``box`` is assigned to the Rectangle, and the Circle's centre
 Available Properties
 --------------------
 
-These are the potentially available properties.  Obviously, their value may
-or may not be set depending on the shape involved; so circular-like shapes
-such as a Circle, Ellipse, Hexagon and Polygon have a radius, whereas shapes
-such as a Rhombus, Line, Star or Cross will not.
+There are a number of potentially available properties.  Obviously, though,
+their value may or may not be set depending on the shape involved. For example,
+circular-like shapes such as a Circle, Ellipse, Hexagon and Polygon have a
+radius, whereas shapes such as a Rhombus, Line, Star or Cross do not.
 
 Named Location Properties
 ~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -135,35 +135,36 @@ Locations are typically referenced via :ref:`compass directions <termsDirection>
 which match the location, relative to the shape's centre, in an exact or
 *approximate* way. These include:
 
-* ``n`` - a point to the north
-* ``s`` - a point to the south
-* ``e`` - a point to the east
-* ``w`` - a point to the west
-* ``ne`` - a point to the north-east
-* ``se`` - a point to the south-east
-* ``nw`` - a point to the north-west
-* ``sw`` - a point to the south-west
-* ``nnw`` - a point to the north-north-west
-* ``nne`` - a point to the north-north-east
-* ``sse`` - a point to the south-south-east
-* ``ssw`` - a point to the south-south-west
-* ``wnw`` - a point to the west-north-west
-* ``ene`` - a point to the east-north-east
-* ``ese`` - a point to the east-south-east
-* ``wsw`` - a point to the west-south-west
+* ``
+* ``n`` - a point on the north edge or vertex
+* ``s`` - a point on the south edge or vertex
+* ``e`` - a point on the east edge or vertex
+* ``w`` - a point on the west edge or vertex
+* ``ne`` - a point on the north-east edge or vertex
+* ``se`` - a point on the south-east edge or vertex
+* ``nw`` - a point on the north-west edge or vertex
+* ``sw`` - a point on the south-west edge or vertex
+* ``nnw`` - a point on the north-north-west edge or vertex
+* ``nne`` - a point on the north-north-east edge or vertex
+* ``sse`` - a point on the south-south-east edge or vertex
+* ``ssw`` - a point on the south-south-west edge or vertex
+* ``wnw`` - a point on the west-north-west edge or vertex
+* ``ene`` - a point on the east-north-east edge or vertex
+* ``ese`` - a point on the east-south-east edge or vertex
+* ``wsw`` - a point on the west-south-west edge or vertex
 
 Unnamed Location Properties
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-It is not always possible to name locations.  For some shapes, they can only
-be referenced by a number.
+It is not always possible access locations by name.  For some shapes, such
+as a Polygon or Star, they can only be referenced by a number.
 
 Unnamed locations include:
 
-* ``vertices`` (``v``) - a list of vertices of the shape, where each item is
-  referenced by number, starting from ``0``.
-* ``perbii`` (``p``) - a list of perbii of the shape, where each item is
-  referenced by number, starting from ``0``.
+* ``vertices`` (``v``) |dash| a list of vertices of the shape, where each item
+  is referenced by a number, starting from ``0``.
+* ``perbii`` (``p``) |dash| a list of perbii of the shape, where each item
+  is referenced by a number, starting from ``0``.
 
 As an example:
 
@@ -172,8 +173,8 @@ As an example:
     ply = Polygon(cx=1, cy=4, sides=7, side=1)
     Line(xy=ply.geo.v[3], length=1)
 
-Here the line uses, as its starting point, the fourth vertex of the 7-sided
-polygon.
+Here the Kine uses, as its starting point, the fourth vertex of the 7-sided
+Polygon named ``ply``.
 
 Size Properties
 ~~~~~~~~~~~~~~~
@@ -191,14 +192,16 @@ Size Properties
 .. WARNING::
 
     Be aware that in some cases, the calculations may **not** yet be in place
-    for some of these calculated values or the calculations themselves may
-    still only be approximations |dash| use with caution!
+    for some, or all, of these calculated values or the calculations themselves
+    may still only be approximations |dash| use with caution!
 
 Non-Numeric Properties
 ~~~~~~~~~~~~~~~~~~~~~~
 
 * ``type`` - the shape type (the internal **protograf** type)
-* ``name`` - the shape's name is usually the same as its command
+* ``name`` - the shape's name is usually the same as its command (this property
+  does **not** refer to any name that might have been assigned to it in a
+  script)
 
 
 Examples of using Named Geometry Properties
@@ -441,9 +444,9 @@ Example 4. Hexagonal Vertices and Perbii
 
       While vertices can be easily identified with primary or secondary
       compass directions, some of the perbii can only be identified by
-      tertiary directions.
+      tertiary compass directions.
 
       The compass image provides some context to see how the named locations
-      are approximations to the actual directions.
+      are only approximations to the actual compass directions.
 
 ===== ======

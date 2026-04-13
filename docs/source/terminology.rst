@@ -211,6 +211,7 @@ at the *top* of a ``Hexagon``.
    direction; its usually the case that the distance is not absolute, but
    relative to some other value e.g. distance from a margin; or the edge
    of a :ref:`Card <the-card-command>`
+-  **cxy** - the centre position of a shape, specified as a ``Point``
 -  **elevation** - a relative vertical location within a shape; can be one
    of: *top*, *middle*, or *bottom*
 -  **x** - the position of a point in the horizontal direction; its
@@ -222,6 +223,7 @@ at the *top* of a ``Hexagon``.
    the case that the distance is not absolute, but relative to some
    other value e.g. distance from a margin; or the top edge of a
    :ref:`Card <the-card-command>`
+-  **xy** - the top-left position of a shape, specified as a ``Point``
 
 
 .. _termsSize:
@@ -344,6 +346,9 @@ Secondary compass directions |dash| with full names shown in brackets:
 -  nw (north-west) - normally corresponds to an angle of 135 degrees
 -  sw (south-west) - normally corresponds to an angle of 225 degrees
 -  se (south-east) - normally corresponds to an angle of 315 degrees
+
+Tertiary compass directions are also used for some
+:ref:`geometry properties <geometryProps>`.
 
 .. NOTE::
 
