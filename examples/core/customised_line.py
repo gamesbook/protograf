@@ -110,11 +110,11 @@ Text(common=txt, text="Line: links; shapes")
 s1 = Square(cx=1, cy=4, side=1, fill="yellow")
 s2 = Square(cx=3, cy=2, side=1)
 Line(
-    links=[(s1, 'v', 'ne'), (s2, 'p', 'w')],
+    links=[s1.geo.ne, s2.geo.w],
     stroke="red",
     stroke_width=2)
 Line(
-    links=[(s1, 'p', 'e'), (s2, 'v', 'se')],
+    links=[s1.geo.e, s2.geo.se],
     stroke="blue",
     stroke_width=2,
     curve=-0.5)

@@ -1192,9 +1192,18 @@ To connect two or more non-circular shapes |dash| for example, ``Rectangle``
 or ``Hexagon`` |dash| supply a list of these, along with the settings for
 each of their *link points*, as the *links* property of the line.
 
-The *link point* setting for non-circular shapes must specify:
+There are two ways to specify the *link point* setting for non-circular
+shapes.
 
-- the shape name;
+The first option is the simpler, setting a point by relying on the
+:ref:`shape's geometry <geometryProps>`. The point is specified using the
+``SHAPE.geo.DIR`` syntax; where ``SHAPE`` is the name assigned to the shape
+by the script and ``POINT`` is the directional point name e.g. ``ne`` for a
+north-east point.
+
+The seconf option must specify a a set of three values:
+
+- the name assigned to the shape by the script;
 - the link type |dash| either a vertex point (``v``) or a perbis
   point (``p``);
 - the link location, as a :ref:`compass direction <termsDirection>`.
@@ -1226,16 +1235,11 @@ and :ref:`Kensington <abstractGameKensington>`.
           cx=3, cy=2, side=1)
 
         Line(
-          links=[
-            (s1, 'v', 'ne'),
-            (s2, 'p', 'w')
-          ],
+          links=[s1.geo.ne, s2.geo.w],
           stroke="red",
           stroke_width=2)
         Line(
-          links=[
-            (s1, 'p', 'e'),
-            (s2, 'v', 'se')],
+          links=[s1.geo.e, s2.geo.se],
           stroke="blue",
           stroke_width=2,
           curve=-0.5)
@@ -1373,6 +1377,8 @@ Example 10. Links - Curve
              curve=0.5,
          )
 
+      Here a "spoke" arrangement is created with the small black dot acting as
+      the central hub and curved lines connecting it to the colored circles.
 
 ===== ======
 

@@ -95,8 +95,8 @@ Using a Property
 ----------------
 
 Each shape, depending on its characteristics, has various geometry properties
-available.  These are referenced using a ``name.geo.XYZ`` syntax; where the
-``name`` is a name assigned in the script to the shape, and the ``XYZ`` is
+available.  These are referenced using a ``NAME.geo.XYZ`` syntax; where the
+``NAME`` is a name assigned in the script to the shape, and the ``XYZ`` is
 the property being referenced.  For example:
 
 .. code:: python
@@ -132,10 +132,9 @@ the perbii i.e. the mid-points of the lines between two vertices at which
 the lines from the centre of the shape form right-angles to them.
 
 Locations are typically referenced via :ref:`compass directions <termsDirection>`
-which match the location, relative to the shape's centre, in an exact or
+which match the location, **relative to the shape's centre**, in an exact or
 *approximate* way. These include:
 
-* ``
 * ``n`` - a point on the north edge or vertex
 * ``s`` - a point on the south edge or vertex
 * ``e`` - a point on the east edge or vertex
@@ -153,6 +152,8 @@ which match the location, relative to the shape's centre, in an exact or
 * ``ese`` - a point on the east-south-east edge or vertex
 * ``wsw`` - a point on the west-south-west edge or vertex
 
+Usage of these is shown in `Example 4. Hexagonal Vertices and Perbii`_.
+
 Unnamed Location Properties
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -161,9 +162,9 @@ as a Polygon or Star, they can only be referenced by a number.
 
 Unnamed locations include:
 
-* ``vertices`` (``v``) |dash| a list of vertices of the shape, where each item
+* ``vertices`` (``v``) |dash| a list of vertices for the shape, where each item
   is referenced by a number, starting from ``0``.
-* ``perbii`` (``p``) |dash| a list of perbii of the shape, where each item
+* ``perbii`` (``p``) |dash| a list of perbii for the shape, where each item
   is referenced by a number, starting from ``0``.
 
 As an example:
@@ -173,7 +174,7 @@ As an example:
     ply = Polygon(cx=1, cy=4, sides=7, side=1)
     Line(xy=ply.geo.v[3], length=1)
 
-Here the Kine uses, as its starting point, the fourth vertex of the 7-sided
+Here the Line uses, as its starting point, the fourth vertex of the 7-sided
 Polygon named ``ply``.
 
 Size Properties
@@ -181,12 +182,12 @@ Size Properties
 
 * ``area`` - the area of the shape
 * ``perimeter`` - the length of the line around the shape
-* ``radius`` - the radius of the shape
-* ``diameter`` - the diameter of the shape
+* ``radius`` - the radius of the shape, where applicable
+* ``diameter`` - the diameter of the shape, where applicable
 * ``side`` - the length of a side of the shape (if all sides are equal)
 * ``length`` - the length of the shape (if it has a set length)
 * ``width`` - the width of the shape  (if it has a set width)
-* ``height`` - the height of the shape
+* ``height`` - the height of the shape (if it has a set height)
 * ``sides`` - the number of side of the shape (if all sides are of equal length)
 
 .. WARNING::
@@ -317,14 +318,14 @@ Example 2. Use of Named Points for Shapes
 ===== ======
 
 
-Example 3. Use of Named Vertices for Polygon
---------------------------------------------
+Example 3. Use of Vertices for Polygon
+--------------------------------------
 
 .. |go3| image:: images/custom/geo/geo_points_poly.png
    :width: 330
 
 ===== ======
-|go3| This example shows named points referenced using these
+|go3| This example shows numbered and named points referenced using these
       commands:
 
       .. code:: python
@@ -368,8 +369,8 @@ Example 3. Use of Named Vertices for Polygon
       versus numbered vertices (such as ``v[0]``).  The named directions can
       only be used for these polygons because of their smaller number of sides.
 
-      Other sizes of polygons will not have any named locations available, and
-      to reference their vertices will require the use of numbers.
+      Other sizes of polygons will **not** have any named locations available,
+      and to reference their vertices will require the use of numbers.
 
 ===== ======
 
