@@ -113,6 +113,9 @@ Here the name ``box`` is assigned to the Rectangle, and the Circle's centre
     You can also refer to a shape's geometry properties by using the term in
     full |dash| for example, ``box.geometry.c``
 
+A ``Circle`` also has **clock** locations available; see
+
+
 Available Properties
 --------------------
 
@@ -205,13 +208,22 @@ Non-Numeric Properties
   script)
 
 
+.. _examples-named-geometry:
+
 Examples of using Named Geometry Properties
 ===========================================
 `↑ <table-of-contents-geometry_>`_
 
+- `Example 1. Named Properties`_
+- `Example 2. Use of Named Points for Shapes`_
+- `Example 3. Use of Vertices for Polygon`_
+- `Example 4. Hexagonal Vertices and Perbii`_
+- `Example 5. Circle Named and Other Points`_
 
 Example 1. Named Properties
 ---------------------------
+`^ <examples-named-geometry_>`_
+
 
 .. |go1| image:: images/custom/geo/polygon_named.png
    :width: 330
@@ -255,6 +267,7 @@ Example 1. Named Properties
 
 Example 2. Use of Named Points for Shapes
 -----------------------------------------
+`^ <examples-named-geometry_>`_
 
 .. |go2| image:: images/custom/geo/shape_points_geo.png
    :width: 330
@@ -320,6 +333,7 @@ Example 2. Use of Named Points for Shapes
 
 Example 3. Use of Vertices for Polygon
 --------------------------------------
+`^ <examples-named-geometry_>`_
 
 .. |go3| image:: images/custom/geo/geo_points_poly.png
    :width: 330
@@ -377,6 +391,7 @@ Example 3. Use of Vertices for Polygon
 
 Example 4. Hexagonal Vertices and Perbii
 ----------------------------------------
+`^ <examples-named-geometry_>`_
 
 .. |go4| image:: images/custom/geo/hex_vertices_perbii.png
    :width: 330
@@ -449,5 +464,60 @@ Example 4. Hexagonal Vertices and Perbii
 
       The compass image provides some context to see how the named locations
       are only approximations to the actual compass directions.
+
+===== ======
+
+
+Example 5. Circle Named and Other Points
+----------------------------------------
+`^ <examples-named-geometry_>`_
+
+A Circle has three different ways to locate a point on its circumference.
+
+.. |go5| image:: images/custom/geo/circle_points_multi.png
+   :width: 330
+
+===== ======
+|go5| This example shows the points that can be referenced using these
+      commands:
+
+      .. code:: python
+
+        cr = Circle(cx=3, cy=1, radius=1, fill=None, stroke_width=1, stroke="red")
+        dcp = Common(dot_width=2, stroke="red", label_stroke="black")
+        Dot(common=dcp, label="N", cxy=cr.geo.n)
+        Dot(common=dcp, label="S", cxy=cr.geo.s)
+        Dot(common=dcp, label="E", cxy=cr.geo.e)
+        Dot(common=dcp, label="W", cxy=cr.geo.w)
+        ...
+        cr = Circle(cx=1, cy=3, radius=1, fill=None, stroke_width=1, stroke="gold")
+        dcc = Common(dot_width=2, stroke="gold", label_stroke="black")
+        Dot(common=dcc, label="12", cxy=cr.clock.h12)
+        Dot(common=dcc, label="9", cxy=cr.clock.h9)
+        Dot(common=dcc, label="6", cxy=cr.clock.h6)
+        Dot(common=dcc, label="3", cxy=cr.clock.h3)
+        ...
+        cr = Circle(cx=3, cy=5, radius=1, fill=None, stroke_width=1, stroke="green")
+        Text("42", xy=cr.poc(42))
+        Text("124", xy=cr.poc(124))
+        Text("308", xy=cr.poc(308))
+        Text("199", xy=cr.poc(199))
+
+      **NOTE** that the code shown above is abbreviated (``...``) but the
+      pattern of usage should be clear from what is here.
+
+      The *red* circle shows the use of named compass points; all sixteen are
+      available for a circle.
+
+      The *yellow* circle shows the use of named **clock** points; these are
+      referenced using a ``NAME.clock.hN`` syntax; where ``NAME`` is the name
+      assigned in the script to the Circle, and the ``hN`` is an ``h``
+      followed by a number corresponding to an hour position.
+
+      The *green* circle shows the use of **angles** to set a location.  The
+      format is ``NAME.poc(N)`` where ``NAME`` is the name assigned in the
+      script to the Circle, and the ``poc(N)`` is the method by which an
+      angle in degrees, between 0 to 360, measured counter-clockwise from
+      the east direction, can be specified.
 
 ===== ======

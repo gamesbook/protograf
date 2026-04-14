@@ -3,17 +3,18 @@ protograf Changes
 
 2026-00-00 (0.5.2)
 ------------------
-- [PLANNED-2] Enable Line links to Text boxes
-- [PLANNED-3] Add code to link *Locations
-- [PLANNED-3] Docs: list all props for Hex, Circle, Rectangle, Line
-- [PLANNED-3] Centre multi-line label text strings
+- [PLANNED-1] Enable Line links to Text boxes
+- [PLANNED-2] Add code to link *Locations
+- [PLANNED-2] Docs: list all props for Hex, Circle, Rectangle, Line
+- [PLANNED-2] Centre multi-line label text strings
 
 2026-00-00 (0.5.1)
 ------------------
 - Add Shape geometry property
 - Add function to get point on Circle circumference
 - Enable use of Shape geometry points for Line links
-- [PLANNED-2] Enable non-curved Line links for Ellipse shapes
+- Update examples to use Shape geometry points
+- Add Circle clock geometry location property
 
 2026-04-02 (0.5.0)
 ------------------

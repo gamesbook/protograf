@@ -163,6 +163,55 @@ Dot(cxy=hx.geo.sse, fill_stroke="green")
 Dot(cxy=hx.geo.ssw, fill_stroke="yellow")
 Dot(cxy=hx.geo.w, fill_stroke="pink")
 Dot(cxy=hx.geo.nnw, fill_stroke="purple")
+PageBreak()
+
+# ---- circle - multi points
+Text(common=txt, text='Circle: multi-points')
+Blueprint(stroke_width=0.5)
+Image("compass.png", x=2.1, y=0.125, height=1.75, width=1.75)
+cr = Circle(cx=3, cy=1, radius=1, fill=None, stroke_width=1, stroke="red")
+Font(size=6)
+dcp = Common(dot_width=2, stroke="red", label_stroke="black")
+Dot(common=dcp, label="N", cxy=cr.geo.n)
+Dot(common=dcp, label="S", cxy=cr.geo.s)
+Dot(common=dcp, label="E", cxy=cr.geo.e)
+Dot(common=dcp, label="W", cxy=cr.geo.w)
+Dot(common=dcp, label="NE", cxy=cr.geo.ne)
+Dot(common=dcp, label="SE", cxy=cr.geo.se)
+Dot(common=dcp, label="SW", cxy=cr.geo.sw)
+Dot(common=dcp, label="NW", cxy=cr.geo.nw)
+Dot(common=dcp, label="NW", cxy=cr.geo.nw)
+Dot(common=dcp, label="nnw", cxy=cr.geo.nnw)
+Dot(common=dcp, label="nne", cxy=cr.geo.nne)
+Dot(common=dcp, label="ssw", cxy=cr.geo.ssw)
+Dot(common=dcp, label="sse", cxy=cr.geo.sse)
+Dot(common=dcp, label="wnw", cxy=cr.geo.wnw)
+Dot(common=dcp, label="ene", cxy=cr.geo.ene)
+Dot(common=dcp, label="wsw", cxy=cr.geo.wsw)
+Dot(common=dcp, label="ese", cxy=cr.geo.ese)
+
+cr = Circle(cx=1, cy=3, radius=1, fill=None, stroke_width=1, stroke="gold")
+Font(size=6)
+dcc = Common(dot_width=2, stroke="gold", label_stroke="black")
+Dot(common=dcc, label="12", cxy=cr.clock.h12)
+Dot(common=dcc, label="11", cxy=cr.clock.h11)
+Dot(common=dcc, label="10", cxy=cr.clock.h10)
+Dot(common=dcc, label="9", cxy=cr.clock.h9)
+Dot(common=dcc, label="8", cxy=cr.clock.h8)
+Dot(common=dcc, label="7", cxy=cr.clock.h7)
+Dot(common=dcc, label="6", cxy=cr.clock.h6)
+Dot(common=dcc, label="5", cxy=cr.clock.h5)
+Dot(common=dcc, label="4", cxy=cr.clock.h4)
+Dot(common=dcc, label="3", cxy=cr.clock.h3)
+Dot(common=dcc, label="2", cxy=cr.clock.h2)
+Dot(common=dcc, label="1", cxy=cr.clock.h1)
+
+cr = Circle(cx=3, cy=5, radius=1, fill=None, stroke_width=1, stroke="green")
+Font(size=6)
+Text("42", xy=cr.poc(42))
+Text("124", xy=cr.poc(124))
+Text("308", xy=cr.poc(308))
+Text("199", xy=cr.poc(199))
 
 Save(
     output='png',
@@ -173,5 +222,6 @@ Save(
         "polygon_named",
         "geo_points_poly",
         "hex_vertices_perbii",
+        "circle_points_multi",
     ]
 )

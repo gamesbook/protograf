@@ -72,8 +72,9 @@ class TriangleType(Enum):
     IRREGULAR = 3
 
 
-# ---- NAMEDTUPLE
+# ---- NAMEDTUPLES
 
+# ---- * Bounds
 Bounds = namedtuple(
     "Bounds",
     [
@@ -87,6 +88,7 @@ Bounds = namedtuple(
 cb_fields = ("fill", "offset_x", "offset_y", "offset_radius")
 CardBleed = namedtuple("CardBleed", cb_fields, defaults=(None,) * len(cb_fields))
 
+# ---- * CrossParts
 CrossParts = namedtuple(
     "CrossParts",
     ["thickness", "half_thick", "arm", "body", "head"],
@@ -103,6 +105,7 @@ DeckPrintState = namedtuple(
     ],
 )
 
+# ---- * GridShape
 GridShape = namedtuple(
     "GridShape",
     [
@@ -113,6 +116,7 @@ GridShape = namedtuple(
     ],
 )
 
+# ---- * GlobalDocument
 GlobalDocument = namedtuple(
     "GlobalDocument",
     [
@@ -134,6 +138,7 @@ GlobalDocument = namedtuple(
     ],
 )
 
+# ---- * HexGeometry
 HexGeometry = namedtuple(
     "HexGeometry",
     [
@@ -151,6 +156,7 @@ LookupType = namedtuple("LookupType", ["column", "lookups"])
 
 Link = namedtuple("Link", ["a", "b", "style"])
 
+# ---- * Locale
 fields = ("col", "row", "x", "y", "id", "sequence", "corner", "label", "page")
 Locale = namedtuple("Locale", fields, defaults=(None,) * len(fields))
 
@@ -164,20 +170,8 @@ OffsetProperties = namedtuple(
     ],
 )
 
-# base margins are in user units
-PageMarginsBase = namedtuple(
-    "PageMarginsBase",
-    [
-        "margin",  # default
-        "left",
-        "right",
-        "bottom",
-        "top",
-        "debug",  # show the margin?
-        "units",  # point equivalent of single user unit
-    ],
-)
 
+# ---- * ClockGeometry
 clockgeometry_fields = (
     "h1",
     "h2",
@@ -192,11 +186,11 @@ clockgeometry_fields = (
     "h11",
     "h12",
 )
-
 ClockGeometry = namedtuple(
     "ClockGeometry", clockgeometry_fields, defaults=(None,) * len(clockgeometry_fields)
 )
 
+# ---- * ShapeGeometry
 # N = 90, W = 180, S = 270, E = 0
 # NE = 45, NW = 135, SW = 225, SE = 315
 # NNW =
@@ -242,9 +236,23 @@ shapegeometry_fields = (
     "shapetype",
     "name",
 )
-
 ShapeGeometry = namedtuple(
     "ShapeGeometry", shapegeometry_fields, defaults=(None,) * len(shapegeometry_fields)
+)
+
+# ----  PAGEMARGINS
+# base margins are in user units
+PageMarginsBase = namedtuple(
+    "PageMarginsBase",
+    [
+        "margin",  # default
+        "left",
+        "right",
+        "bottom",
+        "top",
+        "debug",  # show the margin?
+        "units",  # point equivalent of single user unit
+    ],
 )
 
 
