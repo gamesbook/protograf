@@ -97,7 +97,7 @@ while step < 9:
         options = paper_size
         console.print(f"\n{ms}What is your paper size?{me}")
         for key, value in options.items():
-            print(f"{key}. {value}")
+            console.print(f"{key}. {value}")
         choice = console.input(prompt)
 
         if choice == "?":
@@ -124,7 +124,7 @@ while step < 9:
         options = units
         console.print(f"\n{ms}What are your units?{me}")
         for key, value in options.items():
-            print(f"{key}. {value}")
+            console.print(f"{key}. {value}")
         choice = console.input(prompt)
 
         if choice == "?":
@@ -172,7 +172,7 @@ while step < 9:
         options = card_size
         console.print(f"\n{ms}What is your card size?{me}")
         for key, value in options.items():
-            print(f"{key}. {value}")
+            console.print(f"{key}. {value}")
         choice = console.input(prompt)
 
         if choice == "?":
@@ -211,7 +211,7 @@ while step < 9:
         options = t_f
         _input = console.print(f"\n{ms}Do you want grid marks displayed?{me} ")
         for key, value in options.items():
-            print(f"{key}. {value}")
+            console.print(f"{key}. {value}")
         choice = console.input(prompt)
 
         if choice == "?":

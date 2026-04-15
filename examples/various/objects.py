@@ -349,7 +349,6 @@ Grid(
   stroke="#445368",
   omit_outer=True)
 ci = Circle(cx=3.25, cy=4.25, radius=1.5, stroke="white", stroke_width=1, fill=None)
-print(ci.geo.c)
 loc = ci.poc(45)
 Dot(cxy=loc, fill_stroke="aqua", dot_width=8)
 Dot(cxy=ci.geo.c, fill_stroke="tomato", dot_width=16)

@@ -157,8 +157,7 @@ class FontInterface:
         if not self.font_families:
             self.load_font_families()
         for font_family in list(self.font_families.keys()):
-            # if font_family[0] == 'U' and name[0] == 'U':
-            #     print(f"{name=}", 'vs.', f'+{font_family=}+')
+            # print(f"{name=}", 'vs.', f'+{font_family=}+')
             if (
                 str(name).strip().lower() == font_family.lower()
                 or str(name).strip().lower().replace(" ", "") == font_family.lower()
@@ -282,7 +281,7 @@ class FontInterface:
             return font
         except TTLibFileIsCollectionError as err:
             if not os.path.exists(file_path):
-                print(f"Cannot load font from: {file_path} - {err}")
+                feedback(f"Cannot load font from: {file_path} - {err}", False, True)
         return None
 
     def extract_font_summary(

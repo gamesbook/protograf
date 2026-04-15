@@ -42,7 +42,7 @@ Polygon(
     radii_stroke_width=0.5,
     sides=8
 )
-Text(x=-2.1, y=2, 
+Text(x=-2.1, y=2,
      width=8, height=2,
      text="""
      <span style="font-family:Helvetica; font-size:6.8pt; color:#3085AC; text-align:left">

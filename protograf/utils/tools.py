@@ -1793,9 +1793,7 @@ def set_canvas_props(
 
 def get_font_file(fonts_name: object) -> tuple:
     """Access and track a font and its file."""
-    _name = None
-    font_path = None
-    _file = None
+    _name, font_path, _file = None, None, None
     if not fonts_name:
         return _name, font_path, _file
     if isinstance(fonts_name, str):
@@ -1825,7 +1823,6 @@ def get_font_file(fonts_name: object) -> tuple:
                         globals.css += css + "\n"
                     globals.archive.add(font_path)
                     return _name, font_path, _file
-    feedback(f'Defaulting to "{DEFAULT_FONT}".')
     return _name, font_path, _file
 
 

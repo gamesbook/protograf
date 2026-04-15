@@ -95,7 +95,14 @@ Using a Property
 ----------------
 
 Each shape, depending on its characteristics, has various geometry properties
-available.  These are referenced using a ``NAME.geo.XYZ`` syntax; where the
+available.
+
+.. WARNING::
+
+    The correct geometry properties only become available **after** a shape
+    has been drawn!
+
+Geometry properties are referenced using a ``NAME.geo.XYZ`` syntax; where the
 ``NAME`` is a name assigned in the script to the shape, and the ``XYZ`` is
 the property being referenced.  For example:
 
@@ -110,19 +117,20 @@ Here the name ``box`` is assigned to the Rectangle, and the Circle's centre
 
 .. HINT::
 
-    You can also refer to a shape's geometry properties by using the term in
-    full |dash| for example, ``box.geometry.c``
+    You can also refer to a shape's geometry properties by using the terms in
+    full |dash| for example, ``box.geometry.centre``
 
 A ``Circle`` also has **clock** locations available; see
+- `Example 5. Circle Named and Other Points`_.
 
 
 Available Properties
 --------------------
 
 There are a number of potentially available properties.  Obviously, though,
-their value may or may not be set depending on the shape involved. For example,
-circular-like shapes such as a Circle, Ellipse, Hexagon and Polygon have a
-radius, whereas shapes such as a Rhombus, Line, Star or Cross do not.
+their value may or may not exist depending on the shape involved. For example,
+circular-like shapes such as a Circle, Hexagon and Polygon have a radius,
+whereas shapes such as a Rhombus, Rectangle or Cross do not.
 
 Named Location Properties
 ~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -155,15 +163,16 @@ which match the location, **relative to the shape's centre**, in an exact or
 * ``ese`` - a point on the east-south-east edge or vertex
 * ``wsw`` - a point on the west-south-west edge or vertex
 
-Usage of these is shown in `Example 4. Hexagonal Vertices and Perbii`_.
+Usage of these is shown in `Example 4. Hexagonal Vertices and Perbii`_ as
+well as `Example 5. Circle Named and Other Points`_.
 
-Unnamed Location Properties
-~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Numbered Location Properties
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 It is not always possible access locations by name.  For some shapes, such
 as a Polygon or Star, they can only be referenced by a number.
 
-Unnamed locations include:
+Numbered locations include:
 
 * ``vertices`` (``v``) |dash| a list of vertices for the shape, where each item
   is referenced by a number, starting from ``0``.
@@ -180,24 +189,28 @@ As an example:
 Here the Line uses, as its starting point, the fourth vertex of the 7-sided
 Polygon named ``ply``.
 
+See `Example 3. Use of Vertices for Polygon`_ for use of numbered locations.
+
 Size Properties
 ~~~~~~~~~~~~~~~
+
+In general, size properties are associated with regular, enclosed shapes.
 
 * ``area`` - the area of the shape
 * ``perimeter`` - the length of the line around the shape
 * ``radius`` - the radius of the shape, where applicable
 * ``diameter`` - the diameter of the shape, where applicable
 * ``side`` - the length of a side of the shape (if all sides are equal)
-* ``length`` - the length of the shape (if it has a set length)
-* ``width`` - the width of the shape  (if it has a set width)
-* ``height`` - the height of the shape (if it has a set height)
-* ``sides`` - the number of side of the shape (if all sides are of equal length)
+* ``length`` - the length of the shape (if it has a single length)
+* ``width`` - the width of the shape  (if it has a single width)
+* ``height`` - the height of the shape (if it has a single height)
+* ``sides`` - the number of sides of the shape (if all sides are of equal length)
 
 .. WARNING::
 
-    Be aware that in some cases, the calculations may **not** yet be in place
-    for some, or all, of these calculated values or the calculations themselves
-    may still only be approximations |dash| use with caution!
+    Be aware that calculations are **not** yet in place for some, or all, of
+    these calculated values, or that the calculations themselves may still
+    only be approximations |dash| use these properties with caution for now!
 
 Non-Numeric Properties
 ~~~~~~~~~~~~~~~~~~~~~~
@@ -241,6 +254,7 @@ Example 1. Named Properties
         Polyshape(
           points=[hx.geo.c, hx.geo.ne, hx.geo.se],
           fill="tomato")
+
         cc = Circle(
           x=2, y=3, radius=0.9,
           fill="yellow")
@@ -254,7 +268,7 @@ Example 1. Named Properties
       The two "primary" shapes |dash| Hexagon and Circle |dash| are
       assigned names (``hx`` and ``cc`` respectively).
 
-      These are then used to allow access to their geometric properties.
+      These are then used to gain access to their geometric properties.
 
       For example, the triangular Polyshape is drawn over the Hexagon by
       referencing various of its available vertices for use in the *points*

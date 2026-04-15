@@ -365,7 +365,8 @@ class BGGGame:
         """Display all properties and values of a BGGGame."""
         for attr in dir(self):
             if "__" not in attr:
-                print("%s: %r" % (attr, getattr(self, attr)))
+                info = "%s: %r" % (attr, getattr(self, attr))
+                feedback(info, False, False, True)
 
     def properties(self):
         """Return all properties of a BGGGame as list."""

@@ -56,8 +56,8 @@ def clock_angles(hours: int, minutes: int) -> tuple:
         for item in times:
             h, m = item[0], item[1]
             hour_angle, minute_angle = clock_angles(h, m)
-            print(f"At {h}:{m:02d}, hour hand angle: {hour_angle:.2f}°, "
-                  f"minute hand angle: {minute_angle:.2f}°")
+            # print(f"At {h}:{m:02d}, hour hand angle: {hour_angle:.2f}°, "
+            #      f"minute hand angle: {minute_angle:.2f}°")
     ```
     """
 

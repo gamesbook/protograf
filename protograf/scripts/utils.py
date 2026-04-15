@@ -12,10 +12,11 @@ import configparser
 import sys
 
 
-def failure(message: str):
+def failure(message: str, end: bool = True):
     """End the program with a message."""
     print(message)
-    sys.exit(0)  # Exit with status code 0 (success)
+    if end:
+        sys.exit(0)  # Exit with status code 0 (success)
 
 
 def as_int(value, label: str = None) -> int:

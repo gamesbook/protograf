@@ -1497,11 +1497,10 @@ class BaseShape:
                     attr not in ["canvas", "common", "stylesheet", "kwargs"]
                     and attr[0] != "_"
                 ):
-                    # print(f'### Common {attr=} {base=} {type(base)=}')
+                    # print(f'### Common {attr=} {base=} {type(base)=} {common_attr=}')
                     common_attr = getattr(self.common, attr)
                     base_attr = getattr(base, attr)
-                    # if 'stroke' in attr in attr:
-                    #     print(f'### Common {attr=} {base_attr=} {common_attr=}')
+                    # print(f'### Common {attr=} {base_attr=}')
                     if common_attr != base_attr:
                         setattr(self, attr, common_attr)
 
