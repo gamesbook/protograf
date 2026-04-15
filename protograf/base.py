@@ -14,7 +14,6 @@ import math
 import os
 from pathlib import Path, PosixPath
 from sys import platform
-import traceback
 from urllib.parse import urlparse
 
 # third party
@@ -735,8 +734,6 @@ class BaseShape:
     """Base class for objects drawn on a given canvas aka a pymupdf_utils_Shape"""
 
     def __init__(self, _object: muShape = None, canvas: BaseCanvas = None, **kwargs):
-        # print(''.join(traceback.format_stack()))
-
         # feedback(f'### BaseShape 1 {type(self).__name__} {kwargs=}')
         # inject and then override kwargs supplied by DefaultShape aka user defaults
         if kwargs.get("default"):
@@ -2520,6 +2517,7 @@ class BaseShape:
                 True,
             )
 
+    @functools.lru_cache(maxsize=999)
     def as_point(
         self,
         xy: Point,
