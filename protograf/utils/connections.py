@@ -175,6 +175,56 @@ def get_rotation(centre_a: Point, centre_b: Point) -> tuple:
     return rotation_a, rotation_b
 
 
+def link_pairs(shapes: list, links_style: str = None) -> list:
+    """Convert list of shape/locations - individual or in/out - into pairs.
+
+    Doc Test:
+    >>> print(link_pairs(['a', 'b']))
+    [['a', 'b']]
+    >>> print(link_pairs(['a', 'b', 'c']))
+    [['a', 'b'], ['b', 'c']]
+    >>> print(link_pairs(['a', ['b', 'c'], 'd']))
+    [['a', 'b'], ['c', 'd']]
+    >>> print(link_pairs(['a', ['b', 'c'], ['d', 'e'], 'f']))
+    [['a', 'b'], ['c', 'd'], ['e', 'f']]
+    >>> print(link_pairs(['a', ['b', 'c'], ['d', 'e'], ['f', 'g']]))
+    [['a', 'b'], ['c', 'd'], ['e', 'f']]
+    >>> print(link_pairs([['g', 'a'], ['b', 'c'], ['d', 'e'], 'f']))
+    [['a', 'b'], ['c', 'd'], ['e', 'f']]
+    >>> print(link_pairs(['a', 'b', 'c', 'd'], 'spoke'))
+    [['a', 'b'], ['a', 'c'], ['a', 'd']]
+    """
+    for shape_loc in shapes:
+        if isinstance(shape_loc, list) and links_style:
+            feedback(
+                "Cannot use in/out format for links with a links_style of "
+                f"{links_style}.",
+                True,
+            )
+        if isinstance(shape_loc, list) and len(shape_loc) != 2:
+            feedback(
+                "The in/out format for links must have pairs in [a,b] format!", True
+            )
+
+    shape_loc_pairs = []
+    if _lower(links_style) in [
+        "spoke",
+        "s",
+    ]:
+        for idx in range(1, len(shapes)):
+            shape_loc_pairs.append([shapes[0], shapes[idx]])
+    else:
+        for idx in range(0, len(shapes) - 1):
+            shape1 = shapes[idx][-1] if isinstance(shapes[idx], list) else shapes[idx]
+            shape2 = (
+                shapes[idx + 1][0]
+                if isinstance(shapes[idx + 1], list)
+                else shapes[idx + 1]
+            )
+            shape_loc_pairs.append([shape1, shape2])
+    return shape_loc_pairs
+
+
 def get_links(shapes: list, links_style: str, curve: float = None) -> tuple:
     """Get link vertices.
 
@@ -305,6 +355,12 @@ def get_links(shapes: list, links_style: str, curve: float = None) -> tuple:
             links.append((pt_a, pt_b))
 
         else:
-            feedback("The items in the links list cannot not be used!", True)
+            feedback("The items in the links list cannot be used!", True)
 
     return link_curve, links
+
+
+if __name__ == "__main__":
+    import doctest
+
+    doctest.testmod()

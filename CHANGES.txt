@@ -16,6 +16,7 @@ protograf Changes
 - Enable use of Shape geometry points for Line links
 - Update examples to use Shape geometry points
 - Add Circle clock geometry location property
+- Update links to support in-out pairs
 
 2026-04-02 (0.5.0)
 ------------------

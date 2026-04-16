@@ -1892,6 +1892,14 @@ class BaseShape:
             ]:
                 issue.append(f'"{self.arrow_style}" is an invalid arrow_style!')
                 correct = False
+        # ---- line links style
+        if self.links_style:
+            if _lower(self.links_style) not in [
+                "spoke",
+                "s",
+            ]:
+                issue.append(f'"{self.links_style}" is an invalid links_style!')
+                correct = False
         # ---- line arrows
         # if self.arrow_tail_style:
         #     if _lower(self.arrow_tail_style) not in [

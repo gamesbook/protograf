@@ -34,7 +34,7 @@ from protograf.shapes_circle import CircleShape
 from protograf.shapes_hexagon import HexShape
 from protograf.shapes_polygon import PolygonShape
 from protograf.shapes_rectangle import RectangleShape
-from protograf.utils.connections import get_links
+from protograf.utils import connections
 from protograf.utils import colrs, geoms, support, tools, fonts
 from protograf.utils.tools import _lower  # , _vprint
 from protograf.utils.messaging import feedback
@@ -1164,31 +1164,38 @@ class LineShape(BaseShape):
         """Draw a Line between two or more shapes."""
         if not isinstance(shapes, (list, tuple)) or len(shapes) < 2:
             feedback(
-                "Links can only be made using a list of two or more shapes!",
+                "Links can only be made using a list of two or more shape/locations!",
                 False,
                 True,
             )
             return []
-        curve, links = get_links(shapes, self.links_style, self.curve)  # connections
-        for conn in links:
-            # ---- draw straight line
-            if not self.curve:
-                klargs = draw_line(cnv, conn[0], conn[1], shape=self, **kwargs)
-            else:
-                # ---- draw curve line
-                if kwargs.get("wave_height") or kwargs.get("wave_style"):
-                    feedback("A link cannot use a wave and curve together", True)
-                klargs, curve_centre, circle_centre, radius = draw_line_curve(
-                    cnv, conn[0], conn[1], curve, **kwargs
-                )
-                kwargs["circle_centre"] = circle_centre
-                kwargs["circle_radius"] = radius
-                klargs["fill"] = None
-                klargs["fill"] = None
-                kwargs["curve"] = curve  # used in draw_arrow() & draw_arrowhead()
-            self.set_canvas_props(cnv=cnv, index=ID, **klargs)  # shape.finish()
-            self.draw_arrow(cnv, conn[0], conn[1], **kwargs)
-        return links
+
+        all_links = []
+        shape_loc_pairs = connections.link_pairs(shapes, self.links_style)
+        for shape_pair in shape_loc_pairs:
+            curve, links = connections.get_links(
+                shape_pair, self.links_style, self.curve
+            )
+            all_links.extend(links)
+            for conn in links:
+                # ---- draw straight line
+                if not self.curve:
+                    klargs = draw_line(cnv, conn[0], conn[1], shape=self, **kwargs)
+                else:
+                    # ---- draw curve line
+                    if kwargs.get("wave_height") or kwargs.get("wave_style"):
+                        feedback("A link cannot use a wave and curve together", True)
+                    klargs, curve_centre, circle_centre, radius = draw_line_curve(
+                        cnv, conn[0], conn[1], curve, **kwargs
+                    )
+                    kwargs["circle_centre"] = circle_centre
+                    kwargs["circle_radius"] = radius
+                    klargs["fill"] = None
+                    klargs["fill"] = None
+                    kwargs["curve"] = curve  # used in draw_arrow() & draw_arrowhead()
+                self.set_canvas_props(cnv=cnv, index=ID, **klargs)  # shape.finish()
+                self.draw_arrow(cnv, conn[0], conn[1], **kwargs)
+        return all_links
 
     def draw_arrow(self, cnv, point_a, point_b, **kwargs):
         """Draw arrow (head) on Line."""
@@ -1498,14 +1505,14 @@ class PolylineShape(BasePolyShape):
 
     def polyline_links(self) -> list:
         """Get vertex Points to link sets of two shapes."""
-        if not isinstance(self.links, (list, tuple)) or len(self.links) < 2:
+        if not isinstance(self.links, list) and len(self.links) < 2:
             feedback(
                 "Links can only be made using a list of two or more shapes!",
                 False,
                 True,
             )
             return None
-        curve, links = get_links(self.links, self.links_style)  # connections
+        curve, links = connections.get_links(self.links, self.links_style)
         return links
 
     def draw(self, cnv=None, off_x=0, off_y=0, ID=None, **kwargs):
