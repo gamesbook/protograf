@@ -27,6 +27,13 @@ and especially the
 [installation](https://protograf.readthedocs.io/en/latest/setting_up.html)
 before proceeding...
 
+## :information_desk_person: Support
+
+News and discussion happens at the
+[BoardGameGeek Guild](https://boardgamegeek.com/guild/4528); the developer is
+active there and can also be contacted with a request to join the
+[Discord](https://discord.com/) server for support and chats.
+
 ## :hammer_and_wrench: Requirements
 
 __protograf__ requires Python (version of 3.13 or higher) to be installed
@@ -124,7 +131,7 @@ they just represent current / potential areas of work or ideas.
 * [ ] Annular Sectors
 * [ ] Image alteration operations
 * [ ] Hexagon: 18xx tile example
-* [ ] Pathways: (arcs and lines) in a Hexagonal grid
+* [ ] Pathways: (arcs and lines) on a Hexagonal grid
 * [ ] Cards:
     * [ ] extraction as TableTopSimulator deck
     * [ ] icon alignment
@@ -150,15 +157,13 @@ core infrastructure used to do the underlying graphics processing, PDF file
 creation and images exports; __protograf__ is effectively a highly customised
 wrapper to simplify common uses around its existing and extensive capabilities.
 Internal terminology, such as `shapes`, was developed before the adoption of
-*pyMuPDF* and it is coincidental that these are similar!
+*pyMuPDF* and it is just coincidental that these are similar!
 
 Earlier versions of __protograf__ used the *ReportLab PDF Toolkit*, which is
 also a powerful and useful library for supporting this type of application.
 
 Users on [BoardGameGeek](https://boardgamegeek.com) have provided invaluable
 feedback and suggestions!
-
-Those who have directly contributed to the project are listed in CONTRIBUTORS.
 
 ### :books: Additional Libraries
 

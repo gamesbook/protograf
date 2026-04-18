@@ -62,36 +62,94 @@ class PolygonShape(BaseShape):
         self.set_unit_properties()
 
     @cached_property
-    def shape_area(self) -> float:
-        """Area of Polygon."""
-        return self._p2v(self._shape_area)
-
-    @property
-    def shape_centre(self) -> Point:
-        """Centre of Polygon"""
-        return Point(
-            self._p2v(self._shape_centre.x, 3), self._p2v(self._shape_centre.y, 3)
-        )
-
-    @cached_property
     def shape_vertices(self) -> dict:
         """Vertices of Polygon."""
         vtc = self._shape_vertexes_named
         shape_vtc = {
-            key: Point(self._p2v(value.point.x, 3), self._p2v(value.point.y, 3))
+            key: Point(self._p2v(value.point.x, 10), self._p2v(value.point.y, 10))
             for key, value in vtc.items()
         }
         return shape_vtc
 
-    @cached_property
-    def shape_geom(self) -> ShapeGeometry:
-        """Geometry of Polygon."""
-        return ShapeGeometry()
+    @property
+    def geo(self) -> ShapeGeometry:
+        """Geometry of Polygon in user units."""
+        _type = type(self)
+        cntr = self._shape_centre
+        cntr_user = self.as_point(cntr, self.units, cntr, self.rotation)
+        perim = None
+        radius = self._p2v(self._shape_radius)
+        area = self._p2v(self._shape_area)
+        # numbered vertices and perbii
+        vtcs = self._shape_vertexes
+        vtcs_user = [
+            self.as_point(value, self.units, cntr, self.rotation) for value in vtcs
+        ]
+        perbii_user = []
+        perbii_user.append(
+            geoms.fraction_along_line(vtcs_user[self.sides - 1], vtcs_user[0], 0.5)
+        )
+        for pb in range(0, self.sides - 1):
+            perbii_user.append(
+                geoms.fraction_along_line(vtcs_user[pb], vtcs_user[pb + 1], 0.5)
+            )
+        # named vertices - for "regular" sides
+        n, ne, nw, e, se, s, sw, w = None, None, None, None, None, None, None, None
+        if self.sides == 3:  # triangle
+            se = vtcs_user[0]
+            sw = vtcs_user[1]
+            n = vtcs_user[2]
+        if self.sides == 4:  # square
+            ne = vtcs_user[0]
+            se = vtcs_user[1]
+            sw = vtcs_user[2]
+            nw = vtcs_user[3]
+        if self.sides == 6:  # hexagon
+            ne = vtcs_user[0]
+            e = vtcs_user[1]
+            se = vtcs_user[2]
+            sw = vtcs_user[3]
+            w = vtcs_user[4]
+            nw = vtcs_user[5]
 
-    @cached_property
-    def geom(self) -> ShapeGeometry:
-        """Geometry of Polygon - alias for shape_geom."""
-        return self.shape_geom
+        return ShapeGeometry(
+            # centre
+            centre=cntr_user,
+            center=cntr_user,
+            c=cntr_user,
+            # named vertices (for some polygons only)
+            n=n,
+            ne=ne,
+            e=e,
+            se=se,
+            s=s,
+            sw=sw,
+            w=w,
+            nw=nw,
+            # vertices
+            v=vtcs_user,
+            vertices=vtcs_user,
+            # perbii
+            p=perbii_user,
+            perbii=perbii_user,
+            # length
+            perimeter=perim,
+            radius=radius,
+            diameter=2 * radius,
+            # other
+            area=area,
+            sides=self.sides,
+            # meta
+            t=_type,
+            type=_type,
+            shapetype=_type,
+            name=self.simple_name(self),
+        )
+
+    @property
+    def geometry(self) -> ShapeGeometry:
+        """Geometry of Polygon - alias for geo."""
+        return self.geo
 
     @cached_property
     def _shape_area(self) -> float:

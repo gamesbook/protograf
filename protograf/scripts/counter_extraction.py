@@ -235,7 +235,7 @@ def main():
         filename = sys.argv[1]
     else:
         filename = "config.ini"
-        print(f'No configuration (.ini) filename provided; using: "{filename}')
+        failure(f'No configuration (.ini) filename provided; using: "{filename}', False)
     if not os.path.exists(filename):
         failure(f'Unable to find configuration file "{filename}"')
     config = load_config(filename)

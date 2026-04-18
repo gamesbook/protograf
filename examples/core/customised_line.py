@@ -110,11 +110,11 @@ Text(common=txt, text="Line: links; shapes")
 s1 = Square(cx=1, cy=4, side=1, fill="yellow")
 s2 = Square(cx=3, cy=2, side=1)
 Line(
-    links=[(s1, 'v', 'ne'), (s2, 'p', 'w')],
+    links=[s1.geo.ne, s2.geo.w],
     stroke="red",
     stroke_width=2)
 Line(
-    links=[(s1, 'p', 'e'), (s2, 'v', 'se')],
+    links=[s1.geo.e, s2.geo.se],
     stroke="blue",
     stroke_width=2,
     curve=-0.5)
@@ -298,6 +298,21 @@ Line(x=2.5, y=5.5, length=1, angle=90, curve=-1.5, stroke="red")
 
 PageBreak()
 
+
+# ---- line - paired links (in/out)
+Blueprint(stroke_width=0.5)
+Text(common=txt, text="Line: paired links (in/out")
+box = Common(x=1, height=1, width=2)
+r1 = Rectangle(common=box, y=0.5, fill_stroke="tomato")
+r2 = Rectangle(common=box, y=2, fill_stroke="gold")
+r3 = Rectangle(common=box, y=3.5, fill_stroke="orange")
+r4 = Rectangle(common=box, y=5, fill_stroke="aqua")
+Line(
+     links=[r1.geo.s, [r2.geo.n,r2.geo.s], [r3.geo.n,r3.geo.s], r4.geo.n],
+     stroke_width=1,
+     arrow=True)
+PageBreak()
+
 # ---- END
 Text(common=txt, text="Line END...")
 
@@ -318,4 +333,5 @@ Save(
         "line_centre_shapes",
         "line_centre_shapes_curve",
         "line_curves",
+        "line_links_pairs",
         None])

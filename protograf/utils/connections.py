@@ -62,67 +62,90 @@ def validate_link_params(conn: tuple) -> list:
             direction_group=DirectionGroup.COMPASS,
             label=f"{shape_type} link's third (direction)",
         )
-    return dirs, shape_type
+    return dirs
 
 
-def get_link_point(the_shape: BaseShape, conn_type: str, direction: str) -> Point:
-    """Get Point at which link is to be made."""
+def get_link_point(point_like: object) -> Point:
+    """Get the Point at which link is to be made."""
     from protograf.shapes import StarShape  # avoid circular imports
 
     the_point = None
-    shape_name = the_shape.simple_name()
-    _name = f"{shape_name} ({the_shape.label})" if the_shape.label else shape_name
-    if isinstance(the_shape, HexShape):
-        shape_name = f"{the_shape.ORIENTATION.name.lower()} {shape_name}"
-    if isinstance(the_shape, (PolygonShape, StarShape)):
-        direction = tools.as_int(direction, "direction")
-    match _lower(conn_type):
-        case "v" | "vertex":
-            try:
-                vertexes = the_shape._shape_vertexes_named
-            except AttributeError:
-                feedback(
-                    f"{_name} has no vertices available for a link.",
-                    True,
-                )
-            vtx = vertexes.get(direction)
-            if not vtx:
-                feedback(
-                    f'{_name} cannot use a vertex in the "{direction}" direction.',
-                    True,
-                )
-            else:
-                the_point = vtx.point
-        case "p" | "perbis":
-            the_centre = the_shape.get_center()
-            if the_centre is None:
-                feedback(
-                    f"{_name} centre cannot be calculated; please report this error!",
-                    True,
-                )
-            try:
-                perbises = the_shape.calculate_perbii(centre=the_centre)
-            except AttributeError:
-                feedback(
-                    f"{_name} has no perbii available for a link.",
-                    True,
-                )
-            pbs = perbises.get(direction)
-            if not pbs:
-                feedback(
-                    f'{_name} cannot use a perbis in the "{direction}" direction.',
-                    True,
-                )
-            else:
-                the_point = pbs.point
-    if the_shape.rotation:
-        center_point = the_shape._shape_centre
-        the_point = geoms.rotate_point_around_point(
-            (the_point.x, the_point.y),
-            (center_point.x, center_point.y),
-            the_shape.rotation,
+    if isinstance(point_like, BaseShape):
+        try:
+            pnt = BaseShape.geo.centre  # default link point
+        except Exception:
+            pnt = None
+        if pnt is None:
+            feedback(
+                "Unable to access or calculate a default centre point for"
+                " {point_like.simple_name()}",
+                True,
+            )
+            return None
+        return pnt
+    elif isinstance(point_like, Point):
+        return Point(
+            globals.units * (point_like.x + globals.margins.left),
+            globals.units * (point_like.y + globals.margins.top),
         )
-    return the_point
+    elif isinstance(point_like, tuple):
+        the_shape, conn_type, direction = point_like[0], point_like[1], point_like[2]
+        shape_name = the_shape.simple_name()
+        _name = f"{shape_name} ({the_shape.label})" if the_shape.label else shape_name
+        if isinstance(the_shape, HexShape):
+            shape_name = f"{the_shape.ORIENTATION.name.lower()} {shape_name}"
+        if isinstance(the_shape, (PolygonShape, StarShape)):
+            direction = tools.as_int(direction, "direction")
+        match _lower(conn_type):
+            case "v" | "vertex":
+                try:
+                    vertexes = the_shape._shape_vertexes_named
+                except AttributeError:
+                    feedback(
+                        f"{_name} has no vertices available for a link.",
+                        True,
+                    )
+                vtx = vertexes.get(direction)
+                if not vtx:
+                    feedback(
+                        f'{_name} cannot use a vertex in the "{direction}" direction.',
+                        True,
+                    )
+                else:
+                    the_point = vtx.point
+            case "p" | "perbis":
+                the_centre = the_shape.get_center()
+                if the_centre is None:
+                    feedback(
+                        f"{_name} centre cannot be calculated; please report this error!",
+                        True,
+                    )
+                try:
+                    perbises = the_shape.calculate_perbii(centre=the_centre)
+                except AttributeError:
+                    feedback(
+                        f"{_name} has no perbii available for a link.",
+                        True,
+                    )
+                pbs = perbises.get(direction)
+                if not pbs:
+                    feedback(
+                        f'{_name} cannot use a perbis in the "{direction}" direction.',
+                        True,
+                    )
+                else:
+                    the_point = pbs.point
+        if the_shape.rotation:
+            center_point = the_shape._shape_centre
+            the_point = geoms.rotate_point_around_point(
+                (the_point.x, the_point.y),
+                (center_point.x, center_point.y),
+                the_shape.rotation,
+            )
+        return the_point
+    else:
+        feedback('A Line connection cannot be made using a "{type(point_like)}"', True)
+        return None
 
 
 def get_rotation(centre_a: Point, centre_b: Point) -> tuple:
@@ -150,6 +173,56 @@ def get_rotation(centre_a: Point, centre_b: Point) -> tuple:
         rotation_a = rotation - 90
         rotation_b = rotation + 90
     return rotation_a, rotation_b
+
+
+def link_pairs(shapes: list, links_style: str = None) -> list:
+    """Convert list of shape/locations - individual or in/out - into pairs.
+
+    Doc Test:
+    >>> print(link_pairs(['a', 'b']))
+    [['a', 'b']]
+    >>> print(link_pairs(['a', 'b', 'c']))
+    [['a', 'b'], ['b', 'c']]
+    >>> print(link_pairs(['a', ['b', 'c'], 'd']))
+    [['a', 'b'], ['c', 'd']]
+    >>> print(link_pairs(['a', ['b', 'c'], ['d', 'e'], 'f']))
+    [['a', 'b'], ['c', 'd'], ['e', 'f']]
+    >>> print(link_pairs(['a', ['b', 'c'], ['d', 'e'], ['f', 'g']]))
+    [['a', 'b'], ['c', 'd'], ['e', 'f']]
+    >>> print(link_pairs([['g', 'a'], ['b', 'c'], ['d', 'e'], 'f']))
+    [['a', 'b'], ['c', 'd'], ['e', 'f']]
+    >>> print(link_pairs(['a', 'b', 'c', 'd'], 'spoke'))
+    [['a', 'b'], ['a', 'c'], ['a', 'd']]
+    """
+    for shape_loc in shapes:
+        if isinstance(shape_loc, list) and links_style:
+            feedback(
+                "Cannot use in/out format for links with a links_style of "
+                f"{links_style}.",
+                True,
+            )
+        if isinstance(shape_loc, list) and len(shape_loc) != 2:
+            feedback(
+                "The in/out format for links must have pairs in [a,b] format!", True
+            )
+
+    shape_loc_pairs = []
+    if _lower(links_style) in [
+        "spoke",
+        "s",
+    ]:
+        for idx in range(1, len(shapes)):
+            shape_loc_pairs.append([shapes[0], shapes[idx]])
+    else:
+        for idx in range(0, len(shapes) - 1):
+            shape1 = shapes[idx][-1] if isinstance(shapes[idx], list) else shapes[idx]
+            shape2 = (
+                shapes[idx + 1][0]
+                if isinstance(shapes[idx + 1], list)
+                else shapes[idx + 1]
+            )
+            shape_loc_pairs.append([shape1, shape2])
+    return shape_loc_pairs
 
 
 def get_links(shapes: list, links_style: str, curve: float = None) -> tuple:
@@ -227,7 +300,7 @@ def get_links(shapes: list, links_style: str, curve: float = None) -> tuple:
                     "Faulty second item in link - use a Circle or a shape in a set!",
                     True,
                 )
-            pt_b = get_link_point(shape_b[0], shape_b[1], shape_b[2])
+            pt_b = get_link_point(shape_b)
             centre_a = shape_a._shape_centre  # circle/dot
             rotation_a, rotation_b = get_rotation(centre_a, pt_b)
             if curve:
@@ -252,7 +325,7 @@ def get_links(shapes: list, links_style: str, curve: float = None) -> tuple:
         elif not isinstance(shape_a, (CircleShape, DotShape)) and isinstance(
             shape_b, (CircleShape, DotShape)
         ):
-            pt_a = get_link_point(shape_a[0], shape_a[1], shape_a[2])
+            pt_a = get_link_point(shape_a)
             centre_b = shape_b._shape_centre  # circle/dot
             rotation_a, rotation_b = get_rotation(pt_a, centre_b)
             if curve:
@@ -277,11 +350,17 @@ def get_links(shapes: list, links_style: str, curve: float = None) -> tuple:
         elif not isinstance(shape_a, (CircleShape, DotShape)) and not isinstance(
             shape_b, (CircleShape, DotShape)
         ):
-            pt_a = get_link_point(shape_a[0], shape_a[1], shape_a[2])
-            pt_b = get_link_point(shape_b[0], shape_b[1], shape_b[2])
+            pt_a = get_link_point(shape_a)
+            pt_b = get_link_point(shape_b)
             links.append((pt_a, pt_b))
 
         else:
-            feedback("The items in the links list cannot not be used!", True)
+            feedback("The items in the links list cannot be used!", True)
 
     return link_curve, links
+
+
+if __name__ == "__main__":
+    import doctest
+
+    doctest.testmod()

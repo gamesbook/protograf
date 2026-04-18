@@ -4,7 +4,7 @@ Create Circle shape for protograf
 """
 
 # lib
-from functools import cached_property
+from functools import cached_property, lru_cache
 import logging
 import math
 
@@ -19,6 +19,7 @@ from protograf.utils.tools import _lower
 from protograf.utils.messaging import feedback
 from protograf.utils.structures import (
     BBox,
+    ClockGeometry,
     DirectionGroup,
     Point,
     Radius,
@@ -55,41 +56,79 @@ class CircleShape(BaseShape):
         # ---- RESET UNIT PROPS (last!)
         self.set_unit_properties()
 
-    @cached_property
-    def shape_area(self) -> float:
-        """Area of Circle."""
-        return None
+    @property
+    def clock(self) -> ShapeGeometry:
+        """Clock locations on Circle in user units."""
+        return ClockGeometry(
+            h1=self.poc(60),
+            h2=self.poc(30),
+            h3=self.poc(360),
+            h4=self.poc(330),
+            h5=self.poc(300),
+            h6=self.poc(270),
+            h7=self.poc(240),
+            h8=self.poc(210),
+            h9=self.poc(180),
+            h10=self.poc(150),
+            h11=self.poc(120),
+            h12=self.poc(90),
+        )
 
-    @cached_property
-    def shape_centre(self) -> Point:
-        """Centre of Circle."""
-        return None
+    @property
+    def geo(self) -> ShapeGeometry:
+        """Geometry of Circle in user units."""
+        _type = type(self)
+        cntr = self._shape_centre
+        cntr_user = self.as_point(cntr, self.units, cntr, self.rotation)
+        perim = self.points_to_value(math.pi * 2.0 * self._u.radius)
+        radius = self.points_to_value(self._u.radius)
+        area = math.pi * self.points_to_value(self._u.radius) ** 2
+        return ShapeGeometry(
+            # centre
+            centre=cntr_user,
+            center=cntr_user,
+            c=cntr_user,
+            # compass
+            n=self.poc(90),
+            s=self.poc(270),
+            e=self.poc(0),
+            w=self.poc(180),
+            ne=self.poc(45),
+            se=self.poc(315),
+            sw=self.poc(225),
+            nw=self.poc(135),
+            nnw=self.poc(112.5),
+            nne=self.poc(67.5),
+            sse=self.poc(292.5),
+            ssw=self.poc(247.5),
+            wnw=self.poc(157.5),
+            ene=self.poc(22.5),
+            ese=self.poc(337.5),
+            wsw=self.poc(202.5),
+            # length
+            perimeter=perim,
+            radius=radius,
+            diameter=2 * radius,
+            # other
+            area=area,
+            sides=1,
+            # meta
+            t=_type,
+            type=_type,
+            shapetype=_type,
+            name=self.simple_name(self),
+        )
 
-    @cached_property
-    def shape_vertices(self) -> dict:
-        """Vertices of Circle."""
-        return {}
+    @property
+    def geometry(self) -> ShapeGeometry:
+        """Geometry of Circle - alias for geo."""
+        return self.geo
 
-    @cached_property
-    def shape_perbii(self) -> dict:
-        """Perbii of Circle."""
-        return {}
-
-    @cached_property
-    def shape_geom(self) -> ShapeGeometry:
-        """Geometry of Circle."""
-        return ShapeGeometry()
-
-    @cached_property
-    def geom(self) -> ShapeGeometry:
-        """Geometry of Circle - alias for shape_geom."""
-        return self.shape_geom
-
-    @cached_property
-    def shape_perimeter(self) -> float:
-        """Circle circumference length"""
-        length = math.pi * 2.0 * self._u.radius
-        return self.points_to_value(length)
+    @lru_cache(maxsize=360)
+    def poc(self, angle: float) -> Point:
+        """Return Point on the Circle at a given angle - in user units."""
+        _pt = geoms.point_on_circle(self._shape_centre, self._u.radius, angle)
+        return self.as_point(_pt, self.units, self._shape_centre, self.rotation)
 
     @cached_property
     def _shape_radius(self) -> float:

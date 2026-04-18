@@ -91,38 +91,97 @@ class HexShape(BaseShape):
                 self.set_unit_properties()  # need to recalculate!
         self.ORIENTATION = self.get_orientation()
 
-    @cached_property
-    def shape_area(self) -> float:
-        """Area of Hexagon."""
-        return None
-
-    @cached_property
-    def shape_centre(self) -> Point:
-        """Centre of Hexagon."""
-        self.vertices = self._shape_vertexes  # also sets self.centre
-        return Point(self._p2v(self.centre.x), self._p2v(self.centre.y))
-
-    @cached_property
-    def shape_vertices(self) -> dict:
-        """Vertices of Hexagon."""
-        return {}
-
-    @cached_property
-    def shape_geom(self) -> ShapeGeometry:
-        """Geometry of Hexagon."""
+    @property
+    def geo(self) -> ShapeGeometry:
+        """Geometry of Hexagon in user units."""
+        _type = type(self)
+        cntr = Point(self.x_d, self.y_d)
+        cntr_user = self.as_point(cntr, self.units, None, None)
+        vtcs = self._shape_vertexes
+        # vertices and perbii vary by ORIENTATION!
+        n, ne, nw, e, se, s, sw, w = None, None, None, None, None, None, None, None
+        nnw, nne, sse, ssw = None, None, None, None  # pointy
+        wnw, ene, ese, wsw = None, None, None, None  # flat
+        if self.ORIENTATION == HexOrientation.POINTY:
+            # vertices
+            nw = self.as_point(vtcs[0], self.units, None, None)
+            sw = self.as_point(vtcs[1], self.units, None, None)
+            s = self.as_point(vtcs[2], self.units, None, None)
+            se = self.as_point(vtcs[3], self.units, None, None)
+            ne = self.as_point(vtcs[4], self.units, None, None)
+            n = self.as_point(vtcs[5], self.units, None, None)
+            # perbii
+            e = geoms.fraction_along_line(ne, se, 0.5)
+            w = geoms.fraction_along_line(nw, sw, 0.5)
+            nnw = geoms.fraction_along_line(n, nw, 0.5)
+            nne = geoms.fraction_along_line(n, ne, 0.5)
+            sse = geoms.fraction_along_line(s, se, 0.5)
+            ssw = geoms.fraction_along_line(s, sw, 0.5)
+        elif self.ORIENTATION == HexOrientation.FLAT:
+            # vertices
+            w = self.as_point(vtcs[0], self.units, None, None)
+            sw = self.as_point(vtcs[1], self.units, None, None)
+            se = self.as_point(vtcs[2], self.units, None, None)
+            e = self.as_point(vtcs[3], self.units, None, None)
+            ne = self.as_point(vtcs[4], self.units, None, None)
+            nw = self.as_point(vtcs[5], self.units, None, None)
+            # perbii
+            n = geoms.fraction_along_line(nw, ne, 0.5)
+            s = geoms.fraction_along_line(sw, se, 0.5)
+            wnw = geoms.fraction_along_line(w, nw, 0.5)
+            ene = geoms.fraction_along_line(e, ne, 0.5)
+            ese = geoms.fraction_along_line(e, se, 0.5)
+            wsw = geoms.fraction_along_line(w, sw, 0.5)
+        else:
+            feedback(
+                'Invalid orientation "{self.ORIENTATION}" supplied for hexagon.', True
+            )
         hex_geom = self.get_geometry()
+        radius = self._p2v(hex_geom.radius)
+        diameter = self._p2v(hex_geom.diameter)
+        side = self._p2v(hex_geom.radius)
+        area = math.sqrt(3) * 3 / 2 * side**2
+        perim = 6 * side
         return ShapeGeometry(
-            name=self.simple_name(),
-            radius=self._p2v(hex_geom.radius),
-            diameter=self._p2v(hex_geom.diameter),
-            side=self._p2v(hex_geom.radius),
-            height=self._p2v(hex_geom.height_flat),
+            # centre
+            centre=cntr_user,
+            center=cntr_user,
+            c=cntr_user,
+            # vertices and perbii
+            n=n,
+            ne=ne,
+            e=e,
+            se=se,
+            s=s,
+            sw=sw,
+            w=w,
+            nw=nw,
+            nnw=nnw,
+            nne=nne,
+            sse=sse,
+            ssw=ssw,
+            wnw=wnw,
+            ene=ene,
+            ese=ese,
+            wsw=wsw,
+            # length
+            perimeter=perim,
+            radius=radius,
+            diameter=diameter,
+            side=side,
+            # other
+            area=area,
+            # meta
+            t=_type,
+            type=_type,
+            shapetype=_type,
+            name=self.simple_name(self),
         )
 
-    @cached_property
-    def geom(self) -> ShapeGeometry:
-        """Geometry of Hexagon - alias for shape_geom."""
-        return self.shape_geom
+    @property
+    def geometry(self) -> ShapeGeometry:
+        """Geometry of Hexagon - alias for geo."""
+        return self.geo
 
     @property  # must be able to change e.g. for layout
     def _shape_vertexes(self) -> list:

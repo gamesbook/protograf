@@ -42,11 +42,11 @@ def grouping(x=0, y=0, filled=None):
             fill=None,
             stroke="white", stroke_width=3)
     # connect vertices of outer polygon to those of inner polygon
-    for point in range(1, 7):
+    for point in range(0, 6):
         Line(links=[
-                (outer, 'v', point * 2 - 1),
-                (inner, 'v', point),
-                (outer, 'v', point * 2)
+                outer.geo.v[point * 2],
+                inner.geo.v[point],
+                outer.geo.v[point * 2 + 1],
              ],
              stroke=GREEN)
 

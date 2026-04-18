@@ -50,6 +50,7 @@ useful information designed to build on each other.
 
    core_shapes
    customised_shapes
+   shapes_geometry
    customised_text
 
 .. toctree::

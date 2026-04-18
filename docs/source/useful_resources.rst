@@ -10,6 +10,16 @@ game design when working with :doc:`protograf <index>`.
    Inclusion of these resources does **not** constitute a recommendation! As
    always, check how they are allowed to be used and any terms and conditions.
 
+Contents
+========
+
+- `Prototyping Tools`_
+- `Icons, Art and Images`_
+- `Card Suit Icons`_
+- `BoardGameGeek`_
+- `Unicode Characters`_
+- `Miscellaneous`_
+
 
 Prototyping Tools
 =================
@@ -91,3 +101,11 @@ BoardGameGeek
 The `Board Game Geek <https://boardgamegeek.com>`_ website has many communities
 and lists of resources to help support aspiring game designers; one place to
 start is https://boardgamegeek.com/forum/974616/bgg/board-game-creation
+
+
+Miscellaneous
+=============
+
+- https://legibility.info/contrast-calculator - calculating and testing easily
+  accessible colour combinations for screen and print
+- https://cur.by/styleguide - how to write your rulebook!

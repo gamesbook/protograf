@@ -377,16 +377,19 @@ A Line is a very common shape in many designs; there are a number of ways
 that it can be customised.
 
 - `Dotted, Dashed, Angled and Wavy <lineDotDash_>`_
-- `Dotted, Dashed, and Angled - curved <lineDotDashCurve_>`_
+- `Dotted, Dashed, and Angled - Curved <lineDotDashCurve_>`_
 - `Curved Line <lineCurve_>`_
 - `Centred Line <lineCentred_>`_
 - `Arrowheads <line-with-arrow_>`_
 - `Centre Shapes <lineCentreShapes_>`_
-- `Centre Shapes - curved <lineCentreShapesCurve_>`_
+- `Centre Shapes - Curved <lineCentreShapesCurve_>`_
 - `Links: Circles <lineLinksCircle_>`_
 - `Links: Shapes <lineLinksShapes_>`_
 - `Links with Arrows <lineLinksArrow_>`_
+- `Links as Pairs <lineLinksPairs_>`_
 - `Links as Spokes <lineLinksSpoke_>`_
+- `Links: Curved <lineLinksCurve_>`_
+
 
 Line Properties
 ---------------
@@ -1111,17 +1114,16 @@ Example 6. Links: Circle
 ------------------------
 `^ <lineIndex_>`_
 
-To connect two or more shapes, supply a list of them, together with a
-*link point*, for the *links* property of the line.
+To link (or join or connect) two or more shapes, supply a list of them,
+together with a *link point*, for the *links* property of a ``Line``.
 
 The *link point* for circular shapes |dash| ``Circle`` and ``Dot`` |dash|
 is not required, as the connecting line is always drawn to/from the centre
-of such a shape.
+of such a shape |dash| **but** not crossing its boundary.
 
 For non-circular shapes |dash| for example, ``Rectangle`` or ``Hexagon`` |dash|
 such a shape must have either/or vertex points, or perbis points, that can be
-specified as the *link point* to which the line will connect. This point
-must be set along with the shape, in the  *links* property setting.
+specified as the *link point* to which the line will connect.
 
 .. NOTE::
 
@@ -1171,10 +1173,11 @@ must be set along with the shape, in the  *links* property setting.
 
       Using the *links* property means that the normal point locations,
       or line angle, are **not** used but are superceded by calculated values.
+
       The "start" of the line is at the centre of the first circular shape
       and the "end" of the line is at the centre of the second circular shape.
-      However, the line itself is only drawn between the boundaries of those
-      shapes.
+      However, the line itself is **only** drawn between the boundaries of
+      those shapes.
 
       The thick black line is drawn between a series of shapes, starting and
       ending at the yellow circle.
@@ -1189,13 +1192,22 @@ Example 7. Links: Shapes
 `^ <lineIndex_>`_
 
 To connect two or more non-circular shapes |dash| for example, ``Rectangle``
-or ``Hexagon`` |dash| supply a list of these, along with the settings for
-each of their *link points*, as the *links* property of the line.
+or ``Hexagon`` |dash| supply a list of the *link point* of each ones, as
+the *links* property of the line.
 
-The *link point* setting for non-circular shapes must specify:
+There are two ways to specify the *link point* setting for non-circular
+shapes.
 
-- the shape name;
-- the link type |dash| either a vertex point (``v``) or a perbis
+The first option is the simpler |dash| setting a point by relying on the
+:ref:`shape's geometry <geometryProps>`. The point is specified using the
+``SHAPE.geo.DIR`` syntax; where ``SHAPE`` is the name assigned to the shape
+by the script and ``POINT`` is the directional point name e.g. ``ne`` for a
+north-east point.
+
+The second option specifies a set of *three* values in this order:
+
+- the name assigned to the shape by the script;
+- the point type |dash| either a vertex point (``v``) or a perbis
   point (``p``);
 - the link location, as a :ref:`compass direction <termsDirection>`.
 
@@ -1206,7 +1218,7 @@ The *link point* setting for non-circular shapes must specify:
   properties that specify **how** the line will be appear will still be used.
 
 More concrete examples of the use of links can be found in the
-examples of constructing boards |dash| :ref:`Morabaraba <abstractGameMorabaraba>`
+board construction scripts |dash| :ref:`Morabaraba <abstractGameMorabaraba>`
 and :ref:`Kensington <abstractGameKensington>`.
 
 
@@ -1226,16 +1238,11 @@ and :ref:`Kensington <abstractGameKensington>`.
           cx=3, cy=2, side=1)
 
         Line(
-          links=[
-            (s1, 'v', 'ne'),
-            (s2, 'p', 'w')
-          ],
+          links=[s1.geo.ne, s2.geo.w],
           stroke="red",
           stroke_width=2)
         Line(
-          links=[
-            (s1, 'p', 'e'),
-            (s2, 'v', 'se')],
+          links=[s1.geo.e, s2.geo.se],
           stroke="blue",
           stroke_width=2,
           curve=-0.5)
@@ -1299,10 +1306,59 @@ Example 8. Links - Arrow
 ===== ======
 
 
+.. _lineLinksPairs:
+
+Example 9. Links - Pairs
+------------------------
+`^ <lineIndex_>`_
+
+.. |lnp| image:: images/customised/line_links_pairs.png
+   :width: 330
+
+===== ======
+|lnp| This example shows a Line constructed using commands with the
+      following properties:
+
+      .. code:: python
+
+        box = Common(x=1, height=1, width=2)
+        r1 = Rectangle(
+          common=box, y=0.5,
+          fill_stroke="tomato")
+        r2 = Rectangle(
+          common=box, y=r1.geo.nw + 1.5,
+          fill_stroke="gold")
+        r3 = Rectangle(
+          common=box, y=r2.geo.nw + 1.5,
+          fill_stroke="orange")
+        r4 = Rectangle(
+          common=box, y=r3.geo.nw + 1.5,
+          fill_stroke="aqua")
+        Line(
+           links=[r1.geo.s,
+                  [r2.geo.n, r2.geo.s],
+                  [r3.geo.n, r3.geo.s],
+                  r4.geo.n],
+           stroke_width=1,
+           arrow=True)
+
+      In this example, lines, styled as arrows, are drawn between a series of
+      ``Rectangle`` shapes.  The connectivity here for the ``Line`` is enabled
+      by the *links* property, using point geometry as described in
+      `Links: Shapes <lineLinksShapes_>`_.
+
+      In this example, the "middle" boxes |dash| yellow and orange |dash| have
+      both incoming and outgoing arrows set by pairing the in and out points
+      for each rectangle together in a list, as shown by the square brackets
+      from ``[`` to ``]``.
+
+===== ======
+
+
 .. _lineLinksSpoke:
 
-Example 9. Links - Spoke
-------------------------
+Example 10. Links - Spokes
+--------------------------
 `^ <lineIndex_>`_
 
 .. |ln6| image:: images/customised/line_links_spoke.png
@@ -1342,8 +1398,8 @@ Example 9. Links - Spoke
 
 .. _lineLinksCurve:
 
-Example 10. Links - Curve
--------------------------
+Example 11. Links - Curved
+--------------------------
 `^ <lineIndex_>`_
 
 .. |lc9| image:: images/customised/line_links_curve.png
@@ -1373,6 +1429,9 @@ Example 10. Links - Curve
              curve=0.5,
          )
 
+      Here a "spoke" arrangement is created with the small black dot acting
+      as the central hub and curved lines |dash| set by ``curve=0.5`` |dash|
+      connecting it to all of the colored circles.
 
 ===== ======
 

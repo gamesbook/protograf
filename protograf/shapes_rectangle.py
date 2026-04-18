@@ -22,7 +22,6 @@ from protograf.utils.structures import (
     Locale,
     Perbis,
     Point,
-    PointLocations,
     Radius,
     ShapeGeometry,
     Vertex,
@@ -77,48 +76,53 @@ class RectangleShape(BaseShape):
         # ---- RESET UNIT PROPS (last!)
         self.set_unit_properties()  # need to recalculate!
 
-    @cached_property
-    def shape_area(self) -> float:
-        """Area of Rectangle."""
-        return None
-
-    @cached_property
-    def shape_centre(self) -> Point:
-        """Centre of Rectangle."""
-        return None
-
     @property
-    def pts(self) -> dict:
-        """Vertices, Perbises and Centre of Rectangle (in user units)."""
-        mx = globals.margins[0]
-        my = globals.margins[1]
-        print(mx, my)
-        breakpoint()
+    def geo(self) -> ShapeGeometry:
+        """Geometry of Rectangle in user units."""
         _type = type(self)
         cntr = self._shape_centre
-        cntr_user = Point(cntr.x / self.units - mx, cntr.y / self.units - my)
+        cntr_user = self.as_point(cntr, self.units, cntr, self.rotation)
         vtcs = self._shape_vertexes
-        return PointLocations(
+        ne = self.as_point(vtcs[0], self.units, cntr, self.rotation)
+        se = self.as_point(vtcs[1], self.units, cntr, self.rotation)
+        sw = self.as_point(vtcs[2], self.units, cntr, self.rotation)
+        nw = self.as_point(vtcs[3], self.units, cntr, self.rotation)
+        perim = (self.height + self.width) * 2
+        area = self.height * self.width
+        radius = (
+            math.hypot(self.height, self.width) if self.height == self.width else None
+        )
+        return ShapeGeometry(
+            # centre
             centre=cntr_user,
             center=cntr_user,
             c=cntr_user,
-            ne=Point(vtcs[0].x / self.units - mx, vtcs[0].y / self.units - my),
-            se=Point(vtcs[1].x / self.units - mx, vtcs[1].y / self.units - my),
-            sw=Point(vtcs[2].x / self.units - mx, vtcs[2].y / self.units - my),
-            nw=Point(vtcs[3].x / self.units - mx, vtcs[3].y / self.units - my),
+            # vertices
+            ne=ne,
+            nw=nw,
+            se=se,
+            sw=sw,
+            # perbii
+            n=geoms.fraction_along_line(nw, ne, 0.5),
+            s=geoms.fraction_along_line(sw, se, 0.5),
+            e=geoms.fraction_along_line(ne, se, 0.5),
+            w=geoms.fraction_along_line(nw, sw, 0.5),
+            # length
+            perimeter=perim,
+            radius=radius,
+            # other
+            area=area,
+            # meta
             t=_type,
             type=_type,
             shapetype=_type,
             name=self.simple_name(self),
         )
 
-    @cached_property
-    def shape_geom(self) -> ShapeGeometry:
-        """Geometry of Rectangle."""
-        return ShapeGeometry(
-            width=self.width,
-            height=self.height,
-        )
+    @property
+    def geometry(self) -> ShapeGeometry:
+        """Geometry of Rectangle - alias for geo."""
+        return self.geo
 
     @property
     def _shape_vertexes(self) -> list:
@@ -142,11 +146,6 @@ class RectangleShape(BaseShape):
         #     f' /3: {vertices[3][0]:.2f};{vertices[3][1]:.2f}'
         # )
         return vertices
-
-    @cached_property
-    def geom(self) -> ShapeGeometry:
-        """Geometry of Rectangle - alias for shape_geom."""
-        return self.shape_geom
 
     @cached_property
     def shape_perimeter(self) -> float:

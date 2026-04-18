@@ -72,8 +72,9 @@ class TriangleType(Enum):
     IRREGULAR = 3
 
 
-# ---- NAMEDTUPLE
+# ---- NAMEDTUPLES
 
+# ---- * Bounds
 Bounds = namedtuple(
     "Bounds",
     [
@@ -87,6 +88,7 @@ Bounds = namedtuple(
 cb_fields = ("fill", "offset_x", "offset_y", "offset_radius")
 CardBleed = namedtuple("CardBleed", cb_fields, defaults=(None,) * len(cb_fields))
 
+# ---- * CrossParts
 CrossParts = namedtuple(
     "CrossParts",
     ["thickness", "half_thick", "arm", "body", "head"],
@@ -103,6 +105,7 @@ DeckPrintState = namedtuple(
     ],
 )
 
+# ---- * GridShape
 GridShape = namedtuple(
     "GridShape",
     [
@@ -113,6 +116,7 @@ GridShape = namedtuple(
     ],
 )
 
+# ---- * GlobalDocument
 GlobalDocument = namedtuple(
     "GlobalDocument",
     [
@@ -134,6 +138,7 @@ GlobalDocument = namedtuple(
     ],
 )
 
+# ---- * HexGeometry
 HexGeometry = namedtuple(
     "HexGeometry",
     [
@@ -151,6 +156,7 @@ LookupType = namedtuple("LookupType", ["column", "lookups"])
 
 Link = namedtuple("Link", ["a", "b", "style"])
 
+# ---- * Locale
 fields = ("col", "row", "x", "y", "id", "sequence", "corner", "label", "page")
 Locale = namedtuple("Locale", fields, defaults=(None,) * len(fields))
 
@@ -164,6 +170,77 @@ OffsetProperties = namedtuple(
     ],
 )
 
+
+# ---- * ClockGeometry
+clockgeometry_fields = (
+    "h1",
+    "h2",
+    "h3",
+    "h4",
+    "h5",
+    "h6",
+    "h7",
+    "h8",
+    "h9",
+    "h10",
+    "h11",
+    "h12",
+)
+ClockGeometry = namedtuple(
+    "ClockGeometry", clockgeometry_fields, defaults=(None,) * len(clockgeometry_fields)
+)
+
+# ---- * ShapeGeometry
+# N = 90, W = 180, S = 270, E = 0
+# NE = 45, NW = 135, SW = 225, SE = 315
+# NNW =
+shapegeometry_fields = (
+    # points
+    "centre",
+    "center",
+    "c",
+    "n",
+    "s",
+    "e",
+    "w",
+    "ne",
+    "se",
+    "nw",
+    "sw",
+    "nnw",
+    "nne",
+    "sse",
+    "ssw",
+    "wnw",
+    "ene",
+    "ese",
+    "wsw",
+    "v",
+    "vertices",
+    "p",
+    "perbii",
+    # lengths
+    "radius",
+    "diameter",
+    "side",
+    "length",
+    "width",
+    "height",
+    "perimeter",
+    # other
+    "area",
+    "sides",  # e.g. for a regular Polygon
+    # meta
+    "t",
+    "type",
+    "shapetype",
+    "name",
+)
+ShapeGeometry = namedtuple(
+    "ShapeGeometry", shapegeometry_fields, defaults=(None,) * len(shapegeometry_fields)
+)
+
+# ----  PAGEMARGINS
 # base margins are in user units
 PageMarginsBase = namedtuple(
     "PageMarginsBase",
@@ -177,56 +254,6 @@ PageMarginsBase = namedtuple(
         "units",  # point equivalent of single user unit
     ],
 )
-
-pointlocations_fields = (
-    "centre",
-    "center",
-    "c",
-    "n",
-    "s",
-    "e",
-    "w",
-    "ne",
-    "se",
-    "nw",
-    "sw",
-    "t",
-    "type",
-    "shapetype",
-    "name",
-)
-PointLocations = namedtuple(
-    "PointLocations",
-    pointlocations_fields,
-    defaults=(None,) * len(pointlocations_fields),
-)
-
-shape_fields = (
-    "name",
-    "radius",
-    "diameter",
-    "side",
-    "length",
-    "width",
-    "height",
-    "head",
-    "tail",
-)
-ShapeGeometry = namedtuple(
-    "ShapeGeometry", shape_fields, defaults=(None,) * len(shape_fields)
-)
-# template for use in Shape construction
-# return ShapeGeometry(
-#     name=self.simple_name(),
-#     radius=self.,
-#     diameter=self.,
-#     side=self.,
-#     length=self.,
-#     width=self.,
-#     height=self.,
-#     head=self.,
-#     tail=self.,
-# )
 
 
 class PageMargins(PageMarginsBase):

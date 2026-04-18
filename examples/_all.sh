@@ -20,6 +20,7 @@ python core/customised_line.py
 python core/customised_rectangle.py
 python core/customised_shapes.py
 python core/customised_text.py
+python core/shapes_geo.py
 # ---- examples: simple: layouts
 echo -e "\nCreating customised layouts..."
 python core/layouts/layouts_basic.py

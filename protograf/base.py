@@ -14,7 +14,6 @@ import math
 import os
 from pathlib import Path, PosixPath
 from sys import platform
-import traceback
 from urllib.parse import urlparse
 
 # third party
@@ -164,7 +163,7 @@ class BaseCanvas:
         self.margin_bottom = self.defaults.get("margin_bottom", self.margin)
         self.margin_left = self.defaults.get("margin_left", self.margin)
         self.margin_right = self.defaults.get("margin_right", self.margin)
-        # ---- sizes and positions
+        # ---- sizes
         self.row = self.defaults.get("row", None)
         self.col = self.defaults.get("col", self.defaults.get("column", None))
         self.side = self.defaults.get("side", 1.0)  # square,rhombus,tri
@@ -173,12 +172,18 @@ class BaseCanvas:
         self.thickness = self.defaults.get("thickness", None)  # cross
         self.top = self.defaults.get("width", self.width * 0.5)
         self.depth = self.defaults.get("depth", self.side)  # diamond
-        self.x = self.defaults.get("x", self.defaults.get("left", 1.0))
-        self.y = self.defaults.get("y", self.defaults.get("bottom", 1.0))
-        self.cx = self.defaults.get("cx", None)  # NB! not 0; needed for internal check
-        self.cy = self.defaults.get("cy", None)  # NB! not 0; needed for internal check
         self.scaling = self.defaults.get("scaling", None)  # SVG; snail
         self.dot_width = self.defaults.get("dot_width", 3.0)  # points
+        # ---- positions
+        self.x = self.defaults.get("x", self.defaults.get("left", 1.0))
+        self.y = self.defaults.get("y", self.defaults.get("top", 1.0))
+        self.xy = self.defaults.get(
+            "xy", self.defaults.get("xy", Point(self.x, self.y))
+        )
+        self.cx = self.defaults.get("cx", None)  # NB! not 0; needed for internal check
+        self.cy = self.defaults.get("cy", None)  # NB! not 0; needed for internal check
+        self.cxy = self.defaults.get("cxy", None)
+        self.xy1 = self.defaults.get("xy1", None)
         # ---- to be calculated ...
         self.area = None
         self.vertexes = []
@@ -729,8 +734,6 @@ class BaseShape:
     """Base class for objects drawn on a given canvas aka a pymupdf_utils_Shape"""
 
     def __init__(self, _object: muShape = None, canvas: BaseCanvas = None, **kwargs):
-        # print(''.join(traceback.format_stack()))
-
         # feedback(f'### BaseShape 1 {type(self).__name__} {kwargs=}')
         # inject and then override kwargs supplied by DefaultShape aka user defaults
         if kwargs.get("default"):
@@ -824,7 +827,7 @@ class BaseShape:
             kwargs.get("grid_marks_dotted", base.grid_marks_dotted)
         )
         self.grid_marks_style = kwargs.get("grid_marks_style", base.grid_marks_style)
-        # ---- sizes and positions
+        # ---- sizes
         self.row = kwargs.get("row", base.row)
         self.col = self.kw_int(kwargs.get("col", kwargs.get("column", base.col)), "col")
         self.side = self.kw_float(kwargs.get("side", base.side))
@@ -835,14 +838,31 @@ class BaseShape:
         self.depth = self.kw_float(
             kwargs.get("depth", base.depth)
         )  # was self.side > diamond?
-        self.x = self.kw_float(kwargs.get("x", kwargs.get("left", base.x)))
-        self.y = self.kw_float(kwargs.get("y", kwargs.get("top", base.y)))
-        self.cx = self.kw_float(kwargs.get("cx", base.cx))  # centre (for some shapes)
-        self.cy = self.kw_float(kwargs.get("cy", base.cy))  # centre (for some shapes)
-        self.scaling = self.kw_float(kwargs.get("scaling", None))  # SVG; snail
         self.dot_width = self.kw_float(
             kwargs.get("dot_width", base.dot_width)
-        )  # points
+        )  # units are points!
+        self.scaling = self.kw_float(kwargs.get("scaling", None))  # SVG; snail
+        # ---- positions
+        __x, __y, __cx, __cy = None, None, None, None
+        self.xy = kwargs.get("xy", base.xy)
+        if self.xy is not None and isinstance(self.xy, Point):
+            __x, __y = self.xy.x, self.xy.y
+        self.x = self.kw_float(
+            kwargs.get("x", __x if __x is not None else kwargs.get("left", base.x))
+        )
+        self.y = self.kw_float(
+            kwargs.get("y", __y if __y is not None else kwargs.get("top", base.y))
+        )
+        self.cxy = kwargs.get("cxy", base.cxy)
+        if self.cxy is not None and isinstance(self.cxy, Point):
+            __cx, __cy = self.cxy.x, self.cxy.y
+        self.cx = self.kw_float(
+            kwargs.get("cx", __cx if __cx is not None else base.cx)
+        )  # centre (for some shapes)
+        self.cy = self.kw_float(
+            kwargs.get("cy", __cy if __cy is not None else base.cy)
+        )  # centre (for some shapes)
+        # print(f"{self.xy=} {self.x=} {self.y=} {self.cx=} {self.cy=}")
         # ---- to be calculated ...
         self.area = base.area
         self.vertexes = base.vertexes  # list of shape's "points"
@@ -1047,8 +1067,12 @@ class BaseShape:
         # ---- line
         self.curve = self.kw_float(kwargs.get("curve", base.curve))
         # ---- line / bezier / sector
-        self.x_1 = self.kw_float(kwargs.get("x1", base.x_1))
-        self.y_1 = self.kw_float(kwargs.get("y1", base.y_1))
+        __x1, __y1 = None, None
+        self.xy1 = kwargs.get("xy1", base.xy1)
+        if self.xy1 and isinstance(self.xy1, Point):
+            __x1, __y1 = self.xy1.x, self.xy1.y
+        self.x_1 = self.kw_float(kwargs.get("x1", __x1 or base.x_1))
+        self.y_1 = self.kw_float(kwargs.get("y1", __y1 or base.y_1))
         # ---- line / hex
         self.links = kwargs.get("links", base.links)
         self.links_style = kwargs.get("links_style", base.links_style)
@@ -1473,11 +1497,10 @@ class BaseShape:
                     attr not in ["canvas", "common", "stylesheet", "kwargs"]
                     and attr[0] != "_"
                 ):
-                    # print(f'### Common {attr=} {base=} {type(base)=}')
+                    # print(f'### Common {attr=} {base=} {type(base)=} {common_attr=}')
                     common_attr = getattr(self.common, attr)
                     base_attr = getattr(base, attr)
-                    # if 'stroke' in attr in attr:
-                    #     print(f'### Common {attr=} {base_attr=} {common_attr=}')
+                    # print(f'### Common {attr=} {base_attr=}')
                     if common_attr != base_attr:
                         setattr(self, attr, common_attr)
 
@@ -1868,6 +1891,14 @@ class BaseShape:
                 "c",
             ]:
                 issue.append(f'"{self.arrow_style}" is an invalid arrow_style!')
+                correct = False
+        # ---- line links style
+        if self.links_style:
+            if _lower(self.links_style) not in [
+                "spoke",
+                "s",
+            ]:
+                issue.append(f'"{self.links_style}" is an invalid links_style!')
                 correct = False
         # ---- line arrows
         # if self.arrow_tail_style:
@@ -2492,6 +2523,24 @@ class BaseShape:
                 f'Unable to do units conversion from "{value}" using {self.units}!',
                 True,
             )
+
+    @functools.lru_cache(maxsize=999)
+    def as_point(
+        self,
+        xy: Point,
+        units: float,
+        center: Point,
+        rotation: float = None,
+    ) -> Point:
+        """Create a Point in user units already offset from page margins."""
+        margin_left = globals.margins.left
+        margin_top = globals.margins.top
+        # print(f'as_point() {margin_left=} {margin_top=} {x=} {y=}')
+        if rotation:
+            xy = geoms.rotate_point_around_point(xy, center, rotation)
+        xpt = round(xy.x / units - margin_left, 10)
+        ypt = round(xy.y / units - margin_top, 10)
+        return Point(xpt, ypt)
 
     def _p2v(self, value: float, decimals: int = 4):
         """Convert point value to a rounded, units-based value using current units."""

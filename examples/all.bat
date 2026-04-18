@@ -26,6 +26,7 @@ python core\customised_line.py --no-png -d %location%
 python core\customised_rectangle.py --no-png -d %location%
 python core\customised_shapes.py --no-png -d %location%
 python core\customised_text.py --no-png -d %location%
+python core\shapes_geo.py --no-png -d %location%
 
 REM ---- examples: objects
 ECHO "Creating objects..."
