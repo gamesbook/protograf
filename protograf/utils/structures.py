@@ -157,7 +157,19 @@ LookupType = namedtuple("LookupType", ["column", "lookups"])
 Link = namedtuple("Link", ["a", "b", "style"])
 
 # ---- * Locale
-fields = ("col", "row", "x", "y", "id", "sequence", "corner", "label", "page")
+fields = (
+    "col",
+    "row",
+    "x",
+    "y",
+    "height",
+    "width",
+    "id",
+    "sequence",
+    "corner",
+    "label",
+    "page",
+)
 Locale = namedtuple("Locale", fields, defaults=(None,) * len(fields))
 
 OffsetProperties = namedtuple(

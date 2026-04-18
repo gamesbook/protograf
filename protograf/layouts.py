@@ -428,6 +428,7 @@ class TableShape(BaseShape):
     def __init__(self, _object=None, canvas=None, **kwargs):
         super().__init__(_object=_object, canvas=canvas, **kwargs)
         self.locales = []
+        self.cells = {}  # store Locale data indexed by spreadsheet coordinates
         self.use_side = False
         if "side" in self.kwargs:
             self.use_side = True
@@ -471,8 +472,16 @@ class TableShape(BaseShape):
         if self.col_count < 2 or self.row_count < 2:
             feedback("Minimum layout size is 2 columns x 2 rows!", True)
 
+    def cell(self, cell_id: str = None) -> Locale:
+        """Retrieve cell attributes as a Locale."""
+        try:
+            _id = cell_id.upper()
+            return self.cells[cell_id]
+        except (AttributeError, KeyError):
+            feedback(f'Cannot access cell "{cell_id}" for the Table!', True)
+
     def draw(self, cnv=None, off_x=0, off_y=0, ID=None, **kwargs):
-        """Draw a table on a given canvas."""
+        """Draw a Table on a given canvas."""
         kwargs = self.kwargs | kwargs
         cnv = cnv if cnv else self.canvas
         super().draw(cnv, off_x, off_y, ID, **kwargs)  # unit-based props
@@ -482,6 +491,7 @@ class TableShape(BaseShape):
         # ---- iterate cols and rows
         cell_y = y
         sequence = 0
+        self.vertexes = [None, None, None, None]  # TL, BL, BR, TR
         for row_no in range(0, self.row_count):
             cell_x = x
             rheight = self.unit(self.row_heights[row_no], label="row height")
@@ -489,20 +499,50 @@ class TableShape(BaseShape):
                 cwidth = self.unit(self.col_widths[col_no], label="column width")
                 cnv.draw_rect((cell_x, cell_y, cell_x + cwidth, cell_y + rheight))
                 cx, cy = cell_x + cwidth / 2.0, cell_y + rheight / 2.0
-                ID = tools.sheet_column(col_no + 1) + str(row_no + 1)
+                cell_id = tools.sheet_column(col_no + 1) + str(row_no + 1)
                 locale = Locale(
-                    col=col_no, row=row_no, x=cx, y=cy, id=ID, sequence=sequence
+                    col=col_no,
+                    row=row_no,
+                    x=cx,
+                    y=cy,
+                    height=rheight,
+                    width=cwidth,
+                    id=cell_id,
+                    sequence=sequence,
                 )
                 self.locales.append(locale)
+                self.cells[cell_id] = locale
+                # track vertices for outline of Table
+                if row_no == 0 and col_no == 0:  # top_left
+                    self.vertexes[0] = [cell_x, cell_y]
+                if row_no == self.row_count - 1 and col_no == 0:  # bottom_left
+                    self.vertexes[1] = [cell_x, cell_y + rheight]
+                if (
+                    row_no == self.row_count - 1 and col_no == self.col_count - 1
+                ):  # bottom_right
+                    self.vertexes[2] = [cell_x + cwidth, cell_y + rheight]
+                if row_no == 0 and col_no == self.col_count - 1:  # top_right
+                    self.vertexes[3] = [cell_x + cwidth, cell_y]
                 # finally ...
                 cell_x = cell_x + cwidth
                 sequence += 1
             cell_y = cell_y + rheight
+        # ---- row/col line styles
         self.set_canvas_props(  # shape.finish()
             cnv=cnv,
             index=ID,
             **kwargs,
         )
+        # ---- borders (override)
+        if self.borders:
+            if isinstance(self.borders, tuple):
+                self.borders = [
+                    self.borders,
+                ]
+            if not isinstance(self.borders, list):
+                feedback('The "borders" property must be a list of sets or a set')
+            for border in self.borders:
+                self.draw_border(cnv, border, ID, **kwargs)
         cnv.commit()  # if not, then Page objects e.g. Image not layered
         return self.locales
 

@@ -4159,7 +4159,8 @@ Example 2. Customised Table
         Table(y=3, x=0,
               cols=[0.5, 1, 1.25, 0.75],
               rows=[0.75, 0.5, 0.5, 0.75],
-              stroke="blue", fill="aqua")
+              stroke="blue", fill="aqua",
+              borders=('*', 2, "grey"))
 
       The first Table has the following properties:
 
@@ -4175,6 +4176,13 @@ Example 2. Customised Table
       - *rows* is a list of row heights
       - *stroke* color of ``blue``
       - *fill* color of ``aqua``
+      - *borders* all around of color ``grey`` with a stroke width of ``2``;
+        a border set can contain, in this order:
+
+        - *direction* - one of n(orth), s(outh), e(ast) or w(est), or all(*)
+        - *width* - the line thickness
+        - *color* - either a named color or a hexadecimal value
+        - *style* - ``True`` makes it dotted; a list of values creates dashes
 
 ===== ======
 

@@ -1121,11 +1121,15 @@ Text(common=txt, text="Table: styled")
 Table(y=0,
       width=3, height=2.5,
       cols=5, rows=6,
-      stroke="red", dotted=True)
+      stroke="red",
+      dotted=True
+)
 Table(y=3, x=0,
       cols=[0.5, 1, 1.25, 0.75],
       rows=[0.75, 0.5, 0.5, 0.75],
-      stroke="blue", fill="aqua")
+      stroke="blue", fill="aqua",
+      borders=('*', 2, "grey")
+)
 PageBreak()
 
 # ---- wave styles

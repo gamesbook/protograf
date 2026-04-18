@@ -4411,9 +4411,9 @@ def Table(shapes=None, **kwargs):
     """Draw a grid of rectangles."""
     kwargs = margins(**kwargs)
     kwargs["shapes"] = shapes
-    Table = TableShape(**kwargs)
-    locales = Table.draw()
-    return locales
+    tbl = TableShape(**kwargs)
+    tbl.draw()
+    return tbl
 
 
 def table(shapes=None, **kwargs):

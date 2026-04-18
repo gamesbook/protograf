@@ -184,6 +184,7 @@ class BaseCanvas:
         self.cy = self.defaults.get("cy", None)  # NB! not 0; needed for internal check
         self.cxy = self.defaults.get("cxy", None)
         self.xy1 = self.defaults.get("xy1", None)
+        self.cell = self.defaults.get("cell", None)
         # ---- to be calculated ...
         self.area = None
         self.vertexes = []
@@ -863,6 +864,7 @@ class BaseShape:
             kwargs.get("cy", __cy if __cy is not None else base.cy)
         )  # centre (for some shapes)
         # print(f"{self.xy=} {self.x=} {self.y=} {self.cx=} {self.cy=}")
+        self.cell = kwargs.get("cell", base.cell)
         # ---- to be calculated ...
         self.area = base.area
         self.vertexes = base.vertexes  # list of shape's "points"
@@ -3346,16 +3348,46 @@ class BaseShape:
             dashed = bstyle
         # ---- multi-directions
         shape_name = self.__class__.__name__.replace("Shape", "")
-        _bdirections = tools.validated_directions(
-            bdirections, DirectionGroup.COMPASS, f"{shape_name.lower()} border"
-        )
+        match self.__class__.__name__:
+            case "RectangleShape" | "SquareShape" | "TrapezoidShape" | "TableShape":
+                _bdirections = tools.validated_directions(
+                    bdirections, DirectionGroup.CARDINAL, f"{shape_name.lower()} border"
+                )
+            case "RhombusShape":
+                _bdirections = tools.validated_directions(
+                    bdirections, DirectionGroup.ORDINAL, f"{shape_name.lower()} border"
+                )
+            case "HexShape":
+                if self.orientation == "pointy":
+                    _bdirections = tools.validated_directions(
+                        bdirections,
+                        DirectionGroup.HEX_POINTY_EDGE,
+                        f"{shape_name.lower()} border",
+                    )
+                elif self.orientation == "flat":
+                    _bdirections = tools.validated_directions(
+                        bdirections,
+                        DirectionGroup.HEX_FLAT_EDGE,
+                        f"{shape_name.lower()} border",
+                    )
+                else:
+                    raise ValueError(
+                        f'Invalid orientation "{self.orientation}" for {shape_name}'
+                    )
+            case _:
+                feedback(f"Cannot draw borders for a {shape_name}", True)
+
         for bdirection in _bdirections:
             if not bdirection:
                 continue
+            if not self.vertexes:
+                feedback(
+                    f"Cannot draw borders for a {shape_name} with no vertices!", True
+                )
             # ---- get line start & end
             match self.__class__.__name__:
                 # ---- * Rect, Sq, Trap
-                case "RectangleShape" | "SquareShape" | "TrapezoidShape":
+                case "RectangleShape" | "SquareShape" | "TrapezoidShape" | "TableShape":
                     match bdirection:  # vertices anti-clockwise from top-left
                         case "w":
                             x, y = self.vertexes[0][0], self.vertexes[0][1]
@@ -3448,7 +3480,7 @@ class BaseShape:
                                 )
                     else:
                         raise ValueError(
-                            'Invalid orientation "{self.orientation}" for border'
+                            f'Invalid orientation "{self.orientation}" for {shape_name}'
                         )
 
                 case _:
