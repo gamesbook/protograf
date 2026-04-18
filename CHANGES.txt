@@ -9,7 +9,7 @@ protograf Changes
 - [PLANNED-2] Docs: list all props for Hex, Circle, Rectangle, Line
 - [PLANNED-2] Centre multi-line label text strings
 
-2026-00-00 (0.5.1)
+2026-04-18 (0.5.1)
 ------------------
 - Add Shape geometry property
 - Add function to get point on Circle circumference

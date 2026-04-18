@@ -377,16 +377,19 @@ A Line is a very common shape in many designs; there are a number of ways
 that it can be customised.
 
 - `Dotted, Dashed, Angled and Wavy <lineDotDash_>`_
-- `Dotted, Dashed, and Angled - curved <lineDotDashCurve_>`_
+- `Dotted, Dashed, and Angled - Curved <lineDotDashCurve_>`_
 - `Curved Line <lineCurve_>`_
 - `Centred Line <lineCentred_>`_
 - `Arrowheads <line-with-arrow_>`_
 - `Centre Shapes <lineCentreShapes_>`_
-- `Centre Shapes - curved <lineCentreShapesCurve_>`_
+- `Centre Shapes - Curved <lineCentreShapesCurve_>`_
 - `Links: Circles <lineLinksCircle_>`_
 - `Links: Shapes <lineLinksShapes_>`_
 - `Links with Arrows <lineLinksArrow_>`_
+- `Links as Pairs <lineLinksPairs_>`_
 - `Links as Spokes <lineLinksSpoke_>`_
+- `Links: Curved <lineLinksCurve_>`_
+
 
 Line Properties
 ---------------
@@ -1303,10 +1306,59 @@ Example 8. Links - Arrow
 ===== ======
 
 
+.. _lineLinksPairs:
+
+Example 9. Links - Pairs
+------------------------
+`^ <lineIndex_>`_
+
+.. |lnp| image:: images/customised/line_links_pairs.png
+   :width: 330
+
+===== ======
+|lnp| This example shows a Line constructed using commands with the
+      following properties:
+
+      .. code:: python
+
+        box = Common(x=1, height=1, width=2)
+        r1 = Rectangle(
+          common=box, y=0.5,
+          fill_stroke="tomato")
+        r2 = Rectangle(
+          common=box, y=r1.geo.nw + 1.5,
+          fill_stroke="gold")
+        r3 = Rectangle(
+          common=box, y=r2.geo.nw + 1.5,
+          fill_stroke="orange")
+        r4 = Rectangle(
+          common=box, y=r3.geo.nw + 1.5,
+          fill_stroke="aqua")
+        Line(
+           links=[r1.geo.s,
+                  [r2.geo.n, r2.geo.s],
+                  [r3.geo.n, r3.geo.s],
+                  r4.geo.n],
+           stroke_width=1,
+           arrow=True)
+
+      In this example, lines, styled as arrows, are drawn between a series of
+      ``Rectangle`` shapes.  The connectivity here for the ``Line`` is enabled
+      by the *links* property, using point geometry as described in
+      `Links: Shapes <lineLinksShapes_>`_.
+
+      In this example, the "middle" boxes |dash| yellow and orange |dash| have
+      both incoming and outgoing arrows set by pairing the in and out points
+      for each rectangle together in a list, as shown by the square brackets
+      from ``[`` to ``]``.
+
+===== ======
+
+
 .. _lineLinksSpoke:
 
-Example 9. Links - Spoke
-------------------------
+Example 10. Links - Spokes
+--------------------------
 `^ <lineIndex_>`_
 
 .. |ln6| image:: images/customised/line_links_spoke.png
@@ -1346,8 +1398,8 @@ Example 9. Links - Spoke
 
 .. _lineLinksCurve:
 
-Example 10. Links - Curve
--------------------------
+Example 11. Links - Curved
+--------------------------
 `^ <lineIndex_>`_
 
 .. |lc9| image:: images/customised/line_links_curve.png
@@ -1378,8 +1430,8 @@ Example 10. Links - Curve
          )
 
       Here a "spoke" arrangement is created with the small black dot acting
-      as the central hub and curved lines connecting it to all of the colored
-      circles.
+      as the central hub and curved lines |dash| set by ``curve=0.5`` |dash|
+      connecting it to all of the colored circles.
 
 ===== ======
 
