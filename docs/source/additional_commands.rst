@@ -48,7 +48,8 @@ have been assigned to the ``colors`` name.
 .. NOTE::
 
   The common properties **cannot** be overwritten by a shape; if set, they
-  will be used and cannot be changed on a case-by-case basis!
+  will be used and cannot be changed on a case-by-case basis!  If you want
+  to be able to do such overwrites, rather use the `Default Command`_.
 
 
 .. _the-default-command:

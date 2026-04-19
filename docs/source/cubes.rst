@@ -12,7 +12,7 @@ basic scripts of your own using the :doc:`Core Shapes <core_shapes>`. You also
 be familiar with the various types of shape's properties described in the
 :doc:`Customised Shapes <customised_shapes>`
 
-.. _cubeOver:
+.. _cube-object:
 
 Overview
 ========
@@ -20,7 +20,6 @@ Overview
 Cubes are widely used in many games, so being able to easily add them to
 a graphic layout can be useful.
 
-.. _cube-object:
 
 Cube Properties
 ===============
@@ -36,7 +35,7 @@ The examples below shows how a Cube can be created and styled.
 
 Cube Styling
 ------------
-`^ <cubeOver_>`_
+`^ <cube-object_>`_
 
 .. |cu1| image:: images/objects/cubes.png
    :width: 330

@@ -371,4 +371,4 @@ Finally |dash| and perhaps confusingly |dash| :doc:`protograf <index>` also
 allows you to create your own "defaults" which represent properties that you
 want to share among a number of geometric **shapes**, or text, that make up
 your design; for more on this, see the :ref:`Default <the-default-command>`
-command.
+and the :ref:`Common <the-common-command>` commands.

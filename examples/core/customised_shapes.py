@@ -1115,20 +1115,46 @@ Table(cols=2, rows=2)
 Table(y=2.5, width=3, height=2, cols=3, rows=4)
 PageBreak()
 
-# ---- table - styled
+# ---- table - styled global
 Blueprint()
-Text(common=txt, text="Table: styled")
-Table(y=0,
-      width=3, height=2.5,
-      cols=5, rows=6,
-      stroke="red",
-      dotted=True
+Text(common=txt, text="Table: style - global")
+Table(
+    x=1, y=0,
+    width=3, height=2.5,
+    cols=5, rows=6,
+    stroke="red",
+    dotted=True
 )
-Table(y=3, x=0,
-      cols=[0.5, 1, 1.25, 0.75],
-      rows=[0.75, 0.5, 0.5, 0.75],
-      stroke="blue", fill="aqua",
-      borders=('*', 2, "grey")
+Table(
+    y=3, x=0,
+    cols=[0.5, 1, 1.25, 0.75],
+    rows=[0.75, 0.5, 0.5, 0.75],
+    stroke="blue", fill="aqua",
+    borders=('*', 2, "grey")
+)
+PageBreak()
+
+# ---- table - styled rows and cols
+Blueprint()
+Text(common=txt, text="Table: style - rows and cols")
+t1 = Table(
+    x=0.5, y=0.5,
+    width=3, height=2,
+    cols=5, rows=5,
+    disable_row=True,
+    stroke="red", stroke_width=1,
+    fill="gold",
+    borders=('e w', 2, "grey"),
+)
+t2 = Table(
+    x=0, y=3,
+    cols=[0.5, 1, 1.25, 0.75],
+    rows=[0.75, 0.5, 0.5, 0.5, 0.75],
+    disable_col=True,
+    stroke="grey", stroke_width=1,
+    fill="aqua",
+    borders_header=('n s', 2, "black"),
+    borders_footer=('s', 2, "red", True),
 )
 PageBreak()
 
@@ -1447,7 +1473,7 @@ Save(
         "shape_rotation",
         "shape_rotation_two",
         "shape_hatches_and_rotation",
-        "table_defaults", "table_custom",
+        "table_defaults", "table_custom", "table_rows_cols",
         "perbii_styled",
         "poly_waves",
         "vertex_shapes",

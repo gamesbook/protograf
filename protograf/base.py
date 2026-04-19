@@ -447,6 +447,8 @@ class BaseCanvas:
         self.prows = kwargs.get("prows", [])
         self.prows_dict = {}
         self.borders = kwargs.get("borders", [])
+        self.borders_header = kwargs.get("borders_header", [])
+        self.borders_footer = kwargs.get("borders_footer", [])
         self.rounded_radius = self.defaults.get(
             "rounded_radius", 0.05
         )  # fraction of smallest side
@@ -1136,6 +1138,8 @@ class BaseShape:
         self.prows = kwargs.get("prows", base.prows)
         self.prows_dict = {}
         self.borders = kwargs.get("borders", base.borders)
+        self.borders_header = kwargs.get("borders_header", base.borders_header)
+        self.borders_footer = kwargs.get("borders_footer", base.borders_footer)
         self.rounded_radius = base.rounded_radius
         # ---- slices (rect, rhombus, hex, circle)
         self.slices = kwargs.get("slices", base.slices)
@@ -2545,7 +2549,7 @@ class BaseShape:
         return Point(xpt, ypt)
 
     def _p2v(self, value: float, decimals: int = 4):
-        """Convert point value to a rounded, units-based value using current units."""
+        """Convert point value to a rounded, units-based value using user units."""
         try:
             return round(float(value) / self.units, decimals)
         except Exception as err:
@@ -2556,7 +2560,7 @@ class BaseShape:
             )
 
     def _l2v(self, values: list, decimals: int = 4):
-        """Convert Points to a rounded, units-based values using current units."""
+        """Convert Points list to rounded, units-based values using user units."""
         try:
             _values = [
                 Point(
@@ -3310,7 +3314,7 @@ class BaseShape:
             self.set_canvas_props(cnv=canvas, index=None, **kwargs)
 
     def draw_border(self, cnv, border: tuple, ID: int = None, **kwargs):
-        """Draw a border line based its settings."""
+        """Draw a border line for an area based on its settings."""
         # feedback(f'### border {self.__class__.__name__} {border=} {ID=}')
         if not isinstance(border, tuple):
             feedback(
@@ -3318,6 +3322,7 @@ class BaseShape:
                 f' - not "{border}"',
                 True,
             )
+        border_vertexes = kwargs.get("vertexes", self.vertexes)
         # ---- assign tuple values
         bdirections, bwidth, bcolor, bstyle, dotted, dashed = (
             None,
@@ -3380,7 +3385,7 @@ class BaseShape:
         for bdirection in _bdirections:
             if not bdirection:
                 continue
-            if not self.vertexes:
+            if not border_vertexes:
                 feedback(
                     f"Cannot draw borders for a {shape_name} with no vertices!", True
                 )
@@ -3390,17 +3395,17 @@ class BaseShape:
                 case "RectangleShape" | "SquareShape" | "TrapezoidShape" | "TableShape":
                     match bdirection:  # vertices anti-clockwise from top-left
                         case "w":
-                            x, y = self.vertexes[0][0], self.vertexes[0][1]
-                            x_1, y_1 = self.vertexes[1][0], self.vertexes[1][1]
+                            x, y = border_vertexes[0][0], border_vertexes[0][1]
+                            x_1, y_1 = border_vertexes[1][0], border_vertexes[1][1]
                         case "s":
-                            x, y = self.vertexes[1][0], self.vertexes[1][1]
-                            x_1, y_1 = self.vertexes[2][0], self.vertexes[2][1]
+                            x, y = border_vertexes[1][0], border_vertexes[1][1]
+                            x_1, y_1 = border_vertexes[2][0], border_vertexes[2][1]
                         case "e":
-                            x, y = self.vertexes[2][0], self.vertexes[2][1]
-                            x_1, y_1 = self.vertexes[3][0], self.vertexes[3][1]
+                            x, y = border_vertexes[2][0], border_vertexes[2][1]
+                            x_1, y_1 = border_vertexes[3][0], border_vertexes[3][1]
                         case "n":
-                            x, y = self.vertexes[3][0], self.vertexes[3][1]
-                            x_1, y_1 = self.vertexes[0][0], self.vertexes[0][1]
+                            x, y = border_vertexes[3][0], border_vertexes[3][1]
+                            x_1, y_1 = border_vertexes[0][0], border_vertexes[0][1]
                         case _:
                             feedback(
                                 f"Invalid direction ({bdirection}) for {shape_name} border",
@@ -3410,17 +3415,17 @@ class BaseShape:
                 case "RhombusShape":
                     match bdirection:
                         case "se":
-                            x, y = self.vertexes[1][0], self.vertexes[1][1]
-                            x_1, y_1 = self.vertexes[2][0], self.vertexes[2][1]
+                            x, y = border_vertexes[1][0], border_vertexes[1][1]
+                            x_1, y_1 = border_vertexes[2][0], border_vertexes[2][1]
                         case "ne":
-                            x, y = self.vertexes[2][0], self.vertexes[2][1]
-                            x_1, y_1 = self.vertexes[3][0], self.vertexes[3][1]
+                            x, y = border_vertexes[2][0], border_vertexes[2][1]
+                            x_1, y_1 = border_vertexes[3][0], border_vertexes[3][1]
                         case "nw":
-                            x, y = self.vertexes[3][0], self.vertexes[3][1]
-                            x_1, y_1 = self.vertexes[0][0], self.vertexes[0][1]
+                            x, y = border_vertexes[3][0], border_vertexes[3][1]
+                            x_1, y_1 = border_vertexes[0][0], border_vertexes[0][1]
                         case "sw":
-                            x, y = self.vertexes[0][0], self.vertexes[0][1]
-                            x_1, y_1 = self.vertexes[1][0], self.vertexes[1][1]
+                            x, y = border_vertexes[0][0], border_vertexes[0][1]
+                            x_1, y_1 = border_vertexes[1][0], border_vertexes[1][1]
                         case _:
                             feedback(
                                 f"Invalid direction ({bdirection}) for {shape_name} border",
@@ -3431,23 +3436,23 @@ class BaseShape:
                     if self.orientation == "pointy":
                         match bdirection:
                             case "se":
-                                x, y = self.vertexes[2][0], self.vertexes[2][1]
-                                x_1, y_1 = self.vertexes[3][0], self.vertexes[3][1]
+                                x, y = border_vertexes[2][0], border_vertexes[2][1]
+                                x_1, y_1 = border_vertexes[3][0], border_vertexes[3][1]
                             case "e":
-                                x, y = self.vertexes[3][0], self.vertexes[3][1]
-                                x_1, y_1 = self.vertexes[4][0], self.vertexes[4][1]
+                                x, y = border_vertexes[3][0], border_vertexes[3][1]
+                                x_1, y_1 = border_vertexes[4][0], border_vertexes[4][1]
                             case "ne":
-                                x, y = self.vertexes[4][0], self.vertexes[4][1]
-                                x_1, y_1 = self.vertexes[5][0], self.vertexes[5][1]
+                                x, y = border_vertexes[4][0], border_vertexes[4][1]
+                                x_1, y_1 = border_vertexes[5][0], border_vertexes[5][1]
                             case "nw":
-                                x, y = self.vertexes[5][0], self.vertexes[5][1]
-                                x_1, y_1 = self.vertexes[0][0], self.vertexes[0][1]
+                                x, y = border_vertexes[5][0], border_vertexes[5][1]
+                                x_1, y_1 = border_vertexes[0][0], border_vertexes[0][1]
                             case "w":
-                                x, y = self.vertexes[0][0], self.vertexes[0][1]
-                                x_1, y_1 = self.vertexes[1][0], self.vertexes[1][1]
+                                x, y = border_vertexes[0][0], border_vertexes[0][1]
+                                x_1, y_1 = border_vertexes[1][0], border_vertexes[1][1]
                             case "sw":
-                                x, y = self.vertexes[1][0], self.vertexes[1][1]
-                                x_1, y_1 = self.vertexes[2][0], self.vertexes[2][1]
+                                x, y = border_vertexes[1][0], border_vertexes[1][1]
+                                x_1, y_1 = border_vertexes[2][0], border_vertexes[2][1]
                             case _:
                                 feedback(
                                     f"Invalid direction ({bdirection}) for pointy {shape_name} border",
@@ -3456,23 +3461,23 @@ class BaseShape:
                     elif self.orientation == "flat":
                         match bdirection:
                             case "s":
-                                x, y = self.vertexes[1][0], self.vertexes[1][1]
-                                x_1, y_1 = self.vertexes[2][0], self.vertexes[2][1]
+                                x, y = border_vertexes[1][0], border_vertexes[1][1]
+                                x_1, y_1 = border_vertexes[2][0], border_vertexes[2][1]
                             case "se":
-                                x, y = self.vertexes[2][0], self.vertexes[2][1]
-                                x_1, y_1 = self.vertexes[3][0], self.vertexes[3][1]
+                                x, y = border_vertexes[2][0], border_vertexes[2][1]
+                                x_1, y_1 = border_vertexes[3][0], border_vertexes[3][1]
                             case "ne":
-                                x, y = self.vertexes[3][0], self.vertexes[3][1]
-                                x_1, y_1 = self.vertexes[4][0], self.vertexes[4][1]
+                                x, y = border_vertexes[3][0], border_vertexes[3][1]
+                                x_1, y_1 = border_vertexes[4][0], border_vertexes[4][1]
                             case "n":
-                                x, y = self.vertexes[4][0], self.vertexes[4][1]
-                                x_1, y_1 = self.vertexes[5][0], self.vertexes[5][1]
+                                x, y = border_vertexes[4][0], border_vertexes[4][1]
+                                x_1, y_1 = border_vertexes[5][0], border_vertexes[5][1]
                             case "nw":
-                                x, y = self.vertexes[5][0], self.vertexes[5][1]
-                                x_1, y_1 = self.vertexes[0][0], self.vertexes[0][1]
+                                x, y = border_vertexes[5][0], border_vertexes[5][1]
+                                x_1, y_1 = border_vertexes[0][0], border_vertexes[0][1]
                             case "sw":
-                                x, y = self.vertexes[0][0], self.vertexes[0][1]
-                                x_1, y_1 = self.vertexes[1][0], self.vertexes[1][1]
+                                x, y = border_vertexes[0][0], border_vertexes[0][1]
+                                x_1, y_1 = border_vertexes[1][0], border_vertexes[1][1]
                             case _:
                                 feedback(
                                     f"Invalid direction ({bdirection}) for flat {shape_name} border",

@@ -5,6 +5,7 @@ Create grids, repeats, sequences, and layouts for protograf
 
 # lib
 import copy
+from functools import lru_cache
 import logging
 import math
 
@@ -429,7 +430,12 @@ class TableShape(BaseShape):
         super().__init__(_object=_object, canvas=canvas, **kwargs)
         self.locales = []
         self.cells = {}  # store Locale data indexed by spreadsheet coordinates
+        self.vertexes_header = [None, None, None, None]  # TL, BL, BR, TR
+        self.vertexes_footer = [None, None, None, None]  # TL, BL, BR, TR
         self.use_side = False
+        self.disable_row = self.kwargs.get("disable_row", False)
+        self.disable_col = self.kwargs.get("disable_col", False)
+        self.is_filled = False if kwargs.get("fill") == None else True
         if "side" in self.kwargs:
             self.use_side = True
             if "width" in self.kwargs or "height" in self.kwargs:
@@ -472,11 +478,31 @@ class TableShape(BaseShape):
         if self.col_count < 2 or self.row_count < 2:
             feedback("Minimum layout size is 2 columns x 2 rows!", True)
 
+    @lru_cache(maxsize=999)
     def cell(self, cell_id: str = None) -> Locale:
+        """Retrieve cell attributes as a Locale in user units."""
+        data = self._cell(cell_id)
+        # convert data
+        user_cell = Locale(
+            col=data.col_no,
+            row=data.row_no,
+            x=self._p2v(data.x, decimals=9),
+            y=self._p2v(data.y, decimals=9),
+            xy=self.as_point(data.xy, self.units, None, None),
+            cxy=self.as_point(data.cxy, self.units, None, None),
+            height=self._p2v(data.rheight, decimals=9),
+            width=self._p2v(data.cwidth, decimals=9),
+            id=data.cell_id,
+            sequence=data.sequence,
+        )
+        return user_cell
+
+    @lru_cache(maxsize=999)
+    def _cell(self, cell_id: str = None) -> Locale:
         """Retrieve cell attributes as a Locale."""
         try:
             _id = cell_id.upper()
-            return self.cells[cell_id]
+            return self.cells[_id]
         except (AttributeError, KeyError):
             feedback(f'Cannot access cell "{cell_id}" for the Table!', True)
 
@@ -488,6 +514,24 @@ class TableShape(BaseShape):
         # ---- convert to using units
         x = self._u.x + self._o.delta_x
         y = self._u.y + self._o.delta_y
+        # ---- background rect
+        if self.is_filled:
+            twidths = [
+                self.unit(self.col_widths[col_no])
+                for col_no in range(0, self.col_count)
+            ]
+            theights = [
+                self.unit(self.row_heights[row_no])
+                for row_no in range(0, self.row_count)
+            ]
+            cnv.draw_rect((x, y, x + sum(twidths), y + sum(theights)))
+            bargs = copy.copy(kwargs)
+            bargs["stroke"] = None
+            self.set_canvas_props(  # shape.finish()
+                cnv=cnv,
+                index=ID,
+                **bargs,
+            )
         # ---- iterate cols and rows
         cell_y = y
         sequence = 0
@@ -497,14 +541,32 @@ class TableShape(BaseShape):
             rheight = self.unit(self.row_heights[row_no], label="row height")
             for col_no in range(0, self.col_count):
                 cwidth = self.unit(self.col_widths[col_no], label="column width")
-                cnv.draw_rect((cell_x, cell_y, cell_x + cwidth, cell_y + rheight))
+                # ---- * conditional line draw
+                if self.disable_col:
+                    cnv.draw_line(Point(cell_x, cell_y), Point(cell_x + cwidth, cell_y))
+                    cnv.draw_line(
+                        Point(cell_x, cell_y + rheight),
+                        Point(cell_x + cwidth, cell_y + rheight),
+                    )
+                elif self.disable_row:
+                    cnv.draw_line(
+                        Point(cell_x, cell_y), Point(cell_x, cell_y + rheight)
+                    )
+                    cnv.draw_line(
+                        Point(cell_x + cwidth, cell_y),
+                        Point(cell_x + cwidth, cell_y + rheight),
+                    )
+                else:
+                    cnv.draw_rect((cell_x, cell_y, cell_x + cwidth, cell_y + rheight))
                 cx, cy = cell_x + cwidth / 2.0, cell_y + rheight / 2.0
                 cell_id = tools.sheet_column(col_no + 1) + str(row_no + 1)
                 locale = Locale(
                     col=col_no,
                     row=row_no,
-                    x=cx,
-                    y=cy,
+                    x=x,
+                    y=y,
+                    xy=Point(x, y),
+                    cxy=Point(cx, cy),
                     height=rheight,
                     width=cwidth,
                     id=cell_id,
@@ -512,17 +574,28 @@ class TableShape(BaseShape):
                 )
                 self.locales.append(locale)
                 self.cells[cell_id] = locale
-                # track vertices for outline of Table
-                if row_no == 0 and col_no == 0:  # top_left
+                # track vertices for outline of Table and Header/Footer rows
+                if row_no == 0 and col_no == 0:
+                    # top_left
                     self.vertexes[0] = [cell_x, cell_y]
-                if row_no == self.row_count - 1 and col_no == 0:  # bottom_left
+                    self.vertexes_header[0] = [cell_x, cell_y]
+                    self.vertexes_header[1] = [cell_x, cell_y + rheight]
+                if row_no == self.row_count - 1 and col_no == 0:
+                    # bottom_left
                     self.vertexes[1] = [cell_x, cell_y + rheight]
+                    self.vertexes_footer[0] = [cell_x, cell_y]
+                    self.vertexes_footer[1] = [cell_x, cell_y + rheight]
                 if (
                     row_no == self.row_count - 1 and col_no == self.col_count - 1
                 ):  # bottom_right
                     self.vertexes[2] = [cell_x + cwidth, cell_y + rheight]
-                if row_no == 0 and col_no == self.col_count - 1:  # top_right
+                    self.vertexes_footer[3] = [cell_x + cwidth, cell_y]
+                    self.vertexes_footer[2] = [cell_x + cwidth, cell_y + rheight]
+                if row_no == 0 and col_no == self.col_count - 1:
+                    # top_right
                     self.vertexes[3] = [cell_x + cwidth, cell_y]
+                    self.vertexes_header[3] = [cell_x + cwidth, cell_y]
+                    self.vertexes_header[2] = [cell_x + cwidth, cell_y + rheight]
                 # finally ...
                 cell_x = cell_x + cwidth
                 sequence += 1
@@ -533,16 +606,39 @@ class TableShape(BaseShape):
             index=ID,
             **kwargs,
         )
-        # ---- borders (override)
+        # ----  header row borders (override row)
+        if self.borders_header:
+            if isinstance(self.borders_header, tuple):
+                self.borders_header = [
+                    self.borders_header,
+                ]
+            if not isinstance(self.borders_header, list):
+                feedback(
+                    'The "borders_header" property must be a list of sets or a set'
+                )
+            for border in self.borders_header:
+                kwargs["vertexes"] = self.vertexes_header
+                self.draw_border(cnv, border, ID, **kwargs)
+        # ----  footer row borders (override row)
+        if self.borders_footer:
+            if isinstance(self.borders_footer, tuple):
+                self.borders_footer = [self.borders_footer]
+            if not isinstance(self.borders_footer, list):
+                feedback(
+                    'The "borders_footer" property must be a list of sets or a set'
+                )
+            for border in self.borders_footer:
+                kwargs["vertexes"] = self.vertexes_footer
+                self.draw_border(cnv, border, ID, **kwargs)
+        # ----  table borders (override)
         if self.borders:
             if isinstance(self.borders, tuple):
-                self.borders = [
-                    self.borders,
-                ]
+                self.borders = [self.borders]
             if not isinstance(self.borders, list):
                 feedback('The "borders" property must be a list of sets or a set')
             for border in self.borders:
                 self.draw_border(cnv, border, ID, **kwargs)
+
         cnv.commit()  # if not, then Page objects e.g. Image not layered
         return self.locales
 

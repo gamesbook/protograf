@@ -1346,7 +1346,8 @@ Example 1. Default Hexagon
 
       - upper-left "corner" at x-position ``1`` cm and at y-position ``1`` cm
       - flat-to-flat |dash| opposite edges |dash| distance of ``1`` cm
-      - "flat" top - top edge is parallel to top of paper
+      - the *orientation*  has the default value (not shown here) of ``flat``
+        i.e. the top edge of the hexagon is parallel to the top of the paper
 ===== ======
 
 Example 2. Pointy Hexagon
@@ -1367,7 +1368,8 @@ Example 2. Pointy Hexagon
 
       - upper-left "corner" at x-position ``1`` cm and at y-position ``1`` cm
       - flat-to-flat height of ``1`` cm
-      - *orientation* -``pointy`` i.e. side edge is parallel to side of paper
+      - *orientation* of ``pointy`` i.e. the side edge of the hexagon is parallel
+        to the side of the paper
 ===== ======
 
 
@@ -4102,6 +4104,15 @@ Either the rows and columns are split evenly across the Table's
 height and width, or the values of each row and column can be set via
 lists of values.
 
+Tables colors and line styles can be set as described in the examples
+below.
+
+Tables do not, themselves, contain any information.  However, any of the
+"cells" in a table can be accessed using a spreadsheet-like notation.
+For more details on this; see how to insert :ref:`Text <text-command>`
+or :ref:`Images <image-command>`.
+
+
 Example 1. Table: Basic
 +++++++++++++++++++++++
 
@@ -4183,6 +4194,69 @@ Example 2. Customised Table
         - *width* - the line thickness
         - *color* - either a named color or a hexadecimal value
         - *style* - ``True`` makes it dotted; a list of values creates dashes
+
+===== ======
+
+Example 3. Customised Table Rows and Columns
+++++++++++++++++++++++++++++++++++++++++++++
+
+.. |tb2| image:: images/customised/table_rows_cols.png
+   :width: 330
+
+===== ======
+|tb2| This example shows the Table constructed using the command with
+      these properties:
+
+      .. code:: python
+
+        t1 = Table(
+            x=0.5, y=0.5,
+            width=3, height=2,
+            cols=5, rows=5,
+            disable_row=True,
+            stroke="red", stroke_width=1,
+            fill="gold",
+            borders=('e w', 2, "grey"),
+        )
+        t2 = Table(
+            x=0, y=3,
+            cols=[0.5, 1, 1.25, 0.75],
+            rows=[0.75, 0.5, 0.5, 0.5, 0.75],
+            disable_col=True,
+            stroke="grey", stroke_width=1,
+            fill="aqua",
+            borders_header=('n s', 2, "black"),
+            borders_footer=('s', 2, "red", True),
+        )
+
+      The first Table has the following properties:
+
+      - starts at x-position ``0.5`` cm and y-position ``0.5`` cm
+      - *height* and *width* of ``2`` cm and ``3`` cm respectively
+      - *fill* color of ``gold``
+      - *stroke* color of ``red``
+      - *stroke_width*  of ``1``
+      - *borders* of ``grey`` set to the east (right) and west (left)
+
+      The first table also has the setting ``disable_row=True`` which means
+      that no **row** lines are drawn.
+
+      The second Table has the following properties:
+
+      - starts at x-position ``0`` cm and y-position ``3`` cm
+      - *cols* is a list of column widths
+      - *rows* is a list of row heights
+      - *stroke* color of ``grey``
+      - *stroke_width*  of ``1``
+      - *fill* color of ``aqua``
+
+      The second table also has the setting ``disable_col=True`` which means
+      that no **column** lines are drawn.
+
+      In addition, the second table also demonstrates the use of border styles
+      for the first |dash| header |dash| and last |dash| footer |dash| rows.
+      The syntax for these styles follows that for the table borders |dash| see
+      `Example 2. Customised Table`_.
 
 ===== ======
 

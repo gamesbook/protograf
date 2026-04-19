@@ -162,6 +162,8 @@ fields = (
     "row",
     "x",
     "y",
+    "xy",
+    "cxy",
     "height",
     "width",
     "id",
