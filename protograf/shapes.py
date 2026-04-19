@@ -85,41 +85,11 @@ class ImageShape(BaseShape):
         """Geometry of Image - alias for geo."""
         return self.geo
 
-    def draw(self, cnv=None, off_x=0, off_y=0, ID=None, **kwargs):
-        """Show an image on a given canvas."""
-        kwargs = self.kwargs | kwargs
-        cnv = cnv if cnv else globals.canvas  # a new Page/Shape may now exist
-        super().draw(cnv, off_x, off_y, ID, **kwargs)  # unit-based props
-        img = None
-        # ---- check for Card usage
-        cache_directory = str(self.cache_directory)
-        # ---- process locale data (dict via Locale namedtuple) using jinja2
-        #      this may include the item's sequence number and current page
-        _locale = kwargs.get("locale", None)
-        _source = (
-            self.source if not _locale else tools.eval_template(self.source, _locale)
-        )
-        if ID is not None and isinstance(self.source, list):
-            _source = (
-                self.source[ID]
-                if not _locale
-                else tools.eval_template(self.source[ID], _locale)
-            )
-            cache_directory = set_cached_dir(_source) or cache_directory
-        elif ID is not None and isinstance(self.source, str):
-            _source = (
-                self.source
-                if not _locale
-                else tools.eval_template(self.source, _locale)
-            )
-            cache_directory = set_cached_dir(_source) or cache_directory
-        else:
-            pass
-        # feedback(f"*** IMAGE draw {_source=} {self.source=} {_locale=}")
-        # ---- convert to using units
+    def calculate_xy(self):
+        """Calculate start point of Image."""
+        x, y, x_c, y_c = 0.0, 0.0, 0.0, 0.0
         height = self._u.height
         width = self._u.width
-        x_c, y_c = 0.0, 0.0
         if self.cx is not None and self.cy is not None:
             if width and height:
                 x = self._u.cx - width / 2.0 + self._o.delta_x
@@ -159,6 +129,44 @@ class ImageShape(BaseShape):
             if self.use_abs_c:
                 x = self._abs_cx - width / 2.0
                 y = self._abs_cy - height / 2.0
+
+        return x, y, x_c, y_c
+
+    def draw(self, cnv=None, off_x=0, off_y=0, ID=None, **kwargs):
+        """Show an image on a given canvas."""
+        kwargs = self.kwargs | kwargs
+        cnv = cnv if cnv else globals.canvas  # a new Page/Shape may now exist
+        super().draw(cnv, off_x, off_y, ID, **kwargs)  # unit-based props
+        img = None
+        # ---- check for Card usage
+        cache_directory = str(self.cache_directory)
+        # ---- process locale data (dict via Locale namedtuple) using jinja2
+        #      this may include the item's sequence number and current page
+        _locale = kwargs.get("locale", None)
+        _source = (
+            self.source if not _locale else tools.eval_template(self.source, _locale)
+        )
+        if ID is not None and isinstance(self.source, list):
+            _source = (
+                self.source[ID]
+                if not _locale
+                else tools.eval_template(self.source[ID], _locale)
+            )
+            cache_directory = set_cached_dir(_source) or cache_directory
+        elif ID is not None and isinstance(self.source, str):
+            _source = (
+                self.source
+                if not _locale
+                else tools.eval_template(self.source, _locale)
+            )
+            cache_directory = set_cached_dir(_source) or cache_directory
+        else:
+            pass
+        # feedback(f"*** IMAGE draw {_source=} {self.source=} {_locale=}")
+        # ---- convert to using units
+        height = self._u.height
+        width = self._u.width
+        x, y, x_c, y_c = self.calculate_xy()
         rotation = kwargs.get("rotation", self.rotation)
         # ---- load image
         # feedback(f'*** IMAGE {ID=} {_source=} {x=} {y=} {self.rotation=}')

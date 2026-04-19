@@ -484,15 +484,15 @@ class TableShape(BaseShape):
         data = self._cell(cell_id)
         # convert data
         user_cell = Locale(
-            col=data.col_no,
-            row=data.row_no,
+            col=data.col,
+            row=data.row,
             x=self._p2v(data.x, decimals=9),
             y=self._p2v(data.y, decimals=9),
             xy=self.as_point(data.xy, self.units, None, None),
             cxy=self.as_point(data.cxy, self.units, None, None),
-            height=self._p2v(data.rheight, decimals=9),
-            width=self._p2v(data.cwidth, decimals=9),
-            id=data.cell_id,
+            height=self._p2v(data.height, decimals=9),
+            width=self._p2v(data.width, decimals=9),
+            id=data.id,
             sequence=data.sequence,
         )
         return user_cell
@@ -563,9 +563,9 @@ class TableShape(BaseShape):
                 locale = Locale(
                     col=col_no,
                     row=row_no,
-                    x=x,
-                    y=y,
-                    xy=Point(x, y),
+                    x=cell_x,
+                    y=cell_y,
+                    xy=Point(cell_x, cell_y),
                     cxy=Point(cx, cy),
                     height=rheight,
                     width=cwidth,

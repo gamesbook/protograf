@@ -184,7 +184,7 @@ class BaseCanvas:
         self.cy = self.defaults.get("cy", None)  # NB! not 0; needed for internal check
         self.cxy = self.defaults.get("cxy", None)
         self.xy1 = self.defaults.get("xy1", None)
-        self.cell = self.defaults.get("cell", None)
+        # self.cell = self.defaults.get("cell", None)  Table function!
         # ---- to be calculated ...
         self.area = None
         self.vertexes = []
@@ -866,7 +866,7 @@ class BaseShape:
             kwargs.get("cy", __cy if __cy is not None else base.cy)
         )  # centre (for some shapes)
         # print(f"{self.xy=} {self.x=} {self.y=} {self.cx=} {self.cy=}")
-        self.cell = kwargs.get("cell", base.cell)
+        # self.cell = kwargs.get("cell", base.cell)   Table function!
         # ---- to be calculated ...
         self.area = base.area
         self.vertexes = base.vertexes  # list of shape's "points"
@@ -1722,6 +1722,10 @@ class BaseShape:
             ]:
                 issue.append(f'"{self.align_vertical}" is an invalid align_vertical!')
                 correct = False
+        # if self.cell:    Table function!
+        #     if not isinstance(self.cell, tuple) and len(self.cell) != 2:
+        #         issue.append(f'"The cell property must be a set - not {self.cell}"')
+        #         correct = False
         if self.edges:
             if not isinstance(self.edges, list):
                 _edges = (
