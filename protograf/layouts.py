@@ -479,19 +479,33 @@ class TableShape(BaseShape):
             feedback("Minimum layout size is 2 columns x 2 rows!", True)
 
     @lru_cache(maxsize=999)
-    def cell(self, cell_id: str = None) -> Locale:
+    def cell(
+        self, cell_id: str = None, pad_x: float = None, pad_y: float = None
+    ) -> Locale:
         """Retrieve cell attributes as a Locale in user units."""
         data = self._cell(cell_id)
-        # convert data
+        # print('~~~ Table Cell', cell_id, data.x, data.y, data.xy, self.padding)
+        padding_x = (
+            tools.as_float(pad_x, "cell padding_x")
+            if pad_x is not None
+            else self.padding
+        )
+        padding_y = (
+            tools.as_float(pad_y, "cell padding_y")
+            if pad_y is not None
+            else self.padding
+        )
+        _x = self._p2v(data.x, decimals=9) + padding_x - globals.margins.left
+        _y = self._p2v(data.y, decimals=9) + padding_y - globals.margins.top
         user_cell = Locale(
             col=data.col,
             row=data.row,
-            x=self._p2v(data.x, decimals=9),
-            y=self._p2v(data.y, decimals=9),
-            xy=self.as_point(data.xy, self.units, None, None),
+            x=_x,
+            y=_y,
+            xy=Point(_x, _y),
             cxy=self.as_point(data.cxy, self.units, None, None),
-            height=self._p2v(data.height, decimals=9),
-            width=self._p2v(data.width, decimals=9),
+            height=self._p2v(data.height, decimals=9) - 2 * padding_y,
+            width=self._p2v(data.width, decimals=9) - 2 * padding_x,
             id=data.id,
             sequence=data.sequence,
         )
@@ -499,7 +513,7 @@ class TableShape(BaseShape):
 
     @lru_cache(maxsize=999)
     def _cell(self, cell_id: str = None) -> Locale:
-        """Retrieve cell attributes as a Locale."""
+        """Retrieve cell attributes as a Locale excluding Table padding."""
         try:
             _id = cell_id.upper()
             return self.cells[_id]
@@ -570,6 +584,7 @@ class TableShape(BaseShape):
                     height=rheight,
                     width=cwidth,
                     id=cell_id,
+                    label=cell_id,
                     sequence=sequence,
                 )
                 self.locales.append(locale)
