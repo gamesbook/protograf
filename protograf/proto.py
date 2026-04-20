@@ -686,6 +686,7 @@ class DeckOfCards:
         self.width = kwargs.get("width", the_width)  # OVERWRITE
         self.cx = self.width / 2.0
         self.cy = self.height / 2.0
+        self.cxy = Point(self.cx, self.cy)
         # print(f"$$$ Deck {size=} {self.width=} {self.height} {self.cx=} {self.cy=}")
         self.kwargs["width"] = self.width  # used for create_cardshapes()
         self.kwargs["height"] = self.height  # used for create_cardshapes()
