@@ -1,0 +1,27 @@
+name: Create ZIP Release of Examples
+on:
+  push:
+    tags:
+      - '0*'  # Triggers on any tag push starting with '0'
+
+jobs:
+  build-and-release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: [actions/checkout@v4](https://github.com)
+
+      - name: Examples Zip
+        uses: [thedoctor0/zip-release@0.7.5](https://github.com/marketplace/actions/zip-release)
+        with:
+          type: 'zip'
+          filename: 'examples.zip'
+          path: 'examples'
+          # Space-separated list of patterns to exclude
+          exclusions: '*.pdf* some.sh *temp/*'
+
+      - name: Create GitHub Release
+        uses: [ncipollo/release-action@v1](https://github.com)
+        with:
+          artifacts: "examples.zip"
+          token: ${{ secrets.GITHUB_TOKEN }}
