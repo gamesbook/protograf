@@ -2843,7 +2843,7 @@ class BaseShape:
         if kwargs.get("text_sequence", None):
             raise NotImplementedError("No text_sequence please!")
         # ---- process locale data (dict via Locale namedtuple) using jinja2
-        #      this may include the item's sequence number and current page
+        #      this should include the item's sequence number and current page
         _locale = kwargs.get("locale", None)
         if _locale:
             # feedback(f"\n### multistring {string=} {_locale=}")

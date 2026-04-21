@@ -375,7 +375,39 @@ class ArrowShape(BaseShape):
     @property
     def geo(self) -> ShapeGeometry:
         """Geometry of Arrow in user units."""
-        return ShapeGeometry()
+        _type = type(self)
+        cntr = self._shape_centre
+        cntr_user = self.as_point(cntr, self.units, cntr, self.rotation)
+        vtcs = self._shape_vertexes
+        n = self.as_point(vtcs[3], self.units, cntr, self.rotation)
+        s1 = self.as_point(vtcs[0], self.units, cntr, self.rotation)
+        s2 = self.as_point(vtcs[6], self.units, cntr, self.rotation)
+        if self.tail_notch:
+            _s = geoms.fraction_along_line(s1, s2, 0.5)
+            s = Point(_s.x, _s.y - self.tail_notch)
+        else:
+            s = geoms.fraction_along_line(s1, s2, 0.5)
+        e = self.as_point(vtcs[4], self.units, cntr, self.rotation)
+        w = self.as_point(vtcs[2], self.units, cntr, self.rotation)
+        return ShapeGeometry(
+            # centre
+            centre=cntr_user,
+            center=cntr_user,
+            c=cntr_user,
+            # vertices
+            n=n,  # tip
+            s=s,  # mid-base
+            e=e,  # left wing-tip
+            w=w,  # right wing-tip
+            # perbii
+            # length
+            # other
+            # meta
+            t=_type,
+            type=_type,
+            shapetype=_type,
+            name=self.simple_name(self),
+        )
 
     @property
     def geometry(self) -> ShapeGeometry:
@@ -397,7 +429,16 @@ class ArrowShape(BaseShape):
 
     @property  # must be able to change e.g. for layout
     def _shape_vertexes(self) -> list:
-        """Calculate vertices of Arrow."""
+        """Calculate vertices of Arrow.
+                 3
+                /\
+               /  \
+              /    \
+           2 .-    -.4
+              1|  |5
+               |  |
+              0 __6
+        """
         centre = self._shape_centre
         x_c, y_c = centre.x, centre.y
         y = y_c + self._u.height
@@ -425,6 +466,7 @@ class ArrowShape(BaseShape):
         vertices.append(Point(x_c + self.tail_width_u / 2.0, y_s))  # bottom corner
         if self.tail_notch_u > 0:
             vertices.append(Point(x_c, y_s - self.tail_notch_u))  # centre notch
+        # print(f'*** ARR {vertices=}')
         return vertices
 
     def draw(self, cnv=None, off_x=0, off_y=0, ID=None, **kwargs):
@@ -3206,8 +3248,58 @@ class TextShape(BaseShape):
         """do something when I'm called"""
         log.debug("calling TextShape...")
 
+    @property  # do NOT cache because centre needs to be changed!
+    def _shape_centre(self) -> Point:
+        """Centre of Text in points."""
+        x, y = self.calculate_xy()
+        height, width = 0, 0
+        if self.height:
+            height = self._u.height
+        if self.width:
+            width = self._u.width
+        if height and width:
+            # ---- overrides for grid layout
+            if self.use_abs_c:
+                x = self._abs_cx - self._u.width / 2.0
+                y = self._abs_cy - self._u.height / 2.0
+            x_d = x + self._u.width / 2.0  # centre
+            y_d = y + self._u.height / 2.0  # centre
+            return Point(x_d, y_d)
+        return None
+
+    @property  # must be able to change e.g. for layout
+    def _shape_vertexes(self):
+        """Vertices of Text in points."""
+        centre = self._shape_centre
+        if centre:
+            cx, cy = centre.x, centre.y  # shortcuts
+            vertices = []
+            vertices.append(Point(cx - self._u.width / 2.0, cy))  # w
+            vertices.append(Point(cx, cy + self._u.height / 2.0))  # s
+            vertices.append(Point(cx + self._u.width / 2.0, cy))  # e
+            vertices.append(Point(cx, cy - self._u.height / 2.0))  # n
+            return vertices
+        return None
+
+    def calculate_xy(self, **kwargs):
+        """Start point of Text in points."""
+        # ---- convert to using units
+        x_t = self._u.x + self._o.delta_x
+        y_t = self._u.y + self._o.delta_y
+        # ---- overrides if shape centred
+        if self.use_abs_c:
+            x_t = self._abs_cx
+            y_t = self._abs_cy  # + self.font_size / 2.0
+            self.align = "centre"  # NB otherwise base.draw_multi_string() will shift x
+            self.valign = "centre"
+        # ---- override if offpage (used for e.g. cards to calculate height_used)
+        if kwargs.get("offpage"):
+            x_t = 1e6
+            y_t = 1e6
+        return x_t, y_t
+
     def draw(self, cnv=None, off_x=0, off_y=0, ID=None, **kwargs):
-        """Draw text on a given canvas.
+        """Draw Text on a given canvas.
 
         Args:
             cnv: PyMuPDF page canvas
@@ -3225,19 +3317,7 @@ class TextShape(BaseShape):
         kwargs = self.kwargs | kwargs
         cnv = cnv if cnv else globals.canvas  # a new Page/Shape may now exist
         super().draw(cnv, off_x, off_y, ID, **kwargs)  # unit-based props
-        # ---- convert to using units
-        x_t = self._u.x + self._o.delta_x
-        y_t = self._u.y + self._o.delta_y
-        # ---- overrides if shape centred
-        if self.use_abs_c:
-            x_t = self._abs_cx
-            y_t = self._abs_cy  # + self.font_size / 2.0
-            self.align = "centre"  # NB otherwise base.draw_multi_string() will shift x
-            self.valign = "centre"
-        # ---- override if offpage (used for e.g. cards to calculate height_used)
-        if kwargs.get("offpage"):
-            x_t = 1e6
-            y_t = 1e6
+        x_t, y_t = self.calculate_xy(**kwargs)
         # ---- calculate height & width
         height, width = 0, 0
         if self.height:
@@ -3305,46 +3385,6 @@ class TextShape(BaseShape):
                 fill_opacity=pymu_props.fill_opacity,
             )
             # self.set_canvas_props(cnv=cnv, index=ID, **rkwargs)
-
-        # ---- BOX-like text (with vertical write)
-        # if self.box:
-        # TextWriter
-        #     __init__(self, rect, opacity=1, color=None)
-        # Parameters:
-        #     rect (rect-like) – rectangle internally used for text positioning
-        #     opacity (float) – set transparency for the text to store here
-        #     color (float,sequ) – color of the text.
-        # Methods:
-        #     append(pos, text, font=None, fontsize=11, small_caps=0)
-        #         pos (point_like) – start position, bottom left point of first character.
-        #         Returns: text_rect and last_point.
-        #     appendv(pos, text, font=None, fontsize=11, small_caps=0)  # top-to-bottom
-        #         pos (point_like) – start position,  bottom left point of  first character.
-        #         Returns: text_rect and last_point.
-        #     write_text(page, opacity=None, color=None, morph=None, overlay=True, render_mode=0)
-        #         page – write to this Page.
-        #         opacity (float) – override init value TextWriter
-        #         color (sequ) – override the init value of the TextWriter
-        #         morph (sequ) – modify the text appearance by applying a matrix to it
-        #         overlay (bool) – put in foreground (default) or background.
-        #         render_mode (int) – Values: 0 (default), 1, 2, 3 (invisible).
-        #     fill_textbox(rect, text, *, pos=None, font=None, fontsize=11, align=0, warn=None, small_caps=0)
-        #         rect (rect_like) – the area to fill. No part of the text will appear outside of this.
-        #         warn (bool) – on text overflow do nothing (None), warn (True)
-        #         align (int) – text alignment. Use one of
-        #             TEXT_ALIGN_LEFT, TEXT_ALIGN_CENTER, TEXT_ALIGN_RIGHT or TEXT_ALIGN_JUSTIFY.
-        #         Returns:
-        #             list – List of lines that did not fit in the rectangle.
-        # Props:
-        #     text_rect - area currently occupied (Rect)
-        # text_writer = TextWriter()
-        # keys = self.text_properties(string=_text, **kwargs)
-        # if text_rotation:
-        #     current_page.write_text()
-        # elif kwargs.get("vertical"):
-        #     text_writer.appendv(_text)
-        # else:
-        #     text_writer.appendv(_text)
 
         # ---- WRAP text
         if self.wrap:
