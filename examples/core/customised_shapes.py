@@ -1115,17 +1115,92 @@ Table(cols=2, rows=2)
 Table(y=2.5, width=3, height=2, cols=3, rows=4)
 PageBreak()
 
-# ---- table - styled
+# ---- table - styled global
 Blueprint()
-Text(common=txt, text="Table: styled")
-Table(y=0,
-      width=3, height=2.5,
-      cols=5, rows=6,
-      stroke="red", dotted=True)
-Table(y=3, x=0,
-      cols=[0.5, 1, 1.25, 0.75],
-      rows=[0.75, 0.5, 0.5, 0.75],
-      stroke="blue", fill="aqua")
+Text(common=txt, text="Table: style - global")
+Table(
+    x=1, y=0,
+    width=3, height=2.5,
+    cols=5, rows=6,
+    stroke="red",
+    dotted=True
+)
+Table(
+    y=3, x=0,
+    cols=[0.5, 1, 1.25, 0.75],
+    rows=[0.75, 0.5, 0.5, 0.75],
+    stroke="blue", fill="aqua",
+    borders=('*', 2, "grey")
+)
+PageBreak()
+
+# ---- table - styled rows and cols
+Blueprint()
+Text(common=txt, text="Table: style - rows and cols")
+t1 = Table(
+    x=0.5, y=0.5,
+    width=3, height=2,
+    cols=5, rows=5,
+    disable_row=True,
+    stroke="red", stroke_width=1,
+    fill="gold",
+    borders=('e w', 2, "grey"),
+)
+t2 = Table(
+    x=0, y=3,
+    cols=[0.5, 1, 1.25, 0.75],
+    rows=[0.75, 0.5, 0.5, 0.5, 0.75],
+    disable_col=True,
+    stroke="grey", stroke_width=1,
+    fill="aqua",
+    borders_header=('n s', 2, "black"),
+    borders_footer=('s', 2, "red", True),
+)
+PageBreak()
+
+# ---- table - location by cell
+Blueprint()
+Text(common=txt, text="Table: cell: image, text and shape")
+tt = Table(
+    x=0.25, y=1,
+    cols=[1, 2, 0.75],
+    rows=[0.75, 1, 1.25, 0.75],
+    stroke="grey", stroke_width=0.5,
+    borders_header=('n s', 1, "black"),
+    borders_footer=('s', 1, "black"),
+    padding=0.05,
+)
+
+picture = "fantasy-forest-with-old-bridges-crop.jpg"
+Image(picture, xy=tt.cell("A2").xy, height=tt.cell("A2").height)
+Image(picture, xy=tt.cell("A3", 0, 0).xy, height=tt.cell("A3", 0, 0).height)
+Image(picture, xy=tt.cell("A4").xy, height=tt.cell("A4").height)
+
+Text(
+    xy=tt.cell("B2").xy,
+    height=tt.cell("B2").height,
+    width=tt.cell("B2").width,
+    html=True, box_fill="orange",
+    text="""All the King's ponies and all the King's men?
+    """)
+Text(
+    xy=tt.cell("B3").xy,
+    height=tt.cell("B3").height,
+    width=tt.cell("B3").width,
+    html=True, box_fill="tan",
+    text="""Now is the time for all good men
+    to come to the aid of their party.
+    """)
+Text(
+    xy=tt.cell("B4").xy,
+    height=tt.cell("B4").height,
+    width=tt.cell("B4").width,
+    html=True, box_fill="silver",
+    text="""Fly, you fools!
+    """)
+Circle(cxy=tt.cell("C2").cxy, radius=0.25, fill="tomato")
+Square(cxy=tt.cell("C3").cxy, side=0.5, fill="green")
+Hexagon(cxy=tt.cell("C4").cxy, side=0.25, fill="aqua")
 PageBreak()
 
 # ---- wave styles
@@ -1443,7 +1518,7 @@ Save(
         "shape_rotation",
         "shape_rotation_two",
         "shape_hatches_and_rotation",
-        "table_defaults", "table_custom",
+        "table_defaults", "table_custom", "table_rows_cols", "table_cells",
         "perbii_styled",
         "poly_waves",
         "vertex_shapes",

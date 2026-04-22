@@ -686,6 +686,7 @@ class DeckOfCards:
         self.width = kwargs.get("width", the_width)  # OVERWRITE
         self.cx = self.width / 2.0
         self.cy = self.height / 2.0
+        self.cxy = Point(self.cx, self.cy)
         # print(f"$$$ Deck {size=} {self.width=} {self.height} {self.cx=} {self.cy=}")
         self.kwargs["width"] = self.width  # used for create_cardshapes()
         self.kwargs["height"] = self.height  # used for create_cardshapes()
@@ -4411,9 +4412,9 @@ def Table(shapes=None, **kwargs):
     """Draw a grid of rectangles."""
     kwargs = margins(**kwargs)
     kwargs["shapes"] = shapes
-    Table = TableShape(**kwargs)
-    locales = Table.draw()
-    return locales
+    tbl = TableShape(**kwargs)
+    tbl.draw()
+    return tbl
 
 
 def table(shapes=None, **kwargs):
@@ -5074,6 +5075,7 @@ def Layout(grid, **kwargs):
                             row=loc[1].row,
                             x=loc[1].x,
                             y=loc[1].y,
+                            xy=Point(loc[1].x, loc[1].y),
                             id=f"{loc[1].col}:{loc[1].row}",  # ,loc[1].id,
                             sequence=key,
                             corner=loc[1].corner,
@@ -5094,6 +5096,7 @@ def Layout(grid, **kwargs):
                             row=loc[1].row,
                             x=loc[1].x,
                             y=loc[1].y,
+                            xy=Point(loc[1].x, loc[1].y),
                             id=f"{loc[1].col}:{loc[1].row}",  # ,loc[1].id,
                             sequence=key,
                             corner=loc[1].corner,
@@ -5115,6 +5118,7 @@ def Layout(grid, **kwargs):
                             row=loc[1].row,
                             x=loc[1].x,
                             y=loc[1].y,
+                            xy=Point(loc[1].x, loc[1].y),
                             id=f"{loc[1].col}:{loc[1].row}",  # ,loc[1].id,
                             sequence=key,
                             corner=loc[1].corner,
@@ -5208,8 +5212,10 @@ def Layout(grid, **kwargs):
                 row=loc.row,
                 x=loc.x,
                 y=loc.y,
+                xy=Point(loc.x, loc.y),
                 id=f"{loc.col}:{loc.row}",
-                sequence=loc.sequence,
+                label=f"{loc.col}:{loc.row}",
+                sequence=loc.sequence or count,
                 page=globals.page_count + 1,
             )
             _locale = locale._asdict()

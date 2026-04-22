@@ -85,41 +85,11 @@ class ImageShape(BaseShape):
         """Geometry of Image - alias for geo."""
         return self.geo
 
-    def draw(self, cnv=None, off_x=0, off_y=0, ID=None, **kwargs):
-        """Show an image on a given canvas."""
-        kwargs = self.kwargs | kwargs
-        cnv = cnv if cnv else globals.canvas  # a new Page/Shape may now exist
-        super().draw(cnv, off_x, off_y, ID, **kwargs)  # unit-based props
-        img = None
-        # ---- check for Card usage
-        cache_directory = str(self.cache_directory)
-        # ---- process locale data (dict via Locale namedtuple) using jinja2
-        #      this may include the item's sequence number and current page
-        _locale = kwargs.get("locale", None)
-        _source = (
-            self.source if not _locale else tools.eval_template(self.source, _locale)
-        )
-        if ID is not None and isinstance(self.source, list):
-            _source = (
-                self.source[ID]
-                if not _locale
-                else tools.eval_template(self.source[ID], _locale)
-            )
-            cache_directory = set_cached_dir(_source) or cache_directory
-        elif ID is not None and isinstance(self.source, str):
-            _source = (
-                self.source
-                if not _locale
-                else tools.eval_template(self.source, _locale)
-            )
-            cache_directory = set_cached_dir(_source) or cache_directory
-        else:
-            pass
-        # feedback(f"*** IMAGE draw {_source=} {self.source=} {_locale=}")
-        # ---- convert to using units
+    def calculate_xy(self):
+        """Calculate start point of Image."""
+        x, y, x_c, y_c = 0.0, 0.0, 0.0, 0.0
         height = self._u.height
         width = self._u.width
-        x_c, y_c = 0.0, 0.0
         if self.cx is not None and self.cy is not None:
             if width and height:
                 x = self._u.cx - width / 2.0 + self._o.delta_x
@@ -159,6 +129,44 @@ class ImageShape(BaseShape):
             if self.use_abs_c:
                 x = self._abs_cx - width / 2.0
                 y = self._abs_cy - height / 2.0
+
+        return x, y, x_c, y_c
+
+    def draw(self, cnv=None, off_x=0, off_y=0, ID=None, **kwargs):
+        """Show an image on a given canvas."""
+        kwargs = self.kwargs | kwargs
+        cnv = cnv if cnv else globals.canvas  # a new Page/Shape may now exist
+        super().draw(cnv, off_x, off_y, ID, **kwargs)  # unit-based props
+        img = None
+        # ---- check for Card usage
+        cache_directory = str(self.cache_directory)
+        # ---- process locale data (dict via Locale namedtuple) using jinja2
+        #      this may include the item's sequence number and current page
+        _locale = kwargs.get("locale", None)
+        _source = (
+            self.source if not _locale else tools.eval_template(self.source, _locale)
+        )
+        if ID is not None and isinstance(self.source, list):
+            _source = (
+                self.source[ID]
+                if not _locale
+                else tools.eval_template(self.source[ID], _locale)
+            )
+            cache_directory = set_cached_dir(_source) or cache_directory
+        elif ID is not None and isinstance(self.source, str):
+            _source = (
+                self.source
+                if not _locale
+                else tools.eval_template(self.source, _locale)
+            )
+            cache_directory = set_cached_dir(_source) or cache_directory
+        else:
+            pass
+        # feedback(f"*** IMAGE draw {_source=} {self.source=} {_locale=}")
+        # ---- convert to using units
+        height = self._u.height
+        width = self._u.width
+        x, y, x_c, y_c = self.calculate_xy()
         rotation = kwargs.get("rotation", self.rotation)
         # ---- load image
         # feedback(f'*** IMAGE {ID=} {_source=} {x=} {y=} {self.rotation=}')
@@ -367,7 +375,39 @@ class ArrowShape(BaseShape):
     @property
     def geo(self) -> ShapeGeometry:
         """Geometry of Arrow in user units."""
-        return ShapeGeometry()
+        _type = type(self)
+        cntr = self._shape_centre
+        cntr_user = self.as_point(cntr, self.units, cntr, self.rotation)
+        vtcs = self._shape_vertexes
+        n = self.as_point(vtcs[3], self.units, cntr, self.rotation)
+        s1 = self.as_point(vtcs[0], self.units, cntr, self.rotation)
+        s2 = self.as_point(vtcs[6], self.units, cntr, self.rotation)
+        if self.tail_notch:
+            _s = geoms.fraction_along_line(s1, s2, 0.5)
+            s = Point(_s.x, _s.y - self.tail_notch)
+        else:
+            s = geoms.fraction_along_line(s1, s2, 0.5)
+        e = self.as_point(vtcs[4], self.units, cntr, self.rotation)
+        w = self.as_point(vtcs[2], self.units, cntr, self.rotation)
+        return ShapeGeometry(
+            # centre
+            centre=cntr_user,
+            center=cntr_user,
+            c=cntr_user,
+            # vertices
+            n=n,  # tip
+            s=s,  # mid-base
+            e=e,  # left wing-tip
+            w=w,  # right wing-tip
+            # perbii
+            # length
+            # other
+            # meta
+            t=_type,
+            type=_type,
+            shapetype=_type,
+            name=self.simple_name(self),
+        )
 
     @property
     def geometry(self) -> ShapeGeometry:
@@ -389,7 +429,16 @@ class ArrowShape(BaseShape):
 
     @property  # must be able to change e.g. for layout
     def _shape_vertexes(self) -> list:
-        """Calculate vertices of Arrow."""
+        """Calculate vertices of Arrow.
+                 3
+                /\
+               /  \
+              /    \
+           2 .-    -.4
+              1|  |5
+               |  |
+              0 __6
+        """
         centre = self._shape_centre
         x_c, y_c = centre.x, centre.y
         y = y_c + self._u.height
@@ -417,6 +466,7 @@ class ArrowShape(BaseShape):
         vertices.append(Point(x_c + self.tail_width_u / 2.0, y_s))  # bottom corner
         if self.tail_notch_u > 0:
             vertices.append(Point(x_c, y_s - self.tail_notch_u))  # centre notch
+        # print(f'*** ARR {vertices=}')
         return vertices
 
     def draw(self, cnv=None, off_x=0, off_y=0, ID=None, **kwargs):
@@ -3198,8 +3248,117 @@ class TextShape(BaseShape):
         """do something when I'm called"""
         log.debug("calling TextShape...")
 
+    @property
+    def geo(self) -> ShapeGeometry:
+        """Geometry of Text in user units."""
+        _type = type(self)
+        cntr_user, perim, radius, area = None, None, None, None
+        n, s, e, w, ne, nw, se, sw = None, None, None, None, None, None, None, None
+        cntr = self._shape_centre
+        if cntr:
+            cntr_user = self.as_point(cntr, self.units, cntr, self.rotation)
+            area = self.height * self.width
+            radius = (
+                math.hypot(self.height, self.width)
+                if self.height == self.width
+                else None
+            )
+            perim = (self.height + self.width) * 2
+            vtcs = self._shape_vertexes
+            if vtcs:
+                ne = self.as_point(vtcs[0], self.units, cntr, self.rotation)
+                se = self.as_point(vtcs[1], self.units, cntr, self.rotation)
+                sw = self.as_point(vtcs[2], self.units, cntr, self.rotation)
+                nw = self.as_point(vtcs[3], self.units, cntr, self.rotation)
+                n = geoms.fraction_along_line(nw, ne, 0.5)
+                s = geoms.fraction_along_line(sw, se, 0.5)
+                e = geoms.fraction_along_line(ne, se, 0.5)
+                w = geoms.fraction_along_line(nw, sw, 0.5)
+        return ShapeGeometry(
+            # centre
+            centre=cntr_user,
+            center=cntr_user,
+            c=cntr_user,
+            # vertices
+            ne=ne,
+            nw=nw,
+            se=se,
+            sw=sw,
+            # perbii
+            n=n,
+            s=s,
+            e=e,
+            w=w,
+            # length
+            perimeter=perim,
+            radius=radius,
+            # other
+            area=area,
+            # meta
+            t=_type,
+            type=_type,
+            shapetype=_type,
+            name=self.simple_name(self),
+        )
+
+    @property
+    def geometry(self) -> ShapeGeometry:
+        """Geometry of Text - alias for geo."""
+        return self.geo
+
+    @property  # do NOT cache because centre needs to be changed!
+    def _shape_centre(self) -> Point:
+        """Centre of Text in points."""
+        x, y = self.calculate_xy()
+        height, width = 0, 0
+        if self.height:
+            height = self._u.height
+        if self.width:
+            width = self._u.width
+        if height and width:
+            # ---- overrides for grid layout
+            if self.use_abs_c:
+                x = self._abs_cx - self._u.width / 2.0
+                y = self._abs_cy - self._u.height / 2.0
+            x_d = x + self._u.width / 2.0  # centre
+            y_d = y + self._u.height / 2.0  # centre
+            return Point(x_d, y_d)
+        return None
+
+    @property  # must be able to change e.g. for layout
+    def _shape_vertexes(self):
+        """Vertices of Text in points."""
+        centre = self._shape_centre
+        if centre:
+            cx, cy = centre.x, centre.y  # shortcuts
+            hh, hw = self._u.height / 2.0, self._u.width / 2.0
+            vertices = []
+            vertices.append(Point(cx + hw, cy - hh))  # ne
+            vertices.append(Point(cx + hw, cy + hh))  # se
+            vertices.append(Point(cx - hw, cy + hh))  # sw
+            vertices.append(Point(cx - hw, cy - hh))  # nw
+            return vertices
+        return None
+
+    def calculate_xy(self, **kwargs):
+        """Start point of Text in points."""
+        # ---- convert to using units
+        x_t = self._u.x + self._o.delta_x
+        y_t = self._u.y + self._o.delta_y
+        # ---- overrides if shape centred
+        if self.use_abs_c:
+            x_t = self._abs_cx
+            y_t = self._abs_cy  # + self.font_size / 2.0
+            self.align = "centre"  # NB otherwise base.draw_multi_string() will shift x
+            self.valign = "centre"
+        # ---- override if offpage (used for e.g. cards to calculate height_used)
+        if kwargs.get("offpage"):
+            x_t = 1e6
+            y_t = 1e6
+        return x_t, y_t
+
     def draw(self, cnv=None, off_x=0, off_y=0, ID=None, **kwargs):
-        """Draw text on a given canvas.
+        """Draw Text on a given canvas.
 
         Args:
             cnv: PyMuPDF page canvas
@@ -3217,19 +3376,7 @@ class TextShape(BaseShape):
         kwargs = self.kwargs | kwargs
         cnv = cnv if cnv else globals.canvas  # a new Page/Shape may now exist
         super().draw(cnv, off_x, off_y, ID, **kwargs)  # unit-based props
-        # ---- convert to using units
-        x_t = self._u.x + self._o.delta_x
-        y_t = self._u.y + self._o.delta_y
-        # ---- overrides if shape centred
-        if self.use_abs_c:
-            x_t = self._abs_cx
-            y_t = self._abs_cy  # + self.font_size / 2.0
-            self.align = "centre"  # NB otherwise base.draw_multi_string() will shift x
-            self.valign = "centre"
-        # ---- override if offpage (used for e.g. cards to calculate height_used)
-        if kwargs.get("offpage"):
-            x_t = 1e6
-            y_t = 1e6
+        x_t, y_t = self.calculate_xy(**kwargs)
         # ---- calculate height & width
         height, width = 0, 0
         if self.height:
@@ -3297,46 +3444,6 @@ class TextShape(BaseShape):
                 fill_opacity=pymu_props.fill_opacity,
             )
             # self.set_canvas_props(cnv=cnv, index=ID, **rkwargs)
-
-        # ---- BOX-like text (with vertical write)
-        # if self.box:
-        # TextWriter
-        #     __init__(self, rect, opacity=1, color=None)
-        # Parameters:
-        #     rect (rect-like) – rectangle internally used for text positioning
-        #     opacity (float) – set transparency for the text to store here
-        #     color (float,sequ) – color of the text.
-        # Methods:
-        #     append(pos, text, font=None, fontsize=11, small_caps=0)
-        #         pos (point_like) – start position, bottom left point of first character.
-        #         Returns: text_rect and last_point.
-        #     appendv(pos, text, font=None, fontsize=11, small_caps=0)  # top-to-bottom
-        #         pos (point_like) – start position,  bottom left point of  first character.
-        #         Returns: text_rect and last_point.
-        #     write_text(page, opacity=None, color=None, morph=None, overlay=True, render_mode=0)
-        #         page – write to this Page.
-        #         opacity (float) – override init value TextWriter
-        #         color (sequ) – override the init value of the TextWriter
-        #         morph (sequ) – modify the text appearance by applying a matrix to it
-        #         overlay (bool) – put in foreground (default) or background.
-        #         render_mode (int) – Values: 0 (default), 1, 2, 3 (invisible).
-        #     fill_textbox(rect, text, *, pos=None, font=None, fontsize=11, align=0, warn=None, small_caps=0)
-        #         rect (rect_like) – the area to fill. No part of the text will appear outside of this.
-        #         warn (bool) – on text overflow do nothing (None), warn (True)
-        #         align (int) – text alignment. Use one of
-        #             TEXT_ALIGN_LEFT, TEXT_ALIGN_CENTER, TEXT_ALIGN_RIGHT or TEXT_ALIGN_JUSTIFY.
-        #         Returns:
-        #             list – List of lines that did not fit in the rectangle.
-        # Props:
-        #     text_rect - area currently occupied (Rect)
-        # text_writer = TextWriter()
-        # keys = self.text_properties(string=_text, **kwargs)
-        # if text_rotation:
-        #     current_page.write_text()
-        # elif kwargs.get("vertical"):
-        #     text_writer.appendv(_text)
-        # else:
-        #     text_writer.appendv(_text)
 
         # ---- WRAP text
         if self.wrap:

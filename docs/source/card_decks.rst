@@ -221,32 +221,38 @@ This example shows how different shapes can be assigned to cards:
 
     .. code:: python
 
-        Deck(cards=9)
+        dk = Deck(cards=9)
 
         text1 = text(
             text='proto',
-            x=3.1, y=4.4, font_size=18)
-        rect1 = rectangle(
-            x=0.7, y=7.0, width=5, height=1.5)
+            xy=dk.cxy,
+            font_size=18)
+        rc1 = rectangle(
+            x=0.7, y=7.0,
+            width=5, height=1.5)
         line1 = line(
-            x=0.8, y=7.1, x1=5.6, y1=8.4,
+            xy=rc1.geo.nw,
+            xy1=rc1.geo.se,
             stroke="red")
 
-        line_in_rect = group(rect1, line1)
+        line_in_rect = group(rc1, line1)
 
         Card('*', text1)
-        Card("1-3", rect1)
+        Card("1-3", rc1)
         Card([7,8,9], line_in_rect)
 
 Here:
 
-- *all* (the ``*``) cards get assigned the same text (in the card centre)
+- *all* (the ``*``) cards get assigned the same text (in the card centre by
+  making use of a reference to the deck's properties through ``dk.cxy``)
 - cards 1, 2 and 3 are assigned a rectangle
 - cards 7, 8 and 9 are assigned a *group* (named ``line_in_rect``); this
-  group consists of a rectangle (``rect1``) overdrawn by a red, diagonal line
+  group consists of a rectangle (``rc1``) overdrawn by a red, diagonal line
   (``line1``). The line is superimposed on the rectangle because it appears
   after it in the group list (see below for how the
-  `group <group-function_>`_ function works.)
+  `group <group-function_>`_ function works.)  Note that the line makes use
+  of the ``geo`` property, that many shapes have, allowing you to reference
+  key locations on that shape.
 
 
 .. _the-cardback-command:

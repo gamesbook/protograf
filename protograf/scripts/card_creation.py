@@ -66,8 +66,9 @@ x_size = 1
 console = Console()
 console.print(f"{qs}Welcome to the Card Creation assistant!{qe}\n")
 console.print(f"{qs}Please provide responses to the series of prompts below.{qe}")
+console.print("")
 console.print(f"{qs}Afterwards, a script will be generated that can used as{qe}")
-console.print(f"{qs}a starting point for your card prototype.{qe}\n")
+console.print(f"{qs}a starting point for the prototype of your deck of cards.{qe}\n")
 console.print(f"{qs}* Pressing Enter will accept the default option or value.{qe}")
 console.print(f"{qs}* Pressing ? will take you back to the previous prompt.{qe}")
 # console.print(f"{qs}{qe}")
@@ -89,7 +90,7 @@ while step < 9:
             _name = str(name_input).strip().replace(" ", "_")
             if len(_name) > 0:
                 opts.script = _name
-        if not opts.script:
+        if not opts.script or opts.script == "?":
             opts.script = f"cards_{dstring}"
         step += 1
 

@@ -35,8 +35,12 @@ Creating Cards
 --------------
 
 The card creation script, called ``card_creation``, is designed to run a
-series of prompts that will set up a **protograf** file for you, containing
-a basic template for cards.
+series of prompts whose answers will be used set up a **protograf** file
+for you, containing a basic template for the cards.
+
+To run the card creation script (note the extra ``-m``)::
+
+    python -m protograf.scripts.card_creation
 
 Obviously, card designs vary widely, so this script can only provide a very
 basic starter |dash| hopefully enough to see what the structure of such a

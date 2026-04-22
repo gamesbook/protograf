@@ -33,8 +33,8 @@ a handy cross-reference to the detailed information for that command.
 -  :ref:`Circle <circle-command>` * - a geometric shape that can be drawn on a page
    (see also further :ref:`customisation options <circleIndex>`)
 -  :ref:`Chord <chord-command>` * - a geometric shape that can be drawn on a page
--  :ref:`Common <the-common-command>` - set the properties that will be the same for
-   any shape using them
+-  :ref:`Common <the-common-command>` - set the properties that will be exactly the
+   same for any shape using them  (see also :ref:`Default <the-default-command>`)
 -  :ref:`Counter <the-countersheet-command>`  - details for a counter that is part
    of a :ref:`countersheet <the-countersheet-command>`
 -  :ref:`countersheet <the-countersheet-command>`  - details for a
@@ -51,7 +51,8 @@ a handy cross-reference to the detailed information for that command.
 -  :ref:`Deck <the-deck-command>`  - details for a deck, containing one or
    more :ref:`cards <the-card-command>`
 -  :ref:`Default <the-default-command>` - set the properties that can be used by
-   any number of shapes
+   any number of shapes and overridden by them (see also
+   :ref:`Common <the-common-command>`)
 -  :doc:`DiamondLocations <layouts_diamond>`- defines an ordered series of
    row and column locations that create a diamond grid of shapes - the grid itself
    is not displayed; it is used in a :ref:`Layout <layout-command>` command
@@ -111,11 +112,12 @@ a handy cross-reference to the detailed information for that command.
 -  :ref:`Square <square-command>` * - a geometric shape that can be drawn on a page
 -  :ref:`Stadium <stadium-command>` * - a geometric shape that can be drawn on a page
 -  :ref:`Star <star-command>` * - a geometric shape that can be drawn on a page
--  :ref:`Starfield <star-command>` - a set, or group, of dots that can be drawn on a page
+-  :ref:`Starfield <starfield-command>` - a set, or group, of dots that can be drawn on a page
 -  :ref:`T <the-template-command>` - short for *Template*; the way to access an
    item in a column from a set of :ref:`data <the-data-command>` for a
    :ref:`card <the-card-command>`
--  :ref:`Table <grid-command>` - a grid of rectangles that can be drawn on a page
+-  :ref:`Table <table-command>` - a grid of rectangles that can be drawn on a page
+   and used to display :ref:`Text <text-command>` or :ref:`Images <image-command>`
 -  :ref:`Tetromino <tetrominoesOver>` * - a compound shape made up of four squares
 -  :ref:`Text <text-command>` * - a shape containing text that can be displayed on a page
 -  :ref:`Today <the-today-command>` - display - as text - the current date and time

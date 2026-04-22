@@ -137,7 +137,8 @@ Access to Deck Properties
 =========================
 
 If you assign the Deck to a name, you can use that name to access properties
-of the deck in the rest of your script.
+of the deck |dash| including card attributes, such as the card size or the
+card centre |dash| in the rest of your script.
 
 Properties are accessed by means of a "dot", as illustrated below.
 
@@ -149,14 +150,18 @@ Properties are accessed by means of a "dot", as illustrated below.
       width=2.2)
 
   Circle(cx=dk.cx, cy=dk.cy)
+  Hexagon(cxy=dk.cxy)
   Rectangle(height=dk.height, width=dk.width)
 
 Here ``dk`` is the name assigned to the Deck; so properties are accessed by
 ``dk``, followed by a dot, then the name of the property.
 
-In this code, the ``Circle`` will have its *centre* at x of ``1.1`` and y of
-``1.6``, while the ``Rectangle`` will have its *height* and *width* equal to
-the height and width of the deck's cards.
+In this code:
+
+- the ``Circle`` will have its *centre* at x of ``1.1`` and y of ``1.6``;
+- the ``Hexagon`` will also have its *centre* at x of ``1.1`` and y of ``1.6``;
+- the ``Rectangle`` will have its *height* and *width* equal to the
+  size of the cards i.e. their height and width
 
 
 .. _property-examples:

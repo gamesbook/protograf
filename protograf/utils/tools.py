@@ -996,6 +996,27 @@ def alpha_column(num: int, lower: bool = False) -> str:
 
 
 @lru_cache(maxsize=None)
+def integer_pair_to_cell(row: int, col: int) -> str:
+    """Convert 0-indexed (row, col) to A1-style spreadsheet ID.
+
+    Doc Test:
+
+    >>> print(integer_pair_to_cell(0, 0))
+    A1
+    print(integer_pair_to_cell(10, 27))
+    AB11
+    """
+    column_str = ""
+    while col >= 0:
+        col, remainder = divmod(col, 26)
+        column_str = chr(65 + remainder) + column_str
+        if col == 0:
+            break
+        col -= 1
+    return f"{column_str}{row + 1}"
+
+
+@lru_cache(maxsize=None)
 def column_from_string(col: str) -> int:
     """Convert ASCII column name (base 26) to decimal with 1-based index
 
@@ -1057,7 +1078,7 @@ def coordinate_to_tuple(coordinate: str, zeroed: bool = False) -> tuple:
 
 
 def sheet_column(num: int, lower: bool = False) -> str:
-    """Convert a spreadsheet number to a column letter
+    """Convert a number to a spreadsheet-styled character string
 
     Ref:
         https://stackoverflow.com/questions/23861680/
