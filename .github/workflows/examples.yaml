@@ -9,10 +9,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
-        uses: [actions/checkout@v4](https://github.com)
+        uses: actions/checkout@v4
 
       - name: Examples Zip
-        uses: [thedoctor0/zip-release@0.7.5](https://github.com/marketplace/actions/zip-release)
+        uses: thedoctor0/zip-release@0.7.5
         with:
           type: 'zip'
           filename: 'examples.zip'
@@ -21,7 +21,7 @@ jobs:
           exclusions: '*.pdf* some.sh *temp/*'
 
       - name: Create GitHub Release
-        uses: [ncipollo/release-action@v1](https://github.com)
+        uses: ncipollo/release-action@v1
         with:
           artifacts: "examples.zip"
           token: ${{ secrets.GITHUB_TOKEN }}
