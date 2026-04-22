@@ -1,8 +1,9 @@
 protograf Changes
 =================
 
-2026-00-00 (0.5.3)
+2026-00-00 (0.5.x)
 ------------------
+- [PLANNED-1]
 - [PLANNED-1] Enable output of Cards in TTS file
 - [PLANNED-2] Add code to link *Locations
 - [PLANNED-2] Docs: list all props for Hex, Circle, Rectangle, Line
@@ -13,7 +14,7 @@ protograf Changes
 - Add styling control to Table
 - Enable use of Table cells for layouts
 - Add geo properties to Arrow
-- [PLANNED-1] Enable Line links to Text boxes
+- Enable Line links to Text boxes
 
 2026-04-18 (0.5.1)
 ------------------

@@ -3248,6 +3248,64 @@ class TextShape(BaseShape):
         """do something when I'm called"""
         log.debug("calling TextShape...")
 
+    @property
+    def geo(self) -> ShapeGeometry:
+        """Geometry of Text in user units."""
+        _type = type(self)
+        cntr_user, perim, radius, area = None, None, None, None
+        n, s, e, w, ne, nw, se, sw = None, None, None, None, None, None, None, None
+        cntr = self._shape_centre
+        if cntr:
+            cntr_user = self.as_point(cntr, self.units, cntr, self.rotation)
+            area = self.height * self.width
+            radius = (
+                math.hypot(self.height, self.width)
+                if self.height == self.width
+                else None
+            )
+            perim = (self.height + self.width) * 2
+            vtcs = self._shape_vertexes
+            if vtcs:
+                ne = self.as_point(vtcs[0], self.units, cntr, self.rotation)
+                se = self.as_point(vtcs[1], self.units, cntr, self.rotation)
+                sw = self.as_point(vtcs[2], self.units, cntr, self.rotation)
+                nw = self.as_point(vtcs[3], self.units, cntr, self.rotation)
+                n = geoms.fraction_along_line(nw, ne, 0.5)
+                s = geoms.fraction_along_line(sw, se, 0.5)
+                e = geoms.fraction_along_line(ne, se, 0.5)
+                w = geoms.fraction_along_line(nw, sw, 0.5)
+        return ShapeGeometry(
+            # centre
+            centre=cntr_user,
+            center=cntr_user,
+            c=cntr_user,
+            # vertices
+            ne=ne,
+            nw=nw,
+            se=se,
+            sw=sw,
+            # perbii
+            n=n,
+            s=s,
+            e=e,
+            w=w,
+            # length
+            perimeter=perim,
+            radius=radius,
+            # other
+            area=area,
+            # meta
+            t=_type,
+            type=_type,
+            shapetype=_type,
+            name=self.simple_name(self),
+        )
+
+    @property
+    def geometry(self) -> ShapeGeometry:
+        """Geometry of Text - alias for geo."""
+        return self.geo
+
     @property  # do NOT cache because centre needs to be changed!
     def _shape_centre(self) -> Point:
         """Centre of Text in points."""
@@ -3273,11 +3331,12 @@ class TextShape(BaseShape):
         centre = self._shape_centre
         if centre:
             cx, cy = centre.x, centre.y  # shortcuts
+            hh, hw = self._u.height / 2.0, self._u.width / 2.0
             vertices = []
-            vertices.append(Point(cx - self._u.width / 2.0, cy))  # w
-            vertices.append(Point(cx, cy + self._u.height / 2.0))  # s
-            vertices.append(Point(cx + self._u.width / 2.0, cy))  # e
-            vertices.append(Point(cx, cy - self._u.height / 2.0))  # n
+            vertices.append(Point(cx + hw, cy - hh))  # ne
+            vertices.append(Point(cx + hw, cy + hh))  # se
+            vertices.append(Point(cx - hw, cy + hh))  # sw
+            vertices.append(Point(cx - hw, cy - hh))  # nw
             return vertices
         return None
 
