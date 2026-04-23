@@ -58,9 +58,11 @@ a handy cross-reference to the detailed information for that command.
    is not displayed; it is used in a :ref:`Layout <layout-command>` command
 -  :ref:`Domino <domino-object>` * - create top-down view of a domino
 -  :ref:`Dot <dot-command>` * - a geometric shape that can be drawn on a page
--  :ref:`DotGrid <dotgrid-command>` - a set, or group, of dots that can be drawn on a page
+-  :ref:`DotGrid <dotgrid-command>` - a set, or group, of dots that can be
+   drawn on a page
 -  :ref:`Ellipse <ellipse-command>` * - a geometric shape that can be drawn on a page
--  :ref:`Extract <the-extract-command>` - allows portions of pages to be extracted as PNG images
+-  :ref:`Extract <the-extract-command>` - allows portions of pages to be
+   extracted as PNG images
 -  :ref:`Font <the-font-command>` - set the font properties for any
    :ref:`Text <text-command>` drawn on a page
 -  :ref:`IconFont <the-iconfont-command>` - set the font properties for any
@@ -93,26 +95,30 @@ a handy cross-reference to the detailed information for that command.
 -  :ref:`Polygon <polygon-command>` * - a geometric shape that can be drawn on a page
 -  :ref:`Polyline <polyline-command>` * - a geometric shape that can be drawn on a page
 -  :ref:`Polyomino <polyominoesOver>` * - a compound shape made up of one or more squares
--  :ref:`Polyshape <polyshape-command>` * - an irregular geometric shape that can be drawn on a page
+-  :ref:`Polyshape <polyshape-command>` * - an irregular geometric shape that
+   can be drawn on a page
 -  :ref:`Random <random-command>` - generate a random number within a range
--  :doc:`Repeat <layouts_repeat>` - repeat the drawing of a shape across a rectangular grid pattern
+-  :doc:`Repeat <layouts_repeat>` - repeat the drawing of a shape across a
+   rectangular grid pattern
 -  :ref:`Rectangle <rectangle-command>` * - a geometric shape that can be drawn on a page
    (see also further :ref:`customisation options <rectangleIndex>`)
--  :ref:`Rectangles <rectangles-command>` - a set, or group, of rectangles that can be drawn on a page
+-  :ref:`Rectangles <rectangles-command>` - a set, or group, of rectangles that
+   can be drawn on a page
 -  :doc:`RectangularLocations <layouts_rectangular>` - defines an ordered series of
    row and column locations that create a rectangular grid of shapes - the grid itself
    is not displayed; it is used in a :ref:`Layout <layout-command>` command.
 -  :ref:`Rhombus <rhombus-command>` * - a geometric shape that can be drawn on a page
 -  :ref:`S <the-selection-command>` - short for *Selection*; the way to draw a
    shape on a :ref:`card <the-card-command>` depending on a condition
--  :ref:`Save <save-command>` - end of a script; set the export
-   image file type and filenames, as well as resolution
+-  :ref:`Save <save-command>` - end of a script; sets the export image file
+   type and filenames, as well as image resolution; sets gallery format for cards
 -  :ref:`Sector <sector-command>` * - a geometric shape that can be drawn on a page
 -  :doc:`Sequence <layouts_sequence>` - lay out a number of items in a straight line
 -  :ref:`Square <square-command>` * - a geometric shape that can be drawn on a page
 -  :ref:`Stadium <stadium-command>` * - a geometric shape that can be drawn on a page
 -  :ref:`Star <star-command>` * - a geometric shape that can be drawn on a page
--  :ref:`Starfield <starfield-command>` - a set, or group, of dots that can be drawn on a page
+-  :ref:`Starfield <starfield-command>` - a set, or group, of dots that can be
+   drawn on a page
 -  :ref:`T <the-template-command>` - short for *Template*; the way to access an
    item in a column from a set of :ref:`data <the-data-command>` for a
    :ref:`card <the-card-command>`

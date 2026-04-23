@@ -1,9 +1,9 @@
 protograf Changes
 =================
 
-2026-00-00 (0.5.x)
+2026-00-00 (0.5.3)
 ------------------
-- [PLANNED-1] Enable output of Cards in TTS file
+- Enable output of gallery of Cards e.g. for a TTS file
 - [PLANNED-2] Add code to link *Locations
 - [PLANNED-2] Docs: list all props for Hex, Circle, Rectangle, Line
 - [PLANNED-2] Centre multi-line label text strings

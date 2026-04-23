@@ -806,10 +806,10 @@ class DeckOfCards:
         self.export_cards = kwargs.get("export_cards", False)
         self.dpi = kwargs.get("dpi", None)
         self.directory = kwargs.get("directory", None)
-        # ---- FINALLY...
         extra = globals.deck_settings.get("extra", 0)
         self.cards += extra
         log.debug("Card Counts: %s Settings: %s", self.cards, globals.deck_settings)
+        # ---- FINALLY...
         # print(f'$$$ {self.cards=}, {globals.deck_settings=}')
         self.create_cardshapes(self.cards)
 
@@ -938,6 +938,7 @@ class DeckOfCards:
         - card_cols (int): maximum number of columns of cards on a page
         - dpi (int): resolution for output PNG
         - directory (str): path to save output(s)
+        - gallery (tuple): columns x rows of cards per page
         - zones (list): tuples of form (str|int, Shape), where 0-position is the
           page number, and 1-position is the Shape to be drawn there
 
@@ -1161,13 +1162,47 @@ class DeckOfCards:
                 start_x=0,
             )
 
-        # ---- primary layout settings for draw()
+        # ---- primary layout settings for card.draw()
         cnv = cnv if cnv else globals.canvas
         # feedback(f'$$$ DeckShape.draw {cnv=} KW=> {kwargs}')
         log.debug("Deck cnv:%s type:%s", type(globals.canvas), type(cnv))
         kwargs = self.kwargs | kwargs
         images = kwargs.get("image_list", [])
         kwargs["frame_type"] = self.frame_type
+        # ---- gallery - overrides
+        gallery = kwargs.get("gallery", None)
+        if gallery:
+            cols, rows = gallery[0], gallery[1]
+            print(f"### Gallery  {cols=} {rows=}")
+            self.gutter_layout = None
+            self.gutter = 0
+            self.grouping_rows = 1
+            self.grouping_cols = 1
+            self.card_cols = cols
+            self.card_rows = rows
+            self.spacing_x = 0
+            self.spacing_y = 0
+            # alter page settings
+            globals.page = (
+                globals.units * self.width * cols,
+                globals.units * self.height * rows,
+            )
+            globals.margins = PageMargins(
+                margin=0,
+                left=0,
+                right=0,
+                bottom=0,
+                top=0,
+                debug=False,
+                units=globals.units,
+            )
+            globals.page_width = globals.page[0] / globals.units  # width ~ user units
+            globals.page_height = globals.page[1] / globals.units  # height ~ user units
+            print(
+                f"###    {globals.page=} {globals.page_width=} {globals.page_height=}"
+            )
+            print(f"###    {globals.margins=}")
+
         # ---- user-defined rows and cols
         max_rows = self.card_rows
         max_cols = self.card_cols
@@ -1222,7 +1257,9 @@ class DeckOfCards:
             globals.page_width = width / globals.units
             globals.page_height = height / globals.units
             globals.page = (width, height)
-            # print(f"$$$ {width=} {height=} {globals.page_width=} {globals.page_height=} ")
+            print(
+                f"$$$ {width=} {height=} {globals.page_width=} {globals.page_height=} "
+            )
             # ---- BaseCanvas
             globals.base = BaseCanvas(
                 globals.document, paper=globals.paper, defaults=None, kwargs=kwargs
@@ -1272,7 +1309,8 @@ class DeckOfCards:
         page_across = globals.page_width - margin_right - margin_left  # user units
         page_down = globals.page_height - margin_top - margin_bottom  # user units
         _height, _width, _radius = self.height, self.width, self.radius
-        self.draw_bleed(cnv, page_across, page_down)
+        if gallery is not None:
+            self.draw_bleed(cnv, page_across, page_down)
 
         # ---- deck settings
         col_space, row_space = 0.0, 0.0
@@ -1335,11 +1373,6 @@ class DeckOfCards:
         # ---- gap-at-right (for card back shift)
         right_gap = globals.page_width - effective_right
 
-        # print(f"$$$ {right_gap=} {globals.page_width=} {effective_right=}")
-        # print(f"$$$ {self.grouping_cols=} {self.spacing_x=}")
-        # print(f"$$$ {globals.page_width=} {_width=} {col_space=} {max_cols=}")
-        # print(f"$$${globals.page_height=} {_height=} {row_space=} {max_rows=}")
-
         # ---- prep for card drawing
         page_number = -1
         state_front = DeckPrintState(
@@ -1352,6 +1385,10 @@ class DeckOfCards:
             if back.elements:
                 self.show_backs = True
                 continue
+
+        print(f"$$$ {right_gap=} {globals.page_width=} {effective_right=}")
+        print(f"$$$ {globals.page_width=} card{_width=} {col_space=} {max_cols=}")
+        print(f"$$$ {globals.page_height=} card{_height=} {row_space=} {max_rows=}")
 
         # ---- actually draw cards and the zones!
         while state_front.card_number < len(self.fronts):
@@ -2135,6 +2172,10 @@ def Save(**kwargs):
       exported as PNG files;  the names of the files are either derived using the
       PDF filename, with a dash (-) followed by the page number OR set by the user
       with ``card_name`` property in the Deck()
+    - gallery (tuple): if set to a pair of numbers e.g. ``(6,9)`` will cause that
+      many *cards* to be drawn on a page; the page size will be changed to fit them
+      all; and all margins will be set to zero |dash| this can be used to as a
+      input for programs like Tabletop Simulator (TTS)
     - stop (bool): if set to ``True`` will cause all the script to stop at this point
 
     Notes:
@@ -2154,6 +2195,15 @@ def Save(**kwargs):
     output = kwargs.get("output", None)  # export document into this format e.g. SVG
     local_filename = kwargs.get("filename", None)  # override Create()
     stop_here = kwargs.get("stop", False)  # stop script
+    gallery = kwargs.get("gallery", None)  # card grid size per page
+    # ---- gallery - trigger overrides of settings in CardDeck draw!
+    if gallery:
+        err = f'The gallery property must be a pair of numbers in (M, N) format; not "{gallery}".'
+        if isinstance(gallery, tuple) and len(gallery) == 2:
+            if not isinstance(gallery[0], int) or not isinstance(gallery[1], int):
+                feedback(err, True)
+        else:
+            feedback(err, True)
 
     # ---- directory
     if globals.pargs.directory:
@@ -2180,6 +2230,7 @@ def Save(**kwargs):
             extra=globals.deck_settings.get("extra", 0),
             grid_marks=globals.deck_settings.get("grid_marks", None),
             zones=globals.deck_settings.get("zones", None),
+            gallery=gallery,
             image_list=globals.image_list,
             dpi=dpi,
             directory=globals.directory,
