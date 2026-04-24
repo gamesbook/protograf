@@ -771,6 +771,7 @@ class BaseShape:
         self.show_id = False  # True
         # ---- KEY
         self.doc_page = globals.doc_page
+        # print(f"### BASE-774 {self.doc_page=} {globals.page=}")
         self.page_number = globals.page_count + 1
         self.canvas = canvas or globals.canvas  # pymupdf Shape
         base = _object or globals.base  # protograf BaseCanvas

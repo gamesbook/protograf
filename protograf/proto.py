@@ -1097,6 +1097,7 @@ class DeckOfCards:
                             image=image,
                             **kwargs,
                         )
+                        # print(f"$$$ {card_num+1=} {col+1=} {row+1=} {globals.page=}")
                         if front:
                             col += 1
                             if col >= max_cols:
@@ -1162,6 +1163,8 @@ class DeckOfCards:
                 start_x=0,
             )
 
+        # ---- * DRAW START *
+
         # ---- primary layout settings for card.draw()
         cnv = cnv if cnv else globals.canvas
         # feedback(f'$$$ DeckShape.draw {cnv=} KW=> {kwargs}')
@@ -1169,17 +1172,31 @@ class DeckOfCards:
         kwargs = self.kwargs | kwargs
         images = kwargs.get("image_list", [])
         kwargs["frame_type"] = self.frame_type
+
+        # ---- user-defined rows and cols
+        max_rows = self.card_rows
+        max_cols = self.card_cols
+
+        # print(f"###    {globals.page=} {globals.page_width=} {globals.page_height=}")
+        # print(f"###    {globals.margins=}")
+        # print(f"$$$ {globals.page_width=} card{self.width=} {max_cols=}")
+        # print(f"$$$ {globals.page_height=} card{self.height=} {max_rows=}")
+        # print(f"===================================================================")
+
         # ---- gallery - overrides
         gallery = kwargs.get("gallery", None)
         if gallery:
             cols, rows = gallery[0], gallery[1]
-            print(f"### Gallery  {cols=} {rows=}")
+            # print(f"### Gallery  {cols=} {rows=}")
+            # alter card settings
             self.gutter_layout = None
             self.gutter = 0
             self.grouping_rows = 1
             self.grouping_cols = 1
             self.card_cols = cols
             self.card_rows = rows
+            max_rows = self.card_rows
+            max_cols = self.card_cols
             self.spacing_x = 0
             self.spacing_y = 0
             # alter page settings
@@ -1187,6 +1204,8 @@ class DeckOfCards:
                 globals.units * self.width * cols,
                 globals.units * self.height * rows,
             )
+            # FIXME - how to not centre old content on new page?
+            globals.doc_page.set_mediabox((0, 0, globals.page[0], globals.page[1]))
             globals.margins = PageMargins(
                 margin=0,
                 left=0,
@@ -1198,14 +1217,8 @@ class DeckOfCards:
             )
             globals.page_width = globals.page[0] / globals.units  # width ~ user units
             globals.page_height = globals.page[1] / globals.units  # height ~ user units
-            print(
-                f"###    {globals.page=} {globals.page_width=} {globals.page_height=}"
-            )
-            print(f"###    {globals.margins=}")
+            # print(f"###   {globals.page=} {globals.margins=}")
 
-        # ---- user-defined rows and cols
-        max_rows = self.card_rows
-        max_cols = self.card_cols
         # ---- other settings
         self.export_cards = kwargs.get("export_cards", False)
         self.dpi = kwargs.get("dpi", 300)
@@ -1257,9 +1270,6 @@ class DeckOfCards:
             globals.page_width = width / globals.units
             globals.page_height = height / globals.units
             globals.page = (width, height)
-            print(
-                f"$$$ {width=} {height=} {globals.page_width=} {globals.page_height=} "
-            )
             # ---- BaseCanvas
             globals.base = BaseCanvas(
                 globals.document, paper=globals.paper, defaults=None, kwargs=kwargs
@@ -1386,24 +1396,27 @@ class DeckOfCards:
                 self.show_backs = True
                 continue
 
-        print(f"$$$ {right_gap=} {globals.page_width=} {effective_right=}")
-        print(f"$$$ {globals.page_width=} card{_width=} {col_space=} {max_cols=}")
-        print(f"$$$ {globals.page_height=} card{_height=} {row_space=} {max_rows=}")
-
         # ---- actually draw cards and the zones!
         while state_front.card_number < len(self.fronts):
-            # print(f"\n$$$ FRONT {state_front.card_number=} $$$ ")
             page_number += 1  # for back-to-back OR no backs
             draw_the_zones(cnv, page_number, self.zones)
             cnv, state_front = draw_the_cards(cnv, state_front, page_number, True, 0)
             if self.show_backs:
-                # print(f"\n$$$ BACK  {state_back.card_number=} $$$ ")
                 page_number += 1  # for back-to-back
                 draw_the_zones(cnv, page_number, self.zones)
                 cnv, state_back = draw_the_cards(
                     cnv, state_back, page_number, False, right_gap
                 )
+            if page_number > 9999:
+                feedback(f"Exceeded maximum number of pages ({page_number})", True)
+                break
+
+        # print(f"===================================================================")
+        # print(f"$$$ {right_gap=} {globals.page_width=} {effective_right=}")
+        # print(f"$$$ {globals.page_width=} card{_width=} {col_space=} {max_cols=}")
+        # print(f"$$$ {globals.page_height=} card{_height=} {row_space=} {max_rows=}")
         # ---- delete extra blank page at the end
+
         globals.document.delete_page(globals.page_count)
 
         # ---- reset to prime and load-in gutter pages
@@ -2246,7 +2259,7 @@ def Save(**kwargs):
     msg = "Please check the folder exists and that you have access rights."
     the_filename = local_filename or globals.filename
     output_filepath = os.path.join(globals.directory, the_filename)
-    # print(f'$$$ SAVE {output_filepath=}')
+
     try:
         globals.document.subset_fonts(verbose=True)  # subset fonts to reduce file size
         globals.document.save(output_filepath, garbage=4)  # remove unused & duplicates
@@ -3006,7 +3019,7 @@ def Data(**kwargs):
                 if len(globals.dataset) >= i:
                     _data = list(globals.dataset[i].values())
                     data = ",".join(str(x) for x in _data)
-                    print(data)
+                    print(f"{data=}")
         else:
             print("No {globals.dataset_type} data was loaded!")
 
