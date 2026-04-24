@@ -65,7 +65,7 @@ def validate_link_params(conn: tuple) -> list:
     return dirs
 
 
-def get_link_point(point_like: object) -> Point:
+def get_link_point(point_like: object) -> Point | None:
     """Get the Point at which link is to be made."""
     from protograf.shapes import StarShape  # avoid circular imports
 
@@ -81,7 +81,6 @@ def get_link_point(point_like: object) -> Point:
                 " {point_like.simple_name()}",
                 True,
             )
-            return None
         return pnt
     elif isinstance(point_like, Point):
         return Point(
@@ -96,6 +95,9 @@ def get_link_point(point_like: object) -> Point:
             shape_name = f"{the_shape.ORIENTATION.name.lower()} {shape_name}"
         if isinstance(the_shape, (PolygonShape, StarShape)):
             direction = tools.as_int(direction, "direction")
+        vertexes = {}
+        perbises = {}
+
         match _lower(conn_type):
             case "v" | "vertex":
                 try:
@@ -175,7 +177,7 @@ def get_rotation(centre_a: Point, centre_b: Point) -> tuple:
     return rotation_a, rotation_b
 
 
-def link_pairs(shapes: list, links_style: str = None) -> list:
+def link_pairs(shapes: list, links_style: str | None = None) -> list:
     """Convert list of shape/locations - individual or in/out - into pairs.
 
     Doc Test:
@@ -225,7 +227,7 @@ def link_pairs(shapes: list, links_style: str = None) -> list:
     return shape_loc_pairs
 
 
-def get_links(shapes: list, links_style: str, curve: float = None) -> tuple:
+def get_links(shapes: list, links_style: str, curve: float | None = None) -> tuple:
     """Get link vertices.
 
     Returns:

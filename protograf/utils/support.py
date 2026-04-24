@@ -494,7 +494,7 @@ def pdf_export(
     fformat: ExportFormat,
     dpi: int = 300,
     names: list = None,
-    directory: str = None,
+    directory: str | None = None,
     framerate: float = 1.0,
 ):
     """Extract pages from PDF as PNG or SVG files.  Optionally, assemble into a GIF.
@@ -620,7 +620,7 @@ def pdf_frames_to_png(
     output: str,
     fformat: str = "png",
     dpi: int = 300,
-    directory: str = None,
+    directory: str | None = None,
     frames: dict = None,
 ) -> list:
     """Extract framed areas from PDF as PNG image(s).

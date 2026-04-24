@@ -3673,7 +3673,9 @@ class TrapezoidShape(BaseShape):
             return self.points_to_value(length)
         return length
 
-    def calculate_perbii(self, centre: Point, rotation: float = None, **kwargs) -> dict:
+    def calculate_perbii(
+        self, centre: Point, rotation: float | None = None, **kwargs
+    ) -> dict:
         """Calculate centre points for each Trapezoid edge and angles from centre.
 
         Args:
@@ -4041,7 +4043,9 @@ class TriangleShape(BaseShape):
             return self.points_to_value(length)
         return length
 
-    def calculate_perbii(self, centre: Point, rotation: float = None, **kwargs) -> dict:
+    def calculate_perbii(
+        self, centre: Point, rotation: float | None = None, **kwargs
+    ) -> dict:
         """Calculate centre points for each Triangle edge and angles from centre.
 
         Args:
@@ -4187,7 +4191,7 @@ class TriangleShape(BaseShape):
         )
 
     def draw_perbii(
-        self, cnv, ID, centre: Point, vertices: list, rotation: float = None
+        self, cnv, ID, centre: Point, vertices: list, rotation: float | None = None
     ):
         """Draw lines connecting the Triangle centre to the centre of each edge.
 
@@ -4263,7 +4267,7 @@ class TriangleShape(BaseShape):
         )
 
     def draw_radii(
-        self, cnv, ID, centre: Point, vertices: list, rotation: float = None
+        self, cnv, ID, centre: Point, vertices: list, rotation: float | None = None
     ):
         """Draw line(s) connecting the Triangle centre to a vertex.
 

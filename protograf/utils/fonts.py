@@ -78,7 +78,7 @@ class FontInterface:
         self.font_files = sorted(list(font_filenames))
 
     @lru_cache(maxsize=256)  # limits cache
-    def load_font_families(self, cached: bool = True, cache_path: str = None):
+    def load_font_families(self, cached: bool = True, cache_path: str | None = None):
         """Track family data across all files from default locations used by an OS.
 
         Args:

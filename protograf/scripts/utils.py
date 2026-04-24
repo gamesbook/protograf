@@ -19,7 +19,7 @@ def failure(message: str, end: bool = True):
         sys.exit(0)  # Exit with status code 0 (success)
 
 
-def as_int(value, label: str = None) -> int:
+def as_int(value, label: str | None = None) -> int:
     """Convert a value to an int
 
     Args:

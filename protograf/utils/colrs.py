@@ -14,7 +14,7 @@ from protograf.utils.constants import RGB_COLOR_SINGLES, CMYK_COLOR_SINGLES, COL
 from protograf.utils.messaging import feedback
 
 
-def get_color(name: str = None, color_model: str = "RGB") -> tuple:
+def get_color(name: str | None = None, color_model: str = "RGB") -> tuple | None:
     """Get a color tuple; by name/char from dictionary, or as RGB/CMYK tuple."""
     if name is None:
         return None  # it IS valid to say that NO color has been set
@@ -33,6 +33,7 @@ def get_color(name: str = None, color_model: str = "RGB") -> tuple:
             _hdcolor = RGB_COLOR_SINGLES.get(name, None)
             if not _hdcolor:
                 feedback(f'The color abbreviation "{name}" does not exist!', True)
+                return None
             _rgb = tuple(int(_hdcolor[i : i + 2], 16) for i in (1, 3, 5))
             rgb = tuple(i / 255 for i in _rgb)
             return rgb
@@ -40,6 +41,7 @@ def get_color(name: str = None, color_model: str = "RGB") -> tuple:
             _hdcolor = CMYK_COLOR_SINGLES.get(name, None)
             if not _hdcolor:
                 feedback(f'The color abbreviation "{name}" does not exist!', True)
+                return None
             _cmyk = _hdcolor.split(",")
             cmyk = tuple(float(i) / 100.0 for i in _cmyk)
             return cmyk
@@ -112,7 +114,7 @@ def rgb_to_hex(color: tuple) -> str:
     return _string.upper()
 
 
-def adjust_color_brightness(red, grn, blu, factor, as_hex=True):
+def adjust_color_brightness(red, grn, blu, factor, as_hex=True) -> tuple:
     """Alter brightness of a RGB colour - lighter or darker.
 
     Args:

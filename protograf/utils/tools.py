@@ -184,9 +184,9 @@ def _p2v(value: Point, decimals: int = 4) -> tuple:
 
 def as_int(
     value,
-    label: str = None,
-    maximum: int = None,
-    minimum: int = None,
+    label: str | None = None,
+    maximum: int | None = None,
+    minimum: int | None = None,
     allow_none: bool = False,
 ) -> int:
     """Convert a value to an int
@@ -264,7 +264,11 @@ def as_bool(value, allow_none: bool = True) -> bool:
 
 
 def as_float(
-    value, label: str, maximum: float = None, minimum: float = None, stop: bool = True
+    value,
+    label: str,
+    maximum: float | None = None,
+    minimum: float | None = None,
+    stop: bool = True,
 ) -> float:
     """Set a value to an float; or end program if an invalid value and stop is True
 
@@ -576,7 +580,10 @@ def sequence_split(
 
 
 def split(
-    strng: str, tuple_to_list: bool = False, separator: str = None, clean: bool = False
+    strng: str,
+    tuple_to_list: bool = False,
+    separator: str | None = None,
+    clean: bool = False,
 ):
     """
     Split a string into a list of individual characters
@@ -612,7 +619,10 @@ def split(
 
 
 def separate(
-    strng: str, tuple_to_list: bool = False, separator: str = None, clean: bool = False
+    strng: str,
+    tuple_to_list: bool = False,
+    separator: str | None = None,
+    clean: bool = False,
 ):
     """
     Split a string into a list of individual items
@@ -1182,7 +1192,7 @@ def base_fonts():
           of an alternate
     """
 
-    def register_font(name: str, filename: str = None):
+    def register_font(name: str, filename: str | None = None):
         """Register a font."""
         log.debug("register_font: %s %s", name, filename)
 
@@ -1470,7 +1480,7 @@ def validated_directions(
 
 
 def transpose_lists(
-    original_list: list, direction: str = None, invert: str = None
+    original_list: list, direction: str | None = None, invert: str | None = None
 ) -> list:
     """Reorientate a list-of-lists
 
@@ -1614,7 +1624,7 @@ def restore_globals(doc: GlobalDocument):
     globals.page_grid = doc.page_grid
 
 
-def unit(item, units: str = None, skip_none: bool = False, label: str = ""):
+def unit(item, units: str | None = None, skip_none: bool = False, label: str = ""):
     """Convert an item into the appropriate unit system."""
     log.debug("units %s :: label: %s", units, label)
     if item is None and skip_none:
@@ -1632,7 +1642,7 @@ def unit(item, units: str = None, skip_none: bool = False, label: str = ""):
         )
 
 
-def points(item, units: str = None, skip_none: bool = False, label: str = ""):
+def points(item, units: str | None = None, skip_none: bool = False, label: str = ""):
     """Convert an item from points into the appropriate unit system."""
     log.debug("units %s :: label: %s", units, label)
     if item is None and skip_none:

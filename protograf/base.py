@@ -89,7 +89,7 @@ class BaseCanvas:
     def __init__(
         self,
         document: muDocument,
-        paper: str = None,  # e.g. "A4", "Letter"
+        paper: str | None = None,  # e.g. "A4", "Letter"
         defaults: dict = None,
         **kwargs,
     ):
@@ -1544,7 +1544,9 @@ class BaseShape:
     def kw_bool(self, value):
         return tools.as_bool(value) if value is not None else value
 
-    def unit(self, item, units: str = None, skip_none: bool = False, label: str = ""):
+    def unit(
+        self, item, units: str | None = None, skip_none: bool = False, label: str = ""
+    ):
         """Convert an item into the appropriate unit system."""
         log.debug("units %s %s :: label: %s", units, self.units, label)
         if item is None and skip_none:
@@ -2056,8 +2058,8 @@ class BaseShape:
 
     def load_image(
         self,
-        image_location: str = None,
-        cache_directory: str = None,
+        image_location: str | None = None,
+        cache_directory: str | None = None,
     ) -> Image:
         """Load an image from file or website.
 
@@ -2092,7 +2094,7 @@ class BaseShape:
                     f.write(image.content)
             return image_local
 
-        def get_image_from_svg(image_location: str = None):
+        def get_image_from_svg(image_location: str | None = None):
             """Load SVG image and convert to PNG."""
             with open(image_location) as f:
                 svg_code = f.read()
@@ -2159,9 +2161,9 @@ class BaseShape:
         self,
         pdf_page: muPage,
         image: Image,
-        filename: str = None,
+        filename: str | None = None,
         origin: tuple = None,
-        sliced: str = None,
+        sliced: str | None = None,
         width_height: tuple = None,
         rotation: float = 0,
     ) -> Image:
@@ -2192,7 +2194,7 @@ class BaseShape:
         """
 
         def slice_image(
-            img: Image, slice_portion: str = None, width_height: tuple = (1, 1)
+            img: Image, slice_portion: str | None = None, width_height: tuple = (1, 1)
         ) -> tuple:
             """Slice off a portion of an Image while maintaining its aspect ratio
 
@@ -2328,7 +2330,7 @@ class BaseShape:
                 )
             return new_bbox
 
-        def image_render(img: Image, image_filename: str = None) -> object:
+        def image_render(img: Image, image_filename: str | None = None) -> object:
             """Draw a PIL Image."""
             try:
                 image_local = img.filename  # only exist for open() image from file
@@ -2492,7 +2494,9 @@ class BaseShape:
         # return height
         return float(self.font_size)
 
-    def textify(self, index: int = None, text: str = "", default: bool = True) -> str:
+    def textify(
+        self, index: int | None = None, text: str = "", default: bool = True
+    ) -> str:
         """Extract text from a list, or create string, based on index & type."""
         _text = text
         if not _text and default:
@@ -2508,7 +2512,7 @@ class BaseShape:
             return _text
 
     def points_to_value(
-        self, value: float, units_name: str = None, decimals: int = None
+        self, value: float, units_name: str | None = None, decimals: int | None = None
     ) -> float:
         """Convert a point value to a units-based value."""
         try:
@@ -2539,7 +2543,7 @@ class BaseShape:
         xy: Point,
         units: float,
         center: Point,
-        rotation: float = None,
+        rotation: float | None = None,
     ) -> Point:
         """Create a Point in user units already offset from page margins."""
         margin_left = globals.margins.left
@@ -3316,7 +3320,7 @@ class BaseShape:
                 canvas.draw_circle((point.x, point.y), 1)
             self.set_canvas_props(cnv=canvas, index=None, **kwargs)
 
-    def draw_border(self, cnv, border: tuple, ID: int = None, **kwargs):
+    def draw_border(self, cnv, border: tuple, ID: int | None = None, **kwargs):
         """Draw a border line for an area based on its settings."""
         # feedback(f'### border {self.__class__.__name__} {border=} {ID=}')
         if not isinstance(border, tuple):
@@ -3619,7 +3623,7 @@ class BaseShape:
         radii_shapes: list,
         vertexes: list,
         centre: Point,
-        radius: float = None,
+        radius: float | None = None,
         direction_group: DirectionGroup = None,
         rotation: float = 0.0,
         rotated: bool = False,
@@ -3729,7 +3733,7 @@ class BaseShape:
         perbii_shapes: list,
         vertexes: list,
         centre: Point,
-        radius: float = None,
+        radius: float | None = None,
         direction_group: DirectionGroup = None,
         rotation: float = 0.0,
         rotated: bool = False,

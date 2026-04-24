@@ -21,7 +21,7 @@ from protograf.utils.messaging import feedback
 from protograf.utils import tools
 
 
-def in_memory(the_image: Image) -> Document:
+def in_memory(the_image: Image.Image) -> Document:
     """Return an in-memory instance of an image as a PNG.
 
     Args:

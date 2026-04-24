@@ -20,7 +20,7 @@ DEBUG = False
 
 
 def polygon_vertices(
-    sides: int, radius: float, centre: Point, starting_angle: float = None
+    sides: int, radius: float, centre: Point, starting_angle: float | None = None
 ) -> list:
     """Calculate array of Points for a polygon's vertices.
 

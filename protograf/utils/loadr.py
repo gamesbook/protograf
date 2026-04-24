@@ -136,7 +136,7 @@ def load_googlesheet(sheet, **kwargs):
     return data_list
 
 
-def open_csv(filename: str = None, headers: list = None, selected: list = None):
+def open_csv(filename: str | None = None, headers: list = None, selected: list = None):
     """Read data from CSV file into a list of dictionaries
 
     Args:
@@ -177,8 +177,8 @@ def open_csv(filename: str = None, headers: list = None, selected: list = None):
 def open_excel(
     filename: str,
     sheet: int = 0,
-    sheetname: str = None,
-    cells: str = None,
+    sheetname: str | None = None,
+    cells: str | None = None,
     headers: list = None,
 ):
     """Read data from an Excel file into a list of dictionaries
@@ -243,8 +243,8 @@ def open_excel(
 def open_xlsx(
     filename: str,
     sheet: int = 0,
-    sheetname: str = None,
-    cells: str = None,
+    sheetname: str | None = None,
+    cells: str | None = None,
     headers: list = None,
 ):
     """Read data from XLSX file into a list of dictionaries
@@ -362,8 +362,8 @@ def open_xlsx(
 def open_xls(
     filename: str,
     sheet: int = 0,
-    sheetname: str = None,
-    cells: str = None,
+    sheetname: str | None = None,
+    cells: str | None = None,
     headers: list = None,
 ):
     """Read data from XLS file into a list of dictionaries

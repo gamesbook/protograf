@@ -562,7 +562,7 @@ class HexShape(BaseShape):
         p0: Point,
         p1: Point,
         side: float,
-        size: float = None,
+        size: float | None = None,
         invert: bool = False,
     ) -> Point:
         """Calculate points for caltrops lines (extend from the hex "corner").
@@ -1096,7 +1096,9 @@ class HexShape(BaseShape):
             dotted=self.paths_dotted,
         )
 
-    def calculate_perbii(self, centre: Point, rotation: float = None, **kwargs) -> dict:
+    def calculate_perbii(
+        self, centre: Point, rotation: float | None = None, **kwargs
+    ) -> dict:
         """Calculate centre points for each Hex edge and angles from centre.
 
         Args:
@@ -1186,7 +1188,7 @@ class HexShape(BaseShape):
         return radii_dict
 
     def draw_perbii(
-        self, cnv, ID, centre: Point, vertices: list, rotation: float = None
+        self, cnv, ID, centre: Point, vertices: list, rotation: float | None = None
     ):
         """Draw lines connecting the Hexagon centre to the centre of each edge.
 
@@ -1398,7 +1400,7 @@ class HexShape(BaseShape):
             )
 
     def draw_spikes(
-        self, cnv, ID, centre: Point, vertices: list, rotation: float = None
+        self, cnv, ID, centre: Point, vertices: list, rotation: float | None = None
     ):
         """Draw triangles extending from the centre of each edge.
 

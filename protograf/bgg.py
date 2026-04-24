@@ -139,9 +139,9 @@ class BGGGame:
 
     def __init__(
         self,
-        token: str = None,
-        game_id: int = None,
-        user: str = None,
+        token: str | None = None,
+        game_id: int | None = None,
+        user: str | None = None,
         user_game: CollectionBoardGame = None,
         short: int = 500,
     ):

@@ -869,7 +869,7 @@ class DeckOfCards:
         self,
         filename: str,
         directory: str,
-        output: str = None,
+        output: str | None = None,
         fformat: str = "png",
     ) -> list:
         """Save individual cards as PNG images using their frames."""
@@ -890,7 +890,7 @@ class DeckOfCards:
         self,
         card_names: list,
         filename: str,
-        output: str = None,
+        output: str | None = None,
         directory: str = "/tmp/demo",
         fformat: str = "png",
     ):
@@ -2431,7 +2431,9 @@ def Feedback(msg):
     feedback(msg)
 
 
-def Today(details: str = "datetime", style: str = "iso", formatted: str = None) -> str:
+def Today(
+    details: str = "datetime", style: str = "iso", formatted: str | None = None
+) -> str:
     """Return string-formatted current date / datetime in a pre-defined style
 
     Args:
@@ -4066,7 +4068,7 @@ def starline(row=None, col=None, **kwargs):
 
 
 @docstring_base
-def Text(text: str = None, row=None, col=None, **kwargs):
+def Text(text: str | None = None, row=None, col=None, **kwargs):
     """Draw a Text shape on the canvas.
 
     Args:
@@ -4089,7 +4091,7 @@ def Text(text: str = None, row=None, col=None, **kwargs):
     return text
 
 
-def text(text: str = None, row=None, col=None, **kwargs):
+def text(text: str | None = None, row=None, col=None, **kwargs):
     kwargs = margins(**kwargs)
     kwargs["row"] = row
     kwargs["col"] = col
@@ -5545,8 +5547,8 @@ def Track(track=None, **kwargs):
 
 
 def BGG(
-    token: str = None,
-    user: str = None,
+    token: str | None = None,
+    user: str | None = None,
     ids: list = None,
     progress=False,
     short=500,
