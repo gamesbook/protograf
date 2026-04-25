@@ -38,6 +38,9 @@ def validate_link_params(conn: tuple) -> list:
             True,
         )
     shape_type = conn[0].simple_name()
+    _value = ""
+    if len(conn) >= 3 and isinstance(conn[2], str):
+        _value = _lower(conn[2])
     if _lower(conn[1]) not in ["v", "vertex", "p", "perbis"]:
         feedback(
             f"A {shape_type} link's second entry must be"
@@ -46,19 +49,19 @@ def validate_link_params(conn: tuple) -> list:
         )
     if isinstance(conn[0], PolygonShape):
         dirs = validated_directions(
-            value=_lower(conn[2]),
+            value=_value,
             direction_group=DirectionGroup.POLYGONAL,
             label=f"{shape_type} link's third (direction)",
         )
     elif isinstance(conn[0], StarShape):
         dirs = validated_directions(
-            value=_lower(conn[2]),
+            value=_value,
             direction_group=DirectionGroup.STAR,
             label=f"{shape_type} link's third (direction)",
         )
     else:
         dirs = validated_directions(
-            value=_lower(conn[2]),
+            value=_value,
             direction_group=DirectionGroup.COMPASS,
             label=f"{shape_type} link's third (direction)",
         )

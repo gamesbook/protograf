@@ -147,12 +147,13 @@ def compass_to_angle(direction: str) -> tuple:
     }
     if not isinstance(direction, str):
         feedback(f'The compass bearing "{direction}" must be a string!', True)
-    compass = data.get(direction.upper(), None)
-    if compass is None:
+    if direction.upper() not in data.keys():
         feedback(f'The compass bearing "{direction}" is not valid!', True)
-    rotation = (450 - compass) % 360.0
-    # print(f'compass-angle fn: {compass=}, {rotation=}')
-    return round_tiny_float(compass), round_tiny_float(rotation)
+    compass = data.get(direction.upper(), 0.0)
+    if isinstance(compass, (int, float)):
+        rotation = (450 - compass) % 360.0
+        # print(f'compass-angle fn: {compass=}, {rotation=}')
+        return round_tiny_float(compass), round_tiny_float(rotation)
 
 
 def point_in_polygon(point: Point, vertices: List[Point], valid_border=False) -> bool:
@@ -646,9 +647,8 @@ def separation_between_hexsides(side_a: int, side_b: int) -> int:
     try:
         _side_a = 6 if (side_a % 6 == 0) else side_a % 6
         _side_b = 6 if (side_b % 6 == 0) else side_b % 6
-    except TypeError:
-        # print(f'Cannot use {side_a} and/or {side_b} as side numbers.', True)
-        return None
+    except TypeError as e:
+        raise ValueError(f"Cannot use {side_a} and/or {side_b} as side numbers.") from e
     if _side_a - _side_b > 3:
         result = (_side_b, _side_a)
     else:
@@ -695,7 +695,7 @@ def lines_intersect(a_start: Point, a_end: Point, c_start: Point, c_end: Point) 
 
 def line_intersection_point(
     p1: Point, p2: Point, p3: Point, p4: Point, intersects_primary: bool = False
-) -> Point:
+) -> Point | None:
     """Calculate intersection of two extended lines (p1-p2) and (p3-p4).
 
     Args:
@@ -754,8 +754,8 @@ def bezier_arc_segment(
 
     # Requires theta1 - theta0 <= 90 for a good approximation
     if abs(theta1 - theta0) > 90:
-        feedback("Angles must have a difference less than, or equal to, 90")
-        return None
+        feedback("Angles must have a difference less than, or equal to, 90", True)
+        return ()
     cos0 = math.cos(math.pi * theta0 / 180.0)
     sin0 = math.sin(math.pi * theta0 / 180.0)
     x0 = cx + rx * cos0
@@ -783,7 +783,7 @@ def bezier_arc_segment(
     return (x0, y0), (x1, y1, x2, y2, x3, y3)
 
 
-def circle_angles(radius: float, chord: float) -> float:
+def circle_angles(radius: float, chord: float) -> tuple:
     """Calculate interior angles of isosceles triangle formed inside a circle.
 
     Args:
@@ -913,7 +913,7 @@ def circle_intersections(
     if c2c < abs(radius1 - radius2):
         return []  # circle is contained within the other
     if c2c == 0 and radius1 == radius2:
-        return None  # coincident (infinite intersection points!)
+        return []  # coincident (infinite intersection points!)
     # intermediate values
     a = (radius1**2 - radius2**2 + c2c**2) / (2 * c2c)
     h = math.sqrt(radius1**2 - a**2)
@@ -1029,7 +1029,7 @@ def equilateral_height(side: Any) -> float:
         return math.sqrt(_side**2 - (0.5 * _side) ** 2)
     except ValueError:
         feedback("Equilateral height must be an decimal or integer number.", True)
-        return None
+        return 0.0
 
 
 def rotate_point_around_point(

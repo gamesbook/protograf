@@ -1209,7 +1209,7 @@ class LineShape(BaseShape):
         return self.geo
 
     def draw_links(
-        self, cnv=None, off_x=0, off_y=0, ID=None, shapes: list = None, **kwargs
+        self, cnv=None, off_x=0, off_y=0, ID=None, shapes: list | None = None, **kwargs
     ) -> list:
         """Draw a Line between two or more shapes."""
         if not isinstance(shapes, (list, tuple)) or len(shapes) < 2:
@@ -3941,9 +3941,9 @@ class TriangleShape(BaseShape):
         """Get vertices for a Triangle
 
                   0;n
-                   /\
-                  /  \
-            1;sw /____\ 2;se
+                   /\\
+                  /  \\
+            1;sw /____\\ 2;se
         """
         vertices = []
         if self.triangle_type == TriangleType.EQUILATERAL:

@@ -949,7 +949,7 @@ class DeckOfCards:
         """
 
         def draw_the_zones(
-            cnv, page_number: int = 0, zones: list = None
+            cnv, page_number: int = 0, zones: list | None = None
         ) -> DeckPrintState:
             """Process a list of Zones for a page
 
@@ -1576,6 +1576,7 @@ def Create(**kwargs):
     - page_grid (float): if a valid float, draw a squared grid covering the paper
       of square size equal to the value
     - cached_fonts (bool): if True, will force reload of Font cache
+    - globals_reset (bool): if True, will ignore warning for setting properties
 
     Notes:
 
@@ -1589,7 +1590,8 @@ def Create(**kwargs):
     # ---- set and confirm globals
     globals.initialize()
     if globals_set:
-        feedback("Another document is already open or initialised", True)
+        if not kwargs.get("globals_reset", False):
+            feedback("Another document is already open or initialised", True)
     globals_set = True
     # ---- units
     _units = kwargs.get("units", globals.units)
@@ -1640,7 +1642,7 @@ def Create(**kwargs):
     base_fonts()
     globals.font_size = kwargs.get("font_size", 12)
     # ---- command-line arguments
-    parser = argparse.ArgumentParser()
+    parser = argparse.ArgumentParser(exit_on_error=False)
     parser.add_argument(
         "-b", "--bggapi", help="Specify token for access to BGG API", default=""
     )
@@ -1681,10 +1683,6 @@ def Create(**kwargs):
         default=False,
         action=argparse.BooleanOptionalAction,
     )
-    globals.pargs = parser.parse_args()
-    # NB - pages does not work - see notes in PageBreak()
-    if globals.pargs.pages:
-        feedback("--pages is not yet an implemented feature - sorry!")
     # ---- filename and fallback
     _filename = kwargs.get("filename", "")
     if not _filename:
@@ -1696,12 +1694,24 @@ def Create(**kwargs):
             if _cards:
                 basename = "cards"
         _filename = f"{basename}.pdf"
-    # ---- validate directory & set filename
-    if globals.pargs.directory and not os.path.exists(globals.pargs.directory):
-        feedback(
-            f'Unable to find directory "{globals.pargs.directory}" for output.', True
-        )
-    globals.filename = os.path.join(globals.pargs.directory, _filename)
+    globals.filename = os.path.join(os.getcwd(), _filename)
+    # ---- parser args
+    try:
+        globals.pargs = parser.parse_args()
+        # NB - pages does not work - see notes in PageBreak()
+        if globals.pargs.pages:
+            feedback("--pages is not yet an implemented feature - sorry!")
+        # ---- validate directory & set filename
+        if globals.pargs.directory and not os.path.exists(globals.pargs.directory):
+            feedback(
+                f'Unable to find directory "{globals.pargs.directory}" for output.',
+                True,
+            )
+        globals.filename = os.path.join(globals.pargs.directory, _filename)
+    except SystemExit:
+        print("Ignoring ArgumentParser exit!")
+    except Exception as err:
+        globals.pargs = None
     # ---- pymupdf doc, page, shape/canvas
     globals.document = pymupdf.open()  # pymupdf.Document
     globals.doc_page = globals.document.new_page(
@@ -1724,7 +1734,7 @@ def Create(**kwargs):
     globals.archive = Archive()
     globals.css = ""
     cached_fonts = tools.as_bool(kwargs.get("cached_fonts", True))
-    if not cached_fonts or globals.pargs.fonts:
+    if not cached_fonts or (globals.pargs and globals.pargs.fonts):
         cache_directory = Path(Path.home() / CACHE_DIRECTORY)
         fi = FontInterface(cache_directory=cache_directory)
         fi.load_font_families(cached=False)
@@ -1793,7 +1803,7 @@ def Load(**kwargs):
     base_fonts()
     globals.font_size = kwargs.get("font_size", 12)
     # ---- command-line arguments
-    parser = argparse.ArgumentParser()
+    parser = argparse.ArgumentParser(exit_on_error=False)
     parser.add_argument(
         "-d", "--directory", help="Specify output directory", default=""
     )
@@ -1830,10 +1840,6 @@ def Load(**kwargs):
         default=False,
         action=argparse.BooleanOptionalAction,
     )
-    globals.pargs = parser.parse_args()
-    # NB - pages does not work - see notes in PageBreak()
-    if globals.pargs.pages:
-        feedback("--pages is not yet an implemented feature - sorry!")
     # ---- filename and fallback
     _filename = kwargs.get("filename", "")
     if not _filename:
@@ -1842,12 +1848,23 @@ def Load(**kwargs):
         if sys.argv[0]:
             basename = os.path.basename(sys.argv[0]).split(".")[0]
         _filename = f"{basename}.pdf"
-    # ---- validate directory & set filename
-    if globals.pargs.directory and not os.path.exists(globals.pargs.directory):
-        feedback(
-            f'Unable to find directory "{globals.pargs.directory}" for output.', True
-        )
-    globals.filename = os.path.join(globals.pargs.directory, _filename)
+    globals.filename = os.path.join(os.getcwd(), _filename)
+    try:
+        globals.pargs = parser.parse_args()
+        # NB - pages does not work - see notes in PageBreak()
+        if globals.pargs.pages:
+            feedback("--pages is not yet an implemented feature - sorry!")
+        # ---- validate directory & set filename
+        if globals.pargs.directory and not os.path.exists(globals.pargs.directory):
+            feedback(
+                f'Unable to find directory "{globals.pargs.directory}" for output.',
+                True,
+            )
+        globals.filename = os.path.join(globals.pargs.directory, _filename)
+    except SystemExit:
+        print("Ignoring ArgumentParser exit!")
+    except Exception as err:
+        globals.pargs = None
     # ---- Open pymupdf doc, page, shape/canvas
     if not os.path.exists(globals.filename):
         script_path = os.path.abspath(__file__)
@@ -2501,7 +2518,7 @@ def Random(end: int = 1, start: int = 0, decimals: int = 2) -> float:
 # ---- cards ====
 
 
-def Matrix(labels: list = None, data: list = None) -> list:
+def Matrix(labels: list | None = None, data: list | None = None) -> list:
     """Return list of dicts; each element is a unique combo of all the items in `data`
 
     Args:
@@ -5549,7 +5566,7 @@ def Track(track=None, **kwargs):
 def BGG(
     token: str | None = None,
     user: str | None = None,
-    ids: list = None,
+    ids: list | None = None,
     progress=False,
     short=500,
     **kwargs,

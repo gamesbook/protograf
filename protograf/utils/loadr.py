@@ -98,6 +98,7 @@ def load_googlesheet(sheet, **kwargs):
       defaults to "Sheet1"
     """
     data_list = []
+    data_dict = {}
     spreadsheet_id = sheet
     api_key = kwargs.get("api_key", None)
     if not api_key:
@@ -136,7 +137,7 @@ def load_googlesheet(sheet, **kwargs):
     return data_list
 
 
-def open_csv(filename: str | None = None, headers: list = None, selected: list = None):
+def open_csv(filename: str, headers: list | None = None, selected: list | None = None):
     """Read data from CSV file into a list of dictionaries
 
     Args:
@@ -170,7 +171,7 @@ def open_csv(filename: str | None = None, headers: list = None, selected: list =
                 if key + 1 in selected:
                     dict_list.append(item)
     except IOError:
-        feedback('Unable to find or open CSV "%s"' % csv_filename)
+        feedback('Unable to find or open CSV "%s"' % filename)
     return dict_list
 
 
@@ -179,7 +180,7 @@ def open_excel(
     sheet: int = 0,
     sheetname: str | None = None,
     cells: str | None = None,
-    headers: list = None,
+    headers: list | None = None,
 ):
     """Read data from an Excel file into a list of dictionaries
 
@@ -223,7 +224,7 @@ def open_excel(
     if file_ext == ".xls":
         return open_xls(
             filename=filename,
-            sheet=sheet,
+            sheetnumber=sheet,
             sheetname=sheetname,
             cells=cells,
             headers=headers,
@@ -231,7 +232,7 @@ def open_excel(
     elif file_ext == ".xlsx":
         return open_xlsx(
             filename=filename,
-            sheet=sheet,
+            sheetnumber=sheet,
             sheetname=sheetname,
             cells=cells,
             headers=headers,
@@ -242,17 +243,17 @@ def open_excel(
 
 def open_xlsx(
     filename: str,
-    sheet: int = 0,
+    sheetnumber: int = 0,
     sheetname: str | None = None,
     cells: str | None = None,
-    headers: list = None,
+    headers: list | None = None,
 ):
     """Read data from XLSX file into a list of dictionaries
 
     Args:
 
     - filename (str): path to the file
-    - sheet (int): select a sheet number (otherwise first is used)
+    - sheetnumber (int): select a sheet number (otherwise first is used)
     - sheetname (str): select a sheet by name (otherwise first is used)
     - headers (list): strings to use instead of the first row
     - cells (str): a range of cells delimiting data in the col:row format
@@ -300,15 +301,13 @@ def open_xlsx(
         book = load_workbook(excel_filename, data_only=True)
         if sheetname:
             sheet = book[sheetname]
-        elif sheet is not None:
-            sheet = int(sheet) - 1 if sheet > 0 else int(sheet)
-            _sheetname = book.sheetnames[sheet]
+        elif sheetnumber is not None:
+            _sheet = int(sheetnumber) - 1 if sheetnumber > 0 else int(sheetnumber)
+            _sheetname = book.sheetnames[_sheet]
             sheet = book[_sheetname]
         else:
-            feedback(
-                f'Access to Excel file "{filename}" requires either the sheet number or the sheet name!',
-                True,
-            )
+            _sheetname = book.sheetnames[0]
+            sheet = book[_sheetname]
         start = 1
 
         max_cols = maximum_columns(sheet)
@@ -351,27 +350,27 @@ def open_xlsx(
                     }
                     dict_list.append(item)
     except IOError:
-        feedback('Unable to find or open Excel "%s"' % excel_filename)
+        feedback('Unable to find or open Excel file "%s"' % filename)
     except IndexError:
-        feedback('Unable to open sheet "%s"' % (sheet or sheetname))
+        feedback('Unable to open sheet "%s"' % (sheetnumber or sheetname))
     except Exception:
-        feedback('Unable to open or process sheet "%s"' % (sheet or sheetname))
+        feedback('Unable to open or process sheet "%s"' % (sheetnumber or sheetname))
     return dict_list
 
 
 def open_xls(
     filename: str,
-    sheet: int = 0,
+    sheetnumber: int = 0,
     sheetname: str | None = None,
     cells: str | None = None,
-    headers: list = None,
+    headers: list | None = None,
 ):
     """Read data from XLS file into a list of dictionaries
 
     Args:
 
     - filename (str): path to the file
-    - sheet (int): select a sheet number (otherwise first is used)
+    - sheetnumber (int): select a sheet number (otherwise first is used)
     - sheetname (str): select a sheet by name (otherwise first is used)
     - headers (list): strings to use instead of the first row
     - cells (str): a range of cells delimiting data in the col:row format
@@ -402,11 +401,10 @@ def open_xls(
     try:
         excel_filename = _file_with_path or norm_filename
         book = xlrd.open_workbook(excel_filename)
-        if sheet:
-            sheet = sheet - 1
-            sheet = book.sheet_by_index(sheet)
-        elif sheetname:
+        if sheetname:
             sheet = book.sheet_by_name(sheetname)
+        elif sheetnumber:
+            sheet = book.sheet_by_index(sheetnumber)
         else:
             sheet = book.sheet_by_index(0)
         start = 1
@@ -439,9 +437,11 @@ def open_xls(
                     }
                     dict_list.append(item)
     except IOError:
-        feedback('Unable to find or open Excel "%s"' % excel_filename)
+        feedback('Unable to find or open Excel file "%s"' % filename)
     except IndexError:
-        feedback('Unable to open sheet "%s"' % (sheet or sheetname))
+        feedback('Unable to open or process sheet "%s"' % (sheetnumber or sheetname))
     except xlrd.biffh.XLRDError:
-        feedback('Unable to open sheet "%s"' % sheetname)
+        feedback(
+            'Unable to open open or process sheet "%s"' % (sheetnumber or sheetname)
+        )
     return dict_list

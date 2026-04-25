@@ -8,7 +8,7 @@ from collections import namedtuple
 from dataclasses import dataclass
 from enum import Enum
 import logging
-from typing import List
+from typing import Any, List, NamedTuple
 
 # third-party
 from jinja2 import Template
@@ -85,8 +85,10 @@ Bounds = namedtuple(
     ],
 )
 
+"""
 cb_fields = ("fill", "offset_x", "offset_y", "offset_radius")
 CardBleed = namedtuple("CardBleed", cb_fields, defaults=(None,) * len(cb_fields))
+"""
 
 # ---- * CrossParts
 CrossParts = namedtuple(
@@ -156,8 +158,8 @@ LookupType = namedtuple("LookupType", ["column", "lookups"])
 
 Link = namedtuple("Link", ["a", "b", "style"])
 
-# ---- * Locale
-fields = (
+"""
+locale_fields = (
     "col",
     "row",
     "x",
@@ -172,7 +174,8 @@ fields = (
     "label",
     "page",
 )
-Locale = namedtuple("Locale", fields, defaults=(None,) * len(fields))
+OldLocale = namedtuple("Locale", locale_fields, defaults=(None,) * len(locale_fields))
+"""
 
 OffsetProperties = namedtuple(
     "OffsetProperties",
@@ -184,8 +187,7 @@ OffsetProperties = namedtuple(
     ],
 )
 
-
-# ---- * ClockGeometry
+"""
 clockgeometry_fields = (
     "h1",
     "h2",
@@ -203,8 +205,9 @@ clockgeometry_fields = (
 ClockGeometry = namedtuple(
     "ClockGeometry", clockgeometry_fields, defaults=(None,) * len(clockgeometry_fields)
 )
+"""
 
-# ---- * ShapeGeometry
+"""
 # N = 90, W = 180, S = 270, E = 0
 # NE = 45, NW = 135, SW = 225, SE = 315
 # NNW =
@@ -250,9 +253,10 @@ shapegeometry_fields = (
     "shapetype",
     "name",
 )
-ShapeGeometry = namedtuple(
+OldShapeGeometry = namedtuple(
     "ShapeGeometry", shapegeometry_fields, defaults=(None,) * len(shapegeometry_fields)
 )
+"""
 
 # ----  PAGEMARGINS
 # base margins are in user units
@@ -357,6 +361,107 @@ UnitProperties = namedtuple(
         "offset_y",
     ],
 )
+
+# ---- NAMEDTUPLE CLASS
+
+
+class CardBleed(NamedTuple):
+    """Attributes for setting bleed color and extent around a Card"""
+
+    fill: Any | None = None
+    offset_x: float | None = None
+    offset_y: float | None = None
+    offset_radius: float | None = None
+
+
+class ClockGeometry(NamedTuple):
+    """Clock-hour locations on the circumference of a Circle"""
+
+    h1: Point | None = None
+    h2: Point | None = None
+    h3: Point | None = None
+    h4: Point | None = None
+    h5: Point | None = None
+    h6: Point | None = None
+    h7: Point | None = None
+    h8: Point | None = None
+    h9: Point | None = None
+    h10: Point | None = None
+    h11: Point | None = None
+    h12: Point | None = None
+
+
+class Locale(NamedTuple):
+    """Key values and spatial attributes of a Locale
+
+    Note:
+        * Typically used for a grid-like or cell location
+    """
+
+    col: int | None = None
+    row: int | None = None
+    x: float | None = None
+    y: float | None = None
+    xy: Point | None = None
+    cxy: Point | None = None
+    height: float | None = None
+    width: float | None = None
+    id: int | None = None
+    sequence: int | None = None
+    corner: bool = False
+    label: str | None = None
+    page: int | None = None
+
+
+class ShapeGeometry(NamedTuple):
+    """Key points and spatial attributes of a Shape
+
+    # N = 90, W = 180, S = 270, E = 0
+    # NE = 45, NW = 135, SW = 225, SE = 315
+    # NNW =
+    """
+
+    # points
+    centre: Point | None = None
+    center: Point | None = None
+    c: Point | None = None
+    n: Point | None = None
+    s: Point | None = None
+    e: Point | None = None
+    w: Point | None = None
+    ne: Point | None = None
+    se: Point | None = None
+    nw: Point | None = None
+    sw: Point | None = None
+    nnw: Point | None = None
+    nne: Point | None = None
+    sse: Point | None = None
+    ssw: Point | None = None
+    wnw: Point | None = None
+    ene: Point | None = None
+    ese: Point | None = None
+    wsw: Point | None = None
+    v: list | None = None
+    vertices: list | None = None
+    p: Point | None = None
+    perbii: list | None = None
+    # lengths
+    radius: float | None = None
+    diameter: float | None = None
+    side: float | None = None
+    length: float | None = None
+    width: float | None = None
+    height: float | None = None
+    perimeter: float | None = None
+    # other
+    area: float | None = None
+    sides: int | None = None  # e.g. for a regular Polygon
+    # meta
+    t: str | None = None
+    type: str | None = None
+    shapetype: str | None = None
+    name: str | None = None
+
 
 # ---- DATACLASS
 

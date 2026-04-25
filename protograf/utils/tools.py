@@ -4,6 +4,7 @@ General purpose utility functions for protograf
 """
 
 # lib
+from collections.abc import Iterable
 import collections
 import copy
 from functools import lru_cache
@@ -16,6 +17,7 @@ import re
 import string
 from string import ascii_uppercase, digits
 import sys
+from typing import Any, LiteralString, cast
 from urllib.parse import urlparse
 
 # third-party
@@ -52,7 +54,7 @@ __alpha_to_decimal = {letter: pos for pos, letter in enumerate(ascii_uppercase, 
 __powers = (1, 26, 676)
 
 
-def script_path():
+def script_path() -> str | Path:
     """Get the path for a script being called from command line.
 
     Doc Test:
@@ -64,6 +66,7 @@ def script_path():
     fname = os.path.abspath(sys.argv[0])
     if fname:
         return pathlib.Path(fname).resolve().parent
+    return ""
 
 
 def grouper(n, iterable, fillvalue=None):
@@ -180,6 +183,7 @@ def _p2v(value: Point, decimals: int = 4) -> tuple:
             f'Unable to do units conversion from "{value}" using {globals.units}!',
             True,
         )
+    return (0.0, 0.0)
 
 
 def as_int(
@@ -188,7 +192,7 @@ def as_int(
     maximum: int | None = None,
     minimum: int | None = None,
     allow_none: bool = False,
-) -> int:
+) -> int | None:
     """Convert a value to an int
 
     Args:
@@ -215,7 +219,7 @@ def as_int(
     # FEEDBACK:: The N value "3.1" is not a valid integer!
     """
     if value is None or value == "" and allow_none:
-        return value
+        return None
     _label = f"{label} value " if label else "value "
     try:
         the_value = int(value)
@@ -234,7 +238,7 @@ def as_int(
         feedback(f'The {_label}"{value}" is not a valid integer!!', True)
 
 
-def as_bool(value, allow_none: bool = True) -> bool:
+def as_bool(value, allow_none: bool = True) -> bool | None:
     """Convert a value to a Boolean
 
     Args:
@@ -269,6 +273,7 @@ def as_float(
     maximum: float | None = None,
     minimum: float | None = None,
     stop: bool = True,
+    default: float = 0.0,
 ) -> float:
     """Set a value to an float; or end program if an invalid value and stop is True
 
@@ -279,6 +284,7 @@ def as_float(
     - maximum (float): the upper allowed value for the conversion
     - lower (float): the lower allowed value for the conversion
     - stop (bool): if True, halt program and display error message
+    - default (float): default value to return
 
     Doc Test:
 
@@ -312,8 +318,7 @@ def as_float(
     except (ValueError, Exception):
         if stop:
             feedback(f'The value "{value}"{_label} is not a valid float number!', True)
-        else:
-            return None
+    return default
 
 
 def as_point(value) -> list | Point:
@@ -327,7 +332,7 @@ def as_point(value) -> list | Point:
     [Point(x=1, y=2), Point(x=3, y=4)]
     """
     if value is None:
-        return None
+        return []
     if isinstance(value, tuple):
         return Point(value[0], value[1])
     if isinstance(value, list):
@@ -371,6 +376,7 @@ def compass_to_rotation(value: str) -> float:
             return 315
         case _:
             feedback(f'Compass direction "{value}" is not valid!', True)
+            return 0
 
 
 def tuple_split(
@@ -526,6 +532,7 @@ def sequence_split(
         pass
 
     # multi-values
+    _strings = []
     try:
         _strings = _string.split(sep)
     except AttributeError:
@@ -763,7 +770,7 @@ def splitq(seq, sep=None, pairs=("()", "[]", "{}"), quote="\"'"):
             yield seq[start:]
 
 
-def flatten(lst: list):
+def flatten(lst: Iterable):
     """Flatten nested lists into a single list
 
     Doc Test:
@@ -773,7 +780,7 @@ def flatten(lst: list):
     """
     try:
         for ele in lst:
-            if isinstance(ele, collections.abc.Iterable) and not isinstance(ele, str):
+            if isinstance(ele, Iterable) and not isinstance(ele, str):
                 for sub in flatten(ele):
                     yield sub
             else:
@@ -1013,7 +1020,7 @@ def integer_pair_to_cell(row: int, col: int) -> str:
 
     >>> print(integer_pair_to_cell(0, 0))
     A1
-    print(integer_pair_to_cell(10, 27))
+    >>> print(integer_pair_to_cell(10, 27))
     AB11
     """
     column_str = ""
@@ -1045,19 +1052,20 @@ def column_from_string(col: str) -> int:
     if len(col) > 3:
         raise ValueError(error_msg)
     idx = 0
-    col = reversed(col.upper())
-    for letter, power in zip(col, __powers):
+    _col = reversed(col.upper())
+    for letter, power in zip(list(_col), __powers):
         try:
-            pos = __alpha_to_decimal[letter]
+            pos = __alpha_to_decimal.get(cast(LiteralString, letter))
         except KeyError:
             raise ValueError(error_msg)
-        idx += pos * power
+        if pos is not None:
+            idx += pos * power
     if not 0 < idx < 18279:
         raise ValueError(error_msg)
     return idx
 
 
-def coordinate_to_tuple(coordinate: str, zeroed: bool = False) -> tuple:
+def coordinate_to_tuple(coordinate: str, zeroed: bool = False) -> tuple | None:
     """Convert Excel style coordinate to 1-based (column, row) tuple
 
     Args:
@@ -1155,6 +1163,7 @@ def get_font_by_name(fonts_name: object) -> tuple:
     elif isinstance(fonts_name, (tuple, list)):
         font_names = fonts_name
     else:
+        font_names = []
         feedback("Font name must be a string or a list of strings!", True)
 
     for font_name in font_names:
@@ -1229,6 +1238,7 @@ def base_fonts():
     ]
     missing = []
     for ffont in fonts:
+        name = ""
         try:
             name = ffont["name"]
             register_font(name)
@@ -1243,7 +1253,7 @@ def base_fonts():
         feedback(f"Unable to register the MS font(s): {names}", False, True)
 
 
-def eval_template(strng: str, data: dict = None, label: str = ""):
+def eval_template(strng: str, data: dict | None = None, label: str = ""):
     """Process data dict via jinja2 template in source.
 
     Doc Test:
@@ -1280,7 +1290,7 @@ def valid_directions(
     direction_group: DirectionGroup,
     label: str = "",
     vertex_count: int = 0,
-) -> list:
+) -> dict | set:
     """."""
     match direction_group:
         case DirectionGroup.CARDINAL:
@@ -1404,6 +1414,7 @@ def validated_gridlines(
         f"one of the valid directions {valid}!",
         True,
     )
+    return []
 
 
 def validated_directions(
@@ -1470,13 +1481,14 @@ def validated_directions(
             values_set = set(values)
     if values_set.issubset(valid) or not vertex_count:
         # NOTE in some cases, we need to ignore `vertex_count` because not yet known...
-        return values
+        return list(values)
     _label = f"the {label} value" if label else f'"{value}"'
     feedback(
         f'Cannot use {_label} "{value}" - it must correspond with '
         f"the valid directions {valid}!",
         True,
     )
+    return []
 
 
 def transpose_lists(
@@ -1624,15 +1636,17 @@ def restore_globals(doc: GlobalDocument):
     globals.page_grid = doc.page_grid
 
 
-def unit(item, units: str | None = None, skip_none: bool = False, label: str = ""):
+def unit(
+    item, units: str | None = None, skip_none: bool = False, label: str = ""
+) -> float:
     """Convert an item into the appropriate unit system."""
     log.debug("units %s :: label: %s", units, label)
     if item is None and skip_none:
-        return None
-    units = to_units(units) if units is not None else globals.units
+        return 0.0
+    _units = to_units(units) if units is not None else globals.units
     try:
         _item = as_float(item, label)
-        return _item * units
+        return _item * _units
     except (TypeError, ValueError):
         _label = f" {label}" if label else ""
         feedback(
@@ -1640,6 +1654,7 @@ def unit(item, units: str | None = None, skip_none: bool = False, label: str = "
             " Please check that this is a valid value.",
             stop=True,
         )
+    return 0.0
 
 
 def points(item, units: str | None = None, skip_none: bool = False, label: str = ""):
@@ -1647,10 +1662,11 @@ def points(item, units: str | None = None, skip_none: bool = False, label: str =
     log.debug("units %s :: label: %s", units, label)
     if item is None and skip_none:
         return None
-    units = to_units(units) if units is not None else globals.units
+    _units = to_units(units) if units is not None else globals.units
     try:
         _item = as_float(item, label)
-        return _item / units
+        if _item is not None and _units is not None:
+            return _item / _units
     except (TypeError, ValueError):
         _label = f" {label}" if label else ""
         feedback(
@@ -1685,7 +1701,7 @@ def get_pymupdf_props(
           In this case, the color parameter is ignored.
     """
 
-    def ext(prop):
+    def ext(prop) -> str:
         if isinstance(prop, str):
             return prop
         try:
@@ -1739,9 +1755,9 @@ def get_pymupdf_props(
     _dashed = ext(dashed) or ext(defaults.get("dashed"))
     if _dotted:
         the_stwd = (
-            round(ext(stroke_width))
+            round(stroke_width)
             if stroke_width
-            else round(ext(defaults.get("stroke_width")))
+            else round(defaults.get("stroke_width", 0.1))
         )
         the_stwd = max(the_stwd, 1)
         dashes = f"[{the_stwd} {the_stwd}] 0"
@@ -1832,6 +1848,7 @@ def get_font_file(fonts_name: object) -> tuple:
     elif isinstance(fonts_name, list):
         font_names = fonts_name
     else:
+        font_names = []
         feedback("Font name must be a string or a list of strings!", True)
     for name in font_names:
         _font_name = str(name).strip()
@@ -1850,14 +1867,14 @@ def get_font_file(fonts_name: object) -> tuple:
                 else:
                     _file = fi.get_font_file(fonts_name, fullpath=False)
                     font_path, css = fi.font_file_css(_name)
-                    if css not in globals.css:
+                    if css not in globals.css and css is not None:
                         globals.css += css + "\n"
                     globals.archive.add(font_path)
                     return _name, font_path, _file
     return _name, font_path, _file
 
 
-def card_size(card_size: str, units: str = "pt") -> tuple:
+def card_size(card_size: str, units: str = "pt") -> tuple | None:
     """Return card width and height in requested units for a named size.
 
     Doc Test:
@@ -1900,7 +1917,7 @@ def card_size(card_size: str, units: str = "pt") -> tuple:
     return size
 
 
-def paper_size(paper_size: str, units: str = "pt") -> tuple:
+def paper_size(paper_size: str, units: str = "pt") -> tuple | None:
     """Return paper width and height in requested units for a named size.
 
     Doc Test:
@@ -1921,6 +1938,7 @@ def paper_size(paper_size: str, units: str = "pt") -> tuple:
         return PAPER_SIZES[paper_size][units]
     except KeyError:
         feedback(f'Paper size "{paper_size}" in "{units}" is unavailable.', True)
+    return None
 
 
 def uniques(key: str) -> list:
@@ -1928,14 +1946,26 @@ def uniques(key: str) -> list:
 
     Args:
         key (str): a key in each dict in the list of dicts
+
+    Doc Test:
+
+    >>> uniques(None)
+    []
+    >>> uniques('')
+    []
+    >>> uniques('test')
+    []
     """
     if not key:
         return []
     unique_values = set()
-    for d in globals.dataset:
-        if key in d:
-            unique_values.add(d[key])
-    return unique_values
+    try:
+        for d in globals.dataset:
+            if key in d:
+                unique_values.add(d[key])
+    except AttributeError:
+        pass
+    return list(unique_values)
 
 
 def html_img(text: str) -> str:

@@ -49,6 +49,7 @@ def cairo_pentagon_snail(interval: float, facing: str) -> str:
     degA, degC = 114.2952, 131.4096
     side = interval / (0.5 + math.sqrt(7 / 4))
     half = side / 2.0
+    start = ""
     if not facing or not isinstance(facing, str):
         feedback("The cairo_pentagon_snail() facing must a valid string!", True)
     match facing.lower():
@@ -191,7 +192,7 @@ def letters(start: str = "a", stop: str = "z", step: int = 1):
     return list(gen())
 
 
-def roman(value: int, is_real=True) -> str:
+def roman(value: int, is_real=True) -> str | None:
     """Convert an integer to a Roman number
 
     Args:
@@ -285,31 +286,31 @@ def steps(start, end, step=1, is_real=True) -> list:
         _ = float(start)
     except Exception:
         feedback(f'A start value of "{start}" is not a valid number', is_real)
-        return None
+        return []
     try:
         _ = float(end)
     except Exception:
         feedback(f'An end value of "{end}" is not a valid number', is_real)
-        return None
+        return []
     try:
         _ = float(step)
     except Exception:
         feedback(f'A step value of "{step}" is not a valid number', is_real)
-        return None
+        return []
     if step == 0:
         feedback(f'An step value of "{step}" is not valid', is_real)
-        return None
+        return []
     if end < start and step > 0:
         feedback(
             f'End value of "{end}" must be greater than start value of "{start}"',
             is_real,
         )
-        return None
+        return []
     if start < end and step < 0:
         feedback(
             f'End value of "{end}" must be less than start value of "{start}"', is_real
         )
-        return None
+        return []
 
     result, current = [], start
     while True:
@@ -336,7 +337,7 @@ def steps(start, end, step=1, is_real=True) -> list:
 #     return string.split(delim)
 
 
-def to_int(value: Any, name: str = "", fail: bool = True) -> int:
+def to_int(value: Any, name: str = "", fail: bool = True) -> int | None:
     """Convert value to an integer.
 
     Args:
@@ -370,7 +371,7 @@ def to_int(value: Any, name: str = "", fail: bool = True) -> int:
         return None
 
 
-def to_float(value: Any, name: str = "", fail: bool = True) -> float:
+def to_float(value: Any, name: str = "", fail: bool = True) -> float | None:
     """Convert value to a float.
 
     Args:
@@ -404,7 +405,7 @@ def to_float(value: Any, name: str = "", fail: bool = True) -> float:
         return None
 
 
-def to_units(value):
+def to_units(value: Any) -> float | int:
     """Convert a named unit to a numeric points equivalent"""
     if not isinstance(value, (int, float)):
         match value:
@@ -417,7 +418,7 @@ def to_units(value):
             case "mm" | "millimetre" | "mms" | "millimetres":
                 numeric_units = unit.mm
             case _:
-                numeric_units = None
+                numeric_units = unit.mm
                 feedback(
                     f'Cannot recognise "{value}" as valid units -'
                     " use mm, cm, inch or pt",
@@ -428,7 +429,7 @@ def to_units(value):
     return numeric_units
 
 
-def excel_column(value: int = 1):
+def excel_column(value: int = 1) -> str:
     """Convert a number into an Excel column letter.
 
     Ref:
@@ -493,7 +494,7 @@ def pdf_export(
     filename: str,
     fformat: ExportFormat,
     dpi: int = 300,
-    names: list = None,
+    names: list | None = None,
     directory: str | None = None,
     framerate: float = 1.0,
 ):
@@ -541,7 +542,7 @@ def pdf_export(
             feedback(
                 f'The names setting "{names}" must be a list of names.', False, True
             )
-            names = None
+            names = []
         _names = [name for name in names if name is not None]
         if len(_names) != len(list(set(_names))):
             feedback(
@@ -555,7 +556,8 @@ def pdf_export(
 
         if fformat == ExportFormat.SVG:
             # ---- save pages as .svg files
-            for pg_number, page in enumerate(doc):
+            for pg_number in range(0, pages):
+                page = doc.load_page(pg_number)
                 svg = page.get_svg_image(matrix=Identity)
                 if names and pg_number < len(names):
                     if names[pg_number] is not None:
@@ -572,10 +574,11 @@ def pdf_export(
                     with open(fname, "w") as _file:
                         _file.write(svg)  # store image as a SVG
 
+        all_pngs = []  # track full and final name of each saved .png
         if fformat in [ExportFormat.GIF, ExportFormat.PNG]:
             # ---- save pages as .png files
-            all_pngs = []  # track full and final name of each saved .png
-            for pg_number, page in enumerate(doc):
+            for pg_number in range(0, pages):
+                page = doc.load_page(pg_number)
                 pix = page.get_pixmap(dpi=dpi)
                 if names and pg_number < len(names):
                     if names[pg_number] is not None:
@@ -601,12 +604,13 @@ def pdf_export(
             gif_name = os.path.join(dirname, f"{basename}.gif")
             for _filename in all_pngs:
                 images.append(imageio.imread(_filename))
-            imageio.mimsave(
-                gif_name,
-                images,
-                duration=framerate * 1000,
+            imageio.mimwrite(
+                uri=gif_name,
+                ims=images,
+                # format='gif',
+                duration=framerate * 1000,  # list of values varies speed per frame
                 optimize=True,
-                loop=0,  # keep looping
+                loop=0,  # keeps looping
             )  # ms -> sec
             for _filename in all_pngs:
                 if os.path.isfile(_filename):
@@ -621,7 +625,7 @@ def pdf_frames_to_png(
     fformat: str = "png",
     dpi: int = 300,
     directory: str | None = None,
-    frames: dict = None,
+    frames: dict | None = None,
 ) -> list:
     """Extract framed areas from PDF as PNG image(s).
 
@@ -654,6 +658,8 @@ def pdf_frames_to_png(
     inames = []  # list of image filenames
     if frames:
         feedback("Saving frames(s) as image file(s)...", False)
+    else:
+        frames = {}
     _source = os.path.basename(source_file)
     _output = output or source_file  # default to same as input name
     _filename = os.path.basename(_output)
