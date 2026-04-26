@@ -44,8 +44,8 @@ package_logger = logging.getLogger("fontTools")
 package_logger.setLevel(logging.ERROR)
 
 # local
-from .support import BUILT_IN_FONTS
-from .messaging import feedback
+from protograf.utils.support import BUILT_IN_FONTS
+from protograf.utils.messaging import feedback
 
 
 def builtin_font(name: str) -> Union[str, None]:

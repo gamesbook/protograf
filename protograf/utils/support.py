@@ -263,16 +263,22 @@ def steps(start, end, step=1, is_real=True) -> list:
 
     >>> steps('a', 'b', is_real=False)
     FEEDBACK:: A start value of "a" is not a valid number
+    []
     >>> steps(1, 'b', is_real=False)
     FEEDBACK:: An end value of "b" is not a valid number
+    []
     >>> steps(1, 2, 'c', is_real=False)
     FEEDBACK:: A step value of "c" is not a valid number
+    []
     >>> steps(2, 1, is_real=False)
     FEEDBACK:: End value of "1" must be greater than start value of "2"
+    []
     >>> steps(1, 2, -1, is_real=False)
     FEEDBACK:: End value of "2" must be less than start value of "1"
+    []
     >>> steps(2, 1, 0, is_real=False)
     FEEDBACK:: An step value of "0" is not valid
+    []
     >>> steps(1, 3, is_real=False)
     [1, 2, 3]
     >>> steps(1, 3, 2, is_real=False)

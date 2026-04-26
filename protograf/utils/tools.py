@@ -17,7 +17,7 @@ import re
 import string
 from string import ascii_uppercase, digits
 import sys
-from typing import Any, LiteralString, cast
+from typing import Any, LiteralString, cast, Dict
 from urllib.parse import urlparse
 
 # third-party
@@ -710,10 +710,11 @@ def integer_pairs(pairs, label: str = "list") -> list:
     return []
 
 
-def splitq(seq, sep=None, pairs=("()", "[]", "{}"), quote="\"'"):
-    """Split sequence by separator but considering parts inside pairs or quoted
-       as unbreakable pairs have different start and end value, quote have same
-       symbol in beginning and end.
+def splitq(seq, seps: str | None = None, pairs: str = "()[]{}<>", quotes: str = "'\""):
+    """
+    Split sequence by separator but considering parts inside pairs or quoted
+    as unbreakable; ppairs have different start and end value; quote has same
+    symbol in beginning and end.
 
     Notes:
         * Use itertools.islice if only part of splits is needed
@@ -721,53 +722,51 @@ def splitq(seq, sep=None, pairs=("()", "[]", "{}"), quote="\"'"):
     Source:
         https://www.daniweb.com/programming/software-development/code/426990/\
         split-string-except-inside-brackets-or-quotes
+        -> but using the split_outside() function NOT the original with errors
 
     Doc Test:
 
-    >>> # TODO
+    >>> result = splitq("Hello, (Tony Jarkko) This ('is') quoted Great to 'split'   {this split}'Also Quoted part' [test test] end ")
+    >>> print(list(result))
+    ['Hello,', '(Tony Jarkko)', 'This', "('is')", 'quoted', 'Great', 'to', "'split'", "{this split}'Also Quoted part'", '[test test]', 'end']
     """
-    if not seq:
-        yield []
-    else:
-        lsep = len(sep) if sep is not None else 1
-        lpair, _ = zip(*pairs)
-        pairs = dict(pairs)
-        start = index = 0
-        while 0 <= index < len(seq):
-            sdx = seq[index]
-            if (sep and seq[index:].startswith(sep)) or (sep is None and sdx.isspace()):
-                yield seq[start:index]
-                # pass multiple separators as single one
-                if sep is None:
-                    index = len(seq) - len(seq[index:].lstrip())
-                else:
-                    while sep and seq[index:].startswith(sep):
-                        index = index + lsep
-                start = index
-            elif sdx in quote:
-                index += 1
-                p, index = index, seq.find(sdx, index) + 1
-                if not index:
-                    raise IndexError("Unmatched quote %r\n%i:%s" % (sdx, p, seq[:p]))
-            elif sdx in lpair:
-                nesting = 1
-                while True:
-                    index += 1
-                    p, index = index, seq.find(pairs[sdx], index)
-                    if index < 0:
-                        raise IndexError(
-                            "Did not find end of pair for %r: %r\n%i:%s"
-                            % (sdx, pairs[sdx], p, seq[:p])
-                        )
-                    nesting += "{lpair}({inner})".format(
-                        lpair=sdx, inner=splitq(seq[p:index].count(sdx) - 2)
-                    )
-                    if not nesting:
-                        break
+    closers = {pairs[i + 1]: pairs[i] for i in range(0, len(pairs), 2)}
+    openers = set(closers.values())
+    sep = None if seps is None else set(seps)
+    stack, buf, q = [], [], None
+    for i, ch in enumerate(seq):
+        if q:
+            buf.append(ch)
+            if ch == q and (i == 0 or seq[i - 1] != "\\"):
+                q = None
+        elif ch in quotes:
+            q = ch
+            buf.append(ch)
+        elif ch in openers:
+            stack.append(ch)
+            buf.append(ch)
+        elif ch in closers:
+            if not stack or stack.pop() != closers[ch]:
+                raise ValueError(
+                    f"Did not find end of pair for '{closers.get(ch, '?')}': '{ch}'"
+                )
+            buf.append(ch)
+        else:
+            is_sep = (sep is None and ch.isspace()) or (sep is not None and ch in sep)
+            if is_sep and not stack:
+                if buf:
+                    yield "".join(buf).strip()
+                    buf = []
             else:
-                index += 1
-        if seq[start:]:
-            yield seq[start:]
+                buf.append(ch)
+    if q:
+        raise ValueError("Did not find end of quote.")
+    if stack:
+        opener = stack[-1]
+        expected = next(c for c, o in closers.items() if o == opener)
+        raise ValueError(f"Did not find end of pair for '{opener}': '{expected}'")
+    if buf:
+        yield "".join(buf).strip()
 
 
 def flatten(lst: Iterable):
@@ -878,21 +877,21 @@ def list_ordering(
     return base
 
 
-def comparer(val: str, operator: str, target: str | list) -> bool:
+def comparer(val: Any, operator: str, target: Any) -> bool:
     """Compare value with a target.
 
     Args:
 
     - val (str): the value to be checked
     - operator (str): one of - < | > | ~ | *
-    - target: a single value or a list of values; a list the operator must be a ~
+    - target: a single value or a list of values; for a list the operator must be a ~
 
     Doc Test:
 
     >>> comparer(None, None, None)
     True
     >>> comparer("1", '*', "1")
-    FEEDBACK:: Unknown operator: * (1.0 and 1.0)
+    FEEDBACK:: Unknown operator: * (1 and 1)
     False
     >>> comparer("1", None, "1")
     True
@@ -911,16 +910,45 @@ def comparer(val: str, operator: str, target: str | list) -> bool:
     >>> comparer("False", '<', "False")
     False
     >>> comparer("1", '~', "1.1")
+    FEEDBACK:: Invalid operator for numbers: ~ (1.0 and 1.1)
     False
     >>> comparer("a", '~', "aa")
     True
     >>> comparer("True", '~', "True")
+    FEEDBACK:: Invalid operator for numbers: ~ (1.0 and 1.0)
     False
     >>> comparer("False", '~', "False")
+    FEEDBACK:: Invalid operator for numbers: ~ (0.0 and 0.0)
     False
     >>> comparer("1", '~', [1,2,3])
     True
+    >>> comparer("1.1", '~', [1.1,2,3])
+    True
     """
+
+    def compare_numbers(val: int | float, target: int | float, operator: str) -> bool:
+        if operator == "=":
+            if val == target:
+                return True
+        elif operator == "<":
+            if val < target:
+                return True
+        elif operator == ">":
+            if val > target:
+                return True
+        elif operator == ">=":
+            if val >= target:
+                return True
+        elif operator == "<=":
+            if val <= target:
+                return True
+        elif operator == "!=":
+            if val != target:
+                return True
+        else:
+            feedback(f"Invalid operator for numbers: {operator} ({val} and {target})")
+            return False
+        return False
 
     def to_length(val, target):
         """Get length of object."""
@@ -947,41 +975,37 @@ def comparer(val: str, operator: str, target: str | list) -> bool:
         operator = "="
     if operator in ["<", "<=", ">", ">="]:
         val, target = to_length(val, target)
+    elif operator not in ["=", "~"]:
+        feedback(f"Unknown operator: {operator} ({val} and {target})")
+        return False
 
     try:
-        val = float(val)
+        _val = float(val)
+        _target = float(target)
+        result = compare_numbers(_val, _target, operator)
+        return result
     except Exception:
         pass
-    try:
-        target = float(target)
-    except Exception:
-        pass
+
     if operator == "=":
         if val == target:
+            return True
+    elif operator == "!=":
+        if val != target:
             return True
     elif operator in ["~", "in"]:
         try:
             if val in target:
                 return True
-        except TypeError:
+            if float(val) in target:
+                return True
+            if int(val) in target:
+                return True
+        except (ValueError, TypeError):
             pass
-    elif operator == "!=":
-        if val != target:
-            return True
-    elif operator == "<":
-        if val < target:
-            return True
-    elif operator == ">":
-        if val > target:
-            return True
-    elif operator == ">=":
-        if val >= target:
-            return True
-    elif operator == "<=":
-        if val <= target:
-            return True
     else:
-        feedback(f"Unknown operator: {operator} ({val} and {target})")
+        pass
+
     return False
 
 

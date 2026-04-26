@@ -25,7 +25,7 @@ else
     SAMPEX = ./all.sh
 endif
 
-.PHONY: help setup install format lint test docs examplez samples delete
+.PHONY: help setup install format lint tests docs examplez samples delete
 
 # Show this help message
 help:
@@ -52,11 +52,20 @@ lint:
 	uv run black --target-version py313 --check $(SRC)
 	# uv run pyrefly check --python-version $(PYTHON) $(SRC)
 
-# Run tests using pytest
-test:
+# Run tests
+tests:
 	@echo "Running pytest tests"
 	uv run pytest tests
-    # python protograf/utils/tools.py
+	@echo "Running doc tests"
+	python protograf/utils/tools.py
+	python protograf/utils/colrs.py
+	python protograf/utils/connections.py
+	python protograf/utils/fonts.py
+	python protograf/utils/lazy.py
+	python protograf/utils/loadr.py
+	python protograf/utils/messaging.py
+	python protograf/utils/support.py
+	python protograf/utils/geoms.py
 
 # Build documentation
 docs:
