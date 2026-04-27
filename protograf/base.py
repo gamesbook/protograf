@@ -59,6 +59,7 @@ from protograf.utils.structures import (
     OffsetProperties,
     Point,
     LookupType,
+    ShapeGeometry,
     TemplatingType,
     UnitProperties,
 )
@@ -1534,6 +1535,16 @@ class BaseShape:
             return cshape_name.replace("Shape", "")
         except:
             return "Shape"
+
+    @property
+    def geo(self) -> ShapeGeometry:
+        """Geometry of BaseShape in user units; set properties in child class"""
+        return ShapeGeometry()
+
+    @property
+    def geometry(self) -> ShapeGeometry:
+        """Geometry of BaseShape - alias for geo."""
+        return self.geo
 
     def kw_float(self, value, label: str = ""):
         return tools.as_float(value, label) if value is not None else value

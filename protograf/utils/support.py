@@ -13,6 +13,7 @@ from typing import Any
 
 # third-party
 import imageio
+import numpy as np
 import pymupdf
 from pymupdf import Rect as muRect, Identity
 from pymupdf.utils import getColorInfoList
@@ -601,7 +602,7 @@ def pdf_export(
                         iname = os.path.join(dirname, f"{basename}.png")
                         all_pngs.append(iname)  # track for GIF creation
                     pix.save(iname)
-        # ---- assemble .png into .gif
+        # ---- assemble .png files into .gif
         if fformat == ExportFormat.GIF and framerate > 0:
             feedback(
                 f'Converting PNG image file(s) from "{filename}" into a GIF...', False
@@ -610,14 +611,23 @@ def pdf_export(
             gif_name = os.path.join(dirname, f"{basename}.gif")
             for _filename in all_pngs:
                 images.append(imageio.imread(_filename))
+            nd_array = np.array(images)
+
+            # A Note About Typing
+            # pyrefly insists that imageio needs a list of numpy Arrays for ims;
+            # BUT then the imageio code fails; imageio DOES work when given either
+            # a list of image bytes OR a single numpy array -
+            # for now, am ignoring type checking error for this function call!
+
+            # pyrefly: ignore[no-matching-overload]
             imageio.mimwrite(
                 uri=gif_name,
-                ims=images,
-                # format='gif',
-                duration=framerate * 1000,  # list of values varies speed per frame
+                ims=nd_array,
+                # format='gif',  # inferred from filename/uri
+                duration=framerate * 1000,  # a list of values varies speed per frame
                 optimize=True,
                 loop=0,  # keeps looping
-            )  # ms -> sec
+            )
             for _filename in all_pngs:
                 if os.path.isfile(_filename):
                     os.remove(_filename)

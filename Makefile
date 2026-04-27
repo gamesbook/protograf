@@ -47,25 +47,17 @@ format:
 	uv run black --target-version py313 $(SRC)
 
 # Run Black in check mode
-	@echo "Checking code formatting with Black and pyrefly"
 lint:
+	@echo "Checking code formatting with Black and pyrefly"
 	uv run black --target-version py313 --check $(SRC)
-	# uv run pyrefly check --python-version $(PYTHON) $(SRC)
+	uv run pyrefly check $(SRC)/utils
 
 # Run tests
 tests:
 	@echo "Running pytest tests"
 	uv run pytest tests
 	@echo "Running doc tests"
-	python protograf/utils/tools.py
-	python protograf/utils/colrs.py
-	python protograf/utils/connections.py
-	python protograf/utils/fonts.py
-	python protograf/utils/lazy.py
-	python protograf/utils/loadr.py
-	python protograf/utils/messaging.py
-	python protograf/utils/support.py
-	python protograf/utils/geoms.py
+	pytest --doctest-modules protograf/utils
 
 # Build documentation
 docs:

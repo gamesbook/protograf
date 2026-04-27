@@ -35,7 +35,7 @@ def as_int(value, label: str | None = None) -> int:
         return the_value
     except (ValueError, Exception):
         failure(f'The {_label}"{value}" is not a valid integer!')
-    return None
+        return 0
 
 
 class DynamicConfig:

@@ -423,12 +423,15 @@ def open_xls(
                 _cells = cells.split(":")
                 _topleft = coordinate_to_tuple(_cells[0], True)  # (col, row)
                 _btmrite = coordinate_to_tuple(_cells[1], True)  # (col, row)
-                for row_index in range(_topleft[1], _btmrite[1] + 1):
-                    item = {
-                        keys[col_index]: cleaned(sheet.cell(row_index, col_index).value)
-                        for col_index in range(_topleft[0], _btmrite[0] + 1)
-                    }
-                    dict_list.append(item)
+                if _topleft is not None and _btmrite is not None:
+                    for row_index in range(_topleft[1], _btmrite[1] + 1):
+                        item = {
+                            keys[col_index]: cleaned(
+                                sheet.cell(row_index, col_index).value
+                            )
+                            for col_index in range(_topleft[0], _btmrite[0] + 1)
+                        }
+                        dict_list.append(item)
             else:
                 for row_index in range(start, sheet.nrows):
                     item = {

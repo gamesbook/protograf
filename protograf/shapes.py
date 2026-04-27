@@ -913,7 +913,7 @@ class DotShape(BaseShape):
         return Point(self.x_c, self.y_c)
 
     @cached_property
-    def _shape_radius(self) -> Point:
+    def _shape_radius(self) -> float:
         """Radius of Dot in points."""
         return self.point_size
 

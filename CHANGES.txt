@@ -4,9 +4,10 @@ protograf Changes
 2026-00-00 (0.5.3)
 ------------------
 - Enable output of gallery of Cards e.g. for a TTS file
+- Add pyrefly to assist with typing checks
+- Add Makefile to make key project operations explicit
 - [PLANNED-2] Add code to link *Locations
 - [PLANNED-2] Docs: list all props for Hex, Circle, Rectangle, Line
-- [PLANNED-2] Centre multi-line label text strings
 
 2026-04-22 (0.5.2)
 ------------------

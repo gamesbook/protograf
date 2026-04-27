@@ -263,7 +263,7 @@ def is_inside_polygon(point: tuple, vertices: list, valid_border=False) -> bool:
     return abs(sum_) > 1
 
 
-def length_of_line(start: Point, end: Point) -> float:
+def length_of_line(start: Point | None = None, end: Point | None = None) -> float:
     """Calculate length of line between two Points.
 
     Doc Test:
@@ -273,6 +273,8 @@ def length_of_line(start: Point, end: Point) -> float:
     >>> length_of_line(Point(0, 0), Point(3, 4))
     5.0
     """
+    if start is None or end is None:
+        return 0.0
     # √[(x₂ - x₁)² + (y₂ - y₁)²]
     return math.sqrt((end.x - start.x) ** 2 + (end.y - start.y) ** 2)
 
@@ -643,12 +645,17 @@ def separation_between_hexsides(side_a: int, side_b: int) -> int:
     >>> separation_between_hexsides(6, 1)
     1
     >>> separation_between_hexsides('a', 1)
+    Traceback (most recent call last):
+    ...
+    ValueError: Cannot use 'a' and/or '1' as side numbers.
     """
     try:
         _side_a = 6 if (side_a % 6 == 0) else side_a % 6
         _side_b = 6 if (side_b % 6 == 0) else side_b % 6
     except TypeError as e:
-        raise ValueError(f"Cannot use {side_a} and/or {side_b} as side numbers.") from e
+        raise ValueError(
+            f"Cannot use '{side_a}' and/or '{side_b}' as side numbers."
+        ) from e
     if _side_a - _side_b > 3:
         result = (_side_b, _side_a)
     else:
@@ -748,8 +755,10 @@ def bezier_arc_segment(
 
     >>> bezier_arc_segment(cx=1, cy=2.5, rx=0.5, ry=0.5, theta0=90, theta1=180)
     ((1.0, 3.0), (0.7238576250846034, 3.0, 0.5, 2.7761423749153966, 0.5, 2.5))
-    >>> bezier_arc_segment(cx=1, cy=2.5, rx=0.5, ry=0.5, theta0=90, theta1=270)
-    FEEDBACK:: Angles must have a difference less than, or equal to, 90
+
+    # SystemExit - cannot test
+    # bezier_arc_segment(cx=1, cy=2.5, rx=0.5, ry=0.5, theta0=90, theta1=270)
+    # FEEDBACK:: Angles must have a difference less than, or equal to, 90
     """
 
     # Requires theta1 - theta0 <= 90 for a good approximation

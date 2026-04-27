@@ -106,8 +106,8 @@ def draw_line(
 
 def draw_line_curve(
     cnv=None,
-    start: Point = None,
-    end: Point = None,
+    start: Point | None = None,
+    end: Point | None = None,
     curve_height: float | None = None,
     **kwargs,
 ) -> dict:

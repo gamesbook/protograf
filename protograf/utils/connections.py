@@ -49,19 +49,19 @@ def validate_link_params(conn: tuple) -> list:
         )
     if isinstance(conn[0], PolygonShape):
         dirs = validated_directions(
-            value=_value,
+            value=_value or "",
             direction_group=DirectionGroup.POLYGONAL,
             label=f"{shape_type} link's third (direction)",
         )
     elif isinstance(conn[0], StarShape):
         dirs = validated_directions(
-            value=_value,
+            value=_value or "",
             direction_group=DirectionGroup.STAR,
             label=f"{shape_type} link's third (direction)",
         )
     else:
         dirs = validated_directions(
-            value=_value,
+            value=_value or "",
             direction_group=DirectionGroup.COMPASS,
             label=f"{shape_type} link's third (direction)",
         )
@@ -75,7 +75,7 @@ def get_link_point(point_like: object) -> Point | None:
     the_point = None
     if isinstance(point_like, BaseShape):
         try:
-            pnt = BaseShape.geo.centre  # default link point
+            pnt = point_like.geo.centre  # default link point
         except Exception:
             pnt = None
         if pnt is None:
@@ -140,7 +140,7 @@ def get_link_point(point_like: object) -> Point | None:
                     )
                 else:
                     the_point = pbs.point
-        if the_shape.rotation:
+        if the_shape.rotation and the_point:
             center_point = the_shape._shape_centre
             the_point = geoms.rotate_point_around_point(
                 (the_point.x, the_point.y),
@@ -153,8 +153,10 @@ def get_link_point(point_like: object) -> Point | None:
         return None
 
 
-def get_rotation(centre_a: Point, centre_b: Point) -> tuple:
-    """Get relative rotation between points."""
+def get_rotation(centre_a: Point | None = None, centre_b: Point | None = None) -> tuple:
+    """Get relative rotation between Points."""
+    if centre_a is None or centre_b is None:
+        return (0.0, 0.0)
     _, rotation = geoms.angles_from_points(centre_a, centre_b)
     if centre_b.x < centre_a.x and centre_b.y < centre_a.y:
         rotation_a = 360.0 - rotation
@@ -345,9 +347,10 @@ def get_links(shapes: list, links_style: str, curve: float | None = None) -> tup
                     pt_b = intersects_b[1]
                 else:
                     pt_b = intersects_b[0]
-                chord = geoms.length_of_line(pt_a, pt_b)
-                link_curve = geoms.circle_to_chord(radius, chord) / globals.units
-                link_curve = link_curve * -1 if curve < 0 else link_curve
+                if pt_a is not None and pt_b is not None:
+                    chord = geoms.length_of_line(start=pt_a, end=pt_b)
+                    link_curve = geoms.circle_to_chord(radius, chord) / globals.units
+                    link_curve = link_curve * -1 if curve < 0 else link_curve
             else:
                 pt_b = geoms.point_on_circle(centre_b, shape_b._u.radius, rotation_b)
             links.append((pt_a, pt_b))
