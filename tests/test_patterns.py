@@ -2,7 +2,7 @@ import pytest
 from protograf.proto import (
     Create,
     Grid, HexHex, Blueprint, Repeat, Lines, Sequence, Hexagons, Rectangles,
-    Squares, Locations, Location, LinkLine, Layout, Track, )
+    Squares, Locations, Location, GridLine, Layout, Track, )
 from protograf.utils.structures import Locale, GridShape
 # from protograf.layouts import GridShape
 
@@ -64,10 +64,10 @@ def test_location():
     with pytest.raises(TypeError):
         Location()
 
-def test_linkline():
+def test_gridline():
     Create(globals_reset=True)
     with pytest.raises(TypeError):
-        LinkLine()
+        GridLine()
 
 def test_layout():
     Create(globals_reset=True)

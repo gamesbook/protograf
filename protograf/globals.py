@@ -10,7 +10,11 @@ from collections import namedtuple
 from pymupdf import paper_size
 
 # local
-from protograf.utils.constants import RGB_DEBUG_COLOR
+from protograf.utils.constants import (
+    RGB_DEBUG_COLOR,
+    DEFAULT_MARGIN_SIZE,
+    DEFAULT_PAGE_SIZE,
+)
 
 UnitPoints = namedtuple(
     "UnitPoints",
@@ -52,6 +56,7 @@ def initialize():
     global footer_draw
     global image_list
     global margins
+    global override  # boolean
     global pargs
     global paper
     global page  #  (width, height) in points
@@ -59,7 +64,7 @@ def initialize():
     global page_height  # user units
     global page_fill
     global page_count
-    global page_grid
+    global page_grid  # user units
     global units
     global white
 
@@ -83,16 +88,17 @@ def initialize():
     margins = None  # will become a proto.PageMargins object
     footer = None
     footer_draw = False
-    page_count = 0
+    font_size = 12
     pargs = None
     units = unit.cm
     color_model = "RGB"
+    override = False  # used, as needed, to override Shape properties with globals
     black = "black"  # stroke color for RGB
     white = "white"  # fill color for RGB
-    paper = "A4"
+    page_count = 0
+    paper = DEFAULT_PAGE_SIZE
     page = paper_size(paper)  # (width, height) in points
     page_width = page[0] / units  # width in user units
     page_height = page[1] / units  # height in user units
     page_fill = "white"  # page color for RGB
     page_grid = None  # grid interval in user units
-    font_size = 12

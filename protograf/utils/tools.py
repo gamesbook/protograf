@@ -186,6 +186,30 @@ def _p2v(value: Point, decimals: int = 4) -> tuple:
     return (0.0, 0.0)
 
 
+def _u2p(value: Point) -> tuple:
+    """Convert Point values, in user-units, to a Point with point-based values.
+
+    Doc Test:
+
+    >>> _u2p(Point(0.9878, 1.9756))
+    Point(x=28.0006727, y=56.0013454)
+
+    """
+    try:
+        _units = globals.units
+    except:
+        _units = 28.3465
+    try:
+        return Point(float(value.x) * _units, float(value.y) * _units)
+    except Exception as err:
+        log.exception(err)
+        feedback(
+            f'Unable to do units conversion from "{value}" using {globals.units}!',
+            True,
+        )
+    return (0.0, 0.0)
+
+
 def as_int(
     value,
     label: str | None = None,

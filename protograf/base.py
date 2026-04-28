@@ -48,6 +48,7 @@ from protograf.utils.constants import (
     RGB_DEBUG_COLOR,
     DEFAULT_FONT,
     DEFAULT_MARGIN_SIZE,
+    DEFAULT_PAGE_SIZE,
     GRID_SHAPES_WITH_CENTRE,
 )
 from protograf.globals import unit
@@ -119,7 +120,7 @@ class BaseCanvas:
                     )
         # ---- override file defaults with BaseCanvas kwargs
         if kwargs:
-            _kwargs = kwargs["kwargs"]
+            _kwargs = kwargs.get("kwargs", [])
             for kwarg in _kwargs:
                 self.defaults[kwarg] = _kwargs[kwarg]
             # print(f"### {self.defaults=}")
@@ -142,7 +143,8 @@ class BaseCanvas:
         # print(f'### {self.units=} {self.defaults=} {self.defaults.get("margin")=}')
         self.page_number = None
         # ---- paper
-        _paper = paper or self.defaults.get("paper", "A4")
+        _default_paper = globals.paper if globals.paper else DEFAULT_PAGE_SIZE
+        _paper = paper or self.defaults.get("paper", _default_paper)
         if isinstance(_paper, tuple) and len(_paper) == 2:
             self.paper = _paper
         else:
@@ -158,8 +160,11 @@ class BaseCanvas:
         # ---- paper size in units & margins
         self.page_width = self.paper[0] / self.units  # user-units e.g. cm
         self.page_height = self.paper[1] / self.units  # user-units e.g. cm
-        self.margin = self.defaults.get("margin", DEFAULT_MARGIN_SIZE / self.units)
-        # print(f"### {self.page_height=} {self.page_width=} {self.margin=} {self.units=}")
+        _default_margin = (
+            globals.margins.margin if globals.margins else DEFAULT_MARGIN_SIZE
+        )
+        self.margin = self.defaults.get("margin", _default_margin / self.units)
+        # print(f"###BaseCanvas {self.page_height=} {self.page_width=} {self.margin=} {self.units=}")
         self.margin_top = self.defaults.get("margin_top", self.margin)
         self.margin_bottom = self.defaults.get("margin_bottom", self.margin)
         self.margin_left = self.defaults.get("margin_left", self.margin)
@@ -816,6 +821,14 @@ class BaseShape:
         self.margin_bottom = self.kw_float(kwargs.get("margin_bottom", self.margin))
         self.margin_left = self.kw_float(kwargs.get("margin_left", self.margin))
         self.margin_right = self.kw_float(kwargs.get("margin_right", self.margin))
+        # print(f"###BaseShape/pre  {self.margin=} {self.margin_left=}")
+        if globals.override and globals.margins:
+            self.margin = globals.margins.margin
+            self.margin_top = globals.margins.top
+            self.margin_bottom = globals.margins.bottom
+            self.margin_left = globals.margins.left
+            self.margin_right = globals.margins.right
+            # print(f"###BaseShape/post {self.margin=} {self.margin_left=}")
         # ---- grid marks
         self.grid_marks = self.kw_bool(kwargs.get("grid_marks", base.grid_marks))
         self.grid_marks_stroke = kwargs.get("grid_marks_stroke", base.grid_marks_stroke)

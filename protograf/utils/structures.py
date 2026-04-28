@@ -154,29 +154,23 @@ HexGeometry = namedtuple(
     ],
 )
 
+# ---- * HexEdgeResult - use for GridLine edge path
+HexEdgeResult = namedtuple(
+    "HexEdgeResult",
+    [
+        "edge",  # compass direction / edge
+        "end",  # compass direction / vertex
+        "row",  # int; -1, 0 or 1
+        "col",  # int; -1, 0 or 1
+    ],
+)
+# ---- * LookupType
 LookupType = namedtuple("LookupType", ["column", "lookups"])
 
+# ---- * Link
 Link = namedtuple("Link", ["a", "b", "style"])
 
-"""
-locale_fields = (
-    "col",
-    "row",
-    "x",
-    "y",
-    "xy",
-    "cxy",
-    "height",
-    "width",
-    "id",
-    "sequence",
-    "corner",
-    "label",
-    "page",
-)
-OldLocale = namedtuple("Locale", locale_fields, defaults=(None,) * len(locale_fields))
-"""
-
+# ---- * OffsetProperties
 OffsetProperties = namedtuple(
     "OffsetProperties",
     [
@@ -186,77 +180,6 @@ OffsetProperties = namedtuple(
         "delta_y",
     ],
 )
-
-"""
-clockgeometry_fields = (
-    "h1",
-    "h2",
-    "h3",
-    "h4",
-    "h5",
-    "h6",
-    "h7",
-    "h8",
-    "h9",
-    "h10",
-    "h11",
-    "h12",
-)
-ClockGeometry = namedtuple(
-    "ClockGeometry", clockgeometry_fields, defaults=(None,) * len(clockgeometry_fields)
-)
-"""
-
-"""
-# N = 90, W = 180, S = 270, E = 0
-# NE = 45, NW = 135, SW = 225, SE = 315
-# NNW =
-shapegeometry_fields = (
-    # points
-    "centre",
-    "center",
-    "c",
-    "n",
-    "s",
-    "e",
-    "w",
-    "ne",
-    "se",
-    "nw",
-    "sw",
-    "nnw",
-    "nne",
-    "sse",
-    "ssw",
-    "wnw",
-    "ene",
-    "ese",
-    "wsw",
-    "v",
-    "vertices",
-    "p",
-    "perbii",
-    # lengths
-    "radius",
-    "diameter",
-    "side",
-    "length",
-    "width",
-    "height",
-    "perimeter",
-    # other
-    "area",
-    "sides",  # e.g. for a regular Polygon
-    # meta
-    "t",
-    "type",
-    "shapetype",
-    "name",
-)
-OldShapeGeometry = namedtuple(
-    "ShapeGeometry", shapegeometry_fields, defaults=(None,) * len(shapegeometry_fields)
-)
-"""
 
 # ----  PAGEMARGINS
 # base margins are in user units
@@ -391,28 +314,6 @@ class ClockGeometry(NamedTuple):
     h12: Point | None = None
 
 
-class Locale(NamedTuple):
-    """Key values and spatial attributes of a Locale
-
-    Note:
-        * Typically used for a grid-like or cell location
-    """
-
-    col: int | None = None
-    row: int | None = None
-    x: float | None = None
-    y: float | None = None
-    xy: Point | None = None
-    cxy: Point | None = None
-    height: float | None = None
-    width: float | None = None
-    id: int | None = None
-    sequence: int | None = None
-    corner: bool = False
-    label: str | None = None
-    page: int | None = None
-
-
 class ShapeGeometry(NamedTuple):
     """Key points and spatial attributes of a Shape
 
@@ -461,6 +362,31 @@ class ShapeGeometry(NamedTuple):
     type: str | None = None
     shapetype: str | None = None
     name: str | None = None
+
+
+class Locale(NamedTuple):
+    """Key values and spatial attributes of a Locale
+
+    Note:
+        * Typically used for a grid-like or cell location
+    """
+
+    col: int | None = None
+    row: int | None = None
+    x: float | None = None
+    y: float | None = None
+    xy: Point | None = None
+    cxy: Point | None = None
+    geo: ShapeGeometry | None = None
+    height: float | None = None
+    width: float | None = None
+    radius: float | None = None
+    side: float | None = None
+    id: int | None = None
+    sequence: int | None = None
+    corner: bool = False
+    label: str | None = None
+    page: int | None = None
 
 
 # ---- DATACLASS
@@ -531,3 +457,29 @@ class VirtualHex:
     spine: int
     zone: str
     orientation: HexOrientation
+
+
+# ---- "FIXED" DICT
+
+# ---- * Travel outcomes for GridLine edges
+HEX_FLAT_EDGE_TRAVEL = {
+    # startpoint / direction => result
+    ("ne", "w"): HexEdgeResult(edge="n", end="nw", row=0, col=0),
+    ("ne", "ne"): HexEdgeResult(edge="se", end="nw", row=-1, col=1),
+    ("ne", "se"): HexEdgeResult(edge="ne", end="e", row=0, col=0),
+    ("e", "nw"): HexEdgeResult(edge="ne", end="ne", row=0, col=0),
+    ("e", "e"): HexEdgeResult(edge="s", end="se", row=0, col=1),
+    ("e", "sw"): HexEdgeResult(edge="se", end="se", row=0, col=0),
+    ("se", "ne"): HexEdgeResult(edge="se", end="e", row=0, col=0),
+    ("se", "se"): HexEdgeResult(edge="sw", end="sw", row=0, col=1),
+    ("se", "w"): HexEdgeResult(edge="s", end="sw", row=0, col=0),
+    ("sw", "e"): HexEdgeResult(edge="s", end="se", row=0, col=0),
+    ("sw", "nw"): HexEdgeResult(edge="sw", end="w", row=0, col=0),
+    ("sw", "sw"): HexEdgeResult(edge="se", end="se", row=0, col=-1),
+    ("w", "w"): HexEdgeResult(edge="s", end="sw", row=0, col=-1),
+    ("w", "ne"): HexEdgeResult(edge="nw", end="nw", row=0, col=0),
+    ("w", "se"): HexEdgeResult(edge="sw", end="sw", row=0, col=0),
+    ("nw", "e"): HexEdgeResult(edge="n", end="ne", row=0, col=0),
+    ("nw", "nw"): HexEdgeResult(edge="sw", end="w", row=-1, col=0),
+    ("nw", "sw"): HexEdgeResult(edge="nw", end="w", row=0, col=0),
+}

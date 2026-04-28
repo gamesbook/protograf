@@ -6,7 +6,8 @@ protograf Changes
 - Enable output of gallery of Cards e.g. for a TTS file
 - Add pyrefly to assist with typing checks
 - Add Makefile to make key project operations explicit
-- [PLANNED-2] Add code to link *Locations
+- RENAME `LinkLine` command to  `GridLine` [BREAKING CHANGE]
+- [PLANNED-1] Add code to draw lines on hexes in Grid Locations
 - [PLANNED-2] Docs: list all props for Hex, Circle, Rectangle, Line
 
 2026-04-22 (0.5.2)

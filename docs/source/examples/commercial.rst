@@ -42,8 +42,9 @@ Title       *Squad Leader Modular Board Section*
 ----------- ------------------------------------------------------------------
 Script      `squad_leader.py <https://github.com/gamesbook/protograf/blob/master/examples/boards/commercial/squad_leader.py>`_
 ----------- ------------------------------------------------------------------
-Discussion  This example shows how to construct a board for a wargame - in
-            this Avalon Hill's "Squad Leader" - using a hexagonal grid.
+Discussion  This example shows how to construct a board for a wargame |dash| in
+            this case Avalon Hill's "Squad Leader" |dash| using a hexagonal
+            grid.
 
             The grid's properties, such as alphanumeric coordinates and hex
             column offsets are used for overall appearance; the use of a blank
@@ -93,8 +94,8 @@ Discussion  This example shows how to construct a board for the commercial
             the game's hexes (``Hexagon`` shape) and discs (``Circle``
             shape).  A single large hexagon forms the surrounding sea.
 
-            All the pieces - hexes and discs - are predefined in the script
-            (without any ``x`` or ``y`` settings) and then laid out
+            All the pieces |dash| hexes and discs |dash| are predefined in the
+            script (without any ``x`` or ``y`` settings) and then laid out
             using the ``shapes`` property of the ``HexHex`` grid, which puts
             them in sequence into the "ring" |dash| centred at their correct
             locations.
@@ -224,16 +225,17 @@ Discussion  This example shows how to construct a map for the "Warp War" game.
 
             The example based off an image created by Rick Smith and posted to
             the https://groups.io/g/warpwar/ forum on 3 June 2024.  This is
-            *not* a complete copy of that map - it just serves to illustrate
-            how elements of such a map could be created.
+            *not* a complete copy of that map |dash| it just serves to
+            illustrate how elements of such a map **can** be created.
 
             This is a fairly complex layout as most items need to be placed
             with millimetre accuracy using the ``Location()`` command to detail
             which shapes go into which hexagon grid location.
 
-            The green lines joining hexagons are created with the ``LinkLine()``
-            command; by default this joins the centres of two locations in the
-            hexagon grid; but use of the optional "move x" and "move y"
+            The green lines joining hexagons are created with the ``GridLine()``
+            command; this commmand accesses a set of hex locations |dash|
+            identified by name |dash| in the hexagonal grid and, by default,
+            joins their centres; but use of the optional "move x" and "move y"
             settings allows the line endpoints to be adjusted within their
             respective hexagons.
 
@@ -277,8 +279,8 @@ Script      `underwater_cities.py <https://github.com/gamesbook/protograf/blob/m
 ----------- ------------------------------------------------------------------
 Discussion  This example shows how to construct the board for the commercial
             board game "Underwater Cities". This is *not* a complete copy of
-            that board - it just serves to illustrate how elements of it could
-            be created during the prototyping stage.
+            that board |dash| it just serves to illustrate how elements of it
+            **can** be created during the prototyping stage.
 
             The script for this example is one of the longest but it is not
             really that complex, as most shapes are simple rectangles stacked
@@ -286,15 +288,15 @@ Discussion  This example shows how to construct the board for the commercial
 
             Some items of interest:
 
-            - Extensive use of the ``Common()`` command to avoid duplication
+            * Extensive use of the ``Common()`` command to avoid duplication
               between similar items
-            - Use of an SVG world map to create the background layer
-            - Mix of custom images, free icons and **protograf** to create
+            * Use of an SVG world map to create the background layer
+            * Mix of custom images, free icons and **protograf** to create
               the smaller graphic elements, such as the locks and wreaths
-            - Use of the ``RectangularLocation()`` command to lay out the
+            * Use of the ``RectangularLocation()`` command to lay out the
               primary scoring track; the ``Layout()`` command makes use of multiple
               repeating shapes for the color changes at different intervals
-            - Use of ``Sequence()`` command to create the player order track,
+            * Use of ``Sequence()`` command to create the player order track,
               (in the middle) as well as the different rounds (the dark,
               vertical track on the right)
 ----------- ------------------------------------------------------------------
@@ -327,22 +329,22 @@ Discussion  This example shows a map with the locations of stars described in th
 
             The data is sourced from:
 
-            - https://www.gotshifted.com/honorverseglossary/MAPS.html
-            - https://www.gotshifted.com/honorverseglossary/Book%20Originals.html
+            * https://www.gotshifted.com/honorverseglossary/MAPS.html
+            * https://www.gotshifted.com/honorverseglossary/Book%20Originals.html
 
             Any errors in transcription are mine |dash| and *NOT* the original
             sources!
 
             Some items of interest:
 
-            - The "stars" are just point locations on the grid; a Python loop
+            * The "stars" are just point locations on the grid; a Python loop
               processes them and styles each according to its information; using
               ``if`` and ``else``, while the ZapfDingbats font provides icons
               used to show the star.
-            - The names of stars allow their point locations to be "looked up"
+            * The names of stars allow their point locations to be "looked up"
               in the list, and the stars' locations form the start and end points
               of lines for the connecting wormholes (red lines).
-            - The script has a boolean "toggle" (called ``DARK_MODE``) which can
+            * The script has a boolean "toggle" (called ``DARK_MODE``) which can
               be set to change the background color of the map to black and
               the stars to white, as can be seen in the "zoomed" example.
 
@@ -373,11 +375,11 @@ Discussion  This example shows a version of the player board from the
 
             Some items of interest:
 
-            - Use of the ``Common()`` command to avoid duplication between
+            * Use of the ``Common()`` command to avoid duplication between
               similar items
-            - Use of a font derived from the https://game-icons.net/ to create
+            * Use of a font derived from the https://game-icons.net/ to create
               the small graphic elements, such as the heat and tree symbols
-            - Use of the ``Sequence()`` command to create the various tracks,
+            * Use of the ``Sequence()`` command to create the various tracks,
               as well as some of the different elements (arrows and money)
               on the lower edge
 ----------- ------------------------------------------------------------------

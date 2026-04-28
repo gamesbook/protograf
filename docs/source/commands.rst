@@ -81,8 +81,8 @@ a handy cross-reference to the detailed information for that command.
    grid and specifies the shapes that are to be drawn at that grid's locations
 -  :ref:`Line <line-command>` * - a geometric shape that can be drawn on a page
 -  :ref:`Lines <lines-command>` - a set, or group, of lines that can be drawn on a page
--  :ref:`LinkLine <linkline-command>` - a line joining one or more hexagons inside a
-   hexagonal grid
+-  :ref:`GridLine <gridline-command>` - a line, or lines, along or between one
+   or more hexagons inside a hexagonal grid
 -  :ref:`Load <load-command>` - at the start of a script; define an existing
    PDF file to be loaded
 -  :ref:`Matrix <the-matrix-command>` - a way to create a set of data, inside a script,

@@ -132,12 +132,14 @@ from protograf.utils.structures import (
     DeckPrintState,
     DirectionGroup,
     ExportFormat,
+    HEX_FLAT_EDGE_TRAVEL,
     LookupType,
     Locale,
     PageMargins,
     Point,
     Place,
     Ray,
+    ShapeGeometry,
     TemplatingType,
 )
 from protograf.utils.tools import (  # used in scripts
@@ -699,53 +701,6 @@ class DeckOfCards:
         self.spacing_y = tools.as_float(
             kwargs.get("spacing_y", self.spacing), "spacing_y"
         )
-        # ----- set card frame type
-        self.frame = kwargs.get("frame", "rectangle")
-        match self.frame:
-            case "rectangle" | "r":
-                self.frame_type = CardFrame.RECTANGLE
-                if self.height > (
-                    globals.page_height - globals.margins.top - globals.margins.bottom
-                ):
-                    feedback("Card height cannot exceed available page height.", True)
-                if self.width > (
-                    globals.page_width - globals.margins.left - globals.margins.right
-                ):
-                    feedback("Card width cannot exceed available page width.", True)
-            case "circle" | "c":
-                self.frame_type = CardFrame.CIRCLE
-                if 2 * self.radius > (
-                    globals.page_height - globals.margins.top - globals.margins.bottom
-                ):
-                    feedback("Card diameter cannot exceed available page height.", True)
-                if 2 * self.radius > (
-                    globals.page_width - globals.margins.left - globals.margins.right
-                ):
-                    feedback("Card diameter cannot exceed available page width.", True)
-            case "hexagon" | "h":
-                self.frame_type = CardFrame.HEXAGON
-                if 2 * self.radius > (
-                    globals.page_height - globals.margins.top - globals.margins.bottom
-                ):
-                    feedback("Card diameter cannot exceed available page height.", True)
-                if 2 * self.radius > (
-                    globals.page_width - globals.margins.left - globals.margins.right
-                ):
-                    feedback("Card diameter cannot exceed available page width.", True)
-                if (
-                    self.spacing_x
-                    and self.spacing_y
-                    and self.spacing_x == self.spacing_y
-                ):
-                    feedback(
-                        "Equal card spacing implies hexagon diagonal edges are not aligned.",
-                        False,
-                        True,
-                    )
-            case _:
-                hint = " Try rectangle, hexagon, or circle."
-                feedback(f"Unable to draw a {self.frame}-shaped card. {hint}", True)
-        self.kwargs["frame_type"] = self.frame_type  # used for create_cardshapes()
         # ---- dataset (list of dicts)
         self.dataset = kwargs.get("dataset", None)
         self.set_dataset()  # globals override : dataset AND cards
@@ -808,10 +763,103 @@ class DeckOfCards:
         self.directory = kwargs.get("directory", None)
         extra = globals.deck_settings.get("extra", 0)
         self.cards += extra
-        log.debug("Card Counts: %s Settings: %s", self.cards, globals.deck_settings)
+        # print(f'!!! Card Count: {self.cards} Deck Settings: {globals.deck_settings}')
+        # ---- gallery options: settings override e.g. margin and page size
+        self.gallery = kwargs.get("gallery", None)  # card grid size per page
+        # ---- gallery - trigger overrides of settings in CardDeck draw!
+        if self.gallery:
+            self.gallery_overrides(self.gallery)
+        # ----- set card frame type
+        self.frame = kwargs.get("frame", "rectangle")
+        match self.frame:
+            case "rectangle" | "r":
+                self.frame_type = CardFrame.RECTANGLE
+                if self.height > (
+                    globals.page_height - globals.margins.top - globals.margins.bottom
+                ):
+                    feedback("Card height cannot exceed available page height.", True)
+                if self.width > (
+                    globals.page_width - globals.margins.left - globals.margins.right
+                ):
+                    feedback("Card width cannot exceed available page width.", True)
+            case "circle" | "c":
+                self.frame_type = CardFrame.CIRCLE
+                if 2 * self.radius > (
+                    globals.page_height - globals.margins.top - globals.margins.bottom
+                ):
+                    feedback("Card diameter cannot exceed available page height.", True)
+                if 2 * self.radius > (
+                    globals.page_width - globals.margins.left - globals.margins.right
+                ):
+                    feedback("Card diameter cannot exceed available page width.", True)
+            case "hexagon" | "h":
+                self.frame_type = CardFrame.HEXAGON
+                if 2 * self.radius > (
+                    globals.page_height - globals.margins.top - globals.margins.bottom
+                ):
+                    feedback("Card diameter cannot exceed available page height.", True)
+                if 2 * self.radius > (
+                    globals.page_width - globals.margins.left - globals.margins.right
+                ):
+                    feedback("Card diameter cannot exceed available page width.", True)
+                if (
+                    self.spacing_x
+                    and self.spacing_y
+                    and self.spacing_x == self.spacing_y
+                ):
+                    feedback(
+                        "Equal card spacing implies hexagon diagonal edges are not aligned.",
+                        False,
+                        True,
+                    )
+            case _:
+                hint = " Try rectangle, hexagon, or circle."
+                feedback(f"Unable to draw a {self.frame}-shaped card. {hint}", True)
+        self.kwargs["frame_type"] = self.frame_type  # used for create_cardshapes()
+
         # ---- FINALLY...
         # print(f'$$$ {self.cards=}, {globals.deck_settings=}')
         self.create_cardshapes(self.cards)
+
+    def gallery_overrides(self, gallery):
+        err = f'The gallery property must be a pair of numbers in (M, N) format; not "{gallery}".'
+        if isinstance(gallery, tuple) and len(gallery) == 2:
+            if not isinstance(gallery[0], int) or not isinstance(gallery[1], int):
+                feedback(err, True)
+        else:
+            feedback(err, True)
+
+        cols, rows = gallery[0], gallery[1]
+        # print(f"### Gallery  {cols=} {rows=}")
+        # alter card settings
+        self.gutter_layout = None
+        self.gutter = 0
+        self.grouping_rows = 1
+        self.grouping_cols = 1
+        self.card_cols = cols
+        self.card_rows = rows
+        self.spacing_x = 0
+        self.spacing_y = 0
+        # alter page settings
+        globals.page = (
+            globals.units * self.width * cols,
+            globals.units * self.height * rows,
+        )
+        # FIXME - how to not centre old content on new page?
+        globals.doc_page.set_mediabox((0, 0, globals.page[0], globals.page[1]))
+        globals.margins = PageMargins(
+            margin=0,
+            left=0,
+            right=0,
+            bottom=0,
+            top=0,
+            debug=False,
+            units=globals.units,
+        )
+        globals.page_width = globals.page[0] / globals.units  # width ~ user units
+        globals.page_height = globals.page[1] / globals.units  # height ~ user units
+        # print(f"###   {globals.page=} {globals.margins=}")
+        globals.override = True  # allows Shape margins to be overridden
 
     def set_dataset(self):
         """Create deck dataset from globals dataset"""
@@ -938,7 +986,6 @@ class DeckOfCards:
         - card_cols (int): maximum number of columns of cards on a page
         - dpi (int): resolution for output PNG
         - directory (str): path to save output(s)
-        - gallery (tuple): columns x rows of cards per page
         - zones (list): tuples of form (str|int, Shape), where 0-position is the
           page number, and 1-position is the Shape to be drawn there
 
@@ -1183,42 +1230,6 @@ class DeckOfCards:
         # print(f"$$$ {globals.page_height=} card{self.height=} {max_rows=}")
         # print(f"===================================================================")
 
-        # ---- gallery - overrides
-        gallery = kwargs.get("gallery", None)
-        if gallery:
-            cols, rows = gallery[0], gallery[1]
-            # print(f"### Gallery  {cols=} {rows=}")
-            # alter card settings
-            self.gutter_layout = None
-            self.gutter = 0
-            self.grouping_rows = 1
-            self.grouping_cols = 1
-            self.card_cols = cols
-            self.card_rows = rows
-            max_rows = self.card_rows
-            max_cols = self.card_cols
-            self.spacing_x = 0
-            self.spacing_y = 0
-            # alter page settings
-            globals.page = (
-                globals.units * self.width * cols,
-                globals.units * self.height * rows,
-            )
-            # FIXME - how to not centre old content on new page?
-            globals.doc_page.set_mediabox((0, 0, globals.page[0], globals.page[1]))
-            globals.margins = PageMargins(
-                margin=0,
-                left=0,
-                right=0,
-                bottom=0,
-                top=0,
-                debug=False,
-                units=globals.units,
-            )
-            globals.page_width = globals.page[0] / globals.units  # width ~ user units
-            globals.page_height = globals.page[1] / globals.units  # height ~ user units
-            # print(f"###   {globals.page=} {globals.margins=}")
-
         # ---- other settings
         self.export_cards = kwargs.get("export_cards", False)
         self.dpi = kwargs.get("dpi", 300)
@@ -1319,7 +1330,7 @@ class DeckOfCards:
         page_across = globals.page_width - margin_right - margin_left  # user units
         page_down = globals.page_height - margin_top - margin_bottom  # user units
         _height, _width, _radius = self.height, self.width, self.radius
-        if gallery is not None:
+        if self.gallery is not None:
             self.draw_bleed(cnv, page_across, page_down)
 
         # ---- deck settings
@@ -2202,10 +2213,6 @@ def Save(**kwargs):
       exported as PNG files;  the names of the files are either derived using the
       PDF filename, with a dash (-) followed by the page number OR set by the user
       with ``card_name`` property in the Deck()
-    - gallery (tuple): if set to a pair of numbers e.g. ``(6,9)`` will cause that
-      many *cards* to be drawn on a page; the page size will be changed to fit them
-      all; and all margins will be set to zero |dash| this can be used to as a
-      input for programs like Tabletop Simulator (TTS)
     - stop (bool): if set to ``True`` will cause all the script to stop at this point
 
     Notes:
@@ -2225,15 +2232,6 @@ def Save(**kwargs):
     output = kwargs.get("output", None)  # export document into this format e.g. SVG
     local_filename = kwargs.get("filename", None)  # override Create()
     stop_here = kwargs.get("stop", False)  # stop script
-    gallery = kwargs.get("gallery", None)  # card grid size per page
-    # ---- gallery - trigger overrides of settings in CardDeck draw!
-    if gallery:
-        err = f'The gallery property must be a pair of numbers in (M, N) format; not "{gallery}".'
-        if isinstance(gallery, tuple) and len(gallery) == 2:
-            if not isinstance(gallery[0], int) or not isinstance(gallery[1], int):
-                feedback(err, True)
-        else:
-            feedback(err, True)
 
     # ---- directory
     if globals.pargs.directory:
@@ -2260,7 +2258,6 @@ def Save(**kwargs):
             extra=globals.deck_settings.get("extra", 0),
             grid_marks=globals.deck_settings.get("grid_marks", None),
             zones=globals.deck_settings.get("zones", None),
-            gallery=gallery,
             image_list=globals.image_list,
             dpi=dpi,
             directory=globals.directory,
@@ -2863,6 +2860,10 @@ def Deck(**kwargs):
     - stroke (str): color of the card's border; defaults to ``black`` (for RGB color_model)
     - width (float): card width for a *rectangular* card; defaults to ``6.35`` cm
     - zones (list): list of tuples; each with page number(s) and a shape
+    - gallery (tuple): if set to a pair of numbers e.g. ``(6,9)`` will cause that
+      many *cards* to be drawn on a page; the page size will be changed to fit them
+      all; and all margins will be set to zero |dash| this can be used as an input
+      for programs such as Tabletop Simulator (TTS)
 
     Notes:
 
@@ -4553,11 +4554,21 @@ def Hexagons(rows=1, cols=1, sides=None, **kwargs):
                         row=row, col=ccol - 1, hex_rows=rows, hex_cols=cols, **kwargs
                     )
                     hxgn.draw()
+                    shape_geo = ShapeGeometry(  # keep in user units for GridLine
+                        ne=hxgn.geo.ne,
+                        se=hxgn.geo.se,
+                        e=hxgn.geo.e,
+                        w=hxgn.geo.w,
+                        sw=hxgn.geo.sw,
+                        nw=hxgn.geo.nw,
+                    )
                     _locale = Locale(
                         col=ccol - 1,
                         row=row,
                         x=hxgn.grid.x,
                         y=hxgn.grid.y,
+                        cxy=Point(hxgn.grid.x, hxgn.grid.y),
+                        geo=shape_geo,
                         id=f"{ccol - 1}:{row}",
                         sequence=sequence,
                         label=hxgn.grid.label,
@@ -4627,17 +4638,29 @@ def Hexagons(rows=1, cols=1, sides=None, **kwargs):
                     hxgn = Hexagon(
                         row=row, col=col, hex_rows=rows, hex_cols=cols, **kwargs
                     )
+                    shape_geo = ShapeGeometry(  # keep in user units for GridLine
+                        ne=hxgn.geo.ne,
+                        se=hxgn.geo.se,
+                        e=hxgn.geo.e,
+                        w=hxgn.geo.w,
+                        sw=hxgn.geo.sw,
+                        nw=hxgn.geo.nw,
+                    )
                     _locale = Locale(
                         col=col,
                         row=row,
                         x=hxgn.grid.x,
                         y=hxgn.grid.y,
+                        cxy=Point(hxgn.grid.x, hxgn.grid.y),
+                        geo=shape_geo,
                         id=f"{col}:{row}",
                         sequence=sequence,
                         label=hxgn.grid.label,
                         page=globals.page_count + 1,
                     )
-                    # print(f'$$$ locale {col=} {row=} / {hxgn.grid.x=} {hxgn.grid.y=}')
+                    # print(
+                    #     f"$$$ Locale {id=} {col=} {row=} {hxgn.grid.x=} {hxgn.grid.y=}"
+                    # )
                     locales.append(_locale)
                     sequence += 1
 
@@ -4815,78 +4838,191 @@ def Locations(grid: list, labels: Union[str, list], shapes: list, **kwargs):
         Location(grid, label, shapes)
 
 
-def LinkLine(grid: list, locations: Union[list, str], **kwargs):
-    """Enable a line link between one or more locations in a grid."""
-    kwargs = kwargs
-    if isinstance(locations, str):  # should be a comma-delimited string
-        locations = tools.sequence_split(locations, to_int=False, unique=False)
-    if not isinstance(locations, list):
-        feedback(f"'{locations} is not a list - please check!", True)
-    if len(locations) < 2:
-        feedback("There should be at least 2 locations to create links!", True)
-    dummy = base_shape()  # a BaseShape - not drawable!
-    for index, location in enumerate(locations):
-        # precheck
-        if isinstance(location, str):
-            location = (location, 0, 0)  # reformat into standard notation
-        if not isinstance(location, tuple) or len(location) != 3:
-            feedback(
-                f"The location '{location}' is not valid -- please check its syntax!",
-                True,
-            )
-        # get location centre from grid via the label
+def GridLine(
+    grid: list,
+    start: str = "",
+    vertex: str = "",
+    locations: Union[list, str] | None = None,
+    edges: Union[list, str] | None = None,
+    paths: Union[list, str] | None = None,
+    **kwargs,
+):
+    """Enable drawing Line or Lines between one or more points in a grid."""
+
+    def draw_linked_locations(locations, **kwargs):
+        """Draw lines between points inside hexagons in grid."""
+        dummy = base_shape()  # a BaseShape - not drawable!
+        for index, location in enumerate(locations):
+            # precheck
+            if isinstance(location, str):
+                location = (location, 0, 0)  # reformat into standard notation
+            if not isinstance(location, tuple) or len(location) != 3:
+                feedback(
+                    f"The location '{location}' is not valid -- please check its syntax!",
+                    True,
+                )
+            # get location centre from grid via the label
+            loc = None
+            try:
+                iter(grid)
+            except TypeError:
+                feedback(f"The grid '{grid}' is not valid - please check it!", True)
+            for position in grid:
+                if not isinstance(position, Locale):
+                    feedback(f"The grid '{grid}' is not valid - please check it!", True)
+                if location[0] == position.label:
+                    loc = Point(position.x, position.y)
+                    break
+            if loc is None:
+                feedback(f"The location '{location[0]}' is not in the grid!", True)
+            # new line?
+            if index + 1 < len(locations):
+                # location #2
+                location_2 = locations[index + 1]
+                if isinstance(location_2, str):
+                    location_2 = (location_2, 0, 0)  # reformat into standard notation
+                if not isinstance(location_2, tuple) or len(location_2) != 3:
+                    feedback(
+                        f"The location '{location_2}' is not valid - please check its syntax!",
+                        True,
+                    )
+                loc_2 = None
+                for position in grid:
+                    if location_2[0] == position.label:
+                        loc_2 = Point(position.x, position.y)
+                        break
+                if loc_2 is None:
+                    feedback(
+                        f"The location '{location_2[0]}' is not in the grid!", True
+                    )
+                if location == location_2:
+                    feedback(
+                        "Locations must differ from each other - "
+                        f"({location} matches {location_2})!",
+                        True,
+                    )
+                # line start/end
+                x = dummy.points_to_value(loc.x) + location[1]
+                y = dummy.points_to_value(loc.y) + location[2]
+                x1 = dummy.points_to_value(loc_2.x) + location_2[1]
+                y1 = dummy.points_to_value(loc_2.y) + location_2[2]
+
+                _line = line(x=x, y=y, x1=x1, y1=y1, **kwargs)
+                # feedback(f"$$$ {x=}, {y=}, {x1=}, {y1=}")
+                delta_x = globals.margins.left
+                delta_y = globals.margins.top
+                # feedback(f"$$$ {delta_x=}, {delta_y=}")
+                _line.draw(
+                    off_x=-delta_x,
+                    off_y=-delta_y,
+                )
+
+    def get_starting_location(label: str = "", col: int = 0, row: int = 0) -> Locale:
+        """Find Locale in grid using the label"""
         loc = None
-        try:
-            iter(grid)
-        except TypeError:
-            feedback(f"The grid '{grid}' is not valid - please check it!", True)
         for position in grid:
             if not isinstance(position, Locale):
                 feedback(f"The grid '{grid}' is not valid - please check it!", True)
-            if location[0] == position.label:
-                loc = Point(position.x, position.y)
-                break
-        if loc is None:
-            feedback(f"The location '{location[0]}' is not in the grid!", True)
-        # new line?
-        if index + 1 < len(locations):
-            # location #2
-            location_2 = locations[index + 1]
-            if isinstance(location_2, str):
-                location_2 = (location_2, 0, 0)  # reformat into standard notation
-            if not isinstance(location_2, tuple) or len(location_2) != 3:
+            if label:
+                if label == position.label:
+                    return position
+            else:
+                if row == position.row and col == position.col:
+                    return position
+        if not loc:
+            if label:
+                feedback(f'Cannot find labelled start "{label}" in the grid!', True)
+            else:
                 feedback(
-                    f"The location '{location_2}' is not valid - please check its syntax!",
-                    True,
+                    f'Cannot find the location "{col+1}/{row+1}" in the grid!', True
                 )
-            loc_2 = None
-            for position in grid:
-                if location_2[0] == position.label:
-                    loc_2 = Point(position.x, position.y)
-                    break
-            if loc_2 is None:
-                feedback(f"The location '{location_2[0]}' is not in the grid!", True)
-            if location == location_2:
-                feedback(
-                    "Locations must differ from each other - "
-                    f"({location} matches {location_2})!",
-                    True,
-                )
-            # line start/end
-            x = dummy.points_to_value(loc.x) + location[1]
-            y = dummy.points_to_value(loc.y) + location[2]
-            x1 = dummy.points_to_value(loc_2.x) + location_2[1]
-            y1 = dummy.points_to_value(loc_2.y) + location_2[2]
+        return Locale()
 
-            _line = line(x=x, y=y, x1=x1, y1=y1, **kwargs)
-            # feedback(f"$$$ {x=}, {y=}, {x1=}, {y1=}")
-            delta_x = globals.margins.left
-            delta_y = globals.margins.top
-            # feedback(f"$$$ {delta_x=}, {delta_y=}")
-            _line.draw(
-                off_x=-delta_x,
-                off_y=-delta_y,
+    def draw_edges(start: str, vertex: str, edges: list, **kwargs):
+        """Draw lines along edges of hexagons in grid."""
+        loc = get_starting_location(start)
+        current_vertex = vertex
+        _line = None
+        for index, edge_direction in enumerate(edges):
+            direction = _lower(edge_direction)
+            # print('>>>', index, current_vertex, direction, loc.row, loc.col)
+            outcome = HEX_FLAT_EDGE_TRAVEL.get((current_vertex, direction))
+            if not outcome:
+                feedback(
+                    f'It is not possible to travel "{edge_direction}" from'
+                    f' a "{current_vertex}" vertex on this hexgrid.',
+                    True,
+                )
+
+            # _row = loc.row + outcome.row
+            if direction in ["nw", "sw"]:
+                row = loc.row - 1 if loc.col % 2 else 0  # odd column
+            elif direction in ["sw", "se"]:
+                row = loc.row + 1 if not (loc.col % 2) else 0  # even column
+            else:
+                row = loc.row + outcome.row
+            col = loc.col + outcome.col
+            # print(f'>>> >>> {col=}  {row=}')
+            next_loc = get_starting_location("", col=col, row=row)
+            next_vertex = outcome.end
+
+            _line = line(
+                xy=getattr(loc.geo, current_vertex),
+                xy1=getattr(next_loc.geo, next_vertex),
+                **kwargs,
             )
+            _line.draw()
+            # prep for next iteration
+            loc = next_loc
+            current_vertex = next_vertex
+
+    def draw_paths(start: str, paths: list, **kwargs):
+        """Draw curved lines between edges of hexagons in grid."""
+        start_locale = get_starting_location(start)
+        for index, path in enumerate(paths):
+            pass
+
+    kwargs = kwargs
+    # ---- validation
+    if locations is not None:
+        if isinstance(locations, str):  # should be a comma-delimited string
+            locations = tools.sequence_split(locations, to_int=False, unique=False)
+        if not isinstance(locations, list):
+            feedback(
+                f"GridLine locations '{locations}' is not a list - please check!", True
+            )
+        if locations and len(locations) < 2:
+            feedback("There should be at least 2 locations to create links!", True)
+        draw_linked_locations(locations, **kwargs)
+
+    if edges is not None:
+        if isinstance(edges, str):  # should be a comma-delimited string
+            edges = tools.sequence_split(edges, to_int=False, unique=False)
+        if not isinstance(edges, list):
+            feedback(f"GridLine edges '{edges}' is not a list - please check!", True)
+        if edges and not start:
+            feedback("There must be a start (hexagon location) to draw edges!", True)
+        if edges and not vertex:
+            feedback("There must be a vertex (initial point) to draw edges!", True)
+        if not _lower(vertex) in tools.valid_directions(DirectionGroup.HEX_FLAT):
+            feedback(f'The vertex "{vertex}" is not valid for this hexgrid.', True)
+        draw_edges(start, _lower(vertex), edges, **kwargs)
+
+    if paths is not None:
+        if isinstance(paths, str):  # should be a comma-delimited string
+            paths = tools.sequence_split(paths, to_int=False, unique=False)
+        if not isinstance(paths, list):
+            feedback(f"GridLine paths '{paths}' is not a list - please check!", True)
+        if paths and len(paths) < 2:
+            feedback("There should be at least 2 paths to draw lines!", True)
+        if paths and not start:
+            feedback("There must be a start to draw paths!", True)
+        draw_paths(start, paths, **kwargs)
+
+    if locations is None and edges is None and paths is None:
+        feedback(
+            "Set a value for location, or edges, or paths to draw a GridLine!", True
+        )
 
 
 # ---- layout & tracks ====

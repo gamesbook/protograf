@@ -22,7 +22,7 @@ and that you've created some basic scripts of your own using the
 - `Circular Hexagonal Grid`_
 - `Diamond Hexagonal Grid`_
 - `Grid Locations`_
-- `Grid LinkLine`_
+- `Grid GridLine`_
 - `Other Hexagonal Grid Resources`_
 
 
@@ -920,13 +920,13 @@ Example 4.  Locations & Col/Row
 ===== ======
 
 
-.. _linkline-command:
+.. _gridline-command:
 
-Grid LinkLine
+Grid GridLine
 =============
 `↑ <table-of-contents-hexg_>`_
 
-The ``LinkLine()`` command allows the creation of a line to join one or more
+The ``GridLine()`` command allows the creation of a line to join one or more
 hexagons within a hexagonal grid.
 
 This command should work with any of the types of hexagonal grid layouts
@@ -947,24 +947,24 @@ All of the examples below make use of the same underlying hexagonal grid:
 The grid is assigned the name *hexgrid* so its result can be reused.
 
 
-Example 1. A Single LinkLine
+Example 1. A Single GridLine
 ----------------------------
-`^ <Grid LinkLine_>`_
+`^ <Grid GridLine_>`_
 
 .. |ll0| image:: images/custom/hexagonal_grid/hexgrid_linkline_single.png
    :width: 330
 
 ===== ======
-|ll0| This example shows a ``LinkLine`` constructed using the command:
+|ll0| This example shows a ``GridLine`` constructed using the command:
 
       .. code:: python
 
-        LinkLine(
+        GridLine(
             grid=hexgrid,
             locations="0101,0403"
         )
 
-      The ``LinkLine`` command  has the following properties:
+      The ``GridLine`` command  has the following properties:
 
       - *grid* used is *hexgrid* (as defined for all these examples)
       - *locations* - set to ``"0101,0403"``
@@ -979,24 +979,24 @@ Example 1. A Single LinkLine
 ===== ======
 
 
-Example 2. A Double LinkLine
+Example 2. A Double GridLine
 ----------------------------
-`^ <Grid LinkLine_>`_
+`^ <Grid GridLine_>`_
 
 .. |ll1| image:: images/custom/hexagonal_grid/hexgrid_linkline_double.png
    :width: 330
 
 ===== ======
-|ll1| This example shows a ``LinkLine`` constructed using the command:
+|ll1| This example shows a ``GridLine`` constructed using the command:
 
       .. code:: python
 
-        LinkLine(
+        GridLine(
             hexgrid,
-            "0101,0403,0104"
+            locations="0101,0403,0104"
         )
 
-      The ``LinkLine`` command  has the following properties:
+      The ``GridLine`` command  has the following properties:
 
       - the grid used is *hexgrid* (as defined for all these examples)
       - *locations* are set to ``"0101,0403,0104"``
@@ -1011,45 +1011,45 @@ Example 2. A Double LinkLine
       centre of the hexagon in which it starts or ends, and uses the
       default styling.
 
-      **Note** that in this example, the *grid=* and *locations=* are omitted;
-      the program can just use the values presented, provided they are in the
-      correct order shown above.
+      **Note** that in this example, the ``grid=`` is omitted;
+      the program can just use the value presented, provided its appears
+      first in the command.
 
 ===== ======
 
 
-Example 3. A Styled LinkLine
+Example 3. A Styled GridLine
 ----------------------------
-`^ <Grid LinkLine_>`_
+`^ <Grid GridLine_>`_
 
 .. |ll2| image:: images/custom/hexagonal_grid/hexgrid_linkline_multi_style.png
    :width: 330
 
 ===== ======
-|ll2| This example shows a ``LinkLine`` constructed using the command:
+|ll2| This example shows a ``GridLine`` constructed using the command:
 
       .. code:: python
 
-        LinkLine(
+        GridLine(
             hexgrid,
-            ["0101", "0403", "0104", "0406"],
+            locations=["0101", "0403", "0104", "0406"],
             common=Common(
                 stroke="tomato",
                 stroke_width=2)
         )
-        LinkLine(
+        GridLine(
             hexgrid,
-            ["0104", "0406"],
+            locations=["0104", "0406"],
             common=Common(
                 stroke="cyan",
                 stroke_width=2)
         )
 
-      The ``LinkLine`` commands have the following properties:
+      The ``GridLine`` commands have the following properties:
 
       - the grid used is *hexgrid* (as defined for all these examples)
-      - ``["0101","0403","0104","0406"]`` - location coordinates
-      - ``["0104","0406"]`` - location coordinates
+      - ``["0101","0403","0104","0406"]`` - locations coordinates
+      - ``["0104","0406"]`` - locations coordinates
       - *common* - defines the styling for the line
 
       The location coordinates contain multiple start and end locations in
@@ -1064,31 +1064,32 @@ Example 3. A Styled LinkLine
 ===== ======
 
 
-Example 4. An Offset LinkLine
+Example 4. An Offset GridLine
 -----------------------------
-`^ <Grid LinkLine_>`_
+`^ <Grid GridLine_>`_
 
 .. |ll3| image:: images/custom/hexagonal_grid/hexgrid_linkline_offset.png
    :width: 330
 
 ===== ======
-|ll3| This example shows a ``LinkLine`` constructed using the command:
+|ll3| This example shows a ``GridLine`` constructed using the command:
 
       .. code:: python
 
-        LinkLine(
+        GridLine(
             hexgrid,
-            [("0101", 0.25, 0.25),
-             ("0403", -0.25, -0.25),
-             ("0104", 0.0, 0.25),
-             ("0104", 0.25, -0.25)],
+            locations=[
+              ("0101", 0.25, 0.25),
+              ("0403", -0.25, -0.25),
+              ("0104", 0.0, 0.25),
+              ("0104", 0.25, -0.25)],
             common=Common(
-                stroke="tomato",
-                stroke_width=1,
-                dotted=True)
+              stroke="tomato",
+              stroke_width=1,
+              dotted=True)
         )
 
-      The ``LinkLine`` command  has the following properties:
+      The ``GridLine`` command  has the following properties:
 
       - the grid used is *hexgrid* (as defined for all these examples)
       - ``("0101", 0.25, 0.25)`` - coordinates of a grid location and the
