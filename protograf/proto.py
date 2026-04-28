@@ -4954,11 +4954,20 @@ def GridLine(
                     True,
                 )
 
-            # _row = loc.row + outcome.row
-            if direction in ["nw", "sw"]:
-                row = loc.row - 1 if loc.col % 2 else 0  # odd column
-            elif direction in ["sw", "se"]:
-                row = loc.row + 1 if not (loc.col % 2) else 0  # even column
+            if (
+                direction == "ne"
+                and current_vertex == "ne"
+                or direction == "nw"
+                and current_vertex == "nw"
+            ):
+                row = loc.row - 1 if loc.col % 2 == 0 else loc.row  # even column 0,2,4
+            elif (
+                direction == "se"
+                and current_vertex == "se"
+                or direction == "sw"
+                and current_vertex == "sw"
+            ):
+                row = loc.row + 1 if loc.col % 2 == 1 else loc.row  # odd column 1,3,5
             else:
                 row = loc.row + outcome.row
             col = loc.col + outcome.col

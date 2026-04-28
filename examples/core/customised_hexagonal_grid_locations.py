@@ -19,7 +19,7 @@ Create(
 )
 
 header = Common(x=0, y=0, font_size=8, align="left")
-a_circle = Common(radius=0.4)
+a_circle = Common(radius=0.3)
 '''
 # ---- location - single shape -  hexgrid_location_single
 Blueprint(stroke_width=0.5)
@@ -192,24 +192,34 @@ hexgrid = Hexagons(
     x=0, y=0.1,
     rows=6, cols=5,
     dot=0.02,
-    coord_elevation='top'
+    # coord_elevation='top'
 )
+Locations(
+    hexgrid,
+    "all",
+    [circle(common=a_circle, label="c{{col}}r{{row}}", fill=None, stroke="red", label_size=6)]
+)
+
+for hg in hexgrid:
+    print(hg.col, hg.row, hg.id)
 
 GridLine(
     hexgrid,
-    start="0303",
+    start="0203",
     vertex="nw",
-    edges="e,se,sw,w,sw",
+    edges="e,ne,e,ne",
     common=Common(
         stroke="cyan",
         stroke_width=3)
 )
 
+Hexagons(side=0.5, x=0, y=0.1, rows=6, cols=5, fill=None)
+
 GridLine(
     hexgrid,
-    start="0106",
+    start="0204",
     vertex="ne",
-    edges=["ne", "e"] * 4,
+    edges=["se", "e", "ne", "e"],
     common=Common(
         stroke="tomato",
         stroke_width=2,
