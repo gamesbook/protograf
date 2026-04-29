@@ -4940,50 +4940,85 @@ def GridLine(
 
     def draw_edges(start: str, vertex: str, edges: list, **kwargs):
         """Draw lines along edges of hexagons in grid."""
-        loc = get_starting_location(start)
-        current_vertex = vertex
-        _line = None
-        for index, edge_direction in enumerate(edges):
-            direction = _lower(edge_direction)
-            # print('>>>', index, current_vertex, direction, loc.row, loc.col)
-            outcome = HEX_FLAT_EDGE_TRAVEL.get((current_vertex, direction))
-            if not outcome:
-                feedback(
-                    f'It is not possible to travel "{edge_direction}" from'
-                    f' a "{current_vertex}" vertex on this hexgrid.',
-                    True,
+        starts = (
+            [
+                start,
+            ]
+            if isinstance(start, str)
+            else start
+        )  # must be a list!
+        for start in starts:
+            loc = get_starting_location(start)
+            current_vertex = vertex
+            _line = None
+            for index, edge_direction in enumerate(edges):
+                direction = _lower(edge_direction)
+                # print('>>>', index, current_vertex, direction, loc.row, loc.col)
+                outcome = HEX_FLAT_EDGE_TRAVEL.get((current_vertex, direction))
+                if not outcome:
+                    feedback(
+                        f'It is not possible to travel "{edge_direction}" from'
+                        f' a "{current_vertex}" vertex on this hexgrid.',
+                        True,
+                    )
+
+                # calculate col/row changes for FLAT
+                col, row = 0, 0
+
+                if (
+                    direction == "e"
+                    and current_vertex == "e"
+                    or direction == "ne"
+                    and current_vertex == "ne"
+                    or direction == "se"
+                    and current_vertex == "se"
+                ):
+                    col = 1
+                if (
+                    direction == "w"
+                    and current_vertex == "w"
+                    or direction == "nw"
+                    and current_vertex == "nw"
+                    or direction == "sw"
+                    and current_vertex == "sw"
+                ):
+                    col = -1
+                col = loc.col + col
+
+                if (
+                    direction == "ne"
+                    and current_vertex == "ne"
+                    or direction == "nw"
+                    and current_vertex == "nw"
+                    or direction == "w"
+                    and current_vertex == "w"
+                ):
+                    row = -1 if loc.col % 2 == 0 else 0  # even column 0,2,4
+                if (
+                    direction == "se"
+                    and current_vertex == "se"
+                    or direction == "sw"
+                    and current_vertex == "sw"
+                    or direction == "e"
+                    and current_vertex == "e"
+                ):
+                    row = 1 if loc.col % 2 == 1 else 0  # odd column 1,3,5
+                row = loc.row + row
+
+                # print(f'>>> >>> {col=}  {row=}')
+                next_loc = get_starting_location("", col=col, row=row)
+                next_vertex = outcome.end
+
+                # line settings
+                _line = line(
+                    xy=getattr(loc.geo, current_vertex),
+                    xy1=getattr(next_loc.geo, next_vertex),
+                    **kwargs,
                 )
-
-            if (
-                direction == "ne"
-                and current_vertex == "ne"
-                or direction == "nw"
-                and current_vertex == "nw"
-            ):
-                row = loc.row - 1 if loc.col % 2 == 0 else loc.row  # even column 0,2,4
-            elif (
-                direction == "se"
-                and current_vertex == "se"
-                or direction == "sw"
-                and current_vertex == "sw"
-            ):
-                row = loc.row + 1 if loc.col % 2 == 1 else loc.row  # odd column 1,3,5
-            else:
-                row = loc.row + outcome.row
-            col = loc.col + outcome.col
-            # print(f'>>> >>> {col=}  {row=}')
-            next_loc = get_starting_location("", col=col, row=row)
-            next_vertex = outcome.end
-
-            _line = line(
-                xy=getattr(loc.geo, current_vertex),
-                xy1=getattr(next_loc.geo, next_vertex),
-                **kwargs,
-            )
-            _line.draw()
-            # prep for next iteration
-            loc = next_loc
-            current_vertex = next_vertex
+                _line.draw()
+                # prep for next iteration
+                loc = next_loc
+                current_vertex = next_vertex
 
     def draw_paths(start: str, paths: list, **kwargs):
         """Draw curved lines between edges of hexagons in grid."""
@@ -5005,16 +5040,27 @@ def GridLine(
         draw_linked_locations(locations, **kwargs)
 
     if edges is not None:
-        if isinstance(edges, str):  # should be a comma-delimited string
-            edges = tools.sequence_split(edges, to_int=False, unique=False)
-        if not isinstance(edges, list):
-            feedback(f"GridLine edges '{edges}' is not a list - please check!", True)
-        if edges and not start:
-            feedback("There must be a start (hexagon location) to draw edges!", True)
         if edges and not vertex:
             feedback("There must be a vertex (initial point) to draw edges!", True)
         if not _lower(vertex) in tools.valid_directions(DirectionGroup.HEX_FLAT):
             feedback(f'The vertex "{vertex}" is not valid for this hexgrid.', True)
+        if isinstance(edges, str):  # comma-delimited string for multi-edge
+            if edges == "*" or _lower(edges) == "all":
+                loop = {
+                    "ne": ["se", "sw", "w", "nw", "ne", "e"],
+                    "e": ["sw", "w", "nw", "ne", "e", "se"],
+                    "se": ["w", "nw", "ne", "e", "se", "sw"],
+                    "sw": ["nw", "ne", "e", "se", "sw", "w"],
+                    "w": ["ne", "e", "se", "sw", "w", "nw"],
+                    "nw": ["e", "se", "sw", "w", "nw", "ne"],
+                }
+                edges = loop.get(_lower(vertex))
+            else:
+                edges = tools.sequence_split(edges, to_int=False, unique=False)
+        if not isinstance(edges, list):
+            feedback(f"GridLine edges '{edges}' is not a list - please check!", True)
+        if edges and not start:
+            feedback("There must be a start (hexagon location) to draw edges!", True)
         draw_edges(start, _lower(vertex), edges, **kwargs)
 
     if paths is not None:

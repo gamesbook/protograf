@@ -160,8 +160,6 @@ HexEdgeResult = namedtuple(
     [
         "edge",  # compass direction / edge
         "end",  # compass direction / vertex
-        "row",  # int; -1, 0 or 1
-        "col",  # int; -1, 0 or 1
     ],
 )
 # ---- * LookupType
@@ -464,22 +462,22 @@ class VirtualHex:
 # ---- * Travel outcomes for GridLine edges
 HEX_FLAT_EDGE_TRAVEL = {
     # startpoint / direction => result
-    ("ne", "w"): HexEdgeResult(edge="n", end="nw", row=0, col=0),
-    ("ne", "ne"): HexEdgeResult(edge="se", end="nw", row=-1, col=1),
-    ("ne", "se"): HexEdgeResult(edge="ne", end="e", row=0, col=0),
-    ("e", "nw"): HexEdgeResult(edge="ne", end="ne", row=0, col=0),
-    ("e", "e"): HexEdgeResult(edge="s", end="se", row=0, col=1),
-    ("e", "sw"): HexEdgeResult(edge="se", end="se", row=0, col=0),
-    ("se", "ne"): HexEdgeResult(edge="se", end="e", row=0, col=0),
-    ("se", "se"): HexEdgeResult(edge="sw", end="sw", row=0, col=1),
-    ("se", "w"): HexEdgeResult(edge="s", end="sw", row=0, col=0),
-    ("sw", "e"): HexEdgeResult(edge="s", end="se", row=0, col=0),
-    ("sw", "nw"): HexEdgeResult(edge="sw", end="w", row=0, col=0),
-    ("sw", "sw"): HexEdgeResult(edge="se", end="se", row=0, col=-1),
-    ("w", "w"): HexEdgeResult(edge="s", end="sw", row=0, col=-1),
-    ("w", "ne"): HexEdgeResult(edge="nw", end="nw", row=0, col=0),
-    ("w", "se"): HexEdgeResult(edge="sw", end="sw", row=0, col=0),
-    ("nw", "e"): HexEdgeResult(edge="n", end="ne", row=0, col=0),
-    ("nw", "nw"): HexEdgeResult(edge="sw", end="w", row=-1, col=0),
-    ("nw", "sw"): HexEdgeResult(edge="nw", end="w", row=0, col=0),
+    ("ne", "w"): HexEdgeResult(edge="n", end="nw"),
+    ("ne", "ne"): HexEdgeResult(edge="se", end="nw"),
+    ("ne", "se"): HexEdgeResult(edge="ne", end="e"),
+    ("e", "nw"): HexEdgeResult(edge="n", end="ne"),
+    ("e", "e"): HexEdgeResult(edge="n", end="ne"),
+    ("e", "sw"): HexEdgeResult(edge="s", end="se"),
+    ("se", "ne"): HexEdgeResult(edge="se", end="e"),
+    ("se", "se"): HexEdgeResult(edge="sw", end="sw"),
+    ("se", "w"): HexEdgeResult(edge="s", end="sw"),
+    ("sw", "e"): HexEdgeResult(edge="s", end="se"),
+    ("sw", "nw"): HexEdgeResult(edge="sw", end="w"),
+    ("sw", "sw"): HexEdgeResult(edge="se", end="se"),
+    ("w", "w"): HexEdgeResult(edge="s", end="sw"),
+    ("w", "ne"): HexEdgeResult(edge="nw", end="nw"),
+    ("w", "se"): HexEdgeResult(edge="sw", end="sw"),
+    ("nw", "e"): HexEdgeResult(edge="n", end="ne"),
+    ("nw", "nw"): HexEdgeResult(edge="sw", end="w"),
+    ("nw", "sw"): HexEdgeResult(edge="nw", end="w"),
 }

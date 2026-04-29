@@ -20,7 +20,7 @@ Create(
 
 header = Common(x=0, y=0, font_size=8, align="left")
 a_circle = Common(radius=0.3)
-'''
+
 # ---- location - single shape -  hexgrid_location_single
 Blueprint(stroke_width=0.5)
 Text(common=header, text="Location: single shape")
@@ -183,7 +183,7 @@ GridLine(
     common=Common(stroke="tomato", stroke_width=1, dotted=True)
 )
 PageBreak()
-'''
+
 # ---- gridlines - edges
 Blueprint(stroke_width=0.5)
 Text(common=header, text="GridLine: edges: multi style")
@@ -192,40 +192,38 @@ hexgrid = Hexagons(
     x=0, y=0.1,
     rows=6, cols=5,
     dot=0.02,
-    # coord_elevation='top'
+    coord_elevation='top'
 )
-Locations(
-    hexgrid,
-    "all",
-    [circle(common=a_circle, label="c{{col}}r{{row}}", fill=None, stroke="red", label_size=6)]
-)
-
-for hg in hexgrid:
-    print(hg.col, hg.row, hg.id)
-
 GridLine(
     hexgrid,
     start="0203",
     vertex="nw",
-    edges="e,ne,e,ne",
+    edges="e,ne,e,se,nw,ne,e",
     common=Common(
         stroke="cyan",
         stroke_width=3)
 )
-
-Hexagons(side=0.5, x=0, y=0.1, rows=6, cols=5, fill=None)
-
+Hexagons(
+    side=0.5, x=0, y=0.1, rows=6, cols=5, fill=None)
 GridLine(
     hexgrid,
-    start="0204",
+    start="0504",
     vertex="ne",
-    edges=["se", "e", "ne", "e"],
+    edges=["w", "sw", "w", "nw"] * 2,
     common=Common(
         stroke="tomato",
         stroke_width=2,
         dotted=True)
 )
-PageBreak()
+GridLine(
+    hexgrid,
+    start=["0106", "0306", "0506",],
+    vertex="ne",
+    edges="*",
+    common=Common(
+        stroke="black",
+        stroke_width=2)
+)
 
 Save(
     output='png',
