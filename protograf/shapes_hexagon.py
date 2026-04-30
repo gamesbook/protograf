@@ -139,6 +139,7 @@ class HexShape(BaseShape):
         hex_geom = self.get_geometry()
         radius = self._p2v(hex_geom.radius)
         diameter = self._p2v(hex_geom.diameter)
+        height = self._p2v(hex_geom.height_flat)
         side = self._p2v(hex_geom.radius)
         area = math.sqrt(3) * 3 / 2 * side**2
         perim = 6 * side
@@ -168,6 +169,7 @@ class HexShape(BaseShape):
             perimeter=perim,
             radius=radius,
             diameter=diameter,
+            height=height,
             side=side,
             # other
             area=area,
@@ -987,7 +989,7 @@ class HexShape(BaseShape):
                     case ["sw", "nw"] | ["nw", "sw"]:
                         arc(vertices[0], perbii_dict["sw"].point, 120.0)  # p1
                     case ["n", "nw"] | ["nw", "n"]:
-                        arc(vertices[5], perbii_dict["nw"].point, 120.0)  # p5
+                        arc(vertices[5], perbii_dict["nw"].point, 120.0)  # p0
                     # 60 degrees / long arc
                     case ["n", "se"] | ["se", "n"]:
                         arc(pt_b, perbii_dict["n"].point, 60.0)  # p5

@@ -224,6 +224,29 @@ GridLine(
         stroke="black",
         stroke_width=2)
 )
+PageBreak()
+
+# ---- gridlines - paths
+Blueprint(stroke_width=0.5)
+Text(common=header, text="GridLine: paths: multi style")
+hexgrid = Hexagons(
+    side=0.5,
+    x=0, y=0.1,
+    rows=6, cols=5,
+    dot=0.02,
+    coord_elevation='top'
+)
+GridLine(
+    hexgrid,
+    start="0203",
+    perbis="n",
+    # paths="se,se,s",
+    # paths=["se","se","s",],
+    paths=["se",],
+    common=Common(
+        stroke="cyan",
+        stroke_width=4)
+)
 
 Save(
     output='png',
@@ -241,5 +264,6 @@ Save(
         "hexgrid_linkline_multi_style",
         "hexgrid_linkline_offset",
         "hexgrid_edges_multi_style",
+        "hexgrid_paths_multi_style",
     ]
 )

@@ -133,6 +133,7 @@ from protograf.utils.structures import (
     DirectionGroup,
     ExportFormat,
     HEX_FLAT_EDGE_TRAVEL,
+    HexOrientation,
     LookupType,
     Locale,
     PageMargins,
@@ -4555,12 +4556,21 @@ def Hexagons(rows=1, cols=1, sides=None, **kwargs):
                     )
                     hxgn.draw()
                     shape_geo = ShapeGeometry(  # keep in user units for GridLine
+                        centre=hxgn.geo.centre,
+                        height=hxgn.geo.height,
+                        side=hxgn.geo.side,
                         ne=hxgn.geo.ne,
                         se=hxgn.geo.se,
                         e=hxgn.geo.e,
                         w=hxgn.geo.w,
                         sw=hxgn.geo.sw,
                         nw=hxgn.geo.nw,
+                        n=hxgn.geo.n,
+                        s=hxgn.geo.s,
+                        wnw=hxgn.geo.wnw,
+                        ene=hxgn.geo.ene,
+                        ese=hxgn.geo.ese,
+                        wsw=hxgn.geo.wsw,
                     )
                     _locale = Locale(
                         col=ccol - 1,
@@ -4639,12 +4649,21 @@ def Hexagons(rows=1, cols=1, sides=None, **kwargs):
                         row=row, col=col, hex_rows=rows, hex_cols=cols, **kwargs
                     )
                     shape_geo = ShapeGeometry(  # keep in user units for GridLine
+                        centre=hxgn.geo.centre,
+                        height=hxgn.geo.height,
+                        side=hxgn.geo.side,
                         ne=hxgn.geo.ne,
                         se=hxgn.geo.se,
                         e=hxgn.geo.e,
                         w=hxgn.geo.w,
                         sw=hxgn.geo.sw,
                         nw=hxgn.geo.nw,
+                        n=hxgn.geo.n,
+                        s=hxgn.geo.s,
+                        wnw=hxgn.geo.wnw,
+                        ene=hxgn.geo.ene,
+                        ese=hxgn.geo.ese,
+                        wsw=hxgn.geo.wsw,
                     )
                     _locale = Locale(
                         col=col,
@@ -4842,6 +4861,7 @@ def GridLine(
     grid: list,
     start: str = "",
     vertex: str = "",
+    perbis: str = "",
     locations: Union[list, str] | None = None,
     edges: Union[list, str] | None = None,
     paths: Union[list, str] | None = None,
@@ -5005,7 +5025,7 @@ def GridLine(
                     row = 1 if loc.col % 2 == 1 else 0  # odd column 1,3,5
                 row = loc.row + row
 
-                # print(f'>>> >>> {col=}  {row=}')
+                # print(f'>>> edges >>> {col=}  {row=}')
                 next_loc = get_starting_location("", col=col, row=row)
                 next_vertex = outcome.end
 
@@ -5020,11 +5040,142 @@ def GridLine(
                 loc = next_loc
                 current_vertex = next_vertex
 
-    def draw_paths(start: str, paths: list, **kwargs):
-        """Draw curved lines between edges of hexagons in grid."""
-        start_locale = get_starting_location(start)
-        for index, path in enumerate(paths):
-            pass
+    def draw_arc(centre: Point, start: Point, angle_width: float, **kwargs):
+        radius = geoms.length_of_line(start, centre)
+        compass, rotate = geoms.angles_from_points(centre, start)
+        angle_start = rotate
+        aarc = arc(
+            cxy=centre,
+            radius=radius,
+            angle_start=angle_start,
+            angle_width=angle_width,
+            fullSector=False,
+            **kwargs,
+        )
+        aarc.draw()
+
+    def draw_path_lines(
+        pair: str,
+        perbii: dict,
+        vertices: dict,
+        offset: dict,
+        orientation: HexOrientation = HexOrientation.FLAT,
+        **kwargs,
+    ):
+        """Draw arc or line between centre of edges on a hexagon."""
+        if orientation == HexOrientation.FLAT:
+            match pair:
+                # 120 degrees / short arc
+                case ["n", "ne"] | ["ne", "n"]:
+                    draw_arc(vertices[4], perbii["n"], 120.0, **kwargs)  # p5
+                case ["se", "ne"] | ["ne", "se"]:
+                    draw_arc(vertices[3], perbii["ne"], 120.0, **kwargs)  # p4
+                case ["se", "s"] | ["s", "se"]:
+                    draw_arc(vertices[2], perbii["se"], 120.0, **kwargs)  # p3
+                case ["sw", "s"] | ["s", "sw"]:
+                    draw_arc(vertices[1], perbii["s"], 120.0, **kwargs)  # p2
+                case ["sw", "nw"] | ["nw", "sw"]:
+                    draw_arc(vertices[0], perbii["sw"], 120.0, **kwargs)  # p1
+                case ["n", "nw"] | ["nw", "n"]:
+                    draw_arc(vertices[5], perbii["nw"], 120.0, **kwargs)  # p0
+                # 60 degrees / long arc
+                case ["n", "se"] | ["se", "n"]:
+                    draw_arc(offset["b"], perbii["n"], 60.0, **kwargs)  # p5
+                case ["ne", "s"] | ["s", "ne"]:
+                    draw_arc(offset["c"], perbii["ne"], 60.0, **kwargs)  # p4
+                case ["se", "sw"] | ["sw", "se"]:
+                    draw_arc(offset["d"], perbii["se"], 60.0, **kwargs)  # p3
+                case ["s", "nw"] | ["nw", "s"]:
+                    draw_arc(offset["e"], perbii["s"], 60.0, **kwargs)  # p2
+                case ["sw", "n"] | ["n", "sw"]:
+                    draw_arc(offset["f"], perbii["sw"], 60.0, **kwargs)  # p1
+                case ["nw", "ne"] | ["ne", "nw"]:
+                    draw_arc(offset["a"], perbii["nw"], 60.0, **kwargs)  # p0
+                # 90 degrees / straight line
+                case (
+                    ["nw", "se"]
+                    | ["se", "nw"]
+                    | ["ne", "sw"]
+                    | ["sw", "ne"]
+                    | ["n", "s"]
+                    | ["s", "n"]
+                ):
+                    _line = line(
+                        xy=perbii[pair[0]],
+                        xy1=perbii[pair[1]],
+                        **kwargs,
+                    )
+                    _line.draw()
+
+    def draw_paths(start: str, perbis: str, directions: list, **kwargs):
+        """Draw curved/straight lines between edges of hexagons in grid."""
+        loc = get_starting_location(start)
+        from_edge = perbis
+        to_edge = directions[0]
+        for index in range(0, len(directions)):
+            # ---- perbis pts // FLAT hex
+            perbii = {
+                "n": loc.geo.n,
+                "ne": loc.geo.nne,
+                "se": loc.geo.sse,
+                "s": loc.geo.s,
+                "sw": loc.geo.ssw,
+                "nw": loc.geo.nnw,
+            }
+            # ---- vertex pts // FLAT hex
+            #        0__5
+            #       1/  \4
+            #        \__/
+            #        2  3
+            vertices = [
+                loc.geo.nw,
+                loc.geo.w,
+                loc.geo.sw,
+                loc.geo.se,
+                loc.geo.e,
+                loc.geo.ne,
+            ]
+            # ---- calculate offset centres  // FLAT hex
+            side_plus = loc.geo.side * 1.5
+            h_flat = loc.geo.height / 2.0
+            height_flat = loc.geo.height
+            centre = loc.geo.centre
+            #      A
+            #     ___
+            #  F / . \ B
+            #  E \___/ C
+            #      D
+            offsets = {
+                "a": Point(centre.x, centre.y - height_flat),
+                "b": Point(centre.x + side_plus, centre.y - h_flat),
+                "c": Point(centre.x + side_plus, centre.y + h_flat),
+                "d": Point(centre.x, centre.y + height_flat),
+                "e": Point(centre.x - side_plus, centre.y + h_flat),
+                "f": Point(centre.x - side_plus, centre.y - h_flat),
+            }
+            # ---- draw lines
+            draw_path_lines([from_edge, to_edge], perbii, vertices, offsets, **kwargs)
+            # ---- set next location
+            col, row = 0, 0
+
+            if to_edge in ["se", "ne"]:
+                col = 1
+            if to_edge in ["nw", "sw"]:
+                col = -1
+            col = loc.col + col
+
+            if to_edge in ["nw", "ne", "n"]:
+                row = -1 if loc.col % 2 == 0 else 0  # even column 0,2,4
+            if to_edge in ["sw", "se", "s"]:
+                row = 1 if loc.col % 2 == 1 else 0  # odd column 1,3,5
+            row = loc.row + row
+
+            # print(f'>>> >>> {col=}  {row=}')
+            loc = get_starting_location("", col=col, row=row)
+
+            # ---- set next pair of directions
+            from_edge = directions[index]
+            to_edge = directions[index + 1] if index < (len(directions) - 1) else None
 
     kwargs = kwargs
     # ---- validation
@@ -5064,15 +5215,17 @@ def GridLine(
         draw_edges(start, _lower(vertex), edges, **kwargs)
 
     if paths is not None:
+        if paths and not perbis:
+            feedback("There must be a perbis (initial edge) to draw paths!", True)
+        if not _lower(perbis) in tools.valid_directions(DirectionGroup.HEX_POINTY):
+            feedback(f'The perbis "{perbis}" is not valid for this hexgrid.', True)
         if isinstance(paths, str):  # should be a comma-delimited string
             paths = tools.sequence_split(paths, to_int=False, unique=False)
         if not isinstance(paths, list):
             feedback(f"GridLine paths '{paths}' is not a list - please check!", True)
-        if paths and len(paths) < 2:
-            feedback("There should be at least 2 paths to draw lines!", True)
         if paths and not start:
             feedback("There must be a start to draw paths!", True)
-        draw_paths(start, paths, **kwargs)
+        draw_paths(start, perbis, paths, **kwargs)
 
     if locations is None and edges is None and paths is None:
         feedback(
