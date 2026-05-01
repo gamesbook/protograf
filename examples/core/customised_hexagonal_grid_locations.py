@@ -3,8 +3,8 @@ Show customised Hexagons grid locations and gridlines for protograf
 
 Written by: Derek Hohls
 Created on: 7 December 2024
+Updated on: 1 May 2026
 """
-
 from protograf import *
 
 Create(
@@ -200,8 +200,9 @@ GridLine(
     vertex="nw",
     edges="e,ne,e,se,nw,ne,e",
     common=Common(
-        stroke="cyan",
-        stroke_width=3)
+        stroke="green",
+        stroke_width=4,
+        stroke_ends="rounded")
 )
 Hexagons(
     side=0.5, x=0, y=0.1, rows=6, cols=5, fill=None)
@@ -211,13 +212,13 @@ GridLine(
     vertex="ne",
     edges=["w", "sw", "w", "nw"] * 2,
     common=Common(
-        stroke="tomato",
+        stroke="red",
         stroke_width=2,
         dotted=True)
 )
 GridLine(
     hexgrid,
-    start=["0106", "0306", "0506",],
+    start=["0106", "0306", "0506"],
     vertex="ne",
     edges="*",
     common=Common(
@@ -233,19 +234,32 @@ hexgrid = Hexagons(
     side=0.5,
     x=0, y=0.1,
     rows=6, cols=5,
-    dot=0.02,
-    coord_elevation='top'
 )
 GridLine(
     hexgrid,
-    start="0203",
-    perbis="n",
-    # paths="se,se,s",
-    # paths=["se","se","s",],
-    paths=["se",],
+    start="0103",
+    perbis="sw",
+    paths="ne,ne,se,se,se",
+    common=Common(
+        stroke="grey",
+        stroke_width=3)
+)
+GridLine(
+    hexgrid,
+    start="0106",
+    perbis="nw",
+    paths=["ne", "ne", "n", "se", "s", "se", "s"],
     common=Common(
         stroke="cyan",
-        stroke_width=4)
+        stroke_width=6)
+)
+Hexagons(
+    side=0.5,
+    x=0, y=0.1,
+    rows=6, cols=5,
+    dot=0.02,
+    coord_elevation='top',
+    fill=None
 )
 
 Save(

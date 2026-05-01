@@ -4559,12 +4559,14 @@ def Hexagons(rows=1, cols=1, sides=None, **kwargs):
                         centre=hxgn.geo.centre,
                         height=hxgn.geo.height,
                         side=hxgn.geo.side,
+                        # vertices  // FLAT
                         ne=hxgn.geo.ne,
                         se=hxgn.geo.se,
                         e=hxgn.geo.e,
                         w=hxgn.geo.w,
                         sw=hxgn.geo.sw,
                         nw=hxgn.geo.nw,
+                        # perbii // FLAT
                         n=hxgn.geo.n,
                         s=hxgn.geo.s,
                         wnw=hxgn.geo.wnw,
@@ -4652,12 +4654,14 @@ def Hexagons(rows=1, cols=1, sides=None, **kwargs):
                         centre=hxgn.geo.centre,
                         height=hxgn.geo.height,
                         side=hxgn.geo.side,
+                        # vertices  // FLAT
                         ne=hxgn.geo.ne,
                         se=hxgn.geo.se,
                         e=hxgn.geo.e,
                         w=hxgn.geo.w,
                         sw=hxgn.geo.sw,
                         nw=hxgn.geo.nw,
+                        # perbii // FLAT
                         n=hxgn.geo.n,
                         s=hxgn.geo.s,
                         wnw=hxgn.geo.wnw,
@@ -5044,6 +5048,9 @@ def GridLine(
         radius = geoms.length_of_line(start, centre)
         compass, rotate = geoms.angles_from_points(centre, start)
         angle_start = rotate
+        if kwargs.get("invert"):
+            angle_start = 360 - angle_start
+        # print(f'$$$ GridLine arc {centre=} {radius=} {angle_start=} {angle_width=}')
         aarc = arc(
             cxy=centre,
             radius=radius,
@@ -5067,30 +5074,38 @@ def GridLine(
             match pair:
                 # 120 degrees / short arc
                 case ["n", "ne"] | ["ne", "n"]:
-                    draw_arc(vertices[4], perbii["n"], 120.0, **kwargs)  # p5
+                    draw_arc(vertices["ne"], perbii["n"], 120.0, **kwargs)  # p5 OK
                 case ["se", "ne"] | ["ne", "se"]:
-                    draw_arc(vertices[3], perbii["ne"], 120.0, **kwargs)  # p4
+                    draw_arc(vertices["e"], perbii["ne"], -120.0, **kwargs)  # p4 OK
                 case ["se", "s"] | ["s", "se"]:
-                    draw_arc(vertices[2], perbii["se"], 120.0, **kwargs)  # p3
+                    draw_arc(vertices["se"], perbii["s"], -120.0, **kwargs)  # p3 OK
                 case ["sw", "s"] | ["s", "sw"]:
-                    draw_arc(vertices[1], perbii["s"], 120.0, **kwargs)  # p2
+                    draw_arc(vertices["sw"], perbii["s"], 120.0, **kwargs)  # p2 OK
                 case ["sw", "nw"] | ["nw", "sw"]:
-                    draw_arc(vertices[0], perbii["sw"], 120.0, **kwargs)  # p1
+                    draw_arc(vertices["w"], perbii["sw"], -120.0, **kwargs)  # p1 OK
                 case ["n", "nw"] | ["nw", "n"]:
-                    draw_arc(vertices[5], perbii["nw"], 120.0, **kwargs)  # p0
+                    draw_arc(vertices["nw"], perbii["n"], -120.0, **kwargs)  # p0 OK
                 # 60 degrees / long arc
                 case ["n", "se"] | ["se", "n"]:
-                    draw_arc(offset["b"], perbii["n"], 60.0, **kwargs)  # p5
+                    draw_arc(offset["NE"], perbii["n"], 60.0, **kwargs)  # p5
                 case ["ne", "s"] | ["s", "ne"]:
-                    draw_arc(offset["c"], perbii["ne"], 60.0, **kwargs)  # p4
+                    draw_arc(
+                        offset["SE"], perbii["ne"], 60.0, invert=True, **kwargs
+                    )  # p4
                 case ["se", "sw"] | ["sw", "se"]:
-                    draw_arc(offset["d"], perbii["se"], 60.0, **kwargs)  # p3
+                    draw_arc(
+                        offset["S"], perbii["se"], 60.0, invert=True, **kwargs
+                    )  # p3
                 case ["s", "nw"] | ["nw", "s"]:
-                    draw_arc(offset["e"], perbii["s"], 60.0, **kwargs)  # p2
+                    draw_arc(offset["SW"], perbii["s"], 60.0, **kwargs)  # p2
                 case ["sw", "n"] | ["n", "sw"]:
-                    draw_arc(offset["f"], perbii["sw"], 60.0, **kwargs)  # p1
+                    draw_arc(
+                        offset["NW"], perbii["sw"], 60.0, invert=True, **kwargs
+                    )  # p1
                 case ["nw", "ne"] | ["ne", "nw"]:
-                    draw_arc(offset["a"], perbii["nw"], 60.0, **kwargs)  # p0
+                    draw_arc(
+                        offset["N"], perbii["nw"], 60.0, invert=True, **kwargs
+                    )  # p0
                 # 90 degrees / straight line
                 case (
                     ["nw", "se"]
@@ -5113,28 +5128,28 @@ def GridLine(
         from_edge = perbis
         to_edge = directions[0]
         for index in range(0, len(directions)):
-            # ---- perbis pts // FLAT hex
+            # ---- perbii // FLAT hex
             perbii = {
                 "n": loc.geo.n,
-                "ne": loc.geo.nne,
-                "se": loc.geo.sse,
+                "ne": loc.geo.ene,
+                "se": loc.geo.ese,
                 "s": loc.geo.s,
-                "sw": loc.geo.ssw,
-                "nw": loc.geo.nnw,
+                "sw": loc.geo.wsw,
+                "nw": loc.geo.wnw,
             }
-            # ---- vertex pts // FLAT hex
-            #        0__5
-            #       1/  \4
+            # ---- vertices // FLAT hex
+            #     nw 0__5 ne
+            #     w 1/  \4 e
             #        \__/
-            #        2  3
-            vertices = [
-                loc.geo.nw,
-                loc.geo.w,
-                loc.geo.sw,
-                loc.geo.se,
-                loc.geo.e,
-                loc.geo.ne,
-            ]
+            #     sw 2  3 se
+            vertices = {
+                "nw": loc.geo.nw,
+                "w": loc.geo.w,
+                "sw": loc.geo.sw,
+                "se": loc.geo.se,
+                "e": loc.geo.e,
+                "ne": loc.geo.ne,
+            }
             # ---- calculate offset centres  // FLAT hex
             side_plus = loc.geo.side * 1.5
             h_flat = loc.geo.height / 2.0
@@ -5146,35 +5161,48 @@ def GridLine(
             #  E \___/ C
             #      D
             offsets = {
-                "a": Point(centre.x, centre.y - height_flat),
-                "b": Point(centre.x + side_plus, centre.y - h_flat),
-                "c": Point(centre.x + side_plus, centre.y + h_flat),
-                "d": Point(centre.x, centre.y + height_flat),
-                "e": Point(centre.x - side_plus, centre.y + h_flat),
-                "f": Point(centre.x - side_plus, centre.y - h_flat),
+                "N": Point(centre.x, centre.y - height_flat),
+                "NE": Point(centre.x + side_plus, centre.y - h_flat),
+                "SE": Point(centre.x + side_plus, centre.y + h_flat),
+                "S": Point(centre.x, centre.y + height_flat),
+                "SW": Point(centre.x - side_plus, centre.y + h_flat),
+                "NW": Point(centre.x - side_plus, centre.y - h_flat),
             }
             # ---- draw lines
             draw_path_lines([from_edge, to_edge], perbii, vertices, offsets, **kwargs)
             # ---- set next location
+            if index + 1 == len(directions):
+                continue
             col, row = 0, 0
-
             if to_edge in ["se", "ne"]:
                 col = 1
             if to_edge in ["nw", "sw"]:
                 col = -1
-            col = loc.col + col
-
-            if to_edge in ["nw", "ne", "n"]:
+            if to_edge in ["nw", "ne"]:
                 row = -1 if loc.col % 2 == 0 else 0  # even column 0,2,4
-            if to_edge in ["sw", "se", "s"]:
+            if to_edge in ["sw", "se"]:
                 row = 1 if loc.col % 2 == 1 else 0  # odd column 1,3,5
+            if to_edge in ["n"]:
+                row = -1
+            if to_edge in ["s"]:
+                row = 1
+            col = loc.col + col
             row = loc.row + row
-
-            # print(f'>>> >>> {col=}  {row=}')
             loc = get_starting_location("", col=col, row=row)
-
             # ---- set next pair of directions
-            from_edge = directions[index]
+            match directions[index]:
+                case "ne":
+                    from_edge = "sw"
+                case "se":
+                    from_edge = "nw"
+                case "n":
+                    from_edge = "s"
+                case "s":
+                    from_edge = "n"
+                case "nw":
+                    from_edge = "se"
+                case "sw":
+                    from_edge = "ne"
             to_edge = directions[index + 1] if index < (len(directions) - 1) else None
 
     kwargs = kwargs
