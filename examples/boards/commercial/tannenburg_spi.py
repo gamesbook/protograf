@@ -37,9 +37,23 @@ hg = Hexagons(
 Image("images/forest_large.png", height=4.5, width=4.5,
       cx=hg.cell("0505").geo.c.x - 0.4, cy=hg.cell("0505").geo.c.y + 0.5)
 
+Image("images/forest_small.png", height=1.58, width=1.58, cxy=hg.cell("0108").geo.c, rotation=90)
+Image("images/forest_small.png", height=1.58, width=1.58, cxy=hg.cell("0208").geo.c)
+Image("images/forest_small.png", height=1.58, width=1.58, cxy=hg.cell("1202").geo.c)
+
+
+# swamps
+Image("images/marsh.png", height=1.58, width=1.58, cxy=hg.cell("0106").geo.c)
+Image("images/marsh.png", height=1.58, width=1.58, cxy=hg.cell("0107").geo.c)
+
 # lakes
 
 # broken
+Image("images/broken.png", height=1.58, width=1.58, cxy=hg.cell("1104").geo.c, rotation=60)
+Image("images/broken.png", height=1.58, width=1.58, cxy=hg.cell("1106").geo.c, rotation=90)
+Image("images/broken.png", height=1.58, width=1.58,
+      cx=hg.cell("1004").geo.c.x, cy=hg.cell("1004").geo.c.y+0.6, rotation=90)
+Image("images/broken.png", height=1.58, width=1.58, cxy=hg.cell("1005").geo.c, rotation=270)
 
 # River
 GridLine(
@@ -65,40 +79,63 @@ Text("B", xy=hg.cell("0701").geo.c, common=reinf)
 Text("C", xy=hg.cell("1101").geo.c, common=reinf)
 
 # Towns
-Dot(x=hg.cell("1108").geo.c.x+0.2, y=hg.cell("1108").geo.c.y+0.2,
+Dot(x=hg.cell("1108").geo.c.x+0.2, y=hg.cell("1108").geo.c.y+0.1,
     stroke=TOWN, title="Suvalki", title_size=8)
 Dot(x=hg.cell("0802").geo.c.x+0.2, y=hg.cell("0802").geo.c.y-0.4,
     stroke=TOWN, title="Olita", title_size=8)
+Dot(x=hg.cell("0302").geo.c.x+0.4, y=hg.cell("0302").geo.c.y-0.3,
+    stroke=TOWN, label="Kovno", label_size=8, label_mx=0.8)
 
 # Border
 
 
 # Single Rails
+srl = Common(stroke=RAIL,stroke_width=1, dashed=[0.3, 0.1])
 GridLine(
     hg,
     start="0701",
     perbis="n",
     paths="s,s,s,se,s,se,s",
-    stroke=RAIL,
-    stroke_width=1,
-    dashed=[0.3, 0.1])
-
+    common=srl)
+GridLine(
+    hg,
+    start="1207",
+    perbis="se",
+    paths="sw,nw,nw,nw,sw,nw,nw,n,nw,nw",
+    common=srl)
+GridLine(
+    hg,
+    start="0903",
+    perbis="nw",
+    paths="s,"*4,
+    common=srl)
+GridLine(
+    hg,
+    start="1102",
+    perbis="ne",
+    paths="sw,s,sw",
+    common=srl)
 
 # Double Rails
+drl = Common(stroke=RAIL,stroke_width=1)
 GridLine(
     hg,
     start="0508",
     perbis="s",
     paths="n,nw,n,n,nw,n,n,n,n",
-    stroke=RAIL,
-    stroke_width=1)
+    common=drl)
 GridLine(
     hg,
     start="1101",
     perbis="n",
     paths="s,se,se",
-    stroke=RAIL,
-    stroke_width=1)
+    common=drl)
+GridLine(
+    hg,
+    start="0104",
+    perbis="sw",
+    paths="ne,ne,ne",
+    common=drl)
 
 
 # final grid
