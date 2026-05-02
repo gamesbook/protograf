@@ -926,11 +926,32 @@ Grid GridLine
 =============
 `↑ <table-of-contents-hexg_>`_
 
-The ``GridLine()`` command allows the creation of a line to join one or more
-hexagons within a hexagonal grid.
+The ``GridLine()`` command allows the creation of a line joining, or
+running along, one or more hexagons within a hexagonal grid.
 
 This command should work with any of the types of hexagonal grid layouts
 described above.
+
+.. HINT::
+
+    One example of the use of the `GridLine` command is in drawing features
+    on a hex map such as tracks, roads, railways, rivers, hedges, regional
+    boundaries or borders, or any other similar linear feature.
+
+    See an :ref:`example wargame board <commercialGameTannenburg>` for
+    some uses of  the `GridLine` command.
+
+
+GridLine Properties
+-------------------
+
+The ``GridLine()`` command has the following key properties:
+
+* *hexgrid* - this is the first property that **must** be assigned
+
+
+GridLine Examples
+-----------------
 
 All of the examples below make use of the same underlying hexagonal grid:
 
@@ -944,11 +965,18 @@ All of the examples below make use of the same underlying hexagonal grid:
             coord_elevation='top'
         )
 
-The grid is assigned the name *hexgrid* so its result can be reused.
+This grid is assigned the name *hexgrid* so its result can be reused.
+
+* `Example 1. A Single GridLine`_
+* `Example 2. A Double GridLine`_
+* `Example 3. A Styled GridLine`_
+* `Example 4. An Offset GridLine`_
+* `Example 5. GridLine as a Path`_
+* `Example 6. GridLine along Edges`_
 
 
 Example 1. A Single GridLine
-----------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 `^ <Grid GridLine_>`_
 
 .. |ll0| image:: images/custom/hexagonal_grid/hexgrid_linkline_single.png
@@ -980,7 +1008,7 @@ Example 1. A Single GridLine
 
 
 Example 2. A Double GridLine
-----------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 `^ <Grid GridLine_>`_
 
 .. |ll1| image:: images/custom/hexagonal_grid/hexgrid_linkline_double.png
@@ -1019,7 +1047,7 @@ Example 2. A Double GridLine
 
 
 Example 3. A Styled GridLine
-----------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 `^ <Grid GridLine_>`_
 
 .. |ll2| image:: images/custom/hexagonal_grid/hexgrid_linkline_multi_style.png
@@ -1065,7 +1093,7 @@ Example 3. A Styled GridLine
 
 
 Example 4. An Offset GridLine
------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 `^ <Grid GridLine_>`_
 
 .. |ll3| image:: images/custom/hexagonal_grid/hexgrid_linkline_offset.png
@@ -1107,6 +1135,48 @@ Example 4. An Offset GridLine
       within the **same** hexagon; as shown here in location ``0104``.
 
 ===== ======
+
+
+Example 5. GridLine as a Path
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+`^ <Grid GridLine_>`_
+
+.. |ll4| image:: images/custom/hexagonal_grid/hexgrid_paths_multi_style.png
+   :width: 330
+
+===== ======
+|ll4| This example shows a ``GridLine`` constructed using the command:
+
+      .. code:: python
+
+        GridLine(
+
+      The ``GridLine`` command  has the following properties:
+
+
+===== ======
+
+
+Example 6. GridLine along Edges
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+`^ <Grid GridLine_>`_
+
+.. |ll5| image:: images/custom/hexagonal_grid/hexgrid_edges_multi_style.png
+   :width: 330
+
+===== ======
+|ll45| This example shows a ``GridLine`` constructed using the command:
+
+      .. code:: python
+
+        GridLine(
+
+      The ``GridLine`` command  has the following properties:
+
+
+===== ======
+
+
 
 .. _other-hexagonal-resources:
 

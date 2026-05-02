@@ -465,7 +465,7 @@ HEX_FLAT_EDGE_TRAVEL = {
     ("ne", "w"): HexEdgeResult(edge="n", end="nw"),
     ("ne", "ne"): HexEdgeResult(edge="se", end="nw"),
     ("ne", "se"): HexEdgeResult(edge="ne", end="e"),
-    ("e", "nw"): HexEdgeResult(edge="n", end="ne"),
+    ("e", "nw"): HexEdgeResult(edge="ne", end="ne"),
     ("e", "e"): HexEdgeResult(edge="n", end="ne"),
     ("e", "sw"): HexEdgeResult(edge="s", end="se"),
     ("se", "ne"): HexEdgeResult(edge="se", end="e"),
@@ -478,6 +478,6 @@ HEX_FLAT_EDGE_TRAVEL = {
     ("w", "ne"): HexEdgeResult(edge="nw", end="nw"),
     ("w", "se"): HexEdgeResult(edge="sw", end="sw"),
     ("nw", "e"): HexEdgeResult(edge="n", end="ne"),
-    ("nw", "nw"): HexEdgeResult(edge="sw", end="w"),
+    ("nw", "nw"): HexEdgeResult(edge="ne", end="ne"),  # odd cols; travel up&left
     ("nw", "sw"): HexEdgeResult(edge="nw", end="w"),
 }

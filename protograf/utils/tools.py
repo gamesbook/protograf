@@ -482,6 +482,7 @@ def sequence_split(
     msg: str = "",
     clean: bool = False,
     star: bool = False,
+    no_blanks: bool = False,
 ) -> list:
     """
     Split a string into a list of individual values
@@ -495,6 +496,7 @@ def sequence_split(
     - to_float (bool): if True, convert values to floats
     - msg (str): return as part of the error
     - clean (bool): if True, strip any surrounding spaces
+    - no_blanks (bool): if True, remove any empty string  (ignore for to_int & to_float)
     - star (bool): if True, allow for "all" or "*" as the only list value
 
     Note:
@@ -513,6 +515,8 @@ def sequence_split(
     >>> sequence_split('3,4,5')
     [3, 4, 5]
     >>> sequence_split('3,4,5', to_int=False, unique=False)
+    ['3', '4', '5']
+    >>> sequence_split('3,4,5,', to_int=False, unique=False, no_blanks=True)
     ['3', '4', '5']
     >>> x = sequence_split('3,4,5', to_int=False)
     >>> assert '5' in x
@@ -607,6 +611,9 @@ def sequence_split(
 
     if unique:
         return list(set(values))  # unique
+    if no_blanks:
+        cleaned = [x for x in values if x != ""]
+        return cleaned
     return values
 
 

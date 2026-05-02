@@ -20,18 +20,21 @@ will demonstrate full scalability.
 
 .. _table-of-contents-excomm:
 
-- `Squad Leader`_
-- `Orion`_
+- `Adventurer Conqueror King`_
 - `Catan`_
 - `Kensington`_
-- `Adventurer Conqueror King`_
-- `Traveller: Draft`_
-- `Traveller: Black`_
-- `Warp War`_
-- `Underwater Cities`_
-- `The Honorverse`_
+- `Orion`_
+- `Squad Leader`_
+- `Tannenburg`_
 - `Terraforming Mars: Ares Player Board`_
+- `The Honorverse`_
+- `Traveller: Black`_
+- `Traveller: Draft`_
+- `Underwater Cities`_
+- `Warp War`_
 
+
+.. _commercialGameSquadLeader:
 
 Squad Leader
 ============
@@ -42,9 +45,9 @@ Title       *Squad Leader Modular Board Section*
 ----------- ------------------------------------------------------------------
 Script      `squad_leader.py <https://github.com/gamesbook/protograf/blob/master/examples/boards/commercial/squad_leader.py>`_
 ----------- ------------------------------------------------------------------
-Discussion  This example shows how to construct a board for a wargame |dash| in
-            this case Avalon Hill's "Squad Leader" |dash| using a hexagonal
-            grid.
+Discussion  This example shows how to construct a blank board for a wargame
+            |dash| in this case Avalon Hill's "Squad Leader" |dash| using a
+            hexagonal grid.
 
             The grid's properties, such as alphanumeric coordinates and hex
             column offsets are used for overall appearance; the use of a blank
@@ -52,6 +55,36 @@ Discussion  This example shows how to construct a board for a wargame |dash| in
             of the board.
 ----------- ------------------------------------------------------------------
 Screenshot  .. image:: images/boards/commercial/squadleader_blank.png
+               :width: 90%
+=========== ==================================================================
+
+.. _commercialGameTannenburg:
+
+Tannenburg
+==========
+`↑ <table-of-contents-excomm_>`_
+
+=========== ==================================================================
+Title       *Tannenburg Map Section*
+----------- ------------------------------------------------------------------
+Script      `tannenburg_spi.py <https://github.com/gamesbook/protograf/blob/master/examples/boards/commercial/tannenburg_spi.py>`_
+----------- ------------------------------------------------------------------
+Discussion  This example shows how to construct a board for a wargame |dash| in
+            this case SPI's "Tannenberg and the Opening Battles in the East 1914"
+            |dash| using a hexagonal grid.
+
+            The grid's properties, such as alphanumeric coordinates, fill and
+            hex styles are used for overall appearance.
+
+            Features are drawn either as bitmap PNG images pre-created in a
+            drawing package, or using the built-in vector shapes of *protograf*
+            itself.
+
+            Of interest are:
+
+            * the ...
+----------- ------------------------------------------------------------------
+Screenshot  .. image:: images/boards/commercial/tannenburg_spi.png
                :width: 90%
 =========== ==================================================================
 

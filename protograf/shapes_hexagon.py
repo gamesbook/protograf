@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Create custom shapes for protograf
+Create Hexagon shape for protograf
 """
 
 # lib
