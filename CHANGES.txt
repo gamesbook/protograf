@@ -14,7 +14,7 @@ protograf Changes
 - RENAME `LinkLine` command to  `GridLine` [BREAKING CHANGE]
 - Add `cell` property to Hexagons grid
 - Add `edges` and `paths` for enhanced `GridLine` drawing
-- Add example of a wargame map to show use of `Gridline`
+- Add example of a wargame map to show uses of `Gridline`
 
 2026-04-22 (0.5.2)
 ------------------

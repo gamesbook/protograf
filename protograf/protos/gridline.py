@@ -207,11 +207,12 @@ def GridLine(
         pair: str,
         perbii: dict,
         vertices: dict,
+        centre: Point,
         offset: dict,
         orientation: HexOrientation = HexOrientation.FLAT,
         **kwargs,
     ):
-        """Draw arc or line between centre of edges on a hexagon."""
+        """Draw arc or line between centre of edges, or centre, of a hexagon."""
         if orientation == HexOrientation.FLAT:
             match pair:
                 # 120 degrees / short arc
@@ -263,9 +264,55 @@ def GridLine(
                         **kwargs,
                     )
                     _line.draw()
+                # straight line TO centre
+                case (
+                    ["nw", "c"]
+                    | ["se", "c"]
+                    | ["ne", "c"]
+                    | ["sw", "c"]
+                    | ["n", "c"]
+                    | ["s", "c"]
+                ):
+                    _line = line(
+                        xy=perbii[pair[0]],
+                        xy1=centre,
+                        **kwargs,
+                    )
+                    _line.draw()
+                # straight line FROM centre
+                case (
+                    ["c", "nw"]
+                    | ["c", "se"]
+                    | ["c", "ne"]
+                    | ["c", "sw"]
+                    | ["c", "n"]
+                    | ["c", "s"]
+                ):
+                    _line = line(
+                        xy=centre,
+                        xy1=perbii[pair[1]],
+                        **kwargs,
+                    )
+                    _line.draw()
+                case ["c", "c"]:
+                    feedback(
+                        "Unable to draw lines between two centres of hexagons grid.",
+                        True,
+                    )
+                case _:
+                    pass
+
+        elif orientation == HexOrientation.POINTY:
+            feedback(
+                f'Unable to calculate lines for "{orientation}" orientation for hexagons grid.',
+                True,
+            )
+        else:
+            feedback(f'Invalid orientation "{orientation}" supplied for hexagon.', True)
 
     def draw_paths(start: str, perbis: str, directions: list, **kwargs):
         """Draw curved/straight lines between edges of hexagons in grid."""
+        # print(f'~~~ GridLine draw_paths() {start=} {directions=}')
         loc = grid.cell(start)  # get_starting_location(start)
         from_edge = perbis
         to_edge = directions[0]
@@ -311,7 +358,9 @@ def GridLine(
                 "NW": Point(centre.x - side_plus, centre.y - h_flat),
             }
             # ---- draw lines
-            draw_path_lines([from_edge, to_edge], perbii, vertices, offsets, **kwargs)
+            draw_path_lines(
+                [from_edge, to_edge], perbii, vertices, centre, offsets, **kwargs
+            )
             # ---- set next location
             if index + 1 == len(directions):
                 continue
@@ -388,8 +437,9 @@ def GridLine(
     if paths is not None:
         if paths and not perbis:
             feedback("There must be a perbis (initial edge) to draw paths!", True)
-        if not _lower(perbis) in tools.valid_directions(DirectionGroup.HEX_POINTY):
-            feedback(f'The perbis "{perbis}" is not valid for this hexgrid.', True)
+        if (not _lower(perbis) in tools.valid_directions(DirectionGroup.HEX_POINTY) and
+                _lower(perbis) != 'c'):
+            feedback(f'The perbis "{perbis}" is not valid for this hexagons grid.', True)
         if isinstance(paths, str):  # should be a comma-delimited string
             paths = tools.sequence_split(paths, to_int=False, unique=False)
         if not isinstance(paths, list):

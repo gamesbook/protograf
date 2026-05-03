@@ -268,7 +268,22 @@ class Hexagons(ProtografGrid):
                 )
         else:
             feedback(
-                f'Cell reference for Hexagons must be a label or (col,row), not "{reference}"',
+                f'Cell reference for Hexagons must be a label or (col,row), not "{reference}".',
                 True,
             )
+        feedback(
+            f'Cell reference "{reference}" cannot be located on the Hexagons grid.',
+            True,
+        )
         return Locale()
+
+    def cxy(self, reference: str | int | tuple) -> Locale:
+        """Return centre point, in user units, of a single cell in a Hexagons grid.
+
+        Args:
+            reference (str | tuple):
+                reference a cell either by label (str), sequence (int)
+                or col & row (tuple)
+        """
+        cell = self.cell(reference)
+        return cell.geo.centre

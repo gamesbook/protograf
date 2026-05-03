@@ -6,12 +6,13 @@ Created on: 1 May 2026
 
 Notes:
     * Based off of the map for the SPI game
-      "Tannenberg and the Opening Battles in the East 1914"
+      "Tannnberg and the Opening Battles in the East 1914"
+    * Images created manually by "eye-balling" the orginal map
 """
 from protograf import *
 
 # colors
-TOWN = "#3E91DB"
+TOWN = "#0E6EC3"
 RIVER = "#9AC4D5"
 HEX = "#EBE2B4"
 FORT = "#E38A01"
@@ -33,69 +34,80 @@ hg = Hexagons(
     fill="#EBE2B4",
     rows=8, cols=12)
 
-# forests
-Image("images/forest_large.png", height=4.5, width=4.5,
-      cx=hg.cell("0505").geo.c.x - 0.4, cy=hg.cell("0505").geo.c.y + 0.5)
+imsize = Common(height=1.58, width=1.58)
 
-Image("images/forest_small.png", height=1.58, width=1.58, cxy=hg.cell("0108").geo.c, rotation=90)
-Image("images/forest_small.png", height=1.58, width=1.58, cxy=hg.cell("0208").geo.c)
-Image("images/forest_small.png", height=1.58, width=1.58, cxy=hg.cell("1202").geo.c)
+# Swamps
+Image("images/marsh.png", common=imsize, cxy=hg.cxy("0106"))
+Image("images/marsh.png", common=imsize, cxy=hg.cxy("0107"))
 
+# Broken
+Image("images/broken.png", common=imsize, cxy=hg.cxy("1104"), rotation=60)
+Image("images/broken.png", common=imsize, cxy=hg.cxy("1106"), rotation=90)
+Image("images/broken.png", common=imsize,
+      cx=hg.cxy("1004").x, cy=hg.cxy("1004").y+0.6, rotation=90)
+Image("images/broken.png", common=imsize, cxy=hg.cxy("1005"), rotation=270)
+Image("images/broken.png", common=imsize,
+      cx=hg.cxy("1107").x, cy=hg.cxy("1107").y-0.7, rotation=70)
 
-# swamps
-Image("images/marsh.png", height=1.58, width=1.58, cxy=hg.cell("0106").geo.c)
-Image("images/marsh.png", height=1.58, width=1.58, cxy=hg.cell("0107").geo.c)
-
-# lakes
-
-# broken
-Image("images/broken.png", height=1.58, width=1.58, cxy=hg.cell("1104").geo.c, rotation=60)
-Image("images/broken.png", height=1.58, width=1.58, cxy=hg.cell("1106").geo.c, rotation=90)
-Image("images/broken.png", height=1.58, width=1.58,
-      cx=hg.cell("1004").geo.c.x, cy=hg.cell("1004").geo.c.y+0.6, rotation=90)
-Image("images/broken.png", height=1.58, width=1.58, cxy=hg.cell("1005").geo.c, rotation=270)
+# Lakes
+Image("images/lake.png", common=imsize,
+      cx=hg.cxy("1005").x, cy=hg.cxy("1005").y+0.8)
+Image("images/lake.png", height=1.20, width=1.3,
+      cx=hg.cxy("1104").x, cy=hg.cxy("1104").y+0.8)
+Image("images/lake.png", common=imsize,
+      cx=hg.cxy("1107").x+0.6, cy=hg.cxy("1107").y+0.5, rotation=150)
 
 # River
 GridLine(
     hg,
     start="0108",
     vertex="se",
-    # edges="ne, nw, ne, nw, ",
     edges="ne,nw,"*3+"ne,e,"+"ne,nw,"*3+"ne,"+"e,se,"*3+\
           "e,ne,e,se,e,ne,e,ne,"+"e,se,"*2+"e",
     stroke=RIVER,
     stroke_width=6,
-    stroke_ends="rounded")
+    stroke_ends="rounded",
+    wave_style="wave",
+    wave_height=0.2)
+
+# Forests
+Image("images/forest_large.png", height=4.5, width=4.5,
+      cx=hg.cxy("0505").x-0.4, cy=hg.cxy("0505").y+0.5)
+Image("images/forest_small.png", common=imsize, cxy=hg.cxy("0108"), rotation=90)
+Image("images/forest_small.png", common=imsize, cxy=hg.cxy("0208"))
+Image("images/forest_small.png", common=imsize, cxy=hg.cxy("1202"))
 
 # Russian Fortress
 forts = Common(height=1.3, stroke=FORT, stroke_width=6, fill=None)
-Hexagon(cxy=hg.cell("0303").geo.c, common=forts)
-Hexagon(cxy=hg.cell("0802").geo.c, common=forts)
-
-# Labels
-reinf = Common(font_size=21, stroke=FORT)
-Text("A", xy=hg.cell("0104").geo.c, common=reinf)
-Text("B", xy=hg.cell("0701").geo.c, common=reinf)
-Text("C", xy=hg.cell("1101").geo.c, common=reinf)
+Hexagon(cxy=hg.cxy("0303"), common=forts)
+Hexagon(cxy=hg.cxy("0802"), common=forts)
 
 # Towns
-Dot(x=hg.cell("1108").geo.c.x+0.2, y=hg.cell("1108").geo.c.y+0.1,
+Dot(x=hg.cxy("1108").x+0.2, y=hg.cxy("1108").y+0.1,
     stroke=TOWN, title="Suvalki", title_size=8)
-Dot(x=hg.cell("0802").geo.c.x+0.2, y=hg.cell("0802").geo.c.y-0.4,
+Dot(x=hg.cxy("0802").x+0.2, y=hg.cxy("0802").y-0.4,
     stroke=TOWN, title="Olita", title_size=8)
-Dot(x=hg.cell("0302").geo.c.x+0.4, y=hg.cell("0302").geo.c.y-0.3,
+Dot(x=hg.cxy("0302").x+0.4, y=hg.cxy("0302").y-0.3,
     stroke=TOWN, label="Kovno", label_size=8, label_mx=0.8)
 
 # Border
+GridLine(
+    hg,
+    start="0108",
+    vertex="nw",
+    edges="e,se,e,ne,e,se,e,se",
+    stroke="grey",
+    stroke_width=3,
+    dashed=[0.3, 0.1, 0.1, 0.1]
+)
 
-
-# Single Rails
+# Single-track Rails
 srl = Common(stroke=RAIL,stroke_width=1, dashed=[0.3, 0.1])
 GridLine(
     hg,
     start="0701",
     perbis="n",
-    paths="s,s,s,se,s,se,s",
+    paths="s,s,s,se,s,se,s,c",
     common=srl)
 GridLine(
     hg,
@@ -112,11 +124,12 @@ GridLine(
 GridLine(
     hg,
     start="1102",
-    perbis="ne",
-    paths="sw,s,sw",
+    # perbis="ne",
+    perbis="c",
+    paths="sw,s,sw,c",
     common=srl)
 
-# Double Rails
+# Double-track Rails
 drl = Common(stroke=RAIL,stroke_width=1)
 GridLine(
     hg,
@@ -134,9 +147,14 @@ GridLine(
     hg,
     start="0104",
     perbis="sw",
-    paths="ne,ne,ne",
+    paths="ne,ne,c",
     common=drl)
 
+# Labels
+reinf = Common(font_size=21, stroke=FORT)
+Text("A", xy=hg.cxy("0104"), common=reinf)
+Text("B", xy=hg.cxy("0701"), common=reinf)
+Text("C", xy=hg.cxy("1101"), common=reinf)
 
 # final grid
 Hexagons(
@@ -149,10 +167,10 @@ Hexagons(
     coord_stroke="grey"
 )
 
-# bLOCKed
-GridLine(hg,start="0904",vertex="sw", edges="nw,ne", stroke="black",stroke_width=4)
-GridLine(hg,start=["1005", "1104"],vertex="sw",edges="e", stroke="black",stroke_width=4)
-# GridLine(hg,start=["0709", "1107"],vertex="se",edges="ne", stroke="black",stroke_width=4)
+# Blocked
+GridLine(hg, start="0904", vertex="sw", edges="nw,ne", stroke="black", stroke_width=4)
+GridLine(hg, start=["1005","1104"], vertex="sw", edges="e", stroke="black", stroke_width=4)
+GridLine(hg,start="1107",vertex="se",edges="ne", stroke="black",stroke_width=4)
 
 
 Save(
