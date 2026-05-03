@@ -111,6 +111,7 @@ Locations(
 )
 PageBreak()
 
+
 # ---- gridlines - single line
 Blueprint(stroke_width=0.5)
 Text(common=header, text="GridLine: locations: single")
@@ -126,6 +127,7 @@ GridLine(
     locations="0101,0403"
 )
 PageBreak()
+
 
 # ---- gridlines - double-line
 Blueprint(stroke_width=0.5)
@@ -188,43 +190,42 @@ PageBreak()
 Blueprint(stroke_width=0.5)
 Text(common=header, text="GridLine: edges: multi style")
 hexgrid = Hexagons(
-    side=0.5,
-    x=0, y=0.1,
-    rows=6, cols=5,
-    dot=0.02,
-    coord_elevation='top'
-)
+    side=0.5, x=0, y=0.1, rows=6, cols=5)
 GridLine(
     hexgrid,
     start="0203",
-    vertex="nw",
+    point="nw",
     edges="e,ne,e,se,nw,ne,e",
-    common=Common(
-        stroke="green",
-        stroke_width=4,
-        stroke_ends="rounded")
+    stroke="green",
+    stroke_width=4,
+    stroke_ends="rounded"
 )
-Hexagons(
-    side=0.5, x=0, y=0.1, rows=6, cols=5, fill=None)
 GridLine(
     hexgrid,
     start="0504",
-    vertex="ne",
+    point="ne",
     edges=["w", "sw", "w", "nw"] * 2,
-    common=Common(
-        stroke="red",
-        stroke_width=2,
-        dotted=True)
+    stroke="red",
+    stroke_width=2,
+    dotted=True
 )
 GridLine(
     hexgrid,
     start=["0106", "0306", "0506"],
-    vertex="ne",
+    point="ne",
     edges="*",
-    common=Common(
-        stroke="black",
-        stroke_width=2)
+    stroke="black",
+    stroke_width=2
 )
+Hexagons(
+    side=0.5,
+    x=0, y=0.1,
+    rows=6, cols=5,
+    fill=None,
+    dot=0.02,
+    coord_elevation='top'
+)
+
 PageBreak()
 
 # ---- gridlines - paths
@@ -237,21 +238,19 @@ hexgrid = Hexagons(
 )
 GridLine(
     hexgrid,
-    start="0103",
-    perbis="sw",
-    paths="ne,ne,se,se,se",
-    common=Common(
-        stroke="grey",
-        stroke_width=3)
+    start="0106",
+    point="nw",
+    paths=["ne", "ne", "n", "se", "s", "se", "s"],
+    stroke="cyan",
+    stroke_width=6
 )
 GridLine(
     hexgrid,
-    start="0106",
-    perbis="nw",
-    paths=["ne", "ne", "n", "se", "s", "se", "s"],
-    common=Common(
-        stroke="cyan",
-        stroke_width=6)
+    start="0103",
+    point="c",
+    paths="ne,ne,se,se,c",
+    stroke="grey",
+    stroke_width=3
 )
 Hexagons(
     side=0.5,

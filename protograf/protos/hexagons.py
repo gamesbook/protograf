@@ -45,7 +45,8 @@ class Hexagons(ProtografGrid):
         if kwargs.get("hidden"):
             self.hidden = tools.integer_pairs(kwargs.get("hidden"), "hidden")
         self.hex_layout = kwargs.get("hex_layout")
-        self.draw_layout()  # set the values for self.locales
+        self.locales = []  # will be created by specific draw_* method
+        self.draw_layout()
 
     def get_geometry(self, hexgn: HexShape) -> ShapeGeometry:
         shape_geometry = ShapeGeometry(  # keep in user units for GridLine

@@ -22,20 +22,31 @@ from protograf.utils.structures import (
     Point,
 )
 
+# local
+from .hexagons import Hexagons
+
 
 def GridLine(
     grid: list,
     start: str = "",
-    vertex: str = "",
-    perbis: str = "",
+    point: str = "",
     locations: Union[list, str] | None = None,
     edges: Union[list, str] | None = None,
     paths: Union[list, str] | None = None,
     **kwargs,
 ):
-    """Enable drawing Line or Lines between one or more points in a grid."""
+    """Enable drawing Line or Lines between one or more points in a grid.
 
-    def draw_linked_locations(locations, **kwargs):
+    Args:
+        grid: list of Locales (from Hexagons)
+        start: the ID for a hexagon in the list of Locales
+        point: a named compass point for a Locale (valid for a Hexagon)
+        locations: one or more hexagon IDs to join with lines (centre-to-centre)
+        edges: one or more directions in which to draw lines (vertex-to-vertex)
+        paths: one or more directions in which to draw curved lines (perbis-to-perbis)
+    """
+
+    def draw_linked_locations(grid, locations, **kwargs):
         """Draw lines between points inside hexagons in grid."""
         dummy = base_shape()  # a BaseShape - not drawable!
         for index, location in enumerate(locations):
@@ -406,13 +417,15 @@ def GridLine(
             )
         if locations and len(locations) < 2:
             feedback("There should be at least 2 locations to create links!", True)
-        draw_linked_locations(locations, **kwargs)
+        if isinstance(grid, Hexagons):
+            grid = grid.locales
+        draw_linked_locations(grid, locations, **kwargs)
 
     if edges is not None:
-        if edges and not vertex:
-            feedback("There must be a vertex (initial point) to draw edges!", True)
-        if not _lower(vertex) in tools.valid_directions(DirectionGroup.HEX_FLAT):
-            feedback(f'The vertex "{vertex}" is not valid for this hexgrid.', True)
+        if edges and not point:
+            feedback("There must be an initial point (vertex) to draw edges!", True)
+        if not _lower(point) in tools.valid_directions(DirectionGroup.HEX_FLAT):
+            feedback(f'The point "{point}" is not valid for this hexagons grid.', True)
         if isinstance(edges, str):  # comma-delimited string for multi-edge
             if edges == "*" or _lower(edges) == "all":
                 loop = {
@@ -423,7 +436,7 @@ def GridLine(
                     "w": ["ne", "e", "se", "sw", "w", "nw"],
                     "nw": ["e", "se", "sw", "w", "nw", "ne"],
                 }
-                edges = loop.get(_lower(vertex))
+                edges = loop.get(_lower(point))
             else:
                 edges = tools.sequence_split(
                     edges, to_int=False, unique=False, no_blanks=True
@@ -432,21 +445,23 @@ def GridLine(
             feedback(f"GridLine edges '{edges}' is not a list - please check!", True)
         if edges and not start:
             feedback("There must be a start (hexagon location) to draw edges!", True)
-        draw_edges(start, _lower(vertex), edges, **kwargs)
+        draw_edges(start, _lower(point), edges, **kwargs)
 
     if paths is not None:
-        if paths and not perbis:
-            feedback("There must be a perbis (initial edge) to draw paths!", True)
-        if (not _lower(perbis) in tools.valid_directions(DirectionGroup.HEX_POINTY) and
-                _lower(perbis) != 'c'):
-            feedback(f'The perbis "{perbis}" is not valid for this hexagons grid.', True)
+        if paths and not point:
+            feedback("There must be an initial point (on an edge) to draw paths!", True)
+        if (
+            not _lower(point) in tools.valid_directions(DirectionGroup.HEX_POINTY)
+            and _lower(point) != "c"
+        ):
+            feedback(f'The point "{point}" is not valid for this hexagons grid.', True)
         if isinstance(paths, str):  # should be a comma-delimited string
             paths = tools.sequence_split(paths, to_int=False, unique=False)
         if not isinstance(paths, list):
             feedback(f"GridLine paths '{paths}' is not a list - please check!", True)
         if paths and not start:
-            feedback("There must be a start to draw paths!", True)
-        draw_paths(start, perbis, paths, **kwargs)
+            feedback("There must be a start (hexagon location) to draw paths!", True)
+        draw_paths(start, point, paths, **kwargs)
 
     if locations is None and edges is None and paths is None:
         feedback(

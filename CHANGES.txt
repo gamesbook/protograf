@@ -12,6 +12,7 @@ protograf Changes
 - Add pyrefly to assist with typing checks
 - Add Makefile to make key project operations explicit
 - RENAME `LinkLine` command to  `GridLine` [BREAKING CHANGE]
+- Start of refactoring of large `proto` functions into separate files
 - Add `cell` property to Hexagons grid
 - Add `edges` and `paths` for enhanced `GridLine` drawing
 - Add example of a wargame map to show uses of `Gridline`

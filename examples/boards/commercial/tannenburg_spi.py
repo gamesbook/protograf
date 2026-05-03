@@ -17,6 +17,7 @@ RIVER = "#9AC4D5"
 HEX = "#EBE2B4"
 FORT = "#E38A01"
 RAIL = "black"
+HEXES = "#EBE2B4"  # background
 
 Create(
     filename="tannenburg_spi.pdf",
@@ -31,7 +32,7 @@ Create(
 hg = Hexagons(
     height=1.58,  # 5/8"
     x=0, y=0,
-    fill="#EBE2B4",
+    fill=HEXES,
     rows=8, cols=12)
 
 imsize = Common(height=1.58, width=1.58)
@@ -61,7 +62,7 @@ Image("images/lake.png", common=imsize,
 GridLine(
     hg,
     start="0108",
-    vertex="se",
+    point="se",
     edges="ne,nw,"*3+"ne,e,"+"ne,nw,"*3+"ne,"+"e,se,"*3+\
           "e,ne,e,se,e,ne,e,ne,"+"e,se,"*2+"e",
     stroke=RIVER,
@@ -94,7 +95,7 @@ Dot(x=hg.cxy("0302").x+0.4, y=hg.cxy("0302").y-0.3,
 GridLine(
     hg,
     start="0108",
-    vertex="nw",
+    point="nw",
     edges="e,se,e,ne,e,se,e,se",
     stroke="grey",
     stroke_width=3,
@@ -102,53 +103,52 @@ GridLine(
 )
 
 # Single-track Rails
-srl = Common(stroke=RAIL,stroke_width=1, dashed=[0.3, 0.1])
+sngrl = Common(stroke=RAIL,stroke_width=1, dashed=[0.3, 0.1])
 GridLine(
     hg,
     start="0701",
-    perbis="n",
+    point="n",
     paths="s,s,s,se,s,se,s,c",
-    common=srl)
+    common=sngrl)
 GridLine(
     hg,
     start="1207",
-    perbis="se",
+    point="se",
     paths="sw,nw,nw,nw,sw,nw,nw,n,nw,nw",
-    common=srl)
+    common=sngrl)
 GridLine(
     hg,
     start="0903",
-    perbis="nw",
+    point="nw",
     paths="s,"*4,
-    common=srl)
+    common=sngrl)
 GridLine(
     hg,
     start="1102",
-    # perbis="ne",
-    perbis="c",
+    point="c",
     paths="sw,s,sw,c",
-    common=srl)
+    common=sngrl)
 
 # Double-track Rails
-drl = Common(stroke=RAIL,stroke_width=1)
+dbrl = Common(stroke=RAIL,stroke_width=1)
 GridLine(
     hg,
     start="0508",
-    perbis="s",
+    point="s",
     paths="n,nw,n,n,nw,n,n,n,n",
-    common=drl)
+    common=dbrl)
 GridLine(
     hg,
     start="1101",
-    perbis="n",
+    point="n",
     paths="s,se,se",
-    common=drl)
+    common=dbrl)
 GridLine(
     hg,
     start="0104",
-    perbis="sw",
+    point="sw",
     paths="ne,ne,c",
-    common=drl)
+    common=dbrl)
 
 # Labels
 reinf = Common(font_size=21, stroke=FORT)
@@ -168,10 +168,9 @@ Hexagons(
 )
 
 # Blocked
-GridLine(hg, start="0904", vertex="sw", edges="nw,ne", stroke="black", stroke_width=4)
-GridLine(hg, start=["1005","1104"], vertex="sw", edges="e", stroke="black", stroke_width=4)
-GridLine(hg,start="1107",vertex="se",edges="ne", stroke="black",stroke_width=4)
-
+GridLine(hg, start="0904", point="sw", edges="nw,ne", stroke="black", stroke_width=4)
+GridLine(hg, start=["1005","1104"], point="sw", edges="e", stroke="black", stroke_width=4)
+GridLine(hg,start="1107",point="se",edges="ne", stroke="black",stroke_width=4)
 
 Save(
     output='png',
