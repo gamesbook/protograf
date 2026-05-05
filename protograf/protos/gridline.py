@@ -146,8 +146,11 @@ def GridLine(
                     col = -2
                 if direction == "nw" and current_vertex == "w":  # middle
                     col = -1
-                if (direction == "ne" and current_vertex == "e"  # middle
-                    and loc.col % 2 == 1):
+                if (
+                    direction == "ne"
+                    and current_vertex == "e"  # middle
+                    and loc.col % 2 == 1
+                ):
                     col = 1
                 if (
                     direction == "e"
@@ -185,33 +188,57 @@ def GridLine(
                     and current_vertex == "e"
                 ):
                     row = 1 if loc.col % 2 == 1 else 0  # odd column 1,3,5
-                if (direction == "ne" and current_vertex == "e"  # middle
-                    and loc.col % 2 == 0):
+                if (
+                    direction == "ne"
+                    and current_vertex == "e"  # middle
+                    and loc.col % 2 == 0
+                ):
                     row = -1
-                if (direction == "ne" and current_vertex == "nw"  # middle
-                    and loc.col % 2 != 0): # odd column 1,3,5
+                if (
+                    direction == "ne"
+                    and current_vertex == "nw"  # middle
+                    and loc.col % 2 != 0
+                ):  # odd column 1,3,5
                     row = -1
-                if (direction == "nw" and current_vertex == "w"  # middle
-                    and loc.col % 2 == 0): # odd column 1,3,5
+                if (
+                    direction == "nw"
+                    and current_vertex == "w"  # middle
+                    and loc.col % 2 == 0
+                ):  # odd column 1,3,5
                     row = -1
-                if (direction == "nw" and current_vertex == "ne"  # middle
-                    and loc.col % 2 != 0): # odd column 1,3,5
+                if (
+                    direction == "nw"
+                    and current_vertex == "ne"  # middle
+                    and loc.col % 2 != 0
+                ):  # odd column 1,3,5
                     row = -1
-                if (direction == "se" and current_vertex == "e"  # middle
-                    and loc.col % 2 != 0): # odd column 1,3,5
+                if (
+                    direction == "se"
+                    and current_vertex == "e"  # middle
+                    and loc.col % 2 != 0
+                ):  # odd column 1,3,5
                     row = 1
                     col = 1
-                if direction == "sw" and current_vertex == "se": # middle
+                if direction == "sw" and current_vertex == "se":  # middle
                     row = 1
-                if (direction == "sw" and current_vertex == "w"  # middle
-                    and loc.col % 2 != 0): # odd column 1,3,5
+                if (
+                    direction == "sw"
+                    and current_vertex == "w"  # middle
+                    and loc.col % 2 != 0
+                ):  # odd column 1,3,5
                     row = 1
                     col = -1
-                if (direction == "se" and current_vertex == "sw"  # middle
-                    and loc.col % 2 == 0): # even 0,2,4
+                if (
+                    direction == "se"
+                    and current_vertex == "sw"  # middle
+                    and loc.col % 2 == 0
+                ):  # even 0,2,4
                     row = 1
-                if (direction == "ne" and current_vertex == "e"  # middle
-                    and loc.col % 2 == 0):
+                if (
+                    direction == "ne"
+                    and current_vertex == "e"  # middle
+                    and loc.col % 2 == 0
+                ):
                     col = 1
 
                 col = loc.col + col
