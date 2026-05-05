@@ -129,7 +129,7 @@ def GridLine(
             _line = None
             for edge_direction in edges:
                 direction = _lower(edge_direction)
-                # print('>>>', loc.label, loc.col, loc.row, current_vertex, direction)
+                # print('>>>', loc.label, loc.col, loc.row, f'{current_vertex=}, {direction=}')
                 outcome = HEX_FLAT_EDGE_TRAVEL.get((current_vertex, direction))
                 if not outcome:
                     feedback(
@@ -140,7 +140,15 @@ def GridLine(
 
                 # calculate col/row changes for FLAT
                 col, row = 0, 0
-
+                if direction == "e" and current_vertex == "ne":  # middle
+                    col = 2
+                if direction == "w" and current_vertex == "nw":  # middle
+                    col = -2
+                if direction == "nw" and current_vertex == "w":  # middle
+                    col = -1
+                if (direction == "ne" and current_vertex == "e"  # middle
+                    and loc.col % 2 == 1):
+                    col = 1
                 if (
                     direction == "e"
                     and current_vertex == "e"
@@ -177,6 +185,34 @@ def GridLine(
                     and current_vertex == "e"
                 ):
                     row = 1 if loc.col % 2 == 1 else 0  # odd column 1,3,5
+                if (direction == "ne" and current_vertex == "e"  # middle
+                    and loc.col % 2 == 0):
+                    row = -1
+                if (direction == "ne" and current_vertex == "nw"  # middle
+                    and loc.col % 2 != 0): # odd column 1,3,5
+                    row = -1
+                if (direction == "nw" and current_vertex == "w"  # middle
+                    and loc.col % 2 == 0): # odd column 1,3,5
+                    row = -1
+                if (direction == "nw" and current_vertex == "ne"  # middle
+                    and loc.col % 2 != 0): # odd column 1,3,5
+                    row = -1
+                if (direction == "se" and current_vertex == "e"  # middle
+                    and loc.col % 2 != 0): # odd column 1,3,5
+                    row = 1
+                    col = 1
+                if direction == "sw" and current_vertex == "se": # middle
+                    row = 1
+                if (direction == "sw" and current_vertex == "w"  # middle
+                    and loc.col % 2 != 0): # odd column 1,3,5
+                    row = 1
+                    col = -1
+                if (direction == "se" and current_vertex == "sw"  # middle
+                    and loc.col % 2 == 0): # even 0,2,4
+                    row = 1
+                if (direction == "ne" and current_vertex == "e"  # middle
+                    and loc.col % 2 == 0):
+                    col = 1
 
                 col = loc.col + col
                 row = loc.row + row
@@ -184,7 +220,7 @@ def GridLine(
                     (col, row)
                 )  # get_starting_location("", col=col, row=row)
                 next_vertex = outcome.end
-                # print(f'>>> next edge col/row >>> {col=} {row=} {next_loc=}')
+                # print(f'>>> >>> next ... {col=} {row=} {next_loc.label=}')
 
                 # line settings
                 _line = line(

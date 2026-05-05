@@ -460,8 +460,8 @@ class VirtualHex:
 # ---- "FIXED" DICT
 
 # ---- * Travel outcomes for GridLine edges
-HEX_FLAT_EDGE_TRAVEL = {
-    # startpoint / direction => result
+HEX_FLAT_EDGE_TRAVEL = {  # startpoint / direction => result
+    # travel across edge of a hex
     ("ne", "w"): HexEdgeResult(edge="n", end="nw"),
     ("ne", "ne"): HexEdgeResult(edge="se", end="nw"),
     ("ne", "se"): HexEdgeResult(edge="ne", end="e"),
@@ -480,4 +480,17 @@ HEX_FLAT_EDGE_TRAVEL = {
     ("nw", "e"): HexEdgeResult(edge="n", end="ne"),
     ("nw", "nw"): HexEdgeResult(edge="ne", end="ne"),  # odd cols; travel up&left
     ("nw", "sw"): HexEdgeResult(edge="nw", end="w"),
+    # travel across middle of a hex
+    ("nw", "ne"): HexEdgeResult(edge="-", end="ne"),
+    ("nw", "w"): HexEdgeResult(edge="-", end="ne"),
+    ("ne", "nw"): HexEdgeResult(edge="-", end="nw"),
+    ("ne", "e"): HexEdgeResult(edge="-", end="nw"),
+    ("sw", "ne"): HexEdgeResult(edge="-", end="ne"),
+    ("sw", "se"): HexEdgeResult(edge="-", end="se"),
+    ("w", "nw"): HexEdgeResult(edge="-", end="nw"),
+    ("w", "sw"): HexEdgeResult(edge="-", end="sw"),
+    ("e", "ne"): HexEdgeResult(edge="-", end="ne"),
+    ("e", "se"): HexEdgeResult(edge="-", end="se"),
+    ("se", "sw"): HexEdgeResult(edge="-", end="sw"),
+    ("se", "nw"): HexEdgeResult(edge="-", end="nw"),
 }
