@@ -270,6 +270,25 @@ hexgrid = Hexagons(
     x=0, y=0.1,
     rows=6, cols=5,
 )
+
+road = "ne=,se=,ne=,n"
+GridLine(
+    hexgrid,
+    start="0102",
+    point="nw",
+    paths=road,
+    stroke="grey",
+    stroke_width=4
+)
+GridLine(
+    hexgrid,
+    start="0102",
+    point="nw",
+    paths=road,
+    stroke="silver",
+    stroke_width=2
+)
+
 GridLine(
     hexgrid,
     start="0104",
@@ -288,14 +307,7 @@ GridLine(
     stroke_width=6,
     stroke_ends="rounded"
 )
-GridLine(
-    hexgrid,
-    start="0102",
-    point="c",
-    paths="ne,ne,se,se,c",
-    stroke="grey",
-    stroke_width=3
-)
+
 Hexagons(
     side=0.5,
     x=0, y=0.1,
@@ -304,7 +316,6 @@ Hexagons(
     coord_elevation='top',
     fill=None
 )
-
 
 Save(
     output='png',

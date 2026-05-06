@@ -278,7 +278,7 @@ def GridLine(
         aarc.draw()
 
     def draw_path_lines(
-        pair: str,
+        pair: list,
         perbii: dict,
         vertices: dict,
         centre: Point,
@@ -287,6 +287,10 @@ def GridLine(
         **kwargs,
     ):
         """Draw arc or line between centre of edges, or centre, of a hexagon."""
+        straight, start, end = False, None, None
+        if len(pair) >= 2:
+            straight = True if pair and "=" in pair[1] else False
+            pair = [pair[0].replace("=", ""), pair[1].replace("=", "")]
         if orientation == HexOrientation.FLAT:
             match pair:
                 # 120 degrees / short arc
@@ -303,26 +307,45 @@ def GridLine(
                 case ["n", "nw"] | ["nw", "n"]:
                     draw_arc(vertices["nw"], perbii["n"], -120.0, **kwargs)  # p0 OK
                 # 60 degrees / long arc
+                # skip if straight line
                 case ["n", "se"] | ["se", "n"]:
-                    draw_arc(offset["NE"], perbii["n"], 60.0, **kwargs)  # p5
+                    if not straight:
+                        draw_arc(offset["NE"], perbii["n"], 60.0, **kwargs)  # p5
+                    else:
+                        start, end = perbii["n"], perbii["se"]
                 case ["ne", "s"] | ["s", "ne"]:
-                    draw_arc(
-                        offset["SE"], perbii["ne"], 60.0, invert=True, **kwargs
-                    )  # p4
+                    if not straight:
+                        draw_arc(
+                            offset["SE"], perbii["ne"], 60.0, invert=True, **kwargs
+                        )  # p4
+                    else:
+                        start, end = perbii["ne"], perbii["s"]
                 case ["se", "sw"] | ["sw", "se"]:
-                    draw_arc(
-                        offset["S"], perbii["se"], 60.0, invert=True, **kwargs
-                    )  # p3
+                    if not straight:
+                        draw_arc(
+                            offset["S"], perbii["se"], 60.0, invert=True, **kwargs
+                        )  # p3
+                    else:
+                        start, end = perbii["se"], perbii["sw"]
                 case ["s", "nw"] | ["nw", "s"]:
-                    draw_arc(offset["SW"], perbii["s"], 60.0, **kwargs)  # p2
+                    if not straight:
+                        draw_arc(offset["SW"], perbii["s"], 60.0, **kwargs)  # p2
+                    else:
+                        start, end = perbii["s"], perbii["nw"]
                 case ["sw", "n"] | ["n", "sw"]:
-                    draw_arc(
-                        offset["NW"], perbii["sw"], 60.0, invert=True, **kwargs
-                    )  # p1
+                    if not straight:
+                        draw_arc(
+                            offset["NW"], perbii["sw"], 60.0, invert=True, **kwargs
+                        )  # p1
+                    else:
+                        start, end = perbii["sw"], perbii["n"]
                 case ["nw", "ne"] | ["ne", "nw"]:
-                    draw_arc(
-                        offset["N"], perbii["nw"], 60.0, invert=True, **kwargs
-                    )  # p0
+                    if not straight:
+                        draw_arc(
+                            offset["N"], perbii["nw"], 60.0, invert=True, **kwargs
+                        )  # p0
+                    else:
+                        start, end = perbii["nw"], perbii["ne"]
                 # 90 degrees / straight line
                 case (
                     ["nw", "se"]
@@ -375,6 +398,14 @@ def GridLine(
                     )
                 case _:
                     pass
+            # straight line BETWEEN perbii
+            if straight and start and end:
+                _line = line(
+                    xy=start,
+                    xy1=end,
+                    **kwargs,
+                )
+                _line.draw()
 
         elif orientation == HexOrientation.POINTY:
             feedback(
@@ -386,7 +417,7 @@ def GridLine(
 
     def draw_paths(start: str, perbis: str, directions: list, **kwargs):
         """Draw curved/straight lines between edges of hexagons in grid."""
-        # print(f'~~~ GridLine draw_paths() {start=} {directions=}')
+        # print(f'\n~~~ GridLine draw_paths() {start=} {directions=}')
         loc = grid.cell(start)  # get_starting_location(start)
         from_edge = perbis
         to_edge = directions[0]
@@ -439,23 +470,25 @@ def GridLine(
             if index + 1 == len(directions):
                 continue
             col, row = 0, 0
-            if to_edge in ["se", "ne"]:
+            _to_edge = to_edge.replace("=", "")
+            if _to_edge in ["se", "ne"]:
                 col = 1
-            if to_edge in ["nw", "sw"]:
+            if _to_edge in ["nw", "sw"]:
                 col = -1
-            if to_edge in ["nw", "ne"]:
+            if _to_edge in ["nw", "ne"]:
                 row = -1 if loc.col % 2 == 0 else 0  # even column 0,2,4
-            if to_edge in ["sw", "se"]:
+            if _to_edge in ["sw", "se"]:
                 row = 1 if loc.col % 2 == 1 else 0  # odd column 1,3,5
-            if to_edge in ["n"]:
+            if _to_edge in ["n"]:
                 row = -1
-            if to_edge in ["s"]:
+            if _to_edge in ["s"]:
                 row = 1
             col = loc.col + col
             row = loc.row + row
             loc = grid.cell((col, row))  # get_starting_location("", col=col, row=row)
             # ---- set next pair of directions
-            match directions[index]:
+            _direction = directions[index].replace("=", "")
+            match _direction:
                 case "ne":
                     from_edge = "sw"
                 case "se":
@@ -519,7 +552,9 @@ def GridLine(
         ):
             feedback(f'The point "{point}" is not valid for this hexagons grid.', True)
         if isinstance(paths, str):  # should be a comma-delimited string
-            paths = tools.sequence_split(paths, to_int=False, unique=False)
+            paths = tools.sequence_split(
+                paths, to_int=False, unique=False, no_blanks=True
+            )
         if not isinstance(paths, list):
             feedback(f"GridLine paths '{paths}' is not a list - please check!", True)
         if paths and not start:

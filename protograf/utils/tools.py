@@ -532,6 +532,8 @@ def sequence_split(
     [3]
     >>> sequence_split(3.1)
     [3.1]
+    >>> sequence_split('A=,B,C=', to_int=False, unique=False, no_blanks=True)
+    ['A=', 'B', 'C=']
     """
     values = []
     if isinstance(strng, list):
