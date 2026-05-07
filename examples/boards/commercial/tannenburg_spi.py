@@ -51,20 +51,31 @@ Image("images/broken.png", common=imsize,
       cx=hg.cxy("1107").x, cy=hg.cxy("1107").y-0.7, rotation=70)
 
 # Lakes
-Image("images/lake.png", common=imsize,
+Image("images/lake1.png", common=imsize,
       cx=hg.cxy("1005").x, cy=hg.cxy("1005").y+0.8)
-Image("images/lake.png", height=1.20, width=1.3,
+Image("images/lake1.png", height=1.20, width=1.3,
       cx=hg.cxy("1104").x, cy=hg.cxy("1104").y+0.8)
-Image("images/lake.png", common=imsize,
+Image("images/lake1.png", common=imsize,
       cx=hg.cxy("1107").x+0.6, cy=hg.cxy("1107").y+0.5, rotation=150)
 
 # River
-GridLine(
+channel="ne,nw,"*3+"ne,e,"+"ne,nw,"*3+"ne,"+"e,se,"*3+\
+    "e,ne,e,se,e,ne,e,ne,e,se,e,se,e"
+GridLine(  # outer
     hg,
     start="0108",
     point="se",
-    edges="ne,nw,"*3+"ne,e,"+"ne,nw,"*3+"ne,"+"e,se,"*3+\
-          "e,ne,e,se,e,ne,e,ne,"+"e,se,"*2+"e",
+    edges=channel,
+    stroke=TOWN,
+    stroke_width=7,
+    stroke_ends="rounded",
+    wave_style="wave",
+    wave_height=0.2)
+GridLine(  # inner
+    hg,
+    start="0108",
+    point="se",
+    edges=channel,
     stroke=RIVER,
     stroke_width=6,
     stroke_ends="rounded",
@@ -77,6 +88,10 @@ Image("images/forest_large.png", height=4.5, width=4.5,
 Image("images/forest_small.png", common=imsize, cxy=hg.cxy("0108"), rotation=90)
 Image("images/forest_small.png", common=imsize, cxy=hg.cxy("0208"))
 Image("images/forest_small.png", common=imsize, cxy=hg.cxy("1202"))
+
+# NOT in the original - just examples ...
+# Image("images/town1.png", common=imsize, cxy=hg.cxy("0706"), rotation=10)
+# Image("images/town2.png", common=imsize, cxy=hg.cxy("0708"), rotation=15)
 
 # Russian Fortress
 forts = Common(height=1.3, stroke=FORT, stroke_width=6, fill=None)

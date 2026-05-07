@@ -85,10 +85,14 @@ Discussion  This example shows how to construct a board for a wargame |dash| in
             Of interest are:
 
             * the use of :ref:`GridLines <gridline-command>` to create the
-              black railway lines, the blue river and the grey border
+              dashed black railway lines, the blue river, and the dotted grey
+              border; in the case of the river, two lines are drawn using the
+              same set of directions but with a light blue line superimposed
+              on a dark blue line
             * the use of the :ref:`Image <image-command>` command to load
               PNG terrain feature images that have been created using a
-              regular paint program
+              regular paint program (these images are also available in the
+              examples folder)
 
             These two commands between them, along with the usual
             :ref:`Text <text-command>` command, will likely support most
@@ -102,7 +106,8 @@ Discussion  This example shows how to construct a board for a wargame |dash| in
                to generate "pseudo-irregular" shapes, it is recommended to
                use a tool that makes it straightforward to create these
                images "by hand" |dash| assuming that such images do not
-               already exist.
+               already exist. Using a PNG with a transparent background is
+               usually the best approach.
 
 ----------- ------------------------------------------------------------------
 Screenshot  .. image:: images/boards/commercial/tannenburg_spi.png
@@ -265,6 +270,7 @@ Screenshot  .. image:: images/boards/commercial/traveller_black.png
                :width: 70%
 =========== ==================================================================
 
+.. _commercialGameWarpWar:
 
 Warp War
 ========
@@ -322,6 +328,7 @@ Screenshot  .. image:: images/boards/commercial/warpwar.png
                :width: 95%
 =========== ==================================================================
 
+.. _commercialGameUnderwaterCities:
 
 Underwater Cities
 =================
