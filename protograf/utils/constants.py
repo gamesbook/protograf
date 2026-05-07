@@ -7,8 +7,29 @@ Notes:
     * https://en.wikipedia.org/wiki/Paper_size#Overview_of_ISO_paper_sizes
 """
 
+# lib
+from collections import namedtuple
 import math
+
+# third-party
 from pymupdf.utils import getColorList
+
+Extent = namedtuple(
+    "Extent",
+    [
+        "w",
+        "h",
+    ],
+)
+
+ThePaper = namedtuple(
+    "ThePaper",
+    [
+        "mm",
+        "pt",
+        "inch",
+    ],
+)
 
 YES = True
 NO = False
@@ -400,6 +421,21 @@ PAPER_SIZES = {
     "BusinessCard": {"mm": (88.9, 50.8), "pt": (252, 144), "in": (3.5, 2)},
     "Notelet": {"mm": (95.3, 95.3), "pt": (270, 270), "in": (3.75, 3.75)},
 }
+
+
+def PAPER(size: str | None = None) -> ThePaper | None:
+    """Return the size of named paper in available unit measurements."""
+    if not size:
+        return None
+    _paper = PAPER_SIZES.get(size, None)
+    if not _paper:
+        return None
+    _nones = (None, None)
+    mm = Extent(w=_paper.get("mm", _nones)[0], h=_paper.get("mm", _nones)[1])
+    inch = Extent(w=_paper.get("in", _nones)[0], h=_paper.get("in", _nones)[1])
+    pt = Extent(w=_paper.get("pt", _nones)[0], h=_paper.get("pt", _nones)[1])
+    return ThePaper(mm=mm, pt=pt, inch=inch)
+
 
 LABELS_AVERY = [
     {
