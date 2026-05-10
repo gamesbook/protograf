@@ -2046,12 +2046,12 @@ class RectangleShape(BaseShape):
                 gx, gy = 0, y  # left-side
                 cnv.draw_line((gx, gy), (deltag, gy))
                 cnv.draw_line((0, gy + self._u.height), (deltag, gy + self._u.height))
-                gx, gy = x, globals.page[1]  # top-side
+                gx, gy = x, globals.page.size[1]  # top-side
                 cnv.draw_line((gx, gy), (gx, gy - deltag))
                 cnv.draw_line(
                     (gx + self._u.width, gy), (gx + self._u.width, gy - deltag)
                 )
-                gx, gy = globals.page[0], y  # right-side
+                gx, gy = globals.page.size[0], y  # right-side
                 cnv.draw_line((gx, gy), (gx - deltag, gy))
                 cnv.draw_line(
                     (gx, gy + self._u.height), (gx - deltag, gy + self._u.height)

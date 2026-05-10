@@ -214,10 +214,6 @@ To customise the command, set its properties as follows:
   extension
 - **framerate** - the delay in seconds between each "page" of a GIF image; by
   default this is ``1`` second
-- **gallery** - when set to a pair of numbers, e.g. ``(6,9)``, will cause that
-  many *cards* to be drawn on a page; the page size will be changed to fit them
-  all; and all margins will be set to zero |dash| an image created from such a
-  page can be used as an input for programs such as Tabletop Simulator (TTS)
 - **stop** - when set to ``True`` will cause the script to stop at that point,
   after saving the file |dash| this can be useful when you have a long script
   and want to verify output with adding or displaying all the elements
@@ -259,23 +255,30 @@ In this example, an animated GIF image will be created, assembled out of the
 PNG images; one per page of the PDF.  The *framerate* setting of ``0.5`` means
 there will be a delay of a half second between the display of each image.
 
-Example 3. Save Gallery
-~~~~~~~~~~~~~~~~~~~~~~~
+Example 3. Save Card Gallery
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Here is an example of a customised ``Save`` command used to create an output
+Here is an example of a customised ``Deck`` command used to create an output
 file that contains many cards in a single page (and image of that page):
 
 .. code:: python
 
+    Deck(
+        cards=108,
+        gallery=(9, 6),
+    )
+
     Save(
         output='png',
         dpi=300,
-        gallery=(9, 6)
     )
 
 In this example, each PNG image created will contain a grid, or array, of
 nine cards wide ("cards per row") by six cards high ("cards per column") |dash|
 for a total of up to 54 cards per page of the PDF.
+
+In this case, because there are 108 cards, two PNG images will be created.
+
 
 Example 4. Customise Outputs
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~

@@ -1716,9 +1716,9 @@ class HexShape(BaseShape):
         if self.grid_marks:  # and not kwargs.get("card_back", False):
             delta_grid = self.unit(self.grid_marks_length)
             pg_tl = Point(0, 0)
-            pg_tr = Point(globals.page[0], 0)
-            pg_bl = Point(0, globals.page[1])
-            pg_br = Point(globals.page[0], globals.page[1])
+            pg_tr = Point(globals.page.size[0], 0)
+            pg_bl = Point(0, globals.page.size[1])
+            pg_br = Point(globals.page.size[0], globals.page.size[1])
             v0, v1, v2, v3, v4, v5 = (  # anti-clockwise from west-point
                 self.vertices[0],
                 self.vertices[1],

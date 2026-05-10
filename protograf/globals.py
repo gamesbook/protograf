@@ -59,12 +59,8 @@ def initialize():
     global override  # boolean
     global pargs
     global paper
-    global page  #  (width, height) in points
-    global page_width  # user units
-    global page_height  # user units
-    global page_fill
+    global page_size
     global page_count
-    global page_grid  # user units
     global units
     global white
 
@@ -97,8 +93,4 @@ def initialize():
     white = "white"  # fill color for RGB
     page_count = 0
     paper = DEFAULT_PAGE_SIZE
-    page = paper_size(paper)  # (width, height) in points
-    page_width = page[0] / units  # width in user units
-    page_height = page[1] / units  # height in user units
-    page_fill = "white"  # page color for RGB
-    page_grid = None  # grid interval in user units
+    page_size = paper_size(paper)  # (width, height) in points

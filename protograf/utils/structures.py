@@ -13,6 +13,9 @@ from typing import Any, List, NamedTuple
 # third-party
 from jinja2 import Template
 
+# local
+from .constants import MAXIMUM_PAGE_WIDTH, MAXIMUM_PAGE_HEIGHT
+
 log = logging.getLogger(__name__)
 
 # ---- ENUM
@@ -132,11 +135,7 @@ GlobalDocument = namedtuple(
         "canvas",
         "margins",
         "page",
-        "page_fill",
-        "page_width",
-        "page_height",
         "page_count",
-        "page_grid",
     ],
 )
 
@@ -402,6 +401,19 @@ class BBox:
 
     tl: Point
     br: Point
+
+
+@dataclass
+class DocumentPage:
+    """DocumentPage holds settings and properties for pages in a PyMyPDF document"""
+
+    size: tuple  # (width, height) in points; paper => DEFAULT_PAGE_SIZE
+    width: float  # user units
+    height: float  # user units
+    fill: tuple | None  # color (RGB/CYMK); "white"
+    grid: float  # grid interval in user units
+    current: int  # current page number (from 0 on)
+    gallery: tuple = (MAXIMUM_PAGE_WIDTH, MAXIMUM_PAGE_HEIGHT)  # maximum extent in pts
 
 
 @dataclass

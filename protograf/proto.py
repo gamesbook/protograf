@@ -137,6 +137,7 @@ from protograf.utils.structures import (
     DatasetType,
     DeckPrintState,
     DirectionGroup,
+    DocumentPage,
     ExportFormat,
     HEX_FLAT_EDGE_TRAVEL,
     HexOrientation,
@@ -775,31 +776,31 @@ class DeckOfCards:
             case "rectangle" | "r":
                 self.frame_type = CardFrame.RECTANGLE
                 if self.height > (
-                    globals.page_height - globals.margins.top - globals.margins.bottom
+                    globals.page.height - globals.margins.top - globals.margins.bottom
                 ):
                     feedback("Card height cannot exceed available page height.", True)
                 if self.width > (
-                    globals.page_width - globals.margins.left - globals.margins.right
+                    globals.page.width - globals.margins.left - globals.margins.right
                 ):
                     feedback("Card width cannot exceed available page width.", True)
             case "circle" | "c":
                 self.frame_type = CardFrame.CIRCLE
                 if 2 * self.radius > (
-                    globals.page_height - globals.margins.top - globals.margins.bottom
+                    globals.page.height - globals.margins.top - globals.margins.bottom
                 ):
                     feedback("Card diameter cannot exceed available page height.", True)
                 if 2 * self.radius > (
-                    globals.page_width - globals.margins.left - globals.margins.right
+                    globals.page.width - globals.margins.left - globals.margins.right
                 ):
                     feedback("Card diameter cannot exceed available page width.", True)
             case "hexagon" | "h":
                 self.frame_type = CardFrame.HEXAGON
                 if 2 * self.radius > (
-                    globals.page_height - globals.margins.top - globals.margins.bottom
+                    globals.page.height - globals.margins.top - globals.margins.bottom
                 ):
                     feedback("Card diameter cannot exceed available page height.", True)
                 if 2 * self.radius > (
-                    globals.page_width - globals.margins.left - globals.margins.right
+                    globals.page.width - globals.margins.left - globals.margins.right
                 ):
                     feedback("Card diameter cannot exceed available page width.", True)
                 if (
@@ -822,6 +823,7 @@ class DeckOfCards:
         self.create_cardshapes(self.cards)
 
     def gallery_overrides(self, gallery):
+        """Reset document and page properties to handle NxM card layouts"""
         err = f'The gallery property must be a pair of numbers in (M, N) format; not "{gallery}".'
         if isinstance(gallery, tuple) and len(gallery) == 2:
             if not isinstance(gallery[0], int) or not isinstance(gallery[1], int):
@@ -840,13 +842,13 @@ class DeckOfCards:
         self.card_rows = rows
         self.spacing_x = 0
         self.spacing_y = 0
+        # remove initial default page
+        globals.document.delete_page(0)
         # alter page settings
-        globals.page = (
+        globals.page.size = (
             globals.units * self.width * cols,
             globals.units * self.height * rows,
         )
-        # FIXME - how to not centre old content on new page?
-        globals.doc_page.set_mediabox((0, 0, globals.page[0], globals.page[1]))
         globals.margins = PageMargins(
             margin=0,
             left=0,
@@ -856,10 +858,16 @@ class DeckOfCards:
             debug=False,
             units=globals.units,
         )
-        globals.page_width = globals.page[0] / globals.units  # width ~ user units
-        globals.page_height = globals.page[1] / globals.units  # height ~ user units
-        # print(f"###   {globals.page=} {globals.margins=}")
+        globals.page.width = globals.page.size[0] / globals.units  # width ~user units
+        globals.page.height = globals.page.size[1] / globals.units  # height ~user units
+        # print(f"###   {globals.page.size=} {globals.margins=}")
         globals.override = True  # allows Shape margins to be overridden
+        # create new, larger, page to hold card array
+        globals.doc_page = globals.document.new_page(
+            width=globals.page.size[0], height=globals.page.size[1]
+        )  # pymupdf Page object
+        globals.canvas = globals.doc_page.new_shape()  # pymupdf Shape object
+        page_setup()  # page color, grid and debug margins
 
     def set_dataset(self):
         """Create deck dataset from globals dataset"""
@@ -930,7 +938,7 @@ class DeckOfCards:
                 dpi=self.dpi,
                 directory=directory or self.directory,
                 frames=globals.card_frames,
-                # page_height=globals.page[1],
+                # page_height=globals.page.size[1],
             )
         return card_names
 
@@ -1224,18 +1232,18 @@ class DeckOfCards:
         max_rows = self.card_rows
         max_cols = self.card_cols
 
-        # print(f"###    {globals.page=} {globals.page_width=} {globals.page_height=}")
+        # print(f"###    {globals.page=} {globals.page.width=} {globals.page.height=}")
         # print(f"###    {globals.margins=}")
-        # print(f"$$$ {globals.page_width=} card{self.width=} {max_cols=}")
-        # print(f"$$$ {globals.page_height=} card{self.height=} {max_rows=}")
+        # print(f"$$$ {globals.page.width=} card{self.width=} {max_cols=}")
+        # print(f"$$$ {globals.page.height=} card{self.height=} {max_rows=}")
         # print(f"===================================================================")
 
         # ---- other settings
         self.export_cards = kwargs.get("export_cards", False)
         self.dpi = kwargs.get("dpi", 300)
         prime_globals = None
-        width = globals.page[0]
-        height = globals.page[1]
+        width = globals.page.size[0]
+        height = globals.page.size[1]
 
         # ---- gutter-based settings (new doc)
         if self.gutter > 0:
@@ -1256,31 +1264,31 @@ class DeckOfCards:
                         ' - use "portrait" or "landscape"'
                     )
             if _gutter_layout:  # in ['p', 'portrait']:
-                if globals_page[0] > globals_page[1]:
-                    width = globals_page[0]
-                    height = globals_page[1] / 2
+                if globals_page.size[0] > globals_page.size[1]:
+                    width = globals_page.size[0]
+                    height = globals_page.size[1] / 2
                     is_landscape = True
                 else:
-                    width = globals_page[1]
-                    height = globals_page[0] / 2
+                    width = globals_page.size[1]
+                    height = globals_page.size[0] / 2
                     is_landscape = False
 
             # WIP for landscape layout with TALL cards
-            # height = globals_page[1] / 2
-            # width = globals_page[0]
-            # if globals_page[0] > globals_page[1]:
+            # height = globals_page.size[1] / 2
+            # width = globals_page.size[0]
+            # if globals_page.size[0] > globals_page.size[1]:
             #     is_landscape = True
             # else:
             #     is_landscape = False
-            # print(f"$$$ {globals_page[0]=} {globals_page[1]=} {width=} {height=} ")
+            # print(f"$$$ {globals_page.size[0]=} {globals_page.size[1]=} {width=} {height=} ")
 
             globals.doc_page = globals.document.new_page(
                 width=width, height=height
             )  # pymupdf Page
             # ---- new globals for gutter
-            globals.page_width = width / globals.units
-            globals.page_height = height / globals.units
-            globals.page = (width, height)
+            globals.page.width = width / globals.units
+            globals.page.height = height / globals.units
+            globals.page.size = (width, height)
             # ---- BaseCanvas
             globals.base = BaseCanvas(
                 globals.document, paper=globals.paper, defaults=None, kwargs=kwargs
@@ -1298,7 +1306,7 @@ class DeckOfCards:
             globals.canvas = cnv
             page_setup()  # draw margin/grid
             # ---- validate card fit
-            vspace = globals.page_height - globals.margins.top - globals.margins.bottom
+            vspace = globals.page.height - globals.margins.top - globals.margins.bottom
             if self.height + self.offset_y > vspace:
                 feedback(
                     "Rotated cards cannot fit into the available space!"
@@ -1327,8 +1335,8 @@ class DeckOfCards:
             if globals.margins.top is not None
             else globals.margins.margin
         )
-        page_across = globals.page_width - margin_right - margin_left  # user units
-        page_down = globals.page_height - margin_top - margin_bottom  # user units
+        page_across = globals.page.width - margin_right - margin_left  # user units
+        page_down = globals.page.height - margin_top - margin_bottom  # user units
         _height, _width, _radius = self.height, self.width, self.radius
         if self.gallery is not None:
             self.draw_bleed(cnv, page_across, page_down)
@@ -1352,7 +1360,7 @@ class DeckOfCards:
         # ---- space calcs for rows/cols
         # Note: units here are user-based
         if not max_rows:
-            row_space = globals.page_height - margin_bottom - margin_top - self.offset_y
+            row_space = globals.page.height - margin_bottom - margin_top - self.offset_y
             if self.grouping_rows == 1:
                 max_rows = int(
                     (row_space + self.spacing_y) / (float(_height) + self.spacing_y)
@@ -1364,8 +1372,8 @@ class DeckOfCards:
                 )
                 max_rows = max_groups * self.grouping_rows
         if not max_cols:
-            col_space = globals.page_width - margin_left - margin_right - self.offset_x
-            # print(f'$$$ {globals.page_width=} {margin_left=} {margin_right=} {self.offset_x=}')
+            col_space = globals.page.width - margin_left - margin_right - self.offset_x
+            # print(f'$$$ {globals.page.width=} {margin_left=} {margin_right=} {self.offset_x=}')
             if self.grouping_cols == 1:
                 max_cols = int(
                     (col_space + self.spacing_x) / (float(_width) + self.spacing_x)
@@ -1392,7 +1400,7 @@ class DeckOfCards:
             )
 
         # ---- gap-at-right (for card back shift)
-        right_gap = globals.page_width - effective_right
+        right_gap = globals.page.width - effective_right
 
         # ---- prep for card drawing
         page_number = -1
@@ -1423,9 +1431,9 @@ class DeckOfCards:
                 break
 
         # print(f"===================================================================")
-        # print(f"$$$ {right_gap=} {globals.page_width=} {effective_right=}")
-        # print(f"$$$ {globals.page_width=} card{_width=} {col_space=} {max_cols=}")
-        # print(f"$$$ {globals.page_height=} card{_height=} {row_space=} {max_rows=}")
+        # print(f"$$$ {right_gap=} {globals.page.width=} {effective_right=}")
+        # print(f"$$$ {globals.page.width=} card{_width=} {col_space=} {max_cols=}")
+        # print(f"$$$ {globals.page.height=} card{_height=} {row_space=} {max_rows=}")
         # ---- delete extra blank page at the end
 
         globals.document.delete_page(globals.page_count)
@@ -1479,11 +1487,11 @@ class DeckOfCards:
                 # ---- draw gutter line
                 if self.gutter > 0:
                     if is_landscape:
-                        pt1 = (0, globals.page[1] / 2.0)
-                        pt2 = (globals.page[0], globals.page[1] / 2.0)
+                        pt1 = (0, globals.page.size[1] / 2.0)
+                        pt2 = (globals.page.size[0], globals.page.size[1] / 2.0)
                     else:
-                        pt1 = (globals.page[0] / 2.0, 0)
-                        pt2 = (globals.page[0] / 2.0, globals.page[1])
+                        pt1 = (globals.page.size[0] / 2.0, 0)
+                        pt2 = (globals.page.size[0] / 2.0, globals.page.size[1])
                     globals.canvas.draw_line(pt1, pt2)
                     gwargs = {}  # kwargs
                     GRAY = GRAYS[0] if globals.color_model == "CMYK" else GRAYS[1]
@@ -1519,10 +1527,14 @@ class DeckOfCards:
 def page_setup():
     """Set the page color and (optionally) show a dotted margin line and grid."""
     # ---- paper color
-    _fill = colrs.get_color(globals.page_fill)
+    _fill = (
+        globals.page.fill
+        if isinstance(globals.page.fill, tuple)
+        else colrs.get_color(globals.page.fill)
+    )
     if _fill != colrs.get_color(globals.white):
         globals.doc_page.draw_rect(
-            (0, 0, globals.page[0], globals.page[1]), fill=_fill, color=None
+            (0, 0, globals.page.size[0], globals.page.size[1]), fill=_fill, color=None
         )
     # ---- debug margins
     if globals.margins.debug:
@@ -1532,29 +1544,29 @@ def page_setup():
             (
                 globals.margins.left * globals.units,
                 globals.margins.top * globals.units,
-                globals.page[0] - (globals.margins.right * globals.units),
-                globals.page[1] - (globals.margins.bottom * globals.units),
+                globals.page.size[0] - (globals.margins.right * globals.units),
+                globals.page.size[1] - (globals.margins.bottom * globals.units),
             ),
             color=stroke,
             dashes="[1 2] 0",
         )
     # ---- page grid
-    if globals.page_grid:
+    if globals.page.grid:
         stroke = colrs.get_color(globals.debug_color)
-        grid_size = globals.page_grid * globals.units
-        cols = int(globals.page[0] // grid_size)
-        rows = int(globals.page[1] // grid_size)
+        grid_size = globals.page.grid * globals.units
+        cols = int(globals.page.size[0] // grid_size)
+        rows = int(globals.page.size[1] // grid_size)
         for col in range(1, cols + 1):
             globals.doc_page.draw_line(
                 (col * grid_size, 0),
-                (col * grid_size, globals.page[1]),
+                (col * grid_size, globals.page.size[1]),
                 color=stroke,
                 width=0.1,
             )
         for row in range(1, rows + 1):
             globals.doc_page.draw_line(
                 (0, row * grid_size),
-                (globals.page[0], row * grid_size),
+                (globals.page.size[0], row * grid_size),
                 color=stroke,
                 width=0.1,
             )
@@ -1633,8 +1645,8 @@ def Create(**kwargs):
         CMYK_DEBUG_COLOR if globals.color_model == "CMYK" else RGB_DEBUG_COLOR
     )
     globals.paper = kwargs.get("paper", globals.paper)
-    globals.page = pymupdf.paper_size(globals.paper)  # (width, height) in points
     # user overrides
+    _page = pymupdf.paper_size(globals.paper)  # (width, height) in points
     if kwargs.get("paper_width") or kwargs.get("paper_height"):
         _page_width = tools.as_float(kwargs.get("paper_width", 0), "paper_width")
         _page_height = tools.as_float(kwargs.get("paper_height", 0), "paper_height")
@@ -1644,11 +1656,15 @@ def Create(**kwargs):
         _page_height_pt = (
             _page_height * globals.units if _page_height > 0 else globals.paper[1]
         )
-        globals.page = (_page_width_pt, _page_height_pt)
-    globals.page_width = globals.page[0] / globals.units  # width in user units
-    globals.page_height = globals.page[1] / globals.units  # height in user units
-    globals.page_fill = colrs.get_color(kwargs.get("fill", globals.white))
-    globals.page_grid = tools.as_float(kwargs.get("page_grid", 0), "page_grid")
+        _page = (_page_width_pt, _page_height_pt)
+    globals.page = DocumentPage(
+        size=(_page[0], _page[1]),  # page.rect is visible area of page
+        width=_page[0] / globals.units,  # width in user units
+        height=_page[1] / globals.units,  # height in user units
+        fill=colrs.get_color(kwargs.get("fill", globals.white)),
+        grid=tools.as_float(kwargs.get("page_grid", 0), "page_grid"),
+        current=0,
+    )
     # ---- fonts
     base_fonts()
     globals.font_size = kwargs.get("font_size", 12)
@@ -1726,7 +1742,7 @@ def Create(**kwargs):
     # ---- pymupdf doc, page, shape/canvas
     globals.document = pymupdf.open()  # pymupdf.Document
     globals.doc_page = globals.document.new_page(
-        width=globals.page[0], height=globals.page[1]
+        width=globals.page.size[0], height=globals.page.size[1]
     )  # pymupdf Page
     globals.canvas = globals.doc_page.new_shape()  # pymupdf Shape
     # ---- BaseCanvas (base.py)
@@ -1809,7 +1825,7 @@ def Load(**kwargs):
     globals.black = CMYK_BLACK if globals.color_model == "CMYK" else RGB_BLACK
     globals.white = CMYK_WHITE if globals.color_model == "CMYK" else RGB_WHITE
     globals.paper = kwargs.get("paper", globals.paper)
-    globals.page = pymupdf.paper_size(globals.paper)  # (width, height) in points
+    globals.page_size = pymupdf.paper_size(globals.paper)  # (width, height) in points
     # ---- fonts
     base_fonts()
     globals.font_size = kwargs.get("font_size", 12)
@@ -1886,20 +1902,20 @@ def Load(**kwargs):
     except Exception as err:
         feedback(f"Unable to load {globals.filename} ({err})", True)
     globals.doc_page = globals.document.new_page(
-        width=globals.page[0], height=globals.page[1]
+        width=globals.page.size[0], height=globals.page.size[1]
     )  # pymupdf Page
     # ---- Extract doc info
     page = globals.document[0]
-    # page.rect represents the visible area of the page
-    _page_width_pt = page.rect.width
-    _page_height_pt = page.rect.height
-    globals.page = (_page_width_pt, _page_height_pt)
-    globals.page_width = globals.page[0] / globals.units  # width in user units
-    globals.page_height = globals.page[1] / globals.units  # height in user units
-    globals.page_fill = colrs.get_color(kwargs.get("fill", globals.white))
-    globals.page_grid = tools.as_float(kwargs.get("page_grid", 0), "page_grid")
-    globals.canvas = globals.doc_page.new_shape()  # pymupdf Shape
+    globals.page = DocumentPage(
+        size=(page.rect.width, page.rect.height),  # page.rect is visible area of page
+        width=page.rect.width / globals.units,
+        height=page.rect.height / globals.units,
+        fill=colrs.get_color(kwargs.get("fill", globals.white)),
+        grid=tools.as_float(kwargs.get("page_grid", 0), "page_grid"),
+        current=0,
+    )
     # ---- BaseCanvas (base.py)
+    globals.canvas = globals.doc_page.new_shape()  # pymupdf Shape
     globals.base = BaseCanvas(
         globals.document, paper=globals.paper, defaults=defaults, kwargs=kwargs
     )
@@ -1947,7 +1963,7 @@ def PageBreak(**kwargs):
     globals.canvas.commit()  # add all drawings (to current pymupdf Shape/"canvas")
     globals.page_count += 1
     globals.doc_page = globals.document.new_page(
-        width=globals.page[0], height=globals.page[1]
+        width=globals.page.size[0], height=globals.page.size[1]
     )  # pymupdf Page
     globals.canvas = globals.doc_page.new_shape()  # pymupdf Shape/"canvas" for new Page
     page_setup()
@@ -2061,32 +2077,32 @@ def Extract(pages: object, **kwargs):
                     True,
                 )
     if cards:
-        if height > globals.page_height:
+        if height > globals.page.height:
             feedback(
                 "The height specified for Extract is greater than the page height",
                 True,
             )
-        if width > globals.page_width:
+        if width > globals.page.width:
             feedback(
                 "The width specified for Extract is greater than the page width",
                 True,
             )
-        if tl_y > globals.page_height:
+        if tl_y > globals.page.height:
             feedback(
                 "The y specified for Extract is greater than the page height",
                 True,
             )
-        if tl_x > globals.page_width:
+        if tl_x > globals.page.width:
             feedback(
                 "The x specified for Extract is greater than the page width",
                 True,
             )
-        if gap_y > globals.page_height:
+        if gap_y > globals.page.height:
             feedback(
                 "The y_gap specified for Extract is greater than the page height",
                 True,
             )
-        if gap_x > globals.page_width:
+        if gap_x > globals.page.width:
             feedback(
                 "The x_gap specified for Extract is greater than the page width",
                 True,
@@ -2125,8 +2141,8 @@ def Extract(pages: object, **kwargs):
                 yb = globals.units * area[3]
                 data.append((BBox(tl=Point(xl, yt), br=Point(xr, yb)), name))
         elif cols_rows:
-            col_width = globals.page[0] / _cols_rows[0]
-            row_width = globals.page[1] / _cols_rows[1]
+            col_width = globals.page.size[0] / _cols_rows[0]
+            row_width = globals.page.size[1] / _cols_rows[1]
             for col in range(0, _cols_rows[0]):
                 xl = col * col_width
                 xr = (col + 1) * col_width
@@ -2146,9 +2162,9 @@ def Extract(pages: object, **kwargs):
             _gap_y = gap_y * globals.units
 
             start_y = tl_y * globals.units
-            while start_y + _height < globals.page[1]:
+            while start_y + _height < globals.page.size[1]:
                 start_x = tl_x * globals.units
-                while start_x + _width < globals.page[0]:
+                while start_x + _width < globals.page.size[0]:
                     try:
                         name = names[name_idx]
                     except IndexError:
@@ -2331,14 +2347,14 @@ def Save(**kwargs):
         dpi=300,  # ??? FIXME
         directory=directory or globals.directory,
         frames=globals.extracts,
-        # page_height=globals.page[1],
+        # page_height=globals.page.size[1],
     )
 
     # ---- reset key globals to allow for new Deck()
     # ---- pymupdf doc, page, shape/canvas
     globals.document = pymupdf.open()  # pymupdf.Document
     globals.doc_page = globals.document.new_page(
-        width=globals.page[0], height=globals.page[1]
+        width=globals.page.size[0], height=globals.page.size[1]
     )  # pymupdf Page
     globals.canvas = globals.doc_page.new_shape()  # pymupdf Shape
     # ---- BaseCanvas
@@ -4303,14 +4319,16 @@ def Blueprint(**kwargs):
     kwargs["y"] = kwargs.get("y", 0)
     m_x = kwargs["units"] * (globals.margins.left + globals.margins.right)
     m_y = kwargs["units"] * (globals.margins.top + globals.margins.bottom)
-    _cols = (globals.page[0] - m_x) / (kwargs["units"] * float(kwargs["side"]))
-    _rows = (globals.page[1] - m_y) / (kwargs["units"] * float(kwargs["side"]))
+    _cols = (globals.page.size[0] - m_x) / (kwargs["units"] * float(kwargs["side"]))
+    _rows = (globals.page.size[1] - m_y) / (kwargs["units"] * float(kwargs["side"]))
     rows = int(_rows)
     cols = int(_cols)
     kwargs["rows"] = kwargs.get("rows", rows)
     kwargs["cols"] = kwargs.get("cols", cols)
     kwargs["stroke_width"] = kwargs.get("stroke_width", 0.2)  # fine line
-    default_font_size = 10 * math.sqrt(globals.page[0]) / math.sqrt(globals.page[1])
+    default_font_size = (
+        10 * math.sqrt(globals.page.size[0]) / math.sqrt(globals.page.size[1])
+    )
     dotted = kwargs.get("dotted", False)
     kwargs["font_size"] = kwargs.get("font_size", default_font_size)
     line_stroke, page_fill = set_style(kwargs.get("style", None))
@@ -4319,7 +4337,7 @@ def Blueprint(**kwargs):
     # ---- page color (optional)
     if kwargs["fill"] is not None:
         fill = colrs.get_color(kwargs.get("fill", RGB_WHITE))
-        globals.canvas.draw_rect((0, 0, globals.page[0], globals.page[1]))
+        globals.canvas.draw_rect((0, 0, globals.page.size[0], globals.page.size[1]))
         globals.canvas.finish(fill=fill, lineJoin=0)
     kwargs["fill"] = kwargs.get("fill", line_stroke)  # revert back for font
     # ---- number edges

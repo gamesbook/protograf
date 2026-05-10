@@ -17,7 +17,8 @@ Deck(
     #offset=0.15,
     grid_marks=True,
     grid_marks_length=0.2,
-    gutter=0.4
+    gutter=0.4,
+    # gallery=(5, 4),
     )
 # design card
 Card(

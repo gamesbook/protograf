@@ -77,6 +77,10 @@ The following are other properties that can also be set for a ``Deck``:
 - **fill** - sets the color of the card's area; defaults to ``white``
 - **frame** - the default card frame is a *rectangle* (or square, if the
   height and width match); but can be set to *hexagon* or *circle*
+- **gallery** - when set to a pair of numbers, e.g. ``(9,6)``, will cause that
+  many *cards* to be drawn on a page; the page size will be changed to fit them
+  all; and all margins will be set to zero |dash| an image created from such a
+  page can be used as an input for programs such as Tabletop Simulator (TTS)
 - **grid_marks** - if set to ``True``, will cause small marks to be drawn
   so that they align with the edges of the card frames
 - **grid_marks_length** - the length of the grid marks; defaults to ``0.85`` cm
@@ -169,6 +173,9 @@ In this code:
 Deck Property Examples
 =======================
 `↑ <table-of-contents-deck_>`_
+
+The examples show further usage of the Deck command, in addition to those
+provided in the :ref:`Deck & Card Commands <deckcommandExamples>`.
 
 - `Example 1. Changing Defaults`_
 - `Example 2. Full Bleed`_

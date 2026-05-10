@@ -1665,12 +1665,8 @@ def save_globals() -> GlobalDocument:
         doc_page=globals.doc_page,
         canvas=globals.canvas,
         margins=globals.margins,
-        page=globals.page,
-        page_fill=globals.page_fill,
-        page_width=globals.page_width,
-        page_height=globals.page_height,
+        page=globals.page,  # DocumentPage
         page_count=globals.page_count,
-        page_grid=globals.page_grid,
     )
 
 
@@ -1686,11 +1682,7 @@ def restore_globals(doc: GlobalDocument):
     globals.canvas = doc.canvas
     globals.margins = doc.margins
     globals.page = doc.page
-    globals.page_fill = doc.page_fill
-    globals.page_width = doc.page_width
-    globals.page_height = doc.page_height
     globals.page_count = doc.page_count
-    globals.page_grid = doc.page_grid
 
 
 def unit(
