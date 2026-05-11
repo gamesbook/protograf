@@ -1656,26 +1656,35 @@ def is_url_valid(url: str, qualifying=MIN_ATTRIBUTES):
 def save_globals() -> GlobalDocument:
     """Create a copy of key globals settings"""
     return GlobalDocument(
+        archive=globals.archive,
         base=globals.base,
-        deck=globals.deck,
+        canvas=globals.canvas,
         card_frames=globals.card_frames,
-        filename=globals.filename,
+        deck=globals.deck,
         directory=globals.directory,
         document=globals.document,
         doc_page=globals.doc_page,
-        canvas=globals.canvas,
+        filename=globals.filename,
+        font_size=globals.font_size,
         margins=globals.margins,
         page=globals.page,  # DocumentPage
         page_count=globals.page_count,
+        paper=globals.paper,
+        units=globals.units,
+        black=globals.black,
+        white=globals.white,
+        color_model=globals.color_model,
     )
 
 
 def restore_globals(doc: GlobalDocument):
     """Restore key globals settings"""
+    globals.archive = doc.archive
     globals.base = doc.base
     globals.deck = doc.deck
     globals.card_frames = doc.card_frames
     globals.filename = doc.filename
+    globals.font_size = doc.font_size
     globals.directory = doc.directory
     globals.document = doc.document
     globals.doc_page = doc.doc_page
@@ -1683,6 +1692,11 @@ def restore_globals(doc: GlobalDocument):
     globals.margins = doc.margins
     globals.page = doc.page
     globals.page_count = doc.page_count
+    globals.paper = doc.paper
+    globals.units = doc.units
+    globals.white = doc.white
+    globals.black = doc.black
+    globals.color_model = doc.color_model
 
 
 def unit(

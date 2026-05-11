@@ -57,9 +57,9 @@ def initialize():
     global image_list
     global margins
     global override  # boolean
+    global page
     global pargs
     global paper
-    global page_size
     global page_count
     global units
     global white
@@ -68,11 +68,10 @@ def initialize():
     css = None  # will become a string containing CSS font location
     document = None  # will become a pymupdf Document object
     doc_page = None  # will become a pymupdf Page object
-    canvas = None  # will become a pymupdf Shape object; one created per Page
+    canvas = None  # will become a pymupdf Shape object; one created per pymupdf Page
     base = None  # will become a base.BaseCanvas object
     deck = None  # will become a proto.DeckOfCards object
-    # store kwargs for DeckOfCards; #cards, copy, card_name, extra, grid_marks, zones
-    deck_settings = {}
+    deck_settings = {}  # DeckOfCards; cards, copy, card_name, extra, grid_marks, zones
     debug_color = RGB_DEBUG_COLOR
     card_frames = {}  # list of proto.BBox card frames; keyed on page number
     filename = None
@@ -85,6 +84,7 @@ def initialize():
     footer = None
     footer_draw = False
     font_size = 12
+    page = None  # will become a proto.DocumentPage object
     pargs = None
     units = unit.cm
     color_model = "RGB"
@@ -93,4 +93,3 @@ def initialize():
     white = "white"  # fill color for RGB
     page_count = 0
     paper = DEFAULT_PAGE_SIZE
-    page_size = paper_size(paper)  # (width, height) in points

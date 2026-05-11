@@ -1074,6 +1074,7 @@ class DeckOfCards:
             Returns:
                 DeckPrintState at the end of a Page
             """
+
             # print(f'$$$ draw_the_cards {page_number=} {front=}')
             start_card = state.card_number
             card_count = state.card_count
@@ -1218,35 +1219,8 @@ class DeckOfCards:
                 start_x=0,
             )
 
-        # ---- * DRAW START *
-
-        # ---- primary layout settings for card.draw()
-        cnv = cnv if cnv else globals.canvas
-        # feedback(f'$$$ DeckShape.draw {cnv=} KW=> {kwargs}')
-        log.debug("Deck cnv:%s type:%s", type(globals.canvas), type(cnv))
-        kwargs = self.kwargs | kwargs
-        images = kwargs.get("image_list", [])
-        kwargs["frame_type"] = self.frame_type
-
-        # ---- user-defined rows and cols
-        max_rows = self.card_rows
-        max_cols = self.card_cols
-
-        # print(f"###    {globals.page=} {globals.page.width=} {globals.page.height=}")
-        # print(f"###    {globals.margins=}")
-        # print(f"$$$ {globals.page.width=} card{self.width=} {max_cols=}")
-        # print(f"$$$ {globals.page.height=} card{self.height=} {max_rows=}")
-        # print(f"===================================================================")
-
-        # ---- other settings
-        self.export_cards = kwargs.get("export_cards", False)
-        self.dpi = kwargs.get("dpi", 300)
-        prime_globals = None
-        width = globals.page.size[0]
-        height = globals.page.size[1]
-
-        # ---- gutter-based settings (new doc)
-        if self.gutter > 0:
+        def draw_gutter_cards() -> tuple:
+            breakpoint()
             prime_globals = save_globals()
             globals_page = copy(globals.page)
             gutter = tools.as_float(kwargs.get("gutter", 0.0), "gutter")
@@ -1263,6 +1237,7 @@ class DeckOfCards:
                         f'The gutter_layout "{self.gutter_layout}" is not valid'
                         ' - use "portrait" or "landscape"'
                     )
+                    return "", False
             if _gutter_layout:  # in ['p', 'portrait']:
                 if globals_page.size[0] > globals_page.size[1]:
                     width = globals_page.size[0]
@@ -1313,6 +1288,99 @@ class DeckOfCards:
                     " Reduce card height, or top/bottom margins, or offset from top.",
                     True,
                 )
+            return gutter_filename, is_landscape
+
+        def load_gutter_pages(is_landscape: bool, gutter_filename: str):
+            # ---- * save gutter document
+            gutterfile = os.path.join(globals.directory, globals.filename)
+            globals.document.save(gutterfile)
+            # ---- * export individual cards
+            self.export_cards_as_images(
+                filename=globals.filename,
+                directory=globals.directory,
+                output=prime_globals.filename,
+            )  # default to PNG format
+            # ---- * reset globals to current doc
+            restore_globals(prime_globals)
+            cnv = globals.canvas
+            # ---- * open gutter document
+            src = pymupdf.open(gutterfile)
+            if is_landscape:
+                # upper half page (r1: backs)
+                r1 = muRect(0, 0, cnv.width, cnv.height / 2)
+                r1_rotate = 180
+                # lower half page (r2: fronts)
+                r2 = r1 + (0, cnv.height / 2, 0, cnv.height / 2)
+                r2_rotate = 0
+            else:
+                # left half page (r2: fronts)
+                r2 = muRect(0, 0, cnv.width / 2, cnv.height)
+                r2_rotate = -90
+                # right half page (r1: backs)
+                r1 = muRect(cnv.width / 2, 0, cnv.width, cnv.height)
+                r1_rotate = 90
+            # ---- * insert pages from gutter.pdf
+            for page_number in range(0, src.page_count, 2):
+                globals.doc_page.show_pdf_page(
+                    r2, src, page_number, rotate=r2_rotate
+                )  # fronts
+                globals.doc_page.show_pdf_page(
+                    r1, src, page_number + 1, rotate=r1_rotate
+                )  # backs
+                # ---- draw gutter line
+                if self.gutter > 0:
+                    if is_landscape:
+                        pt1 = (0, globals.page.size[1] / 2.0)
+                        pt2 = (globals.page.size[0], globals.page.size[1] / 2.0)
+                    else:
+                        pt1 = (globals.page.size[0] / 2.0, 0)
+                        pt2 = (globals.page.size[0] / 2.0, globals.page.size[1])
+                    globals.canvas.draw_line(pt1, pt2)
+                    gwargs = {}  # kwargs
+                    GRAY = GRAYS[0] if globals.color_model == "CMYK" else GRAYS[1]
+                    gwargs["stroke"] = self.gutter_stroke or colrs.get_color(GRAY)
+                    gwargs["stroke_width"] = self.gutter_stroke_width
+                    gwargs["dotted"] = self.gutter_dotted
+                    tools.set_canvas_props(cnv=globals.canvas, index=None, **gwargs)
+                # if page_number < src.page_count / 2 - 1:
+                PageBreak()
+            # ---- * delete extra blank page at the end
+            globals.document.delete_page(globals.page_count)
+            # ---- delete gutter PDF document
+            if os.path.exists(gutter_filename):
+                os.remove(gutter_filename)
+
+        # ---- * DRAW START * ----
+
+        # ---- primary layout settings for card.draw()
+        cnv = cnv if cnv else globals.canvas
+        # feedback(f'$$$ DeckShape.draw {cnv=} KW=> {kwargs}')
+        log.debug("Deck cnv:%s type:%s", type(globals.canvas), type(cnv))
+        kwargs = self.kwargs | kwargs
+        images = kwargs.get("image_list", [])
+        kwargs["frame_type"] = self.frame_type
+
+        # ---- user-defined rows and cols
+        max_rows = self.card_rows
+        max_cols = self.card_cols
+
+        # print(f"###    {globals.page=} {globals.page.width=} {globals.page.height=}")
+        # print(f"###    {globals.margins=}")
+        # print(f"$$$ {globals.page.width=} card{self.width=} {max_cols=}")
+        # print(f"$$$ {globals.page.height=} card{self.height=} {max_rows=}")
+        # print(f"===================================================================")
+
+        # ---- other settings
+        self.export_cards = kwargs.get("export_cards", False)
+        self.dpi = kwargs.get("dpi", 300)
+
+        # ---- local defaults
+        prime_globals, is_landscape, gutter_filename = None, False, ""
+
+        # ---- gutter-based settings (new doc)
+        if self.gutter > 0:
+            prime_globals = save_globals()
+            gutter_filename, is_landscape = draw_gutter_cards()
 
         # ---- calculate rows/cols based on page size and margins AND card size
         margin_left = (
@@ -1354,7 +1422,7 @@ class DeckOfCards:
             _card.outline.height,
             _card.outline.width,
         )
-        _radius = _card.outline.radius
+        # _radius = _card.outline.radius
         # print(f'$$$ _card: {_height=} {_width=} {_radius=}')
 
         # ---- space calcs for rows/cols
@@ -1438,76 +1506,9 @@ class DeckOfCards:
 
         globals.document.delete_page(globals.page_count)
 
-        # ---- reset to prime and load-in gutter pages
+        # ---- reset to prime globals and load-in the gutter pages
         if self.gutter > 0:
-            # ---- * save gutter document
-            gutterfile = os.path.join(globals.directory, globals.filename)
-            globals.document.save(gutterfile)
-            # ---- * export individual cards
-            card_names = self.export_cards_as_images(
-                filename=globals.filename,
-                directory=globals.directory,
-                output=prime_globals.filename,
-            )  # default to PNG format
-            # ---- * export cards as single image
-            if False:  # TODO - set and read self.deck_image
-                self.export_cards_as_single_image(
-                    card_names=card_names,
-                    filename=globals.filename,
-                    directory=globals.directory,
-                    output=prime_globals.filename,
-                )  # default to PNG format
-            # ---- * reset globals to current doc
-            restore_globals(prime_globals)
-            cnv = globals.canvas
-            # ---- * open gutter document
-            src = pymupdf.open(gutterfile)
-            if is_landscape:
-                # upper half page (r1: backs)
-                r1 = muRect(0, 0, cnv.width, cnv.height / 2)
-                r1_rotate = 180
-                # lower half page (r2: fronts)
-                r2 = r1 + (0, cnv.height / 2, 0, cnv.height / 2)
-                r2_rotate = 0
-            else:
-                # left half page (r2: fronts)
-                r2 = muRect(0, 0, cnv.width / 2, cnv.height)
-                r2_rotate = -90
-                # right half page (r1: backs)
-                r1 = muRect(cnv.width / 2, 0, cnv.width, cnv.height)
-                r1_rotate = 90
-            # ---- * insert pages from gutter.pdf
-            for page_number in range(0, src.page_count, 2):
-                globals.doc_page.show_pdf_page(
-                    r2, src, page_number, rotate=r2_rotate
-                )  # fronts
-                globals.doc_page.show_pdf_page(
-                    r1, src, page_number + 1, rotate=r1_rotate
-                )  # backs
-                # ---- draw gutter line
-                if self.gutter > 0:
-                    if is_landscape:
-                        pt1 = (0, globals.page.size[1] / 2.0)
-                        pt2 = (globals.page.size[0], globals.page.size[1] / 2.0)
-                    else:
-                        pt1 = (globals.page.size[0] / 2.0, 0)
-                        pt2 = (globals.page.size[0] / 2.0, globals.page.size[1])
-                    globals.canvas.draw_line(pt1, pt2)
-                    gwargs = {}  # kwargs
-                    GRAY = GRAYS[0] if globals.color_model == "CMYK" else GRAYS[1]
-                    gwargs["stroke"] = self.gutter_stroke or colrs.get_color(GRAY)
-                    gwargs["stroke_width"] = self.gutter_stroke_width
-                    gwargs["dotted"] = self.gutter_dotted
-                    tools.set_canvas_props(cnv=globals.canvas, index=None, **gwargs)
-                # if page_number < src.page_count / 2 - 1:
-                PageBreak()
-            # ---- * delete extra blank page at the end
-            globals.document.delete_page(globals.page_count)
-            # ---- delete gutter PDF document
-            if os.path.exists(gutter_filename):
-                os.remove(gutter_filename)
-        else:
-            pass
+            load_gutter_pages(is_landscape, gutter_filename)
 
     def get(self, cid):
         """Return a card based on the internal ID"""
@@ -1901,19 +1902,19 @@ def Load(**kwargs):
         globals.document = pymupdf.open(globals.filename)  # existing Document
     except Exception as err:
         feedback(f"Unable to load {globals.filename} ({err})", True)
+        # ---- Extract and record doc info
+        page = globals.document[0]
+        globals.page = DocumentPage(
+            size=(page.rect.width, page.rect.height),  # page.rect is visible page area
+            width=page.rect.width / globals.units,
+            height=page.rect.height / globals.units,
+            fill=colrs.get_color(kwargs.get("fill", globals.white)),
+            grid=tools.as_float(kwargs.get("page_grid", 0), "page_grid"),
+            current=0,
+        )
     globals.doc_page = globals.document.new_page(
         width=globals.page.size[0], height=globals.page.size[1]
     )  # pymupdf Page
-    # ---- Extract doc info
-    page = globals.document[0]
-    globals.page = DocumentPage(
-        size=(page.rect.width, page.rect.height),  # page.rect is visible area of page
-        width=page.rect.width / globals.units,
-        height=page.rect.height / globals.units,
-        fill=colrs.get_color(kwargs.get("fill", globals.white)),
-        grid=tools.as_float(kwargs.get("page_grid", 0), "page_grid"),
-        current=0,
-    )
     # ---- BaseCanvas (base.py)
     globals.canvas = globals.doc_page.new_shape()  # pymupdf Shape
     globals.base = BaseCanvas(
