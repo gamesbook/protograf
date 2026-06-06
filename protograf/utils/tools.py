@@ -113,7 +113,7 @@ def boolean_join(items):
         elif item == "|" or item == "or":
             expr += " or "
         elif item is not None:
-            expr += "%s" % item
+            expr += f"{item}"
         else:
             pass  # ignore nones
     try:
@@ -1310,7 +1310,7 @@ def base_fonts():
         feedback(f"Unable to register the MS font(s): {names}", False, True)
 
 
-def eval_template(strng: str, data: dict | None = None, label: str = ""):
+def eval_template(strng: str, data: dict | None = None):
     """Process data dict via jinja2 template in source.
 
     Doc Test:
@@ -1656,24 +1656,25 @@ def is_url_valid(url: str, qualifying=MIN_ATTRIBUTES):
 def save_globals() -> GlobalDocument:
     """Create a copy of key globals settings"""
     return GlobalDocument(
-        archive=globals.archive,
-        base=globals.base,
-        canvas=globals.canvas,
-        card_frames=globals.card_frames,
-        deck=globals.deck,
-        directory=globals.directory,
-        document=globals.document,
-        doc_page=globals.doc_page,
-        filename=globals.filename,
-        font_size=globals.font_size,
-        margins=globals.margins,
-        page=globals.page,  # DocumentPage
-        page_count=globals.page_count,
-        paper=globals.paper,
-        units=globals.units,
-        black=globals.black,
-        white=globals.white,
-        color_model=globals.color_model,
+        archive=copy.copy(globals.archive),
+        base=copy.copy(globals.base),
+        black=copy.copy(globals.black),  # RGB / CMYK
+        canvas=copy.copy(globals.canvas),
+        card_frames=copy.copy(globals.card_frames),
+        color_model=copy.copy(globals.color_model),
+        css=copy.copy(globals.css),
+        deck=copy.copy(globals.deck),
+        directory=copy.copy(globals.directory),
+        doc_page=copy.copy(globals.doc_page),
+        document=copy.copy(globals.document),
+        filename=copy.copy(globals.filename),
+        font_size=copy.copy(globals.font_size),
+        margins=copy.copy(globals.margins),  # PageMargins
+        page_count=copy.copy(globals.page_count),
+        page=copy.copy(globals.page),  # DocumentPage
+        paper=copy.copy(globals.paper),  # named paper size
+        units=copy.copy(globals.units),  #  UnitPoints; units point equivalents
+        white=copy.copy(globals.white),  # RGB / CMYK
     )
 
 
@@ -1681,22 +1682,23 @@ def restore_globals(doc: GlobalDocument):
     """Restore key globals settings"""
     globals.archive = doc.archive
     globals.base = doc.base
-    globals.deck = doc.deck
+    globals.black = doc.black
+    globals.canvas = doc.canvas
     globals.card_frames = doc.card_frames
+    globals.color_model = doc.color_model
+    globals.css = (doc.css,)
+    globals.deck = doc.deck
+    globals.directory = doc.directory
+    globals.doc_page = doc.doc_page
+    globals.document = doc.document
     globals.filename = doc.filename
     globals.font_size = doc.font_size
-    globals.directory = doc.directory
-    globals.document = doc.document
-    globals.doc_page = doc.doc_page
-    globals.canvas = doc.canvas
     globals.margins = doc.margins
-    globals.page = doc.page
     globals.page_count = doc.page_count
+    globals.page = doc.page
     globals.paper = doc.paper
     globals.units = doc.units
     globals.white = doc.white
-    globals.black = doc.black
-    globals.color_model = doc.color_model
 
 
 def unit(

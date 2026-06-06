@@ -154,8 +154,6 @@ from protograf.utils.tools import (  # used in scripts
     base_fonts,
     _lower,
     split,
-    save_globals,
-    restore_globals,
     uniques,
 )
 
@@ -188,7 +186,7 @@ class CardOutline(BaseShape):
     def __init__(self, _object=None, canvas=None, **kwargs):
         super().__init__(_object=_object, canvas=canvas, **kwargs)
         self.kwargs = kwargs
-        # feedback(f'\n$$$ CardShape KW=> {self.kwargs}')
+        # feedback(f'\n$$$ CardOutline KW=> {self.kwargs}')
         self.elements = []  # container for objects which get added to the card
         self.members = None
         if kwargs.get("_is_countersheet", False):
@@ -312,7 +310,7 @@ class CardShape(BaseShape):
 
         def draw_element(new_ele, cnv, off_x, off_y, ID, **kwargs):
             """Allow customisation of kwargs before call to Shape's draw()."""
-            # print(f'$$$ draw_element {ID=} {type(new_ele)=}')
+            # print(f'$$$ draw_card::draw_element {cnv} {ID=} {type(new_ele)=}')
             if isinstance(
                 new_ele, (SequenceShape, RepeatShape, GridShape, DotGridShape)
             ):
@@ -324,7 +322,7 @@ class CardShape(BaseShape):
 
             new_ele.draw(cnv, off_x, off_y, ID, **kwargs)
 
-        # feedback(f'\n$$$ draw_card  {cid=} {row=} {col=} {self.elements=}')
+        # feedback(f'\n$$$ draw_card {cnv=} {cid=} {row=} {col=}')
         # feedback(f'$$$ draw_card  {cid=} KW=> {kwargs}')
         is_card_back = kwargs.get("card_back", False)
         image = kwargs.get("image", None)
@@ -337,12 +335,13 @@ class CardShape(BaseShape):
         shape_kwargs["is_cards"] = True
         if not is_card_back:
             shape_kwargs["fill"] = kwargs.get("fill", kwargs.get("bleed_fill", None))
+        else:
+            shape_kwargs["fill"] = None
         shape_kwargs.pop("image_list", None)  # do NOT draw linked image
         shape_kwargs.pop("image", None)  # do NOT draw get_outline(linked image
         outline = self.outline_shape.get_outline(
             cnv=cnv, row=row, col=col, cid=cid, label=label, **shape_kwargs
         )
-        # feedback(f'$$$ draw_card {cid=} {row=} {col=} {outline._o=}') # KW=> {shape_kwargs}
 
         # ---- custom geometry
         if kwargs["frame_type"] == CardFrame.HEXAGON:
@@ -365,13 +364,13 @@ class CardShape(BaseShape):
             move_x = right_gap - self.offset_x - globals.margins.left
         else:
             move_x = 0
-        # feedback(f'$$$ 356 {right_gap=} {self.offset_x=} {move_x=}')
-        # feedback(f'$$$ 357 {shape_kwargs["frame_type"]=} {shape_kwargs["grid_marks"]=}')
-        # feedback(f"$$$ 358 {outline=} {shape_kwargs=}")
+        # feedback(f'$$$ 366 {right_gap=} {self.offset_x=} {move_x=}')
+        # feedback(f'$$$ 367 {shape_kwargs["frame_type"]=} {shape_kwargs["grid_marks"]=}')
+        # feedback(f"$$$ 368 {outline=} {shape_kwargs=}")
 
         # ---- draw card bleed
         if self.card_bleed:
-            # print(f"$$$ 362 {cid=} {self.elements=} {self.card_bleed=}")
+            # print(f"$$$ 372 {cid=} {self.elements=} {self.card_bleed=}")
             bleed_kwargs = copy(shape_kwargs)
             bleed_kwargs["fill"] = self.card_bleed.fill
             bleed_kwargs["stroke"] = self.card_bleed.fill
@@ -384,10 +383,13 @@ class CardShape(BaseShape):
             bleed_outline = bleed_shape.get_outline(
                 cnv=cnv, row=row, col=col, cid=cid, label=label, **bleed_kwargs
             )
-            # feedback(f"$$$ 376 {cid=} {type(bleed_outline=} {bleed_kwargs=}")
+            # feedback(f"$$$ 386 {cid=} {type(bleed_outline=} {bleed_kwargs=}")
             bleed_outline.draw(off_x=move_x, off_y=0, **bleed_kwargs)  # NO grid_marks!
 
-        outline.draw(off_x=move_x, off_y=0, **shape_kwargs)  # inc. grid_marks
+        # feedback(f'$$$ draw_card::OUTLINE {cid=} {row=} {col=} {outline._o=}') # KW=> {shape_kwargs}
+        outline.draw(
+            off_x=move_x, off_y=0, **shape_kwargs
+        )  # inc. grid_marks; globals.canvas
 
         # ---- track frame outlines for possible image extraction
         match kwargs["frame_type"]:
@@ -506,6 +508,11 @@ class CardShape(BaseShape):
 
         # ---- draw card elements
         flat_elements = tools.flatten(self.elements)
+        # print(f"$$$ draw_card ELEMENTS {flat_elements=} ")
+        if cnv != globals.canvas:
+            # required because cnv was not reset for first page when using gutter option
+            # print(f"$$$ draw_card CANVAS {globals.page.current=}")
+            cnv = globals.canvas
         for index, flat_ele in enumerate(flat_elements):
             # ---- * replace image source placeholder
             if image and isinstance(flat_ele, ImageShape):
@@ -764,7 +771,7 @@ class DeckOfCards:
         self.directory = kwargs.get("directory", None)
         extra = globals.deck_settings.get("extra", 0)
         self.cards += extra
-        # print(f'!!! Card Count: {self.cards} Deck Settings: {globals.deck_settings}')
+        # print(f'$$$ Card Count: {self.cards} Deck Settings: {globals.deck_settings}')
         # ---- gallery options: settings override e.g. margin and page size
         self.gallery = kwargs.get("gallery", None)  # card grid size per page
         # ---- gallery - trigger overrides of settings in CardDeck draw!
@@ -819,6 +826,7 @@ class DeckOfCards:
         self.kwargs["frame_type"] = self.frame_type  # used for create_cardshapes()
 
         # ---- FINALLY...
+        self.prime_globals = None  # save main document settings for reuse after gutters
         # print(f'$$$ {self.cards=}, {globals.deck_settings=}')
         self.create_cardshapes(self.cards)
 
@@ -915,7 +923,8 @@ class DeckOfCards:
                 y=0,
                 fill_stroke=self.bleed_fill,
             )
-            # print(f'$$$  {self.bleed_fill=} {page_across=}, {page_down=}')
+            # print(f"$$$ bleed {globals.page_count=} {globals.page.size=}")
+            # print(f"$$$ bleed {self.bleed_fill=} {page_across=} {page_down=}")
             rect.draw()
         # ---- bleed areas (custom)
         # for area in self.bleed_areas:
@@ -1119,7 +1128,7 @@ class DeckOfCards:
                 mask = False
                 if self.mask:
                     _check = tools.eval_template(
-                        self.mask, self.dataset[card_num], label="mask"
+                        self.mask, self.dataset[card_num]  # , label="mask"
                     )
                     mask = tools.as_bool(_check, allow_none=False)
                     if not isinstance(mask, bool):
@@ -1169,7 +1178,6 @@ class DeckOfCards:
                             else:
                                 pass
                         else:
-                            # if row == 1 or row == 2: breakpoint()
                             col += -1
                             if col < 0:
                                 col = max_cols - 1
@@ -1191,6 +1199,7 @@ class DeckOfCards:
                                 row, col = 0, max_cols - 1
                             PageBreak(**kwargs)
                             cnv = globals.canvas  # new one from page break
+                            # for bleed INSIDE face cards ONLY, disable this!
                             self.draw_bleed(cnv, page_across, page_down)
                             # print(f"$$$ card_draw - RETURN FROM rows / {front=} : {card_number + 1}")
                             return cnv, DeckPrintState(
@@ -1207,7 +1216,7 @@ class DeckOfCards:
                 )
             if rendered_one:
                 # If we're here, the last call finished rendering without a full page
-                # We need to add a page break to match what happens when it finishes with a full page
+                # Add a page break to match what happens when it finishes with a full page
                 PageBreak(**kwargs)
                 cnv = globals.canvas  # new one from page break
                 self.draw_bleed(cnv, page_across, page_down)
@@ -1220,8 +1229,8 @@ class DeckOfCards:
             )
 
         def draw_gutter_cards() -> tuple:
-            breakpoint()
-            prime_globals = save_globals()
+            """Reset page size and associated globals."""
+            self.prime_globals = tools.save_globals()
             globals_page = copy(globals.page)
             gutter = tools.as_float(kwargs.get("gutter", 0.0), "gutter")
             # ---- pymupdf: new file, doc, page, shape/canvas
@@ -1238,15 +1247,15 @@ class DeckOfCards:
                         ' - use "portrait" or "landscape"'
                     )
                     return "", False
-            if _gutter_layout:  # in ['p', 'portrait']:
-                if globals_page.size[0] > globals_page.size[1]:
-                    width = globals_page.size[0]
-                    height = globals_page.size[1] / 2
-                    is_landscape = True
-                else:
-                    width = globals_page.size[1]
-                    height = globals_page.size[0] / 2
-                    is_landscape = False
+
+            if globals_page.size[0] > globals_page.size[1]:
+                width = globals_page.size[0]
+                height = globals_page.size[1] / 2
+                is_landscape = True
+            else:
+                width = globals_page.size[1]
+                height = globals_page.size[0] / 2
+                is_landscape = False
 
             # WIP for landscape layout with TALL cards
             # height = globals_page.size[1] / 2
@@ -1269,12 +1278,12 @@ class DeckOfCards:
                 globals.document, paper=globals.paper, defaults=None, kwargs=kwargs
             )
             globals.margins = PageMargins(
-                margin=prime_globals.margins.margin,
-                left=prime_globals.margins.left,
-                right=prime_globals.margins.right,
-                top=prime_globals.margins.top - gutter / 2.0,
-                bottom=prime_globals.margins.bottom,
-                debug=prime_globals.margins.debug,
+                margin=self.prime_globals.margins.margin,
+                left=self.prime_globals.margins.left,
+                right=self.prime_globals.margins.right,
+                top=self.prime_globals.margins.top - gutter / 2.0,
+                bottom=self.prime_globals.margins.bottom,
+                debug=self.prime_globals.margins.debug,
                 units=globals.units,
             )
             cnv = globals.doc_page.new_shape()  # pymupdf Shape
@@ -1288,20 +1297,34 @@ class DeckOfCards:
                     " Reduce card height, or top/bottom margins, or offset from top.",
                     True,
                 )
+
             return gutter_filename, is_landscape
 
         def load_gutter_pages(is_landscape: bool, gutter_filename: str):
+            """Insert gutter pages into primary document and reset globals."""
             # ---- * save gutter document
             gutterfile = os.path.join(globals.directory, globals.filename)
-            globals.document.save(gutterfile)
+            try:
+                globals.document.save(gutterfile)
+            except ValueError as err:
+                feedback(f"Unable to save file: {err}", True, True)
+            except Exception() as err:
+                feedback(f"Unable to save file: {err}", True, True)
             # ---- * export individual cards
             self.export_cards_as_images(
                 filename=globals.filename,
                 directory=globals.directory,
-                output=prime_globals.filename,
+                output=self.prime_globals.filename,
             )  # default to PNG format
-            # ---- * reset globals to current doc
-            restore_globals(prime_globals)
+            # ---- * reset primary document globals and setup fresh document
+            tools.restore_globals(self.prime_globals)
+            globals.document.delete_pages(0, globals.document.page_count - 1)
+            globals.doc_page = globals.document.new_page(
+                width=globals.page.size[0], height=globals.page.size[1]
+            )  # pymupdf Page
+            globals.page_count = 1
+            globals.canvas = globals.doc_page.new_shape()  # pymupdf Shape
+            page_setup()
             cnv = globals.canvas
             # ---- * open gutter document
             src = pymupdf.open(gutterfile)
@@ -1342,10 +1365,9 @@ class DeckOfCards:
                     gwargs["stroke_width"] = self.gutter_stroke_width
                     gwargs["dotted"] = self.gutter_dotted
                     tools.set_canvas_props(cnv=globals.canvas, index=None, **gwargs)
-                # if page_number < src.page_count / 2 - 1:
                 PageBreak()
             # ---- * delete extra blank page at the end
-            globals.document.delete_page(globals.page_count)
+            globals.document.delete_page(globals.page_count - 1)
             # ---- delete gutter PDF document
             if os.path.exists(gutter_filename):
                 os.remove(gutter_filename)
@@ -1353,9 +1375,11 @@ class DeckOfCards:
         # ---- * DRAW START * ----
 
         # ---- primary layout settings for card.draw()
-        cnv = cnv if cnv else globals.canvas
+        # cnv = cnv if cnv else globals.canvas  # no card draw on first page for gutter?
+        cnv = globals.canvas
+
         # feedback(f'$$$ DeckShape.draw {cnv=} KW=> {kwargs}')
-        log.debug("Deck cnv:%s type:%s", type(globals.canvas), type(cnv))
+        # log.debug("Deck cnv:%s type:%s", type(globals.canvas), type(cnv))
         kwargs = self.kwargs | kwargs
         images = kwargs.get("image_list", [])
         kwargs["frame_type"] = self.frame_type
@@ -1375,11 +1399,10 @@ class DeckOfCards:
         self.dpi = kwargs.get("dpi", 300)
 
         # ---- local defaults
-        prime_globals, is_landscape, gutter_filename = None, False, ""
+        is_landscape, gutter_filename = False, ""
 
         # ---- gutter-based settings (new doc)
         if self.gutter > 0:
-            prime_globals = save_globals()
             gutter_filename, is_landscape = draw_gutter_cards()
 
         # ---- calculate rows/cols based on page size and margins AND card size
@@ -1483,7 +1506,7 @@ class DeckOfCards:
                 self.show_backs = True
                 continue
 
-        # ---- actually draw cards and the zones!
+        # ---- actually draw zones and cards!
         while state_front.card_number < len(self.fronts):
             page_number += 1  # for back-to-back OR no backs
             draw_the_zones(cnv, page_number, self.zones)
@@ -1495,17 +1518,18 @@ class DeckOfCards:
                     cnv, state_back, page_number, False, right_gap
                 )
             if page_number > 9999:
-                feedback(f"Exceeded maximum number of pages ({page_number})", True)
+                feedback(
+                    f"Exceeded maximum number of 9999 pages ({page_number})", False
+                )
                 break
 
         # print(f"===================================================================")
         # print(f"$$$ {right_gap=} {globals.page.width=} {effective_right=}")
         # print(f"$$$ {globals.page.width=} card{_width=} {col_space=} {max_cols=}")
         # print(f"$$$ {globals.page.height=} card{_height=} {row_space=} {max_rows=}")
+
         # ---- delete extra blank page at the end
-
         globals.document.delete_page(globals.page_count)
-
         # ---- reset to prime globals and load-in the gutter pages
         if self.gutter > 0:
             load_gutter_pages(is_landscape, gutter_filename)
@@ -4929,10 +4953,6 @@ def Layout(grid, **kwargs):
                     if new_loc not in _locations:
                         _locations.append(new_loc)
             default_locations = enumerate(grid.next_locale())  # regenerate !
-
-    # print('pre-draw locs')
-    # for l in _locations: print(l)
-    # breakpoint()
 
     # ---- generate rotations - keyed per sequence number
     rotation_sequence = {}

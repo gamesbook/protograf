@@ -131,6 +131,7 @@ GlobalDocument = namedtuple(
         "canvas",
         "card_frames",
         "color_model",
+        "css",
         "deck",
         "directory",
         "doc_page",
