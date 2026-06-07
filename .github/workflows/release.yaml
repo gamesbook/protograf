@@ -37,7 +37,7 @@ jobs:
             echo "Suffix is $SUFFIX"
             echo "Tag name is $TAG_NAME"
           else
-|           git fetch --tags  # MASTER tags via manual workflow_dispatch
+            git fetch --tags  # MASTER tags via manual workflow_dispatch
             # find latest tag reachable specifically from the master branch
             TAG_NAME=$(git describe --tags --abbrev=0)
             NEW_VERSION=$(echo $TAG_NAME | awk -F'-' '{print $1}')
