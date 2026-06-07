@@ -383,7 +383,7 @@ class CardShape(BaseShape):
             bleed_outline = bleed_shape.get_outline(
                 cnv=cnv, row=row, col=col, cid=cid, label=label, **bleed_kwargs
             )
-            # feedback(f"$$$ 386 {cid=} {type(bleed_outline=} {bleed_kwargs=}")
+            # feedback(f"$$$ 386 {cid=} {type(bleed_outline)=} {bleed_kwargs=}")
             bleed_outline.draw(off_x=move_x, off_y=0, **bleed_kwargs)  # NO grid_marks!
 
         # feedback(f'$$$ draw_card::OUTLINE {cid=} {row=} {col=} {outline._o=}') # KW=> {shape_kwargs}
@@ -923,8 +923,6 @@ class DeckOfCards:
                 y=0,
                 fill_stroke=self.bleed_fill,
             )
-            # print(f"$$$ bleed {globals.page_count=} {globals.page.size=}")
-            # print(f"$$$ bleed {self.bleed_fill=} {page_across=} {page_down=}")
             rect.draw()
         # ---- bleed areas (custom)
         # for area in self.bleed_areas:
@@ -1084,17 +1082,21 @@ class DeckOfCards:
                 DeckPrintState at the end of a Page
             """
 
-            # print(f'$$$ draw_the_cards {page_number=} {front=}')
+            # print(f'\n$$$ draw_the_cards {page_number=} {front=}')
             start_card = state.card_number
             card_count = state.card_count
+            card_number = start_card
             if front:
                 row, col = 0, 0
             else:
                 row, col = 0, max_cols - 1  # draw left-to-right for back
-            card_number = start_card
+
+            # for bleed INSIDE face cards ONLY, disable this!
+            self.draw_bleed(cnv, page_across, page_down)
 
             rendered_one = False
             for card_num in range(start_card, card_count):
+                # print(f"$$$ {card_num+1} of {card_count=}")
                 card_number = card_num
 
                 if front:
@@ -1162,7 +1164,7 @@ class DeckOfCards:
                             image=image,
                             **kwargs,
                         )
-                        # print(f"$$$ {card_num+1=} {col+1=} {row+1=} {globals.page=}")
+                        # print(f"$$$ CARD DRAWN #{card_num+1} {col+1=} {row+1=}")
                         if front:
                             col += 1
                             if col >= max_cols:
@@ -1192,15 +1194,13 @@ class DeckOfCards:
                             else:
                                 pass
                         if row >= max_rows:
-                            # print(f"$$$ {front} {card_num=} => {col=} {row=} // {max_cols=} {max_rows=}")
+                            # print(f"$$$ {card_num=} => {col=} {row=} // {max_cols=} {max_rows=}")
                             if front:
                                 row, col = 0, 0
                             else:
                                 row, col = 0, max_cols - 1
                             PageBreak(**kwargs)
                             cnv = globals.canvas  # new one from page break
-                            # for bleed INSIDE face cards ONLY, disable this!
-                            self.draw_bleed(cnv, page_across, page_down)
                             # print(f"$$$ card_draw - RETURN FROM rows / {front=} : {card_number + 1}")
                             return cnv, DeckPrintState(
                                 card_count=state.card_count,
@@ -1369,8 +1369,9 @@ class DeckOfCards:
             # ---- * delete extra blank page at the end
             globals.document.delete_page(globals.page_count - 1)
             # ---- delete gutter PDF document
-            if os.path.exists(gutter_filename):
-                os.remove(gutter_filename)
+            # TODO !!! unc
+            # if os.path.exists(gutter_filename):
+            #     os.remove(gutter_filename)
 
         # ---- * DRAW START * ----
 

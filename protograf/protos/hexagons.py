@@ -44,7 +44,7 @@ class Hexagons(ProtografGrid):
         self.hidden = None
         if kwargs.get("hidden"):
             self.hidden = tools.integer_pairs(kwargs.get("hidden"), "hidden")
-        self.hex_layout = kwargs.get("hex_layout")
+        self.hex_layout = kwargs.get("hex_layout", "")  # default to rectangular
         self.locales = []  # will be created by specific draw_* method
         self.draw_layout()
 
@@ -76,7 +76,7 @@ class Hexagons(ProtografGrid):
         self, rows: int, cols: int, stop: int, the_cols: list, odd_mid: bool = True
     ):
         """Draw rows of hexagons for each column in `the_cols`"""
-        locales = None
+        locales = []
         sequence = 0
         top_row = 0
         end_row = rows - 1
@@ -224,17 +224,17 @@ class Hexagons(ProtografGrid):
                 feedback(
                     "Cannot use this Hexagons `hex_layout` with pointy hexagons!", True
                 )
-        match self.hex_layout:
-            case "c", "cir", "circle":
+        match _lower(self.hex_layout):
+            case "c" | "cir" | "circle":
                 return self.draw_layout_circle()
-            case "d", "dia", "diamond":
-                self.draw_layout_diamond()
-            case "t", "tri", "triangle":
-                self.draw_layout_triangle()
-            case "l", "loz", "stadium":
-                self.draw_layout_stadium()
+            case "d" | "dia" | "diamond":
+                return self.draw_layout_diamond()
+            case "t" | "tri" | "triangle":
+                return self.draw_layout_triangle()
+            case "l" | "loz" | "stadium":
+                return self.draw_layout_stadium()
             case _:  # default to rectangular layout
-                self.draw_layout_rectangle()
+                return self.draw_layout_rectangle()
 
     def cell(self, reference: str | int | tuple) -> Locale:
         """Return details for a single cell in a Hexagons grid.

@@ -7,7 +7,7 @@ Created on: 1 May 2026
 Notes:
     * Based off of the map for the SPI game
       "Tannenburg and the Opening Battles in the East 1914"
-    * Images created manually by "eye-balling" the orginal map
+    * Images created manually by "eye-balling" the original map
     * Additional map PNGs generated from
       https://watabou.itch.io/medieval-fantasy-city-generator
 """

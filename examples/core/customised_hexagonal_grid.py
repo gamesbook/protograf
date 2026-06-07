@@ -180,6 +180,7 @@ Hexagons(
     x=0.25, y=1,
     sides=3,
     height=.75,
+    stroke="black",
     fill="white",
     hex_layout="circle",
 )
@@ -187,12 +188,12 @@ PageBreak()
 
 # ---- circular - nested
 Blueprint(stroke_width=0.5)
-Text(common=header, text="Hexagons: circular; nested")
+Text(common=header, text="Hexagons: circular; nested hex")
 Hexagons(
     x=0.25, y=1,
     sides=3,
-    stroke=None,
-    fill="white",
+    stroke="white",
+    fill=None,
     height=.75,
     hex_layout="circle",
     centre_shape=hexagon(stroke="black", fill="lightsteelblue", height=0.6, stroke_width=2),

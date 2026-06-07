@@ -508,8 +508,10 @@ class FontInterface:
         font_info["postTable"] = self.post_table
 
         # Combine layout-related metrics
+        # breakpoint()
+        # print(hhea_table.keys())
         font_info["layoutMetrics"] = {
-            "unitsPerEm": head_table["unitsPerEm"],
+            "unitsPerEm": head_table.get("unitsPerEm", None),
             "boundingBox": {
                 "xMin": head_table["xMin"],
                 "yMin": head_table["yMin"],
@@ -518,7 +520,7 @@ class FontInterface:
             },
             "ascent": hhea_table["ascent"],
             "descent": hhea_table["descent"],
-            "lineGap": hhea_table["lineGap"],
+            "lineGap": hhea_table.get("lineGap", None),
         }
 
         # ----  Font summary
