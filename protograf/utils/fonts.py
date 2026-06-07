@@ -44,8 +44,8 @@ package_logger = logging.getLogger("fontTools")
 package_logger.setLevel(logging.ERROR)
 
 # local
-from .support import BUILT_IN_FONTS
-from .messaging import feedback
+from protograf.utils.support import BUILT_IN_FONTS
+from protograf.utils.messaging import feedback
 
 
 def builtin_font(name: str) -> Union[str, None]:
@@ -78,7 +78,7 @@ class FontInterface:
         self.font_files = sorted(list(font_filenames))
 
     @lru_cache(maxsize=256)  # limits cache
-    def load_font_families(self, cached: bool = True, cache_path: str = None):
+    def load_font_families(self, cached: bool = True, cache_path: str | None = None):
         """Track family data across all files from default locations used by an OS.
 
         Args:
@@ -166,7 +166,7 @@ class FontInterface:
         return None
 
     @lru_cache(maxsize=256)  # limits cache
-    def get_font_file(self, name: str, fullpath: bool = True) -> str:
+    def get_font_file(self, name: str, fullpath: bool = True) -> str | None:
         """Get file name for a specific font style if it exists
 
         Args:
@@ -220,7 +220,7 @@ class FontInterface:
             return None
 
     @lru_cache(maxsize=256)  # limits cache
-    def font_file_css(self, font_family: str) -> Union[str, None]:
+    def font_file_css(self, font_family: str) -> tuple[str | None, str | None]:
         """Create a CSS string to be used by PyMuPDF.
 
         Args:
@@ -306,7 +306,7 @@ class FontInterface:
                 * isItalic (bool): Whether the font is italic.
         """
         font_info = self.extract_font_details(font_path, normalize)
-        result = font_info.get("summary", None) if font_info else None
+        result = font_info.get("summary", {}) if font_info else {}
         return result
 
     def load_ttfont(self, font_path: Union[str, Path], **kwargs) -> TTFont:
@@ -473,7 +473,7 @@ class FontInterface:
         # Parse head table
         head = font["head"]
         head_table = {
-            "unitsPerEm": head.unitsPerEm,
+            # "unitsPerEm": head.unitsPerEm,
             "xMin": head.xMin,
             "yMin": head.yMin,
             "xMax": head.xMax,
@@ -486,30 +486,32 @@ class FontInterface:
         hhea_table = {
             "ascent": hhea.ascent,
             "descent": hhea.descent,
-            "lineGap": hhea.lineGap,
+            # "lineGap": hhea.lineGap,
         }
         font_info["hheaTable"] = hhea_table
 
         # ---- OS/2 table
         os2 = font["OS/2"]
         self.os2_table = {
-            "usWeightClass": os2.usWeightClass,
-            "usWidthClass": os2.usWidthClass,
-            "fsType": os2.fsType,
+            # "usWeightClass": os2.usWeightClass,
+            # "usWidthClass": os2.usWidthClass,
+            # "fsType": os2.fsType,
         }
         font_info["OS2Table"] = self.os2_table
 
         # ----  post table
         post = font["post"]
         self.post_table = {
-            "isFixedPitch": post.isFixedPitch,
-            "italicAngle": post.italicAngle,
+            # "isFixedPitch": post.isFixedPitch,
+            # "italicAngle": post.italicAngle,
         }
         font_info["postTable"] = self.post_table
 
         # Combine layout-related metrics
+        # breakpoint()
+        # print(hhea_table.keys())
         font_info["layoutMetrics"] = {
-            "unitsPerEm": head_table["unitsPerEm"],
+            "unitsPerEm": head_table.get("unitsPerEm", None),
             "boundingBox": {
                 "xMin": head_table["xMin"],
                 "yMin": head_table["yMin"],
@@ -518,7 +520,7 @@ class FontInterface:
             },
             "ascent": hhea_table["ascent"],
             "descent": hhea_table["descent"],
-            "lineGap": hhea_table["lineGap"],
+            "lineGap": hhea_table.get("lineGap", None),
         }
 
         # ----  Font summary
@@ -531,7 +533,7 @@ class FontInterface:
             "altName": self.name_table_summary["altName"],
             "version": self.name_table_summary["version"],
             "postScriptName": self.name_table_summary["postScriptName"],
-            "weightClass": os2.usWeightClass if os2 else None,
+            "weightClass": None,  # os2.usWeightClass if os2 else None,
             "isItalic": self.post_table.get("italicAngle") != 0,
         }
 

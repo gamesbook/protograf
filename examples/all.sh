@@ -62,6 +62,7 @@ python boards/commercial/catan.py --no-png -d /tmp/demo
 python boards/commercial/kensington.py --no-png -d /tmp/demo
 python boards/commercial/orion_game_board.py --no-png -d /tmp/demo
 python boards/commercial/squadleader.py --no-png -d /tmp/demo
+python boards/commercial/tannenburg_spi.py --no-png -d /tmp/demo
 python boards/commercial/traveller_draft.py --no-png -d /tmp/demo
 python boards/commercial/traveller_black.py --no-png -d /tmp/demo
 python boards/commercial/underwater_cities.py --no-png -d /tmp/demo

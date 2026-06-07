@@ -60,6 +60,7 @@ python boards/commercial/catan.py
 python boards/commercial/kensington.py
 python boards/commercial/orion_game_board.py
 python boards/commercial/squadleader.py
+python boards/commercial/tannenburg_spi.py
 python boards/commercial/traveller_draft.py
 python boards/commercial/traveller_black.py
 python boards/commercial/underwater_cities.py

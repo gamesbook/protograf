@@ -10,7 +10,11 @@ from collections import namedtuple
 from pymupdf import paper_size
 
 # local
-from protograf.utils.constants import RGB_DEBUG_COLOR
+from protograf.utils.constants import (
+    RGB_DEBUG_COLOR,
+    DEFAULT_MARGIN_SIZE,
+    DEFAULT_PAGE_SIZE,
+)
 
 UnitPoints = namedtuple(
     "UnitPoints",
@@ -52,47 +56,40 @@ def initialize():
     global footer_draw
     global image_list
     global margins
+    global override  # boolean
+    global page
     global pargs
     global paper
-    global page  #  (width, height) in points
-    global page_width  # user units
-    global page_height  # user units
-    global page_fill
     global page_count
-    global page_grid
     global units
     global white
 
     archive = None  # will become a pymupdf Archive
-    css = None  # will become a string containing CSS font location
-    document = None  # will become a pymupdf Document object
-    doc_page = None  # will become a pymupdf Page object
-    canvas = None  # will become a pymupdf Shape object; one created per Page
     base = None  # will become a base.BaseCanvas object
-    deck = None  # will become a proto.DeckOfCards object
-    # store kwargs for DeckOfCards; #cards, copy, card_name, extra, grid_marks, zones
-    deck_settings = {}
-    debug_color = RGB_DEBUG_COLOR
-    card_frames = {}  # list of proto.BBox card frames; keyed on page number
-    filename = None
-    directory = None  # set by Save() command
+    black = "black"  # stroke color for RGB
+    canvas = None  # will become a pymupdf Shape object; one created per pymupdf Page
+    card_frames = {}  # list of protograf.BBox card frames; keyed on page number
+    color_model = "RGB"
+    css = None  # will become a string containing CSS font location
     dataset = None  # will become a dictionary of data loaded from a file
     dataset_type = None  # set when Data is loaded; enum DatasetType
-    image_list = []  # filenames stored when Data is loaded from image dir
-    extracts = {}  # list of proto.BBox areas to be extracted, keyed on page number
-    margins = None  # will become a proto.PageMargins object
-    footer = None
+    debug_color = RGB_DEBUG_COLOR
+    deck = None  # will become a protograf.DeckOfCards object
+    deck_settings = {}  # DeckOfCards; cards, copy, card_name, extra, grid_marks, zones
+    directory = None  # set by Save() command
+    doc_page = None  # will become a pymupdf Page object
+    document = None  # will become a pymupdf Document object
+    extracts = {}  # list of protograf.BBox areas to be extracted, keyed on page number
+    filename = None
+    font_size = 12
     footer_draw = False
+    footer = None
+    image_list = []  # filenames stored when Data is loaded from image dir
+    margins = None  # will become a protograf.PageMargins object
+    override = False  # used, as needed, to override Shape properties with globals
     page_count = 0
+    page = None  # will become a protograf.DocumentPage object
+    paper = DEFAULT_PAGE_SIZE
     pargs = None
     units = unit.cm
-    color_model = "RGB"
-    black = "black"  # stroke color for RGB
     white = "white"  # fill color for RGB
-    paper = "A4"
-    page = paper_size(paper)  # (width, height) in points
-    page_width = page[0] / units  # width in user units
-    page_height = page[1] / units  # height in user units
-    page_fill = "white"  # page color for RGB
-    page_grid = None  # grid interval in user units
-    font_size = 12

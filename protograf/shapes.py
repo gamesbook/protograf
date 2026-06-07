@@ -913,7 +913,7 @@ class DotShape(BaseShape):
         return Point(self.x_c, self.y_c)
 
     @cached_property
-    def _shape_radius(self) -> Point:
+    def _shape_radius(self) -> float:
         """Radius of Dot in points."""
         return self.point_size
 
@@ -1209,7 +1209,7 @@ class LineShape(BaseShape):
         return self.geo
 
     def draw_links(
-        self, cnv=None, off_x=0, off_y=0, ID=None, shapes: list = None, **kwargs
+        self, cnv=None, off_x=0, off_y=0, ID=None, shapes: list | None = None, **kwargs
     ) -> list:
         """Draw a Line between two or more shapes."""
         if not isinstance(shapes, (list, tuple)) or len(shapes) < 2:
@@ -3673,7 +3673,9 @@ class TrapezoidShape(BaseShape):
             return self.points_to_value(length)
         return length
 
-    def calculate_perbii(self, centre: Point, rotation: float = None, **kwargs) -> dict:
+    def calculate_perbii(
+        self, centre: Point, rotation: float | None = None, **kwargs
+    ) -> dict:
         """Calculate centre points for each Trapezoid edge and angles from centre.
 
         Args:
@@ -3939,9 +3941,9 @@ class TriangleShape(BaseShape):
         """Get vertices for a Triangle
 
                   0;n
-                   /\
-                  /  \
-            1;sw /____\ 2;se
+                   /\\
+                  /  \\
+            1;sw /____\\ 2;se
         """
         vertices = []
         if self.triangle_type == TriangleType.EQUILATERAL:
@@ -4041,7 +4043,9 @@ class TriangleShape(BaseShape):
             return self.points_to_value(length)
         return length
 
-    def calculate_perbii(self, centre: Point, rotation: float = None, **kwargs) -> dict:
+    def calculate_perbii(
+        self, centre: Point, rotation: float | None = None, **kwargs
+    ) -> dict:
         """Calculate centre points for each Triangle edge and angles from centre.
 
         Args:
@@ -4187,7 +4191,7 @@ class TriangleShape(BaseShape):
         )
 
     def draw_perbii(
-        self, cnv, ID, centre: Point, vertices: list, rotation: float = None
+        self, cnv, ID, centre: Point, vertices: list, rotation: float | None = None
     ):
         """Draw lines connecting the Triangle centre to the centre of each edge.
 
@@ -4263,7 +4267,7 @@ class TriangleShape(BaseShape):
         )
 
     def draw_radii(
-        self, cnv, ID, centre: Point, vertices: list, rotation: float = None
+        self, cnv, ID, centre: Point, vertices: list, rotation: float | None = None
     ):
         """Draw line(s) connecting the Triangle centre to a vertex.
 

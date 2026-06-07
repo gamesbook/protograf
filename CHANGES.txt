@@ -1,12 +1,22 @@
 protograf Changes
 =================
 
-2026-00-00 (0.5.x)
+2026-00-00 (0.5.4)
 ------------------
-- [PLANNED-1] Enable output of Cards in TTS file
-- [PLANNED-2] Add code to link *Locations
+- [PLANNED-1] Foldable card box
+- [PLANNED-1] Structure: break-up proto into smaller modules
 - [PLANNED-2] Docs: list all props for Hex, Circle, Rectangle, Line
-- [PLANNED-2] Centre multi-line label text strings
+
+2026-06-07 (0.5.3)
+------------------
+- Enable output of `gallery` of Cards e.g. for a TTS file
+- Add pyrefly to assist with typing checks
+- Add Makefile to make key project operations explicit
+- Rename `LinkLine` command to  `GridLine` [BREAKING CHANGE]
+- Start of refactoring of large `proto` functions into separate files
+- Add `cell` property to Hexagons grid
+- Add `edges` and `paths` for enhanced `GridLine` drawing
+- Add example of a wargame map to show uses of `Gridline`
 
 2026-04-22 (0.5.2)
 ------------------

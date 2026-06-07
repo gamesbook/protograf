@@ -4,6 +4,7 @@ General purpose utility functions for protograf
 """
 
 # lib
+from collections.abc import Iterable
 import collections
 import copy
 from functools import lru_cache
@@ -16,6 +17,7 @@ import re
 import string
 from string import ascii_uppercase, digits
 import sys
+from typing import Any, LiteralString, cast, Dict
 from urllib.parse import urlparse
 
 # third-party
@@ -52,18 +54,19 @@ __alpha_to_decimal = {letter: pos for pos, letter in enumerate(ascii_uppercase, 
 __powers = (1, 26, 676)
 
 
-def script_path():
+def script_path() -> str | Path:
     """Get the path for a script being called from command line.
 
     Doc Test:
 
     >>> R = script_path()
-    >>> 'utils' in R.parts
+    >>> len(str(R)) > 1
     True
     """
     fname = os.path.abspath(sys.argv[0])
     if fname:
         return pathlib.Path(fname).resolve().parent
+    return ""
 
 
 def grouper(n, iterable, fillvalue=None):
@@ -110,7 +113,7 @@ def boolean_join(items):
         elif item == "|" or item == "or":
             expr += " or "
         elif item is not None:
-            expr += "%s" % item
+            expr += f"{item}"
         else:
             pass  # ignore nones
     try:
@@ -180,15 +183,40 @@ def _p2v(value: Point, decimals: int = 4) -> tuple:
             f'Unable to do units conversion from "{value}" using {globals.units}!',
             True,
         )
+    return (0.0, 0.0)
+
+
+def _u2p(value: Point) -> tuple:
+    """Convert Point values, in user-units, to a Point with point-based values.
+
+    Doc Test:
+
+    >>> _u2p(Point(0.9878, 1.9756))
+    Point(x=28.0006727, y=56.0013454)
+
+    """
+    try:
+        _units = globals.units
+    except:
+        _units = 28.3465
+    try:
+        return Point(float(value.x) * _units, float(value.y) * _units)
+    except Exception as err:
+        log.exception(err)
+        feedback(
+            f'Unable to do units conversion from "{value}" using {globals.units}!',
+            True,
+        )
+    return (0.0, 0.0)
 
 
 def as_int(
     value,
-    label: str = None,
-    maximum: int = None,
-    minimum: int = None,
+    label: str | None = None,
+    maximum: int | None = None,
+    minimum: int | None = None,
     allow_none: bool = False,
-) -> int:
+) -> int | None:
     """Convert a value to an int
 
     Args:
@@ -215,7 +243,7 @@ def as_int(
     # FEEDBACK:: The N value "3.1" is not a valid integer!
     """
     if value is None or value == "" and allow_none:
-        return value
+        return None
     _label = f"{label} value " if label else "value "
     try:
         the_value = int(value)
@@ -234,7 +262,7 @@ def as_int(
         feedback(f'The {_label}"{value}" is not a valid integer!!', True)
 
 
-def as_bool(value, allow_none: bool = True) -> bool:
+def as_bool(value, allow_none: bool = True) -> bool | None:
     """Convert a value to a Boolean
 
     Args:
@@ -264,7 +292,12 @@ def as_bool(value, allow_none: bool = True) -> bool:
 
 
 def as_float(
-    value, label: str, maximum: float = None, minimum: float = None, stop: bool = True
+    value,
+    label: str,
+    maximum: float | None = None,
+    minimum: float | None = None,
+    stop: bool = True,
+    default: float = 0.0,
 ) -> float:
     """Set a value to an float; or end program if an invalid value and stop is True
 
@@ -275,6 +308,7 @@ def as_float(
     - maximum (float): the upper allowed value for the conversion
     - lower (float): the lower allowed value for the conversion
     - stop (bool): if True, halt program and display error message
+    - default (float): default value to return
 
     Doc Test:
 
@@ -308,8 +342,7 @@ def as_float(
     except (ValueError, Exception):
         if stop:
             feedback(f'The value "{value}"{_label} is not a valid float number!', True)
-        else:
-            return None
+    return default
 
 
 def as_point(value) -> list | Point:
@@ -323,7 +356,7 @@ def as_point(value) -> list | Point:
     [Point(x=1, y=2), Point(x=3, y=4)]
     """
     if value is None:
-        return None
+        return []
     if isinstance(value, tuple):
         return Point(value[0], value[1])
     if isinstance(value, list):
@@ -367,6 +400,7 @@ def compass_to_rotation(value: str) -> float:
             return 315
         case _:
             feedback(f'Compass direction "{value}" is not valid!', True)
+            return 0
 
 
 def tuple_split(
@@ -448,6 +482,7 @@ def sequence_split(
     msg: str = "",
     clean: bool = False,
     star: bool = False,
+    no_blanks: bool = False,
 ) -> list:
     """
     Split a string into a list of individual values
@@ -461,6 +496,7 @@ def sequence_split(
     - to_float (bool): if True, convert values to floats
     - msg (str): return as part of the error
     - clean (bool): if True, strip any surrounding spaces
+    - no_blanks (bool): if True, remove any empty string  (ignore for to_int & to_float)
     - star (bool): if True, allow for "all" or "*" as the only list value
 
     Note:
@@ -480,6 +516,8 @@ def sequence_split(
     [3, 4, 5]
     >>> sequence_split('3,4,5', to_int=False, unique=False)
     ['3', '4', '5']
+    >>> sequence_split('3,4,5,', to_int=False, unique=False, no_blanks=True)
+    ['3', '4', '5']
     >>> x = sequence_split('3,4,5', to_int=False)
     >>> assert '5' in x
     >>> sequence_split('3-5,6,1-4')
@@ -494,6 +532,8 @@ def sequence_split(
     [3]
     >>> sequence_split(3.1)
     [3.1]
+    >>> sequence_split('A=,B,C=', to_int=False, unique=False, no_blanks=True)
+    ['A=', 'B', 'C=']
     """
     values = []
     if isinstance(strng, list):
@@ -522,6 +562,7 @@ def sequence_split(
         pass
 
     # multi-values
+    _strings = []
     try:
         _strings = _string.split(sep)
     except AttributeError:
@@ -572,11 +613,17 @@ def sequence_split(
 
     if unique:
         return list(set(values))  # unique
+    if no_blanks:
+        cleaned = [x for x in values if x != ""]
+        return cleaned
     return values
 
 
 def split(
-    strng: str, tuple_to_list: bool = False, separator: str = None, clean: bool = False
+    strng: str,
+    tuple_to_list: bool = False,
+    separator: str | None = None,
+    clean: bool = False,
 ):
     """
     Split a string into a list of individual characters
@@ -612,7 +659,10 @@ def split(
 
 
 def separate(
-    strng: str, tuple_to_list: bool = False, separator: str = None, clean: bool = False
+    strng: str,
+    tuple_to_list: bool = False,
+    separator: str | None = None,
+    clean: bool = False,
 ):
     """
     Split a string into a list of individual items
@@ -693,10 +743,11 @@ def integer_pairs(pairs, label: str = "list") -> list:
     return []
 
 
-def splitq(seq, sep=None, pairs=("()", "[]", "{}"), quote="\"'"):
-    """Split sequence by separator but considering parts inside pairs or quoted
-       as unbreakable pairs have different start and end value, quote have same
-       symbol in beginning and end.
+def splitq(seq, seps: str | None = None, pairs: str = "()[]{}<>", quotes: str = "'\""):
+    """
+    Split sequence by separator but considering parts inside pairs or quoted
+    as unbreakable; ppairs have different start and end value; quote has same
+    symbol in beginning and end.
 
     Notes:
         * Use itertools.islice if only part of splits is needed
@@ -704,56 +755,54 @@ def splitq(seq, sep=None, pairs=("()", "[]", "{}"), quote="\"'"):
     Source:
         https://www.daniweb.com/programming/software-development/code/426990/\
         split-string-except-inside-brackets-or-quotes
+        -> but using the split_outside() function NOT the original with errors
 
     Doc Test:
 
-    >>> # TODO
+    >>> result = splitq("Hello, (Tony Jarkko) This ('is') quoted Great to 'split'   {this split}'Also Quoted part' [test test] end ")
+    >>> print(list(result))
+    ['Hello,', '(Tony Jarkko)', 'This', "('is')", 'quoted', 'Great', 'to', "'split'", "{this split}'Also Quoted part'", '[test test]', 'end']
     """
-    if not seq:
-        yield []
-    else:
-        lsep = len(sep) if sep is not None else 1
-        lpair, _ = zip(*pairs)
-        pairs = dict(pairs)
-        start = index = 0
-        while 0 <= index < len(seq):
-            sdx = seq[index]
-            if (sep and seq[index:].startswith(sep)) or (sep is None and sdx.isspace()):
-                yield seq[start:index]
-                # pass multiple separators as single one
-                if sep is None:
-                    index = len(seq) - len(seq[index:].lstrip())
-                else:
-                    while sep and seq[index:].startswith(sep):
-                        index = index + lsep
-                start = index
-            elif sdx in quote:
-                index += 1
-                p, index = index, seq.find(sdx, index) + 1
-                if not index:
-                    raise IndexError("Unmatched quote %r\n%i:%s" % (sdx, p, seq[:p]))
-            elif sdx in lpair:
-                nesting = 1
-                while True:
-                    index += 1
-                    p, index = index, seq.find(pairs[sdx], index)
-                    if index < 0:
-                        raise IndexError(
-                            "Did not find end of pair for %r: %r\n%i:%s"
-                            % (sdx, pairs[sdx], p, seq[:p])
-                        )
-                    nesting += "{lpair}({inner})".format(
-                        lpair=sdx, inner=splitq(seq[p:index].count(sdx) - 2)
-                    )
-                    if not nesting:
-                        break
+    closers = {pairs[i + 1]: pairs[i] for i in range(0, len(pairs), 2)}
+    openers = set(closers.values())
+    sep = None if seps is None else set(seps)
+    stack, buf, q = [], [], None
+    for i, ch in enumerate(seq):
+        if q:
+            buf.append(ch)
+            if ch == q and (i == 0 or seq[i - 1] != "\\"):
+                q = None
+        elif ch in quotes:
+            q = ch
+            buf.append(ch)
+        elif ch in openers:
+            stack.append(ch)
+            buf.append(ch)
+        elif ch in closers:
+            if not stack or stack.pop() != closers[ch]:
+                raise ValueError(
+                    f"Did not find end of pair for '{closers.get(ch, '?')}': '{ch}'"
+                )
+            buf.append(ch)
+        else:
+            is_sep = (sep is None and ch.isspace()) or (sep is not None and ch in sep)
+            if is_sep and not stack:
+                if buf:
+                    yield "".join(buf).strip()
+                    buf = []
             else:
-                index += 1
-        if seq[start:]:
-            yield seq[start:]
+                buf.append(ch)
+    if q:
+        raise ValueError("Did not find end of quote.")
+    if stack:
+        opener = stack[-1]
+        expected = next(c for c, o in closers.items() if o == opener)
+        raise ValueError(f"Did not find end of pair for '{opener}': '{expected}'")
+    if buf:
+        yield "".join(buf).strip()
 
 
-def flatten(lst: list):
+def flatten(lst: Iterable):
     """Flatten nested lists into a single list
 
     Doc Test:
@@ -763,7 +812,7 @@ def flatten(lst: list):
     """
     try:
         for ele in lst:
-            if isinstance(ele, collections.abc.Iterable) and not isinstance(ele, str):
+            if isinstance(ele, Iterable) and not isinstance(ele, str):
                 for sub in flatten(ele):
                     yield sub
             else:
@@ -861,21 +910,21 @@ def list_ordering(
     return base
 
 
-def comparer(val: str, operator: str, target: str | list) -> bool:
+def comparer(val: Any, operator: str, target: Any) -> bool:
     """Compare value with a target.
 
     Args:
 
     - val (str): the value to be checked
     - operator (str): one of - < | > | ~ | *
-    - target: a single value or a list of values; a list the operator must be a ~
+    - target: a single value or a list of values; for a list the operator must be a ~
 
     Doc Test:
 
     >>> comparer(None, None, None)
     True
     >>> comparer("1", '*', "1")
-    FEEDBACK:: Unknown operator: * (1.0 and 1.0)
+    FEEDBACK:: Unknown operator: * (1 and 1)
     False
     >>> comparer("1", None, "1")
     True
@@ -894,16 +943,45 @@ def comparer(val: str, operator: str, target: str | list) -> bool:
     >>> comparer("False", '<', "False")
     False
     >>> comparer("1", '~', "1.1")
+    FEEDBACK:: Invalid operator for numbers: ~ (1.0 and 1.1)
     False
     >>> comparer("a", '~', "aa")
     True
     >>> comparer("True", '~', "True")
+    FEEDBACK:: Invalid operator for numbers: ~ (1.0 and 1.0)
     False
     >>> comparer("False", '~', "False")
+    FEEDBACK:: Invalid operator for numbers: ~ (0.0 and 0.0)
     False
     >>> comparer("1", '~', [1,2,3])
     True
+    >>> comparer("1.1", '~', [1.1,2,3])
+    True
     """
+
+    def compare_numbers(val: int | float, target: int | float, operator: str) -> bool:
+        if operator == "=":
+            if val == target:
+                return True
+        elif operator == "<":
+            if val < target:
+                return True
+        elif operator == ">":
+            if val > target:
+                return True
+        elif operator == ">=":
+            if val >= target:
+                return True
+        elif operator == "<=":
+            if val <= target:
+                return True
+        elif operator == "!=":
+            if val != target:
+                return True
+        else:
+            feedback(f"Invalid operator for numbers: {operator} ({val} and {target})")
+            return False
+        return False
 
     def to_length(val, target):
         """Get length of object."""
@@ -930,41 +1008,37 @@ def comparer(val: str, operator: str, target: str | list) -> bool:
         operator = "="
     if operator in ["<", "<=", ">", ">="]:
         val, target = to_length(val, target)
+    elif operator not in ["=", "~"]:
+        feedback(f"Unknown operator: {operator} ({val} and {target})")
+        return False
 
     try:
-        val = float(val)
+        _val = float(val)
+        _target = float(target)
+        result = compare_numbers(_val, _target, operator)
+        return result
     except Exception:
         pass
-    try:
-        target = float(target)
-    except Exception:
-        pass
+
     if operator == "=":
         if val == target:
+            return True
+    elif operator == "!=":
+        if val != target:
             return True
     elif operator in ["~", "in"]:
         try:
             if val in target:
                 return True
-        except TypeError:
+            if float(val) in target:
+                return True
+            if int(val) in target:
+                return True
+        except (ValueError, TypeError):
             pass
-    elif operator == "!=":
-        if val != target:
-            return True
-    elif operator == "<":
-        if val < target:
-            return True
-    elif operator == ">":
-        if val > target:
-            return True
-    elif operator == ">=":
-        if val >= target:
-            return True
-    elif operator == "<=":
-        if val <= target:
-            return True
     else:
-        feedback(f"Unknown operator: {operator} ({val} and {target})")
+        pass
+
     return False
 
 
@@ -1003,7 +1077,7 @@ def integer_pair_to_cell(row: int, col: int) -> str:
 
     >>> print(integer_pair_to_cell(0, 0))
     A1
-    print(integer_pair_to_cell(10, 27))
+    >>> print(integer_pair_to_cell(10, 27))
     AB11
     """
     column_str = ""
@@ -1035,19 +1109,20 @@ def column_from_string(col: str) -> int:
     if len(col) > 3:
         raise ValueError(error_msg)
     idx = 0
-    col = reversed(col.upper())
-    for letter, power in zip(col, __powers):
+    _col = reversed(col.upper())
+    for letter, power in zip(list(_col), __powers):
         try:
-            pos = __alpha_to_decimal[letter]
+            pos = __alpha_to_decimal.get(cast(LiteralString, letter))
         except KeyError:
             raise ValueError(error_msg)
-        idx += pos * power
+        if pos is not None:
+            idx += pos * power
     if not 0 < idx < 18279:
         raise ValueError(error_msg)
     return idx
 
 
-def coordinate_to_tuple(coordinate: str, zeroed: bool = False) -> tuple:
+def coordinate_to_tuple(coordinate: str, zeroed: bool = False) -> tuple | None:
     """Convert Excel style coordinate to 1-based (column, row) tuple
 
     Args:
@@ -1145,6 +1220,7 @@ def get_font_by_name(fonts_name: object) -> tuple:
     elif isinstance(fonts_name, (tuple, list)):
         font_names = fonts_name
     else:
+        font_names = []
         feedback("Font name must be a string or a list of strings!", True)
 
     for font_name in font_names:
@@ -1182,7 +1258,7 @@ def base_fonts():
           of an alternate
     """
 
-    def register_font(name: str, filename: str = None):
+    def register_font(name: str, filename: str | None = None):
         """Register a font."""
         log.debug("register_font: %s %s", name, filename)
 
@@ -1219,6 +1295,7 @@ def base_fonts():
     ]
     missing = []
     for ffont in fonts:
+        name = ""
         try:
             name = ffont["name"]
             register_font(name)
@@ -1233,7 +1310,7 @@ def base_fonts():
         feedback(f"Unable to register the MS font(s): {names}", False, True)
 
 
-def eval_template(strng: str, data: dict = None, label: str = ""):
+def eval_template(strng: str, data: dict | None = None):
     """Process data dict via jinja2 template in source.
 
     Doc Test:
@@ -1270,7 +1347,7 @@ def valid_directions(
     direction_group: DirectionGroup,
     label: str = "",
     vertex_count: int = 0,
-) -> list:
+) -> dict | set:
     """."""
     match direction_group:
         case DirectionGroup.CARDINAL:
@@ -1394,6 +1471,7 @@ def validated_gridlines(
         f"one of the valid directions {valid}!",
         True,
     )
+    return []
 
 
 def validated_directions(
@@ -1460,17 +1538,18 @@ def validated_directions(
             values_set = set(values)
     if values_set.issubset(valid) or not vertex_count:
         # NOTE in some cases, we need to ignore `vertex_count` because not yet known...
-        return values
+        return list(values)
     _label = f"the {label} value" if label else f'"{value}"'
     feedback(
         f'Cannot use {_label} "{value}" - it must correspond with '
         f"the valid directions {valid}!",
         True,
     )
+    return []
 
 
 def transpose_lists(
-    original_list: list, direction: str = None, invert: str = None
+    original_list: list, direction: str | None = None, invert: str | None = None
 ) -> list:
     """Reorientate a list-of-lists
 
@@ -1577,52 +1656,62 @@ def is_url_valid(url: str, qualifying=MIN_ATTRIBUTES):
 def save_globals() -> GlobalDocument:
     """Create a copy of key globals settings"""
     return GlobalDocument(
-        base=globals.base,
-        deck=globals.deck,
-        card_frames=globals.card_frames,
-        filename=globals.filename,
-        directory=globals.directory,
-        document=globals.document,
-        doc_page=globals.doc_page,
-        canvas=globals.canvas,
-        margins=globals.margins,
-        page=globals.page,
-        page_fill=globals.page_fill,
-        page_width=globals.page_width,
-        page_height=globals.page_height,
-        page_count=globals.page_count,
-        page_grid=globals.page_grid,
+        archive=copy.copy(globals.archive),
+        base=copy.copy(globals.base),
+        black=copy.copy(globals.black),  # RGB / CMYK
+        canvas=copy.copy(globals.canvas),
+        card_frames=copy.copy(globals.card_frames),
+        color_model=copy.copy(globals.color_model),
+        css=copy.copy(globals.css),
+        deck=copy.copy(globals.deck),
+        directory=copy.copy(globals.directory),
+        doc_page=copy.copy(globals.doc_page),
+        document=copy.copy(globals.document),
+        filename=copy.copy(globals.filename),
+        font_size=copy.copy(globals.font_size),
+        margins=copy.copy(globals.margins),  # PageMargins
+        page_count=copy.copy(globals.page_count),
+        page=copy.copy(globals.page),  # DocumentPage
+        paper=copy.copy(globals.paper),  # named paper size
+        units=copy.copy(globals.units),  #  UnitPoints; units point equivalents
+        white=copy.copy(globals.white),  # RGB / CMYK
     )
 
 
 def restore_globals(doc: GlobalDocument):
     """Restore key globals settings"""
+    globals.archive = doc.archive
     globals.base = doc.base
-    globals.deck = doc.deck
-    globals.card_frames = doc.card_frames
-    globals.filename = doc.filename
-    globals.directory = doc.directory
-    globals.document = doc.document
-    globals.doc_page = doc.doc_page
+    globals.black = doc.black
     globals.canvas = doc.canvas
+    globals.card_frames = doc.card_frames
+    globals.color_model = doc.color_model
+    globals.css = (doc.css,)
+    globals.deck = doc.deck
+    globals.directory = doc.directory
+    globals.doc_page = doc.doc_page
+    globals.document = doc.document
+    globals.filename = doc.filename
+    globals.font_size = doc.font_size
     globals.margins = doc.margins
-    globals.page = doc.page
-    globals.page_fill = doc.page_fill
-    globals.page_width = doc.page_width
-    globals.page_height = doc.page_height
     globals.page_count = doc.page_count
-    globals.page_grid = doc.page_grid
+    globals.page = doc.page
+    globals.paper = doc.paper
+    globals.units = doc.units
+    globals.white = doc.white
 
 
-def unit(item, units: str = None, skip_none: bool = False, label: str = ""):
+def unit(
+    item, units: str | None = None, skip_none: bool = False, label: str = ""
+) -> float:
     """Convert an item into the appropriate unit system."""
     log.debug("units %s :: label: %s", units, label)
     if item is None and skip_none:
-        return None
-    units = to_units(units) if units is not None else globals.units
+        return 0.0
+    _units = to_units(units) if units is not None else globals.units
     try:
         _item = as_float(item, label)
-        return _item * units
+        return _item * _units
     except (TypeError, ValueError):
         _label = f" {label}" if label else ""
         feedback(
@@ -1630,17 +1719,19 @@ def unit(item, units: str = None, skip_none: bool = False, label: str = ""):
             " Please check that this is a valid value.",
             stop=True,
         )
+    return 0.0
 
 
-def points(item, units: str = None, skip_none: bool = False, label: str = ""):
+def points(item, units: str | None = None, skip_none: bool = False, label: str = ""):
     """Convert an item from points into the appropriate unit system."""
     log.debug("units %s :: label: %s", units, label)
     if item is None and skip_none:
         return None
-    units = to_units(units) if units is not None else globals.units
+    _units = to_units(units) if units is not None else globals.units
     try:
         _item = as_float(item, label)
-        return _item / units
+        if _item is not None and _units is not None:
+            return _item / _units
     except (TypeError, ValueError):
         _label = f" {label}" if label else ""
         feedback(
@@ -1675,7 +1766,7 @@ def get_pymupdf_props(
           In this case, the color parameter is ignored.
     """
 
-    def ext(prop):
+    def ext(prop) -> str:
         if isinstance(prop, str):
             return prop
         try:
@@ -1729,9 +1820,9 @@ def get_pymupdf_props(
     _dashed = ext(dashed) or ext(defaults.get("dashed"))
     if _dotted:
         the_stwd = (
-            round(ext(stroke_width))
+            round(stroke_width)
             if stroke_width
-            else round(ext(defaults.get("stroke_width")))
+            else round(defaults.get("stroke_width", 0.1))
         )
         the_stwd = max(the_stwd, 1)
         dashes = f"[{the_stwd} {the_stwd}] 0"
@@ -1822,6 +1913,7 @@ def get_font_file(fonts_name: object) -> tuple:
     elif isinstance(fonts_name, list):
         font_names = fonts_name
     else:
+        font_names = []
         feedback("Font name must be a string or a list of strings!", True)
     for name in font_names:
         _font_name = str(name).strip()
@@ -1840,14 +1932,14 @@ def get_font_file(fonts_name: object) -> tuple:
                 else:
                     _file = fi.get_font_file(fonts_name, fullpath=False)
                     font_path, css = fi.font_file_css(_name)
-                    if css not in globals.css:
+                    if css not in globals.css and css is not None:
                         globals.css += css + "\n"
                     globals.archive.add(font_path)
                     return _name, font_path, _file
     return _name, font_path, _file
 
 
-def card_size(card_size: str, units: str = "pt") -> tuple:
+def card_size(card_size: str, units: str = "pt") -> tuple | None:
     """Return card width and height in requested units for a named size.
 
     Doc Test:
@@ -1890,7 +1982,7 @@ def card_size(card_size: str, units: str = "pt") -> tuple:
     return size
 
 
-def paper_size(paper_size: str, units: str = "pt") -> tuple:
+def paper_size(paper_size: str, units: str = "pt") -> tuple | None:
     """Return paper width and height in requested units for a named size.
 
     Doc Test:
@@ -1911,6 +2003,7 @@ def paper_size(paper_size: str, units: str = "pt") -> tuple:
         return PAPER_SIZES[paper_size][units]
     except KeyError:
         feedback(f'Paper size "{paper_size}" in "{units}" is unavailable.', True)
+    return None
 
 
 def uniques(key: str) -> list:
@@ -1918,14 +2011,26 @@ def uniques(key: str) -> list:
 
     Args:
         key (str): a key in each dict in the list of dicts
+
+    Doc Test:
+
+    >>> uniques(None)
+    []
+    >>> uniques('')
+    []
+    >>> uniques('test')
+    []
     """
     if not key:
         return []
     unique_values = set()
-    for d in globals.dataset:
-        if key in d:
-            unique_values.add(d[key])
-    return unique_values
+    try:
+        for d in globals.dataset:
+            if key in d:
+                unique_values.add(d[key])
+    except AttributeError:
+        pass
+    return list(unique_values)
 
 
 def html_img(text: str) -> str:

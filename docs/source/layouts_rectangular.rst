@@ -129,7 +129,14 @@ the name *a_circle*) defined as:
 In these examples, the placeholder names ``{{sequence}}``, ``{{col}}``
 and ``{{row}}`` will be replaced, in the label for the Circle, by the
 values for the row and column in which that circle is placed, as well as
-by the sequence value - or order number - in which that Circle gets drawn.
+by the sequence value - or order number - in which that Circle gets drawn,
+starting from zero.
+
+.. HINT::
+
+    To start the sequence from any other number, simply add or subtract that
+    number from the sequence, for example,  ``{{sequence + 1}}`` or
+    ``{{sequence - 10}}``.
 
 Example 1. Rows and Columns
 ---------------------------
@@ -354,6 +361,8 @@ Example 6a. Outer Edge - Shapes
 
       .. code:: python
 
+        is_common = Common(label="{{sequence + 1}}")
+
         sqr = square(common=is_common, side=0.9,
                      label_size=6)
         sqr5 = square(common=is_common, side=1.0,
@@ -376,6 +385,10 @@ Example 6a. Outer Edge - Shapes
       case the Square named ``sqr5`` |dash| to the final list
       of *shapes* that will be used for the Layout; thereby creating
       the pattern shown.
+
+      Both ``sqr`` and ``sqr5`` make use of the Common label property which
+      is defined as the sequence number plus one i.e. the numbering will
+      start from ``1`` instead of ``0``.
 
       In summary, the final list of shapes becomes:
 
@@ -450,13 +463,13 @@ Example 6c. Outer Edge - Rotation
             label_size=5, points=[('s', 0.1)],
             height=0.5, width=0.5)
         circ = circle(
-            label="{{sequence - 1}}",
+            label="{{sequence}}",
             label_size=5, radius=0.26, fill="rosybrown")
         rct2 = rectangle(
-            common=rct_common, label="{{sequence - 1}}",
+            common=rct_common, label="{{sequence}}",
             fill="tan")
         rct3 = rectangle(
-            common=rct_common, label="{{sequence - 1}}",
+            common=rct_common, label="{{sequence}}",
             fill="maroon", stroke="rosybrown")
 
         locs = RectangularLocations(
@@ -476,10 +489,8 @@ Example 6c. Outer Edge - Rotation
             ],
             corners=[('*',circ)])
 
-      Labels are created by use of the ``{{sequence - 1}}`` placeholder; using
-      ``-1`` after the usual ``sequence`` means that the value of 1 is
-      subtracted from every sequence number, and also means that in this case
-      the numbering will start from zero not one.
+      Labels are created by use of the ``{{sequence}}`` placeholder; as usual
+      the numbering starts from zero.
 
       The *rotations* property references specific sequence values in a list of
       sets of values; for example, ``("17-24", 270)`` rotates the shapes at all
@@ -517,6 +528,7 @@ Example 7. Masked
 
       The *masked* property means that two of the shapes |dash| corresponding
       to sequence numbers ``2`` and ``7`` |dash| will not be drawn.
+
 ===== ======
 
 Example 8. Visible

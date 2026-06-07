@@ -16,22 +16,27 @@ will demonstrate full scalability.
 
     Note that there is *no* intention to infringe on copyright; these are
     partial examples designed to show possibilities and **not** to encourage
-    copying or reproduction of any copyrighted game material.
+    copying or reproduction of any copyrighted game material. The purpose is
+    to illustrate how elements of such games **could have been** be created
+    during their prototyping stage.
 
 .. _table-of-contents-excomm:
 
-- `Squad Leader`_
-- `Orion`_
+- `Adventurer Conqueror King`_
 - `Catan`_
 - `Kensington`_
-- `Adventurer Conqueror King`_
-- `Traveller: Draft`_
-- `Traveller: Black`_
-- `Warp War`_
-- `Underwater Cities`_
-- `The Honorverse`_
+- `Orion`_
+- `Squad Leader`_
+- `Tannenburg`_
 - `Terraforming Mars: Ares Player Board`_
+- `The Honorverse`_
+- `Traveller: Black`_
+- `Traveller: Draft`_
+- `Underwater Cities`_
+- `Warp War`_
 
+
+.. _commercialGameSquadLeader:
 
 Squad Leader
 ============
@@ -42,8 +47,9 @@ Title       *Squad Leader Modular Board Section*
 ----------- ------------------------------------------------------------------
 Script      `squad_leader.py <https://github.com/gamesbook/protograf/blob/master/examples/boards/commercial/squad_leader.py>`_
 ----------- ------------------------------------------------------------------
-Discussion  This example shows how to construct a board for a wargame - in
-            this Avalon Hill's "Squad Leader" - using a hexagonal grid.
+Discussion  This example shows how to construct a blank board for a wargame
+            |dash| in this case Avalon Hill's *"Squad Leader"* |dash| using a
+            hexagonal grid.
 
             The grid's properties, such as alphanumeric coordinates and hex
             column offsets are used for overall appearance; the use of a blank
@@ -51,6 +57,60 @@ Discussion  This example shows how to construct a board for a wargame - in
             of the board.
 ----------- ------------------------------------------------------------------
 Screenshot  .. image:: images/boards/commercial/squadleader_blank.png
+               :width: 90%
+=========== ==================================================================
+
+.. _commercialGameTannenburg:
+
+Tannenburg
+==========
+`↑ <table-of-contents-excomm_>`_
+
+=========== ==================================================================
+Title       *Tannenburg Map Section*
+----------- ------------------------------------------------------------------
+Script      `tannenburg_spi.py <https://github.com/gamesbook/protograf/blob/master/examples/boards/commercial/tannenburg_spi.py>`_
+----------- ------------------------------------------------------------------
+Discussion  This example shows how to construct a board for a wargame |dash| in
+            this case a small portion of SPI's *"Tannenburg and the Opening
+            Battles in the East 1914"* |dash| using a hexagonal grid.
+
+            The grid's properties, such as alphanumeric coordinates, fill and
+            hexagon styles are used for overall appearance.
+
+            Features are drawn either as bitmap PNG images pre-created in a
+            drawing package, or using the built-in vector shapes of *protograf*
+            itself.
+
+            Of interest are:
+
+            * the use of :ref:`GridLines <gridline-command>` to create the
+              dashed black railway lines, the blue river, and the dotted grey
+              border; in the case of the river, two lines are drawn using the
+              same set of directions but with a light blue line superimposed
+              on a dark blue line
+            * the use of the :ref:`Image <image-command>` command to load
+              PNG terrain feature images that have been created using a
+              regular paint program (these images are also available in the
+              examples folder)
+
+            These two commands between them, along with the usual
+            :ref:`Text <text-command>` command, will likely support most
+            requirements for prototyping wargame maps.
+
+            .. NOTE::
+
+               As stated up-front, **protograf** is designed to create
+               regular graphics and most natural terrain features are
+               *irregular*. Rather than trying to add complex algorithms
+               to generate "pseudo-irregular" shapes, it is recommended to
+               use a tool that makes it straightforward to create these
+               images "by hand" |dash| assuming that such images do not
+               already exist. Using a PNG with a transparent background is
+               usually the best approach.
+
+----------- ------------------------------------------------------------------
+Screenshot  .. image:: images/boards/commercial/tannenburg_spi.png
                :width: 90%
 =========== ==================================================================
 
@@ -65,7 +125,7 @@ Title       *Orion Game Board*
 Script      `orion_game_board.py <https://github.com/gamesbook/protograf/blob/master/examples/boards/commercial/orion_game_board.py>`_
 ----------- ------------------------------------------------------------------
 Discussion  This example shows how to construct a board for the commercial
-            board game "Orion".  It is a fairly simple script, as the board
+            board game *"Orion"*.  It is a fairly simple script, as the board
             is similar to many abstract boards; a so-called "hexhex" shape.
 
             The background is just stacked ``Circle`` s of differing fill colors
@@ -93,11 +153,11 @@ Discussion  This example shows how to construct a board for the commercial
             the game's hexes (``Hexagon`` shape) and discs (``Circle``
             shape).  A single large hexagon forms the surrounding sea.
 
-            All the pieces - hexes and discs - are predefined in the script
-            (without any ``x`` or ``y`` settings) and then laid out
+            All the pieces |dash| hexes and discs |dash| are predefined in the
+            script (without any ``x`` or ``y`` settings) and then laid out
             using the ``shapes`` property of the ``HexHex`` grid, which puts
-            them in sequence into the "ring" |dash| centred at their correct
-            locations.
+            them in sequence into the "rings" of the grid |dash| centred at
+            their correct locations.
 
             *An interesting exercise would be to write a script that generates
             random board setups!*
@@ -119,7 +179,7 @@ Title       *Kensington Game Board*
 Script      `kensington.py <https://github.com/gamesbook/protograf/blob/master/examples/boards/commercial/kensington.py>`_
 ----------- ------------------------------------------------------------------
 Discussion  This example shows how to construct a board for the commercial
-            board game "Kensington".
+            board game *"Kensington"*.
 
             This is a more complex example that makes use of a Python
             **function** to draw each of the seven sets of the
@@ -148,11 +208,11 @@ Title       *Adventurer Conqueror King RPG Blank Map*
 Script      `ack_map.py <https://github.com/gamesbook/protograf/blob/master/examples/boards/commercial/ack_map.py>`_
 ----------- ------------------------------------------------------------------
 Discussion  This example shows how to construct a blank map for the
-            "Adventurer Conqueror King" roleplaying game.
+            *"Adventurer Conqueror King"* roleplaying game.
 
             The map is constructed of two hexagonal grids; the larger hexes
-            have fill set to ``None`` so that the small hexes are visible
-            through it. The use of white rectangles enables the  "half-hex"
+            have a fill set to ``None`` so that the small hexes are visible
+            through them. The use of white rectangles enables the  "half-hex"
             effect at the lower edge of the board.
 ----------- ------------------------------------------------------------------
 Screenshot  .. image:: images/boards/commercial/ack_map.png
@@ -170,7 +230,7 @@ Title       *Traveller RPG Map*
 Script      `traveller_draft.py <https://github.com/gamesbook/protograf/blob/master/examples/boards/commercial/traveller_draft.py>`_
 ----------- ------------------------------------------------------------------
 Discussion  This example shows how to construct a blank sector map for the
-            "Traveller" science fiction roleplaying game.
+            *"Traveller"* science fiction roleplaying game.
 
             Its a simple hexagonal grid, with a numeric coordinate system.
             The "edges" are just drawn with lines.
@@ -194,7 +254,7 @@ Title       *Traveller RPG Map*
 Script      `<https://github.com/gamesbook/protograf/blob/master/examples/boards/commercial/traveller_black.py>`_
 ----------- ------------------------------------------------------------------
 Discussion  This example shows how to construct a blank sector map for the
-            "Traveller" scifi roleplaying game.
+            *"Traveller"* science fiction roleplaying game.
 
             Its a simple hexagonal grid, with a numeric coordinate system.
             The "edges" are just drawn with lines. The styling is black because
@@ -207,9 +267,10 @@ Discussion  This example shows how to construct a blank sector map for the
             `Warp War`_ example.
 ----------- ------------------------------------------------------------------
 Screenshot  .. image:: images/boards/commercial/traveller_black.png
-               :width: 80%
+               :width: 70%
 =========== ==================================================================
 
+.. _commercialGameWarpWar:
 
 Warp War
 ========
@@ -220,20 +281,22 @@ Title       *Warp War Map*
 ----------- ------------------------------------------------------------------
 Script      `warpwar.py <https://github.com/gamesbook/protograf/blob/master/examples/boards/commercial/warpwar.py>`_
 ----------- ------------------------------------------------------------------
-Discussion  This example shows how to construct a map for the "Warp War" game.
+Discussion  This example shows how to construct a map for the *"Warp War"*
+            game.
 
-            The example based off an image created by Rick Smith and posted to
-            the https://groups.io/g/warpwar/ forum on 3 June 2024.  This is
-            *not* a complete copy of that map - it just serves to illustrate
-            how elements of such a map could be created.
+            The example is based off an image created by Rick Smith and posted
+            to the https://groups.io/g/warpwar/ forum on 3 June 2024.  This is
+            *not* a complete copy of that map |dash| it just serves to
+            illustrate how elements of such a map **can** be created.
 
             This is a fairly complex layout as most items need to be placed
             with millimetre accuracy using the ``Location()`` command to detail
-            which shapes go into which hexagon grid location.
+            which shapes go into which hexagonal grid location.
 
-            The green lines joining hexagons are created with the ``LinkLine()``
-            command; by default this joins the centres of two locations in the
-            hexagon grid; but use of the optional "move x" and "move y"
+            The green lines joining hexagons are created with the ``GridLine()``
+            command; this commmand accesses a set of hex locations |dash|
+            identified by name |dash| in the hexagonal grid and, by default,
+            joins their centres; but use of the optional "move x" and "move y"
             settings allows the line endpoints to be adjusted within their
             respective hexagons.
 
@@ -244,27 +307,28 @@ Discussion  This example shows how to construct a map for the "Warp War" game.
             The hexagon numbering for this game, which **protograf** terms
             ``diagonal`` is fairly unusual.  It also uses ``upper-multiple``
             for the *coord_type_y* property, as opposed to the more
-            conventional spreadsheet alphanumeric style.
+            conventional spreadsheet-styled alphanumeric coordinates.
 
             The hexagon identifers across the top and side are created with a
-            ``Sequence(`` command; they are not "built-in" to the grid.  Not
+            ``Sequence()`` command; they are not "built-in" to the grid.  Not
             many games seem to use these, or else they use them in a wide
             variety of ways, so there is currently no automated way of
             achieving this.
 
             .. HINT::
 
-                The full map script can be found at
-                `warpwar_full.py <https://github.com/gamesbook/protograf/blob/master/examples/boards/commercial/warpwar_full.py>`_
-                but it uses various :ref:`Python Commands <table-of-contents-pyc>`
-                in order to simplify the map generation; it may be of interest
-                if you want to see how **protograf** can pull in such commands.
+               The full map script can be found at
+               `warpwar_full.py <https://github.com/gamesbook/protograf/blob/master/examples/boards/commercial/warpwar_full.py>`_
+               but it uses various :ref:`Python Commands <table-of-contents-pyc>`
+               in order to simplify the map generation; it may be of interest
+               if you want to see how **protograf** can pull in such commands.
 
 ----------- ------------------------------------------------------------------
 Screenshot  .. image:: images/boards/commercial/warpwar.png
                :width: 95%
 =========== ==================================================================
 
+.. _commercialGameUnderwaterCities:
 
 Underwater Cities
 =================
@@ -276,9 +340,9 @@ Title       *Underwater Cities Game Board*
 Script      `underwater_cities.py <https://github.com/gamesbook/protograf/blob/master/examples/boards/commercial/underwater_cities.py>`_
 ----------- ------------------------------------------------------------------
 Discussion  This example shows how to construct the board for the commercial
-            board game "Underwater Cities". This is *not* a complete copy of
-            that board - it just serves to illustrate how elements of it could
-            be created during the prototyping stage.
+            board game *"Underwater Cities"*. This is **not** a complete copy
+            of that board |dash| it just serves to illustrate how elements of
+            it **could have been** be created during the prototyping stage.
 
             The script for this example is one of the longest but it is not
             really that complex, as most shapes are simple rectangles stacked
@@ -286,17 +350,18 @@ Discussion  This example shows how to construct the board for the commercial
 
             Some items of interest:
 
-            - Extensive use of the ``Common()`` command to avoid duplication
+            * Extensive use of the ``Common()`` command to avoid duplication
               between similar items
-            - Use of an SVG world map to create the background layer
-            - Mix of custom images, free icons and **protograf** to create
+            * Use of an SVG world map to create the background layer
+            * Mix of custom images, free icons and **protograf** to create
               the smaller graphic elements, such as the locks and wreaths
-            - Use of the ``RectangularLocation()`` command to lay out the
+            * Use of the ``RectangularLocation()`` command to lay out the
               primary scoring track; the ``Layout()`` command makes use of multiple
               repeating shapes for the color changes at different intervals
-            - Use of ``Sequence()`` command to create the player order track,
+            * Use of ``Sequence()`` command to create the player order track,
               (in the middle) as well as the different rounds (the dark,
               vertical track on the right)
+
 ----------- ------------------------------------------------------------------
 Screenshot  .. image:: images/boards/commercial/underwater_cities.png
                :width: 90%
@@ -325,24 +390,24 @@ Discussion  This example shows a map with the locations of stars described in th
             centre of a "kingdom" of planets loosely modelled after the British
             Empire in the nineteenth century.
 
-            The data is sourced from:
+            The data for the map is sourced from:
 
-            - https://www.gotshifted.com/honorverseglossary/MAPS.html
-            - https://www.gotshifted.com/honorverseglossary/Book%20Originals.html
+            * https://www.gotshifted.com/honorverseglossary/MAPS.html
+            * https://www.gotshifted.com/honorverseglossary/Book%20Originals.html
 
             Any errors in transcription are mine |dash| and *NOT* the original
             sources!
 
             Some items of interest:
 
-            - The "stars" are just point locations on the grid; a Python loop
+            * The "stars" are just point locations on the grid; a Python loop
               processes them and styles each according to its information; using
               ``if`` and ``else``, while the ZapfDingbats font provides icons
               used to show the star.
-            - The names of stars allow their point locations to be "looked up"
+            * The names of stars allow their point locations to be "looked up"
               in the list, and the stars' locations form the start and end points
               of lines for the connecting wormholes (red lines).
-            - The script has a boolean "toggle" (called ``DARK_MODE``) which can
+            * The script has a boolean "toggle" (called ``DARK_MODE``) which can
               be set to change the background color of the map to black and
               the stars to white, as can be seen in the "zoomed" example.
 
@@ -367,17 +432,17 @@ Title       *Terraforming Mars: Ares Player Board*
 Script      `<https://github.com/gamesbook/protograf/blob/master/examples/boards/commercial/tm_player_board.py>`_
 ----------- ------------------------------------------------------------------
 Discussion  This example shows a version of the player board from the
-            "Terraforming Mars: Ares" card game.
+            *"Terraforming Mars: Ares"* card game.
 
-            It is *not* an exact reproduction and omits some of the text.
+            It is **not** an exact reproduction and omits some of the text.
 
             Some items of interest:
 
-            - Use of the ``Common()`` command to avoid duplication between
+            * Use of the ``Common()`` command to avoid duplication between
               similar items
-            - Use of a font derived from the https://game-icons.net/ to create
+            * Use of a font derived from the https://game-icons.net/ to create
               the small graphic elements, such as the heat and tree symbols
-            - Use of the ``Sequence()`` command to create the various tracks,
+            * Use of the ``Sequence()`` command to create the various tracks,
               as well as some of the different elements (arrows and money)
               on the lower edge
 ----------- ------------------------------------------------------------------

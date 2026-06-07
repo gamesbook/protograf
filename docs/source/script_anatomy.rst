@@ -183,6 +183,9 @@ The ``Save()`` command, by default, simply results in the outcome of all the
 commands used to that point being written out to a PDF file; either with a
 default filename, or with the one set in the `Create Command`_ .
 
+A number of the properties below are relevant when creating a
+:ref:`Deck <the-deck-command>` of :ref:`Cards <the-card-command>`
+
 To customise the command, set its properties as follows:
 
 - **output** - this can be set to:
@@ -237,7 +240,8 @@ third pages of the PDF file.
 Example 2. Save GIF
 ~~~~~~~~~~~~~~~~~~~
 
-Here is another example of a customised ``Save`` command:
+Here is an example of a customised ``Save`` command used to create an animated
+image:
 
 .. code:: python
 
@@ -248,12 +252,37 @@ Here is another example of a customised ``Save`` command:
     )
 
 In this example, an animated GIF image will be created, assembled out of the
-PNG images; one per page of the PDF.  There will be a delay of half-a-second
-between the showing of each image.
+PNG images; one per page of the PDF.  The *framerate* setting of ``0.5`` means
+there will be a delay of a half second between the display of each image.
 
-Example 3. Customise Outputs
+Example 3. Save Card Gallery
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+Here is an example of a customised ``Deck`` command used to create an output
+file that contains many cards in a single page (and image of that page):
+
+.. code:: python
+
+    Deck(
+        cards=108,
+        gallery=(9, 6),
+    )
+
+    Save(
+        output='png',
+        dpi=300,
+    )
+
+In this example, each PNG image created will contain a grid, or array, of
+nine cards wide ("cards per row") by six cards high ("cards per column") |dash|
+for a total of up to 54 cards per page of the PDF.
+
+In this case, because there are 108 cards, two PNG images will be created.
+
+
+Example 4. Customise Outputs
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+`
 Here are various examples of a customised ``Save`` command:
 
 .. code:: python

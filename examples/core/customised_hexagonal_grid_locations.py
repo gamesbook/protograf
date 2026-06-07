@@ -1,10 +1,10 @@
 """
-Show customised Hexagons grid locations and linklines for protograf
+Show customised Hexagons grid locations and gridlines for protograf
 
 Written by: Derek Hohls
 Created on: 7 December 2024
+Updated on: 1 May 2026
 """
-
 from protograf import *
 
 Create(
@@ -19,7 +19,7 @@ Create(
 )
 
 header = Common(x=0, y=0, font_size=8, align="left")
-a_circle = Common(radius=0.4)
+a_circle = Common(radius=0.3)
 
 # ---- location - single shape -  hexgrid_location_single
 Blueprint(stroke_width=0.5)
@@ -111,9 +111,10 @@ Locations(
 )
 PageBreak()
 
-# ---- linklines - single line -  hexgrid_linkline_single
+
+# ---- gridlines - single line
 Blueprint(stroke_width=0.5)
-Text(common=header, text="LinkLine: single")
+Text(common=header, text="GridLine: locations: single")
 hexgrid = Hexagons(
     side=0.5,
     x=0, y=0,
@@ -121,15 +122,16 @@ hexgrid = Hexagons(
     dot=0.02,
     coord_elevation='top'
 )
-LinkLine(
+GridLine(
     grid=hexgrid,
     locations="0101,0403"
 )
 PageBreak()
 
-# ---- linklines - double-line -  hexgrid_linkline_double
+
+# ---- gridlines - double-line
 Blueprint(stroke_width=0.5)
-Text(common=header, text="LinkLine: double")
+Text(common=header, text="GridLine: locations: double")
 hexgrid = Hexagons(
     side=0.5,
     x=0, y=0,
@@ -137,15 +139,15 @@ hexgrid = Hexagons(
     dot=0.02,
     coord_elevation='top'
 )
-LinkLine(
+GridLine(
     hexgrid,
-    "0101,0403,0104"
+    locations="0101,0403,0104"
 )
 PageBreak()
 
-# ---- linklines - double-line style -  hexgrid_linkline_multi_style
+# ---- gridlines - double-line style
 Blueprint(stroke_width=0.5)
-Text(common=header, text="LinkLine: multi style")
+Text(common=header, text="GridLine: locations: multi style")
 hexgrid = Hexagons(
     side=0.5,
     x=0, y=0,
@@ -153,21 +155,21 @@ hexgrid = Hexagons(
     dot=0.02,
     coord_elevation='top'
 )
-LinkLine(
+GridLine(
     hexgrid,
-    ["0101","0403","0104","0406"],
+    locations=["0101","0403","0104","0406"],
     common=Common(stroke="tomato", stroke_width=2)
 )
-LinkLine(
+GridLine(
     hexgrid,
-    ["0104","0406"],
+    locations=["0104","0406"],
     common=Common(stroke="cyan", stroke_width=2)
 )
 PageBreak()
 
-# ---- linklines - double-line & offset -  hexgrid_linkline_offset
+# ---- gridlines - double-line & offset
 Blueprint(stroke_width=0.5)
-Text(common=header, text="LinkLine: style & offset")
+Text(common=header, text="GridLine: locations: style & offset")
 hexgrid = Hexagons(
     side=0.5,
     x=0, y=0,
@@ -175,11 +177,144 @@ hexgrid = Hexagons(
     dot=0.02,
     coord_elevation='top'
 )
-LinkLine(
+GridLine(
     hexgrid,
-    [("0101", 0.25, 0.25), ("0403", -0.25, -0.25),
-     ("0104", 0.0, 0.25), ("0104", 0.25, -0.25)],
+    locations=[
+        ("0101", 0.25, 0.25), ("0403", -0.25, -0.25),
+        ("0104", 0.0, 0.25), ("0104", 0.25, -0.25)],
     common=Common(stroke="tomato", stroke_width=1, dotted=True)
+)
+PageBreak()
+
+# ---- gridlines - edges
+Blueprint(stroke_width=0.5)
+Text(common=header, text="GridLine: edges: multi style")
+hexgrid = Hexagons(
+    side=0.5, x=0, y=0.1, rows=6, cols=5)
+GridLine(
+    hexgrid,
+    start="0203",
+    point="nw",
+    edges="e,ne,e,se,nw,ne,e",
+    stroke="green",
+    stroke_width=4,
+    stroke_ends="rounded"
+)
+GridLine(
+    hexgrid,
+    start="0504",
+    point="ne",
+    edges=["w", "sw", "w", "nw"] * 2,
+    stroke="red",
+    stroke_width=2,
+    dotted=True
+)
+GridLine(
+    hexgrid,
+    start=["0106", "0306", "0506"],
+    point="ne",
+    edges="*",
+    stroke="black",
+    stroke_width=2
+)
+Hexagons(
+    side=0.5,
+    x=0, y=0.1,
+    rows=6, cols=5,
+    fill=None,
+    dot=0.02,
+    coord_elevation='top'
+)
+
+PageBreak()
+
+# ---- gridlines - paths
+Blueprint(stroke_width=0.5)
+Text(common=header, text="GridLine: paths: multi style")
+hexgrid = Hexagons(
+    side=0.5,
+    x=0, y=0.1,
+    rows=6, cols=5,
+)
+GridLine(
+    hexgrid,
+    start="0106",
+    point="nw",
+    paths=["ne", "ne", "n", "se", "s", "se", "s"],
+    stroke="cyan",
+    stroke_width=6
+)
+GridLine(
+    hexgrid,
+    start="0103",
+    point="c",
+    paths="ne,ne,se,se,c",
+    stroke="grey",
+    stroke_width=3
+)
+Hexagons(
+    side=0.5,
+    x=0, y=0.1,
+    rows=6, cols=5,
+    dot=0.02,
+    coord_elevation='top',
+    fill=None
+)
+PageBreak()
+
+# ---- gridlines - paths+edges
+Blueprint(stroke_width=0.5)
+Text(common=header, text="GridLine: paths+edges: custom")
+hexgrid = Hexagons(
+    side=0.5,
+    x=0, y=0.1,
+    rows=6, cols=5,
+)
+
+road = "ne=,se=,ne=,n"
+GridLine(
+    hexgrid,
+    start="0102",
+    point="nw",
+    paths=road,
+    stroke="grey",
+    stroke_width=4
+)
+GridLine(
+    hexgrid,
+    start="0102",
+    point="nw",
+    paths=road,
+    stroke="silver",
+    stroke_width=2
+)
+
+GridLine(
+    hexgrid,
+    start="0104",
+    point="sw",
+    edges="ne,ne,e,se,se,sw,sw,w,nw,nw",
+    stroke="tan",
+    stroke_width=6,
+    stroke_ends="rounded"
+)
+GridLine(
+    hexgrid,
+    start="0504",
+    point="se",
+    edges="nw,nw,w,sw,sw,se,se,e,ne,ne",
+    stroke="palegreen",
+    stroke_width=6,
+    stroke_ends="rounded"
+)
+
+Hexagons(
+    side=0.5,
+    x=0, y=0.1,
+    rows=6, cols=5,
+    dot=0.02,
+    coord_elevation='top',
+    fill=None
 )
 
 Save(
@@ -197,5 +332,8 @@ Save(
         "hexgrid_linkline_double",
         "hexgrid_linkline_multi_style",
         "hexgrid_linkline_offset",
+        "hexgrid_edges_multi_style",
+        "hexgrid_paths_multi_style",
+        "hexgrid_paths_edges_custom",
     ]
 )

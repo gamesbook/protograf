@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Create custom shapes for protograf
+Create Hexagon shape for protograf
 """
 
 # lib
@@ -139,6 +139,7 @@ class HexShape(BaseShape):
         hex_geom = self.get_geometry()
         radius = self._p2v(hex_geom.radius)
         diameter = self._p2v(hex_geom.diameter)
+        height = self._p2v(hex_geom.height_flat)
         side = self._p2v(hex_geom.radius)
         area = math.sqrt(3) * 3 / 2 * side**2
         perim = 6 * side
@@ -168,6 +169,7 @@ class HexShape(BaseShape):
             perimeter=perim,
             radius=radius,
             diameter=diameter,
+            height=height,
             side=side,
             # other
             area=area,
@@ -562,7 +564,7 @@ class HexShape(BaseShape):
         p0: Point,
         p1: Point,
         side: float,
-        size: float = None,
+        size: float | None = None,
         invert: bool = False,
     ) -> Point:
         """Calculate points for caltrops lines (extend from the hex "corner").
@@ -987,7 +989,7 @@ class HexShape(BaseShape):
                     case ["sw", "nw"] | ["nw", "sw"]:
                         arc(vertices[0], perbii_dict["sw"].point, 120.0)  # p1
                     case ["n", "nw"] | ["nw", "n"]:
-                        arc(vertices[5], perbii_dict["nw"].point, 120.0)  # p5
+                        arc(vertices[5], perbii_dict["nw"].point, 120.0)  # p0
                     # 60 degrees / long arc
                     case ["n", "se"] | ["se", "n"]:
                         arc(pt_b, perbii_dict["n"].point, 60.0)  # p5
@@ -1096,7 +1098,9 @@ class HexShape(BaseShape):
             dotted=self.paths_dotted,
         )
 
-    def calculate_perbii(self, centre: Point, rotation: float = None, **kwargs) -> dict:
+    def calculate_perbii(
+        self, centre: Point, rotation: float | None = None, **kwargs
+    ) -> dict:
         """Calculate centre points for each Hex edge and angles from centre.
 
         Args:
@@ -1186,7 +1190,7 @@ class HexShape(BaseShape):
         return radii_dict
 
     def draw_perbii(
-        self, cnv, ID, centre: Point, vertices: list, rotation: float = None
+        self, cnv, ID, centre: Point, vertices: list, rotation: float | None = None
     ):
         """Draw lines connecting the Hexagon centre to the centre of each edge.
 
@@ -1398,7 +1402,7 @@ class HexShape(BaseShape):
             )
 
     def draw_spikes(
-        self, cnv, ID, centre: Point, vertices: list, rotation: float = None
+        self, cnv, ID, centre: Point, vertices: list, rotation: float | None = None
     ):
         """Draw triangles extending from the centre of each edge.
 
@@ -1712,9 +1716,9 @@ class HexShape(BaseShape):
         if self.grid_marks:  # and not kwargs.get("card_back", False):
             delta_grid = self.unit(self.grid_marks_length)
             pg_tl = Point(0, 0)
-            pg_tr = Point(globals.page[0], 0)
-            pg_bl = Point(0, globals.page[1])
-            pg_br = Point(globals.page[0], globals.page[1])
+            pg_tr = Point(globals.page.size[0], 0)
+            pg_bl = Point(0, globals.page.size[1])
+            pg_br = Point(globals.page.size[0], globals.page.size[1])
             v0, v1, v2, v3, v4, v5 = (  # anti-clockwise from west-point
                 self.vertices[0],
                 self.vertices[1],

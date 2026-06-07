@@ -106,9 +106,9 @@ def draw_line(
 
 def draw_line_curve(
     cnv=None,
-    start: Point = None,
-    end: Point = None,
-    curve_height: float = None,
+    start: Point | None = None,
+    end: Point | None = None,
+    curve_height: float | None = None,
     **kwargs,
 ) -> dict:
     """Draw a curved line on the canvas (Page) between two points for a Shape.

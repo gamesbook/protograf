@@ -63,6 +63,22 @@ https://www.fairway3games.com/where-do-i-get-art-for-free-an-ongoing-list/
 https://web.archive.org/web/20220330035328/https://www.fairway3games.com/where-do-i-get-art-for-free-an-ongoing-list/)
 
 
+Map Art and Icons
+=================
+
+- A collation of on-line procedural generators, with multiple configuration
+  options that can generate detailed PNG files; free to use in any way,
+  but please do give credit!
+
+  - https://watabou.itch.io/village-generator - for example, disable fields,
+    buildings, roads and relief to just show the trees
+  - https://watabou.itch.io/medieval-fantasy-city-generator
+  - https://watabou.itch.io/perilous-shores
+
+(Bonus: https://watabou.github.io/realm_styles.html can be used for the above
+to set themes and drawing styles)
+
+
 Card Suit Icons
 ===============
 

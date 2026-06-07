@@ -175,7 +175,9 @@ class RectangleShape(BaseShape):
         y_d = y + self._u.height / 2.0
         return Point(x=x_d, y=y_d)
 
-    def calculate_perbii(self, centre: Point, rotation: float = None, **kwargs) -> dict:
+    def calculate_perbii(
+        self, centre: Point, rotation: float | None = None, **kwargs
+    ) -> dict:
         """Calculate centre points for each Rectangle edge and angles from centre.
 
         Args:
@@ -1040,7 +1042,9 @@ class RectangleShape(BaseShape):
             rotation_point=muPoint(cx, cy),
         )
 
-    def draw_perbii(self, cnv, ID, centre: Point, rotation: float = None, **kwargs):
+    def draw_perbii(
+        self, cnv, ID, centre: Point, rotation: float | None = None, **kwargs
+    ):
         """Draw lines connecting the Rectangle centre to the centre of each edge.
 
         Args:
@@ -1125,7 +1129,7 @@ class RectangleShape(BaseShape):
             rotation_point=rotation_point,
         )
 
-    def draw_radii(self, cnv, ID, centre: Point, rotation: float = None):
+    def draw_radii(self, cnv, ID, centre: Point, rotation: float | None = None):
         """Draw line(s) connecting the Rectangle centre to a vertex.
 
         Args:
@@ -2042,12 +2046,12 @@ class RectangleShape(BaseShape):
                 gx, gy = 0, y  # left-side
                 cnv.draw_line((gx, gy), (deltag, gy))
                 cnv.draw_line((0, gy + self._u.height), (deltag, gy + self._u.height))
-                gx, gy = x, globals.page[1]  # top-side
+                gx, gy = x, globals.page.size[1]  # top-side
                 cnv.draw_line((gx, gy), (gx, gy - deltag))
                 cnv.draw_line(
                     (gx + self._u.width, gy), (gx + self._u.width, gy - deltag)
                 )
-                gx, gy = globals.page[0], y  # right-side
+                gx, gy = globals.page.size[0], y  # right-side
                 cnv.draw_line((gx, gy), (gx - deltag, gy))
                 cnv.draw_line(
                     (gx, gy + self._u.height), (gx - deltag, gy + self._u.height)

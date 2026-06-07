@@ -21,7 +21,7 @@ from protograf.utils.messaging import feedback
 from protograf.utils import tools
 
 
-def in_memory(the_image: Image) -> Document:
+def in_memory(the_image: Image.Image) -> Document:
     """Return an in-memory instance of an image as a PNG.
 
     Args:
@@ -50,7 +50,10 @@ def rounding(the_image: str, rounding_radius: int) -> Document:
     Returns:
         PyMuPDF Document
     """
-    _rad = tools.as_int(rounding_radius, "image operation rounding radius ", minimum=1)
+    _rad = (
+        tools.as_int(rounding_radius, "image operation rounding radius ", minimum=1)
+        or 0
+    )
 
     image_in = Image.open(the_image)
     mask = Image.new("L", image_in.size, 0)

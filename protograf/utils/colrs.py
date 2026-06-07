@@ -14,7 +14,7 @@ from protograf.utils.constants import RGB_COLOR_SINGLES, CMYK_COLOR_SINGLES, COL
 from protograf.utils.messaging import feedback
 
 
-def get_color(name: str = None, color_model: str = "RGB") -> tuple:
+def get_color(name: str | None = None, color_model: str = "RGB") -> tuple | None:
     """Get a color tuple; by name/char from dictionary, or as RGB/CMYK tuple."""
     if name is None:
         return None  # it IS valid to say that NO color has been set
@@ -33,6 +33,7 @@ def get_color(name: str = None, color_model: str = "RGB") -> tuple:
             _hdcolor = RGB_COLOR_SINGLES.get(name, None)
             if not _hdcolor:
                 feedback(f'The color abbreviation "{name}" does not exist!', True)
+                return None
             _rgb = tuple(int(_hdcolor[i : i + 2], 16) for i in (1, 3, 5))
             rgb = tuple(i / 255 for i in _rgb)
             return rgb
@@ -40,6 +41,7 @@ def get_color(name: str = None, color_model: str = "RGB") -> tuple:
             _hdcolor = CMYK_COLOR_SINGLES.get(name, None)
             if not _hdcolor:
                 feedback(f'The color abbreviation "{name}" does not exist!', True)
+                return None
             _cmyk = _hdcolor.split(",")
             cmyk = tuple(float(i) / 100.0 for i in _cmyk)
             return cmyk
@@ -112,7 +114,21 @@ def rgb_to_hex(color: tuple) -> str:
     return _string.upper()
 
 
-def adjust_color_brightness(red, grn, blu, factor, as_hex=True):
+def adjust_color_brightness_hex(red, grn, blu, factor) -> str:
+    """Alter brightness of a RGB colour - lighter or darker.
+
+    Args:
+
+    - red (int): red color channel value; ranging from 0 to 255
+    - grn (int): green color channel value; ranging from 0 to 255
+    - blu (int): blue color channel value; ranging from 0 to 255
+    - factor (float): amount of change to brightness
+    """
+    _r, _g, _b = adjust_color_brightness(red, grn, blu, factor)
+    return "#%02x%02x%02x" % (_r, _g, _b)
+
+
+def adjust_color_brightness(red, grn, blu, factor) -> tuple:
     """Alter brightness of a RGB colour - lighter or darker.
 
     Args:
@@ -127,8 +143,6 @@ def adjust_color_brightness(red, grn, blu, factor, as_hex=True):
     l_t = max(min(l_t * factor, 1.0), 0.0)
     red, grn, blu = hls_to_rgb(h, l_t, s)
     _r, _g, _b = int(red * 255), int(grn * 255), int(blu * 255)
-    if as_hex:
-        return "#%02x%02x%02x" % (_r, _g, _b)
     return _r, _g, _b
 
 
@@ -143,7 +157,9 @@ def lighten_color(red, grn, blu, factor=0.1, as_hex=True):
     - factor (float): amount of change to brightness
     - as_hex (bool): if True, return value as a Hexadecimal color string
     """
-    return adjust_color_brightness(red, grn, blu, 1 + factor, as_hex)
+    if as_hex:
+        adjust_color_brightness_hex(red, grn, blu, 1 + factor)
+    return adjust_color_brightness(red, grn, blu, 1 + factor)
 
 
 def darken_color(red, grn, blu, factor=0.1, as_hex=True):
@@ -157,7 +173,9 @@ def darken_color(red, grn, blu, factor=0.1, as_hex=True):
     - factor (float): amount of change to brightness
     - as_hex (bool): if True, return value as a Hexadecimal color string
     """
-    return adjust_color_brightness(red, grn, blu, 1 - factor, as_hex)
+    if as_hex:
+        return adjust_color_brightness_hex(red, grn, blu, 1 - factor)
+    return adjust_color_brightness(red, grn, blu, 1 - factor)
 
 
 def lighten_pymu(color, factor=0.1) -> tuple:
@@ -174,7 +192,7 @@ def lighten_pymu(color, factor=0.1) -> tuple:
     red = color[0] * 255
     grn = color[1] * 255
     blu = color[2] * 255
-    result = adjust_color_brightness(red, grn, blu, 1 + factor, False)
+    result = adjust_color_brightness(red, grn, blu, 1 + factor)
     return result[0] / 255, result[1] / 255, result[2] / 255
 
 
@@ -192,7 +210,7 @@ def darken_pymu(color, factor=0.1) -> tuple:
     red = color[0] * 255
     grn = color[1] * 255
     blu = color[2] * 255
-    result = adjust_color_brightness(red, grn, blu, 1 - factor, False)
+    result = adjust_color_brightness(red, grn, blu, 1 - factor)
     return result[0] / 255, result[1] / 255, result[2] / 255
 
 

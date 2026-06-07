@@ -29,7 +29,7 @@ class LazyEval(object):
 
     def _exec(self):
         if not self.executed:
-            self.value = self.func(*self.args, **self.kw)
+            self.value = self.func(*self.args, **self.kwargs)
             self.executed = True
         return self.value
 

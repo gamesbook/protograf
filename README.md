@@ -2,7 +2,7 @@
 
 ![protograf](logo.png "protograf logo")
 
-__protograf__ is a utility written in Python for creating simple, regular,
+__protograf__ is an application written in Python for creating simple, regular,
 graphical designs in PDF (or PNG/GIF/SVG) format via a script.
 
 __protograf__  has been primarily created to handle the prototyping of cards,
@@ -30,8 +30,8 @@ before proceeding...
 ## :information_desk_person: Support
 
 News and discussion happens at the
-[BoardGameGeek Guild](https://boardgamegeek.com/guild/4528); the developer is
-active there and can also be contacted with a request to join the
+[BoardGameGeek Guild](https://boardgamegeek.com/guild/4528); the developer
+is active there and can also be contacted with a request to join the
 [Discord](https://discord.com/) server for support and chats.
 
 ## :hammer_and_wrench: Requirements
@@ -40,8 +40,10 @@ __protograf__ requires Python (version of 3.13 or higher) to be installed
 and running on your machine.
 
 If this is **not** your current Python version, or Python is not installed on
-your machine, you may want to [install uv](https://docs.astral.sh/uv/getting-started/installation/)
-which is a cross-platform tool able to [install Python](https://docs.astral.sh/uv/guides/install-python).
+your machine, you may want to
+[install uv](https://docs.astral.sh/uv/getting-started/installation/)
+which is a cross-platform tool able to
+[install Python](https://docs.astral.sh/uv/guides/install-python).
 
 If using [uv](https://docs.astral.sh/uv/), it is recommended to also create and use a
 [virtual environment](https://docs.astral.sh/uv/pip/environments/#creating-a-virtual-environment).
@@ -113,6 +115,7 @@ The full feature list is available in the
 * [x] New shapes: Cross and Pod
 * [x] Common gaming objects: Cube, Domino, Die and Pentomino(es)
 * [x] HexHex boards
+* [x] Pathways: (arcs and lines) on a Hexagonal grid
 * [x] Stripes: interior "areas" for a Rectangle
 * [x] Cards:
     * [x] support for card-back designs
@@ -131,7 +134,6 @@ they just represent current / potential areas of work or ideas.
 * [ ] Annular Sectors
 * [ ] Image alteration operations
 * [ ] Hexagon: 18xx tile example
-* [ ] Pathways: (arcs and lines) on a Hexagonal grid
 * [ ] Cards:
     * [ ] extraction as TableTopSimulator deck
     * [ ] icon alignment
@@ -140,7 +142,7 @@ they just represent current / potential areas of work or ideas.
 
 These are possible examples to show board creation based on existing games:
 
-* [ ] Wargame board: Squad Leader with full terrain features (vector and bitmap)
+* [x] Wargame board: show full terrain features (vector and bitmap)
 * [ ] Traveller board: show a fully-styled Star System
 * [x] WarpWar board: show a fully-styled example
 * [ ] 18xx board: show a basic map with tracks, towns, cities and off-map areas

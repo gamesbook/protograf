@@ -125,9 +125,9 @@ score_common = Common(
     label_size=21, label_stroke="white")
 score_base = circle(common=score_common, stroke="#11B6E4", fill="#008FCE")
 score_5 = circle(
-    common=score_common, stroke="#7BC9E6", fill="#3FA1BB", label="{{sequence}}")
+    common=score_common, stroke="#7BC9E6", fill="#3FA1BB", label="{{sequence+1}}")
 score_10 = circle(
-    common=score_common, stroke="#EEE544", fill="#B5CDB0", label="{{sequence}}")
+    common=score_common, stroke="#EEE544", fill="#B5CDB0", label="{{sequence+1}}")
 score_track = RectangularLocations(
     x=7.5, y=6.5, cols=32, rows=19, interval=1.54,
     start="SE", direction="west", pattern="outer")

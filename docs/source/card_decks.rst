@@ -23,6 +23,7 @@ and that you've created some basic scripts of your own using the
 
   - `Deck Example 1. Default Card Size`_
   - `Deck Example 2. Copy & Mask`_
+  - `Deck Example 3. Create a Card Gallery`_
 - `The Card Command`_
 - `The CardBack Command`_
 - `The Data Command`_
@@ -77,6 +78,8 @@ The following are key properties that will usually need to be set for a
   The ``Deck`` command is covered in detail, with examples of all of its
   properties, in `The Deck Command <deck_command.html>`_ section.
 
+
+.. _deckcommandExamples:
 
 Deck Example 1. Default Card Size
 ---------------------------------
@@ -147,6 +150,46 @@ The dataset that could be used with the above Deck is shown in
 
 The full code - including the data - for this example is available as
 `cards_lotr.py <https://github.com/gamesbook/protograf/blob/master/examples/cards/cards_lotr.py>`_
+
+
+Deck Example 3. Create a Card Gallery
+-------------------------------------
+
+Here is an example of a customised ``Deck`` command used to create an output
+file that contains many cards in a single page.  The ``Save`` command, in
+turn will create a PNG image for each page:
+
+.. code:: python
+
+    Deck(
+        cards=108,
+        gallery=(9, 6),
+    )
+
+    Save(
+        output='png',
+        dpi=300,
+    )
+
+In this example, the cards will be laid out in a gallery, or grid, of
+nine cards wide ("cards per row") by six cards high ("cards per column") |dash|
+for a total of up to 54 cards per page of the PDF.
+
+In this case, because there are 108 cards, and the ``Save()`` command has the
+*output* property set to ``png``, two PNG images will be created.
+
+The size of a PNG file will depend on the *dpi* setting for the ``Save()``
+command.
+
+This type of PNG image can be used as an input when creating digital card
+decks in programs such as TableTop Simulator (TTS).
+
+.. IMPORTANT::
+
+    The *gallery* setting **will** override any margins that have been set
+    |dash| all will be reset to ``0``. It will also ignore any *bleed*
+    areas or *spacing* between cards.  Cards backs will not be laid out in
+    any offset fashion and the *gutter* will not be used.
 
 
 .. _the-card-command:

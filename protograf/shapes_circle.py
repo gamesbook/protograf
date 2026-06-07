@@ -908,13 +908,13 @@ class CircleShape(BaseShape):
             cnv.draw_line(
                 (0, gy + self._u.radius * 2.0), (deltag, gy + self._u.radius * 2.0)
             )
-            gx, gy = x - self._u.radius, globals.page[1]  # top-side
+            gx, gy = x - self._u.radius, globals.page.size[1]  # top-side
             cnv.draw_line((gx, gy), (gx, gy - deltag))
             cnv.draw_line(
                 (gx + self._u.radius * 2.0, gy),
                 (gx + self._u.radius * 2.0, gy - deltag),
             )
-            gx, gy = globals.page[0], y - self._u.radius  # right-side
+            gx, gy = globals.page.size[0], y - self._u.radius  # right-side
             cnv.draw_line((gx, gy), (gx - deltag, gy))
             cnv.draw_line(
                 (gx, gy + self._u.radius * 2.0), (gx - deltag, gy + self._u.radius * 2)

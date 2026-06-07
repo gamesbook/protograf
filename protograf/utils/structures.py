@@ -8,10 +8,13 @@ from collections import namedtuple
 from dataclasses import dataclass
 from enum import Enum
 import logging
-from typing import List
+from typing import Any, List, NamedTuple
 
 # third-party
 from jinja2 import Template
+
+# local
+from .constants import MAXIMUM_PAGE_WIDTH, MAXIMUM_PAGE_HEIGHT
 
 log = logging.getLogger(__name__)
 
@@ -85,8 +88,10 @@ Bounds = namedtuple(
     ],
 )
 
+"""
 cb_fields = ("fill", "offset_x", "offset_y", "offset_radius")
 CardBleed = namedtuple("CardBleed", cb_fields, defaults=(None,) * len(cb_fields))
+"""
 
 # ---- * CrossParts
 CrossParts = namedtuple(
@@ -120,21 +125,25 @@ GridShape = namedtuple(
 GlobalDocument = namedtuple(
     "GlobalDocument",
     [
+        "archive",
         "base",
-        "deck",
-        "card_frames",
-        "filename",
-        "directory",
-        "document",
-        "doc_page",
+        "black",
         "canvas",
+        "card_frames",
+        "color_model",
+        "css",
+        "deck",
+        "directory",
+        "doc_page",
+        "document",
+        "filename",
+        "font_size",
         "margins",
         "page",
-        "page_fill",
-        "page_width",
-        "page_height",
         "page_count",
-        "page_grid",
+        "paper",
+        "units",
+        "white",
     ],
 )
 
@@ -152,28 +161,21 @@ HexGeometry = namedtuple(
     ],
 )
 
+# ---- * HexEdgeResult - use for GridLine edge path
+HexEdgeResult = namedtuple(
+    "HexEdgeResult",
+    [
+        "edge",  # compass direction / edge
+        "end",  # compass direction / vertex
+    ],
+)
+# ---- * LookupType
 LookupType = namedtuple("LookupType", ["column", "lookups"])
 
+# ---- * Link
 Link = namedtuple("Link", ["a", "b", "style"])
 
-# ---- * Locale
-fields = (
-    "col",
-    "row",
-    "x",
-    "y",
-    "xy",
-    "cxy",
-    "height",
-    "width",
-    "id",
-    "sequence",
-    "corner",
-    "label",
-    "page",
-)
-Locale = namedtuple("Locale", fields, defaults=(None,) * len(fields))
-
+# ---- * OffsetProperties
 OffsetProperties = namedtuple(
     "OffsetProperties",
     [
@@ -182,76 +184,6 @@ OffsetProperties = namedtuple(
         "delta_x",
         "delta_y",
     ],
-)
-
-
-# ---- * ClockGeometry
-clockgeometry_fields = (
-    "h1",
-    "h2",
-    "h3",
-    "h4",
-    "h5",
-    "h6",
-    "h7",
-    "h8",
-    "h9",
-    "h10",
-    "h11",
-    "h12",
-)
-ClockGeometry = namedtuple(
-    "ClockGeometry", clockgeometry_fields, defaults=(None,) * len(clockgeometry_fields)
-)
-
-# ---- * ShapeGeometry
-# N = 90, W = 180, S = 270, E = 0
-# NE = 45, NW = 135, SW = 225, SE = 315
-# NNW =
-shapegeometry_fields = (
-    # points
-    "centre",
-    "center",
-    "c",
-    "n",
-    "s",
-    "e",
-    "w",
-    "ne",
-    "se",
-    "nw",
-    "sw",
-    "nnw",
-    "nne",
-    "sse",
-    "ssw",
-    "wnw",
-    "ene",
-    "ese",
-    "wsw",
-    "v",
-    "vertices",
-    "p",
-    "perbii",
-    # lengths
-    "radius",
-    "diameter",
-    "side",
-    "length",
-    "width",
-    "height",
-    "perimeter",
-    # other
-    "area",
-    "sides",  # e.g. for a regular Polygon
-    # meta
-    "t",
-    "type",
-    "shapetype",
-    "name",
-)
-ShapeGeometry = namedtuple(
-    "ShapeGeometry", shapegeometry_fields, defaults=(None,) * len(shapegeometry_fields)
 )
 
 # ----  PAGEMARGINS
@@ -358,6 +290,110 @@ UnitProperties = namedtuple(
     ],
 )
 
+# ---- NAMEDTUPLE CLASS
+
+
+class CardBleed(NamedTuple):
+    """Attributes for setting bleed color and extent around a Card"""
+
+    fill: Any | None = None
+    offset_x: float | None = None
+    offset_y: float | None = None
+    offset_radius: float | None = None
+
+
+class ClockGeometry(NamedTuple):
+    """Clock-hour locations on the circumference of a Circle"""
+
+    h1: Point | None = None
+    h2: Point | None = None
+    h3: Point | None = None
+    h4: Point | None = None
+    h5: Point | None = None
+    h6: Point | None = None
+    h7: Point | None = None
+    h8: Point | None = None
+    h9: Point | None = None
+    h10: Point | None = None
+    h11: Point | None = None
+    h12: Point | None = None
+
+
+class ShapeGeometry(NamedTuple):
+    """Key points and spatial attributes of a Shape
+
+    # N = 90, W = 180, S = 270, E = 0
+    # NE = 45, NW = 135, SW = 225, SE = 315
+    # NNW =
+    """
+
+    # points
+    centre: Point | None = None
+    center: Point | None = None
+    c: Point | None = None
+    n: Point | None = None
+    s: Point | None = None
+    e: Point | None = None
+    w: Point | None = None
+    ne: Point | None = None
+    se: Point | None = None
+    nw: Point | None = None
+    sw: Point | None = None
+    nnw: Point | None = None
+    nne: Point | None = None
+    sse: Point | None = None
+    ssw: Point | None = None
+    wnw: Point | None = None
+    ene: Point | None = None
+    ese: Point | None = None
+    wsw: Point | None = None
+    v: list | None = None
+    vertices: list | None = None
+    p: Point | None = None
+    perbii: list | None = None
+    # lengths
+    radius: float | None = None
+    diameter: float | None = None
+    side: float | None = None
+    length: float | None = None
+    width: float | None = None
+    height: float | None = None
+    perimeter: float | None = None
+    # other
+    area: float | None = None
+    sides: int | None = None  # e.g. for a regular Polygon
+    # meta
+    t: str | None = None
+    type: str | None = None
+    shapetype: str | None = None
+    name: str | None = None
+
+
+class Locale(NamedTuple):
+    """Key values and spatial attributes of a Locale
+
+    Note:
+        * Typically used for a grid-like or cell location
+    """
+
+    col: int | None = None
+    row: int | None = None
+    x: float | None = None
+    y: float | None = None
+    xy: Point | None = None
+    cxy: Point | None = None
+    geo: ShapeGeometry | None = None
+    height: float | None = None
+    width: float | None = None
+    radius: float | None = None
+    side: float | None = None
+    id: int | None = None
+    sequence: int | None = None
+    corner: bool = False
+    label: str | None = None
+    page: int | None = None
+
+
 # ---- DATACLASS
 
 
@@ -373,6 +409,19 @@ class BBox:
 
     tl: Point
     br: Point
+
+
+@dataclass
+class DocumentPage:
+    """DocumentPage holds settings and properties for pages in a PyMyPDF document"""
+
+    size: tuple  # (width, height) in points; paper => DEFAULT_PAGE_SIZE
+    width: float  # user units
+    height: float  # user units
+    fill: tuple | None  # color (RGB/CYMK); "white"
+    grid: float  # grid interval in user units
+    current: int  # current page number (from 0 on)
+    gallery: tuple = (MAXIMUM_PAGE_WIDTH, MAXIMUM_PAGE_HEIGHT)  # maximum extent in pts
 
 
 @dataclass
@@ -426,3 +475,42 @@ class VirtualHex:
     spine: int
     zone: str
     orientation: HexOrientation
+
+
+# ---- "FIXED" DICT
+
+# ---- * Travel outcomes for GridLine edges
+HEX_FLAT_EDGE_TRAVEL = {  # startpoint / direction => result
+    # travel across edge of a hex
+    ("ne", "w"): HexEdgeResult(edge="n", end="nw"),
+    ("ne", "ne"): HexEdgeResult(edge="se", end="nw"),
+    ("ne", "se"): HexEdgeResult(edge="ne", end="e"),
+    ("e", "nw"): HexEdgeResult(edge="ne", end="ne"),
+    ("e", "e"): HexEdgeResult(edge="n", end="ne"),
+    ("e", "sw"): HexEdgeResult(edge="s", end="se"),
+    ("se", "ne"): HexEdgeResult(edge="se", end="e"),
+    ("se", "se"): HexEdgeResult(edge="sw", end="sw"),
+    ("se", "w"): HexEdgeResult(edge="s", end="sw"),
+    ("sw", "e"): HexEdgeResult(edge="s", end="se"),
+    ("sw", "nw"): HexEdgeResult(edge="sw", end="w"),
+    ("sw", "sw"): HexEdgeResult(edge="se", end="se"),
+    ("w", "w"): HexEdgeResult(edge="s", end="sw"),
+    ("w", "ne"): HexEdgeResult(edge="nw", end="nw"),
+    ("w", "se"): HexEdgeResult(edge="sw", end="sw"),
+    ("nw", "e"): HexEdgeResult(edge="n", end="ne"),
+    ("nw", "nw"): HexEdgeResult(edge="ne", end="ne"),  # odd cols; travel up&left
+    ("nw", "sw"): HexEdgeResult(edge="nw", end="w"),
+    # travel across middle of a hex
+    ("nw", "ne"): HexEdgeResult(edge="-", end="ne"),
+    ("nw", "w"): HexEdgeResult(edge="-", end="ne"),
+    ("ne", "nw"): HexEdgeResult(edge="-", end="nw"),
+    ("ne", "e"): HexEdgeResult(edge="-", end="nw"),
+    ("sw", "ne"): HexEdgeResult(edge="-", end="ne"),
+    ("sw", "se"): HexEdgeResult(edge="-", end="se"),
+    ("w", "nw"): HexEdgeResult(edge="-", end="nw"),
+    ("w", "sw"): HexEdgeResult(edge="-", end="sw"),
+    ("e", "ne"): HexEdgeResult(edge="-", end="ne"),
+    ("e", "se"): HexEdgeResult(edge="-", end="se"),
+    ("se", "sw"): HexEdgeResult(edge="-", end="sw"),
+    ("se", "nw"): HexEdgeResult(edge="-", end="nw"),
+}

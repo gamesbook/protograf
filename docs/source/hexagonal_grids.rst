@@ -22,7 +22,7 @@ and that you've created some basic scripts of your own using the
 - `Circular Hexagonal Grid`_
 - `Diamond Hexagonal Grid`_
 - `Grid Locations`_
-- `Grid LinkLine`_
+- `Grid GridLine`_
 - `Other Hexagonal Grid Resources`_
 
 
@@ -428,7 +428,7 @@ Offset
         grid |dash| or every even row |dash| for a pointy grid |dash| is
         offset by one-half hexagon from those on either side
       - *coord_...* - various settings to control the appearance of the
-        `hex coordinates <rectHGCoords_>`_
+        `hexagon coordinates <rectHGCoords_>`_
 
 ===== ======
 
@@ -920,17 +920,63 @@ Example 4.  Locations & Col/Row
 ===== ======
 
 
-.. _linkline-command:
+.. _gridline-command:
 
-Grid LinkLine
+Grid GridLine
 =============
 `↑ <table-of-contents-hexg_>`_
 
-The ``LinkLine()`` command allows the creation of a line to join one or more
-hexagons within a hexagonal grid.
+The ``GridLine()`` command allows the creation of a line, or lines, joining,
+or running along or between  the edges of, one or more hexagons within a
+hexagonal grid.
 
 This command should work with any of the types of hexagonal grid layouts
 described above.
+
+.. HINT::
+
+    One example of the use of the ``GridLine`` command is drawing features
+    on a hex-gridded map; such as tracks, roads, railways / railroads,
+    rivers, hedges, regional boundaries or borders, or any other similar
+    linear features.
+
+    See an :ref:`example wargame board <commercialGameTannenburg>` for
+    such applications of the ``GridLine`` command.
+
+GridLine Properties
+-------------------
+`^ <Grid GridLine_>`_
+
+The ``GridLine()`` command has the following key properties:
+
+* *hexgrid* - this is the first property that **must** be assigned; it is the
+  name of a ``Hexagons()`` grid that must already have been created by the
+  script
+* *locations* - a set of locations in the grid; either as a string containing
+  comma-separated values or as a list (using square brackets `[` and `]``);
+  these location's centres will be joined by straight lines
+* *edges* - a set of directions in the grid; either as a string containing
+  comma-separated values or as a list (using square brackets `[` and `]``);
+  these will result in a continous line **along** hexagon edges
+* *paths* - a set of directions in the grid; either as a string containing
+  comma-separated values or as a list (using square brackets `[` and `]``);
+  these will result in a continous line **between** hexagon edges
+
+For the *edges* and *paths* to work, the following properties must also be
+set:
+
+* *start* - this is a named location in the grid
+* *point* - this a compass-based point reference for the starting hexagon
+  |dash| either a vertex for *paths*; or a perbis (centre point of an edge)
+  for *edges*
+
+The ``GridLine`` can be styled by setting the usual styling properties that
+are applicable to a :ref:`Line <line-command>`.
+
+
+GridLine Examples
+-----------------
+`^ <Grid GridLine_>`_
 
 All of the examples below make use of the same underlying hexagonal grid:
 
@@ -944,27 +990,35 @@ All of the examples below make use of the same underlying hexagonal grid:
             coord_elevation='top'
         )
 
-The grid is assigned the name *hexgrid* so its result can be reused.
+This grid is assigned the name *hexgrid* so its result can be reused.
+
+* `Example 1. A Single GridLine`_
+* `Example 2. A Double GridLine`_
+* `Example 3. A Styled GridLine`_
+* `Example 4. An Offset GridLine`_
+* `Example 5. GridLine as a Path`_
+* `Example 6. GridLine along Edges`_
+* `Example 7. GridLine Custom Paths and Edges`_
 
 
-Example 1. A Single LinkLine
-----------------------------
-`^ <Grid LinkLine_>`_
+Example 1. A Single GridLine
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+`^ <GridLine Examples_>`_
 
 .. |ll0| image:: images/custom/hexagonal_grid/hexgrid_linkline_single.png
    :width: 330
 
 ===== ======
-|ll0| This example shows a ``LinkLine`` constructed using the command:
+|ll0| This example shows a ``GridLine`` constructed using the command:
 
       .. code:: python
 
-        LinkLine(
+        GridLine(
             grid=hexgrid,
             locations="0101,0403"
         )
 
-      The ``LinkLine`` command  has the following properties:
+      The ``GridLine`` command  has the following properties:
 
       - *grid* used is *hexgrid* (as defined for all these examples)
       - *locations* - set to ``"0101,0403"``
@@ -979,27 +1033,28 @@ Example 1. A Single LinkLine
 ===== ======
 
 
-Example 2. A Double LinkLine
-----------------------------
-`^ <Grid LinkLine_>`_
+Example 2. A Double GridLine
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+`^ <GridLine Examples_>`_
 
 .. |ll1| image:: images/custom/hexagonal_grid/hexgrid_linkline_double.png
    :width: 330
 
 ===== ======
-|ll1| This example shows a ``LinkLine`` constructed using the command:
+|ll1| This example shows a ``GridLine`` constructed using the command:
 
       .. code:: python
 
-        LinkLine(
+        GridLine(
             hexgrid,
-            "0101,0403,0104"
+            locations="0101,0403,0104"
         )
 
-      The ``LinkLine`` command  has the following properties:
+      The ``GridLine`` command  has the following properties:
 
       - the grid used is *hexgrid* (as defined for all these examples)
-      - *locations* are set to ``"0101,0403,0104"``
+      - *locations* are set to the comma-delimited string
+        ``"0101,0403,0104"``
 
       The string contains the coordinates of multiple start and
       end locations in the grid, between which the line is drawn.
@@ -1011,45 +1066,45 @@ Example 2. A Double LinkLine
       centre of the hexagon in which it starts or ends, and uses the
       default styling.
 
-      **Note** that in this example, the *grid=* and *locations=* are omitted;
-      the program can just use the values presented, provided they are in the
-      correct order shown above.
+      **Note** that in this example, the ``grid=`` is omitted;
+      the program can just use the value presented, provided its appears
+      first in the command.
 
 ===== ======
 
 
-Example 3. A Styled LinkLine
-----------------------------
-`^ <Grid LinkLine_>`_
+Example 3. A Styled GridLine
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+`^ <GridLine Examples_>`_
 
 .. |ll2| image:: images/custom/hexagonal_grid/hexgrid_linkline_multi_style.png
    :width: 330
 
 ===== ======
-|ll2| This example shows a ``LinkLine`` constructed using the command:
+|ll2| This example shows a ``GridLine`` constructed using the command:
 
       .. code:: python
 
-        LinkLine(
+        GridLine(
             hexgrid,
-            ["0101", "0403", "0104", "0406"],
+            locations=["0101", "0403", "0104", "0406"],
             common=Common(
                 stroke="tomato",
                 stroke_width=2)
         )
-        LinkLine(
+        GridLine(
             hexgrid,
-            ["0104", "0406"],
+            locations=["0104", "0406"],
             common=Common(
                 stroke="cyan",
                 stroke_width=2)
         )
 
-      The ``LinkLine`` commands have the following properties:
+      The ``GridLine`` commands have the following properties:
 
       - the grid used is *hexgrid* (as defined for all these examples)
-      - ``["0101","0403","0104","0406"]`` - location coordinates
-      - ``["0104","0406"]`` - location coordinates
+      - ``["0101","0403","0104","0406"]`` - locations coordinates
+      - ``["0104","0406"]`` - locations coordinates
       - *common* - defines the styling for the line
 
       The location coordinates contain multiple start and end locations in
@@ -1059,53 +1114,283 @@ Example 3. A Styled LinkLine
       in a list.
 
       By default, the lines use the *x* and *y* values of the centre of the
-      hex in which they start or end.
+      hexagon in which they start or end.
 
 ===== ======
 
 
-Example 4. An Offset LinkLine
------------------------------
-`^ <Grid LinkLine_>`_
+Example 4. An Offset GridLine
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+`^ <GridLine Examples_>`_
 
 .. |ll3| image:: images/custom/hexagonal_grid/hexgrid_linkline_offset.png
    :width: 330
 
 ===== ======
-|ll3| This example shows a ``LinkLine`` constructed using the command:
+|ll3| This example shows a ``GridLine`` constructed using the command:
 
       .. code:: python
 
-        LinkLine(
+        GridLine(
             hexgrid,
-            [("0101", 0.25, 0.25),
-             ("0403", -0.25, -0.25),
-             ("0104", 0.0, 0.25),
-             ("0104", 0.25, -0.25)],
+            locations=[
+              ("0101", 0.25, 0.25),
+              ("0403", -0.25, -0.25),
+              ("0104", 0.0, 0.25),
+              ("0104", 0.25, -0.25)],
             common=Common(
-                stroke="tomato",
-                stroke_width=1,
-                dotted=True)
+              stroke="tomato",
+              stroke_width=1,
+              dotted=True)
         )
 
-      The ``LinkLine`` command  has the following properties:
+      The ``GridLine`` command  has the following properties:
 
       - the grid used is *hexgrid* (as defined for all these examples)
-      - ``("0101", 0.25, 0.25)`` - coordinates of a grid location and the
-        **offset** values
+      - *locations* - each values in this list is of the form of a set of values
+        such as ``("0101", 0.25, 0.25)`` - these are the coordinates of a grid
+        location as well as the two **offset** values
       - *common* - this third property defines the styling for the line
 
-      The **offset** values |dash|  *x* and *y*  |dash| are *relative* to
-      the centre of the hex in which the line starts or ends.
+      The **offset** values |dash| *x* and *y* |dash| are distances that are
+      *relative* to the centre of the hexagon in which the line starts or ends.
 
       Positive values for the offset move the *x* and *y* down and to the
       right of the centre; negatives move the *x* and *y* up and to the
       left of the centre.
 
       Note that its possible to define the start and end as different offsets
-      within the **same** hexagon; as shown here in location ``0104``.
+      within the **same** hexagon; as shown here for location ``0104`` (the
+      last one in the list).
 
 ===== ======
+
+
+Example 5. GridLine as a Path
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+`^ <GridLine Examples_>`_
+
+.. |ll4| image:: images/custom/hexagonal_grid/hexgrid_paths_multi_style.png
+   :width: 330
+
+===== ======
+|ll4| This example shows the use of the ``GridLine`` command:
+
+      .. code:: python
+
+        hexgrid = Hexagons(
+            side=0.5,
+            x=0, y=0.1,
+            rows=6, cols=5,
+        )
+        GridLine(
+            hexgrid,
+            start="0106",
+            point="nw",
+            paths=["ne", "ne", "n", "se", "s", "se", "s"],
+            stroke="cyan",
+            stroke_width=6
+        )
+        GridLine(
+            hexgrid,
+            start="0103",
+            point="c",
+            paths="ne,ne,se,se,c",
+            stroke="grey",
+            stroke_width=3
+        )
+        Hexagons(
+            side=0.5,
+            x=0, y=0.1,
+            rows=6, cols=5,
+            dot=0.02,
+            coord_elevation='top',
+            fill=None
+        )
+
+      The ``GridLine`` command  has the following properties:
+
+      - the grid used is *hexgrid* (as defined for all these examples)
+      - *start* represents the location of a hexagon in the grid from
+        which the line will be drawn
+      - *point* represents a point (a perbis |dash| or centre point of an
+        edge) of the starting hexagon
+
+      The *paths* can be specified either as:
+
+      - a list; for example, the blue line is drawn using the values
+        ``["ne", "ne", "n", "se", "s", "se", "s"]``
+      - a string; for example, the grey line is drawn using the values
+        ``"ne,ne,se,se,c"``; observe that this path starts in the centre
+        of the starting hexagon by using the string ``"c"`` and ends in
+        the centre of the last hexagon of the line
+
+===== ======
+
+
+Example 6. GridLine along Edges
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+`^ <GridLine Examples_>`_
+
+.. |ll5| image:: images/custom/hexagonal_grid/hexgrid_edges_multi_style.png
+   :width: 330
+
+===== ======
+|ll5| This example shows the use of the ``GridLine`` command:
+
+      .. code:: python
+
+        hexgrid = Hexagons(
+            side=0.5, x=0, y=0.1, rows=6, cols=5)
+        GridLine(
+            hexgrid,
+            start="0203",
+            point="nw",
+            edges="e,ne,e,se,nw,ne,e",
+            stroke="green",
+            stroke_width=4,
+            stroke_ends="rounded"
+        )
+        GridLine(
+            hexgrid,
+            start="0504",
+            point="ne",
+            edges=["w", "sw", "w", "nw"] * 2,
+            stroke="red",
+            stroke_width=2,
+            dotted=True
+        )
+        GridLine(
+            hexgrid,
+            start=["0106", "0306", "0506"],
+            point="ne",
+            edges="*",
+            stroke="black",
+            stroke_width=2
+        )
+        Hexagons(
+            side=0.5,
+            x=0, y=0.1,
+            rows=6, cols=5,
+            fill=None,
+            dot=0.02,
+            coord_elevation='top'
+        )
+
+      A ``GridLine`` command has the following properties:
+
+      - the grid used is *hexgrid* (as defined for all these examples)
+      - *start* represents the location of a hexagon in the grid from
+        which the line will be drawn
+      - *point* represents a point (a vertex) of the starting hexagon
+
+      The *edges* can be specified either as:
+
+      - a list; for example, the red line is drawn using the values
+        ``["w", "sw", "w", "nw"] * 2`` - this ``* 2`` means the list is
+        used twice to repeat the pattern
+      - a string; for example, the green line is drawn using the values
+        ``"e,ne,e,se,nw,ne,e"``; observe that the "branch" line is drawn
+        by reversing the previous direction to move "backwards"
+      - a ``'*'``; in this case (the black line) the edges are drawn all
+        around the start hexagon
+
+      Note the the various line styling properties affect **how** the line is
+      drawn |dash| as oppposed to **where** it is drawn.
+
+===== ======
+
+
+Example 7. GridLine Custom Paths and Edges
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+`^ <GridLine Examples_>`_
+
+.. |ll6| image:: images/custom/hexagonal_grid/hexgrid_paths_edges_custom.png
+   :width: 330
+
+===== ======
+|ll6| This example shows the use of the ``GridLine`` command:
+
+      .. code:: python
+
+        hexgrid = Hexagons(
+          side=0.5,
+          x=0, y=0.1,
+          rows=6, cols=5,
+        )
+
+        road = "ne=,se=,ne=,n"
+        GridLine(
+          hexgrid,
+          start="0102",
+          point="nw",
+          paths=road,
+          stroke="grey",
+          stroke_width=4
+        )
+        GridLine(
+          hexgrid,
+          start="0102",
+          point="nw",
+          paths=road,
+          stroke="silver",
+          stroke_width=2
+        )
+
+        GridLine(
+          hexgrid,
+          start="0104",
+          point="sw",
+          edges="ne,ne,e,se,se,sw,sw,w,nw,nw",
+          stroke="tan",
+          stroke_width=6,
+          stroke_ends="rounded"
+        )
+        GridLine(
+          hexgrid,
+          start="0504",
+          point="se",
+          edges="nw,nw,w,sw,sw,se,se,e,ne,ne",
+          stroke="palegreen",
+          stroke_width=6,
+          stroke_ends="rounded"
+        )
+
+        Hexagons(
+          side=0.5,
+          x=0, y=0.1,
+          rows=6, cols=5,
+          dot=0.02,
+          coord_elevation='top',
+          fill=None
+        )
+
+      As in other examples, ``GridLine`` commands have the following properties:
+
+      - the grid used is *hexgrid* (as defined for all these examples)
+      - *start* represents the location of a hexagon in the grid from
+        which the line will be drawn
+      - *point* represents a point on the starting hexagon
+
+      In the upper example, the *paths* property is assigned to a name |dash|
+      *road* |dash| which has been defined as a series of directions; some
+      of which have an equal sign ``=`` appended.  This sign is an instruction
+      to draw the path line straight, rather than curved, but **only** applies
+      to the "long" curves.
+
+      In addition, the upper example shows how two lines can be drawn on the
+      same path to create a styled effect: in this case, the thinner, light
+      grey line is drawn over the thicker, dark grey line.
+
+      In the lower two examples, the *edges* property is used to draw lines
+      from the corner (or vertex) of a hexagon to the **opposite** corner
+      (or vertex).  No special symbols are are required for this.  Note that
+      while the two outcomes |dash| brown and green lines |dash| look the
+      same, that one is drawn in a clockwise direction and the other in an
+      anti-clockwise direction.
+
+===== ======
+
 
 .. _other-hexagonal-resources:
 
@@ -1149,7 +1434,7 @@ are listed below:
 The options and facilities provided by these tools have been the primary
 inspiration for how hexagonal grids work in **protograf**. If the
 functionality available here does not work for you, then possibly one of
-these other tools would be of better fit.
+these other tools might be a better fit.
 
 .. HINT::
 

@@ -321,7 +321,7 @@ class PolygonShape(BaseShape):
         cnv,
         ID,
         centre: Point,
-        rotation: float = None,
+        rotation: float | None = None,
     ):
         """Draw lines connecting the Polygon centre to the centre of each edge.
 
@@ -389,7 +389,7 @@ class PolygonShape(BaseShape):
         cnv,
         ID,
         centre: Point,
-        rotation: float = None,
+        rotation: float | None = None,
     ):
         """Draw lines connecting the Polygon centre to each of the vertices."""
         _radii = []
@@ -492,7 +492,7 @@ class PolygonShape(BaseShape):
             if cid > len(slices_colors) - 1:
                 cid = 0
 
-    def get_geometry(self, rotation: float = None):
+    def get_geometry(self, rotation: float | None = None):
         """Calculate centre, radius, side, vertices and sides of Polygon."""
         centre = self._shape_centre
         x, y = centre.x, centre.y

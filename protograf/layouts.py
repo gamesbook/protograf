@@ -480,7 +480,10 @@ class TableShape(BaseShape):
 
     @lru_cache(maxsize=999)
     def cell(
-        self, cell_id: str = None, pad_x: float = None, pad_y: float = None
+        self,
+        cell_id: str | None = None,
+        pad_x: float | None = None,
+        pad_y: float | None = None,
     ) -> Locale:
         """Retrieve cell attributes as a Locale in user units."""
         data = self._cell(cell_id)
@@ -512,7 +515,7 @@ class TableShape(BaseShape):
         return user_cell
 
     @lru_cache(maxsize=999)
-    def _cell(self, cell_id: str = None) -> Locale:
+    def _cell(self, cell_id: str | None = None) -> Locale:
         """Retrieve cell attributes as a Locale excluding Table padding."""
         try:
             _id = cell_id.upper()
@@ -963,7 +966,9 @@ class VirtualShape:
             _label = f" for {label}" if label else ""
             feedback(f'"{value}"{_label} is not a valid floating number!', True)
 
-    def unit(self, item, units: str = None, skip_none: bool = False, label: str = ""):
+    def unit(
+        self, item, units: str | None = None, skip_none: bool = False, label: str = ""
+    ):
         """Convert an item into the appropriate unit system."""
         log.debug("units %s %s :: label: %s", units, globals.units, label)
         if item is None and skip_none:
