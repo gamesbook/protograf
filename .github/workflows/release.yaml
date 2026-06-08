@@ -8,6 +8,10 @@ on:
       - "[0-9]+.[0-9]+.[0-9]+b[0-9]+"
       - "[0-9]+.[0-9]+.[0-9]+rc[0-9]+"
   workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Release tag (leave empty to use latest tag)'
+        required: false
 
 env:
   PACKAGE_NAME: "protograf"
@@ -20,8 +24,13 @@ jobs:
       new_version: ${{ steps.release.outputs.new_version }}
       suffix: ${{ steps.release.outputs.suffix }}
       tag_name: ${{ steps.release.outputs.tag_name }}
+    permissions:
+      contents: write
+
     steps:
       - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0  # Required to fetch all tags
 
       - name: Extract tag and Details
         id: release
@@ -36,10 +45,21 @@ jobs:
             echo "Version is $NEW_VERSION"
             echo "Suffix is $SUFFIX"
             echo "Tag name is $TAG_NAME"
+          elif [ "${{ github.event_name }}" = "push" ]; then
+            # Tag push: use the pushed tag directly
+            TAG_NAME=${GITHUB_REF#refs/tags/}"
+            NEW_VERSION=$(echo $TAG_NAME | awk -F'-' '{print $1}')
+            SUFFIX=$(echo $TAG_NAME | grep -oP '[a-z]+[0-9]+' || echo "")
+            echo "new_version=$NEW_VERSION" >> "$GITHUB_OUTPUT"
+            echo "suffix=$SUFFIX" >> "$GITHUB_OUTPUT"
+            echo "tag_name=$TAG_NAME" >> "$GITHUB_OUTPUT"
+            echo "Version is $NEW_VERSION"
+            echo "Suffix is $SUFFIX"
+            echo "Tag name is $TAG_NAME"
           else
-            git fetch --tags  # MASTER tags via manual workflow_dispatch
-            # find latest tag reachable specifically from the master branch
-            TAG_NAME=$(git describe --tags --abbrev=0)
+            # Manual run with no input: use latest tag
+            LATEST_TAG=$(git describe --tags --abbrev=0)
+            TAG_NAME=${LATEST_TAG}"
             NEW_VERSION=$(echo $TAG_NAME | awk -F'-' '{print $1}')
             SUFFIX=$(echo $TAG_NAME | grep -oP '[a-z]+[0-9]+' || echo "")
             echo "new_version=$NEW_VERSION" >> "$GITHUB_OUTPUT"
