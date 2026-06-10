@@ -12,9 +12,6 @@ on:
       tag:
         description: 'Release tag (leave blank to use latest tag)'
         required: falseLATEST_TAG=$(git describe --tags --abbrev=0)
-TAG_NAME=${LATEST_TAG}
-NEW_VERSION=$(echo $TAG_NAME | awk -F'-' '{print $1}')
-SUFFIX=$(echo $TAG_NAME | grep -oP '[a-z]+[0-9]+' || echo "")
 
 env:
   PACKAGE_NAME: "protograf"
