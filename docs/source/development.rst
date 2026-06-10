@@ -131,7 +131,7 @@ run as normal |dash| then a new version can be released.
 
 Follow this process:
 
-- |check| Format primary code with black (``black --target-version py311 protograf``);
+- |check| Format primary code with black (``black --target-version py313 protograf``);
   update the Python version as needed
 - |check| Finalise release date and notes in ``CHANGES.txt``
 - |check| Ensure all the examples can be run by using shell script(s)
@@ -145,6 +145,7 @@ Follow this process:
 - |check| Ensure you are on the ``master`` branch and ``git pull`` changes
 - |check| Update the version using poetry e.g. ``poetry version patch``
   and inspect ``pyproject.toml`` to ensure it has changed
+- [check] Ensure ``pyproject.toml`` is up-to-date by running ``poetry lock```
 - |check| Git commit and push all these changes to GitHub
 - |check| Add a tag that matches the poetry version e.g. ``git tag 0.1.2``
 - |check| Push tag to GitHub i.e. ``git push origin --tags``
