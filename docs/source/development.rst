@@ -41,6 +41,25 @@ Note, however, that this project "breaks" a few normal conventions:
 Code is formatted using ``black`` (https://black.readthedocs.io/) which is
 triggered as a GitHub action |dash| see the ``.github/workflows/`` directory.
 
+Testing
+=======
+
+GitHub Actions
+--------------
+
+GitHub Actions are tested with Act which is an open-source tool that lets you
+run workflows locally using a Docker-based approach.
+
+Install on Linux via::
+
+    curl https://raw.githubusercontent.com/nektos/act/master/install.sh | sudo bash
+
+For example, to test the effects of a push command::
+
+    act push --verbose
+
+(You may need to use act via ``./bin/act``)
+
 
 Package Management
 ==================

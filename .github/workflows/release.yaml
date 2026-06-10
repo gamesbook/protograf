@@ -10,7 +10,7 @@ on:
   workflow_dispatch:
     inputs:
       tag:
-        description: 'Release tag (leave blank to use the latest tag)'
+        description: 'Release tag (leave blank to use latest tag)'
         required: false
 
 env:
@@ -47,7 +47,7 @@ jobs:
             echo "Tag name is $TAG_NAME"
           elif [ "${{ github.event_name }}" = "push" ]; then
             # Tag push: use the pushed tag directly
-            TAG_NAME=${GITHUB_REF#refs/tags/}"
+            TAG_NAME=${GITHUB_REF#refs/tags/}
             NEW_VERSION=$(echo $TAG_NAME | awk -F'-' '{print $1}')
             SUFFIX=$(echo $TAG_NAME | grep -oP '[a-z]+[0-9]+' || echo "")
             echo "new_version=$NEW_VERSION" >> "$GITHUB_OUTPUT"
@@ -59,7 +59,7 @@ jobs:
           else
             # Manual run with no input: use latest tag
             LATEST_TAG=$(git describe --tags --abbrev=0)
-            TAG_NAME=${LATEST_TAG}"
+            TAG_NAME=${LATEST_TAG}
             NEW_VERSION=$(echo $TAG_NAME | awk -F'-' '{print $1}')
             SUFFIX=$(echo $TAG_NAME | grep -oP '[a-z]+[0-9]+' || echo "")
             echo "new_version=$NEW_VERSION" >> "$GITHUB_OUTPUT"
