@@ -2698,10 +2698,11 @@ class BaseShape:
 
         Values can be accessed via a Jinja template using e.g. T("{{ SUIT }}")
         """
+        from .shapes import VirtualShape
 
         def processed_value(value):
 
-            if isinstance(value, (BaseShape, muShape, muPage)):
+            if isinstance(value, (BaseShape, muShape, muPage, VirtualShape)):
                 return None
 
             elif isinstance(value, Template):
@@ -3618,7 +3619,7 @@ class BaseShape:
             vertex_shapes (list):
                 one or more Shape objects
             vertices (list):
-                list oif the Points at which to draw the Shapes
+                list of the Points at which to draw the Shapes
             centre (tuple):
                 x- and y-position of the parent Shape's centre
             rotated (bool):

@@ -4264,13 +4264,14 @@ def HexHex(**kwargs):
     """
     kwargs = margins(**kwargs)
     hhgrid = HexHexShape(canvas=globals.canvas, **kwargs)
-    # feedback(f' \\\ HexHex {kwargs=}')
+    # feedback(f'HexHex {kwargs=}')
     hhgrid.draw()
     return hhgrid
 
 
 def hexhex(row=None, col=None, **kwargs):
-    return HexHex(canvas=globals.canvas, **kwargs)
+    kwargs.pop("canvas", None)
+    return HexHexShape(canvas=globals.canvas, **kwargs)
 
 
 def Blueprint(**kwargs):
