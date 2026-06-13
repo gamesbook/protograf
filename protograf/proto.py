@@ -65,6 +65,7 @@ from .shapes_hexagon import HexShape
 from .shapes_polygon import PolygonShape
 from .shapes_rectangle import RectangleShape
 from .objects import (
+    CardBoxObject,
     CubeObject,
     D6Object,
     DominoObject,
@@ -774,7 +775,7 @@ class DeckOfCards:
         # print(f'$$$ Card Count: {self.cards} Deck Settings: {globals.deck_settings}')
         # ---- gallery options: settings override e.g. margin and page size
         self.gallery = kwargs.get("gallery", None)  # card grid size per page
-        # ---- gallery - trigger overrides of settings in CardDeck draw!
+        # ---- gallery - trigger overrides of settings in DeckOfCards draw!
         if self.gallery:
             self.gallery_overrides(self.gallery)
         # ----- set card frame type
@@ -865,6 +866,7 @@ class DeckOfCards:
             top=0,
             debug=False,
             units=globals.units,
+            units_type=globals.units_type,
         )
         globals.page.width = globals.page.size[0] / globals.units  # width ~user units
         globals.page.height = globals.page.size[1] / globals.units  # height ~user units
@@ -1285,6 +1287,7 @@ class DeckOfCards:
                 bottom=self.prime_globals.margins.bottom,
                 debug=self.prime_globals.margins.debug,
                 units=globals.units,
+                units_type=globals.units_type,
             )
             cnv = globals.doc_page.new_shape()  # pymupdf Shape
             globals.canvas = cnv
@@ -1643,7 +1646,7 @@ def Create(**kwargs):
             feedback("Another document is already open or initialised", True)
     globals_set = True
     # ---- units
-    _units = kwargs.get("units", globals.units)
+    _units = kwargs.get("units", "cm")
     globals.units = support.to_units(_units)
     # ---- margins
     the_margin = kwargs.get("margin", DEFAULT_MARGIN_SIZE / globals.units)
@@ -1655,6 +1658,7 @@ def Create(**kwargs):
         right=kwargs.get("margin_right", the_margin),
         debug=kwargs.get("margin_debug", False),
         units=globals.units,
+        units_type=_units,
     )
     # ---- cards
     _cards = kwargs.get("cards", 0)
@@ -1841,6 +1845,7 @@ def Load(**kwargs):
         right=kwargs.get("margin_right", the_margin),
         debug=kwargs.get("margin_debug", False),
         units=globals.units,
+        units_type=globals.units_type,
     )
     # ---- defaults
     defaults = kwargs.get("defaults", None)
@@ -5437,6 +5442,45 @@ def d6(*args, **kwargs):
     kwargs = margins(**kwargs)
     _obj = args[0] if args else None
     return D6Object(_object=_obj, canvas=globals.canvas, **kwargs)
+
+
+@docstring_base
+def CardBox(row=None, col=None, **kwargs):
+    """Draw a CardBox shape on the canvas.
+
+    Args:
+
+    - row (int): row in which the shape is drawn.
+    - col (int): column in which the shape is drawn.
+
+    Kwargs:
+
+    - front (shape|list): either a shape, or a list shapes, to be drawn inside
+      the front rectangle of the box
+    - side_one (shape|list): either a shape, or a list shapes, to be drawn inside
+      a side rectangle of the box
+    - side_two (shape|list): either a shape, or a list shapes, to be drawn inside
+      a side rectangle of the box
+    - back (shape|list): either a shape, or a list shapes, to be drawn inside
+      the back rectangle of the box
+    - top (shape|list): either a shape, or a list shapes, to be drawn inside
+      the top-side rectangle of the box
+    - under (shape|list): either a shape, or a list shapes, to be drawn inside
+      the under-side rectangle of the box
+
+    <base>
+
+    """
+    kwargs = margins(**kwargs)
+    cardbox = CardBoxObject(canvas=globals.canvas, **kwargs)
+    cardbox.draw()
+    return cardbox
+
+
+def cardbox(*args, **kwargs):
+    kwargs = margins(**kwargs)
+    _obj = args[0] if args else None
+    return CardBoxObject(_object=_obj, canvas=globals.canvas, **kwargs)
 
 
 @docstring_base

@@ -15,10 +15,13 @@ from pymupdf import Point as muPoint
 from protograf import globals
 from protograf.shapes_utils import draw_line
 from protograf.utils import colrs, geoms, tools
+
+# STANDARD_CARD_SIZES
 from protograf.utils.tools import _lower
 from protograf.utils.messaging import feedback
 from protograf.utils.structures import (
     Point,
+    ShapeGeometry,
     Tetris3D,
 )  # named tuples
 from protograf.base import BaseShape
@@ -1086,3 +1089,155 @@ class DominoObject(DiceObject):
         self.draw_heading(cnv, ID, cx, cy - 0.5 * self._u.height, **kwargs)
         self.draw_label(cnv, ID, cx, cy, **kwargs)
         self.draw_title(cnv, ID, cx, cy + 0.5 * self._u.height, **kwargs)
+
+
+class CardBoxObject(BaseShape):
+    """Draw CardBox outline on a given canvas.
+
+    Reference:
+
+    """
+
+    def __init__(self, _object=None, canvas=None, **kwargs):
+        super(CardBoxObject, self).__init__(_object=_object, canvas=canvas, **kwargs)
+        self.kwargs = kwargs
+        card_size = self.kwargs.get("card_size", "Poker")
+        card_hw = tools.card_size(card_size, globals.margins.units_type)
+        # overrides to create sensible defaults
+        if not kwargs.get("height"):
+            self.height = card_hw[1]
+        if not kwargs.get("width"):
+            self.width = card_hw[0]
+        if not kwargs.get("depth"):
+            self.depth = 51.0 / globals.units  # ~ 1.8 cm or 0.7"
+        # print(f'***  pos: {self.x=} {self.y=}')
+        # print(f'*** size: {self.height=} {self.width=} {self.depth=}')
+        self.set_unit_properties()
+        # vertices for panels; topleft,topright,bottomright,bottomleft
+        self.panel_front = []
+        self.panel_back = []
+        self.panel_left = []
+        self.panel_right = []
+        # need placeholders because drawing order does not match
+        self.panel_top = [None, None, None, None]
+        self.panel_bottom = [None, None, None, None]
+
+    @property
+    def shape_centre(self) -> Point:
+        """Centre of CardBoxObject."""
+        if self.cx and self.cy:
+            return Point(self.cx, self.cy)
+            x = self._u.cx + self._o.delta_x
+            y = self._u.cy + self._o.delta_y
+        return None
+
+    @property
+    def geo(self) -> ShapeGeometry:
+        """Geometry of CardBoxObject in user units."""
+        return ShapeGeometry()
+
+    @property
+    def geometry(self) -> ShapeGeometry:
+        """Geometry of CardBoxObject - alias for geo."""
+        return self.geo
+
+    @property  # must be able to change e.g. for layout
+    def _shape_vertexes(self):
+        """Vertices of CardBoxObject in points."""
+
+        def next(ax, ay):
+            vertices.append(Point(ax, ay))
+            return ax, ay
+
+        vertices = []
+        padding = 4 * 2.83465 if self.padding else 0
+        w_p = self._u.width + padding
+        h_p = self._u.height + padding
+        d_p = self._u.depth * 1.66 if self.padding else self._u.depth
+        flap = 0.25 * w_p
+        flap_top = 0.15 * w_p
+        flap_right = 0.66 * d_p
+        # print(f'*** size: {h_p=} {w_p=} {d_p=} {flap=}')
+        sx, sy = self._u.x, self._u.y + flap_top
+        # along top
+        px, py = next(sx, sy)  # 0
+        self.panel_left.append(Point(px, py + flap))  # TL
+        px, py = next(px + 0.8 * d_p, py)  # 1
+        px, py = next(px + 0.2 * d_p, py + flap)  # 2
+        self.panel_front.append(Point(px, py))  # TL
+        self.panel_left.append(Point(px, py))  # TR
+        px, py = next(px + w_p, py)  # 3
+        self.panel_front.append(Point(px, py))  # TR
+        self.panel_right.append(Point(px, py))  # TL
+        px, py = next(px + 0.15 * d_p, py - flap)  # 4
+        px, py = next(px + 0.7 * d_p, py)  # 5
+        px, py = next(px + 0.15 * d_p, py + flap)  # 6
+        self.panel_right.append(Point(px, py))  # TR
+        self.panel_back.append(Point(px, py))  # TL
+        self.panel_top[3] = Point(px, py)  # BL
+        px, py = next(px, py - d_p)  # 7
+        self.panel_top[0] = Point(px, py)  # TL
+        px, py = next(px + w_p * 0.1, py - flap_top)  # 8
+        px, py = next(px + w_p * 0.8, py)  # 9
+        px, py = next(px + w_p * 0.1, py + flap_top)  # 10
+        self.panel_top[1] = Point(px, py)  # TR
+        px, py = next(px, py + d_p)  # 11
+        self.panel_top[2] = Point(px, py)  # BR
+        self.panel_back.append(Point(px, py))  # TR
+        px, py = next(px + flap_right, py + 0.05 * h_p)  # 12
+        px, py = next(px, py + 0.95 * h_p)  # 13
+        px, py = next(px - flap_right, py + 0.05 * h_p)  # 14
+        self.panel_back.append(Point(px, py))  # BR
+        px, py = next(px - w_p, py)  # 15
+        self.panel_back.append(Point(px, py))  # BL
+        self.panel_right.append(Point(px, py))  # BR
+        px, py = next(px - 0.15 * d_p, py + flap)  # 16
+        px, py = next(px - 0.7 * d_p, py)  # 17
+        px, py = next(px - 0.15 * d_p, py - flap)  # 18
+        self.panel_right.append(Point(px, py))  # BL
+        self.panel_front.append(Point(px, py))  # BR
+        self.panel_bottom[1] = Point(px, py)  # TR
+        px, py = next(px, py + d_p)  # 19
+        self.panel_bottom[2] = Point(px, py)  # BR
+        px, py = next(px - w_p * 0.1, py + flap_top)  # 20
+        px, py = next(px - w_p * 0.8, py)  # 21
+        px, py = next(px - w_p * 0.1, py - flap_top)  # 22
+        self.panel_bottom[3] = Point(px, py)  # BL
+        px, py = next(px, py - d_p)  # 23
+        self.panel_bottom[0] = Point(px, py)  # TL
+        self.panel_front.append(Point(px, py))  # BL
+        self.panel_left.append(Point(px, py))  # BR
+        px, py = next(px - 0.2 * d_p, py + flap)  # 24
+        px, py = next(px - 0.6 * d_p, py)  # 25
+        px, py = next(sx, py - flap)  # 26
+        self.panel_left.append(Point(px, py))  # BL
+        px, py = next(sx, sy)  # 0
+        return vertices
+
+    def draw(self, cnv=None, off_x=0, off_y=0, ID=None, **kwargs):
+        """Draw the CardBoxObject on a given canvas."""
+        kwargs = self.kwargs | kwargs
+        cnv = cnv if cnv else globals.canvas  # a new Page/Shape may now exist
+        super().draw(cnv, off_x, off_y, ID, **kwargs)  # unit-based props
+        # ---- set vertices for point-based draw
+        self.vertexes = self._shape_vertexes
+        # ---- draw folds
+        # ---- draw outline by vertices
+        # feedback(f'***CardBoxObject{x=} {y=} {self.vertexes=}')
+        if self.vertexes:
+            for key, vertex in enumerate(self.vertexes):
+                if key < len(self.vertexes) - 1:
+                    draw_line(cnv, vertex, self.vertexes[key + 1], shape=self, **kwargs)
+                else:
+                    draw_line(cnv, vertex, self.vertexes[0], shape=self, **kwargs)
+            kwargs["closed"] = True
+            if kwargs.get("rounded"):
+                kwargs["lineJoin"] = 1
+            self.set_canvas_props(cnv=cnv, index=ID, **kwargs)
+
+        # ---- cover shape/image
+        # ---- back shape/image
+        # ---- top shape/image
+        # ---- bottom shape/image
+        # ---- left shape/image
+        # ---- right shape/image

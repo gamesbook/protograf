@@ -198,6 +198,7 @@ PageMarginsBase = namedtuple(
         "top",
         "debug",  # show the margin?
         "units",  # point equivalent of single user unit
+        "units_type",  # units name: mm, in, pt
     ],
 )
 
@@ -283,6 +284,7 @@ UnitProperties = namedtuple(
         "diameter",
         "side",
         "length",
+        "depth",
         "spacing_x",
         "spacing_y",
         "offset_x",
