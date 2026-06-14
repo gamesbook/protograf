@@ -7,6 +7,7 @@ protograf Changes
 - [PLANNED-1] Foldable card box
 - [PLANNED-1] Structure: break-up proto into smaller modules
 - [PLANNED-2] Docs: list all props for Hex, Circle, Rectangle, Line
+- [PLANNED-2] BoxCover
 
 2026-06-07 (0.5.3)
 ------------------

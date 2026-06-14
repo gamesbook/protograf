@@ -1235,20 +1235,13 @@ class CardBoxObject(BaseShape):
             return
         _cx = (area[1].x - area[0].x) / 2.0 + area[0].x
         _cy = (area[3].y - area[0].y) / 2.0 + area[0].y
-        cx, cy = _cx / globals.units, _cy / globals.units
-        ox, oy = area[0].x / globals.units, area[0].y / globals.units
         if isinstance(item, (list, tuple)):
             for shp in item:
                 if shp is not None:
-                    shp.draw(off_x=cx, off_y=cy)
+                    shp.draw(_abs_cx=_cx, _abs_cy=_cy)  # used by set_abs_and_offset()
         else:
             if item is not None:
-                item.use_abs_c = True
-                item._abs_cx = _cx
-                item._abs_cy = _cy
-                # print(f'~~~ Box centre {cx=} {cy=} {item=}')
-                item.draw()
-                # item.draw(off_x=ox, off_y=oy)
+                item.draw(_abs_cx=_cx, _abs_cy=_cy)  # used by set_abs_and_offset()
 
     def draw(self, cnv=None, off_x=0, off_y=0, ID=None, **kwargs):
         """Draw the CardBoxObject on a given canvas."""
