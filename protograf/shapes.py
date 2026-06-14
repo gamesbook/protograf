@@ -126,9 +126,12 @@ class ImageShape(BaseShape):
                     y_c = y + height / 2.0
                 case _:
                     y_c = y + height / 2.0
-            if self.use_abs_c:
-                x = self._abs_cx - width / 2.0
-                y = self._abs_cy - height / 2.0
+
+        if self.use_abs_c:
+            x = self._abs_cx - width / 2.0
+            y = self._abs_cy - height / 2.0
+            x_c = self._abs_cx
+            y_c = self._abs_cy
 
         return x, y, x_c, y_c
 

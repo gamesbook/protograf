@@ -742,7 +742,7 @@ class BaseCanvas:
             "fold_stroke_width", self.stroke_width
         )
         self.fold_dashed = self.defaults.get("fold_dashed", None)
-        self.fold_dotted = self.defaults.get("fold_dotted", False)
+        self.fold_dotted = self.defaults.get("fold_dotted", True)
 
     def get_page(self, name="A4"):
         """Get a paper format by name from a pre-defined dictionary."""

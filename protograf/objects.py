@@ -130,7 +130,8 @@ class PolyominoObject(RectangleShape):
                     if not isinstance(item, str) or len(item) != length:
                         correct = False
                         issue.append(
-                            f'pattern must be a list of equal-length strings (not "{self.pattern})"!'
+                            f'pattern must be a list of equal-length strings (not "{
+                                                                              self.pattern})"!'
                         )
                         break
                 values = [item[i] for i in range(0, len(item))]
@@ -140,7 +141,8 @@ class PolyominoObject(RectangleShape):
                     except ValueError:
                         correct = False
                         issue.append(
-                            f'pattern must contain a list of strings with integers (not "{item})"!'
+                            f'pattern must contain a list of strings with integers (not "{
+                                                                                    item})"!'
                         )
                         break
 
@@ -1113,6 +1115,13 @@ class CardBoxObject(BaseShape):
         # print(f'***  pos: {self.x=} {self.y=}')
         # print(f'*** size: {self.height=} {self.width=} {self.depth=}')
         self.set_unit_properties()
+        # placeholders for user-defined items to be drawn on the box
+        self.shapes_front = kwargs.get("shapes_front", None)
+        self.shapes_back = kwargs.get("shapes_back", None)
+        self.shapes_left = kwargs.get("shapes_left", None)
+        self.shapes_right = kwargs.get("shapes_right", None)
+        self.shapes_top = kwargs.get("shapes_top", None)
+        self.shapes_bottom = kwargs.get("shapes_bottom", None)
         # vertices for panels; topleft,topright,bottomright,bottomleft
         self.panel_front = []
         self.panel_back = []
@@ -1121,6 +1130,8 @@ class CardBoxObject(BaseShape):
         # need placeholders because drawing order does not match
         self.panel_top = [None, None, None, None]
         self.panel_bottom = [None, None, None, None]
+        # ---- set vertices for point-based draw
+        self.vertexes = self._shape_vertexes
 
     @property
     def shape_centre(self) -> Point:
@@ -1158,7 +1169,11 @@ class CardBoxObject(BaseShape):
         flap_top = 0.15 * w_p
         flap_right = 0.66 * d_p
         # print(f'*** size: {h_p=} {w_p=} {d_p=} {flap=}')
-        sx, sy = self._u.x, self._u.y + flap_top
+        offset_y = flap_top + d_p - flap
+        sx, sy = (
+            self._u.x + self._u.margin_left,
+            self._u.y + self._u.margin_top + offset_y,
+        )
         # along top
         px, py = next(sx, sy)  # 0
         self.panel_left.append(Point(px, py + flap))  # TL
@@ -1214,16 +1229,34 @@ class CardBoxObject(BaseShape):
         px, py = next(sx, sy)  # 0
         return vertices
 
+    def draw_item(self, item, area):
+        """Draw one or shapes on an area of the card"""
+        if item is None:
+            return
+        _cx = (area[1].x - area[0].x) / 2.0 + area[0].x
+        _cy = (area[3].y - area[0].y) / 2.0 + area[0].y
+        cx, cy = _cx / globals.units, _cy / globals.units
+        ox, oy = area[0].x / globals.units, area[0].y / globals.units
+        if isinstance(item, (list, tuple)):
+            for shp in item:
+                if shp is not None:
+                    shp.draw(off_x=cx, off_y=cy)
+        else:
+            if item is not None:
+                item.use_abs_c = True
+                item._abs_cx = _cx
+                item._abs_cy = _cy
+                # print(f'~~~ Box centre {cx=} {cy=} {item=}')
+                item.draw()
+                # item.draw(off_x=ox, off_y=oy)
+
     def draw(self, cnv=None, off_x=0, off_y=0, ID=None, **kwargs):
         """Draw the CardBoxObject on a given canvas."""
         kwargs = self.kwargs | kwargs
         cnv = cnv if cnv else globals.canvas  # a new Page/Shape may now exist
         super().draw(cnv, off_x, off_y, ID, **kwargs)  # unit-based props
-        # ---- set vertices for point-based draw
-        self.vertexes = self._shape_vertexes
-        # ---- draw folds
         # ---- draw outline by vertices
-        # feedback(f'***CardBoxObject{x=} {y=} {self.vertexes=}')
+        # feedback(f'***CardBoxObject {x=} {y=} {self.vertexes=}')
         if self.vertexes:
             for key, vertex in enumerate(self.vertexes):
                 if key < len(self.vertexes) - 1:
@@ -1234,10 +1267,40 @@ class CardBoxObject(BaseShape):
             if kwargs.get("rounded"):
                 kwargs["lineJoin"] = 1
             self.set_canvas_props(cnv=cnv, index=ID, **kwargs)
+        # ---- process folds (OVER any fill for box)
+        if self.vertexes and self.fold:
+            # ---- * set fold style
+            pargs = {}
+            pargs["stroke"] = self.fold_stroke
+            pargs["stroke_width"] = self.fold_stroke_width
+            pargs["dotted"] = self.fold_dotted
+            pargs["dashed"] = self.fold_dashed
+            pargs["closed"] = False
+            pargs["fill"] = None
+            # ----- * draw fold lines
+            cnv.draw_line(self.panel_left[0], self.panel_left[1])
+            cnv.draw_line(self.panel_left[2], self.panel_left[3])
+            cnv.draw_line(self.panel_front[0], self.panel_front[3])
+            cnv.draw_line(self.panel_front[1], self.panel_front[2])
+            cnv.draw_line(self.panel_right[0], self.panel_right[1])
+            cnv.draw_line(self.panel_right[2], self.panel_right[3])
+            cnv.draw_line(self.panel_back[0], self.panel_back[3])
+            cnv.draw_line(self.panel_back[1], self.panel_back[2])
+            cnv.draw_line(self.panel_top[0], self.panel_top[1])
+            cnv.draw_line(self.panel_top[2], self.panel_top[3])
+            cnv.draw_line(self.panel_bottom[0], self.panel_bottom[1])
+            cnv.draw_line(self.panel_bottom[2], self.panel_bottom[3])
+            self.set_canvas_props(cnv=cnv, index=ID, **pargs)
 
-        # ---- cover shape/image
-        # ---- back shape/image
-        # ---- top shape/image
-        # ---- bottom shape/image
-        # ---- left shape/image
+        # ---- draw front shape/image
+        self.draw_item(self.shapes_front, self.panel_front)
+        # ---- draw back shape/image
+        self.draw_item(self.shapes_back, self.panel_back)
+        # ---- draw top shape/image
+        self.draw_item(self.shapes_top, self.panel_top)
+        # ---- draw bottom shape/image
+        self.draw_item(self.shapes_bottom, self.panel_bottom)
+        # ---- draw left shape/image
+        self.draw_item(self.shapes_left, self.panel_left)
         # ---- right shape/image
+        self.draw_item(self.shapes_right, self.panel_right)
