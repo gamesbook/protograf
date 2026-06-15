@@ -736,7 +736,7 @@ class BaseCanvas:
         self.deck_data = []
         # ---- cardbox
         self.fold = self.defaults.get("fold_marks", False)
-        fold_stroke = self.defaults.get("fold_stroke", "gray")
+        fold_stroke = self.defaults.get("fold_stroke", "dimgray")  # gray is too light
         self.fold_stroke = colrs.get_color(fold_stroke)
         self.fold_stroke_width = self.defaults.get(
             "fold_stroke_width", self.stroke_width

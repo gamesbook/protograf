@@ -1160,73 +1160,90 @@ class CardBoxObject(BaseShape):
             vertices.append(Point(ax, ay))
             return ax, ay
 
-        vertices = []
-        padding = 4 * 2.83465 if self.padding else 0
-        w_p = self._u.width + padding
-        h_p = self._u.height + padding
-        d_p = self._u.depth * 1.66 if self.padding else self._u.depth
-        flap = 0.25 * w_p
-        flap_top = 0.15 * w_p
-        flap_right = 0.66 * d_p
+        padding = (
+            self.padding if self.padding is not None else 2 * 2.83465
+        )  # 2mm padding all round
+        padding_height = (
+            self.padding_height is not None if self.padding_height else padding
+        )
+        padding_width = (
+            self.padding_width is not None if self.padding_width else padding
+        )
+        w_p = self._u.width + padding_width
+        h_p = self._u.height + padding_height
+        d_p = self._u.depth * 1.66 if self.padding is not None else self._u.depth
+        flap = self.flap_inner if self.flap_inner is not None else 0.25 * w_p
+        flap_top = self.flap if self.flap is not None else 0.15 * w_p
+        flap_glue = self.flap_glue if self.flap_glue is not None else 0.66 * d_p
         # print(f'*** size: {h_p=} {w_p=} {d_p=} {flap=}')
         offset_y = flap_top + d_p - flap
         sx, sy = (
             self._u.x + self._u.margin_left,
             self._u.y + self._u.margin_top + offset_y,
         )
-        # along top
+        FI1 = 0.1
+        FI2 = 0.8
+
+        # vertices
+        vertices = []
+        # ... TOP EDGE
         px, py = next(sx, sy)  # 0
-        self.panel_left.append(Point(px, py + flap))  # TL
-        px, py = next(px + 0.8 * d_p, py)  # 1
-        px, py = next(px + 0.2 * d_p, py + flap)  # 2
         self.panel_front.append(Point(px, py))  # TL
-        self.panel_left.append(Point(px, py))  # TR
-        px, py = next(px + w_p, py)  # 3
+        self.panel_top[3] = Point(px, py)  # BL
+        px, py = next(px, py - d_p)  # 1
+        self.panel_top[0] = Point(px, py)  # TL
+        px, py = next(px + w_p * 0.1, py - flap_top)  # 2
+        px, py = next(px + w_p * 0.8, py)  # 3
+        px, py = next(px + w_p * 0.1, py + flap_top)  # 4
+        self.panel_top[1] = Point(px, py)  # TR
+        px, py = next(px, sy)  # 5
         self.panel_front.append(Point(px, py))  # TR
         self.panel_right.append(Point(px, py))  # TL
-        px, py = next(px + 0.15 * d_p, py - flap)  # 4
-        px, py = next(px + 0.7 * d_p, py)  # 5
-        px, py = next(px + 0.15 * d_p, py + flap)  # 6
+        self.panel_top[2] = Point(px, py)  # BR
+        px, py = next(px + FI1 * d_p, py - flap)  # 6
+        px, py = next(px + FI2 * d_p, py)  # 7
+        px, py = next(px + FI1 * d_p, py + flap)  # 8
         self.panel_right.append(Point(px, py))  # TR
         self.panel_back.append(Point(px, py))  # TL
-        self.panel_top[3] = Point(px, py)  # BL
-        px, py = next(px, py - d_p)  # 7
-        self.panel_top[0] = Point(px, py)  # TL
-        px, py = next(px + w_p * 0.1, py - flap_top)  # 8
-        px, py = next(px + w_p * 0.8, py)  # 9
-        px, py = next(px + w_p * 0.1, py + flap_top)  # 10
-        self.panel_top[1] = Point(px, py)  # TR
-        px, py = next(px, py + d_p)  # 11
-        self.panel_top[2] = Point(px, py)  # BR
+        px, py = next(px + w_p, py)  # 9
+        self.panel_left.append(Point(px, py))  # TL
         self.panel_back.append(Point(px, py))  # TR
-        px, py = next(px + flap_right, py + 0.05 * h_p)  # 12
-        px, py = next(px, py + 0.95 * h_p)  # 13
-        px, py = next(px - flap_right, py + 0.05 * h_p)  # 14
-        self.panel_back.append(Point(px, py))  # BR
-        px, py = next(px - w_p, py)  # 15
-        self.panel_back.append(Point(px, py))  # BL
-        self.panel_right.append(Point(px, py))  # BR
-        px, py = next(px - 0.15 * d_p, py + flap)  # 16
-        px, py = next(px - 0.7 * d_p, py)  # 17
-        px, py = next(px - 0.15 * d_p, py - flap)  # 18
-        self.panel_right.append(Point(px, py))  # BL
-        self.panel_front.append(Point(px, py))  # BR
-        self.panel_bottom[1] = Point(px, py)  # TR
-        px, py = next(px, py + d_p)  # 19
-        self.panel_bottom[2] = Point(px, py)  # BR
-        px, py = next(px - w_p * 0.1, py + flap_top)  # 20
-        px, py = next(px - w_p * 0.8, py)  # 21
-        px, py = next(px - w_p * 0.1, py - flap_top)  # 22
-        self.panel_bottom[3] = Point(px, py)  # BL
-        px, py = next(px, py - d_p)  # 23
-        self.panel_bottom[0] = Point(px, py)  # TL
-        self.panel_front.append(Point(px, py))  # BL
+        px, py = next(px + FI1 * d_p, py - flap)  # 10
+        px, py = next(px + FI2 * d_p, py)  # 11
+        px, py = next(px + FI1 * d_p, py + flap)  # 12
+        self.panel_left.append(Point(px, py))  # TR
+        # ... BOTTOM EDGE
+        px, py = next(px, py + h_p)  # 13
         self.panel_left.append(Point(px, py))  # BR
-        px, py = next(px - 0.2 * d_p, py + flap)  # 24
-        px, py = next(px - 0.6 * d_p, py)  # 25
-        px, py = next(sx, py - flap)  # 26
+        px, py = next(px - FI1 * d_p, py + flap)  # 14
+        px, py = next(px - FI2 * d_p, py)  # 15
+        px, py = next(px - FI1 * d_p, py - flap)  # 16
         self.panel_left.append(Point(px, py))  # BL
+        self.panel_back.append(Point(px, py))  # BR
+        self.panel_bottom[1] = Point(px, py)  # TR
+        px, py = next(px, py + d_p)  # 17
+        self.panel_bottom[2] = Point(px, py)  # BR
+        px, py = next(px - w_p * 0.1, py + flap_top)  # 18
+        px, py = next(px - w_p * 0.8, py)  # 19
+        px, py = next(px - w_p * 0.1, py - flap_top)  # 20
+        self.panel_bottom[3] = Point(px, py)  # BL
+        px, py = next(px, py - d_p)  # 21
+        self.panel_back.append(Point(px, py))  # BL
+        self.panel_bottom[0] = Point(px, py)  # TL
+        self.panel_right.append(Point(px, py))  # BR
+        px, py = next(px - FI1 * d_p, py + flap)  # 22
+        px, py = next(px - FI2 * d_p, py)  # 23
+        px, py = next(px - FI1 * d_p, py - flap)  # 24
+        self.panel_front.append(Point(px, py))  # BR
+        self.panel_right.append(Point(px, py))  # BL
+        px, py = next(sx, py)  # 25
+        self.panel_front.append(Point(px, py))  # BL
+        # ... GLUE FLAP
+        px, py = next(px - flap_glue, py - 0.05 * h_p)  # 26
+        px, py = next(px, py - 0.9 * h_p)  # 27
+
         px, py = next(sx, sy)  # 0
+
         return vertices
 
     def draw_item(self, item, area):
