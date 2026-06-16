@@ -8,12 +8,12 @@ Created on: 31 July 2025
 from protograf import *
 
 Create(
-   filename="dice_d6.pdf",
+    filename="dice_d6.pdf",
     paper="A8",
-       margin_left=0.5,
-       margin_right=0.5,
-       margin_bottom=0.5,
-       margin_top=0.5)
+    margin_left=0.5,
+    margin_right=0.5,
+    margin_bottom=0.5,
+    margin_top=0.5)
 
 header = Common(x=0, y=0, font_size=12, align="left")
 

@@ -743,6 +743,8 @@ class BaseCanvas:
         )
         self.fold_dashed = self.defaults.get("fold_dashed", None)
         self.fold_dotted = self.defaults.get("fold_dotted", True)
+        self.padding_width = self.defaults.get("padding_width", None)
+        self.padding_height = self.defaults.get("padding_width", None)
 
     def get_page(self, name="A4"):
         """Get a paper format by name from a pre-defined dictionary."""
@@ -1183,7 +1185,7 @@ class BaseShape:
         )
         # ---- stadium
         self.edges = kwargs.get("edges", base.edges)
-        # ---- table layout
+        # ---- table layout / cardbox
         self.padding = self.kw_float(kwargs.get("padding", base.padding))
         # ---- grid layout
         _rows = kwargs.get("rows", base.rows)
@@ -1507,8 +1509,10 @@ class BaseShape:
         self.fold = self.kw_bool(kwargs.get("fold", base.fold))
         self.fold_dotted = kwargs.get("fold_dotted", base.fold_dotted)
         self.fold_dashed = kwargs.get("fold_dashed", base.fold_dashed)
-        self.fold_stroke_width = kwargs.get("fold_stroke_width", base.fold_stroke_width)
         self.fold_stroke = kwargs.get("fold_stroke", base.fold_stroke)
+        self.fold_stroke_width = kwargs.get("fold_stroke_width", base.fold_stroke_width)
+        self.padding_width = kwargs.get("padding_width", base.padding_width)
+        self.padding_height = kwargs.get("padding_height", base.padding_height)
         # ---- OTHER
         # defaults for attributes called/set elsewhere e.g. in draw()
         self.use_abs = False

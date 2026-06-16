@@ -1105,7 +1105,7 @@ class CardBoxObject(BaseShape):
         self.kwargs = kwargs
         card_size = self.kwargs.get("card_size", "Poker")
         card_hw = tools.card_size(card_size, globals.margins.units_type)
-        # overrides to create sensible defaults
+        # ----  overrides to create sensible defaults
         if not kwargs.get("height"):
             self.height = card_hw[1]
         if not kwargs.get("width"):
@@ -1115,14 +1115,38 @@ class CardBoxObject(BaseShape):
         # print(f'***  pos: {self.x=} {self.y=}')
         # print(f'*** size: {self.height=} {self.width=} {self.depth=}')
         self.set_unit_properties()
-        # placeholders for user-defined items to be drawn on the box
+        # ---- user-selections
+        _fg = kwargs.get("flap_glue", None)
+        self._flap_glue = (
+            tools.as_float(_fg, "flap_glue") * globals.units if _fg else None
+        )
+        _fi = kwargs.get("flap_inner", None)
+        self._flap_inner = (
+            tools.as_float(_fi, "flap_inner") * globals.units if _fi else None
+        )
+        _ft = kwargs.get("flap", None)
+        self._flap_tuck = tools.as_float(_ft, "flap") * globals.units if _ft else None
+        self._flap_size = 0  # NB!! see _shape_vertexes => calculated based on flap_tuck
+        _th = kwargs.get("thumb", None)
+        self._thumb = tools.as_float(_th, "thumb") * globals.units if _th else None
+        self._padding = self.padding * globals.units if self.padding else None
+        self._padding_width = (
+            self.padding_width * globals.units if self.padding_width else self._padding
+        )
+        self._padding_height = (
+            self.padding_height * globals.units
+            if self.padding_height
+            else self._padding
+        )
+        # ---- placeholders for user-defined items to be drawn
         self.shapes_front = kwargs.get("shapes_front", None)
         self.shapes_back = kwargs.get("shapes_back", None)
         self.shapes_left = kwargs.get("shapes_left", None)
         self.shapes_right = kwargs.get("shapes_right", None)
         self.shapes_top = kwargs.get("shapes_top", None)
         self.shapes_bottom = kwargs.get("shapes_bottom", None)
-        # vertices for panels; topleft,topright,bottomright,bottomleft
+        # ---- vertices for panels
+        # topleft, topright, bottomright, bottomleft
         self.panel_front = []
         self.panel_back = []
         self.panel_left = []
@@ -1138,8 +1162,6 @@ class CardBoxObject(BaseShape):
         """Centre of CardBoxObject."""
         if self.cx and self.cy:
             return Point(self.cx, self.cy)
-            x = self._u.cx + self._o.delta_x
-            y = self._u.cy + self._o.delta_y
         return None
 
     @property
@@ -1160,41 +1182,47 @@ class CardBoxObject(BaseShape):
             vertices.append(Point(ax, ay))
             return ax, ay
 
-        padding = (
-            self.padding if self.padding is not None else 2 * 2.83465
-        )  # 2mm padding all round
+        default_padding = 2 * 2.83465  # 2mm padding all round
         padding_height = (
-            self.padding_height is not None if self.padding_height else padding
+            self._padding_height
+            if self._padding_height is not None
+            else default_padding
         )
         padding_width = (
-            self.padding_width is not None if self.padding_width else padding
+            self._padding_width if self._padding_width is not None else default_padding
         )
         w_p = self._u.width + padding_width
         h_p = self._u.height + padding_height
-        d_p = self._u.depth * 1.66 if self.padding is not None else self._u.depth
-        flap = self.flap_inner if self.flap_inner is not None else 0.25 * w_p
-        flap_top = self.flap if self.flap is not None else 0.15 * w_p
-        flap_glue = self.flap_glue if self.flap_glue is not None else 0.66 * d_p
-        # print(f'*** size: {h_p=} {w_p=} {d_p=} {flap=}')
-        offset_y = flap_top + d_p - flap
+        d_p = self._u.depth
+        # ---- flaps
+        flap = self._flap_inner if self._flap_inner is not None else 0.25 * w_p
+        flap_tuck = self._flap_tuck if self._flap_tuck is not None else 0.15 * w_p
+        if flap_tuck * 2.0 > w_p:
+            feedback("Flap size cannot be greater than half of the box width", True)
+        self._flap_size = flap_tuck
+        flap_glue = self._flap_glue if self._flap_glue is not None else 0.66 * d_p
+        # print(f'*** size: {h_p=} {w_p=} {d_p=} {flap=} {flap_tuck=} {flap_glue=}')
+        FI1 = 0.1
+        FI2 = 0.8
+        flap_offcut = flap_tuck  # create 45 deg angle OR use for quarter-round
+        flap_midcut = w_p - 2 * flap_offcut
+
+        # ---- vertices
+        vertices = []
+        offset_y = flap_tuck + d_p - flap
         sx, sy = (
             self._u.x + self._u.margin_left,
             self._u.y + self._u.margin_top + offset_y,
         )
-        FI1 = 0.1
-        FI2 = 0.8
-
-        # vertices
-        vertices = []
         # ... TOP EDGE
         px, py = next(sx, sy)  # 0
         self.panel_front.append(Point(px, py))  # TL
         self.panel_top[3] = Point(px, py)  # BL
         px, py = next(px, py - d_p)  # 1
         self.panel_top[0] = Point(px, py)  # TL
-        px, py = next(px + w_p * 0.1, py - flap_top)  # 2
-        px, py = next(px + w_p * 0.8, py)  # 3
-        px, py = next(px + w_p * 0.1, py + flap_top)  # 4
+        px, py = next(px + flap_offcut, py - flap_tuck)  # 2
+        px, py = next(px + flap_midcut, py)  # 3
+        px, py = next(px + flap_offcut, py + flap_tuck)  # 4
         self.panel_top[1] = Point(px, py)  # TR
         px, py = next(px, sy)  # 5
         self.panel_front.append(Point(px, py))  # TR
@@ -1223,9 +1251,9 @@ class CardBoxObject(BaseShape):
         self.panel_bottom[1] = Point(px, py)  # TR
         px, py = next(px, py + d_p)  # 17
         self.panel_bottom[2] = Point(px, py)  # BR
-        px, py = next(px - w_p * 0.1, py + flap_top)  # 18
-        px, py = next(px - w_p * 0.8, py)  # 19
-        px, py = next(px - w_p * 0.1, py - flap_top)  # 20
+        px, py = next(px - flap_offcut, py + flap_tuck)  # 18
+        px, py = next(px - flap_midcut, py)  # 19
+        px, py = next(px - flap_offcut, py - flap_tuck)  # 20
         self.panel_bottom[3] = Point(px, py)  # BL
         px, py = next(px, py - d_p)  # 21
         self.panel_back.append(Point(px, py))  # BL
@@ -1241,7 +1269,7 @@ class CardBoxObject(BaseShape):
         # ... GLUE FLAP
         px, py = next(px - flap_glue, py - 0.05 * h_p)  # 26
         px, py = next(px, py - 0.9 * h_p)  # 27
-
+        # ... START
         px, py = next(sx, sy)  # 0
 
         return vertices
@@ -1270,13 +1298,24 @@ class CardBoxObject(BaseShape):
         if self.vertexes:
             for key, vertex in enumerate(self.vertexes):
                 if key < len(self.vertexes) - 1:
-                    draw_line(cnv, vertex, self.vertexes[key + 1], shape=self, **kwargs)
+                    # ---- * curved flaps
+                    if self.rounded and key in [1, 3, 17, 19]:
+                        if key in [1, 17]:
+                            midpt = Point(vertex.x, self.vertexes[key + 1].y)
+                        else:
+                            midpt = Point(self.vertexes[key + 1].x, vertex.y)
+                        cnv.draw_curve(vertex, midpt, self.vertexes[key + 1])
+                    else:
+                        draw_line(
+                            cnv, vertex, self.vertexes[key + 1], shape=self, **kwargs
+                        )
                 else:
                     draw_line(cnv, vertex, self.vertexes[0], shape=self, **kwargs)
             kwargs["closed"] = True
             if kwargs.get("rounded"):
                 kwargs["lineJoin"] = 1
             self.set_canvas_props(cnv=cnv, index=ID, **kwargs)
+
         # ---- process folds (OVER any fill for box)
         if self.vertexes and self.fold:
             # ---- * set fold style
@@ -1314,3 +1353,20 @@ class CardBoxObject(BaseShape):
         self.draw_item(self.shapes_left, self.panel_left)
         # ---- right shape/image
         self.draw_item(self.shapes_right, self.panel_right)
+
+        # ---- draw thumb
+        if self._thumb:
+            midx = (
+                self.panel_back[1].x - self.panel_back[0].x
+            ) / 2.0 + self.panel_back[0].x
+            tcentre = Point(midx, self.panel_back[1].y)
+            tstart = Point(midx - (self._thumb / 2.0), self.panel_back[1].y)
+            cnv.draw_sector(
+                (tcentre.x, tcentre.y),
+                (tstart.x, tstart.y),
+                180,
+                fullSector=False,
+            )
+            kwargs["closed"] = False
+            kwargs["fill"] = None
+            self.set_canvas_props(cnv=cnv, index=ID, **kwargs)

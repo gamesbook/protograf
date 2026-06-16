@@ -172,6 +172,9 @@ Documentation
 =============
 `↑ <table-of-contents-dev_>`_
 
+Writing Documentation
+---------------------
+
 Documentation is written in reStructuredText and hosted on *ReadTheDocs*
 at https://app.readthedocs.org/projects/protograf/
 
@@ -180,6 +183,26 @@ see the ``.github/workflows/`` directory |dash| will trigger a build,
 which can be accessed here:
 https://app.readthedocs.org/projects/protograf/builds/
 
+Viewing Documentation
+---------------------
+
+It can be helpful to view the documentation during development.
+
+For this, one option is to use ``sphinvx-view``.
+
+Install these packages::
+
+    uv pip install sphinx
+    uv pip install setuptools
+    uv pip install sphinx-view
+    uv pip install --upgrade sphinx sphinxcontrib-htmlhelp sphinxcontrib-serializinghtml
+
+Then run the tool via::
+
+    sphinx-view docs/source/
+
+This should open the index documentation page in your default browser; pages
+will automatically refresh as you make changes to the source ``.rst`` files.
 
 Documentation Notes
 -------------------
@@ -197,5 +220,3 @@ Some useful tools:
 - https://github.com/retext-project/retext - a reStructuredText editor
 - https://github.com/mgedmin/restview - a reStructuredText viewer in your browser;
   it currently does **not** support Sphinx directives
-- https://pypi.org/project/sphinx-view/ - a reStructuredText viewer in your browser
-  that **does** support Sphinx directives (but is quite dated)
