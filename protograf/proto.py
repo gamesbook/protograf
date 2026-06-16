@@ -5455,18 +5455,31 @@ def CardBox(row=None, col=None, **kwargs):
 
     Kwargs:
 
-    - front (shape|list): either a shape, or a list shapes, to be drawn inside
-      the front rectangle of the box
-    - side_one (shape|list): either a shape, or a list shapes, to be drawn inside
-      a side rectangle of the box
-    - side_two (shape|list): either a shape, or a list shapes, to be drawn inside
-      a side rectangle of the box
-    - back (shape|list): either a shape, or a list shapes, to be drawn inside
-      the back rectangle of the box
-    - top (shape|list): either a shape, or a list shapes, to be drawn inside
-      the top-side rectangle of the box
-    - under (shape|list): either a shape, or a list shapes, to be drawn inside
-      the under-side rectangle of the box
+    - card_size (str): the name of a type of card (default is Poker)
+    - depth (float): the "thickness" of the box
+    - thumb (float): the diameter of a half-circle drawn at the top of the back area
+    - rounded (bool): if True, the primary flaps have rounded corners (default is False)
+    - fold (bool): if True, the fold lines are displayed (default is False)
+    - fold_stroke (str): line color of the *grid_marks*; defaults to ``dimgray``
+    - fold_stroke_width (float): line width of a *fold*; defaults to 0.1
+    - flap (float): the height of the primary flaps
+    - flap_inner (float): the height of the inner flaps
+    - flap_glued (float): the height of the flap to be glued
+    - padding (float): the extra size added to the height and width (default is 2mm)
+    - padding_width (float): the extra size added to the width
+    - padding_height (float): the extra size added to the height
+    - shapes_front (shape|list): either a shape, or a list shapes, to be drawn centred
+      in the front rectangle of the box
+    - shapes_left (shape|list): either a shape, or a list shapes, to be drawn centred
+      in the left side rectangle of the box
+    - shapes_right (shape|list): either a shape, or a list shapes, to be drawn centred
+      in the right side rectangle of the box
+    - shapes_back (shape|list): either a shape, or a list shapes, to be drawn centred
+      in the back rectangle of the box
+    - shapes_top (shape|list): either a shape, or a list shapes, to be drawn centred
+      in the top-side rectangle of the box
+    - shapes_bottom (shape|list): either a shape, or a list shapes, to be drawn centred
+      in the under-side rectangle of the box
 
     <base>
 
@@ -5481,6 +5494,14 @@ def cardbox(*args, **kwargs):
     kwargs = margins(**kwargs)
     _obj = args[0] if args else None
     return CardBoxObject(_object=_obj, canvas=globals.canvas, **kwargs)
+
+
+def TuckBox(row=None, col=None, **kwargs):
+    return CardBox(row=row, col=col, **kwargs)
+
+
+def tuckbox(*args, **kwargs):
+    return cardbox(*args, **kwargs)
 
 
 @docstring_base
@@ -5733,6 +5754,10 @@ save.__doc__ = Save.__doc__
 
 DeckOfCards.__doc__ = Deck.__doc__
 CounterSheet.__doc__ = Deck.__doc__
+
+cardbox.__doc__ = CardBox.__doc__
+TuckBox.__doc__ = CardBox.__doc__
+tuckbox.__doc__ = CardBox.__doc__
 
 arc.__doc__ = Arc.__doc__
 arrow.__doc__ = Arrow.__doc__
