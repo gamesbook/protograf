@@ -103,7 +103,7 @@ that can be set to customize how the box template will appear.
     of a half-circle drawn at the top of the back of the box
 
 Finally, the other useful properties that can be set are for what needs to be
-displayed on the various visible locations of th#cardboxe folded box. These locations
+displayed on the various visible locations of the folded box. These locations
 include the front, the back, the left side, the right side, the top and the
 bottom (or underneath).
 

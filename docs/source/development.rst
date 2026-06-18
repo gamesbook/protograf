@@ -135,10 +135,10 @@ Follow this process:
   update the Python version as needed
 - |check| Finalise release date and notes in ``CHANGES.txt``
 - |check| Ensure all the examples can be run by using shell script(s)
-  in the examples directory e.g. ``all.sh`` or ``_all.sh``
+  in the `examples` directory e.g. ``all.sh`` or ``_all.sh``
 - |check| Update the ``examples.zip`` file with latest example code
   (remove all PDFs in examples - except ``colorset`` and ``colorset_svg``;
-  and also delete the ``temp`` directory)
+  also delete the ``temp`` directory)
 - |check| Update the ``release`` in ``docs/source/conf.py``
 - |check| Update the ``__version_info__`` in ``_version.py``
 - |check| If working in a branch, now merge changes into master on GitHub
@@ -155,6 +155,9 @@ the workflow in action.
 
 When complete, there should now be an updated version showing, if you do a
 refresh of the home page of the project at https://pypi.org/project/protograf/
+
+Bear in mind that the underlying libraries for actions also need to be updated
+(via the version reference) from time-to-time.
 
 Working with latest
 -------------------
@@ -220,3 +223,5 @@ Some useful tools:
 - https://github.com/retext-project/retext - a reStructuredText editor
 - https://github.com/mgedmin/restview - a reStructuredText viewer in your browser;
   it currently does **not** support Sphinx directives
+- https://pypi.org/project/sphinx-view/ - a reStructuredText viewer in your browser
+  that **does** support Sphinx directives (but is quite dated)

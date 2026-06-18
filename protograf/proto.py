@@ -1287,7 +1287,7 @@ class DeckOfCards:
                 bottom=self.prime_globals.margins.bottom,
                 debug=self.prime_globals.margins.debug,
                 units=globals.units,
-                units_type=globals.units_type,
+                units_type=self.prime_globals.margins.units_type,
             )
             cnv = globals.doc_page.new_shape()  # pymupdf Shape
             globals.canvas = cnv

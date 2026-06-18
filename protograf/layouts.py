@@ -268,19 +268,21 @@ class HexHexShape(BaseShape):
         cnv = cnv if cnv else self.canvas
         super().draw(cnv, off_x, off_y, ID, **kwargs)  # unit-based props
         # ---- calculate centre of the shape (might be on cards)
-        x, y = self.calculate_xy(**kwargs)
-        self.cx = self._p2v(x - globals.margins.left_u, decimals=9)
-        self.cy = self._p2v(y - globals.margins.top_u, decimals=9)
-        self.hexhex_locations = HexHexLocations(
-            cx=self.cx,
-            cy=self.cy,
-            radius=self.radius,
-            diameter=self.diameter,
-            height=self.height,
-            side=self.side,
-            rings=self.rings,
-            orientation=self.orientation,
-        )
+        if "locale" in kwargs.keys():  # hexhex is being drawn on cards or row/col
+            x, y = self.calculate_xy(**kwargs)
+            self.cx = self._p2v(x - globals.margins.left_u, decimals=9)
+            self.cy = self._p2v(y - globals.margins.top_u, decimals=9)
+            # print(f'~~~ HexHexShape:draw {self.cx=} {self.cy=} {kwargs=}')
+            self.hexhex_locations = HexHexLocations(
+                cx=self.cx,
+                cy=self.cy,
+                radius=self.radius,
+                diameter=self.diameter,
+                height=self.height,
+                side=self.side,
+                rings=self.rings,
+                orientation=self.orientation,
+            )
         # ---- set local props
         locations = self.hexhex_locations.grid
         hex_count = self.hexhex_locations.hex_count
