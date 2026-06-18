@@ -4098,19 +4098,20 @@ Table
 ~~~~~~~~~~
 `↑ <shape-index_>`_
 
-Tables are an arrangement of rectangles in a column-and-row layout.
+Tables are an arrangement of styled rectangles in a column-and-row
+layout.
 
 Either the rows and columns are split evenly across the Table's
-height and width, or the values of each row and column can be set via
-lists of values.
+height and width, or the values of each column and/or row can be set
+via lists of values.
 
 Table colors and line styles can be set as described in the examples
 below, as can the cell padding |dash| the "white space" around the
 inner-edges of a cell.
 
-Tables do not, themselves, contain any information.  However, any of the
-"cells" in a table can be accessed using a spreadsheet-like notation to
-make use their location and size.
+Tables do **not**, themselves, contain any information.  However, any of
+the "cells" in a table can be accessed using a spreadsheet-like notation
+to make use of their location and size to display other shapes or elements.
 
 - `Example 1. Table Basics`_
 - `Example 2. Customised Table`_
@@ -4193,13 +4194,15 @@ Example 2. Customised Table
       - *rows* is a list of row heights
       - *stroke* color of ``blue``
       - *fill* color of ``aqua``
-      - *borders* all around of color ``grey`` with a stroke width of ``2``;
-        a border set can contain, in this order:
+      - *borders* have an all-around of color ``grey`` with a stroke width
+        of ``2``; a set of border values contains in this order:
 
         - *direction* - one of n(orth), s(outh), e(ast) or w(est), or all(*)
         - *width* - the line thickness
         - *color* - either a named color or a hexadecimal value
-        - *style* - ``True`` makes it dotted; a list of values creates dashes
+        - *style* - this optional value can either be:
+          ``True`` to make the line dotted; or a list of values that will
+          creates dashes
 
 ===== ======
 

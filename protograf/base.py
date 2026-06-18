@@ -734,6 +734,17 @@ class BaseCanvas:
         self.clockwise = True
         # ---- deck
         self.deck_data = []
+        # ---- cardbox
+        self.fold = self.defaults.get("fold_marks", False)
+        fold_stroke = self.defaults.get("fold_stroke", "dimgray")  # gray is too light
+        self.fold_stroke = colrs.get_color(fold_stroke)
+        self.fold_stroke_width = self.defaults.get(
+            "fold_stroke_width", self.stroke_width
+        )
+        self.fold_dashed = self.defaults.get("fold_dashed", None)
+        self.fold_dotted = self.defaults.get("fold_dotted", True)
+        self.padding_width = self.defaults.get("padding_width", None)
+        self.padding_height = self.defaults.get("padding_width", None)
 
     def get_page(self, name="A4"):
         """Get a paper format by name from a pre-defined dictionary."""
@@ -1174,7 +1185,7 @@ class BaseShape:
         )
         # ---- stadium
         self.edges = kwargs.get("edges", base.edges)
-        # ---- table layout
+        # ---- table layout / cardbox
         self.padding = self.kw_float(kwargs.get("padding", base.padding))
         # ---- grid layout
         _rows = kwargs.get("rows", base.rows)
@@ -1494,7 +1505,14 @@ class BaseShape:
         self.hatches_dashed = kwargs.get("hatches_dashed", self.dashed)
         # ---- deck
         self.deck_data = kwargs.get("deck_data", [])  # list of dicts
-
+        # ---- cardbox
+        self.fold = self.kw_bool(kwargs.get("fold", base.fold))
+        self.fold_dotted = kwargs.get("fold_dotted", base.fold_dotted)
+        self.fold_dashed = kwargs.get("fold_dashed", base.fold_dashed)
+        self.fold_stroke = kwargs.get("fold_stroke", base.fold_stroke)
+        self.fold_stroke_width = kwargs.get("fold_stroke_width", base.fold_stroke_width)
+        self.padding_width = kwargs.get("padding_width", base.padding_width)
+        self.padding_height = kwargs.get("padding_height", base.padding_height)
         # ---- OTHER
         # defaults for attributes called/set elsewhere e.g. in draw()
         self.use_abs = False
@@ -1618,6 +1636,7 @@ class BaseShape:
             self.unit(self.diameter) if self.diameter is not None else None,
             self.unit(self.side) if self.side is not None else None,
             self.unit(self.length) if self.length is not None else None,
+            self.unit(self.depth) if self.depth is not None else None,
             self.unit(self.spacing_x) if self.spacing_x is not None else None,
             self.unit(self.spacing_y) if self.spacing_y is not None else None,
             self.unit(self.offset_x) if self.offset_x is not None else None,
@@ -2698,10 +2717,11 @@ class BaseShape:
 
         Values can be accessed via a Jinja template using e.g. T("{{ SUIT }}")
         """
+        from .shapes import VirtualShape
 
         def processed_value(value):
 
-            if isinstance(value, (BaseShape, muShape, muPage)):
+            if isinstance(value, (BaseShape, muShape, muPage, VirtualShape)):
                 return None
 
             elif isinstance(value, Template):
@@ -3618,7 +3638,7 @@ class BaseShape:
             vertex_shapes (list):
                 one or more Shape objects
             vertices (list):
-                list oif the Points at which to draw the Shapes
+                list of the Points at which to draw the Shapes
             centre (tuple):
                 x- and y-position of the parent Shape's centre
             rotated (bool):

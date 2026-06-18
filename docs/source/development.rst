@@ -135,10 +135,10 @@ Follow this process:
   update the Python version as needed
 - |check| Finalise release date and notes in ``CHANGES.txt``
 - |check| Ensure all the examples can be run by using shell script(s)
-  in the examples directory e.g. ``all.sh`` or ``_all.sh``
+  in the `examples` directory e.g. ``all.sh`` or ``_all.sh``
 - |check| Update the ``examples.zip`` file with latest example code
   (remove all PDFs in examples - except ``colorset`` and ``colorset_svg``;
-  and also delete the ``temp`` directory)
+  also delete the ``temp`` directory)
 - |check| Update the ``release`` in ``docs/source/conf.py``
 - |check| Update the ``__version_info__`` in ``_version.py``
 - |check| If working in a branch, now merge changes into master on GitHub
@@ -156,6 +156,9 @@ the workflow in action.
 When complete, there should now be an updated version showing, if you do a
 refresh of the home page of the project at https://pypi.org/project/protograf/
 
+Bear in mind that the underlying libraries for actions also need to be updated
+(via the version reference) from time-to-time.
+
 Working with latest
 -------------------
 
@@ -172,6 +175,9 @@ Documentation
 =============
 `↑ <table-of-contents-dev_>`_
 
+Writing Documentation
+---------------------
+
 Documentation is written in reStructuredText and hosted on *ReadTheDocs*
 at https://app.readthedocs.org/projects/protograf/
 
@@ -180,6 +186,26 @@ see the ``.github/workflows/`` directory |dash| will trigger a build,
 which can be accessed here:
 https://app.readthedocs.org/projects/protograf/builds/
 
+Viewing Documentation
+---------------------
+
+It can be helpful to view the documentation during development.
+
+For this, one option is to use ``sphinvx-view``.
+
+Install these packages::
+
+    uv pip install sphinx
+    uv pip install setuptools
+    uv pip install sphinx-view
+    uv pip install --upgrade sphinx sphinxcontrib-htmlhelp sphinxcontrib-serializinghtml
+
+Then run the tool via::
+
+    sphinx-view docs/source/
+
+This should open the index documentation page in your default browser; pages
+will automatically refresh as you make changes to the source ``.rst`` files.
 
 Documentation Notes
 -------------------

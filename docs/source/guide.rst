@@ -2,13 +2,15 @@
 Guide
 =====
 
+.. |dash| unicode:: U+2014 .. EM DASH SIGN
+
 The `protograf <https://github.com/gamesbook/protograf>`_ documentation
 consists of the primary sections listed below.
 
 Although its great to be able to just "jump in" and start using a
-program, the sections below are designed to be read in order - apart from
-the terminology - as they all contain useful information and build on each
-other.
+program, the sections below are designed to be read in order |dash| apart
+from the terminology |dash| as they all contain useful information and build
+on each other.
 
 .. _guide:
 
@@ -33,7 +35,7 @@ other.
     :doc:`images, symbols and fonts <card_images>`
 9.  :doc:`Customised Shapes <customised_shapes>` - how to refine the
     appearance of certain shapes; circles, hexagons, lines and rectangles;
-    supplemented by doc:`Shape's Geometries <shapes_geometry>`
+    supplemented by the :doc:`geometry of a shape <shapes_geometry>`
 10. :doc:`Customised Text <customised_text>` - how to refine the
     appearance of text
 11. :doc:`Repetitive Elements <layouts>` - how to work with repeats, sequences,
@@ -43,7 +45,7 @@ other.
 13. :doc:`Additional Commands <additional_commands>` - special commands not part
     of the core shapes; fonts, dates and access to BoardGameGeek data
 14. :doc:`Compound Objects <objects>` - special composite shapes not part
-    of the core shapes e.g. cubes, dice, polyominoes, pentominoes
+    of the core shapes e.g. cubes, dice, polyominoes, pentominoes, tuckbox
 15. :doc:`Special Functions <functions>` - special functions for specific
     situations
 16. :doc:`Terminology <terminology>` - summary of common jargon and descriptions
@@ -62,5 +64,5 @@ doing more advanced scripts or needing further resources:
 21. :doc:`Development Notes <development>` - notes for programmers wanting
     to develop further in or with  **protograf**
 22. :doc:`Useful Resources <useful_resources>` - various tools, graphic
-    collections andd other items, alonhg with their website addresses,
-    that could be useful for boardgame prototyping
+    collections and other items, along with their website addresses,
+    that could be useful for game prototyping

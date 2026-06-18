@@ -126,9 +126,12 @@ class ImageShape(BaseShape):
                     y_c = y + height / 2.0
                 case _:
                     y_c = y + height / 2.0
-            if self.use_abs_c:
-                x = self._abs_cx - width / 2.0
-                y = self._abs_cy - height / 2.0
+
+        if self.use_abs_c:
+            x = self._abs_cx - width / 2.0
+            y = self._abs_cy - height / 2.0
+            x_c = self._abs_cx
+            y_c = self._abs_cy
 
         return x, y, x_c, y_c
 
@@ -4614,3 +4617,60 @@ class FooterShape(BaseShape):
         # feedback(f'*** FooterShape {ID=} {text=} {x=} {y=} {font_size=}')
         # ---- draw footer
         self.draw_multi_string(cnv, x, y, text, align="centre", font_size=font_size)
+
+
+class VirtualShape:
+    """
+    Common properties and methods for all virtual shapes (layout and track)
+    """
+
+    def __init__(self, **kwargs):
+        """Common properties"""
+        self.centre_x = None
+        self.centre_y = None
+        self.start_x = None
+        self.start_y = None
+
+    def to_int(self, value, label="", maximum=None, minimum=None) -> int:
+        """Set a value to an int; or stop if an invalid value."""
+        try:
+            int_value = int(value)
+            if minimum and int_value < minimum:
+                feedback(
+                    f"{label} integer is less than the minimum of {minimum}!", True
+                )
+            if maximum and int_value > maximum:
+                feedback(
+                    f"{label} integer is more than the maximum of {maximum}!", True
+                )
+            return int_value
+        except Exception:
+            feedback(f"{value} is not a valid {label} integer!", True)
+
+    def to_float(self, value, label="") -> int:
+        """Set a value to a float; or stop if an invalid value."""
+        try:
+            float_value = float(value)
+            return float_value
+        except Exception:
+            _label = f" for {label}" if label else ""
+            feedback(f'"{value}"{_label} is not a valid floating number!', True)
+
+    def unit(
+        self, item, units: str | None = None, skip_none: bool = False, label: str = ""
+    ):
+        """Convert an item into the appropriate unit system."""
+        log.debug("units %s %s :: label: %s", units, globals.units, label)
+        if item is None and skip_none:
+            return None
+        units = support.to_units(units) if units is not None else globals.units
+        try:
+            _item = tools.as_float(item, label)
+            return _item * units
+        except (TypeError, ValueError):
+            _label = f" {label}" if label else ""
+            feedback(
+                f"Unable to set unit value for{_label}: {item}."
+                " Please check that this is a valid value.",
+                stop=True,
+            )

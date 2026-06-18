@@ -28,8 +28,9 @@ a handy cross-reference to the detailed information for that command.
 -  :ref:`Bezier <bezier-command>` * - a geometric shape that can be drawn on a page
 -  :ref:`BGG <the-bgg-command>` - access boardgame data from BGG (typically for display
    on one or more :ref:`cards <the-card-command>`)
--  :ref:`Card <the-card-command>`  - details for a card that is part of a
+-  :ref:`Card <the-card-command>` - details for a card that is part of a
    :ref:`deck <the-deck-command>`
+-  :ref:`CardBox <cardbox-object>` - a template for a foldable box
 -  :ref:`Circle <circle-command>` * - a geometric shape that can be drawn on a page
    (see also further :ref:`customisation options <circleIndex>`)
 -  :ref:`Chord <chord-command>` * - a geometric shape that can be drawn on a page

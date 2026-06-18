@@ -1723,7 +1723,13 @@ def unit(
 
 
 def points(item, units: str | None = None, skip_none: bool = False, label: str = ""):
-    """Convert an item from points into the appropriate unit system."""
+    """Convert an item from points into the appropriate unit system.
+
+    Doc Test:
+
+    >>> points(1)
+    1
+    """
     log.debug("units %s :: label: %s", units, label)
     if item is None and skip_none:
         return None
@@ -1952,6 +1958,11 @@ def card_size(card_size: str, units: str = "pt") -> tuple | None:
     (41.0, 63.0)
     """
     size = None
+    if units == "cm":
+        is_cm = True
+        units = "mm"
+    else:
+        is_cm = False
     if units not in ["pt", "mm", "in"]:
         feedback(f'Card size units "{units}" is unknown.', True)
     match str(card_size).lower():
@@ -1975,10 +1986,33 @@ def card_size(card_size: str, units: str = "pt") -> tuple | None:
             size = STANDARD_CARD_SIZES["skat"][units]
         case "tarot" | "t":
             size = STANDARD_CARD_SIZES["tarot"][units]
+        # landscape
+        case "bridge-l" | "b-l":
+            size = STANDARD_CARD_SIZES["bridge-l"][units]
+        case "business-l" | "u-l":
+            size = STANDARD_CARD_SIZES["business-l"][units]
+        case "flash-l" | "f-l":
+            size = STANDARD_CARD_SIZES["flash-l"][units]
+        case "mini-l" | "m-l":
+            size = STANDARD_CARD_SIZES["mini-l"][units]
+        case "miniamerican-l" | "ma-l":
+            size = STANDARD_CARD_SIZES["miniamerican-l"][units]
+        case "minieuropean-l" | "me-l":
+            size = STANDARD_CARD_SIZES["minieuropean-l"][units]
+        case "mtg-l" | "magic-l":
+            size = STANDARD_CARD_SIZES["mtg-l"][units]
+        case "poker-l" | "p-l" | "mtg-l":
+            size = STANDARD_CARD_SIZES["poker-l"][units]
+        case "skat-l" | "s-l":
+            size = STANDARD_CARD_SIZES["skat-l"][units]
+        case "tarot-l" | "t-l":
+            size = STANDARD_CARD_SIZES["tarot-l"][units]
         case "":
             pass
         case _:
             feedback(f'Card size "{card_size}" is unknown.', True)
+    if is_cm:
+        return (size[0] / 10.0, size[1] / 10.0)
     return size
 
 

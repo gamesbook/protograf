@@ -23,7 +23,7 @@ from protograf.utils.structures import (
 from protograf.utils import geoms, tools, support
 from protograf.utils.tools import _lower
 from protograf.base import BaseShape, BaseCanvas
-from protograf.shapes import TextShape
+from protograf.shapes import TextShape, VirtualShape
 from protograf.shapes_hexagon import HexShape
 
 log = logging.getLogger(__name__)
@@ -242,11 +242,48 @@ class HexHexShape(BaseShape):
             orientation=self.orientation,
         )
 
+    def calculate_xy(self, **kwargs) -> tuple:
+        """Calculate centre of grid."""
+        # ---- adjust start
+        if self.row is not None and self.col is not None:
+            x = self.col * self._u.width + self._o.delta_x
+            y = self.row * self._u.height + self._o.delta_y
+        elif self.cx is not None and self.cy is not None:
+            x = self._u.cx - self._u.width / 2.0 + self._o.delta_x
+            y = self._u.cy - self._u.height / 2.0 + self._o.delta_y
+        else:
+            x = self._u.x + self._o.delta_x
+            y = self._u.y + self._o.delta_y
+        # ---- overrides for grid layout
+        if self._abs_cx is not None and self._abs_cy is not None:
+            cx = self._abs_cx
+            cy = self._abs_cy
+            x = cx - self._u.width / 2.0
+            y = cy - self._u.height / 2.0
+        return x, y
+
     def draw(self, cnv=None, off_x=0, off_y=0, ID=None, **kwargs):
         """Draw a hexhex layout on a given canvas."""
         kwargs = self.kwargs | kwargs
         cnv = cnv if cnv else self.canvas
         super().draw(cnv, off_x, off_y, ID, **kwargs)  # unit-based props
+        # ---- calculate centre of the shape (might be on cards)
+        if "locale" in kwargs.keys():  # hexhex is being drawn on cards or row/col
+            x, y = self.calculate_xy(**kwargs)
+            self.cx = self._p2v(x - globals.margins.left_u, decimals=9)
+            self.cy = self._p2v(y - globals.margins.top_u, decimals=9)
+            # print(f'~~~ HexHexShape:draw {self.cx=} {self.cy=} {kwargs=}')
+            self.hexhex_locations = HexHexLocations(
+                cx=self.cx,
+                cy=self.cy,
+                radius=self.radius,
+                diameter=self.diameter,
+                height=self.height,
+                side=self.side,
+                rings=self.rings,
+                orientation=self.orientation,
+            )
+        # ---- set local props
         locations = self.hexhex_locations.grid
         hex_count = self.hexhex_locations.hex_count
         hex_geometry = self.hexhex_locations.get_geometry()
@@ -927,63 +964,6 @@ class RepeatShape(BaseShape):
 
 
 # ---- Virtual Class
-
-
-class VirtualShape:
-    """
-    Common properties and methods for all virtual shapes (layout and track)
-    """
-
-    def __init__(self, **kwargs):
-        """Common properties"""
-        self.centre_x = None
-        self.centre_y = None
-        self.start_x = None
-        self.start_y = None
-
-    def to_int(self, value, label="", maximum=None, minimum=None) -> int:
-        """Set a value to an int; or stop if an invalid value."""
-        try:
-            int_value = int(value)
-            if minimum and int_value < minimum:
-                feedback(
-                    f"{label} integer is less than the minimum of {minimum}!", True
-                )
-            if maximum and int_value > maximum:
-                feedback(
-                    f"{label} integer is more than the maximum of {maximum}!", True
-                )
-            return int_value
-        except Exception:
-            feedback(f"{value} is not a valid {label} integer!", True)
-
-    def to_float(self, value, label="") -> int:
-        """Set a value to a float; or stop if an invalid value."""
-        try:
-            float_value = float(value)
-            return float_value
-        except Exception:
-            _label = f" for {label}" if label else ""
-            feedback(f'"{value}"{_label} is not a valid floating number!', True)
-
-    def unit(
-        self, item, units: str | None = None, skip_none: bool = False, label: str = ""
-    ):
-        """Convert an item into the appropriate unit system."""
-        log.debug("units %s %s :: label: %s", units, globals.units, label)
-        if item is None and skip_none:
-            return None
-        units = support.to_units(units) if units is not None else globals.units
-        try:
-            _item = tools.as_float(item, label)
-            return _item * units
-        except (TypeError, ValueError):
-            _label = f" {label}" if label else ""
-            feedback(
-                f"Unable to set unit value for{_label}: {item}."
-                " Please check that this is a valid value.",
-                stop=True,
-            )
 
 
 # ---- virtual HexHex grid

@@ -26,6 +26,16 @@ square. Thus they are able to use, or reference, many of the properties of
 these shapes, in addition to their own particular properties.
 
 
+CardBox
+=======
+
+``CardBox`` is a command used to generate a template, or outline, of a shape
+that is designed to be cut-out and folded to create a box |dash| for
+boardgames, such a box is often referred to as a **tuckbox**.
+
+For more details, see the section on the :ref:`CardBox <cardbox-object>`.
+
+
 Cube
 ====
 
@@ -47,7 +57,7 @@ For more details, see the section on :doc:`Dice <dice>`.
 Dominoes
 ========
 
-Dominoes, like cards, are used in a number of games, and being able to 
+Dominoes, like cards, are used in a number of games, and being able to
 readily create a basic depiction of them can be useful.
 
 For more details, see the section on :doc:`Dominoes <dominos>`.

@@ -37,6 +37,7 @@ python objects/ominoes_basic.py --no-png -d /tmp/demo
 python objects/dice_d6.py --no-png -d /tmp/demo
 python objects/domino.py --no-png -d /tmp/demo
 python objects/cubes.py --no-png -d /tmp/demo
+python objects/cardbox.py --no-png -d /tmp/demo
 # ---- boards: abstract
 echo -e "\nCreating abstract boards..."
 python boards/abstract/chessboard.py --no-png -d /tmp/demo

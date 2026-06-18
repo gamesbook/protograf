@@ -1599,7 +1599,7 @@ class RectangleShape(BaseShape):
             )
         # ---- calculate properties
         x, y = self.calculate_xy(**kwargs)
-        # feedback(f'*** RECT      {self.col=} {self.row=} {x=} {y=}')
+        # feedback(f'*** RECT      {self.col=} {self.row=} {x=} {y=} {self.use_abs_c=}')
         # ---- overrides for grid layout
         if self.use_abs_c:
             x = self._abs_cx - self._u.width / 2.0
