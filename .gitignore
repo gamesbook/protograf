@@ -163,4 +163,5 @@ default_shapes-*.png
 # Geany Project
 Protograf
 projects
-
+# act tool
+bin/*

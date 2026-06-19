@@ -538,7 +538,7 @@ class BezierShape(BaseShape):
         return self.geo
 
     def draw(self, cnv=None, off_x=0, off_y=0, ID=None, **kwargs):
-        """Draw Bezier curve on a given canvas."""
+        """Draw a Bezier curve on a given canvas."""
         kwargs = self.kwargs | kwargs
         cnv = cnv if cnv else globals.canvas  # a new Page/Shape may now exist
         super().draw(cnv, off_x, off_y, ID, **kwargs)  # unit-based props
@@ -1144,7 +1144,7 @@ class EllipseShape(BaseShape):
                         label_key = 0
 
     def draw(self, cnv=None, off_x=0, off_y=0, ID=None, **kwargs):
-        """Draw ellipse on a given canvas."""
+        """Draw an Ellipse on a given canvas."""
         kwargs = self.kwargs | kwargs
         cnv = cnv if cnv else globals.canvas  # a new Page/Shape may now exist
         super().draw(cnv, off_x, off_y, ID, **kwargs)  # unit-based props
@@ -1466,7 +1466,7 @@ class PodShape(BaseShape):
         return x, y
 
     def draw(self, cnv=None, off_x=0, off_y=0, ID=None, **kwargs):
-        """Draw pod on a given canvas."""
+        """Draw a Pod on a given canvas."""
         kwargs = self.kwargs | kwargs
         cnv = cnv if cnv else globals.canvas  # a new Page/Shape may now exist
         super().draw(cnv, off_x, off_y, ID, **kwargs)  # unit-based props
@@ -2388,7 +2388,7 @@ class SectorShape(BaseShape):
     Sector on a given canvas.
 
     Note:
-        * Sector can be referred to as a "wedge", "slice" or "pie slice".
+        * Sector can be referred to as a "slice" or "pie slice".
         * User supplies a "compass" angle i.e. degrees anti-clockwise from East;
           which determines the "width" of the sector at the circumference;
           default is 90°
@@ -2402,13 +2402,13 @@ class SectorShape(BaseShape):
         # ---- perform overrides
         self.radius = self.radius or self.diameter / 2.0
         if self.cx is None and self.x is None:
-            feedback("Either provide x or cx for Sector", True)
+            feedback("Either provide x or cx for a Sector", True)
         if self.cy is None and self.y is None:
-            feedback("Either provide y or cy for Sector", True)
+            feedback("Either provide y or cy for a Sector", True)
         if self.cx is not None and self.cy is not None:
             self.x = self.cx - self.radius
             self.y = self.cy - self.radius
-        # feedback(f'***Sector {self.cx=} {self.cy=} {self.x=} {self.y=}')
+        # feedback(f'*** Sector {self.cx=} {self.cy=} {self.x=} {self.y=}')
         # ---- calculate centre
         radius = self.unit(self.radius)  # changed aboveCross
         if self.row is not None and self.col is not None:
@@ -2421,7 +2421,7 @@ class SectorShape(BaseShape):
         else:
             self.x_c = self._u.x + radius
             self.y_c = self._u.y + radius
-        # feedback(f'***Sector {self.x_c=} {self.y_c=} {self.radius=}')
+        # feedback(f'*** Sector {self.x_c=} {self.y_c=} {self.radius=}')
 
     @cached_property
     def geo(self) -> ShapeGeometry:
@@ -2464,7 +2464,7 @@ class SectorShape(BaseShape):
         return pt_mid
 
     def draw(self, cnv=None, off_x=0, off_y=0, ID=None, **kwargs):
-        """Draw sector on a given canvas."""
+        """Draw a Sector on a given canvas."""
         cnv = cnv if cnv else globals.canvas  # a new Page/Shape may now exist
         super().draw(cnv, off_x, off_y, ID, **kwargs)  # unit-based props
         if self.use_abs_c:
@@ -4560,6 +4560,122 @@ class TriangleShape(BaseShape):
 
         # ---- debug
         self._debug(cnv, vertices=self._shape_vertexes)
+
+
+class WedgeShape(BaseShape):
+    """
+    Wedge on a given canvas.
+
+    Note:
+        * Wedge is formally referred to as a "annular sector".
+        * User supplies a "width" angle i.e. degrees anti-clockwise from East;
+          which determines the "width" of the wedge at the outer circumference;
+          default is 90°
+        * User also supplies a start angle; where 0 corresponds to East,
+          which determines the second point on the circumference;
+          default is 0°
+        * User supplies a height; which is the distance between the inner and
+          outer circumference lines; default is 1
+        * User supplies a radius; which is the distance from the centre to the
+          inner circumference line
+    """
+
+    def __init__(self, _object=None, canvas=None, **kwargs):
+        super().__init__(_object=_object, canvas=canvas, **kwargs)
+        # ---- perform overrides
+        self.radius = self.radius or self.diameter / 2.0
+        if self.cx is None and self.x is None:
+            feedback("Either provide x or cx for a Wedge", True)
+        if self.cy is None and self.y is None:
+            feedback("Either provide y or cy for a Wedge", True)
+        if self.cx is not None and self.cy is not None:
+            self.x = self.cx - self.radius
+            self.y = self.cy - self.radius
+        # feedback(f'*** Wedge {self.cx=} {self.cy=} {self.x=} {self.y=}')
+        # ---- calculate centre
+        radius = self.unit(self.radius)  # changed aboveCross
+        if self.row is not None and self.col is not None:
+            self.x_c = self.col * 2.0 * radius + radius
+            self.y_c = self.row * 2.0 * radius + radius
+            # log.debug(f"{self.col=}, {self.row=}, {self.x_c=}, {self.y_c=}")
+        elif self.cx is not None and self.cy is not None:
+            self.x_c = self._u.cx
+            self.y_c = self._u.cy
+        else:
+            self.x_c = self._u.x + radius
+            self.y_c = self._u.y + radius
+        # feedback(f'*** Wedge {self.x_c=} {self.y_c=} {self.radius=}')
+
+    @cached_property
+    def geo(self) -> ShapeGeometry:
+        """Geometry of Wedge in user units."""
+        _type = type(self)
+        cntr = self._shape_centre
+        cntr_user = self.as_point(cntr, self.units, cntr, self.rotation)
+        return ShapeGeometry(
+            # centre
+            centre=cntr_user,
+            center=cntr_user,
+            c=cntr_user,
+            # vertices
+            # TODO - calculate
+            # perbii
+            # length
+            # other
+            # meta
+            t=_type,
+            type=_type,
+            shapetype=_type,
+            name=self.simple_name(self),
+        )
+
+    @cached_property
+    def geometry(self) -> ShapeGeometry:
+        """Geometry of Wedge - alias for geo."""
+        return self.geo
+
+    @property  # do NOT cache because centre needs to be changed!
+    def _shape_centre(self) -> Point:
+        """Centre of Wedge in points."""
+        if self.use_abs_c:
+            self.x_c = self._abs_cx
+            self.y_c = self._abs_cy
+        pt_c = Point(self.x_c + self._o.delta_x, self.y_c + self._o.delta_y)
+        # ---- mid point in units
+        pt_mid = geoms.point_on_circle(
+            pt_c,
+            self.unit(self.radius) + self.unit(self.height / 2.0),
+            self.angle_start,
+        )
+        return pt_mid
+
+    def draw(self, cnv=None, off_x=0, off_y=0, ID=None, **kwargs):
+        """Draw a Wedge on a given canvas."""
+        cnv = cnv if cnv else globals.canvas  # a new Page/Shape may now exist
+        super().draw(cnv, off_x, off_y, ID, **kwargs)  # unit-based props
+        if self.use_abs_c:
+            self.x_c = self._abs_cx
+            self.y_c = self._abs_cy
+        # ---- centre point of circle in units
+        pt_c = Point(self.x_c + self._o.delta_x, self.y_c + self._o.delta_y)
+        # ---- circumference/perimeter point in units
+        pt_a = geoms.point_on_circle(pt_c, self.unit(self.radius), self.angle_start)
+        pt_mid = self._shape_centre
+        # ---- draw wedge
+        # feedback(f'*** Wedge: {pt_p=} {pt_c=} {pt_mid}')
+        # feedback(f'*** Wedge: {self.angle_start=} {self.angle_width=}')
+        cnv.draw_sector(  # anti-clockwise from pt_a; 90° default
+            (pt_c.x, pt_c.y),
+            (pt_mid.x, pt_mid.y),
+            self.angle_width,  # fullSector=True
+        )
+        # cnv.draw_line()  # down to inner circum
+        kwargs["closed"] = True
+        self.set_canvas_props(cnv=cnv, index=ID, **kwargs)
+        # ---- * draw text
+        self.draw_heading(cnv, ID, pt_mid.x, pt_mid.y, **kwargs)
+        self.draw_label(cnv, ID, pt_mid.x, pt_mid.y, **kwargs)
+        self.draw_title(cnv, ID, pt_c.x, pt_c.y, **kwargs)
 
 
 # ---- Other

@@ -59,6 +59,7 @@ from .shapes import (
     TextShape,
     TrapezoidShape,
     TriangleShape,
+    WedgeShape,
 )
 from .shapes_circle import CircleShape
 from .shapes_hexagon import HexShape
@@ -4217,6 +4218,32 @@ def Triangle(row=None, col=None, **kwargs):
 def triangle(row=None, col=None, **kwargs):
     kwargs = margins(**kwargs)
     return TriangleShape(canvas=globals.canvas, **kwargs)
+
+
+def Wedge(row=None, col=None, **kwargs):
+    """Draw a Wedge shape on the canvas.
+
+    Args:
+
+    - row (int): row in which the shape is drawn.
+    - col (int): column in which shape is drawn.
+
+    Kwargs:
+
+    <center>
+
+    """
+    kwargs = margins(**kwargs)
+    kwargs["row"] = row
+    kwargs["col"] = col
+    wdg = WedgeShape(canvas=globals.canvas, **kwargs)
+    wdg.draw()
+    return wdg
+
+
+def wedge(row=None, col=None, **kwargs):
+    kwargs = margins(**kwargs)
+    return WedgeShape(canvas=globals.canvas, **kwargs)
 
 
 # ---- grids ====
