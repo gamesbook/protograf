@@ -4584,6 +4584,17 @@ class WedgeShape(BaseShape):
         super().__init__(_object=_object, canvas=canvas, **kwargs)
         # ---- perform overrides
         self.radius = self.radius or self.diameter / 2.0
+        # validate
+        if self.width > self.radius:
+            feedback(
+                f"A Wedge's width ({self.width}) cannot exceed its radius ({self.radius}) ",
+                True,
+            )
+        if kwargs.get("rotation"):
+            feedback(
+                "A Wedge does not support rotation - use the angle_start property", True
+            )
+        # calculate centre
         if self.cx is None and self.x is None:
             feedback("Either provide x or cx for a Wedge", True)
         if self.cy is None and self.y is None:
@@ -4644,7 +4655,7 @@ class WedgeShape(BaseShape):
         # ---- mid point in units
         pt_mid = geoms.point_on_circle(
             pt_c,
-            self.unit(self.radius) + self.unit(self.height / 2.0),
+            self.unit(self.radius) + self.unit(self.width / 2.0),
             self.angle_start,
         )
         return pt_mid
@@ -4656,26 +4667,68 @@ class WedgeShape(BaseShape):
         if self.use_abs_c:
             self.x_c = self._abs_cx
             self.y_c = self._abs_cy
-        # ---- centre point of circle in units
-        pt_c = Point(self.x_c + self._o.delta_x, self.y_c + self._o.delta_y)
-        # ---- circumference/perimeter point in units
-        pt_a = geoms.point_on_circle(pt_c, self.unit(self.radius), self.angle_start)
-        pt_mid = self._shape_centre
+
         # ---- draw wedge
-        # feedback(f'*** Wedge: {pt_p=} {pt_c=} {pt_mid}')
-        # feedback(f'*** Wedge: {self.angle_start=} {self.angle_width=}')
-        cnv.draw_sector(  # anti-clockwise from pt_a; 90° default
-            (pt_c.x, pt_c.y),
-            (pt_mid.x, pt_mid.y),
-            self.angle_width,  # fullSector=True
+        # feedback(f"*** Wedge: {self.angle_start=} {self.angle_width=}")
+        # feedback(f"*** Wedge: {self._u.radius=} {self._u.width=}")
+
+        # ---- * bezier control points
+        pt_c = Point(self.x_c + self._o.delta_x, self.y_c + self._o.delta_y)
+        out_start, bez_out_2, bez_out_3, out_end = geoms.bezier_arc_points(
+            self.angle_start,
+            self.angle_width,
+            self._u.radius + self._u.width,
+            pt_c,
+            pt_c.y,
         )
-        # cnv.draw_line()  # down to inner circum
+        inn_start, bez_inn_2, bez_inn_3, inn_end = geoms.bezier_arc_points(
+            self.angle_start, self.angle_width, self._u.radius, pt_c, pt_c.y
+        )
+        # ---- * mid-pt of Wedge
+        pt_mid = geoms.point_on_circle(
+            point_centre=pt_c,
+            radius=self._u.radius + self._u.width / 2.0,
+            angle=self.angle_start + self.angle_width / 2.0,
+        )
+        # ---- * debug
+        # self._debug(cnv, vertices=[out_start, bez_out_2, bez_out_3, out_end])  # outer
+        # ---- * lines
+        cnv.draw_bezier(out_start, bez_out_2, bez_out_3, out_end)
+        draw_line(cnv, out_end, inn_end, shape=self)
+        cnv.draw_bezier(inn_end, bez_inn_3, bez_inn_2, inn_start)  # reverse draw
+        draw_line(cnv, inn_start, out_start, shape=self)
         kwargs["closed"] = True
         self.set_canvas_props(cnv=cnv, index=ID, **kwargs)
-        # ---- * draw text
-        self.draw_heading(cnv, ID, pt_mid.x, pt_mid.y, **kwargs)
+
+        # ---- rotation
+        wedge_rotation = self.angle_start + self.angle_width / 2.0
+        if wedge_rotation < 180:
+            kwargs["rotation"] = 180.0 - wedge_rotation
+        else:
+            kwargs["rotation"] = 270.0 - wedge_rotation
+        # feedback(f"*** Wedge: {wedge_rotation=} {kwargs['rotation']=}")
+        # ---- centred shapes (with offsets)
+        if self.centre_shapes:
+            self.draw_centred_shapes(self.centre_shapes, pt_mid.x, pt_mid.y)
+        # ---- cross
+        ckwargs = copy.copy(kwargs)
+        ckwargs["rotation"] = wedge_rotation
+        self.draw_cross(cnv, pt_mid.x, pt_mid.y, **ckwargs)
+        # ---- dot
+        self.draw_dot(cnv, pt_mid.x, pt_mid.y)
+        # ---- draw text (rotated)
+        # TODO - draw text on vertical up radius line, then rotate around circle centre
+        out_mid_pt = geoms.point_on_circle(
+            pt_c,
+            self._u.radius + self._u.width,
+            self.angle_start + self.angle_width / 2.0,
+        )
+        inn_mid_chord = geoms.fraction_along_line(inn_start, inn_end, 0.5)
+        # self._debug(cnv, vertices=[out_mid_pt, pt_mid, inn_mid_chord])
+        # kwargs["rotation_point"] = pt_c
+        self.draw_heading(cnv, ID, out_mid_pt.x, out_mid_pt.y, **kwargs)
         self.draw_label(cnv, ID, pt_mid.x, pt_mid.y, **kwargs)
-        self.draw_title(cnv, ID, pt_c.x, pt_c.y, **kwargs)
+        self.draw_title(cnv, ID, inn_mid_chord.x, inn_mid_chord.y, **kwargs)
 
 
 # ---- Other

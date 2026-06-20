@@ -3152,7 +3152,6 @@ class BaseShape:
         """Draw a cross on a shape (normally the centre)."""
         if self.cross:
             # ---- properties
-            kwargs = {}
             cross_size = self.unit(self.cross)
             rotation = kwargs.get("rotation", self.rotation)
             if rotation:

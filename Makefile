@@ -1,8 +1,9 @@
 # To use this Makefile, ensure you have uv installed
 
-# Configuration
+# Configuration (keep Python versions in sync!)
 SRC := protograf
 PYTHON := 3.13
+PYTHON_BLACK := py313
 
 # Detect Operating System
 ifeq ($(OS),Windows_NT)
@@ -44,12 +45,12 @@ install:
 # Format code using Black
 format:
 	@echo "Formatting code with Black"
-	uv run black --target-version py313 $(SRC)
+	uv run black --target-version $(PYTHON_BLACK) $(SRC)
 
 # Run Black in check mode
 lint:
 	@echo "Checking code formatting with Black and pyrefly"
-	uv run black --target-version py313 --check $(SRC)
+	uv run black --target-version $(PYTHON_BLACK) --check $(SRC)
 	uv run pyrefly check $(SRC)/utils
 
 # Run tests
