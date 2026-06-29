@@ -3116,20 +3116,20 @@ def Data(**kwargs):
                 ftype = _lower(_filter[2])
                 match ftype:
                     case "<" | "less than" | "less" | "fewer than" | "fewer" | "lt":
-                        globals.dataset = [d for d in globals.dataset if d[key] < value]
+                        globals.dataset = [ds for ds in globals.dataset if ds[key] < value]
                     case ">" | "greater than" | "greater" | "more than" | "more" | "gt":
                         globals.dataset = [d for d in globals.dataset if d[key] > value]
                     case "<>" | "!=" | "not equal" | "not" | "ne":
                         globals.dataset = [
-                            d for d in globals.dataset if d[key] != value
+                            ds for ds in globals.dataset if ds[key] != value
                         ]
                     case "=" | "==" | "equals" | "equal to" | "eq":
                         globals.dataset = [
-                            d for d in globals.dataset if d[key] != value
+                            ds for ds in globals.dataset if ds[key] != value
                         ]
                     case "~" | "in" | "is in" | "contains":
                         globals.dataset = [
-                            d for d in globals.dataset if value in d[key]
+                            ds for ds in globals.dataset if str(value) in str(ds[key])
                         ]
                     case _:
                         feedback(

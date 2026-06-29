@@ -4703,9 +4703,9 @@ class WedgeShape(BaseShape):
         # ---- rotation
         wedge_rotation = self.angle_start + self.angle_width / 2.0
         if wedge_rotation < 180:
-            kwargs["rotation"] = 180.0 - wedge_rotation
+            kwargs["rotation"] =  180. - wedge_rotation
         else:
-            kwargs["rotation"] = 270.0 - wedge_rotation
+            kwargs["rotation"] =  270. - wedge_rotation
         # feedback(f"*** Wedge: {wedge_rotation=} {kwargs['rotation']=}")
         # ---- centred shapes (with offsets)
         if self.centre_shapes:
