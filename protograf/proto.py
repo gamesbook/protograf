@@ -59,7 +59,7 @@ from .shapes import (
     TextShape,
     TrapezoidShape,
     TriangleShape,
-    WedgeShape,
+    BandShape,
 )
 from .shapes_circle import CircleShape
 from .shapes_hexagon import HexShape
@@ -3116,7 +3116,9 @@ def Data(**kwargs):
                 ftype = _lower(_filter[2])
                 match ftype:
                     case "<" | "less than" | "less" | "fewer than" | "fewer" | "lt":
-                        globals.dataset = [ds for ds in globals.dataset if ds[key] < value]
+                        globals.dataset = [
+                            ds for ds in globals.dataset if ds[key] < value
+                        ]
                     case ">" | "greater than" | "greater" | "more than" | "more" | "gt":
                         globals.dataset = [d for d in globals.dataset if d[key] > value]
                     case "<>" | "!=" | "not equal" | "not" | "ne":
@@ -4220,8 +4222,8 @@ def triangle(row=None, col=None, **kwargs):
     return TriangleShape(canvas=globals.canvas, **kwargs)
 
 
-def Wedge(row=None, col=None, **kwargs):
-    """Draw a Wedge shape on the canvas.
+def Band(row=None, col=None, **kwargs):
+    """Draw a Band shape on the canvas.
 
     Args:
 
@@ -4236,14 +4238,14 @@ def Wedge(row=None, col=None, **kwargs):
     kwargs = margins(**kwargs)
     kwargs["row"] = row
     kwargs["col"] = col
-    wdg = WedgeShape(canvas=globals.canvas, **kwargs)
-    wdg.draw()
-    return wdg
+    bnd = BandShape(canvas=globals.canvas, **kwargs)
+    bnd.draw()
+    return bnd
 
 
-def wedge(row=None, col=None, **kwargs):
+def band(row=None, col=None, **kwargs):
     kwargs = margins(**kwargs)
-    return WedgeShape(canvas=globals.canvas, **kwargs)
+    return BandShape(canvas=globals.canvas, **kwargs)
 
 
 # ---- grids ====
