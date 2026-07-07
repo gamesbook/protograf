@@ -502,6 +502,218 @@ class ArrowShape(BaseShape):
         self.draw_title(cnv, ID, cx, cy + self._u.height, **kwargs)
 
 
+class BandShape(BaseShape):
+    """
+    Band on a given canvas.
+
+    Note:
+        * Band is formally referred to as a "annular sector".
+        * User supplies a "width" angle i.e. degrees anti-clockwise from East;
+          which determines the "width" of the band at the outer circumference;
+          default is 90°
+        * User also supplies a start angle; where 0 corresponds to East,
+          which determines the second point on the circumference;
+          default is 0°
+        * User supplies a height; which is the distance between the inner and
+          outer circumference lines; default is 1
+        * User supplies a radius; which is the distance from the centre to the
+          inner circumference line
+    """
+
+    def __init__(self, _object=None, canvas=None, **kwargs):
+        super().__init__(_object=_object, canvas=canvas, **kwargs)
+        self.no_ends = tools.as_bool(self.kwargs.get("no_ends", False), 'no_ends')
+        # ---- perform overrides
+        self.radius = self.radius or self.diameter / 2.0
+        # validate
+        if self.width > self.radius:
+            feedback(
+                f"A Band's width ({self.width}) cannot exceed its radius ({self.radius}) ",
+                True,
+            )
+        if kwargs.get("rotation"):
+            feedback(
+                "A Band does not support rotation - use the angle_start property", True
+            )
+        # calculate centre
+        if self.cx is None and self.x is None:
+            feedback("Either provide x or cx for a Band", True)
+        if self.cy is None and self.y is None:
+            feedback("Either provide y or cy for a Band", True)
+        if self.cx is not None and self.cy is not None:
+            self.x = self.cx - self.radius
+            self.y = self.cy - self.radius
+        # feedback(f'*** Band {self.cx=} {self.cy=} {self.x=} {self.y=}')
+        # ---- calculate centre
+        radius = self.unit(self.radius)  # changed aboveCross
+        if self.row is not None and self.col is not None:
+            self.x_c = self.col * 2.0 * radius + radius
+            self.y_c = self.row * 2.0 * radius + radius
+            # log.debug(f"{self.col=}, {self.row=}, {self.x_c=}, {self.y_c=}")
+        elif self.cx is not None and self.cy is not None:
+            self.x_c = self._u.cx
+            self.y_c = self._u.cy
+        else:
+            self.x_c = self._u.x + radius
+            self.y_c = self._u.y + radius
+        # feedback(f'*** Band {self.x_c=} {self.y_c=} {self.radius=}')
+
+    @cached_property
+    def geo(self) -> ShapeGeometry:
+        """Geometry of Band in user units."""
+        _type = type(self)
+        cntr = self._shape_centre
+        cntr_user = self.as_point(cntr, self.units, cntr)
+        _vertices = self._shape_vertices
+        return ShapeGeometry(
+            # centre
+            centre=cntr_user,
+            center=cntr_user,
+            c=cntr_user,
+            # vertices
+            ne=self.as_point(_vertices[0], self.units, cntr, self.rotation),
+            nw=self.as_point(_vertices[1], self.units, cntr, self.rotation),
+            se=self.as_point(_vertices[2], self.units, cntr, self.rotation),
+            sw=self.as_point(_vertices[3], self.units, cntr, self.rotation),
+            # TODO - calculate
+            # perbii
+            # length
+            # other
+            # meta
+            t=_type,
+            type=_type,
+            shapetype=_type,
+            name=self.simple_name(self),
+        )
+
+    @cached_property
+    def geometry(self) -> ShapeGeometry:
+        """Geometry of Band - alias for geo."""
+        return self.geo
+
+    @cached_property
+    def _shape_vertices(self) -> tuple:
+        """End points of lines used to draw Band."""
+        pt_c = Point(self.x_c + self._o.delta_x, self.y_c + self._o.delta_y)
+        out_start, bez_out_2, bez_out_3, out_end = geoms.bezier_arc_points(
+            self.angle_start,
+            self.angle_width,
+            self._u.radius + self._u.width,
+            pt_c,
+            pt_c.y,
+        )
+        inn_start, bez_inn_2, bez_inn_3, inn_end = geoms.bezier_arc_points(
+            self.angle_start, self.angle_width, self._u.radius, pt_c, pt_c.y
+        )
+        return out_start, out_end, inn_start, inn_end
+
+    @property  # do NOT cache because centre needs to be changed!
+    def _shape_centre(self) -> Point:
+        """Centre of Band in points."""
+        if self.use_abs_c:
+            self.x_c = self._abs_cx
+            self.y_c = self._abs_cy
+        pt_c = Point(self.x_c + self._o.delta_x, self.y_c + self._o.delta_y)
+        # ---- mid point in units
+        pt_mid = geoms.point_on_circle(
+            pt_c,
+            self.unit(self.radius) + self.unit(self.width / 2.0),
+            self.angle_start + self.angle_width / 2.0,
+        )
+        return pt_mid
+
+    def draw(self, cnv=None, off_x=0, off_y=0, ID=None, **kwargs):
+        """Draw a Band on a given canvas."""
+        cnv = cnv if cnv else globals.canvas  # a new Page/Shape may now exist
+        super().draw(cnv, off_x, off_y, ID, **kwargs)  # unit-based props
+        if self.use_abs_c:
+            self.x_c = self._abs_cx
+            self.y_c = self._abs_cy
+        # feedback(f"*** Band: {self.angle_start=} {self.angle_width=}")
+        # feedback(f"*** Band: {self._u.radius=} {self._u.width=}")
+        # ---- * bezier control points
+        pt_c = Point(self.x_c + self._o.delta_x, self.y_c + self._o.delta_y)
+        out_start, bez_out_2, bez_out_3, out_end = geoms.bezier_arc_points(
+            self.angle_start,
+            self.angle_width,
+            self._u.radius + self._u.width,
+            pt_c,
+            pt_c.y,
+        )
+        inn_start, bez_inn_2, bez_inn_3, inn_end = geoms.bezier_arc_points(
+            self.angle_start, self.angle_width, self._u.radius, pt_c, pt_c.y
+        )
+        # ---- * mid-pt of Band
+        pt_mid = geoms.point_on_circle(
+            point_centre=pt_c,
+            radius=self._u.radius + self._u.width / 2.0,
+            angle=self.angle_start + self.angle_width / 2.0,
+        )
+        # ---- * debug
+        # self._debug(cnv, vertices=[out_start, bez_out_2, bez_out_3, out_end])  # outer
+        # ---- * lines
+        if self.no_ends:
+            bwargs = copy.copy(kwargs)
+            bwargs['stroke'] = self.fill
+            cnv.draw_bezier(out_start, bez_out_2, bez_out_3, out_end)
+            draw_line(cnv, out_end, inn_end, shape=self)
+            cnv.draw_bezier(inn_end, bez_inn_3, bez_inn_2, inn_start)  # reverse draw
+            draw_line(cnv, inn_start, out_start, shape=self)
+            kwargs["closed"] = True
+            self.set_canvas_props(cnv=cnv, index=ID, **bwargs)
+            cnv.draw_bezier(out_start, bez_out_2, bez_out_3, out_end)
+            cnv.draw_bezier(inn_end, bez_inn_3, bez_inn_2, inn_start)  # reverse draw
+            kwargs["closed"] = False
+            self.set_canvas_props(cnv=cnv, index=ID, **kwargs)
+        else:
+            cnv.draw_bezier(out_start, bez_out_2, bez_out_3, out_end)
+            draw_line(cnv, out_end, inn_end, shape=self)
+            cnv.draw_bezier(inn_end, bez_inn_3, bez_inn_2, inn_start)  # reverse draw
+            draw_line(cnv, inn_start, out_start, shape=self)
+            kwargs["closed"] = True
+            self.set_canvas_props(cnv=cnv, index=ID, **kwargs)
+        # ---- rotation
+        band_rotation = self.angle_start + self.angle_width / 2.0
+        if band_rotation < 180:
+            kwargs["rotation"] = 180.0 - band_rotation
+        else:
+            kwargs["rotation"] = 270.0 - band_rotation
+        # feedback(f"*** Band: {band_rotation=} {kwargs['rotation']=}")
+        # ---- centred shapes (with offsets)
+        if self.centre_shapes:
+            self.draw_centred_shapes(self.centre_shapes, pt_mid.x, pt_mid.y)
+        # ---- cross
+        ckwargs = copy.copy(kwargs)
+        ckwargs["rotation"] = band_rotation
+        self.draw_cross(cnv, pt_mid.x, pt_mid.y, **ckwargs)
+        # ---- dot
+        self.draw_dot(cnv, pt_mid.x, pt_mid.y)
+        # ---- draw text
+        # NOTE draw text vertically on radius "up" line then rotate around circle centre
+        txt_angle_start = 90.0 - self.angle_width / 2.0  # band drawn either side of 90
+        txt_inn_start, txt_bez_inn_2, txt_bez_inn_3, txt_inn_end = (
+            geoms.bezier_arc_points(
+                txt_angle_start, self.angle_width, self._u.radius, pt_c, pt_c.y
+            )
+        )
+        txt_out_mid_pt = geoms.point_on_circle(
+            pt_c,
+            self._u.radius + self._u.width,
+            txt_angle_start + self.angle_width / 2.0,
+        )
+        txt_pt_mid = geoms.point_on_circle(
+            pt_c,
+            self._u.radius + self._u.width / 2.0,
+            txt_angle_start + self.angle_width / 2.0,
+        )
+        inn_mid_chord = geoms.fraction_along_line(txt_inn_start, txt_inn_end, 0.5)
+        kwargs["rotation_point"] = pt_c
+        kwargs["rotation"] = self.angle_start + self.angle_width / 2.0 - 90.0
+        self.draw_heading(cnv, ID, txt_out_mid_pt.x, txt_out_mid_pt.y, **kwargs)
+        self.draw_label(cnv, ID, txt_pt_mid.x, txt_pt_mid.y, **kwargs)
+        self.draw_title(cnv, ID, inn_mid_chord.x, inn_mid_chord.y, **kwargs)
+
+
 class BezierShape(BaseShape):
     """
     Bezier curve on a given canvas.
@@ -4561,202 +4773,6 @@ class TriangleShape(BaseShape):
         # ---- debug
         self._debug(cnv, vertices=self._shape_vertexes)
 
-
-class BandShape(BaseShape):
-    """
-    Band on a given canvas.
-
-    Note:
-        * Band is formally referred to as a "annular sector".
-        * User supplies a "width" angle i.e. degrees anti-clockwise from East;
-          which determines the "width" of the band at the outer circumference;
-          default is 90°
-        * User also supplies a start angle; where 0 corresponds to East,
-          which determines the second point on the circumference;
-          default is 0°
-        * User supplies a height; which is the distance between the inner and
-          outer circumference lines; default is 1
-        * User supplies a radius; which is the distance from the centre to the
-          inner circumference line
-    """
-
-    def __init__(self, _object=None, canvas=None, **kwargs):
-        super().__init__(_object=_object, canvas=canvas, **kwargs)
-        # ---- perform overrides
-        self.radius = self.radius or self.diameter / 2.0
-        # validate
-        if self.width > self.radius:
-            feedback(
-                f"A Band's width ({self.width}) cannot exceed its radius ({self.radius}) ",
-                True,
-            )
-        if kwargs.get("rotation"):
-            feedback(
-                "A Band does not support rotation - use the angle_start property", True
-            )
-        # calculate centre
-        if self.cx is None and self.x is None:
-            feedback("Either provide x or cx for a Band", True)
-        if self.cy is None and self.y is None:
-            feedback("Either provide y or cy for a Band", True)
-        if self.cx is not None and self.cy is not None:
-            self.x = self.cx - self.radius
-            self.y = self.cy - self.radius
-        # feedback(f'*** Band {self.cx=} {self.cy=} {self.x=} {self.y=}')
-        # ---- calculate centre
-        radius = self.unit(self.radius)  # changed aboveCross
-        if self.row is not None and self.col is not None:
-            self.x_c = self.col * 2.0 * radius + radius
-            self.y_c = self.row * 2.0 * radius + radius
-            # log.debug(f"{self.col=}, {self.row=}, {self.x_c=}, {self.y_c=}")
-        elif self.cx is not None and self.cy is not None:
-            self.x_c = self._u.cx
-            self.y_c = self._u.cy
-        else:
-            self.x_c = self._u.x + radius
-            self.y_c = self._u.y + radius
-        # feedback(f'*** Band {self.x_c=} {self.y_c=} {self.radius=}')
-
-    @cached_property
-    def geo(self) -> ShapeGeometry:
-        """Geometry of Band in user units."""
-        _type = type(self)
-        cntr = self._shape_centre
-        cntr_user = self.as_point(cntr, self.units, cntr, self.rotation)
-        _vertices = self._shape_vertices()
-        return ShapeGeometry(
-            # centre
-            centre=cntr_user,
-            center=cntr_user,
-            c=cntr_user,
-            # vertices
-            nw=self.as_point(_vertices[0], self.units, cntr, self.rotation),
-            ne=self.as_point(_vertices[1], self.units, cntr, self.rotation),
-            sw=self.as_point(_vertices[2], self.units, cntr, self.rotation),
-            se=self.as_point(_vertices[3], self.units, cntr, self.rotation),
-            # TODO - calculate
-            # perbii
-            # length
-            # other
-            # meta
-            t=_type,
-            type=_type,
-            shapetype=_type,
-            name=self.simple_name(self),
-        )
-
-    @cached_property
-    def geometry(self) -> ShapeGeometry:
-        """Geometry of Band - alias for geo."""
-        return self.geo
-
-    @cached_property
-    def _shape_vertices(self) -> tuple:
-        """End points of lines used to draw Band."""
-        pt_c = Point(self.x_c + self._o.delta_x, self.y_c + self._o.delta_y)
-        out_start, bez_out_2, bez_out_3, out_end = geoms.bezier_arc_points(
-            self.angle_start,
-            self.angle_width,
-            self._u.radius + self._u.width,
-            pt_c,
-            pt_c.y,
-        )
-        inn_start, bez_inn_2, bez_inn_3, inn_end = geoms.bezier_arc_points(
-            self.angle_start, self.angle_width, self._u.radius, pt_c, pt_c.y
-        )
-        return out_start, out_end, inn_start, inn_end
-
-    @property  # do NOT cache because centre needs to be changed!
-    def _shape_centre(self) -> Point:
-        """Centre of Band in points."""
-        if self.use_abs_c:
-            self.x_c = self._abs_cx
-            self.y_c = self._abs_cy
-        pt_c = Point(self.x_c + self._o.delta_x, self.y_c + self._o.delta_y)
-        # ---- mid point in units
-        pt_mid = geoms.point_on_circle(
-            pt_c,
-            self.unit(self.radius) + self.unit(self.width / 2.0),
-            self.angle_start,
-        )
-        return pt_mid
-
-    def draw(self, cnv=None, off_x=0, off_y=0, ID=None, **kwargs):
-        """Draw a Band on a given canvas."""
-        cnv = cnv if cnv else globals.canvas  # a new Page/Shape may now exist
-        super().draw(cnv, off_x, off_y, ID, **kwargs)  # unit-based props
-        if self.use_abs_c:
-            self.x_c = self._abs_cx
-            self.y_c = self._abs_cy
-        # feedback(f"*** Band: {self.angle_start=} {self.angle_width=}")
-        # feedback(f"*** Band: {self._u.radius=} {self._u.width=}")
-        # ---- * bezier control points
-        pt_c = Point(self.x_c + self._o.delta_x, self.y_c + self._o.delta_y)
-        out_start, bez_out_2, bez_out_3, out_end = geoms.bezier_arc_points(
-            self.angle_start,
-            self.angle_width,
-            self._u.radius + self._u.width,
-            pt_c,
-            pt_c.y,
-        )
-        inn_start, bez_inn_2, bez_inn_3, inn_end = geoms.bezier_arc_points(
-            self.angle_start, self.angle_width, self._u.radius, pt_c, pt_c.y
-        )
-        # ---- * mid-pt of Band
-        pt_mid = geoms.point_on_circle(
-            point_centre=pt_c,
-            radius=self._u.radius + self._u.width / 2.0,
-            angle=self.angle_start + self.angle_width / 2.0,
-        )
-        # ---- * debug
-        # self._debug(cnv, vertices=[out_start, bez_out_2, bez_out_3, out_end])  # outer
-        # ---- * lines
-        cnv.draw_bezier(out_start, bez_out_2, bez_out_3, out_end)
-        draw_line(cnv, out_end, inn_end, shape=self)
-        cnv.draw_bezier(inn_end, bez_inn_3, bez_inn_2, inn_start)  # reverse draw
-        draw_line(cnv, inn_start, out_start, shape=self)
-        kwargs["closed"] = True
-        self.set_canvas_props(cnv=cnv, index=ID, **kwargs)
-        # ---- rotation
-        band_rotation = self.angle_start + self.angle_width / 2.0
-        if band_rotation < 180:
-            kwargs["rotation"] = 180.0 - band_rotation
-        else:
-            kwargs["rotation"] = 270.0 - band_rotation
-        # feedback(f"*** Band: {band_rotation=} {kwargs['rotation']=}")
-        # ---- centred shapes (with offsets)
-        if self.centre_shapes:
-            self.draw_centred_shapes(self.centre_shapes, pt_mid.x, pt_mid.y)
-        # ---- cross
-        ckwargs = copy.copy(kwargs)
-        ckwargs["rotation"] = band_rotation
-        self.draw_cross(cnv, pt_mid.x, pt_mid.y, **ckwargs)
-        # ---- dot
-        self.draw_dot(cnv, pt_mid.x, pt_mid.y)
-        # ---- draw text
-        # NOTE draw text vertically on radius "up" line then rotate around circle centre
-        txt_angle_start = 90.0 - self.angle_width / 2.0  # band drawn either side of 90
-        txt_inn_start, txt_bez_inn_2, txt_bez_inn_3, txt_inn_end = (
-            geoms.bezier_arc_points(
-                txt_angle_start, self.angle_width, self._u.radius, pt_c, pt_c.y
-            )
-        )
-        txt_out_mid_pt = geoms.point_on_circle(
-            pt_c,
-            self._u.radius + self._u.width,
-            txt_angle_start + self.angle_width / 2.0,
-        )
-        txt_pt_mid = geoms.point_on_circle(
-            pt_c,
-            self._u.radius + self._u.width / 2.0,
-            txt_angle_start + self.angle_width / 2.0,
-        )
-        inn_mid_chord = geoms.fraction_along_line(txt_inn_start, txt_inn_end, 0.5)
-        kwargs["rotation_point"] = pt_c
-        kwargs["rotation"] = self.angle_start + self.angle_width / 2.0 - 90.0
-        self.draw_heading(cnv, ID, txt_out_mid_pt.x, txt_out_mid_pt.y, **kwargs)
-        self.draw_label(cnv, ID, txt_pt_mid.x, txt_pt_mid.y, **kwargs)
-        self.draw_title(cnv, ID, inn_mid_chord.x, inn_mid_chord.y, **kwargs)
 
 
 # ---- Other

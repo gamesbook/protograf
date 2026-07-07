@@ -214,6 +214,11 @@ Blueprint(stroke_width=blue_width)
 Text(common=header, text="Match Fill and Stroke")
 Circle(fill_stroke="cyan")
 
+Blueprint(stroke_width=blue_width)
+Text(common=header, text='Band')
+Band(width=0.5)
+PageBreak()
+
 Save(output='png',
      dpi=300,
      directory="../docs/source/images/defaults",
@@ -227,5 +232,6 @@ Save(output='png',
         'stadium', 'starfield', 'dot', 'dotgrid', 'fill-stroke',
         'transparency', 'track-rectangle', 'chord',
         'rectangular_layout', 'rectangular_layout_debug', 'lines',
-        'fill-and-stroke'
+        'fill-and-stroke',
+        "band",
      ])

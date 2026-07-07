@@ -1471,6 +1471,89 @@ Pod(cx=3, cy=4.5,
     rotation=-90)
 PageBreak()
 
+# ---- band
+notation = Common(label_size=6, title_size=6, heading_size=6)
+
+Blueprint()
+Text(common=header, text="Band - Custom")
+
+Band(width=0.25)
+
+Band(
+    cx=2, cy=4,
+    stroke_width=1, stroke="red", fill="gold",
+    radius=1,
+    angle_start=112.5,
+    angle_width=45,
+    dot=0.05,
+    cross=0.33,
+)
+
+bnd = Band(
+    cx=2, cy=6,
+    radius=1,
+    angle_start=45,
+    angle_width=90,
+    no_ends=True,
+)
+Dot(cxy=bnd.geo.ne, fill="red", dot_width=5)
+Dot(cxy=bnd.geo.sw, fill="gold", dot_width=5)
+Dot(cxy=bnd.geo.c, fill="green", dot_width=5)
+
+PageBreak()
+
+Blueprint()
+Text(common=header, text="Band - Text")
+Band(
+    cx=2, cy=2,
+    stroke_width=0.5, stroke="green",
+    radius=1, width=0.5,
+    fill=None,
+    angle_start=45,
+    angle_width=90,
+    heading="Heading",
+    label="Label",
+    title="Title",
+    common=notation,
+ )
+Band(
+    cx=4, cy=3,
+    stroke_width=0.5, stroke="blue",
+    radius=1, width=0.5,
+    fill=None,
+    angle_start=135,
+    angle_width=90,
+    heading="Heading",
+    label="Label",
+    title="Title",
+    common=notation,
+)
+Band(
+    cx=0, cy=3,
+    stroke_width=0.5, stroke="gold",
+    radius=1, width=0.5,
+    fill=None,
+    angle_start=315,
+    angle_width=90,
+    heading="Heading",
+    label="Label",
+    title="Title",
+    common=notation,
+)
+Band(
+    cx=2, cy=4, stroke="red",
+    stroke_width=0.5,
+    radius=1, width=0.5,
+    fill=None,
+    angle_start=225,
+    angle_width=90,
+    heading="Heading",
+    label="Label",
+    title="Title",
+    common=notation,
+)
+PageBreak()
+
 # ---- END
 Text(common=txt, text="Shapes END...")
 
@@ -1524,6 +1607,6 @@ Save(
         "vertex_shapes",
         "radii_shapes",
         "perbii_shapes",
-        "pod_custom",
-        "pod_customised",
+        "pod_custom", "pod_customised",
+        "band_custom", "band_text",
         None])
