@@ -522,7 +522,7 @@ class BandShape(BaseShape):
 
     def __init__(self, _object=None, canvas=None, **kwargs):
         super().__init__(_object=_object, canvas=canvas, **kwargs)
-        self.no_ends = tools.as_bool(self.kwargs.get("no_ends", False), 'no_ends')
+        self.no_ends = tools.as_bool(self.kwargs.get("no_ends", False), "no_ends")
         # ---- perform overrides
         self.radius = self.radius or self.diameter / 2.0
         # validate
@@ -565,6 +565,12 @@ class BandShape(BaseShape):
         cntr = self._shape_centre
         cntr_user = self.as_point(cntr, self.units, cntr)
         _vertices = self._shape_vertices
+        _area = (
+            self.angle_width
+            / 360.0
+            * math.pi
+            * (self.radius**2 - (self.radius - self.width) ** 2)
+        )
         return ShapeGeometry(
             # centre
             centre=cntr_user,
@@ -579,6 +585,7 @@ class BandShape(BaseShape):
             # perbii
             # length
             # other
+            area=_area,
             # meta
             t=_type,
             type=_type,
@@ -654,7 +661,7 @@ class BandShape(BaseShape):
         # ---- * lines
         if self.no_ends:
             bwargs = copy.copy(kwargs)
-            bwargs['stroke'] = self.fill
+            bwargs["stroke"] = self.fill
             cnv.draw_bezier(out_start, bez_out_2, bez_out_3, out_end)
             draw_line(cnv, out_end, inn_end, shape=self)
             cnv.draw_bezier(inn_end, bez_inn_3, bez_inn_2, inn_start)  # reverse draw
@@ -4772,7 +4779,6 @@ class TriangleShape(BaseShape):
 
         # ---- debug
         self._debug(cnv, vertices=self._shape_vertexes)
-
 
 
 # ---- Other

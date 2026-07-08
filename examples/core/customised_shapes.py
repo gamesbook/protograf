@@ -1472,10 +1472,10 @@ Pod(cx=3, cy=4.5,
 PageBreak()
 
 # ---- band
-notation = Common(label_size=6, title_size=6, heading_size=6)
+notation = Common()
 
 Blueprint()
-Text(common=header, text="Band - Custom")
+Text(common=txt, text="Band: Custom")
 
 Band(width=0.25)
 
@@ -1503,54 +1503,42 @@ Dot(cxy=bnd.geo.c, fill="green", dot_width=5)
 PageBreak()
 
 Blueprint()
-Text(common=header, text="Band - Text")
-Band(
-    cx=2, cy=2,
-    stroke_width=0.5, stroke="green",
+Text(common=txt, text="Band: Text")
+bnd = Common(
     radius=1, width=0.5,
-    fill=None,
-    angle_start=45,
     angle_width=90,
+    stroke_width=0.5,
+    fill=None,
+    label_size=6,
+    title_size=6,
+    heading_size=6,
     heading="Heading",
     label="Label",
     title="Title",
-    common=notation,
+)
+Band(
+    cx=2, cy=2,
+    stroke="green",
+    angle_start=45,
+    common=bnd,
  )
 Band(
     cx=4, cy=3,
-    stroke_width=0.5, stroke="blue",
-    radius=1, width=0.5,
-    fill=None,
+    stroke="blue",
     angle_start=135,
-    angle_width=90,
-    heading="Heading",
-    label="Label",
-    title="Title",
-    common=notation,
+    common=bnd,
 )
 Band(
     cx=0, cy=3,
-    stroke_width=0.5, stroke="gold",
-    radius=1, width=0.5,
-    fill=None,
+    stroke="gold",
     angle_start=315,
-    angle_width=90,
-    heading="Heading",
-    label="Label",
-    title="Title",
-    common=notation,
+    common=bnd,
 )
 Band(
-    cx=2, cy=4, stroke="red",
-    stroke_width=0.5,
-    radius=1, width=0.5,
-    fill=None,
+    cx=2, cy=4,
+    stroke="red",
     angle_start=225,
-    angle_width=90,
-    heading="Heading",
-    label="Label",
-    title="Title",
-    common=notation,
+    common=bnd,
 )
 PageBreak()
 
