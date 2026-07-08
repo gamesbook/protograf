@@ -1087,7 +1087,10 @@ where and how wide the sector extends.
 
 .. NOTE::
 
-    The **maximum** extent of a Band is 180 |deg| |dash| half a circle!
+    1. The **maximum** extent of a Band is 180 |deg| |dash| half a circle!
+    2. The Band does **not** support a defined rotation property, like many
+       other shapes, but rather the rotation value is calculated based on the
+       *angle_start* and the *angle_width* properties.
 
 
 Example 1. Default Band
@@ -1127,8 +1130,6 @@ Example 2. Customised Band
 
       .. code:: python
 
-        Band(width=0.25)
-
         Band(
             cx=2, cy=4,
             stroke_width=1,
@@ -1138,6 +1139,24 @@ Example 2. Customised Band
             angle_width=45,
             dot=0.05,
             cross=0.33,
+        )
+
+        Band(
+            cx=3, cy=4,
+            stroke_width=1,
+            radius=1,
+            angle_start=112.5,
+            angle_width=45,
+            vertex_shapes=[
+                circle(radius=0.2, label="ne"),
+                circle(radius=0.2, label="se"),
+                circle(radius=0.2, label="sw"),
+                circle(radius=0.2, label="nw")
+            ],
+            vertex_shapes_rotated=True,
+            centre_shapes=[
+                circle(radius=0.2, label="t")],
+            centre_shapes_rotated=True,
         )
 
         bnd = Band(
@@ -1160,22 +1179,24 @@ Example 2. Customised Band
             fill="green",
             dot_width=5)
 
-      The top Band is the same as the default shown in
-      `Example 1. Default Band`_.
-
-      The middle Band sets the centre point around which it is drawn to be
+      The top Band sets the centre point around which it is drawn to be
       *cx* at `2` and `cy` of 4.  The Band is styled with *stroke*, *fill*,
       amnd *stroke_width*. Its start angle is set at 112.5 |deg| (anti-clockwise
       from horizontal east) and the width of the angle is 45 |deg|.
       In addition, the Band has a *cross* and *dot* assigned to the centre.
 
-      The lower Band has similar configuration to the mddle Band, but it also
+      The middle Band shows how shapes can be drawn at the vertices |dash|
+      clockwise, from north-east |dash| and at the centre.  For more detail
+      on drawing these, including the ability to rotate them, see
+      `Shapes Common Properties`_.
+
+      The lower Band has similar configuration to the middle Band, but it also
       has the property *no_ends* set to ``True``.  This will cause the two end
       lines to be drawn in the same color as the Band's *fill*, giving it an
       "open" appearance.
 
       As an example of accessing the Band's :doc:`geometry <shapes_geometry>`,
-      the three Dots are shown located at two of the vertices, as well as the
+      colored Dots are shown located at two of the vertices, as well as at the
       centre of the Band.
 
 ===== ======
@@ -4790,7 +4811,7 @@ Rotation
 
 Every shape, whose *centre* can be calculated, will support a *rotation*
 property. Rotation takes place in anti-clockwise direction, from the horizontal,
-around the centre of the shape, in *degrees*.
+around the centre of the shape, in *degrees*. (An exception is the `Band`_ shape.)
 
 Example 1. Rhombus Rotation
 +++++++++++++++++++++++++++
@@ -5001,8 +5022,8 @@ Radii shapes are constructed using the following properties:
     ``1`` the radii shape will be drawn outside of, or away from, the parent
     shape
 - *radii_shapes_rotated* - an optional property which, if ``True``, will
-  rotate the vertex shapes such they "point" away from the centre of the
-  parent shape
+  rotate the vertex shapes such they lie along the line extending from
+  the centre of the parent shape to that vertex
 
 Radii shapes can be constructed for:
 
@@ -5634,7 +5655,13 @@ Centre Shapes
 Any shape that can be defined using its centre, may have multiple shapes |dash|
 called "centre shapes" |dash| placed inside of it.
 
-These shapes are supplied as a list of sets; for example ``[(shape1), (shape2)]``
+Centre shapes are constructed using the following properties:
+
+- *centre_shapes* - this is a list (values in ``[...]``) of shapes that
+  should be placed at the centre, in order of drawing; for example
+  ``[(shape1), (shape2)]``
+- *centre_shapes_rotated* - an optional setting which, if ``True``, will
+  rotate the centre shapes to align with the shape's rotation (if any)
 
 .. NOTE::
 
@@ -5702,7 +5729,7 @@ the change in ``x`` and ``y`` values as part of the set.
       of centre.
 
 ===== ======
-
+; for example ``[(shape1), (shape2)]``
 
 .. _coreVertexShapes:
 
@@ -5716,12 +5743,12 @@ will be centered on those points.
 
 Vertex shapes are constructed using the following properties:
 
-- *vertex_shapes* - this a list (values in ``[...]``) of shapes that
+- *vertex_shapes* - this is a list (values in ``[...]``) of shapes that
   should be placed on vertices, in the order that these vertices are
-  drawn
+  drawn; for example ``[(shape1), (shape2)]``
 - *vertex_shapes_rotated* - an optional setting which, if ``True``, will
   rotate the vertex shapes such they "point" away from the centre of the
-  parent shape
+  parent shape and towards the vertex
 
 Vertex shapes can be constructed for:
 

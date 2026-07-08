@@ -1477,16 +1477,31 @@ notation = Common()
 Blueprint()
 Text(common=txt, text="Band: Custom")
 
-Band(width=0.25)
-
 Band(
-    cx=2, cy=4,
+    cx=3, cy=2,
     stroke_width=1, stroke="red", fill="gold",
     radius=1,
     angle_start=112.5,
     angle_width=45,
     dot=0.05,
     cross=0.33,
+)
+
+Band(
+    cx=3, cy=4,
+    stroke_width=1,
+    radius=1,
+    angle_start=112.5,
+    angle_width=45,
+    vertex_shapes=[
+        circle(radius=0.2, label="ne"),
+        circle(radius=0.2, label="se"),
+        circle(radius=0.2, label="sw"),
+        circle(radius=0.2, label="nw")
+    ],
+    vertex_shapes_rotated=True,
+    centre_shapes=[circle(radius=0.2, label="t")],
+    centre_shapes_rotated=True,
 )
 
 bnd = Band(

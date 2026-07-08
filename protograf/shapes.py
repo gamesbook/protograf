@@ -650,6 +650,8 @@ class BandShape(BaseShape):
         inn_start, bez_inn_2, bez_inn_3, inn_end = geoms.bezier_arc_points(
             self.angle_start, self.angle_width, self._u.radius, pt_c, pt_c.y
         )
+        # self.vertices = [out_start, out_end, inn_start, inn_end]
+        self.vertices = [out_start, inn_start, inn_end, out_end]
         # ---- * mid-pt of Band
         pt_mid = geoms.point_on_circle(
             point_centre=pt_c,
@@ -688,7 +690,17 @@ class BandShape(BaseShape):
         # feedback(f"*** Band: {band_rotation=} {kwargs['rotation']=}")
         # ---- centred shapes (with offsets)
         if self.centre_shapes:
-            self.draw_centred_shapes(self.centre_shapes, pt_mid.x, pt_mid.y)
+            self.draw_centred_shapes(
+                self.centre_shapes, pt_mid.x, pt_mid.y, rotation=kwargs["rotation"]
+            )
+        # ---- draw vertex shapes
+        if self.vertex_shapes:
+            self.draw_vertex_shapes(
+                self.vertex_shapes,
+                self.vertices,
+                pt_mid,
+                self.vertex_shapes_rotated,
+            )
         # ---- cross
         ckwargs = copy.copy(kwargs)
         ckwargs["rotation"] = band_rotation
