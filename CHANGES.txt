@@ -11,6 +11,7 @@ protograf Changes
 ------------------
 - Add Band shape
 - Enhance CardBox
+- Add geometry property for Card data
 
 2026-06-18 (0.5.4)
 ------------------
