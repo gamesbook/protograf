@@ -505,6 +505,7 @@ class CardShape(BaseShape):
                 fr_vertices = outline._shape_vertexes  # clockwise from top-right
                 base_frame_bbox = BBox(tl=fr_vertices[3], br=fr_vertices[1])
             case CardFrame.CIRCLE:
+                fr_vertices = []
                 base_frame_bbox = outline.bbox
             case CardFrame.HEXAGON:
                 fr_vertices = outline._shape_vertexes  # anti-clockwise from mid-left
@@ -589,6 +590,8 @@ class CardShape(BaseShape):
                 globals.card_frames[page] = [_cframe]
             else:
                 globals.card_frames[page].append(_cframe)
+        else:
+            frame_bbox = base_frame_bbox
 
         # ---- set card frame geometry
         self.frame_geometry = self.get_geometry(

@@ -685,18 +685,35 @@ class DiceObject(BaseShape):
         """Draw pips based on a number (the 'pips') and the pip style."""
         pargs = {}
 
-
         if isinstance(pip_shape, BaseShape):
             if rotation:
-                c_n = geoms._rotate_point_around_point(Point(px, py), self.centroid, rotation)
-                t_l = geoms._rotate_point_around_point(Point(px - offset, py - offset), self.centroid, rotation)
-                t_r = geoms._rotate_point_around_point(Point(px + offset, py - offset), self.centroid, rotation)
-                b_l = geoms._rotate_point_around_point(Point(px - offset, py + offset), self.centroid, rotation)
-                b_r = geoms._rotate_point_around_point(Point(px + offset, py + offset), self.centroid, rotation)
-                m_l = geoms._rotate_point_around_point(Point(px - offset, py), self.centroid, rotation)
-                m_r = geoms._rotate_point_around_point(Point(px + offset, py), self.centroid, rotation)
-                t_c = geoms._rotate_point_around_point(Point(px, py - offset), self.centroid, rotation)
-                b_c = geoms._rotate_point_around_point(Point(px, py + offset), self.centroid, rotation)
+                c_n = geoms._rotate_point_around_point(
+                    Point(px, py), self.centroid, rotation
+                )
+                t_l = geoms._rotate_point_around_point(
+                    Point(px - offset, py - offset), self.centroid, rotation
+                )
+                t_r = geoms._rotate_point_around_point(
+                    Point(px + offset, py - offset), self.centroid, rotation
+                )
+                b_l = geoms._rotate_point_around_point(
+                    Point(px - offset, py + offset), self.centroid, rotation
+                )
+                b_r = geoms._rotate_point_around_point(
+                    Point(px + offset, py + offset), self.centroid, rotation
+                )
+                m_l = geoms._rotate_point_around_point(
+                    Point(px - offset, py), self.centroid, rotation
+                )
+                m_r = geoms._rotate_point_around_point(
+                    Point(px + offset, py), self.centroid, rotation
+                )
+                t_c = geoms._rotate_point_around_point(
+                    Point(px, py - offset), self.centroid, rotation
+                )
+                b_c = geoms._rotate_point_around_point(
+                    Point(px, py + offset), self.centroid, rotation
+                )
 
             else:
                 c_n = Point(px, py)
@@ -713,103 +730,103 @@ class DiceObject(BaseShape):
                 case 0:
                     pass  # blank face
                 case 1:
-                    kwargs = {'_abs_cx': c_n.x, '_abs_cy': c_n.y}
+                    kwargs = {"_abs_cx": c_n.x, "_abs_cy": c_n.y}
                     pip_shape.draw(**kwargs)
                 case 2:
-                    kwargs = {'_abs_cx': t_l.x, '_abs_cy': t_l.y}
+                    kwargs = {"_abs_cx": t_l.x, "_abs_cy": t_l.y}
                     pip_shape.draw(**kwargs)
-                    kwargs = {'_abs_cx': b_r.x, '_abs_cy': b_r.y}
+                    kwargs = {"_abs_cx": b_r.x, "_abs_cy": b_r.y}
                     pip_shape.draw(**kwargs)
                 case 3:
-                    kwargs = {'_abs_cx': t_l.x, '_abs_cy': t_l.y}
+                    kwargs = {"_abs_cx": t_l.x, "_abs_cy": t_l.y}
                     pip_shape.draw(**kwargs)
-                    kwargs = {'_abs_cx': c_n.x, '_abs_cy': c_n.y}
+                    kwargs = {"_abs_cx": c_n.x, "_abs_cy": c_n.y}
                     pip_shape.draw(**kwargs)
-                    kwargs = {'_abs_cx': b_r.x, '_abs_cy': b_r.y}
+                    kwargs = {"_abs_cx": b_r.x, "_abs_cy": b_r.y}
                     pip_shape.draw(**kwargs)
                 case 4:
-                    kwargs = {'_abs_cx': t_l.x, '_abs_cy': t_l.y}
+                    kwargs = {"_abs_cx": t_l.x, "_abs_cy": t_l.y}
                     pip_shape.draw(**kwargs)
-                    kwargs = {'_abs_cx': t_r.x, '_abs_cy': t_r.y}
+                    kwargs = {"_abs_cx": t_r.x, "_abs_cy": t_r.y}
                     pip_shape.draw(**kwargs)
-                    kwargs = {'_abs_cx': b_l.x, '_abs_cy': b_l.y}
+                    kwargs = {"_abs_cx": b_l.x, "_abs_cy": b_l.y}
                     pip_shape.draw(**kwargs)
-                    kwargs = {'_abs_cx': b_r.x, '_abs_cy': b_r.y}
+                    kwargs = {"_abs_cx": b_r.x, "_abs_cy": b_r.y}
                     pip_shape.draw(**kwargs)
                 case 5:
-                    kwargs = {'_abs_cx': t_l.x, '_abs_cy': t_l.y}
+                    kwargs = {"_abs_cx": t_l.x, "_abs_cy": t_l.y}
                     pip_shape.draw(**kwargs)
-                    kwargs = {'_abs_cx': t_r.x, '_abs_cy': t_r.y}
+                    kwargs = {"_abs_cx": t_r.x, "_abs_cy": t_r.y}
                     pip_shape.draw(**kwargs)
-                    kwargs = {'_abs_cx': c_n.x, '_abs_cy': c_n.y}
+                    kwargs = {"_abs_cx": c_n.x, "_abs_cy": c_n.y}
                     pip_shape.draw(**kwargs)
-                    kwargs = {'_abs_cx': b_l.x, '_abs_cy': b_l.y}
+                    kwargs = {"_abs_cx": b_l.x, "_abs_cy": b_l.y}
                     pip_shape.draw(**kwargs)
-                    kwargs = {'_abs_cx': b_r.x, '_abs_cy': b_r.y}
+                    kwargs = {"_abs_cx": b_r.x, "_abs_cy": b_r.y}
                     pip_shape.draw(**kwargs)
                 case 6:
-                    kwargs = {'_abs_cx': t_l.x, '_abs_cy': t_l.y}
+                    kwargs = {"_abs_cx": t_l.x, "_abs_cy": t_l.y}
                     pip_shape.draw(**kwargs)
-                    kwargs = {'_abs_cx': t_r.x, '_abs_cy': t_r.y}
+                    kwargs = {"_abs_cx": t_r.x, "_abs_cy": t_r.y}
                     pip_shape.draw(**kwargs)
-                    kwargs = {'_abs_cx': m_l.x, '_abs_cy': m_l.y}
+                    kwargs = {"_abs_cx": m_l.x, "_abs_cy": m_l.y}
                     pip_shape.draw(**kwargs)
-                    kwargs = {'_abs_cx': m_r.x, '_abs_cy': m_r.y}
+                    kwargs = {"_abs_cx": m_r.x, "_abs_cy": m_r.y}
                     pip_shape.draw(**kwargs)
-                    kwargs = {'_abs_cx': b_l.x, '_abs_cy': b_l.y}
+                    kwargs = {"_abs_cx": b_l.x, "_abs_cy": b_l.y}
                     pip_shape.draw(**kwargs)
-                    kwargs = {'_abs_cx': b_r.x, '_abs_cy': b_r.y}
+                    kwargs = {"_abs_cx": b_r.x, "_abs_cy": b_r.y}
                     pip_shape.draw(**kwargs)
                 case 7:
-                    kwargs = {'_abs_cx': t_l.x, '_abs_cy': t_l.y}
+                    kwargs = {"_abs_cx": t_l.x, "_abs_cy": t_l.y}
                     pip_shape.draw(**kwargs)
-                    kwargs = {'_abs_cx': t_r.x, '_abs_cy': t_r.y}
+                    kwargs = {"_abs_cx": t_r.x, "_abs_cy": t_r.y}
                     pip_shape.draw(**kwargs)
-                    kwargs = {'_abs_cx': m_l.x, '_abs_cy': m_l.y}
+                    kwargs = {"_abs_cx": m_l.x, "_abs_cy": m_l.y}
                     pip_shape.draw(**kwargs)
-                    kwargs = {'_abs_cx': c_n.x, '_abs_cy': c_n.y}
+                    kwargs = {"_abs_cx": c_n.x, "_abs_cy": c_n.y}
                     pip_shape.draw(**kwargs)
-                    kwargs = {'_abs_cx': m_r.x, '_abs_cy': m_r.y}
+                    kwargs = {"_abs_cx": m_r.x, "_abs_cy": m_r.y}
                     pip_shape.draw(**kwargs)
-                    kwargs = {'_abs_cx': b_l.x, '_abs_cy': b_l.y}
+                    kwargs = {"_abs_cx": b_l.x, "_abs_cy": b_l.y}
                     pip_shape.draw(**kwargs)
-                    kwargs = {'_abs_cx': b_r.x, '_abs_cy': b_r.y}
+                    kwargs = {"_abs_cx": b_r.x, "_abs_cy": b_r.y}
                     pip_shape.draw(**kwargs)
                 case 8:
-                    kwargs = {'_abs_cx': t_l.x, '_abs_cy': t_l.y}
+                    kwargs = {"_abs_cx": t_l.x, "_abs_cy": t_l.y}
                     pip_shape.draw(**kwargs)
-                    kwargs = {'_abs_cx': t_r.x, '_abs_cy': t_r.y}
+                    kwargs = {"_abs_cx": t_r.x, "_abs_cy": t_r.y}
                     pip_shape.draw(**kwargs)
-                    kwargs = {'_abs_cx': m_l.x, '_abs_cy': m_l.y}
+                    kwargs = {"_abs_cx": m_l.x, "_abs_cy": m_l.y}
                     pip_shape.draw(**kwargs)
-                    kwargs = {'_abs_cx': t_c.x, '_abs_cy': t_c.y}
+                    kwargs = {"_abs_cx": t_c.x, "_abs_cy": t_c.y}
                     pip_shape.draw(**kwargs)
-                    kwargs = {'_abs_cx': b_c.x, '_abs_cy': b_c.y}
+                    kwargs = {"_abs_cx": b_c.x, "_abs_cy": b_c.y}
                     pip_shape.draw(**kwargs)
-                    kwargs = {'_abs_cx': m_r.x, '_abs_cy': m_r.y}
+                    kwargs = {"_abs_cx": m_r.x, "_abs_cy": m_r.y}
                     pip_shape.draw(**kwargs)
-                    kwargs = {'_abs_cx': b_l.x, '_abs_cy': b_l.y}
+                    kwargs = {"_abs_cx": b_l.x, "_abs_cy": b_l.y}
                     pip_shape.draw(**kwargs)
-                    kwargs = {'_abs_cx': b_r.x, '_abs_cy': b_r.y}
+                    kwargs = {"_abs_cx": b_r.x, "_abs_cy": b_r.y}
                     pip_shape.draw(**kwargs)
                 case 9:
-                    kwargs = {'_abs_cx': t_l.x, '_abs_cy': t_l.y}
+                    kwargs = {"_abs_cx": t_l.x, "_abs_cy": t_l.y}
                     pip_shape.draw(**kwargs)
-                    kwargs = {'_abs_cx': t_r.x, '_abs_cy': t_r.y}
+                    kwargs = {"_abs_cx": t_r.x, "_abs_cy": t_r.y}
                     pip_shape.draw(**kwargs)
-                    kwargs = {'_abs_cx': m_l.x, '_abs_cy': m_l.y}
+                    kwargs = {"_abs_cx": m_l.x, "_abs_cy": m_l.y}
                     pip_shape.draw(**kwargs)
-                    kwargs = {'_abs_cx': t_c.x, '_abs_cy': t_c.y}
+                    kwargs = {"_abs_cx": t_c.x, "_abs_cy": t_c.y}
                     pip_shape.draw(**kwargs)
-                    kwargs = {'_abs_cx': c_n.x, '_abs_cy': c_n.y}
+                    kwargs = {"_abs_cx": c_n.x, "_abs_cy": c_n.y}
                     pip_shape.draw(**kwargs)
-                    kwargs = {'_abs_cx': b_c.x, '_abs_cy': b_c.y}
+                    kwargs = {"_abs_cx": b_c.x, "_abs_cy": b_c.y}
                     pip_shape.draw(**kwargs)
-                    kwargs = {'_abs_cx': m_r.x, '_abs_cy': m_r.y}
+                    kwargs = {"_abs_cx": m_r.x, "_abs_cy": m_r.y}
                     pip_shape.draw(**kwargs)
-                    kwargs = {'_abs_cx': b_l.x, '_abs_cy': b_l.y}
+                    kwargs = {"_abs_cx": b_l.x, "_abs_cy": b_l.y}
                     pip_shape.draw(**kwargs)
-                    kwargs = {'_abs_cx': b_r.x, '_abs_cy': b_r.y}
+                    kwargs = {"_abs_cx": b_r.x, "_abs_cy": b_r.y}
                     pip_shape.draw(**kwargs)
                 case _:
                     feedback(f"The {shape_name} must use a number from 0 to 9", True)
@@ -1019,7 +1036,9 @@ class D6Object(DiceObject):
         px = x + self._u.width / 2.0
         py = y + self._u.height / 2.0
         offset = 3 * (0.2 * self._u.width / 2.0)  # fixed regardless of pip size
-        self.draw_pips(cnv, number, offset, px, py, self.pip_shape, pip_radius, rotation, "D6")
+        self.draw_pips(
+            cnv, number, offset, px, py, self.pip_shape, pip_radius, rotation, "D6"
+        )
         # add style
         pargs = {}
         pargs["stroke"] = self.pip_stroke
@@ -1209,7 +1228,15 @@ class DominoObject(DiceObject):
             py = y + self._u.height / 2.0
             offset = 3 * (0.2 * self._u.height / 2.0)  # fixed regardless of pip size
             self.draw_pips(
-                cnv, number, offset, px, py, self.pip_shape, pip_radius, rotation, "Domino"
+                cnv,
+                number,
+                offset,
+                px,
+                py,
+                self.pip_shape,
+                pip_radius,
+                rotation,
+                "Domino",
             )
             # self.set_canvas_props(cnv=None, index=ID, **kwargs)
         # ---- set style

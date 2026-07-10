@@ -1139,6 +1139,7 @@ def rotate_point_around_point(
     final_y = rotated_y + cy
     return Point(round(final_x, 8), round(final_y, 8))
 
+
 def _rotate_point_around_point(
     point_to_rotate: Point, center_point: Point, angle: float
 ) -> Point:
@@ -1165,7 +1166,8 @@ def _rotate_point_around_point(
     return rotate_point_around_point(
         point_to_rotate=(point_to_rotate.x, point_to_rotate.y),
         center_point=(center_point.x, center_point.y),
-        angle=angle)
+        angle=angle,
+    )
 
 
 def rectangles_overlap(rect1: tuple, rect2: tuple) -> bool:
