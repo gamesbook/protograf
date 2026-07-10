@@ -38,24 +38,40 @@ Domino(x=0, y=2, pips=(1, 5), common=blu_wite)
 Domino(x=2, y=2, pips=(1, 6), common=blu_wite)
 
 # ---- sized, labelled & rotated Domino
-Domino(x=0.25, y=3.75, side=0.8, 
-       pips=(2, 4), 
-       title="Title", 
-       heading="Domino", 
-       label="2-4")
-Domino(cx=3, cy=4, 
-       side=0.5, 
-       pips=(3, 5), 
+Domino(x=0.25, y=3.75,
+       side=0.7,
+       pips=(2, 4),
+       title="Title",
+       heading="Domino",
+       label="2-4",
+       label_size=8)
+Domino(cx=3, cy=3.5,
+       side=0.5,
+       pips=(3, 5),
        stroke_width=0.5, rotation=30)
-Domino(cx=3, cy=5, 
-       side=0.6, 
+Domino(cx=3, cy=4.5,
+       side=0.6,
        centre_line=True,
        centre_line_stroke="red",
        centre_line_stroke_width=1,
        centre_line_length=0.22,
        centre_shape=dot(stroke="gold"),
-       pips=(3, 5), 
+       pips=(3, 5),
        stroke_width=0.5, rotation=15)
+
+# ---- custom shape for pips
+Domino(
+   x=0, y=5,
+   stroke_width=0.5,
+   pips=(3, 8),
+   pip_shape=polygon(side=0.125, sides=3))
+Domino(
+   x=2.25, y=5,
+   stroke_width=0.5,
+   side=0.75,
+   pips=(1, 6),
+   pip_shape=polygon(side=0.1, sides=6),
+   rotation=15)
 
 Save(
     output='png',

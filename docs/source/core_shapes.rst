@@ -5731,7 +5731,6 @@ the change in ``x`` and ``y`` values as part of the set.
       of centre.
 
 ===== ======
-; for example ``[(shape1), (shape2)]``
 
 .. _coreVertexShapes:
 

@@ -161,6 +161,7 @@ class PolygonShape(BaseShape):
     @property  # do NOT cache because centre needs to be changed!
     def _shape_centre(self) -> Point:
         """Centre of Polygon in points"""
+        # print(f"*** POLYGON cntr {self.use_abs_c=} {self._abs_cx=} {self._abs_cy=}")
         if self.cx is not None and self.cy is not None:
             x = self._u.cx + self._o.delta_x
             y = self._u.cy + self._o.delta_y

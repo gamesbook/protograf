@@ -294,7 +294,7 @@ This example shows how different shapes can be assigned to cards:
         Card('*', text1)
         Card("1-3", rc1)
         Card([7,8,9], line_in_rect)
-`Supporting Commands`_
+
 Here:
 
 - *all* (the ``*``) cards get assigned the same text (in the card centre by

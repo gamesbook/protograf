@@ -1718,8 +1718,6 @@ class BaseShape:
         self.use_abs_c = (
             True if self._abs_cx is not None and self._abs_cy is not None else False
         )
-        # if self.use_abs_c:
-        #     print(f"### Base set_abs: {self.use_abs_c=} {self._abs_cx=} {self._abs_cy=}")
 
     def draw(self, cnv=None, off_x=0, off_y=0, ID=None, **kwargs):
         """Draw an element on a given canvas."""

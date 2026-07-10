@@ -1139,6 +1139,34 @@ def rotate_point_around_point(
     final_y = rotated_y + cy
     return Point(round(final_x, 8), round(final_y, 8))
 
+def _rotate_point_around_point(
+    point_to_rotate: Point, center_point: Point, angle: float
+) -> Point:
+    """
+    Rotates a point around another point by a specified angle.
+
+    Args:
+        point_to_rotate: the Point to rotate
+        center_point: the Point to rotate around
+        angle (float): the rotation angle in degrees (anti-clockwise)
+
+    Returns:
+        Point: The (x, y) coordinates of the rotated point (rounded to 8 decimals)
+
+    Doc Test:
+
+    >>> rotate_point_around_point(Point(2,2), Point(1,1), 90)
+    Point(x=2.0, y=0.0)
+    >>> rotate_point_around_point(Point(2,2), Point(1,3), 45)
+    Point(x=1.0, y=1.58578644)
+    >>> rotate_point_around_point(Point(10,0), Point(0,0), 90)
+    Point(x=0.0, y=-10.0)
+    """
+    return rotate_point_around_point(
+        point_to_rotate=(point_to_rotate.x, point_to_rotate.y),
+        center_point=(center_point.x, center_point.y),
+        angle=angle)
+
 
 def rectangles_overlap(rect1: tuple, rect2: tuple) -> bool:
     """Check if rectangles overlap, given top-left and bottom-right coordinates
