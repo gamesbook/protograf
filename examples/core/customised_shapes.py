@@ -1479,7 +1479,8 @@ Text(common=txt, text="Band: Custom")
 
 Band(
     cx=3, cy=2,
-    stroke_width=1, stroke="red", fill="gold",
+    stroke_width=1,
+    stroke="red", fill="gold",
     radius=1,
     angle_start=112.5,
     angle_width=45,
@@ -1520,7 +1521,7 @@ PageBreak()
 Blueprint()
 Text(common=txt, text="Band: Text")
 bnd = Common(
-    radius=1, width=0.5,
+    radius=1, height=0.5,
     angle_width=90,
     stroke_width=0.5,
     fill=None,

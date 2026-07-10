@@ -169,7 +169,6 @@ class PolygonShape(BaseShape):
             y = self._u.y + self._o.delta_y
         # recalculate centre if preset
         if self.use_abs_c:
-            breakpoint()
             if self._abs_cx is not None and self._abs_cy is not None:
                 x = self._abs_cx
                 y = self._abs_cy

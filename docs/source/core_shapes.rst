@@ -1080,16 +1080,18 @@ A Band is a curved area between two radii; effectively it is a "subset" or
 "slice" of a `Sector`_. More formally it is known as an *Annular Sector* or
 *Annular Section*.
 
-A Band is drawn with a *width* (its "thickness"), a *radius*, as well as a
-centre point from which the radii extend.  There is a starting angle, and
-a "sweep" angle |dash| the *angle_width* property |dash| which together define
-where and how wide the sector extends.
+A Band is drawn with a *height* (its "thickness"), a *radius*, as well as a
+*centre* point from which the radii extend.  There is a starting angle, which
+determines where one radius, forming the end line, is drawn, and a "sweep"
+angle |dash| the *angle_width* property |dash| which determines where the
+second radius, forming the other end line, is drawn. Together, these
+properties define where and how wide a Band extends.
 
 .. NOTE::
 
     1. The **maximum** extent of a Band is 180 |deg| |dash| half a circle!
     2. The Band does **not** support a defined rotation property, like many
-       other shapes, but rather the rotation value is calculated based on the
+       other shapes'; rather the rotation value is calculated based on the
        *angle_start* and the *angle_width* properties.
 
 
@@ -1105,15 +1107,15 @@ Example 1. Default Band
 
       .. code:: python
 
-          Band(width=0.25)
+          Band(height=0.25)
 
       It has the following properties:
 
       - *centre* is at the default x-position ``1`` cm and y-position ``1`` cm
-      - *width* is ``0.25`` cm
+      - *height* is ``0.25`` cm
 
       **Note** that a Band cannot be drawn with only default values; this is
-      because its *width* |dash| which defaults to ``1`` cm |dash| must be
+      because its *height* |dash| which defaults to ``1`` cm |dash| must be
       less than its *radius* |dash| which also defaults to ``1`` cm.
 
 ===== ======
@@ -1183,11 +1185,12 @@ Example 2. Customised Band
       *cx* at `2` and `cy` of 4.  The Band is styled with *stroke*, *fill*,
       amnd *stroke_width*. Its start angle is set at 112.5 |deg| (anti-clockwise
       from horizontal east) and the width of the angle is 45 |deg|.
-      In addition, the Band has a *cross* and *dot* assigned to the centre.
+      In addition, the Band has a *cross* and *dot* which are automatically
+      drawn at the centre.
 
       The middle Band shows how shapes can be drawn at the vertices |dash|
       clockwise, from north-east |dash| and at the centre.  For more detail
-      on drawing these, including the ability to rotate them, see
+      on drawing such shapes, including the ability to rotate them, see
       `Shapes Common Properties`_.
 
       The lower Band has similar configuration to the middle Band, but it also
@@ -1214,7 +1217,7 @@ Example 3. Band with Text
       .. code:: python
 
         bnd = Common(
-            radius=1, width=0.5,
+            radius=1, height=0.5,
             angle_width=90,
             stroke_width=0.5,
             fill=None,
@@ -1251,17 +1254,16 @@ Example 3. Band with Text
         )
 
       These four Bands share a number of common properties, in terms of their
-      *angle_width* of ``90`` |deg| as well as the various text properties.
+      *angle_width* of ``90`` |deg|, *height* of ``0.5``, *radius* of ``1``,
+      as well as the various text properties.
 
       The different *angle_start* values show how the text is effectively
-      "rotated" relative to the centre of each Band.  The Band does **not**
+      "rotated" relative to the centre of each Band.  A Band does **not**
       have a defined rotation property, like many other shapes, but rather
       the rotation value is calculated based on the *angle_start* and the
       *angle_width* properties.
 
 ===== ======
-
-
 
 
 .. _circle-command:

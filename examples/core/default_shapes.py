@@ -217,7 +217,7 @@ PageBreak()
 
 Blueprint(stroke_width=blue_width)
 Text(common=header, text='Band')
-Band(width=0.25)
+Band(height=0.25)
 
 Save(output='png',
      dpi=300,

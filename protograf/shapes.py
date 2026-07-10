@@ -526,14 +526,18 @@ class BandShape(BaseShape):
         # ---- perform overrides
         self.radius = self.radius or self.diameter / 2.0
         # validate
-        if self.width > self.radius:
+        if self.height > self.radius:
             feedback(
-                f"A Band's width ({self.width}) cannot exceed its radius ({self.radius}) ",
+                f"A Band's height ({self.height}) cannot exceed its radius ({self.radius}) ",
                 True,
             )
         if kwargs.get("rotation"):
             feedback(
                 "A Band does not support rotation - use the angle_start property", True
+            )
+        if kwargs.get("width"):
+            feedback(
+                "A Band does not have a width property - use the height property", False
             )
         # calculate centre
         if self.cx is None and self.x is None:
@@ -569,7 +573,7 @@ class BandShape(BaseShape):
             self.angle_width
             / 360.0
             * math.pi
-            * (self.radius**2 - (self.radius - self.width) ** 2)
+            * (self.radius**2 - (self.radius - self.height) ** 2)
         )
         return ShapeGeometry(
             # centre
@@ -605,7 +609,7 @@ class BandShape(BaseShape):
         out_start, bez_out_2, bez_out_3, out_end = geoms.bezier_arc_points(
             self.angle_start,
             self.angle_width,
-            self._u.radius + self._u.width,
+            self._u.radius + self._u.height,
             pt_c,
             pt_c.y,
         )
@@ -624,7 +628,7 @@ class BandShape(BaseShape):
         # ---- mid point in units
         pt_mid = geoms.point_on_circle(
             pt_c,
-            self.unit(self.radius) + self.unit(self.width / 2.0),
+            self.unit(self.radius) + self.unit(self.height / 2.0),
             self.angle_start + self.angle_width / 2.0,
         )
         return pt_mid
@@ -637,13 +641,13 @@ class BandShape(BaseShape):
             self.x_c = self._abs_cx
             self.y_c = self._abs_cy
         # feedback(f"*** Band: {self.angle_start=} {self.angle_width=}")
-        # feedback(f"*** Band: {self._u.radius=} {self._u.width=}")
+        # feedback(f"*** Band: {self._u.radius=} {self._u.height=}")
         # ---- * bezier control points
         pt_c = Point(self.x_c + self._o.delta_x, self.y_c + self._o.delta_y)
         out_start, bez_out_2, bez_out_3, out_end = geoms.bezier_arc_points(
             self.angle_start,
             self.angle_width,
-            self._u.radius + self._u.width,
+            self._u.radius + self._u.height,
             pt_c,
             pt_c.y,
         )
@@ -655,7 +659,7 @@ class BandShape(BaseShape):
         # ---- * mid-pt of Band
         pt_mid = geoms.point_on_circle(
             point_centre=pt_c,
-            radius=self._u.radius + self._u.width / 2.0,
+            radius=self._u.radius + self._u.height / 2.0,
             angle=self.angle_start + self.angle_width / 2.0,
         )
         # ---- * debug
@@ -717,12 +721,12 @@ class BandShape(BaseShape):
         )
         txt_out_mid_pt = geoms.point_on_circle(
             pt_c,
-            self._u.radius + self._u.width,
+            self._u.radius + self._u.height,
             txt_angle_start + self.angle_width / 2.0,
         )
         txt_pt_mid = geoms.point_on_circle(
             pt_c,
-            self._u.radius + self._u.width / 2.0,
+            self._u.radius + self._u.height / 2.0,
             txt_angle_start + self.angle_width / 2.0,
         )
         inn_mid_chord = geoms.fraction_along_line(txt_inn_start, txt_inn_end, 0.5)
