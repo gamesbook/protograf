@@ -308,12 +308,18 @@ class CardShape(BaseShape):
     def get_geometry(
         self, frame_type: CardFrame, bbox: BBox, vertices: list
     ) -> ShapeGeometry:
-        """Geometry of Card frame."""
-        # breakpoint()  # UDF
+        """Geometry of Card frame.
+
+        Notes:
+            * Used by user defined card functions (UDF)
+        """
         _type = type(self)
-        cntr = Point((bbox.br.x - bbox.tl.x) / 2.0, (bbox.br.y - bbox.tl.y) / 2.0)
+        cntr = Point(
+            bbox.tl.x + (bbox.br.x - bbox.tl.x) / 2.0,
+            bbox.tl.y + (bbox.br.y - bbox.tl.y) / 2.0,
+        )
         cntr_user = self.as_point(cntr, self.units, None, None)
-        user_vertices = self._l2v(vertices)
+        user_vertices = self._l2v(vertices, margin_offset=True)  # handle margins
         # for i,v in enumerate(user_vertices): print(f'$$$ {frame_type} {i=} {v=}')
         n, ne, nw, e, se, s, sw, w = None, None, None, None, None, None, None, None
         nnw, nne, sse, ssw = None, None, None, None  # pointy hex
@@ -689,8 +695,7 @@ class CardShape(BaseShape):
                     if callable(new_ele) and not isinstance(
                         new_ele, (BaseShape, Switch)
                     ):
-                        # call user-defined function-like objects! # UDF
-                        # breakpoint()
+                        # call user defined card function or function-like object # UDF
                         try:
                             card_values = self.deck_data[cid]
                         except (IndexError, TypeError):  # may not be any deck_data

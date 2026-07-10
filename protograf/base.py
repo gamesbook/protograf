@@ -1718,6 +1718,8 @@ class BaseShape:
         self.use_abs_c = (
             True if self._abs_cx is not None and self._abs_cy is not None else False
         )
+        # if self.use_abs_c:
+        #     print(f"### Base set_abs: {self.use_abs_c=} {self._abs_cx=} {self._abs_cy=}")
 
     def draw(self, cnv=None, off_x=0, off_y=0, ID=None, **kwargs):
         """Draw an element on a given canvas."""
@@ -1979,9 +1981,12 @@ class BaseShape:
                 correct = False
         # ---- dice pip shape
         if self.pip_shape:
-            if _lower(self.pip_shape) not in ["circle", "diamond", "d", "c"]:
-                issue.append(f'"{self.pip_shape}" is an invalid pip_shape!')
-                correct = False
+            if isinstance(self.pip_shape, str):
+                if _lower(self.pip_shape) not in ["circle", "diamond", "d", "c"]:
+                    issue.append(
+                        f'"{self.pip_shape}" is an invalid pre-defined pip_shape!'
+                    )
+                    correct = False
         # ---- rectangle - corners
         if self.corners_style:
             if _lower(self.corners_style) not in [
@@ -2609,13 +2614,23 @@ class BaseShape:
                 True,
             )
 
-    def _l2v(self, values: list, decimals: int = 4):
-        """Convert Points list to rounded, units-based values using user units."""
+    def _l2v(self, values: list, decimals: int = 4, margin_offset: bool = False):
+        """Convert Points list to rounded, units-based values using user units.
+
+        Args:
+            values: list of Points to be convetrted
+            decimals: number of decimals to be rounded
+            margin_offset: if True, values should be offset from page margins
+        """
+        margin_left, margin_top = 0.0, 0.0
+        if margin_offset:
+            margin_left = globals.margins.left
+            margin_top = globals.margins.top
         try:
             _values = [
                 Point(
-                    round(float(value.x) / self.units, decimals),
-                    round(float(value.y) / self.units, decimals),
+                    round(float(value.x) / self.units - margin_left, decimals),
+                    round(float(value.y) / self.units - margin_top, decimals),
                 )
                 for value in values
             ]

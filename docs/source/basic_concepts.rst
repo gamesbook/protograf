@@ -66,6 +66,9 @@ i.e. a recipe or list of instructions that are stored in a file.
 A script's instructions are used to define a game board, a set of cards
 or tiles, or any other, similar, regular graphical design of your choice.
 
+A complete script with all commands, is what some software refers to as
+a "template" for your design.
+
 You will then use Python to "run" the script. Python will take the file
 you have written, and step through it, line by line, from top to bottom,
 to finally create an output PDF file or, optionally, PNG or GIF images,

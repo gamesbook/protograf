@@ -232,6 +232,7 @@ Examples of using Named Geometry Properties
 - `Example 3. Use of Vertices for Polygon`_
 - `Example 4. Hexagonal Vertices and Perbii`_
 - `Example 5. Circle Named and Other Points`_
+- `Example 6. Named Geometry for Cards`_
 
 Example 1. Named Properties
 ---------------------------
@@ -535,3 +536,34 @@ A Circle has three different ways to locate a point on its circumference.
       the east direction, can be specified.
 
 ===== ======
+
+.. _geometryCards:
+
+Example 6. Named Geometry for Cards
+-----------------------------------
+`^ <examples-named-geometry_>`_
+
+When working with :ref:`Cards <the-card-command>` and, specifically, in a
+:ref:`function <card-functions>` defined in the script, access to a card's
+frame geometry |dash| where the frame type, such as a rectangle, is defined
+in the :doc:`Deck command <deck_command>` |dash| is possible.
+
+This example shows how the corners of a rectangular Card's frame can be
+referenced.
+
+.. code:: python
+
+    def basic(data):
+        Dot(cxy=data.geo.nw)
+        Dot(cxy=data.geo.se)
+        return []
+
+    Deck()
+    Card("1-9", basic)
+
+Here, the *geo* property that has been created for a card, is available,
+along with any other card data; this case it is used to locate the
+``Dot`` commands that are drawn at opposing corners of each Card.
+
+Refer to the sections above for more details on what the geometry properties
+mean.

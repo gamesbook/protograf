@@ -42,7 +42,7 @@ and that you've created some basic scripts of your own using the
       - `Data Example 8. Filters`_
 - `The Matrix Command`_
 - `Countersheet and Counter Commands`_
-- `Supporting Commands`_
+- `Supporting Commands for Cards`_
 
   - `group function`_
   - `T(emplate) command`_
@@ -51,7 +51,7 @@ and that you've created some basic scripts of your own using the
       - `Template Functions`_
   - `S(election) command`_
   - `L(ookup) command`_
-  - `Card functions`_
+  - `Card Functions`_
 
 .. _the-deck-command:
 
@@ -76,7 +76,7 @@ The following are key properties that will usually need to be set for a
 .. IMPORTANT::
 
   The ``Deck`` command is covered in detail, with examples of all of its
-  properties, in `The Deck Command <deck_command.html>`_ section.
+  properties, in the `Deck Command <deck_command.html>`_ section.
 
 
 .. _deckcommandExamples:
@@ -199,15 +199,15 @@ The Card Command
 `↑ <table-of-contents-crddk_>`_
 
 This command is both simple and flexible. It allows for a complex design, with
-many elements, to be added to one, some |dash| or all |dash| of the cards in
-a deck.
+many elements |dash| primarily shapes |dash| to be added to one, some |dash| or
+all |dash| of the cards in a deck.
 
 The **key concept** to note about a card is that its essentially a "small page".
 Any x- and y-locations are therefore defined relative to the card edges
 and **not** to the page.
 
 A Card is defined somewhat differently from other shapes in **protograf**
-in that the properties are not named... a typical Card command looks like:
+in that its "properties" are not named... a typical Card command looks like:
 
     .. code:: python
 
@@ -248,14 +248,25 @@ Card Elements
 -------------
 
 The **second value**, and **all further values**, supplied to the ``Card()``
-command must be a :doc:`core shape <core_shapes>` or a
-:ref:`group <group-function>`.
+command *must* be either:
+
+* a :doc:`core shape <core_shapes>`, or
+* one of the a :ref:`supporting commands <deck-supporting-commands>`, such
+  as a :ref:`group <group-function>`, or
+* a Python function defined in the script.
 
 There can be any number of ``Card()`` commands; and the same output card could
 be targeted by multiple ``Card()`` commands, each affecting some aspect of its
 appearance; as elsewhere in **protograf** the order of commands matter in
 the sense that later commands may overwrite any elements created by earlier
 ones.
+
+.. IMPORTANT::
+
+    Be aware that when defining elements, such as shapes, that are not needed
+    immediately, you **MUST** use the *lowercase* version of the command name;
+    refer to the section on :ref:`case sensitivity <case-sensitivity-concept>`
+
 
 Card Creation Example 1.
 ------------------------
@@ -283,7 +294,7 @@ This example shows how different shapes can be assigned to cards:
         Card('*', text1)
         Card("1-3", rc1)
         Card([7,8,9], line_in_rect)
-
+`Supporting Commands`_
 Here:
 
 - *all* (the ``*``) cards get assigned the same text (in the card centre by
@@ -338,11 +349,11 @@ commands making the cards.
    spreadsheet; etc. |dash| will **always** take priority over the number
    of cards specified in the :ref:`Deck Command <the-deck-command>`..
 
-Because values now have "names" they can be
-referenced and used by the `Supporting Commands`_ - this is usually the primary
-reason to supply a data source in this way.
+Because values now have "names" they can be referenced and used by the
+:ref:`supporting commands <deck-supporting-commands>` |dash| this is usually
+the primary reason to supply a data source in this way.
 
-.. NOTE::
+.. IMPORTANT::
 
    A dataset that the script must use should be defined **before** a ``Deck``
    or ``Countersheet`` command is used; otherwise you will get this error:
@@ -578,6 +589,7 @@ to missing item in the CSV file (for Gandalf's age).
 See below under the `T(emplate) command`_ and also under the
 `S(election) command`_ for examples how this data could be used.
 
+.. _deck-data-google:
 
 Data Example 6. Google Sheets
 +++++++++++++++++++++++++++++
@@ -817,8 +829,8 @@ as to its purpose and use.
 
 .. _deck-supporting-commands:
 
-Supporting Commands
-===================
+Supporting Commands for Cards
+=============================
 `↑ <table-of-contents-crddk_>`_
 
 The following commands are helpful in terms of increased flexibilty and
@@ -1206,7 +1218,7 @@ the card with **ID** of ``1``; and then returns the value from that card's
 
 .. _card-functions:
 
-Card functions
+Card Functions
 --------------
 `↑ <table-of-contents-crddk_>`_
 
@@ -1220,16 +1232,29 @@ The function should accept one incoming value; this will hold the data
 associated with  a card |dash| for example, the row of data in a
 spreadsheet.  The function can then work with this data.
 
-The function should **return** one or more shapes; anything else will trigger
-an error.
+.. IMPORTANT::
 
-For example, if the function was called ``icon_list`` and it returned a
-number, then this error would be displayed::
+    The function should **return** a shape, **or** a list of one or more
+    shapes **or** an empty list |dash| anything else will trigger an error!
 
-    FEEDBACK:: Check that all elements created by 'icon_list' are shapes.
+    For example, if the function was called ``icon_list`` and it returned a
+    number, then this error would be displayed::
+
+        FEEDBACK:: Check that all elements created by 'icon_list' are shapes.
 
 The name of the function is assigned directly to the Card in the same way
-that shapes are usually assigned.
+that shapes, or template functions, are usually assigned.
+
+.. HINT::
+
+    It can be useful to treat the Card as a "small page", and make use of
+    other layout commands |dash| for example, :doc:`Repeat <layouts_repeat>`
+    or :ref:`Layout <layout-command>` |dash| to compose shapes on a card.
+    Such commands will require that you position them **relative** to a
+    top-left corner; by default this is the page corner, but you can alter
+    this via a reference to the Card's corner by making use of the
+    :ref:`card geometry <geometryCards>`.
+
 
 Card Function Example 1.
 ++++++++++++++++++++++++
@@ -1251,7 +1276,8 @@ by the ``Card()`` command as follows:
 A card's data is accessed by the use of the "." (dot) notation; in this
 case the value of the ``Name`` column for the card is accessed by using
 ``data.Name`` and the value of the ``Birth`` column for the card is accessed
-by using ``data.Birth``.
+by using ``data.Birth``.  This example assumes that you have text values
+for ``Name`` and numeric values for ``Birth``.
 
 The function makes use of a :ref:`Python if <python-if>` switch to choose
 different ``greeting`` values depending on the ``Birth`` value.  The text

@@ -677,11 +677,28 @@ class DiceObject(BaseShape):
         offset: float,
         px: float,
         py: float,
-        pip_shape: str,
+        pip_shape: str | BaseShape,
         pip_radius: float,
         shape_name: str = "shape",
     ):
         """Draw pips based on a number (the 'pips') and the pip style."""
+        if isinstance(pip_shape, BaseShape):
+            match number:
+                case 1:
+                    pip_shape.set_abs_and_offset(_abs_cx=px, _abs_cy=py)
+                    pip_shape.draw()
+                case 2:
+                    pip_shape.set_abs_and_offset(
+                        _abs_cx=px - offset, _abs_cy=py - offset
+                    )
+                    pip_shape.draw()
+                    pip_shape.set_abs_and_offset(
+                        _abs_cx=px + offset, _abs_cy=py + offset
+                    )
+                    pip_shape.draw()
+                case _:
+                    feedback(f"The {shape_name} must use a number from 1 to 9", True)
+            return
 
         if _lower(pip_shape) in ["circle", "c"]:
             match number:

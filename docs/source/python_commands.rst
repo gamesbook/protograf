@@ -339,10 +339,10 @@ are part of them.
 
 A function is simply created/defined by using a ``def`` command, followed by
 the name you want to give the function |dash| using a word with **no** spaces
-in it |dash| followed by the set of property names and their default values
-|dash| if any. These properties are only available as part of the function,
-and represent aspects of that function that you need to be able to change
-every time the function is activated.
+in it |dash| followed by a bracket-wrapped set of property names and their
+default values |dash| if any. These properties are only available as part of
+the function, and represent aspects of that function that you need to be able
+to change or process every time the function is activated.
 
 The ``def`` line is followed by one or more lines that are all indented and
 all aligned; these represent the actions that are to be carried out in that
@@ -353,6 +353,14 @@ When a function is defined, it is **not** activated; its only when you issue
 a command for it |dash| ``name()`` |dash| that it will perform the actions
 defined as part of it, and the script will carry on from the point where it
 was activated.
+
+.. HINT::
+
+    When using :ref:`functions <card-functions>` in conjunction with
+    :ref:`Cards <the-card-command>`, the function is referenced from
+    the card's properties **without** the trailing ``()``; this is
+    because the script activates the function on your behalf as and
+    when the card is drawn.
 
 
 Function Example 1. Drawing Shapes
