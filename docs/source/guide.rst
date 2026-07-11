@@ -34,7 +34,7 @@ on each other.
     :doc:`Deck command <deck_command>` and the use of
     :doc:`images, symbols and fonts <card_images>`
 9.  :doc:`Customised Shapes <customised_shapes>` - how to refine the
-    appearance of certain shapes; circles, hexagons, lines and rectangles;
+    appearance of major shapes; circles, hexagons, lines and rectangles;
     supplemented by the :doc:`geometry of a shape <shapes_geometry>`
 10. :doc:`Customised Text <customised_text>` - how to refine the
     appearance of text

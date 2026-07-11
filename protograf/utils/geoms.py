@@ -7,6 +7,7 @@ Mathematical utility functions for protograf
 import cmath
 import logging
 import math
+import numpy as np
 import sys
 from typing import Any, List
 
@@ -792,11 +793,67 @@ def bezier_arc_segment(
     return (x0, y0), (x1, y1, x2, y2, x3, y3)
 
 
+def bezier_arc_points(
+    start_angle: float,
+    width_angle: float,
+    radius: float,
+    centre: Point,
+    invert: float = 0,
+) -> tuple:
+    """
+    Calculates the 4 control points of a cubic Bezier curve to approximate a circular arc.
+
+    Note:
+        * This approximates a circular arc up to 180 degrees.
+        * Angles are in degrees, measured from East (positive X-axis) anti-clockwise.
+    """
+    if abs(width_angle) > 180:
+        feedback("Angle of width must be less than, or equal to, 180", True)
+        return None, None, None, None
+
+    # 0. Convert angles to radians
+    theta0 = np.radians(start_angle)
+    delta_theta = np.radians(width_angle)
+    theta1 = theta0 + delta_theta
+    cx, cy = centre.x, centre.y
+
+    # 1. Calculate end points (P0 and P3)
+    pt0 = np.array([cx + radius * np.cos(theta0), cy + radius * np.sin(theta0)])
+    pt3 = np.array([cx + radius * np.cos(theta1), cy + radius * np.sin(theta1)])
+
+    # 2. Calculate weight factor 'k' (distance to internal control points)
+    k = (4.0 / 3.0) * np.tan(delta_theta / 4.0)
+
+    # 3. Calculate internal control points (P1 and P2) using tangents
+    # Tangent at theta0 points counter-clockwise: (-sin(theta0), cos(theta0))
+    pt1 = pt0 + k * radius * np.array([-np.sin(theta0), np.cos(theta0)])
+    # Tangent at theta1 points counter-clockwise: (-sin(theta1), cos(theta1))
+    pt2 = pt3 - k * radius * np.array([-np.sin(theta1), np.cos(theta1)])
+
+    # invert Y around the inversion value: 2 * L - y_old
+    if invert:
+        return (
+            Point(pt0[0].item(), 2 * invert - pt0[1].item()),
+            Point(pt1[0].item(), 2 * invert - pt1[1].item()),
+            Point(pt2[0].item(), 2 * invert - pt2[1].item()),
+            Point(pt3[0].item(), 2 * invert - pt3[1].item()),
+        )
+    else:
+        return (
+            Point(pt0[0].item(), pt0[1].item()),
+            Point(pt1[0].item(), pt1[1].item()),
+            Point(pt2[0].item(), pt2[1].item()),
+            Point(pt3[0].item(), pt3[1].item()),
+        )
+
+
 def circle_angles(radius: float, chord: float) -> tuple:
     """Calculate interior angles of isosceles triangle formed inside a circle.
 
     Args:
-        radius (float): radius of circle
+        radius (float): radius of circle    breakpoint()
+    print('!!!', pt0, pt1, pt2, pt3)
+    return pt0, pt1, pt2, pt3
         chord (float): length of line between two points on circle
 
     Source:
@@ -1007,7 +1064,7 @@ def circle_chord_endpoints(
 
 
 def circle_to_chord(radius: float, chord: float) -> float:
-    """Calculate the distance between centre of a chord and the diameter
+    """Calculate the distance between centre of a chord and the circumference
 
     Args:
         radius (float): radius of circle
@@ -1081,6 +1138,36 @@ def rotate_point_around_point(
     final_x = rotated_x + cx
     final_y = rotated_y + cy
     return Point(round(final_x, 8), round(final_y, 8))
+
+
+def _rotate_point_around_point(
+    point_to_rotate: Point, center_point: Point, angle: float
+) -> Point:
+    """
+    Rotates a point around another point by a specified angle.
+
+    Args:
+        point_to_rotate: the Point to rotate
+        center_point: the Point to rotate around
+        angle (float): the rotation angle in degrees (anti-clockwise)
+
+    Returns:
+        Point: The (x, y) coordinates of the rotated point (rounded to 8 decimals)
+
+    Doc Test:
+
+    >>> rotate_point_around_point(Point(2,2), Point(1,1), 90)
+    Point(x=2.0, y=0.0)
+    >>> rotate_point_around_point(Point(2,2), Point(1,3), 45)
+    Point(x=1.0, y=1.58578644)
+    >>> rotate_point_around_point(Point(10,0), Point(0,0), 90)
+    Point(x=0.0, y=-10.0)
+    """
+    return rotate_point_around_point(
+        point_to_rotate=(point_to_rotate.x, point_to_rotate.y),
+        center_point=(center_point.x, center_point.y),
+        angle=angle,
+    )
 
 
 def rectangles_overlap(rect1: tuple, rect2: tuple) -> bool:

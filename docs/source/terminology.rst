@@ -293,8 +293,8 @@ to set.
    item in question; examples include: **cross_stroke_width**;
    **grid_stroke_width**; **radii_stroke_width**; **perbsis_stroke_width**,
    etc.
--  **width** - the horizontal dimension of a shape e.g. a ``Rectangle``
-   or a bitmap ``Image``
+-  **width** - one of the dimensions of a shape e.g. the "horizontal" size
+   of ``Rectangle`` or bitmap ``Image``, or the "thickness" of a ``Band``
 
 
 .. _termsAmount:

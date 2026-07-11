@@ -34,6 +34,7 @@ Shape Index
 
 -  `Arc`_
 -  `Arrow`_
+-  `Band`_
 -  `Blueprint`_
 -  `Bezier`_
 -  `Circle`_
@@ -125,6 +126,10 @@ Arc
 
 An Arc is a curved line between two points located along the circumference
 of a circle.
+
+.. HINT::
+
+    To create the "area equivalent" of an Arc, use a `Band`_.
 
 Example 1. Default Arc
 ++++++++++++++++++++++
@@ -1062,6 +1067,201 @@ Example 3. Styled Arrow
 
       The blue arrow also has matching *width* and *head_width* (of ``0.5`` cm)
       which means that there are no visible arrowhead "wingtips".
+
+===== ======
+
+.. _band-command:
+
+Band
+~~~~
+`↑ <shape-index_>`_
+
+A Band is a curved area between two radii; effectively it is a "subset" or
+"slice" of a `Sector`_. More formally it is known as an *Annular Sector* or
+*Annular Section*.
+
+A Band is drawn with a *height* (its "thickness"), a *radius*, as well as a
+*centre* point from which the radii extend.  There is a starting angle, which
+determines where one radius, forming the end line, is drawn, and a "sweep"
+angle |dash| the *angle_width* property |dash| which determines where the
+second radius, forming the other end line, is drawn. Together, these
+properties define where and how wide a Band extends.
+
+.. NOTE::
+
+    1. The **maximum** extent of a Band is 180 |deg| |dash| half a circle!
+    2. The Band does **not** support a defined rotation property, like many
+       other shapes'; rather the rotation value is calculated based on the
+       *angle_start* and the *angle_width* properties.
+
+
+Example 1. Default Band
++++++++++++++++++++++++
+
+.. |bnd| image:: images/defaults/band.png
+   :width: 330
+
+===== ======
+|bnd| This example shows the shape constructed using the command with only
+      one property set:
+
+      .. code:: python
+
+          Band(height=0.25)
+
+      It has the following properties:
+
+      - *centre* is at the default x-position ``1`` cm and y-position ``1`` cm
+      - *height* is ``0.25`` cm
+
+      **Note** that a Band cannot be drawn with only default values; this is
+      because its *height* |dash| which defaults to ``1`` cm |dash| must be
+      less than its *radius* |dash| which also defaults to ``1`` cm.
+
+===== ======
+
+Example 2. Customised Band
+++++++++++++++++++++++++++
+
+.. |bn2| image:: images/customised/band_custom.png
+   :width: 330
+
+===== ======
+|bn2| This example shows the shape constructed using the command with these
+      properties:
+
+      .. code:: python
+
+        Band(
+            cx=2, cy=4,
+            stroke_width=1,
+            stroke="red", fill="gold",
+            radius=1,
+            angle_start=112.5,
+            angle_width=45,
+            dot=0.05,
+            cross=0.33,
+        )
+
+        Band(
+            cx=3, cy=4,
+            stroke_width=1,
+            radius=1,
+            angle_start=112.5,
+            angle_width=45,
+            vertex_shapes=[
+                circle(radius=0.2, label="ne"),
+                circle(radius=0.2, label="se"),
+                circle(radius=0.2, label="sw"),
+                circle(radius=0.2, label="nw")
+            ],
+            vertex_shapes_rotated=True,
+            centre_shapes=[
+                circle(radius=0.2, label="t")],
+            centre_shapes_rotated=True,
+        )
+
+        bnd = Band(
+            cx=2, cy=6,
+            radius=1,
+            angle_start=45,
+            angle_width=90,
+            no_ends=True,
+        )
+        Dot(
+            cxy=bnd.geo.ne,
+            fill="red",
+            dot_width=5)
+        Dot(
+            cxy=bnd.geo.sw,
+            fill="gold",
+            dot_width=5)
+        Dot(
+            cxy=bnd.geo.c,
+            fill="green",
+            dot_width=5)
+
+      The top Band sets the centre point around which it is drawn to be
+      *cx* at `2` and `cy` of 4.  The Band is styled with *stroke*, *fill*,
+      amnd *stroke_width*. Its start angle is set at 112.5 |deg| (anti-clockwise
+      from horizontal east) and the width of the angle is 45 |deg|.
+      In addition, the Band has a *cross* and *dot* which are automatically
+      drawn at the centre.
+
+      The middle Band shows how shapes can be drawn at the vertices |dash|
+      clockwise, from north-east |dash| and at the centre.  For more detail
+      on drawing such shapes, including the ability to rotate them, see
+      `Shapes Common Properties`_.
+
+      The lower Band has similar configuration to the middle Band, but it also
+      has the property *no_ends* set to ``True``.  This will cause the two end
+      lines to be drawn in the same color as the Band's *fill*, giving it an
+      "open" appearance.
+
+      As an example of accessing the Band's :doc:`geometry <shapes_geometry>`,
+      colored Dots are shown located at two of the vertices, as well as at the
+      centre of the Band.
+
+===== ======
+
+Example 3. Band with Text
++++++++++++++++++++++++++
+
+.. |bn3| image:: images/customised/band_text.png
+   :width: 330
+
+===== ======
+|bn3| This example shows the shape constructed using the command with these
+      properties:
+
+      .. code:: python
+
+        bnd = Common(
+            radius=1, height=0.5,
+            angle_width=90,
+            stroke_width=0.5,
+            fill=None,
+            label_size=6,
+            title_size=6,
+            heading_size=6,
+            heading="Heading",
+            label="Label",
+            title="Title",
+        )
+        Band(
+            cx=2, cy=2,
+            stroke="green",
+            angle_start=45,
+            common=bnd,
+         )
+        Band(
+            cx=4, cy=3,
+            stroke="blue",
+            angle_start=135,
+            common=bnd,
+        )
+        Band(
+            cx=0, cy=3,
+            stroke="gold",
+            angle_start=315,
+            common=bnd,
+        )
+        Band(
+            cx=2, cy=4,
+            stroke="red",
+            angle_start=225,
+            common=bnd,
+        )
+
+      These four Bands share a number of common properties, in terms of their
+      *angle_width* of ``90`` |deg|, *height* of ``0.5``, *radius* of ``1``,
+      as well as the various text properties.
+
+      The different *angle_start* values show how the text is effectively
+      "rotated" relative to the centre of each Band.  A Band does **not**
+      have a defined rotation property, like many other shapes, but rather
+      the rotation value is calculated based on the *angle_start* and the
+      *angle_width* properties.
 
 ===== ======
 
@@ -4414,7 +4614,7 @@ the desired output:
 .. NOTE::
 
   The term "common" in this section is referring to the concept that many
-  shapes are properrties with the same names and similar behaviour.  This
+  shapes are properties with the same names and similar behaviour.  This
   makes it a bit easier to use and remember them.  In **protograf** the
   :ref:`Common command <the-common-command>` has the specific meaning of
   setting the same property value(s) to be used in multiple shapes in the
@@ -4613,7 +4813,7 @@ Rotation
 
 Every shape, whose *centre* can be calculated, will support a *rotation*
 property. Rotation takes place in anti-clockwise direction, from the horizontal,
-around the centre of the shape, in *degrees*.
+around the centre of the shape, in *degrees*. (An exception is the `Band`_ shape.)
 
 Example 1. Rhombus Rotation
 +++++++++++++++++++++++++++
@@ -4824,8 +5024,8 @@ Radii shapes are constructed using the following properties:
     ``1`` the radii shape will be drawn outside of, or away from, the parent
     shape
 - *radii_shapes_rotated* - an optional property which, if ``True``, will
-  rotate the vertex shapes such they "point" away from the centre of the
-  parent shape
+  rotate the vertex shapes such they lie along the line extending from
+  the centre of the parent shape to that vertex
 
 Radii shapes can be constructed for:
 
@@ -5457,7 +5657,13 @@ Centre Shapes
 Any shape that can be defined using its centre, may have multiple shapes |dash|
 called "centre shapes" |dash| placed inside of it.
 
-These shapes are supplied as a list of sets; for example ``[(shape1), (shape2)]``
+Centre shapes are constructed using the following properties:
+
+- *centre_shapes* - this is a list (values in ``[...]``) of shapes that
+  should be placed at the centre, in order of drawing; for example
+  ``[(shape1), (shape2)]``
+- *centre_shapes_rotated* - an optional setting which, if ``True``, will
+  rotate the centre shapes to align with the shape's rotation (if any)
 
 .. NOTE::
 
@@ -5526,7 +5732,6 @@ the change in ``x`` and ``y`` values as part of the set.
 
 ===== ======
 
-
 .. _coreVertexShapes:
 
 Vertex Shapes
@@ -5539,12 +5744,12 @@ will be centered on those points.
 
 Vertex shapes are constructed using the following properties:
 
-- *vertex_shapes* - this a list (values in ``[...]``) of shapes that
+- *vertex_shapes* - this is a list (values in ``[...]``) of shapes that
   should be placed on vertices, in the order that these vertices are
-  drawn
+  drawn; for example ``[(shape1), (shape2)]``
 - *vertex_shapes_rotated* - an optional setting which, if ``True``, will
   rotate the vertex shapes such they "point" away from the centre of the
-  parent shape
+  parent shape and towards the vertex
 
 Vertex shapes can be constructed for:
 

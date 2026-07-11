@@ -59,6 +59,7 @@ from .shapes import (
     TextShape,
     TrapezoidShape,
     TriangleShape,
+    BandShape,
 )
 from .shapes_circle import CircleShape
 from .shapes_hexagon import HexShape
@@ -275,6 +276,7 @@ class CardShape(BaseShape):
             cnv=canvas, row=None, col=None, cid=None, label=None, **kwargs
         )
         self.image = kwargs.get("image", None)
+        self.frame_geometry = ShapeGeometry()  # empty place-holder
 
     def draw(self, cnv=None, off_x=0, off_y=0, ID=None, **kwargs):
         """Draw an element on a given canvas."""
@@ -302,6 +304,111 @@ class CardShape(BaseShape):
                     f" created by '{the_function.__name__}' are all shapes.",
                     True,
                 )
+
+    def get_geometry(
+        self, frame_type: CardFrame, bbox: BBox, vertices: list
+    ) -> ShapeGeometry:
+        """Geometry of Card frame.
+
+        Notes:
+            * Used by user defined card functions (UDF)
+        """
+        _type = type(self)
+        cntr = Point(
+            bbox.tl.x + (bbox.br.x - bbox.tl.x) / 2.0,
+            bbox.tl.y + (bbox.br.y - bbox.tl.y) / 2.0,
+        )
+        cntr_user = self.as_point(cntr, self.units, None, None)
+        user_vertices = self._l2v(vertices, margin_offset=True)  # handle margins
+        # for i,v in enumerate(user_vertices): print(f'$$$ {frame_type} {i=} {v=}')
+        n, ne, nw, e, se, s, sw, w = None, None, None, None, None, None, None, None
+        nnw, nne, sse, ssw = None, None, None, None  # pointy hex
+        wnw, ene, ese, wsw = None, None, None, None  # flat hex
+        perim, radius, diameter, height, width, side, area = (
+            None,
+            None,
+            None,
+            None,
+            None,
+            None,
+            None,
+        )
+        match frame_type:
+            case CardFrame.RECTANGLE:
+                # user_vertices => clockwise from top-right
+                ne = user_vertices[0]
+                se = user_vertices[1]
+                sw = user_vertices[2]
+                nw = user_vertices[3]
+                height = self.height
+                width = self.width
+                area = height * width
+                perim = 2.0 * height + 2.0 * width
+            case CardFrame.CIRCLE:
+                radius = self.radius
+                diameter = 2 * self.radius
+                area = math.pi * radius**2
+            case CardFrame.HEXAGON:
+                #   5__4
+                #   /  \
+                # 0/    \3
+                #  \    /
+                #  1\__/2
+                ne = user_vertices[4]
+                e = user_vertices[3]
+                se = user_vertices[2]
+                sw = user_vertices[1]
+                w = user_vertices[0]
+                nw = user_vertices[5]
+                # radius = self._p2v(hex_geom.radius)
+                # diameter = self._p2v(hex_geom.diameter)
+                # height = self._p2v(hex_geom.height_flat)
+                # side = self._p2v(hex_geom.radius)
+                # area = math.sqrt(3) * 3 / 2 * side**2
+                # perim = 6 * side
+            case _:
+                raise NotImplementedError(
+                    f"Outline cannot handle card frame type: {frame_type}"
+                )
+
+        _type = type(self)
+        return ShapeGeometry(
+            # centre
+            centre=cntr_user,
+            center=cntr_user,
+            c=cntr_user,
+            # vertices and perbii
+            n=n,
+            ne=ne,
+            e=e,
+            se=se,
+            s=s,
+            sw=sw,
+            w=w,
+            nw=nw,
+            nnw=nnw,
+            nne=nne,
+            sse=sse,
+            ssw=ssw,
+            wnw=wnw,
+            ene=ene,
+            ese=ese,
+            wsw=wsw,
+            # length
+            perimeter=perim,
+            radius=radius,
+            diameter=diameter,
+            height=height,
+            width=width,
+            side=side,
+            # other
+            area=area,
+            # meta
+            t=_type,
+            type=_type,
+            shapetype=_type,
+            name=self.simple_name(self),
+        )
 
     def draw_card(self, cnv, row, col, cid, **kwargs):
         """Draw a Card on a given canvas.
@@ -395,14 +502,15 @@ class CardShape(BaseShape):
         # ---- track frame outlines for possible image extraction
         match kwargs["frame_type"]:
             case CardFrame.RECTANGLE:
-                _vertices = outline._shape_vertexes  # clockwise from top-right
-                base_frame_bbox = BBox(tl=_vertices[3], br=_vertices[1])
+                fr_vertices = outline._shape_vertexes  # clockwise from top-right
+                base_frame_bbox = BBox(tl=fr_vertices[3], br=fr_vertices[1])
             case CardFrame.CIRCLE:
+                fr_vertices = []
                 base_frame_bbox = outline.bbox
             case CardFrame.HEXAGON:
-                _vertices = outline._shape_vertexes  # anti-clockwise from mid-left
-                # print(f"$$$ HEXAGON {_vertices=}")
-                # _vvs = self._l2v(_vertices)
+                fr_vertices = outline._shape_vertexes  # anti-clockwise from mid-left
+                # print(f"$$$ HEXAGON {fr_vertices=}")
+                # _vvs = self._l2v(fr_vertices)
                 # for i,v in enumerate(_vvs): print(f'$$$ HEX-V {i=} {v=}')
                 #   5__4
                 #   /  \
@@ -410,8 +518,8 @@ class CardShape(BaseShape):
                 #  \    /
                 #  1\__/2
                 base_frame_bbox = BBox(
-                    tl=Point(_vertices[0].x, _vertices[5].y),
-                    br=Point(_vertices[3].x, _vertices[2].y),
+                    tl=Point(fr_vertices[0].x, fr_vertices[5].y),
+                    br=Point(fr_vertices[3].x, fr_vertices[2].y),
                 )
             case _:
                 raise NotImplementedError(
@@ -482,6 +590,13 @@ class CardShape(BaseShape):
                 globals.card_frames[page] = [_cframe]
             else:
                 globals.card_frames[page].append(_cframe)
+        else:
+            frame_bbox = base_frame_bbox
+
+        # ---- set card frame geometry
+        self.frame_geometry = self.get_geometry(
+            kwargs["frame_type"], frame_bbox, fr_vertices
+        )
 
         # ---- draw card grid for Rectangle cards
         if card_grid and kwargs["frame_type"] == CardFrame.RECTANGLE:
@@ -583,16 +698,21 @@ class CardShape(BaseShape):
                     if callable(new_ele) and not isinstance(
                         new_ele, (BaseShape, Switch)
                     ):
-                        # call user-defined function-like objects!
-                        card_values = self.deck_data[cid]
-                        card_values_tuple = namedtuple("Data", card_values.keys())(
-                            **card_values
-                        )
+                        # call user defined card function or function-like object # UDF
+                        try:
+                            card_values = self.deck_data[cid]
+                        except (IndexError, TypeError):  # may not be any deck_data
+                            card_values = {}
+                        card_values["geo"] = self.frame_geometry
+                        Data = namedtuple("Data", card_values.keys())
+                        card_values_tuple = Data(**card_values)
                         try:
                             _one_or_more_eles = new_ele(card_values_tuple) or []
                         except Exception as err:
+                            e_n = type(err).__name__
+                            fname = new_ele.__name__
                             feedback(
-                                f"Unable to create card #{cid + 1}. (Error:- {err})",
+                                f"Unable to create card #{cid + 1}. ({e_n}: {err} for '{fname}' function)",
                                 True,
                             )
                         if isinstance(_one_or_more_eles, list):
@@ -657,7 +777,12 @@ class CardShape(BaseShape):
                 except Exception as err:
                     feedback(f"Unable to create card #{cid + 1}. (Error: {err})", True)
             except Exception as err:
-                feedback(f"Unable to draw card #{cid + 1}. (Error: {err})", True)
+                t_b = sys.exc_info()[2]
+                e_n = type(err).__name__
+                feedback(
+                    f"Unable to draw card #{cid + 1}. ({e_n}: {err} on line: {t_b.tb_lineno})",
+                    True,
+                )
 
 
 class DeckOfCards:
@@ -833,7 +958,8 @@ class DeckOfCards:
 
     def gallery_overrides(self, gallery):
         """Reset document and page properties to handle NxM card layouts"""
-        err = f'The gallery property must be a pair of numbers in (M, N) format; not "{gallery}".'
+        err = f'The gallery property must be a pair of numbers in (M, N) format; not "{
+            gallery}".'
         if isinstance(gallery, tuple) and len(gallery) == 2:
             if not isinstance(gallery[0], int) or not isinstance(gallery[1], int):
                 feedback(err, True)
@@ -2290,7 +2416,8 @@ def Save(**kwargs):
     # print(f'$$$ SAVE {globals.directory=}')
     if not os.path.exists(globals.directory):
         feedback(
-            f'Cannot find the directory "{globals.directory}" - please create this first.',
+            f'Cannot find the directory "{
+                globals.directory}" - please create this first.',
             True,
         )
 
@@ -2635,6 +2762,7 @@ def Card(
 
     kwargs = margins(**kwargs)
     # print(f'*** Card: {kwargs}')
+    # print(f'*** Card: {elements}')
     if not globals.deck:
         feedback("The Deck() has not been defined or is incorrect.", True)
     if not sequence:
@@ -2709,7 +2837,7 @@ def Card(
         if card:
             # ---- add elements to card
             for element in elements:
-                # print(f'$$$  Card() {element=} {type(element)=}')
+                # print(f"$$$  Card() {element=} {type(element)=}")
                 if isinstance(element, TemplatingType):
                     add_members_to_card(element)
                 else:
@@ -2799,9 +2927,8 @@ def CardBack(sequence: object = None, *elements, **kwargs):
                 globals.deck.images_back_list,
                 err,
             )
-            feedback(
-                f'Unable to convert "{sequence}" into a cardback or range of cardbacks {globals.deck}.'
-            )
+            feedback(f'Unable to convert "{
+                    sequence}" into a cardback or range of cardbacks {globals.deck}.')
     max_backs = len(globals.deck.backs)
     for index, _back in enumerate(_cardbacks):
         if _back > max_backs:
@@ -3115,20 +3242,22 @@ def Data(**kwargs):
                 ftype = _lower(_filter[2])
                 match ftype:
                     case "<" | "less than" | "less" | "fewer than" | "fewer" | "lt":
-                        globals.dataset = [d for d in globals.dataset if d[key] < value]
+                        globals.dataset = [
+                            ds for ds in globals.dataset if ds[key] < value
+                        ]
                     case ">" | "greater than" | "greater" | "more than" | "more" | "gt":
                         globals.dataset = [d for d in globals.dataset if d[key] > value]
                     case "<>" | "!=" | "not equal" | "not" | "ne":
                         globals.dataset = [
-                            d for d in globals.dataset if d[key] != value
+                            ds for ds in globals.dataset if ds[key] != value
                         ]
                     case "=" | "==" | "equals" | "equal to" | "eq":
                         globals.dataset = [
-                            d for d in globals.dataset if d[key] != value
+                            ds for ds in globals.dataset if ds[key] != value
                         ]
                     case "~" | "in" | "is in" | "contains":
                         globals.dataset = [
-                            d for d in globals.dataset if value in d[key]
+                            ds for ds in globals.dataset if str(value) in str(ds[key])
                         ]
                     case _:
                         feedback(
@@ -4219,6 +4348,32 @@ def triangle(row=None, col=None, **kwargs):
     return TriangleShape(canvas=globals.canvas, **kwargs)
 
 
+def Band(row=None, col=None, **kwargs):
+    """Draw a Band shape on the canvas.
+
+    Args:
+
+    - row (int): row in which the shape is drawn.
+    - col (int): column in which shape is drawn.
+
+    Kwargs:
+
+    <center>
+
+    """
+    kwargs = margins(**kwargs)
+    kwargs["row"] = row
+    kwargs["col"] = col
+    bnd = BandShape(canvas=globals.canvas, **kwargs)
+    bnd.draw()
+    return bnd
+
+
+def band(row=None, col=None, **kwargs):
+    kwargs = margins(**kwargs)
+    return BandShape(canvas=globals.canvas, **kwargs)
+
+
 # ---- grids ====
 
 
@@ -4692,12 +4847,14 @@ def Layout(grid, **kwargs):
                 shape = corner[1]
                 if _lower(value) not in ["nw", "ne", "sw", "se", "*"]:
                     feedback(
-                        f'The {grid_classname} corner must be one of nw, ne, sw, se (not "{value}")!',
+                        f'The {grid_classname} corner must be one of nw, ne, sw, se (not "{
+                            value}")!',
                         True,
                     )
                 if not isinstance(shape, BaseShape):
                     feedback(
-                        f'The {grid_classname} corner item must be a shape (not "{shape}") !',
+                        f'The {grid_classname} corner item must be a shape (not "{
+                            shape}") !',
                         True,
                     )
                 if value == "*":
@@ -4709,7 +4866,8 @@ def Layout(grid, **kwargs):
                     corners_dict[value] = shape
             except Exception:
                 feedback(
-                    f'The {grid_classname} corners setting "{corner}" is not a valid list',
+                    f'The {grid_classname} corners setting "{
+                        corner}" is not a valid list',
                     True,
                 )
 
@@ -5141,7 +5299,8 @@ def Track(track=None, **kwargs):
         except KeyError as err:
             text = str(err).split()
             feedback(
-                f"You cannot use {text[0]} as a special field; remove the {{ }} brackets",
+                f"You cannot use {
+                    text[0]} as a special field; remove the {{ }} brackets",
                 True,
             )
 

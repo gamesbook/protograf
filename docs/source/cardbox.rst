@@ -312,6 +312,7 @@ always, check how they are allowed to be used and any terms and conditions.
 * https://www.cpforbes.net/tuckbox/
 * https://deckinabox.sgenoud.com/deck
 * https://andylei.github.io/paperbox/
+* https://dprather12.github.io/tuckbox-gen/
 
 In addition, BoardGameGeek hosts a page listing similar resources at
 https://boardgamegeek.com/wiki/page/Tuck_boxes

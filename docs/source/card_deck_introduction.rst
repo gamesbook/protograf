@@ -14,7 +14,7 @@ and that you've created some basic scripts of your own using the
 .. _table-of-contents-wwc:
 
 - `Background`_
-- `The Development Process`_
+- `The Card Development Process`_
 - `Key Concepts and Commands`_
 - `Images, Symbols and Fonts`_
 - `Supporting Commands`_
@@ -54,21 +54,21 @@ all aspects of the modern board gaming experience, with cards or tiles
 taking a predominant role in many of them.
 
 
-The Development Process
-=======================
+The Card Development Process
+============================
 `↑ <table-of-contents-wwc_>`_
 
 The aim of prototyping is to encapsulate a simple but effective representation
-of your ideas into a design.
+of the ideas for your cards into a viable design.
 
-The heart of the design process for prototyping cards is a three step process:
+The heart of the design process for prototyping *cards* are three steps:
 
 - define **what** "things" you want to appear on the cards
 - define **where** you want those "things" to appear
 - define **how** you want those "things" to look
 
 You probably will iterate |dash| repeat |dash| those steps a number of times,
-adding and adjusting until you are happy with the result.
+adding and adjusting until you are satisfied with the result.
 
 In brief; the "things" for your cards are typically text, along with the names
 of icons and images, stored in a CSV file or spreadsheet; while in your script
@@ -106,7 +106,7 @@ the related detail in the `Card Command`_ section below.
 .. HINT::
 
     Be aware that when defining elements, such as shapes, that are not needed
-    immediately, you will use the **lowercase** version of the command name;
+    immediately, you **MUST** use the *lowercase* version of the command name;
     refer to the section on  :ref:`case sensitivity <case-sensitivity-concept>`
 
 There are two core commands needed; the ``Deck()`` and the ``Card()``; with

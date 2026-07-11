@@ -23,6 +23,7 @@ a handy cross-reference to the detailed information for that command.
 
 -  :ref:`Arc <arc-command>` * - a geometric shape that can be drawn on a page
 -  :ref:`Arrow <arrow-command>` * - a geometric shape that can be drawn on a page
+-  :ref:`Band <band-command>` * - a geometric shape that can be drawn on a page
 -  :ref:`Blueprint <blueprint-command>` - a grid of lines that can be drawn on a page
    (see also further :ref:`customisation options <blueprintIndex>`)
 -  :ref:`Bezier <bezier-command>` * - a geometric shape that can be drawn on a page

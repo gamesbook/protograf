@@ -677,14 +677,166 @@ class DiceObject(BaseShape):
         offset: float,
         px: float,
         py: float,
-        pip_shape: str,
+        pip_shape: str | BaseShape,
         pip_radius: float,
+        rotation: float = 0,
         shape_name: str = "shape",
     ):
         """Draw pips based on a number (the 'pips') and the pip style."""
+        pargs = {}
+
+        if isinstance(pip_shape, BaseShape):
+            if rotation:
+                m_c = geoms._rotate_point_around_point(
+                    Point(px, py), self.centroid, rotation
+                )
+                t_l = geoms._rotate_point_around_point(
+                    Point(px - offset, py - offset), self.centroid, rotation
+                )
+                t_r = geoms._rotate_point_around_point(
+                    Point(px + offset, py - offset), self.centroid, rotation
+                )
+                b_l = geoms._rotate_point_around_point(
+                    Point(px - offset, py + offset), self.centroid, rotation
+                )
+                b_r = geoms._rotate_point_around_point(
+                    Point(px + offset, py + offset), self.centroid, rotation
+                )
+                m_l = geoms._rotate_point_around_point(
+                    Point(px - offset, py), self.centroid, rotation
+                )
+                m_r = geoms._rotate_point_around_point(
+                    Point(px + offset, py), self.centroid, rotation
+                )
+                t_c = geoms._rotate_point_around_point(
+                    Point(px, py - offset), self.centroid, rotation
+                )
+                b_c = geoms._rotate_point_around_point(
+                    Point(px, py + offset), self.centroid, rotation
+                )
+
+            else:
+                m_c = Point(px, py)
+                t_l = Point(px - offset, py - offset)
+                t_r = Point(px + offset, py - offset)
+                b_l = Point(px - offset, py + offset)
+                b_r = Point(px + offset, py + offset)
+                m_l = Point(px - offset, py)
+                m_r = Point(px + offset, py)
+                t_c = Point(px, py - offset)
+                b_c = Point(px, py + offset)
+
+            match number:
+                case 0:
+                    pass  # blank face
+                case 1:
+                    kwargs = {"_abs_cx": m_c.x, "_abs_cy": m_c.y}
+                    pip_shape.draw(**kwargs)
+                case 2:
+                    kwargs = {"_abs_cx": t_l.x, "_abs_cy": t_l.y}
+                    pip_shape.draw(**kwargs)
+                    kwargs = {"_abs_cx": b_r.x, "_abs_cy": b_r.y}
+                    pip_shape.draw(**kwargs)
+                case 3:
+                    kwargs = {"_abs_cx": t_l.x, "_abs_cy": t_l.y}
+                    pip_shape.draw(**kwargs)
+                    kwargs = {"_abs_cx": m_c.x, "_abs_cy": m_c.y}
+                    pip_shape.draw(**kwargs)
+                    kwargs = {"_abs_cx": b_r.x, "_abs_cy": b_r.y}
+                    pip_shape.draw(**kwargs)
+                case 4:
+                    kwargs = {"_abs_cx": t_l.x, "_abs_cy": t_l.y}
+                    pip_shape.draw(**kwargs)
+                    kwargs = {"_abs_cx": t_r.x, "_abs_cy": t_r.y}
+                    pip_shape.draw(**kwargs)
+                    kwargs = {"_abs_cx": b_l.x, "_abs_cy": b_l.y}
+                    pip_shape.draw(**kwargs)
+                    kwargs = {"_abs_cx": b_r.x, "_abs_cy": b_r.y}
+                    pip_shape.draw(**kwargs)
+                case 5:
+                    kwargs = {"_abs_cx": t_l.x, "_abs_cy": t_l.y}
+                    pip_shape.draw(**kwargs)
+                    kwargs = {"_abs_cx": t_r.x, "_abs_cy": t_r.y}
+                    pip_shape.draw(**kwargs)
+                    kwargs = {"_abs_cx": m_c.x, "_abs_cy": m_c.y}
+                    pip_shape.draw(**kwargs)
+                    kwargs = {"_abs_cx": b_l.x, "_abs_cy": b_l.y}
+                    pip_shape.draw(**kwargs)
+                    kwargs = {"_abs_cx": b_r.x, "_abs_cy": b_r.y}
+                    pip_shape.draw(**kwargs)
+                case 6:
+                    kwargs = {"_abs_cx": t_l.x, "_abs_cy": t_l.y}
+                    pip_shape.draw(**kwargs)
+                    kwargs = {"_abs_cx": t_r.x, "_abs_cy": t_r.y}
+                    pip_shape.draw(**kwargs)
+                    kwargs = {"_abs_cx": m_l.x, "_abs_cy": m_l.y}
+                    pip_shape.draw(**kwargs)
+                    kwargs = {"_abs_cx": m_r.x, "_abs_cy": m_r.y}
+                    pip_shape.draw(**kwargs)
+                    kwargs = {"_abs_cx": b_l.x, "_abs_cy": b_l.y}
+                    pip_shape.draw(**kwargs)
+                    kwargs = {"_abs_cx": b_r.x, "_abs_cy": b_r.y}
+                    pip_shape.draw(**kwargs)
+                case 7:
+                    kwargs = {"_abs_cx": t_l.x, "_abs_cy": t_l.y}
+                    pip_shape.draw(**kwargs)
+                    kwargs = {"_abs_cx": t_r.x, "_abs_cy": t_r.y}
+                    pip_shape.draw(**kwargs)
+                    kwargs = {"_abs_cx": m_l.x, "_abs_cy": m_l.y}
+                    pip_shape.draw(**kwargs)
+                    kwargs = {"_abs_cx": m_c.x, "_abs_cy": m_c.y}
+                    pip_shape.draw(**kwargs)
+                    kwargs = {"_abs_cx": m_r.x, "_abs_cy": m_r.y}
+                    pip_shape.draw(**kwargs)
+                    kwargs = {"_abs_cx": b_l.x, "_abs_cy": b_l.y}
+                    pip_shape.draw(**kwargs)
+                    kwargs = {"_abs_cx": b_r.x, "_abs_cy": b_r.y}
+                    pip_shape.draw(**kwargs)
+                case 8:
+                    kwargs = {"_abs_cx": t_l.x, "_abs_cy": t_l.y}
+                    pip_shape.draw(**kwargs)
+                    kwargs = {"_abs_cx": t_r.x, "_abs_cy": t_r.y}
+                    pip_shape.draw(**kwargs)
+                    kwargs = {"_abs_cx": m_l.x, "_abs_cy": m_l.y}
+                    pip_shape.draw(**kwargs)
+                    kwargs = {"_abs_cx": t_c.x, "_abs_cy": t_c.y}
+                    pip_shape.draw(**kwargs)
+                    kwargs = {"_abs_cx": b_c.x, "_abs_cy": b_c.y}
+                    pip_shape.draw(**kwargs)
+                    kwargs = {"_abs_cx": m_r.x, "_abs_cy": m_r.y}
+                    pip_shape.draw(**kwargs)
+                    kwargs = {"_abs_cx": b_l.x, "_abs_cy": b_l.y}
+                    pip_shape.draw(**kwargs)
+                    kwargs = {"_abs_cx": b_r.x, "_abs_cy": b_r.y}
+                    pip_shape.draw(**kwargs)
+                case 9:
+                    kwargs = {"_abs_cx": t_l.x, "_abs_cy": t_l.y}
+                    pip_shape.draw(**kwargs)
+                    kwargs = {"_abs_cx": t_r.x, "_abs_cy": t_r.y}
+                    pip_shape.draw(**kwargs)
+                    kwargs = {"_abs_cx": m_l.x, "_abs_cy": m_l.y}
+                    pip_shape.draw(**kwargs)
+                    kwargs = {"_abs_cx": t_c.x, "_abs_cy": t_c.y}
+                    pip_shape.draw(**kwargs)
+                    kwargs = {"_abs_cx": m_c.x, "_abs_cy": m_c.y}
+                    pip_shape.draw(**kwargs)
+                    kwargs = {"_abs_cx": b_c.x, "_abs_cy": b_c.y}
+                    pip_shape.draw(**kwargs)
+                    kwargs = {"_abs_cx": m_r.x, "_abs_cy": m_r.y}
+                    pip_shape.draw(**kwargs)
+                    kwargs = {"_abs_cx": b_l.x, "_abs_cy": b_l.y}
+                    pip_shape.draw(**kwargs)
+                    kwargs = {"_abs_cx": b_r.x, "_abs_cy": b_r.y}
+                    pip_shape.draw(**kwargs)
+                case _:
+                    feedback(f"The {shape_name} must use a number from 0 to 9", True)
+            self.set_canvas_props(cnv=cnv, index=None, **pargs)
+            return
 
         if _lower(pip_shape) in ["circle", "c"]:
             match number:
+                case 0:
+                    pass  # blank face
                 case 1:
                     cnv.draw_circle((px, py), pip_radius)
                 case 2:
@@ -740,9 +892,11 @@ class DiceObject(BaseShape):
                     cnv.draw_circle((px, py + offset), pip_radius)
                     cnv.draw_circle((px, py), pip_radius)  # centre
                 case _:
-                    feedback(f"The {shape_name} must use a number from 1 to 9", True)
+                    feedback(f"The {shape_name} must use a number from 0 to 9", True)
         elif _lower(pip_shape) in ["diamond", "d"]:
             match number:
+                case 0:
+                    pass  # blank face
                 case 1:
                     self.draw_diamond(cnv, (px, py), pip_radius)
                 case 2:
@@ -771,7 +925,7 @@ class DiceObject(BaseShape):
                     self.draw_diamond(cnv, (px - offset, py), pip_radius)
                     self.draw_diamond(cnv, (px + offset, py), pip_radius)
                 case _:
-                    feedback(f"The {shape_name} must use a number from 1 to 6", True)
+                    feedback(f"The {shape_name} must use a number from 0 to 6", True)
         else:
             raise NotImplementedError('No support for pip shape: "{pip_shape}"')
 
@@ -818,8 +972,8 @@ class D6Object(DiceObject):
         if self.random and self.pips is not None:
             issue.append("Both random and pips cannot be set at the same time!")
             correct = False
-        if not self.random and self.pips not in [1, 2, 3, 4, 5, 6, 7, 8, 9]:
-            issue.append("The value for pips must be a number from 1 to 9")
+        if not self.random and self.pips not in [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]:
+            issue.append("The value for pips must be a number from 0 to 9")
             correct = False
         if self.pip_fraction > 0.33 or self.pip_fraction < 0.1:
             issue.append("The pip_fraction must be between 0.1 and 0.33")
@@ -882,7 +1036,9 @@ class D6Object(DiceObject):
         px = x + self._u.width / 2.0
         py = y + self._u.height / 2.0
         offset = 3 * (0.2 * self._u.width / 2.0)  # fixed regardless of pip size
-        self.draw_pips(cnv, number, offset, px, py, self.pip_shape, pip_radius, "D6")
+        self.draw_pips(
+            cnv, number, offset, px, py, self.pip_shape, pip_radius, rotation, "D6"
+        )
         # add style
         pargs = {}
         pargs["stroke"] = self.pip_stroke
@@ -975,13 +1131,13 @@ class DominoObject(DiceObject):
             if self.pips:
                 if not isinstance(self.pips, (list, tuple)):
                     issue.append(
-                        "The pips setting must be a pair of numbers; each from 1 to 6"
+                        "The pips setting must be a pair of numbers, each between 0 to 6"
                     )
                     correct = False
                 else:
-                    allowed = [1, 2, 3, 4, 5, 6]
+                    allowed = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
                     if self.pips[0] not in allowed or self.pips[1] not in allowed:
-                        issue.append("Each pips value must be a number from 1 to 6")
+                        issue.append("Each pips value must be a number between 0 to 9")
                         correct = False
         if self.pip_fraction > 0.33 or self.pip_fraction < 0.1:
             issue.append("The pip_fraction must be between 0.1 and 0.33")
@@ -1072,7 +1228,15 @@ class DominoObject(DiceObject):
             py = y + self._u.height / 2.0
             offset = 3 * (0.2 * self._u.height / 2.0)  # fixed regardless of pip size
             self.draw_pips(
-                cnv, number, offset, px, py, self.pip_shape, pip_radius, "Domino"
+                cnv,
+                number,
+                offset,
+                px,
+                py,
+                self.pip_shape,
+                pip_radius,
+                rotation,
+                "Domino",
             )
             # self.set_canvas_props(cnv=None, index=ID, **kwargs)
         # ---- set style
