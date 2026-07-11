@@ -687,7 +687,7 @@ class DiceObject(BaseShape):
 
         if isinstance(pip_shape, BaseShape):
             if rotation:
-                c_n = geoms._rotate_point_around_point(
+                m_c = geoms._rotate_point_around_point(
                     Point(px, py), self.centroid, rotation
                 )
                 t_l = geoms._rotate_point_around_point(
@@ -716,7 +716,7 @@ class DiceObject(BaseShape):
                 )
 
             else:
-                c_n = Point(px, py)
+                m_c = Point(px, py)
                 t_l = Point(px - offset, py - offset)
                 t_r = Point(px + offset, py - offset)
                 b_l = Point(px - offset, py + offset)
@@ -730,7 +730,7 @@ class DiceObject(BaseShape):
                 case 0:
                     pass  # blank face
                 case 1:
-                    kwargs = {"_abs_cx": c_n.x, "_abs_cy": c_n.y}
+                    kwargs = {"_abs_cx": m_c.x, "_abs_cy": m_c.y}
                     pip_shape.draw(**kwargs)
                 case 2:
                     kwargs = {"_abs_cx": t_l.x, "_abs_cy": t_l.y}
@@ -740,7 +740,7 @@ class DiceObject(BaseShape):
                 case 3:
                     kwargs = {"_abs_cx": t_l.x, "_abs_cy": t_l.y}
                     pip_shape.draw(**kwargs)
-                    kwargs = {"_abs_cx": c_n.x, "_abs_cy": c_n.y}
+                    kwargs = {"_abs_cx": m_c.x, "_abs_cy": m_c.y}
                     pip_shape.draw(**kwargs)
                     kwargs = {"_abs_cx": b_r.x, "_abs_cy": b_r.y}
                     pip_shape.draw(**kwargs)
@@ -758,7 +758,7 @@ class DiceObject(BaseShape):
                     pip_shape.draw(**kwargs)
                     kwargs = {"_abs_cx": t_r.x, "_abs_cy": t_r.y}
                     pip_shape.draw(**kwargs)
-                    kwargs = {"_abs_cx": c_n.x, "_abs_cy": c_n.y}
+                    kwargs = {"_abs_cx": m_c.x, "_abs_cy": m_c.y}
                     pip_shape.draw(**kwargs)
                     kwargs = {"_abs_cx": b_l.x, "_abs_cy": b_l.y}
                     pip_shape.draw(**kwargs)
@@ -784,7 +784,7 @@ class DiceObject(BaseShape):
                     pip_shape.draw(**kwargs)
                     kwargs = {"_abs_cx": m_l.x, "_abs_cy": m_l.y}
                     pip_shape.draw(**kwargs)
-                    kwargs = {"_abs_cx": c_n.x, "_abs_cy": c_n.y}
+                    kwargs = {"_abs_cx": m_c.x, "_abs_cy": m_c.y}
                     pip_shape.draw(**kwargs)
                     kwargs = {"_abs_cx": m_r.x, "_abs_cy": m_r.y}
                     pip_shape.draw(**kwargs)
@@ -818,7 +818,7 @@ class DiceObject(BaseShape):
                     pip_shape.draw(**kwargs)
                     kwargs = {"_abs_cx": t_c.x, "_abs_cy": t_c.y}
                     pip_shape.draw(**kwargs)
-                    kwargs = {"_abs_cx": c_n.x, "_abs_cy": c_n.y}
+                    kwargs = {"_abs_cx": m_c.x, "_abs_cy": m_c.y}
                     pip_shape.draw(**kwargs)
                     kwargs = {"_abs_cx": b_c.x, "_abs_cy": b_c.y}
                     pip_shape.draw(**kwargs)

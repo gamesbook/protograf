@@ -12,7 +12,7 @@ protograf Changes
 - Add Band shape
 - Enhance CardBox
 - Add geometry property to Card data
-- Enable Domino pip to be a custom Shape
+- Enable Domino pips to be a custom Shape
 
 2026-06-18 (0.5.4)
 ------------------

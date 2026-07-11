@@ -134,8 +134,8 @@ Follow this process:
 - |check| Format primary code with black (``black --target-version py313 protograf``);
   update the Python version as needed
 - |check| Finalise release date and notes in ``CHANGES.txt``
-- |check| Ensure all the examples can be run by using shell script(s)
-  in the `examples` directory e.g. ``all.sh`` or ``_all.sh``
+- |check| Ensure all the examples can be run by using shell script(s); change
+  to the ``examples`` directory and run ``all.sh`` and then ``_all.sh``
 - |check| Update the ``examples.zip`` file with latest example code
   (remove all PDFs in examples - except ``colorset`` and ``colorset_svg``;
   also delete the ``temp`` directory)
