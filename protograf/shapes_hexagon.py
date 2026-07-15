@@ -804,7 +804,7 @@ class HexShape(BaseShape):
             stroke_width=self.hatches_stroke_width,
             stroke_ends=self.hatches_ends,
             dashed=self.hatches_dashed,
-            dotted=self.hatches_dots,
+            dotted=self.hatches_dotted,
         )
 
     def draw_links(self, cnv, ID, side: float, vertices: list, links: list):

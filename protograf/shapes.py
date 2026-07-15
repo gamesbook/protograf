@@ -521,6 +521,7 @@ class BandShape(BaseShape):
     """
 
     def __init__(self, _object=None, canvas=None, **kwargs):
+        self._clean_kwargs = self.clean_kwargs(**kwargs)  # used for RaceTrack
         super().__init__(_object=_object, canvas=canvas, **kwargs)
         self.no_ends = tools.as_bool(self.kwargs.get("no_ends", False), "no_ends")
         # ---- perform overrides
@@ -2282,7 +2283,7 @@ class RhombusShape(BaseShape):
             stroke_width=self.hatches_stroke_width,
             stroke_ends=self.hatches_ends,
             dashed=self.hatches_dashed,
-            dotted=self.hatches_dots,
+            dotted=self.hatches_dotted,
             rotation=rotation,
             rotation_point=muPoint(x_c, y_c),
         )
@@ -4423,7 +4424,7 @@ class TriangleShape(BaseShape):
             stroke_width=self.hatches_stroke_width,
             stroke_ends=self.hatches_ends,
             dashed=self.hatches_dashed,
-            dotted=self.hatches_dots,
+            dotted=self.hatches_dotted,
             rotation=rotation,
             rotation_point=centre,
         )

@@ -334,7 +334,7 @@ class CircleShape(BaseShape):
             stroke_width=self.hatches_stroke_width,
             stroke_ends=self.hatches_ends,
             dashed=self.hatches_dashed,
-            dotted=self.hatches_dots,
+            dotted=self.hatches_dotted,
             rotation=rotation,
             rotation_point=muPoint(x_c, y_c),
         )

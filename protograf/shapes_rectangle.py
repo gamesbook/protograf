@@ -53,6 +53,7 @@ class RectangleShape(BaseShape):
     """
 
     def __init__(self, _object=None, canvas=None, **kwargs):
+        self._clean_kwargs = self.clean_kwargs(**kwargs)  # used for RaceTrack
         super().__init__(_object=_object, canvas=canvas, **kwargs)
         # ---- class vars
         self.calculated_left, self.calculated_top = None, None
@@ -891,7 +892,6 @@ class RectangleShape(BaseShape):
 
         Args:
             ID: unique ID
-            vertices: the rectangle's nodes
             num: number of lines
             rotation: degrees anti-clockwise from horizontal "east"
         """
@@ -1037,7 +1037,70 @@ class RectangleShape(BaseShape):
             stroke_width=self.hatches_stroke_width,
             stroke_ends=self.hatches_ends,
             dashed=self.hatches_dashed,
-            dotted=self.hatches_dots,
+            dotted=self.hatches_dotted,
+            rotation=rotation,
+            rotation_point=muPoint(cx, cy),
+        )
+
+    def draw_lanes(self, cnv, ID, lanes: list | int, rotation: float = 0.0):
+        """Draw line(s) from one side of Rectangle's width to the parallel opposite.
+
+        Args:
+            ID: unique ID
+            lanes: spacing of lanes as fractions OR number of evenly spaced lines
+            rotation: degrees anti-clockwise from horizontal "east"
+        """
+
+        def draw_lines(vertices: list, lines: list):
+            """Draw lines at a given spacing intervals."""
+            # print("rect vertices", self._l2v(vertices))
+            pt_ne, pt_se, pt_sw, pt_nw = (
+                vertices[0],
+                vertices[1],
+                vertices[2],
+                vertices[3],
+            )
+            # draw lines starting closest to sw->se bottom edge
+
+        vertices = self._shape_vertexes
+        # ---- get line fraction spacing
+        if isinstance(self.lanes, int):
+            if self.lanes < 2:
+                feedback("Lanes must be a minimum value of 2.", True)
+            lines = []
+            lane_sum = 0.0
+            for count in range(0, self.lanes - 1):
+                lane_sum += 1 / self.lanes
+                lines.append(lane_sum)
+        elif isinstance(self.lanes, (list, tuple)):
+            lane_sum = 0.0
+            for item in self.lanes:
+                if not isinstance(item, (int, float)):
+                    feedback("Lane values must be fractions, or zero!", True)
+                lane_sum += item
+            lines = self.lanes
+        else:
+            feedback(f"Lanes must be a list or an integer - not '{self.lanes}.'", True)
+        total_space = sum(lines)
+        if total_space > 1:
+            feedback(
+                f"Lanes' fractions must sum to no more than 1 (i.e. not {total_space})!",
+                True,
+            )
+        if total_space == 0:
+            feedback("Lanes fractions must sum to more than 0!", True)
+
+        draw_lines(vertices, lines)
+        # ---- set canvas
+        cx = vertices[3].x + 0.5 * self._u.width
+        cy = vertices[3].y + 0.5 * self._u.height
+        self.set_canvas_props(
+            index=ID,
+            stroke=self.lanes_stroke,
+            stroke_width=self.lanes_stroke_width,
+            stroke_ends=self.lanes_ends,
+            dashed=self.lanes_dashed,
+            dotted=self.lanes_dotted,
             rotation=rotation,
             rotation_point=muPoint(cx, cy),
         )
@@ -1877,6 +1940,7 @@ class RectangleShape(BaseShape):
             "slices",
             "stripes",
             "hatches",
+            "lanes",
             "perbii",
             "radii",
             "corners",
@@ -1964,6 +2028,10 @@ class RectangleShape(BaseShape):
                     self.draw_hatches(
                         cnv, ID, num=self.hatches_count, rotation=rotation
                     )
+            if item == "lanes":
+                # ---- * draw lanes
+                if self.lanes is not None:
+                    self.draw_lanes(cnv, ID, lanes=self.lanes, rotation=rotation)
             if item == "perbii":
                 # ---- * draw perbii
                 if self.perbii:

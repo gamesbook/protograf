@@ -4913,8 +4913,8 @@ def Layout(grid, **kwargs):
                     hatches=gridlines_config,
                     hatches_stroke=layout_grid_stroke,
                     hatches_stroke_width=layout_grid_stroke_width,
-                    hatches_dots=layout_grid_dotted,
                     hatches_ends=layout_grid_ends,
+                    hatches_dotted=layout_grid_dotted,
                     hatches_dashed=layout_grid_dashed,
                     # rotation=0,
                 )
@@ -4968,8 +4968,8 @@ def Layout(grid, **kwargs):
                     hatches=gridlines_config,
                     hatches_stroke=layout_grid_stroke,
                     hatches_stroke_width=layout_grid_stroke_width,
-                    hatches_dots=layout_grid_dotted,
                     hatches_ends=layout_grid_ends,
+                    hatches_dotted=layout_grid_dotted,
                     hatches_dashed=layout_grid_dashed,
                     # rotation=rotation,
                 )
@@ -5028,8 +5028,8 @@ def Layout(grid, **kwargs):
                     hatches=gridlines_config,
                     hatches_stroke=layout_grid_stroke,
                     hatches_stroke_width=layout_grid_stroke_width,
-                    hatches_dots=layout_grid_dotted,
                     hatches_ends=layout_grid_ends,
+                    hatches_dotted=layout_grid_dotted,
                     hatches_dashed=layout_grid_dashed,
                     rotation=rotation,
                 )
