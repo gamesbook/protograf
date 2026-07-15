@@ -745,6 +745,25 @@ class BaseCanvas:
         self.fold_dotted = self.defaults.get("fold_dotted", True)
         self.padding_width = self.defaults.get("padding_width", None)
         self.padding_height = self.defaults.get("padding_width", None)
+        # ---- racetrack
+        self.lanes = self.defaults.get("lanes", False)
+        self.lanes_stroke = self.defaults.get("lanes_stroke", self.stroke)
+        self.lanes_fill = self.defaults.get("lanes_fill", None)
+        self.lanes_ends = self.defaults.get("lanes_ends", None)
+        self.lanes_stroke_width = self.defaults.get(
+            "lanes_stroke_width", self.stroke_width
+        )
+        self.lanes_dotted = self.defaults.get("lanes_dotted", False)
+        self.lanes_dashed = self.defaults.get("lanes_dashed", None)
+        self.segments = self.defaults.get("segments", False)
+        self.segments_stroke = self.defaults.get("segments_stroke", self.stroke)
+        self.segments_fill = self.defaults.get("segments_fill", None)
+        self.segments_ends = self.defaults.get("segments_ends", None)
+        self.segments_stroke_width = self.defaults.get(
+            "segments_stroke_width", self.stroke_width
+        )
+        self.segments_dotted = self.defaults.get("segments_dotted", False)
+        self.segments_dashed = self.defaults.get("segments_dashed", None)
 
     def get_page(self, name="A4"):
         """Get a paper format by name from a pre-defined dictionary."""
@@ -1513,6 +1532,29 @@ class BaseShape:
         self.fold_stroke_width = kwargs.get("fold_stroke_width", base.fold_stroke_width)
         self.padding_width = kwargs.get("padding_width", base.padding_width)
         self.padding_height = kwargs.get("padding_height", base.padding_height)
+        # ---- racetrack: band /rectangle
+        self.lanes = self.kw_bool(kwargs.get("lanes", base.lanes))
+        self.lanes_fill = kwargs.get("lanes_fill", None)
+        self.lanes_stroke = kwargs.get("lanes_stroke", base.lanes_stroke)
+        self.lanes_stroke_width = self.kw_float(
+            kwargs.get("lanes_stroke_width", base.lanes_stroke_width)
+        )
+        self.lanes_ends = kwargs.get("lanes_ends", base.lanes_ends)
+        self.lanes_dotted = self.kw_bool(kwargs.get("lanes_dotted", base.lanes_dotted))
+        self.lanes_dashed = self.kw_bool(kwargs.get("lanes_dashed", base.lanes_dashed))
+        self.segments = self.kw_bool(kwargs.get("segments", base.segments))
+        self.segments_fill = kwargs.get("segments_fill", None)
+        self.segments_stroke = kwargs.get("segments_stroke", base.segments_stroke)
+        self.segments_stroke_width = self.kw_float(
+            kwargs.get("segments_stroke_width", base.segments_stroke_width)
+        )
+        self.segments_ends = kwargs.get("segments_ends", base.segments_ends)
+        self.segments_dotted = self.kw_bool(
+            kwargs.get("segments_dotted", base.segments_dotted)
+        )
+        self.segments_dashed = self.kw_bool(
+            kwargs.get("segments_dashed", base.segments_dashed)
+        )
         # ---- OTHER
         # defaults for attributes called/set elsewhere e.g. in draw()
         self.use_abs = False

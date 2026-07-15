@@ -72,6 +72,7 @@ from .objects import (
     DominoObject,
     PolyominoObject,
     PentominoObject,
+    RaceTrackObject,
     TetrominoObject,
     StarFieldObject,
 )
@@ -5791,6 +5792,35 @@ def tetromino(row=None, col=None, **kwargs):
     kwargs["row"] = row
     kwargs["col"] = col
     return TetrominoObject(canvas=globals.canvas, **kwargs)
+
+
+@docstring_base
+def RaceTrack(row=None, col=None, **kwargs):
+    """Draw a RaceTrack shape with "pips" on the canvas.
+
+    Args:
+
+    - row (int): row in which the shape is drawn.
+    - col (int): column in which the shape is drawn.
+
+    Kwargs:
+
+    - stages (list): list of Reactangle and/or Band shapes
+    - lanes_*: styling for lines running parallel to top&bottom
+    - segments_*: styling for lines running parallel to left&right
+    <base>
+
+    """
+    kwargs = margins(**kwargs)
+    racetrak = RaceTrackObject(canvas=globals.canvas, **kwargs)
+    racetrak.draw()
+    return racetrak
+
+
+def racetrack(*args, **kwargs):
+    kwargs = margins(**kwargs)
+    _obj = args[0] if args else None
+    return RaceTrackObject(_object=_obj, canvas=globals.canvas, **kwargs)
 
 
 @docstring_base

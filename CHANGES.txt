@@ -3,11 +3,12 @@ protograf Changes
 
 2026-00-00 (0.5.6)
 ------------------
-- [PLANNED-1] Structure: break-up proto into smaller modules
+- [PLANNED-1] RaceTrack
+- [PLANNED-2] Structure: break-up proto into smaller modules
 - [PLANNED-2] Docs: list all props for Hex, Circle, Rectangle, Line
 - [PLANNED-2] BoxCover
 
-2026-07-00 (0.5.5)
+2026-07-`11 (0.5.5)
 ------------------
 - Add Band shape
 - Enhance CardBox

@@ -1534,3 +1534,53 @@ class CardBoxObject(BaseShape):
             kwargs["closed"] = False
             kwargs["fill"] = None
             self.set_canvas_props(cnv=cnv, index=ID, **kwargs)
+
+
+class RaceTrackObject(BaseShape):
+    """Draw RaceTrack composite shape on a given canvas.
+
+    Reference:
+
+    """
+
+    def __init__(self, _object=None, canvas=None, **kwargs):
+        super(RaceTrackObject, self).__init__(_object=_object, canvas=canvas, **kwargs)
+        self.kwargs = kwargs
+        self.set_unit_properties()
+        # ---- user-choices
+        self.stages = kwargs.get("stages", None)
+        if not self.stages:
+            feedback(
+                "The RaceTrack 'stages' property must be a list of one or more Rectangles and Bands.",
+                True,
+            )
+        if not isinstance(self.stages, list):
+            feedback(
+                "The RaceTrack 'stages' property must be in the form of a list, "
+                f"not a '{type(self.stages).__name__}'.",
+                True,
+            )
+
+    @property
+    def shape_centre(self) -> Point:
+        """Centre of RaceTrackObject."""
+        return None
+
+    @property
+    def geo(self) -> ShapeGeometry:
+        """Geometry of RaceTrackObject in user units."""
+        return ShapeGeometry()
+
+    @property
+    def geometry(self) -> ShapeGeometry:
+        """Geometry of RaceTrackObject - alias for geo."""
+        return self.geo
+
+    def draw(self, cnv=None, off_x=0, off_y=0, ID=None, **kwargs):
+        """Draw the RaceTrackObject on a given canvas."""
+        kwargs = self.kwargs | kwargs
+        cnv = cnv if cnv else globals.canvas  # a new Page/Shape may now exist
+        super().draw(cnv, off_x, off_y, ID, **kwargs)  # unit-based props
+        # ---- draw by stage
+        for stage in self.stages:
+            stage.draw()
