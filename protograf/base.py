@@ -2624,6 +2624,47 @@ class BaseShape:
         # return height
         return float(self.font_size)
 
+    def get_property_spacing(
+        self, the_property: object, property_name: str = "Property"
+    ) -> list:
+        """Calculate fractions for a property
+
+        Notes:
+            * Used for Lane and Segmennt (Rectangle and Band)
+        """
+        fractions = []
+        if the_property:
+            if isinstance(the_property, int):
+                if the_property < 2:
+                    feedback("{property_name} value must be a minimum of 2.", True)
+                lane_sum = 0.0
+                for count in range(0, the_property - 1):
+                    lane_sum += 1 / the_property
+                    fractions.append(lane_sum)
+            elif isinstance(the_property, (list, tuple)):
+                lane_sum = 0.0
+                for item in the_property:
+                    if not isinstance(item, (int, float)):
+                        feedback(
+                            "{property_name} values must be fractions, or zero!", True
+                        )
+                    lane_sum += item
+                fractions = the_property
+            else:
+                feedback(
+                    f"{property_name} value must be a list or an integer - not '{the_property}.'",
+                    True,
+                )
+            total_space = sum(fractions)
+            if total_space > 1:
+                feedback(
+                    f"{property_name} fractions must sum to no more than 1 (i.e. not {total_space})!",
+                    True,
+                )
+            if total_space == 0:
+                feedback("{property_name} fractions must sum to more than 0!", True)
+        return fractions
+
     def textify(
         self, index: int | None = None, text: str = "", default: bool = True
     ) -> str:

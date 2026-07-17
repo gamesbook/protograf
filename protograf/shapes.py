@@ -634,6 +634,38 @@ class BandShape(BaseShape):
         )
         return pt_mid
 
+    def draw_lanes(self, cnv, ID, lanes: list | int, rotation: float = 0.0):
+        """Draw curved line(s) from one edge of Band to the opposite.
+
+        Args:
+            ID: unique ID
+            lanes: spacing of lanes as fractions
+            rotation: degrees anti-clockwise from horizontal "east"
+
+        Note:
+            Draw curved lines starting closest to the inner (shorter) curve
+        """
+        spacing = self.get_property_spacing(self.lanes, "Lanes")
+        pt_c = Point(self.x_c + self._o.delta_x, self.y_c + self._o.delta_y)
+        for fraction in spacing:
+            out_start, bez_out_2, bez_out_3, out_end = geoms.bezier_arc_points(
+                self.angle_start,
+                self.angle_width,
+                self._u.radius + self._u.height * fraction,
+                pt_c,
+                pt_c.y,
+            )
+            cnv.draw_bezier(out_start, bez_out_2, bez_out_3, out_end)
+        # ---- set canvas
+        self.set_canvas_props(
+            index=ID,
+            stroke=self.lanes_stroke,
+            stroke_width=self.lanes_stroke_width,
+            stroke_ends=self.lanes_ends,
+            dashed=self.lanes_dashed,
+            dotted=self.lanes_dotted,
+        )
+
     def draw(self, cnv=None, off_x=0, off_y=0, ID=None, **kwargs):
         """Draw a Band on a given canvas."""
         cnv = cnv if cnv else globals.canvas  # a new Page/Shape may now exist
@@ -693,6 +725,9 @@ class BandShape(BaseShape):
         else:
             kwargs["rotation"] = 270.0 - band_rotation
         # feedback(f"*** Band: {band_rotation=} {kwargs['rotation']=}")
+        # ---- lanes
+        if self.lanes is not None:
+            self.draw_lanes(cnv, ID, lanes=self.lanes, rotation=kwargs["rotation"])
         # ---- centred shapes (with offsets)
         if self.centre_shapes:
             self.draw_centred_shapes(

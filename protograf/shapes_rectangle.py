@@ -1047,50 +1047,23 @@ class RectangleShape(BaseShape):
 
         Args:
             ID: unique ID
-            lanes: spacing of lanes as fractions OR number of evenly spaced lines
+            lanes: spacing of lanes as fractions
             rotation: degrees anti-clockwise from horizontal "east"
+
+        Note:
+            Draw lines starting closest to the "sw->se" bottom edge
         """
-
-        def draw_lines(vertices: list, lines: list):
-            """Draw lines at a given spacing intervals."""
-            # print("rect vertices", self._l2v(vertices))
-            pt_ne, pt_se, pt_sw, pt_nw = (
-                vertices[0],
-                vertices[1],
-                vertices[2],
-                vertices[3],
-            )
-            # draw lines starting closest to sw->se bottom edge
-
         vertices = self._shape_vertexes
-        # ---- get line fraction spacing
-        if isinstance(self.lanes, int):
-            if self.lanes < 2:
-                feedback("Lanes must be a minimum value of 2.", True)
-            lines = []
-            lane_sum = 0.0
-            for count in range(0, self.lanes - 1):
-                lane_sum += 1 / self.lanes
-                lines.append(lane_sum)
-        elif isinstance(self.lanes, (list, tuple)):
-            lane_sum = 0.0
-            for item in self.lanes:
-                if not isinstance(item, (int, float)):
-                    feedback("Lane values must be fractions, or zero!", True)
-                lane_sum += item
-            lines = self.lanes
-        else:
-            feedback(f"Lanes must be a list or an integer - not '{self.lanes}.'", True)
-        total_space = sum(lines)
-        if total_space > 1:
-            feedback(
-                f"Lanes' fractions must sum to no more than 1 (i.e. not {total_space})!",
-                True,
-            )
-        if total_space == 0:
-            feedback("Lanes fractions must sum to more than 0!", True)
-
-        draw_lines(vertices, lines)
+        spacing = self.get_property_spacing(self.lanes, "Lanes")
+        pt_ne, pt_se, pt_sw, pt_nw = (
+            vertices[0],
+            vertices[1],
+            vertices[2],
+            vertices[3],
+        )
+        for fraction in spacing:
+            start_pt = geoms.fraction_along_line(pt_sw, pt_nw, fraction)
+            cnv.draw_line((pt_sw.x, start_pt.y), (pt_se.x, start_pt.y))
         # ---- set canvas
         cx = vertices[3].x + 0.5 * self._u.width
         cy = vertices[3].y + 0.5 * self._u.height
