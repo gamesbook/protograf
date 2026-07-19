@@ -407,10 +407,21 @@ class BBox:
 
     - `tl` is minimum x,y point
     - `br` is maximum x,y point
+
+    Notes:
+        * Y-values start at top-left of co-ordinate system
     """
 
     tl: Point
     br: Point
+
+    @property
+    def height(self):
+        return self.br.y - self.tl.y
+
+    @property
+    def width(self):
+        return self.br.x - self.tl.x
 
 
 @dataclass
@@ -448,6 +459,26 @@ class Radius:
     angle: float
 
 
+@dataclass
+class SectorBand:
+    """Defining geometry for either a Sector or Annular Sector.
+
+    Properties:
+
+    - `angle_start` is the angle in degrees (anti-clocwkise from east) of start radius
+    - `angle_width` is the width angle in degrees of the shape
+    - `radius_inner` is length of the radius of the outer bounding line
+    - `radius_outer` is length of the radius of the inner bounding line (Annular only)
+    - `centre` is the centre point from whch radii lines are drawn
+    """
+
+    angle_start: float | None = None
+    angle_width: float | None = None
+    radius_inner: float | None = None  # Annular Sector (aka "Band") only
+    radius_outer: float | None = None
+    centre: Point | None = None
+
+
 # wrapper around a jinja Template to support operations on an Template output
 @dataclass
 class TemplatingType:
@@ -460,7 +491,7 @@ class TemplatingType:
 
 @dataclass
 class Vertex:
-    """Vertext is a named point corresponding a vertex on a Shape"""
+    """Vertex is a named point corresponding to a vertex on a Shape"""
 
     point: Point
     direction: str

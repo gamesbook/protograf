@@ -18,6 +18,7 @@ from protograf.utils import colrs, geoms, tools
 from protograf.utils.tools import _lower
 from protograf.utils.messaging import feedback
 from protograf.utils.structures import (
+    BBox,
     DirectionGroup,
     Locale,
     Perbis,
@@ -59,6 +60,7 @@ class RectangleShape(BaseShape):
         self.calculated_left, self.calculated_top = None, None
         self.grid = None
         self.coord_text = None
+        self._lanes = {}  # store BBox for lanes; 0 is "bottom" (close to sw->se line)
         # ---- overrides to centre shape
         if self.cx is not None and self.cy is not None:
             self.x = self.cx - self.width / 2.0
@@ -1043,7 +1045,7 @@ class RectangleShape(BaseShape):
         )
 
     def draw_lanes(self, cnv, ID, lanes: list | int, rotation: float = 0.0):
-        """Draw line(s) from one side of Rectangle's width to the parallel opposite.
+        """Draw line(s) from one edge of a Rectangle's width to the parallel opposite.
 
         Args:
             ID: unique ID
@@ -1051,7 +1053,9 @@ class RectangleShape(BaseShape):
             rotation: degrees anti-clockwise from horizontal "east"
 
         Note:
-            Draw lines starting closest to the "sw->se" bottom edge
+            * Draw lines starting closest to the "sw->se" bottom edge
+            * Lane geometry is stored as a BBox in `_lanes` dict, keyed on lane number
+              (starting from lane 0, closest to bottom edge)
         """
         vertices = self._shape_vertexes
         spacing = self.get_property_spacing(self.lanes, "Lanes")
@@ -1061,9 +1065,19 @@ class RectangleShape(BaseShape):
             vertices[2],
             vertices[3],
         )
-        for fraction in spacing:
+        last_pt = None
+        for key, fraction in enumerate(spacing):
             start_pt = geoms.fraction_along_line(pt_sw, pt_nw, fraction)
             cnv.draw_line((pt_sw.x, start_pt.y), (pt_se.x, start_pt.y))
+            # store geometry
+            if key == 0:  # first
+                self._lanes[key] = BBox(start_pt, pt_se)
+            elif key == len(spacing):  # last
+                self._lanes[key] = BBox(pt_nw, Point(pt_se.x, last_pt.y))
+            else:
+                self._lanes[key] = BBox(start_pt, Point(pt_se.x, last_pt.y))
+            last_pt = start_pt
+
         # ---- set canvas
         cx = vertices[3].x + 0.5 * self._u.width
         cy = vertices[3].y + 0.5 * self._u.height

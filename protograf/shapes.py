@@ -44,6 +44,7 @@ from protograf.utils.structures import (
     Perbis,
     Point,
     Radius,
+    SectorBand,
     ShapeGeometry,
     TriangleType,
     Vertex,
@@ -524,6 +525,7 @@ class BandShape(BaseShape):
         self._clean_kwargs = self.clean_kwargs(**kwargs)  # used for RaceTrack
         super().__init__(_object=_object, canvas=canvas, **kwargs)
         self.no_ends = tools.as_bool(self.kwargs.get("no_ends", False), "no_ends")
+        self._lanes = {}  # store SectorBand for lanes; 0 is "inner"
         # ---- perform overrides
         self.radius = self.radius or self.diameter / 2.0
         # validate
@@ -635,7 +637,7 @@ class BandShape(BaseShape):
         return pt_mid
 
     def draw_lanes(self, cnv, ID, lanes: list | int, rotation: float = 0.0):
-        """Draw curved line(s) from one edge of Band to the opposite.
+        """Draw curved line(s) parallel to inner curve of Band to the outer.
 
         Args:
             ID: unique ID
@@ -643,11 +645,13 @@ class BandShape(BaseShape):
             rotation: degrees anti-clockwise from horizontal "east"
 
         Note:
-            Draw curved lines starting closest to the inner (shorter) curve
+            * Draw curved lines starting closest to the inner (shorter) curve
+            * Lane geometry is stored as a SectorBand in `_lanes` dict, keyed on
+              the lane number (starting from lane 0, closest to inner curve)
         """
         spacing = self.get_property_spacing(self.lanes, "Lanes")
         pt_c = Point(self.x_c + self._o.delta_x, self.y_c + self._o.delta_y)
-        for fraction in spacing:
+        for key, fraction in enumerate(spacing):
             out_start, bez_out_2, bez_out_3, out_end = geoms.bezier_arc_points(
                 self.angle_start,
                 self.angle_width,
@@ -655,11 +659,21 @@ class BandShape(BaseShape):
                 pt_c,
                 pt_c.y,
             )
+            # ---- store geometry
+            self._lanes[key] = SectorBand(
+                angle_start=self.angle_start,
+                angle_width=self.angle_width,
+                radius_inner=self._u.radius + self._u.height * fraction,
+                radius_outer=self._u.radius + self._u.height,
+                centre=pt_c,
+            )
+            # ---- draw band line
             cnv.draw_bezier(out_start, bez_out_2, bez_out_3, out_end)
         # ---- set canvas
         self.set_canvas_props(
             index=ID,
             stroke=self.lanes_stroke,
+            fill=None,
             stroke_width=self.lanes_stroke_width,
             stroke_ends=self.lanes_ends,
             dashed=self.lanes_dashed,
