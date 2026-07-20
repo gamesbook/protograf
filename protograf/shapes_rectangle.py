@@ -1092,6 +1092,25 @@ class RectangleShape(BaseShape):
             rotation_point=muPoint(cx, cy),
         )
 
+    def draw_segments(self, cnv, ID, segs: list | int, rotation: float = 0.0):
+        """Draw vertical lines at intervals along a band.
+
+        Args:
+            ID: unique ID
+            segs: spacing of segments per lane
+            rotation: degrees anti-clockwise from horizontal "east"
+
+        Note:
+            * Draw vertical lines parallel, and starting closest, to the east edge
+        """
+        if isinstance(segs, int):  # global spacing
+            spacing = self.get_property_spacing(self.lanes, "Lanes")
+        else:
+            spacing = None  # per lane
+        # segs in list form must be: [lane_number, [f1, f2, ... fn]]  # f = fraction
+        for _lane in self._lanes.keys():
+            print(_lane)
+
     def draw_perbii(
         self, cnv, ID, centre: Point, rotation: float | None = None, **kwargs
     ):
@@ -2019,6 +2038,17 @@ class RectangleShape(BaseShape):
                 # ---- * draw lanes
                 if self.lanes is not None:
                     self.draw_lanes(cnv, ID, lanes=self.lanes, rotation=rotation)
+            if item == "segments":
+                # ---- * draw segments
+                if self.segments is not None:
+                    if self.lanes is not None:
+                        self.draw_segments(
+                            cnv, ID, segs=self.segments, rotation=rotation
+                        )
+                    else:
+                        feedback(
+                            'Cannot set "segments" if "lanes" has not been set.', True
+                        )
             if item == "perbii":
                 # ---- * draw perbii
                 if self.perbii:
