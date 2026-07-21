@@ -6,9 +6,9 @@ __protograf__ is an application written in Python for creating simple, regular,
 graphical designs in PDF (or PNG/GIF/SVG) format via a script.
 
 __protograf__  has been primarily created to handle the prototyping of cards,
-counters, tiles and boards for board games, including hexagonal grids, but can
-also be used for creating any relatively simple design that has regular or
-repetitive elements; typically a mix of graphics and text.
+counters, tiles, boards and boxes for board games, including hexagonal grids,
+but can also be used for creating any relatively simple design that has regular
+or repetitive elements; typically a mix of graphics and text.
 
 > You do not need to know the Python language to be able to use __protograf__
 > but you do need Python installed on your machine!
@@ -81,7 +81,7 @@ This script is very simple - it just contains these lines:
 ```
 # `example1` script for protograf
 # Written by: Derek Hohls
-# Created on: 29 February 2016
+# Created on: 29 February 2026
 from protograf import *
 Create()
 Save()
@@ -112,14 +112,16 @@ This section highlights a few of the more recent features added.
 The full feature list is available in the
 [documentation](https://protograf.readthedocs.io/).
 
-* [x] New shapes: Cross and Pod
+* [x] New shapes: Band (aka "Annular Sector")
+* [x] CardBox: create foldable boxes for decks of cards
 * [x] Common gaming objects: Cube, Domino, Die and Pentomino(es)
 * [x] HexHex boards
 * [x] Pathways: (arcs and lines) on a Hexagonal grid
 * [x] Stripes: interior "areas" for a Rectangle
 * [x] Cards:
+    * [x] extract cards as a TableTopSimulator image
     * [x] support for card-back designs
-    * [x] grid marks for hexagonal cards
+    * [x] grid marks for hexagonal cards/tiles
     * [x] corner crosses as grid marks
     * [x] card-specific bleed areas
 * [x] Color support for CYMK
@@ -131,11 +133,9 @@ they just represent current / potential areas of work or ideas.
 
 * [ ] Common objects:
     * [ ] Meeple (Polyshape with curves)
-* [ ] Annular Sectors
+* [ ] RaceTrack
 * [ ] Image alteration operations
-* [ ] Hexagon: 18xx tile example
 * [ ] Cards:
-    * [ ] extraction as TableTopSimulator deck
     * [ ] icon alignment
 
 ## :jigsaw: Potential Examples
@@ -143,8 +143,8 @@ they just represent current / potential areas of work or ideas.
 These are possible examples to show board creation based on existing games:
 
 * [x] Wargame board: show full terrain features (vector and bitmap)
-* [ ] Traveller board: show a fully-styled Star System
 * [x] WarpWar board: show a fully-styled example
+* [ ] Traveller board: show a fully-styled Star System
 * [ ] 18xx board: show a basic map with tracks, towns, cities and off-map areas
 
 ## :mega: Acknowledgements

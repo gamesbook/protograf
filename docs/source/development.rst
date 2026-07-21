@@ -24,12 +24,15 @@ In general, follow the `Zen of Python <https://peps.python.org/pep-0020/>`_
 |dash| which is much easier to say than do |dash| but also try to follow
 the style of the code in the rest of the project.
 
+Conventions
+-----------
+
 Note, however, that this project "breaks" a few normal conventions:
 
-- Use of ``global`` variables in the ``proto.py`` file
-- Extensive use of ``**kwargs**`` for the various shapes which means that a user
-  could pass in a key+value setting that simply gets ignored without raising an
-  error; this could be improved by creating numerous subclasses with a more
+- Use of ``global`` variables in the ``proto.py`` file to share document settings
+- Extensive use of ``**kwargs**`` for the various shapes. This means that a user
+  can pass in a key+value setting that simply gets ignored, without raising an
+  error. This could be improved by creating numerous subclasses with a more
   extensive inheritance framework, but these soon start getting tricky to
   juggle...
 - Use of ``from protograf import *`` for running scripts; you could force a
@@ -38,8 +41,20 @@ Note, however, that this project "breaks" a few normal conventions:
   part of another Python project, then of course you should follow the normal
   approach of only importing **exactly** what you need!
 
+Local Usage
+-----------
+
+To use the module while developing, install it with a "development" setting
+using ``uv``::
+
+    uv add --editable --dev /local/path/to/protograf
+
+Formatting
+----------
+
 Code is formatted using ``black`` (https://black.readthedocs.io/) which is
-triggered as a GitHub action |dash| see the ``.github/workflows/`` directory.
+also triggered as a GitHub action |dash| see the ``.github/workflows/``
+directory.
 
 Testing
 =======
@@ -159,8 +174,8 @@ refresh of the home page of the project at https://pypi.org/project/protograf/
 Bear in mind that the underlying libraries for actions also need to be updated
 (via the version reference) from time-to-time.
 
-Working with latest
--------------------
+Using the latest
+----------------
 
 If you're just interested in installing the latest version via ``pip``,
 then use::

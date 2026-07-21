@@ -2,7 +2,6 @@
 `cards4` example for protograf
 
 Written by: Derek Hohls
-Created on: 29 February 2016
 """
 from protograf import *
 
@@ -10,11 +9,12 @@ from protograf import *
 Create(filename='example4.pdf', margin_bottom=2.5)
 
 # create a deck design
-Deck(cards=25,
-     fill="skyblue",
-     stroke="white",
-     height=5,
-     width=3.8)
+Deck(
+    cards=25,
+    fill="skyblue",
+    stroke="white",
+    height=5,
+    width=3.8)
 
 # create some text, with the default font, and centre it at a location
 mytext = text(text="25!", point=(1.9, 2.5))

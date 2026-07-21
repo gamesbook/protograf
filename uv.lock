@@ -629,6 +629,11 @@ dependencies = [
     { name = "xlrd" },
 ]
 
+[package.dev-dependencies]
+dev = [
+    { name = "protograf" },
+]
+
 [package.metadata]
 requires-dist = [
     { name = "bgg-api", specifier = ">=1.1.14,<2.0.0" },
@@ -660,6 +665,9 @@ requires-dist = [
     { name = "wand", specifier = ">=0.6.13,<0.8.0" },
     { name = "xlrd", specifier = ">=2.0.2,<3.0.0" },
 ]
+
+[package.metadata.requires-dev]
+dev = [{ name = "protograf", editable = "." }]
 
 [[package]]
 name = "pycparser"
