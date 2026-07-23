@@ -37,14 +37,17 @@ DEBUG = False
 
 
 def _sin(degrees: float) -> float:
+    """Return sine of a degree value."""
     return math.sin(math.radians(degrees))
 
 
 def _cos(degrees: float) -> float:
+    """Return cosine of a degree value."""
     return math.cos(math.radians(degrees))
 
 
 def _tan(degrees: float) -> float:
+    """Return arctan of a degree value."""
     return math.tan(math.radians(degrees))
 
 
@@ -315,7 +318,6 @@ class RectangleShape(BaseShape):
         if (kwargs.get("cx") and kwargs.get("cy")) and not (lx or ly):
             x = kwargs.get("cx") * self.units - self._u.width / 2.0 + self._o.delta_x
             y = kwargs.get("cy") * self.units - self._u.height / 2.0 + self._o.delta_y
-            # breakpoint()
         return x, y
 
     def get_angles(self, rotation=0, **kwargs):
@@ -1072,13 +1074,13 @@ class RectangleShape(BaseShape):
             # store geometry
             if key == 0:  # first
                 self._lanes[key] = BBox(start_pt, pt_se)
-            elif key == len(spacing):  # last
-                self._lanes[key] = BBox(pt_nw, Point(pt_se.x, last_pt.y))
             else:
                 self._lanes[key] = BBox(start_pt, Point(pt_se.x, last_pt.y))
+                if key == len(spacing) - 1:  # last
+                    self._lanes[key + 1] = BBox(pt_nw, Point(pt_se.x, last_pt.y))
             last_pt = start_pt
 
-        # ---- set canvas
+        # ---- style lanes lines
         cx = vertices[3].x + 0.5 * self._u.width
         cy = vertices[3].y + 0.5 * self._u.height
         self.set_canvas_props(
@@ -1093,23 +1095,42 @@ class RectangleShape(BaseShape):
         )
 
     def draw_segments(self, cnv, ID, segs: list | int, rotation: float = 0.0):
-        """Draw vertical lines at intervals along a band.
+        """Draw vertical lines at intervals along all lanes of the Rectangle.
 
         Args:
             ID: unique ID
-            segs: spacing of segments per lane
+            segs: spacing of segments per lane - "list of lists"
             rotation: degrees anti-clockwise from horizontal "east"
 
         Note:
             * Draw vertical lines parallel, and starting closest, to the east edge
         """
-        if isinstance(segs, int):  # global spacing
-            spacing = self.get_property_spacing(self.lanes, "Lanes")
-        else:
-            spacing = None  # per lane
-        # segs in list form must be: [lane_number, [f1, f2, ... fn]]  # f = fraction
+        vertices = self._shape_vertexes
+        seg_spacing = self.get_property_spacing(segs, "Lanes")
+        breakpoint()
+        # segs as lists: [[f1, f2, ... fn], [f1, f2, ... fn]]  # f = fraction
         for _lane in self._lanes.keys():
-            print(_lane)
+            lane_bbox = self._lanes[_lane]
+            start_point = lane_bbox.br
+            for _seg in seg_spacing:
+                x = start_point.x - lane_bbox.width * _seg
+                btm_point = Point(x, start_point.y)
+                top_point = Point(x, start_point.y - lane_bbox.height)
+                # ---- draw segment line
+                draw_line(cnv, btm_point, top_point, shape=self)
+        # ---- style segment lines
+        cx = vertices[3].x + 0.5 * self._u.width
+        cy = vertices[3].y + 0.5 * self._u.height
+        self.set_canvas_props(
+            index=ID,
+            stroke=self.segments_stroke,
+            stroke_width=self.segments_stroke_width,
+            stroke_ends=self.segments_ends,
+            dashed=self.segments_dashed,
+            dotted=self.segments_dotted,
+            rotation=rotation,
+            rotation_point=muPoint(cx, cy),
+        )
 
     def draw_perbii(
         self, cnv, ID, centre: Point, rotation: float | None = None, **kwargs
@@ -1125,7 +1146,7 @@ class RectangleShape(BaseShape):
             A perpendicular bisector ("perbis") of a chord is:
                 A line passing through the center of circle such that it divides
                 the chord into two equal parts and meets the chord at a right angle;
-                for a polygon, each edge is effectively a chord.
+                for a polygon, each edself._lanes[key]ge is effectively a chord.
         """
         # vertices = self._shape_vertexes
         perbii_dict = self.calculate_perbii(centre=centre, rotation=rotation)
@@ -1947,6 +1968,7 @@ class RectangleShape(BaseShape):
             "stripes",
             "hatches",
             "lanes",
+            "segments",
             "perbii",
             "radii",
             "corners",
