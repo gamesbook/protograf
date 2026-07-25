@@ -681,23 +681,42 @@ class BandShape(BaseShape):
         )
 
     def draw_segments(self, cnv, ID, segs: list | int, rotation: float = 0.0):
-        """Draw radial lines at intervals along a band.
+        """Draw radial lines at intervals along all lanes of the Band.
 
         Args:
             ID: unique ID
-            segs: spacing of segments per lane
+            segs: spacing of segments per lane - "list of lists"
             rotation: degrees anti-clockwise from horizontal "east"
 
         Note:
-            * Draw radial lines starting closest to the angle_start
+            * Draw radial lines starting closest to the angle_start,
+              from the "inner" curved side of the Band to the "outer"
         """
-        if isinstance(segs, int):  # global spacing
-            spacing = self.get_property_spacing(self.lanes, "Lanes")
-        else:
-            spacing = None  # per lane
-        # segs in list form must be: [lane_number, [f1, f2, ... fn]]  # f = fraction
+        seg_spacing = self.get_property_spacing(segs, "Lanes")
+        # segs as lists: [[f1, f2, ... fn], [f1, f2, ... fn]]  # f = fraction
         for _lane in self._lanes.keys():
-            print(_lane)
+            lane_band = self._lanes[_lane]
+            # print(f"*** BandSeg {lane_band=}")
+            for _seg in seg_spacing:
+                # print(f"***   BandSeg {_seg=}")
+                angle = lane_band.angle_start + _seg * lane_band.angle_width
+                point_outer = geoms.point_on_circle(
+                    lane_band.centre, lane_band.radius_outer, angle
+                )
+                point_inner = geoms.point_on_circle(
+                    lane_band.centre, lane_band.radius_inner, angle
+                )
+                # ---- draw segment line
+                draw_line(cnv, point_inner, point_outer, shape=self)
+        # ---- style segment lines
+        self.set_canvas_props(
+            index=ID,
+            stroke=self.segments_stroke,
+            stroke_width=self.segments_stroke_width,
+            stroke_ends=self.segments_ends,
+            dashed=self.segments_dashed,
+            dotted=self.segments_dotted,
+        )
 
     def draw(self, cnv=None, off_x=0, off_y=0, ID=None, **kwargs):
         """Draw a Band on a given canvas."""

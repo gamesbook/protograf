@@ -1107,7 +1107,6 @@ class RectangleShape(BaseShape):
         """
         vertices = self._shape_vertexes
         seg_spacing = self.get_property_spacing(segs, "Lanes")
-        breakpoint()
         # segs as lists: [[f1, f2, ... fn], [f1, f2, ... fn]]  # f = fraction
         for _lane in self._lanes.keys():
             lane_bbox = self._lanes[_lane]
