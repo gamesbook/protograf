@@ -19,8 +19,7 @@ also be used for creating any simple design that has regular or repetitive
 elements; typically a mix of graphics and text.
 
 If it's your first time here, *please consult the* `guide <guide.html>`_
-which presents the sections designed to be read in order; they all contain
-useful information designed to build on each other.
+which provides a logical reading order.
 
 .. toctree::
    :maxdepth: 2

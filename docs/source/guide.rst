@@ -5,12 +5,12 @@ Guide
 .. |dash| unicode:: U+2014 .. EM DASH SIGN
 
 The `protograf <https://github.com/gamesbook/protograf>`_ documentation
-consists of the primary sections listed below.
+consists of the primary parts listed below.
 
 Although its great to be able to just "jump in" and start using a
-program, the sections below are designed to be read in order |dash| apart
-from the terminology |dash| as they all contain useful information and build
-on each other.
+program, the list provides a logical reading order that builds up
+the full picture of capabilities |dash| apart from the terminology
+and commands, which act as summary and cross-reference.
 
 .. _guide:
 
@@ -52,8 +52,8 @@ on each other.
     of many of the elements' properties
 17. :doc:`Commands <commands>` - summary of all the commands available
 
-The following are supplementary sections that you're likely to need when
-doing more advanced scripts or needing further resources:
+The following contain supplementary details that you're likely to need
+when doing more advanced scripts or needing further resources:
 
 18. :doc:`Descriptions of Supplied Examples <examples/index>` - brief
     walkthoughs of many of the examples provided with **protograf**

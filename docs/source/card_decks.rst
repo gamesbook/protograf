@@ -4,7 +4,7 @@ Deck & Card Commands
 
 .. |dash| unicode:: U+2014 .. EM DASH SIGN
 
-This section assumes you are very familiar with the concepts, terms and
+It is assumed here you are very familiar with the concepts, terms and
 ideas for :doc:`protograf <index>` as presented in the
 :doc:`Basic Concepts <basic_concepts>` , that you understand all of the
 :doc:`Additional Concepts <additional_concepts>`
@@ -13,7 +13,7 @@ and that you've created some basic scripts of your own using the
 
 .. NOTE::
 
-    This section provides all the details, along with supporting examples,
+    Provide here are all the details, along with supporting examples,
     of the commands used in card creation. A high-level overview can be
     found in :doc:`Working with Cards <card_deck_introduction>`.
 
@@ -76,7 +76,7 @@ The following are key properties that will usually need to be set for a
 .. IMPORTANT::
 
   The ``Deck`` command is covered in detail, with examples of all of its
-  properties, in the `Deck Command <deck_command.html>`_ section.
+  properties, in `Deck Command <deck_command.html>`_.
 
 
 .. _deckcommandExamples:
@@ -214,7 +214,7 @@ in that its "properties" are not named... a typical Card command looks like:
         Card("1", rectangle(), text())
         Card("2-5", circle())
 
-This format is explained in the next two sections.
+This format is explained below.
 
 Card Numbering
 --------------

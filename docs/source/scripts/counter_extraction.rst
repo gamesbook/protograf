@@ -4,7 +4,7 @@ Counter Extraction Script
 
 .. |dash| unicode:: U+2014 .. EM DASH SIGN
 
-This section is part of the "add-on" scripts for **protograf**.
+This is one of the "add-on" scripts for **protograf**.
 For background and general information, see the :doc:`overview <overview>`.
 
 Purpose
@@ -64,17 +64,17 @@ An example of the contents of such a file is shown below::
     color=black
     alias=1
 
-There are four sections in the file, identifed by the ``[name]`` format, and
-each section contains one or more settings, in the format ``name=value``.
+There are four parts to the file, identifed by the ``[name]`` format, and
+each part contains one or more settings, in the format ``name=value``.
 By changing these values, the script behaves in different ways.
 
 The script does provide default values for these, but its best to set your
 own to ensure the output is correct!
 
-File section
-------------
+File part
+---------
 
-This section contains the settings for input and output:
+This part contains the settings for input and output:
 
 - *name*: this is name of the countersheet file; if it is located outside of
   the directory from whcih the script is being run; the full and absolute path
@@ -82,10 +82,10 @@ This section contains the settings for input and output:
 - *output*: this is the name of the directory in which the counter images must
   be stored
 
-Counter section
----------------
+Counter part
+------------
 
-This section contains the settings for individual counters:
+This part contains the settings for individual counters:
 
 - *width*: this is the width in pixels of the portion of the counter that must
   be extracted
@@ -103,10 +103,10 @@ This section contains the settings for individual counters:
   next adjacent counter that must be extracted
 - *prefix*: this is text that must be added to each counter's filename
 
-Group section
--------------
+Group part
+----------
 
-This section contains the settings for the way that counters are "grouped"
+This part contains the settings for the way that counters are "grouped"
 on a countersheet:
 
 - *sets*: this is the number of groups of counters "across" and "down"; so
@@ -118,10 +118,10 @@ on a countersheet:
 - *gap_row*: this is the distance in pixels between each group,
   going down the image
 
-Frame section
--------------
+Frame part
+----------
 
-This section contains the settings for the appearance of an extra "frame"
+This part contains the settings for the appearance of an extra "frame"
 |dash| a thick line added around the border of each counter image:
 
 - *thickness*: this is the width in pixels of the frame; it *must* be an

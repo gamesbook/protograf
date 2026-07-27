@@ -4,7 +4,7 @@ Additional Concepts
 
 .. |dash| unicode:: U+2014 .. EM DASH SIGN
 
-This section assumes you are familiar with the concepts, terms and ideas
+It is assumed here you are familiar with the concepts, terms and ideas
 for :doc:`protograf <index>` as presented in
 :doc:`Basic Concepts <basic_concepts>`, have looked through the
 :doc:`Core Shapes <core_shapes>`, and that perhaps you have created one
@@ -378,7 +378,7 @@ Reusable Script
 ===============
 `↑ <table-of-contents-addcon_>`_
 
-It could be that you need to share snippets or sections of code between
+It could be that you need to share snippets of code, or functions, between
 different scripts.  In this case, these can be added to a common script
 and then **imported** (in a similar way to how  **protograf** itself is
 imported) for use.

@@ -612,12 +612,16 @@ class BandShape(BaseShape):
         out_start, bez_out_2, bez_out_3, out_end = geoms.bezier_arc_points(
             self.angle_start,
             self.angle_width,
-            self._u.radius + self._u.height,
+            self._u.radius,
             pt_c,
             pt_c.y,
         )
         inn_start, bez_inn_2, bez_inn_3, inn_end = geoms.bezier_arc_points(
-            self.angle_start, self.angle_width, self._u.radius, pt_c, pt_c.y
+            self.angle_start,
+            self.angle_width,
+            self._u.radius - self._u.height,
+            pt_c,
+            pt_c.y,
         )
         return out_start, out_end, inn_start, inn_end
 
@@ -637,7 +641,7 @@ class BandShape(BaseShape):
         return pt_mid
 
     def draw_lanes(self, cnv, ID, lanes: list | int, rotation: float = 0.0):
-        """Draw curved line(s) parallel to inner curve of Band to the outer.
+        """Draw curved line(s) parallel to inner and outer curves of the Band.
 
         Args:
             ID: unique ID
@@ -645,30 +649,46 @@ class BandShape(BaseShape):
             rotation: degrees anti-clockwise from horizontal "east"
 
         Note:
-            * Draw curved lines starting closest to the inner (shorter) curve
+            * Inner curve is at the Band radius;  outer curve is at the Band
+              radius+height
+            * Draw curved lines starting closest to the inner curve
             * Lane geometry is stored as a SectorBand in `_lanes` dict, keyed on
               the lane number (starting from lane 0, closest to inner curve)
         """
         spacing = self.get_property_spacing(self.lanes, "Lanes")
         pt_c = Point(self.x_c + self._o.delta_x, self.y_c + self._o.delta_y)
+        radius_inner = self._u.radius - self._u.height
+        radius_inner_last = radius_inner
         for key, fraction in enumerate(spacing):
-            out_start, bez_out_2, bez_out_3, out_end = geoms.bezier_arc_points(
+            lline_start, bez_lline_2, bez_lline_3, lline_end = geoms.bezier_arc_points(
                 self.angle_start,
                 self.angle_width,
-                self._u.radius + self._u.height * fraction,
+                radius_inner + self._u.height * fraction,
                 pt_c,
                 pt_c.y,
             )
-            # ---- store geometry
+            # ---- store lane geometry
             self._lanes[key] = SectorBand(
                 angle_start=self.angle_start,
                 angle_width=self.angle_width,
-                radius_inner=self._u.radius + self._u.height * fraction,
-                radius_outer=self._u.radius + self._u.height,
+                radius_inner=radius_inner_last,
+                radius_outer=radius_inner + self._u.height * fraction,
                 centre=pt_c,
             )
+            radius_inner_last = radius_inner + self._u.height * fraction
+            # ---- store final lane geometry
+            if key + 1 == len(spacing):
+                self._lanes[key + 1] = SectorBand(
+                    angle_start=self.angle_start,
+                    angle_width=self.angle_width,
+                    radius_inner=radius_inner_last,
+                    radius_outer=self._u.radius,
+                    centre=pt_c,
+                )
             # ---- draw band line
-            cnv.draw_bezier(out_start, bez_out_2, bez_out_3, out_end)
+            cnv.draw_bezier(lline_start, bez_lline_2, bez_lline_3, lline_end)
+
+        print(f"***   BandLanes {spacing=} /n {self._lanes=}")
         # ---- set canvas
         self.set_canvas_props(
             index=ID,
@@ -732,12 +752,16 @@ class BandShape(BaseShape):
         out_start, bez_out_2, bez_out_3, out_end = geoms.bezier_arc_points(
             self.angle_start,
             self.angle_width,
-            self._u.radius + self._u.height,
+            self._u.radius,
             pt_c,
             pt_c.y,
         )
         inn_start, bez_inn_2, bez_inn_3, inn_end = geoms.bezier_arc_points(
-            self.angle_start, self.angle_width, self._u.radius, pt_c, pt_c.y
+            self.angle_start,
+            self.angle_width,
+            self._u.radius - self._u.height,
+            pt_c,
+            pt_c.y,
         )
         # self.vertices = [out_start, out_end, inn_start, inn_end]
         self.vertices = [out_start, inn_start, inn_end, out_end]
@@ -2595,10 +2619,9 @@ class RhombusShape(BaseShape):
             vert_br = [vertexes[1], midpt, vertexes[2]]
             vert_tr = [vertexes[2], midpt, vertexes[3]]
             vert_tl = [vertexes[3], midpt, vertexes[0]]
-            # sections = [vert_l, vert_r, vert_t, vert_b]  # order is important!
-            sections = [vert_tr, vert_br, vert_bl, vert_tl]  # order is important!
-            for key, section in enumerate(sections):
-                cnv.draw_polyline(section)
+            parts = [vert_tr, vert_br, vert_bl, vert_tl]  # order is important!
+            for key, part in enumerate(parts):
+                cnv.draw_polyline(part)
                 self.set_canvas_props(
                     index=ID,
                     stroke=self.slices_stroke or slices_colors[key],

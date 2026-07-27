@@ -6,7 +6,7 @@ Cards: Images, Symbols and Fonts
 .. |shm| image:: shamrock.png
    :width: 12
 
-This section assumes you are very familiar with the concepts, terms and
+It is assumed here you are very familiar with the concepts, terms and
 ideas for :doc:`protograf <index>` as presented in the
 :doc:`Basic Concepts <basic_concepts>` , that you understand all of the
 :doc:`Additional Concepts <additional_concepts>`
@@ -15,9 +15,9 @@ and that you've created some basic scripts of your own using the
 
 .. NOTE::
 
-    This section provides further information about how images, together with
+    Provided here is information about how images, together with
     fonts, can be used to add graphics to cards. It will be helpful if you have
-    already read the other sections referred to in the card's overview section:
+    already read the other parts of the cards overview in
     :doc:`Working with Cards <card_deck_introduction>`.
 
 .. _table-of-contents-ciif:

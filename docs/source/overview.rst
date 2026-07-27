@@ -74,16 +74,18 @@ should be ready to show to a wider audience:
     **Don't** use textures, bevels, gradients, realistic shadows, or other
     embellishments.
 
-    The best design is design done by a professional. The second-best design
-    is no design at all, which is what you should do.
-
     In the same way, icons should just be simple, flat-colour shapes.
     Just go and get free, basic icons from https://thenounproject.com/
     Make better ones later, if you're good with graphic design.
 
-(See more good advice at https://daniel.games/the-work-of-game-design.htm )
+    The best design is design done by a professional. The second-best design
+    is no design at all, which is what you should do.
 
-So, **protograf** aims to help you achieve the above |dash| the
+(See more good advice at https://daniel.games/the-work-of-game-design.htm ;
+also see a useful blog page around design at the prototype stage at
+https://www.spacesluggames.com/articles/playtesting-and-prototyping/board-game-print-and-play-tips ).
+
+So, **protograf** is available to help you achieve the above aim |dash| the
 "second-best design"!
 
 As an example of this approach, here is a quote from a game designer:
@@ -150,22 +152,22 @@ underlying routines that allows a Python program to draw vector graphics and
 generate a PDF output |dash| or export to PNG/SVG/GIF images.
 
 *protograf* provides a set of commands that will draw graphics - these are
-shapes such as circles, rectangles, stars, and many more - as well as lines 
-and text. Each of these can be customized in terms of their color, size, 
+shapes such as circles, rectangles, stars, and many more - as well as lines
+and text. Each of these can be customized in terms of their color, size,
 shape etc. From these primitive graphics, more complex ones can be built up.
 
 *protograf* also provides commands to allow to layout shapes onto various
-"virtual" grids, which in turn can be used to support visible grids. There 
+"virtual" grids, which in turn can be used to support visible grids. There
 is a strong emphasis on hexagons and hexagonal grids, as I really just enjoy
 working with this particular shape.
 
 *protograf* can also generate cards, using data from Excel or CSV files,
-or other sources such Google Sheets or the 
+or other sources such Google Sheets or the
 `BoardGameGeek API <https://boardgamegeek.com/wiki/page/BGG_XML_API#_>`_
 
 *protograf* is not aimed at a "professional software level" for creating
 production-ready graphics and does *NOT* handle "special effects" such kerning,
-skewing, image tiling, gradient colors, fancy text-effects (e.g. drop shadows; 
+skewing, image tiling, gradient colors, fancy text-effects (e.g. drop shadows;
 3D), etc. etc.
 
 
@@ -178,6 +180,6 @@ and tested.
 Now read through the :doc:`basic concepts <basic_concepts>` and
 :doc:`script anatomy <script_anatomy>` before trying out a
 :doc:`worked example <worked_example>`. After that,
-browse through the sections listed in the :doc:`Guide <guide>`, according
+browse through the options listed in the :doc:`Guide <guide>`, according
 to what you have in mind, or look at the various
 :doc:`Examples <examples/index>` for inspiration.

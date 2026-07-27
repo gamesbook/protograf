@@ -54,7 +54,7 @@ Rectangle(common=rsrc,
           hatches_stroke=DK_GREEN, hatches_count=16,
           centre_shape=rectangle(height=0.9, width=0.9, fill="#8CC352", stroke='dimgray'))
 
-# horizontal sections
+# horizontal parts
 seq_rsc = Common(
     height=0.9, width=0.9,
     notch=0.1, label="{{sequence}}",
@@ -114,7 +114,7 @@ Sequence(
     setting=(0, 4, 1, 'number'),
     interval_x=0.9)
 
-# vertical sections
+# vertical parts
 seq_vert = Common(
     height=0.9, width=0.9,
     notch=0.1, label="{{sequence}}",

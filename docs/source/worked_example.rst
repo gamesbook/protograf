@@ -9,8 +9,8 @@ installed :doc:`protograf <index>` and have tested to **check that you
 can create a test file which generates a blank PDF**.
 If not, please first see the :doc:`Setting Up <setting_up>` document.
 
-It will also be helpful if you have read the
-:doc:`Basic Concepts <basic_concepts>` section.  However, do note that
+It will also be helpful if you have already read the
+:doc:`Basic Concepts <basic_concepts>`.  However, do note that
 not all aspects of the examples shown here are described in depth, and
 many of these will only become clear once you have read other parts of
 the full documentation such as the one on
@@ -270,18 +270,18 @@ The resulting ``example4.pdf`` file will show a page of small,
 white-bordered, light-blue cards - with the same text appearing on cards
 one to nine, but with different text on the last card (number ``25``).
 
-Continuing on …
----------------
+Continuing on...
+----------------
 
 If you are interested in carrying on with design of card decks, then the
-section on :doc:`Card Decks <card_decks>` will be helpful for you.
-Please bear in mind that that section assumes you are familiar with **all**
-the :doc:`basic concepts <basic_concepts>` and program usage described in
-earlier sections.
+:doc:`Card Decks <card_decks>` will be helpful for you.
+Please bear in mind that is is assumed here you are familiar with **all**
+the :doc:`basic concepts <basic_concepts>` and program usage described
+earlier.
 
 There is a card creation script to help set up a basic template for your
-cards, based on a series of choices you make |dash| find this in the
-:doc:`Available Scripts <scripts/overview>` section.
+cards, based on a series of choices you make |dash| find this in
+:doc:`Available Scripts <scripts/overview>`.
 
-There are also card-related examples in the
-:doc:`Available Examples <examples/index>` section.
+There are also card-related examples in
+:doc:`Available Examples <examples/index>`.

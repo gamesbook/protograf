@@ -17,7 +17,7 @@ Note that some shapes, such as the :ref:`Hexagon <hexIndex>`,
 available; its better to refer to their specific descriptions to understand
 exactly how these can used.
 
-This section is meant to be complementary to the concepts, terms and ideas for
+This summary is meant to be complementary to the concepts, terms and ideas for
 :doc:`protograf <index>` discussed in :doc:`Basic Concepts <basic_concepts>`.
 
 .. _table-of-contents-terms:
@@ -42,7 +42,7 @@ protograf Jargon
 places in the documentation:
 
 - **command** - an instruction that is specified in a **protograf** script;
-  see a full list in the :doc:`Commands <commands>` section
+  see a full list in :doc:`Commands <commands>`
 - **default**  - a value set by **protograf** if no other is given;
   for example, the line length defaults to being 1 centimetre long
 - **list** - a number of comma-separated values enclosed in square brackets
@@ -51,8 +51,8 @@ places in the documentation:
   or looks; for example, a circle might have its size defined by using a radius
   property of 2 centimetres - in a script this would be shown as ``radius=2``
 - **shape** - a geometric element, for example, a circle, square, text or
-  line i.e. something that can be drawn |dash| see a list in the
-  :doc:`Shapes <core_shapes>` section
+  line i.e. something that can be drawn |dash| see a list in
+  :doc:`Shapes <core_shapes>`
 - **script** - a file,  that can be **run**, containing various **protograf**
   commands |dash| see an outline in :doc:`Script Anatomy <script_anatomy>`
 - **set** - a number of comma-separated values enclosed in round brackets
@@ -94,8 +94,8 @@ shows all the names and RGB colors that are available.
 .. HINT::
 
    For more details on hexadecimal colors, refer to
-   http://www.w3.org/TR/css3-color; the color names are listed in the
-   section https://www.w3.org/TR/css-color-3/#svg-color (this list can
+   http://www.w3.org/TR/css3-color; the color names are listed in
+   https://www.w3.org/TR/css-color-3/#svg-color (this list can
    also be found at https://en.wikipedia.org/wiki/X11_color_names)
 
 .. _termsColorCMYK:
@@ -108,7 +108,7 @@ four colors.
 
 To set these as percentage values - between 0 and 100 - use a string value,
 for example, ``"0, 48.75, 71.87, 37.2"`` (which corresponds to the color
-*sienna* color described in the previous section).
+*sienna* color described previously).
 
 To set these as fractional values, use a set of numbers enclosed in ``(...)``
 brackets, for example: ``(0, 0.4875, 0.7187, 0.3725)``
@@ -483,9 +483,9 @@ Area-orientated Terms
    direction and a value, that designate that the edge of a rectangle
    should be drawn as a triangular "peak"; e.g. a **set** of ``('n', 2)``
    would draw a 2cm high triangle on the upper (north) edge
--  **shades** - a way to fill in the rhombus-shaped subsections of a hexagon
+-  **shades** - a way to fill in the rhombus-shaped sub-parts of a hexagon
    in order to create the effect of a ``Cube``
--  **slices** - a way to fill in triangular sections of a square, rectangle or
+-  **slices** - a way to fill in triangular areas of a square, rectangle or
    rhombus by supplying a list of colors; for a square or rectangle, a
    **slices_line** can also be used to create both trapezoids and triangles
    which gives the appearance of a building's roof when viewed from above

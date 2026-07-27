@@ -1328,9 +1328,9 @@ class RectangleShape(BaseShape):
                 vert_b = [vertexes[1], midpt, vertexes[2]]
                 vert_l = [vertexes[2], midpt, vertexes[3]]
 
-            sections = [vert_t, vert_r, vert_b, vert_l]  # order is important!
-            for key, section in enumerate(sections):
-                cnv.draw_polyline(section)
+            parts = [vert_t, vert_r, vert_b, vert_l]  # order is important!
+            for key, part in enumerate(parts):
+                cnv.draw_polyline(part)
                 self.set_canvas_props(
                     index=ID,
                     stroke=self.slices_stroke or slices_colors[key],

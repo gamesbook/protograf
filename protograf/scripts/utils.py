@@ -61,11 +61,11 @@ class DynamicConfigIni:
             raise TypeError(f"ConfigParser expected, found {type(defs).__name__}")
 
         # merge default and file-based
-        for section in conf.sections():
-            if not defs.has_section(section):
-                defs.add_section(section)
-            for key, value in conf.items(section):
-                defs.set(section, key, value)
+        for _section in conf.sections():
+            if not defs.has_section(_section):
+                defs.add_section(_section)
+            for key, value in conf.items(_section):
+                defs.set(_section, key, value)
 
         # set attrs
         self._raw = defs
