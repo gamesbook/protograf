@@ -1060,7 +1060,7 @@ class RectangleShape(BaseShape):
               (starting from lane 0, closest to bottom edge)
         """
         vertices = self._shape_vertexes
-        spacing = self.get_property_spacing(self.lanes, "Lanes")
+        spacing = tools.get_property_spacing(self.lanes, "Lanes")
         pt_ne, pt_se, pt_sw, pt_nw = (
             vertices[0],
             vertices[1],
@@ -1071,15 +1071,16 @@ class RectangleShape(BaseShape):
         for key, fraction in enumerate(spacing):
             start_pt = geoms.fraction_along_line(pt_sw, pt_nw, fraction)
             cnv.draw_line((pt_sw.x, start_pt.y), (pt_se.x, start_pt.y))
-            # store geometry
+            # ---- store lane geometry
             if key == 0:  # first
                 self._lanes[key] = BBox(start_pt, pt_se)
             else:
                 self._lanes[key] = BBox(start_pt, Point(pt_se.x, last_pt.y))
-                if key == len(spacing) - 1:  # last
-                    self._lanes[key + 1] = BBox(pt_nw, Point(pt_se.x, last_pt.y))
             last_pt = start_pt
+            if key == len(spacing) - 1:  # last
+                self._lanes[key + 1] = BBox(pt_nw, Point(pt_se.x, last_pt.y))
 
+        # print(f"***   RectLanes {spacing=} /n {self._lanes=}")
         # ---- style lanes lines
         cx = vertices[3].x + 0.5 * self._u.width
         cy = vertices[3].y + 0.5 * self._u.height
@@ -1094,25 +1095,29 @@ class RectangleShape(BaseShape):
             rotation_point=muPoint(cx, cy),
         )
 
-    def draw_segments(self, cnv, ID, segs: list | int, rotation: float = 0.0):
+    def draw_sections(self, cnv, ID, sects: list | int, rotation: float = 0.0):
         """Draw vertical lines at intervals along all lanes of the Rectangle.
 
         Args:
             ID: unique ID
-            segs: spacing of segments per lane - "list of lists"
+            sects: spacing of sections per lane - "list of lists"
             rotation: degrees anti-clockwise from horizontal "east"
 
         Note:
             * Draw vertical lines parallel, and starting closest, to the east edge
         """
         vertices = self._shape_vertexes
-        seg_spacing = self.get_property_spacing(segs, "Lanes")
-        # segs as lists: [[f1, f2, ... fn], [f1, f2, ... fn]]  # f = fraction
+        sect_spacing = tools.get_property_spacing(sects, "Sections")
+        # sects as lists: [[f1, f2, ... fn], [f1, f2, ... fn]]  # f = fraction
         for _lane in self._lanes.keys():
+            if isinstance(sect_spacing[0], (list, tuple)):
+                lane_sect_spacing = sect_spacing[_lane]  # lane-specific sections
+            else:
+                lane_sect_spacing = sect_spacing
             lane_bbox = self._lanes[_lane]
             start_point = lane_bbox.br
-            for _seg in seg_spacing:
-                x = start_point.x - lane_bbox.width * _seg
+            for _sect in lane_sect_spacing:
+                x = start_point.x - lane_bbox.width * _sect
                 btm_point = Point(x, start_point.y)
                 top_point = Point(x, start_point.y - lane_bbox.height)
                 # ---- draw segment line
@@ -1122,11 +1127,11 @@ class RectangleShape(BaseShape):
         cy = vertices[3].y + 0.5 * self._u.height
         self.set_canvas_props(
             index=ID,
-            stroke=self.segments_stroke,
-            stroke_width=self.segments_stroke_width,
-            stroke_ends=self.segments_ends,
-            dashed=self.segments_dashed,
-            dotted=self.segments_dotted,
+            stroke=self.sections_stroke,
+            stroke_width=self.sections_stroke_width,
+            stroke_ends=self.sections_ends,
+            dashed=self.sections_dashed,
+            dotted=self.sections_dotted,
             rotation=rotation,
             rotation_point=muPoint(cx, cy),
         )
@@ -1967,7 +1972,7 @@ class RectangleShape(BaseShape):
             "stripes",
             "hatches",
             "lanes",
-            "segments",
+            "sections",
             "perbii",
             "radii",
             "corners",
@@ -2059,16 +2064,16 @@ class RectangleShape(BaseShape):
                 # ---- * draw lanes
                 if self.lanes is not None:
                     self.draw_lanes(cnv, ID, lanes=self.lanes, rotation=rotation)
-            if item == "segments":
-                # ---- * draw segments
-                if self.segments is not None:
+            if item == "sections":
+                # ---- * draw sections
+                if self.sections is not None:
                     if self.lanes is not None:
-                        self.draw_segments(
-                            cnv, ID, segs=self.segments, rotation=rotation
+                        self.draw_sections(
+                            cnv, ID, sects=self.sections, rotation=rotation
                         )
                     else:
                         feedback(
-                            'Cannot set "segments" if "lanes" has not been set.', True
+                            'Cannot set "sections" if "lanes" has not been set.', True
                         )
             if item == "perbii":
                 # ---- * draw perbii

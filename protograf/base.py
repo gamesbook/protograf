@@ -755,15 +755,15 @@ class BaseCanvas:
         )
         self.lanes_dotted = self.defaults.get("lanes_dotted", False)
         self.lanes_dashed = self.defaults.get("lanes_dashed", None)
-        self.segments = self.defaults.get("segments", None)
-        self.segments_stroke = self.defaults.get("segments_stroke", self.stroke)
-        self.segments_fill = self.defaults.get("segments_fill", None)
-        self.segments_ends = self.defaults.get("segments_ends", None)
-        self.segments_stroke_width = self.defaults.get(
-            "segments_stroke_width", self.stroke_width
+        self.sections = self.defaults.get("sections", None)
+        self.sections_stroke = self.defaults.get("sections_stroke", self.stroke)
+        self.sections_fill = self.defaults.get("sections_fill", None)
+        self.sections_ends = self.defaults.get("sections_ends", None)
+        self.sections_stroke_width = self.defaults.get(
+            "sections_stroke_width", self.stroke_width
         )
-        self.segments_dotted = self.defaults.get("segments_dotted", False)
-        self.segments_dashed = self.defaults.get("segments_dashed", None)
+        self.sections_dotted = self.defaults.get("sections_dotted", False)
+        self.sections_dashed = self.defaults.get("sections_dashed", None)
 
     def get_page(self, name="A4"):
         """Get a paper format by name from a pre-defined dictionary."""
@@ -1542,18 +1542,18 @@ class BaseShape:
         self.lanes_ends = kwargs.get("lanes_ends", base.lanes_ends)
         self.lanes_dotted = self.kw_bool(kwargs.get("lanes_dotted", base.lanes_dotted))
         self.lanes_dashed = self.kw_bool(kwargs.get("lanes_dashed", base.lanes_dashed))
-        self.segments = kwargs.get("segments", base.segments)
-        self.segments_fill = kwargs.get("segments_fill", None)
-        self.segments_stroke = kwargs.get("segments_stroke", base.segments_stroke)
-        self.segments_stroke_width = self.kw_float(
-            kwargs.get("segments_stroke_width", base.segments_stroke_width)
+        self.sections = kwargs.get("sections", base.sections)
+        self.sections_fill = kwargs.get("sections_fill", None)
+        self.sections_stroke = kwargs.get("sections_stroke", base.sections_stroke)
+        self.sections_stroke_width = self.kw_float(
+            kwargs.get("sections_stroke_width", base.sections_stroke_width)
         )
-        self.segments_ends = kwargs.get("segments_ends", base.segments_ends)
-        self.segments_dotted = self.kw_bool(
-            kwargs.get("segments_dotted", base.segments_dotted)
+        self.sections_ends = kwargs.get("sections_ends", base.sections_ends)
+        self.sections_dotted = self.kw_bool(
+            kwargs.get("sections_dotted", base.sections_dotted)
         )
-        self.segments_dashed = self.kw_bool(
-            kwargs.get("segments_dashed", base.segments_dashed)
+        self.sections_dashed = self.kw_bool(
+            kwargs.get("sections_dashed", base.sections_dashed)
         )
         # ---- OTHER
         # defaults for attributes called/set elsewhere e.g. in draw()
@@ -2623,44 +2623,6 @@ class BaseShape:
         # height = (face.ascent - face.descent) / 1000 * self.font_size
         # return height
         return float(self.font_size)
-
-    def get_property_spacing(
-        self, the_property: object, property_name: str = "Property"
-    ) -> list:
-        """Calculate fractions for a property
-
-        Notes:
-            * Used for Lane and Segmennt (Rectangle and Band)
-        """
-        fractions = []
-        if the_property:
-            if isinstance(the_property, int):
-                if the_property < 2:
-                    feedback("{property_name} value must be a minimum of 2.", True)
-                lane_sum = 0.0
-                for count in range(0, the_property - 1):
-                    lane_sum += 1 / the_property
-                    fractions.append(lane_sum)
-            elif isinstance(the_property, (list, tuple)):
-                for item in the_property:
-                    if not isinstance(item, (int, float)):
-                        feedback(
-                            "{property_name} values must be fractions, or zero!", True
-                        )
-                    elif isinstance(item, (int, float)) and float(item) > 1.0:
-                        feedback(
-                            "{property_name} values must be fractional values less than 1!",
-                            True,
-                        )
-                    else:
-                        pass
-                fractions = the_property
-            else:
-                feedback(
-                    f"{property_name} value must be a list or an integer - not '{the_property}.'",
-                    True,
-                )
-        return fractions
 
     def textify(
         self, index: int | None = None, text: str = "", default: bool = True

@@ -1727,13 +1727,15 @@ def points(item, units: str | None = None, skip_none: bool = False, label: str =
 
     Doc Test:
 
-    >>> points(1)
-    1
+    >>> points(1, units='pt')
+    1.0
+    >>> points(1, units='in')
+    0.013888888888888888
     """
     log.debug("units %s :: label: %s", units, label)
     if item is None and skip_none:
         return None
-    _units = to_units(units) if units is not None else globals.units
+    _units = to_units(units) if units is not None else globals.unit
     try:
         _item = as_float(item, label)
         if _item is not None and _units is not None:
@@ -1745,6 +1747,52 @@ def points(item, units: str | None = None, skip_none: bool = False, label: str =
             " Please check that this is a valid value.",
             stop=True,
         )
+
+
+def get_property_spacing(the_property: object, property_name: str = "Property") -> list:
+    """Calculate fractions for a property
+
+    Notes:
+        * Used for Lane and Section (Rectangle and Band)
+
+    Doc Test:
+
+    >>> get_property_spacing(2)
+    [0.5]
+    >>> get_property_spacing([0.5])
+    [0.5]
+    """
+    fractions = []
+    if the_property:
+        if isinstance(the_property, int):
+            if the_property < 2:
+                feedback(f"{property_name} value must be a minimum of 2.", True)
+            lane_sum = 0.0
+            for count in range(0, the_property - 1):
+                lane_sum += 1 / the_property
+                fractions.append(lane_sum)
+        elif isinstance(the_property, (list, tuple)):
+            the_flat_property = flatten(the_property)
+            for item in the_flat_property:
+                if not isinstance(item, (int, float)):
+                    feedback(
+                        f"{property_name} values must be fractions, or zero  - not {item}!",
+                        True,
+                    )
+                elif isinstance(item, (int, float)) and float(item) > 1.0:
+                    feedback(
+                        f"{property_name} values must be fractional values less than 1!",
+                        True,
+                    )
+                else:
+                    pass
+            fractions = the_property
+        else:
+            feedback(
+                f"{property_name} value must be a list or an integer - not '{the_property}.'",
+                True,
+            )
+    return fractions
 
 
 def get_pymupdf_props(

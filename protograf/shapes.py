@@ -655,7 +655,7 @@ class BandShape(BaseShape):
             * Lane geometry is stored as a SectorBand in `_lanes` dict, keyed on
               the lane number (starting from lane 0, closest to inner curve)
         """
-        spacing = self.get_property_spacing(self.lanes, "Lanes")
+        spacing = tools.get_property_spacing(self.lanes, "Lanes")
         pt_c = Point(self.x_c + self._o.delta_x, self.y_c + self._o.delta_y)
         radius_inner = self._u.radius - self._u.height
         radius_inner_last = radius_inner
@@ -688,7 +688,7 @@ class BandShape(BaseShape):
             # ---- draw band line
             cnv.draw_bezier(lline_start, bez_lline_2, bez_lline_3, lline_end)
 
-        print(f"***   BandLanes {spacing=} /n {self._lanes=}")
+        # print(f"***   BandLanes {spacing=} /n {self._lanes=}")
         # ---- set canvas
         self.set_canvas_props(
             index=ID,
@@ -700,26 +700,30 @@ class BandShape(BaseShape):
             dotted=self.lanes_dotted,
         )
 
-    def draw_segments(self, cnv, ID, segs: list | int, rotation: float = 0.0):
+    def draw_sections(self, cnv, ID, sects: list | int, rotation: float = 0.0):
         """Draw radial lines at intervals along all lanes of the Band.
 
         Args:
             ID: unique ID
-            segs: spacing of segments per lane - "list of lists"
+            sects: spacing of sections per lane - "list of lists"
             rotation: degrees anti-clockwise from horizontal "east"
 
         Note:
             * Draw radial lines starting closest to the angle_start,
               from the "inner" curved side of the Band to the "outer"
         """
-        seg_spacing = self.get_property_spacing(segs, "Lanes")
-        # segs as lists: [[f1, f2, ... fn], [f1, f2, ... fn]]  # f = fraction
+        sect_spacing = tools.get_property_spacing(sects, "Sections")
+        # sects as lists: [[f1, f2, ... fn], [f1, f2, ... fn]]  # f = fraction
         for _lane in self._lanes.keys():
+            if isinstance(sect_spacing[0], (list, tuple)):
+                lane_sect_spacing = sect_spacing[_lane]  # lane-specific sections
+            else:
+                lane_sect_spacing = sect_spacing
             lane_band = self._lanes[_lane]
             # print(f"*** BandSeg {lane_band=}")
-            for _seg in seg_spacing:
-                # print(f"***   BandSeg {_seg=}")
-                angle = lane_band.angle_start + _seg * lane_band.angle_width
+            for _sect in lane_sect_spacing:
+                # print(f"***   BandSeg {_sect=}")
+                angle = lane_band.angle_start + _sect * lane_band.angle_width
                 point_outer = geoms.point_on_circle(
                     lane_band.centre, lane_band.radius_outer, angle
                 )
@@ -731,11 +735,11 @@ class BandShape(BaseShape):
         # ---- style segment lines
         self.set_canvas_props(
             index=ID,
-            stroke=self.segments_stroke,
-            stroke_width=self.segments_stroke_width,
-            stroke_ends=self.segments_ends,
-            dashed=self.segments_dashed,
-            dotted=self.segments_dotted,
+            stroke=self.sections_stroke,
+            stroke_width=self.sections_stroke_width,
+            stroke_ends=self.sections_ends,
+            dashed=self.sections_dashed,
+            dotted=self.sections_dotted,
         )
 
     def draw(self, cnv=None, off_x=0, off_y=0, ID=None, **kwargs):
@@ -804,13 +808,13 @@ class BandShape(BaseShape):
         # ---- lanes
         if self.lanes is not None:
             self.draw_lanes(cnv, ID, lanes=self.lanes, rotation=kwargs["rotation"])
-        if self.segments is not None:
+        if self.sections is not None:
             if self.lanes is not None:
-                self.draw_segments(
-                    cnv, ID, segs=self.segments, rotation=kwargs["rotation"]
+                self.draw_sections(
+                    cnv, ID, sects=self.sections, rotation=kwargs["rotation"]
                 )
             else:
-                feedback('Cannot set "segments" if "lanes" has not been set.', True)
+                feedback('Cannot set "sections" if "lanes" has not been set.', True)
         # ---- centred shapes (with offsets)
         if self.centre_shapes:
             self.draw_centred_shapes(
