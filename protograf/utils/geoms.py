@@ -1202,6 +1202,61 @@ def rectangles_overlap(rect1: tuple, rect2: tuple) -> bool:
     return True
 
 
+def racetrack_rectangle_properties(ur: Point, lr: Point, width: float) -> tuple:
+    """Calculate center point and anti-clockwise rotation of a Rectangle.
+
+    Args:
+        ur (Point): upper-right coordinate
+        lr (Point): lower-right coordinate
+        width (float): width of the rectangle
+
+    Returns:
+        tuple (Point, float): center, rotation in degrees
+
+    Doc Test:
+
+    >>> ur_pt = Point(2, 2)
+    >>> lr_pt = Point(2, 0)
+    >>> width = 2
+    >>> center, rotation = racetrack_rectangle_properties(ur_pt, lr_pt, width)
+    >>> assert center == Point(x=1.0, y=1.0)
+    >>> assert rotation == 0.0
+
+    >>> ur_pt = Point(3, 3)
+    >>> lr_pt = Point(4, 2)
+    >>> width = 2.82843  # sqrt 8
+    >>> center, rotation = racetrack_rectangle_properties(ur_pt, lr_pt, width)
+    >>> assert center == Point(x=2.499998983444267, y=1.4999989834442669)
+    >>> assert rotation == 45.0
+    """
+    # ---- calculate the vector of the right edge (from LR to UR)
+    dx = ur.x - lr.x
+    dy = ur.y - lr.y
+    # ---- calculate the height (length of the right edge)
+    height = math.sqrt(dx**2 + dy**2)
+    # ---- calculate the midpoint of the right edge
+    midpoint_right = Point((ur.x + lr.x) / 2, (ur.y + lr.y) / 2)
+    # ---- calculate the rotation angle
+    # atan2(dy, dx) gives the angle of the right edge vector.
+    # In an unrotated rectangle (0°), the right edge points straight up (90°).
+    # Therefore, rotation = edge_angle - 90 degrees
+    edge_angle_rad = math.atan2(dy, dx)
+    rotation_deg = math.degrees(edge_angle_rad) - 90
+    # Normalize angle to be within (0, 360) or (-180, 180)
+    rotation_deg = rotation_deg % 360
+    # ---- find the center point
+    # Move from the midpoint_right towards the "left" (inside).
+    # If the 'up' vector is (dx, dy), the 'left' vector is (-dy, dx).
+    # Normalize this and multiply by half the width
+    unit_inward_x = -dy / height
+    unit_inward_y = dx / height
+    center_x = midpoint_right.x + (width / 2) * unit_inward_x
+    center_y = midpoint_right.y + (width / 2) * unit_inward_y
+    center = Point(center_x, center_y)
+    # print(center, rotation_deg)
+    return center, rotation_deg
+
+
 if __name__ == "__main__":
     import doctest
 
