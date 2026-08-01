@@ -104,6 +104,7 @@ class RectangleShape(BaseShape):
             center=cntr_user,
             c=cntr_user,
             # vertices
+            vertices=[ne, se, sw, nw],
             ne=ne,
             nw=nw,
             se=se,
@@ -113,11 +114,14 @@ class RectangleShape(BaseShape):
             s=geoms.fraction_along_line(sw, se, 0.5),
             e=geoms.fraction_along_line(ne, se, 0.5),
             w=geoms.fraction_along_line(nw, sw, 0.5),
-            # length
+            # dimensions
             perimeter=perim,
             radius=radius,
+            height=self.height,
+            width=self.width,
             # other
             area=area,
+            sides=4,
             # meta
             t=_type,
             type=_type,

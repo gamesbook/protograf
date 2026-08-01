@@ -25,6 +25,7 @@ from protograf.utils.structures import (
     Tetris3D,
 )  # named tuples
 from protograf.base import BaseShape
+from protograf.shapes import BandShape
 from protograf.shapes_polygon import PolygonShape
 from protograf.shapes_circle import CircleShape
 from protograf.shapes_rectangle import RectangleShape
@@ -1547,7 +1548,7 @@ class RaceTrackObject(BaseShape):
         super(RaceTrackObject, self).__init__(_object=_object, canvas=canvas, **kwargs)
         self.kwargs = kwargs
         self.set_unit_properties()
-        # ---- user-choices
+        # ---- validate user-choices
         self.stages = kwargs.get("stages", None)
         if not self.stages:
             feedback(
@@ -1560,6 +1561,14 @@ class RaceTrackObject(BaseShape):
                 f"not a '{type(self.stages).__name__}'.",
                 True,
             )
+        for stage in self.stages:
+            if not isinstance(stage, (RectangleShape, BandShape)):
+                invalid = stage.simple_name()
+                feedback(
+                    f"Each stage must be either a Rectangle or Band - not a {invalid}.",
+                    True,
+                    True,
+                )
 
     @property
     def shape_centre(self) -> Point:
@@ -1582,5 +1591,19 @@ class RaceTrackObject(BaseShape):
         cnv = cnv if cnv else globals.canvas  # a new Page/Shape may now exist
         super().draw(cnv, off_x, off_y, ID, **kwargs)  # unit-based props
         # ---- draw by stage
-        for stage in self.stages:
-            stage.draw()
+        old_stage, track_height = None, None
+        for key, stage in enumerate(self.stages):
+            if key == 0:
+                # FIRST stage ONLY - draw "as is"
+                stage.draw()
+                old_stage = stage
+                # use settings of first stage to determine kwarg overrides
+                track_height = stage.geo.height
+            if key > 0:
+                supplied_kwargs = stage.kwargs
+                supplied_kwargs["height"] = track_height
+                # TODO - get "end" of old_stage to calculate start of this stage
+                stage_type = type(stage)
+                shadow_stage = stage_type(canvas=globals.canvas, **supplied_kwargs)
+                shadow_stage.draw()
+                old_stage = shadow_stage
