@@ -569,6 +569,57 @@ def angles_from_points(first: Point, second: Point) -> tuple:
     return round_tiny_float(compass), round_tiny_float(rotation)
 
 
+def angle_between_points(first: Point, second: Point) -> float:
+    """Calculate the angle in degrees between first and second points.
+
+    Notes:
+        * Angle is measured counter-clockwise from the horizontal x-axis.
+        * Assumes y-axis increases downwards (top-left origin).
+
+    Doc Test:
+
+    >>> p1 = Point(100, 100)
+    >>> p2 = Point(200, 50)  # point is "right and up" from p1
+    >>> angle = angle_between_points(p1, p2)
+    >>> assert angle == 26.56505117707799
+    >>> p1 = Point(2, 3)
+    >>> p2 = Point(1, 4)  # point is "down and left" from p1
+    >>> angle = angle_between_points(p1, p2)
+    >>> assert angle == 225
+
+    >>> p1 = Point(2, 3)
+    >>> p2 = Point(3, 3)  # point is right of p1
+    >>> angle = angle_between_points(p1, p2)
+    >>> assert angle == 0
+
+    >>> p1 = Point(2, 3)
+    >>> p2 = Point(2, 2)  # This point above p1
+    >>> angle = angle_between_points(p1, p2)
+    >>> assert angle == 90
+
+    >>> p1 = Point(2, 3)
+    >>> p2 = Point(1, 3)  # point is left of p1
+    >>> angle = angle_between_points(p1, p2)
+    >>> assert angle == 180
+
+    >>> p1 = Point(2, 3)
+    >>> p2 = Point(2, 4)  # point is below p1
+    >>> angle = angle_between_points(p1, p2)
+    >>> assert angle == 270
+
+    """
+    dx = second.x - first.x
+    dy = second.y - first.y
+    # negate dy because in screen coordinates (y-down), 'up' direction is negative y
+    # Negating it maps it to a standard Cartesian system (y-up) where atan2
+    # naturally measures counter-clockwise.
+    angle_rad = math.atan2(-dy, dx)
+    # Convert from radians to degrees
+    angle_deg = math.degrees(angle_rad)
+    # Normalize the result to a 0-360 degree range
+    return angle_deg % 360
+
+
 def centre_radius_from_points(pt_a: Point, pt_b: Point, pt_c: Point) -> tuple:
     """Return (center, radius) of the circle passing through three Points.
 

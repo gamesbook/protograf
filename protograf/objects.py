@@ -1555,17 +1555,17 @@ class RaceTrackObject(BaseShape):
                 "The RaceTrack 'stages' property must be a list of one or more Rectangles and Bands.",
                 True,
             )
-        if not isinstance(self.stages, list):
+        if not isinstance(self.stages, (list, tuple)):
             feedback(
-                "The RaceTrack 'stages' property must be in the form of a list, "
-                f"not a '{type(self.stages).__name__}'.",
+                "The RaceTrack 'stages' property must be in the form of a list,"
+                f" not a '{type(self.stages).__name__}'.",
                 True,
             )
         for stage in self.stages:
             if not isinstance(stage, (RectangleShape, BandShape)):
                 invalid = stage.simple_name()
                 feedback(
-                    f"Each stage must be either a Rectangle or Band - not a {invalid}.",
+                    f"Each stage must be either a Rectangle or a Band - not a {invalid}.",
                     True,
                     True,
                 )
@@ -1591,19 +1591,61 @@ class RaceTrackObject(BaseShape):
         cnv = cnv if cnv else globals.canvas  # a new Page/Shape may now exist
         super().draw(cnv, off_x, off_y, ID, **kwargs)  # unit-based props
         # ---- draw by stage
-        old_stage, track_height = None, None
+        old_stage, track_height = None, 0.0
         for key, stage in enumerate(self.stages):
             if key == 0:
+                # print("\nstage:first")
                 # FIRST stage ONLY - draw "as is"
                 stage.draw()
                 old_stage = stage
                 # use settings of first stage to determine kwarg overrides
                 track_height = stage.geo.height
             if key > 0:
+                # print(key, type(stage), f"{old_stage.geo.nw=}", f"{old_stage.geo.sw=}")
                 supplied_kwargs = stage.kwargs
                 supplied_kwargs["height"] = track_height
-                # TODO - get "end" of old_stage to calculate start of this stage
                 stage_type = type(stage)
+                # coordinates of old_stage used to calculate props of this stage
+                old_nw = old_stage.geo.nw
+                old_sw = old_stage.geo.sw
+                old_ne = old_stage.geo.ne
+                old_se = old_stage.geo.se
+                if isinstance(stage, RectangleShape):
+                    # print("\nstage:rect")
+                    new_center, new_rotation = geoms.racetrack_rectangle_properties(
+                        ur=old_sw, lr=old_nw, width=stage.width
+                    )
+                    supplied_kwargs.pop("x", None)
+                    supplied_kwargs.pop("y", None)
+                    supplied_kwargs.pop("cxy", None)
+                    supplied_kwargs["x"] = new_center.x - stage.width / 2.0
+                    supplied_kwargs["y"] = new_center.y - track_height / 2.0
+                    supplied_kwargs["rotation"] = 360.0 - new_rotation
+                elif isinstance(stage, BandShape):
+                    # print("\nstage:band")
+                    if track_height > stage.radius:
+                        feedback(
+                            f"The RaceTrack's adjusted Band height is greater than its radius",
+                            True,
+                            True,
+                        )
+                    new_rotation = geoms.angle_between_points(
+                        first=old_sw, second=old_nw
+                    )
+                    corner_to_centre = stage.radius - track_height
+                    pid = geoms.point_in_direction(
+                        point_start=old_nw,
+                        point_end=old_sw,
+                        distance_factor=corner_to_centre / track_height,
+                    )
+                    supplied_kwargs["angle_start"] = new_rotation
+                    supplied_kwargs["cx"] = pid.x
+                    supplied_kwargs["cy"] = pid.y
+                    # print(f"band {pid=} angle_start={new_rotation}")
+                else:
+                    raise ValueError(
+                        f'A RaceTrack cannot contain shapes of type "{stage_type}"'
+                    )
                 shadow_stage = stage_type(canvas=globals.canvas, **supplied_kwargs)
                 shadow_stage.draw()
                 old_stage = shadow_stage
