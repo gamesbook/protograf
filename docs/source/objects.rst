@@ -97,3 +97,13 @@ unique patterns. They can also referred to by their shortcut ``letter``
 property.
 
 For more details, see the section on :doc:`Tetrominoes <tetrominoes>`.
+
+
+RaceTrack
+=========
+
+A RaceTrack is a composite shapes, used some games, and are composed of a
+series of Bands and Rectange shapes.  It can be useful to readily create
+basic tracks, or pathways, with the available properties.
+
+For more details, see the section on :doc:`RaceTracks <racetracks>`.

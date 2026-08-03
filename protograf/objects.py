@@ -1638,6 +1638,7 @@ class RaceTrackObject(BaseShape):
                         point_end=old_sw,
                         distance_factor=corner_to_centre / track_height,
                     )
+                    supplied_kwargs.pop("width", None)
                     supplied_kwargs["angle_start"] = new_rotation
                     supplied_kwargs["cx"] = pid.x
                     supplied_kwargs["cy"] = pid.y

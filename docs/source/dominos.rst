@@ -138,7 +138,7 @@ The examples below shows how a Domino can be created and styled.
       including ``_stroke``, ``_stroke_width``, ``_length``, ``_dashed``,
       and ``_dotted``.
 
-      The white dominoes in the bottomost section show how the Domino's
+      The white dominoes in the bottom-most section show how the Domino's
       pips can be assigned to an shape that can be centred; in these
       example, a ``Polygon`` is used.  **Note** that the Polygon is
       not rotated with the Domino; you will need to assign it it's own

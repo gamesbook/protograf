@@ -99,6 +99,8 @@ a handy cross-reference to the detailed information for that command.
 -  :ref:`Polyomino <polyominoesOver>` * - a compound shape made up of one or more squares
 -  :ref:`Polyshape <polyshape-command>` * - an irregular geometric shape that
    can be drawn on a page
+-  :ref:`RaceTrack <racetrack-object>` - a pathway composed of one or more
+   :ref:`Rectangles <rectangle-command>` and/or :ref:`Bands <band-command>`
 -  :ref:`Random <random-command>` - generate a random number within a range
 -  :doc:`Repeat <layouts_repeat>` - repeat the drawing of a shape across a
    rectangular grid pattern

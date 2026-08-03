@@ -533,14 +533,18 @@ class BandShape(BaseShape):
             feedback(
                 f"A Band's height ({self.height}) cannot exceed its radius ({self.radius}) ",
                 True,
+                True
             )
         if kwargs.get("rotation"):
             feedback(
-                "A Band does not support rotation - use the angle_start property", True
+                "A Band does not support rotation - use the angle_start property", True,
+                True,
             )
         if kwargs.get("width"):
             feedback(
-                "A Band does not have a width property - use the height property", False
+                "A Band does not have a width property - use the height property",
+                True,
+                True
             )
         # calculate centre
         if self.cx is None and self.x is None:
@@ -588,11 +592,13 @@ class BandShape(BaseShape):
             nw=self.as_point(_vertices[1], self.units, cntr, self.rotation),
             se=self.as_point(_vertices[2], self.units, cntr, self.rotation),
             sw=self.as_point(_vertices[3], self.units, cntr, self.rotation),
-            # TODO - calculate
             # perbii
-            # length
+            # dimensions
+            radius=self.radius,
+            height=self.height,
             # other
             area=_area,
+            sides=4,  # sort-of...
             # meta
             t=_type,
             type=_type,
