@@ -204,20 +204,18 @@ https://app.readthedocs.org/projects/protograf/builds/
 Viewing Documentation
 ---------------------
 
-It can be helpful to view the documentation during development.
+It can be helpful to view the documentation during development and writing.
 
-For this, one option is to use ``sphinvx-view``.
+For this, one option is to use ``sphinx-autobuild``.
 
-Install these packages::
+Install the following packages (assuming you are using ``uv``)::
 
-    uv pip install sphinx
-    uv pip install setuptools
-    uv pip install sphinx-view
-    uv pip install --upgrade sphinx sphinxcontrib-htmlhelp sphinxcontrib-serializinghtml
+    uv pip install -U sphinx sphinx-autobuild
+    uv pip install -U sphinx-rtd-theme
 
-Then run the tool via::
+Then, from the project folder, display the documentation via::
 
-    sphinx-view docs/source/
+    sphinx-autobuild docs/source docs/_build/html --open-browse
 
 This should open the index documentation page in your default browser; pages
 will automatically refresh as you make changes to the source ``.rst`` files.

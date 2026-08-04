@@ -9,35 +9,49 @@ for :doc:`protograf <index>`  as presented in the
 :doc:`Basic Concepts <basic_concepts>` , that you understand all of the
 :doc:`Additional Concepts <additional_concepts>` and that you've created some
 basic scripts of your own using the :doc:`Core Shapes <core_shapes>`. You also
-be familiar with the various types of shape's properties described in the
+be familiar with the various types of shapes' properties described in the
 :doc:`Customised Shapes <customised_shapes>`
+
+.. _objects-overview:
 
 Overview
 ========
 
-:doc:`protograf <index>` provides additional objects that can be drawn, along
-with customised properties, in addition to the basic set of
-:doc:`core shapes <core_shapes>`.
+In many cases, compound objects are constructed |dash| compounded |dash| out
+of one or more of the :doc:`core shapes <core_shapes>`; for example,
+a `polyomino`_ is composed of one or more :ref:`squares <square-command>` and
+simple `dice`_ are also a single square. Thus these objects are able to use,
+or reference, many of the properties of the core shapes, in addition to their
+own particular properties.
 
-In many cases, these are constructed |dash| compounded |dash| out of one or
-more of the core shapes; for example, `polyominoes`_ are composed of one or
-more :ref:`squares <square-command>` and simple `dice`_ are also a single
-square. Thus they are able to use, or reference, many of the properties of
-these shapes, in addition to their own particular properties.
+The compound objects available are:
+
+- `CardBox`_ - a template to be cut-out and folded to create a box
+- `Cube`_ - a 3D depiction of a shaded cube
+- `Dice`_ - a top-down view of a "square" with dice pips
+- `Domino`_ - a top-down view of a "double-square" with dice pips
+- `Polyomino`_ - a pattern of one or more squares touching on their edges
+- `Pentomino`_ - a well-known type of polyomino; each is composed of 5 squares
+  in one of 12 unique patterns
+- `Tetromino`_ - another type of polyomino; each is composed of 4 squares
+  in one of 5 unique patterns
+- `RaceTrack`_ - a shape composed of Rectangles and Bands to create a pathway
 
 
 CardBox
 =======
+`^ <objects-overview_>`_
 
-``CardBox`` is a command used to generate a template, or outline, of a shape
+A CardBox can be used to generate a template, or outline, of a shape
 that is designed to be cut-out and folded to create a box |dash| for
 boardgames, such a box is often referred to as a **tuckbox**.
 
-For more details, see the section on the :ref:`CardBox <cardbox-object>`.
+For more details, see the :ref:`CardBox <cardbox-object>` section.
 
 
 Cube
 ====
+`^ <objects-overview_>`_
 
 Cubes are used in many games, and being able to readily create a basic
 depiction of them can be useful.
@@ -47,6 +61,7 @@ For more details, see the section on :doc:`Cubes <cubes>`.
 
 Dice
 ====
+`^ <objects-overview_>`_
 
 Dice are used in many games, and being able to readily create a basic
 depiction of them can be useful.
@@ -54,19 +69,21 @@ depiction of them can be useful.
 For more details, see the section on :doc:`Dice <dice>`.
 
 
-Dominoes
-========
+Domino
+======
+`^ <objects-overview_>`_
 
-Dominoes, like cards, are used in a number of games, and being able to
-readily create a basic depiction of them can be useful.
+Dominoes, like cards, are playing pieces used in a number of games, so being
+able to readily create a basic depiction of them can be useful.
 
 For more details, see the section on :doc:`Dominoes <dominos>`.
 
 
-Polyominoes
-===========
+Polyomino
+=========
+`^ <objects-overview_>`_
 
-These are shapes constructed out of a pattern of one or more squares.
+A Polyomino is a shape constructed out of a pattern of one or more squares.
 
 Normally, polyominoes are made up of squares that touch other squares
 along one or more sides, but the ``pattern`` property approach used by
@@ -76,10 +93,11 @@ constructed.
 For more details, see the section on :doc:`Polyominoes <polyominoes>`.
 
 
-Pentominoes
-===========
+Pentomino
+=========
+`^ <objects-overview_>`_
 
-These are one of the most popular and well-known types of polyominoes;
+A Pentomino is one of the most popular and well-known types of polyominoes;
 and each one is composed of **5** squares in one of 12 unique patterns.
 
 They can referred to by their shortcut ``letter`` property which has been
@@ -89,8 +107,9 @@ the Roman alphabet.
 For more details, see the section on :doc:`Pentominoes <pentominoes>`.
 
 
-Tetrominoes
-===========
+Tetromino
+=========
+`^ <objects-overview_>`_
 
 Similar to Pentominoes, these are each composed of **4** squares in one of 5
 unique patterns. They can also referred to by their shortcut ``letter``
@@ -101,9 +120,11 @@ For more details, see the section on :doc:`Tetrominoes <tetrominoes>`.
 
 RaceTrack
 =========
+`^ <objects-overview_>`_
 
-A RaceTrack is a composite shapes, used some games, and are composed of a
-series of Bands and Rectange shapes.  It can be useful to readily create
-basic tracks, or pathways, with the available properties.
+A RaceTrack is a composite shape, used in some games, that is composed of
+a series of Bands and Rectangle shapes.  It can be useful to readily create
+basic tracks, or pathways, making use of the specialised properties of its
+component shapes.
 
-For more details, see the section on :doc:`RaceTracks <racetracks>`.
+For more details, see the :doc:`RaceTrack <racetracks>` section.

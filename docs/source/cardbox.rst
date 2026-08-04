@@ -9,7 +9,7 @@ for :doc:`protograf <index>`  as presented in the
 :doc:`Basic Concepts <basic_concepts>` , that you understand all of the
 :doc:`Additional Concepts <additional_concepts>` and that you've created some
 basic scripts of your own using the :doc:`Core Shapes <core_shapes>`. You also
-be familiar with the various types of shape's properties described in the
+be familiar with the various types of shapes' properties described in the
 :doc:`Customised Shapes <customised_shapes>`
 
 .. _table-of-contents-cardbox:

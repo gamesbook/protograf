@@ -45,11 +45,12 @@ which provides a logical reading order.
 
 .. toctree::
    :maxdepth: 2
-   :caption: Text & Shapes:
+   :caption: Shapes & Text:
 
    core_shapes
    customised_shapes
    shapes_geometry
+   objects
    customised_text
 
 .. toctree::
@@ -70,7 +71,6 @@ which provides a logical reading order.
    hexagonal_grids
    hexhex_grids
    additional_commands
-   objects
    functions
    using_fonts
    python_commands
