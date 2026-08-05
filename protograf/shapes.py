@@ -525,26 +525,30 @@ class BandShape(BaseShape):
         self._clean_kwargs = self.clean_kwargs(**kwargs)  # used for RaceTrack
         super().__init__(_object=_object, canvas=canvas, **kwargs)
         self.no_ends = tools.as_bool(self.kwargs.get("no_ends", False), "no_ends")
+        self.inverted = tools.as_bool(self.kwargs.get("inverted", False), "inverted")
         self._lanes = {}  # store SectorBand for lanes; 0 is "inner"
         # ---- perform overrides
+        if self.radius < 0:
+            self.radius = abs(self.radius)
         self.radius = self.radius or self.diameter / 2.0
         # validate
         if self.height > self.radius:
             feedback(
                 f"A Band's height ({self.height}) cannot exceed its radius ({self.radius}) ",
                 True,
-                True
+                True,
             )
         if kwargs.get("rotation"):
             feedback(
-                "A Band does not support rotation - use the angle_start property", True,
+                "A Band does not support rotation - use the angle_start property",
+                True,
                 True,
             )
         if kwargs.get("width"):
             feedback(
                 "A Band does not have a width property - use the height property",
                 True,
-                True
+                True,
             )
         # calculate centre
         if self.cx is None and self.x is None:

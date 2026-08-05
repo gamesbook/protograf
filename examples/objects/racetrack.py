@@ -100,6 +100,7 @@ b1 = band(
     common=mixed,
     radius=1,
     angle_width=90,
+    no_ends=True,
     sections=3)
 b2 = band(
     common=mixed,
@@ -114,6 +115,59 @@ b3 = band(
 
 RaceTrack(stages=[r1, b1, r2, b2, r3, b2, b3])
 
+PageBreak()
+
+Blueprint(stroke_width=0.5)
+Text(common=txt, text="RaceTrack: Band Inverted")
+
+rtrack = Common(
+    height=0.5,
+    fill="green",
+    stroke_width=1,
+    lanes_stroke_width=0.75,
+    sections_stroke_width=0.5,
+    sections_stroke="brown",
+    sections_dotted=True,
+    no_ends=True,
+    lanes=2)
+
+r1 = rectangle(
+    common=rtrack,
+    x=1, width=1.4,
+    sections=2)
+r2 = rectangle(
+    common=rtrack,
+    sections=2)
+
+b1 = band(
+    common=rtrack,
+    radius=1,
+    sections=2)
+b2 = band(
+    common=rtrack,
+    radius=1,
+    sections=3,
+    angle_start=30, angle_width=130)
+b4 = band(
+    common=rtrack,
+    radius=1,
+    sections=2,
+    inverted=True,
+    angle_width=60)
+b5 = band(
+    common=rtrack,
+    radius=1.35,
+    sections=5,
+    angle_width=174)
+b6 = band(
+    common=rtrack,
+    radius=1.95,
+    sections=2,
+    angle_width=25)
+
+RaceTrack(stages=[r1, b1, r2, b2, b4, b5, b6])
+
+
 Save(
     output='png',
     dpi=300,
@@ -122,5 +176,6 @@ Save(
         'racetrack_simple',
         'racetrack_joined',
         'racetrack_complex',
+        'racetrack_invert',
     ]
 )

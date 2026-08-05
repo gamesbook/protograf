@@ -1606,10 +1606,13 @@ class RaceTrackObject(BaseShape):
                 supplied_kwargs["height"] = track_height
                 stage_type = type(stage)
                 # coordinates of old_stage used to calculate props of this stage
-                old_nw = old_stage.geo.nw
-                old_sw = old_stage.geo.sw
-                old_ne = old_stage.geo.ne
-                old_se = old_stage.geo.se
+                if getattr(old_stage, "inverted", False):
+                    # previous curve was drawn bulging "inwards"
+                    old_nw = old_stage.geo.se
+                    old_sw = old_stage.geo.ne
+                else:
+                    old_nw = old_stage.geo.nw
+                    old_sw = old_stage.geo.sw
                 if isinstance(stage, RectangleShape):
                     # print("\nstage:rect")
                     new_center, new_rotation = geoms.racetrack_rectangle_properties(
@@ -1629,15 +1632,29 @@ class RaceTrackObject(BaseShape):
                             True,
                             True,
                         )
-                    new_rotation = geoms.angle_between_points(
-                        first=old_sw, second=old_nw
-                    )
                     corner_to_centre = stage.radius - track_height
-                    pid = geoms.point_in_direction(
-                        point_start=old_nw,
-                        point_end=old_sw,
-                        distance_factor=corner_to_centre / track_height,
-                    )
+                    if stage.inverted:  # draw with curve towards the "inside"
+                        new_rotation = (
+                            geoms.angle_between_points(first=old_nw, second=old_sw)
+                            - stage.angle_width
+                        )
+
+                        pid = geoms.point_in_direction(
+                            point_start=old_sw,
+                            point_end=old_nw,
+                            distance_factor=corner_to_centre / track_height,
+                        )
+                    else:
+                        new_rotation = geoms.angle_between_points(
+                            first=old_sw, second=old_nw
+                        )
+
+                        pid = geoms.point_in_direction(
+                            point_start=old_nw,
+                            point_end=old_sw,
+                            distance_factor=corner_to_centre / track_height,
+                        )
+
                     supplied_kwargs.pop("width", None)
                     supplied_kwargs["angle_start"] = new_rotation
                     supplied_kwargs["cx"] = pid.x
