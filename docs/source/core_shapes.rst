@@ -1081,11 +1081,22 @@ A Band is a curved area between two radii; effectively it is a "subset" or
 *Annular Section*.
 
 A Band is drawn with a *height* (its "thickness"), a *radius*, as well as a
-*centre* point from which the radii extend.  There is a starting angle, which
+*centre* point from which the radii extend. The radius determines the position
+of the outer arc, while the height is "subtracted" from the radius to determine
+the position of the inner arc line. There is also a starting angle, which
 determines where one radius, forming the end line, is drawn, and a "sweep"
 angle |dash| the *angle_width* property |dash| which determines where the
 second radius, forming the other end line, is drawn. Together, these
 properties define where and how wide a Band extends.
+
+A Band can be subdivided, using the *lanes* and *sections* properties.
+The *lanes*  defines how many parts the Band is divided into, in a
+vertical, or outwards, direction; this property can either be a single, whole
+number or a list of fractions. The *section*  defines how many parts the lanes
+is divided into, in a lengthwise, or circumferential, direction; this property
+can either be a single, whole number or a list of fractions or a list of list
+of fractions.  This latter value means that each lane can be subdivided into
+different number of parts.
 
 .. NOTE::
 
@@ -1093,10 +1104,14 @@ properties define where and how wide a Band extends.
     2. The Band does **not** support a defined rotation property, like many
        other shapes'; rather the rotation value is calculated based on the
        *angle_start* and the *angle_width* properties.
+    3. The other shape for which *lanes* and *sections* can be defined is the
+       :ref:`Rectangle <rectangle-command>`; this is so that both these shapes
+       can be used in the construction of a :ref:`RaceTrack <racetrack-object>`.
 
 
 Example 1. Default Band
 +++++++++++++++++++++++
+`^ <band-command_>`_
 
 .. |bnd| image:: images/defaults/band.png
    :width: 330
@@ -1111,17 +1126,24 @@ Example 1. Default Band
 
       It has the following properties:
 
-      - *centre* is at the default x-position ``1`` cm and y-position ``1`` cm
+      - *centre* is at the default x-position ``1.5`` cm and
+        y-position ``1.5`` cm |dash| this is because a circle is normally
+        drawn inside the square, with a side of `1`` cm and with a top-left
+        corner at x-position ``1`` cm and y-position ``1`` cm
+      - *radius* is ``0.5`` cm
       - *height* is ``0.25`` cm
 
       **Note** that a Band cannot be drawn with only default values; this is
       because its *height* |dash| which defaults to ``1`` cm |dash| must be
-      less than its *radius* |dash| which also defaults to ``1`` cm.
+      less than its *radius* |dash| which defaults to ``0.5`` cm.  The reason
+      the radius is not ``1``, is because its default value is derived from
+      the *diameter* which in turn has a default of ``1`` cm .
 
 ===== ======
 
 Example 2. Customised Band
 ++++++++++++++++++++++++++
+`^ <band-command_>`_
 
 .. |bn2| image:: images/customised/band_custom.png
    :width: 330
@@ -1137,6 +1159,7 @@ Example 2. Customised Band
             stroke_width=1,
             stroke="red", fill="gold",
             radius=1,
+            height=0.75,
             angle_start=112.5,
             angle_width=45,
             dot=0.05,
@@ -1147,6 +1170,7 @@ Example 2. Customised Band
             cx=3, cy=4,
             stroke_width=1,
             radius=1,
+            height=0.75,
             angle_start=112.5,
             angle_width=45,
             vertex_shapes=[
@@ -1164,6 +1188,7 @@ Example 2. Customised Band
         bnd = Band(
             cx=2, cy=6,
             radius=1,
+            height=0.75,
             angle_start=45,
             angle_width=90,
             no_ends=True,
@@ -1181,10 +1206,15 @@ Example 2. Customised Band
             fill="green",
             dot_width=5)
 
+      All the Bands share a common *radius* of ``1`` and *height* of ``0.75``.
+      The radius determines the position of the outer line |dash| arc |dash|
+      while the height is "subtracted" from the radius to determine the
+      position of the inner arc line.
+
       The top Band sets the centre point around which it is drawn to be
       *cx* at `2` and `cy` of 4.  The Band is styled with *stroke*, *fill*,
-      amnd *stroke_width*. Its start angle is set at 112.5 |deg| (anti-clockwise
-      from horizontal east) and the width of the angle is 45 |deg|.
+      amnd *stroke_width*. Its start angle is set at 45 |deg| (anti-clockwise
+      from horizontal east) and the width of the angle is 90 |deg|.
       In addition, the Band has a *cross* and *dot* which are automatically
       drawn at the centre.
 
@@ -1206,6 +1236,7 @@ Example 2. Customised Band
 
 Example 3. Band with Text
 +++++++++++++++++++++++++
+`^ <band-command_>`_
 
 .. |bn3| image:: images/customised/band_text.png
    :width: 330
@@ -1255,13 +1286,77 @@ Example 3. Band with Text
 
       These four Bands share a number of common properties, in terms of their
       *angle_width* of ``90`` |deg|, *height* of ``0.5``, *radius* of ``1``,
-      as well as the various text properties.
+      as well as the various text properties.`3`
 
       The different *angle_start* values show how the text is effectively
       "rotated" relative to the centre of each Band.  A Band does **not**
       have a defined rotation property, like many other shapes, but rather
       the rotation value is calculated based on the *angle_start* and the
       *angle_width* properties.
+
+===== ======
+
+Example 4. Band with Lanes & Sections
++++++++++++++++++++++++++++++++++++++
+`^ <band-command_>`_
+
+.. |bn4| image:: images/customised/band_lanes.png
+   :width: 330
+
+===== ======
+|bn4| This example shows the shape constructed using the command with these
+      properties:
+
+      .. code:: python
+
+        bnd = Common(
+          radius=1, height=0.75,
+          angle_width=90,
+          angle_start=45,
+          stroke_width=0.5,
+        )
+
+        Band(
+          common=bnd,
+          cx=2, cy=2,
+          angle_start=45,
+          lanes=2
+         )
+        Band(
+          common=bnd,
+          cx=2, cy=4,
+          lanes=[1/3, 7/8],
+          lanes_stroke="red",
+          lanes_stroke_width=0.5,
+          sections=3
+        )
+        Band(
+          common=bnd,
+          cx=2, cy=6,
+          fill="lightcyan",
+          lanes=2,
+          sections=[[0.5], [0.333, 0.666]],
+          sections_stroke="red",
+          sections_stroke_width=0.5,
+          sections_dotted=True,
+        )
+
+      The top example shows the Band divided into two lanes, simply by
+      setting *lanes* to the value ``2``.
+
+      The middle example shows the Band divided into two lanes, but with
+      differing heights, because of the fractional values assigned to them
+      by the lane's list value of ``[1/3, 7/8]``.  Each lane is divided into
+      three equal *sections* by assigning ``3`` to that property.  Note how
+      the lanes can be styled by the common approach of adding *_stroke* or
+      *_stroke_width* to the property name.
+
+      The middle example shows the Band divided into two lanes, by
+      setting *lanes* to the value ``2``.  Each lane is then divided into
+      different *sections* sizes by assigning ``[[0.5], [0.333, 0.666]]`` to
+      that property.  Note how the sections can be styled by the common
+      approach of adding *_stroke*, *_stroke_width* or *_dotted* to the
+      property name.
 
 ===== ======
 

@@ -645,7 +645,7 @@ class BandShape(BaseShape):
         # ---- mid point in units
         pt_mid = geoms.point_on_circle(
             pt_c,
-            self.unit(self.radius) + self.unit(self.height / 2.0),
+            self.unit(self.radius) - self.unit(self.height / 2.0),
             self.angle_start + self.angle_width / 2.0,
         )
         return pt_mid
@@ -782,7 +782,7 @@ class BandShape(BaseShape):
         # ---- * mid-pt of Band
         pt_mid = geoms.point_on_circle(
             point_centre=pt_c,
-            radius=self._u.radius + self._u.height / 2.0,
+            radius=self._u.radius - self._u.height / 2.0,
             angle=self.angle_start + self.angle_width / 2.0,
         )
         # ---- * debug
