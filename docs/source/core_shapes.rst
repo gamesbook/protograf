@@ -1092,11 +1092,12 @@ properties define where and how wide a Band extends.
 A Band can be subdivided, using the *lanes* and *sections* properties.
 The *lanes*  defines how many parts the Band is divided into, in a
 vertical, or outwards, direction; this property can either be a single, whole
-number or a list of fractions. The *section*  defines how many parts the lanes
+number or a list of fractions. The *sections*  defines how many parts the lanes
 is divided into, in a lengthwise, or circumferential, direction; this property
 can either be a single, whole number or a list of fractions or a list of list
 of fractions.  This latter value means that each lane can be subdivided into
-different number of parts.
+different number of parts. Lanes and sections are particularly useful for the
+styling of a :ref:`RaceTrack <racetrack-object>`.
 
 .. NOTE::
 

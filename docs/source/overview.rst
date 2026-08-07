@@ -22,14 +22,14 @@ The aim of :doc:`protograf <index>` is to provide a general purpose
 program that allows you to design simple, scalable and reproducible text
 and graphics that can be used for prototyping the elements or components
 of a project, such as the creation of a board game, including the board,
-the tiles, the cards and so on.
+the tiles, the cards, the box, and so on.
 
 .. IMPORTANT::
 
    **protograf** is *NOT* a full-blown graphics editor |dash| like the
    Adobe Photoshop, GIMP, or Inkscape packages |dash| or a desktop publishing
    tool |dash| like Scribus, InDesign, or Xpress |dash| which allow
-   sophisticated creation of complex graphics and text layouts; it does not
+   sophisticated creation of complex graphics and text layouts; and does not
    attempt in **any** way to replicate their extensive functionality!
 
 
@@ -63,8 +63,8 @@ Obviously, if you're a designer who uses a graphics package as an everyday
 tool, then that will likely suit your needs perfectly.
 
 However, there might be a reason to use something simpler. Daniel, of
-https://daniel.games/ has this to say about making a game prototype which
-should be ready to show to a wider audience:
+https://daniel.games/ has this to say about the graphic design for a
+board or card game prototype which needs to be shown to a wider audience:
 
     The game should be neat. This means it's simple, clear, and not ugly.
 
@@ -81,7 +81,7 @@ should be ready to show to a wider audience:
     The best design is design done by a professional. The second-best design
     is no design at all, which is what you should do.
 
-(See more good advice at https://daniel.games/the-work-of-game-design.htm ;
+(See more good advice at https://daniel.games/graphic-design/ ;
 also see a useful blog page around design at the prototype stage at
 https://www.spacesluggames.com/articles/playtesting-and-prototyping/board-game-print-and-play-tips ).
 
@@ -99,8 +99,8 @@ As an example of this approach, here is a quote from a game designer:
     Magnus Karlsson, from his *"Designer Diary: The Plank"*, at
     https://boardgamegeek.com/blog/1/blogpost/176994/designer-diary-the-plank
 
-To see how a professional graphic designer develops production-ready design
-of game components, watch this interview with Brigette Indelicato at
+To see how a professional graphic designer develops actual production-ready
+design of game components, watch this interview with Brigette Indelicato at
 https://www.youtube.com/watch?v=_PfOjSAEFUY
 
 
@@ -161,14 +161,16 @@ shape etc. From these primitive graphics, more complex ones can be built up.
 is a strong emphasis on hexagons and hexagonal grids, as I really just enjoy
 working with this particular shape.
 
-*protograf* can also generate cards, using data from Excel or CSV files,
-or other sources such Google Sheets or the
-`BoardGameGeek API <https://boardgamegeek.com/wiki/page/BGG_XML_API#_>`_
+*protograf* can generate decks of cards, using data from Excel or CSV files,
+or other sources such Google Sheets or API's, such as the
+`BoardGameGeek API <https://boardgamegeek.com/wiki/page/BGG_XML_API#_>`_,
+and lay these cards out in various ways, as well as export them for use in
+other platforms e.g. virtual "gaming tables".
 
 *protograf* is not aimed at a "professional software level" for creating
 production-ready graphics and does *NOT* handle "special effects" such kerning,
-skewing, image tiling, gradient colors, fancy text-effects (e.g. drop shadows;
-3D), etc. etc.
+skewing, image tiling, gradient colors, or fancy text-effects (e.g. drop shadows;
+3D), etc.
 
 
 How do I get started?

@@ -12,27 +12,27 @@ protograf Changes
 - Rename `hatches_dots` property to `hatches_dotted` [BREAKING CHANGE]
 - Update `cards` examples in "manual" section
 - Add `lanes` and `sections` properties to Band and Rectangle
-- Add RaceTrack
+- Add RaceTrack command
 - Switch to sphinx-autobuild for docs display
 
 2026-07-11 (0.5.5)
 ------------------
 - Add Band shape
 - Enhance CardBox
-- Add geometry property to Card data
+- Add `geometry` property to Card data
 - Enable Domino pips to be a custom Shape
 
 2026-06-18 (0.5.4)
 ------------------
 - Patch use of HexHex grid on cards
-- Foldable box template aka tuck box
+- Add foldable box template aka tuck box
 
 2026-06-07 (0.5.3)
 ------------------
 - Enable output of `gallery` of Cards e.g. for a TTS file
-- Add pyrefly to assist with typing checks
+- Add "pyrefly" library to assist with typing checks
 - Add Makefile to make key project operations explicit
-- Rename `LinkLine` command to  `GridLine` [BREAKING CHANGE]
+- Rename LinkLine command to  GridLine [BREAKING CHANGE]
 - Start of refactoring of large `proto` functions into separate files
 - Add `cell` property to Hexagons grid
 - Add `edges` and `paths` for enhanced `GridLine` drawing
@@ -116,7 +116,7 @@ protograf Changes
 - Increase Python requirement to 3.11
 - Update pyMuPDF to 1.26.7 (update import changes!)
 - Update various library dependencies
-- Add `wand` library (for image processing)
+- Add "wand" library (for image processing)
 - Add script to process counters
 
 2025-12-22 (0.3.6)
@@ -200,18 +200,18 @@ protograf Changes
 - Rename property: `corner` to `corners`
 - Rename property: `hatch` to `hatches`
 - Rename property: `perbis` to `perbii`
-- Add Load property (for existing PDF)
+- Add Load command (for existing PDF)
 - Expand Extract command (for card extraction from existing PDF)
-- Add stripes property for Rectangle
+- Add `stripes` property for Rectangle
 
 2025-09-03 (0.2.17)
 -------------------
-- Add prow property for Rectangle
+- Add `prow` property for Rectangle
 - Patch label error for Rectangle
 - Renamed `notch_corners` to `notch_directions`
-- Add corner property for Rectangle
-- Add perbis property for Rectangle (with x,y offsets)
-- Add radii property for Rectangle
+- Add `corner` property for Rectangle
+- Add `perbis` property for Rectangle (with x,y offsets)
+- Add `radii` property for Rectangle
 - Alter default orientation for Polygon (flat "down")
 - Add wave styling for perbis and radii
 - Restructure documentation; add Deck & Cards introduction
@@ -220,22 +220,22 @@ protograf Changes
 2025-08-30 (0.2.16)
 -------------------
 - Add text descriptors for Grid
-- Add slices property to Polygon
-- Add connections property to Line
+- Add `slices` property to Polygon
+- Add `connections` property to Line
 - Add landscape mode to standard card sizes
-- Add nested property to Circle
-- Add nested property to Arc
-- Add order_* property to Hexagon, Circle and Rectangle
+- Add `nested` property to Circle
+- Add `nested` property to Arc
+- Add `order_*` property to Hexagon, Circle and Rectangle
 - Patch bug with gutter file
 
 2025-08-23 (0.2.15)
 -------------------
 - Add Meridians board example
-- Add paths property for Hexagon shape
-- Add _ends property for line style (replaces squared line ends)
-- Add wave_style property to Line
-- Add slices property to Circle
-- Add spikes property for Hexagon shape
+- Add `paths` property for Hexagon shape
+- Add `_ends` property for line style (replaces squared line ends)
+- Add `wave_style` property to Line
+- Add `slices` property to Circle
+- Add `spikes` property for Hexagon shape
 - Patch page color fill error
 - Extend Sequence for irregular intervals
 
@@ -253,7 +253,7 @@ protograf Changes
 -------------------
 - Add example for use of API to create Card Data
 - Add squared line ends
-- Add card_grid for Card shapes
+- Add `card_grid` property for Card shapes
 - Add docstrings for Shapes
 - Patch caption locations for Image
 - Shift Starfield into objects module (no API change)
@@ -410,4 +410,4 @@ protograf Changes
 
 2016-02-05 (0.1.0a1)
 --------------------
-- First draft!
+- First ever draft!

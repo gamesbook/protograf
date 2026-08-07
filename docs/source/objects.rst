@@ -21,7 +21,7 @@ In many cases, compound objects are constructed |dash| compounded |dash| out
 of one or more of the :doc:`core shapes <core_shapes>`; for example,
 a `polyomino`_ is composed of one or more :ref:`squares <square-command>` and
 simple `dice`_ are also a single square. Thus these objects are able to use,
-or reference, many of the properties of the core shapes, in addition to their
+or reference, many of the properties of these core shapes, in addition to their
 own particular properties.
 
 The compound objects available are:
@@ -35,7 +35,7 @@ The compound objects available are:
   in one of 12 unique patterns
 - `Tetromino`_ - another type of polyomino; each is composed of 4 squares
   in one of 5 unique patterns
-- `RaceTrack`_ - a shape composed of Rectangles and Bands to create a pathway
+- `RaceTrack`_ - a pathway composed of Rectangles and Bands
 
 
 CardBox

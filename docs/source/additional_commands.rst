@@ -73,6 +73,10 @@ shape, but the ``Default()`` command does *not* actually draw anything itself.
 For a shape to make use of properties set by a ``Default()`` command, the shape
 must assign the name given to the ``Default()`` to its *default* property.
 
+A shape's *default* can make use of a single ``Default`` or can be supplied
+with a list of names of different ``Default`` s; note that the property values
+from the second (and onwards) ``Default`` s override those of earlier ones.
+
 For example:
 
 .. |dfc| image:: images/custom/commands/defaults.png
@@ -115,8 +119,8 @@ For example:
 
       Note that the **order**, when using multiple Defaults, is important.
       Its clear in the bottom circle that ``stroke_width=2`` from ``def2``
-      supercedes ``stroke_width=4`` from ``def1`` i.e. the values from
-      the second, and onwards, Defaults override those from earlier ones.
+      supercedes ``stroke_width=4`` from ``def1`` i.e. the property values
+      from the second (and onwards) Defaults override those of earlier ones.
 
 ===== ======
 

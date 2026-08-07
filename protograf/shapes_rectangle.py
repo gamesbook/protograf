@@ -1659,6 +1659,7 @@ class RectangleShape(BaseShape):
         is_peaks = True if self.peaks else False
         is_prows = True if self.prows else False
         is_borders = True if self.borders else False
+        is_lanes = True if self.lanes else False
         is_round = True if (self.rounding or self.rounded) else False
         if self.slices and (is_round or is_notched or is_peaks or is_chevron):
             feedback("Cannot use slices with other styles.", True)
@@ -1692,7 +1693,12 @@ class RectangleShape(BaseShape):
             feedback("Cannot use hatches_count and prows together.", True)
         if is_borders and (is_chevron or is_peaks or is_notched or is_prows):
             feedback(
-                "Cannot use borders with any of: hatches, peaks or chevron or prows.",
+                "Cannot use borders with any of: notch, peaks, chevron or prows.",
+                True,
+            )
+        if is_lanes and (is_chevron or is_peaks or is_notched or is_prows or is_round):
+            feedback(
+                "Cannot use lanes with any of: notch, peaks, chevron, prows, rounding or rounded.",
                 True,
             )
         # ---- calculate properties

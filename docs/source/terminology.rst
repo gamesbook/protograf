@@ -444,24 +444,30 @@ Display-orientated Terms
 -  **hidden** - a list of locations, indicated by their *row and
    column* identifier, which should **not** be used for display - the rest
    are displayed as normal
+-  **lanes** - a series of lines that are drawn to sub-divide either a ``Band``
+   or a ``Rectangle`` along their length
 -  **masked** - a list of locations, indicated by their *sequence
    number* |dash| i.e. their position in the drawing order |dash| which
    should **not** be used for display |dash| the rest are displayed as normal
 -  **radii** - if given a value of ``True`` will cause the radii of a
    ``Polygon``or ``Hexagon`` to be shown
 -  *paths* - a list of one or more pairs of *compass directions*, representing
-   two edges of a hexagon shap,e between which a line |dash| straight or an
-   arc |dash| is drawns
+   two edges of a hexagon shape between which a line |dash| straight or an
+   arc |dash| is drawn
 -  **perbii** - if given one or more numbers will cause the perpendicular
    bisectors ("perbii" is plural for the shortcut "perbis") |dash| lines
    from centre to the middle of the edges |dash| of a ``Polygon``, ``Hexagon``
    or ``Rectangle`` to be drawn; a ``Polygon's`` unnamed edges are numbered
    from the east-facing one in an anti-clockwise direction
+-  **sections** - a series of lines that are drawn to sub-divide a **lane**
+   of either a ``Band`` or a ``Rectangle`` along their height
 -  **shown** - a list of locations, indicated by their *row and
    column* identifier which are the only ones that **must** be used for
    display - the rest are ignored
 -  **stripes** - will draw a series of parallel areas between two opposing
    locations of a ``Rectangle`` in any/all of the specified direction(s)
+-  **stages** - a list of ``Band``s and/or ``Rectangle``s that make up the
+   parts of ``RaceTrack``
 -  **vertex_shapes** - will cause a list of shapes to be drawn at the vertices
    of the parent shape
 -  **visible** - a list of locations, indicated by their *sequence
@@ -506,10 +512,10 @@ Miscellaneous Terms
    can be stored; its useful because it supports multiple layers and can be
    animated.
 -  **PDF** - Portable Document Format. A widely used format to create documents
-   such that they display the same way on all devices; its Useful because it
+   such that they display the same way on all devices; its useful because it
    supports the vector-format of **protograf** shapes.
 -  **PNG** - Portable Network Graphic. A file format in which an image can
    be stored; its useful because it supports transparent backgrounds.
 -  **SVG** - Scaleable Vector Graphics. A file format in which an image can
-   be stored; its a vector-format unlike the bitmap- or raster-format of PNG
+   be stored; its a vector-format, unlike the bitmap- or raster-format of PNG
    and JPEG files, so its size can be changed without loss of quality.
