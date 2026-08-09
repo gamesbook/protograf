@@ -300,8 +300,7 @@ class HexHexShape(BaseShape):
             )
         # ---- actual grid lines
         if self.gridlines:
-            # radius = tools.points(hex_geometry.radius)
-            height = tools.points(hex_geometry.height_flat)
+            height = self.points_to_value(hex_geometry.height_flat)  # points=>units
             orientation = (
                 "flat"
                 if self.hexhex_locations.ORIENTATION == HexOrientation.POINTY
@@ -1108,13 +1107,13 @@ class HexHexLocations(VirtualShape):
         z_fraction = (diameter - side) / 2.0
         self.ORIENTATION = self.get_orientation()
         hex_geometry = HexGeometry(  # in point units
-            tools.unit(radius),
-            tools.unit(diameter),
-            tools.unit(side),
-            tools.unit(half_side),
-            tools.unit(half_flat),
-            tools.unit(height_flat),
-            z_fraction,
+            radius=tools.unit(radius),
+            diameter=tools.unit(diameter),
+            side=tools.unit(side),
+            half_side=tools.unit(half_side),
+            half_flat=tools.unit(half_flat),
+            height_flat=tools.unit(height_flat),
+            z_fraction=z_fraction,
         )
         return hex_geometry
 
@@ -2065,7 +2064,6 @@ class DiamondLocations(VirtualLocations):
                 key + 1,
                 corner,
             )
-            # print(_locale.col, _locale.row, _locale.corner)
             yield _locale
 
 

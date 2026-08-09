@@ -147,7 +147,7 @@ run as normal |dash| then a new version can be released.
 Follow this process:
 
 - |check| Format primary code with black (``black --target-version py313 protograf``);
-  update the Python version as needed
+  update the Python version if needed
 - |check| Finalise release date and notes in ``CHANGES.txt``
 - |check| Ensure all the examples can be run by using shell script(s); change
   to the ``examples`` directory and run ``all.sh`` and then ``_all.sh``

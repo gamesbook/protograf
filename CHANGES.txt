@@ -3,6 +3,7 @@ protograf Changes
 
 2026-00-00 (0.5.7)
 ------------------
+- [PLANNED-1] Image Changes
 - [PLANNED-2] Structure: break-up proto into smaller modules
 - [PLANNED-2] Docs: list all props for Hex, Circle, Rectangle, Line
 - [PLANNED-2] BoxCover
