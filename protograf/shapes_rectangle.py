@@ -65,7 +65,6 @@ class RectangleShape(BaseShape):
         self.grid = None
         self.coord_text = None
         self._lanes = {}  # store BBox for lanes; 0 is "bottom" (close to sw->se line)
-        self.no_ends = kwargs.get("no_ends", False)  # overdraw width ends with fill
         # ---- overrides to centre shape
         if self.cx is not None and self.cy is not None:
             self.x = self.cx - self.width / 2.0
@@ -2023,8 +2022,9 @@ class RectangleShape(BaseShape):
         # ---- draw in ORDER
         for item in ordering:
             if item == "base":
-                # ---- * draw rectangle
+                # ---- draw rectangle
                 # feedback(f'*** RECT {self.col=} {self.row=} {x=} {y=} {radius=}')
+                # ---- * draw - with notche
                 if is_notched or is_chevron or is_peaks:
                     # feedback(f'*** RECT  vertices')
                     if _lower(self.notch_style) in ["b", "bite"]:
@@ -2036,6 +2036,7 @@ class RectangleShape(BaseShape):
                         kwargs["closed"] = True
                     self.set_canvas_props(cnv=cnv, index=ID, **kwargs)
                     self._debug(cnv, vertices=self.vertexes)
+                # ---- * draw - with prows
                 elif is_prows:
                     for line in self.lines:
                         if len(line) == 2:
@@ -2045,32 +2046,45 @@ class RectangleShape(BaseShape):
                     kwargs["closed"] = True
                     self.set_canvas_props(cnv=cnv, index=ID, **kwargs)
                 else:
-                    # feedback(f'*** RECT  normal {radius=} {kwargs=}')
-                    cnv.draw_rect(
-                        (x, y, x + self._u.width, y + self._u.height), radius=radius
-                    )
-                    self.set_canvas_props(cnv=cnv, index=ID, **kwargs)
-                    self._debug(cnv, vertices=self.vertexes)
-                    # ---- * * no ends (lines override)
+                    # ---- * draw - with no ends
                     if self.no_ends:
+                        # feedback(f'*** RECT no_ends {kwargs=}')
+                        # draw rectangle area with veerry thin border
+                        # match colors
+                        zwargs = copy.copy(kwargs)
+                        zwargs["stroke"] = self.fill
+                        zwargs["stroke_width"] = self.points_to_value(0.01)
+                        cnv.draw_rect(
+                            (x, y, x + self._u.width, y + self._u.height), radius=radius
+                        )
+                        self.set_canvas_props(cnv=cnv, index=ID, **zwargs)
+                        # draw only top & bottom lines
                         gwargs = copy.copy(kwargs)
-                        gwargs["stroke"] = self.fill
-                        draw_line(
+                        gwargs["closed"] = None
+                        draw_line(  # top
                             cnv,
                             Point(x, y),
-                            Point(x, y + self._u.height),
+                            Point(x + self._u.width, y),
                             self,
                             **gwargs,
                         )
-                        draw_line(
+                        draw_line(  # bottom
                             cnv,
-                            Point(x + self._u.width, y),
+                            Point(x, y + self._u.height),
                             Point(x + self._u.width, y + self._u.height),
                             self,
                             **gwargs,
                         )
                         self.set_canvas_props(cnv=cnv, index=ID, **gwargs)
-                    # ---- * * borders (lines override)
+                    # ---- * draw  - normal
+                    else:
+                        # feedback(f'*** RECT  normal {radius=} {kwargs=}')
+                        cnv.draw_rect(
+                            (x, y, x + self._u.width, y + self._u.height), radius=radius
+                        )
+                        self.set_canvas_props(cnv=cnv, index=ID, **kwargs)
+                        self._debug(cnv, vertices=self.vertexes)
+                    # ---- * add borders (lines override)
                     if self.borders:
                         if isinstance(self.borders, tuple):
                             self.borders = [

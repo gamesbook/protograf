@@ -745,7 +745,10 @@ class BaseCanvas:
         self.fold_dotted = self.defaults.get("fold_dotted", True)
         self.padding_width = self.defaults.get("padding_width", None)
         self.padding_height = self.defaults.get("padding_width", None)
-        # ---- racetrack
+        # ---- racetrack: band /rectangle
+        self.no_ends = self.defaults.get(
+            "no_ends", False
+        )  # overdraw end lines with fill
         self.lanes = self.defaults.get("lanes", None)
         self.lanes_stroke = self.defaults.get("lanes_stroke", self.stroke)
         self.lanes_fill = self.defaults.get("lanes_fill", None)
@@ -1533,6 +1536,7 @@ class BaseShape:
         self.padding_width = kwargs.get("padding_width", base.padding_width)
         self.padding_height = kwargs.get("padding_height", base.padding_height)
         # ---- racetrack: band /rectangle
+        self.no_ends = self.kw_bool(kwargs.get("no_ends", base.no_ends))
         self.lanes = kwargs.get("lanes", base.lanes)
         self.lanes_fill = kwargs.get("lanes_fill", None)
         self.lanes_stroke = kwargs.get("lanes_stroke", base.lanes_stroke)

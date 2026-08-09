@@ -14,9 +14,9 @@ Python for designing and creating simple, regular, graphical outputs in PDF
 (or PNG/GIF/SVG) format via a script.
 
 **protograf**  has been primarily created to handle the prototyping of cards,
-counters, tiles and boards for board games, including hexagonal grids, but can
-also be used for creating any simple design that has regular or repetitive
-elements; typically a mix of graphics and text.
+counters, tiles, boards and boxes for board games, including hexagonal grids,
+but can also be used for creating any simple design that has regular or
+repetitive elements; typically a mix of graphics and text.
 
 If it's your first time here, *please consult the* `guide <guide.html>`_
 which provides a logical reading order.

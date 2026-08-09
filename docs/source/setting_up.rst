@@ -18,6 +18,10 @@ Setting Up
 - `Other software installs`_
 - `Installing protograf`_
 - `Checking that protograf works`_
+
+  - `1. Create a test file`_
+  - `2. Run file using Python`_
+  - `3. View test results`_
 - `Python in the cloud`_
 
 
@@ -25,8 +29,8 @@ Outline
 =======
 `↑ <table-of-contents-setup_>`_
 
-There are four parts to being able to use :doc:`protograf <index>`
-on your own machine:
+There are four steps you need to complete before being able to use
+:doc:`protograf <index>` on your own machine:
 
 1. Install the correct version of `Python <http://www.python.org>`_
 2. Install and set-up **protograf**
@@ -49,7 +53,7 @@ executable files, such as the typical ``.exe`` ones you find on Windows
 (or ``.app`` on macOS). Instead, Python itself is first loaded and then
 it "runs" your Python file/script/program on your behalf. So, running any
 Python script, such as the ones created for **protograf** requires that you
-first install Python itself.
+first install Python.
 
 Python itself is composed of many built-in libaries, or *packages*, each of
 which handles some aspect of a program. Python also is designed to be extended
@@ -258,6 +262,8 @@ Installing protograf
 ====================
 `↑ <table-of-contents-setup_>`_
 
+This section assumes you are here after `testing that Python is installed`_
+
 .. IMPORTANT::
 
     Windows users will need to install an additional program - a "DLL" -
@@ -267,16 +273,16 @@ Installing protograf
 
     This package is needed for the SVG export option to work.
 
-After `testing that Python is installed`_, you can install **protograf** itself
-via ``pip``.
-
-After `opening a Terminal`_, and activating the virtual environment::
-
-   pip install protograf
+After `opening a Terminal`_, and activating the virtual environment, you can
+install **protograf** itself via ``pip``.
 
 If you are using ``uv``::
 
    uv pip install protograf
+
+Otherwise::
+
+   pip install protograf
 
 .. HINT::
 
@@ -294,15 +300,14 @@ Checking that protograf works
 1. Create a test file
 ---------------------
 
-To now check that **protograf** works, you should create a small test
-file.
+To now check that **protograf** works, you should create a small test file.
 
 Open your text editor and type |dash| or copy and paste |dash| the following,
-making sure you do not have any spaces at the start of any line!::
+making sure there are **no** spaces at the start of any line!::
 
    from protograf import *
    Create()
-   Text(text="Hello World")
+   Text("Hello World")
    Save()
 
 .. HINT::
@@ -316,8 +321,8 @@ is a Python file |dash| this is useful but not absolutely essential!
 
 .. _runWithPython:
 
-2. Run file with Python
------------------------
+2. Run file using Python
+-------------------------
 
 Now use Python to "run" this test file i.e. after `opening a Terminal`_,
 and activating the virtual environment, you will need to change to the
@@ -342,6 +347,23 @@ called ``test.pdf`` that has been created in the same directory.
 You should be able to open and view this PDF file via your `PDF viewer`_.
 It should be a mostly blank, A4-sized page with the phrase *Hello World*
 in a small, Helvetica font near the top-left.
+
+
+.. HINT::
+
+    If you work in Linux, you can use https://en.wikipedia.org/wiki/Inotify
+    to automatically run and create the output for you |dash| the PDF viewer
+    should already be set to show any changes without your having to manually
+    reload the file.  This is useful if there is a single script to which
+    you are making many changes.
+
+    The syntax looks like this::
+
+        while true; do inotifywait -e modify test.py; python test.py; done
+
+    Paths can be added as needed here.
+
+    (Untested, but available for Windows is https://github.com/thekid/inotify-win)
 
 
 Python in the cloud

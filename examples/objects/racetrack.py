@@ -122,15 +122,29 @@ Text(common=txt, text="RaceTrack: Band Inverted")
 
 rtrack = Common(
     height=0.5,
-    fill="green",
-    stroke_width=1,
+    fill="dimgrey",
+    stroke_width=2,
     lanes_stroke_width=0.75,
+    lanes_stroke="white",
     sections_stroke_width=0.5,
-    sections_stroke="brown",
+    sections_stroke="white",
     sections_dotted=True,
     no_ends=True,
     lanes=2)
 
+'''
+# TEST
+Rectangle(
+    common=rtrack,
+    x=1, y=2, width=0.75,
+    sections=2)
+Band(
+    common=rtrack,
+    cy=3, cx=3, angle_start=90,
+    radius=1,
+    sections=2)
+# TEST
+'''
 r1 = rectangle(
     common=rtrack,
     x=1, width=1.4,

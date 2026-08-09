@@ -59,6 +59,11 @@ RaceTrack Examples
 The examples below show how Bands and/or Rectangles are used to create a
 RaceTrack.
 
+- `Example 1. Simple Track`_
+- `Example 2. Joined Track`_
+- `Example 3. Complex Track`_
+- `Example 4. Inverted Track`_
+
 
 Example 1. Simple Track
 ------------------------
@@ -157,7 +162,7 @@ Example 2. Joined Track
       In this example, as in the one above, the use of the ``Common`` command
       enables shared properties between the elements of the RaceTrack.
 
-      The use of the *no_end* property means that the ends of the stages are
+      The use of the *no_ends* property means that the ends of the stages are
       drawn in the same color as the *fill* of each shape |dash| in this case,
       ``silver``.
 
@@ -225,10 +230,11 @@ Example 3. Complex Track
 
       In this example, as in the ones above, the use of the ``Common`` command
       enables shared properties between the elements of the RaceTrack.
-      In particular, the *lanes* and the *sections* are styled.
+      In particular, the *lanes* and the *sections* are styled in a similar
+      fashion for both the Rectangles and the Bands.
 
       While it often makes sense for the the different *stages* to share the same
-      number of lanes, this example, shows how can each have their own differing
+      number of lanes, this example shows how each can have their own differing
       number of sections, which in turn can be different on a per-lane basis.
       For details, consult the relevant examples for
       :ref:`Rectangles <rectangle-command>` and :ref:`Bands <band-command>`.
@@ -238,6 +244,82 @@ Example 3. Complex Track
           Getting "closure" on a RaceTrack composed of multiple elements can
           be tricky. In this case, some experimentation was needed to "flatten"
           the last Band (``b3``) by giving it a longer radius, while also
-          extending the width of first Rectangle by a small amount.
+          extending the width of first Rectangle by a small amount, such the two
+          shapes joned in a more natural way.
+
+===== ======
+
+
+Example 4. Inverted Track
+-------------------------
+`^ <racetrack-object_>`_
+
+.. |rt4| image:: images/objects/racetrack_invert.png
+   :width: 330
+
+===== ======
+|rt4| This example shows a RaceTrack constructed using commands like:
+
+      .. code:: python
+
+        rtrack = Common(
+            height=0.5,
+            fill="dimgrey",
+            stroke_width=2,
+            lanes_stroke_width=0.75,
+            lanes_stroke="white",
+            sections_stroke_width=0.5,
+            sections_stroke="white",
+            sections_dotted=True,
+            no_ends=True,
+            lanes=2)
+
+        r1 = rectangle(
+            common=rtrack,
+            x=1, width=1.4,
+            sections=2)
+        r2 = rectangle(
+            common=rtrack,
+            sections=2)
+
+        b1 = band(
+            common=rtrack,
+            radius=1,
+            sections=2)
+        b2 = band(
+            common=rtrack,
+            radius=1,
+            sections=3,
+            angle_start=30, angle_width=130)
+        b4 = band(
+            common=rtrack,
+            radius=1,
+            sections=2,
+            inverted=True,
+            angle_width=60)
+        b5 = band(
+            common=rtrack,
+            radius=1.35,
+            sections=5,
+            angle_width=174)
+        b6 = band(
+            common=rtrack,
+            radius=1.95,
+            sections=2,
+            angle_width=25)
+
+      In this example, as in the ones above, the use of the ``Common`` command
+      enables shared properties between the elements of the RaceTrack.
+      In particular, the *lanes* and the *sections* are styled in a similar
+      fashion for both the Rectangles and the Bands.
+
+      This is example is much the same as `Example 3. Complex Track`_, but there
+      is a change for the third Band |dash| ``b3`` |dash| that is drawn.
+
+      The use of the ``inverted=True`` means that Band is not drawn with its
+      centre point "inside" the track area |dash| what is called the *infield*
+      in racing terms |dash| but outside of this.  This also means that the
+      Band is drawn in the opposite direction from the others; which may in
+      turn impact where the *sections* appear.
 
 ===== ======

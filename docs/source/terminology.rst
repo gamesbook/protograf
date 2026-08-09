@@ -36,6 +36,8 @@ This summary is meant to be complementary to the concepts, terms and ideas for
 - `Miscellaneous Terms`_
 
 
+.. _termsJargon:
+
 protograf Jargon
 ==================
 `↑ <table-of-contents-terms_>`_
@@ -66,9 +68,6 @@ places in the documentation:
 - **vertex** / **vertices** - the sharp "points" at the intersection of the
   lines used to construct a shape; for example, a triangle has 3 vertices;
   a square has 4 vertices and a hexagon has 6 vertices
-- **_x** and **_y** - some terms can be modified to be specific for
-  *x* (left to right) or *y* (top to bottom) distances by appending one of
-  these underscore-prefixed terms to them
 
 
 .. _termsColor:
@@ -452,7 +451,7 @@ Display-orientated Terms
 -  **masked** - a list of locations, indicated by their *sequence
    number* |dash| i.e. their position in the drawing order |dash| which
    should **not** be used for display |dash| the rest are displayed as normal
--  **no_end** - a Boolean property |dash|``True`` or ``False`` |dash| which
+-  **no_end** - a Boolean property |dash| ``True`` or ``False`` |dash| which
    can be set for a ``Rectangle`` or ``Band`` to essentially change the color
    of the "end" lines to match that of the shape's fill
 -  *paths* - a list of one or more pairs of *compass directions*, representing

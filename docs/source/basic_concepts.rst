@@ -40,7 +40,7 @@ other graphics editing or programming tools, but some are specific to it.
 
 This is a general discussion; it may also be useful to look at the more
 detailed definitions of some of the terms in the section covering
-:doc:`terminology <terminology>`.
+:doc:`terminology <terminology>`; especially the :ref:`jargon <termsJargon>`.
 
 .. _table-of-contents-basic:
 
@@ -203,6 +203,11 @@ are provided in the section on :doc:`core shapes <core_shapes>`.
 
 Other *elements* include things like :doc:`hexagonal grids <hexagonal_grids>`,
 regular :doc:`layouts <layouts>` and :doc:`cards <card_deck_introduction>`.
+
+More complex *elements* are :doc:`compound objects <objects>` ; these are
+typically composed of one or more of the basic shapes, and have their own
+customisation options.
+
 
 .. _element-properties:
 
@@ -372,6 +377,6 @@ Some examples of defaults are:
 
 Finally |dash| and perhaps confusingly |dash| :doc:`protograf <index>` also
 allows you to create your own "defaults" which represent properties that you
-want to share among a number of geometric **shapes**, or text, that make up
+want to share among a number of *shapes*, or *elements*, that make up
 your design; for more on this, see the :ref:`Default <the-default-command>`
 and the :ref:`Common <the-common-command>` commands.

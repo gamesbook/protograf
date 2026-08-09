@@ -14,6 +14,7 @@ protograf Changes
 - Add `lanes` and `sections` properties to Band and Rectangle
 - Add RaceTrack command
 - Switch to sphinx-autobuild for docs display
+- Update document links
 
 2026-07-11 (0.5.5)
 ------------------

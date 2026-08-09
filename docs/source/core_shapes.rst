@@ -3519,7 +3519,8 @@ Example 2. Moleskine Grid
       To simulate the dot grid found in Moleskine notebooks, it
       has the following properties set:
 
-      - *x* and *y* - start the grid at the top-left of the page
+      - *x* and *y* - both set to ``0`` to start the grid at the top-left
+        of the page
       - *width* and *height* - intervals between the centre of the dots
         in the x- and y-directions respectively
       - *dot_width* - set to be smaller than the default of ``3``
@@ -3548,7 +3549,7 @@ Grid
 `↑ <shape-index_>`_
 
 A Grid is a series of crossed lines |dash| both in the vertical and
-horizontal directions. The Grid will, by default |dash| i.e. if the exact
+horizontal directions. The Grid will, by default |dash| if the exact
 number of rows and columns is not specified |dash| fill the page as far
 as possible between its margins.
 
@@ -3761,9 +3762,10 @@ Example 5. Omit Edges
       - *stroke_width* - set to ``0.5`` points; the thicker line makes
         the grid more visible
 
-      In addition, each grid has an *outer_...* property set to ``True``.
-      This means that the line on that edge of the grid is not drawn. Setting
-      *omit_outer* to ``True`` means **all** edge lines are not drawn.
+      In addition, each grid has an *omit_...* property set to ``True``.
+      This means that the named line on that edge of the grid is not drawn.
+      Setting *omit_outer* to ``True`` means that **all** edge lines are
+      not drawn.
 
 ===== ======
 
@@ -4147,9 +4149,13 @@ It is possible change the way an Image appears by either creating a "cut-out"
 from it, or by blurring the edges.  These changes are termed *operations*.
 
 Each operation is specified by its name, followed by one or more settings,
-in list format (i.e. inside ``[...]`` brackets). Be aware that values used
-for these operations are pixel-based values and do not correspond to the
-units used elsewhere in **protograf**.
+in list format (i.e. inside ``[...]`` brackets).
+
+.. IMPORTANT::
+
+    Be aware that numerical values used for the operations are pixel-based
+    values and do *not* correspond to the normal measurement units used
+    elsewhere in **protograf**.
 
 The cut-out operations are:
 
