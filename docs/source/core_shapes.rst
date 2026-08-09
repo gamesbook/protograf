@@ -1076,9 +1076,9 @@ Band
 ~~~~
 `↑ <shape-index_>`_
 
-A Band is a curved area between two radii; effectively it is a "subset" or
-"slice" of a `Sector`_. More formally it is known as an *Annular Sector* or
-*Annular Section*.
+A Band is a curved area between two radii of the same circle; effectively it
+is a "subset" or "slice" of a `Sector`_. More formally it is known as an
+*Annular Sector* or *Annular Section*.
 
 A Band is drawn with a *height* (its "thickness"), a *radius*, as well as a
 *centre* point from which the radii extend. The radius determines the position
@@ -1103,7 +1103,7 @@ styling of a :ref:`RaceTrack <racetrack-object>`.
 
     1. The **maximum** extent of a Band is 180 |deg| |dash| half a circle!
     2. The Band does **not** support a defined rotation property, like many
-       other shapes'; rather the rotation value is calculated based on the
+       other shapes'; instead the rotation value is calculated based on the
        *angle_start* and the *angle_width* properties.
     3. The other shape for which *lanes* and *sections* can be defined is the
        :ref:`Rectangle <rectangle-command>`; this is so that both these shapes
@@ -1142,6 +1142,7 @@ Example 1. Default Band
 
 ===== ======
 
+
 Example 2. Customised Band
 ++++++++++++++++++++++++++
 `^ <band-command_>`_
@@ -1159,8 +1160,8 @@ Example 2. Customised Band
             cx=2, cy=4,
             stroke_width=1,
             stroke="red", fill="gold",
-            radius=1,
-            height=0.75,
+            radius=1.5,
+            height=1,
             angle_start=112.5,
             angle_width=45,
             dot=0.05,
@@ -1170,8 +1171,8 @@ Example 2. Customised Band
         Band(
             cx=3, cy=4,
             stroke_width=1,
-            radius=1,
-            height=0.75,
+            radius=1.5,
+            height=1,
             angle_start=112.5,
             angle_width=45,
             vertex_shapes=[
@@ -1188,8 +1189,8 @@ Example 2. Customised Band
 
         bnd = Band(
             cx=2, cy=6,
-            radius=1,
-            height=0.75,
+            radius=1.5,
+            height=1,
             angle_start=45,
             angle_width=90,
             no_ends=True,
@@ -1207,7 +1208,7 @@ Example 2. Customised Band
             fill="green",
             dot_width=5)
 
-      All the Bands share a common *radius* of ``1`` and *height* of ``0.75``.
+      All the Bands use the same *radius* of ``1.5`` and *height* of ``1``.
       The radius determines the position of the outer line |dash| arc |dash|
       while the height is "subtracted" from the radius to determine the
       position of the inner arc line.
@@ -1235,6 +1236,7 @@ Example 2. Customised Band
 
 ===== ======
 
+
 Example 3. Band with Text
 +++++++++++++++++++++++++
 `^ <band-command_>`_
@@ -1249,7 +1251,8 @@ Example 3. Band with Text
       .. code:: python
 
         bnd = Common(
-            radius=1, height=0.5,
+            radius=1,
+            height=0.5,
             angle_width=90,
             stroke_width=0.5,
             fill=None,
@@ -1297,6 +1300,7 @@ Example 3. Band with Text
 
 ===== ======
 
+
 Example 4. Band with Lanes & Sections
 +++++++++++++++++++++++++++++++++++++
 `^ <band-command_>`_
@@ -1311,7 +1315,8 @@ Example 4. Band with Lanes & Sections
       .. code:: python
 
         bnd = Common(
-          radius=1, height=0.75,
+          radius=1.5,
+          height=1,
           angle_width=90,
           angle_start=45,
           stroke_width=0.5,
@@ -1334,9 +1339,13 @@ Example 4. Band with Lanes & Sections
         Band(
           common=bnd,
           cx=2, cy=6,
-          fill="lightcyan",
+          fill="gold",
+          no_ends=True,
           lanes=2,
-          sections=[[0.5], [0.333, 0.666]],
+          sections=[
+            [0.5],
+            [0, 0.333, 0.666, 1]
+          ],
           sections_stroke="red",
           sections_stroke_width=0.5,
           sections_dotted=True,
@@ -1352,12 +1361,16 @@ Example 4. Band with Lanes & Sections
       the lanes can be styled by the common approach of adding *_stroke* or
       *_stroke_width* to the property name.
 
-      The middle example shows the Band divided into two lanes, by
+      The bottom example shows the Band divided into two lanes, by
       setting *lanes* to the value ``2``.  Each lane is then divided into
-      different *sections* sizes by assigning ``[[0.5], [0.333, 0.666]]`` to
-      that property.  Note how the sections can be styled by the common
+      different *sections* sizes by assigning ``[[0.5], [0, 0.333, 0.666, 1]]``
+      to that property.  Note how the sections can be styled by the common
       approach of adding *_stroke*, *_stroke_width* or *_dotted* to the
-      property name.
+      property name.  Also note that the sections can be drawn at the start
+      **and** end of the Band by including the "fractions" of ``0`` and ``1``
+      respectively.  The use of ``no_ends=True`` means the normal radial lines
+      are **not** drawn at the end of the Band; thus allowing better display
+      of the sections lines in those positions.
 
 ===== ======
 
@@ -2726,6 +2739,10 @@ A Sector is like the triangular-shaped wedge that is often cut from a pizza
 or cake. It extends from the centre of a "virtual" circle outwards to its
 enclosing diameter.  The two "arms" of the sector will cover a certain number
 of degrees of the circle (from 1 to 360).
+
+.. HINT::
+
+    If you need to draw only a subsection of Sector, then use a `Band`_.
 
 Example 1. Default Sector
 +++++++++++++++++++++++++

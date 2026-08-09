@@ -1481,8 +1481,8 @@ Band(
     cx=2, cy=2,
     stroke_width=1,
     stroke="red", fill="gold",
-    radius=1,
-    height=0.75,
+    radius=1.5,
+    height=1,
     angle_start=45,
     angle_width=90,
     dot=0.05,
@@ -1492,8 +1492,8 @@ Band(
 Band(
     cx=2, cy=4,
     stroke_width=1,
-    radius=1,
-    height=0.75,
+    radius=1.5,
+    height=1,
     angle_start=45,
     angle_width=90,
     vertex_shapes=[
@@ -1509,11 +1509,10 @@ Band(
 
 bnd = Band(
     cx=2, cy=6,
-    radius=1,
-    height=0.75,
+    radius=1.5,
+    height=1,
     angle_start=45,
     angle_width=90,
-    no_ends=True,
 )
 Dot(cxy=bnd.geo.ne, fill="red", dot_width=5)
 Dot(cxy=bnd.geo.sw, fill="gold", dot_width=5)
@@ -1567,7 +1566,7 @@ PageBreak()
 Blueprint()
 Text(common=txt, text="Band: Lanes & Sections")
 bnd = Common(
-    radius=1, height=0.75,
+    radius=1.5, height=1,
     angle_width=90,
     angle_start=45,
     stroke_width=0.5,
@@ -1589,10 +1588,11 @@ Band(
 Band(
     common=bnd,
     cx=2, cy=6,
-    fill="lightcyan",
+    fill="gold",
     lanes=2,
-    sections=[[0.5], [0.333, 0.666]],
-    sections_stroke="red",
+    no_ends=True,
+    sections=[[0.5], [0, 0.333, 0.666, 1]],
+    sections_stroke="brown",
     sections_stroke_width=0.5,
     sections_dotted=True,
 )

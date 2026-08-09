@@ -389,7 +389,8 @@ bnd = Common(
 Rectangle(
     common=bnd,
     y=1,
-    lanes=2
+    lanes=2,
+    no_ends=True,
  )
 Rectangle(
     common=bnd,

@@ -1813,7 +1813,8 @@ The use of lanes and sections is illustrated in the example below.
         Rectangle(
             common=bnd,
             y=1,
-            lanes=2
+            lanes=2,
+            no_ends=True,
          )
         Rectangle(
             common=bnd,
@@ -1835,7 +1836,10 @@ The use of lanes and sections is illustrated in the example below.
         )
 
       The top example shows the Rectangle divided into two lanes, simply by
-      setting *lanes* to the value ``2``.
+      setting *lanes* to the value ``2``.  In addition, the settings of the
+      *no_ends* property to ``True`` means that both end edge lines are
+      overwritten by two other lines of the same color as he Rectangle's
+      fill |dash| in this case ``white``.
 
       The middle example shows the Rectangle divided into two lanes, but with
       differing heights, because of the fractional values assigned to them

@@ -4,6 +4,7 @@ Create Rectangle shape for protograf
 """
 
 # lib
+import copy
 from functools import cached_property
 import logging
 import math
@@ -64,6 +65,7 @@ class RectangleShape(BaseShape):
         self.grid = None
         self.coord_text = None
         self._lanes = {}  # store BBox for lanes; 0 is "bottom" (close to sw->se line)
+        self.no_ends = kwargs.get("no_ends", False)  # overdraw width ends with fill
         # ---- overrides to centre shape
         if self.cx is not None and self.cy is not None:
             self.x = self.cx - self.width / 2.0
@@ -1701,6 +1703,17 @@ class RectangleShape(BaseShape):
                 "Cannot use lanes with any of: notch, peaks, chevron, prows, rounding or rounded.",
                 True,
             )
+        if self.no_ends and (
+            is_chevron or is_peaks or is_notched or is_prows or is_round
+        ):
+            feedback(
+                "Cannot use 'no_ends' with any of: notch, peaks, chevron, prows, rounding or rounded.",
+                True,
+            )
+        if self.no_ends and is_borders:
+            feedback(
+                "Note that 'no_ends' may be overriden by the borders settings.", False
+            )
         # ---- calculate properties
         x, y = self.calculate_xy(**kwargs)
         # feedback(f'*** RECT      {self.col=} {self.row=} {x=} {y=} {self.use_abs_c=}')
@@ -2038,7 +2051,26 @@ class RectangleShape(BaseShape):
                     )
                     self.set_canvas_props(cnv=cnv, index=ID, **kwargs)
                     self._debug(cnv, vertices=self.vertexes)
-                    # ---- * borders (override)
+                    # ---- * * no ends (lines override)
+                    if self.no_ends:
+                        gwargs = copy.copy(kwargs)
+                        gwargs["stroke"] = self.fill
+                        draw_line(
+                            cnv,
+                            Point(x, y),
+                            Point(x, y + self._u.height),
+                            self,
+                            **gwargs,
+                        )
+                        draw_line(
+                            cnv,
+                            Point(x + self._u.width, y),
+                            Point(x + self._u.width, y + self._u.height),
+                            self,
+                            **gwargs,
+                        )
+                        self.set_canvas_props(cnv=cnv, index=ID, **gwargs)
+                    # ---- * * borders (lines override)
                     if self.borders:
                         if isinstance(self.borders, tuple):
                             self.borders = [

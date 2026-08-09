@@ -524,6 +524,7 @@ class BandShape(BaseShape):
     def __init__(self, _object=None, canvas=None, **kwargs):
         self._clean_kwargs = self.clean_kwargs(**kwargs)  # used for RaceTrack
         super().__init__(_object=_object, canvas=canvas, **kwargs)
+        # ---- class vars
         self.no_ends = tools.as_bool(self.kwargs.get("no_ends", False), "no_ends")
         self.inverted = tools.as_bool(self.kwargs.get("inverted", False), "inverted")
         self._lanes = {}  # store SectorBand for lanes; 0 is "inner"
@@ -787,20 +788,24 @@ class BandShape(BaseShape):
         )
         # ---- * debug
         # self._debug(cnv, vertices=[out_start, bez_out_2, bez_out_3, out_end])  # outer
-        # ---- * lines
+        # ---- * lines - no ends
         if self.no_ends:
+            # draw band using matching fill and stroke
             bwargs = copy.copy(kwargs)
             bwargs["stroke"] = self.fill
             cnv.draw_bezier(out_start, bez_out_2, bez_out_3, out_end)
             draw_line(cnv, out_end, inn_end, shape=self)
             cnv.draw_bezier(inn_end, bez_inn_3, bez_inn_2, inn_start)  # reverse draw
             draw_line(cnv, inn_start, out_start, shape=self)
-            kwargs["closed"] = True
+            bwargs["closed"] = True
             self.set_canvas_props(cnv=cnv, index=ID, **bwargs)
+            # draw only curves (bezier lines) with user colors
+            fwargs = copy.copy(kwargs)
             cnv.draw_bezier(out_start, bez_out_2, bez_out_3, out_end)
             cnv.draw_bezier(inn_end, bez_inn_3, bez_inn_2, inn_start)  # reverse draw
-            kwargs["closed"] = False
-            self.set_canvas_props(cnv=cnv, index=ID, **kwargs)
+            fwargs["closed"] = False
+            # self.set_canvas_props(cnv=cnv, index=ID, **fwargs)
+        # ---- * lines - normal
         else:
             cnv.draw_bezier(out_start, bez_out_2, bez_out_3, out_end)
             draw_line(cnv, out_end, inn_end, shape=self)

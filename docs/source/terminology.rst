@@ -11,11 +11,13 @@ which they are used.
 However, in order to help with clarity, below is a reasonably comprehensive
 list of terms used in different places, grouped by what aspects they affect.
 
-Note that some shapes, such as the :ref:`Hexagon <hexIndex>`,
-:ref:`Circle <circleIndex>`, :ref:`Line <lineIndex>`, or
-:ref:`Rectangle <rectangleIndex>`,  have extensive customisation properties
-available; its better to refer to their specific descriptions to understand
-exactly how these can used.
+.. NOTE::
+
+    Some shapes, such as the :ref:`Hexagon <hexIndex>`,
+    :ref:`Circle <circleIndex>`, :ref:`Line <lineIndex>`, and
+    :ref:`Rectangle <rectangleIndex>`,  have extensive customisation
+    properties available; so its better to refer to their specific
+    descriptions to understand exactly how these can used.
 
 This summary is meant to be complementary to the concepts, terms and ideas for
 :doc:`protograf <index>` discussed in :doc:`Basic Concepts <basic_concepts>`.
@@ -44,25 +46,26 @@ places in the documentation:
 - **command** - an instruction that is specified in a **protograf** script;
   see a full list in :doc:`Commands <commands>`
 - **default**  - a value set by **protograf** if no other is given;
-  for example, the line length defaults to being 1 centimetre long
+  for example, the line length defaults to being 1 centimetre long, and a
+  line's color defaults to black
 - **list** - a number of comma-separated values enclosed in square brackets
-  e.g. ``[1, 2, 3]`` |dash| whihc are usually assigned to a **property**
+  e.g. ``[1, 2, 3]`` |dash| which are usually assigned to a property
 - **property** - an aspect of a command or shape that helps define how it works
   or looks; for example, a circle might have its size defined by using a radius
-  property of 2 centimetres - in a script this would be shown as ``radius=2``
+  property of 2 centimetres |dash| in a script this is shown as ``radius=2``
 - **shape** - a geometric element, for example, a circle, square, text or
   line i.e. something that can be drawn |dash| see a list in
   :doc:`Shapes <core_shapes>`
-- **script** - a file,  that can be **run**, containing various **protograf**
+- **script** - a file, that can be **run**, containing various **protograf**
   commands |dash| see an outline in :doc:`Script Anatomy <script_anatomy>`
 - **set** - a number of comma-separated values enclosed in round brackets
-  e.g. ``(1, "a")`` |dash| these are usually assigned to a **property**
-- **run** - to cause Python to act on the script so that all instructions in
+  e.g. ``(1, "a")`` |dash| these are usually assigned to a property
+- **run** - to cause Python to act on the script so that all commands in
   it are carried out |dash| this should usually cause an output file to be
   created (or recreated)
 - **vertex** / **vertices** - the sharp "points" at the intersection of the
-  lines used to construct a shape; for example, a triangle has 3 verticesl;
-  a square has 4 vertices and a hexagon has 6 vertices.
+  lines used to construct a shape; for example, a triangle has 3 vertices;
+  a square has 4 vertices and a hexagon has 6 vertices
 - **_x** and **_y** - some terms can be modified to be specific for
   *x* (left to right) or *y* (top to bottom) distances by appending one of
   these underscore-prefixed terms to them
@@ -449,8 +452,9 @@ Display-orientated Terms
 -  **masked** - a list of locations, indicated by their *sequence
    number* |dash| i.e. their position in the drawing order |dash| which
    should **not** be used for display |dash| the rest are displayed as normal
--  **radii** - if given a value of ``True`` will cause the radii of a
-   ``Polygon``or ``Hexagon`` to be shown
+-  **no_end** - a Boolean property |dash|``True`` or ``False`` |dash| which
+   can be set for a ``Rectangle`` or ``Band`` to essentially change the color
+   of the "end" lines to match that of the shape's fill
 -  *paths* - a list of one or more pairs of *compass directions*, representing
    two edges of a hexagon shape between which a line |dash| straight or an
    arc |dash| is drawn
@@ -459,6 +463,8 @@ Display-orientated Terms
    from centre to the middle of the edges |dash| of a ``Polygon``, ``Hexagon``
    or ``Rectangle`` to be drawn; a ``Polygon's`` unnamed edges are numbered
    from the east-facing one in an anti-clockwise direction
+-  **radii** - if given a value of ``True`` will cause the radii of a
+   ``Polygon``or ``Hexagon`` to be shown
 -  **sections** - a series of lines that are drawn to sub-divide a **lane**
    of either a ``Band`` or a ``Rectangle`` along their height
 -  **shown** - a list of locations, indicated by their *row and
