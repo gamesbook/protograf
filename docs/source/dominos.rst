@@ -9,7 +9,7 @@ for :doc:`protograf <index>`  as presented in the
 :doc:`Basic Concepts <basic_concepts>` , that you understand all of the
 :doc:`Additional Concepts <additional_concepts>` and that you've created some
 basic scripts of your own using the :doc:`Core Shapes <core_shapes>`. You also
-be familiar with the various types of shape's properties described in the
+be familiar with the various types of shapes' properties described in the
 :doc:`Customised Shapes <customised_shapes>`
 
 .. _dominoesOver:
@@ -138,7 +138,7 @@ The examples below shows how a Domino can be created and styled.
       including ``_stroke``, ``_stroke_width``, ``_length``, ``_dashed``,
       and ``_dotted``.
 
-      The white dominoes in the bottomost section show how the Domino's
+      The white dominoes in the bottom-most section show how the Domino's
       pips can be assigned to an shape that can be centred; in these
       example, a ``Polygon`` is used.  **Note** that the Polygon is
       not rotated with the Domino; you will need to assign it it's own

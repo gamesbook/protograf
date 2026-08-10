@@ -28,13 +28,14 @@ Overview
 ========
 `↑ <table-of-contents-geometry_>`_
 
-When reading this section, you should already know how shapes are created by
+When reading this, you should already know how shapes are created by
 using commands, and understand how their properties are set.
 
-This section describes the use of **point** locations to set where shapes are
-drawn. It also covers the availability and use of a shape's **geometry**
-properties that can be used to set *relative* locations e.g. given that a
-Rectangle has been drawn, use a relative reference to its north-east corner.
+This part of the documentation describes the use of **point** locations to
+set where shapes are drawn. It also covers the availability and use of a
+shape's **geometry** properties that can be used to set *relative* locations
+e.g. given that a Rectangle has been drawn, use a relative reference for its
+north-east corner.
 
 
 .. _point-command:
@@ -564,6 +565,3 @@ referenced.
 Here, the *geo* property that has been created for a card, is available,
 along with any other card data; this case it is used to locate the
 ``Dot`` commands that are drawn at opposing corners of each Card.
-
-Refer to the sections above for more details on what the geometry properties
-mean.

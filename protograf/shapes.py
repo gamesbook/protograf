@@ -44,6 +44,7 @@ from protograf.utils.structures import (
     Perbis,
     Point,
     Radius,
+    SectorBand,
     ShapeGeometry,
     TriangleType,
     Vertex,
@@ -521,23 +522,33 @@ class BandShape(BaseShape):
     """
 
     def __init__(self, _object=None, canvas=None, **kwargs):
+        self._clean_kwargs = self.clean_kwargs(**kwargs)  # used for RaceTrack
         super().__init__(_object=_object, canvas=canvas, **kwargs)
-        self.no_ends = tools.as_bool(self.kwargs.get("no_ends", False), "no_ends")
+        # ---- class vars
+        self.inverted = tools.as_bool(self.kwargs.get("inverted", False), "inverted")
+        self._lanes = {}  # store SectorBand for lanes; 0 is "inner"
         # ---- perform overrides
+        if self.radius < 0:
+            self.radius = abs(self.radius)
         self.radius = self.radius or self.diameter / 2.0
         # validate
         if self.height > self.radius:
             feedback(
                 f"A Band's height ({self.height}) cannot exceed its radius ({self.radius}) ",
                 True,
+                True,
             )
         if kwargs.get("rotation"):
             feedback(
-                "A Band does not support rotation - use the angle_start property", True
+                "A Band does not support rotation - use the angle_start property",
+                True,
+                True,
             )
         if kwargs.get("width"):
             feedback(
-                "A Band does not have a width property - use the height property", False
+                "A Band does not have a width property - use the height property",
+                True,
+                True,
             )
         # calculate centre
         if self.cx is None and self.x is None:
@@ -585,11 +596,13 @@ class BandShape(BaseShape):
             nw=self.as_point(_vertices[1], self.units, cntr, self.rotation),
             se=self.as_point(_vertices[2], self.units, cntr, self.rotation),
             sw=self.as_point(_vertices[3], self.units, cntr, self.rotation),
-            # TODO - calculate
             # perbii
-            # length
+            # dimensions
+            radius=self.radius,
+            height=self.height,
             # other
             area=_area,
+            sides=4,  # sort-of...
             # meta
             t=_type,
             type=_type,
@@ -609,12 +622,16 @@ class BandShape(BaseShape):
         out_start, bez_out_2, bez_out_3, out_end = geoms.bezier_arc_points(
             self.angle_start,
             self.angle_width,
-            self._u.radius + self._u.height,
+            self._u.radius,
             pt_c,
             pt_c.y,
         )
         inn_start, bez_inn_2, bez_inn_3, inn_end = geoms.bezier_arc_points(
-            self.angle_start, self.angle_width, self._u.radius, pt_c, pt_c.y
+            self.angle_start,
+            self.angle_width,
+            self._u.radius - self._u.height,
+            pt_c,
+            pt_c.y,
         )
         return out_start, out_end, inn_start, inn_end
 
@@ -628,10 +645,112 @@ class BandShape(BaseShape):
         # ---- mid point in units
         pt_mid = geoms.point_on_circle(
             pt_c,
-            self.unit(self.radius) + self.unit(self.height / 2.0),
+            self.unit(self.radius) - self.unit(self.height / 2.0),
             self.angle_start + self.angle_width / 2.0,
         )
         return pt_mid
+
+    def draw_lanes(self, cnv, ID, lanes: list | int, rotation: float = 0.0):
+        """Draw curved line(s) parallel to inner and outer curves of the Band.
+
+        Args:
+            ID: unique ID
+            lanes: spacing of lanes as fractions
+            rotation: degrees anti-clockwise from horizontal "east"
+
+        Note:
+            * Inner curve is at the Band radius;  outer curve is at the Band
+              radius+height
+            * Draw curved lines starting closest to the inner curve
+            * Lane geometry is stored as a SectorBand in `_lanes` dict, keyed on
+              the lane number (starting from lane 0, closest to inner curve)
+        """
+        spacing = tools.get_property_spacing(self.lanes, "Lanes")
+        pt_c = Point(self.x_c + self._o.delta_x, self.y_c + self._o.delta_y)
+        radius_inner = self._u.radius - self._u.height
+        radius_inner_last = radius_inner
+        for key, fraction in enumerate(spacing):
+            lline_start, bez_lline_2, bez_lline_3, lline_end = geoms.bezier_arc_points(
+                self.angle_start,
+                self.angle_width,
+                radius_inner + self._u.height * fraction,
+                pt_c,
+                pt_c.y,
+            )
+            # ---- store lane geometry
+            self._lanes[key] = SectorBand(
+                angle_start=self.angle_start,
+                angle_width=self.angle_width,
+                radius_inner=radius_inner_last,
+                radius_outer=radius_inner + self._u.height * fraction,
+                centre=pt_c,
+            )
+            radius_inner_last = radius_inner + self._u.height * fraction
+            # ---- store final lane geometry
+            if key + 1 == len(spacing):
+                self._lanes[key + 1] = SectorBand(
+                    angle_start=self.angle_start,
+                    angle_width=self.angle_width,
+                    radius_inner=radius_inner_last,
+                    radius_outer=self._u.radius,
+                    centre=pt_c,
+                )
+            # ---- draw band line
+            cnv.draw_bezier(lline_start, bez_lline_2, bez_lline_3, lline_end)
+
+        # print(f"***   BandLanes {spacing=} /n {self._lanes=}")
+        # ---- set canvas
+        self.set_canvas_props(
+            index=ID,
+            stroke=self.lanes_stroke,
+            fill=None,
+            stroke_width=self.lanes_stroke_width,
+            stroke_ends=self.lanes_ends,
+            dashed=self.lanes_dashed,
+            dotted=self.lanes_dotted,
+        )
+
+    def draw_sections(self, cnv, ID, sects: list | int, rotation: float = 0.0):
+        """Draw radial lines at intervals along all lanes of the Band.
+
+        Args:
+            ID: unique ID
+            sects: spacing of sections per lane - "list of lists"
+            rotation: degrees anti-clockwise from horizontal "east"
+
+        Note:
+            * Draw radial lines starting closest to the angle_start,
+              from the "inner" curved side of the Band to the "outer"
+        """
+        sect_spacing = tools.get_property_spacing(sects, "Sections")
+        # sects as lists: [[f1, f2, ... fn], [f1, f2, ... fn]]  # f = fraction
+        for _lane in self._lanes.keys():
+            if isinstance(sect_spacing[0], (list, tuple)):
+                lane_sect_spacing = sect_spacing[_lane]  # lane-specific sections
+            else:
+                lane_sect_spacing = sect_spacing
+            lane_band = self._lanes[_lane]
+            # print(f"*** BandSeg {lane_band=}")
+            for _sect in lane_sect_spacing:
+                # print(f"***   BandSeg {_sect=}")
+                angle = lane_band.angle_start + _sect * lane_band.angle_width
+                point_outer = geoms.point_on_circle(
+                    lane_band.centre, lane_band.radius_outer, angle
+                )
+                point_inner = geoms.point_on_circle(
+                    lane_band.centre, lane_band.radius_inner, angle
+                )
+                # ---- draw segment line
+                draw_line(cnv, point_inner, point_outer, shape=self)
+        # ---- style segment lines
+        self.set_canvas_props(
+            index=ID,
+            stroke=self.sections_stroke,
+            stroke_width=self.sections_stroke_width,
+            stroke_ends=self.sections_ends,
+            dashed=self.sections_dashed,
+            dotted=self.sections_dotted,
+        )
 
     def draw(self, cnv=None, off_x=0, off_y=0, ID=None, **kwargs):
         """Draw a Band on a given canvas."""
@@ -647,37 +766,51 @@ class BandShape(BaseShape):
         out_start, bez_out_2, bez_out_3, out_end = geoms.bezier_arc_points(
             self.angle_start,
             self.angle_width,
-            self._u.radius + self._u.height,
+            self._u.radius,
             pt_c,
             pt_c.y,
         )
         inn_start, bez_inn_2, bez_inn_3, inn_end = geoms.bezier_arc_points(
-            self.angle_start, self.angle_width, self._u.radius, pt_c, pt_c.y
+            self.angle_start,
+            self.angle_width,
+            self._u.radius - self._u.height,
+            pt_c,
+            pt_c.y,
         )
         # self.vertices = [out_start, out_end, inn_start, inn_end]
         self.vertices = [out_start, inn_start, inn_end, out_end]
         # ---- * mid-pt of Band
         pt_mid = geoms.point_on_circle(
             point_centre=pt_c,
-            radius=self._u.radius + self._u.height / 2.0,
+            radius=self._u.radius - self._u.height / 2.0,
             angle=self.angle_start + self.angle_width / 2.0,
         )
         # ---- * debug
         # self._debug(cnv, vertices=[out_start, bez_out_2, bez_out_3, out_end])  # outer
-        # ---- * lines
+        # ---- * lines - no ends
         if self.no_ends:
+            # draw band using matching fill and stroke; with veerry thin border
             bwargs = copy.copy(kwargs)
             bwargs["stroke"] = self.fill
+            bwargs["stroke_width"] = self.points_to_value(0.01)
             cnv.draw_bezier(out_start, bez_out_2, bez_out_3, out_end)
             draw_line(cnv, out_end, inn_end, shape=self)
             cnv.draw_bezier(inn_end, bez_inn_3, bez_inn_2, inn_start)  # reverse draw
             draw_line(cnv, inn_start, out_start, shape=self)
             kwargs["closed"] = True
             self.set_canvas_props(cnv=cnv, index=ID, **bwargs)
-            cnv.draw_bezier(out_start, bez_out_2, bez_out_3, out_end)
-            cnv.draw_bezier(inn_end, bez_inn_3, bez_inn_2, inn_start)  # reverse draw
-            kwargs["closed"] = False
-            self.set_canvas_props(cnv=cnv, index=ID, **kwargs)
+            # draw only curves (bezier lines) with user colors
+            fwargs = copy.copy(kwargs)
+            fwargs["closed"] = False
+            fwargs["fill"] = None  # otherwise bezier fill 'joins' ends
+            cnv.draw_bezier(
+                out_start, bez_out_2, bez_out_3, out_end
+            )  # , closePath=False)
+            cnv.draw_bezier(
+                inn_end, bez_inn_3, bez_inn_2, inn_start
+            )  # , closePath=False)
+            self.set_canvas_props(cnv=cnv, index=ID, **fwargs)
+        # ---- * lines - normal
         else:
             cnv.draw_bezier(out_start, bez_out_2, bez_out_3, out_end)
             draw_line(cnv, out_end, inn_end, shape=self)
@@ -692,6 +825,16 @@ class BandShape(BaseShape):
         else:
             kwargs["rotation"] = 270.0 - band_rotation
         # feedback(f"*** Band: {band_rotation=} {kwargs['rotation']=}")
+        # ---- lanes
+        if self.lanes is not None:
+            self.draw_lanes(cnv, ID, lanes=self.lanes, rotation=kwargs["rotation"])
+        if self.sections is not None:
+            if self.lanes is not None:
+                self.draw_sections(
+                    cnv, ID, sects=self.sections, rotation=kwargs["rotation"]
+                )
+            else:
+                feedback('Cannot set "sections" if "lanes" has not been set.', True)
         # ---- centred shapes (with offsets)
         if self.centre_shapes:
             self.draw_centred_shapes(
@@ -2282,7 +2425,7 @@ class RhombusShape(BaseShape):
             stroke_width=self.hatches_stroke_width,
             stroke_ends=self.hatches_ends,
             dashed=self.hatches_dashed,
-            dotted=self.hatches_dots,
+            dotted=self.hatches_dotted,
             rotation=rotation,
             rotation_point=muPoint(x_c, y_c),
         )
@@ -2500,10 +2643,9 @@ class RhombusShape(BaseShape):
             vert_br = [vertexes[1], midpt, vertexes[2]]
             vert_tr = [vertexes[2], midpt, vertexes[3]]
             vert_tl = [vertexes[3], midpt, vertexes[0]]
-            # sections = [vert_l, vert_r, vert_t, vert_b]  # order is important!
-            sections = [vert_tr, vert_br, vert_bl, vert_tl]  # order is important!
-            for key, section in enumerate(sections):
-                cnv.draw_polyline(section)
+            parts = [vert_tr, vert_br, vert_bl, vert_tl]  # order is important!
+            for key, part in enumerate(parts):
+                cnv.draw_polyline(part)
                 self.set_canvas_props(
                     index=ID,
                     stroke=self.slices_stroke or slices_colors[key],
@@ -4423,7 +4565,7 @@ class TriangleShape(BaseShape):
             stroke_width=self.hatches_stroke_width,
             stroke_ends=self.hatches_ends,
             dashed=self.hatches_dashed,
-            dotted=self.hatches_dots,
+            dotted=self.hatches_dotted,
             rotation=rotation,
             rotation_point=centre,
         )

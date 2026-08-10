@@ -569,6 +569,57 @@ def angles_from_points(first: Point, second: Point) -> tuple:
     return round_tiny_float(compass), round_tiny_float(rotation)
 
 
+def angle_between_points(first: Point, second: Point) -> float:
+    """Calculate the angle in degrees between first and second points.
+
+    Notes:
+        * Angle is measured counter-clockwise from the horizontal x-axis.
+        * Assumes y-axis increases downwards (top-left origin).
+
+    Doc Test:
+
+    >>> p1 = Point(100, 100)
+    >>> p2 = Point(200, 50)  # point is "right and up" from p1
+    >>> angle = angle_between_points(p1, p2)
+    >>> assert angle == 26.56505117707799
+    >>> p1 = Point(2, 3)
+    >>> p2 = Point(1, 4)  # point is "down and left" from p1
+    >>> angle = angle_between_points(p1, p2)
+    >>> assert angle == 225
+
+    >>> p1 = Point(2, 3)
+    >>> p2 = Point(3, 3)  # point is right of p1
+    >>> angle = angle_between_points(p1, p2)
+    >>> assert angle == 0
+
+    >>> p1 = Point(2, 3)
+    >>> p2 = Point(2, 2)  # This point above p1
+    >>> angle = angle_between_points(p1, p2)
+    >>> assert angle == 90
+
+    >>> p1 = Point(2, 3)
+    >>> p2 = Point(1, 3)  # point is left of p1
+    >>> angle = angle_between_points(p1, p2)
+    >>> assert angle == 180
+
+    >>> p1 = Point(2, 3)
+    >>> p2 = Point(2, 4)  # point is below p1
+    >>> angle = angle_between_points(p1, p2)
+    >>> assert angle == 270
+
+    """
+    dx = second.x - first.x
+    dy = second.y - first.y
+    # negate dy because in screen coordinates (y-down), 'up' direction is negative y
+    # Negating it maps it to a standard Cartesian system (y-up) where atan2
+    # naturally measures counter-clockwise.
+    angle_rad = math.atan2(-dy, dx)
+    # Convert from radians to degrees
+    angle_deg = math.degrees(angle_rad)
+    # Normalize the result to a 0-360 degree range
+    return angle_deg % 360
+
+
 def centre_radius_from_points(pt_a: Point, pt_b: Point, pt_c: Point) -> tuple:
     """Return (center, radius) of the circle passing through three Points.
 
@@ -1200,6 +1251,61 @@ def rectangles_overlap(rect1: tuple, rect2: tuple) -> bool:
         return False
     # Overlap found
     return True
+
+
+def racetrack_rectangle_properties(ur: Point, lr: Point, width: float) -> tuple:
+    """Calculate center point and anti-clockwise rotation of a Rectangle.
+
+    Args:
+        ur (Point): upper-right coordinate
+        lr (Point): lower-right coordinate
+        width (float): width of the rectangle
+
+    Returns:
+        tuple (Point, float): center, rotation in degrees
+
+    Doc Test:
+
+    >>> ur_pt = Point(2, 2)
+    >>> lr_pt = Point(2, 0)
+    >>> width = 2
+    >>> center, rotation = racetrack_rectangle_properties(ur_pt, lr_pt, width)
+    >>> assert center == Point(x=1.0, y=1.0)
+    >>> assert rotation == 0.0
+
+    >>> ur_pt = Point(3, 3)
+    >>> lr_pt = Point(4, 2)
+    >>> width = 2.82843  # sqrt 8
+    >>> center, rotation = racetrack_rectangle_properties(ur_pt, lr_pt, width)
+    >>> assert center == Point(x=2.499998983444267, y=1.4999989834442669)
+    >>> assert rotation == 45.0
+    """
+    # ---- calculate the vector of the right edge (from LR to UR)
+    dx = ur.x - lr.x
+    dy = ur.y - lr.y
+    # ---- calculate the height (length of the right edge)
+    height = math.sqrt(dx**2 + dy**2)
+    # ---- calculate the midpoint of the right edge
+    midpoint_right = Point((ur.x + lr.x) / 2, (ur.y + lr.y) / 2)
+    # ---- calculate the rotation angle
+    # atan2(dy, dx) gives the angle of the right edge vector.
+    # In an unrotated rectangle (0°), the right edge points straight up (90°).
+    # Therefore, rotation = edge_angle - 90 degrees
+    edge_angle_rad = math.atan2(dy, dx)
+    rotation_deg = math.degrees(edge_angle_rad) - 90
+    # Normalize angle to be within (0, 360) or (-180, 180)
+    rotation_deg = rotation_deg % 360
+    # ---- find the center point
+    # Move from the midpoint_right towards the "left" (inside).
+    # If the 'up' vector is (dx, dy), the 'left' vector is (-dy, dx).
+    # Normalize this and multiply by half the width
+    unit_inward_x = -dy / height
+    unit_inward_y = dx / height
+    center_x = midpoint_right.x + (width / 2) * unit_inward_x
+    center_y = midpoint_right.y + (width / 2) * unit_inward_y
+    center = Point(center_x, center_y)
+    # print(center, rotation_deg)
+    return center, rotation_deg
 
 
 if __name__ == "__main__":

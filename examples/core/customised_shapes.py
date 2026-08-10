@@ -1471,29 +1471,31 @@ Pod(cx=3, cy=4.5,
     rotation=-90)
 PageBreak()
 
-# ---- band
+# ---- band - custom
 notation = Common()
 
 Blueprint()
 Text(common=txt, text="Band: Custom")
 
 Band(
-    cx=3, cy=2,
+    cx=2, cy=2,
     stroke_width=1,
     stroke="red", fill="gold",
-    radius=1,
-    angle_start=112.5,
-    angle_width=45,
+    radius=1.5,
+    height=1,
+    angle_start=45,
+    angle_width=90,
     dot=0.05,
     cross=0.33,
 )
 
 Band(
-    cx=3, cy=4,
+    cx=2, cy=4,
     stroke_width=1,
-    radius=1,
-    angle_start=112.5,
-    angle_width=45,
+    radius=1.5,
+    height=1,
+    angle_start=45,
+    angle_width=90,
     vertex_shapes=[
         circle(radius=0.2, label="ne"),
         circle(radius=0.2, label="se"),
@@ -1507,10 +1509,10 @@ Band(
 
 bnd = Band(
     cx=2, cy=6,
-    radius=1,
+    radius=1.5,
+    height=1,
     angle_start=45,
     angle_width=90,
-    no_ends=True,
 )
 Dot(cxy=bnd.geo.ne, fill="red", dot_width=5)
 Dot(cxy=bnd.geo.sw, fill="gold", dot_width=5)
@@ -1518,6 +1520,7 @@ Dot(cxy=bnd.geo.c, fill="green", dot_width=5)
 
 PageBreak()
 
+# ---- band - text
 Blueprint()
 Text(common=txt, text="Band: Text")
 bnd = Common(
@@ -1556,6 +1559,44 @@ Band(
     angle_start=225,
     common=bnd,
 )
+
+PageBreak()
+
+# ---- band - lanes & sections
+Blueprint()
+Text(common=txt, text="Band: Lanes & Sections")
+bnd = Common(
+    radius=1.5, height=1,
+    angle_width=90,
+    angle_start=45,
+    stroke_width=0.5,
+)
+Band(
+    common=bnd,
+    cx=2, cy=2,
+    angle_start=45,
+    lanes=2
+ )
+Band(
+    common=bnd,
+    cx=2, cy=4,
+    lanes=[1/3, 7/8],
+    lanes_stroke="red",
+    lanes_stroke_width=0.5,
+    sections=3
+)
+Band(
+    common=bnd,
+    cx=2, cy=6,
+    fill="gold",
+    lanes=2,
+    no_ends=True,
+    sections=[[0.5], [0, 0.333, 0.666, 1]],
+    sections_stroke="brown",
+    sections_stroke_width=0.5,
+    sections_dotted=True,
+)
+
 PageBreak()
 
 # ---- END
@@ -1612,5 +1653,5 @@ Save(
         "radii_shapes",
         "perbii_shapes",
         "pod_custom", "pod_customised",
-        "band_custom", "band_text",
+        "band_custom", "band_text", "band_lanes",
         None])

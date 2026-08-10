@@ -31,18 +31,19 @@ python core/layouts/layouts_sequence.py
 python core/layouts/layouts_tracks.py
 python core/layouts/layouts_repeat.py
 # ---- examples: objects
-python objects/polyominoes.py
-python objects/ominoes_basic.py
-python objects/pentominoes.py
+python objects/cardbox.py
+python objects/cubes.py
 python objects/dice_d6.py
 python objects/domino.py
-python objects/cubes.py
-python objects/cardbox.py
+python objects/ominoes_basic.py
+python objects/pentominoes.py
+python objects/polyominoes.py
+python objects/racetrack.py
 # ---- boards: abstract
 echo -e "\nCreating abstract boards..."
 python boards/abstract/chessboard.py
-python boards/abstract/dejarik.py
 python boards/abstract/chessboard_brown.py
+python boards/abstract/dejarik.py
 python boards/abstract/go.py
 python boards/abstract/hex_game.py
 python boards/abstract/hexhex.py

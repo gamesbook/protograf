@@ -1452,6 +1452,7 @@ that it can be customised.
 - `Chevron <rectChevron_>`_
 - `Hatches <rectHatches_>`_
 - `Hatches: Variable <rectHatchesVariable_>`_
+- `Lanes and Sections <rectLanesSections_>`_
 - `Notch <rectNotch_>`_
 - `Peak <rectPeak_>`_
 - `Perbii <rectPerbii_>`_
@@ -1777,6 +1778,85 @@ This is illustrated in the example below.
       and 5 ``diagonal`` lines i.e. north-east and south-east.
 
 ===== ======
+
+.. _rectLanesSections:
+
+Lanes and Sections
+------------------
+
+A Rectangle can be subdivided, using the *lanes* and *sections* properties.
+The *lanes* defines how many parts the Rectangle is divided into, in a
+vertical, or outwards, direction; this property can either be a single, whole
+number or a list of fractions. The *sections*  defines how many parts the lanes
+is divided into, in a width-wise direction; this property can either be a
+single, whole number or a list of fractions or a list of list of fractions.
+This latter value means that each lane can be subdivided into different number
+of parts.  Lanes and sections are particularly useful for the styling of a
+:ref:`RaceTrack <racetrack-object>`.
+
+The use of lanes and sections is illustrated in the example below.
+
+.. |rls| image:: images/custom/rectangle/band.png
+   :width: 330
+
+===== ======
+|rls| This example shows a Rectangle constructed using these commands:
+
+      .. code:: python
+
+        bnd = Common(
+            x=1,
+            height=1,
+            width=2,
+            stroke_width=0.5,
+        )
+        Rectangle(
+            common=bnd,
+            y=1,
+            lanes=2,
+            no_ends=True,
+         )
+        Rectangle(
+            common=bnd,
+            y=3,
+            lanes=[1/3, 7/8],
+            lanes_stroke="red",
+            lanes_stroke_width=0.5,
+            sections=3
+        )
+        Rectangle(
+            common=bnd,
+            y=5,
+            fill="lightcyan",
+            lanes=2,
+            sections=[[0.5], [0.333, 0.666]],
+            sections_stroke="red",
+            sections_stroke_width=0.5,
+            sections_dotted=True,
+        )
+
+      The top example shows the Rectangle divided into two lanes, simply by
+      setting *lanes* to the value ``2``.  In addition, the settings of the
+      *no_ends* property to ``True`` means that both end edge lines are
+      overwritten by two other lines of the same color as he Rectangle's
+      fill |dash| in this case ``white``.
+
+      The middle example shows the Rectangle divided into two lanes, but with
+      differing heights, because of the fractional values assigned to them
+      by the lane's list value of ``[1/3, 7/8]``.  Each lane is divided into
+      three equal *sections* by assigning ``3`` to that property.  Note how
+      the lanes can be styled by the common approach of adding *_stroke* or
+      *_stroke_width* to the property name.
+
+      The middle example shows the Rectangle divided into two lanes, by
+      setting *lanes* to the value ``2``.  Each lane is then divided into
+      different *sections* sizes by assigning ``[[0.5], [0.333, 0.666]]`` to
+      that property.  Note how the sections can be styled by the common
+      approach of adding *_stroke*, *_stroke_width* or *_dotted* to the
+      property name.
+
+===== ======
+
 
 .. _rectNotch:
 
@@ -2617,6 +2697,8 @@ The available property names, shown in their default order, are:
 #. slices
 #. stripes
 #. hatches
+#. lanes
+#. sections
 #. radii
 #. corners
 #. radii_shapes

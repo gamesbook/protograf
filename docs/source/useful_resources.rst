@@ -32,7 +32,7 @@ Prototyping Tools
 
 .. HINT::
 
-    Please also refer to the sections on
+    Please also refer to the guides on
     :ref:`hexagonal grid resources <other-hexagonal-resources>`
     as well as  :ref:`playing cards resources <other-card-resources>`.
 

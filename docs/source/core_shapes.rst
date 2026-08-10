@@ -1076,27 +1076,43 @@ Band
 ~~~~
 `↑ <shape-index_>`_
 
-A Band is a curved area between two radii; effectively it is a "subset" or
-"slice" of a `Sector`_. More formally it is known as an *Annular Sector* or
-*Annular Section*.
+A Band is a curved area between two radii of the same circle; effectively it
+is a "subset" or "slice" of a `Sector`_. More formally it is known as an
+*Annular Sector* or *Annular Section*.
 
 A Band is drawn with a *height* (its "thickness"), a *radius*, as well as a
-*centre* point from which the radii extend.  There is a starting angle, which
+*centre* point from which the radii extend. The radius determines the position
+of the outer arc, while the height is "subtracted" from the radius to determine
+the position of the inner arc line. There is also a starting angle, which
 determines where one radius, forming the end line, is drawn, and a "sweep"
 angle |dash| the *angle_width* property |dash| which determines where the
 second radius, forming the other end line, is drawn. Together, these
 properties define where and how wide a Band extends.
 
+A Band can be subdivided, using the *lanes* and *sections* properties.
+The *lanes*  defines how many parts the Band is divided into, in a
+vertical, or outwards, direction; this property can either be a single, whole
+number or a list of fractions. The *sections*  defines how many parts the lanes
+is divided into, in a lengthwise, or circumferential, direction; this property
+can either be a single, whole number or a list of fractions or a list of list
+of fractions.  This latter value means that each lane can be subdivided into
+different number of parts. Lanes and sections are particularly useful for the
+styling of a :ref:`RaceTrack <racetrack-object>`.
+
 .. NOTE::
 
     1. The **maximum** extent of a Band is 180 |deg| |dash| half a circle!
     2. The Band does **not** support a defined rotation property, like many
-       other shapes'; rather the rotation value is calculated based on the
+       other shapes'; instead the rotation value is calculated based on the
        *angle_start* and the *angle_width* properties.
+    3. The other shape for which *lanes* and *sections* can be defined is the
+       :ref:`Rectangle <rectangle-command>`; this is so that both these shapes
+       can be used in the construction of a :ref:`RaceTrack <racetrack-object>`.
 
 
 Example 1. Default Band
 +++++++++++++++++++++++
+`^ <band-command_>`_
 
 .. |bnd| image:: images/defaults/band.png
    :width: 330
@@ -1111,17 +1127,25 @@ Example 1. Default Band
 
       It has the following properties:
 
-      - *centre* is at the default x-position ``1`` cm and y-position ``1`` cm
+      - *centre* is at the default x-position ``1.5`` cm and
+        y-position ``1.5`` cm |dash| this is because a circle is normally
+        drawn inside the square, with a side of `1`` cm and with a top-left
+        corner at x-position ``1`` cm and y-position ``1`` cm
+      - *radius* is ``0.5`` cm
       - *height* is ``0.25`` cm
 
       **Note** that a Band cannot be drawn with only default values; this is
       because its *height* |dash| which defaults to ``1`` cm |dash| must be
-      less than its *radius* |dash| which also defaults to ``1`` cm.
+      less than its *radius* |dash| which defaults to ``0.5`` cm.  The reason
+      the radius is not ``1``, is because its default value is derived from
+      the *diameter* which in turn has a default of ``1`` cm .
 
 ===== ======
 
+
 Example 2. Customised Band
 ++++++++++++++++++++++++++
+`^ <band-command_>`_
 
 .. |bn2| image:: images/customised/band_custom.png
    :width: 330
@@ -1136,7 +1160,8 @@ Example 2. Customised Band
             cx=2, cy=4,
             stroke_width=1,
             stroke="red", fill="gold",
-            radius=1,
+            radius=1.5,
+            height=1,
             angle_start=112.5,
             angle_width=45,
             dot=0.05,
@@ -1146,7 +1171,8 @@ Example 2. Customised Band
         Band(
             cx=3, cy=4,
             stroke_width=1,
-            radius=1,
+            radius=1.5,
+            height=1,
             angle_start=112.5,
             angle_width=45,
             vertex_shapes=[
@@ -1163,7 +1189,8 @@ Example 2. Customised Band
 
         bnd = Band(
             cx=2, cy=6,
-            radius=1,
+            radius=1.5,
+            height=1,
             angle_start=45,
             angle_width=90,
             no_ends=True,
@@ -1181,10 +1208,15 @@ Example 2. Customised Band
             fill="green",
             dot_width=5)
 
+      All the Bands use the same *radius* of ``1.5`` and *height* of ``1``.
+      The radius determines the position of the outer line |dash| arc |dash|
+      while the height is "subtracted" from the radius to determine the
+      position of the inner arc line.
+
       The top Band sets the centre point around which it is drawn to be
       *cx* at `2` and `cy` of 4.  The Band is styled with *stroke*, *fill*,
-      amnd *stroke_width*. Its start angle is set at 112.5 |deg| (anti-clockwise
-      from horizontal east) and the width of the angle is 45 |deg|.
+      amnd *stroke_width*. Its start angle is set at 45 |deg| (anti-clockwise
+      from horizontal east) and the width of the angle is 90 |deg|.
       In addition, the Band has a *cross* and *dot* which are automatically
       drawn at the centre.
 
@@ -1204,8 +1236,10 @@ Example 2. Customised Band
 
 ===== ======
 
+
 Example 3. Band with Text
 +++++++++++++++++++++++++
+`^ <band-command_>`_
 
 .. |bn3| image:: images/customised/band_text.png
    :width: 330
@@ -1217,7 +1251,8 @@ Example 3. Band with Text
       .. code:: python
 
         bnd = Common(
-            radius=1, height=0.5,
+            radius=1,
+            height=0.5,
             angle_width=90,
             stroke_width=0.5,
             fill=None,
@@ -1255,13 +1290,87 @@ Example 3. Band with Text
 
       These four Bands share a number of common properties, in terms of their
       *angle_width* of ``90`` |deg|, *height* of ``0.5``, *radius* of ``1``,
-      as well as the various text properties.
+      as well as the various text properties.`3`
 
       The different *angle_start* values show how the text is effectively
       "rotated" relative to the centre of each Band.  A Band does **not**
       have a defined rotation property, like many other shapes, but rather
       the rotation value is calculated based on the *angle_start* and the
       *angle_width* properties.
+
+===== ======
+
+
+Example 4. Band with Lanes & Sections
++++++++++++++++++++++++++++++++++++++
+`^ <band-command_>`_
+
+.. |bn4| image:: images/customised/band_lanes.png
+   :width: 330
+
+===== ======
+|bn4| This example shows the shape constructed using the command with these
+      properties:
+
+      .. code:: python
+
+        bnd = Common(
+          radius=1.5,
+          height=1,
+          angle_width=90,
+          angle_start=45,
+          stroke_width=0.5,
+        )
+
+        Band(
+          common=bnd,
+          cx=2, cy=2,
+          angle_start=45,
+          lanes=2
+         )
+        Band(
+          common=bnd,
+          cx=2, cy=4,
+          lanes=[1/3, 7/8],
+          lanes_stroke="red",
+          lanes_stroke_width=0.5,
+          sections=3
+        )
+        Band(
+          common=bnd,
+          cx=2, cy=6,
+          fill="gold",
+          no_ends=True,
+          lanes=2,
+          sections=[
+            [0.5],
+            [0, 0.333, 0.666, 1]
+          ],
+          sections_stroke="red",
+          sections_stroke_width=0.5,
+          sections_dotted=True,
+        )
+
+      The top example shows the Band divided into two lanes, simply by
+      setting *lanes* to the value ``2``.
+
+      The middle example shows the Band divided into two lanes, but with
+      differing heights, because of the fractional values assigned to them
+      by the lane's list value of ``[1/3, 7/8]``.  Each lane is divided into
+      three equal *sections* by assigning ``3`` to that property.  Note how
+      the lanes can be styled by the common approach of adding *_stroke* or
+      *_stroke_width* to the property name.
+
+      The bottom example shows the Band divided into two lanes, by
+      setting *lanes* to the value ``2``.  Each lane is then divided into
+      different *sections* sizes by assigning ``[[0.5], [0, 0.333, 0.666, 1]]``
+      to that property.  Note how the sections can be styled by the common
+      approach of adding *_stroke*, *_stroke_width* or *_dotted* to the
+      property name.  Also note that the sections can be drawn at the start
+      **and** end of the Band by including the "fractions" of ``0`` and ``1``
+      respectively.  The use of ``no_ends=True`` means the normal radial lines
+      are **not** drawn at the end of the Band; thus allowing better display
+      of the sections lines in those positions.
 
 ===== ======
 
@@ -2631,6 +2740,10 @@ or cake. It extends from the centre of a "virtual" circle outwards to its
 enclosing diameter.  The two "arms" of the sector will cover a certain number
 of degrees of the circle (from 1 to 360).
 
+.. HINT::
+
+    If you need to draw only a subsection of Sector, then use a `Band`_.
+
 Example 1. Default Sector
 +++++++++++++++++++++++++
 
@@ -3406,7 +3519,8 @@ Example 2. Moleskine Grid
       To simulate the dot grid found in Moleskine notebooks, it
       has the following properties set:
 
-      - *x* and *y* - start the grid at the top-left of the page
+      - *x* and *y* - both set to ``0`` to start the grid at the top-left
+        of the page
       - *width* and *height* - intervals between the centre of the dots
         in the x- and y-directions respectively
       - *dot_width* - set to be smaller than the default of ``3``
@@ -3435,7 +3549,7 @@ Grid
 `↑ <shape-index_>`_
 
 A Grid is a series of crossed lines |dash| both in the vertical and
-horizontal directions. The Grid will, by default |dash| i.e. if the exact
+horizontal directions. The Grid will, by default |dash| if the exact
 number of rows and columns is not specified |dash| fill the page as far
 as possible between its margins.
 
@@ -3648,9 +3762,10 @@ Example 5. Omit Edges
       - *stroke_width* - set to ``0.5`` points; the thicker line makes
         the grid more visible
 
-      In addition, each grid has an *outer_...* property set to ``True``.
-      This means that the line on that edge of the grid is not drawn. Setting
-      *omit_outer* to ``True`` means **all** edge lines are not drawn.
+      In addition, each grid has an *omit_...* property set to ``True``.
+      This means that the named line on that edge of the grid is not drawn.
+      Setting *omit_outer* to ``True`` means that **all** edge lines are
+      not drawn.
 
 ===== ======
 
@@ -4034,9 +4149,13 @@ It is possible change the way an Image appears by either creating a "cut-out"
 from it, or by blurring the edges.  These changes are termed *operations*.
 
 Each operation is specified by its name, followed by one or more settings,
-in list format (i.e. inside ``[...]`` brackets). Be aware that values used
-for these operations are pixel-based values and do not correspond to the
-units used elsewhere in **protograf**.
+in list format (i.e. inside ``[...]`` brackets).
+
+.. IMPORTANT::
+
+    Be aware that numerical values used for the operations are pixel-based
+    values and do *not* correspond to the normal measurement units used
+    elsewhere in **protograf**.
 
 The cut-out operations are:
 

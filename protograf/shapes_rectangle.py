@@ -4,6 +4,7 @@ Create Rectangle shape for protograf
 """
 
 # lib
+import copy
 from functools import cached_property
 import logging
 import math
@@ -18,6 +19,7 @@ from protograf.utils import colrs, geoms, tools
 from protograf.utils.tools import _lower
 from protograf.utils.messaging import feedback
 from protograf.utils.structures import (
+    BBox,
     DirectionGroup,
     Locale,
     Perbis,
@@ -36,14 +38,17 @@ DEBUG = False
 
 
 def _sin(degrees: float) -> float:
+    """Return sine of a degree value."""
     return math.sin(math.radians(degrees))
 
 
 def _cos(degrees: float) -> float:
+    """Return cosine of a degree value."""
     return math.cos(math.radians(degrees))
 
 
 def _tan(degrees: float) -> float:
+    """Return arctan of a degree value."""
     return math.tan(math.radians(degrees))
 
 
@@ -53,11 +58,13 @@ class RectangleShape(BaseShape):
     """
 
     def __init__(self, _object=None, canvas=None, **kwargs):
+        self._clean_kwargs = self.clean_kwargs(**kwargs)  # used for RaceTrack
         super().__init__(_object=_object, canvas=canvas, **kwargs)
         # ---- class vars
         self.calculated_left, self.calculated_top = None, None
         self.grid = None
         self.coord_text = None
+        self._lanes = {}  # store BBox for lanes; 0 is "bottom" (close to sw->se line)
         # ---- overrides to centre shape
         if self.cx is not None and self.cy is not None:
             self.x = self.cx - self.width / 2.0
@@ -98,6 +105,7 @@ class RectangleShape(BaseShape):
             center=cntr_user,
             c=cntr_user,
             # vertices
+            vertices=[ne, se, sw, nw],
             ne=ne,
             nw=nw,
             se=se,
@@ -107,11 +115,14 @@ class RectangleShape(BaseShape):
             s=geoms.fraction_along_line(sw, se, 0.5),
             e=geoms.fraction_along_line(ne, se, 0.5),
             w=geoms.fraction_along_line(nw, sw, 0.5),
-            # length
+            # dimensions
             perimeter=perim,
             radius=radius,
+            height=self.height,
+            width=self.width,
             # other
             area=area,
+            sides=4,
             # meta
             t=_type,
             type=_type,
@@ -312,7 +323,6 @@ class RectangleShape(BaseShape):
         if (kwargs.get("cx") and kwargs.get("cy")) and not (lx or ly):
             x = kwargs.get("cx") * self.units - self._u.width / 2.0 + self._o.delta_x
             y = kwargs.get("cy") * self.units - self._u.height / 2.0 + self._o.delta_y
-            # breakpoint()
         return x, y
 
     def get_angles(self, rotation=0, **kwargs):
@@ -891,7 +901,6 @@ class RectangleShape(BaseShape):
 
         Args:
             ID: unique ID
-            vertices: the rectangle's nodes
             num: number of lines
             rotation: degrees anti-clockwise from horizontal "east"
         """
@@ -1037,7 +1046,97 @@ class RectangleShape(BaseShape):
             stroke_width=self.hatches_stroke_width,
             stroke_ends=self.hatches_ends,
             dashed=self.hatches_dashed,
-            dotted=self.hatches_dots,
+            dotted=self.hatches_dotted,
+            rotation=rotation,
+            rotation_point=muPoint(cx, cy),
+        )
+
+    def draw_lanes(self, cnv, ID, lanes: list | int, rotation: float = 0.0):
+        """Draw line(s) from one edge of a Rectangle's width to the parallel opposite.
+
+        Args:
+            ID: unique ID
+            lanes: spacing of lanes as fractions
+            rotation: degrees anti-clockwise from horizontal "east"
+
+        Note:
+            * Draw lines starting closest to the "sw->se" bottom edge
+            * Lane geometry is stored as a BBox in `_lanes` dict, keyed on lane number
+              (starting from lane 0, closest to bottom edge)
+        """
+        vertices = self._shape_vertexes
+        spacing = tools.get_property_spacing(self.lanes, "Lanes")
+        pt_ne, pt_se, pt_sw, pt_nw = (
+            vertices[0],
+            vertices[1],
+            vertices[2],
+            vertices[3],
+        )
+        last_pt = None
+        for key, fraction in enumerate(spacing):
+            start_pt = geoms.fraction_along_line(pt_sw, pt_nw, fraction)
+            cnv.draw_line((pt_sw.x, start_pt.y), (pt_se.x, start_pt.y))
+            # ---- store lane geometry
+            if key == 0:  # first
+                self._lanes[key] = BBox(start_pt, pt_se)
+            else:
+                self._lanes[key] = BBox(start_pt, Point(pt_se.x, last_pt.y))
+            last_pt = start_pt
+            if key == len(spacing) - 1:  # last
+                self._lanes[key + 1] = BBox(pt_nw, Point(pt_se.x, last_pt.y))
+
+        # print(f"***   RectLanes {spacing=} /n {self._lanes=}")
+        # ---- style lanes lines
+        cx = vertices[3].x + 0.5 * self._u.width
+        cy = vertices[3].y + 0.5 * self._u.height
+        self.set_canvas_props(
+            index=ID,
+            stroke=self.lanes_stroke,
+            stroke_width=self.lanes_stroke_width,
+            stroke_ends=self.lanes_ends,
+            dashed=self.lanes_dashed,
+            dotted=self.lanes_dotted,
+            rotation=rotation,
+            rotation_point=muPoint(cx, cy),
+        )
+
+    def draw_sections(self, cnv, ID, sects: list | int, rotation: float = 0.0):
+        """Draw vertical lines at intervals along all lanes of the Rectangle.
+
+        Args:
+            ID: unique ID
+            sects: spacing of sections per lane - "list of lists"
+            rotation: degrees anti-clockwise from horizontal "east"
+
+        Note:
+            * Draw vertical lines parallel, and starting closest, to the east edge
+        """
+        vertices = self._shape_vertexes
+        sect_spacing = tools.get_property_spacing(sects, "Sections")
+        # sects as lists: [[f1, f2, ... fn], [f1, f2, ... fn]]  # f = fraction
+        for _lane in self._lanes.keys():
+            if isinstance(sect_spacing[0], (list, tuple)):
+                lane_sect_spacing = sect_spacing[_lane]  # lane-specific sections
+            else:
+                lane_sect_spacing = sect_spacing
+            lane_bbox = self._lanes[_lane]
+            start_point = lane_bbox.br
+            for _sect in lane_sect_spacing:
+                x = start_point.x - lane_bbox.width * _sect
+                btm_point = Point(x, start_point.y)
+                top_point = Point(x, start_point.y - lane_bbox.height)
+                # ---- draw segment line
+                draw_line(cnv, btm_point, top_point, shape=self)
+        # ---- style segment lines
+        cx = vertices[3].x + 0.5 * self._u.width
+        cy = vertices[3].y + 0.5 * self._u.height
+        self.set_canvas_props(
+            index=ID,
+            stroke=self.sections_stroke,
+            stroke_width=self.sections_stroke_width,
+            stroke_ends=self.sections_ends,
+            dashed=self.sections_dashed,
+            dotted=self.sections_dotted,
             rotation=rotation,
             rotation_point=muPoint(cx, cy),
         )
@@ -1056,7 +1155,7 @@ class RectangleShape(BaseShape):
             A perpendicular bisector ("perbis") of a chord is:
                 A line passing through the center of circle such that it divides
                 the chord into two equal parts and meets the chord at a right angle;
-                for a polygon, each edge is effectively a chord.
+                for a polygon, each edself._lanes[key]ge is effectively a chord.
         """
         # vertices = self._shape_vertexes
         perbii_dict = self.calculate_perbii(centre=centre, rotation=rotation)
@@ -1239,9 +1338,9 @@ class RectangleShape(BaseShape):
                 vert_b = [vertexes[1], midpt, vertexes[2]]
                 vert_l = [vertexes[2], midpt, vertexes[3]]
 
-            sections = [vert_t, vert_r, vert_b, vert_l]  # order is important!
-            for key, section in enumerate(sections):
-                cnv.draw_polyline(section)
+            parts = [vert_t, vert_r, vert_b, vert_l]  # order is important!
+            for key, part in enumerate(parts):
+                cnv.draw_polyline(part)
                 self.set_canvas_props(
                     index=ID,
                     stroke=self.slices_stroke or slices_colors[key],
@@ -1561,6 +1660,7 @@ class RectangleShape(BaseShape):
         is_peaks = True if self.peaks else False
         is_prows = True if self.prows else False
         is_borders = True if self.borders else False
+        is_lanes = True if self.lanes else False
         is_round = True if (self.rounding or self.rounded) else False
         if self.slices and (is_round or is_notched or is_peaks or is_chevron):
             feedback("Cannot use slices with other styles.", True)
@@ -1594,8 +1694,24 @@ class RectangleShape(BaseShape):
             feedback("Cannot use hatches_count and prows together.", True)
         if is_borders and (is_chevron or is_peaks or is_notched or is_prows):
             feedback(
-                "Cannot use borders with any of: hatches, peaks or chevron or prows.",
+                "Cannot use borders with any of: notch, peaks, chevron or prows.",
                 True,
+            )
+        if is_lanes and (is_chevron or is_peaks or is_notched or is_prows or is_round):
+            feedback(
+                "Cannot use lanes with any of: notch, peaks, chevron, prows, rounding or rounded.",
+                True,
+            )
+        if self.no_ends and (
+            is_chevron or is_peaks or is_notched or is_prows or is_round
+        ):
+            feedback(
+                "Cannot use 'no_ends' with any of: notch, peaks, chevron, prows, rounding or rounded.",
+                True,
+            )
+        if self.no_ends and is_borders:
+            feedback(
+                "Note that 'no_ends' may be overriden by the borders settings.", False
             )
         # ---- calculate properties
         x, y = self.calculate_xy(**kwargs)
@@ -1877,6 +1993,8 @@ class RectangleShape(BaseShape):
             "slices",
             "stripes",
             "hatches",
+            "lanes",
+            "sections",
             "perbii",
             "radii",
             "corners",
@@ -1904,8 +2022,9 @@ class RectangleShape(BaseShape):
         # ---- draw in ORDER
         for item in ordering:
             if item == "base":
-                # ---- * draw rectangle
+                # ---- draw rectangle
                 # feedback(f'*** RECT {self.col=} {self.row=} {x=} {y=} {radius=}')
+                # ---- * draw - with notche
                 if is_notched or is_chevron or is_peaks:
                     # feedback(f'*** RECT  vertices')
                     if _lower(self.notch_style) in ["b", "bite"]:
@@ -1917,6 +2036,7 @@ class RectangleShape(BaseShape):
                         kwargs["closed"] = True
                     self.set_canvas_props(cnv=cnv, index=ID, **kwargs)
                     self._debug(cnv, vertices=self.vertexes)
+                # ---- * draw - with prows
                 elif is_prows:
                     for line in self.lines:
                         if len(line) == 2:
@@ -1926,13 +2046,45 @@ class RectangleShape(BaseShape):
                     kwargs["closed"] = True
                     self.set_canvas_props(cnv=cnv, index=ID, **kwargs)
                 else:
-                    # feedback(f'*** RECT  normal {radius=} {kwargs=}')
-                    cnv.draw_rect(
-                        (x, y, x + self._u.width, y + self._u.height), radius=radius
-                    )
-                    self.set_canvas_props(cnv=cnv, index=ID, **kwargs)
-                    self._debug(cnv, vertices=self.vertexes)
-                    # ---- * borders (override)
+                    # ---- * draw - with no ends
+                    if self.no_ends:
+                        # feedback(f'*** RECT no_ends {kwargs=}')
+                        # draw rectangle area with veerry thin border
+                        # match colors
+                        zwargs = copy.copy(kwargs)
+                        zwargs["stroke"] = self.fill
+                        zwargs["stroke_width"] = self.points_to_value(0.01)
+                        cnv.draw_rect(
+                            (x, y, x + self._u.width, y + self._u.height), radius=radius
+                        )
+                        self.set_canvas_props(cnv=cnv, index=ID, **zwargs)
+                        # draw only top & bottom lines
+                        gwargs = copy.copy(kwargs)
+                        gwargs["closed"] = None
+                        draw_line(  # top
+                            cnv,
+                            Point(x, y),
+                            Point(x + self._u.width, y),
+                            self,
+                            **gwargs,
+                        )
+                        draw_line(  # bottom
+                            cnv,
+                            Point(x, y + self._u.height),
+                            Point(x + self._u.width, y + self._u.height),
+                            self,
+                            **gwargs,
+                        )
+                        self.set_canvas_props(cnv=cnv, index=ID, **gwargs)
+                    # ---- * draw  - normal
+                    else:
+                        # feedback(f'*** RECT  normal {radius=} {kwargs=}')
+                        cnv.draw_rect(
+                            (x, y, x + self._u.width, y + self._u.height), radius=radius
+                        )
+                        self.set_canvas_props(cnv=cnv, index=ID, **kwargs)
+                        self._debug(cnv, vertices=self.vertexes)
+                    # ---- * add borders (lines override)
                     if self.borders:
                         if isinstance(self.borders, tuple):
                             self.borders = [
@@ -1964,6 +2116,21 @@ class RectangleShape(BaseShape):
                     self.draw_hatches(
                         cnv, ID, num=self.hatches_count, rotation=rotation
                     )
+            if item == "lanes":
+                # ---- * draw lanes
+                if self.lanes is not None:
+                    self.draw_lanes(cnv, ID, lanes=self.lanes, rotation=rotation)
+            if item == "sections":
+                # ---- * draw sections
+                if self.sections is not None:
+                    if self.lanes is not None:
+                        self.draw_sections(
+                            cnv, ID, sects=self.sections, rotation=rotation
+                        )
+                    else:
+                        feedback(
+                            'Cannot set "sections" if "lanes" has not been set.', True
+                        )
             if item == "perbii":
                 # ---- * draw perbii
                 if self.perbii:

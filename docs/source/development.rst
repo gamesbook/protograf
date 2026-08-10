@@ -24,12 +24,15 @@ In general, follow the `Zen of Python <https://peps.python.org/pep-0020/>`_
 |dash| which is much easier to say than do |dash| but also try to follow
 the style of the code in the rest of the project.
 
+Conventions
+-----------
+
 Note, however, that this project "breaks" a few normal conventions:
 
-- Use of ``global`` variables in the ``proto.py`` file
-- Extensive use of ``**kwargs**`` for the various shapes which means that a user
-  could pass in a key+value setting that simply gets ignored without raising an
-  error; this could be improved by creating numerous subclasses with a more
+- Use of ``global`` variables in the ``proto.py`` file to share document settings
+- Extensive use of ``**kwargs**`` for the various shapes. This means that a user
+  can pass in a key+value setting that simply gets ignored, without raising an
+  error. This could be improved by creating numerous subclasses with a more
   extensive inheritance framework, but these soon start getting tricky to
   juggle...
 - Use of ``from protograf import *`` for running scripts; you could force a
@@ -38,8 +41,20 @@ Note, however, that this project "breaks" a few normal conventions:
   part of another Python project, then of course you should follow the normal
   approach of only importing **exactly** what you need!
 
+Local Usage
+-----------
+
+To use the module while developing, install it with a "development" setting
+using ``uv``::
+
+    uv add --editable --dev /local/path/to/protograf
+
+Formatting
+----------
+
 Code is formatted using ``black`` (https://black.readthedocs.io/) which is
-triggered as a GitHub action |dash| see the ``.github/workflows/`` directory.
+also triggered as a GitHub action |dash| see the ``.github/workflows/``
+directory.
 
 Testing
 =======
@@ -132,13 +147,13 @@ run as normal |dash| then a new version can be released.
 Follow this process:
 
 - |check| Format primary code with black (``black --target-version py313 protograf``);
-  update the Python version as needed
-- |check| Finalise release date and notes in ``CHANGES.txt``
+  update the Python version if needed
 - |check| Ensure all the examples can be run by using shell script(s); change
   to the ``examples`` directory and run ``all.sh`` and then ``_all.sh``
 - |check| Update the ``examples.zip`` file with latest example code
   (remove all PDFs in examples - except ``colorset`` and ``colorset_svg``;
   also delete the ``temp`` directory)
+- |check| Finalise release date and notes in ``CHANGES.txt``
 - |check| Update the ``release`` in ``docs/source/conf.py``
 - |check| Update the ``__version_info__`` in ``_version.py``
 - |check| If working in a branch, now merge changes into master on GitHub
@@ -159,8 +174,8 @@ refresh of the home page of the project at https://pypi.org/project/protograf/
 Bear in mind that the underlying libraries for actions also need to be updated
 (via the version reference) from time-to-time.
 
-Working with latest
--------------------
+Using the latest
+----------------
 
 If you're just interested in installing the latest version via ``pip``,
 then use::
@@ -189,20 +204,18 @@ https://app.readthedocs.org/projects/protograf/builds/
 Viewing Documentation
 ---------------------
 
-It can be helpful to view the documentation during development.
+It can be helpful to view the documentation during development and writing.
 
-For this, one option is to use ``sphinvx-view``.
+For this, one option is to use ``sphinx-autobuild``.
 
-Install these packages::
+Install the following packages (assuming you are using ``uv``)::
 
-    uv pip install sphinx
-    uv pip install setuptools
-    uv pip install sphinx-view
-    uv pip install --upgrade sphinx sphinxcontrib-htmlhelp sphinxcontrib-serializinghtml
+    uv pip install -U sphinx sphinx-autobuild
+    uv pip install -U sphinx-rtd-theme
 
-Then run the tool via::
+Then, from the project folder, display the documentation via::
 
-    sphinx-view docs/source/
+    sphinx-autobuild docs/source docs/_build/html --open-browse
 
 This should open the index documentation page in your default browser; pages
 will automatically refresh as you make changes to the source ``.rst`` files.

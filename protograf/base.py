@@ -724,7 +724,7 @@ class BaseCanvas:
         self.hatches_stroke_width = self.defaults.get(
             "hatches_stroke_width", self.stroke_width
         )
-        self.hatches_dots = self.defaults.get("hatches_dots", None)
+        self.hatches_dotted = self.defaults.get("hatches_dotted", None)
         self.hatches_ends = self.defaults.get("hatches_ends", self.line_ends)
         self.hatches_dashed = self.defaults.get("hatches_dashed", None)  # ---- OTHER
         # defaults for attributes called/set elsewhere e.g. in draw()
@@ -745,6 +745,28 @@ class BaseCanvas:
         self.fold_dotted = self.defaults.get("fold_dotted", True)
         self.padding_width = self.defaults.get("padding_width", None)
         self.padding_height = self.defaults.get("padding_width", None)
+        # ---- racetrack: band /rectangle
+        self.no_ends = self.defaults.get(
+            "no_ends", False
+        )  # overdraw end lines with fill
+        self.lanes = self.defaults.get("lanes", None)
+        self.lanes_stroke = self.defaults.get("lanes_stroke", self.stroke)
+        self.lanes_fill = self.defaults.get("lanes_fill", None)
+        self.lanes_ends = self.defaults.get("lanes_ends", None)
+        self.lanes_stroke_width = self.defaults.get(
+            "lanes_stroke_width", self.stroke_width
+        )
+        self.lanes_dotted = self.defaults.get("lanes_dotted", False)
+        self.lanes_dashed = self.defaults.get("lanes_dashed", None)
+        self.sections = self.defaults.get("sections", None)
+        self.sections_stroke = self.defaults.get("sections_stroke", self.stroke)
+        self.sections_fill = self.defaults.get("sections_fill", None)
+        self.sections_ends = self.defaults.get("sections_ends", None)
+        self.sections_stroke_width = self.defaults.get(
+            "sections_stroke_width", self.stroke_width
+        )
+        self.sections_dotted = self.defaults.get("sections_dotted", False)
+        self.sections_dashed = self.defaults.get("sections_dashed", None)
 
     def get_page(self, name="A4"):
         """Get a paper format by name from a pre-defined dictionary."""
@@ -921,7 +943,7 @@ class BaseShape:
         # ---- line style
         self.line_width = self.kw_float(kwargs.get("line_width", base.line_width))
         self.line_ends = kwargs.get("line_ends", base.line_ends)
-        self.dotted = kwargs.get("dotted", kwargs.get("dots", base.dotted))
+        self.dotted = kwargs.get("dotted", kwargs.get("dotted", base.dotted))
         self.dashed = kwargs.get("dashed", base.dashed)
         # ---- fill color
         self.fill = kwargs.get("fill", kwargs.get("fill_color", base.fill))
@@ -1501,7 +1523,7 @@ class BaseShape:
         )
         self.hatches_stroke = kwargs.get("hatches_stroke", base.stroke)
         self.hatches_ends = kwargs.get("hatches_ends", base.hatches_ends)
-        self.hatches_dots = kwargs.get("hatches_dots", base.dotted)
+        self.hatches_dotted = kwargs.get("hatches_dotted", base.dotted)
         self.hatches_dashed = kwargs.get("hatches_dashed", self.dashed)
         # ---- deck
         self.deck_data = kwargs.get("deck_data", [])  # list of dicts
@@ -1513,6 +1535,30 @@ class BaseShape:
         self.fold_stroke_width = kwargs.get("fold_stroke_width", base.fold_stroke_width)
         self.padding_width = kwargs.get("padding_width", base.padding_width)
         self.padding_height = kwargs.get("padding_height", base.padding_height)
+        # ---- racetrack: band /rectangle
+        self.no_ends = self.kw_bool(kwargs.get("no_ends", base.no_ends))
+        self.lanes = kwargs.get("lanes", base.lanes)
+        self.lanes_fill = kwargs.get("lanes_fill", None)
+        self.lanes_stroke = kwargs.get("lanes_stroke", base.lanes_stroke)
+        self.lanes_stroke_width = self.kw_float(
+            kwargs.get("lanes_stroke_width", base.lanes_stroke_width)
+        )
+        self.lanes_ends = kwargs.get("lanes_ends", base.lanes_ends)
+        self.lanes_dotted = self.kw_bool(kwargs.get("lanes_dotted", base.lanes_dotted))
+        self.lanes_dashed = self.kw_bool(kwargs.get("lanes_dashed", base.lanes_dashed))
+        self.sections = kwargs.get("sections", base.sections)
+        self.sections_fill = kwargs.get("sections_fill", None)
+        self.sections_stroke = kwargs.get("sections_stroke", base.sections_stroke)
+        self.sections_stroke_width = self.kw_float(
+            kwargs.get("sections_stroke_width", base.sections_stroke_width)
+        )
+        self.sections_ends = kwargs.get("sections_ends", base.sections_ends)
+        self.sections_dotted = self.kw_bool(
+            kwargs.get("sections_dotted", base.sections_dotted)
+        )
+        self.sections_dashed = self.kw_bool(
+            kwargs.get("sections_dashed", base.sections_dashed)
+        )
         # ---- OTHER
         # defaults for attributes called/set elsewhere e.g. in draw()
         self.use_abs = False
@@ -1585,6 +1631,33 @@ class BaseShape:
 
     def kw_bool(self, value):
         return tools.as_bool(value) if value is not None else value
+
+    def is_kwarg(self, value) -> bool:
+        """Validate if value is in direct kwargs OR in Common _kwargs."""
+        if value in self.kwargs:
+            return True
+        if "common" in self.kwargs:
+            try:
+                if value in self.kwargs.get("common")._kwargs:
+                    return True
+            except AttributeError:
+                feedback(
+                    "Unable to process Common properties"
+                    " - has the Common command been set?",
+                    True,
+                )
+        return False
+
+    def clean_kwargs(self, remove_margins=True, **kwargs) -> bool:
+        """Remove margins from kwargs"""
+        if not remove_margins:
+            return kwargs
+        kwargs.pop("margin", None)
+        kwargs.pop("margin_left", None)
+        kwargs.pop("margin_right", None)
+        kwargs.pop("margin_top", None)
+        kwargs.pop("margin_bottom", None)
+        return kwargs
 
     def unit(
         self, item, units: str | None = None, skip_none: bool = False, label: str = ""
@@ -2086,22 +2159,6 @@ class BaseShape:
                 self._alignment = TEXT_ALIGN_LEFT
         return self._alignment
 
-    def is_kwarg(self, value) -> bool:
-        """Validate if value is in direct kwargs OR in Common _kwargs."""
-        if value in self.kwargs:
-            return True
-        if "common" in self.kwargs:
-            try:
-                if value in self.kwargs.get("common")._kwargs:
-                    return True
-            except AttributeError:
-                feedback(
-                    "Unable to process Common properties"
-                    " - has the Common command been set?",
-                    True,
-                )
-        return False
-
     def load_image(
         self,
         image_location: str | None = None,
@@ -2510,6 +2567,20 @@ class BaseShape:
         # if _dict.get('x'):
         #    self.x = _dict.get('x', 1)
 
+    def can_draw_centred_shape(
+        self, centre_shape, fail_on_invalid: bool = True
+    ) -> bool:
+        """Test if a given Shape can be drawn at centre of another."""
+        if fail_on_invalid and not isinstance(centre_shape, BaseShape):
+            _type = type(centre_shape)
+            feedback(f"A shape is required - not a {_type} ({centre_shape})!", True)
+        cshape_name = centre_shape.__class__.__name__
+        if cshape_name in GRID_SHAPES_WITH_CENTRE:
+            return True
+        _name = cshape_name.replace("Shape", "")
+        feedback(f"Cannot draw a centered {_name}!", True)
+        return False
+
     def get_center(self) -> Point:
         """Attempt to get centre for a shape."""
         if self.cx is not None and self.cy is not None:
@@ -2517,6 +2588,23 @@ class BaseShape:
         if self.x is not None and self.y is not None and self.width and self.height:
             return Point(self.x + self.width / 2.0, self.y + self.height / 2.0)
         return None
+
+    @functools.cache
+    def get_circle_vertexes(self, directions, centre, radius) -> list:
+        """Get a list of vertexes where radii intersect the circumference"""
+        angles = tools.sequence_split(
+            directions,
+            unique=False,
+            to_int=False,
+            to_float=True,
+            sep=" ",
+            msg="",
+        )
+        vertexes = []
+        for angle in angles:
+            vtx = geoms.point_on_circle(centre, radius, angle)
+            vertexes.append(vtx)
+        return vertexes
 
     def get_bounds(self) -> Bounds:
         """Attempt to get bounds of Rectangle (or any Shape with height and width)."""
@@ -3339,43 +3427,6 @@ class BaseShape:
             )
             cnv.draw_line(left_pt, right_pt)
 
-    def _debug(self, canvas, **kwargs):
-        """Execute any debug statements."""
-        if self.run_debug:
-            # display vertex index number next to vertex
-            if kwargs.get("vertices", []):
-                kwargs["stroke"] = self.debug_color
-                kwargs["fill"] = self.debug_color
-                kwargs["font_name"] = self.font_name
-                kwargs["font_size"] = 4
-                for key, vert in enumerate(kwargs.get("vertices")):
-                    # x = self.points_to_value(vert.x)
-                    # y = self.points_to_value(vert.y)
-                    self.draw_multi_string(
-                        # canvas, vert.x, vert.y, f"{key}:{x:.2f},{y:.2f}", **kwargs
-                        canvas,
-                        vert.x,
-                        vert.y,
-                        f"{key}/{vert.x:.1f}/{vert.y:.1f}",
-                        **kwargs,
-                    )
-                    canvas.draw_circle((vert.x, vert.y), 1)
-            # display labelled point (geoms.Point)
-            if kwargs.get("point", []):
-                point = kwargs.get("point")
-                label = kwargs.get("label", "")
-                kwargs["fill"] = kwargs.get("color", self.debug_color)
-                kwargs["stroke"] = kwargs.get("color", self.debug_color)
-                kwargs["stroke_width"] = 0.1
-                kwargs["font_size"] = 4
-                # x = self.points_to_value(point.x)
-                # y = self.points_to_value(point.y)
-                self.draw_multi_string(
-                    canvas, point.x, point.y, f"{label}/{point.x:.1f}/{point.y:.1f}"
-                )
-                canvas.draw_circle((point.x, point.y), 1)
-            self.set_canvas_props(cnv=canvas, index=None, **kwargs)
-
     def draw_border(self, cnv, border: tuple, ID: int | None = None, **kwargs):
         """Draw a border line for an area based on its settings."""
         # feedback(f'### border {self.__class__.__name__} {border=} {ID=}')
@@ -3575,37 +3626,6 @@ class BaseShape:
                 rotation=kwargs.get("rotation", 0.0),
                 rotation_point=kwargs.get("rotation_point", None),
             )
-
-    def can_draw_centred_shape(
-        self, centre_shape, fail_on_invalid: bool = True
-    ) -> bool:
-        """Test if a given Shape can be drawn at centre of another."""
-        if fail_on_invalid and not isinstance(centre_shape, BaseShape):
-            _type = type(centre_shape)
-            feedback(f"A shape is required - not a {_type} ({centre_shape})!", True)
-        cshape_name = centre_shape.__class__.__name__
-        if cshape_name in GRID_SHAPES_WITH_CENTRE:
-            return True
-        _name = cshape_name.replace("Shape", "")
-        feedback(f"Cannot draw a centered {_name}!", True)
-        return False
-
-    @functools.cache
-    def get_circle_vertexes(self, directions, centre, radius) -> list:
-        """Get a list of vertexes where radii intersect the circumference"""
-        angles = tools.sequence_split(
-            directions,
-            unique=False,
-            to_int=False,
-            to_float=True,
-            sep=" ",
-            msg="",
-        )
-        vertexes = []
-        for angle in angles:
-            vtx = geoms.point_on_circle(centre, radius, angle)
-            vertexes.append(vtx)
-        return vertexes
 
     def draw_centred_shapes(
         self, centre_shapes: list, cx: float, cy: float, rotation: float = 0
@@ -3876,6 +3896,43 @@ class BaseShape:
                     _abs_cy=shape_centre.y,
                     rotation=_rotation,
                 )
+
+    def _debug(self, canvas, **kwargs):
+        """Execute any debug statements."""
+        if self.run_debug:
+            # display vertex index number next to vertex
+            if kwargs.get("vertices", []):
+                kwargs["stroke"] = self.debug_color
+                kwargs["fill"] = self.debug_color
+                kwargs["font_name"] = self.font_name
+                kwargs["font_size"] = 4
+                for key, vert in enumerate(kwargs.get("vertices")):
+                    # x = self.points_to_value(vert.x)
+                    # y = self.points_to_value(vert.y)
+                    self.draw_multi_string(
+                        # canvas, vert.x, vert.y, f"{key}:{x:.2f},{y:.2f}", **kwargs
+                        canvas,
+                        vert.x,
+                        vert.y,
+                        f"{key}/{vert.x:.1f}/{vert.y:.1f}",
+                        **kwargs,
+                    )
+                    canvas.draw_circle((vert.x, vert.y), 1)
+            # display labelled point (geoms.Point)
+            if kwargs.get("point", []):
+                point = kwargs.get("point")
+                label = kwargs.get("label", "")
+                kwargs["fill"] = kwargs.get("color", self.debug_color)
+                kwargs["stroke"] = kwargs.get("color", self.debug_color)
+                kwargs["stroke_width"] = 0.1
+                kwargs["font_size"] = 4
+                # x = self.points_to_value(point.x)
+                # y = self.points_to_value(point.y)
+                self.draw_multi_string(
+                    canvas, point.x, point.y, f"{label}/{point.x:.1f}/{point.y:.1f}"
+                )
+                canvas.draw_circle((point.x, point.y), 1)
+            self.set_canvas_props(cnv=canvas, index=None, **kwargs)
 
 
 class GroupBase(list):

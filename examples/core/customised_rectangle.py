@@ -377,6 +377,42 @@ Rectangle(common=strp, x=1.5, y=4, stripes_directions='o', label="O")
 Rectangle(common=strp, x=3, y=4, stripes_directions='d', label="D")
 PageBreak()
 
+# ---- band - lanes & sections
+Blueprint()
+Text(common=txt, text="Band: Lanes & Sections")
+bnd = Common(
+    x=1,
+    height=1,
+    width=2,
+    stroke_width=0.5,
+)
+Rectangle(
+    common=bnd,
+    y=1,
+    lanes=2,
+    no_ends=True,
+ )
+Rectangle(
+    common=bnd,
+    y=3,
+    lanes=[1/3, 7/8],
+    lanes_stroke="red",
+    lanes_stroke_width=0.5,
+    sections=3
+)
+Rectangle(
+    common=bnd,
+    y=5,
+    fill="lightcyan",
+    lanes=2,
+    sections=[[0.5], [0.333, 0.666]],
+    sections_stroke="red",
+    sections_stroke_width=0.5,
+    sections_dotted=True,
+)
+
+PageBreak()
+
 # ---- END
 Text(common=txt, text="Rectangle END...")
 
@@ -396,4 +432,5 @@ Save(
         "prows_defaults", "prows_inwards", "prows_outwards",
         "corners",
         "stripes", "stripes_flush",
+        "band",
         None])

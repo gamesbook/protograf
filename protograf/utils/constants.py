@@ -110,6 +110,7 @@ CMYK_COLOR_SINGLES = {
 
 GRID_SHAPES_WITH_CENTRE = [
     "ArrowShape",
+    "BandShape",
     "CircleShape",
     "CrossShape",
     "DotShape",

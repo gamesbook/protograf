@@ -79,8 +79,8 @@ Discussion  This example shows how to construct a regular Backgammon board.
             point; this can be copied across in a line using a ``Sequence()``
             command.
 
-            There is one Sequence command for each section of the
-            board |dash| top and bottom sections of each panel |dash| and each
+            There is one Sequence command for each part of the
+            board |dash| top and bottom parts of each panel |dash| and each
             Sequence draws a pair of Trapezoid shapes multiple times.
 
 ----------- ------------------------------------------------------------------

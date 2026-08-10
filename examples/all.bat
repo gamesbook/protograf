@@ -30,6 +30,7 @@ python core\shapes_geo.py --no-png -d %location%
 
 REM ---- examples: objects
 ECHO "Creating objects..."
+python objects\racetrack.py --no-png -d %location%
 python objects\polyominoes.py --no-png -d %location%
 python objects\pentominoes.py --no-png -d %location%
 python objects\ominoes_basic.py --no-png -d %location%

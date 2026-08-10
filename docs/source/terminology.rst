@@ -11,13 +11,15 @@ which they are used.
 However, in order to help with clarity, below is a reasonably comprehensive
 list of terms used in different places, grouped by what aspects they affect.
 
-Note that some shapes, such as the :ref:`Hexagon <hexIndex>`,
-:ref:`Circle <circleIndex>`, :ref:`Line <lineIndex>`, or
-:ref:`Rectangle <rectangleIndex>`,  have extensive customisation properties
-available; its better to refer to their specific descriptions to understand
-exactly how these can used.
+.. NOTE::
 
-This section is meant to be complementary to the concepts, terms and ideas for
+    Some shapes, such as the :ref:`Hexagon <hexIndex>`,
+    :ref:`Circle <circleIndex>`, :ref:`Line <lineIndex>`, and
+    :ref:`Rectangle <rectangleIndex>`,  have extensive customisation
+    properties available; so its better to refer to their specific
+    descriptions to understand exactly how these can used.
+
+This summary is meant to be complementary to the concepts, terms and ideas for
 :doc:`protograf <index>` discussed in :doc:`Basic Concepts <basic_concepts>`.
 
 .. _table-of-contents-terms:
@@ -34,6 +36,8 @@ This section is meant to be complementary to the concepts, terms and ideas for
 - `Miscellaneous Terms`_
 
 
+.. _termsJargon:
+
 protograf Jargon
 ==================
 `↑ <table-of-contents-terms_>`_
@@ -42,30 +46,28 @@ protograf Jargon
 places in the documentation:
 
 - **command** - an instruction that is specified in a **protograf** script;
-  see a full list in the :doc:`Commands <commands>` section
+  see a full list in :doc:`Commands <commands>`
 - **default**  - a value set by **protograf** if no other is given;
-  for example, the line length defaults to being 1 centimetre long
+  for example, the line length defaults to being 1 centimetre long, and a
+  line's color defaults to black
 - **list** - a number of comma-separated values enclosed in square brackets
-  e.g. ``[1, 2, 3]`` |dash| whihc are usually assigned to a **property**
+  e.g. ``[1, 2, 3]`` |dash| which are usually assigned to a property
 - **property** - an aspect of a command or shape that helps define how it works
   or looks; for example, a circle might have its size defined by using a radius
-  property of 2 centimetres - in a script this would be shown as ``radius=2``
+  property of 2 centimetres |dash| in a script this is shown as ``radius=2``
 - **shape** - a geometric element, for example, a circle, square, text or
-  line i.e. something that can be drawn |dash| see a list in the
-  :doc:`Shapes <core_shapes>` section
-- **script** - a file,  that can be **run**, containing various **protograf**
+  line i.e. something that can be drawn |dash| see a list in
+  :doc:`Shapes <core_shapes>`
+- **script** - a file, that can be **run**, containing various **protograf**
   commands |dash| see an outline in :doc:`Script Anatomy <script_anatomy>`
 - **set** - a number of comma-separated values enclosed in round brackets
-  e.g. ``(1, "a")`` |dash| these are usually assigned to a **property**
-- **run** - to cause Python to act on the script so that all instructions in
+  e.g. ``(1, "a")`` |dash| these are usually assigned to a property
+- **run** - to cause Python to act on the script so that all commands in
   it are carried out |dash| this should usually cause an output file to be
   created (or recreated)
 - **vertex** / **vertices** - the sharp "points" at the intersection of the
-  lines used to construct a shape; for example, a triangle has 3 verticesl;
-  a square has 4 vertices and a hexagon has 6 vertices.
-- **_x** and **_y** - some terms can be modified to be specific for
-  *x* (left to right) or *y* (top to bottom) distances by appending one of
-  these underscore-prefixed terms to them
+  lines used to construct a shape; for example, a triangle has 3 vertices;
+  a square has 4 vertices and a hexagon has 6 vertices
 
 
 .. _termsColor:
@@ -94,8 +96,8 @@ shows all the names and RGB colors that are available.
 .. HINT::
 
    For more details on hexadecimal colors, refer to
-   http://www.w3.org/TR/css3-color; the color names are listed in the
-   section https://www.w3.org/TR/css-color-3/#svg-color (this list can
+   http://www.w3.org/TR/css3-color; the color names are listed in
+   https://www.w3.org/TR/css-color-3/#svg-color (this list can
    also be found at https://en.wikipedia.org/wiki/X11_color_names)
 
 .. _termsColorCMYK:
@@ -108,7 +110,7 @@ four colors.
 
 To set these as percentage values - between 0 and 100 - use a string value,
 for example, ``"0, 48.75, 71.87, 37.2"`` (which corresponds to the color
-*sienna* color described in the previous section).
+*sienna* color described previously).
 
 To set these as fractional values, use a set of numbers enclosed in ``(...)``
 brackets, for example: ``(0, 0.4875, 0.7187, 0.3725)``
@@ -444,24 +446,33 @@ Display-orientated Terms
 -  **hidden** - a list of locations, indicated by their *row and
    column* identifier, which should **not** be used for display - the rest
    are displayed as normal
+-  **lanes** - a series of lines that are drawn to sub-divide either a ``Band``
+   or a ``Rectangle`` along their length
 -  **masked** - a list of locations, indicated by their *sequence
    number* |dash| i.e. their position in the drawing order |dash| which
    should **not** be used for display |dash| the rest are displayed as normal
--  **radii** - if given a value of ``True`` will cause the radii of a
-   ``Polygon``or ``Hexagon`` to be shown
+-  **no_end** - a Boolean property |dash| ``True`` or ``False`` |dash| which
+   can be set for a ``Rectangle`` or ``Band`` to essentially change the color
+   of the "end" lines to match that of the shape's fill
 -  *paths* - a list of one or more pairs of *compass directions*, representing
-   two edges of a hexagon shap,e between which a line |dash| straight or an
-   arc |dash| is drawns
+   two edges of a hexagon shape between which a line |dash| straight or an
+   arc |dash| is drawn
 -  **perbii** - if given one or more numbers will cause the perpendicular
    bisectors ("perbii" is plural for the shortcut "perbis") |dash| lines
    from centre to the middle of the edges |dash| of a ``Polygon``, ``Hexagon``
    or ``Rectangle`` to be drawn; a ``Polygon's`` unnamed edges are numbered
    from the east-facing one in an anti-clockwise direction
+-  **radii** - if given a value of ``True`` will cause the radii of a
+   ``Polygon``or ``Hexagon`` to be shown
+-  **sections** - a series of lines that are drawn to sub-divide a **lane**
+   of either a ``Band`` or a ``Rectangle`` along their height
 -  **shown** - a list of locations, indicated by their *row and
    column* identifier which are the only ones that **must** be used for
    display - the rest are ignored
 -  **stripes** - will draw a series of parallel areas between two opposing
    locations of a ``Rectangle`` in any/all of the specified direction(s)
+-  **stages** - a list of ``Band``s and/or ``Rectangle``s that make up the
+   parts of ``RaceTrack``
 -  **vertex_shapes** - will cause a list of shapes to be drawn at the vertices
    of the parent shape
 -  **visible** - a list of locations, indicated by their *sequence
@@ -483,9 +494,9 @@ Area-orientated Terms
    direction and a value, that designate that the edge of a rectangle
    should be drawn as a triangular "peak"; e.g. a **set** of ``('n', 2)``
    would draw a 2cm high triangle on the upper (north) edge
--  **shades** - a way to fill in the rhombus-shaped subsections of a hexagon
+-  **shades** - a way to fill in the rhombus-shaped sub-parts of a hexagon
    in order to create the effect of a ``Cube``
--  **slices** - a way to fill in triangular sections of a square, rectangle or
+-  **slices** - a way to fill in triangular areas of a square, rectangle or
    rhombus by supplying a list of colors; for a square or rectangle, a
    **slices_line** can also be used to create both trapezoids and triangles
    which gives the appearance of a building's roof when viewed from above
@@ -506,10 +517,10 @@ Miscellaneous Terms
    can be stored; its useful because it supports multiple layers and can be
    animated.
 -  **PDF** - Portable Document Format. A widely used format to create documents
-   such that they display the same way on all devices; its Useful because it
+   such that they display the same way on all devices; its useful because it
    supports the vector-format of **protograf** shapes.
 -  **PNG** - Portable Network Graphic. A file format in which an image can
    be stored; its useful because it supports transparent backgrounds.
 -  **SVG** - Scaleable Vector Graphics. A file format in which an image can
-   be stored; its a vector-format unlike the bitmap- or raster-format of PNG
+   be stored; its a vector-format, unlike the bitmap- or raster-format of PNG
    and JPEG files, so its size can be changed without loss of quality.

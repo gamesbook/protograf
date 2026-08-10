@@ -64,13 +64,15 @@ Domino(
    x=0, y=5,
    stroke_width=0.5,
    pips=(3, 8),
-   pip_shape=polygon(side=0.125, sides=3))
+   pip_shape=polygon(
+       side=0.125, sides=3, stroke_width=0.5))
 Domino(
    x=2.25, y=5,
    stroke_width=0.5,
    side=0.75,
    pips=(1, 6),
-   pip_shape=polygon(side=0.1, sides=6),
+   pip_shape=polygon(
+       side=0.1, sides=6, stroke_width=0.5),
    rotation=15)
 
 Save(

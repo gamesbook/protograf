@@ -53,7 +53,6 @@ HexHex(
     show_counter=True)
 PageBreak()
 
-
 # ---- lines
 Blueprint()
 Text(common=txt, text="HexHex: grid (lines & shape)")
@@ -63,7 +62,8 @@ HexHex(
     rings=3,
     fill=None,
     shape=None,  # grid only!
-    gridlines=True)
+    gridlines=True
+)
 HexHex(
     cx=4, cy=6,
     height=0.5,
@@ -74,6 +74,7 @@ HexHex(
     gridlines_stroke="red",
     gridlines_stroke_width=2)
 PageBreak()
+
 
 # ---- layout
 Blueprint()
@@ -233,3 +234,5 @@ Save(
         "lines_pointy",
         "ring_pointy",
         None])
+''' '''
+# Save()
