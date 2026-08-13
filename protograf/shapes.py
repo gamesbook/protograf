@@ -9,6 +9,7 @@ import copy
 from functools import cached_property
 import logging
 import math
+import io
 import os
 from pathlib import Path
 from pprint import pprint
@@ -16,6 +17,7 @@ import sys
 from urllib.parse import urlparse
 
 # third party
+from PIL import Image, ImageEnhance
 import pymupdf
 from pymupdf import Point as muPoint, Rect as muRect
 import segno  # QRCode
@@ -77,7 +79,7 @@ class ImageShape(BaseShape):
                 True,
             )
 
-    def load_image(self, ID=None):
+    def load_image_from_source(self, ID=None):
         """Load an image from source."""
         # ---- check for Card usage
         cache_directory = str(self.cache_directory)
@@ -139,7 +141,7 @@ class ImageShape(BaseShape):
                     False,
                     True,
                 )
-        return self.width, self.height
+        return width, height
 
     @property
     def geo(self) -> ShapeGeometry:
@@ -243,6 +245,81 @@ class ImageShape(BaseShape):
 
         return x, y, x_c, y_c
 
+    def alter_transparency(self, img: Image, color: str, tolerance: int = 30) -> Image:
+        """Make a color of an image transparent
+
+        Args:
+            img (PIL Image)
+            color (str): the name or code of the color to be made transparent
+            tolerance (int): Allow slight color variations near the background
+        """
+        target_color = colrs.get_color(color)  # convert target color to a tuple
+        img = img.convert("RGBA")
+        datas = img.getdata()
+        new_data = []
+        # target_color = (255, 255, 255) = white
+        for item in datas:
+            # check if the pixel is close to the target color (R, G, B)
+            if (
+                abs(item[0] - target_color[0]) < tolerance
+                and abs(item[1] - target_color[1]) < tolerance
+                and abs(item[2] - target_color[2]) < tolerance
+            ):
+                # change pixel to transparent (Alpha = 0)
+                new_data.append((255, 255, 255, 0))
+            else:
+                new_data.append(item)
+
+        img.putdata(new_data)
+
+    def alter_brightness(self, img: Image, brightness: float = 1.0) -> Image:
+        """Alter the brightness of an image"""
+        _factor = tools.as_float(brightness, "brightness")
+        enhancer = ImageEnhance.Brightness(img)
+        img = enhancer.enhance(_factor)
+        # img.save('/tmp/demo/bright.png')
+
+    def alter_sharpness(self, img: Image, sharpness: float = 1.0) -> Image:
+        """Alter the sharpness of an image"""
+        _factor = tools.as_float(sharpness, "sharpness")
+        enhancer = ImageEnhance.Sharpness(img)
+        img = enhancer.enhance(_factor)
+        # img.save('/tmp/demo/sharp.png')
+
+    def alter_color_balance(self, balance: float = 1.0) -> Image:
+        """Alter the color balance of an image
+
+        Notes:
+          * If balance < 1.0, image will contain less color
+          * If balance == 0.0, image will be black and white
+        """
+        _factor = tools.as_float(balance, "balance")
+        enhancer = ImageEnhance.Color(self.img)
+        self.img = enhancer.enhance(_factor)
+        # img.save('/tmp/demo/balance.png')
+
+    def alter_sepia(self, img: Image) -> Image:
+        """apply a sepia filter to an image."""
+        # standard sepia matrix formula coefficients
+        sepia_matrix = (
+            0.393,
+            0.769,
+            0.189,
+            0,  # Red channel weights
+            0.349,
+            0.686,
+            0.168,
+            0,  # Green channel weights
+            0.272,
+            0.534,
+            0.131,
+            0,  # Blue channel weights
+        )
+        # Convert to standard RGB mode
+        img = img.convert("RGB")
+        img = img.convert("RGB", matrix=sepia_matrix)
+        # img.save('/tmp/demo/speia.png')
+
     def draw(self, cnv=None, off_x=0, off_y=0, ID=None, **kwargs):
         """Show an image on a given canvas."""
         kwargs = self.kwargs | kwargs
@@ -253,12 +330,31 @@ class ImageShape(BaseShape):
         width = self._u.width
         x, y, x_c, y_c = self.calculate_xy()
         rotation = kwargs.get("rotation", self.rotation)
-        # ---- load and show image
-        self.load_image(ID)
+        # ---- load image from source
+        self.load_image_from_source(ID)
+        # ---- image alterations
+        if kwargs.get("transparent"):
+            self.alter_transparency(self.img, kwargs.get("transparent"))
+        if kwargs.get("balance", None) is not None:
+            self.alter_color_balance(kwargs.get("balance"))
+        if kwargs.get("sepia"):
+            if tools.as_bool(kwargs.get("sepia"), False):
+                self.alter_sepia(self.img)
+        if kwargs.get("brightness"):
+            self.alter_brightness(self.img, kwargs.get("brightness"))
+        if kwargs.get("sharpness"):
+            self.alter_sharpness(self.img, kwargs.get("sharpness"))
+        # ---- show image
         width, height = self.image_size()
+        self.img.save("/tmp/demo/altered.png")
+        img_byte_arr = io.BytesIO()
+        self.img.save(img_byte_arr, format="PNG")  # or "JPEG"
+        img_byte_arr.seek(0)
+
         self.insert_image(  # via base.BaseShape
             globals.doc_page,
             image=self.img,
+            stream=img_byte_arr,
             filename=self.filename,
             origin=(x, y),
             sliced=self.sliced,

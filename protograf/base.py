@@ -2264,6 +2264,7 @@ class BaseShape:
         self,
         pdf_page: muPage,
         image: Image,
+        stream,  # IO stream
         filename: str | None = None,
         origin: tuple = None,
         sliced: str | None = None,
@@ -2490,7 +2491,17 @@ class BaseShape:
                             True,
                         )
             else:
-                image_doc = pymupdf.open(image_local)  # open file image as document
+                # ---- stream
+                if stream:
+                    image_doc = pymupdf.open()
+                    page = image_doc.new_page()  # add a page
+                    breakpoint()
+                    rect = pymupdf.Rect(
+                        (0, 0), (width_height[0], width_height[1])
+                    )  # define position on page
+                    page.insert_image(rect, stream=stream.getvalue())
+                elif img:
+                    image_doc = pymupdf.open(image_local)  # open file image as document
 
             # ---- draw image
             pdfbytes = image_doc.convert_to_pdf()  # make a 1-page PDF of it
