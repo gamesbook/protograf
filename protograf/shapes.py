@@ -62,6 +62,7 @@ class ImageShape(BaseShape):
     def __init__(self, _object=None, canvas=None, **kwargs):
         super().__init__(_object=_object, canvas=canvas, **kwargs)
         # ---- overrides / extra args
+        self.img = None  # loaded image
         self.sliced = kwargs.get("sliced", None)
         self.cache_directory = get_cache(**kwargs)
         self.image_location = None
@@ -76,10 +77,116 @@ class ImageShape(BaseShape):
                 True,
             )
 
+    def load_image(self, ID=None):
+        """Load an image from source."""
+        # ---- check for Card usage
+        cache_directory = str(self.cache_directory)
+        # ---- process locale data (dict via Locale namedtuple) using jinja2
+        #      this may include the item's sequence number and current page
+        _locale = self.kwargs.get("locale", None)
+        _source = (
+            self.source if not _locale else tools.eval_template(self.source, _locale)
+        )
+        if ID is not None and isinstance(self.source, list):
+            _source = (
+                self.source[ID]
+                if not _locale
+                else tools.eval_template(self.source[ID], _locale)
+            )
+            cache_directory = set_cached_dir(_source) or cache_directory
+        elif ID is not None and isinstance(self.source, str):
+            _source = (
+                self.source
+                if not _locale
+                else tools.eval_template(self.source, _locale)
+            )
+            cache_directory = set_cached_dir(_source) or cache_directory
+        else:
+            pass
+        # feedback(f"*** IMAGE draw {_source=} {self.source=} {_locale=}")
+
+        # ---- load image
+        # feedback(f'*** IMAGE {ID=} {_source=} {x=} {y=} {self.rotation=}')
+        self.img, self.filename = self.load_image(
+            image_location=_source, cache_directory=cache_directory
+        )
+        if not self.img:
+            feedback(
+                f'Unable to load image "{_source}" - please check this is a valid filename',
+                False,
+                True,
+            )
+
+    def image_size(self) -> tuple:
+        """Calculate auto-size of image once loaded.
+
+        Returns:
+            tuple (float, float): width, height
+        """
+        width = self._u.width
+        height = self._u.height
+        if self.kwargs.get("auto_frame") and self.auto_frame and self.img:
+            # ---- set image sizes
+            if self.width_set and not self.height_set:
+                height = self.img.height * width / self.img.width
+                self.height = self.img.height * self.width / self.img.width
+            elif self.height_set and not self.width_set:
+                width = self.img.width * height / self.img.height
+                self.width = self.img.width * self.height / self.img.height
+            else:
+                feedback(
+                    "Both width and height are set - auto_frame not used.",
+                    False,
+                    True,
+                )
+        return self.width, self.height
+
     @property
     def geo(self) -> ShapeGeometry:
         """Geometry of Image in user units."""
-        return ShapeGeometry()
+        _type = type(self)
+        x, y, x_c, y_c = self.calculate_xy()
+        width, height = self.image_size()
+        cntr = Point(x_c, y_c)
+        cntr_user = self.as_point(cntr, self.units, None, None)
+        # TODO - add rotation as per Rectangle
+        nw = Point(x, y)
+        ne = Point(x + width, y)
+        se = Point(x + width, y + height)
+        sw = Point(x, y + height)
+        n = Point(x + width / 2.0, y)
+        e = Point(x + width, y + height / 2.0)
+        s = Point(x + width / 2.0, y + height)
+        w = Point(x, y + height / 2.0)
+        return ShapeGeometry(
+            # centre
+            centre=cntr_user,
+            center=cntr_user,
+            c=cntr_user,
+            # vertices
+            nw=nw,
+            ne=ne,
+            sw=sw,
+            se=se,
+            vertices=[ne, se, sw, nw],
+            # perbii
+            n=n,
+            s=s,
+            e=e,
+            w=w,
+            perbii=[n, e, s, w],
+            # length
+            width=width,
+            height=height,
+            perimeter=2.0 * width + 2.0 * height,
+            # other
+            area=width * height,
+            # meta
+            t=_type,
+            type=_type,
+            shapetype=_type,
+            name=self.simple_name(self),
+        )
 
     @property
     def geometry(self) -> ShapeGeometry:
@@ -141,74 +248,23 @@ class ImageShape(BaseShape):
         kwargs = self.kwargs | kwargs
         cnv = cnv if cnv else globals.canvas  # a new Page/Shape may now exist
         super().draw(cnv, off_x, off_y, ID, **kwargs)  # unit-based props
-        img = None
-        # ---- check for Card usage
-        cache_directory = str(self.cache_directory)
-        # ---- process locale data (dict via Locale namedtuple) using jinja2
-        #      this may include the item's sequence number and current page
-        _locale = kwargs.get("locale", None)
-        _source = (
-            self.source if not _locale else tools.eval_template(self.source, _locale)
-        )
-        if ID is not None and isinstance(self.source, list):
-            _source = (
-                self.source[ID]
-                if not _locale
-                else tools.eval_template(self.source[ID], _locale)
-            )
-            cache_directory = set_cached_dir(_source) or cache_directory
-        elif ID is not None and isinstance(self.source, str):
-            _source = (
-                self.source
-                if not _locale
-                else tools.eval_template(self.source, _locale)
-            )
-            cache_directory = set_cached_dir(_source) or cache_directory
-        else:
-            pass
-        # feedback(f"*** IMAGE draw {_source=} {self.source=} {_locale=}")
         # ---- convert to using units
         height = self._u.height
         width = self._u.width
         x, y, x_c, y_c = self.calculate_xy()
         rotation = kwargs.get("rotation", self.rotation)
-        # ---- load image
-        # feedback(f'*** IMAGE {ID=} {_source=} {x=} {y=} {self.rotation=}')
-        img, filename = self.load_image(
-            image_location=_source, cache_directory=cache_directory
+        # ---- load and show image
+        self.load_image(ID)
+        width, height = self.image_size()
+        self.insert_image(  # via base.BaseShape
+            globals.doc_page,
+            image=self.img,
+            filename=self.filename,
+            origin=(x, y),
+            sliced=self.sliced,
+            width_height=(width, height),
+            rotation=rotation,
         )
-        if not img:
-            feedback(
-                f'Unable to load image "{_source}" - please check this is a valid filename',
-                False,
-                True,
-            )
-            return
-        else:
-            # feedback(f'*** IMAGE {self.width=} {self.height=} {width=} {height=}')
-            if kwargs.get("auto_frame") and self.auto_frame:
-                # ---- set image area
-                if self.width_set and not self.height_set:
-                    height = img.height * width / img.width
-                    self.height = img.height * self.width / img.width
-                elif self.height_set and not self.width_set:
-                    width = img.width * height / img.height
-                    self.width = img.width * self.height / img.height
-                else:
-                    feedback(
-                        "Both width and height are set - auto_frame not used.",
-                        False,
-                        True,
-                    )
-            self.insert_image(  # via base.BaseShape
-                globals.doc_page,
-                image=img,
-                filename=filename,
-                origin=(x, y),
-                sliced=self.sliced,
-                width_height=(width, height),
-                rotation=rotation,
-            )
         # ---- centre
         if self.use_abs_c:
             x_c = self._abs_cx

@@ -94,6 +94,10 @@ class RectangleShape(BaseShape):
         se = self.as_point(vtcs[1], self.units, cntr, self.rotation)
         sw = self.as_point(vtcs[2], self.units, cntr, self.rotation)
         nw = self.as_point(vtcs[3], self.units, cntr, self.rotation)
+        n = geoms.fraction_along_line(nw, ne, 0.5)
+        s = geoms.fraction_along_line(sw, se, 0.5)
+        e = geoms.fraction_along_line(ne, se, 0.5)
+        w = geoms.fraction_along_line(nw, sw, 0.5)
         perim = (self.height + self.width) * 2
         area = self.height * self.width
         radius = (
@@ -111,10 +115,11 @@ class RectangleShape(BaseShape):
             se=se,
             sw=sw,
             # perbii
-            n=geoms.fraction_along_line(nw, ne, 0.5),
-            s=geoms.fraction_along_line(sw, se, 0.5),
-            e=geoms.fraction_along_line(ne, se, 0.5),
-            w=geoms.fraction_along_line(nw, sw, 0.5),
+            n=n,
+            s=s,
+            e=e,
+            w=w,
+            perbii=[n, e, s, w],
             # dimensions
             perimeter=perim,
             radius=radius,
