@@ -26,11 +26,12 @@ the tiles, the cards, the box, and so on.
 
 .. IMPORTANT::
 
-   **protograf** is *NOT* a full-blown graphics editor |dash| like the
-   Adobe Photoshop, GIMP, or Inkscape packages |dash| or a desktop publishing
-   tool |dash| like Scribus, InDesign, or Xpress |dash| which allow
-   sophisticated creation of complex graphics and text layouts; and does not
-   attempt in **any** way to replicate their extensive functionality!
+   **protograf** is *NOT* a full-blown graphics editor or sketching program
+   |dash| like, for example, thr Adobe Photoshop, GIMP, or Inkscape packages
+   |dash| or a desktop publishing tool |dash| suc as Scribus, InDesign, or
+   Xpress |dash| which allow sophisticated creation of complex graphics,
+   sketches, and text layouts; and does not attempt in **any** way to replicate
+   their extensive functionality!
 
 
 Who might want to use protograf?

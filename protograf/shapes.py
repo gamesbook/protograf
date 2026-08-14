@@ -17,7 +17,7 @@ import sys
 from urllib.parse import urlparse
 
 # third party
-from PIL import Image, ImageEnhance
+from PIL import Image, ImageEnhance, ImageOps
 import pymupdf
 from pymupdf import Point as muPoint, Rect as muRect
 import segno  # QRCode
@@ -249,7 +249,6 @@ class ImageShape(BaseShape):
         """Make a color of an image transparent
 
         Args:
-            img (PIL Image)
             color (str): the name or code of the color to be made transparent
             tolerance (int): Allow slight color variations near the background
         """
@@ -257,9 +256,8 @@ class ImageShape(BaseShape):
         img = img.convert("RGBA")
         datas = img.getdata()
         new_data = []
-        # target_color = (255, 255, 255) = white
         for item in datas:
-            # check if the pixel is close to the target color (R, G, B)
+            # check if pixel is close to target color (R,G,B)
             if (
                 abs(item[0] - target_color[0]) < tolerance
                 and abs(item[1] - target_color[1]) < tolerance
@@ -271,6 +269,23 @@ class ImageShape(BaseShape):
                 new_data.append(item)
 
         img.putdata(new_data)
+        return img
+
+    def alter_invert(self, img: Image) -> Image:
+        """Invert the colors of an image."""
+        if img.mode == "RGBA":
+            # separate RGB color bands from Alpha (transparency) band
+            r, g, b, a = img.split()
+            # merge RGB back together to invert safely
+            rgb_image = Image.merge("RGB", (r, g, b))
+            inverted_rgb = ImageOps.invert(rgb_image)
+            # re-attach the original alpha channel
+            r2, g2, b2 = inverted_rgb.split()
+            invert_image = Image.merge("RGBA", (r2, g2, b2, a))
+        else:
+            # handle standard RGB or Grayscale images natively
+            invert_image = ImageOps.invert(img)
+        return invert_image
 
     def alter_brightness(self, img: Image, brightness: float = 1.0) -> Image:
         """Alter the brightness of an image"""
@@ -278,6 +293,7 @@ class ImageShape(BaseShape):
         enhancer = ImageEnhance.Brightness(img)
         img = enhancer.enhance(_factor)
         # img.save('/tmp/demo/bright.png')
+        return img
 
     def alter_sharpness(self, img: Image, sharpness: float = 1.0) -> Image:
         """Alter the sharpness of an image"""
@@ -285,8 +301,9 @@ class ImageShape(BaseShape):
         enhancer = ImageEnhance.Sharpness(img)
         img = enhancer.enhance(_factor)
         # img.save('/tmp/demo/sharp.png')
+        return img
 
-    def alter_color_balance(self, balance: float = 1.0) -> Image:
+    def alter_color_balance(self, img: Image, balance: float = 1.0) -> Image:
         """Alter the color balance of an image
 
         Notes:
@@ -294,12 +311,13 @@ class ImageShape(BaseShape):
           * If balance == 0.0, image will be black and white
         """
         _factor = tools.as_float(balance, "balance")
-        enhancer = ImageEnhance.Color(self.img)
-        self.img = enhancer.enhance(_factor)
+        enhancer = ImageEnhance.Color(img)
+        img = enhancer.enhance(_factor)
         # img.save('/tmp/demo/balance.png')
+        return img
 
     def alter_sepia(self, img: Image) -> Image:
-        """apply a sepia filter to an image."""
+        """Apply a sepia filter to an image."""
         # standard sepia matrix formula coefficients
         sepia_matrix = (
             0.393,
@@ -319,6 +337,7 @@ class ImageShape(BaseShape):
         img = img.convert("RGB")
         img = img.convert("RGB", matrix=sepia_matrix)
         # img.save('/tmp/demo/speia.png')
+        return img
 
     def draw(self, cnv=None, off_x=0, off_y=0, ID=None, **kwargs):
         """Show an image on a given canvas."""
@@ -332,30 +351,45 @@ class ImageShape(BaseShape):
         rotation = kwargs.get("rotation", self.rotation)
         # ---- load image from source
         self.load_image_from_source(ID)
+        width, height = self.image_size()
+        img_filename = self.filename
+        image = self.img
+
         # ---- image alterations
+        cache_name = ""  # created according to actual alteration
         if kwargs.get("transparent"):
-            self.alter_transparency(self.img, kwargs.get("transparent"))
+            image = self.alter_transparency(image, kwargs.get("transparent"))
+            cache_name += "T"
         if kwargs.get("balance", None) is not None:
-            self.alter_color_balance(kwargs.get("balance"))
+            image = self.alter_color_balance(image, kwargs.get("balance"))
+            cache_name += f'L{kwargs.get("balance")}'
         if kwargs.get("sepia"):
             if tools.as_bool(kwargs.get("sepia"), False):
-                self.alter_sepia(self.img)
+                image = self.alter_sepia(image)
+                cache_name += "S"
+        if kwargs.get("invert"):
+            if tools.as_bool(kwargs.get("invert"), False):
+                image = self.alter_invert(image)
+                cache_name += "I"
         if kwargs.get("brightness"):
-            self.alter_brightness(self.img, kwargs.get("brightness"))
+            image = self.alter_brightness(image, kwargs.get("brightness"))
+            cache_name += f'R{kwargs.get("brightness")}'
         if kwargs.get("sharpness"):
-            self.alter_sharpness(self.img, kwargs.get("sharpness"))
-        # ---- show image
-        width, height = self.image_size()
-        self.img.save("/tmp/demo/altered.png")
-        img_byte_arr = io.BytesIO()
-        self.img.save(img_byte_arr, format="PNG")  # or "JPEG"
-        img_byte_arr.seek(0)
+            image = self.alter_sharpness(image, kwargs.get("sharpness"))
+            cache_name += f'P{kwargs.get("sharpness")}'
+        if cache_name != "":
+            # Uses the CACHE_DIRECTORY to store altered (temporary) image
+            cache_directory = get_cache()
+            f_p = Path(self.filename)
+            img2_filename = f_p.stem + f"_{cache_name}" + f_p.suffix
+            img_filename = os.path.join(cache_directory, img2_filename)
+            image.save(img_filename)
 
+        # ---- show image
         self.insert_image(  # via base.BaseShape
             globals.doc_page,
-            image=self.img,
-            stream=img_byte_arr,
-            filename=self.filename,
+            image=image,
+            filename=img_filename,
             origin=(x, y),
             sliced=self.sliced,
             width_height=(width, height),

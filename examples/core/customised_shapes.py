@@ -1037,6 +1037,62 @@ Image(img_file, x=2, y=3, height=2, auto_frame=True)
 Rectangle(x=2, y=3, label="H", common=rred)
 PageBreak()
 
+# ---- image - alterations
+Blueprint()
+Text(common=txt, text="Image: alterations")
+allim = Common(
+    width=2, height=2,
+    label_stroke="red")
+Image("fantasy-forest-with-old-bridges.png",
+      common=allim,
+      label="Original",
+      x=0, y=0)
+Image("fantasy-forest-with-old-bridges.png",
+      common=allim,
+      label="Brightness:3",
+      x=2, y=0,
+      brightness=3)
+Image("fantasy-forest-with-old-bridges.png",
+      common=allim,
+      label="Balance:0.0",
+      x=0, y=2,
+      balance=0.0)
+Image("fantasy-forest-with-old-bridges.png",
+      common=allim,
+      label="Sepia:True",
+      x=2, y=2,
+      sepia=True)
+Image("fantasy-forest-with-old-bridges.png",
+      common=allim,
+      label="Sharpness:5",
+      x=0, y=4,
+      sharpness=5)
+Image("fantasy-forest-with-old-bridges.png",
+      common=allim,
+      label="Invert:True",
+      x=2, y=4,
+      invert=True)
+PageBreak()
+
+# ---- image - multi-alterations
+Text(common=txt, text="Image: multi-alterations")
+Image("fantasy-forest-with-old-bridges.png",
+      common=allim,
+      label="Original",
+      x=0, y=0)
+Image("fantasy-forest-with-old-bridges.png",
+      common=allim,
+      label="Balance+Invert",
+      x=2, y=2,
+      balance=0.0,
+      invert=True)
+Image("fantasy-forest-with-old-bridges.png",
+      common=allim,
+      label="Transparent/Sharp",
+      x=0, y=4,
+      transparent="black",
+      sharpness=5)
+PageBreak()
 
 # ---- shape rotation I
 Blueprint()
@@ -1643,6 +1699,7 @@ Save(
         "image_sliced", "image_label",
         "image_operations", "image_align",
         "image_auto_frame",
+        "image_alterations", "image_alterations_multi",
         "shape_rotation",
         "shape_rotation_two",
         "shape_hatches_and_rotation",
