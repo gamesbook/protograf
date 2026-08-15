@@ -360,9 +360,6 @@ class ImageShape(BaseShape):
         if kwargs.get("transparent"):
             image = self.alter_transparency(image, kwargs.get("transparent"))
             cache_name += "T"
-        if kwargs.get("balance", None) is not None:
-            image = self.alter_color_balance(image, kwargs.get("balance"))
-            cache_name += f'L{kwargs.get("balance")}'
         if kwargs.get("sepia"):
             if tools.as_bool(kwargs.get("sepia"), False):
                 image = self.alter_sepia(image)
@@ -371,6 +368,9 @@ class ImageShape(BaseShape):
             if tools.as_bool(kwargs.get("invert"), False):
                 image = self.alter_invert(image)
                 cache_name += "I"
+        if kwargs.get("balance", None) is not None:
+            image = self.alter_color_balance(image, kwargs.get("balance"))
+            cache_name += f'L{kwargs.get("balance")}'
         if kwargs.get("brightness"):
             image = self.alter_brightness(image, kwargs.get("brightness"))
             cache_name += f'R{kwargs.get("brightness")}'
