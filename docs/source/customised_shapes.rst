@@ -853,18 +853,21 @@ Example 8: Alterations: Single
 ++++++++++++++++++++++++++++++
 `^ <imageIndex_>`_
 
-It is possible to change the way an Image appears by altering its color or
-colors in some way. These changes are termed *alterations*.
+It is possible to change the way an Image appears by altering its colors or
+appearance in some way. These changes are termed *alterations*.
 
 The following alterations are supported:
 
 * *brightness* - change the brightness of the image by a factor;
-  a factor of ``1`` equates to no change
+  a factor of ``1`` equates to no change;  values below ``1.0``
+  make it darker it, and values above ``1.0`` make it brighter
 * *sharpness* - change the sharpness of the image by a factor;
-  a factor of ``1`` equates to no change
-* *balance* - change the color balance of the image by a factor;
-  a factor of ``1`` equates to no change, while a factor of ``0``
-  equates to making the image one that is 'black and white'
+  a factor of ``1`` equates to no change; a value of ``0.0`` makes it
+  completely blurred, and values above ``1.0`` make it sharper
+* *balance* - change the color balance, or saturation, of the image by a
+  factor; a factor of ``1`` equates to no change; a factor of ``0``
+  equates to making the image one that is 'black and white', while a
+  factor of ```2.0`` will double the saturation, making colors more vibrant
 * *sepia* - if set to ``True`` will gives whole image brownish shades
 * *invert* - if set to ``True`` will invert colors across the whole image
 * *transparent* - if set to a color, will turn make all pixels of the
@@ -997,14 +1000,46 @@ If multiple alterations are specified, they are applied in this order:
       The middle-right alterations shows the effect of setting the *balance*
       to ``0`` ("black and white") and the *invert*  to ``True``.  This is
       somewhat equivalent to making the image appear to be an old-style
-      photograph negative
-      ( https://en.wikipedia.org/wiki/Negative_(photography) )
+      `photograph negative <https://en.wikipedia.org/wiki/Negative_(photography)>`_
 
       The lower-left alterations shows the effect of setting the transparent
       color to ``black`` and also setting the *sharpness* to ``5``.
 
 ===== ======
 
+
+.. _image-resizing:
+
+Example 10: Resizing
+++++++++++++++++++++
+`^ <imageIndex_>`_
+
+It is possible to change the physical size of an Image to be smaller or larger;
+either using specific pixel sizes or via a fit.
+
+Resizing is only relevant to raster images, such PNG or JPEG files, as vector-based
+SVG images can be scaled to any size without loss of quality.
+
+Obviously, if the ratio of width:height of the resized image is different
+from the original, then it will appear "stretched" or "compressed" in some
+direction.
+
+Image Resizing Algorithms
+
+You can choose the most appropriate resizing algorithm filter for your
+application by setting the *resize_filter*.  If none is specified then
+``LANCZOS`` will be the default used.
+
+======== ==================================================== ======================= ========================
+Name     Filter Description                                   Best For                Speed vs. Quality
+======== ==================================================== ======================= ========================
+NEAREST  Picks the nearest pixel without calculating averages Pixel art, sharp masks  Fastest / Lowest quality
+BOX      Groups pixels into blocks and takes the average      Fast downscaling        Very Fast / Low quality
+BILINEAR Interpolates pixels using a 2 × 2 matrix             General quick previews  Fast / Medium quality
+HAMMING  Filters with a Hamming window; sharper than Bilinear Fast downscaling        Fast / Good quality
+BICUBIC  Interpolates pixels using a 4 × 4 matrix             Upscaling photo images  Slow / High quality
+LANCZOS  Uses a high-quality Sinc truncation filter           "Pro" down/upscaling    Slowest / Best quality
+======== ==================================================== ======================= ========================
 
 .. _lineIndex:
 

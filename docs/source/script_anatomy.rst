@@ -197,11 +197,11 @@ To customise the command, set its properties as follows:
     of the SVG files are derived using the PDF filename, with a ``-`` followed
     by the page number;
   - ``gif`` - to create a GIF file composed of all the PNG pages (these will be
-    removed after the file been created)
+    removed after the file been created) - see also the **framerate** property
 - **directory** - sets the location where the output will be created; the
   default is the directory on which the script is being run
-- **dpi** - can be set to the dots-per-inch resolution required; by default
-  this is ``300``
+- **dpi** - can be set to the dots-per-inch resolution required in raster format
+  files; by default this is ``300``
 - **names** - this can be used to provide a list of names |dash| without an
   extension |dash| for the **output** files that will be created from the PDF;
   the first name corresponds to the first page, the second name to the second
@@ -212,6 +212,10 @@ To customise the command, set its properties as follows:
   exported as PNG files; the names of the files are based on the PDF
   filename, with a dash (-) followed by the page number, and ``.png`` file
   extension
+- **compression** - when set to a value between 1 to 100, will result in that
+  effort of document compression (using the Brotli algorithm); note however
+  that the actual size of the document may not change by very much at all,
+  depending on its contents
 - **framerate** - the delay in seconds between each "page" of a GIF image; by
   default this is ``1`` second
 - **stop** - when set to ``True`` will cause the script to stop at that point,
@@ -253,7 +257,8 @@ image:
 
 In this example, an animated GIF image will be created, assembled out of the
 PNG images; one per page of the PDF.  The *framerate* setting of ``0.5`` means
-there will be a delay of a half second between the display of each image.
+there will be a delay of a half second between the display of each image in the
+GIF.
 
 Example 3. Save Card Gallery
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~

@@ -3,8 +3,7 @@ protograf Changes
 
 2026-00-00 (0.5.8)
 ------------------
-- [PLANNED-1] Enable PDF compression via Brotli
-- [PLANNED-2] Expand geo coverage
+- [PLANNED-1] Expand geo coverage for minor shapes
 - [PLANNED-2] Structure: break-up proto into smaller modules
 - [PLANNED-2] Docs: list all props for Hex, Circle, Rectangle, Line
 
@@ -12,6 +11,7 @@ protograf Changes
 ------------------
 - Image Alterations
 - Expand geo coverage for Image
+- Enable PDF compression via Brotli
 - [PLANNED-1] Wrap image for CardBox
 - [PLANNED-2] BoxCover
 

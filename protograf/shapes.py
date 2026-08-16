@@ -339,6 +339,20 @@ class ImageShape(BaseShape):
         # img.save('/tmp/demo/speia.png')
         return img
 
+    def resize_image(self, img: Image, fit: str = None, resize: list = None) -> Image:
+        """Resize aspect of an image."""
+        if fit:
+            if _lower(fit) not in [
+                "height",
+                "width",
+                "h",
+                "w",
+            ]:
+                feedback(f'"{fit}" is an invalid "fit" settting!', True, True)
+        elif resize:
+            pass
+        return img
+
     def draw(self, cnv=None, off_x=0, off_y=0, ID=None, **kwargs):
         """Show an image on a given canvas."""
         kwargs = self.kwargs | kwargs
@@ -354,9 +368,19 @@ class ImageShape(BaseShape):
         width, height = self.image_size()
         img_filename = self.filename
         image = self.img
+        cache_name = ""  # created based on resize or alterations
+
+        # ---- image resize
+        if kwargs.get("fit") and kwargs.get("resize"):
+            feedback('Use either "fit" or "resize" but not both.', True, True)
+        if kwargs.get("fit"):
+            image = self.resize_image(image, fit=kwargs.get("fit"))
+            cache_name += "fit"
+        if kwargs.get("resize"):
+            image = self.resize_image(image, resize=kwargs.get("resize"))
+            cache_name += "resize"
 
         # ---- image alterations
-        cache_name = ""  # created according to actual alteration
         if kwargs.get("transparent"):
             image = self.alter_transparency(image, kwargs.get("transparent"))
             cache_name += "T"
