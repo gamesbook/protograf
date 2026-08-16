@@ -32,9 +32,9 @@ Prototyping Tools
 
 .. HINT::
 
-    Please also refer to the guides on
+    Please also refer to the tool guides for
     :ref:`hexagonal grid resources <other-hexagonal-resources>`
-    as well as  :ref:`playing cards resources <other-card-resources>`.
+    as well as :ref:`playing cards resources <other-card-resources>`.
 
 
 Icons, Art and Images
@@ -45,8 +45,11 @@ Icons, Art and Images
 -  https://game-icons.net/
 -  https://icon-sets.iconify.design/ (check license and attribution)
 -  https://publicdomainicons.firebaseapp.com/icons
+-  https://publicdomainreview.org/collections/
 -  https://creazilla.com/
 -  https://www.irasutoya.com/
+-  https://www.si.edu/openaccess
+-  https://www.oldbookillustrations.com/
 -  https://bioart.niaid.nih.gov/ - medical, biological, animal and "various"
    in PNG and SVG formats
 -  https://thenounproject.com/ (some free, provided they are attributed)
@@ -85,7 +88,6 @@ Card Suit Icons
 -  Playing Cards - the section has a table showing a number of symbols
    linked to image files:
    https://en.wikipedia.org/wiki/Playing_card#Modern_formats
-
 -  New Suit Icons - https://boardgamegeek.com/image/7928106/bmorayta1
 
 

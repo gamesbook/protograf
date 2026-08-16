@@ -339,18 +339,61 @@ class ImageShape(BaseShape):
         # img.save('/tmp/demo/speia.png')
         return img
 
-    def resize_image(self, img: Image, fit: str = None, resize: list = None) -> Image:
+    def resize_image(
+        self, img: Image, resample, fit: str = None, resize: list = None
+    ) -> Image:
         """Resize aspect of an image."""
         if fit:
-            if _lower(fit) not in [
-                "height",
-                "width",
-                "h",
-                "w",
-            ]:
-                feedback(f'"{fit}" is an invalid "fit" settting!', True, True)
+            iwidth = img.size[0]
+            iheight = img.size[1]
+            # breakpoint()
+            match _lower(fit):
+                case "height" | "h":
+                    # keep existing height; calc new width
+                    nwidth = iheight * self.width / self.height
+                    resize = (int(nwidth), iheight)
+                case "width" | "w":
+                    # keep existing width; calc new height
+                    nheight = iwidth * self.height / self.width
+                    resize = (iwidth, int(nheight))
+                case _:
+                    resize = None
+                    feedback(
+                        f'Image "{fit}" is an invalid "fit" setting; use "height" or "width".',
+                        True,
+                        True,
+                    )
         elif resize:
-            pass
+            if not isinstance(resize, (list, tuple)):
+                feedback(f'Image "resize" must be a list - not "{resize}"!', True, True)
+            if len(resize) != 2:
+                feedback(
+                    f'Image "resize" must be a list with two elements - not "{resize}"!',
+                    True,
+                    True,
+                )
+            for item in resize:
+                if not isinstance(item, (float, int)):
+                    feedback(
+                        'Image "resize" must be a list of integers;'
+                        f' it cannot contain "{item}"!',
+                        True,
+                        True,
+                    )
+                if item <= 0:
+                    feedback(
+                        'Image "resize" must be a list of positive integers;'
+                        f' it cannot contain "{item}"!',
+                        True,
+                        True,
+                    )
+        if resize:  # supplied or calculated
+            # resize to exact dimensions (width, height)
+            resized_image = img.resize(
+                (int(resize[0]), int(resize[1])), resample=resample
+            )
+            return resized_image
+
         return img
 
     def draw(self, cnv=None, off_x=0, off_y=0, ID=None, **kwargs):
@@ -370,14 +413,41 @@ class ImageShape(BaseShape):
         image = self.img
         cache_name = ""  # created based on resize or alterations
 
-        # ---- image resize
+        # ---- image resize (and resample)
+        if kwargs.get("resample"):
+            res = _lower(kwargs.get("resample"))
+            match res:
+                case "lanczos" | "l":
+                    resample = Image.Resampling.LANCZOS
+                case "nearest" | "n":
+                    resample = Image.Resampling.NEAREST
+                case "box" | "x":
+                    resample = Image.Resampling.BOX
+                case "bilinear" | "b":
+                    resample = Image.Resampling.BILINEAR
+                case "hamming" | "h":
+                    resample = Image.Resampling.HAMMING
+                case "bicubic" | "c":
+                    resample = Image.Resampling.BICUBIC
+                case _:
+                    feedback(
+                        f'Image "{res}" is an invalid "resample" setting',
+                        True,
+                        True,
+                    )
+        else:
+            resample = Image.Resampling.LANCZOS
         if kwargs.get("fit") and kwargs.get("resize"):
-            feedback('Use either "fit" or "resize" but not both.', True, True)
+            feedback(
+                'Use either "fit" or "resize" but not both for an Image.', True, True
+            )
         if kwargs.get("fit"):
-            image = self.resize_image(image, fit=kwargs.get("fit"))
+            image = self.resize_image(image, resample=resample, fit=kwargs.get("fit"))
             cache_name += "fit"
         if kwargs.get("resize"):
-            image = self.resize_image(image, resize=kwargs.get("resize"))
+            image = self.resize_image(
+                image, resample=resample, resize=kwargs.get("resize")
+            )
             cache_name += "resize"
 
         # ---- image alterations

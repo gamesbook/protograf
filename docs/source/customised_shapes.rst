@@ -371,14 +371,25 @@ Edges Numbering at x and y
 .. _imageIndex:
 
 Image
-~~~~~
+=====
 `↑ <table-of-contents-custom_>`_
+
+An "image" refers to an external file which is simply inserted into the page
+and displayed at the desired location.
 
 Pedantically speaking, an image is not like most other shapes in the sense that
 it does not consist of lines and areas drawn by **protograf** itself.
 
-An "image" refers to an external file which is simply inserted into the page
-at the desired location.
+- `General`_
+- `Image Alignment`_
+- `Image Operations`_
+- `Image Alterations`_
+- `Image Resizing`_
+- `Image Examples`_
+
+General
+-------
+`^ <imageIndex_>`_
 
 The Image shape shares a number of common aspects with other shapes |dash| such
 as its ``x`` & ``y`` "top" and "left" positions, a ``width`` and a ``height``,
@@ -388,8 +399,172 @@ the ability to be rotated, and the addition of text in form of a ``label``,
 If an image has a transparent area, this will be respected and shapes
 drawn previously by the script may then be visible "below" it (see
 examples below). An image can also be "drawn over" by other shapes
-appearing later on in the script.  An image can also have a transparent
-area created for it.
+appearing later on in the script.
+
+Images can be altered or sized in various ways as described in the sections
+below.
+
+
+.. _imageAlignment:
+
+Image Alignment
+---------------
+`^ <imageIndex_>`_
+
+Image alignment is somewhat similar to alignment of Text.
+
+Instead of the shape's ``x`` and ``y`` values defining the top-left position,
+the use of either, or both, *align_horizontal* or *align_vertical* can cause
+the shape to be located in a different relative position.
+
+The *align_horizontal* property can take on values of ``"left"``, ``"centre"``
+or ``"right"``; the *align_vertical* property can take on values of ``"top"``,
+``"middle"`` or ``"bottom"``.
+
+For examples, see `Example 4. Alignment`_
+
+
+.. _imageOperations:.. _
+
+Image Operations
+----------------
+`^ <imageIndex_>`_
+
+It is possible change the way an Image appears by either creating a "cut-out"
+from it, or by blurring the edges.  These changes are termed *operations*.
+
+Each operation is specified by its name, followed by one or more settings,
+in list format (i.e. inside ``[...]`` brackets).
+
+.. IMPORTANT::
+
+    Be aware that numerical values used for the operations are pixel-based
+    values and do *not* correspond to the normal measurement units used
+    elsewhere in **protograf**.
+
+The cut-out operations are:
+
+- *circle* (or ``c``): cut-out a circle; this must be followed by the radius,
+  in pixels, of the circle
+- *ellipse* (or ``e``): cut-out an ellipse; this must be followed by the width
+  and height |dash| inside ``(...)`` brackets |dash| in pixels, of the ellipse
+- *polygon* (or ``p``): cut-out a regular polygon; this must be followed by
+  the radius, in pixels, of the polygon; and an optional number for the number
+  of sides of the polygon |dash| the default is 6 (a hexagon)
+- *rounding* (or ``r``): cut-out a rounded portion of each corner of the image;
+  this must be followed by the radius, in pixels, of the cutout size
+
+By default, the cutout center matches the center of the image; but it is
+possible to shift the center by adding two values for the x- and y-shift,
+in pixels, respectively.  This shift does **not** apply to *rounding*.
+
+The blur operation is:
+
+- *blur* (or ``b``): blur the edges; this must be followed by the radius,
+  in pixels, of the size of the blur
+
+For examples, see `Example 7: Operations`_
+
+It is also possible to just cut-out a one-third "slice" from an image.
+For examples, see `Example 6. Sliced Images`_
+
+
+.. _imageAlterations:
+
+Image Alterations
+-----------------
+`^ <imageIndex_>`_
+
+It is possible to change the way an Image appears by altering its colors or
+appearance in some way. These changes are termed *alterations*.
+
+The following alterations are supported:
+
+* *brightness* - change the brightness of the image by a factor;
+  a factor of ``1`` equates to no change;  values below ``1.0``
+  make it darker it, and values above ``1.0`` make it brighter
+* *sharpness* - change the sharpness of the image by a factor;
+  a factor of ``1`` equates to no change; a value of ``0.0`` makes it
+  completely blurred, and values above ``1.0`` make it sharper
+* *balance* - change the color balance, or saturation, of the image by a
+  factor; a factor of ``1`` equates to no change; a factor of ``0``
+  equates to making the image one that is 'black and white', while a
+  factor of ```2.0`` will double the saturation, making colors more vibrant
+* *sepia* - if set to ``True`` will gives whole image brownish shades
+* *invert* - if set to ``True`` will invert colors across the whole image
+* *transparent* - if set to a color, will turn make all pixels of the
+  color transparent; the algorithm also make "closely matching" shades
+  transparent as well
+
+For examples, see `Example 8: Alterations: Single`_
+
+It is possible to change the way an Image appears by altering its color or
+colors in multiple, combined ways.
+
+If multiple alterations are specified, they are applied in this order:
+
+1. Transparent
+2. Sepia
+3. Invert
+4. Balance
+5. Brightness
+6. Sharpness`
+
+For examples, see `Example 9: Alterations: Multiple`_
+
+
+.. _imageResizing:
+
+Image Resizing
+--------------
+`^ <imageIndex_>`_
+
+It is possible to change the physical size of an Image to be smaller or larger;
+either using specific pixel sizes or via a fittin process.
+
+Resizing is only relevant to raster images, such PNG or JPEG files, as vector-based
+SVG images can be scaled to any size without loss of quality.
+
+The *fit* property can be used to make the image fit into the available *height*
+and *width* set for the Image.  If the value for *fit* is set to ``width`` then
+a copy of the original image will be made with its height scaled accordingly;
+but if the value for *fit* is set to ``height`` then a copy of the original
+image will be made with its width scaled accordingly.
+
+The *resize* property will set a new width and height of the image (in pixels)
+by altering a copy of the original.  For example ``resize=[800, 600]`` will
+generate a new image of 800 pixels wide by 600 pixels high from the original.
+
+Obviously, if the ratio of width:height of the resized image is different
+from the original, then it will appear "stretched" or "compressed" in some
+direction.
+
+For examples, see `Example 10: Resizing`_
+
+Image Resampling Algorithms
++++++++++++++++++++++++++++
+
+You can choose the most appropriate resampling algorithm filter for your
+resizing process by setting the *resample* property.  If none is specified,
+then ``LANCZOS`` will be the default one used.
+
+======== ==================================================== ======================= ========================
+Name     Filter Description                                   Best For                Speed vs. Quality
+======== ==================================================== ======================= ========================
+NEAREST  Picks the nearest pixel without calculating averages Pixel art, sharp masks  Fastest / Lowest quality
+BOX      Groups pixels into blocks and takes the average      Fast downscaling        Very Fast / Low quality
+BILINEAR Interpolates pixels using a 2 × 2 matrix             General quick previews  Fast / Medium quality
+HAMMING  Filters with a Hamming window; sharper than Bilinear Fast downscaling        Fast / Good quality
+BICUBIC  Interpolates pixels using a 4 × 4 matrix             Upscaling photo images  Slow / High quality
+LANCZOS  Uses a high-quality Sinc truncation filter           "Pro" down/upscaling    Slowest / Best quality
+======== ==================================================== ======================= ========================
+
+
+.. _imageExamples:
+
+Image Examples
+--------------
+`^ <imageIndex_>`_
 
 The following examples show how an image display can be controlled, added
 to, or altered, in a variety of ways:
@@ -403,6 +578,7 @@ to, or altered, in a variety of ways:
 - `Example 7: Operations`_ ("cutout" shapes, rounding, and blurred edges)
 - `Example 8: Alterations: Single`_ (change a color in some way)
 - `Example 9: Alterations: Multiple`_ (change colors in multiple ways)
+- `Example 10: Resizing`_ (change the image physical size and/or aspect ratio)
 
 .. HINT::
 
@@ -412,17 +588,11 @@ to, or altered, in a variety of ways:
   your script - see https://pillow.readthedocs.io/en/latest/handbook/index.html
 
 
-.. HINT::
-
-  The bulk of the image manipulations are enabled through the use of PIL;
-  the Python Imaging Library.  It has extensive capabilities, far beyond
-  the simple uses here, and is worth pursuing if you need such operations in
-  your script - see https://pillow.readthedocs.io/en/latest/handbook/index.html
 .. _image-default:
 
 Example 1. Default Image
 ++++++++++++++++++++++++
-`^ <imageIndex_>`_
+`^ <imageExamples_>`_
 
 .. |im1| image:: images/customised/image_default.png
    :width: 330
@@ -466,7 +636,7 @@ Example 1. Default Image
 
 Example 2. Rotation & Scaling
 +++++++++++++++++++++++++++++
-`^ <imageIndex_>`_
+`^ <imageExamples_>`_
 
 .. NOTE::
 
@@ -540,7 +710,7 @@ Example 2. Rotation & Scaling
 
 Example 3. Auto Frame
 +++++++++++++++++++++
-`^ <imageIndex_>`_
+`^ <imageExamples_>`_
 
 Normally the frame |dash| or size of the Image occupied on the page |dash| is
 done by setting **both** its ``height`` and ``width`` properties.
@@ -552,27 +722,40 @@ based on the relative dimensions of the image itself.
 If both ``height`` and ``width`` are set, then ``auto_frame`` will not be
 used.
 
-.. |im8| image:: images/customised/image_auto_frame.png
+.. |im3| image:: images/customised/image_auto_frame.png
    :width: 330
 
 ===== ======
-|im8| This example shows the Image constructed using the command with the
+|im3| This example shows the Image constructed using the command with the
       following properties:
 
       .. code:: python
 
         img_file = "fantasy-forest-with-old-bridges-crop.jpg"
+        rred = Common(
+          width=2, height=3,
+          stroke="tomato",
+          fill=None,
+          stroke_width=2,
+          label_size=12)
+
         Image(
           img_file,
           x=0, y=0,
-          width=1.5, auto_frame=True)
-        Rectangle(x=0, y=0, label="W", common=rred)
+          width=1.5,
+          auto_frame=True)
+        Rectangle(
+          x=0, y=0, label="W",
+          common=rred)
 
         Image(
           img_file,
           x=2, y=3,
-          height=2, auto_frame=True)
-        Rectangle(x=2, y=3, label="H", common=rred)
+          height=2,
+          auto_frame=True)
+        Rectangle(
+          x=2, y=3, label="H",
+          common=rred)
 
       In the top-left example, the *width* has been set for the Image, and
       then the height is automatically calculated; in this case because the
@@ -591,23 +774,14 @@ used.
 
 Example 4. Alignment
 ++++++++++++++++++++
-`^ <imageIndex_>`_
+`^ <imageExamples_>`_
 
-Image alignment is somewhat similar to alignment of Text.
 
-Instead of the shape's ``x`` and ``y`` values defining the top-left position,
-the use of either, or both, *align_horizontal* or *align_vertical* can cause
-the shape to be located in a different relative position.
-
-The *align_horizontal* property can take on values of ``"left"``, ``"centre"``
-or ``"right"``; the *align_vertical* property can take on values of ``"top"``,
-``"middle"`` or ``"bottom"``. These are illustrated in the exampe below.
-
-.. |ia1| image:: images/customised/image_align.png
+.. |im4| image:: images/customised/image_align.png
    :width: 330
 
 ===== ======
-|ia1| This example shows the Image constructed using the command with the
+|im4| This example shows the Image constructed using the command with the
       properties shown.
 
       Note the use of the :ref:`Common command <the-common-command>`
@@ -670,13 +844,13 @@ or ``"right"``; the *align_vertical* property can take on values of ``"top"``,
 
 Example 5. Captions and Markings
 ++++++++++++++++++++++++++++++++
-`^ <imageIndex_>`_
+`^ <imageExamples_>`_
 
-.. |im3| image:: images/customised/image_label.png
+.. |im5| image:: images/customised/image_label.png
    :width: 330
 
 ===== ======
-|im3| This example shows shapes constructed using their command with the
+|im5| This example shows shapes constructed using their command with the
       following properties:
 
       .. code:: python
@@ -715,13 +889,13 @@ Example 5. Captions and Markings
 
 Example 6. Sliced Images
 ++++++++++++++++++++++++
-`^ <imageIndex_>`_
+`^ <imageExamples_>`_
 
-.. |im4| image:: images/customised/image_sliced.png
+.. |im6| image:: images/customised/image_sliced.png
    :width: 330
 
 ===== ======
-|im4| This example shows the Image constructed using the command with the
+|im6| This example shows the Image constructed using the command with the
       following properties:
 
       .. code:: python
@@ -759,47 +933,13 @@ Example 6. Sliced Images
 
 Example 7: Operations
 +++++++++++++++++++++
-`^ <imageIndex_>`_
+`^ <imageExamples_>`_
 
-It is possible change the way an Image appears by either creating a "cut-out"
-from it, or by blurring the edges.  These changes are termed *operations*.
-
-Each operation is specified by its name, followed by one or more settings,
-in list format (i.e. inside ``[...]`` brackets).
-
-.. IMPORTANT::
-
-    Be aware that numerical values used for the operations are pixel-based
-    values and do *not* correspond to the normal measurement units used
-    elsewhere in **protograf**.
-
-The cut-out operations are:
-
-- *circle* (or ``c``): cut-out a circle; this must be followed by the radius,
-  in pixels, of the circle
-- *ellipse* (or ``e``): cut-out an ellipse; this must be followed by the width
-  and height |dash| inside ``(...)`` brackets |dash| in pixels, of the ellipse
-- *polygon* (or ``p``): cut-out a regular polygon; this must be followed by
-  the radius, in pixels, of the polygon; and an optional number for the number
-  of sides of the polygon |dash| the default is 6 (a hexagon)
-- *rounding* (or ``r``): cut-out a rounded portion of each corner of the image;
-  this must be followed by the radius, in pixels, of the cutout size
-
-By default, the cutout center matches the center of the image; but it is
-possible to shift the center by adding two values for the x- and y-shift,
-in pixels, respectively.  This shift does **not** apply to *rounding*.
-
-The blur operation is:
-
-- *blur* (or ``b``): blur the edges; this must be followed by the radius,
-  in pixels, of the size of the blur
-
-
-.. |im5| image:: images/customised/image_operations.png
+.. |im7| image:: images/customised/image_operations.png
    :width: 330
 
 ===== ======
-|im5| This example shows the Image constructed using the command with the
+|im7| This example shows the Image constructed using the command with the
       following properties:
 
       .. code:: python
@@ -851,28 +991,7 @@ The blur operation is:
 
 Example 8: Alterations: Single
 ++++++++++++++++++++++++++++++
-`^ <imageIndex_>`_
-
-It is possible to change the way an Image appears by altering its colors or
-appearance in some way. These changes are termed *alterations*.
-
-The following alterations are supported:
-
-* *brightness* - change the brightness of the image by a factor;
-  a factor of ``1`` equates to no change;  values below ``1.0``
-  make it darker it, and values above ``1.0`` make it brighter
-* *sharpness* - change the sharpness of the image by a factor;
-  a factor of ``1`` equates to no change; a value of ``0.0`` makes it
-  completely blurred, and values above ``1.0`` make it sharper
-* *balance* - change the color balance, or saturation, of the image by a
-  factor; a factor of ``1`` equates to no change; a factor of ``0``
-  equates to making the image one that is 'black and white', while a
-  factor of ```2.0`` will double the saturation, making colors more vibrant
-* *sepia* - if set to ``True`` will gives whole image brownish shades
-* *invert* - if set to ``True`` will invert colors across the whole image
-* *transparent* - if set to a color, will turn make all pixels of the
-  color transparent; the algorithm also make "closely matching" shades
-  transparent as well
+`^ <imageExamples_>`_
 
 .. |im8| image:: images/customised/image_alterations.png
    :width: 330
@@ -946,21 +1065,8 @@ The following alterations are supported:
 
 Example 9: Alterations: Multiple
 ++++++++++++++++++++++++++++++++
-`^ <imageIndex_>`_
+`^ <imageExamples_>`_
 
-It is possible to change the way an Image appears by altering its color or
-colors in multiple, combined ways. Each of these changes is termed an
-*alteration* and these are described in `Example 8: Alterations: Single`_
-above.
-
-If multiple alterations are specified, they are applied in this order:
-
-1. Transparent
-2. Sepia
-3. Invert
-4. Balance
-5. Brightness
-6. Sharpness
 
 .. |im9| image:: images/customised/image_alterations_multi.png
    :width: 330
@@ -1012,34 +1118,74 @@ If multiple alterations are specified, they are applied in this order:
 
 Example 10: Resizing
 ++++++++++++++++++++
-`^ <imageIndex_>`_
+`^ <imageExamples_>`_
 
-It is possible to change the physical size of an Image to be smaller or larger;
-either using specific pixel sizes or via a fit.
+.. |im0| image:: images/customised/image_resize.png
+   :width: 330
 
-Resizing is only relevant to raster images, such PNG or JPEG files, as vector-based
-SVG images can be scaled to any size without loss of quality.
+===== ======
+|im0| This example shows the Image constructed using the command with the
+      following properties:
 
-Obviously, if the ratio of width:height of the resized image is different
-from the original, then it will appear "stretched" or "compressed" in some
-direction.
+      .. code:: python
 
-Image Resizing Algorithms
+        Image(
+          "fantasy-forest-with-old-bridges.png",
+          common=allim,
+          label="Original",
+          width=2, height=2,
+          x=0, y=0)
 
-You can choose the most appropriate resizing algorithm filter for your
-application by setting the *resize_filter*.  If none is specified then
-``LANCZOS`` will be the default used.
+        Image(
+          "fantasy-forest-with-old-bridges.png",
+          common=allim,
+          label="Change Height",
+          width=2, height=1,
+          x=2, y=0)
+        Image(
+          "fantasy-forest-with-old-bridges.png",
+          common=allim,
+          label="Change Width",
+          width=1, height=2,
+          x=3, y=1)
 
-======== ==================================================== ======================= ========================
-Name     Filter Description                                   Best For                Speed vs. Quality
-======== ==================================================== ======================= ========================
-NEAREST  Picks the nearest pixel without calculating averages Pixel art, sharp masks  Fastest / Lowest quality
-BOX      Groups pixels into blocks and takes the average      Fast downscaling        Very Fast / Low quality
-BILINEAR Interpolates pixels using a 2 × 2 matrix             General quick previews  Fast / Medium quality
-HAMMING  Filters with a Hamming window; sharper than Bilinear Fast downscaling        Fast / Good quality
-BICUBIC  Interpolates pixels using a 4 × 4 matrix             Upscaling photo images  Slow / High quality
-LANCZOS  Uses a high-quality Sinc truncation filter           "Pro" down/upscaling    Slowest / Best quality
-======== ==================================================== ======================= ========================
+        Image(
+          "fantasy-forest-with-old-bridges.png",
+          common=allim,
+          label="Fit: Width",
+          width=2, height=3,
+          fit="width",
+          x=0, y=2)
+        Image(
+          "fantasy-forest-with-old-bridges.png",
+          common=allim,
+          label="Fit: Height",
+          width=4, height=1,
+          fit="height",
+          x=0, y=5)
+
+        Image(
+          "fantasy-forest-with-old-bridges.png",
+          common=allim,
+          label="Resize W&H",
+          width=1.5, height=1.25,
+          resize=[363*1.5, 363*1.25],
+          x=2.5, y=3)
+
+      Note that the original image is shown at the top-left.
+
+      The middle-left and bottom-left images shows the effect of setting the
+      *fit* property; either keeping the underlying image's pixel width fixed
+      and scaling the pixel height to match the ``Image`` command's *height*
+      property; or keeping the underlying image's pixel height fixed
+      and scaling the pixel width to match the ``Image`` command's *width*.
+
+      The middle-right shows the effect of manually resizing the image; in this
+      case each of the width and height of underlying image's pixel size are
+      changed to match the ratio of the ``Image`` command's *width* to *height*.
+
+===== ======
+
 
 .. _lineIndex:
 
