@@ -32,9 +32,10 @@ Prototyping Tools
 
 .. HINT::
 
-    Please also refer to the tool guides for
-    :ref:`hexagonal grid resources <other-hexagonal-resources>`
-    as well as :ref:`playing cards resources <other-card-resources>`.
+    Please also refer to the tool lists/guides for
+    :ref:`hexagonal grid resources <other-hexagonal-resources>`,
+    :ref:`playing cards resources <other-card-resources>`,
+    as well as :ref:`card/deck box resources <cardbox-resources>`.
 
 
 Icons, Art and Images

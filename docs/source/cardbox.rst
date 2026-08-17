@@ -297,6 +297,8 @@ Example 3: CardBox Shapes
 ===== ======
 
 
+.. _cardbox-resources:
+
 Useful Resources
 ================
 `↑ <table-of-contents-cardbox_>`_
