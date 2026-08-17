@@ -14,7 +14,8 @@ protograf Changes
 - Enable PDF compression via Brotli
 - Enable "wrap" of image for CardBox
 - Add more external resources
-- [PLANNED-2] BoxCover
+- Add Mancala board example
+- Enable PDF of the docs to be generated
 
 2026-08-10 (0.5.6)
 ------------------

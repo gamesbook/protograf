@@ -21,6 +21,7 @@ will demonstrate full scalability.
 - `Hex`_
 - `HexHex Games`_
 - `Morabaraba`_
+- `Mancala`_
 - `Octagons`_
 - `Snex`_
 - `TicTacToe`_
@@ -215,6 +216,39 @@ Discussion  This example shows how to construct a HexHex board, but with
 Screenshot  .. image:: images/boards/abstract/hexhex_hexagons.png
                :width: 66%
 =========== ==================================================================
+
+
+.. _abstractGameMancala:
+
+Mancala
+=======
+`↑ <table-of-contents-exabs_>`_
+
+=========== ==================================================================
+Title       *Mancala Board*
+----------- ------------------------------------------------------------------
+Script      `mancala.py <https://github.com/gamesbook/protograf/blob/master/examples/boards/abstract/mancala.py>`_
+----------- ------------------------------------------------------------------
+Discussion  This example shows how to construct a Mancala board.
+
+            The board is itself is a simple Rectangle, with the *prows*
+            property being set to create the rounded edges at the east and
+            west ends of the board.
+
+            The top and bottow row of small circles |dash| representing the
+            "pits" on the board |dash| are generated with the Repeat command.
+
+            The large circles, or *Kahalas*, are simple Circles.
+
+            Of interest is the use of the *geo* property to do the layout;
+            all pit locations are defined relative to the top-left corner of
+            the Rectangle used for the board.
+
+----------- ------------------------------------------------------------------
+Screenshot  .. image:: images/boards/abstract/mancala.png
+               :width: 66%
+=========== ==================================================================
+
 
 .. _abstractGameMorabaraba:
 

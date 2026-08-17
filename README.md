@@ -112,6 +112,9 @@ This section highlights a few of the more recent features added.
 The full feature list is available in the
 [documentation](https://protograf.readthedocs.io/).
 
+* [x] RaceTrack
+* [x] Image alteration operations
+* [x] New abstract board example: Mancala
 * [x] New shapes: Band (aka "Annular Sector")
 * [x] CardBox: create foldable boxes for decks of cards
 * [x] Common gaming objects: Cube, Domino, Die and Pentomino(es)
@@ -133,16 +136,16 @@ they just represent current / potential areas of work or ideas.
 
 * [ ] Common objects:
     * [ ] Meeple (Polyshape with curves)
-* [ ] RaceTrack
-* [ ] Image alteration operations
 * [ ] Cards:
     * [ ] icon alignment
+* [ ] Others:
+    * [ ] snail-drawn Greek Key
 
 ## :jigsaw: Potential Examples
 
 These are possible examples to show board creation based on existing games:
 
-* [x] Wargame board: show full terrain features (vector and bitmap)
+* [x] Wargame board: show full --terrain features (vector and bitmap)
 * [x] WarpWar board: show a fully-styled example
 * [ ] Traveller board: show a fully-styled Star System
 * [ ] 18xx board: show a basic map with tracks, towns, cities and off-map areas
