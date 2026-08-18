@@ -16,6 +16,7 @@ protograf Changes
 - Add more external resources
 - Add Mancala board example
 - Enable PDF of the docs to be generated
+- Patch error with label location for Band
 
 2026-08-10 (0.5.6)
 ------------------

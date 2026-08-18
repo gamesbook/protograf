@@ -1139,22 +1139,28 @@ class BandShape(BaseShape):
         txt_angle_start = 90.0 - self.angle_width / 2.0  # band drawn either side of 90
         txt_inn_start, txt_bez_inn_2, txt_bez_inn_3, txt_inn_end = (
             geoms.bezier_arc_points(
-                txt_angle_start, self.angle_width, self._u.radius, pt_c, pt_c.y
+                txt_angle_start,
+                self.angle_width,
+                self._u.radius - self._u.height,
+                pt_c,
+                pt_c.y,
             )
         )
         txt_out_mid_pt = geoms.point_on_circle(
             pt_c,
-            self._u.radius + self._u.height,
+            self._u.radius,
             txt_angle_start + self.angle_width / 2.0,
         )
         txt_pt_mid = geoms.point_on_circle(
             pt_c,
-            self._u.radius + self._u.height / 2.0,
+            self._u.radius - self._u.height / 2.0,
             txt_angle_start + self.angle_width / 2.0,
         )
         inn_mid_chord = geoms.fraction_along_line(txt_inn_start, txt_inn_end, 0.5)
+        rotation = self.angle_start + self.angle_width / 2.0 - 90.0
         kwargs["rotation_point"] = pt_c
-        kwargs["rotation"] = self.angle_start + self.angle_width / 2.0 - 90.0
+        kwargs["rotation"] = rotation
+        # print(f"*** BAND {self.label=} {pt_c=} {self._u.height=} {rotation=}")
         self.draw_heading(cnv, ID, txt_out_mid_pt.x, txt_out_mid_pt.y, **kwargs)
         self.draw_label(cnv, ID, txt_pt_mid.x, txt_pt_mid.y, **kwargs)
         self.draw_title(cnv, ID, inn_mid_chord.x, inn_mid_chord.y, **kwargs)
