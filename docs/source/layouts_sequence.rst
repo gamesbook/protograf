@@ -97,15 +97,17 @@ Example 1. Sequence Numbers
 
 ===== ======
 |sv1| This example shows how the ``Text()`` shape is used to display the
-      values in the sequence; the values are automatically assigned to its
-      **text** property.
+      values in the sequence.
+
+      The ``{{sequence}}`` keyword is replaced by the **actual** value of
+      the sequence number calculated for the item when the script is run.
 
       This example with **normal integer numbers** is created by:
 
       .. code:: python
 
           Sequence(
-              text(x=1, y=3),
+              text(text="{{sequence}}", x=1, y=3),
               setting=(10, 0, -2, 'number'),
               interval_x=0.5,
           )
@@ -133,15 +135,17 @@ Example 2. Sequence Lowercase
 
 ===== ======
 |sv2| This example shows how the ``Text()`` shape is used to display the
-      values in the sequence; the values are automatically assigned to its
-      **text** property.
+      values in the sequence.
+
+      The ``{{sequence}}`` keyword is replaced by the **actual** value of
+      the sequence number calculated for the item when the script is run.
 
       This example with **lowercase letters** is created by:
 
       .. code:: python
 
           Sequence(
-              text(x=1, y=2.5),
+              text(text="{{sequence}}", x=1, y=2.5),
               setting=('h', 'b', -2, 'letter'),
               interval_y=0.5,
               interval_x=0.5,
@@ -172,15 +176,17 @@ Example 3. Sequence Uppercase
 
 ===== ======
 |sv3| This example shows how the ``Text()`` shape is used to display the
-      values in the sequence; the values are automatically assigned to its
-      **text** property.
+      values in the sequence.
+
+      The ``{{sequence}}`` keyword is replaced by the **actual** value of
+      the sequence number calculated for the item when the script is run.
 
       This example with **uppercase letters** is created by:
 
       .. code:: python
 
           Sequence(
-              text(x=1, y=4),
+              text(text="{{sequence}}", x=1, y=4),
               setting=('B', 'J', 2, 'letter'),
               interval_y=-0.5,
               interval_x=0.5,
@@ -204,15 +210,17 @@ Example 4. Sequence Roman
 
 ===== ======
 |sv4| This example shows how the ``Text()`` shape is used to display the
-      values in the sequence; the values are automatically assigned to its
-      **text** property.
+      values in the sequence.
+
+      The ``{{sequence}}`` keyword is replaced by the **actual** value of
+      the sequence number calculated for the item when the script is run.
 
       This example with **Roman numerals** is created by:
 
       .. code:: python
 
           Sequence(
-              text(x=0.5, y=3),
+              text(text="{{sequence}}", x=0.5, y=3),
               setting=(5, 11, 1, 'roman'),
               interval_x=0.5,
           )
@@ -233,15 +241,17 @@ Example 5. Sequence Excel
 
 ===== ======
 |sv5| This example shows how the ``Text()`` shape is used to display the
-      values in the sequence; the values are automatically assigned to its
-      **text** property.
+      values in the sequence.
+
+      The ``{{sequence}}`` keyword is replaced by the **actual** value of
+      the sequence number calculated for the item when the script is run.
 
       This example with **Excel columns** is created by:
 
       .. code:: python
 
           Sequence(
-              text(x=0.5, y=3),
+              text(text="{{sequence}}", x=0.5, y=3),
               setting=(27, 52, 5, 'excel'),
               interval_x=0.5,
           )
@@ -269,10 +279,10 @@ Example 6. Sequence Shapes - Label
 
 ===== ======
 |sq1| In this example, values in the sequence are being assigned
-      to a text-based property using the special ``{{sequence}}`` keyword.
+      to a text-based property.
 
-      The keyword is replaced by the **actual** value of the sequence number
-      for the item.
+      The ``{{sequence}}`` keyword is replaced by the **actual** value of
+      the sequence number calculated for the item when the script is run.
 
       This example with **rectangles** is created by:
 
@@ -304,10 +314,10 @@ Example 7. Sequence Shapes - Multiple
 
 ===== ======
 |sq2| In this example, values in the sequence are being assigned
-      to a text-based property using the special ``{{sequence}}`` keyword.
+      to a text-based property.
 
-      The keyword is replaced by the **actual** value of the sequence number
-      for the item.
+      The ``{{sequence}}`` keyword is replaced by the **actual** value of
+      the sequence number calculated for the item when the script is run.
 
       This example with **hexagons** and **circles** is
       created by:
@@ -355,10 +365,10 @@ Example 8. Sequence Shapes - Setting #1
 
 ===== ======
 |sq3| In this example, values in the sequence are being assigned
-      to a text-based property using the special ``{{sequence}}`` keyword.
+      to a text-based property.
 
-      The keyword is replaced by the **actual** value of the sequence number
-      for the item.
+      The ``{{sequence}}`` keyword is replaced by the **actual** value of
+      the sequence number calculated for the item when the script is run.
 
       This example with **circles** is created by:
 
@@ -398,10 +408,10 @@ Example 9. Sequence Shapes - Setting #2
 
 ===== ======
 |sq4| In this example, values in the sequence are being assigned
-      to a text-based property using the special ``{{sequence}}`` keyword.
+      to a text-based property.
 
-      The keyword is replaced by the **actual** value of the sequence number
-      for the item.
+      The ``{{sequence}}`` keyword is replaced by the **actual** value of
+      the sequence number calculated for the item when the script is run.
 
       This example with **squares** is created by:
 
@@ -434,10 +444,10 @@ Example 10. Sequence Shapes - Intervals
 
 ===== ======
 |sq5| In this example, values in the sequence are being assigned
-      to a text-based property using the special ``{{sequence}}`` keyword.
+      to a text-based property.
 
-      The keyword is replaced by the **actual** value of the sequence number
-      for the item.
+      The ``{{sequence}}`` keyword is replaced by the **actual** value of
+      the sequence number calculated for the item when the script is run.
 
       This example with **polygons** is created by:
 
