@@ -18,7 +18,7 @@ def feedback(item, stop=False, warn=False, alert=False):
     """Placeholder for more complete feedback."""
     console = Console()
     if hasattr(globals, "pargs") and globals.pargs:
-        no_warning = globals.pargs.nowarning
+        no_warning = globals.pargs.warning
     else:
         no_warning = False
     if warn and not no_warning:

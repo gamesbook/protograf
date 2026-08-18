@@ -55,7 +55,7 @@ __powers = (1, 26, 676)
 
 
 def script_path() -> str | Path:
-    """Get the path for a script being called from command line.
+    """Get the path for a script being called from command-line.
 
     Doc Test:
 

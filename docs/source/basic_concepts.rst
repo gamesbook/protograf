@@ -284,11 +284,11 @@ applies throughout a specific script (see this
 `cautionary story <https://www.simscale.com/blog/nasa-mars-climate-orbiter-metric/>`_
 on why not to mix units!)
 
-In the USA, people tend to use the so-called Imperial System. In
-**protograf** this means that distances might be measured in units of
-*inches*. Inches are often shown with a double-quotes symbol (``"``)
-in documents; in **protograf** inches are often referred to using the
-abbreviation *in*.
+In the USA, and a few other countries, the so-called "Imperial System"
+is still in use. In **protograf** this means that distances might be
+measured in units of *inches*. Inches are often shown with a double-quotes
+symbol (``"``) in documents; in **protograf** inches are referred to using
+the abbreviation *in*.
 
 In almost all of the rest of the world, the Metric System is in use. In
 **protograf** this means that distances will be measured in units of
@@ -302,6 +302,9 @@ The :ref:`default <default-concept>` **units** in **protograf**  are *cm*.
    For conversion purposes, 1 inch equals 2.54 centimetres or 25.4
    millimetres.
 
+Points Units
+------------
+
 **protograf** also allows units of *points*, which are the measurement
 units traditionally used in the printing industry. There are 72 points
 in 1 inch. Internal calculations in **protograf** are all done in
@@ -312,8 +315,16 @@ millimetres |dash| or anything else |dash| are converted to points.
 
    In a few cases, **protograf** adopts the word "size" or "width" where
    point units are in use e.g. font size, stroke width and dot width, but
-   because "size" is such a general term, it's not really used elsewhere.
+   because "size" is too general a term, it's not really used elsewhere.
 
+Pixel Units
+-----------
+
+Some graphic tools or programs work primarily in "pixels"; a pixel being
+a single dot |dash| typically with color and display properties |dash| in
+a raster images such as a JPEG, GIF or PNG. **protograf** only use pixels
+in a few cases where it is working directly with an
+:ref:`Image <image-command>` to do cut-outs or resizing.
 
 .. _stroke-concept:
 

@@ -1844,7 +1844,7 @@ def Create(**kwargs):
     # use: --no-warning to ignore WARNING:: messages
     parser.add_argument(
         "-w",
-        "--nowarning",
+        "--warning",
         help="Do NOT show any WARNING:: messages (default is False)",
         default=False,
         action=argparse.BooleanOptionalAction,

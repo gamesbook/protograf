@@ -80,7 +80,7 @@ python counters/counters.py --no-png -d /tmp/demo
 python counters/counters_excel.py --no-png -d /tmp/demo
 python counters/counters_doagc.py --no-png -d /tmp/demo
 python counters/counters_csv.py --no-png -d /tmp/demo
-python counters/blocks_csv.py --no-png -d /tmp/demo
+python counters/blocks_csv.py --no-png -d /tmp/demo -w
 # ---- cards
 echo -e "\nCreating cards..."
 python cards/cards_design.py --no-png -d /tmp/demo

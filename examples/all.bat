@@ -92,7 +92,7 @@ python counters\counters.py --no-png -d %location%
 python counters\counters_excel.py --no-png -d %location%
 python counters\counters_csv.py --no-png -d %location%
 python counters\counters_doagc.py --no-png -d %location%
-python counters\blocks_csv.py --no-png -d %location%
+python counters\blocks_csv.py --no-warning --no-png -d %location%
 
 REM ---- cards
 ECHO "Creating cards..."

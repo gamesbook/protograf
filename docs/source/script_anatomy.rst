@@ -30,7 +30,7 @@ an extension of ``.py``
 - `Basic Shapes`_
 - `Card Decks`_
 - `Layouts, Sequences, Tracks and Grids`_
-- `The FEEDBACK Message`_
+- `FEEDBACK and WARNING Messages`_
 - `Making Mistakes`_
 
 
@@ -492,16 +492,17 @@ for adding shapes to them.
 
 .. _feedback-message:
 
-The FEEDBACK Message
-====================
+FEEDBACK and WARNING Messages
+=============================
 `↑ <table-of-contents-anat_>`_
 
 Normally, a script will run without you seeing anything. However, there are
-some occasions when you will see feedback or warning message of some kind.
+some occasions when you will see a feedback or warning message of some kind.
 
 1. **An error happens** - this is described further in the section on
    `making mistakes`_
-2. **Generating Images from Save()** - this will show a message like::
+2. **Generating images created during Save()** - this will show a message
+   like::
 
         FEEDBACK:: Saving page(s) from "/tmp/test.pdf" as PNG image file(s)...
 3. **Accessing BGG** - you can enable progress when using the
@@ -526,6 +527,34 @@ some occasions when you will see feedback or warning message of some kind.
 
    This is not an error, but does act as a reminder about what might still
    be needed.
+5. **An empty shapes list** -  this is just a warning issued because the
+   ``Track()`` has no shapes allocated for it to draw |dash| you will see
+   a message like::
+
+       WARNING:: Track needs at least one Shape assigned to shapes list
+
+  This is not an error, but does act as a reminder about what might still
+  be needed.
+6. **Missing part of template data** - these warnings can be issued when
+   part of the data for a card's  :ref:`Template <the-template-command>` is
+   missing or blank; for example, some cards may have images and some not, and
+   so supplying a path as part of the ``T()`` command will result in warnings
+   like this::
+
+       WARNING:: The image "images/" is a directory
+       WARNING:: Unable to load image "images/" - please check this is a valid filename
+       WARNING:: The Image's filename was not supplied or could not be determined.
+
+.. HINT::
+
+   It is possible to disable or suppress the warnings issued, by using a "flag"
+   that is added onto the line when running a script, for example::
+
+       python mycards.py --warning
+
+   or, for short::
+
+       python mycards.py -w
 
 
 Making Mistakes
@@ -533,7 +562,7 @@ Making Mistakes
 `↑ <table-of-contents-anat_>`_
 
 It is, unfortunately, all too easy to make mistakes while writing scripts.
-Some common types of mistakes are listed below |dash| these are in no way
+Some common types of mistakes are described below |dash| these are in no way
 meant to be comprehensive!
 
 Supplying the script an **incorrect value**, for example, giving the
@@ -562,7 +591,7 @@ Supplying the script with a **duplicate property**, for example:
 .. code:: python
 
    display = hexagon(stroke="black", fill="white", height=2, stroke=2)
-                                                             ^^^^^^^^
+                                                            ^^^^^^^^
    SyntaxError: keyword argument repeated: stroke
 
 This kind of mistake is usually easier to see as both keywords, in this

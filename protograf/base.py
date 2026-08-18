@@ -2446,8 +2446,10 @@ class BaseShape:
             if not image_local:
                 feedback(
                     "The Image's filename was not supplied or could not be determined.",
+                    False,
                     True,
                 )
+                return  # do NOT fail here as it breaks use of Images in cards/counters
             image_doc = None
             # ---- alter image
             if self.operation:

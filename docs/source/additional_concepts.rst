@@ -380,8 +380,8 @@ Reusable Script
 
 It could be that you need to share snippets of code, or functions, between
 different scripts.  In this case, these can be added to a common script
-and then **imported** (in a similar way to how  **protograf** itself is
-imported) for use.
+and then **imported** |dash| in a similar way to how  **protograf** itself
+is imported |dash| for use or reuse.
 
 For example, in a script called ``mystuff.py`` you could have:
 
@@ -389,12 +389,15 @@ For example, in a script called ``mystuff.py`` you could have:
 
    groceries = ['apples', 'oranges', 'bananas', 'plums']
 
-And then in another script, in the same directory, you could use this:
+And then in another script, in the same directory, you could add, at the top
+of the script:
 
 .. code:: python
 
    from mystuff import groceries
 
+Now the value, or values, associated with ``groceries`` are available in this
+other script.
 
 .. _script-errors:
 
@@ -473,7 +476,7 @@ Another example:
 .. code:: python
 
    Rectangle(height=1.5, stroke="green", fill=bred)
-                                              ^^^^
+                                             ^^^^
    NameError: name 'bred' is not defined
 
 In this case, the script uses the name of something - ``bred`` - which

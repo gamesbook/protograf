@@ -79,7 +79,7 @@ python counters/counters.py
 python counters/counters_excel.py
 python counters/counters_csv.py
 python counters/counters_doagc.py
-python counters/blocks_csv.py
+python counters/blocks_csv.py -w
 # ---- cards
 echo -e "\nCreating cards..."
 python cards/cards_design.py
