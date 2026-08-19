@@ -1310,16 +1310,18 @@ class CardBoxObject(BaseShape):
         self.shapes_right = kwargs.get("shapes_right", None)
         self.shapes_top = kwargs.get("shapes_top", None)
         self.shapes_bottom = kwargs.get("shapes_bottom", None)
+        self.shapes_wrap = kwargs.get("shapes_wrap", None)  # front,left,right,back
         # ---- vertices for panels
         # topleft, topright, bottomright, bottomleft
         self.panel_front = []
         self.panel_back = []
         self.panel_left = []
         self.panel_right = []
+        self.panel_wrap = []
         # need placeholders because drawing order does not match
         self.panel_top = [None, None, None, None]
         self.panel_bottom = [None, None, None, None]
-        # ---- set vertices for point-based draw
+        # ---- set vertices and panel_* for point-based draw
         self.vertexes = self._shape_vertexes
 
     @property
@@ -1341,7 +1343,7 @@ class CardBoxObject(BaseShape):
 
     @property  # must be able to change e.g. for layout
     def _shape_vertexes(self):
-        """Vertices of CardBoxObject in points."""
+        """Vertices and Panels of CardBoxObject in points."""
 
         def next(ax, ay):
             vertices.append(Point(ax, ay))
@@ -1363,7 +1365,7 @@ class CardBoxObject(BaseShape):
         flap = self._flap_inner if self._flap_inner is not None else 0.25 * w_p
         flap_tuck = self._flap_tuck if self._flap_tuck is not None else 0.15 * w_p
         if flap_tuck * 2.0 > w_p:
-            feedback("Flap size cannot be greater than half of the box width", True)
+            feedback("Flap size cannot be greater than half of the box width.", True)
         self._flap_size = flap_tuck
         flap_glue = self._flap_glue if self._flap_glue is not None else 0.66 * d_p
         # print(f'*** size: {h_p=} {w_p=} {d_p=} {flap=} {flap_tuck=} {flap_glue=}')
@@ -1437,6 +1439,15 @@ class CardBoxObject(BaseShape):
         # ... START
         px, py = next(sx, sy)  # 0
 
+        # wrap
+        # topleft, topright, bottomright, bottomleft
+        self.panel_wrap = [
+            self.panel_front[0],
+            self.panel_left[1],
+            self.panel_left[2],
+            self.panel_front[3],
+        ]
+
         return vertices
 
     def draw_item(self, item, area):
@@ -1506,6 +1517,8 @@ class CardBoxObject(BaseShape):
             cnv.draw_line(self.panel_bottom[2], self.panel_bottom[3])
             self.set_canvas_props(cnv=cnv, index=ID, **pargs)
 
+        # ---- draw wrap-around shape/image
+        self.draw_item(self.shapes_wrap, self.panel_wrap)
         # ---- draw front shape/image
         self.draw_item(self.shapes_front, self.panel_front)
         # ---- draw back shape/image

@@ -30,7 +30,7 @@ an extension of ``.py``
 - `Basic Shapes`_
 - `Card Decks`_
 - `Layouts, Sequences, Tracks and Grids`_
-- `The FEEDBACK Message`_
+- `FEEDBACK and WARNING Messages`_
 - `Making Mistakes`_
 
 
@@ -197,11 +197,11 @@ To customise the command, set its properties as follows:
     of the SVG files are derived using the PDF filename, with a ``-`` followed
     by the page number;
   - ``gif`` - to create a GIF file composed of all the PNG pages (these will be
-    removed after the file been created)
+    removed after the file been created) - see also the **framerate** property
 - **directory** - sets the location where the output will be created; the
   default is the directory on which the script is being run
-- **dpi** - can be set to the dots-per-inch resolution required; by default
-  this is ``300``
+- **dpi** - can be set to the dots-per-inch resolution required in raster format
+  files; by default this is ``300``
 - **names** - this can be used to provide a list of names |dash| without an
   extension |dash| for the **output** files that will be created from the PDF;
   the first name corresponds to the first page, the second name to the second
@@ -212,6 +212,10 @@ To customise the command, set its properties as follows:
   exported as PNG files; the names of the files are based on the PDF
   filename, with a dash (-) followed by the page number, and ``.png`` file
   extension
+- **compression** - when set to a value between 1 to 100, will result in that
+  effort of document compression (using the Brotli algorithm); note however
+  that the actual size of the document may not change by very much at all,
+  depending on its contents
 - **framerate** - the delay in seconds between each "page" of a GIF image; by
   default this is ``1`` second
 - **stop** - when set to ``True`` will cause the script to stop at that point,
@@ -253,7 +257,8 @@ image:
 
 In this example, an animated GIF image will be created, assembled out of the
 PNG images; one per page of the PDF.  The *framerate* setting of ``0.5`` means
-there will be a delay of a half second between the display of each image.
+there will be a delay of a half second between the display of each image in the
+GIF.
 
 Example 3. Save Card Gallery
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -487,16 +492,17 @@ for adding shapes to them.
 
 .. _feedback-message:
 
-The FEEDBACK Message
-====================
+FEEDBACK and WARNING Messages
+=============================
 `↑ <table-of-contents-anat_>`_
 
 Normally, a script will run without you seeing anything. However, there are
-some occasions when you will see feedback or warning message of some kind.
+some occasions when you will see a feedback or warning message of some kind.
 
 1. **An error happens** - this is described further in the section on
    `making mistakes`_
-2. **Generating Images from Save()** - this will show a message like::
+2. **Generating images created during Save()** - this will show a message
+   like::
 
         FEEDBACK:: Saving page(s) from "/tmp/test.pdf" as PNG image file(s)...
 3. **Accessing BGG** - you can enable progress when using the
@@ -521,6 +527,34 @@ some occasions when you will see feedback or warning message of some kind.
 
    This is not an error, but does act as a reminder about what might still
    be needed.
+5. **An empty shapes list** -  this is just a warning issued because the
+   ``Track()`` has no shapes allocated for it to draw |dash| you will see
+   a message like::
+
+       WARNING:: Track needs at least one Shape assigned to shapes list
+
+  This is not an error, but does act as a reminder about what might still
+  be needed.
+6. **Missing part of template data** - these warnings can be issued when
+   part of the data for a card's  :ref:`Template <the-template-command>` is
+   missing or blank; for example, some cards may have images and some not, and
+   so supplying a path as part of the ``T()`` command will result in warnings
+   like this::
+
+       WARNING:: The image "images/" is a directory
+       WARNING:: Unable to load image "images/" - please check this is a valid filename
+       WARNING:: The Image's filename was not supplied or could not be determined.
+
+.. HINT::
+
+   It is possible to disable or suppress the warnings issued, by using a "flag"
+   that is added onto the line when running a script, for example::
+
+       python mycards.py --warning
+
+   or, for short::
+
+       python mycards.py -w
 
 
 Making Mistakes
@@ -528,7 +562,7 @@ Making Mistakes
 `↑ <table-of-contents-anat_>`_
 
 It is, unfortunately, all too easy to make mistakes while writing scripts.
-Some common types of mistakes are listed below |dash| these are in no way
+Some common types of mistakes are described below |dash| these are in no way
 meant to be comprehensive!
 
 Supplying the script an **incorrect value**, for example, giving the
@@ -557,7 +591,7 @@ Supplying the script with a **duplicate property**, for example:
 .. code:: python
 
    display = hexagon(stroke="black", fill="white", height=2, stroke=2)
-                                                             ^^^^^^^^
+                                                            ^^^^^^^^
    SyntaxError: keyword argument repeated: stroke
 
 This kind of mistake is usually easier to see as both keywords, in this

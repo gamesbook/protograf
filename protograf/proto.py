@@ -1844,7 +1844,7 @@ def Create(**kwargs):
     # use: --no-warning to ignore WARNING:: messages
     parser.add_argument(
         "-w",
-        "--nowarning",
+        "--warning",
         help="Do NOT show any WARNING:: messages (default is False)",
         default=False,
         action=argparse.BooleanOptionalAction,
@@ -2388,6 +2388,8 @@ def Save(**kwargs):
       PDF filename, with a dash (-) followed by the page number OR set by the user
       with ``card_name`` property in the Deck()
     - stop (bool): if set to ``True`` will cause all the script to stop at this point
+    - compression (int): value set will indicate the percentage of compression;
+      0 (default) is no compression and 100 is maximum compression (but slowest)
 
     Notes:
 
@@ -2406,6 +2408,7 @@ def Save(**kwargs):
     output = kwargs.get("output", None)  # export document into this format e.g. SVG
     local_filename = kwargs.get("filename", None)  # override Create()
     stop_here = kwargs.get("stop", False)  # stop script
+    compression = kwargs.get("compression", 0)  # compress output
 
     # ---- directory
     if globals.pargs.directory:
@@ -2448,10 +2451,23 @@ def Save(**kwargs):
     msg = "Please check the folder exists and that you have access rights."
     the_filename = local_filename or globals.filename
     output_filepath = os.path.join(globals.directory, the_filename)
-
+    compress_value = 0
+    if compression:
+        compress_value = tools.as_int(
+            compression, "compression", maximum=100, minimum=0
+        )
     try:
         globals.document.subset_fonts(verbose=True)  # subset fonts to reduce file size
-        globals.document.save(output_filepath, garbage=4)  # remove unused & duplicates
+        if compress_value:
+            globals.document.save(
+                output_filepath,
+                compression_effort=compress_value,  # Brotli compression algorithm
+                garbage=4,  # remove unused & duplicates
+            )
+        else:
+            globals.document.save(
+                output_filepath, garbage=4
+            )  # remove unused & duplicates
     # TODO - allow appending?
     except ValueError as err:
         feedback(f'Unable to overwrite "{output_filepath} - {err}"', False, True)

@@ -52,6 +52,7 @@ python boards/abstract/hexhex_dots.py --no-png -d /tmp/demo
 python boards/abstract/hexhex_hexagons.py --no-png -d /tmp/demo
 python boards/abstract/hexhex_rectangles.py --no-png -d /tmp/demo
 python boards/abstract/morabaraba.py --no-png -d /tmp/demo
+python boards/abstract/mancala.py --no-png -d /tmp/demo
 python boards/abstract/octagons.py --no-png -d /tmp/demo
 python boards/abstract/snex.py --no-png -d /tmp/demo
 python boards/abstract/tictactoe.py --no-png -d /tmp/demo
@@ -79,7 +80,7 @@ python counters/counters.py --no-png -d /tmp/demo
 python counters/counters_excel.py --no-png -d /tmp/demo
 python counters/counters_doagc.py --no-png -d /tmp/demo
 python counters/counters_csv.py --no-png -d /tmp/demo
-python counters/blocks_csv.py --no-png -d /tmp/demo
+python counters/blocks_csv.py --no-png -d /tmp/demo -w
 # ---- cards
 echo -e "\nCreating cards..."
 python cards/cards_design.py --no-png -d /tmp/demo

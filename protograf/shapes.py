@@ -9,6 +9,7 @@ import copy
 from functools import cached_property
 import logging
 import math
+import io
 import os
 from pathlib import Path
 from pprint import pprint
@@ -16,6 +17,7 @@ import sys
 from urllib.parse import urlparse
 
 # third party
+from PIL import Image, ImageEnhance, ImageOps
 import pymupdf
 from pymupdf import Point as muPoint, Rect as muRect
 import segno  # QRCode
@@ -62,6 +64,7 @@ class ImageShape(BaseShape):
     def __init__(self, _object=None, canvas=None, **kwargs):
         super().__init__(_object=_object, canvas=canvas, **kwargs)
         # ---- overrides / extra args
+        self.img = None  # loaded image
         self.sliced = kwargs.get("sliced", None)
         self.cache_directory = get_cache(**kwargs)
         self.image_location = None
@@ -76,10 +79,116 @@ class ImageShape(BaseShape):
                 True,
             )
 
+    def load_image_from_source(self, ID=None):
+        """Load an image from source."""
+        # ---- check for Card usage
+        cache_directory = str(self.cache_directory)
+        # ---- process locale data (dict via Locale namedtuple) using jinja2
+        #      this may include the item's sequence number and current page
+        _locale = self.kwargs.get("locale", None)
+        _source = (
+            self.source if not _locale else tools.eval_template(self.source, _locale)
+        )
+        if ID is not None and isinstance(self.source, list):
+            _source = (
+                self.source[ID]
+                if not _locale
+                else tools.eval_template(self.source[ID], _locale)
+            )
+            cache_directory = set_cached_dir(_source) or cache_directory
+        elif ID is not None and isinstance(self.source, str):
+            _source = (
+                self.source
+                if not _locale
+                else tools.eval_template(self.source, _locale)
+            )
+            cache_directory = set_cached_dir(_source) or cache_directory
+        else:
+            pass
+        # feedback(f"*** IMAGE draw {_source=} {self.source=} {_locale=}")
+
+        # ---- load image
+        # feedback(f'*** IMAGE {ID=} {_source=} {x=} {y=} {self.rotation=}')
+        self.img, self.filename = self.load_image(
+            image_location=_source, cache_directory=cache_directory
+        )
+        if not self.img:
+            feedback(
+                f'Unable to load image "{_source}" - please check this is a valid filename',
+                False,
+                True,
+            )
+
+    def image_size(self) -> tuple:
+        """Calculate auto-size of image once loaded.
+
+        Returns:
+            tuple (float, float): width, height
+        """
+        width = self._u.width
+        height = self._u.height
+        if self.kwargs.get("auto_frame") and self.auto_frame and self.img:
+            # ---- set image sizes
+            if self.width_set and not self.height_set:
+                height = self.img.height * width / self.img.width
+                self.height = self.img.height * self.width / self.img.width
+            elif self.height_set and not self.width_set:
+                width = self.img.width * height / self.img.height
+                self.width = self.img.width * self.height / self.img.height
+            else:
+                feedback(
+                    "Both width and height are set - auto_frame not used.",
+                    False,
+                    True,
+                )
+        return width, height
+
     @property
     def geo(self) -> ShapeGeometry:
         """Geometry of Image in user units."""
-        return ShapeGeometry()
+        _type = type(self)
+        x, y, x_c, y_c = self.calculate_xy()
+        width, height = self.image_size()
+        cntr = Point(x_c, y_c)
+        cntr_user = self.as_point(cntr, self.units, None, None)
+        # TODO - add rotation as per Rectangle
+        nw = Point(x, y)
+        ne = Point(x + width, y)
+        se = Point(x + width, y + height)
+        sw = Point(x, y + height)
+        n = Point(x + width / 2.0, y)
+        e = Point(x + width, y + height / 2.0)
+        s = Point(x + width / 2.0, y + height)
+        w = Point(x, y + height / 2.0)
+        return ShapeGeometry(
+            # centre
+            centre=cntr_user,
+            center=cntr_user,
+            c=cntr_user,
+            # vertices
+            nw=nw,
+            ne=ne,
+            sw=sw,
+            se=se,
+            vertices=[ne, se, sw, nw],
+            # perbii
+            n=n,
+            s=s,
+            e=e,
+            w=w,
+            perbii=[n, e, s, w],
+            # length
+            width=width,
+            height=height,
+            perimeter=2.0 * width + 2.0 * height,
+            # other
+            area=width * height,
+            # meta
+            t=_type,
+            type=_type,
+            shapetype=_type,
+            name=self.simple_name(self),
+        )
 
     @property
     def geometry(self) -> ShapeGeometry:
@@ -136,79 +245,250 @@ class ImageShape(BaseShape):
 
         return x, y, x_c, y_c
 
+    def alter_transparency(self, img: Image, color: str, tolerance: int = 30) -> Image:
+        """Make a color of an image transparent
+
+        Args:
+            color (str): the name or code of the color to be made transparent
+            tolerance (int): Allow slight color variations near the background
+        """
+        target_color = colrs.get_color(color)  # convert target color to a tuple
+        img = img.convert("RGBA")
+        datas = img.getdata()
+        new_data = []
+        for item in datas:
+            # check if pixel is close to target color (R,G,B)
+            if (
+                abs(item[0] - target_color[0]) < tolerance
+                and abs(item[1] - target_color[1]) < tolerance
+                and abs(item[2] - target_color[2]) < tolerance
+            ):
+                # change pixel to transparent (Alpha = 0)
+                new_data.append((255, 255, 255, 0))
+            else:
+                new_data.append(item)
+
+        img.putdata(new_data)
+        return img
+
+    def alter_invert(self, img: Image) -> Image:
+        """Invert the colors of an image."""
+        if img.mode == "RGBA":
+            # separate RGB color bands from Alpha (transparency) band
+            r, g, b, a = img.split()
+            # merge RGB back together to invert safely
+            rgb_image = Image.merge("RGB", (r, g, b))
+            inverted_rgb = ImageOps.invert(rgb_image)
+            # re-attach the original alpha channel
+            r2, g2, b2 = inverted_rgb.split()
+            invert_image = Image.merge("RGBA", (r2, g2, b2, a))
+        else:
+            # handle standard RGB or Grayscale images natively
+            invert_image = ImageOps.invert(img)
+        return invert_image
+
+    def alter_brightness(self, img: Image, brightness: float = 1.0) -> Image:
+        """Alter the brightness of an image"""
+        _factor = tools.as_float(brightness, "brightness")
+        enhancer = ImageEnhance.Brightness(img)
+        img = enhancer.enhance(_factor)
+        # img.save('/tmp/demo/bright.png')
+        return img
+
+    def alter_sharpness(self, img: Image, sharpness: float = 1.0) -> Image:
+        """Alter the sharpness of an image"""
+        _factor = tools.as_float(sharpness, "sharpness")
+        enhancer = ImageEnhance.Sharpness(img)
+        img = enhancer.enhance(_factor)
+        # img.save('/tmp/demo/sharp.png')
+        return img
+
+    def alter_color_balance(self, img: Image, balance: float = 1.0) -> Image:
+        """Alter the color balance of an image
+
+        Notes:
+          * If balance < 1.0, image will contain less color
+          * If balance == 0.0, image will be black and white
+        """
+        _factor = tools.as_float(balance, "balance")
+        enhancer = ImageEnhance.Color(img)
+        img = enhancer.enhance(_factor)
+        # img.save('/tmp/demo/balance.png')
+        return img
+
+    def alter_sepia(self, img: Image) -> Image:
+        """Apply a sepia filter to an image."""
+        # standard sepia matrix formula coefficients
+        sepia_matrix = (
+            0.393,
+            0.769,
+            0.189,
+            0,  # Red channel weights
+            0.349,
+            0.686,
+            0.168,
+            0,  # Green channel weights
+            0.272,
+            0.534,
+            0.131,
+            0,  # Blue channel weights
+        )
+        # Convert to standard RGB mode
+        img = img.convert("RGB")
+        img = img.convert("RGB", matrix=sepia_matrix)
+        # img.save('/tmp/demo/speia.png')
+        return img
+
+    def resize_image(
+        self, img: Image, resample, fit: str = None, resize: list = None
+    ) -> Image:
+        """Resize aspect of an image."""
+        if fit:
+            iwidth = img.size[0]
+            iheight = img.size[1]
+            # breakpoint()
+            match _lower(fit):
+                case "height" | "h":
+                    # keep existing height; calc new width
+                    nwidth = iheight * self.width / self.height
+                    resize = (int(nwidth), iheight)
+                case "width" | "w":
+                    # keep existing width; calc new height
+                    nheight = iwidth * self.height / self.width
+                    resize = (iwidth, int(nheight))
+                case _:
+                    resize = None
+                    feedback(
+                        f'Image "{fit}" is an invalid "fit" setting; use "height" or "width".',
+                        True,
+                        True,
+                    )
+        elif resize:
+            if not isinstance(resize, (list, tuple)):
+                feedback(f'Image "resize" must be a list - not "{resize}"!', True, True)
+            if len(resize) != 2:
+                feedback(
+                    f'Image "resize" must be a list with two elements - not "{resize}"!',
+                    True,
+                    True,
+                )
+            for item in resize:
+                if not isinstance(item, (float, int)):
+                    feedback(
+                        'Image "resize" must be a list of integers;'
+                        f' it cannot contain "{item}"!',
+                        True,
+                        True,
+                    )
+                if item <= 0:
+                    feedback(
+                        'Image "resize" must be a list of positive integers;'
+                        f' it cannot contain "{item}"!',
+                        True,
+                        True,
+                    )
+        if resize:  # supplied or calculated
+            # resize to exact dimensions (width, height)
+            resized_image = img.resize(
+                (int(resize[0]), int(resize[1])), resample=resample
+            )
+            return resized_image
+
+        return img
+
     def draw(self, cnv=None, off_x=0, off_y=0, ID=None, **kwargs):
         """Show an image on a given canvas."""
         kwargs = self.kwargs | kwargs
         cnv = cnv if cnv else globals.canvas  # a new Page/Shape may now exist
         super().draw(cnv, off_x, off_y, ID, **kwargs)  # unit-based props
-        img = None
-        # ---- check for Card usage
-        cache_directory = str(self.cache_directory)
-        # ---- process locale data (dict via Locale namedtuple) using jinja2
-        #      this may include the item's sequence number and current page
-        _locale = kwargs.get("locale", None)
-        _source = (
-            self.source if not _locale else tools.eval_template(self.source, _locale)
-        )
-        if ID is not None and isinstance(self.source, list):
-            _source = (
-                self.source[ID]
-                if not _locale
-                else tools.eval_template(self.source[ID], _locale)
-            )
-            cache_directory = set_cached_dir(_source) or cache_directory
-        elif ID is not None and isinstance(self.source, str):
-            _source = (
-                self.source
-                if not _locale
-                else tools.eval_template(self.source, _locale)
-            )
-            cache_directory = set_cached_dir(_source) or cache_directory
-        else:
-            pass
-        # feedback(f"*** IMAGE draw {_source=} {self.source=} {_locale=}")
         # ---- convert to using units
         height = self._u.height
         width = self._u.width
         x, y, x_c, y_c = self.calculate_xy()
         rotation = kwargs.get("rotation", self.rotation)
-        # ---- load image
-        # feedback(f'*** IMAGE {ID=} {_source=} {x=} {y=} {self.rotation=}')
-        img, filename = self.load_image(
-            image_location=_source, cache_directory=cache_directory
-        )
-        if not img:
-            feedback(
-                f'Unable to load image "{_source}" - please check this is a valid filename',
-                False,
-                True,
-            )
-            return
-        else:
-            # feedback(f'*** IMAGE {self.width=} {self.height=} {width=} {height=}')
-            if kwargs.get("auto_frame") and self.auto_frame:
-                # ---- set image area
-                if self.width_set and not self.height_set:
-                    height = img.height * width / img.width
-                    self.height = img.height * self.width / img.width
-                elif self.height_set and not self.width_set:
-                    width = img.width * height / img.height
-                    self.width = img.width * self.height / img.height
-                else:
+        # ---- load image from source
+        self.load_image_from_source(ID)
+        width, height = self.image_size()
+        img_filename = self.filename
+        image = self.img
+        cache_name = ""  # created based on resize or alterations
+
+        # ---- image resize (and resample)
+        if kwargs.get("resample"):
+            res = _lower(kwargs.get("resample"))
+            match res:
+                case "lanczos" | "l":
+                    resample = Image.Resampling.LANCZOS
+                case "nearest" | "n":
+                    resample = Image.Resampling.NEAREST
+                case "box" | "x":
+                    resample = Image.Resampling.BOX
+                case "bilinear" | "b":
+                    resample = Image.Resampling.BILINEAR
+                case "hamming" | "h":
+                    resample = Image.Resampling.HAMMING
+                case "bicubic" | "c":
+                    resample = Image.Resampling.BICUBIC
+                case _:
                     feedback(
-                        "Both width and height are set - auto_frame not used.",
-                        False,
+                        f'Image "{res}" is an invalid "resample" setting',
+                        True,
                         True,
                     )
-            self.insert_image(  # via base.BaseShape
-                globals.doc_page,
-                image=img,
-                filename=filename,
-                origin=(x, y),
-                sliced=self.sliced,
-                width_height=(width, height),
-                rotation=rotation,
+        else:
+            resample = Image.Resampling.LANCZOS
+        if kwargs.get("fit") and kwargs.get("resize"):
+            feedback(
+                'Use either "fit" or "resize" but not both for an Image.', True, True
             )
+        if kwargs.get("fit"):
+            image = self.resize_image(image, resample=resample, fit=kwargs.get("fit"))
+            cache_name += "fit"
+        if kwargs.get("resize"):
+            image = self.resize_image(
+                image, resample=resample, resize=kwargs.get("resize")
+            )
+            cache_name += "resize"
+
+        # ---- image alterations
+        if kwargs.get("transparent"):
+            image = self.alter_transparency(image, kwargs.get("transparent"))
+            cache_name += "T"
+        if kwargs.get("sepia"):
+            if tools.as_bool(kwargs.get("sepia"), False):
+                image = self.alter_sepia(image)
+                cache_name += "S"
+        if kwargs.get("invert"):
+            if tools.as_bool(kwargs.get("invert"), False):
+                image = self.alter_invert(image)
+                cache_name += "I"
+        if kwargs.get("balance", None) is not None:
+            image = self.alter_color_balance(image, kwargs.get("balance"))
+            cache_name += f'L{kwargs.get("balance")}'
+        if kwargs.get("brightness"):
+            image = self.alter_brightness(image, kwargs.get("brightness"))
+            cache_name += f'R{kwargs.get("brightness")}'
+        if kwargs.get("sharpness"):
+            image = self.alter_sharpness(image, kwargs.get("sharpness"))
+            cache_name += f'P{kwargs.get("sharpness")}'
+        if cache_name != "":
+            # Uses the CACHE_DIRECTORY to store altered (temporary) image
+            cache_directory = get_cache()
+            f_p = Path(self.filename)
+            img2_filename = f_p.stem + f"_{cache_name}" + f_p.suffix
+            img_filename = os.path.join(cache_directory, img2_filename)
+            image.save(img_filename)
+
+        # ---- show image
+        self.insert_image(  # via base.BaseShape
+            globals.doc_page,
+            image=image,
+            filename=img_filename,
+            origin=(x, y),
+            sliced=self.sliced,
+            width_height=(width, height),
+            rotation=rotation,
+        )
         # ---- centre
         if self.use_abs_c:
             x_c = self._abs_cx
@@ -859,22 +1139,28 @@ class BandShape(BaseShape):
         txt_angle_start = 90.0 - self.angle_width / 2.0  # band drawn either side of 90
         txt_inn_start, txt_bez_inn_2, txt_bez_inn_3, txt_inn_end = (
             geoms.bezier_arc_points(
-                txt_angle_start, self.angle_width, self._u.radius, pt_c, pt_c.y
+                txt_angle_start,
+                self.angle_width,
+                self._u.radius - self._u.height,
+                pt_c,
+                pt_c.y,
             )
         )
         txt_out_mid_pt = geoms.point_on_circle(
             pt_c,
-            self._u.radius + self._u.height,
+            self._u.radius,
             txt_angle_start + self.angle_width / 2.0,
         )
         txt_pt_mid = geoms.point_on_circle(
             pt_c,
-            self._u.radius + self._u.height / 2.0,
+            self._u.radius - self._u.height / 2.0,
             txt_angle_start + self.angle_width / 2.0,
         )
         inn_mid_chord = geoms.fraction_along_line(txt_inn_start, txt_inn_end, 0.5)
+        rotation = self.angle_start + self.angle_width / 2.0 - 90.0
         kwargs["rotation_point"] = pt_c
-        kwargs["rotation"] = self.angle_start + self.angle_width / 2.0 - 90.0
+        kwargs["rotation"] = rotation
+        # print(f"*** BAND {self.label=} {pt_c=} {self._u.height=} {rotation=}")
         self.draw_heading(cnv, ID, txt_out_mid_pt.x, txt_out_mid_pt.y, **kwargs)
         self.draw_label(cnv, ID, txt_pt_mid.x, txt_pt_mid.y, **kwargs)
         self.draw_title(cnv, ID, inn_mid_chord.x, inn_mid_chord.y, **kwargs)

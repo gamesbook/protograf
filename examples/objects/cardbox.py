@@ -72,6 +72,47 @@ CardBox(
     shapes_right=name_rgh,
 )
 Text(common=title, text="CardBox: Customised with Text, Shapes and Image")
+PageBreak()
+
+name = Common(text="Norsemen: The Cards", font_size=14, stroke="white")
+cbx = Common(font_size=14, stroke="white")
+name_up = text(common=name)
+name_front = text(common=name)
+name_top = text(common=name)
+name_btm = text("NtG:Bottom", common=cbx, rotation=180)
+name_lft = text("NtG:Left", common=cbx, rotation=-90)
+name_rgh = text("NtG:Right", common=cbx, rotation=90)
+name_bck = text("NtG:Back", common=cbx)
+
+# Photo by <a href="https://unsplash.com/@rogueli?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Rogue Li</a> on <a href="https://unsplash.com/photos/dark-stormy-clouds-over-a-calm-blue-ocean-_bO-Wa0DHaU?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Unsplash</a>
+# Original is 640x426
+wrapper = image(
+    "images/rogue-li-unsplash.jpg",
+    width=14, height=7,
+    fit="width")
+
+CardBox(
+    x=0, y=0,
+    thumb=1.25,
+    card_size="Mini",  #44.5, 63.5
+    fold=True,
+    fold_stroke="yellow",
+    fill="#61778F",
+    padding_width=0.8,
+    padding_height=0.8,
+    rounded=True,
+    flap=1,
+    flap_glue=0.25,
+    flap_inner=0.5,
+    shapes_wrap=wrapper,
+    shapes_front=name_front,
+    shapes_back=name_bck,
+    shapes_top=name_top,
+    shapes_bottom=name_btm,
+    shapes_left=name_lft,
+    shapes_right=name_rgh,
+)
+Text("Photo by https://unsplash.com/@rogueli", y=13, x=0, align="left")
 
 Save(
     output='png',
@@ -81,5 +122,6 @@ Save(
         'cardbox_default',
         'cardbox_custom',
         'cardbox_shapes',
+        'cardbox_wrap',
     ]
 )

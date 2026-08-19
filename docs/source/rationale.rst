@@ -93,7 +93,7 @@ from the top edge of the page, then it's reasonably clear where this rectangle
 would be drawn and what it would look like.
 
 The language used for **protograf** tries to match everyday usage of terms
-and/or terms already is use by existing software.
+and/or terms already used by existing, similar software.
 
 *Consistency* is about doing similar things in the same way.  An ellipse shape
 is similar to a rectangle except that - obviously! - it's drawn with curves

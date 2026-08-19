@@ -62,6 +62,7 @@ python boards\abstract\hexhex_dots.py --no-png -d %location%
 python boards\abstract\hexhex_hexagons.py --no-png -d %location%
 python boards\abstract\hexhex_rectangles.py --no-png -d %location%
 python boards\abstract\morabaraba.py --no-png -d %location%
+python boards\abstract\mancala.py --no-png -d %location%
 python boards\abstract\new_classics.py --no-png -d %location%
 python boards\abstract\octagons.py --no-png -d %location%
 python boards\abstract\snex.py --no-png -d %location%
@@ -91,7 +92,7 @@ python counters\counters.py --no-png -d %location%
 python counters\counters_excel.py --no-png -d %location%
 python counters\counters_csv.py --no-png -d %location%
 python counters\counters_doagc.py --no-png -d %location%
-python counters\blocks_csv.py --no-png -d %location%
+python counters\blocks_csv.py --no-warning --no-png -d %location%
 
 REM ---- cards
 ECHO "Creating cards..."

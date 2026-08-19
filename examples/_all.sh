@@ -52,6 +52,7 @@ python boards/abstract/hexhex_dots.py
 python boards/abstract/hexhex_hexagons.py
 python boards/abstract/hexhex_rectangles.py
 python boards/abstract/morabaraba.py
+python boards/abstract/mancala.py
 python boards/abstract/new_classics.py
 python boards/abstract/octagons.py
 python boards/abstract/snex.py
@@ -78,7 +79,7 @@ python counters/counters.py
 python counters/counters_excel.py
 python counters/counters_csv.py
 python counters/counters_doagc.py
-python counters/blocks_csv.py
+python counters/blocks_csv.py -w
 # ---- cards
 echo -e "\nCreating cards..."
 python cards/cards_design.py

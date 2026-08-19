@@ -193,4 +193,4 @@ Rectangle(
     common=name_rect, x=44, y=36.75, width=10.5, height=1.25,
     label="PROJECT: UNDERWATER CITIES", label_size=18)
 
-Save()
+Save(compression=100)

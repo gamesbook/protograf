@@ -1037,6 +1037,106 @@ Image(img_file, x=2, y=3, height=2, auto_frame=True)
 Rectangle(x=2, y=3, label="H", common=rred)
 PageBreak()
 
+# ---- image - alterations
+Blueprint()
+Text(common=txt, text="Image: alterations")
+allim = Common(
+    width=2, height=2,
+    label_stroke="red")
+Image("fantasy-forest-with-old-bridges.png",
+      common=allim,
+      label="Original",
+      x=0, y=0)
+Image("fantasy-forest-with-old-bridges.png",
+      common=allim,
+      label="Brightness:3",
+      x=2, y=0,
+      brightness=3)
+Image("fantasy-forest-with-old-bridges.png",
+      common=allim,
+      label="Balance:0.0",
+      x=0, y=2,
+      balance=0.0)
+Image("fantasy-forest-with-old-bridges.png",
+      common=allim,
+      label="Sepia:True",
+      x=2, y=2,
+      sepia=True)
+Image("fantasy-forest-with-old-bridges.png",
+      common=allim,
+      label="Sharpness:5",
+      x=0, y=4,
+      sharpness=5)
+Image("fantasy-forest-with-old-bridges.png",
+      common=allim,
+      label="Invert:True",
+      x=2, y=4,
+      invert=True)
+PageBreak()
+
+# ---- image - multi-alterations
+Text(common=txt, text="Image: multi-alterations")
+Image("fantasy-forest-with-old-bridges.png",
+      common=allim,
+      label="Original",
+      x=0, y=0)
+Image("fantasy-forest-with-old-bridges.png",
+      common=allim,
+      label="Balance+Invert",
+      x=2, y=2,
+      balance=0.0,
+      invert=True)
+Image("fantasy-forest-with-old-bridges.png",
+      common=allim,
+      label="Transparent/Sharp",
+      x=0, y=4,
+      transparent="black",
+      sharpness=5)
+PageBreak()
+
+# ---- image - resize and fit
+Blueprint()
+Text(common=txt, text="Image: Fit & Resize")
+
+allim = Common(label_stroke="red")
+
+Image("fantasy-forest-with-old-bridges.png",
+      common=allim,
+      label="Original",
+      width=2, height=2,
+      x=0, y=0)
+
+Image("fantasy-forest-with-old-bridges.png",
+      common=allim,
+      label="Change Height",
+      width=2, height=1,
+      x=2, y=0)
+Image("fantasy-forest-with-old-bridges.png",
+      common=allim,
+      label="Change Width",
+      width=1, height=2,
+      x=3, y=1)
+
+Image("fantasy-forest-with-old-bridges.png",
+      common=allim,
+      label="Fit: Width",
+      width=2, height=3,
+      fit="width",
+      x=0, y=2)
+Image("fantasy-forest-with-old-bridges.png",
+      common=allim,
+      label="Fit: Height",
+      width=4, height=1,
+      fit="height",
+      x=0, y=5)
+
+Image("fantasy-forest-with-old-bridges.png",
+      common=allim,
+      label="Resize W&H",
+      width=1.5, height=1.25,
+      resize=[363*1.5, 363*1.25],
+      x=2.5, y=3)
+PageBreak()
 
 # ---- shape rotation I
 Blueprint()
@@ -1596,7 +1696,6 @@ Band(
     sections_stroke_width=0.5,
     sections_dotted=True,
 )
-
 PageBreak()
 
 # ---- END
@@ -1640,9 +1739,14 @@ Save(
         "shape_centred", "shape_centred_move", "shape_centred_custom",
         "shapes_centred",
         "qr_code",
-        "image_sliced", "image_label",
-        "image_operations", "image_align",
+        "image_sliced",
+        "image_label",
+        "image_operations",
+        "image_align",
         "image_auto_frame",
+        "image_alterations",
+        "image_alterations_multi",
+        "image_resize",
         "shape_rotation",
         "shape_rotation_two",
         "shape_hatches_and_rotation",
