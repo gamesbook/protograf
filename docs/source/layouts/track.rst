@@ -7,13 +7,13 @@ Track Command
    :ltrim:
 
 This section assumes you are very familiar with the concepts, terms and
-ideas for :doc:`protograf <index>` as presented in the
-:doc:`Basic Concepts <basic_concepts>` , that you understand all of the
-:doc:`Additional Concepts <additional_concepts>`
+ideas for :doc:`protograf <../index>` as presented in the
+:doc:`Basic Concepts <../basic_concepts>` , that you understand all of the
+:doc:`Additional Concepts <../additional_concepts>`
 and that you've created some basic scripts of your own using the
-:doc:`Core Shapes <core_shapes>`.
+:doc:`Core Shapes <../core_shapes>`.
 
-This is part of the set of commands use for :doc:`Layouts <layouts>`.
+This is part of the set of commands used for :doc:`Layouts <../layouts>`.
 
 .. _table-of-contents-laytrk:
 
@@ -40,11 +40,11 @@ Apart from the ``Track()`` command described here,
 there are also these other commands which allow you to layout
 elements in a more repetitive or regular way within a page:
 
-- :doc:`Repeat <layouts_repeat>`
-- :doc:`Sequence <layouts_sequence>`
-- :doc:`RectangularLocations <layouts_rectangular>`
-- :doc:`TriangularLocations <layouts_triangular>`
-- :doc:`DiamondLocations <layouts_diamond>`
+- :doc:`Repeat <repeat>`
+- :doc:`Sequence <sequence>`
+- :doc:`RectangularLocations <rectangular>`
+- :doc:`TriangularLocations <triangular>`
+- :doc:`DiamondLocations <diamond>`
 
 
 Usage
@@ -106,7 +106,7 @@ Example 1. Default
 ------------------
 `^ <key-properties-track_>`_
 
-.. |tk1| image:: images/tracks/track_default.png
+.. |tk1| image:: ../images/tracks/track_default.png
    :width: 330
 
 ===== ======
@@ -132,7 +132,7 @@ Example 2. Track with a Shape
 -----------------------------
 `^ <key-properties-track_>`_
 
-.. |tk2| image:: images/tracks/track_default_circle.png
+.. |tk2| image:: ../images/tracks/track_default_circle.png
    :width: 330
 
 ===== ======
@@ -163,7 +163,7 @@ Example 3. Track with sequence
 ------------------------------
 `^ <key-properties-track_>`_
 
-.. |tk3| image:: images/tracks/track_default_count.png
+.. |tk3| image:: ../images/tracks/track_default_count.png
    :width: 330
 
 ===== ======
@@ -201,7 +201,7 @@ Example 4. Square Track with Star
 ---------------------------------
 `^ <key-properties-track_>`_
 
-.. |tk4| image:: images/tracks/track_square_star.png
+.. |tk4| image:: ../images/tracks/track_square_star.png
    :width: 330
 
 ===== ======
@@ -232,7 +232,7 @@ Example 5. Polygon Track
 ------------------------
 `^ <key-properties-track_>`_
 
-.. |tk5| image:: images/tracks/track_polygon_hex.png
+.. |tk5| image:: ../images/tracks/track_polygon_hex.png
    :width: 330
 
 ===== ======
@@ -267,7 +267,7 @@ Example 6. Polygon Track with start and stop
 --------------------------------------------
 `^ <key-properties-track_>`_
 
-.. |tk6| image:: images/tracks/track_polygon_hex_stop.png
+.. |tk6| image:: ../images/tracks/track_polygon_hex_stop.png
    :width: 330
 
 ===== ======
@@ -301,7 +301,7 @@ Example 7. Polyline Track
 -------------------------
 `^ <key-properties-track_>`_
 
-.. |tk7| image:: images/tracks/track_polyline.png
+.. |tk7| image:: ../images/tracks/track_polyline.png
    :width: 330
 
 ===== ======
@@ -331,7 +331,7 @@ Example 8. Circle Track - clockwise
 -----------------------------------
 `^ <key-properties-track_>`_
 
-.. |tk8| image:: images/tracks/track_circle.png
+.. |tk8| image:: ../images/tracks/track_circle.png
    :width: 330
 
 ===== ======
@@ -362,7 +362,7 @@ Example 9. Polygon Track - custom shape
 ---------------------------------------
 `^ <key-properties-track_>`_
 
-.. |tk9| image:: images/tracks/track_polygon_six.png
+.. |tk9| image:: ../images/tracks/track_polygon_six.png
    :width: 330
 
 ===== ======
@@ -393,7 +393,7 @@ Example 10. Polygon Track - clockwise
 -------------------------------------
 `^ <key-properties-track_>`_
 
-.. |tc0| image:: images/tracks/track_polygon_anti.png
+.. |tc0| image:: ../images/tracks/track_polygon_anti.png
    :width: 330
 
 ===== ======
@@ -424,7 +424,7 @@ Example 11. Polygon Track - inwards
 -----------------------------------
 `^ <key-properties-track_>`_
 
-.. |tc1| image:: images/tracks/track_polygon_rotate_i.png
+.. |tc1| image:: ../images/tracks/track_polygon_rotate_i.png
    :width: 330
 
 ===== ======
@@ -456,7 +456,7 @@ Example 12. Polygon Track - outwards
 ------------------------------------
 `^ <key-properties-track_>`_
 
-.. |tc2| image:: images/tracks/track_polygon_rotate_o.png
+.. |tc2| image:: ../images/tracks/track_polygon_rotate_o.png
    :width: 330
 
 ===== ======
@@ -488,7 +488,7 @@ Example 13. Circular Track - inwards
 -------------------------------------
 `^ <key-properties-track_>`_
 
-.. |tc3| image:: images/tracks/track_circle_rotate_o.png
+.. |tc3| image:: ../images/tracks/track_circle_rotate_o.png
    :width: 330
 
 ===== ======
@@ -519,7 +519,7 @@ Example 14. Rectangular Track - inwards
 ---------------------------------------
 `^ <key-properties-track_>`_
 
-.. |tc4| image:: images/tracks/track_square_rotate_i.png
+.. |tc4| image:: ../images/tracks/track_square_rotate_i.png
    :width: 330
 
 ===== ======
@@ -550,7 +550,7 @@ Example 15. Rectangular Track - outwards
 ----------------------------------------
 `^ <key-properties-track_>`_
 
-.. |tc5| image:: images/tracks/track_square_rotate_o.png
+.. |tc5| image:: ../images/tracks/track_square_rotate_o.png
    :width: 330
 
 ===== ======
@@ -581,7 +581,7 @@ Example 16. Polygon Track - sequences
 -------------------------------------
 `^ <key-properties-track_>`_
 
-.. |tc6| image:: images/tracks/track_sequences.png
+.. |tc6| image:: ../images/tracks/track_sequences.png
    :width: 330
 
 ===== ======
@@ -617,7 +617,7 @@ Example 17. Multiple Tracks - starts
 ------------------------------------
 `^ <key-properties-track_>`_
 
-.. |tc7| image:: images/tracks/track_starts.png
+.. |tc7| image:: ../images/tracks/track_starts.png
    :width: 330
 
 ===== ======
@@ -685,7 +685,7 @@ Example 18. Circular Track - clock
 ----------------------------------
 `^ <key-properties-track_>`_
 
-.. |tc8| image:: images/tracks/track_clock.png
+.. |tc8| image:: ../images/tracks/track_clock.png
    :width: 330
 
 ===== ======
@@ -722,7 +722,7 @@ Example 19. Polygon Track - scoring
 -----------------------------------
 `^ <key-properties-track_>`_
 
-.. |tc9| image:: images/tracks/track_score.png
+.. |tc9| image:: ../images/tracks/track_score.png
    :width: 330
 
 ===== ======

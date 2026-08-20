@@ -4,13 +4,16 @@ Pentominoes
 
 .. |dash| unicode:: U+2014 .. EM DASH SIGN
 
+Pentominoes are one of a number of what are termed
+:doc:`Compound Objects <../objects>`.
+
 This section assumes you are very familiar with the concepts, terms and ideas
-for :doc:`protograf <index>`  as presented in the
-:doc:`Basic Concepts <basic_concepts>` , that you understand all of the
-:doc:`Additional Concepts <additional_concepts>` and that you've created some
-basic scripts of your own using the :doc:`Core Shapes <core_shapes>`. You also
-be familiar with the various types of shapes' properties described in the
-:doc:`Customised Shapes <customised_shapes>`
+for :doc:`protograf <../index>`  as presented in the
+:doc:`Basic Concepts <../basic_concepts>` , that you understand all of the
+:doc:`Additional Concepts <../additional_concepts>` and that you've created some
+basic scripts of your own using the :doc:`Core Shapes <../core_shapes>`. You
+should also be familiar with the various types of shapes' properties described in
+the :doc:`Customised Shapes <../customised_shapes>`.
 
 .. _pentominoesOver:
 
@@ -47,7 +50,7 @@ Pentomino: Uppercase Letter
 ---------------------------
 `^ <pentominoesOver_>`_
 
-.. |te1| image:: images/objects/pentomino_upper.png
+.. |te1| image:: ../images/objects/pentomino_upper.png
    :width: 330
 
 ===== ======
@@ -74,7 +77,7 @@ Pentomino: Lowercase Letter
 ---------------------------
 `^ <pentominoesOver_>`_
 
-.. |te2| image:: images/objects/pentomino_lower.png
+.. |te2| image:: ../images/objects/pentomino_lower.png
    :width: 330
 
 ===== ======
@@ -111,5 +114,5 @@ or 4 x 15 or 3 x 20.
 See the `pentominoes.py <https://github.com/gamesbook/protograf/blob/master/examples/objects/pentominoes.py>`_
 script for how this is done.
 
-.. image:: images/objects/pentominoes_gp.png
+.. image:: ../images/objects/pentominoes_gp.png
    :width: 90%

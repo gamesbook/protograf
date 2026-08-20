@@ -5,13 +5,13 @@ Sequence Command
 .. |dash| unicode:: U+2014 .. EM DASH SIGN
 
 This section assumes you are very familiar with the concepts, terms and
-ideas for :doc:`protograf <index>` as presented in the
-:doc:`Basic Concepts <basic_concepts>` , that you understand all of the
-:doc:`Additional Concepts <additional_concepts>`
+ideas for :doc:`protograf <../index>` as presented in the
+:doc:`Basic Concepts <../basic_concepts>` , that you understand all of the
+:doc:`Additional Concepts <../additional_concepts>`
 and that you've created some basic scripts of your own using the
-:doc:`Core Shapes <core_shapes>`.
+:doc:`Core Shapes <../core_shapes>`.
 
-This is part of the set of commands use for :doc:`Layouts <layouts>`.
+This is part of the set of commands used for :doc:`Layouts <../layouts>`.
 
 .. _table-of-contents-seq:
 
@@ -31,11 +31,11 @@ Apart from the ``Sequence()`` command described here, there are also these
 other commands which allow you to layout elements in a more repetitive or
 regular way within a page:
 
-- :doc:`Repeat <layouts_repeat>`
-- :doc:`Track <layouts_track>`
-- :doc:`RectangularLocations <layouts_rectangular>`
-- :doc:`TriangularLocations <layouts_triangular>`
-- :doc:`DiamondLocations <layouts_diamond>`
+- :doc:`Repeat <repeat>`
+- :doc:`Track <track>`
+- :doc:`RectangularLocations <rectangular>`
+- :doc:`TriangularLocations <triangular>`
+- :doc:`DiamondLocations <diamond>`
 
 .. _the-sequence-command:
 
@@ -92,7 +92,7 @@ Example 1. Sequence Numbers
 ---------------------------
 `↑ <table-of-contents-props_>`_
 
-.. |sv1| image:: images/layouts/sequence_values1.png
+.. |sv1| image:: ../images/layouts/sequence_values1.png
    :width: 330
 
 ===== ======
@@ -130,7 +130,7 @@ Example 2. Sequence Lowercase
 -----------------------------
 `↑ <table-of-contents-props_>`_
 
-.. |sv2| image:: images/layouts/sequence_values2.png
+.. |sv2| image:: ../images/layouts/sequence_values2.png
    :width: 330
 
 ===== ======
@@ -171,7 +171,7 @@ Example 3. Sequence Uppercase
 -----------------------------
 `↑ <table-of-contents-props_>`_
 
-.. |sv3| image:: images/layouts/sequence_values3.png
+.. |sv3| image:: ../images/layouts/sequence_values3.png
    :width: 330
 
 ===== ======
@@ -205,7 +205,7 @@ Example 4. Sequence Roman
 -------------------------
 `↑ <table-of-contents-props_>`_
 
-.. |sv4| image:: images/layouts/sequence_values4.png
+.. |sv4| image:: ../images/layouts/sequence_values4.png
    :width: 330
 
 ===== ======
@@ -236,7 +236,7 @@ Example 5. Sequence Excel
 -------------------------
 `↑ <table-of-contents-props_>`_
 
-.. |sv5| image:: images/layouts/sequence_values5.png
+.. |sv5| image:: ../images/layouts/sequence_values5.png
    :width: 330
 
 ===== ======
@@ -274,7 +274,7 @@ Example 6. Sequence Shapes - Label
 ----------------------------------
 `↑ <table-of-contents-props_>`_
 
-.. |sq1| image:: images/layouts/sequence_shape2.png
+.. |sq1| image:: ../images/layouts/sequence_shape2.png
    :width: 330
 
 ===== ======
@@ -309,7 +309,7 @@ Example 7. Sequence Shapes - Multiple
 -------------------------------------
 `↑ <table-of-contents-props_>`_
 
-.. |sq2| image:: images/layouts/sequence_shape3.png
+.. |sq2| image:: ../images/layouts/sequence_shape3.png
    :width: 330
 
 ===== ======
@@ -360,7 +360,7 @@ Example 8. Sequence Shapes - Setting #1
 ---------------------------------------
 `↑ <table-of-contents-props_>`_
 
-.. |sq3| image:: images/layouts/sequence_shape1.png
+.. |sq3| image:: ../images/layouts/sequence_shape1.png
    :width: 330
 
 ===== ======
@@ -403,7 +403,7 @@ Example 9. Sequence Shapes - Setting #2
 ---------------------------------------
 `↑ <table-of-contents-props_>`_
 
-.. |sq4| image:: images/layouts/sequence_shape4.png
+.. |sq4| image:: ../images/layouts/sequence_shape4.png
    :width: 330
 
 ===== ======
@@ -439,7 +439,7 @@ Example 10. Sequence Shapes - Intervals
 ---------------------------------------
 `↑ <table-of-contents-props_>`_
 
-.. |sq5| image:: images/layouts/sequence_shape5.png
+.. |sq5| image:: ../images/layouts/sequence_shape5.png
    :width: 330
 
 ===== ======

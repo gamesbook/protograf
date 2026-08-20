@@ -4,13 +4,16 @@ Dice
 
 .. |dash| unicode:: U+2014 .. EM DASH SIGN
 
+Dice are one of a number of what are termed
+:doc:`Compound Objects <../objects>`.
+
 This section assumes you are very familiar with the concepts, terms and ideas
-for :doc:`protograf <index>`  as presented in the
-:doc:`Basic Concepts <basic_concepts>` , that you understand all of the
-:doc:`Additional Concepts <additional_concepts>` and that you've created some
-basic scripts of your own using the :doc:`Core Shapes <core_shapes>`. You also
-be familiar with the various types of shapes' properties described in the
-:doc:`Customised Shapes <customised_shapes>`
+for :doc:`protograf <../index>`  as presented in the
+:doc:`Basic Concepts <../basic_concepts>` , that you understand all of the
+:doc:`Additional Concepts <../additional_concepts>` and that you've created some
+basic scripts of your own using the :doc:`Core Shapes <../core_shapes>`. You
+should also be familiar with the various types of shapes' properties described in
+the :doc:`Customised Shapes <../customised_shapes>`.
 
 .. _diceOver:
 
@@ -26,7 +29,7 @@ D6 Properties
 =============
 
 The six-sided die object ``D6`` shares some of the basic properties of many
-other :doc:`shapes <core_shapes>`, with additional properties of *pips* and
+other :doc:`shapes <../core_shapes>`, with additional properties of *pips* and
 *random*, as well as the various *pip_* properties.
 
 d6 Examples
@@ -38,7 +41,7 @@ D6 Styling
 ----------
 `^ <diceOver_>`_
 
-.. |d61| image:: images/objects/dice_d6.png
+.. |d61| image:: ../images/objects/dice_d6.png
    :width: 330
 
 ===== ======

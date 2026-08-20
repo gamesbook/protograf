@@ -1,11 +1,15 @@
 protograf Changes
 =================
 
-2026-00-00 (0.5.8)
+2026-00-00 (0.5.9)
 ------------------
 - [PLANNED-1] Expand geo coverage for minor shapes
 - [PLANNED-2] Structure: break-up proto into smaller modules
 - [PLANNED-2] Docs: list all props for Hex, Circle, Rectangle, Line
+
+2026-00-00 (0.5.8)
+------------------
+- Revise docs structure and add missing details
 
 2026-08-19 (0.5.7)
 ------------------

@@ -7,10 +7,10 @@ Repeat Command
 **protograf** allows you to directly define where elements, that make up
 your design, should be placed within a page, or over a series of pages
 within a ``Deck``, but it also includes commands that let you place, or
-":doc:`layout <layouts>`", elements in a more repetitive or regular way
+":doc:`layout <../layouts>`", elements in a more repetitive or regular way
 within a page.
 
-This is part of the set of commands use for :doc:`Layouts <layouts>`.
+This is part of the set of commands use for :doc:`Layouts <../layouts>`.
 
 Overview
 ========
@@ -22,10 +22,10 @@ Apart from the ``Repeat()`` command described here,
 there are also these other commands which allow you to layout
 elements in a more repetitive or regular way within a page:
 
-- :doc:`Sequence <layouts_sequence>`
-- :doc:`Track <layouts_track>`
-- :doc:`RectangularLocations <layouts_rectangular>`
-- :doc:`TriangularLocations <layouts_triangular>`
+- :doc:`Sequence <sequence>`
+- :doc:`Track <track>`
+- :doc:`RectangularLocations <rectangular>`
+- :doc:`TriangularLocations <triangular>`
 
 Usage
 =====
@@ -60,7 +60,7 @@ a light green fill color).
 Example 1.
 ----------
 
-.. |rp0| image:: images/layouts/repeat_basic.png
+.. |rp0| image:: ../images/layouts/repeat_basic.png
    :width: 330
 
 ===== ======
@@ -80,7 +80,7 @@ Example 1.
 Example 2.
 ----------
 
-.. |rp1| image:: images/layouts/repeat_interval.png
+.. |rp1| image:: ../images/layouts/repeat_interval.png
    :width: 330
 
 ===== ======
@@ -100,7 +100,7 @@ Example 2.
 Example 3.
 ----------
 
-.. |rp2| image:: images/layouts/repeat_interval_acrossdown.png
+.. |rp2| image:: ../images/layouts/repeat_interval_acrossdown.png
    :width: 330
 
 ===== ======
@@ -123,7 +123,7 @@ Example 3.
 Example 4.
 ----------
 
-.. |rp3| image:: images/layouts/repeat_across.png
+.. |rp3| image:: ../images/layouts/repeat_across.png
    :width: 330
 
 ===== ======
@@ -145,7 +145,7 @@ Example 4.
 Example 5.
 ----------
 
-.. |rp4| image:: images/layouts/repeat_down.png
+.. |rp4| image:: ../images/layouts/repeat_down.png
    :width: 330
 
 ===== ======
@@ -167,7 +167,7 @@ Example 5.
 Example 6.
 ----------
 
-.. |rp5| image:: images/layouts/repeat_acrossdown.png
+.. |rp5| image:: ../images/layouts/repeat_acrossdown.png
    :width: 330
 
 ===== ======

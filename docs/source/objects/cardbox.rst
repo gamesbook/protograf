@@ -4,13 +4,16 @@ CardBox
 
 .. |dash| unicode:: U+2014 .. EM DASH SIGN
 
+A CardBox is one of a number of what are termed
+:doc:`Compound Objects <../objects>`.
+
 This section assumes you are very familiar with the concepts, terms and ideas
-for :doc:`protograf <index>`  as presented in the
-:doc:`Basic Concepts <basic_concepts>` , that you understand all of the
-:doc:`Additional Concepts <additional_concepts>` and that you've created some
-basic scripts of your own using the :doc:`Core Shapes <core_shapes>`. You also
-be familiar with the various types of shapes' properties described in the
-:doc:`Customised Shapes <customised_shapes>`
+for :doc:`protograf <../index>`  as presented in the
+:doc:`Basic Concepts <../basic_concepts>` , that you understand all of the
+:doc:`Additional Concepts <../additional_concepts>` and that you've created some
+basic scripts of your own using the :doc:`Core Shapes <../core_shapes>`. You
+should also be familiar with the various types of shapes' properties described in
+the :doc:`Customised Shapes <../customised_shapes>`.
 
 .. _table-of-contents-cardbox:
 
@@ -102,7 +105,10 @@ that can be set to customize how the box template will appear.
   * *thumb* - the value, in the chosen or default units, of the diameter
     of a half-circle drawn at the top of the back of the box
 
-Finally, the other useful properties that can be set are for what needs to be
+CardBox Areas for Drawing Shapes
+--------------------------------
+
+The other useful properties that can be set are for what needs to be
 displayed on the various visible locations of the folded box. These locations
 include the front, the back, the left side, the right side, the top and the
 bottom (or underneath).
@@ -112,13 +118,18 @@ appear in that area.
 
 The shapes are automatically placed in the center of the area to which they are
 allocated.  If there are multiple shapes, they should be in a list (inside
-``[`` ... ``]`` brackets), and they will be drawn in order from left to right.
+``[`` ... ``]`` brackets), and these will be drawn in order from left to right.
 In other words, the leftmost shape is drawn first and the following shapes
 are drawn over each other in sequence.
 
 The locations for the shapes are all identified by the prefix ``shape_``,
 followed by the area name: ``shape_front``, ``shape_back``, ``shape_left``,
 ``shape_right``, ``shape_top`` and ``shape_bottom``.
+
+In addition to the six primary areas, the ``shape_wrap`` property will allow
+one or more shapes to occupy **all** of the areas excluding``shape_top``
+and ``shape_bottom``. Shapes in this area are drawn first, so shapes specified
+for the other locations are, or can be, drawn over it.
 
 .. HINT::
 
@@ -133,11 +144,16 @@ CardBox Examples
 ================
 `↑ <table-of-contents-cardbox_>`_
 
-The examples below shows how a ``CardBox`` can be created and styled.
+The examples below show how a ``CardBox`` can be created and styled.
 
-The examples are shown on a A5-size page, landscape orientation, with
-a background grid (``1`` cm squares) and ``0.25`` cm (~1/10") margin.
-The code for this is:
+- `Example 1: A default CardBox`_
+- `Example 2: CardBox Properties`_
+- `Example 3: CardBox Shapes`_
+- `Example 4: CardBox Wrap`_
+
+All of examples are shown on an A5-size page, in landscape orientation,
+with a background grid (``1`` cm squares) and ``0.25`` cm (~1/10")
+margin. The code for this is:
 
 .. code:: python
 
@@ -152,11 +168,11 @@ Note also that for purposes of easy viewing, the line thicknesses of the
 first two examples have been increased; if the images are still unclear,
 then click on them to see a larger view.
 
-Example 1: The default CardBox
-------------------------------
+Example 1: A default CardBox
+----------------------------
 `^ <cardboxExamples_>`_
 
-.. |cb1| image:: images/objects/cardbox_default.png
+.. |cb1| image:: ../images/objects/cardbox_default.png
    :width: 330
 
 ===== ======
@@ -168,7 +184,7 @@ Example 1: The default CardBox
 
       All of the CardBox shapes are constructed with same basic layout:
       the front, right, back and left areas in sequence across the midddle
-      with the top atached to the front and the bottom attached to the back.
+      with the top attached to the front and the bottom attached to the back.
 
       The default template is designed to house a standard playing card deck
       of *Poker*-sized cards.  The default *padding* for these cards is 2mm.
@@ -183,7 +199,7 @@ Example 2: CardBox Properties
 -----------------------------
 `^ <cardboxExamples_>`_
 
-.. |cb2| image:: images/objects/cardbox_custom.png
+.. |cb2| image:: ../images/objects/cardbox_custom.png
    :width: 330
 
 ===== ======
@@ -202,7 +218,7 @@ Example 2: CardBox Properties
 
       All of the CardBox shapes are constructed with same basic layout:
       the front, right, back and left areas in sequence across the midddle
-      with the top atached to the front and the bottom attached to the back.
+      with the top attached to the front and the bottom attached to the back.
 
       The customisation here involves:
 
@@ -221,7 +237,7 @@ Example 3: CardBox Shapes
 -------------------------
 `^ <cardboxExamples_>`_
 
-.. |cb3| image:: images/objects/cardbox_shapes.png
+.. |cb3| image:: ../images/objects/cardbox_shapes.png
    :width: 330
 
 ===== ======
@@ -272,7 +288,7 @@ Example 3: CardBox Shapes
 
       All of the CardBox shapes are constructed with same basic layout:
       the front, right, back and left areas in sequence across the midddle
-      with the top atached to the front and the bottom attached to the back.
+      with the top attached to the front and the bottom attached to the back.
 
       In addition to the same kind of customisation shown above in
       `Example 2: CardBox Properties`_ the following are also set:
@@ -296,6 +312,88 @@ Example 3: CardBox Shapes
 
 ===== ======
 
+Example 4: CardBox Wrap
+-----------------------
+`^ <cardboxExamples_>`_
+
+.. |cb4| image:: ../images/objects/cardbox_wrap.png
+   :width: 330
+
+===== ======
+|cb4| This example shows a CardBox object constructed using these commands:
+
+      .. code:: python
+
+        name = Common(
+            text="Norsemen: The Cards",
+            font_size=14,
+            stroke="white")
+        cbx = Common(font_size=14, stroke="white")
+        name_up = text(common=name)
+        name_front = text(common=name)
+        name_top = text(common=name)
+        name_btm = text(
+            "NtG:Bottom", common=cbx, rotation=180)
+        name_lft = text(
+            "NtG:Left", common=cbx, rotation=-90)
+        name_rgh = text(
+            "NtG:Right", common=cbx, rotation=90)
+        name_bck = text(
+            "NtG:Back", common=cbx)
+
+        wrapper = image(
+            "images/rogue-li-unsplash.jpg",
+            width=14, height=7,
+            fit="width")
+
+        CardBox(
+            x=0, y=0,
+            thumb=1.25,
+            card_size="Mini",  #44.5, 63.5
+            fold=True,
+            fold_stroke="yellow",
+            fill="#61778F",
+            padding_width=0.8,
+            padding_height=0.8,
+            rounded=True,
+            flap=1,
+            flap_glue=0.25,
+            flap_inner=0.5,
+            shapes_wrap=wrapper,
+            shapes_front=name_front,
+            shapes_back=name_bck,
+            shapes_top=name_top,
+            shapes_bottom=name_btm,
+            shapes_left=name_lft,
+            shapes_right=name_rgh,
+        )
+        Text(
+            "Photo by https://unsplash.com/@rogueli",
+            y=13, x=0, align="left")
+
+      All of the CardBox shapes are constructed with same basic layout:
+      the front, right, back and left areas in sequence across the midddle
+      with the top attached to the front and the bottom attached to the back.
+
+      In addition to the same kind of customisation shown above in
+      `Example 3: CardBox Shapes`_ the following is also set:
+
+          ``shapes_wrap=wrapper``
+
+      This shape covers occupies all of the other areas excluding
+      ``shape_top`` and ``shape_bottom``, and within the bounds set by the
+      ``padding``, and is drawn first; that is why the text shapes from the
+      other areas appear over it.
+
+      The ``Image()`` used for the wrap makes use of the ``fit`` property
+      to ensure the whole area is occupied; this causes a small distortion
+      across the width of the image but, in this case, its less noticable
+      because of the landscape it depicts.
+
+      **Note:** The background image used for this example is sourced from:
+      https://unsplash.com/photos/dark-stormy-clouds-over-a-calm-blue-ocean-_bO-Wa0DHaU
+
+===== ======
 
 .. _cardbox-resources:
 

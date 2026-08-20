@@ -50,7 +50,7 @@ which provides a logical reading order.
    core_shapes
    customised_shapes
    shapes_geometry
-   objects
+   objects/index
    customised_text
 
 .. toctree::
@@ -67,7 +67,7 @@ which provides a logical reading order.
    :maxdepth: 2
    :caption: Advanced Topics:
 
-   layouts
+   layouts/index
    hexagonal_grids
    hexhex_grids
    additional_commands

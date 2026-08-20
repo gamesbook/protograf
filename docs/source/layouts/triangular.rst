@@ -5,14 +5,14 @@ TriangularLocations Command
 .. |dash| unicode:: U+2014 .. EM DASH SIGN
 
 This section assumes you are very familiar with the concepts, terms and
-ideas for :doc:`protograf <index>` as presented in the
-:doc:`Basic Concepts <basic_concepts>` , that you understand all of the
-:doc:`Additional Concepts <additional_concepts>`
+ideas for :doc:`protograf <../index>` as presented in the
+:doc:`Basic Concepts <../basic_concepts>` , that you understand all of the
+:doc:`Additional Concepts <../additional_concepts>`
 and that you've created some basic scripts of your own using the
-:doc:`Core Shapes <core_shapes>`.
+:doc:`Core Shapes <../core_shapes>`.
 
-This is part of the set of commands used for :doc:`Layouts <layouts>`,
-that are used in conjunction with the :doc:`Layout command <layout_command>`.
+This is part of the set of commands used for :doc:`Layouts <../layouts>`,
+that are used in conjunction with the :doc:`Layout command <command>`.
 
 
 .. _table-of-contents-trilay:
@@ -37,11 +37,11 @@ Apart from the ``TriangularLocations()`` command described here,
 there are also these other commands which allow you to layout
 elements in a more repetitive or regular way within a page:
 
-- :doc:`Repeat <layouts_repeat>`
-- :doc:`Sequence <layouts_sequence>`
-- :doc:`Tracks <layouts_track>`
-- :doc:`RectangularLocations <layouts_rectangular>`
-- :doc:`DiamondLocations <layouts_diamond>`
+- :doc:`Repeat <repeat>`
+- :doc:`Sequence <sequence>`
+- :doc:`Tracks <track>`
+- :doc:`RectangularLocations <rectangular>`
+- :doc:`DiamondLocations <diamond>`
 
 
 Usage
@@ -107,7 +107,7 @@ Example 1. Rows and Columns
 ---------------------------
 `^ <trilay-properties_>`_
 
-.. |tl0| image:: images/layouts/layout_tri_default.png
+.. |tl0| image:: ../images/layouts/layout_tri_default.png
    :width: 330
 
 ===== ======
@@ -130,7 +130,7 @@ Example 2. East - 2 Rows
 ------------------------
 `^ <trilay-properties_>`_
 
-.. |tl1| image:: images/layouts/layout_tri_east_row2.png
+.. |tl1| image:: ../images/layouts/layout_tri_east_row2.png
    :width: 330
 
 ===== ======
@@ -157,7 +157,7 @@ Example 3. East - 6 Rows
 ------------------------
 `^ <trilay-properties_>`_
 
-.. |tl2| image:: images/layouts/layout_tri_east_row6.png
+.. |tl2| image:: ../images/layouts/layout_tri_east_row6.png
    :width: 330
 
 ===== ======
@@ -184,7 +184,7 @@ Example 4. North - 2 Columns
 ----------------------------
 `^ <trilay-properties_>`_
 
-.. |tl3| image:: images/layouts/layout_tri_north_col2.png
+.. |tl3| image:: ../images/layouts/layout_tri_north_col2.png
    :width: 330
 
 ===== ======
@@ -211,7 +211,7 @@ Example 5. North - 6 Columns
 ----------------------------
 `^ <trilay-properties_>`_
 
-.. |tl4| image:: images/layouts/layout_tri_north_col6.png
+.. |tl4| image:: ../images/layouts/layout_tri_north_col6.png
    :width: 330
 
 ===== ======
@@ -238,7 +238,7 @@ Example 6. West - 3 Rows
 ------------------------
 `^ <trilay-properties_>`_
 
-.. |tl5| image:: images/layouts/layout_tri_west_row3.png
+.. |tl5| image:: ../images/layouts/layout_tri_west_row3.png
    :width: 330
 
 ===== ======
@@ -265,7 +265,7 @@ Example 7. South - 3 Columns
 ----------------------------
 `^ <trilay-properties_>`_
 
-.. |tl6| image:: images/layouts/layout_tri_south_col3.png
+.. |tl6| image:: ../images/layouts/layout_tri_south_col3.png
    :width: 330
 
 ===== ======
@@ -292,7 +292,7 @@ Example 8. Mixed Styles
 -----------------------
 `^ <trilay-properties_>`_
 
-.. |tl7| image:: images/layouts/layout_tri_all.png
+.. |tl7| image:: ../images/layouts/layout_tri_all.png
    :width: 330
 
 ===== ======
@@ -340,7 +340,7 @@ Example 9. Gridlines - Direction
 --------------------------------
 `^ <trilay-properties_>`_
 
-.. |tl8| image:: images/layouts/layout_tri_gridlines_ne.png
+.. |tl8| image:: ../images/layouts/layout_tri_gridlines_ne.png
    :width: 330
 
 ===== ======
@@ -382,7 +382,7 @@ Example 10. Gridlines - Fill
 ----------------------------
 `^ <trilay-properties_>`_
 
-.. |tl9| image:: images/layouts/layout_tri_gridlines_fill.png
+.. |tl9| image:: ../images/layouts/layout_tri_gridlines_fill.png
    :width: 330
 
 ===== ======

@@ -27,26 +27,25 @@ Why use this?
 =============
 
 **protograf** is not going to change your life forever and make you wonder how
-you  ever managed without it. It's not the best tool for every project nor is
-it better than everything else. However, it is possible that for some cases
-for some people it will be a helpful tool in the process of board game
-creation.
+you ever managed without it. It's not the best tool for every project nor is
+it better than everything else.  However, it is possible that for some cases
+for some people it will be a helpful tool in the process of board game design.
 
 Most people who start off a game's design process are going to be drawing by
 hand on sheets of paper or card, or scribbling on small card-sized pieces.
 
 When things are in a state of flux, you don't want to be committed to anything
 fancy that takes lots of time or effort to change.  However, at some point,
-you'd like to share your creation with a wider group of people; friends, family
-or even fellow game designers and game testers.  This means converting it into
-a digital format which has legible text and clear graphics.
+you need to share your creation with a wider group of people; friends, family
+or even fellow game designers and game playtesters.  This means converting the
+scribbles into a digital format which has legible text and clear graphics.
 
 At this point you're **not** trying to create a fancy polished project that is
-ready for production and sale.  You just need a prototype.  If you are not a
+ready for production and sale.  You just need a prototype.  If you are *not* a
 graphic designer, then you have a choice. Do you now try and learn a graphic
 design program, or do you rather just make use of any existing tools that you
 have |dash| for example, a word-processor or spreadsheet |dash| which are not
-really specifically designed to meet the typical requirements for a game layout
+specifically designed to meet the typical requirements for a game layout
 and could be awkward to work with?
 
 At this point you can consider looking at **protograf** to meet your needs.
@@ -61,7 +60,8 @@ The primary way that you express yourself is through logically constructed
 discussions and arguments where the details matter.  With **protograf**, you
 start off simple and gradually add more layers of detail as you go on.
 Its very easy to turn things on and off, and everything that you've done so
-far is directly visible to you, and not hidden away in layers of menus.
+far is directly visible to you, and not hidden away in layers of menus, or
+complex sequences of changes.
 
 Getting to a final product might seem intimidating if you are looking at a
 100-line long "final script", but because it's a *process* that you are in
@@ -75,15 +75,19 @@ as it was when you first created it.
 How is this designed?
 =====================
 
+The aim was to develop a program that is reasonably simple, quick and useful;
+and which supports rapid development of a clean and simple prototype design
+that will change and develop over a number of versions.
+
 The three principles of **protograf** |dash| as much as any piece of software
 can have "principles" |dash| are clarity, consistency, and comprehensiveness.
 
-By *clarity* I mean that the terminology and approach to constructing elements
-of a game design should be reasonably obvious.  I do appreciate that nothing
+*Clarity* means that the terminology and approach to constructing elements
+of a game design should be reasonably obvious.  I appreciate that nothing
 is fully intuitive and inherently obvious, and every new thing we do relies to
 some degree on our previous knowledge. So **protograf** tries to avoid jargon,
-and also to use "long hand", rather than abbreviations which may not be that
-memorable.
+and also to use "long hand", rather than quirky abbreviations or special
+characters, which may not be that easy to remember.
 
 As an example, to draw a rectangle on a page you would use a command like:
 ``Rectangle(x=3, y=5, height=6, width=7)``.  If you understand the basic

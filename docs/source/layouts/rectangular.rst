@@ -7,14 +7,14 @@ RectangularLocations Command
    :ltrim:
 
 This section assumes you are very familiar with the concepts, terms and
-ideas for :doc:`protograf <index>` as presented in the
-:doc:`Basic Concepts <basic_concepts>` , that you understand all of the
-:doc:`Additional Concepts <additional_concepts>`
+ideas for :doc:`protograf <../index>` as presented in the
+:doc:`Basic Concepts <../basic_concepts>` , that you understand all of the
+:doc:`Additional Concepts <../additional_concepts>`
 and that you've created some basic scripts of your own using the
-:doc:`Core Shapes <core_shapes>`.
+:doc:`Core Shapes <../core_shapes>`.
 
-This is part of the set of commands used for :doc:`Layouts <layouts>`,
-that are used in conjunction with the :doc:`Layout command <layout_command>`.
+This is part of the set of commands used for :doc:`Layouts <../layouts>`,
+that are used in conjunction with the :doc:`Layout command <command>`.
 
 .. _table-of-contents-rect:
 
@@ -42,11 +42,11 @@ Apart from the ``RectangularLocations()`` command described here,
 there are also these other commands which allow you to layout
 elements in a more repetitive or regular way within a page:
 
-- :doc:`Repeat <layouts_repeat>`
-- :doc:`Sequence <layouts_sequence>`
-- :doc:`Tracks <layouts_track>`
-- :doc:`TriangularLocations <layouts_triangular>`
-- :doc:`DiamondLocations <layouts_diamond>`
+- :doc:`Repeat <repeat>`
+- :doc:`Sequence <sequence>`
+- :doc:`Tracks <track>`
+- :doc:`TriangularLocations <triangular>`
+- :doc:`DiamondLocations <diamond>`
 
 
 Usage
@@ -142,7 +142,7 @@ Example 1. Rows and Columns
 ---------------------------
 `^ <key-properties-rect_>`_
 
-.. |r00| image:: images/layouts/rect_basic_default.png
+.. |r00| image:: ../images/layouts/rect_basic_default.png
    :width: 330
 
 ===== ======
@@ -168,7 +168,7 @@ Example 2. Start and Direction
 ------------------------------
 `^ <key-properties-rect_>`_
 
-.. |r01| image:: images/layouts/rect_basic_east.png
+.. |r01| image:: ../images/layouts/rect_basic_east.png
    :width: 330
 
 ===== ======
@@ -191,7 +191,7 @@ Example 3. Row and Column Interval
 ----------------------------------
 `^ <key-properties-rect_>`_
 
-.. |02a| image:: images/layouts/rect_basic_interval.png
+.. |02a| image:: ../images/layouts/rect_basic_interval.png
    :width: 330
 
 ===== ======
@@ -212,7 +212,7 @@ Example 3. Row and Column Interval
 
 ===== ======
 
-.. |02b| image:: images/layouts/rect_basic_interval_row_col.png
+.. |02b| image:: ../images/layouts/rect_basic_interval_row_col.png
    :width: 330
 
 ===== ======
@@ -237,7 +237,7 @@ Example 4. Row and Column Offset
 --------------------------------
 `^ <key-properties-rect_>`_
 
-.. |03a| image:: images/layouts/rect_basic_east_even.png
+.. |03a| image:: ../images/layouts/rect_basic_east_even.png
    :width: 330
 
 ===== ======
@@ -259,7 +259,7 @@ Example 4. Row and Column Offset
 
 ===== ======
 
-.. |03b| image:: images/layouts/rect_basic_east_odd.png
+.. |03b| image:: ../images/layouts/rect_basic_east_odd.png
    :width: 330
 
 ===== ======
@@ -285,7 +285,7 @@ Example 5. Snaking
 ------------------
 `^ <key-properties-rect_>`_
 
-.. |r03| image:: images/layouts/rect_basic_snake.png
+.. |r03| image:: ../images/layouts/rect_basic_snake.png
    :width: 330
 
 ===== ======
@@ -310,7 +310,7 @@ Example 6. Outer Edge
 ---------------------
 `^ <key-properties-rect_>`_
 
-.. |r04| image:: images/layouts/rect_basic_outer.png
+.. |r04| image:: ../images/layouts/rect_basic_outer.png
    :width: 330
 
 ===== ======
@@ -352,7 +352,7 @@ Example 6a. Outer Edge - Shapes
 -------------------------------
 `^ <key-properties-rect_>`_
 
-.. |r4a| image:: images/layouts/layout_rect_outer_multi.png
+.. |r4a| image:: ../images/layouts/layout_rect_outer_multi.png
    :width: 330
 
 ===== ======
@@ -406,7 +406,7 @@ Example 6b. Outer Edge - Stop and Start
 ---------------------------------------
 `^ <key-properties-rect_>`_
 
-.. |r4b| image:: images/layouts/layout_rect_outer_multi_stop.png
+.. |r4b| image:: ../images/layouts/layout_rect_outer_multi_stop.png
    :width: 330
 
 ===== ======
@@ -450,7 +450,7 @@ Example 6c. Outer Edge - Rotation
 ---------------------------------
 `^ <key-properties-rect_>`_
 
-.. |r4c| image:: images/layouts/layout_rect_outer_rotation.png
+.. |r4c| image:: ../images/layouts/layout_rect_outer_rotation.png
    :width: 330
 
 ===== ======
@@ -510,7 +510,7 @@ Example 7. Masked
 -----------------
 `^ <key-properties-rect_>`_
 
-.. |r05| image:: images/layouts/rect_basic_outer_mask.png
+.. |r05| image:: ../images/layouts/rect_basic_outer_mask.png
    :width: 330
 
 ===== ======
@@ -535,7 +535,7 @@ Example 8. Visible
 ------------------
 `^ <key-properties-rect_>`_
 
-.. |r06| image:: images/layouts/rect_basic_outer_visible.png
+.. |r06| image:: ../images/layouts/rect_basic_outer_visible.png
    :width: 330
 
 ===== ======
@@ -560,7 +560,7 @@ Example 9. Locations Setting
 ----------------------------
 `^ <key-properties-rect_>`_
 
-.. |r07| image:: images/layouts/rect_basic_locations.png
+.. |r07| image:: ../images/layouts/rect_basic_locations.png
    :width: 330
 
 ===== ======
@@ -594,7 +594,7 @@ Example 10. Debug
 -----------------
 `^ <key-properties-rect_>`_
 
-.. |10a| image:: images/layouts/rect_basic_debug.png
+.. |10a| image:: ../images/layouts/rect_basic_debug.png
    :width: 330
 
 ===== ======
@@ -615,7 +615,7 @@ Example 10. Debug
 
 ===== ======
 
-.. |10b| image:: images/layouts/rect_basic_debug_sequence.png
+.. |10b| image:: ../images/layouts/rect_basic_debug_sequence.png
    :width: 330
 
 ===== ======
@@ -637,7 +637,7 @@ Example 10. Debug
 
 ===== ======
 
-.. |07c| image:: images/layouts/rect_basic_debug_colrow.png
+.. |07c| image:: ../images/layouts/rect_basic_debug_colrow.png
    :width: 330
 
 ===== ======
@@ -665,7 +665,7 @@ Example 11. Gridlines - Orthogonal
 ----------------------------------
 `^ <key-properties-rect_>`_
 
-.. |11g| image:: images/layouts/rect_locs_grid_orth.png
+.. |11g| image:: ../images/layouts/rect_locs_grid_orth.png
    :width: 330
 
 ===== ======
@@ -707,7 +707,7 @@ Example 12. Gridlines - Diagonal
 --------------------------------
 `^ <key-properties-rect_>`_
 
-.. |12g| image:: images/layouts/rect_locs_grid_diag.png
+.. |12g| image:: ../images/layouts/rect_locs_grid_diag.png
    :width: 330
 
 ===== ======
@@ -749,7 +749,7 @@ Example 13. Gridlines - Fill
 ----------------------------
 `^ <key-properties-rect_>`_
 
-.. |13g| image:: images/layouts/rect_locs_grid_fill.png
+.. |13g| image:: ../images/layouts/rect_locs_grid_fill.png
    :width: 330
 
 ===== ======
@@ -801,7 +801,7 @@ Example 14. Shapes - by Rows
 ----------------------------
 `^ <key-properties-rect_>`_
 
-.. |14g| image:: images/layouts/rect_locs_shape_rows.png
+.. |14g| image:: ../images/layouts/rect_locs_shape_rows.png
    :width: 330
 
 ===== ======
@@ -842,7 +842,7 @@ Example 15. Shapes - by Columns
 -------------------------------
 `^ <key-properties-rect_>`_
 
-.. |15g| image:: images/layouts/rect_locs_shape_cols.png
+.. |15g| image:: ../images/layouts/rect_locs_shape_cols.png
    :width: 330
 
 ===== ======

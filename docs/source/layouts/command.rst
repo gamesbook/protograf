@@ -7,13 +7,13 @@ Layout Command
    :ltrim:
 
 This section assumes you are very familiar with the concepts, terms and
-ideas for :doc:`protograf <index>` as presented in the
-:doc:`Basic Concepts <basic_concepts>` , that you understand all of the
-:doc:`Additional Concepts <additional_concepts>`
+ideas for :doc:`protograf <../index>` as presented in the
+:doc:`Basic Concepts <../basic_concepts>` , that you understand all of the
+:doc:`Additional Concepts <../additional_concepts>`
 and that you've created some basic scripts of your own using the
-:doc:`Core Shapes <core_shapes>`.
+:doc:`Core Shapes <../core_shapes>`.
 
-This is part of the set of commands used for :doc:`Layouts <layouts>`.
+This is part of the set of commands used for :doc:`Layouts <../layouts>`.
 
 .. _layout-command:
 
@@ -25,13 +25,13 @@ Location-based grid; it specifies the shapes that are to be drawn at locations.
 
 The location-based grids that are available are:
 
--  :doc:`RectangularLocations() <layouts_rectangular>` - defines a series of
+-  :doc:`RectangularLocations() <rectangular>` - defines a series of
    differing x- and y-points in a rectangular pattern; these x- and y-values
    will set the centre of any element being placed on the grid
--  :doc:`TriangularLocations() <layouts_triangular>` - defines a series of
+-  :doc:`TriangularLocations() <triangular>` - defines a series of
    differing x- and y-points in a triangular pattern; these x- and y-values
    will set the centre of any element being placed on the grid
--  :doc:`DiamondLocations() <layouts_diamond>` - defines a series of
+-  :doc:`DiamondLocations() <diamond>` - defines a series of
    differing x- and y-points in a diamond pattern; these x- and y-values
    will set the centre of any element being placed on the grid
 

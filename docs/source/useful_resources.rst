@@ -41,6 +41,9 @@ Prototyping Tools
 Icons, Art and Images
 =====================
 
+As far as possible, this excludes AI-generated art or icons; if you see any
+listed, please create an issue on this program's GitHub website.
+
 -  https://openclipart.org/
 -  https://www.svgrepo.com/
 -  https://game-icons.net/
@@ -60,11 +63,6 @@ Icons, Art and Images
    military and other equipment and objects... plus a skull or two
 -  https://www.deviantart.com/sharandra/gallery/38764181/stock-textures - images
    that can be used to fill in background areas (check license and attribution)
-
-There is a collated list of sites with free *artwork* at
-https://www.fairway3games.com/where-do-i-get-art-for-free-an-ongoing-list/
-(if this site is down, check the archived copy:
-https://web.archive.org/web/20220330035328/https://www.fairway3games.com/where-do-i-get-art-for-free-an-ongoing-list/)
 
 
 Map Art and Icons

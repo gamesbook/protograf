@@ -4,13 +4,16 @@ RaceTrack
 
 .. |dash| unicode:: U+2014 .. EM DASH SIGN
 
+Racetracks are one of a number of what are termed
+:doc:`Compound Objects <../objects>`.
+
 This section assumes you are very familiar with the concepts, terms and ideas
-for :doc:`protograf <index>`  as presented in the
-:doc:`Basic Concepts <basic_concepts>` , that you understand all of the
-:doc:`Additional Concepts <additional_concepts>` and that you've created some
-basic scripts of your own using the :doc:`Core Shapes <core_shapes>`. You also
-be familiar with the various types of shapes' properties described in the
-:doc:`Customised Shapes <customised_shapes>`
+for :doc:`protograf <../index>`  as presented in the
+:doc:`Basic Concepts <../basic_concepts>` , that you understand all of the
+:doc:`Additional Concepts <../additional_concepts>` and that you've created some
+basic scripts of your own using the :doc:`Core Shapes <../core_shapes>`. You
+should also be familiar with the various types of shapes' properties described in
+the :doc:`Customised Shapes <../customised_shapes>`.
 
 .. _racetrackOver:
 
@@ -33,7 +36,7 @@ A ``RaceTrack`` is effectively a pathway; and, if the end of the pathway
 aligns with the start, it becomes what can be perceived as a "racetrack".
 
 The ``RaceTrack`` does not really have the positioning and styling properties
-common to many other :doc:`shapes <core_shapes>`; instead it derives its
+common to many other :doc:`shapes <../core_shapes>`; instead it derives its
 appearance from the Bands and/or Rectangles which compose it.
 
 The ``RaceTrack`` command only has one property:
@@ -69,7 +72,7 @@ Example 1. Simple Track
 ------------------------
 `^ <racetrack-object_>`_
 
-.. |rt1| image:: images/objects/racetrack_simple.png
+.. |rt1| image:: ../images/objects/racetrack_simple.png
    :width: 330
 
 ===== ======
@@ -127,7 +130,7 @@ Example 2. Joined Track
 ------------------------
 `^ <racetrack-object_>`_
 
-.. |rt2| image:: images/objects/racetrack_joined.png
+.. |rt2| image:: ../images/objects/racetrack_joined.png
    :width: 330
 
 ===== ======
@@ -178,7 +181,7 @@ Example 3. Complex Track
 ------------------------
 `^ <racetrack-object_>`_
 
-.. |rt3| image:: images/objects/racetrack_complex.png
+.. |rt3| image:: ../images/objects/racetrack_complex.png
    :width: 330
 
 ===== ======
@@ -254,7 +257,7 @@ Example 4. Inverted Track
 -------------------------
 `^ <racetrack-object_>`_
 
-.. |rt4| image:: images/objects/racetrack_invert.png
+.. |rt4| image:: ../images/objects/racetrack_invert.png
    :width: 330
 
 ===== ======

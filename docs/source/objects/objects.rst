@@ -1,24 +1,24 @@
-================
-Compound Objects
-================
+=========================
+Compound Objects Overview
+=========================
 
 .. |dash| unicode:: U+2014 .. EM DASH SIGN
 
 This section assumes you are very familiar with the concepts, terms and ideas
-for :doc:`protograf <index>`  as presented in the
-:doc:`Basic Concepts <basic_concepts>` , that you understand all of the
-:doc:`Additional Concepts <additional_concepts>` and that you've created some
-basic scripts of your own using the :doc:`Core Shapes <core_shapes>`. You also
+for :doc:`protograf <../index>`  as presented in the
+:doc:`Basic Concepts <../basic_concepts>` , that you understand all of the
+:doc:`Additional Concepts <../additional_concepts>` and that you've created some
+basic scripts of your own using the :doc:`Core Shapes <../core_shapes>`. You also
 be familiar with the various types of shapes' properties described in the
-:doc:`Customised Shapes <customised_shapes>`
+:doc:`Customised Shapes <../customised_shapes>`
 
 .. _objects-overview:
 
-Overview
-========
+Summary
+=======
 
 In many cases, compound objects are constructed |dash| compounded |dash| out
-of one or more of the :doc:`core shapes <core_shapes>`; for example,
+of one or more of the :doc:`core shapes <../core_shapes>`; for example,
 a `polyomino`_ is composed of one or more :ref:`squares <square-command>` and
 simple `dice`_ are also a single square. Thus these objects are able to use,
 or reference, many of the properties of these core shapes, in addition to their
@@ -46,7 +46,7 @@ A CardBox can be used to generate a template, or outline, of a shape
 that is designed to be cut-out and folded to create a box |dash| for
 boardgames, such a box is often referred to as a **tuckbox**.
 
-For more details, see the :ref:`CardBox <cardbox-object>` section.
+For more details, see the :doc:`CardBox <cardbox>` section.
 
 
 Cube

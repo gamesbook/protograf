@@ -4,13 +4,16 @@ Tetrominoes
 
 .. |dash| unicode:: U+2014 .. EM DASH SIGN
 
+Tetrominoes are one of a number of what are termed
+:doc:`Compound Objects <../objects>`.
+
 This section assumes you are very familiar with the concepts, terms and ideas
-for :doc:`protograf <index>`  as presented in the
-:doc:`Basic Concepts <basic_concepts>` , that you understand all of the
-:doc:`Additional Concepts <additional_concepts>` and that you've created some
-basic scripts of your own using the :doc:`Core Shapes <core_shapes>`. You also
-be familiar with the various types of shapes' properties described in the
-:doc:`Customised Shapes <customised_shapes>`
+for :doc:`protograf <../index>`  as presented in the
+:doc:`Basic Concepts <../basic_concepts>` , that you understand all of the
+:doc:`Additional Concepts <../additional_concepts>` and that you've created some
+basic scripts of your own using the :doc:`Core Shapes <../core_shapes>`. You
+should also be familiar with the various types of shapes' properties described in
+the :doc:`Customised Shapes <../customised_shapes>`.
 
 .. _tetrominoesOver:
 
@@ -47,7 +50,7 @@ Tetromino: Uppercase Letter
 ---------------------------
 `^ <tetrominoesOver_>`_
 
-.. |te1| image:: images/objects/tetromino_upper.png
+.. |te1| image:: ../images/objects/tetromino_upper.png
    :width: 330
 
 ===== ======
@@ -75,7 +78,7 @@ Tetromino: Lowercase Letter
 ---------------------------
 `^ <tetrominoesOver_>`_
 
-.. |te2| image:: images/objects/tetromino_lower.png
+.. |te2| image:: ../images/objects/tetromino_lower.png
    :width: 330
 
 ===== ======
@@ -103,7 +106,7 @@ Tetromino: Tetris-styled
 ------------------------
 `^ <tetrominoesOver_>`_
 
-.. |te3| image:: images/objects/tetromino_tetris.png
+.. |te3| image:: ../images/objects/tetromino_tetris.png
    :width: 330
 
 ===== ======

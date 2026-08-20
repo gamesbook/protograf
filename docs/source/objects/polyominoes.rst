@@ -6,21 +6,23 @@ Polyominoes
 .. |deg|  unicode:: U+00B0 .. DEGREE SIGN
    :ltrim:
 
+Polyominoes are one of a number of what are termed
+:doc:`Compound Objects <../objects>`.
+
 This section assumes you are very familiar with the concepts, terms and ideas
-for :doc:`protograf <index>`  as presented in the
-:doc:`Basic Concepts <basic_concepts>` , that you understand all of the
-:doc:`Additional Concepts <additional_concepts>` and that you've created some
-basic scripts of your own using the :doc:`Core Shapes <core_shapes>`. You also
-be familiar with the various types of shapes' properties described in the
-:doc:`Customised Shapes <customised_shapes>`
+for :doc:`protograf <../index>`  as presented in the
+:doc:`Basic Concepts <../basic_concepts>` , that you understand all of the
+:doc:`Additional Concepts <../additional_concepts>` and that you've created some
+basic scripts of your own using the :doc:`Core Shapes <../core_shapes>`. You
+should also be familiar with the various types of shapes' properties described in
+the :doc:`Customised Shapes <../customised_shapes>`.
 
 .. _polyominoesOver:
 
 Overview
 ========
 
-Polyominoes are :doc:`graphical objects <objects>` constructed out of a
-``pattern`` of one or more squares.
+Polyominoes are constructed out of a ``pattern`` of one or more squares.
 
 Normally, polyominoes are made up of squares that touch other squares
 along one or more sides, but the ``pattern`` property approach used by
@@ -81,7 +83,7 @@ Polyomino: Basic
 ----------------
 `^ <polyominoesIndex_>`_
 
-.. |po1| image:: images/objects/polyomino_basic.png
+.. |po1| image:: ../images/objects/polyomino_basic.png
    :width: 330
 
 ===== ======
@@ -108,7 +110,7 @@ Polyomino: Pattern
 ------------------
 `^ <polyominoesIndex_>`_
 
-.. |po2| image:: images/objects/polyomino_pattern.png
+.. |po2| image:: ../images/objects/polyomino_pattern.png
    :width: 330
 
 ===== ======
@@ -142,7 +144,7 @@ Polyomino: Gap
 --------------
 `^ <polyominoesIndex_>`_
 
-.. |po3| image:: images/objects/polyomino_gap.png
+.. |po3| image:: ../images/objects/polyomino_gap.png
    :width: 330
 
 ===== ======
@@ -178,7 +180,7 @@ Polyomino: Invert
 -----------------
 `^ <polyominoesIndex_>`_
 
-.. |po4| image:: images/objects/polyomino_invert.png
+.. |po4| image:: ../images/objects/polyomino_invert.png
    :width: 330
 
 ===== ======
@@ -214,7 +216,7 @@ Polyomino: Flip
 ---------------
 `^ <polyominoesIndex_>`_
 
-.. |po5| image:: images/objects/polyomino_flip.png
+.. |po5| image:: ../images/objects/polyomino_flip.png
    :width: 330
 
 ===== ======
@@ -250,7 +252,7 @@ Polyomino: Outline
 ------------------
 `^ <polyominoesIndex_>`_
 
-.. |po6| image:: images/objects/polyomino_outline.png
+.. |po6| image:: ../images/objects/polyomino_outline.png
    :width: 330
 
 ===== ======
@@ -279,7 +281,7 @@ Polyomino: Properties
 ---------------------
 `^ <polyominoesIndex_>`_
 
-.. |po7| image:: images/objects/polyomino_color.png
+.. |po7| image:: ../images/objects/polyomino_color.png
    :width: 330
 
 ===== ======
@@ -319,7 +321,7 @@ Polyomino: Shapes
 -----------------
 `^ <polyominoesIndex_>`_
 
-.. |po8| image:: images/objects/polyomino_shapes.png
+.. |po8| image:: ../images/objects/polyomino_shapes.png
    :width: 330
 
 ===== ======
@@ -358,7 +360,7 @@ Polyomino: Adhoc Design
 -----------------------
 `^ <polyominoesIndex_>`_
 
-.. |po9| image:: images/objects/polyomino_generic.png
+.. |po9| image:: ../images/objects/polyomino_generic.png
    :width: 330
 
 ===== ======

@@ -5,14 +5,14 @@ DiamondLocations Command
 .. |dash| unicode:: U+2014 .. EM DASH SIGN
 
 This section assumes you are very familiar with the concepts, terms and
-ideas for :doc:`protograf <index>` as presented in the
-:doc:`Basic Concepts <basic_concepts>` , that you understand all of the
-:doc:`Additional Concepts <additional_concepts>`
+ideas for :doc:`protograf <../index>` as presented in the
+:doc:`Basic Concepts <../basic_concepts>` , that you understand all of the
+:doc:`Additional Concepts <../additional_concepts>`
 and that you've created some basic scripts of your own using the
-:doc:`Core Shapes <core_shapes>`.
+:doc:`Core Shapes <../core_shapes>`.
 
-This is part of the set of commands used for :doc:`Layouts <layouts>`,
-that are used in conjunction with the :doc:`Layout command <layout_command>`.
+This is part of the set of commands used for :doc:`Layouts <../layouts>`,
+that are used in conjunction with the :doc:`Layout command <command>`.
 
 .. _table-of-contents-dialay:
 
@@ -38,11 +38,11 @@ Apart from the ``DiamondLocations()`` command described here,
 there are also these other commands which allow you to layout
 elements in a more repetitive or regular way within a page:
 
-- :doc:`Repeat <layouts_repeat>`
-- :doc:`Sequence <layouts_sequence>`
-- :doc:`Tracks <layouts_track>`
-- :doc:`RectangularLocations <layouts_rectangular>`
-- :doc:`TriangularLocations <layouts_triangular>`
+- :doc:`Repeat <repeat>`
+- :doc:`Sequence <sequence>`
+- :doc:`Tracks <track>`
+- :doc:`RectangularLocations <rectangular>`
+- :doc:`TriangularLocations <triangular>`
 
 
 Usage
@@ -109,7 +109,7 @@ Example 1. Rows and Columns
 ---------------------------
 `^ <dialay-properties_>`_
 
-.. |tl0| image:: images/layouts/layout_dia_default.png
+.. |tl0| image:: ../images/layouts/layout_dia_default.png
    :width: 330
 
 ===== ======
@@ -133,7 +133,7 @@ Example 2. East - 3 Columns
 ---------------------------
 `^ <dialay-properties_>`_
 
-.. |tl1| image:: images/layouts/layout_dia_east_col3.png
+.. |tl1| image:: ../images/layouts/layout_dia_east_col3.png
    :width: 330
 
 ===== ======
@@ -161,7 +161,7 @@ Example 3. West - 5 Rows
 ------------------------
 `^ <dialay-properties_>`_
 
-.. |tl2| image:: images/layouts/layout_dia_west_row5.png
+.. |tl2| image:: ../images/layouts/layout_dia_west_row5.png
    :width: 330
 
 ===== ======
@@ -189,7 +189,7 @@ Example 4. North - 3 Columns
 ----------------------------
 `^ <dialay-properties_>`_
 
-.. |tl3| image:: images/layouts/layout_dia_north_col3.png
+.. |tl3| image:: ../images/layouts/layout_dia_north_col3.png
    :width: 330
 
 ===== ======
@@ -217,7 +217,7 @@ Example 5. South - 5 Rows
 -------------------------
 `^ <dialay-properties_>`_
 
-.. |tl4| image:: images/layouts/layout_dia_south_row5.png
+.. |tl4| image:: ../images/layouts/layout_dia_south_row5.png
    :width: 330
 
 ===== ======
@@ -245,7 +245,7 @@ Example 6. Shapes - by Rows
 ---------------------------
 `^ <dialay-properties_>`_
 
-.. |tl5| image:: images/layouts/layout_dia_shape_rows.png
+.. |tl5| image:: ../images/layouts/layout_dia_shape_rows.png
    :width: 330
 
 ===== ======
@@ -285,7 +285,7 @@ Example 7. Shapes - by Columns
 ------------------------------
 `^ <dialay-properties_>`_
 
-.. |tl6| image:: images/layouts/layout_dia_shape_cols.png
+.. |tl6| image:: ../images/layouts/layout_dia_shape_cols.png
    :width: 330
 
 ===== ======
@@ -325,7 +325,7 @@ Example 8. Shapes - by Locations
 --------------------------------
 `^ <dialay-properties_>`_
 
-.. |tl7| image:: images/layouts/layout_dia_shape_locs.png
+.. |tl7| image:: ../images/layouts/layout_dia_shape_locs.png
    :width: 330
 
 ===== ======
@@ -366,7 +366,7 @@ Example 9. Gridlines - Direction
 --------------------------------
 `^ <dialay-properties_>`_
 
-.. |tl8| image:: images/layouts/layout_dia_gridlines_ne.png
+.. |tl8| image:: ../images/layouts/layout_dia_gridlines_ne.png
    :width: 330
 
 ===== ======
@@ -408,7 +408,7 @@ Example 10. Gridlines - Fill
 ----------------------------
 `^ <dialay-properties_>`_
 
-.. |tl9| image:: images/layouts/layout_dia_gridlines_fill.png
+.. |tl9| image:: ../images/layouts/layout_dia_gridlines_fill.png
    :width: 330
 
 ===== ======
