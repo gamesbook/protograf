@@ -37,6 +37,17 @@ extensions = [
     'sphinx_copybutton',
 ]
 
+# verbatimwrapslines=true: Tells Sphinx to wrap lines in standard code for PDF
+# verbatimforcewraps=true: Targets extreme line lengths and aggressively breaks
+#                          code tokens when they encounter rigid cell borders.
+latex_elements = {
+    'sphinxsetup': (
+        'verbatimwrapslines=true, '
+        'verbatimforcewraps=true, '
+        'sphinxVerbatimintable=true'
+    ),
+}
+
 # https://docs.readthedocs.io/en/stable/guides/cross-referencing-with-sphinx.html#automatically-label-sections
 # Make sure the target is unique
 autosectionlabel_prefix_document = True
