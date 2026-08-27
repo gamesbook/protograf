@@ -11,6 +11,7 @@ own particular properties.
    :maxdepth: 1
 
    objects
+   abstracts
    cardbox
    cubes
    dice

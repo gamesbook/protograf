@@ -1680,3 +1680,272 @@ class RaceTrackObject(BaseShape):
                 shadow_stage = stage_type(canvas=globals.canvas, **supplied_kwargs)
                 shadow_stage.draw()
                 old_stage = shadow_stage
+
+
+class AbstractBoardObject(BaseShape):
+    """Draw AbstractBoard composite shape on a given canvas.
+
+    Ref:
+
+    """
+
+    def __init__(self, _object=None, canvas=None, **kwargs):
+        super(AbstractBoardObject, self).__init__(
+            _object=_object, canvas=canvas, **kwargs
+        )
+        self.kwargs = kwargs
+        self.set_unit_properties()
+        # ---- custom properties
+        self.name = kwargs.get("name", "checkers")
+        self.colors = kwargs.get("colors", None)
+        self.hairs = tools.as_bool(kwargs.get("hairs", False))
+        self.labels = tools.as_bool(kwargs.get("labels", False))
+        self.grid_align = tools.as_bool(kwargs.get("grid_align", False))
+        self.pieces = kwargs.get("pieces", None)
+        self.pieces_resize = kwargs.get("pieces_resize", 0.8)
+        self._validate_choices()
+        # ---- conditional defaults
+        match _lower(self.name):
+            case "chess":
+                self.pieces_type = "chess"
+                if not self.colors:
+                    self.colors = ("white", "gray")
+                if not self.cols:
+                    self.rows = 8
+                if not self.cols:
+                    self.cols = 8
+                if not self.pieces:
+                    pass  # TODO - defaults
+
+            case "checkers":  # default
+                self.pieces_type = "checkers"
+                if not self.colors:
+                    self.colors = ("white",)
+                if not self.cols:
+                    self.rows = 8
+                if not self.cols:
+                    self.cols = 8
+            case "go":
+                self.pieces_type = "go"
+                self.grid_align = True
+                if not self.colors:
+                    self.colors = ("white",)
+                if not self.cols:
+                    self.rows = 18
+                if not self.cols:
+                    self.cols = 18
+            case "hex":
+                raise NotImplementedError("Sorry, a hex board is not available yet.")
+            case "hexhex":
+                raise NotImplementedError("Sorry, a hexhex board is not available yet.")
+            case _:
+                feedback(
+                    "The AbstractBoard 'name' property must be one of the following: "
+                    f" Chess, Go, Checkers (not '{self.name}').",
+                    True,
+                    True,
+                )
+
+    def _validate_choices(self) -> bool:
+        """Check user choices for valid selections."""
+        if self.pieces is not None:
+            if not isinstance(self.pieces, (list, tuple)):
+                feedback(
+                    "The AbstractBoard 'pieces' property must be a list of pieces, "
+                    f" not a '{type(self.pieces).__name__}'.",
+                    True,
+                    True,
+                )
+        if not isinstance(self.pieces_resize, (type(None), float, int)):
+            feedback(
+                "The AbstractBoard 'pieces_resize' property must be a number, "
+                f" not a '{type(self.name).__name__}'.",
+                True,
+                True,
+            )
+        if not isinstance(self.name, (type(None), str)):
+            feedback(
+                "The AbstractBoard 'name' property must be a string, "
+                f" not a '{type(self.name).__name__}'.",
+                True,
+                True,
+            )
+        if self.colors:
+            if not isinstance(self.colors, (list, tuple)):
+                feedback(
+                    "The AbstractBoard 'colors' property must be a list of colors, "
+                    f" not a '{type(self.name).__name__}'.",
+                    True,
+                    True,
+                )
+            for col in self.colors:
+                colrs.get_color(col)
+
+        return True
+
+    @property
+    def shape_centre(self) -> Point:
+        """Centre of AbstractBoardObject."""
+        return None
+
+    @property
+    def geo(self) -> ShapeGeometry:
+        """Geometry of AbstractBoardObject in user units."""
+        return ShapeGeometry()
+
+    @property
+    def geometry(self) -> ShapeGeometry:
+        """Geometry of AbstractBoardObject - alias for geo."""
+        return self.geo
+
+    def draw(self, cnv=None, off_x=0, off_y=0, ID=None, **kwargs):
+        """Draw the AbstractBoardObject on a given canvas."""
+        kwargs = self.kwargs | kwargs
+        cnv = cnv if cnv else globals.canvas  # a new Page/Shape may now exist
+        super().draw(cnv, off_x, off_y, ID, **kwargs)  # unit-based props
+
+    def aa(self):
+        pass
+
+
+class AbstractGameObject(BaseShape):
+    """Draw AbstractGame composite shape on a given canvas.
+
+    Reference:
+
+    """
+
+    def __init__(self, _object=None, canvas=None, **kwargs):
+        super(AbstractGameObject, self).__init__(
+            _object=_object, canvas=canvas, **kwargs
+        )
+        self.kwargs = kwargs
+        self.set_unit_properties()
+        # ---- custom properties
+        self.board = kwargs.get("board", None)
+        self.positions = kwargs.get("positions", None)
+        self.moves = kwargs.get("moves", None)
+        self.annotations = kwargs.get("annotations", None)
+        self.position_shapes = []
+        self._validate_choices()
+        self.process_positions()
+
+    def _validate_choices(self) -> bool:
+        """Check user choices for valid selections."""
+        if self.board is None:
+            feedback(
+                "The AbstractGame 'board' property must be set!",
+                True,
+                True,
+            )
+        if not isinstance(self.board, AbstractBoardObject):
+            feedback(
+                "The AbstractBoard 'board' property must be an AbstractBoard shape, "
+                f" not a '{type(self.name).__name__}'.",
+                True,
+                True,
+            )
+            if board.pieces is not None:
+                if not isinstance(board.pieces, (list, tuple)):
+                    feedback(
+                        "The AbstractBoard 'pieces' property must be a list of pieces, "
+                        f" not a '{type(board.pieces).__name__}'.",
+                        True,
+                        True,
+                    )
+        if self.positions is not None:
+            if not isinstance(self.positions, str):
+                feedback(
+                    "The AbstractGame 'positions' property must be a string with positions setting or layout, "
+                    f" not a '{type(self.positions).__name__}'.",
+                    True,
+                    True,
+                )
+        if self.moves is not None:
+            if not isinstance(self.moves, (list, tuple)):
+                feedback(
+                    "The AbstractGame 'moves' property must be a list of moves, "
+                    f" not a '{type(self.moves).__name__}'.",
+                    True,
+                    True,
+                )
+        if self.annotations is not None:
+            if not isinstance(self.annotations, (list, tuple)):
+                feedback(
+                    "The AbstractGame 'annotations' property must be a list of annotations, "
+                    f" not a '{type(self.annotations).__name__}'.",
+                    True,
+                    True,
+                )
+        # ---- handle special positions
+        match _lower(self.positions):
+            case "setup":
+                match _lower(board.name):
+                    case "chess":
+                        self.positions = "rnbqkbnr/pppppp/8/8/8/8/PPPPPPPP/RNBQKBNR"
+                    case "checkers":
+                        self.positions = (
+                            "1B1B1B1B/B1B1B1B1/1B1B1B1B/8/8/W1W1W1W1/1W1W1W1w/W1W1W1W1"
+                        )
+                    case "go":
+                        self.positions = ""
+                    case _:
+                        if board.name:
+                            feedback(
+                                "The AbstractBoard does not have a setup for '{board.name}'.",
+                                True,
+                                True,
+                            )
+            case "clear":
+                self.positions = ""
+            case _:
+                pass  # leave "as is" for processing
+        return True
+
+    @property
+    def shape_centre(self) -> Point:
+        """Centre of AbstractGameObject."""
+        return None
+
+    @property
+    def geo(self) -> ShapeGeometry:
+        """Geometry of AbstractGameObject in user units."""
+        return None
+
+    @property
+    def geometry(self) -> ShapeGeometry:
+        """Geometry of AbstractGameObject - alias for geo."""
+        return self.geo
+
+    def process_positions(self) -> bool:
+        """Convert positions into a structure of Shapes suitable for drawing."""
+        if self.positions is None or self.positions == "":
+            self.position_shapes = []
+            return False
+        if "/" in self.positions and "/n" in self.positions:
+            feedback(
+                "Do not mix '/' and line-breaks in AbstractGame 'positions'.",
+                True,
+                True,
+            )
+            return False
+        return True
+
+    def draw(self, cnv=None, off_x=0, off_y=0, ID=None, **kwargs):
+        """Draw the AbstractGameObject on a given canvas."""
+        kwargs = self.kwargs | kwargs
+        cnv = cnv if cnv else globals.canvas  # a new Page/Shape may now exist
+        super().draw(cnv, off_x, off_y, ID, **kwargs)  # unit-based props
+        # ---- draw pieces
+        if self.board.pieces and self.positions:
+            pass
+        else:
+            feedback(
+                "To draw an AbstractGame requires at least 'positions' for the pieces",
+                True,
+                True,
+            )
+
+        # ---- draw moves
+
+        # ---- draw annotations

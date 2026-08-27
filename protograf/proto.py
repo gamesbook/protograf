@@ -66,6 +66,8 @@ from .shapes_hexagon import HexShape
 from .shapes_polygon import PolygonShape
 from .shapes_rectangle import RectangleShape
 from .objects import (
+    AbstractBoardObject,
+    AbstractGameObject,
     CardBoxObject,
     CubeObject,
     D6Object,
@@ -5555,6 +5557,84 @@ def BGG(
 
 
 # ---- objects ====
+
+
+@docstring_base
+def AbstractBoard(row=None, col=None, **kwargs):
+    """Store an AbstractBoardObject for the canvas.
+
+    Args:
+
+    - row (int): row in which the shape is located.
+    - col (int): column in which the shape is located.
+
+    Kwargs:
+
+    - name (str): the name of a type of board (default is Checkers)
+    - colors (list): a list of one or more Colors in which to draw alternating
+      board spaces (default is `white`)
+    - hairs (bool): if True, draw small lines extending outwards from board
+      gridlines of one-quarter cell size
+    - labels (bool): if True, draw labels along board edges, using notation
+      appropriate to the type of board; Chess notation is the common default
+    - grid_align (bool): if True, draw pieces on grid intersections, not grid
+      spaces
+    - pieces (list|str): details of pieces that will be placed on the board
+    - pieces_resize (float): a fractional value by which to resize the piece
+      shapes or images (default: 1.0)
+    - rows (int): if no game name (which has a predefined number of rows) is
+      set, these are the number of cells in the vertical direction for a
+      regular grid (default: 8)
+    - cols (int): if no game name (which has a predefined number of rows) is
+      set, these are the number of cells in the horizontal direction for a
+      regular grid (default: 8)
+
+    <base>
+
+    """
+    kwargs = margins(**kwargs)
+    absboard = AbstractBoardObject(canvas=globals.canvas, **kwargs)
+    # absboard.draw()
+    return absboard
+
+
+def abstractboard(*args, **kwargs):
+    kwargs = margins(**kwargs)
+    _obj = args[0] if args else None
+    return AbstractBoardObject(_object=_obj, canvas=globals.canvas, **kwargs)
+
+
+@docstring_base
+def AbstractGame(row=None, col=None, **kwargs):
+    """Draw an AbstractGameObject on the canvas.
+
+    Args:
+
+    - row (int): row in which the shape is drawn.
+    - col (int): column in which the shape is drawn.
+
+    Kwargs:
+
+    - board (str): an AbstractBoardObject (default board type is Checkers)
+      which should be displayed
+    - positions (str): details of where an AbstractBoardObject's pieces go
+      on the board display
+    - moves (list): a list of moves (optional)
+    - annotations (list): a list of board annotations (optional)
+
+    <base>
+
+    """
+    kwargs = margins(**kwargs)
+    absgame = AbstractGameObject(canvas=globals.canvas, **kwargs)
+    absgame.draw()
+    return absgame
+
+
+def abstractgame(*args, **kwargs):
+    kwargs = margins(**kwargs)
+    _obj = args[0] if args else None
+    return AbstractGameObject(_object=_obj, canvas=globals.canvas, **kwargs)
 
 
 @docstring_base
