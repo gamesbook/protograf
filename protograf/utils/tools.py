@@ -283,7 +283,7 @@ def as_bool(value, allow_none: bool = True) -> bool | None:
     >>> as_bool(value='Y')
     True
     """
-    trues = ["yes", "y", "ya", "yep", "yeah", "ja", "oui", "si", "true", "t", "1"]
+    trues = ["yes", "y", "ya", "yep", "yeah", "da", "ja", "oui", "si", "true", "t", "1"]
     if value is None and allow_none:
         return value
     # _label = f" for {label}" if label else " of"

@@ -24,17 +24,18 @@ Abstract games are the ancestors of many modern games.  They continue to be very
 much played and appreciated by gamers of all ages across many societies.
 In addition, many new abstract games are still being designed and tested.
 
-The aim of AbstractBoard and AbstractGame is to allow diagrams for such games to
-be readily created.
+The aim of the ``AbstractBoard`` and ``AbstractGame`` commands is to allow
+diagrams for such games to be readily created.
 
-The AbstractBoard compound object allows for the details of the board and pieces
+The AbstractBoard command allows for the details of the board and pieces
 for such a game to be specified.   However, such an object is **not** designed
 to be shown |dash| it can be thought of as the game being "still in the box".
 
-The AbstractGame compound object will, when supplied with a given AbstractBoard,
-allow for a position in the game |dash| from setup through to end state |dash|
-to be visualised and, optionally, annotated.  A series of such AbstractGame
-objects, all using the same AbstractBoard, could thus depict an entire game.
+The AbstractGame command will, when supplied with a previously defined
+AbstractBoard, allow for a position in the game |dash| from setup through
+to end state |dash| to be visualised and, optionally, annotated.  A series
+of such AbstractGame objects, all using the same AbstractBoard, could thus
+depict an entire game.
 
 .. _abstractBoard:
 
@@ -42,10 +43,25 @@ AbstractBoard Object
 ====================
 
 An AbstractBoard can be specifed either by referring to an existing abstract
-game by name |dash| for example, Chess, Checkers, or Go |dash| or via specific
-combination of rows and columns. Similarly, pieces can also be specified by the
-type of game  |dash| for example, Chess, Checkers, or Go |dash| or completely
-unique ones can be created using *protograf* shapes and/or images.
+game by name |dash| for example, Chess, Checkers (aka Draughts), or Go |dash|
+or via a specific combination of rows and columns.
+
+Similarly, pieces can also be specified by the type of game that they are
+usually used with |dash| for example, Chess, Checkers (aka Draughts), or
+Go.
+
+It is also possible to create completely unique pieces by using one or
+more of *protograf* shapes and/or images.
+
+..NOTE::
+
+    The default settings for an AbstractBoard are:
+    * *name*: ``grid``
+    * *rows*: ``8`` (the same as Chess or Checkers board)
+    * *cols*: ``8`` (the same as Chess or Checkers board)
+    * *pieces*: ``checkers`` (simple black and white circles)
+
+.. _abstractBoardProperties:
 
 AbstractBoard Properties
 ------------------------
@@ -81,6 +97,11 @@ The properties that can be set for an AbstractBoard are:
   of the page margins.  The size of cells on the board are based on these values,
   using the required *rows* and *cols:
 
+.. _abstractBoardPieces:
+
+AbstractBoard Pieces
+--------------------
+
 
 AbstractBoard Examples
 ----------------------
@@ -94,6 +115,8 @@ AbstractGame Object
 An AbstractGame object serves to enable the display of the board and its pieces
 at a given point in an abstract game |dash| often referred to as the "game state".
 
+.. _abstractGameProperties:
+
 AbstractGame Properties
 -----------------------
 
@@ -105,6 +128,79 @@ The properties that can be set for an AbstractBoard are:
   see below for details
 * *moves*: a list of moves; see below for details
 * *annotations*: a list of board annotations; see below for details
+
+.. _abstractGamePositions:
+
+AbstractGame Positions
+----------------------
+
+The *positions* property of an AbstractGame indicates where the pieces |dash|
+as defined for the AbstractBoard by the shapes, icons or images associated with
+a character |dash| are placed.
+
+The notation for doing this is by providing a string of characters.
+There are two options available.
+
+FEN-like Notation
+~~~~~~~~~~~~~~~~~
+
+This notation is based on the Chess notation called "FEN" (ref: wikipedia ???)
+in which the pieces' characters are separated by a combination of numbers, to
+represent blank cells and/or ``/`` (forward slash) to mark the start of the
+next row.
+
+For example:
+
+.. code:: python
+
+   positions = "rnbqkbnr/pppppppp/8"
+
+would represent the Black pieces in Chess, as well as the unoccupied row in
+front of the pawns.
+
+If there are more than nine adjacent blank cells in a row, as there might be in
+a game of Go, then use multiple numbers, For example:
+
+.. code:: python
+
+   positions = ""8B9/B98"
+
+The FEN-like notation is converted internally by *protograf* into
+`Line-and-Dot Notation`_.
+
+Line-and-Dot Notation
+~~~~~~~~~~~~~~~~~~~~~
+
+This notation represents each row as separate line, and each blank cell
+with a ``.`` (dot or full stop).
+
+The best way to represent multi-line sets of characters is by starting
+and ending with triple quotes |dash| `"""`.
+
+For example:
+
+.. code:: python
+
+   positions = """r.bqkb.r
+   .ppppppp"""
+
+would show the rows where Black has moved both Knights and one Pawn.
+
+
+.. _abstractGameMoves:
+
+AbstractBoard Moves
+-------------------
+
+<TBD>
+
+
+.. _abstractGameAnnotations:
+
+AbstractBoard Annotations
+-------------------------
+
+<TBD>
 
 AbstractGame Examples
 ---------------------

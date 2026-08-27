@@ -7,6 +7,7 @@ Create custom objects for protograf
 import logging
 import math
 import random
+import re
 
 # third party
 from pymupdf import Point as muPoint
@@ -1696,7 +1697,7 @@ class AbstractBoardObject(BaseShape):
         self.kwargs = kwargs
         self.set_unit_properties()
         # ---- custom properties
-        self.name = kwargs.get("name", "checkers")
+        self.name = kwargs.get("name", "grid")
         self.colors = kwargs.get("colors", None)
         self.hairs = tools.as_bool(kwargs.get("hairs", False))
         self.labels = tools.as_bool(kwargs.get("labels", False))
@@ -1704,8 +1705,18 @@ class AbstractBoardObject(BaseShape):
         self.pieces = kwargs.get("pieces", None)
         self.pieces_resize = kwargs.get("pieces_resize", 0.8)
         self._validate_choices()
+        # ---- defaults
+        self.pieces_type = None
         # ---- conditional defaults
         match _lower(self.name):
+            case "grid":  # default
+                self.pieces_type = "checkers"
+                if not self.colors:
+                    self.colors = ("white",)
+                if not self.cols:
+                    self.rows = 8
+                if not self.cols:
+                    self.cols = 8
             case "chess":
                 self.pieces_type = "chess"
                 if not self.colors:
@@ -1714,10 +1725,7 @@ class AbstractBoardObject(BaseShape):
                     self.rows = 8
                 if not self.cols:
                     self.cols = 8
-                if not self.pieces:
-                    pass  # TODO - defaults
-
-            case "checkers":  # default
+            case "checkers" | "draughts":
                 self.pieces_type = "checkers"
                 if not self.colors:
                     self.colors = ("white",)
@@ -1738,13 +1746,19 @@ class AbstractBoardObject(BaseShape):
                 raise NotImplementedError("Sorry, a hex board is not available yet.")
             case "hexhex":
                 raise NotImplementedError("Sorry, a hexhex board is not available yet.")
+            case None:
+                pass  # can ignore the name for this AB
             case _:
                 feedback(
                     "The AbstractBoard 'name' property must be one of the following: "
-                    f" Chess, Go, Checkers (not '{self.name}').",
+                    f" Chess, Go, Checkers, or grid (not '{self.name}').",
                     True,
                     True,
                 )
+        # ---- setup pieces
+        self.pieces_map = self.setup_pieces(self.pieces_type)
+        # ---- setup board
+        # TODO - calculate board params
 
     def _validate_choices(self) -> bool:
         """Check user choices for valid selections."""
@@ -1804,8 +1818,32 @@ class AbstractBoardObject(BaseShape):
         cnv = cnv if cnv else globals.canvas  # a new Page/Shape may now exist
         super().draw(cnv, off_x, off_y, ID, **kwargs)  # unit-based props
 
-    def aa(self):
-        pass
+    def setup_pieces(self, pieces_type: str = None) -> dict:
+        """Return pieces mapped from character:shape."""
+        pieces_map = {}
+        pg_pieces = []
+        match pieces_type:
+            case "checkers":
+                pg_pieces = [
+                    ["B", CircleShape(canvas=self.canvas, fill_stroke="black")],
+                    [
+                        "W",
+                        CircleShape(canvas=self.canvas, fill="white", stroke="black"),
+                    ],
+                ]
+            case "chess":
+                pg_pieces = []  # TODO - load images from resources
+            case "go":
+                pg_pieces = []  # TODO - load images from resources
+            case None:
+                pass  # no defauls
+            case _:
+                raise NotImplementedError(
+                    f'Pieces Type "{pieces_type}" is not available.'
+                )
+        # ---- convert PG and User lists to dict
+        # TODO - convert!
+        return pieces_map
 
 
 class AbstractGameObject(BaseShape):
@@ -1880,9 +1918,10 @@ class AbstractGameObject(BaseShape):
         # ---- handle special positions
         match _lower(self.positions):
             case "setup":
-                match _lower(board.name):
+                breakpoint()
+                match _lower(self.board.name):
                     case "chess":
-                        self.positions = "rnbqkbnr/pppppp/8/8/8/8/PPPPPPPP/RNBQKBNR"
+                        self.positions = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR"
                     case "checkers":
                         self.positions = (
                             "1B1B1B1B/B1B1B1B1/1B1B1B1B/8/8/W1W1W1W1/1W1W1W1w/W1W1W1W1"
@@ -1890,9 +1929,16 @@ class AbstractGameObject(BaseShape):
                     case "go":
                         self.positions = ""
                     case _:
-                        if board.name:
+                        if self.board.name:
                             feedback(
-                                "The AbstractBoard does not have a setup for '{board.name}'.",
+                                "The AbstractBoard does not have a setup for '{self.board.name}'.",
+                                True,
+                                True,
+                            )
+                        else:
+                            feedback(
+                                "The AbstractBoard does not have the 'name' property set;"
+                                " so no predefined setup can be determined.",
                                 True,
                                 True,
                             )
@@ -1917,27 +1963,70 @@ class AbstractGameObject(BaseShape):
         """Geometry of AbstractGameObject - alias for geo."""
         return self.geo
 
-    def process_positions(self) -> bool:
-        """Convert positions into a structure of Shapes suitable for drawing."""
+    def set_shape_positions(self, positions) -> list:
+        """Convert positions list into Shapes suitable for drawing on board."""
+
+    def process_positions(self) -> list:
+        """Convert positions into a list structure."""
         if self.positions is None or self.positions == "":
-            self.position_shapes = []
-            return False
+            return []
         if "/" in self.positions and "/n" in self.positions:
             feedback(
                 "Do not mix '/' and line-breaks in AbstractGame 'positions'.",
                 True,
                 True,
             )
-            return False
-        return True
+            return []
+        # ---- get list of item positions
+        if "/" in self.positions:
+            position_std = re.sub(r"\d", lambda m: "." * int(m.group()), self.positions)
+            _position_list = position_std.split("/")
+        elif "/n" in self.positions:
+            _position_list = self.positions.split("/")
+        else:
+            feedback(
+                "Neither '/' or line-break were specified for AbstractGame 'positions'.",
+                True,
+                True,
+            )
+            _position_list = []
+        # ---- clean list
+        position_list = [row for row in _position_list if row]
+        # ---- validate list of item positions
+        if position_list and len(position_list) != self.board.rows:
+            if len(position_list) < self.board.rows:
+                error = "few"
+            if len(position_list) > self.board.rows:
+                error = "many"
+            feedback(
+                f"There are too {error} rows for the AbstractGame 'positions'"
+                f" ({len(position_list)} vs {self.board.rows}).",
+                True,
+                True,
+            )
+        for key, row in enumerate(position_list):
+            if len(row) != self.board.cols:
+                if len(row) < self.board.cols:
+                    error = "few"
+                if len(row) > self.board.cols:
+                    error = "many"
+                feedback(
+                    f"There are too {error} columns for row#{key + 1} of the AbstractGame"
+                    f" 'positions' ({len(row)} vs {self.board.cols}).",
+                    True,
+                    True,
+                )
+        return position_list
 
     def draw(self, cnv=None, off_x=0, off_y=0, ID=None, **kwargs):
         """Draw the AbstractGameObject on a given canvas."""
         kwargs = self.kwargs | kwargs
         cnv = cnv if cnv else globals.canvas  # a new Page/Shape may now exist
         super().draw(cnv, off_x, off_y, ID, **kwargs)  # unit-based props
+        # ---- set positions
+        self.position_matrix = self.process_positions()
         # ---- draw pieces
-        if self.board.pieces and self.positions:
+        if self.board.pieces and self.position_matrix:
             pass
         else:
             feedback(
