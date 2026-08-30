@@ -1683,15 +1683,15 @@ class RaceTrackObject(BaseShape):
                 old_stage = shadow_stage
 
 
-class AbstractBoardObject(BaseShape):
-    """Draw AbstractBoard composite shape on a given canvas.
+class AbstractGameObject(BaseShape):
+    """Create an AbstractGame for a given canvas.
 
     Ref:
 
     """
 
     def __init__(self, _object=None, canvas=None, **kwargs):
-        super(AbstractBoardObject, self).__init__(
+        super(AbstractGameObject, self).__init__(
             _object=_object, canvas=canvas, **kwargs
         )
         self.kwargs = kwargs
@@ -1750,7 +1750,7 @@ class AbstractBoardObject(BaseShape):
                 pass  # can ignore the name for this AB
             case _:
                 feedback(
-                    "The AbstractBoard 'name' property must be one of the following: "
+                    "The AbstractGame 'name' property must be one of the following: "
                     f" Chess, Go, Checkers, or grid (not '{self.name}').",
                     True,
                     True,
@@ -1765,21 +1765,21 @@ class AbstractBoardObject(BaseShape):
         if self.pieces is not None:
             if not isinstance(self.pieces, (list, tuple)):
                 feedback(
-                    "The AbstractBoard 'pieces' property must be a list of pieces, "
+                    "The AbstractGame 'pieces' property must be a list of pieces, "
                     f" not a '{type(self.pieces).__name__}'.",
                     True,
                     True,
                 )
         if not isinstance(self.pieces_resize, (type(None), float, int)):
             feedback(
-                "The AbstractBoard 'pieces_resize' property must be a number, "
+                "The AbstractGame 'pieces_resize' property must be a number, "
                 f" not a '{type(self.name).__name__}'.",
                 True,
                 True,
             )
         if not isinstance(self.name, (type(None), str)):
             feedback(
-                "The AbstractBoard 'name' property must be a string, "
+                "The AbstractGame 'name' property must be a string, "
                 f" not a '{type(self.name).__name__}'.",
                 True,
                 True,
@@ -1787,7 +1787,7 @@ class AbstractBoardObject(BaseShape):
         if self.colors:
             if not isinstance(self.colors, (list, tuple)):
                 feedback(
-                    "The AbstractBoard 'colors' property must be a list of colors, "
+                    "The AbstractGame 'colors' property must be a list of colors, "
                     f" not a '{type(self.name).__name__}'.",
                     True,
                     True,
@@ -1799,21 +1799,21 @@ class AbstractBoardObject(BaseShape):
 
     @property
     def shape_centre(self) -> Point:
-        """Centre of AbstractBoardObject."""
+        """Centre of AbstractGameObject."""
         return None
 
     @property
     def geo(self) -> ShapeGeometry:
-        """Geometry of AbstractBoardObject in user units."""
+        """Geometry of AbstractGameObject in user units."""
         return ShapeGeometry()
 
     @property
     def geometry(self) -> ShapeGeometry:
-        """Geometry of AbstractBoardObject - alias for geo."""
+        """Geometry of AbstractGameObject - alias for geo."""
         return self.geo
 
     def draw(self, cnv=None, off_x=0, off_y=0, ID=None, **kwargs):
-        """Draw the AbstractBoardObject on a given canvas."""
+        """Draw the AbstractGameObject on a given canvas."""
         kwargs = self.kwargs | kwargs
         cnv = cnv if cnv else globals.canvas  # a new Page/Shape may now exist
         super().draw(cnv, off_x, off_y, ID, **kwargs)  # unit-based props
@@ -1846,15 +1846,15 @@ class AbstractBoardObject(BaseShape):
         return pieces_map
 
 
-class AbstractGameObject(BaseShape):
-    """Draw AbstractGame composite shape on a given canvas.
+class AbstractStateObject(BaseShape):
+    """Draw AbstractState composite shape on a given canvas.
 
     Reference:
 
     """
 
     def __init__(self, _object=None, canvas=None, **kwargs):
-        super(AbstractGameObject, self).__init__(
+        super(AbstractStateObject, self).__init__(
             _object=_object, canvas=canvas, **kwargs
         )
         self.kwargs = kwargs
@@ -1866,19 +1866,20 @@ class AbstractGameObject(BaseShape):
         self.annotations = kwargs.get("annotations", None)
         self.position_shapes = []
         self._validate_choices()
-        self.process_positions()
+        # ---- set positions
+        self.position_matrix = self.process_positions()
 
     def _validate_choices(self) -> bool:
         """Check user choices for valid selections."""
         if self.board is None:
             feedback(
-                "The AbstractGame 'board' property must be set!",
+                "The AbstractState 'board' property must be set!",
                 True,
                 True,
             )
-        if not isinstance(self.board, AbstractBoardObject):
+        if not isinstance(self.board, AbstractGameObject):
             feedback(
-                "The AbstractBoard 'board' property must be an AbstractBoard shape, "
+                "The AbstractGame 'board' property must be an AbstractGame shape, "
                 f" not a '{type(self.name).__name__}'.",
                 True,
                 True,
@@ -1886,7 +1887,7 @@ class AbstractGameObject(BaseShape):
             if board.pieces is not None:
                 if not isinstance(board.pieces, (list, tuple)):
                     feedback(
-                        "The AbstractBoard 'pieces' property must be a list of pieces, "
+                        "The AbstractGame 'pieces' property must be a list of pieces, "
                         f" not a '{type(board.pieces).__name__}'.",
                         True,
                         True,
@@ -1894,7 +1895,7 @@ class AbstractGameObject(BaseShape):
         if self.positions is not None:
             if not isinstance(self.positions, str):
                 feedback(
-                    "The AbstractGame 'positions' property must be a string with positions setting or layout, "
+                    "The AbstractState 'positions' property must be a string with positions setting or layout, "
                     f" not a '{type(self.positions).__name__}'.",
                     True,
                     True,
@@ -1902,7 +1903,7 @@ class AbstractGameObject(BaseShape):
         if self.moves is not None:
             if not isinstance(self.moves, (list, tuple)):
                 feedback(
-                    "The AbstractGame 'moves' property must be a list of moves, "
+                    "The AbstractState 'moves' property must be a list of moves, "
                     f" not a '{type(self.moves).__name__}'.",
                     True,
                     True,
@@ -1910,7 +1911,7 @@ class AbstractGameObject(BaseShape):
         if self.annotations is not None:
             if not isinstance(self.annotations, (list, tuple)):
                 feedback(
-                    "The AbstractGame 'annotations' property must be a list of annotations, "
+                    "The AbstractState 'annotations' property must be a list of annotations, "
                     f" not a '{type(self.annotations).__name__}'.",
                     True,
                     True,
@@ -1931,13 +1932,13 @@ class AbstractGameObject(BaseShape):
                     case _:
                         if self.board.name:
                             feedback(
-                                "The AbstractBoard does not have a setup for '{self.board.name}'.",
+                                "The AbstractGame does not have a setup for '{self.board.name}'.",
                                 True,
                                 True,
                             )
                         else:
                             feedback(
-                                "The AbstractBoard does not have the 'name' property set;"
+                                "The AbstractGame does not have the 'name' property set;"
                                 " so no predefined setup can be determined.",
                                 True,
                                 True,
@@ -1950,17 +1951,17 @@ class AbstractGameObject(BaseShape):
 
     @property
     def shape_centre(self) -> Point:
-        """Centre of AbstractGameObject."""
+        """Centre of AbstractStateObject."""
         return None
 
     @property
     def geo(self) -> ShapeGeometry:
-        """Geometry of AbstractGameObject in user units."""
+        """Geometry of AbstractStateObject in user units."""
         return None
 
     @property
     def geometry(self) -> ShapeGeometry:
-        """Geometry of AbstractGameObject - alias for geo."""
+        """Geometry of AbstractStateObject - alias for geo."""
         return self.geo
 
     def set_shape_positions(self, positions) -> list:
@@ -1972,7 +1973,7 @@ class AbstractGameObject(BaseShape):
             return []
         if "/" in self.positions and "/n" in self.positions:
             feedback(
-                "Do not mix '/' and line-breaks in AbstractGame 'positions'.",
+                "Do not mix '/' and line-breaks for AbstractState 'positions'.",
                 True,
                 True,
             )
@@ -1985,56 +1986,78 @@ class AbstractGameObject(BaseShape):
             _position_list = self.positions.split("/")
         else:
             feedback(
-                "Neither '/' or line-break were specified for AbstractGame 'positions'.",
-                True,
+                "Neither '/' or line-break were specified for AbstractState 'positions'"
+                " only a single row will be processed.",
+                False,
                 True,
             )
-            _position_list = []
+            _position_list = self.positions
         # ---- clean list
         position_list = [row for row in _position_list if row]
         # ---- validate list of item positions
         if position_list and len(position_list) != self.board.rows:
             if len(position_list) < self.board.rows:
-                error = "few"
+                feedback(
+                    f"Not all rows have been set for the AbstractState 'positions'"
+                    f" ({len(position_list)} vs {self.board.rows}).",
+                    False,
+                    True,
+                )
             if len(position_list) > self.board.rows:
                 error = "many"
-            feedback(
-                f"There are too {error} rows for the AbstractGame 'positions'"
-                f" ({len(position_list)} vs {self.board.rows}).",
-                True,
-                True,
-            )
-        for key, row in enumerate(position_list):
-            if len(row) != self.board.cols:
-                if len(row) < self.board.cols:
-                    error = "few"
-                if len(row) > self.board.cols:
-                    error = "many"
                 feedback(
-                    f"There are too {error} columns for row#{key + 1} of the AbstractGame"
-                    f" 'positions' ({len(row)} vs {self.board.cols}).",
+                    f"There are too many rows for the AbstractState 'positions'"
+                    f" ({len(position_list)} vs {self.board.rows}).",
                     True,
                     True,
                 )
+        for key, row in enumerate(position_list):
+            if row == ".":
+                row = "." * self.board.cols
+                position_list[key] = row
+            if len(row) != self.board.cols:
+                if len(row) < self.board.cols:
+                    feedback(
+                        f"Not all columns have been set for row#{key + 1} of the"
+                        f" AbstractState 'positions' ({len(row)} vs {self.board.cols}).",
+                        False,
+                        True,
+                    )
+                if len(row) > self.board.cols:
+                    feedback(
+                        f"There are too many columns for row#{key + 1} of the AbstractState"
+                        f" 'positions' ({len(row)} vs {self.board.cols}).",
+                        True,
+                        True,
+                    )
         return position_list
 
     def draw(self, cnv=None, off_x=0, off_y=0, ID=None, **kwargs):
-        """Draw the AbstractGameObject on a given canvas."""
+        """Draw the AbstractStateObject on a given canvas."""
         kwargs = self.kwargs | kwargs
         cnv = cnv if cnv else globals.canvas  # a new Page/Shape may now exist
         super().draw(cnv, off_x, off_y, ID, **kwargs)  # unit-based props
-        # ---- set positions
-        self.position_matrix = self.process_positions()
         # ---- draw pieces
         if self.board.pieces and self.position_matrix:
             pass
-        else:
+        elif self.board.pieces and not self.position_matrix:
             feedback(
-                "To draw an AbstractGame requires at least 'positions' for the pieces",
+                "To draw an AbstractState requires the 'positions' for the pieces",
                 True,
                 True,
             )
-
+        elif self.position_matrix and not self.board.pieces:
+            feedback(
+                "To draw an AbstractState requires the board's pieces to be defined.",
+                True,
+                True,
+            )
+        elif not elf.position_matrix and not self.board.pieces:
+            feedback(
+                "To draw an AbstractState requires both 'positions' and board pieces.",
+                True,
+                True,
+            )
         # ---- draw moves
 
         # ---- draw annotations

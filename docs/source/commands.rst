@@ -21,6 +21,10 @@ a handy cross-reference to the detailed information for that command.
   `Python packages <https://pypi.org>`_  |dash| can be used to further enhance
   your own script.
 
+-  :ref:`AbstractBoard <abstractboard-command>` * - definitions for the board
+   and pieces of an abstract game; *cannot* be drawn
+-  :ref:`AbstractState <abstractstate-command>` * - the layout of pieces on an
+   AbstractBoard
 -  :ref:`Arc <arc-command>` * - a geometric shape that can be drawn on a page
 -  :ref:`Arrow <arrow-command>` * - a geometric shape that can be drawn on a page
 -  :ref:`Band <band-command>` * - a geometric shape that can be drawn on a page

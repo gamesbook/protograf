@@ -66,7 +66,7 @@ from .shapes_hexagon import HexShape
 from .shapes_polygon import PolygonShape
 from .shapes_rectangle import RectangleShape
 from .objects import (
-    AbstractBoardObject,
+    AbstractStateObject,
     AbstractGameObject,
     CardBoxObject,
     CubeObject,
@@ -5560,8 +5560,8 @@ def BGG(
 
 
 @docstring_base
-def AbstractBoard(row=None, col=None, **kwargs):
-    """Store an AbstractBoardObject for the canvas.
+def AbstractGame(row=None, col=None, **kwargs):
+    """Store an AbstractGameObject for the canvas.
 
     Args:
 
@@ -5588,12 +5588,14 @@ def AbstractBoard(row=None, col=None, **kwargs):
     - cols (int): if no game name (which has a predefined number of rows) is
       set, these are the number of cells in the horizontal direction for a
       regular grid (default: 8)
+    - annotations (list): a list of game annotations (optional)
+
 
     <base>
 
     """
     kwargs = margins(**kwargs)
-    absboard = AbstractBoardObject(canvas=globals.canvas, **kwargs)
+    absboard = AbstractGameObject(canvas=globals.canvas, **kwargs)
     # absboard.draw()
     return absboard
 
@@ -5601,12 +5603,12 @@ def AbstractBoard(row=None, col=None, **kwargs):
 def abstractboard(*args, **kwargs):
     kwargs = margins(**kwargs)
     _obj = args[0] if args else None
-    return AbstractBoardObject(_object=_obj, canvas=globals.canvas, **kwargs)
+    return AbstractGameObject(_object=_obj, canvas=globals.canvas, **kwargs)
 
 
 @docstring_base
-def AbstractGame(row=None, col=None, **kwargs):
-    """Draw an AbstractGameObject on the canvas.
+def AbstractState(row=None, col=None, **kwargs):
+    """Draw an AbstractStateObject on the canvas.
 
     Args:
 
@@ -5615,18 +5617,17 @@ def AbstractGame(row=None, col=None, **kwargs):
 
     Kwargs:
 
-    - board (str): an AbstractBoardObject (default board type is Checkers)
+    - board (str): an AbstractGameObject (default board type is Checkers)
       which should be displayed
-    - positions (str): details of where an AbstractBoardObject's pieces go
+    - positions (str): details of where an AbstractGameObject's pieces go
       on the board display
-    - moves (list): a list of moves (optional)
-    - annotations (list): a list of board annotations (optional)
+    - annotations (list): a list of state annotations (optional)
 
     <base>
 
     """
     kwargs = margins(**kwargs)
-    absgame = AbstractGameObject(canvas=globals.canvas, **kwargs)
+    absgame = AbstractStateObject(canvas=globals.canvas, **kwargs)
     absgame.draw()
     return absgame
 
@@ -5634,7 +5635,7 @@ def AbstractGame(row=None, col=None, **kwargs):
 def abstractgame(*args, **kwargs):
     kwargs = margins(**kwargs)
     _obj = args[0] if args else None
-    return AbstractGameObject(_object=_obj, canvas=globals.canvas, **kwargs)
+    return AbstractStateObject(_object=_obj, canvas=globals.canvas, **kwargs)
 
 
 @docstring_base
