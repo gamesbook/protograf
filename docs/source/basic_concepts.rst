@@ -231,10 +231,19 @@ Common examples of settings include:
 
 All of these types of settings are termed **properties**.
 
-Most of the common properties are defined in the section covering
-:doc:`terminology <terminology>` and their usage is covered in
-the section on :doc:`core chapes <core_shapes>`.  Some shapes have
-more :doc:`extensive properties  <customised_shapes>`.
+A property is usually set by providing its name and value along with the
+element, or command, that it applies to; for example:
+
+.. code:: python
+
+  Circle(radius=2.5)
+
+is a command used to create a ``Circle`` element with a radius of ``2.5`` cm.
+
+Most of the common properties are listed in the section on
+:doc:`terminology <terminology>` and examples of their usage, as well as
+those of various specialised properties, is covered in many of the other
+sections in  **protograf**.
 
 .. _basic-color:
 

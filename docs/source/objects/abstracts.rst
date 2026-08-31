@@ -4,8 +4,8 @@ AbstractGame and AbstractState
 
 .. |dash| unicode:: U+2014 .. EM DASH SIGN
 
-The AbstractGame and AbstractState are one of a number of what are termed
-:doc:`Compound Objects <../objects>`.
+The ``AbstractGame`` and ``AbstractState`` are two of a number of commands
+used to create what are termed :doc:`Compound Objects <index>`.
 
 This section assumes you are very familiar with the concepts, terms and ideas
 for :doc:`protograf <../index>`  as presented in the
@@ -27,18 +27,18 @@ In addition, many new abstract games are still being designed and tested.
 The aim of the ``AbstractGame`` and ``AbstractState`` commands is to allow
 diagrams for such games to be readily created.
 
-The AbstractGame command allows for the details of the board and pieces
+The ``AbstractGame`` command allows for the details of the board and pieces
 for such a game to be specified.   However, such an object is **not** designed
 to be drawn |dash| it can be thought of as the game being "still in the box".
 
-The AbstractState command will, when supplied with a previously defined
+The ``AbstractState`` command will, when supplied with a previously defined
 AbstractGame, allow for a position in the game |dash| at any point from
 the setup through to its end state |dash| to be shown in diagrammatic form
 and, optionally, annotated.
 
-A series of AbstractState objects, all using the same AbstractGame could, if
-required, depict an entire game but this is not the primary intended use of
-the AbstractState command.
+A series of ``AbstractState`` commands, all using the same AbstractGame could,
+if required, depict an entire game but this is not the primary intended use
+of the AbstractState command.
 
 .. NOTE::
 
@@ -64,13 +64,18 @@ with |dash| for example, Chess, Checkers (aka Draughts), or Go. It is also
 possible to create completely unique pieces by using one or more of
 *protograf* shapes and/or images.
 
-..NOTE::
+.. NOTE::
 
     The default settings for an AbstractGame are:
+
     * *name*: ``grid``
     * *rows*: ``8`` (the same as Chess or Checkers board)
     * *cols*: ``8`` (the same as Chess or Checkers board)
     * *pieces*: ``checkers`` (simple black and white circles)
+
+    Note also that the definitions of the board and pieces are **not** the
+    determinants of where the pieces get placed; how many pieces there are,
+    or what the rules are for their movement!
 
 .. _abstractGameProperties:
 
@@ -83,17 +88,21 @@ The properties that can be set for an AbstractGame are:
   one of: ``chess``, ``checkers``, ``go``; if omitted, the
   type is a simply a ``grid``
 * *pieces*: details of pieces that will be placed on the board; the piece set
-  can |dash| **independantly of the board name |dash| be chosen from a
-  prexisting set ``chess``, ``checkers`` (the default), ``go`` or a custom
-  set defined in a list |dash| see below for `AbstractGame Pieces`_
-* *colors*: a list of one or more Colors in which to draw alternating
-  board spaces; the default is to draw all squares ``white``
-* *hairs*: if True, draw small lines extending outwards from board gridlines;
-  these lines are one-quarter of the length of a board cell, for example, if
-  the board had squares of 1", the hairs would be one-quarter inch long
-* *labels*: if True, draw labels along board edges, using notation appropriate
-  to type of board
-* *grid_align*: if True, draw pieces on grid intersections, not grid spaces
+  can |dash| **independantly** of the board name |dash| be chosen from a
+  pre-existing set: ``chess``, ``checkers`` (the default), ``go`` or a
+  customised list; see below for `AbstractGame Pieces`_
+* *colors*: a list of one or more :ref:`colors <basic-color>`  in which to draw
+  alternating board spaces; the default is to draw all squares ``white`` (or
+  the board's *fill* color)
+* *hairs*: if ``True``, draw small lines extending outwards from the board's
+  gridlines; these lines are one-quarter of the length of a board cell, for
+  example, if the board had squares of side 1 inch, then the hairs would be
+  one-quarter of an inch long
+* *labels*: if ``True``, draw labels along board edges, using notation
+  appropriate to the type of board; the primary labelling system is based on
+  the one used for Chess
+* *grid_align*: if ``True``, draw pieces on grid intersections, not grid spaces,
+  and label lines, not spaces
 * *pieces_resize*: a fractional value by which to resize the built-in piece
   shapes or images; this defaults to ``1`` |dash| note that this does **not**
   apply to custom-made shapes
@@ -110,10 +119,17 @@ The properties that can be set for an AbstractGame are:
 * *annotations*: a list of AbstractGame annotations; see below for details
 
 
-.. _abstractGamePieces:
+.. _abstractGameBoard:
 
 AbstractGame Board
 ------------------
+
+A basic AbstractGame board is just a square grid and, depending on the game,
+will contain either an equal or unequal number of rows and columms.
+
+Such a grid allows pieces to be placed either in the spaces between the lines
+or on their intersection points |dash| **protograf** terms these locations
+*cells*.
 
 
 .. _abstractGamePieces:
@@ -140,8 +156,9 @@ AbstractState Command
 =====================
 
 The ``AbstractState()`` command will create a display of a board and its pieces
-at a given point in an abstract game |dash| a situation commonly referred to as
-the "game state".
+that have been defined in an :ref:`AbstractGame <abstractgame-command>`. This
+display represents a given point in an abstract game |dash| a situation commonly
+referred to as "the game state".
 
 .. _AbstractStateProperties:
 
@@ -171,10 +188,11 @@ There are two options available.
 FEN-like Notation
 ~~~~~~~~~~~~~~~~~
 
-This notation is based on the Chess notation called "FEN" (ref: wikipedia ???)
+This notation is based on the Chess notation called "FEN" (see:
+https://en.wikipedia.org/wiki/Forsyth%E2%80%93Edwards_Notation)
 in which the pieces' characters are separated by a combination of numbers, to
-represent blank cells and/or ``/`` (forward slash) to mark the start of the
-next row.
+represent blank cells and/or ``/`` (forward slash) characters to mark the
+start of the next row.
 
 For example:
 
@@ -211,7 +229,8 @@ For example:
    positions = """r.bqkb.r
    .ppppppp"""
 
-would show the rows where Black has moved both Knights and one Pawn.
+would show the rows in a Chess game where Black has moved both Knights
+and one Pawn.
 
 If row is entirely blank, it can be shown with a single ``.``.
 

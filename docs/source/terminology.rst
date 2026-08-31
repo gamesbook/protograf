@@ -54,7 +54,8 @@ places in the documentation:
   e.g. ``[1, 2, 3]`` |dash| which are usually assigned to a property
 - **property** - an aspect of a command or shape that helps define how it works
   or looks; for example, a circle might have its size defined by using a radius
-  property of 2 centimetres |dash| in a script this is shown as ``radius=2``
+  property of 2 centimetres |dash| in a script's command this can be shown as
+  ``radius=2``
 - **shape** - a geometric element, for example, a circle, square, text or
   line i.e. something that can be drawn |dash| see a list in
   :doc:`Shapes <core_shapes>`
@@ -63,8 +64,8 @@ places in the documentation:
 - **set** - a number of comma-separated values enclosed in round brackets
   e.g. ``(1, "a")`` |dash| these are usually assigned to a property
 - **run** - to cause Python to act on the script so that all commands in
-  it are carried out |dash| this should usually cause an output file to be
-  created (or recreated)
+  it are carried out |dash| this should usually cause an output file, such as
+  a PDF document, to be created (or recreated)
 - **vertex** / **vertices** - the sharp "points" at the intersection of the
   lines used to construct a shape; for example, a triangle has 3 vertices;
   a square has 4 vertices and a hexagon has 6 vertices
@@ -128,8 +129,8 @@ Quick Colors
 ------------
 
 A list of "one-letter" colors is also available (based off of a popular
-Python library called *matplotlib*); their RGB hexadecimal codes are also
-shown here for reference:
+Python library called `matplotlib <https://matplotlib.org/>`_); these
+RGB hexadecimal codes are also shown here for quick reference:
 
 - ``b`` is blue ("#0000FF")
 - ``c`` is cyan ("#00FFFF")
@@ -176,7 +177,7 @@ the respective proprerties of a shape that is being drawn.
 
 .. IMPORTANT::
 
-   **Note** that it is possible to use the term *None* in place of a
+   **Note** that it is possible to use the term ``None`` in place of a
    specific color; this effectively means that nothing will be drawn
    there - this results in an "invisible" line or area!
 
@@ -197,7 +198,7 @@ from the left- and top-edge of a page or a card.
 and **y** positions; it could be a row and/or column identifier; it
 could be a sequence identifier; or just a indicator of where something
 is relative to something else, for example, a coordinate being drawn
-at the *top* of a ``Hexagon``.
+at the *top* of a :ref:`Hexagon <hexagon-command>`.
 
 -  **align** - used to move ``Text`` horizontally, relative to its starting
    location; can be one of: *justify*, *left*, *right*, or *centre*
@@ -205,6 +206,9 @@ at the *top* of a ``Hexagon``.
    its starting location; can be one of:  *left*, *centre*, or *right*
 -  **align_vertical** - used to move an ``Image`` vertically, relative to
    its starting location; can be one of:  *top*, *middle*, or *bottom*
+-  **cell** - not a value that can be set, but the reference to either a
+   space, or an intersection point, for an
+   :ref:`AbstractGame <abstractgame-command>`
 -  **cx** - the centre position of a shape, measured in the horizontal
    direction; its usually the case that the distance is not absolute, but
    relative to some other value e.g. distance from a margin; or the edge

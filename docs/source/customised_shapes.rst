@@ -424,7 +424,7 @@ or ``"right"``; the *align_vertical* property can take on values of ``"top"``,
 For examples, see `Example 4. Alignment`_
 
 
-.. _imageOperations:.. _
+.. _imageOperations:
 
 Image Operations
 ----------------
