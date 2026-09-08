@@ -286,7 +286,6 @@ class PolyominoObject(RectangleShape):
                 feedback(f"The Tetronimo letter {self.letter} is unknown", True)
 
         swidth = 0.0247 * self.unit(self.width)
-        # breakpoint()
         self.centre_shape = RectangleShape(
             width=0.8 * self.width,
             height=0.8 * self.height,
@@ -1702,7 +1701,8 @@ class AbstractGameObject(BaseShape):
         self.hairs = tools.as_bool(kwargs.get("hairs", False))
         self.labels = tools.as_bool(kwargs.get("labels", False))
         self.grid_align = tools.as_bool(kwargs.get("grid_align", False))
-        self.pieces = kwargs.get("pieces", None)
+        self.pieces = None
+        user_pieces = kwargs.get("pieces", [])
         self.pieces_resize = kwargs.get("pieces_resize", 0.8)
         self._validate_choices()
         # ---- defaults
@@ -1756,8 +1756,9 @@ class AbstractGameObject(BaseShape):
                     True,
                 )
         # ---- setup pieces
-        self.pieces_map = self.setup_pieces(self.pieces_type)
+        self.pieces = self.setup_pieces(self.pieces_type, user_pieces)
         # ---- setup board
+        print("TODO - setup board!")
         # TODO - calculate board params
 
     def _validate_choices(self) -> bool:
@@ -1818,23 +1819,54 @@ class AbstractGameObject(BaseShape):
         cnv = cnv if cnv else globals.canvas  # a new Page/Shape may now exist
         super().draw(cnv, off_x, off_y, ID, **kwargs)  # unit-based props
 
-    def setup_pieces(self, pieces_type: str = None) -> dict:
-        """Return pieces mapped from character:shape."""
-        pieces_map = {}
-        pg_pieces = []
+    def character_map(self, piece_name: str) -> object:
+        """Return predefined shape or Image associated with a known piece character."""
+
+        def chess_piece(name):
+            # lookup image and return Image
+            return None
+
+        def go_stone(name):
+            # lookup image and return Image
+            return None
+
+        match piece_name:
+            case "cB":
+                return CircleShape(canvas=self.canvas, fill="black", stroke="black")
+            case "cW":
+                return CircleShape(canvas=self.canvas, fill="white", stroke="black")
+            case "gB":
+                return go_stone("black")
+            case "gW":
+                return go_stone("white")
+            case "b":
+                return chess_piece("bishop_black")
+            case "B":
+                return chess_piece("bishop_white")
+            case _:
+                raise NotImplementedError(f"Piece type {piece_name} is not pre-defined")
+
+    def setup_pieces(self, pieces_type: str = None, pieces_list: list = None) -> dict:
+        """Return pieces mapped as character:shape(s)."""
+        if pieces_type is None and not pieces_list:
+            pieces_type = "checkers"  # Default!
+        pg_pieces = {}
         match pieces_type:
-            case "checkers":
-                pg_pieces = [
-                    ["B", CircleShape(canvas=self.canvas, fill_stroke="black")],
-                    [
-                        "W",
-                        CircleShape(canvas=self.canvas, fill="white", stroke="black"),
-                    ],
-                ]
+            case "checkers" | "draughts":
+                pg_pieces = {
+                    "B": self.character_map("cB"),
+                    "W": self.character_map("cW"),
+                }
             case "chess":
-                pg_pieces = []  # TODO - load images from resources
+                pg_pieces = {  # TODO - load images from resources
+                    "B": self.character_map("B"),
+                    "b": self.character_map("b"),
+                }
             case "go":
-                pg_pieces = []  # TODO - load images from resources
+                pg_pieces = {  # TODO - load images from resources
+                    "B": self.character_map("gB"),
+                    "W": self.character_map("gW"),
+                }
             case None:
                 pass  # no defauls
             case _:
@@ -1842,8 +1874,107 @@ class AbstractGameObject(BaseShape):
                     f'Pieces Type "{pieces_type}" is not available.'
                 )
         # ---- convert PG and User lists to dict
-        # TODO - convert!
-        return pieces_map
+        if not pieces_list:
+            pieces_list = []
+        for _piece in pieces_list:
+            if not isinstance(_piece, (list, tuple)):
+                feedback(
+                    "The AbstractGame 'pieces' property must contain a list of lists,"
+                    f" not a '{type(self.name).__name__}'.",
+                    True,
+                    True,
+                )
+            if len(_piece) < 2:
+                feedback(
+                    "Each item in the AbstractGame 'pieces' property must contain a piece identity and its pattern,"
+                    f" so not '{_piece}'.",
+                    True,
+                    True,
+                )
+            piece_id = _piece[0]
+            if not isinstance(piece_id, str) or _piece == ".":
+                feedback(
+                    "Each item in the AbstractGame 'pieces' property must have a single character piece identity,"
+                    f" not '{piece_id}'.",
+                    True,
+                    True,
+                )
+            if len(piece_id) != 1:
+                feedback(
+                    "Each item in the AbstractGame 'pieces' property must have a single character piece identity,"
+                    f" not '{piece_id}'.",
+                    True,
+                    True,
+                )
+            if isinstance(_piece[1], str):
+                # try to use existing, defined piece
+                # e.g. checkers_black, or chess_white_rook
+                parts = _piece[1].split("_")
+                game = _lower(parts[0])
+                if game not in ("go", "checkers", "chess"):
+                    feedback(
+                        "A named piece type must start with a matching game, "
+                        f" not '{parts[0]}'.",
+                        True,
+                        True,
+                    )
+                if len(parts) < 2:
+                    feedback(
+                        "A named piece type must start with a matching game, followed by a color, "
+                        f" not '{parts}'.",
+                        True,
+                        True,
+                    )
+                pcolor = _lower(parts[1])
+                if pcolor not in ("black", "white"):
+                    feedback(
+                        "A named piece type color must be either black or white, "
+                        f" not '{parts[1]}'.",
+                        True,
+                        True,
+                    )
+                if len(parts) > 2:
+                    pname = _lower(parts[2])
+                    if pname not in (
+                        "pawn",
+                        "queen",
+                        "king",
+                        "rook",
+                        "bishop",
+                        "knight",
+                    ):
+                        feedback(
+                            f"A named piece's Chess name cannot be '{parts[2]}'.",
+                            True,
+                            True,
+                        )
+                    match game:
+                        case "checkers":
+                            match pcolor:
+                                case "black":
+                                    pg_pieces[piece_id] = self.character_map("cB")
+                                case "white":
+                                    pg_pieces[piece_id] = self.character_map("cW")
+                        case "chess":
+                            match pcolor:
+                                case "black":
+                                    pg_pieces[piece_id] = self.character_map(pname)
+                                case "white":
+                                    pg_pieces[piece_id] = self.character_map(
+                                        pname.upper()
+                                    )
+                        case "go":
+                            match pcolor:
+                                case "black":
+                                    pg_pieces[piece_id] = self.character_map("gB")
+                                case "white":
+                                    pg_pieces[piece_id] = self.character_map("bW")
+
+            else:
+                # user-defined piece; could be single shape or list of shapes
+                pg_pieces[piece_id] = _piece[1]
+
+        return pg_pieces
 
 
 class AbstractStateObject(BaseShape):
@@ -1861,7 +1992,7 @@ class AbstractStateObject(BaseShape):
         self.set_unit_properties()
         # ---- custom properties
         self.board = kwargs.get("board", None)
-        self.positions = kwargs.get("positions", None)
+        self.positions = kwargs.get("positions", ".")
         self.moves = kwargs.get("moves", None)
         self.annotations = kwargs.get("annotations", None)
         self.position_shapes = []
@@ -1884,11 +2015,11 @@ class AbstractStateObject(BaseShape):
                 True,
                 True,
             )
-            if board.pieces is not None:
-                if not isinstance(board.pieces, (list, tuple)):
+            if self.board.pieces is not None:
+                if not isinstance(self.board.pieces, (list, tuple)):
                     feedback(
                         "The AbstractGame 'pieces' property must be a list of pieces, "
-                        f" not a '{type(board.pieces).__name__}'.",
+                        f" not a '{type(self.board.pieces).__name__}'.",
                         True,
                         True,
                     )
@@ -1919,7 +2050,6 @@ class AbstractStateObject(BaseShape):
         # ---- handle special positions
         match _lower(self.positions):
             case "setup":
-                breakpoint()
                 match _lower(self.board.name):
                     case "chess":
                         self.positions = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR"
@@ -1986,10 +2116,9 @@ class AbstractStateObject(BaseShape):
             _position_list = self.positions.split("/")
         else:
             feedback(
-                "Neither '/' or line-break were specified for AbstractState 'positions'"
-                " only a single row will be processed.",
+                "Neither '/' or line-break were specified for AbstractState 'positions',"
+                " so only a single row will be processed.",
                 False,
-                True,
             )
             _position_list = self.positions
         # ---- clean list
@@ -2001,10 +2130,8 @@ class AbstractStateObject(BaseShape):
                     f"Not all rows have been set for the AbstractState 'positions'"
                     f" ({len(position_list)} vs {self.board.rows}).",
                     False,
-                    True,
                 )
             if len(position_list) > self.board.rows:
-                error = "many"
                 feedback(
                     f"There are too many rows for the AbstractState 'positions'"
                     f" ({len(position_list)} vs {self.board.rows}).",
@@ -2021,7 +2148,6 @@ class AbstractStateObject(BaseShape):
                         f"Not all columns have been set for row#{key + 1} of the"
                         f" AbstractState 'positions' ({len(row)} vs {self.board.cols}).",
                         False,
-                        True,
                     )
                 if len(row) > self.board.cols:
                     feedback(
@@ -2052,7 +2178,7 @@ class AbstractStateObject(BaseShape):
                 True,
                 True,
             )
-        elif not elf.position_matrix and not self.board.pieces:
+        elif not self.position_matrix and not self.board.pieces:
             feedback(
                 "To draw an AbstractState requires both 'positions' and board pieces.",
                 True,

@@ -39,7 +39,8 @@ and commands, which act as summary and cross-reference.
 10. :doc:`Customised Text <customised_text>` - how to refine the
     appearance of text
 11. :doc:`Compound Objects <objects>` - special composite shapes not part
-    of the core shapes e.g. cubes, dice, polyominoes, pentominoes, tuckbox
+    of the core shapes e.g. cubes, dice, polyominoes, pentominoes, tuckbox,
+    abstract board & game
 12. :doc:`Repetitive Elements <layouts>` - how to work with repeats, sequences,
     tracks and grid layouts
 13. :doc:`Hexagonal <hexagonal_grids>` and :doc:`HexHex <hexhex_grids>`

@@ -21,8 +21,8 @@ Introduction
 The aim of :doc:`protograf <index>` is to provide a general purpose
 program that allows you to design simple, scalable and reproducible text
 and graphics that can be used for prototyping the elements or components
-of a project, such as the creation of a board game, including the board,
-the tiles, the cards, the box, and so on.
+of a project, such as the creation of a board game; including the board,
+tiles, cards, playmat, box, and so on.
 
 .. IMPORTANT::
 
