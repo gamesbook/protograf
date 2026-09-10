@@ -1,15 +1,15 @@
 # -*- coding: utf-8 -*-
 """
-Dice functions for protograf
-
-Note: for the D6 Shape - see objects.py
+protograf function for generating dice rolls
 """
 
 # lib
 import random
 
 # third party
+
 # project
+from protograf.utils.messaging import feedback
 
 
 class Dice:
@@ -49,9 +49,9 @@ class Dice:
         """Generate a list with count values, summed for the number of dice."""
         self.set_rolls(rolls=count)
         self.set_dice(dice=dice)
-        for rll in range(0, self.roll_count):
+        for _rll in range(0, self.roll_count):
             total = 0
-            for dce in range(0, self.dice_count):
+            for _dce in range(0, self.dice_count):
                 total += random.randint(1, pips)
             self.rolls.append(total)
         return self.rolls
@@ -104,3 +104,60 @@ class DiceD100(Dice):
 
     def roll(self, count=None):
         return self.do_roll(count=count, pips=100)
+
+
+def roll_dice(dice="1d6", rolls=None):
+    """Roll multiple totals for a type of die.
+
+    Examples:
+    >>> roll_dice('2d6')  # Catan dice roll
+    [9]
+    >>> roll_dice('3D6', 6)  # D&D Basic Character Attributes
+    [14, 11, 8, 10, 9, 7]
+    >>> roll_dice()  # single D6 roll
+    [3]
+    """
+    if not dice:
+        dice = "1d6"
+    try:
+        dice = dice.replace(" ", "").replace("D", "d")
+        _list = dice.split("d")
+        _type, pips = int(_list[0]), int(_list[1])
+    except Exception:
+        feedback(f'Unable to determine dice type/roll for "{dice}"', True)
+    return Dice().multi_roll(count=rolls, pips=pips, dice=_type)
+
+
+def roll_d4(rolls=None):
+    """Roll multiple totals for a 4-sided die."""
+    return DiceD4().roll(count=rolls)
+
+
+def roll_d6(rolls=None):
+    """Roll multiple totals for a 6-sided die."""
+    return DiceD6().roll(count=rolls)
+
+
+def roll_d8(rolls=None):
+    """Roll multiple totals for a 8-sided die."""
+    return DiceD8().roll(count=rolls)
+
+
+def roll_d10(rolls=None):
+    """Roll multiple totals for a 10-sided die."""
+    return DiceD10().roll(count=rolls)
+
+
+def roll_d12(rolls=None):
+    """Roll multiple totals for a 12-sided die."""
+    return DiceD12().roll(count=rolls)
+
+
+def roll_d20(rolls=None):
+    """Roll multiple totals for a 20-sided die."""
+    return DiceD20().roll(count=rolls)
+
+
+def roll_d100(rolls=None):
+    """Roll multiple totals for a 100-sided die."""
+    return DiceD100().roll(count=rolls)

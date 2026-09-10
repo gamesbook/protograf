@@ -22,7 +22,7 @@ import pymupdf
 from pymupdf import Point as muPoint, Rect as muRect
 import segno  # QRCode
 
-# local
+# project
 from protograf import globals
 from protograf.shapes_utils import set_cached_dir, draw_line, draw_line_curve
 from protograf.base import (
@@ -32,10 +32,6 @@ from protograf.base import (
 from protograf.base_extended import (
     BasePolyShape,
 )
-from protograf.shapes_circle import CircleShape
-from protograf.shapes_hexagon import HexShape
-from protograf.shapes_polygon import PolygonShape
-from protograf.shapes_rectangle import RectangleShape
 from protograf.utils import connections
 from protograf.utils import colrs, geoms, support, tools, fonts
 from protograf.utils.tools import _lower  # , _vprint
@@ -51,6 +47,13 @@ from protograf.utils.structures import (
     TriangleType,
     Vertex,
 )  # named tuples
+
+# locale
+from .circle import CircleShape
+
+# from .hexagon import HexShape
+# from .polygon import PolygonShape
+from .rectangle import RectangleShape
 
 log = logging.getLogger(__name__)
 DEBUG = False
@@ -414,8 +417,10 @@ class ImageShape(BaseShape):
         cache_name = ""  # created based on resize or alterations
 
         # ---- image resize (and resample)
+        resample = Image.Resampling.LANCZOS
         if kwargs.get("resample"):
             res = _lower(kwargs.get("resample"))
+            resample = Image.Resampling.BICUBIC
             match res:
                 case "lanczos" | "l":
                     resample = Image.Resampling.LANCZOS
@@ -435,8 +440,7 @@ class ImageShape(BaseShape):
                         True,
                         True,
                     )
-        else:
-            resample = Image.Resampling.LANCZOS
+
         if kwargs.get("fit") and kwargs.get("resize"):
             feedback(
                 'Use either "fit" or "resize" but not both for an Image.', True, True
@@ -1657,6 +1661,7 @@ class EllipseShape(BaseShape):
 
     def calculate_xy(self, **kwargs):
         """Start point of Ellipse in points."""
+        x, y = None, None
         # ---- adjust start
         if self.row is not None and self.col is not None:
             x = self.col * self._u.width + self._o.delta_x
@@ -2502,7 +2507,7 @@ class RhombusShape(BaseShape):
     @property  # do NOT cache because centre needs to be changed!
     def _shape_centre(self) -> Point:
         """Centre of Rhombus in points."""
-        cx, cy = None, None
+        cx, cy, x, y = None, None, None, None
         if self.use_abs_c:
             # ---- overrides for grid layout or centred shape
             cx = self._abs_cx

@@ -7,8 +7,8 @@ protograf Class for layout of Hexagons on a grid
 
 # module
 from protograf import globals
-from protograf.proto import hexagon, Hexagon
-from protograf.shapes_hexagon import HexShape
+from protograf.proto_shapes import hexagon, Hexagon
+from protograf.shapes import HexShape
 from protograf.utils import tools  # , geoms, support
 from protograf.utils.messaging import feedback
 from protograf.utils.tools import _lower

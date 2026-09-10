@@ -23,8 +23,7 @@ from protograf.utils.structures import (
 from protograf.utils import geoms, tools, support
 from protograf.utils.tools import _lower
 from protograf.base import BaseShape, BaseCanvas
-from protograf.shapes import TextShape, VirtualShape
-from protograf.shapes_hexagon import HexShape
+from protograf.shapes import HexShape, TextShape, VirtualShape
 
 log = logging.getLogger(__name__)
 DEBUG = False
@@ -1413,6 +1412,7 @@ class RectangularLocations(VirtualLocations):
         # ---- calculated values
         self.total_height = self.interval_x * (self.rows - 1)
         self.total_width = self.interval_y * (self.cols - 1)
+        self.cells = {}  # store (col,row) : Point(x,y)
 
     def rectangle_validate(self, **kwargs):
         """Check that settings for RectangularLocations are correct."""
@@ -1501,6 +1501,7 @@ class RectangularLocations(VirtualLocations):
             # TODO!  set actual x and y
             x = self.x + (col - 1) * self.interval_x
             y = self.y + (row - 1) * self.interval_y
+            self.cells[(col, row)] = Point(x, y)
             # offset(s)
             if self.side:
                 if row & 1:

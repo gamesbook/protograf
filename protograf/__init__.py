@@ -1,10 +1,11 @@
+# protograf
 from ._version import __version__, __version_info__
-from .proto import *
+
+# from .proto import *
 
 # protos
-from protograf.protos.hexagons import Hexagons
-from protograf.protos.gridline import GridLine
-from protograf.protos.locations import Location, Locations
+from protograf.protos import *
+from protograf.layout import Layout
 
 # utils
 from protograf.utils.geoms import point_from_angle

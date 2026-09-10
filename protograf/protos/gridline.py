@@ -10,7 +10,7 @@ from typing import Union
 
 # module
 from protograf import globals
-from protograf.proto import base_shape, line, arc
+from protograf.proto_shapes import base_shape, line, arc
 from protograf.utils import tools, geoms  # , support
 from protograf.utils.messaging import feedback
 from protograf.utils.tools import _lower

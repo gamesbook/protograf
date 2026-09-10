@@ -9,9 +9,9 @@ import math
 # local
 from protograf import globals
 from protograf.base import BaseShape
-from protograf.shapes_hexagon import HexShape
-from protograf.shapes_polygon import PolygonShape
-from protograf.shapes_utils import draw_line_curve
+from protograf.shapes.hexagon import HexShape
+from protograf.shapes.polygon import PolygonShape
+from protograf.shapes.utils import draw_line_curve
 from protograf.utils.messaging import feedback
 from protograf.utils.tools import _lower, validated_directions  # , _vprint
 from protograf.utils import geoms, tools
